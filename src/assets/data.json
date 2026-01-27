@@ -1,0 +1,6 @@
+{
+  "wares": {},
+  "modules": [
+    { "id": "test_module", "name": "测试模块", "race": "Argon" }
+  ]
+}

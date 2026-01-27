@@ -1,0 +1,62 @@
+[
+  {
+    "code": "en",
+    "name": "English",
+    "x4_id": "044"
+  },
+  {
+    "code": "de",
+    "name": "Deutsch",
+    "x4_id": "049"
+  },
+  {
+    "code": "fr",
+    "name": "Français",
+    "x4_id": "033"
+  },
+  {
+    "code": "it",
+    "name": "Italiano",
+    "x4_id": "039"
+  },
+  {
+    "code": "es",
+    "name": "Español",
+    "x4_id": "034"
+  },
+  {
+    "code": "ru",
+    "name": "Русский",
+    "x4_id": "007"
+  },
+  {
+    "code": "ja",
+    "name": "日本語",
+    "x4_id": "081"
+  },
+  {
+    "code": "ko",
+    "name": "한국어",
+    "x4_id": "082"
+  },
+  {
+    "code": "zh-CN",
+    "name": "简体中文",
+    "x4_id": "086"
+  },
+  {
+    "code": "zh-TW",
+    "name": "繁體中文",
+    "x4_id": "088"
+  },
+  {
+    "code": "pt-BR",
+    "name": "Português (Brasil)",
+    "x4_id": "055"
+  },
+  {
+    "code": "pl",
+    "name": "Polski",
+    "x4_id": "048"
+  }
+]

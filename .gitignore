@@ -1,0 +1,63 @@
+# ==========================
+# 1. Node.js & 前端构建
+# ==========================
+node_modules/
+.pnpm-store/
+dist/
+dist-ssr/
+*.local
+
+# 日志文件
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ==========================
+# 2. Python 脚本相关
+# ==========================
+# 字节码编译文件
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 虚拟环境 (如果你使用了 venv)
+venv/
+.venv/
+env/
+.env/
+
+# ==========================
+# 3. X4 项目特定数据 (关键)
+# ==========================
+# 忽略解包后的原始游戏数据
+# 原因：体积巨大、包含版权内容，严禁上传到 GitHub
+x4_raw_data/
+
+# 之前的中间产物目录 (如果有残留)
+output_assets/
+
+# 忽略 Python 脚本生成的临时缓存或日志(如果有)
+scripts/*.log
+
+# ==========================
+# 4. 操作系统 & IDE
+# ==========================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.ntvs
+*.njsproj
+*.sln
+*.sw?
+
+# ==========================
+# 5. 环境变量
+# ==========================
+.env
+.env.local
+.env.*.local
+
+# 注意：不要忽略 .env.example (如果有的话)

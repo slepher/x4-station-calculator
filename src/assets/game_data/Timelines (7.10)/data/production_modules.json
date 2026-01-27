@@ -1,0 +1,1271 @@
+[
+  {
+    "id": "xenon_small_station_01_solarpanel_01_macro",
+    "ware_id": "module_xen_prod_energycells_01",
+    "name_id": "{20104,14701}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "energycells",
+        "amount": 562
+      },
+      {
+        "ware": "ore",
+        "amount": 963
+      },
+      {
+        "ware": "silicon",
+        "amount": 963
+      }
+    ],
+    "build_time": 378.0,
+    "produces": "energycells",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_arg_foodrations_macro",
+    "ware_id": "module_arg_prod_foodrations_01",
+    "name_id": "{20104,13401}",
+    "type": "production",
+    "race": "argon",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 262
+      },
+      {
+        "ware": "energycells",
+        "amount": 525
+      },
+      {
+        "ware": "hullparts",
+        "amount": 961
+      }
+    ],
+    "build_time": 757.0,
+    "produces": "foodrations",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_arg_meat_macro",
+    "ware_id": "module_arg_prod_meat_01",
+    "name_id": "{20104,13501}",
+    "type": "production",
+    "race": "argon",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 248
+      },
+      {
+        "ware": "energycells",
+        "amount": 497
+      },
+      {
+        "ware": "hullparts",
+        "amount": 910
+      }
+    ],
+    "build_time": 750.0,
+    "produces": "meat",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_arg_medicalsupplies_macro",
+    "ware_id": "module_arg_prod_medicalsupplies_01",
+    "name_id": "{20104,11601}",
+    "type": "production",
+    "race": "argon",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 225
+      },
+      {
+        "ware": "energycells",
+        "amount": 450
+      },
+      {
+        "ware": "hullparts",
+        "amount": 823
+      }
+    ],
+    "build_time": 739.0,
+    "produces": "medicalsupplies",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_arg_spacefuel_macro",
+    "ware_id": "module_arg_prod_spacefuel_01",
+    "name_id": "{20104,13601}",
+    "type": "production",
+    "race": "argon",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 319
+      },
+      {
+        "ware": "energycells",
+        "amount": 638
+      },
+      {
+        "ware": "hullparts",
+        "amount": 1168
+      }
+    ],
+    "build_time": 781.0,
+    "produces": "spacefuel",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_arg_wheat_macro",
+    "ware_id": "module_arg_prod_wheat_01",
+    "name_id": "{20104,13701}",
+    "type": "production",
+    "race": "argon",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 296
+      },
+      {
+        "ware": "energycells",
+        "amount": 592
+      },
+      {
+        "ware": "hullparts",
+        "amount": 1084
+      }
+    ],
+    "build_time": 772.0,
+    "produces": "wheat",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_advancedcomposites_macro",
+    "ware_id": "module_gen_prod_advancedcomposites_01",
+    "name_id": "{20104,10001}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 648
+      },
+      {
+        "ware": "energycells",
+        "amount": 1296
+      },
+      {
+        "ware": "hullparts",
+        "amount": 2373
+      }
+    ],
+    "build_time": 869.0,
+    "produces": "advancedcomposites",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_advancedelectronics_macro",
+    "ware_id": "module_gen_prod_advancedelectronics_01",
+    "name_id": "{20104,10201}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 482
+      },
+      {
+        "ware": "energycells",
+        "amount": 965
+      },
+      {
+        "ware": "hullparts",
+        "amount": 1767
+      }
+    ],
+    "build_time": 832.0,
+    "produces": "advancedelectronics",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_antimattercells_macro",
+    "ware_id": "module_gen_prod_antimattercells_01",
+    "name_id": "{20104,10301}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 69
+      },
+      {
+        "ware": "energycells",
+        "amount": 138
+      },
+      {
+        "ware": "hullparts",
+        "amount": 253
+      }
+    ],
+    "build_time": 593.0,
+    "produces": "antimattercells",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_antimatterconverters_macro",
+    "ware_id": "module_gen_prod_antimatterconverters_01",
+    "name_id": "{20104,10401}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 1780
+      },
+      {
+        "ware": "energycells",
+        "amount": 3560
+      },
+      {
+        "ware": "hullparts",
+        "amount": 6516
+      }
+    ],
+    "build_time": 993.0,
+    "produces": "antimatterconverters",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_claytronics_macro",
+    "ware_id": "module_gen_prod_claytronics_01",
+    "name_id": "{20104,10501}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "advancedcomposites",
+        "amount": 5630
+      },
+      {
+        "ware": "energycells",
+        "amount": 6571
+      },
+      {
+        "ware": "plasmaconductors",
+        "amount": 4737
+      }
+    ],
+    "build_time": 1049.0,
+    "produces": "claytronics",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_dronecomponents_macro",
+    "ware_id": "module_gen_prod_dronecomponents_01",
+    "name_id": "{20104,10701}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 1225
+      },
+      {
+        "ware": "energycells",
+        "amount": 2449
+      },
+      {
+        "ware": "hullparts",
+        "amount": 4483
+      }
+    ],
+    "build_time": 947.0,
+    "produces": "dronecomponents",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_energycells_macro",
+    "ware_id": "module_gen_prod_energycells_01",
+    "name_id": "{20104,10801}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 260
+      },
+      {
+        "ware": "energycells",
+        "amount": 520
+      },
+      {
+        "ware": "hullparts",
+        "amount": 951
+      }
+    ],
+    "build_time": 756.0,
+    "produces": "energycells",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_engineparts_macro",
+    "ware_id": "module_gen_prod_engineparts_01",
+    "name_id": "{20104,10901}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 389
+      },
+      {
+        "ware": "energycells",
+        "amount": 779
+      },
+      {
+        "ware": "hullparts",
+        "amount": 1426
+      }
+    ],
+    "build_time": 806.0,
+    "produces": "engineparts",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_fieldcoils_macro",
+    "ware_id": "module_gen_prod_fieldcoils_01",
+    "name_id": "{20104,11101}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 1735
+      },
+      {
+        "ware": "energycells",
+        "amount": 3470
+      },
+      {
+        "ware": "hullparts",
+        "amount": 6351
+      }
+    ],
+    "build_time": 989.0,
+    "produces": "fieldcoils",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_graphene_macro",
+    "ware_id": "module_gen_prod_graphene_01",
+    "name_id": "{20104,11201}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 28
+      },
+      {
+        "ware": "energycells",
+        "amount": 57
+      },
+      {
+        "ware": "hullparts",
+        "amount": 104
+      }
+    ],
+    "build_time": 482.0,
+    "produces": "graphene",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_hullparts_macro",
+    "ware_id": "module_gen_prod_hullparts_01",
+    "name_id": "{20104,11301}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "advancedcomposites",
+        "amount": 853
+      },
+      {
+        "ware": "energycells",
+        "amount": 1357
+      },
+      {
+        "ware": "plasmaconductors",
+        "amount": 1228
+      }
+    ],
+    "build_time": 862.0,
+    "produces": "hullparts",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_microchips_macro",
+    "ware_id": "module_gen_prod_microchips_01",
+    "name_id": "{20104,11901}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 758
+      },
+      {
+        "ware": "energycells",
+        "amount": 1516
+      },
+      {
+        "ware": "hullparts",
+        "amount": 2774
+      }
+    ],
+    "build_time": 888.0,
+    "produces": "microchips",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_missilecomponents_macro",
+    "ware_id": "module_gen_prod_missilecomponents_01",
+    "name_id": "{20104,12001}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 35
+      },
+      {
+        "ware": "energycells",
+        "amount": 71
+      },
+      {
+        "ware": "hullparts",
+        "amount": 131
+      }
+    ],
+    "build_time": 510.0,
+    "produces": "missilecomponents",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_plasmaconductors_macro",
+    "ware_id": "module_gen_prod_plasmaconductors_01",
+    "name_id": "{20104,12101}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 473
+      },
+      {
+        "ware": "energycells",
+        "amount": 946
+      },
+      {
+        "ware": "hullparts",
+        "amount": 1732
+      }
+    ],
+    "build_time": 830.0,
+    "produces": "plasmaconductors",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_quantumtubes_macro",
+    "ware_id": "module_gen_prod_quantumtubes_01",
+    "name_id": "{20104,12201}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 380
+      },
+      {
+        "ware": "energycells",
+        "amount": 761
+      },
+      {
+        "ware": "hullparts",
+        "amount": 1394
+      }
+    ],
+    "build_time": 803.0,
+    "produces": "quantumtubes",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_refinedmetals_macro",
+    "ware_id": "module_gen_prod_refinedmetals_01",
+    "name_id": "{20104,12301}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 36
+      },
+      {
+        "ware": "energycells",
+        "amount": 73
+      },
+      {
+        "ware": "hullparts",
+        "amount": 135
+      }
+    ],
+    "build_time": 514.0,
+    "produces": "refinedmetals",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_scanningarrays_macro",
+    "ware_id": "module_gen_prod_scanningarrays_01",
+    "name_id": "{20104,12401}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 629
+      },
+      {
+        "ware": "energycells",
+        "amount": 1259
+      },
+      {
+        "ware": "hullparts",
+        "amount": 2305
+      }
+    ],
+    "build_time": 865.0,
+    "produces": "scanningarrays",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_scrap_recycler_macro",
+    "ware_id": "module_gen_prod_scrap_recycler",
+    "name_id": "{20104,130101}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 300
+      },
+      {
+        "ware": "energycells",
+        "amount": 600
+      },
+      {
+        "ware": "hullparts",
+        "amount": 1100
+      }
+    ],
+    "build_time": 777.0,
+    "produces": "claytronics hullparts",
+    "cycle_time": 3600.0,
+    "cycle_amount": 1.0,
+    "hourly_yield": 1.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_shieldcomponents_macro",
+    "ware_id": "module_gen_prod_shieldcomponents_01",
+    "name_id": "{20104,12601}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 432
+      },
+      {
+        "ware": "energycells",
+        "amount": 865
+      },
+      {
+        "ware": "hullparts",
+        "amount": 1583
+      }
+    ],
+    "build_time": 819.0,
+    "produces": "shieldcomponents",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_siliconwafers_macro",
+    "ware_id": "module_gen_prod_siliconwafers_01",
+    "name_id": "{20104,12701}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 74
+      },
+      {
+        "ware": "energycells",
+        "amount": 149
+      },
+      {
+        "ware": "hullparts",
+        "amount": 273
+      }
+    ],
+    "build_time": 602.0,
+    "produces": "siliconwafers",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_smartchips_macro",
+    "ware_id": "module_gen_prod_smartchips_01",
+    "name_id": "{20104,12801}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 126
+      },
+      {
+        "ware": "energycells",
+        "amount": 253
+      },
+      {
+        "ware": "hullparts",
+        "amount": 464
+      }
+    ],
+    "build_time": 667.0,
+    "produces": "smartchips",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_spices_macro",
+    "ware_id": "module_gen_prod_spices_01",
+    "name_id": "{20104,12901}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 139
+      },
+      {
+        "ware": "energycells",
+        "amount": 278
+      },
+      {
+        "ware": "hullparts",
+        "amount": 510
+      }
+    ],
+    "build_time": 679.0,
+    "produces": "spices",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_superfluidcoolant_macro",
+    "ware_id": "module_gen_prod_superfluidcoolant_01",
+    "name_id": "{20104,13001}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 25
+      },
+      {
+        "ware": "energycells",
+        "amount": 51
+      },
+      {
+        "ware": "hullparts",
+        "amount": 94
+      }
+    ],
+    "build_time": 469.0,
+    "produces": "superfluidcoolant",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_turretcomponents_macro",
+    "ware_id": "module_gen_prod_turretcomponents_01",
+    "name_id": "{20104,13101}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 475
+      },
+      {
+        "ware": "energycells",
+        "amount": 951
+      },
+      {
+        "ware": "hullparts",
+        "amount": 1741
+      }
+    ],
+    "build_time": 830.0,
+    "produces": "turretcomponents",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_water_macro",
+    "ware_id": "module_gen_prod_water_01",
+    "name_id": "{20104,13201}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 36
+      },
+      {
+        "ware": "energycells",
+        "amount": 72
+      },
+      {
+        "ware": "hullparts",
+        "amount": 132
+      }
+    ],
+    "build_time": 513.0,
+    "produces": "water",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_gen_weaponcomponents_macro",
+    "ware_id": "module_gen_prod_weaponcomponents_01",
+    "name_id": "{20104,13301}",
+    "type": "production",
+    "race": "generic",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 396
+      },
+      {
+        "ware": "energycells",
+        "amount": 793
+      },
+      {
+        "ware": "hullparts",
+        "amount": 1452
+      }
+    ],
+    "build_time": 808.0,
+    "produces": "weaponcomponents",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_par_majadust_macro",
+    "ware_id": "module_par_prod_majadust_01",
+    "name_id": "{20104,13801}",
+    "type": "production",
+    "race": "paranid",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 373
+      },
+      {
+        "ware": "energycells",
+        "amount": 746
+      },
+      {
+        "ware": "hullparts",
+        "amount": 1366
+      }
+    ],
+    "build_time": 800.0,
+    "produces": "majadust",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_par_majasnails_macro",
+    "ware_id": "module_par_prod_majasnails_01",
+    "name_id": "{20104,13901}",
+    "type": "production",
+    "race": "paranid",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 248
+      },
+      {
+        "ware": "energycells",
+        "amount": 497
+      },
+      {
+        "ware": "hullparts",
+        "amount": 910
+      }
+    ],
+    "build_time": 750.0,
+    "produces": "majasnails",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_par_medicalsupplies_macro",
+    "ware_id": "module_par_prod_medicalsupplies_01",
+    "name_id": "{20104,11701}",
+    "type": "production",
+    "race": "paranid",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 226
+      },
+      {
+        "ware": "energycells",
+        "amount": 451
+      },
+      {
+        "ware": "hullparts",
+        "amount": 827
+      }
+    ],
+    "build_time": 739.0,
+    "produces": "medicalsupplies",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_par_sojabeans_macro",
+    "ware_id": "module_par_prod_sojabeans_01",
+    "name_id": "{20104,14001}",
+    "type": "production",
+    "race": "paranid",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 296
+      },
+      {
+        "ware": "energycells",
+        "amount": 592
+      },
+      {
+        "ware": "hullparts",
+        "amount": 1084
+      }
+    ],
+    "build_time": 772.0,
+    "produces": "sojabeans",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_par_sojahusk_macro",
+    "ware_id": "module_par_prod_sojahusk_01",
+    "name_id": "{20104,14101}",
+    "type": "production",
+    "race": "paranid",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 316
+      },
+      {
+        "ware": "energycells",
+        "amount": 633
+      },
+      {
+        "ware": "hullparts",
+        "amount": 1159
+      }
+    ],
+    "build_time": 780.0,
+    "produces": "sojahusk",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_tel_advancedcomposites_macro",
+    "ware_id": "module_tel_prod_advancedcomposites_01",
+    "name_id": "{20104,10101}",
+    "type": "production",
+    "race": "teladi",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 628
+      },
+      {
+        "ware": "energycells",
+        "amount": 1241
+      },
+      {
+        "ware": "hullparts",
+        "amount": 2300
+      }
+    ],
+    "build_time": 863.0,
+    "produces": "advancedcomposites",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_tel_engineparts_macro",
+    "ware_id": "module_tel_prod_engineparts_01",
+    "name_id": "{20104,11001}",
+    "type": "production",
+    "race": "teladi",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 394
+      },
+      {
+        "ware": "energycells",
+        "amount": 778
+      },
+      {
+        "ware": "hullparts",
+        "amount": 1443
+      }
+    ],
+    "build_time": 806.0,
+    "produces": "engineparts",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_tel_hullparts_macro",
+    "ware_id": "module_tel_prod_hullparts_01",
+    "name_id": "{20104,11401}",
+    "type": "production",
+    "race": "teladi",
+    "build_cost": [
+      {
+        "ware": "advancedcomposites",
+        "amount": 853
+      },
+      {
+        "ware": "energycells",
+        "amount": 1341
+      },
+      {
+        "ware": "plasmaconductors",
+        "amount": 1228
+      }
+    ],
+    "build_time": 861.0,
+    "produces": "hullparts",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_tel_medicalsupplies_macro",
+    "ware_id": "module_tel_prod_medicalsupplies_01",
+    "name_id": "{20104,11801}",
+    "type": "production",
+    "race": "teladi",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 224
+      },
+      {
+        "ware": "energycells",
+        "amount": 448
+      },
+      {
+        "ware": "hullparts",
+        "amount": 822
+      }
+    ],
+    "build_time": 738.0,
+    "produces": "medicalsupplies",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_tel_nostropoil_macro",
+    "ware_id": "module_tel_prod_nostropoil_01",
+    "name_id": "{20104,14201}",
+    "type": "production",
+    "race": "teladi",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 289
+      },
+      {
+        "ware": "energycells",
+        "amount": 579
+      },
+      {
+        "ware": "hullparts",
+        "amount": 1063
+      }
+    ],
+    "build_time": 769.0,
+    "produces": "nostropoil",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_tel_scanningarrays_macro",
+    "ware_id": "module_tel_prod_scanningarrays_01",
+    "name_id": "{20104,12501}",
+    "type": "production",
+    "race": "teladi",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 637
+      },
+      {
+        "ware": "energycells",
+        "amount": 1259
+      },
+      {
+        "ware": "hullparts",
+        "amount": 2333
+      }
+    ],
+    "build_time": 865.0,
+    "produces": "scanningarrays",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_tel_spaceweed_macro",
+    "ware_id": "module_tel_prod_spaceweed_01",
+    "name_id": "{20104,14301}",
+    "type": "production",
+    "race": "teladi",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 639
+      },
+      {
+        "ware": "energycells",
+        "amount": 1277
+      },
+      {
+        "ware": "hullparts",
+        "amount": 2338
+      }
+    ],
+    "build_time": 867.0,
+    "produces": "spaceweed",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_tel_sunriseflowers_macro",
+    "ware_id": "module_tel_prod_sunriseflowers_01",
+    "name_id": "{20104,14401}",
+    "type": "production",
+    "race": "teladi",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 296
+      },
+      {
+        "ware": "energycells",
+        "amount": 592
+      },
+      {
+        "ware": "hullparts",
+        "amount": 1087
+      }
+    ],
+    "build_time": 772.0,
+    "produces": "sunriseflowers",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_tel_swampplant_macro",
+    "ware_id": "module_tel_prod_swampplant_01",
+    "name_id": "{20104,14501}",
+    "type": "production",
+    "race": "teladi",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 639
+      },
+      {
+        "ware": "energycells",
+        "amount": 1277
+      },
+      {
+        "ware": "hullparts",
+        "amount": 2338
+      }
+    ],
+    "build_time": 867.0,
+    "produces": "swampplant",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  },
+  {
+    "id": "prod_tel_teladianium_macro",
+    "ware_id": "module_tel_prod_teladianium_01",
+    "name_id": "{20104,14601}",
+    "type": "production",
+    "race": "teladi",
+    "build_cost": [
+      {
+        "ware": "claytronics",
+        "amount": 50
+      },
+      {
+        "ware": "energycells",
+        "amount": 101
+      },
+      {
+        "ware": "hullparts",
+        "amount": 185
+      }
+    ],
+    "build_time": 554.0,
+    "produces": "teladianium",
+    "cycle_time": 3600,
+    "cycle_amount": 0,
+    "hourly_yield": 0.0,
+    "workforce_needed": 0
+  }
+]
