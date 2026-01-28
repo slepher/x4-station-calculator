@@ -19,14 +19,14 @@ export const useStationStore = defineStore('station', () => {
 
   const settings = ref({
     useHQ: false,           
-    actualWorkforce: 0,      // 【新增】实际人口数值，作为产量计算的唯一标准
+    manualWorkforce: 0,      
     workforcePercent: 100,  
     workforceAuto: true,    
-    priceMultiplier: 0.5    // 0:min, 0.5:avg, 1:max
+    priceMultiplier: 0.5    
   })
 
   // ----------------------------------------------------------------
-  // Computed Maps (保持不变)
+  // Computed Maps
   // ----------------------------------------------------------------
 
   const waresMap = computed(() => {
@@ -58,7 +58,7 @@ export const useStationStore = defineStore('station', () => {
   })
 
   // ----------------------------------------------------------------
-  // Actions (保持不变)
+  // Actions
   // ----------------------------------------------------------------
 
   function loadDemoData() {
@@ -169,73 +169,86 @@ export const useStationStore = defineStore('station', () => {
     }
   })
 
-  /**
-   * 【核心改动】效率指标计算
-   * 饱和度现在基于 settings.actualWorkforce 计算，范围为 0.0 到 1.0
-   * 组件层负责确保 actualWorkforce 不超过 needed.total
-   */
-  const efficiencyMetrics = computed(() => {
-    const wf = workforceBreakdown.value
-    if (wf.needed.total === 0) return { saturation: 0 }
-    
-    const actual = settings.value.actualWorkforce || 0
-    return {
-      saturation: actual / wf.needed.total // 实际人口占需求人口的比例
-    }
-  })
+  // 计算生效的实际人口数值
+  const actualWorkforce = computed(() => {
+     const wf = workforceBreakdown.value
+     const maxCapacity = wf.capacity.total
+     if (settings.value.workforceAuto) {
+       return Math.min(wf.needed.total, maxCapacity)
+     }
+     return Math.max(0, Math.min(settings.value.manualWorkforce, maxCapacity))
+   })
+ 
+   const efficiencyMetrics = computed(() => {
+     const wf = workforceBreakdown.value
+     if (wf.needed.total === 0) return { saturation: 0 }
+     // 效率封顶：参与生产计算的效率数据不允许超过 100%
+     return { saturation: Math.min(1.0, actualWorkforce.value / wf.needed.total) }
+   })
   
   const profitBreakdown = computed(() => {
-    const production: Record<string, number> = {}  
-    const consumption: Record<string, number> = {} 
-    
-    // 核心：从效率指标中获取基于 actualWorkforce 的饱和度
+    const wareDetails: Record<string, { production: number, consumption: number, list: any[] }> = {}
     const { saturation } = efficiencyMetrics.value 
-
-    let totalRevenue = 0
-    let totalExpense = 0
+    let totalRevenue = 0, totalExpense = 0
 
     plannedModules.value.forEach(item => {
       const info = modulesMap.value[item.id]
       if (!info) return
 
-      /**
-       * 计算实际加成后的产量：
-       * 实际效率 = 基础(1.0) + (当前饱和度 * 该模块最大加成率)
-       */
-      const moduleEff = 1.0 + (saturation * (info.workforce?.maxBonus || 0))
+      const currentBonusRatio = saturation * (info.workforce?.maxBonus || 0)
+      const moduleEff = 1.0 + currentBonusRatio
 
-      // 产出部分：应用效率加成
+      // 产出明细：应用工人修正
       for (const [wareId, hourlyAmount] of Object.entries(info.outputs)) {
-        const actualAmount = hourlyAmount * item.count * moduleEff // 增加产出逻辑
+        if (!wareDetails[wareId]) wareDetails[wareId] = { production: 0, consumption: 0, list: [] }
+        const actualAmount = hourlyAmount * item.count * moduleEff
         const price = getDynamicPrice(wareId)
-        production[wareId] = (production[wareId] || 0) + actualAmount
+        wareDetails[wareId].production += actualAmount
+        wareDetails[wareId].list.push({
+          moduleId: item.id,
+          nameId: info.nameId,
+          count: item.count,
+          amount: actualAmount,
+          bonusPercent: Math.round(currentBonusRatio * 100),
+          type: 'production'
+        })
         totalRevenue += actualAmount * price
       }
 
-      // 消耗部分：不受工人影响 (保持原样)
+      // 消耗明细：不受工人效率影响
       for (const [wareId, hourlyAmount] of Object.entries(info.inputs)) {
+        if (!wareDetails[wareId]) wareDetails[wareId] = { production: 0, consumption: 0, list: [] }
         const actualAmount = hourlyAmount * item.count
         const price = getDynamicPrice(wareId)
-        consumption[wareId] = (consumption[wareId] || 0) + actualAmount
+        wareDetails[wareId].consumption += actualAmount
+        wareDetails[wareId].list.push({
+          moduleId: item.id,
+          nameId: info.nameId,
+          count: item.count,
+          amount: -actualAmount,
+          bonusPercent: 0,
+          type: 'consumption'
+        })
         totalExpense += actualAmount * price
       }
     })
 
-    return {
-      production: { total: totalRevenue, items: production },
-      expenses: { total: totalExpense, items: consumption },
-      profit: totalRevenue - totalExpense
-    }
+    return { wareDetails, totalRevenue, totalExpense, profit: totalRevenue - totalExpense }
   })
   
   const netProduction = computed(() => {
-    const net: Record<string, number> = {}
-    const { production, expenses } = profitBreakdown.value
-    const allIds = new Set([...Object.keys(production.items), ...Object.keys(expenses.items)])
-    allIds.forEach(id => {
-      const diff = (production.items[id] || 0) - (expenses.items[id] || 0)
-      if (Math.abs(diff) > 0.001) net[id] = diff
-    })
+    const net: Record<string, { total: number, details: any[] }> = {}
+    const { wareDetails } = profitBreakdown.value
+    
+    for (const [wareId, data] of Object.entries(wareDetails)) {
+      const diff = data.production - data.consumption
+      if (Math.abs(diff) > 0.001) {
+        net[wareId] = {
+          total: diff,
+          details: data.list
+        }
+      }
+    }
     return net
   })
 
@@ -244,6 +257,7 @@ export const useStationStore = defineStore('station', () => {
     wares: waresMap, modules: modulesMap,
     loadDemoData, addModule, updateModuleCount, removeModule, removeModuleById, clearAll, getModuleInfo,
     constructionBreakdown, workforceBreakdown, profitBreakdown,
+    actualWorkforce, 
     currentEfficiency: computed(() => efficiencyMetrics.value.saturation),
     netProduction
   }

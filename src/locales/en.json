@@ -22,6 +22,7 @@
     "surplus": "Surplus",
     "shortage": "Shortage",
     "req_production": "Required for Production",
+    "hab_capacity": "Habitation Capacity",
     "actual_workforce": "Actual Workforce",
     "auto_calc": "Auto-Calculate",
     "limit": "Limit",
