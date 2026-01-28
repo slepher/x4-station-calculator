@@ -10,22 +10,21 @@ const store = useStationStore()
 const { t } = useI18n();
 const { translateWare } = useX4I18n()
 
-// 资源列表计算
+// 资源列表计算：取消排序以稳定显示
 const resourcesList = computed(() => {
   const prod = store.netProduction
   return Object.entries(prod)
-    .sort(([, a], [, b]) => b - a) 
-    .map(([key, amount]) => {
+    .map(([key, data]) => {
       const wareInfo = store.wares[key]
       return {
         id: key,
         name: wareInfo ? translateWare(wareInfo) : key,
-        amount
+        amount: data.total,
+        details: data.details // 透传明细列表
       }
     })
 })
 
-// 逻辑保留但不再在模板中使用
 const globalEffDisplay = computed(() => {
   const eff =  1.0
   return `${Math.round(eff * 100)}%`
@@ -51,6 +50,7 @@ const globalEffDisplay = computed(() => {
         :resourceId="res.id"
         :name="res.name"
         :amount="res.amount"
+        :details="res.details"
       />
       
       <div v-if="resourcesList.length === 0" class="empty-container">
@@ -70,7 +70,6 @@ const globalEffDisplay = computed(() => {
 }
 
 .list-header {
-  /* 使用 items-center 确保左右对齐 */
   @apply flex justify-between items-center p-4 bg-slate-800/30 border-b border-slate-700/50;
 }
 
