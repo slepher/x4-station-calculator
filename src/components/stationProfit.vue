@@ -136,17 +136,18 @@ const data = computed(() => {
 .header-title { @apply font-bold text-slate-200 uppercase tracking-widest text-xs; }
 .header-subtitle { @apply font-mono text-[10px] text-slate-500; }
 
-/* 模拟控件样式 [@apply 优化] */
 .simulation-controls { @apply p-3 bg-slate-900/50 border-b border-slate-700 space-y-4; }
 .toggle-group { @apply flex flex-col gap-2; }
 .control-toggle { @apply flex items-center gap-2 text-[11px] text-slate-400 cursor-pointer hover:text-slate-200 transition-colors; }
 .cb-input { @apply rounded border-slate-600 bg-slate-800 text-sky-500 focus:ring-0; }
 .cb-label { @apply font-medium; }
+
 .slider-group { @apply space-y-3 pt-1; }
 .slider-item { @apply space-y-1.5; }
 .slider-header { @apply flex justify-between text-[10px] uppercase text-slate-500 font-bold tracking-tighter; }
 .val-buy { @apply text-sky-400 font-mono; }
 .val-sell { @apply text-emerald-400 font-mono; }
+
 .custom-range { @apply w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer focus:outline-none; }
 .range-buy { @apply accent-sky-500; }
 .range-sell { @apply accent-emerald-500; }

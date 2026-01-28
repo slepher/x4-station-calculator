@@ -14,6 +14,7 @@ export interface PlannedModuleDisplay extends SavedModule {
 }
 
 export const useStationStore = defineStore('station', () => {
+  
   const plannedModules = ref<SavedModule[]>([])
 
   const settings = ref({
@@ -108,7 +109,6 @@ export const useStationStore = defineStore('station', () => {
   // Getters
   // ----------------------------------------------------------------
 
-  // 价格计算函数：根据买/卖身份应用不同乘数
   function getDynamicPrice(wareId: string, isInput = false) {
     const ware = waresMap.value[wareId]
     if (!ware) return 0
@@ -143,14 +143,19 @@ export const useStationStore = defineStore('station', () => {
   })
 
   const workforceBreakdown = computed(() => {
-    let neededTotal = 0, capacityTotal = 0
-    const neededList: any[] = [], capacityList: any[] = []
+    let neededTotal = 0
+    let capacityTotal = 0
+    const neededList: any[] = []
+    const capacityList: any[] = []
+
     if (settings.value.useHQ) {
       neededTotal += 200
       neededList.push({ id: 'player_hq', nameId: '{20102,2011}', count: 1, value: 200 })
     }
+
     plannedModules.value.forEach(item => {
-      const info = modulesMap.value[item.id]; if (!info) return
+      const info = modulesMap.value[item.id]
+      if (!info) return
       if (info.workforce.needed > 0) {
         const val = info.workforce.needed * item.count
         neededTotal += val
@@ -162,7 +167,12 @@ export const useStationStore = defineStore('station', () => {
         capacityList.push({ id: item.id, nameId: info.nameId, count: item.count, value: val })
       }
     })
-    return { needed: { total: neededTotal, list: neededList }, capacity: { total: capacityTotal, list: capacityList }, diff: capacityTotal - neededTotal }
+
+    return {
+      needed: { total: neededTotal, list: neededList },
+      capacity: { total: capacityTotal, list: capacityList },
+      diff: capacityTotal - neededTotal
+    }
   })
 
   const actualWorkforce = computed(() => {
@@ -182,11 +192,7 @@ export const useStationStore = defineStore('station', () => {
   
   const profitBreakdown = computed(() => {
     const wareDetails: Record<string, { production: number, consumption: number, list: any[] }> = {}
-    const expenseItems: Record<string, { amount: number, value: number }> = {}
-    const productionItems: Record<string, { amount: number, value: number }> = {}
-    
-    const { saturation } = efficiencyMetrics.value 
-    let totalRevenue = 0, totalExpense = 0
+    const { saturation } = efficiencyMetrics.value
 
     plannedModules.value.forEach(item => {
       const info = modulesMap.value[item.id]
@@ -195,61 +201,62 @@ export const useStationStore = defineStore('station', () => {
       const currentBonusRatio = saturation * (info.workforce?.maxBonus || 0)
       const moduleEff = 1.0 + currentBonusRatio
 
-      // 产出明细：使用 sellMultiplier
       for (const [wareId, hourlyAmount] of Object.entries(info.outputs)) {
         if (!wareDetails[wareId]) wareDetails[wareId] = { production: 0, consumption: 0, list: [] }
         const actualAmount = hourlyAmount * item.count * moduleEff
-        const price = getDynamicPrice(wareId, false)
-        const val = actualAmount * price
-
         wareDetails[wareId].production += actualAmount
-        productionItems[wareId] = {
-          amount: (productionItems[wareId]?.amount || 0) + actualAmount,
-          value: (productionItems[wareId]?.value || 0) + val
-        }
         wareDetails[wareId].list.push({
           moduleId: item.id, nameId: info.nameId, count: item.count, amount: actualAmount,
           bonusPercent: Math.round(currentBonusRatio * 100), type: 'production'
         })
-        totalRevenue += val
       }
 
-      // 消耗明细：应用成本豁免逻辑
       for (const [wareId, hourlyAmount] of Object.entries(info.inputs)) {
         if (!wareDetails[wareId]) wareDetails[wareId] = { production: 0, consumption: 0, list: [] }
         const actualAmount = hourlyAmount * item.count
-        
-        const ware = waresMap.value[wareId]
-        const isMined = ware?.transport === 'mineral' || ware?.transport === 'liquid'
-        
-        let price = getDynamicPrice(wareId, true)
-        
-        if (settings.value.internalSupply) {
-          price = 0
-        } else if (settings.value.minersEnabled && isMined) {
-          price = 0
-        }
-
-        const val = actualAmount * price
-
         wareDetails[wareId].consumption += actualAmount
-        expenseItems[wareId] = {
-          amount: (expenseItems[wareId]?.amount || 0) + actualAmount,
-          value: (expenseItems[wareId]?.value || 0) + val
-        }
         wareDetails[wareId].list.push({
           moduleId: item.id, nameId: info.nameId, count: item.count, amount: -actualAmount,
           bonusPercent: 0, type: 'consumption'
         })
-        totalExpense += val
       }
     })
 
+    const productionItems: Record<string, { amount: number, value: number }> = {}
+    const expenseItems: Record<string, { amount: number, value: number }> = {}
+    let totalRevenue = 0, totalExpense = 0
+
+    // 第二阶段：轧差法核心逻辑
+    for (const [wareId, data] of Object.entries(wareDetails)) {
+      const net = data.production - data.consumption
+      if (Math.abs(net) < 0.001) continue
+
+      if (net > 0) {
+        // 净产出 > 0: 计入收入
+        const price = getDynamicPrice(wareId, false)
+        const val = net * price
+        productionItems[wareId] = { amount: net, value: val }
+        totalRevenue += val
+      } else {
+        // 净产出 < 0: 计入支出
+        const absAmount = Math.abs(net)
+        const ware = waresMap.value[wareId]
+        const isMined = ware?.transport === 'solid' || ware?.transport === 'liquid'
+        console.log(ware)
+        console.log(isMined)
+        
+        let price = getDynamicPrice(wareId, true)
+        if (settings.value.internalSupply) price = 0
+        else if (settings.value.minersEnabled && isMined) price = 0
+        
+        const val = absAmount * price
+        expenseItems[wareId] = { amount: absAmount, value: val }
+        totalExpense += val
+      }
+    }
+
     return { 
-      wareDetails, 
-      totalRevenue, 
-      totalExpense, 
-      profit: totalRevenue - totalExpense,
+      wareDetails, totalRevenue, totalExpense, profit: totalRevenue - totalExpense,
       production: { total: totalRevenue, items: productionItems },
       expenses: { total: totalExpense, items: expenseItems }
     }
