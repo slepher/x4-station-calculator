@@ -26,7 +26,25 @@
     "actual_workforce": "当前劳动力",
     "auto_calc": "自动计算",
     "limit": "上限",
-    "inc_phq": "包含总部 (PHQ)"
+    "inc_phq": "包含总部 (PHQ)",
+    "station_costs": "空间站建设成本",
+    "build_res_required": "所需建设资源",
+    "module_breakdown": "各模块资源明细",
+    "no_materials": "标准模块 - 无需额外材料",
+    "total_build_cost": "总建设成本",
+    "build_res_price": "建设资源价格"
+  },
+  "profit": {
+    "title": "经济分析",
+    "unit": "信用点 / 小时",
+    "miners_enabled": "矿工提供基础资源",
+    "internal_supply": "由其他空间站提供资源",
+    "res_price": "资源买入价格",
+    "prod_price": "产品卖出价格",
+    "average": "平均",
+    "expenses": "运行支出",
+    "production": "总产值",
+    "footer": "预估每小时利润"
   },
   "race": {
     "argon": "Argon",

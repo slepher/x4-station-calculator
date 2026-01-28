@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { PlannedModule, ModuleData } from '@/store/useStationStore'
-
 import { useX4I18n } from '@/utils/useX4I18n';
 const { translateModule } = useX4I18n();
 
@@ -16,7 +15,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="module-row group">
+  <div class="module-row group/row">
     <div class="color-bar" 
          :class="info.type === 'habitat' ? 'bg-orange-500' : 'bg-sky-500'">
     </div>
@@ -55,9 +54,29 @@ const emit = defineEmits<{
 .controls {
   @apply flex items-center gap-1;
 }
+
+/* --- 输入框统一样式 --- */
 .count-input {
-  @apply w-12 bg-slate-900 border border-slate-600 text-center text-white font-mono rounded focus:border-sky-500 outline-none text-sm py-1;
+  /* 基础：缩小文字、实体边框、暗色背景 */
+  @apply w-14 bg-slate-950/50 border border-slate-700 text-center text-sky-400/90 font-mono rounded transition-all;
+  @apply focus:border-slate-500 focus:bg-slate-950 focus:ring-0 outline-none text-sm py-0.5 h-6;
+  appearance: auto;
 }
+
+/* 调节箭头重塑：初始隐藏，匹配页面低饱和度风格 */
+.count-input::-webkit-inner-spin-button {
+  @apply opacity-0 cursor-pointer ml-0.5 transition-opacity duration-200;
+  background-color: transparent;
+  /* 翻转并降低亮度，呈现深灰色 */
+  filter: invert(1) brightness(0.4) contrast(0.8);
+  height: 14px;
+}
+
+/* 鼠标指向时显示箭头 */
+.count-input:hover::-webkit-inner-spin-button {
+  @apply opacity-70;
+}
+
 .remove-btn {
   @apply text-slate-600 hover:text-red-400 px-1.5 transition-colors text-lg leading-none;
 }

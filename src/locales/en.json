@@ -26,8 +26,27 @@
     "actual_workforce": "Actual Workforce",
     "auto_calc": "Auto-Calculate",
     "limit": "Limit",
-    "inc_phq": "Inc. PHQ"
+    "inc_phq": "Inc. PHQ",
+    "station_costs": "STATION COSTS",
+    "build_res_required": "BUILD RESOURCES REQUIRED",
+    "module_breakdown": "MODULE RESOURCE BREAKDOWN",
+    "no_materials": "Standard module - No materials required",
+    "total_build_cost": "TOTAL CONSTRUCTION COST",
+    "build_res_price": "BUILD RESOURCES PRICE"  
   },
+  "profit": {
+    "title": "ECONOMIC ANALYSIS",
+    "unit": "CREDITS / HOUR",
+    "miners_enabled": "MINERS PROVIDE BASIC RESOURCES",
+    "internal_supply": "RESOURCES FROM OTHER STATIONS",
+    "res_price": "RESOURCES PRICE",
+    "prod_price": "PRODUCTS PRICE",
+    "average": "AVERAGE",
+    "expenses": "RUNNING EXPENSES",
+    "production": "GROSS PRODUCTION",
+    "footer": "ESTIMATED HOURLY PROFIT"
+  },
+
   "race": {
     "argon": "Argon",
     "paranid": "Paranid",

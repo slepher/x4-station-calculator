@@ -30,14 +30,12 @@ const data = computed(() => {
   };
 })
 
-// 生产实际上限：min(需求, 容量)
 const maxAllowedWorkforce = computed(() => {
   const needed = data.value.needed.total || 0;
   const capacity = data.value.capacity.total || 0;
   return Math.min(needed, capacity);
 });
 
-// 初始值逻辑
 watch(() => maxAllowedWorkforce.value, (max) => {
   if (store.settings.manualWorkforce === 0 && max > 0) {
     store.settings.manualWorkforce = max;
@@ -48,14 +46,12 @@ const saturationPercent = computed({
   get: () => {
     const capacity = data.value.capacity.total || 0;
     if (capacity === 0) return 0;
-    // 开启 Auto 时跟随实际生效值，关闭时跟随人工设定值
     const currentVal = store.settings.workforceAuto ? store.actualWorkforce : store.settings.manualWorkforce;
     return Math.round((currentVal / capacity) * 100);
   },
   set: (val: number) => {
     if (store.settings.workforceAuto) return;
     const capacity = data.value.capacity.total || 0;
-    // 允许拖动到满额居住容量
     store.settings.manualWorkforce = Math.min(Math.round((val / 100) * capacity), capacity);
   }
 })
@@ -63,7 +59,6 @@ const saturationPercent = computed({
 const handleWorkforceInput = (e: Event) => {
   const target = e.target as HTMLInputElement;
   let val = parseInt(target.value) || 0;
-  // 允许填入到满额居住容量
   const clamped = Math.max(0, Math.min(val, data.value.capacity.total));
   store.settings.manualWorkforce = clamped;
   target.value = clamped.toString();
@@ -76,40 +71,48 @@ const handleWorkforceInput = (e: Event) => {
       <div class="flex items-center gap-2">
         <h3 class="header-title">{{ t('ui.workforce_mgmt') }}</h3>
       </div>
-      <div :class="['status-badge', data.diff >= 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400']">
+      <div :class="['status-badge', data.diff >= 0 ? 'status-surplus' : 'status-shortage']">
         {{ data.diff >= 0 ? t('ui.surplus') : t('ui.shortage') }}: {{ formatNum(Math.abs(data.diff)) }}
       </div>
     </div>
 
     <div class="content">
-      <div class="section">
+      <div class="section section-needed">
         <div @click="showNeeded = !showNeeded" class="section-header">
-          <div class="label-group">
+          <div class="section-label">
             <span :class="['arrow', { 'arrow-open': showNeeded }]">▶</span>
-            <span>{{ t('ui.req_production') }}</span>
+            {{ t('ui.req_production') }}
           </div>
-          <span class="val-text text-red-400">{{ formatNum(data.needed.total) }}</span>
+          <span class="total-val">{{ formatNum(data.needed.total) }}</span>
         </div>
-        <div v-show="showNeeded" class="list-container">
+        <div v-show="showNeeded" class="list-box">
           <div v-for="item in data.needed.list" :key="item.id" class="list-item">
-            <span class="name-text">{{ item.displayName }} (x{{ item.count }})</span>
-            <span class="val-small text-red-400/80">{{ formatNum(item.value) }}</span>
+            <span class="item-name">
+              <span class="qty">{{ formatNum(item.count) }}</span>
+              <span class="symbol">x</span>
+              <span class="name">{{ item.displayName }}</span>
+            </span>
+            <span class="item-val">{{ formatNum(item.value) }}</span>
           </div>
         </div>
       </div>
 
-      <div class="section">
+      <div class="section section-capacity">
         <div @click="showCapacity = !showCapacity" class="section-header">
-          <div class="label-group">
+          <div class="section-label">
             <span :class="['arrow', { 'arrow-open': showCapacity }]">▶</span>
-            <span>{{ t('ui.hab_capacity') }}</span>
+            {{ t('ui.hab_capacity') }}
           </div>
-          <span class="val-text text-emerald-400">{{ formatNum(data.capacity.total) }}</span>
+          <span class="total-val">{{ formatNum(data.capacity.total) }}</span>
         </div>
-        <div v-show="showCapacity" class="list-container">
+        <div v-show="showCapacity" class="list-box">
           <div v-for="item in data.capacity.list" :key="item.id" class="list-item">
-            <span class="name-text">{{ item.displayName }} (x{{ item.count }})</span>
-            <span class="val-small text-emerald-400/80">+{{ formatNum(item.value) }}</span>
+            <span class="item-name">
+              <span class="qty">{{ formatNum(item.count) }}</span>
+              <span class="symbol">x</span>
+              <span class="name">{{ item.displayName }}</span>
+            </span>
+            <span class="item-val">+{{ formatNum(item.value) }}</span>
           </div>
         </div>
       </div>
@@ -117,28 +120,25 @@ const handleWorkforceInput = (e: Event) => {
       <div class="footer">
         <div class="workforce-control-panel">
           <div class="control-header">
-            <div class="flex items-baseline gap-2">
+            <div class="flex items-center gap-2">
               <span class="text-[10px] text-slate-500 font-bold uppercase">{{ t('ui.actual_workforce') }}</span>
+              
               <input 
+                v-if="!store.settings.workforceAuto"
                 type="number" 
                 :value="store.actualWorkforce"
                 @input="handleWorkforceInput"
-                :disabled="store.settings.workforceAuto"
                 class="val-input-large"
               >
+              <span v-else class="val-text-display">
+                {{ store.actualWorkforce }}
+              </span>
             </div>
             <span class="percent-display">{{ Math.round((store.actualWorkforce / (data.capacity.total || 1)) * 100) }}%</span>
           </div>
 
           <div class="slider-container">
-            <input 
-              type="range" 
-              v-model.number="saturationPercent"
-              min="0"
-              max="100"
-              :disabled="store.settings.workforceAuto"
-              class="range-slider"
-            >
+            <input type="range" v-model.number="saturationPercent" min="0" max="100" :disabled="store.settings.workforceAuto" class="range-slider">
             <div class="slider-track-bg">
                <div class="slider-fill" :style="{ width: `${saturationPercent}%` }"></div>
             </div>
@@ -150,8 +150,7 @@ const handleWorkforceInput = (e: Event) => {
               <div class="cb" :class="{ 'cb-active': store.settings.workforceAuto }">
                 <div v-if="store.settings.workforceAuto" class="cb-inner"></div>
               </div>
-              <span class="text-[11px] font-bold italic uppercase" 
-                    :class="store.settings.workforceAuto ? 'text-sky-400' : 'text-slate-500'">
+              <span class="text-[11px] font-bold italic uppercase" :class="store.settings.workforceAuto ? 'text-sky-400' : 'text-slate-500'">
                 {{ t('ui.auto_calc') }} ({{ t('ui.limit') }}: {{ formatNum(maxAllowedWorkforce) }})
               </span>
             </label>
@@ -170,19 +169,61 @@ const handleWorkforceInput = (e: Event) => {
 .panel-container { @apply bg-slate-800 rounded border border-slate-700 overflow-hidden text-sm shadow-xl; }
 .panel-header { @apply flex justify-between items-center p-3 bg-slate-900 border-b border-slate-700; }
 .header-title { @apply font-bold text-slate-200 uppercase tracking-widest text-xs; }
+
 .status-badge { @apply px-2 py-0.5 rounded font-mono text-[10px] font-bold border border-current; }
+.status-surplus { @apply bg-emerald-500/20 text-emerald-400; }
+.status-shortage { @apply bg-red-500/20 text-red-400; }
+
 .section-header { @apply flex justify-between px-3 py-2 bg-slate-800/50 hover:bg-slate-700 cursor-pointer border-b border-slate-700/50 select-none transition-colors; }
-.label-group { @apply flex items-center gap-2 font-bold text-[10px] uppercase tracking-tighter; }
-.arrow { @apply text-[8px] text-slate-500 transform transition-transform; }
-.arrow-open { @apply rotate-90 text-sky-400; }
-.val-text { @apply font-mono font-bold; }
-.list-container { @apply bg-slate-950/30 px-4 py-2 space-y-1 border-b border-slate-800; }
-.list-item { @apply flex justify-between text-[11px] py-1 border-b border-white/5 last:border-0; }
-.name-text { @apply text-slate-400; }
-.val-small { @apply font-mono font-medium; }
+.section-label { @apply flex items-center gap-2 font-bold text-[10px] uppercase tracking-tighter; }
+.arrow { @apply text-[8px] text-slate-500 mr-1 transition-transform duration-200; }
+.arrow-open { @apply rotate-90; }
+.total-val { @apply font-mono font-bold; }
+
+.list-box { @apply bg-slate-950/30 border-b border-slate-700/50; }
+.list-item { @apply flex justify-between items-center px-4 py-1.5 text-[11px] hover:bg-slate-800/50 transition-colors border-b border-slate-800/30 last:border-0; }
+
+.item-name { @apply flex items-center gap-1; }
+.item-name .qty { @apply font-mono; }
+.item-name .symbol { @apply opacity-30 scale-90 text-slate-500; }
+.item-val { @apply font-mono font-medium; }
+
+.section-needed .section-label, .section-needed .total-val { @apply text-red-400; }
+.section-needed .arrow-open { @apply text-red-400; }
+.section-needed .list-item .item-name { @apply text-red-400/70; }
+.section-needed .list-item .qty { @apply text-red-400/80; }
+.section-needed .list-item .item-val { @apply text-red-500; }
+
+.section-capacity .section-label, .section-capacity .total-val { @apply text-emerald-400; }
+.section-capacity .arrow-open { @apply text-emerald-400; }
+.section-capacity .list-item .item-name { @apply text-emerald-400/70; }
+.section-capacity .list-item .qty { @apply text-emerald-400/80; }
+.section-capacity .list-item .item-val { @apply text-emerald-500; }
+
+/* 输入框样式：仅在手动编辑时可见 */
+.val-input-large { 
+  @apply bg-slate-950/50 border border-slate-700 rounded px-1.5 text-sm font-mono font-bold text-sky-400/90 w-24 transition-all;
+  @apply focus:border-slate-500 focus:bg-slate-950 focus:ring-0 h-6 leading-none;
+  appearance: auto;
+}
+
+/* 文本展示样式：与输入框文字完全对齐 */
+.val-text-display { 
+  @apply text-sm font-mono font-bold text-sky-400/90 h-6 flex items-center px-1.5; 
+}
+
+.val-input-large::-webkit-inner-spin-button {
+  @apply opacity-0 cursor-pointer ml-0.5 transition-opacity duration-200;
+  background-color: transparent;
+  filter: invert(1) brightness(0.4) contrast(0.8);
+  height: 14px;
+}
+
+.val-input-large:hover::-webkit-inner-spin-button { @apply opacity-70; }
+
 .footer { @apply p-4 border-t border-slate-700 bg-slate-800; }
 .workforce-control-panel { @apply bg-slate-900/50 p-3 rounded border border-slate-700/50; }
-.val-input-large { @apply bg-transparent border-none p-0 text-xl font-mono font-bold text-sky-400 w-24 focus:ring-0 disabled:text-slate-500; }
+.control-header { @apply flex justify-between items-center mb-2; }
 .percent-display { @apply text-sm font-mono text-slate-500 font-bold; }
 .slider-container { @apply relative w-full h-6 flex items-center; }
 .range-slider { @apply absolute z-10 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed; }
