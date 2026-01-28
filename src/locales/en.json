@@ -1,0 +1,39 @@
+{
+  "ui": {
+    "resource_overview": "Resource Production Overview",
+    "current_efficiency": "Current Efficiency",
+    "hourly_rate": "Hourly Rate",
+    "no_active_production": "No Active Production",
+    "add_modules_hint": "Add production modules to see data",
+    "workforce_needed": "Workforce Needed",
+    "workforce_capacity": "Workforce Capacity",
+    "efficiency_bonus": "Efficiency Bonus",
+    "cycle_time": "Cycle Time",
+    "build_cost": "Build Cost",
+    "build_time": "Build Time",
+    "average_price": "Average Price",
+    "min_price": "Min Price",
+    "max_price": "Max Price",
+    "profit_estimate": "Profit Estimate",
+    "total_revenue": "Total Revenue",
+    "total_expense": "Total Expense",
+    "net_profit": "Net Profit",
+    "workforce_mgmt": "Workforce Management",
+    "surplus": "Surplus",
+    "shortage": "Shortage",
+    "req_production": "Required for Production",
+    "actual_workforce": "Actual Workforce",
+    "auto_calc": "Auto-Calculate",
+    "limit": "Limit",
+    "inc_phq": "Inc. PHQ"
+  },
+  "race": {
+    "argon": "Argon",
+    "paranid": "Paranid",
+    "teladi": "Teladi",
+    "split": "Split",
+    "terran": "Terran",
+    "boron": "Boron",
+    "generic": "Generic"
+  }
+}

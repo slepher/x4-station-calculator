@@ -1,401 +1,250 @@
 import { defineStore } from 'pinia'
-import { mockModules, waresDb } from '@/assets/mock_data'
+import { ref, computed } from 'vue'
+import { demoSaveData, type SavedModule } from '@/mock/mock_data'
+import type { X4Module, X4Ware, WareAmountMap } from '../types/x4'
 
-// 增强接口定义
-export interface ModuleData {
-  id: string
-  name: string
-  race?: string
-  type?: string
-  workforce?: { capacity: number, needed: number }
-  inputs?: Record<string, number> // 资源ID: 每小时数量
-  outputs?: Record<string, number>
-  cost?: number
-  buildCost?: Record<string, number> // 新增
+// 1. 静态导入游戏数据
+import waresRaw from '@/assets/game_data/Timelines (7.10)/data/wares.json'
+import ModulesRaw from '@/assets/game_data/Timelines (7.10)/data/modules.json'
+
+export interface PlannedModuleDisplay extends SavedModule {
+  nameId: string;    
+  cost: number;      
+  buildCost: WareAmountMap; 
 }
 
-export interface ResourceDetailItem {
-  moduleName: string;
-  count: number;
-  amount: number; // 正数生产，负数消耗
-  efficiency?: number; // 比如光照加成
-}
+export const useStationStore = defineStore('station', () => {
+  
+  const plannedModules = ref<SavedModule[]>([])
 
-export interface PlannedModule {
-  moduleId: string
-  count: number
-}
+  const settings = ref({
+    useHQ: false,           
+    actualWorkforce: 0,      // 【新增】实际人口数值，作为产量计算的唯一标准
+    workforcePercent: 100,  
+    workforceAuto: true,    
+    priceMultiplier: 0.5    // 0:min, 0.5:avg, 1:max
+  })
 
-export const useStationStore = defineStore('station', {
-  state: () => ({
-    modules: mockModules,
-    plannedModules: [] as PlannedModule[],
-    sunlight: 100,
-    wares: waresDb,
-    settings: {
-      useHQ: false,
-      workforceAuto: true,
-      workforcePercent: 100,
-      resourcePricePercent: 50, // 资源价格滑块
-      productPricePercent: 50,  // 产品价格滑块
+  // ----------------------------------------------------------------
+  // Computed Maps (保持不变)
+  // ----------------------------------------------------------------
+
+  const waresMap = computed(() => {
+    const map: Record<string, X4Ware> = {}
+    const raw = waresRaw as any[]
+    raw.forEach(w => {
+      map[w.id] = { ...w, price: w.price || 0, minPrice: w.minPrice || 0, maxPrice: w.maxPrice || 0 }
+    })
+    return map
+  })
+
+  const modulesMap = computed(() => {
+    const map: Record<string, X4Module> = {}
+    ModulesRaw.forEach(m => {
+      map[m.id] = {
+        ...m,
+        buildCost: m.buildCost || {},
+        outputs: m.outputs || {},
+        inputs: m.inputs || {},
+        cycleTime: m.cycleTime || 0,
+        workforce: {
+          capacity: m.workforce?.capacity || 0,
+          needed: m.workforce?.needed || 0,
+          maxBonus: m.workforce?.maxBonus || 0
+        }
+      } as X4Module
+    })
+    return map
+  })
+
+  // ----------------------------------------------------------------
+  // Actions (保持不变)
+  // ----------------------------------------------------------------
+
+  function loadDemoData() {
+    const validData = demoSaveData.filter(item => modulesMap.value[item.id])
+    plannedModules.value = JSON.parse(JSON.stringify(validData))
+  }
+
+  function addModule(id: string, count = 1) {
+    if (!modulesMap.value[id]) return
+    const existing = plannedModules.value.find(m => m.id === id)
+    if (existing) { existing.count += count } 
+    else { plannedModules.value.push({ id, count }) }
+  }
+
+  function updateModuleCount(id: string, count: number) {
+    const existing = plannedModules.value.find(m => m.id === id)
+    if (existing) {
+      if (count <= 0) { removeModuleById(id) } 
+      else { existing.count = count }
     }
-  }),
+  }
 
-  getters: {
-    getModuleInfo: (state) => (id: string) => state.modules.find(m => m.id === id),
+  function removeModule(index: number) {
+    if (index >= 0 && index < plannedModules.value.length) {
+      plannedModules.value.splice(index, 1)
+    }
+  }
 
-    // 1. 计算全站资源净产出 (核心算法)
-    netProduction(state) {
-      const result: Record<string, number> = {}
+  function removeModuleById(id: string) {
+    const index = plannedModules.value.findIndex(m => m.id === id)
+    if (index !== -1) removeModule(index)
+  }
 
-      state.plannedModules.forEach(item => {
-        const info = state.modules.find(m => m.id === item.moduleId)
-        if (!info) return
+  function clearAll() { plannedModules.value = [] }
 
-        // 计算产出 (加法)
-        if (info.outputs) {
-          for (const [ware, amount] of Object.entries(info.outputs)) {
-            // 特殊逻辑：能量电池受阳光影响
-            let efficiency = 1.0
-            if (ware === 'energycells' && info.type === 'production') {
-              efficiency = state.sunlight / 100
-            }
-            const total = amount * item.count * efficiency
-            result[ware] = (result[ware] || 0) + total
-          }
-        }
+  function getModuleInfo(id: string): X4Module {
+    return modulesMap.value[id] || {
+      id, wareId: '', nameId: id, type: 'unknown', race: 'unknown', buildTime: 0,
+      buildCost: {}, cycleTime: 0, outputs: {}, inputs: {},
+      workforce: { capacity: 0, needed: 0, maxBonus: 0 }
+    } as X4Module
+  }
 
-        // 计算消耗 (减法)
-        if (info.inputs) {
-          for (const [ware, amount] of Object.entries(info.inputs)) {
-             const total = amount * item.count
-             result[ware] = (result[ware] || 0) - total
-          }
-        }
-      })
-      return result
-    },
+  // ----------------------------------------------------------------
+  // Getters
+  // ----------------------------------------------------------------
 
-    // 2. 计算劳动力情况
-    workforceStats(state) {
-      let needed = 0
-      let capacity = 0
+  function getDynamicPrice(wareId: string) {
+    const ware = waresMap.value[wareId]
+    if (!ware) return 0
+    if (settings.value.priceMultiplier <= 0.5) {
+      const t = settings.value.priceMultiplier * 2
+      return ware.minPrice + (ware.price - ware.minPrice) * t
+    } else {
+      const t = (settings.value.priceMultiplier - 0.5) * 2
+      return ware.price + (ware.maxPrice - ware.price) * t
+    }
+  }
 
-      state.plannedModules.forEach(item => {
-        const info = state.modules.find(m => m.id === item.moduleId)
-        if (info?.workforce) {
-          needed += (info.workforce.needed || 0) * item.count
-          capacity += (info.workforce.capacity || 0) * item.count
-        }
-      })
+  const constructionBreakdown = computed(() => {
+    let totalCost = 0
+    const totalMaterials: Record<string, number> = {}
+    const moduleList: PlannedModuleDisplay[] = plannedModules.value.map(item => {
+      const info = modulesMap.value[item.id]
+      if (!info) return null
+      let itemTotalCost = 0
+      for (const [matId, amountPerModule] of Object.entries(info.buildCost)) {
+        const totalAmount = amountPerModule * item.count
+        itemTotalCost += totalAmount * (waresMap.value[matId]?.price || 0)
+        totalMaterials[matId] = (totalMaterials[matId] || 0) + totalAmount
+      }
+      totalCost += itemTotalCost
+      return { ...item, nameId: info.nameId || info.id, cost: itemTotalCost, buildCost: info.buildCost }
+    }).filter((item): item is PlannedModuleDisplay => item !== null)
+    return { moduleList, totalCost, totalMaterials }
+  })
 
-      return { needed, capacity, diff: capacity - needed }
-    },
+  const workforceBreakdown = computed(() => {
+    let neededTotal = 0
+    let capacityTotal = 0
+    const neededList: any[] = []
+    const capacityList: any[] = []
 
-    // 3. 计算建造成本
-    totalConstructionCost(state) {
-      return state.plannedModules.reduce((acc, item) => {
-        const info = state.modules.find(m => m.id === item.moduleId)
-        return acc + (info?.cost || 0) * item.count
-      }, 0)
-    },
+    if (settings.value.useHQ) {
+      neededTotal += 200
+      neededList.push({ id: 'player_hq', nameId: '{20102,2011}', count: 1, value: 200 })
+    }
+
+    plannedModules.value.forEach(item => {
+      const info = modulesMap.value[item.id]
+      if (!info) return
+      if (info.workforce.needed > 0) {
+        const val = info.workforce.needed * item.count
+        neededTotal += val
+        neededList.push({ id: item.id, nameId: info.nameId, count: item.count, value: val })
+      }
+      if (info.workforce.capacity > 0) {
+        const val = info.workforce.capacity * item.count
+        capacityTotal += val
+        capacityList.push({ id: item.id, nameId: info.nameId, count: item.count, value: val })
+      }
+    })
+
+    return {
+      needed: { total: neededTotal, list: neededList },
+      capacity: { total: capacityTotal, list: capacityList },
+      diff: capacityTotal - neededTotal
+    }
+  })
+
+  /**
+   * 【核心改动】效率指标计算
+   * 饱和度现在基于 settings.actualWorkforce 计算，范围为 0.0 到 1.0
+   * 组件层负责确保 actualWorkforce 不超过 needed.total
+   */
+  const efficiencyMetrics = computed(() => {
+    const wf = workforceBreakdown.value
+    if (wf.needed.total === 0) return { saturation: 0 }
     
-    // 4. 计算每小时盈利 (净产出 * 价格)
-    hourlyProfit(state): number {
-      // 这里的 netProduction 需要通过 this 访问，TS 中通常不能直接访问兄弟 getter
-      // 简单起见，我们在外部计算，或者这里重新调用逻辑。
-      // 为演示方便，我们暂时简化，在 UI 层结合 netProduction 和 prices 计算。
-      return 0 
-    },
-
-    getResourceDetails: (state) => (resourceId: string): ResourceDetailItem[] => {
-      const details: ResourceDetailItem[] = [];
-
-      state.plannedModules.forEach(item => {
-        const info = state.modules.find(m => m.id === item.moduleId);
-        if (!info) return;
-
-        let amount = 0;
-        let efficiency = 1.0;
-
-        // 1. 检查是否是产出
-        if (info.outputs && info.outputs[resourceId]) {
-          // 特殊逻辑：能量电池受阳光影响
-          if (resourceId === 'energycells' && info.type === 'production') {
-            efficiency = state.sunlight / 100;
-          }
-          amount = info.outputs[resourceId] * item.count * efficiency;
-        }
-
-        // 2. 检查是否是消耗 (消耗为负数)
-        if (info.inputs && info.inputs[resourceId]) {
-          amount = -(info.inputs[resourceId] * item.count);
-        }
-
-        // 如果该模块与此资源有关，加入列表
-        if (amount !== 0) {
-          details.push({
-            moduleName: info.name,
-            count: item.count,
-            amount: amount,
-            efficiency: efficiency !== 1.0 ? efficiency : undefined
-          });
-        }
-      });
-
-      // 排序：先看生产(正数)，再看消耗(负数)
-      return details.sort((a, b) => b.amount - a.amount);
-    },
-
-    // ★ 1. 人力详情 Getter (用于 StationWorkforce)
-    workforceDetails(state) {
-      const details: any[] = []
-      let totalNeeded = 0
-      let totalCapacity = 0
-
-      // 如果勾选了 HQ，增加额外需求
-      if (state.settings.useHQ) {
-         totalNeeded += 200
-      }
-
-      state.plannedModules.forEach(item => {
-        const info = state.modules.find(m => m.id === item.moduleId)
-        if (!info?.workforce) return
-
-        const needed = (info.workforce.needed || 0) * item.count
-        const capacity = (info.workforce.capacity || 0) * item.count
-        
-        if (needed > 0 || capacity > 0) {
-          totalNeeded += needed
-          totalCapacity += capacity
-          details.push({
-            name: info.name,
-            count: item.count,
-            value: capacity > 0 ? capacity : -needed, // 正数提供，负数消耗
-            isCapacity: capacity > 0
-          })
-        }
-      })
-      
-      // 排序：先显示提供的(绿色)，再显示消耗的(红色)
-      details.sort((a, b) => b.value - a.value)
-
-      return { list: details, totalNeeded, totalCapacity }
-    },
-
-    // ★ 2. 建设成本详情 Getter (用于 StationConstruction)
-    constructionDetails(state) {
-      const materials: Record<string, number> = {}
-      let totalCredits = 0
-
-      state.plannedModules.forEach(item => {
-        const info = state.modules.find(m => m.id === item.moduleId)
-        if (!info) return
-
-        // 计算总价 (Credits)
-        totalCredits += (info.cost || 0) * item.count
-
-        // 计算材料 (Materials)
-        if (info.buildCost) {
-          for (const [mat, amount] of Object.entries(info.buildCost)) {
-            materials[mat] = (materials[mat] || 0) + amount * item.count
-          }
-        }
-      })
-
-      return { totalCredits, materials }
-    },
-
-    // ★ 3. 利润计算 Getter (用于 StationProfit)
-    // 这里为了简化，暂时只计算基础逻辑，暂不应用复杂的百分比滑块算法
-    profitDetails(state) {
-       // 复用 netProduction 的结果
-       // 注意：在 Store 内部调用 getter 需要用 this
-       const production = this.netProduction
-       let expenses = 0
-       let revenue = 0
-       
-       const items = Object.entries(production).map(([key, amount]) => {
-         const price = state.wares[key]?.price || 0
-         const value = amount * price
-         if (amount > 0) revenue += value
-         else expenses += Math.abs(value)
-         
-         return {
-           id: key,
-           name: state.wares[key]?.name || key,
-           amount,
-           value, // 总价值
-           isIncome: amount > 0
-         }
-       })
-       
-       return {
-         list: items.sort((a, b) => b.value - a.value),
-         expenses: -expenses,
-         revenue,
-         profit: revenue - expenses
-       }
-    },
-
-    // ----------------------------------------------------------------
-    // 1. 人力详情 (拆分为：需求组 & 提供组)
-    // ----------------------------------------------------------------
-    workforceBreakdown(state) {
-      const neededItems: any[] = []
-      const capacityItems: any[] = []
-      let totalNeeded = 0
-      let totalCapacity = 0
-
-      // 1. 遍历模块
-      state.plannedModules.forEach(item => {
-        const info = state.modules.find(m => m.id === item.moduleId)
-        if (!info?.workforce) return
-
-        const needed = (info.workforce.needed || 0) * item.count
-        const capacity = (info.workforce.capacity || 0) * item.count
-
-        // 记录需求 (红)
-        if (needed > 0) {
-          totalNeeded += needed
-          neededItems.push({ name: info.name, count: item.count, value: -needed })
-        }
-        // 记录提供 (绿)
-        if (capacity > 0) {
-          totalCapacity += capacity
-          capacityItems.push({ name: info.name, count: item.count, value: capacity })
-        }
-      })
-
-      // 2. 处理 HQ (作为需求项)
-      if (state.settings.useHQ) {
-        totalNeeded += 200
-        neededItems.push({ name: 'Headquarters', count: 1, value: -200 })
-      }
-
-      return {
-        needed: { total: totalNeeded, list: neededItems },
-        capacity: { total: totalCapacity, list: capacityItems },
-        diff: totalCapacity - totalNeeded
-      }
-    },
-
-    // ----------------------------------------------------------------
-    // 2. 利润详情 (拆分为：支出组 & 收入组)
-    // ----------------------------------------------------------------
-    profitBreakdown(state) {
-      // 需要先获取净产出 (这里逻辑稍微复杂，为了性能我们手动再算一遍，或者拆分 netProduction)
-      // 为了准确对应“支出”和“收入”，我们不能只看净值，要看每个资源的流向
-      
-      const expensesMap: Record<string, number> = {} // 消耗的资源
-      const productionMap: Record<string, number> = {} // 生产的资源
-
-      state.plannedModules.forEach(item => {
-        const info = state.modules.find(m => m.id === item.moduleId)
-        if (!info) return
-
-        // 累加产出
-        if (info.outputs) {
-          for (const [ware, amount] of Object.entries(info.outputs)) {
-            let efficiency = 1.0
-            if (ware === 'energycells' && info.type === 'production') {
-              efficiency = state.sunlight / 100
-            }
-            const total = amount * item.count * efficiency
-            productionMap[ware] = (productionMap[ware] || 0) + total
-          }
-        }
-        // 累加消耗
-        if (info.inputs) {
-          for (const [ware, amount] of Object.entries(info.inputs)) {
-            const total = amount * item.count
-            expensesMap[ware] = (expensesMap[ware] || 0) + total
-          }
-        }
-      })
-
-      // 转换为数组并计算价值
-      // 注意：这里用的是“平均价格”，如果要做滑块，需要用 settings.pricePercent 计算
-      const toList = (map: Record<string, number>, isExpense: boolean) => {
-        let totalVal = 0
-        const list = Object.entries(map).map(([id, amount]) => {
-          const price = state.wares[id]?.price || 0
-          const value = amount * price
-          totalVal += value
-          return { id, name: state.wares[id]?.name, amount, value: isExpense ? -value : value }
-        }).sort((a, b) => Math.abs(b.value) - Math.abs(a.value))
-        return { total: totalVal, list }
-      }
-
-      const expenses = toList(expensesMap, true)
-      const production = toList(productionMap, false)
-
-      return {
-        expenses,
-        production,
-        profit: production.total - expenses.total
-      }
-    },
-
-    constructionBreakdown(state) {
-      let totalCost = 0
-      const moduleList: any[] = []
-      const totalMaterials: Record<string, number> = {}
-
-      state.plannedModules.forEach(item => {
-        const info = state.modules.find(m => m.id === item.moduleId)
-        if (!info) return
-
-        const cost = (info.cost || 0) * item.count
-        totalCost += cost
-
-        // ★ 修改点：这里要把 buildCost 和 id 带上
-        moduleList.push({
-          id: item.moduleId, // 必须有 ID 才能控制展开
-          name: info.name,
-          count: item.count,
-          cost: cost,
-          buildCost: info.buildCost // 把配方传出去
-        })
-
-        // 汇总所有材料 (用于最底部的总计)
-        if (info.buildCost) {
-          for (const [mat, amount] of Object.entries(info.buildCost)) {
-            totalMaterials[mat] = (totalMaterials[mat] || 0) + amount * item.count
-          }
-        }
-      })
-
-      return { totalCost, moduleList, totalMaterials }
+    const actual = settings.value.actualWorkforce || 0
+    return {
+      saturation: actual / wf.needed.total // 实际人口占需求人口的比例
     }
-  },
+  })
+  
+  const profitBreakdown = computed(() => {
+    const production: Record<string, number> = {}  
+    const consumption: Record<string, number> = {} 
+    
+    // 核心：从效率指标中获取基于 actualWorkforce 的饱和度
+    const { saturation } = efficiencyMetrics.value 
 
-  actions: {
-    addModule(moduleId: string, amount = 1) {
-      const existing = this.plannedModules.find(m => m.moduleId === moduleId)
-      if (existing) existing.count += amount
-      else this.plannedModules.push({ moduleId, count: amount })
-    },
-    removeModule(moduleId: string) {
-      const index = this.plannedModules.findIndex(m => m.moduleId === moduleId)
-      if (index !== -1) this.plannedModules.splice(index, 1)
-    },
-    updateCount(moduleId: string, count: number) {
-      const item = this.plannedModules.find(m => m.moduleId === moduleId)
-      if (item) item.count = Math.max(1, count)
-    },
-    loadDemoPreset() {
-      this.plannedModules = [
-        { moduleId: 'module_arg_hab_l_01', count: 16 },
-        { moduleId: 'module_gen_prod_energycells_01', count: 4 },
-        { moduleId: 'module_gen_prod_quantumtubes_01', count: 8 },
-        { moduleId: 'module_gen_prod_graphene_01', count: 8 },
-        { moduleId: 'module_gen_prod_hullparts_01', count: 20 },
-        { moduleId: 'module_gen_prod_refinedmetals_01', count: 9 },
-        { moduleId: 'module_gen_prod_superfluidcoolant_01', count: 4 },
-        { moduleId: 'module_gen_prod_plasmaconductors_01', count: 10 },
-        { moduleId: 'module_gen_prod_advancedcomposites_01', count: 4 },
-      ]
+    let totalRevenue = 0
+    let totalExpense = 0
+
+    plannedModules.value.forEach(item => {
+      const info = modulesMap.value[item.id]
+      if (!info) return
+
+      /**
+       * 计算实际加成后的产量：
+       * 实际效率 = 基础(1.0) + (当前饱和度 * 该模块最大加成率)
+       */
+      const moduleEff = 1.0 + (saturation * (info.workforce?.maxBonus || 0))
+
+      // 产出部分：应用效率加成
+      for (const [wareId, hourlyAmount] of Object.entries(info.outputs)) {
+        const actualAmount = hourlyAmount * item.count * moduleEff // 增加产出逻辑
+        const price = getDynamicPrice(wareId)
+        production[wareId] = (production[wareId] || 0) + actualAmount
+        totalRevenue += actualAmount * price
+      }
+
+      // 消耗部分：不受工人影响 (保持原样)
+      for (const [wareId, hourlyAmount] of Object.entries(info.inputs)) {
+        const actualAmount = hourlyAmount * item.count
+        const price = getDynamicPrice(wareId)
+        consumption[wareId] = (consumption[wareId] || 0) + actualAmount
+        totalExpense += actualAmount * price
+      }
+    })
+
+    return {
+      production: { total: totalRevenue, items: production },
+      expenses: { total: totalExpense, items: consumption },
+      profit: totalRevenue - totalExpense
     }
+  })
+  
+  const netProduction = computed(() => {
+    const net: Record<string, number> = {}
+    const { production, expenses } = profitBreakdown.value
+    const allIds = new Set([...Object.keys(production.items), ...Object.keys(expenses.items)])
+    allIds.forEach(id => {
+      const diff = (production.items[id] || 0) - (expenses.items[id] || 0)
+      if (Math.abs(diff) > 0.001) net[id] = diff
+    })
+    return net
+  })
+
+  return {
+    plannedModules, settings,
+    wares: waresMap, modules: modulesMap,
+    loadDemoData, addModule, updateModuleCount, removeModule, removeModuleById, clearAll, getModuleInfo,
+    constructionBreakdown, workforceBreakdown, profitBreakdown,
+    currentEfficiency: computed(() => efficiencyMetrics.value.saturation),
+    netProduction
   }
 })

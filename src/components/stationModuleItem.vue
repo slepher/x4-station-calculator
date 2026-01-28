@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { PlannedModule, ModuleData } from '@/store/useStationStore'
 
+import { useX4I18n } from '@/utils/useX4I18n';
+const { translateModule } = useX4I18n();
+
 const props = defineProps<{
   item: PlannedModule
   info: ModuleData
@@ -20,7 +23,7 @@ const emit = defineEmits<{
     
     <div class="module-info">
        <div class="module-name" :title="info.name">
-         {{ info.name }}
+         {{ translateModule(info) }}
        </div>
     </div>
     

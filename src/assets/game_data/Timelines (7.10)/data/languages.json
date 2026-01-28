@@ -5,6 +5,16 @@
     "x4_id": "044"
   },
   {
+    "code": "zh-CN",
+    "name": "简体中文",
+    "x4_id": "086"
+  },
+  {
+    "code": "zh-TW",
+    "name": "繁體中文",
+    "x4_id": "088"
+  },
+  {
     "code": "de",
     "name": "Deutsch",
     "x4_id": "049"
@@ -38,16 +48,6 @@
     "code": "ko",
     "name": "한국어",
     "x4_id": "082"
-  },
-  {
-    "code": "zh-CN",
-    "name": "简体中文",
-    "x4_id": "086"
-  },
-  {
-    "code": "zh-TW",
-    "name": "繁體中文",
-    "x4_id": "088"
   },
   {
     "code": "pt-BR",

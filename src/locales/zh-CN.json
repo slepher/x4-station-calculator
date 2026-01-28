@@ -1,0 +1,40 @@
+{
+  "ui": {
+    "resource_overview": "资源产出概览",
+    "current_efficiency": "当前综合效率",
+    "hourly_rate": "每小时流量",
+    "no_active_production": "暂无活跃生产周期",
+    "add_modules_hint": "请添加生产模块以查看数据",
+    "workforce_needed": "所需劳动力",
+    "workforce_capacity": "劳动力容量",
+    "efficiency_bonus": "产量加成",
+    "cycle_time": "生产周期",
+    "build_cost": "建造消耗",
+    "build_time": "建造时间",
+    "average_price": "平均价格",
+    "min_price": "最低价格",
+    "max_price": "最高价格",
+    "profit_estimate": "利润预估",
+    "total_revenue": "总收入",
+    "total_expense": "总支出",
+    "net_profit": "净利润",
+    "workforce_mgmt": "劳动力管理",
+    "surplus": "盈余",
+    "shortage": "缺口",
+    "req_production": "生产需求",
+    "hab_capacity": "居住容量",
+    "actual_workforce": "当前劳动力",
+    "auto_calc": "自动计算",
+    "limit": "上限",
+    "inc_phq": "包含总部 (PHQ)"
+  },
+  "race": {
+    "argon": "Argon",
+    "paranid": "Paranid",
+    "teladi": "Teladi",
+    "split": "Split",
+    "terran": "Terran",
+    "boron": "Boron",
+    "generic": "通用"
+  }
+}
