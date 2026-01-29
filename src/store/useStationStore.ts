@@ -30,6 +30,7 @@ export const useStationStore = defineStore('station', () => {
     manualWorkforce: 0,      
     workforcePercent: 100,  
     workforceAuto: true,    
+    considerWorkforceForAutoFill: false, // 自动填充时是否考虑工人加成
     buyMultiplier: 0.5,      
     sellMultiplier: 0.5,     
     minersEnabled: false,    
@@ -333,11 +334,44 @@ export const useStationStore = defineStore('station', () => {
     return net
   })
 
+  /**
+   * 自动填充缺失生产线：
+   * 1. 扫描 netProduction 中所有为负的资源
+   * 2. 根据是否考虑工人加成计算所需模块数量
+   * 3. 自动加入规划列表
+   */
+  function autoFillMissingLines() {
+    const net = netProduction.value;
+    const saturation = efficiencyMetrics.value.saturation;
+
+    Object.entries(net).forEach(([wareId, data]) => {
+      if (data.total < -0.001) {
+        const deficit = Math.abs(data.total);
+        // 寻找产出该资源的第一个模块（排除居住模块本身）
+        const targetModule = Object.values(modulesMap.value).find(m => m.outputs[wareId] && m.type !== 'habitat');
+        
+        if (targetModule) {
+          // 计算单模块效率系数
+          let eff = 1.0;
+          if (settings.value.considerWorkforceForAutoFill) {
+            eff = 1.0 + (saturation * (targetModule.workforce?.maxBonus || 0));
+          }
+          
+          const singleModuleOutput = (targetModule.outputs[wareId] || 0) * eff;
+          if (singleModuleOutput > 0) {
+            const count = Math.ceil(deficit / singleModuleOutput);
+            addModule(targetModule.id, count);
+          }
+        }
+      }
+    });
+  }
+
   return {
     plannedModules, settings, searchQuery, filteredModulesGrouped,
     wares: waresMap, modules: localizedModulesMap,
     loadDemoData, addModule, updateModuleId, updateModuleCount, removeModule, removeModuleById, clearAll, getModuleInfo,
-    constructionBreakdown, workforceBreakdown, profitBreakdown,
+    constructionBreakdown, workforceBreakdown, profitBreakdown, autoFillMissingLines,
     actualWorkforce, currentEfficiency: computed(() => efficiencyMetrics.value.saturation), netProduction
   }
 })
