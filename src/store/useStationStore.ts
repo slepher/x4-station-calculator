@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { demoSaveData, type SavedModule } from '@/mock/mock_data'
 import type { X4Module, X4Ware, WareAmountMap } from '../types/x4'
+import { useI18n } from 'vue-i18n'
+import { useX4I18n } from '@/utils/useX4I18n'
 
 // 1. 静态导入游戏数据
 import waresRaw from '@/assets/game_data/Timelines (7.10)/data/wares.json'
@@ -14,24 +16,27 @@ export interface PlannedModuleDisplay extends SavedModule {
 }
 
 export const useStationStore = defineStore('station', () => {
+  const { locale: currentLocale } = useI18n();
+  const { translateModule } = useX4I18n();
   
+  // --- 状态 (State) ---
   const plannedModules = ref<SavedModule[]>([])
+  const searchQuery = ref('') // 全局搜索状态，驱动检索逻辑
+  const localizedModulesMap = ref<Record<string, X4Module & { localeName: string }>>({});
 
   const settings = ref({
+    sunlight: 100, // 强制初始值为 100%
     useHQ: false,           
     manualWorkforce: 0,      
     workforcePercent: 100,  
     workforceAuto: true,    
-    buyMultiplier: 0.5,      // 对应 Resources Price
-    sellMultiplier: 0.5,     // 对应 Products Price
-    minersEnabled: false,    // 对应 Miners provide basic resources
-    internalSupply: false    // 对应 Resources are provided by other stations
+    buyMultiplier: 0.5,      
+    sellMultiplier: 0.5,     
+    minersEnabled: false,    
+    internalSupply: false
   })
 
-  // ----------------------------------------------------------------
-  // Computed Maps
-  // ----------------------------------------------------------------
-
+  // --- 基础数据映射 (Computed Maps) ---
   const waresMap = computed(() => {
     const map: Record<string, X4Ware> = {}
     const raw = waresRaw as any[]
@@ -60,27 +65,88 @@ export const useStationStore = defineStore('station', () => {
     return map
   })
 
-  // ----------------------------------------------------------------
-  // Actions
-  // ----------------------------------------------------------------
+  // --- 数据预热 (针对 EN 模式优化：不执行重复翻译计算) ---
+  const prepareLocalizedData = () => {
+    const isEn = currentLocale.value === 'en';
+    const newMap: Record<string, any> = {};
 
+    ModulesRaw.forEach(m => {
+      newMap[m.id] = {
+        ...m,
+        // 如果是 en，直接同步 name 字段，不再进入 translate 查找开销
+        localeName: isEn ? (m.name || '') : translateModule(m as any)
+      };
+    });
+    localizedModulesMap.value = newMap;
+  };
+
+  watch(() => currentLocale.value, () => prepareLocalizedData(), { immediate: true });
+
+  // --- 搜索增强 (ID/Name/Locale 三重判定) ---
+  const filteredModulesGrouped = computed(() => {
+    const query = searchQuery.value.trim().toLowerCase();
+    const isSearching = query.length > 0;
+    const isEn = currentLocale.value === 'en';
+
+    const results: Record<string, any[]> = {};
+
+    Object.values(localizedModulesMap.value).forEach(m => {
+      const localeName = (m.localeName || '').toLowerCase();
+      const originalName = (m.name || '').toLowerCase();
+      const id = (m.id || '').toLowerCase();
+
+      const localeHit = localeName.includes(query);
+      const idHit = id.includes(query);
+      const nameHit = !isEn && originalName.includes(query); // 仅在非 EN 模式匹配原始名
+      
+      const isMatch = !isSearching || (localeHit || nameHit || idHit);
+
+      if (isMatch) {
+        let label = m.localeName;
+        if (isSearching) {
+          // 像素级共识：括号补偿显示逻辑
+          if (isEn) {
+            if (idHit && !localeHit) label += ` (${m.id})`;
+          } else {
+            if (nameHit && !localeHit) {
+              label += ` (${m.name})`;
+            } else if (idHit && !localeHit && !nameHit) {
+              label += ` (${m.id})`;
+            }
+          }
+        }
+        const type = m.type || 'others';
+        if (!results[type]) results[type] = [];
+        results[type].push({ ...m, displayLabel: label });
+      }
+    });
+    return results;
+  });
+  
+  // --- 操作方法 (Actions) ---
   function loadDemoData() {
-    const validData = demoSaveData.filter(item => modulesMap.value[item.id])
+    const validData = demoSaveData.filter(item => modulesMap.value[item.id] || item.id === '')
     plannedModules.value = JSON.parse(JSON.stringify(validData))
   }
 
-  function addModule(id: string, count = 1) {
-    if (!modulesMap.value[id]) return
-    const existing = plannedModules.value.find(m => m.id === id)
+  function addModule(id: string = '', count = 1) {
+    if (id !== '' && !modulesMap.value[id]) return
+    const existing = plannedModules.value.find(m => m.id === id && id !== '')
     if (existing) { existing.count += count } 
     else { plannedModules.value.push({ id, count }) }
   }
 
+  function updateModuleId(index: number, newId: string) {
+    if (index >= 0 && index < plannedModules.value.length) {
+      plannedModules.value[index].id = newId
+    }
+  }
+
   function updateModuleCount(index: number, count: number) {
-      if (index >= 0 && index < plannedModules.value.length) {
-        const module = plannedModules.value[index];
-        if(module) module.count = count;
-      }
+    if (index >= 0 && index < plannedModules.value.length) {
+      const module = plannedModules.value[index];
+      if(module) module.count = count;
+    }
   }
 
   function removeModule(index: number) {
@@ -104,14 +170,10 @@ export const useStationStore = defineStore('station', () => {
     } as X4Module
   }
 
-  // ----------------------------------------------------------------
-  // Getters
-  // ----------------------------------------------------------------
-
+  // --- 业务计算逻辑 (接口完整性保障) ---
   function getDynamicPrice(wareId: string, isInput = false) {
     const ware = waresMap.value[wareId]
     if (!ware) return 0
-    
     const multiplier = isInput ? settings.value.buyMultiplier : settings.value.sellMultiplier
     
     if (multiplier <= 0.5) {
@@ -229,7 +291,6 @@ export const useStationStore = defineStore('station', () => {
     for (const [wareId, data] of Object.entries(wareDetails)) {
       const net = data.production - data.consumption
       if (Math.abs(net) < 0.001) continue
-
       if (net > 0) {
         // 净产出 > 0: 计入收入
         const price = getDynamicPrice(wareId, false)
@@ -273,12 +334,10 @@ export const useStationStore = defineStore('station', () => {
   })
 
   return {
-    plannedModules, settings,
-    wares: waresMap, modules: modulesMap,
-    loadDemoData, addModule, updateModuleCount, removeModule, removeModuleById, clearAll, getModuleInfo,
+    plannedModules, settings, searchQuery, filteredModulesGrouped,
+    wares: waresMap, modules: localizedModulesMap,
+    loadDemoData, addModule, updateModuleId, updateModuleCount, removeModule, removeModuleById, clearAll, getModuleInfo,
     constructionBreakdown, workforceBreakdown, profitBreakdown,
-    actualWorkforce, 
-    currentEfficiency: computed(() => efficiencyMetrics.value.saturation),
-    netProduction
+    actualWorkforce, currentEfficiency: computed(() => efficiencyMetrics.value.saturation), netProduction
   }
 })

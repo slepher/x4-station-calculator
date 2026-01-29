@@ -32,7 +32,12 @@
     "module_breakdown": "MODULE RESOURCE BREAKDOWN",
     "no_materials": "Standard module - No materials required",
     "total_build_cost": "TOTAL CONSTRUCTION COST",
-    "build_res_price": "BUILD RESOURCES PRICE"  
+    "build_res_price": "BUILD RESOURCES PRICE",
+    "station_planner": "Station Planner",
+    "module_list": "Station Modules",
+    "search_placeholder": "Search (Name / ID / Pinyin)...",
+    "add_hint": "Add to planning list",
+    "sun_light": "SUN LIGHT"
   },
   "profit": {
     "title": "ECONOMIC ANALYSIS",
@@ -46,7 +51,6 @@
     "production": "GROSS PRODUCTION",
     "footer": "ESTIMATED HOURLY PROFIT"
   },
-
   "race": {
     "argon": "Argon",
     "paranid": "Paranid",

@@ -22,15 +22,6 @@ const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.roun
       <div class="flex items-center gap-6">
         <h2 class="text-2xl font-bold text-sky-400 uppercase tracking-widest">Station Planner</h2>
         
-        <div class="flex items-center gap-2 bg-slate-900 px-3 py-1 rounded border border-slate-700">
-           <span class="text-slate-400 text-xs uppercase font-bold">Sun Light</span>
-           <input 
-             type="number" 
-             v-model.number="store.settings.sunlight" 
-             class="w-12 bg-transparent text-right text-yellow-400 font-mono focus:outline-none" 
-           />
-           <span class="text-slate-500">%</span>
-        </div>
       </div>
 
       <div class="flex items-center gap-2">

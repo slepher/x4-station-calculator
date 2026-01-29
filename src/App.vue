@@ -9,13 +9,5 @@ if (import.meta.env.DEV) {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#0b1120] text-gray-200 font-sans">
-    <header class="p-6 border-b border-slate-800">
-      <h1 class="text-2xl font-bold tracking-wider text-sky-500 uppercase">X4 Station Calculator <span class="text-xs text-slate-500 align-top">Vue3 Clone</span></h1>
-    </header>
-
-    <main class="py-8">
-      <StationPlanner />
-    </main>
-  </div>
+  <StationPlanner />
 </template>
