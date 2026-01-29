@@ -17,7 +17,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="module-row group/row cursor-move">
+  <div class="module-row group/row cursor-move h-9">
     <div class="color-bar" 
          :class="info.type === 'habitat' ? 'bg-orange-500' : 'bg-sky-500'">
     </div>
@@ -48,16 +48,16 @@ const emit = defineEmits<{
 
 <style scoped>
 .module-row {
-  @apply flex items-center bg-slate-800/80 border border-slate-700/50 px-2 rounded-sm hover:border-sky-500/40 transition-all;
+  @apply flex items-center bg-slate-800 border border-slate-700 p-1 rounded hover:border-sky-500/50 transition-all;
 }
 .color-bar {
-  @apply w-1 h-4 rounded-full mr-2 flex-shrink-0;
+  @apply w-1 h-5 rounded mr-2 flex-shrink-0;
 }
 .module-info {
   @apply flex-1 min-w-0 mr-2;
 }
 .module-name {
-  @apply truncate font-medium text-slate-300 text-[11px] leading-none;
+  @apply truncate font-medium text-slate-300 text-xs sm:text-sm;
 }
 .controls {
   @apply flex items-center gap-1;
