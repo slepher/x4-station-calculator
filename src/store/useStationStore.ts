@@ -76,12 +76,11 @@ export const useStationStore = defineStore('station', () => {
     else { plannedModules.value.push({ id, count }) }
   }
 
-  function updateModuleCount(id: string, count: number) {
-    const existing = plannedModules.value.find(m => m.id === id)
-    if (existing) {
-      if (count <= 0) { removeModuleById(id) } 
-      else { existing.count = count }
-    }
+  function updateModuleCount(index: number, count: number) {
+      if (index >= 0 && index < plannedModules.value.length) {
+        const module = plannedModules.value[index];
+        if(module) module.count = count;
+      }
   }
 
   function removeModule(index: number) {
@@ -242,8 +241,6 @@ export const useStationStore = defineStore('station', () => {
         const absAmount = Math.abs(net)
         const ware = waresMap.value[wareId]
         const isMined = ware?.transport === 'solid' || ware?.transport === 'liquid'
-        console.log(ware)
-        console.log(isMined)
         
         let price = getDynamicPrice(wareId, true)
         if (settings.value.internalSupply) price = 0

@@ -3,8 +3,6 @@ import { useStationStore } from '@/store/useStationStore'
 import StationModuleItem from './StationModuleItem.vue'
 
 const store = useStationStore()
-
-
 </script>
 
 <template>
@@ -16,12 +14,12 @@ const store = useStationStore()
 
     <div class="space-y-2 max-h-[600px] overflow-y-auto pr-1 scrollbar-thin">
       <StationModuleItem 
-        v-for="item in store.plannedModules" 
+        v-for="(item, index) in store.plannedModules" 
         :key="item.id"
         :item="item"
         :info="store.getModuleInfo(item.id)!"
-        @update:count="(val) => store.updateCount(item.id, val)"
-        @remove="store.removeModule(item.id)"
+        @update:count="(val) => store.updateModuleCount(index, val)"
+        @remove="store.removeModule(index)"
       />
     </div>
 

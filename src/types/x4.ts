@@ -4,6 +4,7 @@
 export interface X4Ware {
   id: string;
   nameId: string;
+  name: string;
   transport: 'container' | 'solid' | 'liquid';
   price: number;      // 平均价格
   minPrice: number;   // 最低价格
@@ -26,6 +27,7 @@ export interface X4Module {
   id: string;         // 宏 ID (如 prod_gen_plasmaconductors_macro)
   wareId: string;     // 对应的商品 ID (用于关联图标和建造费)
   nameId: string;     // 国际化文本 ID (如 {20104,12101})
+  name: string;
   type: 'production' | 'habitation' | 'storage' | 'dock' | 'connection' | string;
   race: string;       // 种族归属
   buildTime: number;  // 建造所需时间 (秒)

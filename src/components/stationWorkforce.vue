@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue'
 import { useStationStore } from '@/store/useStationStore'
 import { useX4I18n } from '@/utils/useX4I18n'
 import { useI18n } from 'vue-i18n'
+import X4NumberInput from '@/components/common/X4NumberInput.vue'
 
 const store = useStationStore()
 const { t } = useI18n()
@@ -55,14 +56,6 @@ const saturationPercent = computed({
     store.settings.manualWorkforce = Math.min(Math.round((val / 100) * capacity), capacity);
   }
 })
-
-const handleWorkforceInput = (e: Event) => {
-  const target = e.target as HTMLInputElement;
-  let val = parseInt(target.value) || 0;
-  const clamped = Math.max(0, Math.min(val, data.value.capacity.total));
-  store.settings.manualWorkforce = clamped;
-  target.value = clamped.toString();
-};
 </script>
 
 <template>
@@ -123,13 +116,12 @@ const handleWorkforceInput = (e: Event) => {
             <div class="flex items-center gap-2">
               <span class="text-[10px] text-slate-500 font-bold uppercase">{{ t('ui.actual_workforce') }}</span>
               
-              <input 
+              <X4NumberInput 
                 v-if="!store.settings.workforceAuto"
-                type="number" 
-                :value="store.actualWorkforce"
-                @input="handleWorkforceInput"
-                class="val-input-large"
-              >
+                v-model="store.settings.manualWorkforce"
+                :max="data.capacity.total"
+                width-class="w-24"
+              />
               <span v-else class="val-text-display">
                 {{ store.actualWorkforce }}
               </span>
@@ -200,26 +192,10 @@ const handleWorkforceInput = (e: Event) => {
 .section-capacity .list-item .qty { @apply text-emerald-400/80; }
 .section-capacity .list-item .item-val { @apply text-emerald-500; }
 
-/* 输入框样式：仅在手动编辑时可见 */
-.val-input-large { 
-  @apply bg-slate-950/50 border border-slate-700 rounded px-1.5 text-sm font-mono font-bold text-sky-400/90 w-24 transition-all;
-  @apply focus:border-slate-500 focus:bg-slate-950 focus:ring-0 h-6 leading-none;
-  appearance: auto;
-}
-
-/* 文本展示样式：与输入框文字完全对齐 */
+/* 文本展示样式：与 X4NumberInput 视觉对齐 */
 .val-text-display { 
   @apply text-sm font-mono font-bold text-sky-400/90 h-6 flex items-center px-1.5; 
 }
-
-.val-input-large::-webkit-inner-spin-button {
-  @apply opacity-0 cursor-pointer ml-0.5 transition-opacity duration-200;
-  background-color: transparent;
-  filter: invert(1) brightness(0.4) contrast(0.8);
-  height: 14px;
-}
-
-.val-input-large:hover::-webkit-inner-spin-button { @apply opacity-70; }
 
 .footer { @apply p-4 border-t border-slate-700 bg-slate-800; }
 .workforce-control-panel { @apply bg-slate-900/50 p-3 rounded border border-slate-700/50; }

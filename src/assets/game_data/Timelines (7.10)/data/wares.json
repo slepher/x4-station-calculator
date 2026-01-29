@@ -2,6 +2,7 @@
   {
     "id": "advancedcomposites",
     "nameId": "{20201,401}",
+    "name": "Advanced Composites",
     "transport": "container",
     "price": 540,
     "minPrice": 432,
@@ -10,6 +11,7 @@
   {
     "id": "advancedelectronics",
     "nameId": "{20201,101}",
+    "name": "Advanced Electronics",
     "transport": "container",
     "price": 1014,
     "minPrice": 710,
@@ -18,6 +20,7 @@
   {
     "id": "antimattercells",
     "nameId": "{20201,201}",
+    "name": "Antimatter Cells",
     "transport": "container",
     "price": 202,
     "minPrice": 121,
@@ -26,6 +29,7 @@
   {
     "id": "antimatterconverters",
     "nameId": "{20201,301}",
+    "name": "Antimatter Converters",
     "transport": "container",
     "price": 354,
     "minPrice": 248,
@@ -34,6 +38,7 @@
   {
     "id": "claytronics",
     "nameId": "{20201,501}",
+    "name": "Claytronics",
     "transport": "container",
     "price": 2040,
     "minPrice": 1734,
@@ -42,6 +47,7 @@
   {
     "id": "dronecomponents",
     "nameId": "{20201,601}",
+    "name": "Drone Components",
     "transport": "container",
     "price": 914,
     "minPrice": 685,
@@ -50,6 +56,7 @@
   {
     "id": "energycells",
     "nameId": "{20201,701}",
+    "name": "Energy Cells",
     "transport": "container",
     "price": 16,
     "minPrice": 10,
@@ -58,6 +65,7 @@
   {
     "id": "engineparts",
     "nameId": "{20201,801}",
+    "name": "Engine Parts",
     "transport": "container",
     "price": 182,
     "minPrice": 128,
@@ -66,6 +74,7 @@
   {
     "id": "fieldcoils",
     "nameId": "{20201,901}",
+    "name": "Field Coils",
     "transport": "container",
     "price": 412,
     "minPrice": 247,
@@ -74,6 +83,7 @@
   {
     "id": "foodrations",
     "nameId": "{20201,1101}",
+    "name": "Food Rations",
     "transport": "container",
     "price": 21,
     "minPrice": 12,
@@ -82,6 +92,7 @@
   {
     "id": "graphene",
     "nameId": "{20201,1501}",
+    "name": "Graphene",
     "transport": "container",
     "price": 166,
     "minPrice": 100,
@@ -90,6 +101,7 @@
   {
     "id": "helium",
     "nameId": "{20201,2801}",
+    "name": "Helium",
     "transport": "liquid",
     "price": 44,
     "minPrice": 37,
@@ -98,6 +110,7 @@
   {
     "id": "hullparts",
     "nameId": "{20201,1201}",
+    "name": "Hull Parts",
     "transport": "container",
     "price": 209,
     "minPrice": 146,
@@ -106,6 +119,7 @@
   {
     "id": "hydrogen",
     "nameId": "{20201,1301}",
+    "name": "Hydrogen",
     "transport": "liquid",
     "price": 58,
     "minPrice": 49,
@@ -114,6 +128,7 @@
   {
     "id": "ice",
     "nameId": "{20201,1401}",
+    "name": "Ice",
     "transport": "solid",
     "price": 30,
     "minPrice": 26,
@@ -122,6 +137,7 @@
   {
     "id": "majadust",
     "nameId": "{20201,1801}",
+    "name": "Maja Dust",
     "transport": "container",
     "price": 208,
     "minPrice": 94,
@@ -130,6 +146,7 @@
   {
     "id": "majasnails",
     "nameId": "{20201,1901}",
+    "name": "Maja Snails",
     "transport": "container",
     "price": 58,
     "minPrice": 35,
@@ -138,6 +155,7 @@
   {
     "id": "meat",
     "nameId": "{20201,2001}",
+    "name": "Meat",
     "transport": "container",
     "price": 48,
     "minPrice": 29,
@@ -146,6 +164,7 @@
   {
     "id": "medicalsupplies",
     "nameId": "{20201,2101}",
+    "name": "Medical Supplies",
     "transport": "container",
     "price": 66,
     "minPrice": 43,
@@ -154,6 +173,7 @@
   {
     "id": "methane",
     "nameId": "{20201,1601}",
+    "name": "Methane",
     "transport": "liquid",
     "price": 48,
     "minPrice": 41,
@@ -162,6 +182,7 @@
   {
     "id": "microchips",
     "nameId": "{20201,2201}",
+    "name": "Microchips",
     "transport": "container",
     "price": 948,
     "minPrice": 805,
@@ -170,6 +191,7 @@
   {
     "id": "missilecomponents",
     "nameId": "{20201,2301}",
+    "name": "Missile Components",
     "transport": "container",
     "price": 9,
     "minPrice": 6,
@@ -178,6 +200,7 @@
   {
     "id": "nividium",
     "nameId": "{20201,2401}",
+    "name": "Nividium",
     "transport": "solid",
     "price": 510,
     "minPrice": 434,
@@ -186,6 +209,7 @@
   {
     "id": "nividiumgems",
     "nameId": "(TEMP)nividiumgems",
+    "name": "nividiumgems",
     "transport": "container",
     "price": 1077,
     "minPrice": 646,
@@ -194,6 +218,7 @@
   {
     "id": "nostropoil",
     "nameId": "{20201,2601}",
+    "name": "Nostrop Oil",
     "transport": "container",
     "price": 34,
     "minPrice": 20,
@@ -202,6 +227,7 @@
   {
     "id": "ore",
     "nameId": "{20201,2701}",
+    "name": "Ore",
     "transport": "solid",
     "price": 50,
     "minPrice": 43,
@@ -210,6 +236,7 @@
   {
     "id": "plasmaconductors",
     "nameId": "{20201,3001}",
+    "name": "Plasma Conductors",
     "transport": "container",
     "price": 1026,
     "minPrice": 769,
@@ -218,6 +245,7 @@
   {
     "id": "quantumtubes",
     "nameId": "{20201,3101}",
+    "name": "Quantum Tubes",
     "transport": "container",
     "price": 300,
     "minPrice": 225,
@@ -226,6 +254,7 @@
   {
     "id": "rawscrap",
     "nameId": "{20201,6801}",
+    "name": "Raw Scrap",
     "transport": "solid",
     "price": 180,
     "minPrice": 153,
@@ -234,6 +263,7 @@
   {
     "id": "refinedmetals",
     "nameId": "{20201,3201}",
+    "name": "Refined Metals",
     "transport": "container",
     "price": 148,
     "minPrice": 89,
@@ -242,6 +272,7 @@
   {
     "id": "scanningarrays",
     "nameId": "{20201,3301}",
+    "name": "Scanning Arrays",
     "transport": "container",
     "price": 1053,
     "minPrice": 842,
@@ -250,6 +281,7 @@
   {
     "id": "scrapmetal",
     "nameId": "{20201,6601}",
+    "name": "Scrap Metal",
     "transport": "solid",
     "price": 375,
     "minPrice": 318,
@@ -258,6 +290,7 @@
   {
     "id": "shieldcomponents",
     "nameId": "{20201,3401}",
+    "name": "Shield Components",
     "transport": "container",
     "price": 188,
     "minPrice": 113,
@@ -266,6 +299,7 @@
   {
     "id": "silicon",
     "nameId": "{20201,3501}",
+    "name": "Silicon",
     "transport": "solid",
     "price": 130,
     "minPrice": 111,
@@ -274,6 +308,7 @@
   {
     "id": "siliconwafers",
     "nameId": "{20201,3601}",
+    "name": "Silicon Wafers",
     "transport": "container",
     "price": 299,
     "minPrice": 180,
@@ -282,6 +317,7 @@
   {
     "id": "smartchips",
     "nameId": "{20201,3701}",
+    "name": "Smart Chips",
     "transport": "container",
     "price": 57,
     "minPrice": 46,
@@ -290,6 +326,7 @@
   {
     "id": "sojabeans",
     "nameId": "{20201,3801}",
+    "name": "Soja Beans",
     "transport": "container",
     "price": 67,
     "minPrice": 40,
@@ -298,6 +335,7 @@
   {
     "id": "sojahusk",
     "nameId": "{20201,3901}",
+    "name": "Soja Husk",
     "transport": "container",
     "price": 32,
     "minPrice": 19,
@@ -306,6 +344,7 @@
   {
     "id": "spacefuel",
     "nameId": "{20201,4001}",
+    "name": "Spacefuel",
     "transport": "container",
     "price": 133,
     "minPrice": 60,
@@ -314,6 +353,7 @@
   {
     "id": "spaceweed",
     "nameId": "{20201,4101}",
+    "name": "Spaceweed",
     "transport": "container",
     "price": 166,
     "minPrice": 75,
@@ -322,6 +362,7 @@
   {
     "id": "spices",
     "nameId": "{20201,4201}",
+    "name": "Spices",
     "transport": "container",
     "price": 20,
     "minPrice": 12,
@@ -330,6 +371,7 @@
   {
     "id": "sunriseflowers",
     "nameId": "{20201,4301}",
+    "name": "Sunrise Flowers",
     "transport": "container",
     "price": 80,
     "minPrice": 48,
@@ -338,6 +380,7 @@
   {
     "id": "superfluidcoolant",
     "nameId": "{20201,2901}",
+    "name": "Superfluid Coolant",
     "transport": "container",
     "price": 150,
     "minPrice": 90,
@@ -346,6 +389,7 @@
   {
     "id": "swampplant",
     "nameId": "{20201,4401}",
+    "name": "Swamp Plant",
     "transport": "container",
     "price": 84,
     "minPrice": 50,
@@ -354,6 +398,7 @@
   {
     "id": "teladianium",
     "nameId": "{20201,4501}",
+    "name": "Teladianium",
     "transport": "container",
     "price": 202,
     "minPrice": 121,
@@ -362,6 +407,7 @@
   {
     "id": "turretcomponents",
     "nameId": "{20201,4601}",
+    "name": "Turret Components",
     "transport": "container",
     "price": 273,
     "minPrice": 164,
@@ -370,6 +416,7 @@
   {
     "id": "water",
     "nameId": "{20201,4701}",
+    "name": "Water",
     "transport": "container",
     "price": 53,
     "minPrice": 32,
@@ -378,6 +425,7 @@
   {
     "id": "weaponcomponents",
     "nameId": "{20201,4801}",
+    "name": "Weapon Components",
     "transport": "container",
     "price": 285,
     "minPrice": 171,
@@ -386,6 +434,7 @@
   {
     "id": "wheat",
     "nameId": "{20201,4901}",
+    "name": "Wheat",
     "transport": "container",
     "price": 31,
     "minPrice": 19,

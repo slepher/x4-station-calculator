@@ -32,28 +32,38 @@ class X4PrecisionLoader:
     def __init__(self, raw_data_path, output_root):
         self.raw_path = raw_data_path
         self.output_root = output_root
+        
         self.valid_macros = {}       
         self.all_modules = []        
         self.wares_data = []         
         self.i18n_data = {}         
         self.recipes = {} 
         
+        # 收集需要翻译的原始名称 (Raw Key)
+        self.needed_raw_names = set()
+
         if not os.path.exists(self.raw_path):
             print(f"❌ 错误: 找不到解包目录: {self.raw_path}")
             sys.exit(1)
 
+    # =======================================================
+    # 1. 构建数据库 (Wares)
+    # =======================================================
     def build_database(self):
-        print(f"📖 [1/4] 解析 wares.xml 并记录生产周期...")
+        print(f"📖 [1/5] 解析 wares.xml...")
         wares_path = os.path.join(self.raw_path, "libraries", "wares.xml")
         try:
             tree = ET.parse(wares_path)
             root = tree.getroot()
+            count = 0
+            
             for ware in root.findall('ware'):
                 w_id = ware.get('id')
                 tags = ware.get('tags', '')
                 transport = ware.get('transport')
+                raw_name = ware.get('name', '')
                 
-                # 提取生产配方、效率加成以及原始生产周期
+                # 提取配方
                 for prod in ware.findall('production'):
                     method = prod.get('method', 'default')
                     bonus = 0.0
@@ -62,38 +72,58 @@ class X4PrecisionLoader:
                         bonus = float(eff_node.get('product', 0))
 
                     recipe = {
-                        "time": float(prod.get('time', 1)), # 原始生产周期 (秒)
+                        "time": float(prod.get('time', 1)),
                         "amount": float(prod.get('amount', 1)),
                         "bonus": bonus,
                         "inputs": {r.get('ware'): float(r.get('amount')) for r in prod.findall('primary/ware')}
                     }
                     self.recipes.setdefault(w_id, {})[method] = recipe
 
-                # 保存细化价格
+                # 筛选逻辑
+                is_valid = False
+                
+                # A. 商品
                 if transport in {'container', 'solid', 'liquid'} and 'module' not in tags:
                     p_node = ware.find('price')
                     if p_node is not None:
+                        is_valid = True
                         self.wares_data.append({
-                            "id": w_id, "nameId": ware.get('name'), "transport": transport,
+                            "id": w_id, 
+                            "nameId": raw_name, # 原始引用 Key
+                            "name": raw_name,   # ⚠️ 占位，稍后注入英文
+                            "transport": transport,
                             "price": int(p_node.get('average') or 0),
                             "minPrice": int(p_node.get('min') or 0),
                             "maxPrice": int(p_node.get('max') or 0)
                         })
 
+                # B. 模块
                 if 'module' in tags:
                     comp = ware.find('component')
                     if comp is not None and comp.get('ref'):
                         ref = comp.get('ref')
                         m_prod = ware.find("./production[@method='default']")
+                        is_valid = True
                         self.valid_macros[ref] = {
-                            "module_ware_id": w_id, "name_id": ware.get('name'), 
+                            "module_ware_id": w_id, 
+                            "name_id": raw_name, 
                             "build_cost": {r.get('ware'): int(r.get('amount')) for r in m_prod.findall('primary/ware')} if m_prod is not None else {},
                             "build_time": float(m_prod.get('time', 0)) if m_prod is not None else 0
                         }
-        except Exception as e: print(f"XML Error: {e}")
 
+                if is_valid and raw_name:
+                    self.needed_raw_names.add(raw_name)
+                    count += 1
+            
+            print(f"   ✅ 从 {count} 个物品中收集到 {len(self.needed_raw_names)} 个原始 Key。")
+
+        except Exception as e: print(f"   ❌ XML Error: {e}")
+
+    # =======================================================
+    # 2. 扫描资产 (Assets)
+    # =======================================================
     def scan_assets(self):
-        print(f"🔍 [2/4] 扫描资产并注入 cycleTime...")
+        print(f"🔍 [2/5] 扫描资产并注入 cycleTime...")
         files = glob.glob(os.path.join(self.raw_path, "assets", "structures", "**", "*.xml"), recursive=True)
         for f in files:
             fname = os.path.splitext(os.path.basename(f))[0]
@@ -112,10 +142,12 @@ class X4PrecisionLoader:
                     wf_cap = int(wf_node.get('capacity') or 0) if wf_node is not None else 0
 
                     module_data = {
-                        "id": fname, "wareId": info['module_ware_id'], "nameId": info['name_id'],
+                        "id": fname, "wareId": info['module_ware_id'], 
+                        "nameId": info['name_id'], # 原始引用 Key
+                        "name": info['name_id'],   # ⚠️ 占位，稍后注入英文
                         "type": m_class, "race": "generic",
                         "buildTime": info['build_time'], "buildCost": info['build_cost'],
-                        "cycleTime": 0, # 新增字段：单次生产周期 (秒)
+                        "cycleTime": 0,
                         "workforce": { "capacity": wf_cap, "needed": wf_val, "maxBonus": 0 },
                         "outputs": {}, "inputs": {}
                     }
@@ -127,7 +159,7 @@ class X4PrecisionLoader:
                             recipe = self.recipes.get(p_id, {}).get('default')
                             if recipe:
                                 factor = 3600 / recipe['time']
-                                module_data["cycleTime"] = recipe['time'] # 注入生产周期
+                                module_data["cycleTime"] = recipe['time']
                                 module_data["outputs"] = { p_id: round(recipe['amount'] * factor, 2) }
                                 module_data["inputs"] = { k: round(v * factor, 2) for k, v in recipe['inputs'].items() }
                                 module_data["workforce"]["maxBonus"] = recipe['bonus']
@@ -139,47 +171,112 @@ class X4PrecisionLoader:
                     self.all_modules.append(module_data)
                 except: pass
 
-    def extract_languages(self):
-        print(f"\n🌍 [3/4] 语言提取状态:")
+    # =======================================================
+    # 3. 语言提取 (Backend Translation)
+    # =======================================================
+    def extract_and_resolve_languages(self):
+        print(f"\n🌍 [3/5] 构建翻译数据库...")
         t_path = os.path.join(self.raw_path, "t")
-        all_data_str = json.dumps(self.wares_data) + json.dumps(self.all_modules)
-        required_keys = {f"{{{p},{t}}}" for p, t in re.findall(r"\{(\d+),\s*(\d+)\}", all_data_str)}
-        required_keys.add("{20102,2011}")  # 保留占位符
+        
         for x4_id, conf in X4_LANG_CONFIG.items():
             iso = conf['iso']
             self.i18n_data[iso] = {}
-            # 完全回滚逻辑：不加 if 判断
             target_name = f"0001-L{x4_id}.xml" 
             t_file = os.path.join(t_path, target_name)
             
-            if os.path.exists(t_file):
-                try:
-                    tree = ET.parse(t_file)
-                    root = tree.getroot()
-                    loaded = 0
-                    for page in root.findall('page'):
-                        p_id = page.get('id')
-                        for t in page.findall('t'):
-                            key = f"{{{p_id},{t.get('id')}}}"
-                            if key in required_keys: 
-                                self.i18n_data[iso][key] = "".join(t.itertext())
-                                loaded += 1
-                    print(f"  ✅ [Found] {iso:6} ({x4_id}) -> 已加载 {loaded} 条")
-                except: pass
-            else:
-                print(f"  🚫 [Miss]  {iso:6} ({x4_id}) -> 找不到文件: {t_file}")
+            # A. 加载查找表
+            current_lang_db = {}
+            def load_xml(path):
+                if os.path.exists(path):
+                    try:
+                        tree = ET.parse(path)
+                        root = tree.getroot()
+                        for page in root.findall('page'):
+                            p_id = page.get('id')
+                            if not p_id: continue
+                            if p_id not in current_lang_db: current_lang_db[p_id] = {}
+                            for t in page.findall('t'):
+                                current_lang_db[p_id][t.get('id')] = "".join(t.itertext())
+                        return True
+                    except: return False
+                return False
 
+            has_file = load_xml(t_file)
+            if not has_file and x4_id == '044':
+                load_xml(os.path.join(t_path, "0001.xml"))
+
+            if not current_lang_db: continue
+
+            # B. 递归清洗
+            resolved_count = 0
+            for raw_name in self.needed_raw_names:
+                final_text = self._resolve_name(raw_name, current_lang_db)
+                if final_text:
+                    self.i18n_data[iso][raw_name] = final_text
+                    resolved_count += 1
+            
+            print(f"  ✅ [Done]  {iso:6} ({x4_id}) -> {resolved_count} 条")
+
+    def _resolve_name(self, raw_name, lang_db, depth=0):
+        if not raw_name or depth > 5: return raw_name
+        text = re.sub(r"\([^)]*\)", "", raw_name)
+        def replace_callback(match):
+            page, tid = match.group(1), match.group(2)
+            if page in lang_db and tid in lang_db[page]:
+                return self._resolve_name(lang_db[page][tid], lang_db, depth + 1)
+            return match.group(0)
+        text = re.sub(r"\{\s*(\d+)\s*,\s*(\d+)\s*\}", replace_callback, text)
+        return re.sub(r"\s+", " ", text).strip()
+
+    # =======================================================
+    # 🆕 4. 注入英文名称到数据对象
+    # =======================================================
+    def inject_english_names(self):
+        print(f"\n💉 [4/5] 将英文结果注入 name 字段...")
+        
+        # 获取英文数据，如果没生成则为空
+        en_map = self.i18n_data.get('en', {})
+        
+        if not en_map:
+            print("   ⚠️ 警告: 未找到 'en' 语言包，name 字段将保持原始ID。")
+            return
+
+        # 更新商品数据
+        count_wares = 0
+        for item in self.wares_data:
+            raw_key = item['nameId']
+            if raw_key in en_map:
+                item['name'] = en_map[raw_key]
+                count_wares += 1
+        
+        # 更新模块数据
+        count_mods = 0
+        for item in self.all_modules:
+            raw_key = item['nameId']
+            if raw_key in en_map:
+                item['name'] = en_map[raw_key]
+                count_mods += 1
+
+        print(f"   ✅ 更新了 {count_wares} 个商品和 {count_mods} 个模块的英文名称。")
+
+    # =======================================================
+    # 5. 保存结果
+    # =======================================================
     def save(self):
-        print(f"\n💾 [4/4] 保存结果...")
+        print(f"\n💾 [5/5] 保存结果...")
         data_dir = os.path.join(self.output_root, "data")
         locales_dir = os.path.join(self.output_root, "locales")
-        os.makedirs(data_dir, exist_ok=True); os.makedirs(locales_dir, exist_ok=True)
+        
+        if not os.path.exists(data_dir): os.makedirs(data_dir)
+        if not os.path.exists(locales_dir): os.makedirs(locales_dir)
 
+        # 保存数据 (此时 data 对象里已经有了正确的 name 字段)
         with open(os.path.join(data_dir, "modules.json"), 'w', encoding='utf-8') as f:
             json.dump(self.all_modules, f, indent=2, ensure_ascii=False)
         with open(os.path.join(data_dir, "wares.json"), 'w', encoding='utf-8') as f:
             json.dump(self.wares_data, f, indent=2, ensure_ascii=False)
 
+        # 保存语言包
         available_languages = []
         for x4_id, conf in X4_LANG_CONFIG.items():
             iso = conf['iso']
@@ -190,8 +287,13 @@ class X4PrecisionLoader:
 
         with open(os.path.join(data_dir, "languages.json"), 'w', encoding='utf-8') as f:
             json.dump(available_languages, f, indent=2, ensure_ascii=False)
-        print("🎉 任务完成！")
+            
+        print("🎉 全部完成！")
 
 if __name__ == "__main__":
     loader = X4PrecisionLoader(X4_UNPACKED_DATA_PATH, OUTPUT_VERSION_DIR)
-    loader.build_database(); loader.scan_assets(); loader.extract_languages(); loader.save()
+    loader.build_database()
+    loader.scan_assets()
+    loader.extract_and_resolve_languages()
+    loader.inject_english_names() # 新增步骤
+    loader.save()
