@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useStationStore } from '@/store/useStationStore'
+import draggable from 'vuedraggable' // 请确保已安装 vuedraggable@next
 import StationModuleItem from './StationModuleItem.vue'
 import X4ModuleSearch from './common/X4ModuleSearch.vue'
 import X4NumberInput from './common/X4NumberInput.vue'
@@ -19,13 +20,13 @@ const handleConfirmAdd = () => {
 
 <template>
   <div class="space-y-2">
-    <div class="header-row flex justify-between items-center mb-2 border-b border-slate-700 pb-2">
-      <h3 class="text-lg font-semibold text-slate-200 uppercase tracking-tight">
+    <div class="header-row">
+      <h3 class="header-title">
         {{ $t('ui.module_list') }}
       </h3>
       
       <div class="flex items-center gap-2">
-        <span class="text-slate-500 text-[10px] uppercase font-bold tracking-widest leading-none">
+        <span class="header-label">
           {{ $t('ui.sun_light') }}
         </span>
         
@@ -43,14 +44,23 @@ const handleConfirmAdd = () => {
     </div>
 
     <div class="module-list-scroll">
-      <StationModuleItem 
-        v-for="(item, index) in store.plannedModules" 
-        :key="index"
-        :item="item"
-        :info="store.getModuleInfo(item.id)!"
-        @update:count="(val) => store.updateModuleCount(index, val)"
-        @remove="store.removeModule(index)"
-      />
+      <draggable 
+        v-model="store.plannedModules"
+        item-key="id"
+        ghost-class="drag-ghost"
+        filter=".ignore-drag"
+        :prevent-on-filter="false"
+        class="space-y-2"
+      >
+        <template #item="{ element, index }">
+          <StationModuleItem 
+            :item="element"
+            :info="store.getModuleInfo(element.id)!"
+            @update:count="(val) => store.updateModuleCount(index, val)"
+            @remove="store.removeModule(index)"
+          />
+        </template>
+      </draggable>
     </div>
 
     <div class="add-module-container">
@@ -73,7 +83,15 @@ const handleConfirmAdd = () => {
 
 <style scoped>
 .header-row {
-  @apply h-9;
+  @apply flex justify-between items-center mb-2 border-b border-slate-700 pb-2 h-9;
+}
+
+.header-title {
+  @apply text-lg font-semibold text-slate-200 uppercase tracking-tight;
+}
+
+.header-label {
+  @apply text-slate-500 text-[10px] uppercase font-bold tracking-widest leading-none;
 }
 
 .x4-composite-input-wrapper {
@@ -84,7 +102,6 @@ const handleConfirmAdd = () => {
   @apply border-slate-500;
 }
 
-/* 穿透重置嵌套组件样式 */
 :deep(.x4-nested-input .x4-input-container) {
   @apply border-none bg-transparent rounded-none h-full;
 }
@@ -96,7 +113,11 @@ const handleConfirmAdd = () => {
 }
 
 .module-list-scroll {
-  @apply space-y-2 max-h-[600px] overflow-y-auto pr-1 scrollbar-thin;
+  @apply max-h-[600px] overflow-y-auto pr-1 scrollbar-thin;
+}
+
+.drag-ghost {
+  @apply opacity-30 bg-slate-700 border-emerald-500 border-dashed border-2;
 }
 
 .add-module-container {
@@ -116,11 +137,6 @@ const handleConfirmAdd = () => {
   @apply opacity-20 bg-slate-700 text-slate-500 cursor-not-allowed shadow-none;
 }
 
-/* 滚动条 Apply 化 */
-.scrollbar-thin::-webkit-scrollbar {
-  @apply w-1;
-}
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  @apply bg-slate-700 rounded-full;
-}
+.scrollbar-thin::-webkit-scrollbar { @apply w-1; }
+.scrollbar-thin::-webkit-scrollbar-thumb { @apply bg-slate-700 rounded-full; }
 </style>

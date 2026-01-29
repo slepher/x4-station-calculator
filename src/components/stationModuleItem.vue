@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { PlannedModule, ModuleData } from '@/store/useStationStore'
+import type { SavedModule, X4Module } from '@/store/useStationStore'
 import { useX4I18n } from '@/utils/useX4I18n';
-import X4NumberInput from '@/components/common/X4NumberInput.vue'; // 引入通用组件
+import X4NumberInput from '@/components/common/X4NumberInput.vue';
 
 const { translateModule } = useX4I18n();
 
 const props = defineProps<{
-  item: PlannedModule
-  info: ModuleData
+  item: SavedModule
+  info: X4Module
 }>()
 
 const emit = defineEmits<{
@@ -17,25 +17,31 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="module-row group/row">
+  <div class="module-row group/row cursor-move">
     <div class="color-bar" 
          :class="info.type === 'habitat' ? 'bg-orange-500' : 'bg-sky-500'">
     </div>
     
-    <div class="module-info">
+    <div class="module-info ignore-drag cursor-text">
        <div class="module-name" :title="info.name">
          {{ translateModule(info) }}
        </div>
     </div>
     
     <div class="controls">
-      <X4NumberInput 
-        :modelValue="item.count"
-        @update:modelValue="emit('update:count', $event)"
-        width-class="w-14"
-        :min="1"
-      />
-      <button @click="emit('remove')" class="remove-btn" title="Remove">×</button>
+      <div class="ignore-drag">
+        <X4NumberInput 
+          :modelValue="item.count"
+          @update:modelValue="emit('update:count', $event)"
+          width-class="w-14"
+          :min="1"
+        />
+      </div>
+      <button 
+        @click="emit('remove')" 
+        class="remove-btn ignore-drag" 
+        title="Remove"
+      >×</button>
     </div>
   </div>
 </template>
@@ -57,9 +63,7 @@ const emit = defineEmits<{
   @apply flex items-center gap-1;
 }
 
-/* 移除原本冗余的 .count-input 样式，现在由 X4NumberInput 内部管理 */
-
 .remove-btn {
-  @apply text-slate-600 hover:text-red-400 px-1.5 transition-colors text-lg leading-none;
+  @apply text-slate-600 hover:text-red-400 px-1.5 transition-colors text-lg leading-none cursor-pointer;
 }
 </style>

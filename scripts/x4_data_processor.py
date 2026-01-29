@@ -114,7 +114,8 @@ class X4PrecisionLoader:
                 if is_valid and raw_name:
                     self.needed_raw_names.add(raw_name)
                     count += 1
-            
+                    
+            self.needed_raw_names.add("{20102,2011}")
             print(f"   ✅ 从 {count} 个物品中收集到 {len(self.needed_raw_names)} 个原始 Key。")
 
         except Exception as e: print(f"   ❌ XML Error: {e}")
