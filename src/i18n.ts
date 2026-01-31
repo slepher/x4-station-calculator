@@ -39,6 +39,7 @@ function setI18nLanguage(lang: string) {
  */
 export async function loadLanguageAsync(lang: string) {
   // 1. 如果是当前语言，直接返回
+  console.log('loadLanguageAsync', lang)
   if (i18n.global.locale.value === lang) {
     return setI18nLanguage(lang)
   }

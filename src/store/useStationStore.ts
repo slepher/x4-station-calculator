@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
-import { demoSaveData, type SavedModule } from '@/mock/mock_data'
+import { mockStationData, type SavedModule } from '@/mock/mock_data_v1'
 import type { X4Module, X4Ware, WareAmountMap } from '../types/x4'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/useX4I18n'
+import { loadLanguageAsync } from '@/i18n'
 
 // 1. 静态导入游戏数据
 import waresRaw from '@/assets/game_data/Timelines (7.10)/data/wares.json'
@@ -21,8 +22,24 @@ export const useStationStore = defineStore('station', () => {
   
   // --- 状态 (State) ---
   const plannedModules = ref<SavedModule[]>([])
+  const savedLayouts = ref<{
+    version: number;
+    activeId: string | null;
+    list: Array<{
+      id: string;
+      name: string;
+      modules: SavedModule[];
+      settings: any;
+      description: string;
+      lastUpdated: number;
+    }>;
+  }>({ version: 1, activeId: null, list: [] });
   const searchQuery = ref('') // 全局搜索状态，驱动检索逻辑
   const localizedModulesMap = ref<Record<string, X4Module & { localeName: string }>>({});
+
+  // --- 脏检查快照 (Dirty Check) ---
+  // 存储最后一次保存或加载时的 JSON 字符串，用于物理级对比
+  const lastSavedSnapshot = ref<string>('')
 
   const settings = ref({
     sunlight: 100, // 强制初始值为 100%
@@ -125,10 +142,100 @@ export const useStationStore = defineStore('station', () => {
   });
   
   // --- 操作方法 (Actions) ---
-  function loadDemoData() {
-    const validData = demoSaveData.filter(item => modulesMap.value[item.id] || item.id === '')
-    plannedModules.value = JSON.parse(JSON.stringify(validData))
+  async function loadData(source: any) {
+    const targetLocale = source.locale;
+    
+    // 步骤 B: 只有当目标语言与当前不同，或为了确保加载时，调用异步加载
+    // loadLanguageAsync 内部通常会处理 "已加载则跳过" 的逻辑，所以直接调用是安全的
+    if (targetLocale) {
+        console.log('Target Locale:', targetLocale);
+        await loadLanguageAsync(targetLocale);
+        // 注意：loadLanguageAsync 通常会自动设置 locale.value，
+        // 但为了保险，可以在这里再次确认 (取决于你的 loadLanguageAsync 实现)
+    }
+    // 使用 JSON 序列化进行深拷贝，防止污染原始数据源
+    savedLayouts.value = JSON.parse(JSON.stringify(source));
+    if (savedLayouts.value.activeId) {
+      const target = savedLayouts.value.list.find(l => l.id === savedLayouts.value.activeId);
+      if (target) {
+        plannedModules.value = JSON.parse(JSON.stringify(target.modules));
+        settings.value = JSON.parse(JSON.stringify(target.settings));
+      }
+    }
+    takeSnapshot()
   }
+
+  function takeSnapshot() {
+    // 将当前关键数据序列化为字符串作为对比基准
+    lastSavedSnapshot.value = JSON.stringify({
+      modules: plannedModules.value,
+      settings: settings.value
+    })
+  }
+
+  async function loadDemoData() {
+    await loadData(mockStationData);
+  }
+
+  function saveCurrentLayout(name: string) {
+    const description = [...plannedModules.value]
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 3)
+      .map(m => {
+        const info = localizedModulesMap.value[m.id];
+        return `${m.count} x ${info?.localeName || m.id}`;
+      })
+      .join(', ') + (plannedModules.value.length > 3 ? '...' : '');
+
+    const layoutData = {
+      id: savedLayouts.value.activeId || crypto.randomUUID(),
+      name,
+      modules: JSON.parse(JSON.stringify(plannedModules.value)),
+      settings: JSON.parse(JSON.stringify(settings.value)),
+      description,
+      lastUpdated: Date.now()
+    };
+
+    const idx = savedLayouts.value.list.findIndex(l => l.id === layoutData.id);
+    if (idx !== -1) savedLayouts.value.list[idx] = layoutData;
+    else savedLayouts.value.list.push(layoutData);
+    savedLayouts.value.activeId = layoutData.id;
+    takeSnapshot()
+  }
+
+  // 计算属性：脏检查
+  const isDirty = computed(() => {
+    const current = JSON.stringify({
+      modules: plannedModules.value,
+      settings: settings.value
+    })
+    return current !== lastSavedSnapshot.value
+  })
+
+  function loadLayout(index: number) {
+    const layout = savedLayouts.value.list[index];
+    if (layout) {
+      plannedModules.value = JSON.parse(JSON.stringify(layout.modules));
+      settings.value = JSON.parse(JSON.stringify(layout.settings));
+      savedLayouts.value.activeId = layout.id;
+    }
+  }
+
+  function mergeLayout(index: number) {
+    const layout = savedLayouts.value.list[index];
+    if (layout) layout.modules.forEach(m => addModule(m.id, m.count));
+  }
+
+  function deleteLayout(index: number) {
+    if (savedLayouts.value.list[index]?.id === savedLayouts.value.activeId) {
+      savedLayouts.value.activeId = null;
+    }
+    savedLayouts.value.list.splice(index, 1);
+  }
+
+  watch(savedLayouts, (val) => {
+    localStorage.setItem('x4_station_data', JSON.stringify(val));
+  }, { deep: true });
 
   function addModule(id: string = '', count = 1) {
     if (id !== '' && !modulesMap.value[id]) return
@@ -161,7 +268,10 @@ export const useStationStore = defineStore('station', () => {
     if (index !== -1) removeModule(index)
   }
 
-  function clearAll() { plannedModules.value = [] }
+  function clearAll() { 
+    plannedModules.value = [];
+    savedLayouts.value.activeId = null;
+  }
 
   function getModuleInfo(id: string): X4Module {
     return modulesMap.value[id] || {
@@ -367,10 +477,15 @@ export const useStationStore = defineStore('station', () => {
     });
   }
 
+  // 初始化：直接加载 Demo 数据
+  loadDemoData();
+
   return {
+    isDirty,
     plannedModules, settings, searchQuery, filteredModulesGrouped,
     wares: waresMap, modules: localizedModulesMap,
-    loadDemoData, addModule, updateModuleId, updateModuleCount, removeModule, removeModuleById, clearAll, getModuleInfo,
+    loadData, loadDemoData, savedLayouts, saveCurrentLayout, loadLayout, mergeLayout, deleteLayout,
+    addModule, updateModuleId, updateModuleCount, removeModule, removeModuleById, clearAll, getModuleInfo,
     constructionBreakdown, workforceBreakdown, profitBreakdown, autoFillMissingLines,
     actualWorkforce, currentEfficiency: computed(() => efficiencyMetrics.value.saturation), netProduction
   }

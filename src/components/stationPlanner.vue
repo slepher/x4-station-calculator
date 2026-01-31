@@ -1,15 +1,12 @@
 <script setup lang="ts">
-import { useStationStore } from '@/store/useStationStore'
 import StationModuleList from './StationModuleList.vue'
 import ResourceList from './ResourceList.vue'
 import StationWorkforce from './StationWorkforce.vue'
 import StationProfit from './StationProfit.vue'
 import StationConstruction from './StationConstruction.vue'
-import LanguageSelector from './LanguageSelector.vue'
+import StationToolbar from './StationToolbar.vue'
 import StatusMonitor from './StatusMonitor.vue' // <--- 引入状态监控组件
-import MissingTranslate from './MissingTranslate.vue'
 
-const store = useStationStore()
 
 // 这里的格式化逻辑可以保留用于简单的局部显示，复杂逻辑已由各子组件从 Store 获取
 const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
@@ -18,25 +15,9 @@ const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.roun
 <template>
   <div class="w-full max-w-[1600px] mx-auto p-4 text-sm relative min-h-screen">
     
-    <div class="flex flex-wrap gap-4 justify-between items-center mb-6 bg-slate-800 p-4 rounded border border-slate-700">
-      <div class="flex items-center gap-6">
-        <h2 class="text-2xl font-bold text-sky-400 uppercase tracking-widest">Station Planner</h2>
-        
-      </div>
+    <StationToolbar />
 
-      <div class="flex items-center gap-2">
-        <button 
-          @click="store.loadDemoData()" 
-          class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded font-bold transition shadow-lg shadow-emerald-900/20"
-        >
-          Load Demo Data
-        </button>
-        <MissingTranslate />
-        <LanguageSelector />
-      </div>
-    </div>
-
-    <div class="grid grid-cols-12 gap-6 items-start">
+    <div class="main-layout">
       
       <div class="col-span-12 lg:col-span-3">
         <StationModuleList />
@@ -58,6 +39,11 @@ const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.roun
 </template>
 
 <style scoped>
+
+.main-layout {
+  @apply grid grid-cols-12 gap-8 items-start;
+}
+
 /* 确保输入框在不同浏览器下外观一致 */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
