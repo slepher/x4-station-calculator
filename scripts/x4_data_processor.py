@@ -38,6 +38,7 @@ class X4PrecisionLoader:
         self.wares_data = []         
         self.i18n_data = {}         
         self.recipes = {} 
+        self.race_consumption = {}  # 种群消耗速率 (每人每秒)
         
         # 收集需要翻译的原始名称 (Raw Key)
         self.needed_raw_names = set()
@@ -82,6 +83,20 @@ class X4PrecisionLoader:
                 # 筛选逻辑
                 is_valid = False
                 
+                # C. 工人消耗 (Food/Medical)
+                if transport == 'workunit' and w_id == 'workunit_busy':
+                    for prod in ware.findall('production'):
+                        method = prod.get('method', 'default')
+                        p_time = float(prod.get('time', 600))
+                        p_amount = float(prod.get('amount', 200))
+                        consumables = {}
+                        for r in prod.findall('primary/ware'):
+                            c_ware = r.get('ware')
+                            c_amount = float(r.get('amount'))
+                            # 计算每人每秒消耗量
+                            consumables[c_ware] = c_amount / (p_amount * p_time)
+                        self.race_consumption[method] = consumables
+
                 # A. 商品
                 if transport in {'container', 'solid', 'liquid'} and 'module' not in tags:
                     p_node = ware.find('price')
@@ -276,6 +291,8 @@ class X4PrecisionLoader:
             json.dump(self.all_modules, f, indent=2, ensure_ascii=False)
         with open(os.path.join(data_dir, "wares.json"), 'w', encoding='utf-8') as f:
             json.dump(self.wares_data, f, indent=2, ensure_ascii=False)
+        with open(os.path.join(data_dir, "consumption.json"), 'w', encoding='utf-8') as f:
+            json.dump(self.race_consumption, f, indent=2, ensure_ascii=False)
 
         # 保存语言包
         available_languages = []
