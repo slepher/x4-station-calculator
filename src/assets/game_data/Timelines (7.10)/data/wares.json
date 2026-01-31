@@ -439,5 +439,104 @@
     "price": 31,
     "minPrice": 19,
     "maxPrice": 44
+  },
+  {
+    "id": "cheltmeat",
+    "nameId": "{20201,5001}",
+    "name": "Chelt Meat",
+    "transport": "container",
+    "price": 51,
+    "minPrice": 31,
+    "maxPrice": 72
+  },
+  {
+    "id": "scruffinfruits",
+    "nameId": "{20201,5101}",
+    "name": "Scruffin Fruit",
+    "transport": "container",
+    "price": 28,
+    "minPrice": 17,
+    "maxPrice": 40
+  },
+  {
+    "id": "computronicsubstrate",
+    "nameId": "{20201,6001}",
+    "name": "Computronic Substrate",
+    "transport": "container",
+    "price": 8280,
+    "minPrice": 7452,
+    "maxPrice": 9108
+  },
+  {
+    "id": "metallicmicrolattice",
+    "nameId": "{20201,6101}",
+    "name": "Metallic Microlattice",
+    "transport": "container",
+    "price": 50,
+    "minPrice": 42,
+    "maxPrice": 57
+  },
+  {
+    "id": "proteinpaste",
+    "nameId": "{20201,6201}",
+    "name": "Protein Paste",
+    "transport": "container",
+    "price": 96,
+    "minPrice": 57,
+    "maxPrice": 134
+  },
+  {
+    "id": "siliconcarbide",
+    "nameId": "{20201,6301}",
+    "name": "Silicon Carbide",
+    "transport": "container",
+    "price": 1414,
+    "minPrice": 1202,
+    "maxPrice": 1627
+  },
+  {
+    "id": "stimulants",
+    "nameId": "{20201,6401}",
+    "name": "Stimulants",
+    "transport": "container",
+    "price": 340,
+    "minPrice": 153,
+    "maxPrice": 527
+  },
+  {
+    "id": "terranmre",
+    "nameId": "{20201,6501}",
+    "name": "Terran MRE",
+    "transport": "container",
+    "price": 54,
+    "minPrice": 32,
+    "maxPrice": 75
+  },
+  {
+    "id": "bofu",
+    "nameId": "{20201,7101}",
+    "name": "BoFu",
+    "transport": "container",
+    "price": 101,
+    "minPrice": 61,
+    "maxPrice": 142
+  },
+  {
+    "id": "bogas",
+    "nameId": "{20201,7201}",
+    "name": "BoGas",
+    "transport": "container",
+    "price": 73,
+    "minPrice": 44,
+    "maxPrice": 102
+  },
+  {
+    "id": "plankton",
+    "nameId": "{20201,7301}",
+    "name": "Plankton",
+    "transport": "container",
+    "price": 18,
+    "minPrice": 11,
+    "maxPrice": 25
   }
 ]

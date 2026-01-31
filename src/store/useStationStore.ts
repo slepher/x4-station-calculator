@@ -9,6 +9,7 @@ import { loadLanguageAsync } from '@/i18n'
 // 1. 静态导入游戏数据
 import waresRaw from '@/assets/game_data/Timelines (7.10)/data/wares.json'
 import ModulesRaw from '@/assets/game_data/Timelines (7.10)/data/modules.json'
+import consumptionRaw from '@/assets/game_data/Timelines (7.10)/data/consumption.json'
 
 export interface PlannedModuleDisplay extends SavedModule {
   nameId: string;    
@@ -432,6 +433,13 @@ export const useStationStore = defineStore('station', () => {
   const profitBreakdown = computed(() => {
     const wareDetails: Record<string, { production: number, consumption: number, list: any[] }> = {}
     const { saturation } = efficiencyMetrics.value
+    const currentWf = actualWorkforce.value
+
+    // 预处理所有生活物资 ID 集合，用于后续过滤工业模块的静态 inputs
+    const lifeWareIds = new Set<string>();
+    Object.values(consumptionRaw).forEach((raceData: any) => {
+      Object.keys(raceData.wares || raceData).forEach(id => lifeWareIds.add(id));
+    });
 
     plannedModules.value.forEach(item => {
       const info = modulesMap.value[item.id]
@@ -451,12 +459,48 @@ export const useStationStore = defineStore('station', () => {
       }
 
       for (const [wareId, hourlyAmount] of Object.entries(info.inputs)) {
+        if (lifeWareIds.has(wareId)) continue; // 跳过由工人驱动的物资
         if (!wareDetails[wareId]) wareDetails[wareId] = { production: 0, consumption: 0, list: [] }
         const actualAmount = hourlyAmount * item.count
         wareDetails[wareId].consumption += actualAmount
         wareDetails[wareId].list.push({
           moduleId: item.id, nameId: info.nameId, count: item.count, amount: -actualAmount,
           bonusPercent: 0, type: 'consumption'
+        })
+      }
+    })
+
+
+    // 第二阶段：动态工人消耗（按照规划列表顺序，前面的建筑优先住满）
+    let remainingWf = currentWf;
+    plannedModules.value.forEach(item => {
+      const info = modulesMap.value[item.id]
+      // 仅处理带人口容量且还有剩余工人的模块
+      if (!info || !info.workforce || info.workforce.capacity <= 0 || remainingWf <= 0) return
+
+      const capacity = info.workforce.capacity * item.count
+      const residents = Math.min(remainingWf, capacity)
+      remainingWf -= residents
+
+      // 优先匹配模块自带的 race，匹配失败则回退到 default
+      const raceKey = info.race in consumptionRaw ? info.race : 'default';
+      const raceConsumption = (consumptionRaw as any)[raceKey];
+      const wares = raceConsumption.wares || raceConsumption; // 兼容嵌套结构
+
+      for (const [wareId, perPersonPerSecond] of Object.entries(wares)) {
+        if (!wareDetails[wareId]) wareDetails[wareId] = { production: 0, consumption: 0, list: [] }
+        
+        // 公式：居住人数 * 每秒消耗系数 * 3600秒
+        const hourlyAmount = residents * (perPersonPerSecond as number) * 3600;
+        
+        wareDetails[wareId].consumption += hourlyAmount
+        wareDetails[wareId].list.push({
+          moduleId: item.id,
+          nameId: info.nameId,
+          count: item.count,
+          amount: -hourlyAmount,
+          label: `Worker Consumption (${Math.round(residents)} ppl)`,
+          type: 'consumption'
         })
       }
     })

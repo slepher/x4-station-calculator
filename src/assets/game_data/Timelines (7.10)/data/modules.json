@@ -1523,7 +1523,7 @@
     "nameId": "{20104,30301}",
     "name": "Argon L Habitat",
     "type": "habitation",
-    "race": "generic",
+    "race": "argon",
     "buildTime": 750.0,
     "buildCost": {
       "claytronics": 191,
@@ -1545,7 +1545,7 @@
     "nameId": "{20104,30201}",
     "name": "Argon M Habitat",
     "type": "habitation",
-    "race": "generic",
+    "race": "argon",
     "buildTime": 530.0,
     "buildCost": {
       "claytronics": 135,
@@ -1567,7 +1567,7 @@
     "nameId": "{20104,30101}",
     "name": "Argon S Habitat",
     "type": "habitation",
-    "race": "generic",
+    "race": "argon",
     "buildTime": 367.0,
     "buildCost": {
       "claytronics": 94,
@@ -1589,7 +1589,7 @@
     "nameId": "{20104,30601}",
     "name": "Paranid L Dome",
     "type": "habitation",
-    "race": "generic",
+    "race": "paranid",
     "buildTime": 822.0,
     "buildCost": {
       "claytronics": 210,
@@ -1611,7 +1611,7 @@
     "nameId": "{20104,30501}",
     "name": "Paranid M Dome",
     "type": "habitation",
-    "race": "generic",
+    "race": "paranid",
     "buildTime": 530.0,
     "buildCost": {
       "claytronics": 135,
@@ -1633,7 +1633,7 @@
     "nameId": "{20104,30401}",
     "name": "Paranid S Dome",
     "type": "habitation",
-    "race": "generic",
+    "race": "paranid",
     "buildTime": 367.0,
     "buildCost": {
       "claytronics": 94,
@@ -1655,7 +1655,7 @@
     "nameId": "{20104,30901}",
     "name": "Teladi L Biome",
     "type": "habitation",
-    "race": "generic",
+    "race": "teladi",
     "buildTime": 711.0,
     "buildCost": {
       "claytronics": 182,
@@ -1677,7 +1677,7 @@
     "nameId": "{20104,30801}",
     "name": "Teladi M Biome",
     "type": "habitation",
-    "race": "generic",
+    "race": "teladi",
     "buildTime": 474.0,
     "buildCost": {
       "claytronics": 121,
@@ -1699,7 +1699,7 @@
     "nameId": "{20104,30701}",
     "name": "Teladi S Biome",
     "type": "habitation",
-    "race": "generic",
+    "race": "teladi",
     "buildTime": 335.0,
     "buildCost": {
       "claytronics": 86,
@@ -2092,7 +2092,7 @@
     "nameId": "{20104,100401}",
     "name": "Habitat City",
     "type": "habitation",
-    "race": "generic",
+    "race": "teladi",
     "buildTime": 1061.0,
     "buildCost": {
       "claytronics": 594,
@@ -2114,7 +2114,7 @@
     "nameId": "{20104,100401}",
     "name": "Habitat City",
     "type": "habitation",
-    "race": "generic",
+    "race": "teladi",
     "buildTime": 1061.0,
     "buildCost": {
       "claytronics": 594,
@@ -4459,6 +4459,3069 @@
       "claytronics": 376,
       "energycells": 342,
       "hullparts": 1546
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "buildmodule_bor_equip_l_macro",
+    "wareId": "module_bor_equip_l_01",
+    "nameId": "{20104,62301}",
+    "name": "Boron L Ship Maintenance Bay",
+    "type": "buildmodule",
+    "race": "generic",
+    "buildTime": 653.0,
+    "buildCost": {
+      "claytronics": 872,
+      "energycells": 9260,
+      "hullparts": 2836,
+      "water": 8387
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 500,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "buildmodule_bor_equip_m_dockarea_01_macro",
+    "wareId": "module_bor_equip_dockarea_m_01",
+    "nameId": "{20104,62201}",
+    "name": "Boron S/M Ship Maintenance Bay",
+    "type": "buildmodule",
+    "race": "generic",
+    "buildTime": 596.0,
+    "buildCost": {
+      "claytronics": 595,
+      "energycells": 6322,
+      "hullparts": 1936,
+      "water": 5725
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 400,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "buildmodule_bor_equip_xl_macro",
+    "wareId": "module_bor_equip_xl_01",
+    "nameId": "{20104,62401}",
+    "name": "Boron XL Ship Maintenance Bay",
+    "type": "buildmodule",
+    "race": "generic",
+    "buildTime": 1136.0,
+    "buildCost": {
+      "claytronics": 1125,
+      "energycells": 11958,
+      "hullparts": 3662,
+      "water": 10830
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 500,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "buildmodule_bor_ships_l_macro",
+    "wareId": "module_bor_build_l_01",
+    "nameId": "{20104,62601}",
+    "name": "Boron L Ship Fabrication Bay",
+    "type": "buildmodule",
+    "race": "generic",
+    "buildTime": 722.0,
+    "buildCost": {
+      "claytronics": 1714,
+      "energycells": 18213,
+      "hullparts": 5577,
+      "water": 16495
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 700,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "buildmodule_bor_ships_m_dockarea_01_macro",
+    "wareId": "module_bor_build_dockarea_m_01",
+    "nameId": "{20104,62501}",
+    "name": "Boron S/M Ship Fabrication Bay",
+    "type": "buildmodule",
+    "race": "generic",
+    "buildTime": 688.0,
+    "buildCost": {
+      "claytronics": 818,
+      "energycells": 8696,
+      "hullparts": 2663,
+      "water": 7875
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 800,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "buildmodule_bor_ships_xl_macro",
+    "wareId": "module_bor_build_xl_01",
+    "nameId": "{20104,62701}",
+    "name": "Boron XL Ship Fabrication Bay",
+    "type": "buildmodule",
+    "race": "generic",
+    "buildTime": 1252.0,
+    "buildCost": {
+      "claytronics": 1744,
+      "energycells": 18526,
+      "hullparts": 5673,
+      "water": 16778
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 500,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "struct_bor_base_01_macro",
+    "wareId": "module_bor_conn_base_01",
+    "nameId": "{20104,54101}",
+    "name": "Boron Base Connection Structure 01",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 38.0,
+    "buildCost": {
+      "claytronics": 9,
+      "energycells": 275,
+      "hullparts": 63,
+      "water": 166
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "struct_bor_base_02_macro",
+    "wareId": "module_bor_conn_base_02",
+    "nameId": "{20104,54201}",
+    "name": "Boron Base Connection Structure 02",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 72.0,
+    "buildCost": {
+      "claytronics": 11,
+      "energycells": 336,
+      "hullparts": 77,
+      "water": 203
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "struct_bor_base_03_macro",
+    "wareId": "module_bor_conn_base_03",
+    "nameId": "{20104,54301}",
+    "name": "Boron Base Connection Structure 03",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 109.0,
+    "buildCost": {
+      "claytronics": 11,
+      "energycells": 360,
+      "hullparts": 83,
+      "water": 217
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "struct_bor_base_04_macro",
+    "wareId": "module_bor_conn_base_04",
+    "nameId": "{20104,54401}",
+    "name": "Boron Base Connection Structure 04",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 115.0,
+    "buildCost": {
+      "claytronics": 12,
+      "energycells": 380,
+      "hullparts": 87,
+      "water": 230
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "struct_bor_base_05_macro",
+    "wareId": "module_bor_conn_base_05",
+    "nameId": "{20104,54501}",
+    "name": "Boron Base Connection Structure 05",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 133.0,
+    "buildCost": {
+      "claytronics": 13,
+      "energycells": 417,
+      "hullparts": 96,
+      "water": 252
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "struct_bor_cross_01_macro",
+    "wareId": "module_bor_conn_cross_01",
+    "nameId": "{20104,54601}",
+    "name": "Boron Y Connection Structure 01",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 56.0,
+    "buildCost": {
+      "claytronics": 7,
+      "energycells": 238,
+      "hullparts": 55,
+      "water": 144
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "struct_bor_cross_02_macro",
+    "wareId": "module_bor_conn_cross_02",
+    "nameId": "{20104,54701}",
+    "name": "Boron Hex Connection Structure 01",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 85.0,
+    "buildCost": {
+      "claytronics": 9,
+      "energycells": 296,
+      "hullparts": 68,
+      "water": 179
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "struct_bor_vertical_01_macro",
+    "wareId": "module_bor_conn_vertical_01",
+    "nameId": "{20104,54801}",
+    "name": "Boron Vertical Connection Structure 01",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 35.0,
+    "buildCost": {
+      "claytronics": 6,
+      "energycells": 197,
+      "hullparts": 45,
+      "water": 119
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "struct_bor_vertical_02_macro",
+    "wareId": "module_bor_conn_vertical_02",
+    "nameId": "{20104,54901}",
+    "name": "Boron Vertical Connection Structure 02",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 68.0,
+    "buildCost": {
+      "claytronics": 8,
+      "energycells": 258,
+      "hullparts": 59,
+      "water": 156
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "defence_bor_claim_01_macro",
+    "wareId": "module_bor_def_claim_01",
+    "nameId": "{20104,95301}",
+    "name": "Boron Administrative Centre",
+    "type": "defencemodule",
+    "race": "generic",
+    "buildTime": 414.0,
+    "buildCost": {
+      "claytronics": 85,
+      "energycells": 2711,
+      "hullparts": 623,
+      "water": 1637
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "defence_bor_disc_01_macro",
+    "wareId": "module_bor_def_disc_01",
+    "nameId": "{20104,95401}",
+    "name": "Boron Disc Defence Platform",
+    "type": "defencemodule",
+    "race": "generic",
+    "buildTime": 133.0,
+    "buildCost": {
+      "claytronics": 61,
+      "energycells": 1940,
+      "hullparts": 446,
+      "water": 1172
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "defence_bor_tube_01_macro",
+    "wareId": "module_bor_def_tube_01",
+    "nameId": "{20104,95501}",
+    "name": "Boron Bridge Defence Platform",
+    "type": "defencemodule",
+    "race": "generic",
+    "buildTime": 118.0,
+    "buildCost": {
+      "claytronics": 53,
+      "energycells": 1684,
+      "hullparts": 387,
+      "water": 1017
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "dockarea_bor_m_station_01_standard_macro",
+    "wareId": "module_bor_dock_m_01_standard",
+    "nameId": "{20104,74701}",
+    "name": "Boron 4M14S Luxury Dock Area",
+    "type": "dockarea",
+    "race": "generic",
+    "buildTime": 773.0,
+    "buildCost": {
+      "claytronics": 52,
+      "energycells": 1647,
+      "hullparts": 378,
+      "water": 995
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "pier_bor_harbor_01_macro",
+    "wareId": "module_bor_pier_l_01",
+    "nameId": "{20104,74301}",
+    "name": "Boron 4-Dock T Pier",
+    "type": "pier",
+    "race": "generic",
+    "buildTime": 739.0,
+    "buildCost": {
+      "claytronics": 336,
+      "energycells": 10723,
+      "hullparts": 2463,
+      "water": 6474
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "pier_bor_harbor_02_macro",
+    "wareId": "module_bor_pier_l_02",
+    "nameId": "{20104,74201}",
+    "name": "Boron 1-Dock Pier",
+    "type": "pier",
+    "race": "generic",
+    "buildTime": 283.0,
+    "buildCost": {
+      "claytronics": 194,
+      "energycells": 6192,
+      "hullparts": 1422,
+      "water": 3738
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "pier_bor_harbor_03_macro",
+    "wareId": "module_bor_pier_l_03",
+    "nameId": "{20104,74401}",
+    "name": "Boron 3-Dock E Pier",
+    "type": "pier",
+    "race": "generic",
+    "buildTime": 1087.0,
+    "buildCost": {
+      "claytronics": 388,
+      "energycells": 12371,
+      "hullparts": 2841,
+      "water": 7470
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "pier_bor_harbor_04_macro",
+    "wareId": "module_bor_pier_l_04",
+    "nameId": "{20104,74501}",
+    "name": "Boron Trading Station 4-Dock Pier",
+    "type": "pier",
+    "race": "generic",
+    "buildTime": 517.0,
+    "buildCost": {
+      "claytronics": 273,
+      "energycells": 8715,
+      "hullparts": 2002,
+      "water": 5262
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "pier_bor_tradestation_01_macro",
+    "wareId": "module_bor_pier_tradestation_01",
+    "nameId": "{20104,74801}",
+    "name": "Boron Trading Station Hexa-Dock Pier",
+    "type": "pier",
+    "race": "generic",
+    "buildTime": 1087.0,
+    "buildCost": {
+      "claytronics": 417,
+      "energycells": 13303,
+      "hullparts": 3055,
+      "water": 8032
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "hab_bor_l_01_macro",
+    "wareId": "module_bor_hab_l_01",
+    "nameId": "{20104,32101}",
+    "name": "Boron L Oasis",
+    "type": "habitation",
+    "race": "boron",
+    "buildTime": 640.0,
+    "buildCost": {
+      "claytronics": 114,
+      "energycells": 3631,
+      "hullparts": 834,
+      "water": 2192
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 1000,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "hab_bor_m_01_macro",
+    "wareId": "module_bor_hab_m_01",
+    "nameId": "{20104,32001}",
+    "name": "Boron M Oasis",
+    "type": "habitation",
+    "race": "boron",
+    "buildTime": 347.0,
+    "buildCost": {
+      "claytronics": 81,
+      "energycells": 2567,
+      "hullparts": 590,
+      "water": 1550
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 500,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "hab_bor_s_01_macro",
+    "wareId": "module_bor_hab_s_01",
+    "nameId": "{20104,31901}",
+    "name": "Boron S Oasis",
+    "type": "habitation",
+    "race": "boron",
+    "buildTime": 187.0,
+    "buildCost": {
+      "claytronics": 56,
+      "energycells": 1785,
+      "hullparts": 410,
+      "water": 1078
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 250,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "prod_bor_bofu_macro",
+    "wareId": "module_bor_prod_bofu_01",
+    "nameId": "{20104,16201}",
+    "name": "BoFu Production",
+    "type": "production",
+    "race": "generic",
+    "buildTime": 367.0,
+    "buildCost": {
+      "claytronics": 163,
+      "energycells": 5190,
+      "hullparts": 1192,
+      "water": 3133
+    },
+    "cycleTime": 240.0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 125,
+      "maxBonus": 0.38
+    },
+    "outputs": {
+      "bofu": 1230.0
+    },
+    "inputs": {
+      "bogas": 600.0,
+      "energycells": 600.0,
+      "plankton": 1800.0
+    }
+  },
+  {
+    "id": "prod_bor_bogas_macro",
+    "wareId": "module_bor_prod_bogas_01",
+    "nameId": "{20104,16001}",
+    "name": "BoGas Production",
+    "type": "production",
+    "race": "generic",
+    "buildTime": 411.0,
+    "buildCost": {
+      "claytronics": 154,
+      "energycells": 4913,
+      "hullparts": 1128,
+      "water": 2966
+    },
+    "cycleTime": 150.0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 100,
+      "maxBonus": 0.46
+    },
+    "outputs": {
+      "bogas": 2640.0
+    },
+    "inputs": {
+      "energycells": 960.0,
+      "water": 2400.0
+    }
+  },
+  {
+    "id": "prod_bor_medicalsupplies_macro",
+    "wareId": "module_bor_prod_medicalsupplies_01",
+    "nameId": "{20104,15901}",
+    "name": "Boron Medical Supply Production",
+    "type": "production",
+    "race": "generic",
+    "buildTime": 453.0,
+    "buildCost": {
+      "claytronics": 140,
+      "energycells": 4453,
+      "hullparts": 1023,
+      "water": 2689
+    },
+    "cycleTime": 300.0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 90,
+      "maxBonus": 0.28
+    },
+    "outputs": {
+      "medicalsupplies": 2496.0
+    },
+    "inputs": {
+      "energycells": 1200.0,
+      "spices": 480.0,
+      "water": 720.0,
+      "wheat": 360.0
+    }
+  },
+  {
+    "id": "prod_bor_plankton_macro",
+    "wareId": "module_bor_prod_plankton_01",
+    "nameId": "{20104,16101}",
+    "name": "Plankton Production",
+    "type": "production",
+    "race": "generic",
+    "buildTime": 278.0,
+    "buildCost": {
+      "claytronics": 96,
+      "energycells": 3048,
+      "hullparts": 700,
+      "water": 1840
+    },
+    "cycleTime": 400.0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 40,
+      "maxBonus": 0.4
+    },
+    "outputs": {
+      "plankton": 2475.0
+    },
+    "inputs": {
+      "energycells": 180.0,
+      "water": 450.0
+    }
+  },
+  {
+    "id": "storage_bor_l_container_01_macro",
+    "wareId": "module_bor_stor_container_l_01",
+    "nameId": "{20104,92901}",
+    "name": "Boron L Container Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 783.0,
+    "buildCost": {
+      "claytronics": 71,
+      "energycells": 2277,
+      "hullparts": 523,
+      "water": 1375
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 1000000
+  },
+  {
+    "id": "storage_bor_l_liquid_01_macro",
+    "wareId": "module_bor_stor_liquid_l_01",
+    "nameId": "{20104,93201}",
+    "name": "Boron L Liquid Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 783.0,
+    "buildCost": {
+      "claytronics": 71,
+      "energycells": 2277,
+      "hullparts": 523,
+      "water": 1375
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 1000000
+  },
+  {
+    "id": "storage_bor_l_solid_01_macro",
+    "wareId": "module_bor_stor_solid_l_01",
+    "nameId": "{20104,93501}",
+    "name": "Boron L Solid Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 783.0,
+    "buildCost": {
+      "claytronics": 71,
+      "energycells": 2277,
+      "hullparts": 523,
+      "water": 1375
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 1000000
+  },
+  {
+    "id": "storage_bor_m_container_01_macro",
+    "wareId": "module_bor_stor_container_m_01",
+    "nameId": "{20104,92801}",
+    "name": "Boron M Container Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 423.0,
+    "buildCost": {
+      "claytronics": 51,
+      "energycells": 1621,
+      "hullparts": 372,
+      "water": 979
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 250000
+  },
+  {
+    "id": "storage_bor_m_liquid_01_macro",
+    "wareId": "module_bor_stor_liquid_m_01",
+    "nameId": "{20104,93101}",
+    "name": "Boron M Liquid Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 423.0,
+    "buildCost": {
+      "claytronics": 51,
+      "energycells": 1621,
+      "hullparts": 372,
+      "water": 979
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 500000
+  },
+  {
+    "id": "storage_bor_m_solid_01_macro",
+    "wareId": "module_bor_stor_solid_m_01",
+    "nameId": "{20104,93401}",
+    "name": "Boron M Solid Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 423.0,
+    "buildCost": {
+      "claytronics": 51,
+      "energycells": 1621,
+      "hullparts": 372,
+      "water": 979
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 500000
+  },
+  {
+    "id": "storage_bor_s_container_01_macro",
+    "wareId": "module_bor_stor_container_s_01",
+    "nameId": "{20104,92701}",
+    "name": "Boron S Container Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 268.0,
+    "buildCost": {
+      "claytronics": 32,
+      "energycells": 1027,
+      "hullparts": 236,
+      "water": 620
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 50000
+  },
+  {
+    "id": "storage_bor_s_liquid_01_macro",
+    "wareId": "module_bor_stor_liquid_s_01",
+    "nameId": "{20104,93001}",
+    "name": "Boron S Liquid Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 268.0,
+    "buildCost": {
+      "claytronics": 32,
+      "energycells": 1027,
+      "hullparts": 236,
+      "water": 620
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 100000
+  },
+  {
+    "id": "storage_bor_s_solid_01_macro",
+    "wareId": "module_bor_stor_solid_s_01",
+    "nameId": "{20104,93301}",
+    "name": "Boron S Solid Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 268.0,
+    "buildCost": {
+      "claytronics": 32,
+      "energycells": 1027,
+      "hullparts": 236,
+      "water": 620
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 100000
+  },
+  {
+    "id": "welfare_bor_artacademy_01_macro",
+    "wareId": "welfare_bor_artacademy_01",
+    "nameId": "{20104,110301}",
+    "name": "Pheromone Art Gallery",
+    "type": "welfaremodule",
+    "race": "generic",
+    "buildTime": 1155.0,
+    "buildCost": {
+      "claytronics": 516,
+      "energycells": 16435,
+      "hullparts": 3775,
+      "water": 9923
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "hab_pir_l_01_macro",
+    "wareId": "module_pir_hab_l_01",
+    "nameId": "{20104,31801}",
+    "name": "Argon L Dormitory",
+    "type": "habitation",
+    "race": "argon",
+    "buildTime": 1155.0,
+    "buildCost": {
+      "claytronics": 420,
+      "energycells": 383,
+      "hullparts": 1729
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 1000,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "hab_pir_m_01_macro",
+    "wareId": "module_pir_hab_m_01",
+    "nameId": "{20104,31701}",
+    "name": "Argon M Dormitory",
+    "type": "habitation",
+    "race": "argon",
+    "buildTime": 816.0,
+    "buildCost": {
+      "claytronics": 297,
+      "energycells": 271,
+      "hullparts": 1222
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 500,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "hab_pir_s_01_macro",
+    "wareId": "module_pir_hab_s_01",
+    "nameId": "{20104,31601}",
+    "name": "Argon S Dormitory",
+    "type": "habitation",
+    "race": "argon",
+    "buildTime": 566.0,
+    "buildCost": {
+      "claytronics": 206,
+      "energycells": 188,
+      "hullparts": 847
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 250,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "landmarks_gen_piratestation_01_core_01_macro",
+    "wareId": "module_conn_lndm_piratestation_01_core_01",
+    "nameId": "{20104,102601}",
+    "name": "Drill Support Structure",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 211.0,
+    "buildCost": {
+      "claytronics": 77,
+      "energycells": 70,
+      "hullparts": 316
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "landmarks_gen_piratestation_01_exit_01_macro",
+    "wareId": "module_conn_lndm_piratestation_01_exit_01",
+    "nameId": "{20104,102701}",
+    "name": "Drill Access Module",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 211.0,
+    "buildCost": {
+      "claytronics": 77,
+      "energycells": 70,
+      "hullparts": 316
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "landmarks_gen_piratestation_01_port_01_macro",
+    "wareId": "module_hab_lndm_piratestation_01_port_01",
+    "nameId": "{20104,102901}",
+    "name": "Dormitory Module",
+    "type": "habitation",
+    "race": "generic",
+    "buildTime": 1633.0,
+    "buildCost": {
+      "claytronics": 594,
+      "energycells": 541,
+      "hullparts": 2445
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "landmarks_gen_piratestation_01_ring_01_macro",
+    "wareId": "module_stor_lndm_piratestation_01_ring_01",
+    "nameId": "{20104,103101}",
+    "name": "Storage Ring",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 1033.0,
+    "buildCost": {
+      "claytronics": 291,
+      "energycells": 265,
+      "hullparts": 1198
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 50000
+  },
+  {
+    "id": "landmarks_gen_piratestation_02_port_01_macro",
+    "wareId": "module_hab_lndm_piratestation_02_port_01",
+    "nameId": "{20104,102901}",
+    "name": "Dormitory Module",
+    "type": "habitation",
+    "race": "generic",
+    "buildTime": 1633.0,
+    "buildCost": {
+      "claytronics": 594,
+      "energycells": 541,
+      "hullparts": 2445
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "landmarks_gen_piratestation_02_ring_01_macro",
+    "wareId": "module_def_lndm_piratestation_02_ring_01",
+    "nameId": "{20104,102801}",
+    "name": "Defence Array",
+    "type": "defencemodule",
+    "race": "generic",
+    "buildTime": 2309.0,
+    "buildCost": {
+      "claytronics": 841,
+      "energycells": 765,
+      "hullparts": 3457
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "landmarks_gen_piratestation_02_ring_02_macro",
+    "wareId": "module_hab_lndm_piratestation_02_ring_02",
+    "nameId": "{20104,103001}",
+    "name": "Half-Ring Dormitory",
+    "type": "habitation",
+    "race": "argon",
+    "buildTime": 1633.0,
+    "buildCost": {
+      "claytronics": 594,
+      "energycells": 541,
+      "hullparts": 2445
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 500,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "landmarks_gen_piratestation_02_storage_01_macro",
+    "wareId": "module_stor_lndm_piratestation_02_storage_01",
+    "nameId": "{20104,103201}",
+    "name": "Storage Arm",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 1033.0,
+    "buildCost": {
+      "claytronics": 291,
+      "energycells": 265,
+      "hullparts": 1198
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "landmarks_gen_piratestation_02_storage_02_macro",
+    "wareId": "module_stor_lndm_piratestation_02_storage_02",
+    "nameId": "{20104,103201}",
+    "name": "Storage Arm",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 1033.0,
+    "buildCost": {
+      "claytronics": 291,
+      "energycells": 265,
+      "hullparts": 1198
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "storage_pir_l_condensate_01_macro",
+    "wareId": "module_pir_stor_condensate_l_01",
+    "nameId": "{20104,92501}",
+    "name": "Protectyon Shield Generator",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 1033.0,
+    "buildCost": {
+      "claytronics": 291,
+      "energycells": 265,
+      "hullparts": 1198
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 50
+  },
+  {
+    "id": "storage_pir_s_condensate_01_macro",
+    "wareId": "module_pir_stor_condensate_s_01",
+    "nameId": "{20104,92601}",
+    "name": "Condensate Containment Facility",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 327.0,
+    "buildCost": {
+      "claytronics": 92,
+      "energycells": 84,
+      "hullparts": 379
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 10000
+  },
+  {
+    "id": "welfare_gen_casino_01_macro",
+    "wareId": "module_gen_welfare_casino_01",
+    "nameId": "{20104,110101}",
+    "name": "Casino",
+    "type": "welfaremodule",
+    "race": "generic",
+    "buildTime": 1155.0,
+    "buildCost": {
+      "claytronics": 594,
+      "energycells": 541,
+      "hullparts": 2445
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "struct_spl_base_01_macro",
+    "wareId": "module_spl_conn_base_01",
+    "nameId": "{20104,51001}",
+    "name": "Split Base Connection Structure 01",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 59.0,
+    "buildCost": {
+      "claytronics": 14,
+      "energycells": 27,
+      "hullparts": 50
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "struct_spl_base_02_macro",
+    "wareId": "module_spl_conn_base_02",
+    "nameId": "{20104,51101}",
+    "name": "Split Base Connection Structure 02",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 53.0,
+    "buildCost": {
+      "claytronics": 17,
+      "energycells": 34,
+      "hullparts": 62
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "struct_spl_base_03_macro",
+    "wareId": "module_spl_conn_base_03",
+    "nameId": "{20104,51201}",
+    "name": "Split Base Connection Structure 03",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 72.0,
+    "buildCost": {
+      "claytronics": 18,
+      "energycells": 37,
+      "hullparts": 68
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "struct_spl_cross_01_macro",
+    "wareId": "module_spl_conn_cross_01",
+    "nameId": "{20104,51901}",
+    "name": "Split Y Connection Structure 01",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 47.0,
+    "buildCost": {
+      "claytronics": 12,
+      "energycells": 24,
+      "hullparts": 44
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "struct_spl_vertical_01_macro",
+    "wareId": "module_spl_conn_vertical_01",
+    "nameId": "{20104,52701}",
+    "name": "Split Vertical Connection Structure 01",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 38.0,
+    "buildCost": {
+      "claytronics": 10,
+      "energycells": 20,
+      "hullparts": 36
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "struct_spl_vertical_02_macro",
+    "wareId": "module_spl_conn_vertical_02",
+    "nameId": "{20104,52801}",
+    "name": "Split Vertical Connection Structure 02",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 52.0,
+    "buildCost": {
+      "claytronics": 13,
+      "energycells": 26,
+      "hullparts": 48
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "defence_spl_claim_01_macro",
+    "wareId": "module_spl_def_claim_01",
+    "nameId": "{20104,40401}",
+    "name": "Split Administrative Centre",
+    "type": "defencemodule",
+    "race": "generic",
+    "buildTime": 541.0,
+    "buildCost": {
+      "claytronics": 138,
+      "energycells": 276,
+      "hullparts": 505
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "defence_spl_disc_01_macro",
+    "wareId": "module_spl_def_disc_01",
+    "nameId": "{20104,40901}",
+    "name": "Split Disc Defence Platform",
+    "type": "defencemodule",
+    "race": "generic",
+    "buildTime": 410.0,
+    "buildCost": {
+      "claytronics": 105,
+      "energycells": 210,
+      "hullparts": 384
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "defence_spl_tube_01_macro",
+    "wareId": "module_spl_def_tube_01",
+    "nameId": "{20104,41401}",
+    "name": "Split Bridge Defence Platform",
+    "type": "defencemodule",
+    "race": "generic",
+    "buildTime": 410.0,
+    "buildCost": {
+      "claytronics": 105,
+      "energycells": 210,
+      "hullparts": 384
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "pier_spl_harbor_01_macro",
+    "wareId": "module_spl_pier_l_01",
+    "nameId": "{20104,72201}",
+    "name": "Split 4-Dock T Pier",
+    "type": "pier",
+    "race": "generic",
+    "buildTime": 750.0,
+    "buildCost": {
+      "claytronics": 542,
+      "energycells": 1083,
+      "hullparts": 1980
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "pier_spl_harbor_02_macro",
+    "wareId": "module_spl_pier_l_02",
+    "nameId": "{20104,72101}",
+    "name": "Split 1-Dock Pier",
+    "type": "pier",
+    "race": "generic",
+    "buildTime": 433.0,
+    "buildCost": {
+      "claytronics": 313,
+      "energycells": 625,
+      "hullparts": 1143
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "pier_spl_harbor_03_macro",
+    "wareId": "module_spl_pier_l_03",
+    "nameId": "{20104,72301}",
+    "name": "Split 3-Dock E Pier",
+    "type": "pier",
+    "race": "generic",
+    "buildTime": 866.0,
+    "buildCost": {
+      "claytronics": 625,
+      "energycells": 1250,
+      "hullparts": 2287
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "hab_spl_l_01_macro",
+    "wareId": "module_spl_hab_l_01",
+    "nameId": "{20104,31201}",
+    "name": "Split L Parlour",
+    "type": "habitation",
+    "race": "split",
+    "buildTime": 750.0,
+    "buildCost": {
+      "claytronics": 191,
+      "energycells": 383,
+      "hullparts": 700
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 1000,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "hab_spl_m_01_macro",
+    "wareId": "module_spl_hab_m_01",
+    "nameId": "{20104,31101}",
+    "name": "Split M Parlour",
+    "type": "habitation",
+    "race": "split",
+    "buildTime": 530.0,
+    "buildCost": {
+      "claytronics": 135,
+      "energycells": 271,
+      "hullparts": 495
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 500,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "hab_spl_s_01_macro",
+    "wareId": "module_spl_hab_s_01",
+    "nameId": "{20104,31001}",
+    "name": "Split S Parlour",
+    "type": "habitation",
+    "race": "split",
+    "buildTime": 367.0,
+    "buildCost": {
+      "claytronics": 94,
+      "energycells": 188,
+      "hullparts": 343
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 250,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "prod_spl_cheltmeat_macro",
+    "wareId": "module_spl_prod_cheltmeat_01",
+    "nameId": "{20104,14901}",
+    "name": "Chelt Production",
+    "type": "production",
+    "race": "generic",
+    "buildTime": 503.0,
+    "buildCost": {
+      "claytronics": 282,
+      "energycells": 256,
+      "hullparts": 1158
+    },
+    "cycleTime": 450.0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 90,
+      "maxBonus": 0.6
+    },
+    "outputs": {
+      "cheltmeat": 1672.0
+    },
+    "inputs": {
+      "energycells": 400.0,
+      "water": 960.0
+    }
+  },
+  {
+    "id": "prod_spl_medicalsupplies_macro",
+    "wareId": "module_spl_prod_medicalsupplies_01",
+    "nameId": "{20104,15001}",
+    "name": "Split Medical Supply Production",
+    "type": "production",
+    "race": "generic",
+    "buildTime": 739.0,
+    "buildCost": {
+      "claytronics": 248,
+      "energycells": 451,
+      "hullparts": 910
+    },
+    "cycleTime": 300.0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 90,
+      "maxBonus": 0.28
+    },
+    "outputs": {
+      "medicalsupplies": 2496.0
+    },
+    "inputs": {
+      "energycells": 1200.0,
+      "spices": 480.0,
+      "water": 720.0,
+      "wheat": 360.0
+    }
+  },
+  {
+    "id": "prod_spl_scruffinfruit_macro",
+    "wareId": "module_spl_prod_scruffinfruits_01",
+    "nameId": "{20104,14801}",
+    "name": "Scruffin Production",
+    "type": "production",
+    "race": "generic",
+    "buildTime": 598.0,
+    "buildCost": {
+      "claytronics": 335,
+      "energycells": 305,
+      "hullparts": 1377
+    },
+    "cycleTime": 300.0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 90,
+      "maxBonus": 0.53
+    },
+    "outputs": {
+      "scruffinfruits": 3060.0
+    },
+    "inputs": {
+      "energycells": 360.0,
+      "water": 960.0
+    }
+  },
+  {
+    "id": "storage_spl_l_container_01_macro",
+    "wareId": "module_spl_stor_container_l_01",
+    "nameId": "{20104,25301}",
+    "name": "Split L Container Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 683.0,
+    "buildCost": {
+      "claytronics": 135,
+      "energycells": 270,
+      "hullparts": 494
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 1000000
+  },
+  {
+    "id": "storage_spl_l_liquid_01_macro",
+    "wareId": "module_spl_stor_liquid_l_01",
+    "nameId": "{20104,26301}",
+    "name": "Split L Liquid Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 683.0,
+    "buildCost": {
+      "claytronics": 135,
+      "energycells": 270,
+      "hullparts": 494
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 1000000
+  },
+  {
+    "id": "storage_spl_l_solid_01_macro",
+    "wareId": "module_spl_stor_solid_l_01",
+    "nameId": "{20104,27301}",
+    "name": "Split L Solid Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 683.0,
+    "buildCost": {
+      "claytronics": 135,
+      "energycells": 270,
+      "hullparts": 494
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 1000000
+  },
+  {
+    "id": "storage_spl_m_container_01_macro",
+    "wareId": "module_spl_stor_container_m_01",
+    "nameId": "{20104,25201}",
+    "name": "Split M Container Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 455.0,
+    "buildCost": {
+      "claytronics": 90,
+      "energycells": 180,
+      "hullparts": 329
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 250000
+  },
+  {
+    "id": "storage_spl_m_liquid_01_macro",
+    "wareId": "module_spl_stor_liquid_m_01",
+    "nameId": "{20104,26201}",
+    "name": "Split M Liquid Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 455.0,
+    "buildCost": {
+      "claytronics": 90,
+      "energycells": 180,
+      "hullparts": 329
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 500000
+  },
+  {
+    "id": "storage_spl_m_solid_01_macro",
+    "wareId": "module_spl_stor_solid_m_01",
+    "nameId": "{20104,27201}",
+    "name": "Split M Solid Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 455.0,
+    "buildCost": {
+      "claytronics": 90,
+      "energycells": 180,
+      "hullparts": 329
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 500000
+  },
+  {
+    "id": "storage_spl_s_container_01_macro",
+    "wareId": "module_spl_stor_container_s_01",
+    "nameId": "{20104,25101}",
+    "name": "Split S Container Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 307.0,
+    "buildCost": {
+      "claytronics": 61,
+      "energycells": 121,
+      "hullparts": 222
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 50000
+  },
+  {
+    "id": "storage_spl_s_liquid_01_macro",
+    "wareId": "module_spl_stor_liquid_s_01",
+    "nameId": "{20104,26101}",
+    "name": "Split S Liquid Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 307.0,
+    "buildCost": {
+      "claytronics": 61,
+      "energycells": 121,
+      "hullparts": 222
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 100000
+  },
+  {
+    "id": "storage_spl_s_solid_01_macro",
+    "wareId": "module_spl_stor_solid_s_01",
+    "nameId": "{20104,27101}",
+    "name": "Split S Solid Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 307.0,
+    "buildCost": {
+      "claytronics": 61,
+      "energycells": 121,
+      "hullparts": 222
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 100000
+  },
+  {
+    "id": "buildmodule_ter_equip_l_macro",
+    "wareId": "module_ter_equip_l_01",
+    "nameId": "{20104,61701}",
+    "name": "Terran L Ship Maintenance Bay",
+    "type": "buildmodule",
+    "race": "generic",
+    "buildTime": 364.0,
+    "buildCost": {
+      "computronicsubstrate": 252,
+      "energycells": 1866,
+      "siliconcarbide": 519
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 500,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "buildmodule_ter_equip_m_dockarea_01_macro",
+    "wareId": "module_ter_equip_dockarea_m_01",
+    "nameId": "{20104,61601}",
+    "name": "Terran S/M Ship Maintenance Bay",
+    "type": "buildmodule",
+    "race": "generic",
+    "buildTime": 650.0,
+    "buildCost": {
+      "computronicsubstrate": 447,
+      "energycells": 3312,
+      "siliconcarbide": 921
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 400,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "buildmodule_ter_equip_xl_macro",
+    "wareId": "module_ter_equip_xl_01",
+    "nameId": "{20104,61801}",
+    "name": "Terran XL Ship Maintenance Bay",
+    "type": "buildmodule",
+    "race": "generic",
+    "buildTime": 477.0,
+    "buildCost": {
+      "computronicsubstrate": 329,
+      "energycells": 2434,
+      "siliconcarbide": 677
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 700,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "buildmodule_ter_ships_l_macro",
+    "wareId": "module_ter_build_l_01",
+    "nameId": "{20104,62001}",
+    "name": "Terran L Ship Fabrication Bay",
+    "type": "buildmodule",
+    "race": "generic",
+    "buildTime": 731.0,
+    "buildCost": {
+      "computronicsubstrate": 505,
+      "energycells": 3731,
+      "siliconcarbide": 1039
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 500,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "buildmodule_ter_ships_m_dockarea_01_macro",
+    "wareId": "module_ter_build_dockarea_m_01",
+    "nameId": "{20104,61901}",
+    "name": "Terran S/M Ship Fabrication Bay",
+    "type": "buildmodule",
+    "race": "generic",
+    "buildTime": 1298.0,
+    "buildCost": {
+      "computronicsubstrate": 895,
+      "energycells": 6620,
+      "siliconcarbide": 1843
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 800,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "buildmodule_ter_ships_xl_macro",
+    "wareId": "module_ter_build_xl_01",
+    "nameId": "{20104,62101}",
+    "name": "Terran XL Ship Fabrication Bay",
+    "type": "buildmodule",
+    "race": "generic",
+    "buildTime": 954.0,
+    "buildCost": {
+      "computronicsubstrate": 658,
+      "energycells": 4866,
+      "siliconcarbide": 1354
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 700,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "struct_ter_base_01_macro",
+    "wareId": "module_ter_conn_base_01",
+    "nameId": "{20104,53801}",
+    "name": "Terran Base Connection Structure 01",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 37.0,
+    "buildCost": {
+      "computronicsubstrate": 3,
+      "energycells": 19,
+      "siliconcarbide": 5
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "struct_ter_base_02_macro",
+    "wareId": "module_ter_conn_base_02",
+    "nameId": "{20104,53901}",
+    "name": "Terran Base Connection Structure 02",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 53.0,
+    "buildCost": {
+      "computronicsubstrate": 4,
+      "energycells": 27,
+      "siliconcarbide": 8
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "struct_ter_base_03_macro",
+    "wareId": "module_ter_conn_base_03",
+    "nameId": "{20104,54001}",
+    "name": "Terran Base Connection Structure 03",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 74.0,
+    "buildCost": {
+      "computronicsubstrate": 5,
+      "energycells": 38,
+      "siliconcarbide": 11
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "struct_ter_cross_01_macro",
+    "wareId": "module_ter_conn_cross_01",
+    "nameId": "{20104,53701}",
+    "name": "Terran Cross Connection Structure 01",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 74.0,
+    "buildCost": {
+      "computronicsubstrate": 5,
+      "energycells": 38,
+      "siliconcarbide": 11
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "struct_ter_vertical_01_macro",
+    "wareId": "module_ter_conn_vertical_01",
+    "nameId": "{20104,53501}",
+    "name": "Terran Vertical Connection Structure 01",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 37.0,
+    "buildCost": {
+      "computronicsubstrate": 3,
+      "energycells": 19,
+      "siliconcarbide": 5
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "struct_ter_vertical_02_macro",
+    "wareId": "module_ter_conn_vertical_02",
+    "nameId": "{20104,53601}",
+    "name": "Terran Vertical Connection Structure 02",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 53.0,
+    "buildCost": {
+      "computronicsubstrate": 4,
+      "energycells": 27,
+      "siliconcarbide": 8
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "defence_ter_claim_01_macro",
+    "wareId": "module_ter_def_claim_01",
+    "nameId": "{20104,95001}",
+    "name": "Terran Administrative Centre",
+    "type": "defencemodule",
+    "race": "generic",
+    "buildTime": 1162.0,
+    "buildCost": {
+      "computronicsubstrate": 80,
+      "energycells": 593,
+      "siliconcarbide": 165
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "defence_ter_disc_01_macro",
+    "wareId": "module_ter_def_disc_01",
+    "nameId": "{20104,95101}",
+    "name": "Terran Disc Defence Platform",
+    "type": "defencemodule",
+    "race": "generic",
+    "buildTime": 822.0,
+    "buildCost": {
+      "computronicsubstrate": 57,
+      "energycells": 419,
+      "siliconcarbide": 117
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "defence_ter_tube_01_macro",
+    "wareId": "module_ter_def_tube_01",
+    "nameId": "{20104,95201}",
+    "name": "Terran Bridge Defence Platform",
+    "type": "defencemodule",
+    "race": "generic",
+    "buildTime": 581.0,
+    "buildCost": {
+      "computronicsubstrate": 40,
+      "energycells": 296,
+      "siliconcarbide": 83
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "dockarea_ter_m_station_01_hightech_macro",
+    "wareId": "module_ter_dock_m_01_hightech",
+    "nameId": "{20104,74101}",
+    "name": "Terran 4M10S Luxury Dock Area",
+    "type": "dockarea",
+    "race": "generic",
+    "buildTime": 318.0,
+    "buildCost": {
+      "computronicsubstrate": 11,
+      "energycells": 81,
+      "siliconcarbide": 23
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "pier_ter_harbor_01_macro",
+    "wareId": "module_ter_pier_01",
+    "nameId": "{20104,73701}",
+    "name": "Terran 3-Dock T Pier",
+    "type": "pier",
+    "race": "generic",
+    "buildTime": 750.0,
+    "buildCost": {
+      "computronicsubstrate": 146,
+      "energycells": 1083,
+      "siliconcarbide": 301
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "pier_ter_harbor_02_macro",
+    "wareId": "module_ter_pier_02",
+    "nameId": "{20104,73601}",
+    "name": "Terran 1-Dock Pier",
+    "type": "pier",
+    "race": "generic",
+    "buildTime": 433.0,
+    "buildCost": {
+      "computronicsubstrate": 85,
+      "energycells": 625,
+      "siliconcarbide": 174
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "pier_ter_harbor_03_macro",
+    "wareId": "module_ter_pier_03",
+    "nameId": "{20104,73801}",
+    "name": "Terran 3-Dock E Pier",
+    "type": "pier",
+    "race": "generic",
+    "buildTime": 866.0,
+    "buildCost": {
+      "computronicsubstrate": 169,
+      "energycells": 1250,
+      "siliconcarbide": 348
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "pier_ter_harbor_04_macro",
+    "wareId": "module_ter_pier_04",
+    "nameId": "{20104,73901}",
+    "name": "Terran 4-Dock T Pier",
+    "type": "pier",
+    "race": "generic",
+    "buildTime": 433.0,
+    "buildCost": {
+      "computronicsubstrate": 85,
+      "energycells": 625,
+      "siliconcarbide": 174
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "pier_ter_tradestation_01_macro",
+    "wareId": "module_ter_pier_tradestation_01",
+    "nameId": "{20104,74001}",
+    "name": "Terran Trading Station Hexa-Dock Pier",
+    "type": "pier",
+    "race": "generic",
+    "buildTime": 1225.0,
+    "buildCost": {
+      "computronicsubstrate": 239,
+      "energycells": 1768,
+      "siliconcarbide": 492
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "hab_ter_l_01_macro",
+    "wareId": "module_ter_hab_l_01",
+    "nameId": "{20104,31501}",
+    "name": "Terran L Living Quarters",
+    "type": "habitation",
+    "race": "terran",
+    "buildTime": 1162.0,
+    "buildCost": {
+      "computronicsubstrate": 80,
+      "energycells": 593,
+      "siliconcarbide": 165
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 500,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "hab_ter_m_01_macro",
+    "wareId": "module_ter_hab_m_01",
+    "nameId": "{20104,31401}",
+    "name": "Terran M Living Quarters",
+    "type": "habitation",
+    "race": "terran",
+    "buildTime": 822.0,
+    "buildCost": {
+      "computronicsubstrate": 57,
+      "energycells": 419,
+      "siliconcarbide": 117
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 250,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "hab_ter_s_01_macro",
+    "wareId": "module_ter_hab_s_01",
+    "nameId": "{20104,31301}",
+    "name": "Terran S Living Quarters",
+    "type": "habitation",
+    "race": "terran",
+    "buildTime": 581.0,
+    "buildCost": {
+      "computronicsubstrate": 40,
+      "energycells": 296,
+      "siliconcarbide": 83
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 100,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "prod_ter_computronicsubstrate_macro",
+    "wareId": "module_ter_prod_computronicsubstrate_01",
+    "nameId": "{20104,15101}",
+    "name": "Computronic Substrate Production",
+    "type": "production",
+    "race": "generic",
+    "buildTime": 800.0,
+    "buildCost": {
+      "computronicsubstrate": 238,
+      "energycells": 688,
+      "siliconcarbide": 155
+    },
+    "cycleTime": 600.0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 1500,
+      "maxBonus": 0.1
+    },
+    "outputs": {
+      "computronicsubstrate": 588.0
+    },
+    "inputs": {
+      "energycells": 24000.0,
+      "hydrogen": 12000.0,
+      "ore": 18000.0,
+      "silicon": 18000.0
+    }
+  },
+  {
+    "id": "prod_ter_energycells_macro",
+    "wareId": "module_ter_prod_energycells_01",
+    "nameId": "{20104,15201}",
+    "name": "Terran Energy Cell Production",
+    "type": "production",
+    "race": "generic",
+    "buildTime": 175.0,
+    "buildCost": {
+      "computronicsubstrate": 24,
+      "energycells": 100,
+      "siliconcarbide": 20
+    },
+    "cycleTime": 60.0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 45,
+      "maxBonus": 0.43
+    },
+    "outputs": {
+      "energycells": 10500.0
+    },
+    "inputs": {}
+  },
+  {
+    "id": "prod_ter_medicalsupplies_macro",
+    "wareId": "module_ter_prod_medicalsupplies_01",
+    "nameId": "{20104,15301}",
+    "name": "Terran Medical Supply Production",
+    "type": "production",
+    "race": "generic",
+    "buildTime": 336.0,
+    "buildCost": {
+      "computronicsubstrate": 17,
+      "energycells": 50,
+      "siliconcarbide": 11
+    },
+    "cycleTime": 300.0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 90,
+      "maxBonus": 0.28
+    },
+    "outputs": {
+      "medicalsupplies": 2496.0
+    },
+    "inputs": {
+      "energycells": 1200.0,
+      "spices": 480.0,
+      "water": 720.0,
+      "wheat": 360.0
+    }
+  },
+  {
+    "id": "prod_ter_metallicmicrolattice_macro",
+    "wareId": "module_ter_prod_metallicmicrolattice_01",
+    "nameId": "{20104,15401}",
+    "name": "Metallic Microlattice Production",
+    "type": "production",
+    "race": "generic",
+    "buildTime": 152.0,
+    "buildCost": {
+      "computronicsubstrate": 6,
+      "energycells": 18,
+      "siliconcarbide": 4
+    },
+    "cycleTime": 180.0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 120,
+      "maxBonus": 0.2
+    },
+    "outputs": {
+      "metallicmicrolattice": 3800.0
+    },
+    "inputs": {
+      "energycells": 1000.0,
+      "helium": 2600.0,
+      "ore": 1000.0
+    }
+  },
+  {
+    "id": "prod_ter_mre_macro",
+    "wareId": "module_ter_prod_terranmre_01",
+    "nameId": "{20104,15501}",
+    "name": "Terran MRE Production",
+    "type": "production",
+    "race": "generic",
+    "buildTime": 436.0,
+    "buildCost": {
+      "computronicsubstrate": 30,
+      "energycells": 89,
+      "siliconcarbide": 20
+    },
+    "cycleTime": 240.0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 135,
+      "maxBonus": 0.42
+    },
+    "outputs": {
+      "terranmre": 2625.0
+    },
+    "inputs": {
+      "energycells": 900.0,
+      "proteinpaste": 900.0
+    }
+  },
+  {
+    "id": "prod_ter_proteinpaste_macro",
+    "wareId": "module_ter_prod_proteinpaste_01",
+    "nameId": "{20104,15601}",
+    "name": "Protein Paste Production",
+    "type": "production",
+    "race": "generic",
+    "buildTime": 592.0,
+    "buildCost": {
+      "computronicsubstrate": 73,
+      "energycells": 211,
+      "siliconcarbide": 47
+    },
+    "cycleTime": 300.0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 180,
+      "maxBonus": 0.3
+    },
+    "outputs": {
+      "proteinpaste": 2628.0
+    },
+    "inputs": {
+      "energycells": 960.0,
+      "ice": 960.0,
+      "methane": 2400.0
+    }
+  },
+  {
+    "id": "prod_ter_scrap_recycler_macro",
+    "wareId": "module_ter_prod_scrap_recycler",
+    "nameId": "{20104,140101}",
+    "name": "Terran Scrap Recycler",
+    "type": "production",
+    "race": "generic",
+    "buildTime": 777.0,
+    "buildCost": {
+      "computronicsubstrate": 99,
+      "energycells": 131,
+      "siliconcarbide": 21
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 1250,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "prod_ter_siliconcarbide_macro",
+    "wareId": "module_ter_prod_siliconcarbide_01",
+    "nameId": "{20104,15701}",
+    "name": "Silicon Carbide Production",
+    "type": "production",
+    "race": "generic",
+    "buildTime": 486.0,
+    "buildCost": {
+      "computronicsubstrate": 40,
+      "energycells": 117,
+      "siliconcarbide": 26
+    },
+    "cycleTime": 300.0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 750,
+      "maxBonus": 0.2
+    },
+    "outputs": {
+      "siliconcarbide": 576.0
+    },
+    "inputs": {
+      "energycells": 2400.0,
+      "metallicmicrolattice": 24.0,
+      "methane": 4800.0,
+      "silicon": 3600.0
+    }
+  },
+  {
+    "id": "prod_ter_stimulants_macro",
+    "wareId": "module_ter_prod_stimulants_01",
+    "nameId": "{20104,15801}",
+    "name": "Stimulant Production",
+    "type": "production",
+    "race": "generic",
+    "buildTime": 707.0,
+    "buildCost": {
+      "computronicsubstrate": 140,
+      "energycells": 407,
+      "siliconcarbide": 92
+    },
+    "cycleTime": 300.0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 300,
+      "maxBonus": 0.65
+    },
+    "outputs": {
+      "stimulants": 1176.0
+    },
+    "inputs": {
+      "energycells": 960.0,
+      "helium": 4800.0,
+      "silicon": 240.0
+    }
+  },
+  {
+    "id": "storage_ter_l_container_01_macro",
+    "wareId": "module_ter_stor_container_l_01",
+    "nameId": "{20104,90301}",
+    "name": "Terran L Container Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 671.0,
+    "buildCost": {
+      "computronicsubstrate": 36,
+      "energycells": 265,
+      "siliconcarbide": 74
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 1000000
+  },
+  {
+    "id": "storage_ter_l_liquid_01_macro",
+    "wareId": "module_ter_stor_liquid_l_01",
+    "nameId": "{20104,90601}",
+    "name": "Terran L Liquid Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 671.0,
+    "buildCost": {
+      "computronicsubstrate": 36,
+      "energycells": 265,
+      "siliconcarbide": 74
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 1000000
+  },
+  {
+    "id": "storage_ter_l_solid_01_macro",
+    "wareId": "module_ter_stor_solid_l_01",
+    "nameId": "{20104,90901}",
+    "name": "Terran L Solid Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 671.0,
+    "buildCost": {
+      "computronicsubstrate": 36,
+      "energycells": 265,
+      "siliconcarbide": 74
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 1000000
+  },
+  {
+    "id": "storage_ter_m_container_01_macro",
+    "wareId": "module_ter_stor_container_m_01",
+    "nameId": "{20104,90201}",
+    "name": "Terran M Container Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 450.0,
+    "buildCost": {
+      "computronicsubstrate": 24,
+      "energycells": 178,
+      "siliconcarbide": 50
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 500000
+  },
+  {
+    "id": "storage_ter_m_container_tradestation_01_macro",
+    "wareId": "module_ter_stor_container_m_tradestation",
+    "nameId": "{20104,91701}",
+    "name": "Terran M Trading Station Container Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 520.0,
+    "buildCost": {
+      "computronicsubstrate": 28,
+      "energycells": 205,
+      "siliconcarbide": 57
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 300000
+  },
+  {
+    "id": "storage_ter_m_liquid_01_macro",
+    "wareId": "module_ter_stor_liquid_m_01",
+    "nameId": "{20104,90501}",
+    "name": "Terran M Liquid Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 450.0,
+    "buildCost": {
+      "computronicsubstrate": 24,
+      "energycells": 178,
+      "siliconcarbide": 50
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 500000
+  },
+  {
+    "id": "storage_ter_m_solid_01_macro",
+    "wareId": "module_ter_stor_solid_m_01",
+    "nameId": "{20104,90801}",
+    "name": "Terran M Solid Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 450.0,
+    "buildCost": {
+      "computronicsubstrate": 24,
+      "energycells": 178,
+      "siliconcarbide": 50
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 500000
+  },
+  {
+    "id": "storage_ter_s_container_01_macro",
+    "wareId": "module_ter_stor_container_s_01",
+    "nameId": "{20104,90101}",
+    "name": "Terran S Container Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 260.0,
+    "buildCost": {
+      "computronicsubstrate": 14,
+      "energycells": 103,
+      "siliconcarbide": 29
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 100000
+  },
+  {
+    "id": "storage_ter_s_liquid_01_macro",
+    "wareId": "module_ter_stor_liquid_s_01",
+    "nameId": "{20104,90401}",
+    "name": "Terran S Liquid Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 260.0,
+    "buildCost": {
+      "computronicsubstrate": 14,
+      "energycells": 103,
+      "siliconcarbide": 29
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 100000
+  },
+  {
+    "id": "storage_ter_s_liquid_tradestation_01_macro",
+    "wareId": "module_ter_stor_liquid_s_tradestation",
+    "nameId": "{20104,91901}",
+    "name": "Terran S Trading Station Liquid Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 367.0,
+    "buildCost": {
+      "computronicsubstrate": 20,
+      "energycells": 145,
+      "siliconcarbide": 40
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 100000
+  },
+  {
+    "id": "storage_ter_s_solid_01_macro",
+    "wareId": "module_ter_stor_solid_s_01",
+    "nameId": "{20104,90701}",
+    "name": "Terran S Solid Storage",
+    "type": "storage",
+    "race": "generic",
+    "buildTime": 260.0,
+    "buildCost": {
+      "computronicsubstrate": 14,
+      "energycells": 103,
+      "siliconcarbide": 29
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {},
+    "capacity": 100000
+  },
+  {
+    "id": "landmarks_arg_antigonearc_01_macro",
+    "wareId": "module_conn_arg_antigonearc_01",
+    "nameId": "{20104,55101}",
+    "name": "Argon Arc Connection Structure 02",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 220.0,
+    "buildCost": {
+      "claytronics": 19,
+      "energycells": 1060,
+      "hullparts": 142
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "landmarks_arg_antigonepillar_01_macro",
+    "wareId": "module_hab_arg_antigonepillar_01",
+    "nameId": "{20104,32201}",
+    "name": "Argon L Housing Spire",
+    "type": "habitation",
+    "race": "argon",
+    "buildTime": 530.0,
+    "buildCost": {
+      "claytronics": 117,
+      "energycells": 6627,
+      "hullparts": 888
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 1000,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "landmarks_arg_antigonescaffolding_01_macro",
+    "wareId": "module_conn_arg_antigonescaffolding_01",
+    "nameId": "{20104,55401}",
+    "name": "Argon Span Connection Structure 02",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 302.0,
+    "buildCost": {
+      "claytronics": 21,
+      "energycells": 1185,
+      "hullparts": 159
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 0,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "landmarks_arg_antigonespire_01_macro",
+    "wareId": "module_hab_arg_antigonespire_01",
+    "nameId": "{20104,32301}",
+    "name": "Argon XL Housing Spire",
+    "type": "habitation",
+    "race": "argon",
+    "buildTime": 848.0,
+    "buildCost": {
+      "claytronics": 165,
+      "energycells": 9375,
+      "hullparts": 1256
+    },
+    "cycleTime": 0,
+    "workforce": {
+      "capacity": 2000,
+      "needed": 0,
+      "maxBonus": 0
+    },
+    "outputs": {},
+    "inputs": {}
+  },
+  {
+    "id": "landmarks_arg_antigonestraight_01_macro",
+    "wareId": "module_conn_arg_antigonestraight_01",
+    "nameId": "{20104,55301}",
+    "name": "Argon Span Connection Structure 01",
+    "type": "connectionmodule",
+    "race": "generic",
+    "buildTime": 275.0,
+    "buildCost": {
+      "claytronics": 15,
+      "energycells": 835,
+      "hullparts": 112
     },
     "cycleTime": 0,
     "workforce": {

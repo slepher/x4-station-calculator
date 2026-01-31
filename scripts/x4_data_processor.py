@@ -52,7 +52,7 @@ class X4PrecisionLoader:
     # =======================================================
     def build_database(self):
         print(f"📖 [1/5] 解析 wares.xml...")
-        wares_path = os.path.join(self.raw_path, "libraries", "wares.xml")
+        wares_path = os.path.join(self.raw_path, "libraries", "wares_final.xml")
         try:
             tree = ET.parse(wares_path)
             root = tree.getroot()
@@ -139,8 +139,11 @@ class X4PrecisionLoader:
     # 2. 扫描资产 (Assets)
     # =======================================================
     def scan_assets(self):
-        print(f"🔍 [2/5] 扫描资产并注入 cycleTime...")
+        print(f"🔍 [2/5] 扫描资产并注入 cycleTime (含 DLC)...")
+        # 基础游戏资产
         files = glob.glob(os.path.join(self.raw_path, "assets", "structures", "**", "*.xml"), recursive=True)
+        # 增加对 DLC (extensions) 的支持
+        files.extend(glob.glob(os.path.join(self.raw_path, "extensions", "*", "assets", "structures", "**", "*.xml"), recursive=True))
         for f in files:
             fname = os.path.splitext(os.path.basename(f))[0]
             if fname in self.valid_macros:
@@ -157,16 +160,23 @@ class X4PrecisionLoader:
                     wf_val = int(wf_node.get('max') or wf_node.get('amount') or 0) if wf_node is not None else 0
                     wf_cap = int(wf_node.get('capacity') or 0) if wf_node is not None else 0
 
+                    # 提取建筑种族属性 (主要用于 Habitation)
+                    module_race = "generic"
+                    if wf_node is not None and wf_node.get('race'):
+                        module_race = wf_node.get('race')
+
                     module_data = {
                         "id": fname, "wareId": info['module_ware_id'], 
-                        "nameId": info['name_id'], # 原始引用 Key
-                        "name": info['name_id'],   # ⚠️ 占位，稍后注入英文
-                        "type": m_class, "race": "generic",
+                        "nameId": info['name_id'], 
+                        "name": info['name_id'], 
+                        "type": m_class, "race": module_race,
                         "buildTime": info['build_time'], "buildCost": info['build_cost'],
                         "cycleTime": 0,
                         "workforce": { "capacity": wf_cap, "needed": wf_val, "maxBonus": 0 },
                         "outputs": {}, "inputs": {}
                     }
+                    # 临时记录来源用于日志，不存入最终对象
+                    module_data['_tmp_src'] = f
 
                     if m_class == 'production':
                         prod_tag = macro.find('properties/production')
@@ -186,6 +196,17 @@ class X4PrecisionLoader:
 
                     self.all_modules.append(module_data)
                 except: pass
+
+        # 统计各文件贡献数量并清理临时字段
+        source_stats = {}
+        for mod in self.all_modules:
+            src_path = mod.pop('_tmp_src', 'unknown')
+            src_rel = os.path.relpath(src_path, self.raw_path)
+            source_stats[src_rel] = source_stats.get(src_rel, 0) + 1
+        
+        print(f"   ✅ 扫描完成: 覆盖 {len(source_stats)} 个资产文件")
+        for src, count in sorted(source_stats.items(), key=lambda x: x[1], reverse=True):
+            print(f"     └─ {src}: {count} 个模块")
 
     # =======================================================
     # 3. 语言提取 (Backend Translation)

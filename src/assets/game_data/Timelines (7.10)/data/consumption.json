@@ -10,5 +10,19 @@
   "teladi": {
     "medicalsupplies": 0.000375,
     "nostropoil": 0.00031666666666666665
+  },
+  "split": {
+    "cheltmeat": 0.00014166666666666668,
+    "medicalsupplies": 0.000375,
+    "scruffinfruits": 0.00019166666666666667
+  },
+  "terran": {
+    "medicalsupplies": 0.000375,
+    "terranmre": 0.00035833333333333333
+  },
+  "boron": {
+    "bofu": 0.000125,
+    "medicalsupplies": 0.000275,
+    "water": 0.000225
   }
 }
