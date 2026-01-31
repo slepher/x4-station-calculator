@@ -21,6 +21,7 @@ export const useStationStore = defineStore('station', () => {
   const { translateModule } = useX4I18n();
   
   // --- 状态 (State) ---
+  const isReady = ref(false)
   const plannedModules = ref<SavedModule[]>([])
   const savedLayouts = ref<{
     version: number;
@@ -98,7 +99,14 @@ export const useStationStore = defineStore('station', () => {
     localizedModulesMap.value = newMap;
   };
 
-  watch(() => currentLocale.value, () => prepareLocalizedData(), { immediate: true });
+  watch(
+    () => currentLocale.value, 
+    async (newLang) => {
+      await loadLanguageAsync(newLang);
+      prepareLocalizedData();
+    }, 
+    { immediate: true }
+  );
 
   // --- 搜索增强 (ID/Name/Locale 三重判定) ---
   const filteredModulesGrouped = computed(() => {
@@ -142,17 +150,8 @@ export const useStationStore = defineStore('station', () => {
   });
   
   // --- 操作方法 (Actions) ---
-  async function loadData(source: any) {
-    const targetLocale = source.locale;
-    
-    // 步骤 B: 只有当目标语言与当前不同，或为了确保加载时，调用异步加载
-    // loadLanguageAsync 内部通常会处理 "已加载则跳过" 的逻辑，所以直接调用是安全的
-    if (targetLocale) {
-        console.log('Target Locale:', targetLocale);
-        await loadLanguageAsync(targetLocale);
-        // 注意：loadLanguageAsync 通常会自动设置 locale.value，
-        // 但为了保险，可以在这里再次确认 (取决于你的 loadLanguageAsync 实现)
-    }
+  function loadData(source: any) {
+
     // 使用 JSON 序列化进行深拷贝，防止污染原始数据源
     savedLayouts.value = JSON.parse(JSON.stringify(source));
     if (savedLayouts.value.activeId) {
@@ -173,8 +172,8 @@ export const useStationStore = defineStore('station', () => {
     })
   }
 
-  async function loadDemoData() {
-    await loadData(mockStationData);
+  function loadDemoData() {
+    loadData(mockStationData);
   }
 
   function saveCurrentLayout(name: string) {
@@ -476,12 +475,28 @@ export const useStationStore = defineStore('station', () => {
       }
     });
   }
+  // 物理阻塞初始化，确保顺序
+  const initializeStore = async () => {
+    isReady.value = false;
+    try {
+      // 1. 显式等待 Cookie 指定的语言包加载完毕
+      await loadLanguageAsync(currentLocale.value);
+      
+      // 2. 此时翻译字典已就绪，再加载 Demo 数据
+      loadDemoData();
+      
+      // 3. 此时快照记录的是翻译完备后的数据，脏检查(isDirty)才会准确
+      takeSnapshot();
+      isReady.value = true;
+    } catch (e) {
+      console.error('[Store] Initialization failed:', e);
+    }
+  };
 
-  // 初始化：直接加载 Demo 数据
-  loadDemoData();
+  initializeStore();
 
   return {
-    isDirty,
+    isReady, isDirty,
     plannedModules, settings, searchQuery, filteredModulesGrouped,
     wares: waresMap, modules: localizedModulesMap,
     loadData, loadDemoData, savedLayouts, saveCurrentLayout, loadLayout, mergeLayout, deleteLayout,

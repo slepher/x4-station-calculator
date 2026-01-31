@@ -1,4 +1,5 @@
 import { createI18n } from 'vue-i18n'
+import Cookies from 'js-cookie'
 
 // 1. 默认导入英文作为 Fallback 基础包
 import uiEn from '@/locales/en.json'
@@ -6,10 +7,18 @@ import uiEn from '@/locales/en.json'
 // 注意：路径里的版本号 'Timelines (7.10)' 最好提取为常量配置，这里暂时硬编码
 import gameEn from '@/assets/game_data/Timelines (7.10)/locales/en.json'
 
+// ★ 物理优先级：Cookie > 浏览器语言 > 默认 'en'
+const getInitialLocale = () => {
+  const saved = Cookies.get('user_locale')
+  console.log('Saved locale from cookie:', saved)
+  if (saved) return saved
+  return navigator.language.startsWith('zh') ? 'zh-CN' : 'en'
+}
+
 // 2. 初始化 i18n 实例
 const i18n = createI18n({
   legacy: false,
-  locale: 'en', // 默认语言
+  locale: getInitialLocale(), // 从持久化层读取
   fallbackLocale: 'en', // ★ 关键：UI 缺失时回退到这里
   globalInjection: true,
   messages: {
@@ -28,23 +37,34 @@ const loadedLanguages = ['en']
  */
 function setI18nLanguage(lang: string) {
   if (i18n.global.locale.value !== lang) {
-    i18n.global.locale.value = lang
+    // 支持 Composition API 模式下的 Ref 更新
+    (i18n.global.locale as any).value = lang
     document.querySelector('html')?.setAttribute('lang', lang)
+    // ★ 物理写入 Cookie，有效期 365 天
+    Cookies.set('user_locale', lang, { expires: 365, path: '/' })
   }
   return lang
 }
 
 /**
- * ★ 异步加载语言包 (核心函数)
+ * ★ 外部调用的切换接口
+ */
+export async function changeLanguage(lang: string) {
+  await loadLanguageAsync(lang)
+  return setI18nLanguage(lang)
+}
+
+/**
+ * 内部异步加载逻辑
  */
 export async function loadLanguageAsync(lang: string) {
-  // 1. 如果是当前语言，直接返回
+  // 1. 物理检查：只有当语言包已加载 且 locale 属性已对齐时才跳过
   console.log('loadLanguageAsync', lang)
-  if (i18n.global.locale.value === lang) {
-    return setI18nLanguage(lang)
+  if (loadedLanguages.includes(lang) && i18n.global.locale.value === lang) {
+    return lang
   }
 
-  // 2. 如果已经加载过，直接切换
+  // 2. 如果物理文件已加载但 locale 没对齐，直接执行物理切换
   if (loadedLanguages.includes(lang)) {
     return setI18nLanguage(lang)
   }
