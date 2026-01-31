@@ -280,13 +280,20 @@ export const useStationStore = defineStore('station', () => {
     if (raw.startsWith('<') || raw.includes('xml version') || raw.includes('<entry')) {
       const matchMacro = /macro="([^"]+)"/g;
       let match;
-      let count = 0;
+      const counts: Record<string, number> = {};
+      let totalFound = 0;
       while ((match = matchMacro.exec(raw)) !== null) {
         const macro = match[1];
-        addModule(macro, 1);
-        count++;
+        // 过滤掉武器、盾牌等升级组件，只统计站台模块本身
+        if (macro.includes('turret_') || macro.includes('shield_') || macro.includes('missile_')) continue;
+        counts[macro] = (counts[macro] || 0) + 1;
+        totalFound++;
       }
-      if (count > 0) return;
+      if (totalFound > 0) {
+        clearAll();
+        Object.entries(counts).forEach(([id, count]) => addModule(id, count));
+        return;
+      }
     }
 
     // Mode B: Parse x4-game.com Share Link
