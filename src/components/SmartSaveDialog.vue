@@ -135,7 +135,7 @@ const handleDiscard = () => {
       </div>
 
       <div class="p-6">
-        <p v-if="dialogMessage" class="text-slate-300 mb-4 leading-relaxed">
+        <p v-if="dialogMessage" class="text-slate-300 mb-4 leading-relaxed white-space-pre">
           {{ dialogMessage }}
         </p>
 
@@ -211,5 +211,8 @@ const handleDiscard = () => {
 /* 统一按钮基础样式，只通过 tailwind utility 类改变颜色 */
 .btn-base {
   @apply px-4 py-2 rounded text-sm font-bold text-white shadow-lg transition whitespace-nowrap;
+}
+.white-space-pre {
+  white-space: pre-line;
 }
 </style>

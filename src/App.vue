@@ -9,5 +9,5 @@ if (import.meta.env.DEV) {
 </script>
 
 <template>
-  <StationPlanner v-if="store.isReady" />
+  <StationPlanner v-if="store.isReady"/>
 </template>

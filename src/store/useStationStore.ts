@@ -272,6 +272,69 @@ export const useStationStore = defineStore('station', () => {
     savedLayouts.value.activeId = null;
   }
 
+  function importPlan(input: string) {
+    const raw = input.trim();
+    if (!raw) return;
+
+    // Mode A: Parse XML content (construction plans)
+    if (raw.startsWith('<') || raw.includes('xml version') || raw.includes('<entry')) {
+      const matchMacro = /macro="([^"]+)"/g;
+      let match;
+      let count = 0;
+      while ((match = matchMacro.exec(raw)) !== null) {
+        const macro = match[1];
+        addModule(macro, 1);
+        count++;
+      }
+      if (count > 0) return;
+    }
+
+    // Mode B: Parse x4-game.com Share Link
+    let decoded = decodeURIComponent(raw);
+    const urlMatch = /l=@?([^&]+)/.exec(decoded) || [null, decoded]; 
+    let paramStr = urlMatch[1] || '';
+    if (paramStr.startsWith('@')) paramStr = paramStr.substring(1);
+
+    const parts = paramStr.split(/[;]+/);
+    if(parts.length === 0) return;
+    clearAll();
+    parts.forEach(part => {
+      if (!part.includes('$module-')) return;
+      console.log(part);
+      
+      const idMatch = /\$module-([^,]+)/.exec(part);
+      const countMatch = /count:(\d+)/.exec(part);
+      
+      if (idMatch) {
+        let id = idMatch[1];
+        const count = countMatch ? parseInt(countMatch[1], 10) : 1;
+        
+        // 策略1: 直接匹配
+        if (modulesMap.value[id]) {
+          addModule(id, count);
+          return;
+        }
+
+        // 策略2: 尝试标准后缀
+        if (modulesMap.value[`${id}_macro`]) {
+          addModule(`${id}_macro`, count);
+        return;
+        }
+
+        // 策略3: 简单转换 (module_X -> X_macro)
+        const simpleConverted = id.replace('module_', '') + '_macro';
+        if (modulesMap.value[simpleConverted]) {
+          addModule(simpleConverted, count);
+          return;
+        }
+
+        // 策略4: wareId 兜底
+        const target = Object.values(modulesMap.value).find(m => m.wareId === id);
+        if (target) addModule(target.id, count);
+      }
+    });
+  }
+
   function getModuleInfo(id: string): X4Module {
     return modulesMap.value[id] || {
       id, wareId: '', nameId: id, type: 'unknown', race: 'unknown', buildTime: 0,
@@ -500,7 +563,7 @@ export const useStationStore = defineStore('station', () => {
     plannedModules, settings, searchQuery, filteredModulesGrouped,
     wares: waresMap, modules: localizedModulesMap,
     loadData, loadDemoData, savedLayouts, saveCurrentLayout, loadLayout, mergeLayout, deleteLayout,
-    addModule, updateModuleId, updateModuleCount, removeModule, removeModuleById, clearAll, getModuleInfo,
+    addModule, importPlan, updateModuleId, updateModuleCount, removeModule, removeModuleById, clearAll, getModuleInfo,
     constructionBreakdown, workforceBreakdown, profitBreakdown, autoFillMissingLines,
     actualWorkforce, currentEfficiency: computed(() => efficiencyMetrics.value.saturation), netProduction
   }

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useStationStore } from '@/store/useStationStore'
 import { useX4I18n } from '@/utils/useX4I18n'
 
 const props = defineProps<{
@@ -10,7 +9,6 @@ const props = defineProps<{
   details?: any[] 
 }>()
 
-const store = useStationStore()
 const { translate } = useX4I18n()
 const isOpen = ref(false)
 

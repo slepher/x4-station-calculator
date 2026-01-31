@@ -7,7 +7,6 @@ import StationConstruction from './StationConstruction.vue'
 import StationToolbar from './StationToolbar.vue'
 import StatusMonitor from './StatusMonitor.vue' // <--- 引入状态监控组件
 
-
 // 这里的格式化逻辑可以保留用于简单的局部显示，复杂逻辑已由各子组件从 Store 获取
 const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
 </script>
