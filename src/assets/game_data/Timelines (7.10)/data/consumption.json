@@ -1,0 +1,14 @@
+{
+  "default": {
+    "foodrations": 0.000625,
+    "medicalsupplies": 0.000375
+  },
+  "paranid": {
+    "medicalsupplies": 0.000375,
+    "sojahusk": 0.0004
+  },
+  "teladi": {
+    "medicalsupplies": 0.000375,
+    "nostropoil": 0.00031666666666666665
+  }
+}
