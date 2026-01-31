@@ -177,29 +177,28 @@ export const useStationStore = defineStore('station', () => {
   }
 
   function saveCurrentLayout(name: string) {
-    const description = [...plannedModules.value]
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 3)
-      .map(m => {
-        const info = localizedModulesMap.value[m.id];
-        return `${m.count} x ${info?.localeName || m.id}`;
-      })
-      .join(', ') + (plannedModules.value.length > 3 ? '...' : '');
-
     const layoutData = {
       id: savedLayouts.value.activeId || crypto.randomUUID(),
       name,
       modules: JSON.parse(JSON.stringify(plannedModules.value)),
       settings: JSON.parse(JSON.stringify(settings.value)),
-      description,
       lastUpdated: Date.now()
     };
+
+    // 保持与存储同步：保存前尝试从 localStorage 同步列表，防止多标签页冲突
+    const stored = localStorage.getItem('x4_station_data');
+    if (stored) {
+      try {
+        const remote = JSON.parse(stored);
+        savedLayouts.value.list = remote.list || [];
+      } catch (e) { /* ignore parse error */ }
+    }
 
     const idx = savedLayouts.value.list.findIndex(l => l.id === layoutData.id);
     if (idx !== -1) savedLayouts.value.list[idx] = layoutData;
     else savedLayouts.value.list.push(layoutData);
     savedLayouts.value.activeId = layoutData.id;
-    takeSnapshot()
+    takeSnapshot();
   }
 
   // 计算属性：脏检查
@@ -307,7 +306,6 @@ export const useStationStore = defineStore('station', () => {
     clearAll();
     parts.forEach(part => {
       if (!part.includes('$module-')) return;
-      console.log(part);
       
       const idMatch = /\$module-([^,]+)/.exec(part);
       const countMatch = /count:(\d+)/.exec(part);
@@ -552,8 +550,18 @@ export const useStationStore = defineStore('station', () => {
       // 1. 显式等待 Cookie 指定的语言包加载完毕
       await loadLanguageAsync(currentLocale.value);
       
-      // 2. 此时翻译字典已就绪，再加载 Demo 数据
-      loadDemoData();
+      // 2. 优先从 localStorage 恢复数据，若无则加载 Demo
+      const stored = localStorage.getItem('x4_station_data');
+      if (stored) {
+        try {
+          loadData(JSON.parse(stored));
+        } catch (e) {
+          console.error('[Store] Failed to parse localStorage data, falling back to demo', e);
+          loadDemoData();
+        }
+      } else {
+        loadDemoData();
+      }
       
       // 3. 此时快照记录的是翻译完备后的数据，脏检查(isDirty)才会准确
       takeSnapshot();

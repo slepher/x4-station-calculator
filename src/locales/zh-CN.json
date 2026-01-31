@@ -63,7 +63,13 @@
     "btn_overwrite_and_create": "覆盖并新建",
     "btn_save": "保存",
     "copy_suffix": "(副本)",
-    "default_station_name": "我的空间站"
+    "default_station_name": "我的空间站",
+    "import_plans": "导入蓝图",
+    "import_description": "在下方粘贴 constructionplans.xml 内容或 x4-game.com 分享链接。蓝图将被添加到当前布局中。",
+    "import_placeholder_suffix": "或 https://x4-game.com/#/station-calculator?l=...",
+    "import_failed": "导入失败，请检查格式是否正确。",
+    "action_import": "导入",
+    "action_cancel": "取消"
   },
   "profit": {
     "title": "经济分析",

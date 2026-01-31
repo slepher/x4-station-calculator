@@ -10,9 +10,8 @@ export const mockStationData = {
     {
       id: '1',
       name: 'Advanced Hull & Claytronics',
-      description: '5 x Claytronics, 10 x Hull Parts, 8 x Microchips...',
       modules: [
-        { id: 'prod_gen_claytronics_macro', count: 5 },
+        { id: 'prod_gen_claytronics_macro', count: 12 },
         { id: 'prod_gen_hullparts_macro', count: 10 },
         { id: 'prod_gen_antimattercells_macro', count: 1 },
         { id: 'prod_gen_microchips_macro', count: 8 },
@@ -38,7 +37,6 @@ export const mockStationData = {
     {
       id: '2',
       name: 'Starter Hull Production',
-      description: '4 x Hull Parts, 2 x Refined Metals, 2 x Argon L Habitat...',
       modules: [
         { id: 'prod_gen_energycells_macro', count: 2 },
         { id: 'prod_gen_hullparts_macro', count: 4 },

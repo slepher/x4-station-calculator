@@ -63,7 +63,13 @@
     "action_load": "Load Layout",
     "action_merge": "Merge Modules",
     "action_delete": "Delete",
-    "confirm_delete_layout": "Are you sure you want to delete this layout?"
+    "confirm_delete_layout": "Are you sure you want to delete this layout?",
+    "import_plans": "Import Plans",
+    "import_description": "Paste the constructionplans.xml content or an x4-game.com share link below. The plans will be added to your current layout.",
+    "import_placeholder_suffix": "OR https://x4-game.com/#/station-calculator?l=...",
+    "import_failed": "Import failed. Please check the format.",
+    "action_import": "Import",
+    "action_cancel": "Cancel"
   },
   "profit": {
     "title": "ECONOMIC ANALYSIS",

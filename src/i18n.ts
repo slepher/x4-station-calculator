@@ -10,7 +10,6 @@ import gameEn from '@/assets/game_data/Timelines (7.10)/locales/en.json'
 // ★ 物理优先级：Cookie > 浏览器语言 > 默认 'en'
 const getInitialLocale = () => {
   const saved = Cookies.get('user_locale')
-  console.log('Saved locale from cookie:', saved)
   if (saved) return saved
   return navigator.language.startsWith('zh') ? 'zh-CN' : 'en'
 }
@@ -59,7 +58,6 @@ export async function changeLanguage(lang: string) {
  */
 export async function loadLanguageAsync(lang: string) {
   // 1. 物理检查：只有当语言包已加载 且 locale 属性已对齐时才跳过
-  console.log('loadLanguageAsync', lang)
   if (loadedLanguages.includes(lang) && i18n.global.locale.value === lang) {
     return lang
   }

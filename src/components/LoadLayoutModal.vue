@@ -2,6 +2,8 @@
 import { defineProps, defineEmits } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStationStore } from '@/store/useStationStore'
+import { useX4I18n } from '@/utils/useX4I18n'
+const { translateModule } = useX4I18n()
 
 const props = defineProps<{
   isOpen: boolean
@@ -21,6 +23,17 @@ const handleLoad = (index: number) => {
 const handleMerge = (index: number) => {
   store.mergeLayout(index)
   emit('close')
+}
+
+const getLayoutDescription = (modules: any[]) => {
+  return [...modules]
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 3)
+    .map(m => {
+      const info = store.modules[m.id];
+      return `${m.count} x ${translateModule(info) || m.id}`;
+    })
+    .join(', ') + (modules.length > 3 ? '...' : '');
 }
 
 const handleDelete = (index: number) => {
@@ -65,7 +78,7 @@ const handleDelete = (index: number) => {
           </div>
           
           <div class="text-sm text-slate-300 mb-4 line-clamp-2 leading-relaxed bg-slate-800/50 p-2 rounded border border-slate-700/50">
-            {{ layout.description }}
+            {{ getLayoutDescription(layout.modules) }}
           </div>
 
           <div class="flex items-center gap-3 pt-2 border-t border-slate-700/50">
