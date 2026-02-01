@@ -8,8 +8,18 @@ import re
 # =============================================================================
 # ⚙️ 项目配置
 # =============================================================================
-X4_UNPACKED_DATA_PATH = r"D:\Documents\project\x4tools\x4data"
-OUTPUT_VERSION_DIR = r"D:\Documents\project\x4-station-calculator\src\assets\game_data\Timelines (7.10)"
+if not os.path.exists('x4config.json'):
+    print("" + "!" * 60)
+    print("❌ 错误: 找不到配置文件 'x4config.json'")
+    print("💡 请先参考 'x4config.json.example' 手动创建配置并运行 sync_assets.py。")
+    print("!" * 60 + "")
+    sys.exit(1)
+
+with open('x4config.json', 'r', encoding='utf-8') as f:
+    _config = json.load(f)
+
+X4_UNPACKED_DATA_PATH = _config['X4_PATHS']['DEST']
+OUTPUT_VERSION_DIR = _config['X4_PATHS']['PROJECT_ASSETS']
 
 X4_LANG_CONFIG = {
     '044': {'iso': 'en',    'name': 'English'},
