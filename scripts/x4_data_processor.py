@@ -174,6 +174,7 @@ class X4PrecisionLoader:
                     self.module_groups_result.append({
                         "id": g_id,
                         "nameId": g_name,
+                        "type": "production",
                         "name": g_name # 占位
                     })
                     if g_name: self.needed_raw_names.add(g_name)
@@ -189,6 +190,7 @@ class X4PrecisionLoader:
             self.module_groups_result.append({
                 "id": m_type,
                 "nameId": raw_key,
+                "type": m_type,
                 "name": raw_key # 占位
             })
             if raw_key: self.needed_raw_names.add(raw_key)

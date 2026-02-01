@@ -23,10 +23,10 @@
 
     <Transition name="fade-slide">
       <div v-if="isFocused" :class="popoverDirectionClass" class="results-popover scrollbar-thin" @mousedown.prevent>
-        <div v-for="group in store.filteredModulesGrouped" :key="group.type" class="type-group">
+        <div v-for="group in store.filteredModulesGrouped" :key="group.group" class="type-group">
           <div class="group-header">{{ group.displayLabel }}</div>
           <div v-for="m in group.modules" :key="m.id" class="result-item" @click="handleSelect(m)">
-            <div class="color-indicator" :class="m.type === 'habitation' ? 'bg-orange-500' : 'bg-sky-500'"></div>
+            <div class="color-indicator" :class="m.moduleGroup?.type === 'habitation' ? 'bg-orange-500' : 'bg-sky-500'"></div>
             <span class="label">{{ m.displayLabel }}</span>
           </div>
         </div>

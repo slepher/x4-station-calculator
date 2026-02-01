@@ -2,186 +2,223 @@
   {
     "id": "agricultural",
     "nameId": "{20215,101}",
+    "type": "production",
     "name": "Agricultural Goods"
   },
   {
     "id": "energy",
     "nameId": "{20215,201}",
+    "type": "production",
     "name": "Energy"
   },
   {
     "id": "food",
     "nameId": "{20215,301}",
+    "type": "production",
     "name": "Food"
   },
   {
     "id": "gases",
     "nameId": "{20215,401}",
+    "type": "production",
     "name": "Gases"
   },
   {
     "id": "hightech",
     "nameId": "{20215,501}",
+    "type": "production",
     "name": "High Tech Goods"
   },
   {
     "id": "ice",
     "nameId": "{20215,601}",
+    "type": "production",
     "name": "Ice"
   },
   {
     "id": "minerals",
     "nameId": "{20215,701}",
+    "type": "production",
     "name": "Minerals"
   },
   {
     "id": "pharmaceutical",
     "nameId": "{20215,801}",
+    "type": "production",
     "name": "Pharmaceutical Goods"
   },
   {
     "id": "refined",
     "nameId": "{20215,901}",
+    "type": "production",
     "name": "Refined Goods"
   },
   {
     "id": "shiptech",
     "nameId": "{20215,1001}",
+    "type": "production",
     "name": "Ship Technology"
   },
   {
     "id": "water",
     "nameId": "{20215,1201}",
+    "type": "production",
     "name": "Water"
   },
   {
     "id": "contraband",
     "nameId": "{20215,3201}",
+    "type": "production",
     "name": "Contraband"
   },
   {
     "id": "countermeasures",
     "nameId": "{20215,1701}",
+    "type": "production",
     "name": "Countermeasures"
   },
   {
     "id": "curiosity",
     "nameId": "{20215,3101}",
+    "type": "production",
     "name": "Curiosities"
   },
   {
     "id": "drones",
     "nameId": "{20215,1601}",
+    "type": "production",
     "name": "Drones"
   },
   {
     "id": "engines",
     "nameId": "{20215,1801}",
+    "type": "production",
     "name": "Engines"
   },
   {
     "id": "generalitem",
     "nameId": "{20215,3501}",
+    "type": "production",
     "name": "General Items"
   },
   {
     "id": "hardware",
     "nameId": "{20215,3301}",
+    "type": "production",
     "name": "Hardware"
   },
   {
     "id": "luxuryitem",
     "nameId": "{20215,3401}",
+    "type": "production",
     "name": "Luxury Items"
   },
   {
     "id": "missiles",
     "nameId": "{20215,1901}",
+    "type": "production",
     "name": "Missiles"
   },
   {
     "id": "shields",
     "nameId": "{20215,2001}",
+    "type": "production",
     "name": "Shields"
   },
   {
     "id": "software",
     "nameId": "{20215,2101}",
+    "type": "production",
     "name": "Software"
   },
   {
     "id": "thrusters",
     "nameId": "{20215,2201}",
+    "type": "production",
     "name": "Thrusters"
   },
   {
     "id": "turrets",
     "nameId": "{20215,2301}",
+    "type": "production",
     "name": "Turrets"
   },
   {
     "id": "weapons",
     "nameId": "{20215,2401}",
+    "type": "production",
     "name": "Weapons"
   },
   {
     "id": "habitation",
     "nameId": "{1001,2451}",
+    "type": "habitation",
     "name": "Habitation Modules"
   },
   {
     "id": "production",
     "nameId": "{1001,2421}",
+    "type": "production",
     "name": "Production Modules"
   },
   {
     "id": "processingmodule",
     "nameId": "{1001,9621}",
+    "type": "processingmodule",
     "name": "Processing Modules"
   },
   {
     "id": "welfaremodule",
     "nameId": "{1001,9620}",
+    "type": "welfaremodule",
     "name": "Welfare Modules"
   },
   {
     "id": "storage",
     "nameId": "{1001,2422}",
+    "type": "storage",
     "name": "Storage Modules"
   },
   {
     "id": "defencemodule",
     "nameId": "{1001,2424}",
+    "type": "defencemodule",
     "name": "Defence Modules"
   },
   {
     "id": "dockarea",
     "nameId": "{20104,79901}",
+    "type": "dockarea",
     "name": "Dock Area Module"
   },
   {
     "id": "pier",
     "nameId": "{20104,79801}",
+    "type": "pier",
     "name": "Pier Module"
   },
   {
     "id": "connectionmodule",
     "nameId": "{20104,59901}",
+    "type": "connectionmodule",
     "name": "Connection Module"
   },
   {
     "id": "buildmodule",
     "nameId": "{1001,2439}",
+    "type": "buildmodule",
     "name": "Build Modules"
   },
   {
     "id": "radar",
     "nameId": "{1001,1706}",
+    "type": "radar",
     "name": "Radar"
   },
   {
     "id": "ventureplatform",
     "nameId": "{1001,2454}",
+    "type": "ventureplatform",
     "name": "Venture Modules"
   }
 ]

@@ -210,8 +210,10 @@ export const useStationStore = defineStore('station', () => {
 
     return Object.keys(groups)
       .sort((a, b) => {
-        const pA = TYPE_PRIORITY[a] || 99;
-        const pB = TYPE_PRIORITY[b] || 99;
+        const typeA = localizedModuleGroupsMap.value[a]?.type || a;
+        const typeB = localizedModuleGroupsMap.value[b]?.type || b;
+        const pA = TYPE_PRIORITY[typeA] || 99;
+        const pB = TYPE_PRIORITY[typeB] || 99;
         if (pA !== pB) return pA - pB;
         return a.localeCompare(b);
       })
