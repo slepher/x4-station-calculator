@@ -4,22 +4,24 @@ import json
 import glob
 import sys
 import re
+from collections import defaultdict
 
 # =============================================================================
 # ⚙️ 项目配置
 # =============================================================================
-if not os.path.exists('x4config.json'):
+config_file = 'x4-station-calculator.config.json'
+if not os.path.exists(config_file):
     print("" + "!" * 60)
-    print("❌ 错误: 找不到配置文件 'x4config.json'")
-    print("💡 请先参考 'x4config.json.example' 手动创建配置并运行 sync_assets.py。")
+    print(f"❌ 错误: 找不到配置文件 '{config_file}'")
     print("!" * 60 + "")
     sys.exit(1)
 
-with open('x4config.json', 'r', encoding='utf-8') as f:
+with open(config_file, 'r', encoding='utf-8') as f:
     _config = json.load(f)
 
-X4_UNPACKED_DATA_PATH = _config['X4_PATHS']['DEST']
-OUTPUT_VERSION_DIR = _config['X4_PATHS']['PROJECT_ASSETS']
+# 考虑 distiller 生成的版本号子目录
+X4_UNPACKED_DATA_PATH = os.path.join(_config['raw_assets_dir'], _config['folder_name'])
+OUTPUT_VERSION_DIR = os.path.join(_config['processed_assets_dir'], _config['folder_name'])
 
 X4_LANG_CONFIG = {
     '044': {'iso': 'en',    'name': 'English'},
@@ -39,9 +41,10 @@ X4_LANG_CONFIG = {
 # =============================================================================
 
 class X4PrecisionLoader:
-    def __init__(self, raw_data_path, output_root):
+    def __init__(self, raw_data_path, output_root, config):
         self.raw_path = raw_data_path
         self.output_root = output_root
+        self.config = config
         
         self.valid_macros = {}       
         self.all_modules = []        
@@ -49,6 +52,7 @@ class X4PrecisionLoader:
         self.i18n_data = {}         
         self.recipes = {} 
         self.race_consumption = {}  # 种群消耗速率 (每人每秒)
+        self.module_types_result = []  # 模块类型结果
         
         # 收集需要翻译的原始名称 (Raw Key)
         self.needed_raw_names = set()
@@ -62,6 +66,9 @@ class X4PrecisionLoader:
     # =======================================================
     def build_database(self):
         print(f"📖 [1/5] 解析 wares.xml...")
+        # 从配置中提取模块类型原始 Key
+        for raw_key in self.config.get('module_types', {}).values():
+            self.needed_raw_names.add(raw_key)
         wares_path = os.path.join(self.raw_path, "libraries", "wares_final.xml")
         try:
             tree = ET.parse(wares_path)
@@ -306,6 +313,58 @@ class X4PrecisionLoader:
 
         print(f"   ✅ 更新了 {count_wares} 个商品和 {count_mods} 个模块的英文名称。")
 
+        # 处理模块分类翻译逻辑
+        en_map = self.i18n_data.get('en', {})
+        for m_type, raw_key in self.config.get('module_types', {}).items():
+            self.module_types_result.append({
+                "id": m_type,
+                "nameId": raw_key,
+                "name": en_map.get(raw_key, raw_key)
+            })
+    # =======================================================
+    # 🆕 4.1. 模块类型分析
+    # =======================================================
+    def analyze_module_types(self):
+        print(f"📊 [4.1/5] 分析模块类型配置...")
+        config_types = self.config.get('module_types', {})
+        
+        # 统计实际类型及其 Page ID
+        actual_types = defaultdict(lambda: defaultdict(int))
+        for module in self.all_modules:
+            m_type = module.get("type", "unknown")
+            name_id = module.get("nameId", "")
+            match = re.search(r'\{(\d+),', name_id)
+            page_id = match.group(1) if match else "Other"
+            actual_types[m_type][page_id] += 1
+
+        config_keys = set(config_types.keys())
+        json_keys = set(actual_types.keys())
+
+        # 打印对比结果
+        print(f"-" * 85)
+        print(f"{'Module Type':<20} | {'Page ID 分布':<15} | {'状态':<10} | {'现有配置 Key'}")
+        print(f"-" * 85)
+
+        all_keys = sorted(json_keys | config_keys)
+        missing_in_config = []
+
+        for k in all_keys:
+            status = "✅ 已配置" if k in config_keys else "❌ 缺失"
+            pages = ", ".join([f"{p}({c})" for p, c in actual_types.get(k, {}).items()]) or "N/A"
+            config_val = config_types.get(k, "---")
+            
+            if k in json_keys and k not in config_keys:
+                missing_in_config.append(k)
+
+            print(f"{k:<20} | {pages:<15} | {status:<10} | {config_val}")
+
+        if missing_in_config:
+            print(f"⚠️  配置文件中缺失的项 (建议添加):")
+            for m in missing_in_config:
+                print(f"  - \"{m}\": \"{{待定ID}}\"")
+        else:
+            print(f"   ✅ 所有模块类型均已配置。")
+
     # =======================================================
     # 5. 保存结果
     # =======================================================
@@ -322,6 +381,8 @@ class X4PrecisionLoader:
             json.dump(self.all_modules, f, indent=2, ensure_ascii=False)
         with open(os.path.join(data_dir, "wares.json"), 'w', encoding='utf-8') as f:
             json.dump(self.wares_data, f, indent=2, ensure_ascii=False)
+        with open(os.path.join(data_dir, "module_types.json"), 'w', encoding='utf-8') as f:
+            json.dump(self.module_types_result, f, indent=2, ensure_ascii=False)
         with open(os.path.join(data_dir, "consumption.json"), 'w', encoding='utf-8') as f:
             json.dump(self.race_consumption, f, indent=2, ensure_ascii=False)
 
@@ -335,14 +396,14 @@ class X4PrecisionLoader:
                 available_languages.append({"code": iso, "name": conf['name'], "x4_id": x4_id})
 
         with open(os.path.join(data_dir, "languages.json"), 'w', encoding='utf-8') as f:
-            json.dump(available_languages, f, indent=2, ensure_ascii=False)
-            
+            json.dump(available_languages, f, indent=2, ensure_ascii=False)   
         print("🎉 全部完成！")
 
 if __name__ == "__main__":
-    loader = X4PrecisionLoader(X4_UNPACKED_DATA_PATH, OUTPUT_VERSION_DIR)
+    loader = X4PrecisionLoader(X4_UNPACKED_DATA_PATH, OUTPUT_VERSION_DIR, _config)
     loader.build_database()
     loader.scan_assets()
     loader.extract_and_resolve_languages()
     loader.inject_english_names() # 新增步骤
+    loader.analyze_module_types()
     loader.save()

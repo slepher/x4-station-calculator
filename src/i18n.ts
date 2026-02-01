@@ -5,7 +5,7 @@ import Cookies from 'js-cookie'
 import uiEn from '@/locales/en.json'
 // 这里为了首屏速度，我们也可以先把默认的游戏英文包导进来
 // 注意：路径里的版本号 'Timelines (7.10)' 最好提取为常量配置，这里暂时硬编码
-import gameEn from '@/assets/game_data/Timelines (7.10)/locales/en.json'
+import gameEn from '@/assets/x4_game_data/8.0-Diplomacy/locales/en.json'
 
 // ★ 物理优先级：Cookie > 浏览器语言 > 默认 'en'
 const getInitialLocale = () => {
@@ -71,7 +71,7 @@ export async function loadLanguageAsync(lang: string) {
   try {
     // A. 加载游戏数据 (Python 生成的，必然存在)
     // Vite 的 import 必须包含一部分静态路径以便静态分析
-    const gameMsg = await import(`@/assets/game_data/Timelines (7.10)/locales/${lang}.json`)
+    const gameMsg = await import(`@/assets/x4_game_data/8.0-Diplomacy/locales/${lang}.json`)
 
     // B. 加载 UI 数据 (可能不存在，需要容错)
     let uiMsg = {}

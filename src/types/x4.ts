@@ -21,6 +21,15 @@ export interface X4Workforce {
 }
 
 /**
+ * 空间站模块类型接口 - 对应 module_types.json
+ */
+export interface X4ModuleType {
+  id: string;         //  ID (如 prod_gen_plasmaconductors_macro)
+  nameId: string;     // 国际化文本 ID (如 {20104,12101})
+  name: string;
+}
+
+/**
  * 空间站模块接口 - 对应 modules.json
  */
 export interface X4Module {

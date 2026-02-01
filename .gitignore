@@ -61,3 +61,4 @@ Thumbs.db
 .env.*.local
 
 # 注意：不要忽略 .env.example (如果有的话)
+x4-game.config.json

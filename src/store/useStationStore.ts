@@ -1,15 +1,16 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
 import { mockStationData, type SavedModule } from '@/mock/mock_data_v1'
-import type { X4Module, X4Ware, WareAmountMap } from '../types/x4'
+import type { X4Module, X4Ware, X4ModuleType, WareAmountMap } from '../types/x4'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/useX4I18n'
 import { loadLanguageAsync } from '@/i18n'
 
 // 1. 静态导入游戏数据
-import waresRaw from '@/assets/game_data/Timelines (7.10)/data/wares.json'
-import ModulesRaw from '@/assets/game_data/Timelines (7.10)/data/modules.json'
-import consumptionRaw from '@/assets/game_data/Timelines (7.10)/data/consumption.json'
+import waresRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/wares.json'
+import ModulesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/modules.json'
+import moduleTypesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/module_types.json'
+import consumptionRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/consumption.json'
 
 export interface PlannedModuleDisplay extends SavedModule {
   nameId: string;    
@@ -19,7 +20,7 @@ export interface PlannedModuleDisplay extends SavedModule {
 
 export const useStationStore = defineStore('station', () => {
   const { locale: currentLocale } = useI18n();
-  const { translateModule } = useX4I18n();
+  const { translateModule, translateModuleType } = useX4I18n();
   
   // --- 状态 (State) ---
   const isReady = ref(false)
@@ -38,6 +39,7 @@ export const useStationStore = defineStore('station', () => {
   }>({ version: 1, activeId: null, list: [] });
   const searchQuery = ref('') // 全局搜索状态，驱动检索逻辑
   const localizedModulesMap = ref<Record<string, X4Module & { localeName: string }>>({});
+  const localizedModuleTypesMap = ref<Record<string, X4ModuleType & { localeName: string }>>({});
 
   // --- 脏检查快照 (Dirty Check) ---
   // 存储最后一次保存或加载时的 JSON 字符串，用于物理级对比
@@ -88,16 +90,26 @@ export const useStationStore = defineStore('station', () => {
   // --- 数据预热 (针对 EN 模式优化：不执行重复翻译计算) ---
   const prepareLocalizedData = () => {
     const isEn = currentLocale.value === 'en';
-    const newMap: Record<string, any> = {};
+    const newModuleMap: Record<string, any> = {};
 
     ModulesRaw.forEach(m => {
-      newMap[m.id] = {
+      newModuleMap[m.id] = {
         ...m,
         // 如果是 en，直接同步 name 字段，不再进入 translate 查找开销
         localeName: isEn ? (m.name || '') : translateModule(m as any)
       };
     });
-    localizedModulesMap.value = newMap;
+    localizedModulesMap.value = newModuleMap;
+
+    const newModuleTypesMap: Record<string, any> = {};
+    moduleTypesRaw.forEach((mt: any) => {
+      newModuleTypesMap[mt.id] = {
+        ...mt,
+        // 如果是 en，直接同步 name 字段，不再进入 translate 查找开销
+        localeName: isEn ? (mt.name || '') : translateModuleType(mt)
+      };
+    });
+    localizedModuleTypesMap.value = newModuleTypesMap;
   };
 
   watch(
@@ -110,44 +122,104 @@ export const useStationStore = defineStore('station', () => {
   );
 
   // --- 搜索增强 (ID/Name/Locale 三重判定) ---
-  const filteredModulesGrouped = computed(() => {
+    const filteredModulesGrouped = computed(() => {
     const query = searchQuery.value.trim().toLowerCase();
     const isSearching = query.length > 0;
     const isEn = currentLocale.value === 'en';
 
-    const results: Record<string, any[]> = {};
+    const groups: Record<string, any[]> = {};
+    const typeMetadata: Record<string, { displayLabel: string; isHit: boolean }> = {};
 
+    // 1. 预处理类型命中逻辑与 Header 补偿
+    Object.keys(localizedModuleTypesMap.value).forEach(typeId => {
+      const mt = localizedModuleTypesMap.value[typeId];
+      const name = (mt.name || '').toLowerCase();
+      const id = (mt.id || '').toLowerCase();
+      const localeName = (mt.localeName || '').toLowerCase();
+
+      let isHit = false;
+      let displayLabel = mt.localeName;
+
+      if (isSearching) {
+        if (isEn) {
+          // EN 模式：仅匹配 id 或 name
+          const idHit = id.includes(query);
+          const nameHit = name.includes(query);
+          isHit = idHit || nameHit;
+          if (idHit && !nameHit) displayLabel += ` (${mt.id})`;
+        } else {
+          // 非 EN 模式：匹配 id, name 或 localeName
+          const localeHit = localeName.includes(query);
+          const nameHit = name.includes(query);
+          const idHit = id.includes(query);
+          isHit = localeHit || nameHit || idHit;
+          
+          if (!localeHit) {
+            if (nameHit) displayLabel += ` (${mt.name})`;
+            else if (idHit) displayLabel += ` (${mt.id})`;
+          }
+        }
+      }
+
+      typeMetadata[typeId] = { displayLabel, isHit };
+    });
+
+    // 2. 遍历模块，结合类型命中状态进行级联过滤
     Object.values(localizedModulesMap.value).forEach(m => {
       const localeName = (m.localeName || '').toLowerCase();
       const originalName = (m.name || '').toLowerCase();
       const id = (m.id || '').toLowerCase();
-
-      const localeHit = localeName.includes(query);
-      const idHit = id.includes(query);
-      const nameHit = !isEn && originalName.includes(query); // 仅在非 EN 模式匹配原始名
       
-      const isMatch = !isSearching || (localeHit || nameHit || idHit);
+      const typeInfo = typeMetadata[m.type] || { displayLabel: m.type, isHit: false };
+
+      let moduleHit = false;
+      if (isEn) {
+        moduleHit = id.includes(query) || originalName.includes(query);
+      } else {
+        moduleHit = localeName.includes(query) || originalName.includes(query) || id.includes(query);
+      }
+
+      const isMatch = !isSearching || typeInfo.isHit || moduleHit;
 
       if (isMatch) {
         let label = m.localeName;
         if (isSearching) {
-          // 像素级共识：括号补偿显示逻辑
+          const localeHit = !isEn && localeName.includes(query);
+          const nameHit = originalName.includes(query);
+          const idHit = id.includes(query);
+
           if (isEn) {
-            if (idHit && !localeHit) label += ` (${m.id})`;
+            if (idHit && !nameHit) label += ` (${m.id})`;
           } else {
-            if (nameHit && !localeHit) {
-              label += ` (${m.name})`;
-            } else if (idHit && !localeHit && !nameHit) {
-              label += ` (${m.id})`;
-            }
+            if (nameHit && !localeHit) label += ` (${m.name})`;
+            else if (idHit && !localeHit && !nameHit) label += ` (${m.id})`;
           }
         }
+
         const type = m.type || 'others';
-        if (!results[type]) results[type] = [];
-        results[type].push({ ...m, displayLabel: label });
+        if (!groups[type]) groups[type] = [];
+        groups[type].push({ ...m, displayLabel: label, moduleType: localizedModuleTypesMap.value[m.type] });
       }
     });
-    return results;
+
+    const TYPE_PRIORITY: Record<string, number> = {
+      production: 1,
+      habitation: 2,
+      storage: 3
+    };
+
+    return Object.keys(groups)
+      .sort((a, b) => {
+        const pA = TYPE_PRIORITY[a] || 99;
+        const pB = TYPE_PRIORITY[b] || 99;
+        if (pA !== pB) return pA - pB;
+        return a.localeCompare(b);
+      })
+      .map(type => ({
+        type,
+        displayLabel: typeMetadata[type]?.displayLabel || type,
+        modules: groups[type]
+      }));
   });
   
   // --- 操作方法 (Actions) ---
@@ -620,7 +692,7 @@ export const useStationStore = defineStore('station', () => {
   return {
     isReady, isDirty,
     plannedModules, settings, searchQuery, filteredModulesGrouped,
-    wares: waresMap, modules: localizedModulesMap,
+    wares: waresMap, modules: localizedModulesMap, moduleTypes: localizedModuleTypesMap,
     loadData, loadDemoData, savedLayouts, saveCurrentLayout, loadLayout, mergeLayout, deleteLayout,
     addModule, importPlan, updateModuleId, updateModuleCount, removeModule, removeModuleById, clearAll, getModuleInfo,
     constructionBreakdown, workforceBreakdown, profitBreakdown, autoFillMissingLines,

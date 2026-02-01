@@ -2,7 +2,7 @@
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { loadLanguageAsync } from '@/i18n' // 导入我们刚写的异步函数
-import languageList from '@/assets/game_data/Timelines (7.10)/data/languages.json'
+import languageList from '@/assets/x4_game_data/8.0-Diplomacy/data/languages.json'
 
 const { locale } = useI18n()
 

@@ -1,5 +1,5 @@
 import { useI18n } from 'vue-i18n';
-import type { X4Module, X4Ware } from '../types/x4';
+import type { X4Module, X4Ware, X4ModuleType } from '../types/x4';
 import { useStatusStore } from '../store/useStatusStore';
 import { ref } from 'vue';
 
@@ -10,7 +10,7 @@ export function useX4I18n() {
   const { t, te } = useI18n();
   const statusStore = useStatusStore();
 
-  const translate = (id: string, nameId: string, category: 'module' | 'ware'): string => {
+  const translate = (id: string, nameId: string, category: 'module' | 'ware' | 'type'): string => {
     if (te(nameId)) {
       return t(nameId);
     }
@@ -49,6 +49,10 @@ export function useX4I18n() {
     // 严格保留原始 translateWare 定义
     translateWare: (w: X4Ware) => {
       return translate(w.id, w.nameId || 'MISSING_NAME_ID', 'ware');
+    },
+
+    translateModuleType: (mt: X4ModuleType) => {
+      return translate(mt.id, mt.nameId || 'MISSING_NAME_ID', 'type');
     },
 
     translate,

@@ -1,9 +1,9 @@
 ﻿# ================= 读取配置 =================
-$ConfigPath = "x4config.json"
+$ConfigPath = "x4-game.config.json"
 if (-not (Test-Path $ConfigPath)) {
     Write-Host "!" * 60 -ForegroundColor Red
-    Write-Host "❌ 错误: 找不到配置文件 'x4config.json'"
-    Write-Host "💡 请根据 'x4config.json.example' 手动创建配置。"
+    Write-Host "❌ 错误: 找不到配置文件 'x4-game.config.json'"
+    Write-Host "💡 请根据 'x4-game.config.json.example' 手动创建配置。"
     Write-Host "!" * 60 -ForegroundColor Red
     Pause; exit
 }

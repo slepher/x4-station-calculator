@@ -2,10 +2,12 @@
 import { ref } from 'vue'
 import { useStationStore } from '@/store/useStationStore'
 import draggable from 'vuedraggable'
+import { useI18n } from 'vue-i18n'
 import StationModuleItem from './StationModuleItem.vue'
 import X4ModuleSearch from './common/X4ModuleSearch.vue'
 import X4NumberInput from './common/X4NumberInput.vue'
 
+const {t} = useI18n()
 const store = useStationStore()
 const currentSelectedId = ref<string | null>(null)
 
@@ -21,9 +23,9 @@ const handleConfirmAdd = () => {
 <template>
   <div class="space-y-2">
     <div class="header-row">
-      <h3 class="header-title">{{ $t('ui.module_list') }}</h3>
+      <h3 class="header-title">{{ t('ui.module_list') }}</h3>
       <div class="flex items-center gap-2">
-        <span class="header-label">{{ $t('ui.sun_light') }}</span>
+        <span class="header-label">{{ t('ui.sun_light') }}</span>
         <div class="x4-composite-input-wrapper">
           <X4NumberInput v-model="store.settings.sunlight" width-class="w-16" class="x4-nested-input" />
           <div class="x4-unit-suffix-box">%</div>
@@ -53,7 +55,7 @@ const handleConfirmAdd = () => {
 
     <div class="module-controls-panel space-y-3">
       <div class="flex items-stretch gap-1">
-        <X4ModuleSearch v-model="store.searchQuery" @select="(m) => currentSelectedId = m.id" class="flex-1" :placeholder="$t('ui.search_placeholder')" />
+        <X4ModuleSearch v-model="store.searchQuery" @select="(m) => currentSelectedId = m.id" class="flex-1" :placeholder="t('ui.search_placeholder')" />
         <button class="action-add-btn" :disabled="!currentSelectedId" @click="handleConfirmAdd">+</button>
       </div>
 
@@ -62,7 +64,7 @@ const handleConfirmAdd = () => {
           <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 mr-1.5 fill-current">
             <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
           </svg>
-          <span>AUTO-FILL DEFICIT</span>
+          <span>{{ t('ui.auto_fill_deficit') }}</span>
         </button>
         
         <label for="wf-fill-check" class="wf-config-note">
@@ -72,7 +74,7 @@ const handleConfirmAdd = () => {
             v-model="store.settings.considerWorkforceForAutoFill" 
             class="x4-checkbox-mini" 
           />
-          <span>Consider Workforce Bonus for Calculation</span>
+          <span>{{ t('ui.consider_workforce_bonus') }}</span>
         </label>
       </div>
     </div>

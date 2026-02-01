@@ -36,6 +36,8 @@
     "station_planner": "空间站规划器",
     "module_list": "模块列表",
     "search_placeholder": "搜索模块 ID 或名称...",
+    "auto_fill_deficit": "自动补足缺口",
+    "consider_workforce_bonus": "计算时考虑劳动力加成",
     "add_hint": "添加到规划列表",
     "sun_light": "日照",
     "new": "新建",
