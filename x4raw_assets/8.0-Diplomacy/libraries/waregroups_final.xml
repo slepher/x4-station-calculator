@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--Last exported: 23.04.2025 11:27:18-->
+<groups>
+  <group id="agricultural" name="{20215,101}" factoryname="{20215,104}" icon="be_upgrade_agricultural" factorymapicon="mapob_agricultural" factoryhudicon="si_agricultural" tags="tradable" tier="5" priority="5"/>
+  <group id="energy" name="{20215,201}" factoryname="{20215,204}" icon="be_upgrade_energy" factorymapicon="mapob_energy" factoryhudicon="si_energy" tags="tradable" tier="1" priority="1"/>
+  <group id="food" name="{20215,301}" factoryname="{20215,304}" icon="be_upgrade_food" factorymapicon="mapob_food" factoryhudicon="si_food" tags="tradable" tier="6" priority="6"/>
+  <group id="gases" name="{20215,401}" factoryname="{20215,404}" icon="be_upgrade_refined" factorymapicon="mapob_refined" factoryhudicon="si_refined" tags="tradable" priority="3"/>
+  <group id="hightech" name="{20215,501}" factoryname="{20215,504}" icon="be_upgrade_hightech" factorymapicon="mapob_hightech" factoryhudicon="si_hightech" tags="tradable" tier="3" priority="11"/>
+  <group id="ice" name="{20215,601}" factoryname="{20215,604}" icon="be_upgrade_water" factorymapicon="mapob_water" factoryhudicon="si_water" tags="tradable" priority="2"/>
+  <group id="minerals" name="{20215,701}" factoryname="{20215,704}" icon="be_upgrade_refined" factorymapicon="mapob_refined" factoryhudicon="si_refined" tags="tradable" priority="9"/>
+  <group id="pharmaceutical" name="{20215,801}" factoryname="{20215,804}" icon="be_upgrade_pharmaceutical" factorymapicon="mapob_pharmaceutical" factoryhudicon="si_pharmaceutical" tags="tradable" tier="7" priority="7"/>
+  <group id="refined" name="{20215,901}" factoryname="{20215,904}" icon="be_upgrade_refined" factorymapicon="mapob_refined" factoryhudicon="si_refined" tags="tradable" tier="2" priority="8"/>
+  <group id="shiptech" name="{20215,1001}" factoryname="{20215,1004}" icon="be_upgrade_shiptech" factorymapicon="mapob_shiptech" factoryhudicon="si_shiptech" tags="tradable" tier="4" priority="10"/>
+  <group id="water" name="{20215,1201}" factoryname="{20215,1204}" icon="be_upgrade_water" factorymapicon="mapob_water" factoryhudicon="si_water" tags="tradable" tier="2" priority="4"/>
+  <group id="contraband" name="{20215,3201}" tags="craftable"/>
+  <group id="countermeasures" name="{20215,1701}" tags="buildable"/>
+  <group id="curiosity" name="{20215,3101}" tags="craftable"/>
+  <group id="drones" name="{20215,1601}" tags="buildable"/>
+  <group id="engines" name="{20215,1801}" tags="buildable"/>
+  <group id="generalitem" name="{20215,3501}" tags="craftable"/>
+  <group id="hardware" name="{20215,3301}" tags="craftable"/>
+  <group id="luxuryitem" name="{20215,3401}" tags="craftable"/>
+  <group id="missiles" name="{20215,1901}" tags="buildable"/>
+  <group id="shields" name="{20215,2001}" tags="buildable"/>
+  <group id="software" name="{20215,2101}" tags="buildable"/>
+  <group id="thrusters" name="{20215,2201}" tags="buildable"/>
+  <group id="turrets" name="{20215,2301}" tags="buildable"/>
+  <group id="weapons" name="{20215,2401}" tags="buildable"/>
+</groups>

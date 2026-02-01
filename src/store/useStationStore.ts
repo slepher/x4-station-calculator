@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
 import { mockStationData, type SavedModule } from '@/mock/mock_data_v1'
-import type { X4Module, X4Ware, X4ModuleType, WareAmountMap } from '../types/x4'
+import type { X4Module, X4Ware, X4ModuleGroup, WareAmountMap } from '../types/x4'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/useX4I18n'
 import { loadLanguageAsync } from '@/i18n'
@@ -9,7 +9,7 @@ import { loadLanguageAsync } from '@/i18n'
 // 1. 静态导入游戏数据
 import waresRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/wares.json'
 import ModulesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/modules.json'
-import moduleTypesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/module_types.json'
+import moduleGroupsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/module_groups.json'
 import consumptionRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/consumption.json'
 
 export interface PlannedModuleDisplay extends SavedModule {
@@ -20,7 +20,7 @@ export interface PlannedModuleDisplay extends SavedModule {
 
 export const useStationStore = defineStore('station', () => {
   const { locale: currentLocale } = useI18n();
-  const { translateModule, translateModuleType } = useX4I18n();
+  const { translateModule, translateModuleGroup } = useX4I18n();
   
   // --- 状态 (State) ---
   const isReady = ref(false)
@@ -39,7 +39,7 @@ export const useStationStore = defineStore('station', () => {
   }>({ version: 1, activeId: null, list: [] });
   const searchQuery = ref('') // 全局搜索状态，驱动检索逻辑
   const localizedModulesMap = ref<Record<string, X4Module & { localeName: string }>>({});
-  const localizedModuleTypesMap = ref<Record<string, X4ModuleType & { localeName: string }>>({});
+  const localizedModuleGroupsMap = ref<Record<string, X4ModuleGroup & { localeName: string }>>({});
 
   // --- 脏检查快照 (Dirty Check) ---
   // 存储最后一次保存或加载时的 JSON 字符串，用于物理级对比
@@ -101,15 +101,15 @@ export const useStationStore = defineStore('station', () => {
     });
     localizedModulesMap.value = newModuleMap;
 
-    const newModuleTypesMap: Record<string, any> = {};
-    moduleTypesRaw.forEach((mt: any) => {
-      newModuleTypesMap[mt.id] = {
-        ...mt,
+    const newModuleGroupsMap: Record<string, any> = {};
+    moduleGroupsRaw.forEach((mg: any) => {
+      newModuleGroupsMap[mg.id] = {
+        ...mg,
         // 如果是 en，直接同步 name 字段，不再进入 translate 查找开销
-        localeName: isEn ? (mt.name || '') : translateModuleType(mt)
+        localeName: isEn ? (mg.name || '') : translateModuleGroup(mg)
       };
     });
-    localizedModuleTypesMap.value = newModuleTypesMap;
+    localizedModuleGroupsMap.value = newModuleGroupsMap;
   };
 
   watch(
@@ -131,14 +131,14 @@ export const useStationStore = defineStore('station', () => {
     const typeMetadata: Record<string, { displayLabel: string; isHit: boolean }> = {};
 
     // 1. 预处理类型命中逻辑与 Header 补偿
-    Object.keys(localizedModuleTypesMap.value).forEach(typeId => {
-      const mt = localizedModuleTypesMap.value[typeId];
-      const name = (mt.name || '').toLowerCase();
-      const id = (mt.id || '').toLowerCase();
-      const localeName = (mt.localeName || '').toLowerCase();
-
+    Object.keys(localizedModuleGroupsMap.value).forEach(typeId => {
+      const mg = localizedModuleGroupsMap.value[typeId];
+      if(!mg) return;
+      const name = (mg.name || '').toLowerCase();
+      const id = (mg.id || '').toLowerCase();
+      const localeName = (mg.localeName || '').toLowerCase();
       let isHit = false;
-      let displayLabel = mt.localeName;
+      let displayLabel = mg.localeName;
 
       if (isSearching) {
         if (isEn) {
@@ -146,7 +146,7 @@ export const useStationStore = defineStore('station', () => {
           const idHit = id.includes(query);
           const nameHit = name.includes(query);
           isHit = idHit || nameHit;
-          if (idHit && !nameHit) displayLabel += ` (${mt.id})`;
+          if (idHit && !nameHit) displayLabel += ` (${mg.id})`;
         } else {
           // 非 EN 模式：匹配 id, name 或 localeName
           const localeHit = localeName.includes(query);
@@ -155,8 +155,8 @@ export const useStationStore = defineStore('station', () => {
           isHit = localeHit || nameHit || idHit;
           
           if (!localeHit) {
-            if (nameHit) displayLabel += ` (${mt.name})`;
-            else if (idHit) displayLabel += ` (${mt.id})`;
+            if (nameHit) displayLabel += ` (${mg.name})`;
+            else if (idHit) displayLabel += ` (${mg.id})`;
           }
         }
       }
@@ -170,7 +170,7 @@ export const useStationStore = defineStore('station', () => {
       const originalName = (m.name || '').toLowerCase();
       const id = (m.id || '').toLowerCase();
       
-      const typeInfo = typeMetadata[m.type] || { displayLabel: m.type, isHit: false };
+      const typeInfo = typeMetadata[m.group] || { displayLabel: m.group, isHit: false };
 
       let moduleHit = false;
       if (isEn) {
@@ -196,9 +196,9 @@ export const useStationStore = defineStore('station', () => {
           }
         }
 
-        const type = m.type || 'others';
+        const type = m.group || 'others';
         if (!groups[type]) groups[type] = [];
-        groups[type].push({ ...m, displayLabel: label, moduleType: localizedModuleTypesMap.value[m.type] });
+        groups[type].push({ ...m, displayLabel: label, moduleGroup: localizedModuleGroupsMap.value[m.group] });
       }
     });
 
@@ -215,10 +215,10 @@ export const useStationStore = defineStore('station', () => {
         if (pA !== pB) return pA - pB;
         return a.localeCompare(b);
       })
-      .map(type => ({
-        type,
-        displayLabel: typeMetadata[type]?.displayLabel || type,
-        modules: groups[type]
+      .map(group => ({
+        group,
+        displayLabel: typeMetadata[group]?.displayLabel || group,
+        modules: groups[group]
       }));
   });
   
@@ -692,7 +692,7 @@ export const useStationStore = defineStore('station', () => {
   return {
     isReady, isDirty,
     plannedModules, settings, searchQuery, filteredModulesGrouped,
-    wares: waresMap, modules: localizedModulesMap, moduleTypes: localizedModuleTypesMap,
+    wares: waresMap, modules: localizedModulesMap, moduleGroups: localizedModuleGroupsMap,
     loadData, loadDemoData, savedLayouts, saveCurrentLayout, loadLayout, mergeLayout, deleteLayout,
     addModule, importPlan, updateModuleId, updateModuleCount, removeModule, removeModuleById, clearAll, getModuleInfo,
     constructionBreakdown, workforceBreakdown, profitBreakdown, autoFillMissingLines,

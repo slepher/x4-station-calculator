@@ -1,0 +1,187 @@
+[
+  {
+    "id": "agricultural",
+    "nameId": "{20215,101}",
+    "name": "Agricultural Goods"
+  },
+  {
+    "id": "energy",
+    "nameId": "{20215,201}",
+    "name": "Energy"
+  },
+  {
+    "id": "food",
+    "nameId": "{20215,301}",
+    "name": "Food"
+  },
+  {
+    "id": "gases",
+    "nameId": "{20215,401}",
+    "name": "Gases"
+  },
+  {
+    "id": "hightech",
+    "nameId": "{20215,501}",
+    "name": "High Tech Goods"
+  },
+  {
+    "id": "ice",
+    "nameId": "{20215,601}",
+    "name": "Ice"
+  },
+  {
+    "id": "minerals",
+    "nameId": "{20215,701}",
+    "name": "Minerals"
+  },
+  {
+    "id": "pharmaceutical",
+    "nameId": "{20215,801}",
+    "name": "Pharmaceutical Goods"
+  },
+  {
+    "id": "refined",
+    "nameId": "{20215,901}",
+    "name": "Refined Goods"
+  },
+  {
+    "id": "shiptech",
+    "nameId": "{20215,1001}",
+    "name": "Ship Technology"
+  },
+  {
+    "id": "water",
+    "nameId": "{20215,1201}",
+    "name": "Water"
+  },
+  {
+    "id": "contraband",
+    "nameId": "{20215,3201}",
+    "name": "Contraband"
+  },
+  {
+    "id": "countermeasures",
+    "nameId": "{20215,1701}",
+    "name": "Countermeasures"
+  },
+  {
+    "id": "curiosity",
+    "nameId": "{20215,3101}",
+    "name": "Curiosities"
+  },
+  {
+    "id": "drones",
+    "nameId": "{20215,1601}",
+    "name": "Drones"
+  },
+  {
+    "id": "engines",
+    "nameId": "{20215,1801}",
+    "name": "Engines"
+  },
+  {
+    "id": "generalitem",
+    "nameId": "{20215,3501}",
+    "name": "General Items"
+  },
+  {
+    "id": "hardware",
+    "nameId": "{20215,3301}",
+    "name": "Hardware"
+  },
+  {
+    "id": "luxuryitem",
+    "nameId": "{20215,3401}",
+    "name": "Luxury Items"
+  },
+  {
+    "id": "missiles",
+    "nameId": "{20215,1901}",
+    "name": "Missiles"
+  },
+  {
+    "id": "shields",
+    "nameId": "{20215,2001}",
+    "name": "Shields"
+  },
+  {
+    "id": "software",
+    "nameId": "{20215,2101}",
+    "name": "Software"
+  },
+  {
+    "id": "thrusters",
+    "nameId": "{20215,2201}",
+    "name": "Thrusters"
+  },
+  {
+    "id": "turrets",
+    "nameId": "{20215,2301}",
+    "name": "Turrets"
+  },
+  {
+    "id": "weapons",
+    "nameId": "{20215,2401}",
+    "name": "Weapons"
+  },
+  {
+    "id": "habitation",
+    "nameId": "{1001,2451}",
+    "name": "Habitation Modules"
+  },
+  {
+    "id": "production",
+    "nameId": "{1001,2421}",
+    "name": "Production Modules"
+  },
+  {
+    "id": "processingmodule",
+    "nameId": "{1001,9621}",
+    "name": "Processing Modules"
+  },
+  {
+    "id": "welfaremodule",
+    "nameId": "{1001,9620}",
+    "name": "Welfare Modules"
+  },
+  {
+    "id": "storage",
+    "nameId": "{1001,2422}",
+    "name": "Storage Modules"
+  },
+  {
+    "id": "defencemodule",
+    "nameId": "{1001,2424}",
+    "name": "Defence Modules"
+  },
+  {
+    "id": "dockarea",
+    "nameId": "{20104,79901}",
+    "name": "Dock Area Module"
+  },
+  {
+    "id": "pier",
+    "nameId": "{20104,79801}",
+    "name": "Pier Module"
+  },
+  {
+    "id": "connectionmodule",
+    "nameId": "{20104,59901}",
+    "name": "Connection Module"
+  },
+  {
+    "id": "buildmodule",
+    "nameId": "{1001,2439}",
+    "name": "Build Modules"
+  },
+  {
+    "id": "radar",
+    "nameId": "{1001,1706}",
+    "name": "Radar"
+  },
+  {
+    "id": "ventureplatform",
+    "nameId": "{1001,2454}",
+    "name": "Venture Modules"
+  }
+]

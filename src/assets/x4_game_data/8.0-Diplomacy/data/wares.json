@@ -2,6 +2,7 @@
   {
     "id": "advancedcomposites",
     "nameId": "{20201,401}",
+    "group": "hightech",
     "name": "Advanced Composites",
     "transport": "container",
     "price": 540,
@@ -11,6 +12,7 @@
   {
     "id": "advancedelectronics",
     "nameId": "{20201,101}",
+    "group": "shiptech",
     "name": "Advanced Electronics",
     "transport": "container",
     "price": 1014,
@@ -20,6 +22,7 @@
   {
     "id": "antimattercells",
     "nameId": "{20201,201}",
+    "group": "refined",
     "name": "Antimatter Cells",
     "transport": "container",
     "price": 202,
@@ -29,6 +32,7 @@
   {
     "id": "antimatterconverters",
     "nameId": "{20201,301}",
+    "group": "shiptech",
     "name": "Antimatter Converters",
     "transport": "container",
     "price": 354,
@@ -38,6 +42,7 @@
   {
     "id": "claytronics",
     "nameId": "{20201,501}",
+    "group": "shiptech",
     "name": "Claytronics",
     "transport": "container",
     "price": 2040,
@@ -47,6 +52,7 @@
   {
     "id": "dronecomponents",
     "nameId": "{20201,601}",
+    "group": "shiptech",
     "name": "Drone Components",
     "transport": "container",
     "price": 914,
@@ -56,6 +62,7 @@
   {
     "id": "energycells",
     "nameId": "{20201,701}",
+    "group": "energy",
     "name": "Energy Cells",
     "transport": "container",
     "price": 16,
@@ -65,6 +72,7 @@
   {
     "id": "engineparts",
     "nameId": "{20201,801}",
+    "group": "hightech",
     "name": "Engine Parts",
     "transport": "container",
     "price": 182,
@@ -74,6 +82,7 @@
   {
     "id": "fieldcoils",
     "nameId": "{20201,901}",
+    "group": "shiptech",
     "name": "Field Coils",
     "transport": "container",
     "price": 412,
@@ -83,6 +92,7 @@
   {
     "id": "foodrations",
     "nameId": "{20201,1101}",
+    "group": "food",
     "name": "Food Rations",
     "transport": "container",
     "price": 21,
@@ -92,6 +102,7 @@
   {
     "id": "graphene",
     "nameId": "{20201,1501}",
+    "group": "refined",
     "name": "Graphene",
     "transport": "container",
     "price": 166,
@@ -101,6 +112,7 @@
   {
     "id": "helium",
     "nameId": "{20201,2801}",
+    "group": "gases",
     "name": "Helium",
     "transport": "liquid",
     "price": 44,
@@ -110,6 +122,7 @@
   {
     "id": "hullparts",
     "nameId": "{20201,1201}",
+    "group": "hightech",
     "name": "Hull Parts",
     "transport": "container",
     "price": 209,
@@ -119,6 +132,7 @@
   {
     "id": "hydrogen",
     "nameId": "{20201,1301}",
+    "group": "gases",
     "name": "Hydrogen",
     "transport": "liquid",
     "price": 58,
@@ -128,6 +142,7 @@
   {
     "id": "ice",
     "nameId": "{20201,1401}",
+    "group": "ice",
     "name": "Ice",
     "transport": "solid",
     "price": 30,
@@ -137,6 +152,7 @@
   {
     "id": "majadust",
     "nameId": "{20201,1801}",
+    "group": "pharmaceutical",
     "name": "Maja Dust",
     "transport": "container",
     "price": 208,
@@ -146,6 +162,7 @@
   {
     "id": "majasnails",
     "nameId": "{20201,1901}",
+    "group": "agricultural",
     "name": "Maja Snails",
     "transport": "container",
     "price": 58,
@@ -155,6 +172,7 @@
   {
     "id": "meat",
     "nameId": "{20201,2001}",
+    "group": "agricultural",
     "name": "Meat",
     "transport": "container",
     "price": 48,
@@ -164,6 +182,7 @@
   {
     "id": "medicalsupplies",
     "nameId": "{20201,2101}",
+    "group": "pharmaceutical",
     "name": "Medical Supplies",
     "transport": "container",
     "price": 66,
@@ -173,6 +192,7 @@
   {
     "id": "methane",
     "nameId": "{20201,1601}",
+    "group": "gases",
     "name": "Methane",
     "transport": "liquid",
     "price": 48,
@@ -182,6 +202,7 @@
   {
     "id": "microchips",
     "nameId": "{20201,2201}",
+    "group": "hightech",
     "name": "Microchips",
     "transport": "container",
     "price": 948,
@@ -191,6 +212,7 @@
   {
     "id": "missilecomponents",
     "nameId": "{20201,2301}",
+    "group": "shiptech",
     "name": "Missile Components",
     "transport": "container",
     "price": 9,
@@ -200,6 +222,7 @@
   {
     "id": "nividium",
     "nameId": "{20201,2401}",
+    "group": "minerals",
     "name": "Nividium",
     "transport": "solid",
     "price": 510,
@@ -209,6 +232,7 @@
   {
     "id": "nividiumgems",
     "nameId": "(TEMP)nividiumgems",
+    "group": "",
     "name": "nividiumgems",
     "transport": "container",
     "price": 1077,
@@ -218,6 +242,7 @@
   {
     "id": "nostropoil",
     "nameId": "{20201,2601}",
+    "group": "food",
     "name": "Nostrop Oil",
     "transport": "container",
     "price": 34,
@@ -227,6 +252,7 @@
   {
     "id": "ore",
     "nameId": "{20201,2701}",
+    "group": "minerals",
     "name": "Ore",
     "transport": "solid",
     "price": 50,
@@ -236,6 +262,7 @@
   {
     "id": "plasmaconductors",
     "nameId": "{20201,3001}",
+    "group": "hightech",
     "name": "Plasma Conductors",
     "transport": "container",
     "price": 1026,
@@ -245,6 +272,7 @@
   {
     "id": "quantumtubes",
     "nameId": "{20201,3101}",
+    "group": "hightech",
     "name": "Quantum Tubes",
     "transport": "container",
     "price": 300,
@@ -254,6 +282,7 @@
   {
     "id": "rawscrap",
     "nameId": "{20201,6801}",
+    "group": "refined",
     "name": "Raw Scrap",
     "transport": "solid",
     "price": 180,
@@ -263,6 +292,7 @@
   {
     "id": "refinedmetals",
     "nameId": "{20201,3201}",
+    "group": "refined",
     "name": "Refined Metals",
     "transport": "container",
     "price": 148,
@@ -272,6 +302,7 @@
   {
     "id": "scanningarrays",
     "nameId": "{20201,3301}",
+    "group": "hightech",
     "name": "Scanning Arrays",
     "transport": "container",
     "price": 1053,
@@ -281,6 +312,7 @@
   {
     "id": "scrapmetal",
     "nameId": "{20201,6601}",
+    "group": "refined",
     "name": "Scrap Metal",
     "transport": "solid",
     "price": 375,
@@ -290,6 +322,7 @@
   {
     "id": "shieldcomponents",
     "nameId": "{20201,3401}",
+    "group": "shiptech",
     "name": "Shield Components",
     "transport": "container",
     "price": 188,
@@ -299,6 +332,7 @@
   {
     "id": "silicon",
     "nameId": "{20201,3501}",
+    "group": "minerals",
     "name": "Silicon",
     "transport": "solid",
     "price": 130,
@@ -308,6 +342,7 @@
   {
     "id": "siliconwafers",
     "nameId": "{20201,3601}",
+    "group": "refined",
     "name": "Silicon Wafers",
     "transport": "container",
     "price": 299,
@@ -317,6 +352,7 @@
   {
     "id": "smartchips",
     "nameId": "{20201,3701}",
+    "group": "shiptech",
     "name": "Smart Chips",
     "transport": "container",
     "price": 57,
@@ -326,6 +362,7 @@
   {
     "id": "sojabeans",
     "nameId": "{20201,3801}",
+    "group": "agricultural",
     "name": "Soja Beans",
     "transport": "container",
     "price": 67,
@@ -335,6 +372,7 @@
   {
     "id": "sojahusk",
     "nameId": "{20201,3901}",
+    "group": "food",
     "name": "Soja Husk",
     "transport": "container",
     "price": 32,
@@ -344,6 +382,7 @@
   {
     "id": "spacefuel",
     "nameId": "{20201,4001}",
+    "group": "pharmaceutical",
     "name": "Spacefuel",
     "transport": "container",
     "price": 133,
@@ -353,6 +392,7 @@
   {
     "id": "spaceweed",
     "nameId": "{20201,4101}",
+    "group": "pharmaceutical",
     "name": "Spaceweed",
     "transport": "container",
     "price": 166,
@@ -362,6 +402,7 @@
   {
     "id": "spices",
     "nameId": "{20201,4201}",
+    "group": "agricultural",
     "name": "Spices",
     "transport": "container",
     "price": 20,
@@ -371,6 +412,7 @@
   {
     "id": "sunriseflowers",
     "nameId": "{20201,4301}",
+    "group": "agricultural",
     "name": "Sunrise Flowers",
     "transport": "container",
     "price": 80,
@@ -380,6 +422,7 @@
   {
     "id": "superfluidcoolant",
     "nameId": "{20201,2901}",
+    "group": "refined",
     "name": "Superfluid Coolant",
     "transport": "container",
     "price": 150,
@@ -389,6 +432,7 @@
   {
     "id": "swampplant",
     "nameId": "{20201,4401}",
+    "group": "agricultural",
     "name": "Swamp Plant",
     "transport": "container",
     "price": 84,
@@ -398,6 +442,7 @@
   {
     "id": "teladianium",
     "nameId": "{20201,4501}",
+    "group": "refined",
     "name": "Teladianium",
     "transport": "container",
     "price": 202,
@@ -407,6 +452,7 @@
   {
     "id": "turretcomponents",
     "nameId": "{20201,4601}",
+    "group": "shiptech",
     "name": "Turret Components",
     "transport": "container",
     "price": 273,
@@ -416,6 +462,7 @@
   {
     "id": "water",
     "nameId": "{20201,4701}",
+    "group": "water",
     "name": "Water",
     "transport": "container",
     "price": 53,
@@ -425,6 +472,7 @@
   {
     "id": "weaponcomponents",
     "nameId": "{20201,4801}",
+    "group": "shiptech",
     "name": "Weapon Components",
     "transport": "container",
     "price": 285,
@@ -434,6 +482,7 @@
   {
     "id": "wheat",
     "nameId": "{20201,4901}",
+    "group": "agricultural",
     "name": "Wheat",
     "transport": "container",
     "price": 31,
@@ -443,6 +492,7 @@
   {
     "id": "cheltmeat",
     "nameId": "{20201,5001}",
+    "group": "agricultural",
     "name": "Chelt Meat",
     "transport": "container",
     "price": 51,
@@ -452,6 +502,7 @@
   {
     "id": "scruffinfruits",
     "nameId": "{20201,5101}",
+    "group": "agricultural",
     "name": "Scruffin Fruit",
     "transport": "container",
     "price": 28,
@@ -461,6 +512,7 @@
   {
     "id": "computronicsubstrate",
     "nameId": "{20201,6001}",
+    "group": "hightech",
     "name": "Computronic Substrate",
     "transport": "container",
     "price": 8280,
@@ -470,6 +522,7 @@
   {
     "id": "metallicmicrolattice",
     "nameId": "{20201,6101}",
+    "group": "hightech",
     "name": "Metallic Microlattice",
     "transport": "container",
     "price": 50,
@@ -479,6 +532,7 @@
   {
     "id": "proteinpaste",
     "nameId": "{20201,6201}",
+    "group": "agricultural",
     "name": "Protein Paste",
     "transport": "container",
     "price": 96,
@@ -488,6 +542,7 @@
   {
     "id": "siliconcarbide",
     "nameId": "{20201,6301}",
+    "group": "hightech",
     "name": "Silicon Carbide",
     "transport": "container",
     "price": 1414,
@@ -497,6 +552,7 @@
   {
     "id": "stimulants",
     "nameId": "{20201,6401}",
+    "group": "pharmaceutical",
     "name": "Stimulants",
     "transport": "container",
     "price": 340,
@@ -506,6 +562,7 @@
   {
     "id": "terranmre",
     "nameId": "{20201,6501}",
+    "group": "food",
     "name": "Terran MRE",
     "transport": "container",
     "price": 54,
@@ -515,6 +572,7 @@
   {
     "id": "bofu",
     "nameId": "{20201,7101}",
+    "group": "food",
     "name": "BoFu",
     "transport": "container",
     "price": 101,
@@ -524,6 +582,7 @@
   {
     "id": "bogas",
     "nameId": "{20201,7201}",
+    "group": "refined",
     "name": "BoGas",
     "transport": "container",
     "price": 73,
@@ -533,6 +592,7 @@
   {
     "id": "plankton",
     "nameId": "{20201,7301}",
+    "group": "agricultural",
     "name": "Plankton",
     "transport": "container",
     "price": 18,

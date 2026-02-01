@@ -1,5 +1,5 @@
 import { useI18n } from 'vue-i18n';
-import type { X4Module, X4Ware, X4ModuleType } from '../types/x4';
+import type { X4Module, X4Ware, X4ModuleGroup } from '../types/x4';
 import { useStatusStore } from '../store/useStatusStore';
 import { ref } from 'vue';
 
@@ -51,8 +51,8 @@ export function useX4I18n() {
       return translate(w.id, w.nameId || 'MISSING_NAME_ID', 'ware');
     },
 
-    translateModuleType: (mt: X4ModuleType) => {
-      return translate(mt.id, mt.nameId || 'MISSING_NAME_ID', 'type');
+    translateModuleGroup: (mg: X4ModuleGroup) => {
+      return translate(mg.id, mg.nameId || 'MISSING_NAME_ID', 'type');
     },
 
     translate,

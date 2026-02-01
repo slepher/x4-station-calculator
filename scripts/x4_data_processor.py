@@ -52,7 +52,7 @@ class X4PrecisionLoader:
         self.i18n_data = {}         
         self.recipes = {} 
         self.race_consumption = {}  # 种群消耗速率 (每人每秒)
-        self.module_types_result = []  # 模块类型结果
+        self.module_groups_result = []  # 模块分组结果 (合并 types 和 waregroups)
         
         # 收集需要翻译的原始名称 (Raw Key)
         self.needed_raw_names = set()
@@ -80,6 +80,7 @@ class X4PrecisionLoader:
                 tags = ware.get('tags', '')
                 transport = ware.get('transport')
                 raw_name = ware.get('name', '')
+                group = ware.get('group', '')
                 
                 # 提取配方
                 for prod in ware.findall('production'):
@@ -122,6 +123,7 @@ class X4PrecisionLoader:
                         self.wares_data.append({
                             "id": w_id, 
                             "nameId": raw_name, # 原始引用 Key
+                            "group": group,
                             "name": raw_name,   # ⚠️ 占位，稍后注入英文
                             "transport": transport,
                             "price": int(p_node.get('average') or 0),
@@ -153,77 +155,134 @@ class X4PrecisionLoader:
         except Exception as e: print(f"   ❌ XML Error: {e}")
 
     # =======================================================
-    # 2. 扫描资产 (Assets)
+    # 1.5 处理模块分组 (Module Groups - 合并 Waregroups 和 ModuleTypes)
+    # =======================================================
+    def process_module_groups(self):
+        print(f"📦 [1.5/5] 解析 waregroups_final.xml 并合并配置...")
+        wg_path = os.path.join(self.raw_path, "libraries", "waregroups_final.xml")
+        
+        # 1. 解析 XML 中的 Waregroups
+        if os.path.exists(wg_path):
+            try:
+                tree = ET.parse(wg_path)
+                root = tree.getroot()
+                count = 0
+                for group in root.findall('group'):
+                    g_id = group.get('id')
+                    g_name = group.get('name', '')
+                    # 忽略 icon, 只保留 id 和 name
+                    self.module_groups_result.append({
+                        "id": g_id,
+                        "nameId": g_name,
+                        "name": g_name # 占位
+                    })
+                    if g_name: self.needed_raw_names.add(g_name)
+                    count += 1
+                print(f"   ✅ 解析了 {count} 个商品组。")
+            except Exception as e:
+                print(f"   ❌ Waregroups XML Error: {e}")
+
+        # 2. 合并配置文件中的 Module Types
+        count_types = 0
+        for m_type, raw_key in self.config.get('module_types', {}).items():
+            # 避免重复 (如果配置里的 key 和 group id 冲突，优先保留 xml 的? 或者 append 即可，这里简单 append)
+            self.module_groups_result.append({
+                "id": m_type,
+                "nameId": raw_key,
+                "name": raw_key # 占位
+            })
+            if raw_key: self.needed_raw_names.add(raw_key)
+            count_types += 1
+        print(f"   ✅ 合并了 {count_types} 个基础模块类型配置。")
+
+
+    # =======================================================
+    # 2. 扫描资产 (Assets) -> 改为读取聚合库
     # =======================================================
     def scan_assets(self):
-        print(f"🔍 [2/5] 扫描资产并注入 cycleTime (含 DLC)...")
-        # 基础游戏资产
-        files = glob.glob(os.path.join(self.raw_path, "assets", "structures", "**", "*.xml"), recursive=True)
-        # 增加对 DLC (extensions) 的支持
-        files.extend(glob.glob(os.path.join(self.raw_path, "extensions", "*", "assets", "structures", "**", "*.xml"), recursive=True))
-        for f in files:
-            fname = os.path.splitext(os.path.basename(f))[0]
-            if fname in self.valid_macros:
-                try:
-                    tree = ET.parse(f)
-                    root = tree.getroot()
-                    macro = root if root.tag=='macro' else root.find(f".//macro[@name='{fname}']")
-                    if macro is None: continue
-                    
-                    m_class = macro.get('class')
-                    info = self.valid_macros[fname]
-                    
-                    wf_node = macro.find('properties/workforce')
-                    wf_val = int(wf_node.get('max') or wf_node.get('amount') or 0) if wf_node is not None else 0
-                    wf_cap = int(wf_node.get('capacity') or 0) if wf_node is not None else 0
-
-                    # 提取建筑种族属性 (主要用于 Habitation)
-                    module_race = "generic"
-                    if wf_node is not None and wf_node.get('race'):
-                        module_race = wf_node.get('race')
-
-                    module_data = {
-                        "id": fname, "wareId": info['module_ware_id'], 
-                        "nameId": info['name_id'], 
-                        "name": info['name_id'], 
-                        "type": m_class, "race": module_race,
-                        "buildTime": info['build_time'], "buildCost": info['build_cost'],
-                        "cycleTime": 0,
-                        "workforce": { "capacity": wf_cap, "needed": wf_val, "maxBonus": 0 },
-                        "outputs": {}, "inputs": {}
-                    }
-                    # 临时记录来源用于日志，不存入最终对象
-                    module_data['_tmp_src'] = f
-
-                    if m_class == 'production':
-                        prod_tag = macro.find('properties/production')
-                        if prod_tag is not None:
-                            p_id = prod_tag.get('wares')
-                            recipe = self.recipes.get(p_id, {}).get('default')
-                            if recipe:
-                                factor = 3600 / recipe['time']
-                                module_data["cycleTime"] = recipe['time']
-                                module_data["outputs"] = { p_id: round(recipe['amount'] * factor, 2) }
-                                module_data["inputs"] = { k: round(v * factor, 2) for k, v in recipe['inputs'].items() }
-                                module_data["workforce"]["maxBonus"] = recipe['bonus']
-                    
-                    if m_class == 'storage':
-                        cargo = macro.find('properties/cargo')
-                        if cargo is not None: module_data['capacity'] = int(cargo.get('max', 0))
-
-                    self.all_modules.append(module_data)
-                except: pass
-
-        # 统计各文件贡献数量并清理临时字段
-        source_stats = {}
-        for mod in self.all_modules:
-            src_path = mod.pop('_tmp_src', 'unknown')
-            src_rel = os.path.relpath(src_path, self.raw_path)
-            source_stats[src_rel] = source_stats.get(src_rel, 0) + 1
+        print(f"🔍 [2/5] 从 macros_final.xml 读取宏定义...")
+        macros_path = os.path.join(self.raw_path, "libraries", "macros_final.xml")
         
-        print(f"   ✅ 扫描完成: 覆盖 {len(source_stats)} 个资产文件")
-        for src, count in sorted(source_stats.items(), key=lambda x: x[1], reverse=True):
-            print(f"     └─ {src}: {count} 个模块")
+        if not os.path.exists(macros_path):
+            print(f"❌ 错误: 找不到宏定义文件: {macros_path}")
+            sys.exit(1)
+
+        try:
+            tree = ET.parse(macros_path)
+            root = tree.getroot()
+            
+            # Distiller 生成的 macros_final.xml 根节点为 <macros>，子节点为 <macro>
+            # 不再需要 glob 扫描文件，直接遍历 XML 树
+            
+            count = 0
+            # 遍历所有 macro 节点
+            for macro in root.findall('macro'):
+                fname = macro.get('name')
+                
+                # 过滤：只处理我们在 wares.xml 中识别到的模块
+                if fname not in self.valid_macros:
+                    continue
+                    
+                m_class = macro.get('class')
+                info = self.valid_macros[fname]
+                
+                wf_node = macro.find('properties/workforce')
+                wf_val = int(wf_node.get('max') or wf_node.get('amount') or 0) if wf_node is not None else 0
+                wf_cap = int(wf_node.get('capacity') or 0) if wf_node is not None else 0
+
+                # 提取建筑种族属性 (主要用于 Habitation)
+                module_race = "generic"
+                if wf_node is not None and wf_node.get('race'):
+                    module_race = wf_node.get('race')
+
+                module_data = {
+                    "id": fname, 
+                    "wareId": info['module_ware_id'], 
+                    "nameId": info['name_id'], 
+                    "name": info['name_id'], 
+                    "type": m_class, 
+                    "group": m_class, 
+                    "race": module_race,
+                    "buildTime": info['build_time'], 
+                    "buildCost": info['build_cost'],
+                    "cycleTime": 0,
+                    "workforce": { "capacity": wf_cap, "needed": wf_val, "maxBonus": 0 },
+                    "outputs": {}, 
+                    "inputs": {}
+                }
+
+                if m_class == 'production':
+                    prod_tag = macro.find('properties/production')
+                    if prod_tag is not None:
+                        p_id = prod_tag.get('wares')
+                        
+                        # 尝试关联 Ware Group
+                        target_ware = next((w for w in self.wares_data if w['id'] == p_id), None)
+                        if target_ware and target_ware.get('group'):
+                            module_data["group"] = target_ware['group']
+
+                        recipe = self.recipes.get(p_id, {}).get('default')
+                        if recipe:
+                            factor = 3600 / recipe['time']
+                            module_data["cycleTime"] = recipe['time']
+                            module_data["outputs"] = { p_id: round(recipe['amount'] * factor, 2) }
+                            module_data["inputs"] = { k: round(v * factor, 2) for k, v in recipe['inputs'].items() }
+                            module_data["workforce"]["maxBonus"] = recipe['bonus']
+                
+                if m_class == 'storage':
+                    cargo = macro.find('properties/cargo')
+                    if cargo is not None: 
+                        # cargo max 可能是 tags="container" max="10000" 这种形式
+                        # 这里简单取 max 属性
+                        module_data['capacity'] = int(cargo.get('max', 0))
+
+                self.all_modules.append(module_data)
+                count += 1
+            
+            print(f"   ✅ 解析完成: 从聚合库中提取 {count} 个模块数据。")
+
+        except Exception as e: 
+            print(f"   ❌ Macro Parse Error: {e}")
 
     # =======================================================
     # 3. 语言提取 (Backend Translation)
@@ -311,16 +370,16 @@ class X4PrecisionLoader:
                 item['name'] = en_map[raw_key]
                 count_mods += 1
 
-        print(f"   ✅ 更新了 {count_wares} 个商品和 {count_mods} 个模块的英文名称。")
+        # 更新商品组数据
+        count_wg = 0
+        for item in self.module_groups_result:
+            raw_key = item['nameId']
+            if raw_key in en_map:
+                item['name'] = en_map[raw_key]
+                count_wg += 1
+        
+        print(f"   ✅ 更新了 {count_wares} 个商品, {count_mods} 个模块, {count_wg} 个模块分组的英文名称。")
 
-        # 处理模块分类翻译逻辑
-        en_map = self.i18n_data.get('en', {})
-        for m_type, raw_key in self.config.get('module_types', {}).items():
-            self.module_types_result.append({
-                "id": m_type,
-                "nameId": raw_key,
-                "name": en_map.get(raw_key, raw_key)
-            })
     # =======================================================
     # 🆕 4.1. 模块类型分析
     # =======================================================
@@ -381,8 +440,8 @@ class X4PrecisionLoader:
             json.dump(self.all_modules, f, indent=2, ensure_ascii=False)
         with open(os.path.join(data_dir, "wares.json"), 'w', encoding='utf-8') as f:
             json.dump(self.wares_data, f, indent=2, ensure_ascii=False)
-        with open(os.path.join(data_dir, "module_types.json"), 'w', encoding='utf-8') as f:
-            json.dump(self.module_types_result, f, indent=2, ensure_ascii=False)
+        with open(os.path.join(data_dir, "module_groups.json"), 'w', encoding='utf-8') as f:
+            json.dump(self.module_groups_result, f, indent=2, ensure_ascii=False)
         with open(os.path.join(data_dir, "consumption.json"), 'w', encoding='utf-8') as f:
             json.dump(self.race_consumption, f, indent=2, ensure_ascii=False)
 
@@ -402,6 +461,7 @@ class X4PrecisionLoader:
 if __name__ == "__main__":
     loader = X4PrecisionLoader(X4_UNPACKED_DATA_PATH, OUTPUT_VERSION_DIR, _config)
     loader.build_database()
+    loader.process_module_groups()
     loader.scan_assets()
     loader.extract_and_resolve_languages()
     loader.inject_english_names() # 新增步骤
