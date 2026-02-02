@@ -4,20 +4,11 @@ import { useStationStore } from '@/store/useStationStore'
 import draggable from 'vuedraggable'
 import { useI18n } from 'vue-i18n'
 import StationModuleItem from './StationModuleItem.vue'
-import X4ModuleSearch from './common/X4ModuleSearch.vue'
+import StationModuleSelector from './StationModuleSelector.vue'
 import X4NumberInput from './common/X4NumberInput.vue'
 
 const {t} = useI18n()
 const store = useStationStore()
-const currentSelectedId = ref<string | null>(null)
-
-const handleConfirmAdd = () => {
-  if (currentSelectedId.value) {
-    store.addModule(currentSelectedId.value)
-    currentSelectedId.value = null
-    store.searchQuery = ''
-  }
-}
 </script>
 
 <template>
@@ -54,10 +45,7 @@ const handleConfirmAdd = () => {
     </div>
 
     <div class="module-controls-panel space-y-3">
-      <div class="flex items-stretch gap-1">
-        <X4ModuleSearch v-model="store.searchQuery" @select="(m) => currentSelectedId = m.id" class="flex-1" :placeholder="t('ui.search_placeholder')" />
-        <button class="action-add-btn" :disabled="!currentSelectedId" @click="handleConfirmAdd">+</button>
-      </div>
+      <StationModuleSelector />
 
       <div class="auto-fill-section items-start px-1">
         <button class="action-fill-capsule" @click="store.autoFillMissingLines">
@@ -95,11 +83,6 @@ const handleConfirmAdd = () => {
 
 .module-controls-panel { @apply mt-4 pt-4 border-t border-slate-700; }
 
-.action-add-btn { @apply w-8 flex items-center justify-center rounded bg-emerald-600 text-white font-bold text-lg transition-all; }
-.action-add-btn:hover:not(:disabled) { @apply bg-emerald-500; }
-.action-add-btn:disabled { @apply opacity-20 bg-slate-700 cursor-not-allowed; }
-
-/* 自动填充区：左对齐补丁 */
 .auto-fill-section {
   @apply flex flex-col gap-1.5;
 }

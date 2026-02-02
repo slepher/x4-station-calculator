@@ -1,8 +1,3 @@
-export interface SavedModule {
-  id: string;
-  count: number;
-}
-
 export const mockStationData = {
   version: 1,
   activeId: '1',

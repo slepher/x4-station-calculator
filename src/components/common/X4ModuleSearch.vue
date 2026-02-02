@@ -14,47 +14,38 @@ const popoverDirectionClass = computed(() => {
 const searchInput = ref<HTMLInputElement | null>(null);
 const isFocused = ref(false);
 const isHovered = ref(false);
-
-// 核心逻辑：backupValue 仅作为“已确认模块”的锚点
-const backupValue = ref(props.modelValue || ''); 
-
-watch(() => props.modelValue, (newVal) => {
-  if (!isFocused.value) backupValue.value = newVal || '';
-});
+const focusSnapshot = ref(''); // 聚焦快照
 
 const onInput = (e: Event) => {
   emit('update:modelValue', (e.target as HTMLInputElement).value);
 };
 
 const onFocus = () => {
+  focusSnapshot.value = props.modelValue || '';
   isFocused.value = true;
 };
 
 const onBlur = () => {
   if (isFocused.value) {
-    // 只有在存在“已确认备份”时，失焦才回滚
-    if (backupValue.value) {
-      emit('update:modelValue', backupValue.value);
+    // 无效搜索回滚逻辑
+    const hasResults = store.filteredModulesGrouped.length > 0;
+    if (!hasResults) {
+      emit('update:modelValue', focusSnapshot.value);
     }
     isFocused.value = false;
   }
 };
 
 const onClearClick = () => {
-  // 1. 立即清空外部 v-model，从而触发 Store 的空字符串(全量)搜索
   emit('update:modelValue', '');
-  // 2. 物理焦点保持在输入框，不触发 onBlur
+  focusSnapshot.value = ''; // 毁灭快照
   searchInput.value?.focus();
 };
 
 const handleSelect = (m: any) => {
-  const selectedName = m.localeName;
-  backupValue.value = selectedName; // 物理确认：锁定新的回滚目标
-  emit('update:modelValue', selectedName);
   emit('select', m);
-  
-  isFocused.value = false;
-  searchInput.value?.blur(); // 选中后彻底退出编辑态
+  isFocused.value = false; // 关闭列表
+  searchInput.value?.blur(); // 保持文本不变
 };
 
 const onEsc = () => {

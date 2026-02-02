@@ -205,27 +205,43 @@ export const useStationStore = defineStore('station', () => {
         groups[type].push({ ...m, displayLabel: label, moduleGroup: localizedModuleGroupsMap.value[m.group] });
       }
     });
+const TYPE_PRIORITY: Record<string, number> = {
+    production: 1,
+    habitation: 2,
+    storage: 3
+  };
 
-    const TYPE_PRIORITY: Record<string, number> = {
-      production: 1,
-      habitation: 2,
-      storage: 3
-    };
+  // 新增：针对生产类目下的子组排序优先级
+  const GROUP_PRIORITY: Record<string, number> = {
+    shiptech: 1, // 飞船商品
+    hightech: 2, // 高科技商品
+    refined: 3,  // 精炼商品
+    energy: 4    // 太阳能/能量
+  };
 
-    return Object.keys(groups)
-      .sort((a, b) => {
-        const typeA = localizedModuleGroupsMap.value[a]?.type || a;
-        const typeB = localizedModuleGroupsMap.value[b]?.type || b;
-        const pA = TYPE_PRIORITY[typeA] || 99;
-        const pB = TYPE_PRIORITY[typeB] || 99;
-        if (pA !== pB) return pA - pB;
-        return a.localeCompare(b);
-      })
-      .map(group => ({
-        group,
-        displayLabel: typeMetadata[group]?.displayLabel || group,
-        modules: groups[group]
-      }));
+  return Object.keys(groups)
+    .sort((a, b) => {
+      const typeA = localizedModuleGroupsMap.value[a]?.type || a;
+      const typeB = localizedModuleGroupsMap.value[b]?.type || b;
+
+      // 1. 第一级排序：按 Type 优先级 (生产 > 居住 > 存储)
+      const pTypeA = TYPE_PRIORITY[typeA] || 99;
+      const pTypeB = TYPE_PRIORITY[typeB] || 99;
+      if (pTypeA !== pTypeB) return pTypeA - pTypeB;
+
+      // 2. 第二级排序：按特定的 Group ID 优先级
+      const pGroupA = GROUP_PRIORITY[a] || 99;
+      const pGroupB = GROUP_PRIORITY[b] || 99;
+      if (pGroupA !== pGroupB) return pGroupA - pGroupB;
+
+      // 3. 第三级排序：默认字母序
+      return a.localeCompare(b);
+    })
+    .map(group => ({
+      group,
+      displayLabel: typeMetadata[group]?.displayLabel || group,
+      modules: groups[group]
+    }));
   });
   
   // --- 操作方法 (Actions) ---
@@ -351,18 +367,19 @@ export const useStationStore = defineStore('station', () => {
     savedLayouts.value.activeId = null;
   }
 
-  function importPlan(input: string) {
+function importPlan(input: string) {
     const raw = input.trim();
     if (!raw) return;
 
     // Mode A: Parse XML content (construction plans)
     if (raw.startsWith('<') || raw.includes('xml version') || raw.includes('<entry')) {
       const matchMacro = /macro="([^"]+)"/g;
-      let match;
+      let match: RegExpExecArray | null; // 显式类型标注
       const counts: Record<string, number> = {};
       let totalFound = 0;
       while ((match = matchMacro.exec(raw)) !== null) {
         const macro = match[1];
+        if(!macro) continue;
         // 过滤掉武器、盾牌等升级组件，只统计站台模块本身
         if (macro.includes('turret_') || macro.includes('shield_') || macro.includes('missile_')) continue;
         counts[macro] = (counts[macro] || 0) + 1;
@@ -387,12 +404,13 @@ export const useStationStore = defineStore('station', () => {
     parts.forEach(part => {
       if (!part.includes('$module-')) return;
       
+      // 使用可选链解构，防止 exec 返回 null
       const idMatch = /\$module-([^,]+)/.exec(part);
       const countMatch = /count:(\d+)/.exec(part);
       
-      if (idMatch) {
+      if (idMatch && idMatch[1]) {
         let id = idMatch[1];
-        const count = countMatch ? parseInt(countMatch[1], 10) : 1;
+        const count = (countMatch && countMatch[1]) ? parseInt(countMatch[1], 10) : 1;
         
         // 策略1: 直接匹配
         if (modulesMap.value[id]) {
@@ -403,7 +421,7 @@ export const useStationStore = defineStore('station', () => {
         // 策略2: 尝试标准后缀
         if (modulesMap.value[`${id}_macro`]) {
           addModule(`${id}_macro`, count);
-        return;
+          return;
         }
 
         // 策略3: 简单转换 (module_X -> X_macro)

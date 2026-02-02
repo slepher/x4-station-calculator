@@ -71,19 +71,19 @@ export async function loadLanguageAsync(lang: string) {
   try {
     // A. 加载游戏数据 (Python 生成的，必然存在)
     // Vite 的 import 必须包含一部分静态路径以便静态分析
-    const gameMsg = await import(`@/assets/x4_game_data/8.0-Diplomacy/locales/${lang}.json`)
+    const gameMsg = (lang === 'en') ? { default: gameEn } : await import(`@/assets/x4_game_data/8.0-Diplomacy/locales/${lang}.json`);
 
     // B. 加载 UI 数据 (可能不存在，需要容错)
-    let uiMsg = {}
-    try {
-      // 尝试加载对应的 UI 翻译
-      const module = await import(`@/locales/${lang}.json`)
-      uiMsg = module.default
-    } catch (e) {
-      // 捕获 "Module not found" 错误
-      console.warn(`[i18n] UI translation for '${lang}' not found, falling back to English UI.`)
-      // 这里不需要做任何事，因为 uiMsg 默认为空，
-      // Vue I18n 会因为找不到 key 而自动去 fallbackLocale ('en') 里找
+    let uiMsg = {};
+    if (lang === 'en') {
+      uiMsg = uiEn;
+    } else {
+      try {
+        const module = await import(`@/locales/${lang}.json`);
+        uiMsg = module.default;
+      } catch (e) {
+        console.warn(`[i18n] UI translation for '${lang}' not found, falling back to English UI.`);
+      }
     }
 
     // C. 合并并设置
