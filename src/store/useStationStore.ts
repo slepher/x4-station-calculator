@@ -1,36 +1,28 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
 import { mockStationData } from '@/mock/mock_data_v1'
-import type { X4Module, X4Ware, X4ModuleGroup, X4Workforce } from '../types/x4'
+import type {
+  X4Module,
+  X4Ware,
+  X4ModuleGroup,
+  X4Workforce,
+  SavedModule,
+  StationSettings,
+  ProductionLogItem,
+  WareDetail
+} from '../types/x4'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { loadLanguageAsync } from '@/i18n'
+import { calculateWorkforceBreakdown, calculateActualWorkforce, calculateEfficiencySaturation } from './logic/workforceCalculator'
+import { calculateProfitBreakdown, calculateNetProduction, calculateAutoFillSuggestions } from './logic/productionCalculator'
 
 // 1. 静态导入游戏数据
 import waresRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/wares.json'
 import ModulesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/modules.json'
 import moduleGroupsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/module_groups.json'
 import consumptionRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/consumption.json'
-
 // --- 类型定义 (Type Definitions) ---
-
-export interface SavedModule {
-  id: string;
-  count: number;
-}
-
-export interface StationSettings {
-  sunlight: number;
-  useHQ: boolean;
-  manualWorkforce: number;
-  workforcePercent: number;
-  workforceAuto: boolean;
-  considerWorkforceForAutoFill: boolean;
-  buyMultiplier: number;
-  sellMultiplier: number;
-  minersEnabled: boolean;
-  internalSupply: boolean;
-}
 
 export interface StationLayout {
   id: string;
@@ -64,29 +56,6 @@ export interface ModuleGroupResult {
   group: string;
   displayLabel: string;
   modules: GroupedModuleItem[];
-}
-
-export interface ProductionLogItem {
-  moduleId: string;
-  nameId: string;
-  count: number;
-  amount: number;
-  bonusPercent: number;
-  type: 'production' | 'consumption';
-  label?: string;
-}
-
-export interface WareDetail {
-  production: number;
-  consumption: number;
-  list: ProductionLogItem[];
-}
-
-export interface WorkforceItem {
-  id: string;
-  nameId: string;
-  count: number;
-  value: number;
 }
 
 export const useStationStore = defineStore('station', () => {
@@ -508,19 +477,6 @@ function importPlan(input: string) {
   }
 
   // --- 业务计算逻辑 (接口完整性保障) ---
-  function getDynamicPrice(wareId: string, isInput = false) {
-    const ware = waresMap.value[wareId]
-    if (!ware) return 0
-    const multiplier = isInput ? settings.value.buyMultiplier : settings.value.sellMultiplier
-    
-    if (multiplier <= 0.5) {
-      const t = multiplier * 2
-      return ware.minPrice + (ware.price - ware.minPrice) * t
-    } else {
-      const t = (multiplier - 0.5) * 2
-      return ware.price + (ware.maxPrice - ware.price) * t
-    }
-  }
 
   const constructionBreakdown = computed(() => {
     let totalCost = 0
@@ -540,184 +496,32 @@ function importPlan(input: string) {
     return { moduleList, totalCost, totalMaterials }
   })
 
-  const workforceBreakdown = computed(() => {
-    let neededTotal = 0
-    let capacityTotal = 0
-    const neededList: WorkforceItem[] = []
-    const capacityList: WorkforceItem[] = []
+  const workforceBreakdown = computed(() => 
+    calculateWorkforceBreakdown(plannedModules.value, modulesMap.value, settings.value)
+  )
 
-    if (settings.value.useHQ) {
-      neededTotal += 200
-      neededList.push({ id: 'player_hq', nameId: '{20102,2011}', count: 1, value: 200 })
-    }
+  const actualWorkforce = computed(() => 
+    calculateActualWorkforce(workforceBreakdown.value, settings.value)
+  )
 
-    plannedModules.value.forEach(item => {
-      const info = modulesMap.value[item.id]
-      if (!info) return
-      if (info.workforce.needed > 0) {
-        const val = info.workforce.needed * item.count
-        neededTotal += val
-        neededList.push({ id: item.id, nameId: info.nameId, count: item.count, value: val })
-      }
-      if (info.workforce.capacity > 0) {
-        const val = info.workforce.capacity * item.count
-        capacityTotal += val
-        capacityList.push({ id: item.id, nameId: info.nameId, count: item.count, value: val })
-      }
-    })
-
-    return {
-      needed: { total: neededTotal, list: neededList },
-      capacity: { total: capacityTotal, list: capacityList },
-      diff: capacityTotal - neededTotal
-    }
-  })
-
-  const actualWorkforce = computed(() => {
-     const wf = workforceBreakdown.value
-     const maxCapacity = wf.capacity.total
-     if (settings.value.workforceAuto) {
-       return Math.min(wf.needed.total, maxCapacity)
-     }
-     return Math.max(0, Math.min(settings.value.manualWorkforce, maxCapacity))
-   })
- 
-   const efficiencyMetrics = computed(() => {
-     const wf = workforceBreakdown.value
-     if (wf.needed.total === 0) return { saturation: 0 }
-     return { saturation: Math.min(1.0, actualWorkforce.value / wf.needed.total) }
-   })
+  const efficiencyMetrics = computed(() => ({
+    saturation: calculateEfficiencySaturation(workforceBreakdown.value.needed.total, actualWorkforce.value)
+  }))
   
   const profitBreakdown = computed(() => {
-    const wareDetails: Record<string, WareDetail> = {}
-    const { saturation } = efficiencyMetrics.value
-    const currentWf = actualWorkforce.value
-
-    // 预处理所有生活物资 ID 集合，用于后续过滤工业模块的静态 inputs
-    const lifeWareIds = new Set<string>();
-    Object.values(consumptionRaw).forEach((raceData: any) => {
-      Object.keys(raceData.wares || raceData).forEach(id => lifeWareIds.add(id));
-    });
-
-    plannedModules.value.forEach(item => {
-      const info = modulesMap.value[item.id]
-      if (!info) return
-
-      const currentBonusRatio = saturation * (info.workforce?.maxBonus || 0)
-      const moduleEff = 1.0 + currentBonusRatio
-
-      for (const [wareId, hourlyAmount] of Object.entries(info.outputs)) {
-        if (!wareDetails[wareId]) wareDetails[wareId] = { production: 0, consumption: 0, list: [] }
-        // Fix: Apply sunlight bonus specifically for Energy Cells
-        let sunlightFactor = 1.0;
-        if (wareId === 'energycells') {
-          sunlightFactor = settings.value.sunlight / 100.0;
-        }
-        const actualAmount = hourlyAmount * item.count * moduleEff * sunlightFactor
-        wareDetails[wareId].production += actualAmount
-        wareDetails[wareId].list.push({
-          moduleId: item.id, nameId: info.nameId, count: item.count, amount: actualAmount,
-          bonusPercent: Math.round(currentBonusRatio * 100), type: 'production'
-        })
-      }
-
-      for (const [wareId, hourlyAmount] of Object.entries(info.inputs)) {
-        if (lifeWareIds.has(wareId)) continue; // 跳过由工人驱动的物资
-        if (!wareDetails[wareId]) wareDetails[wareId] = { production: 0, consumption: 0, list: [] }
-        const actualAmount = hourlyAmount * item.count
-        wareDetails[wareId].consumption += actualAmount
-        wareDetails[wareId].list.push({
-          moduleId: item.id, nameId: info.nameId, count: item.count, amount: -actualAmount,
-          bonusPercent: 0, type: 'consumption'
-        })
-      }
-    })
-
-
-    // 第二阶段：动态工人消耗（按照规划列表顺序，前面的建筑优先住满）
-    let remainingWf = currentWf;
-    plannedModules.value.forEach(item => {
-      const info = modulesMap.value[item.id]
-      // 仅处理带人口容量且还有剩余工人的模块
-      if (!info || !info.workforce || info.workforce.capacity <= 0 || remainingWf <= 0) return
-
-      const capacity = info.workforce.capacity * item.count
-      const residents = Math.min(remainingWf, capacity)
-      remainingWf -= residents
-
-      // 优先匹配模块自带的 race，匹配失败则回退到 default
-      const raceKey = info.race in consumptionRaw ? info.race : 'default';
-      const raceConsumption = (consumptionRaw as any)[raceKey];
-      const wares = raceConsumption.wares || raceConsumption; // 兼容嵌套结构
-
-      for (const [wareId, perPersonPerSecond] of Object.entries(wares)) {
-        if (!wareDetails[wareId]) wareDetails[wareId] = { production: 0, consumption: 0, list: [] }
-        
-        // 公式：居住人数 * 每秒消耗系数 * 3600秒
-        const hourlyAmount = residents * (perPersonPerSecond as number) * 3600;
-        
-        wareDetails[wareId].consumption += hourlyAmount
-        wareDetails[wareId].list.push({
-          moduleId: item.id,
-          nameId: info.nameId,
-          count: item.count,
-          amount: -hourlyAmount,
-          bonusPercent: 0,
-          label: `Worker Consumption (${Math.round(residents)} ppl)`,
-          type: 'consumption'
-        })
-      }
-    })
-
-    const productionItems: Record<string, { amount: number, value: number }> = {}
-    const expenseItems: Record<string, { amount: number, value: number }> = {}
-    let totalRevenue = 0, totalExpense = 0
-
-    // 第二阶段：轧差法核心逻辑
-    for (const [wareId, data] of Object.entries(wareDetails)) {
-      const net = data.production - data.consumption
-      if (Math.abs(net) < 0.001) continue
-      if (net > 0) {
-        // 净产出 > 0: 计入收入
-        const price = getDynamicPrice(wareId, false)
-        const val = net * price
-        productionItems[wareId] = { amount: net, value: val }
-        totalRevenue += val
-      } else {
-        // 净产出 < 0: 计入支出
-        const absAmount = Math.abs(net)
-        const ware = waresMap.value[wareId]
-        const isMined = ware?.transport === 'solid' || ware?.transport === 'liquid'
-        
-        let price = getDynamicPrice(wareId, true)
-        if (settings.value.internalSupply) price = 0
-        else if (settings.value.minersEnabled && isMined) price = 0
-        
-        const val = absAmount * price
-        expenseItems[wareId] = { amount: absAmount, value: val }
-        totalExpense += val
-      }
-    }
-
-    return { 
-      wareDetails, totalRevenue, totalExpense, profit: totalRevenue - totalExpense,
-      production: { total: totalRevenue, items: productionItems },
-      expenses: { total: totalExpense, items: expenseItems }
-    }
+    return calculateProfitBreakdown(
+      plannedModules.value,
+      modulesMap.value,
+      waresMap.value,
+      settings.value,
+      actualWorkforce.value,
+      efficiencyMetrics.value.saturation
+    )
   })
   
-  const netProduction = computed(() => {
-    const net: Record<string, { total: number, details: ProductionLogItem[] }> = {}
-    const { wareDetails } = profitBreakdown.value
-    
-    for (const [wareId, data] of Object.entries(wareDetails)) {
-      const diff = data.production - data.consumption
-      if (Math.abs(diff) > 0.001) {
-        net[wareId] = { total: diff, details: data.list }
-      }
-    }
-    return net
-  })
+  const netProduction = computed(() => 
+    calculateNetProduction(profitBreakdown.value.wareDetails)
+  )
 
   /**
    * 自动填充缺失生产线：
@@ -726,29 +530,14 @@ function importPlan(input: string) {
    * 3. 自动加入规划列表
    */
   function autoFillMissingLines() {
-    const net = netProduction.value;
-    const saturation = efficiencyMetrics.value.saturation;
-
-    Object.entries(net).forEach(([wareId, data]) => {
-      if (data.total < -0.001) {
-        const deficit = Math.abs(data.total);
-        // 寻找产出该资源的第一个模块（排除居住模块本身）
-        const targetModule = Object.values(modulesMap.value).find(m => m.outputs[wareId] && m.type !== 'habitat');
-        
-        if (targetModule) {
-          // 计算单模块效率系数
-          let eff = 1.0;
-          if (settings.value.considerWorkforceForAutoFill) {
-            eff = 1.0 + (saturation * (targetModule.workforce?.maxBonus || 0));
-          }
-          
-          const singleModuleOutput = (targetModule.outputs[wareId] || 0) * eff;
-          if (singleModuleOutput > 0) {
-            const count = Math.ceil(deficit / singleModuleOutput);
-            addModule(targetModule.id, count);
-          }
-        }
-      }
+    const suggestions = calculateAutoFillSuggestions(
+      netProduction.value,
+      modulesMap.value,
+      settings.value,
+      efficiencyMetrics.value.saturation
+    );
+    suggestions.forEach(suggestion => {
+      addModule(suggestion.moduleId, suggestion.count);
     });
   }
   // 物理阻塞初始化，确保顺序

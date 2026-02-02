@@ -63,3 +63,63 @@ export interface X4GameData {
   modules: X4Module[];
   wares: X4Ware[];
 }
+
+// --- 核心业务实体类型 (Core Entities) ---
+
+/**
+ * 用户规划的单个模块实例
+ */
+export interface SavedModule {
+  id: string;
+  count: number;
+}
+
+/**
+ * 空间站全局设置
+ */
+export interface StationSettings {
+  sunlight: number;
+  useHQ: boolean;
+  manualWorkforce: number;
+  workforcePercent: number;
+  workforceAuto: boolean;
+  considerWorkforceForAutoFill: boolean;
+  buyMultiplier: number;
+  sellMultiplier: number;
+  minersEnabled: boolean;
+  internalSupply: boolean;
+}
+
+// --- 计算结果类型 (Calculation Results) ---
+
+/**
+ * 劳动力条目（需求或容量）
+ */
+export interface WorkforceItem {
+  id: string;
+  nameId: string;
+  count: number;
+  value: number;
+}
+
+/**
+ * 生产日志条目（用于展示详细的产出/消耗构成）
+ */
+export interface ProductionLogItem {
+  moduleId: string;
+  nameId: string;
+  count: number;
+  amount: number;
+  bonusPercent: number;
+  type: 'production' | 'consumption';
+  label?: string;
+}
+
+/**
+ * 单个商品的生产/消耗汇总详情
+ */
+export interface WareDetail {
+  production: number;
+  consumption: number;
+  list: ProductionLogItem[];
+}
