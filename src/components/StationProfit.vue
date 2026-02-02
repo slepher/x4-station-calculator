@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useStationStore } from '@/store/useStationStore'
-import { useX4I18n } from '@/utils/useX4I18n'
+import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
 import PriceSlider from '@/components/PriceSlider.vue'
 

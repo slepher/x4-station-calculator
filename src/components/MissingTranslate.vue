@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useX4I18n } from '@/utils/useX4I18n'
+import { useX4I18n } from '@/utils/UseX4I18n'
 const { missingKeys, showMissingDetails } = useX4I18n();
 </script>
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useStationStore } from '@/store/useStationStore'
-import { useX4I18n } from '@/utils/useX4I18n'
+import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n';
 
 import ResourceItem from './ResourceItem.vue'
@@ -25,10 +25,6 @@ const resourcesList = computed(() => {
     })
 })
 
-const globalEffDisplay = computed(() => {
-  const eff =  1.0
-  return `${Math.round(eff * 100)}%`
-})
 </script>
 
 <template>

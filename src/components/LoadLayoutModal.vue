@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useStationStore } from '@/store/useStationStore'
-import { useX4I18n } from '@/utils/useX4I18n'
+import { useStationStore, type SavedModule } from '@/store/useStationStore'
+import { useX4I18n } from '@/utils/UseX4I18n'
 const { translateModule } = useX4I18n()
 
 const props = defineProps<{
@@ -25,13 +24,13 @@ const handleMerge = (index: number) => {
   emit('close')
 }
 
-const getLayoutDescription = (modules: any[]) => {
+const getLayoutDescription = (modules:  SavedModule[]) => {
   return [...modules]
     .sort((a, b) => b.count - a.count)
     .slice(0, 3)
     .map(m => {
       const info = store.modules[m.id];
-      return `${m.count} x ${translateModule(info) || m.id}`;
+      return `${m.count} x ${info ? translateModule(info) : m.id}`;
     })
     .join(', ') + (modules.length > 3 ? '...' : '');
 }

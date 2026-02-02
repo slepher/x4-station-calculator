@@ -25,6 +25,7 @@ export interface X4Workforce {
  */
 export interface X4ModuleGroup {
   id: string;         //  ID (如 prod_gen_plasmaconductors_macro)
+  type: string;     // 模块类型 (如 production, habitation 等)
   nameId: string;     // 国际化文本 ID (如 {20104,12101})
   name: string;
 }

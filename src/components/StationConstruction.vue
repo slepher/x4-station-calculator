@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useStationStore } from '@/store/useStationStore'
-import { useX4I18n } from '@/utils/useX4I18n'
+import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
 import PriceSlider from '@/components/PriceSlider.vue'
 
@@ -41,11 +41,14 @@ const data = computed(() => {
   return {
     ...raw,
     totalCost,
-    moduleList: raw.moduleList.map(item => ({
-      ...item,
-      displayName: store.modules[item.id] ? translateModule(store.modules[item.id]) : item.id,
-      cost: Object.entries(item.buildCost).reduce((acc, [id, qty]) => acc + qty * getDynamicBuildPrice(id), 0) * item.count
-    }))
+    moduleList: raw.moduleList.map(item => {
+      const moduleData = store.modules[item.id];
+      return {
+        ...item,
+        displayName: moduleData ? translateModule(moduleData) : item.id,
+        cost: Object.entries(item.buildCost).reduce((acc, [id, qty]) => acc + qty * getDynamicBuildPrice(id), 0) * item.count
+      }
+    })
   }
 })
 

@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
-import { mockStationData, type SavedModule } from '@/mock/mock_data_v1'
-import type { X4Module, X4Ware, X4ModuleGroup, WareAmountMap } from '../types/x4'
+import { mockStationData } from '@/mock/mock_data_v1'
+import type { X4Module, X4Ware, X4ModuleGroup } from '../types/x4'
 import { useI18n } from 'vue-i18n'
-import { useX4I18n } from '@/utils/useX4I18n'
+import { useX4I18n } from '@/utils/UseX4I18n'
 import { loadLanguageAsync } from '@/i18n'
 
 // 1. 静态导入游戏数据
@@ -12,10 +12,15 @@ import ModulesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/modules.json'
 import moduleGroupsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/module_groups.json'
 import consumptionRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/consumption.json'
 
+export interface SavedModule {
+  id: string;
+  count: number;
+}
+
 export interface PlannedModuleDisplay extends SavedModule {
   nameId: string;    
   cost: number;      
-  buildCost: WareAmountMap; 
+  buildCost: Record<string, number>; 
 }
 
 export const useStationStore = defineStore('station', () => {
@@ -33,7 +38,6 @@ export const useStationStore = defineStore('station', () => {
       name: string;
       modules: SavedModule[];
       settings: any;
-      description: string;
       lastUpdated: number;
     }>;
   }>({ version: 1, activeId: null, list: [] });
@@ -318,8 +322,9 @@ export const useStationStore = defineStore('station', () => {
   }
 
   function updateModuleId(index: number, newId: string) {
-    if (index >= 0 && index < plannedModules.value.length) {
-      plannedModules.value[index].id = newId
+    if (index >= 0 && index < plannedModules.value.length) { 
+      const plannedModule = plannedModules.value[index];
+      if(plannedModule) plannedModule.id = newId;
     }
   }
 

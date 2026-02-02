@@ -1,39 +1,3 @@
-<template>
-  <div class="x4-search-container" @mouseenter="isHovered = true" @mouseleave="isHovered = false">
-    <div class="search-box" :class="{ 'focused': isFocused }">
-      <span class="search-icon">🔍</span>
-      <input
-        ref="searchInput"
-        :value="modelValue" 
-        class="search-input"
-        :placeholder="placeholder || 'search...'"
-        @input="onInput"
-        @focus="onFocus"
-        @blur="onBlur"
-        @keydown.esc="onEsc"
-      />
-      <button 
-        v-show="modelValue && isHovered" 
-        class="clear-btn" 
-        @mousedown.prevent="onClearClick"
-      >
-        ×
-      </button>
-    </div>
-
-    <Transition name="fade-slide">
-      <div v-if="isFocused" :class="popoverDirectionClass" class="results-popover scrollbar-thin" @mousedown.prevent>
-        <div v-for="group in store.filteredModulesGrouped" :key="group.group" class="type-group">
-          <div class="group-header">{{ group.displayLabel }}</div>
-          <div v-for="m in group.modules" :key="m.id" class="result-item" @click="handleSelect(m)">
-            <div class="color-indicator" :class="m.moduleGroup?.type === 'habitation' ? 'bg-orange-500' : 'bg-sky-500'"></div>
-            <span class="label">{{ m.displayLabel }}</span>
-          </div>
-        </div>
-      </div>
-    </Transition>
-  </div>
-</template>
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
@@ -97,6 +61,43 @@ const onEsc = () => {
   searchInput.value?.blur();
 };
 </script>
+
+<template>
+  <div class="x4-search-container" @mouseenter="isHovered = true" @mouseleave="isHovered = false">
+    <div class="search-box" :class="{ 'focused': isFocused }">
+      <span class="search-icon">🔍</span>
+      <input
+        ref="searchInput"
+        :value="modelValue" 
+        class="search-input"
+        :placeholder="placeholder || 'search...'"
+        @input="onInput"
+        @focus="onFocus"
+        @blur="onBlur"
+        @keydown.esc="onEsc"
+      />
+      <button 
+        v-show="modelValue && isHovered" 
+        class="clear-btn" 
+        @mousedown.prevent="onClearClick"
+      >
+        ×
+      </button>
+    </div>
+
+    <Transition name="fade-slide">
+      <div v-if="isFocused" :class="popoverDirectionClass" class="results-popover scrollbar-thin" @mousedown.prevent>
+        <div v-for="group in store.filteredModulesGrouped" :key="group.group" class="type-group">
+          <div class="group-header">{{ group.displayLabel }}</div>
+          <div v-for="m in group.modules" :key="m.id" class="result-item" @click="handleSelect(m)">
+            <div class="color-indicator" :class="m.moduleGroup?.type === 'habitation' ? 'bg-orange-500' : 'bg-sky-500'"></div>
+            <span class="label">{{ m.displayLabel }}</span>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </div>
+</template>
 
 <style scoped>
 .x4-search-container { @apply relative w-full h-10; }
