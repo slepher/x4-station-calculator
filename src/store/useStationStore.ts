@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
 import { mockStationData } from '@/mock/mock_data_v1'
-import type { X4Module, X4Ware, X4ModuleGroup } from '../types/x4'
+import type { X4Module, X4Ware, X4ModuleGroup, X4Workforce } from '../types/x4'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { loadLanguageAsync } from '@/i18n'
@@ -12,15 +12,81 @@ import ModulesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/modules.json'
 import moduleGroupsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/module_groups.json'
 import consumptionRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/consumption.json'
 
+// --- 类型定义 (Type Definitions) ---
+
 export interface SavedModule {
   id: string;
   count: number;
+}
+
+export interface StationSettings {
+  sunlight: number;
+  useHQ: boolean;
+  manualWorkforce: number;
+  workforcePercent: number;
+  workforceAuto: boolean;
+  considerWorkforceForAutoFill: boolean;
+  buyMultiplier: number;
+  sellMultiplier: number;
+  minersEnabled: boolean;
+  internalSupply: boolean;
+}
+
+export interface StationLayout {
+  id: string;
+  name: string;
+  modules: SavedModule[];
+  settings: StationSettings;
+  lastUpdated: number;
+}
+
+export interface SavedLayoutsState {
+  version: number;
+  activeId: string | null;
+  list: StationLayout[];
 }
 
 export interface PlannedModuleDisplay extends SavedModule {
   nameId: string;    
   cost: number;      
   buildCost: Record<string, number>; 
+}
+
+export type LocalizedX4Module = X4Module & { localeName: string };
+export type LocalizedX4ModuleGroup = X4ModuleGroup & { localeName: string };
+
+export interface GroupedModuleItem extends LocalizedX4Module {
+  displayLabel: string;
+  moduleGroup?: LocalizedX4ModuleGroup;
+}
+
+export interface ModuleGroupResult {
+  group: string;
+  displayLabel: string;
+  modules: GroupedModuleItem[];
+}
+
+export interface ProductionLogItem {
+  moduleId: string;
+  nameId: string;
+  count: number;
+  amount: number;
+  bonusPercent: number;
+  type: 'production' | 'consumption';
+  label?: string;
+}
+
+export interface WareDetail {
+  production: number;
+  consumption: number;
+  list: ProductionLogItem[];
+}
+
+export interface WorkforceItem {
+  id: string;
+  nameId: string;
+  count: number;
+  value: number;
 }
 
 export const useStationStore = defineStore('station', () => {
@@ -30,26 +96,16 @@ export const useStationStore = defineStore('station', () => {
   // --- 状态 (State) ---
   const isReady = ref(false)
   const plannedModules = ref<SavedModule[]>([])
-  const savedLayouts = ref<{
-    version: number;
-    activeId: string | null;
-    list: Array<{
-      id: string;
-      name: string;
-      modules: SavedModule[];
-      settings: any;
-      lastUpdated: number;
-    }>;
-  }>({ version: 1, activeId: null, list: [] });
+  const savedLayouts = ref<SavedLayoutsState>({ version: 1, activeId: null, list: [] });
   const searchQuery = ref('') // 全局搜索状态，驱动检索逻辑
-  const localizedModulesMap = ref<Record<string, X4Module & { localeName: string }>>({});
-  const localizedModuleGroupsMap = ref<Record<string, X4ModuleGroup & { localeName: string }>>({});
+  const localizedModulesMap = ref<Record<string, LocalizedX4Module>>({});
+  const localizedModuleGroupsMap = ref<Record<string, LocalizedX4ModuleGroup>>({});
 
   // --- 脏检查快照 (Dirty Check) ---
   // 存储最后一次保存或加载时的 JSON 字符串，用于物理级对比
   const lastSavedSnapshot = ref<string>('')
 
-  const settings = ref({
+  const settings = ref<StationSettings>({
     sunlight: 100, // 强制初始值为 100%
     useHQ: false,           
     manualWorkforce: 0,      
@@ -85,7 +141,7 @@ export const useStationStore = defineStore('station', () => {
           capacity: m.workforce?.capacity || 0,
           needed: m.workforce?.needed || 0,
           maxBonus: m.workforce?.maxBonus || 0
-        }
+        } as X4Workforce
       } as X4Module
     })
     return map
@@ -94,18 +150,18 @@ export const useStationStore = defineStore('station', () => {
   // --- 数据预热 (针对 EN 模式优化：不执行重复翻译计算) ---
   const prepareLocalizedData = () => {
     const isEn = currentLocale.value === 'en';
-    const newModuleMap: Record<string, any> = {};
+    const newModuleMap: Record<string, LocalizedX4Module> = {};
 
     ModulesRaw.forEach(m => {
       newModuleMap[m.id] = {
-        ...m,
+        ...(m as unknown as X4Module),
         // 如果是 en，直接同步 name 字段，不再进入 translate 查找开销
         localeName: isEn ? (m.name || '') : translateModule(m as any)
       };
     });
     localizedModulesMap.value = newModuleMap;
 
-    const newModuleGroupsMap: Record<string, any> = {};
+    const newModuleGroupsMap: Record<string, LocalizedX4ModuleGroup> = {};
     moduleGroupsRaw.forEach((mg: any) => {
       newModuleGroupsMap[mg.id] = {
         ...mg,
@@ -126,12 +182,12 @@ export const useStationStore = defineStore('station', () => {
   );
 
   // --- 搜索增强 (ID/Name/Locale 三重判定) ---
-    const filteredModulesGrouped = computed(() => {
+    const filteredModulesGrouped = computed<ModuleGroupResult[]>(() => {
     const query = searchQuery.value.trim().toLowerCase();
     const isSearching = query.length > 0;
     const isEn = currentLocale.value === 'en';
 
-    const groups: Record<string, any[]> = {};
+    const groups: Record<string, GroupedModuleItem[]> = {};
     const typeMetadata: Record<string, { displayLabel: string; isHit: boolean }> = {};
 
     // 1. 预处理类型命中逻辑与 Header 补偿
@@ -202,7 +258,11 @@ export const useStationStore = defineStore('station', () => {
 
         const type = m.group || 'others';
         if (!groups[type]) groups[type] = [];
-        groups[type].push({ ...m, displayLabel: label, moduleGroup: localizedModuleGroupsMap.value[m.group] });
+        groups[type].push({ 
+          ...m, 
+          displayLabel: label, 
+          moduleGroup: localizedModuleGroupsMap.value[m.group] 
+        });
       }
     });
 const TYPE_PRIORITY: Record<string, number> = {
@@ -241,12 +301,12 @@ const TYPE_PRIORITY: Record<string, number> = {
     .map(group => ({
       group,
       displayLabel: typeMetadata[group]?.displayLabel || group,
-      modules: groups[group]
+      modules: groups[group] || []
     }));
   });
   
   // --- 操作方法 (Actions) ---
-  function loadData(source: any) {
+  function loadData(source: SavedLayoutsState) {
 
     // 使用 JSON 序列化进行深拷贝，防止污染原始数据源
     savedLayouts.value = JSON.parse(JSON.stringify(source));
@@ -269,11 +329,11 @@ const TYPE_PRIORITY: Record<string, number> = {
   }
 
   function loadDemoData() {
-    loadData(mockStationData);
+    loadData(mockStationData as unknown as SavedLayoutsState);
   }
 
   function saveCurrentLayout(name: string) {
-    const layoutData = {
+    const layoutData: StationLayout = {
       id: savedLayouts.value.activeId || crypto.randomUUID(),
       name,
       modules: JSON.parse(JSON.stringify(plannedModules.value)),
@@ -441,7 +501,7 @@ function importPlan(input: string) {
 
   function getModuleInfo(id: string): X4Module {
     return modulesMap.value[id] || {
-      id, wareId: '', nameId: id, type: 'unknown', race: 'unknown', buildTime: 0,
+      id, wareId: '', nameId: id, type: 'unknown', group: 'others', race: 'unknown', buildTime: 0,
       buildCost: {}, cycleTime: 0, outputs: {}, inputs: {},
       workforce: { capacity: 0, needed: 0, maxBonus: 0 }
     } as X4Module
@@ -483,8 +543,8 @@ function importPlan(input: string) {
   const workforceBreakdown = computed(() => {
     let neededTotal = 0
     let capacityTotal = 0
-    const neededList: any[] = []
-    const capacityList: any[] = []
+    const neededList: WorkforceItem[] = []
+    const capacityList: WorkforceItem[] = []
 
     if (settings.value.useHQ) {
       neededTotal += 200
@@ -529,7 +589,7 @@ function importPlan(input: string) {
    })
   
   const profitBreakdown = computed(() => {
-    const wareDetails: Record<string, { production: number, consumption: number, list: any[] }> = {}
+    const wareDetails: Record<string, WareDetail> = {}
     const { saturation } = efficiencyMetrics.value
     const currentWf = actualWorkforce.value
 
@@ -602,6 +662,7 @@ function importPlan(input: string) {
           nameId: info.nameId,
           count: item.count,
           amount: -hourlyAmount,
+          bonusPercent: 0,
           label: `Worker Consumption (${Math.round(residents)} ppl)`,
           type: 'consumption'
         })
@@ -646,7 +707,7 @@ function importPlan(input: string) {
   })
   
   const netProduction = computed(() => {
-    const net: Record<string, { total: number, details: any[] }> = {}
+    const net: Record<string, { total: number, details: ProductionLogItem[] }> = {}
     const { wareDetails } = profitBreakdown.value
     
     for (const [wareId, data] of Object.entries(wareDetails)) {

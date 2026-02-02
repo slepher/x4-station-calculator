@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "js-cookie": "^3.0.5",
+    "pinia": "^3.0.4",
     "pinyin-pro": "^3.28.0",
     "vue": "^3.5.24",
     "vue-i18n": "^11.2.8",
@@ -21,7 +22,7 @@
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/tsconfig": "^0.8.1",
     "typescript": "~5.9.3",
-    "vite": "^7.2.4",
-    "vue-tsc": "^3.1.4"
+    "vite": "^7.3.1",
+    "vue-tsc": "^3.2.4"
   }
 }

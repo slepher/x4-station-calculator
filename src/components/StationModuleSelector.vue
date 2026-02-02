@@ -5,8 +5,6 @@ import { useX4I18n } from '@/utils/UseX4I18n'
 
 const store = useStationStore()
 const { translateModule } = useX4I18n()
-// 假设 t 函数来自父级或全局
-const t = (k: string) => k 
 
 const currentSelectedId = ref<string | null>(null)
 

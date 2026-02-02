@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useStationStore } from '@/store/useStationStore'
 import draggable from 'vuedraggable'
 import { useI18n } from 'vue-i18n'

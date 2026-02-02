@@ -2,6 +2,7 @@
 import { ref, computed, watch, nextTick } from 'vue'
 import { useStationStore } from '@/store/useStationStore'
 import { useI18n } from 'vue-i18n'
+import type { StationLayout } from '@/store/useStationStore';
 
 const props = defineProps<{
   isOpen: boolean
@@ -24,7 +25,7 @@ watch(() => props.isOpen, (val) => {
     // Default name logic
     if (props.intent === 'SAVE_AS') {
         const baseName = store.savedLayouts.activeId 
-            ? store.savedLayouts.list.find(l => l.id === store.savedLayouts.activeId)?.name 
+            ? store.savedLayouts.list.find((l: StationLayout) => l.id === store.savedLayouts.activeId)?.name 
             : ''
         inputName.value = baseName ? `${baseName} ${t('ui.copy_suffix')}` : t('ui.default_station_name')
     } else {
@@ -42,7 +43,7 @@ watch(() => props.isOpen, (val) => {
 const isNewPlan = computed(() => !store.savedLayouts.activeId)
 const currentPlanName = computed(() => {
     if (store.savedLayouts.activeId) {
-        return store.savedLayouts.list.find(l => l.id === store.savedLayouts.activeId)?.name || ''
+        return store.savedLayouts.list.find((l: StationLayout) => l.id === store.savedLayouts.activeId)?.name || ''
     }
     return ''
 })
