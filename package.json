@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "autoprefixer": "^10.4.24",
     "js-cookie": "^3.0.5",
     "pinia": "^3.0.4",
     "pinyin-pro": "^3.28.0",
