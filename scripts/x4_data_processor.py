@@ -38,6 +38,11 @@ X4_LANG_CONFIG = {
     '048': {'iso': 'pl',    'name': 'Polski'}
 }
 
+SPECIAL_TYPE_MAPPING = {
+    'moduletypes_processing': 'processingmodule',
+    'moduletypes_venture': 'ventureplatform'
+}
+
 # =============================================================================
 
 class X4PrecisionLoader:
@@ -203,6 +208,7 @@ class X4PrecisionLoader:
     # =======================================================
     def scan_assets(self):
         print(f"🔍 [2/5] 从 macros_final.xml 读取宏定义...")
+        unmapped_types = defaultdict(list)
         macros_path = os.path.join(self.raw_path, "libraries", "macros_final.xml")
         
         if not os.path.exists(macros_path):
@@ -253,24 +259,54 @@ class X4PrecisionLoader:
                     "inputs": {}
                 }
 
+                # Fix: Check identification tag for specific module types
+                ident = macro.find('properties/identification')
+                if ident is not None:
+                    raw_type = ident.get('type')
+                    if raw_type:
+                        if raw_type in SPECIAL_TYPE_MAPPING:
+                            module_data['group'] = SPECIAL_TYPE_MAPPING[raw_type]
+                        else:
+                            unmapped_types[raw_type].append(fname)
+
                 if m_class == 'production':
                     prod_tag = macro.find('properties/production')
                     if prod_tag is not None:
-                        p_id = prod_tag.get('wares')
+                        # Fix: Handle multiple outputs via <queue> tags (e.g. Scrap Recycler)
+                        production_configs = []
+                        queue_tag = prod_tag.find('queue')
                         
-                        # 尝试关联 Ware Group
-                        target_ware = next((w for w in self.wares_data if w['id'] == p_id), None)
-                        if target_ware and target_ware.get('group'):
-                            module_data["group"] = target_ware['group']
-
-                        recipe = self.recipes.get(p_id, {}).get('default')
-                        if recipe:
-                            factor = 3600 / recipe['time']
-                            module_data["cycleTime"] = recipe['time']
-                            module_data["outputs"] = { p_id: round(recipe['amount'] * factor, 2) }
-                            module_data["inputs"] = { k: round(v * factor, 2) for k, v in recipe['inputs'].items() }
-                            module_data["workforce"]["maxBonus"] = recipe['bonus']
-                
+                        # Strategy 1: <queue><item ware="..."/></queue>
+                        if queue_tag is not None and len(queue_tag.findall('item')) > 0:
+                            for item in queue_tag.findall('item'):
+                                production_configs.append((item.get('ware'), item.get('method', 'default')))
+                        
+                        # Strategy 2: <queue ware="..." method="..."/>
+                        elif queue_tag is not None and queue_tag.get('ware'):
+                            production_configs.append((queue_tag.get('ware'), queue_tag.get('method', 'default')))
+                        
+                        # Strategy 3: <production wares="..." method="..."/> (Fallback)
+                        else:
+                            p_wares = prod_tag.get('wares')
+                            if p_wares:
+                                production_configs.append((p_wares, prod_tag.get('method', 'default')))
+                        
+                        for p_id, p_method in production_configs:
+                            # Update Group info based on first valid ware
+                            if 'group' not in module_data or module_data['group'] == module_data['type']:
+                                target_ware = next((w for w in self.wares_data if w['id'] == p_id), None)
+                                if target_ware and target_ware.get('group'):
+                                    module_data["group"] = target_ware['group']
+                            
+                            recipe = self.recipes.get(p_id, {}).get(p_method)
+                            if recipe:
+                                factor = 3600 / recipe['time']
+                                module_data["cycleTime"] = recipe['time']
+                                module_data["outputs"][p_id] = module_data["outputs"].get(p_id, 0) + round(recipe['amount'] * factor, 2)
+                                for k, v in recipe['inputs'].items():
+                                    module_data["inputs"][k] = module_data["inputs"].get(k, 0) + round(v * factor, 2)
+                                module_data["workforce"]["maxBonus"] = max(module_data["workforce"]["maxBonus"], recipe['bonus'])
+                    
                 if m_class == 'storage':
                     cargo = macro.find('properties/cargo')
                     if cargo is not None: 
@@ -281,6 +317,13 @@ class X4PrecisionLoader:
                 self.all_modules.append(module_data)
                 count += 1
             
+
+            if unmapped_types:
+                print("⚠️  [警告] 发现未映射的模块类型 (Identification Type):")
+                for u_type, macros in unmapped_types.items():
+                    sample = ", ".join(macros[:5])
+                    if len(macros) > 5: sample += f" ... (+{len(macros)-5} more)"
+                    print(f"   - {u_type}: Found in {len(macros)} macros ({sample})")
             print(f"   ✅ 解析完成: 从聚合库中提取 {count} 个模块数据。")
 
         except Exception as e: 

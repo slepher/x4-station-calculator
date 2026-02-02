@@ -33,7 +33,7 @@
     "nameId": "{20104,70901}",
     "name": "L/XL Venture Sendoff Dock",
     "type": "dockarea",
-    "group": "dockarea",
+    "group": "ventureplatform",
     "race": "generic",
     "buildTime": 1099.0,
     "buildCost": {
@@ -442,19 +442,14 @@
       "energycells": 592,
       "hullparts": 1087
     },
-    "cycleTime": 300.0,
+    "cycleTime": 0,
     "workforce": {
       "capacity": 0,
       "needed": 50,
-      "maxBonus": 0.28
+      "maxBonus": 0
     },
-    "outputs": {
-      "sunriseflowers": 1200.0
-    },
-    "inputs": {
-      "energycells": 360.0,
-      "water": 960.0
-    }
+    "outputs": {},
+    "inputs": {}
   },
   {
     "id": "struct_ter_base_03_macro",
@@ -544,21 +539,14 @@
       "energycells": 633,
       "hullparts": 1159
     },
-    "cycleTime": 300.0,
+    "cycleTime": 0,
     "workforce": {
       "capacity": 0,
       "needed": 99,
-      "maxBonus": 0.37
+      "maxBonus": 0
     },
-    "outputs": {
-      "sojahusk": 4200.0
-    },
-    "inputs": {
-      "energycells": 960.0,
-      "majasnails": 600.0,
-      "sojabeans": 480.0,
-      "spices": 240.0
-    }
+    "outputs": {},
+    "inputs": {}
   },
   {
     "id": "buildmodule_gen_equip_m_dockarea_01_macro",
@@ -764,7 +752,7 @@
     "nameId": "{20104,140101}",
     "name": "Terran Scrap Recycler",
     "type": "production",
-    "group": "production",
+    "group": "processingmodule",
     "race": "generic",
     "buildTime": 777.0,
     "buildCost": {
@@ -772,14 +760,20 @@
       "energycells": 131,
       "siliconcarbide": 21
     },
-    "cycleTime": 0,
+    "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
       "needed": 1250,
-      "maxBonus": 0
+      "maxBonus": 0.2
     },
-    "outputs": {},
-    "inputs": {}
+    "outputs": {
+      "computronicsubstrate": 600.0,
+      "siliconcarbide": 720.0
+    },
+    "inputs": {
+      "energycells": 198000.0,
+      "scrapmetal": 15000.0
+    }
   },
   {
     "id": "dockarea_ter_m_station_01_hightech_macro",
@@ -1104,19 +1098,14 @@
       "energycells": 497,
       "hullparts": 910
     },
-    "cycleTime": 450.0,
+    "cycleTime": 0,
     "workforce": {
       "capacity": 0,
       "needed": 75,
-      "maxBonus": 0.33
+      "maxBonus": 0
     },
-    "outputs": {
-      "meat": 2320.0
-    },
-    "inputs": {
-      "energycells": 640.0,
-      "water": 800.0
-    }
+    "outputs": {},
+    "inputs": {}
   },
   {
     "id": "defence_arg_claim_01_macro",
@@ -1147,7 +1136,7 @@
     "nameId": "{20104,53401}",
     "name": "Venture Vertical Connection Structure 02",
     "type": "connectionmodule",
-    "group": "connectionmodule",
+    "group": "ventureplatform",
     "race": "generic",
     "buildTime": 52.0,
     "buildCost": {
@@ -1479,7 +1468,7 @@
       "maxBonus": 0.43
     },
     "outputs": {
-      "energycells": 10500.0
+      "energycells": 3000.0
     },
     "inputs": {}
   },
@@ -1568,19 +1557,14 @@
       "energycells": 101,
       "hullparts": 185
     },
-    "cycleTime": 120.0,
+    "cycleTime": 0,
     "workforce": {
       "capacity": 0,
       "needed": 225,
-      "maxBonus": 0.43
+      "maxBonus": 0
     },
-    "outputs": {
-      "teladianium": 2100.0
-    },
-    "inputs": {
-      "energycells": 1350.0,
-      "ore": 8400.0
-    }
+    "outputs": {},
+    "inputs": {}
   },
   {
     "id": "landmarks_tel_tradestation_01_ringclamp_02_macro",
@@ -1807,20 +1791,14 @@
       "energycells": 638,
       "hullparts": 1168
     },
-    "cycleTime": 480.0,
+    "cycleTime": 0,
     "workforce": {
       "capacity": 0,
       "needed": 225,
-      "maxBonus": 0.69
+      "maxBonus": 0
     },
-    "outputs": {
-      "spacefuel": 735.0
-    },
-    "inputs": {
-      "energycells": 300.0,
-      "water": 750.0,
-      "wheat": 600.0
-    }
+    "outputs": {},
+    "inputs": {}
   },
   {
     "id": "storage_tel_l_container_01_macro",
@@ -2156,21 +2134,14 @@
       "energycells": 525,
       "hullparts": 961
     },
-    "cycleTime": 240.0,
+    "cycleTime": 0,
     "workforce": {
       "capacity": 0,
       "needed": 90,
-      "maxBonus": 0.35
+      "maxBonus": 0
     },
-    "outputs": {
-      "foodrations": 6900.0
-    },
-    "inputs": {
-      "energycells": 1500.0,
-      "meat": 600.0,
-      "spices": 600.0,
-      "wheat": 600.0
-    }
+    "outputs": {},
+    "inputs": {}
   },
   {
     "id": "storage_pir_s_condensate_01_macro",
@@ -2393,7 +2364,7 @@
     "inputs": {
       "antimattercells": 320.0,
       "energycells": 240.0,
-      "refinedmetals": 384.0
+      "teladianium": 280.0
     }
   },
   {
@@ -2573,8 +2544,8 @@
     },
     "inputs": {
       "energycells": 360.0,
-      "refinedmetals": 600.0,
-      "siliconwafers": 360.0
+      "siliconwafers": 360.0,
+      "teladianium": 438.0
     }
   },
   {
@@ -3420,8 +3391,8 @@
     "inputs": {
       "energycells": 1200.0,
       "spices": 480.0,
-      "water": 720.0,
-      "wheat": 360.0
+      "sunriseflowers": 144.0,
+      "water": 720.0
     }
   },
   {
@@ -3587,20 +3558,14 @@
       "energycells": 746,
       "hullparts": 1366
     },
-    "cycleTime": 600.0,
+    "cycleTime": 0,
     "workforce": {
       "capacity": 0,
       "needed": 123,
-      "maxBonus": 0.75
+      "maxBonus": 0
     },
-    "outputs": {
-      "majadust": 384.0
-    },
-    "inputs": {
-      "energycells": 240.0,
-      "majasnails": 720.0,
-      "spices": 360.0
-    }
+    "outputs": {},
+    "inputs": {}
   },
   {
     "id": "storage_tel_m_solid_01_macro",
@@ -3655,7 +3620,7 @@
     "nameId": "{20104,130101}",
     "name": "Scrap Recycler",
     "type": "production",
-    "group": "production",
+    "group": "processingmodule",
     "race": "generic",
     "buildTime": 777.0,
     "buildCost": {
@@ -3663,14 +3628,20 @@
       "energycells": 600,
       "hullparts": 1100
     },
-    "cycleTime": 0,
+    "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
       "needed": 1250,
-      "maxBonus": 0
+      "maxBonus": 0.37
     },
-    "outputs": {},
-    "inputs": {}
+    "outputs": {
+      "claytronics": 720.0,
+      "hullparts": 2400.0
+    },
+    "inputs": {
+      "energycells": 186000.0,
+      "scrapmetal": 4500.0
+    }
   },
   {
     "id": "ventureplatform_gen_cross_01_macro",
@@ -3792,9 +3763,9 @@
     },
     "inputs": {
       "energycells": 1200.0,
+      "sojabeans": 120.0,
       "spices": 480.0,
-      "water": 720.0,
-      "wheat": 360.0
+      "water": 720.0
     }
   },
   {
@@ -4235,7 +4206,7 @@
     "nameId": "{20104,53101}",
     "name": "Venture Base Connection Structure 03",
     "type": "connectionmodule",
-    "group": "connectionmodule",
+    "group": "ventureplatform",
     "race": "generic",
     "buildTime": 72.0,
     "buildCost": {
@@ -4446,7 +4417,7 @@
     "nameId": "{20104,53201}",
     "name": "Venture Cross Connection Structure 01",
     "type": "connectionmodule",
-    "group": "connectionmodule",
+    "group": "ventureplatform",
     "race": "generic",
     "buildTime": 47.0,
     "buildCost": {
@@ -4880,7 +4851,7 @@
     "nameId": "{20104,52901}",
     "name": "Venture Base Connection Structure 01",
     "type": "connectionmodule",
-    "group": "connectionmodule",
+    "group": "ventureplatform",
     "race": "generic",
     "buildTime": 59.0,
     "buildCost": {
@@ -4998,7 +4969,7 @@
     "inputs": {
       "energycells": 600.0,
       "graphene": 960.0,
-      "refinedmetals": 960.0
+      "teladianium": 696.0
     }
   },
   {
@@ -5333,20 +5304,14 @@
       "energycells": 1277,
       "hullparts": 2338
     },
-    "cycleTime": 600.0,
+    "cycleTime": 0,
     "workforce": {
       "capacity": 0,
       "needed": 90,
-      "maxBonus": 0.7
+      "maxBonus": 0
     },
-    "outputs": {
-      "spaceweed": 1098.0
-    },
-    "inputs": {
-      "energycells": 840.0,
-      "spices": 240.0,
-      "swampplant": 720.0
-    }
+    "outputs": {},
+    "inputs": {}
   },
   {
     "id": "landmarks_tel_tradestation_01_column_01_macro",
@@ -5400,7 +5365,7 @@
     "nameId": "{20104,53301}",
     "name": "Venture Vertical Connection Structure 01",
     "type": "connectionmodule",
-    "group": "connectionmodule",
+    "group": "ventureplatform",
     "race": "generic",
     "buildTime": 38.0,
     "buildCost": {
@@ -5679,9 +5644,8 @@
     },
     "inputs": {
       "energycells": 1200.0,
-      "spices": 480.0,
-      "water": 720.0,
-      "wheat": 360.0
+      "plankton": 1140.0,
+      "water": 720.0
     }
   },
   {
@@ -5744,19 +5708,14 @@
       "energycells": 1277,
       "hullparts": 2338
     },
-    "cycleTime": 450.0,
+    "cycleTime": 0,
     "workforce": {
       "capacity": 0,
       "needed": 50,
-      "maxBonus": 0.59
+      "maxBonus": 0
     },
-    "outputs": {
-      "swampplant": 960.0
-    },
-    "inputs": {
-      "energycells": 320.0,
-      "water": 800.0
-    }
+    "outputs": {},
+    "inputs": {}
   },
   {
     "id": "pier_ter_harbor_04_macro",
@@ -5912,19 +5871,14 @@
       "energycells": 497,
       "hullparts": 910
     },
-    "cycleTime": 450.0,
+    "cycleTime": 0,
     "workforce": {
       "capacity": 0,
       "needed": 175,
-      "maxBonus": 0.59
+      "maxBonus": 0
     },
-    "outputs": {
-      "majasnails": 1168.0
-    },
-    "inputs": {
-      "energycells": 320.0,
-      "water": 800.0
-    }
+    "outputs": {},
+    "inputs": {}
   },
   {
     "id": "prod_gen_engineparts_macro",
@@ -5961,7 +5915,7 @@
     "nameId": "{20104,53001}",
     "name": "Venture Base Connection Structure 02",
     "type": "connectionmodule",
-    "group": "connectionmodule",
+    "group": "ventureplatform",
     "race": "generic",
     "buildTime": 53.0,
     "buildCost": {
@@ -6527,7 +6481,7 @@
     "inputs": {
       "energycells": 320.0,
       "graphene": 160.0,
-      "refinedmetals": 1120.0
+      "teladianium": 816.0
     }
   },
   {
@@ -6683,21 +6637,14 @@
       "energycells": 579,
       "hullparts": 1063
     },
-    "cycleTime": 300.0,
+    "cycleTime": 0,
     "workforce": {
       "capacity": 0,
       "needed": 120,
-      "maxBonus": 0.2
+      "maxBonus": 0
     },
-    "outputs": {
-      "nostropoil": 6000.0
-    },
-    "inputs": {
-      "energycells": 1200.0,
-      "spices": 480.0,
-      "sunriseflowers": 480.0,
-      "water": 720.0
-    }
+    "outputs": {},
+    "inputs": {}
   },
   {
     "id": "hab_ter_l_01_macro",
@@ -7151,9 +7098,9 @@
     },
     "inputs": {
       "energycells": 1200.0,
-      "spices": 480.0,
-      "water": 720.0,
-      "wheat": 360.0
+      "scruffinfruits": 360.0,
+      "spices": 720.0,
+      "water": 720.0
     }
   },
   {
@@ -7198,16 +7145,15 @@
     "workforce": {
       "capacity": 0,
       "needed": 90,
-      "maxBonus": 0.28
+      "maxBonus": 0.59
     },
     "outputs": {
-      "medicalsupplies": 2496.0
+      "medicalsupplies": 1680.0
     },
     "inputs": {
       "energycells": 1200.0,
-      "spices": 480.0,
-      "water": 720.0,
-      "wheat": 360.0
+      "ice": 600.0,
+      "proteinpaste": 288.0
     }
   },
   {
@@ -7247,19 +7193,14 @@
       "energycells": 592,
       "hullparts": 1084
     },
-    "cycleTime": 300.0,
+    "cycleTime": 0,
     "workforce": {
       "capacity": 0,
       "needed": 175,
-      "maxBonus": 0.48
+      "maxBonus": 0
     },
-    "outputs": {
-      "sojabeans": 1248.0
-    },
-    "inputs": {
-      "energycells": 360.0,
-      "water": 960.0
-    }
+    "outputs": {},
+    "inputs": {}
   },
   {
     "id": "storage_par_s_solid_01_macro",
@@ -7523,7 +7464,7 @@
     "nameId": "{20104,70801}",
     "name": "S/M Venture Sendoff Dock",
     "type": "dockarea",
-    "group": "dockarea",
+    "group": "ventureplatform",
     "race": "generic",
     "buildTime": 390.0,
     "buildCost": {
@@ -7719,19 +7660,14 @@
       "energycells": 592,
       "hullparts": 1084
     },
-    "cycleTime": 300.0,
+    "cycleTime": 0,
     "workforce": {
       "capacity": 0,
       "needed": 75,
-      "maxBonus": 0.28
+      "maxBonus": 0
     },
-    "outputs": {
-      "wheat": 3720.0
-    },
-    "inputs": {
-      "energycells": 720.0,
-      "water": 960.0
-    }
+    "outputs": {},
+    "inputs": {}
   },
   {
     "id": "hab_ter_m_01_macro",

@@ -207,8 +207,9 @@ export const useStationStore = defineStore('station', () => {
     });
 const TYPE_PRIORITY: Record<string, number> = {
     production: 1,
-    habitation: 2,
-    storage: 3
+    processingmodule: 2,
+    habitation: 3,
+    storage: 4
   };
 
   // 新增：针对生产类目下的子组排序优先级
@@ -547,7 +548,12 @@ function importPlan(input: string) {
 
       for (const [wareId, hourlyAmount] of Object.entries(info.outputs)) {
         if (!wareDetails[wareId]) wareDetails[wareId] = { production: 0, consumption: 0, list: [] }
-        const actualAmount = hourlyAmount * item.count * moduleEff
+        // Fix: Apply sunlight bonus specifically for Energy Cells
+        let sunlightFactor = 1.0;
+        if (wareId === 'energycells') {
+          sunlightFactor = settings.value.sunlight / 100.0;
+        }
+        const actualAmount = hourlyAmount * item.count * moduleEff * sunlightFactor
         wareDetails[wareId].production += actualAmount
         wareDetails[wareId].list.push({
           moduleId: item.id, nameId: info.nameId, count: item.count, amount: actualAmount,
