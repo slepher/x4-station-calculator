@@ -78,12 +78,6 @@ const handleLoad = () => {
 
     <h2 class="toolbar-title">{{ t('ui.station_planner') }}</h2>
     <div class="flex items-center gap-2 ml-auto lg:ml-0 mr-4">
-      <button 
-        @click="store.loadDemoData()" 
-        class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded font-bold transition shadow-lg shadow-emerald-900/20"
-      >
-        {{ t('ui.load_demo_data') }}
-      </button>
       <MissingTranslate />
       <LanguageSelector />
     </div>
