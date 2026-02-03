@@ -44,9 +44,11 @@ const resourcesList = computed(() => {
         v-for="res in resourcesList" 
         :key="res.id"
         :resourceId="res.id"
-        :name="res.name"
+        :name="res.name"value
         :amount="res.amount"
         :details="res.details"
+        :locked="store.isWareLocked(res.id)"
+        @update:locked="store.toggleWareLock(res.id)"
       />
       
       <div v-if="resourcesList.length === 0" class="empty-container">

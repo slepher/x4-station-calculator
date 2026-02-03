@@ -6,7 +6,8 @@ import type {
   X4Module,
   X4Ware,
   SavedModule,
-  StationSettings
+  StationSettings,
+  StationLayout
 } from '../types/x4'
 import { useGameData, type LocalizedX4Module, type LocalizedX4ModuleGroup } from './logic/useGameData'
 import { calculateWorkforceBreakdown, calculateActualWorkforce, calculateEfficiencySaturation } from './logic/workforceCalculator'
@@ -23,16 +24,8 @@ import { calculateModuleDiff } from './logic/moduleDiffCalculator'
 import { calculateConstructionBreakdown } from './logic/productionCalculator'
 
 // --- 类型定义 (Type Definitions) ---
-export type { SavedModule } from '../types/x4'
+export type { SavedModule, StationLayout } from '../types/x4'
 export type { LocalizedX4ModuleGroup, LocalizedX4Module } from './logic/useGameData'
-
-export interface StationLayout {
-  id: string;
-  name: string;
-  modules: SavedModule[];
-  settings: StationSettings;
-  lastUpdated: number;
-}
 
 export interface SavedLayoutsState {
   version: number;
@@ -58,6 +51,7 @@ export const useStationStore = defineStore('station', () => {
   // --- 状态 (State) ---
   const isReady = ref(false)
   const plannedModules = ref<SavedModule[]>([])
+  const lockedWares = ref<string[]>([]) // 提升至外层，与 plannedModules 并列
   const savedLayouts = ref<SavedLayoutsState>({ version: 1, activeId: null, list: [] })
   const searchQuery = ref('')
   const lastSavedSnapshot = ref<string>('')
@@ -99,16 +93,14 @@ export const useStationStore = defineStore('station', () => {
       if (target) {
         plannedModules.value = JSON.parse(JSON.stringify(target.modules))
         settings.value = JSON.parse(JSON.stringify(target.settings))
+        lockedWares.value = target.lockedWares ? JSON.parse(JSON.stringify(target.lockedWares)) : []
       }
     }
     takeSnapshot()
   }
 
   function takeSnapshot() {
-    lastSavedSnapshot.value = JSON.stringify({
-      modules: plannedModules.value,
-      settings: settings.value
-    })
+    lastSavedSnapshot.value = JSON.stringify({ m: plannedModules.value, l: lockedWares.value, s: settings.value })
   }
 
   function loadDemoData() {
@@ -120,6 +112,7 @@ export const useStationStore = defineStore('station', () => {
       id: savedLayouts.value.activeId || crypto.randomUUID(),
       name,
       modules: JSON.parse(JSON.stringify(plannedModules.value)),
+      lockedWares: JSON.parse(JSON.stringify(lockedWares.value)),
       settings: JSON.parse(JSON.stringify(settings.value)),
       lastUpdated: Date.now()
     }
@@ -140,10 +133,7 @@ export const useStationStore = defineStore('station', () => {
   }
 
   const isDirty = computed(() => {
-    const current = JSON.stringify({
-      modules: plannedModules.value,
-      settings: settings.value
-    })
+    const current = JSON.stringify({ m: plannedModules.value, l: lockedWares.value, s: settings.value })
     return current !== lastSavedSnapshot.value
   })
 
@@ -153,6 +143,7 @@ export const useStationStore = defineStore('station', () => {
       plannedModules.value = JSON.parse(JSON.stringify(layout.modules))
       settings.value = JSON.parse(JSON.stringify(layout.settings))
       savedLayouts.value.activeId = layout.id
+      lockedWares.value = layout.lockedWares ? JSON.parse(JSON.stringify(layout.lockedWares)) : []
     }
   }
 
@@ -206,7 +197,26 @@ export const useStationStore = defineStore('station', () => {
 
   function clearAll() { 
     plannedModules.value = []
+    lockedWares.value = []
     savedLayouts.value.activeId = null
+  }
+
+  // 切换资源锁定状态
+  function toggleWareLock(wareId: string) {
+    const ware = waresMap.value[wareId];
+    if(ware?.transport !== 'container') return;;
+    const idx = lockedWares.value.indexOf(wareId)
+    if (idx > -1) {
+      lockedWares.value.splice(idx, 1)
+    } else {
+      lockedWares.value.push(wareId)
+    }
+  }
+
+  function isWareLocked(wareId: string) {
+    const ware = waresMap.value[wareId];
+    if(ware?.transport !== 'container') return true;
+    return lockedWares.value.includes(wareId)
   }
 
   function importPlan(input: string) {
@@ -284,10 +294,11 @@ export const useStationStore = defineStore('station', () => {
   function autoFillMissingLines() {
     const suggestions = calculateModuleDiff(
       plannedModules.value,
-      "argon",
+      "argon", // 或从设置中获取种族
       settings.value.considerWorkforceForAutoFill,
       modulesMap.value,
-      waresMap.value
+      waresMap.value,
+      lockedWares.value // 传入当前锁定列表
     )
     suggestions.forEach(suggestion => {
       addModule(suggestion.id, suggestion.count)
@@ -328,6 +339,7 @@ export const useStationStore = defineStore('station', () => {
     plannedModules, settings, searchQuery, filteredModulesGrouped,
     wares: waresMap, modules: localizedModulesMap, moduleGroups: localizedModuleGroupsMap,
     loadData, loadDemoData, savedLayouts, saveCurrentLayout, loadLayout, mergeLayout, deleteLayout,
+    lockedWares, isWareLocked, toggleWareLock,
     addModule, importPlan, updateModuleId, updateModuleCount, removeModule, removeModuleById, clearAll, getModuleInfo,
     constructionBreakdown, workforceBreakdown, profitBreakdown, autoFillMissingLines,
     actualWorkforce, currentEfficiency: computed(() => efficiencyMetrics.value.saturation), netProduction

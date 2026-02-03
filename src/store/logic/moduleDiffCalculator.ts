@@ -9,7 +9,8 @@ export function calculateModuleDiff(
   race: string,
   enableWorkforce: boolean,
   modules: Record<string, X4Module>,
-  wares: Record<string, X4Ware>
+  wares: Record<string, X4Ware>,
+  lockedWares: string[] = [] // 新增参数：接收锁定列表
 ): SavedModule[] {
 
   // 1. 初始化计算画布
@@ -49,21 +50,26 @@ export function calculateModuleDiff(
     }
     
     // 1.2 填补缺口
-    for (const [wareId, netAmount] of Object.entries(productionState)) {
-      if (netAmount >= -0.001) continue;
-      
-      const deficit = Math.abs(netAmount);
-      
-      // 转换格式适配辅助函数
-      const currentModulesAsSaved: SavedModule[] = Object.entries(currentModules).map(([id, count]) => ({ id, count }));
-      
-      const producer = findBestProducer(
-        wareId, 
-        race, 
-        currentModulesAsSaved, // 优先使用已添加的同类工厂
-        modules, 
-        wares
-      );
+      for (const [wareId, netAmount] of Object.entries(productionState)) {
+        if (netAmount >= -0.001) continue;
+        
+        const deficit = Math.abs(netAmount);
+        
+        // 转换格式适配辅助函数
+        const currentModulesAsSaved: SavedModule[] = Object.entries(currentModules).map(([id, count]) => ({ id, count }));
+        
+        // 如果该资源已被锁定，则跳过补齐生产模块的逻辑
+        if (lockedWares.includes(wareId)) {
+          continue;
+        }
+        
+        const producer = findBestProducer(
+          wareId, 
+          race, 
+          currentModulesAsSaved, // 优先使用已添加的同类工厂
+          modules, 
+          wares
+        );
       
       if (!producer) continue;
       
