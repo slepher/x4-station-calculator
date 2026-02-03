@@ -77,7 +77,7 @@ const store = useStationStore()
 :deep(.x4-nested-input .x4-input-container) { @apply border-none bg-transparent rounded-none h-full; }
 .x4-unit-suffix-box { @apply flex items-center justify-center px-1.5 h-full text-[10px] font-bold text-slate-500 border-l border-slate-700/50 bg-slate-900/40; min-width: 20px; }
 
-.module-list-scroll { @apply max-h-[600px] overflow-y-auto pr-1 scrollbar-thin; }
+.module-list-scroll { @apply overflow-y-auto pr-1 scrollbar-thin; }
 .drag-ghost { @apply opacity-30 bg-slate-700 border-sky-500 border-dashed border-2; }
 
 .module-controls-panel { @apply mt-4 pt-4 border-t border-slate-700; }

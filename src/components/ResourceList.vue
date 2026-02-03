@@ -80,7 +80,7 @@ const resourcesList = computed(() => {
 }
 
 .list-body {
-  @apply p-2 max-h-[600px] overflow-y-auto;
+  @apply p-2 overflow-y-auto;
 }
 
 .empty-container {
