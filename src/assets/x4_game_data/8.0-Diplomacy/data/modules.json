@@ -215,7 +215,7 @@
     "group": "connectionmodule",
     "method": "none",
     "race": "default",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 137.0,
     "buildCost": {
       "claytronics": 77,
@@ -396,7 +396,7 @@
     "group": "habitation",
     "method": "none",
     "race": "argon",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 1633.0,
     "buildCost": {
       "claytronics": 594,
@@ -716,7 +716,7 @@
     "group": "pier",
     "method": "none",
     "race": "teladi",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 387.0,
     "buildCost": {
       "claytronics": 614,
@@ -1408,7 +1408,7 @@
     "group": "habitation",
     "method": "none",
     "race": "teladi",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 1061.0,
     "buildCost": {
       "claytronics": 594,
@@ -1433,7 +1433,7 @@
     "group": "storage",
     "method": "none",
     "race": "teladi",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 775.0,
     "buildCost": {
       "claytronics": 336,
@@ -1459,7 +1459,7 @@
     "group": "storage",
     "method": "none",
     "race": "teladi",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 1550.0,
     "buildCost": {
       "claytronics": 672,
@@ -1646,7 +1646,7 @@
     "group": "connectionmodule",
     "method": "none",
     "race": "default",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 96.0,
     "buildCost": {
       "claytronics": 54,
@@ -1727,7 +1727,7 @@
     "group": "defencemodule",
     "method": "none",
     "race": "default",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 499.0,
     "buildCost": {
       "claytronics": 280,
@@ -1803,7 +1803,7 @@
     "group": "storage",
     "method": "none",
     "race": "default",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 1033.0,
     "buildCost": {
       "claytronics": 291,
@@ -2365,7 +2365,7 @@
     "group": "storage",
     "method": "none",
     "race": "default",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 327.0,
     "buildCost": {
       "claytronics": 92,
@@ -2473,7 +2473,7 @@
     "group": "habitation",
     "method": "none",
     "race": "argon",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 848.0,
     "buildCost": {
       "claytronics": 165,
@@ -2903,7 +2903,7 @@
     "group": "habitation",
     "method": "none",
     "race": "argon",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 530.0,
     "buildCost": {
       "claytronics": 117,
@@ -3301,7 +3301,7 @@
     "group": "connectionmodule",
     "method": "none",
     "race": "argon",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 211.0,
     "buildCost": {
       "claytronics": 77,
@@ -3408,7 +3408,7 @@
     "group": "dockarea",
     "method": "none",
     "race": "default",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 1225.0,
     "buildCost": {
       "claytronics": 343,
@@ -3662,7 +3662,7 @@
     "group": "defencemodule",
     "method": "none",
     "race": "default",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 707.0,
     "buildCost": {
       "claytronics": 396,
@@ -4153,7 +4153,7 @@
     "group": "defencemodule",
     "method": "none",
     "race": "default",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 707.0,
     "buildCost": {
       "claytronics": 396,
@@ -4259,7 +4259,7 @@
     "group": "connectionmodule",
     "method": "none",
     "race": "default",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 59.0,
     "buildCost": {
       "claytronics": 34,
@@ -4495,7 +4495,7 @@
     "group": "connectionmodule",
     "method": "none",
     "race": "argon",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 220.0,
     "buildCost": {
       "claytronics": 19,
@@ -4621,7 +4621,7 @@
     "group": "storage",
     "method": "none",
     "race": "terran",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 520.0,
     "buildCost": {
       "computronicsubstrate": 28,
@@ -4925,7 +4925,7 @@
     "group": "storage",
     "method": "none",
     "race": "argon",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 1033.0,
     "buildCost": {
       "claytronics": 291,
@@ -5091,7 +5091,7 @@
     "group": "connectionmodule",
     "method": "none",
     "race": "argon",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 211.0,
     "buildCost": {
       "claytronics": 77,
@@ -5142,7 +5142,7 @@
     "group": "connectionmodule",
     "method": "none",
     "race": "default",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 96.0,
     "buildCost": {
       "claytronics": 54,
@@ -5351,7 +5351,7 @@
     "group": "connectionmodule",
     "method": "none",
     "race": "split",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 52.0,
     "buildCost": {
       "claytronics": 13,
@@ -5376,7 +5376,7 @@
     "group": "connectionmodule",
     "method": "none",
     "race": "default",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 443.0,
     "buildCost": {
       "claytronics": 243,
@@ -5432,7 +5432,7 @@
     "group": "habitation",
     "method": "none",
     "race": "argon",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 1633.0,
     "buildCost": {
       "claytronics": 594,
@@ -5807,7 +5807,7 @@
     "group": "connectionmodule",
     "method": "none",
     "race": "default",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 96.0,
     "buildCost": {
       "claytronics": 54,
@@ -5832,7 +5832,7 @@
     "group": "connectionmodule",
     "method": "none",
     "race": "default",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 96.0,
     "buildCost": {
       "claytronics": 54,
@@ -5990,7 +5990,7 @@
     "group": "defencemodule",
     "method": "none",
     "race": "default",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 499.0,
     "buildCost": {
       "claytronics": 280,
@@ -6113,7 +6113,7 @@
     "group": "defencemodule",
     "method": "none",
     "race": "default",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 866.0,
     "buildCost": {
       "claytronics": 485,
@@ -6170,7 +6170,7 @@
     "group": "connectionmodule",
     "method": "none",
     "race": "argon",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 275.0,
     "buildCost": {
       "claytronics": 15,
@@ -6326,7 +6326,7 @@
     "group": "habitation",
     "method": "none",
     "race": "teladi",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 1061.0,
     "buildCost": {
       "claytronics": 594,
@@ -6351,7 +6351,7 @@
     "group": "connectionmodule",
     "method": "none",
     "race": "default",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 96.0,
     "buildCost": {
       "claytronics": 54,
@@ -6745,7 +6745,7 @@
     "group": "defencemodule",
     "method": "none",
     "race": "argon",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 2309.0,
     "buildCost": {
       "claytronics": 841,
@@ -6795,7 +6795,7 @@
     "group": "storage",
     "method": "none",
     "race": "argon",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 1033.0,
     "buildCost": {
       "claytronics": 291,
@@ -7086,7 +7086,7 @@
     "group": "connectionmodule",
     "method": "none",
     "race": "argon",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 302.0,
     "buildCost": {
       "claytronics": 21,
@@ -7187,7 +7187,7 @@
     "group": "storage",
     "method": "none",
     "race": "argon",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 1033.0,
     "buildCost": {
       "claytronics": 291,
@@ -7294,7 +7294,7 @@
     "group": "defencemodule",
     "method": "none",
     "race": "default",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 353.0,
     "buildCost": {
       "claytronics": 198,
@@ -7927,7 +7927,7 @@
     "group": "storage",
     "method": "none",
     "race": "terran",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 367.0,
     "buildCost": {
       "computronicsubstrate": 20,
@@ -7953,7 +7953,7 @@
     "group": "habitation",
     "method": "none",
     "race": "argon",
-    "isPlayerBlueprint": true,
+    "isPlayerBlueprint": false,
     "buildTime": 1633.0,
     "buildCost": {
       "claytronics": 594,

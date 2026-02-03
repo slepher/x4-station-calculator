@@ -89,6 +89,7 @@ export function useGameData(): GameDataState & { initialize: () => Promise<void>
     const newModuleMap: Record<string, LocalizedX4Module> = {}
 
     ;(ModulesRaw as any[]).forEach(m => {
+      if(!m.isPlayerBlueprint) return; // 跳过非玩家蓝图模块
       newModuleMap[m.id] = {
         ...m,
         localeName: isEn ? (m.name || '') : translateModule(m)

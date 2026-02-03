@@ -1,121 +1,6 @@
 import type { SavedModule, X4Module, X4Ware } from '@/types/x4'
+import {findBestProducer, findStandardPowerPlant, findBestHabitat, getProductionEfficiency} from './bestModuleSelector'
 import { calculateWorkerSupplyNeeds } from './workerModuleCalculator'
-
-// --- 核心通用选择器 ---
-
-/**
- * 通用模块选择器
- * 逻辑: 来源池锁定(Pool Priority) -> 种族正交筛选(Race Filter) -> 权重排序(Sorter)
- */
-function _selectBestModule(
-  existingCandidates: X4Module[],
-  databaseCandidates: X4Module[],
-  targetRace: string,
-  sortFn: (a: X4Module, b: X4Module) => number
-): X4Module | undefined {
-  
-  // 1. 维度一：来源池选择 (Pool Selection)
-  // 如果现有池里有东西，死锁在现有池；否则使用数据库池
-  let activePool = existingCandidates;
-  if (existingCandidates.length === 0) {
-    if (databaseCandidates.length === 0) return undefined;
-    activePool = databaseCandidates;
-  }
-
-  // 2. 维度二：种族偏好筛选 (Race Filter)
-  let matches = activePool.filter(m => m.race === targetRace);
-  
-  // 兜底：如果种族匹配落空，回退到当前池子的所有候选者
-  if (matches.length === 0) {
-    matches = activePool;
-  }
-
-  // 3. 最终决断：权重排序 (Sorting)
-  matches.sort(sortFn);
-
-  // 取 Top 1
-  return matches[0];
-}
-
-// --- 业务封装函数 ---
-
-/**
- * 寻找最佳生产工厂
- * 排序权重: 单体产出量 (outputs[wareId])
- */
-function _findBestProducer(
-  wareId: string,
-  race: string,
-  existingModules: SavedModule[],
-  modules: Record<string, X4Module>,
-  wares: Record<string, X4Ware>
-): X4Module | undefined {
-  const ware = wares[wareId];
-  // 边界检查：矿物/气体跳过
-  if (!ware || ware.transport === 'solid' || ware.transport === 'liquid') return undefined;
-
-  // 准备筛选器 lambda
-  const isValidProducer = (m: X4Module) => 
-    m.outputs[wareId] && m.type === 'production' && m.method != "recycling";
-
-  // 准备 Pool A: 现有模块 (使用 flatMap 清洗类型)
-  const existingCandidates = existingModules.flatMap(item => {
-    const m = modules[item.id];
-    return (m && isValidProducer(m)) ? [m] : [];
-  });
-
-  // 准备 Pool B: 数据库模块
-  const dbCandidates = Object.values(modules).filter(isValidProducer);
-
-  // 定义排序: 按该物资的产出量降序
-  const sortByOutput = (a: X4Module, b: X4Module) => 
-    (b.outputs[wareId] || 0) - (a.outputs[wareId] || 0);
-
-  return _selectBestModule(existingCandidates, dbCandidates, race, sortByOutput);
-}
-
-/**
- * 寻找最佳居住舱
- * 排序权重: 人口容量 (workforce.needed)
- */
-function _findBestHabitat(
-  race: string,
-  existingModules: SavedModule[],
-  modules: Record<string, X4Module>
-): X4Module | undefined {
-  
-  // 准备筛选器 lambda
-  const isHabitat = (m: X4Module) => m.type === 'habitation';
-
-  // 准备 Pool A: 现有模块
-  const existingCandidates = existingModules.flatMap(item => {
-    const m = modules[item.id];
-    return (m && isHabitat(m)) ? [m] : [];
-  });
-
-  // 准备 Pool B: 数据库模块
-  const dbCandidates = Object.values(modules).filter(isHabitat);
-
-  // 定义排序: 按人口容量降序 (使用 needed 字段)
-  const sortByCapacity = (a: X4Module, b: X4Module) => 
-    (b.workforce?.needed || 0) - (a.workforce?.needed || 0);
-
-  return _selectBestModule(existingCandidates, dbCandidates, race, sortByCapacity);
-}
-
-/**
- * 获取产出效率 (仅工厂且有工人需求时享受加成)
- */
-function _getProductionEfficiency(
-  module: X4Module,
-  enableWorkforce: boolean,
-  raceBonus: number = 0.25
-): number {
-  if (enableWorkforce && module.workforce?.needed) {
-    return 1 + raceBonus;
-  }
-  return 1.0;
-}
 
 // --- 主计算流程 ---
 
@@ -151,7 +36,7 @@ export function calculateModuleDiff(
       const module = modules[modId];
       if (!module) continue;
       
-      const eff = _getProductionEfficiency(module, enableWorkforce);
+      const eff = getProductionEfficiency(module, enableWorkforce);
       
       // 产出 (乘效率)
       for (const [outWare, val] of Object.entries(module.outputs)) {
@@ -172,7 +57,7 @@ export function calculateModuleDiff(
       // 转换格式适配辅助函数
       const currentModulesAsSaved: SavedModule[] = Object.entries(currentModules).map(([id, count]) => ({ id, count }));
       
-      const producer = _findBestProducer(
+      const producer = findBestProducer(
         wareId, 
         race, 
         currentModulesAsSaved, // 优先使用已添加的同类工厂
@@ -182,7 +67,7 @@ export function calculateModuleDiff(
       
       if (!producer) continue;
       
-      const eff = _getProductionEfficiency(producer, enableWorkforce);
+      const eff = getProductionEfficiency(producer, enableWorkforce);
       const singleOutput = (producer.outputs[wareId] || 0) * eff;
       if (singleOutput <= 0) continue;
       
@@ -199,28 +84,108 @@ export function calculateModuleDiff(
   // ==========================================
   
   if (enableWorkforce) {
+    const supplyWares = new Set([
+      // 1. 水 (Water) - 关键修正！排除农业用水导致的死循环
+      'water',
+      // 2. 食品 (Food) - 最终消耗品
+      'food',
+      // 3. 药品 (Medicine)
+      'pharmaceutical',
+      // 4. 农业商品 (Agricultural) - 中间原料
+      'agricultural'
+    ]);
+
     // 2.1 统计工业人口需求
     let industrialWorkers = 0;
+    let supplyChainEnergyNeeded = 0;
     for (const [modId, count] of Object.entries(currentModules)) {
       const m = modules[modId];
-      if (m?.workforce?.needed) {
+      if(!m) continue;
+      if(!m.workforce?.needed) continue;
+      const isSupplyModule = supplyWares.has(m.group);
+      if(isSupplyModule) {
+        supplyChainEnergyNeeded += count * (m.inputs?.['energycells'] || 0);
+      } else {
         industrialWorkers += count * m.workforce.needed;
       }
     }
-    
+
+    const currentModulesAsSaved1: SavedModule[] = Object.entries(currentModules).map(([id, count]) => ({ id, count }));
+
+
+    const standardPowerPlant = findStandardPowerPlant(  
+      race,
+      currentModulesAsSaved1,
+      modules,
+      wares
+    );
+
+    // 2. [关键算法] 向上取整标准工时剥离法
+    let deductedWorkers = 0;
+    if (standardPowerPlant && supplyChainEnergyNeeded > 0) {
+      // 标准电厂单体产能 (计算基础效率，不含加成，以保证"多扣"的安全性)
+      const unitOutput = standardPowerPlant.outputs['energycells'] || 3000; 
+      // 标准电厂单体工人
+      const unitWorkforce = standardPowerPlant.workforce?.needed || 0;
+      
+      // 理论需要的电厂数量 (向上取整)
+      const theoreticalPlants = Math.ceil(supplyChainEnergyNeeded / unitOutput);
+      
+      // 需要扣除的工人数量
+      deductedWorkers = theoreticalPlants * unitWorkforce;
+    }
+
+    industrialWorkers = Math.max(0, industrialWorkers - deductedWorkers);
+
     if (industrialWorkers > 0) {
-      // 2.2 计算食物/医疗工厂
-      const foodModules = calculateWorkerSupplyNeeds(
-        industrialWorkers,
-        race,
-        modules,
-        wares
+
+      const bestHatabitat = findBestHabitat(
+        race ,
+        currentModulesAsSaved1, 
+        modules
       );
-      
-      for (const [id, count] of Object.entries(foodModules)) {
-        currentModules[id] = (currentModules[id] || 0) + count;
+      const bestHabitatRace = bestHatabitat?.race || race;
+
+      let habitatWorkerMap: Record<string, number> = {};
+      let bestHabitatWorkers = 0;
+      let nonBestHabitatWorkers = 0;
+
+      Object.entries(currentModules).forEach(([id, count]) => {
+        const module = modules[id];
+        if(!module) return;
+        if(module.type === 'habitation') {
+          if(module.race !== bestHabitatRace) {
+            const workers = habitatWorkerMap[module.race] || 0;
+            const moduleWorkers = (module.workforce?.capacity || 0) * count;
+            habitatWorkerMap[module.race] = workers + moduleWorkers;
+            nonBestHabitatWorkers += moduleWorkers;
+          } else {
+            bestHabitatWorkers += (module.workforce?.capacity || 0) * count;
+          }
+        }
+      });
+      //TODO: 分配工人到最佳居住舱, 这个算法还是有问题, 和下一个功能一起修了, 现在看起来差不多就行了
+      industrialWorkers = Math.max(industrialWorkers - nonBestHabitatWorkers, Math.min(industrialWorkers, bestHabitatWorkers));
+      habitatWorkerMap[bestHabitatRace] = industrialWorkers;
+      const supplyModules: Record<string, number> = {};
+      Object.entries(habitatWorkerMap).forEach(([race, raceWorkers]) => {
+        // 2.2 计算食物/医疗工厂
+        const foodModules = calculateWorkerSupplyNeeds(
+          raceWorkers,
+          race,
+          modules,
+          wares
+        );
+        
+        for (const [id, count] of Object.entries(foodModules)) {      
+          supplyModules[id] = (supplyModules[id] || 0) + count;
+        }
+      });
+
+      for (const [id, count] of Object.entries(supplyModules)) {
+        currentModules[id] = Math.max(currentModules[id] || 0, count);
       }
-      
+
       // 2.3 统计总人口
       let totalWorkers = 0;
       for (const [modId, count] of Object.entries(currentModules)) {
@@ -233,15 +198,15 @@ export function calculateModuleDiff(
       // 2.4 补完居住舱
       const currentModulesAsSaved: SavedModule[] = Object.entries(currentModules).map(([id, count]) => ({ id, count }));
       
-      const habitat = _findBestHabitat(
+      const habitat = findBestHabitat(
         race, 
         currentModulesAsSaved, 
         modules
       );
       
       // 使用 needed 作为容量
-      if (habitat && habitat.workforce?.needed && habitat.workforce.needed > 0) {
-        const neededHabitats = Math.ceil(totalWorkers / habitat.workforce.needed);
+      if (habitat) {
+        const neededHabitats = Math.ceil(totalWorkers / habitat.workforce.capacity);
         const currentCount = currentModules[habitat.id] || 0;
         if (neededHabitats > currentCount) {
           currentModules[habitat.id] = neededHabitats;
@@ -289,7 +254,7 @@ export function calculateModuleDiff(
         const activeCount = (modId === energyModId) ? testCount : count;
         
         if (m.outputs['energycells']) {
-          const eff = _getProductionEfficiency(m, enableWorkforce);
+          const eff = getProductionEfficiency(m, enableWorkforce);
           p += activeCount * m.outputs['energycells'] * eff;
         }
         

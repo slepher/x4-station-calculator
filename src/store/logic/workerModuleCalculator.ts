@@ -1,10 +1,12 @@
 import type { X4Module, X4Ware } from '@/types/x4'
+import { findBestProducer } from './bestModuleSelector'
 import consumptionRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/consumption.json'
 
 // --- 私有辅助函数：递归计算单单位物资的工人成本 ---
 
 /**
  * 内部辅助函数：递归计算生产 1 单位特定物资所需的累计工人数
+ * @param raceKey 目标种族 (用于选择最佳工厂)
  * @param wareId 当前物资ID
  * @param modulesMap 模块数据
  * @param waresMap 物资数据
@@ -13,6 +15,7 @@ import consumptionRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/consumption
  */
 function _getRecursiveWorkforceCost(
   wareId: string,
+  raceKey: string,
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
   cache: Map<string, number>,
@@ -20,12 +23,9 @@ function _getRecursiveWorkforceCost(
 ): number {
   if (cache.has(wareId)) return cache.get(wareId)!;
 
-  // 1. 基础情况：矿物 (Solid/Liquid) 或无工厂产品视为无制造人工成本
-  const isMined = waresMap[wareId]?.transport === 'solid' || waresMap[wareId]?.transport === 'liquid';
-  if (isMined) return 0;
-
-  // 2. 寻找生产者：取第一个能产出该物资的非居住模块
-  const module = Object.values(modulesMap).find(m => m.outputs[wareId] && m.type !== 'habitat');
+  // 1. 寻找最佳生产者 (findBestProducer 内部已处理矿物/气体返回 undefined 的逻辑)
+  // 传入空数组 [] 作为 existingModules，因为这是理论成本计算
+  const module = findBestProducer(wareId, raceKey, [], modulesMap, waresMap);
   
   // 如果找不到模块，或者检测到循环依赖，则视为无成本
   if (!module || visited.has(wareId)) return 0;
@@ -41,7 +41,7 @@ function _getRecursiveWorkforceCost(
 
   // 4. 递归累加所有原料的成本
   for (const [inputId, inputAmount] of Object.entries(module.inputs)) {
-    const inputCost = _getRecursiveWorkforceCost(inputId, modulesMap, waresMap, cache, visited);
+    const inputCost = _getRecursiveWorkforceCost(inputId, raceKey, modulesMap, waresMap, cache, visited);
     // 原料工本 * (生产1单位产品需要的原料数量)
     totalWorkforce += inputCost * (inputAmount / outputAmount);
   }
@@ -76,7 +76,7 @@ export function calculateSustainMultiplier(
   for (const [wareId, amountPerSec] of Object.entries(consumptionRates)) {
     const hourlyAmount = (amountPerSec as number) * 3600;
     // 计算生产这些东西背后需要多少人
-    const cost = _getRecursiveWorkforceCost(wareId, modulesMap, waresMap, cache, visited);
+    const cost = _getRecursiveWorkforceCost(wareId, raceKey, modulesMap, waresMap, cache, visited);
     R += cost * hourlyAmount;
   }
 
@@ -144,12 +144,13 @@ export function calculateWorkerSupplyNeeds(
         
         const deficit = Math.abs(amount);
         
-        // 寻找工厂 (排除居住舱)
-        const module = Object.values(modulesMap).find(m => m.outputs[wareId] && m.type !== 'habitat');
-        const isMined = waresMap[wareId]?.transport === 'solid' || waresMap[wareId]?.transport === 'liquid';
+        // 寻找最佳工厂
+        // 1. 传入 [] 作为 existingModules (新建需求不依赖现有存档模块)
+        // 2. findBestProducer 内部会自动过滤掉矿物/气体(mined)和居住舱，返回 undefined
+        const module = findBestProducer(wareId, raceKey, [], modulesMap, waresMap);
         
-        // 如果无法制造或是矿物，则跳过
-        if (!module || isMined) continue;
+        // 如果无法制造(或是矿物)，则跳过
+        if (!module) continue;
 
         // 核心逻辑：向上取整计算工厂数
         const singleOutput = module.outputs[wareId] || 0;

@@ -10,7 +10,7 @@ import type {
 } from '../types/x4'
 import { useGameData, type LocalizedX4Module, type LocalizedX4ModuleGroup } from './logic/useGameData'
 import { calculateWorkforceBreakdown, calculateActualWorkforce, calculateEfficiencySaturation } from './logic/workforceCalculator'
-import { calculateProfitBreakdown, calculateNetProduction, calculateAutoFillSuggestions } from './logic/productionCalculator'
+import { calculateProfitBreakdown, calculateNetProduction } from './logic/productionCalculator'
 import { generateFilteredModulesGrouped } from './logic/searchModule'
 import { 
   parseXmlBlueprint, 

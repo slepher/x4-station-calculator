@@ -239,6 +239,10 @@ class X4PrecisionLoader:
                 m_class = macro.get('class')
                 info = self.valid_macros[fname]
                 
+                # Check build availability
+                build_node = macro.find('properties/build')
+                is_player_bp = (build_node is not None)
+                
                 wf_node = macro.find('properties/workforce')
                 wf_val = int(wf_node.get('max') or wf_node.get('amount') or 0) if wf_node is not None else 0
                 wf_cap = int(wf_node.get('capacity') or 0) if wf_node is not None else 0
@@ -252,7 +256,7 @@ class X4PrecisionLoader:
                     "group": m_class, 
                     "method": "none",
                     "race": "default",
-                    "isPlayerBlueprint": True,
+                    "isPlayerBlueprint": is_player_bp,
                     "buildTime": info['build_time'], 
                     "buildCost": info['build_cost'],
                     "cycleTime": 0,
@@ -272,7 +276,7 @@ class X4PrecisionLoader:
 
                     # 标记不可建造种族
                     non_player_races = {'xenon', 'khaak', 'unknown'}
-                    module_data['isPlayerBlueprint'] = (module_data['race'] not in non_player_races)
+                    module_data['isPlayerBlueprint'] = is_player_bp and (module_data['race'] not in non_player_races)
                     raw_type = ident.get('type')
                     if raw_type:
                         if raw_type in SPECIAL_TYPE_MAPPING:
