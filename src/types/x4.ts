@@ -38,6 +38,7 @@ export interface X4Module {
   wareId: string;     // 对应的商品 ID (用于关联图标和建造费)
   nameId: string;     // 国际化文本 ID (如 {20104,12101})
   name: string;
+  method: 'terran' | 'closed_loop' | 'default' | 'none'; // 生产方式偏好
   type: 'production' | 'habitation' | 'storage' | 'dock' | 'connection' | string;
   group: string;      // 模块分组 ID
   race: string;       // 种族归属

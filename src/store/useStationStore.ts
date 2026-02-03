@@ -18,6 +18,9 @@ import {
   parseGameComLink, 
   resolveModuleId 
 } from './logic/blueprintParser'
+import { calculateModuleDiff } from './logic/moduleDiffCalculator'
+
+import { calculateConstructionBreakdown } from './logic/productionCalculator'
 
 // --- 类型定义 (Type Definitions) ---
 export type { SavedModule } from '../types/x4'
@@ -37,21 +40,15 @@ export interface SavedLayoutsState {
   list: StationLayout[];
 }
 
-export interface PlannedModuleDisplay extends SavedModule {
-  nameId: string;    
-  cost: number;      
-  buildCost: Record<string, number>; 
-}
-
 export interface GroupedModuleItem extends LocalizedX4Module {
-  displayLabel: string;
-  moduleGroup?: LocalizedX4ModuleGroup;
+  displayLabel: string
+  moduleGroup?: LocalizedX4ModuleGroup
 }
 
 export interface ModuleGroupResult {
-  group: string;
-  displayLabel: string;
-  modules: GroupedModuleItem[];
+  group: string
+  displayLabel: string
+  modules: GroupedModuleItem[]
 }
 
 export const useStationStore = defineStore('station', () => {
@@ -250,21 +247,11 @@ export const useStationStore = defineStore('station', () => {
 
   // --- 业务计算逻辑 ---
   const constructionBreakdown = computed(() => {
-    let totalCost = 0
-    const totalMaterials: Record<string, number> = {}
-    const moduleList: PlannedModuleDisplay[] = plannedModules.value.map(item => {
-      const info = modulesMap.value[item.id]
-      if (!info) return null
-      let itemTotalCost = 0
-      for (const [matId, amountPerModule] of Object.entries(info.buildCost)) {
-        const totalAmount = amountPerModule * item.count
-        itemTotalCost += totalAmount * (waresMap.value[matId]?.price || 0)
-        totalMaterials[matId] = (totalMaterials[matId] || 0) + totalAmount
-      }
-      totalCost += itemTotalCost
-      return { ...item, nameId: info.nameId || info.id, cost: itemTotalCost, buildCost: info.buildCost }
-    }).filter((item): item is PlannedModuleDisplay => item !== null)
-    return { moduleList, totalCost, totalMaterials }
+    return calculateConstructionBreakdown(
+      plannedModules.value,
+      modulesMap.value,
+      waresMap.value
+    )
   })
 
   const workforceBreakdown = computed(() => 
@@ -295,14 +282,15 @@ export const useStationStore = defineStore('station', () => {
   )
 
   function autoFillMissingLines() {
-    const suggestions = calculateAutoFillSuggestions(
-      netProduction.value,
+    const suggestions = calculateModuleDiff(
+      plannedModules.value,
+      "argon",
+      settings.value.considerWorkforceForAutoFill,
       modulesMap.value,
-      settings.value,
-      efficiencyMetrics.value.saturation
+      waresMap.value
     )
     suggestions.forEach(suggestion => {
-      addModule(suggestion.moduleId, suggestion.count)
+      addModule(suggestion.id, suggestion.count)
     })
   }
 

@@ -62,6 +62,7 @@ export function useGameData(): GameDataState & { initialize: () => Promise<void>
   function buildModulesMap() {
     const map: Record<string, X4Module> = {}
     ;(ModulesRaw as any[]).forEach(m => {
+      if(!m.isPlayerBlueprint) return; // 跳过非玩家蓝图模块
       map[m.id] = {
         ...m,
         buildCost: m.buildCost || {},

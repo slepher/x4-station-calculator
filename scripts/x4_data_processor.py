@@ -58,6 +58,7 @@ class X4PrecisionLoader:
         self.recipes = {} 
         self.race_consumption = {}  # 种群消耗速率 (每人每秒)
         self.module_groups_result = []  # 模块分组结果 (合并 types 和 waregroups)
+        self.all_methods = set()
         
         # 收集需要翻译的原始名称 (Raw Key)
         self.needed_raw_names = set()
@@ -90,6 +91,7 @@ class X4PrecisionLoader:
                 # 提取配方
                 for prod in ware.findall('production'):
                     method = prod.get('method', 'default')
+                    self.all_methods.add(method)
                     bonus = 0.0
                     eff_node = prod.find("./effects/effect[@type='work']")
                     if eff_node is not None:
@@ -156,6 +158,7 @@ class X4PrecisionLoader:
                     
             self.needed_raw_names.add("{20102,2011}")
             print(f"   ✅ 从 {count} 个物品中收集到 {len(self.needed_raw_names)} 个原始 Key。")
+            print(f"   ℹ️  发现生产方式: {sorted(list(self.all_methods))}")
 
         except Exception as e: print(f"   ❌ XML Error: {e}")
 
@@ -208,6 +211,8 @@ class X4PrecisionLoader:
     # =======================================================
     def scan_assets(self):
         print(f"🔍 [2/5] 从 macros_final.xml 读取宏定义...")
+        macro_race_set = set()
+        macro_method_set = set()
         unmapped_types = defaultdict(list)
         macros_path = os.path.join(self.raw_path, "libraries", "macros_final.xml")
         
@@ -238,11 +243,6 @@ class X4PrecisionLoader:
                 wf_val = int(wf_node.get('max') or wf_node.get('amount') or 0) if wf_node is not None else 0
                 wf_cap = int(wf_node.get('capacity') or 0) if wf_node is not None else 0
 
-                # 提取建筑种族属性 (主要用于 Habitation)
-                module_race = "generic"
-                if wf_node is not None and wf_node.get('race'):
-                    module_race = wf_node.get('race')
-
                 module_data = {
                     "id": fname, 
                     "wareId": info['module_ware_id'], 
@@ -250,7 +250,9 @@ class X4PrecisionLoader:
                     "name": info['name_id'], 
                     "type": m_class, 
                     "group": m_class, 
-                    "race": module_race,
+                    "method": "none",
+                    "race": "default",
+                    "isPlayerBlueprint": True,
                     "buildTime": info['build_time'], 
                     "buildCost": info['build_cost'],
                     "cycleTime": 0,
@@ -262,6 +264,15 @@ class X4PrecisionLoader:
                 # Fix: Check identification tag for specific module types
                 ident = macro.find('properties/identification')
                 if ident is not None:
+                    # 提取真实制造商种族
+                    maker_race = ident.get('makerrace')
+                    if maker_race:
+                        macro_race_set.add(maker_race)
+                        module_data['race'] = maker_race
+
+                    # 标记不可建造种族
+                    non_player_races = {'xenon', 'khaak', 'unknown'}
+                    module_data['isPlayerBlueprint'] = (module_data['race'] not in non_player_races)
                     raw_type = ident.get('type')
                     if raw_type:
                         if raw_type in SPECIAL_TYPE_MAPPING:
@@ -292,6 +303,8 @@ class X4PrecisionLoader:
                                 production_configs.append((p_wares, prod_tag.get('method', 'default')))
                         
                         for p_id, p_method in production_configs:
+                            macro_method_set.add(p_method)
+                            module_data['method'] = p_method
                             # Update Group info based on first valid ware
                             if 'group' not in module_data or module_data['group'] == module_data['type']:
                                 target_ware = next((w for w in self.wares_data if w['id'] == p_id), None)
@@ -299,6 +312,8 @@ class X4PrecisionLoader:
                                     module_data["group"] = target_ware['group']
                             
                             recipe = self.recipes.get(p_id, {}).get(p_method)
+                            if not recipe:
+                                recipe = self.recipes.get(p_id, {}).get('default')
                             if recipe:
                                 factor = 3600 / recipe['time']
                                 module_data["cycleTime"] = recipe['time']
@@ -324,6 +339,8 @@ class X4PrecisionLoader:
                     sample = ", ".join(macros[:5])
                     if len(macros) > 5: sample += f" ... (+{len(macros)-5} more)"
                     print(f"   - {u_type}: Found in {len(macros)} macros ({sample})")
+            print(f"   ℹ️  Macros中使用的种族生产方式: {sorted(list(macro_race_set))}")
+            print(f"   ℹ️  Macros中使用的生产方式: {sorted(list(macro_method_set))}")
             print(f"   ✅ 解析完成: 从聚合库中提取 {count} 个模块数据。")
 
         except Exception as e: 

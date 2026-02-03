@@ -5,10 +5,49 @@ import type {
   X4Ware, 
   WareDetail, 
   ProductionLogItem 
-} from '@/types/x4';
+} from '@/types/x4'
 
-// 移动静态数据引用到计算层
-import consumptionRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/consumption.json';
+import consumptionRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/consumption.json'
+
+// --- 类型定义 ---
+export interface PlannedModuleDisplay extends SavedModule {
+  nameId: string
+  cost: number
+  buildCost: Record<string, number>
+}
+
+export interface ConstructionBreakdown {
+  moduleList: PlannedModuleDisplay[]
+  totalCost: number
+  totalMaterials: Record<string, number>
+}
+
+/**
+ * 计算建筑成本明细
+ */
+export function calculateConstructionBreakdown(
+  plannedModules: SavedModule[],
+  modulesMap: Record<string, X4Module>,
+  waresMap: Record<string, X4Ware>
+): ConstructionBreakdown {
+  let totalCost = 0
+  const totalMaterials: Record<string, number> = {}
+  const moduleList: PlannedModuleDisplay[] = plannedModules
+    .map(item => {
+      const info = modulesMap[item.id]
+      if (!info) return null
+      let itemTotalCost = 0
+      for (const [matId, amountPerModule] of Object.entries(info.buildCost)) {
+        const totalAmount = (amountPerModule as number) * item.count
+        itemTotalCost += totalAmount * (waresMap[matId]?.price || 0)
+        totalMaterials[matId] = (totalMaterials[matId] || 0) + totalAmount
+      }
+      totalCost += itemTotalCost
+      return { ...item, nameId: info.nameId || info.id, cost: itemTotalCost, buildCost: info.buildCost }
+    })
+    .filter((item): item is PlannedModuleDisplay => item !== null)
+  return { moduleList, totalCost, totalMaterials }
+}
 
 /**
  * 动态价格计算逻辑
