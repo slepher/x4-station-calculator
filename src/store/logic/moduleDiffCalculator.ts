@@ -1,6 +1,7 @@
 import type { SavedModule, X4Module, X4Ware } from '@/types/x4'
 import {findBestProducer, findBestHabitat, getProductionEfficiency} from './bestModuleSelector'
 import { calculateWorkerSupplyNeeds } from './workerModuleCalculator'
+import { calculateWorkforceCensus } from './productionCalculator'
 
 // --- 辅助函数 ---
 
@@ -175,16 +176,38 @@ export function calculateAutoFill(
   const autoSupply: SavedModule[] = [];
   
   if (clientPopulation > 0) {
-    // 步骤 A: 物资生产 (Production)
-    const supplyModules = calculateWorkerSupplyNeeds(
-      clientPopulation,
-      race,
-      modules,
-      wares
-    );
+    // [修改] 引入人口普查逻辑 (使用 Shared Code)
+    // 1. 合并列表
+    const allModulesForCensus = [...plannedModules, ...autoIndustry];
+
+    // 2. 调用共享的普查函数
+    const census = calculateWorkforceCensus(allModulesForCensus, modules, clientPopulation);
+
+    // 3. 统计各族人数
+    const workersByRace: Record<string, number> = {};
+    let housedWorkers = 0;
+
+    for (const item of census) {
+      workersByRace[item.race] = (workersByRace[item.race] || 0) + item.residents;
+      housedWorkers += item.residents;
+    }
+
+    // 5. 分别计算各族补给需求并汇总
+    const supplyModulesMap: Record<string, number> = {};
+
+    for (const [r, count] of Object.entries(workersByRace)) {
+      if (count <= 0) continue;
+      
+      // 调用旧接口
+      const raceModules = calculateWorkerSupplyNeeds(count, r, modules, wares);
+
+      for (const [id, c] of Object.entries(raceModules)) {
+        supplyModulesMap[id] = (supplyModulesMap[id] || 0) + c;
+      }
+    }
     
-    // 转换为 SavedModule[] 格式
-    for (const [id, count] of Object.entries(supplyModules)) {
+    // 转换为 SavedModule[]
+    for (const [id, count] of Object.entries(supplyModulesMap)) {
       autoSupply.push({ id, count });
     }
     

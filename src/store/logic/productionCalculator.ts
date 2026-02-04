@@ -22,6 +22,15 @@ export interface ConstructionBreakdown {
   totalMaterials: Record<string, number>
 }
 
+// [新增] 人口普查结果接口
+export interface WorkforceCensusItem {
+  moduleId: string
+  nameId: string
+  residents: number
+  count: number,
+  race: string
+}
+
 /**
  * 计算建筑成本明细
  */
@@ -47,6 +56,39 @@ export function calculateConstructionBreakdown(
     })
     .filter((item): item is PlannedModuleDisplay => item !== null)
   return { moduleList, totalCost, totalMaterials }
+}
+
+// [新增] 独立导出的人口普查函数 (Shared Logic)
+// 职责：仅负责计算 "谁住在哪里"，不涉及物资计算
+export function calculateWorkforceCensus(
+  modules: SavedModule[],
+  modulesMap: Record<string, X4Module>,
+  availableWorkforce: number
+): WorkforceCensusItem[] {
+  const result: WorkforceCensusItem[] = [];
+  let remainingWf = availableWorkforce;
+
+  modules.forEach(item => {
+    const info = modulesMap[item.id];
+    // 检查是否为有效居住舱
+    if (!info || !info.workforce || info.workforce.capacity <= 0 || remainingWf <= 0) return;
+
+    const capacity = info.workforce.capacity * item.count;
+    const residents = Math.min(remainingWf, capacity);
+    const count = Math.ceil(residents / info.workforce.capacity);
+    remainingWf -= residents;
+
+    if (residents <= 0) return;
+
+    result.push({
+      moduleId: item.id,
+      nameId: info.nameId || info.id,
+      residents: residents,
+      count: count,
+      race: info.race || 'default'
+    });
+  });
+  return result;
 }
 
 /**
@@ -120,33 +162,28 @@ export function calculateProfitBreakdown(
     }
   });
 
-  // 第二阶段：动态工人消耗
-  let remainingWf = actualWorkforce;
-  plannedModules.forEach(item => {
-    const info = modulesMap[item.id];
-    if (!info || !info.workforce || info.workforce.capacity <= 0 || remainingWf <= 0) return;
+  // [修改] 第二阶段：动态工人消耗 (使用 Shared Census Logic)
+  const censusItems = calculateWorkforceCensus(plannedModules, modulesMap, actualWorkforce);
 
-    const capacity = info.workforce.capacity * item.count;
-    const residents = Math.min(remainingWf, capacity);
-    remainingWf -= residents;
-
-    const raceKey = info.race in consumptionRaw ? info.race : 'default';
+  censusItems.forEach(item => {
+    // 查表计算消耗
+    const raceKey = item.race in consumptionRaw ? item.race : 'default';
     const raceConsumption = (consumptionRaw as any)[raceKey];
     const wares = raceConsumption.wares || raceConsumption;
 
     for (const [wareId, perPersonPerSecond] of Object.entries(wares)) {
       if (!wareDetails[wareId]) wareDetails[wareId] = { production: 0, consumption: 0, list: [] };
       
-      const hourlyAmount = residents * (perPersonPerSecond as number) * 3600;
+      const hourlyAmount = item.residents * (perPersonPerSecond as number) * 3600;
       
       wareDetails[wareId].consumption += hourlyAmount;
       wareDetails[wareId].list.push({
-        moduleId: item.id,
-        nameId: info.nameId,
+        moduleId: item.moduleId,
+        nameId: item.nameId,
         count: item.count,
         amount: -hourlyAmount,
         bonusPercent: 0,
-        label: `Worker Consumption (${Math.round(residents)} ppl)`,
+        label: `Worker Consumption (${Math.round(item.residents)} ppl)`,
         type: 'consumption'
       });
     }

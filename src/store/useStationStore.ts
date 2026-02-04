@@ -301,7 +301,7 @@ export const useStationStore = defineStore('station', () => {
       modulesMap.value,
       waresMap.value,
       settings.value,
-      0, // 工业产出不计算工人消耗
+      actualWorkforce.value, // 工业产出不计算工人消耗
       efficiencyMetrics.value.saturation
     )
   })
