@@ -14,7 +14,7 @@ const isFocused = ref(false)
 const focusSnapshot = ref('') // 聚焦快照
 
 const popoverDirectionClass = computed(() => {
-  return store.plannedModules.length <= 4 ? 'pop-down' : 'pop-up'
+  return store.allModules.length <= 4 ? 'pop-down' : 'pop-up'
 })
 
 const onInput = (e: Event) => {
