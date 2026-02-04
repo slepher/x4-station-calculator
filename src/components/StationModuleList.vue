@@ -14,10 +14,10 @@ const isSupplyOpen = ref(false) // 自动补给区折叠状态，默认折叠
 </script>
 
 <template>
-  <div class="space-y-2">
+  <div class="module-list-container">
     <div class="header-row">
       <h3 class="header-title">{{ t('ui.module_list') }}</h3>
-      <div class="flex items-center gap-2">
+      <div class="sunlight-control">
         <span class="header-label">{{ t('ui.sun_light') }}</span>
         <div class="x4-composite-input-wrapper">
           <X4NumberInput v-model="store.settings.sunlight" width-class="w-16" class="x4-nested-input" />
@@ -38,7 +38,7 @@ const isSupplyOpen = ref(false) // 自动补给区折叠状态，默认折叠
           ghost-class="drag-ghost" 
           filter=".ignore-drag"
           :prevent-on-filter="false"
-          class="space-y-2"
+          class="draggable-container"
         >
           <template #item="{ element, index }">
             <StationModuleItem 
@@ -58,7 +58,7 @@ const isSupplyOpen = ref(false) // 自动补给区折叠状态，默认折叠
         <span class="tier-label">{{ t('ui.tier_industry') }}</span>
       </div>
       <div class="module-list-scroll">
-        <div class="space-y-2">
+        <div class="auto-modules-container">
           <StationModuleItem 
             v-for="(element, index) in store.autoIndustryModules"
             :key="element.id + '-' + index"
@@ -74,32 +74,33 @@ const isSupplyOpen = ref(false) // 自动补给区折叠状态，默认折叠
     <!-- Tier 3: 自动补给区 -->
     <div v-if="store.autoSupplyModules.length > 0" class="tier-section tier-auto">
       <div 
-        class="tier-header cursor-pointer" 
+        class="tier-header supply-tier-header" 
         :class="{ 'is-active': isSupplyOpen }"
         @click="isSupplyOpen = !isSupplyOpen"
       >
-        <span class="arrow mr-1" :class="{ 'arrow-open': isSupplyOpen }">▶</span>
+        <span class="arrow" :class="{ 'arrow-open': isSupplyOpen }">▶</span>
         <span class="tier-label">{{ t('ui.tier_supply') }}</span>
       </div>
       <Transition name="expand">
         <div v-if="isSupplyOpen" class="module-list-scroll">
-          <div class="space-y-2">
+          <div class="auto-modules-container">
             <StationModuleItem 
               v-for="(element, index) in store.autoSupplyModules"
               :key="element.id + '-' + index"
               :item="element"
               :info="store.getModuleInfo(element.id)!"
               :readonly="true"
+              :no-click="true"
             />
           </div>
         </div>
       </Transition>
     </div>
 
-    <div class="module-controls-panel space-y-3">
+    <div class="module-controls-panel">
       <StationModuleSelector />
 
-      <div class="auto-fill-section items-start px-1">
+      <div class="auto-fill-section">
         <div class="wf-config-group">
           <label for="wf-fill-check" class="wf-config-note">
             <input 
@@ -138,10 +139,22 @@ const isSupplyOpen = ref(false) // 自动补给区折叠状态，默认折叠
 .module-list-scroll { @apply overflow-y-auto pr-1 scrollbar-thin; }
 .drag-ghost { @apply opacity-30 bg-slate-700 border-sky-500 border-dashed border-2; }
 
-.module-controls-panel { @apply mt-4 pt-4 border-t border-slate-700; }
+.module-list-container { @apply space-y-2; }
 
-.auto-fill-section {
-  @apply flex flex-col gap-1.5;
+.sunlight-control { @apply flex items-center gap-2; }
+
+.draggable-container { @apply space-y-2; }
+
+.auto-modules-container { @apply space-y-2; }
+
+.supply-tier-header { @apply cursor-pointer; }
+
+.arrow { @apply mr-1; }
+
+.module-controls-panel { @apply mt-4 pt-4 border-t border-slate-700 space-y-3; }
+
+auto-fill-section {
+  @apply flex flex-col gap-1.5 items-start px-1;
 }
 
 .wf-config-note {

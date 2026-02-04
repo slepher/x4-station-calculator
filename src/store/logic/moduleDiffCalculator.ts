@@ -199,32 +199,33 @@ export function calculateAutoFill(
       if (count <= 0) continue;
       
       // 调用旧接口
-      const raceModules = calculateWorkerSupplyNeeds(count, r, modules, wares);
+      const raceModules = calculateWorkerSupplyNeeds(count, r, modules, wares, supplyWorkforceBonus);
+      const raceSupplyModules: SavedModule[] = [];
 
       for (const [id, c] of Object.entries(raceModules)) {
         supplyModulesMap[id] = (supplyModulesMap[id] || 0) + c;
+        raceSupplyModules.push({ id, count: c });
+      }
+
+      if(supplyWorkforceBonus) {
+
+        const supplyWorkers = calculateTotalWorkforce(raceSupplyModules, modules);
+        
+        if (supplyWorkers > 0) {
+          // 选择最佳居住舱 (不参考 plannedModules 中的居住舱类型)
+          const habitat = findBestHabitat(r, [], modules);
+          
+          if (habitat) {
+            const habitatCount = Math.ceil(supplyWorkers / habitat.workforce.capacity);
+            autoSupply.push({ id: habitat.id, count: habitatCount });
+          }
+        }
       }
     }
     
     // 转换为 SavedModule[]
     for (const [id, count] of Object.entries(supplyModulesMap)) {
       autoSupply.push({ id, count });
-    }
-    
-    // 步骤 B: 居住舱补全 (Habitation) - 逻辑分支
-    if (supplyWorkforceBonus) {
-      // 统计补给区工人需求
-      const supplyWorkers = calculateTotalWorkforce(autoSupply, modules);
-      
-      if (supplyWorkers > 0) {
-        // 选择最佳居住舱 (不参考 plannedModules 中的居住舱类型)
-        const habitat = findBestHabitat(race, [], modules);
-        
-        if (habitat) {
-          const habitatCount = Math.ceil(supplyWorkers / habitat.workforce.capacity);
-          autoSupply.push({ id: habitat.id, count: habitatCount });
-        }
-      }
     }
   }
 
