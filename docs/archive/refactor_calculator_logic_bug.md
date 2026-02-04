@@ -1,0 +1,5 @@
+- [x] 引用已改变, import { calculateModuleDiff } from './logic/moduleDiffCalculator', 但是引用的函数名没有修正为 calculateAutoFill - **已修复**
+- [x] 勾选 considerWorkforceForAutoFill plannedModule 的产出没有增加, 但是instrustryModule 的产出反而减少了 - **已修复**
+- [x] 勾选 considerWorkforceForAutoFill 后, 劳动力需求没有按照AllIndustryModules的模块计算 - **已修复**
+- [x] 勾选 considerWorkforceForAutoFill 后, 工业区没有正常增加人口建筑 - **已修复**
+- [x] 勾选 considerWorkforceForAutoFill 后, 补给区的工人建筑数量不对, 大大超出了 - **已修复**

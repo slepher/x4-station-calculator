@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useX4I18n } from '@/utils/UseX4I18n'
+import { useStationStore } from '@/store/useStationStore'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
   resourceId: string
@@ -15,7 +17,12 @@ const emit = defineEmits<{
 }>()
 
 const { translate } = useX4I18n()
+const store = useStationStore()
+const { t } = useI18n()
 const isOpen = ref(false)
+
+// 计算是否可操作
+const nonOperable = computed(() => !store.isWareOperable(props.resourceId))
 
 const formatNum = (n: number) => new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 1,
@@ -57,9 +64,9 @@ const toggleLock = () => {
         </div>
         <div 
           class="lock-btn" 
-          :class="{ 'is-locked': locked }"
-          @click.stop="toggleLock"
-          title="锁定数量 (不自动补充生产模块)"
+          :class="{ 'is-locked': locked, 'non-operable': nonOperable }"
+          @click.stop="!nonOperable && toggleLock()"
+          :title="nonOperable ? t('ui.non_operable_resource') : t('ui.lock_quantity_hint')"
         >
           <svg v-if="locked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
             <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
@@ -95,7 +102,7 @@ const toggleLock = () => {
 
 <style scoped>
 .item-container { @apply mb-1 select-none; }
-.main-row { @apply flex justify-between items-center px-3 py-2 bg-slate-800/40 rounded cursor-pointer hover:bg-slate-700/50 transition-colors border border-transparent; }
+.main-row { @apply flex justify-between items-center px-3 py-0.5 bg-slate-800/40 rounded cursor-pointer hover:bg-slate-700/50 transition-colors border border-transparent; }
 .is-active { @apply border-slate-600/50 bg-slate-700/40; }
 
 /* 基础图标与文字 */
@@ -113,7 +120,15 @@ const toggleLock = () => {
 /* 锁按钮样式 */
 .lock-btn { @apply p-1.5 rounded-md text-slate-600 hover:text-slate-300 hover:bg-slate-600/30 transition-all cursor-pointer; }
 .lock-btn.is-locked { @apply text-amber-500 hover:text-amber-400 bg-amber-500/10 hover:bg-amber-500/20; }
+/* 采集/上级资源不可操作状态：降低透明度并强制去色 */
+.lock-btn.non-operable { 
+  @apply text-slate-500/40 bg-transparent cursor-default pointer-events-none; 
+}
 
+/* 处于锁定但同时不可操作的情况（兜底样式） */
+.lock-btn.is-locked.non-operable { 
+  @apply text-amber-500/30 bg-transparent; 
+}
 .name { @apply text-sm font-medium text-slate-200; }
 .value { @apply text-sm font-bold min-w-[70px] text-right font-mono; }
 

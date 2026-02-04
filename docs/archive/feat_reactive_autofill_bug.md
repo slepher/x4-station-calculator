@@ -1,0 +1,1 @@
+- [ ] 资源产出需要根据新的计算引擎进行调整 为plannedModule + industroyModule + supplyModule 的食物和医药部分 - **未修复**

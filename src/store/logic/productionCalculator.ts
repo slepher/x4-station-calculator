@@ -84,12 +84,6 @@ export function calculateProfitBreakdown(
 ) {
   const wareDetails: Record<string, WareDetail> = {};
   
-  // 预处理所有生活物资 ID 集合
-  const lifeWareIds = new Set<string>();
-  Object.values(consumptionRaw).forEach((raceData: any) => {
-    Object.keys(raceData.wares || raceData).forEach(id => lifeWareIds.add(id));
-  });
-
   // 第一阶段：模块产出与工业消耗
   plannedModules.forEach(item => {
     const info = modulesMap[item.id];
@@ -116,7 +110,6 @@ export function calculateProfitBreakdown(
 
     // Inputs
     for (const [wareId, hourlyAmount] of Object.entries(info.inputs)) {
-      if (lifeWareIds.has(wareId)) continue; // 跳过由工人驱动的物资
       if (!wareDetails[wareId]) wareDetails[wareId] = { production: 0, consumption: 0, list: [] };
       const actualAmount = hourlyAmount * item.count;
       wareDetails[wareId].consumption += actualAmount;

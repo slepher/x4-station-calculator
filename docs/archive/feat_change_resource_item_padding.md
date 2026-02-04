@@ -1,0 +1,1 @@
+- [ ] 将ResourceItem的上下padding从8px调整为2px

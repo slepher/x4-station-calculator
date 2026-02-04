@@ -86,6 +86,7 @@ export interface StationSettings {
   workforcePercent: number;
   workforceAuto: boolean;
   considerWorkforceForAutoFill: boolean;
+  supplyWorkforceBonus: boolean;
   buyMultiplier: number;
   sellMultiplier: number;
   minersEnabled: boolean;

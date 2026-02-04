@@ -48,6 +48,10 @@
     "import": "导入",
     "load_demo_data": "加载演示数据",
     "load_layout": "加载",
+    "remove": "删除",
+    "transfer_to_planning": "点击转移到用户规划区",
+    "non_operable_resource": "此资源不可操作",
+    "lock_quantity_hint": "锁定数量 (不自动补充生产模块)",
     "action_load": "加载布局",
     "action_merge": "合并模块",
     "action_delete": "删除",
@@ -71,7 +75,11 @@
     "import_placeholder_suffix": "或 https://x4-game.com/#/station-calculator?l=...",
     "import_failed": "导入失败，请检查格式是否正确。",
     "action_import": "导入",
-    "action_cancel": "取消"
+    "action_cancel": "取消",
+    "tier_planned": "用户规划区",
+    "tier_industry": "自动工业区",
+    "tier_supply": "自动补给区",
+    "supply_workforce_bonus": "补给区考虑劳动力加成"
   },
   "profit": {
     "title": "经济分析",

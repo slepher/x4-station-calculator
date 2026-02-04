@@ -19,7 +19,7 @@ import {
   parseGameComLink, 
   resolveModuleId 
 } from './logic/blueprintParser'
-import { calculateModuleDiff } from './logic/moduleDiffCalculator'
+import { calculateAutoFill } from './logic/moduleDiffCalculator'
 
 import { calculateConstructionBreakdown } from './logic/productionCalculator'
 
@@ -50,7 +50,7 @@ export const useStationStore = defineStore('station', () => {
 
   // --- 状态 (State) ---
   const isReady = ref(false)
-  const plannedModules = ref<SavedModule[]>([])
+  const plannedModules = ref<SavedModule[]>([]) // Tier 1: 用户规划的核心模块
   const lockedWares = ref<string[]>([]) // 提升至外层，与 plannedModules 并列
   const savedLayouts = ref<SavedLayoutsState>({ version: 1, activeId: null, list: [] })
   const searchQuery = ref('')
@@ -63,6 +63,7 @@ export const useStationStore = defineStore('station', () => {
     workforcePercent: 100,  
     workforceAuto: true,    
     considerWorkforceForAutoFill: false,
+    supplyWorkforceBonus: false,
     buyMultiplier: 0.5,      
     sellMultiplier: 0.5,     
     minersEnabled: false,    
@@ -195,6 +196,19 @@ export const useStationStore = defineStore('station', () => {
     if (index !== -1) removeModule(index)
   }
 
+  // 从自动工业区转移模块到用户规划区
+  function transferModuleFromAutoIndustry(module: SavedModule) {
+    // 检查是否在自动工业区中
+    const autoModuleIndex = autoIndustryModules.value.findIndex(m => m.id === module.id)
+    if (autoModuleIndex === -1) return
+    
+    // 添加到用户规划区
+    addModule(module.id, module.count)
+    
+    // 注意：由于autoIndustryModules是计算属性，不能直接修改
+    // 转移操作会触发重新计算，自动工业区会相应减少
+  }
+
   function clearAll() { 
     plannedModules.value = []
     lockedWares.value = []
@@ -213,9 +227,14 @@ export const useStationStore = defineStore('station', () => {
     }
   }
 
-  function isWareLocked(wareId: string) {
+  function isWareOperable(wareId: string) {
     const ware = waresMap.value[wareId];
-    if(ware?.transport !== 'container') return true;
+    return ware?.transport === 'container';
+  }
+
+  function isWareLocked(wareId: string) {
+    // 不可操作的资源项始终显示为锁定状态
+    if (!isWareOperable(wareId)) return true;
     return lockedWares.value.includes(wareId)
   }
 
@@ -265,7 +284,7 @@ export const useStationStore = defineStore('station', () => {
   })
 
   const workforceBreakdown = computed(() => 
-    calculateWorkforceBreakdown(plannedModules.value, modulesMap.value, settings.value)
+    calculateWorkforceBreakdown(allIndustryModules.value, modulesMap.value, settings.value) // 使用完整的工业区模块计算劳动力需求
   )
 
   const actualWorkforce = computed(() => 
@@ -278,11 +297,11 @@ export const useStationStore = defineStore('station', () => {
   
   const profitBreakdown = computed(() => {
     return calculateProfitBreakdown(
-      plannedModules.value,
+      allIndustryModules.value, // 只计算工业区模块（planned + industry）的资源产出
       modulesMap.value,
       waresMap.value,
       settings.value,
-      actualWorkforce.value,
+      0, // 工业产出不计算工人消耗
       efficiencyMetrics.value.saturation
     )
   })
@@ -291,18 +310,50 @@ export const useStationStore = defineStore('station', () => {
     calculateNetProduction(profitBreakdown.value.wareDetails)
   )
 
-  function autoFillMissingLines() {
-    const suggestions = calculateModuleDiff(
+  // 2. The Engine (核心计算引擎)
+  // 这是一个 Computed，它监听 manualModules 变化，
+  // 并在内部一次性完成所有依赖计算，输出最终的两个自动列表。
+  const calculationResult = computed(() => {
+    
+    /// 调用刚才重构完成的函数 calculateAutoFill
+    const result = calculateAutoFill(
       plannedModules.value,
       "argon", // 或从设置中获取种族
       settings.value.considerWorkforceForAutoFill,
+      settings.value.supplyWorkforceBonus,
       modulesMap.value,
       waresMap.value,
-      lockedWares.value // 传入当前锁定列表
-    )
-    suggestions.forEach(suggestion => {
-      addModule(suggestion.id, suggestion.count)
-    })
+      lockedWares.value
+    );
+
+    return {
+      industry: result.autoIndustry,
+      supply: result.autoSupply
+    };
+  });
+
+  // 3. 暴露给 UI 的接口
+  // UI 只需要读这两个属性，它们会自动同步
+  const autoIndustryModules = computed(() => calculationResult.value.industry);
+  const autoSupplyModules = computed(() => calculationResult.value.supply);
+
+  // 工业区模块：planned + industry（用于资源产出计算）
+  const allIndustryModules = computed(() => [
+    ...plannedModules.value,
+    ...autoIndustryModules.value
+  ])
+
+  // 合并所有模块用于计算
+  const allModules = computed(() => [
+    ...plannedModules.value,
+    ...autoIndustryModules.value,
+    ...autoSupplyModules.value
+  ])
+
+  function autoFillMissingLines() {
+    // 此函数现在已过时，因为计算是自动的
+    // 保留函数签名以保持兼容性
+    console.log('autoFillMissingLines is now handled automatically via computed properties');
   }
 
   // --- 初始化 ---
@@ -336,11 +387,11 @@ export const useStationStore = defineStore('station', () => {
 
   return {
     isReady, isDirty,
-    plannedModules, settings, searchQuery, filteredModulesGrouped,
+    plannedModules, autoIndustryModules, autoSupplyModules, allModules, settings, searchQuery, filteredModulesGrouped,
     wares: waresMap, modules: localizedModulesMap, moduleGroups: localizedModuleGroupsMap,
     loadData, loadDemoData, savedLayouts, saveCurrentLayout, loadLayout, mergeLayout, deleteLayout,
-    lockedWares, isWareLocked, toggleWareLock,
-    addModule, importPlan, updateModuleId, updateModuleCount, removeModule, removeModuleById, clearAll, getModuleInfo,
+    lockedWares, isWareLocked, isWareOperable, toggleWareLock,
+    addModule, importPlan, updateModuleId, updateModuleCount, removeModule, removeModuleById, transferModuleFromAutoIndustry, clearAll, getModuleInfo,
     constructionBreakdown, workforceBreakdown, profitBreakdown, autoFillMissingLines,
     actualWorkforce, currentEfficiency: computed(() => efficiencyMetrics.value.saturation), netProduction
   }

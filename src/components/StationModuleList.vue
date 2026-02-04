@@ -5,9 +5,12 @@ import { useI18n } from 'vue-i18n'
 import StationModuleItem from './StationModuleItem.vue'
 import StationModuleSelector from './StationModuleSelector.vue'
 import X4NumberInput from './common/X4NumberInput.vue'
+import { ref } from 'vue'
 
 const {t} = useI18n()
 const store = useStationStore()
+const isSupplyOpen = ref(false) // 自动补给区折叠状态，默认折叠
+
 </script>
 
 <template>
@@ -23,46 +26,101 @@ const store = useStationStore()
       </div>
     </div>
 
-    <div class="module-list-scroll">
-      <draggable 
-        v-model="store.plannedModules" 
-        item-key="id" 
-        ghost-class="drag-ghost" 
-        filter=".ignore-drag"
-        :prevent-on-filter="false"
-        class="space-y-2"
-      >
-        <template #item="{ element, index }">
+    <!-- Tier 1: 用户规划区 -->
+    <div class="tier-section">
+      <div class="tier-header">
+        <span class="tier-label">{{ t('ui.tier_planned') }}</span>
+      </div>
+      <div class="module-list-scroll">
+        <draggable 
+          v-model="store.plannedModules" 
+          item-key="id" 
+          ghost-class="drag-ghost" 
+          filter=".ignore-drag"
+          :prevent-on-filter="false"
+          class="space-y-2"
+        >
+          <template #item="{ element, index }">
+            <StationModuleItem 
+              :item="element"
+              :info="store.getModuleInfo(element.id)!"
+              @update:count="(val) => store.updateModuleCount(index, val)"
+              @remove="store.removeModule(index)"
+            />
+          </template>
+        </draggable>
+      </div>
+    </div>
+
+    <!-- Tier 2: 自动工业区 -->
+    <div v-if="store.autoIndustryModules.length > 0" class="tier-section tier-auto">
+      <div class="tier-header">
+        <span class="tier-label">{{ t('ui.tier_industry') }}</span>
+      </div>
+      <div class="module-list-scroll">
+        <div class="space-y-2">
           <StationModuleItem 
+            v-for="(element, index) in store.autoIndustryModules"
+            :key="element.id + '-' + index"
             :item="element"
             :info="store.getModuleInfo(element.id)!"
-            @update:count="(val) => store.updateModuleCount(index, val)"
-            @remove="store.removeModule(index)"
+            :readonly="true"
+            @transfer="store.transferModuleFromAutoIndustry(element)"
           />
-        </template>
-      </draggable>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tier 3: 自动补给区 -->
+    <div v-if="store.autoSupplyModules.length > 0" class="tier-section tier-auto">
+      <div 
+        class="tier-header cursor-pointer" 
+        :class="{ 'is-active': isSupplyOpen }"
+        @click="isSupplyOpen = !isSupplyOpen"
+      >
+        <span class="arrow mr-1" :class="{ 'arrow-open': isSupplyOpen }">▶</span>
+        <span class="tier-label">{{ t('ui.tier_supply') }}</span>
+      </div>
+      <Transition name="expand">
+        <div v-if="isSupplyOpen" class="module-list-scroll">
+          <div class="space-y-2">
+            <StationModuleItem 
+              v-for="(element, index) in store.autoSupplyModules"
+              :key="element.id + '-' + index"
+              :item="element"
+              :info="store.getModuleInfo(element.id)!"
+              :readonly="true"
+            />
+          </div>
+        </div>
+      </Transition>
     </div>
 
     <div class="module-controls-panel space-y-3">
       <StationModuleSelector />
 
       <div class="auto-fill-section items-start px-1">
-        <button class="action-fill-capsule" @click="store.autoFillMissingLines">
-          <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 mr-1.5 fill-current">
-            <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
-          </svg>
-          <span>{{ t('ui.auto_fill_deficit') }}</span>
-        </button>
-        
-        <label for="wf-fill-check" class="wf-config-note">
-          <input 
-            type="checkbox" 
-            id="wf-fill-check" 
-            v-model="store.settings.considerWorkforceForAutoFill" 
-            class="x4-checkbox-mini" 
-          />
-          <span>{{ t('ui.consider_workforce_bonus') }}</span>
-        </label>
+        <div class="wf-config-group">
+          <label for="wf-fill-check" class="wf-config-note">
+            <input 
+              type="checkbox" 
+              id="wf-fill-check" 
+              v-model="store.settings.considerWorkforceForAutoFill" 
+              class="x4-checkbox-mini" 
+            />
+            <span>{{ t('ui.consider_workforce_bonus') }}</span>
+          </label>
+          
+          <label for="supply-wf-check" class="wf-config-note">
+            <input 
+              type="checkbox" 
+              id="supply-wf-check" 
+              v-model="store.settings.supplyWorkforceBonus" 
+              class="x4-checkbox-mini" 
+            />
+            <span>{{ t('ui.supply_workforce_bonus') }}</span>
+          </label>
+        </div>
       </div>
     </div>
   </div>
@@ -86,12 +144,6 @@ const store = useStationStore()
   @apply flex flex-col gap-1.5;
 }
 
-.action-fill-capsule {
-  @apply flex items-center px-4 h-7 rounded bg-sky-600 text-white transition-all hover:bg-sky-500 active:scale-95 shadow-lg shadow-sky-900/20;
-  @apply text-[10px] font-bold tracking-tight;
-  width: fit-content;
-}
-
 .wf-config-note {
   @apply flex items-center gap-1.5 text-[8px] text-slate-600 uppercase font-bold tracking-tighter cursor-pointer hover:text-slate-500 transition-colors select-none;
 }
@@ -102,4 +154,52 @@ const store = useStationStore()
 
 .scrollbar-thin::-webkit-scrollbar { @apply w-1; }
 .scrollbar-thin::-webkit-scrollbar-thumb { @apply bg-slate-700 rounded-full; }
+
+.tier-section {
+  @apply space-y-2;
+}
+
+.tier-section.tier-auto {
+  @apply opacity-90;
+}
+
+.tier-section.tier-auto .module-list-scroll {
+  @apply border-l-2 border-dashed border-slate-600 pl-2;
+}
+
+.tier-header {
+  @apply flex items-center gap-2 px-3 py-1.5 bg-slate-800/40 rounded cursor-pointer hover:bg-slate-700/50 transition-colors border border-transparent;
+}
+
+.tier-header.is-active {
+  @apply border-slate-600/50 bg-slate-700/40;
+}
+
+.tier-label {
+  @apply text-xs font-semibold text-slate-400 uppercase tracking-wider;
+}
+
+.wf-config-group {
+  @apply flex flex-col gap-1;
+}
+
+/* 折叠箭头样式 */
+.arrow {
+  @apply text-[10px] text-slate-500 transition-transform duration-200;
+}
+
+.arrow-open {
+  @apply rotate-90 text-slate-300;
+}
+
+/* 折叠动画 */
+.expand-enter-active, .expand-leave-active { 
+  transition: all 0.2s ease-out; 
+  max-height: 500px; 
+}
+
+.expand-enter-from, .expand-leave-to { 
+  opacity: 0; 
+  max-height: 0; 
+}
 </style>

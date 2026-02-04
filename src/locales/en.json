@@ -48,6 +48,10 @@
     "import": "Import",
     "load_demo_data": "Load Demo Data",
     "dialog_title_save_as": "Save Layout As",
+    "remove": "Remove",
+    "transfer_to_planning": "Click to transfer to planning area",
+    "non_operable_resource": "This resource is not operable",
+    "lock_quantity_hint": "Lock quantity (do not auto-fill production modules)",
     "dialog_title_save_new_plan": "Save New Layout?",
     "dialog_title_save_changes": "Save Changes?",
     "dialog_msg_save_changes_to": "Do you want to save changes to\n{name}\n before creating a new plan?",
@@ -71,7 +75,11 @@
     "import_placeholder_suffix": "OR https://x4-game.com/#/station-calculator?l=...",
     "import_failed": "Import failed. Please check the format.",
     "action_import": "Import",
-    "action_cancel": "Cancel"
+    "action_cancel": "Cancel",
+    "tier_planned": "Planned Modules",
+    "tier_industry": "Auto Industry",
+    "tier_supply": "Auto Supply",
+    "supply_workforce_bonus": "Consider Workforce Bonus for Supply"
   },
   "profit": {
     "title": "ECONOMIC ANALYSIS",
