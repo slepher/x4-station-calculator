@@ -10,6 +10,7 @@ import { ref, watch, nextTick } from 'vue'
 const {t} = useI18n()
 const store = useStationStore()
 const isSupplyOpen = ref(false) // 自动补给区折叠状态，默认折叠
+const flashTime = 300;0; // 闪烁动画时长（毫秒）
 
 // 跟踪需要高亮的模块，支持多个同时动画
 const highlightedModuleIds = ref<Set<string>>(new Set())
@@ -26,7 +27,7 @@ const triggerHighlight = (id: string) => {
   highlightedModuleIds.value.add(id)
   setTimeout(() => {
     highlightedModuleIds.value.delete(id)
-  }, 300)
+  }, flashTime)
 }
 
 const triggerNumberFlash = async (id: string) => {
@@ -42,7 +43,7 @@ const triggerNumberFlash = async (id: string) => {
     // 4. 动画结束后清理
     setTimeout(() => {
       flashingNumberModuleIds.value.delete(id)
-    }, 300)
+    }, flashTime)
   }, 10)
 }
 
@@ -81,26 +82,6 @@ watch(() => store.plannedModules.length, (newLength, oldLength) => {
     })
   }
 })
-
-// 监听模块数量变化，检测更新的模块
-watch(() => store.plannedModules.map(m => m.count), (newCounts, oldCounts) => {
-  // 检测数量发生变化的模块
-  newCounts.forEach((count, index) => {
-    if (index < oldCounts.length && count !== oldCounts[index]) {
-      const module = store.plannedModules[index]
-      if (module) {
-        // 添加模块到数字闪烁集合
-        flashingNumberModuleIds.value.add(module.id)
-        
-        // 0.3秒后从闪烁集合中移除该模块
-        setTimeout(() => {
-          flashingNumberModuleIds.value.delete(module.id)
-        }, 300)
-      }
-    }
-  })
-}, { deep: true })
-
 </script>
 
 <template>
