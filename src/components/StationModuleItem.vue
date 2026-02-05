@@ -14,6 +14,7 @@ const props = defineProps<{
   info: X4Module
   readonly?: boolean
   noClick?: boolean
+  isNumberFlashing?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -44,7 +45,7 @@ const moduleInfoClass = computed(() => {
     </div>
     
     <div class="controls" v-if="!readonly">
-      <div class="ignore-drag">
+      <div class="ignore-drag input-wrapper" :class="{ 'input-wrapper--flashing': isNumberFlashing }">
         <X4NumberInput 
           :modelValue="item.count"
           @update:modelValue="emit('update:count', $event)"
@@ -62,11 +63,15 @@ const moduleInfoClass = computed(() => {
       <div v-if="!props.noClick" class="count-display ignore-drag" @click="emit('transfer', item)">
         <span 
           class="count-text count-text--clickable"
+          :class="{ 'count-text--flashing': isNumberFlashing }"
           :title="t('ui.transfer_to_planning')"
         >{{ item.count }}</span>
       </div>
       <div v-else class="count-display">
-        <span class="count-text count-text--static">{{ item.count }}</span>
+        <span 
+          class="count-text count-text--static"
+          :class="{ 'count-text--flashing': isNumberFlashing }"
+        >{{ item.count }}</span>
       </div>
     </div>
   </div>
@@ -75,6 +80,26 @@ const moduleInfoClass = computed(() => {
 <style scoped>
 .module-row {
   @apply flex items-center bg-slate-800/80 border border-slate-700 p-1 rounded hover:border-sky-500/50 transition-all h-9;
+}
+
+.module-row--highlight {
+  @apply border-sky-500/50;
+  animation: highlight-animation 0.3s ease-in-out;
+}
+
+@keyframes highlight-animation {
+  0% {
+    border-color: rgb(14 165 233 / 0.5);
+    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.3);
+  }
+  50% {
+    border-color: rgb(14 165 233 / 0.7);
+    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.2);
+  }
+  100% {
+    border-color: rgb(14 165 233 / 0.5);
+    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0);
+  }
 }
 
 .module-row--draggable {
@@ -135,5 +160,36 @@ const moduleInfoClass = computed(() => {
 
 .count-text--static {
   @apply text-slate-500;
+}
+
+.count-text--flashing {
+  animation: number-flash 0.3s ease-in-out;
+}
+
+/* 新增：输入框容器的闪烁样式 */
+.input-wrapper {
+  @apply rounded transition-colors;
+}
+
+.input-wrapper--flashing {
+  animation: number-flash 0.3s ease-in-out;
+}
+
+@keyframes number-flash {
+  0% {
+    background-color: rgba(14, 165, 233, 0.1);
+    color: rgb(14, 165, 233);
+    transform: scale(1);
+  }
+  50% {
+    background-color: rgba(14, 165, 233, 0.3);
+    color: rgb(56, 189, 248);
+    transform: scale(1.05);
+  }
+  100% {
+    background-color: rgba(14, 165, 233, 0.1);
+    color: rgb(14, 165, 233);
+    transform: scale(1);
+  }
 }
 </style>

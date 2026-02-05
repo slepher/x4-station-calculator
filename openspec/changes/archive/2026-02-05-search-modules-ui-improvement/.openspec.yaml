@@ -1,0 +1,27 @@
+name: search-modules-ui-improvement
+schema: spec-driven
+created: 2026-02-05T00:00:00Z
+modified: 2026-02-05T00:00:00Z
+status: archived
+artifacts:
+  proposal:
+    status: completed
+    dependsOn: []
+  specs:
+    status: completed
+    dependsOn:
+      - proposal
+  design:
+    status: completed
+    dependsOn:
+      - specs
+  tasks:
+    status: completed
+    dependsOn:
+      - design
+deltas:
+  - capability: search-ui
+    file: specs/search-ui/spec.md
+    added: 3
+    modified: 2
+    removed: 0

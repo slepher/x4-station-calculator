@@ -24,7 +24,7 @@ def setup_customizer(m_config):
     if customizer_path not in sys.path:
         sys.path.append(customizer_path)
     try:
-        from Framework import File_Manager
+        from Framework import File_Manager # type: ignore
         return File_Manager.XML_Diff
     except ImportError:
         raise ImportError("❌ 错误: 无法加载 Customizer 框架逻辑。")

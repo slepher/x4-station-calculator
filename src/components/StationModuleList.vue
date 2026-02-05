@@ -5,11 +5,101 @@ import { useI18n } from 'vue-i18n'
 import StationModuleItem from './StationModuleItem.vue'
 import StationModuleSelector from './StationModuleSelector.vue'
 import X4NumberInput from './common/X4NumberInput.vue'
-import { ref } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 
 const {t} = useI18n()
 const store = useStationStore()
 const isSupplyOpen = ref(false) // 自动补给区折叠状态，默认折叠
+
+// 跟踪需要高亮的模块，支持多个同时动画
+const highlightedModuleIds = ref<Set<string>>(new Set())
+
+// 跟踪需要数字闪烁的模块，支持多个同时动画
+const flashingNumberModuleIds = ref<Set<string>>(new Set())
+
+// 记录上一帧的模块数量状态，用于精准对比 { [id: string]: number }
+const lastModuleCounts = ref<Record<string, number>>({})
+
+// --- 动画控制函数 ---
+
+const triggerHighlight = (id: string) => {
+  highlightedModuleIds.value.add(id)
+  setTimeout(() => {
+    highlightedModuleIds.value.delete(id)
+  }, 300)
+}
+
+const triggerNumberFlash = async (id: string) => {
+  // 1. 先移除类名，强制中断当前动画
+  flashingNumberModuleIds.value.delete(id)
+  
+  // 2. 等待 Vue 更新 DOM (关键：这确保了浏览器感知到类名被移除)
+  await nextTick()
+  
+  // 3. 重新添加类名，触发新的一轮动画
+  setTimeout(() => {
+    flashingNumberModuleIds.value.add(id)
+    // 4. 动画结束后清理
+    setTimeout(() => {
+      flashingNumberModuleIds.value.delete(id)
+    }, 300)
+  }, 10)
+}
+
+// --- 智能监听 ---
+
+// 监听模块列表的深度变化，通过 ID 对比来精准触发闪烁
+// 解决"删除模块导致后续模块错误闪烁"的问题
+watch(() => store.plannedModules, (newVal) => {
+  const currentCounts: Record<string, number> = {}
+
+  newVal.forEach(m => {
+    currentCounts[m.id] = m.count
+    const prevCount = lastModuleCounts.value[m.id]
+
+    // 只有当 ID 存在且数量不一致时才触发 (避免了删除导致的索引错位)
+    if (prevCount !== undefined && prevCount !== m.count) {
+      triggerNumberFlash(m.id)
+    }
+  })
+
+  // 更新历史状态
+  lastModuleCounts.value = currentCounts
+}, { deep: true, immediate: true })
+
+// 监听模块列表变化，检测新添加的模块
+watch(() => store.plannedModules.length, (newLength, oldLength) => {
+  if (newLength > oldLength) {
+    // 检测所有新添加的模块
+    const newModules = store.plannedModules.slice(oldLength)
+    
+    newModules.forEach(module => {
+      if (module) {
+        // 添加模块到高亮集合（整体边框动画）
+        triggerHighlight(module.id)
+      }
+    })
+  }
+})
+
+// 监听模块数量变化，检测更新的模块
+watch(() => store.plannedModules.map(m => m.count), (newCounts, oldCounts) => {
+  // 检测数量发生变化的模块
+  newCounts.forEach((count, index) => {
+    if (index < oldCounts.length && count !== oldCounts[index]) {
+      const module = store.plannedModules[index]
+      if (module) {
+        // 添加模块到数字闪烁集合
+        flashingNumberModuleIds.value.add(module.id)
+        
+        // 0.3秒后从闪烁集合中移除该模块
+        setTimeout(() => {
+          flashingNumberModuleIds.value.delete(module.id)
+        }, 300)
+      }
+    }
+  })
+}, { deep: true })
 
 </script>
 
@@ -24,6 +114,11 @@ const isSupplyOpen = ref(false) // 自动补给区折叠状态，默认折叠
           <div class="x4-unit-suffix-box">%</div>
         </div>
       </div>
+    </div>
+
+    <!-- 搜索框移动到顶部 -->
+    <div class="search-panel">
+      <StationModuleSelector />
     </div>
 
     <!-- Tier 1: 用户规划区 -->
@@ -44,6 +139,8 @@ const isSupplyOpen = ref(false) // 自动补给区折叠状态，默认折叠
             <StationModuleItem 
               :item="element"
               :info="store.getModuleInfo(element.id)!"
+              :class="{ 'module-row--highlight': highlightedModuleIds.has(element.id) }"
+              :is-number-flashing="flashingNumberModuleIds.has(element.id)"
               @update:count="(val) => store.updateModuleCount(index, val)"
               @remove="store.removeModule(index)"
             />
@@ -98,8 +195,6 @@ const isSupplyOpen = ref(false) // 自动补给区折叠状态，默认折叠
     </div>
 
     <div class="module-controls-panel">
-      <StationModuleSelector />
-
       <div class="auto-fill-section">
         <div class="wf-config-group">
           <label for="wf-fill-check" class="wf-config-note">
@@ -150,6 +245,8 @@ const isSupplyOpen = ref(false) // 自动补给区折叠状态，默认折叠
 .supply-tier-header { @apply cursor-pointer; }
 
 .arrow { @apply mr-1; }
+
+.search-panel { @apply mb-4; }
 
 .module-controls-panel { @apply mt-4 pt-4 border-t border-slate-700 space-y-3; }
 
