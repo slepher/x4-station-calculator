@@ -12,6 +12,16 @@ const store = useStationStore()
 const isSupplyOpen = ref(false) // 自动补给区折叠状态，默认折叠
 const flashTime = 300; 0; // 闪烁动画时长（毫秒）
 
+// 规划区数量调整功能
+// 应用缩放比例
+const applyScale = (scale: number) => {
+  // 更新所有规划模块的数量
+  store.plannedModules.forEach((module, index) => {
+    const newCount = Math.ceil(module.count * scale)
+    store.updateModuleCount(index, newCount)
+  })
+}
+
 // 跟踪需要高亮的模块，支持多个同时动画
 const highlightedModuleIds = ref<Set<string>>(new Set())
 
@@ -106,6 +116,16 @@ watch(() => store.plannedModules.length, (newLength, oldLength) => {
     <div class="tier-section">
       <div class="tier-header">
         <span class="tier-label">{{ t('ui.tier_planned') }}</span>
+        <div class="scale-buttons">
+          <button 
+            v-for="scale in [0.2, 0.333, 0.5, 2, 3, 5]" 
+            :key="scale"
+            class="scale-button"
+            @click="applyScale(scale)"
+          >
+            {{ scale === 0.2 ? '1/5' : scale === 0.333 ? '1/3' : scale === 0.5 ? '1/2' : scale + 'x' }}
+          </button>
+        </div>
       </div>
       <div class="module-list-scroll">
         <draggable v-model="store.plannedModules" item-key="id" ghost-class="drag-ghost" filter=".ignore-drag"
@@ -267,6 +287,20 @@ auto-fill-section {
 
 .tier-section.tier-auto .module-list-scroll {
   @apply border-l-2 border-dashed border-slate-600 pl-2;
+}
+
+/* 规划区数量调整按钮样式 */
+.scale-buttons {
+  @apply flex gap-1 ml-auto;
+}
+
+.scale-button {
+  @apply px-1 h-[18px] rounded text-[8px] font-bold uppercase tracking-tighter transition-all duration-200;
+  @apply bg-slate-700 text-slate-400 border border-transparent flex items-center justify-center;
+}
+
+.scale-button:hover {
+  @apply bg-amber-600 text-amber-50 border-amber-500;
 }
 
 .tier-header {

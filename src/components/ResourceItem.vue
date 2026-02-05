@@ -128,11 +128,11 @@ const toggleLock = () => {
 }
 
 .dot-pos {
-  @apply bg-emerald-500 shadow-[0_0_8px_rgba(16, 185, 129, 0.5)];
+  @apply bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)];
 }
 
 .dot-neg {
-  @apply bg-red-500 shadow-[0_0_8px_rgba(239, 68, 68, 0.5)];
+  @apply bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)];
 }
 
 /* 核心修复：添加 flex 布局确保横向排列 */

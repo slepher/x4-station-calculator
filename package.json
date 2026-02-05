@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "playwright:install": "playwright install"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.18",
@@ -20,6 +24,7 @@
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.1",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^24.10.9",
     "@vitejs/plugin-vue": "^6.0.1",
