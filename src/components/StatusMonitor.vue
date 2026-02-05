@@ -1,17 +1,17 @@
 <template>
-  <div v-if="statusStore.messages.length > 0" 
-       class="fixed bottom-6 right-6 z-[9999] w-85 flex flex-col gap-3 pointer-events-none">
-    
+  <div v-if="statusStore.messages.length > 0"
+    class="fixed bottom-6 right-6 z-[9999] w-85 flex flex-col gap-3 pointer-events-none">
+
     <TransitionGroup name="status-list">
-      <div v-for="msg in statusStore.messages" :key="msg.id"
-           :class="[
-             'pointer-events-auto p-4 rounded-xl border-l-4 shadow-2xl backdrop-blur-md flex flex-col gap-2 transition-all duration-300',
-             typeStyles[msg.type]
-           ]">
-        
+      <div v-for="msg in statusStore.messages" :key="msg.id" :class="[
+        'pointer-events-auto p-4 rounded-xl border-l-4 shadow-2xl backdrop-blur-md flex flex-col gap-2 transition-all duration-300',
+        typeStyles[msg.type]
+      ]">
+
         <div class="flex justify-between items-center">
           <div class="flex items-center gap-2">
-            <span :class="['text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-black/20', categoryTextStyles[msg.type]]">
+            <span
+              :class="['text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-black/20', categoryTextStyles[msg.type]]">
               {{ msg.category }}
             </span>
             <span v-if="msg.type === 'error'" class="flex h-2 w-2">
@@ -19,8 +19,8 @@
               <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
             </span>
           </div>
-          <button @click="statusStore.removeMessage(msg.id)" 
-                  class="text-lg leading-none opacity-50 hover:opacity-100 transition-opacity">
+          <button @click="statusStore.removeMessage(msg.id)"
+            class="text-lg leading-none opacity-50 hover:opacity-100 transition-opacity">
             &times;
           </button>
         </div>
@@ -37,9 +37,8 @@
       </div>
     </TransitionGroup>
 
-    <button v-if="statusStore.messages.length > 3" 
-            @click="statusStore.clearAll"
-            class="pointer-events-auto self-end text-[10px] font-bold tracking-tighter bg-slate-800/80 text-slate-400 px-3 py-1.5 rounded-full hover:bg-slate-700 hover:text-white transition-all shadow-lg border border-slate-700">
+    <button v-if="statusStore.messages.length > 3" @click="statusStore.clearAll"
+      class="pointer-events-auto self-end text-[10px] font-bold tracking-tighter bg-slate-800/80 text-slate-400 px-3 py-1.5 rounded-full hover:bg-slate-700 hover:text-white transition-all shadow-lg border border-slate-700">
       CLEAR ALL NOTIFICATIONS
     </button>
   </div>
@@ -74,19 +73,19 @@ const formatTime = (ts: number) => {
 
 <style scoped>
 /* 列表过渡动画：新消息滑入，旧消息缩放消失 */
-.status-list-enter-active, 
-.status-list-leave-active { 
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+.status-list-enter-active,
+.status-list-leave-active {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.status-list-enter-from { 
-  opacity: 0; 
-  transform: translateX(50px) scale(0.9); 
+.status-list-enter-from {
+  opacity: 0;
+  transform: translateX(50px) scale(0.9);
 }
 
-.status-list-leave-to { 
-  opacity: 0; 
-  transform: scale(0.8) translateY(-20px); 
+.status-list-leave-to {
+  opacity: 0;
+  transform: scale(0.8) translateY(-20px);
 }
 
 /* 列表移动动画（其他元素平滑位移） */
@@ -98,6 +97,7 @@ const formatTime = (ts: number) => {
 ::-webkit-scrollbar {
   width: 3px;
 }
+
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;

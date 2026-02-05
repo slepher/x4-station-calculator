@@ -11,11 +11,11 @@ import StatusMonitor from './StatusMonitor.vue' // <--- 引入状态监控组件
 
 <template>
   <div class="w-full max-w-[1600px] mx-auto p-4 text-sm relative min-h-screen">
-    
+
     <StationToolbar />
 
     <div class="main-layout">
-      
+
       <div class="col-span-12 lg:col-span-3">
         <StationModuleList />
       </div>
@@ -25,9 +25,9 @@ import StatusMonitor from './StatusMonitor.vue' // <--- 引入状态监控组件
       </div>
 
       <div class="col-span-12 lg:col-span-4 space-y-4">
-         <StationWorkforce />
-         <StationProfit />
-         <StationConstruction />
+        <StationWorkforce />
+        <StationProfit />
+        <StationConstruction />
       </div>
     </div>
 
@@ -36,7 +36,6 @@ import StatusMonitor from './StatusMonitor.vue' // <--- 引入状态监控组件
 </template>
 
 <style scoped>
-
 .main-layout {
   @apply grid grid-cols-12 gap-8 items-start;
 }

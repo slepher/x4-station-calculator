@@ -115,24 +115,22 @@ const saturationPercent = computed({
           <div class="control-header">
             <div class="flex items-center gap-2">
               <span class="text-[10px] text-slate-500 font-bold uppercase">{{ t('ui.actual_workforce') }}</span>
-              
-              <X4NumberInput 
-                v-if="!store.settings.workforceAuto"
-                v-model="store.settings.manualWorkforce"
-                :max="data.capacity.total"
-                width-class="w-24"
-              />
+
+              <X4NumberInput v-if="!store.settings.workforceAuto" v-model="store.settings.manualWorkforce"
+                :max="data.capacity.total" width-class="w-24" />
               <span v-else class="val-text-display">
                 {{ store.actualWorkforce }}
               </span>
             </div>
-            <span class="percent-display">{{ Math.round((store.actualWorkforce / (data.capacity.total || 1)) * 100) }}%</span>
+            <span class="percent-display">{{ Math.round((store.actualWorkforce / (data.capacity.total || 1)) * 100)
+              }}%</span>
           </div>
 
           <div class="slider-container">
-            <input type="range" v-model.number="saturationPercent" min="0" max="100" :disabled="store.settings.workforceAuto" class="range-slider">
+            <input type="range" v-model.number="saturationPercent" min="0" max="100"
+              :disabled="store.settings.workforceAuto" class="range-slider">
             <div class="slider-track-bg">
-               <div class="slider-fill" :style="{ width: `${saturationPercent}%` }"></div>
+              <div class="slider-fill" :style="{ width: `${saturationPercent}%` }"></div>
             </div>
           </div>
 
@@ -142,7 +140,8 @@ const saturationPercent = computed({
               <div class="cb" :class="{ 'cb-active': store.settings.workforceAuto }">
                 <div v-if="store.settings.workforceAuto" class="cb-inner"></div>
               </div>
-              <span class="text-[11px] font-bold italic uppercase" :class="store.settings.workforceAuto ? 'text-sky-400' : 'text-slate-500'">
+              <span class="text-[11px] font-bold italic uppercase"
+                :class="store.settings.workforceAuto ? 'text-sky-400' : 'text-slate-500'">
                 {{ t('ui.auto_calc') }} ({{ t('ui.limit') }}: {{ formatNum(maxAllowedWorkforce) }})
               </span>
             </label>
@@ -158,56 +157,170 @@ const saturationPercent = computed({
 </template>
 
 <style scoped>
-.panel-container { @apply bg-slate-800 rounded border border-slate-700 overflow-hidden text-sm shadow-xl; }
-.panel-header { @apply flex justify-between items-center p-3 bg-slate-900 border-b border-slate-700; }
-.header-title { @apply font-bold text-slate-200 uppercase tracking-widest text-xs; }
-
-.status-badge { @apply px-2 py-0.5 rounded font-mono text-[10px] font-bold border border-current; }
-.status-surplus { @apply bg-emerald-500/20 text-emerald-400; }
-.status-shortage { @apply bg-red-500/20 text-red-400; }
-
-.section-header { @apply flex justify-between px-3 py-2 bg-slate-800/50 hover:bg-slate-700 cursor-pointer border-b border-slate-700/50 select-none transition-colors; }
-.section-label { @apply flex items-center gap-2 font-bold text-[10px] uppercase tracking-tighter; }
-.arrow { @apply text-[8px] text-slate-500 mr-1 transition-transform duration-200; }
-.arrow-open { @apply rotate-90; }
-.total-val { @apply font-mono font-bold; }
-
-.list-box { @apply bg-slate-950/30 border-b border-slate-700/50; }
-.list-item { @apply flex justify-between items-center px-4 py-1.5 text-[11px] hover:bg-slate-800/50 transition-colors border-b border-slate-800/30 last:border-0; }
-
-.item-name { @apply flex items-center gap-1; }
-.item-name .qty { @apply font-mono; }
-.item-name .symbol { @apply opacity-30 scale-90 text-slate-500; }
-.item-val { @apply font-mono font-medium; }
-
-.section-needed .section-label, .section-needed .total-val { @apply text-red-400; }
-.section-needed .arrow-open { @apply text-red-400; }
-.section-needed .list-item .item-name { @apply text-red-400/70; }
-.section-needed .list-item .qty { @apply text-red-400/80; }
-.section-needed .list-item .item-val { @apply text-red-500; }
-
-.section-capacity .section-label, .section-capacity .total-val { @apply text-emerald-400; }
-.section-capacity .arrow-open { @apply text-emerald-400; }
-.section-capacity .list-item .item-name { @apply text-emerald-400/70; }
-.section-capacity .list-item .qty { @apply text-emerald-400/80; }
-.section-capacity .list-item .item-val { @apply text-emerald-500; }
-
-/* 文本展示样式：与 X4NumberInput 视觉对齐 */
-.val-text-display { 
-  @apply text-sm font-mono font-bold text-sky-400/90 h-6 flex items-center px-1.5; 
+.panel-container {
+  @apply bg-slate-800 rounded border border-slate-700 overflow-hidden text-sm shadow-xl;
 }
 
-.footer { @apply p-4 border-t border-slate-700 bg-slate-800; }
-.workforce-control-panel { @apply bg-slate-900/50 p-3 rounded border border-slate-700/50; }
-.control-header { @apply flex justify-between items-center mb-2; }
-.percent-display { @apply text-sm font-mono text-slate-500 font-bold; }
-.slider-container { @apply relative w-full h-6 flex items-center; }
-.range-slider { @apply absolute z-10 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed; }
-.slider-track-bg { @apply w-full h-2 bg-slate-800 rounded-full border border-slate-700 overflow-hidden; }
-.slider-fill { @apply h-full bg-slate-500 transition-all duration-200; }
-.auto-toggle { @apply flex items-center gap-2 cursor-pointer select-none; }
-.cb { @apply w-4 h-4 rounded bg-slate-950 border border-slate-700 flex items-center justify-center transition-all; }
-.cb-active { @apply border-sky-500/50 bg-sky-500/10; }
-.cb-inner { @apply w-2 h-2 bg-sky-500 rounded-sm; }
-.cb-sm { @apply w-3 h-3 rounded bg-slate-900 border-slate-700 accent-sky-500; }
+.panel-header {
+  @apply flex justify-between items-center p-3 bg-slate-900 border-b border-slate-700;
+}
+
+.header-title {
+  @apply font-bold text-slate-200 uppercase tracking-widest text-xs;
+}
+
+.status-badge {
+  @apply px-2 py-0.5 rounded font-mono text-[10px] font-bold border border-current;
+}
+
+.status-surplus {
+  @apply bg-emerald-500/20 text-emerald-400;
+}
+
+.status-shortage {
+  @apply bg-red-500/20 text-red-400;
+}
+
+.section-header {
+  @apply flex justify-between px-3 py-2 bg-slate-800/50 hover:bg-slate-700 cursor-pointer border-b border-slate-700/50 select-none transition-colors;
+}
+
+.section-label {
+  @apply flex items-center gap-2 font-bold text-[10px] uppercase tracking-tighter;
+}
+
+.arrow {
+  @apply text-[8px] text-slate-500 mr-1 transition-transform duration-200;
+}
+
+.arrow-open {
+  @apply rotate-90;
+}
+
+.total-val {
+  @apply font-mono font-bold;
+}
+
+.list-box {
+  @apply bg-slate-950/30 border-b border-slate-700/50;
+}
+
+.list-item {
+  @apply flex justify-between items-center px-4 py-1.5 text-[11px] hover:bg-slate-800/50 transition-colors border-b border-slate-800/30 last:border-0;
+}
+
+.item-name {
+  @apply flex items-center gap-1;
+}
+
+.item-name .qty {
+  @apply font-mono;
+}
+
+.item-name .symbol {
+  @apply opacity-30 scale-90 text-slate-500;
+}
+
+.item-val {
+  @apply font-mono font-medium;
+}
+
+.section-needed .section-label,
+.section-needed .total-val {
+  @apply text-red-400;
+}
+
+.section-needed .arrow-open {
+  @apply text-red-400;
+}
+
+.section-needed .list-item .item-name {
+  @apply text-red-400/70;
+}
+
+.section-needed .list-item .qty {
+  @apply text-red-400/80;
+}
+
+.section-needed .list-item .item-val {
+  @apply text-red-500;
+}
+
+.section-capacity .section-label,
+.section-capacity .total-val {
+  @apply text-emerald-400;
+}
+
+.section-capacity .arrow-open {
+  @apply text-emerald-400;
+}
+
+.section-capacity .list-item .item-name {
+  @apply text-emerald-400/70;
+}
+
+.section-capacity .list-item .qty {
+  @apply text-emerald-400/80;
+}
+
+.section-capacity .list-item .item-val {
+  @apply text-emerald-500;
+}
+
+/* 文本展示样式：与 X4NumberInput 视觉对齐 */
+.val-text-display {
+  @apply text-sm font-mono font-bold text-sky-400/90 h-6 flex items-center px-1.5;
+}
+
+.footer {
+  @apply p-4 border-t border-slate-700 bg-slate-800;
+}
+
+.workforce-control-panel {
+  @apply bg-slate-900/50 p-3 rounded border border-slate-700/50;
+}
+
+.control-header {
+  @apply flex justify-between items-center mb-2;
+}
+
+.percent-display {
+  @apply text-sm font-mono text-slate-500 font-bold;
+}
+
+.slider-container {
+  @apply relative w-full h-6 flex items-center;
+}
+
+.range-slider {
+  @apply absolute z-10 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed;
+}
+
+.slider-track-bg {
+  @apply w-full h-2 bg-slate-800 rounded-full border border-slate-700 overflow-hidden;
+}
+
+.slider-fill {
+  @apply h-full bg-slate-500 transition-all duration-200;
+}
+
+.auto-toggle {
+  @apply flex items-center gap-2 cursor-pointer select-none;
+}
+
+.cb {
+  @apply w-4 h-4 rounded bg-slate-950 border border-slate-700 flex items-center justify-center transition-all;
+}
+
+.cb-active {
+  @apply border-sky-500/50 bg-sky-500/10;
+}
+
+.cb-inner {
+  @apply w-2 h-2 bg-sky-500 rounded-sm;
+}
+
+.cb-sm {
+  @apply w-3 h-3 rounded bg-slate-900 border-slate-700 accent-sky-500;
+}
 </style>

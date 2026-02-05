@@ -7,10 +7,10 @@ import StationModuleSelector from './StationModuleSelector.vue'
 import X4NumberInput from './common/X4NumberInput.vue'
 import { ref, watch, nextTick } from 'vue'
 
-const {t} = useI18n()
+const { t } = useI18n()
 const store = useStationStore()
 const isSupplyOpen = ref(false) // 自动补给区折叠状态，默认折叠
-const flashTime = 300;0; // 闪烁动画时长（毫秒）
+const flashTime = 300; 0; // 闪烁动画时长（毫秒）
 
 // 跟踪需要高亮的模块，支持多个同时动画
 const highlightedModuleIds = ref<Set<string>>(new Set())
@@ -33,10 +33,10 @@ const triggerHighlight = (id: string) => {
 const triggerNumberFlash = async (id: string) => {
   // 1. 先移除类名，强制中断当前动画
   flashingNumberModuleIds.value.delete(id)
-  
+
   // 2. 等待 Vue 更新 DOM (关键：这确保了浏览器感知到类名被移除)
   await nextTick()
-  
+
   // 3. 重新添加类名，触发新的一轮动画
   setTimeout(() => {
     flashingNumberModuleIds.value.add(id)
@@ -73,7 +73,7 @@ watch(() => store.plannedModules.length, (newLength, oldLength) => {
   if (newLength > oldLength) {
     // 检测所有新添加的模块
     const newModules = store.plannedModules.slice(oldLength)
-    
+
     newModules.forEach(module => {
       if (module) {
         // 添加模块到高亮集合（整体边框动画）
@@ -108,23 +108,13 @@ watch(() => store.plannedModules.length, (newLength, oldLength) => {
         <span class="tier-label">{{ t('ui.tier_planned') }}</span>
       </div>
       <div class="module-list-scroll">
-        <draggable 
-          v-model="store.plannedModules" 
-          item-key="id" 
-          ghost-class="drag-ghost" 
-          filter=".ignore-drag"
-          :prevent-on-filter="false"
-          class="draggable-container"
-        >
+        <draggable v-model="store.plannedModules" item-key="id" ghost-class="drag-ghost" filter=".ignore-drag"
+          :prevent-on-filter="false" class="draggable-container">
           <template #item="{ element, index }">
-            <StationModuleItem 
-              :item="element"
-              :info="store.getModuleInfo(element.id)!"
+            <StationModuleItem :item="element" :info="store.getModuleInfo(element.id)!"
               :class="{ 'module-row--highlight': highlightedModuleIds.has(element.id) }"
               :is-number-flashing="flashingNumberModuleIds.has(element.id)"
-              @update:count="(val) => store.updateModuleCount(index, val)"
-              @remove="store.removeModule(index)"
-            />
+              @update:count="(val) => store.updateModuleCount(index, val)" @remove="store.removeModule(index)" />
           </template>
         </draggable>
       </div>
@@ -137,39 +127,25 @@ watch(() => store.plannedModules.length, (newLength, oldLength) => {
       </div>
       <div class="module-list-scroll">
         <div class="auto-modules-container">
-          <StationModuleItem 
-            v-for="(element, index) in store.autoIndustryModules"
-            :key="element.id + '-' + index"
-            :item="element"
-            :info="store.getModuleInfo(element.id)!"
-            :readonly="true"
-            @transfer="store.transferModuleFromAutoIndustry(element)"
-          />
+          <StationModuleItem v-for="(element, index) in store.autoIndustryModules" :key="element.id + '-' + index"
+            :item="element" :info="store.getModuleInfo(element.id)!" :readonly="true"
+            @transfer="store.transferModuleFromAutoIndustry(element)" />
         </div>
       </div>
     </div>
 
     <!-- Tier 3: 自动补给区 -->
     <div v-if="store.autoSupplyModules.length > 0" class="tier-section tier-auto">
-      <div 
-        class="tier-header supply-tier-header" 
-        :class="{ 'is-active': isSupplyOpen }"
-        @click="isSupplyOpen = !isSupplyOpen"
-      >
+      <div class="tier-header supply-tier-header" :class="{ 'is-active': isSupplyOpen }"
+        @click="isSupplyOpen = !isSupplyOpen">
         <span class="arrow" :class="{ 'arrow-open': isSupplyOpen }">▶</span>
         <span class="tier-label">{{ t('ui.tier_supply') }}</span>
       </div>
       <Transition name="expand">
         <div v-if="isSupplyOpen" class="module-list-scroll">
           <div class="auto-modules-container">
-            <StationModuleItem 
-              v-for="(element, index) in store.autoSupplyModules"
-              :key="element.id + '-' + index"
-              :item="element"
-              :info="store.getModuleInfo(element.id)!"
-              :readonly="true"
-              :no-click="true"
-            />
+            <StationModuleItem v-for="(element, index) in store.autoSupplyModules" :key="element.id + '-' + index"
+              :item="element" :info="store.getModuleInfo(element.id)!" :readonly="true" :no-click="true" />
           </div>
         </div>
       </Transition>
@@ -179,22 +155,14 @@ watch(() => store.plannedModules.length, (newLength, oldLength) => {
       <div class="auto-fill-section">
         <div class="wf-config-group">
           <label for="wf-fill-check" class="wf-config-note">
-            <input 
-              type="checkbox" 
-              id="wf-fill-check" 
-              v-model="store.settings.considerWorkforceForAutoFill" 
-              class="x4-checkbox-mini" 
-            />
+            <input type="checkbox" id="wf-fill-check" v-model="store.settings.considerWorkforceForAutoFill"
+              class="x4-checkbox-mini" />
             <span>{{ t('ui.consider_workforce_bonus') }}</span>
           </label>
-          
+
           <label for="supply-wf-check" class="wf-config-note">
-            <input 
-              type="checkbox" 
-              id="supply-wf-check" 
-              v-model="store.settings.supplyWorkforceBonus" 
-              class="x4-checkbox-mini" 
-            />
+            <input type="checkbox" id="supply-wf-check" v-model="store.settings.supplyWorkforceBonus"
+              class="x4-checkbox-mini" />
             <span>{{ t('ui.supply_workforce_bonus') }}</span>
           </label>
         </div>
@@ -204,32 +172,70 @@ watch(() => store.plannedModules.length, (newLength, oldLength) => {
 </template>
 
 <style scoped>
-.header-row { @apply flex justify-between items-center mb-2 border-b border-slate-700 pb-2 h-9; }
-.header-title { @apply text-lg font-semibold text-slate-200 uppercase tracking-tight; }
-.header-label { @apply text-slate-500 text-[10px] uppercase font-bold tracking-widest leading-none; }
+.header-row {
+  @apply flex justify-between items-center mb-2 border-b border-slate-700 pb-2 h-9;
+}
 
-.x4-composite-input-wrapper { @apply flex items-center h-6 overflow-hidden rounded border border-slate-700 bg-slate-950/60 transition-colors duration-200; }
-:deep(.x4-nested-input .x4-input-container) { @apply border-none bg-transparent rounded-none h-full; }
-.x4-unit-suffix-box { @apply flex items-center justify-center px-1.5 h-full text-[10px] font-bold text-slate-500 border-l border-slate-700/50 bg-slate-900/40; min-width: 20px; }
+.header-title {
+  @apply text-lg font-semibold text-slate-200 uppercase tracking-tight;
+}
 
-.module-list-scroll { @apply overflow-y-auto pr-1 scrollbar-thin; }
-.drag-ghost { @apply opacity-30 bg-slate-700 border-sky-500 border-dashed border-2; }
+.header-label {
+  @apply text-slate-500 text-[10px] uppercase font-bold tracking-widest leading-none;
+}
 
-.module-list-container { @apply space-y-2; }
+.x4-composite-input-wrapper {
+  @apply flex items-center h-6 overflow-hidden rounded border border-slate-700 bg-slate-950/60 transition-colors duration-200;
+}
 
-.sunlight-control { @apply flex items-center gap-2; }
+:deep(.x4-nested-input .x4-input-container) {
+  @apply border-none bg-transparent rounded-none h-full;
+}
 
-.draggable-container { @apply space-y-2; }
+.x4-unit-suffix-box {
+  @apply flex items-center justify-center px-1.5 h-full text-[10px] font-bold text-slate-500 border-l border-slate-700/50 bg-slate-900/40;
+  min-width: 20px;
+}
 
-.auto-modules-container { @apply space-y-2; }
+.module-list-scroll {
+  @apply overflow-y-auto pr-1 scrollbar-thin;
+}
 
-.supply-tier-header { @apply cursor-pointer; }
+.drag-ghost {
+  @apply opacity-30 bg-slate-700 border-sky-500 border-dashed border-2;
+}
 
-.arrow { @apply mr-1; }
+.module-list-container {
+  @apply space-y-2;
+}
 
-.search-panel { @apply mb-4; }
+.sunlight-control {
+  @apply flex items-center gap-2;
+}
 
-.module-controls-panel { @apply mt-4 pt-4 border-t border-slate-700 space-y-3; }
+.draggable-container {
+  @apply space-y-2;
+}
+
+.auto-modules-container {
+  @apply space-y-2;
+}
+
+.supply-tier-header {
+  @apply cursor-pointer;
+}
+
+.arrow {
+  @apply mr-1;
+}
+
+.search-panel {
+  @apply mb-4;
+}
+
+.module-controls-panel {
+  @apply mt-4 pt-4 border-t border-slate-700 space-y-3;
+}
 
 auto-fill-section {
   @apply flex flex-col gap-1.5 items-start px-1;
@@ -243,8 +249,13 @@ auto-fill-section {
   @apply w-2.5 h-2.5 rounded-sm border-slate-800 bg-slate-950 text-sky-600 focus:ring-0 cursor-pointer;
 }
 
-.scrollbar-thin::-webkit-scrollbar { @apply w-1; }
-.scrollbar-thin::-webkit-scrollbar-thumb { @apply bg-slate-700 rounded-full; }
+.scrollbar-thin::-webkit-scrollbar {
+  @apply w-1;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  @apply bg-slate-700 rounded-full;
+}
 
 .tier-section {
   @apply space-y-2;
@@ -284,13 +295,15 @@ auto-fill-section {
 }
 
 /* 折叠动画 */
-.expand-enter-active, .expand-leave-active { 
-  transition: all 0.2s ease-out; 
-  max-height: 500px; 
+.expand-enter-active,
+.expand-leave-active {
+  transition: all 0.2s ease-out;
+  max-height: 500px;
 }
 
-.expand-enter-from, .expand-leave-to { 
-  opacity: 0; 
-  max-height: 0; 
+.expand-enter-from,
+.expand-leave-to {
+  opacity: 0;
+  max-height: 0;
 }
 </style>

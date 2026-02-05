@@ -37,41 +37,28 @@ const moduleInfoClass = computed(() => {
   <div class="module-row group/row" :class="{ 'module-row--draggable': !readonly, 'module-row--readonly': readonly }">
     <div class="color-bar" :class="colorBarClass">
     </div>
-    
+
     <div class="module-info" :class="moduleInfoClass">
-       <div class="module-name" :title="info.name">
-         {{ translateModule(info) }}
-       </div>
+      <div class="module-name" :title="info.name">
+        {{ translateModule(info) }}
+      </div>
     </div>
-    
+
     <div class="controls" v-if="!readonly">
       <div class="ignore-drag input-wrapper" :class="{ 'input-wrapper--flashing': isNumberFlashing }">
-        <X4NumberInput 
-          :modelValue="item.count"
-          @update:modelValue="emit('update:count', $event)"
-          width-class="w-14"
-          :min="1"
-        />
+        <X4NumberInput :modelValue="item.count" @update:modelValue="emit('update:count', $event)" width-class="w-14"
+          :min="1" />
       </div>
-      <button 
-        @click="emit('remove')" 
-        class="remove-btn ignore-drag" 
-        :title="t('ui.remove')"
-      >×</button>
+      <button @click="emit('remove')" class="remove-btn ignore-drag" :title="t('ui.remove')">×</button>
     </div>
     <div class="controls" v-else>
       <div v-if="!props.noClick" class="count-display ignore-drag" @click="emit('transfer', item)">
-        <span 
-          class="count-text count-text--clickable"
-          :class="{ 'count-text--flashing': isNumberFlashing }"
-          :title="t('ui.transfer_to_planning')"
-        >{{ item.count }}</span>
+        <span class="count-text count-text--clickable" :class="{ 'count-text--flashing': isNumberFlashing }"
+          :title="t('ui.transfer_to_planning')">{{ item.count }}</span>
       </div>
       <div v-else class="count-display">
-        <span 
-          class="count-text count-text--static"
-          :class="{ 'count-text--flashing': isNumberFlashing }"
-        >{{ item.count }}</span>
+        <span class="count-text count-text--static" :class="{ 'count-text--flashing': isNumberFlashing }">{{ item.count
+          }}</span>
       </div>
     </div>
   </div>
@@ -92,10 +79,12 @@ const moduleInfoClass = computed(() => {
     border-color: rgb(14 165 233 / 0.5);
     box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.3);
   }
+
   50% {
     border-color: rgb(14 165 233 / 0.7);
     box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.2);
   }
+
   100% {
     border-color: rgb(14 165 233 / 0.5);
     box-shadow: 0 0 0 0 rgba(14, 165, 233, 0);
@@ -181,11 +170,13 @@ const moduleInfoClass = computed(() => {
     color: rgb(14, 165, 233);
     transform: scale(1);
   }
+
   50% {
     background-color: rgba(14, 165, 233, 0.3);
     color: rgb(56, 189, 248);
     transform: scale(1.05);
   }
+
   100% {
     background-color: rgba(14, 165, 233, 0.1);
     color: rgb(14, 165, 233);

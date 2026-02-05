@@ -33,24 +33,17 @@ const resourcesList = computed(() => {
       <h3 class="header-title">
         {{ t('ui.resource_overview') || 'Resource Production Overview' }}
       </h3>
-      
+
       <span class="header-badge">
         {{ t('ui.hourly_rate') || 'Hourly Rate' }}
       </span>
     </div>
-    
+
     <div class="list-body custom-scrollbar">
-      <ResourceItem 
-        v-for="res in resourcesList" 
-        :key="res.id"
-        :resourceId="res.id"
-        :name="res.name"value
-        :amount="res.amount"
-        :details="res.details"
-        :locked="store.isWareLocked(res.id)"
-        @update:locked="store.toggleWareLock(res.id)"
-      />
-      
+      <ResourceItem v-for="res in resourcesList" :key="res.id" :resourceId="res.id" :name="res.name" value
+        :amount="res.amount" :details="res.details" :locked="store.isWareLocked(res.id)"
+        @update:locked="store.toggleWareLock(res.id)" />
+
       <div v-if="resourcesList.length === 0" class="empty-container">
         <div class="empty-icon-wrapper">
           <span class="empty-icon-text">!</span>
@@ -106,12 +99,15 @@ const resourcesList = computed(() => {
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
   @apply bg-transparent;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   @apply bg-slate-700 rounded-full;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   @apply bg-slate-600;
 }

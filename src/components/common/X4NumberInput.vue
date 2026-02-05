@@ -9,7 +9,7 @@ interface Props {
   max?: number
   step?: number
   disabled?: boolean
-  widthClass?: string 
+  widthClass?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -41,20 +41,18 @@ const handleInput = (e: Event) => {
 
 <template>
   <div class="x4-input-container group" :class="[widthClass, { 'is-disabled': disabled }]">
-    <input
-      type="number"
-      :value="modelValue"
-      :disabled="disabled"
-      @input="handleInput"
-      class="x4-num-input"
-    />
-    
+    <input type="number" :value="modelValue" :disabled="disabled" @input="handleInput" class="x4-num-input" />
+
     <div class="x4-spin-buttons">
       <button class="spin-up" @click="updateValue(step)" tabindex="-1">
-        <svg viewBox="0 0 16 8" class="spin-icon"><path d="M8 2l-4 4h8z" /></svg>
+        <svg viewBox="0 0 16 8" class="spin-icon">
+          <path d="M8 2l-4 4h8z" />
+        </svg>
       </button>
       <button class="spin-down" @click="updateValue(-step)" tabindex="-1">
-        <svg viewBox="0 0 16 8" class="spin-icon"><path d="M8 6l4-4H4z" /></svg>
+        <svg viewBox="0 0 16 8" class="spin-icon">
+          <path d="M8 6l4-4H4z" />
+        </svg>
       </button>
     </div>
   </div>
@@ -71,8 +69,10 @@ const handleInput = (e: Event) => {
   -webkit-appearance: none;
   -moz-appearance: textfield;
   @apply bg-transparent border-none w-full px-1.5 text-sm font-mono font-bold transition-all outline-none;
-  color: #a5d8ff; /* 淡蓝色文字 */
-  padding-right: 20px; /* 预留固定空间，防止 hover 抖动 */
+  color: #a5d8ff;
+  /* 淡蓝色文字 */
+  padding-right: 20px;
+  /* 预留固定空间，防止 hover 抖动 */
   height: 100%;
 }
 
@@ -98,12 +98,18 @@ const handleInput = (e: Event) => {
 }
 
 /* 核心：实现 1px 的物理缝隙 */
-.spin-up { margin-bottom: 0.5px; }
-.spin-down { margin-top: 0.5px; }
+.spin-up {
+  margin-bottom: 0.5px;
+}
+
+.spin-down {
+  margin-top: 0.5px;
+}
 
 .spin-icon {
   @apply w-3 h-2;
-  fill: #a5d8ff; /* 图标颜色设为淡蓝 */
+  fill: #a5d8ff;
+  /* 图标颜色设为淡蓝 */
   opacity: 0.4;
 }
 </style>
