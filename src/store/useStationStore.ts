@@ -281,7 +281,7 @@ export const useStationStore = defineStore('station', () => {
   // --- 业务计算逻辑 ---
   const constructionBreakdown = computed(() => {
     return calculateConstructionBreakdown(
-      plannedModules.value,
+      allIndustryModules.value,
       modulesMap.value,
       waresMap.value
     )
