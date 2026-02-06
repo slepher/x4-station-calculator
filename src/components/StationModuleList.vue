@@ -161,10 +161,10 @@ const availableRaces = computed(() => {
 
     <!-- Tier 2: 自动工业区 -->
     <div v-if="store.autoIndustryModules.length > 0" class="tier-section tier-auto">
-        <div class="tier-header">
+        <div class="tier-header tier-header-with-controls">
           <div class="tier-header-left">
             <span class="tier-label">{{ t('ui.tier_industry') }}</span>
-            <div class="workforce-option" :title="t('ui.consider_workforce_bonus')">
+            <div class="workforce-option" :title="t('ui.consider_workforce_bonus')" @click.stop>
               <input type="checkbox" id="wf-fill-check" v-model="store.settings.considerWorkforceForAutoFill"
                 class="x4-checkbox-mini" @click.stop />
               <span class="option-icon">👥</span>
@@ -192,12 +192,12 @@ const availableRaces = computed(() => {
 
     <!-- Tier 3: 自动补给区 -->
     <div v-if="store.autoSupplyModules.length > 0" class="tier-section tier-auto">
-        <div class="tier-header" :class="{ 'is-active': isSupplyOpen }"
+        <div class="tier-header tier-header--supply" :class="{ 'is-active': isSupplyOpen }"
           @click="isSupplyOpen = !isSupplyOpen">
           <div class="tier-header-left">
             <span class="arrow" :class="{ 'arrow-open': isSupplyOpen }">▶</span>
             <span class="tier-label">{{ t('ui.tier_supply') }}</span>
-            <div class="supply-workforce-option" :title="t('ui.consider_workforce_bonus')">
+            <div class="supply-workforce-option" :title="t('ui.consider_workforce_bonus')" @click.stop>
               <input type="checkbox" id="supply-wf-check" v-model="store.settings.supplyWorkforceBonus"
                 class="x4-checkbox-mini" @click.stop />
               <span class="option-icon">👥</span>
@@ -242,22 +242,21 @@ const availableRaces = computed(() => {
 
 .race-select {
   @apply bg-slate-900 border border-slate-700 text-slate-200 text-[11px] rounded px-2 h-6 focus:border-sky-500 outline-none cursor-pointer hover:border-slate-600 transition-colors;
-  min-width: 120px;
-  line-height: 22px;
+  min-width: 80px;
   padding: 0 8px;
   appearance: none;
 }
 
 .workforce-option {
-  @apply flex items-center gap-1.5 text-[8px] text-slate-600 uppercase font-bold tracking-tighter cursor-pointer hover:text-slate-500 transition-colors select-none;
+  @apply flex items-end text-[8px] text-slate-600 uppercase font-bold tracking-tighter cursor-pointer hover:text-slate-500 transition-colors select-none;
 }
 
 .supply-workforce-option {
-  @apply flex items-center gap-1.5 text-[8px] text-slate-600 uppercase font-bold tracking-tighter cursor-pointer hover:text-slate-500 transition-colors select-none;
+  @apply flex items-end text-[8px] text-slate-600 uppercase font-bold tracking-tighter cursor-pointer hover:text-slate-500 transition-colors select-none;
 }
 
 .option-icon {
-  @apply text-[10px];
+  @apply text-[12px] leading-none;
 }
 
 .option-text {
@@ -326,7 +325,7 @@ auto-fill-section {
 }
 
 .x4-checkbox-mini {
-  @apply w-2.5 h-2.5 rounded-sm border-slate-800 bg-slate-950 text-sky-600 focus:ring-0 cursor-pointer;
+  @apply w-2.5 h-2.5 rounded-sm border-slate-800 bg-slate-950 text-sky-600 focus:ring-0 cursor-pointer m-0 p-0 flex-shrink-0;
 }
 
 .scrollbar-thin::-webkit-scrollbar {
@@ -364,28 +363,11 @@ auto-fill-section {
 }
 
 .tier-header {
-  @apply flex items-center px-3 py-1.5 bg-slate-800/40 rounded cursor-pointer hover:bg-slate-700/50 transition-colors border border-transparent;
-}
-
-.tier-header.tier-header-with-controls {
-  @apply justify-between;
-}
-
-.tier-header.tier-header-with-controls > .workforce-option,
-.tier-header.tier-header-with-controls > .supply-workforce-option {
-  @apply ml-2; /* 紧邻标题后的间距 */
-}
-
-.tier-header--supply > .supply-workforce-option {
-  @apply ml-2; /* 补给区选项紧邻标题后的间距 */
-}
-
-.tier-header--supply {
-  @apply justify-between;
+  @apply flex items-center justify-between px-3 h-8 bg-slate-800/40 rounded cursor-pointer hover:bg-slate-700/50 transition-colors border border-transparent w-full;
 }
 
 .tier-header-left {
-  @apply flex items-center;
+  @apply flex items-center gap-2 h-full;
 }
 
 .tier-header.is-active {
@@ -393,20 +375,17 @@ auto-fill-section {
 }
 
 .tier-label {
-  @apply text-xs font-semibold text-slate-400 uppercase tracking-wider;
+  @apply text-xs font-semibold text-slate-400 uppercase tracking-wider leading-none;
 }
 
 .tier-controls {
   @apply flex items-center gap-2;
 }
 
-.wf-config-group {
-  @apply flex flex-col gap-1;
-}
-
 /* 折叠箭头样式 */
 .arrow {
-  @apply text-[10px] text-slate-500 transition-transform duration-200;
+  @apply text-[10px] text-slate-500 transition-transform duration-200 leading-none flex items-center justify-center;
+  width: 12px;
 }
 
 .arrow-open {
@@ -426,68 +405,5 @@ auto-fill-section {
   max-height: 0;
 }
 
-/* 一劳永逸的对齐方案 */
-.tier-header {
-  @apply flex items-center gap-3 w-full; /* 强制所有 header 使用相同的间距逻辑 */
-}
 
-.tier-header-left {
-  @apply flex items-center gap-2;
-}
-
-/* 移除之前重复且冲突的定义 */
-.supply-tier-header {
-  @apply justify-start; /* 确保补给区不会因为 flex-between 跑到右边 */
-}
-
-/* 移除冗余的 .tier-header 类定义 */
-.tier-header {
-  @apply flex items-center px-3 py-1.5 bg-slate-800/40 rounded cursor-pointer hover:bg-slate-700/50 transition-colors border border-transparent w-full justify-between;
-}
-
-.tier-header-left {
-  @apply flex items-center gap-2; /* 控制标题与选项之间的紧凑间距 */
-}
-
-.workforce-option, .supply-workforce-option {
-  @apply ml-0; /* 依靠父级的 gap 控制间距，不再需要额外的左边距 */
-}
-
-.tier-header.tier-header-with-controls > .workforce-option,
-.tier-header.tier-header-with-controls > .supply-workforce-option {
-  @apply ml-2; /* 紧邻标题后的间距 */
-}
-
-.tier-header--supply > .supply-workforce-option {
-  @apply ml-2; /* 补给区选项紧邻标题后的间距 */
-}
-
-.tier-header--supply {
-  @apply justify-between;
-}
-
-.tier-header--supply .tier-header-left {
-  @apply flex items-center gap-1; /* 减少间距 */
-}
-
-.tier-header--supply .supply-workforce-option {
-  @apply ml-1; /* 减少间距，真正紧贴 */
-}
-
-.tier-header.tier-header-with-controls > .workforce-option {
-  @apply ml-1; /* 工业区选项也减少间距 */
-}
-
-/* 确保补给区选项紧贴标题 */
-.tier-header--supply {
-  @apply justify-between;
-}
-
-.tier-header--supply .tier-header-left {
-  @apply flex items-center gap-1; /* 减少间距 */
-}
-
-.tier-header--supply .supply-workforce-option {
-  @apply ml-1; /* 减少间距，真正紧贴 */
-}
 </style>
