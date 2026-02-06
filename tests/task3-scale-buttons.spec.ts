@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 let sharedPage;
 
-test.describe('Task 2: 规划区数量调整功能测试', () => {
+test.describe('Task 3: 规划区数量调整功能测试', () => {
   test.beforeAll(async ({ browser }) => {
     // 创建共享的页面实例
     sharedPage = await browser.newPage();

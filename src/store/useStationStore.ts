@@ -7,7 +7,8 @@ import type {
   X4Ware,
   SavedModule,
   StationSettings,
-  StationLayout
+  StationLayout,
+  RaceMedicalConsumption
 } from '../types/x4'
 import { useGameData, type LocalizedX4Module, type LocalizedX4ModuleGroup } from './logic/useGameData'
 import { calculateWorkforceBreakdown, calculateActualWorkforce, calculateEfficiencySaturation } from './logic/workforceCalculator'
@@ -67,7 +68,8 @@ export const useStationStore = defineStore('station', () => {
     buyMultiplier: 0.5,      
     sellMultiplier: 0.5,     
     minersEnabled: false,    
-    internalSupply: false
+    internalSupply: false,
+    racePreference: 'argon'  // 默认种族偏好
   })
 
   // --- 基础数据映射 (Ref 类型，需要用 .value 访问) ---
@@ -75,6 +77,7 @@ export const useStationStore = defineStore('station', () => {
   const modulesMap: Ref<Record<string, X4Module>> = gameData.modulesMap
   const localizedModulesMap: Ref<Record<string, LocalizedX4Module>> = gameData.localizedModulesMap
   const localizedModuleGroupsMap: Ref<Record<string, LocalizedX4ModuleGroup>> = gameData.localizedModuleGroupsMap
+  const medicalConsumptionMap: Ref<RaceMedicalConsumption> = gameData.medicalConsumptionMap
 
   // --- 搜索增强 ---
   const filteredModulesGrouped = computed<ModuleGroupResult[]>(() => {
@@ -94,6 +97,7 @@ export const useStationStore = defineStore('station', () => {
       if (target) {
         plannedModules.value = JSON.parse(JSON.stringify(target.modules))
         settings.value = JSON.parse(JSON.stringify(target.settings))
+        settings.value.racePreference = settings.value.racePreference || 'argon' // 兼容旧数据
         lockedWares.value = target.lockedWares ? JSON.parse(JSON.stringify(target.lockedWares)) : []
       }
     }
@@ -318,7 +322,7 @@ export const useStationStore = defineStore('station', () => {
     /// 调用刚才重构完成的函数 calculateAutoFill
     const result = calculateAutoFill(
       plannedModules.value,
-      "argon", // 或从设置中获取种族
+      settings.value.racePreference, // 使用store中的种族偏好设置
       settings.value.considerWorkforceForAutoFill,
       settings.value.supplyWorkforceBonus,
       modulesMap.value,
@@ -388,7 +392,7 @@ export const useStationStore = defineStore('station', () => {
   return {
     isReady, isDirty,
     plannedModules, autoIndustryModules, autoSupplyModules, allModules, settings, searchQuery, filteredModulesGrouped,
-    wares: waresMap, modules: localizedModulesMap, moduleGroups: localizedModuleGroupsMap,
+    wares: waresMap, modules: localizedModulesMap, moduleGroups: localizedModuleGroupsMap, medicalConsumption: medicalConsumptionMap,
     loadData, loadDemoData, savedLayouts, saveCurrentLayout, loadLayout, mergeLayout, deleteLayout,
     lockedWares, isWareLocked, isWareOperable, toggleWareLock,
     addModule, importPlan, updateModuleId, updateModuleCount, removeModule, removeModuleById, transferModuleFromAutoIndustry, clearAll, getModuleInfo,

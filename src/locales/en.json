@@ -37,8 +37,8 @@
     "module_list": "Station Modules",
     "search_placeholder": "Search (Name / ID)...",
     "auto_fill_deficit": "AUTO-FILL DEFICIT",
-    "consider_workforce_bonus": "Consider Workforce Bonus for Calculation",
-    "add_hint": "Add to planning list",
+    "consider_workforce_bonus": "Consider Worker Efficiency Bonus",
+    "add_hint": "Add to Planning List",
     "sun_light": "SUN LIGHT",
     "new": "New",
     "save": "Save",
@@ -79,7 +79,7 @@
     "tier_planned": "Planned Modules",
     "tier_industry": "Auto Industry",
     "tier_supply": "Auto Supply",
-    "supply_workforce_bonus": "Consider Workforce Bonus for Supply"
+    "race_preference": "Race Preference"
   },
   "profit": {
     "title": "ECONOMIC ANALYSIS",
@@ -100,6 +100,6 @@
     "split": "Split",
     "terran": "Terran",
     "boron": "Boron",
-    "generic": "Generic"
+    "default": "Default(Argon)"
   }
 }

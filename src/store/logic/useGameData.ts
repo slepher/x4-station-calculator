@@ -3,13 +3,13 @@ import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { loadLanguageAsync } from '@/i18n'
-import type { X4Module, X4Ware, X4ModuleGroup } from '@/types/x4'
+import type { X4Module, X4Ware, X4ModuleGroup, RaceMedicalConsumption } from '@/types/x4'
 
 // 静态导入游戏数据
 import waresRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/wares.json'
 import ModulesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/modules.json'
 import moduleGroupsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/module_groups.json'
-
+import consumptionRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/consumption.json'
 // --- 类型导出 ---
 export type LocalizedX4Module = X4Module & { localeName: string }
 export type LocalizedX4ModuleGroup = X4ModuleGroup & { localeName: string }
@@ -19,6 +19,7 @@ export interface GameDataState {
   modulesMap: Ref<Record<string, X4Module>>
   localizedModulesMap: Ref<Record<string, LocalizedX4Module>>
   localizedModuleGroupsMap: Ref<Record<string, LocalizedX4ModuleGroup>>
+  medicalConsumptionMap: Ref<RaceMedicalConsumption>
 }
 
 /**
@@ -37,7 +38,7 @@ export function useGameData(): GameDataState & { initialize: () => Promise<void>
   const modulesMap = ref<Record<string, X4Module>>({})
   const localizedModulesMap = ref<Record<string, LocalizedX4Module>>({})
   const localizedModuleGroupsMap = ref<Record<string, LocalizedX4ModuleGroup>>({})
-
+  const medicalConsumptionMap = ref<RaceMedicalConsumption>({})
   /**
    * 构建 Wares 基础映射
    * 确保每个 Ware 对象都具有必要的默认值
@@ -77,6 +78,14 @@ export function useGameData(): GameDataState & { initialize: () => Promise<void>
       }
     })
     modulesMap.value = map
+  }
+
+  /**
+   * 构建医疗消耗数据映射
+   * 从consumption.json文件中读取种族消耗数据
+   */
+  function buildMedicalConsumptionMap() {
+    medicalConsumptionMap.value = consumptionRaw as RaceMedicalConsumption
   }
 
   /**
@@ -128,6 +137,7 @@ export function useGameData(): GameDataState & { initialize: () => Promise<void>
     // 构建基础 Map
     buildWaresMap()
     buildModulesMap()
+    buildMedicalConsumptionMap()
 
     // 预热本地化数据
     prepareLocalizedModules()
@@ -153,6 +163,7 @@ export function useGameData(): GameDataState & { initialize: () => Promise<void>
     modulesMap,
     localizedModulesMap,
     localizedModuleGroupsMap,
+    medicalConsumptionMap,
     initialize,
     currentLocale
   }

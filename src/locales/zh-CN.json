@@ -37,7 +37,7 @@
     "module_list": "模块列表",
     "search_placeholder": "搜索模块 ID 或名称...",
     "auto_fill_deficit": "自动补足缺口",
-    "consider_workforce_bonus": "计算时考虑劳动力加成",
+    "consider_workforce_bonus": "考虑工人效率加成",
     "add_hint": "添加到规划列表",
     "sun_light": "日照",
     "new": "新建",
@@ -79,7 +79,7 @@
     "tier_planned": "用户规划区",
     "tier_industry": "自动工业区",
     "tier_supply": "自动补给区",
-    "supply_workforce_bonus": "补给区考虑劳动力加成"
+    "race_preference": "种族偏好"
   },
   "profit": {
     "title": "经济分析",
@@ -100,6 +100,6 @@
     "split": "Split",
     "terran": "Terran",
     "boron": "Boron",
-    "generic": "通用"
+    "default": "通用"
   }
 }

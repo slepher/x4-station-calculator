@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n'
 import StationModuleItem from './StationModuleItem.vue'
 import StationModuleSelector from './StationModuleSelector.vue'
 import X4NumberInput from './common/X4NumberInput.vue'
-import { ref, watch, nextTick } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 
 const { t } = useI18n()
 const store = useStationStore()
@@ -92,17 +92,36 @@ watch(() => store.plannedModules.length, (newLength, oldLength) => {
     })
   }
 })
+
+// 获取可用的种族列表
+const availableRaces = computed(() => {
+  const races = Object.keys(store.medicalConsumption || {})
+  const defaultRaces = ['argon', 'boron', 'paranid', 'split', 'teladi', 'terran']
+  
+  if (races.length > 0) {
+    // 确保default在第一个位置
+    const filtered = races.filter(race => race !== 'default')
+    return ['argon', ...filtered].sort((a, b) => {
+      if (a > b) return 1;
+      if (a < b) return -1;
+      return 0
+    })
+  }
+  return defaultRaces
+})
 </script>
 
 <template>
   <div class="module-list-container">
     <div class="header-row">
       <h3 class="header-title">{{ t('ui.module_list') }}</h3>
-      <div class="sunlight-control">
-        <span class="header-label">{{ t('ui.sun_light') }}</span>
-        <div class="x4-composite-input-wrapper">
-          <X4NumberInput v-model="store.settings.sunlight" width-class="w-16" class="x4-nested-input" />
-          <div class="x4-unit-suffix-box">%</div>
+      <div class="header-controls">
+        <div class="sunlight-control">
+          <span class="header-label">{{ t('ui.sun_light') }}</span>
+          <div class="x4-composite-input-wrapper">
+            <X4NumberInput v-model="store.settings.sunlight" width-class="w-16" class="x4-nested-input" />
+            <div class="x4-unit-suffix-box">%</div>
+          </div>
         </div>
       </div>
     </div>
@@ -142,9 +161,26 @@ watch(() => store.plannedModules.length, (newLength, oldLength) => {
 
     <!-- Tier 2: 自动工业区 -->
     <div v-if="store.autoIndustryModules.length > 0" class="tier-section tier-auto">
-      <div class="tier-header">
-        <span class="tier-label">{{ t('ui.tier_industry') }}</span>
-      </div>
+        <div class="tier-header">
+          <div class="tier-header-left">
+            <span class="tier-label">{{ t('ui.tier_industry') }}</span>
+            <div class="workforce-option" :title="t('ui.consider_workforce_bonus')">
+              <input type="checkbox" id="wf-fill-check" v-model="store.settings.considerWorkforceForAutoFill"
+                class="x4-checkbox-mini" @click.stop />
+              <span class="option-icon">👥</span>
+            </div>
+          </div>
+          <div class="tier-controls">
+            <div class="race-selector">
+              <span class="header-label">{{ t('ui.race_preference') }}</span>
+              <select v-model="store.settings.racePreference" class="race-select">
+                <option v-for="race in availableRaces" :key="race" :value="race">
+                  {{ t(`race.${race}`) }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
       <div class="module-list-scroll">
         <div class="auto-modules-container">
           <StationModuleItem v-for="(element, index) in store.autoIndustryModules" :key="element.id + '-' + index"
@@ -156,11 +192,18 @@ watch(() => store.plannedModules.length, (newLength, oldLength) => {
 
     <!-- Tier 3: 自动补给区 -->
     <div v-if="store.autoSupplyModules.length > 0" class="tier-section tier-auto">
-      <div class="tier-header supply-tier-header" :class="{ 'is-active': isSupplyOpen }"
-        @click="isSupplyOpen = !isSupplyOpen">
-        <span class="arrow" :class="{ 'arrow-open': isSupplyOpen }">▶</span>
-        <span class="tier-label">{{ t('ui.tier_supply') }}</span>
-      </div>
+        <div class="tier-header" :class="{ 'is-active': isSupplyOpen }"
+          @click="isSupplyOpen = !isSupplyOpen">
+          <div class="tier-header-left">
+            <span class="arrow" :class="{ 'arrow-open': isSupplyOpen }">▶</span>
+            <span class="tier-label">{{ t('ui.tier_supply') }}</span>
+            <div class="supply-workforce-option" :title="t('ui.consider_workforce_bonus')">
+              <input type="checkbox" id="supply-wf-check" v-model="store.settings.supplyWorkforceBonus"
+                class="x4-checkbox-mini" @click.stop />
+              <span class="option-icon">👥</span>
+            </div>
+          </div>
+        </div>
       <Transition name="expand">
         <div v-if="isSupplyOpen" class="module-list-scroll">
           <div class="auto-modules-container">
@@ -171,23 +214,7 @@ watch(() => store.plannedModules.length, (newLength, oldLength) => {
       </Transition>
     </div>
 
-    <div class="module-controls-panel">
-      <div class="auto-fill-section">
-        <div class="wf-config-group">
-          <label for="wf-fill-check" class="wf-config-note">
-            <input type="checkbox" id="wf-fill-check" v-model="store.settings.considerWorkforceForAutoFill"
-              class="x4-checkbox-mini" />
-            <span>{{ t('ui.consider_workforce_bonus') }}</span>
-          </label>
-
-          <label for="supply-wf-check" class="wf-config-note">
-            <input type="checkbox" id="supply-wf-check" v-model="store.settings.supplyWorkforceBonus"
-              class="x4-checkbox-mini" />
-            <span>{{ t('ui.supply_workforce_bonus') }}</span>
-          </label>
-        </div>
-      </div>
-    </div>
+    <!-- 劳动力加成选项已移动到各自标题栏 -->
   </div>
 </template>
 
@@ -202,6 +229,39 @@ watch(() => store.plannedModules.length, (newLength, oldLength) => {
 
 .header-label {
   @apply text-slate-500 text-[10px] uppercase font-bold tracking-widest leading-none;
+}
+
+.header-controls {
+  @apply flex items-center gap-4;
+}
+
+.race-selector {
+  @apply flex items-center gap-2;
+  align-items: center; /* Ensure vertical alignment */
+}
+
+.race-select {
+  @apply bg-slate-900 border border-slate-700 text-slate-200 text-[11px] rounded px-2 h-6 focus:border-sky-500 outline-none cursor-pointer hover:border-slate-600 transition-colors;
+  min-width: 120px;
+  line-height: 22px;
+  padding: 0 8px;
+  appearance: none;
+}
+
+.workforce-option {
+  @apply flex items-center gap-1.5 text-[8px] text-slate-600 uppercase font-bold tracking-tighter cursor-pointer hover:text-slate-500 transition-colors select-none;
+}
+
+.supply-workforce-option {
+  @apply flex items-center gap-1.5 text-[8px] text-slate-600 uppercase font-bold tracking-tighter cursor-pointer hover:text-slate-500 transition-colors select-none;
+}
+
+.option-icon {
+  @apply text-[10px];
+}
+
+.option-text {
+  @apply whitespace-nowrap;
 }
 
 .x4-composite-input-wrapper {
@@ -304,7 +364,28 @@ auto-fill-section {
 }
 
 .tier-header {
-  @apply flex items-center gap-2 px-3 py-1.5 bg-slate-800/40 rounded cursor-pointer hover:bg-slate-700/50 transition-colors border border-transparent;
+  @apply flex items-center px-3 py-1.5 bg-slate-800/40 rounded cursor-pointer hover:bg-slate-700/50 transition-colors border border-transparent;
+}
+
+.tier-header.tier-header-with-controls {
+  @apply justify-between;
+}
+
+.tier-header.tier-header-with-controls > .workforce-option,
+.tier-header.tier-header-with-controls > .supply-workforce-option {
+  @apply ml-2; /* 紧邻标题后的间距 */
+}
+
+.tier-header--supply > .supply-workforce-option {
+  @apply ml-2; /* 补给区选项紧邻标题后的间距 */
+}
+
+.tier-header--supply {
+  @apply justify-between;
+}
+
+.tier-header-left {
+  @apply flex items-center;
 }
 
 .tier-header.is-active {
@@ -313,6 +394,10 @@ auto-fill-section {
 
 .tier-label {
   @apply text-xs font-semibold text-slate-400 uppercase tracking-wider;
+}
+
+.tier-controls {
+  @apply flex items-center gap-2;
 }
 
 .wf-config-group {
@@ -339,5 +424,70 @@ auto-fill-section {
 .expand-leave-to {
   opacity: 0;
   max-height: 0;
+}
+
+/* 一劳永逸的对齐方案 */
+.tier-header {
+  @apply flex items-center gap-3 w-full; /* 强制所有 header 使用相同的间距逻辑 */
+}
+
+.tier-header-left {
+  @apply flex items-center gap-2;
+}
+
+/* 移除之前重复且冲突的定义 */
+.supply-tier-header {
+  @apply justify-start; /* 确保补给区不会因为 flex-between 跑到右边 */
+}
+
+/* 移除冗余的 .tier-header 类定义 */
+.tier-header {
+  @apply flex items-center px-3 py-1.5 bg-slate-800/40 rounded cursor-pointer hover:bg-slate-700/50 transition-colors border border-transparent w-full justify-between;
+}
+
+.tier-header-left {
+  @apply flex items-center gap-2; /* 控制标题与选项之间的紧凑间距 */
+}
+
+.workforce-option, .supply-workforce-option {
+  @apply ml-0; /* 依靠父级的 gap 控制间距，不再需要额外的左边距 */
+}
+
+.tier-header.tier-header-with-controls > .workforce-option,
+.tier-header.tier-header-with-controls > .supply-workforce-option {
+  @apply ml-2; /* 紧邻标题后的间距 */
+}
+
+.tier-header--supply > .supply-workforce-option {
+  @apply ml-2; /* 补给区选项紧邻标题后的间距 */
+}
+
+.tier-header--supply {
+  @apply justify-between;
+}
+
+.tier-header--supply .tier-header-left {
+  @apply flex items-center gap-1; /* 减少间距 */
+}
+
+.tier-header--supply .supply-workforce-option {
+  @apply ml-1; /* 减少间距，真正紧贴 */
+}
+
+.tier-header.tier-header-with-controls > .workforce-option {
+  @apply ml-1; /* 工业区选项也减少间距 */
+}
+
+/* 确保补给区选项紧贴标题 */
+.tier-header--supply {
+  @apply justify-between;
+}
+
+.tier-header--supply .tier-header-left {
+  @apply flex items-center gap-1; /* 减少间距 */
+}
+
+.tier-header--supply .supply-workforce-option {
+  @apply ml-1; /* 减少间距，真正紧贴 */
 }
 </style>

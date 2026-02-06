@@ -59,6 +59,15 @@ export interface X4Module {
 }
 
 /**
+ * 种族医疗消耗数据结构
+ */
+export interface RaceMedicalConsumption {
+  [race: string]: {
+    [wareId: string]: number; // 商品ID -> 每小时每人消耗量
+  };
+}
+
+/**
  * 游戏数据根结构
  */
 export interface X4GameData {
@@ -91,6 +100,7 @@ export interface StationSettings {
   sellMultiplier: number;
   minersEnabled: boolean;
   internalSupply: boolean;
+  racePreference: string;
 }
 
 /**

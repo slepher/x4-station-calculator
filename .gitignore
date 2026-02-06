@@ -63,3 +63,10 @@ Thumbs.db
 # 注意：不要忽略 .env.example (如果有的话)
 x4-game.config.json
 backupspecs
+
+# ==========================
+# 6. 测试相关文件
+# ==========================
+# Playwright 测试报告和结果
+playwright-report/
+test-results/
