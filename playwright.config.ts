@@ -29,4 +29,8 @@ export default defineConfig({
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
   },
+  expect: {
+    // 设置全局 expect 断言的默认超时时间为 0.2 秒
+    timeout: 200,
+  },
 });

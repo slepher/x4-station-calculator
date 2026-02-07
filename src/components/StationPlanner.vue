@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import StationModuleList from './StationModuleList.vue'
-import ResourceList from './ResourceList.vue'
 import StationWorkforce from './StationWorkforce.vue'
 import StationProfit from './StationProfit.vue'
 import StationConstruction from './StationConstruction.vue'
 import StationToolbar from './StationToolbar.vue'
 import StatusMonitor from './StatusMonitor.vue' // <--- 引入状态监控组件
+import StationWareFlowsDashboard from './StationWareFlowsDashboard.vue'
 
 </script>
 
@@ -21,7 +21,7 @@ import StatusMonitor from './StatusMonitor.vue' // <--- 引入状态监控组件
       </div>
 
       <div class="col-span-12 lg:col-span-5">
-        <ResourceList />
+        <StationWareFlowsDashboard />
       </div>
 
       <div class="col-span-12 lg:col-span-4 space-y-4">

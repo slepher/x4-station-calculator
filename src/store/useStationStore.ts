@@ -23,6 +23,7 @@ import {
 import { calculateAutoFill } from './logic/moduleDiffCalculator'
 
 import { calculateConstructionBreakdown } from './logic/productionCalculator'
+import { analyzeWareFlow } from './logic/analyzeWareFlow'
 
 // --- 类型定义 (Type Definitions) ---
 export type { SavedModule, StationLayout } from '../types/x4'
@@ -69,7 +70,9 @@ export const useStationStore = defineStore('station', () => {
     sellMultiplier: 0.5,     
     minersEnabled: false,    
     internalSupply: false,
-    racePreference: 'argon'  // 默认种族偏好
+    racePreference: 'argon',  // 默认种族偏好
+    resourceBufferHours: 1.0, // 默认资源缓冲时间
+    productBufferHours: 1.0   // 默认产品缓冲时间
   })
 
   // --- 基础数据映射 (Ref 类型，需要用 .value 访问) ---
@@ -314,6 +317,21 @@ export const useStationStore = defineStore('station', () => {
     calculateNetProduction(profitBreakdown.value.wareDetails)
   )
 
+  // 资源流向分析 (Ware Flow Analysis)
+  const wareFlowList = computed(() => {
+    return analyzeWareFlow(
+      allIndustryModules.value,
+      modulesMap.value,
+      waresMap.value,
+      medicalConsumptionMap.value,
+      settings.value,
+      actualWorkforce.value,
+      efficiencyMetrics.value.saturation,
+      settings.value.resourceBufferHours,
+      settings.value.productBufferHours
+    )
+  })
+
   // 2. The Engine (核心计算引擎)
   // 这是一个 Computed，它监听 manualModules 变化，
   // 并在内部一次性完成所有依赖计算，输出最终的两个自动列表。
@@ -397,6 +415,6 @@ export const useStationStore = defineStore('station', () => {
     lockedWares, isWareLocked, isWareOperable, toggleWareLock,
     addModule, importPlan, updateModuleId, updateModuleCount, removeModule, removeModuleById, transferModuleFromAutoIndustry, clearAll, getModuleInfo,
     constructionBreakdown, workforceBreakdown, profitBreakdown, autoFillMissingLines,
-    actualWorkforce, currentEfficiency: computed(() => efficiencyMetrics.value.saturation), netProduction
+    actualWorkforce, currentEfficiency: computed(() => efficiencyMetrics.value.saturation), netProduction, wareFlowList
   }
 })

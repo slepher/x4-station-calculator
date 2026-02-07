@@ -125,6 +125,7 @@ class X4PrecisionLoader:
                 # A. 商品
                 if transport in {'container', 'solid', 'liquid'} and 'module' not in tags:
                     p_node = ware.find('price')
+                    volume = int(ware.get('volume') or 0)
                     if p_node is not None:
                         is_valid = True
                         self.wares_data.append({
@@ -134,6 +135,7 @@ class X4PrecisionLoader:
                             "name": raw_name,   # ⚠️ 占位，稍后注入英文
                             "transport": transport,
                             "price": int(p_node.get('average') or 0),
+                            "volume": volume,
                             "minPrice": int(p_node.get('min') or 0),
                             "maxPrice": int(p_node.get('max') or 0)
                         })

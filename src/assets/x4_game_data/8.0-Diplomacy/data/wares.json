@@ -6,6 +6,7 @@
     "name": "Advanced Composites",
     "transport": "container",
     "price": 540,
+    "volume": 32,
     "minPrice": 432,
     "maxPrice": 648
   },
@@ -16,6 +17,7 @@
     "name": "Advanced Electronics",
     "transport": "container",
     "price": 1014,
+    "volume": 30,
     "minPrice": 710,
     "maxPrice": 1318
   },
@@ -26,6 +28,7 @@
     "name": "Antimatter Cells",
     "transport": "container",
     "price": 202,
+    "volume": 18,
     "minPrice": 121,
     "maxPrice": 282
   },
@@ -36,6 +39,7 @@
     "name": "Antimatter Converters",
     "transport": "container",
     "price": 354,
+    "volume": 10,
     "minPrice": 248,
     "maxPrice": 461
   },
@@ -46,6 +50,7 @@
     "name": "Claytronics",
     "transport": "container",
     "price": 2040,
+    "volume": 24,
     "minPrice": 1734,
     "maxPrice": 2346
   },
@@ -56,6 +61,7 @@
     "name": "Drone Components",
     "transport": "container",
     "price": 914,
+    "volume": 30,
     "minPrice": 685,
     "maxPrice": 1142
   },
@@ -66,6 +72,7 @@
     "name": "Energy Cells",
     "transport": "container",
     "price": 16,
+    "volume": 1,
     "minPrice": 10,
     "maxPrice": 22
   },
@@ -76,6 +83,7 @@
     "name": "Engine Parts",
     "transport": "container",
     "price": 182,
+    "volume": 15,
     "minPrice": 128,
     "maxPrice": 237
   },
@@ -86,6 +94,7 @@
     "name": "Field Coils",
     "transport": "container",
     "price": 412,
+    "volume": 15,
     "minPrice": 247,
     "maxPrice": 576
   },
@@ -96,6 +105,7 @@
     "name": "Food Rations",
     "transport": "container",
     "price": 21,
+    "volume": 1,
     "minPrice": 12,
     "maxPrice": 29
   },
@@ -106,6 +116,7 @@
     "name": "Graphene",
     "transport": "container",
     "price": 166,
+    "volume": 20,
     "minPrice": 100,
     "maxPrice": 233
   },
@@ -116,6 +127,7 @@
     "name": "Helium",
     "transport": "liquid",
     "price": 44,
+    "volume": 6,
     "minPrice": 37,
     "maxPrice": 51
   },
@@ -126,6 +138,7 @@
     "name": "Hull Parts",
     "transport": "container",
     "price": 209,
+    "volume": 12,
     "minPrice": 146,
     "maxPrice": 272
   },
@@ -136,6 +149,7 @@
     "name": "Hydrogen",
     "transport": "liquid",
     "price": 58,
+    "volume": 6,
     "minPrice": 49,
     "maxPrice": 67
   },
@@ -146,6 +160,7 @@
     "name": "Ice",
     "transport": "solid",
     "price": 30,
+    "volume": 8,
     "minPrice": 26,
     "maxPrice": 35
   },
@@ -156,6 +171,7 @@
     "name": "Maja Dust",
     "transport": "container",
     "price": 208,
+    "volume": 6,
     "minPrice": 94,
     "maxPrice": 323
   },
@@ -166,6 +182,7 @@
     "name": "Maja Snails",
     "transport": "container",
     "price": 58,
+    "volume": 6,
     "minPrice": 35,
     "maxPrice": 81
   },
@@ -176,6 +193,7 @@
     "name": "Meat",
     "transport": "container",
     "price": 48,
+    "volume": 6,
     "minPrice": 29,
     "maxPrice": 68
   },
@@ -186,6 +204,7 @@
     "name": "Medical Supplies",
     "transport": "container",
     "price": 66,
+    "volume": 2,
     "minPrice": 43,
     "maxPrice": 89
   },
@@ -196,6 +215,7 @@
     "name": "Methane",
     "transport": "liquid",
     "price": 48,
+    "volume": 6,
     "minPrice": 41,
     "maxPrice": 55
   },
@@ -206,6 +226,7 @@
     "name": "Microchips",
     "transport": "container",
     "price": 948,
+    "volume": 22,
     "minPrice": 805,
     "maxPrice": 1090
   },
@@ -216,6 +237,7 @@
     "name": "Missile Components",
     "transport": "container",
     "price": 9,
+    "volume": 2,
     "minPrice": 6,
     "maxPrice": 13
   },
@@ -226,6 +248,7 @@
     "name": "Nividium",
     "transport": "solid",
     "price": 510,
+    "volume": 10,
     "minPrice": 434,
     "maxPrice": 587
   },
@@ -236,6 +259,7 @@
     "name": "nividiumgems",
     "transport": "container",
     "price": 1077,
+    "volume": 2,
     "minPrice": 646,
     "maxPrice": 1507
   },
@@ -246,6 +270,7 @@
     "name": "Nostrop Oil",
     "transport": "container",
     "price": 34,
+    "volume": 1,
     "minPrice": 20,
     "maxPrice": 47
   },
@@ -256,6 +281,7 @@
     "name": "Ore",
     "transport": "solid",
     "price": 50,
+    "volume": 10,
     "minPrice": 43,
     "maxPrice": 58
   },
@@ -266,6 +292,7 @@
     "name": "Plasma Conductors",
     "transport": "container",
     "price": 1026,
+    "volume": 32,
     "minPrice": 769,
     "maxPrice": 1282
   },
@@ -276,6 +303,7 @@
     "name": "Quantum Tubes",
     "transport": "container",
     "price": 300,
+    "volume": 22,
     "minPrice": 225,
     "maxPrice": 375
   },
@@ -286,6 +314,7 @@
     "name": "Raw Scrap",
     "transport": "solid",
     "price": 180,
+    "volume": 10,
     "minPrice": 153,
     "maxPrice": 207
   },
@@ -296,6 +325,7 @@
     "name": "Refined Metals",
     "transport": "container",
     "price": 148,
+    "volume": 14,
     "minPrice": 89,
     "maxPrice": 207
   },
@@ -306,6 +336,7 @@
     "name": "Scanning Arrays",
     "transport": "container",
     "price": 1053,
+    "volume": 38,
     "minPrice": 842,
     "maxPrice": 1264
   },
@@ -316,6 +347,7 @@
     "name": "Scrap Metal",
     "transport": "solid",
     "price": 375,
+    "volume": 10,
     "minPrice": 318,
     "maxPrice": 431
   },
@@ -326,6 +358,7 @@
     "name": "Shield Components",
     "transport": "container",
     "price": 188,
+    "volume": 10,
     "minPrice": 113,
     "maxPrice": 264
   },
@@ -336,6 +369,7 @@
     "name": "Silicon",
     "transport": "solid",
     "price": 130,
+    "volume": 10,
     "minPrice": 111,
     "maxPrice": 150
   },
@@ -346,6 +380,7 @@
     "name": "Silicon Wafers",
     "transport": "container",
     "price": 299,
+    "volume": 18,
     "minPrice": 180,
     "maxPrice": 419
   },
@@ -356,6 +391,7 @@
     "name": "Smart Chips",
     "transport": "container",
     "price": 57,
+    "volume": 2,
     "minPrice": 46,
     "maxPrice": 69
   },
@@ -366,6 +402,7 @@
     "name": "Soja Beans",
     "transport": "container",
     "price": 67,
+    "volume": 5,
     "minPrice": 40,
     "maxPrice": 93
   },
@@ -376,6 +413,7 @@
     "name": "Soja Husk",
     "transport": "container",
     "price": 32,
+    "volume": 1,
     "minPrice": 19,
     "maxPrice": 45
   },
@@ -386,6 +424,7 @@
     "name": "Spacefuel",
     "transport": "container",
     "price": 133,
+    "volume": 2,
     "minPrice": 60,
     "maxPrice": 207
   },
@@ -396,6 +435,7 @@
     "name": "Spaceweed",
     "transport": "container",
     "price": 166,
+    "volume": 3,
     "minPrice": 75,
     "maxPrice": 257
   },
@@ -406,6 +446,7 @@
     "name": "Spices",
     "transport": "container",
     "price": 20,
+    "volume": 3,
     "minPrice": 12,
     "maxPrice": 28
   },
@@ -416,6 +457,7 @@
     "name": "Sunrise Flowers",
     "transport": "container",
     "price": 80,
+    "volume": 5,
     "minPrice": 48,
     "maxPrice": 112
   },
@@ -426,6 +468,7 @@
     "name": "Superfluid Coolant",
     "transport": "container",
     "price": 150,
+    "volume": 16,
     "minPrice": 90,
     "maxPrice": 211
   },
@@ -436,6 +479,7 @@
     "name": "Swamp Plant",
     "transport": "container",
     "price": 84,
+    "volume": 6,
     "minPrice": 50,
     "maxPrice": 117
   },
@@ -446,6 +490,7 @@
     "name": "Teladianium",
     "transport": "container",
     "price": 202,
+    "volume": 16,
     "minPrice": 121,
     "maxPrice": 283
   },
@@ -456,6 +501,7 @@
     "name": "Turret Components",
     "transport": "container",
     "price": 273,
+    "volume": 20,
     "minPrice": 164,
     "maxPrice": 383
   },
@@ -466,6 +512,7 @@
     "name": "Water",
     "transport": "container",
     "price": 53,
+    "volume": 6,
     "minPrice": 32,
     "maxPrice": 74
   },
@@ -476,6 +523,7 @@
     "name": "Weapon Components",
     "transport": "container",
     "price": 285,
+    "volume": 20,
     "minPrice": 171,
     "maxPrice": 399
   },
@@ -486,6 +534,7 @@
     "name": "Wheat",
     "transport": "container",
     "price": 31,
+    "volume": 4,
     "minPrice": 19,
     "maxPrice": 44
   },
@@ -496,6 +545,7 @@
     "name": "Chelt Meat",
     "transport": "container",
     "price": 51,
+    "volume": 7,
     "minPrice": 31,
     "maxPrice": 72
   },
@@ -506,6 +556,7 @@
     "name": "Scruffin Fruit",
     "transport": "container",
     "price": 28,
+    "volume": 6,
     "minPrice": 17,
     "maxPrice": 40
   },
@@ -516,6 +567,7 @@
     "name": "Computronic Substrate",
     "transport": "container",
     "price": 8280,
+    "volume": 50,
     "minPrice": 7452,
     "maxPrice": 9108
   },
@@ -526,6 +578,7 @@
     "name": "Metallic Microlattice",
     "transport": "container",
     "price": 50,
+    "volume": 1,
     "minPrice": 42,
     "maxPrice": 57
   },
@@ -536,6 +589,7 @@
     "name": "Protein Paste",
     "transport": "container",
     "price": 96,
+    "volume": 4,
     "minPrice": 57,
     "maxPrice": 134
   },
@@ -546,6 +600,7 @@
     "name": "Silicon Carbide",
     "transport": "container",
     "price": 1414,
+    "volume": 20,
     "minPrice": 1202,
     "maxPrice": 1627
   },
@@ -556,6 +611,7 @@
     "name": "Stimulants",
     "transport": "container",
     "price": 340,
+    "volume": 12,
     "minPrice": 153,
     "maxPrice": 527
   },
@@ -566,6 +622,7 @@
     "name": "Terran MRE",
     "transport": "container",
     "price": 54,
+    "volume": 2,
     "minPrice": 32,
     "maxPrice": 75
   },
@@ -576,6 +633,7 @@
     "name": "BoFu",
     "transport": "container",
     "price": 101,
+    "volume": 4,
     "minPrice": 61,
     "maxPrice": 142
   },
@@ -586,6 +644,7 @@
     "name": "BoGas",
     "transport": "container",
     "price": 73,
+    "volume": 4,
     "minPrice": 44,
     "maxPrice": 102
   },
@@ -596,6 +655,7 @@
     "name": "Plankton",
     "transport": "container",
     "price": 18,
+    "volume": 1,
     "minPrice": 11,
     "maxPrice": 25
   }

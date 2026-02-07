@@ -1,3 +1,5 @@
+
+export type TransportType = 'container' | 'solid' | 'liquid';
 /**
  * 基础商品接口 - 对应 wares.json
  */
@@ -5,7 +7,8 @@ export interface X4Ware {
   id: string;
   nameId: string;
   name: string;
-  transport: 'container' | 'solid' | 'liquid';
+  transport: TransportType;
+  volume: number;     // 单位体积
   price: number;      // 平均价格
   minPrice: number;   // 最低价格
   maxPrice: number;   // 最高价格
@@ -101,6 +104,8 @@ export interface StationSettings {
   minersEnabled: boolean;
   internalSupply: boolean;
   racePreference: string;
+  resourceBufferHours: number; // 资源缓冲时间（小时）
+  productBufferHours: number;   // 产品缓冲时间（小时）
 }
 
 /**
@@ -147,4 +152,77 @@ export interface WareDetail {
   production: number;
   consumption: number;
   list: ProductionLogItem[];
+}
+
+export interface ModuleFlowAtom {
+  moduleId: string;
+  count: number;
+  
+  // 类型：决定了它是作为“输入缓冲”还是“输出缓冲”的来源
+  type: 'production' | 'consumption';
+
+  // --- 1. 数量流 (基础) ---
+  amount: number;       // 贡献的数量 (个)
+  bonusPercent: number;
+
+  // --- 2. 体积流 (重点) ---
+  // 这是你查看"消耗明细"时最关键的字段
+  // 例如：-33,600 m³ (巨大的消耗带宽)
+  volumeFlow: number;   // amount * Module
+  
+  // --- 3. 资金流 (参考) ---
+  valueFlow: number;    // amount * unitPrice
+}
+
+export interface WareFlow {
+  // --- 核心标识 ---
+  wareId: string;
+  transportType: TransportType; // 集装箱/固体/液体
+  unitVolume: number;           // 单体体积
+
+  // 数量流 (Quantity)
+  production: number;      // 总产出/h
+  consumption: number;     // 总消耗/h
+  netRate: number;         // 净产出
+
+  // 体积流 (Volume) - 新增核心
+  // 意义：展示该产线对此类物资的"搬运压力"
+  productionVolume: number;  // 产出体积流 (totalProduction * unitVolume)
+  consumptionVolume: number; // 消耗体积流 (totalConsumption * unitVolume)
+  netVolume: number;         // 净体积变化
+
+  // 规划容器占用数量 (Total Requirement)
+  totalOccupiedCount: number;
+  // 规划容器消耗占用数量 (Total Requirement)
+  // 通常是consumption * consumptionBufferTime
+  totalOccupiedConsumptionCount: number;
+  // 总规划占用空间 (Total Requirement)
+  // 逻辑：X4中通常是输入输出共享池子，或者取最大值覆盖，
+  // 产物采取consumptionVolume * consumptionBufferTime + netVolume * transportBufferTime
+  // 中间产物(不需要产品)采取(Out + NetSurplus) * consumptionBufferTime
+  // 是产物还是中间产物看是plannedModule中模块产出的还是industryModules中模块产出的
+  // 或者最简单的：(Production + Consumption) * buffer ? 
+  // *根据你的要求：要看消耗也要看产出，通常意味着两者都要留缓冲*
+  totalOccupiedVolume: number;
+
+  unitPrice: number;
+  netValue: number;        // 总利润流
+
+  // ====================================================
+  // 维度 D: 构成明细 (Drill-down)
+  // ====================================================
+  /**
+   * 包含所有的 ModuleFlowAtom。
+   * UI 上可以分为 "来源(Sources)" 和 "去向(Sinks)" 两组展示
+   */
+  contributions: ModuleFlowAtom[];
+}
+
+// [新增] 人口普查结果接口
+export interface WorkforceCensusItem {
+  moduleId: string
+  nameId: string
+  residents: number
+  count: number,
+  race: string
 }
