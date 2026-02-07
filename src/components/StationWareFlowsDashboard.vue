@@ -15,12 +15,8 @@ const { translateWare } = useX4I18n()
 // 视图模式状态管理
 const viewMode = ref<'quantity' | 'volume' | 'economy'>('quantity')
 
-
-
 // 格式化函数
 const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
-
-
 
 // 资源流向列表计算：使用 wareFlowList 替代 netProduction
 const wareFlowList = computed(() => {
@@ -45,6 +41,20 @@ const wareFlowList = computed(() => {
 
 // 体积数据分组功能
 const volumeGroups = computed(() => {
+  // 创建一个映射表，记录wareId与其在allIndustryModules中的首次出现顺序
+  const wareOrderMap = new Map<string, number>();
+  store.allIndustryModules.forEach((module, index) => {
+    const moduleInfo = store.modules[module.id];
+    if (moduleInfo) {
+      // 记录该模块产出的所有ware的顺序
+      Object.keys(moduleInfo.outputs || {}).forEach(wareId => {
+        if (!wareOrderMap.has(wareId)) {
+          wareOrderMap.set(wareId, index); // 以第一次出现的模块为准
+        }
+      });
+    }
+  });
+  
   const groups = {
     solid: [] as any[],
     liquid: [] as any[],
@@ -61,6 +71,7 @@ const volumeGroups = computed(() => {
       unitVolume: flow.unitVolume,
       totalOccupiedVolume: flow.totalOccupiedVolume,
       totalOccupiedCount: flow.totalOccupiedCount,
+      orderIndex: wareOrderMap.get(flow.wareId) ?? Number.MAX_SAFE_INTEGER, // 如果没在allIndustryModules中找到，则放在最后
       // 添加明细数据用于展开显示
       details: flow.contributions || []
     }
@@ -74,6 +85,26 @@ const volumeGroups = computed(() => {
     }
   })
   
+  // 按allIndustryModules中的顺序排序，如果orderIndex相同则按绝对值降序排序
+  groups.solid.sort((a, b) => {
+    if (a.orderIndex !== b.orderIndex) {
+      return a.orderIndex - b.orderIndex;
+    }
+    return Math.abs(b.netVolume) - Math.abs(a.netVolume);
+  });
+  groups.liquid.sort((a, b) => {
+    if (a.orderIndex !== b.orderIndex) {
+      return a.orderIndex - b.orderIndex;
+    }
+    return Math.abs(b.netVolume) - Math.abs(a.netVolume);
+  });
+  groups.container.sort((a, b) => {
+    if (a.orderIndex !== b.orderIndex) {
+      return a.orderIndex - b.orderIndex;
+    }
+    return Math.abs(b.netVolume) - Math.abs(a.netVolume);
+  });
+  
   return groups
 })
 
@@ -85,18 +116,13 @@ const groupByTypeAndSign = (getValueFn: (flow: any) => number) => {
     resources: [] as any[]    // 资源项目（非container类型的负值）
   }
   
-  // 创建一个映射表，记录wareId与其在plannedModules中的首次出现顺序
+  // 创建一个映射表，记录wareId与其在allIndustryModules中的首次出现顺序
   const wareOrderMap = new Map<string, number>();
-  store.plannedModules.forEach((module, index) => {
+  store.allIndustryModules.forEach((module, index) => {
     const moduleInfo = store.modules[module.id];
     if (moduleInfo) {
       // 记录该模块产出的所有ware的顺序
       Object.keys(moduleInfo.outputs || {}).forEach(wareId => {
-        if (!wareOrderMap.has(wareId)) {
-          wareOrderMap.set(wareId, index); // 以第一次出现的模块为准
-        }
-      });
-      Object.keys(moduleInfo.inputs || {}).forEach(wareId => {
         if (!wareOrderMap.has(wareId)) {
           wareOrderMap.set(wareId, index); // 以第一次出现的模块为准
         }
@@ -112,7 +138,7 @@ const groupByTypeAndSign = (getValueFn: (flow: any) => number) => {
       name: wareInfo ? translateWare(wareInfo) : flow.wareId,
       value: value,
       transportType: flow.transportType,
-      orderIndex: wareOrderMap.get(flow.wareId) ?? Number.MAX_SAFE_INTEGER, // 如果没在plannedModules中找到，则放在最后
+      orderIndex: wareOrderMap.get(flow.wareId) ?? Number.MAX_SAFE_INTEGER, // 如果没在allIndustryModules中找到，则放在最后
       // 为两种视图保留详细信息
       netRate: flow.netRate,
       netVolume: flow.netVolume,
@@ -135,7 +161,7 @@ const groupByTypeAndSign = (getValueFn: (flow: any) => number) => {
     }
   })
   
-  // 按plannedModules中的顺序排序，如果orderIndex相同则按绝对值降序排序
+  // 按allIndustryModules中的顺序排序，如果orderIndex相同则按绝对值降序排序
   groups.positive.sort((a, b) => {
     if (a.orderIndex !== b.orderIndex) {
       return a.orderIndex - b.orderIndex;
@@ -158,23 +184,8 @@ const groupByTypeAndSign = (getValueFn: (flow: any) => number) => {
   return groups
 }
 
-// 通用的资源分组，用于所有视图 - 优化版本，只计算一次分组
-const resourceGroups = computed(() => {
-  // 由于netRate和netValue的正负号相同，只需进行一次分组计算
-  const rateGroups = groupByTypeAndSign(flow => flow.netRate)
-  const valueGroups = groupByTypeAndSign(flow => flow.netValue)
-  
-  return {
-    // 资源视图使用净产量分组
-    products: rateGroups.positive,
-    operations: rateGroups.operations,
-    resources: rateGroups.resources,
-    // 经济视图使用净价值分组
-    income: valueGroups.positive,
-    expenses: valueGroups.operations,
-    resource_expenses: valueGroups.resources
-  }
-})
+// 计算分组（基于netRate，但netValue的分组逻辑相同）
+const rateGroups = computed(() => groupByTypeAndSign(flow => flow.netRate))
 
 // 总利润计算
 const totalProfit = computed(() => {
@@ -291,18 +302,17 @@ const totalProfit = computed(() => {
       <div v-if="viewMode === 'economy' || viewMode === 'quantity'" 
            :class="viewMode === 'economy' ? 'economy-groups-container space-y-1' : 'resource-groups-container space-y-1'">
         <!-- 产品/收入组 -->
-        <div v-if="(viewMode === 'economy' && resourceGroups.income.length > 0) || 
-                   (viewMode === 'quantity' && resourceGroups.products.length > 0)" 
+        <div v-if="rateGroups.positive.length > 0" 
              :class="viewMode === 'economy' ? 'economy-group' : 'resource-group'">
           <div :class="viewMode === 'economy' ? 'economy-group-header' : 'resource-group-header'">
             <h4 :class="viewMode === 'economy' ? 'economy-group-title' : 'resource-group-title'">
               {{ viewMode === 'economy' ? t('ui.income_group') : t('ui.products_group') }}
             </h4>
             <span v-if="viewMode === 'economy'" class="economy-group-sum positive">
-              +{{ formatNum(resourceGroups.income.reduce((sum, item) => sum + item.netValue, 0)) }} Cr
+              +{{ formatNum(rateGroups.positive.reduce((sum, item) => sum + item.netValue, 0)) }} Cr
             </span>
           </div>
-          <StationWareFlow v-for="item in (viewMode === 'economy' ? resourceGroups.income : resourceGroups.products)" 
+          <StationWareFlow v-for="item in rateGroups.positive" 
             :key="item.id" 
             :resourceId="item.id" 
             :name="item.name" 
@@ -320,18 +330,17 @@ const totalProfit = computed(() => {
         </div>
 
         <!-- 运营组 -->
-        <div v-if="(viewMode === 'economy' && resourceGroups.expenses.length > 0) || 
-                   (viewMode === 'quantity' && resourceGroups.operations.length > 0)" 
+        <div v-if="rateGroups.operations.length > 0" 
              :class="viewMode === 'economy' ? 'economy-group' : 'resource-group'">
           <div :class="viewMode === 'economy' ? 'economy-group-header' : 'resource-group-header'">
             <h4 :class="viewMode === 'economy' ? 'economy-group-title' : 'resource-group-title'">
                {{ viewMode === 'economy' ? t('ui.expenses_operations_group') : t('ui.operations_group') }}
              </h4>
             <span v-if="viewMode === 'economy'" class="economy-group-sum negative">
-              -{{ formatNum(Math.abs(resourceGroups.expenses.reduce((sum, item) => sum + item.netValue, 0))) }} Cr
+              -{{ formatNum(Math.abs(rateGroups.operations.reduce((sum, item) => sum + item.netValue, 0))) }} Cr
             </span>
           </div>
-          <StationWareFlow v-for="item in (viewMode === 'economy' ? resourceGroups.expenses : resourceGroups.operations)" 
+          <StationWareFlow v-for="item in rateGroups.operations" 
             :key="item.id" 
             :resourceId="item.id" 
             :name="item.name" 
@@ -349,18 +358,17 @@ const totalProfit = computed(() => {
         </div>
 
         <!-- 资源组 -->
-        <div v-if="(viewMode === 'economy' && resourceGroups.resource_expenses.length > 0) || 
-                   (viewMode === 'quantity' && resourceGroups.resources.length > 0)" 
+        <div v-if="rateGroups.resources.length > 0" 
              :class="viewMode === 'economy' ? 'economy-group' : 'resource-group'">
           <div :class="viewMode === 'economy' ? 'economy-group-header' : 'resource-group-header'">
             <h4 :class="viewMode === 'economy' ? 'economy-group-title' : 'resource-group-title'">
-               {{ viewMode === 'economy' ? t('ui.expenses_resources_group') : t('ui.resources_group') }}
-             </h4>
+              {{ viewMode === 'economy' ? t('ui.expenses_resources_group') : t('ui.resources_group') }}
+            </h4>
             <span v-if="viewMode === 'economy'" class="economy-group-sum negative">
-              -{{ formatNum(Math.abs(resourceGroups.resource_expenses.reduce((sum, item) => sum + item.netValue, 0))) }} Cr
+              -{{ formatNum(Math.abs(rateGroups.resources.reduce((sum, item) => sum + item.netValue, 0))) }} Cr
             </span>
           </div>
-          <StationWareFlow v-for="item in (viewMode === 'economy' ? resourceGroups.resource_expenses : resourceGroups.resources)" 
+          <StationWareFlow v-for="item in rateGroups.resources" 
             :key="item.id" 
             :resourceId="item.id" 
             :name="item.name" 

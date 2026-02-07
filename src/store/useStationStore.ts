@@ -423,7 +423,7 @@ export const useStationStore = defineStore('station', () => {
 
   return {
     isReady, isDirty,
-    plannedModules, autoIndustryModules, autoSupplyModules, allModules, settings, searchQuery, filteredModulesGrouped,
+    plannedModules, autoIndustryModules, autoSupplyModules, allIndustryModules, allModules, settings, searchQuery, filteredModulesGrouped,
     wares: waresMap, modules: localizedModulesMap, moduleGroups: localizedModuleGroupsMap, medicalConsumption: medicalConsumptionMap,
     loadData, loadDemoData, savedLayouts, saveCurrentLayout, loadLayout, mergeLayout, deleteLayout,
     lockedWares, isWareLocked, isWareOperable, toggleWareLock,
