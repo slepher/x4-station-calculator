@@ -41,20 +41,6 @@ const wareFlowList = computed(() => {
 
 // 体积数据分组功能
 const volumeGroups = computed(() => {
-  // 创建一个映射表，记录wareId与其在allIndustryModules中的首次出现顺序
-  const wareOrderMap = new Map<string, number>();
-  store.allIndustryModules.forEach((module, index) => {
-    const moduleInfo = store.modules[module.id];
-    if (moduleInfo) {
-      // 记录该模块产出的所有ware的顺序
-      Object.keys(moduleInfo.outputs || {}).forEach(wareId => {
-        if (!wareOrderMap.has(wareId)) {
-          wareOrderMap.set(wareId, index); // 以第一次出现的模块为准
-        }
-      });
-    }
-  });
-  
   const groups = {
     solid: [] as any[],
     liquid: [] as any[],
@@ -71,7 +57,6 @@ const volumeGroups = computed(() => {
       unitVolume: flow.unitVolume,
       totalOccupiedVolume: flow.totalOccupiedVolume,
       totalOccupiedCount: flow.totalOccupiedCount,
-      orderIndex: wareOrderMap.get(flow.wareId) ?? Number.MAX_SAFE_INTEGER, // 如果没在allIndustryModules中找到，则放在最后
       // 添加明细数据用于展开显示
       details: flow.contributions || []
     }
@@ -85,26 +70,6 @@ const volumeGroups = computed(() => {
     }
   })
   
-  // 按allIndustryModules中的顺序排序，如果orderIndex相同则按绝对值降序排序
-  groups.solid.sort((a, b) => {
-    if (a.orderIndex !== b.orderIndex) {
-      return a.orderIndex - b.orderIndex;
-    }
-    return Math.abs(b.netVolume) - Math.abs(a.netVolume);
-  });
-  groups.liquid.sort((a, b) => {
-    if (a.orderIndex !== b.orderIndex) {
-      return a.orderIndex - b.orderIndex;
-    }
-    return Math.abs(b.netVolume) - Math.abs(a.netVolume);
-  });
-  groups.container.sort((a, b) => {
-    if (a.orderIndex !== b.orderIndex) {
-      return a.orderIndex - b.orderIndex;
-    }
-    return Math.abs(b.netVolume) - Math.abs(a.netVolume);
-  });
-  
   return groups
 })
 
@@ -116,9 +81,9 @@ const groupByTypeAndSign = (getValueFn: (flow: any) => number) => {
     resources: [] as any[]    // 资源项目（非container类型的负值）
   }
   
-  // 创建一个映射表，记录wareId与其在allIndustryModules中的首次出现顺序
+  // 创建一个映射表，记录wareId与其在plannedModules中的首次出现顺序
   const wareOrderMap = new Map<string, number>();
-  store.allIndustryModules.forEach((module, index) => {
+  store.plannedModules.forEach((module, index) => {
     const moduleInfo = store.modules[module.id];
     if (moduleInfo) {
       // 记录该模块产出的所有ware的顺序
@@ -138,7 +103,7 @@ const groupByTypeAndSign = (getValueFn: (flow: any) => number) => {
       name: wareInfo ? translateWare(wareInfo) : flow.wareId,
       value: value,
       transportType: flow.transportType,
-      orderIndex: wareOrderMap.get(flow.wareId) ?? Number.MAX_SAFE_INTEGER, // 如果没在allIndustryModules中找到，则放在最后
+      orderIndex: wareOrderMap.get(flow.wareId) ?? Number.MAX_SAFE_INTEGER, // 如果没在plannedModules中找到，则放在最后
       // 为两种视图保留详细信息
       netRate: flow.netRate,
       netVolume: flow.netVolume,
@@ -161,7 +126,7 @@ const groupByTypeAndSign = (getValueFn: (flow: any) => number) => {
     }
   })
   
-  // 按allIndustryModules中的顺序排序，如果orderIndex相同则按绝对值降序排序
+  // 按plannedModules中的顺序排序，如果orderIndex相同则按绝对值降序排序
   groups.positive.sort((a, b) => {
     if (a.orderIndex !== b.orderIndex) {
       return a.orderIndex - b.orderIndex;
