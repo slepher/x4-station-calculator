@@ -77,41 +77,70 @@ const volumeGroups = computed(() => {
   return groups
 })
 
-// 经济视图数据分组功能
-const economyGroups = computed(() => {
+// 通用分组函数：根据数值正负性和运输类型进行分组
+const groupByTypeAndSign = (getValueFn: (flow: any) => number) => {
   const groups = {
-    income: [] as any[],      // 产品收入（正净价值）
-    operations: [] as any[],  // 运营支出（运输类型为container的负净价值）
-    resources: [] as any[]    // 资源支出（非container类型的负净价值）
+    positive: [] as any[],    // 正值项目
+    operations: [] as any[],  // 运营项目（运输类型为container的负值）
+    resources: [] as any[]    // 资源项目（非container类型的负值）
   }
   
   store.wareFlowList.forEach(flow => {
     const wareInfo = store.wares[flow.wareId]
+    const value = getValueFn(flow)
     const item = {
       id: flow.wareId,
       name: wareInfo ? translateWare(wareInfo) : flow.wareId,
-      netValue: flow.netValue,
-      transportType: flow.transportType
+      value: value,
+      transportType: flow.transportType,
+      // 为资源视图保留详细信息
+      netRate: flow.netRate,
+      netVolume: flow.netVolume,
+      unitVolume: flow.unitVolume,
+      totalOccupiedVolume: flow.totalOccupiedVolume,
+      totalOccupiedCount: flow.totalOccupiedCount,
+      details: flow.contributions,
+      netValue: flow.netValue
     }
     
-    if (flow.netValue > 0) {
-      // 产品收入：正值
-      groups.income.push(item)
+    if (value > 0) {
+      // 正值：产品/收入
+      groups.positive.push(item)
     } else if (flow.transportType === 'container') {
-      // 运营支出：container类型的负值
+      // 运营：container类型的负值
       groups.operations.push(item)
     } else {
-      // 资源支出：非container类型的负值
+      // 资源：非container类型的负值
       groups.resources.push(item)
     }
   })
   
-  // 按netValue绝对值降序排序
-  groups.income.sort((a, b) => Math.abs(b.netValue) - Math.abs(a.netValue))
-  groups.operations.sort((a, b) => Math.abs(b.netValue) - Math.abs(a.netValue))
-  groups.resources.sort((a, b) => Math.abs(b.netValue) - Math.abs(a.netValue))
+  // 按绝对值降序排序
+  groups.positive.sort((a, b) => Math.abs(b.value) - Math.abs(a.value))
+  groups.operations.sort((a, b) => Math.abs(b.value) - Math.abs(a.value))
+  groups.resources.sort((a, b) => Math.abs(b.value) - Math.abs(a.value))
   
   return groups
+}
+
+// 经济视图数据分组功能
+const economyGroups = computed(() => {
+  const rawGroups = groupByTypeAndSign(flow => flow.netValue)
+  return {
+    income: rawGroups.positive,      // 产品收入（正净价值）
+    operations: rawGroups.operations, // 运营支出（运输类型为container的负净价值）
+    resources: rawGroups.resources    // 资源支出（非container类型的负净价值）
+  }
+})
+
+// 资源视图数据分组功能
+const resourceGroups = computed(() => {
+  const rawGroups = groupByTypeAndSign(flow => flow.netRate)
+  return {
+    products: rawGroups.positive,    // 产品（正净产量）
+    operations: rawGroups.operations, // 运营（运输类型为container的负净产量）
+    resources: rawGroups.resources    // 资源（非container类型的负净产量）
+  }
 })
 
 // 总利润计算
@@ -306,21 +335,71 @@ const getEconomyDetails = (wareId: string) => {
         </div>
       </div>
       
-      <!-- 数量视图：显示资源列表 -->
-      <StationWareFlow v-if="viewMode === 'quantity'" v-for="flow in wareFlowList" :key="flow.id" 
-        :resourceId="flow.id" 
-        :name="flow.name" 
-        :netRate="flow.netRate" 
-        :netVolume="flow.netVolume" 
-        :netValue="0" 
-        :transportType="flow.transportType" 
-        :unitVolume="flow.unitVolume" 
-        :totalOccupiedVolume="flow.totalOccupiedVolume"
-        :totalOccupiedCount="flow.totalOccupiedCount"
-        :details="flow.details" 
-        :locked="store.isWareLocked(flow.id)"
-        :viewMode="viewMode"
-        @update:locked="store.toggleWareLock(flow.id)" />
+      <!-- 数量视图（资源视图）：显示分组数据 -->
+      <div v-if="viewMode === 'quantity'" class="resource-groups-container space-y-1">
+        <!-- 产品组 -->
+        <div v-if="resourceGroups.products.length > 0" class="resource-group">
+          <div class="resource-group-header">
+            <h4 class="resource-group-title">{{ t('ui.products_group') || '产品' }}</h4>
+          </div>
+          <StationWareFlow v-for="item in resourceGroups.products" :key="item.id" 
+            :resourceId="item.id" 
+            :name="item.name" 
+            :netRate="item.netRate" 
+            :netVolume="item.netVolume" 
+            :netValue="0" 
+            :transportType="item.transportType" 
+            :unitVolume="item.unitVolume" 
+            :totalOccupiedVolume="item.totalOccupiedVolume"
+            :totalOccupiedCount="item.totalOccupiedCount"
+            :details="item.details" 
+            :locked="store.isWareLocked(item.id)"
+            :viewMode="viewMode"
+            @update:locked="store.toggleWareLock(item.id)" />
+        </div>
+
+        <!-- 运营组 -->
+        <div v-if="resourceGroups.operations.length > 0" class="resource-group">
+          <div class="resource-group-header">
+            <h4 class="resource-group-title">{{ t('ui.operations_group') || '运营' }}</h4>
+          </div>
+          <StationWareFlow v-for="item in resourceGroups.operations" :key="item.id" 
+            :resourceId="item.id" 
+            :name="item.name" 
+            :netRate="item.netRate" 
+            :netVolume="item.netVolume" 
+            :netValue="0" 
+            :transportType="item.transportType" 
+            :unitVolume="item.unitVolume" 
+            :totalOccupiedVolume="item.totalOccupiedVolume"
+            :totalOccupiedCount="item.totalOccupiedCount"
+            :details="item.details" 
+            :locked="store.isWareLocked(item.id)"
+            :viewMode="viewMode"
+            @update:locked="store.toggleWareLock(item.id)" />
+        </div>
+
+        <!-- 资源组 -->
+        <div v-if="resourceGroups.resources.length > 0" class="resource-group">
+          <div class="resource-group-header">
+            <h4 class="resource-group-title">{{ t('ui.resources_group') || '资源' }}</h4>
+          </div>
+          <StationWareFlow v-for="item in resourceGroups.resources" :key="item.id" 
+            :resourceId="item.id" 
+            :name="item.name" 
+            :netRate="item.netRate" 
+            :netVolume="item.netVolume" 
+            :netValue="0" 
+            :transportType="item.transportType" 
+            :unitVolume="item.unitVolume" 
+            :totalOccupiedVolume="item.totalOccupiedVolume"
+            :totalOccupiedCount="item.totalOccupiedCount"
+            :details="item.details" 
+            :locked="store.isWareLocked(item.id)"
+            :viewMode="viewMode"
+            @update:locked="store.toggleWareLock(item.id)" />
+        </div>
+      </div>
 
       <div v-if="wareFlowList.length === 0 && viewMode !== 'economy'" class="empty-container">
         <div class="empty-icon-wrapper">
@@ -584,5 +663,22 @@ const getEconomyDetails = (wareId: string) => {
 
 .economy-item-value.negative {
   @apply text-red-400;
+}
+
+/* 资源视图样式 */
+.resource-groups-container {
+  @apply space-y-1;
+}
+
+.resource-group {
+  @apply mb-1;
+}
+
+.resource-group-header {
+  @apply flex justify-between items-center h-8 px-3 py-0.5 bg-slate-800/40 rounded mb-1;
+}
+
+.resource-group-title {
+  @apply text-sm font-bold text-slate-300;
 }
 </style>
