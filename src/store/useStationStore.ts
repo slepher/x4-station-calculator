@@ -100,7 +100,9 @@ export const useStationStore = defineStore('station', () => {
       if (target) {
         plannedModules.value = JSON.parse(JSON.stringify(target.modules))
         settings.value = JSON.parse(JSON.stringify(target.settings))
-        settings.value.racePreference = settings.value.racePreference || 'argon' // 兼容旧数据
+        settings.value.racePreference = settings.value.racePreference || 'argon' 
+        settings.value.productBufferHours = settings.value.productBufferHours || 12
+        settings.value.resourceBufferHours = settings.value.resourceBufferHours || 2 // 兼容旧数据
         lockedWares.value = target.lockedWares ? JSON.parse(JSON.stringify(target.lockedWares)) : []
       }
     }
@@ -319,8 +321,20 @@ export const useStationStore = defineStore('station', () => {
 
   // 资源流向分析 (Ware Flow Analysis)
   const wareFlowList = computed(() => {
+    let plannedWareIds : string[] = [];
+
+    plannedModules.value.forEach(item => {
+      const info :X4Module | undefined = modulesMap.value[item.id];
+      if (!info) return;
+      Object.keys(info.outputs || {}).forEach((wareId) => {
+        if(plannedWareIds.includes(wareId)) return;
+        plannedWareIds.push(wareId);
+      })
+    })
+
     return analyzeWareFlow(
       allIndustryModules.value,
+      plannedWareIds,
       modulesMap.value,
       waresMap.value,
       medicalConsumptionMap.value,

@@ -1,6 +1,10 @@
 {
   "ui": {
     "resource_overview": "资源产出概览",
+    "volume_overview": "体积概览",
+    "income_group": "产品收入",
+    "operations_group": "运营支出",
+    "resources_group": "资源支出",
     "current_efficiency": "当前综合效率",
     "hourly_rate": "每小时流量",
     "no_active_production": "暂无活跃生产周期",
@@ -82,7 +86,14 @@
     "tier_planned": "用户规划区",
     "tier_industry": "自动工业区",
     "tier_supply": "自动补给区",
-    "race_preference": "种族偏好"
+    "race_preference": "种族偏好",
+    "container_group": "集装箱",
+    "solid_group": "固体",
+    "liquid_group": "液体",
+    "planning_space": "规划空间",
+    "compression_ratio": "压缩比",
+    "resource_buffer_hours": "资源缓冲时间",
+    "product_buffer_hours": "产品缓冲时间"
   },
   "profit": {
     "title": "经济分析",

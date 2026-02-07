@@ -7,3 +7,11 @@
 **工作环境要求**：
   - **当前工作目录**：`D:\Documents\project\x4-station-calculator`
   - **运行环境**：Windows PowerShell（使用分号分隔命令）
+  - 使用git的的时候应该禁用less功能, 否则会导致git命令无法正常执行
+  - 执行任务的时候, 先检查当前任务的完成情况, 如果任务已经完成, 则直接跳过
+  - 执行没有完成的任务的时候, 应该先编写测试, 在正式执行任务
+  - 使用playwright的时候, 先确认当前执行目录, 并添加--reporter=list参数, 可以查看所有测试用例的执行结果
+  - 执行命令行任务的时候应该先确认当前目录为工作目录再执行, 否则会导致任务执行失败
+  - 为何每次执行npx playwright的时候都不在正确的工作目录
+  - i18n 的原则是只要i18n本身, 不需在组件中硬编码fallback 
+    **举例** 是t('ui.volume_overview') 而不是 t('ui.volume_overview') || 'Volume Overview'

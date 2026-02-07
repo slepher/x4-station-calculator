@@ -1,6 +1,10 @@
 {
   "ui": {
     "resource_overview": "Resource Production Overview",
+    "volume_overview": "Volume Overview",
+    "income_group": "Product Income",
+    "operations_group": "Operations Expenses",
+    "resources_group": "Resource Expenses",
     "current_efficiency": "Current Efficiency",
     "hourly_rate": "Hourly Rate",
     "no_active_production": "No Active Production",
@@ -82,7 +86,14 @@
     "tier_planned": "Planned Modules",
     "tier_industry": "Auto Industry",
     "tier_supply": "Auto Supply",
-    "race_preference": "Race Preference"
+    "race_preference": "Race Preference",
+    "container_group": "Container",
+    "solid_group": "Solid",
+    "liquid_group": "Liquid",
+    "planning_space": "Planning Space",
+    "compression_ratio": "Compression Ratio",
+    "resource_buffer_hours": "Resource Buffer Hours",
+    "product_buffer_hours": "Product Buffer Hours"
   },
   "profit": {
     "title": "ECONOMIC ANALYSIS",

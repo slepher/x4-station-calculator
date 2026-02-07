@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useX4I18n } from '@/utils/UseX4I18n'
 import { useStationStore } from '@/store/useStationStore'
 import { useI18n } from 'vue-i18n'
 
@@ -11,12 +10,15 @@ const props = defineProps<{
   details?: any[]
   locked?: boolean // 新增 locked 属性
   // 新增体积和经济数据
-  netVolume?: number
-  netValue?: number
-  transportType?: string
-  unitVolume?: number
+  netVolume: number
+  netValue: number
+  transportType: string
+  unitVolume: number
+  // 新增仓储规划数据
+  totalOccupiedVolume?: number
+  totalOccupiedCount?: number
   // 新增视图模式属性
-  viewMode?: 'quantity' | 'volume' | 'economy'
+  viewMode: 'quantity' | 'volume' | 'economy'
 }>()
 
 const emit = defineEmits<{
@@ -45,6 +47,9 @@ const displayValue = computed(() => {
   if (props.viewMode === 'economy' && props.netValue !== undefined) {
     return props.netValue
   }
+  if (props.viewMode === 'volume' && props.netVolume !== undefined) {
+    return props.netVolume
+  }
   return props.netRate
 })
 
@@ -52,6 +57,9 @@ const displayValue = computed(() => {
 const displaySign = computed(() => {
   if (props.viewMode === 'economy' && props.netValue !== undefined) {
     return props.netValue >= 0 ? '+' : ''
+  }
+  if (props.viewMode === 'volume' && props.netVolume !== undefined) {
+    return props.netVolume >= 0 ? '+' : ''
   }
   return props.netRate >= 0 ? '+' : ''
 })
@@ -74,13 +82,25 @@ const formattedDetails = computed(() => {
   // 如果是经济视图，需要将明细数据转换为经济数据
   if (props.viewMode === 'economy') {
     return processedDetails.value.map(detail => {
-      // 这里需要根据模块的经济价值计算明细的经济数据
-      // 暂时使用简单的转换逻辑，实际应该根据模块配置计算
-      const economicValue = detail.amount * 100 // 假设每个单位价值100 credits
+      // 使用analyzeWareFlow函数计算的实际valueFlow数据
+      const economicValue = detail.valueFlow !== undefined ? detail.valueFlow : detail.amount * 100
       return {
         ...detail,
         economicAmount: economicValue,
         displayAmount: economicValue
+      }
+    })
+  }
+  
+  // 如果是体积视图，需要将明细数据转换为体积数据
+  if (props.viewMode === 'volume') {
+    return processedDetails.value.map(detail => {
+      // 使用analyzeWareFlow函数计算的实际volumeFlow数据
+      const volumeValue = detail.volumeFlow !== undefined ? detail.volumeFlow : detail.amount * (props.unitVolume || 0)
+      return {
+        ...detail,
+        volumeAmount: volumeValue,
+        displayAmount: volumeValue
       }
     })
   }
@@ -108,8 +128,19 @@ const toggleLock = () => {
         <span class="name">{{ name }}</span>
       </div>
       <div class="right-group">
-        <div class="value">
+        <div class="value" v-if="viewMode !== 'volume'">
           {{ displaySign }}{{ formatNum(displayValue) }}
+        </div>
+        <div class="volume-title-group" v-else>
+          <span class="volume-net" :class="netVolume >= 0 ? 'text-emerald-400' : 'text-red-400'">
+            {{ displaySign }}{{ formatNum(Math.abs(netVolume || 0)) }}m³
+          </span>
+          <span class="volume-planning text-blue-400" v-if="totalOccupiedVolume !== undefined">
+            {{ formatNum(totalOccupiedVolume || 0) }}m³
+          </span>
+          <span class="volume-count text-blue-400" v-if="totalOccupiedCount !== undefined">
+            {{ Math.ceil(totalOccupiedCount || 0) }}
+          </span>
         </div>
         <div class="lock-btn" :class="{ 'is-locked': locked, 'non-operable': nonOperable }"
           @click.stop="!nonOperable && toggleLock()"
@@ -252,6 +283,34 @@ const toggleLock = () => {
 
 .item-name .name {
   @apply text-xs font-normal text-slate-400;
+}
+
+.volume-info {
+  @apply text-[10px] text-slate-500 ml-1;
+}
+
+.volume-title-group {
+  @apply flex items-center gap-3 font-mono font-bold;
+}
+
+.volume-net {
+  @apply text-sm;
+}
+
+.volume-planning {
+  @apply text-sm;
+}
+
+.volume-count {
+  @apply text-sm;
+}
+
+.volume-value {
+  @apply flex items-center gap-2;
+}
+
+.volume-details {
+  @apply text-[10px] text-slate-400 ml-1;
 }
 
 .item-val-group {

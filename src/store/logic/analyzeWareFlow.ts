@@ -21,6 +21,7 @@ type X4WareWithVolume = X4Ware & { volume?: number };
  */
 export function analyzeWareFlow(
   plannedModules: SavedModule[],
+  plannedWareIds: string[],
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4WareWithVolume>,
   medicalConsumptionMap: RaceMedicalConsumption,
@@ -184,10 +185,9 @@ export function analyzeWareFlow(
     const consumptionBufferCount = entry.consumption * resourceBufferHours;
     
     // 2. 产出缓冲 (Output/Transport Buffer)
-    // 通常仅当有净产出时才需要额外的产出堆积空间
-    const productionBufferCount = entry.netRate > 0 
-      ? entry.netRate * productBufferHours 
-      : 0;
+    // 通常仅当需要产品产物的时候
+    const productionBufferCount = plannedWareIds.includes(wareId) && (entry.netRate > 0) ? entry.netRate * productBufferHours : 0;
+
 
     // 3. 填充结果
     entry.totalOccupiedConsumptionCount = consumptionBufferCount;

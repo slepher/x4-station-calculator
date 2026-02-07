@@ -11,8 +11,9 @@ test.describe('Task 3: 统一资源仪表盘和视图模式切换测试', () => 
     // 访问应用首页
     await sharedPage.goto('/x4-station-calculator/');
     
-    // 等待应用加载完成
-    await sharedPage.waitForSelector('.module-list-container', { timeout: 10000 });
+    // 等待应用加载完成 - 使用更通用的选择器
+    await sharedPage.waitForLoadState('networkidle');
+    await sharedPage.waitForTimeout(2000);
     
     // 切换到中文界面
     const languageSelector = sharedPage.locator('select').first();
@@ -93,9 +94,6 @@ test.describe('Task 3: 统一资源仪表盘和视图模式切换测试', () => 
     
     // 验证标题更新为"经济分析"
     await expect(title).toContainText(/经济分析|Economic Overview/);
-    
-    // 验证体积视图按钮禁用状态
-    await expect(volumeView).toBeDisabled();
     
     // 切换回数量视图
     await quantityView.click();
@@ -322,7 +320,7 @@ test.describe('Task 3: 统一资源仪表盘和视图模式切换测试', () => 
     // 验证展开后显示产出消耗明细
     const mainRow = firstItem.locator('.main-row');
     await mainRow.evaluate((node) => {
-      node.click();
+      (node as HTMLElement).click();
     });
     await sharedPage.waitForTimeout(500);
     
@@ -357,5 +355,49 @@ test.describe('Task 3: 统一资源仪表盘和视图模式切换测试', () => 
     
     const hintText = emptyContainer.locator('.empty-sub-text');
     await expect(hintText).toContainText(/请添加生产模块以查看数据|Add modules to view data/);
+  });
+
+  test('3.8 体积分析功能测试', async () => {
+    const dashboard = sharedPage.locator('.list-wrapper').first();
+    await expect(dashboard).toBeVisible();
+    
+    // 验证体积视图按钮存在且可用
+    const volumeView = dashboard.locator('.view-mode-btn').nth(1);
+    await expect(volumeView).toBeVisible();
+    await expect(volumeView).not.toBeDisabled();
+    
+    // 验证体积视图按钮文本
+    await expect(volumeView).toHaveText('体积视图');
+    
+    // 切换到体积视图
+    await volumeView.click();
+    await sharedPage.waitForTimeout(500);
+    
+    // 验证标题显示"Volume Overview"
+    const title = dashboard.locator('.header-title');
+    await expect(title).toContainText(/Volume Overview/);
+    
+    // 验证体积视图激活
+    await expect(volumeView).toHaveClass(/active/);
+    
+    // 验证体积分组显示
+    const volumeGroups = dashboard.locator('.volume-groups-container');
+    await expect(volumeGroups).toBeVisible();
+    
+    // 验证体积视图布局与数量视图一致（没有额外的水平padding）
+    const volumeGroup = dashboard.locator('.volume-group').first();
+    await expect(volumeGroup).toBeVisible();
+    
+    // 验证压缩比显示
+    const compressionRatio = dashboard.locator('.compression-ratio-section');
+    await expect(compressionRatio).toBeVisible();
+    
+    // 切换回数量视图
+    const quantityView = dashboard.locator('.view-mode-btn').nth(0);
+    await quantityView.click();
+    await sharedPage.waitForTimeout(500);
+    
+    // 验证标题显示"资源产出概览"
+    await expect(title).toContainText(/资源产出概览|Resource Production Overview/);
   });
 });
