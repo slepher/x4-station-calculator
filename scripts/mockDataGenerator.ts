@@ -392,7 +392,7 @@ async function run() {
     const fs = await import('fs');
     const path = await import('path');
     
-    const outputPath = path.join(process.cwd(), 'src', 'mock', 'station_mock_data.json');
+    const outputPath = path.join(process.cwd(), 'tests', 'mock', 'station_mock_data.json');
     fs.writeFileSync(outputPath, JSON.stringify(results, null, 2));
     
     console.log(`💾 Data written to ${outputPath}`);
