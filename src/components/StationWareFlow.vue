@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useStationStore } from '@/store/useStationStore'
-import { useI18n } from 'vue-i18n'
+import CollapsibleDetailList from './common/CollapsibleDetailList.vue'
 
 const props = defineProps<{
   resourceId: string
@@ -26,8 +26,6 @@ const emit = defineEmits<{
 }>()
 
 const store = useStationStore()
-const { t } = useI18n()
-const isOpen = ref(false)
 
 const translateModule = (moduleId: string) => {
     const store = useStationStore()
@@ -119,12 +117,14 @@ const toggleLock = () => {
 </script>
 
 <template>
-  <div class="item-container">
-    <div class="main-row" :class="[displayValue >= 0 ? 'status-pos' : 'status-neg', { 'is-active': isOpen }]"
-      @click="isOpen = !isOpen">
+  <CollapsibleDetailList
+    :data="formattedDetails"
+    :isPositive="displayValue >= 0"
+  >
+    <template #header="{ isOpen }">
       <div class="label-group">
         <span class="arrow" :class="{ 'arrow-open': isOpen }">▶</span>
-        <div class="dot" :class="displayValue >= 0 ? 'dot-pos' : 'dot-neg'"></div>
+        <div class="dot"></div>
         <span class="name">{{ name }}</span>
       </div>
       <div class="right-group">
@@ -135,16 +135,15 @@ const toggleLock = () => {
           <span class="volume-net" :class="netVolume >= 0 ? 'text-emerald-400' : 'text-red-400'">
             {{ displaySign }}{{ formatNum(Math.abs(netVolume || 0)) }}m³
           </span>
-          <span class="volume-planning text-blue-400" v-if="totalOccupiedVolume !== undefined">
+          <span class="volume-planning text-blue-400">
             {{ formatNum(totalOccupiedVolume || 0) }}m³
           </span>
-          <span class="volume-count text-blue-400" v-if="totalOccupiedCount !== undefined">
+          <span class="volume-count text-blue-400">
             {{ Math.ceil(totalOccupiedCount || 0) }}
           </span>
         </div>
         <div class="lock-btn" :class="{ 'is-locked': locked, 'non-operable': nonOperable }"
-          @click.stop="!nonOperable && toggleLock()"
-          :title="nonOperable ? t('ui.non_operable_resource') : t('ui.lock_quantity_hint')">
+          @click.stop="!nonOperable && toggleLock()">
           <svg v-if="locked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
             <path fill-rule="evenodd"
               d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z"
@@ -155,44 +154,26 @@ const toggleLock = () => {
               d="M18 1.5c2.9 0 5.25 2.35 5.25 5.25v3.75a.75.75 0 01-1.5 0V6.75a3.75 3.75 0 10-7.5 0v3a3 3 0 013 3v6.75a3 3 0 01-3 3H3.75a3 3 0 01-3-3v-6.75a3 3 0 013-3h9v-3c0-2.9 2.35-5.25 5.25-5.25z" />
           </svg>
         </div>
-
       </div>
-    </div>
+    </template>
 
-    <Transition name="expand">
-      <div v-if="isOpen" class="list-box">
-        <div v-for="(det, idx) in formattedDetails" :key="idx"
-          :class="['list-item', det.type === 'production' ? 'item-prod' : 'item-cons']">
-          <span class="item-name">
-            <span class="qty">{{ det.count }}</span>
-            <span class="symbol">x</span>
-            <span class="name">{{ translateModule(det.moduleId) }}</span>
-          </span>
-          <div class="item-val-group">
-            <span v-if="det.bonusPercent > 0" class="item-bonus">(+{{ det.bonusPercent }}%)</span>
-            <span class="item-val">
-              {{ det.displayAmount > 0 ? '+' : '' }}{{ formatNum(det.displayAmount) }}
-            </span>
-          </div>
-        </div>
+    <template #row="{ item }">
+      <span class="item-name">
+        <span class="qty">{{ item.count }}</span>
+        <span class="symbol">x</span>
+        <span class="name">{{ translateModule(item.moduleId) }}</span>
+      </span>
+      <div class="item-val-group">
+        <span v-if="item.bonusPercent > 0" class="item-bonus">(+{{ item.bonusPercent }}%)</span>
+        <span class="item-val">
+          {{ item.displayAmount > 0 ? '+' : '' }}{{ formatNum(item.displayAmount) }}
+        </span>
       </div>
-    </Transition>
-  </div>
+    </template>
+  </CollapsibleDetailList>
 </template>
 
 <style scoped>
-.item-container {
-  @apply mb-1 select-none;
-}
-
-.main-row {
-  @apply flex justify-between items-center px-3 py-0.5 bg-slate-800/40 rounded cursor-pointer hover:bg-slate-700/50 transition-colors border border-transparent;
-}
-
-.is-active {
-  @apply border-slate-600/50 bg-slate-700/40;
-}
-
 /* 基础图标与文字 */
 .label-group {
   @apply flex items-center gap-2;
@@ -208,14 +189,6 @@ const toggleLock = () => {
 
 .dot {
   @apply w-1.5 h-1.5 rounded-full;
-}
-
-.dot-pos {
-  @apply bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)];
-}
-
-.dot-neg {
-  @apply bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)];
 }
 
 /* 核心修复：添加 flex 布局确保横向排列 */
@@ -257,15 +230,6 @@ const toggleLock = () => {
 
 .status-neg .value {
   @apply text-red-400;
-}
-
-/* 明细列表布局 */
-.list-box {
-  @apply bg-slate-900/60 mx-1 px-4 py-2 text-[11px] rounded-b border-x border-b border-slate-700/30 overflow-hidden;
-}
-
-.list-item {
-  @apply flex justify-between items-center py-1.5 border-b border-slate-700/20 last:border-0;
 }
 
 /* 三段式紧凑结构 */
@@ -332,18 +296,5 @@ const toggleLock = () => {
 
 .item-cons .item-val {
   @apply text-red-400/70;
-}
-
-/* 动画 */
-.expand-enter-active,
-.expand-leave-active {
-  transition: all 0.2s ease-out;
-  max-height: 500px;
-}
-
-.expand-enter-from,
-.expand-leave-to {
-  opacity: 0;
-  max-height: 0;
 }
 </style>
