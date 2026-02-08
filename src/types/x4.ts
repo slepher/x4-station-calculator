@@ -187,6 +187,8 @@ export interface ModuleFlowAtom {
 export interface WareFlow {
   // --- 核心标识 ---
   wareId: string;
+  orderIndex: number; // 排序索引：基于 firstAppearanceInModules 的顺序
+  tier: number;
   transportType: TransportType; // 集装箱/固体/液体
   unitVolume: number;           // 单体体积
 
@@ -226,6 +228,26 @@ export interface WareFlow {
    * UI 上可以分为 "来源(Sources)" 和 "去向(Sinks)" 两组展示
    */
   contributions: ModuleFlowAtom[];
+}
+
+// [新增] 分组流向接口 - 用于统一管理和展示
+export interface GroupedFlows {
+  // 主数据：所有流向（已按orderIndex排序）
+  flows: WareFlow[]; 
+  
+  // 按数量/经济视图分组
+  rateGroups: {
+    positive: WareFlow[];  // 产品/收入 (netRate > 0)
+    operations: WareFlow[]; // 运营 (netRate <= 0 && transportType === 'container')
+    resources: WareFlow[];  // 资源 (netRate <= 0 && transportType !== 'container')
+  };
+  
+  // 按体积视图分组
+  volumeGroups: {
+    solid: WareFlow[];     // 固体
+    liquid: WareFlow[];    // 液体
+    container: WareFlow[]; // 容器
+  };
 }
 
 // [新增] 人口普查结果接口

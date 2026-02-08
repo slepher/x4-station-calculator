@@ -320,7 +320,7 @@ export const useStationStore = defineStore('station', () => {
   )
 
   // 资源流向分析 (Ware Flow Analysis)
-  const wareFlowList = computed(() => {
+  const groupedFlows = computed(() => {
     let plannedWareIds : string[] = [];
 
     plannedModules.value.forEach(item => {
@@ -429,6 +429,6 @@ export const useStationStore = defineStore('station', () => {
     lockedWares, isWareLocked, isWareOperable, toggleWareLock,
     addModule, importPlan, updateModuleId, updateModuleCount, removeModule, removeModuleById, transferModuleFromAutoIndustry, clearAll, getModuleInfo,
     constructionBreakdown, workforceBreakdown, profitBreakdown, autoFillMissingLines,
-    actualWorkforce, currentEfficiency: computed(() => efficiencyMetrics.value.saturation), netProduction, wareFlowList
+    actualWorkforce, currentEfficiency: computed(() => efficiencyMetrics.value.saturation), netProduction, groupedFlows
   }
 })

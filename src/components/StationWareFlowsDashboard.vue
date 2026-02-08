@@ -18,143 +18,36 @@ const viewMode = ref<'quantity' | 'volume' | 'economy'>('quantity')
 // 格式化函数
 const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
 
-// 资源流向列表计算：使用 wareFlowList 替代 netProduction
-const wareFlowList = computed(() => {
-  return store.wareFlowList.map(flow => {
-    const wareInfo = store.wares[flow.wareId]
-    return {
-      id: flow.wareId,
-      name: wareInfo ? translateWare(wareInfo) : flow.wareId,
-      netRate: flow.netRate,
-      details: flow.contributions,
-      // 新增体积和经济数据
-      netVolume: flow.netVolume,
-      netValue: flow.netValue,
-      transportType: flow.transportType,
-      unitVolume: flow.unitVolume,
-      // 新增仓储规划数据
-       totalOccupiedVolume: flow.totalOccupiedVolume,
-       totalOccupiedCount: flow.totalOccupiedCount
-    }
-  })
-})
+// 从store获取已排序和分组好的数据
+const groupedFlows = computed(() => store.groupedFlows)
 
-// 体积数据分组功能
-const volumeGroups = computed(() => {
-  const groups = {
-    solid: [] as any[],
-    liquid: [] as any[],
-    container: [] as any[]
+// 辅助函数：为UI提供名称翻译后的包装对象
+const wrapFlow = (flow: any) => {
+  const wareInfo = store.wares[flow.wareId]
+  return {
+    id: flow.wareId,
+    name: wareInfo ? translateWare(wareInfo) : flow.wareId,
+    ...flow
   }
-  
-  store.wareFlowList.forEach(flow => {
-    const wareInfo = store.wares[flow.wareId]
-    const item = {
-      id: flow.wareId,
-      name: wareInfo ? translateWare(wareInfo) : flow.wareId,
-      netVolume: flow.netVolume,
-      transportType: flow.transportType,
-      unitVolume: flow.unitVolume,
-      totalOccupiedVolume: flow.totalOccupiedVolume,
-      totalOccupiedCount: flow.totalOccupiedCount,
-      // 添加明细数据用于展开显示
-      details: flow.contributions || []
-    }
-    
-    if (flow.transportType === 'solid') {
-      groups.solid.push(item)
-    } else if (flow.transportType === 'liquid') {
-      groups.liquid.push(item)
-    } else {
-      groups.container.push(item)
-    }
-  })
-  
-  return groups
-})
-
-// 通用分组函数：根据数值正负性和运输类型进行分组
-const groupByTypeAndSign = (getValueFn: (flow: any) => number) => {
-  const groups = {
-    positive: [] as any[],    // 正值项目
-    operations: [] as any[],  // 运营项目（运输类型为container的负值）
-    resources: [] as any[]    // 资源项目（非container类型的负值）
-  }
-  
-  // 创建一个映射表，记录wareId与其在allIndustryModules中的首次出现顺序
-  const wareOrderMap = new Map<string, number>();
-  store.allIndustryModules.forEach((module, index) => {
-    const moduleInfo = store.modules[module.id];
-    if (moduleInfo) {
-      // 记录该模块产出的所有ware的顺序
-      Object.keys(moduleInfo.outputs || {}).forEach(wareId => {
-        if (!wareOrderMap.has(wareId)) {
-          wareOrderMap.set(wareId, index); // 以第一次出现的模块为准
-        }
-      });
-    }
-  });
-  
-  store.wareFlowList.forEach(flow => {
-    const wareInfo = store.wares[flow.wareId]
-    const value = getValueFn(flow)
-    const item = {
-      id: flow.wareId,
-      name: wareInfo ? translateWare(wareInfo) : flow.wareId,
-      value: value,
-      transportType: flow.transportType,
-      orderIndex: wareOrderMap.get(flow.wareId) ?? Number.MAX_SAFE_INTEGER, // 如果没在plannedModules中找到，则放在最后
-      // 为两种视图保留详细信息
-      netRate: flow.netRate,
-      netVolume: flow.netVolume,
-      netValue: flow.netValue,
-      unitVolume: flow.unitVolume,
-      totalOccupiedVolume: flow.totalOccupiedVolume,
-      totalOccupiedCount: flow.totalOccupiedCount,
-      details: flow.contributions
-    }
-    
-    if (value > 0) {
-      // 正值：产品/收入
-      groups.positive.push(item)
-    } else if (flow.transportType === 'container') {
-      // 运营：container类型的负值
-      groups.operations.push(item)
-    } else {
-      // 资源：非container类型的负值
-      groups.resources.push(item)
-    }
-  })
-  
-  // 按plannedModules中的顺序排序，如果orderIndex相同则按绝对值降序排序
-  groups.positive.sort((a, b) => {
-    if (a.orderIndex !== b.orderIndex) {
-      return a.orderIndex - b.orderIndex;
-    }
-    return Math.abs(b.value) - Math.abs(a.value);
-  });
-  groups.operations.sort((a, b) => {
-    if (a.orderIndex !== b.orderIndex) {
-      return a.orderIndex - b.orderIndex;
-    }
-    return Math.abs(b.value) - Math.abs(a.value);
-  });
-  groups.resources.sort((a, b) => {
-    if (a.orderIndex !== b.orderIndex) {
-      return a.orderIndex - b.orderIndex;
-    }
-    return Math.abs(b.value) - Math.abs(a.value);
-  });
-  
-  return groups
 }
 
-// 计算分组（基于netRate，但netValue的分组逻辑相同）
-const rateGroups = computed(() => groupByTypeAndSign(flow => flow.netRate))
+// 体积数据分组功能
+const volumeGroups = computed(() => ({
+  solid: groupedFlows.value.volumeGroups.solid.map(wrapFlow),
+  liquid: groupedFlows.value.volumeGroups.liquid.map(wrapFlow),
+  container: groupedFlows.value.volumeGroups.container.map(wrapFlow)
+}))
+
+// 计算分组（基于netRate）
+const rateGroups = computed(() => ({
+  positive: groupedFlows.value.rateGroups.positive.map(wrapFlow),
+  operations: groupedFlows.value.rateGroups.operations.map(wrapFlow),
+  resources: groupedFlows.value.rateGroups.resources.map(wrapFlow)
+}))
 
 // 总利润计算
 const totalProfit = computed(() => {
-  return store.wareFlowList.reduce((sum, flow) => sum + flow.netValue, 0)
+  return groupedFlows.value.flows.reduce((sum, flow) => sum + flow.netValue, 0)
 })
 
 </script>
@@ -212,7 +105,7 @@ const totalProfit = computed(() => {
             :unitVolume="item.unitVolume" 
             :totalOccupiedVolume="item.totalOccupiedVolume"
             :totalOccupiedCount="item.totalOccupiedCount"
-            :details="item.details" 
+            :details="item.contributions" 
             :locked="store.isWareLocked(item.id)"
             :viewMode="viewMode"
             @update:locked="store.toggleWareLock(item.id)" />
@@ -233,7 +126,7 @@ const totalProfit = computed(() => {
             :unitVolume="item.unitVolume" 
             :totalOccupiedVolume="item.totalOccupiedVolume"
             :totalOccupiedCount="item.totalOccupiedCount"
-            :details="item.details" 
+            :details="item.contributions"
             :locked="store.isWareLocked(item.id)"
             :viewMode="viewMode"
             @update:locked="store.toggleWareLock(item.id)" />
@@ -254,7 +147,7 @@ const totalProfit = computed(() => {
             :unitVolume="item.unitVolume" 
             :totalOccupiedVolume="item.totalOccupiedVolume"
             :totalOccupiedCount="item.totalOccupiedCount"
-            :details="item.details" 
+            :details="item.contributions" 
             :locked="store.isWareLocked(item.id)"
             :viewMode="viewMode"
             @update:locked="store.toggleWareLock(item.id)" />
@@ -286,7 +179,7 @@ const totalProfit = computed(() => {
             :unitVolume="item.unitVolume" 
             :totalOccupiedVolume="item.totalOccupiedVolume"
             :totalOccupiedCount="item.totalOccupiedCount"
-            :details="item.details" 
+            :details="item.contributions" 
             :locked="store.isWareLocked(item.id)"
             :viewMode="viewMode"
             @update:locked="store.toggleWareLock(item.id)" />
@@ -314,7 +207,7 @@ const totalProfit = computed(() => {
             :unitVolume="item.unitVolume" 
             :totalOccupiedVolume="item.totalOccupiedVolume"
             :totalOccupiedCount="item.totalOccupiedCount"
-            :details="item.details" 
+            :details="item.contributions" 
             :locked="store.isWareLocked(item.id)"
             :viewMode="viewMode"
             @update:locked="store.toggleWareLock(item.id)" />
@@ -342,14 +235,14 @@ const totalProfit = computed(() => {
             :unitVolume="item.unitVolume" 
             :totalOccupiedVolume="item.totalOccupiedVolume"
             :totalOccupiedCount="item.totalOccupiedCount"
-            :details="item.details" 
+            :details="item.contributions" 
             :locked="store.isWareLocked(item.id)"
             :viewMode="viewMode"
             @update:locked="store.toggleWareLock(item.id)" />
         </div>
         
         <!-- 经济视图空状态 -->
-        <div v-if="viewMode === 'economy' && wareFlowList.length === 0" class="empty-container">
+        <div v-if="viewMode === 'economy' && groupedFlows.flows.length === 0" class="empty-container">
           <div class="empty-icon-wrapper">
             <span class="empty-icon-text">!</span>
           </div>
@@ -358,7 +251,7 @@ const totalProfit = computed(() => {
         </div>
       </div>
 
-      <div v-if="wareFlowList.length === 0 && viewMode !== 'economy'" class="empty-container">
+      <div v-if="groupedFlows.flows.length === 0 && viewMode !== 'economy'" class="empty-container">
         <div class="empty-icon-wrapper">
           <span class="empty-icon-text">!</span>
         </div>

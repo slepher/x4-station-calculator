@@ -3,7 +3,8 @@ import type {
   StationSettings,
   X4Module,
   X4Ware,
-  WareFlow, // <--- 确保导入了正确的类型名
+  WareFlow,
+  GroupedFlows,
   RaceMedicalConsumption
 } from '../../types/x4'
 
@@ -30,9 +31,19 @@ export function analyzeWareFlow(
   saturation: number,
   resourceBufferHours: number = 1.0, // 对应 consumptionBufferTime
   productBufferHours: number = 1.0   // 对应 transportBufferTime
-): WareFlow[] {
+): GroupedFlows {
   
   const flowMap: Record<string, WareFlow> = {};
+
+  // 0. 建立排序映射：基于 plannedModules 及其产出的顺序 
+  const wareOrderMap = new Map<string, number>(); 
+  plannedModules.forEach((mod, index) => { 
+    const info = modulesMap[mod.id]; 
+    if (!info) return; 
+    Object.keys(info.outputs || {}).forEach(wareId => { 
+      if (!wareOrderMap.has(wareId)) wareOrderMap.set(wareId, index); 
+    }); 
+  });
 
   // 辅助：初始化 WareFlow 对象
   const getOrInitFlow = (wareId: string): WareFlow => {
@@ -40,6 +51,8 @@ export function analyzeWareFlow(
       const ware = waresMap[wareId];
       flowMap[wareId] = {
         wareId: wareId,
+        orderIndex: wareOrderMap.get(wareId) ?? Number.MAX_SAFE_INTEGER,
+        tier: ware?.tier || 0,
         transportType: ware?.transport || 'container',
         unitVolume: ware?.volume || 0,
         
@@ -168,7 +181,7 @@ export function analyzeWareFlow(
   // ---------------------------------------------------------
   // 3. 汇总计算 (Net, Storage, Economy)
   // ---------------------------------------------------------
-  return Object.values(flowMap).map(entry => {
+  const allFlows = Object.values(flowMap).map(entry => {
     // A. 流量净值
     entry.netRate = entry.production - entry.consumption;
     entry.netVolume = entry.productionVolume - entry.consumptionVolume;
@@ -201,4 +214,32 @@ export function analyzeWareFlow(
 
     return entry;
   });
+
+  // 4. 执行全局排序：第一权重 index，第二权重流量绝对值 
+  allFlows.sort((a, b) => {
+    if (a.orderIndex !== b.orderIndex) return a.orderIndex - b.orderIndex;
+    if (a.tier !== b.tier) return b.tier - a.tier;
+    return Math.abs(b.netRate) - Math.abs(a.netRate);
+  });
+
+  // 5. 线性分发分组 (保持已排好的顺序) 
+  const result: GroupedFlows = { 
+    flows: allFlows, 
+    rateGroups: { positive: [], operations: [], resources: [] }, 
+    volumeGroups: { solid: [], liquid: [], container: [] } 
+  }; 
+
+  allFlows.forEach(flow => { 
+    // 分发到数量/经济视图 
+    if (flow.netRate > 0) result.rateGroups.positive.push(flow); 
+    else if (flow.transportType === 'container') result.rateGroups.operations.push(flow); 
+    else result.rateGroups.resources.push(flow); 
+
+    // 分发到体积视图 
+    if (flow.transportType === 'solid') result.volumeGroups.solid.push(flow); 
+    else if (flow.transportType === 'liquid') result.volumeGroups.liquid.push(flow); 
+    else result.volumeGroups.container.push(flow); 
+  }); 
+
+  return result; 
 }
