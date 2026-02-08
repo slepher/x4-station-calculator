@@ -58,7 +58,10 @@ class X4PrecisionLoader:
         self.recipes = {} 
         self.race_consumption = {}  # 种群消耗速率 (每人每秒)
         self.module_groups_result = []  # 模块分组结果 (合并 types 和 waregroups)
+        self.ware_tier_map = {}     # 缓存物品层级映射
         self.all_methods = set()
+        self.colors_db = {}
+        self.mappings_db = {}
         
         # 收集需要翻译的原始名称 (Raw Key)
         self.needed_raw_names = set()
@@ -160,9 +163,91 @@ class X4PrecisionLoader:
                     
             self.needed_raw_names.add("{20102,2011}")
             print(f"   ✅ 从 {count} 个物品中收集到 {len(self.needed_raw_names)} 个原始 Key。")
+            
+            # 计算 Tier 层级 
+            self._calculate_tiers()
+            # 注入 Tier 到 wares_data 
+            for item in self.wares_data:
+                item['tier'] = self.ware_tier_map.get(item['id'], 0)
+                
             print(f"   ℹ️  发现生产方式: {sorted(list(self.all_methods))}")
 
         except Exception as e: print(f"   ❌ XML Error: {e}")
+
+    # =======================================================
+    # 1.1 计算物品生产层级 (Tier)
+    # =======================================================
+    def _calculate_tiers(self):
+        def get_tier(ware_id, visited=None):
+            if visited is None: visited = set()
+            if ware_id in self.ware_tier_map: return self.ware_tier_map[ware_id]
+            if ware_id in visited: return 0  # 防止循环引用
+            
+            recipe_group = self.recipes.get(ware_id)
+            if not recipe_group:
+                self.ware_tier_map[ware_id] = 0
+                return 0
+            
+            visited.add(ware_id)
+            max_input_tier = -1
+            for method, recipe in recipe_group.items():
+                for input_id in recipe['inputs']:
+                    max_input_tier = max(max_input_tier, get_tier(input_id, visited))
+            
+            tier = max_input_tier + 1 if max_input_tier >= 0 else 1
+            self.ware_tier_map[ware_id] = tier
+            return tier
+
+        for ware in self.wares_data:
+            get_tier(ware['id'])
+
+    # =======================================================
+    # 1.2 加载颜色库
+    # =======================================================
+    def load_colors(self):
+        print(f"🎨 [1.2/5] 解析 colors_final.xml...")
+        colors_path = os.path.join(self.raw_path, "libraries", "colors_final.xml")
+        if not os.path.exists(colors_path):
+            print(f"   ⚠️ 警告: 找不到颜色定义文件: {colors_path}")
+            return 
+
+        try:
+            tree = ET.parse(colors_path)
+            root = tree.getroot()
+            
+            # 1. 解析基础颜色定义 (RGBA -> Hex) 
+            color_defs = {}
+            for c in root.findall(".//colors/color"):
+                c_id = c.get('id')
+                r, g, b = int(c.get('r', 0)), int(c.get('g', 0)), int(c.get('b', 0))
+                color_defs[c_id] = f"#{r:02X}{g:02X}{b:02X}"
+            
+            self.colors_db = color_defs
+            # 2. 解析 Mapping 映射 
+            self.mappings_db = {m.get('id'): m.get('ref') for m in root.findall(".//mappings/mapping")}
+            print(f"   ✅ 加载了 {len(color_defs)} 个颜色定义和 {len(self.mappings_db)} 个映射。")
+        except Exception as e:
+            print(f"   ❌ Colors XML Error: {e}")
+
+    def _get_module_colors(self, m_type):
+        # 内部映射逻辑: 模块类型 -> Holomap Mapping ID 
+        type_to_mapping = {
+            'production': 'holomap_component_production',
+            'storage': 'holomap_component_storage',
+            'habitation': 'holomap_component_habitation',
+            'defense': 'holomap_component_defence',
+            'defence': 'holomap_component_defence',
+            'dockarea': 'holomap_component_dockingbay',
+            'connectionmodule': 'holomap_component_connection',
+            'processingmodule': 'holomap_component_processing',
+            'ventureplatform': 'holomap_component_ventureplatform',
+            'welfare': 'holomap_component_welfare',
+            'build': 'holomap_component_build'
+        }
+        mapping_id = type_to_mapping.get(m_type, f"holomap_component_{m_type}")
+        color_id = self.mappings_db.get(mapping_id, self.mappings_db.get('holomap_component_base', 'grey_160'))
+        hex_color = self.colors_db.get(color_id, "#A0A0A0")
+        return color_id, hex_color
 
     # =======================================================
     # 1.5 处理模块分组 (Module Groups - 合并 Waregroups 和 ModuleTypes)
@@ -180,12 +265,15 @@ class X4PrecisionLoader:
                 for group in root.findall('group'):
                     g_id = group.get('id')
                     g_name = group.get('name', '')
+                    color_id, hex_color = self._get_module_colors("production")
                     # 忽略 icon, 只保留 id 和 name
                     self.module_groups_result.append({
                         "id": g_id,
                         "nameId": g_name,
                         "type": "production",
-                        "name": g_name # 占位
+                        "name": g_name, # 占位
+                        "color": color_id,
+                        "color_rgb": hex_color
                     })
                     if g_name: self.needed_raw_names.add(g_name)
                     count += 1
@@ -196,12 +284,15 @@ class X4PrecisionLoader:
         # 2. 合并配置文件中的 Module Types
         count_types = 0
         for m_type, raw_key in self.config.get('module_types', {}).items():
+            color_id, hex_color = self._get_module_colors(m_type)
             # 避免重复 (如果配置里的 key 和 group id 冲突，优先保留 xml 的? 或者 append 即可，这里简单 append)
             self.module_groups_result.append({
                 "id": m_type,
                 "nameId": raw_key,
                 "type": m_type,
-                "name": raw_key # 占位
+                "name": raw_key, # 占位
+                "color": color_id,
+                "color_rgb": hex_color
             })
             if raw_key: self.needed_raw_names.add(raw_key)
             count_types += 1
@@ -249,6 +340,7 @@ class X4PrecisionLoader:
                 wf_val = int(wf_node.get('max') or wf_node.get('amount') or 0) if wf_node is not None else 0
                 wf_cap = int(wf_node.get('capacity') or 0) if wf_node is not None else 0
 
+                color_id, hex_color = self._get_module_colors(m_class)
                 module_data = {
                     "id": fname, 
                     "wareId": info['module_ware_id'], 
@@ -261,8 +353,11 @@ class X4PrecisionLoader:
                     "isPlayerBlueprint": is_player_bp,
                     "buildTime": info['build_time'], 
                     "buildCost": info['build_cost'],
+                    "tier": 0,
                     "cycleTime": 0,
                     "workforce": { "capacity": wf_cap, "needed": wf_val, "maxBonus": 0 },
+                    "color": color_id,
+                    "color_rgb": hex_color,
                     "outputs": {}, 
                     "inputs": {}
                 }
@@ -285,6 +380,7 @@ class X4PrecisionLoader:
                             module_data['group'] = SPECIAL_TYPE_MAPPING[raw_type]
                         else:
                             unmapped_types[raw_type].append(fname)
+                        module_data['color'], module_data['color_rgb'] = self._get_module_colors(raw_type)
 
                 if m_class == 'production':
                     prod_tag = macro.find('properties/production')
@@ -327,6 +423,9 @@ class X4PrecisionLoader:
                                 for k, v in recipe['inputs'].items():
                                     module_data["inputs"][k] = module_data["inputs"].get(k, 0) + round(v * factor, 2)
                                 module_data["workforce"]["maxBonus"] = max(module_data["workforce"]["maxBonus"], recipe['bonus'])
+                        
+                        # 计算模块 Tier: 取所有产物中最高的 Tier 
+                        module_data['tier'] = max([self.ware_tier_map.get(p_id, 0) for p_id, _ in production_configs] or [0])
                     
                 if m_class == 'storage':
                     cargo = macro.find('properties/cargo')
@@ -529,6 +628,7 @@ class X4PrecisionLoader:
 if __name__ == "__main__":
     loader = X4PrecisionLoader(X4_UNPACKED_DATA_PATH, OUTPUT_VERSION_DIR, _config)
     loader.build_database()
+    loader.load_colors()  # 加载颜色定义
     loader.process_module_groups()
     loader.scan_assets()
     loader.extract_and_resolve_languages()

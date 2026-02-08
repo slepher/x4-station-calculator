@@ -86,8 +86,11 @@ export function calculateAutoFill(
     const currentModulesAsSaved: SavedModule[] = Object.entries(industryModules).map(([id, count]) => ({ id, count }));
     const productionState = calculateNetProduction(currentModulesAsSaved, modules, globalWorkforceBonus);
     
-    // 填补缺口
-    for (const [wareId, netAmount] of Object.entries(productionState)) {
+    // [修改] 按 Tier 降序处理缺口，确保高 Tier 模块优先触发下游需求，建立正确的发现顺序 
+    const sortedWares = Object.entries(productionState) 
+      .sort(([idA], [idB]) => (wares[idB]?.tier || 0) - (wares[idA]?.tier || 0)); 
+
+    for (const [wareId, netAmount] of sortedWares) {
       if (netAmount >= -0.001) continue;
       
       const deficit = Math.abs(netAmount);
@@ -125,7 +128,9 @@ export function calculateAutoFill(
       const existingCount = plannedModules.find(m => m.id === id)?.count || 0;
       return { id, count: count - existingCount };
     })
-    .filter(m => m.count > 0);
+    .filter(m => m.count > 0) 
+    // [修改] 最终按 Tier 降序排序，由于 Array.sort 是稳定的，同 Tier 内将保持其被"发现"的先后顺序 
+    .sort((a, b) => (modules[b.id]?.tier || 0) - (modules[a.id]?.tier || 0));
 
   // ==========================================
   // Phase 2: 客户人口普查 (Client Census)
@@ -225,8 +230,11 @@ export function calculateAutoFill(
     
     // 转换为 SavedModule[]
     for (const [id, count] of Object.entries(supplyModulesMap)) {
-      autoSupply.push({ id, count });
+      if (count > 0) autoSupply.push({ id, count });
     }
+    
+    // [修改] 补给区模块同样按 Tier 排序 (通常为 T1/T2 级的食物和医疗) 
+    autoSupply.sort((a, b) => (modules[b.id]?.tier || 0) - (modules[a.id]?.tier || 0));
   }
 
   // ==========================================

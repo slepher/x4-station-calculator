@@ -12,6 +12,7 @@ export interface X4Ware {
   price: number;      // 平均价格
   minPrice: number;   // 最低价格
   maxPrice: number;   // 最高价格
+  tier: number;       // 物品层级
 }
 
 /**
@@ -31,6 +32,8 @@ export interface X4ModuleGroup {
   type: string;     // 模块类型 (如 production, habitation 等)
   nameId: string;     // 国际化文本 ID (如 {20104,12101})
   name: string;
+  color: string;
+  color_rgb: string;
 }
 
 /**
@@ -59,6 +62,13 @@ export interface X4Module {
   
   // 存储逻辑 (仅限存储模块)
   capacity?: number;  // 存储容量
+  
+  // 颜色标记
+  color: string;
+  color_rgb: string;
+  
+  // 模块层级
+  tier: number;
 }
 
 /**

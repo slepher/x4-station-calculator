@@ -1,0 +1,1002 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<colormap xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="colors.xsd">
+  <daltonization>
+    <!-- Transformation from RGB to LMS color space (combination of D65 rgb2xyz (https://ixora.io/projects/colorblindness/color-blindness-simulation-research/) and CIECAM02 xyz2lms (https://en.wikipedia.org/wiki/LMS_color_space) -->
+    <transformation name="lms_trafo" type="rgb2lms">
+      <long red="0.3905" green="0.07093" blue="0.02314"/>
+      <middle red="0.5499" green="0.9631" blue="0.1280"/>
+      <short red="0.008902" green="0.001358" blue="0.9361"/>
+    </transformation>
+    <!-- Pre-calculated Inverse -->
+    <transformation name="rgb_trafo" type="lms2rgb">
+      <red long="2.85811" middle="-0.210434" short="0.041877"/>
+      <green long="-1.62859" middle="1.15842" short="-0.118142"/>
+      <blue long="-0.024817" middle="0.00032063" short="1.06883"/>
+    </transformation>
+    <!-- Calculated analog to https://ixora.io/projects/colorblindness/color-blindness-simulation-research/ but we are using a different xyz2lms transformation -->
+    <transformation name="protanopia" type="lms2lms">
+      <long long="0.0" middle="0.0" short="0.0"/>
+      <middle long="0.9082" middle="1.0" short="0.0"/>
+      <short long="0.008192" middle="0.0" short="1.0"/>
+    </transformation>
+    <transformation name="deuteranopia" type="lms2lms">
+      <long long="1.0" middle="1.101" short="0.0"/>
+      <middle long="0.0" middle="0.0" short="0.0"/>
+      <short long="0.0" middle="-0.009020" short="1.0"/>
+    </transformation>
+    <!-- Using the original values from https://ixora.io/projects/colorblindness/color-blindness-simulation-research/ here, as they seemed to provide better results with simulated colorblindness. This type is very rare and could be adjusted, if we find someone to test it. -->
+    <transformation name="tritanopia" type="lms2lms">
+      <long long="1.0" middle="0.0" short="-0.8674"/>
+      <middle long="0.0" middle="1.0" short="1.867"/>
+      <short long="0.0" middle="0.0" short="0.0"/>
+    </transformation>
+    <!-- How the difference between defined and simulated color is applied to the correct color (also used for scaling the effect) -->
+    <transformation name="error_correction" type="rgb2rgb">
+      <red red="0.0" green="0.7" blue="0.7"/>
+      <green red="0.0" green="1.0" blue="0.0"/>
+      <blue red="0.7" green="0.7" blue="1.0"/>
+    </transformation>
+  </daltonization>
+  <colors>
+    <color id="white" r="255" g="255" b="255" a="255"/>
+    <color id="white_weak_glow" r="255" g="255" b="255" a="255" glow="0.02"/> <!--"weak_glow" should be 0.05 but that was too much, therefore i am breaking the rule on purpose-->
+    <color id="white_moderate_glow" r="255" g="255" b="255" a="255" glow="0.2"/>
+    <color id="white_glow" r="255" g="255" b="255" a="255" glow="0.5"/>
+    <color id="white_alpha_192" r="255" g="255" b="255" a="192"/>
+    <color id="white_alpha_96_glow" r="255" g="255" b="255" a="96" glow="0.5"/>
+    <color id="white_alpha_32_glow" r="255" g="255" b="255" a="32" glow="0.5"/>
+    <color id="white_alpha_32" r="255" g="255" b="255" a="32"/>
+    <color id="white_alpha_12" r="255" g="255" b="255" a="12"/>
+    <color id="white_alpha_3" r="255" g="255" b="255" a="3"/>
+    <color id="white_alpha_6" r="255" g="255" b="255" a="6"/>
+    <color id="black" r="0" g="0" b="0" a="255"/>
+    <color id="black_alpha_0" r="0" g="0" b="0" a="0"/>
+    <color id="black_alpha_128" r="0" g="0" b="0" a="128"/>
+    <color id="black_alpha_160" r="0" g="0" b="0" a="160"/>
+    <color id="black_alpha_192" r="0" g="0" b="0" a="192"/>
+    <color id="black_alpha_224" r="0" g="0" b="0" a="224"/>
+    <color id="black_alpha_248" r="0" g="0" b="0" a="248"/>
+    <color id="grey_8" r="8" g="8" b="8" a="255"/>
+    <color id="grey_16" r="16" g="16" b="16" a="255"/>
+    <color id="grey_32" r="32" g="32" b="32" a="255"/>
+    <color id="grey_32_glow" r="32" g="32" b="32" a="255" glow="0.5"/>
+    <color id="grey_32_alpha_160" r="32" g="32" b="32" a="160"/>
+    <color id="grey_48" r="48" g="48" b="48" a="255"/>
+    <color id="grey_48_alpha_128" r="48" g="48" b="48" a="128"/>
+    <color id="grey_48_alpha_160" r="48" g="48" b="48" a="160"/>
+    <color id="grey_48_alpha_192" r="48" g="48" b="48" a="192"/>
+    <color id="grey_64" r="64" g="64" b="64" a="255"/>
+    <color id="grey_64_glow" r="64" g="64" b="64" a="255" glow="0.5"/>
+    <color id="grey_64_alpha_64_glow" r="64" g="64" b="64" a="64" glow="0.5"/>
+    <color id="grey_64_alpha_128" r="64" g="64" b="64" a="128"/>
+    <color id="grey_96" r="96" g="96" b="96" a="255"/>
+    <color id="grey_96_alpha_192" r="96" g="96" b="96" a="192"/>
+    <color id="grey_128" r="128" g="128" b="128" a="255"/>
+    <color id="grey_128_moderate_glow" r="128" g="128" b="128" a="255" glow="0.2"/>
+    <color id="grey_128_weak_glow" r="128" g="128" b="128" a="255" glow="0.05"/>
+    <color id="grey_128_glow" r="128" g="128" b="128" a="255" glow="0.5"/>
+    <color id="grey_128_alpha_160" r="128" g="128" b="128" a="160"/>
+    <color id="grey_128_alpha_160_glow" r="128" g="128" b="128" a="160" glow="0.5"/>
+    <color id="grey_128_alpha_192" r="128" g="128" b="128" a="192"/>
+    <color id="grey_160" r="160" g="160" b="160" a="255"/>
+    <color id="grey_160_glow" r="160" g="160" b="160" a="255" glow="0.5"/>
+    <color id="grey_192" r="192" g="192" b="192" a="255"/>
+    <color id="grey_192_weak_glow" r="192" g="192" b="192" a="255" glow="0.05"/>
+    <color id="grey_192_glow" r="192" g="192" b="192" a="255" glow="0.5"/>
+    <color id="grey_192_alpha_192_glow" r="192" g="192" b="192" a="192" glow="0.5"/>
+    <color id="red" r="255" g="0" b="0" a="255"/>
+    <color id="red_weak_glow" r="255" g="0" b="0" a="255" glow="0.05"/>
+    <color id="red_moderate_glow" r="255" g="0" b="0" a="255" glow="0.2"/>
+    <color id="red_glow" r="255" g="0" b="0" a="255" glow="0.5"/>
+    <color id="red_alpha_64" r="255" g="0" b="0" a="64"/>
+    <color id="red_very_bright_weak_glow" r="255" g="153" b="153" a="255" glow="0.05"/>
+    <color id="red_very_bright_moderate_glow" r="255" g="153" b="153" a="255" glow="0.2"/>
+    <color id="red_very_bright_glow" r="255" g="153" b="153" a="255" glow="0.5"/>
+    <color id="red_very_bright_alpha_160_glow" r="255" g="153" b="153" a="160" glow="0.5"/>
+    <color id="red_extra_bright_glow" r="255" g="204" b="204" a="255" glow="0.5"/>
+    <color id="red_extra_bright_strong_glow" r="255" g="204" b="204" a="255" glow="1.0"/>
+    <color id="red_bright" r="255" g="77" b="77" a="255"/>
+    <color id="red_bright_weak_glow" r="255" g="77" b="77" a="255" glow="0.05"/>
+    <color id="red_bright_moderate_glow" r="255" g="77" b="77" a="255" glow="0.2"/>
+    <color id="red_bright_glow" r="255" g="77" b="77" a="255" glow="0.5"/>
+    <color id="red_dark" r="179" g="0" b="0" a="255"/>
+    <color id="red_dark_moderate_glow" r="179" g="0" b="0" a="255" glow="0.2"/>
+    <color id="red_dark_glow" r="179" g="0" b="0" a="255" glow="0.5"/>
+    <color id="red_dark_alpha_128" r="179" g="0" b="0" a="128"/>
+    <color id="red_dark_alpha_160" r="179" g="0" b="0" a="160"/>
+    <color id="red_dark_alpha_160_glow" r="179" g="0" b="0" a="160" glow="0.5"/>
+    <color id="red_very_dark" r="102" g="0" b="0" a="255"/>
+    <color id="red_very_dark_moderate_glow" r="102" g="0" b="0" a="255" glow="0.2"/>
+    <color id="red_very_dark_glow" r="102" g="0" b="0" a="255" glow="0.5"/>
+    <color id="red_extra_dark" r="50" g="0" b="0" a="255"/>
+    <color id="orange" r="255" g="139" b="0" a="255"/>
+    <color id="orange_weak_glow" r="255" g="139" b="0" a="255" glow="0.05"/>
+    <color id="orange_moderate_glow" r="255" g="139" b="0" a="255" glow="0.2"/>
+    <color id="orange_glow" r="255" g="139" b="0" a="255" glow="0.5"/>
+    <color id="orange_alpha_160" r="255" g="139" b="0" a="160"/>
+    <color id="orange_alpha_160_glow" r="255" g="139" b="0" a="160" glow="0.5"/>
+    <color id="orange_very_bright" r="255" g="209" b="153" a="255"/>
+    <color id="orange_bright" r="255" g="185" b="102" a="255"/>
+    <color id="orange_bright_weak_glow" r="255" g="185" b="102" a="255" glow="0.05"/>
+    <color id="orange_bright_moderate_glow" r="255" g="185" b="102" a="255" glow="0.2"/>
+    <color id="orange_bright_glow" r="255" g="185" b="102" a="255" glow="0.5"/>
+    <color id="orange_bright_alpha_160" r="255" g="185" b="102" a="160"/>
+    <color id="orange_bright_alpha_160_glow" r="255" g="185" b="102" a="160" glow="0.5"/>
+    <color id="orange_dark" r="179" g="97" b="0" a="255"/>
+    <color id="orange_dark_alpha_128" r="179" g="97" b="0" a="128"/>
+    <color id="orange_dark_weak_glow" r="179" g="97" b="0" a="255" glow="0.05"/>
+    <color id="orange_dark_glow" r="179" g="97" b="0" a="255" glow="0.5"/>
+    <color id="orange_very_dark" r="102" g="55" b="0" a="255"/>
+    <color id="orange_very_dark_glow" r="102" g="55" b="0" a="255" glow="0.5"/>
+    <color id="orange_extra_dark" r="51" g="28" b="0" a="255"/>
+    <color id="orange_extra_dark_alpha_160" r="51" g="28" b="0" a="160"/>
+    <color id="orange_extra_dark_glow" r="51" g="28" b="0" a="255" glow="0.5"/>
+    <color id="amber" r="255" g="191" b="0" a="255"/>
+    <color id="amber_moderate_glow" r="255" g="191" b="0" a="255" glow="0.2"/>
+    <color id="amber_glow" r="255" g="191" b="0" a="255" glow="0.5"/>
+    <color id="amber_extra_bright" r="255" g="242" b="204" a="255"/>
+    <color id="amber_extra_bright_glow" r="255" g="242" b="204" a="255" glow="0.5"/>
+    <color id="amber_very_bright" r="255" g="229" b="153" a="255"/>
+    <color id="amber_very_bright_glow" r="255" g="229" b="153" a="255" glow="0.5"/>
+    <color id="amber_bright" r="255" g="210" b="77" a="255"/>
+    <color id="amber_dark" r="179" g="134" b="0" a="255"/>
+    <color id="amber_dark_moderate_glow" r="179" g="134" b="0" a="255" glow="0.2"/>
+    <color id="amber_dark_glow" r="179" g="134" b="0" a="255" glow="0.5"/>
+    <color id="amber_very_dark" r="102" g="76" b="0" a="255"/>
+    <color id="amber_very_dark_moderate_glow" r="102" g="76" b="0" a="255" glow="0.2"/>
+    <color id="amber_extra_dark" r="51" g="35" b="0" a="255"/>
+    <color id="yellow" r="255" g="255" b="0" a="255"/>
+    <color id="yellow_moderate_glow" r="255" g="255" b="0" a="255" glow="0.2"/>
+    <color id="yellow_glow" r="255" g="255" b="0" a="255" glow="0.5"/>
+    <color id="yellow_alpha_160" r="255" g="255" b="0" a="160"/>
+    <color id="yellow_alpha_160_glow" r="255" g="255" b="0" a="160" glow="0.5"/>
+    <color id="yellow_extra_bright" r="255" g="255" b="204" a="255"/>
+    <color id="yellow_extra_bright_moderate_glow" r="255" g="255" b="204" a="255" glow="0.2"/>
+    <color id="yellow_very_bright" r="255" g="255" b="153" a="255"/>
+    <color id="yellow_very_bright_weak_glow" r="255" g="255" b="153" a="255" glow="0.05"/>
+    <color id="yellow_very_bright_glow" r="255" g="255" b="153" a="255" glow="0.5"/>
+    <color id="yellow_bright" r="255" g="255" b="77" a="255"/>
+    <color id="yellow_bright_glow" r="255" g="255" b="77" a="255" glow="0.5"/>
+    <color id="yellow_dark" r="179" g="179" b="0" a="255"/>
+    <color id="yellow_dark_weak_glow" r="179" g="179" b="0" a="255" glow="0.05"/>
+    <color id="yellow_dark_glow" r="179" g="179" b="0" a="255" glow="0.5"/>
+    <color id="yellow_very_dark" r="102" g="102" b="0" a="255"/>
+    <color id="yellow_very_dark_moderate_glow" r="102" g="102" b="0" a="255" glow="0.2"/>
+    <color id="yellow_very_dark_glow" r="102" g="102" b="0" a="255" glow="0.5"/>
+    <color id="green" r="0" g="255" b="0" a="255"/>
+    <color id="green_weak_glow" r="0" g="255" b="0" a="255" glow="0.05"/>
+    <color id="green_moderate_glow" r="0" g="255" b="0" a="255" glow="0.2"/>
+    <color id="green_glow" r="0" g="255" b="0" a="255" glow="0.5"/>
+    <color id="green_extra_bright" r="204" g="255" b="204" a="255"/>
+    <color id="green_extra_bright_weak_glow" r="204" g="255" b="204" a="255" glow="0.02"/> <!--"weak_glow" should be 0.05 but that was too much, therefore i am breaking the rule on purpose-->
+    <color id="green_extra_bright_glow" r="204" g="255" b="204" a="255" glow="0.5"/>
+    <color id="green_very_bright" r="153" g="255" b="153" a="255"/>
+    <color id="green_very_bright_weak_glow" r="153" g="255" b="153" a="255" glow="0.05"/>
+    <color id="green_very_bright_moderate_glow" r="153" g="255" b="153" a="255" glow="0.2"/>
+    <color id="green_very_bright_glow" r="153" g="255" b="153" a="255" glow="0.5"/>
+    <color id="green_bright" r="77" g="255" b="77" a="255"/>
+    <color id="green_bright_alpha_64" r="77" g="255" b="77" a="64"/>
+    <color id="green_bright_weak_glow" r="77" g="255" b="77" a="255" glow="0.05"/>
+    <color id="green_bright_moderate_glow" r="77" g="255" b="77" a="255" glow="0.2"/>
+    <color id="green_bright_glow" r="77" g="255" b="77" a="255" glow="0.5"/>
+    <color id="green_dark" r="0" g="179" b="0" a="255"/>
+    <color id="green_dark_moderate_glow" r="0" g="179" b="0" a="255" glow="0.2"/>
+    <color id="green_dark_weak_glow" r="0" g="179" b="0" a="255" glow="0.05"/>
+    <color id="green_dark_glow" r="0" g="179" b="0" a="255" glow="0.5"/>
+    <color id="green_very_dark" r="0" g="102" b="0" a="255"/>
+    <color id="green_very_dark_moderate_glow" r="0" g="102" b="0" a="255" glow="0.2"/>
+    <color id="green_very_dark_weak_glow" r="0" g="102" b="0" a="255" glow="0.05"/>
+    <color id="green_very_dark_glow" r="0" g="102" b="0" a="255" glow="0.5"/>
+    <color id="cyan" r="0" g="249" b="255" a="255"/>
+    <color id="cyan_weak_glow" r="0" g="249" b="255" a="255" glow="0.05"/>
+    <color id="cyan_glow" r="0" g="249" b="255" a="255" glow="0.5"/>
+    <color id="cyan_alpha_64_glow" r="0" g="249" b="255" a="64"/>
+    <color id="cyan_very_bright" r="153" g="253" b="255" a="255"/>
+    <color id="cyan_very_bright_glow" r="153" g="253" b="255" a="255" glow="0.5"/>
+    <color id="cyan_bright_glow" r="77" g="252" b="255" a="255" glow="0.5"/>
+    <color id="cyan_dark" r="0" g="175" b="179" a="255"/>
+    <color id="cyan_dark_weak_glow" r="0" g="175" b="179" a="255" glow="0.05"/>
+    <color id="cyan_dark_moderate_glow" r="0" g="175" b="179" a="255" glow="0.2"/>
+    <color id="cyan_dark_glow" r="0" g="175" b="179" a="255" glow="0.5"/>
+    <color id="cyan_very_dark" r="0" g="100" b="102" a="255"/>
+    <color id="cyan_very_dark_moderate_glow" r="0" g="100" b="102" a="255" glow="0.2"/>
+    <color id="cyan_very_dark_glow" r="0" g="100" b="102" a="255" glow="0.5"/>
+    <color id="cyan_extra_dark" r="0" g="49" b="51" a="255"/>
+    <color id="cyan_extra_dark_alpha_160" r="0" g="49" b="51" a="160"/>
+    <color id="azure" r="0" g="149" b="255" a="255"/>
+    <color id="azure_alpha_128" r="0" g="149" b="255" a="128"/>
+    <color id="azure_weak_glow" r="0" g="149" b="255" a="255" glow="0.05"/>
+    <color id="azure_moderate_glow" r="0" g="149" b="255" a="255" glow="0.2"/>
+    <color id="azure_glow" r="0" g="149" b="255" a="255" glow="0.5"/>
+    <color id="azure_extra_bright" r="204" g="234" b="255" a="255"/>
+    <color id="azure_very_bright" r="153" g="213" b="255" a="255"/>
+    <color id="azure_very_bright_weak_glow" r="153" g="213" b="255" a="255" glow="0.05"/>
+    <color id="azure_very_bright_glow" r="153" g="213" b="255" a="255" glow="0.5"/>
+    <color id="azure_very_bright_strong_glow" r="153" g="213" b="255" a="255" glow="1.0"/>
+    <color id="azure_bright" r="77" g="181" b="255" a="255"/>
+    <color id="azure_bright_weak_glow" r="77" g="181" b="255" a="255" glow="0.05"/>
+    <color id="azure_bright_moderate_glow" r="77" g="181" b="255" a="255" glow="0.2"/>
+    <color id="azure_bright_glow" r="77" g="181" b="255" a="255" glow="0.5"/>
+    <color id="azure_bright_alpha_160_glow" r="77" g="181" b="255" a="160" glow="0.5"/>
+    <color id="azure_bright_strong_glow" r="77" g="181" b="255" a="255" glow="1"/>
+    <color id="azure_dark" r="0" g="105" b="179" a="255"/>
+    <color id="azure_dark_moderate_glow" r="0" g="105" b="179" a="255" glow="0.2"/>
+    <color id="azure_dark_glow" r="0" g="105" b="179" a="255" glow="0.5"/>
+    <color id="azure_dark_alpha_160" r="0" g="105" b="179" a="160"/>
+    <color id="azure_dark_alpha_160_glow" r="0" g="105" b="179" a="160" glow="0.5"/>
+    <color id="azure_dark_alpha_224" r="0" g="105" b="179" a="224"/>
+    <color id="azure_very_dark" r="0" g="60" b="102" a="255"/>
+    <color id="azure_very_dark_moderate_glow" r="0" g="60" b="102" a="255" glow="0.2"/>
+    <color id="azure_very_dark_glow" r="0" g="60" b="102" a="255" glow="0.5"/>
+    <color id="azure_very_dark_alpha_160" r="0" g="60" b="102" a="160"/>
+    <color id="azure_very_dark_alpha_224" r="0" g="60" b="102" a="224"/>
+    <color id="azure_extra_dark" r="0" g="30" b="51" a="255"/>
+    <color id="azure_extra_dark_glow" r="0" g="30" b="51" a="255" glow="0.5"/>
+    <color id="azure_extra_dark_alpha_96" r="0" g="30" b="51" a="96"/>
+    <color id="azure_extra_dark_alpha_160" r="0" g="30" b="51" a="160"/>
+    <color id="magenta" r="255" g="0" b="255" a="255"/>
+    <color id="magenta_moderate_glow" r="255" g="0" b="255" a="255" glow="0.2"/>
+    <color id="magenta_glow" r="255" g="0" b="255" a="255" glow="0.5"/>
+    <color id="magenta_extra_bright_moderate_glow" r="255" g="204" b="255" a="255" glow="0.2"/>
+    <color id="magenta_very_bright" r="255" g="153" b="255" a="255"/>
+    <color id="magenta_very_bright_weak_glow" r="255" g="153" b="255" a="255" glow="0.05"/>
+    <color id="magenta_very_bright_moderate_glow" r="255" g="153" b="255" a="255" glow="0.2"/>
+    <color id="magenta_very_bright_glow" r="255" g="153" b="255" a="255" glow="0.5"/>
+    <color id="magenta_bright" r="255" g="77" b="255" a="255"/>
+    <color id="magenta_bright_moderate_glow" r="255" g="77" b="255" a="255" glow="0.2"/>
+    <color id="magenta_bright_glow" r="255" g="77" b="255" a="255" glow="0.5"/>
+    <color id="magenta_bright_alpha_160_glow" r="255" g="77" b="255" a="160" glow="0.5"/>
+    <color id="magenta_dark" r="179" g="0" b="179" a="255"/>
+    <color id="magenta_dark_weak_glow" r="179" g="0" b="179" a="255" glow="0.05"/>
+    <color id="magenta_dark_glow" r="179" g="0" b="179" a="255" glow="0.5"/>
+    <color id="magenta_dark_alpha_160_glow" r="179" g="0" b="179" a="160" glow="0.5"/>
+    <color id="magenta_very_dark" r="102" g="0" b="102" a="255"/>
+    <color id="magenta_very_dark_moderate_glow" r="102" g="0" b="102" a="255" glow="0.2"/>
+    <color id="magenta_very_dark_glow" r="102" g="0" b="102" a="255" glow="0.5"/>
+    <color id="magenta_extra_dark" r="51" g="0" b="51" a="255"/>
+    <color id="magenta_extra_dark_alpha_160" r="51" g="0" b="51" a="160"/>
+  </colors>
+  <mappings>
+    <mapping id="text_normal" ref="white_weak_glow"/>
+    <mapping id="text_lowlight" ref="grey_192"/>
+    <mapping id="text_inactive" ref="grey_128"/>
+    <mapping id="text_hidden" ref="black_alpha_0"/>
+    <mapping id="text_success" ref="green_glow"/>
+    <mapping id="text_failure" ref="red_moderate_glow"/>
+    <mapping id="text_criticalerror" ref="red_moderate_glow"/>
+    <mapping id="text_error" ref="red_moderate_glow"/>
+    <mapping id="text_warning" ref="orange_glow"/>
+    <mapping id="text_positive" ref="green_weak_glow"/>
+    <mapping id="text_neutral" ref="yellow_very_bright_glow"/>
+    <mapping id="text_negative" ref="red_moderate_glow"/>
+    <mapping id="text_inprogress" ref="yellow_very_bright_glow"/>
+    <mapping id="text_player" ref="green_glow"/>
+    <mapping id="text_player_current" ref="green_very_bright_moderate_glow"/>
+    <mapping id="text_player_lowlight" ref="green_dark_weak_glow"/>
+    <mapping id="text_player_inactive" ref="green_very_dark_weak_glow"/>
+    <mapping id="text_ally" ref="green_bright_weak_glow"/>
+    <mapping id="text_member" ref="green_very_bright_weak_glow"/>
+    <mapping id="text_friend" ref="green_very_bright_weak_glow"/>
+    <mapping id="text_relation_neutral" ref="white_weak_glow"/>
+    <mapping id="text_enemy" ref="red_very_bright_weak_glow"/>
+    <mapping id="text_hostile" ref="red_weak_glow"/>
+    <mapping id="text_boarding_done" ref="green_glow"/>
+    <mapping id="text_boarding_started" ref="amber_glow"/>
+    <mapping id="text_boarding_waiting" ref="red_moderate_glow"/>
+    <mapping id="text_boarding_risk_verylow" ref="green_glow"/>
+    <mapping id="text_boarding_risk_low" ref="yellow_dark_glow"/>
+    <mapping id="text_boarding_risk_medium" ref="amber_glow"/>
+    <mapping id="text_boarding_risk_high" ref="red_moderate_glow"/>
+    <mapping id="text_boarding_risk_veryhigh" ref="red_moderate_glow"/>
+    <mapping id="text_boarding_risk_impossible" ref="red_moderate_glow"/>
+    <mapping id="text_input_device_controller" ref="amber_glow"/>
+    <mapping id="text_input_device_mouse" ref="green_glow"/>
+    <mapping id="text_input_device_joystick" ref="yellow_very_bright_glow"/>
+    <mapping id="text_input_device_keyboard" ref="azure_bright_glow"/>
+    <mapping id="text_input_device_compassmenu" ref="orange_bright_glow"/>
+    <mapping id="text_price_good" ref="green_moderate_glow"/>
+    <mapping id="text_price_average" ref="white_weak_glow"/>
+    <mapping id="text_price_bad" ref="amber_moderate_glow"/>
+    <mapping id="text_logbook_highlight" ref="red_moderate_glow"/>
+    <mapping id="text_skills" ref="yellow_very_bright_glow"/>
+    <mapping id="text_skills_irrelevant" ref="yellow_very_dark_glow"/>
+    <mapping id="text_mission" ref="amber_glow"/>
+    <mapping id="text_illegal" ref="orange_moderate_glow"/>
+    <mapping id="text_illegal_inactive" ref="orange_very_dark_glow"/>
+    <mapping id="text_notification_header" ref="azure_bright_glow"/>
+    <mapping id="text_notification_text" ref="azure_bright_glow"/>
+    <mapping id="text_notification_text_critical" ref="red_moderate_glow"/>
+    <mapping id="text_notification_text_lowlight" ref="azure_dark_moderate_glow"/>
+    <mapping id="text_chat_message_command" ref="white_moderate_glow"/>
+    <mapping id="text_chat_message_direct" ref="red_bright_glow"/>
+    <mapping id="text_chat_message_other" ref="yellow_glow"/>
+    <mapping id="text_chat_message_own" ref="green_very_dark_glow"/>
+    <mapping id="text_chat_message_server" ref="magenta_dark_glow"/>
+    <mapping id="text_subchannel_normal" ref="white_weak_glow"/>
+    <mapping id="text_subchannel_normal_speakername" ref="green_very_bright_weak_glow"/>
+    <mapping id="text_subchannel_backgroundspeak" ref="grey_128_weak_glow"/>
+    <mapping id="text_subchannel_backgroundspeak_speakername" ref="green_dark_weak_glow"/>
+    <mapping id="text_online_save" ref="yellow_glow"/>
+    <mapping id="overlay_text_background" ref="black_alpha_128"/>
+    <mapping id="icon_normal" ref="white_weak_glow"/>
+    <mapping id="icon_inactive" ref="grey_128"/>
+    <mapping id="icon_hidden" ref="black_alpha_0"/>
+    <mapping id="icon_transparent" ref="black_alpha_0"/>
+    <mapping id="icon_error" ref="red_glow"/>
+    <mapping id="icon_error_inactive" ref="red_dark_glow"/>
+    <mapping id="icon_warning" ref="orange_glow"/>
+    <mapping id="icon_mission" ref="amber_glow"/>
+    <mapping id="icon_positive" ref="green_weak_glow"/>
+    <mapping id="icon_negative" ref="red_moderate_glow"/>
+    <mapping id="menu_start_animation" ref="azure_very_dark_glow"/>
+    <mapping id="frame_background_default" ref="white"/>
+    <mapping id="frame_background_black" ref="black"/>
+    <mapping id="frame_background_semitransparent" ref="black_alpha_248"/>
+    <mapping id="frame_background_notification" ref="grey_32"/>
+    <mapping id="frame_background2_notification" ref="azure_bright"/>
+    <mapping id="table_background_default" ref="white"/>
+    <mapping id="table_background_3d_editor" ref="black_alpha_248"/>
+    <mapping id="table_row_multiselect" ref="azure_dark_alpha_224"/>
+    <mapping id="table_row_highlight" ref="azure_bright_moderate_glow"/>
+    <mapping id="table_row_highlight_grey" ref="grey_128_alpha_192"/>
+    <mapping id="row_background" ref="black_alpha_0"/>
+    <mapping id="row_background_blue" ref="azure_very_dark_alpha_224"/>
+    <mapping id="row_background_blue_opaque" ref="azure_dark"/>
+    <mapping id="row_background_selected" ref="azure_bright_alpha_160_glow"/>
+    <mapping id="row_background_unselectable" ref="grey_32"/>
+    <mapping id="row_background_immediate" ref="green_glow"/>
+    <mapping id="row_background_container" ref="white_alpha_3"/>
+    <mapping id="row_background_container2" ref="white_alpha_6"/>
+    <mapping id="row_separator" ref="grey_128"/>
+    <mapping id="row_separator_white" ref="white"/>
+    <mapping id="row_separator_encyclopedia" ref="azure_extra_dark"/>
+    <mapping id="row_title" ref="azure_dark_alpha_160"/>
+    <mapping id="row_title_background" ref="azure_very_dark_alpha_224"/>
+    <mapping id="button_text_inactive" ref="grey_128"/>
+    <mapping id="button_background_default" ref="azure_very_dark_alpha_224"/>
+    <mapping id="button_background_solid" ref="azure_very_dark"/>
+    <mapping id="button_background_inactive" ref="grey_32"/>
+    <mapping id="button_background_hidden" ref="black_alpha_0"/>
+    <mapping id="button_background_white" ref="white"/>
+    <mapping id="button_background_active" ref="green"/>
+    <mapping id="button_highlight_default" ref="azure_moderate_glow"/>
+    <mapping id="button_highlight_bigbutton" ref="azure_weak_glow"/>
+    <mapping id="button_highlight_inactive" ref="grey_96"/>
+    <mapping id="button_highlight_hidden" ref="black_alpha_0"/>
+    <mapping id="button_content_default" ref="white_weak_glow"/>
+    <mapping id="button_content_default_inverse" ref="black"/>
+    <mapping id="checkbox_highlight" ref="azure_bright"/>
+    <mapping id="checkbox_background" ref="black"/>
+    <mapping id="checkbox_background_default" ref="azure_very_dark"/>
+    <mapping id="checkbox_background_highlight" ref="grey_48_alpha_192"/>
+    <mapping id="checkbox_background_inactive" ref="azure_extra_dark_alpha_160"/>
+    <mapping id="checkbox_symbol_active" ref="white_moderate_glow"/>
+    <mapping id="checkbox_symbol_inactive" ref="grey_160"/>
+    <mapping id="dropdown_text_inactive" ref="grey_128"/>
+    <mapping id="dropdown_background_default" ref="azure_very_dark_alpha_224"/>
+    <mapping id="dropdown_background_inactive" ref="grey_48"/>
+    <mapping id="dropdown_background_options" ref="black"/>
+    <mapping id="dropdown_highlight_default" ref="azure_moderate_glow"/>
+    <mapping id="dropdown_highlight_big" ref="azure_dark_moderate_glow"/>
+    <mapping id="dropdown_highlight_inactive" ref="grey_96"/>
+    <mapping id="dropdown_option_text_inactive" ref="grey_160"/>
+    <mapping id="dropdown_option_background" ref="black_alpha_0"/>
+    <mapping id="dropdown_option_background_inactive" ref="grey_32"/>
+    <mapping id="dropdown_option_deleted" ref="red_moderate_glow"/>
+    <mapping id="editbox_text_default" ref="grey_128"/>
+    <mapping id="editbox_background_default" ref="azure_very_dark_alpha_224"/>
+    <mapping id="editbox_background_black" ref="black"/>
+    <mapping id="editbox_inactive" ref="grey_128_alpha_160"/>
+    <mapping id="editbox_border" ref="azure_moderate_glow"/>
+    <mapping id="flowchart_node_default" ref="azure_bright"/>
+    <mapping id="flowchart_node_background" ref="grey_32"/>
+    <mapping id="flowchart_node_arrow" ref="white_moderate_glow"/>
+    <mapping id="flowchart_value_default" ref="azure_dark_moderate_glow"/>
+    <mapping id="flowchart_slider_value1" ref="orange"/>
+    <mapping id="flowchart_slider_value2" ref="green_dark"/>
+    <mapping id="flowchart_slider_diff1" ref="orange_very_dark"/>
+    <mapping id="flowchart_slider_diff2" ref="green_very_dark"/>
+    <mapping id="flowchart_slider_mousedown" ref="white"/>
+    <mapping id="flowchart_border_default" ref="black_alpha_0"/>
+    <mapping id="flowchart_column_caption_default" ref="white_moderate_glow"/>
+    <mapping id="flowchart_edge_default" ref="white"/>
+    <mapping id="flowchart_junction_default" ref="white"/>
+    <mapping id="flowchart_slot_default" ref="white"/>
+    <mapping id="helpoverlay_border" ref="yellow"/>
+    <mapping id="helpoverlay_highlight" ref="yellow_extra_bright_moderate_glow"/>
+    <mapping id="helpoverlay_background" ref="black_alpha_192"/>
+    <mapping id="slider_value" ref="azure_dark"/>
+    <mapping id="slider_value_inactive" ref="grey_128"/>
+    <mapping id="slider_value_inactive_dark" ref="grey_64"/>
+    <mapping id="slider_background_default" ref="azure_extra_dark_alpha_160"/>
+    <mapping id="slider_background_inactive" ref="grey_48_alpha_160"/>
+    <mapping id="slider_diff_pos" ref="green_bright_alpha_64"/>
+    <mapping id="slider_diff_neg" ref="red_alpha_64"/>
+    <mapping id="slider_background_transparent" ref="black_alpha_0"/>
+    <mapping id="slider_arrow_disabled" ref="grey_96"/>
+    <mapping id="slider_arrow_normal" ref="white_moderate_glow"/>
+    <mapping id="slider_arrow_highlight" ref="white_moderate_glow"/>
+    <mapping id="slider_arrow_click" ref="azure_very_dark"/>
+    <mapping id="shieldhullbar_shield" ref="azure_glow"/>
+    <mapping id="shieldhullbar_hull" ref="white_moderate_glow"/>
+    <mapping id="hint_background2_black" ref="black"/>
+    <mapping id="hint_background_orange" ref="amber_glow"/>
+    <mapping id="hint_background_azure" ref="azure_bright_glow"/>
+    <mapping id="graph_background" ref="black_alpha_224"/>
+    <mapping id="graph_grid" ref="grey_96_alpha_192"/>
+    <mapping id="graph_data_1" ref="red_bright_moderate_glow"/>
+    <mapping id="graph_data_2" ref="orange_bright_moderate_glow"/>
+    <mapping id="graph_data_3" ref="green_dark_moderate_glow"/>
+    <mapping id="graph_data_4" ref="green_very_bright_weak_glow"/>
+    <mapping id="graph_data_5" ref="cyan_dark_moderate_glow"/>
+    <mapping id="graph_data_6" ref="azure_dark_moderate_glow"/>
+    <mapping id="graph_data_7" ref="magenta_very_bright_moderate_glow"/>
+    <mapping id="graph_data_8" ref="magenta_bright_moderate_glow"/>
+    <mapping id="graph_selection" ref="azure_moderate_glow"/>
+    <mapping id="boxtext_box_default" ref="azure_very_dark_alpha_224"/>
+    <mapping id="boxtext_box_hidden" ref="black_alpha_0"/>
+    <mapping id="statusbar_value_default" ref="azure_bright"/>
+    <mapping id="statusbar_value_white" ref="white_weak_glow"/>
+    <mapping id="statusbar_value_orange" ref="orange_bright_weak_glow"/>
+    <mapping id="statusbar_diff_pos_default" ref="green_bright_alpha_64"/>
+    <mapping id="statusbar_diff_pos" ref="azure_dark_alpha_160"/>
+    <mapping id="statusbar_diff_neg_default" ref="red_alpha_64"/>
+    <mapping id="statusbar_diff_neg" ref="azure_extra_dark_alpha_160"/>
+    <mapping id="statusbar_marker_default" ref="azure_very_bright"/>
+    <mapping id="statusbar_marker_hidden" ref="black_alpha_0"/>
+    <mapping id="scrollbar_background" ref="azure_very_dark"/>
+    <mapping id="scrollbar_slider_normal" ref="azure_weak_glow"/>
+    <mapping id="scrollbar_slider_highlight" ref="azure_bright_glow"/>
+    <mapping id="scrollbar_slider_click" ref="azure_extra_dark"/>
+    <mapping id="weapon_compatibility_empty" ref="black"/>
+    <mapping id="weapon_group_highlight" ref="azure_dark_alpha_224"/>
+    <mapping id="lso_node_inactive" ref="grey_128"/>
+    <mapping id="lso_node_removed" ref="red_glow"/>
+    <mapping id="lso_node_error" ref="red_glow"/>
+    <mapping id="lso_node_warning" ref="orange_glow"/>
+    <mapping id="lso_slot_container" ref="orange"/>
+    <mapping id="lso_slot_liquid" ref="cyan_dark"/>
+    <mapping id="lso_slot_solid" ref="yellow"/>
+    <mapping id="lso_slot_condensate" ref="magenta_very_bright"/>
+    <mapping id="research_incomplete" ref="grey_128"/>
+    <mapping id="customgamestart_budget_known" ref="green_bright_glow"/>
+    <mapping id="customgamestart_budget_people" ref="red_glow"/>
+    <mapping id="customgamestart_budget_research" ref="white_moderate_glow"/>
+    <mapping id="customgamestart_budget_relations" ref="yellow_very_bright_glow"/>
+    <mapping id="customgamestart_budget_money" ref="azure_bright_glow"/>
+    <mapping id="customgamestart_budget_story" ref="cyan_bright_glow"/>
+    <mapping id="customgamestart_property_changed" ref="yellow_bright_glow"/>
+    <mapping id="gamestart_recommended" ref="white"/>
+    <mapping id="tutorial_completed" ref="white"/>
+    <mapping id="order_override" ref="red_glow"/>
+    <mapping id="order_temp" ref="azure_bright_glow"/>
+    <mapping id="player_info_background" ref="black_alpha_160"/>
+    <mapping id="ship_stat_background" ref="black_alpha_160"/>
+    <mapping id="optionsmenu_cell_background" ref="black_alpha_160"/>
+    <mapping id="optionsmenu_cell_background_icon" ref="black"/>
+    <mapping id="toplevel_background_default" ref="black_alpha_0"/>
+    <mapping id="toplevel_button_background" ref="black_alpha_0"/>
+    <mapping id="toplevel_arrow" ref="azure_very_bright"/>
+    <mapping id="toplevel_arrow_inactive" ref="azure_dark"/>
+    <mapping id="transactionlog_graph_data" ref="yellow_very_bright_glow"/>
+    <mapping id="crew_transfer" ref="yellow_very_bright_glow"/>
+    <mapping id="licence" ref="cyan_bright_glow"/>
+    <mapping id="player_cover" ref="yellow_glow"/>
+    <mapping id="shape_default" ref="white"/>
+    <mapping id="ship_retrieval" ref="azure_very_bright_glow"/>
+    <mapping id="equipmentmod_quality_basic" ref="green_bright"/>
+    <mapping id="equipmentmod_quality_advanced" ref="azure_bright"/>
+    <mapping id="equipmentmod_quality_exceptional" ref="magenta_dark"/>
+    <mapping id="equipment_comp_standard" ref="white"/>
+    <mapping id="equipment_comp_missile" ref="green_very_bright"/>
+    <mapping id="equipment_comp_mining" ref="azure_dark"/>
+    <mapping id="equipment_comp_highpower" ref="magenta_very_bright"/>
+    <mapping id="equipment_comp_venture" ref="amber_dark"/>
+    <mapping id="equipment_comp_boron" ref="cyan_dark"/>
+    <mapping id="equipment_comp_xenon" ref="red_dark"/>
+    <mapping id="equipment_comp_advanced" ref="azure_extra_bright"/>
+    <mapping id="debuglog_enabled" ref="red"/>
+    <mapping id="debuglog_disabled" ref="green_very_dark"/>
+    <mapping id="debugline_black_bar" ref="black"/>
+    <mapping id="resource_mineral" ref="red"/>
+    <mapping id="resource_liquid" ref="azure"/>
+    <mapping id="resource_mineral_liquid" ref="magenta"/>
+    <mapping id="trade_buyoffer" ref="azure_bright"/>
+    <mapping id="trade_selloffer" ref="orange_bright"/>
+    <mapping id="behaviour_inspection" ref="orange_dark"/>
+    <mapping id="behaviour_inspection_text" ref="orange"/>
+    <mapping id="chat_background" ref="black_alpha_160"/>
+    <mapping id="chat_editbox" ref="grey_64"/>
+    <mapping id="chat_move_background" ref="green_glow"/>
+    <mapping id="scenario_completed" ref="orange_bright_moderate_glow"/>
+    <mapping id="scenario_completed_border" ref="orange_bright_weak_glow"/>
+    <mapping id="scenario_button_background" ref="black"/>
+    <mapping id="scenario_button_inactive" ref="grey_128"/>
+    <mapping id="debuglog_button_background" ref="black"/>
+    <mapping id="targetmonitor_notoriety_friendly_1" ref="azure_very_dark_glow"/>
+    <mapping id="targetmonitor_notoriety_friendly_2" ref="azure_dark_glow"/>
+    <mapping id="targetmonitor_notoriety_friendly_3" ref="azure_glow"/>
+    <mapping id="targetmonitor_notoriety_friendly_4" ref="azure_very_bright_glow"/>
+    <mapping id="targetmonitor_notoriety_hostile_1" ref="red_very_dark_glow"/>
+    <mapping id="targetmonitor_notoriety_hostile_2" ref="red_dark_glow"/>
+    <mapping id="targetmonitor_notoriety_hostile_3" ref="red_glow"/>
+    <mapping id="targetmonitor_notoriety_hostile_4" ref="red_extra_bright_glow"/>
+    <mapping id="targetmonitor_notoriety_hostile_5" ref="red_glow"/>
+    <mapping id="targetmonitor_notoriety_neutral_1" ref="grey_32"/>
+    <mapping id="targetmonitor_notoriety_neutral_2" ref="grey_160"/>
+    <mapping id="targetmonitor_notoriety_player_1" ref="green_glow"/>
+    <mapping id="targetmonitor_notoriety_unknown_1" ref="grey_160_glow"/>
+    <mapping id="targetmonitor_text" ref="azure_bright_glow"/>
+    <mapping id="targetmonitor_text_background_default" ref="black_alpha_0"/>
+    <mapping id="targetmonitor_text_background_overlay" ref="black_alpha_192"/>
+    <mapping id="targetmonitor_interact_text" ref="amber_glow"/>
+    <mapping id="targetmonitor_deco" ref="azure_bright_glow"/>
+    <mapping id="targetmonitor_deco_background" ref="azure_extra_dark"/>
+    <mapping id="messageticker_mission" ref="amber_glow"/>
+    <mapping id="messageticker_mission_highlight" ref="amber_dark"/>
+    <mapping id="messageticker_curmission_text" ref="amber_bright"/>
+    <mapping id="messageticker_curmission_text_highlight" ref="amber_extra_bright"/>
+    <mapping id="messageticker_bgmission_text" ref="amber_very_bright"/>
+    <mapping id="messageticker_bgmission_text_highlight" ref="amber_extra_bright"/>
+    <mapping id="messageticker_mail_icon" ref="azure_bright_glow"/>
+    <mapping id="messageticker_mail_icon_highlight" ref="white_moderate_glow"/>
+    <mapping id="messageticker_text" ref="azure_bright_glow"/>
+    <mapping id="messageticker_text_background_default" ref="black_alpha_0"/>
+    <mapping id="messageticker_deco" ref="azure_bright_glow"/>
+    <mapping id="messageticker_deco_background" ref="azure_extra_dark"/>
+    <mapping id="messageticker_cover_text" ref="yellow_very_bright_glow"/>
+    <mapping id="gravidar_background" ref="black_alpha_248"/>
+    <mapping id="vrpointer_inrange" ref="white"/>
+    <mapping id="vrpointer_outofrange" ref="red"/>
+    <mapping id="dialogmenu_normal_text" ref="azure_bright_glow"/>
+    <mapping id="dialogmenu_normal_background" ref="azure_bright_glow"/>
+    <mapping id="dialogmenu_instant_text" ref="azure_very_bright_glow"/>
+    <mapping id="dialogmenu_instant_background" ref="azure_very_bright_glow"/>
+    <mapping id="dialogmenu_inactive_text" ref="grey_128"/>
+    <mapping id="dialogmenu_inactive_background" ref="grey_96"/>
+    <mapping id="dialogmenu_selected_text" ref="white_moderate_glow"/>
+    <mapping id="dialogmenu_selected_background" ref="white"/>
+    <mapping id="dialogmenu_center_selected" ref="white_moderate_glow"/>
+    <mapping id="dialogmenu_center_unselected" ref="azure_bright"/>
+    <mapping id="targetsystem_relation_hostile" ref="red_glow"/>
+    <mapping id="targetsystem_relation_hostile_obstructed" ref="red_very_dark_glow"/>
+    <mapping id="targetsystem_relation_hostile_text" ref="red_glow"/>
+    <mapping id="targetsystem_relation_hostile_text_obstructed" ref="red_glow"/>
+    <mapping id="targetsystem_relation_enemy" ref="red_extra_bright_glow"/>
+    <mapping id="targetsystem_relation_enemy_obstructed" ref="red_very_bright_weak_glow"/>
+    <mapping id="targetsystem_relation_enemy_text" ref="red_extra_bright_glow"/>
+    <mapping id="targetsystem_relation_enemy_text_obstructed" ref="red_extra_bright_glow"/>
+    <mapping id="targetsystem_relation_neutral" ref="azure_bright_glow"/>
+    <mapping id="targetsystem_relation_neutral_obstructed" ref="azure_very_dark_glow"/>
+    <mapping id="targetsystem_relation_neutral_text" ref="azure_bright_glow"/>
+    <mapping id="targetsystem_relation_neutral_text_obstructed" ref="azure_bright_glow"/>
+    <mapping id="targetsystem_relation_friendly" ref="azure_bright_glow"/>
+    <mapping id="targetsystem_relation_friendly_obstructed" ref="azure_very_dark_glow"/>
+    <mapping id="targetsystem_relation_friendly_text" ref="azure_bright_glow"/>
+    <mapping id="targetsystem_relation_friendly_text_obstructed" ref="azure_bright_glow"/>
+    <mapping id="targetsystem_relation_member" ref="azure_bright_glow"/>
+    <mapping id="targetsystem_relation_member_obstructed" ref="azure_very_dark_glow"/>
+    <mapping id="targetsystem_relation_member_text" ref="azure_bright_glow"/>
+    <mapping id="targetsystem_relation_member_text_obstructed" ref="azure_bright_glow"/>
+    <mapping id="targetsystem_relation_player" ref="green_glow"/>
+    <mapping id="targetsystem_relation_player_obstructed" ref="green_very_dark_glow"/>
+    <mapping id="targetsystem_relation_player_text" ref="green_glow"/>
+    <mapping id="targetsystem_relation_player_text_obstructed" ref="green_glow"/>
+    <mapping id="targetsystem_mission" ref="amber"/>
+    <mapping id="targetsystem_mission_obstructed" ref="amber_dark"/>
+    <mapping id="targetsystem_wreck" ref="grey_128"/>
+    <mapping id="targetsystem_wreck_obstructed" ref="grey_96"/>
+    <mapping id="targetsystem_normal" ref="white"/>
+    <mapping id="targetsystem_obstructed" ref="grey_128"/>
+    <mapping id="targetsystem_autotarget" ref="grey_192"/>
+    <mapping id="targetsystem_shield" ref="azure"/>
+    <mapping id="targetsystem_shield_obstructed" ref="azure_very_dark"/>
+    <mapping id="targetsystem_missile_hostile_locking" ref="azure_bright"/>
+    <mapping id="targetsystem_missile_hostile_locked" ref="red"/>
+    <mapping id="targetsystem_missile_locked_text" ref="red_glow"/>
+    <mapping id="targetsystem_collectible" ref="white_moderate_glow"/>
+    <mapping id="targetsystem_collectible_unavailable" ref="grey_192"/>
+    <mapping id="targetsystem_aimahead" ref="white_moderate_glow"/>
+    <mapping id="targetsystem_velocity_indicator" ref="azure_dark_moderate_glow"/>
+    <mapping id="targetsystem_velocity_indicator_offscreen" ref="azure_moderate_glow"/>
+    <mapping id="crosshair_crosshair" ref="azure_bright_glow"/>
+    <mapping id="crosshair_crosshair_shadow" ref="black"/>
+    <mapping id="crosshair_mission_arrow" ref="amber_glow"/>
+    <mapping id="crosshair_target_arrow" ref="white_moderate_glow"/>
+    <mapping id="crosshair_hull" ref="white_moderate_glow"/>
+    <mapping id="crosshair_hull_damage_animation" ref="red_extra_bright_strong_glow"/>
+    <mapping id="crosshair_hull_damage" ref="red_glow"/>
+    <mapping id="crosshair_hull_gradient" ref="azure_very_dark"/>
+    <mapping id="crosshair_hull_gradient_glow" ref="azure_bright"/>
+    <mapping id="crosshair_shield" ref="azure_glow"/>
+    <mapping id="crosshair_shield_damage_animation" ref="azure_very_bright_strong_glow"/>
+    <mapping id="crosshair_shield_damage" ref="red_glow"/>
+    <mapping id="crosshair_shield_boost" ref="azure_dark_alpha_160_glow"/>
+    <mapping id="crosshair_shield_gradient_glow" ref="azure_bright"/>
+    <mapping id="crosshair_oxygen" ref="azure_bright"/>
+    <mapping id="crosshair_oxygen_low" ref="red"/>
+    <mapping id="crosshair_speedbar" ref="white_moderate_glow"/>
+    <mapping id="crosshair_speedbar_boost" ref="azure_bright_glow"/>
+    <mapping id="crosshair_speedbar_zeropoint" ref="orange_glow"/>
+    <mapping id="crosshair_speedbar_maxpoint" ref="azure_bright"/>
+    <mapping id="crosshair_speedbar_base" ref="grey_160"/>
+    <mapping id="crosshair_boostbar" ref="azure_bright_glow"/>
+    <mapping id="crosshair_boostbar_full" ref="azure_dark_alpha_160_glow"/>
+    <mapping id="crosshair_boostbar_inactive" ref="grey_64"/>
+    <mapping id="crosshair_boostbar_error" ref="red"/>
+    <mapping id="crosshair_weapon" ref="azure_bright_glow"/>
+    <mapping id="crosshair_weapon_highlight" ref="azure_very_bright_glow"/>
+    <mapping id="crosshair_weapon_inactive" ref="grey_64"/>
+    <mapping id="crosshair_weapon_inactive_highlight" ref="grey_128"/>
+    <mapping id="crosshair_weapon_damaged" ref="orange_glow"/>
+    <mapping id="crosshair_weapon_damaged_highlight" ref="orange_bright_glow"/>
+    <mapping id="crosshair_weapon_damaged_inactive" ref="orange"/>
+    <mapping id="crosshair_weapon_damaged_inactive_highlight" ref="orange_bright"/>
+    <mapping id="crosshair_weapon_broken" ref="red_glow"/>
+    <mapping id="crosshair_weapon_broken_highlight" ref="red_bright_glow"/>
+    <mapping id="crosshair_weapon_broken_inactive" ref="red"/>
+    <mapping id="crosshair_weapon_broken_inactive_highlight" ref="red_bright"/>
+    <mapping id="crosshair_weapon_disabled" ref="grey_128"/>
+    <mapping id="crosshair_weapon_error" ref="red"/>
+    <mapping id="crosshair_weapon_ammo" ref="white_moderate_glow"/>
+    <mapping id="crosshair_weapon_deco" ref="azure_bright_glow"/>
+    <mapping id="crosshair_weapon_group_active" ref="azure_bright_glow"/>
+    <mapping id="crosshair_weapon_group_inactive" ref="grey_64"/>
+    <mapping id="crosshair_reload_ready" ref="grey_64"/>
+    <mapping id="crosshair_reload_ready_inactive" ref="grey_64"/>
+    <mapping id="crosshair_reload_reloading" ref="red"/>
+    <mapping id="crosshair_reload_reloading_inactive" ref="red"/>
+    <mapping id="crosshair_reload_autoreloading" ref="azure_dark"/>
+    <mapping id="crosshair_reload_autoreloading_inactive" ref="azure_dark"/>
+    <mapping id="crosshair_heat" ref="grey_64"/>
+    <mapping id="crosshair_heat_inactive" ref="grey_64"/>
+    <mapping id="crosshair_heat_normal" ref="azure_bright_glow"/>
+    <mapping id="crosshair_heat_normal_inactive" ref="azure_bright"/>
+    <mapping id="crosshair_heat_overheating" ref="orange_glow"/>
+    <mapping id="crosshair_heat_overheating_inactive" ref="orange"/>
+    <mapping id="crosshair_heat_cooling" ref="red_glow"/>
+    <mapping id="crosshair_heat_cooling_inactive" ref="red"/>
+    <mapping id="crosshair_heat_next_shot" ref="grey_48_alpha_128"/>
+    <mapping id="crosshair_heat_next_shot_inactive" ref="grey_48_alpha_128"/>
+    <mapping id="crosshair_heat_next_shot_normal" ref="azure_alpha_128"/>
+    <mapping id="crosshair_heat_next_shot_normal_inactive" ref="azure_alpha_128"/>
+    <mapping id="crosshair_heat_next_shot_overheating" ref="orange_dark_alpha_128"/>
+    <mapping id="crosshair_heat_next_shot_overheating_inactive" ref="orange_dark_alpha_128"/>
+    <mapping id="crosshair_heat_next_shot_cooling" ref="red"/>
+    <mapping id="crosshair_heat_next_shot_cooling_inactive" ref="red_dark_alpha_128"/>
+    <mapping id="crosshair_turret_mode" ref="azure_bright_glow"/>
+    <mapping id="crosshair_turret_mode_highlight" ref="azure_very_bright_glow"/>
+    <mapping id="crosshair_drone_armed" ref="azure_bright_glow"/>
+    <mapping id="crosshair_drone_armed_highlight" ref="azure_very_bright_glow"/>
+    <mapping id="crosshair_drone_disarmed" ref="grey_128"/>
+    <mapping id="crosshair_drone_disarmed_highlight" ref="grey_192"/>
+    <mapping id="crosshair_drone_mode_active" ref="azure_bright_glow"/>
+    <mapping id="crosshair_drone_mode_active_highlight" ref="azure_very_bright_glow"/>
+    <mapping id="crosshair_drone_mode_pending" ref="grey_128"/>
+    <mapping id="crosshair_drone_mode_pending_highlight" ref="grey_192"/>
+    <mapping id="crosshair_drone_blocked" ref="red"/>
+    <mapping id="crosshair_drone_blocked_highlight" ref="red_bright"/>
+    <mapping id="crosshair_drone_destroyed" ref="red"/>
+    <mapping id="crosshair_drone_destroyed_highlight" ref="red_bright"/>
+    <mapping id="crosshair_drone_number" ref="white_moderate_glow"/>
+    <mapping id="crosshair_drone_deco" ref="grey_64"/>
+    <mapping id="crosshair_indicator_active" ref="azure_bright_glow"/>
+    <mapping id="crosshair_indicator_activated" ref="azure_dark"/>
+    <mapping id="crosshair_indicator_inactive" ref="grey_64_alpha_128"/>
+    <mapping id="crosshair_countermeasures" ref="azure_bright_glow"/>
+    <mapping id="crosshair_progressbar_grid" ref="azure_bright"/>
+    <mapping id="crosshair_progressbar_ring" ref="azure"/>
+    <mapping id="crosshair_progressbar_icon" ref="white_moderate_glow"/>
+    <mapping id="crosshair_interaction_text" ref="white_moderate_glow"/>
+    <mapping id="crosshair_seta_ring" ref="azure_bright_glow"/>
+    <mapping id="crosshair_seta_unavailable" ref="grey_64"/>
+    <mapping id="crosshair_seta_available" ref="azure_bright_glow"/>
+    <mapping id="crosshair_seta_active" ref="azure_bright_glow"/>
+    <mapping id="crosshair_checkengine_normal" ref="white_moderate_glow"/>
+    <mapping id="crosshair_checkengine_notravel" ref="yellow_glow"/>
+    <mapping id="crosshair_checkengine_restricted" ref="orange_glow"/>
+    <mapping id="crosshair_checkengine_noboost" ref="red_glow"/>
+    <mapping id="crosshair_checkengine_disabled" ref="red_glow"/>
+    <mapping id="crosshair_checkengine_disabled2" ref="red_very_dark"/>
+    <mapping id="crosshair_mousesteering_line" ref="white_alpha_12"/>
+    <mapping id="firstperson_crosshair_text" ref="white_moderate_glow"/>
+    <mapping id="firstperson_crosshair_crosshair" ref="azure_bright_glow"/>
+    <mapping id="firstperson_crosshair_crosshair_shadow" ref="black"/>
+    <mapping id="firstperson_crosshair_softtarget_ring" ref="amber_glow"/>
+    <mapping id="firstperson_crosshair_softtarget_shadow" ref="black"/>
+    <mapping id="si_prefix" ref="cyan_bright_glow"/>
+    <mapping id="livestreamview_text_controls" ref="grey_128"/>
+    <mapping id="livestreamview_text_background" ref="black_alpha_224"/>
+    <mapping id="livestreamview_text_background_transparent" ref="black_alpha_0"/>
+    <mapping id="livestreamview_channel_icon" ref="white_alpha_32"/>
+    <mapping id="livestreamview_recording" ref="red_moderate_glow"/>
+    <mapping id="loadingscreen_text" ref="white_weak_glow"/>
+    <mapping id="loadingscreen_text_input" ref="orange_weak_glow"/>
+    <mapping id="loadingscreen_background" ref="white"/>
+    <mapping id="loadingscreen_circle" ref="white_moderate_glow"/>
+    <mapping id="loadingscreen_bar" ref="white_weak_glow"/>
+    <mapping id="loadingscreen_bar_background" ref="grey_64"/>
+    <mapping id="loadingscreen_scenario_text" ref="amber_glow"/>
+    <mapping id="loadingscreen_scenario_dust" ref="amber_glow"/>
+    <mapping id="hotkey" ref="white_weak_glow"/>
+    <mapping id="compass_1_ring_core" ref="cyan_extra_dark"/>
+    <mapping id="compass_1_ring_pointer" ref="cyan_very_bright_glow"/>
+    <mapping id="compass_2_ring_core" ref="amber_extra_dark"/>
+    <mapping id="compass_2_ring_pointer" ref="amber_very_bright_glow"/>
+    <mapping id="compass_background" ref="black"/>
+    <mapping id="compass_button_normal" ref="azure_very_dark"/>
+    <mapping id="compass_button_highlight" ref="azure_moderate_glow"/>
+    <mapping id="compass_button_inactive" ref="grey_64"/>
+    <mapping id="compass_button_unmapped" ref="grey_64_alpha_128"/>
+    <mapping id="compass_button_text_control" ref="white_weak_glow"/>
+    <mapping id="compass_button_text_control_inactive" ref="grey_192_weak_glow"/>
+    <mapping id="compass_button_text_shortcut" ref="grey_192_weak_glow"/>
+    <mapping id="subchannel_background" ref="black_alpha_192"/>
+    <mapping id="subchannel_skip_text" ref="grey_128"/>
+    <mapping id="subchannel_skip_background" ref="black_alpha_192"/>
+    <mapping id="holomap_equipment_slot" ref="cyan_bright_glow"/>
+    <mapping id="holomap_verticaldrag" ref="grey_128_alpha_160"/>
+    <mapping id="holomap_verticaldrag_lowlight" ref="grey_64_alpha_128"/>
+    <mapping id="holomap_target_bracket" ref="yellow_glow"/>
+    <mapping id="holomap_selection_bracket" ref="white_moderate_glow"/>
+    <mapping id="holomap_highway" ref="azure_bright_alpha_160_glow"/>
+    <mapping id="holomap_highway_inactive" ref="grey_128_alpha_160_glow"/>
+    <mapping id="holomap_superhighway" ref="azure_dark_alpha_160_glow"/>
+    <mapping id="holomap_tradeoffer_frame" ref="grey_192_glow"/>
+    <mapping id="holomap_yieldbar" ref="azure_weak_glow"/>
+    <mapping id="holomap_yieldbar_empty" ref="azure_extra_dark_alpha_96"/>
+    <mapping id="holomap_yield_value" ref="yellow_glow"/>
+    <mapping id="holomap_yield_detail" ref="white_moderate_glow"/>
+    <mapping id="holomap_sectorname" ref="grey_128_moderate_glow"/>
+    <mapping id="holomap_sectorname_picked" ref="white_moderate_glow"/>
+    <mapping id="holomap_hostile" ref="red_glow"/>
+    <mapping id="holomap_playerlocation_hostile" ref="red_bright_glow"/>
+    <mapping id="holomap_enemy" ref="red_very_bright_glow"/>
+    <mapping id="holomap_playerlocation_enemy" ref="red_extra_bright_glow"/>
+    <mapping id="holomap_neutral" ref="azure_weak_glow"/>
+    <mapping id="holomap_playerlocation_neutral" ref="azure_bright_glow"/>
+    <mapping id="holomap_player" ref="green_bright_weak_glow"/>
+    <mapping id="holomap_playerlocation_playerowned" ref="green_extra_bright_weak_glow"/>
+    <mapping id="holomap_selected" ref="white_weak_glow"/>
+    <mapping id="holomap_picked" ref="white_weak_glow"/>
+    <mapping id="holomap_lowlight" ref="grey_64"/>
+    <mapping id="holomap_inspectionmode_lowlight" ref="grey_16"/>
+    <mapping id="holomap_missiontarget" ref="amber_glow"/>
+    <mapping id="holomap_inactivemissiontarget" ref="amber_dark"/>
+    <mapping id="holomap_visitor" ref="yellow_glow"/>
+    <mapping id="holomap_playerlocation_visitor" ref="yellow_glow"/>
+    <mapping id="holomap_playerlocation_faction" ref="white_weak_glow"/>
+    <mapping id="holomap_wreck" ref="grey_64_glow"/>
+    <mapping id="holomap_missile" ref="red_glow"/>
+    <mapping id="holomap_mine" ref="red_glow"/>
+    <mapping id="holomap_collectable" ref="azure_glow"/>
+    <mapping id="holomap_not_collectable" ref="grey_96"/>
+    <mapping id="holomap_jumpgate" ref="grey_128_glow"/>
+    <mapping id="holomap_inactivejumpgate" ref="grey_32_glow"/>
+    <mapping id="holomap_highwayentry" ref="grey_128_glow"/>
+    <mapping id="holomap_highwayexit" ref="grey_128_glow"/>
+    <mapping id="holomap_asteroid" ref="grey_128_glow"/>
+    <mapping id="holomap_unidentified" ref="grey_128_glow"/>
+    <mapping id="holomap_inactiveradar" ref="grey_192_glow"/>
+    <mapping id="holomap_inactiveprobe" ref="grey_192_glow"/>
+    <mapping id="holomap_unlockeddatavault" ref="grey_128_glow"/>
+    <mapping id="holomap_component_base" ref="grey_160"/>
+    <mapping id="holomap_component_undiscovered" ref="grey_128"/>
+    <mapping id="holomap_component_production" ref="orange"/>
+    <mapping id="holomap_component_build" ref="amber"/>
+    <mapping id="holomap_component_efficiency" ref="azure_dark"/>
+    <mapping id="holomap_component_ventureplatform" ref="magenta_dark"/>
+    <mapping id="holomap_component_storage" ref="cyan_dark"/>
+    <mapping id="holomap_component_shield" ref="azure"/>
+    <mapping id="holomap_component_weapon" ref="red"/>
+    <mapping id="holomap_component_dockingbay" ref="yellow"/>
+    <mapping id="holomap_component_venturedock" ref="magenta_bright"/>
+    <mapping id="holomap_component_pier" ref="yellow"/>
+    <mapping id="holomap_component_habitation" ref="azure_dark"/>
+    <mapping id="holomap_component_defence" ref="red"/>
+    <mapping id="holomap_component_connection" ref="cyan_very_bright"/>
+    <mapping id="holomap_component_ventureconnection" ref="magenta_dark"/>
+    <mapping id="holomap_component_welfare" ref="azure_bright"/>
+    <mapping id="holomap_component_processing" ref="orange"/>
+    <mapping id="holomap_component_radar" ref="green_bright"/>
+    <mapping id="holomap_upkeepalert_low" ref="yellow_very_bright_weak_glow"/>
+    <mapping id="holomap_upkeepalert_medium" ref="orange_moderate_glow"/>
+    <mapping id="holomap_upkeepalert_high" ref="red_moderate_glow"/>
+    <mapping id="holomap_hullbar" ref="white_weak_glow"/>
+    <mapping id="holomap_hullbar_empty" ref="black"/>
+    <mapping id="holomap_shieldbar" ref="azure_moderate_glow"/>
+    <mapping id="holomap_shieldbar_empty" ref="black"/>
+    <mapping id="holomap_oxygenbar" ref="azure_very_bright_weak_glow"/>
+    <mapping id="holomap_oxygenbar_empty" ref="grey_64"/>
+    <mapping id="holomap_progressbar" ref="azure_bright"/>
+    <mapping id="holomap_progressbar_empty" ref="black"/>
+    <mapping id="holomap_buyoffer" ref="azure_very_bright_glow"/>
+    <mapping id="holomap_selloffer" ref="orange_bright_glow"/>
+    <mapping id="holomap_radar_background" ref="azure"/>
+    <mapping id="holomap_radar_ecliptic" ref="azure"/>
+    <mapping id="holomap_radar_axis_labels" ref="azure_bright"/>
+    <mapping id="holomap_radar_range" ref="green"/>
+    <mapping id="holomap_radar_range_reduced" ref="yellow"/>
+    <mapping id="holomap_ecliptic_line" ref="azure_dark"/>
+    <mapping id="holomap_ecliptic_sphere" ref="azure_dark"/>
+    <mapping id="holomap_infobox_background" ref="grey_192_glow"/>
+    <mapping id="holomap_infobox_selected" ref="grey_32_glow"/>
+    <mapping id="holomap_infobox_picked" ref="grey_192_glow"/>
+    <mapping id="holomap_infobox_frame" ref="grey_64_glow"/>
+    <mapping id="holomap_construction_valid" ref="green_bright_weak_glow"/>
+    <mapping id="holomap_construction_invalid" ref="red_bright_weak_glow"/>
+    <mapping id="holomap_construction_compatible" ref="green_bright"/>
+    <mapping id="holomap_construction_venture" ref="yellow_glow"/>
+    <mapping id="holomap_construction_incompatible" ref="grey_128_alpha_160"/>
+    <mapping id="holomap_construction_incompatible_venture" ref="magenta_very_dark"/>
+    <mapping id="holomap_construction_frame" ref="grey_32_glow"/>
+    <mapping id="holomap_construction_frame_obstructed" ref="red_bright_weak_glow"/>
+    <mapping id="holomap_construction_exclusionzone" ref="grey_32_glow"/>
+    <mapping id="holomap_plot_valid" ref="green_bright_glow"/>
+    <mapping id="holomap_plot_invalid" ref="red_bright_glow"/>
+    <mapping id="holomap_order_active" ref="azure_bright_glow"/>
+    <mapping id="holomap_order_selected_active" ref="azure_very_bright_glow"/>
+    <mapping id="holomap_order_inactive" ref="grey_64"/>
+    <mapping id="holomap_order_selected_inactive" ref="grey_96"/>
+    <mapping id="holomap_order_override" ref="red_glow"/>
+    <mapping id="holomap_order_failed" ref="orange_glow"/>
+    <mapping id="holomap_orderline_active" ref="azure_glow"/>
+    <mapping id="holomap_orderline_selected_active" ref="azure_bright_glow"/>
+    <mapping id="holomap_orderline_inactive" ref="grey_32"/>
+    <mapping id="holomap_orderline_selected_inactive" ref="grey_64"/>
+    <mapping id="holomap_intersector_defence_line" ref="grey_64_alpha_128"/>
+    <mapping id="holomap_jumpgate_line" ref="white_moderate_glow"/>
+    <mapping id="holomap_cluster" ref="grey_128_glow"/>
+    <mapping id="holomap_cluster_coords" ref="grey_128_moderate_glow"/>
+    <mapping id="holomap_fogofwar_periphery" ref="grey_16"/>
+    <mapping id="holomap_regiondetail_object" ref="orange_very_dark"/>
+    <mapping id="holomap_regiondetail_nebula" ref="grey_8"/>
+    <mapping id="holomap_sectorbg" ref="grey_64"/>
+    <mapping id="holomap_multiverse_player" ref="green_glow"/>
+    <mapping id="holomap_multiverse_home" ref="azure_glow"/>
+    <mapping id="holomap_multiverse_remote" ref="red_glow"/>
+    <mapping id="holomap_multiverse_home_bg" ref="azure_extra_dark"/>
+    <mapping id="holomap_multiverse_remote_bg" ref="red_extra_dark"/>
+    <mapping id="holomap_multiverse_operation_progress" ref="white_moderate_glow"/>
+    <mapping id="holomap_multiverse_operation_progress_background" ref="grey_64"/>
+    <mapping id="holomap_multiverse_venture_home" ref="azure_glow"/>
+    <mapping id="holomap_multiverse_venture_home_fill" ref="black"/>
+    <mapping id="holomap_multiverse_venture_home_progress" ref="white_moderate_glow"/>
+    <mapping id="holomap_multiverse_venture_home_progress_background" ref="grey_64_glow"/>
+    <mapping id="holomap_multiverse_venture_remote" ref="red_very_bright_glow"/>
+    <mapping id="holomap_multiverse_venture_remote_fill" ref="black"/>
+    <mapping id="holomap_multiverse_venture_remote_progress" ref="white_moderate_glow"/>
+    <mapping id="holomap_multiverse_venture_remote_progress_background" ref="grey_64_glow"/>
+    <mapping id="holomap_transform_gizmo_translate_x" ref="red_dark_moderate_glow"/>
+    <mapping id="holomap_transform_gizmo_translate_y" ref="azure_dark_moderate_glow"/>
+    <mapping id="holomap_transform_gizmo_translate_z" ref="green_dark_moderate_glow"/>
+    <mapping id="holomap_transform_gizmo_rotate_x" ref="red_dark_moderate_glow"/>
+    <mapping id="holomap_transform_gizmo_rotate_y" ref="azure_dark_moderate_glow"/>
+    <mapping id="holomap_transform_gizmo_rotate_z" ref="green_dark_moderate_glow"/>
+    <mapping id="holomap_transform_gizmo_text_background" ref="black"/>
+    <mapping id="holomap_spline_gizmo_point" ref="magenta_dark_glow"/>
+    <mapping id="holomap_spline_gizmo_faded" ref="grey_128_alpha_160"/>
+    <mapping id="holomap_spline_gizmo_in" ref="yellow_glow"/>
+    <mapping id="holomap_spline_gizmo_out" ref="cyan_glow"/>
+    <mapping id="holomap_locked_sector" ref="grey_64_glow"/>
+    <mapping id="holomap_attackmarker" ref="grey_192_glow"/>
+    <mapping id="longrangescan_good" ref="cyan_bright_glow"/>
+    <mapping id="longrangescan_bad" ref="red_glow"/>
+    <mapping id="signalleak_base" ref="azure_glow"/>
+    <mapping id="signalleak_background" ref="azure_very_dark_glow"/>
+    <mapping id="signalleak_scanmode" ref="azure_glow"/>
+    <mapping id="guidance_firstperson" ref="amber_glow"/>
+    <mapping id="external_view_target_arrow" ref="azure_dark_glow"/>
+    <mapping id="external_view_mission_arrow" ref="amber_dark_glow"/>
+    <mapping id="highlight_target_outline" ref="azure_very_bright_glow"/>
+    <mapping id="highlight_environmentobject_outline" ref="azure_very_bright_glow"/>
+    <mapping id="highlight_scan_outline" ref="white_moderate_glow"/>
+    <mapping id="highlight_scan_fill_0" ref="azure_very_bright_glow"/>
+    <mapping id="highlight_scan_fill_1" ref="azure_very_bright_glow"/>
+    <mapping id="highlight_scan_fill_4" ref="azure_very_bright_glow"/>
+    <mapping id="trail_highway_safe" ref="yellow_dark_glow"/>
+    <mapping id="trail_highway_danger" ref="red_glow"/>
+    <mapping id="weaponpointer_inrange" ref="grey_192_glow"/>
+    <mapping id="weaponpointer_outofrange" ref="grey_64_glow"/>
+    <mapping id="dockui_uturn" ref="red_glow"/>
+    <mapping id="dockui_shiprot_horizontal" ref="orange_glow"/>
+    <mapping id="dockui_target_rot_good" ref="green_bright_glow"/>
+    <mapping id="dockui_target_rot_bad" ref="red_glow"/>
+    <mapping id="dockui_current_roll_good" ref="green_bright_glow"/>
+    <mapping id="dockui_current_roll_bad" ref="red_glow"/>
+    <mapping id="dockui_target_roll_good" ref="green_bright_glow"/>
+    <mapping id="dockui_target_roll_bad" ref="red_glow"/>
+    <mapping id="dockui_dockframe_ground_good" ref="white_moderate_glow"/>
+    <mapping id="dockui_dockframe_ground_bad" ref="white_moderate_glow"/>
+    <mapping id="dockui_dockpos_horizontal_good" ref="green_bright_glow"/>
+    <mapping id="dockui_dockpos_horizontal_bad" ref="red_glow"/>
+    <mapping id="dockui_dockpos_vertical_good" ref="green_bright_glow"/>
+    <mapping id="dockui_dockpos_vertical_bad" ref="red_glow"/>
+    <mapping id="dockui_shippos_current_good" ref="white_moderate_glow"/>
+    <mapping id="dockui_shippos_current_bad" ref="azure_bright_glow"/>
+    <mapping id="dockui_shippos_projected_good" ref="green_bright_glow"/>
+    <mapping id="dockui_shippos_projected_bad" ref="red_glow"/>
+    <mapping id="dockguidance_shiphologram" ref="green_bright"/>
+    <mapping id="faction_alliance" ref="magenta_very_dark_moderate_glow"/>
+    <mapping id="faction_antigone" ref="azure_weak_glow"/>
+    <mapping id="faction_argon" ref="azure_dark_moderate_glow"/>
+    <mapping id="faction_boron" ref="azure_bright_weak_glow"/>
+    <mapping id="faction_buccaneers" ref="cyan_very_dark_moderate_glow"/>
+    <mapping id="faction_court" ref="amber_moderate_glow"/>
+    <mapping id="faction_civilian" ref="grey_192_weak_glow"/>
+    <mapping id="faction_criminal" ref="red_dark_moderate_glow"/>
+    <mapping id="faction_fallensplit" ref="red_very_bright_moderate_glow"/>
+    <mapping id="faction_freesplit" ref="orange_weak_glow"/>
+    <mapping id="faction_hatikvah" ref="cyan_weak_glow"/>
+    <mapping id="faction_holyorder" ref="magenta_very_bright_weak_glow"/>
+    <mapping id="faction_holyorderfanatic" ref="red_very_dark_moderate_glow"/>
+    <mapping id="faction_kaori" ref="orange_bright_moderate_glow"/>
+    <mapping id="faction_khaak" ref="magenta_moderate_glow"/>
+    <mapping id="faction_loanshark" ref="amber_dark_moderate_glow"/>
+    <mapping id="faction_ministry" ref="green_very_dark_moderate_glow"/>
+    <mapping id="faction_ownerless" ref="grey_192_weak_glow"/>
+    <mapping id="faction_paranid" ref="magenta_dark_weak_glow"/>
+    <mapping id="faction_pioneers" ref="cyan_dark_weak_glow"/>
+    <mapping id="faction_player" ref="green_bright_weak_glow"/>
+    <mapping id="faction_scaleplate" ref="yellow_very_dark_moderate_glow"/>
+    <mapping id="faction_scavenger" ref="azure_very_dark_moderate_glow"/>
+    <mapping id="faction_smuggler" ref="red_dark_moderate_glow"/>
+    <mapping id="faction_split" ref="orange_dark_weak_glow"/>
+    <mapping id="faction_teladi" ref="yellow_dark_weak_glow"/>
+    <mapping id="faction_terran" ref="azure_very_bright_weak_glow"/>
+    <mapping id="faction_trinity" ref="magenta_extra_bright_moderate_glow"/>
+    <mapping id="faction_visitor" ref="yellow_moderate_glow"/>
+    <mapping id="faction_yaki" ref="red_bright_moderate_glow"/>
+    <mapping id="faction_xenon" ref="red_dark_moderate_glow"/>
+    <mapping id="resource_ore" ref="orange_dark"/>
+    <mapping id="resource_silicon" ref="azure_dark"/>
+    <mapping id="resource_nividium" ref="magenta_extra_dark"/>
+    <mapping id="resource_ice" ref="grey_128"/>
+    <mapping id="resource_node_ore" ref="cyan_glow"/>
+    <mapping id="resource_node_silicon" ref="amber_glow"/>
+    <mapping id="resource_node_nividium" ref="cyan_glow"/>
+    <mapping id="resource_node_ice" ref="orange_dark_glow"/>
+    <mapping id="resource_icon_ore" ref="orange_glow"/>
+    <mapping id="resource_icon_silicon" ref="azure_glow"/>
+    <mapping id="resource_icon_nividium" ref="magenta_glow"/>
+    <mapping id="resource_icon_ice" ref="azure_very_bright_glow"/>
+    <mapping id="playeractivity_travel" ref="orange_dark_glow"/>
+    <mapping id="playeractivity_travel_background" ref="orange_extra_dark"/>
+    <mapping id="playeractivity_longrangescan" ref="cyan_bright_glow"/>
+    <mapping id="playeractivity_longrangescan_background" ref="cyan_extra_dark"/>
+    <mapping id="playeractivity_scan" ref="magenta_dark_glow"/>
+    <mapping id="playeractivity_scan_background" ref="magenta_extra_dark"/>
+    <mapping id="playeractivity_seta" ref="grey_192"/>
+    <mapping id="playeractivity_seta_background" ref="grey_48"/>
+    <mapping id="chatuser_0" ref="orange"/>
+    <mapping id="chatuser_1" ref="orange_bright"/>
+    <mapping id="chatuser_2" ref="amber"/>
+    <mapping id="chatuser_3" ref="amber_very_bright"/>
+    <mapping id="chatuser_4" ref="amber_dark"/>
+    <mapping id="chatuser_5" ref="yellow"/>
+    <mapping id="chatuser_6" ref="yellow_very_bright"/>
+    <mapping id="chatuser_7" ref="yellow_dark"/>
+    <mapping id="chatuser_8" ref="green_very_bright"/>
+    <mapping id="chatuser_9" ref="green_bright"/>
+    <mapping id="chatuser_10" ref="green_dark"/>
+    <mapping id="chatuser_11" ref="cyan"/>
+    <mapping id="chatuser_12" ref="cyan_very_bright"/>
+    <mapping id="chatuser_13" ref="azure"/>
+    <mapping id="chatuser_14" ref="azure_very_bright"/>
+    <mapping id="chatuser_15" ref="azure_dark"/>
+    <mapping id="chatuser_16" ref="magenta_very_bright"/>
+    <mapping id="chatuser_17" ref="magenta_dark"/>
+    <mapping id="overlay_background_default" ref="black"/>
+    <mapping id="overlay_scenario_stat_background" ref="black_alpha_0"/>
+    <mapping id="overlay_scenario_stat_text" ref="azure_bright_weak_glow"/>
+    <mapping id="overlay_scenario_stat_flash" ref="red_dark_moderate_glow"/>
+    <mapping id="promo_text_highlight" ref="azure_bright_weak_glow"/>
+    <mapping id="promo_text_background" ref="black"/>
+    <mapping id="promo_white_line" ref="white_weak_glow"/>
+    <mapping id="promo_background" ref="white_alpha_192"/>
+    <mapping id="mapblip_special" ref="magenta_very_bright"/>
+    <mapping id="mapblip_good" ref="amber"/>
+    <mapping id="mapblip_neutral" ref="azure_bright"/>
+    <mapping id="mapblip_bad" ref="white"/>
+  </mappings>
+</colormap>

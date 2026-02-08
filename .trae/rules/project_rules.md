@@ -14,3 +14,4 @@
   - 为何每次执行npx playwright的时候都不在正确的工作目录
   - i18n 的原则是只要i18n本身, 不需在组件中硬编码fallback 
     **举例** 是t('ui.volume_overview') 而不是 t('ui.volume_overview') || 'Volume Overview'
+  - 阅读spec_translate_rules.md, 里面列举了所有不能被翻译成其他语言的文档关键字

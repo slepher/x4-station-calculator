@@ -54,7 +54,7 @@ def main():
     lib_dest_dir = os.path.join(dest_root, "libraries")
     os.makedirs(lib_dest_dir, exist_ok=True)
 
-    lib_files = ['wares.xml', 'waregroups.xml']
+    lib_files = ['wares.xml', 'waregroups.xml', 'colors.xml']
     parser = etree.XMLParser(remove_blank_text=True)
     dlc_order = v_config.get('dlc_order', [])
 

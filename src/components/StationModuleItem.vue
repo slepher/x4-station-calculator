@@ -24,8 +24,26 @@ const emit = defineEmits<{
 }>()
 
 // 计算属性
-const colorBarClass = computed(() => {
-  return props.info.type === 'habitat' ? 'color-bar--habitat' : 'color-bar--default'
+const colorBarStyle = computed(() => {
+  // 优先使用模块的color_rgb，如果没有则根据type使用默认颜色
+  const colorRgb = props.info.color_rgb;
+  if (colorRgb) {
+    return {
+      backgroundColor: colorRgb
+    };
+  }
+  
+  // 如果没有颜色信息，使用默认颜色
+  const type = props.info.type;
+  if (type === 'habitation' || type.includes('habitat')) {
+    return {
+      backgroundColor: '#f97316' // orange-500
+    };
+  } else {
+    return {
+      backgroundColor: '#0ea5e9' // sky-500
+    };
+  }
 })
 
 const moduleInfoClass = computed(() => {
@@ -35,7 +53,7 @@ const moduleInfoClass = computed(() => {
 
 <template>
   <div class="module-row group/row" :class="{ 'module-row--draggable': !readonly, 'module-row--readonly': readonly }">
-    <div class="color-bar" :class="colorBarClass">
+    <div class="color-bar" :style="colorBarStyle">
     </div>
 
     <div class="module-info" :class="moduleInfoClass">

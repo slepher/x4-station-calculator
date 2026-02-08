@@ -3,222 +3,296 @@
     "id": "agricultural",
     "nameId": "{20215,101}",
     "type": "production",
-    "name": "Agricultural Goods"
+    "name": "Agricultural Goods",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "energy",
     "nameId": "{20215,201}",
     "type": "production",
-    "name": "Energy"
+    "name": "Energy",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "food",
     "nameId": "{20215,301}",
     "type": "production",
-    "name": "Food"
+    "name": "Food",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "gases",
     "nameId": "{20215,401}",
     "type": "production",
-    "name": "Gases"
+    "name": "Gases",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "hightech",
     "nameId": "{20215,501}",
     "type": "production",
-    "name": "High Tech Goods"
+    "name": "High Tech Goods",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "ice",
     "nameId": "{20215,601}",
     "type": "production",
-    "name": "Ice"
+    "name": "Ice",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "minerals",
     "nameId": "{20215,701}",
     "type": "production",
-    "name": "Minerals"
+    "name": "Minerals",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "pharmaceutical",
     "nameId": "{20215,801}",
     "type": "production",
-    "name": "Pharmaceutical Goods"
+    "name": "Pharmaceutical Goods",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "refined",
     "nameId": "{20215,901}",
     "type": "production",
-    "name": "Refined Goods"
+    "name": "Refined Goods",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "shiptech",
     "nameId": "{20215,1001}",
     "type": "production",
-    "name": "Ship Technology"
+    "name": "Ship Technology",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "water",
     "nameId": "{20215,1201}",
     "type": "production",
-    "name": "Water"
+    "name": "Water",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "contraband",
     "nameId": "{20215,3201}",
     "type": "production",
-    "name": "Contraband"
+    "name": "Contraband",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "countermeasures",
     "nameId": "{20215,1701}",
     "type": "production",
-    "name": "Countermeasures"
+    "name": "Countermeasures",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "curiosity",
     "nameId": "{20215,3101}",
     "type": "production",
-    "name": "Curiosities"
+    "name": "Curiosities",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "drones",
     "nameId": "{20215,1601}",
     "type": "production",
-    "name": "Drones"
+    "name": "Drones",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "engines",
     "nameId": "{20215,1801}",
     "type": "production",
-    "name": "Engines"
+    "name": "Engines",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "generalitem",
     "nameId": "{20215,3501}",
     "type": "production",
-    "name": "General Items"
+    "name": "General Items",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "hardware",
     "nameId": "{20215,3301}",
     "type": "production",
-    "name": "Hardware"
+    "name": "Hardware",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "luxuryitem",
     "nameId": "{20215,3401}",
     "type": "production",
-    "name": "Luxury Items"
+    "name": "Luxury Items",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "missiles",
     "nameId": "{20215,1901}",
     "type": "production",
-    "name": "Missiles"
+    "name": "Missiles",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "shields",
     "nameId": "{20215,2001}",
     "type": "production",
-    "name": "Shields"
+    "name": "Shields",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "software",
     "nameId": "{20215,2101}",
     "type": "production",
-    "name": "Software"
+    "name": "Software",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "thrusters",
     "nameId": "{20215,2201}",
     "type": "production",
-    "name": "Thrusters"
+    "name": "Thrusters",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "turrets",
     "nameId": "{20215,2301}",
     "type": "production",
-    "name": "Turrets"
+    "name": "Turrets",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "weapons",
     "nameId": "{20215,2401}",
     "type": "production",
-    "name": "Weapons"
+    "name": "Weapons",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "habitation",
     "nameId": "{1001,2451}",
     "type": "habitation",
-    "name": "Habitation Modules"
+    "name": "Habitation Modules",
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "production",
     "nameId": "{1001,2421}",
     "type": "production",
-    "name": "Production Modules"
+    "name": "Production Modules",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "processingmodule",
     "nameId": "{1001,9621}",
     "type": "processingmodule",
-    "name": "Processing Modules"
+    "name": "Processing Modules",
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "welfaremodule",
     "nameId": "{1001,9620}",
     "type": "welfaremodule",
-    "name": "Welfare Modules"
+    "name": "Welfare Modules",
+    "color": "grey_160",
+    "color_rgb": "#A0A0A0"
   },
   {
     "id": "storage",
     "nameId": "{1001,2422}",
     "type": "storage",
-    "name": "Storage Modules"
+    "name": "Storage Modules",
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3"
   },
   {
     "id": "defencemodule",
     "nameId": "{1001,2424}",
     "type": "defencemodule",
-    "name": "Defence Modules"
+    "name": "Defence Modules",
+    "color": "grey_160",
+    "color_rgb": "#A0A0A0"
   },
   {
     "id": "dockarea",
     "nameId": "{20104,79901}",
     "type": "dockarea",
-    "name": "Dock Area Module"
+    "name": "Dock Area Module",
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "pier",
     "nameId": "{20104,79801}",
     "type": "pier",
-    "name": "Pier Module"
+    "name": "Pier Module",
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "connectionmodule",
     "nameId": "{20104,59901}",
     "type": "connectionmodule",
-    "name": "Connection Module"
+    "name": "Connection Module",
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "buildmodule",
     "nameId": "{1001,2439}",
     "type": "buildmodule",
-    "name": "Build Modules"
+    "name": "Build Modules",
+    "color": "grey_160",
+    "color_rgb": "#A0A0A0"
   },
   {
     "id": "radar",
     "nameId": "{1001,1706}",
     "type": "radar",
-    "name": "Radar"
+    "name": "Radar",
+    "color": "green_bright",
+    "color_rgb": "#4DFF4D"
   },
   {
     "id": "ventureplatform",
     "nameId": "{1001,2454}",
     "type": "ventureplatform",
-    "name": "Venture Modules"
+    "name": "Venture Modules",
+    "color": "magenta_dark",
+    "color_rgb": "#B300B3"
   }
 ]
