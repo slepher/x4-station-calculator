@@ -83,7 +83,7 @@ const onEsc = () => {
         <div v-for="group in store.filteredModulesGrouped" :key="group.group" class="type-group">
           <div class="group-header">{{ group.displayLabel }}</div>
           <div v-for="m in group.modules" :key="m.id" class="result-item" @click="handleSelect(m)">
-            <div class="color-indicator" :class="m.moduleGroup?.type === 'habitation' ? 'bg-orange-500' : 'bg-sky-500'">
+            <div class="color-indicator" :style="{ backgroundColor: m.color_rgb || (m.moduleGroup?.type === 'habitation' || m.moduleGroup?.type?.includes('habitat') ? '#f97316' : '#0ea5e9') }">
             </div>
             <span class="label">{{ m.displayLabel }}</span>
           </div>

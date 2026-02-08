@@ -137,6 +137,15 @@ export function generateFilteredModulesGrouped(
     .map(group => ({
       group,
       displayLabel: typeMetadata[group]?.displayLabel || group,
-      modules: groups[group] || []
+      modules: (groups[group] || [])
+        // 按Tier排序，高级产品在前，同Tier内按名称字母顺序排序
+        .sort((a, b) => {
+          // 首先按Tier降序排序（高Tier在前）
+          const tierDiff = (b.tier || 0) - (a.tier || 0);
+          if (tierDiff !== 0) return tierDiff;
+          
+          // 同Tier内按名称字母顺序排序
+          return (a.displayLabel || '').localeCompare(b.displayLabel || '');
+        })
     }))
 }

@@ -1,6 +1,6 @@
 {
   "ui": {
-    "resource_overview": "Resource Production Overview",
+    "resource_overview": "Resource Overview",
     "volume_overview": "Volume Overview",
     "products_group": "Products",
     "operations_group": "Operations",
@@ -12,9 +12,9 @@
     "hourly_rate": "Hourly Rate",
     "no_active_production": "No Active Production",
     "add_modules_hint": "Add production modules to see data",
-    "quantity_view": "Quantity View",
-    "volume_view": "Volume View",
-    "economy_view": "Economy View",
+    "quantity_view": "Quantity",
+    "volume_view": "Volume",
+    "economy_view": "Economy",
     "workforce_needed": "Workforce Needed",
     "workforce_capacity": "Workforce Capacity",
     "efficiency_bonus": "Efficiency Bonus",

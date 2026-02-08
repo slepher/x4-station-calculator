@@ -26,5 +26,9 @@
     "buildmodule": "{1001,2439}",
     "radar": "{1001,1706}",
     "ventureplatform": "{1001,2454}"
-  }
+  },
+  "mock_modules": [
+    {"claytronics": 6, "hullparts": 12},
+    {"claytronics": 6}
+  ]
 }

@@ -1,7 +1,7 @@
 # module-list-ui Specification
 
 ## Purpose
-TBD - created by archiving change modules-list-ui-options. Update Purpose after archive.
+Enhance the module list UI with intelligent color coding, multi-level sorting, and tier-based prioritization to improve user navigation and visual distinction of different module types in X4 station calculator.
 ## Requirements
 ### Requirement: 规划区数量调整
 系统SHALL提供快速调整规划模块数量的选项。
@@ -59,4 +59,58 @@ TBD - created by archiving change modules-list-ui-options. Update Purpose after 
 - **当** 初始化种族选择下拉列表
 - **那么** 应从consumption数据源正确解析种族信息
 - **并且** 下拉列表应显示完整的种族选项
+
+### Requirement: 模块颜色编码系统
+系统 SHALL 根据模块类型或类别为模块分配不同颜色，以改善视觉区分。
+
+#### Scenario: 显示彩色模块标记
+- **WHEN** 用户查看模块列表或搜索结果
+- **THEN** 每个模块 SHALL 具有与其类型/类别相对应的彩色标记，而不是默认的蓝色
+
+### Requirement: 按模块类型的颜色映射
+系统 SHALL 通过解析来自 colors_final.xml 的游戏数据并将映射到 holomap 组件颜色来将模块类型映射到特定颜色：
+- Production modules: 映射到 'holomap_component_production' -> 实际颜色
+- Storage modules: 映射到 'holomap_component_storage' -> 实际颜色
+- Habitation modules: 映射到 'holomap_component_habitation' -> 实际颜色
+- Defense modules: 映射到 'holomap_component_defence' -> 实际颜色
+- Dockarea modules: 映射到 'holomap_component_dockingbay' -> 实际颜色
+- Connection modules: 映射到 'holomap_component_connection' -> 实际颜色
+- Processing modules: 映射到 'holomap_component_processing' -> 实际颜色
+- Venture platform modules: 映射到 'holomap_component_ventureplatform' -> 实际颜色
+- Other modules: 使用基础颜色作为默认值
+
+### Requirement: 远征组颜色逻辑
+系统 SHALL 特殊处理远征组模块的颜色分配：
+- WHEN 模块属于远征组 (group name 包含 'venture')
+- THEN IF 模块类型包含 'dock' -> 映射到 'venturedock'
+- AND IF 模块类型包含 'connection' -> 映射到 'ventureconnection'
+- AND ELSE -> 映射到 'ventureplatform'
+
+### Requirement: 模块排序逻辑
+系统 SHALL 根据定义的层次结构对自动生成的模块列表中的模块进行排序，以改善用户导航。
+
+#### Scenario: 对模块列表中的模块进行排序
+- **WHEN** 生成模块列表
+- **THEN** 模块 SHALL 根据定义的层次结构进行排序
+
+### Requirement: 多级排序层次结构
+系统 SHALL 使用多级层次结构对模块进行排序：
+- 主级别：按模块类型分组
+- 次级别：在每种类型内，按层级排序（较高等级优先）
+- 第三级别：在同一层级内，按名称字母顺序排序
+- 备用：使用基础颜色作为默认值
+
+#### Scenario: 应用多级排序
+- **WHEN** 用户查看模块列表
+- **THEN** 模块 SHALL 按类型分组，每组按层级排序，然后按字母顺序排序
+
+### Requirement: 层级(Tier)计算
+系统 SHALL 实现物品生产链深度解析算法，以确定每个物品的层级：
+- Tier 0: 基础材料 (无上游生产)
+- Tier N: 高级产品 (需要 N 级生产链)
+
+#### Scenario: 自动填充层级优先级
+- **WHEN** 系统执行自动填充算法
+- **THEN** 应优先处理高Tier物品的缺口
+- **AND** 最终输出应按Tier降序排序
 

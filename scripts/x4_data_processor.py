@@ -229,20 +229,29 @@ class X4PrecisionLoader:
         except Exception as e:
             print(f"   ❌ Colors XML Error: {e}")
 
-    def _get_module_colors(self, m_type):
+    def _get_module_colors(self, m_type, m_group=None):
+        # 优先处理远征组逻辑 
+        if m_group and 'venture' in m_group.lower(): 
+            # 特殊映射处理 
+            if 'dock' in m_type.lower(): m_type = 'venturedock' 
+            elif 'connection' in m_type.lower(): m_type = 'ventureconnection' 
+            else: m_type = 'ventureplatform' 
+
         # 内部映射逻辑: 模块类型 -> Holomap Mapping ID 
         type_to_mapping = {
             'production': 'holomap_component_production',
             'storage': 'holomap_component_storage',
             'habitation': 'holomap_component_habitation',
+            'defencemodule': 'holomap_component_defence',
             'defense': 'holomap_component_defence',
-            'defence': 'holomap_component_defence',
             'dockarea': 'holomap_component_dockingbay',
+            'pier': 'holomap_component_pier',
             'connectionmodule': 'holomap_component_connection',
             'processingmodule': 'holomap_component_processing',
             'ventureplatform': 'holomap_component_ventureplatform',
-            'welfare': 'holomap_component_welfare',
-            'build': 'holomap_component_build'
+            'welfaremodule': 'holomap_component_welfare',
+            'buildmodule': 'holomap_component_build',
+            'radar': 'holomap_component_radar'
         }
         mapping_id = type_to_mapping.get(m_type, f"holomap_component_{m_type}")
         color_id = self.mappings_db.get(mapping_id, self.mappings_db.get('holomap_component_base', 'grey_160'))
@@ -265,7 +274,7 @@ class X4PrecisionLoader:
                 for group in root.findall('group'):
                     g_id = group.get('id')
                     g_name = group.get('name', '')
-                    color_id, hex_color = self._get_module_colors("production")
+                    color_id, hex_color = self._get_module_colors("production", g_id)
                     # 忽略 icon, 只保留 id 和 name
                     self.module_groups_result.append({
                         "id": g_id,
@@ -284,7 +293,7 @@ class X4PrecisionLoader:
         # 2. 合并配置文件中的 Module Types
         count_types = 0
         for m_type, raw_key in self.config.get('module_types', {}).items():
-            color_id, hex_color = self._get_module_colors(m_type)
+            color_id, hex_color = self._get_module_colors(m_type, m_type)
             # 避免重复 (如果配置里的 key 和 group id 冲突，优先保留 xml 的? 或者 append 即可，这里简单 append)
             self.module_groups_result.append({
                 "id": m_type,
@@ -340,7 +349,6 @@ class X4PrecisionLoader:
                 wf_val = int(wf_node.get('max') or wf_node.get('amount') or 0) if wf_node is not None else 0
                 wf_cap = int(wf_node.get('capacity') or 0) if wf_node is not None else 0
 
-                color_id, hex_color = self._get_module_colors(m_class)
                 module_data = {
                     "id": fname, 
                     "wareId": info['module_ware_id'], 
@@ -356,11 +364,12 @@ class X4PrecisionLoader:
                     "tier": 0,
                     "cycleTime": 0,
                     "workforce": { "capacity": wf_cap, "needed": wf_val, "maxBonus": 0 },
-                    "color": color_id,
-                    "color_rgb": hex_color,
                     "outputs": {}, 
                     "inputs": {}
                 }
+                
+                # 初始颜色分配 
+                module_data['color'], module_data['color_rgb'] = self._get_module_colors(m_class)
 
                 # Fix: Check identification tag for specific module types
                 ident = macro.find('properties/identification')
@@ -380,7 +389,7 @@ class X4PrecisionLoader:
                             module_data['group'] = SPECIAL_TYPE_MAPPING[raw_type]
                         else:
                             unmapped_types[raw_type].append(fname)
-                        module_data['color'], module_data['color_rgb'] = self._get_module_colors(raw_type)
+                        module_data['color'], module_data['color_rgb'] = self._get_module_colors(raw_type, module_data.get('group'))
 
                 if m_class == 'production':
                     prod_tag = macro.find('properties/production')

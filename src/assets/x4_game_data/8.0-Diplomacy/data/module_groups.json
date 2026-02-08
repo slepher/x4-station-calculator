@@ -228,8 +228,8 @@
     "nameId": "{1001,9620}",
     "type": "welfaremodule",
     "name": "Welfare Modules",
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0"
+    "color": "azure_bright",
+    "color_rgb": "#4DB5FF"
   },
   {
     "id": "storage",
@@ -244,8 +244,8 @@
     "nameId": "{1001,2424}",
     "type": "defencemodule",
     "name": "Defence Modules",
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0"
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "dockarea",
@@ -276,8 +276,8 @@
     "nameId": "{1001,2439}",
     "type": "buildmodule",
     "name": "Build Modules",
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0"
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "radar",

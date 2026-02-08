@@ -81,9 +81,9 @@ const groupByTypeAndSign = (getValueFn: (flow: any) => number) => {
     resources: [] as any[]    // 资源项目（非container类型的负值）
   }
   
-  // 创建一个映射表，记录wareId与其在plannedModules中的首次出现顺序
+  // 创建一个映射表，记录wareId与其在allIndustryModules中的首次出现顺序
   const wareOrderMap = new Map<string, number>();
-  store.plannedModules.forEach((module, index) => {
+  store.allIndustryModules.forEach((module, index) => {
     const moduleInfo = store.modules[module.id];
     if (moduleInfo) {
       // 记录该模块产出的所有ware的顺序
@@ -156,8 +156,6 @@ const rateGroups = computed(() => groupByTypeAndSign(flow => flow.netRate))
 const totalProfit = computed(() => {
   return store.wareFlowList.reduce((sum, flow) => sum + flow.netValue, 0)
 })
-
-
 
 </script>
 

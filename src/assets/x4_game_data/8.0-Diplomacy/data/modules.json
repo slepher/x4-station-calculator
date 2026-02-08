@@ -23,10 +23,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_bright",
+    "color_rgb": "#4DB5FF"
   },
   {
     "id": "prod_bor_bogas_macro",
@@ -52,15 +52,15 @@
       "needed": 100,
       "maxBonus": 0.46
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "bogas": 2640.0
     },
     "inputs": {
       "energycells": 960.0,
       "water": 2400.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "struct_gen_observationdeck_01_macro",
@@ -85,10 +85,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "defence_ter_claim_01_macro",
@@ -113,10 +113,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "storage_arg_s_solid_01_macro",
@@ -141,10 +141,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 100000
   },
   {
@@ -170,10 +170,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "pier_arg_harbor_02_macro",
@@ -198,10 +198,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "storage_bor_l_solid_01_macro",
@@ -227,10 +227,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 1000000
   },
   {
@@ -256,8 +256,6 @@
       "needed": 225,
       "maxBonus": 0.53
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "weaponcomponents": 340.0
     },
@@ -265,7 +263,9 @@
       "energycells": 120.0,
       "hullparts": 40.0,
       "plasmaconductors": 60.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "landmarks_gen_piratestation_01_exit_01_macro",
@@ -290,10 +290,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "pier_spl_harbor_03_macro",
@@ -318,10 +318,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "storage_par_m_container_01_macro",
@@ -346,10 +346,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 250000
   },
   {
@@ -375,10 +375,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "hab_bor_l_01_macro",
@@ -404,10 +404,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "landmarks_tel_tradestation_01_ring_01_macro",
@@ -432,10 +432,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "struct_spl_vertical_02_macro",
@@ -460,10 +460,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "pier_ter_tradestation_01_macro",
@@ -488,10 +488,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "landmarks_gen_piratestation_01_core_01_macro",
@@ -516,10 +516,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "storage_tel_s_solid_01_macro",
@@ -544,10 +544,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 100000
   },
   {
@@ -573,10 +573,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "storage_spl_l_container_01_macro",
@@ -601,10 +601,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 1000000
   },
   {
@@ -630,10 +630,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "dockarea_xen_m_station_01_macro",
@@ -658,10 +658,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "pier_bor_harbor_02_macro",
@@ -687,10 +687,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "storage_arg_l_liquid_01_macro",
@@ -715,10 +715,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 1000000
   },
   {
@@ -744,10 +744,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "struct_arg_arc_01_macro",
@@ -772,10 +772,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "prod_ter_metallicmicrolattice_macro",
@@ -800,8 +800,6 @@
       "needed": 120,
       "maxBonus": 0.2
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "metallicmicrolattice": 3800.0
     },
@@ -809,7 +807,9 @@
       "energycells": 1000.0,
       "helium": 2600.0,
       "ore": 1000.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "storage_spl_l_liquid_01_macro",
@@ -834,10 +834,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 1000000
   },
   {
@@ -863,10 +863,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "prod_ter_energycells_macro",
@@ -891,12 +891,12 @@
       "needed": 45,
       "maxBonus": 0.43
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "energycells": 3000.0
     },
-    "inputs": {}
+    "inputs": {},
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "prod_tel_sunriseflowers_macro",
@@ -921,15 +921,15 @@
       "needed": 50,
       "maxBonus": 0.28
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "sunriseflowers": 1200.0
     },
     "inputs": {
       "energycells": 360.0,
       "water": 960.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "landmarks_tel_tradestation_01_centerend_01_macro",
@@ -954,10 +954,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "landmarks_tel_tradestation_01_ring_inside_01_macro",
@@ -982,10 +982,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "buildmodule_gen_equip_m_dockarea_01_macro",
@@ -1010,10 +1010,10 @@
       "needed": 400,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "prod_bor_plankton_macro",
@@ -1039,15 +1039,15 @@
       "needed": 40,
       "maxBonus": 0.4
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "plankton": 2475.0
     },
     "inputs": {
       "energycells": 180.0,
       "water": 450.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "pier_arg_harbor_04_macro",
@@ -1072,10 +1072,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "hab_par_s_01_macro",
@@ -1100,10 +1100,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "buildmodule_xen_ships_xl_macro",
@@ -1128,10 +1128,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "prod_ter_computronicsubstrate_macro",
@@ -1156,8 +1156,6 @@
       "needed": 1500,
       "maxBonus": 0.1
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "computronicsubstrate": 588.0
     },
@@ -1166,7 +1164,9 @@
       "hydrogen": 12000.0,
       "ore": 18000.0,
       "silicon": 18000.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "landmarks_tel_tradestation_01_extension_01_macro",
@@ -1191,10 +1191,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "struct_bor_base_03_macro",
@@ -1220,10 +1220,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "dockarea_arg_m_02_tradestation_01_macro",
@@ -1248,10 +1248,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "landmarks_tel_tradestation_01_ringclamp_01_macro",
@@ -1276,10 +1276,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "dockarea_ter_m_station_01_hightech_macro",
@@ -1304,10 +1304,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "prod_bor_medicalsupplies_macro",
@@ -1333,8 +1333,6 @@
       "needed": 90,
       "maxBonus": 0.28
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "medicalsupplies": 2496.0
     },
@@ -1342,7 +1340,9 @@
       "energycells": 1200.0,
       "plankton": 1140.0,
       "water": 720.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "struct_par_base_01_macro",
@@ -1367,10 +1367,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "pier_arg_harbor_03_macro",
@@ -1395,10 +1395,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "pier_arg_single_01_tradestation_01_macro",
@@ -1423,10 +1423,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "landmarks_gen_piratestation_02_storage_01_macro",
@@ -1451,10 +1451,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3"
   },
   {
     "id": "storage_arg_m_solid_01_macro",
@@ -1479,10 +1479,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 500000
   },
   {
@@ -1509,10 +1509,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "struct_bor_cross_02_macro",
@@ -1538,10 +1538,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "prod_ter_stimulants_macro",
@@ -1566,8 +1566,6 @@
       "needed": 300,
       "maxBonus": 0.65
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "stimulants": 1176.0
     },
@@ -1575,7 +1573,9 @@
       "energycells": 960.0,
       "helium": 4800.0,
       "silicon": 240.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "ventureplatform_gen_cross_01_macro",
@@ -1600,10 +1600,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "magenta_dark",
-    "color_rgb": "#B300B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "magenta_dark",
+    "color_rgb": "#B300B3"
   },
   {
     "id": "landmarks_tel_tradestation_01_ring_inside_03_macro",
@@ -1628,10 +1628,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "prod_spl_cheltmeat_macro",
@@ -1656,15 +1656,15 @@
       "needed": 90,
       "maxBonus": 0.6
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "cheltmeat": 1672.0
     },
     "inputs": {
       "energycells": 400.0,
       "water": 960.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "struct_arg_cross_05_macro",
@@ -1689,10 +1689,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "struct_par_cross_03_macro",
@@ -1717,10 +1717,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "landmarks_tel_tradestation_01_ringcenter_01_macro",
@@ -1745,10 +1745,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "defence_spl_disc_01_macro",
@@ -1773,10 +1773,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "struct_arg_vertical_02_macro",
@@ -1801,10 +1801,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "pier_spl_harbor_01_macro",
@@ -1829,10 +1829,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "struct_par_base_03_macro",
@@ -1857,10 +1857,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "hab_pir_s_01_macro",
@@ -1885,10 +1885,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "struct_par_vertical_01_macro",
@@ -1913,10 +1913,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "landmarks_tel_tradestation_01_radar_01_macro",
@@ -1941,10 +1941,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "dockarea_arg_m_station_02_lowtech_macro",
@@ -1969,10 +1969,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "struct_spl_base_03_macro",
@@ -1997,10 +1997,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "struct_tel_base_03_macro",
@@ -2025,10 +2025,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "prod_tel_medicalsupplies_macro",
@@ -2053,8 +2053,6 @@
       "needed": 90,
       "maxBonus": 0.28
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "medicalsupplies": 2496.0
     },
@@ -2063,7 +2061,9 @@
       "spices": 480.0,
       "sunriseflowers": 144.0,
       "water": 720.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "struct_ter_vertical_01_macro",
@@ -2088,10 +2088,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "prod_gen_claytronics_macro",
@@ -2116,8 +2116,6 @@
       "needed": 1215,
       "maxBonus": 0.34
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "claytronics": 432.0
     },
@@ -2126,7 +2124,9 @@
       "energycells": 560.0,
       "microchips": 640.0,
       "quantumtubes": 400.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "hab_pir_m_01_macro",
@@ -2151,10 +2151,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "dockarea_arg_m_station_02_macro",
@@ -2179,10 +2179,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "struct_arg_cross_01_macro",
@@ -2207,10 +2207,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "defence_tel_disc_01_macro",
@@ -2235,10 +2235,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "landmarks_gen_piratestation_02_ring_01_macro",
@@ -2263,10 +2263,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "landmarks_tel_tradestation_01_column_02_macro",
@@ -2291,10 +2291,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "storage_tel_m_container_01_macro",
@@ -2319,10 +2319,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 250000
   },
   {
@@ -2348,10 +2348,10 @@
       "needed": 700,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "prod_gen_engineparts_macro",
@@ -2376,8 +2376,6 @@
       "needed": 225,
       "maxBonus": 0.47
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "engineparts": 832.0
     },
@@ -2385,7 +2383,9 @@
       "antimattercells": 320.0,
       "energycells": 240.0,
       "refinedmetals": 384.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "buildmodule_gen_equip_l_macro",
@@ -2410,10 +2410,10 @@
       "needed": 500,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "prod_gen_advancedcomposites_macro",
@@ -2438,8 +2438,6 @@
       "needed": 315,
       "maxBonus": 0.34
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "advancedcomposites": 648.0
     },
@@ -2447,7 +2445,9 @@
       "energycells": 600.0,
       "graphene": 960.0,
       "refinedmetals": 960.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "landmarks_gen_piratestation_02_port_01_macro",
@@ -2472,10 +2472,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "struct_gen_venturervertical_02_macro",
@@ -2500,10 +2500,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "magenta_dark",
+    "color_rgb": "#B300B3"
   },
   {
     "id": "struct_arg_base_01_macro",
@@ -2528,10 +2528,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "storage_ter_s_container_01_macro",
@@ -2556,10 +2556,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 100000
   },
   {
@@ -2585,10 +2585,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 500000
   },
   {
@@ -2614,10 +2614,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 1000000
   },
   {
@@ -2644,10 +2644,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "pier_ter_harbor_01_macro",
@@ -2672,10 +2672,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "storage_spl_m_container_01_macro",
@@ -2700,10 +2700,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 250000
   },
   {
@@ -2729,8 +2729,6 @@
       "needed": 90,
       "maxBonus": 0.28
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "medicalsupplies": 2496.0
     },
@@ -2739,7 +2737,9 @@
       "sojabeans": 120.0,
       "spices": 480.0,
       "water": 720.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "defence_par_claim_story_01_macro",
@@ -2764,10 +2764,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "pier_par_harbor_01_macro",
@@ -2792,10 +2792,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "hab_arg_s_01_macro",
@@ -2820,10 +2820,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "hab_pir_l_01_macro",
@@ -2848,10 +2848,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "buildmodule_ter_ships_m_dockarea_01_macro",
@@ -2876,10 +2876,10 @@
       "needed": 800,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "storage_ter_s_liquid_01_macro",
@@ -2904,10 +2904,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 100000
   },
   {
@@ -2933,8 +2933,6 @@
       "needed": 270,
       "maxBonus": 0.37
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "hullparts": 1176.0
     },
@@ -2942,7 +2940,9 @@
       "energycells": 320.0,
       "graphene": 160.0,
       "teladianium": 816.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "struct_par_cross_01_macro",
@@ -2967,10 +2967,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "landmarks_tel_tradestation_01_tradelocation_01_macro",
@@ -2995,10 +2995,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "prod_tel_spaceweed_macro",
@@ -3023,8 +3023,6 @@
       "needed": 90,
       "maxBonus": 0.7
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "spaceweed": 1098.0
     },
@@ -3032,7 +3030,9 @@
       "energycells": 840.0,
       "spices": 240.0,
       "swampplant": 720.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "buildmodule_bor_ships_m_dockarea_01_macro",
@@ -3058,10 +3058,10 @@
       "needed": 800,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "buildmodule_gen_ships_m_dockarea_01_macro",
@@ -3086,10 +3086,10 @@
       "needed": 800,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "pier_ter_harbor_03_macro",
@@ -3114,10 +3114,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "storage_spl_s_container_01_macro",
@@ -3142,10 +3142,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 50000
   },
   {
@@ -3171,10 +3171,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 100000
   },
   {
@@ -3200,10 +3200,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_bright",
+    "color_rgb": "#4DB5FF"
   },
   {
     "id": "struct_gen_observationdeck_02_macro",
@@ -3228,10 +3228,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "storage_pir_s_condensate_01_macro",
@@ -3256,10 +3256,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 10000
   },
   {
@@ -3285,10 +3285,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 50
   },
   {
@@ -3314,15 +3314,15 @@
       "needed": 135,
       "maxBonus": 0.42
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "terranmre": 2625.0
     },
     "inputs": {
       "energycells": 900.0,
       "proteinpaste": 900.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "buildmodule_bor_ships_xl_macro",
@@ -3348,10 +3348,10 @@
       "needed": 500,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "landmarks_arg_antigonepillar_01_macro",
@@ -3376,10 +3376,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "hab_ter_m_01_macro",
@@ -3404,10 +3404,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "struct_ter_vertical_02_macro",
@@ -3432,10 +3432,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "hab_arg_l_01_macro",
@@ -3460,10 +3460,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "prod_par_majadust_macro",
@@ -3488,8 +3488,6 @@
       "needed": 123,
       "maxBonus": 0.75
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "majadust": 384.0
     },
@@ -3497,7 +3495,9 @@
       "energycells": 240.0,
       "majasnails": 720.0,
       "spices": 360.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "prod_par_sojabeans_macro",
@@ -3522,15 +3522,15 @@
       "needed": 175,
       "maxBonus": 0.48
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "sojabeans": 1248.0
     },
     "inputs": {
       "energycells": 360.0,
       "water": 960.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "prod_par_sojahusk_macro",
@@ -3555,8 +3555,6 @@
       "needed": 99,
       "maxBonus": 0.37
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "sojahusk": 4200.0
     },
@@ -3565,7 +3563,9 @@
       "majasnails": 600.0,
       "sojabeans": 480.0,
       "spices": 240.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "hab_spl_s_01_macro",
@@ -3590,10 +3590,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "buildmodule_ter_equip_m_dockarea_01_macro",
@@ -3618,10 +3618,10 @@
       "needed": 400,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "storage_par_s_container_01_macro",
@@ -3646,10 +3646,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 50000
   },
   {
@@ -3675,10 +3675,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "struct_tel_base_01_macro",
@@ -3703,10 +3703,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "storage_par_s_solid_01_macro",
@@ -3731,10 +3731,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 100000
   },
   {
@@ -3760,10 +3760,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "hab_par_m_01_macro",
@@ -3788,10 +3788,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "storage_arg_l_container_01_macro",
@@ -3816,10 +3816,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 1000000
   },
   {
@@ -3841,10 +3841,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "storage_spl_l_solid_01_macro",
@@ -3869,10 +3869,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 1000000
   },
   {
@@ -3898,10 +3898,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 500000
   },
   {
@@ -3927,8 +3927,6 @@
       "needed": 225,
       "maxBonus": 0.53
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "quantumtubes": 470.0
     },
@@ -3936,7 +3934,9 @@
       "energycells": 200.0,
       "graphene": 580.0,
       "superfluidcoolant": 150.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "storage_bor_l_container_01_macro",
@@ -3962,10 +3962,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 1000000
   },
   {
@@ -3991,8 +3991,6 @@
       "needed": 270,
       "maxBonus": 0.37
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "hullparts": 1176.0
     },
@@ -4000,7 +3998,9 @@
       "energycells": 320.0,
       "graphene": 160.0,
       "refinedmetals": 1120.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "storage_par_l_liquid_01_macro",
@@ -4025,10 +4025,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 1000000
   },
   {
@@ -4054,10 +4054,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "proc_gen_scrapworks_macro",
@@ -4082,10 +4082,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "grey_160",
+    "color_rgb": "#A0A0A0"
   },
   {
     "id": "prod_gen_antimatterconverters_macro",
@@ -4110,8 +4110,6 @@
       "needed": 1080,
       "maxBonus": 0.39
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "antimatterconverters": 1596.0
     },
@@ -4119,7 +4117,9 @@
       "advancedcomposites": 240.0,
       "energycells": 960.0,
       "microchips": 360.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "dockarea_arg_m_station_01_hightech_macro",
@@ -4144,10 +4144,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "storage_arg_l_tradestation_01_macro",
@@ -4172,10 +4172,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 300000
   },
   {
@@ -4202,10 +4202,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "hab_tel_m_01_macro",
@@ -4230,10 +4230,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "prod_tel_swampplant_macro",
@@ -4258,15 +4258,15 @@
       "needed": 50,
       "maxBonus": 0.59
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "swampplant": 960.0
     },
     "inputs": {
       "energycells": 320.0,
       "water": 800.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "buildmodule_xen_ships_m_macro",
@@ -4291,10 +4291,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "struct_spl_cross_01_macro",
@@ -4319,10 +4319,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "storage_spl_m_solid_01_macro",
@@ -4347,10 +4347,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 500000
   },
   {
@@ -4376,10 +4376,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 1000000
   },
   {
@@ -4405,8 +4405,6 @@
       "needed": 90,
       "maxBonus": 0.28
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "medicalsupplies": 2496.0
     },
@@ -4415,7 +4413,9 @@
       "scruffinfruits": 360.0,
       "spices": 720.0,
       "water": 720.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "pier_tel_harbor_03_macro",
@@ -4440,10 +4440,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "struct_ter_base_02_macro",
@@ -4468,10 +4468,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "buildmodule_bor_ships_l_macro",
@@ -4497,10 +4497,10 @@
       "needed": 700,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "struct_arg_cross_03_macro",
@@ -4525,10 +4525,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "dockarea_arg_m_station_02_hightech_macro",
@@ -4553,10 +4553,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "welfare_gen_casino_01_macro",
@@ -4581,10 +4581,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_bright",
+    "color_rgb": "#4DB5FF"
   },
   {
     "id": "radar_arg_dish_01_macro",
@@ -4609,10 +4609,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "green_bright",
-    "color_rgb": "#4DFF4D",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "green_bright",
+    "color_rgb": "#4DFF4D"
   },
   {
     "id": "struct_spl_base_02_macro",
@@ -4637,10 +4637,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "storage_bor_s_solid_01_macro",
@@ -4666,10 +4666,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 100000
   },
   {
@@ -4695,10 +4695,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 1000000
   },
   {
@@ -4724,10 +4724,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "prod_tel_scanningarrays_macro",
@@ -4752,8 +4752,6 @@
       "needed": 315,
       "maxBonus": 0.38
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "scanningarrays": 216.0
     },
@@ -4761,7 +4759,9 @@
       "energycells": 360.0,
       "siliconwafers": 360.0,
       "teladianium": 438.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "prod_gen_spices_macro",
@@ -4786,15 +4786,15 @@
       "needed": 60,
       "maxBonus": 0.4
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "spices": 3000.0
     },
     "inputs": {
       "energycells": 240.0,
       "water": 480.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "defence_bor_disc_01_macro",
@@ -4820,10 +4820,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "pier_tel_harbor_01_macro",
@@ -4848,10 +4848,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "struct_bor_base_02_macro",
@@ -4877,10 +4877,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "landmarks_tel_tradestation_01_center_01_macro",
@@ -4905,10 +4905,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "storage_bor_m_solid_01_macro",
@@ -4934,10 +4934,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 500000
   },
   {
@@ -4963,10 +4963,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3"
   },
   {
     "id": "dockarea_bor_m_station_01_standard_macro",
@@ -4992,10 +4992,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "storage_spl_s_solid_01_macro",
@@ -5020,10 +5020,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 100000
   },
   {
@@ -5049,8 +5049,6 @@
       "needed": 90,
       "maxBonus": 0.59
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "medicalsupplies": 1680.0
     },
@@ -5058,7 +5056,9 @@
       "energycells": 1200.0,
       "ice": 600.0,
       "proteinpaste": 288.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "struct_par_base_02_macro",
@@ -5083,10 +5083,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "prod_gen_energycells_macro",
@@ -5111,12 +5111,12 @@
       "needed": 90,
       "maxBonus": 0.43
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "energycells": 10500.0
     },
-    "inputs": {}
+    "inputs": {},
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "landmarks_gen_piratestation_01_ring_01_macro",
@@ -5141,10 +5141,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 50000
   },
   {
@@ -5170,10 +5170,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "prod_gen_superfluidcoolant_macro",
@@ -5198,15 +5198,15 @@
       "needed": 180,
       "maxBonus": 0.49
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "superfluidcoolant": 1425.0
     },
     "inputs": {
       "energycells": 900.0,
       "helium": 4800.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "prod_gen_microchips_macro",
@@ -5231,15 +5231,15 @@
       "needed": 450,
       "maxBonus": 0.36
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "microchips": 432.0
     },
     "inputs": {
       "energycells": 300.0,
       "siliconwafers": 1200.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "prod_tel_teladianium_macro",
@@ -5264,15 +5264,15 @@
       "needed": 225,
       "maxBonus": 0.43
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "teladianium": 2100.0
     },
     "inputs": {
       "energycells": 1350.0,
       "ore": 8400.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "landmarks_tel_tradestation_01_dockarea_m_01_macro",
@@ -5297,10 +5297,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "buildmodule_ter_equip_xl_macro",
@@ -5325,10 +5325,10 @@
       "needed": 700,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "defence_ter_disc_01_macro",
@@ -5353,10 +5353,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "struct_arg_base_02_macro",
@@ -5381,10 +5381,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "xenon_small_station_01_storage_01_macro",
@@ -5409,10 +5409,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 250000
   },
   {
@@ -5438,10 +5438,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "defence_spl_tube_01_macro",
@@ -5466,10 +5466,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "storage_tel_s_container_01_macro",
@@ -5494,10 +5494,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 50000
   },
   {
@@ -5523,10 +5523,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 400000
   },
   {
@@ -5552,10 +5552,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 1000000
   },
   {
@@ -5581,10 +5581,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "landmarks_tel_tradestation_01_column_01_macro",
@@ -5609,10 +5609,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "struct_ter_base_03_macro",
@@ -5637,10 +5637,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "defence_par_claim_01_macro",
@@ -5665,10 +5665,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "pier_par_harbor_03_macro",
@@ -5693,10 +5693,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "struct_gen_venturervertical_01_macro",
@@ -5721,10 +5721,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "magenta_dark",
+    "color_rgb": "#B300B3"
   },
   {
     "id": "hab_ter_s_01_macro",
@@ -5749,10 +5749,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "storage_bor_m_liquid_01_macro",
@@ -5778,10 +5778,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 500000
   },
   {
@@ -5807,8 +5807,6 @@
       "needed": 540,
       "maxBonus": 0.36
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "advancedelectronics": 270.0
     },
@@ -5816,7 +5814,9 @@
       "energycells": 300.0,
       "microchips": 220.0,
       "quantumtubes": 100.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "prod_ter_proteinpaste_macro",
@@ -5841,8 +5841,6 @@
       "needed": 180,
       "maxBonus": 0.3
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "proteinpaste": 2628.0
     },
@@ -5850,7 +5848,9 @@
       "energycells": 960.0,
       "ice": 960.0,
       "methane": 2400.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "prod_gen_scrap_recycler_macro",
@@ -5875,8 +5875,6 @@
       "needed": 1250,
       "maxBonus": 0.37
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {
       "claytronics": 720.0,
       "hullparts": 2400.0
@@ -5884,7 +5882,9 @@
     "inputs": {
       "energycells": 186000.0,
       "scrapmetal": 4500.0
-    }
+    },
+    "color": "grey_160",
+    "color_rgb": "#A0A0A0"
   },
   {
     "id": "prod_gen_refinedmetals_macro",
@@ -5909,15 +5909,15 @@
       "needed": 225,
       "maxBonus": 0.43
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "refinedmetals": 2112.0
     },
     "inputs": {
       "energycells": 2160.0,
       "ore": 5760.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "defence_spl_claim_01_macro",
@@ -5942,10 +5942,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "dockarea_arg_m_station_01_lowtech_macro",
@@ -5970,10 +5970,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "hab_spl_l_01_macro",
@@ -5998,10 +5998,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "storage_ter_s_solid_01_macro",
@@ -6026,10 +6026,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 100000
   },
   {
@@ -6056,10 +6056,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "buildmodule_bor_equip_l_macro",
@@ -6085,10 +6085,10 @@
       "needed": 500,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "storage_arg_l_solid_01_macro",
@@ -6113,10 +6113,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 1000000
   },
   {
@@ -6142,8 +6142,6 @@
       "needed": 225,
       "maxBonus": 0.47
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "engineparts": 832.0
     },
@@ -6151,7 +6149,9 @@
       "antimattercells": 320.0,
       "energycells": 240.0,
       "teladianium": 280.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "struct_arg_cross_04_macro",
@@ -6176,10 +6176,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "prod_arg_spacefuel_macro",
@@ -6204,8 +6204,6 @@
       "needed": 225,
       "maxBonus": 0.69
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "spacefuel": 735.0
     },
@@ -6213,7 +6211,9 @@
       "energycells": 300.0,
       "water": 750.0,
       "wheat": 600.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "prod_bor_bofu_macro",
@@ -6239,8 +6239,6 @@
       "needed": 125,
       "maxBonus": 0.38
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "bofu": 1230.0
     },
@@ -6248,7 +6246,9 @@
       "bogas": 600.0,
       "energycells": 600.0,
       "plankton": 1800.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "prod_arg_medicalsupplies_macro",
@@ -6273,8 +6273,6 @@
       "needed": 90,
       "maxBonus": 0.28
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "medicalsupplies": 2496.0
     },
@@ -6283,7 +6281,9 @@
       "spices": 480.0,
       "water": 720.0,
       "wheat": 360.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "buildmodule_xen_ships_s_macro",
@@ -6308,10 +6308,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "buildmodule_gen_ships_m_macro",
@@ -6336,10 +6336,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "pier_bor_tradestation_01_macro",
@@ -6365,10 +6365,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "storage_bor_s_liquid_01_macro",
@@ -6394,10 +6394,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 100000
   },
   {
@@ -6424,10 +6424,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "prod_ter_siliconcarbide_macro",
@@ -6452,8 +6452,6 @@
       "needed": 750,
       "maxBonus": 0.2
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "siliconcarbide": 576.0
     },
@@ -6462,7 +6460,9 @@
       "metallicmicrolattice": 24.0,
       "methane": 4800.0,
       "silicon": 3600.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "defence_arg_tube_01_macro",
@@ -6487,10 +6487,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "prod_spl_scruffinfruit_macro",
@@ -6515,15 +6515,15 @@
       "needed": 90,
       "maxBonus": 0.53
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "scruffinfruits": 3060.0
     },
     "inputs": {
       "energycells": 360.0,
       "water": 960.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "landmarks_arg_antigonestraight_01_macro",
@@ -6548,10 +6548,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "struct_ter_cross_01_macro",
@@ -6576,10 +6576,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "storage_ter_l_liquid_01_macro",
@@ -6604,10 +6604,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 1000000
   },
   {
@@ -6633,10 +6633,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 1000000
   },
   {
@@ -6662,10 +6662,10 @@
       "needed": 700,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "prod_gen_siliconwafers_macro",
@@ -6690,15 +6690,15 @@
       "needed": 225,
       "maxBonus": 0.37
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "siliconwafers": 2140.0
     },
     "inputs": {
       "energycells": 1800.0,
       "silicon": 4800.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "struct_gen_venturerbase_01_macro",
@@ -6723,10 +6723,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "magenta_dark",
+    "color_rgb": "#B300B3"
   },
   {
     "id": "storage_par_l_solid_01_macro",
@@ -6751,10 +6751,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 1000000
   },
   {
@@ -6780,8 +6780,6 @@
       "needed": 90,
       "maxBonus": 0.35
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "foodrations": 6900.0
     },
@@ -6790,7 +6788,9 @@
       "meat": 600.0,
       "spices": 600.0,
       "wheat": 600.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "storage_arg_s_container_01_macro",
@@ -6815,10 +6815,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 50000
   },
   {
@@ -6844,10 +6844,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "magenta_dark",
+    "color_rgb": "#B300B3"
   },
   {
     "id": "storage_par_m_liquid_01_macro",
@@ -6872,10 +6872,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 500000
   },
   {
@@ -6901,8 +6901,6 @@
       "needed": 675,
       "maxBonus": 0.43
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "dronecomponents": 315.0
     },
@@ -6912,7 +6910,9 @@
       "hullparts": 60.0,
       "microchips": 60.0,
       "scanningarrays": 120.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "prod_gen_turretcomponents_macro",
@@ -6937,8 +6937,6 @@
       "needed": 225,
       "maxBonus": 0.53
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "turretcomponents": 340.0
     },
@@ -6947,7 +6945,9 @@
       "microchips": 40.0,
       "quantumtubes": 40.0,
       "scanningarrays": 20.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "landmarks_tel_tradestation_01_ringclamp_02_macro",
@@ -6972,10 +6972,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "storage_arg_s_liquid_01_macro",
@@ -7000,10 +7000,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 100000
   },
   {
@@ -7029,10 +7029,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 500000
   },
   {
@@ -7058,10 +7058,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "magenta_dark",
+    "color_rgb": "#B300B3"
   },
   {
     "id": "dockarea_gen_m_venturer_01_macro",
@@ -7086,10 +7086,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "magenta_dark",
+    "color_rgb": "#B300B3"
   },
   {
     "id": "landmarks_arg_antigonespire_01_macro",
@@ -7114,10 +7114,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "prod_ter_scrap_recycler_macro",
@@ -7142,8 +7142,6 @@
       "needed": 1250,
       "maxBonus": 0.2
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {
       "computronicsubstrate": 600.0,
       "siliconcarbide": 720.0
@@ -7151,7 +7149,9 @@
     "inputs": {
       "energycells": 198000.0,
       "scrapmetal": 15000.0
-    }
+    },
+    "color": "grey_160",
+    "color_rgb": "#A0A0A0"
   },
   {
     "id": "prod_gen_fieldcoils_macro",
@@ -7176,8 +7176,6 @@
       "needed": 810,
       "maxBonus": 0.43
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "fieldcoils": 1050.0
     },
@@ -7185,7 +7183,9 @@
       "energycells": 360.0,
       "plasmaconductors": 240.0,
       "quantumtubes": 258.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "struct_arg_base_03_macro",
@@ -7210,10 +7210,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "struct_tel_vertical_01_macro",
@@ -7238,10 +7238,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "hab_tel_s_01_macro",
@@ -7266,10 +7266,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "buildmodule_gen_ships_l_macro",
@@ -7294,10 +7294,10 @@
       "needed": 700,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "struct_gen_observationdeck_03_macro",
@@ -7322,10 +7322,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "prod_par_majasnails_macro",
@@ -7350,15 +7350,15 @@
       "needed": 175,
       "maxBonus": 0.59
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "majasnails": 1168.0
     },
     "inputs": {
       "energycells": 320.0,
       "water": 800.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "prod_arg_wheat_macro",
@@ -7383,15 +7383,15 @@
       "needed": 75,
       "maxBonus": 0.28
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "wheat": 3720.0
     },
     "inputs": {
       "energycells": 720.0,
       "water": 960.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "landmarks_tel_tradestation_01_ring_inside_02_macro",
@@ -7416,10 +7416,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "struct_bor_base_04_macro",
@@ -7445,10 +7445,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "defence_bor_claim_01_macro",
@@ -7474,10 +7474,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "buildmodule_ter_ships_l_macro",
@@ -7502,10 +7502,10 @@
       "needed": 500,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "storage_ter_s_liquid_tradestation_01_macro",
@@ -7530,10 +7530,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 100000
   },
   {
@@ -7559,8 +7559,6 @@
       "needed": 315,
       "maxBonus": 0.34
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "advancedcomposites": 648.0
     },
@@ -7568,7 +7566,9 @@
       "energycells": 600.0,
       "graphene": 960.0,
       "teladianium": 696.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "struct_spl_base_01_macro",
@@ -7593,10 +7593,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "defence_arg_claim_01_macro",
@@ -7621,10 +7621,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "prod_gen_shieldcomponents_macro",
@@ -7649,8 +7649,6 @@
       "needed": 225,
       "maxBonus": 0.43
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "shieldcomponents": 579.0
     },
@@ -7658,7 +7656,9 @@
       "energycells": 210.0,
       "plasmaconductors": 60.0,
       "quantumtubes": 60.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "pier_spl_harbor_02_macro",
@@ -7683,10 +7683,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "prod_gen_smartchips_macro",
@@ -7711,15 +7711,15 @@
       "needed": 60,
       "maxBonus": 0.37
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "smartchips": 858.0
     },
     "inputs": {
       "energycells": 300.0,
       "siliconwafers": 120.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "hab_arg_m_01_macro",
@@ -7744,10 +7744,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "landmarks_tel_tradestation_01_centercylinder_01_macro",
@@ -7772,10 +7772,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "defence_par_tube_01_macro",
@@ -7800,10 +7800,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "storage_spl_m_liquid_01_macro",
@@ -7828,10 +7828,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 500000
   },
   {
@@ -7857,10 +7857,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "storage_ter_m_container_tradestation_01_macro",
@@ -7885,10 +7885,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 300000
   },
   {
@@ -7914,15 +7914,15 @@
       "needed": 180,
       "maxBonus": 0.46
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "graphene": 1440.0
     },
     "inputs": {
       "energycells": 1200.0,
       "methane": 4800.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "buildmodule_bor_equip_m_dockarea_01_macro",
@@ -7948,10 +7948,10 @@
       "needed": 400,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "prod_gen_scanningarrays_macro",
@@ -7976,8 +7976,6 @@
       "needed": 315,
       "maxBonus": 0.38
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "scanningarrays": 216.0
     },
@@ -7985,7 +7983,9 @@
       "energycells": 360.0,
       "refinedmetals": 600.0,
       "siliconwafers": 360.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "struct_gen_venturercross_01_macro",
@@ -8010,10 +8010,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "magenta_dark",
+    "color_rgb": "#B300B3"
   },
   {
     "id": "struct_bor_cross_01_macro",
@@ -8039,10 +8039,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "landmarks_arg_antigonearc_01_macro",
@@ -8067,10 +8067,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "struct_arg_cross_02_macro",
@@ -8095,10 +8095,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "prod_gen_plasmaconductors_macro",
@@ -8123,8 +8123,6 @@
       "needed": 225,
       "maxBonus": 0.43
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "plasmaconductors": 176.0
     },
@@ -8132,7 +8130,9 @@
       "energycells": 240.0,
       "graphene": 384.0,
       "superfluidcoolant": 560.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "hab_tel_l_01_macro",
@@ -8157,10 +8157,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "buildmodule_gen_ships_s_macro",
@@ -8185,10 +8185,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "dockarea_arg_m_station_01_macro",
@@ -8213,10 +8213,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "struct_par_vertical_02_macro",
@@ -8241,10 +8241,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "landmarks_gen_piratestation_02_ring_02_macro",
@@ -8269,10 +8269,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "struct_spl_vertical_01_macro",
@@ -8297,10 +8297,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "storage_bor_m_container_01_macro",
@@ -8326,10 +8326,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 250000
   },
   {
@@ -8355,10 +8355,10 @@
       "needed": 500,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "pier_par_harbor_02_macro",
@@ -8383,10 +8383,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "defence_par_disc_01_macro",
@@ -8411,10 +8411,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "landmarks_tel_tradestation_01_bridge_01_macro",
@@ -8439,10 +8439,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "buildmodule_bor_equip_xl_macro",
@@ -8468,10 +8468,10 @@
       "needed": 500,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "defence_tel_claim_01_macro",
@@ -8496,10 +8496,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "red",
+    "color_rgb": "#FF0000"
   },
   {
     "id": "struct_arg_vertical_01_macro",
@@ -8524,10 +8524,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "storage_spl_s_liquid_01_macro",
@@ -8552,10 +8552,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 100000
   },
   {
@@ -8581,10 +8581,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 500000
   },
   {
@@ -8610,10 +8610,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "magenta_dark",
+    "color_rgb": "#B300B3"
   },
   {
     "id": "pier_ter_harbor_02_macro",
@@ -8638,10 +8638,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "prod_tel_nostropoil_macro",
@@ -8666,8 +8666,6 @@
       "needed": 120,
       "maxBonus": 0.2
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "nostropoil": 6000.0
     },
@@ -8676,7 +8674,9 @@
       "spices": 480.0,
       "sunriseflowers": 480.0,
       "water": 720.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "buildmodule_gen_equip_xl_macro",
@@ -8701,10 +8701,10 @@
       "needed": 500,
       "maxBonus": 0
     },
-    "color": "grey_160",
-    "color_rgb": "#A0A0A0",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "amber",
+    "color_rgb": "#FFBF00"
   },
   {
     "id": "struct_tel_vertical_02_macro",
@@ -8729,10 +8729,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "landmarks_par_storage_01_macro",
@@ -8757,10 +8757,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 1000000
   },
   {
@@ -8786,15 +8786,15 @@
       "needed": 180,
       "maxBonus": 0.43
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "water": 5790.0
     },
     "inputs": {
       "energycells": 1800.0,
       "ice": 9600.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "landmarks_tel_tradestation_01_storage_01_macro",
@@ -8819,10 +8819,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 100000
   },
   {
@@ -8848,12 +8848,12 @@
       "needed": 0,
       "maxBonus": 0.43
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "energycells": 10500.0
     },
-    "inputs": {}
+    "inputs": {},
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "hab_bor_s_01_macro",
@@ -8879,10 +8879,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "storage_ter_m_container_01_macro",
@@ -8907,10 +8907,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 500000
   },
   {
@@ -8937,10 +8937,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "prod_arg_meat_macro",
@@ -8965,15 +8965,15 @@
       "needed": 75,
       "maxBonus": 0.33
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "meat": 2320.0
     },
     "inputs": {
       "energycells": 640.0,
       "water": 800.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "storage_ter_m_solid_01_macro",
@@ -8998,10 +8998,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 500000
   },
   {
@@ -9028,10 +9028,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 50000
   },
   {
@@ -9057,10 +9057,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 1000000
   },
   {
@@ -9087,10 +9087,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "yellow",
-    "color_rgb": "#FFFF00",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "yellow",
+    "color_rgb": "#FFFF00"
   },
   {
     "id": "hab_par_l_01_macro",
@@ -9115,10 +9115,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "prod_gen_antimattercells_macro",
@@ -9143,15 +9143,15 @@
       "needed": 180,
       "maxBonus": 0.35
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "antimattercells": 2970.0
     },
     "inputs": {
       "energycells": 3000.0,
       "hydrogen": 9600.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "struct_bor_base_01_macro",
@@ -9177,10 +9177,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "landmarks_gen_piratestation_01_port_01_macro",
@@ -9205,10 +9205,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "hab_bor_m_01_macro",
@@ -9234,10 +9234,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "azure_dark",
-    "color_rgb": "#0069B3",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "azure_dark",
+    "color_rgb": "#0069B3"
   },
   {
     "id": "struct_par_cross_02_macro",
@@ -9262,10 +9262,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_very_bright",
-    "color_rgb": "#99FDFF",
     "outputs": {},
-    "inputs": {}
+    "inputs": {},
+    "color": "cyan_very_bright",
+    "color_rgb": "#99FDFF"
   },
   {
     "id": "storage_arg_m_container_01_macro",
@@ -9290,10 +9290,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 250000
   },
   {
@@ -9320,10 +9320,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 1000000
   },
   {
@@ -9349,10 +9349,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 100000
   },
   {
@@ -9378,8 +9378,6 @@
       "needed": 22,
       "maxBonus": 0.53
     },
-    "color": "orange",
-    "color_rgb": "#FF8B00",
     "outputs": {
       "missilecomponents": 1124.0
     },
@@ -9387,7 +9385,9 @@
       "advancedcomposites": 8.0,
       "energycells": 80.0,
       "hullparts": 8.0
-    }
+    },
+    "color": "orange",
+    "color_rgb": "#FF8B00"
   },
   {
     "id": "storage_arg_m_liquid_01_macro",
@@ -9412,10 +9412,10 @@
       "needed": 0,
       "maxBonus": 0
     },
-    "color": "cyan_dark",
-    "color_rgb": "#00AFB3",
     "outputs": {},
     "inputs": {},
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "capacity": 500000
   }
 ]
