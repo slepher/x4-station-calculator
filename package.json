@@ -10,7 +10,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
-    "playwright:install": "playwright install"
+    "playwright:install": "playwright install",
+    "mock-data": "tsx scripts/mockDataGenerator.ts"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.18",

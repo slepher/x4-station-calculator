@@ -8,7 +8,7 @@ import type {
   WorkforceCensusItem
 } from '@/types/x4'
 
-import consumptionRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/consumption.json'
+import consumptionRaw from '../../assets/x4_game_data/8.0-Diplomacy/data/consumption.json'
 
 // --- 类型定义 ---
 export interface PlannedModuleDisplay extends SavedModule {

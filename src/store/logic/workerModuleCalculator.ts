@@ -1,6 +1,6 @@
-import type { X4Module, X4Ware } from '@/types/x4'
+import type { X4Module, X4Ware } from '../../types/x4'
 import { findBestProducer } from './bestModuleSelector'
-import consumptionRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/consumption.json'
+import consumptionRaw from '../../assets/x4_game_data/8.0-Diplomacy/data/consumption.json'
 
 // --- 私有辅助函数：递归计算单单位物资的工人成本 ---
 

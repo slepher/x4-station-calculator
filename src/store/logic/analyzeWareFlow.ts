@@ -5,7 +5,7 @@ import type {
   X4Ware,
   WareFlow, // <--- 确保导入了正确的类型名
   RaceMedicalConsumption
-} from '@/types/x4'
+} from '../../types/x4'
 
 import {
   getDynamicPrice,

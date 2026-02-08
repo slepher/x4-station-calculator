@@ -1,4 +1,4 @@
-import type { SavedModule, X4Module, X4Ware } from '@/types/x4'
+import type { SavedModule, X4Module, X4Ware } from '../../types/x4'
 /**
  * 通用模块选择器
  * 逻辑: 来源池锁定(Pool Priority) -> 种族正交筛选(Race Filter) -> 权重排序(Sorter)

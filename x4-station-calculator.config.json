@@ -28,7 +28,7 @@
     "ventureplatform": "{1001,2454}"
   },
   "mock_modules": [
-    {"claytronics": 6, "hullparts": 12},
-    {"claytronics": 6}
+    [{"module" : "claytronics", "count": 6}, {"module" : "hullparts", "count": 12}],
+    [{"module" : "claytronics", "count": 6}]
   ]
 }

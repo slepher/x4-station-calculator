@@ -1,4 +1,4 @@
-import type { SavedModule, StationSettings, WorkforceItem, X4Module } from '@/types/x4';
+import type { SavedModule, StationSettings, WorkforceItem, X4Module } from '../../types/x4';
 
 /**
  * 计算空间站的人口细分数据

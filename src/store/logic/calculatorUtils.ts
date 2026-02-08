@@ -4,7 +4,7 @@ import type {
   X4Module, 
   X4Ware,
   WorkforceCensusItem
-} from '@/types/x4'
+} from '../../types/x4'
 /**
  * 动态价格计算逻辑
  */
