@@ -121,39 +121,36 @@ const toggleLock = () => {
     :data="formattedDetails"
     :isPositive="displayValue >= 0"
   >
-    <template #header="{ isOpen }">
-      <div class="label-group">
-        <span class="arrow" :class="{ 'arrow-open': isOpen }">▶</span>
-        <div class="dot"></div>
-        <span class="name">{{ name }}</span>
+    <template #title>
+      <div class="dot" :class="displayValue >= 0 ? 'dot-pos' : 'dot-neg'"></div>
+      <span class="name">{{ name }}</span>
+    </template>
+    <template #header>
+      <div class="value" v-if="viewMode !== 'volume'">
+        {{ displaySign }}{{ formatNum(displayValue) }}
       </div>
-      <div class="right-group">
-        <div class="value" v-if="viewMode !== 'volume'">
-          {{ displaySign }}{{ formatNum(displayValue) }}
-        </div>
-        <div class="volume-title-group" v-else>
-          <span class="volume-net" :class="netVolume >= 0 ? 'text-emerald-400' : 'text-red-400'">
-            {{ displaySign }}{{ formatNum(Math.abs(netVolume || 0)) }}m³
-          </span>
-          <span class="volume-planning text-blue-400">
-            {{ formatNum(totalOccupiedVolume || 0) }}m³
-          </span>
-          <span class="volume-count text-blue-400">
-            {{ Math.ceil(totalOccupiedCount || 0) }}
-          </span>
-        </div>
-        <div class="lock-btn" :class="{ 'is-locked': locked, 'non-operable': nonOperable }"
-          @click.stop="!nonOperable && toggleLock()">
-          <svg v-if="locked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
-            <path fill-rule="evenodd"
-              d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z"
-              clip-rule="evenodd" />
-          </svg>
-          <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
-            <path
-              d="M18 1.5c2.9 0 5.25 2.35 5.25 5.25v3.75a.75.75 0 01-1.5 0V6.75a3.75 3.75 0 10-7.5 0v3a3 3 0 013 3v6.75a3 3 0 01-3 3H3.75a3 3 0 01-3-3v-6.75a3 3 0 013-3h9v-3c0-2.9 2.35-5.25 5.25-5.25z" />
-          </svg>
-        </div>
+      <div class="volume-title-group" v-else>
+        <span class="volume-net" :class="netVolume >= 0 ? 'text-emerald-400' : 'text-red-400'">
+          {{ displaySign }}{{ formatNum(Math.abs(netVolume || 0)) }}m³
+        </span>
+        <span class="volume-planning text-blue-400">
+          {{ formatNum(totalOccupiedVolume || 0) }}m³
+        </span>
+        <span class="volume-count text-blue-400">
+          {{ Math.ceil(totalOccupiedCount || 0) }}
+        </span>
+      </div>
+      <div class="lock-btn" :class="{ 'is-locked': locked, 'non-operable': nonOperable }"
+        @click.stop="!nonOperable && toggleLock()">
+        <svg v-if="locked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+          <path fill-rule="evenodd"
+            d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z"
+            clip-rule="evenodd" />
+        </svg>
+        <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+          <path
+            d="M18 1.5c2.9 0 5.25 2.35 5.25 5.25v3.75a.75.75 0 01-1.5 0V6.75a3.75 3.75 0 10-7.5 0v3a3 3 0 013 3v6.75a3 3 0 01-3 3H3.75a3 3 0 01-3-3v-6.75a3 3 0 013-3h9v-3c0-2.9 2.35-5.25 5.25-5.25z" />
+        </svg>
       </div>
     </template>
 
@@ -174,27 +171,12 @@ const toggleLock = () => {
 </template>
 
 <style scoped>
-/* 基础图标与文字 */
-.label-group {
-  @apply flex items-center gap-2;
-}
-
-.arrow {
-  @apply text-[10px] text-slate-500 transition-transform duration-200;
-}
-
-.arrow-open {
-  @apply rotate-90 text-slate-300;
-}
 
 .dot {
   @apply w-1.5 h-1.5 rounded-full;
 }
-
-/* 核心修复：添加 flex 布局确保横向排列 */
-.right-group {
-  @apply flex items-center gap-2;
-}
+.status-pos .dot { @apply bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]; }
+.status-neg .dot { @apply bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]; }
 
 /* 锁按钮样式 */
 .lock-btn {
