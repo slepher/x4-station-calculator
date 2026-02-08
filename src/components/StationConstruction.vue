@@ -128,7 +128,7 @@ const getMaterialValue = (matId: string, amountPerModule: number, moduleCount: n
 
 <style scoped>
 .panel-container {
-  @apply bg-slate-800 rounded border border-slate-700 overflow-hidden mt-4 text-sm shadow-2xl;
+  @apply bg-slate-800 rounded border border-slate-700 overflow-hidden text-sm shadow-2xl;
 }
 
 .panel-header {

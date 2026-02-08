@@ -23,9 +23,9 @@ import StationWareFlowsDashboard from './StationWareFlowsDashboard.vue'
         <StationWareFlowsDashboard />
       </div>
 
-      <div class="col-span-12 lg:col-span-4 space-y-4">
-        <StationWorkforce />
+      <div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
         <StationConstruction />
+        <StationWorkforce />
       </div>
     </div>
 
