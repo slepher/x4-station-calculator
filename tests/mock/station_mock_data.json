@@ -13,11 +13,11 @@
       },
       {
         "id": "prod_gen_microchips_macro",
-        "count": 8
+        "count": 9
       },
       {
         "id": "prod_gen_quantumtubes_macro",
-        "count": 5
+        "count": 6
       },
       {
         "id": "prod_gen_antimattercells_macro",
@@ -25,11 +25,11 @@
       },
       {
         "id": "prod_gen_siliconwafers_macro",
-        "count": 4
+        "count": 6
       },
       {
         "id": "prod_gen_graphene_macro",
-        "count": 2
+        "count": 3
       },
       {
         "id": "prod_gen_superfluidcoolant_macro",
@@ -37,11 +37,7 @@
       },
       {
         "id": "prod_gen_energycells_macro",
-        "count": 2
-      },
-      {
-        "id": "landmarks_tel_tradestation_01_ring_inside_01_macro",
-        "count": 14
+        "count": 3
       }
     ],
     "industryModulesWithWorker": [
@@ -106,10 +102,6 @@
       {
         "id": "prod_gen_energycells_macro",
         "count": 2
-      },
-      {
-        "id": "landmarks_tel_tradestation_01_ring_inside_01_macro",
-        "count": 2
       }
     ],
     "supplyModulesWithWorker": [
@@ -142,449 +134,1420 @@
         "count": 2
       }
     ],
-    "wareFlows": [
-      {
-        "wareId": "claytronics",
-        "transportType": "container",
-        "unitVolume": 24,
-        "production": 3473.28,
-        "consumption": 0,
-        "netRate": 3473.28,
-        "productionVolume": 83358.72,
-        "consumptionVolume": 0,
-        "netVolume": 83358.72,
-        "totalOccupiedCount": 0,
-        "totalOccupiedConsumptionCount": 0,
-        "totalOccupiedVolume": 0,
-        "unitPrice": 2346,
-        "netValue": 8148314.880000001,
-        "contributions": [
+    "groupedFlows": {
+      "flows": [
+        {
+          "wareId": "claytronics",
+          "orderIndex": 0,
+          "tier": 4,
+          "transportType": "container",
+          "unitVolume": 24,
+          "production": 3473.28,
+          "consumption": 0,
+          "netRate": 3473.28,
+          "productionVolume": 83358.72,
+          "consumptionVolume": 0,
+          "netVolume": 83358.72,
+          "totalOccupiedCount": 0,
+          "totalOccupiedConsumptionCount": 0,
+          "totalOccupiedVolume": 0,
+          "unitPrice": 2346,
+          "netValue": 8148314.880000001,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_claytronics_macro",
+              "count": 6,
+              "type": "production",
+              "amount": 3473.28,
+              "bonusPercent": 34,
+              "volumeFlow": 83358.72,
+              "valueFlow": 8148314.880000001
+            }
+          ]
+        },
+        {
+          "wareId": "microchips",
+          "orderIndex": 1,
+          "tier": 3,
+          "transportType": "container",
+          "unitVolume": 22,
+          "production": 4700.16,
+          "consumption": 3840,
+          "netRate": 860.1599999999999,
+          "productionVolume": 103403.51999999999,
+          "consumptionVolume": 84480,
+          "netVolume": 18923.51999999999,
+          "totalOccupiedCount": 3840,
+          "totalOccupiedConsumptionCount": 3840,
+          "totalOccupiedVolume": 84480,
+          "unitPrice": 1090,
+          "netValue": 937574.3999999998,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_claytronics_macro",
+              "count": 6,
+              "type": "consumption",
+              "amount": -3840,
+              "bonusPercent": 0,
+              "volumeFlow": -84480,
+              "valueFlow": -4185600
+            },
+            {
+              "moduleId": "prod_gen_microchips_macro",
+              "count": 8,
+              "type": "production",
+              "amount": 4700.16,
+              "bonusPercent": 36,
+              "volumeFlow": 103403.51999999999,
+              "valueFlow": 5123174.399999999
+            }
+          ]
+        },
+        {
+          "wareId": "quantumtubes",
+          "orderIndex": 2,
+          "tier": 3,
+          "transportType": "container",
+          "unitVolume": 22,
+          "production": 3595.5,
+          "consumption": 2400,
+          "netRate": 1195.5,
+          "productionVolume": 79101,
+          "consumptionVolume": 52800,
+          "netVolume": 26301,
+          "totalOccupiedCount": 2400,
+          "totalOccupiedConsumptionCount": 2400,
+          "totalOccupiedVolume": 52800,
+          "unitPrice": 375,
+          "netValue": 448312.5,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_claytronics_macro",
+              "count": 6,
+              "type": "consumption",
+              "amount": -2400,
+              "bonusPercent": 0,
+              "volumeFlow": -52800,
+              "valueFlow": -900000
+            },
+            {
+              "moduleId": "prod_gen_quantumtubes_macro",
+              "count": 5,
+              "type": "production",
+              "amount": 3595.5,
+              "bonusPercent": 53,
+              "volumeFlow": 79101,
+              "valueFlow": 1348312.5
+            }
+          ]
+        },
+        {
+          "wareId": "antimattercells",
+          "orderIndex": 3,
+          "tier": 2,
+          "transportType": "container",
+          "unitVolume": 18,
+          "production": 4009.5000000000005,
+          "consumption": 2400,
+          "netRate": 1609.5000000000005,
+          "productionVolume": 72171.00000000001,
+          "consumptionVolume": 43200,
+          "netVolume": 28971.000000000015,
+          "totalOccupiedCount": 2400,
+          "totalOccupiedConsumptionCount": 2400,
+          "totalOccupiedVolume": 43200,
+          "unitPrice": 282,
+          "netValue": 453879.0000000001,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_claytronics_macro",
+              "count": 6,
+              "type": "consumption",
+              "amount": -2400,
+              "bonusPercent": 0,
+              "volumeFlow": -43200,
+              "valueFlow": -676800
+            },
+            {
+              "moduleId": "prod_gen_antimattercells_macro",
+              "count": 1,
+              "type": "production",
+              "amount": 4009.5000000000005,
+              "bonusPercent": 35,
+              "volumeFlow": 72171.00000000001,
+              "valueFlow": 1130679.0000000002
+            }
+          ]
+        },
+        {
+          "wareId": "siliconwafers",
+          "orderIndex": 4,
+          "tier": 2,
+          "transportType": "container",
+          "unitVolume": 18,
+          "production": 11727.2,
+          "consumption": 9600,
+          "netRate": 2127.2000000000007,
+          "productionVolume": 211089.6,
+          "consumptionVolume": 172800,
+          "netVolume": 38289.600000000006,
+          "totalOccupiedCount": 9600,
+          "totalOccupiedConsumptionCount": 9600,
+          "totalOccupiedVolume": 172800,
+          "unitPrice": 419,
+          "netValue": 891296.8000000003,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_microchips_macro",
+              "count": 8,
+              "type": "consumption",
+              "amount": -9600,
+              "bonusPercent": 0,
+              "volumeFlow": -172800,
+              "valueFlow": -4022400
+            },
+            {
+              "moduleId": "prod_gen_siliconwafers_macro",
+              "count": 4,
+              "type": "production",
+              "amount": 11727.2,
+              "bonusPercent": 37,
+              "volumeFlow": 211089.6,
+              "valueFlow": 4913696.800000001
+            }
+          ]
+        },
+        {
+          "wareId": "graphene",
+          "orderIndex": 5,
+          "tier": 2,
+          "transportType": "container",
+          "unitVolume": 20,
+          "production": 4204.8,
+          "consumption": 2900,
+          "netRate": 1304.8000000000002,
+          "productionVolume": 84096,
+          "consumptionVolume": 58000,
+          "netVolume": 26096,
+          "totalOccupiedCount": 2900,
+          "totalOccupiedConsumptionCount": 2900,
+          "totalOccupiedVolume": 58000,
+          "unitPrice": 233,
+          "netValue": 304018.4,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_quantumtubes_macro",
+              "count": 5,
+              "type": "consumption",
+              "amount": -2900,
+              "bonusPercent": 0,
+              "volumeFlow": -58000,
+              "valueFlow": -675700
+            },
+            {
+              "moduleId": "prod_gen_graphene_macro",
+              "count": 2,
+              "type": "production",
+              "amount": 4204.8,
+              "bonusPercent": 46,
+              "volumeFlow": 84096,
+              "valueFlow": 979718.4
+            }
+          ]
+        },
+        {
+          "wareId": "superfluidcoolant",
+          "orderIndex": 6,
+          "tier": 2,
+          "transportType": "container",
+          "unitVolume": 16,
+          "production": 2123.25,
+          "consumption": 750,
+          "netRate": 1373.25,
+          "productionVolume": 33972,
+          "consumptionVolume": 12000,
+          "netVolume": 21972,
+          "totalOccupiedCount": 750,
+          "totalOccupiedConsumptionCount": 750,
+          "totalOccupiedVolume": 12000,
+          "unitPrice": 211,
+          "netValue": 289755.75,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_quantumtubes_macro",
+              "count": 5,
+              "type": "consumption",
+              "amount": -750,
+              "bonusPercent": 0,
+              "volumeFlow": -12000,
+              "valueFlow": -158250
+            },
+            {
+              "moduleId": "prod_gen_superfluidcoolant_macro",
+              "count": 1,
+              "type": "production",
+              "amount": 2123.25,
+              "bonusPercent": 49,
+              "volumeFlow": 33972,
+              "valueFlow": 448005.75
+            }
+          ]
+        },
+        {
+          "wareId": "energycells",
+          "orderIndex": 7,
+          "tier": 1,
+          "transportType": "container",
+          "unitVolume": 1,
+          "production": 30030,
+          "consumption": 20260,
+          "netRate": 9770,
+          "productionVolume": 30030,
+          "consumptionVolume": 20260,
+          "netVolume": 9770,
+          "totalOccupiedCount": 20260,
+          "totalOccupiedConsumptionCount": 20260,
+          "totalOccupiedVolume": 20260,
+          "unitPrice": 22,
+          "netValue": 214940,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_claytronics_macro",
+              "count": 6,
+              "type": "consumption",
+              "amount": -3360,
+              "bonusPercent": 0,
+              "volumeFlow": -3360,
+              "valueFlow": -73920
+            },
+            {
+              "moduleId": "prod_gen_microchips_macro",
+              "count": 8,
+              "type": "consumption",
+              "amount": -2400,
+              "bonusPercent": 0,
+              "volumeFlow": -2400,
+              "valueFlow": -52800
+            },
+            {
+              "moduleId": "prod_gen_quantumtubes_macro",
+              "count": 5,
+              "type": "consumption",
+              "amount": -1000,
+              "bonusPercent": 0,
+              "volumeFlow": -1000,
+              "valueFlow": -22000
+            },
+            {
+              "moduleId": "prod_gen_antimattercells_macro",
+              "count": 1,
+              "type": "consumption",
+              "amount": -3000,
+              "bonusPercent": 0,
+              "volumeFlow": -3000,
+              "valueFlow": -66000
+            },
+            {
+              "moduleId": "prod_gen_siliconwafers_macro",
+              "count": 4,
+              "type": "consumption",
+              "amount": -7200,
+              "bonusPercent": 0,
+              "volumeFlow": -7200,
+              "valueFlow": -158400
+            },
+            {
+              "moduleId": "prod_gen_graphene_macro",
+              "count": 2,
+              "type": "consumption",
+              "amount": -2400,
+              "bonusPercent": 0,
+              "volumeFlow": -2400,
+              "valueFlow": -52800
+            },
+            {
+              "moduleId": "prod_gen_superfluidcoolant_macro",
+              "count": 1,
+              "type": "consumption",
+              "amount": -900,
+              "bonusPercent": 0,
+              "volumeFlow": -900,
+              "valueFlow": -19800
+            },
+            {
+              "moduleId": "prod_gen_energycells_macro",
+              "count": 2,
+              "type": "production",
+              "amount": 30030,
+              "bonusPercent": 43,
+              "volumeFlow": 30030,
+              "valueFlow": 660660
+            }
+          ]
+        },
+        {
+          "wareId": "silicon",
+          "orderIndex": 9007199254740991,
+          "tier": 0,
+          "transportType": "solid",
+          "unitVolume": 10,
+          "production": 0,
+          "consumption": 19200,
+          "netRate": -19200,
+          "productionVolume": 0,
+          "consumptionVolume": 192000,
+          "netVolume": -192000,
+          "totalOccupiedCount": 19200,
+          "totalOccupiedConsumptionCount": 19200,
+          "totalOccupiedVolume": 192000,
+          "unitPrice": 150,
+          "netValue": -2880000,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_siliconwafers_macro",
+              "count": 4,
+              "type": "consumption",
+              "amount": -19200,
+              "bonusPercent": 0,
+              "volumeFlow": -192000,
+              "valueFlow": -2880000
+            }
+          ]
+        },
+        {
+          "wareId": "hydrogen",
+          "orderIndex": 9007199254740991,
+          "tier": 0,
+          "transportType": "liquid",
+          "unitVolume": 6,
+          "production": 0,
+          "consumption": 9600,
+          "netRate": -9600,
+          "productionVolume": 0,
+          "consumptionVolume": 57600,
+          "netVolume": -57600,
+          "totalOccupiedCount": 9600,
+          "totalOccupiedConsumptionCount": 9600,
+          "totalOccupiedVolume": 57600,
+          "unitPrice": 67,
+          "netValue": -643200,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_antimattercells_macro",
+              "count": 1,
+              "type": "consumption",
+              "amount": -9600,
+              "bonusPercent": 0,
+              "volumeFlow": -57600,
+              "valueFlow": -643200
+            }
+          ]
+        },
+        {
+          "wareId": "methane",
+          "orderIndex": 9007199254740991,
+          "tier": 0,
+          "transportType": "liquid",
+          "unitVolume": 6,
+          "production": 0,
+          "consumption": 9600,
+          "netRate": -9600,
+          "productionVolume": 0,
+          "consumptionVolume": 57600,
+          "netVolume": -57600,
+          "totalOccupiedCount": 9600,
+          "totalOccupiedConsumptionCount": 9600,
+          "totalOccupiedVolume": 57600,
+          "unitPrice": 55,
+          "netValue": -528000,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_graphene_macro",
+              "count": 2,
+              "type": "consumption",
+              "amount": -9600,
+              "bonusPercent": 0,
+              "volumeFlow": -57600,
+              "valueFlow": -528000
+            }
+          ]
+        },
+        {
+          "wareId": "helium",
+          "orderIndex": 9007199254740991,
+          "tier": 0,
+          "transportType": "liquid",
+          "unitVolume": 6,
+          "production": 0,
+          "consumption": 4800,
+          "netRate": -4800,
+          "productionVolume": 0,
+          "consumptionVolume": 28800,
+          "netVolume": -28800,
+          "totalOccupiedCount": 4800,
+          "totalOccupiedConsumptionCount": 4800,
+          "totalOccupiedVolume": 28800,
+          "unitPrice": 51,
+          "netValue": -244800,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_superfluidcoolant_macro",
+              "count": 1,
+              "type": "consumption",
+              "amount": -4800,
+              "bonusPercent": 0,
+              "volumeFlow": -28800,
+              "valueFlow": -244800
+            }
+          ]
+        }
+      ],
+      "rateGroups": {
+        "positive": [
           {
-            "moduleId": "prod_gen_claytronics_macro",
-            "count": 6,
-            "type": "production",
-            "amount": 3473.28,
-            "bonusPercent": 34,
-            "volumeFlow": 83358.72,
-            "valueFlow": 8148314.880000001
+            "wareId": "claytronics",
+            "orderIndex": 0,
+            "tier": 4,
+            "transportType": "container",
+            "unitVolume": 24,
+            "production": 3473.28,
+            "consumption": 0,
+            "netRate": 3473.28,
+            "productionVolume": 83358.72,
+            "consumptionVolume": 0,
+            "netVolume": 83358.72,
+            "totalOccupiedCount": 0,
+            "totalOccupiedConsumptionCount": 0,
+            "totalOccupiedVolume": 0,
+            "unitPrice": 2346,
+            "netValue": 8148314.880000001,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_claytronics_macro",
+                "count": 6,
+                "type": "production",
+                "amount": 3473.28,
+                "bonusPercent": 34,
+                "volumeFlow": 83358.72,
+                "valueFlow": 8148314.880000001
+              }
+            ]
+          },
+          {
+            "wareId": "microchips",
+            "orderIndex": 1,
+            "tier": 3,
+            "transportType": "container",
+            "unitVolume": 22,
+            "production": 4700.16,
+            "consumption": 3840,
+            "netRate": 860.1599999999999,
+            "productionVolume": 103403.51999999999,
+            "consumptionVolume": 84480,
+            "netVolume": 18923.51999999999,
+            "totalOccupiedCount": 3840,
+            "totalOccupiedConsumptionCount": 3840,
+            "totalOccupiedVolume": 84480,
+            "unitPrice": 1090,
+            "netValue": 937574.3999999998,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_claytronics_macro",
+                "count": 6,
+                "type": "consumption",
+                "amount": -3840,
+                "bonusPercent": 0,
+                "volumeFlow": -84480,
+                "valueFlow": -4185600
+              },
+              {
+                "moduleId": "prod_gen_microchips_macro",
+                "count": 8,
+                "type": "production",
+                "amount": 4700.16,
+                "bonusPercent": 36,
+                "volumeFlow": 103403.51999999999,
+                "valueFlow": 5123174.399999999
+              }
+            ]
+          },
+          {
+            "wareId": "quantumtubes",
+            "orderIndex": 2,
+            "tier": 3,
+            "transportType": "container",
+            "unitVolume": 22,
+            "production": 3595.5,
+            "consumption": 2400,
+            "netRate": 1195.5,
+            "productionVolume": 79101,
+            "consumptionVolume": 52800,
+            "netVolume": 26301,
+            "totalOccupiedCount": 2400,
+            "totalOccupiedConsumptionCount": 2400,
+            "totalOccupiedVolume": 52800,
+            "unitPrice": 375,
+            "netValue": 448312.5,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_claytronics_macro",
+                "count": 6,
+                "type": "consumption",
+                "amount": -2400,
+                "bonusPercent": 0,
+                "volumeFlow": -52800,
+                "valueFlow": -900000
+              },
+              {
+                "moduleId": "prod_gen_quantumtubes_macro",
+                "count": 5,
+                "type": "production",
+                "amount": 3595.5,
+                "bonusPercent": 53,
+                "volumeFlow": 79101,
+                "valueFlow": 1348312.5
+              }
+            ]
+          },
+          {
+            "wareId": "antimattercells",
+            "orderIndex": 3,
+            "tier": 2,
+            "transportType": "container",
+            "unitVolume": 18,
+            "production": 4009.5000000000005,
+            "consumption": 2400,
+            "netRate": 1609.5000000000005,
+            "productionVolume": 72171.00000000001,
+            "consumptionVolume": 43200,
+            "netVolume": 28971.000000000015,
+            "totalOccupiedCount": 2400,
+            "totalOccupiedConsumptionCount": 2400,
+            "totalOccupiedVolume": 43200,
+            "unitPrice": 282,
+            "netValue": 453879.0000000001,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_claytronics_macro",
+                "count": 6,
+                "type": "consumption",
+                "amount": -2400,
+                "bonusPercent": 0,
+                "volumeFlow": -43200,
+                "valueFlow": -676800
+              },
+              {
+                "moduleId": "prod_gen_antimattercells_macro",
+                "count": 1,
+                "type": "production",
+                "amount": 4009.5000000000005,
+                "bonusPercent": 35,
+                "volumeFlow": 72171.00000000001,
+                "valueFlow": 1130679.0000000002
+              }
+            ]
+          },
+          {
+            "wareId": "siliconwafers",
+            "orderIndex": 4,
+            "tier": 2,
+            "transportType": "container",
+            "unitVolume": 18,
+            "production": 11727.2,
+            "consumption": 9600,
+            "netRate": 2127.2000000000007,
+            "productionVolume": 211089.6,
+            "consumptionVolume": 172800,
+            "netVolume": 38289.600000000006,
+            "totalOccupiedCount": 9600,
+            "totalOccupiedConsumptionCount": 9600,
+            "totalOccupiedVolume": 172800,
+            "unitPrice": 419,
+            "netValue": 891296.8000000003,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_microchips_macro",
+                "count": 8,
+                "type": "consumption",
+                "amount": -9600,
+                "bonusPercent": 0,
+                "volumeFlow": -172800,
+                "valueFlow": -4022400
+              },
+              {
+                "moduleId": "prod_gen_siliconwafers_macro",
+                "count": 4,
+                "type": "production",
+                "amount": 11727.2,
+                "bonusPercent": 37,
+                "volumeFlow": 211089.6,
+                "valueFlow": 4913696.800000001
+              }
+            ]
+          },
+          {
+            "wareId": "graphene",
+            "orderIndex": 5,
+            "tier": 2,
+            "transportType": "container",
+            "unitVolume": 20,
+            "production": 4204.8,
+            "consumption": 2900,
+            "netRate": 1304.8000000000002,
+            "productionVolume": 84096,
+            "consumptionVolume": 58000,
+            "netVolume": 26096,
+            "totalOccupiedCount": 2900,
+            "totalOccupiedConsumptionCount": 2900,
+            "totalOccupiedVolume": 58000,
+            "unitPrice": 233,
+            "netValue": 304018.4,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_quantumtubes_macro",
+                "count": 5,
+                "type": "consumption",
+                "amount": -2900,
+                "bonusPercent": 0,
+                "volumeFlow": -58000,
+                "valueFlow": -675700
+              },
+              {
+                "moduleId": "prod_gen_graphene_macro",
+                "count": 2,
+                "type": "production",
+                "amount": 4204.8,
+                "bonusPercent": 46,
+                "volumeFlow": 84096,
+                "valueFlow": 979718.4
+              }
+            ]
+          },
+          {
+            "wareId": "superfluidcoolant",
+            "orderIndex": 6,
+            "tier": 2,
+            "transportType": "container",
+            "unitVolume": 16,
+            "production": 2123.25,
+            "consumption": 750,
+            "netRate": 1373.25,
+            "productionVolume": 33972,
+            "consumptionVolume": 12000,
+            "netVolume": 21972,
+            "totalOccupiedCount": 750,
+            "totalOccupiedConsumptionCount": 750,
+            "totalOccupiedVolume": 12000,
+            "unitPrice": 211,
+            "netValue": 289755.75,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_quantumtubes_macro",
+                "count": 5,
+                "type": "consumption",
+                "amount": -750,
+                "bonusPercent": 0,
+                "volumeFlow": -12000,
+                "valueFlow": -158250
+              },
+              {
+                "moduleId": "prod_gen_superfluidcoolant_macro",
+                "count": 1,
+                "type": "production",
+                "amount": 2123.25,
+                "bonusPercent": 49,
+                "volumeFlow": 33972,
+                "valueFlow": 448005.75
+              }
+            ]
+          },
+          {
+            "wareId": "energycells",
+            "orderIndex": 7,
+            "tier": 1,
+            "transportType": "container",
+            "unitVolume": 1,
+            "production": 30030,
+            "consumption": 20260,
+            "netRate": 9770,
+            "productionVolume": 30030,
+            "consumptionVolume": 20260,
+            "netVolume": 9770,
+            "totalOccupiedCount": 20260,
+            "totalOccupiedConsumptionCount": 20260,
+            "totalOccupiedVolume": 20260,
+            "unitPrice": 22,
+            "netValue": 214940,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_claytronics_macro",
+                "count": 6,
+                "type": "consumption",
+                "amount": -3360,
+                "bonusPercent": 0,
+                "volumeFlow": -3360,
+                "valueFlow": -73920
+              },
+              {
+                "moduleId": "prod_gen_microchips_macro",
+                "count": 8,
+                "type": "consumption",
+                "amount": -2400,
+                "bonusPercent": 0,
+                "volumeFlow": -2400,
+                "valueFlow": -52800
+              },
+              {
+                "moduleId": "prod_gen_quantumtubes_macro",
+                "count": 5,
+                "type": "consumption",
+                "amount": -1000,
+                "bonusPercent": 0,
+                "volumeFlow": -1000,
+                "valueFlow": -22000
+              },
+              {
+                "moduleId": "prod_gen_antimattercells_macro",
+                "count": 1,
+                "type": "consumption",
+                "amount": -3000,
+                "bonusPercent": 0,
+                "volumeFlow": -3000,
+                "valueFlow": -66000
+              },
+              {
+                "moduleId": "prod_gen_siliconwafers_macro",
+                "count": 4,
+                "type": "consumption",
+                "amount": -7200,
+                "bonusPercent": 0,
+                "volumeFlow": -7200,
+                "valueFlow": -158400
+              },
+              {
+                "moduleId": "prod_gen_graphene_macro",
+                "count": 2,
+                "type": "consumption",
+                "amount": -2400,
+                "bonusPercent": 0,
+                "volumeFlow": -2400,
+                "valueFlow": -52800
+              },
+              {
+                "moduleId": "prod_gen_superfluidcoolant_macro",
+                "count": 1,
+                "type": "consumption",
+                "amount": -900,
+                "bonusPercent": 0,
+                "volumeFlow": -900,
+                "valueFlow": -19800
+              },
+              {
+                "moduleId": "prod_gen_energycells_macro",
+                "count": 2,
+                "type": "production",
+                "amount": 30030,
+                "bonusPercent": 43,
+                "volumeFlow": 30030,
+                "valueFlow": 660660
+              }
+            ]
+          }
+        ],
+        "operations": [],
+        "resources": [
+          {
+            "wareId": "silicon",
+            "orderIndex": 9007199254740991,
+            "tier": 0,
+            "transportType": "solid",
+            "unitVolume": 10,
+            "production": 0,
+            "consumption": 19200,
+            "netRate": -19200,
+            "productionVolume": 0,
+            "consumptionVolume": 192000,
+            "netVolume": -192000,
+            "totalOccupiedCount": 19200,
+            "totalOccupiedConsumptionCount": 19200,
+            "totalOccupiedVolume": 192000,
+            "unitPrice": 150,
+            "netValue": -2880000,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_siliconwafers_macro",
+                "count": 4,
+                "type": "consumption",
+                "amount": -19200,
+                "bonusPercent": 0,
+                "volumeFlow": -192000,
+                "valueFlow": -2880000
+              }
+            ]
+          },
+          {
+            "wareId": "hydrogen",
+            "orderIndex": 9007199254740991,
+            "tier": 0,
+            "transportType": "liquid",
+            "unitVolume": 6,
+            "production": 0,
+            "consumption": 9600,
+            "netRate": -9600,
+            "productionVolume": 0,
+            "consumptionVolume": 57600,
+            "netVolume": -57600,
+            "totalOccupiedCount": 9600,
+            "totalOccupiedConsumptionCount": 9600,
+            "totalOccupiedVolume": 57600,
+            "unitPrice": 67,
+            "netValue": -643200,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_antimattercells_macro",
+                "count": 1,
+                "type": "consumption",
+                "amount": -9600,
+                "bonusPercent": 0,
+                "volumeFlow": -57600,
+                "valueFlow": -643200
+              }
+            ]
+          },
+          {
+            "wareId": "methane",
+            "orderIndex": 9007199254740991,
+            "tier": 0,
+            "transportType": "liquid",
+            "unitVolume": 6,
+            "production": 0,
+            "consumption": 9600,
+            "netRate": -9600,
+            "productionVolume": 0,
+            "consumptionVolume": 57600,
+            "netVolume": -57600,
+            "totalOccupiedCount": 9600,
+            "totalOccupiedConsumptionCount": 9600,
+            "totalOccupiedVolume": 57600,
+            "unitPrice": 55,
+            "netValue": -528000,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_graphene_macro",
+                "count": 2,
+                "type": "consumption",
+                "amount": -9600,
+                "bonusPercent": 0,
+                "volumeFlow": -57600,
+                "valueFlow": -528000
+              }
+            ]
+          },
+          {
+            "wareId": "helium",
+            "orderIndex": 9007199254740991,
+            "tier": 0,
+            "transportType": "liquid",
+            "unitVolume": 6,
+            "production": 0,
+            "consumption": 4800,
+            "netRate": -4800,
+            "productionVolume": 0,
+            "consumptionVolume": 28800,
+            "netVolume": -28800,
+            "totalOccupiedCount": 4800,
+            "totalOccupiedConsumptionCount": 4800,
+            "totalOccupiedVolume": 28800,
+            "unitPrice": 51,
+            "netValue": -244800,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_superfluidcoolant_macro",
+                "count": 1,
+                "type": "consumption",
+                "amount": -4800,
+                "bonusPercent": 0,
+                "volumeFlow": -28800,
+                "valueFlow": -244800
+              }
+            ]
           }
         ]
       },
-      {
-        "wareId": "antimattercells",
-        "transportType": "container",
-        "unitVolume": 18,
-        "production": 4009.5000000000005,
-        "consumption": 2400,
-        "netRate": 1609.5000000000005,
-        "productionVolume": 72171.00000000001,
-        "consumptionVolume": 43200,
-        "netVolume": 28971.000000000015,
-        "totalOccupiedCount": 2400,
-        "totalOccupiedConsumptionCount": 2400,
-        "totalOccupiedVolume": 43200,
-        "unitPrice": 282,
-        "netValue": 453879.0000000001,
-        "contributions": [
+      "volumeGroups": {
+        "solid": [
           {
-            "moduleId": "prod_gen_claytronics_macro",
-            "count": 6,
-            "type": "consumption",
-            "amount": -2400,
-            "bonusPercent": 0,
-            "volumeFlow": -43200,
-            "valueFlow": -676800
-          },
-          {
-            "moduleId": "prod_gen_antimattercells_macro",
-            "count": 1,
-            "type": "production",
-            "amount": 4009.5000000000005,
-            "bonusPercent": 35,
-            "volumeFlow": 72171.00000000001,
-            "valueFlow": 1130679.0000000002
+            "wareId": "silicon",
+            "orderIndex": 9007199254740991,
+            "tier": 0,
+            "transportType": "solid",
+            "unitVolume": 10,
+            "production": 0,
+            "consumption": 19200,
+            "netRate": -19200,
+            "productionVolume": 0,
+            "consumptionVolume": 192000,
+            "netVolume": -192000,
+            "totalOccupiedCount": 19200,
+            "totalOccupiedConsumptionCount": 19200,
+            "totalOccupiedVolume": 192000,
+            "unitPrice": 150,
+            "netValue": -2880000,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_siliconwafers_macro",
+                "count": 4,
+                "type": "consumption",
+                "amount": -19200,
+                "bonusPercent": 0,
+                "volumeFlow": -192000,
+                "valueFlow": -2880000
+              }
+            ]
           }
-        ]
-      },
-      {
-        "wareId": "energycells",
-        "transportType": "container",
-        "unitVolume": 1,
-        "production": 30030,
-        "consumption": 20260,
-        "netRate": 9770,
-        "productionVolume": 30030,
-        "consumptionVolume": 20260,
-        "netVolume": 9770,
-        "totalOccupiedCount": 20260,
-        "totalOccupiedConsumptionCount": 20260,
-        "totalOccupiedVolume": 20260,
-        "unitPrice": 22,
-        "netValue": 214940,
-        "contributions": [
+        ],
+        "liquid": [
           {
-            "moduleId": "prod_gen_claytronics_macro",
-            "count": 6,
-            "type": "consumption",
-            "amount": -3360,
-            "bonusPercent": 0,
-            "volumeFlow": -3360,
-            "valueFlow": -73920
+            "wareId": "hydrogen",
+            "orderIndex": 9007199254740991,
+            "tier": 0,
+            "transportType": "liquid",
+            "unitVolume": 6,
+            "production": 0,
+            "consumption": 9600,
+            "netRate": -9600,
+            "productionVolume": 0,
+            "consumptionVolume": 57600,
+            "netVolume": -57600,
+            "totalOccupiedCount": 9600,
+            "totalOccupiedConsumptionCount": 9600,
+            "totalOccupiedVolume": 57600,
+            "unitPrice": 67,
+            "netValue": -643200,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_antimattercells_macro",
+                "count": 1,
+                "type": "consumption",
+                "amount": -9600,
+                "bonusPercent": 0,
+                "volumeFlow": -57600,
+                "valueFlow": -643200
+              }
+            ]
           },
           {
-            "moduleId": "prod_gen_microchips_macro",
-            "count": 8,
-            "type": "consumption",
-            "amount": -2400,
-            "bonusPercent": 0,
-            "volumeFlow": -2400,
-            "valueFlow": -52800
+            "wareId": "methane",
+            "orderIndex": 9007199254740991,
+            "tier": 0,
+            "transportType": "liquid",
+            "unitVolume": 6,
+            "production": 0,
+            "consumption": 9600,
+            "netRate": -9600,
+            "productionVolume": 0,
+            "consumptionVolume": 57600,
+            "netVolume": -57600,
+            "totalOccupiedCount": 9600,
+            "totalOccupiedConsumptionCount": 9600,
+            "totalOccupiedVolume": 57600,
+            "unitPrice": 55,
+            "netValue": -528000,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_graphene_macro",
+                "count": 2,
+                "type": "consumption",
+                "amount": -9600,
+                "bonusPercent": 0,
+                "volumeFlow": -57600,
+                "valueFlow": -528000
+              }
+            ]
           },
           {
-            "moduleId": "prod_gen_quantumtubes_macro",
-            "count": 5,
-            "type": "consumption",
-            "amount": -1000,
-            "bonusPercent": 0,
-            "volumeFlow": -1000,
-            "valueFlow": -22000
-          },
-          {
-            "moduleId": "prod_gen_antimattercells_macro",
-            "count": 1,
-            "type": "consumption",
-            "amount": -3000,
-            "bonusPercent": 0,
-            "volumeFlow": -3000,
-            "valueFlow": -66000
-          },
-          {
-            "moduleId": "prod_gen_siliconwafers_macro",
-            "count": 4,
-            "type": "consumption",
-            "amount": -7200,
-            "bonusPercent": 0,
-            "volumeFlow": -7200,
-            "valueFlow": -158400
-          },
-          {
-            "moduleId": "prod_gen_graphene_macro",
-            "count": 2,
-            "type": "consumption",
-            "amount": -2400,
-            "bonusPercent": 0,
-            "volumeFlow": -2400,
-            "valueFlow": -52800
-          },
-          {
-            "moduleId": "prod_gen_superfluidcoolant_macro",
-            "count": 1,
-            "type": "consumption",
-            "amount": -900,
-            "bonusPercent": 0,
-            "volumeFlow": -900,
-            "valueFlow": -19800
-          },
-          {
-            "moduleId": "prod_gen_energycells_macro",
-            "count": 2,
-            "type": "production",
-            "amount": 30030,
-            "bonusPercent": 43,
-            "volumeFlow": 30030,
-            "valueFlow": 660660
+            "wareId": "helium",
+            "orderIndex": 9007199254740991,
+            "tier": 0,
+            "transportType": "liquid",
+            "unitVolume": 6,
+            "production": 0,
+            "consumption": 4800,
+            "netRate": -4800,
+            "productionVolume": 0,
+            "consumptionVolume": 28800,
+            "netVolume": -28800,
+            "totalOccupiedCount": 4800,
+            "totalOccupiedConsumptionCount": 4800,
+            "totalOccupiedVolume": 28800,
+            "unitPrice": 51,
+            "netValue": -244800,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_superfluidcoolant_macro",
+                "count": 1,
+                "type": "consumption",
+                "amount": -4800,
+                "bonusPercent": 0,
+                "volumeFlow": -28800,
+                "valueFlow": -244800
+              }
+            ]
           }
-        ]
-      },
-      {
-        "wareId": "microchips",
-        "transportType": "container",
-        "unitVolume": 22,
-        "production": 4700.16,
-        "consumption": 3840,
-        "netRate": 860.1599999999999,
-        "productionVolume": 103403.51999999999,
-        "consumptionVolume": 84480,
-        "netVolume": 18923.51999999999,
-        "totalOccupiedCount": 3840,
-        "totalOccupiedConsumptionCount": 3840,
-        "totalOccupiedVolume": 84480,
-        "unitPrice": 1090,
-        "netValue": 937574.3999999998,
-        "contributions": [
+        ],
+        "container": [
           {
-            "moduleId": "prod_gen_claytronics_macro",
-            "count": 6,
-            "type": "consumption",
-            "amount": -3840,
-            "bonusPercent": 0,
-            "volumeFlow": -84480,
-            "valueFlow": -4185600
+            "wareId": "claytronics",
+            "orderIndex": 0,
+            "tier": 4,
+            "transportType": "container",
+            "unitVolume": 24,
+            "production": 3473.28,
+            "consumption": 0,
+            "netRate": 3473.28,
+            "productionVolume": 83358.72,
+            "consumptionVolume": 0,
+            "netVolume": 83358.72,
+            "totalOccupiedCount": 0,
+            "totalOccupiedConsumptionCount": 0,
+            "totalOccupiedVolume": 0,
+            "unitPrice": 2346,
+            "netValue": 8148314.880000001,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_claytronics_macro",
+                "count": 6,
+                "type": "production",
+                "amount": 3473.28,
+                "bonusPercent": 34,
+                "volumeFlow": 83358.72,
+                "valueFlow": 8148314.880000001
+              }
+            ]
           },
           {
-            "moduleId": "prod_gen_microchips_macro",
-            "count": 8,
-            "type": "production",
-            "amount": 4700.16,
-            "bonusPercent": 36,
-            "volumeFlow": 103403.51999999999,
-            "valueFlow": 5123174.399999999
-          }
-        ]
-      },
-      {
-        "wareId": "quantumtubes",
-        "transportType": "container",
-        "unitVolume": 22,
-        "production": 3595.5,
-        "consumption": 2400,
-        "netRate": 1195.5,
-        "productionVolume": 79101,
-        "consumptionVolume": 52800,
-        "netVolume": 26301,
-        "totalOccupiedCount": 2400,
-        "totalOccupiedConsumptionCount": 2400,
-        "totalOccupiedVolume": 52800,
-        "unitPrice": 375,
-        "netValue": 448312.5,
-        "contributions": [
-          {
-            "moduleId": "prod_gen_claytronics_macro",
-            "count": 6,
-            "type": "consumption",
-            "amount": -2400,
-            "bonusPercent": 0,
-            "volumeFlow": -52800,
-            "valueFlow": -900000
+            "wareId": "microchips",
+            "orderIndex": 1,
+            "tier": 3,
+            "transportType": "container",
+            "unitVolume": 22,
+            "production": 4700.16,
+            "consumption": 3840,
+            "netRate": 860.1599999999999,
+            "productionVolume": 103403.51999999999,
+            "consumptionVolume": 84480,
+            "netVolume": 18923.51999999999,
+            "totalOccupiedCount": 3840,
+            "totalOccupiedConsumptionCount": 3840,
+            "totalOccupiedVolume": 84480,
+            "unitPrice": 1090,
+            "netValue": 937574.3999999998,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_claytronics_macro",
+                "count": 6,
+                "type": "consumption",
+                "amount": -3840,
+                "bonusPercent": 0,
+                "volumeFlow": -84480,
+                "valueFlow": -4185600
+              },
+              {
+                "moduleId": "prod_gen_microchips_macro",
+                "count": 8,
+                "type": "production",
+                "amount": 4700.16,
+                "bonusPercent": 36,
+                "volumeFlow": 103403.51999999999,
+                "valueFlow": 5123174.399999999
+              }
+            ]
           },
           {
-            "moduleId": "prod_gen_quantumtubes_macro",
-            "count": 5,
-            "type": "production",
-            "amount": 3595.5,
-            "bonusPercent": 53,
-            "volumeFlow": 79101,
-            "valueFlow": 1348312.5
-          }
-        ]
-      },
-      {
-        "wareId": "siliconwafers",
-        "transportType": "container",
-        "unitVolume": 18,
-        "production": 11727.2,
-        "consumption": 9600,
-        "netRate": 2127.2000000000007,
-        "productionVolume": 211089.6,
-        "consumptionVolume": 172800,
-        "netVolume": 38289.600000000006,
-        "totalOccupiedCount": 9600,
-        "totalOccupiedConsumptionCount": 9600,
-        "totalOccupiedVolume": 172800,
-        "unitPrice": 419,
-        "netValue": 891296.8000000003,
-        "contributions": [
-          {
-            "moduleId": "prod_gen_microchips_macro",
-            "count": 8,
-            "type": "consumption",
-            "amount": -9600,
-            "bonusPercent": 0,
-            "volumeFlow": -172800,
-            "valueFlow": -4022400
+            "wareId": "quantumtubes",
+            "orderIndex": 2,
+            "tier": 3,
+            "transportType": "container",
+            "unitVolume": 22,
+            "production": 3595.5,
+            "consumption": 2400,
+            "netRate": 1195.5,
+            "productionVolume": 79101,
+            "consumptionVolume": 52800,
+            "netVolume": 26301,
+            "totalOccupiedCount": 2400,
+            "totalOccupiedConsumptionCount": 2400,
+            "totalOccupiedVolume": 52800,
+            "unitPrice": 375,
+            "netValue": 448312.5,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_claytronics_macro",
+                "count": 6,
+                "type": "consumption",
+                "amount": -2400,
+                "bonusPercent": 0,
+                "volumeFlow": -52800,
+                "valueFlow": -900000
+              },
+              {
+                "moduleId": "prod_gen_quantumtubes_macro",
+                "count": 5,
+                "type": "production",
+                "amount": 3595.5,
+                "bonusPercent": 53,
+                "volumeFlow": 79101,
+                "valueFlow": 1348312.5
+              }
+            ]
           },
           {
-            "moduleId": "prod_gen_siliconwafers_macro",
-            "count": 4,
-            "type": "production",
-            "amount": 11727.2,
-            "bonusPercent": 37,
-            "volumeFlow": 211089.6,
-            "valueFlow": 4913696.800000001
-          }
-        ]
-      },
-      {
-        "wareId": "graphene",
-        "transportType": "container",
-        "unitVolume": 20,
-        "production": 4204.8,
-        "consumption": 2900,
-        "netRate": 1304.8000000000002,
-        "productionVolume": 84096,
-        "consumptionVolume": 58000,
-        "netVolume": 26096,
-        "totalOccupiedCount": 2900,
-        "totalOccupiedConsumptionCount": 2900,
-        "totalOccupiedVolume": 58000,
-        "unitPrice": 233,
-        "netValue": 304018.4,
-        "contributions": [
-          {
-            "moduleId": "prod_gen_quantumtubes_macro",
-            "count": 5,
-            "type": "consumption",
-            "amount": -2900,
-            "bonusPercent": 0,
-            "volumeFlow": -58000,
-            "valueFlow": -675700
+            "wareId": "antimattercells",
+            "orderIndex": 3,
+            "tier": 2,
+            "transportType": "container",
+            "unitVolume": 18,
+            "production": 4009.5000000000005,
+            "consumption": 2400,
+            "netRate": 1609.5000000000005,
+            "productionVolume": 72171.00000000001,
+            "consumptionVolume": 43200,
+            "netVolume": 28971.000000000015,
+            "totalOccupiedCount": 2400,
+            "totalOccupiedConsumptionCount": 2400,
+            "totalOccupiedVolume": 43200,
+            "unitPrice": 282,
+            "netValue": 453879.0000000001,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_claytronics_macro",
+                "count": 6,
+                "type": "consumption",
+                "amount": -2400,
+                "bonusPercent": 0,
+                "volumeFlow": -43200,
+                "valueFlow": -676800
+              },
+              {
+                "moduleId": "prod_gen_antimattercells_macro",
+                "count": 1,
+                "type": "production",
+                "amount": 4009.5000000000005,
+                "bonusPercent": 35,
+                "volumeFlow": 72171.00000000001,
+                "valueFlow": 1130679.0000000002
+              }
+            ]
           },
           {
-            "moduleId": "prod_gen_graphene_macro",
-            "count": 2,
-            "type": "production",
-            "amount": 4204.8,
-            "bonusPercent": 46,
-            "volumeFlow": 84096,
-            "valueFlow": 979718.4
-          }
-        ]
-      },
-      {
-        "wareId": "superfluidcoolant",
-        "transportType": "container",
-        "unitVolume": 16,
-        "production": 2123.25,
-        "consumption": 750,
-        "netRate": 1373.25,
-        "productionVolume": 33972,
-        "consumptionVolume": 12000,
-        "netVolume": 21972,
-        "totalOccupiedCount": 750,
-        "totalOccupiedConsumptionCount": 750,
-        "totalOccupiedVolume": 12000,
-        "unitPrice": 211,
-        "netValue": 289755.75,
-        "contributions": [
-          {
-            "moduleId": "prod_gen_quantumtubes_macro",
-            "count": 5,
-            "type": "consumption",
-            "amount": -750,
-            "bonusPercent": 0,
-            "volumeFlow": -12000,
-            "valueFlow": -158250
+            "wareId": "siliconwafers",
+            "orderIndex": 4,
+            "tier": 2,
+            "transportType": "container",
+            "unitVolume": 18,
+            "production": 11727.2,
+            "consumption": 9600,
+            "netRate": 2127.2000000000007,
+            "productionVolume": 211089.6,
+            "consumptionVolume": 172800,
+            "netVolume": 38289.600000000006,
+            "totalOccupiedCount": 9600,
+            "totalOccupiedConsumptionCount": 9600,
+            "totalOccupiedVolume": 172800,
+            "unitPrice": 419,
+            "netValue": 891296.8000000003,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_microchips_macro",
+                "count": 8,
+                "type": "consumption",
+                "amount": -9600,
+                "bonusPercent": 0,
+                "volumeFlow": -172800,
+                "valueFlow": -4022400
+              },
+              {
+                "moduleId": "prod_gen_siliconwafers_macro",
+                "count": 4,
+                "type": "production",
+                "amount": 11727.2,
+                "bonusPercent": 37,
+                "volumeFlow": 211089.6,
+                "valueFlow": 4913696.800000001
+              }
+            ]
           },
           {
-            "moduleId": "prod_gen_superfluidcoolant_macro",
-            "count": 1,
-            "type": "production",
-            "amount": 2123.25,
-            "bonusPercent": 49,
-            "volumeFlow": 33972,
-            "valueFlow": 448005.75
-          }
-        ]
-      },
-      {
-        "wareId": "hydrogen",
-        "transportType": "liquid",
-        "unitVolume": 6,
-        "production": 0,
-        "consumption": 9600,
-        "netRate": -9600,
-        "productionVolume": 0,
-        "consumptionVolume": 57600,
-        "netVolume": -57600,
-        "totalOccupiedCount": 9600,
-        "totalOccupiedConsumptionCount": 9600,
-        "totalOccupiedVolume": 57600,
-        "unitPrice": 67,
-        "netValue": -643200,
-        "contributions": [
+            "wareId": "graphene",
+            "orderIndex": 5,
+            "tier": 2,
+            "transportType": "container",
+            "unitVolume": 20,
+            "production": 4204.8,
+            "consumption": 2900,
+            "netRate": 1304.8000000000002,
+            "productionVolume": 84096,
+            "consumptionVolume": 58000,
+            "netVolume": 26096,
+            "totalOccupiedCount": 2900,
+            "totalOccupiedConsumptionCount": 2900,
+            "totalOccupiedVolume": 58000,
+            "unitPrice": 233,
+            "netValue": 304018.4,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_quantumtubes_macro",
+                "count": 5,
+                "type": "consumption",
+                "amount": -2900,
+                "bonusPercent": 0,
+                "volumeFlow": -58000,
+                "valueFlow": -675700
+              },
+              {
+                "moduleId": "prod_gen_graphene_macro",
+                "count": 2,
+                "type": "production",
+                "amount": 4204.8,
+                "bonusPercent": 46,
+                "volumeFlow": 84096,
+                "valueFlow": 979718.4
+              }
+            ]
+          },
           {
-            "moduleId": "prod_gen_antimattercells_macro",
-            "count": 1,
-            "type": "consumption",
-            "amount": -9600,
-            "bonusPercent": 0,
-            "volumeFlow": -57600,
-            "valueFlow": -643200
-          }
-        ]
-      },
-      {
-        "wareId": "silicon",
-        "transportType": "solid",
-        "unitVolume": 10,
-        "production": 0,
-        "consumption": 19200,
-        "netRate": -19200,
-        "productionVolume": 0,
-        "consumptionVolume": 192000,
-        "netVolume": -192000,
-        "totalOccupiedCount": 19200,
-        "totalOccupiedConsumptionCount": 19200,
-        "totalOccupiedVolume": 192000,
-        "unitPrice": 150,
-        "netValue": -2880000,
-        "contributions": [
+            "wareId": "superfluidcoolant",
+            "orderIndex": 6,
+            "tier": 2,
+            "transportType": "container",
+            "unitVolume": 16,
+            "production": 2123.25,
+            "consumption": 750,
+            "netRate": 1373.25,
+            "productionVolume": 33972,
+            "consumptionVolume": 12000,
+            "netVolume": 21972,
+            "totalOccupiedCount": 750,
+            "totalOccupiedConsumptionCount": 750,
+            "totalOccupiedVolume": 12000,
+            "unitPrice": 211,
+            "netValue": 289755.75,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_quantumtubes_macro",
+                "count": 5,
+                "type": "consumption",
+                "amount": -750,
+                "bonusPercent": 0,
+                "volumeFlow": -12000,
+                "valueFlow": -158250
+              },
+              {
+                "moduleId": "prod_gen_superfluidcoolant_macro",
+                "count": 1,
+                "type": "production",
+                "amount": 2123.25,
+                "bonusPercent": 49,
+                "volumeFlow": 33972,
+                "valueFlow": 448005.75
+              }
+            ]
+          },
           {
-            "moduleId": "prod_gen_siliconwafers_macro",
-            "count": 4,
-            "type": "consumption",
-            "amount": -19200,
-            "bonusPercent": 0,
-            "volumeFlow": -192000,
-            "valueFlow": -2880000
-          }
-        ]
-      },
-      {
-        "wareId": "methane",
-        "transportType": "liquid",
-        "unitVolume": 6,
-        "production": 0,
-        "consumption": 9600,
-        "netRate": -9600,
-        "productionVolume": 0,
-        "consumptionVolume": 57600,
-        "netVolume": -57600,
-        "totalOccupiedCount": 9600,
-        "totalOccupiedConsumptionCount": 9600,
-        "totalOccupiedVolume": 57600,
-        "unitPrice": 55,
-        "netValue": -528000,
-        "contributions": [
-          {
-            "moduleId": "prod_gen_graphene_macro",
-            "count": 2,
-            "type": "consumption",
-            "amount": -9600,
-            "bonusPercent": 0,
-            "volumeFlow": -57600,
-            "valueFlow": -528000
-          }
-        ]
-      },
-      {
-        "wareId": "helium",
-        "transportType": "liquid",
-        "unitVolume": 6,
-        "production": 0,
-        "consumption": 4800,
-        "netRate": -4800,
-        "productionVolume": 0,
-        "consumptionVolume": 28800,
-        "netVolume": -28800,
-        "totalOccupiedCount": 4800,
-        "totalOccupiedConsumptionCount": 4800,
-        "totalOccupiedVolume": 28800,
-        "unitPrice": 51,
-        "netValue": -244800,
-        "contributions": [
-          {
-            "moduleId": "prod_gen_superfluidcoolant_macro",
-            "count": 1,
-            "type": "consumption",
-            "amount": -4800,
-            "bonusPercent": 0,
-            "volumeFlow": -28800,
-            "valueFlow": -244800
+            "wareId": "energycells",
+            "orderIndex": 7,
+            "tier": 1,
+            "transportType": "container",
+            "unitVolume": 1,
+            "production": 30030,
+            "consumption": 20260,
+            "netRate": 9770,
+            "productionVolume": 30030,
+            "consumptionVolume": 20260,
+            "netVolume": 9770,
+            "totalOccupiedCount": 20260,
+            "totalOccupiedConsumptionCount": 20260,
+            "totalOccupiedVolume": 20260,
+            "unitPrice": 22,
+            "netValue": 214940,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_claytronics_macro",
+                "count": 6,
+                "type": "consumption",
+                "amount": -3360,
+                "bonusPercent": 0,
+                "volumeFlow": -3360,
+                "valueFlow": -73920
+              },
+              {
+                "moduleId": "prod_gen_microchips_macro",
+                "count": 8,
+                "type": "consumption",
+                "amount": -2400,
+                "bonusPercent": 0,
+                "volumeFlow": -2400,
+                "valueFlow": -52800
+              },
+              {
+                "moduleId": "prod_gen_quantumtubes_macro",
+                "count": 5,
+                "type": "consumption",
+                "amount": -1000,
+                "bonusPercent": 0,
+                "volumeFlow": -1000,
+                "valueFlow": -22000
+              },
+              {
+                "moduleId": "prod_gen_antimattercells_macro",
+                "count": 1,
+                "type": "consumption",
+                "amount": -3000,
+                "bonusPercent": 0,
+                "volumeFlow": -3000,
+                "valueFlow": -66000
+              },
+              {
+                "moduleId": "prod_gen_siliconwafers_macro",
+                "count": 4,
+                "type": "consumption",
+                "amount": -7200,
+                "bonusPercent": 0,
+                "volumeFlow": -7200,
+                "valueFlow": -158400
+              },
+              {
+                "moduleId": "prod_gen_graphene_macro",
+                "count": 2,
+                "type": "consumption",
+                "amount": -2400,
+                "bonusPercent": 0,
+                "volumeFlow": -2400,
+                "valueFlow": -52800
+              },
+              {
+                "moduleId": "prod_gen_superfluidcoolant_macro",
+                "count": 1,
+                "type": "consumption",
+                "amount": -900,
+                "bonusPercent": 0,
+                "volumeFlow": -900,
+                "valueFlow": -19800
+              },
+              {
+                "moduleId": "prod_gen_energycells_macro",
+                "count": 2,
+                "type": "production",
+                "amount": 30030,
+                "bonusPercent": 43,
+                "volumeFlow": 30030,
+                "valueFlow": 660660
+              }
+            ]
           }
         ]
       }
-    ],
+    },
     "stationWorkforce": {
       "needed": {
         "total": 13815,
@@ -777,11 +1740,11 @@
       },
       {
         "id": "prod_gen_microchips_macro",
-        "count": 8
+        "count": 9
       },
       {
         "id": "prod_gen_quantumtubes_macro",
-        "count": 5
+        "count": 6
       },
       {
         "id": "prod_gen_antimattercells_macro",
@@ -789,11 +1752,11 @@
       },
       {
         "id": "prod_gen_siliconwafers_macro",
-        "count": 4
+        "count": 6
       },
       {
         "id": "prod_gen_graphene_macro",
-        "count": 2
+        "count": 3
       },
       {
         "id": "prod_gen_superfluidcoolant_macro",
@@ -801,11 +1764,7 @@
       },
       {
         "id": "prod_gen_energycells_macro",
-        "count": 2
-      },
-      {
-        "id": "landmarks_tel_tradestation_01_ring_inside_01_macro",
-        "count": 14
+        "count": 3
       }
     ],
     "industryModulesWithWorker": [
@@ -870,10 +1829,6 @@
       {
         "id": "prod_gen_energycells_macro",
         "count": 2
-      },
-      {
-        "id": "landmarks_tel_tradestation_01_ring_inside_01_macro",
-        "count": 2
       }
     ],
     "supplyModulesWithWorker": [
@@ -906,449 +1861,1420 @@
         "count": 2
       }
     ],
-    "wareFlows": [
-      {
-        "wareId": "claytronics",
-        "transportType": "container",
-        "unitVolume": 24,
-        "production": 3473.28,
-        "consumption": 0,
-        "netRate": 3473.28,
-        "productionVolume": 83358.72,
-        "consumptionVolume": 0,
-        "netVolume": 83358.72,
-        "totalOccupiedCount": 0,
-        "totalOccupiedConsumptionCount": 0,
-        "totalOccupiedVolume": 0,
-        "unitPrice": 2346,
-        "netValue": 8148314.880000001,
-        "contributions": [
+    "groupedFlows": {
+      "flows": [
+        {
+          "wareId": "claytronics",
+          "orderIndex": 0,
+          "tier": 4,
+          "transportType": "container",
+          "unitVolume": 24,
+          "production": 3473.28,
+          "consumption": 0,
+          "netRate": 3473.28,
+          "productionVolume": 83358.72,
+          "consumptionVolume": 0,
+          "netVolume": 83358.72,
+          "totalOccupiedCount": 0,
+          "totalOccupiedConsumptionCount": 0,
+          "totalOccupiedVolume": 0,
+          "unitPrice": 2346,
+          "netValue": 8148314.880000001,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_claytronics_macro",
+              "count": 6,
+              "type": "production",
+              "amount": 3473.28,
+              "bonusPercent": 34,
+              "volumeFlow": 83358.72,
+              "valueFlow": 8148314.880000001
+            }
+          ]
+        },
+        {
+          "wareId": "microchips",
+          "orderIndex": 1,
+          "tier": 3,
+          "transportType": "container",
+          "unitVolume": 22,
+          "production": 4700.16,
+          "consumption": 3840,
+          "netRate": 860.1599999999999,
+          "productionVolume": 103403.51999999999,
+          "consumptionVolume": 84480,
+          "netVolume": 18923.51999999999,
+          "totalOccupiedCount": 3840,
+          "totalOccupiedConsumptionCount": 3840,
+          "totalOccupiedVolume": 84480,
+          "unitPrice": 1090,
+          "netValue": 937574.3999999998,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_claytronics_macro",
+              "count": 6,
+              "type": "consumption",
+              "amount": -3840,
+              "bonusPercent": 0,
+              "volumeFlow": -84480,
+              "valueFlow": -4185600
+            },
+            {
+              "moduleId": "prod_gen_microchips_macro",
+              "count": 8,
+              "type": "production",
+              "amount": 4700.16,
+              "bonusPercent": 36,
+              "volumeFlow": 103403.51999999999,
+              "valueFlow": 5123174.399999999
+            }
+          ]
+        },
+        {
+          "wareId": "quantumtubes",
+          "orderIndex": 2,
+          "tier": 3,
+          "transportType": "container",
+          "unitVolume": 22,
+          "production": 3595.5,
+          "consumption": 2400,
+          "netRate": 1195.5,
+          "productionVolume": 79101,
+          "consumptionVolume": 52800,
+          "netVolume": 26301,
+          "totalOccupiedCount": 2400,
+          "totalOccupiedConsumptionCount": 2400,
+          "totalOccupiedVolume": 52800,
+          "unitPrice": 375,
+          "netValue": 448312.5,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_claytronics_macro",
+              "count": 6,
+              "type": "consumption",
+              "amount": -2400,
+              "bonusPercent": 0,
+              "volumeFlow": -52800,
+              "valueFlow": -900000
+            },
+            {
+              "moduleId": "prod_gen_quantumtubes_macro",
+              "count": 5,
+              "type": "production",
+              "amount": 3595.5,
+              "bonusPercent": 53,
+              "volumeFlow": 79101,
+              "valueFlow": 1348312.5
+            }
+          ]
+        },
+        {
+          "wareId": "antimattercells",
+          "orderIndex": 3,
+          "tier": 2,
+          "transportType": "container",
+          "unitVolume": 18,
+          "production": 4009.5000000000005,
+          "consumption": 2400,
+          "netRate": 1609.5000000000005,
+          "productionVolume": 72171.00000000001,
+          "consumptionVolume": 43200,
+          "netVolume": 28971.000000000015,
+          "totalOccupiedCount": 2400,
+          "totalOccupiedConsumptionCount": 2400,
+          "totalOccupiedVolume": 43200,
+          "unitPrice": 282,
+          "netValue": 453879.0000000001,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_claytronics_macro",
+              "count": 6,
+              "type": "consumption",
+              "amount": -2400,
+              "bonusPercent": 0,
+              "volumeFlow": -43200,
+              "valueFlow": -676800
+            },
+            {
+              "moduleId": "prod_gen_antimattercells_macro",
+              "count": 1,
+              "type": "production",
+              "amount": 4009.5000000000005,
+              "bonusPercent": 35,
+              "volumeFlow": 72171.00000000001,
+              "valueFlow": 1130679.0000000002
+            }
+          ]
+        },
+        {
+          "wareId": "siliconwafers",
+          "orderIndex": 4,
+          "tier": 2,
+          "transportType": "container",
+          "unitVolume": 18,
+          "production": 11727.2,
+          "consumption": 9600,
+          "netRate": 2127.2000000000007,
+          "productionVolume": 211089.6,
+          "consumptionVolume": 172800,
+          "netVolume": 38289.600000000006,
+          "totalOccupiedCount": 9600,
+          "totalOccupiedConsumptionCount": 9600,
+          "totalOccupiedVolume": 172800,
+          "unitPrice": 419,
+          "netValue": 891296.8000000003,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_microchips_macro",
+              "count": 8,
+              "type": "consumption",
+              "amount": -9600,
+              "bonusPercent": 0,
+              "volumeFlow": -172800,
+              "valueFlow": -4022400
+            },
+            {
+              "moduleId": "prod_gen_siliconwafers_macro",
+              "count": 4,
+              "type": "production",
+              "amount": 11727.2,
+              "bonusPercent": 37,
+              "volumeFlow": 211089.6,
+              "valueFlow": 4913696.800000001
+            }
+          ]
+        },
+        {
+          "wareId": "graphene",
+          "orderIndex": 5,
+          "tier": 2,
+          "transportType": "container",
+          "unitVolume": 20,
+          "production": 4204.8,
+          "consumption": 2900,
+          "netRate": 1304.8000000000002,
+          "productionVolume": 84096,
+          "consumptionVolume": 58000,
+          "netVolume": 26096,
+          "totalOccupiedCount": 2900,
+          "totalOccupiedConsumptionCount": 2900,
+          "totalOccupiedVolume": 58000,
+          "unitPrice": 233,
+          "netValue": 304018.4,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_quantumtubes_macro",
+              "count": 5,
+              "type": "consumption",
+              "amount": -2900,
+              "bonusPercent": 0,
+              "volumeFlow": -58000,
+              "valueFlow": -675700
+            },
+            {
+              "moduleId": "prod_gen_graphene_macro",
+              "count": 2,
+              "type": "production",
+              "amount": 4204.8,
+              "bonusPercent": 46,
+              "volumeFlow": 84096,
+              "valueFlow": 979718.4
+            }
+          ]
+        },
+        {
+          "wareId": "superfluidcoolant",
+          "orderIndex": 6,
+          "tier": 2,
+          "transportType": "container",
+          "unitVolume": 16,
+          "production": 2123.25,
+          "consumption": 750,
+          "netRate": 1373.25,
+          "productionVolume": 33972,
+          "consumptionVolume": 12000,
+          "netVolume": 21972,
+          "totalOccupiedCount": 750,
+          "totalOccupiedConsumptionCount": 750,
+          "totalOccupiedVolume": 12000,
+          "unitPrice": 211,
+          "netValue": 289755.75,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_quantumtubes_macro",
+              "count": 5,
+              "type": "consumption",
+              "amount": -750,
+              "bonusPercent": 0,
+              "volumeFlow": -12000,
+              "valueFlow": -158250
+            },
+            {
+              "moduleId": "prod_gen_superfluidcoolant_macro",
+              "count": 1,
+              "type": "production",
+              "amount": 2123.25,
+              "bonusPercent": 49,
+              "volumeFlow": 33972,
+              "valueFlow": 448005.75
+            }
+          ]
+        },
+        {
+          "wareId": "energycells",
+          "orderIndex": 7,
+          "tier": 1,
+          "transportType": "container",
+          "unitVolume": 1,
+          "production": 30030,
+          "consumption": 20260,
+          "netRate": 9770,
+          "productionVolume": 30030,
+          "consumptionVolume": 20260,
+          "netVolume": 9770,
+          "totalOccupiedCount": 20260,
+          "totalOccupiedConsumptionCount": 20260,
+          "totalOccupiedVolume": 20260,
+          "unitPrice": 22,
+          "netValue": 214940,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_claytronics_macro",
+              "count": 6,
+              "type": "consumption",
+              "amount": -3360,
+              "bonusPercent": 0,
+              "volumeFlow": -3360,
+              "valueFlow": -73920
+            },
+            {
+              "moduleId": "prod_gen_microchips_macro",
+              "count": 8,
+              "type": "consumption",
+              "amount": -2400,
+              "bonusPercent": 0,
+              "volumeFlow": -2400,
+              "valueFlow": -52800
+            },
+            {
+              "moduleId": "prod_gen_quantumtubes_macro",
+              "count": 5,
+              "type": "consumption",
+              "amount": -1000,
+              "bonusPercent": 0,
+              "volumeFlow": -1000,
+              "valueFlow": -22000
+            },
+            {
+              "moduleId": "prod_gen_antimattercells_macro",
+              "count": 1,
+              "type": "consumption",
+              "amount": -3000,
+              "bonusPercent": 0,
+              "volumeFlow": -3000,
+              "valueFlow": -66000
+            },
+            {
+              "moduleId": "prod_gen_siliconwafers_macro",
+              "count": 4,
+              "type": "consumption",
+              "amount": -7200,
+              "bonusPercent": 0,
+              "volumeFlow": -7200,
+              "valueFlow": -158400
+            },
+            {
+              "moduleId": "prod_gen_graphene_macro",
+              "count": 2,
+              "type": "consumption",
+              "amount": -2400,
+              "bonusPercent": 0,
+              "volumeFlow": -2400,
+              "valueFlow": -52800
+            },
+            {
+              "moduleId": "prod_gen_superfluidcoolant_macro",
+              "count": 1,
+              "type": "consumption",
+              "amount": -900,
+              "bonusPercent": 0,
+              "volumeFlow": -900,
+              "valueFlow": -19800
+            },
+            {
+              "moduleId": "prod_gen_energycells_macro",
+              "count": 2,
+              "type": "production",
+              "amount": 30030,
+              "bonusPercent": 43,
+              "volumeFlow": 30030,
+              "valueFlow": 660660
+            }
+          ]
+        },
+        {
+          "wareId": "silicon",
+          "orderIndex": 9007199254740991,
+          "tier": 0,
+          "transportType": "solid",
+          "unitVolume": 10,
+          "production": 0,
+          "consumption": 19200,
+          "netRate": -19200,
+          "productionVolume": 0,
+          "consumptionVolume": 192000,
+          "netVolume": -192000,
+          "totalOccupiedCount": 19200,
+          "totalOccupiedConsumptionCount": 19200,
+          "totalOccupiedVolume": 192000,
+          "unitPrice": 150,
+          "netValue": -2880000,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_siliconwafers_macro",
+              "count": 4,
+              "type": "consumption",
+              "amount": -19200,
+              "bonusPercent": 0,
+              "volumeFlow": -192000,
+              "valueFlow": -2880000
+            }
+          ]
+        },
+        {
+          "wareId": "hydrogen",
+          "orderIndex": 9007199254740991,
+          "tier": 0,
+          "transportType": "liquid",
+          "unitVolume": 6,
+          "production": 0,
+          "consumption": 9600,
+          "netRate": -9600,
+          "productionVolume": 0,
+          "consumptionVolume": 57600,
+          "netVolume": -57600,
+          "totalOccupiedCount": 9600,
+          "totalOccupiedConsumptionCount": 9600,
+          "totalOccupiedVolume": 57600,
+          "unitPrice": 67,
+          "netValue": -643200,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_antimattercells_macro",
+              "count": 1,
+              "type": "consumption",
+              "amount": -9600,
+              "bonusPercent": 0,
+              "volumeFlow": -57600,
+              "valueFlow": -643200
+            }
+          ]
+        },
+        {
+          "wareId": "methane",
+          "orderIndex": 9007199254740991,
+          "tier": 0,
+          "transportType": "liquid",
+          "unitVolume": 6,
+          "production": 0,
+          "consumption": 9600,
+          "netRate": -9600,
+          "productionVolume": 0,
+          "consumptionVolume": 57600,
+          "netVolume": -57600,
+          "totalOccupiedCount": 9600,
+          "totalOccupiedConsumptionCount": 9600,
+          "totalOccupiedVolume": 57600,
+          "unitPrice": 55,
+          "netValue": -528000,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_graphene_macro",
+              "count": 2,
+              "type": "consumption",
+              "amount": -9600,
+              "bonusPercent": 0,
+              "volumeFlow": -57600,
+              "valueFlow": -528000
+            }
+          ]
+        },
+        {
+          "wareId": "helium",
+          "orderIndex": 9007199254740991,
+          "tier": 0,
+          "transportType": "liquid",
+          "unitVolume": 6,
+          "production": 0,
+          "consumption": 4800,
+          "netRate": -4800,
+          "productionVolume": 0,
+          "consumptionVolume": 28800,
+          "netVolume": -28800,
+          "totalOccupiedCount": 4800,
+          "totalOccupiedConsumptionCount": 4800,
+          "totalOccupiedVolume": 28800,
+          "unitPrice": 51,
+          "netValue": -244800,
+          "contributions": [
+            {
+              "moduleId": "prod_gen_superfluidcoolant_macro",
+              "count": 1,
+              "type": "consumption",
+              "amount": -4800,
+              "bonusPercent": 0,
+              "volumeFlow": -28800,
+              "valueFlow": -244800
+            }
+          ]
+        }
+      ],
+      "rateGroups": {
+        "positive": [
           {
-            "moduleId": "prod_gen_claytronics_macro",
-            "count": 6,
-            "type": "production",
-            "amount": 3473.28,
-            "bonusPercent": 34,
-            "volumeFlow": 83358.72,
-            "valueFlow": 8148314.880000001
+            "wareId": "claytronics",
+            "orderIndex": 0,
+            "tier": 4,
+            "transportType": "container",
+            "unitVolume": 24,
+            "production": 3473.28,
+            "consumption": 0,
+            "netRate": 3473.28,
+            "productionVolume": 83358.72,
+            "consumptionVolume": 0,
+            "netVolume": 83358.72,
+            "totalOccupiedCount": 0,
+            "totalOccupiedConsumptionCount": 0,
+            "totalOccupiedVolume": 0,
+            "unitPrice": 2346,
+            "netValue": 8148314.880000001,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_claytronics_macro",
+                "count": 6,
+                "type": "production",
+                "amount": 3473.28,
+                "bonusPercent": 34,
+                "volumeFlow": 83358.72,
+                "valueFlow": 8148314.880000001
+              }
+            ]
+          },
+          {
+            "wareId": "microchips",
+            "orderIndex": 1,
+            "tier": 3,
+            "transportType": "container",
+            "unitVolume": 22,
+            "production": 4700.16,
+            "consumption": 3840,
+            "netRate": 860.1599999999999,
+            "productionVolume": 103403.51999999999,
+            "consumptionVolume": 84480,
+            "netVolume": 18923.51999999999,
+            "totalOccupiedCount": 3840,
+            "totalOccupiedConsumptionCount": 3840,
+            "totalOccupiedVolume": 84480,
+            "unitPrice": 1090,
+            "netValue": 937574.3999999998,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_claytronics_macro",
+                "count": 6,
+                "type": "consumption",
+                "amount": -3840,
+                "bonusPercent": 0,
+                "volumeFlow": -84480,
+                "valueFlow": -4185600
+              },
+              {
+                "moduleId": "prod_gen_microchips_macro",
+                "count": 8,
+                "type": "production",
+                "amount": 4700.16,
+                "bonusPercent": 36,
+                "volumeFlow": 103403.51999999999,
+                "valueFlow": 5123174.399999999
+              }
+            ]
+          },
+          {
+            "wareId": "quantumtubes",
+            "orderIndex": 2,
+            "tier": 3,
+            "transportType": "container",
+            "unitVolume": 22,
+            "production": 3595.5,
+            "consumption": 2400,
+            "netRate": 1195.5,
+            "productionVolume": 79101,
+            "consumptionVolume": 52800,
+            "netVolume": 26301,
+            "totalOccupiedCount": 2400,
+            "totalOccupiedConsumptionCount": 2400,
+            "totalOccupiedVolume": 52800,
+            "unitPrice": 375,
+            "netValue": 448312.5,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_claytronics_macro",
+                "count": 6,
+                "type": "consumption",
+                "amount": -2400,
+                "bonusPercent": 0,
+                "volumeFlow": -52800,
+                "valueFlow": -900000
+              },
+              {
+                "moduleId": "prod_gen_quantumtubes_macro",
+                "count": 5,
+                "type": "production",
+                "amount": 3595.5,
+                "bonusPercent": 53,
+                "volumeFlow": 79101,
+                "valueFlow": 1348312.5
+              }
+            ]
+          },
+          {
+            "wareId": "antimattercells",
+            "orderIndex": 3,
+            "tier": 2,
+            "transportType": "container",
+            "unitVolume": 18,
+            "production": 4009.5000000000005,
+            "consumption": 2400,
+            "netRate": 1609.5000000000005,
+            "productionVolume": 72171.00000000001,
+            "consumptionVolume": 43200,
+            "netVolume": 28971.000000000015,
+            "totalOccupiedCount": 2400,
+            "totalOccupiedConsumptionCount": 2400,
+            "totalOccupiedVolume": 43200,
+            "unitPrice": 282,
+            "netValue": 453879.0000000001,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_claytronics_macro",
+                "count": 6,
+                "type": "consumption",
+                "amount": -2400,
+                "bonusPercent": 0,
+                "volumeFlow": -43200,
+                "valueFlow": -676800
+              },
+              {
+                "moduleId": "prod_gen_antimattercells_macro",
+                "count": 1,
+                "type": "production",
+                "amount": 4009.5000000000005,
+                "bonusPercent": 35,
+                "volumeFlow": 72171.00000000001,
+                "valueFlow": 1130679.0000000002
+              }
+            ]
+          },
+          {
+            "wareId": "siliconwafers",
+            "orderIndex": 4,
+            "tier": 2,
+            "transportType": "container",
+            "unitVolume": 18,
+            "production": 11727.2,
+            "consumption": 9600,
+            "netRate": 2127.2000000000007,
+            "productionVolume": 211089.6,
+            "consumptionVolume": 172800,
+            "netVolume": 38289.600000000006,
+            "totalOccupiedCount": 9600,
+            "totalOccupiedConsumptionCount": 9600,
+            "totalOccupiedVolume": 172800,
+            "unitPrice": 419,
+            "netValue": 891296.8000000003,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_microchips_macro",
+                "count": 8,
+                "type": "consumption",
+                "amount": -9600,
+                "bonusPercent": 0,
+                "volumeFlow": -172800,
+                "valueFlow": -4022400
+              },
+              {
+                "moduleId": "prod_gen_siliconwafers_macro",
+                "count": 4,
+                "type": "production",
+                "amount": 11727.2,
+                "bonusPercent": 37,
+                "volumeFlow": 211089.6,
+                "valueFlow": 4913696.800000001
+              }
+            ]
+          },
+          {
+            "wareId": "graphene",
+            "orderIndex": 5,
+            "tier": 2,
+            "transportType": "container",
+            "unitVolume": 20,
+            "production": 4204.8,
+            "consumption": 2900,
+            "netRate": 1304.8000000000002,
+            "productionVolume": 84096,
+            "consumptionVolume": 58000,
+            "netVolume": 26096,
+            "totalOccupiedCount": 2900,
+            "totalOccupiedConsumptionCount": 2900,
+            "totalOccupiedVolume": 58000,
+            "unitPrice": 233,
+            "netValue": 304018.4,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_quantumtubes_macro",
+                "count": 5,
+                "type": "consumption",
+                "amount": -2900,
+                "bonusPercent": 0,
+                "volumeFlow": -58000,
+                "valueFlow": -675700
+              },
+              {
+                "moduleId": "prod_gen_graphene_macro",
+                "count": 2,
+                "type": "production",
+                "amount": 4204.8,
+                "bonusPercent": 46,
+                "volumeFlow": 84096,
+                "valueFlow": 979718.4
+              }
+            ]
+          },
+          {
+            "wareId": "superfluidcoolant",
+            "orderIndex": 6,
+            "tier": 2,
+            "transportType": "container",
+            "unitVolume": 16,
+            "production": 2123.25,
+            "consumption": 750,
+            "netRate": 1373.25,
+            "productionVolume": 33972,
+            "consumptionVolume": 12000,
+            "netVolume": 21972,
+            "totalOccupiedCount": 750,
+            "totalOccupiedConsumptionCount": 750,
+            "totalOccupiedVolume": 12000,
+            "unitPrice": 211,
+            "netValue": 289755.75,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_quantumtubes_macro",
+                "count": 5,
+                "type": "consumption",
+                "amount": -750,
+                "bonusPercent": 0,
+                "volumeFlow": -12000,
+                "valueFlow": -158250
+              },
+              {
+                "moduleId": "prod_gen_superfluidcoolant_macro",
+                "count": 1,
+                "type": "production",
+                "amount": 2123.25,
+                "bonusPercent": 49,
+                "volumeFlow": 33972,
+                "valueFlow": 448005.75
+              }
+            ]
+          },
+          {
+            "wareId": "energycells",
+            "orderIndex": 7,
+            "tier": 1,
+            "transportType": "container",
+            "unitVolume": 1,
+            "production": 30030,
+            "consumption": 20260,
+            "netRate": 9770,
+            "productionVolume": 30030,
+            "consumptionVolume": 20260,
+            "netVolume": 9770,
+            "totalOccupiedCount": 20260,
+            "totalOccupiedConsumptionCount": 20260,
+            "totalOccupiedVolume": 20260,
+            "unitPrice": 22,
+            "netValue": 214940,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_claytronics_macro",
+                "count": 6,
+                "type": "consumption",
+                "amount": -3360,
+                "bonusPercent": 0,
+                "volumeFlow": -3360,
+                "valueFlow": -73920
+              },
+              {
+                "moduleId": "prod_gen_microchips_macro",
+                "count": 8,
+                "type": "consumption",
+                "amount": -2400,
+                "bonusPercent": 0,
+                "volumeFlow": -2400,
+                "valueFlow": -52800
+              },
+              {
+                "moduleId": "prod_gen_quantumtubes_macro",
+                "count": 5,
+                "type": "consumption",
+                "amount": -1000,
+                "bonusPercent": 0,
+                "volumeFlow": -1000,
+                "valueFlow": -22000
+              },
+              {
+                "moduleId": "prod_gen_antimattercells_macro",
+                "count": 1,
+                "type": "consumption",
+                "amount": -3000,
+                "bonusPercent": 0,
+                "volumeFlow": -3000,
+                "valueFlow": -66000
+              },
+              {
+                "moduleId": "prod_gen_siliconwafers_macro",
+                "count": 4,
+                "type": "consumption",
+                "amount": -7200,
+                "bonusPercent": 0,
+                "volumeFlow": -7200,
+                "valueFlow": -158400
+              },
+              {
+                "moduleId": "prod_gen_graphene_macro",
+                "count": 2,
+                "type": "consumption",
+                "amount": -2400,
+                "bonusPercent": 0,
+                "volumeFlow": -2400,
+                "valueFlow": -52800
+              },
+              {
+                "moduleId": "prod_gen_superfluidcoolant_macro",
+                "count": 1,
+                "type": "consumption",
+                "amount": -900,
+                "bonusPercent": 0,
+                "volumeFlow": -900,
+                "valueFlow": -19800
+              },
+              {
+                "moduleId": "prod_gen_energycells_macro",
+                "count": 2,
+                "type": "production",
+                "amount": 30030,
+                "bonusPercent": 43,
+                "volumeFlow": 30030,
+                "valueFlow": 660660
+              }
+            ]
+          }
+        ],
+        "operations": [],
+        "resources": [
+          {
+            "wareId": "silicon",
+            "orderIndex": 9007199254740991,
+            "tier": 0,
+            "transportType": "solid",
+            "unitVolume": 10,
+            "production": 0,
+            "consumption": 19200,
+            "netRate": -19200,
+            "productionVolume": 0,
+            "consumptionVolume": 192000,
+            "netVolume": -192000,
+            "totalOccupiedCount": 19200,
+            "totalOccupiedConsumptionCount": 19200,
+            "totalOccupiedVolume": 192000,
+            "unitPrice": 150,
+            "netValue": -2880000,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_siliconwafers_macro",
+                "count": 4,
+                "type": "consumption",
+                "amount": -19200,
+                "bonusPercent": 0,
+                "volumeFlow": -192000,
+                "valueFlow": -2880000
+              }
+            ]
+          },
+          {
+            "wareId": "hydrogen",
+            "orderIndex": 9007199254740991,
+            "tier": 0,
+            "transportType": "liquid",
+            "unitVolume": 6,
+            "production": 0,
+            "consumption": 9600,
+            "netRate": -9600,
+            "productionVolume": 0,
+            "consumptionVolume": 57600,
+            "netVolume": -57600,
+            "totalOccupiedCount": 9600,
+            "totalOccupiedConsumptionCount": 9600,
+            "totalOccupiedVolume": 57600,
+            "unitPrice": 67,
+            "netValue": -643200,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_antimattercells_macro",
+                "count": 1,
+                "type": "consumption",
+                "amount": -9600,
+                "bonusPercent": 0,
+                "volumeFlow": -57600,
+                "valueFlow": -643200
+              }
+            ]
+          },
+          {
+            "wareId": "methane",
+            "orderIndex": 9007199254740991,
+            "tier": 0,
+            "transportType": "liquid",
+            "unitVolume": 6,
+            "production": 0,
+            "consumption": 9600,
+            "netRate": -9600,
+            "productionVolume": 0,
+            "consumptionVolume": 57600,
+            "netVolume": -57600,
+            "totalOccupiedCount": 9600,
+            "totalOccupiedConsumptionCount": 9600,
+            "totalOccupiedVolume": 57600,
+            "unitPrice": 55,
+            "netValue": -528000,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_graphene_macro",
+                "count": 2,
+                "type": "consumption",
+                "amount": -9600,
+                "bonusPercent": 0,
+                "volumeFlow": -57600,
+                "valueFlow": -528000
+              }
+            ]
+          },
+          {
+            "wareId": "helium",
+            "orderIndex": 9007199254740991,
+            "tier": 0,
+            "transportType": "liquid",
+            "unitVolume": 6,
+            "production": 0,
+            "consumption": 4800,
+            "netRate": -4800,
+            "productionVolume": 0,
+            "consumptionVolume": 28800,
+            "netVolume": -28800,
+            "totalOccupiedCount": 4800,
+            "totalOccupiedConsumptionCount": 4800,
+            "totalOccupiedVolume": 28800,
+            "unitPrice": 51,
+            "netValue": -244800,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_superfluidcoolant_macro",
+                "count": 1,
+                "type": "consumption",
+                "amount": -4800,
+                "bonusPercent": 0,
+                "volumeFlow": -28800,
+                "valueFlow": -244800
+              }
+            ]
           }
         ]
       },
-      {
-        "wareId": "antimattercells",
-        "transportType": "container",
-        "unitVolume": 18,
-        "production": 4009.5000000000005,
-        "consumption": 2400,
-        "netRate": 1609.5000000000005,
-        "productionVolume": 72171.00000000001,
-        "consumptionVolume": 43200,
-        "netVolume": 28971.000000000015,
-        "totalOccupiedCount": 2400,
-        "totalOccupiedConsumptionCount": 2400,
-        "totalOccupiedVolume": 43200,
-        "unitPrice": 282,
-        "netValue": 453879.0000000001,
-        "contributions": [
+      "volumeGroups": {
+        "solid": [
           {
-            "moduleId": "prod_gen_claytronics_macro",
-            "count": 6,
-            "type": "consumption",
-            "amount": -2400,
-            "bonusPercent": 0,
-            "volumeFlow": -43200,
-            "valueFlow": -676800
-          },
-          {
-            "moduleId": "prod_gen_antimattercells_macro",
-            "count": 1,
-            "type": "production",
-            "amount": 4009.5000000000005,
-            "bonusPercent": 35,
-            "volumeFlow": 72171.00000000001,
-            "valueFlow": 1130679.0000000002
+            "wareId": "silicon",
+            "orderIndex": 9007199254740991,
+            "tier": 0,
+            "transportType": "solid",
+            "unitVolume": 10,
+            "production": 0,
+            "consumption": 19200,
+            "netRate": -19200,
+            "productionVolume": 0,
+            "consumptionVolume": 192000,
+            "netVolume": -192000,
+            "totalOccupiedCount": 19200,
+            "totalOccupiedConsumptionCount": 19200,
+            "totalOccupiedVolume": 192000,
+            "unitPrice": 150,
+            "netValue": -2880000,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_siliconwafers_macro",
+                "count": 4,
+                "type": "consumption",
+                "amount": -19200,
+                "bonusPercent": 0,
+                "volumeFlow": -192000,
+                "valueFlow": -2880000
+              }
+            ]
           }
-        ]
-      },
-      {
-        "wareId": "energycells",
-        "transportType": "container",
-        "unitVolume": 1,
-        "production": 30030,
-        "consumption": 20260,
-        "netRate": 9770,
-        "productionVolume": 30030,
-        "consumptionVolume": 20260,
-        "netVolume": 9770,
-        "totalOccupiedCount": 20260,
-        "totalOccupiedConsumptionCount": 20260,
-        "totalOccupiedVolume": 20260,
-        "unitPrice": 22,
-        "netValue": 214940,
-        "contributions": [
+        ],
+        "liquid": [
           {
-            "moduleId": "prod_gen_claytronics_macro",
-            "count": 6,
-            "type": "consumption",
-            "amount": -3360,
-            "bonusPercent": 0,
-            "volumeFlow": -3360,
-            "valueFlow": -73920
+            "wareId": "hydrogen",
+            "orderIndex": 9007199254740991,
+            "tier": 0,
+            "transportType": "liquid",
+            "unitVolume": 6,
+            "production": 0,
+            "consumption": 9600,
+            "netRate": -9600,
+            "productionVolume": 0,
+            "consumptionVolume": 57600,
+            "netVolume": -57600,
+            "totalOccupiedCount": 9600,
+            "totalOccupiedConsumptionCount": 9600,
+            "totalOccupiedVolume": 57600,
+            "unitPrice": 67,
+            "netValue": -643200,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_antimattercells_macro",
+                "count": 1,
+                "type": "consumption",
+                "amount": -9600,
+                "bonusPercent": 0,
+                "volumeFlow": -57600,
+                "valueFlow": -643200
+              }
+            ]
           },
           {
-            "moduleId": "prod_gen_microchips_macro",
-            "count": 8,
-            "type": "consumption",
-            "amount": -2400,
-            "bonusPercent": 0,
-            "volumeFlow": -2400,
-            "valueFlow": -52800
+            "wareId": "methane",
+            "orderIndex": 9007199254740991,
+            "tier": 0,
+            "transportType": "liquid",
+            "unitVolume": 6,
+            "production": 0,
+            "consumption": 9600,
+            "netRate": -9600,
+            "productionVolume": 0,
+            "consumptionVolume": 57600,
+            "netVolume": -57600,
+            "totalOccupiedCount": 9600,
+            "totalOccupiedConsumptionCount": 9600,
+            "totalOccupiedVolume": 57600,
+            "unitPrice": 55,
+            "netValue": -528000,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_graphene_macro",
+                "count": 2,
+                "type": "consumption",
+                "amount": -9600,
+                "bonusPercent": 0,
+                "volumeFlow": -57600,
+                "valueFlow": -528000
+              }
+            ]
           },
           {
-            "moduleId": "prod_gen_quantumtubes_macro",
-            "count": 5,
-            "type": "consumption",
-            "amount": -1000,
-            "bonusPercent": 0,
-            "volumeFlow": -1000,
-            "valueFlow": -22000
-          },
-          {
-            "moduleId": "prod_gen_antimattercells_macro",
-            "count": 1,
-            "type": "consumption",
-            "amount": -3000,
-            "bonusPercent": 0,
-            "volumeFlow": -3000,
-            "valueFlow": -66000
-          },
-          {
-            "moduleId": "prod_gen_siliconwafers_macro",
-            "count": 4,
-            "type": "consumption",
-            "amount": -7200,
-            "bonusPercent": 0,
-            "volumeFlow": -7200,
-            "valueFlow": -158400
-          },
-          {
-            "moduleId": "prod_gen_graphene_macro",
-            "count": 2,
-            "type": "consumption",
-            "amount": -2400,
-            "bonusPercent": 0,
-            "volumeFlow": -2400,
-            "valueFlow": -52800
-          },
-          {
-            "moduleId": "prod_gen_superfluidcoolant_macro",
-            "count": 1,
-            "type": "consumption",
-            "amount": -900,
-            "bonusPercent": 0,
-            "volumeFlow": -900,
-            "valueFlow": -19800
-          },
-          {
-            "moduleId": "prod_gen_energycells_macro",
-            "count": 2,
-            "type": "production",
-            "amount": 30030,
-            "bonusPercent": 43,
-            "volumeFlow": 30030,
-            "valueFlow": 660660
+            "wareId": "helium",
+            "orderIndex": 9007199254740991,
+            "tier": 0,
+            "transportType": "liquid",
+            "unitVolume": 6,
+            "production": 0,
+            "consumption": 4800,
+            "netRate": -4800,
+            "productionVolume": 0,
+            "consumptionVolume": 28800,
+            "netVolume": -28800,
+            "totalOccupiedCount": 4800,
+            "totalOccupiedConsumptionCount": 4800,
+            "totalOccupiedVolume": 28800,
+            "unitPrice": 51,
+            "netValue": -244800,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_superfluidcoolant_macro",
+                "count": 1,
+                "type": "consumption",
+                "amount": -4800,
+                "bonusPercent": 0,
+                "volumeFlow": -28800,
+                "valueFlow": -244800
+              }
+            ]
           }
-        ]
-      },
-      {
-        "wareId": "microchips",
-        "transportType": "container",
-        "unitVolume": 22,
-        "production": 4700.16,
-        "consumption": 3840,
-        "netRate": 860.1599999999999,
-        "productionVolume": 103403.51999999999,
-        "consumptionVolume": 84480,
-        "netVolume": 18923.51999999999,
-        "totalOccupiedCount": 3840,
-        "totalOccupiedConsumptionCount": 3840,
-        "totalOccupiedVolume": 84480,
-        "unitPrice": 1090,
-        "netValue": 937574.3999999998,
-        "contributions": [
+        ],
+        "container": [
           {
-            "moduleId": "prod_gen_claytronics_macro",
-            "count": 6,
-            "type": "consumption",
-            "amount": -3840,
-            "bonusPercent": 0,
-            "volumeFlow": -84480,
-            "valueFlow": -4185600
+            "wareId": "claytronics",
+            "orderIndex": 0,
+            "tier": 4,
+            "transportType": "container",
+            "unitVolume": 24,
+            "production": 3473.28,
+            "consumption": 0,
+            "netRate": 3473.28,
+            "productionVolume": 83358.72,
+            "consumptionVolume": 0,
+            "netVolume": 83358.72,
+            "totalOccupiedCount": 0,
+            "totalOccupiedConsumptionCount": 0,
+            "totalOccupiedVolume": 0,
+            "unitPrice": 2346,
+            "netValue": 8148314.880000001,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_claytronics_macro",
+                "count": 6,
+                "type": "production",
+                "amount": 3473.28,
+                "bonusPercent": 34,
+                "volumeFlow": 83358.72,
+                "valueFlow": 8148314.880000001
+              }
+            ]
           },
           {
-            "moduleId": "prod_gen_microchips_macro",
-            "count": 8,
-            "type": "production",
-            "amount": 4700.16,
-            "bonusPercent": 36,
-            "volumeFlow": 103403.51999999999,
-            "valueFlow": 5123174.399999999
-          }
-        ]
-      },
-      {
-        "wareId": "quantumtubes",
-        "transportType": "container",
-        "unitVolume": 22,
-        "production": 3595.5,
-        "consumption": 2400,
-        "netRate": 1195.5,
-        "productionVolume": 79101,
-        "consumptionVolume": 52800,
-        "netVolume": 26301,
-        "totalOccupiedCount": 2400,
-        "totalOccupiedConsumptionCount": 2400,
-        "totalOccupiedVolume": 52800,
-        "unitPrice": 375,
-        "netValue": 448312.5,
-        "contributions": [
-          {
-            "moduleId": "prod_gen_claytronics_macro",
-            "count": 6,
-            "type": "consumption",
-            "amount": -2400,
-            "bonusPercent": 0,
-            "volumeFlow": -52800,
-            "valueFlow": -900000
+            "wareId": "microchips",
+            "orderIndex": 1,
+            "tier": 3,
+            "transportType": "container",
+            "unitVolume": 22,
+            "production": 4700.16,
+            "consumption": 3840,
+            "netRate": 860.1599999999999,
+            "productionVolume": 103403.51999999999,
+            "consumptionVolume": 84480,
+            "netVolume": 18923.51999999999,
+            "totalOccupiedCount": 3840,
+            "totalOccupiedConsumptionCount": 3840,
+            "totalOccupiedVolume": 84480,
+            "unitPrice": 1090,
+            "netValue": 937574.3999999998,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_claytronics_macro",
+                "count": 6,
+                "type": "consumption",
+                "amount": -3840,
+                "bonusPercent": 0,
+                "volumeFlow": -84480,
+                "valueFlow": -4185600
+              },
+              {
+                "moduleId": "prod_gen_microchips_macro",
+                "count": 8,
+                "type": "production",
+                "amount": 4700.16,
+                "bonusPercent": 36,
+                "volumeFlow": 103403.51999999999,
+                "valueFlow": 5123174.399999999
+              }
+            ]
           },
           {
-            "moduleId": "prod_gen_quantumtubes_macro",
-            "count": 5,
-            "type": "production",
-            "amount": 3595.5,
-            "bonusPercent": 53,
-            "volumeFlow": 79101,
-            "valueFlow": 1348312.5
-          }
-        ]
-      },
-      {
-        "wareId": "siliconwafers",
-        "transportType": "container",
-        "unitVolume": 18,
-        "production": 11727.2,
-        "consumption": 9600,
-        "netRate": 2127.2000000000007,
-        "productionVolume": 211089.6,
-        "consumptionVolume": 172800,
-        "netVolume": 38289.600000000006,
-        "totalOccupiedCount": 9600,
-        "totalOccupiedConsumptionCount": 9600,
-        "totalOccupiedVolume": 172800,
-        "unitPrice": 419,
-        "netValue": 891296.8000000003,
-        "contributions": [
-          {
-            "moduleId": "prod_gen_microchips_macro",
-            "count": 8,
-            "type": "consumption",
-            "amount": -9600,
-            "bonusPercent": 0,
-            "volumeFlow": -172800,
-            "valueFlow": -4022400
+            "wareId": "quantumtubes",
+            "orderIndex": 2,
+            "tier": 3,
+            "transportType": "container",
+            "unitVolume": 22,
+            "production": 3595.5,
+            "consumption": 2400,
+            "netRate": 1195.5,
+            "productionVolume": 79101,
+            "consumptionVolume": 52800,
+            "netVolume": 26301,
+            "totalOccupiedCount": 2400,
+            "totalOccupiedConsumptionCount": 2400,
+            "totalOccupiedVolume": 52800,
+            "unitPrice": 375,
+            "netValue": 448312.5,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_claytronics_macro",
+                "count": 6,
+                "type": "consumption",
+                "amount": -2400,
+                "bonusPercent": 0,
+                "volumeFlow": -52800,
+                "valueFlow": -900000
+              },
+              {
+                "moduleId": "prod_gen_quantumtubes_macro",
+                "count": 5,
+                "type": "production",
+                "amount": 3595.5,
+                "bonusPercent": 53,
+                "volumeFlow": 79101,
+                "valueFlow": 1348312.5
+              }
+            ]
           },
           {
-            "moduleId": "prod_gen_siliconwafers_macro",
-            "count": 4,
-            "type": "production",
-            "amount": 11727.2,
-            "bonusPercent": 37,
-            "volumeFlow": 211089.6,
-            "valueFlow": 4913696.800000001
-          }
-        ]
-      },
-      {
-        "wareId": "graphene",
-        "transportType": "container",
-        "unitVolume": 20,
-        "production": 4204.8,
-        "consumption": 2900,
-        "netRate": 1304.8000000000002,
-        "productionVolume": 84096,
-        "consumptionVolume": 58000,
-        "netVolume": 26096,
-        "totalOccupiedCount": 2900,
-        "totalOccupiedConsumptionCount": 2900,
-        "totalOccupiedVolume": 58000,
-        "unitPrice": 233,
-        "netValue": 304018.4,
-        "contributions": [
-          {
-            "moduleId": "prod_gen_quantumtubes_macro",
-            "count": 5,
-            "type": "consumption",
-            "amount": -2900,
-            "bonusPercent": 0,
-            "volumeFlow": -58000,
-            "valueFlow": -675700
+            "wareId": "antimattercells",
+            "orderIndex": 3,
+            "tier": 2,
+            "transportType": "container",
+            "unitVolume": 18,
+            "production": 4009.5000000000005,
+            "consumption": 2400,
+            "netRate": 1609.5000000000005,
+            "productionVolume": 72171.00000000001,
+            "consumptionVolume": 43200,
+            "netVolume": 28971.000000000015,
+            "totalOccupiedCount": 2400,
+            "totalOccupiedConsumptionCount": 2400,
+            "totalOccupiedVolume": 43200,
+            "unitPrice": 282,
+            "netValue": 453879.0000000001,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_claytronics_macro",
+                "count": 6,
+                "type": "consumption",
+                "amount": -2400,
+                "bonusPercent": 0,
+                "volumeFlow": -43200,
+                "valueFlow": -676800
+              },
+              {
+                "moduleId": "prod_gen_antimattercells_macro",
+                "count": 1,
+                "type": "production",
+                "amount": 4009.5000000000005,
+                "bonusPercent": 35,
+                "volumeFlow": 72171.00000000001,
+                "valueFlow": 1130679.0000000002
+              }
+            ]
           },
           {
-            "moduleId": "prod_gen_graphene_macro",
-            "count": 2,
-            "type": "production",
-            "amount": 4204.8,
-            "bonusPercent": 46,
-            "volumeFlow": 84096,
-            "valueFlow": 979718.4
-          }
-        ]
-      },
-      {
-        "wareId": "superfluidcoolant",
-        "transportType": "container",
-        "unitVolume": 16,
-        "production": 2123.25,
-        "consumption": 750,
-        "netRate": 1373.25,
-        "productionVolume": 33972,
-        "consumptionVolume": 12000,
-        "netVolume": 21972,
-        "totalOccupiedCount": 750,
-        "totalOccupiedConsumptionCount": 750,
-        "totalOccupiedVolume": 12000,
-        "unitPrice": 211,
-        "netValue": 289755.75,
-        "contributions": [
-          {
-            "moduleId": "prod_gen_quantumtubes_macro",
-            "count": 5,
-            "type": "consumption",
-            "amount": -750,
-            "bonusPercent": 0,
-            "volumeFlow": -12000,
-            "valueFlow": -158250
+            "wareId": "siliconwafers",
+            "orderIndex": 4,
+            "tier": 2,
+            "transportType": "container",
+            "unitVolume": 18,
+            "production": 11727.2,
+            "consumption": 9600,
+            "netRate": 2127.2000000000007,
+            "productionVolume": 211089.6,
+            "consumptionVolume": 172800,
+            "netVolume": 38289.600000000006,
+            "totalOccupiedCount": 9600,
+            "totalOccupiedConsumptionCount": 9600,
+            "totalOccupiedVolume": 172800,
+            "unitPrice": 419,
+            "netValue": 891296.8000000003,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_microchips_macro",
+                "count": 8,
+                "type": "consumption",
+                "amount": -9600,
+                "bonusPercent": 0,
+                "volumeFlow": -172800,
+                "valueFlow": -4022400
+              },
+              {
+                "moduleId": "prod_gen_siliconwafers_macro",
+                "count": 4,
+                "type": "production",
+                "amount": 11727.2,
+                "bonusPercent": 37,
+                "volumeFlow": 211089.6,
+                "valueFlow": 4913696.800000001
+              }
+            ]
           },
           {
-            "moduleId": "prod_gen_superfluidcoolant_macro",
-            "count": 1,
-            "type": "production",
-            "amount": 2123.25,
-            "bonusPercent": 49,
-            "volumeFlow": 33972,
-            "valueFlow": 448005.75
-          }
-        ]
-      },
-      {
-        "wareId": "hydrogen",
-        "transportType": "liquid",
-        "unitVolume": 6,
-        "production": 0,
-        "consumption": 9600,
-        "netRate": -9600,
-        "productionVolume": 0,
-        "consumptionVolume": 57600,
-        "netVolume": -57600,
-        "totalOccupiedCount": 9600,
-        "totalOccupiedConsumptionCount": 9600,
-        "totalOccupiedVolume": 57600,
-        "unitPrice": 67,
-        "netValue": -643200,
-        "contributions": [
+            "wareId": "graphene",
+            "orderIndex": 5,
+            "tier": 2,
+            "transportType": "container",
+            "unitVolume": 20,
+            "production": 4204.8,
+            "consumption": 2900,
+            "netRate": 1304.8000000000002,
+            "productionVolume": 84096,
+            "consumptionVolume": 58000,
+            "netVolume": 26096,
+            "totalOccupiedCount": 2900,
+            "totalOccupiedConsumptionCount": 2900,
+            "totalOccupiedVolume": 58000,
+            "unitPrice": 233,
+            "netValue": 304018.4,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_quantumtubes_macro",
+                "count": 5,
+                "type": "consumption",
+                "amount": -2900,
+                "bonusPercent": 0,
+                "volumeFlow": -58000,
+                "valueFlow": -675700
+              },
+              {
+                "moduleId": "prod_gen_graphene_macro",
+                "count": 2,
+                "type": "production",
+                "amount": 4204.8,
+                "bonusPercent": 46,
+                "volumeFlow": 84096,
+                "valueFlow": 979718.4
+              }
+            ]
+          },
           {
-            "moduleId": "prod_gen_antimattercells_macro",
-            "count": 1,
-            "type": "consumption",
-            "amount": -9600,
-            "bonusPercent": 0,
-            "volumeFlow": -57600,
-            "valueFlow": -643200
-          }
-        ]
-      },
-      {
-        "wareId": "silicon",
-        "transportType": "solid",
-        "unitVolume": 10,
-        "production": 0,
-        "consumption": 19200,
-        "netRate": -19200,
-        "productionVolume": 0,
-        "consumptionVolume": 192000,
-        "netVolume": -192000,
-        "totalOccupiedCount": 19200,
-        "totalOccupiedConsumptionCount": 19200,
-        "totalOccupiedVolume": 192000,
-        "unitPrice": 150,
-        "netValue": -2880000,
-        "contributions": [
+            "wareId": "superfluidcoolant",
+            "orderIndex": 6,
+            "tier": 2,
+            "transportType": "container",
+            "unitVolume": 16,
+            "production": 2123.25,
+            "consumption": 750,
+            "netRate": 1373.25,
+            "productionVolume": 33972,
+            "consumptionVolume": 12000,
+            "netVolume": 21972,
+            "totalOccupiedCount": 750,
+            "totalOccupiedConsumptionCount": 750,
+            "totalOccupiedVolume": 12000,
+            "unitPrice": 211,
+            "netValue": 289755.75,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_quantumtubes_macro",
+                "count": 5,
+                "type": "consumption",
+                "amount": -750,
+                "bonusPercent": 0,
+                "volumeFlow": -12000,
+                "valueFlow": -158250
+              },
+              {
+                "moduleId": "prod_gen_superfluidcoolant_macro",
+                "count": 1,
+                "type": "production",
+                "amount": 2123.25,
+                "bonusPercent": 49,
+                "volumeFlow": 33972,
+                "valueFlow": 448005.75
+              }
+            ]
+          },
           {
-            "moduleId": "prod_gen_siliconwafers_macro",
-            "count": 4,
-            "type": "consumption",
-            "amount": -19200,
-            "bonusPercent": 0,
-            "volumeFlow": -192000,
-            "valueFlow": -2880000
-          }
-        ]
-      },
-      {
-        "wareId": "methane",
-        "transportType": "liquid",
-        "unitVolume": 6,
-        "production": 0,
-        "consumption": 9600,
-        "netRate": -9600,
-        "productionVolume": 0,
-        "consumptionVolume": 57600,
-        "netVolume": -57600,
-        "totalOccupiedCount": 9600,
-        "totalOccupiedConsumptionCount": 9600,
-        "totalOccupiedVolume": 57600,
-        "unitPrice": 55,
-        "netValue": -528000,
-        "contributions": [
-          {
-            "moduleId": "prod_gen_graphene_macro",
-            "count": 2,
-            "type": "consumption",
-            "amount": -9600,
-            "bonusPercent": 0,
-            "volumeFlow": -57600,
-            "valueFlow": -528000
-          }
-        ]
-      },
-      {
-        "wareId": "helium",
-        "transportType": "liquid",
-        "unitVolume": 6,
-        "production": 0,
-        "consumption": 4800,
-        "netRate": -4800,
-        "productionVolume": 0,
-        "consumptionVolume": 28800,
-        "netVolume": -28800,
-        "totalOccupiedCount": 4800,
-        "totalOccupiedConsumptionCount": 4800,
-        "totalOccupiedVolume": 28800,
-        "unitPrice": 51,
-        "netValue": -244800,
-        "contributions": [
-          {
-            "moduleId": "prod_gen_superfluidcoolant_macro",
-            "count": 1,
-            "type": "consumption",
-            "amount": -4800,
-            "bonusPercent": 0,
-            "volumeFlow": -28800,
-            "valueFlow": -244800
+            "wareId": "energycells",
+            "orderIndex": 7,
+            "tier": 1,
+            "transportType": "container",
+            "unitVolume": 1,
+            "production": 30030,
+            "consumption": 20260,
+            "netRate": 9770,
+            "productionVolume": 30030,
+            "consumptionVolume": 20260,
+            "netVolume": 9770,
+            "totalOccupiedCount": 20260,
+            "totalOccupiedConsumptionCount": 20260,
+            "totalOccupiedVolume": 20260,
+            "unitPrice": 22,
+            "netValue": 214940,
+            "contributions": [
+              {
+                "moduleId": "prod_gen_claytronics_macro",
+                "count": 6,
+                "type": "consumption",
+                "amount": -3360,
+                "bonusPercent": 0,
+                "volumeFlow": -3360,
+                "valueFlow": -73920
+              },
+              {
+                "moduleId": "prod_gen_microchips_macro",
+                "count": 8,
+                "type": "consumption",
+                "amount": -2400,
+                "bonusPercent": 0,
+                "volumeFlow": -2400,
+                "valueFlow": -52800
+              },
+              {
+                "moduleId": "prod_gen_quantumtubes_macro",
+                "count": 5,
+                "type": "consumption",
+                "amount": -1000,
+                "bonusPercent": 0,
+                "volumeFlow": -1000,
+                "valueFlow": -22000
+              },
+              {
+                "moduleId": "prod_gen_antimattercells_macro",
+                "count": 1,
+                "type": "consumption",
+                "amount": -3000,
+                "bonusPercent": 0,
+                "volumeFlow": -3000,
+                "valueFlow": -66000
+              },
+              {
+                "moduleId": "prod_gen_siliconwafers_macro",
+                "count": 4,
+                "type": "consumption",
+                "amount": -7200,
+                "bonusPercent": 0,
+                "volumeFlow": -7200,
+                "valueFlow": -158400
+              },
+              {
+                "moduleId": "prod_gen_graphene_macro",
+                "count": 2,
+                "type": "consumption",
+                "amount": -2400,
+                "bonusPercent": 0,
+                "volumeFlow": -2400,
+                "valueFlow": -52800
+              },
+              {
+                "moduleId": "prod_gen_superfluidcoolant_macro",
+                "count": 1,
+                "type": "consumption",
+                "amount": -900,
+                "bonusPercent": 0,
+                "volumeFlow": -900,
+                "valueFlow": -19800
+              },
+              {
+                "moduleId": "prod_gen_energycells_macro",
+                "count": 2,
+                "type": "production",
+                "amount": 30030,
+                "bonusPercent": 43,
+                "volumeFlow": 30030,
+                "valueFlow": 660660
+              }
+            ]
           }
         ]
       }
-    ],
+    },
     "stationWorkforce": {
       "needed": {
         "total": 13815,

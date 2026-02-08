@@ -41,7 +41,7 @@ export interface GeneratedMockData {
   industryModulesWithWorker: SavedModule[];
   supplyModules: SavedModule[];
   supplyModulesWithWorker: SavedModule[];
-  wareFlows: WareFlow[];
+  groupedFlows: GroupedFlows;
   stationWorkforce: {
     needed: {
       total: number;
@@ -153,7 +153,7 @@ async function generateWareFlows(
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
   settings: StationSettings
-): Promise<WareFlow[]> {
+): Promise<GroupedFlows> {
   return analyzeWareFlow(
     industryModules,
     [], // plannedWareIds - could be configurable
@@ -290,7 +290,7 @@ async function generateMockDataForGroup(groupId: string, modulesInput: any[]): P
   // We explicitly exclude supply modules from calculation to reflect external supply dependency
   const activeBaseline = industryModulesWithWorker;
 
-  const wareFlows = await generateWareFlows(activeBaseline, modulesMap, waresMap, commonSettings);
+  const groupedFlows = await generateWareFlows(activeBaseline, modulesMap, waresMap, commonSettings);
   const stationWorkforce = await generateWorkforce(activeBaseline, modulesMap, commonSettings);
   const stationConstructions = await generateConstruction(activeBaseline, modulesMap, waresMap);
 
@@ -300,7 +300,7 @@ async function generateMockDataForGroup(groupId: string, modulesInput: any[]): P
     industryModulesWithWorker,
     supplyModules,
     supplyModulesWithWorker,
-    wareFlows,
+    groupedFlows,
     stationWorkforce,
     stationConstructions
   };
@@ -392,7 +392,7 @@ async function run() {
       console.log(`   Industry Modules With Worker: ${result.industryModulesWithWorker.length}`);
       console.log(`   Supply Modules: ${result.supplyModules.length}`);
       console.log(`   Supply Modules With Worker: ${result.supplyModulesWithWorker.length}`);
-      console.log(`   Ware Flows: ${result.wareFlows.length}`);
+      console.log(`   Ware Flows: ${result.groupedFlows.flows.length}`);
       console.log(`   Workforce Needed: ${result.stationWorkforce.needed.total}`);
       console.log(`   Workforce Capacity: ${result.stationWorkforce.capacity.total}`);
       console.log(`   Construction Cost: ${result.stationConstructions.totalCost}`);
