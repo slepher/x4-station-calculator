@@ -9,7 +9,7 @@ import VolumeControlSlider from '@/components/VolumeControlSlider.vue'
 import StationWareFlowGroup from './StationWareFlowGroup.vue'
 
 const store = useStationStore()
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { translateWare } = useX4I18n()
 
 type ViewMode = 'quantity' | 'volume' | 'economy'
@@ -57,11 +57,13 @@ const title = () => {
   }
 }
 
-const modes : {"key": ViewMode, title:string}[] = [
+const modes = computed<{"key": ViewMode; title: string}[]>(() => {
+  locale.value
+  return [
   {key: 'quantity', title: t('ui.quantity_view')},
   {key: 'economy', title: t('ui.economy_view')},
   {key: 'volume', title: t('ui.volume_view')}
-]
+]})
 
 const volumeGroups = computed(() => [
   {key: 'container', title: t('ui.container_group'),
