@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import CollapsibleDetailList from './common/CollapsibleDetailList.vue'
+import LockButton from './common/LockButton.vue'
 import StationWareFlow from './StationWareFlow.vue'
 import { useStationStore } from '@/store/useStationStore'
 
@@ -20,6 +21,7 @@ const store = useStationStore()
       </template>
       <template #header>
         <slot></slot>
+        <LockButton :placeholder="true"/>
       </template>
     </CollapsibleDetailList>
 

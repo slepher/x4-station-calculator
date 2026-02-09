@@ -380,7 +380,7 @@ const rateGroups = computed(() => ([
 }
 
 .economy-group-sum.positive {
-  @apply text-green-400;
+  @apply text-emerald-400;
 }
 
 .economy-group-sum.negative {
