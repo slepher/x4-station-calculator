@@ -68,6 +68,6 @@ const isOpen = ref(false)
 
 /* 核心修复：添加 flex 布局确保横向排列 */
 .right-group {
-  @apply flex items-center gap-2;
+  @apply flex items-center;
 }
 </style>

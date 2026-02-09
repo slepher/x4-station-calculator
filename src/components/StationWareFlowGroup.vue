@@ -21,7 +21,7 @@ const store = useStationStore()
       </template>
       <template #header>
         <slot></slot>
-        <LockButton :placeholder="true"/>
+          <div class="w-11 flex-none"></div>
       </template>
     </CollapsibleDetailList>
 

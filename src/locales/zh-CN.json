@@ -96,7 +96,11 @@
     "planning_space": "规划空间",
     "compression_ratio": "压缩比",
     "resource_buffer_hours": "资源缓冲时间",
-    "product_buffer_hours": "产品缓冲时间"
+    "product_buffer_hours": "产品缓冲时间",
+    "net_rate": "净生产率",
+    "total_volume": "规划总体积",
+    "storage_slots": "规划数量",
+    "unit_slots": "个"
   },
   "profit": {
     "title": "经济分析",

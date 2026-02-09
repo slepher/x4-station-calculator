@@ -96,7 +96,11 @@
     "planning_space": "Planning Space",
     "compression_ratio": "Compression Ratio",
     "resource_buffer_hours": "Resource Buffer Hours",
-    "product_buffer_hours": "Product Buffer Hours"
+    "product_buffer_hours": "Product Buffer Hours",
+    "net_rate": "Net Rate",
+    "total_volume": "Total Volume",
+    "storage_slots": "Planned Quantity",
+    "unit_slots": "Slots"
   },
   "profit": {
     "title": "ECONOMIC ANALYSIS",

@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useStationStore } from '@/store/useStationStore'
 import CollapsibleDetailList from './common/CollapsibleDetailList.vue'
 import LockButton from './common/LockButton.vue'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
   resourceId: string
@@ -27,6 +28,7 @@ const emit = defineEmits<{
 }>()
 
 const store = useStationStore()
+const { t } = useI18n()
 
 const translateModule = (moduleId: string) => {
     const store = useStationStore()
@@ -116,60 +118,99 @@ const formattedDetails = computed(() => {
   }))
 })
 
+const volumeTooltipContent = computed(() => {
+  const netRateClass = props.netVolume >= 0 ? 'text-emerald-400' : 'text-red-400'
+  return `
+    <div class="volume-tooltip-grid">
+      <span class="label">${t('ui.net_rate')}</span>
+      <span class="value ${netRateClass}">${formatNum(props.netVolume)}</span>
+      <span class="unit">m³</span>
+      
+      <span class="label">${t('ui.total_volume')}</span>
+      <span class="value text-blue-400">${formatNum(props.totalOccupiedVolume)}</span>
+      <span class="unit">m³</span>
+      
+      <span class="label">${t('ui.storage_slots')}</span>
+      <span class="value text-blue-400">${Math.ceil(props.totalOccupiedCount)}</span>
+      <span class="unit">${t('ui.unit_slots')}</span>
+    </div>
+  `
+})
+
 const classWithSymbol = (displayValue: number, className:string) => [className, className + '-' + (displayValue >= 0 ? 'pos' : 'neg')]
 </script>
 
 <template>
-  <CollapsibleDetailList
-    :data="formattedDetails"
-    :isPositive="displayValue >= 0"
-  >
-    <template #title>
-      <div :class="classWithSymbol(displayValue, 'dot')"></div>
-      <span class="name">{{ name }}</span>
-    </template>
-    <template #header>
-      <div :class="classWithSymbol(displayValue, 'value')" v-if="viewMode === 'economy' || viewMode === 'quantity'">
-        {{ formattedDisplayValue }}
-      </div>
-      <div class="volume-title-group" v-if="viewMode === 'volume'">
-        <span :class="classWithSymbol(netVolume, 'value')">
-          {{ formattedDisplayValue }}
-        </span>
-        <span class="volume-planning text-blue-400">
-          {{ formatNum(totalOccupiedVolume) }}m³
-        </span>
-        <span class="volume-count text-blue-400">
-          {{ Math.ceil(totalOccupiedCount) }}
-        </span>
-      </div>
+  <div class="flow-wrapper">
+    <div class="flow-content">
+      <CollapsibleDetailList
+        :data="formattedDetails"
+        :isPositive="displayValue >= 0"
+      >
+        <template #title>
+          <div :class="classWithSymbol(displayValue, 'dot')"></div>
+          <span class="name">{{ name }}</span>
+        </template>
+        <template #header>
+          <div :class="classWithSymbol(displayValue, 'value')" v-if="viewMode === 'economy' || viewMode === 'quantity'">
+            {{ formattedDisplayValue }}
+          </div>
+          <div class="volume-trigger-container" v-if="viewMode === 'volume'">
+            <span class="volume-count-main text-blue-400 font-mono font-bold text-sm leading-none">
+              {{ Math.ceil(totalOccupiedCount) }}
+            </span>
+            <div class="icon-anchor" v-tippy="{ content: volumeTooltipContent, allowHTML: true, theme: 'tomato' }">
+              <svg class="w-3.5 h-3.5 text-blue-300/60" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                <path d="m3.3 7 8.7 5 8.7-5"/>
+                <path d="M12 22V12"/>
+              </svg>
+            </div>
+          </div>
+        </template>
+
+        <template #row="{ item }">
+          <span class="item-name">
+            <span class="qty">{{ item.count }}</span>
+            <span class="symbol">x</span>
+            <span class="name">{{ translateModule(item.moduleId) }}</span>
+          </span>
+          <div class="item-val-group">
+            <span v-if="item.bonusPercent > 0" class="item-bonus">(+{{ item.bonusPercent }}%)</span>
+            <span class="item-val">
+              {{ item.displayAmount > 0 ? '+' : '' }}{{ formatNum(item.displayAmount) }}
+            </span>
+          </div>
+        </template>
+      </CollapsibleDetailList>
+    </div>
+    <div class="flow-action-rail">
       <LockButton 
         :locked="locked"
         :disabled="nonOperable"
         @update:locked="emit('update:locked', $event)"
       />
-    </template>
-
-    <template #row="{ item }">
-      <span class="item-name">
-        <span class="qty">{{ item.count }}</span>
-        <span class="symbol">x</span>
-        <span class="name">{{ translateModule(item.moduleId) }}</span>
-      </span>
-      <div class="item-val-group">
-        <span v-if="item.bonusPercent > 0" class="item-bonus">(+{{ item.bonusPercent }}%)</span>
-        <span class="item-val">
-          {{ item.displayAmount > 0 ? '+' : '' }}{{ formatNum(item.displayAmount) }}
-        </span>
-      </div>
-    </template>
-  </CollapsibleDetailList>
+    </div>
+  </div>
 </template>
 
 <style scoped>
 
 .dot {
   @apply w-1.5 h-1.5 rounded-full;
+}
+
+.flow-wrapper {
+  @apply flex items-start gap-1 mb-1;
+}
+
+.flow-content {
+  @apply flex-1 min-w-0;
+}
+
+.flow-action-rail {
+  @apply w-10 h-8 flex-none flex items-center justify-center bg-slate-800/40 rounded;
+  /* 微调 pt-2 以便更好地对齐左侧文字的视觉中心 */
 }
 .dot-pos { @apply bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]; }
 .dot-neg { @apply bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]; }
@@ -219,22 +260,6 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
   @apply text-[10px] text-slate-500 ml-1;
 }
 
-.volume-title-group {
-  @apply flex items-center gap-3 font-mono font-bold;
-}
-
-.volume-net {
-  @apply text-sm;
-}
-
-.volume-planning {
-  @apply text-sm;
-}
-
-.volume-count {
-  @apply text-sm;
-}
-
 .volume-value {
   @apply flex items-center gap-2;
 }
@@ -262,5 +287,46 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
 
 .item-cons .item-val {
   @apply text-red-400/70;
+}
+
+.volume-trigger-container {
+  @apply flex items-end gap-1 cursor-default;
+}
+
+.icon-anchor {
+  @apply cursor-help flex items-center h-[14px];
+}
+</style>
+
+<style>
+/* Tooltip 内部网格布局 (非 Scoped 以便 Tippy 渲染) */
+.volume-tooltip-grid {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 4px 12px;
+  align-items: center;
+  padding: 4px;
+  font-size: 12px;
+}
+.volume-tooltip-grid .label { @apply text-slate-400; }
+.volume-tooltip-grid .unit { @apply text-slate-500 text-[10px]; }
+
+.tippy-box[data-theme~='tomato'] {
+  background-color: #151C2C;
+}
+.tippy-box[data-theme~='tomato'][data-placement^='top'] > .tippy-arrow::before {
+  border-top-color: #151C2C;
+}
+.tippy-box[data-theme~='tomato'][data-placement^='bottom']
+  > .tippy-arrow::before {
+  border-bottom-color: #151C2C;
+}
+.tippy-box[data-theme~='tomato'][data-placement^='left']
+  > .tippy-arrow::before {
+  border-left-color: #151C2C; 
+}
+.tippy-box[data-theme~='tomato'][data-placement^='right']
+  > .tippy-arrow::before {
+  border-right-color: #151C2C;
 }
 </style>

@@ -122,6 +122,11 @@ const rateGroups = computed(() => ([
           <span class="volume-group-planning">
             {{ getGroupVolume(group.items) }}m³
           </span>
+          <svg class="w-3.5 h-3.5 text-blue-300/60" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+            <path d="m3.3 7 8.7 5 8.7-5"/>
+            <path d="M12 22V12"/>
+          </svg>
         </StationWareFlowGroup>
       </div>
       
@@ -347,7 +352,7 @@ const rateGroups = computed(() => ([
 }
 
 .volume-group-planning {
-  @apply text-sm font-mono text-slate-400;
+  @apply text-sm font-mono text-blue-400;
 }
 
 .volume-item {
