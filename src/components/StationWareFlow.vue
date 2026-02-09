@@ -126,10 +126,13 @@ const toggleLock = () => {
       <span class="name">{{ name }}</span>
     </template>
     <template #header>
-      <div class="value" v-if="viewMode !== 'volume'">
+      <div class="value" v-if="viewMode === 'economy'">
+        {{ displaySign }}{{ formatNum(displayValue) }} Cr
+      </div>
+      <div class="value" v-if="viewMode === 'quantity'">
         {{ displaySign }}{{ formatNum(displayValue) }}
       </div>
-      <div class="volume-title-group" v-else>
+      <div class="volume-title-group" v-if="viewMode === 'volume'">
         <span class="volume-net" :class="netVolume >= 0 ? 'text-emerald-400' : 'text-red-400'">
           {{ displaySign }}{{ formatNum(Math.abs(netVolume || 0)) }}m³
         </span>
@@ -175,8 +178,8 @@ const toggleLock = () => {
 .dot {
   @apply w-1.5 h-1.5 rounded-full;
 }
-.status-pos .dot { @apply bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]; }
-.status-neg .dot { @apply bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]; }
+.dot-pos { @apply bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]; }
+.dot-neg { @apply bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]; }
 
 /* 锁按钮样式 */
 .lock-btn {
