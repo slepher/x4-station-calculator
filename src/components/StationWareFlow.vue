@@ -201,7 +201,7 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
 }
 
 .flow-wrapper {
-  @apply flex items-start gap-1 mb-1;
+  @apply flex items-start gap-1;
 }
 
 .flow-content {
