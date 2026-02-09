@@ -96,7 +96,8 @@
     "planning_space": "规划空间",
     "compression_ratio": "压缩比",
     "resource_buffer_hours": "资源缓冲时间",
-    "product_buffer_hours": "产品缓冲时间",
+    "primary_product_buffer_hours": "主产物缓冲时间",
+    "secondary_product_buffer_hours": "副产物缓冲时间",
     "net_rate": "净生产率",
     "total_volume": "规划总体积",
     "storage_slots": "规划数量",
@@ -124,5 +125,15 @@
     "terran": "Terran",
     "boron": "Boron",
     "default": "通用"
+  },
+  "tooltip": {
+    "priority_level_0_label": "无需求",
+    "priority_level_1_label": "副产物", 
+    "priority_level_2_label": "主产物",
+    "priority_level_0_buffer": "资源缓冲",
+    "priority_level_1_buffer": "短缓冲+资源缓冲",
+    "priority_level_2_buffer": "长缓冲+资源缓冲",
+    "lock_unlocked": "未锁定 - 自动补充",
+    "lock_locked": "已锁定 - 保持当前"
   }
 }

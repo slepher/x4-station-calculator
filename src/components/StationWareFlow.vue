@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useStationStore } from '@/store/useStationStore'
 import CollapsibleDetailList from './common/CollapsibleDetailList.vue'
 import LockButton from './common/LockButton.vue'
+import FavoriteButton from './common/FavoriteButton.vue'
 import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
@@ -11,6 +12,7 @@ const props = defineProps<{
   name: string
   details?: any[]
   locked?: boolean // 新增 locked 属性
+  priorityLevel?: number // 新增：产物优先级级别 (0, 1, 2)
   // 新增体积和经济数据
   netVolume: number
   netValue: number
@@ -26,6 +28,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:locked', value: boolean): void
+  (e: 'update:priorityLevel', value: number): void // 新增：优先级变更事件
 }>()
 
 const store = useStationStore()
@@ -160,7 +163,7 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
           <div :class="classWithSymbol(displayValue, 'value')" v-if="viewMode === 'economy' || viewMode === 'quantity'">
             {{ formattedDisplayValue }}
           </div>
-          <div class="volume-trigger-container" v-if="viewMode === 'volume'"  v-tippy="{ content: volumeTooltipContent, allowHTML: true, theme: 'tomato' }">
+          <div class="volume-trigger-container" v-if="viewMode === 'volume'"  v-tippy="{ content: volumeTooltipContent, allowHTML: true, theme: 'x4' }">
             <span class="volume-count-main text-blue-400 font-mono font-bold text-sm leading-none">
               {{ Math.ceil(totalOccupiedCount) }}
             </span>
@@ -190,7 +193,12 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
       </CollapsibleDetailList>
     </div>
     <div class="flow-action-rail">
-      <LockButton 
+      <FavoriteButton
+        :level="priorityLevel ?? 0"
+        :disabled="nonOperable"
+        @update:level="emit('update:priorityLevel', $event)"
+      />
+      <LockButton
         :locked="locked"
         :disabled="nonOperable"
         @update:locked="emit('update:locked', $event)"
@@ -214,7 +222,7 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
 }
 
 .flow-action-rail {
-  @apply w-10 h-8 flex-none flex items-center justify-center bg-slate-800/40 rounded;
+  @apply w-20 h-8 flex-none flex items-center justify-center gap-2 bg-slate-800/40 rounded;
   /* 微调 pt-2 以便更好地对齐左侧文字的视觉中心 */
 }
 .dot-pos { @apply bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]; }
@@ -315,23 +323,4 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
 }
 .volume-tooltip-grid .label { @apply text-slate-400; }
 .volume-tooltip-grid .unit { @apply text-slate-500 text-[10px]; }
-
-.tippy-box[data-theme~='tomato'] {
-  background-color: #151C2C;
-}
-.tippy-box[data-theme~='tomato'][data-placement^='top'] > .tippy-arrow::before {
-  border-top-color: #151C2C;
-}
-.tippy-box[data-theme~='tomato'][data-placement^='bottom']
-  > .tippy-arrow::before {
-  border-bottom-color: #151C2C;
-}
-.tippy-box[data-theme~='tomato'][data-placement^='left']
-  > .tippy-arrow::before {
-  border-left-color: #151C2C; 
-}
-.tippy-box[data-theme~='tomato'][data-placement^='right']
-  > .tippy-arrow::before {
-  border-right-color: #151C2C;
-}
 </style>

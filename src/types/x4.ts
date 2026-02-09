@@ -115,7 +115,8 @@ export interface StationSettings {
   internalSupply: boolean;
   racePreference: string;
   resourceBufferHours: number; // 资源缓冲时间（小时）
-  productBufferHours: number;   // 产品缓冲时间（小时）
+  primaryProductBufferHours: number;   // 主产物缓冲时间（小时）
+  secondaryProductBufferHours: number; // 副产物缓冲时间（小时）
 }
 
 /**
@@ -127,6 +128,7 @@ export interface StationLayout {
   modules: SavedModule[];
   lockedWares: string[]; // 新增：锁定的资源ID列表 (如 ["energycells"])
   settings: StationSettings;
+  warePriority?: Record<string, number>; // 产物优先级覆盖：wareId -> priorityLevel (0, 1, 2)
   lastUpdated: number;
 }
 

@@ -22,7 +22,6 @@ type X4WareWithVolume = X4Ware & { volume?: number };
  */
 export function analyzeWareFlow(
   plannedModules: SavedModule[],
-  plannedWareIds: string[],
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4WareWithVolume>,
   medicalConsumptionMap: RaceMedicalConsumption,
@@ -30,7 +29,9 @@ export function analyzeWareFlow(
   actualWorkforce: number,
   saturation: number,
   resourceBufferHours: number = 1.0, // 对应 consumptionBufferTime
-  productBufferHours: number = 1.0   // 对应 transportBufferTime
+  primaryProductBufferHours: number = 12.0,   // 主产物缓冲时间
+  secondaryProductBufferHours: number = 2.0,  // 副产物缓冲时间
+  warePriorityLevels: Record<string, number> // 产物优先级：wareId -> level (0, 1, 2)
 ): GroupedFlows {
   
   const flowMap: Record<string, WareFlow> = {};
@@ -197,9 +198,22 @@ export function analyzeWareFlow(
     // 1. 消耗缓冲 (Input Buffer) = consumption * consumptionBufferTime
     const consumptionBufferCount = entry.consumption * resourceBufferHours;
     
-    // 2. 产出缓冲 (Output/Transport Buffer)
-    // 通常仅当需要产品产物的时候
-    const productionBufferCount = plannedWareIds.includes(wareId) && (entry.netRate > 0) ? entry.netRate * productBufferHours : 0;
+    // 2. 产出缓冲 (Output/Transport Buffer) - 基于优先级
+    // 获取产物优先级级别 (0=无需求, 1=副产物, 2=主产物)
+    const priorityLevel = warePriorityLevels?.[wareId] ?? 2; // 默认为主产物
+    
+    // 根据优先级选择缓冲时间
+    let productBufferHours = 0;
+    if (priorityLevel === 2) {
+      productBufferHours = primaryProductBufferHours;    // 主产物使用长缓冲
+    } else if (priorityLevel === 1) {
+      productBufferHours = secondaryProductBufferHours;  // 副产物使用短缓冲
+    } // priorityLevel === 0 时，productBufferHours 保持为 0（无缓冲）
+    
+    // 仅当 netRate > 0 且需要缓冲时才计算
+    const productionBufferCount = (entry.netRate > 0) && (priorityLevel > 0)
+      ? entry.netRate * productBufferHours
+      : 0;
 
 
     // 3. 填充结果

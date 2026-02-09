@@ -164,17 +164,23 @@ const rateGroups = computed(() => ([
     <!-- 体积控件部分 -->
     <div class="volume-controls-section" v-if="viewMode === 'volume'">
       <div class="simulation-controls flex flex-row gap-4">
-        <VolumeControlSlider 
-          v-model="store.settings.resourceBufferHours" 
-          :label="t('ui.resource_buffer_hours')" 
-          type="resource" 
-          :max="24" 
+        <VolumeControlSlider
+          v-model="store.settings.resourceBufferHours"
+          :label="t('ui.resource_buffer_hours')"
+          type="resource"
+          :max="24"
           :step="1" />
-        <VolumeControlSlider 
-          v-model="store.settings.productBufferHours" 
-          :label="t('ui.product_buffer_hours')" 
-          type="product" 
-          :max="24" 
+        <VolumeControlSlider
+          v-model="store.settings.primaryProductBufferHours"
+          :label="t('ui.primary_product_buffer_hours')"
+          type="product"
+          :max="24"
+          :step="1" />
+        <VolumeControlSlider
+          v-model="store.settings.secondaryProductBufferHours"
+          :label="t('ui.secondary_product_buffer_hours')"
+          type="product"
+          :max="24"
           :step="1" />
       </div>
     </div>

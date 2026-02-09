@@ -20,7 +20,7 @@ const store = useStationStore()
       </template>
       <template #header>
         <slot></slot>
-          <div class="w-10 flex-none"></div>
+          <div class="w-20 flex-none"></div>
       </template>
     </CollapsibleDetailList>
 
@@ -39,8 +39,10 @@ const store = useStationStore()
       :totalOccupiedConsumptionCount="item.totalOccupiedConsumptionCount"
       :details="item.contributions"
       :locked="store.isWareLocked(item.id)"
+      :priorityLevel="store.getResolvedLevel(item.id)"
       :viewMode="viewMode"
       @update:locked="store.toggleWareLock(item.id)"
+      @update:priorityLevel="store.toggleWarePriority(item.id)"
     />
   </div>
 </template>

@@ -96,7 +96,8 @@
     "planning_space": "Planning Space",
     "compression_ratio": "Compression Ratio",
     "resource_buffer_hours": "Resource Buffer Hours",
-    "product_buffer_hours": "Product Buffer Hours",
+    "primary_product_buffer_hours": "Primary Product Buffer Hours",
+    "secondary_product_buffer_hours": "Secondary Product Buffer Hours",
     "net_rate": "Net Rate",
     "total_volume": "Total Volume",
     "storage_slots": "Planned Quantity",
@@ -123,5 +124,15 @@
     "terran": "Terran",
     "boron": "Boron",
     "default": "Default(Argon)"
+  },
+  "tooltip": {
+    "priority_level_0_label": "No Demand",
+    "priority_level_1_label": "Secondary",
+    "priority_level_2_label": "Primary",
+    "priority_level_0_buffer": "Resource Buffer",
+    "priority_level_1_buffer": "Short+Resource Buffer",
+    "priority_level_2_buffer": "Long+Resource Buffer",
+    "lock_unlocked": "Unlocked - Auto Fill",
+    "lock_locked": "Locked - Keep Current"
   }
 }

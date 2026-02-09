@@ -72,8 +72,12 @@ export const useStationStore = defineStore('station', () => {
     internalSupply: false,
     racePreference: 'argon',  // 默认种族偏好
     resourceBufferHours: 1.0, // 默认资源缓冲时间
-    productBufferHours: 1.0   // 默认产品缓冲时间
+    primaryProductBufferHours: 12.0,   // 默认主产物缓冲时间（小时）
+    secondaryProductBufferHours: 2.0   // 默认副产物缓冲时间（小时）
   })
+
+  // 产物优先级覆盖状态：wareId -> priorityLevel (0, 1, 2)
+  const warePriority = ref<Record<string, number>>({})
 
   // --- 基础数据映射 (Ref 类型，需要用 .value 访问) ---
   const waresMap: Ref<Record<string, X4Ware>> = gameData.waresMap
@@ -101,9 +105,17 @@ export const useStationStore = defineStore('station', () => {
         plannedModules.value = JSON.parse(JSON.stringify(target.modules))
         settings.value = JSON.parse(JSON.stringify(target.settings))
         settings.value.racePreference = settings.value.racePreference || 'argon' 
-        settings.value.productBufferHours = settings.value.productBufferHours || 12
+        // 兼容旧数据：将 productBufferHours 迁移到 primaryProductBufferHours
+        if ('productBufferHours' in settings.value) {
+          const oldValue = (settings.value as any).productBufferHours
+          settings.value.primaryProductBufferHours = oldValue
+          delete (settings.value as any).productBufferHours
+        }
+        settings.value.primaryProductBufferHours = settings.value.primaryProductBufferHours ?? 12.0
+        settings.value.secondaryProductBufferHours = settings.value.secondaryProductBufferHours ?? 2.0
         settings.value.resourceBufferHours = settings.value.resourceBufferHours || 2 // 兼容旧数据
         lockedWares.value = target.lockedWares ? JSON.parse(JSON.stringify(target.lockedWares)) : []
+        warePriority.value = target.warePriority ? JSON.parse(JSON.stringify(target.warePriority)) : {}
       }
     }
     takeSnapshot()
@@ -124,6 +136,7 @@ export const useStationStore = defineStore('station', () => {
       modules: JSON.parse(JSON.stringify(plannedModules.value)),
       lockedWares: JSON.parse(JSON.stringify(lockedWares.value)),
       settings: JSON.parse(JSON.stringify(settings.value)),
+      warePriority: JSON.parse(JSON.stringify(warePriority.value)),
       lastUpdated: Date.now()
     }
 
@@ -152,8 +165,12 @@ export const useStationStore = defineStore('station', () => {
     if (layout) {
       plannedModules.value = JSON.parse(JSON.stringify(layout.modules))
       settings.value = JSON.parse(JSON.stringify(layout.settings))
+      settings.value.primaryProductBufferHours = settings.value.primaryProductBufferHours ?? 12.0
+      settings.value.secondaryProductBufferHours = settings.value.secondaryProductBufferHours ?? 2.0
+      settings.value.resourceBufferHours = settings.value.resourceBufferHours || 2 // 兼容旧数据
       savedLayouts.value.activeId = layout.id
       lockedWares.value = layout.lockedWares ? JSON.parse(JSON.stringify(layout.lockedWares)) : []
+      warePriority.value = layout.warePriority ? JSON.parse(JSON.stringify(layout.warePriority)) : {}
     }
   }
 
@@ -247,6 +264,85 @@ export const useStationStore = defineStore('station', () => {
     return lockedWares.value.includes(wareId)
   }
 
+  // ========== 产物优先级管理 ==========
+
+  /**
+   * 检查产物是否为计划产物（存在于 plannedModules 的输出中）
+   */
+  function isPlannedWare(wareId: string): boolean {
+    return plannedModules.value.some(module => {
+      const moduleInfo = modulesMap.value[module.id]
+      if (!moduleInfo) return false
+      return Object.keys(moduleInfo.outputs || {}).includes(wareId)
+    })
+  }
+
+  /**
+   * 检查产物是否为自动产物（仅存在于 autoIndustryModules 的输出中）
+   */
+  function isAutoWare(wareId: string): boolean {
+    // 如果是计划产物，则不是自动产物
+    if (isPlannedWare(wareId)) return false
+    // 检查是否在自动工业区的输出中
+    return autoIndustryModules.value.some(module => {
+      const moduleInfo = modulesMap.value[module.id]
+      if (!moduleInfo) return false
+      return Object.keys(moduleInfo.outputs || {}).includes(wareId)
+    })
+  }
+
+  /**
+   * 获取产物的最终优先级级别
+   * 判定顺序：1. 自动纠错 2. 手动覆盖 3. 默认身份
+   */
+  function getResolvedLevel(wareId: string): number {
+    const planned = isPlannedWare(wareId)
+    const auto = isAutoWare(wareId)
+    const override = warePriority.value[wareId]
+
+    // 1. 自动纠错
+    if (planned && override === 0) return 1 // 计划产物不能设为0，自动纠正为1
+    if (auto && override === 2) return 1    // 自动产物不能设为2，自动纠正为1
+
+    // 2. 手动覆盖
+    if (override !== undefined) return override
+
+    // 3. 默认身份
+    if (planned) return 2  // 计划产物默认为主产物
+    if (auto) return 0     // 自动产物默认为无需求
+    return 0               // 其他情况默认为无需求
+  }
+
+  /**
+   * 切换产物优先级
+   * 计划产物：2 ↔ 1
+   * 自动产物：0 ↔ 1
+   */
+  function toggleWarePriority(wareId: string) {
+    const currentLevel = getResolvedLevel(wareId)
+    const planned = isPlannedWare(wareId)
+    const auto = isAutoWare(wareId)
+
+    if (planned) {
+      // 计划产物：2 ↔ 1
+      if (currentLevel === 2) {
+        warePriority.value[wareId] = 1
+      } else {
+        // 切回默认，删除覆盖
+        delete warePriority.value[wareId]
+      }
+    } else if (auto) {
+      // 自动产物：0 ↔ 1
+      if (currentLevel === 0) {
+        warePriority.value[wareId] = 1
+      } else {
+        // 切回默认，删除覆盖
+        delete warePriority.value[wareId]
+      }
+    }
+    // 非计划非自动产物不处理
+  }
+
   function importPlan(input: string) {
     const raw = input.trim()
     if (!raw) return
@@ -332,9 +428,14 @@ export const useStationStore = defineStore('station', () => {
       })
     })
 
+    // 构建产物优先级映射：wareId -> resolvedLevel
+    const warePriorityLevels: Record<string, number> = {}
+    Object.keys(waresMap.value).forEach(wareId => {
+      warePriorityLevels[wareId] = getResolvedLevel(wareId)
+    })
+
     return analyzeWareFlow(
       allIndustryModules.value,
-      plannedWareIds,
       modulesMap.value,
       waresMap.value,
       medicalConsumptionMap.value,
@@ -342,7 +443,9 @@ export const useStationStore = defineStore('station', () => {
       actualWorkforce.value,
       efficiencyMetrics.value.saturation,
       settings.value.resourceBufferHours,
-      settings.value.productBufferHours
+      settings.value.primaryProductBufferHours,
+      settings.value.secondaryProductBufferHours,
+      warePriorityLevels
     )
   })
 
@@ -427,6 +530,7 @@ export const useStationStore = defineStore('station', () => {
     wares: waresMap, modules: localizedModulesMap, moduleGroups: localizedModuleGroupsMap, medicalConsumption: medicalConsumptionMap,
     loadData, loadDemoData, savedLayouts, saveCurrentLayout, loadLayout, mergeLayout, deleteLayout,
     lockedWares, isWareLocked, isWareOperable, toggleWareLock,
+    warePriority, isPlannedWare, isAutoWare, getResolvedLevel, toggleWarePriority,
     addModule, importPlan, updateModuleId, updateModuleCount, removeModule, removeModuleById, transferModuleFromAutoIndustry, clearAll, getModuleInfo,
     constructionBreakdown, workforceBreakdown, profitBreakdown, autoFillMissingLines,
     actualWorkforce, currentEfficiency: computed(() => efficiencyMetrics.value.saturation), netProduction, groupedFlows
