@@ -100,6 +100,8 @@
     "net_rate": "净生产率",
     "total_volume": "规划总体积",
     "storage_slots": "规划数量",
+    "storage_min_slots": "最少保存数量",
+
     "unit_slots": "个"
   },
   "profit": {

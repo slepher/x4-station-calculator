@@ -19,6 +19,7 @@ const props = defineProps<{
   // 新增仓储规划数据
   totalOccupiedVolume: number
   totalOccupiedCount: number
+  totalOccupiedConsumptionCount: number
   // 新增视图模式属性
   viewMode: 'quantity' | 'volume' | 'economy'
 }>()
@@ -129,9 +130,13 @@ const volumeTooltipContent = computed(() => {
       <span class="label">${t('ui.total_volume')}</span>
       <span class="value text-blue-400">${formatNum(props.totalOccupiedVolume)}</span>
       <span class="unit">m³</span>
-      
+
       <span class="label">${t('ui.storage_slots')}</span>
       <span class="value text-blue-400">${Math.ceil(props.totalOccupiedCount)}</span>
+      <span class="unit">${t('ui.unit_slots')}</span>
+      
+      <span class="label">${t('ui.storage_min_slots')}</span>
+      <span class="value text-blue-400">${Math.ceil(props.totalOccupiedConsumptionCount)}</span>
       <span class="unit">${t('ui.unit_slots')}</span>
     </div>
   `
@@ -155,11 +160,11 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
           <div :class="classWithSymbol(displayValue, 'value')" v-if="viewMode === 'economy' || viewMode === 'quantity'">
             {{ formattedDisplayValue }}
           </div>
-          <div class="volume-trigger-container" v-if="viewMode === 'volume'">
+          <div class="volume-trigger-container" v-if="viewMode === 'volume'"  v-tippy="{ content: volumeTooltipContent, allowHTML: true, theme: 'tomato' }">
             <span class="volume-count-main text-blue-400 font-mono font-bold text-sm leading-none">
               {{ Math.ceil(totalOccupiedCount) }}
             </span>
-            <div class="icon-anchor" v-tippy="{ content: volumeTooltipContent, allowHTML: true, theme: 'tomato' }">
+            <div class="icon-anchor">
               <svg class="w-3.5 h-3.5 text-blue-300/60" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
                 <path d="m3.3 7 8.7 5 8.7-5"/>
@@ -290,11 +295,11 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
 }
 
 .volume-trigger-container {
-  @apply flex items-end gap-1 cursor-default;
+  @apply flex items-end gap-2 cursor-help;
 }
 
 .icon-anchor {
-  @apply cursor-help flex items-center h-[14px];
+  @apply flex items-center h-[14px];
 }
 </style>
 
