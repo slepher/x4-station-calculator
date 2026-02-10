@@ -12,6 +12,9 @@
     "hourly_rate": "Hourly Rate",
     "no_active_production": "No Active Production",
     "add_modules_hint": "Add production modules to see data",
+    "materials_view": "Materials",
+    "time_view": "Time",
+    "workers_view": "Workers",
     "quantity_view": "Quantity",
     "volume_view": "Volume",
     "economy_view": "Economy",
@@ -102,7 +105,8 @@
     "total_volume": "Total Volume",
     "storage_slots": "Planned Quantity",
     "storage_min_slots": "Minimum Storage Quantity",
-    "unit_slots": "Slots"
+    "unit_slots": "Slots",
+    "credits": "Cr"
   },
   "profit": {
     "title": "ECONOMIC ANALYSIS",

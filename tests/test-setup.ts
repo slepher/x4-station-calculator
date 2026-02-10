@@ -5,22 +5,21 @@ export const test = base.extend({
     const errors: Error[] = [];
 
     // 监听网页内部未捕获的异常
-    page.on('pageerror', async (error) => {
-    // 1. 记录错误堆栈
-    console.log(`AGENT_FEEDBACK_START: ${JSON.stringify({
-        type: 'JS_RUNTIME_ERROR',
-        message: error.message,
-        stack: error.stack
-    })} AGENT_FEEDBACK_END`);
-
-    // 2. 自动保存当前报错现场的截图名
-    const screenshotPath = `error-screenshot-${Date.now()}.png`;
-    await page.screenshot({ path: screenshotPath });
+    page.on('pageerror', (error) => {
+      errors.push(error);
+      // 1. 记录错误堆栈
+      console.log(`AGENT_FEEDBACK_START: ${JSON.stringify({
+          type: 'JS_RUNTIME_ERROR',
+          message: error.message,
+          stack: error.stack
+      })} AGENT_FEEDBACK_END`);
     });
 
     // 监听控制台打印的严重错误
     page.on('console', (msg) => {
       if (msg.type() === 'error') {
+        const error = new Error(msg.text());
+        errors.push(error);
         console.error('⚠️ [控制台错误日志]:', msg.text());
       }
     });

@@ -12,6 +12,9 @@
     "hourly_rate": "每小时流量",
     "no_active_production": "暂无活跃生产周期",
     "add_modules_hint": "请添加生产模块以查看数据",
+    "materials_view": "材料视图",
+    "time_view": "时间视图",
+    "workers_view": "工人视图",
     "quantity_view": "数量视图",
     "volume_view": "体积视图",
     "economy_view": "经济视图",
@@ -103,7 +106,8 @@
     "storage_slots": "规划数量",
     "storage_min_slots": "最少保存数量",
 
-    "unit_slots": "个"
+    "unit_slots": "个",
+    "credits": "Cr"
   },
   "profit": {
     "title": "经济分析",

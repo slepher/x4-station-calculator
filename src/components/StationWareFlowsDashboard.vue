@@ -220,7 +220,7 @@ const rateGroups = computed(() => ([
 }
 
 .header-title {
-  @apply text-sm font-bold text-slate-300 tracking-wide uppercase;
+  @apply text-base font-bold text-slate-100 tracking-wider uppercase;
 }
 
 .header-right-group {
@@ -228,16 +228,15 @@ const rateGroups = computed(() => ([
 }
 
 .view-mode-switcher {
-  @apply flex items-center gap-1 bg-slate-800/50 rounded-md p-1;
+  @apply flex items-center gap-1 bg-slate-900/60 p-0.5 rounded-md border border-slate-700/30;
 }
 
 .view-mode-btn {
-  @apply px-2 h-6 rounded text-xs font-medium transition-all duration-200;
-  @apply bg-transparent text-slate-500 hover:text-slate-300 hover:bg-slate-700/50;
+  @apply px-3 py-1 text-[10px] font-bold uppercase tracking-tighter rounded transition-all duration-200 text-slate-500 hover:text-slate-300;
 }
 
 .view-mode-btn.active {
-  @apply bg-amber-500 text-slate-900 shadow-md;
+  @apply bg-sky-500/20 text-sky-400 shadow-[0_0_12px_rgba(14,165,233,0.15)];
 }
 
 .view-mode-btn:disabled {

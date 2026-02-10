@@ -22,8 +22,11 @@ import {
 } from './logic/blueprintParser'
 import { calculateAutoFill } from './logic/moduleDiffCalculator'
 
-import { calculateConstructionBreakdown } from './logic/productionCalculator'
+import { 
+  calculateConstructionBreakdown
+} from './logic/calculatorUtils'
 import { analyzeWareFlow } from './logic/analyzeWareFlow'
+import { analyzeStation } from './logic/analyzeStation'
 
 // --- 类型定义 (Type Definitions) ---
 export type { SavedModule, StationLayout } from '../types/x4'
@@ -76,6 +79,8 @@ export const useStationStore = defineStore('station', () => {
     secondaryProductBufferHours: 2.0   // 默认副产物缓冲时间（小时）
   })
 
+  const buildPriceMultiplier = ref(0.5)
+
   // 产物优先级覆盖状态：wareId -> priorityLevel (0, 1, 2)
   const warePriority = ref<Record<string, number>>({})
 
@@ -93,6 +98,16 @@ export const useStationStore = defineStore('station', () => {
       gameData.currentLocale.value,
       localizedModulesMap.value,
       localizedModuleGroupsMap.value
+    )
+  })
+
+  // --- 分析计算 ---
+  const stationAnalysis = computed(() => {
+    return analyzeStation(
+      allIndustryModules.value,
+      modulesMap.value,
+      waresMap.value,
+      buildPriceMultiplier.value
     )
   })
 
@@ -533,6 +548,7 @@ export const useStationStore = defineStore('station', () => {
     warePriority, isPlannedWare, isAutoWare, getResolvedLevel, toggleWarePriority,
     addModule, importPlan, updateModuleId, updateModuleCount, removeModule, removeModuleById, transferModuleFromAutoIndustry, clearAll, getModuleInfo,
     constructionBreakdown, workforceBreakdown, profitBreakdown, autoFillMissingLines,
-    actualWorkforce, currentEfficiency: computed(() => efficiencyMetrics.value.saturation), netProduction, groupedFlows
+    actualWorkforce, currentEfficiency: computed(() => efficiencyMetrics.value.saturation), netProduction, groupedFlows,
+    buildPriceMultiplier, stationAnalysis
   }
 })

@@ -1,7 +1,7 @@
 import type { SavedModule, X4Module, X4Ware } from '../../types/x4'
 import {findBestProducer, findBestHabitat, getProductionEfficiency} from './bestModuleSelector'
 import { calculateWorkerSupplyNeeds } from './workerModuleCalculator'
-import { calculateWorkforceCensus } from './productionCalculator'
+import { calculateWorkforceCensus } from './calculatorUtils'
 
 // --- 辅助函数 ---
 

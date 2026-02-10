@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test';
-import { test } from './test-setup';
+import { test } from '../../test-setup';
 
 let sharedPage;
 

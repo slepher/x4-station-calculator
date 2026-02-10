@@ -22,7 +22,7 @@ import type { ConstructionBreakdown } from '../src/store/logic/productionCalcula
 import { calculateAutoFill } from '../src/store/logic/moduleDiffCalculator';
 import { analyzeWareFlow } from '../src/store/logic/analyzeWareFlow';
 import { calculateWorkforceBreakdown } from '../src/store/logic/workforceCalculator';
-import { calculateConstructionBreakdown } from '../src/store/logic/productionCalculator';
+import { calculateConstructionBreakdown } from '../src/store/logic/calculatorUtils';
 
 // Interface definitions for the mock data generator
 export interface MockModuleConfig {
@@ -156,7 +156,6 @@ async function generateWareFlows(
 ): Promise<GroupedFlows> {
   return analyzeWareFlow(
     industryModules,
-    [], // plannedWareIds - could be configurable
     modulesMap,
     waresMap,
     {}, // medicalConsumptionMap
@@ -164,7 +163,9 @@ async function generateWareFlows(
     1000, // actualWorkforce - mock value
     1.0, // saturation - mock value
     1.0, // resourceBufferHours
-    1.0 // productBufferHours
+    1.0, // primaryProductBufferHours
+    1.0, // secondaryProductBufferHours
+    {} // warePriorityLevels
   );
 }
 
@@ -294,7 +295,7 @@ async function generateMockDataForGroup(groupId: string, modulesInput: any[]): P
   const stationWorkforce = await generateWorkforce(activeBaseline, modulesMap, commonSettings);
   const stationConstructions = await generateConstruction(activeBaseline, modulesMap, waresMap);
 
-  return {
+  const result = {
     planned,
     industryModules,
     industryModulesWithWorker,
@@ -304,6 +305,75 @@ async function generateMockDataForGroup(groupId: string, modulesInput: any[]): P
     stationWorkforce,
     stationConstructions
   };
+
+  // Inject names for modules and wares into the final JSON structure
+  const injectNames = (obj: any) => {
+    // 1. Handle Module Names (id or moduleId)
+    const addModuleName = (item: any) => {
+      if (!item || typeof item !== 'object') return;
+      const mId = item.id || item.moduleId;
+      if (mId && modulesMap[mId]) {
+        item.name = modulesMap[mId].name;
+      }
+    };
+
+    // 2. Handle Ware Names (wareId)
+    const addWareName = (item: any) => {
+      if (!item || typeof item !== 'object') return;
+      if (item.wareId && waresMap[item.wareId]) {
+        item.name = waresMap[item.wareId].name;
+      }
+    };
+
+    // Apply to module lists
+    result.planned.forEach(addModuleName);
+    result.industryModules.forEach(addModuleName);
+    result.industryModulesWithWorker.forEach(addModuleName);
+    result.supplyModules.forEach(addModuleName);
+    result.supplyModulesWithWorker.forEach(addModuleName);
+
+    // Apply to workforce breakdown
+    result.stationWorkforce.needed.breakdown.forEach(addModuleName);
+    result.stationWorkforce.capacity.breakdown.forEach(addModuleName);
+
+    // Apply to constructions
+    result.stationConstructions.moduleList.forEach((m: any) => {
+      addModuleName(m);
+      if (m.buildCost) {
+        m.buildCostNames = {};
+        Object.keys(m.buildCost).forEach(wId => {
+          if (waresMap[wId]) m.buildCostNames[wId] = waresMap[wId].name;
+        });
+      }
+    });
+
+    if (result.stationConstructions.totalMaterials) {
+      (result.stationConstructions as any).totalMaterialsNames = {};
+      Object.keys(result.stationConstructions.totalMaterials).forEach(wId => {
+        if (waresMap[wId]) (result.stationConstructions as any).totalMaterialsNames[wId] = waresMap[wId].name;
+      });
+    }
+
+    // Apply to flows
+    result.groupedFlows.flows.forEach((f: any) => {
+      addWareName(f);
+      if (f.contributions) {
+        f.contributions.forEach(addModuleName);
+      }
+    });
+
+    // Ensure groups also have names (they usually reference the same objects, but just in case)
+    const processFlowGroup = (group: any[]) => {
+      if (group) group.forEach(addWareName);
+    };
+
+    Object.values(result.groupedFlows.rateGroups).forEach(processFlowGroup);
+    Object.values(result.groupedFlows.volumeGroups).forEach(processFlowGroup);
+  };
+
+  injectNames(result);
+
+  return result;
 }
 
 /**

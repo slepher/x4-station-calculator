@@ -156,7 +156,6 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
         :isPositive="displayValue >= 0"
       >
         <template #title>
-          <div :class="classWithSymbol(displayValue, 'dot')"></div>
           <span class="name">{{ name }}</span>
         </template>
         <template #header>
@@ -209,10 +208,6 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
 
 <style scoped>
 
-.dot {
-  @apply w-1.5 h-1.5 rounded-full;
-}
-
 .flow-wrapper {
   @apply flex items-start gap-1;
 }
@@ -225,10 +220,6 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
   @apply w-20 h-8 flex-none flex items-center justify-center gap-2 bg-slate-800/40 rounded;
   /* 微调 pt-2 以便更好地对齐左侧文字的视觉中心 */
 }
-.dot-pos { @apply bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]; }
-.dot-neg { @apply bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]; }
-
-
 
 /* 处于锁定但同时不可操作的情况（兜底样式） */
 .lock-btn.is-locked.non-operable {
