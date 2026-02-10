@@ -43,6 +43,11 @@ This skill ensures OpenSpec documents are generated, translated, and formatted c
     -   When creating or generating a task list (e.g., `tasks.md`), **YOU MUST** simultaneously create a `test_tasks.md` file in the same directory.
     -   This file should define specific verification steps. While 1:1 mapping with implementation tasks is not required, the test tasks must be comprehensive, logically split, and strictly mapped 1:1 to future test scripts.
 
+5.  **Assess Spec State (Sync & Promote)**
+    -   Before archiving, check `openspec/changes/<name>/specs/`.
+    -   **Promote New Specs**: If a spec file exists there but NOT in `openspec/specs/`, it is a NEW spec. **YOU MUST** promote it by moving/copying it to `openspec/specs/<name>/` and stripping any Delta headers (ADDED/MODIFIED).
+    -   **Sync Delta Specs**: If a spec file exists in both places, it is a Delta spec. Prompt the user to sync changes.
+
 **Guardrails**
 -   NEVER translate `Requirement:` or `Scenario:` prefixes.
 -   NEVER translate the keywords `SHALL` or `MUST` inside requirement bodies.
