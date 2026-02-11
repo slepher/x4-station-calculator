@@ -123,24 +123,15 @@ const formattedDetails = computed(() => {
 })
 
 const volumeTooltipContent = computed(() => {
-  const netRateClass = props.netVolume >= 0 ? 'text-emerald-400' : 'text-red-400'
   return `
     <div class="volume-tooltip-grid">
-      <span class="label">${t('ui.net_rate')}</span>
-      <span class="value ${netRateClass}">${formatNum(props.netVolume)}</span>
-      <span class="unit">m³</span>
-      
-      <span class="label">${t('ui.storage_total_volume')}</span>
-      <span class="value text-blue-400">${formatNum(props.totalOccupiedVolume)}</span>
-      <span class="unit">m³</span>
-
-      <span class="label">${t('ui.storage_slots')}</span>
+      <span class="label">${t('wareflow.storage_slots')}</span>
       <span class="value text-blue-400">${Math.ceil(props.totalOccupiedCount)}</span>
-      <span class="unit">${t('ui.unit_slots')}</span>
+      <span class="unit">${t('wareflow.unit_slots')}</span>
       
-      <span class="label">${t('ui.storage_min_slots')}</span>
+      <span class="label">${t('wareflow.storage_min_slots')}</span>
       <span class="value text-blue-400">${Math.ceil(props.totalOccupiedConsumptionCount)}</span>
-      <span class="unit">${t('ui.unit_slots')}</span>
+      <span class="unit">${t('wareflow.unit_slots')}</span>
     </div>
   `
 })

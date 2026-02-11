@@ -2,8 +2,8 @@
 import { useStationStore } from '@/store/useStationStore'
 import draggable from 'vuedraggable'
 import { useI18n } from 'vue-i18n'
-import StationModuleItem from './StationModuleItem.vue'
-import StationModuleSelector from './StationModuleSelector.vue'
+import StationPlanningItem from './StationPlanningItem.vue'
+import StationModulePicker from './StationModulePicker.vue'
 import X4NumberInput from './common/X4NumberInput.vue'
 import { ref, computed, watch, nextTick } from 'vue'
 
@@ -114,10 +114,10 @@ const availableRaces = computed(() => {
 <template>
   <div class="module-list-container">
     <div class="header-row">
-      <h3 class="header-title">{{ t('ui.module_list') }}</h3>
+      <h3 class="header-title">{{ t('planning.module_list') }}</h3>
       <div class="header-controls">
         <div class="sunlight-control">
-          <span class="header-label">{{ t('ui.sun_light') }}</span>
+          <span class="header-label">{{ t('planning.sun_light') }}</span>
           <div class="x4-composite-input-wrapper">
             <X4NumberInput v-model="store.settings.sunlight" width-class="w-16" class="x4-nested-input" />
             <div class="x4-unit-suffix-box">%</div>
@@ -128,13 +128,13 @@ const availableRaces = computed(() => {
 
     <!-- 搜索框移动到顶部 -->
     <div class="search-panel">
-      <StationModuleSelector />
+      <StationModulePicker />
     </div>
 
     <!-- Tier 1: 用户规划区 -->
     <div class="tier-section">
       <div class="tier-header">
-        <span class="tier-label">{{ t('ui.tier_planned') }}</span>
+        <span class="tier-label">{{ t('planning.tier_planned') }}</span>
         <div class="scale-buttons">
           <button 
             v-for="scale in [0.2, 0.333, 0.5, 2, 3, 5]" 
@@ -150,10 +150,10 @@ const availableRaces = computed(() => {
         <draggable v-model="store.plannedModules" item-key="id" ghost-class="drag-ghost" filter=".ignore-drag"
           :prevent-on-filter="false" class="draggable-container">
           <template #item="{ element, index }">
-            <StationModuleItem :item="element" :info="store.getModuleInfo(element.id)!"
+            <StationPlanningItem :item="element" :info="store.getModuleInfo(element.id)!"
               :class="{ 'module-row--highlight': highlightedModuleIds.has(element.id) }"
               :is-number-flashing="flashingNumberModuleIds.has(element.id)"
-              @update:count="(val) => store.updateModuleCount(index, val)" @remove="store.removeModule(index)" />
+              @update:count="(val: number) => store.updateModuleCount(index, val)" @remove="store.removeModule(index)" />
           </template>
         </draggable>
       </div>
@@ -163,8 +163,8 @@ const availableRaces = computed(() => {
     <div v-if="store.autoIndustryModules.length > 0" class="tier-section tier-auto">
         <div class="tier-header tier-header-with-controls">
           <div class="tier-header-left">
-            <span class="tier-label">{{ t('ui.tier_industry') }}</span>
-            <div class="workforce-option" :title="t('ui.consider_workforce_bonus')" @click.stop>
+            <span class="tier-label">{{ t('planning.tier_industry') }}</span>
+            <div class="workforce-option" :title="t('planning.consider_workforce_bonus')" @click.stop>
               <input type="checkbox" id="wf-fill-check" v-model="store.settings.considerWorkforceForAutoFill"
                 class="x4-checkbox-mini" @click.stop />
               <span class="option-icon">👥</span>
@@ -172,7 +172,7 @@ const availableRaces = computed(() => {
           </div>
           <div class="tier-controls">
             <div class="race-selector">
-              <span class="header-label">{{ t('ui.race_preference') }}</span>
+              <span class="header-label">{{ t('planning.race_preference') }}</span>
               <select v-model="store.settings.racePreference" class="race-select">
                 <option v-for="race in availableRaces" :key="race" :value="race">
                   {{ t(`race.${race}`) }}
@@ -183,7 +183,7 @@ const availableRaces = computed(() => {
         </div>
       <div class="module-list-scroll">
         <div class="auto-modules-container">
-          <StationModuleItem v-for="(element, index) in store.autoIndustryModules" :key="element.id + '-' + index"
+          <StationPlanningItem v-for="(element, index) in store.autoIndustryModules" :key="element.id + '-' + index"
             :item="element" :info="store.getModuleInfo(element.id)!" :readonly="true"
             @transfer="store.transferModuleFromAutoIndustry(element)" />
         </div>
@@ -196,8 +196,8 @@ const availableRaces = computed(() => {
           @click="isSupplyOpen = !isSupplyOpen">
           <div class="tier-header-left">
             <span class="arrow" :class="{ 'arrow-open': isSupplyOpen }">▶</span>
-            <span class="tier-label">{{ t('ui.tier_supply') }}</span>
-            <div class="supply-workforce-option" :title="t('ui.consider_workforce_bonus')" @click.stop>
+            <span class="tier-label">{{ t('planning.tier_supply') }}</span>
+            <div class="supply-workforce-option" :title="t('planning.consider_workforce_bonus')" @click.stop>
               <input type="checkbox" id="supply-wf-check" v-model="store.settings.supplyWorkforceBonus"
                 class="x4-checkbox-mini" @click.stop />
               <span class="option-icon">👥</span>
@@ -207,7 +207,7 @@ const availableRaces = computed(() => {
       <Transition name="expand">
         <div v-if="isSupplyOpen" class="module-list-scroll">
           <div class="auto-modules-container">
-            <StationModuleItem v-for="(element, index) in store.autoSupplyModules" :key="element.id + '-' + index"
+            <StationPlanningItem v-for="(element, index) in store.autoSupplyModules" :key="element.id + '-' + index"
               :item="element" :info="store.getModuleInfo(element.id)!" :readonly="true" :no-click="true" />
           </div>
         </div>

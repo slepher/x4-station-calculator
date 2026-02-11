@@ -1,51 +1,43 @@
 ---
 name: x4-test
-description: Execute, create, or modify E2E tests for the X4 Station Calculator. Use this skill when the user mentions "test", "verification", "Playwright", or "E2E".
+description: Execute and write E2E tests for X4 Station Calculator using Playwright. (Triggered by /x4:verify or "test")
 metadata:
-  version: "1.0"
+  version: "1.1"
 ---
 
-This skill governs the creation and execution of E2E tests for the X4 Station Calculator project.
+# X4 Test Execution
 
-**Input**: User requests related to testing, verification, or bug reproduction.
+This skill governs the **coding and execution** of E2E tests. It is invoked during the `/x4:verify` phase or whenever coding tests.
 
-**Steps**
+## 1. Test Environment & Setup
+- **Framework**: Playwright + Vitest.
+- **Location**: `tests/` directory.
+- **MANDATORY Imports**:
+  ```typescript
+  import { test } from '../test-setup'; // Or relative path
+  import { expect } from '@playwright/test';
+  ```
+  *Note: Do NOT import `test` from `@playwright/test` directly.*
 
-1.  **Check Directory Structure**
-    Ensure test files mirror the `openspec/changes/` structure.
-    - `openspec/changes/station-ui/design.md` -> `tests/station-ui/`
+## 2. Coding Standards
+- **Pure UI Interactions**: Use Click, Fill, KeyPress. **NO** `page.evaluate` for state manipulation.
+- **Data Mocking**: Hardcode data from `tests/mock/station_mock_data.json` directly into test cases. **NO** JSON imports.
+- **Timeouts**: Max 200ms for element waiting. Use `waitForTimeout` sparingly.
+- **Interaction Rules**:
+  - **Search**: Fill -> Wait (500ms) -> Click Result -> Press Escape.
+  - **Reset**: Always start with "New" button (handle unsaved changes dialog).
 
-2.  **Verify Environment Setup**
-    -   **MANDATORY IMPORT**: Start every test file with:
-        ```typescript
-        import { test } from '../test-setup'; // Or relative path to test-setup
-        import { expect } from '@playwright/test';
-        ```
-    -   **FORBIDDEN**: Do NOT import `test` from `@playwright/test` directly.
-    -   Must use `--reporter=list` when running Playwright.
-    -   Must run from project root.
+## 3. Test-Document Mapping
+- **Source**: Tests are derived strictly from `test_tasks.md`.
+- **Mapping**: Each `test('description', ...)` block must correspond 1:1 to a checklist item in `test_tasks.md`.
+- **Validation**: When running tests, verify that `test_tasks.md` accurately reflects the pass/fail status.
 
-3.  **Validate Test Design**
-    -   **Document-Script Mapping**: Verify each `test(...)` corresponds strictly to a task in `test_tasks.md` (1:1 mapping).
-    -   **Logical Splitting**: Test tasks should be arranged comprehensively and split logically. They do NOT need to match implementation tasks 1:1.
-    -   **Pure UI**: Reject any `page.evaluate` usage for state manipulation. Use UI interactions (Click, Fill, KeyPress) only.
-    -   **Data Source**: Hardcode data from `tests/mock/station_mock_data.json` directly into test cases. Do NOT import the JSON file.
+## 4. Verification Guardrails
+- **I18n Checks**:
+  - Detect broken translations: Check for `ui.` prefixes or `!!{id}!!`.
+  - Use regex for dynamic text: `/Name|名称/`.
+- **State Isolation**: Never manipulate Pinia/Vue state directly via JS.
 
-4.  **Enforce Interaction Rules**
-    -   **Search**: Fill -> Wait (500ms) -> Click Result -> Press Escape.
-    -   **Reset**: Always start with "New" button (handle unsaved changes dialog).
-    -   **Timeouts**: Max 200ms for element waiting; use `waitForTimeout` sparingly for async logic.
-
-5.  **Verify i18n & Logic**
-    -   Check for `ui.` prefixes or `!!{id}!!` patterns to detect broken translations.
-    -   Use regex for dynamic text (e.g., `/Name|名称/`).
-    -   Use `locator().filter({ hasText: ... })` for nested components.
-
-6.  **Sync & Optimize Execution**
-    -   **Sync Status**: After running tests, immediately update `test_tasks.md`. Mark passing tests with `[x]` and failing tests with `[ ]`.
-    -   **Skip Passed**: When planning a test run, check `test_tasks.md`. Prioritize running unchecked `[ ]` items. Skip `[x]` items unless the underlying code has been modified since the last run.
-
-**Guardrails**
--   NEVER use `import data from '...json'` in test files.
--   NEVER manipulate Pinia/Vue state directly via JS.
--   NEVER merge multiple `test_tasks.md` items into one test case without user approval.
+## Guardrails
+- **NEVER** use `import data from '...json'`.
+- **NEVER** merge multiple `test_tasks.md` items into one test case.

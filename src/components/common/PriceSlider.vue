@@ -13,7 +13,7 @@ const { t } = useI18n()
 
 const priceText = computed(() => {
   return Math.abs(props.modelValue - 0.5) < 0.001
-    ? t('profit.average')
+    ? t('common.average')
     : `${Math.round(props.modelValue * 100)}%`
 })
 

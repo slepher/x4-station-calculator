@@ -3,10 +3,11 @@ import { ref, computed } from 'vue'
 import { useStationStore } from '@/store/useStationStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
-import PriceSlider from '@/components/PriceSlider.vue'
+import PriceSlider from '@/components/common/PriceSlider.vue'
 import StationModuleDetail from './StationModuleDetail.vue'
 import X4NumberInput from '@/components/common/X4NumberInput.vue'
-import VolumeControlSlider from '@/components/VolumeControlSlider.vue'
+import VolumeControlSlider from '@/components/common/VolumeControlSlider.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
 
 const store = useStationStore()
 const { translateModule, translateWare, translate } = useX4I18n()
@@ -314,24 +315,24 @@ const headerTitle = computed(() => {
         <span class="stat-value text-blue-400">{{ formatLargeNum(store.stationAnalysis.totalVolume) }} <small>m³</small></span>
       </div>
       <div class="stat-item">
-        <span class="stat-label">{{ t('station.stats_workers_needed') }}</span>
+        <span class="stat-label">{{ t('station.summary_workers_needed') }}</span>
         <span class="stat-value text-emerald-400">{{ formatNum(store.stationAnalysis.totalNeeded) }}</span>
       </div>
 
       <!-- Row 2: Time, Ships, Efficiency -->
       <div class="stat-item">
-        <span class="stat-label">{{ t('station.header_time') }}</span>
+        <span class="stat-label">{{ t('station.summary_time') }}</span>
         <span class="stat-value text-red-400">{{ formatTime(store.stationAnalysis.totalTime) }}</span>
       </div>
       <div class="stat-item">
-        <span class="stat-label">{{ t('station.stats_transport_trips') }}</span>
+        <span class="stat-label">{{ t('station.summary_transport_trips') }}</span>
         <span class="stat-value text-blue-400">
           {{ Math.ceil(store.stationAnalysis.totalVolume / transportShipCapacity) }}
           <small class="text-xs text-slate-500 font-normal">({{ formatLargeNum(transportShipCapacity) }})</small>
         </span>
       </div>
       <div class="stat-item">
-        <span class="stat-label">{{ t('station.stats_efficiency') }}</span>
+        <span class="stat-label">{{ t('station.summary_efficiency') }}</span>
         <span class="stat-value" :class="workforceEfficiencyColor">
           {{ workforceEfficiencyText }}
         </span>
@@ -370,13 +371,7 @@ const headerTitle = computed(() => {
       </div>
       
       <!-- Empty State -->
-      <div v-else class="empty-state">
-        <div class="empty-icon">
-          <span class="empty-icon-text">!</span>
-        </div>
-        <p class="empty-main-text">{{ t('station.no_active_production') }}</p>
-        <p class="empty-sub-text">{{ t('station.add_modules_hint') }}</p>
-      </div>
+      <EmptyState v-else class="empty-state" />
     </div>
 
     <!-- Footer with Controls -->
@@ -568,26 +563,6 @@ const headerTitle = computed(() => {
 
 .total-time-summary .value {
   @apply text-sm font-bold text-sky-400 font-mono;
-}
-
-.empty-state {
-  @apply flex flex-col items-center justify-center h-full py-12 opacity-40;
-}
-
-.empty-icon {
-  @apply w-12 h-12 rounded-full border-2 border-slate-600 flex items-center justify-center mb-4;
-}
-
-.empty-icon-text {
-  @apply text-2xl font-black text-slate-500;
-}
-
-.empty-main-text {
-  @apply text-sm font-bold text-slate-300 mb-1;
-}
-
-.empty-sub-text {
-  @apply text-xs text-slate-500;
 }
 
 /* Custom Scrollbar Style */

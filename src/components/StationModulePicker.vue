@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useStationStore } from '@/store/useStationStore'
+import { useI18n } from 'vue-i18n'
 
 const store = useStationStore()
+const { t } = useI18n()
 
 // --- Search Logic & State ---
 const searchInput = ref<HTMLInputElement | null>(null)
@@ -68,7 +70,7 @@ const onEsc = () => {
     <div class="flex flex-col gap-1">
       <div class="search-box group" :class="{ 'focused': isFocused }">
         <span class="search-icon">🔍</span>
-        <input ref="searchInput" :value="store.searchQuery" class="search-input" placeholder="Search modules..."
+        <input ref="searchInput" :value="store.searchQuery" class="search-input" :placeholder="t('planning.search_placeholder')"
           @input="onInput" @focus="onFocus" @blur="onBlur" @keydown.esc="onEsc" />
         <button v-show="store.searchQuery"
           class="clear-btn opacity-0 group-hover:opacity-100 transition-opacity duration-200"

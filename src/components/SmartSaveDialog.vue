@@ -2,11 +2,12 @@
 import { ref, computed, watch, nextTick } from 'vue'
 import { useStationStore } from '@/store/useStationStore'
 import { useI18n } from 'vue-i18n'
-import type { StationLayout } from '@/store/useStationStore';
+import type { StationPlan } from '@/store/useStationStore';
 
 const props = defineProps<{
   isOpen: boolean
   intent: 'NEW' | 'SAVE_AS'
+  initialName?: string
 }>()
 
 const emit = defineEmits(['close'])
@@ -23,13 +24,15 @@ watch(() => props.isOpen, (val) => {
   if (val) {
     isSaveAsExpanded.value = false
     // Default name logic
-    if (props.intent === 'SAVE_AS') {
-      const baseName = store.savedLayouts.activeId
-        ? store.savedLayouts.list.find((l: StationLayout) => l.id === store.savedLayouts.activeId)?.name
+    if (props.initialName) {
+      inputName.value = props.initialName
+    } else if (props.intent === 'SAVE_AS') {
+      const baseName = store.savedPlans.activeId
+        ? store.savedPlans.list.find((l: StationPlan) => l.id === store.savedPlans.activeId)?.name
         : ''
-      inputName.value = baseName ? `${baseName} ${t('ui.copy_suffix')}` : t('ui.default_station_name')
+      inputName.value = baseName ? `${baseName} ${t('menu.copy_suffix')}` : t('menu.default_station_name')
     } else {
-      inputName.value = t('ui.default_station_name')
+      inputName.value = t('menu.default_station_name')
     }
 
     if (showInput.value) {
@@ -40,22 +43,22 @@ watch(() => props.isOpen, (val) => {
 
 // --- Computed UI Logic ---
 
-const isNewPlan = computed(() => !store.savedLayouts.activeId)
+const isNewPlan = computed(() => !store.savedPlans.activeId)
 const currentPlanName = computed(() => {
-  if (store.savedLayouts.activeId) {
-    return store.savedLayouts.list.find((l: StationLayout) => l.id === store.savedLayouts.activeId)?.name || ''
+  if (store.savedPlans.activeId) {
+    return store.savedPlans.list.find((l: StationPlan) => l.id === store.savedPlans.activeId)?.name || ''
   }
   return ''
 })
 
 const dialogTitle = computed(() => {
   if (props.intent === 'SAVE_AS') {
-    return t('ui.dialog_title_save_as')
+    return t('menu.dialog_title_save_as')
   }
   if (isNewPlan.value) {
-    return t('ui.dialog_title_save_new_plan')
+    return t('menu.dialog_title_save_new_plan')
   } else {
-    return t('ui.dialog_title_save_changes')
+    return t('menu.dialog_title_save_changes')
   }
 })
 
@@ -63,9 +66,9 @@ const dialogMessage = computed(() => {
   if (props.intent === 'SAVE_AS') return null
 
   if (!isNewPlan.value) {
-    return t('ui.dialog_msg_save_changes_to', { name: currentPlanName.value })
+    return t('menu.dialog_msg_save_changes_to', { name: currentPlanName.value })
   }
-  return t('ui.dialog_msg_unsaved_new_plan')
+  return t('menu.dialog_msg_unsaved_new_plan')
 })
 
 const showInput = computed(() => {
@@ -83,17 +86,17 @@ const handlePrimaryAction = () => {
   if (!nameToSave.trim()) return
 
   if (isNewPlan.value || showInput.value) {
-    const originalId = store.savedLayouts.activeId
+    const originalId = store.savedPlans.activeId
     if (showInput.value) {
-      store.savedLayouts.activeId = null
+      store.savedPlans.activeId = null
     }
     try {
-      store.saveCurrentLayout(nameToSave)
+      store.saveCurrentPlan(nameToSave)
     } catch (e) {
-      store.savedLayouts.activeId = originalId
+      store.savedPlans.activeId = originalId
     }
   } else {
-    store.saveCurrentLayout(nameToSave)
+    store.saveCurrentPlan(nameToSave)
   }
 
   if (props.intent === 'NEW') {
@@ -148,18 +151,18 @@ const handleDiscard = () => {
 
         <div v-if="showInput" class="animate-expand mb-4">
           <label class="block text-xs font-bold text-slate-400 uppercase mb-2 ml-1">
-            {{ t('ui.label_layout_name') }}
+            {{ t('menu.label_layout_name') }}
           </label>
           <input ref="inputRef" v-model="inputName" @keyup.enter="handlePrimaryAction" type="text"
             class="w-full bg-slate-900 border border-slate-600 text-white rounded px-4 py-2 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition placeholder-slate-600"
-            :placeholder="t('ui.placeholder_enter_name')" />
+            :placeholder="t('menu.placeholder_enter_name')" />
         </div>
 
         <div v-if="intent === 'NEW' && !isNewPlan" class="flex items-center gap-2">
           <input type="checkbox" id="saveAsCopy" v-model="isSaveAsExpanded"
             class="w-4 h-4 accent-cyan-500 cursor-pointer" />
           <label for="saveAsCopy" class="text-sm text-slate-300 cursor-pointer select-none">
-            {{ t('ui.btn_save_as_copy') }}
+            {{ t('menu.btn_save_as_copy') }}
           </label>
         </div>
       </div>
@@ -167,15 +170,15 @@ const handleDiscard = () => {
       <div class="px-6 py-4 bg-slate-900/20 border-t border-slate-700 flex justify-end gap-3">
         <button v-if="intent === 'NEW'" @click="handleDiscard"
           class="btn-base bg-red-600 hover:bg-red-500 shadow-red-900/20">
-          {{ t('ui.btn_discard_and_new') }}
+          {{ t('menu.btn_discard_and_new') }}
         </button>
 
         <button @click="handlePrimaryAction" class="btn-base bg-cyan-600 hover:bg-cyan-500 shadow-cyan-900/20">
           <span v-if="intent === 'NEW'">
-            {{ (showInput || isNewPlan) ? t('ui.btn_save_new_and_create') : t('ui.btn_overwrite_and_create') }}
+            {{ (showInput || isNewPlan) ? t('menu.btn_save_new_and_create') : t('menu.btn_overwrite_and_create') }}
           </span>
           <span v-else>
-            {{ t('ui.btn_save') }}
+            {{ t('menu.btn_save') }}
           </span>
         </button>
       </div>

@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import { useStationStore } from '@/store/useStationStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
-import PriceSlider from '@/components/PriceSlider.vue'
+import PriceSlider from '@/components/common/PriceSlider.vue'
 
 const store = useStationStore()
 const { translateModule, translateWare } = useX4I18n()

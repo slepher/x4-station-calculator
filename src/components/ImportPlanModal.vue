@@ -49,7 +49,7 @@ const handleClose = () => {
             <path d="M8 18h8" />
             <path d="M8 14h8" />
           </svg>
-          {{ t('ui.import_plans') }}
+          {{ t('menu.import_plans') }}
         </h3>
         <button @click="handleClose" class="text-slate-400 hover:text-white transition p-1 hover:bg-slate-700 rounded">
           <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -60,12 +60,12 @@ const handleClose = () => {
 
       <div class="p-6 space-y-4">
         <p class="text-slate-300 text-sm leading-relaxed">
-          {{ t('ui.import_description') }}
+          {{ t('menu.import_description') }}
         </p>
 
         <textarea v-model="importContent"
           class="w-full h-64 bg-slate-900/50 border border-slate-600 rounded p-4 text-xs font-mono text-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 outline-none resize-none custom-scrollbar"
-          :placeholder="`<plan>...</plan> ${t('ui.import_placeholder_suffix')}`"></textarea>
+          :placeholder="`<plan>...</plan> ${t('menu.import_placeholder_suffix')}`"></textarea>
 
         <div v-if="hasError" class="text-red-400 text-sm flex items-center gap-2">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -73,18 +73,18 @@ const handleClose = () => {
             <line x1="12" y1="8" x2="12" y2="12" />
             <line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
-          {{ t('ui.import_failed') }}
+          {{ t('menu.import_failed') }}
         </div>
       </div>
 
       <div class="flex justify-end items-center gap-3 px-6 py-4 border-t border-slate-700 bg-slate-900/30">
         <button @click="handleClose"
           class="px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-700 rounded font-bold transition text-sm">
-          {{ t('ui.action_cancel') }}
+          {{ t('menu.action_cancel') }}
         </button>
         <button @click="handleImport"
           class="px-6 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded font-bold transition shadow-lg shadow-amber-900/20 flex items-center gap-2 text-sm">
-          {{ t('ui.action_import') }}
+          {{ t('menu.action_import') }}
         </button>
       </div>
     </div>

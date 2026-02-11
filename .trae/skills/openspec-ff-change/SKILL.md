@@ -1,6 +1,6 @@
 ---
 name: openspec-ff-change
-description: Fast-forward through OpenSpec artifact creation. Use when the user wants to quickly create all artifacts needed for implementation without stepping through each one individually.
+description: Fast-forward through OpenSpec artifact creation (Trigger: /opsx:ff). Use when the user wants to quickly create all artifacts needed for implementation without stepping through each one individually.
 license: MIT
 compatibility: Requires openspec CLI.
 metadata:
@@ -85,13 +85,13 @@ After completing all artifacts, summarize:
 
 **Artifact Creation Guidelines**
 
-- Follow the `instruction` field from `openspec instructions` for each artifact type
-- The schema defines what each artifact should contain - follow it
-- Read dependency artifacts for context before creating new ones
-- Use `template` as the structure for your output file - fill in its sections
-- **IMPORTANT**: `context` and `rules` are constraints for YOU, not content for the file
-  - Do NOT copy `<context>`, `<rules>`, `<project_context>` blocks into the artifact
-  - These guide what you write, but should never appear in the output
+  - Follow the `instruction` field from `openspec instructions` for each artifact type
+  - The schema defines what each artifact should contain - follow it
+  - Read dependency artifacts for context before creating new ones
+  - Use `template` as the structure for your output file - fill in its sections
+  - **IMPORTANT**: `context` and `rules` are constraints for YOU, not content for the file
+    - Do NOT copy `<context>`, `<rules>`, `<project_context>` blocks into the artifact
+    - These guide what you write, but should never appear in the output
 
 **Guardrails**
 - Create ALL artifacts needed for implementation (as defined by schema's `apply.requires`)

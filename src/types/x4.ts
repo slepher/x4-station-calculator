@@ -123,14 +123,14 @@ export interface StationSettings {
 /**
  * 空间站布局配置
  */
-export interface StationLayout {
+export interface StationPlan {
   id: string;
   name: string;
   modules: SavedModule[];
-  lockedWares: string[]; // 新增：锁定的资源ID列表 (如 ["energycells"])
   settings: StationSettings;
-  warePriority?: Record<string, number>; // 产物优先级覆盖：wareId -> priorityLevel (0, 1, 2)
   lastUpdated: number;
+  lockedWares?: string[];
+  warePriority?: Record<string, number>;
 }
 
 // --- 计算结果类型 (Calculation Results) ---

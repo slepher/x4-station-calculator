@@ -4,9 +4,10 @@ import { useStationStore } from '@/store/useStationStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n';
 
-import PriceSlider from '@/components/PriceSlider.vue'
-import VolumeControlSlider from '@/components/VolumeControlSlider.vue'
+import PriceSlider from '@/components/common/PriceSlider.vue'
+import VolumeControlSlider from '@/components/common/VolumeControlSlider.vue'
 import StationWareFlowGroup from './StationWareFlowGroup.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
 
 const store = useStationStore()
 const { t, locale } = useI18n();
@@ -49,9 +50,9 @@ const getGroupSymboledValue = (group: any[]) => {
 
 const title = () => {
   if (viewMode.value === 'quantity') {
-    return t('ui.resource_overview')
+    return t('wareflow.resource_overview')
   } else if (viewMode.value === 'economy') {
-    return t('profit.title')
+    return t('wareflow.profit_title')
   } else {
     return t('station.header_volume')
   }
@@ -60,32 +61,32 @@ const title = () => {
 const modes = computed<{"key": ViewMode; title: string}[]>(() => {
   locale.value
   return [
-  {key: 'quantity', title: t('ui.quantity_view')},
-  {key: 'economy', title: t('ui.economy_view')},
-  {key: 'volume', title: t('station.view_volume')}
+  {key: 'quantity', title: t('wareflow.quantity_view')},
+  {key: 'economy', title: t('wareflow.economy_view')},
+  {key: 'volume', title: t('wareflow.volume_view')}
 ]})
 
 const volumeGroups = computed(() => [
-  {key: 'container', title: t('ui.container_group'),
+  {key: 'container', title: t('wareflow.container_group'),
    items: groupedFlows.value.volumeGroups.container.map(wrapFlow)},
-  {key: 'solid', title: t('ui.solid_group'),
+  {key: 'solid', title: t('wareflow.solid_group'),
    items: groupedFlows.value.volumeGroups.solid.map(wrapFlow)},
-  {key: 'liquid', title: t('ui.liquid_group'),
+  {key: 'liquid', title: t('wareflow.liquid_group'),
    items: groupedFlows.value.volumeGroups.liquid.map(wrapFlow)}
 ])
 
 const rateGroups = computed(() => ([
   {key: 'positive',
    symbolClass: "positive",
-   title: viewMode.value === 'economy' ? t('ui.income_group') : t('ui.products_group'),
+   title: viewMode.value === 'economy' ? t('wareflow.income_group') : t('wareflow.products_group'),
    items: groupedFlows.value.rateGroups.positive.map(wrapFlow)},
   {key: 'operations',
    symbolClass: "negative",
-   title: viewMode.value === 'economy' ? t('ui.expenses_operations_group') : t('ui.operations_group'),
+   title: viewMode.value === 'economy' ? t('wareflow.expenses_operations_group') : t('wareflow.operations_group'),
    items: groupedFlows.value.rateGroups.operations.map(wrapFlow)},
   {key: 'resources', 
    symbolClass: "negative",
-   title: viewMode.value === 'economy' ? t('ui.expenses_resources_group') : t('ui.resources_group'),
+   title: viewMode.value === 'economy' ? t('wareflow.expenses_resources_group') : t('wareflow.resources_group'),
    items: groupedFlows.value.rateGroups.resources.map(wrapFlow)}
 ]))
 </script>
@@ -108,7 +109,7 @@ const rateGroups = computed(() => ([
         </div>
 
         <span class="header-badge">
-          {{ t('ui.hourly_rate') }}
+          {{ t('wareflow.hourly_rate') }}
         </span>
       </div>
     </div>
@@ -145,22 +146,10 @@ const rateGroups = computed(() => ([
             </span> 
           </StationWareFlowGroup>
         <!-- 经济视图空状态 -->
-        <div v-if="viewMode === 'economy' && groupedFlows.flows.length === 0" class="empty-container">
-          <div class="empty-icon-wrapper">
-            <span class="empty-icon-text">!</span>
-          </div>
-          <p class="empty-main-text">{{ t('station.no_active_production') }}</p>
-          <p class="empty-sub-text">{{ t('station.add_modules_hint') }}</p>
-        </div>
+        <EmptyState v-if="viewMode === 'economy' && groupedFlows.flows.length === 0" />
       </div>
 
-      <div v-if="groupedFlows.flows.length === 0 && viewMode !== 'economy'" class="empty-container">
-        <div class="empty-icon-wrapper">
-          <span class="empty-icon-text">!</span>
-        </div>
-        <p class="empty-main-text">{{ t('station.no_active_production') }}</p>
-        <p class="empty-sub-text">{{ t('station.add_modules_hint') }}</p>
-      </div>
+      <EmptyState v-if="groupedFlows.flows.length === 0 && viewMode !== 'economy'" />
     </div>
 
     <!-- 体积控件部分 -->
@@ -168,19 +157,19 @@ const rateGroups = computed(() => ([
       <div class="simulation-controls flex flex-row gap-4">
         <VolumeControlSlider
           v-model="store.settings.resourceBufferHours"
-          :label="t('ui.resource_buffer_hours')"
+          :label="t('wareflow.resource_buffer_hours')"
           type="resource"
           :max="24"
           :step="1" />
         <VolumeControlSlider
           v-model="store.settings.primaryProductBufferHours"
-          :label="t('ui.primary_product_buffer_hours')"
+          :label="t('wareflow.primary_product_buffer_hours')"
           type="product"
           :max="24"
           :step="1" />
         <VolumeControlSlider
           v-model="store.settings.secondaryProductBufferHours"
-          :label="t('ui.secondary_product_buffer_hours')"
+          :label="t('wareflow.secondary_product_buffer_hours')"
           type="product"
           :max="24"
           :step="1" />
@@ -190,8 +179,8 @@ const rateGroups = computed(() => ([
     <!-- 利润分析部分 -->
     <div class="profit-section" v-if="viewMode === 'economy'">
       <div class="simulation-controls flex flex-row gap-4">
-        <PriceSlider v-model="store.settings.buyMultiplier" :label="t('profit.res_price')" type="buy" />
-        <PriceSlider v-model="store.settings.sellMultiplier" :label="t('profit.prod_price')" type="sell" />
+        <PriceSlider v-model="store.settings.buyMultiplier" :label="t('wareflow.res_price')" type="buy" />
+        <PriceSlider v-model="store.settings.sellMultiplier" :label="t('wareflow.prod_price')" type="sell" />
       </div>
 
       <!-- 总利润 -->
@@ -200,7 +189,7 @@ const rateGroups = computed(() => ([
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
           </svg>
-          {{ t('profit.footer') }}
+          {{ t('wareflow.profit_footer') }}
         </span>
         <span class="profit-val" :class="totalProfit >= 0 ? 'positive' : 'negative'">
           {{ formatNum(totalProfit) }} Cr
@@ -251,26 +240,7 @@ const rateGroups = computed(() => ([
   @apply p-2 overflow-y-auto;
 }
 
-.empty-container {
-  @apply py-12 flex flex-col items-center justify-center opacity-30;
-}
-
-.empty-icon-wrapper {
-  @apply w-12 h-12 border-2 border-dashed border-slate-500 rounded-full mb-3 flex items-center justify-center;
-}
-
-.empty-icon-text {
-  @apply text-xl;
-}
-
-.empty-main-text {
-  @apply text-xs font-medium;
-}
-
-.empty-sub-text {
-  @apply text-[10px];
-}
-
+/* Custom Scrollbar Style */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }

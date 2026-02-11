@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import StationPlanner from './components/StationPlanner.vue'
+import StationWorkbench from './components/StationWorkbench.vue'
 import { useStationStore } from '@/store/useStationStore'
 const store = useStationStore()
 
@@ -9,7 +9,7 @@ if (import.meta.env.DEV) {
 </script>
 
 <template>
-  <StationPlanner v-if="store.isReady"/>
+  <StationWorkbench v-if="store.isReady"/>
 </template>
 
 <style>

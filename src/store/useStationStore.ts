@@ -7,7 +7,7 @@ import type {
   X4Ware,
   SavedModule,
   StationSettings,
-  StationLayout,
+  StationPlan,
   RaceMedicalConsumption
 } from '../types/x4'
 import { useGameData, type LocalizedX4Module, type LocalizedX4ModuleGroup } from './logic/useGameData'
@@ -29,13 +29,13 @@ import { analyzeWareFlow } from './logic/analyzeWareFlow'
 import { analyzeStation } from './logic/analyzeStation'
 
 // --- 类型定义 (Type Definitions) ---
-export type { SavedModule, StationLayout } from '../types/x4'
+export type { SavedModule, StationPlan } from '../types/x4'
 export type { LocalizedX4ModuleGroup, LocalizedX4Module } from './logic/useGameData'
 
-export interface SavedLayoutsState {
+export interface SavedPlansState {
   version: number;
   activeId: string | null;
-  list: StationLayout[];
+  list: StationPlan[];
 }
 
 export interface GroupedModuleItem extends LocalizedX4Module {
@@ -57,7 +57,8 @@ export const useStationStore = defineStore('station', () => {
   const isReady = ref(false)
   const plannedModules = ref<SavedModule[]>([]) // Tier 1: 用户规划的核心模块
   const lockedWares = ref<string[]>([]) // 提升至外层，与 plannedModules 并列
-  const savedLayouts = ref<SavedLayoutsState>({ version: 1, activeId: null, list: [] })
+  const savedPlans = ref<SavedPlansState>({ version: 1, activeId: null, list: [] })
+  const currentPlanName = ref<string>('') // 当前方案名称，"" 代表未命名/新建
   const searchQuery = ref('')
   const lastSavedSnapshot = ref<string>('')
 
@@ -129,25 +130,26 @@ export const useStationStore = defineStore('station', () => {
     return s as StationSettings
   }
 
-  function applyLayout(layout: StationLayout) {
-    plannedModules.value = JSON.parse(JSON.stringify(layout.modules))
+  function applyPlan(plan: StationPlan) {
+    plannedModules.value = JSON.parse(JSON.stringify(plan.modules))
+    currentPlanName.value = plan.name
     
     // 处理设置及兼容性
-    const rawSettings = JSON.parse(JSON.stringify(layout.settings))
+    const rawSettings = JSON.parse(JSON.stringify(plan.settings))
     settings.value = migrateSettings(rawSettings)
     
-    savedLayouts.value.activeId = layout.id
-    lockedWares.value = layout.lockedWares ? JSON.parse(JSON.stringify(layout.lockedWares)) : []
-    warePriority.value = layout.warePriority ? JSON.parse(JSON.stringify(layout.warePriority)) : {}
+    savedPlans.value.activeId = plan.id
+    lockedWares.value = plan.lockedWares ? JSON.parse(JSON.stringify(plan.lockedWares)) : []
+    warePriority.value = plan.warePriority ? JSON.parse(JSON.stringify(plan.warePriority)) : {}
   }
 
   // --- 操作方法 (Actions) ---
-  function loadData(source: SavedLayoutsState) {
-    savedLayouts.value = JSON.parse(JSON.stringify(source))
-    if (savedLayouts.value.activeId) {
-      const target = savedLayouts.value.list.find(l => l.id === savedLayouts.value.activeId)
+  function loadData(source: SavedPlansState) {
+    savedPlans.value = JSON.parse(JSON.stringify(source))
+    if (savedPlans.value.activeId) {
+      const target = savedPlans.value.list.find(l => l.id === savedPlans.value.activeId)
       if (target) {
-        applyLayout(target)
+        applyPlan(target)
       }
     }
     takeSnapshot()
@@ -158,13 +160,16 @@ export const useStationStore = defineStore('station', () => {
   }
 
   function loadDemoData() {
-    loadData(mockStationData as unknown as SavedLayoutsState)
+    loadData(mockStationData as unknown as SavedPlansState)
   }
 
-  function saveCurrentLayout(name: string) {
-    const layoutData: StationLayout = {
-      id: savedLayouts.value.activeId || crypto.randomUUID(),
-      name,
+  function saveCurrentPlan(name?: string) {
+    const finalName = name || currentPlanName.value
+    // 注意：Store 层不做最终空检查，由 UI 层保证 finalName 有效或逻辑正确
+    
+    const planData: StationPlan = {
+      id: savedPlans.value.activeId || crypto.randomUUID(),
+      name: finalName,
       modules: JSON.parse(JSON.stringify(plannedModules.value)),
       lockedWares: JSON.parse(JSON.stringify(lockedWares.value)),
       settings: JSON.parse(JSON.stringify(settings.value)),
@@ -176,14 +181,14 @@ export const useStationStore = defineStore('station', () => {
     if (stored) {
       try {
         const remote = JSON.parse(stored)
-        savedLayouts.value.list = remote.list || []
+        savedPlans.value.list = remote.list || []
       } catch (e) { /* ignore parse error */ }
     }
 
-    const idx = savedLayouts.value.list.findIndex(l => l.id === layoutData.id)
-    if (idx !== -1) savedLayouts.value.list[idx] = layoutData
-    else savedLayouts.value.list.push(layoutData)
-    savedLayouts.value.activeId = layoutData.id
+    const idx = savedPlans.value.list.findIndex(l => l.id === planData.id)
+    if (idx !== -1) savedPlans.value.list[idx] = planData
+    else savedPlans.value.list.push(planData)
+    savedPlans.value.activeId = planData.id
     takeSnapshot()
   }
 
@@ -192,26 +197,26 @@ export const useStationStore = defineStore('station', () => {
     return current !== lastSavedSnapshot.value
   })
 
-  function loadLayout(index: number) {
-    const layout = savedLayouts.value.list[index]
-    if (layout) {
-      applyLayout(layout)
+  function loadPlan(index: number) {
+    const plan = savedPlans.value.list[index]
+    if (plan) {
+      applyPlan(plan)
     }
   }
 
-  function mergeLayout(index: number) {
-    const layout = savedLayouts.value.list[index]
-    if (layout) layout.modules.forEach(m => addModule(m.id, m.count))
+  function mergePlan(index: number) {
+    const plan = savedPlans.value.list[index]
+    if (plan) plan.modules.forEach(m => addModule(m.id, m.count))
   }
 
-  function deleteLayout(index: number) {
-    if (savedLayouts.value.list[index]?.id === savedLayouts.value.activeId) {
-      savedLayouts.value.activeId = null
+  function deletePlan(index: number) {
+    if (savedPlans.value.list[index]?.id === savedPlans.value.activeId) {
+      savedPlans.value.activeId = null
     }
-    savedLayouts.value.list.splice(index, 1)
+    savedPlans.value.list.splice(index, 1)
   }
 
-  watch(savedLayouts, (val) => {
+  watch(savedPlans, (val) => {
     localStorage.setItem('x4_station_data', JSON.stringify(val))
   }, { deep: true })
 
@@ -263,7 +268,8 @@ export const useStationStore = defineStore('station', () => {
   function clearAll() { 
     plannedModules.value = []
     lockedWares.value = []
-    savedLayouts.value.activeId = null
+    savedPlans.value.activeId = null
+    currentPlanName.value = ''
   }
 
   // 切换资源锁定状态
@@ -551,9 +557,9 @@ export const useStationStore = defineStore('station', () => {
 
   return {
     isReady, isDirty,
-    plannedModules, autoIndustryModules, autoSupplyModules, allIndustryModules, allModules, settings, searchQuery, filteredModulesGrouped,
+    plannedModules, autoIndustryModules, autoSupplyModules, allIndustryModules, allModules, settings, searchQuery, filteredModulesGrouped, currentPlanName,
     wares: waresMap, modules: localizedModulesMap, moduleGroups: localizedModuleGroupsMap, medicalConsumption: medicalConsumptionMap,
-    loadData, loadDemoData, savedLayouts, saveCurrentLayout, loadLayout, mergeLayout, deleteLayout,
+    loadData, loadDemoData, savedPlans, saveCurrentPlan, loadPlan, mergePlan, deletePlan,
     lockedWares, isWareLocked, isWareOperable, toggleWareLock,
     warePriority, isPlannedWare, isAutoWare, getResolvedLevel, toggleWarePriority,
     addModule, importPlan, updateModuleId, updateModuleCount, removeModule, removeModuleById, transferModuleFromAutoIndustry, clearAll, getModuleInfo,

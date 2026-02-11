@@ -67,12 +67,12 @@ const moduleInfoClass = computed(() => {
         <X4NumberInput :modelValue="item.count" @update:modelValue="emit('update:count', $event)" width-class="w-14"
           :min="1" />
       </div>
-      <button @click="emit('remove')" class="remove-btn ignore-drag" :title="t('ui.remove')">×</button>
+      <button @click="emit('remove')" class="remove-btn ignore-drag" :title="t('planning.remove')">×</button>
     </div>
     <div class="controls" v-else>
       <div v-if="!props.noClick" class="count-display ignore-drag" @click="emit('transfer', item)">
         <span class="count-text count-text--clickable" :class="{ 'count-text--flashing': isNumberFlashing }"
-          :title="t('ui.transfer_to_planning')">{{ item.count }}</span>
+          :title="t('planning.transfer_to_planning')">{{ item.count }}</span>
       </div>
       <div v-else class="count-display">
         <span class="count-text count-text--static" :class="{ 'count-text--flashing': isNumberFlashing }">{{ item.count
