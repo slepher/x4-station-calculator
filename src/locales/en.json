@@ -109,7 +109,9 @@
     "res_price": "RESOURCES PRICE",
     "prod_price": "PRODUCTS PRICE",
     "profit_footer": "ESTIMATED HOURLY PROFIT",
-    "header_volume": "Material Volume"
+    "header_volume": "Material Volume",
+    "net_volume": "Net Volume",
+    "storage_volume": "Storage Volume"
   },
   "race": {
     "argon": "Argon",

@@ -111,7 +111,9 @@
     "res_price": "原材料价格",
     "prod_price": "产品价格",
     "profit_footer": "预计每小时利润",
-    "header_volume": "材料体积"
+    "header_volume": "材料体积",
+    "net_volume": "吞吐容量",
+    "storage_volume": "占用容量"
   },
   "race": {
     "argon": "Argon",
