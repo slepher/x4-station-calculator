@@ -76,7 +76,8 @@ export const useStationStore = defineStore('station', () => {
     racePreference: 'argon',  // 默认种族偏好
     resourceBufferHours: 1.0, // 默认资源缓冲时间
     primaryProductBufferHours: 12.0,   // 默认主产物缓冲时间（小时）
-    secondaryProductBufferHours: 2.0   // 默认副产物缓冲时间（小时）
+    secondaryProductBufferHours: 2.0,   // 默认副产物缓冲时间（小时）
+    transportShipCapacity: 62000 // 默认运输船运量
   })
 
   const buildPriceMultiplier = ref(0.5)
@@ -107,9 +108,38 @@ export const useStationStore = defineStore('station', () => {
       allIndustryModules.value,
       modulesMap.value,
       waresMap.value,
-      buildPriceMultiplier.value
+      buildPriceMultiplier.value,
+      settings.value.useHQ
     )
   })
+
+  // --- 辅助方法 (Helpers) ---
+  function migrateSettings(s: any): StationSettings {
+    s.racePreference = s.racePreference || 'argon' 
+    // 兼容旧数据：将 productBufferHours 迁移到 primaryProductBufferHours
+    if ('productBufferHours' in s) {
+      const oldValue = s.productBufferHours
+      s.primaryProductBufferHours = oldValue
+      delete s.productBufferHours
+    }
+    s.primaryProductBufferHours = s.primaryProductBufferHours ?? 12.0
+    s.secondaryProductBufferHours = s.secondaryProductBufferHours ?? 2.0
+    s.resourceBufferHours = s.resourceBufferHours || 2 // 兼容旧数据
+    s.transportShipCapacity = s.transportShipCapacity ?? 62000 // 兼容旧数据，默认 62000
+    return s as StationSettings
+  }
+
+  function applyLayout(layout: StationLayout) {
+    plannedModules.value = JSON.parse(JSON.stringify(layout.modules))
+    
+    // 处理设置及兼容性
+    const rawSettings = JSON.parse(JSON.stringify(layout.settings))
+    settings.value = migrateSettings(rawSettings)
+    
+    savedLayouts.value.activeId = layout.id
+    lockedWares.value = layout.lockedWares ? JSON.parse(JSON.stringify(layout.lockedWares)) : []
+    warePriority.value = layout.warePriority ? JSON.parse(JSON.stringify(layout.warePriority)) : {}
+  }
 
   // --- 操作方法 (Actions) ---
   function loadData(source: SavedLayoutsState) {
@@ -117,20 +147,7 @@ export const useStationStore = defineStore('station', () => {
     if (savedLayouts.value.activeId) {
       const target = savedLayouts.value.list.find(l => l.id === savedLayouts.value.activeId)
       if (target) {
-        plannedModules.value = JSON.parse(JSON.stringify(target.modules))
-        settings.value = JSON.parse(JSON.stringify(target.settings))
-        settings.value.racePreference = settings.value.racePreference || 'argon' 
-        // 兼容旧数据：将 productBufferHours 迁移到 primaryProductBufferHours
-        if ('productBufferHours' in settings.value) {
-          const oldValue = (settings.value as any).productBufferHours
-          settings.value.primaryProductBufferHours = oldValue
-          delete (settings.value as any).productBufferHours
-        }
-        settings.value.primaryProductBufferHours = settings.value.primaryProductBufferHours ?? 12.0
-        settings.value.secondaryProductBufferHours = settings.value.secondaryProductBufferHours ?? 2.0
-        settings.value.resourceBufferHours = settings.value.resourceBufferHours || 2 // 兼容旧数据
-        lockedWares.value = target.lockedWares ? JSON.parse(JSON.stringify(target.lockedWares)) : []
-        warePriority.value = target.warePriority ? JSON.parse(JSON.stringify(target.warePriority)) : {}
+        applyLayout(target)
       }
     }
     takeSnapshot()
@@ -178,14 +195,7 @@ export const useStationStore = defineStore('station', () => {
   function loadLayout(index: number) {
     const layout = savedLayouts.value.list[index]
     if (layout) {
-      plannedModules.value = JSON.parse(JSON.stringify(layout.modules))
-      settings.value = JSON.parse(JSON.stringify(layout.settings))
-      settings.value.primaryProductBufferHours = settings.value.primaryProductBufferHours ?? 12.0
-      settings.value.secondaryProductBufferHours = settings.value.secondaryProductBufferHours ?? 2.0
-      settings.value.resourceBufferHours = settings.value.resourceBufferHours || 2 // 兼容旧数据
-      savedLayouts.value.activeId = layout.id
-      lockedWares.value = layout.lockedWares ? JSON.parse(JSON.stringify(layout.lockedWares)) : []
-      warePriority.value = layout.warePriority ? JSON.parse(JSON.stringify(layout.warePriority)) : {}
+      applyLayout(layout)
     }
   }
 
@@ -397,7 +407,7 @@ export const useStationStore = defineStore('station', () => {
   // --- 业务计算逻辑 ---
   const constructionBreakdown = computed(() => {
     return calculateConstructionBreakdown(
-      allIndustryModules.value,
+      allModules.value,
       modulesMap.value,
       waresMap.value
     )

@@ -1,11 +1,11 @@
 <template>
   <div class="item-container">
     <div 
-      :class="['main-row', isPositive ? 'status-pos' : 'status-neg', !isEmpty ? 'main-row-hover' : '', { 'is-active': isOpen && !isEmpty }]"
-      @click="isOpen = !isOpen"
+      :class="['main-row', isPositive ? 'status-pos' : 'status-neg', (!isEmpty && isExpandable) ? 'main-row-hover cursor-pointer' : 'cursor-default', { 'is-active': isOpen && !isEmpty && isExpandable }]"
+      @click="isExpandable && (isOpen = !isOpen)"
     >
       <div class="label-group">
-        <span class="arrow" :class="{ 'arrow-open': isOpen }" v-if="!isEmpty">▶</span>
+        <span class="arrow" :class="{ 'arrow-open': isOpen }" v-if="!isEmpty && isExpandable">▶</span>
         <slot name="title"></slot>
       </div>
       <div class="right-group">
@@ -33,10 +33,12 @@ import { ref, computed } from 'vue'
 
 const props = withDefaults(defineProps<{
   data?: any[],
-  isPositive?: boolean
+  isPositive?: boolean,
+  isExpandable?: boolean
 }>(), {
   data: () => [],
-  isPositive: true
+  isPositive: true,
+  isExpandable: true
 })
 
 const isEmpty = computed(() => props.data.length == 0);
@@ -47,7 +49,7 @@ const isOpen = ref(false)
 <style scoped>
 /* 样式资产冻结：直接继承原组件的 UI 规范 */
 .item-container { @apply mb-1 select-none; }
-.main-row { @apply flex justify-between items-center h-8 px-3 py-0.5 bg-slate-800/40 rounded cursor-pointer transition-colors border border-transparent; }
+.main-row { @apply flex justify-between items-center h-8 px-3 py-0.5 bg-slate-800/40 rounded transition-colors border border-transparent; }
 .main-row-hover { @apply hover:bg-slate-700/50 }
 .is-active { @apply border-slate-600/50 bg-slate-700/40; }
 

@@ -117,6 +117,7 @@ export interface StationSettings {
   resourceBufferHours: number; // 资源缓冲时间（小时）
   primaryProductBufferHours: number;   // 主产物缓冲时间（小时）
   secondaryProductBufferHours: number; // 副产物缓冲时间（小时）
+  transportShipCapacity: number; // 运输船运量
 }
 
 /**

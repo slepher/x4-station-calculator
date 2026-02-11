@@ -1,0 +1,40 @@
+# Tasks: Station Dashboard Views
+
+- [x] **Logic**: 更新 `analyzeStation.ts` 以包含时间、工人维度的计算。
+    - [x] 在 `AnalysisItem` 和 `AnalysisGroup` 接口中添加必要的字段。
+    - [x] 更新 `analyzeStation` 函数，汇总 `buildTime`, `capacity`, `needed`。
+    - [x] 修正数据源为 `allIndustryModules` 以对齐 WareFlow。
+- [x] **UI**: 在 `StationDashboard.vue` 中实现 Stats Bar。
+    - [x] 添加 HTML 结构和 Tailwind 样式。
+    - [x] 绑定汇总数据（价格、时间、工人效率）。
+- [x] **UI**: 更新 `StationDashboard.vue` 视图切换逻辑。
+    - [x] 确保 `viewMode` 切换时列表数据正确映射。
+    - [x] 实现 `formatTime` 逻辑（符合 XD HH:MM:SS 规范）。
+    - [x] 工人视图映射单体数据 (Unit Data) 到明细行。
+- [x] **UI**: 更新 `StationModuleDetail.vue`。
+    - [x] 处理 `unit`, `isTime`, `isWorkers` 等新 Props。
+    - [x] 实现工人视图的颜色逻辑（容量绿/需求红，绝对值，无符号）。
+    - [x] 实现时间视图的颜色逻辑（红色）。
+    - [x] 调小展开明细行的字体大小 (`text-xs`)。
+    - [x] 实现不同视图下的展开控制逻辑。
+- [x] **UI**: 在 `StationDashboard.vue` 中工人视图模式下添加控制面板。
+    - [x] 确保 `manualWorkforce` 和 `workforceAuto` 的双向绑定。
+    - [x] 确保 `saturationPercent` 的逻辑在 Dashboard 中正常工作。
+    - [x] 添加 `useHQ` 开关并确保其影响 UI 显示。
+- [x] **Logic**: 在 `analyzeStation.ts` 中支持 PHQ 数据。
+    - [x] 更新 `StationAnalysis` 接口，添加 `playerHQNeeded: number`。
+    - [x] 在 `analyzeStation` 函数中，根据 `settings.useHQ` 设置 `playerHQNeeded` 为 200 或 0。
+    - [x] 确保 `totalNeeded` 的汇总计算包含了 `playerHQNeeded`。
+- [x] **UI**: 在 `StationDashboard.vue` 中显示 PHQ 条目。
+    - [x] 在工人视图列表中，根据 `analysis.playerHQNeeded` 渲染 PHQ 行。
+- [x] **UI**: 更新 `StationDashboard.vue` 中的展开逻辑。
+    - [x] 确保时间视图汇总行和模块行均可展开，显示单体时间。
+- [x] **UI**: 实现价格简化显示逻辑。
+    - [x] 实现 `formatLargeNum` 函数 (175M Cr 格式)。
+    - [x] 应用于 Stats Bar 的总价格显示。
+- [x] **UI**: 增强 Stats Bar 信息。
+    - [x] 增加“总需求”显示。
+    - [x] 统一支出类数值颜色为红色。
+- [x] **I18n**: 修复英文模式下的翻译缺失。
+    - [x] 补全 `en.json` 中的 `workforce_efficiency` 键。
+    - [x] 统一 PHQ 使用游戏原生文本翻译逻辑。

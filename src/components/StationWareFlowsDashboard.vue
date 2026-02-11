@@ -53,7 +53,7 @@ const title = () => {
   } else if (viewMode.value === 'economy') {
     return t('profit.title')
   } else {
-    return t('ui.volume_overview')
+    return t('station.header_volume')
   }
 }
 
@@ -62,7 +62,7 @@ const modes = computed<{"key": ViewMode; title: string}[]>(() => {
   return [
   {key: 'quantity', title: t('ui.quantity_view')},
   {key: 'economy', title: t('ui.economy_view')},
-  {key: 'volume', title: t('ui.volume_view')}
+  {key: 'volume', title: t('station.view_volume')}
 ]})
 
 const volumeGroups = computed(() => [
@@ -149,8 +149,8 @@ const rateGroups = computed(() => ([
           <div class="empty-icon-wrapper">
             <span class="empty-icon-text">!</span>
           </div>
-          <p class="empty-main-text">{{ t('ui.no_active_production') }}</p>
-          <p class="empty-sub-text">{{ t('ui.add_modules_hint') }}</p>
+          <p class="empty-main-text">{{ t('station.no_active_production') }}</p>
+          <p class="empty-sub-text">{{ t('station.add_modules_hint') }}</p>
         </div>
       </div>
 
@@ -158,8 +158,8 @@ const rateGroups = computed(() => ([
         <div class="empty-icon-wrapper">
           <span class="empty-icon-text">!</span>
         </div>
-        <p class="empty-main-text">{{ t('ui.no_active_production') }}</p>
-        <p class="empty-sub-text">{{ t('ui.add_modules_hint') }}</p>
+        <p class="empty-main-text">{{ t('station.no_active_production') }}</p>
+        <p class="empty-sub-text">{{ t('station.add_modules_hint') }}</p>
       </div>
     </div>
 

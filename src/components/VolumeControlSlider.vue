@@ -4,19 +4,28 @@ import { computed } from 'vue'
 const props = defineProps<{
   modelValue: number,
   label: string,
-  type: 'resource' | 'product',
+  type: 'resource' | 'product' | 'transport',
+  min?: number,
   max?: number,
-  step?: number
+  step?: number,
+  unit?: string
 }>()
 
 const emit = defineEmits(['update:modelValue'])
 
-// 默认最大值为24小时，步长为1小时
+// 默认最小值为0，最大值为24小时，步长为1小时
+const minValue = computed(() => props.min ?? 0)
 const maxValue = computed(() => props.max ?? 24)
 const stepValue = computed(() => props.step ?? 1)
+const unitText = computed(() => props.unit ?? 'h')
 
-const hoursText = computed(() => {
-  return `${Math.round(props.modelValue * 10) / 10}h` // 保留一位小数
+const displayValue = computed(() => {
+  const rounded = Math.round(props.modelValue * 10) / 10
+  // 如果单位是 m³，使用千分位分隔符
+  if (unitText.value === 'm³') {
+    return new Intl.NumberFormat('en-US').format(rounded) + unitText.value
+  }
+  return rounded + unitText.value
 })
 
 const updateValue = (e: Event) => {
@@ -29,13 +38,17 @@ const updateValue = (e: Event) => {
     <div class="slider-wrapper">
       <div class="slider-header">
         <span class="slider-label uppercase whitespace-nowrap">{{ label }}</span>
-        <span :class="['font-black uppercase whitespace-nowrap', type === 'resource' ? 'text-amber-400' : 'text-purple-400']">
-          {{ hoursText }}
+        <span :class="['font-black uppercase whitespace-nowrap', 
+          type === 'resource' ? 'text-amber-400' : 
+          type === 'transport' ? 'text-blue-400' : 'text-purple-400']">
+          {{ displayValue }}
         </span>
       </div>
       <input type="range" :value="modelValue" @input="updateValue" 
-        :min="0" :max="maxValue" :step="stepValue"
-        :class="['custom-range', type === 'resource' ? 'range-resource' : 'range-product']">
+        :min="minValue" :max="maxValue" :step="stepValue"
+        :class="['custom-range', 
+          type === 'resource' ? 'range-resource' : 
+          type === 'transport' ? 'range-transport' : 'range-product']">
     </div>
   </div>
 </template>
@@ -71,5 +84,9 @@ const updateValue = (e: Event) => {
 
 .range-product {
   @apply accent-purple-500;
+}
+
+.range-transport {
+  @apply accent-blue-500;
 }
 </style>

@@ -1,34 +1,60 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
 import CollapsibleDetailList from './common/CollapsibleDetailList.vue'
 
-const { t } = useI18n()
 const props = withDefaults(defineProps<{
   title: string
   value: number
   items: any[]
   variant?: 'summary' | 'module'
   count?: number
+  unit?: string
+  isTime?: boolean
+  isWorkers?: boolean
+  isVolume?: boolean // [新增]
 }>(), {
   variant: 'module',
-  count: 0
+  count: 0,
+  unit: 'Cr',
+  isTime: false,
+  isWorkers: false,
+  isVolume: false // [新增]
 })
 
 const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
+
+const formatTime = (seconds: number) => {
+  if (!seconds) return '00:00:00'
+  const d = Math.floor(seconds / (24 * 3600))
+  const h = Math.floor((seconds % (24 * 3600)) / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  const s = seconds % 60
+
+  const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+  
+  if (d >= 2) {
+    return `${d}D ${timeStr}`
+  }
+  
+  const totalHours = Math.floor(seconds / 3600)
+  const totalTimeStr = `${String(totalHours).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+  return totalTimeStr
+}
 
 const formattedItems = computed(() => {
   return props.items.map(item => ({
     ...item,
     displayAmount: item.count,
-    displayValue: item.price
+    displayValue: props.isVolume ? item.volume : item.price // [修改]
   }))
 })
 </script>
 
 <template>
   <div class="module-detail">
-    <CollapsibleDetailList :data="formattedItems">
+    <CollapsibleDetailList 
+      :data="formattedItems"
+    >
       <template #title>
         <div v-if="variant === 'summary'" class="group-title variant-summary">
           {{ title }}
@@ -40,17 +66,33 @@ const formattedItems = computed(() => {
         </div>
       </template>
       <template #header>
-        <span class="total-value">{{ formatNum(value) }} {{ t('ui.credits') }}</span>
+        <span v-if="isTime" class="total-value text-red-400">{{ formatTime(value) }}</span>
+        <span v-else-if="isWorkers" class="total-value" :class="value >= 0 ? 'text-emerald-400' : 'text-red-400'">
+          {{ Math.abs(value) }}
+        </span>
+        <span v-else-if="isVolume" class="total-value text-blue-400">{{ formatNum(value) }} m³</span>
+        <span v-else class="total-value text-red-400">{{ formatNum(value) }} {{ unit }}</span>
       </template>
       <template #row="{ item }">
         <div class="material-row">
           <span class="material-name">
-            <span class="qty">{{ formatNum(item.displayAmount) }}</span>
-            <span class="symbol">x</span>
-            <span class="name">{{ item.displayName }}</span>
+            <span v-if="!isWorkers && !isTime" class="qty">{{ formatNum(item.displayAmount) }}</span>
+            <span v-if="!isWorkers && !isTime" class="symbol">x</span>
+            <span class="name" :class="{ 
+              'text-emerald-500/70': isWorkers && item.id === 'cap',
+              'text-red-500/70': isWorkers && item.id === 'need',
+              'text-red-400/70': isTime,
+              'text-blue-400/70': isVolume
+            }">{{ item.displayName }}</span>
           </span>
         </div>
-        <span class="material-value">{{ formatNum(item.displayValue) }} {{ t('ui.credits') }}</span>
+        <span v-if="isWorkers" class="material-value" :class="{
+          'text-emerald-500/70': item.id === 'cap',
+          'text-red-500/70': item.id === 'need'
+        }">{{ Math.abs(item.displayAmount) }}</span>
+        <span v-else-if="isTime" class="material-value text-red-400/70">{{ formatTime(item.displayValue) }}</span>
+        <span v-else-if="isVolume" class="material-value text-blue-400/70">{{ formatNum(item.displayValue) }} m³</span>
+        <span v-else class="material-value text-red-400/70">{{ formatNum(item.displayValue) }} {{ unit }}</span>
       </template>
     </CollapsibleDetailList>
   </div>
@@ -86,7 +128,7 @@ const formattedItems = computed(() => {
 }
 
 .total-value {
-  @apply text-sm font-bold text-red-400 font-mono;
+  @apply text-sm font-bold font-mono;
 }
 
 .material-row {
@@ -98,11 +140,11 @@ const formattedItems = computed(() => {
 }
 
 .material-name .qty {
-  @apply font-mono text-slate-500;
+  @apply font-mono text-xs text-slate-500;
 }
 
 .material-name .symbol {
-  @apply opacity-30 scale-90 text-slate-500;
+  @apply opacity-30 scale-90 text-slate-500 text-[10px];
 }
 
 .material-name .name {
@@ -110,6 +152,6 @@ const formattedItems = computed(() => {
 }
 
 .material-value {
-  @apply font-mono text-sm font-bold text-red-400/70;
+  @apply font-mono text-xs font-bold;
 }
 </style>

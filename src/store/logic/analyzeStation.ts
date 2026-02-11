@@ -9,17 +9,38 @@ export interface AnalysisItem {
   id: string
   count: number
   price: number
+  volume: number
 }
 
 export interface AnalysisGroup {
   id: string
   count: number
-  value: number
-  items: AnalysisItem[]
+  value: number // Total Price (Cr)
+  volume: number // Total Volume (m³)
+  
+  // Time View Data
+  unitTime: number
+  totalTime: number
+
+  // Worker View Data
+  unitCapacity: number
+  totalCapacity: number
+  unitNeeded: number
+  totalNeeded: number
+  unitWorkerDiff: number // unitCapacity - unitNeeded
+  totalWorkerDiff: number // totalCapacity - totalNeeded
+
+  items: AnalysisItem[] // Materials breakdown
 }
 
 export interface StationAnalysis {
   totalCost: number
+  totalVolume: number
+  totalTime: number
+  totalCapacity: number
+  totalNeeded: number
+  playerHQNeeded: number
+  totalWorkerDiff: number
   summaryItems: AnalysisItem[]
   moduleGroups: AnalysisGroup[]
 }
@@ -31,7 +52,8 @@ export function analyzeStation(
   plannedModules: SavedModule[],
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
-  priceMultiplier: number // 0-1 (buildPriceMultiplier)
+  priceMultiplier: number, // 0-1 (buildPriceMultiplier)
+  useHQ: boolean = false
 ): StationAnalysis {
   // 1. 模块合并 (按 moduleId 聚合)
   // 注意：我们按输入的 plannedModules 顺序保留第一个出现的模块位置
@@ -66,17 +88,37 @@ export function analyzeStation(
 
   // 3. 计算各模块分组
   let totalCost = 0
+  let totalVolume = 0
+  let totalTime = 0
+  let totalCapacity = 0
+  let totalNeeded = 0
   const globalMaterials: Record<string, number> = {}
 
   const moduleGroups: AnalysisGroup[] = aggregatedModules.map(m => {
     const info = modulesMap[m.id]
     if (!info) {
-      return { id: m.id, count: m.count, value: 0, items: [] }
+      return { 
+        id: m.id, 
+        count: m.count, 
+        value: 0, 
+        volume: 0,
+        items: [],
+        unitTime: 0,
+        totalTime: 0,
+        unitCapacity: 0,
+        totalCapacity: 0,
+        unitNeeded: 0,
+        totalNeeded: 0,
+        unitWorkerDiff: 0,
+        totalWorkerDiff: 0
+      }
     }
 
     const items: AnalysisItem[] = []
     let moduleTotalValue = 0
-
+    let moduleTotalVolume = 0
+    
+    // 计算材料
     for (const [wareId, amountPerModule] of Object.entries(info.buildCost)) {
       const totalAmount = (amountPerModule as number) * m.count
       const ware = waresMap[wareId]
@@ -84,23 +126,54 @@ export function analyzeStation(
 
       const price = getPriceByMultiplier(ware, priceMultiplier)
       const value = totalAmount * price
+      const volume = totalAmount * (ware.volume || 0)
       
       items.push({
         id: wareId,
         count: totalAmount,
-        price: value
+        price: value,
+        volume: volume
       })
 
       moduleTotalValue += value
+      moduleTotalVolume += volume
       globalMaterials[wareId] = (globalMaterials[wareId] || 0) + totalAmount
     }
 
+    const unitTime = info.buildTime || 0
+    const moduleTotalTime = unitTime * m.count
+    
+    const unitCapacity = info.workforce?.capacity || 0
+    const moduleTotalCapacity = unitCapacity * m.count
+    
+    const unitNeeded = info.workforce?.needed || 0
+    const moduleTotalNeeded = unitNeeded * m.count
+    
+    const unitWorkerDiff = unitCapacity - unitNeeded
+    const moduleTotalWorkerDiff = moduleTotalCapacity - moduleTotalNeeded
+
     totalCost += moduleTotalValue
+    totalVolume += moduleTotalVolume
+    totalTime += moduleTotalTime
+    totalCapacity += moduleTotalCapacity
+    totalNeeded += moduleTotalNeeded
 
     return {
       id: m.id,
       count: m.count,
       value: moduleTotalValue,
+      volume: moduleTotalVolume,
+      
+      unitTime,
+      totalTime: moduleTotalTime,
+      
+      unitCapacity,
+      totalCapacity: moduleTotalCapacity,
+      unitNeeded,
+      totalNeeded: moduleTotalNeeded,
+      unitWorkerDiff,
+      totalWorkerDiff: moduleTotalWorkerDiff,
+
       items: sortMaterials(items)
     }
   })
@@ -109,15 +182,26 @@ export function analyzeStation(
   const summaryItems: AnalysisItem[] = Object.entries(globalMaterials).map(([id, count]) => {
     const ware = waresMap[id]
     const price = ware ? getPriceByMultiplier(ware, priceMultiplier) : 0
+    const unitVolume = ware?.volume || 0
     return {
       id,
       count,
-      price: count * price
+      price: count * price,
+      volume: count * unitVolume
     }
   })
 
+  const playerHQNeeded = useHQ ? 200 : 0
+  const finalTotalNeeded = totalNeeded + playerHQNeeded
+
   return {
     totalCost,
+    totalVolume,
+    totalTime,
+    totalCapacity,
+    totalNeeded: finalTotalNeeded,
+    playerHQNeeded,
+    totalWorkerDiff: totalCapacity - finalTotalNeeded,
     summaryItems: sortMaterials(summaryItems),
     moduleGroups: moduleGroups
   }

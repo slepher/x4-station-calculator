@@ -130,7 +130,7 @@ const volumeTooltipContent = computed(() => {
       <span class="value ${netRateClass}">${formatNum(props.netVolume)}</span>
       <span class="unit">m³</span>
       
-      <span class="label">${t('ui.total_volume')}</span>
+      <span class="label">${t('ui.storage_total_volume')}</span>
       <span class="value text-blue-400">${formatNum(props.totalOccupiedVolume)}</span>
       <span class="unit">m³</span>
 
@@ -156,7 +156,7 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
         :isPositive="displayValue >= 0"
       >
         <template #title>
-          <span class="name">{{ name }}</span>
+          <span class="header-name">{{ name }}</span>
         </template>
         <template #header>
           <div :class="classWithSymbol(displayValue, 'value')" v-if="viewMode === 'economy' || viewMode === 'quantity'">
@@ -226,7 +226,7 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
   @apply text-amber-500/30 bg-transparent;
 }
 
-.name {
+.header-name {
   @apply text-sm font-medium text-slate-200;
 }
 

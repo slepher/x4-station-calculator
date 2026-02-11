@@ -1,0 +1,13 @@
+schema: spec-driven
+name: station-dashboard-views
+created: 2026-02-10
+status: in-progress
+artifacts:
+  proposal:
+    status: pending
+  specs:
+    status: in-progress
+  design:
+    status: pending
+  tasks:
+    status: pending
