@@ -11,5 +11,11 @@ export default defineConfig({
       // 关键配置：让 Vite 知道 @ 代表 src 目录
       '@': path.resolve(__dirname, './src') 
     }
+  },
+  server: {
+    watch: {
+      // 排除 openspec, tests 文件夹
+      ignored: ['openspec/**', 'tests/**']
+    }
   }
 })

@@ -440,8 +440,19 @@ class X4PrecisionLoader:
                     cargo = macro.find('properties/cargo')
                     if cargo is not None: 
                         # cargo max 可能是 tags="container" max="10000" 这种形式
-                        # 这里简单取 max 属性
-                        module_data['capacity'] = int(cargo.get('max', 0))
+                        # [Modified] Extract both max (capacity) and tags (type)
+                        cap = int(cargo.get('max', 0))
+                        tags = cargo.get('tags', '')
+                        
+                        # Simple mapping for primary tag
+                        c_type = 'container'
+                        if 'liquid' in tags: c_type = 'liquid'
+                        elif 'solid' in tags: c_type = 'solid'
+                        
+                        module_data['cargo'] = {
+                            "capacity": cap,
+                            "type": c_type
+                        }
 
                 self.all_modules.append(module_data)
                 count += 1

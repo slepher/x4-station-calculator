@@ -1,0 +1,12 @@
+schema: spec-driven
+created: 2026-02-11
+status: in-progress
+artifacts:
+  proposal:
+    status: completed
+  specs:
+    status: completed
+  design:
+    status: completed
+  tasks:
+    status: completed

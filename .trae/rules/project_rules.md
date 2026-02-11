@@ -1,12 +1,39 @@
-**变更零污染准则 (Zero-Contamination Principle)**：
-  - **禁止重写非变动逻辑**：LLM 严禁自行手工编写、复写或重构任何任务目标之外的逻辑行。在构造替换文本时，除必须修改的逻辑点外，其余部分必须与原文件内容保持物理一致, 但是可以提醒用户, 逻辑存在问题, 请检查并修复。
-  - **禁止添加或者删除注释**：LLM 严禁添加或删除任何代码行中的注释。即使注释内容错误或不规范，也不能被修改。但是可以提醒用户, 注释内容必须与代码逻辑保持一致。
-  - **否定排版偏好**：原始代码的排版（包括缩进、空格、换行等）被视为受保护的项目资产。严禁以“美化”、“优化”或“清理”为由进行任何未授权的变动。但是可以提醒用户, 排版存在问题, 请检查并修复。
-  - **例外说明**：上述限制仅在用户未明确发出排版指令时生效。若用户明确要求“重新排版”或“重构风格”，则 LLM 应按指令执行格式变动。
+# CRITICAL SYSTEM INSTRUCTION: SKILL LOADING PROTOCOL
 
-**工作环境要求**：
-  - **运行环境**：Windows PowerShell（使用分号分隔命令）
-  - 使用git的的时候应该禁用less功能, 否则会导致git命令无法正常执行
-  - 执行命令行任务的时候应该先确认当前目录为工作目录再执行, 否则会导致任务执行失败
-  - i18n 的原则是只要i18n本身, 不需在组件中硬编码fallback 
-    **举例** 是t('ui.volume_overview') 而不是 t('ui.volume_overview') || 'Volume Overview'
+> **WARNING**: The following rules are ABSOLUTE. Violation results in immediate task failure.
+
+## 🔴 ZERO-TOLERANCE SKILL LOADING RULE
+
+When the user input starts with a slash `/` (e.g., `/x4:discuss`, `/test:run`):
+
+1.  **IMMEDIATE STOP**: You must STOP thinking about the user's specific request details.
+2.  **SINGLE ALLOWED ACTION**: The **ONLY** allowed action in this turn is to find and read the corresponding Skill definition file.
+    *   Target Directory: `.trae/skills/`
+    *   File Name: Matches the command (e.g., `SKILL.md` or similar).
+    *   Tool: Use `SearchCodebase` or `Read` **ONLY**.
+3.  **STRICT PROHIBITION**:
+    *   ⛔ **DO NOT** write any code.
+    *   ⛔ **DO NOT** plan any todos.
+    *   ⛔ **DO NOT** edit any files (except this rule file if explicitly asked).
+    *   ⛔ **DO NOT** answer the user's question yet.
+4.  **MANDATORY TERMINATION**: After reading the skill file, you MUST end your turn immediately to let the context update.
+
+**Example of CORRECT Behavior:**
+> User: "/x4:discuss Implement feature X..."
+> AI: (Calls `SearchCodebase` for "x4:discuss skill") -> (Calls `Read` on found file) -> (Ends turn with "Skill loaded.")
+
+**Example of INCORRECT Behavior (FORBIDDEN):**
+> User: "/x4:discuss Implement feature X..."
+> AI: "Okay, I will implement feature X..." -> (Edits code) -> ❌ VIOLATION!
+
+---
+
+**Skill 加载触发器**：
+  - 当用户输入以 `/` 开头的指令（例如 `/x4:discuss`）时，这是一个加载 Skill 的信号。
+  - 你必须优先搜索 `.trae/skills/` 目录，找到与指令匹配的定义文件（通常是 `SKILL.md`）。
+  - **必须**在执行任何操作前读取该 Skill 文件的内容，并严格遵循其中的工作流和约束。
+
+**Skill 加载原子性 (Skill Loading Atomicity)**：
+  - **唯一动作约束**：当用户输入包含 Skill 加载指令（如 `/x4:discuss`, `/x4:doc` 等）时，LLM 在该回合的 **唯一合法动作** 是调用 `SearchCodebase` 或 `Read` 工具去寻找和读取对应的 Skill 定义文件（通常是 `SKILL.md`）。
+  - **严禁抢跑**：在成功读取 Skill 内容并完全理解之前，**严禁**执行任何实质性的任务操作（如创建文件、修改代码、规划 Todo 等）。必须等待下一回合用户确认或 Skill 内容加载完毕后，再根据 Skill 的具体规则行动。
+  - **指令优先级**：Skill 加载指令的优先级高于 System Prompt 中的 "Bias for Action"。当二者冲突时，必须优先满足 Skill 加载的原子性，暂停行动。

@@ -156,7 +156,7 @@ const onEsc = () => {
 /* Animations */
 .fade-enter-active,
 .fade-leave-active {
-  @apply transition-opacity duration-200;
+  @apply transition-opacity duration-75;
 }
 
 .fade-enter-from,
@@ -166,7 +166,7 @@ const onEsc = () => {
 
 .fade-slide-enter-active,
 .fade-slide-leave-active {
-  @apply transition-all duration-200;
+  @apply transition-all duration-75;
 }
 
 .fade-slide-enter-from,

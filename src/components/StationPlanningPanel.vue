@@ -191,7 +191,7 @@ const availableRaces = computed(() => {
     </div>
 
     <!-- Tier 3: 自动补给区 -->
-    <div v-if="store.autoSupplyModules.length > 0" class="tier-section tier-auto">
+    <div v-if="store.autoSupplyModules.length > 0 || store.settings.considerWorkforceForAutoFill" class="tier-section tier-auto">
         <div class="tier-header tier-header--supply" :class="{ 'is-active': isSupplyOpen }"
           @click="isSupplyOpen = !isSupplyOpen">
           <div class="tier-header-left">

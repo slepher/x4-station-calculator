@@ -145,7 +145,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 100000
+    "cargo": {
+      "capacity": 100000,
+      "type": "solid"
+    }
   },
   {
     "id": "landmarks_tel_tradestation_01_centerfill_01_macro",
@@ -231,7 +234,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 1000000
+    "cargo": {
+      "capacity": 1000000,
+      "type": "solid"
+    }
   },
   {
     "id": "prod_gen_weaponcomponents_macro",
@@ -350,7 +356,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 250000
+    "cargo": {
+      "capacity": 250000,
+      "type": "container"
+    }
   },
   {
     "id": "xenon_small_station_01_base_macro",
@@ -548,7 +557,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 100000
+    "cargo": {
+      "capacity": 100000,
+      "type": "solid"
+    }
   },
   {
     "id": "hab_spl_m_01_macro",
@@ -605,7 +617,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 1000000
+    "cargo": {
+      "capacity": 1000000,
+      "type": "container"
+    }
   },
   {
     "id": "struct_tel_base_02_macro",
@@ -719,7 +734,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 1000000
+    "cargo": {
+      "capacity": 1000000,
+      "type": "liquid"
+    }
   },
   {
     "id": "hab_ter_l_01_macro",
@@ -838,7 +856,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 1000000
+    "cargo": {
+      "capacity": 1000000,
+      "type": "liquid"
+    }
   },
   {
     "id": "defence_arg_disc_01_macro",
@@ -1483,7 +1504,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 500000
+    "cargo": {
+      "capacity": 500000,
+      "type": "solid"
+    }
   },
   {
     "id": "pier_bor_harbor_04_macro",
@@ -2323,7 +2347,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 250000
+    "cargo": {
+      "capacity": 250000,
+      "type": "container"
+    }
   },
   {
     "id": "buildmodule_ter_ships_xl_macro",
@@ -2560,7 +2587,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 100000
+    "cargo": {
+      "capacity": 100000,
+      "type": "container"
+    }
   },
   {
     "id": "storage_tel_m_liquid_01_macro",
@@ -2589,7 +2619,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 500000
+    "cargo": {
+      "capacity": 500000,
+      "type": "liquid"
+    }
   },
   {
     "id": "storage_ter_l_solid_01_macro",
@@ -2618,7 +2651,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 1000000
+    "cargo": {
+      "capacity": 1000000,
+      "type": "solid"
+    }
   },
   {
     "id": "struct_bor_base_05_macro",
@@ -2704,7 +2740,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 250000
+    "cargo": {
+      "capacity": 250000,
+      "type": "container"
+    }
   },
   {
     "id": "prod_par_medicalsupplies_macro",
@@ -2908,7 +2947,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 100000
+    "cargo": {
+      "capacity": 100000,
+      "type": "liquid"
+    }
   },
   {
     "id": "prod_tel_hullparts_macro",
@@ -3146,7 +3188,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 50000
+    "cargo": {
+      "capacity": 50000,
+      "type": "container"
+    }
   },
   {
     "id": "storage_par_s_liquid_01_macro",
@@ -3175,7 +3220,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 100000
+    "cargo": {
+      "capacity": 100000,
+      "type": "liquid"
+    }
   },
   {
     "id": "welfare_gen_gamblinghall_01_macro",
@@ -3260,7 +3308,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 10000
+    "cargo": {
+      "capacity": 10000,
+      "type": "container"
+    }
   },
   {
     "id": "storage_pir_l_condensate_01_macro",
@@ -3289,7 +3340,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 50
+    "cargo": {
+      "capacity": 50,
+      "type": "container"
+    }
   },
   {
     "id": "prod_ter_mre_macro",
@@ -3650,7 +3704,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 50000
+    "cargo": {
+      "capacity": 50000,
+      "type": "container"
+    }
   },
   {
     "id": "pier_arg_harbor_01_macro",
@@ -3735,7 +3792,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 100000
+    "cargo": {
+      "capacity": 100000,
+      "type": "solid"
+    }
   },
   {
     "id": "pier_ter_harbor_04_macro",
@@ -3820,7 +3880,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 1000000
+    "cargo": {
+      "capacity": 1000000,
+      "type": "container"
+    }
   },
   {
     "id": "landmarks_player_hq_01_research_macro",
@@ -3873,7 +3936,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 1000000
+    "cargo": {
+      "capacity": 1000000,
+      "type": "solid"
+    }
   },
   {
     "id": "storage_tel_m_solid_01_macro",
@@ -3902,7 +3968,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 500000
+    "cargo": {
+      "capacity": 500000,
+      "type": "solid"
+    }
   },
   {
     "id": "prod_gen_quantumtubes_macro",
@@ -3966,7 +4035,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 1000000
+    "cargo": {
+      "capacity": 1000000,
+      "type": "container"
+    }
   },
   {
     "id": "prod_gen_hullparts_macro",
@@ -4029,7 +4101,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 1000000
+    "cargo": {
+      "capacity": 1000000,
+      "type": "liquid"
+    }
   },
   {
     "id": "struct_ter_base_01_macro",
@@ -4176,7 +4251,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 300000
+    "cargo": {
+      "capacity": 300000,
+      "type": "liquid"
+    }
   },
   {
     "id": "struct_bor_vertical_02_macro",
@@ -4351,7 +4429,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 500000
+    "cargo": {
+      "capacity": 500000,
+      "type": "solid"
+    }
   },
   {
     "id": "storage_ter_l_container_01_macro",
@@ -4380,7 +4461,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 1000000
+    "cargo": {
+      "capacity": 1000000,
+      "type": "container"
+    }
   },
   {
     "id": "prod_spl_medicalsupplies_macro",
@@ -4670,7 +4754,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 100000
+    "cargo": {
+      "capacity": 100000,
+      "type": "solid"
+    }
   },
   {
     "id": "storage_par_l_container_01_macro",
@@ -4699,7 +4786,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 1000000
+    "cargo": {
+      "capacity": 1000000,
+      "type": "container"
+    }
   },
   {
     "id": "struct_tel_cross_01_macro",
@@ -4938,7 +5028,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 500000
+    "cargo": {
+      "capacity": 500000,
+      "type": "solid"
+    }
   },
   {
     "id": "landmarks_gen_piratestation_02_storage_02_macro",
@@ -5024,7 +5117,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 100000
+    "cargo": {
+      "capacity": 100000,
+      "type": "solid"
+    }
   },
   {
     "id": "prod_ter_medicalsupplies_macro",
@@ -5145,7 +5241,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 50000
+    "cargo": {
+      "capacity": 50000,
+      "type": "container"
+    }
   },
   {
     "id": "defence_tel_tube_01_macro",
@@ -5413,7 +5512,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 250000
+    "cargo": {
+      "capacity": 250000,
+      "type": "liquid"
+    }
   },
   {
     "id": "defence_ter_tube_01_macro",
@@ -5498,7 +5600,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 50000
+    "cargo": {
+      "capacity": 50000,
+      "type": "container"
+    }
   },
   {
     "id": "landmarks_tel_tradestation_01_ring_storage_01_macro",
@@ -5527,7 +5632,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 400000
+    "cargo": {
+      "capacity": 400000,
+      "type": "liquid"
+    }
   },
   {
     "id": "storage_tel_l_liquid_01_macro",
@@ -5556,7 +5664,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 1000000
+    "cargo": {
+      "capacity": 1000000,
+      "type": "liquid"
+    }
   },
   {
     "id": "landmarks_arg_antigonescaffolding_01_macro",
@@ -5782,7 +5893,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 500000
+    "cargo": {
+      "capacity": 500000,
+      "type": "liquid"
+    }
   },
   {
     "id": "prod_gen_advancedelectronics_macro",
@@ -6030,7 +6144,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 100000
+    "cargo": {
+      "capacity": 100000,
+      "type": "solid"
+    }
   },
   {
     "id": "defence_bor_tube_01_macro",
@@ -6117,7 +6234,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 1000000
+    "cargo": {
+      "capacity": 1000000,
+      "type": "solid"
+    }
   },
   {
     "id": "prod_tel_engineparts_macro",
@@ -6398,7 +6518,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 100000
+    "cargo": {
+      "capacity": 100000,
+      "type": "liquid"
+    }
   },
   {
     "id": "pier_bor_harbor_03_macro",
@@ -6608,7 +6731,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 1000000
+    "cargo": {
+      "capacity": 1000000,
+      "type": "liquid"
+    }
   },
   {
     "id": "storage_tel_l_solid_01_macro",
@@ -6637,7 +6763,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 1000000
+    "cargo": {
+      "capacity": 1000000,
+      "type": "solid"
+    }
   },
   {
     "id": "buildmodule_gen_ships_xl_macro",
@@ -6755,7 +6884,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 1000000
+    "cargo": {
+      "capacity": 1000000,
+      "type": "solid"
+    }
   },
   {
     "id": "prod_arg_foodrations_macro",
@@ -6819,7 +6951,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 50000
+    "cargo": {
+      "capacity": 50000,
+      "type": "container"
+    }
   },
   {
     "id": "dockarea_gen_xl_venturer_01_macro",
@@ -6876,7 +7011,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 500000
+    "cargo": {
+      "capacity": 500000,
+      "type": "liquid"
+    }
   },
   {
     "id": "prod_gen_dronecomponents_macro",
@@ -7004,7 +7142,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 100000
+    "cargo": {
+      "capacity": 100000,
+      "type": "liquid"
+    }
   },
   {
     "id": "storage_par_m_solid_01_macro",
@@ -7033,7 +7174,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 500000
+    "cargo": {
+      "capacity": 500000,
+      "type": "solid"
+    }
   },
   {
     "id": "struct_gen_venturerbase_02_macro",
@@ -7534,7 +7678,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 100000
+    "cargo": {
+      "capacity": 100000,
+      "type": "liquid"
+    }
   },
   {
     "id": "prod_tel_advancedcomposites_macro",
@@ -7832,7 +7979,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 500000
+    "cargo": {
+      "capacity": 500000,
+      "type": "liquid"
+    }
   },
   {
     "id": "pier_tel_harbor_02_macro",
@@ -7889,7 +8039,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 300000
+    "cargo": {
+      "capacity": 300000,
+      "type": "container"
+    }
   },
   {
     "id": "prod_gen_graphene_macro",
@@ -8330,7 +8483,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 250000
+    "cargo": {
+      "capacity": 250000,
+      "type": "container"
+    }
   },
   {
     "id": "buildmodule_ter_equip_l_macro",
@@ -8556,7 +8712,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 100000
+    "cargo": {
+      "capacity": 100000,
+      "type": "liquid"
+    }
   },
   {
     "id": "storage_ter_m_liquid_01_macro",
@@ -8585,7 +8744,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 500000
+    "cargo": {
+      "capacity": 500000,
+      "type": "liquid"
+    }
   },
   {
     "id": "struct_gen_venturerbase_03_macro",
@@ -8761,7 +8923,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 1000000
+    "cargo": {
+      "capacity": 1000000,
+      "type": "container"
+    }
   },
   {
     "id": "prod_gen_water_macro",
@@ -8823,7 +8988,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 100000
+    "cargo": {
+      "capacity": 100000,
+      "type": "liquid"
+    }
   },
   {
     "id": "xenon_small_station_01_solarpanel_01_macro",
@@ -8911,7 +9079,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 500000
+    "cargo": {
+      "capacity": 500000,
+      "type": "container"
+    }
   },
   {
     "id": "struct_bor_vertical_01_macro",
@@ -9002,7 +9173,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 500000
+    "cargo": {
+      "capacity": 500000,
+      "type": "solid"
+    }
   },
   {
     "id": "storage_bor_s_container_01_macro",
@@ -9032,7 +9206,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 50000
+    "cargo": {
+      "capacity": 50000,
+      "type": "container"
+    }
   },
   {
     "id": "storage_tel_l_container_01_macro",
@@ -9061,7 +9238,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 1000000
+    "cargo": {
+      "capacity": 1000000,
+      "type": "container"
+    }
   },
   {
     "id": "pier_bor_harbor_01_macro",
@@ -9294,7 +9474,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 250000
+    "cargo": {
+      "capacity": 250000,
+      "type": "container"
+    }
   },
   {
     "id": "storage_bor_l_liquid_01_macro",
@@ -9324,7 +9507,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 1000000
+    "cargo": {
+      "capacity": 1000000,
+      "type": "liquid"
+    }
   },
   {
     "id": "storage_tel_s_liquid_01_macro",
@@ -9353,7 +9539,10 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 100000
+    "cargo": {
+      "capacity": 100000,
+      "type": "liquid"
+    }
   },
   {
     "id": "prod_gen_missilecomponents_macro",
@@ -9416,6 +9605,9 @@
     "inputs": {},
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
-    "capacity": 500000
+    "cargo": {
+      "capacity": 500000,
+      "type": "liquid"
+    }
   }
 ]

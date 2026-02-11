@@ -61,7 +61,10 @@ export interface X4Module {
   inputs: Record<string, number>;  // key 为商品 ID, value 为每小时消耗量
   
   // 存储逻辑 (仅限存储模块)
-  capacity?: number;  // 存储容量
+  cargo?: {
+    capacity: number;
+    type: 'container' | 'solid' | 'liquid';
+  };
   
   // 颜色标记
   color: string;

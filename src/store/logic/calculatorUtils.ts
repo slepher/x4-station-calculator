@@ -110,3 +110,18 @@ export function calculateWorkforceCensus(
   });
   return result;
 }
+
+/**
+ * 劳动力饱和度计算
+ */
+export function calculateEfficiencySaturation(
+  needed: number,
+  actual: number
+): number {
+  if (needed <= 0) return 1.0;
+  // 饱和度 = 实际工人数 / 需求工人数
+  // 范围: 0.0 ~ 1.0+
+  // 超过1.0表示有盈余，但对效率提升没有额外帮助(除非未来有过度工作机制)
+  // 此处我们返回原始比例，由调用者决定是否截断为 1.0
+  return actual / needed;
+}

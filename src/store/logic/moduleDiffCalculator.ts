@@ -1,9 +1,66 @@
-import type { SavedModule, X4Module, X4Ware } from '../../types/x4'
+import type { 
+  SavedModule, 
+  X4Module, 
+  X4Ware, 
+  StationSettings, 
+  RaceMedicalConsumption 
+} from '../../types/x4'
 import {findBestProducer, findBestHabitat, getProductionEfficiency} from './bestModuleSelector'
 import { calculateWorkerSupplyNeeds } from './workerModuleCalculator'
 import { calculateWorkforceCensus } from './calculatorUtils'
+import { analyzeWareFlow } from './analyzeWareFlow'
 
 // --- 辅助函数 ---
+
+/**
+ * 查找最佳仓储模块
+ */
+function findBestStorage(
+  type: 'container' | 'solid' | 'liquid',
+  race: string,
+  modules: Record<string, X4Module>,
+  existingModules: SavedModule[] = []
+): X4Module | null {
+  // 0. 优先匹配已存在的仓储模块
+  const existingCandidates = existingModules
+    .map(m => modules[m.id])
+    .filter((m): m is X4Module => !!m && m.type === 'storage' && m.cargo?.type === type)
+    .sort((a, b) => (b.cargo?.capacity || 0) - (a.cargo?.capacity || 0));
+
+  if (existingCandidates.length > 0) {
+    return existingCandidates[0]!;
+  }
+
+  // 1. 查找符合种族偏好的 L 级仓储
+  let candidate = Object.values(modules).find(m => 
+    m.type === 'storage' && 
+    m.race === race && 
+    m.cargo?.type === type && 
+    m.cargo?.capacity > 500000 // 假设 L 级通常 > 500k，或者我们可以通过名称/ID判断
+  );
+
+  // 如果没有找到特定种族的，尝试查找通用的 L 级 (Argon 通常是默认选择)
+  if (!candidate) {
+    candidate = Object.values(modules).find(m => 
+      m.type === 'storage' && 
+      m.cargo?.type === type && 
+      m.cargo?.capacity > 500000
+    );
+  }
+
+  // 如果还是没有 (可能只有 S/M 级)，找最大的
+  if (!candidate) {
+    const allStorages = Object.values(modules).filter(m => 
+      m.type === 'storage' && 
+      m.cargo?.type === type
+    );
+    if (allStorages.length > 0) {
+      candidate = allStorages.sort((a, b) => (b.cargo?.capacity || 0) - (a.cargo?.capacity || 0))[0];
+    }
+  }
+
+  return candidate || null;
+}
 
 /**
  * 计算模块列表的净产出
@@ -57,13 +114,17 @@ export function calculateTotalWorkforce(
 
 export function calculateAutoFill(
   plannedModules: SavedModule[],
-  race: string,
-  globalWorkforceBonus: boolean,
-  supplyWorkforceBonus: boolean,
+  settings: StationSettings,
   modules: Record<string, X4Module>,
   wares: Record<string, X4Ware>,
-  lockedWares: string[] = []
+  lockedWares: string[] = [],
+  medicalConsumption: RaceMedicalConsumption,
+  userPriority: Record<string, number>
 ): { autoIndustry: SavedModule[]; autoSupply: SavedModule[] } {
+
+  const race = settings.racePreference;
+  const globalWorkforceBonus = settings.considerWorkforceForAutoFill;
+  const supplyWorkforceBonus = settings.supplyWorkforceBonus;
 
   // ==========================================
   // Phase 1: 工业硬补完 (Tier 2 Calculation)
@@ -203,7 +264,8 @@ export function calculateAutoFill(
     for (const [r, count] of Object.entries(workersByRace)) {
       if (count <= 0) continue;
       
-      // 调用旧接口
+      // 1. 始终计算补给工厂 (calculateWorkerSupplyNeeds 内部处理效率开关)
+      // 如果 supplyWorkforceBonus 为 false，则效率为 100%，不产生额外工人需求
       const raceModules = calculateWorkerSupplyNeeds(count, r, modules, wares, supplyWorkforceBonus);
       const raceSupplyModules: SavedModule[] = [];
 
@@ -212,14 +274,14 @@ export function calculateAutoFill(
         raceSupplyModules.push({ id, count: c });
       }
 
-      if(supplyWorkforceBonus) {
-
+      // 2. 仅当开启工人加成时，才计算居住舱
+      if (supplyWorkforceBonus) {
         const supplyWorkers = calculateTotalWorkforce(raceSupplyModules, modules);
-        
+          
         if (supplyWorkers > 0) {
           // 选择最佳居住舱 (不参考 plannedModules 中的居住舱类型)
           const habitat = findBestHabitat(r, [], modules);
-          
+            
           if (habitat) {
             const habitatCount = Math.ceil(supplyWorkers / habitat.workforce.capacity);
             autoSupply.push({ id: habitat.id, count: habitatCount });
@@ -235,6 +297,148 @@ export function calculateAutoFill(
     
     // [修改] 补给区模块同样按 Tier 排序 (通常为 T1/T2 级的食物和医疗) 
     autoSupply.sort((a, b) => (modules[b.id]?.tier || 0) - (modules[a.id]?.tier || 0));
+  }
+
+  // ==========================================
+  // Phase 4: 仓储自动填充 (Auto Storage)
+  // ==========================================
+
+  // 4.0 构建优先级映射 (Breaking the cycle)
+  const autoWaresSet = new Set<string>();
+  autoIndustry.forEach(m => {
+    const info = modules[m.id];
+    if (info && info.outputs) {
+      Object.keys(info.outputs).forEach(w => autoWaresSet.add(w));
+    }
+  });
+
+  const isPlannedWare = (wareId: string) => {
+    return plannedModules.some(m => {
+      const info = modules[m.id];
+      return info && info.outputs && Object.keys(info.outputs).includes(wareId);
+    });
+  };
+
+  const getLocalResolvedLevel = (wareId: string): number => {
+    const planned = isPlannedWare(wareId);
+    const auto = autoWaresSet.has(wareId);
+    const override = userPriority[wareId];
+
+    // 1. 自动纠错
+    if (planned && override === 0) return 1;
+    if (auto && override === 2) return 1;
+
+    // 2. 手动覆盖
+    if (override !== undefined) return override;
+
+    // 3. 默认身份
+    if (planned) return 2;
+    if (auto) return 0;
+    return 0;
+  };
+
+  const resolvedPriority: Record<string, number> = {};
+  Object.keys(wares).forEach(id => {
+    resolvedPriority[id] = getLocalResolvedLevel(id);
+  });
+
+  // Helper: 计算指定模块列表的仓储需求并返回增量模块
+  const calculateStorageDelta = (
+    targetModules: SavedModule[], 
+    targetWorkforce: number,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _isAutoSupply: boolean
+  ): SavedModule[] => {
+    // 假设满员满效率计算最大流量
+    const saturation = 1.0; 
+    
+    const analysis = analyzeWareFlow(
+      targetModules,
+      modules,
+      wares,
+      medicalConsumption,
+      settings,
+      targetWorkforce,
+      saturation,
+      settings.resourceBufferHours,
+      settings.primaryProductBufferHours,
+      settings.secondaryProductBufferHours,
+      resolvedPriority
+    );
+
+    const needs = { container: 0, solid: 0, liquid: 0 };
+    
+    analysis.flows.forEach(flow => {
+      if (flow.totalOccupiedVolume > 0) {
+        if (flow.transportType === 'solid') needs.solid += flow.totalOccupiedVolume;
+        else if (flow.transportType === 'liquid') needs.liquid += flow.totalOccupiedVolume;
+        else needs.container += flow.totalOccupiedVolume;
+      }
+    });
+
+    const result: SavedModule[] = [];
+    (['container', 'solid', 'liquid'] as const).forEach(type => {
+      const needed = needs[type];
+      
+      // 计算现有容量
+      let existingCapacity = 0;
+      targetModules.forEach(m => {
+        const info = modules[m.id];
+        if (info?.cargo?.type === type) {
+          existingCapacity += info.cargo.capacity * m.count;
+        }
+      });
+
+      const deficit = needed - existingCapacity;
+      
+      if (deficit > 0) {
+        // 对于 AutoSupply，我们不考虑"种族匹配" plannedModules，因为它是独立的
+        // 但 findBestStorage 会考虑 settings.racePreference
+        // 对于 AutoSupply, existingModules 应该只包括 autoSupply 本身 (递归补全) 或者是空的，
+        // 实际上 AutoSupply 是一次性计算的，所以如果是增量计算，这里 targetModules 就是已经添加的部分
+        const storageModule = findBestStorage(type, race, modules, targetModules);
+        if (storageModule && storageModule.cargo) {
+          const count = Math.ceil(deficit / storageModule.cargo.capacity);
+          result.push({ id: storageModule.id, count });
+        }
+      }
+    });
+    
+    return result;
+  };
+
+  // 4a. Main Storage Calculation
+  // 包含: Planned + AutoIndustry
+  // 排除: AutoSupply (它们独立计算)
+  const mainModules = [...plannedModules, ...autoIndustry];
+  const mainWorkforce = calculateTotalWorkforce(mainModules, modules);
+  const mainStorage = calculateStorageDelta(mainModules, mainWorkforce, false);
+
+  // 将生成的仓储模块追加到 autoIndustry
+  mainStorage.forEach(s => {
+    const existing = autoIndustry.find(m => m.id === s.id);
+    if (existing) {
+      existing.count += s.count;
+    } else {
+      autoIndustry.push(s);
+    }
+  });
+
+  // 4b. AutoSupply Storage Calculation
+  // 仅包含: AutoSupply
+  if (autoSupply.length > 0) {
+    const supplyWorkforce = calculateTotalWorkforce(autoSupply, modules);
+    const supplyStorage = calculateStorageDelta(autoSupply, supplyWorkforce, true);
+    
+    // 将生成的仓储模块追加到 autoSupply
+    supplyStorage.forEach(s => {
+      const existing = autoSupply.find(m => m.id === s.id);
+      if (existing) {
+        existing.count += s.count;
+      } else {
+        autoSupply.push(s);
+      }
+    });
   }
 
   // ==========================================

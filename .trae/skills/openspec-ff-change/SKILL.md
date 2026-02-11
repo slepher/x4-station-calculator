@@ -1,6 +1,6 @@
 ---
 name: openspec-ff-change
-description: Fast-forward through OpenSpec artifact creation (Trigger: /opsx:ff). Use when the user wants to quickly create all artifacts needed for implementation without stepping through each one individually.
+description: Fast-forward through OpenSpec artifact creation. Use when the user wants to quickly create all artifacts needed for implementation without stepping through each one individually.
 license: MIT
 compatibility: Requires openspec CLI.
 metadata:

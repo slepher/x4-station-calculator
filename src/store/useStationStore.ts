@@ -255,8 +255,9 @@ export const useStationStore = defineStore('station', () => {
   // 从自动工业区转移模块到用户规划区
   function transferModuleFromAutoIndustry(module: SavedModule) {
     // 检查是否在自动工业区中
-    const autoModuleIndex = autoIndustryModules.value.findIndex(m => m.id === module.id)
-    if (autoModuleIndex === -1) return
+    const inIndustry = autoIndustryModules.value.some(m => m.id === module.id)
+    
+    if (!inIndustry) return
     
     // 添加到用户规划区
     addModule(module.id, module.count)
@@ -488,12 +489,12 @@ export const useStationStore = defineStore('station', () => {
     /// 调用刚才重构完成的函数 calculateAutoFill
     const result = calculateAutoFill(
       plannedModules.value,
-      settings.value.racePreference, // 使用store中的种族偏好设置
-      settings.value.considerWorkforceForAutoFill,
-      settings.value.supplyWorkforceBonus,
+      settings.value,
       modulesMap.value,
       waresMap.value,
-      lockedWares.value
+      lockedWares.value,
+      medicalConsumptionMap.value,
+      warePriority.value // Pass raw user overrides, resolve internally
     );
 
     return {
@@ -507,7 +508,7 @@ export const useStationStore = defineStore('station', () => {
   const autoIndustryModules = computed(() => calculationResult.value.industry);
   const autoSupplyModules = computed(() => calculationResult.value.supply);
 
-  // 工业区模块：planned + industry（用于资源产出计算）
+  // 工业区模块：planned + industry（用于资源产出计算和概览）
   const allIndustryModules = computed(() => [
     ...plannedModules.value,
     ...autoIndustryModules.value
