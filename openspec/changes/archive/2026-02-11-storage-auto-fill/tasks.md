@@ -13,7 +13,7 @@
     - [x] 执行第二次计算：AutoSupply Storage (Supply Only)
     - [x] 将结果分别合并到 `autoStorage` 和 `autoSupply` 数组
 - [x] 验证生成的 `modules.json` 数据结构 (手动检查或运行脚本) <!-- id: 4 -->
-- [ ] Refactor: 合并 `autoStorage` 到 `autoIndustry` <!-- id: 5 -->
-    - [ ] 修改 `calculateAutoFill` 将计算出的仓储模块追加到 `autoIndustry` 数组
-    - [ ] 从返回值和 Store 中移除 `autoStorage`
-    - [ ] 更新 UI，移除独立的 `autoStorage` 渲染循环（它们将作为工业区的一部分显示）
+- [x] Refactor: 合并 `autoStorage` 到 `autoIndustry` <!-- id: 5 -->
+    - [x] 修改 `calculateAutoFill` 将计算出的仓储模块追加到 `autoIndustry` 数组
+    - [x] 从返回值和 Store 中移除 `autoStorage`
+    - [x] 更新 UI，移除独立的 `autoStorage` 渲染循环（它们将作为工业区的一部分显示）
