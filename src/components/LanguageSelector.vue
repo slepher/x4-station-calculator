@@ -22,10 +22,8 @@ watch(locale, (val) => {
 
 <template>
   <div class="flex items-center gap-2 border-l border-slate-700 pl-4 ml-2">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24"
-      stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M3 5h12M9 3v2m1.204 8.595l4.897-5.127M20 12h-6c-2.455 0-4.909.91-6.736 2.535l-.75.676M20 12l-2-2m2 2l-2 2" />
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
     </svg>
 
     <select v-model="currentLang" @change="handleLanguageChange"
