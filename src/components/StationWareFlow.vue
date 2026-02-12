@@ -5,7 +5,6 @@ import CollapsibleDetailList from './common/CollapsibleDetailList.vue'
 import LockButton from './common/LockButton.vue'
 import FavoriteButton from './common/FavoriteButton.vue'
 import VolumeTooltip from './common/VolumeTooltip.vue'
-import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
   resourceId: string
@@ -33,7 +32,6 @@ const emit = defineEmits<{
 }>()
 
 const store = useStationStore()
-const { t } = useI18n()
 
 const translateModule = (moduleId: string) => {
     const store = useStationStore()
