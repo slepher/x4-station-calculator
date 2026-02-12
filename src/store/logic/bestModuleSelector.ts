@@ -113,11 +113,10 @@ export function findBestHabitat(
  */
 export function getProductionEfficiency(
   module: X4Module,
-  enableWorkforce: boolean,
-  raceBonus: number = 0.25
+  enableWorkforce: boolean
 ): number {
   if (enableWorkforce && module.workforce?.needed) {
-    return 1 + raceBonus;
+    return 1 + (module.workforce.maxBonus || 0);
   }
   return 1.0;
 }

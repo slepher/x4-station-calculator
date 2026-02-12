@@ -11,6 +11,7 @@ import consumptionRaw from '../../assets/x4_game_data/8.0-Diplomacy/data/consump
  * @param modulesMap 模块数据
  * @param waresMap 物资数据
  * @param useEfficiency 是否计算生产效率加成 (补给区有工人时为 true)
+ * @param sunlight 光照强度 (100 = 100%)
  * @param cache 记忆化缓存
  * @param visited 递归防环集合
  */
@@ -20,6 +21,7 @@ function _getRecursiveWorkforceCost(
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
   useEfficiency: boolean,
+  sunlight: number,
   cache: Map<string, number>,
   visited: Set<string>
 ): number {
@@ -39,7 +41,14 @@ function _getRecursiveWorkforceCost(
 
   // 3. 计算单产量归一化数据
   const baseOutput = module.outputs[wareId] || 1;
-  const outputAmount = baseOutput * eff;
+
+  // 光照影响 (仅能量电池)
+  let sunlightFactor = 1.0;
+  if (wareId === 'energycells') {
+    sunlightFactor = sunlight / 100.0;
+  }
+
+  const outputAmount = baseOutput * eff * sunlightFactor;
   const myWorkforce = module.workforce?.needed || 0;
   
   // 当前层级的工本 (人/单位)
@@ -47,7 +56,7 @@ function _getRecursiveWorkforceCost(
 
   // 4. 递归累加所有原料的成本
   for (const [inputId, inputAmount] of Object.entries(module.inputs)) {
-    const inputCost = _getRecursiveWorkforceCost(inputId, raceKey, modulesMap, waresMap, useEfficiency, cache, visited);
+    const inputCost = _getRecursiveWorkforceCost(inputId, raceKey, modulesMap, waresMap, useEfficiency, sunlight, cache, visited);
     // 原料工本 * (生产1单位产品需要的原料数量)
     // 注意：inputAmount 是单次循环消耗，outputAmount 是单次循环产出(含效率)
     totalWorkforce += inputCost * (inputAmount / outputAmount);
@@ -63,12 +72,14 @@ function _getRecursiveWorkforceCost(
 /**
  * 计算种族自维持系数 (R) 和 生产乘数 (M)
  * @param useEfficiency 是否启用效率计算
+ * @param sunlight 光照强度
  */
 export function calculateSustainMultiplier(
   raceKey: string,
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
-  useEfficiency: boolean
+  useEfficiency: boolean,
+  sunlight: number = 100
 ): { R: number, M: number } {
   const cache = new Map<string, number>();
   const visited = new Set<string>();
@@ -83,7 +94,7 @@ export function calculateSustainMultiplier(
   for (const [wareId, amountPerSec] of Object.entries(consumptionRates)) {
     const hourlyAmount = (amountPerSec as number) * 3600;
     // 计算生产这些东西背后需要多少人 (传入 efficiency 开关)
-    const cost = _getRecursiveWorkforceCost(wareId, raceKey, modulesMap, waresMap, useEfficiency, cache, visited);
+    const cost = _getRecursiveWorkforceCost(wareId, raceKey, modulesMap, waresMap, useEfficiency, sunlight, cache, visited);
     R += cost * hourlyAmount;
   }
 
@@ -105,20 +116,22 @@ export function calculateSustainMultiplier(
  * @param modulesMap 模块表
  * @param waresMap 物资表
  * @param supplyWorkforceBonus 补给区是否启用工人 (关键参数)
+ * @param sunlight 光照强度
  */
 export function calculateWorkerSupplyNeeds(
   targetWorkerCount: number,
   raceKey: string,
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
-  supplyWorkforceBonus: boolean
+  supplyWorkforceBonus: boolean,
+  sunlight: number = 100
 ): Record<string, number> {
   
   // 1. 快速预估：计算乘数 M
   // 如果补给区没有工人 (supplyWorkforceBonus = false)，则不需要递归乘数 (M=1)
   let M = 1.0;
   if (supplyWorkforceBonus) {
-    const result = calculateSustainMultiplier(raceKey, modulesMap, waresMap, true);
+    const result = calculateSustainMultiplier(raceKey, modulesMap, waresMap, true, sunlight);
     M = result.M;
   }
 
@@ -161,7 +174,14 @@ export function calculateWorkerSupplyNeeds(
 
         // 如果启用工人，享受效率加成；否则只按基础产能计算
         const eff = supplyWorkforceBonus ? (1 + (module.workforce?.maxBonus || 0)) : 1.0;
-        const singleOutput = baseOutput * eff;
+
+        // 光照影响 (仅能量电池)
+        let sunlightFactor = 1.0;
+        if (wareId === 'energycells') {
+          sunlightFactor = sunlight / 100.0;
+        }
+
+        const singleOutput = baseOutput * eff * sunlightFactor;
 
         const count = Math.ceil(deficit / singleOutput);
         

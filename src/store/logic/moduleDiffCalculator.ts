@@ -68,7 +68,8 @@ function findBestStorage(
 export function calculateNetProduction(
   modules: SavedModule[],
   modulesMap: Record<string, X4Module>,
-  bonus: boolean
+  bonus: boolean,
+  sunlight: number = 100
 ): Record<string, number> {
   const productionState: Record<string, number> = {};
   
@@ -80,7 +81,11 @@ export function calculateNetProduction(
     
     // 产出 (乘效率)
     for (const [outWare, val] of Object.entries(module.outputs)) {
-      productionState[outWare] = (productionState[outWare] || 0) + (moduleItem.count * val * eff);
+      let sunlightFactor = 1.0;
+      if (outWare === 'energycells') {
+        sunlightFactor = sunlight / 100.0;
+      }
+      productionState[outWare] = (productionState[outWare] || 0) + (moduleItem.count * val * eff * sunlightFactor);
     }
     // 消耗 (不乘效率)
     for (const [inWare, val] of Object.entries(module.inputs)) {
@@ -145,7 +150,7 @@ export function calculateAutoFill(
     
     // 使用新的辅助函数计算净产出
     const currentModulesAsSaved: SavedModule[] = Object.entries(industryModules).map(([id, count]) => ({ id, count }));
-    const productionState = calculateNetProduction(currentModulesAsSaved, modules, globalWorkforceBonus);
+    const productionState = calculateNetProduction(currentModulesAsSaved, modules, globalWorkforceBonus, settings.sunlight);
     
     // [修改] 按 Tier 降序处理缺口，确保高 Tier 模块优先触发下游需求，建立正确的发现顺序 
     const sortedWares = Object.entries(productionState) 
@@ -172,7 +177,14 @@ export function calculateAutoFill(
       if (!producer) continue;
       
       const eff = getProductionEfficiency(producer, globalWorkforceBonus);
-      const singleOutput = (producer.outputs[wareId] || 0) * eff;
+      
+      // 光照影响 (仅能量电池)
+      let sunlightFactor = 1.0;
+      if (wareId === 'energycells') {
+        sunlightFactor = settings.sunlight / 100.0;
+      }
+      
+      const singleOutput = (producer.outputs[wareId] || 0) * eff * sunlightFactor;
       if (singleOutput <= 0) continue;
       
       const countNeeded = Math.ceil(deficit / singleOutput);
@@ -266,7 +278,7 @@ export function calculateAutoFill(
       
       // 1. 始终计算补给工厂 (calculateWorkerSupplyNeeds 内部处理效率开关)
       // 如果 supplyWorkforceBonus 为 false，则效率为 100%，不产生额外工人需求
-      const raceModules = calculateWorkerSupplyNeeds(count, r, modules, wares, supplyWorkforceBonus);
+      const raceModules = calculateWorkerSupplyNeeds(count, r, modules, wares, supplyWorkforceBonus, settings.sunlight);
       const raceSupplyModules: SavedModule[] = [];
 
       for (const [id, c] of Object.entries(raceModules)) {
