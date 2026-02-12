@@ -125,7 +125,7 @@
     "default": "通用"
   },
   "tooltip": {
-    "priority_level_0_label": "无需求",
+    "priority_level_0_label": "资源",
     "priority_level_1_label": "副产物",
     "priority_level_2_label": "主产物",
     "buffer_resource": "资源缓冲",

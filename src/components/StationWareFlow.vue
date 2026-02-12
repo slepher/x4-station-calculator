@@ -4,6 +4,7 @@ import { useStationStore } from '@/store/useStationStore'
 import CollapsibleDetailList from './common/CollapsibleDetailList.vue'
 import LockButton from './common/LockButton.vue'
 import FavoriteButton from './common/FavoriteButton.vue'
+import VolumeTooltip from './common/VolumeTooltip.vue'
 import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
@@ -122,29 +123,6 @@ const formattedDetails = computed(() => {
   }))
 })
 
-const volumeTooltipContent = computed(() => {
-  const netRateClass = props.netVolume >= 0 ? 'text-emerald-400' : 'text-red-400'
-  return `
-    <div class="volume-tooltip-grid">
-      <span class="label">${t('wareflow.net_volume')}</span>
-      <span class="value ${netRateClass}">${formatNum(props.netVolume)}</span>
-      <span class="unit">m³</span>
-      
-      <span class="label">${t('wareflow.storage_volume')}</span>
-      <span class="value text-blue-400">${formatNum(props.totalOccupiedVolume)}</span>
-      <span class="unit">m³</span>
-
-      <span class="label">${t('wareflow.storage_slots')}</span>
-      <span class="value text-blue-400">${Math.ceil(props.totalOccupiedCount)}</span>
-      <span class="unit">${t('wareflow.unit_slots')}</span>
-      
-      <span class="label">${t('wareflow.storage_min_slots')}</span>
-      <span class="value text-blue-400">${Math.ceil(props.totalOccupiedConsumptionCount)}</span>
-      <span class="unit">${t('wareflow.unit_slots')}</span>
-    </div>
-  `
-})
-
 const hasProduction = computed(() => props.details?.some(d => d.amount > 0) ?? false)
 const hasConsumption = computed(() => props.details?.some(d => d.amount < 0) ?? false)
 
@@ -190,18 +168,28 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
           <div :class="classWithSymbol(displayValue, 'value')" v-if="viewMode === 'economy' || viewMode === 'quantity'">
             {{ formattedDisplayValue }}
           </div>
-          <div class="volume-trigger-container" v-if="viewMode === 'volume'"  v-tippy="{ content: volumeTooltipContent, allowHTML: true, theme: 'x4' }">
-            <span class="volume-count-main text-blue-400 font-mono font-bold text-sm leading-none">
-              {{ Math.ceil(totalOccupiedCount) }}
-            </span>
-            <div class="icon-anchor">
-              <svg class="w-3.5 h-3.5 text-blue-300/60" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
-                <path d="m3.3 7 8.7 5 8.7-5"/>
-                <path d="M12 22V12"/>
-              </svg>
+          <tippy v-if="viewMode === 'volume'" theme="x4" :allowHTML="true" interactive>
+            <div class="volume-trigger-container">
+              <span class="volume-count-main text-blue-400 font-mono font-bold text-sm leading-none">
+                {{ Math.ceil(totalOccupiedCount) }}
+              </span>
+              <div class="icon-anchor">
+                <svg class="w-3.5 h-3.5 text-blue-300/60" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                  <path d="m3.3 7 8.7 5 8.7-5"/>
+                  <path d="M12 22V12"/>
+                </svg>
+              </div>
             </div>
-          </div>
+            <template #content>
+              <VolumeTooltip
+                :net-volume="netVolume"
+                :total-occupied-volume="totalOccupiedVolume"
+                :total-occupied-count="totalOccupiedCount"
+                :total-occupied-consumption-count="totalOccupiedConsumptionCount"
+              />
+            </template>
+          </tippy>
         </template>
 
         <template #row="{ item }">
