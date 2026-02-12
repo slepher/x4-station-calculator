@@ -79,7 +79,7 @@ test.describe('Station Dashboard Volume View', () => {
     console.log('Available buttons:', buttons);
 
     // Click Volume View (Scoped to Dashboard)
-    await page.locator('.dashboard-container .view-mode-btn').filter({ hasText: '空间' }).first().click();
+    await page.locator('.dashboard-container .view-mode-btn').filter({ hasText: /运输|Transport/ }).first().click();
     await page.waitForTimeout(500); // Wait for UI update
 
     // Verify list updates to volume (check for m³ unit)
@@ -105,9 +105,9 @@ test.describe('Station Dashboard Volume View', () => {
 
     // Verify Header Title updates dynamically
     // Scope to the dashboard container that has the view switcher
-    const dashboard = page.locator('.dashboard-container').filter({ has: page.locator('.view-mode-btn', { hasText: '空间' }) }).first();
+    const dashboard = page.locator('.dashboard-container').filter({ has: page.locator('.view-mode-btn', { hasText: /运输|Transport/ }) }).first();
     const headerTitle = dashboard.locator('.header-title');
-    await expect(headerTitle).toHaveText(/体积概览/); // ui.volume_overview
+    await expect(headerTitle).toHaveText(/材料体积|Material Volume/); // station.header_volume
   });
 
   test('UI Verification: Footer Controls', async ({ page }) => {
@@ -118,7 +118,7 @@ test.describe('Station Dashboard Volume View', () => {
     await expect(page.locator('.dashboard-footer').filter({ hasText: /建设资源价格/ })).toBeVisible();
 
     // Switch to Volume View
-    await page.locator('.dashboard-container .view-mode-btn').filter({ hasText: '空间' }).first().click();
+    await page.locator('.dashboard-container .view-mode-btn').filter({ hasText: /运输|Transport/ }).first().click();
 
     // Verify Transport Capacity slider exists
     const transportSliderLabel = page.locator('.slider-label').filter({ hasText: /运输船运量/ });
@@ -183,7 +183,7 @@ test.describe('Station Dashboard Volume View', () => {
     await addModule(page, 'prod_gen_claytronics_macro');
     
     // Switch to Volume View
-    await page.locator('.dashboard-container .view-mode-btn').filter({ hasText: '空间视图' }).first().click();
+    await page.locator('.dashboard-container .view-mode-btn').filter({ hasText: /运输视图|Transport/ }).first().click();
     
     // Change transport capacity
     const transportSlider = page.locator('.dashboard-footer input[type="range"]').first();
@@ -241,7 +241,7 @@ test.describe('Station Dashboard Volume View', () => {
 
     // Switch to Volume View (might reset view mode but settings should persist)
     // Need to verify if the app remembers the view mode? Probably not.
-    await page.locator('.dashboard-container .view-mode-btn').filter({ hasText: '空间视图' }).first().click();
+    await page.locator('.dashboard-container .view-mode-btn').filter({ hasText: /运输视图|Transport/ }).first().click();
 
     // Verify Slider Value
     const sliderValueLoc = page.locator('.slider-header span').nth(1);
@@ -259,15 +259,15 @@ test.describe('Station Dashboard Volume View', () => {
   test('I18n Verification', async ({ page }) => {
     // ZH-CN Verified in previous tests (default)
     await expect(page.locator('.view-mode-btn').filter({ hasText: '成本视图' }).first()).toBeVisible(); // Material -> Cost View
-    await expect(page.locator('.view-mode-btn').filter({ hasText: '空间视图' }).first()).toBeVisible();
+    await expect(page.locator('.view-mode-btn').filter({ hasText: '运输视图' }).first()).toBeVisible();
 
     // Switch to EN
     const langSelect = page.locator('.toolbar-panel select').first();
     await langSelect.selectOption('en');
     await page.waitForTimeout(500);
 
-    await expect(page.locator('.view-mode-btn').filter({ hasText: 'Cost View' }).first()).toBeVisible();
-    await expect(page.locator('.view-mode-btn').filter({ hasText: 'Volume' }).first()).toBeVisible();
+    await expect(page.locator('.view-mode-btn').filter({ hasText: 'Cost' }).first()).toBeVisible();
+    await expect(page.locator('.view-mode-btn').filter({ hasText: 'Transport' }).first()).toBeVisible();
 
     await addModule(page, 'prod_gen_claytronics_macro');
     // Case insensitive matching for safety
@@ -276,8 +276,8 @@ test.describe('Station Dashboard Volume View', () => {
     // await expect(page.locator('.stat-item').filter({ hasText: /TOTAL BUILD VOLUME/i })).toBeVisible(); // This is in Summary, not Stats Bar necessarily with that label, Stats bar has TOTAL VOLUME
     
     // Switch to Volume View to check Summary Title
-    await page.locator('.dashboard-container .view-mode-btn').filter({ hasText: 'Volume' }).first().click();
+    await page.locator('.dashboard-container .view-mode-btn').filter({ hasText: 'Transport' }).first().click();
     const summaryTitle = page.locator('.variant-summary').first();
-    await expect(summaryTitle).toHaveText(/Build Volume/i);
+    await expect(summaryTitle).toHaveText(/Total Build Volume/i);
   });
 });

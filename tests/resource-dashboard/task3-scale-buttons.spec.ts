@@ -1,45 +1,31 @@
-import { test, expect } from '@playwright/test';
-
-let sharedPage;
+import { expect } from '@playwright/test';
+import { test } from '../test-setup';
 
 test.describe('Task 3: 规划区数量调整功能测试', () => {
-  test.beforeAll(async ({ browser }) => {
-    // 创建共享的页面实例
-    sharedPage = await browser.newPage();
-    
-    // 访问应用首页（注意base路径）
-    await sharedPage.goto('/x4-station-calculator/');
+  test.beforeEach(async ({ page }) => {
+    // 访问应用首页
+    await page.goto('/x4-station-calculator/');
     
     // 等待应用加载完成
-    await sharedPage.waitForSelector('.module-list-container');
-  });
+    await page.waitForSelector('.module-list-container');
 
-  test.beforeEach(async () => {
     // 点击新建按钮获得干净的界面
-    // 支持中英文两种语言的按钮文本
-    const newButton = sharedPage.locator('button:has-text("新建"), button:has-text("New")').first();
+    const newButton = page.locator('button:has-text("新建"), button:has-text("New")').first();
     await newButton.click();
     
     // 检查是否弹出保存对话框，如果有则选择丢弃并新建
-    const discardButton = sharedPage.locator('button:has-text("丢弃并新建"), button:has-text("Discard & New")').first();
+    const discardButton = page.locator('button:has-text("丢弃并新建"), button:has-text("Discard & New")').first();
     if (await discardButton.isVisible()) {
       await discardButton.click();
     }
     
     // 等待界面重置完成
-    await sharedPage.waitForTimeout(500);
+    await page.waitForTimeout(500);
   });
 
-  test.afterAll(async () => {
-    // 测试结束后关闭共享页面
-    if (sharedPage) {
-      await sharedPage.close();
-    }
-  });
-
-  test('应该显示正确的按钮选项', async () => {
+  test('应该显示正确的按钮选项', async ({ page }) => {
     // 检查按钮组是否存在
-    const scaleButtons = sharedPage.locator('.scale-buttons');
+    const scaleButtons = page.locator('.scale-buttons');
     await expect(scaleButtons).toBeVisible();
 
     // 检查按钮数量是否正确
@@ -53,8 +39,8 @@ test.describe('Task 3: 规划区数量调整功能测试', () => {
     }
   });
 
-  test('按钮应该右对齐', async () => {
-    const scaleButtons = sharedPage.locator('.scale-buttons');
+  test('按钮应该右对齐', async ({ page }) => {
+    const scaleButtons = page.locator('.scale-buttons');
     
     // 检查按钮组是否右对齐
     const marginLeft = await scaleButtons.evaluate(el => {
@@ -64,8 +50,8 @@ test.describe('Task 3: 规划区数量调整功能测试', () => {
     expect(marginLeft).toMatch(/^(auto|0px|[0-9.]+px)$/); // 兼容计算后的像素值
   });
 
-  test('按钮hover效果应该正确', async () => {
-    const firstButton = sharedPage.locator('.scale-button').first();
+  test('按钮hover效果应该正确', async ({ page }) => {
+    const firstButton = page.locator('.scale-button').first();
     
     // 检查默认状态
     const defaultBgColor = await firstButton.evaluate(el => {
@@ -82,7 +68,7 @@ test.describe('Task 3: 规划区数量调整功能测试', () => {
     await firstButton.hover();
     
     // 等待hover效果应用
-    await sharedPage.waitForTimeout(500);
+    await page.waitForTimeout(500);
     
     // 检查hover颜色（琥珀色）
     const hoverBgColor = await firstButton.evaluate(el => {
@@ -97,17 +83,17 @@ test.describe('Task 3: 规划区数量调整功能测试', () => {
     expect(hoverColor).toMatch(/rgb\(25[45], 25[12], 23[25]\)/);
   });
 
-  test('按钮高度应该为18px', async () => {
-    const firstButton = sharedPage.locator('.scale-button').first();
+  test('按钮高度应该为18px', async ({ page }) => {
+    const firstButton = page.locator('.scale-button').first();
     
     // 检查按钮高度
     await expect(firstButton).toHaveCSS('height', '18px');
   });
 
-  test('按钮点击应该调整模块数量', async () => {
+  test('按钮点击应该调整模块数量', async ({ page }) => {
     // 简化测试：仅测试按钮点击功能，不依赖模块选择
     // 检查按钮是否可以点击
-    const doubleButton = sharedPage.locator('text=2x');
+    const doubleButton = page.locator('text=2x');
     await expect(doubleButton).toBeVisible();
     
     // 点击按钮并检查没有错误
@@ -117,9 +103,9 @@ test.describe('Task 3: 规划区数量调整功能测试', () => {
     await expect(doubleButton).not.toBeDisabled();
   });
 
-  test('规划区高度应该与工业区保持一致', async () => {
+  test('规划区高度应该与工业区保持一致', async ({ page }) => {
     // 简化测试：检查标题栏是否存在且可见
-    const plannedHeader = sharedPage.locator('.tier-header').first();
+    const plannedHeader = page.locator('.tier-header').first();
     await expect(plannedHeader).toBeVisible();
     
     // 检查高度是否合理（在合理范围内）
@@ -128,8 +114,8 @@ test.describe('Task 3: 规划区数量调整功能测试', () => {
     expect(plannedHeight).toBeLessThan(50);
   });
 
-  test('按钮样式应该与资源产出概览标签保持一致', async () => {
-    const scaleButton = sharedPage.locator('.scale-button').first();
+  test('按钮样式应该与资源产出概览标签保持一致', async ({ page }) => {
+    const scaleButton = page.locator('.scale-button').first();
     
     // 检查按钮基本样式属性
     const buttonStyles = await scaleButton.evaluate(el => {

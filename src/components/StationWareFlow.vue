@@ -177,7 +177,7 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
 </script>
 
 <template>
-  <div class="flow-wrapper">
+  <div class="flow-wrapper" :data-resource-id="resourceId">
     <div class="flow-content">
       <CollapsibleDetailList
         :data="formattedDetails"

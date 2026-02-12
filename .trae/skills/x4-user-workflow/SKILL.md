@@ -41,7 +41,12 @@ When generating or translating spec documents (`.md` in `openspec/`), **YOU MUST
 - **Content**: Defines specific verification steps. Must be comprehensive and logically split.
 - **Mapping**: Future test scripts will map 1:1 to these items.
 
-**5. Zero-Code Policy during Planning**
+**5. Test Experience & Locator Loop (MANDATORY)**
+- **Sync Rule**: Whenever an E2E test passes or fails due to a locator issue, **YOU MUST** immediately update `openspec/test_experience.md`.
+- **Content**: Record the successful DOM path (✅), the logical description, and any "Pitfalls" (e.g., timing issues, i18n mismatches).
+- **Continuity**: Updating this documentation is a sub-step of the current task. Do NOT terminate the turn after updating.
+
+**6. Zero-Code Policy during Planning**
 - **Scope**: Applies to `/x4:discuss`, `/x4:ff`, and `/x4:new` phases.
 - **Restriction**: **STRICTLY FORBIDDEN** to modify, create, or delete any source code files (e.g., `.ts`, `.vue`, `.js`, `.json` outside `openspec/`) until the implementation phase (`/x4:apply`) begins.
 - **Allowed**: Only files within `openspec/` directory are mutable during planning.

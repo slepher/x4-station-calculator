@@ -20,9 +20,10 @@ When the user input starts with a slash `/` (e.g., `/x4:discuss`, `/x4:new`):
 
 ## 🧪 测试定位闭环协议 (TEST LOCATOR LOOP)
 
-1. **定位失败 (On Failure)**: 一旦发生 Timeout 或元素未找到，立即停止测试编写，阅读 `test_experience.md` 中的 [历史定位大坑] 章节，并根据失败路径更新 [树形形态记录] 的错误尝试部分。气愤度 +10。
-2. **定位成功 (On Success)**: 任何时候确认了正确的元素定位路径，必须立即将其记录到 `openspec/test_experience.md`。
-3. **完备描述**: 记录必须包含：目标对象的逻辑描述、最终正确的路径（✅）、以及操作该元素所需的特定数据。
+1. **定位失败 (On Failure)**: 一旦发生 Timeout 或元素未找到，立即阅读 `test_experience.md` 中的 [历史定位大坑] 章节，并根据失败路径更新 [树形形态记录] 的错误尝试部分。**更新记录后，必须继续尝试修复或执行后续任务，严禁在此终止回合。**
+2. **定位成功 (On Success)**: 任何时候确认了正确的元素定位路径，必须立即将其记录到 `openspec/test_experience.md`。**注意：记录必须使用当前用户对话所使用的语言。记录完成后必须继续执行任务，严禁在此终止回合。**
+3. **完备描述**: 记录必须包含：目标对象的逻辑描述（使用用户语言）、最终正确的路径（✅）、以及操作该元素所需的特定数据。
+4. **禁止中断**: 记录经验（无论成功或失败）均视为任务的中间步骤，AI 必须在同一回合内继续推进主线任务，直到任务完全完成。
 
 4.  **STRICT PROHIBITION**:
     * ⛔ **DO NOT** write any code until the `/x4:apply` phase is explicitly triggered or the skill rules allow it.

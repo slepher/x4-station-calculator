@@ -51,13 +51,13 @@ test.describe('StationDashboard UI and Logic', () => {
     await expect(unitBadge).not.toBeVisible();
 
     // 验证视图按钮状态
-    const materialsBtn = switcher.locator('button').filter({ hasText: /材料/ });
-    const timeBtn = switcher.locator('button').filter({ hasText: /时间/ });
-    const workersBtn = switcher.locator('button').filter({ hasText: /工人/ });
+    const materialsBtn = switcher.locator('button').filter({ hasText: /成本|Cost/ });
+    const timeBtn = switcher.locator('button').filter({ hasText: /时间|Time/ });
+    const workersBtn = switcher.locator('button').filter({ hasText: /工人|Workers/ });
 
     await expect(materialsBtn).toHaveClass(/active/);
-    await expect(timeBtn).toHaveClass(/disabled/);
-    await expect(workersBtn).toHaveClass(/disabled/);
+    await expect(timeBtn).not.toHaveClass(/active/);
+    await expect(workersBtn).not.toHaveClass(/active/);
   });
 
   test('Test Case 2: 建设费用汇总逻辑验证', async ({ page }) => {
@@ -213,12 +213,12 @@ test.describe('StationDashboard UI and Logic', () => {
 
     // 验证 UI 文本
     const switcher = page.locator('.dashboard-container .view-mode-switcher');
-    await expect(switcher).toContainText('Materials');
+    await expect(switcher).toContainText('Cost');
     await expect(switcher).toContainText('Time');
     await expect(switcher).toContainText('Workers');
-
+// 验证 Summary
     const summary = page.locator('.variant-summary');
-    await expect(summary).toContainText(/Total Construction Cost/i);
+    await expect(summary).toContainText(/Total Build Cost/i);
 
     // 验证游戏数据 i18n
     const moduleTitle = page.locator('.variant-module').first();

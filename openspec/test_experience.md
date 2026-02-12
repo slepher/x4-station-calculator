@@ -1,26 +1,100 @@
-# Test Experience & Locator Knowledge Base
+# 测试经验与定位器知识库 (Test Experience & Locator Knowledge Base)
 
 ## 🌲 树形形态记录 (DOM Tree & Locators)
 
-### FavoriteButton & LockButton Tooltip
-*   **Logical Object**: Tooltip for Favorite/Lock buttons
-*   **Locator**: `.tippy-box[data-theme~="x4"]`
-*   **Valid Path**: 
-    *   Row Container: `.priority-tooltip-row` (✅)
-    *   Grid Columns: `.icon-cell`, `.label-cell`, `.hours-cell`, `.desc-cell` (✅)
-*   **Specific Data**:
-    *   Layout: `display: grid`
-    *   Filtering: "Planned" resources show 2 rows, "Pure Consumption" shows 1 row.
+### 1. 全局与通用控件 (Global & Common)
+*   **语言切换器**: `select.first()` (✅)
+*   **“新建”流程**:
+    *   新建按钮: `button:has-text("新建"), button:has-text("New")` (✅)
+    *   丢弃确认: `button:has-text("丢弃并新建"), button:has-text("Discard & New")` (✅)
+*   **模块搜索**:
+    *   搜索框: `input[placeholder*="搜索"], input[placeholder*="Search"]` (✅)
+    *   结果项: `.result-item, .module-item` (✅)
+    *   模块列表: `.module-list-container` (✅)
 
-### Resource Flow List
-*   **Logical Object**: Row in the Ware Flow list
-*   **Locator**: `.list-body .group-container .flow-wrapper` (✅)
-*   **Specific Data**: First item is often 'Energy Cells' if a Solar Power Plant is added.
+### 2. 统一仪表盘 (Dashboard & View Modes)
+*   **主容器**: `.list-wrapper` (✅)
+*   **页眉标题**: `.header-title` (✅)
+*   **视图切换按钮组**:
+    *   通用定位: `.view-mode-btn` (✅)
+    *   数量视图: `.view-mode-btn.nth(0)` 或 `.filter({ hasText: /数量|Quantity/ })` (✅)
+    *   经济视图: `.view-mode-btn.nth(1)` 或 `.filter({ hasText: /经济|Economy/ })` (✅)
+    *   仓储视图: `.view-mode-btn.nth(2)` 或 `.filter({ hasText: /仓储|Volume/ })` (✅)
+    *   激活状态: `.active` (✅)
+*   **底部汇总**:
+    *   利润总计: `.profit-val` (✅)
+    *   经济分组总和: `.economy-group-sum` (✅)
+
+### 3. 资源流项目 (WareFlow & Items)
+*   **行容器**: `.flow-wrapper` (✅)
+*   **特定标识**: `[data-resource-id="wareId"]` (如 `[data-resource-id="energycells"]`) (✅)
+*   **资源名称**: `.header-name` (✅)
+*   **主数值**: `.value` (✅) - *注：数量视图显示产量，经济视图显示利润（带 Cr）*
+*   **收藏按钮 (FavoriteButton)**:
+    *   定位器: `.favorite-btn` (✅)
+    *   状态: `.disabled` 表示无可选优先级 (✅)
+*   **交互逻辑**:
+    *   可点击主行: `.main-row` (✅)
+    *   展开状态: `.main-row.is-active` (✅)
+    *   明细列表: `.list-box` (✅)
+    *   明细项: `.list-item` (✅)
+    *   明细数值: `.item-val` (✅)
+
+### 4. 仓储规划专项 (Volume/Storage Specific)
+*   **分组系统**:
+    *   分组总容器: `.volume-groups-container` (✅)
+    *   单组容器: `.group-container` (✅)
+    *   组标题: `.group-title` (✅)
+    *   组汇总标题 (Summary): `.variant-summary` (✅) - *注：英文为 "Total Build Volume", 中文为 "材料总体积"*
+    *   组规划空间: `.volume-group-planning` (✅) - *格式：`\d+m³`*
+*   **槽位验证**:
+    *   触发容器: `.volume-trigger-container` (✅)
+    *   主计数值: `.volume-count-main` (✅) - *注：颜色类 `.text-blue-400`*
+*   **详细数据 (Tooltip)**:
+    *   容器: `.tippy-box` (✅)
+    *   网格布局: `.volume-tooltip-grid` (✅)
+*   **缓冲区控制**:
+    *   控制区块: `.volume-controls-section` (✅)
+    *   滑动条: `input[type="range"]` (✅) - *共 3 个：资源、主要、次要*
+
+### 5. 顶部状态栏 (Stats Bar) & 右侧面板 (Station Dashboard)
+*   **统计项**: `.stat-item` (✅)
+*   **统计值**: `.stat-value` (✅)
+*   **实战匹配文本**: `/建设总成本/`, `/总体积/`, `/工人需求/`, `/建造总用时/`, `/运输船次/`, `/工人效率/` (✅)
+*   **状态颜色**: `.text-blue-400` (体积/运输), `.text-emerald-400` (工人) (✅)
+*   **汇总标题 (Summary)**: `.variant-summary` (✅) - *注：建设费用下为 "Total Build Cost" / "建设总成本"*
+*   **视图切换 (Right Panel)**:
+    *   费用视图: `.filter({ hasText: /费用|Cost/ })` (✅)
+    *   运输视图: `.filter({ hasText: /运输|Transport/ })` (✅)
+
+### 6. 劳动力与阶级 (Workforce & Tiers)
+*   **阶级区块**: `.tier-section.tier-auto` (✅)
+*   **阶级页眉**: `.tier-header` (✅)
+*   **劳动力选项**: `.workforce-option` (✅)
+*   **选项图标**: `.option-icon` (✅)
+*   **状态勾选框**: `input[type="checkbox"]` (✅)
+
+### FavoriteButton & LockButton 提示框 (Tooltip)
+*   **逻辑对象**: 收藏/锁定按钮的提示框
+*   **定位器**: `.tippy-box[data-theme~="x4"]`
+*   **有效路径**: 
+    *   行容器: `.priority-tooltip-row` (✅)
+    *   网格列: `.icon-cell`, `.label-cell`, `.hours-cell`, `.desc-cell` (✅)
+*   **特定数据**:
+    *   布局: `display: grid`
+    *   过滤: “已规划”资源显示 2 行，“纯消耗”资源显示 1 行。
+
+### 资源流列表 (Resource Flow List)
+*   **逻辑对象**: 货物流列表中的行
+*   **定位器**: `.list-body .group-container .flow-wrapper` (✅)
+*   **特定数据**: 如果添加了太阳能发电厂，第一个项目通常是“能量电池”。
 
 ## 🕳️ 历史定位大坑 (Pitfalls)
 
-*   **Timeout waiting for store**: E2E tests wait for `window.store` but `main.ts` didn't expose it. Fixed by adding explicit exposure in [App.vue](file:///d:/Documents/project/x4-station-calculator/src/App.vue) when `isTestEnv` is true. (✅)
-*   **Production vs Dev Env**: `import.meta.env.DEV` is false in `npm run preview`. Tests must use `isTestEnv` flag injected via `addInitScript`. (✅)
-*   **Tooltip Persistence**: Tippy tooltips with `hideOnClick: false` still require manual mouse move to verify hiding behavior in tests. (✅)
-*   **Vite Preview Base Path**: The preview server might use a base path like `/x4-station-calculator/`. `playwright.config.ts` must match this exactly in `baseURL` and `webServer.url`. (✅)
-*   **TypeScript Errors in Tests**: Playwright might try to compile `.spec.ts` files that are actually unit tests for `vitest`. Ensure `testDir` or file filters are used to separate them. (✅)
+*   **等待 Store 超时**: E2E 测试等待 `window.store`，但 `main.ts` 未暴露它。已通过在 [App.vue](file:///d:/Documents/project/x4-station-calculator/src/App.vue) 中当 `isTestEnv` 为真时显式暴露来修复。(✅)
+*   **生产环境 vs 开发环境**: 在 `npm run preview` 中 `import.meta.env.DEV` 为假。测试必须使用通过 `addInitScript` 注入的 `isTestEnv` 标志。(✅)
+*   **提示框持久性**: 设置了 `hideOnClick: false` 的 Tippy 提示框在测试中仍需要手动移动鼠标来验证隐藏行为。(✅)
+*   **Vite Preview 基础路径**: 预览服务器可能使用类似 `/x4-station-calculator/` 的基础路径。`playwright.config.ts` 必须在 `baseURL` 和 `webServer.url` 中与之完全匹配。(✅)
+*   **测试中的 TypeScript 错误**: Playwright 可能会尝试编译实际上是 `vitest` 单元测试的 `.spec.ts` 文件。确保使用 `testDir` 或文件过滤器将其分开。(✅)
+*   **明细项单位陷阱**: `.item-val` 中仅包含格式化后的数值（如 `+3,000.0`），不包含单位（如 `m³`）。在测试验证时应避免使用 `toMatch(/m³/)` 匹配明细行数值。(✅)
+*   **视图名称变更**: “体积视图”已在界面上更名为“仓储视图”。测试定位器应使用 `/仓储|Volume/` 以保持兼容性。(✅)
