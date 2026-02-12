@@ -3,7 +3,7 @@ import StationWorkbench from './components/StationWorkbench.vue'
 import { useStationStore } from '@/store/useStationStore'
 const store = useStationStore()
 
-if (import.meta.env.DEV) {
+if (import.meta.env.DEV || (window as any).isTestEnv) {
   (window as any).store = store
 }
 </script>

@@ -145,6 +145,34 @@ const volumeTooltipContent = computed(() => {
   `
 })
 
+const hasProduction = computed(() => props.details?.some(d => d.amount > 0) ?? false)
+const hasConsumption = computed(() => props.details?.some(d => d.amount < 0) ?? false)
+
+// 计算是否为用户规划的产物 (Planned Ware)
+const isPlanned = computed(() => {
+  return store.plannedModules.some(m => {
+    const info = store.modules[m.id]
+    return info && info.outputs && Object.keys(info.outputs).includes(props.resourceId)
+  })
+})
+
+// 计算可用优先级 (Available Levels)
+const availableLevels = computed(() => {
+  if (isPlanned.value) {
+    // 用户规划产物: 必须保留，不能设为无需求 (0)
+    return [1, 2]
+  } else if (hasProduction.value) {
+    // 自动/副产物: 不能设为主产物 (2)，防止死循环
+    return [0, 1]
+  } else {
+    // 纯消耗: 只能是无需求 (0)
+    return [0]
+  }
+})
+
+// FavoriteButton 的禁用状态仅取决于是否有多个选项
+const favoriteDisabled = computed(() => availableLevels.value.length <= 1)
+
 const classWithSymbol = (displayValue: number, className:string) => [className, className + '-' + (displayValue >= 0 ? 'pos' : 'neg')]
 </script>
 
@@ -194,7 +222,13 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
     <div class="flow-action-rail">
       <FavoriteButton
         :level="priorityLevel ?? 0"
-        :disabled="nonOperable"
+        :disabled="favoriteDisabled"
+        :has-consumption="hasConsumption"
+        :has-production="hasProduction"
+        :resource-buffer-hours="store.settings.resourceBufferHours"
+        :primary-product-buffer-hours="store.settings.primaryProductBufferHours"
+        :secondary-product-buffer-hours="store.settings.secondaryProductBufferHours"
+        :available-levels="availableLevels"
         @update:level="emit('update:priorityLevel', $event)"
       />
       <LockButton

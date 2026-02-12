@@ -5,9 +5,21 @@ import { useI18n } from 'vue-i18n'
 const props = withDefaults(defineProps<{
   level?: number  // 0 = 无需求/空心, 1 = 副产物/半空心, 2 = 主产物/实心
   disabled?: boolean
+  hasConsumption?: boolean
+  hasProduction?: boolean
+  resourceBufferHours?: number
+  primaryProductBufferHours?: number
+  secondaryProductBufferHours?: number
+  availableLevels?: number[] // Array of allowed priority levels (e.g., [1, 2] or [0, 1])
 }>(), {
   level: 0,
-  disabled: false
+  disabled: false,
+  hasConsumption: false,
+  hasProduction: false,
+  resourceBufferHours: 0,
+  primaryProductBufferHours: 0,
+  secondaryProductBufferHours: 0,
+  availableLevels: () => [0, 1, 2]
 })
 
 const emit = defineEmits<{
@@ -21,6 +33,43 @@ const toggleLevel = () => {
   emit('update:level', props.level)
 }
 
+// Format helper
+const fmt = (n: number) => n % 1 === 0 ? n.toFixed(0) : n.toFixed(1)
+
+// Generate dynamic buffer string for a given product buffer hours
+const getBufferHoursString = (pHours: number) => {
+  if (props.hasProduction && props.hasConsumption) {
+    if (pHours <= 0.01) {
+      return `${fmt(props.resourceBufferHours)}h`
+    }
+    return `${fmt(pHours)}h + ${fmt(props.resourceBufferHours)}h`
+  } else if (props.hasProduction) {
+    return `${fmt(pHours)}h`
+  } else if (props.hasConsumption) {
+    return `${fmt(props.resourceBufferHours)}h`
+  }
+  return '-'
+}
+
+// Generate dynamic description
+const getBufferDescription = (level: number) => {
+  const parts = []
+  
+  if (level === 2) {
+    parts.push(t('tooltip.buffer_long'))
+  } else if (level === 1) {
+    parts.push(t('tooltip.buffer_short'))
+  }
+  
+  if (props.hasConsumption) {
+    parts.push(t('tooltip.buffer_resource'))
+  } else if (parts.length === 0) {
+      return t('tooltip.buffer_resource')
+  }
+  
+  return parts.join('+')
+}
+
 // SVG icons for tooltip
 const emptyStarSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>`
 
@@ -32,32 +81,47 @@ const fullStarSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
 const tooltipContent = computed(() => {
   const lines = [
     { 
+      level: 2,
       icon: fullStarSvg, 
       label: t('tooltip.priority_level_2_label'), 
-      buffer: t('tooltip.priority_level_2_buffer'),
+      hours: getBufferHoursString(props.primaryProductBufferHours),
+      desc: getBufferDescription(2),
       active: props.level === 2 
     },
     { 
+      level: 1,
       icon: halfStarSvg, 
       label: t('tooltip.priority_level_1_label'), 
-      buffer: t('tooltip.priority_level_1_buffer'),
+      hours: getBufferHoursString(props.secondaryProductBufferHours),
+      desc: getBufferDescription(1),
       active: props.level === 1 
     },
     { 
+      level: 0,
       icon: emptyStarSvg, 
       label: t('tooltip.priority_level_0_label'), 
-      buffer: t('tooltip.priority_level_0_buffer'),
+      hours: getBufferHoursString(0),
+      desc: getBufferDescription(0),
       active: props.level === 0 
     }
   ]
+  
+  // Filter based on availableLevels
+  const filteredLines = lines.filter(line => props.availableLevels.includes(line.level))
 
-  return lines.map(line => `
-    <div class="priority-tooltip-row ${line.active ? 'is-active' : ''}">
+  // Determine if highlighting should be applied (only if there's more than one option)
+  const showHighlight = filteredLines.length > 1
+
+  const rowsHtml = filteredLines.map(line => `
+    <div class="priority-tooltip-row ${line.active && showHighlight ? 'is-active' : ''}">
       <span class="icon-cell">${line.icon}</span>
       <span class="label-cell">${line.label}</span>
-      <span class="buffer-cell">${line.buffer}</span>
+      <span class="hours-cell">${line.hours}</span>
+      <span class="desc-cell">${line.desc}</span>
     </div>
   `).join('')
+
+  return `<div class="priority-tooltip-container">${rowsHtml}</div>`
 })
 </script>
 
@@ -71,7 +135,7 @@ const tooltipContent = computed(() => {
       'disabled': disabled
     }"
     @click.stop="!disabled && toggleLevel()"
-    v-tippy="{ content: tooltipContent, allowHTML: true, theme: 'x4' }"
+    v-tippy="{ content: tooltipContent, allowHTML: true, theme: 'x4', hideOnClick: false }"
   >
     <!-- Level 0: 空心五角星 -->
     <svg v-if="level === 0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-4 h-4">
@@ -125,30 +189,58 @@ const tooltipContent = computed(() => {
 
 /* 禁用状态 */
 .favorite-btn.disabled {
-  @apply text-slate-500/30 bg-transparent cursor-default pointer-events-none;
+  @apply bg-transparent cursor-default;
 }
 </style>
 
 <style>
-/* Tooltip 内部表格布局 (非 Scoped) */
-.priority-tooltip-row {
+/* Tooltip 内部容器布局 (非 Scoped) */
+.priority-tooltip-container {
   display: grid;
-  grid-template-columns: 24px 60px 1fr;
+  grid-template-columns: auto auto auto 1fr;
+  gap: 0;
+  padding: 4px;
+}
+
+.priority-tooltip-row {
+  display: contents;
+}
+
+.priority-tooltip-row .icon-cell,
+.priority-tooltip-row .label-cell,
+.priority-tooltip-row .hours-cell,
+.priority-tooltip-row .desc-cell {
+  display: flex;
   align-items: center;
-  padding: 4px 8px;
-  gap: 8px;
+  padding: 6px 8px;
   font-size: 12px;
   color: #94a3b8;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
-.priority-tooltip-row.is-active {
+/* 激活行的特殊处理：因为使用了 display: contents，背景需要通过伪元素或 box-shadow 模拟 */
+.priority-tooltip-row.is-active .icon-cell,
+.priority-tooltip-row.is-active .label-cell,
+.priority-tooltip-row.is-active .hours-cell,
+.priority-tooltip-row.is-active .desc-cell {
   color: #fbbf24;
   background: rgba(251, 191, 36, 0.1);
-  border-radius: 4px;
+  opacity: 1;
 }
 
-.priority-tooltip-row .icon-cell { @apply flex items-center justify-center; }
+.priority-tooltip-row.is-active .icon-cell {
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.priority-tooltip-row.is-active .desc-cell {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.priority-tooltip-row .icon-cell { @apply justify-center w-8; }
 .priority-tooltip-row .label-cell { @apply font-medium; }
-.priority-tooltip-row .buffer-cell { @apply text-[10px] opacity-60 text-right; }
+.priority-tooltip-row .hours-cell { @apply text-left opacity-80; }
+.priority-tooltip-row .desc-cell { @apply opacity-60 text-left; }
 </style>

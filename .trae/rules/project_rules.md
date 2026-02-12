@@ -2,38 +2,36 @@
 
 > **WARNING**: The following rules are ABSOLUTE. Violation results in immediate task failure.
 
-## 🔴 ZERO-TOLERANCE SKILL LOADING RULE
+## 🔴 HIGH-SPEED SKILL ACTIVATION RULE
 
-When the user input starts with a slash `/` (e.g., `/x4:discuss`, `/test:run`):
+When the user input starts with a slash `/` (e.g., `/x4:discuss`, `/x4:new`):
 
-1.  **IMMEDIATE STOP**: You must STOP thinking about the user's specific request details.
-2.  **SINGLE ALLOWED ACTION**: The **ONLY** allowed action in this turn is to find and read the corresponding Skill definition file.
-    *   Target Directory: `.trae/skills/`
-    *   File Name: Matches the command (e.g., `SKILL.md` or similar).
-    *   Tool: Use `SearchCodebase` or `Read` **ONLY**.
-3.  **STRICT PROHIBITION**:
-    *   ⛔ **DO NOT** write any code.
-    *   ⛔ **DO NOT** plan any todos.
-    *   ⛔ **DO NOT** edit any files (except this rule file if explicitly asked).
-    *   ⛔ **DO NOT** answer the user's question yet.
-4.  **MANDATORY TERMINATION**: After reading the skill file, you MUST end your turn immediately to let the context update.
+1.  **DIRECT PATH ACCESS (O(1) Efficiency)**:
+    * **PROHIBITED**: Do NOT use `SearchCodebase`. Do NOT perform a fuzzy search for the skill.
+    * **MANDATORY**: Use the `Read` tool to directly access the skill definition at the known path:
+        * Path: `.trae/skills/x4-user-workflow/SKILL.md`
+2.  **CONTEXT & EXPERIENCE CHECK**:
+    * Check if `x4-user-workflow/SKILL.md` is in context.
+    * **MANDATORY**: If the task involves testing or element interaction, you MUST `Read` `openspec/test_experience.md` before writing any test code.
 
-**Example of CORRECT Behavior:**
-> User: "/x4:discuss Implement feature X..."
-> AI: (Calls `SearchCodebase` for "x4:discuss skill") -> (Calls `Read` on found file) -> (Ends turn with "Skill loaded.")
+3.  **CONTINUOUS EXECUTION**:
+    * **NO FORCED STOP**: After reading the skill/experience files, you MUST NOT terminate the turn.
+    * **IMMEDIATE ACTION**: Integrate the skill rules, **test experience**, and the user's request into a single response.
 
-**Example of INCORRECT Behavior (FORBIDDEN):**
-> User: "/x4:discuss Implement feature X..."
-> AI: "Okay, I will implement feature X..." -> (Edits code) -> ❌ VIOLATION!
+## 🧪 测试定位闭环协议 (TEST LOCATOR LOOP)
+
+1. **定位失败 (On Failure)**: 一旦发生 Timeout 或元素未找到，立即停止测试编写，阅读 `test_experience.md` 中的 [历史定位大坑] 章节，并根据失败路径更新 [树形形态记录] 的错误尝试部分。气愤度 +10。
+2. **定位成功 (On Success)**: 任何时候确认了正确的元素定位路径，必须立即将其记录到 `openspec/test_experience.md`。
+3. **完备描述**: 记录必须包含：目标对象的逻辑描述、最终正确的路径（✅）、以及操作该元素所需的特定数据。
+
+4.  **STRICT PROHIBITION**:
+    * ⛔ **DO NOT** write any code until the `/x4:apply` phase is explicitly triggered or the skill rules allow it.
+    * ⛔ **DO NOT** guess the workflow; if the `Read` fails, ask the user to confirm the directory structure.
 
 ---
 
-**Skill 加载触发器**：
-  - 当用户输入以 `/` 开头的指令（例如 `/x4:discuss`）时，这是一个加载 Skill 的信号。
-  - 你必须优先搜索 `.trae/skills/` 目录，找到与指令匹配的定义文件（通常是 `SKILL.md`）。
-  - **必须**在执行任何操作前读取该 Skill 文件的内容，并严格遵循其中的工作流和约束。
+## **Skill 加载优化准则**
 
-**Skill 加载原子性 (Skill Loading Atomicity)**：
-  - **唯一动作约束**：当用户输入包含 Skill 加载指令（如 `/x4:discuss`, `/x4:doc` 等）时，LLM 在该回合的 **唯一合法动作** 是调用 `SearchCodebase` 或 `Read` 工具去寻找和读取对应的 Skill 定义文件（通常是 `SKILL.md`）。
-  - **严禁抢跑**：在成功读取 Skill 内容并完全理解之前，**严禁**执行任何实质性的任务操作（如创建文件、修改代码、规划 Todo 等）。必须等待下一回合用户确认或 Skill 内容加载完毕后，再根据 Skill 的具体规则行动。
-  - **指令优先级**：Skill 加载指令的优先级高于 System Prompt 中的 "Bias for Action"。当二者冲突时，必须优先满足 Skill 加载的原子性，暂停行动。
+* **路径直达 (Path Assert)**：当识别到 `/x4:` 指令时，禁止进行全库搜索。直接读取固定路径 `.trae/skills/x4-user-workflow/SKILL.md`。
+* **消除往返 (Zero-Latency)**：读取 Skill 文件后，无需等待用户确认，必须在同一回合内根据 Skill 规范执行后续逻辑。
+* **内存优先**：如果上下文中已存在该 Skill 的定义，禁止重复执行读取动作。

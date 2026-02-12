@@ -18,8 +18,8 @@ app.use(i18n)
 app.use(VueTippy)
 
 // 开发环境下将 pinia 挂载到 window，方便测试脚本访问
-if (import.meta.env.DEV || (window as any).isTestEnv) {
-  (window as any).__pinia = pinia
+if (import.meta.env.DEV) {
+  (window as any).__pinia = pinia;
 }
 
 app.mount('#app')

@@ -35,13 +35,15 @@ const tooltipContent = computed(() => {
     { icon: lockedSvg, text: t('tooltip.lock_locked'), active: props.locked }
   ]
 
-  return lines.map(line => `
+  const rowsHtml = lines.map(line => `
     <div class="lock-tooltip-row ${line.active ? 'is-active' : ''}">
       <span class="icon-cell">${line.icon}</span>
       <span class="label-cell">${line.text.split(' - ')[0]}</span>
       <span class="desc-cell">${line.text.split(' - ')[1] || ''}</span>
     </div>
   `).join('')
+
+  return `<div class="lock-tooltip-container">${rowsHtml}</div>`
 })
 </script>
 
@@ -57,7 +59,7 @@ const tooltipContent = computed(() => {
     class="lock-btn"
     :class="{ 'is-locked': locked, 'non-operable': disabled }"
     @click.stop="!disabled && toggleLock()"
-    v-tippy="{ content: tooltipContent, allowHTML: true, theme: 'x4' }"
+    v-tippy="{ content: tooltipContent, allowHTML: true, theme: 'x4', hideOnClick: false }"
   >
     <svg v-if="locked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
       <path fill-rule="evenodd"
@@ -72,27 +74,51 @@ const tooltipContent = computed(() => {
 </template>
 
 <style>
-/* Tooltip 内部表格布局 (全局样式以适配 Tippy) */
-.lock-tooltip-row {
+/* Tooltip 内部容器布局 (全局样式以适配 Tippy) */
+.lock-tooltip-container {
   display: grid;
-  grid-template-columns: 20px 50px 1fr;
+  grid-template-columns: auto auto 1fr;
+  gap: 0;
+  padding: 4px;
+}
+
+.lock-tooltip-row {
+  display: contents;
+}
+
+.lock-tooltip-row .icon-cell,
+.lock-tooltip-row .label-cell,
+.lock-tooltip-row .desc-cell {
+  display: flex;
   align-items: center;
-  padding: 4px 8px;
-  gap: 4px;
+  padding: 6px 8px;
   font-size: 12px;
   color: #94a3b8;
-  min-width: 140px;
+  transition: all 0.2s;
+  white-space: nowrap;
 }
 
-.lock-tooltip-row.is-active {
+.lock-tooltip-row.is-active .icon-cell,
+.lock-tooltip-row.is-active .label-cell,
+.lock-tooltip-row.is-active .desc-cell {
   color: #fbbf24;
   background: rgba(251, 191, 36, 0.1);
-  border-radius: 4px;
+  opacity: 1;
 }
 
-.lock-tooltip-row .icon-cell { display: flex; align-items: center; }
-.lock-tooltip-row .label-cell { font-weight: 600; }
-.lock-tooltip-row .desc-cell { opacity: 0.6; font-size: 11px; text-align: right; }
+.lock-tooltip-row.is-active .icon-cell {
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.lock-tooltip-row.is-active .desc-cell {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.lock-tooltip-row .icon-cell { @apply justify-center w-8; }
+.lock-tooltip-row .label-cell { @apply font-semibold; }
+.lock-tooltip-row .desc-cell { @apply opacity-60 text-left; }
 </style>
 
 <style scoped>

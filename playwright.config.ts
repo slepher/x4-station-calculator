@@ -2,6 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
+  testIgnore: '**/unit/**',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -9,7 +10,7 @@ export default defineConfig({
   reporter: 'list',
   
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://localhost:4173/x4-station-calculator/',
     trace: 'on-first-retry',
     locale: 'en-US',
     viewport: { width: 1920, height: 1080 },
@@ -26,8 +27,8 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:5173',
+    command: 'npm run preview',
+    url: 'http://localhost:4173/x4-station-calculator/',
     reuseExistingServer: !process.env.CI,
   },
   expect: {

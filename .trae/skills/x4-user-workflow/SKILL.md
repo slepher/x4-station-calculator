@@ -86,32 +86,35 @@ When generating or translating spec documents (`.md` in `openspec/`), **YOU MUST
 - **Allowed**: Only modify files within `openspec/` or other documentation.
 
 ### 3. Fast-Forward Creation (`/x4:ff`)
-**Action**: Delegate to `#openspec-ff-change`.
+**Action**: **MANDATORY**: Search for and read `.trae/skills/openspec-ff-change/SKILL.md`.
+**Context Injection**:
+- **Language**: You MUST generate all documentation (specs, tasks) in the user's current conversation language (e.g., Chinese).
+- **No-Translate**: Do NOT translate `Requirement:`, `Scenario:`, or `SHALL`/`MUST` keywords.
+- **Test Tasks**: You MUST generate `test_tasks.md` immediately after the spec/tasks are created.
 **Constraints**:
 - **ENFORCE Zero-Code Policy**: Do not touch source code.
 - Apply **Project Standards** immediately.
-- Generate `test_tasks.md` alongside `tasks.md`.
 
 ### 4. New Change Step-by-Step (`/x4:new`)
-**Action**: Delegate to `#openspec-new-change`.
+**Action**: **MANDATORY**: Search for and read `.trae/skills/openspec-new-change/SKILL.md`.
 **Constraints**:
 - **ENFORCE Zero-Code Policy**: Do not touch source code.
 - Apply **Project Standards** immediately.
 - Ensure `test_tasks.md` is included in the planned artifacts.
 
 ### 5. Implement Change (`/x4:apply`)
-**Action**: Delegate to `#openspec-apply-change`.
+**Action**: **MANDATORY**: Search for and read `.trae/skills/openspec-apply-change/SKILL.md`.
 **Constraints**:
 - For implementation tasks, refer to `#x4-test` for coding guidelines (imports, data mocking).
 
 ### 6. Verify Change (`/x4:verify`)
-**Action**: Delegate to `#openspec-verify-change` (or `/opsx:verify`).
+**Action**: **MANDATORY**: Search for and read `.trae/skills/openspec-verify-change/SKILL.md`.
 **Constraints**:
 - Trigger E2E tests using `#x4-test`.
 - Update `test_tasks.md` status (`[x]` or `[ ]`) based on results.
 
 ### 7. Archive Change (`/x4:archive`)
-**Action**: Delegate to `#openspec-archive-change`.
+**Action**: **MANDATORY**: Search for and read `.trae/skills/openspec-archive-change/SKILL.md`.
 **Constraints**:
 - **Strictly Follow Protocol**: You MUST load and read `openspec-archive-change/SKILL.md` and follow its steps exactly. Do not improvise.
 - **Promote Specs (New Feature)**: If `specs/<feature>/spec.md` does not exist, you MUST manually CREATE and MERGE the spec (stripping Delta headers) into that location BEFORE calling openspec-archive.

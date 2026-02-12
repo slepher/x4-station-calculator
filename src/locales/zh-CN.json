@@ -128,9 +128,9 @@
     "priority_level_0_label": "无需求",
     "priority_level_1_label": "副产物",
     "priority_level_2_label": "主产物",
-    "priority_level_0_buffer": "资源缓冲",
-    "priority_level_1_buffer": "短缓冲+资源缓冲",
-    "priority_level_2_buffer": "长缓冲+资源缓冲",
+    "buffer_resource": "资源缓冲",
+    "buffer_short": "短缓冲",
+    "buffer_long": "长缓冲",
     "lock_unlocked": "未锁定 - 自动补充",
     "lock_locked": "已锁定 - 保持当前"
   },

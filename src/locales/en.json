@@ -126,9 +126,9 @@
     "priority_level_0_label": "No Demand",
     "priority_level_1_label": "Secondary",
     "priority_level_2_label": "Primary",
-    "priority_level_0_buffer": "Resource Buffer",
-    "priority_level_1_buffer": "Short+Resource Buffer",
-    "priority_level_2_buffer": "Long+Resource Buffer",
+    "buffer_resource": "Res",
+    "buffer_short": "Short",
+    "buffer_long": "Long",
     "lock_unlocked": "Unlocked - Auto Fill",
     "lock_locked": "Locked - Keep Current"
   },
