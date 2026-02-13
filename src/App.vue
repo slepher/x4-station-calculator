@@ -1,15 +1,50 @@
 <script setup lang="ts">
 import StationWorkbench from './components/StationWorkbench.vue'
 import { useStationStore } from '@/store/useStationStore'
-const store = useStationStore()
+import { useGameDataStore } from '@/store/useGameDataStore'
+import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 
-if (import.meta.env.DEV || (window as any).isTestEnv) {
-  (window as any).store = store
-}
+const stationStore = useStationStore()
+const gameDataStore = useGameDataStore()
+const logicFlowStore = useLogicFlowStore()
+
+// 暴露 store 供测试使用
+const checkExportStores = () => {
+  const isTest = (window as any).isTestEnv || 
+                 window.location.search.includes('test=true') || 
+                 window.localStorage.getItem('isTestEnv') === 'true';
+
+  if (import.meta.env.DEV || isTest) {
+    if (!(window as any).stationStore) {
+      console.log('[App] Exporting stores to window for test env');
+      (window as any).stationStore = stationStore;
+      (window as any).gameDataStore = gameDataStore;
+      (window as any).logicFlowStore = logicFlowStore;
+      (window as any).store = stationStore;
+    }
+    
+    if (!gameDataStore.isReady) {
+      console.log('[App] GameData not ready, initializing...');
+      gameDataStore.initialize();
+    }
+    return true;
+  }
+  return false;
+};
+
+// 立即尝试暴露
+checkExportStores();
+
+// 延迟重试，处理某些极端情况下的加载顺序问题
+setTimeout(checkExportStores, 100);
+setTimeout(checkExportStores, 500);
 </script>
 
 <template>
-  <StationWorkbench v-if="store.isReady"/>
+  <div id="app-root">
+    <StationWorkbench v-if="stationStore.isReady"/>
+    <div v-else class="loading-gate">Initializing Station Store...</div>
+  </div>
 </template>
 
 <style>

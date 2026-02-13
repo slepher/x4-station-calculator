@@ -16,7 +16,7 @@ const flashTime = 300; 0; // 闪烁动画时长（毫秒）
 // 应用缩放比例
 const applyScale = (scale: number) => {
   // 更新所有规划模块的数量
-  store.plannedModules.forEach((module, index) => {
+  store.plannedModules.forEach((module: any, index: number) => {
     const newCount = Math.ceil(module.count * scale)
     store.updateModuleCount(index, newCount)
   })
@@ -64,7 +64,7 @@ const triggerNumberFlash = async (id: string) => {
 watch(() => store.plannedModules, (newVal) => {
   const currentCounts: Record<string, number> = {}
 
-  newVal.forEach(m => {
+  newVal.forEach((m: any) => {
     currentCounts[m.id] = m.count
     const prevCount = lastModuleCounts.value[m.id]
 
@@ -84,7 +84,7 @@ watch(() => store.plannedModules.length, (newLength, oldLength) => {
     // 检测所有新添加的模块
     const newModules = store.plannedModules.slice(oldLength)
 
-    newModules.forEach(module => {
+    newModules.forEach((module: any) => {
       if (module) {
         // 添加模块到高亮集合（整体边框动画）
         triggerHighlight(module.id)

@@ -1,16 +1,15 @@
-import type { Ref } from 'vue'
-import { defineStore } from 'pinia'
+import { defineStore, storeToRefs } from 'pinia'
 import { ref, computed, watch } from 'vue'
 import { mockStationData } from '@/mock/mock_data_v1'
 import type {
   X4Module,
-  X4Ware,
   SavedModule,
   StationSettings,
   StationPlan,
-  RaceMedicalConsumption
+  ModuleGroupResult,
 } from '../types/x4'
-import { useGameData, type LocalizedX4Module, type LocalizedX4ModuleGroup } from './logic/useGameData'
+import { useGameDataStore } from './useGameDataStore'
+import { useLogicFlowStore } from './useLogicFlowStore'
 import { calculateWorkforceBreakdown, calculateActualWorkforce, calculateEfficiencySaturation } from './logic/workforceCalculator'
 import { calculateProfitBreakdown, calculateNetProduction } from './logic/productionCalculator'
 import { generateFilteredModulesGrouped } from './logic/searchModule'
@@ -30,7 +29,6 @@ import { analyzeStation } from './logic/analyzeStation'
 
 // --- 类型定义 (Type Definitions) ---
 export type { SavedModule, StationPlan } from '../types/x4'
-export type { LocalizedX4ModuleGroup, LocalizedX4Module } from './logic/useGameData'
 
 export interface SavedPlansState {
   version: number;
@@ -38,28 +36,19 @@ export interface SavedPlansState {
   list: StationPlan[];
 }
 
-export interface GroupedModuleItem extends LocalizedX4Module {
-  displayLabel: string
-  moduleGroup?: LocalizedX4ModuleGroup
-}
-
-export interface ModuleGroupResult {
-  group: string
-  displayLabel: string
-  modules: GroupedModuleItem[]
-}
-
 export const useStationStore = defineStore('station', () => {
   // --- 数据管理层 ---
-  const gameData = useGameData()
+    const gameData = useGameDataStore()
+    const logicFlow = useLogicFlowStore()
+    logicFlow.init() // 抑制未使用警告并确保初始化
 
   // --- 状态 (State) ---
+  const activeView = ref<'production' | 'flow'>((localStorage.getItem('x4_station_active_view') as any) || 'production')
   const isReady = ref(false)
   const plannedModules = ref<SavedModule[]>([]) // Tier 1: 用户规划的核心模块
   const lockedWares = ref<string[]>([]) // 提升至外层，与 plannedModules 并列
   const savedPlans = ref<SavedPlansState>({ version: 1, activeId: null, list: [] })
   const currentPlanName = ref<string>('') // 当前方案名称，"" 代表未命名/新建
-  const searchQuery = ref('')
   const lastSavedSnapshot = ref<string>('')
 
   const settings = ref<StationSettings>({
@@ -83,21 +72,31 @@ export const useStationStore = defineStore('station', () => {
 
   const buildPriceMultiplier = ref(0.5)
 
+  // 监听视图切换并持久化
+  watch(activeView, (newView) => {
+    localStorage.setItem('x4_station_active_view', newView)
+  })
+
   // 产物优先级覆盖状态：wareId -> priorityLevel (0, 1, 2)
   const warePriority = ref<Record<string, number>>({})
 
   // --- 基础数据映射 (Ref 类型，需要用 .value 访问) ---
-  const waresMap: Ref<Record<string, X4Ware>> = gameData.waresMap
-  const modulesMap: Ref<Record<string, X4Module>> = gameData.modulesMap
-  const localizedModulesMap: Ref<Record<string, LocalizedX4Module>> = gameData.localizedModulesMap
-  const localizedModuleGroupsMap: Ref<Record<string, LocalizedX4ModuleGroup>> = gameData.localizedModuleGroupsMap
-  const medicalConsumptionMap: Ref<RaceMedicalConsumption> = gameData.medicalConsumptionMap
+  const { 
+    waresMap, 
+    modulesMap, 
+    localizedModulesMap, 
+    localizedModuleGroupsMap, 
+    medicalConsumptionMap,
+    searchQuery
+  } = storeToRefs(gameData)
 
   // --- 搜索增强 ---
+  const { currentLocale } = storeToRefs(gameData)
+
   const filteredModulesGrouped = computed<ModuleGroupResult[]>(() => {
     return generateFilteredModulesGrouped(
       searchQuery.value,
-      gameData.currentLocale.value,
+      currentLocale.value,
       localizedModulesMap.value,
       localizedModuleGroupsMap.value
     )
@@ -215,6 +214,10 @@ export const useStationStore = defineStore('station', () => {
     }
     savedPlans.value.list.splice(index, 1)
   }
+
+  watch(activeView, (val) => {
+    localStorage.setItem('x4_station_active_view', val)
+  })
 
   watch(savedPlans, (val) => {
     localStorage.setItem('x4_station_data', JSON.stringify(val))
@@ -529,12 +532,22 @@ export const useStationStore = defineStore('station', () => {
 
   // --- 初始化 ---
   const initializeStore = async () => {
+    console.log('[StationStore] Initializing...')
     isReady.value = false
     try {
       // 1. 初始化游戏数据层
       await gameData.initialize()
       
-      // 2. 从 localStorage 恢复或加载 Demo
+      // 2. 初始化逻辑组网层
+      logicFlow.init()
+
+      // 3. 恢复视图状态
+      const storedView = localStorage.getItem('x4_station_active_view')
+      if (storedView === 'production' || storedView === 'flow') {
+        activeView.value = storedView as 'production' | 'flow'
+      }
+
+      // 4. 从 localStorage 恢复或加载 Demo
       const stored = localStorage.getItem('x4_station_data')
       if (stored) {
         try {
@@ -549,6 +562,7 @@ export const useStationStore = defineStore('station', () => {
       
       takeSnapshot()
       isReady.value = true
+      console.log('[StationStore] Initialized. Ready:', isReady.value)
     } catch (e) {
       console.error('[Store] Initialization failed:', e)
     }
@@ -557,9 +571,10 @@ export const useStationStore = defineStore('station', () => {
   initializeStore()
 
   return {
-    isReady, isDirty,
-    plannedModules, autoIndustryModules, autoSupplyModules, allIndustryModules, allModules, settings, searchQuery, filteredModulesGrouped, currentPlanName,
+    isReady, isDirty, activeView,
+    plannedModules, autoIndustryModules, autoSupplyModules, allIndustryModules, allModules, settings, currentPlanName,
     wares: waresMap, modules: localizedModulesMap, moduleGroups: localizedModuleGroupsMap, medicalConsumption: medicalConsumptionMap,
+    searchQuery, filteredModulesGrouped,
     loadData, loadDemoData, savedPlans, saveCurrentPlan, loadPlan, mergePlan, deletePlan,
     lockedWares, isWareLocked, isWareOperable, toggleWareLock,
     warePriority, isPlannedWare, isAutoWare, getResolvedLevel, toggleWarePriority,

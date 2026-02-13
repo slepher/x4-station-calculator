@@ -1,4 +1,8 @@
 {
+  "view": {
+    "production": "量化生产",
+    "logical_flow": "逻辑组网"
+  },
   "station": {
     "total_needed": "总需求",
     "total_capacity": "总容量",
@@ -31,11 +35,15 @@
     "item_build_time": "建造时间"
   },
   "ui": {
+    "industrial": "工业链",
+    "agricultural": "生活/农业",
     "build_res_required": "所需建设资源",
     "module_breakdown": "各模块消耗明细",
     "no_materials": "标准模块 - 无需额外材料",
     "build_res_price": "建设资源价格",
-    "total_volume": "总体积"
+    "total_volume": "总体积",
+    "tag_res": "资源",
+    "tag_ops": "运营"
   },
   "menu": {
     "new": "新建",
@@ -138,5 +146,10 @@
     "average": "平均",
     "no_active_production": "暂无活跃生产周期",
     "add_modules_hint": "请添加生产模块以查看数据"
+  },
+  "logicFlow": {
+    "dropToCreate": "拖拽至此处创建新产线",
+    "compactView": "紧凑视图",
+    "planningZone": "规划区"
   }
 }

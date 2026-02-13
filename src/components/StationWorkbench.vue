@@ -1,19 +1,28 @@
 <script setup lang="ts">
+import { useStationStore } from '@/store/useStationStore'
 import StationPlanningPanel from './StationPlanningPanel.vue'
 import StationDashboard from './StationDashboard.vue'
 import StationToolbar from './StationToolbar.vue'
 import StatusMonitor from './StatusMonitor.vue' // <--- 引入状态监控组件
 import StationWareFlowsDashboard from './StationWareFlowsDashboard.vue'
+import LogicFlowCandidateZone from './LogicFlowCandidateZone.vue'
+import LogicFlowPlanningZone from './LogicFlowPlanningZone.vue'
 
+const store = useStationStore()
+
+import { watchEffect } from 'vue'
+watchEffect(() => {
+  console.log('[StationWorkbench] isReady:', store.isReady, 'activeView:', store.activeView)
+})
 </script>
 
 <template>
-  <div class="w-full max-w-[1600px] mx-auto p-4 text-sm relative min-h-screen">
+  <div class="station-workbench w-full max-w-[1600px] mx-auto p-4 text-sm relative min-h-screen">
+    <div id="debug-ready-marker" v-if="store.isReady" class="hidden">READY</div>
 
     <StationToolbar />
-
-    <div class="main-layout">
-
+    
+    <div v-if="store.activeView === 'production'" class="main-layout">
       <div class="col-span-12 lg:col-span-3">
         <StationPlanningPanel />
       </div>
@@ -25,6 +34,11 @@ import StationWareFlowsDashboard from './StationWareFlowsDashboard.vue'
       <div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
         <StationDashboard />
       </div>
+    </div>
+
+    <div v-else class="flow-layout flex flex-col gap-6">
+      <LogicFlowCandidateZone class="shrink-0" />
+      <LogicFlowPlanningZone class="flex-1" />
     </div>
 
     <StatusMonitor />

@@ -13,6 +13,7 @@ export interface X4Ware {
   minPrice: number;   // 最低价格
   maxPrice: number;   // 最高价格
   tier: number;       // 物品层级
+  group: string;      // 物品分组 (hightech, shiptech, refined, food, etc.)
 }
 
 /**
@@ -45,7 +46,7 @@ export interface X4Module {
   nameId: string;     // 国际化文本 ID (如 {20104,12101})
   name: string;
   type: 'production' | 'habitation' | 'storage' | 'dock' | 'connection' | string;
-  method: 'terran' | 'closed_loop' | 'recycling' | 'default' | 'none'; // 生产方式偏好
+  method: 'terran' | 'closed_loop' | 'recycling' | 'default' | 'teladi' | 'none'; // 生产方式偏好
 
   group: string;      // 模块分组 ID
   race: string;       // 种族归属
@@ -92,6 +93,20 @@ export interface X4GameData {
 }
 
 // --- 核心业务实体类型 (Core Entities) ---
+
+export type LocalizedX4Module = X4Module & { localeName: string }
+export type LocalizedX4ModuleGroup = X4ModuleGroup & { localeName: string }
+
+export interface GroupedModuleItem extends LocalizedX4Module {
+  displayLabel: string
+  moduleGroup?: LocalizedX4ModuleGroup
+}
+
+export interface ModuleGroupResult {
+  group: string
+  displayLabel: string
+  modules: GroupedModuleItem[]
+}
 
 /**
  * 用户规划的单个模块实例
@@ -263,4 +278,29 @@ export interface WorkforceCensusItem {
   residents: number
   count: number,
   race: string
+}
+
+/**
+ * 逻辑组网：单个节点
+ */
+export interface FlowNode {
+  id: string
+  wareId: string
+  moduleId?: string
+  race: string  // 节点偏好的种族 (用于 UI 图标及回溯匹配)
+  column: number // 基于 Tier (0-3)
+  isLocked: boolean
+  source: 'manual' | 'auto' // 节点来源
+  order: number // 列内垂直排序
+}
+
+/**
+ * 逻辑组网：生产线组
+ */
+export interface ProductionLineGroup {
+  id: string
+  name: string
+  category: 'industrial' | 'agricultural'
+  subCategory: string // 始终代表 race (工业: default/terran/teladi, 农业: 具体种族)
+  nodes: FlowNode[]
 }

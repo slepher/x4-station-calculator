@@ -3,7 +3,7 @@ import type {
   LocalizedX4ModuleGroup,
   GroupedModuleItem,
   ModuleGroupResult
-} from '../useStationStore'
+} from '@/types/x4'
 
 const TYPE_PRIORITY: Record<string, number> = {
   production: 1,

@@ -106,7 +106,7 @@ const data = computed(() => {
       unit: '',
       isTime: true,
       summaryItems: [], // 时间视图不需要汇总行明细
-      moduleGroups: analysis.moduleGroups.map(group => {
+      moduleGroups: analysis.moduleGroups.map((group: any) => {
         const moduleData = store.modules[group.id]
         return {
           ...group,
@@ -154,8 +154,8 @@ const data = computed(() => {
     }
 
     const moduleGroups = analysis.moduleGroups
-      .filter(group => group.unitCapacity || group.unitNeeded)
-      .map(group => {
+      .filter((group: any) => group.unitCapacity || group.unitNeeded)
+      .map((group: any) => {
         const moduleData = store.modules[group.id]
         const items = []
         if (group.unitCapacity) {
@@ -196,20 +196,20 @@ const data = computed(() => {
       totalValue: analysis.totalVolume,
       unit: 'm³',
       isVolume: true,
-      summaryItems: analysis.summaryItems.map(item => {
+      summaryItems: analysis.summaryItems.map((item: any) => {
         const ware = store.wares[item.id]
         return {
           ...item,
           displayName: ware ? translateWare(ware) : item.id
         }
       }),
-      moduleGroups: analysis.moduleGroups.map(group => {
+      moduleGroups: analysis.moduleGroups.map((group: any) => {
         const moduleData = store.modules[group.id]
         return {
           ...group,
           displayName: moduleData ? translateModule(moduleData) : group.id,
           displayValue: group.volume,
-          items: group.items.map(item => {
+          items: group.items.map((item: any) => {
             const ware = store.wares[item.id]
             return {
               ...item,
@@ -225,20 +225,20 @@ const data = computed(() => {
   return {
     totalValue: analysis.totalCost,
     unit: 'Cr',
-    summaryItems: analysis.summaryItems.map(item => {
+    summaryItems: analysis.summaryItems.map((item: any) => {
       const ware = store.wares[item.id]
       return {
         ...item,
         displayName: ware ? translateWare(ware) : item.id
       }
     }),
-    moduleGroups: analysis.moduleGroups.map(group => {
+    moduleGroups: analysis.moduleGroups.map((group: any) => {
       const moduleData = store.modules[group.id]
       return {
         ...group,
         displayName: moduleData ? translateModule(moduleData) : group.id,
         displayValue: group.value,
-        items: group.items.map(item => {
+        items: group.items.map((item: any) => {
           const ware = store.wares[item.id]
           return {
             ...item,

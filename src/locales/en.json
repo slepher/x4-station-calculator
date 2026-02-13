@@ -1,4 +1,8 @@
 {
+  "view": {
+    "production": "Quantified",
+    "logical_flow": "Logical Flow"
+  },
   "station": {
     "total_needed": "TOTAL NEEDED",
     "total_capacity": "TOTAL CAPACITY",
@@ -30,10 +34,14 @@
     "item_build_time": "Build Time"
   },
   "ui": {
-    "build_res_required": "BUILD RESOURCES REQUIRED",
+    "industrial": "Industrial",
+    "agricultural": "Agri/Life",
+    "build_res_required": "CONSTRUCTION RESOURCES REQUIRED",
     "module_breakdown": "MODULE RESOURCE BREAKDOWN",
     "no_materials": "Standard module - No materials required",
-    "build_res_price": "BUILD RESOURCES PRICE"
+    "build_res_price": "BUILD RESOURCES PRICE",
+    "tag_res": "RES",
+    "tag_ops": "OPS"
   },
   "menu": {
     "new": "New",
@@ -135,6 +143,11 @@
   "common": {
     "average": "AVERAGE",
     "no_active_production": "No Active Production",
-    "add_modules_hint": "Add production modules to see data"
+    "add_modules_hint": "Please add production modules to see data"
+  },
+  "logicFlow": {
+    "dropToCreate": "DROP TO CREATE NEW PRODUCTION LINE",
+    "compactView": "Compact View",
+    "planningZone": "Planning Zone"
   }
 }
