@@ -34,7 +34,7 @@
     "nameId": "{20104,16001}",
     "name": "BoGas Production",
     "type": "production",
-    "group": "refined",
+    "group": "agricultural",
     "method": "default",
     "race": "boron",
     "isPlayerBlueprint": true,
@@ -45,7 +45,7 @@
       "hullparts": 1128,
       "water": 2966
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 150.0,
     "workforce": {
       "capacity": 0,
@@ -255,7 +255,7 @@
       "energycells": 793,
       "hullparts": 1452
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 1800.0,
     "workforce": {
       "capacity": 0,
@@ -811,7 +811,7 @@
       "energycells": 18,
       "siliconcarbide": 4
     },
-    "tier": 2,
+    "tier": 1,
     "cycleTime": 180.0,
     "workforce": {
       "capacity": 0,
@@ -905,7 +905,7 @@
       "energycells": 100,
       "siliconcarbide": 20
     },
-    "tier": 1,
+    "tier": 0,
     "cycleTime": 60.0,
     "workforce": {
       "capacity": 0,
@@ -935,7 +935,7 @@
       "energycells": 592,
       "hullparts": 1087
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
@@ -1053,7 +1053,7 @@
       "hullparts": 700,
       "water": 1840
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 400.0,
     "workforce": {
       "capacity": 0,
@@ -1170,7 +1170,7 @@
       "energycells": 688,
       "siliconcarbide": 155
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 600.0,
     "workforce": {
       "capacity": 0,
@@ -1347,7 +1347,7 @@
       "hullparts": 1023,
       "water": 2689
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
@@ -1583,7 +1583,7 @@
       "energycells": 407,
       "siliconcarbide": 92
     },
-    "tier": 2,
+    "tier": 1,
     "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
@@ -1673,7 +1673,7 @@
       "energycells": 256,
       "hullparts": 1158
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 450.0,
     "workforce": {
       "capacity": 0,
@@ -2070,7 +2070,7 @@
       "energycells": 448,
       "hullparts": 822
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
@@ -2133,7 +2133,7 @@
       "energycells": 6571,
       "plasmaconductors": 4737
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 900.0,
     "workforce": {
       "capacity": 0,
@@ -2396,7 +2396,7 @@
       "energycells": 779,
       "hullparts": 1426
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 900.0,
     "workforce": {
       "capacity": 0,
@@ -2458,7 +2458,7 @@
       "energycells": 1296,
       "hullparts": 2373
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
@@ -2761,7 +2761,7 @@
       "energycells": 451,
       "hullparts": 827
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
@@ -2968,7 +2968,7 @@
       "energycells": 1341,
       "plasmaconductors": 1228
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 900.0,
     "workforce": {
       "capacity": 0,
@@ -3058,7 +3058,7 @@
       "energycells": 1277,
       "hullparts": 2338
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 600.0,
     "workforce": {
       "capacity": 0,
@@ -3361,7 +3361,7 @@
       "energycells": 89,
       "siliconcarbide": 20
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 240.0,
     "workforce": {
       "capacity": 0,
@@ -3535,7 +3535,7 @@
       "energycells": 746,
       "hullparts": 1366
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 600.0,
     "workforce": {
       "capacity": 0,
@@ -3569,7 +3569,7 @@
       "energycells": 592,
       "hullparts": 1084
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
@@ -3602,7 +3602,7 @@
       "energycells": 633,
       "hullparts": 1159
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
@@ -3989,7 +3989,7 @@
       "energycells": 761,
       "hullparts": 1394
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 720.0,
     "workforce": {
       "capacity": 0,
@@ -4056,7 +4056,7 @@
       "energycells": 1357,
       "plasmaconductors": 1228
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 900.0,
     "workforce": {
       "capacity": 0,
@@ -4178,7 +4178,7 @@
       "energycells": 3560,
       "hullparts": 6516
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
@@ -4329,7 +4329,7 @@
       "energycells": 1277,
       "hullparts": 2338
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 450.0,
     "workforce": {
       "capacity": 0,
@@ -4482,7 +4482,7 @@
       "energycells": 451,
       "hullparts": 910
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
@@ -4835,7 +4835,7 @@
       "energycells": 1259,
       "hullparts": 2333
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 600.0,
     "workforce": {
       "capacity": 0,
@@ -4869,7 +4869,7 @@
       "energycells": 278,
       "hullparts": 510
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 600.0,
     "workforce": {
       "capacity": 0,
@@ -5138,7 +5138,7 @@
       "energycells": 50,
       "siliconcarbide": 11
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
@@ -5200,7 +5200,7 @@
       "energycells": 520,
       "hullparts": 951
     },
-    "tier": 1,
+    "tier": 0,
     "cycleTime": 60.0,
     "workforce": {
       "capacity": 0,
@@ -5290,7 +5290,7 @@
       "energycells": 51,
       "hullparts": 94
     },
-    "tier": 2,
+    "tier": 1,
     "cycleTime": 240.0,
     "workforce": {
       "capacity": 0,
@@ -5323,7 +5323,7 @@
       "energycells": 1516,
       "hullparts": 2774
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 600.0,
     "workforce": {
       "capacity": 0,
@@ -5356,7 +5356,7 @@
       "energycells": 101,
       "hullparts": 185
     },
-    "tier": 2,
+    "tier": 1,
     "cycleTime": 120.0,
     "workforce": {
       "capacity": 0,
@@ -5914,7 +5914,7 @@
       "energycells": 965,
       "hullparts": 1767
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 720.0,
     "workforce": {
       "capacity": 0,
@@ -5948,7 +5948,7 @@
       "energycells": 211,
       "siliconcarbide": 47
     },
-    "tier": 2,
+    "tier": 1,
     "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
@@ -5982,7 +5982,7 @@
       "energycells": 600,
       "hullparts": 1100
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
@@ -6016,7 +6016,7 @@
       "energycells": 73,
       "hullparts": 135
     },
-    "tier": 2,
+    "tier": 1,
     "cycleTime": 150.0,
     "workforce": {
       "capacity": 0,
@@ -6255,7 +6255,7 @@
       "energycells": 778,
       "hullparts": 1443
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 900.0,
     "workforce": {
       "capacity": 0,
@@ -6317,7 +6317,7 @@
       "energycells": 638,
       "hullparts": 1168
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 480.0,
     "workforce": {
       "capacity": 0,
@@ -6352,7 +6352,7 @@
       "hullparts": 1192,
       "water": 3133
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 240.0,
     "workforce": {
       "capacity": 0,
@@ -6386,7 +6386,7 @@
       "energycells": 450,
       "hullparts": 823
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
@@ -6568,7 +6568,7 @@
       "energycells": 117,
       "siliconcarbide": 26
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
@@ -6631,7 +6631,7 @@
       "energycells": 305,
       "hullparts": 1377
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
@@ -6812,7 +6812,7 @@
       "energycells": 149,
       "hullparts": 273
     },
-    "tier": 2,
+    "tier": 1,
     "cycleTime": 180.0,
     "workforce": {
       "capacity": 0,
@@ -6905,7 +6905,7 @@
       "energycells": 525,
       "hullparts": 961
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 240.0,
     "workforce": {
       "capacity": 0,
@@ -7032,7 +7032,7 @@
       "energycells": 2449,
       "hullparts": 4483
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 1200.0,
     "workforce": {
       "capacity": 0,
@@ -7068,7 +7068,7 @@
       "energycells": 951,
       "hullparts": 1741
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 1800.0,
     "workforce": {
       "capacity": 0,
@@ -7279,7 +7279,7 @@
       "energycells": 131,
       "siliconcarbide": 21
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
@@ -7313,7 +7313,7 @@
       "energycells": 3470,
       "hullparts": 6351
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 600.0,
     "workforce": {
       "capacity": 0,
@@ -7487,7 +7487,7 @@
       "energycells": 497,
       "hullparts": 910
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 450.0,
     "workforce": {
       "capacity": 0,
@@ -7520,7 +7520,7 @@
       "energycells": 592,
       "hullparts": 1084
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
@@ -7699,7 +7699,7 @@
       "energycells": 1241,
       "hullparts": 2300
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
@@ -7789,7 +7789,7 @@
       "energycells": 865,
       "hullparts": 1583
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 1200.0,
     "workforce": {
       "capacity": 0,
@@ -7851,7 +7851,7 @@
       "energycells": 253,
       "hullparts": 464
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 600.0,
     "workforce": {
       "capacity": 0,
@@ -8060,7 +8060,7 @@
       "energycells": 57,
       "hullparts": 104
     },
-    "tier": 2,
+    "tier": 1,
     "cycleTime": 240.0,
     "workforce": {
       "capacity": 0,
@@ -8122,7 +8122,7 @@
       "energycells": 1259,
       "hullparts": 2305
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 600.0,
     "workforce": {
       "capacity": 0,
@@ -8269,7 +8269,7 @@
       "energycells": 946,
       "hullparts": 1732
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 900.0,
     "workforce": {
       "capacity": 0,
@@ -8821,7 +8821,7 @@
       "energycells": 579,
       "hullparts": 1063
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 300.0,
     "workforce": {
       "capacity": 0,
@@ -8944,7 +8944,7 @@
       "energycells": 72,
       "hullparts": 132
     },
-    "tier": 2,
+    "tier": 1,
     "cycleTime": 120.0,
     "workforce": {
       "capacity": 0,
@@ -9009,7 +9009,7 @@
       "ore": 963,
       "silicon": 963
     },
-    "tier": 1,
+    "tier": 0,
     "cycleTime": 60.0,
     "workforce": {
       "capacity": 0,
@@ -9129,7 +9129,7 @@
       "energycells": 497,
       "hullparts": 910
     },
-    "tier": 3,
+    "tier": 2,
     "cycleTime": 450.0,
     "workforce": {
       "capacity": 0,
@@ -9316,7 +9316,7 @@
       "energycells": 138,
       "hullparts": 253
     },
-    "tier": 2,
+    "tier": 1,
     "cycleTime": 120.0,
     "workforce": {
       "capacity": 0,
@@ -9560,7 +9560,7 @@
       "energycells": 71,
       "hullparts": 131
     },
-    "tier": 4,
+    "tier": 3,
     "cycleTime": 900.0,
     "workforce": {
       "capacity": 0,

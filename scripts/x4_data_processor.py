@@ -91,6 +91,10 @@ class X4PrecisionLoader:
                 raw_name = ware.get('name', '')
                 group = ware.get('group', '')
                 
+                # 手动修正: BoGas 在游戏数据中被归类为 refined，但实际属于 agricultural
+                if w_id == 'bogas':
+                    group = 'agricultural'
+                
                 # 提取配方
                 for prod in ware.findall('production'):
                     method = prod.get('method', 'default')
@@ -194,7 +198,7 @@ class X4PrecisionLoader:
                 for input_id in recipe['inputs']:
                     max_input_tier = max(max_input_tier, get_tier(input_id, visited))
             
-            tier = max_input_tier + 1 if max_input_tier >= 0 else 1
+            tier = max_input_tier + 1 if max_input_tier >= 0 else 0
             self.ware_tier_map[ware_id] = tier
             return tier
 

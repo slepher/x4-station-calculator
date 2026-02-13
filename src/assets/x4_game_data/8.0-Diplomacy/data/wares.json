@@ -9,7 +9,7 @@
     "volume": 32,
     "minPrice": 432,
     "maxPrice": 648,
-    "tier": 3
+    "tier": 2
   },
   {
     "id": "advancedelectronics",
@@ -21,7 +21,7 @@
     "volume": 30,
     "minPrice": 710,
     "maxPrice": 1318,
-    "tier": 4
+    "tier": 3
   },
   {
     "id": "antimattercells",
@@ -33,7 +33,7 @@
     "volume": 18,
     "minPrice": 121,
     "maxPrice": 282,
-    "tier": 2
+    "tier": 1
   },
   {
     "id": "antimatterconverters",
@@ -45,7 +45,7 @@
     "volume": 10,
     "minPrice": 248,
     "maxPrice": 461,
-    "tier": 4
+    "tier": 3
   },
   {
     "id": "claytronics",
@@ -57,7 +57,7 @@
     "volume": 24,
     "minPrice": 1734,
     "maxPrice": 2346,
-    "tier": 4
+    "tier": 3
   },
   {
     "id": "dronecomponents",
@@ -69,7 +69,7 @@
     "volume": 30,
     "minPrice": 685,
     "maxPrice": 1142,
-    "tier": 4
+    "tier": 3
   },
   {
     "id": "energycells",
@@ -81,7 +81,7 @@
     "volume": 1,
     "minPrice": 10,
     "maxPrice": 22,
-    "tier": 1
+    "tier": 0
   },
   {
     "id": "engineparts",
@@ -93,7 +93,7 @@
     "volume": 15,
     "minPrice": 128,
     "maxPrice": 237,
-    "tier": 3
+    "tier": 2
   },
   {
     "id": "fieldcoils",
@@ -105,7 +105,7 @@
     "volume": 15,
     "minPrice": 247,
     "maxPrice": 576,
-    "tier": 4
+    "tier": 3
   },
   {
     "id": "foodrations",
@@ -117,7 +117,7 @@
     "volume": 1,
     "minPrice": 12,
     "maxPrice": 29,
-    "tier": 4
+    "tier": 3
   },
   {
     "id": "graphene",
@@ -129,7 +129,7 @@
     "volume": 20,
     "minPrice": 100,
     "maxPrice": 233,
-    "tier": 2
+    "tier": 1
   },
   {
     "id": "helium",
@@ -153,7 +153,7 @@
     "volume": 12,
     "minPrice": 146,
     "maxPrice": 272,
-    "tier": 3
+    "tier": 2
   },
   {
     "id": "hydrogen",
@@ -189,7 +189,7 @@
     "volume": 6,
     "minPrice": 94,
     "maxPrice": 323,
-    "tier": 4
+    "tier": 3
   },
   {
     "id": "majasnails",
@@ -201,7 +201,7 @@
     "volume": 6,
     "minPrice": 35,
     "maxPrice": 81,
-    "tier": 3
+    "tier": 2
   },
   {
     "id": "meat",
@@ -213,7 +213,7 @@
     "volume": 6,
     "minPrice": 29,
     "maxPrice": 68,
-    "tier": 3
+    "tier": 2
   },
   {
     "id": "medicalsupplies",
@@ -225,7 +225,7 @@
     "volume": 2,
     "minPrice": 43,
     "maxPrice": 89,
-    "tier": 4
+    "tier": 3
   },
   {
     "id": "methane",
@@ -249,7 +249,7 @@
     "volume": 22,
     "minPrice": 805,
     "maxPrice": 1090,
-    "tier": 3
+    "tier": 2
   },
   {
     "id": "missilecomponents",
@@ -261,7 +261,7 @@
     "volume": 2,
     "minPrice": 6,
     "maxPrice": 13,
-    "tier": 4
+    "tier": 3
   },
   {
     "id": "nividium",
@@ -285,7 +285,7 @@
     "volume": 2,
     "minPrice": 646,
     "maxPrice": 1507,
-    "tier": 2
+    "tier": 1
   },
   {
     "id": "nostropoil",
@@ -297,7 +297,7 @@
     "volume": 1,
     "minPrice": 20,
     "maxPrice": 47,
-    "tier": 4
+    "tier": 3
   },
   {
     "id": "ore",
@@ -321,7 +321,7 @@
     "volume": 32,
     "minPrice": 769,
     "maxPrice": 1282,
-    "tier": 3
+    "tier": 2
   },
   {
     "id": "quantumtubes",
@@ -333,7 +333,7 @@
     "volume": 22,
     "minPrice": 225,
     "maxPrice": 375,
-    "tier": 3
+    "tier": 2
   },
   {
     "id": "rawscrap",
@@ -357,7 +357,7 @@
     "volume": 14,
     "minPrice": 89,
     "maxPrice": 207,
-    "tier": 2
+    "tier": 1
   },
   {
     "id": "scanningarrays",
@@ -369,7 +369,7 @@
     "volume": 38,
     "minPrice": 842,
     "maxPrice": 1264,
-    "tier": 3
+    "tier": 2
   },
   {
     "id": "scrapmetal",
@@ -381,7 +381,7 @@
     "volume": 10,
     "minPrice": 318,
     "maxPrice": 431,
-    "tier": 2
+    "tier": 1
   },
   {
     "id": "shieldcomponents",
@@ -393,7 +393,7 @@
     "volume": 10,
     "minPrice": 113,
     "maxPrice": 264,
-    "tier": 4
+    "tier": 3
   },
   {
     "id": "silicon",
@@ -417,7 +417,7 @@
     "volume": 18,
     "minPrice": 180,
     "maxPrice": 419,
-    "tier": 2
+    "tier": 1
   },
   {
     "id": "smartchips",
@@ -429,7 +429,7 @@
     "volume": 2,
     "minPrice": 46,
     "maxPrice": 69,
-    "tier": 3
+    "tier": 2
   },
   {
     "id": "sojabeans",
@@ -441,7 +441,7 @@
     "volume": 5,
     "minPrice": 40,
     "maxPrice": 93,
-    "tier": 3
+    "tier": 2
   },
   {
     "id": "sojahusk",
@@ -453,7 +453,7 @@
     "volume": 1,
     "minPrice": 19,
     "maxPrice": 45,
-    "tier": 4
+    "tier": 3
   },
   {
     "id": "spacefuel",
@@ -465,7 +465,7 @@
     "volume": 2,
     "minPrice": 60,
     "maxPrice": 207,
-    "tier": 4
+    "tier": 3
   },
   {
     "id": "spaceweed",
@@ -477,7 +477,7 @@
     "volume": 3,
     "minPrice": 75,
     "maxPrice": 257,
-    "tier": 4
+    "tier": 3
   },
   {
     "id": "spices",
@@ -489,7 +489,7 @@
     "volume": 3,
     "minPrice": 12,
     "maxPrice": 28,
-    "tier": 3
+    "tier": 2
   },
   {
     "id": "sunriseflowers",
@@ -501,7 +501,7 @@
     "volume": 5,
     "minPrice": 48,
     "maxPrice": 112,
-    "tier": 3
+    "tier": 2
   },
   {
     "id": "superfluidcoolant",
@@ -513,7 +513,7 @@
     "volume": 16,
     "minPrice": 90,
     "maxPrice": 211,
-    "tier": 2
+    "tier": 1
   },
   {
     "id": "swampplant",
@@ -525,7 +525,7 @@
     "volume": 6,
     "minPrice": 50,
     "maxPrice": 117,
-    "tier": 3
+    "tier": 2
   },
   {
     "id": "teladianium",
@@ -537,7 +537,7 @@
     "volume": 16,
     "minPrice": 121,
     "maxPrice": 283,
-    "tier": 2
+    "tier": 1
   },
   {
     "id": "turretcomponents",
@@ -549,7 +549,7 @@
     "volume": 20,
     "minPrice": 164,
     "maxPrice": 383,
-    "tier": 4
+    "tier": 3
   },
   {
     "id": "water",
@@ -561,7 +561,7 @@
     "volume": 6,
     "minPrice": 32,
     "maxPrice": 74,
-    "tier": 2
+    "tier": 1
   },
   {
     "id": "weaponcomponents",
@@ -573,7 +573,7 @@
     "volume": 20,
     "minPrice": 171,
     "maxPrice": 399,
-    "tier": 4
+    "tier": 3
   },
   {
     "id": "wheat",
@@ -585,7 +585,7 @@
     "volume": 4,
     "minPrice": 19,
     "maxPrice": 44,
-    "tier": 3
+    "tier": 2
   },
   {
     "id": "cheltmeat",
@@ -597,7 +597,7 @@
     "volume": 7,
     "minPrice": 31,
     "maxPrice": 72,
-    "tier": 3
+    "tier": 2
   },
   {
     "id": "scruffinfruits",
@@ -609,7 +609,7 @@
     "volume": 6,
     "minPrice": 17,
     "maxPrice": 40,
-    "tier": 3
+    "tier": 2
   },
   {
     "id": "computronicsubstrate",
@@ -621,7 +621,7 @@
     "volume": 50,
     "minPrice": 7452,
     "maxPrice": 9108,
-    "tier": 3
+    "tier": 2
   },
   {
     "id": "metallicmicrolattice",
@@ -633,7 +633,7 @@
     "volume": 1,
     "minPrice": 42,
     "maxPrice": 57,
-    "tier": 2
+    "tier": 1
   },
   {
     "id": "proteinpaste",
@@ -645,7 +645,7 @@
     "volume": 4,
     "minPrice": 57,
     "maxPrice": 134,
-    "tier": 2
+    "tier": 1
   },
   {
     "id": "siliconcarbide",
@@ -657,7 +657,7 @@
     "volume": 20,
     "minPrice": 1202,
     "maxPrice": 1627,
-    "tier": 3
+    "tier": 2
   },
   {
     "id": "stimulants",
@@ -669,7 +669,7 @@
     "volume": 12,
     "minPrice": 153,
     "maxPrice": 527,
-    "tier": 2
+    "tier": 1
   },
   {
     "id": "terranmre",
@@ -681,7 +681,7 @@
     "volume": 2,
     "minPrice": 32,
     "maxPrice": 75,
-    "tier": 3
+    "tier": 2
   },
   {
     "id": "bofu",
@@ -693,19 +693,19 @@
     "volume": 4,
     "minPrice": 61,
     "maxPrice": 142,
-    "tier": 4
+    "tier": 3
   },
   {
     "id": "bogas",
     "nameId": "{20201,7201}",
-    "group": "refined",
+    "group": "agricultural",
     "name": "BoGas",
     "transport": "container",
     "price": 73,
     "volume": 4,
     "minPrice": 44,
     "maxPrice": 102,
-    "tier": 3
+    "tier": 2
   },
   {
     "id": "plankton",
@@ -717,6 +717,6 @@
     "volume": 1,
     "minPrice": 11,
     "maxPrice": 25,
-    "tier": 3
+    "tier": 2
   }
 ]
