@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import draggable from 'vuedraggable'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import { useI18n } from 'vue-i18n'
 import type { ProductionLineGroup, FlowNode } from '@/types/x4'
 import FlowNodeComponent from './FlowNode.vue'
 
@@ -10,6 +11,7 @@ const props = defineProps<{
   group: ProductionLineGroup
 }>()
 
+const { t } = useI18n()
 const logicFlow = useLogicFlowStore()
 const gameData = useGameDataStore()
 
@@ -123,6 +125,10 @@ onUnmounted(() => {
   window.removeEventListener('resize', updateConnections)
 })
 
+const handleToggleGroupLock = () => {
+  logicFlow.toggleGroupLock(props.group.id)
+}
+
 const removeGroup = () => {
   if (confirm(`Remove production line group "${props.group.name}"?`)) {
     logicFlow.removeGroup(props.group.id)
@@ -217,6 +223,18 @@ const handleAdd = (_colIndex: number, event: any) => {
       </div>
       
       <div class="flex items-center gap-3">
+        <!-- Group Lock Toggle -->
+        <div class="group-lock-control flex items-center gap-2">
+          <button 
+            @click="handleToggleGroupLock"
+            class="group-lock-btn"
+            :class="group.isLocked ? 'group-lock-btn-active' : 'group-lock-btn-inactive'"
+          >
+            <span class="text-[12px]">{{ group.isLocked ? '🔒' : '🔓' }}</span>
+            <span class="text-[10px] font-bold uppercase tracking-widest">{{ group.isLocked ? t('race.' + group.lockedLineage) : t('logicFlow.unlock') }}</span>
+          </button>
+        </div>
+
         <button 
           @click="removeGroup"
           class="p-2 hover:bg-red-500/10 text-white/20 hover:text-red-400 rounded-lg transition-all"
@@ -302,5 +320,18 @@ const handleAdd = (_colIndex: number, event: any) => {
 }
 .column-container:hover {
   @apply border-white/10 bg-black/30;
+}
+
+/* --- Group Lock Button Styles --- */
+.group-lock-btn {
+  @apply flex items-center gap-2 px-3 py-1.5 rounded-full transition-all border;
+}
+
+.group-lock-btn-active {
+  @apply bg-amber-500/20 border-amber-500/50 text-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.2)];
+}
+
+.group-lock-btn-inactive {
+  @apply bg-white/5 border-white/10 text-white/30 hover:text-white/60 hover:bg-white/10;
 }
 </style>

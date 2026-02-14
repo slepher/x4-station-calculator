@@ -36,17 +36,26 @@ const getTierBg = (tier: number) => {
   }
 }
 
-const toggleLock = () => {
-  logicFlow.toggleLock(props.groupId, props.node.id)
+const isDepended = computed(() => logicFlow.isNodeDepended(props.groupId, props.node.wareId))
+
+const canIsolate = computed(() => {
+  // 基础资源不能隔离（本身就是基础）
+  if (isRawResource.value) return false
+  return true
+})
+
+const handleToggleIsolation = () => {
+  logicFlow.toggleNodeIsolation(props.groupId, props.node.id)
 }
 
-const removeNode = () => {
-  logicFlow.removeNode(props.groupId, props.node.id)
+const handlePromote = () => {
+  logicFlow.promoteNode(props.groupId, props.node.id)
 }
 
-const expandUpstream = () => {
-  if (props.node.isLocked) return
-  logicFlow.expandUpstream(props.groupId, props.node.wareId, 'manual')
+const handleRemove = () => {
+  if (props.node.source === 'manual') {
+    logicFlow.removeNode(props.groupId, props.node.id)
+  }
 }
 </script>
 
@@ -55,11 +64,14 @@ const expandUpstream = () => {
     class="flow-node group relative px-2 py-1.5 rounded-lg border transition-all duration-300"
     :class="[
       node.isLocked 
-        ? 'bg-white/5 border-white/10 opacity-80 grayscale italic' 
-        : 'bg-white/10 border-white/20 shadow-lg hover:border-blue-500/50 hover:bg-white/15',
+        ? 'bg-white/5 border-white/10 opacity-80 grayscale italic border-dashed' 
+        : (node.source === 'manual' 
+          ? 'bg-white/10 border-white/20 shadow-lg hover:border-blue-500/50 hover:bg-white/15' 
+          : 'bg-white/5 border-white/10 border-dashed opacity-80 hover:border-white/20'),
       getTierBg(node.column)
     ]"
     :id="`node-${node.id}`"
+    :data-ware-id="node.wareId"
   >
     <!-- Content: Ware/Module Name & Actions -->
     <div class="flex items-center gap-2 h-5">
@@ -79,25 +91,30 @@ const expandUpstream = () => {
       
       <!-- Actions (Hover Only) -->
       <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+        <!-- Promote Button (+) for Auto Nodes -->
         <button 
-          v-if="!isRawResource && !node.isLocked"
-          @click="expandUpstream"
+          v-if="node.source === 'auto' && !node.isLocked"
+          @click="handlePromote"
           class="hover:bg-blue-500/20 rounded transition-colors"
-          title="Expand"
+          title="Promote to Manual"
         >
-          <span class="text-[9px]">🌳</span>
+          <span class="text-[9px]">➕</span>
         </button>
+
+        <!-- Isolation Toggle (Isolate/Connect) -->
         <button 
-          v-if="!isRawResource"
-          @click="toggleLock"
+          v-if="canIsolate"
+          @click="handleToggleIsolation"
           class="hover:bg-white/10 rounded transition-colors"
-          :title="node.isLocked ? 'Unlock' : 'Lock'"
+          :title="node.isLocked ? t('logicFlow.connect') : t('logicFlow.isolate')"
         >
-          <span class="text-[9px]">{{ node.isLocked ? '🔓' : '🔒' }}</span>
+          <span class="text-[9px]">{{ node.isLocked ? '🔗' : '✂️' }}</span>
         </button>
+
+        <!-- Remove Button for Manual Nodes -->
         <button 
           v-if="node.source === 'manual'"
-          @click="removeNode"
+          @click="handleRemove"
           class="hover:bg-red-500/20 rounded transition-colors"
           title="Remove"
         >
@@ -109,6 +126,12 @@ const expandUpstream = () => {
     <!-- Subtitle: Race / Status -->
     <div class="flex items-center justify-between mt-0.5 h-3">
       <div class="flex items-center gap-1 overflow-hidden">
+        <span 
+          v-if="node.source === 'auto' && !node.isLocked"
+          class="text-[7px] font-bold uppercase tracking-tighter px-0.5 rounded bg-blue-500/20 text-blue-400 shrink-0 border border-blue-500/30"
+        >
+          Auto
+        </span>
         <span 
           class="text-[7px] font-bold uppercase tracking-tighter px-0.5 rounded bg-black/40 shrink-0"
           :class="getTierColor(node.column)"

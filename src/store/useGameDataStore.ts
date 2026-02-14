@@ -40,6 +40,7 @@ export const useGameDataStore = defineStore('gameData', () => {
   const localizedWaresMap = ref<Record<string, { id: string, localeName: string }>>({})
   const localizedModuleGroupsMap = ref<Record<string, LocalizedX4ModuleGroup>>({})
   const medicalConsumptionMap = ref<RaceMedicalConsumption>({})
+  const modulesByOutputMap = ref<Record<string, X4Module[]>>({}) // 索引：按产物 ID 查找生产模块
   const wareSetsByIndustrialRace = ref<Record<string, Set<string>>>({}) // 工业回溯集 (基于 Race: default/terran/teladi)
   const wareSetsByRace = ref<Record<string, Set<string>>>({})           // 农业回溯集 (基于 Race: argon/boron/etc)
 
@@ -58,31 +59,38 @@ export const useGameDataStore = defineStore('gameData', () => {
   /**
    * 寻找生产特定产物的最佳模块 (回溯逻辑核心)
    * @param wareId 产物 ID
-   * @param preferredRace 优先种族 (针对工业区为 default/terran/teladi, 针对农业为具体种族)
-   * @param fallbackRace 兜底种族 (通常为 argon)
+   * @param lineage 想要遵循的血统 (工业: default/terran/teladi, 农业: 具体种族)
    */
-  function findModuleForWare(wareId: string, preferredRace: string, fallbackRace: string = 'argon') {
-    const modules = Object.values(modulesMap.value)
-    const producers = modules.filter(m => m.outputs[wareId])
+  function findModuleForWare(wareId: string, lineage: string) {
+    const producers = modulesByOutputMap.value[wareId] || []
     if (producers.length === 0) return null
 
-    // 1. 尝试匹配指定 race (核心逻辑：工业候选区 terran, teladi, default 实际上是 race)
-    let found = producers.find(m => m.race === preferredRace)
+    // 1. 尝试匹配指定 race (核心逻辑：lineage 实际上直接对应 race)
+    let found = producers.find(m => m.race === lineage)
     if (found) return found
 
-    // 2. 尝试匹配指定 method (保留作为次优匹配，例如 preferredRace 为 'argon' 时寻找 method 为 'argon' 的模块)
-    found = producers.find(m => m.method === preferredRace)
+    // 2. 尝试匹配指定 method (例如 lineage 为 'argon' 时寻找 method 为 'argon' 的模块)
+    found = producers.find(m => m.method === lineage)
     if (found) return found
 
-    // 3. 尝试匹配指定 default method (Fallback 1: 许多通用模块 method 为 default)
+    // 3. 特殊逻辑：Teladi 工业线如果找不到 Teladi 模块，回退到 Default
+    if (lineage === 'teladi') {
+      found = producers.find(m => m.race === 'default')
+      if (found) return found
+    }
+
+    // 4. 尝试匹配指定 default method (许多通用模块 method 为 default)
     found = producers.find(m => m.method === 'default')
     if (found) return found
 
-    // 4. 尝试匹配兜底 race (Fallback 2: 农业回溯时 preferredRace 为具体种族，但模块可能属于兜底种族)
-    found = producers.find(m => m.race === fallbackRace)
-    if (found) return found
+    // 5. 兜底逻辑：农业线 (如 argon) 如果找不到匹配，回退到默认
+    const agriRaces = ['argon', 'boron', 'paranid', 'split']
+    if (agriRaces.includes(lineage)) {
+      found = producers.find(m => m.race === 'default')
+      if (found) return found
+    }
 
-    // 5. 兜底返回第一个可用的模块
+    // 6. 最后的兜底：返回第一个可用的模块
     return producers[0]
   }
 
@@ -93,17 +101,20 @@ export const useGameDataStore = defineStore('gameData', () => {
     const industrialRaces = ['default', 'terran', 'teladi']
     const agriRaces = ['argon', 'boron', 'paranid', 'split', 'teladi', 'terran']
 
+    // 核心组定义，用于种子隔离
+    const INDUSTRIAL_GROUPS = ['minerals', 'gases', 'refined', 'hightech', 'shiptech', 'energy']
+    const AGRICULTURAL_GROUPS = ['agricultural', 'food', 'pharmaceutical', 'water', 'ice', 'energy']
+
     // 1. 计算工业 (By Race: default/terran/teladi)
     industrialRaces.forEach(raceKey => {
       const resultSet = new Set<string>()
-      const directOutputs = new Set<string>()
+      const seeds = new Set<string>()
       
-      // 找出该 race 直接产出的所有产物
+      // 找出该 race 的工业种子产物
       Object.values(modulesMap.value).forEach(m => {
-        if (m.race === raceKey) {
+        if (m.race === raceKey && INDUSTRIAL_GROUPS.includes(m.group)) {
           Object.keys(m.outputs).forEach(id => {
-            directOutputs.add(id)
-            resultSet.add(id)
+            seeds.add(id)
           })
         }
       })
@@ -111,11 +122,10 @@ export const useGameDataStore = defineStore('gameData', () => {
       // Teladi 特殊处理：包含 Default T3 作为种子
       if (raceKey === 'teladi') {
         Object.values(modulesMap.value).forEach(m => {
-          if (m.race === 'default') {
+          if (m.race === 'default' && INDUSTRIAL_GROUPS.includes(m.group)) {
             Object.keys(m.outputs).forEach(id => {
               if (waresMap.value[id]?.tier === 3) {
-                directOutputs.add(id)
-                resultSet.add(id)
+                seeds.add(id)
               }
             })
           }
@@ -127,27 +137,31 @@ export const useGameDataStore = defineStore('gameData', () => {
       const trace = (wareId: string) => {
         if (visited.has(wareId)) return
         visited.add(wareId)
+        
         resultSet.add(wareId)
         
-        const module = findModuleForWare(wareId, raceKey, 'argon')
+        const ware = waresMap.value[wareId]
+        if (ware && ware.tier === 0) return
+
+        const module = findModuleForWare(wareId, raceKey)
         if (module && module.inputs) {
           Object.keys(module.inputs).forEach(inputId => trace(inputId))
         }
       }
-      directOutputs.forEach(id => trace(id))
+      seeds.forEach(id => trace(id))
       wareSetsByIndustrialRace.value[raceKey] = resultSet
     })
 
     // 2. 计算农业 (By Race)
     agriRaces.forEach(race => {
       const resultSet = new Set<string>()
-      const directOutputs = new Set<string>()
+      const seeds = new Set<string>()
 
+      // 找出该 race 的农业种子产物
       Object.values(modulesMap.value).forEach(m => {
-        if (m.race === race) {
+        if (m.race === race && AGRICULTURAL_GROUPS.includes(m.group)) {
           Object.keys(m.outputs).forEach(id => {
-            directOutputs.add(id)
-            resultSet.add(id)
+            seeds.add(id)
           })
         }
       })
@@ -156,14 +170,19 @@ export const useGameDataStore = defineStore('gameData', () => {
       const trace = (wareId: string) => {
         if (visited.has(wareId)) return
         visited.add(wareId)
+        
         resultSet.add(wareId)
 
-        const module = findModuleForWare(wareId, 'default', race)
+        const ware = waresMap.value[wareId]
+        if (ware && ware.tier === 0) return
+
+        // 核心修正：农业回溯时优先使用对应种族的生产方法
+        const module = findModuleForWare(wareId, race)
         if (module && module.inputs) {
           Object.keys(module.inputs).forEach(inputId => trace(inputId))
         }
       }
-      directOutputs.forEach(id => trace(id))
+      seeds.forEach(id => trace(id))
       wareSetsByRace.value[race] = resultSet
     })
   }
@@ -190,9 +209,11 @@ export const useGameDataStore = defineStore('gameData', () => {
    */
   function buildModulesMap() {
     const map: Record<string, X4Module> = {}
+    const outputMap: Record<string, X4Module[]> = {}
+
     ;(ModulesRaw as any[]).forEach(m => {
       if(!m.isPlayerBlueprint) return; 
-      map[m.id] = {
+      const module: X4Module = {
         ...m,
         buildCost: m.buildCost || {},
         outputs: m.outputs || {},
@@ -204,8 +225,18 @@ export const useGameDataStore = defineStore('gameData', () => {
           maxBonus: m.workforce?.maxBonus || 0
         }
       }
+      map[m.id] = module
+
+      // 建立产物到模块的索引
+      Object.keys(module.outputs).forEach(wareId => {
+        if (!outputMap[wareId]) {
+          outputMap[wareId] = []
+        }
+        outputMap[wareId].push(module)
+      })
     })
     modulesMap.value = map
+    modulesByOutputMap.value = outputMap
   }
 
   /**

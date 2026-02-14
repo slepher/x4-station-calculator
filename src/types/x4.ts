@@ -288,8 +288,10 @@ export interface FlowNode {
   wareId: string
   moduleId?: string
   race: string  // 节点偏好的种族 (用于 UI 图标及回溯匹配)
+  lineage: string // [新增] 血统元数据 (用于回溯导航)
   column: number // 基于 Tier (0-3)
   isLocked: boolean
+  isAuto: boolean // [新增] 是否为自动生成的节点
   source: 'manual' | 'auto' // 节点来源
   order: number // 列内垂直排序
 }
@@ -302,5 +304,7 @@ export interface ProductionLineGroup {
   name: string
   category: 'industrial' | 'agricultural'
   subCategory: string // 始终代表 race (工业: default/terran/teladi, 农业: 具体种族)
+  isLocked: boolean // [新增] 组是否锁定血统
+  lockedLineage: string // [新增] 锁定的血统
   nodes: FlowNode[]
 }

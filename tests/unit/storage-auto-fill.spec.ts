@@ -73,8 +73,8 @@ describe('Storage Auto-Fill Logic', () => {
     const industryStorage = result.autoIndustry.filter(m => modules[m.id]?.type === 'storage');
     
     // 验证是否有 Solid 和 Container 仓储
-    const hasSolid = industryStorage.some(m => modules[m.id].cargo?.type === 'solid');
-    const hasContainer = industryStorage.some(m => modules[m.id].cargo?.type === 'container');
+    const hasSolid = industryStorage.some(m => modules[m.id]!.cargo?.type === 'solid');
+    const hasContainer = industryStorage.some(m => modules[m.id]!.cargo?.type === 'container');
 
     expect(hasSolid).toBe(true);
     expect(hasContainer).toBe(true);
@@ -125,7 +125,7 @@ describe('Storage Auto-Fill Logic', () => {
     // 所以应该主要是 Container
     expect(supplyStorage.length).toBeGreaterThan(0);
     
-    const hasContainer = supplyStorage.some(m => modules[m.id].cargo?.type === 'container');
+    const hasContainer = supplyStorage.some(m => modules[m.id]!.cargo?.type === 'container');
     expect(hasContainer).toBe(true);
   });
 
@@ -176,7 +176,7 @@ describe('Storage Auto-Fill Logic', () => {
 
     // Verify Terran storage is used
     // Terran storage usually has 'terran' in ID or name, or specific IDs like 'module_ter_sto_container_l_01'
-    const hasTerranStorage = industryStorage.some(m => m.id.includes('ter') || modules[m.id].race === 'terran');
+    const hasTerranStorage = industryStorage.some(m => m.id.includes('ter') || modules[m.id]!.race === 'terran');
     expect(hasTerranStorage).toBe(true);
   });
 

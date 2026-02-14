@@ -616,6 +616,49 @@ class X4PrecisionLoader:
             print(f"   ✅ 所有模块类型均已配置。")
 
     # =======================================================
+    # 4.2 生成 res.json
+    # =======================================================
+    def generate_res_data(self):
+        print(f"\n🏷️ [4.2/5] 生成 res.json (T0资源)...")
+        data_dir = os.path.join(self.output_root, "data")
+        if not os.path.exists(data_dir): os.makedirs(data_dir)
+
+        # 1. Filter T0 wares
+        t0_wares = [w for w in self.wares_data if w.get('tier') == 0]
+        print(f"   ℹ️  Found {len(t0_wares)} Tier 0 wares.")
+
+        res_list = []
+        
+        for ware in t0_wares:
+            w_id = ware['id']
+            # Default English name
+            en_name = ware.get('name', w_id)
+            
+            # Construct res.json entry
+            # Base entry
+            entry = {
+                "id": w_id
+            }
+
+            # Process all available languages
+            for iso, lang_map in self.i18n_data.items():
+                # Resolve full name first
+                raw_key = ware.get('nameId')
+                full_name = lang_map.get(raw_key, en_name)
+                
+                # Assign to res.json field
+                # Use name_{iso} for all languages, no abbreviations
+                entry[f"name_{iso}"] = full_name
+            
+            res_list.append(entry)
+
+        # Write res.json
+        res_path = os.path.join(data_dir, "res.json")
+        with open(res_path, 'w', encoding='utf-8') as f:
+            json.dump(res_list, f, indent=2, ensure_ascii=False)
+        print(f"   ✅ Written res.json with {len(res_list)} items.")
+
+    # =======================================================
     # 5. 保存结果
     # =======================================================
     def save(self):
@@ -658,4 +701,5 @@ if __name__ == "__main__":
     loader.extract_and_resolve_languages()
     loader.inject_english_names() # 新增步骤
     loader.analyze_module_types()
+    loader.generate_res_data() # 新增步骤: 生成资源元数据及缩写
     loader.save()

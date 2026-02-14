@@ -27,8 +27,10 @@
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
+    "@pinia/testing": "^1.0.3",
     "@playwright/test": "^1.58.1",
     "@types/js-cookie": "^3.0.6",
+    "@types/jsdom": "^27.0.0",
     "@types/node": "^24.10.9",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/test-utils": "^2.4.6",

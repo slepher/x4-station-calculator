@@ -18,14 +18,8 @@ const activeSubCategory = ref('default') // 工业和农业均基于 race
 const industrialRaces = ['default', 'terran', 'teladi']
 const agriculturalRaces = ['argon', 'boron', 'paranid', 'split', 'teladi', 'terran']
 
-// --- 逻辑组定义 (基于 design.md) ---
-const INDUSTRIAL_GROUPS = ['minerals', 'gases', 'refined', 'hightech', 'shiptech', 'energy']
-const AGRICULTURAL_GROUPS = ['agricultural', 'food', 'pharmaceutical', 'water', 'ice', 'energy']
-
 // --- 计算过滤后的商品 ---
 const filteredWares = computed(() => {
-  const allowedGroups = activeCategory.value === 'industrial' ? INDUSTRIAL_GROUPS : AGRICULTURAL_GROUPS
-  
   // 从 Store 中获取预计算好的回溯集
   const currentWareSet = activeCategory.value === 'industrial'
     ? gameData.wareSetsByIndustrialRace[activeSubCategory.value]
@@ -33,24 +27,8 @@ const filteredWares = computed(() => {
 
   const res = Object.values(gameData.waresMap)
     .filter(w => {
-      // 1. 基础组过滤
-      if (!allowedGroups.includes(w.group)) return false
-      
-      // 2. 特殊逻辑：冰 (Ice) 仅出现在农业分类下
-      if (w.id === 'ice' && activeCategory.value === 'industrial') return false
-      
-      // 3. 基于回溯和直接生产的综合过滤
-      // Tier 0 产物 (资源/电池) 只要在组内就显示，其他的需要满足回溯关系
-      let matchesBacktrace = false
-      if (w.tier === 0 || w.id === 'energycells') {
-        matchesBacktrace = true
-      } else {
-        matchesBacktrace = currentWareSet?.has(w.id) || false
-      }
-
-      if (!matchesBacktrace) return false
-
-      return true
+      // 职责转移：UI 不再进行 group 过滤，完全信任 Store 的回溯结果
+      return currentWareSet?.has(w.id)
     })
     .sort((a, b) => {
       // 1. 按 Tier 升序 (0, 1, 2, 3)
@@ -104,31 +82,18 @@ const handleSwitchCategory = (cat: 'industrial' | 'agricultural') => {
   activeSubCategory.value = cat === 'industrial' ? 'default' : 'argon'
 }
 
-const handleWareClick = (wareId: string) => {
-  // If no group exists, create one
-  if (logicFlow.groups.length === 0) {
-    handleQuickAdd(wareId)
-  } else if (logicFlow.activeGroupId) {
-    // Add to active group
-    const race = activeSubCategory.value
-    logicFlow.expandUpstream(logicFlow.activeGroupId, wareId, 'manual', race)
-  }
-}
+// 是否默认锁定
+const isDefaultLocked = ref(false)
 
 const handleDragStart = (evt: any) => {
-  console.log('[CandidateZone] Drag start triggered')
-  logicFlow.isDragging = true
   const wareId = evt.item.getAttribute('data-ware-id')
   if (wareId) {
-    logicFlow.draggingWareId = wareId
+    logicFlow.startDragging(wareId)
   }
 }
 
 const handleDragEnd = () => {
-  console.log('[CandidateZone] Drag end triggered')
-  logicFlow.isDragging = false
-  logicFlow.draggingWareId = null
-  logicFlow.hoveredGroupId = null // 确保清理悬停状态
+  logicFlow.stopDragging()
 }
 
 // Quick Add / Manual Add
@@ -139,10 +104,10 @@ const handleQuickAdd = (wareId: string) => {
   // 使用当前选中的一二级分类作为上下文
   const category = activeCategory.value
   const subCategory = activeSubCategory.value
-
-  const group = logicFlow.addGroup(category, subCategory)
+  const group = logicFlow.addGroup(category, subCategory, undefined, isDefaultLocked.value)
   
   logicFlow.expandUpstream(group.id, wareId, 'manual', subCategory)
+  activeMenuWareId.value = null
 }
 
 // --- Menu State ---
@@ -189,7 +154,7 @@ const handleAddWare = (ware: any) => {
   const category = isAgricultural ? 'agricultural' : 'industrial'
   
   const subCategory = activeSubCategory.value
-  const group = logicFlow.addGroup(category, subCategory)
+  const group = logicFlow.addGroup(category, subCategory, undefined, isDefaultLocked.value)
   
   logicFlow.expandUpstream(group.id, ware.id, 'manual', subCategory)
 }
@@ -215,65 +180,75 @@ defineExpose({
 </script>
 
 <template>
-  <div class="candidate-zone flex flex-col h-full bg-[#0f172a] border-b border-white/10 shadow-2xl relative z-10">
+  <div class="candidate-zone">
     <!-- Top Header: Primary Tabs & Race Selection & Search -->
-    <div class="flex items-center justify-between px-6 py-4 border-b border-white/10">
-      <div class="flex items-center gap-6">
+    <div class="header-area">
+      <div class="header-left">
         <!-- Primary Tabs -->
-        <div class="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10">
+        <div class="tab-group">
           <button 
             @click="handleSwitchCategory('industrial')"
-            class="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm transition-all duration-300"
-            :class="activeCategory === 'industrial' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40' : 'text-white/40 hover:text-white/60'"
+            class="tab-btn"
+            :class="activeCategory === 'industrial' ? 'tab-btn-industrial-active' : 'tab-btn-inactive'"
           >
-            <span class="w-1.5 h-1.5 rounded-full" :class="activeCategory === 'industrial' ? 'bg-white' : 'bg-white/20'"></span>
+            <span class="tab-dot" :class="activeCategory === 'industrial' ? 'tab-dot-active' : 'tab-dot-inactive'"></span>
             {{ t('ui.industrial') }}
           </button>
           <button 
             @click="handleSwitchCategory('agricultural')"
-            class="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm transition-all duration-300"
-            :class="activeCategory === 'agricultural' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/40' : 'text-white/40 hover:text-white/60'"
+            class="tab-btn"
+            :class="activeCategory === 'agricultural' ? 'tab-btn-agricultural-active' : 'tab-btn-inactive'"
           >
-            <span class="w-1.5 h-1.5 rounded-full" :class="activeCategory === 'agricultural' ? 'bg-white' : 'bg-white/20'"></span>
+            <span class="tab-dot" :class="activeCategory === 'agricultural' ? 'tab-dot-active' : 'tab-dot-inactive'"></span>
             {{ t('ui.agricultural') }}
           </button>
         </div>
 
+        <!-- Lock Control (iOS Style placeholder) -->
+        <div class="lock-control">
+          <button 
+            @click="isDefaultLocked = !isDefaultLocked"
+            class="lock-toggle-btn"
+            :class="isDefaultLocked ? 'lock-toggle-btn-active' : 'lock-toggle-btn-inactive'"
+          >
+            <span class="lock-icon">{{ isDefaultLocked ? '🔒' : '🔓' }}</span>
+            <span class="lock-text">{{ isDefaultLocked ? t('logicFlow.lock') : t('logicFlow.unlock') }}</span>
+          </button>
+        </div>
+
         <!-- Race Selection (Secondary Nav moved to Header) -->
-        <div class="flex items-center gap-2 h-8">
-          <div class="h-4 w-[1px] bg-white/10 mr-2"></div>
+        <div class="race-filter">
+          <div class="race-separator"></div>
           <button 
             v-for="sub in (activeCategory === 'industrial' ? industrialRaces : agriculturalRaces)"
             :key="sub"
             @click="activeSubCategory = sub"
-            class="px-3 py-1 rounded-lg text-[10px] font-bold transition-all border whitespace-nowrap uppercase tracking-wider"
-            :class="activeSubCategory === sub 
-              ? 'bg-white/15 border-white/20 text-white shadow-sm shadow-black/20' 
-              : 'border-transparent text-white/30 hover:text-white/50 hover:bg-white/5'"
+            class="race-btn"
+            :class="activeSubCategory === sub ? 'race-btn-active' : 'race-btn-inactive'"
           >
-            {{ activeCategory === 'industrial' ? sub : t(`race.${sub}`) }}
+            {{ t(`race.${sub}`) }}
           </button>
         </div>
       </div>
 
       <!-- Global Search Integration -->
-      <div class="flex items-center gap-4">
-        <div class="relative w-72 group">
+      <div class="global-search">
+        <div class="search-wrapper group">
           <input 
             v-model="gameData.searchQuery"
             type="text" 
             :placeholder="t('planning.search_placeholder')"
-            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-white/80 focus:outline-none focus:border-blue-500/50 focus:bg-white/10 focus:ring-2 focus:ring-blue-500/10 transition-all placeholder:text-white/20"
+            class="search-input"
           />
-          <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+          <div class="search-actions">
             <button 
               v-if="gameData.searchQuery"
               @click="gameData.searchQuery = ''"
-              class="text-white/20 hover:text-white/60 transition-colors"
+              class="search-clear-btn"
             >
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
-            <div class="text-white/20 group-hover:text-white/40 pointer-events-none border-l border-white/10 pl-2 ml-1">
+            <div class="search-icon">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             </div>
           </div>
@@ -281,32 +256,33 @@ defineExpose({
 
         <button 
           @click="handleClearAll"
-          class="flex items-center gap-1.5 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500 hover:text-white hover:shadow-lg hover:shadow-red-900/20"
+          class="clear-all-btn"
           v-if="logicFlow.groups.length > 0"
         >
           <span>🗑️</span>
-          <span>Clear All</span>
+          <span>{{ t('logicFlow.clearAll') }}</span>
         </button>
       </div>
     </div>
 
     <!-- Ware Grid: 4-Column Layout -->
-    <div class="flex-1 overflow-hidden p-6 grid grid-cols-4 gap-6 bg-transparent">
-      <div v-for="tier in [0, 1, 2, 3]" :key="tier" class="flex flex-col h-full min-w-0">
+    <div class="ware-grid">
+      <div v-for="tier in [0, 1, 2, 3]" :key="tier" class="tier-column">
         <!-- Tier Header -->
-        <div class="flex items-center justify-between px-2 py-1 mb-2 border-b border-white/10">
-          <span class="text-[10px] font-black text-white/60 uppercase tracking-widest">Tier {{ tier }}</span>
-          <span class="text-[9px] text-white/40">{{ waresByTier[tier]?.length || 0 }}</span>
+        <div class="tier-header">
+          <span class="tier-title">Tier {{ tier }}</span>
+          <span class="tier-count">{{ waresByTier[tier]?.length || 0 }}</span>
         </div>
 
         <!-- Tier List -->
-        <div class="flex-1 overflow-y-auto custom-scrollbar pr-1">
+        <div class="tier-list custom-scrollbar">
           <draggable 
-            class="flex flex-col gap-1.5 min-h-[50px]"
+            class="draggable-area"
             :model-value="waresByTier[tier] || []"
             :group="{ name: 'wares', pull: 'clone', put: false }"
             :clone="(original: any) => ({ ...original })"
             :sort="false"
+            :disabled="tier === 0"
             item-key="id"
             :data-subcategory="activeSubCategory"
             @start="handleDragStart"
@@ -314,42 +290,48 @@ defineExpose({
           >
             <template #item="{ element: ware }">
               <div 
-                @click="handleWareClick(ware.id)"
                 :data-ware-id="ware.id"
-                class="ware-card group relative flex items-center h-8 px-2 rounded-lg border transition-all duration-300 cursor-pointer hover:bg-white/10"
+                class="ware-card group"
                 :class="[
-                  isWarePlanned(ware.id) 
-                    ? 'bg-emerald-500/20 border-emerald-500/50 shadow-[inset_0_0_10px_rgba(16,185,129,0.1)]' 
-                    : 'bg-white/5 border-white/10 hover:border-white/30',
+                  isWarePlanned(ware.id) ? 'ware-card-planned' : 'ware-card-default',
                   gameData.searchQuery && (
                     ware.id.toLowerCase().includes(gameData.searchQuery.toLowerCase()) || 
                     ware.name.toLowerCase().includes(gameData.searchQuery.toLowerCase()) ||
                     (gameData.localizedWaresMap[ware.id]?.localeName.toLowerCase().includes(gameData.searchQuery.toLowerCase()))
-                  )
-                    ? 'ring-1 ring-blue-500/50 border-blue-500/50 bg-blue-500/5'
-                    : ''
+                  ) ? 'ware-card-match' : ''
                 ]"
               >
                 <!-- Status Indicator -->
                 <div 
-                  class="w-1.5 h-1.5 rounded-full mr-2 shrink-0"
-                  :class="isWarePlanned(ware.id) ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' : 'bg-white/20'"
+                  class="ware-status-dot"
+                  :class="isWarePlanned(ware.id) ? 'ware-status-dot-planned' : 'ware-status-dot-default'"
                 ></div>
 
                 <!-- Ware Icon Small -->
-                <div class="w-5 h-5 rounded bg-white/10 flex items-center justify-center mr-2 shrink-0 border border-white/10 group-hover:border-white/30 transition-colors shadow-sm shadow-black/40">
-                  <span class="text-[10px] opacity-80 group-hover:opacity-100 transition-opacity">📦</span>
+                <div class="ware-icon">
+                  <span class="ware-icon-text">📦</span>
                 </div>
 
                 <!-- Ware Name -->
-                <div class="flex-1 text-[11px] font-bold truncate text-white">
+                <div class="ware-name">
                   {{ gameData.localizedWaresMap[ware.id]?.localeName || ware.name }}
                 </div>
 
+                <!-- T0 Resources Preview -->
+                <div class="resource-preview-container" v-if="ware.tier > 0">
+                  <div 
+                    v-for="resId in Object.keys(logicFlow.calculateRequiredT0Wares(ware.id, activeSubCategory) || {}).sort()" 
+                    :key="resId"
+                    class="resource-tag"
+                  >
+                    <span class="resource-text">{{ t('res.' + resId) }}</span>
+                  </div>
+                </div>
+
                 <!-- Quick Action Button -->
-                <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2 shrink-0">
+                <div class="quick-add-container" v-if="ware.tier > 0 || ware.id === 'energycells'">
                   <button 
-                    class="w-5 h-5 rounded-md bg-blue-500/20 text-blue-400 hover:bg-blue-500 hover:text-white transition-all flex items-center justify-center text-[10px] relative z-20"
+                    class="quick-add-btn"
                     @click.stop="toggleMenu($event, ware.id)"
                   >
                     ＋
@@ -360,29 +342,39 @@ defineExpose({
                 <Teleport to="body">
                   <div 
                     v-if="activeMenuWareId === ware.id"
-                    class="fixed bg-slate-900 border border-white/10 rounded-xl shadow-2xl z-[9999] overflow-hidden min-w-[192px]"
+                    class="context-menu"
                     :style="{
                       top: `${menuPosition.y}px`,
                       left: `${menuPosition.x}px`,
                     }"
                   >
-                    <div class="p-2 border-b border-white/5 bg-black/40 text-[9px] font-bold text-white/20 uppercase tracking-widest">
+                    <div class="context-menu-header">
                       Add to...
                     </div>
-                    <div class="max-h-48 overflow-y-auto custom-scrollbar">
+                    <div class="context-menu-list custom-scrollbar">
                       <button 
                         v-for="group in logicFlow.groups"
                         :key="group.id"
                         @click.stop="addToGroup(group.id, ware.id)"
-                        class="w-full px-4 py-2 text-left text-[11px] text-white/60 hover:text-white hover:bg-blue-500/20 transition-all flex items-center gap-2"
+                        class="context-menu-item"
+                        :class="{ 
+                          'opacity-40 cursor-not-allowed pointer-events-none': logicFlow.getWareGroupStatus(group.id, ware.id, activeSubCategory) !== 'available'
+                        }"
                       >
-                        <span class="w-1.5 h-1.5 rounded-full" :class="group.category === 'industrial' ? 'bg-blue-500' : 'bg-emerald-500'"></span>
-                        <span class="truncate">{{ group.name }}</span>
+                        <div class="flex items-center justify-between w-full gap-4">
+                          <div class="flex items-center gap-2 min-w-0">
+                            <span class="context-menu-dot" :class="group.category === 'industrial' ? 'context-menu-dot-industrial' : 'context-menu-dot-agricultural'"></span>
+                            <span class="truncate">{{ group.name }}</span>
+                          </div>
+                          <span v-if="logicFlow.getWareGroupStatus(group.id, ware.id, activeSubCategory) !== 'available'" class="text-[9px] font-bold uppercase tracking-tighter text-white/40 bg-white/5 px-1.5 py-0.5 rounded border border-white/10 shrink-0">
+                            {{ t('logicFlow.status.' + logicFlow.getWareGroupStatus(group.id, ware.id, activeSubCategory)) }}
+                          </span>
+                        </div>
                       </button>
                     </div>
                     <button 
                       @click.stop="handleQuickAdd(ware.id)"
-                      class="w-full px-4 py-2 text-left text-[11px] text-blue-400 hover:text-white hover:bg-blue-500 transition-all border-t border-white/5 flex items-center gap-2"
+                      class="context-menu-new-line"
                     >
                       <span>✨</span>
                       <span>New Production Line</span>
@@ -415,5 +407,247 @@ defineExpose({
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
   @apply bg-white/5 rounded-full hover:bg-white/10;
+}
+
+/* --- Main Layout --- */
+.candidate-zone {
+  @apply flex flex-col h-full bg-[#0f172a] border-b border-white/10 shadow-2xl relative z-10;
+}
+
+.header-area {
+  @apply flex items-center justify-between px-6 py-4 border-b border-white/10;
+}
+
+.header-left {
+  @apply flex items-center gap-6;
+}
+
+/* --- Tabs --- */
+.tab-group {
+  @apply flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10;
+}
+
+.tab-btn {
+  @apply flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm transition-all duration-300;
+}
+
+.tab-btn-industrial-active {
+  @apply bg-blue-600 text-white shadow-lg shadow-blue-900/40;
+}
+
+.tab-btn-agricultural-active {
+  @apply bg-emerald-600 text-white shadow-lg shadow-emerald-900/40;
+}
+
+.tab-btn-inactive {
+  @apply text-white/40 hover:text-white/60;
+}
+
+.tab-dot {
+  @apply w-1.5 h-1.5 rounded-full;
+}
+
+.tab-dot-active {
+  @apply bg-white;
+}
+
+.tab-dot-inactive {
+  @apply bg-white/20;
+}
+
+/* --- Lock Control --- */
+.lock-control {
+  @apply flex items-center h-8;
+}
+
+.lock-toggle-btn {
+  @apply flex items-center gap-2 px-3 py-1 rounded-lg text-[10px] font-bold transition-all border;
+}
+
+.lock-toggle-btn-active {
+  @apply bg-amber-500/20 border-amber-500/50 text-amber-500;
+}
+
+.lock-toggle-btn-inactive {
+  @apply bg-white/5 border-white/10 text-white/40 hover:text-white/60;
+}
+
+.lock-icon {
+  @apply text-[12px];
+}
+
+/* --- Race Filter --- */
+.race-filter {
+  @apply flex items-center gap-2 h-8;
+}
+
+.race-separator {
+  @apply h-4 w-[1px] bg-white/10 mr-2;
+}
+
+.race-btn {
+  @apply px-3 py-1 rounded-lg text-[10px] font-bold transition-all border whitespace-nowrap uppercase tracking-wider;
+}
+
+.race-btn-active {
+  @apply bg-white/15 border-white/20 text-white shadow-sm shadow-black/20;
+}
+
+.race-btn-inactive {
+  @apply border-transparent text-white/30 hover:text-white/50 hover:bg-white/5;
+}
+
+/* --- Global Search --- */
+.global-search {
+  @apply flex items-center gap-4;
+}
+
+.search-wrapper {
+  @apply relative w-72;
+}
+
+.search-input {
+  @apply w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-white/80 focus:outline-none focus:border-blue-500/50 focus:bg-white/10 focus:ring-2 focus:ring-blue-500/10 transition-all placeholder:text-white/20;
+}
+
+.search-actions {
+  @apply absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2;
+}
+
+.search-clear-btn {
+  @apply text-white/20 hover:text-white/60 transition-colors;
+}
+
+.search-icon {
+  @apply text-white/20 group-hover:text-white/40 pointer-events-none border-l border-white/10 pl-2 ml-1;
+}
+
+.clear-all-btn {
+  @apply flex items-center gap-1.5 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500 hover:text-white hover:shadow-lg hover:shadow-red-900/20;
+}
+
+/* --- Ware Grid --- */
+.ware-grid {
+  @apply flex-1 overflow-hidden p-6 grid grid-cols-4 gap-6 bg-transparent;
+}
+
+.tier-column {
+  @apply flex flex-col h-full min-w-0;
+}
+
+.tier-header {
+  @apply flex items-center justify-between px-2 py-1 mb-2 border-b border-white/10;
+}
+
+.tier-title {
+  @apply text-[10px] font-black text-white/60 uppercase tracking-widest;
+}
+
+.tier-count {
+  @apply text-[9px] text-white/40;
+}
+
+.tier-list {
+  @apply flex-1 overflow-y-auto pr-1;
+}
+
+.draggable-area {
+  @apply flex flex-col gap-1.5 min-h-[50px];
+}
+
+/* --- Ware Card --- */
+.ware-card {
+  @apply relative flex items-center h-8 px-2 rounded-lg border transition-all duration-300 cursor-grab hover:bg-white/10;
+}
+
+.ware-card-planned {
+  @apply bg-emerald-500/20 border-emerald-500/50 shadow-[inset_0_0_10px_rgba(16,185,129,0.1)];
+}
+
+.ware-card-default {
+  @apply bg-white/5 border-white/10 hover:border-white/30;
+}
+
+.ware-card-match {
+  @apply ring-1 ring-blue-500/50 border-blue-500/50 bg-blue-500/5;
+}
+
+.ware-status-dot {
+  @apply w-1.5 h-1.5 rounded-full mr-2 shrink-0;
+}
+
+.ware-status-dot-planned {
+  @apply bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)];
+}
+
+.ware-status-dot-default {
+  @apply bg-white/20;
+}
+
+.ware-icon {
+  @apply w-5 h-5 rounded bg-white/10 flex items-center justify-center mr-2 shrink-0 border border-white/10 group-hover:border-white/30 transition-colors shadow-sm shadow-black/40;
+}
+
+.ware-icon-text {
+  @apply text-[10px] opacity-80 group-hover:opacity-100 transition-opacity;
+}
+
+.ware-name {
+  @apply text-[11px] font-bold truncate text-white max-w-[120px];
+}
+
+/* --- Resource Preview --- */
+.resource-preview-container {
+  @apply flex items-center gap-1 ml-2 overflow-hidden flex-1;
+}
+
+.resource-tag {
+  @apply flex items-center gap-0.5 px-1 rounded bg-white/5 border border-white/10 shrink-0;
+}
+
+.resource-text {
+  @apply text-[9px] font-medium text-blue-200;
+}
+
+/* --- Quick Add Button --- */
+.quick-add-container {
+  @apply flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-auto shrink-0;
+}
+
+.quick-add-btn {
+  @apply w-5 h-5 rounded-md bg-blue-500/20 text-blue-400 hover:bg-blue-500 hover:text-white transition-all flex items-center justify-center text-[10px] relative z-20;
+}
+
+/* --- Context Menu --- */
+.context-menu {
+  @apply fixed bg-slate-900 border border-white/10 rounded-xl shadow-2xl z-[9999] overflow-hidden min-w-[192px];
+}
+
+.context-menu-header {
+  @apply p-2 border-b border-white/5 bg-black/40 text-[9px] font-bold text-white/20 uppercase tracking-widest;
+}
+
+.context-menu-list {
+  @apply max-h-48 overflow-y-auto;
+}
+
+.context-menu-item {
+  @apply w-full px-4 py-2 text-left text-[11px] text-white/60 hover:text-white hover:bg-blue-500/20 transition-all flex items-center gap-2;
+}
+
+.context-menu-dot {
+  @apply w-1.5 h-1.5 rounded-full;
+}
+
+.context-menu-dot-industrial {
+  @apply bg-blue-500;
+}
+
+.context-menu-dot-agricultural {
+  @apply bg-emerald-500;
+}
+
+.context-menu-new-line {
+  @apply w-full px-4 py-2 text-left text-[11px] text-blue-400 hover:text-white hover:bg-blue-500 transition-all border-t border-white/5 flex items-center gap-2;
 }
 </style>

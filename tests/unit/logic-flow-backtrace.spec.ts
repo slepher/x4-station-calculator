@@ -5,6 +5,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { useLogicFlowStore } from '../../src/store/useLogicFlowStore'
 import { useGameDataStore } from '../../src/store/useGameDataStore'
+import type { FlowNode } from '../../src/types/x4'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -116,16 +117,16 @@ describe('LogicFlow Fallback & Teladi Tracing Logic', () => {
       logicFlow.expandUpstream(group.id, wareId, 'manual')
 
       const addedNodes = group.nodes
-      expect(addedNodes.some(n => n.wareId === wareId)).toBe(true)
+      expect(addedNodes.some((n: FlowNode) => n.wareId === wareId)).toBe(true)
 
       // Check Silicon Wafers (siliconwafers)
-      const siliconNode = addedNodes.find(n => n.wareId === 'siliconwafers')
+      const siliconNode = addedNodes.find((n: FlowNode) => n.wareId === 'siliconwafers')
       expect(siliconNode).toBeDefined()
       // Silicon Wafers does NOT have a teladi race in game data, should fallback to default
       expect(siliconNode.race).toBe('default')
 
       // Check Teladianium (teladianium) - This IS a Teladi specific ware
-      const teladianiumNode = addedNodes.find(n => n.wareId === 'teladianium')
+      const teladianiumNode = addedNodes.find((n: FlowNode) => n.wareId === 'teladianium')
       if (teladianiumNode) {
         expect(teladianiumNode.race).toBe('teladi')
       }
@@ -139,7 +140,7 @@ describe('LogicFlow Fallback & Teladi Tracing Logic', () => {
       // Scanning Arrays (T3) -> Silicon Wafers (T1)
       logicFlow.expandUpstream(group.id, 'scanningarrays', 'manual')
       
-      const siliconNode = group.nodes.find(n => n.wareId === 'siliconwafers')
+      const siliconNode = group.nodes.find((n: FlowNode) => n.wareId === 'siliconwafers')
       expect(siliconNode).toBeDefined()
       expect(siliconNode.source).toBe('auto')
       
@@ -150,7 +151,7 @@ describe('LogicFlow Fallback & Teladi Tracing Logic', () => {
       // It is still needed by Scanning Arrays, so it should NOT be removed, but downgraded.
       logicFlow.removeNode(group.id, siliconNode.id)
       
-      const nodeAfter = group.nodes.find(n => n.wareId === 'siliconwafers')
+      const nodeAfter = group.nodes.find((n: FlowNode) => n.wareId === 'siliconwafers')
       expect(nodeAfter).toBeDefined()
       expect(nodeAfter.source).toBe('auto') // Successfully downgraded
     })
@@ -159,17 +160,17 @@ describe('LogicFlow Fallback & Teladi Tracing Logic', () => {
       const group = logicFlow.addGroup('industrial', 'default')
       logicFlow.expandUpstream(group.id, 'antimattercells', 'manual')
       
-      const node = group.nodes.find(n => n.wareId === 'antimattercells')
+      const node = group.nodes.find((n: FlowNode) => n.wareId === 'antimattercells')
       logicFlow.removeNode(group.id, node.id)
       
-      expect(group.nodes.find(n => n.wareId === 'antimattercells')).toBeUndefined()
+      expect(group.nodes.find((n: FlowNode) => n.wareId === 'antimattercells')).toBeUndefined()
     })
 
     it('should cleanup unused auto nodes when a parent is locked', () => {
       const group = logicFlow.addGroup('industrial', 'default')
       logicFlow.expandUpstream(group.id, 'scanningarrays', 'manual')
       
-      const scanningArrayNode = group.nodes.find(n => n.wareId === 'scanningarrays')
+      const scanningArrayNode = group.nodes.find((n: FlowNode) => n.wareId === 'scanningarrays')
       expect(group.nodes.length).toBeGreaterThan(1)
       
       // Lock Scanning Arrays
@@ -202,7 +203,7 @@ describe('LogicFlow Fallback & Teladi Tracing Logic', () => {
       const group = logicFlow.addGroup('industrial', 'default')
       logicFlow.expandUpstream(group.id, 'scanningarrays', 'manual')
       
-      const node = group.nodes.find(n => n.wareId === 'scanningarrays')
+      const node = group.nodes.find((n: FlowNode) => n.wareId === 'scanningarrays')
       // Lock it (clears moduleId)
       logicFlow.toggleLock(group.id, node.id)
       expect(node.isLocked).toBe(true)
@@ -223,11 +224,11 @@ describe('LogicFlow Fallback & Teladi Tracing Logic', () => {
       logicFlow.expandUpstream(group.id, 'scanningarrays', 'manual', 'teladi')
       
       // In Teladi mode, Scanning Arrays should require Silicon Wafers and Teladianium
-      const scanningNode = group.nodes.find(n => n.wareId === 'scanningarrays')
+      const scanningNode = group.nodes.find((n: FlowNode) => n.wareId === 'scanningarrays')
       expect(scanningNode).toBeDefined()
       expect(scanningNode.race).toBe('teladi')
       
-      const teladianiumNode = group.nodes.find(n => n.wareId === 'teladianium')
+      const teladianiumNode = group.nodes.find((n: FlowNode) => n.wareId === 'teladianium')
       expect(teladianiumNode).toBeDefined()
       expect(teladianiumNode.race).toBe('teladi')
     })
@@ -238,23 +239,23 @@ describe('LogicFlow Fallback & Teladi Tracing Logic', () => {
       // Weapon Components (weaponcomponents) in Default mode
       logicFlow.expandUpstream(group.id, 'weaponcomponents', 'manual', 'default')
       
-      const weaponNode = group.nodes.find(n => n.wareId === 'weaponcomponents')
+      const weaponNode = group.nodes.find((n: FlowNode) => n.wareId === 'weaponcomponents')
       expect(weaponNode).toBeDefined()
       expect(weaponNode.moduleId).toBeDefined()
       expect(weaponNode.race).toBe('default')
       
       // Check upstream dependencies for Default Weapon Components:
       // Hull Parts (T2), Plasma Conductors (T2)
-      const hullParts = group.nodes.find(n => n.wareId === 'hullparts')
+      const hullParts = group.nodes.find((n: FlowNode) => n.wareId === 'hullparts')
       expect(hullParts).toBeDefined()
       expect(hullParts.race).toBe('default')
       
-      const plasmaConductors = group.nodes.find(n => n.wareId === 'plasmaconductors')
+      const plasmaConductors = group.nodes.find((n: FlowNode) => n.wareId === 'plasmaconductors')
       expect(plasmaConductors).toBeDefined()
       expect(plasmaConductors.race).toBe('default')
       
       // Ensure no "No Module" nodes (nodes without moduleId and not basic)
-      const noModuleNodes = group.nodes.filter(n => {
+      const noModuleNodes = group.nodes.filter((n: FlowNode) => {
         const ware = gameData.waresMap[n.wareId]
         const isBasic = ware.tier === 0 || n.wareId === 'energycells'
         return !isBasic && !n.moduleId
@@ -282,13 +283,13 @@ describe('LogicFlow Fallback & Teladi Tracing Logic', () => {
       
       logicFlow.expandUpstream(group.id, 'missilecomponents', 'manual', 'teladi')
       
-      const missileNode = group.nodes.find(n => n.wareId === 'missilecomponents')
+      const missileNode = group.nodes.find((n: FlowNode) => n.wareId === 'missilecomponents')
       expect(missileNode).toBeDefined()
       expect(missileNode.moduleId).toBe('teladi_missile_module')
       
       // Upstream T1 should be Teladianium, NOT Refined Metals
-      const teladianiumNode = group.nodes.find(n => n.wareId === 'teladianium')
-      const refinedMetalsNode = group.nodes.find(n => n.wareId === 'refinedmetals')
+      const teladianiumNode = group.nodes.find((n: FlowNode) => n.wareId === 'teladianium')
+      const refinedMetalsNode = group.nodes.find((n: FlowNode) => n.wareId === 'refinedmetals')
       
       expect(teladianiumNode).toBeDefined()
       expect(refinedMetalsNode).toBeUndefined()

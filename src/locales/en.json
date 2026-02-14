@@ -146,8 +146,32 @@
     "add_modules_hint": "Please add production modules to see data"
   },
   "logicFlow": {
+    "status": {
+      "locked": "Locked",
+      "duplicated": "Duplicated"
+    },
     "dropToCreate": "DROP TO CREATE NEW PRODUCTION LINE",
     "compactView": "Compact View",
-    "planningZone": "Planning Zone"
+    "planningZone": "Planning Zone",
+    "isolate": "Isolate",
+    "connect": "Connect",
+    "lock": "Lock",
+    "unlock": "Unlock",
+    "auto": "Auto",
+    "manual": "Manual",
+    "duplicate": "Duplicate",
+    "clearAll": "Clear All",
+    "clickToAddManually": "Click to add manually"
+  },
+  "res": {
+    "energycells": "EC",
+    "helium": "He",
+    "hydrogen": "H",
+    "ice": "Ice",
+    "methane": "CH4",
+    "nividium": "Niv",
+    "ore": "Ore",
+    "rawscrap": "Scr",
+    "silicon": "Si"
   }
 }

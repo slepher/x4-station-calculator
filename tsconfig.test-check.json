@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.test-check.tsbuildinfo",
+    "lib": ["esnext", "dom"],
+    "types": ["node", "jsdom", "vite/client"],
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "verbatimModuleSyntax": false,
+    "erasableSyntaxOnly": false
+  },
+  "include": [
+    "src/**/*",
+    "tests/**/*"
+  ]
+}

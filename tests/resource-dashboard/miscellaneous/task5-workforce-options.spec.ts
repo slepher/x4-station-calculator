@@ -136,8 +136,13 @@ test.describe('Task 5: 劳动力加成选项位置调整和UI优化测试', () =
     const optionRect = await workforceOption.boundingBox();
     const containerRect = await industryHeader.boundingBox();
     
-    expect(optionRect.x).toBeGreaterThan(containerRect.x);
-    expect(optionRect.y).toBeGreaterThan(containerRect.y);
-    expect(optionRect.y + optionRect.height).toBeLessThan(containerRect.y + containerRect.height + 5); // Allow small margin
+    expect(optionRect).not.toBeNull();
+    expect(containerRect).not.toBeNull();
+
+    if (optionRect && containerRect) {
+      expect(optionRect.x).toBeGreaterThan(containerRect.x);
+      expect(optionRect.y).toBeGreaterThan(containerRect.y);
+      expect(optionRect.y + optionRect.height).toBeLessThan(containerRect.y + containerRect.height + 5); // Allow small margin
+    }
   });
 });

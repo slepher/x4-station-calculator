@@ -148,8 +148,32 @@
     "add_modules_hint": "请添加生产模块以查看数据"
   },
   "logicFlow": {
+    "status": {
+      "locked": "已锁定",
+      "duplicated": "已存在"
+    },
     "dropToCreate": "拖拽至此处创建新产线",
     "compactView": "紧凑视图",
-    "planningZone": "规划区"
+    "planningZone": "规划区",
+    "isolate": "隔离",
+    "connect": "连接",
+    "lock": "锁定",
+    "unlock": "解锁",
+    "auto": "自动",
+    "manual": "手动",
+    "duplicate": "重复",
+    "clearAll": "全部清空",
+    "clickToAddManually": "点击手动添加"
+  },
+  "res": {
+    "energycells": "电",
+    "helium": "氦",
+    "hydrogen": "氢",
+    "ice": "冰",
+    "methane": "烷",
+    "nividium": "N",
+    "ore": "矿",
+    "rawscrap": "废",
+    "silicon": "硅"
   }
 }
