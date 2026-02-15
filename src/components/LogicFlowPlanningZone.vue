@@ -11,6 +11,42 @@ const { t } = useI18n()
 const logicFlow = useLogicFlowStore()
 const gameData = useGameDataStore()
 
+const getAttribute = (element: any, attribute: string) => {
+  if (element && typeof element.getAttribute === 'function') {
+    return element.getAttribute(attribute)
+  }
+  if (element?.el && typeof element.el.getAttribute === 'function') {
+    return element.el.getAttribute(attribute)
+  }
+  return null
+}
+
+/**
+ * 获取有效的血统（考虑锁定组）
+ */
+const getEffectiveLineage = (group: ProductionLineGroup, event?: any): string => {
+  const fromSubCategory = event ? getAttribute(event?.from, 'data-subcategory') : null
+  const draggingLineage = logicFlow.draggingLineage || fromSubCategory || 'default'
+  return group.isLocked ? group.lockedLineage! : draggingLineage
+}
+
+/**
+ * 获取拖拽状态（统一入口）
+ */
+const getDropStatus = (group: ProductionLineGroup, event?: any): string => {
+  const wareId = logicFlow.draggingWareId || (event?.item?._underlying_vm_?.id)
+  if (!wareId) return 'available'
+  const effectiveLineage = getEffectiveLineage(group, event)
+  return logicFlow.getWareGroupStatus(group.id, wareId, effectiveLineage)
+}
+
+/**
+ * 判断是否允许 drop
+ */
+const isDropAllowedForStatus = (status: string): boolean => {
+  return status !== 'rejected' && status !== 'duplicated'
+}
+
 /**
  * 格式化资源数据以便循环显示
  */
@@ -64,21 +100,17 @@ const getNewLineResources = () => {
  * Nodes for display, including a preview node if dragging over a group
  */
 const nodesWithPreview = (group: any) => {
-  // 1. Get current manual nodes
   const nodes = group.nodes
-    .filter((n: any) => n.source === 'manual')
+    .filter((n: any) => n.source === 'manual' && !n.isIsolated)
     .map((n: any) => ({ ...n, isPreview: false }))
 
-  // 2. If dragging over this group
   if (logicFlow.isDragging && 
       logicFlow.draggingWareId && 
       logicFlow.hoveredGroupId === group.id) {
     
-    // 检查是否已经存在该产物
-    const existingNode = group.nodes.find((n: any) => n.wareId === logicFlow.draggingWareId)
+    const status = getDropStatus(group)
     
-    // 如果不存在，或者虽然存在但是锁定的（Locked 节点也是预览的目标），或者虽然存在但是 Auto 的（转正的目标），则显示预览点
-    if (!existingNode || existingNode.isLocked || existingNode.source === 'auto') {
+    if (isDropAllowedForStatus(status)) {
       const ware = gameData.waresMap[logicFlow.draggingWareId]
       if (ware) {
         nodes.push({
@@ -92,35 +124,29 @@ const nodesWithPreview = (group: any) => {
     }
   }
 
-  // 3. Sort by Tier (High to Low)
   return nodes.sort((a: any, b: any) => b.column - a.column)
 }
 
 const handleAddToExistingGroup = (groupId: string, event: any) => {
-  if (logicFlow.hoveredGroupId !== groupId) return
-
   const draggingWareId = logicFlow.draggingWareId || (event.item?._underlying_vm_?.id)
   
   if (draggingWareId) {
     const group = logicFlow.groups.find(g => g.id === groupId)
     if (group) {
-      const node = group.nodes.find(n => n.wareId === draggingWareId)
+      const effectiveLineage = getEffectiveLineage(group, event)
+      const status = getDropStatus(group, event)
       
-      if (node) {
-        if (node.isLocked) {
-          // 如果已锁定，执行解锁并扩展逻辑
-          logicFlow.unlockAndExpand(groupId, draggingWareId)
-        } else if (node.source === 'auto') {
-          // 如果是自动节点，执行转正逻辑
-          logicFlow.promoteNode(groupId, draggingWareId)
-        } else {
-          // 如果已经是手动节点且未锁定，视为重复，不执行操作
-          console.warn('[PlanningZone] Duplicate manual ware detected, blocking add')
+      if (status === 'isolated') {
+        logicFlow.connectAndExpand(groupId, draggingWareId, effectiveLineage)
+      } else if (status === 'replace') {
+        logicFlow.replaceNodeWithLineage(groupId, draggingWareId, effectiveLineage)
+      } else if (status === 'auto') {
+        const node = group.nodes.find(n => n.wareId === draggingWareId)
+        if (node) {
+          logicFlow.promoteNode(groupId, node.id)
         }
-      } else {
-        // 如果不存在，正常添加
-        const subCategory = event.from?.getAttribute('data-subcategory') || 'default'
-        logicFlow.expandUpstream(groupId, draggingWareId, 'manual', subCategory)
+      } else if (status === 'available') {
+        logicFlow.expandUpstream(groupId, draggingWareId, 'manual', effectiveLineage)
       }
     }
   }
@@ -128,67 +154,43 @@ const handleAddToExistingGroup = (groupId: string, event: any) => {
   logicFlow.hoveredGroupId = null
 }
 
-const isRejected = (groupId: string, event: any) => {
-  const wareId = logicFlow.draggingWareId || (event.item?._underlying_vm_?.id)
-  if (!wareId) return false
-  
-  const subCategory = event.from?.getAttribute('data-subcategory') || 'default'
-  return logicFlow.getWareGroupStatus(groupId, wareId, subCategory) === 'rejected'
+const isRejected = (group: ProductionLineGroup, event: any) => {
+  return getDropStatus(group, event) === 'rejected'
 }
 
-const isDuplicate = (groupId: string) => {
-  if (!logicFlow.draggingWareId) return false
-  const group = logicFlow.groups.find(g => g.id === groupId)
-  if (!group) return false
-  
-  const node = group.nodes.find(n => n.wareId === logicFlow.draggingWareId)
-  // 如果节点存在：
-  // 1. 如果是 locked，不重复（可以解锁）
-  // 2. 如果是 auto，不重复（可以转正）
-  // 3. 只有当它是 manual 且非 locked 时，才算重复
-  return node ? (node.source === 'manual' && !node.isLocked) : false
+const isDuplicated = (group: ProductionLineGroup, event: any) => {
+  return getDropStatus(group, event) === 'duplicated'
 }
 
-const isLocked = (groupId: string) => {
-  if (!logicFlow.draggingWareId) return false
-  const group = logicFlow.groups.find(g => g.id === groupId)
-  if (!group) return false
-  
-  const node = group.nodes.find(n => n.wareId === logicFlow.draggingWareId)
-  return node ? node.isLocked : false
+const isDropAllowed = (group: ProductionLineGroup, event: any) => {
+  return isDropAllowedForStatus(getDropStatus(group, event))
 }
 
-const isAuto = (groupId: string) => {
-  if (!logicFlow.draggingWareId) return false
-  const group = logicFlow.groups.find(g => g.id === groupId)
-  if (!group) return false
-  
-  const node = group.nodes.find(n => n.wareId === logicFlow.draggingWareId)
-  return node ? node.source === 'auto' : false
+const getDragStatus = (group: ProductionLineGroup) => {
+  if (!logicFlow.draggingWareId) return null
+  return getDropStatus(group)
 }
 
 const dummyList = ref([])
 
 const handleAddFromDrop = (event: any) => {
-  // vuedraggable 的 item 是 DOM 元素，通过 _underlying_vm_ 获取数据
   const ware = event.item?._underlying_vm_
+  const capturedLineage = logicFlow.draggingLineage
+  const fromSubCategory = getAttribute(event.from, 'data-subcategory')
   
-  // 关键修复：延迟处理，让 vuedraggable 完成其内部的 DOM 操作
-  // 使用 requestAnimationFrame 或较长的 setTimeout 确保生命周期解耦
   setTimeout(() => {
     if (ware && ware.id) {
       const isAgricultural = ['agricultural', 'food', 'pharmaceutical', 'water', 'ice'].includes(ware.group)
       const category = isAgricultural ? 'agricultural' : 'industrial'
       
-      const subCategory = event.from?.getAttribute('data-subcategory') || (category === 'industrial' ? 'default' : 'argon')
+      const subCategory = capturedLineage || fromSubCategory || (category === 'industrial' ? 'default' : 'argon')
       const group = logicFlow.addGroup(category, subCategory)
       
       logicFlow.expandUpstream(group.id, ware.id, 'manual', subCategory)
     }
     
-    // 最后清空临时列表
     dummyList.value = []
-  }, 20) // 给 vuedraggable 留出足够的清理时间
+  }, 20)
 }
 </script>
 
@@ -246,7 +248,9 @@ const handleAddFromDrop = (event: any) => {
         :list="[]"
         :group="{ 
           name: 'wares', 
-          put: (to: any, from: any, item: any) => !isDuplicate(group.id) && !isRejected(group.id, { from, item }), 
+          put: (_to: any, from: any, item: any) => {
+            return isDropAllowed(group, { from, item });
+          }, 
           pull: false 
         }"
         :sort="false"
@@ -254,11 +258,11 @@ const handleAddFromDrop = (event: any) => {
         @add="(event: any) => handleAddToExistingGroup(group.id, event)"
         class="compact-group drop-target bg-white/5 border rounded-2xl p-4 flex flex-col gap-3 transition-all cursor-pointer min-h-[160px]"
         :class="[
-          isRejected(group.id, { from: null, item: null })
+          isRejected(group, null)
             ? 'border-red-600 bg-red-900/10'
-            : (isDuplicate(group.id) 
-              ? 'border-red-500 bg-red-500/5' 
-              : (isLocked(group.id) 
+            : (isDuplicated(group, null)
+              ? 'border-red-500 bg-red-500/5'
+              : (logicFlow.groups.find(g => g.id === group.id)?.isLocked 
                   ? 'border-amber-500/50 bg-amber-500/5' 
                   : (logicFlow.hoveredGroupId === group.id ? 'border-blue-500 bg-blue-500/10' : 'border-white/10')))
         ]"
@@ -293,21 +297,31 @@ const handleAddFromDrop = (event: any) => {
                 </div>
               </div>
 
-              <div v-if="isRejected(group.id, { from: null, item: null })" class="ml-auto text-[10px] text-red-500 font-bold uppercase tracking-widest flex items-center gap-1" data-testid="rejected-label">
+              <div v-if="isRejected(group, { from: null, item: null })" class="ml-auto text-[10px] text-red-500 font-bold uppercase tracking-widest flex items-center gap-1" data-testid="rejected-label">
                 <span>🚫</span>
                 <span>{{ t('logicFlow.rejected') }}</span>
               </div>
-              <div v-else-if="isDuplicate(group.id)" class="ml-auto text-[10px] text-red-400 font-bold uppercase tracking-widest" data-testid="duplicate-label">
+              <div v-else-if="isDuplicated(group, null)" class="ml-auto text-[10px] text-red-400 font-bold uppercase tracking-widest" data-testid="duplicate-label">
                 {{ t('logicFlow.duplicate') }}
               </div>
-              <div v-else-if="isLocked(group.id)" class="ml-auto text-[10px] font-bold uppercase tracking-widest" data-testid="locked-label">
+              <div v-else-if="getDragStatus(group) === 'isolated'" class="ml-auto text-[10px] font-bold uppercase tracking-widest" data-testid="isolated-label">
                 <span :class="logicFlow.hoveredGroupId === group.id ? 'text-blue-400' : 'text-amber-400/60'">
                   {{ logicFlow.hoveredGroupId === group.id ? t('logicFlow.connect') : t('logicFlow.isolate') }}
                 </span>
               </div>
-              <div v-else-if="isAuto(group.id)" class="ml-auto text-[10px] font-bold uppercase tracking-widest" data-testid="auto-label">
+              <div v-else-if="getDragStatus(group) === 'replace'" class="ml-auto text-[10px] font-bold uppercase tracking-widest" data-testid="replace-label">
+                <span :class="logicFlow.hoveredGroupId === group.id ? 'text-blue-400' : 'text-purple-400/60'">
+                  {{ logicFlow.hoveredGroupId === group.id ? t('logicFlow.replace') : t('logicFlow.auto') }}
+                </span>
+              </div>
+              <div v-else-if="getDragStatus(group) === 'auto'" class="ml-auto text-[10px] font-bold uppercase tracking-widest" data-testid="auto-label">
                 <span :class="logicFlow.hoveredGroupId === group.id ? 'text-blue-400' : 'text-emerald-400/60'">
                   {{ logicFlow.hoveredGroupId === group.id ? t('logicFlow.manual') : t('logicFlow.auto') }}
+                </span>
+              </div>
+              <div v-else-if="logicFlow.groups.find(g => g.id === group.id)?.isLocked" class="ml-auto text-[10px] font-bold uppercase tracking-widest" data-testid="locked-label">
+                <span class="text-amber-400/60">
+                  {{ t('race.' + logicFlow.groups.find(g => g.id === group.id)?.lockedLineage) }}
                 </span>
               </div>
             </div>

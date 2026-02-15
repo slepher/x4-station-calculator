@@ -11,7 +11,7 @@ vi.mock('@/store/useGameDataStore', () => ({
   useGameDataStore: vi.fn()
 }))
 
-describe('LogicFlow Locked Node Behavior', () => {
+describe('LogicFlow Isolated Node Behavior', () => {
   let store: ReturnType<typeof useLogicFlowStore>
 
   beforeEach(() => {
@@ -34,6 +34,12 @@ describe('LogicFlow Locked Node Behavior', () => {
        localizedWaresMap: {
          'hullparts': { id: 'hullparts', localeName: 'Hull Parts' },
          'refinedmetals': { id: 'refinedmetals', localeName: 'Refined Metals' }
+       },
+       wareSetsByIndustrialRace: {
+         'default': new Set(['hullparts', 'refinedmetals', 'ore'])
+       },
+       wareSetsByRace: {
+         'default': new Set(['hullparts', 'refinedmetals', 'ore'])
        }
      }
     
@@ -52,7 +58,7 @@ describe('LogicFlow Locked Node Behavior', () => {
       wareId: 'hullparts',
       moduleId: 'prod_hullparts',
       race: 'default',
-      isLocked: true, // LOCKED
+      isIsolated: true, // ISOLATED
       source: 'manual',
       column: 2,
       order: 0
@@ -72,7 +78,7 @@ describe('LogicFlow Locked Node Behavior', () => {
       wareId: 'hullparts',
       moduleId: 'prod_hullparts',
       race: 'default',
-      isLocked: false, // UNLOCKED
+      isIsolated: false, // NOT ISOLATED
       source: 'manual',
       column: 2,
       order: 0
@@ -83,102 +89,108 @@ describe('LogicFlow Locked Node Behavior', () => {
     expect(store.isWareInAnyGroup('hullparts')).toBe(true)
   })
 
-  it('should NOT expand upstream if existing node is locked', () => {
+  it('should transform isolated node when user drags same ware (UI path)', () => {
     const group = store.addGroup('industrial', 'default')
     
-    // 1. Manually add a locked Refined Metals node
-    const lockedNode = {
-      id: 'node-rm-locked',
+    // 1. Manually add a isolated Refined Metals node
+    const isolatedNode = {
+      id: 'node-rm-isolated',
       wareId: 'refinedmetals',
-      moduleId: undefined, // Locked usually has no module
+      moduleId: undefined, // Isolated usually has no module
       race: 'default',
-      isLocked: true,
-      source: 'manual',
+      lineage: 'default',
+      isIsolated: true,
+      source: 'auto',
       column: 1,
       order: 0
     }
     // @ts-ignore
-    group.nodes.push(lockedNode)
+    group.nodes.push(isolatedNode)
 
-    // 2. Add Hull Parts (Manual) which needs Refined Metals
-    // This calls expandUpstream('hullparts') -> expands 'refinedmetals'
-    store.expandUpstream(group.id, 'hullparts', 'manual')
+    // 2. 模拟 UI 调用路径
+    const status = store.getWareGroupStatus(group.id, 'refinedmetals', 'default')
+    expect(status).toBe('isolated')
+    
+    // UI 会调用 connectAndExpand
+    store.connectAndExpand(group.id, 'refinedmetals', 'default')
 
     // 3. Verify:
-    // - Hull Parts node created
-    // - Refined Metals node: Should still be the LOCKED one (no new auto node)
-    // - Ore node: Should NOT be created (because recursion stopped at locked Refined Metals)
+    // - Refined Metals node: Should be transformed (no longer isolated)
+    // - Ore node: Should be created (because recursion continues)
 
-    const hullParts = group.nodes.find(n => n.wareId === 'hullparts')
-    expect(hullParts).toBeDefined()
+    const refinedMetals = group.nodes.find((n: any) => n.wareId === 'refinedmetals')
+    expect(refinedMetals).toBeDefined()
+    expect(refinedMetals.isIsolated).toBe(false)
+    expect(refinedMetals.source).toBe('manual')
+    expect(refinedMetals.moduleId).toBe('prod_refinedmetals')
 
-    const refinedMetals = group.nodes.filter(n => n.wareId === 'refinedmetals')
-    expect(refinedMetals.length).toBe(1)
-    if (refinedMetals[0]) {
-      expect(refinedMetals[0].isLocked).toBe(true)
-      expect(refinedMetals[0].id).toBe('node-rm-locked') // Same instance
-    }
-
-    const ore = group.nodes.find(n => n.wareId === 'ore')
-    expect(ore).toBeUndefined() // Recursion stopped
+    const ore = group.nodes.find((n: any) => n.wareId === 'ore')
+    expect(ore).toBeDefined() // Recursion continues
   })
 
-  it('should NOT modify locked node properties during expansion', () => {
+  it('should transform isolated node properties when user drags (UI path)', () => {
     const group = store.addGroup('industrial', 'default')
     
-    // 1. Locked Auto node (simulated scenario)
-    const lockedNode = {
-      id: 'node-rm-locked',
+    // 1. Isolated Auto node (simulated scenario)
+    const isolatedNode = {
+      id: 'node-rm-isolated',
       wareId: 'refinedmetals',
       moduleId: 'old_module',
       race: 'default',
-      isLocked: true,
-      source: 'auto', // It was auto, then locked
+      lineage: 'default',
+      isIsolated: true,
+      source: 'auto', // It was auto, then isolated
       column: 1,
       order: 0
     }
     // @ts-ignore
-    group.nodes.push(lockedNode)
+    group.nodes.push(isolatedNode)
 
-    // 2. Try to manually expand Refined Metals (simulating drag same item)
-    store.expandUpstream(group.id, 'refinedmetals', 'manual')
+    // 2. 模拟 UI 调用路径
+    const status = store.getWareGroupStatus(group.id, 'refinedmetals', 'default')
+    expect(status).toBe('isolated')
+    
+    // UI 会调用 connectAndExpand
+    store.connectAndExpand(group.id, 'refinedmetals', 'default')
 
-    // 3. Verify it wasn't touched
+    // 3. Verify it was transformed
     const node = group.nodes[0]
     expect(node).toBeDefined()
     if (node) {
-      expect(node.isLocked).toBe(true)
-      expect(node.source).toBe('auto') // Should NOT change to manual
-      expect(node.moduleId).toBe('old_module') // Should NOT change module
+      expect(node.isIsolated).toBe(false)
+      expect(node.source).toBe('manual') // Changed to manual
+      expect(node.moduleId).toBe('prod_refinedmetals') // Changed to correct module
     }
   })
 
-  it('should unlock and expand when unlockAndExpand is called', () => {
+  it('should connect and expand when connectAndExpand is called', () => {
     const group = store.addGroup('industrial', 'default')
     
-    // 1. Add a locked Hull Parts node
-    const lockedNode = {
-      id: 'node-hp-locked',
+    // 1. Add a isolated Hull Parts node (隔离后应该是 auto)
+    const isolatedNode = {
+      id: 'node-hp-isolated',
       wareId: 'hullparts',
       moduleId: undefined,
       race: 'default',
-      isLocked: true,
-      source: 'manual',
+      lineage: 'default',
+      isIsolated: true,
+      source: 'auto', // 隔离后是 auto
       column: 2,
       order: 0
     }
     // @ts-ignore
-    group.nodes.push(lockedNode)
+    group.nodes.push(isolatedNode)
 
-    // 2. Unlock and expand
-    store.unlockAndExpand(group.id, 'hullparts')
+    // 2. Connect and expand (模拟用户拖拽)
+    store.connectAndExpand(group.id, 'hullparts', 'default')
 
     // 3. Verify
-    const hullParts = group.nodes.find(n => n.wareId === 'hullparts')
-    expect(hullParts?.isLocked).toBe(false)
+    const hullParts = group.nodes.find((n: any) => n.wareId === 'hullparts')
+    expect(hullParts?.isIsolated).toBe(false)
+    expect(hullParts?.source).toBe('manual') // 用户拖拽是主动行为，变为 manual
     
     // Should have expanded upstream (added Refined Metals)
-    const refinedMetals = group.nodes.find(n => n.wareId === 'refinedmetals')
+    const refinedMetals = group.nodes.find((n: any) => n.wareId === 'refinedmetals')
     expect(refinedMetals).toBeDefined()
     expect(refinedMetals?.source).toBe('auto')
   })
@@ -192,7 +204,7 @@ describe('LogicFlow Locked Node Behavior', () => {
       wareId: 'hullparts',
       moduleId: 'prod_hullparts',
       race: 'default',
-      isLocked: false,
+      isIsolated: false,
       source: 'auto',
       column: 2,
       order: 0
@@ -200,11 +212,11 @@ describe('LogicFlow Locked Node Behavior', () => {
     // @ts-ignore
     group.nodes.push(autoNode)
 
-    // 2. Promote it
-    store.promoteNode(group.id, 'hullparts')
+    // 2. Promote it (使用 nodeId，不是 wareId)
+    store.promoteNode(group.id, 'node-auto')
 
     // 3. Verify
-    const node = group.nodes.find(n => n.wareId === 'hullparts')
+    const node = group.nodes.find((n: any) => n.wareId === 'hullparts')
     expect(node?.source).toBe('manual')
   })
 })

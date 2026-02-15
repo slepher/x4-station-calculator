@@ -117,6 +117,8 @@
 *   **交互大坑**:
     *   **拖拽触发**: 必须模拟 `mouse.move` 配合 `steps` 才能触发 `vuedraggable` 的 `start` 事件并使 `compact-view` 进入 DOM。(✅)
     *   **克隆模式**: 候选区拖拽后原元素应保留，验证方式为检查拖拽前后 `.candidate-ware-item` 数量一致。(✅)
+    *   **DataTransfer 模拟无效**: `vuedraggable` 基于 Sortable.js，不直接监听原生 `DragEvent`。派发 `dragstart`/`drop` 等 HTML5 事件无法触发其内部逻辑，因为缺少 `_underlying_vm_` 属性和 Sortable.js 内部状态。必须使用 Playwright 的 `mouse` API 模拟真实鼠标操作。(✅)
+    *   **lineage 闭包捕获**: `handleAddFromDrop` 使用 `setTimeout` 延迟处理，而 `stopDragging` 在 `handleDragEnd` 中被调用。必须在 setTimeout 外部捕获 `draggingLineage` 的值，否则回调执行时该值已被清空为 `null`。(✅)
 
 ## 🕳️ 历史定位大坑 (Pitfalls)
 

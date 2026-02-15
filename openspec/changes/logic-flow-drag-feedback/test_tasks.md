@@ -169,3 +169,23 @@
     4. **Verify**: 自动生成的依赖节点为虚线边框。
     5. **Verify**: 节点不再包含 🌳 按钮。
 
+### 4.16 UI: Incompatible Drop Target Visibility (Bug Fix)
+- [x] **Scenario**: Drag incompatible ware to existing group.
+  - **Goal**: Verify that groups incompatible with the dragged ware (e.g. Agricultural ware to Industrial group) do not appear as valid drop targets.
+  - **Steps**:
+    1. Create an Industrial group (default).
+    2. Switch to Agricultural tab in Candidate Zone.
+    3. Start dragging `Spaceweed` (or another agricultural/drug item).
+    4. **Verify**: The Industrial group does not show the "Rejected" (Red) state. Instead, it should be hidden or visually disabled (dimmed/non-interactive).
+    5. **Verify**: The "New Line" zone should still accept it (creating a new Agricultural group).
+    6. **Verify**: If there was an existing Agricultural group, it should appear as a valid drop target.
+
+### 4.17 UI: Locked Group Conflict Feedback (Refined)
+- [x] **Scenario**: Drag incompatible ware to LOCKED group.
+  - **Goal**: Verify that if a group is LOCKED, incompatible items still show the RED rejection border instead of disappearing.
+  - **Steps**:
+    1. Create a Terran Industrial group.
+    2. Lock the group.
+    3. Drag an Argon Industrial item (incompatible with Terran) to it.
+    4. **Verify**: The group shows a RED border and "Rejected" label (not dimmed/hidden).
+    5. **Verify**: User understands why they cannot drop it (because it's locked to a specific lineage).

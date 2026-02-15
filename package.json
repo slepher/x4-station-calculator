@@ -15,11 +15,13 @@
     "mockdata": "tsx scripts/mockDataGenerator.ts"
   },
   "dependencies": {
+    "@playwright/test": "^1.57.0",
     "@tailwindcss/postcss": "^4.1.18",
     "autoprefixer": "^10.4.24",
     "js-cookie": "^3.0.5",
     "pinia": "^3.0.4",
     "pinyin-pro": "^3.28.0",
+    "playwright": "^1.57.0",
     "tailwindcss": "^3.4.19",
     "vue": "^3.5.24",
     "vue-i18n": "^11.2.8",
@@ -28,7 +30,6 @@
   },
   "devDependencies": {
     "@pinia/testing": "^1.0.3",
-    "@playwright/test": "^1.58.1",
     "@types/js-cookie": "^3.0.6",
     "@types/jsdom": "^27.0.0",
     "@types/node": "^24.10.9",

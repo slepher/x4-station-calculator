@@ -290,7 +290,7 @@ export interface FlowNode {
   race: string  // 节点偏好的种族 (用于 UI 图标及回溯匹配)
   lineage: string // [新增] 血统元数据 (用于回溯导航)
   column: number // 基于 Tier (0-3)
-  isLocked: boolean
+  isIsolated: boolean // 节点隔离状态（产品占位符 vs 模块）
   isAuto: boolean // [新增] 是否为自动生成的节点
   isRoot: boolean // [新增] 是否为手动添加的根节点
   source: 'manual' | 'auto' // 节点来源

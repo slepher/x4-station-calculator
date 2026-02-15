@@ -46,8 +46,8 @@ const connections = ref<{ d: string, id: string }[]>([])
         }
 
         // B. 锁定状态（EXT/Locked）置底
-        if (a.isLocked && !b.isLocked) return 1
-        if (!a.isLocked && b.isLocked) return -1
+        if (a.isIsolated && !b.isIsolated) return 1
+        if (!a.isIsolated && b.isIsolated) return -1
 
         // C. 来源排序 (Manual 置顶)
         if (a.source === 'manual' && b.source === 'auto') return -1
@@ -73,7 +73,7 @@ const updateConnections = async () => {
 
     props.group.nodes.forEach(targetNode => {
       // Only nodes with modules have inputs (upstream dependencies)
-      if (!targetNode.moduleId || targetNode.isLocked) return
+      if (!targetNode.moduleId || targetNode.isIsolated) return
 
       const module = gameData.modulesMap[targetNode.moduleId]
       if (!module) return
@@ -89,24 +89,26 @@ const updateConnections = async () => {
         // energycell不再进行连线防止过于杂乱
         if (inputWareId === 'energycells') return
 
-        // Find the source node for this input in the same group
-        const sourceNode = props.group.nodes.find(n => n.wareId === inputWareId)
-        if (!sourceNode) return
+        // Find ALL source nodes for this input in the same group
+        // (multiple nodes with same wareId but different lineages)
+        const sourceNodes = props.group.nodes.filter(n => n.wareId === inputWareId)
+        
+        sourceNodes.forEach(sourceNode => {
+          const sourceEl = document.getElementById(`node-${sourceNode.id}`)
+          if (!sourceEl) return
 
-        const sourceEl = document.getElementById(`node-${sourceNode.id}`)
-        if (!sourceEl) return
+          const sourceRect = sourceEl.getBoundingClientRect()
+          const sourceX = sourceRect.right - svgRect.left
+          const sourceY = sourceRect.top - svgRect.top + sourceRect.height / 2
 
-      const sourceRect = sourceEl.getBoundingClientRect()
-      const sourceX = sourceRect.right - svgRect.left
-      const sourceY = sourceRect.top - svgRect.top + sourceRect.height / 2
-
-      // Create a cubic bezier curve
-      const cp1x = sourceX + (targetX - sourceX) / 2
-      const cp2x = sourceX + (targetX - sourceX) / 2
-      
-      const d = `M ${sourceX} ${sourceY} C ${cp1x} ${sourceY}, ${cp2x} ${targetY}, ${targetX} ${targetY}`
-      newConnections.push({ d, id: `${sourceNode.id}-${targetNode.id}` })
-    })
+          // Create a cubic bezier curve
+          const cp1x = sourceX + (targetX - sourceX) / 2
+          const cp2x = sourceX + (targetX - sourceX) / 2
+          
+          const d = `M ${sourceX} ${sourceY} C ${cp1x} ${sourceY}, ${cp2x} ${targetY}, ${targetX} ${targetY}`
+          newConnections.push({ d, id: `${sourceNode.id}-${targetNode.id}` })
+        })
+      })
   })
 
   connections.value = newConnections
@@ -155,8 +157,8 @@ const getGroupName = computed(() => {
       }
 
       // 2. 锁定状态（EXT/Locked）置底
-      if (a.isLocked && !b.isLocked) return 1
-      if (!a.isLocked && b.isLocked) return -1
+      if (a.isIsolated && !b.isIsolated) return 1
+      if (!a.isIsolated && b.isIsolated) return -1
 
       // 3. 来源排序 (Manual 置顶)
       if (a.source === 'manual' && b.source === 'auto') return -1
@@ -190,6 +192,16 @@ const handleReorder = (colIndex: number, newNodes: any[]) => {
   logicFlow.reorderNodes(props.group.id, colIndex, updatedNodes)
 }
 
+const getAttribute = (element: any, attribute: string) => {
+  if (element && typeof element.getAttribute === 'function') {
+    return element.getAttribute(attribute)
+  }
+  if (element?.el && typeof element.el.getAttribute === 'function') {
+    return element.el.getAttribute(attribute)
+  }
+  return null
+}
+
 const handleAdd = (_colIndex: number, event: any) => {
   // draggable adds the item to the local list, we need to handle it in the store
   const ware = event.item._underlying_vm_
@@ -197,7 +209,7 @@ const handleAdd = (_colIndex: number, event: any) => {
   // 关键修复：延迟处理，让 vuedraggable 完成其内部的 DOM 操作
   setTimeout(() => {
     if (ware && ware.id) {
-      const subCategory = event.from?.getAttribute('data-subcategory') || props.group.subCategory
+      const subCategory = getAttribute(event.from, 'data-subcategory') || props.group.subCategory
       
       logicFlow.expandUpstream(props.group.id, ware.id, 'manual', subCategory)
     }

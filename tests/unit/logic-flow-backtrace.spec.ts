@@ -199,20 +199,20 @@ describe('LogicFlow Fallback & Teladi Tracing Logic', () => {
       gameData.findModuleForWare = originalFind
     })
 
-    it('should re-activate and unlock a node if manually added again', () => {
+    it('should re-activate and connect a node if manually added again', () => {
       const group = logicFlow.addGroup('industrial', 'default')
       logicFlow.expandUpstream(group.id, 'scanningarrays', 'manual')
       
       const node = group.nodes.find((n: FlowNode) => n.wareId === 'scanningarrays')
-      // Lock it (clears moduleId)
-      logicFlow.toggleLock(group.id, node.id)
-      expect(node.isLocked).toBe(true)
+      // Isolate it (clears moduleId)
+      logicFlow.toggleNodeIsolation(group.id, node.id)
+      expect(node.isIsolated).toBe(true)
       expect(node.moduleId).toBeUndefined()
       
       // Manually add again
       logicFlow.expandUpstream(group.id, 'scanningarrays', 'manual')
       
-      expect(node.isLocked).toBe(false)
+      expect(node.isIsolated).toBe(false)
       expect(node.moduleId).toBeDefined()
       expect(group.nodes.length).toBeGreaterThan(1) // Should have expanded upstream
     })

@@ -160,6 +160,7 @@
     "auto": "Auto",
     "manual": "Manual",
     "duplicate": "Duplicate",
+    "replace": "Replace",
     "rejected": "Lineage Conflict",
     "clearAll": "Clear All",
     "clickToAddManually": "Click to add manually"

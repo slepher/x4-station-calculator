@@ -119,20 +119,22 @@ describe('LogicFlow Lineage & PK Verification', () => {
     const group = logicFlow.addGroup('industrial', 'default')
     logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'default')
     
-    const hullPartsNode = group.nodes.find(n => n.wareId === 'hullparts')
-    expect(group.nodes.some(n => n.wareId === 'graphene')).toBe(true)
+    const hullPartsNode = group.nodes.find((n: any) => n.wareId === 'hullparts')
+    expect(group.nodes.some((n: any) => n.wareId === 'graphene')).toBe(true)
     
-    // Isolate Hull Parts
+    // Isolate Hull Parts (Manual → Auto + Isolated)
     logicFlow.toggleNodeIsolation(group.id, hullPartsNode.id)
-    expect(hullPartsNode.isLocked).toBe(true)
+    expect(hullPartsNode.isIsolated).toBe(true)
+    expect(hullPartsNode.source).toBe('auto') // 降级为 Auto
     
     // Upstream (Graphene) should be cleaned up if not needed by others
-    expect(group.nodes.some(n => n.wareId === 'graphene')).toBe(false)
+    expect(group.nodes.some((n: any) => n.wareId === 'graphene')).toBe(false)
     
-    // Connect back
+    // Connect back (Isolated → Auto, not Manual)
     logicFlow.toggleNodeIsolation(group.id, hullPartsNode.id)
-    expect(hullPartsNode.isLocked).toBe(false)
-    expect(group.nodes.some(n => n.wareId === 'graphene')).toBe(true)
+    expect(hullPartsNode.isIsolated).toBe(false)
+    expect(hullPartsNode.source).toBe('auto') // 保持 Auto，用户需要手动转正
+    expect(group.nodes.some((n: any) => n.wareId === 'graphene')).toBe(true)
   })
 
   it('should respect group lock when adding new nodes', () => {
@@ -144,5 +146,26 @@ describe('LogicFlow Lineage & PK Verification', () => {
     
     const node = group.nodes.find(n => n.wareId === 'hullparts')
     expect(node.lineage).toBe('terran')
+  })
+
+  it('should allow same wareId with different lineages (not duplicated)', () => {
+    const group = logicFlow.addGroup('industrial', 'default')
+    
+    // 1. Add default Hull Parts
+    logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'default')
+    
+    const defaultNode = group.nodes.find(n => n.wareId === 'hullparts')
+    expect(defaultNode).toBeDefined()
+    expect(defaultNode.source).toBe('manual')
+    
+    // 2. Check status for Teladi Hull Parts - should be 'available', not 'duplicated'
+    const status = logicFlow.getWareGroupStatus(group.id, 'hullparts', 'teladi')
+    expect(status).toBe('available')
+    
+    // 3. Add Teladi Hull Parts - should succeed
+    logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'teladi')
+    
+    // 4. Both should coexist
+    expect(group.nodes.filter(n => n.wareId === 'hullparts').length).toBe(2)
   })
 })

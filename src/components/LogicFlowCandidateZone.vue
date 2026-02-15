@@ -88,7 +88,7 @@ const isDefaultLocked = ref(false)
 const handleDragStart = (evt: any) => {
   const wareId = evt.item.getAttribute('data-ware-id')
   if (wareId) {
-    logicFlow.startDragging(wareId)
+    logicFlow.startDragging(wareId, activeSubCategory.value)
   }
 }
 
@@ -138,8 +138,26 @@ const toggleMenu = (event: MouseEvent, wareId: string) => {
 }
 
 const addToGroup = (groupId: string, wareId: string) => {
-  const race = activeSubCategory.value
-  logicFlow.expandUpstream(groupId, wareId, 'manual', race)
+  const group = logicFlow.groups.find(g => g.id === groupId)
+  if (!group) return
+  
+  const effectiveLineage = group.isLocked ? group.lockedLineage : activeSubCategory.value
+  const status = logicFlow.getWareGroupStatus(groupId, wareId, effectiveLineage)
+  
+  if (status === 'duplicated' || status === 'rejected') {
+    return
+  }
+  
+  if (status === 'isolated') {
+    logicFlow.connectAndExpand(groupId, wareId, effectiveLineage)
+  } else if (status === 'auto') {
+    const node = group.nodes.find(n => n.wareId === wareId)
+    if (node) {
+      logicFlow.promoteNode(groupId, node.id)
+    }
+  } else {
+    logicFlow.expandUpstream(groupId, wareId, 'manual', effectiveLineage)
+  }
   activeMenuWareId.value = null
 }
 
@@ -367,6 +385,8 @@ defineExpose({
                         <span class="flex-1 truncate">{{ group.name }}</span>
                         <span v-if="logicFlow.getWareGroupStatus(group.id, ware.id, activeSubCategory) === 'rejected'" class="text-[10px] ml-2">🚫</span>
                         <span v-else-if="logicFlow.getWareGroupStatus(group.id, ware.id, activeSubCategory) === 'duplicated'" class="text-[10px] ml-2 opacity-50">{{ t('logicFlow.duplicate') }}</span>
+                        <span v-else-if="logicFlow.getWareGroupStatus(group.id, ware.id, activeSubCategory) === 'isolated'" class="text-[10px] ml-2 opacity-70">{{ t('logicFlow.isolate') }}</span>
+                        <span v-else-if="logicFlow.getWareGroupStatus(group.id, ware.id, activeSubCategory) === 'auto'" class="text-[10px] ml-2 opacity-70">{{ t('logicFlow.auto') }}</span>
                         <span v-else-if="group.isLocked" class="text-[10px] ml-2 opacity-50">{{ t('race.' + group.lockedLineage) }}</span>
                       </button>
                     </div>

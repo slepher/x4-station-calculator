@@ -65,7 +65,7 @@ const handleRemove = () => {
   <div 
     class="flow-node group relative px-2 py-1.5 rounded-lg border transition-all duration-300"
     :class="[
-      node.isLocked 
+      node.isIsolated 
         ? 'bg-white/5 border-white/10 opacity-80 grayscale italic border-dashed' 
         : (node.source === 'manual' 
           ? 'bg-white/10 border-white/20 shadow-lg hover:border-blue-500/50 hover:bg-white/15' 
@@ -98,14 +98,14 @@ const handleRemove = () => {
           v-if="canIsolate"
           @click="handleToggleIsolation"
           class="hover:bg-white/10 rounded transition-colors"
-          :title="node.isLocked ? t('logicFlow.connect') : t('logicFlow.isolate')"
+          :title="node.isIsolated ? t('logicFlow.connect') : t('logicFlow.isolate')"
         >
-          <span class="text-[9px]">{{ node.isLocked ? '🔗' : '✂️' }}</span>
+          <span class="text-[9px]">{{ node.isIsolated ? '🔗' : '✂️' }}</span>
         </button>
 
         <!-- Promote Button (+) for Auto Nodes -->
         <button 
-          v-if="node.source === 'auto' && !node.isLocked && !isRawResource"
+          v-if="node.source === 'auto' && !node.isIsolated && !isRawResource"
           @click="handlePromote"
           class="hover:bg-blue-500/20 rounded transition-colors"
           title="Promote to Manual"
@@ -113,9 +113,9 @@ const handleRemove = () => {
           <span class="text-[9px]">➕</span>
         </button>
 
-        <!-- Remove Button for Manual Nodes -->
+        <!-- Remove Button for Manual Nodes (not isolated) -->
         <button 
-          v-if="node.source === 'manual'"
+          v-if="node.source === 'manual' && !node.isIsolated"
           @click="handleRemove"
           class="hover:bg-red-500/20 rounded transition-colors"
           title="Remove"
@@ -129,7 +129,7 @@ const handleRemove = () => {
     <div class="flex items-center justify-between mt-0.5 h-3">
       <div class="flex items-center gap-1 overflow-hidden">
         <span 
-          v-if="node.source === 'auto' && !node.isLocked"
+          v-if="node.source === 'auto' && !node.isIsolated"
           class="text-[7px] font-bold uppercase tracking-tighter px-0.5 rounded bg-blue-500/20 text-blue-400 shrink-0 border border-blue-500/30"
         >
           Auto
@@ -145,7 +145,7 @@ const handleRemove = () => {
 
     <!-- Status indicator for external supply -->
     <div 
-      v-if="node.isLocked" 
+      v-if="node.isIsolated" 
       class="absolute inset-0 flex items-center justify-center pointer-events-none"
     >
       <div class="px-1 py-0.5 bg-black/40 backdrop-blur-sm border border-white/5 rounded text-[7px] font-bold text-white/40 uppercase tracking-widest">

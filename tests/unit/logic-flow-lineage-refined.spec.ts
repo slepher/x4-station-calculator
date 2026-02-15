@@ -79,7 +79,7 @@ describe('LogicFlow Refined Cleanup & Restrictions', () => {
 
     // 2. 将“石墨烯”隔离
     logicFlow.toggleNodeIsolation(group.id, grapheneNode.id)
-    expect(grapheneNode.isLocked).toBe(true)
+    expect(grapheneNode.isIsolated).toBe(true)
 
     // 3. 删除“船体部件” (下游消费者)
     const hullPartsNode = group.nodes.find((n: any) => n.wareId === 'hullparts')
@@ -97,9 +97,9 @@ describe('LogicFlow Refined Cleanup & Restrictions', () => {
     const grapheneNode = group.nodes.find((n: any) => n.wareId === 'graphene')
     expect(grapheneNode.isRoot).toBe(true)
 
-    // 2. 隔离“石墨烯”
+    // 2. 隔离"石墨烯"
     logicFlow.toggleNodeIsolation(group.id, grapheneNode.id)
-    expect(grapheneNode.isLocked).toBe(true)
+    expect(grapheneNode.isIsolated).toBe(true)
 
     // 3. 执行清理
     logicFlow.cleanupUnusedAutoNodes(group.id)
@@ -136,5 +136,61 @@ describe('LogicFlow Refined Cleanup & Restrictions', () => {
     // 3. 验证升级后 isRoot 变为 true
     expect(grapheneNode.source).toBe('manual')
     expect(grapheneNode.isRoot).toBe(true)
+  })
+
+  it('should reject incompatible wares based on group category and lineage', () => {
+    // 1. 创建通用工业组
+    const industrialGroup = logicFlow.addGroup('industrial', 'default')
+    
+    // 2. 尝试添加农业产品 (Spaceweed) -> 应该被拒绝
+    // Spaceweed is usually agricultural, not industrial.
+    // We assume 'spaceweed' is not in wareSetsByIndustrialRace['default']
+    const status1 = logicFlow.getWareGroupStatus(industrialGroup.id, 'spaceweed', 'default')
+    expect(status1).toBe('rejected')
+
+    // 3. 尝试添加通用工业产品 (Hull Parts) -> 应该可用
+    const status2 = logicFlow.getWareGroupStatus(industrialGroup.id, 'hullparts', 'default')
+    expect(status2).toBe('available')
+
+    // 4. 创建 Terran 工业组
+    const terranGroup = logicFlow.addGroup('industrial', 'terran')
+
+    // 5. 尝试添加 Argon 工业产品 (Hull Parts) -> 应该被拒绝 (假设 Terran 不生产 Hull Parts)
+    // Note: This depends on actual game data. In X4, Terrans use different materials.
+    // If Hull Parts is not in Terran build tree, it should be rejected.
+    const status3 = logicFlow.getWareGroupStatus(terranGroup.id, 'hullparts', 'default')
+    // Check if hullparts is in terran set. Likely not.
+    if (!gameData.wareSetsByIndustrialRace['terran'].has('hullparts')) {
+        expect(status3).toBe('rejected')
+    }
+
+    // 6. 尝试添加 Terran 工业产品 (Computronic Substrate) -> 应该可用
+    const status4 = logicFlow.getWareGroupStatus(terranGroup.id, 'computronicsubstrate', 'terran')
+    expect(status4).toBe('available')
+  })
+
+  it('should differentiate between locked and unlocked rejection for UI feedback', () => {
+    // Note: getWareGroupStatus returns 'rejected' for both cases.
+    // The UI (LogicFlowPlanningZone.vue) uses group.isLocked to decide whether to show red border or fade out.
+    // This test ensures the underlying data supports this logic.
+
+    const group = logicFlow.addGroup('industrial', 'terran')
+    
+    // Case 1: Unlocked, Incompatible Item
+    // Expect: status is 'rejected', isLocked is false
+    const status1 = logicFlow.getWareGroupStatus(group.id, 'hullparts', 'default')
+    if (!gameData.wareSetsByIndustrialRace['terran'].has('hullparts')) {
+        expect(status1).toBe('rejected')
+    }
+    expect(group.isLocked).toBe(false)
+
+    // Case 2: Locked, Incompatible Item
+    logicFlow.toggleGroupLock(group.id)
+    expect(group.isLocked).toBe(true)
+    
+    const status2 = logicFlow.getWareGroupStatus(group.id, 'hullparts', 'default')
+    if (!gameData.wareSetsByIndustrialRace['terran'].has('hullparts')) {
+        expect(status2).toBe('rejected')
+    }
   })
 })

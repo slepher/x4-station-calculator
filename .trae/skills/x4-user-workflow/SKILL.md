@@ -62,7 +62,6 @@ When generating or translating spec documents (`.md` in `openspec/`), **YOU MUST
   - **例外说明**：上述限制仅在用户未明确发出排版指令时生效。若用户明确要求“重新排版”或“重构风格”，则 LLM 应按指令执行格式变动。
 
 **工作环境要求**：
-  - **运行环境**：Windows PowerShell（使用分号分隔命令）
   - 使用git的的时候应该禁用less功能, 否则会导致git命令无法正常执行
   - 执行命令行任务的时候应该先确认当前目录为工作目录再执行, 否则会导致任务执行失败
   - i18n 的原则是只要i18n本身, 不需在组件中硬编码fallback 

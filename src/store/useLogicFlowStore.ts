@@ -11,18 +11,21 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   const activeGroupId = ref<string | null>(null)
   const isDragging = ref(false)
   const draggingWareId = ref<string | null>(null)
+  const draggingLineage = ref<string | null>(null)
   const hoveredGroupId = ref<string | null>(null)
   const isHoveringNewZone = ref(false)
 
   // 同步到 state 以便持久化（可选，但目前主要用于测试注入）
-  const startDragging = (wareId: string) => {
+  const startDragging = (wareId: string, lineage?: string) => {
     isDragging.value = true
     draggingWareId.value = wareId
+    draggingLineage.value = lineage || null
   }
 
   const stopDragging = () => {
     isDragging.value = false
     draggingWareId.value = null
+    draggingLineage.value = null
     hoveredGroupId.value = null
     isHoveringNewZone.value = false
   }
@@ -215,6 +218,8 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
 
   /**
    * 切换节点隔离状态 (原 Lock/Unlock)
+   * 隔离操作：Manual → 先降级为 Auto → 再设置 isIsolated = true
+   * 连接操作：isIsolated = false，保持 Auto 状态（用户需要手动转正）
    */
   function toggleNodeIsolation(groupId: string, nodeId: string) {
     const group = groups.value.find(g => g.id === groupId)
@@ -223,21 +228,40 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     const node = group.nodes.find(n => n.id === nodeId)
     if (!node) return
 
-    node.isLocked = !node.isLocked
-
-    if (!node.isLocked) {
-      // 如果切换到连接状态 (Connect)，尝试展开上游
-      if (node.moduleId) {
-        const module = gameData.modulesMap[node.moduleId]
-        if (module?.inputs) {
+    if (!node.isIsolated) {
+      // 切换到隔离状态 (Isolate)
+      // 1. 如果是 Manual，先降级为 Auto（类似删除按钮的行为）
+      if (node.source === 'manual') {
+        node.source = 'auto'
+      }
+      // 2. 设置隔离状态
+      node.isIsolated = true
+      // 3. 清除模块信息（变成产品占位符）
+      node.moduleId = undefined
+      // 4. 删除其他同 wareId 的节点（合并为一个 isolated 节点）
+      const otherNodes = group.nodes.filter(n => n.wareId === node.wareId && n.id !== node.id)
+      otherNodes.forEach(n => {
+        const index = group.nodes.indexOf(n)
+        if (index > -1) {
+          group.nodes.splice(index, 1)
+        }
+      })
+      // 5. 清理不再被需要的上游
+      cleanupUnusedAutoNodes(groupId)
+    } else {
+      // 切换到连接状态 (Connect)
+      node.isIsolated = false
+      // 保持 Auto 状态，用户需要手动转正
+      // 尝试展开上游
+      const module = gameData.findModuleForWare(node.wareId, node.lineage || group.subCategory)
+      if (module) {
+        node.moduleId = module.id
+        if (module.inputs) {
           Object.keys(module.inputs).forEach(inputWareId => {
             expandUpstream(groupId, inputWareId, 'auto', node.lineage)
           })
         }
       }
-    } else {
-      // 如果切换到隔离状态 (Isolate)，清理不再被需要的上游
-      cleanupUnusedAutoNodes(groupId)
     }
   }
 
@@ -250,7 +274,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
 
     return group.nodes.some(n => {
       // 只有非隔离且具有模块 ID 的节点才会依赖上游
-      if (!n.moduleId || n.isLocked) return false
+      if (!n.moduleId || n.isIsolated) return false
       const module = gameData.modulesMap[n.moduleId]
       return module && module.inputs && module.inputs[wareId] !== undefined
     })
@@ -271,15 +295,15 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   }
 
   /**
-   * 将节点转换为锁定状态的 auto 节点
+   * 将节点转换为隔离状态的 auto 节点
    */
-  function convertToLockedAuto(groupId: string, nodeId: string) {
+  function convertToIsolatedAuto(groupId: string, nodeId: string) {
     const group = groups.value.find(g => g.id === groupId)
     if (group) {
       const node = group.nodes.find(n => n.id === nodeId)
       if (node) {
         node.source = 'auto'
-        node.isLocked = true
+        node.isIsolated = true
         node.moduleId = undefined
         cleanupUnusedAutoNodes(groupId)
       }
@@ -340,7 +364,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
           wareId,
           race: 'default',
           lineage: 'default',
-          isLocked: false,
+          isIsolated: false,
           isAuto: true,
           isRoot: false,
           source: 'auto',
@@ -353,9 +377,34 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       return
     }
 
-    // 1. 物理主键检查：moduleId 唯一性 (对于非 T0 资源)
+    // 1. 检查是否存在相同 wareId 的隔离节点
+    // 用户主动拖拽表示要打破隔离状态，将隔离节点转化为新模块
+    const isolatedNode = group.nodes.find(n => n.wareId === wareId && n.isIsolated)
+    if (isolatedNode) {
+      const effectiveLineage = group.isLocked ? group.lockedLineage : (overrideLineage || group.subCategory)
+      const module = gameData.findModuleForWare(wareId, effectiveLineage)
+      
+      if (module) {
+        isolatedNode.isIsolated = false
+        isolatedNode.moduleId = module.id
+        isolatedNode.lineage = effectiveLineage
+        isolatedNode.race = module.race
+        isolatedNode.source = source
+        isolatedNode.isAuto = source === 'auto'
+        isolatedNode.isRoot = source === 'manual'
+        
+        if (module.inputs && source === 'manual') {
+          Object.keys(module.inputs).forEach(inputWareId => {
+            expandUpstream(groupId, inputWareId, 'auto', effectiveLineage)
+          })
+        }
+      }
+      return
+    }
+
+    // 2. 物理主键检查：moduleId 唯一性 (对于非 T0 资源)
     // 首先根据 lineage 确定模块
-    const effectiveLineage = overrideLineage || (group.isLocked ? group.lockedLineage : group.subCategory)
+    const effectiveLineage = group.isLocked ? group.lockedLineage : (overrideLineage || group.subCategory)
     const module = gameData.findModuleForWare(wareId, effectiveLineage)
     
     if (!module) {
@@ -374,14 +423,14 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       return
     }
 
-    // 2. 创建新节点
+    // 3. 创建新节点
     const node: FlowNode = {
       id: crypto.randomUUID(),
       wareId,
       moduleId: module.id,
       race: module.race,
       lineage: effectiveLineage,
-      isLocked: false,
+      isIsolated: false,
       isAuto: source === 'auto',
       isRoot: source === 'manual',
       source: source,
@@ -412,7 +461,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     let insertIndex = 0
     for (let i = group.nodes.length - 1; i >= 0; i--) {
       const existing = group.nodes[i]
-      if (existing.column >= targetTier) {
+      if (existing && existing.column >= targetTier) {
         insertIndex = i + 1
         break
       }
@@ -458,7 +507,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
           if (nodesToRemove.has(otherNode.id) || otherNode.id === node.id) return false
           
           // 如果下游节点被隔离，则它不产生对当前节点（上游）的需求
-          if (otherNode.isLocked) return false
+          if (otherNode.isIsolated) return false
 
           // 获取 otherNode 的输入
           let inputs: string[] = []
@@ -486,7 +535,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
    * 检查产物是否已在任何组中规划（忽略锁定的节点）
    */
   function isWareInAnyGroup(wareId: string) {
-    return groups.value.some(g => g.nodes.some(n => n.wareId === wareId && !n.isLocked))
+    return groups.value.some(g => g.nodes.some(n => n.wareId === wareId && !n.isIsolated))
   }
 
   /**
@@ -512,16 +561,15 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   }
 
   /**
-   * 解锁并扩展上游
+   * 连接并扩展上游
    */
-  function unlockAndExpand(groupId: string, wareId: string) {
+  function connectAndExpand(groupId: string, wareId: string, lineage?: string) {
     const group = groups.value.find(g => g.id === groupId)
     if (!group) return
 
-    const node = group.nodes.find(n => n.wareId === wareId)
-    if (node && node.isLocked) {
-      node.isLocked = false
-      expandUpstream(groupId, wareId, 'manual')
+    const isolatedNode = group.nodes.find(n => n.wareId === wareId && n.isIsolated)
+    if (isolatedNode) {
+      expandUpstream(groupId, wareId, 'manual', lineage)
     }
   }
 
@@ -538,6 +586,40 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       node.isAuto = false
       updateGroupName(group)
     }
+  }
+
+  /**
+   * 替换节点为指定血统的模块（用于不同血统的同种产品替换）
+   */
+  function replaceNodeWithLineage(groupId: string, wareId: string, newLineage: string) {
+    const group = groups.value.find(g => g.id === groupId)
+    if (!group) return
+
+    const node = group.nodes.find(n => n.wareId === wareId)
+    if (!node) return
+
+    const newModule = gameData.findModuleForWare(wareId, newLineage)
+    if (!newModule) return
+
+    // 更新节点信息
+    node.moduleId = newModule.id
+    node.lineage = newLineage
+    node.race = newModule.race
+    node.source = 'manual'
+    node.isAuto = false
+    node.isRoot = true
+
+    // 清理旧的上游
+    cleanupUnusedAutoNodes(groupId)
+
+    // 扩展新的上游
+    if (newModule.inputs) {
+      Object.keys(newModule.inputs).forEach(inputWareId => {
+        expandUpstream(groupId, inputWareId, 'auto', newLineage)
+      })
+    }
+
+    updateGroupName(group)
   }
 
   /**
@@ -559,12 +641,16 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
 
     group.isLocked = !group.isLocked
     if (group.isLocked && lineages.size === 1) {
-      group.lockedLineage = Array.from(lineages)[0]
+      const lineage = Array.from(lineages)[0]
+      if (lineage) {
+        group.lockedLineage = lineage
+      }
     }
   }
 
   /**
    * 获取产物在指定组中的状态
+   * 状态优先级：rejected > duplicated > isolated > auto > available
    */
   function getWareGroupStatus(groupId: string, wareId: string, lineage: string) {
     const group = groups.value.find(g => g.id === groupId)
@@ -576,24 +662,46 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       return 'available'
     }
 
-    // 1. 检查锁定冲突
-    if (group.isLocked) {
-      // 检查该 wareId 是否属于 group.lockedLineage 的回溯集
-      const backtraceSet = group.category === 'industrial' 
-        ? gameData.wareSetsByIndustrialRace[group.lockedLineage]
-        : gameData.wareSetsByRace[group.lockedLineage]
-      
-      if (!backtraceSet?.has(wareId)) {
-        return 'rejected'
-      }
-
-      // 如果属于该血统，但当前拖拽/选择的 lineage 与之不同，标记为需要重映射
-      if (group.lockedLineage !== lineage) {
-        return 'available' // 仍然可用，但 expandUpstream 会执行重映射
-      }
+    // 1. 检查锁定冲突与血统兼容性（最高优先级）
+    const effectiveLineage = group.isLocked ? group.lockedLineage : lineage
+    
+    const backtraceSet = group.category === 'industrial' 
+      ? gameData.wareSetsByIndustrialRace[effectiveLineage]
+      : gameData.wareSetsByRace[effectiveLineage]
+    
+    if (!backtraceSet?.has(wareId)) {
+      return 'rejected'
     }
 
-    // 2. 检查重复 (基于 moduleId)
+    // 2. 查找组内是否存在相同 wareId 的节点
+    const existingNode = group.nodes.find(n => n.wareId === wareId)
+    
+    if (existingNode) {
+      // 2.1 检查是否为隔离节点
+      // 用户主动拖拽表示要打破隔离状态，将隔离节点转化为新模块
+      if (existingNode.isIsolated) {
+        return 'isolated'
+      }
+      
+      // 2.2 检查新模块是否与现有节点的模块相同
+      const newModule = gameData.findModuleForWare(wareId, effectiveLineage)
+      
+      // 2.3 如果模块相同，根据节点类型返回状态
+      if (newModule && existingNode.moduleId === newModule.id) {
+        if (existingNode.source === 'auto') {
+          return 'auto' // 可以转正
+        }
+        return 'duplicated' // 真正的重复
+      }
+      
+      // 2.4 模块不同（不同血统的同种产品）
+      if (existingNode.source === 'auto') {
+        return 'replace' // 可以替换为不同血统
+      }
+      // Manual 节点已存在不同血统，允许添加新节点
+    }
+
+    // 3. 检查重复（基于 moduleId，用于不同 wareId 但相同 module 的情况）
     const module = gameData.findModuleForWare(wareId, lineage)
     if (module && group.nodes.some(n => n.moduleId === module.id)) {
       return 'duplicated'
@@ -607,6 +715,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     activeGroupId,
     isDragging,
     draggingWareId,
+    draggingLineage,
     hoveredGroupId,
     isHoveringNewZone,
     startDragging,
@@ -619,7 +728,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     toggleGroupLock,
     removeNode,
     expandUpstream,
-    unlockAndExpand,
+    connectAndExpand,
     isWareInAnyGroup,
     reorderNodes,
     calculateRequiredT0Wares,
@@ -627,8 +736,9 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     getSortedGroupT0Resources,
     isNodeDepended,
     downgradeNode,
-    convertToLockedAuto,
+    convertToIsolatedAuto,
     promoteNode,
+    replaceNodeWithLineage,
     getWareGroupStatus,
     cleanupUnusedAutoNodes,
   }
