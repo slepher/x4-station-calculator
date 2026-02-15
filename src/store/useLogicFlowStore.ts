@@ -570,9 +570,27 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     const group = groups.value.find(g => g.id === groupId)
     if (!group) return 'available'
 
+    // 0. T0 资源始终可用
+    const ware = gameData.waresMap[wareId]
+    if (ware && (ware.tier === 0 || wareId === 'energycells')) {
+      return 'available'
+    }
+
     // 1. 检查锁定冲突
-    if (group.isLocked && group.lockedLineage !== lineage) {
-      return 'locked'
+    if (group.isLocked) {
+      // 检查该 wareId 是否属于 group.lockedLineage 的回溯集
+      const backtraceSet = group.category === 'industrial' 
+        ? gameData.wareSetsByIndustrialRace[group.lockedLineage]
+        : gameData.wareSetsByRace[group.lockedLineage]
+      
+      if (!backtraceSet?.has(wareId)) {
+        return 'rejected'
+      }
+
+      // 如果属于该血统，但当前拖拽/选择的 lineage 与之不同，标记为需要重映射
+      if (group.lockedLineage !== lineage) {
+        return 'available' // 仍然可用，但 expandUpstream 会执行重映射
+      }
     }
 
     // 2. 检查重复 (基于 moduleId)

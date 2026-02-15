@@ -285,7 +285,6 @@ defineExpose({
             :group="{ name: 'wares', pull: 'clone', put: false }"
             :clone="(original: any) => ({ ...original })"
             :sort="false"
-            :disabled="tier === 0"
             item-key="id"
             :data-subcategory="activeSubCategory"
             @start="handleDragStart"
@@ -361,18 +360,14 @@ defineExpose({
                         @click.stop="addToGroup(group.id, ware.id)"
                         class="context-menu-item"
                         :class="{ 
-                          'opacity-40 cursor-not-allowed pointer-events-none': logicFlow.getWareGroupStatus(group.id, ware.id, activeSubCategory) !== 'available'
+                          'opacity-40 cursor-not-allowed pointer-events-none': logicFlow.getWareGroupStatus(group.id, ware.id, activeSubCategory) === 'rejected',
+                          'opacity-60': logicFlow.getWareGroupStatus(group.id, ware.id, activeSubCategory) === 'duplicated'
                         }"
                       >
-                        <div class="flex items-center justify-between w-full gap-4">
-                          <div class="flex items-center gap-2 min-w-0">
-                            <span class="context-menu-dot" :class="group.category === 'industrial' ? 'context-menu-dot-industrial' : 'context-menu-dot-agricultural'"></span>
-                            <span class="truncate">{{ group.name }}</span>
-                          </div>
-                          <span v-if="logicFlow.getWareGroupStatus(group.id, ware.id, activeSubCategory) !== 'available'" class="text-[9px] font-bold uppercase tracking-tighter text-white/40 bg-white/5 px-1.5 py-0.5 rounded border border-white/10 shrink-0">
-                            {{ t('logicFlow.status.' + logicFlow.getWareGroupStatus(group.id, ware.id, activeSubCategory)) }}
-                          </span>
-                        </div>
+                        <span class="flex-1 truncate">{{ group.name }}</span>
+                        <span v-if="logicFlow.getWareGroupStatus(group.id, ware.id, activeSubCategory) === 'rejected'" class="text-[10px] ml-2">🚫</span>
+                        <span v-else-if="logicFlow.getWareGroupStatus(group.id, ware.id, activeSubCategory) === 'duplicated'" class="text-[10px] ml-2 opacity-50">{{ t('logicFlow.duplicate') }}</span>
+                        <span v-else-if="group.isLocked" class="text-[10px] ml-2 opacity-50">{{ t('race.' + group.lockedLineage) }}</span>
                       </button>
                     </div>
                     <button 

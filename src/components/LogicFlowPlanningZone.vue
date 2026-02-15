@@ -128,6 +128,14 @@ const handleAddToExistingGroup = (groupId: string, event: any) => {
   logicFlow.hoveredGroupId = null
 }
 
+const isRejected = (groupId: string, event: any) => {
+  const wareId = logicFlow.draggingWareId || (event.item?._underlying_vm_?.id)
+  if (!wareId) return false
+  
+  const subCategory = event.from?.getAttribute('data-subcategory') || 'default'
+  return logicFlow.getWareGroupStatus(groupId, wareId, subCategory) === 'rejected'
+}
+
 const isDuplicate = (groupId: string) => {
   if (!logicFlow.draggingWareId) return false
   const group = logicFlow.groups.find(g => g.id === groupId)
@@ -238,7 +246,7 @@ const handleAddFromDrop = (event: any) => {
         :list="[]"
         :group="{ 
           name: 'wares', 
-          put: () => !isDuplicate(group.id), 
+          put: (to: any, from: any, item: any) => !isDuplicate(group.id) && !isRejected(group.id, { from, item }), 
           pull: false 
         }"
         :sort="false"
@@ -246,11 +254,13 @@ const handleAddFromDrop = (event: any) => {
         @add="(event: any) => handleAddToExistingGroup(group.id, event)"
         class="compact-group drop-target bg-white/5 border rounded-2xl p-4 flex flex-col gap-3 transition-all cursor-pointer min-h-[160px]"
         :class="[
-          isDuplicate(group.id) 
-            ? 'border-red-500 bg-red-500/5' 
-            : (isLocked(group.id) 
-                ? 'border-amber-500/50 bg-amber-500/5' 
-                : (logicFlow.hoveredGroupId === group.id ? 'border-blue-500 bg-blue-500/10' : 'border-white/10'))
+          isRejected(group.id, { from: null, item: null })
+            ? 'border-red-600 bg-red-900/10'
+            : (isDuplicate(group.id) 
+              ? 'border-red-500 bg-red-500/5' 
+              : (isLocked(group.id) 
+                  ? 'border-amber-500/50 bg-amber-500/5' 
+                  : (logicFlow.hoveredGroupId === group.id ? 'border-blue-500 bg-blue-500/10' : 'border-white/10')))
         ]"
         @dragenter="logicFlow.hoveredGroupId = group.id"
         @dragleave="logicFlow.hoveredGroupId = null"
@@ -283,7 +293,11 @@ const handleAddFromDrop = (event: any) => {
                 </div>
               </div>
 
-              <div v-if="isDuplicate(group.id)" class="ml-auto text-[10px] text-red-400 font-bold uppercase tracking-widest" data-testid="duplicate-label">
+              <div v-if="isRejected(group.id, { from: null, item: null })" class="ml-auto text-[10px] text-red-500 font-bold uppercase tracking-widest flex items-center gap-1" data-testid="rejected-label">
+                <span>🚫</span>
+                <span>{{ t('logicFlow.rejected') }}</span>
+              </div>
+              <div v-else-if="isDuplicate(group.id)" class="ml-auto text-[10px] text-red-400 font-bold uppercase tracking-widest" data-testid="duplicate-label">
                 {{ t('logicFlow.duplicate') }}
               </div>
               <div v-else-if="isLocked(group.id)" class="ml-auto text-[10px] font-bold uppercase tracking-widest" data-testid="locked-label">
