@@ -204,16 +204,19 @@ defineExpose({
           </button>
         </div>
 
-        <!-- Lock Control (iOS Style placeholder) -->
-        <div class="lock-control">
-          <button 
-            @click="isDefaultLocked = !isDefaultLocked"
-            class="lock-toggle-btn"
-            :class="isDefaultLocked ? 'lock-toggle-btn-active' : 'lock-toggle-btn-inactive'"
-          >
-            <span class="lock-icon">{{ isDefaultLocked ? '🔒' : '🔓' }}</span>
-            <span class="lock-text">{{ isDefaultLocked ? t('logicFlow.lock') : t('logicFlow.unlock') }}</span>
-          </button>
+        <!-- Lock Control (iOS Style) -->
+        <div class="lock-control flex items-center gap-2 ml-4">
+          <label class="relative inline-flex items-center cursor-pointer group">
+            <input 
+              type="checkbox" 
+              v-model="isDefaultLocked" 
+              class="sr-only peer"
+            >
+            <div class="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 transition-colors"></div>
+            <span class="ml-2 text-[10px] font-bold uppercase tracking-widest text-white/40 group-hover:text-white/70 transition-colors">
+              {{ isDefaultLocked ? t('race.' + activeSubCategory) : t('logicFlow.unlock') }}
+            </span>
+          </label>
         </div>
 
         <!-- Race Selection (Secondary Nav moved to Header) -->
@@ -329,7 +332,7 @@ defineExpose({
                 </div>
 
                 <!-- Quick Action Button -->
-                <div class="quick-add-container" v-if="ware.tier > 0 || ware.id === 'energycells'">
+                <div class="quick-add-container" v-if="ware.tier > 0 && ware.id !== 'energycells'">
                   <button 
                     class="quick-add-btn"
                     @click.stop="toggleMenu($event, ware.id)"
@@ -453,27 +456,6 @@ defineExpose({
 
 .tab-dot-inactive {
   @apply bg-white/20;
-}
-
-/* --- Lock Control --- */
-.lock-control {
-  @apply flex items-center h-8;
-}
-
-.lock-toggle-btn {
-  @apply flex items-center gap-2 px-3 py-1 rounded-lg text-[10px] font-bold transition-all border;
-}
-
-.lock-toggle-btn-active {
-  @apply bg-amber-500/20 border-amber-500/50 text-amber-500;
-}
-
-.lock-toggle-btn-inactive {
-  @apply bg-white/5 border-white/10 text-white/40 hover:text-white/60;
-}
-
-.lock-icon {
-  @apply text-[12px];
 }
 
 /* --- Race Filter --- */

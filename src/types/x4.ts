@@ -292,6 +292,7 @@ export interface FlowNode {
   column: number // 基于 Tier (0-3)
   isLocked: boolean
   isAuto: boolean // [新增] 是否为自动生成的节点
+  isRoot: boolean // [新增] 是否为手动添加的根节点
   source: 'manual' | 'auto' // 节点来源
   order: number // 列内垂直排序
 }

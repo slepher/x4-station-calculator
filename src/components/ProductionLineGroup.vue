@@ -223,16 +223,20 @@ const handleAdd = (_colIndex: number, event: any) => {
       </div>
       
       <div class="flex items-center gap-3">
-        <!-- Group Lock Toggle -->
+        <!-- Group Lock Toggle (iOS Style) -->
         <div class="group-lock-control flex items-center gap-2">
-          <button 
-            @click="handleToggleGroupLock"
-            class="group-lock-btn"
-            :class="group.isLocked ? 'group-lock-btn-active' : 'group-lock-btn-inactive'"
-          >
-            <span class="text-[12px]">{{ group.isLocked ? '🔒' : '🔓' }}</span>
-            <span class="text-[10px] font-bold uppercase tracking-widest">{{ group.isLocked ? t('race.' + group.lockedLineage) : t('logicFlow.unlock') }}</span>
-          </button>
+          <label class="relative inline-flex items-center cursor-pointer group">
+            <input 
+              type="checkbox" 
+              :checked="group.isLocked"
+              @change="handleToggleGroupLock"
+              class="sr-only peer"
+            >
+            <div class="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 transition-colors"></div>
+            <span class="ml-2 text-[10px] font-bold uppercase tracking-widest text-white/40 group-hover:text-white/70 transition-colors">
+              {{ group.isLocked ? t('race.' + group.lockedLineage) : t('logicFlow.unlock') }}
+            </span>
+          </label>
         </div>
 
         <button 
@@ -322,16 +326,5 @@ const handleAdd = (_colIndex: number, event: any) => {
   @apply border-white/10 bg-black/30;
 }
 
-/* --- Group Lock Button Styles --- */
-.group-lock-btn {
-  @apply flex items-center gap-2 px-3 py-1.5 rounded-full transition-all border;
-}
 
-.group-lock-btn-active {
-  @apply bg-amber-500/20 border-amber-500/50 text-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.2)];
-}
-
-.group-lock-btn-inactive {
-  @apply bg-white/5 border-white/10 text-white/30 hover:text-white/60 hover:bg-white/10;
-}
 </style>

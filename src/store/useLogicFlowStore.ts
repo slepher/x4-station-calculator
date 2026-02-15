@@ -265,6 +265,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       const node = group.nodes.find(n => n.id === nodeId)
       if (node) {
         node.source = 'auto'
+        node.isRoot = false
       }
     }
   }
@@ -303,6 +304,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
         if (isNodeDepended(groupId, targetNode.wareId)) {
           // 降级为 auto
           targetNode.source = 'auto'
+          targetNode.isRoot = false
         } else {
           // 物理移除
           group.nodes.splice(idx, 1)
@@ -340,6 +342,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
           lineage: 'default',
           isLocked: false,
           isAuto: true,
+          isRoot: false,
           source: 'auto',
           column: ware.tier,
           order: 0
@@ -366,6 +369,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       if (existingNode.source === 'auto' && source === 'manual') {
         existingNode.source = 'manual'
         existingNode.isAuto = false
+        existingNode.isRoot = true
       }
       return
     }
@@ -379,6 +383,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       lineage: effectiveLineage,
       isLocked: false,
       isAuto: source === 'auto',
+      isRoot: source === 'manual',
       source: source,
       column: ware.tier,
       order: 0
@@ -442,16 +447,17 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
 
     while (hasChanged) {
       hasChanged = false
-      const currentAutoNodes = group.nodes.filter(n => n.source === 'auto')
+      // 所有非根节点（包括自动生成的和被提升但失去了下游的）都应参与清理检查
+      const candidates = group.nodes.filter(n => !n.isRoot)
       
-      currentAutoNodes.forEach(node => {
+      candidates.forEach(node => {
         if (nodesToRemove.has(node.id)) return
 
         // 检查是否有任何节点（手动或未被标记删除的自动）依赖于此节点的产出
         const isNeeded = group.nodes.some(otherNode => {
           if (nodesToRemove.has(otherNode.id) || otherNode.id === node.id) return false
           
-          // 如果节点被隔离，则不产生对上游的需求
+          // 如果下游节点被隔离，则它不产生对当前节点（上游）的需求
           if (otherNode.isLocked) return false
 
           // 获取 otherNode 的输入
@@ -606,5 +612,6 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     convertToLockedAuto,
     promoteNode,
     getWareGroupStatus,
+    cleanupUnusedAutoNodes,
   }
 })

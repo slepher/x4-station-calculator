@@ -41,7 +41,9 @@ const isDepended = computed(() => logicFlow.isNodeDepended(props.groupId, props.
 const canIsolate = computed(() => {
   // 基础资源不能隔离（本身就是基础）
   if (isRawResource.value) return false
-  return true
+  // 只有当该节点被下游依赖时，才允许隔离 (✂️)
+  // 手动添加且没有下游的节点，无法隔离
+  return isDepended.value
 })
 
 const handleToggleIsolation = () => {
@@ -91,16 +93,6 @@ const handleRemove = () => {
       
       <!-- Actions (Hover Only) -->
       <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-        <!-- Promote Button (+) for Auto Nodes -->
-        <button 
-          v-if="node.source === 'auto' && !node.isLocked"
-          @click="handlePromote"
-          class="hover:bg-blue-500/20 rounded transition-colors"
-          title="Promote to Manual"
-        >
-          <span class="text-[9px]">➕</span>
-        </button>
-
         <!-- Isolation Toggle (Isolate/Connect) -->
         <button 
           v-if="canIsolate"
@@ -109,6 +101,16 @@ const handleRemove = () => {
           :title="node.isLocked ? t('logicFlow.connect') : t('logicFlow.isolate')"
         >
           <span class="text-[9px]">{{ node.isLocked ? '🔗' : '✂️' }}</span>
+        </button>
+
+        <!-- Promote Button (+) for Auto Nodes -->
+        <button 
+          v-if="node.source === 'auto' && !node.isLocked && !isRawResource"
+          @click="handlePromote"
+          class="hover:bg-blue-500/20 rounded transition-colors"
+          title="Promote to Manual"
+        >
+          <span class="text-[9px]">➕</span>
         </button>
 
         <!-- Remove Button for Manual Nodes -->
