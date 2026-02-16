@@ -261,29 +261,16 @@ const getAttribute = (element: any, attribute: string) => {
 }
 
 const handleAdd = (_colIndex: number, event: any) => {
-  // draggable adds the item to the local list, we need to handle it in the store
   const ware = event.item._underlying_vm_
-  const item = event.item
   
-  // 关键修复：延迟处理，让 vuedraggable 完成其内部的 DOM 操作
-  setTimeout(() => {
-    // 检查拖拽状态是否仍然有效
-    // 如果 isDragging 为 false，说明拖拽已取消
-    if (!logicFlow.isDragging) {
-      return
-    }
-    
-    if (ware && ware.id) {
-      const subCategory = getAttribute(event.from, 'data-subcategory') || props.group.subCategory
-      
-      logicFlow.expandUpstream(props.group.id, ware.id, 'manual', subCategory)
-    }
-    
-    // 手动移除 vuedraggable 插入的 DOM 节点，因为我们的数据模型已经更新并会重新渲染
-    if (item && item.parentNode) {
-      item.parentNode.removeChild(item)
-    }
-  }, 20)
+  if (!logicFlow.isDragging) {
+    return
+  }
+  
+  if (ware && ware.id) {
+    const subCategory = getAttribute(event.from, 'data-subcategory') || props.group.subCategory
+    logicFlow.handleDrop(props.group.id, subCategory)
+  }
 }
 </script>
 

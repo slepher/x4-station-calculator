@@ -572,9 +572,9 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
       await page.evaluate(() => {
         const logicFlow = (window as any).logicFlowStore;
         logicFlow.clearAllGroups();
-        const group = logicFlow.addGroup('industrial', 'terran', 'Locked', true);
-        group.lockedLineage = 'terran';
-        logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'terran');
+        const group = logicFlow.addGroup('industrial', 'default', 'Locked', true);
+        group.lockedLineage = 'default';
+        logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'default');
       });
       await page.waitForTimeout(100);
 
@@ -692,13 +692,13 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
   test.describe('Bug 15: 多组交互', () => {
     test('15.1 多个组之间拖拽应正确切换', async ({ page }) => {
       await dragWareToTarget(page, 'hullparts', '.compact-group');
-      await dragWareToTarget(page, 'energycells', '.compact-group:last-child');
+      await dragWareToTarget(page, 'weaponcomponents', '.compact-group:last-child');
 
       const groupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
       expect(groupCount).toBe(2);
 
-      const weaponCard = page.locator('.ware-card[data-ware-id="weaponcomponents"]').first();
-      const sourceBox = await weaponCard.boundingBox();
+      const refinedmetalsCard = page.locator('.ware-card[data-ware-id="refinedmetals"]').first();
+      const sourceBox = await refinedmetalsCard.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
       await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
@@ -721,10 +721,10 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
         const firstGroup = logicFlow.groups[0];
         return {
           firstGroupNodes: firstGroup.nodes.length,
-          hasWeapon: firstGroup.nodes.some((n: any) => n.wareId === 'weaponcomponents')
+          hasRefinedmetals: firstGroup.nodes.some((n: any) => n.wareId === 'refinedmetals')
         };
       });
-      expect(result.hasWeapon).toBe(true);
+      expect(result.hasRefinedmetals).toBe(true);
     });
   });
 });
@@ -1300,5 +1300,184 @@ test.describe('Module Name Display Tests (E2E)', () => {
 
     console.log('Groups before:', groupsBefore, 'Groups after:', groupsAfter);
     expect(groupsAfter.count).toBe(groupsBefore);
+  });
+
+  test.describe('Bug 16: 血统检查与T0资源问题', () => {
+    test('16.1 锁定规划区拒绝不同血统时不应添加T0资源', async ({ page }) => {
+      // 创建锁定的 Teladi 工业规划区
+      await page.evaluate(() => {
+        const logicFlow = (window as any).logicFlowStore;
+        logicFlow.clearAllGroups();
+        const group = logicFlow.addGroup('industrial', 'teladi', 'Locked Teladi', true);
+        group.lockedLineage = 'teladi';
+        logicFlow.expandUpstream(group.id, 'silicon', 'manual', 'teladi');
+      });
+      await page.waitForTimeout(200);
+
+      // 记录初始 T0 资源
+      const initialT0 = await page.evaluate(() => {
+        const logicFlow = (window as any).logicFlowStore;
+        const group = logicFlow.groups[0];
+        const t0Nodes = group.nodes.filter((n: any) => n.column === 0);
+        return t0Nodes.map((n: any) => n.wareId);
+      });
+      console.log('Initial T0 resources:', initialT0);
+
+      // 切换到 Default 工业分区（不同血统）
+      const industrialButton = page.locator('button:has-text("Industrial")').first();
+      await industrialButton.click();
+      await page.waitForTimeout(200);
+      
+      const defaultButton = page.locator('button:has-text("Default")').first();
+      await defaultButton.click();
+      await page.waitForTimeout(200);
+
+      // 拖拽精炼金属(refinedmetals)到锁定的 Teladi 规划区
+      const refinedmetalsCard = page.locator('.ware-card[data-ware-id="refinedmetals"]').first();
+      await expect(refinedmetalsCard).toBeVisible({ timeout: 5000 });
+      
+      const sourceBox = await refinedmetalsCard.boundingBox();
+      if (!sourceBox) throw new Error('Source not found');
+
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.waitForTimeout(100);
+
+      const compactGroup = page.locator('.compact-group').first();
+      const targetBox = await compactGroup.boundingBox();
+      if (!targetBox) throw new Error('Target not found');
+
+      await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 10 });
+      await page.waitForTimeout(200);
+
+      // 验证：锁定的规划区应该拒绝不同血统产品
+      await expect(compactGroup).toHaveClass(/border-red-600/);
+
+      // 【关键验证】在 hover 预览阶段，UI 上不应显示新增的 T0 资源预览
+      // 检查 T0 资源区域是否有 "isNew" 样式（蓝色边框 + 脉冲动画）
+      const newT0PreviewInUI = await compactGroup.locator('[data-ware-id]').evaluateAll((elements) => {
+        return elements.filter(el => {
+          const classList = el.className;
+          // isNew 的样式：border-blue-500 bg-blue-500/20 animate-pulse scale-110
+          return classList.includes('border-blue-500') && 
+                 classList.includes('animate-pulse');
+        }).map(el => el.getAttribute('data-ware-id'));
+      });
+      console.log('New T0 preview in UI (should be empty):', newT0PreviewInUI);
+      
+      // 由于血统不匹配被拒绝，UI 上不应有任何新增的 T0 资源预览
+      expect(newT0PreviewInUI.length).toBe(0);
+
+      // 同时验证 store 中的实际 T0 资源也未增加
+      const hoverT0 = await page.evaluate(() => {
+        const logicFlow = (window as any).logicFlowStore;
+        const group = logicFlow.groups[0];
+        const t0Nodes = group.nodes.filter((n: any) => n.column === 0);
+        return t0Nodes.map((n: any) => n.wareId);
+      });
+      console.log('Hover T0 resources in store:', hoverT0);
+      expect(hoverT0.length).toBe(initialT0.length);
+
+      await page.mouse.up();
+      await page.waitForTimeout(300);
+
+      // 验证：drop 后 T0 资源也不应增加
+      const finalT0 = await page.evaluate(() => {
+        const logicFlow = (window as any).logicFlowStore;
+        const group = logicFlow.groups[0];
+        const t0Nodes = group.nodes.filter((n: any) => n.column === 0);
+        return t0Nodes.map((n: any) => n.wareId);
+      });
+      console.log('Final T0 resources:', finalT0);
+
+      expect(finalT0.length).toBe(initialT0.length);
+      expect(finalT0).toEqual(expect.arrayContaining(initialT0));
+    });
+
+    test('16.2 未锁定规划区应接受不同血统产品', async ({ page }) => {
+      // 先关闭默认锁定开关
+      const lockCheckbox = page.locator('.lock-control input[type="checkbox"]').first();
+      if (await lockCheckbox.isChecked()) {
+        await lockCheckbox.uncheck({ force: true });
+        await page.waitForTimeout(200);
+      }
+
+      // 切换到 Terran 医疗分区
+      const agriculturalButton = page.locator('button:has-text("Agri/Life")').first();
+      await agriculturalButton.click();
+      await page.waitForTimeout(200);
+      
+      const terranButton = page.locator('button:has-text("Terran")').first();
+      await terranButton.click();
+      await page.waitForTimeout(200);
+
+      // 拖拽医疗产线到新建区域
+      const medicalsuppliesCard = page.locator('.ware-card[data-ware-id="medicalsupplies"]').first();
+      await expect(medicalsuppliesCard).toBeVisible({ timeout: 5000 });
+      
+      const sourceBox = await medicalsuppliesCard.boundingBox();
+      if (!sourceBox) throw new Error('Source not found');
+
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.waitForTimeout(100);
+
+      const compactGroup = page.locator('.compact-group').first();
+      const targetBox = await compactGroup.boundingBox();
+      if (!targetBox) throw new Error('Target not found');
+
+      await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 10 });
+      await page.waitForTimeout(200);
+      await page.mouse.up();
+      await page.waitForTimeout(300);
+
+      // 验证组已创建且未锁定
+      const groupState = await page.evaluate(() => {
+        const logicFlow = (window as any).logicFlowStore;
+        const group = logicFlow.groups[0];
+        return {
+          isLocked: group?.isLocked || false,
+          hasMedical: group?.nodes?.some((n: any) => n.wareId === 'medicalsupplies') || false
+        };
+      });
+      expect(groupState.isLocked).toBe(false);
+      expect(groupState.hasMedical).toBe(true);
+
+      // 切换到工业分区 Default
+      const industrialButton = page.locator('button:has-text("Industrial")').first();
+      await industrialButton.click();
+      await page.waitForTimeout(200);
+      
+      const defaultButton = page.locator('button:has-text("Default")').first();
+      await defaultButton.click();
+      await page.waitForTimeout(200);
+
+      // 拖拽石墨烯到未锁定的规划区
+      const grapheneCard = page.locator('.ware-card[data-ware-id="graphene"]').first();
+      await expect(grapheneCard).toBeVisible({ timeout: 5000 });
+      
+      const grapheneSourceBox = await grapheneCard.boundingBox();
+      if (!grapheneSourceBox) throw new Error('Graphene source not found');
+
+      await page.mouse.move(grapheneSourceBox.x + grapheneSourceBox.width / 2, grapheneSourceBox.y + grapheneSourceBox.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(grapheneSourceBox.x + grapheneSourceBox.width / 2 + 5, grapheneSourceBox.y + grapheneSourceBox.height / 2 + 5);
+      await page.waitForTimeout(100);
+
+      const existingGroup = page.locator('.compact-group').first();
+      const existingTargetBox = await existingGroup.boundingBox();
+      if (!existingTargetBox) throw new Error('Existing target not found');
+
+      await page.mouse.move(existingTargetBox.x + existingTargetBox.width / 2, existingTargetBox.y + existingTargetBox.height / 2, { steps: 10 });
+      await page.waitForTimeout(200);
+
+      // 验证：未锁定的规划区应该接受不同血统产品（不应显示红色边框）
+      await expect(existingGroup).not.toHaveClass(/border-red-600/);
+
+      await page.mouse.up();
+      await page.waitForTimeout(300);
+    });
   });
 });

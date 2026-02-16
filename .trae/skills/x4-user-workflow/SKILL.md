@@ -9,7 +9,7 @@ This skill acts as the central orchestrator for the X4 Station Calculator projec
 
 ## Project Standards (MANDATORY)
 
-**1. Immutable Headers (English Only)**f
+### 1. Immutable Headers (English Only)
 When generating or translating spec documents (`.md` in `openspec/`), **YOU MUST** preserve the following headers in English:
 - `# [Name] Specification`
 - `## Purpose`
@@ -20,46 +20,92 @@ When generating or translating spec documents (`.md` in `openspec/`), **YOU MUST
 - `## REMOVED Requirements`
 - `## RENAMED Requirements`
 
-**2. Localization (Match User Language)**
+### 2. Localization (Match User Language)
 - **Body Content**: The content (Purpose, Requirement descriptions, Scenario steps) **MUST** be written in the user's current conversation language (e.g., Chinese).
 - **Design Docs**: The content of `design.md` (Architecture, Decisions, etc.) **MUST** be written in the user's current conversation language.
 - **Keywords**: Keep technical terms, code references, and keywords (`SHALL`, `MUST`) in English.
 - **Scenario Keywords (Chinese)**: `**前提**` (Given), `**当**` (When), `**那么**` (Then), `**并且**` (And).
 
-**3. Delta Structures (For Changes)**
+### 3. Delta Structures (For Changes)
 - **ADDED**: Use `## ADDED Requirements` for new features instead of `## Requirements`.
 - **MODIFIED**: Use `## MODIFIED Requirements` for changes to existing logic.
 - **RENAMED**: `- FROM: ### Requirement: [Old Name]` / `- TO:   ### Requirement: [New Name]`
 - **REMOVED**: Must include justification. No `Scenario` blocks.
 
-**4. Test Planning (`test_tasks.md`)**
-- **Sync Rule**: Whenever `tasks.md` is created/updated, **YOU MUST** simultaneously create or update `test_tasks.md`.
-- **Feature Additions & Bug Fixes**: If new functionality is added OR a bug is fixed during implementation, **YOU MUST** add corresponding verification steps to `test_tasks.md`.
-- **Language**: The content of test tasks **MUST** be written in the user's current conversation language (e.g., Chinese).
-- **Grouping**: Tasks **MUST** be grouped into "**Unit Tests**" (for logic/functions) and "**Web Integration Tests**" (for UI/E2E).
-- **Performance First**: Web Integration Tests **MUST** be designed for extreme speed (target <500ms per interaction). Avoid long waits.
-- **Content**: Defines specific verification steps. Must be comprehensive and logically split.
-- **Mapping**: Future test scripts will map 1:1 to these items.
+### 4. Request Document (`request.md`)
+- **Purpose**: Captures the complete discussion conclusions before entering `/x4:new` or `/x4:ff`.
+- **Location**: Same directory as `design.md` (i.e., `openspec/changes/<change-name>/request.md`).
+- **Role**: **Single Source of Truth** for generating all OpenSpec artifacts. Nothing should be omitted.
+- **Content Requirements**:
+  - Feature description and business context
+  - User scenarios and acceptance criteria
+  - Technical constraints and dependencies
+  - Any decisions made during discussion
+- **Timing**: Created at the end of `/x4:discuss` phase, before `/x4:new` or `/x4:ff`.
 
-**5. Test Experience & Locator Loop (MANDATORY)**
+### 5. Bug Tracking (`bugs.md`)
+- **Purpose**: Records all bugs discovered during development and testing.
+- **Location**: `openspec/changes/<change-name>/bugs.md`.
+- **Content Format**:
+  ```markdown
+  ## Bug: [Bug Name]
+  - **ID**: BUG-001
+  - **Description**: [Detailed description]
+  - **Steps to Reproduce**: [Step-by-step instructions]
+  - **Expected Behavior**: [What should happen]
+  - **Actual Behavior**: [What actually happens]
+  - **Status**: [New | Confirmed | Fixed | Verified]
+  - **Related Test**: [Link to test_tasks.md item]
+  ```
+- **Workflow**:
+  1. When a bug is reported, add it to `bugs.md`
+  2. Generate a reproduction test in `test_tasks.md`
+  3. Run reproduction test to confirm bug exists
+  4. Fix the bug
+  5. Run reproduction test to verify fix
+
+- **Unrelated Bug Handling**:
+  - If a reported bug is unrelated to any existing change, create a new change: `fix-<bug-name>`
+  - This new change should contain only `bugs.md` and `test_tasks.md`
+  - Follow standard workflow for the fix
+
+### 6. Test Planning (`test_tasks.md`)
+- **Sync Rule**: Whenever `tasks.md` is created/updated, **YOU MUST** simultaneously create or update `test_tasks.md`.
+- **Language**: The content **MUST** be written in the user's current conversation language (e.g., Chinese).
+- **Grouping**: Tasks **MUST** be grouped into "**Unit Tests**" and "**Web Integration Tests**".
+- **Content Format** (each test item must include):
+  ```markdown
+  - [ ] [Test Name]
+    - **目标**: [What is being tested]
+    - **步骤**:
+      1. [Step 1]
+      2. [Step 2]
+      3. ...
+    - **Bug现状**: [If this is a bug reproduction test, describe current broken behavior]
+    - **期待结果**: [Expected outcome]
+  ```
+- **1:1 Mapping**: Each item in `test_tasks.md` maps to exactly one test case in the test files.
+- **Performance**: Web Integration Tests target <500ms per interaction.
+
+### 7. Test Experience & Locator Loop (MANDATORY)
 - **Sync Rule**: Whenever an E2E test passes or fails due to a locator issue, **YOU MUST** immediately update `openspec/test_experience.md`.
 - **Content**: Record the successful DOM path (✅), the logical description, and any "Pitfalls" (e.g., timing issues, i18n mismatches).
 - **Continuity**: Updating this documentation is a sub-step of the current task. Do NOT terminate the turn after updating.
 
-**6. Zero-Code Policy during Planning**
-- **Scope**: Applies to `/x4:discuss`, `/x4:ff`, and `/x4:new` phases.
+### 8. Zero-Code Policy during Planning
+- **Scope**: Applies to `/x4:discuss`, `/x4:doc`, `/x4:ff`, and `/x4:new` phases.
 - **Restriction**: **STRICTLY FORBIDDEN** to modify, create, or delete any source code files (e.g., `.ts`, `.vue`, `.js`, `.json` outside `openspec/`) until the implementation phase (`/x4:apply`) begins.
 - **Allowed**: Only files within `openspec/` directory are mutable during planning.
 
-**6. Specs Directory Structure**
+### 9. Specs Directory Structure
 - **Feature Folders**: All specs MUST reside in a feature-specific subdirectory under `specs/` (e.g., `specs/title-as-plan-title/spec.md`). Do NOT place spec files directly in `specs/`.
 
-**7. General Development Rules (Imported from Project Rules)**
+### 10. General Development Rules (Imported from Project Rules)
 **变更零污染准则 (Zero-Contamination Principle)**：
   - **禁止重写非变动逻辑**：LLM 严禁自行手工编写、复写或重构任何任务目标之外的逻辑行。在构造替换文本时，除必须修改的逻辑点外，其余部分必须与原文件内容保持物理一致, 但是可以提醒用户, 逻辑存在问题, 请检查并修复。
   - **禁止添加或者删除注释**：LLM 严禁添加或删除任何代码行中的注释。即使注释内容错误或不规范，也不能被修改。但是可以提醒用户, 注释内容必须与代码逻辑保持一致。
-  - **否定排版偏好**：原始代码的排版（包括缩进、空格、换行等）被视为受保护的项目资产。严禁以“美化”、“优化”或“清理”为由进行任何未授权的变动。但是可以提醒用户, 排版存在问题, 请检查并修复。
-  - **例外说明**：上述限制仅在用户未明确发出排版指令时生效。若用户明确要求“重新排版”或“重构风格”，则 LLM 应按指令执行格式变动。
+  - **否定排版偏好**：原始代码的排版（包括缩进、空格、换行等）被视为受保护的项目资产。严禁以"美化"、"优化"或"清理"为由进行任何未授权的变动。但是可以提醒用户, 排版存在问题, 请检查并修复。
+  - **例外说明**：上述限制仅在用户未明确发出排版指令时生效。若用户明确要求"重新排版"或"重构风格"，则 LLM 应按指令执行格式变动。
 
 **工作环境要求**：
   - 使用git的的时候应该禁用less功能, 否则会导致git命令无法正常执行
@@ -67,65 +113,306 @@ When generating or translating spec documents (`.md` in `openspec/`), **YOU MUST
   - i18n 的原则是只要i18n本身, 不需在组件中硬编码fallback 
     **举例** 是t('ui.volume_overview') 而不是 t('ui.volume_overview') || 'Volume Overview'
 
+**Vue 拖拽开发原则 (vuedraggable/Sortable.js)**：
+  - **核心原则**: 拖拽只负责发送信号，Store 负责生成节点，Vue 负责渲染。
+    ```
+    拖拽 → 发送 wareId → Store 生成节点 → Vue 渲染 UI
+    ```
+  - **问题根源**: `vuedraggable` 默认是 **移动 (Move)** 行为。即使配置 `pull: 'clone'`，如果目标容器 DOM 结构在拖拽过程中剧烈变动（如 `v-show` 切换视图），可能退化为"移动"，导致源节点从候选区消失。
+  - **实现规范**:
+    1. **禁止手动 DOM 操作**: 永远不要在 drop handler 中使用 `removeChild` 或 `setTimeout` 操作 DOM。让 Vue 根据数据变化自动更新 UI。
+    2. **投放区使用空数组**: Drop Zone 的 `list` 绑定到空数组 `[]`，防止 `vuedraggable` 尝试插入克隆节点，确保只触发 `@add` 事件：
+       ```vue
+       <draggable :list="[]" :group="{ name: 'wares', pull: false, put: true }" @add="handleDropSignal" />
+       ```
+    3. **干净的 clone 函数**: 候选区的 `clone` 返回干净副本，防止引用污染：
+       ```typescript
+       :clone="(ware) => ({ ...ware, instanceId: Math.random() })"
+       ```
+  - **反模式警告**:
+    - ❌ 在 drop handler 中手动 `item.parentNode.removeChild(item)`
+    - ❌ 使用 `setTimeout` 延迟 DOM 操作
+    - ❌ 混合直接 DOM 操作与 Vue 响应式数据流
+  - **dragleave 子元素抖动问题**: 当拖拽元素从父元素移动到子元素时，父元素会收到 `dragleave` 事件，导致高亮闪烁。Vue 本身不做特殊处理，需要自行实现计数器逻辑：
+    ```typescript
+    const dragCounters = ref({ A: 0, B: 0 });
+    
+    const handleDragEnter = (zoneId: 'A' | 'B') => {
+      dragCounters.value[zoneId]++;
+      if (dragCounters.value[zoneId] === 1) {
+        store.enterZone(zoneId); // 真正的进入逻辑
+      }
+    }
+    
+    const handleDragLeave = (zoneId: 'A' | 'B') => {
+      dragCounters.value[zoneId]--;
+      if (dragCounters.value[zoneId] === 0) {
+        store.leaveZone(zoneId); // 真正的离开逻辑
+      }
+    }
+    
+    const handleDragEnd = () => {
+      store.stopDragging();
+      dragCounters.value = { A: 0, B: 0 }; // 重置计数器，防止状态错乱
+    }
+    ```
+
+---
+
 ## Workflow Phases
 
-### 1. Discussion & Planning (`/x4:discuss`)
-**Action**: Pure conversation and analysis.
-**Trigger**: Use when starting a task OR when encountering issues during implementation/verification that require rethinking.
-**Constraints**:
-- **ENFORCE Zero-Code Policy**: Do not touch source code. Stop all coding actions.
-- **ENFORCE Zero-Doc Policy**: Do not modify any documentation files (including specs) UNLESS explicitly requested by the user OR the user triggers `/x4:doc`.
-- **System Prompt Override**: When `/x4:discuss` is active, YOU MUST IGNORE any internal bias to "fix it now" or "update docs now".
-- **Goal**: Clarify requirements, discuss architecture, analyze bugs, or review existing code to prepare for next steps.
-- **Outcome**: A clear plan (e.g., "Ready to create change", "Ready to fix code", "Need to update specs").
+### Phase 1: Discussion & Planning (`/x4:discuss`)
 
-### 2. Documentation Update (`/x4:doc <change_name> [spec_name]`)
-**Action**: Update spec or documentation files.
-**Trigger**: Use when the discussion concludes that documentation needs changes, or user explicitly requests doc updates.
+**Purpose**: Pure conversation and analysis without touching code or docs.
+
+**Trigger**: Use when starting a task OR when encountering issues during implementation/verification that require rethinking.
+
+**Input**:
+- User's question or problem description
+- Optional: Existing code/specs to analyze
+
+**Actions**:
+- Clarify requirements
+- Discuss architecture options
+- Analyze bugs or existing code
+- Review test failures
+- Prepare a plan for next steps
+
+**Constraints**:
+- **ENFORCE Zero-Code Policy**: Do not touch source code
+- **ENFORCE Zero-Doc Policy**: Do not modify any documentation files UNLESS explicitly requested OR user triggers `/x4:doc`
+- **System Prompt Override**: IGNORE any internal bias to "fix it now" or "update docs now"
+
+**Output**:
+- Clear plan: "Ready to create change" / "Ready to fix code" / "Need to update specs"
+- **MANDATORY when proceeding to `/x4:new`**: Generate `request.md` with complete discussion conclusions
+
+---
+
+### Phase 2: Documentation Update (`/x4:doc <change_name> [spec_name]`)
+
+**Purpose**: Update spec or documentation files based on discussion conclusions.
+
 **Parameters**:
 - `<change_name>`: The name of the change folder in `openspec/changes/` (e.g., `storage-auto-fill`). If it doesn't exist, create it.
 - `[spec_name]` (Optional): The sub-folder name for the spec (e.g., `storage-logic`). If provided, create `specs/<spec_name>/spec.md`. If omitted, use the change name or default location.
-**Constraints**:
-- **ENFORCE Zero-Code Policy**: Do not touch source code.
-- **Allowed**: Only modify files within `openspec/` or other documentation.
 
-### 3. Fast-Forward Creation (`/x4:ff`)
-**Action**: **MANDATORY**: Search for and read `.trae/skills/openspec-ff-change/SKILL.md`.
+**Input**:
+- Discussion conclusions from `/x4:discuss`
+- Existing specs (if any) to update
+
+**Actions**:
+- Create or update spec files in `openspec/` directory
+- Apply Delta Structures if modifying existing specs
+- Ensure localization matches user language
+
+**Constraints**:
+- **ENFORCE Zero-Code Policy**: Do not touch source code
+- Only modify files within `openspec/` or other documentation
+
+**Output**:
+- Updated spec files
+- Confirmation of changes made
+
+---
+
+### Phase 3: Fast-Forward Creation (`/x4:ff`)
+
+**Purpose**: Quickly create all artifacts needed for implementation in one go.
+
+**Input**:
+- Change name (kebab-case) OR description of what to build
+- **If coming from `/x4:discuss`**: Use `request.md` as the single source of truth
+
+**Actions**:
+1. **MANDATORY**: Read `.trae/skills/openspec-ff-change/SKILL.md` for detailed steps
+2. Create change directory: `openspec new change "<name>"`
+3. Generate all artifacts in dependency order (based on `request.md` content):
+   - `spec.md` (or delta spec)
+   - `design.md` (if needed)
+   - `tasks.md`
+   - `test_tasks.md` (MANDATORY for functional changes)
+   - `bugs.md` (if bugs were identified)
+
 **Context Injection**:
-- **Language**: You MUST generate all documentation (specs, tasks) in the user's current conversation language (e.g., Chinese).
-- **No-Translate**: Do NOT translate `Requirement:`, `Scenario:`, or `SHALL`/`MUST` keywords.
-- **Test Tasks**: You MUST generate `test_tasks.md` immediately after the spec/tasks are created.
-**Constraints**:
-- **ENFORCE Zero-Code Policy**: Do not touch source code.
-- Apply **Project Standards** immediately.
+- **Language**: Generate all documentation in user's current conversation language
+- **No-Translate**: Do NOT translate `Requirement:`, `Scenario:`, or `SHALL`/`MUST` keywords
+- **Test Tasks**: Generate `test_tasks.md` immediately after spec/tasks are created
 
-### 4. New Change Step-by-Step (`/x4:new`)
-**Action**: **MANDATORY**: Search for and read `.trae/skills/openspec-new-change/SKILL.md`.
 **Constraints**:
-- **ENFORCE Zero-Code Policy**: Do not touch source code.
-- Apply **Project Standards** immediately.
-- Ensure `test_tasks.md` is included in the planned artifacts.
+- **ENFORCE Zero-Code Policy**: Do not touch source code
+- Apply **Project Standards** immediately
+- **Nothing from `request.md` should be omitted**
 
-### 5. Implement Change (`/x4:apply`)
-**Action**: **MANDATORY**: Search for and read `.trae/skills/openspec-apply-change/SKILL.md`.
-**Constraints**:
-- For implementation tasks, refer to `#x4-test` for coding guidelines (imports, data mocking).
+**Output**:
+- Change directory with all artifacts
+- Status: "All artifacts created! Ready for implementation."
 
-### 6. Verify Change (`/x4:verify`)
-**Action**: **MANDATORY**: Search for and read `.trae/skills/openspec-verify-change/SKILL.md`.
-**Constraints**:
-- Trigger E2E tests using `#x4-test`.
-- Update `test_tasks.md` status (`[x]` or `[ ]`) based on results.
+---
 
-### 7. Archive Change (`/x4:archive`)
-**Action**: **MANDATORY**: Search for and read `.trae/skills/openspec-archive-change/SKILL.md`.
+### Phase 4: New Change Step-by-Step (`/x4:new`)
+
+**Purpose**: Create artifacts one by one with user confirmation at each step.
+
+**Input**:
+- Change name or description
+- **If coming from `/x4:discuss`**: Use `request.md` as the single source of truth
+
+**Actions**:
+1. **MANDATORY**: Read `.trae/skills/openspec-new-change/SKILL.md` for detailed steps
+2. Create each artifact with user review between steps
+3. **Ensure all content from `request.md` is reflected in artifacts**
+
 **Constraints**:
-- **Strictly Follow Protocol**: You MUST load and read `openspec-archive-change/SKILL.md` and follow its steps exactly. Do not improvise.
-- **Promote Specs (New Feature)**: If `specs/<feature>/spec.md` does not exist, you MUST manually CREATE and MERGE the spec (stripping Delta headers) into that location BEFORE calling openspec-archive.
-- **Promote Specs (Existing)**: If it exists, let `openspec-archive-change` handle the sync.
-- Verify `test_tasks.md` is fully checked (`[x]`).
+- **ENFORCE Zero-Code Policy**: Do not touch source code
+- Apply **Project Standards** immediately
+- Ensure `test_tasks.md` is included in the planned artifacts
+
+**Output**:
+- Change directory with artifacts created step by step
+
+---
+
+### Phase 5: Implement Change (`/x4:apply`)
+
+**Purpose**: Execute implementation tasks from `tasks.md`.
+
+**Input**:
+- Change name (optional, inferred from context if possible)
+
+**Actions**:
+1. **MANDATORY**: Read `.trae/skills/openspec-apply-change/SKILL.md` for detailed steps
+2. Read context files (specs, design, tasks)
+3. Implement each task sequentially
+4. Mark tasks complete: `- [ ]` → `- [x]`
+5. **If bugs are discovered**:
+   - Add to `bugs.md`
+   - Add reproduction test to `test_tasks.md`
+   - Run reproduction test to confirm bug
+   - Fix bug
+   - Verify fix with test
+
+**Bug Discovery Workflow**:
+```
+发现 Bug → 记录到 bugs.md → 添加复现测试到 test_tasks.md 
+→ 运行复现测试确认 Bug 存在 → 修复 Bug → 运行测试验证修复
+```
+
+**Unrelated Bug Handling**:
+If a bug is discovered that is unrelated to the current change:
+1. Note the bug for later
+2. After current change is complete, create new change: `fix-<bug-name>`
+3. The new change contains only `bugs.md` and `test_tasks.md`
+
+**Constraints**:
+- For coding guidelines, refer to `#x4-test` skill
+- Follow **变更零污染准则** strictly
+- Update `test_tasks.md` if new test cases are discovered during implementation
+
+**Output**:
+- Implemented code changes
+- Updated `tasks.md` with completion status
+- Updated `bugs.md` (if bugs were found and fixed)
+
+---
+
+### Phase 6: Verify Change (`/x4:verify`)
+
+**Purpose**: Validate implementation matches specs and all tests pass.
+
+**Input**:
+- Change name (optional, inferred from context if possible)
+
+**Actions**:
+1. **MANDATORY**: Read `.trae/skills/openspec-verify-change/SKILL.md` for detailed steps
+2. Run `npm run build` to ensure no syntax errors
+3. **MANDATORY**: Invoke `x4-test` skill via Skill tool to execute Unit and E2E tests
+4. **After each test run**: Update `test_tasks.md` status immediately
+5. **MANDATORY**: Update `openspec/test_experience.md` for any locator discoveries
+
+**x4-test Integration**:
+- Call `Skill` tool with `name: "x4-test"` to load the test skill
+- Follow x4-test instructions to:
+  - Write unit tests (Vitest) for each `test_tasks.md` Unit Tests item
+  - Write E2E tests (Playwright) for each `test_tasks.md` Web Integration Tests item
+  - Run tests and update `test_tasks.md` status
+- Each test case maps 1:1 to a `test_tasks.md` checklist item
+
+**Verification Dimensions**:
+- **Completeness**: All tasks done, all requirements implemented
+- **Correctness**: Implementation matches spec intent
+- **Coherence**: Follows design decisions and project patterns
+
+**Output**:
+- Verification report with pass/fail status
+- Updated `test_tasks.md` (synced after each test run)
+- Updated `test_experience.md` (if applicable)
+
+---
+
+### Phase 7: Archive Change (`/x4:archive`)
+
+**Purpose**: Finalize and archive the completed change.
+
+**Input**:
+- Change name (optional, inferred from context if possible)
+
+**Actions**:
+1. **MANDATORY**: Read `.trae/skills/openspec-archive-change/SKILL.md` and follow exactly
+2. Verify all `test_tasks.md` items are checked `[x]`
+3. Verify all bugs in `bugs.md` are marked as "Verified" (if applicable)
+4. Promote specs to `specs/<feature>/spec.md` (strip Delta headers)
+5. Archive the change
+
+**Constraints**:
+- **Strictly Follow Protocol**: Load and follow `openspec-archive-change/SKILL.md` exactly
+- **Promote Specs (New Feature)**: If `specs/<feature>/spec.md` doesn't exist, CREATE and MERGE the spec (stripping Delta headers) BEFORE calling openspec-archive
+- **Promote Specs (Existing)**: If it exists, let `openspec-archive-change` handle the sync
+
+**Output**:
+- Archived change
+- Updated main specs
+
+---
+
+## Change Directory Structure
+
+```
+openspec/changes/<change-name>/
+├── request.md          # Discussion conclusions (single source of truth)
+├── spec.md             # Feature specification
+├── design.md           # Technical design
+├── tasks.md            # Implementation tasks
+├── test_tasks.md       # Test cases (Unit + Integration)
+├── bugs.md             # Bug tracking (if bugs were found)
+└── specs/              # Delta specs (if modifying existing)
+```
+
+---
+
+## Collaboration with x4-test
+
+The `x4-test` skill handles all E2E test coding and execution. Key integration points:
+
+| Phase | x4-test Integration |
+|-------|---------------------|
+| `/x4:ff` | Generates `test_tasks.md` structure |
+| `/x4:apply` | Reference for coding standards |
+| `/x4:verify` | Executes tests, updates `test_tasks.md` and `test_experience.md` |
+
+**Locator Loop Protocol** (from project rules):
+- On test failure (timeout/element not found): Read `test_experience.md` → Update error attempts → Continue fixing
+- On test success: Record correct locator path to `test_experience.md` → Continue task
+- **NEVER terminate turn after updating experience doc**
+
+---
 
 ## Guardrails
-- **NEVER** translate `Requirement:` or `Scenario:` prefixes.
-- **NEVER** proceed without `test_tasks.md` when functional changes are involved.
-- **NEVER** modify source code during `/x4:discuss`, `/x4:doc`, `/x4:ff`, or `/x4:new`. Wait for `/x4:apply`.
+
+- **NEVER** translate `Requirement:` or `Scenario:` prefixes
+- **NEVER** proceed without `test_tasks.md` when functional changes are involved
+- **NEVER** modify source code during `/x4:discuss`, `/x4:doc`, `/x4:ff`, or `/x4:new`. Wait for `/x4:apply`
+- **NEVER** skip updating `test_experience.md` after locator discoveries
+- **NEVER** archive without all `test_tasks.md` items checked
+- **NEVER** omit content from `request.md` when generating artifacts
+- **NEVER** fix a bug without first running reproduction test to confirm it exists

@@ -19,6 +19,23 @@ const wareDisplayName = computed(() => gameData.getWareDisplayName(props.node.wa
 
 const isRawResource = computed(() => props.node.column === 0 || props.node.wareId === 'energycells')
 
+const volumeCompressionRate = computed(() => {
+  // 显示条件：有 moduleId、非 isolated、非 T0、模块有输入
+  if (!props.node.moduleId || props.node.isIsolated || props.node.column === 0) {
+    return undefined
+  }
+  return gameData.getModuleVolumeCompression(props.node.moduleId)
+})
+
+const volumeCompressionPercent = computed(() => {
+  if (volumeCompressionRate.value === undefined) return undefined
+  return Math.round(volumeCompressionRate.value * 100)
+})
+
+const isVolumeCompression = computed(() => {
+  return volumeCompressionRate.value !== undefined && volumeCompressionRate.value <= 1
+})
+
 const getTierColor = (tier: number) => {
   switch (tier) {
     case 3: return 'text-purple-400'
@@ -157,6 +174,24 @@ const handleRemove = () => {
         >
           {{ isRawResource ? t('ui.tag_res') : (!moduleDisplayName ? t('ui.tag_ops') : (node.race?.replace('_', ' ') || '???')) }}
         </span>
+      </div>
+      
+      <!-- Volume Compression Rate -->
+      <div 
+        v-if="volumeCompressionPercent !== undefined"
+        class="flex items-center gap-0.5 shrink-0"
+      >
+        <span 
+          class="text-[7px] font-bold font-mono"
+          :class="isVolumeCompression ? 'text-emerald-400' : 'text-red-400'"
+        >
+          {{ volumeCompressionPercent }}%
+        </span>
+        <svg class="w-2.5 h-2.5" :class="isVolumeCompression ? 'text-emerald-400/60' : 'text-red-400/60'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+          <path d="m3.3 7 8.7 5 8.7-5"/>
+          <path d="M12 22V12"/>
+        </svg>
       </div>
     </div>
 

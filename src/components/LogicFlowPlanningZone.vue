@@ -26,29 +26,11 @@ const getAttribute = (element: any, attribute: string) => {
 
 /**
  * 获取有效的血统（考虑锁定组）
- * 锁定状态：使用 lockedLineage
- * 解锁状态：优先使用拖拽携带的血统，否则使用规划区的 subCategory
  */
 const getEffectiveLineage = (group: ProductionLineGroup, event?: any): string => {
-  if (group.isLocked) {
-    return group.lockedLineage!
-  }
-  
-  // 优先使用拖拽时携带的血统
-  const draggingLineage = logicFlow.draggingLineage
-  if (draggingLineage) {
-    return draggingLineage
-  }
-  
-  // 其次使用来源区域的血统
   const fromSubCategory = event ? getAttribute(event?.from, 'data-subcategory') : null
-  if (fromSubCategory) {
-    return fromSubCategory
-  }
-  
-  // 最后使用规划区自身的血统偏好
-  // 工业区使用 'default'，农业区使用创建时选择的种族
-  return group.subCategory
+  const draggingLineage = logicFlow.draggingLineage || fromSubCategory || 'default'
+  return group.isLocked ? group.lockedLineage! : draggingLineage
 }
 
 /**
@@ -102,48 +84,52 @@ const getFormattedResources = (group: ProductionLineGroup, includeDragging: bool
   // 4. 如果正在拖拽，计算新增的 T0 资源（排除能量电池）
   const newIds: string[] = []
   if (includeDragging && logicFlow.draggingWareId) {
-    const draggingWare = gameData.waresMap[logicFlow.draggingWareId]
-    if (draggingWare && draggingWare.tier > 0) {
-      const lineage = getEffectiveLineage(group)
-      
-      // 自定义递归追踪：遇到隔离节点时停止
-      const traceT0 = (wareId: string, visited: Set<string>): string[] => {
-        if (wareId === 'energycells') return []
+    // 【修复】先检查拖拽是否被拒绝或重复，如果是则不显示预览
+    const dropStatus = getDropStatus(group)
+    if (dropStatus !== 'rejected' && dropStatus !== 'duplicated') {
+      const draggingWare = gameData.waresMap[logicFlow.draggingWareId]
+      if (draggingWare && draggingWare.tier > 0) {
+        const lineage = getEffectiveLineage(group)
         
-        const ware = gameData.waresMap[wareId]
-        if (!ware) return []
-        
-        // T0 资源直接返回
-        if (ware.tier === 0) return [wareId]
-        
-        // 防止循环
-        if (visited.has(wareId)) return []
-        visited.add(wareId)
-        
-        // 遇到隔离节点，停止追踪（隔离节点不参与供应链）
-        if (isolatedWareIds.has(wareId)) return []
-        
-        // 递归追踪上游
-        const module = gameData.findModuleForWare(wareId, lineage)
-        if (!module || !module.inputs) return []
-        
-        const result: string[] = []
-        Object.keys(module.inputs).forEach(inputId => {
-          result.push(...traceT0(inputId, visited))
-        })
-        
-        return result
-      }
-      
-      const requiredT0 = traceT0(logicFlow.draggingWareId, new Set())
-      const uniqueT0 = [...new Set(requiredT0)]
-      
-      uniqueT0.forEach(wareId => {
-        // 排除能量电池、已存在的 T0 资源、以及组内已有非隔离节点供应的资源
-        if (wareId !== 'energycells' && !existingT0Ids.has(wareId) && !existingNonIsolatedWareIds.has(wareId)) {
-          newIds.push(wareId)
+        // 自定义递归追踪：遇到隔离节点时停止
+        const traceT0 = (wareId: string, visited: Set<string>): string[] => {
+          if (wareId === 'energycells') return []
+          
+          const ware = gameData.waresMap[wareId]
+          if (!ware) return []
+          
+          // T0 资源直接返回
+          if (ware.tier === 0) return [wareId]
+          
+          // 防止循环
+          if (visited.has(wareId)) return []
+          visited.add(wareId)
+          
+          // 遇到隔离节点，停止追踪（隔离节点不参与供应链）
+          if (isolatedWareIds.has(wareId)) return []
+          
+          // 递归追踪上游
+          const module = gameData.findModuleForWare(wareId, lineage)
+          if (!module || !module.inputs) return []
+          
+          const result: string[] = []
+          Object.keys(module.inputs).forEach(inputId => {
+            result.push(...traceT0(inputId, visited))
+          })
+          
+          return result
         }
-      })
+        
+        const requiredT0 = traceT0(logicFlow.draggingWareId, new Set())
+        const uniqueT0 = [...new Set(requiredT0)]
+        
+        uniqueT0.forEach(wareId => {
+          // 排除能量电池、已存在的 T0 资源、以及组内已有非隔离节点供应的资源
+          if (wareId !== 'energycells' && !existingT0Ids.has(wareId) && !existingNonIsolatedWareIds.has(wareId)) {
+            newIds.push(wareId)
+          }
+        })
+      }
     }
   }
   
@@ -252,36 +238,17 @@ const nodesWithPreview = (group: any) => {
   
   const nodes = filteredNodes.map((n: any) => ({ ...n, isPreview: false }))
 
-  if (logicFlow.isDragging && 
-      logicFlow.draggingWareId && 
-      logicFlow.hoveredGroupId === group.id) {
-    
-    const status = getDropStatus(group)
-    
-    if (isDropAllowedForStatus(status)) {
-      const ware = gameData.waresMap[logicFlow.draggingWareId]
-      if (ware) {
-        nodes.push({
-          id: 'preview-' + logicFlow.draggingWareId,
-          wareId: logicFlow.draggingWareId,
-          column: ware.tier,
-          isPreview: true,
-          source: 'manual'
-        })
-      }
-    }
+  // 从 store 获取预览节点
+  const previewNode = logicFlow.previewNodes.get(group.id)
+  if (previewNode) {
+    nodes.push(previewNode)
   }
 
   return nodes.sort((a: any, b: any) => b.column - a.column)
 }
 
 const handleAddToExistingGroup = (groupId: string, event: any) => {
-  const item = event.item
-  
   if (logicFlow.hoveredGroupId !== groupId) {
-    if (item && item.parentNode) {
-      item.parentNode.removeChild(item)
-    }
     return
   }
   
@@ -291,28 +258,9 @@ const handleAddToExistingGroup = (groupId: string, event: any) => {
     const group = logicFlow.groups.find(g => g.id === groupId)
     if (group) {
       const effectiveLineage = getEffectiveLineage(group, event)
-      const status = getDropStatus(group, event)
-      
-      if (status === 'isolated') {
-        logicFlow.connectAndExpand(groupId, draggingWareId, effectiveLineage)
-      } else if (status === 'replace') {
-        logicFlow.replaceNodeWithLineage(groupId, draggingWareId, effectiveLineage)
-      } else if (status === 'auto') {
-        const node = group.nodes.find(n => n.wareId === draggingWareId)
-        if (node) {
-          logicFlow.promoteNode(groupId, node.id)
-        }
-      } else if (status === 'available') {
-        logicFlow.expandUpstream(groupId, draggingWareId, 'manual', effectiveLineage)
-      }
+      logicFlow.handleDrop(groupId, effectiveLineage)
     }
   }
-  
-  if (item && item.parentNode) {
-    item.parentNode.removeChild(item)
-  }
-  
-  logicFlow.hoveredGroupId = null
 }
 
 const isRejected = (group: ProductionLineGroup, event: any) => {
@@ -338,7 +286,7 @@ const handleDragEnter = (groupId: string) => {
   if (!logicFlow.isDragging) return
   dragEnterCounter.value[groupId] = (dragEnterCounter.value[groupId] || 0) + 1
   if (dragEnterCounter.value[groupId] === 1) {
-    logicFlow.hoveredGroupId = groupId
+    logicFlow.handleHover(groupId)
   }
 }
 
@@ -346,7 +294,7 @@ const handleDragLeave = (groupId: string) => {
   if (!logicFlow.isDragging) return
   dragEnterCounter.value[groupId] = Math.max(0, (dragEnterCounter.value[groupId] || 0) - 1)
   if (dragEnterCounter.value[groupId] === 0) {
-    logicFlow.hoveredGroupId = null
+    logicFlow.handleMoveOut(groupId)
   }
 }
 
@@ -361,7 +309,7 @@ const handleNewZoneDragEnter = () => {
   if (!logicFlow.isDragging) return
   newZoneEnterCounter.value++
   if (newZoneEnterCounter.value === 1) {
-    logicFlow.isHoveringNewZone = true
+    logicFlow.handleHover('new')
   }
 }
 
@@ -369,7 +317,7 @@ const handleNewZoneDragLeave = () => {
   if (!logicFlow.isDragging) return
   newZoneEnterCounter.value = Math.max(0, newZoneEnterCounter.value - 1)
   if (newZoneEnterCounter.value === 0) {
-    logicFlow.isHoveringNewZone = false
+    logicFlow.handleMoveOut('new')
   }
 }
 
@@ -386,14 +334,10 @@ const isDropAllowedForNewZone = () => {
 
 const handleAddFromDrop = (event: any) => {
   const ware = event.item?._underlying_vm_
-  const item = event.item
   const capturedLineage = logicFlow.draggingLineage
   const fromSubCategory = getAttribute(event.from, 'data-subcategory')
   
   if (!logicFlow.isHoveringNewZone) {
-    if (item && item.parentNode) {
-      item.parentNode.removeChild(item)
-    }
     return
   }
   
@@ -401,23 +345,11 @@ const handleAddFromDrop = (event: any) => {
     // T0 资源不可被添加
     const wareData = gameData.waresMap[ware.id]
     if (wareData && wareData.tier === 0) {
-      if (item && item.parentNode) {
-        item.parentNode.removeChild(item)
-      }
       return
     }
     
-    const isAgricultural = ['agricultural', 'food', 'pharmaceutical', 'water', 'ice'].includes(ware.group)
-    const category = isAgricultural ? 'agricultural' : 'industrial'
-    
-    const subCategory = capturedLineage || fromSubCategory || (category === 'industrial' ? 'default' : 'argon')
-    const group = logicFlow.addGroup(category, subCategory, undefined, logicFlow.isDefaultLocked)
-    
-    logicFlow.expandUpstream(group.id, ware.id, 'manual', subCategory)
-  }
-  
-  if (item && item.parentNode) {
-    item.parentNode.removeChild(item)
+    const effectiveLineage = capturedLineage || fromSubCategory || 'default'
+    logicFlow.handleDrop('new', effectiveLineage)
   }
   
   dummyList.value = []

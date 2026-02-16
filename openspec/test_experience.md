@@ -120,15 +120,71 @@
     *   **DataTransfer 模拟无效**: `vuedraggable` 基于 Sortable.js，不直接监听原生 `DragEvent`。派发 `dragstart`/`drop` 等 HTML5 事件无法触发其内部逻辑，因为缺少 `_underlying_vm_` 属性和 Sortable.js 内部状态。必须使用 Playwright 的 `mouse` API 模拟真实鼠标操作。(✅)
     *   **lineage 闭包捕获**: `handleAddFromDrop` 使用 `setTimeout` 延迟处理，而 `stopDragging` 在 `handleDragEnd` 中被调用。必须在 setTimeout 外部捕获 `draggingLineage` 的值，否则回调执行时该值已被清空为 `null`。(✅)
 
+## 🔍 定位器最佳实践 (Locator Best Practices)
+
+### 搜索模式 (Search Pattern)
+```typescript
+// 填入搜索词 → 等待防抖 → 点击结果
+await page.locator('.search-input').fill('Energy Cells');
+await page.waitForTimeout(300); // 等待防抖
+await page.locator('.result-item').first().click();
+```
+
+### i18n 感知定位器 (i18n-Aware Locators)
+使用正则表达式支持多语言：
+```typescript
+// ✅ 同时支持中英文
+await expect(page.locator('.title')).toMatchText(/新建|New/);
+
+// ❌ 只支持单一语言
+await expect(page.locator('.title')).toHaveText('新建');
+```
+
+### 通用定位器模式 (Common Locator Patterns)
+
+| 元素类型 | 推荐定位器 |
+|----------|------------|
+| 带文本按钮 | `button:has-text("Label")` 或 `getByRole('button', { name: /Label/i })` |
+| 带占位符输入框 | `input[placeholder*="hint"]` |
+| 数据属性 | `[data-testid="element-id"]` |
+| CSS 类 | `.class-name` (结合上下文使用) |
+
+---
+
 ## 🕳️ 历史定位大坑 (Pitfalls)
 
-*   **等待 Store 超时**: E2E 测试等待 `window.store`，但 `main.ts` 未暴露它。已通过在 [App.vue](file:///d:/Documents/project/x4-station-calculator/src/App.vue) 中当 `isTestEnv` 为真时显式暴露来修复。(✅)
-*   **生产环境 vs 开发环境**: 在 `npm run preview` 中 `import.meta.env.DEV` 为假。测试必须使用通过 `addInitScript` 注入的 `isTestEnv` 标志。(✅)
+### 环境与配置类
+
+*   **等待 Store 超时**: E2E 测试等待 `window.store`，但 `main.ts` 未暴露它。
+    *   **解决方案**: 在 `App.vue` 中当 `isTestEnv` 为真时显式暴露：
+        ```typescript
+        if (import.meta.env.VITE_TEST_ENV) {
+          (window as any).store = useMainStore();
+        }
+        ```
+*   **生产环境 vs 开发环境**: 在 `npm run preview` 中 `import.meta.env.DEV` 为假。
+    *   **解决方案**: 使用通过 `addInitScript` 注入的 `isTestEnv` 标志。
+*   **Vite Preview 基础路径**: 预览服务器可能使用类似 `/x4-station-calculator/` 的基础路径。
+    *   **解决方案**: `playwright.config.ts` 必须在 `baseURL` 和 `webServer.url` 中与之完全匹配。
+*   **构建更新滞后**: `npm run preview` 运行的是构建后的 `dist` 文件。修改源码后，必须重新执行 `npm run build` 才能在 preview 模式下生效。
+    *   **建议**: 开发测试阶段使用 `npm run dev` 实现热更新，避免忘记构建导致的假阴性失败。
+*   **测试中的 TypeScript 错误**: Playwright 可能会尝试编译实际上是 `vitest` 单元测试的 `.spec.ts` 文件。
+    *   **解决方案**: 使用 `testDir` 或 `testIgnore` 将其分开。
+
+### UI 交互类
+
 *   **提示框持久性**: 设置了 `hideOnClick: false` 的 Tippy 提示框在测试中仍需要手动移动鼠标来验证隐藏行为。(✅)
-*   **Vite Preview 基础路径**: 预览服务器可能使用类似 `/x4-station-calculator/` 的基础路径。`playwright.config.ts` 必须在 `baseURL` 和 `webServer.url` 中与之完全匹配。(✅)
-*   **测试中的 TypeScript 错误**: Playwright 可能会尝试编译实际上是 `vitest` 单元测试的 `.spec.ts` 文件。确保使用 `testDir` 或文件过滤器将其分开。(✅)
-*   **明细项单位陷阱**: `.item-val` 中仅包含格式化后的数值（如 `+3,000.0`），不包含单位（如 `m³`）。在测试验证时应避免使用 `toMatch(/m³/)` 匹配明细行数值。(✅)
-*   **视图名称变更**: “体积视图”已在界面上更名为“仓储视图”。测试定位器应使用 `/仓储|Volume/` 以保持兼容性。(✅)
+*   **明细项单位陷阱**: `.item-val` 中仅包含格式化后的数值（如 `+3,000.0`），不包含单位（如 `m³`）。
+    *   **解决方案**: 测试验证时避免使用 `toMatch(/m³/)` 匹配明细行数值。
+*   **视图名称变更**: "体积视图"已在界面上更名为"仓储视图"。
+    *   **解决方案**: 测试定位器应使用 `/仓储|Volume/` 以保持兼容性。
+*   **i18n Key 显示**: 翻译键显示为 `ui.key_name` 或 `!!key!!`。
+    *   **解决方案**: 检查 i18n 配置，测试中使用正则 `/Name|名称/`。
+
+### 测试设计类
+
+*   **仅 Store 操作测试**: 测试仅通过 `page.evaluate` 操作 Store，没有 UI 验证。
+    *   **解决方案**: 必须包含 UI 交互和断言。Store 操作可用于 setup，但不能作为唯一验证。
 
 ### 7. 逻辑组网 (Logical Flow)
 *   **候选区 (Candidate Zone)**:
@@ -153,57 +209,9 @@
 
 ## 🧪 Vue 拖拽测试专项 (Vue Drag Testing)
 
-### 方案对比结论
+> **详细指南请参阅 `x4-drag-test` skill**
 
-| 方案 | 结论 | 原因 |
-|------|------|------|
-| dispatchEvent | ❌ 不可行 | `vuedraggable` 基于 SortableJS，不监听原生 HTML5 Drag Events |
-| 直接操作 Store | ⚠️ 不适合测试 UI | 绕过了真实交互，无法验证"停靠时高亮"等视觉反馈 |
-| **Playwright Mouse API** | ✅ 推荐方案 | 模拟真实用户操作，可完整测试交互流程和视觉反馈 |
-
-### 推荐方案：Playwright Mouse API
-
-#### 工作原理
-`page.mouse.down()` + `page.mouse.move()` + `page.mouse.up()` 触发 `vuedraggable` 的事件。
-
-#### 验证结果
-*   `isDragging` 在 `mouse.down()` + 小幅移动后变为 `true` (✅)
-*   `hoveredZoneId` 在移动到目标区域后变为 `'B'` (✅)
-*   高亮样式在悬停时正确应用 `border-blue-500` + `bg-blue-500/10` (✅)
-*   数据在 `mouse.up()` 后正确更新 (✅)
-
-#### 完整测试代码示例
-```typescript
-test('Real mouse drag triggers highlight and updates data', async ({ page }) => {
-  const sourceItem = page.locator('[data-item-id="item-1"]');
-  const targetZone = page.locator('[data-zone-id="B"]');
-
-  const sourceBox = await sourceItem.boundingBox();
-  const targetBox = await targetZone.boundingBox();
-  if (!sourceBox || !targetBox) throw new Error('Box not found');
-
-  // 1. 鼠标按下并开始拖拽
-  await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 10, sourceBox.y + sourceBox.height / 2 + 10);
-
-  // 2. 拖拽进入目标区域
-  await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 20 });
-
-  // 3. 【关键】在 mouse.up() 之前断言高亮样式
-  await expect(targetZone).toHaveClass(/border-blue-500/);
-  await expect(targetZone).toHaveClass(/bg-blue-500\/10/);
-
-  // 4. 释放鼠标
-  await page.mouse.up();
-
-  // 5. 验证数据变动
-  const zoneBIds = await page.evaluate(() => 
-    (window as any).dragTestStore.zoneBItems.map((i: any) => i.id)
-  );
-  expect(zoneBIds).toContain('item-1');
-});
-```
+本节仅保留项目特定的拖拽定位器记录。
 
 ### 拖拽状态分类测试 (Drop Status Classification)
 
@@ -220,42 +228,7 @@ test('Real mouse drag triggers highlight and updates data', async ({ page }) => 
 *   **取消拖拽**: `dragstart` → `dragend` (无 `drop`) (✅)
 *   **悬停后离开**: `dragstart` → `dragenter` → `dragleave` → `dragend` (✅)
 
-### 常见陷阱与修复 (Common Pitfalls)
-
-#### dragleave 子元素闪烁问题
-*   **问题描述**: 当拖拽元素进入子元素（如从 Zone B 空白处移动到 Zone B 内的 `drag-item`）时，父元素会触发 `dragleave`，导致高亮闪烁。
-*   **修复方案**: 使用计数器 `dragEnterCounter` 跟踪进入/离开次数，仅在计数归零时才真正触发 `leaveZone`。
-*   **代码示例**:
-    ```typescript
-    const dragEnterCounter = ref<{ A: number; B: number }>({ A: 0, B: 0 })
-    
-    const handleDragEnter = (zoneId: 'A' | 'B') => {
-      if (store.isDragging) {
-        dragEnterCounter.value[zoneId]++
-        if (dragEnterCounter.value[zoneId] === 1) {
-          store.enterZone(zoneId)
-        }
-      }
-    }
-    
-    const handleDragLeave = (zoneId: 'A' | 'B') => {
-      if (store.isDragging) {
-        dragEnterCounter.value[zoneId]--
-        if (dragEnterCounter.value[zoneId] === 0) {
-          store.leaveZone(zoneId)
-        }
-      }
-    }
-    
-    const handleDragEnd = () => {
-      dragEnterCounter.value = { A: 0, B: 0 } // 重置计数器
-      store.stopDragging()
-    }
-    ```
-
-#### 测试断言时机
-*   **错误做法**: 仅在 `mouse.up()` 后验证最终状态，无法测试"停靠时高亮"。
-*   **正确做法**: 在 `mouse.up()` **之前**插入 `expect(targetZone).toHaveClass(/border-blue-500/)` 断言。
+---
 
 ### 8. 产线组标题编辑与高亮链路 (Production Line Title & Highlight)
 
@@ -277,6 +250,21 @@ test('Real mouse drag triggers highlight and updates data', async ({ page }) => 
     *   量化生产: `getByRole('button', { name: /量化|Quantified/i })` (✅)
     *   逻辑组网: `getByRole('button', { name: /逻辑|Logical/i })` (✅)
     *   注意: i18n 键为 `view.production` 和 `view.logical_flow` (✅)
+
+### 9. FlowNode 体积压缩率显示 (Volume Compression Rate)
+*   **FlowNode 节点定位**:
+    *   按 wareId 定位: `.flow-node[data-ware-id="hullparts"]` (✅)
+    *   注意: 不要用 `filter({ hasText: /船体部件/i })` 因为节点标题可能是自定义名称
+*   **压缩率显示元素**:
+    *   定位器: `.flow-node[data-ware-id="xxx"] .text-\\[7px\\]` 配合 `filter({ hasText: /\d+%/ })` (✅)
+    *   颜色类: `text-emerald-400` (≤100%), `text-red-400` (>100%) (✅)
+*   **T0 资源节点**:
+    *   定位器: `.flow-node[data-ware-id="energycells"], .flow-node[data-ware-id="ore"]` (✅)
+    *   特点: T0 节点不显示压缩率，因为 `column === 0` (✅)
+*   **Isolated 状态**:
+    *   设置方式: `logicFlowStore.groups[0].nodes.find(n => n.wareId === 'xxx').isIsolated = true` (✅)
+    *   视觉标识: 节点内显示 `EXT` 徽章 (✅)
+    *   压缩率隐藏: isolated 节点不显示压缩率 (✅)
 
 #### 测试注意事项
 *   **SVG 连线可见性**: 使用 `toBeAttached()` 代替 `toBeVisible()`，因为 faint 颜色可能导致 Playwright 判定为 hidden。(✅)

@@ -311,7 +311,7 @@ defineExpose({
             class="draggable-area"
             :model-value="waresByTier[tier] || []"
             :group="{ name: 'wares', pull: 'clone', put: false }"
-            :clone="(original: any) => ({ ...original })"
+            :clone="(original: any) => ({ ...original, instanceId: Date.now() + Math.random() })"
             :sort="false"
             :disabled="tier === 0"
             item-key="id"

@@ -295,6 +295,7 @@ export interface FlowNode {
   isRoot: boolean // [新增] 是否为手动添加的根节点
   source: 'manual' | 'auto' // 节点来源
   order: number // 列内垂直排序
+  isPreview?: boolean // [新增] 是否为预览节点（拖拽时显示）
 }
 
 /**

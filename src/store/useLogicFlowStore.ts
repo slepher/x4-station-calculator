@@ -15,7 +15,8 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   const hoveredGroupId = ref<string | null>(null)
   const hoveredNodeId = ref<string | null>(null) // 高亮链路追踪：当前悬停的节点 ID
   const isHoveringNewZone = ref(false)
-  const isDefaultLocked = ref(false)
+  const isDefaultLocked = ref(true)
+  const previewNodes = ref<Map<string, FlowNode>>(new Map()) // 预览节点：key 为 groupId 或 '__new__'
 
   // 同步到 state 以便持久化（可选，但目前主要用于测试注入）
   const startDragging = (wareId: string, lineage?: string) => {
@@ -36,6 +37,124 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     draggingLineage.value = null
     hoveredGroupId.value = null
     isHoveringNewZone.value = false
+    previewNodes.value.clear()
+  }
+
+  /**
+   * 悬停进入目标 - 生成预览节点
+   */
+  const handleHover = (targetGroupId: string | 'new') => {
+    hoveredGroupId.value = targetGroupId === 'new' ? null : targetGroupId
+    isHoveringNewZone.value = targetGroupId === 'new'
+    
+    if (!draggingWareId.value) return
+    
+    // 清除其他组的预览节点
+    previewNodes.value.clear()
+    
+    // 检查血统兼容性（对于锁定的产线组）
+    if (targetGroupId !== 'new') {
+      const lineage = draggingLineage.value || 'default'
+      const status = getWareGroupStatus(targetGroupId, draggingWareId.value, lineage)
+      if (status === 'rejected' || status === 'duplicated') {
+        return
+      }
+    }
+    
+    // 生成预览节点
+    const lineage = draggingLineage.value || 'default'
+    const ware = gameData.waresMap[draggingWareId.value]
+    if (!ware) return
+    
+    const previewNode: FlowNode = {
+      id: `preview-${draggingWareId.value}`,
+      wareId: draggingWareId.value,
+      moduleId: `preview-module-${draggingWareId.value}`,
+      race: lineage,
+      lineage,
+      column: ware.tier,
+      isIsolated: false,
+      isAuto: false,
+      isRoot: true,
+      source: 'manual',
+      order: 0,
+      isPreview: true,
+    }
+    
+    const key = targetGroupId === 'new' ? '__new__' : targetGroupId
+    previewNodes.value.set(key, previewNode)
+  }
+
+  /**
+   * 离开目标区域 - 清除该目标的预览节点
+   */
+  const handleMoveOut = (targetGroupId: string | 'new') => {
+    const key = targetGroupId === 'new' ? '__new__' : targetGroupId
+    previewNodes.value.delete(key)
+    
+    if (targetGroupId === 'new') {
+      isHoveringNewZone.value = false
+    } else if (hoveredGroupId.value === targetGroupId) {
+      hoveredGroupId.value = null
+    }
+  }
+
+  /**
+   * 放置确认 - 将预览转为正式节点
+   */
+  const handleDrop = (targetGroupId: string | 'new', effectiveLineage?: string) => {
+    if (!draggingWareId.value) return
+    
+    const lineage = effectiveLineage || draggingLineage.value || 'default'
+    
+    if (targetGroupId === 'new') {
+      // 创建新产线组
+      const ware = gameData.waresMap[draggingWareId.value]
+      if (ware) {
+        const isAgricultural = ['agricultural', 'food', 'pharmaceutical', 'water', 'ice'].includes(ware.group)
+        const category = isAgricultural ? 'agricultural' : 'industrial'
+        const subCategory = lineage || (category === 'industrial' ? 'default' : 'argon')
+        const group = addGroup(category, subCategory, undefined, isDefaultLocked.value)
+        expandUpstream(group.id, draggingWareId.value, 'manual', subCategory)
+      }
+    } else {
+      // 添加到现有产线组
+      const status = getWareGroupStatus(targetGroupId, draggingWareId.value, lineage)
+      switch (status) {
+        case 'isolated':
+          connectAndExpand(targetGroupId, draggingWareId.value, lineage)
+          break
+        case 'replace':
+          replaceNodeWithLineage(targetGroupId, draggingWareId.value, lineage)
+          break
+        case 'auto':
+          const node = groups.value.find(g => g.id === targetGroupId)?.nodes.find(n => n.wareId === draggingWareId.value)
+          if (node) promoteNode(targetGroupId, node.id)
+          break
+        case 'available':
+          expandUpstream(targetGroupId, draggingWareId.value, 'manual', lineage)
+          break
+      }
+    }
+    
+    stopDragging()
+  }
+
+  /**
+   * 获取产线组的节点（包含预览节点）
+   */
+  const getNodesWithPreview = (groupId: string): FlowNode[] => {
+    const group = groups.value.find(g => g.id === groupId)
+    if (!group) return []
+    
+    const nodes = [...group.nodes]
+    
+    const preview = previewNodes.value.get(groupId)
+    if (preview) {
+      nodes.push(preview)
+    }
+    
+    return nodes
   }
 
   /**
@@ -829,8 +948,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       return 'available'
     }
 
-    // 1. 锁定状态：检查血统兼容性
-    // 解锁状态允许跨 category 添加产物（工业/农业混合）
+    // 1. 检查锁定冲突与血统兼容性（仅对锁定的规划区）
     if (group.isLocked) {
       const backtraceSet = group.category === 'industrial' 
         ? gameData.wareSetsByIndustrialRace[group.lockedLineage]
@@ -843,8 +961,6 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
 
     // 2. 查找组内是否存在相同 wareId 的节点
     const existingNode = group.nodes.find(n => n.wareId === wareId)
-    
-    // 确定用于模块查找的血统
     const effectiveLineage = group.isLocked ? group.lockedLineage : lineage
     
     if (existingNode) {
@@ -901,11 +1017,16 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     hoveredNodeId,
     isHoveringNewZone,
     isDefaultLocked,
+    previewNodes,
     setHoveredNode,
     highlightedNodeIds,
     highlightedConnectionIds,
     startDragging,
     stopDragging,
+    handleHover,
+    handleMoveOut,
+    handleDrop,
+    getNodesWithPreview,
     init,
     addGroup,
     removeGroup,

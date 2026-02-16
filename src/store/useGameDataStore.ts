@@ -43,6 +43,7 @@ export const useGameDataStore = defineStore('gameData', () => {
   const modulesByOutputMap = ref<Record<string, X4Module[]>>({}) // 索引：按产物 ID 查找生产模块
   const wareSetsByIndustrialRace = ref<Record<string, Set<string>>>({}) // 工业回溯集 (基于 Race: default/terran/teladi)
   const wareSetsByRace = ref<Record<string, Set<string>>>({})           // 农业回溯集 (基于 Race: argon/boron/etc)
+  const volumeCompressionMap = ref<Record<string, number>>({})          // 模块体积压缩率 (产出体积/消耗体积)
 
   /**
    * 搜索增强：过滤后的模块列表（分组）
@@ -267,6 +268,56 @@ export const useGameDataStore = defineStore('gameData', () => {
   }
 
   /**
+   * 构建模块体积压缩率映射
+   * 压缩率 = 产出体积 / 消耗体积 (忽略 energycells)
+   */
+  function buildVolumeCompressionMap() {
+    const map: Record<string, number> = {}
+    
+    Object.values(modulesMap.value).forEach(module => {
+      // 计算产出体积
+      let outputVolume = 0
+      if (module.outputs) {
+        Object.entries(module.outputs).forEach(([wareId, amount]) => {
+          const ware = waresMap.value[wareId]
+          if (ware) {
+            outputVolume += amount * ware.volume
+          }
+        })
+      }
+      
+      // 计算消耗体积（忽略 energycells）
+      let inputVolume = 0
+      if (module.inputs) {
+        Object.entries(module.inputs).forEach(([wareId, amount]) => {
+          if (wareId === 'energycells') return
+          const ware = waresMap.value[wareId]
+          if (ware) {
+            inputVolume += amount * ware.volume
+          }
+        })
+      }
+      
+      // 只有有输入的模块才计算压缩率
+      if (inputVolume > 0) {
+        map[module.id] = outputVolume / inputVolume
+      }
+    })
+    
+    volumeCompressionMap.value = map
+  }
+
+  /**
+   * 获取模块体积压缩率
+   * @param moduleId 模块 ID
+   * @returns 压缩率 (0-1 表示压缩，>1 表示膨胀)，无输入模块返回 undefined
+   */
+  function getModuleVolumeCompression(moduleId: string | undefined): number | undefined {
+    if (!moduleId) return undefined
+    return volumeCompressionMap.value[moduleId]
+  }
+
+  /**
    * 预热本地化模块数据
    */
   function prepareLocalizedModules() {
@@ -332,6 +383,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     buildWaresMap()
     buildModulesMap()
     buildMedicalConsumptionMap()
+    buildVolumeCompressionMap()
 
     // 预热本地化数据
     prepareLocalizedModules()
@@ -381,6 +433,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     medicalConsumptionMap,
     wareSetsByIndustrialRace,
     wareSetsByRace,
+    volumeCompressionMap,
     filteredModulesGrouped,
     currentLocale,
     initialize,
@@ -388,6 +441,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     precomputeCandidateWares,
     findModuleForWare,
     getModuleDisplayName,
-    getWareDisplayName
+    getWareDisplayName,
+    getModuleVolumeCompression
   }
 })
