@@ -82,9 +82,6 @@ const handleSwitchCategory = (cat: 'industrial' | 'agricultural') => {
   activeSubCategory.value = cat === 'industrial' ? 'default' : 'argon'
 }
 
-// 是否默认锁定
-const isDefaultLocked = ref(false)
-
 const handleDragStart = (evt: any) => {
   const wareId = evt.item.getAttribute('data-ware-id')
   if (wareId) {
@@ -104,7 +101,7 @@ const handleQuickAdd = (wareId: string) => {
   // 使用当前选中的一二级分类作为上下文
   const category = activeCategory.value
   const subCategory = activeSubCategory.value
-  const group = logicFlow.addGroup(category, subCategory, undefined, isDefaultLocked.value)
+  const group = logicFlow.addGroup(category, subCategory, undefined, logicFlow.isDefaultLocked)
   
   logicFlow.expandUpstream(group.id, wareId, 'manual', subCategory)
   activeMenuWareId.value = null
@@ -172,7 +169,7 @@ const handleAddWare = (ware: any) => {
   const category = isAgricultural ? 'agricultural' : 'industrial'
   
   const subCategory = activeSubCategory.value
-  const group = logicFlow.addGroup(category, subCategory, undefined, isDefaultLocked.value)
+  const group = logicFlow.addGroup(category, subCategory, undefined, logicFlow.isDefaultLocked)
   
   logicFlow.expandUpstream(group.id, ware.id, 'manual', subCategory)
 }
@@ -227,12 +224,12 @@ defineExpose({
           <label class="relative inline-flex items-center cursor-pointer group">
             <input 
               type="checkbox" 
-              v-model="isDefaultLocked" 
+              v-model="logicFlow.isDefaultLocked" 
               class="sr-only peer"
             >
             <div class="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 transition-colors"></div>
             <span class="ml-2 text-[10px] font-bold uppercase tracking-widest text-white/40 group-hover:text-white/70 transition-colors">
-              {{ isDefaultLocked ? t('race.' + activeSubCategory) : t('logicFlow.unlock') }}
+              {{ logicFlow.isDefaultLocked ? t('race.' + activeSubCategory) : t('logicFlow.unlock') }}
             </span>
           </label>
         </div>

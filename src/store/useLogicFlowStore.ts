@@ -14,6 +14,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   const draggingLineage = ref<string | null>(null)
   const hoveredGroupId = ref<string | null>(null)
   const isHoveringNewZone = ref(false)
+  const isDefaultLocked = ref(false)
 
   // 同步到 state 以便持久化（可选，但目前主要用于测试注入）
   const startDragging = (wareId: string, lineage?: string) => {
@@ -718,6 +719,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     draggingLineage,
     hoveredGroupId,
     isHoveringNewZone,
+    isDefaultLocked,
     startDragging,
     stopDragging,
     init,

@@ -184,7 +184,7 @@ const handleAddFromDrop = (event: any) => {
       const category = isAgricultural ? 'agricultural' : 'industrial'
       
       const subCategory = capturedLineage || fromSubCategory || (category === 'industrial' ? 'default' : 'argon')
-      const group = logicFlow.addGroup(category, subCategory)
+      const group = logicFlow.addGroup(category, subCategory, undefined, logicFlow.isDefaultLocked)
       
       logicFlow.expandUpstream(group.id, ware.id, 'manual', subCategory)
     }
@@ -216,7 +216,7 @@ const handleAddFromDrop = (event: any) => {
         item-key="id"
         @add="handleAddFromDrop"
         class="drop-target bg-white/[0.02] border-2 border-dashed border-white/10 rounded-2xl p-12 flex flex-col items-center justify-center gap-4 hover:bg-blue-500/5 hover:border-blue-500/30 transition-all cursor-pointer group"
-        @click="logicFlow.addGroup('industrial', 'default')"
+        @click="logicFlow.addGroup('industrial', 'default', undefined, logicFlow.isDefaultLocked)"
       >
         <template #item="{ element }">
           <div :key="element.id" class="hidden"></div>

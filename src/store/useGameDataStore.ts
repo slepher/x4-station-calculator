@@ -331,9 +331,10 @@ export const useGameDataStore = defineStore('gameData', () => {
   async function changeLanguage(newLang: string) {
     currentLocale.value = newLang
     await loadLanguageAsync(newLang)
+    prepareLocalizedWares()
     prepareLocalizedModules()
     prepareLocalizedModuleGroups()
-    precomputeCandidateWares() // 重新计算（虽然 ID 不变，但为了保险同步语言上下文）
+    precomputeCandidateWares()
   }
 
   // 监听外部语言切换（如来自 i18n 插件）
@@ -342,6 +343,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     async (newLang) => {
       if (!isReady.value) return
       await loadLanguageAsync(newLang)
+      prepareLocalizedWares()
       prepareLocalizedModules()
       prepareLocalizedModuleGroups()
       precomputeCandidateWares()
