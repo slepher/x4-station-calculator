@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import draggable from 'vuedraggable'
 import { useI18n } from 'vue-i18n'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
@@ -10,6 +10,9 @@ import type { ProductionLineGroup, FlowNode } from '@/types/x4'
 const { t } = useI18n()
 const logicFlow = useLogicFlowStore()
 const gameData = useGameDataStore()
+
+const dragEnterCounter = ref<Record<string, number>>({})
+const newZoneEnterCounter = ref(0)
 
 const getAttribute = (element: any, attribute: string) => {
   if (element && typeof element.getAttribute === 'function') {
@@ -36,6 +39,11 @@ const getEffectiveLineage = (group: ProductionLineGroup, event?: any): string =>
 const getDropStatus = (group: ProductionLineGroup, event?: any): string => {
   const wareId = logicFlow.draggingWareId || (event?.item?._underlying_vm_?.id)
   if (!wareId) return 'available'
+  
+  // T0 资源不可被拖入规划区
+  const ware = gameData.waresMap[wareId]
+  if (ware && ware.tier === 0) return 'rejected'
+  
   const effectiveLineage = getEffectiveLineage(group, event)
   return logicFlow.getWareGroupStatus(group.id, wareId, effectiveLineage)
 }
@@ -49,60 +57,182 @@ const isDropAllowedForStatus = (status: string): boolean => {
 
 /**
  * 格式化资源数据以便循环显示
+ * 原则：使用与 ProductionLineGroup 相同的数据源（group.nodes 中的 T0 节点）
+ * 注意：紧凑模式排除能量电池
  */
 const getFormattedResources = (group: ProductionLineGroup, includeDragging: boolean) => {
-  // 1. 获取节点列表 (如果正在拖拽且悬停在该组，则包含预览节点)
-  let nodes: any[] = []
-  if (includeDragging) {
-    nodes = nodesWithPreview(group)
-  } else {
-    nodes = group.nodes
-      .filter((n: FlowNode) => n.source === 'manual')
-      .sort((a: FlowNode, b: FlowNode) => b.column - a.column)
-  }
-
-  // 2. 获取排序后的资源 ID
-  // Note: nodesWithPreview returns objects that match FlowNode structure but with extra props.
-  // We cast to FlowNode[] for the store method.
-  const sortedIds = logicFlow.getSortedGroupT0Resources(nodes as FlowNode[])
-
-  // 3. 获取原始资源用于比对新增状态
-  const originalResources = logicFlow.getGroupT0Resources(group.id, false)
+  // 1. 获取实际存储的 T0 节点（column === 0，排除能量电池和隔离节点）
+  const existingT0Nodes = group.nodes
+    .filter((n: FlowNode) => n.column === 0 && n.wareId !== 'energycells' && !n.isIsolated)
   
-  return sortedIds.map(wareId => ({
-    wareId,
-    isNew: !originalResources[wareId]
-  }))
+  const existingT0Ids = new Set(existingT0Nodes.map(n => n.wareId))
+  
+  // 2. 获取组内所有非隔离节点的 wareId（用于排除中间层级的供应）
+  const existingNonIsolatedWareIds = new Set(
+    group.nodes
+      .filter((n: FlowNode) => !n.isIsolated)
+      .map((n: FlowNode) => n.wareId)
+  )
+  
+  // 3. 获取组内所有隔离节点的 wareId（用于停止递归追踪）
+  const isolatedWareIds = new Set(
+    group.nodes
+      .filter((n: FlowNode) => n.isIsolated)
+      .map((n: FlowNode) => n.wareId)
+  )
+  
+  // 4. 如果正在拖拽，计算新增的 T0 资源（排除能量电池）
+  const newIds: string[] = []
+  if (includeDragging && logicFlow.draggingWareId) {
+    const draggingWare = gameData.waresMap[logicFlow.draggingWareId]
+    if (draggingWare && draggingWare.tier > 0) {
+      const lineage = getEffectiveLineage(group)
+      
+      // 自定义递归追踪：遇到隔离节点时停止
+      const traceT0 = (wareId: string, visited: Set<string>): string[] => {
+        if (wareId === 'energycells') return []
+        
+        const ware = gameData.waresMap[wareId]
+        if (!ware) return []
+        
+        // T0 资源直接返回
+        if (ware.tier === 0) return [wareId]
+        
+        // 防止循环
+        if (visited.has(wareId)) return []
+        visited.add(wareId)
+        
+        // 遇到隔离节点，停止追踪（隔离节点不参与供应链）
+        if (isolatedWareIds.has(wareId)) return []
+        
+        // 递归追踪上游
+        const module = gameData.findModuleForWare(wareId, lineage)
+        if (!module || !module.inputs) return []
+        
+        const result: string[] = []
+        Object.keys(module.inputs).forEach(inputId => {
+          result.push(...traceT0(inputId, visited))
+        })
+        
+        return result
+      }
+      
+      const requiredT0 = traceT0(logicFlow.draggingWareId, new Set())
+      const uniqueT0 = [...new Set(requiredT0)]
+      
+      uniqueT0.forEach(wareId => {
+        // 排除能量电池、已存在的 T0 资源、以及组内已有非隔离节点供应的资源
+        if (wareId !== 'energycells' && !existingT0Ids.has(wareId) && !existingNonIsolatedWareIds.has(wareId)) {
+          newIds.push(wareId)
+        }
+      })
+    }
+  }
+  
+  // 5. 合并结果
+  const result = [
+    ...existingT0Nodes.map(n => ({ wareId: n.wareId, isNew: false })),
+    ...newIds.map(wareId => ({ wareId, isNew: true }))
+  ]
+  
+  return result
 }
 
 /**
  * 获取 New Line 预览的排序后资源
+ * 注意：排除能量电池
  */
 const getNewLineResources = () => {
   if (!logicFlow.draggingWareId) return []
   const ware = gameData.waresMap[logicFlow.draggingWareId]
   if (!ware) return []
   
-  // 构造临时节点用于计算排序
-  const tempNode: any = {
-    id: 'temp',
-    wareId: logicFlow.draggingWareId,
-    column: ware.tier,
-    source: 'manual',
-    // 默认 race
-    race: 'default' 
+  // 计算拖拽产物的 T0 需求（排除能量电池）
+  const lineage = logicFlow.draggingLineage || 'default'
+  const requiredT0 = logicFlow.calculateRequiredT0Wares(logicFlow.draggingWareId, lineage)
+  
+  return Object.keys(requiredT0).filter(wareId => wareId !== 'energycells')
+}
+
+/**
+ * 获取新产线预览的模块名称
+ */
+const getNewLineModuleName = (): string => {
+  if (!logicFlow.draggingWareId) return ''
+  
+  const ware = gameData.waresMap[logicFlow.draggingWareId]
+  if (!ware || ware.tier === 0) {
+    return gameData.getWareDisplayName(logicFlow.draggingWareId)
   }
   
-  return logicFlow.getSortedGroupT0Resources([tempNode])
+  const lineage = logicFlow.draggingLineage || 'default'
+  const module = gameData.findModuleForWare(logicFlow.draggingWareId, lineage)
+  
+  if (module) {
+    return gameData.getModuleDisplayName(module.id) || gameData.getWareDisplayName(logicFlow.draggingWareId)
+  }
+  
+  return gameData.getWareDisplayName(logicFlow.draggingWareId)
+}
+
+/**
+ * 获取紧凑版节点显示名称
+ */
+const getCompactNodeDisplayName = (node: any, group: any): string => {
+  // T0 资源显示产品名称
+  const ware = gameData.waresMap[node.wareId]
+  if (ware?.tier === 0) {
+    return gameData.getWareDisplayName(node.wareId)
+  }
+  
+  // 非预览节点：直接从 group.nodes 查找 moduleId
+  if (!node.isPreview) {
+    const storeNode = group.nodes.find((n: any) => n.wareId === node.wareId)
+    if (storeNode?.moduleId) {
+      return gameData.getModuleDisplayName(storeNode.moduleId) || gameData.getWareDisplayName(node.wareId)
+    }
+  }
+  
+  // 预览节点：根据 wareId + 血统查找模块
+  if (node.isPreview) {
+    const lineage = getEffectiveLineage(group)
+    const module = gameData.findModuleForWare(node.wareId, lineage)
+    if (module) {
+      return gameData.getModuleDisplayName(module.id) || gameData.getWareDisplayName(node.wareId)
+    }
+  }
+  
+  // 最终回退：显示产品名称
+  return gameData.getWareDisplayName(node.wareId)
+}
+
+/**
+ * 获取紧凑模式产线组标题
+ * 优先级：T0 产物完整显示 > 自定义标题缩略显示 > 自动计算名称
+ */
+const getCompactGroupTitle = (group: ProductionLineGroup): { title: string; t0Resources: string[] } => {
+  // 获取 T0 资源（排除能量电池和隔离节点）
+  const t0Nodes = group.nodes.filter(n => n.column === 0 && n.wareId !== 'energycells' && !n.isIsolated)
+  const t0Resources = t0Nodes.map(n => gameData.getWareDisplayName(n.wareId))
+  
+  // 如果有自定义标题，返回自定义标题
+  if (group.customName) {
+    return { title: group.customName, t0Resources }
+  }
+  
+  // 否则返回自动计算的名称
+  return { title: group.name, t0Resources }
 }
 
 /**
  * Nodes for display, including a preview node if dragging over a group
+ * 注意：紧凑模式模块区域只显示 manual 节点，T0 资源显示在标题旁边
  */
 const nodesWithPreview = (group: any) => {
-  const nodes = group.nodes
+  const filteredNodes = group.nodes
     .filter((n: any) => n.source === 'manual' && !n.isIsolated)
-    .map((n: any) => ({ ...n, isPreview: false }))
+  
+  const nodes = filteredNodes.map((n: any) => ({ ...n, isPreview: false }))
 
   if (logicFlow.isDragging && 
       logicFlow.draggingWareId && 
@@ -128,6 +258,15 @@ const nodesWithPreview = (group: any) => {
 }
 
 const handleAddToExistingGroup = (groupId: string, event: any) => {
+  const item = event.item
+  
+  if (logicFlow.hoveredGroupId !== groupId) {
+    if (item && item.parentNode) {
+      item.parentNode.removeChild(item)
+    }
+    return
+  }
+  
   const draggingWareId = logicFlow.draggingWareId || (event.item?._underlying_vm_?.id)
   
   if (draggingWareId) {
@@ -149,6 +288,10 @@ const handleAddToExistingGroup = (groupId: string, event: any) => {
         logicFlow.expandUpstream(groupId, draggingWareId, 'manual', effectiveLineage)
       }
     }
+  }
+  
+  if (item && item.parentNode) {
+    item.parentNode.removeChild(item)
   }
   
   logicFlow.hoveredGroupId = null
@@ -173,24 +316,93 @@ const getDragStatus = (group: ProductionLineGroup) => {
 
 const dummyList = ref([])
 
+const handleDragEnter = (groupId: string) => {
+  if (!logicFlow.isDragging) return
+  dragEnterCounter.value[groupId] = (dragEnterCounter.value[groupId] || 0) + 1
+  if (dragEnterCounter.value[groupId] === 1) {
+    logicFlow.hoveredGroupId = groupId
+  }
+}
+
+const handleDragLeave = (groupId: string) => {
+  if (!logicFlow.isDragging) return
+  dragEnterCounter.value[groupId] = Math.max(0, (dragEnterCounter.value[groupId] || 0) - 1)
+  if (dragEnterCounter.value[groupId] === 0) {
+    logicFlow.hoveredGroupId = null
+  }
+}
+
+watch(() => logicFlow.isDragging, (newVal) => {
+  if (!newVal) {
+    dragEnterCounter.value = {}
+    newZoneEnterCounter.value = 0
+  }
+})
+
+const handleNewZoneDragEnter = () => {
+  if (!logicFlow.isDragging) return
+  newZoneEnterCounter.value++
+  if (newZoneEnterCounter.value === 1) {
+    logicFlow.isHoveringNewZone = true
+  }
+}
+
+const handleNewZoneDragLeave = () => {
+  if (!logicFlow.isDragging) return
+  newZoneEnterCounter.value = Math.max(0, newZoneEnterCounter.value - 1)
+  if (newZoneEnterCounter.value === 0) {
+    logicFlow.isHoveringNewZone = false
+  }
+}
+
+const isDropAllowedForNewZone = () => {
+  const wareId = logicFlow.draggingWareId
+  if (!wareId) return true
+  
+  // T0 资源不可被拖入规划区
+  const ware = gameData.waresMap[wareId]
+  if (ware && ware.tier === 0) return false
+  
+  return true
+}
+
 const handleAddFromDrop = (event: any) => {
   const ware = event.item?._underlying_vm_
+  const item = event.item
   const capturedLineage = logicFlow.draggingLineage
   const fromSubCategory = getAttribute(event.from, 'data-subcategory')
   
-  setTimeout(() => {
-    if (ware && ware.id) {
-      const isAgricultural = ['agricultural', 'food', 'pharmaceutical', 'water', 'ice'].includes(ware.group)
-      const category = isAgricultural ? 'agricultural' : 'industrial'
-      
-      const subCategory = capturedLineage || fromSubCategory || (category === 'industrial' ? 'default' : 'argon')
-      const group = logicFlow.addGroup(category, subCategory, undefined, logicFlow.isDefaultLocked)
-      
-      logicFlow.expandUpstream(group.id, ware.id, 'manual', subCategory)
+  if (!logicFlow.isHoveringNewZone) {
+    if (item && item.parentNode) {
+      item.parentNode.removeChild(item)
+    }
+    return
+  }
+  
+  if (ware && ware.id) {
+    // T0 资源不可被添加
+    const wareData = gameData.waresMap[ware.id]
+    if (wareData && wareData.tier === 0) {
+      if (item && item.parentNode) {
+        item.parentNode.removeChild(item)
+      }
+      return
     }
     
-    dummyList.value = []
-  }, 20)
+    const isAgricultural = ['agricultural', 'food', 'pharmaceutical', 'water', 'ice'].includes(ware.group)
+    const category = isAgricultural ? 'agricultural' : 'industrial'
+    
+    const subCategory = capturedLineage || fromSubCategory || (category === 'industrial' ? 'default' : 'argon')
+    const group = logicFlow.addGroup(category, subCategory, undefined, logicFlow.isDefaultLocked)
+    
+    logicFlow.expandUpstream(group.id, ware.id, 'manual', subCategory)
+  }
+  
+  if (item && item.parentNode) {
+    item.parentNode.removeChild(item)
+  }
+  
+  dummyList.value = []
 }
 </script>
 
@@ -211,7 +423,7 @@ const handleAddFromDrop = (event: any) => {
       <draggable
         v-if="logicFlow.groups.length === 0"
         :list="[]"
-        :group="{ name: 'wares', put: true, pull: false }"
+        :group="{ name: 'wares', put: isDropAllowedForNewZone, pull: false }"
         :sort="false"
         item-key="id"
         @add="handleAddFromDrop"
@@ -266,34 +478,34 @@ const handleAddFromDrop = (event: any) => {
                   ? 'border-amber-500/50 bg-amber-500/5' 
                   : (logicFlow.hoveredGroupId === group.id ? 'border-blue-500 bg-blue-500/10' : 'border-white/10')))
         ]"
-        @dragenter="logicFlow.hoveredGroupId = group.id"
-        @dragleave="logicFlow.hoveredGroupId = null"
-        @mouseenter="logicFlow.isDragging && (logicFlow.hoveredGroupId = group.id)"
-        @mouseleave="logicFlow.isDragging && (logicFlow.hoveredGroupId = null)"
+        @dragenter="handleDragEnter(group.id)"
+        @dragleave="handleDragLeave(group.id)"
       >
         <template #item="{ element }">
           <div :key="element.id" class="hidden"></div>
         </template>
         <template #header>
           <div class="flex flex-col gap-3 pointer-events-none h-full">
-            <div class="flex items-center gap-2 border-b border-white/5 pb-2">
+            <div class="flex items-center gap-2 border-b border-white/5 pb-2 min-w-0">
               <div 
-                class="w-1 h-3 rounded-full"
+                class="w-1 h-3 rounded-full flex-shrink-0"
                 :class="group.category === 'industrial' ? 'bg-blue-500' : 'bg-emerald-500'"
               ></div>
-              <span class="text-[13px] font-black text-white truncate">{{ group.name }}</span>
               
-              <!-- T0 Resources Preview in Header -->
-              <div class="flex items-center gap-1 ml-2 overflow-hidden">
+              <!-- 标题 - 可缩略显示，为 T0 资源留出空间 -->
+              <span class="text-[13px] font-black text-white truncate max-w-[40%]">{{ getCompactGroupTitle(group).title }}</span>
+              
+              <!-- T0 Resources Preview in Header - 优先完整显示 -->
+              <div class="flex items-center gap-1 overflow-hidden flex-1 min-w-0">
                 <div 
                   v-for="res in getFormattedResources(group, logicFlow.hoveredGroupId === group.id)" 
                   :key="res.wareId"
-                  class="flex items-center gap-0.5 px-1 rounded bg-white/5 border border-white/5 transition-all duration-300"
+                  class="flex items-center gap-0.5 px-1 rounded bg-white/5 border border-white/5 transition-all duration-300 flex-shrink-0"
                   :class="{ 'border-blue-500 bg-blue-500/20 animate-pulse scale-110': res.isNew }"
-                  :title="gameData.localizedWaresMap[res.wareId]?.localeName"
+                  :title="gameData.getWareDisplayName(res.wareId)"
                   :data-ware-id="res.wareId"
                 >
-                  <span class="text-[10px] font-bold text-white/80 leading-none">{{ t('res.' + res.wareId) }}</span>
+                  <span class="text-[10px] font-bold text-white/80 leading-none whitespace-nowrap">{{ t('res.' + res.wareId) }}</span>
                 </div>
               </div>
 
@@ -340,7 +552,7 @@ const handleAddFromDrop = (event: any) => {
                 :data-ware-id="node.wareId"
               >
                 <span class="truncate text-center w-full leading-tight">
-                  {{ gameData.localizedWaresMap[node.wareId]?.localeName || node.wareId }}
+                  {{ getCompactNodeDisplayName(node, group) }}
                 </span>
               </div>
             </div>
@@ -351,7 +563,7 @@ const handleAddFromDrop = (event: any) => {
       <!-- New Line Drop Zone (Compact Version) -->
       <draggable
         :list="[]"
-        :group="{ name: 'wares', put: true, pull: false }"
+        :group="{ name: 'wares', put: isDropAllowedForNewZone, pull: false }"
         :sort="false"
         item-key="id"
         @add="handleAddFromDrop"
@@ -361,10 +573,8 @@ const handleAddFromDrop = (event: any) => {
             ? 'bg-white/5 border-blue-500/50 p-4' 
             : 'bg-white/[0.02] border-dashed border-white/10 p-8 flex flex-col items-center justify-center'
         ]"
-        @dragenter="logicFlow.isHoveringNewZone = true"
-        @dragleave="logicFlow.isHoveringNewZone = false"
-        @mouseenter="logicFlow.isDragging && (logicFlow.isHoveringNewZone = true)"
-        @mouseleave="logicFlow.isDragging && (logicFlow.isHoveringNewZone = false)"
+        @dragenter="handleNewZoneDragEnter()"
+        @dragleave="handleNewZoneDragLeave()"
       >
         <template #item="{ element }">
           <div :key="element.id" class="hidden"></div>
@@ -385,7 +595,7 @@ const handleAddFromDrop = (event: any) => {
             <div class="flex items-center gap-2 border-b border-white/5 pb-2">
               <div class="w-1 h-3 rounded-full bg-blue-500"></div>
               <span class="text-[13px] font-black text-white/80 truncate italic">
-                Preview: {{ logicFlow.draggingWareId ? (gameData.localizedWaresMap[logicFlow.draggingWareId]?.localeName || logicFlow.draggingWareId) : 'New Line' }}
+                Preview: {{ getNewLineModuleName() || 'New Line' }}
               </span>
               
               <!-- T0 Resources Preview for New Line -->
@@ -410,7 +620,7 @@ const handleAddFromDrop = (event: any) => {
                 }"
               >
                 <span class="truncate text-center w-full leading-tight">
-                  {{ logicFlow.draggingWareId ? (gameData.localizedWaresMap[logicFlow.draggingWareId]?.localeName || logicFlow.draggingWareId) : '' }}
+                  {{ getNewLineModuleName() }}
                 </span>
               </div>
             </div>

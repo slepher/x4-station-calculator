@@ -14,7 +14,8 @@ const { t } = useI18n()
 const gameData = useGameDataStore()
 const logicFlow = useLogicFlowStore()
 
-const module = computed(() => props.node.moduleId ? gameData.localizedModulesMap[props.node.moduleId] : null)
+const moduleDisplayName = computed(() => gameData.getModuleDisplayName(props.node.moduleId))
+const wareDisplayName = computed(() => gameData.getWareDisplayName(props.node.wareId))
 
 const isRawResource = computed(() => props.node.column === 0 || props.node.wareId === 'energycells')
 
@@ -46,6 +47,19 @@ const canIsolate = computed(() => {
   return isDepended.value
 })
 
+// 高亮状态
+const isHighlighted = computed(() => {
+  return logicFlow.highlightedNodeIds.has(props.node.id)
+})
+
+const handleMouseEnter = () => {
+  logicFlow.setHoveredNode(props.node.id)
+}
+
+const handleMouseLeave = () => {
+  logicFlow.setHoveredNode(null)
+}
+
 const handleToggleIsolation = () => {
   logicFlow.toggleNodeIsolation(props.groupId, props.node.id)
 }
@@ -65,6 +79,7 @@ const handleRemove = () => {
   <div 
     class="flow-node group relative px-2 py-1.5 rounded-lg border transition-all duration-300"
     :class="[
+      isHighlighted ? 'highlighted-node' : '',
       node.isIsolated 
         ? 'bg-white/5 border-white/10 opacity-80 grayscale italic border-dashed' 
         : (node.source === 'manual' 
@@ -74,6 +89,8 @@ const handleRemove = () => {
     ]"
     :id="`node-${node.id}`"
     :data-ware-id="node.wareId"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
   >
     <!-- Content: Ware/Module Name & Actions -->
     <div class="flex items-center gap-2 h-5">
@@ -86,9 +103,9 @@ const handleRemove = () => {
       <!-- Module Name (Primary) -->
       <div 
         class="flex-1 text-[11px] font-bold text-white truncate cursor-default"
-        :title="module?.localeName || (gameData.localizedWaresMap[node.wareId]?.localeName || node.wareId)"
+        :title="moduleDisplayName || wareDisplayName"
       >
-        {{ module?.localeName || (gameData.localizedWaresMap[node.wareId]?.localeName || node.wareId) }}
+        {{ moduleDisplayName || wareDisplayName }}
       </div>
       
       <!-- Actions (Hover Only) -->
@@ -138,7 +155,7 @@ const handleRemove = () => {
           class="text-[7px] font-bold uppercase tracking-tighter px-0.5 rounded bg-black/40 shrink-0"
           :class="getTierColor(node.column)"
         >
-          {{ isRawResource ? t('ui.tag_res') : (!module ? t('ui.tag_ops') : (node.race?.replace('_', ' ') || '???')) }}
+          {{ isRawResource ? t('ui.tag_res') : (!moduleDisplayName ? t('ui.tag_ops') : (node.race?.replace('_', ' ') || '???')) }}
         </span>
       </div>
     </div>
@@ -159,5 +176,11 @@ const handleRemove = () => {
 .flow-node {
   min-width: 130px;
   height: 36px;
+}
+
+.highlighted-node {
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.5), 0 0 24px rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.6) !important;
+  background-color: rgba(59, 130, 246, 0.15) !important;
 }
 </style>

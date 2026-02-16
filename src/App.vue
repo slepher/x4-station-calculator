@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import StationWorkbench from './components/StationWorkbench.vue'
+import DragTestPage from './components/drag/DragTestPage.vue'
 import { useStationStore } from '@/store/useStationStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
@@ -7,6 +9,15 @@ import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 const stationStore = useStationStore()
 const gameDataStore = useGameDataStore()
 const logicFlowStore = useLogicFlowStore()
+
+const currentView = ref<'main' | 'drag-test'>('main')
+
+onMounted(() => {
+  const params = new URLSearchParams(window.location.search)
+  if (params.get('view') === 'drag-test') {
+    currentView.value = 'drag-test'
+  }
+})
 
 // 暴露 store 供测试使用
 const checkExportStores = () => {
@@ -42,7 +53,8 @@ setTimeout(checkExportStores, 500);
 
 <template>
   <div id="app-root">
-    <StationWorkbench v-if="stationStore.isReady"/>
+    <DragTestPage v-if="currentView === 'drag-test'" />
+    <StationWorkbench v-else-if="stationStore.isReady"/>
     <div v-else class="loading-gate">Initializing Station Store...</div>
   </div>
 </template>

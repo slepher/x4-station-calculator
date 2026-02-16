@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useGameDataStore } from './useGameDataStore'
 import type { FlowNode, ProductionLineGroup } from '@/types/x4'
 
@@ -13,11 +13,18 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   const draggingWareId = ref<string | null>(null)
   const draggingLineage = ref<string | null>(null)
   const hoveredGroupId = ref<string | null>(null)
+  const hoveredNodeId = ref<string | null>(null) // 高亮链路追踪：当前悬停的节点 ID
   const isHoveringNewZone = ref(false)
   const isDefaultLocked = ref(false)
 
   // 同步到 state 以便持久化（可选，但目前主要用于测试注入）
   const startDragging = (wareId: string, lineage?: string) => {
+    // T0 资源不可被拖拽 - 每次调用时重新获取 gameData 实例
+    const gameDataStore = useGameDataStore()
+    const ware = gameDataStore.waresMap[wareId]
+    if (ware && ware.tier === 0) {
+      return
+    }
     isDragging.value = true
     draggingWareId.value = wareId
     draggingLineage.value = lineage || null
@@ -30,6 +37,138 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     hoveredGroupId.value = null
     isHoveringNewZone.value = false
   }
+
+  /**
+   * 设置悬停节点（用于高亮链路追踪）
+   */
+  const setHoveredNode = (nodeId: string | null) => {
+    hoveredNodeId.value = nodeId
+  }
+
+  /**
+   * 计算需要高亮的节点 ID 集合
+   * 从 hoveredNodeId 出发，追踪上下游依赖链路
+   */
+  const highlightedNodeIds = computed(() => {
+    const result = new Set<string>()
+    if (!hoveredNodeId.value) return result
+
+    // 找到悬停的节点
+    let hoveredNode: FlowNode | null = null
+    let hoveredGroup: ProductionLineGroup | null = null
+    
+    for (const group of groups.value) {
+      const node = group.nodes.find(n => n.id === hoveredNodeId.value)
+      if (node) {
+        hoveredNode = node
+        hoveredGroup = group
+        break
+      }
+    }
+
+    if (!hoveredNode || !hoveredGroup) return result
+
+    // 添加悬停节点本身
+    result.add(hoveredNodeId.value)
+
+    // 追踪上游（递归查找输入依赖，直到 T0）
+    const traceUpstream = (node: FlowNode, visited: Set<string>) => {
+      if (visited.has(node.id)) return
+      visited.add(node.id)
+
+      // 获取该节点的输入
+      if (node.moduleId) {
+        const module = gameData.modulesMap[node.moduleId]
+        if (module?.inputs) {
+          Object.keys(module.inputs).forEach(inputWareId => {
+            // 排除能量电池
+            if (inputWareId === 'energycells') return
+            
+            // 找到组内提供该输入的所有节点（包括 isolated 节点）
+            const sourceNodes = hoveredGroup!.nodes.filter(n => n.wareId === inputWareId)
+            sourceNodes.forEach(sourceNode => {
+              result.add(sourceNode.id)
+              // 只有非隔离节点才继续递归追踪
+              if (!sourceNode.isIsolated) {
+                traceUpstream(sourceNode, visited)
+              }
+            })
+          })
+        }
+      }
+    }
+
+    // 追踪下游（查找消费该产物的节点，直到 T3）
+    const traceDownstream = (node: FlowNode, visited: Set<string>) => {
+      if (visited.has(node.id)) return
+      visited.add(node.id)
+
+      // 找到组内消费该节点产物的所有节点
+      hoveredGroup!.nodes.forEach(consumerNode => {
+        if (!consumerNode.moduleId) return
+
+        const module = gameData.modulesMap[consumerNode.moduleId]
+        if (module?.inputs && module.inputs[node.wareId] !== undefined) {
+          result.add(consumerNode.id)
+          // 只有非隔离节点才继续递归追踪
+          if (!consumerNode.isIsolated) {
+            traceDownstream(consumerNode, visited)
+          }
+        }
+      })
+    }
+
+    // 执行追踪
+    traceUpstream(hoveredNode, new Set())
+    traceDownstream(hoveredNode, new Set())
+
+    return result
+  })
+
+  /**
+   * 计算需要高亮的连线 ID 集合
+   * 连线 ID 格式为 `${sourceNodeId}-${targetNodeId}`
+   */
+  const highlightedConnectionIds = computed(() => {
+    const result = new Set<string>()
+    if (!hoveredNodeId.value || highlightedNodeIds.value.size === 0) return result
+
+    // 找到悬停节点所在的组
+    let hoveredGroup: ProductionLineGroup | null = null
+    for (const group of groups.value) {
+      if (group.nodes.some(n => n.id === hoveredNodeId.value)) {
+        hoveredGroup = group
+        break
+      }
+    }
+
+    if (!hoveredGroup) return result
+
+    // 遍历所有高亮节点之间的连线
+    highlightedNodeIds.value.forEach((nodeId: string) => {
+      const node = hoveredGroup!.nodes.find(n => n.id === nodeId)
+      if (!node || !node.moduleId) return
+
+      const module = gameData.modulesMap[node.moduleId]
+      if (!module?.inputs) return
+
+      Object.keys(module.inputs).forEach(inputWareId => {
+        // 排除能量电池
+        if (inputWareId === 'energycells') return
+
+        // 找到提供该输入的节点
+        const sourceNodes = hoveredGroup!.nodes.filter(n => n.wareId === inputWareId)
+        sourceNodes.forEach(sourceNode => {
+          // 只有当两个节点都在高亮集合中时，才高亮连线
+          if (highlightedNodeIds.value.has(sourceNode.id) && highlightedNodeIds.value.has(node.id)) {
+            result.add(`${sourceNode.id}-${node.id}`)
+          }
+        })
+      })
+    })
+
+    return result
+  })
 
   // --- Computed ---
   /**
@@ -77,8 +216,8 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
 
     const total: Record<string, number> = {}
     
-    // 1. 计算现有 manual 节点的 T0 需求
-    group.nodes.filter(n => n.source === 'manual').forEach(node => {
+    // 1. 计算现有 manual 节点的 T0 需求（排除隔离节点）
+    group.nodes.filter(n => n.source === 'manual' && !n.isIsolated).forEach(node => {
       const resources = calculateRequiredT0Wares(node.wareId, node.race)
       Object.entries(resources).forEach(([id, amount]) => {
         total[id] = (total[id] || 0) + amount
@@ -379,27 +518,11 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     }
 
     // 1. 检查是否存在相同 wareId 的隔离节点
-    // 用户主动拖拽表示要打破隔离状态，将隔离节点转化为新模块
+    // 重要：上游产品的隔离状态不应该被自动打破
+    // 只有用户直接拖拽该产品时才应该打破隔离（由 connectAndExpand 处理）
     const isolatedNode = group.nodes.find(n => n.wareId === wareId && n.isIsolated)
     if (isolatedNode) {
-      const effectiveLineage = group.isLocked ? group.lockedLineage : (overrideLineage || group.subCategory)
-      const module = gameData.findModuleForWare(wareId, effectiveLineage)
-      
-      if (module) {
-        isolatedNode.isIsolated = false
-        isolatedNode.moduleId = module.id
-        isolatedNode.lineage = effectiveLineage
-        isolatedNode.race = module.race
-        isolatedNode.source = source
-        isolatedNode.isAuto = source === 'auto'
-        isolatedNode.isRoot = source === 'manual'
-        
-        if (module.inputs && source === 'manual') {
-          Object.keys(module.inputs).forEach(inputWareId => {
-            expandUpstream(groupId, inputWareId, 'auto', effectiveLineage)
-          })
-        }
-      }
+      // 隔离节点保持隔离状态，不参与上游扩展
       return
     }
 
@@ -570,7 +693,26 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
 
     const isolatedNode = group.nodes.find(n => n.wareId === wareId && n.isIsolated)
     if (isolatedNode) {
-      expandUpstream(groupId, wareId, 'manual', lineage)
+      // 打破隔离状态
+      isolatedNode.isIsolated = false
+      isolatedNode.source = 'manual'
+      isolatedNode.isRoot = true
+      
+      // 更新 moduleId 为正确的模块
+      const effectiveLineage = lineage || group.subCategory
+      const module = gameData.findModuleForWare(wareId, effectiveLineage)
+      if (module) {
+        isolatedNode.moduleId = module.id
+        isolatedNode.race = module.race
+        isolatedNode.lineage = effectiveLineage
+        
+        // 直接扩展上游（绕过 expandUpstream 的 moduleId 检查）
+        if (module.inputs) {
+          Object.keys(module.inputs).forEach(inputWareId => {
+            expandUpstream(groupId, inputWareId, 'auto', effectiveLineage)
+          })
+        }
+      }
     }
   }
 
@@ -711,6 +853,16 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     return 'available'
   }
 
+  /**
+   * 更新产线组自定义标题
+   */
+  function updateGroupCustomName(groupId: string, customName: string) {
+    const group = groups.value.find(g => g.id === groupId)
+    if (group) {
+      group.customName = customName
+    }
+  }
+
   return {
     groups,
     activeGroupId,
@@ -718,8 +870,12 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     draggingWareId,
     draggingLineage,
     hoveredGroupId,
+    hoveredNodeId,
     isHoveringNewZone,
     isDefaultLocked,
+    setHoveredNode,
+    highlightedNodeIds,
+    highlightedConnectionIds,
     startDragging,
     stopDragging,
     init,
@@ -743,5 +899,6 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     replaceNodeWithLineage,
     getWareGroupStatus,
     cleanupUnusedAutoNodes,
+    updateGroupCustomName,
   }
 })

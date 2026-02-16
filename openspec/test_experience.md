@@ -148,4 +148,137 @@
     *   渲染等待: 在节点添加后需要 `page.waitForTimeout(200)` 以等待 `nextTick` 中的 SVG 坐标计算。 (✅)
 *   **规划效率不一致**: “安排模块”在 Phase 1 曾硬编码 25% 的工人效率加成，导致高加成（如 Argon/Boron 43%+）环境下出现过量规划。已修正为使用模块定义的 `maxBonus`。(✅)
 *   **太阳能板 ID 坑**: 游戏数据中通用的太阳能板 ID 是 `prod_gen_energycells_macro`，而不是 `prod_arg_energycells_macro`。在单元测试或硬编码引用时需注意。(✅)
+*   **模块数据结构陷阱**: `X4Module.wareId` 不是产品ID，而是模块内部ID（如 `module_gen_prod_weaponcomponents_01`）。产品ID存储在 `X4Module.outputs` 的 key 中。查找生产某产品的模块时，必须检查 `outputs` 而非 `wareId`。例如：`modules.filter(m => m.outputs && 'weaponcomponents' in m.outputs)`。(✅)
 *   **构建更新滞后**: `npm run preview` 运行的是构建后的 `dist` 文件。修改源码后，必须重新执行 `npm run build` 才能在 preview 模式下生效。在开发测试阶段，推荐修改 `playwright.config.ts` 使用 `npm run dev` 以实现代码变更的实时热更新测试，避免因忘记构建导致的假阴性测试失败。(✅)
+
+## 🧪 Vue 拖拽测试专项 (Vue Drag Testing)
+
+### 方案对比结论
+
+| 方案 | 结论 | 原因 |
+|------|------|------|
+| dispatchEvent | ❌ 不可行 | `vuedraggable` 基于 SortableJS，不监听原生 HTML5 Drag Events |
+| 直接操作 Store | ⚠️ 不适合测试 UI | 绕过了真实交互，无法验证"停靠时高亮"等视觉反馈 |
+| **Playwright Mouse API** | ✅ 推荐方案 | 模拟真实用户操作，可完整测试交互流程和视觉反馈 |
+
+### 推荐方案：Playwright Mouse API
+
+#### 工作原理
+`page.mouse.down()` + `page.mouse.move()` + `page.mouse.up()` 触发 `vuedraggable` 的事件。
+
+#### 验证结果
+*   `isDragging` 在 `mouse.down()` + 小幅移动后变为 `true` (✅)
+*   `hoveredZoneId` 在移动到目标区域后变为 `'B'` (✅)
+*   高亮样式在悬停时正确应用 `border-blue-500` + `bg-blue-500/10` (✅)
+*   数据在 `mouse.up()` 后正确更新 (✅)
+
+#### 完整测试代码示例
+```typescript
+test('Real mouse drag triggers highlight and updates data', async ({ page }) => {
+  const sourceItem = page.locator('[data-item-id="item-1"]');
+  const targetZone = page.locator('[data-zone-id="B"]');
+
+  const sourceBox = await sourceItem.boundingBox();
+  const targetBox = await targetZone.boundingBox();
+  if (!sourceBox || !targetBox) throw new Error('Box not found');
+
+  // 1. 鼠标按下并开始拖拽
+  await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 10, sourceBox.y + sourceBox.height / 2 + 10);
+
+  // 2. 拖拽进入目标区域
+  await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 20 });
+
+  // 3. 【关键】在 mouse.up() 之前断言高亮样式
+  await expect(targetZone).toHaveClass(/border-blue-500/);
+  await expect(targetZone).toHaveClass(/bg-blue-500\/10/);
+
+  // 4. 释放鼠标
+  await page.mouse.up();
+
+  // 5. 验证数据变动
+  const zoneBIds = await page.evaluate(() => 
+    (window as any).dragTestStore.zoneBItems.map((i: any) => i.id)
+  );
+  expect(zoneBIds).toContain('item-1');
+});
+```
+
+### 拖拽状态分类测试 (Drop Status Classification)
+
+*   **Normal**: 拖拽到空区域 → `border-blue-500` (✅)
+*   **Duplicated**: 拖拽已存在的项目 → `border-red-500` + "Duplicated" 标签 (✅)
+*   **Auto**: 拖拽到自动占位符 → 悬停时 "Manual"，非悬停时 "Auto" (✅)
+*   **Isolate**: 拖拽到隔离占位符 → 悬停时 "Connect"，非悬停时 "Isolate" (✅)
+*   **Locked**: 拖拽匹配阵营的项目 → `border-amber-500` (✅)
+*   **Rejected**: 拖拽不匹配阵营的项目 → `border-red-600` + "Rejected" 标签 (✅)
+
+### 事件序列验证 (Event Sequence)
+
+*   **成功投放**: `dragstart` → `dragenter` → `drop` → `dragend` (✅)
+*   **取消拖拽**: `dragstart` → `dragend` (无 `drop`) (✅)
+*   **悬停后离开**: `dragstart` → `dragenter` → `dragleave` → `dragend` (✅)
+
+### 常见陷阱与修复 (Common Pitfalls)
+
+#### dragleave 子元素闪烁问题
+*   **问题描述**: 当拖拽元素进入子元素（如从 Zone B 空白处移动到 Zone B 内的 `drag-item`）时，父元素会触发 `dragleave`，导致高亮闪烁。
+*   **修复方案**: 使用计数器 `dragEnterCounter` 跟踪进入/离开次数，仅在计数归零时才真正触发 `leaveZone`。
+*   **代码示例**:
+    ```typescript
+    const dragEnterCounter = ref<{ A: number; B: number }>({ A: 0, B: 0 })
+    
+    const handleDragEnter = (zoneId: 'A' | 'B') => {
+      if (store.isDragging) {
+        dragEnterCounter.value[zoneId]++
+        if (dragEnterCounter.value[zoneId] === 1) {
+          store.enterZone(zoneId)
+        }
+      }
+    }
+    
+    const handleDragLeave = (zoneId: 'A' | 'B') => {
+      if (store.isDragging) {
+        dragEnterCounter.value[zoneId]--
+        if (dragEnterCounter.value[zoneId] === 0) {
+          store.leaveZone(zoneId)
+        }
+      }
+    }
+    
+    const handleDragEnd = () => {
+      dragEnterCounter.value = { A: 0, B: 0 } // 重置计数器
+      store.stopDragging()
+    }
+    ```
+
+#### 测试断言时机
+*   **错误做法**: 仅在 `mouse.up()` 后验证最终状态，无法测试"停靠时高亮"。
+*   **正确做法**: 在 `mouse.up()` **之前**插入 `expect(targetZone).toHaveClass(/border-blue-500/)` 断言。
+
+### 8. 产线组标题编辑与高亮链路 (Production Line Title & Highlight)
+
+*   **标题编辑输入框**:
+    *   定位器: `.production-group input` (✅)
+    *   触发编辑: 点击 `.production-group h3` 标题元素 (✅)
+    *   确认按钮: `.production-group button` 配合 SVG path 过滤 (✅)
+    
+*   **高亮链路追踪**:
+    *   高亮节点: `.flow-node.highlighted` (✅)
+    *   高亮连线: `.highlighted-connection` (✅)
+    *   Store 状态: `logicFlowStore.highlightedNodeIds` (Set) (✅)
+    
+*   **紧凑模式标题**:
+    *   定位器: `.compact-view .compact-group span.truncate` (✅)
+    *   显示逻辑: 优先显示 `customName`，否则显示自动计算的名称 (✅)
+
+*   **视图切换按钮**:
+    *   量化生产: `getByRole('button', { name: /量化|Quantified/i })` (✅)
+    *   逻辑组网: `getByRole('button', { name: /逻辑|Logical/i })` (✅)
+    *   注意: i18n 键为 `view.production` 和 `view.logical_flow` (✅)
+
+#### 测试注意事项
+*   **SVG 连线可见性**: 使用 `toBeAttached()` 代替 `toBeVisible()`，因为 faint 颜色可能导致 Playwright 判定为 hidden。(✅)
+*   **编辑模式切换**: 点击标题后需要 `waitForTimeout(100)` 等待 Vue 响应式更新。(✅)
+*   **拖拽后等待**: 拖拽完成后需要 `waitForTimeout(300)` 等待数据更新和 DOM 渲染。(✅)

@@ -303,6 +303,7 @@ export interface FlowNode {
 export interface ProductionLineGroup {
   id: string
   name: string
+  customName?: string // 用户自定义标题
   category: 'industrial' | 'agricultural'
   subCategory: string // 始终代表 race (工业: default/terran/teladi, 农业: 具体种族)
   isLocked: boolean // [新增] 组是否锁定血统

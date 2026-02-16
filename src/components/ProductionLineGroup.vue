@@ -15,6 +15,12 @@ const { t } = useI18n()
 const logicFlow = useLogicFlowStore()
 const gameData = useGameDataStore()
 
+// 标题编辑状态
+const isEditingTitle = ref(false)
+const titleInputRef = ref<HTMLInputElement | null>(null)
+const lastValidTitle = ref('')
+const editingValue = ref('')
+
 // SVG Connectivity
 const svgRef = ref<SVGSVGElement | null>(null)
 const connections = ref<{ d: string, id: string }[]>([])
@@ -138,7 +144,12 @@ const removeGroup = () => {
 }
 
 const getGroupName = computed(() => {
-  // Find highest tier nodes
+  // 优先显示用户自定义标题
+  if (props.group.customName) {
+    return props.group.customName
+  }
+  
+  // 否则自动计算：Find highest tier nodes
   let maxTier = -1
   props.group.nodes.forEach(n => {
     if (n.column > maxTier) maxTier = n.column
@@ -168,10 +179,35 @@ const getGroupName = computed(() => {
     })
 
   const topNode = highestTierNodes[0]
-  const wareName = topNode ? (gameData.localizedWaresMap[topNode.wareId]?.localeName || topNode.wareId) : '空'
+  const wareName = topNode ? gameData.getWareDisplayName(topNode.wareId) : '空'
   
   return wareName
 })
+
+// 标题编辑方法
+const startEditing = async () => {
+  lastValidTitle.value = getGroupName.value
+  editingValue.value = getGroupName.value
+  isEditingTitle.value = true
+  await nextTick()
+  titleInputRef.value?.focus()
+  titleInputRef.value?.select()
+}
+
+const finishEditing = () => {
+  isEditingTitle.value = false
+  editingValue.value = ''
+}
+
+const confirmEditing = () => {
+  isEditingTitle.value = false
+  if (!editingValue.value.trim()) {
+    // 空值回退到上一个有效值
+    return
+  }
+  // 保存自定义标题
+  logicFlow.updateGroupCustomName(props.group.id, editingValue.value.trim())
+}
 
 const handleReorder = (colIndex: number, newNodes: any[]) => {
   // 关键过滤：确保 newNodes 中只包含 FlowNode (即具有 wareId 属性的对象)
@@ -205,9 +241,16 @@ const getAttribute = (element: any, attribute: string) => {
 const handleAdd = (_colIndex: number, event: any) => {
   // draggable adds the item to the local list, we need to handle it in the store
   const ware = event.item._underlying_vm_
+  const item = event.item
   
   // 关键修复：延迟处理，让 vuedraggable 完成其内部的 DOM 操作
   setTimeout(() => {
+    // 检查拖拽状态是否仍然有效
+    // 如果 isDragging 为 false，说明拖拽已取消
+    if (!logicFlow.isDragging) {
+      return
+    }
+    
     if (ware && ware.id) {
       const subCategory = getAttribute(event.from, 'data-subcategory') || props.group.subCategory
       
@@ -215,8 +258,8 @@ const handleAdd = (_colIndex: number, event: any) => {
     }
     
     // 手动移除 vuedraggable 插入的 DOM 节点，因为我们的数据模型已经更新并会重新渲染
-    if (event.item && event.item.parentNode) {
-      event.item.parentNode.removeChild(event.item)
+    if (item && item.parentNode) {
+      item.parentNode.removeChild(item)
     }
   }, 20)
 }
@@ -226,12 +269,42 @@ const handleAdd = (_colIndex: number, event: any) => {
   <div class="production-group mb-8 last:mb-0">
     <!-- Group Header: Title & Actions -->
     <div class="flex items-center justify-between mb-2 px-4">
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 min-w-0">
         <div 
-          class="w-1.5 h-4 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.5)]"
+          class="w-1.5 h-4 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.5)] flex-shrink-0"
           :class="group.category === 'industrial' ? 'bg-blue-500' : 'bg-emerald-500'"
         ></div>
-        <h3 class="text-xl font-black text-white tracking-tight">{{ getGroupName }}</h3>
+        
+        <!-- 编辑模式 -->
+        <div v-if="isEditingTitle" class="flex items-center gap-2 flex-1 min-w-0">
+          <input
+            ref="titleInputRef"
+            v-model="editingValue"
+            class="bg-slate-700 text-white font-black text-xl px-2 py-0.5 rounded border border-sky-500/50 outline-none flex-1 min-w-0 text-left transition-all h-[32px]"
+            @blur="finishEditing"
+            @keydown.enter="confirmEditing"
+          />
+          <button 
+            @mousedown.prevent="confirmEditing" 
+            class="text-green-400 hover:text-green-300 transition-colors p-1 rounded hover:bg-slate-700 h-[32px] w-[32px] flex items-center justify-center flex-shrink-0"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </button>
+        </div>
+        
+        <!-- 显示模式 -->
+        <div 
+          v-else 
+          class="group/title flex items-center gap-2 cursor-pointer hover:bg-slate-700/50 px-2 py-0.5 rounded transition-colors min-w-0"
+          @click="startEditing"
+        >
+          <h3 class="text-xl font-black text-white tracking-tight truncate">{{ getGroupName }}</h3>
+          <svg class="w-4 h-4 text-slate-500 opacity-0 group-hover/title:opacity-100 transition-opacity flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+          </svg>
+        </div>
       </div>
       
       <div class="flex items-center gap-3">
@@ -283,16 +356,27 @@ const handleAdd = (_colIndex: number, event: any) => {
           >
             <polygon points="0 0, 6 2, 0 4" fill="rgba(255,255,255,0.1)" />
           </marker>
+          <marker
+            id="arrowhead-highlighted"
+            markerWidth="8"
+            markerHeight="5"
+            refX="6"
+            refY="2.5"
+            orient="auto"
+          >
+            <polygon points="0 0, 8 2.5, 0 5" fill="rgba(59,130,246,0.8)" />
+          </marker>
         </defs>
         <path 
           v-for="conn in connections" 
           :key="conn.id"
           :d="conn.d"
           fill="none"
-          stroke="rgba(255,255,255,0.08)"
-          stroke-width="1.5"
-          marker-end="url(#arrowhead)"
-          class="connection-line transition-all duration-500"
+          :stroke="logicFlow.highlightedConnectionIds.has(conn.id) ? 'rgba(59,130,246,0.8)' : 'rgba(255,255,255,0.08)'"
+          :stroke-width="logicFlow.highlightedConnectionIds.has(conn.id) ? 2.5 : 1.5"
+          :marker-end="logicFlow.highlightedConnectionIds.has(conn.id) ? 'url(#arrowhead-highlighted)' : 'url(#arrowhead)'"
+          class="connection-line transition-all duration-300"
+          :class="{ 'highlighted-connection': logicFlow.highlightedConnectionIds.has(conn.id) }"
         />
       </svg>
 

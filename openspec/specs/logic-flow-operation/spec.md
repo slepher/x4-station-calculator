@@ -186,3 +186,97 @@
 - **WHEN** 规划组处于血统锁定状态
 - **THEN** 使用 `group.isLocked` 属性
 - **AND** 状态标签为 `Locked`
+
+### Requirement: Drag Display Module Name
+系统 SHALL 在拖拽相关场景中优先显示模块名称而非产品名称。
+
+#### Scenario: Compact view existing node display
+- **WHEN** 用户在紧凑版查看已有节点
+- **THEN** 显示模块名称（使用 `node.moduleId` 查找 `localizedModulesMap`）
+- **AND** 若无 `moduleId` 则回退显示产品名称
+
+#### Scenario: Compact view preview node display
+- **WHEN** 用户拖拽产品悬停在现有组上
+- **THEN** 预览节点显示模块名称
+- **AND** 模块根据 `wareId` + 组的血统（`lockedLineage` 或 `subCategory`）查找
+
+#### Scenario: Compact view new line header display
+- **WHEN** 用户拖拽产品悬停在新产线区域
+- **THEN** Header 显示即将创建的模块名称
+- **AND** 模块根据 `wareId` + 当前选中的 `activeSubCategory` 查找
+
+#### Scenario: Drag ghost element display
+- **WHEN** 用户从候选区拖拽产品
+- **THEN** 拖拽幽灵元素显示模块名称
+- **AND** 模块根据 `wareId` + 拖拽开始时的 `activeSubCategory` 查找
+
+#### Scenario: T0 resource fallback display
+- **WHEN** 节点为 T0 资源
+- **THEN** 显示产品名称（T0 资源无对应模块）
+
+#### Scenario: Module not found fallback display
+- **WHEN** 找不到对应的模块
+- **THEN** 回退显示产品名称
+
+### Requirement: Isolation Node Expansion Rules
+系统 SHALL 在上游扩展时正确处理隔离节点。
+
+#### Scenario: Isolation not auto-broken during expansion
+- **WHEN** 上游扩展遇到隔离节点
+- **THEN** 停止追踪该分支
+- **AND** 不自动打破隔离状态
+
+#### Scenario: User主动连接隔离节点
+- **WHEN** 用户拖拽已隔离的产品到规划区
+- **THEN** 解除隔离状态 (`isIsolated = false`)
+- **AND** 更新 `moduleId` 为正确的模块
+- **AND** 扩展上游依赖
+
+#### Scenario: T0 preview stops at isolated node
+- **WHEN** T0 预览追踪遇到隔离节点
+- **THEN** 停止追踪该分支
+- **AND** 不预览隔离节点上游的 T0 资源
+
+### Requirement: Compact Mode T0 Display
+系统 SHALL 在紧凑模式中正确显示 T0 资源。
+
+#### Scenario: T0 display next to group title
+- **WHEN** 用户在紧凑模式查看规划组
+- **THEN** T0 资源显示在组标题旁边
+- **AND** T0 资源不显示在模块区域
+
+#### Scenario: Compact and non-compact use same data source
+- **WHEN** 计算T0 资源需求
+- **THEN** 紧凑模式和非紧凑模式使用同一数据源
+- **AND** 区别仅在于显示方式和过滤条件
+
+### Requirement: Language Switch Updates Ware Text
+系统 SHALL 在语言切换时更新所有 ware 文本。
+
+#### Scenario: Language switch updates all ware text
+- **WHEN** 用户切换语言
+- **THEN** 所有 ware 文本自动更新为新语言
+- **AND** 候选区 ware 文本更新
+- **AND** 规划区节点 ware 文本更新
+
+### Requirement: Candidate Zone Lock Switch Affects New Groups
+系统 SHALL 将候选区锁定开关状态传递给新建的规划区。
+
+#### Scenario: Lock switch affects new groups
+- **WHEN** 用户在候选区开启锁定开关
+- **AND** 添加产品到新规划区
+- **THEN** 新规划区默认锁定
+
+#### Scenario: Unlock switch creates unlocked groups
+- **WHEN** 用户在候选区关闭锁定开关
+- **AND** 添加产品到新规划区
+- **THEN** 新规划区默认不锁定
+
+### Requirement: Drag Cancel Detection
+系统 SHALL 正确检测拖拽取消操作。
+
+#### Scenario: Drag out without dropping
+- **WHEN** 用户从候选区拖拽产品到规划区
+- **AND** 在规划区悬停后拖出来
+- **AND** 在空白处释放
+- **THEN** 产品不被添加到任何规划区

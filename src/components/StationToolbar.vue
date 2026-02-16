@@ -99,26 +99,6 @@ const handleLoad = () => {
 
 <template>
   <div class="toolbar-panel">
-    <!-- 视图切换 (View Switcher) -->
-    <div class="flex items-center bg-black/40 p-1 rounded-full border border-white/10 mx-4">
-      <button 
-        @click="store.activeView = 'production'"
-        class="px-4 py-1.5 rounded-full text-xs transition-all duration-300 flex items-center gap-2"
-        :class="store.activeView === 'production' ? 'bg-blue-600 text-white shadow-lg' : 'text-white/40 hover:text-white/70'"
-      >
-        <span class="w-2 h-2 rounded-full" :class="store.activeView === 'production' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'bg-transparent border border-white/20'"></span>
-        {{ t('view.production') }}
-      </button>
-      <button 
-        @click="store.activeView = 'flow'"
-        class="px-4 py-1.5 rounded-full text-xs transition-all duration-300 flex items-center gap-2"
-        :class="store.activeView === 'flow' ? 'bg-purple-600 text-white shadow-lg' : 'text-white/40 hover:text-white/70'"
-      >
-        <span class="w-2 h-2 rounded-full" :class="store.activeView === 'flow' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'bg-transparent border border-white/20'"></span>
-        {{ t('view.logical_flow') }}
-      </button>
-    </div>
-
     <div class="flex items-center gap-1.5 ml-4">
       <button class="btn-tool btn-cyan" @click="handleNew">
         <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
@@ -205,7 +185,28 @@ const handleLoad = () => {
         </svg>
       </div>
     </div>
-    <div class="flex items-center gap-2 ml-auto lg:ml-0 mr-4">
+
+    <!-- 视图切换 (View Switcher) - 移动到右侧，紧贴语言选择器 -->
+    <div class="flex items-center bg-black/40 p-1 rounded-full border border-white/10">
+      <button 
+        @click="store.activeView = 'production'"
+        class="px-4 py-1.5 rounded-full text-xs transition-all duration-300 flex items-center gap-2"
+        :class="store.activeView === 'production' ? 'bg-blue-600 text-white shadow-lg' : 'text-white/40 hover:text-white/70'"
+      >
+        <span class="w-2 h-2 rounded-full" :class="store.activeView === 'production' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'bg-transparent border border-white/20'"></span>
+        {{ t('view.production') }}
+      </button>
+      <button 
+        @click="store.activeView = 'flow'"
+        class="px-4 py-1.5 rounded-full text-xs transition-all duration-300 flex items-center gap-2"
+        :class="store.activeView === 'flow' ? 'bg-purple-600 text-white shadow-lg' : 'text-white/40 hover:text-white/70'"
+      >
+        <span class="w-2 h-2 rounded-full" :class="store.activeView === 'flow' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'bg-transparent border border-white/20'"></span>
+        {{ t('view.logical_flow') }}
+      </button>
+    </div>
+
+    <div class="flex items-center gap-2 ml-2 mr-4">
       <MissingTranslate />
       <LanguageSelector />
     </div>

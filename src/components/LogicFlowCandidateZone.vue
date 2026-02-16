@@ -85,12 +85,25 @@ const handleSwitchCategory = (cat: 'industrial' | 'agricultural') => {
 const handleDragStart = (evt: any) => {
   const wareId = evt.item.getAttribute('data-ware-id')
   if (wareId) {
+    // T0 资源不可被拖拽，立即停止
+    const ware = gameData.waresMap[wareId]
+    if (ware && ware.tier === 0) {
+      logicFlow.stopDragging()
+      return
+    }
     logicFlow.startDragging(wareId, activeSubCategory.value)
   }
 }
 
 const handleDragEnd = () => {
   logicFlow.stopDragging()
+}
+
+/**
+ * 获取产线组显示名称（优先自定义标题）
+ */
+const getGroupDisplayName = (group: any): string => {
+  return group.customName || group.name
 }
 
 // Quick Add / Manual Add
@@ -300,6 +313,7 @@ defineExpose({
             :group="{ name: 'wares', pull: 'clone', put: false }"
             :clone="(original: any) => ({ ...original })"
             :sort="false"
+            :disabled="tier === 0"
             item-key="id"
             :data-subcategory="activeSubCategory"
             @start="handleDragStart"
@@ -308,8 +322,11 @@ defineExpose({
             <template #item="{ element: ware }">
               <div 
                 :data-ware-id="ware.id"
+                :data-tier="ware.tier"
+                :draggable="ware.tier > 0"
                 class="ware-card group"
                 :class="[
+                  ware.tier === 0 ? 'is-locked-tier cursor-not-allowed opacity-70' : 'is-draggable-tier cursor-grab',
                   isWarePlanned(ware.id) ? 'ware-card-planned' : 'ware-card-default',
                   gameData.searchQuery && (
                     ware.id.toLowerCase().includes(gameData.searchQuery.toLowerCase()) || 
@@ -379,7 +396,7 @@ defineExpose({
                           'opacity-60': logicFlow.getWareGroupStatus(group.id, ware.id, activeSubCategory) === 'duplicated'
                         }"
                       >
-                        <span class="flex-1 truncate">{{ group.name }}</span>
+                        <span class="flex-1 truncate">{{ getGroupDisplayName(group) }}</span>
                         <span v-if="logicFlow.getWareGroupStatus(group.id, ware.id, activeSubCategory) === 'rejected'" class="text-[10px] ml-2">🚫</span>
                         <span v-else-if="logicFlow.getWareGroupStatus(group.id, ware.id, activeSubCategory) === 'duplicated'" class="text-[10px] ml-2 opacity-50">{{ t('logicFlow.duplicate') }}</span>
                         <span v-else-if="logicFlow.getWareGroupStatus(group.id, ware.id, activeSubCategory) === 'isolated'" class="text-[10px] ml-2 opacity-70">{{ t('logicFlow.isolate') }}</span>
@@ -564,6 +581,10 @@ defineExpose({
 
 .ware-card-match {
   @apply ring-1 ring-blue-500/50 border-blue-500/50 bg-blue-500/5;
+}
+
+.is-locked-tier {
+  @apply hover:bg-transparent hover:border-white/10;
 }
 
 .ware-status-dot {

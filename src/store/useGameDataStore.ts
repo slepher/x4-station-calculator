@@ -95,6 +95,26 @@ export const useGameDataStore = defineStore('gameData', () => {
   }
 
   /**
+   * 获取模块显示名称
+   * @param moduleId 模块 ID
+   * @returns 本地化的模块名称，如果找不到返回 moduleId
+   */
+  function getModuleDisplayName(moduleId: string | undefined): string {
+    if (!moduleId) return ''
+    return localizedModulesMap.value[moduleId]?.localeName || moduleId
+  }
+
+  /**
+   * 获取产品显示名称
+   * @param wareId 产品 ID
+   * @returns 本地化的产品名称，如果找不到返回 wareId
+   */
+  function getWareDisplayName(wareId: string | undefined): string {
+    if (!wareId) return ''
+    return localizedWaresMap.value[wareId]?.localeName || wareId
+  }
+
+  /**
    * 预计算所有分类的回溯产业链 (候选区显示优化)
    */
   function precomputeCandidateWares() {
@@ -366,6 +386,8 @@ export const useGameDataStore = defineStore('gameData', () => {
     initialize,
     changeLanguage,
     precomputeCandidateWares,
-    findModuleForWare
+    findModuleForWare,
+    getModuleDisplayName,
+    getWareDisplayName
   }
 })
