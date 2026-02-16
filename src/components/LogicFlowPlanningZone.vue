@@ -26,11 +26,29 @@ const getAttribute = (element: any, attribute: string) => {
 
 /**
  * 获取有效的血统（考虑锁定组）
+ * 锁定状态：使用 lockedLineage
+ * 解锁状态：优先使用拖拽携带的血统，否则使用规划区的 subCategory
  */
 const getEffectiveLineage = (group: ProductionLineGroup, event?: any): string => {
+  if (group.isLocked) {
+    return group.lockedLineage!
+  }
+  
+  // 优先使用拖拽时携带的血统
+  const draggingLineage = logicFlow.draggingLineage
+  if (draggingLineage) {
+    return draggingLineage
+  }
+  
+  // 其次使用来源区域的血统
   const fromSubCategory = event ? getAttribute(event?.from, 'data-subcategory') : null
-  const draggingLineage = logicFlow.draggingLineage || fromSubCategory || 'default'
-  return group.isLocked ? group.lockedLineage! : draggingLineage
+  if (fromSubCategory) {
+    return fromSubCategory
+  }
+  
+  // 最后使用规划区自身的血统偏好
+  // 工业区使用 'default'，农业区使用创建时选择的种族
+  return group.subCategory
 }
 
 /**

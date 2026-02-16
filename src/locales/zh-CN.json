@@ -159,6 +159,7 @@
     "connect": "连接",
     "lock": "锁定",
     "unlock": "解锁",
+    "mixed": "混合",
     "auto": "自动",
     "manual": "手动",
     "duplicate": "重复",

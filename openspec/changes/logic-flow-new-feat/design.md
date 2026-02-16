@@ -63,6 +63,60 @@
 - 原位置：`[视图切换] [按钮组] ... [标题] ... [MissingTranslate] [LanguageSelector]`
 - 新位置：`[按钮组] ... [标题] ... [视图切换] [LanguageSelector]`
 
+### D5: 解锁规划区血统检查逻辑
+
+**决策**: 解锁的规划区允许跨 category 添加产物，只有锁定状态才检查血统兼容性
+
+**血统系统结构**:
+| Category | 血统键 | 数据源 |
+|----------|--------|--------|
+| 工业 | `default`, `terran`, `teladi` | `wareSetsByIndustrialRace` |
+| 农业 | `argon`, `boron`, `paranid`, `split`, `teladi`, `terran` | `wareSetsByRace` |
+
+**注意**: `teladi` 和 `terran` 在工业和农业中都存在，但指向不同的产物集合。
+
+**修改逻辑**:
+```typescript
+function getWareGroupStatus(groupId: string, wareId: string, lineage: string) {
+  // ...
+  
+  // 锁定状态：检查血统兼容性
+  if (group.isLocked) {
+    const backtraceSet = group.category === 'industrial' 
+      ? gameData.wareSetsByIndustrialRace[group.lockedLineage]
+      : gameData.wareSetsByRace[group.lockedLineage]
+    
+    if (!backtraceSet?.has(wareId)) {
+      return 'rejected'
+    }
+  }
+  
+  // 解锁状态：不检查血统，允许跨 category 添加
+  // ...
+}
+```
+
+**效果**:
+| 场景 | 规划区状态 | 结果 |
+|------|-----------|------|
+| Teladi 农业 → Teladi 工业区 | 解锁 | ✅ 允许 |
+| Teladi 农业 → Teladi 工业区 | 锁定 | ❌ 拒绝 |
+| Argon 农业 → Teladi 农业区 | 解锁 | ✅ 允许 |
+| Argon 农业 → Teladi 农业区 | 锁定 | ❌ 拒绝 |
+
+### D6: 混合血统显示与锁定禁用
+
+**决策**: 当规划区内存在多种血统的手动模块时，显示"混合"文字并禁用锁定按钮
+
+**实现要点**:
+1. 添加 `hasMixedLineage` computed 属性检测混合血统
+2. 混合血统时显示 `t('logicFlow.mixed')` 文字
+3. 锁定按钮添加 `:disabled="hasMixedLineage"` 和禁用样式
+
+**i18n 新增**:
+- `zh-CN`: `"mixed": "混合"`
+- `en`: `"mixed": "Mixed"`
+
 ## Risks / Trade-offs
 
 **R1: 高亮性能** → 使用 Set 数据结构存储高亮 ID，O(1) 查找复杂度

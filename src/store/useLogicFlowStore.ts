@@ -357,6 +357,30 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   }
 
   /**
+   * 上移产线组
+   */
+  function moveGroupUp(groupId: string) {
+    const index = groups.value.findIndex(g => g.id === groupId)
+    if (index <= 0) return
+    const moved = groups.value.splice(index, 1)[0]
+    if (moved) {
+      groups.value.splice(index - 1, 0, moved)
+    }
+  }
+
+  /**
+   * 下移产线组
+   */
+  function moveGroupDown(groupId: string) {
+    const index = groups.value.findIndex(g => g.id === groupId)
+    if (index < 0 || index >= groups.value.length - 1) return
+    const moved = groups.value.splice(index, 1)[0]
+    if (moved) {
+      groups.value.splice(index + 1, 0, moved)
+    }
+  }
+
+  /**
    * 切换节点隔离状态 (原 Lock/Unlock)
    * 隔离操作：Manual → 先降级为 Auto → 再设置 isIsolated = true
    * 连接操作：isIsolated = false，保持 Auto 状态（用户需要手动转正）
@@ -805,19 +829,23 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       return 'available'
     }
 
-    // 1. 检查锁定冲突与血统兼容性（最高优先级）
-    const effectiveLineage = group.isLocked ? group.lockedLineage : lineage
-    
-    const backtraceSet = group.category === 'industrial' 
-      ? gameData.wareSetsByIndustrialRace[effectiveLineage]
-      : gameData.wareSetsByRace[effectiveLineage]
-    
-    if (!backtraceSet?.has(wareId)) {
-      return 'rejected'
+    // 1. 锁定状态：检查血统兼容性
+    // 解锁状态允许跨 category 添加产物（工业/农业混合）
+    if (group.isLocked) {
+      const backtraceSet = group.category === 'industrial' 
+        ? gameData.wareSetsByIndustrialRace[group.lockedLineage]
+        : gameData.wareSetsByRace[group.lockedLineage]
+      
+      if (!backtraceSet?.has(wareId)) {
+        return 'rejected'
+      }
     }
 
     // 2. 查找组内是否存在相同 wareId 的节点
     const existingNode = group.nodes.find(n => n.wareId === wareId)
+    
+    // 确定用于模块查找的血统
+    const effectiveLineage = group.isLocked ? group.lockedLineage : lineage
     
     if (existingNode) {
       // 2.1 检查是否为隔离节点
@@ -881,6 +909,8 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     init,
     addGroup,
     removeGroup,
+    moveGroupUp,
+    moveGroupDown,
     clearAllGroups,
     toggleNodeIsolation,
     toggleGroupLock,

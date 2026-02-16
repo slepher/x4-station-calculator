@@ -157,6 +157,7 @@
     "connect": "Connect",
     "lock": "Lock",
     "unlock": "Unlock",
+    "mixed": "Mixed",
     "auto": "Auto",
     "manual": "Manual",
     "duplicate": "Duplicate",

@@ -42,3 +42,16 @@
 - [x] 6.2 预览区菜单按钮添加的对象显示自定义标题
 - [x] 6.3 预览区标题显示优先级：T0 产物完整显示 > 自定义标题缩略显示
 - [x] 6.4 菜单标题支持缩略显示
+
+## 7. 解锁规划区血统检查逻辑优化
+
+- [x] 7.1 修改 `getWareGroupStatus` 函数，仅在锁定状态检查血统兼容性
+- [x] 7.2 解锁状态允许跨 category 添加产物（工业/农业混合）
+- [x] 7.3 更新 `getEffectiveLineage` 逻辑，解锁状态使用 `group.subCategory` 作为默认值
+
+## 8. 混合血统显示与锁定禁用
+
+- [x] 8.1 添加 `hasMixedLineage` computed 属性检测混合血统
+- [x] 8.2 混合血统时显示"混合"文字
+- [x] 8.3 锁定按钮禁用（`:disabled="hasMixedLineage"`）
+- [x] 8.4 添加 i18n 翻译：`zh-CN` 和 `en`

@@ -143,6 +143,28 @@ const removeGroup = () => {
   }
 }
 
+const isFirstGroup = computed(() => {
+  return logicFlow.groups[0]?.id === props.group.id
+})
+
+const isLastGroup = computed(() => {
+  return logicFlow.groups[logicFlow.groups.length - 1]?.id === props.group.id
+})
+
+const hasMixedLineage = computed(() => {
+  const manualNodes = props.group.nodes.filter(n => n.source === 'manual')
+  const lineages = new Set(manualNodes.map(n => n.lineage))
+  return lineages.size > 1
+})
+
+const handleMoveUp = () => {
+  logicFlow.moveGroupUp(props.group.id)
+}
+
+const handleMoveDown = () => {
+  logicFlow.moveGroupDown(props.group.id)
+}
+
 const getGroupName = computed(() => {
   // 优先显示用户自定义标题
   if (props.group.customName) {
@@ -310,20 +332,41 @@ const handleAdd = (_colIndex: number, event: any) => {
       <div class="flex items-center gap-3">
         <!-- Group Lock Toggle (iOS Style) -->
         <div class="group-lock-control flex items-center gap-2">
-          <label class="relative inline-flex items-center cursor-pointer group">
+          <span class="text-[10px] font-bold uppercase tracking-widest text-white/40 group-hover:text-white/70 transition-colors">
+            {{ hasMixedLineage ? t('logicFlow.mixed') : (group.isLocked ? t('race.' + group.lockedLineage) : t('logicFlow.unlock')) }}
+          </span>
+          <label class="relative inline-flex items-center cursor-pointer group" :class="{ 'pointer-events-none opacity-50': hasMixedLineage }">
             <input 
               type="checkbox" 
               :checked="group.isLocked"
+              :disabled="hasMixedLineage"
               @change="handleToggleGroupLock"
               class="sr-only peer"
             >
             <div class="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 transition-colors"></div>
-            <span class="ml-2 text-[10px] font-bold uppercase tracking-widest text-white/40 group-hover:text-white/70 transition-colors">
-              {{ group.isLocked ? t('race.' + group.lockedLineage) : t('logicFlow.unlock') }}
-            </span>
           </label>
         </div>
 
+        <button 
+          @click="handleMoveUp"
+          :disabled="isFirstGroup"
+          class="p-1 hover:bg-blue-500/10 text-white/20 hover:text-blue-400 rounded transition-all disabled:opacity-0 disabled:pointer-events-none"
+          title="Move Up"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+          </svg>
+        </button>
+        <button 
+          @click="handleMoveDown"
+          :disabled="isLastGroup"
+          class="p-1 hover:bg-blue-500/10 text-white/20 hover:text-blue-400 rounded transition-all disabled:opacity-0 disabled:pointer-events-none"
+          title="Move Down"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
         <button 
           @click="removeGroup"
           class="p-2 hover:bg-red-500/10 text-white/20 hover:text-red-400 rounded-lg transition-all"
@@ -331,9 +374,6 @@ const handleAdd = (_colIndex: number, event: any) => {
         >
           <span class="text-sm">🗑️</span>
         </button>
-        <div class="drag-handle cursor-grab active:cursor-grabbing p-2 text-white/10 hover:text-white/40">
-          <span class="text-lg">⋮⋮</span>
-        </div>
       </div>
     </div>
 
