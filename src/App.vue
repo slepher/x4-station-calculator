@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import StationWorkbench from './components/StationWorkbench.vue'
 import DragTestPage from './components/test/DragTestPage.vue'
-import TestTemplateFlow from './components/test/TestTemplateFlow.vue'
+import TestTemplateFlow from './components/test/GLM-Parent.vue'
 import { useStationStore } from '@/store/useStationStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'

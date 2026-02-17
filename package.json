@@ -15,6 +15,7 @@
     "mockdata": "tsx scripts/mockDataGenerator.ts"
   },
   "dependencies": {
+    "@heroicons/vue": "^2.2.0",
     "@playwright/test": "^1.57.0",
     "@tailwindcss/postcss": "^4.1.18",
     "autoprefixer": "^10.4.24",
