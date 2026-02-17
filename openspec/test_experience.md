@@ -262,9 +262,11 @@ await expect(page.locator('.title')).toHaveText('新建');
     *   定位器: `.flow-node[data-ware-id="energycells"], .flow-node[data-ware-id="ore"]` (✅)
     *   特点: T0 节点不显示压缩率，因为 `column === 0` (✅)
 *   **Isolated 状态**:
-    *   设置方式: `logicFlowStore.groups[0].nodes.find(n => n.wareId === 'xxx').isIsolated = true` (✅)
+    *   设置方式: 通过 UI 点击隔离按钮 `✂️`（hover 后显示）(✅)
+    *   前提条件: 节点必须被下游依赖（`canIsolate = isDepended`）(✅)
     *   视觉标识: 节点内显示 `EXT` 徽章 (✅)
     *   压缩率隐藏: isolated 节点不显示压缩率 (✅)
+    *   注意: 不能直接操作 store，必须通过 UI 交互 (✅)
 
 #### 测试注意事项
 *   **SVG 连线可见性**: 使用 `toBeAttached()` 代替 `toBeVisible()`，因为 faint 颜色可能导致 Playwright 判定为 hidden。(✅)

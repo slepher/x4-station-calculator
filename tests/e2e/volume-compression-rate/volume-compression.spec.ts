@@ -84,25 +84,24 @@ test.describe('Volume Compression Rate Display', () => {
     const hullpartsNode = page.locator('.flow-node[data-ware-id="hullparts"]');
     await expect(hullpartsNode).toBeVisible({ timeout: 5000 });
 
-    const compressionBefore = hullpartsNode.locator('.text-\\[7px\\]').filter({ hasText: /\d+%/ });
+    const grapheneNode = page.locator('.flow-node[data-ware-id="graphene"]');
+    await expect(grapheneNode).toBeVisible({ timeout: 5000 });
+
+    const compressionBefore = grapheneNode.locator('.text-\\[7px\\]').filter({ hasText: /\d+%/ });
     await expect(compressionBefore).toBeVisible({ timeout: 3000 });
 
-    await page.evaluate(() => {
-      const logicFlow = (window as any).logicFlowStore;
-      const group = logicFlow.groups[0];
-      if (group && group.nodes.length > 0) {
-        const hullpartsNode = group.nodes.find((n: any) => n.wareId === 'hullparts');
-        if (hullpartsNode) {
-          hullpartsNode.isIsolated = true;
-        }
-      }
-    });
+    await grapheneNode.hover();
+    await page.waitForTimeout(100);
+
+    const isolateBtn = grapheneNode.locator('button').filter({ hasText: '✂️' });
+    await expect(isolateBtn).toBeVisible({ timeout: 2000 });
+    await isolateBtn.click();
     await page.waitForTimeout(300);
 
-    const extBadge = hullpartsNode.locator('text=EXT');
+    const extBadge = grapheneNode.locator('text=EXT');
     await expect(extBadge).toBeVisible({ timeout: 3000 });
 
-    const compressionDisplay = hullpartsNode.locator('.text-\\[7px\\]').filter({ hasText: /\d+%/ });
+    const compressionDisplay = grapheneNode.locator('.text-\\[7px\\]').filter({ hasText: /\d+%/ });
     await expect(compressionDisplay).not.toBeVisible();
   });
 
