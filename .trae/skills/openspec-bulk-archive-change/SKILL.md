@@ -120,18 +120,25 @@ This skill allows you to batch-archive changes, handling spec conflicts intellig
 
    Process changes in the determined order (respecting conflict resolution):
 
-   a. **Sync specs** if delta specs exist:
+   a. **VERIFY SPECS DIRECTORY PATH (MANDATORY)**:
+      - Run `LS` on `openspec/specs/` to get the correct absolute path
+      - **CRITICAL**: The specs directory is `openspec/specs/`, NOT `specs/`
+      - Store the full path: `<project-root>/openspec/specs/`
+      - **NEVER** construct paths from memory - always use the verified path
+
+   b. **Sync specs** if delta specs exist:
       - Use the openspec-sync-specs approach (agent-driven intelligent merge)
       - For conflicts, apply in resolved order
+      - **Write to verified path**: `<project-root>/openspec/specs/<spec-name>/spec.md`
       - Track if sync was done
 
-   b. **Perform the archive**:
+   c. **Perform the archive**:
       ```bash
       mkdir -p openspec/changes/archive
       mv openspec/changes/<name> openspec/changes/archive/YYYY-MM-DD-<name>
       ```
 
-   c. **Track outcome** for each change:
+   d. **Track outcome** for each change:
       - Success: archived successfully
       - Failed: error during archive (record error)
       - Skipped: user chose not to archive (if applicable)

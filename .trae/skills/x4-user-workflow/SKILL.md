@@ -324,29 +324,65 @@ If a bug is discovered that is unrelated to the current change:
 - Change name (optional, inferred from context if possible)
 
 **Actions**:
-1. **MANDATORY**: Read `.trae/skills/openspec-verify-change/SKILL.md` for detailed steps
-2. Run `npm run build` to ensure no syntax errors
-3. **MANDATORY**: Invoke `x4-test` skill via Skill tool to execute Unit and E2E tests
-4. **After each test run**: Update `test_tasks.md` status immediately
-5. **MANDATORY**: Update `openspec/test_experience.md` for any locator discoveries
 
-**x4-test Integration**:
-- Call `Skill` tool with `name: "x4-test"` to load the test skill
-- Follow x4-test instructions to:
-  - Write unit tests (Vitest) for each `test_tasks.md` Unit Tests item
-  - Write E2E tests (Playwright) for each `test_tasks.md` Web Integration Tests item
-  - Run tests and update `test_tasks.md` status
-- Each test case maps 1:1 to a `test_tasks.md` checklist item
+#### Step 1: Build Check
+```bash
+npm run build
+```
+- If build fails: Stop and report errors
+- If build succeeds: Continue to Step 2
+
+#### Step 2: Static Verification (openspec-verify-change)
+1. Run `openspec status --change "<name>" --json` to get schema and artifacts
+2. Run `openspec instructions apply --change "<name>" --json` to get context files
+3. Read all context files (tasks.md, specs, design.md)
+4. Execute static checks:
+   - **Completeness**: Count `- [x]` vs `- [ ]` in tasks.md
+   - **Correctness**: Search codebase for each requirement implementation
+   - **Coherence**: Verify design decisions are followed
+5. Generate static verification report
+
+#### Step 3: Dynamic Testing (x4-test) - MANDATORY
+1. **Invoke x4-test skill**: Call `Skill` tool with `name: "x4-test"`
+2. **Read test_tasks.md**: Load `openspec/changes/<change-name>/test_tasks.md`
+3. **Check test files existence**:
+   - Unit tests: `tests/unit/<change-name>/*.spec.ts`
+   - E2E tests: `tests/e2e/<change-name>/*.spec.ts`
+4. **If test files do NOT exist**:
+   - Create test directory structure
+   - Write unit tests for each "Unit Tests" item in test_tasks.md
+   - Write E2E tests for each "Web Integration Tests" item in test_tasks.md
+5. **If test files exist**:
+   - Compare test_tasks.md items against existing test descriptions
+   - Add missing test cases
+6. **Run tests**:
+   ```bash
+   npm run test:unit                    # Run unit tests
+   npx playwright test                  # Run E2E tests
+   ```
+7. **Update test_tasks.md**: Mark `[x]` for passed, add `<!-- FAILED: reason -->` for failed
+8. **Update test_experience.md**: Record locator discoveries
+
+#### Step 4: Final Verification Report
+Generate combined report with:
+- Static verification results (from Step 2)
+- Test execution results (from Step 3)
+- Overall pass/fail status
 
 **Verification Dimensions**:
 - **Completeness**: All tasks done, all requirements implemented
-- **Correctness**: Implementation matches spec intent
+- **Correctness**: Implementation matches spec intent, all tests pass
 - **Coherence**: Follows design decisions and project patterns
 
 **Output**:
 - Verification report with pass/fail status
 - Updated `test_tasks.md` (synced after each test run)
 - Updated `test_experience.md` (if applicable)
+
+**Guardrails**:
+- **NEVER** skip Step 3 (x4-test) - it is MANDATORY
+- **NEVER** mark verification complete if any test fails
+- **NEVER** proceed to archive without all test_tasks.md items checked
 
 ---
 

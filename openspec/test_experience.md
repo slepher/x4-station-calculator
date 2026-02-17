@@ -272,3 +272,32 @@ await expect(page.locator('.title')).toHaveText('新建');
 *   **SVG 连线可见性**: 使用 `toBeAttached()` 代替 `toBeVisible()`，因为 faint 颜色可能导致 Playwright 判定为 hidden。(✅)
 *   **编辑模式切换**: 点击标题后需要 `waitForTimeout(100)` 等待 Vue 响应式更新。(✅)
 *   **拖拽后等待**: 拖拽完成后需要 `waitForTimeout(300)` 等待数据更新和 DOM 渲染。(✅)
+
+### 10. Logic Flow UI Adjust 测试定位器
+*   **候选区 Ware Card**:
+    *   定位器: `.ware-card-wrapper[data-ware-id="xxx"]` (✅)
+    *   注意: 不是 `.ware-card`，而是 `.ware-card-wrapper`
+*   **候选区 Grid 布局**:
+    *   定位器: `.candidate-zone .ware-grid` (✅)
+    *   列宽样式: `grid-cols-[2fr_3fr_3fr_4fr]`
+*   **ProductionLineGroup Grid 布局**:
+    *   定位器: `.production-group .grid` (✅)
+    *   列宽样式: `grid-cols-[2fr_3fr_3fr_4fr]`
+*   **紧凑视图**:
+    *   容器: `.compact-view` (✅)
+    *   组容器: `.compact-group` (✅)
+    *   节点网格: `.compact-node-grid` (✅)
+    *   新建区域: `.drop-target` (✅)
+*   **压缩率显示**:
+    *   容器: `.compression-rate-container` (✅)
+    *   文本: `.compression-rate-text` (✅)
+    *   颜色类: `text-emerald-400` (≤100%), `text-red-400` (>100%) (✅)
+*   **T0 资源卡片**:
+    *   定位器: `.ware-card-wrapper[data-tier="0"]` (✅)
+    *   特点: T0 卡片不显示压缩率和+按钮 (✅)
+*   **快速添加按钮**:
+    *   定位器: `.ware-card-add-btn` (✅)
+    *   触发: hover 时显示 (✅)
+*   **资源预览容器**:
+    *   定位器: `.resource-preview-container` (✅)
+    *   行为: hover 时 opacity 变为 0 (✅)

@@ -212,20 +212,43 @@ const getCompactNodeDisplayName = (node: any, group: any): string => {
 
 /**
  * 获取紧凑模式产线组标题
- * 优先级：T0 产物完整显示 > 自定义标题缩略显示 > 自动计算名称
+ * 如果 name 为空，则动态计算默认名称（最高 tier 的 manual 产线名称）
  */
 const getCompactGroupTitle = (group: ProductionLineGroup): { title: string; t0Resources: string[] } => {
   // 获取 T0 资源（排除能量电池和隔离节点）
   const t0Nodes = group.nodes.filter(n => n.column === 0 && n.wareId !== 'energycells' && !n.isIsolated)
   const t0Resources = t0Nodes.map(n => gameData.getWareDisplayName(n.wareId))
   
-  // 如果有自定义标题，返回自定义标题
-  if (group.customName) {
-    return { title: group.customName, t0Resources }
+  // 如果有用户自定义名称，直接返回
+  if (group.name) {
+    return { title: group.name, t0Resources }
   }
   
-  // 否则返回自动计算的名称
-  return { title: group.name, t0Resources }
+  // 动态计算默认名称：Find highest tier manual nodes
+  let maxTier = -1
+  group.nodes.forEach(n => {
+    if (n.source === 'manual' && n.column > maxTier) {
+      maxTier = n.column
+    }
+  })
+
+  if (maxTier === -1) {
+    return { title: '空', t0Resources }
+  }
+
+  // Get manual nodes in the highest tier column
+  const highestTierNodes = group.nodes
+    .filter(n => n.source === 'manual' && n.column === maxTier)
+    .sort((a, b) => {
+      if (a.isIsolated && !b.isIsolated) return 1
+      if (!a.isIsolated && b.isIsolated) return -1
+      return a.order - b.order
+    })
+
+  const topNode = highestTierNodes[0]
+  const title = topNode ? gameData.getWareDisplayName(topNode.wareId) : '空'
+  
+  return { title, t0Resources }
 }
 
 /**
@@ -357,7 +380,7 @@ const handleAddFromDrop = (event: any) => {
 </script>
 
 <template>
-  <div class="planning-zone mt-8 overflow-x-auto custom-scrollbar pb-8">
+  <div class="planning-zone mt-8 overflow-x-auto custom-scrollbar pb-8 pl-4 pr-8">
     <!-- Regular View -->
     <div 
       class="groups-list flex flex-col gap-8 min-w-[1000px]" 
@@ -369,31 +392,27 @@ const handleAddFromDrop = (event: any) => {
         :group="group"
       />
 
-      <!-- Add New Zone in Regular View (Visible when empty or as a footer) -->
+      <!-- Add New Zone in Regular View (Always visible as footer) -->
       <draggable
-        v-if="logicFlow.groups.length === 0"
         :list="[]"
         :group="{ name: 'wares', put: isDropAllowedForNewZone, pull: false }"
         :sort="false"
         item-key="id"
         @add="handleAddFromDrop"
-        class="drop-target bg-white/[0.02] border-2 border-dashed border-white/10 rounded-2xl p-12 flex flex-col items-center justify-center gap-4 hover:bg-blue-500/5 hover:border-blue-500/30 transition-all cursor-pointer group"
+        class="drop-target bg-white/[0.02] border-2 border-dashed border-white/10 rounded-2xl p-8 flex flex-col items-center justify-center gap-3 hover:bg-blue-500/5 hover:border-blue-500/30 transition-all cursor-pointer group"
         @click="logicFlow.addGroup('industrial', 'default', undefined, logicFlow.isDefaultLocked)"
       >
         <template #item="{ element }">
           <div :key="element.id" class="hidden"></div>
         </template>
         <template #header>
-          <div class="flex flex-col items-center gap-3 pointer-events-none">
-            <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
-              <span class="text-2xl text-white/40 group-hover:text-blue-400">+</span>
+          <div class="flex flex-col items-center gap-2 pointer-events-none">
+            <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
+              <span class="text-xl text-white/40 group-hover:text-blue-400">+</span>
             </div>
             <div class="text-center">
-              <div class="text-sm font-bold text-white/40 group-hover:text-blue-400/80 uppercase tracking-widest mb-1">
+              <div class="text-xs font-bold text-white/30 group-hover:text-blue-400/60 uppercase tracking-widest">
                 {{ $t('logicFlow.dropToCreate') }}
-              </div>
-              <div class="text-[10px] text-white/20 uppercase tracking-tighter">
-                {{ t('logicFlow.clickToAddManually') }}
               </div>
             </div>
           </div>
@@ -402,7 +421,7 @@ const handleAddFromDrop = (event: any) => {
     </div>
 
     <!-- 2. Compact View (Active during dragging) -->
-    <div v-show="logicFlow.isDragging" class="compact-view grid grid-cols-[2fr_3fr_3fr_4fr] gap-6 px-12 py-12 min-h-full" data-testid="compact-view">
+    <div v-show="logicFlow.isDragging" class="compact-view grid grid-cols-4 gap-6 py-12 min-h-full" data-testid="compact-view">
       <!-- Existing Groups as Drop Targets -->
       <draggable
         v-for="group in logicFlow.groups"
@@ -489,7 +508,7 @@ const handleAddFromDrop = (event: any) => {
             </div>
             
             <!-- Nodes Grid (4xN logic: 4 columns) -->
-      <div class="grid grid-cols-[2fr_3fr_3fr_4fr] gap-1.5 flex-1 content-start compact-node-grid">
+      <div class="grid grid-cols-4 gap-1.5 flex-1 content-start compact-node-grid">
               <div 
                 v-for="node in nodesWithPreview(group)" 
                 :key="node.id"
@@ -565,9 +584,6 @@ const handleAddFromDrop = (event: any) => {
             <div class="grid grid-cols-4 gap-1.5 flex-1 content-start compact-node-grid">
               <div 
                 class="compact-node px-1 py-0.5 rounded border border-dashed border-blue-500 bg-blue-500/20 text-blue-300 text-[8px] font-bold flex items-center justify-center min-h-[20px] animate-pulse"
-                :style="{ 
-                  gridColumnStart: logicFlow.draggingWareId ? (gameData.waresMap[logicFlow.draggingWareId]?.tier === 0 ? 1 : 4 - (gameData.waresMap[logicFlow.draggingWareId]?.tier || 0)) : 1 
-                }"
               >
                 <span class="truncate text-center w-full leading-tight">
                   {{ getNewLineModuleName() }}

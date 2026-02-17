@@ -61,6 +61,7 @@
     "action_cancel": "取消",
     "copy_suffix": "(副本)",
     "default_station_name": "我的空间站",
+    "default_flow_name": "我的逻辑组网",
     "dialog_title_save_as": "另存方案",
     "dialog_title_save_new_plan": "保存新方案",
     "dialog_title_save_changes": "保存更改",
@@ -87,11 +88,16 @@
     "transfer_to_planning": "点击转移到用户规划区",
     "remove": "删除",
     "load_plan": "加载方案",
+    "load_flow_plan": "加载逻辑组网方案",
     "no_saved_plans": "暂无保存的方案",
+    "no_saved_flow_plans": "暂无保存的逻辑组网方案",
     "action_load_plan": "加载方案",
     "action_merge": "合并模块",
     "action_delete": "删除",
-    "confirm_delete_plan": "确定要删除这个方案吗？"
+    "confirm_delete_plan": "确定要删除这个方案吗？",
+    "confirm_load_with_unsaved": "当前方案有未保存的修改，确定要加载新方案吗？",
+    "groups_count": "个产线组",
+    "nodes_count": "个节点"
   },
   "wareflow": {
     "resource_overview": "资源产出",

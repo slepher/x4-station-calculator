@@ -1,9 +1,6 @@
-# Title as Plan Title Specification
+# Title as Plan Title Specification (Delta)
 
-## Purpose
-将工具栏标题与方案名称关联，实现标题编辑、文档标题同步、主题色切换等功能，确保生产视图和逻辑组网视图的一致体验。
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Dynamic Document Title
 The system SHALL 根据当前活动的方案名称更新浏览器文档标题。

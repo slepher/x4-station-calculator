@@ -100,10 +100,35 @@ const handleDragEnd = () => {
 }
 
 /**
- * 获取产线组显示名称（优先自定义标题）
+ * 获取产线组显示名称
+ * 如果 name 为空，则动态计算默认名称（最高 tier 的 manual 产线名称）
  */
 const getGroupDisplayName = (group: any): string => {
-  return group.customName || group.name
+  if (group.name) {
+    return group.name
+  }
+  
+  // 动态计算：Find highest tier manual nodes
+  let maxTier = -1
+  group.nodes?.forEach((n: any) => {
+    if (n.source === 'manual' && n.column > maxTier) {
+      maxTier = n.column
+    }
+  })
+
+  if (maxTier === -1) return '空'
+
+  // Get manual nodes in the highest tier column
+  const highestTierNodes = group.nodes
+    ?.filter((n: any) => n.source === 'manual' && n.column === maxTier)
+    .sort((a: any, b: any) => {
+      if (a.isIsolated && !b.isIsolated) return 1
+      if (!a.isIsolated && b.isIsolated) return -1
+      return a.order - b.order
+    }) || []
+
+  const topNode = highestTierNodes[0]
+  return topNode ? gameData.getWareDisplayName(topNode.wareId) : '空'
 }
 
 /**
@@ -343,7 +368,7 @@ defineExpose({
                   ) ? 'ware-card-match' : ''
                 ]"
               >
-                <!-- Background Layer (expands on hover) -->
+                <!-- Background Layer (expands on hover for non-T0) -->
                 <div class="ware-card-bg" v-if="ware.tier > 0 && ware.id !== 'energycells'">
                   <button 
                     class="ware-card-add-btn"
@@ -352,6 +377,9 @@ defineExpose({
                     ＋
                   </button>
                 </div>
+
+                <!-- Background Layer for T0 (no button, just styling) -->
+                <div class="ware-card-bg" v-else-if="ware.tier === 0"></div>
 
                 <!-- Content Layer -->
                 <div class="ware-card-content">
@@ -583,7 +611,7 @@ defineExpose({
 
 /* --- Ware Grid --- */
 .ware-grid {
-  @apply flex-1 overflow-hidden p-4 grid grid-cols-[2fr_3fr_3fr_4fr] gap-12 bg-transparent;
+  @apply flex-1 overflow-hidden pl-4 pr-8 grid grid-cols-[2fr_3fr_3fr_4fr] gap-12 bg-transparent;
 }
 
 .tier-column {
@@ -606,7 +634,7 @@ defineExpose({
   @apply flex-1 overflow-y-auto overflow-x-hidden mr-[-36px] pr-[36px];
 }
 .draggable-area {
-  @apply flex flex-col gap-1.5 min-h-[50px];
+  @apply flex flex-col gap-1.5 min-h-[50px] mb-1.5;
 }
 
 /* --- Ware Card --- */
@@ -699,13 +727,12 @@ defineExpose({
 
 /* --- Resource Preview with Gradient Mask --- */
 .resource-preview-container {
-  @apply flex items-center gap-1 h-full pl-8 pr-2;
-  background: linear-gradient(to right, transparent, theme('colors.slate.900 / 80%') 30%, theme('colors.slate.900'));
-  @apply transition-opacity duration-300 group-hover:opacity-0;
+  @apply flex items-center gap-1 h-full pl-2 pr-0;
+  @apply transition-opacity duration-300 hover:opacity-0;
 }
 
 .resource-tag {
-  @apply flex items-center gap-0.5 px-1 rounded bg-white/5 border border-white/10 shrink-0;
+  @apply flex items-center gap-0.5 px-1 rounded bg-white/5 border border-white/10 shrink-0 bg-slate-900/70;
 }
 
 .resource-text {
@@ -714,12 +741,12 @@ defineExpose({
 
 /* --- Compression Rate --- */
 .compression-rate-container {
-  @apply flex items-center gap-0.5 shrink-0 h-full bg-slate-900 px-1;
+  @apply flex items-center gap-0.5 shrink-0 h-full px-1;
   @apply transition-opacity duration-300;
 }
 
 .compression-rate-text {
-  @apply text-[9px] font-bold font-mono;
+  @apply text-[9px] font-bold font-mono min-w-[22px] text-right;
 }
 
 /* --- Context Menu --- */

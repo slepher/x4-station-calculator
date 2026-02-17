@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
-import { ref, watch, computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useGameDataStore } from './useGameDataStore'
-import type { FlowNode, ProductionLineGroup } from '@/types/x4'
+import type { FlowNode, ProductionLineGroup, SavedFlowNode, SavedFlowGroup, LogicFlowPlan, SavedFlowPlansState, LogicFlowSettings } from '@/types/x4'
 
 export const useLogicFlowStore = defineStore('logicFlow', () => {
   const gameData = useGameDataStore()
@@ -17,6 +17,12 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   const isHoveringNewZone = ref(false)
   const isDefaultLocked = ref(true)
   const previewNodes = ref<Map<string, FlowNode>>(new Map()) // 预览节点：key 为 groupId 或 '__new__'
+
+  // --- Plan Management State ---
+  const currentPlanName = ref<string>('')
+  const savedPlans = ref<SavedFlowPlansState>({ version: 1, activeId: null, list: [] })
+  const lastSavedSnapshot = ref<string>('')
+  const settings = ref<LogicFlowSettings>({ isDefaultLocked: true })
 
   // 同步到 state 以便持久化（可选，但目前主要用于测试注入）
   const startDragging = (wareId: string, lineage?: string) => {
@@ -393,47 +399,20 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     return allResources
   }
 
-  // --- Persistence ---
-  const loadFromStorage = () => {
-    const stored = localStorage.getItem('x4_logic_flow_data')
-    if (stored) {
-      try {
-        const data = JSON.parse(stored)
-        const loadedGroups = data.groups || []
-        
-        // 数据迁移：将旧的 method 字段转换为 race
-        loadedGroups.forEach((g: any) => {
-          g.nodes?.forEach((n: any) => {
-            if (n.method && !n.race) {
-              n.race = n.method
-              delete n.method
-            }
-          })
-        })
-
-        groups.value = loadedGroups
-        activeGroupId.value = data.activeGroupId || null
-      } catch (e) {
-        console.error('[LogicFlowStore] Failed to load data:', e)
-      }
-    }
-  }
-
-  const saveToStorage = () => {
-    localStorage.setItem('x4_logic_flow_data', JSON.stringify({
-      groups: groups.value,
-      activeGroupId: activeGroupId.value
-    }))
-  }
-
-  watch(groups, saveToStorage, { deep: true })
-  watch(activeGroupId, saveToStorage)
-
   /**
    * 初始化
    */
   function init() {
-    loadFromStorage()
+    loadPlansFromStorage()
+    
+    // 根据 activeId 自动加载当前方案
+    if (savedPlans.value.activeId) {
+      const activePlan = savedPlans.value.list.find(p => p.id === savedPlans.value.activeId)
+      if (activePlan) {
+        applyPlan(activePlan)
+      }
+    }
+    
     if (!gameData.isReady) {
       gameData.initialize()
     }
@@ -445,12 +424,10 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   function addGroup(category: 'industrial' | 'agricultural', subCategory: string, name?: string, isLocked: boolean = false) {
     const id = crypto.randomUUID()
     
-    // 如果没有提供名称，暂时使用默认占位符，由 expandUpstream 或 UI 在添加首个 manual 节点时更新
-    const defaultName = name || `${category === 'industrial' ? '工业' : '农业'} - ${subCategory}`
-    
+    // name 为空时，UI 会显示默认名称（最高 tier 的 manual 产线名称）
     const newGroup: ProductionLineGroup = {
       id,
-      name: defaultName,
+      name: name || '',
       category,
       subCategory,
       isLocked,
@@ -998,13 +975,215 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   }
 
   /**
-   * 更新产线组自定义标题
+   * 更新产线组名称
    */
-  function updateGroupCustomName(groupId: string, customName: string) {
+  function updateGroupCustomName(groupId: string, name: string) {
     const group = groups.value.find(g => g.id === groupId)
     if (group) {
-      group.customName = customName
+      group.name = name
     }
+  }
+
+  // --- Plan Management Methods ---
+
+  /**
+   * 脏检查：当前状态与上次保存的快照是否一致
+   */
+  const isDirty = computed(() => {
+    const current = JSON.stringify({ groups: groups.value, settings: settings.value })
+    return current !== lastSavedSnapshot.value
+  })
+
+  /**
+   * 将 FlowNode 转换为 SavedFlowNode（仅保存 manual 和 isolated 节点）
+   */
+  function toSavedFlowNode(node: FlowNode): SavedFlowNode | null {
+    if (node.source === 'auto' && !node.isIsolated) return null
+    return {
+      id: node.id,
+      wareId: node.wareId,
+      moduleId: node.moduleId,
+      race: node.race,
+      lineage: node.lineage,
+      column: node.column,
+      isIsolated: node.isIsolated,
+      source: 'manual',
+      isRoot: node.isRoot,
+      order: node.order
+    }
+  }
+
+  /**
+   * 将 ProductionLineGroup 转换为 SavedFlowGroup
+   */
+  function toSavedFlowGroup(group: ProductionLineGroup): SavedFlowGroup {
+    return {
+      id: group.id,
+      name: group.name,
+      category: group.category,
+      subCategory: group.subCategory,
+      isLocked: group.isLocked,
+      lockedLineage: group.lockedLineage,
+      nodes: group.nodes
+        .map(toSavedFlowNode)
+        .filter((n): n is SavedFlowNode => n !== null)
+    }
+  }
+
+  /**
+   * 保存当前方案
+   */
+  function saveCurrentPlan(name?: string): boolean {
+    if (groups.value.length === 0) return false
+
+    const planName = name || currentPlanName.value
+    if (!planName.trim()) return false
+
+    const plan: LogicFlowPlan = {
+      id: savedPlans.value.activeId || crypto.randomUUID(),
+      name: planName,
+      groups: groups.value.map(toSavedFlowGroup),
+      settings: { ...settings.value },
+      lastUpdated: Date.now()
+    }
+
+    if (savedPlans.value.activeId) {
+      const idx = savedPlans.value.list.findIndex(p => p.id === savedPlans.value.activeId)
+      if (idx !== -1) {
+        savedPlans.value.list[idx] = plan
+      } else {
+        savedPlans.value.list.push(plan)
+        savedPlans.value.activeId = plan.id
+      }
+    } else {
+      savedPlans.value.list.push(plan)
+      savedPlans.value.activeId = plan.id
+    }
+
+    currentPlanName.value = planName
+    lastSavedSnapshot.value = JSON.stringify({ groups: groups.value, settings: settings.value })
+    savePlansToStorage()
+    return true
+  }
+
+  /**
+   * 加载指定方案
+   */
+  function loadPlan(index: number) {
+    const plan = savedPlans.value.list[index]
+    if (!plan) return
+    applyPlan(plan)
+  }
+
+  /**
+   * 应用方案数据（含 auto 节点重建）
+   */
+  function applyPlan(plan: LogicFlowPlan) {
+    groups.value = []
+    activeGroupId.value = null
+    currentPlanName.value = plan.name
+    savedPlans.value.activeId = plan.id
+    settings.value = { ...plan.settings }
+    isDefaultLocked.value = plan.settings.isDefaultLocked
+
+    for (const savedGroup of plan.groups) {
+      const newGroup: ProductionLineGroup = {
+        id: savedGroup.id,
+        name: savedGroup.name,
+        category: savedGroup.category,
+        subCategory: savedGroup.subCategory,
+        isLocked: savedGroup.isLocked,
+        lockedLineage: savedGroup.lockedLineage,
+        nodes: []
+      }
+      groups.value.push(newGroup)
+
+      // 第一轮：先添加所有 isolated 节点，确保 expandUpstream 能检测到它们
+      for (const savedNode of savedGroup.nodes) {
+        if (savedNode.isIsolated) {
+          const isolatedNode: FlowNode = {
+            ...savedNode,
+            isAuto: false,
+            isPreview: false
+          }
+          newGroup.nodes.push(isolatedNode)
+        }
+      }
+
+      // 第二轮：添加 manual 节点并扩展上游
+      for (const savedNode of savedGroup.nodes) {
+        if (!savedNode.isIsolated) {
+          const manualNode: FlowNode = {
+            ...savedNode,
+            isAuto: false,
+            isPreview: false
+          }
+          newGroup.nodes.push(manualNode)
+          if (manualNode.moduleId) {
+            const module = gameData.modulesMap[manualNode.moduleId]
+            if (module?.inputs) {
+              Object.keys(module.inputs).forEach(inputWareId => {
+                expandUpstream(newGroup.id, inputWareId, 'auto', manualNode.lineage)
+              })
+            }
+          }
+        }
+      }
+
+      if (newGroup.nodes.length > 0) {
+        activeGroupId.value = newGroup.id
+      }
+    }
+
+    lastSavedSnapshot.value = JSON.stringify({ groups: groups.value, settings: settings.value })
+  }
+
+  /**
+   * 删除指定方案
+   */
+  function deletePlan(index: number) {
+    const plan = savedPlans.value.list[index]
+    if (!plan) return
+
+    savedPlans.value.list.splice(index, 1)
+
+    if (savedPlans.value.activeId === plan.id) {
+      savedPlans.value.activeId = null
+      currentPlanName.value = ''
+    }
+
+    savePlansToStorage()
+  }
+
+  /**
+   * 清空当前工作区
+   */
+  function clearAll() {
+    groups.value = []
+    activeGroupId.value = null
+    currentPlanName.value = ''
+    savedPlans.value.activeId = null
+    settings.value = { isDefaultLocked: true }
+    isDefaultLocked.value = true
+    lastSavedSnapshot.value = ''
+  }
+
+  // --- Plan Persistence ---
+
+  function loadPlansFromStorage() {
+    const stored = localStorage.getItem('x4_logic_flow_plans')
+    if (stored) {
+      try {
+        const data = JSON.parse(stored)
+        savedPlans.value = data
+      } catch (e) {
+        console.error('[LogicFlowStore] Failed to load plans:', e)
+      }
+    }
+  }
+
+  function savePlansToStorage() {
+    localStorage.setItem('x4_logic_flow_plans', JSON.stringify(savedPlans.value))
   }
 
   return {
@@ -1051,5 +1230,16 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     getWareGroupStatus,
     cleanupUnusedAutoNodes,
     updateGroupCustomName,
+    // Plan Management
+    currentPlanName,
+    savedPlans,
+    lastSavedSnapshot,
+    settings,
+    isDirty,
+    saveCurrentPlan,
+    loadPlan,
+    applyPlan,
+    deletePlan,
+    clearAll,
   }
 })

@@ -303,11 +303,53 @@ export interface FlowNode {
  */
 export interface ProductionLineGroup {
   id: string
-  name: string
-  customName?: string // 用户自定义标题
+  name: string // 用户自定义标题，为空时显示默认名称（最高 tier 的 manual 产线名称）
   category: 'industrial' | 'agricultural'
   subCategory: string // 始终代表 race (工业: default/terran/teladi, 农业: 具体种族)
   isLocked: boolean // [新增] 组是否锁定血统
   lockedLineage: string // [新增] 锁定的血统
   nodes: FlowNode[]
+}
+
+// --- 逻辑组网方案持久化类型 ---
+
+export interface SavedFlowNode {
+  id: string
+  wareId: string
+  moduleId?: string
+  race: string
+  lineage: string
+  column: number
+  isIsolated: boolean
+  source: 'manual'
+  isRoot: boolean
+  order: number
+}
+
+export interface SavedFlowGroup {
+  id: string
+  name: string // 用户自定义标题，为空时显示默认名称
+  category: 'industrial' | 'agricultural'
+  subCategory: string
+  isLocked: boolean
+  lockedLineage: string
+  nodes: SavedFlowNode[]
+}
+
+export interface LogicFlowSettings {
+  isDefaultLocked: boolean
+}
+
+export interface LogicFlowPlan {
+  id: string
+  name: string
+  groups: SavedFlowGroup[]
+  settings: LogicFlowSettings
+  lastUpdated: number
+}
+
+export interface SavedFlowPlansState {
+  version: 1
+  activeId: string | null
+  list: LogicFlowPlan[]
 }

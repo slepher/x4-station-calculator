@@ -1,38 +1,47 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
 import { useStationStore } from '@/store/useStationStore'
+import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useI18n } from 'vue-i18n'
 import type { StationPlan } from '@/store/useStationStore';
+import type { LogicFlowPlan } from '@/types/x4';
 
 const props = defineProps<{
   isOpen: boolean
   intent: 'NEW' | 'SAVE_AS'
   initialName?: string
+  storeType?: 'station' | 'logicFlow'
 }>()
 
 const emit = defineEmits(['close'])
-const store = useStationStore()
+const stationStore = useStationStore()
+const logicFlowStore = useLogicFlowStore()
 const { t } = useI18n()
 
-// Local StateS
+const store = computed(() => 
+  props.storeType === 'logicFlow' ? logicFlowStore : stationStore
+)
+
 const isSaveAsExpanded = ref(false)
 const inputName = ref('')
 const inputRef = ref<HTMLInputElement | null>(null)
 
-// Reset state when opened
+const defaultNameKey = computed(() => 
+  props.storeType === 'logicFlow' ? 'menu.default_flow_name' : 'menu.default_station_name'
+)
+
 watch(() => props.isOpen, (val) => {
   if (val) {
     isSaveAsExpanded.value = false
-    // Default name logic
     if (props.initialName) {
       inputName.value = props.initialName
     } else if (props.intent === 'SAVE_AS') {
-      const baseName = store.savedPlans.activeId
-        ? store.savedPlans.list.find((l: StationPlan) => l.id === store.savedPlans.activeId)?.name
+      const baseName = store.value.savedPlans.activeId
+        ? store.value.savedPlans.list.find((l: StationPlan | LogicFlowPlan) => l.id === store.value.savedPlans.activeId)?.name
         : ''
-      inputName.value = baseName ? `${baseName} ${t('menu.copy_suffix')}` : t('menu.default_station_name')
+      inputName.value = baseName ? `${baseName} ${t('menu.copy_suffix')}` : t(defaultNameKey.value)
     } else {
-      inputName.value = t('menu.default_station_name')
+      inputName.value = t(defaultNameKey.value)
     }
 
     if (showInput.value) {
@@ -41,12 +50,10 @@ watch(() => props.isOpen, (val) => {
   }
 })
 
-// --- Computed UI Logic ---
-
-const isNewPlan = computed(() => !store.savedPlans.activeId)
+const isNewPlan = computed(() => !store.value.savedPlans.activeId)
 const currentPlanName = computed(() => {
-  if (store.savedPlans.activeId) {
-    return store.savedPlans.list.find((l: StationPlan) => l.id === store.savedPlans.activeId)?.name || ''
+  if (store.value.savedPlans.activeId) {
+    return store.value.savedPlans.list.find((l: StationPlan | LogicFlowPlan) => l.id === store.value.savedPlans.activeId)?.name || ''
   }
   return ''
 })
@@ -78,36 +85,34 @@ const showInput = computed(() => {
   return false
 })
 
-// --- Actions ---
-
 const handlePrimaryAction = () => {
   const nameToSave = showInput.value ? inputName.value : currentPlanName.value
 
   if (!nameToSave.trim()) return
 
   if (isNewPlan.value || showInput.value) {
-    const originalId = store.savedPlans.activeId
+    const originalId = store.value.savedPlans.activeId
     if (showInput.value) {
-      store.savedPlans.activeId = null
+      store.value.savedPlans.activeId = null
     }
     try {
-      store.saveCurrentPlan(nameToSave)
+      store.value.saveCurrentPlan(nameToSave)
     } catch (e) {
-      store.savedPlans.activeId = originalId
+      store.value.savedPlans.activeId = originalId
     }
   } else {
-    store.saveCurrentPlan(nameToSave)
+    store.value.saveCurrentPlan(nameToSave)
   }
 
   if (props.intent === 'NEW') {
-    store.clearAll()
+    store.value.clearAll()
   }
 
   emit('close')
 }
 
 const handleDiscard = () => {
-  store.clearAll()
+  store.value.clearAll()
   emit('close')
 }
 
@@ -219,7 +224,6 @@ const handleDiscard = () => {
   }
 }
 
-/* 统一按钮基础样式，只通过 tailwind utility 类改变颜色 */
 .btn-base {
   @apply px-4 py-2 rounded text-sm font-bold text-white shadow-lg transition whitespace-nowrap;
 }

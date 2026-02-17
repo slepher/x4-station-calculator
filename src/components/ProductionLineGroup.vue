@@ -166,36 +166,28 @@ const handleMoveDown = () => {
 }
 
 const getGroupName = computed(() => {
-  // 优先显示用户自定义标题
-  if (props.group.customName) {
-    return props.group.customName
+  // 如果有用户自定义名称，直接显示
+  if (props.group.name) {
+    return props.group.name
   }
   
-  // 否则自动计算：Find highest tier nodes
+  // 否则自动计算：Find highest tier manual nodes
   let maxTier = -1
   props.group.nodes.forEach(n => {
-    if (n.column > maxTier) maxTier = n.column
+    if (n.source === 'manual' && n.column > maxTier) {
+      maxTier = n.column
+    }
   })
 
-  if (maxTier === -1) return props.group.name || '空'
+  if (maxTier === -1) return '空'
 
-  // Get nodes in the highest tier column
+  // Get manual nodes in the highest tier column
   const highestTierNodes = props.group.nodes
-    .filter(n => n.column === maxTier)
+    .filter(n => n.source === 'manual' && n.column === maxTier)
     .sort((a, b) => {
-      // 1. 特殊逻辑：能量电池（Energy Cells）在 Tier 0 中绝对置底
-      if (a.column === 0 && b.column === 0) {
-        if (a.wareId === 'energycells' && b.wareId !== 'energycells') return 1
-        if (a.wareId !== 'energycells' && b.wareId === 'energycells') return -1
-      }
-
-      // 2. 锁定状态（EXT/Locked）置底
+      // 1. 锁定状态（EXT/Locked）置底
       if (a.isIsolated && !b.isIsolated) return 1
       if (!a.isIsolated && b.isIsolated) return -1
-
-      // 3. 来源排序 (Manual 置顶)
-      if (a.source === 'manual' && b.source === 'auto') return -1
-      if (a.source === 'auto' && b.source === 'manual') return 1
 
       return a.order - b.order
     })
@@ -208,8 +200,9 @@ const getGroupName = computed(() => {
 
 // 标题编辑方法
 const startEditing = async () => {
-  lastValidTitle.value = getGroupName.value
-  editingValue.value = getGroupName.value
+  // 编辑时显示当前 name（如果为空则显示默认名称）
+  lastValidTitle.value = props.group.name || getGroupName.value
+  editingValue.value = props.group.name || getGroupName.value
   isEditingTitle.value = true
   await nextTick()
   titleInputRef.value?.focus()
@@ -223,12 +216,21 @@ const finishEditing = () => {
 
 const confirmEditing = () => {
   isEditingTitle.value = false
-  if (!editingValue.value.trim()) {
-    // 空值回退到上一个有效值
+  const trimmedValue = editingValue.value.trim()
+  
+  // 如果输入为空，清空 name（UI 会显示默认名称）
+  if (!trimmedValue) {
+    logicFlow.updateGroupCustomName(props.group.id, '')
     return
   }
-  // 保存自定义标题
-  logicFlow.updateGroupCustomName(props.group.id, editingValue.value.trim())
+  
+  // 如果输入与默认名称相同，也清空 name
+  if (trimmedValue === getGroupName.value && !props.group.name) {
+    return
+  }
+  
+  // 保存用户自定义名称
+  logicFlow.updateGroupCustomName(props.group.id, trimmedValue)
 }
 
 const handleReorder = (colIndex: number, newNodes: any[]) => {
@@ -277,7 +279,7 @@ const handleAdd = (_colIndex: number, event: any) => {
 <template>
   <div class="production-group mb-8 last:mb-0">
     <!-- Group Header: Title & Actions -->
-    <div class="flex items-center justify-between mb-2 px-4">
+    <div class="flex items-center justify-between mb-2">
       <div class="flex items-center gap-2 min-w-0">
         <div 
           class="w-1.5 h-4 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.5)] flex-shrink-0"
@@ -365,7 +367,7 @@ const handleAdd = (_colIndex: number, event: any) => {
     </div>
 
     <!-- 4-Column Layout -->
-    <div class="grid grid-cols-[2fr_3fr_3fr_4fr] gap-12 px-4 relative">
+    <div class="grid grid-cols-[2fr_3fr_3fr_4fr] gap-12 relative">
       <!-- SVG Connectivity Layer -->
       <svg 
         ref="svgRef"
