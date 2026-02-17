@@ -365,7 +365,7 @@ const handleAdd = (_colIndex: number, event: any) => {
     </div>
 
     <!-- 4-Column Layout -->
-    <div class="grid grid-cols-4 gap-12 px-4 relative">
+    <div class="grid grid-cols-[2fr_3fr_3fr_4fr] gap-12 px-4 relative">
       <!-- SVG Connectivity Layer -->
       <svg 
         ref="svgRef"

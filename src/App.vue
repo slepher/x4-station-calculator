@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import StationWorkbench from './components/StationWorkbench.vue'
-import DragTestPage from './components/drag/DragTestPage.vue'
+import DragTestPage from './components/test/DragTestPage.vue'
+import TestTemplateFlow from './components/test/TestTemplateFlow.vue'
 import { useStationStore } from '@/store/useStationStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
@@ -10,12 +11,15 @@ const stationStore = useStationStore()
 const gameDataStore = useGameDataStore()
 const logicFlowStore = useLogicFlowStore()
 
-const currentView = ref<'main' | 'drag-test'>('main')
+const currentView = ref<'main' | 'drag-test' | 'template-flow'>('main')
 
 onMounted(() => {
   const params = new URLSearchParams(window.location.search)
-  if (params.get('view') === 'drag-test') {
+  const view = params.get('view')
+  if (view === 'drag-test') {
     currentView.value = 'drag-test'
+  } else if (view === 'template-flow') {
+    currentView.value = 'template-flow'
   }
 })
 
@@ -54,6 +58,7 @@ setTimeout(checkExportStores, 500);
 <template>
   <div id="app-root">
     <DragTestPage v-if="currentView === 'drag-test'" />
+    <TestTemplateFlow v-else-if="currentView === 'template-flow'" />
     <StationWorkbench v-else-if="stationStore.isReady"/>
     <div v-else class="loading-gate">Initializing Station Store...</div>
   </div>

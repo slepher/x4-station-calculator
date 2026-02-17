@@ -402,7 +402,7 @@ const handleAddFromDrop = (event: any) => {
     </div>
 
     <!-- 2. Compact View (Active during dragging) -->
-    <div v-show="logicFlow.isDragging" class="compact-view grid grid-cols-4 gap-6 px-12 py-12 min-h-full" data-testid="compact-view">
+    <div v-show="logicFlow.isDragging" class="compact-view grid grid-cols-[2fr_3fr_3fr_4fr] gap-6 px-12 py-12 min-h-full" data-testid="compact-view">
       <!-- Existing Groups as Drop Targets -->
       <draggable
         v-for="group in logicFlow.groups"
@@ -489,7 +489,7 @@ const handleAddFromDrop = (event: any) => {
             </div>
             
             <!-- Nodes Grid (4xN logic: 4 columns) -->
-      <div class="grid grid-cols-4 gap-1.5 flex-1 content-start compact-node-grid">
+      <div class="grid grid-cols-[2fr_3fr_3fr_4fr] gap-1.5 flex-1 content-start compact-node-grid">
               <div 
                 v-for="node in nodesWithPreview(group)" 
                 :key="node.id"
