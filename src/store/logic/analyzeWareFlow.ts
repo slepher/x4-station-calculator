@@ -60,6 +60,7 @@ export function analyzeWareFlow(
         // 数量流
         production: 0,
         consumption: 0,
+        workforceConsumption: 0,
         netRate: 0,
 
         // 体积流
@@ -165,6 +166,7 @@ export function analyzeWareFlow(
       const valueFlow = hourlyAmount * price;
 
       entry.consumption += hourlyAmount;
+      entry.workforceConsumption += hourlyAmount;
       entry.consumptionVolume += volumeFlow;
 
       entry.contributions.push({
@@ -239,13 +241,14 @@ export function analyzeWareFlow(
   // 5. 线性分发分组 (保持已排好的顺序) 
   const result: GroupedFlows = { 
     flows: allFlows, 
-    rateGroups: { positive: [], operations: [], resources: [] }, 
+    rateGroups: { positive: [], operations: [], supply: [], resources: [] }, 
     volumeGroups: { solid: [], liquid: [], container: [] } 
   }; 
 
   allFlows.forEach(flow => { 
     // 分发到数量/经济视图 
     if (flow.netRate > 0) result.rateGroups.positive.push(flow); 
+    else if (flow.workforceConsumption > 0) result.rateGroups.supply.push(flow);
     else if (flow.transportType === 'container') result.rateGroups.operations.push(flow); 
     else result.rateGroups.resources.push(flow); 
 

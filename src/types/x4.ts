@@ -250,6 +250,7 @@ export interface WareFlow {
   // 数量流 (Quantity)
   production: number;      // 总产出/h
   consumption: number;     // 总消耗/h
+  workforceConsumption: number; // 工人消耗/h
   netRate: number;         // 净产出
 
   // 体积流 (Volume) - 新增核心
@@ -293,8 +294,9 @@ export interface GroupedFlows {
   // 按数量/经济视图分组
   rateGroups: {
     positive: WareFlow[];  // 产品/收入 (netRate > 0)
-    operations: WareFlow[]; // 运营 (netRate <= 0 && transportType === 'container')
-    resources: WareFlow[];  // 资源 (netRate <= 0 && transportType !== 'container')
+    operations: WareFlow[]; // 运营 (netRate <= 0 && transportType === 'container' && workforceConsumption === 0)
+    supply: WareFlow[];    // 补给 (netRate <= 0 && workforceConsumption > 0)
+    resources: WareFlow[];  // 资源 (netRate <= 0 && transportType !== 'container' && workforceConsumption === 0)
   };
   
   // 按体积视图分组

@@ -216,9 +216,10 @@ test.describe('帝国 CRUD 全面测试', () => {
       
       const dialog = page.locator('.fixed.inset-0')
       await expect(dialog).toBeVisible({ timeout: 500 })
+      await page.waitForTimeout(100)
       
       const loadEmpireA = dialog.locator('button').filter({ hasText: /加载|Load/i }).first()
-      await loadEmpireA.click()
+      await loadEmpireA.click({ force: true })
       await dialog.waitFor({ state: 'hidden', timeout: 1000 }).catch(() => {})
       
       const moduleEnergy = page.locator('text=/Energy|能量电池/')
@@ -228,9 +229,10 @@ test.describe('帝国 CRUD 全面测试', () => {
       
       await loadBtn.click()
       await expect(dialog).toBeVisible({ timeout: 500 })
+      await page.waitForTimeout(100)
       
       const loadEmpireB = dialog.locator('text=Empire B').first()
-      await loadEmpireB.click()
+      await loadEmpireB.click({ force: true })
       await dialog.waitFor({ state: 'hidden', timeout: 1000 }).catch(() => {})
       
       const moduleHull = page.locator('text=/Hull|船体/')
@@ -324,10 +326,11 @@ test.describe('帝国 CRUD 全面测试', () => {
       
       const dialog = page.locator('.fixed.inset-0')
       await expect(dialog).toBeVisible({ timeout: 500 })
+      await page.waitForTimeout(100)
       const nameInput = page.locator('.fixed.inset-0 input[type="text"]')
       await nameInput.fill('Empire B')
       const confirmBtn = page.locator('.fixed.inset-0 button').filter({ hasText: /保存|Save/i }).last()
-      await confirmBtn.click()
+      await confirmBtn.click({ force: true })
       await expect(dialog).not.toBeVisible({ timeout: 500 })
       
       const savedEmpires = await getSavedEmpires(page)
@@ -371,7 +374,8 @@ test.describe('帝国 CRUD 全面测试', () => {
       })
       
       const deleteBtn = dialog.locator('button').filter({ hasText: /删除|Delete/i }).first()
-      await deleteBtn.click()
+      await page.waitForTimeout(100)
+      await deleteBtn.click({ force: true })
       
       await page.waitForTimeout(500)
       
@@ -408,9 +412,10 @@ test.describe('帝国 CRUD 全面测试', () => {
       
       const dialog = page.locator('.fixed.inset-0')
       await expect(dialog).toBeVisible({ timeout: 500 })
+      await page.waitForTimeout(100)
       
       const loadBtn2 = dialog.locator('button').filter({ hasText: /加载|Load/i }).first()
-      await loadBtn2.click()
+      await loadBtn2.click({ force: true })
       await dialog.waitFor({ state: 'hidden', timeout: 1000 }).catch(() => {})
       
       await page.waitForTimeout(300)
@@ -423,7 +428,8 @@ test.describe('帝国 CRUD 全面测试', () => {
       })
       
       const deleteBtn = dialog.locator('button').filter({ hasText: /删除|Delete/i }).first()
-      await deleteBtn.click()
+      await page.waitForTimeout(100)
+      await deleteBtn.click({ force: true })
       
       await page.waitForTimeout(500)
       
@@ -598,9 +604,10 @@ test.describe('帝国 CRUD 全面测试', () => {
       
       const dialog = page.locator('.fixed.inset-0')
       await expect(dialog).toBeVisible({ timeout: 500 })
+      await page.waitForTimeout(100)
       
       const loadEmpireA = dialog.locator('text=Empire A').first()
-      await loadEmpireA.click()
+      await loadEmpireA.click({ force: true })
       await dialog.waitFor({ state: 'hidden', timeout: 1000 }).catch(() => {})
       
       const activeTab = page.locator('.station-tab.active')

@@ -33,6 +33,10 @@
 *   **收藏按钮 (FavoriteButton)**:
     *   定位器: `.favorite-btn` (✅)
     *   状态: `.disabled` 表示无可选优先级 (✅)
+*   **锁定按钮 (LockButton)**:
+    *   定位器: `.flow-wrapper .lock-btn` (✅)
+    *   触发显示: hover `.flow-wrapper` 后可见 (✅)
+    *   锁定状态: `.lock-btn.is-locked` (✅)
 *   **交互逻辑**:
     *   可点击主行: `.main-row` (✅)
     *   展开状态: `.main-row.is-active` (✅)
@@ -153,17 +157,28 @@ await expect(page.locator('.title')).toHaveText('新建');
 *   **标签栏**:
     *   帝国总览标签: `.overview-tab` (✅)
     *   分站标签: `.station-tab` (✅)
-    *   添加分站按钮: `.add-station-btn` (✅)
+    *   添加分站按钮: `.add-btn` (✅)
 *   **工具栏**:
     *   工具按钮: `.btn-tool` (✅)
-    *   帝国名称输入: `.empire-name-input` (✅)
+    *   帝国名称输入: `.ghost-input.w-64` (✅) - *注意：不是 `.empire-name-input`*
+    *   开关按钮: `.toggle-chip` (✅) - *注意：不是 `.toggle-btn`*
+    *   工人运算开关: `.toggle-chip.active-green` (✅)
+    *   站内补给开关: `.toggle-chip.active-blue` (✅)
 *   **模块搜索**:
     *   搜索框: `.search-box .search-input` (✅)
     *   结果弹出框: `.results-popover` (✅)
     *   结果项: `.results-popover .result-item` (✅)
+*   **测试数据 (常用模块)**:
+    *   电子黏土产线: 搜索关键词 "Clay"，包含上游产物量子管、微芯片等 (✅)
+    *   量子管: 在产品分组中，可通过 `.flow-wrapper` + `hasText: /量子管|Quantum Tube/` 定位 (✅)
+    *   能量电池产线: 搜索关键词 "Energy Cell"，无上游依赖 (✅)
 *   **对话框**:
     *   模态框容器: `.fixed.inset-0` (✅)
     *   文本输入: `.fixed.inset-0 input[type="text"]` (✅)
+    *   删除确认模态框: `.modal-backdrop` (✅) - *注意：不是 `.modal-overlay`*
+*   **右键菜单**:
+    *   菜单容器: `.context-menu` (✅)
+    *   危险操作项: `.menu-item.danger` (✅)
 
 ---
 
@@ -189,6 +204,11 @@ await expect(page.locator('.title')).toHaveText('新建');
 
 ### UI 交互类
 
+*   **元素不稳定 (element is not stable)**: Playwright 点击按钮时报错 "element is not stable"，通常是因为动画或 DOM 更新导致元素位置变化。
+    *   **解决方案**: 
+        1. 在点击前添加 `await page.waitForTimeout(100)` 等待动画完成
+        2. 使用 `{ force: true }` 选项绕过稳定性检查：`await btn.click({ force: true })`
+    *   **适用场景**: 模态框按钮、对话框确认按钮、删除按钮等
 *   **提示框持久性**: 设置了 `hideOnClick: false` 的 Tippy 提示框在测试中仍需要手动移动鼠标来验证隐藏行为。(✅)
 *   **明细项单位陷阱**: `.item-val` 中仅包含格式化后的数值（如 `+3,000.0`），不包含单位（如 `m³`）。
     *   **解决方案**: 测试验证时避免使用 `toMatch(/m³/)` 匹配明细行数值。

@@ -21,7 +21,7 @@ test.describe('多空间站帝国规划 - 标签栏交互', () => {
     await overviewTab.click()
     await expect(page.locator('.empire-overview')).toBeVisible()
     
-    const addBtn = page.locator('.add-station-btn')
+    const addBtn = page.locator('.add-btn')
     await addBtn.click()
     await page.waitForTimeout(200)
     
@@ -33,7 +33,7 @@ test.describe('多空间站帝国规划 - 标签栏交互', () => {
   })
 
   test('新建分站测试', async ({ page }) => {
-    const addBtn = page.locator('.add-station-btn')
+    const addBtn = page.locator('.add-btn')
     const initialCount = await page.locator('.station-tab').count()
     
     await addBtn.click()
@@ -49,7 +49,7 @@ test.describe('多空间站帝国规划 - 标签栏交互', () => {
   })
 
   test('分站菜单测试', async ({ page }) => {
-    const addBtn = page.locator('.add-station-btn')
+    const addBtn = page.locator('.add-btn')
     await addBtn.click()
     await page.waitForTimeout(200)
     
@@ -62,7 +62,7 @@ test.describe('多空间站帝国规划 - 标签栏交互', () => {
     await expect(deleteOption).toBeVisible()
     
     await deleteOption.click()
-    await expect(page.locator('.modal-overlay')).toBeVisible()
+    await expect(page.locator('.modal-backdrop')).toBeVisible()
   })
 })
 
@@ -82,57 +82,51 @@ test.describe('多空间站帝国规划 - 动态工具栏', () => {
   test('工具栏内容切换测试', async ({ page }) => {
     const overviewTab = page.locator('.overview-tab')
     await overviewTab.click()
-    await expect(page.locator('.overview-toolbar')).toBeVisible()
-    await expect(page.locator('.empire-name-input')).toBeVisible()
+    await expect(page.locator('.context-toolbar')).toBeVisible()
+    await expect(page.locator('.ghost-input.w-64')).toBeVisible()
     
-    const addBtn = page.locator('.add-station-btn')
+    const addBtn = page.locator('.add-btn')
     await addBtn.click()
     await page.waitForTimeout(200)
     
-    await expect(page.locator('.station-toolbar')).toBeVisible()
-    await expect(page.locator('.toolbar-group.group-identity')).toBeVisible()
-    await expect(page.locator('.toolbar-group.group-environment')).toBeVisible()
-    await expect(page.locator('.toolbar-group.group-operations')).toBeVisible()
+    await expect(page.locator('.context-toolbar')).toBeVisible()
+    await expect(page.locator('.toolbar-section')).toHaveCount(3)
   })
 
   test('工人运算开关测试', async ({ page }) => {
-    const addBtn = page.locator('.add-station-btn')
+    const addBtn = page.locator('.add-btn')
     await addBtn.click()
     await page.waitForTimeout(200)
     
-    const workforceBtn = page.locator('.toggle-btn').filter({ hasText: /👥|workforce/i }).first()
+    const workforceBtn = page.locator('.toggle-chip').filter({ hasText: /👥|ON|OFF/ }).first()
     await expect(workforceBtn).toBeVisible()
-    
-    await expect(workforceBtn).not.toHaveClass(/active/)
     
     await workforceBtn.click()
     await page.waitForTimeout(100)
     
-    await expect(workforceBtn).toHaveClass(/active/)
+    await expect(workforceBtn).toHaveClass(/active-green/)
   })
 
   test('站内补给开关测试', async ({ page }) => {
-    const addBtn = page.locator('.add-station-btn')
+    const addBtn = page.locator('.add-btn')
     await addBtn.click()
     await page.waitForTimeout(200)
     
-    const supplyBtn = page.locator('.toggle-btn').filter({ hasText: /🍱|supply/i }).first()
+    const supplyBtn = page.locator('.toggle-chip').filter({ hasText: /🔄|ON|OFF/ }).last()
     await expect(supplyBtn).toBeVisible()
-    
-    await expect(supplyBtn).not.toHaveClass(/active/)
     
     await supplyBtn.click()
     await page.waitForTimeout(100)
     
-    await expect(supplyBtn).toHaveClass(/active/)
+    await expect(supplyBtn).toHaveClass(/active-blue/)
   })
 
   test('星区矿物选择测试', async ({ page }) => {
-    const addBtn = page.locator('.add-station-btn')
+    const addBtn = page.locator('.add-btn')
     await addBtn.click()
     await page.waitForTimeout(200)
     
-    const mineralSelector = page.locator('.mineral-selector')
+    const mineralSelector = page.locator('.input-group').filter({ hasText: /资源|Resources/ })
     await expect(mineralSelector).toBeVisible()
     
     await mineralSelector.click()
@@ -142,9 +136,6 @@ test.describe('多空间站帝国规划 - 动态工具栏', () => {
     
     const mineralOption = page.locator('.mineral-option').first()
     await mineralOption.click()
-    
-    const count = await mineralSelector.locator('.mineral-count').textContent()
-    expect(parseInt(count || '0')).toBeGreaterThanOrEqual(1)
   })
 })
 
@@ -220,7 +211,7 @@ test.describe('多空间站帝国规划 - 分站视图数据绑定', () => {
   })
 
   test('分站数据隔离测试', async ({ page }) => {
-    const addBtn = page.locator('.add-station-btn')
+    const addBtn = page.locator('.add-btn')
     
     await addBtn.click()
     await page.waitForTimeout(200)

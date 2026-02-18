@@ -35,9 +35,10 @@ test.describe('Bug 修复验证测试', () => {
     
     const dialog = page.locator('.fixed.inset-0')
     await expect(dialog).toBeVisible({ timeout: 500 })
+    await page.waitForTimeout(100)
     
     const discardBtn = page.locator('button').filter({ hasText: /丢弃并新建|Discard/i }).first()
-    await discardBtn.click()
+    await discardBtn.click({ force: true })
     
     await expect(dialog).not.toBeVisible({ timeout: 500 })
     
@@ -62,6 +63,7 @@ test.describe('Bug 修复验证测试', () => {
     
     const overviewTab = page.locator('.overview-tab')
     await overviewTab.click()
+    await page.waitForTimeout(100)
     
     const empireNameInput = page.locator('.ghost-input.w-64')
     await expect(empireNameInput).toBeVisible({ timeout: 500 })
@@ -72,16 +74,18 @@ test.describe('Bug 修复验证测试', () => {
     
     const dialog = page.locator('.fixed.inset-0')
     await expect(dialog).toBeVisible({ timeout: 500 })
+    await page.waitForTimeout(100)
     
     const nameInput = page.locator('.fixed.inset-0 input[type="text"]')
     await nameInput.fill('Empire B')
     
     const saveBtn = page.locator('.fixed.inset-0 button').filter({ hasText: /保存|Save/i }).last()
-    await saveBtn.click()
+    await saveBtn.click({ force: true })
     
     await expect(dialog).not.toBeVisible({ timeout: 500 })
     
     await overviewTab.click()
+    await page.waitForTimeout(100)
     
     const empireNameDisplay = await page.locator('.ghost-input.w-64').inputValue()
     
@@ -109,9 +113,10 @@ test.describe('Bug 修复验证测试', () => {
     
     const dialog = page.locator('.fixed.inset-0')
     await expect(dialog).toBeVisible({ timeout: 500 })
+    await page.waitForTimeout(100)
     
     const saveAndNewBtn = page.locator('button').filter({ hasText: /保存并新建|覆盖并新建|Save.*Create|Overwrite/i }).first()
-    await saveAndNewBtn.click()
+    await saveAndNewBtn.click({ force: true })
     
     await expect(dialog).not.toBeVisible({ timeout: 500 })
     

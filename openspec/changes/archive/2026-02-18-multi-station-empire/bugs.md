@@ -7,8 +7,8 @@
 | Bug #1 | `SmartSaveDialog.vue` | `handleDiscard()` | ✅ 已修复 |
 | Bug #2 | `SmartSaveDialog.vue` | `handlePrimaryAction()` | ✅ 已修复 |
 | Bug #3 | `useEmpireStore.ts` | `activeStationId` 持久化 | ✅ 已修复 |
-| Bug #4 | `useEmpireStore.ts` | 自动保存机制 | ⏳ 待验证 |
-| Bug #5 | `useEmpireStore.ts` | 删除逻辑 | ⏳ 待验证 |
+| Bug #4 | `useEmpireStore.ts` | 自动保存机制 | ✅ 已修复 |
+| Bug #5 | `useEmpireStore.ts` | 删除逻辑 | ✅ 已修复 |
 | Bug #6 | `useEmpireStore.ts` | `activeStationId` 持久化 | ✅ 已修复 |
 | Bug #7 | `SmartSaveDialog.vue` | `handlePrimaryAction()` | ✅ 已修复 |
 
@@ -120,7 +120,7 @@ if (props.intent === 'NEW') {
 3. 不点击保存，直接点击"加载"
 4. 观察加载列表：发现"帝国A"在列表中
 
-**修复状态**: ⏳ 待验证
+**修复状态**: ✅ 已验证 (2026-02-18) - 测试通过
 
 ---
 
@@ -136,7 +136,7 @@ if (props.intent === 'NEW') {
 3. 刷新页面
 4. 观察结果：被删除的帝国仍然存在
 
-**修复状态**: ⏳ 待验证
+**修复状态**: ✅ 已验证 (2026-02-18) - 测试通过
 
 ---
 

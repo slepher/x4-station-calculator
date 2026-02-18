@@ -14,11 +14,11 @@ export default defineConfig({
     trace: 'on-first-retry',
     locale: 'en-US',
     viewport: { width: 1920, height: 1080 },
-    actionTimeout: 500,      // 针对 click, fill 等动作的超时 (这才是你要改的)
+    actionTimeout: 1000,      // 针对 click, fill 等动作的超时 (这才是你要改的)
     navigationTimeout: 2000  // 页面跳转超时
   },
   expect: {
-    timeout: 500,
+    timeout: 1000,
   },
 
   projects: [

@@ -252,7 +252,8 @@ export function calculateAutoFill(
   
   const autoSupply: SavedModule[] = [];
   
-  if (clientPopulation > 0) {
+  // 检查 internalSupply 开关：仅当开启时才生成补给区
+  if (settings.internalSupply && clientPopulation > 0) {
     // [修改] 引入人口普查逻辑 (使用 Shared Code)
     // 1. 合并列表
     const allModulesForCensus = [...plannedModules, ...autoIndustry];

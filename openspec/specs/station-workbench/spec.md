@@ -1,44 +1,70 @@
 # Station Workbench Specification
 
 ## Purpose
-描述空间站工作台（StationWorkbench）的整体布局结构，作为应用的主容器，协调工具栏、规划面板、资源流仪表盘和建设仪表盘的协作关系。
+描述空间站工作台（StationWorkbench）的整体布局结构，作为应用的主容器，协调工具栏、标签栏、动态工具栏和内容区域的协作关系。
 
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: 整体布局结构 (Overall Layout Structure)
-系统 SHALL 采用垂直布局，顶部为工具栏，下方为根据视图模式切换的内容区域。
-- **工具栏区域**: 固定在顶部，包含视图切换、功能按钮、标题编辑和语言选择。
-- **内容区域**: 根据当前视图模式（production/flow）动态渲染不同的布局。
+系统 SHALL 采用垂直布局，从上到下分为四个部分：
+- **顶栏**: 保存/加载/分享按钮（保持不变）
+- **标签栏**: 用于切换"帝国总览"和"各个分站"
+- **动态工具栏**: 高度固定 56px，根据当前选中的 Tab 显示不同内容
+- **内容区域**: 根据选中的 Tab 显示总览视图或分站三列布局
 
-### Requirement: 工具栏组件 (Toolbar Component)
-工具栏 SHALL 包含以下功能区块，从左到右排列：
-- **视图切换器**: 双按钮组，切换"量化生产"和"逻辑组网"视图。
-- **功能按钮组**: 新建、保存、另存为、加载、分享、导入。
-- **标题区域**: 居中显示当前方案名称，支持点击编辑。
-- **语言选择器**: 右侧位置，切换界面语言。
+#### Scenario: 布局层级
+- **前提** 用户打开应用
+- **当** 工作台渲染时
+- **那么** 顶栏 SHALL 显示在最上方
+- **并且** 标签栏 SHALL 紧随顶栏下方
+- **并且** 动态工具栏 SHALL 紧随标签栏下方
+- **并且** 内容区域 SHALL 占据剩余空间
 
-#### Scenario: 视图切换
-- **前提**: 用户正在查看工作台
-- **当** 用户点击视图切换按钮
-- **那么** 内容区域 SHALL 切换到对应的视图布局
-- **并且** 当前激活的按钮 SHALL 显示高亮样式
+### Requirement: 内容区域切换 (Content Area Switching)
+内容区域 SHALL 根据当前选中的 Tab 动态切换：
+- **选中"帝国总览"**: 显示总览视图（"Coming Soon" 占位符）
+- **选中"分站"**: 显示现有的三列布局（模块列表、资源产出、建设成本）
 
-#### Scenario: 标题编辑
-- **前提** 用户查看工具栏标题
-- **当** 用户点击标题区域
-- **那么** 标题 SHALL 变为可编辑输入框
-- **并且** 用户按 Enter 或点击确认按钮后保存新标题
+#### Scenario: 切换到帝国总览
+- **前提** 用户点击"帝国总览"标签
+- **当** 视图切换时
+- **那么** 内容区域 SHALL 显示总览视图
+- **并且** 总览视图 SHALL 显示 "Coming Soon" 占位符
 
-### Requirement: 量化生产视图布局 (Production View Layout)
-当 `activeView` 为 `production` 时，内容区域 SHALL 采用 12 列网格布局：
-- **左侧 (3列)**: StationPlanningPanel - 模块规划面板
-- **中间 (5列)**: StationWareFlowsDashboard - 资源流仪表盘
-- **右侧 (4列)**: StationDashboard - 建设仪表盘
+#### Scenario: 切换到分站视图
+- **前提** 用户点击某个分站标签
+- **当** 视图切换时
+- **那么** 内容区域 SHALL 显示三列布局
+- **并且** 数据源 SHALL 绑定到当前选中的分站对象
 
-### Requirement: 逻辑组网视图布局 (Logical Flow View Layout)
-当 `activeView` 为 `flow` 时，内容区域 SHALL 采用垂直堆叠布局：
-- **候选区**: LogicFlowCandidateZone - 展示可拖拽的产物候选卡片
-- **规划区**: LogicFlowPlanningZone - 产业链拓扑画布
+### Requirement: 分站视图数据绑定 (Station View Data Binding)
+分站视图 SHALL 将数据源绑定到当前选中的 Station 对象：
+- **StationPlanningPanel**: 绑定到当前分站的 plannedModules
+- **StationWareFlowsDashboard**: 绑定到当前分站的资源流计算结果
+- **StationDashboard**: 绑定到当前分站的建设成本计算结果
 
-### Requirement: 状态监控组件 (Status Monitor)
-系统 SHALL 在工作台内包含一个状态监控组件，用于显示临时消息和状态反馈。
+#### Scenario: 分站数据隔离
+- **前提** 用户切换到分站 A
+- **当** 用户修改模块配置时
+- **那么** 修改 SHALL 仅影响分站 A 的数据
+- **并且** 其他分站的数据 SHALL 不受影响
+
+## ADDED Requirements
+
+### Requirement: 标签栏组件集成 (Tab Bar Integration)
+工作台 SHALL 包含标签栏组件，用于管理帝国总览和各分站的切换。
+
+#### Scenario: 标签栏渲染
+- **前提** 工作台初始化完成
+- **当** 标签栏组件渲染时
+- **那么** 标签栏 SHALL 显示所有分站标签
+- **并且** 当前激活的标签 SHALL 有高亮样式
+
+### Requirement: 动态工具栏组件集成 (Context Toolbar Integration)
+工作台 SHALL 包含动态工具栏组件，根据当前选中的 Tab 显示不同内容。
+
+#### Scenario: 工具栏内容切换
+- **前提** 用户切换标签
+- **当** 选中的 Tab 变化时
+- **那么** 工具栏内容 SHALL 动态更新
+- **并且** 工具栏高度 SHALL 保持 56px 不变
