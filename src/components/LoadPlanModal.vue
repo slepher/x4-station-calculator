@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { useStationStore, type SavedModule } from '@/store/useStationStore'
+import { useEmpireStore } from '@/store/useEmpireStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 const { translateModule } = useX4I18n()
 
@@ -10,35 +11,37 @@ const props = defineProps<{
 
 const emit = defineEmits(['close'])
 const { t } = useI18n()
-const store = useStationStore()
+const stationStore = useStationStore()
+const empireStore = useEmpireStore()
 
 const formatDate = (ts: number) => new Date(ts).toLocaleString()
 
-const handleLoadPlan = (index: number) => {
-  store.loadPlan(index)
+const handleLoadEmpire = (empireId: string) => {
+  empireStore.loadEmpire(empireId)
   emit('close')
 }
 
-const handleMergePlan = (index: number) => {
-  store.mergePlan(index)
-  emit('close')
-}
-
-const getPlanDescription = (modules: SavedModule[]) => {
+const getStationDescription = (modules: SavedModule[]) => {
   return [...modules]
     .sort((a, b) => b.count - a.count)
     .slice(0, 3)
     .map(m => {
-      const info = store.modules[m.id];
+      const info = stationStore.modules[m.id];
       return `${m.count} x ${info ? translateModule(info) : m.id}`;
     })
     .join(', ') + (modules.length > 3 ? '...' : '');
 }
 
-const handleDeletePlan = (index: number) => {
+const handleDeleteEmpire = (empireId: string) => {
   if (confirm(t('planning.confirm_delete_plan'))) {
-    store.deletePlan(index)
+    empireStore.deleteEmpire(empireId)
   }
+}
+
+const getEmpireLastUpdated = (empireId: string) => {
+  const empire = empireStore.savedEmpires.list.find(e => e.id === empireId)
+  if (!empire || empire.stations.length === 0) return 0
+  return Math.max(...empire.stations.map(s => s.lastUpdated))
 }
 </script>
 
@@ -64,27 +67,39 @@ const handleDeletePlan = (index: number) => {
       </div>
 
       <div class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
-        <div v-if="store.savedPlans.list.length === 0" class="text-center py-12 text-slate-500 italic">
+        <div v-if="empireStore.savedEmpires.list.length === 0" class="text-center py-12 text-slate-500 italic">
           {{ t('planning.no_saved_plans') }}
         </div>
 
-        <div v-for="(plan, index) in store.savedPlans.list" :key="plan.id"
+        <div v-for="empire in empireStore.savedEmpires.list" :key="empire.id"
           class="group bg-slate-700/40 border border-slate-600/50 rounded-md p-4 hover:border-cyan-500/50 hover:bg-slate-700/60 transition-all duration-200">
           <div class="flex justify-between items-start mb-2">
-            <div>
-              <div class="font-bold text-lg text-cyan-100 mb-1 group-hover:text-cyan-400 transition-colors">{{
-                plan.name }}</div>
-              <div class="text-xs text-slate-500 font-mono">{{ formatDate(plan.lastUpdated) }}</div>
+            <div class="flex items-center gap-2">
+              <span class="text-lg">📊</span>
+              <div>
+                <div class="font-bold text-lg text-cyan-100 mb-1 group-hover:text-cyan-400 transition-colors">{{
+                  empire.name }}</div>
+                <div class="text-xs text-slate-500 font-mono">{{ formatDate(getEmpireLastUpdated(empire.id)) }}</div>
+              </div>
+            </div>
+            <div class="text-xs text-slate-400 bg-slate-600/50 px-2 py-1 rounded">
+              {{ empire.stations.length }} {{ t('empire.stations_count') }}
             </div>
           </div>
 
-          <div
-            class="text-sm text-slate-300 mb-4 line-clamp-2 leading-relaxed bg-slate-800/50 p-2 rounded border border-slate-700/50">
-            {{ getPlanDescription(plan.modules) }}
+          <div class="mb-3">
+            <div v-for="station in empire.stations.slice(0, 2)" :key="station.id" 
+              class="text-sm text-slate-300 mb-1 line-clamp-1 leading-relaxed bg-slate-800/50 p-2 rounded border border-slate-700/50">
+              <span class="font-medium">{{ station.name }}:</span>
+              {{ getStationDescription(station.modules) }}
+            </div>
+            <div v-if="empire.stations.length > 2" class="text-xs text-slate-500 italic ml-2">
+              +{{ empire.stations.length - 2 }} more...
+            </div>
           </div>
 
           <div class="flex items-center gap-3 pt-2 border-t border-slate-700/50">
-            <button @click="handleLoadPlan(index)"
+            <button @click="handleLoadEmpire(empire.id)"
               class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-cyan-400 hover:text-cyan-300 hover:bg-cyan-900/30 px-3 py-1.5 rounded transition">
               <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M15 3h6v6" />
@@ -94,20 +109,9 @@ const handleDeletePlan = (index: number) => {
               {{ t('planning.action_load_plan') }}
             </button>
 
-            <div class="w-px h-4 bg-slate-600"></div>
-
-            <button @click="handleMergePlan(index)"
-              class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-blue-400 hover:text-blue-300 hover:bg-blue-900/30 px-3 py-1.5 rounded transition">
-              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
-              {{ t('planning.action_merge') }}
-            </button>
-
             <div class="flex-1"></div>
 
-            <button @click="handleDeletePlan(index)"
+            <button @click="handleDeleteEmpire(empire.id)"
               class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-red-400 hover:text-red-300 hover:bg-red-900/30 px-3 py-1.5 rounded transition">
               <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6" />

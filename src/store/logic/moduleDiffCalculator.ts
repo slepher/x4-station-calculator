@@ -129,7 +129,6 @@ export function calculateAutoFill(
 
   const race = settings.racePreference;
   const globalWorkforceBonus = settings.considerWorkforceForAutoFill;
-  const supplyWorkforceBonus = settings.supplyWorkforceBonus;
 
   // ==========================================
   // Phase 1: 工业硬补完 (Tier 2 Calculation)
@@ -277,8 +276,8 @@ export function calculateAutoFill(
       if (count <= 0) continue;
       
       // 1. 始终计算补给工厂 (calculateWorkerSupplyNeeds 内部处理效率开关)
-      // 如果 supplyWorkforceBonus 为 false，则效率为 100%，不产生额外工人需求
-      const raceModules = calculateWorkerSupplyNeeds(count, r, modules, wares, supplyWorkforceBonus, settings.sunlight);
+      // 如果 considerWorkforceForAutoFill 为 false，则效率为 100%，不产生额外工人需求
+      const raceModules = calculateWorkerSupplyNeeds(count, r, modules, wares, globalWorkforceBonus, settings.sunlight);
       const raceSupplyModules: SavedModule[] = [];
 
       for (const [id, c] of Object.entries(raceModules)) {
@@ -287,7 +286,7 @@ export function calculateAutoFill(
       }
 
       // 2. 仅当开启工人加成时，才计算居住舱
-      if (supplyWorkforceBonus) {
+      if (globalWorkforceBonus) {
         const supplyWorkers = calculateTotalWorkforce(raceSupplyModules, modules);
           
         if (supplyWorkers > 0) {

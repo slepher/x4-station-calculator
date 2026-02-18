@@ -1,4 +1,51 @@
 {
+  "empire": {
+    "overview": "Empire Overview",
+    "new_empire_name": "New Empire",
+    "name_placeholder": "Enter empire plan name...",
+    "coming_soon": "Empire overview coming soon...",
+    "stations_count": "stations",
+    "empire_name": "Empire Name",
+    "unnamed_empire": "Unnamed Empire Plan",
+    "global_stats": "Global Statistics Panel",
+    "new_station_name": "New Station",
+    "add_station": "Add Station",
+    "rename_station": "Rename",
+    "duplicate_station": "Duplicate",
+    "delete_station": "Delete",
+    "confirm_delete": "Confirm Delete",
+    "delete_warning": "This action cannot be undone. Are you sure you want to dismantle this station?",
+    "menu_operations": "Actions"
+  },
+  "toolbar": {
+    "import_config": "Import Config",
+    "station_name": "Name",
+    "station_name_placeholder": "Station Name",
+    "station_type": "Type",
+    "station_count": "Count",
+    "sector_resources": "Sector Resources",
+    "no_resources": "No Resources",
+    "select_resources": "Select Available Resources",
+    "sunlight_efficiency": "Sunlight",
+    "race_preference": "Race Preference",
+    "workforce_calc": "Workforce",
+    "workforce_calc_title": "Consider workforce needs in auto-fill",
+    "internal_supply": "Supply",
+    "internal_supply_title": "Include food/medical in auto-fill",
+    "station_types": {
+      "industrial": "🏭 Industrial",
+      "supply": "📦 Supply",
+      "transit": "🚚 Transit",
+      "shipyard": "⚓ Shipyard"
+    },
+    "races": {
+      "argon": "🛡️ Argon",
+      "terran": "🌏 Terran",
+      "teladi": "💰 Teladi",
+      "paranid": "👁️ Paranid",
+      "split": "🐲 Split"
+    }
+  },
   "view": {
     "production": "Quantified",
     "logical_flow": "Logical Flow"
@@ -41,7 +88,9 @@
     "no_materials": "Standard module - No materials required",
     "build_res_price": "BUILD RESOURCES PRICE",
     "tag_res": "RES",
-    "tag_ops": "OPS"
+    "tag_ops": "OPS",
+    "cancel": "Cancel",
+    "delete": "Delete"
   },
   "menu": {
     "new": "New",
@@ -59,6 +108,8 @@
     "action_cancel": "Cancel",
     "copy_suffix": " (Copy)",
     "default_station_name": "Default Station Name",
+    "default_empire_name": "My Empire",
+    "new_empire_name": "New Empire",
     "default_flow_name": "Default Flow Name",
     "dialog_title_save_as": "Save Plan As",
     "dialog_title_save_new_plan": "Save New Plan?",

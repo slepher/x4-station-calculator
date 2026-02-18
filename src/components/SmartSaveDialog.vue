@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
-import { useStationStore } from '@/store/useStationStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
+import { useEmpireStore } from '@/store/useEmpireStore'
 import { useI18n } from 'vue-i18n'
-import type { StationPlan } from '@/store/useStationStore';
 import type { LogicFlowPlan } from '@/types/x4';
 
 const props = defineProps<{
@@ -14,20 +13,16 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['close'])
-const stationStore = useStationStore()
 const logicFlowStore = useLogicFlowStore()
+const empireStore = useEmpireStore()
 const { t } = useI18n()
-
-const store = computed(() => 
-  props.storeType === 'logicFlow' ? logicFlowStore : stationStore
-)
 
 const isSaveAsExpanded = ref(false)
 const inputName = ref('')
 const inputRef = ref<HTMLInputElement | null>(null)
 
 const defaultNameKey = computed(() => 
-  props.storeType === 'logicFlow' ? 'menu.default_flow_name' : 'menu.default_station_name'
+  props.storeType === 'logicFlow' ? 'menu.default_flow_name' : 'empire.new_empire_name'
 )
 
 watch(() => props.isOpen, (val) => {
@@ -36,9 +31,9 @@ watch(() => props.isOpen, (val) => {
     if (props.initialName) {
       inputName.value = props.initialName
     } else if (props.intent === 'SAVE_AS') {
-      const baseName = store.value.savedPlans.activeId
-        ? store.value.savedPlans.list.find((l: StationPlan | LogicFlowPlan) => l.id === store.value.savedPlans.activeId)?.name
-        : ''
+      const baseName = props.storeType === 'logicFlow' 
+        ? (logicFlowStore.savedPlans.activeId ? logicFlowStore.savedPlans.list.find((l: LogicFlowPlan) => l.id === logicFlowStore.savedPlans.activeId)?.name : '')
+        : empireStore.activeEmpire?.name
       inputName.value = baseName ? `${baseName} ${t('menu.copy_suffix')}` : t(defaultNameKey.value)
     } else {
       inputName.value = t(defaultNameKey.value)
@@ -50,12 +45,21 @@ watch(() => props.isOpen, (val) => {
   }
 })
 
-const isNewPlan = computed(() => !store.value.savedPlans.activeId)
-const currentPlanName = computed(() => {
-  if (store.value.savedPlans.activeId) {
-    return store.value.savedPlans.list.find((l: StationPlan | LogicFlowPlan) => l.id === store.value.savedPlans.activeId)?.name || ''
+const isNewPlan = computed(() => {
+  if (props.storeType === 'logicFlow') {
+    return !logicFlowStore.savedPlans.activeId
   }
-  return ''
+  return !empireStore.activeEmpire
+})
+
+const currentPlanName = computed(() => {
+  if (props.storeType === 'logicFlow') {
+    if (logicFlowStore.savedPlans.activeId) {
+      return logicFlowStore.savedPlans.list.find((l: LogicFlowPlan) => l.id === logicFlowStore.savedPlans.activeId)?.name || ''
+    }
+    return ''
+  }
+  return empireStore.activeEmpire?.name || ''
 })
 
 const dialogTitle = computed(() => {
@@ -90,29 +94,53 @@ const handlePrimaryAction = () => {
 
   if (!nameToSave.trim()) return
 
-  if (isNewPlan.value || showInput.value) {
-    const originalId = store.value.savedPlans.activeId
-    if (showInput.value) {
-      store.value.savedPlans.activeId = null
+  if (props.storeType === 'logicFlow') {
+    if (isNewPlan.value || showInput.value) {
+      const originalId = logicFlowStore.savedPlans.activeId
+      if (showInput.value) {
+        logicFlowStore.savedPlans.activeId = null
+      }
+      try {
+        logicFlowStore.saveCurrentPlan(nameToSave)
+      } catch (e) {
+        logicFlowStore.savedPlans.activeId = originalId
+      }
+    } else {
+      logicFlowStore.saveCurrentPlan(nameToSave)
     }
-    try {
-      store.value.saveCurrentPlan(nameToSave)
-    } catch (e) {
-      store.value.savedPlans.activeId = originalId
+
+    if (props.intent === 'NEW') {
+      logicFlowStore.clearAll()
     }
   } else {
-    store.value.saveCurrentPlan(nameToSave)
-  }
-
-  if (props.intent === 'NEW') {
-    store.value.clearAll()
+    if (props.intent === 'SAVE_AS') {
+      if (empireStore.activeEmpire) {
+        const newEmpire = JSON.parse(JSON.stringify(empireStore.activeEmpire))
+        newEmpire.id = crypto.randomUUID()
+        newEmpire.name = nameToSave
+        newEmpire.stations.forEach((s: any) => { s.id = crypto.randomUUID() })
+        
+        empireStore.activeEmpire = newEmpire
+        empireStore.saveEmpire()
+      }
+    } else if (props.intent === 'NEW') {
+      if (empireStore.activeEmpire) {
+        empireStore.updateEmpireName(nameToSave)
+        empireStore.saveEmpire()
+      }
+      empireStore.createEmpire(t('menu.default_empire_name'))
+    }
   }
 
   emit('close')
 }
 
 const handleDiscard = () => {
-  store.value.clearAll()
+  if (props.storeType === 'logicFlow') {
+    logicFlowStore.clearAll()
+  } else {
+    empireStore.createEmpire(t('menu.default_empire_name'))
+  }
   emit('close')
 }
 

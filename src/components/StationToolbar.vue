@@ -2,6 +2,7 @@
 import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { useStationStore } from '@/store/useStationStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
+import { useEmpireStore } from '@/store/useEmpireStore'
 import { useStatusStore } from '@/store/useStatusStore'
 import LanguageSelector from './LanguageSelector.vue'
 import MissingTranslate from './MissingTranslate.vue'
@@ -13,6 +14,7 @@ import { useI18n } from 'vue-i18n'
 
 const stationStore = useStationStore()
 const logicFlowStore = useLogicFlowStore()
+const empireStore = useEmpireStore()
 const statusStore = useStatusStore()
 const { t } = useI18n()
 
@@ -30,7 +32,6 @@ const lastValidTitle = ref('')
 const editingValue = ref('')
 
 const isFlowView = computed(() => stationStore.activeView === 'flow')
-const currentStore = computed(() => isFlowView.value ? logicFlowStore : stationStore)
 
 const themeColors = computed(() => {
   return isFlowView.value
@@ -52,7 +53,7 @@ const displayTitle = computed(() => {
   if (isFlowView.value) {
     return logicFlowStore.currentPlanName || t('menu.default_flow_name')
   }
-  return stationStore.currentPlanName || t('menu.default_station_name')
+  return empireStore.activeEmpire?.name || t('empire.new_empire_name')
 })
 
 const startEditing = async () => {
@@ -71,18 +72,18 @@ const finishEditing = () => {
 
 const confirmEditing = () => {
   isEditingTitle.value = false
-  const defaultName = isFlowView.value ? t('menu.default_flow_name') : t('menu.default_station_name')
+  const defaultName = isFlowView.value ? t('menu.default_flow_name') : t('empire.new_empire_name')
   if (!editingValue.value.trim()) {
     if (isFlowView.value) {
       logicFlowStore.currentPlanName = lastValidTitle.value === defaultName ? '' : lastValidTitle.value
-    } else {
-      stationStore.currentPlanName = lastValidTitle.value === defaultName ? '' : lastValidTitle.value
+    } else if (empireStore.activeEmpire) {
+      empireStore.activeEmpire.name = lastValidTitle.value === defaultName ? t('empire.new_empire_name') : lastValidTitle.value
     }
   } else {
     if (isFlowView.value) {
       logicFlowStore.currentPlanName = editingValue.value
-    } else {
-      stationStore.currentPlanName = editingValue.value
+    } else if (empireStore.activeEmpire) {
+      empireStore.activeEmpire.name = editingValue.value
     }
   }
 }
@@ -92,13 +93,19 @@ watch(displayTitle, (newVal) => {
 }, { immediate: true })
 
 const handleNew = () => {
-  const store = currentStore.value
-  const isEmpty = isFlowView.value 
-    ? logicFlowStore.groups.length === 0 
-    : stationStore.plannedModules.length === 0
+  if (isFlowView.value) {
+    const isEmpty = logicFlowStore.groups.length === 0
+    if (isEmpty || !logicFlowStore.isDirty) {
+      logicFlowStore.clearAll()
+      return
+    }
+    smartDialog.intent = 'NEW'
+    smartDialog.isOpen = true
+    return
+  }
   
-  if (isEmpty || !store.isDirty) {
-    store.clearAll()
+  if (!empireStore.isDirty) {
+    empireStore.createEmpire(t('menu.default_empire_name'))
     return
   }
   smartDialog.intent = 'NEW'
@@ -106,31 +113,44 @@ const handleNew = () => {
 }
 
 const handleSave = () => {
-  const store = currentStore.value
-  const isEmpty = isFlowView.value 
-    ? logicFlowStore.groups.length === 0 
-    : stationStore.plannedModules.length === 0
+  if (isFlowView.value) {
+    if (logicFlowStore.groups.length === 0) {
+      statusStore.pushMessage('warning', 'save', t('menu.cannot_save_empty_plan'))
+      return
+    }
+    if (logicFlowStore.savedPlans.activeId) {
+      const current = logicFlowStore.savedPlans.list.find((l: any) => l.id === logicFlowStore.savedPlans.activeId)
+      if (current) {
+        logicFlowStore.saveCurrentPlan()
+        return
+      }
+    }
+    handleSaveAs()
+    return
+  }
   
-  if (isEmpty) {
+  const hasStations = empireStore.activeEmpire?.stations.some(s => s.modules.length > 0)
+  if (!hasStations) {
     statusStore.pushMessage('warning', 'save', t('menu.cannot_save_empty_plan'))
     return
   }
-  if (store.savedPlans.activeId) {
-    const current = store.savedPlans.list.find(l => l.id === store.savedPlans.activeId)
-    if (current) {
-      store.saveCurrentPlan()
-      return
-    }
-  }
-  handleSaveAs()
+  empireStore.saveEmpire()
+  statusStore.pushMessage('success', 'save', t('menu.save'))
 }
 
 const handleSaveAs = () => {
-  const isEmpty = isFlowView.value 
-    ? logicFlowStore.groups.length === 0 
-    : stationStore.plannedModules.length === 0
+  if (isFlowView.value) {
+    if (logicFlowStore.groups.length === 0) {
+      statusStore.pushMessage('warning', 'save', t('menu.cannot_save_empty_plan'))
+      return
+    }
+    smartDialog.intent = 'SAVE_AS'
+    smartDialog.isOpen = true
+    return
+  }
   
-  if (isEmpty) {
+  const hasStations = empireStore.activeEmpire?.stations.some(s => s.modules.length > 0)
+  if (!hasStations) {
     statusStore.pushMessage('warning', 'save', t('menu.cannot_save_empty_plan'))
     return
   }
@@ -268,7 +288,7 @@ const handleLoad = () => {
     <SmartSaveDialog 
       :isOpen="smartDialog.isOpen" 
       :intent="smartDialog.intent" 
-      :initialName="currentStore.currentPlanName"
+      :initialName="displayTitle"
       :storeType="isFlowView ? 'logicFlow' : 'station'"
       @close="smartDialog.isOpen = false" 
     />

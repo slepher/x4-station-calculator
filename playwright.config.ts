@@ -14,6 +14,11 @@ export default defineConfig({
     trace: 'on-first-retry',
     locale: 'en-US',
     viewport: { width: 1920, height: 1080 },
+    actionTimeout: 500,      // 针对 click, fill 等动作的超时 (这才是你要改的)
+    navigationTimeout: 2000  // 页面跳转超时
+  },
+  expect: {
+    timeout: 500,
   },
 
   projects: [
@@ -30,9 +35,5 @@ export default defineConfig({
     command: 'npm run preview',
     url: 'http://localhost:4173/x4-station-calculator/',
     reuseExistingServer: !process.env.CI,
-  },
-  expect: {
-    // 设置全局 expect 断言的默认超时时间为 0.5 秒
-    timeout: 500,
-  },
+  }
 });

@@ -149,6 +149,22 @@ await expect(page.locator('.title')).toHaveText('新建');
 | 数据属性 | `[data-testid="element-id"]` |
 | CSS 类 | `.class-name` (结合上下文使用) |
 
+### 多空间站帝国规划定位器 (Multi-Station Empire)
+*   **标签栏**:
+    *   帝国总览标签: `.overview-tab` (✅)
+    *   分站标签: `.station-tab` (✅)
+    *   添加分站按钮: `.add-station-btn` (✅)
+*   **工具栏**:
+    *   工具按钮: `.btn-tool` (✅)
+    *   帝国名称输入: `.empire-name-input` (✅)
+*   **模块搜索**:
+    *   搜索框: `.search-box .search-input` (✅)
+    *   结果弹出框: `.results-popover` (✅)
+    *   结果项: `.results-popover .result-item` (✅)
+*   **对话框**:
+    *   模态框容器: `.fixed.inset-0` (✅)
+    *   文本输入: `.fixed.inset-0 input[type="text"]` (✅)
+
 ---
 
 ## 🕳️ 历史定位大坑 (Pitfalls)

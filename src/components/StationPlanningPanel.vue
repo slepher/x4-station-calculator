@@ -4,8 +4,7 @@ import draggable from 'vuedraggable'
 import { useI18n } from 'vue-i18n'
 import StationPlanningItem from './StationPlanningItem.vue'
 import StationModulePicker from './StationModulePicker.vue'
-import X4NumberInput from './common/X4NumberInput.vue'
-import { ref, computed, watch, nextTick } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 
 const { t } = useI18n()
 const store = useStationStore()
@@ -92,41 +91,10 @@ watch(() => store.plannedModules.length, (newLength, oldLength) => {
     })
   }
 })
-
-// 获取可用的种族列表
-const availableRaces = computed(() => {
-  const races = Object.keys(store.medicalConsumption || {})
-  const defaultRaces = ['argon', 'boron', 'paranid', 'split', 'teladi', 'terran']
-  
-  if (races.length > 0) {
-    // 确保default在第一个位置
-    const filtered = races.filter(race => race !== 'default')
-    return ['argon', ...filtered].sort((a, b) => {
-      if (a > b) return 1;
-      if (a < b) return -1;
-      return 0
-    })
-  }
-  return defaultRaces
-})
 </script>
 
 <template>
   <div class="module-list-container">
-    <div class="header-row">
-      <h3 class="header-title">{{ t('planning.module_list') }}</h3>
-      <div class="header-controls">
-        <div class="sunlight-control">
-          <span class="header-label">{{ t('planning.sun_light') }}</span>
-          <div class="x4-composite-input-wrapper">
-            <X4NumberInput v-model="store.settings.sunlight" width-class="w-16" class="x4-nested-input" />
-            <div class="x4-unit-suffix-box">%</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 搜索框移动到顶部 -->
     <div class="search-panel">
       <StationModulePicker />
     </div>
@@ -161,25 +129,8 @@ const availableRaces = computed(() => {
 
     <!-- Tier 2: 自动工业区 -->
     <div v-if="store.autoIndustryModules.length > 0" class="tier-section tier-auto">
-        <div class="tier-header tier-header-with-controls">
-          <div class="tier-header-left">
-            <span class="tier-label">{{ t('planning.tier_industry') }}</span>
-            <div class="workforce-option" :title="t('planning.consider_workforce_bonus')" @click.stop>
-              <input type="checkbox" id="wf-fill-check" v-model="store.settings.considerWorkforceForAutoFill"
-                class="x4-checkbox-mini" @click.stop />
-              <span class="option-icon">👥</span>
-            </div>
-          </div>
-          <div class="tier-controls">
-            <div class="race-selector">
-              <span class="header-label">{{ t('planning.race_preference') }}</span>
-              <select v-model="store.settings.racePreference" class="race-select">
-                <option v-for="race in availableRaces" :key="race" :value="race">
-                  {{ t(`race.${race}`) }}
-                </option>
-              </select>
-            </div>
-          </div>
+        <div class="tier-header">
+          <span class="tier-label">{{ t('planning.tier_industry') }}</span>
         </div>
       <div class="module-list-scroll">
         <div class="auto-modules-container">
@@ -197,11 +148,6 @@ const availableRaces = computed(() => {
           <div class="tier-header-left">
             <span class="arrow" :class="{ 'arrow-open': isSupplyOpen }">▶</span>
             <span class="tier-label">{{ t('planning.tier_supply') }}</span>
-            <div class="supply-workforce-option" :title="t('planning.consider_workforce_bonus')" @click.stop>
-              <input type="checkbox" id="supply-wf-check" v-model="store.settings.supplyWorkforceBonus"
-                class="x4-checkbox-mini" @click.stop />
-              <span class="option-icon">👥</span>
-            </div>
           </div>
         </div>
       <Transition name="expand">

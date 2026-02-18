@@ -10,6 +10,7 @@ import type {
 } from '../types/x4'
 import { useGameDataStore } from './useGameDataStore'
 import { useLogicFlowStore } from './useLogicFlowStore'
+import { useEmpireStore } from './useEmpireStore'
 import { calculateWorkforceBreakdown, calculateActualWorkforce, calculateEfficiencySaturation } from './logic/workforceCalculator'
 import { calculateProfitBreakdown, calculateNetProduction } from './logic/productionCalculator'
 import { generateFilteredModulesGrouped } from './logic/searchModule'
@@ -40,15 +41,23 @@ export const useStationStore = defineStore('station', () => {
   // --- 数据管理层 ---
     const gameData = useGameDataStore()
     const logicFlow = useLogicFlowStore()
+    const empireStore = useEmpireStore()
     logicFlow.init() // 抑制未使用警告并确保初始化
 
   // --- 状态 (State) ---
   const activeView = ref<'production' | 'flow'>((localStorage.getItem('x4_station_active_view') as any) || 'production')
-  const isReady = ref(false)
+  const isReady = computed(() => empireStore.isReady && gameData.isReady)
   const plannedModules = ref<SavedModule[]>([]) // Tier 1: 用户规划的核心模块
   const lockedWares = ref<string[]>([]) // 提升至外层，与 plannedModules 并列
   const savedPlans = ref<SavedPlansState>({ version: 1, activeId: null, list: [] })
-  const currentPlanName = ref<string>('') // 当前方案名称，"" 代表未命名/新建
+  const currentPlanName = computed({
+    get: () => empireStore.activeStation?.name || '',
+    set: (name: string) => {
+      if (empireStore.activeStation) {
+        empireStore.activeStation.name = name
+      }
+    }
+  })
   const lastSavedSnapshot = ref<string>('')
 
   const settings = ref<StationSettings>({
@@ -58,7 +67,6 @@ export const useStationStore = defineStore('station', () => {
     workforcePercent: 100,  
     workforceAuto: true,    
     considerWorkforceForAutoFill: false,
-    supplyWorkforceBonus: false,
     buyMultiplier: 0.5,      
     sellMultiplier: 0.5,     
     minersEnabled: false,    
@@ -191,10 +199,7 @@ export const useStationStore = defineStore('station', () => {
     takeSnapshot()
   }
 
-  const isDirty = computed(() => {
-    const current = JSON.stringify({ m: plannedModules.value, l: lockedWares.value, s: settings.value })
-    return current !== lastSavedSnapshot.value
-  })
+  const isDirty = computed(() => empireStore.isDirty)
 
   function loadPlan(index: number) {
     const plan = savedPlans.value.list[index]
@@ -222,6 +227,29 @@ export const useStationStore = defineStore('station', () => {
   watch(savedPlans, (val) => {
     localStorage.setItem('x4_station_data', JSON.stringify(val))
   }, { deep: true })
+
+  // 同步当前分站数据到 EmpireStore
+  watch([plannedModules, lockedWares, warePriority, settings], () => {
+    const station = empireStore.activeStation
+    if (station) {
+      station.modules = JSON.parse(JSON.stringify(plannedModules.value))
+      station.lockedWares = JSON.parse(JSON.stringify(lockedWares.value))
+      station.warePriority = JSON.parse(JSON.stringify(warePriority.value))
+      station.settings = JSON.parse(JSON.stringify(settings.value))
+      station.lastUpdated = Date.now()
+    }
+  }, { deep: true })
+
+  // 从 EmpireStore 同步到本地状态（当切换分站时）
+  watch(() => empireStore.activeStation, (station) => {
+    if (station) {
+      plannedModules.value = JSON.parse(JSON.stringify(station.modules))
+      lockedWares.value = station.lockedWares ? JSON.parse(JSON.stringify(station.lockedWares)) : []
+      warePriority.value = station.warePriority ? JSON.parse(JSON.stringify(station.warePriority)) : {}
+      const rawSettings = JSON.parse(JSON.stringify(station.settings))
+      settings.value = migrateSettings(rawSettings)
+    }
+  })
 
   function addModule(id: string = '', count = 1) {
     if (id !== '' && !modulesMap.value[id]) return
@@ -533,7 +561,6 @@ export const useStationStore = defineStore('station', () => {
   // --- 初始化 ---
   const initializeStore = async () => {
     console.log('[StationStore] Initializing...')
-    isReady.value = false
     try {
       // 1. 初始化游戏数据层
       await gameData.initialize()
@@ -547,21 +574,18 @@ export const useStationStore = defineStore('station', () => {
         activeView.value = storedView as 'production' | 'flow'
       }
 
-      // 4. 从 localStorage 恢复或加载 Demo
-      const stored = localStorage.getItem('x4_station_data')
-      if (stored) {
-        try {
-          loadData(JSON.parse(stored))
-        } catch (e) {
-          console.error('[Store] Failed to parse localStorage data, falling back to demo', e)
-          loadDemoData()
-        }
-      } else {
-        loadDemoData()
+      // 4. 从 localStorage 恢复或加载 Demo (由 EmpireStore 处理)
+      // EmpireStore 负责数据持久化，这里仅同步当前分站数据
+      const activeStation = empireStore.activeStation
+      if (activeStation) {
+        plannedModules.value = JSON.parse(JSON.stringify(activeStation.modules))
+        lockedWares.value = activeStation.lockedWares ? JSON.parse(JSON.stringify(activeStation.lockedWares)) : []
+        warePriority.value = activeStation.warePriority ? JSON.parse(JSON.stringify(activeStation.warePriority)) : {}
+        const rawSettings = JSON.parse(JSON.stringify(activeStation.settings))
+        settings.value = migrateSettings(rawSettings)
       }
       
       takeSnapshot()
-      isReady.value = true
       console.log('[StationStore] Initialized. Ready:', isReady.value)
     } catch (e) {
       console.error('[Store] Initialization failed:', e)

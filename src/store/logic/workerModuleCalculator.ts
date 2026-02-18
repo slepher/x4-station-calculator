@@ -115,7 +115,7 @@ export function calculateSustainMultiplier(
  * @param raceKey 种族
  * @param modulesMap 模块表
  * @param waresMap 物资表
- * @param supplyWorkforceBonus 补给区是否启用工人 (关键参数)
+ * @param considerWorkforceForAutoFill 是否启用工人计算 (关键参数)
  * @param sunlight 光照强度
  */
 export function calculateWorkerSupplyNeeds(
@@ -123,14 +123,14 @@ export function calculateWorkerSupplyNeeds(
   raceKey: string,
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
-  supplyWorkforceBonus: boolean,
+  considerWorkforceForAutoFill: boolean,
   sunlight: number = 100
 ): Record<string, number> {
   
   // 1. 快速预估：计算乘数 M
-  // 如果补给区没有工人 (supplyWorkforceBonus = false)，则不需要递归乘数 (M=1)
+  // 如果没有启用工人计算，则不需要递归乘数 (M=1)
   let M = 1.0;
-  if (supplyWorkforceBonus) {
+  if (considerWorkforceForAutoFill) {
     const result = calculateSustainMultiplier(raceKey, modulesMap, waresMap, true, sunlight);
     M = result.M;
   }
@@ -172,8 +172,8 @@ export function calculateWorkerSupplyNeeds(
         const baseOutput = module.outputs[wareId] || 0;
         if (baseOutput <= 0) continue;
 
-        // 如果启用工人，享受效率加成；否则只按基础产能计算
-        const eff = supplyWorkforceBonus ? (1 + (module.workforce?.maxBonus || 0)) : 1.0;
+        // 如果启用工人计算，享受效率加成；否则只按基础产能计算
+        const eff = considerWorkforceForAutoFill ? (1 + (module.workforce?.maxBonus || 0)) : 1.0;
 
         // 光照影响 (仅能量电池)
         let sunlightFactor = 1.0;
@@ -199,9 +199,9 @@ export function calculateWorkerSupplyNeeds(
       }
     }
 
-    // 如果补给区不配工人，就不存在"新增设施带来额外工人需求"的问题
+    // 如果未启用工人计算，就不存在"新增设施带来额外工人需求"的问题
     // 直接一次循环即可结束 (iter 0 就会 break)
-    if (!supplyWorkforceBonus) {
+    if (!considerWorkforceForAutoFill) {
       finalModules = tempModules;
       break;
     }

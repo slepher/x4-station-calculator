@@ -126,7 +126,6 @@ export interface StationSettings {
   workforcePercent: number;
   workforceAuto: boolean;
   considerWorkforceForAutoFill: boolean;
-  supplyWorkforceBonus: boolean;
   buyMultiplier: number;
   sellMultiplier: number;
   minersEnabled: boolean;
@@ -144,11 +143,46 @@ export interface StationSettings {
 export interface StationPlan {
   id: string;
   name: string;
+  type?: StationType;
   modules: SavedModule[];
   settings: StationSettings;
   lastUpdated: number;
   lockedWares?: string[];
   warePriority?: Record<string, number>;
+  minerals?: string[];
+}
+
+/**
+ * 分站类型定义
+ */
+export type StationType = 'industrial' | 'supply' | 'transit' | 'shipyard';
+
+/**
+ * 帝国方案配置
+ */
+export interface EmpirePlan {
+  id: string;
+  name: string;
+  stations: StationPlan[];
+}
+
+/**
+ * V2 存储状态
+ */
+export interface V2StorageState {
+  version: 2;
+  activeEmpireId: string | null;
+  activeStationId: string | null;
+  empires: EmpirePlan[];
+}
+
+/**
+ * V1 存储状态 (用于迁移)
+ */
+export interface V1StorageState {
+  version: 1;
+  activeId: string | null;
+  list: StationPlan[];
 }
 
 // --- 计算结果类型 (Calculation Results) ---
