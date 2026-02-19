@@ -1,8 +1,8 @@
 ---
 name: x4-test
-description: Execute and write Unit tests (Vitest) and E2E tests (Playwright) for X4 Station Calculator.
+description: "Execute and write Unit tests (Vitest) and E2E tests (Playwright) for X4 Station Calculator. "
 metadata:
-  version: "3.0"
+  version: "3.1"
 ---
 
 # X4 Test Execution
@@ -98,18 +98,20 @@ import { expect } from '@playwright/test';
 
 **If test files do NOT exist**:
 1. Read `test_tasks.md` to understand test requirements
-2. Create the test directory and files based on `test_tasks.md` items
-3. Write test cases following the 1:1 mapping rule
-4. Run the newly created tests
-5. Update `test_tasks.md` status after test run
+2. Read `ui_knowledge.md` to get locators and flows (MANDATORY for E2E tests)
+3. Create the test directory and files based on `test_tasks.md` items
+4. Write test cases following the 1:1 mapping rule
+5. Run the newly created tests
+6. Update `test_tasks.md` status after test run
 
 **If test files already exist**:
 1. Read `test_tasks.md` to get the complete list of required test items
-2. Read existing test files to extract current test descriptions
-3. **1:1 Comparison**: Compare each `test_tasks.md` item against existing tests
-4. **Identify Missing Tests**: Find items in `test_tasks.md` without corresponding test cases
-5. **Supplement Missing Tests**: Add test cases for any missing items
-6. Run all tests and update `test_tasks.md` status
+2. Read `ui_knowledge.md` to get locators and flows (MANDATORY for E2E tests)
+3. Read existing test files to extract current test descriptions
+4. **1:1 Comparison**: Compare each `test_tasks.md` item against existing tests
+5. **Identify Missing Tests**: Find items in `test_tasks.md` without corresponding test cases
+6. **Supplement Missing Tests**: Add test cases for any missing items
+7. Run all tests and update `test_tasks.md` status
 
 ### Step 1: Read test_tasks.md
 Before writing any test, read the corresponding `test_tasks.md` from the change directory:
@@ -117,19 +119,31 @@ Before writing any test, read the corresponding `test_tasks.md` from the change 
 - Understand the test requirements and expected outcomes
 - Each item in `test_tasks.md` maps 1:1 to a test case
 
-### Step 2: Check test_experience.md
+### Step 2: Read ui_knowledge.md (MANDATORY for E2E)
+**For E2E tests**, read `openspec/changes/<change-name>/ui_knowledge.md` to get:
+- **Flows**: Pre-defined interaction sequences
+- **Locators**: DOM selectors for UI elements
+- **Data Bindings**: Test data sources and their fields
+
+**If `ui_knowledge.md` does not exist**:
+- Generate it based on `test_tasks.md` content
+- Follow the rules defined in `x4-ff` skill
+
+### Step 3: Check test_experience.md
 **MANDATORY**: Read `openspec/test_experience.md` to find:
 - Existing locators (marked with ✅)
 - "定位器最佳实践" section for patterns
 - "历史定位大坑" section for pitfalls to avoid
 
-### Step 3: Write Test Code
+### Step 4: Write Test Code
 Follow the coding standards below. Each test should map 1:1 to a `test_tasks.md` item.
+Use locators from `ui_knowledge.md` as the primary source.
 
-### Step 4: Run and Verify
+### Step 5: Run and Verify
 Execute tests and update documentation:
 - Update `test_tasks.md` status
 - Update `test_experience.md` for new locator discoveries
+- Update `ui_knowledge.md` if new locators are discovered
 
 ---
 
@@ -249,21 +263,32 @@ test('验证新建按钮显示正确', async ({ page }) => { /* ... */ });
 
 ---
 
-## 7. Locator Loop Protocol (MANDATORY)
+## 7. Locator Knowledge Base Protocol (MANDATORY)
+
+### Primary Source: ui_knowledge.md
+For E2E tests, `ui_knowledge.md` is the **primary source** for locators:
+- Use locators defined in `ui_knowledge.md` first
+- If locator doesn't work, check `test_experience.md` for alternatives
+
+### Secondary Source: test_experience.md
+Read `openspec/test_experience.md` for:
+- Historical locator discoveries
+- Pitfalls and best practices
 
 ### On Test Failure (Timeout/Element Not Found)
-1. Read `openspec/test_experience.md` → Check "历史定位大坑" section
-2. Try alternative locators from the knowledge base
-3. If new locator works, update `test_experience.md` with:
-   - Logical description (user language)
-   - Correct locator path (✅)
-   - Any pitfalls discovered
-4. **Continue task** - do NOT terminate turn
+1. Check `ui_knowledge.md` for alternative locators
+2. Read `test_experience.md` → Check "历史定位大坑" section
+3. Try alternative locators
+4. If new locator works, update **both**:
+   - `ui_knowledge.md`: Add/update the locator
+   - `test_experience.md`: Record the discovery
+5. **Continue task** - do NOT terminate turn
 
 ### On Test Success (New Locator Discovered)
-1. Record the successful locator to `test_experience.md`
-2. Include: logical description, DOM path (✅), special data/conditions
-3. **Continue task** - do NOT terminate turn
+1. Record the successful locator to **both**:
+   - `ui_knowledge.md`: Add to the relevant flow/element section
+   - `test_experience.md`: Include logical description, DOM path (✅)
+2. **Continue task** - do NOT terminate turn
 
 ---
 
@@ -292,6 +317,13 @@ npm run test:unit
 ### Scope Rules
 - **Targeted Execution**: Only run tests for current `test_tasks.md` items
 - **Full Regression**: Only when explicitly requested
+- **/x4:verify Change Selection**:
+  - If `/x4:verify` does **not** provide a change name, use the change discussed in the current context.
+  - If the current context mentions **multiple** changes, present a short list and ask the user to choose.
+  - If the current context has **exactly one** change, proceed with that change.
+  - If the current context mentions **no** change, choose from current `openspec/changes/`:
+    - If **multiple** changes exist, present a short list and ask the user to choose.
+    - If **exactly one** change exists, proceed with that change.
 
 ---
 
@@ -309,7 +341,9 @@ Skill: x4-drag-test
 
 - **NEVER** use `import data from '...json'`
 - **NEVER** merge multiple `test_tasks.md` items into one test case
+- **NEVER** skip reading `ui_knowledge.md` for E2E tests
 - **NEVER** skip updating `test_tasks.md` after test runs
+- **NEVER** skip updating `ui_knowledge.md` for new locator discoveries
 - **NEVER** skip updating `test_experience.md` for locator discoveries
 - **NEVER** use `page.evaluate` to manipulate Vue/Pinia state as the only verification
 - **NEVER** exceed 500ms timeout for UI operations unless absolutely necessary
