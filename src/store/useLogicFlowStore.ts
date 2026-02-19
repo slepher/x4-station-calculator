@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useGameDataStore } from './useGameDataStore'
+import { computeExpandUpstream, type ExpandContext, type GroupSnapshot } from './logic/logicFlowStream'
 import type { FlowNode, ProductionLineGroup, SavedFlowNode, SavedFlowGroup, LogicFlowPlan, SavedFlowPlansState, LogicFlowSettings } from '@/types/x4'
 
 export const useLogicFlowStore = defineStore('logicFlow', () => {
@@ -611,89 +612,35 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     const group = groups.value.find(g => g.id === groupId)
     if (!group) return
 
-    const ware = gameData.waresMap[wareId]
-    if (!ware) return
+    const ctx: ExpandContext = {
+      waresMap: gameData.waresMap,
+      modulesMap: gameData.modulesMap,
+      modulesByOutputMap: gameData.modulesByOutputMap
+    }
 
-    // 0. T0 资源特殊处理：强制合并且无血统
-    const isT0 = ware.tier === 0 || wareId === 'energycells'
-    if (isT0) {
-      const existingT0Node = group.nodes.find(n => n.wareId === wareId)
-      if (!existingT0Node) {
-        const t0Node: FlowNode = {
-          id: crypto.randomUUID(),
-          wareId,
-          race: 'default',
-          lineage: 'default',
-          isIsolated: false,
-          isAuto: true,
-          isRoot: false,
-          source: 'auto',
-          column: ware.tier,
-          order: 0
-        }
-        // T0 总是插入到对应的 Tier 列
-        insertNodeSorted(group, t0Node)
+    const groupSnapshot: GroupSnapshot = {
+      id: group.id,
+      nodes: group.nodes,
+      isLocked: group.isLocked,
+      lockedLineage: group.lockedLineage,
+      subCategory: group.subCategory
+    }
+
+    const result = computeExpandUpstream(ctx, groupSnapshot, wareId, source, overrideLineage)
+
+    result.newNodes.forEach(node => {
+      insertNodeSorted(group, node)
+    })
+
+    result.updatedNodes.forEach(update => {
+      const node = group.nodes.find(n => n.id === update.nodeId)
+      if (node) {
+        Object.assign(node, update.updates)
       }
-      return
-    }
+    })
 
-    // 1. 检查是否存在相同 wareId 的隔离节点
-    // 重要：上游产品的隔离状态不应该被自动打破
-    // 只有用户直接拖拽该产品时才应该打破隔离（由 connectAndExpand 处理）
-    const isolatedNode = group.nodes.find(n => n.wareId === wareId && n.isIsolated)
-    if (isolatedNode) {
-      // 隔离节点保持隔离状态，不参与上游扩展
-      return
-    }
-
-    // 2. 物理主键检查：moduleId 唯一性 (对于非 T0 资源)
-    // 首先根据 lineage 确定模块
-    const effectiveLineage = group.isLocked ? group.lockedLineage : (overrideLineage || group.subCategory)
-    const module = gameData.findModuleForWare(wareId, effectiveLineage)
-    
-    if (!module) {
-      console.warn(`[LogicFlowStore] No module found for ware ${wareId} under lineage ${effectiveLineage}`)
-      return
-    }
-
-    const existingNode = group.nodes.find(n => n.moduleId === module.id)
-    if (existingNode) {
-      // 如果已存在物理模块，则仅处理升级逻辑
-      if (existingNode.source === 'auto' && source === 'manual') {
-        existingNode.source = 'manual'
-        existingNode.isAuto = false
-        existingNode.isRoot = true
-      }
-      return
-    }
-
-    // 3. 创建新节点
-    const node: FlowNode = {
-      id: crypto.randomUUID(),
-      wareId,
-      moduleId: module.id,
-      race: module.race,
-      lineage: effectiveLineage,
-      isIsolated: false,
-      isAuto: source === 'auto',
-      isRoot: source === 'manual',
-      source: source,
-      column: ware.tier,
-      order: 0
-    }
-
-    insertNodeSorted(group, node)
-
-    // 3. 更新组名称
-    if (source === 'manual') {
+    if (source === 'manual' && result.newNodes.length > 0) {
       updateGroupName(group)
-    }
-
-    // 4. 递归回溯：使用当前节点的 lineage
-    if (module.inputs) {
-      Object.keys(module.inputs).forEach(inputWareId => {
-        expandUpstream(groupId, inputWareId, 'auto', node.lineage)
-      })
     }
   }
 

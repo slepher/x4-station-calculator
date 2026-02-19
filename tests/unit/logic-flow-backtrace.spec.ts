@@ -62,13 +62,11 @@ describe('LogicFlow Fallback & Teladi Tracing Logic', () => {
     logicFlow = useLogicFlowStore()
     gameData = useGameDataStore()
 
-    // Mock static data loading
     const modules = JSON.parse(fs.readFileSync(path.join(DATA_PATH, 'modules.json'), 'utf-8'))
     const wares = JSON.parse(fs.readFileSync(path.join(DATA_PATH, 'wares.json'), 'utf-8'))
     
     const modulesMap: Record<string, any> = {}
     modules.forEach((m: any) => {
-      // 在测试中，我们确保所有模块都被包含，或者至少我们关心的模块被包含
       modulesMap[m.id] = {
         ...m,
         outputs: m.outputs || {},
@@ -76,11 +74,22 @@ describe('LogicFlow Fallback & Teladi Tracing Logic', () => {
       }
     })
     
+    const modulesByOutputMap: Record<string, any[]> = {}
+    modules.forEach((m: any) => {
+      Object.keys(m.outputs || {}).forEach(wareId => {
+        if (!modulesByOutputMap[wareId]) {
+          modulesByOutputMap[wareId] = []
+        }
+        modulesByOutputMap[wareId].push(modulesMap[m.id])
+      })
+    })
+    
     const waresMap: Record<string, any> = {}
     wares.forEach((w: any) => waresMap[w.id] = w)
 
     gameData.modulesMap = modulesMap
     gameData.waresMap = waresMap
+    gameData.modulesByOutputMap = modulesByOutputMap
     gameData.isReady = true
   })
 

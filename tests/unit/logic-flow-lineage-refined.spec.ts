@@ -59,13 +59,7 @@ describe('LogicFlow Refined Cleanup & Restrictions', () => {
     logicFlow = useLogicFlowStore()
     gameData = useGameDataStore()
 
-    // 加载真实数据以获得真实的依赖关系
-    const modules = JSON.parse(fs.readFileSync(path.join(DATA_PATH, 'modules.json'), 'utf-8'))
-    const wares = JSON.parse(fs.readFileSync(path.join(DATA_PATH, 'wares.json'), 'utf-8'))
-    
-    gameData.modules = modules
-    gameData.wares = wares
-    gameData.initialize()
+    await gameData.initialize()
   })
 
   it('should delete an isolated node if it loses all consumers', () => {
