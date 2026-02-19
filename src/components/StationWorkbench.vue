@@ -10,6 +10,7 @@ import StationWareFlowsDashboard from './StationWareFlowsDashboard.vue'
 import EmpireWareFlowsDashboard from './EmpireWareFlowsDashboard.vue'
 import LogicFlowCandidateZone from './LogicFlowCandidateZone.vue'
 import LogicFlowPlanningZone from './LogicFlowPlanningZone.vue'
+import StatusMonitor from './StatusMonitor.vue'
 
 const store = useStationStore()
 const empireStore = useEmpireStore()

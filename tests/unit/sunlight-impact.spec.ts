@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { calculateAutoFill } from '../../src/store/logic/moduleDiffCalculator';
+import { calculateAutoSupplyModules } from '../../src/store/logic/workerModuleCalculator';
 import { StationSettings, X4Module, X4Ware, SavedModule } from '../../src/types/x4';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -158,11 +159,29 @@ describe('Sunlight Impact Logic', () => {
     settings50.considerWorkforceForAutoFill = true;
     settings50.supplyWorkforceBonus = true;
 
-    const result100 = calculateAutoFill(plannedModules, settings100, modules, wares, [], consumption, {});
-    const solar100 = getSolarCount(result100.autoSupply);
+    const autoIndustry100 = calculateAutoFill(plannedModules, settings100, modules, wares, [], consumption, {}).autoIndustry;
+    const autoSupply100 = calculateAutoSupplyModules(
+      plannedModules,
+      autoIndustry100,
+      settings100,
+      modules,
+      wares,
+      consumption,
+      {}
+    );
+    const solar100 = getSolarCount(autoSupply100);
 
-    const result50 = calculateAutoFill(plannedModules, settings50, modules, wares, [], consumption, {});
-    const solar50 = getSolarCount(result50.autoSupply);
+    const autoIndustry50 = calculateAutoFill(plannedModules, settings50, modules, wares, [], consumption, {}).autoIndustry;
+    const autoSupply50 = calculateAutoSupplyModules(
+      plannedModules,
+      autoIndustry50,
+      settings50,
+      modules,
+      wares,
+      consumption,
+      {}
+    );
+    const solar50 = getSolarCount(autoSupply50);
 
     console.log(`Solar Panels (Supply) - 50%: ${solar50}, 100%: ${solar100}`);
 

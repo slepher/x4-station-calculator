@@ -52,27 +52,22 @@ const stationCount = computed({
 
 const sunlight = computed({
   get: () => stationStore.settings.sunlight,
-  set: (val: number) => { stationStore.settings.sunlight = val }
+  set: (val: number) => { stationStore.updateSetting('sunlight', val) }
 })
 
 const workforce = computed({
   get: () => stationStore.settings.considerWorkforceForAutoFill,
-  set: (val: boolean) => { stationStore.settings.considerWorkforceForAutoFill = val }
-})
-
-const supply = computed({
-  get: () => stationStore.settings.internalSupply,
-  set: (val: boolean) => { stationStore.settings.internalSupply = val }
+  set: (val: boolean) => { stationStore.updateSetting('considerWorkforceForAutoFill', val) }
 })
 
 const showEmpireGaps = computed({
   get: () => stationStore.settings.showEmpireGaps ?? false,
-  set: (val: boolean) => { stationStore.settings.showEmpireGaps = val }
+  set: (val: boolean) => { stationStore.updateSetting('showEmpireGaps', val) }
 })
 
 const racePreference = computed({
   get: () => stationStore.settings.racePreference,
-  set: (val: string) => { stationStore.settings.racePreference = val }
+  set: (val: string) => { stationStore.updateSetting('racePreference', val) }
 })
 
 // --- 矿物选择逻辑 ---
@@ -223,19 +218,6 @@ const races = computed(() => [
         </div>
 
         <div class="input-group ml-6">
-          <label class="group-label">{{ t('toolbar.internal_supply') }}</label>
-          <button 
-            class="toggle-chip"
-            :class="supply ? 'active-blue' : 'inactive'"
-            @click="supply = !supply"
-            :title="t('toolbar.internal_supply_title')"
-          >
-            <span class="text-sm">🔄</span>
-            <span class="chip-status">{{ supply ? 'ON' : 'OFF' }}</span>
-          </button>
-        </div>
-
-        <div class="input-group ml-6">
           <label class="group-label">{{ t('ui.show_empire_gaps') }}</label>
           <button 
             class="toggle-chip"
@@ -366,12 +348,6 @@ const races = computed(() => [
 }
 .toggle-chip.active-green .chip-status { @apply text-emerald-300; }
 .toggle-chip.active-green .chip-label { @apply text-emerald-600; }
-
-.toggle-chip.active-blue {
-  @apply bg-sky-950/40 border-sky-500/30 text-sky-400 shadow-[0_0_8px_rgba(14,165,233,0.2)];
-}
-.toggle-chip.active-blue .chip-status { @apply text-sky-300; }
-.toggle-chip.active-blue .chip-label { @apply text-sky-600; }
 
 /* 矿物弹出层 */
 .mineral-popover {

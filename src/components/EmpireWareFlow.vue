@@ -10,6 +10,9 @@ const props = defineProps<{
   netValue: number
   viewMode: 'quantity' | 'economy'
   showAddButton?: boolean
+  showRemoveButton?: boolean
+  disableAdd?: boolean
+  disableRemove?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -102,9 +105,23 @@ const formatStationName = (detail: any) => {
         </template>
       </CollapsibleDetailList>
     </div>
-    <div v-if="showAddButton" class="flow-action-rail">
-      <div class="fav-placeholder"></div>
-      <button class="add-btn" type="button" @click.stop="emit('add', resourceId)">
+    <div v-if="showAddButton || showRemoveButton" class="flow-action-rail">
+      <button
+        v-if="showRemoveButton"
+        class="action-btn remove-btn"
+        type="button"
+        :disabled="disableRemove"
+        @click.stop="emit('remove', resourceId)"
+      >
+        -
+      </button>
+      <button
+        v-if="showAddButton"
+        class="action-btn add-btn"
+        type="button"
+        :disabled="disableAdd"
+        @click.stop="emit('add', resourceId)"
+      >
         +
       </button>
     </div>
@@ -124,12 +141,16 @@ const formatStationName = (detail: any) => {
   @apply w-20 h-8 flex-none flex items-center justify-center gap-2 bg-slate-800/40 rounded;
 }
 
-.fav-placeholder {
-  @apply w-7 h-7;
+.action-btn {
+  @apply w-7 h-7 rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-600/30 transition-all font-bold;
 }
 
-.add-btn {
-  @apply w-7 h-7 rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-600/30 transition-all font-bold;
+.action-btn:disabled {
+  @apply text-slate-600 bg-slate-900/40 cursor-not-allowed hover:text-slate-600 hover:bg-slate-900/40;
+}
+
+.remove-btn {
+  @apply text-slate-500;
 }
 
 .header-name {

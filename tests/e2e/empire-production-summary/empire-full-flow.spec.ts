@@ -46,13 +46,6 @@ test.describe('帝国总览多空间站聚合完整流程', () => {
       await page.waitForTimeout(100);
     }
     
-    const supplyToggle = page.locator('.toggle-chip').filter({ hasText: /ON|OFF/ }).nth(1);
-    const isSupplyOn = await supplyToggle.evaluate(el => el.classList.contains('active-blue'))
-    if (!isSupplyOn) {
-      await supplyToggle.click();
-      await page.waitForTimeout(100);
-    }
-    
     const quantumTubeFlow = page.locator('.flow-wrapper').filter({ hasText: /量子管|Quantum Tube/ }).first();
     if (await quantumTubeFlow.isVisible()) {
       await quantumTubeFlow.hover();

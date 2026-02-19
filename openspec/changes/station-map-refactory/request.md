@@ -135,3 +135,11 @@
 2. 切换 `currentStationId` 时，UI 与计算结果瞬时切换且无串站。
 3. 单站和帝国总览读取的分站数据一致，不出现重复算法差异。
 4. 保存/读取后状态可恢复，且无明显性能退化。
+
+## 9. 补记（实现后追加）
+
+基于后续实现与回归结果，新增以下结论：
+
+1. `currentEfficiency` 作为单一效率真源保留在 `StationStateMap`，`useStationStore` 与 UI 仅透传读取，不在组件或 store 中重复计算。
+2. `StationStateMap` 内部已进一步收敛，移除未被当前三模块（Planner / WareFlow / StationDashboard）直接消费的冗余字段，减少状态面与同步负担。
+3. 组件侧所有 `store.settings.xxx` 直写路径已收敛到 `updateSetting` 主动重算入口，避免“设置变化但不触发重算”的同类回归。

@@ -3,7 +3,8 @@ import type { FlowNode, X4Module, X4Ware } from '@/types/x4'
 export interface ExpandContext {
   waresMap: Record<string, X4Ware>
   modulesMap: Record<string, X4Module>
-  modulesByOutputMap: Record<string, X4Module[]>
+  modulesByOutputMap?: Record<string, X4Module[]>
+  findModuleForWare?: (wareId: string, lineage: string) => X4Module | null
 }
 
 export interface GroupSnapshot {
@@ -93,7 +94,12 @@ export function computeExpandUpstream(
   const effectiveLineage = group.isLocked 
     ? (group.lockedLineage || 'default') 
     : (overrideLineage || group.subCategory || 'default')
-  const module = findModuleForWare(wareId, effectiveLineage, ctx.modulesByOutputMap)
+  let module: X4Module | null = null
+  if (ctx.modulesByOutputMap && Object.keys(ctx.modulesByOutputMap).length > 0) {
+    module = findModuleForWare(wareId, effectiveLineage, ctx.modulesByOutputMap)
+  } else if (ctx.findModuleForWare) {
+    module = ctx.findModuleForWare(wareId, effectiveLineage)
+  }
 
   if (!module) {
     return result
@@ -165,7 +171,12 @@ export function traceWareDependencies(
 
     collectedWares.add(wareId)
 
-    const module = findModuleForWare(wareId, race, ctx.modulesByOutputMap)
+    let module: X4Module | null = null
+    if (ctx.modulesByOutputMap && Object.keys(ctx.modulesByOutputMap).length > 0) {
+      module = findModuleForWare(wareId, race, ctx.modulesByOutputMap)
+    } else if (ctx.findModuleForWare) {
+      module = ctx.findModuleForWare(wareId, race)
+    }
     if (!module) return
 
     collectedModules.add(module.id)

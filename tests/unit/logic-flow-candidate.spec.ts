@@ -83,7 +83,7 @@ describe('LogicFlowCandidateZone', () => {
     expect(siliconCard.find('.quick-add-container').exists()).toBe(false)
   })
 
-  it('should show quick add button for Energy Cells', () => {
+  it('should NOT show add button for Energy Cells', () => {
     const wrapper = mount(LogicFlowCandidateZone, {
       global: {
         plugins: [createTestingPinia({
@@ -98,10 +98,10 @@ describe('LogicFlowCandidateZone', () => {
 
     const ecCard = wrapper.find('[data-ware-id="energycells"]')
     expect(ecCard.exists()).toBe(true)
-    expect(ecCard.find('.quick-add-container').exists()).toBe(true)
+    expect(ecCard.find('.ware-card-add-btn').exists()).toBe(false)
   })
 
-  it('should show quick add button for Tier 1+ resources', () => {
+  it('should show add button for Tier 1+ resources', () => {
     const wrapper = mount(LogicFlowCandidateZone, {
       global: {
         plugins: [createTestingPinia({
@@ -116,6 +116,6 @@ describe('LogicFlowCandidateZone', () => {
 
     const microchipCard = wrapper.find('[data-ware-id="microchip"]')
     expect(microchipCard.exists()).toBe(true)
-    expect(microchipCard.find('.quick-add-container').exists()).toBe(true)
+    expect(microchipCard.find('.ware-card-add-btn').exists()).toBe(true)
   })
 })

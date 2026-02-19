@@ -16,25 +16,19 @@ const { t } = useI18n()
 const viewMode = ref<'materials' | 'time' | 'workers' | 'volume'>('materials')
 const transportShipCapacity = computed({
   get: () => store.settings.transportShipCapacity,
-  set: (val) => store.settings.transportShipCapacity = val
+  set: (val) => store.updateSetting('transportShipCapacity', val)
 })
 const buildPriceMultiplier = computed({
   get: () => store.buildPriceMultiplier,
   set: (val) => store.buildPriceMultiplier = val
 })
 
-const workforceEfficiency = computed(() => {
-  const needed = store.stationAnalysis.totalNeeded
-  if (needed <= 0) return 1
-  return Math.min(1, store.actualWorkforce / needed)
-})
-
 const workforceEfficiencyText = computed(() => {
-  return `${Math.round(workforceEfficiency.value * 100)}%`
+  return `${Math.round(store.currentEfficiency * 100)}%`
 })
 
 const workforceEfficiencyColor = computed(() => {
-  const eff = workforceEfficiency.value
+  const eff = store.currentEfficiency
   if (eff >= 1) return 'text-emerald-400'
   if (eff >= 0.5) return 'text-amber-400'
   return 'text-red-400'
@@ -59,8 +53,20 @@ const saturationPercent = computed({
     if (store.settings.workforceAuto) return;
     const analysis = store.stationAnalysis
     const capacity = analysis.totalCapacity || 0;
-    store.settings.manualWorkforce = Math.min(Math.round((val / 100) * capacity), capacity);
+    store.updateSetting('manualWorkforce', Math.min(Math.round((val / 100) * capacity), capacity));
   }
+})
+const manualWorkforce = computed({
+  get: () => store.settings.manualWorkforce,
+  set: (val: number) => store.updateSetting('manualWorkforce', val)
+})
+const workforceAuto = computed({
+  get: () => store.settings.workforceAuto,
+  set: (val: boolean) => store.updateSetting('workforceAuto', val)
+})
+const useHQ = computed({
+  get: () => store.settings.useHQ,
+  set: (val: boolean) => store.updateSetting('useHQ', val)
 })
 
 const formatLargeNum = (n: number) => {
@@ -401,7 +407,7 @@ const headerTitle = computed(() => {
           <div class="flex items-center gap-2">
             <span class="text-[10px] text-slate-500 font-bold uppercase">{{ t('station.control_actual_workforce') }}</span>
 
-            <X4NumberInput v-if="!store.settings.workforceAuto" v-model="store.settings.manualWorkforce"
+            <X4NumberInput v-if="!store.settings.workforceAuto" v-model="manualWorkforce"
               :max="store.stationAnalysis.totalCapacity" width-class="w-24" />
             <span v-else class="val-text-display">
               {{ store.actualWorkforce }}
@@ -421,7 +427,7 @@ const headerTitle = computed(() => {
 
         <div class="flex items-center justify-between mt-2">
           <label class="auto-toggle group">
-            <input type="checkbox" v-model="store.settings.workforceAuto" class="hidden">
+            <input type="checkbox" v-model="workforceAuto" class="hidden">
             <div class="cb" :class="{ 'cb-active': store.settings.workforceAuto }">
               <div v-if="store.settings.workforceAuto" class="cb-inner"></div>
             </div>
@@ -431,7 +437,7 @@ const headerTitle = computed(() => {
             </span>
           </label>
           <label class="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" v-model="store.settings.useHQ" class="cb-sm">
+            <input type="checkbox" v-model="useHQ" class="cb-sm">
             <span class="text-[9px] text-slate-500 uppercase font-bold">{{ t('station.inc_phq') }}</span>
           </label>
         </div>

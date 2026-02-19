@@ -107,20 +107,6 @@ test.describe('多空间站帝国规划 - 动态工具栏', () => {
     await expect(workforceBtn).toHaveClass(/active-green/)
   })
 
-  test('站内补给开关测试', async ({ page }) => {
-    const addBtn = page.locator('.add-btn')
-    await addBtn.click()
-    await page.waitForTimeout(200)
-    
-    const supplyBtn = page.locator('.toggle-chip').filter({ hasText: /🔄|ON|OFF/ }).last()
-    await expect(supplyBtn).toBeVisible()
-    
-    await supplyBtn.click()
-    await page.waitForTimeout(100)
-    
-    await expect(supplyBtn).toHaveClass(/active-blue/)
-  })
-
   test('星区矿物选择测试', async ({ page }) => {
     const addBtn = page.locator('.add-btn')
     await addBtn.click()

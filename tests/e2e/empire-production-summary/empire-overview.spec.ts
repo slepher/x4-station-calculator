@@ -157,13 +157,6 @@ test.describe('补给优先归类测试', () => {
       await page.waitForTimeout(100);
     }
 
-    const supplyToggle = page.locator('.toggle-chip').filter({ hasText: /ON|OFF/ }).nth(1);
-    const isSupplyOn = await supplyToggle.evaluate(el => el.classList.contains('active-blue'));
-    if (!isSupplyOn) {
-      await supplyToggle.click();
-      await page.waitForTimeout(100);
-    }
-
     await addStationBtn.click();
     await addModuleToStation(page, 'Medical');
     await page.waitForTimeout(300);

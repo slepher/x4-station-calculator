@@ -8,7 +8,6 @@ import { ref, watch, nextTick } from 'vue'
 
 const { t } = useI18n()
 const store = useStationStore()
-const isSupplyOpen = ref(false) // 自动补给区折叠状态，默认折叠
 const flashTime = 300; 0; // 闪烁动画时长（毫秒）
 
 // 规划区数量调整功能
@@ -139,25 +138,6 @@ watch(() => store.plannedModules.length, (newLength, oldLength) => {
             @transfer="store.transferModuleFromAutoIndustry(element)" />
         </div>
       </div>
-    </div>
-
-    <!-- Tier 3: 自动补给区 -->
-    <div v-if="store.autoSupplyModules.length > 0 || store.settings.considerWorkforceForAutoFill" class="tier-section tier-auto">
-        <div class="tier-header tier-header--supply" :class="{ 'is-active': isSupplyOpen }"
-          @click="isSupplyOpen = !isSupplyOpen">
-          <div class="tier-header-left">
-            <span class="arrow" :class="{ 'arrow-open': isSupplyOpen }">▶</span>
-            <span class="tier-label">{{ t('planning.tier_supply') }}</span>
-          </div>
-        </div>
-      <Transition name="expand">
-        <div v-if="isSupplyOpen" class="module-list-scroll">
-          <div class="auto-modules-container">
-            <StationPlanningItem v-for="(element, index) in store.autoSupplyModules" :key="element.id + '-' + index"
-              :item="element" :info="store.getModuleInfo(element.id)!" :readonly="true" :no-click="true" />
-          </div>
-        </div>
-      </Transition>
     </div>
 
     <!-- 劳动力加成选项已移动到各自标题栏 -->
@@ -327,29 +307,5 @@ auto-fill-section {
 .tier-controls {
   @apply flex items-center gap-2;
 }
-
-/* 折叠箭头样式 */
-.arrow {
-  @apply text-[10px] text-slate-500 transition-transform duration-200 leading-none flex items-center justify-center;
-  width: 12px;
-}
-
-.arrow-open {
-  @apply rotate-90 text-slate-300;
-}
-
-/* 折叠动画 */
-.expand-enter-active,
-.expand-leave-active {
-  transition: all 0.2s ease-out;
-  max-height: 500px;
-}
-
-.expand-enter-from,
-.expand-leave-to {
-  opacity: 0;
-  max-height: 0;
-}
-
 
 </style>

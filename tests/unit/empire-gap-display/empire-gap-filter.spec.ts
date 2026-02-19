@@ -20,6 +20,7 @@ vi.mock('@/utils/UseX4I18n', () => ({
 vi.mock('@/store/useStationStore', () => ({
   useStationStore: () => ({
     settings: { showEmpireGaps: true, racePreference: 'argon' },
+    plannedModules: [{ id: 'module_ore', count: 2 }],
     getResolvedLevel: (wareId: string) => (wareId === 'microchips' ? 1 : 0),
     groupedFlows: {
       flows: [],
@@ -60,7 +61,9 @@ vi.mock('@/store/useEmpireStore', () => ({
 
 vi.mock('@/store/useGameDataStore', () => ({
   useGameDataStore: () => ({
-    findModuleForWare: vi.fn().mockReturnValue(null)
+    findModuleForWare: vi.fn().mockImplementation((wareId: string) => ({
+      id: `module_${wareId}`
+    }))
   })
 }))
 
@@ -77,10 +80,21 @@ describe('帝国运营/补给过滤逻辑', () => {
     expect(operationsGroup).toBeDefined()
     expect(supplyGroup).toBeDefined()
 
-    const operationIds = (operationsGroup?.props('items') || []).map((item: any) => item.id)
-    const supplyIds = (supplyGroup?.props('items') || []).map((item: any) => item.id)
+    const operationItems = (operationsGroup?.props('items') || []) as any[]
+    const supplyItems = (supplyGroup?.props('items') || []) as any[]
+    const operationIds = operationItems.map(item => item.id)
+    const supplyIds = supplyItems.map(item => item.id)
 
     expect(operationIds).toEqual(['microchips', 'ore'])
     expect(supplyIds).toEqual(['foodrations', 'medicalsupplies'])
+
+    const microchips = operationItems.find(item => item.id === 'microchips')
+    const ore = operationItems.find(item => item.id === 'ore')
+    const food = supplyItems.find(item => item.id === 'foodrations')
+
+    expect(microchips?.disableAdd).toBe(true)
+    expect(ore?.disableAdd).toBe(false)
+    expect(ore?.disableRemove).toBe(false)
+    expect(food?.disableAdd).toBe(false)
   })
 })

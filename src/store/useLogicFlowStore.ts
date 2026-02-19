@@ -615,7 +615,8 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     const ctx: ExpandContext = {
       waresMap: gameData.waresMap,
       modulesMap: gameData.modulesMap,
-      modulesByOutputMap: gameData.modulesByOutputMap
+      modulesByOutputMap: gameData.modulesByOutputMap || {},
+      findModuleForWare: gameData.findModuleForWare
     }
 
     const groupSnapshot: GroupSnapshot = {

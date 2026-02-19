@@ -28,6 +28,26 @@ const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.roun
 
 // 从store获取已排序和分组好的数据
 const groupedFlows = computed(() => store.groupedFlows)
+const resourceBufferHours = computed({
+  get: () => store.settings.resourceBufferHours,
+  set: (val: number) => store.updateSetting('resourceBufferHours', val)
+})
+const primaryProductBufferHours = computed({
+  get: () => store.settings.primaryProductBufferHours,
+  set: (val: number) => store.updateSetting('primaryProductBufferHours', val)
+})
+const secondaryProductBufferHours = computed({
+  get: () => store.settings.secondaryProductBufferHours,
+  set: (val: number) => store.updateSetting('secondaryProductBufferHours', val)
+})
+const buyMultiplier = computed({
+  get: () => store.settings.buyMultiplier,
+  set: (val: number) => store.updateSetting('buyMultiplier', val)
+})
+const sellMultiplier = computed({
+  get: () => store.settings.sellMultiplier,
+  set: (val: number) => store.updateSetting('sellMultiplier', val)
+})
 
 // 辅助函数：为UI提供名称翻译后的包装对象
 const wrapFlow = (flow: any) => {
@@ -39,12 +59,27 @@ const wrapFlow = (flow: any) => {
   }
 }
 
+const getModuleForWare = (wareId: string) =>
+  gameData.findModuleForWare(wareId, store.settings.racePreference)
+
+const getPlannedModuleIndex = (moduleId: string) =>
+  store.plannedModules.findIndex(module => module.id === moduleId)
+
 const empireGaps = computed(() => {
   const flows = empireStore.empireGroupedFlows
+  store.plannedModules
   locale.value
   const operations = [...flows.empireGroups.operations, ...flows.empireGroups.products]
     .filter((flow: any) => flow.netRate < 0 || store.getResolvedLevel(flow.wareId) > 0)
-    .map(wrapFlow)
+    .map((flow: any) => {
+      const module = getModuleForWare(flow.wareId)
+      const plannedIndex = module ? getPlannedModuleIndex(module.id) : -1
+      return {
+        ...wrapFlow(flow),
+        disableAdd: !module || flow.netRate > 0,
+        disableRemove: !module || plannedIndex === -1
+      }
+    })
     .sort((a: any, b: any) => {
       const tierDiff = (b.tier ?? 0) - (a.tier ?? 0)
       if (tierDiff !== 0) return tierDiff
@@ -52,7 +87,15 @@ const empireGaps = computed(() => {
     })
   return {
     operations,
-    supply: flows.empireGroups.supply.map(wrapFlow)
+    supply: flows.empireGroups.supply.map((flow: any) => {
+      const module = getModuleForWare(flow.wareId)
+      const plannedIndex = module ? getPlannedModuleIndex(module.id) : -1
+      return {
+        ...wrapFlow(flow),
+        disableAdd: !module || flow.netRate > 0,
+        disableRemove: !module || plannedIndex === -1
+      }
+    })
   }
 })
 
@@ -117,9 +160,26 @@ const rateGroups = computed(() => ([
 ]))
 
 const handleAddModule = (wareId: string) => {
-  const module = gameData.findModuleForWare(wareId, store.settings.racePreference)
+  const module = getModuleForWare(wareId)
   if (!module) return
+  const flow = empireStore.empireGroupedFlows.empireGroups.operations
+    .concat(empireStore.empireGroupedFlows.empireGroups.products, empireStore.empireGroupedFlows.empireGroups.supply)
+    .find(item => item.wareId === wareId)
+  if (flow && flow.netRate > 0) return
   store.addModule(module.id, 1)
+}
+
+const handleRemoveModule = (wareId: string) => {
+  const module = getModuleForWare(wareId)
+  if (!module) return
+  const plannedIndex = getPlannedModuleIndex(module.id)
+  if (plannedIndex === -1) return
+  const current = store.plannedModules[plannedIndex]?.count ?? 0
+  if (current <= 1) {
+    store.removeModule(plannedIndex)
+  } else {
+    store.updateModuleCount(plannedIndex, current - 1)
+  }
 }
 </script>
 
@@ -174,7 +234,9 @@ const handleAddModule = (wareId: string) => {
                 :items="empireGaps.operations"
                 :viewMode="viewMode"
                 :showAddButton="true"
+                :showRemoveButton="true"
                 @add="handleAddModule"
+                @remove="handleRemoveModule"
               />
             </div>
             <div v-if="empireGaps.supply.length > 0" class="empire-gap-group">
@@ -183,7 +245,9 @@ const handleAddModule = (wareId: string) => {
                 :items="empireGaps.supply"
                 :viewMode="viewMode"
                 :showAddButton="true"
+                :showRemoveButton="true"
                 @add="handleAddModule"
+                @remove="handleRemoveModule"
               />
             </div>
           </div>
@@ -208,19 +272,19 @@ const handleAddModule = (wareId: string) => {
     <div class="volume-controls-section" v-if="viewMode === 'volume'">
       <div class="simulation-controls flex flex-row gap-4">
         <VolumeControlSlider
-          v-model="store.settings.resourceBufferHours"
+          v-model="resourceBufferHours"
           :label="t('wareflow.resource_buffer_hours')"
           type="resource"
           :max="24"
           :step="1" />
         <VolumeControlSlider
-          v-model="store.settings.primaryProductBufferHours"
+          v-model="primaryProductBufferHours"
           :label="t('wareflow.primary_product_buffer_hours')"
           type="product"
           :max="24"
           :step="1" />
         <VolumeControlSlider
-          v-model="store.settings.secondaryProductBufferHours"
+          v-model="secondaryProductBufferHours"
           :label="t('wareflow.secondary_product_buffer_hours')"
           type="product"
           :max="24"
@@ -231,8 +295,8 @@ const handleAddModule = (wareId: string) => {
     <!-- 利润分析部分 -->
     <div class="profit-section" v-if="viewMode === 'economy'">
       <div class="simulation-controls flex flex-row gap-4">
-        <PriceSlider v-model="store.settings.buyMultiplier" :label="t('wareflow.res_price')" type="buy" />
-        <PriceSlider v-model="store.settings.sellMultiplier" :label="t('wareflow.prod_price')" type="sell" />
+        <PriceSlider v-model="buyMultiplier" :label="t('wareflow.res_price')" type="buy" />
+        <PriceSlider v-model="sellMultiplier" :label="t('wareflow.prod_price')" type="sell" />
       </div>
 
       <!-- 总利润 -->

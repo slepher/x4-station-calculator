@@ -7,10 +7,12 @@ defineProps<{
   items: any[]
   viewMode: 'quantity' | 'economy'
   showAddButton?: boolean
+  showRemoveButton?: boolean
 }>()
 
 defineEmits<{
   add: [wareId: string]
+  remove: [wareId: string]
 }>()
 </script>
 
@@ -35,7 +37,11 @@ defineEmits<{
       :details="item.contributions"
       :viewMode="viewMode"
       :showAddButton="showAddButton"
+      :showRemoveButton="showRemoveButton"
+      :disableAdd="item.disableAdd"
+      :disableRemove="item.disableRemove"
       @add="$emit('add', $event)"
+      @remove="$emit('remove', $event)"
     />
   </div>
 </template>

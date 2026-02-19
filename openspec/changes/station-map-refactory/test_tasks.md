@@ -50,6 +50,36 @@
   - **Bug现状**: 现有缓存与单站重复计算存在漂移风险
   - **期待结果**: 聚合值与各分站运行态结果可精确对齐
 
+- [x] 偏好种族变更触发重算
+  - **目标**: 验证通过 `useStationStore` 设置 `racePreference` 后会同步写回 active station 并触发重算链路
+  - **步骤**:
+    1. 创建并选中分站 A
+    2. 调用 `stationStore.updateSetting('racePreference', 'terran')`
+    3. 读取 `stationStore.settings.racePreference`
+    4. 读取 `empireStore.getStationById(A).settings.racePreference`
+  - **Bug现状**: UI 直接写 `store.settings.racePreference` 时不会触发主动重算，导致产线不更新
+  - **期待结果**: `stationStore` 与 `active station` 的 `racePreference` 同步为 `terran`，后续计算使用新偏好
+
+- [x] 价格倍率变更触发重算
+  - **目标**: 验证调整 `buyMultiplier/sellMultiplier` 后利润会重新计算
+  - **步骤**:
+    1. 创建并选中分站，添加可生产模块
+    2. 记录当前 `groupedFlows` 汇总净值（`netValue` 求和）
+    3. 调用 `stationStore.updateSetting('sellMultiplier', 1)`
+    4. 再次读取 `groupedFlows` 汇总净值
+  - **Bug现状**: 价格滑条直写 `store.settings.xxx` 时不会触发主动重算，利润不更新
+  - **期待结果**: 调整倍率后汇总净值发生变化
+
+- [x] 手动劳动力变更触发效率重算
+  - **目标**: 验证关闭自动劳动力后调整 `manualWorkforce` 会重新计算效率
+  - **步骤**:
+    1. 创建并选中分站，添加存在劳动力需求与容量的模块组合
+    2. 设置 `workforceAuto=false` 且 `manualWorkforce=0`，记录 `actualWorkforce`
+    3. 设置较大 `manualWorkforce`
+    4. 对比前后 `actualWorkforce`
+  - **Bug现状**: 劳动力控件直写 settings 嵌套字段时，效率可能不刷新
+  - **期待结果**: 手动劳动力变化后实际劳动力与效率同步变化
+
 ## Web Integration Tests
 
 - [ ] 多分站切换隔离回归

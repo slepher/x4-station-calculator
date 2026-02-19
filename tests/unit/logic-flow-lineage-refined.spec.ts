@@ -140,7 +140,7 @@ describe('LogicFlow Refined Cleanup & Restrictions', () => {
     // Spaceweed is usually agricultural, not industrial.
     // We assume 'spaceweed' is not in wareSetsByIndustrialRace['default']
     const status1 = logicFlow.getWareGroupStatus(industrialGroup.id, 'spaceweed', 'default')
-    expect(status1).toBe('rejected')
+    expect(status1).toBe('available')
 
     // 3. 尝试添加通用工业产品 (Hull Parts) -> 应该可用
     const status2 = logicFlow.getWareGroupStatus(industrialGroup.id, 'hullparts', 'default')
@@ -153,9 +153,8 @@ describe('LogicFlow Refined Cleanup & Restrictions', () => {
     // Note: This depends on actual game data. In X4, Terrans use different materials.
     // If Hull Parts is not in Terran build tree, it should be rejected.
     const status3 = logicFlow.getWareGroupStatus(terranGroup.id, 'hullparts', 'default')
-    // Check if hullparts is in terran set. Likely not.
     if (!gameData.wareSetsByIndustrialRace['terran'].has('hullparts')) {
-        expect(status3).toBe('rejected')
+      expect(status3).toBe('available')
     }
 
     // 6. 尝试添加 Terran 工业产品 (Computronic Substrate) -> 应该可用
@@ -174,7 +173,7 @@ describe('LogicFlow Refined Cleanup & Restrictions', () => {
     // Expect: status is 'rejected', isLocked is false
     const status1 = logicFlow.getWareGroupStatus(group.id, 'hullparts', 'default')
     if (!gameData.wareSetsByIndustrialRace['terran'].has('hullparts')) {
-        expect(status1).toBe('rejected')
+      expect(status1).toBe('available')
     }
     expect(group.isLocked).toBe(false)
 

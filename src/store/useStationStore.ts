@@ -1,6 +1,5 @@
 import { defineStore, storeToRefs } from 'pinia'
 import { ref, computed, watch } from 'vue'
-import { mockStationData } from '@/mock/mock_data_v1'
 import type {
   X4Module,
   SavedModule,
@@ -41,9 +40,7 @@ export const useStationStore = defineStore('station', () => {
   const activeView = ref<'production' | 'flow'>((localStorage.getItem('x4_station_active_view') as any) || 'production')
   const isReady = computed(() => empireStore.isReady && gameData.isReady)
   const savedPlans = ref<SavedPlansState>({ version: 1, activeId: null, list: [] })
-  const lastSavedSnapshot = ref<string>('')
   const buildPriceMultiplier = ref(0.5)
-  const isHydratingState = ref(false)
 
   const currentPlanName = computed({
     get: () => empireStore.activeStation?.name || '',
@@ -103,12 +100,10 @@ export const useStationStore = defineStore('station', () => {
     const station = empireStore.activeStation
     if (!station) return
 
-    isHydratingState.value = true
     station.settings = migrateStationSettings(station.settings)
     stationStateMap.fromPersisted(station.id, station)
     const deps = getComputeDeps()
     if (deps) stationStateMap.recompute(station.id, deps)
-    isHydratingState.value = false
   }
 
   function syncActiveStationFromState(updateTimestamp: boolean) {
@@ -128,24 +123,25 @@ export const useStationStore = defineStore('station', () => {
     }
   }
 
-  function recomputeActiveStation() {
+  function applyAndRecompute(writer: (stationId: string) => void) {
     const ctx = getActiveContext()
     if (!ctx) return
+    const stationId = ctx.station?.id || '__local__'
+    writer(stationId)
     const deps = getComputeDeps()
-    if (!deps) return
-    stationStateMap.recompute(ctx.station?.id || '__local__', deps)
+    if (deps) stationStateMap.recompute(stationId, deps)
+    syncActiveStationFromState(false)
   }
 
-  function takeSnapshot() {
-    const ctx = getActiveContext()
-    if (!ctx) {
-      lastSavedSnapshot.value = JSON.stringify({ m: [], l: [], s: DEFAULT_STATION_SETTINGS })
-      return
-    }
-    lastSavedSnapshot.value = JSON.stringify({
-      m: ctx.state.plannedModules,
-      l: ctx.state.lockedWares,
-      s: ctx.state.settings
+  function updateSetting<K extends keyof StationSettings>(key: K, value: StationSettings[K]) {
+    applyAndRecompute((stationId) => {
+      const current = stationStateMap.get(stationId)?.settings || { ...DEFAULT_STATION_SETTINGS }
+      stationStateMap.patch(stationId, {
+        settings: {
+          ...current,
+          [key]: value
+        }
+      })
     })
   }
 
@@ -174,100 +170,49 @@ export const useStationStore = defineStore('station', () => {
     }),
     () => {
       syncStateFromActiveStation()
-      takeSnapshot()
     },
     { immediate: true }
-  )
-
-  watch(
-    () => {
-      const ctx = getActiveContext()
-      if (!ctx) return null
-      const stationId = ctx.station?.id || '__local__'
-      return {
-        id: stationId,
-        modules: ctx.state.plannedModules,
-        locked: ctx.state.lockedWares,
-        priority: ctx.state.warePriority,
-        settings: ctx.state.settings
-      }
-    },
-    () => {
-      if (isHydratingState.value) return
-      recomputeActiveStation()
-      syncActiveStationFromState(false)
-    },
-    { deep: true }
   )
 
   const plannedModules = computed<SavedModule[]>({
     get: () => getActiveContext()?.state.plannedModules || [],
     set: (value) => {
-      const ctx = getActiveContext()
-      if (!ctx) return
-      stationStateMap.patch(ctx.station?.id || '__local__', { plannedModules: deepClone(value) })
-      recomputeActiveStation()
-      syncActiveStationFromState(false)
+      applyAndRecompute((stationId) => {
+        stationStateMap.patch(stationId, { plannedModules: deepClone(value) })
+      })
     }
   })
 
   const lockedWares = computed<string[]>({
     get: () => getActiveContext()?.state.lockedWares || [],
     set: (value) => {
-      const ctx = getActiveContext()
-      if (!ctx) return
-      stationStateMap.patch(ctx.station?.id || '__local__', { lockedWares: deepClone(value) })
-      recomputeActiveStation()
-      syncActiveStationFromState(false)
+      applyAndRecompute((stationId) => {
+        stationStateMap.patch(stationId, { lockedWares: deepClone(value) })
+      })
     }
   })
 
   const warePriority = computed<Record<string, number>>({
     get: () => getActiveContext()?.state.warePriority || {},
     set: (value) => {
-      const ctx = getActiveContext()
-      if (!ctx) return
-      stationStateMap.patch(ctx.station?.id || '__local__', { warePriority: deepClone(value) })
-      recomputeActiveStation()
-      syncActiveStationFromState(false)
+      applyAndRecompute((stationId) => {
+        stationStateMap.patch(stationId, { warePriority: deepClone(value) })
+      })
     }
   })
 
   const settings = computed<StationSettings>({
     get: () => getActiveContext()?.state.settings || { ...DEFAULT_STATION_SETTINGS },
     set: (value) => {
-      const ctx = getActiveContext()
-      if (!ctx) return
-      stationStateMap.patch(ctx.station?.id || '__local__', { settings: migrateStationSettings(value) })
-      recomputeActiveStation()
-      syncActiveStationFromState(false)
+      applyAndRecompute((stationId) => {
+        stationStateMap.patch(stationId, { settings: migrateStationSettings(value) })
+      })
     }
   })
 
   const autoIndustryModules = computed(() => getActiveContext()?.state.autoIndustryModules || [])
-  const autoSupplyModules = computed(() => getActiveContext()?.state.autoSupplyModules || [])
-  const allIndustryModules = computed(() => getActiveContext()?.state.allIndustryModules || [])
-  const allModules = computed(() => getActiveContext()?.state.allModules || [])
-  const constructionBreakdown = computed(() => getActiveContext()?.state.constructionBreakdown || {
-    moduleList: [],
-    totalCost: 0,
-    totalMaterials: {}
-  })
-  const workforceBreakdown = computed(() => getActiveContext()?.state.workforceBreakdown || {
-    needed: { total: 0, details: [] },
-    capacity: { total: 0, details: [] }
-  })
-  const profitBreakdown = computed(() => getActiveContext()?.state.profitBreakdown || {
-    wareDetails: {},
-    totalRevenue: 0,
-    totalExpense: 0,
-    profit: 0,
-    production: { total: 0, items: {} },
-    expenses: { total: 0, items: {} }
-  })
   const actualWorkforce = computed(() => getActiveContext()?.state.actualWorkforce || 0)
   const currentEfficiency = computed(() => getActiveContext()?.state.currentEfficiency || 0)
-  const netProduction = computed(() => getActiveContext()?.state.netProduction || {})
   const groupedFlows = computed(() => {
     const ctx = getActiveContext()
     if (!ctx) return stationStateMap.getGroupedFlows('__local__')
@@ -286,17 +231,14 @@ export const useStationStore = defineStore('station', () => {
   })
 
   function applyPlan(plan: StationPlan) {
-    const ctx = getActiveContext()
-    if (!ctx) return
-    const stationId = ctx.station?.id || '__local__'
-    stationStateMap.patch(stationId, {
-      plannedModules: deepClone(plan.modules),
-      lockedWares: deepClone(plan.lockedWares || []),
-      warePriority: deepClone(plan.warePriority || {}),
-      settings: migrateStationSettings(plan.settings)
+    applyAndRecompute((stationId) => {
+      stationStateMap.patch(stationId, {
+        plannedModules: deepClone(plan.modules),
+        lockedWares: deepClone(plan.lockedWares || []),
+        warePriority: deepClone(plan.warePriority || {}),
+        settings: migrateStationSettings(plan.settings)
+      })
     })
-    recomputeActiveStation()
-    syncActiveStationFromState(false)
     savedPlans.value.activeId = plan.id
   }
 
@@ -306,11 +248,6 @@ export const useStationStore = defineStore('station', () => {
       const target = savedPlans.value.list.find(l => l.id === savedPlans.value.activeId)
       if (target) applyPlan(target)
     }
-    takeSnapshot()
-  }
-
-  function loadDemoData() {
-    loadData(mockStationData as unknown as SavedPlansState)
   }
 
   function saveCurrentPlan(name?: string) {
@@ -345,7 +282,6 @@ export const useStationStore = defineStore('station', () => {
     else savedPlans.value.list.push(planData)
 
     savedPlans.value.activeId = planData.id
-    takeSnapshot()
   }
 
   const isDirty = computed(() => empireStore.isDirty)
@@ -370,58 +306,46 @@ export const useStationStore = defineStore('station', () => {
 
   function addModule(id: string = '', count = 1) {
     if (id !== '' && !modulesMap.value[id]) return
-    const ctx = getActiveContext()
-    if (!ctx) return
-    const stationId = ctx.station?.id || '__local__'
-    stationStateMap.mutate(stationId, (state) => {
-      const existing = state.plannedModules.find(m => m.id === id && id !== '')
-      if (existing) existing.count += count
-      else state.plannedModules.push({ id, count })
+    applyAndRecompute((stationId) => {
+      stationStateMap.mutate(stationId, (state) => {
+        const existing = state.plannedModules.find(m => m.id === id && id !== '')
+        if (existing) existing.count += count
+        else state.plannedModules.push({ id, count })
+      })
     })
-    recomputeActiveStation()
-    syncActiveStationFromState(false)
   }
 
   function updateModuleId(index: number, newId: string) {
     if (!modulesMap.value[newId]) return
-    const ctx = getActiveContext()
-    if (!ctx) return
-    const stationId = ctx.station?.id || '__local__'
-    stationStateMap.mutate(stationId, (state) => {
-      if (index >= 0 && index < state.plannedModules.length) {
-        const plannedModule = state.plannedModules[index]
-        if (plannedModule) plannedModule.id = newId
-      }
+    applyAndRecompute((stationId) => {
+      stationStateMap.mutate(stationId, (state) => {
+        if (index >= 0 && index < state.plannedModules.length) {
+          const plannedModule = state.plannedModules[index]
+          if (plannedModule) plannedModule.id = newId
+        }
+      })
     })
-    recomputeActiveStation()
-    syncActiveStationFromState(false)
   }
 
   function updateModuleCount(index: number, count: number) {
-    const ctx = getActiveContext()
-    if (!ctx) return
-    const stationId = ctx.station?.id || '__local__'
-    stationStateMap.mutate(stationId, (state) => {
-      if (index >= 0 && index < state.plannedModules.length) {
-        const module = state.plannedModules[index]
-        if (module) module.count = count
-      }
+    applyAndRecompute((stationId) => {
+      stationStateMap.mutate(stationId, (state) => {
+        if (index >= 0 && index < state.plannedModules.length) {
+          const module = state.plannedModules[index]
+          if (module) module.count = count
+        }
+      })
     })
-    recomputeActiveStation()
-    syncActiveStationFromState(false)
   }
 
   function removeModule(index: number) {
-    const ctx = getActiveContext()
-    if (!ctx) return
-    const stationId = ctx.station?.id || '__local__'
-    stationStateMap.mutate(stationId, (state) => {
-      if (index >= 0 && index < state.plannedModules.length) {
-        state.plannedModules.splice(index, 1)
-      }
+    applyAndRecompute((stationId) => {
+      stationStateMap.mutate(stationId, (state) => {
+        if (index >= 0 && index < state.plannedModules.length) {
+          state.plannedModules.splice(index, 1)
+        }
+      })
     })
-    recomputeActiveStation()
-    syncActiveStationFromState(false)
   }
 
   function removeModuleById(id: string) {
@@ -436,16 +360,13 @@ export const useStationStore = defineStore('station', () => {
   }
 
   function clearAll() {
-    const ctx = getActiveContext()
-    if (!ctx) return
-    const stationId = ctx.station?.id || '__local__'
-    stationStateMap.patch(stationId, {
-      plannedModules: [],
-      lockedWares: [],
-      warePriority: {}
+    applyAndRecompute((stationId) => {
+      stationStateMap.patch(stationId, {
+        plannedModules: [],
+        lockedWares: [],
+        warePriority: {}
+      })
     })
-    recomputeActiveStation()
-    syncActiveStationFromState(false)
     savedPlans.value.activeId = null
     currentPlanName.value = ''
   }
@@ -454,17 +375,13 @@ export const useStationStore = defineStore('station', () => {
     const ware = waresMap.value[wareId]
     if (ware?.transport !== 'container') return
 
-    const ctx = getActiveContext()
-    if (!ctx) return
-
-    const stationId = ctx.station?.id || '__local__'
-    stationStateMap.mutate(stationId, (state) => {
-      const idx = state.lockedWares.indexOf(wareId)
-      if (idx > -1) state.lockedWares.splice(idx, 1)
-      else state.lockedWares.push(wareId)
+    applyAndRecompute((stationId) => {
+      stationStateMap.mutate(stationId, (state) => {
+        const idx = state.lockedWares.indexOf(wareId)
+        if (idx > -1) state.lockedWares.splice(idx, 1)
+        else state.lockedWares.push(wareId)
+      })
     })
-    recomputeActiveStation()
-    syncActiveStationFromState(false)
   }
 
   function isWareOperable(wareId: string) {
@@ -557,10 +474,6 @@ export const useStationStore = defineStore('station', () => {
     } as X4Module
   }
 
-  function autoFillMissingLines() {
-    console.log('autoFillMissingLines is now handled automatically via StationStateMap')
-  }
-
   const initializeStore = async () => {
     console.log('[StationStore] Initializing...')
     try {
@@ -571,7 +484,6 @@ export const useStationStore = defineStore('station', () => {
         activeView.value = storedView as 'production' | 'flow'
       }
       syncStateFromActiveStation()
-      takeSnapshot()
       console.log('[StationStore] Initialized. Ready:', isReady.value)
     } catch (e) {
       console.error('[Store] Initialization failed:', e)
@@ -582,15 +494,15 @@ export const useStationStore = defineStore('station', () => {
 
   return {
     isReady, isDirty, activeView,
-    plannedModules, autoIndustryModules, autoSupplyModules, allIndustryModules, allModules, settings, currentPlanName,
+    plannedModules, autoIndustryModules, settings, currentPlanName,
     wares: waresMap, modules: localizedModulesMap, moduleGroups: localizedModuleGroupsMap, medicalConsumption: medicalConsumptionMap,
     searchQuery, filteredModulesGrouped,
-    loadData, loadDemoData, savedPlans, saveCurrentPlan, loadPlan, mergePlan, deletePlan,
+    loadData, savedPlans, saveCurrentPlan, loadPlan, mergePlan, deletePlan,
     lockedWares, isWareLocked, isWareOperable, toggleWareLock,
     warePriority, isPlannedWare, isAutoWare, getResolvedLevel, toggleWarePriority,
+    updateSetting,
     addModule, importPlan, updateModuleId, updateModuleCount, removeModule, removeModuleById, transferModuleFromAutoIndustry, clearAll, getModuleInfo,
-    constructionBreakdown, workforceBreakdown, profitBreakdown, autoFillMissingLines,
-    actualWorkforce, currentEfficiency, netProduction, groupedFlows,
+    actualWorkforce, currentEfficiency, groupedFlows,
     buildPriceMultiplier, stationAnalysis
   }
 })

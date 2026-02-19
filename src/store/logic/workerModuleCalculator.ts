@@ -1,5 +1,7 @@
-import type { X4Module, X4Ware } from '../../types/x4'
-import { findBestProducer } from './bestModuleSelector'
+import type { SavedModule, StationSettings, X4Module, X4Ware, RaceMedicalConsumption } from '../../types/x4'
+import { findBestHabitat, findBestProducer } from './bestModuleSelector'
+import { calculateWorkforceCensus } from './calculatorUtils'
+import { analyzeWareFlow } from './analyzeWareFlow'
 import consumptionRaw from '../../assets/x4_game_data/8.0-Diplomacy/data/consumption.json'
 
 // --- 私有辅助函数：递归计算单单位物资的工人成本 ---
@@ -227,4 +229,244 @@ export function calculateWorkerSupplyNeeds(
   }
 
   return finalModules;
+}
+
+// --- 导出函数 3：自动补给区计算（当前未在主流程使用） ---
+
+/**
+ * 计算自动补给区模块清单（包含补给工厂、居住舱、补给仓储）
+ * 注意：该逻辑已从 autoFill 中迁移，仅在未来需要时使用。
+ */
+export function calculateAutoSupplyModules(
+  plannedModules: SavedModule[],
+  autoIndustryModules: SavedModule[],
+  settings: StationSettings,
+  modules: Record<string, X4Module>,
+  wares: Record<string, X4Ware>,
+  medicalConsumption: RaceMedicalConsumption,
+  userPriority: Record<string, number>
+): SavedModule[] {
+  const globalWorkforceBonus = settings.considerWorkforceForAutoFill;
+  const allProducers: SavedModule[] = [...plannedModules, ...autoIndustryModules];
+  const clientPopulation = calculateTotalWorkforce(allProducers, modules);
+
+  if (!settings.internalSupply || clientPopulation <= 0) {
+    return [];
+  }
+
+  const census = calculateWorkforceCensus(allProducers, modules, clientPopulation);
+  const workersByRace: Record<string, number> = {};
+  for (const item of census) {
+    workersByRace[item.race] = (workersByRace[item.race] || 0) + item.residents;
+  }
+
+  const autoSupply: SavedModule[] = [];
+  const supplyModulesMap: Record<string, number> = {};
+
+  for (const [race, count] of Object.entries(workersByRace)) {
+    if (count <= 0) continue;
+
+    const raceModules = calculateWorkerSupplyNeeds(
+      count,
+      race,
+      modules,
+      wares,
+      globalWorkforceBonus,
+      settings.sunlight
+    );
+    const raceSupplyModules: SavedModule[] = [];
+
+    for (const [id, c] of Object.entries(raceModules)) {
+      supplyModulesMap[id] = (supplyModulesMap[id] || 0) + c;
+      raceSupplyModules.push({ id, count: c });
+    }
+
+    if (globalWorkforceBonus) {
+      const supplyWorkers = calculateTotalWorkforce(raceSupplyModules, modules);
+      if (supplyWorkers > 0) {
+        const habitat = findBestHabitat(race, [], modules);
+        if (habitat) {
+          const habitatCount = Math.ceil(supplyWorkers / habitat.workforce.capacity);
+          autoSupply.push({ id: habitat.id, count: habitatCount });
+        }
+      }
+    }
+  }
+
+  for (const [id, count] of Object.entries(supplyModulesMap)) {
+    if (count > 0) autoSupply.push({ id, count });
+  }
+
+  autoSupply.sort((a, b) => (modules[b.id]?.tier || 0) - (modules[a.id]?.tier || 0));
+
+  // 补给仓储计算
+  if (autoSupply.length > 0) {
+    const autoWaresSet = new Set<string>();
+    autoIndustryModules.forEach(m => {
+      const info = modules[m.id];
+      if (info?.outputs) {
+        Object.keys(info.outputs).forEach(w => autoWaresSet.add(w));
+      }
+    });
+
+    const isPlannedWare = (wareId: string) => {
+      return plannedModules.some(m => {
+        const info = modules[m.id];
+        return info?.outputs && Object.keys(info.outputs).includes(wareId);
+      });
+    };
+
+    const getLocalResolvedLevel = (wareId: string): number => {
+      const planned = isPlannedWare(wareId);
+      const auto = autoWaresSet.has(wareId);
+      const override = userPriority[wareId];
+
+      if (planned && override === 0) return 1;
+      if (auto && override === 2) return 1;
+      if (override !== undefined) return override;
+      if (planned) return 2;
+      if (auto) return 0;
+      return 0;
+    };
+
+    const resolvedPriority: Record<string, number> = {};
+    Object.keys(wares).forEach(id => {
+      resolvedPriority[id] = getLocalResolvedLevel(id);
+    });
+
+    const supplyWorkforce = calculateTotalWorkforce(autoSupply, modules);
+    const supplyStorage = calculateStorageDelta(
+      autoSupply,
+      supplyWorkforce,
+      settings,
+      modules,
+      wares,
+      medicalConsumption,
+      resolvedPriority
+    );
+
+    supplyStorage.forEach(s => {
+      const existing = autoSupply.find(m => m.id === s.id);
+      if (existing) existing.count += s.count;
+      else autoSupply.push(s);
+    });
+  }
+
+  return autoSupply;
+}
+
+function calculateTotalWorkforce(
+  modules: SavedModule[],
+  modulesMap: Record<string, X4Module>
+): number {
+  let totalWorkers = 0;
+
+  for (const moduleItem of modules) {
+    const module = modulesMap[moduleItem.id];
+    if (module?.workforce?.needed) {
+      totalWorkers += moduleItem.count * module.workforce.needed;
+    }
+  }
+
+  return totalWorkers;
+}
+
+function findBestStorage(
+  type: 'container' | 'solid' | 'liquid',
+  race: string,
+  modules: Record<string, X4Module>,
+  existingModules: SavedModule[] = []
+): X4Module | null {
+  const existingCandidates = existingModules
+    .map(m => modules[m.id])
+    .filter((m): m is X4Module => !!m && m.type === 'storage' && m.cargo?.type === type)
+    .sort((a, b) => (b.cargo?.capacity || 0) - (a.cargo?.capacity || 0));
+
+  if (existingCandidates.length > 0) {
+    return existingCandidates[0]!;
+  }
+
+  let candidate = Object.values(modules).find(m =>
+    m.type === 'storage' &&
+    m.race === race &&
+    m.cargo?.type === type &&
+    m.cargo?.capacity > 500000
+  );
+
+  if (!candidate) {
+    candidate = Object.values(modules).find(m =>
+      m.type === 'storage' &&
+      m.cargo?.type === type &&
+      m.cargo?.capacity > 500000
+    );
+  }
+
+  if (!candidate) {
+    const allStorages = Object.values(modules).filter(m =>
+      m.type === 'storage' &&
+      m.cargo?.type === type
+    );
+    if (allStorages.length > 0) {
+      candidate = allStorages.sort((a, b) => (b.cargo?.capacity || 0) - (a.cargo?.capacity || 0))[0];
+    }
+  }
+
+  return candidate || null;
+}
+
+function calculateStorageDelta(
+  targetModules: SavedModule[],
+  targetWorkforce: number,
+  settings: StationSettings,
+  modules: Record<string, X4Module>,
+  wares: Record<string, X4Ware>,
+  medicalConsumption: RaceMedicalConsumption,
+  resolvedPriority: Record<string, number>
+): SavedModule[] {
+  const saturation = 1.0;
+  const analysis = analyzeWareFlow(
+    targetModules,
+    modules,
+    wares,
+    medicalConsumption,
+    settings,
+    targetWorkforce,
+    saturation,
+    settings.resourceBufferHours,
+    settings.primaryProductBufferHours,
+    settings.secondaryProductBufferHours,
+    resolvedPriority
+  );
+
+  const needs = { container: 0, solid: 0, liquid: 0 };
+  analysis.flows.forEach(flow => {
+    if (flow.totalOccupiedVolume > 0) {
+      if (flow.transportType === 'solid') needs.solid += flow.totalOccupiedVolume;
+      else if (flow.transportType === 'liquid') needs.liquid += flow.totalOccupiedVolume;
+      else needs.container += flow.totalOccupiedVolume;
+    }
+  });
+
+  const result: SavedModule[] = [];
+  (['container', 'solid', 'liquid'] as const).forEach(type => {
+    const needed = needs[type];
+    let existingCapacity = 0;
+    targetModules.forEach(m => {
+      const info = modules[m.id];
+      if (info?.cargo?.type === type) {
+        existingCapacity += info.cargo.capacity * m.count;
+      }
+    });
+
+    const deficit = needed - existingCapacity;
+    if (deficit > 0) {
+      const storageModule = findBestStorage(type, settings.racePreference, modules, targetModules);
+      if (storageModule?.cargo) {
+        const count = Math.ceil(deficit / storageModule.cargo.capacity);
+        result.push({ id: storageModule.id, count });
+      }
+    }
+  });
+
+  return result;
 }

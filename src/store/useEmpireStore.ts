@@ -53,7 +53,10 @@ export const useEmpireStore = defineStore('empire', () => {
   const isReady = ref(false)
   const lastSavedSnapshot = ref<string>('')
 
-  const savedEmpires = ref<SavedEmpiresState>({ version: 1, activeId: null, activeStationId: null, list: [] })
+  const savedEmpires = ref<SavedEmpiresState>({ version: 2, activeId: null, activeStationId: null, list: [] })
+  const version = computed(() => savedEmpires.value.version)
+  const empires = computed(() => savedEmpires.value.list)
+  const activeEmpireId = computed(() => savedEmpires.value.activeId)
   
   const activeEmpire = ref<EmpirePlan | null>(null)
   const activeStationId = ref<string | null>(null)
@@ -220,6 +223,11 @@ export const useEmpireStore = defineStore('empire', () => {
     const empire = createDefaultEmpire(name)
     activeEmpire.value = empire
     activeStationId.value = null
+    if (!savedEmpires.value.list.find(e => e.id === empire.id)) {
+      savedEmpires.value.list.push(JSON.parse(JSON.stringify(empire)))
+    }
+    savedEmpires.value.activeId = empire.id
+    savedEmpires.value.activeStationId = null
     takeSnapshot()
     return empire
   }
@@ -380,7 +388,7 @@ export const useEmpireStore = defineStore('empire', () => {
     }))
     
     return {
-      version: 1,
+      version: 2,
       activeId: list[0]?.id || null,
       activeStationId: list[0]?.stations[0]?.id || null,
       list
@@ -398,7 +406,7 @@ export const useEmpireStore = defineStore('empire', () => {
       if (stored) {
         try {
           const data = JSON.parse(stored) as SavedEmpiresState
-          if (data.version === 1 && data.list) {
+          if ((data.version === 2 || data.version === 1) && data.list) {
             loadData(data)
             initializeAllStationCaches()
             isReady.value = true
@@ -444,6 +452,9 @@ export const useEmpireStore = defineStore('empire', () => {
   return {
     isReady,
     isDirty,
+    version,
+    empires,
+    activeEmpireId,
     activeEmpire,
     activeStation,
     activeStationId,

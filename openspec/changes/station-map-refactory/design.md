@@ -79,6 +79,30 @@
 **替代方案**:
 - 使用 `s.resourceBufferHours || 2`：会吞掉合法的 `0`
 
+### Decision 6: `currentEfficiency` 作为 Map 内单一真源
+
+**选择**: 在 `StationStateMap` 中保留 `currentEfficiency` 字段并作为单一真源；`useStationStore` 与组件仅透传读取。
+
+**理由**:
+- WareFlow 与 Dashboard 读取同一来源，避免未来公式漂移
+- 保持计算链单点定义，减少“同义值多处推导”风险
+- 调试时可直接观察分站运行态中的效率结果
+
+**替代方案**:
+- 在 `useStationStore`/组件层重复推导 `currentEfficiency`：短期可行但容易与计算链参数演进产生偏差
+
+### Decision 7: 精简 `StationStateMap` 内部非必要运行态字段
+
+**选择**: 移除当前三模块未直接消费的内部字段存储，`recompute` 仅保留必要输出；中间值改为局部变量。
+
+**理由**:
+- 缩小响应式状态面，减少无效依赖更新
+- 保持计算链在单点执行，不在状态树保留临时结果
+- 与“Store 代理 + 运行时重算”目标一致
+
+**替代方案**:
+- 保留全部中间字段在 `StationState`：便于调试但会增加状态复杂度与冗余维护成本
+
 ## Risks / Trade-offs
 
 - **风险: 可写代理与数组原地修改触发不稳定** → 通过 `mutate` 封装写操作并补充单测覆盖 `v-model`/拖拽场景

@@ -5,8 +5,6 @@ import { calculateAutoFill } from '@/store/logic/moduleDiffCalculator'
 import { calculateWorkforceBreakdown, calculateActualWorkforce, calculateEfficiencySaturation } from '@/store/logic/workforceCalculator'
 import { buildResolvedWarePriority } from '@/store/logic/warePriorityResolver'
 import { analyzeWareFlow } from '@/store/logic/analyzeWareFlow'
-import { calculateProfitBreakdown, calculateNetProduction } from '@/store/logic/productionCalculator'
-import { calculateConstructionBreakdown } from '@/store/logic/calculatorUtils'
 import { analyzeStation } from '@/store/logic/analyzeStation'
 
 export const DEFAULT_STATION_SETTINGS: StationSettings = {
@@ -16,6 +14,7 @@ export const DEFAULT_STATION_SETTINGS: StationSettings = {
   workforcePercent: 100,
   workforceAuto: true,
   considerWorkforceForAutoFill: false,
+  supplyWorkforceBonus: false,
   buyMultiplier: 0.5,
   sellMultiplier: 0.5,
   minersEnabled: false,
@@ -42,21 +41,11 @@ export interface StationState {
   warePriority: Record<string, number>
   settings: StationSettings
   autoIndustryModules: SavedModule[]
-  autoSupplyModules: SavedModule[]
-  allIndustryModules: SavedModule[]
-  allModules: SavedModule[]
-  workforceBreakdown: ReturnType<typeof calculateWorkforceBreakdown> | null
   actualWorkforce: number
   currentEfficiency: number
-  profitBreakdown: ReturnType<typeof calculateProfitBreakdown> | null
-  netProduction: ReturnType<typeof calculateNetProduction>
   groupedFlows: GroupedFlows | null
   groupedFlowsForEmpire: GroupedFlows | null
-  constructionBreakdown: ReturnType<typeof calculateConstructionBreakdown> | null
   stationAnalysis: ReturnType<typeof analyzeStation> | null
-  revision: number
-  lastComputedAt: number | null
-  computeFingerprint: string
 }
 
 function deepClone<T>(value: T): T {
@@ -125,21 +114,11 @@ function createDefaultState(stationId: string): StationState {
     warePriority: {},
     settings: { ...DEFAULT_STATION_SETTINGS },
     autoIndustryModules: [],
-    autoSupplyModules: [],
-    allIndustryModules: [],
-    allModules: [],
-    workforceBreakdown: null,
     actualWorkforce: 0,
     currentEfficiency: 0,
-    profitBreakdown: null,
-    netProduction: {},
     groupedFlows: null,
     groupedFlowsForEmpire: null,
-    constructionBreakdown: null,
-    stationAnalysis: null,
-    revision: 0,
-    lastComputedAt: null,
-    computeFingerprint: ''
+    stationAnalysis: null
   })
 }
 
@@ -157,7 +136,6 @@ export class StationStateMap {
       if (seed.lockedWares) state.lockedWares = deepClone(seed.lockedWares)
       if (seed.warePriority) state.warePriority = deepClone(seed.warePriority)
       if (seed.settings) state.settings = migrateStationSettings(seed.settings)
-      state.revision += 1
     }
     return state
   }
@@ -176,14 +154,12 @@ export class StationStateMap {
     if (partial.lockedWares !== undefined) state.lockedWares = deepClone(partial.lockedWares)
     if (partial.warePriority !== undefined) state.warePriority = deepClone(partial.warePriority)
     if (partial.settings !== undefined) state.settings = migrateStationSettings(partial.settings)
-    state.revision += 1
     return state
   }
 
   mutate(stationId: string, updater: (state: StationState) => void): StationState {
     const state = this.ensure(stationId)
     updater(state)
-    state.revision += 1
     return state
   }
 
@@ -199,16 +175,15 @@ export class StationStateMap {
     cloned.lockedWares = deepClone(source.lockedWares)
     cloned.warePriority = deepClone(source.warePriority)
     cloned.settings = deepClone(source.settings)
-    cloned.revision += 1
     return cloned
   }
 
   fromPersisted(stationId: string, plan: StationPlan): StationState {
     return this.patch(stationId, {
-      plannedModules: deepClone(plan.modules || []),
-      lockedWares: deepClone(plan.lockedWares || []),
-      warePriority: deepClone(plan.warePriority || {}),
-      settings: migrateStationSettings(plan.settings)
+      plannedModules: plan.modules || [],
+      lockedWares: plan.lockedWares || [],
+      warePriority: plan.warePriority || {},
+      settings: plan.settings
     })
   }
 
@@ -237,12 +212,10 @@ export class StationStateMap {
     )
 
     state.autoIndustryModules = autoFillResult.autoIndustry
-    state.autoSupplyModules = autoFillResult.autoSupply
-    state.allIndustryModules = [...state.plannedModules, ...state.autoIndustryModules]
-    state.allModules = [...state.plannedModules, ...state.autoIndustryModules, ...state.autoSupplyModules]
+    const allIndustryModules = [...state.plannedModules, ...state.autoIndustryModules]
 
     const workforceBreakdown = calculateWorkforceBreakdown(
-      state.allIndustryModules,
+      allIndustryModules,
       deps.modulesMap,
       state.settings
     )
@@ -260,7 +233,7 @@ export class StationStateMap {
     )
 
     const groupedFlows = analyzeWareFlow(
-      state.allIndustryModules,
+      allIndustryModules,
       deps.modulesMap,
       deps.waresMap,
       deps.medicalConsumptionMap,
@@ -273,44 +246,18 @@ export class StationStateMap {
       warePriorityLevels
     )
 
-    state.workforceBreakdown = workforceBreakdown
     state.actualWorkforce = actualWorkforce
     state.currentEfficiency = currentEfficiency
     state.groupedFlows = groupedFlows
     state.groupedFlowsForEmpire = filterGroupedFlowsByPriority(groupedFlows, warePriorityLevels)
 
-    const profitBreakdown = calculateProfitBreakdown(
-      state.allIndustryModules,
-      deps.modulesMap,
-      deps.waresMap,
-      state.settings,
-      actualWorkforce,
-      currentEfficiency
-    )
-    state.profitBreakdown = profitBreakdown
-    state.netProduction = calculateNetProduction(profitBreakdown.wareDetails)
-
-    state.constructionBreakdown = calculateConstructionBreakdown(
-      state.allModules,
-      deps.modulesMap,
-      deps.waresMap
-    )
-
     state.stationAnalysis = analyzeStation(
-      state.allIndustryModules,
+      allIndustryModules,
       deps.modulesMap,
       deps.waresMap,
       deps.buildPriceMultiplier ?? 0.5,
       state.settings.useHQ
     )
-
-    state.lastComputedAt = Date.now()
-    state.computeFingerprint = JSON.stringify({
-      m: state.plannedModules,
-      s: state.settings,
-      l: state.lockedWares,
-      p: state.warePriority
-    })
 
     return state
   }

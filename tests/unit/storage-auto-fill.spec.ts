@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { calculateAutoFill } from '../../src/store/logic/moduleDiffCalculator';
+import { calculateAutoSupplyModules } from '../../src/store/logic/workerModuleCalculator';
 import { StationSettings, X4Module, X4Ware, SavedModule } from '../../src/types/x4';
 
 // 获取当前文件的目录
@@ -107,18 +108,28 @@ describe('Storage Auto-Fill Logic', () => {
       { id: refinedMetalsModuleId, count: 10 }
     ];
     
-    const result = calculateAutoFill(
+    const autoIndustry = calculateAutoFill(
       plannedModules,
       settings,
       modules,
       wares,
-      [], 
+      [],
+      consumption,
+      {}
+    ).autoIndustry;
+
+    const autoSupply = calculateAutoSupplyModules(
+      plannedModules,
+      autoIndustry,
+      settings,
+      modules,
+      wares,
       consumption,
       {}
     );
-    
+
     // 检查 AutoSupply 是否生成了仓储
-    const supplyStorage = result.autoSupply.filter(m => modules[m.id]?.type === 'storage');
+    const supplyStorage = autoSupply.filter(m => modules[m.id]?.type === 'storage');
     
     // AutoSupply 自给自足需要食物和医疗，通常涉及 Container 仓储（如果食物需要原料，可能还需要 Solid/Liquid，视种族而定）
     // Argon 食物链: Meat (Container), Wheat (Container), Spices (Container) -> Food Rations (Container)

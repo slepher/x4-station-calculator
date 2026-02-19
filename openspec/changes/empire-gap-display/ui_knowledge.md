@@ -39,6 +39,7 @@ await expect(toggle).toHaveClass(/active-green/);
 | 帝国运营标题 | `.empire-gap-group` + `hasText: /帝国运营/` | - |
 | 帝国补给标题 | `.empire-gap-group` + `hasText: /帝国补给/` | - |
 | 分组项 | `.flow-wrapper` | 复用 `EmpireWareFlow` 的容器 |
+| - 按钮 | `.remove-btn` | 减少模块按钮（新增在 `EmpireWareFlow` 中） |
 | + 按钮 | `.add-btn` | 添加模块按钮（新增在 `EmpireWareFlow` 中） |
 
 ### 显示条件
@@ -56,6 +57,10 @@ await expect(operationsGap).toBeVisible();
 // 点击 + 按钮添加模块
 const addBtn = page.locator('.flow-wrapper .add-btn').first();
 await addBtn.click();
+
+// 点击 - 按钮减少模块
+const removeBtn = page.locator('.flow-wrapper .remove-btn').first();
+await removeBtn.click();
 ```
 
 ### 更新验证
@@ -71,13 +76,20 @@ await addBtn.click();
 | 分组项容器 | `.flow-wrapper` | 复用 `EmpireWareFlow` 的容器 |
 | 资源名称 | `.header-name` | - |
 | 数值 | `.value` | - |
+| - 按钮 | `.remove-btn` | 减少按钮，位于 + 左侧 |
 | + 按钮 | `.add-btn` | 新增按钮，位置对应锁按钮 |
 | 收藏按钮位置 | 无 | 不显示收藏按钮，位置留空 |
 
 ### 验证要点
 - 分组项不显示收藏按钮
 - 收藏按钮位置留空
+- - 按钮位于 + 左侧
 - + 按钮位于分组项右侧
+
+### 禁用规则
+- 当缺口项 `netRate > 0` 时禁用 +
+- 当无可用默认产线模块时禁用 +
+- 当不存在对应模块时禁用 -
 
 ## 4. 视图切换
 经济视图不显示分组，仅资源视图显示。
