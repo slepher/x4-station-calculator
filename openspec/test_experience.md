@@ -11,19 +11,26 @@
     *   搜索框: `input[placeholder*="搜索"], input[placeholder*="Search"]` (✅)
     *   结果项: `.result-item, .module-item` (✅)
     *   模块列表: `.module-list-container` (✅)
+*   **显示缺口开关**:
+    *   失败尝试: `.input-group` + `hasText: /显示缺口|Show Gaps/` → `.toggle-chip`（超时，未命中） (❌)
+    *   正确定位: `[data-testid="toggle-show-empire-gaps"]` (✅)
+    *   注意: 仅在分站视图出现，需先选中 `.station-tab` 才会渲染 (✅)
 
 ### 2. 统一仪表盘 (Dashboard & View Modes)
 *   **主容器**: `.list-wrapper` (✅)
 *   **激活状态**: `.active` (✅)
 *   **视图切换按钮组**:
-    *   通用定位: `.view-mode-btn` (✅)
-    *   数量视图: `.view-mode-btn.nth(0)` 或 `.filter({ hasText: /数量|Quantity/ })` (✅)
-    *   经济视图: `.view-mode-btn.nth(1)` 或 `.filter({ hasText: /经济|Economy/ })` (✅)
-    *   仓储视图: `.view-mode-btn.nth(2)` 或 `.filter({ hasText: /仓储|Volume/ })` (✅)
-    *   逻辑流视图: `.view-mode-btn.nth(3)` 或 `.filter({ hasText: /逻辑|Logic/ })` (✅)
+    *   通用定位: `.view-mode-switcher` (✅)
+    *   推荐作用域: `.view-mode-switcher` + `hasText: /经济|Economy/` (✅)
+    *   数量视图: `switcher.locator('.view-mode-btn').nth(0)` (✅)
+    *   经济视图: `switcher.locator('.view-mode-btn').nth(1)` (✅)
+    *   仓储视图: `switcher.locator('.view-mode-btn').nth(2)` (✅)
+    *   逻辑流视图: `switcher.locator('.view-mode-btn').nth(3)` (✅)
 *   **底部汇总**:
     *   利润总计: `.profit-val` (✅)
     *   经济分组总和: `.economy-group-sum` (✅)
+*   **分组标题顺序检查**:
+    *   失败尝试: 资源视图下 `group-title` 列表未出现“产品/Products”，导致分组顺序断言失败 (❌)
 
 ### 3. 资源流项目 (WareFlow & Items)
 *   **行容器**: `.flow-wrapper` (✅)
@@ -43,6 +50,10 @@
     *   明细列表: `.list-box` (✅)
     *   明细项: `.list-item` (✅)
     *   明细数值: `.item-val` (✅)
+
+### 模块数量输入 (Module Count)
+*   **模块行**: `.module-row` (✅)
+*   **数量输入框**: `.x4-num-input` (✅)
 
 ### 4. 仓储规划专项 (Volume/Storage Specific)
 *   **分组系统**:
@@ -168,6 +179,15 @@ await expect(page.locator('.title')).toHaveText('新建');
     *   搜索框: `.search-box .search-input` (✅)
     *   结果弹出框: `.results-popover` (✅)
     *   结果项: `.results-popover .result-item` (✅)
+    *   **搜索模式**: 必须先 `focus()` 再 `fill()`，否则弹出框不会显示 (✅)
+        ```typescript
+        const searchInput = page.locator('.search-box .search-input');
+        await searchInput.focus();
+        await searchInput.fill(moduleName);
+        const resultItem = page.locator('.results-popover .result-item').first();
+        await expect(resultItem).toBeVisible({ timeout: 500 });
+        await resultItem.click();
+        ```
 *   **测试数据 (常用模块)**:
     *   电子黏土产线: 搜索关键词 "Clay"，包含上游产物量子管、微芯片等 (✅)
     *   量子管: 在产品分组中，可通过 `.flow-wrapper` + `hasText: /量子管|Quantum Tube/` 定位 (✅)
@@ -179,6 +199,10 @@ await expect(page.locator('.title')).toHaveText('新建');
 *   **右键菜单**:
     *   菜单容器: `.context-menu` (✅)
     *   危险操作项: `.menu-item.danger` (✅)
+*   **补给优先归类断言**:
+    *   先按组定位：`.group-container` + `hasText: /产品|Products|运营|Operations|补给|Supply/` (✅)
+    *   再在组内断言：`.flow-wrapper` + `hasText: /医疗物资|Medical Supplies/` (✅)
+    *   推荐断言：补给组 `toHaveCount(1)`，产品/运营组 `toHaveCount(0)`，避免全局匹配误判 (✅)
 
 ---
 

@@ -1,15 +1,20 @@
 <script setup lang="tsx">
 import { computed, ref } from 'vue'
 import { useStationStore } from '@/store/useStationStore'
+import { useEmpireStore } from '@/store/useEmpireStore'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n';
 
 import PriceSlider from '@/components/common/PriceSlider.vue'
 import VolumeControlSlider from '@/components/common/VolumeControlSlider.vue'
 import StationWareFlowGroup from './StationWareFlowGroup.vue'
+import EmpireWareFlowGroup from './EmpireWareFlowGroup.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 
 const store = useStationStore()
+const empireStore = useEmpireStore()
+const gameData = useGameDataStore()
 const { t, locale } = useI18n();
 const { translateWare } = useX4I18n()
 
@@ -33,6 +38,23 @@ const wrapFlow = (flow: any) => {
     ...flow
   }
 }
+
+const empireGaps = computed(() => {
+  const flows = empireStore.empireGroupedFlows
+  locale.value
+  const operations = [...flows.empireGroups.operations, ...flows.empireGroups.products]
+    .filter((flow: any) => flow.netRate < 0 || store.getResolvedLevel(flow.wareId) > 0)
+    .map(wrapFlow)
+    .sort((a: any, b: any) => {
+      const tierDiff = (b.tier ?? 0) - (a.tier ?? 0)
+      if (tierDiff !== 0) return tierDiff
+      return a.name.localeCompare(b.name)
+    })
+  return {
+    operations,
+    supply: flows.empireGroups.supply.map(wrapFlow)
+  }
+})
 
 // 总利润计算
 const totalProfit = computed(() => {
@@ -93,6 +115,12 @@ const rateGroups = computed(() => ([
    title: viewMode.value === 'economy' ? t('wareflow.expenses_resources_group') : t('wareflow.resources_group'),
    items: groupedFlows.value.rateGroups.resources.map(wrapFlow)}
 ]))
+
+const handleAddModule = (wareId: string) => {
+  const module = gameData.findModuleForWare(wareId, store.settings.racePreference)
+  if (!module) return
+  store.addModule(module.id, 1)
+}
 </script>
 
 <template>
@@ -139,6 +167,26 @@ const rateGroups = computed(() => ([
       
       <!-- 通用分组视图：根据当前视图模式显示对应的数据 -->
       <div v-if="viewMode === 'economy' || viewMode === 'quantity'" class="volume-groups-container">
+          <div v-if="store.settings.showEmpireGaps && viewMode === 'quantity'" class="empire-gap-groups">
+            <div v-if="empireGaps.operations.length > 0" class="empire-gap-group">
+              <EmpireWareFlowGroup
+                :title="t('wareflow.empire_operations')"
+                :items="empireGaps.operations"
+                :viewMode="viewMode"
+                :showAddButton="true"
+                @add="handleAddModule"
+              />
+            </div>
+            <div v-if="empireGaps.supply.length > 0" class="empire-gap-group">
+              <EmpireWareFlowGroup
+                :title="t('wareflow.empire_supply')"
+                :items="empireGaps.supply"
+                :viewMode="viewMode"
+                :showAddButton="true"
+                @add="handleAddModule"
+              />
+            </div>
+          </div>
           <!-- 产品/收入组 -->
           <StationWareFlowGroup v-for="group in rateGroups" :key="group.key"
             :title="group.title" 

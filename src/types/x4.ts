@@ -130,6 +130,7 @@ export interface StationSettings {
   sellMultiplier: number;
   minersEnabled: boolean;
   internalSupply: boolean;
+  showEmpireGaps?: boolean;
   racePreference: string;
   resourceBufferHours: number; // 资源缓冲时间（小时）
   primaryProductBufferHours: number;   // 主产物缓冲时间（小时）
@@ -144,6 +145,7 @@ export interface StationPlan {
   id: string;
   name: string;
   type?: StationType;
+  count?: number;
   modules: SavedModule[];
   settings: StationSettings;
   lastUpdated: number;
@@ -304,6 +306,44 @@ export interface GroupedFlows {
     solid: WareFlow[];     // 固体
     liquid: WareFlow[];    // 液体
     container: WareFlow[]; // 容器
+  };
+}
+
+export interface StationFlowAtom {
+  stationId: string;
+  stationName: string;
+  stationCount: number;
+  production: number;
+  consumption: number;
+  workforceConsumption: number;
+  netRate: number;
+  netValue: number;
+}
+
+export interface EmpireWareFlow {
+  wareId: string;
+  orderIndex: number;
+  tier: number;
+  transportType: TransportType;
+  unitVolume: number;
+  
+  production: number;
+  consumption: number;
+  workforceConsumption: number;
+  netRate: number;
+  
+  unitPrice: number;
+  netValue: number;
+  
+  contributions: StationFlowAtom[];
+}
+
+export interface EmpireGroupedFlows {
+  flows: EmpireWareFlow[];
+  empireGroups: {
+    products: EmpireWareFlow[];
+    operations: EmpireWareFlow[];
+    supply: EmpireWareFlow[];
   };
 }
 

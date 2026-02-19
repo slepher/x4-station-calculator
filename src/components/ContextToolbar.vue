@@ -41,8 +41,12 @@ const stationType = computed({
 })
 
 const stationCount = computed({
-  get: () => 1,
-  set: (_val: number) => { 
+  get: () => activeStation.value?.count ?? 1,
+  set: (val: number) => { 
+    if (activeStation.value) {
+      activeStation.value.count = val
+      activeStation.value.lastUpdated = Date.now()
+    }
   }
 })
 
@@ -59,6 +63,11 @@ const workforce = computed({
 const supply = computed({
   get: () => stationStore.settings.internalSupply,
   set: (val: boolean) => { stationStore.settings.internalSupply = val }
+})
+
+const showEmpireGaps = computed({
+  get: () => stationStore.settings.showEmpireGaps ?? false,
+  set: (val: boolean) => { stationStore.settings.showEmpireGaps = val }
 })
 
 const racePreference = computed({
@@ -139,7 +148,7 @@ const races = computed(() => [
 
         <div class="input-group ml-6">
           <label class="group-label">{{ t('toolbar.station_count') }}</label>
-          <X4NumberInput v-model="stationCount" :min="1" width-class="w-12" />
+          <X4NumberInput v-model="stationCount" :min="0" width-class="w-12" />
         </div>
       </div>
 
@@ -223,6 +232,20 @@ const races = computed(() => [
           >
             <span class="text-sm">🔄</span>
             <span class="chip-status">{{ supply ? 'ON' : 'OFF' }}</span>
+          </button>
+        </div>
+
+        <div class="input-group ml-6">
+          <label class="group-label">{{ t('ui.show_empire_gaps') }}</label>
+          <button 
+            class="toggle-chip"
+            :class="showEmpireGaps ? 'active-green' : 'inactive'"
+            @click="showEmpireGaps = !showEmpireGaps"
+            data-testid="toggle-show-empire-gaps"
+          >
+            <span class="sr-only">{{ t('ui.show_empire_gaps') }}</span>
+            <span class="text-sm">📊</span>
+            <span class="chip-status">{{ showEmpireGaps ? 'ON' : 'OFF' }}</span>
           </button>
         </div>
       </div>

@@ -90,7 +90,8 @@
     "tag_res": "RES",
     "tag_ops": "OPS",
     "cancel": "Cancel",
-    "delete": "Delete"
+    "delete": "Delete",
+    "show_empire_gaps": "Show Gaps"
   },
   "menu": {
     "new": "New",
@@ -161,11 +162,17 @@
     "expenses_operations_group": "Operations Expenses",
     "expenses_supply_group": "Supply Expenses",
     "expenses_resources_group": "Resource Expenses",
+    "products_income_group": "Product Income",
+    "operations_expense_group": "Operations Expense",
+    "supply_income_group": "Supply Income",
+    "supply_expense_group": "Supply Expense",
     "current_efficiency": "Current Efficiency",
     "products_group": "Products",
     "operations_group": "Operations",
     "supply_group": "Supply",
     "resources_group": "Resources",
+    "empire_operations": "Empire Operations",
+    "empire_supply": "Empire Supply",
     "resource_buffer_hours": "Resource Buffer Hours",
     "primary_product_buffer_hours": "Primary Product Buffer Hours",
     "secondary_product_buffer_hours": "Secondary Product Buffer Hours",

@@ -1,0 +1,139 @@
+wares:
+  - id: energycells
+    name: Energy Cells
+    nameCN: 能量电池
+    price: 16
+    volume: 1
+    tier: 0
+  - id: helium
+    name: Helium
+    nameCN: 氦
+    price: 44
+    volume: 6
+    tier: 0
+  - id: hydrogen
+    name: Hydrogen
+    nameCN: 氢
+    price: 58
+    volume: 6
+    tier: 0
+  - id: ice
+    name: Ice
+    nameCN: 冰
+    price: 30
+    volume: 8
+    tier: 0
+  - id: methane
+    name: Methane
+    nameCN: 甲烷
+    price: 48
+    volume: 6
+    tier: 0
+  - id: ore
+    name: Ore
+    nameCN: 金属矿石
+    price: 50
+    volume: 10
+    tier: 0
+  - id: silicon
+    name: Silicon
+    nameCN: 硅
+    price: 130
+    volume: 10
+    tier: 0
+  - id: antimattercells
+    name: Antimatter Cells
+    nameCN: 反物质单元
+    price: 202
+    volume: 18
+    tier: 1
+  - id: graphene
+    name: Graphene
+    nameCN: 石墨烯
+    price: 166
+    volume: 20
+    tier: 1
+  - id: refinedmetals
+    name: Refined Metals
+    nameCN: 精炼金属
+    price: 148
+    volume: 14
+    tier: 1
+  - id: siliconwafers
+    name: Silicon Wafers
+    nameCN: 硅晶片
+    price: 299
+    volume: 18
+    tier: 1
+  - id: superfluidcoolant
+    name: Superfluid Coolant
+    nameCN: 超流体冷却剂
+    price: 150
+    volume: 16
+    tier: 1
+  - id: teladianium
+    name: Teladianium
+    nameCN: T材料
+    price: 202
+    volume: 16
+    tier: 1
+  - id: water
+    name: Water
+    nameCN: 水
+    price: 53
+    volume: 6
+    tier: 1
+  - id: hullparts
+    name: Hull Parts
+    nameCN: 船体部件
+    price: 209
+    volume: 12
+    tier: 2
+  - id: meat
+    name: Meat
+    nameCN: 食用肉
+    price: 48
+    volume: 6
+    tier: 2
+  - id: microchips
+    name: Microchips
+    nameCN: 微芯片
+    price: 948
+    volume: 22
+    tier: 2
+  - id: quantumtubes
+    name: Quantum Tubes
+    nameCN: 量子管
+    price: 300
+    volume: 22
+    tier: 2
+  - id: spices
+    name: Spices
+    nameCN: 香料
+    price: 20
+    volume: 3
+    tier: 2
+  - id: wheat
+    name: Wheat
+    nameCN: 小麦
+    price: 31
+    volume: 4
+    tier: 2
+  - id: claytronics
+    name: Claytronics
+    nameCN: 电子黏土
+    price: 2040
+    volume: 24
+    tier: 3
+  - id: foodrations
+    name: Food Rations
+    nameCN: 食品配给
+    price: 21
+    volume: 1
+    tier: 3
+  - id: medicalsupplies
+    name: Medical Supplies
+    nameCN: 医疗物资
+    price: 66
+    volume: 2
+    tier: 3

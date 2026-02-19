@@ -92,7 +92,8 @@
     "tag_res": "资源",
     "tag_ops": "运营",
     "cancel": "取消",
-    "delete": "删除"
+    "delete": "删除",
+    "show_empire_gaps": "显示缺口"
   },
   "menu": {
     "new": "新建",
@@ -163,11 +164,17 @@
     "expenses_operations_group": "运营支出",
     "expenses_supply_group": "补给支出",
     "expenses_resources_group": "资源支出",
+    "products_income_group": "产品收入",
+    "operations_expense_group": "运营支出",
+    "supply_income_group": "补给收入",
+    "supply_expense_group": "补给支出",
     "current_efficiency": "当前综合效率",
     "products_group": "产品",
     "operations_group": "运营",
     "supply_group": "补给",
     "resources_group": "资源",
+    "empire_operations": "帝国运营",
+    "empire_supply": "帝国补给",
     "resource_buffer_hours": "资源缓冲时间",
     "primary_product_buffer_hours": "主产物缓冲时间",
     "secondary_product_buffer_hours": "副产物缓冲时间",

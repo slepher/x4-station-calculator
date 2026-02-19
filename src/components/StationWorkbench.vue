@@ -6,8 +6,8 @@ import StationDashboard from './StationDashboard.vue'
 import StationToolbar from './StationToolbar.vue'
 import StationTabBar from './StationTabBar.vue'
 import ContextToolbar from './ContextToolbar.vue'
-import StatusMonitor from './StatusMonitor.vue'
 import StationWareFlowsDashboard from './StationWareFlowsDashboard.vue'
+import EmpireWareFlowsDashboard from './EmpireWareFlowsDashboard.vue'
 import LogicFlowCandidateZone from './LogicFlowCandidateZone.vue'
 import LogicFlowPlanningZone from './LogicFlowPlanningZone.vue'
 
@@ -32,10 +32,21 @@ const isProductionView = computed(() => store.activeView === 'production')
       <StationTabBar />
       <ContextToolbar />
       
-      <div v-if="empireStore.activeStationId === null" class="empire-overview mt-6">
-        <div class="coming-soon">
-          <h2 class="text-2xl font-bold text-slate-300 mb-2">📊 {{ $t('empire.overview') }}</h2>
-          <p class="text-slate-500">{{ $t('empire.coming_soon') }}</p>
+      <div v-if="empireStore.activeStationId === null" class="main-layout mt-6">
+        <div class="col-span-12 lg:col-span-3">
+          <div class="coming-soon-panel">
+            <p class="text-slate-500">{{ $t('empire.coming_soon') }}</p>
+          </div>
+        </div>
+
+        <div class="col-span-12 lg:col-span-5">
+          <EmpireWareFlowsDashboard />
+        </div>
+
+        <div class="col-span-12 lg:col-span-4">
+          <div class="coming-soon-panel">
+            <p class="text-slate-500">{{ $t('empire.coming_soon') }}</p>
+          </div>
         </div>
       </div>
       
@@ -68,12 +79,8 @@ const isProductionView = computed(() => store.activeView === 'production')
   @apply grid grid-cols-12 gap-8 items-start;
 }
 
-.empire-overview {
-  @apply flex-1 flex items-center justify-center min-h-[400px];
-}
-
-.coming-soon {
-  @apply text-center;
+.coming-soon-panel {
+  @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl p-8 text-center min-h-[400px] flex items-center justify-center;
 }
 
 input::-webkit-outer-spin-button,

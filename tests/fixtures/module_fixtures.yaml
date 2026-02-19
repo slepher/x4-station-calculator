@@ -1,0 +1,243 @@
+modules:
+  - id: prod_gen_energycells_macro
+    module: Energy Cell Production
+    name: Energy Cell Production
+    nameCN: 能量电池产线
+    tier: 0
+    group: energy
+    race: default
+    method: default
+    inputs:
+      
+    outputs:
+      energycells: 10500
+  - id: prod_gen_antimattercells_macro
+    module: Antimatter Cell Production
+    name: Antimatter Cell Production
+    nameCN: 反物质单元产线
+    tier: 1
+    group: refined
+    race: default
+    method: default
+    inputs:
+      energycells: 3000
+      hydrogen: 9600
+    outputs:
+      antimattercells: 2970
+  - id: prod_gen_graphene_macro
+    module: Graphene Production
+    name: Graphene Production
+    nameCN: 石墨烯生产线
+    tier: 1
+    group: refined
+    race: default
+    method: default
+    inputs:
+      energycells: 1200
+      methane: 4800
+    outputs:
+      graphene: 1440
+  - id: prod_gen_refinedmetals_macro
+    module: Refined Metal Production
+    name: Refined Metal Production
+    nameCN: 精炼金属产线
+    tier: 1
+    group: refined
+    race: default
+    method: default
+    inputs:
+      energycells: 2160
+      ore: 5760
+    outputs:
+      refinedmetals: 2112
+  - id: prod_gen_siliconwafers_macro
+    module: Silicon Wafer Production
+    name: Silicon Wafer Production
+    nameCN: 硅晶片产线
+    tier: 1
+    group: refined
+    race: default
+    method: default
+    inputs:
+      energycells: 1800
+      silicon: 4800
+    outputs:
+      siliconwafers: 2140
+  - id: prod_gen_superfluidcoolant_macro
+    module: Superfluid Coolant Production
+    name: Superfluid Coolant Production
+    nameCN: 超流体冷却剂产线
+    tier: 1
+    group: refined
+    race: default
+    method: default
+    inputs:
+      energycells: 900
+      helium: 4800
+    outputs:
+      superfluidcoolant: 1425
+  - id: prod_gen_water_macro
+    module: Water Production
+    name: Water Production
+    nameCN: 水产线
+    tier: 1
+    group: water
+    race: default
+    method: default
+    inputs:
+      energycells: 1800
+      ice: 9600
+    outputs:
+      water: 5790
+  - id: prod_tel_teladianium_macro
+    module: Teladianium Production
+    name: Teladianium Production
+    nameCN: T材料产线
+    tier: 1
+    group: refined
+    race: teladi
+    method: teladi
+    inputs:
+      energycells: 1350
+      ore: 8400
+    outputs:
+      teladianium: 2100
+  - id: prod_arg_meat_macro
+    module: Meat Production
+    name: Meat Production
+    nameCN: 食用肉产线
+    tier: 2
+    group: agricultural
+    race: argon
+    method: argon
+    inputs:
+      energycells: 640
+      water: 800
+    outputs:
+      meat: 2320
+  - id: prod_arg_wheat_macro
+    module: Wheat Production
+    name: Wheat Production
+    nameCN: 小麦产线
+    tier: 2
+    group: agricultural
+    race: argon
+    method: argon
+    inputs:
+      energycells: 720
+      water: 960
+    outputs:
+      wheat: 3720
+  - id: prod_gen_hullparts_macro
+    module: Hull Part Production
+    name: Hull Part Production
+    nameCN: 船体部件产线
+    tier: 2
+    group: hightech
+    race: default
+    method: default
+    inputs:
+      energycells: 320
+      graphene: 160
+      refinedmetals: 1120
+    outputs:
+      hullparts: 1176
+  - id: prod_gen_microchips_macro
+    module: Microchip Production
+    name: Microchip Production
+    nameCN: 微芯片产线
+    tier: 2
+    group: hightech
+    race: default
+    method: default
+    inputs:
+      energycells: 300
+      siliconwafers: 1200
+    outputs:
+      microchips: 432
+  - id: prod_gen_quantumtubes_macro
+    module: Quantum Tube Production
+    name: Quantum Tube Production
+    nameCN: 量子管产线
+    tier: 2
+    group: hightech
+    race: default
+    method: default
+    inputs:
+      energycells: 200
+      graphene: 580
+      superfluidcoolant: 150
+    outputs:
+      quantumtubes: 470
+  - id: prod_gen_spices_macro
+    module: Spice Production
+    name: Spice Production
+    nameCN: 香料产线
+    tier: 2
+    group: agricultural
+    race: default
+    method: default
+    inputs:
+      energycells: 240
+      water: 480
+    outputs:
+      spices: 3000
+  - id: prod_tel_hullparts_macro
+    module: Teladi Hull Part Production
+    name: Teladi Hull Part Production
+    nameCN: Teladi 船体部件产线
+    tier: 2
+    group: hightech
+    race: teladi
+    method: teladi
+    inputs:
+      energycells: 320
+      graphene: 160
+      teladianium: 816
+    outputs:
+      hullparts: 1176
+  - id: prod_arg_foodrations_macro
+    module: Food Ration Production
+    name: Food Ration Production
+    nameCN: 食品配给产线
+    tier: 3
+    group: food
+    race: argon
+    method: argon
+    inputs:
+      energycells: 1500
+      meat: 600
+      spices: 600
+      wheat: 600
+    outputs:
+      foodrations: 6900
+  - id: prod_arg_medicalsupplies_macro
+    module: Argon Medical Supply Production
+    name: Argon Medical Supply Production
+    nameCN: Argon 医疗物资产线
+    tier: 3
+    group: pharmaceutical
+    race: argon
+    method: default
+    inputs:
+      energycells: 1200
+      spices: 480
+      water: 720
+      wheat: 360
+    outputs:
+      medicalsupplies: 2496
+  - id: prod_gen_claytronics_macro
+    module: Claytronics Production
+    name: Claytronics Production
+    nameCN: 电子黏土产线
+    tier: 3
+    group: shiptech
+    race: default
+    method: default
+    inputs:
+      antimattercells: 400
+      energycells: 560
+      microchips: 640
+      quantumtubes: 400
+    outputs:
+      claytronics: 432

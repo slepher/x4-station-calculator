@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type {
   EmpirePlan,
   StationPlan,
@@ -7,12 +7,40 @@ import type {
   V1StorageState,
   StationSettings,
   SavedModule,
+  GroupedFlows,
+  EmpireGroupedFlows,
 } from '@/types/x4'
 import { useGameDataStore } from './useGameDataStore'
+import { analyzeWareFlow } from './logic/analyzeWareFlow'
+import { analyzeEmpireWareFlow } from './logic/analyzeEmpireWareFlow'
+import { calculateWorkforceBreakdown, calculateActualWorkforce, calculateEfficiencySaturation } from './logic/workforceCalculator'
+import { buildResolvedWarePriority } from './logic/warePriorityResolver'
+import { calculateAutoFill } from './logic/moduleDiffCalculator'
 
 const STORAGE_KEY = 'x4_empire_data'
 const V1_STORAGE_KEY = 'x4_station_data'
 const SESSION_ACTIVE_STATION_KEY = 'x4_active_station_id'
+
+function filterGroupedFlowsByPriority(
+  flows: GroupedFlows,
+  priorityLevels: Record<string, number>
+): GroupedFlows {
+  return {
+    flows: flows.flows.filter(f => {
+      if (f.netRate <= 0) return true
+      return (priorityLevels[f.wareId] ?? 0) > 0
+    }),
+    rateGroups: {
+      positive: flows.rateGroups.positive.filter(f =>
+        (priorityLevels[f.wareId] ?? 0) > 0
+      ),
+      operations: flows.rateGroups.operations,
+      supply: flows.rateGroups.supply,
+      resources: flows.rateGroups.resources
+    },
+    volumeGroups: flows.volumeGroups
+  }
+}
 
 const DEFAULT_SETTINGS: StationSettings = {
   sunlight: 100,
@@ -25,6 +53,7 @@ const DEFAULT_SETTINGS: StationSettings = {
   sellMultiplier: 0.5,
   minersEnabled: false,
   internalSupply: false,
+  showEmpireGaps: false,
   racePreference: 'argon',
   resourceBufferHours: 1.0,
   primaryProductBufferHours: 12.0,
@@ -37,6 +66,7 @@ function createDefaultStation(name: string, type: StationType = 'industrial'): S
     id: crypto.randomUUID(),
     name,
     type,
+    count: 1,
     modules: [],
     settings: { ...DEFAULT_SETTINGS },
     lastUpdated: Date.now(),
@@ -70,6 +100,9 @@ export const useEmpireStore = defineStore('empire', () => {
   
   const activeEmpire = ref<EmpirePlan | null>(null)
   const activeStationId = ref<string | null>(null)
+  
+  const stationFlowCache = ref<Map<string, GroupedFlows>>(new Map())
+  let lastCacheUpdateTime: number = 0
 
   const activeStation = computed(() => {
     if (!activeEmpire.value || !activeStationId.value) return null
@@ -95,6 +128,114 @@ export const useEmpireStore = defineStore('empire', () => {
     allStations.value.filter(item => item.station.type === 'industrial')
   )
 
+  const empireGroupedFlows = computed<EmpireGroupedFlows>(() => {
+    if (!activeEmpire.value || !gameData.modulesMap) {
+      return {
+        flows: [],
+        empireGroups: {
+          products: [],
+          operations: [],
+          supply: []
+        }
+      }
+    }
+    
+    return analyzeEmpireWareFlow(
+      activeEmpire.value.stations,
+      (stationId) => stationFlowCache.value.get(stationId) || null
+    )
+  })
+
+  function refreshStationFlowCache(stationId: string) {
+    const station = getStationById(stationId)
+    if (!station || !gameData.isReady) return
+    
+    const { modulesMap, waresMap, medicalConsumptionMap } = gameData
+    if (!modulesMap || !waresMap || !medicalConsumptionMap) return
+    
+    const autoFillResult = calculateAutoFill(
+      station.modules,
+      station.settings,
+      modulesMap,
+      waresMap,
+      station.lockedWares || [],
+      medicalConsumptionMap,
+      station.warePriority || {}
+    )
+    const autoIndustryModules = autoFillResult.autoIndustry
+    const allIndustryModules = [...station.modules, ...autoIndustryModules]
+    
+    const workforceBreakdown = calculateWorkforceBreakdown(
+      allIndustryModules,
+      modulesMap,
+      station.settings
+    )
+    const actualWorkforce = calculateActualWorkforce(workforceBreakdown, station.settings)
+    const saturation = calculateEfficiencySaturation(workforceBreakdown.needed.total, actualWorkforce)
+    
+    const warePriorityLevels = buildResolvedWarePriority(
+      {
+        plannedModules: station.modules,
+        autoIndustryModules,
+        modulesMap,
+        userPriorityOverride: station.warePriority || {}
+      },
+      Object.keys(waresMap)
+    )
+    
+    const groupedFlows = analyzeWareFlow(
+      allIndustryModules,
+      modulesMap,
+      waresMap,
+      medicalConsumptionMap,
+      station.settings,
+      actualWorkforce,
+      saturation,
+      station.settings.resourceBufferHours,
+      station.settings.primaryProductBufferHours,
+      station.settings.secondaryProductBufferHours,
+      warePriorityLevels
+    )
+    
+    const filteredFlows = filterGroupedFlowsByPriority(groupedFlows, warePriorityLevels)
+    
+    stationFlowCache.value.set(stationId, filteredFlows)
+  }
+
+  function getStationFlowCache(stationId: string): GroupedFlows | null {
+    return stationFlowCache.value.get(stationId) || null
+  }
+
+  function initializeAllStationCaches() {
+    if (!activeEmpire.value) return
+    activeEmpire.value.stations.forEach(station => {
+      refreshStationFlowCache(station.id)
+    })
+  }
+
+  function clearStationCaches() {
+    stationFlowCache.value.clear()
+  }
+
+  watch(
+    () => ({
+      stationId: activeStation.value?.id,
+      lastUpdated: activeStation.value?.lastUpdated
+    }),
+    (current, previous) => {
+      if (!current.stationId) return
+      
+      if (current.stationId !== previous?.stationId) {
+        return
+      }
+      
+      if (current.lastUpdated && current.lastUpdated !== lastCacheUpdateTime) {
+        lastCacheUpdateTime = current.lastUpdated
+        refreshStationFlowCache(current.stationId)
+      }
+    }
+  )
+
   function takeSnapshot() {
     lastSavedSnapshot.value = JSON.stringify({
       activeEmpire: activeEmpire.value ? JSON.parse(JSON.stringify(activeEmpire.value)) : null,
@@ -107,6 +248,11 @@ export const useEmpireStore = defineStore('empire', () => {
     if (data.activeId) {
       const empire = data.list.find(e => e.id === data.activeId)
       if (empire) {
+        empire.stations.forEach(station => {
+          if (station.count === null || station.count === undefined) {
+            station.count = 1
+          }
+        })
         activeEmpire.value = JSON.parse(JSON.stringify(empire))
         
         const sessionTabId = sessionStorage.getItem(SESSION_ACTIVE_STATION_KEY)
@@ -155,6 +301,7 @@ export const useEmpireStore = defineStore('empire', () => {
   function loadEmpire(empireId: string) {
     const empire = savedEmpires.value.list.find(e => e.id === empireId)
     if (empire) {
+      clearStationCaches()
       activeEmpire.value = JSON.parse(JSON.stringify(empire))
       savedEmpires.value.activeId = empireId
       
@@ -165,6 +312,7 @@ export const useEmpireStore = defineStore('empire', () => {
       } else {
         activeStationId.value = empire.stations[0]?.id || null
       }
+      initializeAllStationCaches()
       takeSnapshot()
     }
   }
@@ -193,6 +341,7 @@ export const useEmpireStore = defineStore('empire', () => {
     const station = createDefaultStation(name, type)
     activeEmpire.value.stations.push(station)
     activeStationId.value = station.id
+    refreshStationFlowCache(station.id)
     return station
   }
 
@@ -202,6 +351,7 @@ export const useEmpireStore = defineStore('empire', () => {
     const index = activeEmpire.value.stations.findIndex(s => s.id === stationId)
     if (index !== -1) {
       activeEmpire.value.stations.splice(index, 1)
+      stationFlowCache.value.delete(stationId)
       if (activeStationId.value === stationId) {
         activeStationId.value = activeEmpire.value.stations[0]?.id || null
         if (activeStationId.value) {
@@ -228,6 +378,7 @@ export const useEmpireStore = defineStore('empire', () => {
     
     activeEmpire.value.stations.push(newStation)
     activeStationId.value = newStation.id
+    refreshStationFlowCache(newStation.id)
     return newStation
   }
 
@@ -321,6 +472,7 @@ export const useEmpireStore = defineStore('empire', () => {
           const data = JSON.parse(stored) as SavedEmpiresState
           if (data.version === 1 && data.list) {
             loadData(data)
+            initializeAllStationCaches()
             isReady.value = true
             console.log('[EmpireStore] Loaded saved empires')
             return
@@ -340,6 +492,7 @@ export const useEmpireStore = defineStore('empire', () => {
             loadData(data)
             saveToStorage()
             localStorage.removeItem(V1_STORAGE_KEY)
+            initializeAllStationCaches()
             console.log('[EmpireStore] Migration complete')
             isReady.value = true
             return
@@ -369,6 +522,12 @@ export const useEmpireStore = defineStore('empire', () => {
     savedEmpires,
     allStations,
     industrialStations,
+    stationFlowCache,
+    getStationFlowCache,
+    refreshStationFlowCache,
+    initializeAllStationCaches,
+    clearStationCaches,
+    empireGroupedFlows,
     loadData,
     saveToStorage,
     saveEmpire,

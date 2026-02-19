@@ -21,6 +21,7 @@ import {
   resolveModuleId 
 } from './logic/blueprintParser'
 import { calculateAutoFill } from './logic/moduleDiffCalculator'
+import { buildResolvedWarePriority } from './logic/warePriorityResolver'
 
 import { 
   calculateConstructionBreakdown
@@ -71,6 +72,7 @@ export const useStationStore = defineStore('station', () => {
     sellMultiplier: 0.5,     
     minersEnabled: false,    
     internalSupply: false,
+    showEmpireGaps: false,
     racePreference: 'argon',  // 默认种族偏好
     resourceBufferHours: 1.0, // 默认资源缓冲时间
     primaryProductBufferHours: 12.0,   // 默认主产物缓冲时间（小时）
@@ -134,6 +136,7 @@ export const useStationStore = defineStore('station', () => {
     s.secondaryProductBufferHours = s.secondaryProductBufferHours ?? 2.0
     s.resourceBufferHours = s.resourceBufferHours || 2 // 兼容旧数据
     s.transportShipCapacity = s.transportShipCapacity ?? 62000 // 兼容旧数据，默认 62000
+    s.showEmpireGaps = s.showEmpireGaps ?? false
     return s as StationSettings
   }
 
@@ -480,22 +483,15 @@ export const useStationStore = defineStore('station', () => {
 
   // 资源流向分析 (Ware Flow Analysis)
   const groupedFlows = computed(() => {
-    let plannedWareIds : string[] = [];
-
-    plannedModules.value.forEach(item => {
-      const info :X4Module | undefined = modulesMap.value[item.id];
-      if (!info) return;
-      Object.keys(info.outputs || {}).forEach((wareId) => {
-        if(plannedWareIds.includes(wareId)) return;
-        plannedWareIds.push(wareId);
-      })
-    })
-
-    // 构建产物优先级映射：wareId -> resolvedLevel
-    const warePriorityLevels: Record<string, number> = {}
-    Object.keys(waresMap.value).forEach(wareId => {
-      warePriorityLevels[wareId] = getResolvedLevel(wareId)
-    })
+    const warePriorityLevels = buildResolvedWarePriority(
+      {
+        plannedModules: plannedModules.value,
+        autoIndustryModules: autoIndustryModules.value,
+        modulesMap: modulesMap.value,
+        userPriorityOverride: warePriority.value
+      },
+      Object.keys(waresMap.value)
+    )
 
     return analyzeWareFlow(
       allIndustryModules.value,

@@ -246,13 +246,11 @@ export function analyzeWareFlow(
   }; 
 
   allFlows.forEach(flow => { 
-    // 分发到数量/经济视图 
     if (flow.netRate > 0) result.rateGroups.positive.push(flow); 
     else if (flow.workforceConsumption > 0) result.rateGroups.supply.push(flow);
     else if (flow.transportType === 'container') result.rateGroups.operations.push(flow); 
     else result.rateGroups.resources.push(flow); 
 
-    // 分发到体积视图 
     if (flow.transportType === 'solid') result.volumeGroups.solid.push(flow); 
     else if (flow.transportType === 'liquid') result.volumeGroups.liquid.push(flow); 
     else result.volumeGroups.container.push(flow); 
