@@ -153,6 +153,7 @@
   },
   "wareflow": {
     "resource_overview": "资源产出",
+    "resource_view": "资源视图",
     "hourly_rate": "每小时流量",
     "quantity_view": "数量视图",
     "economy_view": "经济视图",

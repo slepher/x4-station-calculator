@@ -10,7 +10,7 @@
 - 创建 `analyzeEmpireWareFlow` 聚合函数，从缓存中汇总帝国级数据
 - 创建 `EmpireWareFlowsDashboard` 组件，复制 `StationWareFlowsDashboard` 的两级子模块结构
 - 帝国视图只包含两个视图：数量视图和经济视图（无体积视图）
-- 帝国视图按三组显示：产品组、运营组、补给组
+- 聚合层输出运营组与补给组并完成排序；帝国总览展示层按 `netRate` 将运营组拆分为产品组/运营组（不额外排序）
 
 ## Capabilities
 

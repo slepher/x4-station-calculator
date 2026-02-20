@@ -45,23 +45,78 @@
 - **并且** 分站 SHALL 运行完整的 calculateAutoFill 逻辑
 
 ### Requirement: 分站 CRUD 操作 (Station CRUD Operations)
-系统 SHALL 提供分站的创建、读取、更新、删除操作：
-- **创建**: 通过标签栏 [+] 按钮或帝国总览菜单
-- **读取**: 通过标签栏切换查看
-- **更新**: 通过分站视图编辑
-- **删除**: 通过分站菜单删除选项
+系统 SHALL 在执行分站创建、读取、更新、删除操作时，保持帝国元数据与分站运行态生命周期一致：
+- **创建**: 创建分站实体后 SHALL 初始化对应运行态
+- **读取**: 切换分站时 SHALL 读取对应运行态
+- **更新**: 分站输入更新 SHALL 写入该分站运行态
+- **删除**: 删除分站时 SHALL 同步删除对应运行态
 
 #### Scenario: 创建新分站
 - **前提** 用户在帝国总览或标签栏
 - **当** 用户点击新建分站按钮
 - **那么** 系统 SHALL 创建新的分站对象
-- **并且** 新分站 SHALL 自动激活
+- **并且** 新分站 SHALL 自动激活并初始化运行态
 
 #### Scenario: 删除分站
 - **前提** 用户在分站菜单中
 - **当** 用户点击删除分站选项
 - **那么** 系统 SHALL 从帝国中移除该分站
-- **并且** 如果删除的是当前激活分站，activeStationId SHALL 切换到 null
+- **并且** 系统 SHALL 清理该分站运行态
+
+### Requirement: 帝国聚合数据来源一致性 (Empire Aggregation Source Consistency)
+帝国总览聚合 SHALL 读取统一分站运行态计算结果，而非维护独立重复计算真源。
+
+#### Scenario: 分站变更后总览同步
+- **前提** 分站 A 的模块或设置发生变化
+- **当** 该分站运行态完成重算
+- **那么** 帝国聚合 SHALL 读取更新后的分站结果
+- **并且** 单站视图与帝国总览 SHALL 保持一致
+
+#### Scenario: 切换分站不触发跨站污染
+- **前提** 多分站同时存在且各自数据不同
+- **当** 用户在分站标签间切换
+- **那么** 帝国聚合 SHALL 继续基于各自分站运行态聚合
+- **并且** 不同分站结果 SHALL 不因切站动作互相覆盖
+
+### Requirement: 空间站流量缓存 (Station Flow Cache)
+系统 SHALL 在 EmpireStore 中维护每个空间站的流量分析缓存：
+- 缓存键为 `stationId`，值为 `GroupedFlows` 对象
+- 初始化时为所有空间站执行 `analyzeWareFlow` 并缓存结果
+- 空间站模块更新时自动更新对应的缓存
+- 提供缓存访问接口 `getStationFlowCache(stationId)`
+
+#### Scenario: 初始化缓存
+- **前提** EmpireStore 初始化完成
+- **当** 系统加载帝国数据
+- **那么** 系统 SHALL 为每个空间站执行 `analyzeWareFlow`
+- **并且** 结果 SHALL 存储到 `stationFlowCache` 中
+
+#### Scenario: 更新缓存
+- **前提** 用户修改空间站模块
+- **当** `updateStationModules` 被调用
+- **那么** 系统 SHALL 重新计算该空间站的流量分析
+- **并且** 更新 `stationFlowCache` 中对应的缓存
+
+#### Scenario: 访问缓存
+- **前提** 某空间站存在
+- **当** 调用 `getStationFlowCache(stationId)`
+- **那么** 系统 SHALL 返回该空间站的 `GroupedFlows` 对象
+- **并且** 如果缓存不存在，SHALL 返回 null
+
+### Requirement: 运行态持久化边界 (Runtime Persistence Boundary)
+帝国持久化层 MUST 仅保存可编辑分站输入，不将派生模块与资源流计算结果作为长期存储真源。
+
+#### Scenario: 保存帝国数据
+- **前提** 用户执行保存操作
+- **当** 系统序列化帝国与分站数据
+- **那么** 系统 MUST 保存分站可编辑输入字段
+- **并且** 系统 MUST 不把派生与计算结果作为唯一数据来源保存
+
+#### Scenario: 载入帝国数据
+- **前提** 系统从存档恢复帝国数据
+- **当** 分站进入激活或聚合流程
+- **那么** 系统 SHALL 基于恢复输入重建运行态
+- **并且** 当前版本计算结果 SHALL 由重算生成
 
 ### Requirement: 补给站计算逻辑 (Supply Station Calculation)
 补给站 SHALL 根据帝国所有工业站的工人需求总和生成补给模块：

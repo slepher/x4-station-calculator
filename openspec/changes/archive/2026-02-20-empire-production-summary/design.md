@@ -18,8 +18,9 @@
 
 **Goals:**
 - 在 EmpireStore 中实现缓存机制，存储每个空间站的 `GroupedFlows`
-- 实现帝国级数据聚合，按产品/运营/补给三组显示
+- 实现帝国级数据聚合，在聚合层输出运营组与补给组
 - 创建 `EmpireWareFlowsDashboard` 组件，复用两级子模块结构
+- 在帝国总览展示层将运营组按 `netRate` 拆分为产品/运营两组显示
 - 确保空间站更新时缓存同步更新
 - 确保切换 tab 时不触发缓存重新计算
 
@@ -170,9 +171,9 @@ export function filterGroupedFlowsByPriority(
 **选择**: 在 Step 3 归类阶段先判断 `wareId` 是否属于 `supply`，命中后直接归入补给组，并与已有补给聚合结果合并。
 
 **理由**:
-- 补给语义优先于产品/运营语义，避免同一 `wareId` 同时出现在补给组和产品/运营组
+- 补给语义优先于运营语义，避免同一 `wareId` 同时出现在补给组和运营组
 - 当候选集中出现补给资源时（例如运营组中出现同 `wareId`），需要保持分组唯一性与可解释性
-- 与讨论结论一致：`supply` 命中后不再参与 `netRate` 的 products/operations 判定
+- 与讨论结论一致：`supply` 命中后不再参与运营组判定
 
 **实现细节**:
 
@@ -184,14 +185,36 @@ for (const flow of candidateFlows) {
     supplyMap.set(flow.wareId, mergeEmpireFlow(supplyMap.get(flow.wareId), flow))
     continue
   }
-  if (flow.netRate > 0) products.push(flow)
-  else if (flow.netRate < 0) operations.push(flow)
+  operations.push(flow)
 }
 ```
 
 **替代方案**:
 - 候选命中补给时直接丢弃：会损失该 `wareId` 的候选贡献数据
 - 允许同一 `wareId` 多组并存：UI 与业务语义冲突，用户难以理解
+
+### Decision 8: 排序职责与页面拆分
+
+**选择**: 排序仅在聚合层执行；帝国总览页面拆分运营为产品/运营时不做额外排序。
+
+**理由**:
+- 避免双重排序导致顺序漂移
+- 保持单一事实来源（排序规则只在 EmpireStore 一处定义）
+- 降低维护成本与回归风险（规则变更只改一处）
+- 降低无意义计算与测试波动
+- 拆分是展示映射，不应改变数据层顺序
+
+**实现细节**:
+
+```typescript
+// 聚合层：先排序 operations / supply
+const sortedOperations = [...grouped.empireGroups.operations].sort(sortByTierThenName)
+const sortedSupply = [...grouped.empireGroups.supply].sort(sortByTierThenName)
+
+// 展示层：仅按 netRate 拆分，不再排序
+const products = sortedOperations.filter(f => f.netRate > 0)
+const operations = sortedOperations.filter(f => f.netRate <= 0)
+```
 
 ## Risks / Trade-offs
 

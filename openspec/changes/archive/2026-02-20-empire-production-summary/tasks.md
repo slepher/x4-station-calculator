@@ -3,7 +3,7 @@
 - [x] 1.1 在 `src/types/x4.ts` 中为 `StationPlan` 添加 `count` 字段（可选，默认为 1）
 - [x] 1.2 在 `src/types/x4.ts` 中添加 `EmpireFlowAtom` 接口（扩展 `ModuleFlowAtom`，添加 `stationId`、`stationName`、`stationCount` 字段）
 - [x] 1.3 在 `src/types/x4.ts` 中添加 `EmpireWareFlow` 接口（包含汇总数据和 `EmpireFlowAtom[]` 明细）
-- [x] 1.4 在 `src/types/x4.ts` 中添加 `EmpireGroupedFlows` 接口（包含 `products`、`operations`、`supply` 三组）
+- [x] 1.4 在 `src/types/x4.ts` 中更新 `EmpireGroupedFlows` 接口（聚合层保留 `operations`、`supply` 两组；总览展示层再按 `netRate` 拆分产品/运营）
 
 ## 2. 空间站数量功能
 

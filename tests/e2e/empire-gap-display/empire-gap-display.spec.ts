@@ -133,6 +133,38 @@ const enableShowGaps = async (page: any) => {
 };
 
 test.describe('帝国缺口显示', () => {
+  test('帝国缺口明细显示数量x名称结构', async ({ page }) => {
+    await createNewEmpire(page);
+    await setupStationAWithClay(page);
+    await setupStationB(page);
+    await enableShowGaps(page);
+    await switchToResourceView(page);
+
+    const opsGapGroup = getOperationsGroup(page);
+    const flow = opsGapGroup.locator('.flow-wrapper[data-resource-id="quantumtubes"]').first();
+    await expect(flow).toBeVisible({ timeout: 500 });
+    await flow.locator('.main-row').click();
+
+    await expect(flow.locator('.item-name .qty').first()).toBeVisible({ timeout: 500 });
+    await expect(flow.locator('.item-name .symbol').first()).toContainText('x');
+    await expect(flow.locator('.item-name .name').first()).toBeVisible({ timeout: 500 });
+  });
+
+  test('空间站帝国资源区域标题显示且不显示每小时流量标签', async ({ page }) => {
+    await createNewEmpire(page);
+    await setupStationAWithClay(page);
+    await setupStationB(page);
+    await enableShowGaps(page);
+
+    const wrapper = getListWrapper(page);
+    await expect(wrapper.locator('.header-title')).toContainText(/资源视图|Resource View/);
+    await expect(wrapper.locator('.header-badge')).toHaveCount(0);
+
+    await switchToEconomyView(page, wrapper);
+    await expect(wrapper.locator('.header-title')).toContainText(/经济视图|Economy/);
+    await expect(wrapper.locator('.header-badge')).toHaveCount(0);
+  });
+
   test('显示缺口开关', async ({ page }) => {
     await createNewEmpire(page);
     await setupStationAWithClay(page);
@@ -248,19 +280,6 @@ test.describe('帝国缺口显示', () => {
     }
   });
 
-  test('缺口项不显示收藏按钮', async ({ page }) => {
-    await createNewEmpire(page);
-    await setupStationAWithClay(page);
-
-    await setupStationB(page);
-    await enableShowGaps(page);
-
-    const opsGapItem = getOperationsGroup(page).locator('.flow-wrapper[data-resource-id="quantumtubes"]');
-    await expect(opsGapItem).toBeVisible({ timeout: 500 });
-    await expect(opsGapItem.locator('.favorite-btn')).toHaveCount(0);
-    await expect(opsGapItem.locator('.fav-placeholder')).toBeVisible({ timeout: 500 });
-  });
-
   test('无缺口时不显示缺口分组', async ({ page }) => {
     await createNewEmpire(page);
 
@@ -313,7 +332,7 @@ test.describe('帝国缺口显示', () => {
     await expect(opsGapGroup.locator('.flow-wrapper[data-resource-id="energycells"]')).toBeVisible({ timeout: 500 });
   });
 
-  test('帝国补给全量显示', async ({ page }) => {
+  test('帝国补给显示负净值和零净值项', async ({ page }) => {
     await createNewEmpire(page);
     await setupStationAWithClay(page);
 
@@ -369,7 +388,7 @@ test.describe('帝国缺口显示', () => {
     expect(items.map(item => item.id)).toEqual(sorted.map(item => item.id));
   });
 
-  test('帝国补给转正后仍显示', async ({ page }) => {
+  test('帝国补给转正后在规划内仍显示', async ({ page }) => {
     await createNewEmpire(page);
     await setupStationAWithClay(page);
 

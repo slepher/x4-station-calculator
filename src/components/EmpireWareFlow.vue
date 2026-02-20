@@ -17,6 +17,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   add: [wareId: string]
+  remove: [wareId: string]
 }>()
 
 const formatNum = (n: number, digits: number = 1) => new Intl.NumberFormat('en-US', {
@@ -67,14 +68,8 @@ const formattedDetails = computed(() => {
 
 const classWithSymbol = (displayValue: number, className: string) => [className, className + '-' + (displayValue >= 0 ? 'pos' : 'neg')]
 
-const formatStationName = (detail: any) => {
-  const stationName = detail.stationName || 'Unknown'
-  const count = detail.stationCount || 1
-  if (count > 1) {
-    return `${stationName} (x${count})`
-  }
-  return stationName
-}
+const getStationName = (detail: any) => detail.stationName || 'Unknown'
+const getStationCount = (detail: any) => detail.stationCount || 1
 </script>
 
 <template>
@@ -95,7 +90,9 @@ const formatStationName = (detail: any) => {
 
         <template #row="{ item }">
           <span class="item-name">
-            <span class="name">{{ formatStationName(item) }}</span>
+            <span class="qty">{{ getStationCount(item) }}</span>
+            <span class="symbol">x</span>
+            <span class="name">{{ getStationName(item) }}</span>
           </span>
           <div class="item-val-group">
             <span class="item-val">
@@ -171,6 +168,14 @@ const formatStationName = (detail: any) => {
 
 .item-name {
   @apply flex items-center gap-1;
+}
+
+.item-name .qty {
+  @apply font-mono text-slate-500;
+}
+
+.item-name .symbol {
+  @apply opacity-30 scale-90 text-slate-500;
 }
 
 .item-name .name {

@@ -23,14 +23,14 @@
 ## 5. StationWareFlowsDashboard 集成
 
 - [x] 5.1 在 `StationWareFlowsDashboard.vue` 中引入 `useEmpireStore`
-- [x] 5.2 添加 `empireGaps` computed 属性，过滤 `netRate < 0` 的运营和补给项
+- [x] 5.2 添加 `empireGaps` computed 属性：帝国运营沿用既有过滤规则；帝国补给过滤为 `netRate < 0` 或 `netRate > 0` 且在当前站 `plannedModules` 中存在对应模块
 - [x] 5.3 在 `list-body` 顶部添加缺口分组渲染逻辑（使用 `EmpireWareFlowGroup`）
 - [x] 5.4 实现 `handleAddModule` 函数，点击 + 按钮添加默认产线模块
 - [x] 5.5 确保分组仅在资源视图显示，经济视图不显示
-- [x] 5.6 帝国运营分组合并 products + operations，并应用过滤规则（`netRate < 0` 或 `priority > 0`）
+- [x] 5.6 帝国运营分组使用 `empireGroups.operations`，并应用过滤规则（`netRate < 0` 或 `priority > 0`）
 - [x] 5.7 priority 使用空间站“修正后的优先级”结果（非原始覆盖值）
-- [x] 5.8 帝国运营分组内排序：tier 高的在前，同 tier 字母序
-- [x] 5.9 帝国补给分组不再按 netRate 过滤，显示全部
+- [x] 5.8 帝国运营分组顺序直接使用 `empireStore` 数据，不在页面层额外排序
+- [x] 5.9 帝国补给分组对 `netRate > 0` 的项仅在当前站 `plannedModules` 中存在对应模块时显示
 
 ## 6. 测试
 
@@ -39,5 +39,5 @@
 - [x] 6.3 编写 + 按钮添加模块 E2E 测试
 - [x] 6.4 编写分组显示顺序 E2E 测试（帝国运营→帝国补给→产品→运营→补给→资源）
 - [x] 6.5 编写帝国运营优先级过滤 E2E 测试（priority > 0 时显示）
-- [x] 6.6 编写帝国补给全量显示 E2E 测试（不按 netRate 过滤）
-- [x] 6.7 编写帝国运营排序 E2E 测试（tier 高优先，同 tier 字母序）
+- [x] 6.6 编写帝国补给正净值显示条件 E2E 测试（`netRate > 0` 且在 `plannedModules` 中时才显示）
+- [x] 6.7 编写帝国运营顺序继承 E2E 测试（验证页面不做额外排序）

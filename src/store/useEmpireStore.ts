@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import type {
   EmpirePlan,
   StationPlan,
@@ -99,34 +99,16 @@ export const useEmpireStore = defineStore('empire', () => {
       return {
         flows: [],
         empireGroups: {
-          products: [],
           operations: [],
           supply: []
         }
       }
     }
     
-    const grouped = analyzeEmpireWareFlow(
+    return analyzeEmpireWareFlow(
       activeEmpire.value.stations,
       (stationId) => stationStateMap.getFilteredGroupedFlows(stationId)
     )
-
-    const wares = gameData.waresMap || {}
-    const getWareName = (wareId: string) => wares[wareId]?.name || wareId
-    const sortByTierThenName = (a: EmpireWareFlow, b: EmpireWareFlow) => {
-      const tierDiff = (b.tier ?? 0) - (a.tier ?? 0)
-      if (tierDiff !== 0) return tierDiff
-      return getWareName(a.wareId).localeCompare(getWareName(b.wareId), 'en', { sensitivity: 'base' })
-    }
-
-    return {
-      ...grouped,
-      empireGroups: {
-        products: [...grouped.empireGroups.products].sort(sortByTierThenName),
-        operations: [...grouped.empireGroups.operations].sort(sortByTierThenName),
-        supply: [...grouped.empireGroups.supply].sort(sortByTierThenName)
-      }
-    }
   })
 
   function getComputeDeps() {
@@ -316,6 +298,18 @@ export const useEmpireStore = defineStore('empire', () => {
     return newStation
   }
 
+  function reorderStations(reorderedStations: StationPlan[]) {
+    if (!activeEmpire.value) return
+
+    const currentStations = activeEmpire.value.stations
+    if (reorderedStations.length !== currentStations.length) return
+
+    const currentIds = new Set(currentStations.map(station => station.id))
+    if (reorderedStations.some(station => !currentIds.has(station.id))) return
+
+    activeEmpire.value.stations = [...reorderedStations]
+  }
+
   function renameStation(stationId: string, newName: string) {
     if (!activeEmpire.value) return false
     
@@ -476,6 +470,7 @@ export const useEmpireStore = defineStore('empire', () => {
     createStation,
     deleteStation,
     duplicateStation,
+    reorderStations,
     renameStation,
     selectStation,
     getStationById,

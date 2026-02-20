@@ -32,6 +32,41 @@ async function addModuleToStation(page: any, moduleName: string) {
 
 test.describe('帝国总览多空间站聚合测试', () => {
   
+  test('帝国总览标题显示且明细使用数量x名称结构', async ({ page }) => {
+    await createNewEmpire(page);
+
+    const addStationBtn = page.locator('.add-btn');
+    await addStationBtn.click();
+    await addModuleToStation(page, 'Energy');
+    await page.waitForTimeout(200);
+
+    const countInput = page.locator('input[type="number"]').first();
+    await countInput.fill('2');
+    await page.waitForTimeout(200);
+
+    const empireOverviewTab = page.locator('.overview-tab').first();
+    await empireOverviewTab.click();
+    await page.waitForTimeout(200);
+
+    const wrapper = page.locator('.list-wrapper').first();
+    await expect(wrapper.locator('.header-title')).toContainText(/资源视图|Resource View/);
+    await expect(wrapper.locator('.header-badge')).toHaveCount(0);
+
+    const economyBtn = wrapper.locator('.view-mode-btn').filter({ hasText: /经济|Economy/ }).first();
+    await economyBtn.click();
+    await page.waitForTimeout(200);
+    await expect(wrapper.locator('.header-title')).toContainText(/经济视图|Economy/);
+    await expect(wrapper.locator('.header-badge')).toHaveCount(0);
+
+    const quantityBtn = wrapper.locator('.view-mode-btn').filter({ hasText: /数量|Quantity/ }).first();
+    await quantityBtn.click();
+    await page.waitForTimeout(200);
+
+    await wrapper.locator('.flow-wrapper .main-row').first().click();
+    await expect(wrapper.locator('.flow-wrapper .item-name .qty').first()).toContainText('2');
+    await expect(wrapper.locator('.flow-wrapper .item-name .symbol').first()).toContainText('x');
+  });
+
   test('帝国总览界面显示 EmpireWareFlowsDashboard 组件', async ({ page }) => {
     await createNewEmpire(page);
     

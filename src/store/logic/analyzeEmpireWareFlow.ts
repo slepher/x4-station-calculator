@@ -160,7 +160,6 @@ export function analyzeEmpireWareFlow(
   })
   const supplyWareIdSet = new Set(supplyByWareIdMap.keys())
   
-  const products: EmpireWareFlow[] = []
   const operations: EmpireWareFlow[] = []
   
   const candidateFlows = aggregateFlows(candidatesByWareId)
@@ -172,9 +171,7 @@ export function analyzeEmpireWareFlow(
       } else {
         supplyByWareIdMap.set(flow.wareId, flow)
       }
-    } else if (flow.netRate > 0) {
-      products.push(flow)
-    } else if (flow.netRate < 0) {
+    } else {
       operations.push(flow)
     }
   })
@@ -184,7 +181,7 @@ export function analyzeEmpireWareFlow(
     return Math.abs(b.netRate) - Math.abs(a.netRate)
   })
   
-  const allFlows = [...products, ...operations, ...mergedSupplyFlows].sort((a, b) => {
+  const allFlows = [...operations, ...mergedSupplyFlows].sort((a, b) => {
     if (a.orderIndex !== b.orderIndex) return a.orderIndex - b.orderIndex
     if (a.tier !== b.tier) return b.tier - a.tier
     return Math.abs(b.netRate) - Math.abs(a.netRate)
@@ -193,7 +190,6 @@ export function analyzeEmpireWareFlow(
   return {
     flows: allFlows,
     empireGroups: {
-      products,
       operations,
       supply: mergedSupplyFlows
     }

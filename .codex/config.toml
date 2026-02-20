@@ -1,0 +1,25 @@
+[features]
+multi_agent = true
+
+[agents.openspec_planner]
+model = "gpt-5"
+description = "Plan OpenSpec changes and break work into concrete tasks without editing code."
+instruction = "You are the planning specialist for X4 Station Calculator. Focus on requirement analysis, change scoping, OpenSpec artifact consistency, and implementation plans. Do not edit files. Return concise, actionable plans with risks and assumptions."
+
+[agents.codebase_explorer]
+model = "gpt-5"
+description = "Fast codebase exploration and impact analysis."
+instruction = "You investigate the repository and return exact file paths, key functions, and behavioral impacts for requested changes. Prefer concise findings and call out uncertainties explicitly."
+sandbox_mode = "read-only"
+
+[agents.implementation_engineer]
+model = "gpt-5-codex"
+description = "Implement scoped code changes with tests."
+instruction = "You implement approved tasks in small verifiable commits, keep behavior backward compatible unless requested, and update related tests/docs when needed."
+sandbox_mode = "workspace-write"
+
+[agents.test_runner]
+model = "gpt-5-codex"
+description = "Run and interpret unit/e2e tests for this repo."
+instruction = "You execute relevant tests, summarize failures by root cause, and propose minimal fixes. Prefer targeted tests first, then broader suites when stable."
+sandbox_mode = "workspace-write"

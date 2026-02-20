@@ -3,6 +3,7 @@ import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useI18n } from 'vue-i18n'
 import type { StationType } from '@/types/x4'
+import draggable from 'vuedraggable'
 
 const empireStore = useEmpireStore()
 const { t } = useI18n()
@@ -21,6 +22,14 @@ const stations = computed(() => {
 })
 
 const activeStationId = computed(() => empireStore.activeStationId)
+const isDraggingTabs = ref(false)
+
+const sortableStations = computed({
+  get: () => stations.value,
+  set: (reorderedStations) => {
+    empireStore.reorderStations(reorderedStations)
+  }
+})
 
 // 图标映射
 const getStationIcon = (type?: StationType): string => {
@@ -129,20 +138,32 @@ const cancelDelete = () => {
 
       <div class="h-6 w-px bg-slate-700/50 mx-1 self-center"></div>
 
-      <div
-        v-for="station in stations"
-        :key="station.id"
-        class="tab-item station-tab"
-        :class="{ 'active': activeStationId === station.id }"
-        @click="selectStation(station.id)"
-        @contextmenu.stop="openMenu(station.id, $event)"
+      <draggable
+        v-model="sortableStations"
+        item-key="id"
+        class="tabs-draggable-list"
+        ghost-class="tab-drag-ghost"
+        chosen-class="tab-drag-chosen"
+        drag-class="tab-dragging"
+        :animation="160"
+        @start="isDraggingTabs = true"
+        @end="isDraggingTabs = false"
       >
-        <div class="tab-highlight"></div>
-        <div class="tab-content">
-          <span class="tab-icon">{{ getStationIcon(station.type) }}</span>
-          <span class="tab-label max-w-[120px] truncate">{{ station.name }}</span>
-        </div>
-      </div>
+        <template #item="{ element: station }">
+          <div
+            class="tab-item station-tab"
+            :class="{ 'active': activeStationId === station.id, 'is-dragging': isDraggingTabs }"
+            @click="selectStation(station.id)"
+            @contextmenu.stop="openMenu(station.id, $event)"
+          >
+            <div class="tab-highlight"></div>
+            <div class="tab-content">
+              <span class="tab-icon">{{ getStationIcon(station.type) }}</span>
+              <span class="tab-label max-w-[120px] truncate">{{ station.name }}</span>
+            </div>
+          </div>
+        </template>
+      </draggable>
 
       <button class="add-btn" @click="addNewStation" :title="t('empire.add_station')">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -208,6 +229,10 @@ const cancelDelete = () => {
   @apply flex items-end h-full px-4 gap-1 overflow-x-auto;
   scrollbar-width: none; /* Firefox */
 }
+
+.tabs-draggable-list {
+  @apply flex items-end gap-1;
+}
 .tabs-scroll-area::-webkit-scrollbar {
   display: none; /* Chrome/Safari */
 }
@@ -219,6 +244,27 @@ const cancelDelete = () => {
   @apply hover:bg-slate-800/60 hover:text-slate-200;
   /* 关键：让 Tab 看起来像是插在底座上的卡片 */
   min-width: 100px;
+}
+
+.station-tab {
+  @apply cursor-grab;
+}
+
+.station-tab:active,
+.station-tab.is-dragging {
+  @apply cursor-grabbing;
+}
+
+.tab-drag-ghost {
+  @apply opacity-40 border-sky-500 border-dashed bg-slate-700/60;
+}
+
+.tab-drag-chosen {
+  @apply shadow-lg shadow-sky-900/20;
+}
+
+.tab-dragging {
+  @apply opacity-90;
 }
 
 /* 选中状态 */

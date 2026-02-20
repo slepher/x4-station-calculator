@@ -56,16 +56,24 @@
 ```typescript
 // 在 StationWareFlowsDashboard.vue 中
 const empireStore = useEmpireStore()
+const gameData = useGameDataStore()
 
 const empireGaps = computed(() => {
   const flows = empireStore.empireGroupedFlows
-  const operations = [...flows.operations, ...flows.products].filter(f => {
+  const operations = flows.empireGroups.operations.filter(f => {
     const priorityLevel = warePriorityLevels[f.wareId] ?? 0
     return f.netRate < 0 || priorityLevel > 0
   })
+  const plannedModuleIds = new Set(
+    store.plannedModules.filter(m => m.count > 0).map(m => m.id)
+  )
+  const supply = flows.empireGroups.supply.filter(f => {
+    const module = gameData.findModuleForWare(f.wareId, store.settings.racePreference)
+    return f.netRate < 0 || (!!module && plannedModuleIds.has(module.id))
+  })
   return {
     operations,
-    supply: flows.supply
+    supply
   }
 })
 ```
@@ -166,7 +174,13 @@ const handleAddModule = (wareId: string) => {
 - 符合用户期望的"缺口优先"阅读顺序
 - 不影响现有的分组布局
 - 仅在资源视图显示
-- 帝国运营组内排序：tier 高的在前，同 tier 按字母序
+- 直接复用 `empireStore` 的排序结果，避免页面层二次排序
+- 帝国补给对 `netRate > 0` 的项仅显示当前站 `plannedModules` 中存在对应模块的资源
+
+**不再额外排序的理由**:
+- 避免双重排序导致顺序漂移
+- 保持排序规则单点维护（单一事实来源）
+- 拆分/过滤仅做展示映射，不改动数据顺序
 
 **实现**:
 ```vue

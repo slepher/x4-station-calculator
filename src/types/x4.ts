@@ -342,7 +342,6 @@ export interface EmpireWareFlow {
 export interface EmpireGroupedFlows {
   flows: EmpireWareFlow[];
   empireGroups: {
-    products: EmpireWareFlow[];
     operations: EmpireWareFlow[];
     supply: EmpireWareFlow[];
   };

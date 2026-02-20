@@ -32,7 +32,8 @@ vi.mock('@/store/useStationStore', () => ({
       energycells: { id: 'energycells', name: 'Energy Cells' },
       microchips: { id: 'microchips', name: 'Microchips' },
       foodrations: { id: 'foodrations', name: 'Food Rations' },
-      medicalsupplies: { id: 'medicalsupplies', name: 'Medical Supplies' }
+      medicalsupplies: { id: 'medicalsupplies', name: 'Medical Supplies' },
+      spices: { id: 'spices', name: 'Spices' }
     },
     addModule: vi.fn()
   })
@@ -45,14 +46,13 @@ vi.mock('@/store/useEmpireStore', () => ({
       empireGroups: {
         operations: [
           { wareId: 'ore', netRate: -10, netValue: -100, contributions: [] },
-          { wareId: 'energycells', netRate: 5, netValue: 50, contributions: [] }
-        ],
-        products: [
+          { wareId: 'energycells', netRate: 5, netValue: 50, contributions: [] },
           { wareId: 'microchips', netRate: 8, netValue: 80, contributions: [] }
         ],
         supply: [
           { wareId: 'foodrations', netRate: -2, netValue: -20, contributions: [] },
-          { wareId: 'medicalsupplies', netRate: 0, netValue: 0, contributions: [] }
+          { wareId: 'medicalsupplies', netRate: 0, netValue: 0, contributions: [] },
+          { wareId: 'spices', netRate: 3, netValue: 30, contributions: [] }
         ]
       }
     }
@@ -70,7 +70,7 @@ vi.mock('@/store/useGameDataStore', () => ({
 import StationWareFlowsDashboard from '@/components/StationWareFlowsDashboard.vue'
 
 describe('帝国运营/补给过滤逻辑', () => {
-  it('保留 netRate < 0 或 priority > 0 的运营/产品项，并保留全部补给项', () => {
+  it('保留 netRate < 0 或 priority > 0 的运营项，并按 plannedModules 过滤 netRate > 0 的补给项', () => {
     const wrapper = shallowMount(StationWareFlowsDashboard)
     const groups = wrapper.findAllComponents({ name: 'EmpireWareFlowGroup' })
 
@@ -85,8 +85,9 @@ describe('帝国运营/补给过滤逻辑', () => {
     const operationIds = operationItems.map(item => item.id)
     const supplyIds = supplyItems.map(item => item.id)
 
-    expect(operationIds).toEqual(['microchips', 'ore'])
+    expect(operationIds).toEqual(['ore', 'microchips'])
     expect(supplyIds).toEqual(['foodrations', 'medicalsupplies'])
+    expect(supplyIds).not.toContain('spices')
 
     const microchips = operationItems.find(item => item.id === 'microchips')
     const ore = operationItems.find(item => item.id === 'ore')

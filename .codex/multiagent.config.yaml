@@ -1,0 +1,176 @@
+version: 1
+name: x4-station-calculator-multiagent
+description: Multi-agent orchestration aligned with current /x4 workflow and OpenSpec skills.
+
+defaults:
+  language: follow_user
+  planning_write_scope: "openspec/**"
+  implement_write_scope: "src/**,tests/**,openspec/**"
+  must_update_together:
+    - "openspec/changes/<change>/test_tasks.md"
+    - "openspec/changes/<change>/ui_knowledge.md"
+
+routing:
+  "/x4:discuss":
+    pipeline: [workflow_orchestrator, discuss_analyst]
+  "/x4:doc":
+    pipeline: [workflow_orchestrator, doc_editor]
+  "/x4:new":
+    pipeline: [workflow_orchestrator, change_creator]
+  "/x4:ff":
+    pipeline: [workflow_orchestrator, fast_forward_creator]
+  "/x4:apply":
+    pipeline: [workflow_orchestrator, implementer, bug_tracker]
+  "/x4:verify":
+    pipeline: [workflow_orchestrator, verifier, test_engineer]
+  "/x4:archive":
+    pipeline: [workflow_orchestrator, archiver]
+  default:
+    pipeline: [workflow_orchestrator, implementer]
+
+agents:
+  workflow_orchestrator:
+    role: "Phase router and guardrail enforcer"
+    use_skills:
+      - x4-user-workflow
+    responsibilities:
+      - "Parse command phase and choose agent pipeline."
+      - "Enforce zero-code policy before /x4:apply."
+      - "Require request.md as source of truth when entering /x4:new or /x4:ff from discuss."
+      - "Ensure language follows current user language."
+      - "Ensure immutable spec headers remain English."
+
+  discuss_analyst:
+    role: "Discussion and requirement clarification"
+    use_skills:
+      - openspec-explore
+    inputs:
+      - "User problem statement"
+      - "Existing specs/code for analysis"
+    outputs:
+      - "Implementation-ready plan"
+      - "request.md draft checklist"
+    constraints:
+      - "No source-code edits."
+      - "No docs edits unless explicitly requested."
+
+  doc_editor:
+    role: "Documentation/spec updater"
+    use_skills:
+      - x4-doc
+      - openspec-sync-specs
+    outputs:
+      - "Updated spec/test docs under openspec/"
+    constraints:
+      - "Do not edit src/ or tests/."
+
+  change_creator:
+    role: "Step-by-step artifact creation"
+    use_skills:
+      - openspec-new-change
+    required_inputs:
+      - "change_name"
+      - "request.md (if from discuss)"
+    required_outputs:
+      - "proposal/spec/design/tasks/test_tasks"
+
+  fast_forward_creator:
+    role: "One-pass artifact creation"
+    use_skills:
+      - x4-ff
+      - openspec-ff-change
+    required_outputs:
+      - "request.md"
+      - "proposal.md"
+      - "design.md"
+      - "tasks.md"
+      - "test_tasks.md"
+      - "ui_knowledge.md"
+
+  implementer:
+    role: "Code implementation"
+    use_skills:
+      - openspec-apply-change
+    required_inputs:
+      - "openspec/changes/<change>/tasks.md"
+      - "openspec/changes/<change>/design.md"
+      - "openspec/changes/<change>/specs/**/spec.md"
+    required_outputs:
+      - "Code changes"
+      - "tasks.md checkbox updates"
+
+  bug_tracker:
+    role: "Bug lifecycle owner during implementation"
+    use_skills:
+      - x4-bug
+    responsibilities:
+      - "When bug discovered: record in bugs.md, add reproduction test, verify fail, fix, verify pass."
+
+  verifier:
+    role: "Spec/task/code coherence verification"
+    use_skills:
+      - openspec-verify-change
+    required_outputs:
+      - "Static verification report"
+      - "Completion status across tasks/spec/design"
+
+  test_engineer:
+    role: "Unit + E2E test author/runner"
+    use_skills:
+      - x4-test
+      - x4-drag-test
+    required_inputs:
+      - "openspec/changes/<change>/test_tasks.md"
+      - "openspec/test_experience.md"
+    required_outputs:
+      - "tests/unit/<change>/*.spec.ts"
+      - "tests/e2e/<change>/*.spec.ts"
+      - "Updated test_tasks.md"
+      - "Updated openspec/test_experience.md"
+      - "Updated ui_knowledge.md"
+
+  archiver:
+    role: "Archive completed change and promote specs"
+    use_skills:
+      - openspec-archive-change
+      - openspec-bulk-archive-change
+    required_inputs:
+      - "All test_tasks checklist items are [x]"
+    required_outputs:
+      - "Archived change"
+      - "Promoted/merged main specs"
+
+handoff_contracts:
+  - from: discuss_analyst
+    to: change_creator
+    requires:
+      - "request.md complete and approved"
+  - from: change_creator
+    to: implementer
+    requires:
+      - "tasks.md complete"
+      - "test_tasks.md complete"
+  - from: implementer
+    to: verifier
+    requires:
+      - "tasks.md updated with progress"
+  - from: verifier
+    to: test_engineer
+    requires:
+      - "No blocking static mismatch"
+  - from: test_engineer
+    to: archiver
+    requires:
+      - "All tests passed"
+      - "test_tasks.md all checked"
+
+quality_gates:
+  - name: planning_zero_code
+    when: ["/x4:discuss", "/x4:doc", "/x4:new", "/x4:ff"]
+    rule: "Reject any src/** or tests/** edits."
+  - name: verify_no_skip
+    when: ["/x4:verify"]
+    rule: "Reject completion if x4-test stage not executed."
+  - name: archive_no_skip
+    when: ["/x4:archive"]
+    rule: "Reject archive if any test_tasks item is unchecked."

@@ -41,9 +41,9 @@ const getGroupSymboledValue = (group: any[]) => {
 
 const title = () => {
   if (viewMode.value === 'quantity') {
-    return t('wareflow.resource_overview')
+    return t('wareflow.resource_view')
   } else {
-    return t('wareflow.profit_title')
+    return t('wareflow.economy_view')
   }
 }
 
@@ -54,6 +54,8 @@ const modes = computed<{key: ViewMode; title: string}[]>(() => [
 
 const empireGroups = computed(() => {
   const groups = empireGroupedFlows.value.empireGroups
+  const products = groups.operations.filter(item => item.netRate > 0)
+  const operations = groups.operations.filter(item => item.netRate <= 0)
   
   const getSupplyTitle = () => {
     const supplyValue = groups.supply.reduce((sum, item) => sum + item.netValue, 0)
@@ -67,13 +69,13 @@ const empireGroups = computed(() => {
       key: 'products',
       symbolClass: 'positive',
       title: viewMode.value === 'economy' ? t('wareflow.products_income_group') : t('wareflow.products_group'),
-      items: groups.products.map(wrapFlow)
+      items: products.map(wrapFlow)
     },
     {
       key: 'operations',
       symbolClass: 'negative',
       title: viewMode.value === 'economy' ? t('wareflow.operations_expense_group') : t('wareflow.operations_group'),
-      items: groups.operations.map(wrapFlow)
+      items: operations.map(wrapFlow)
     },
     {
       key: 'supply',
@@ -101,9 +103,6 @@ const empireGroups = computed(() => {
           </button>
         </div>
 
-        <span class="header-badge">
-          {{ t('wareflow.hourly_rate') }}
-        </span>
       </div>
     </div>
 

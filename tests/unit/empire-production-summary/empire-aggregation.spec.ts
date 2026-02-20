@@ -95,6 +95,14 @@ function createMockStation(id: string, name: string, count: number = 1): Station
   }
 }
 
+function getProducts(result: ReturnType<typeof analyzeEmpireWareFlow>) {
+  return result.empireGroups.operations.filter(flow => flow.netRate > 0)
+}
+
+function getOperations(result: ReturnType<typeof analyzeEmpireWareFlow>) {
+  return result.empireGroups.operations.filter(flow => flow.netRate <= 0)
+}
+
 describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
   it('补给组数据正确聚合', () => {
     const station1 = createMockStation('station-1', 'Station 1', 1)
@@ -204,10 +212,12 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
 
     const result = analyzeEmpireWareFlow([station], (id) => cache.get(id) || null)
 
-    expect(result.empireGroups.products.length).toBe(1)
-    expect(result.empireGroups.products[0].wareId).toBe('claytronics')
-    expect(result.empireGroups.products[0].netRate).toBe(432)
-    expect(result.empireGroups.operations.length).toBe(0)
+    const products = getProducts(result)
+    const operations = getOperations(result)
+    expect(products.length).toBe(1)
+    expect(products[0].wareId).toBe('claytronics')
+    expect(products[0].netRate).toBe(432)
+    expect(operations.length).toBe(0)
   })
 
   it('运营组数据正确归类（netRate < 0）', () => {
@@ -249,10 +259,12 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
 
     const result = analyzeEmpireWareFlow([station], (id) => cache.get(id) || null)
 
-    expect(result.empireGroups.operations.length).toBe(1)
-    expect(result.empireGroups.operations[0].wareId).toBe('quantumtubes')
-    expect(result.empireGroups.operations[0].netRate).toBe(-70)
-    expect(result.empireGroups.products.length).toBe(0)
+    const products = getProducts(result)
+    const operations = getOperations(result)
+    expect(operations.length).toBe(1)
+    expect(operations[0].wareId).toBe('quantumtubes')
+    expect(operations[0].netRate).toBe(-70)
+    expect(products.length).toBe(0)
   })
 
   it('数量为 0 的空间站不参与计算', () => {
@@ -321,9 +333,10 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
 
     const result = analyzeEmpireWareFlow([station1, station2], (id) => cache.get(id) || null)
 
-    expect(result.empireGroups.products.length).toBe(1)
-    expect(result.empireGroups.products[0].wareId).toBe('hullparts')
-    expect(result.empireGroups.products[0].production).toBe(200)
+    const products = getProducts(result)
+    expect(products.length).toBe(1)
+    expect(products[0].wareId).toBe('hullparts')
+    expect(products[0].production).toBe(200)
   })
 
   it('数量 > 1 的空间站数据正确乘以倍数', () => {
@@ -362,9 +375,10 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
 
     const result = analyzeEmpireWareFlow([station], (id) => cache.get(id) || null)
 
-    expect(result.empireGroups.products[0].production).toBe(300)
-    expect(result.empireGroups.products[0].netRate).toBe(300)
-    expect(result.empireGroups.products[0].netValue).toBe(300000)
+    const products = getProducts(result)
+    expect(products[0].production).toBe(300)
+    expect(products[0].netRate).toBe(300)
+    expect(products[0].netValue).toBe(300000)
   })
 
   it('候选数据中的 supply wareId 优先归入补给组', () => {
@@ -425,8 +439,10 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
     expect(result.empireGroups.supply.length).toBe(1)
     expect(result.empireGroups.supply[0].wareId).toBe('foodrations')
     expect(result.empireGroups.supply[0].netRate).toBe(-90)
-    expect(result.empireGroups.products.length).toBe(0)
-    expect(result.empireGroups.operations.length).toBe(0)
+    const products = getProducts(result)
+    const operations = getOperations(result)
+    expect(products.length).toBe(0)
+    expect(operations.length).toBe(0)
   })
 
   it('候选数据命中 supply 时与补给组聚合结果合并', () => {
@@ -519,8 +535,8 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
     expect(supply!.netRate).toBe(-65)
     expect(supply!.production).toBe(15)
     expect(supply!.consumption).toBe(80)
-    expect(result.empireGroups.products.find(flow => flow.wareId === 'medicalsupplies')).toBeUndefined()
-    expect(result.empireGroups.operations.find(flow => flow.wareId === 'medicalsupplies')).toBeUndefined()
+    expect(getProducts(result).find(flow => flow.wareId === 'medicalsupplies')).toBeUndefined()
+    expect(getOperations(result).find(flow => flow.wareId === 'medicalsupplies')).toBeUndefined()
   })
 })
 
@@ -604,9 +620,10 @@ describe('EmpireFlowAtom 数据结构测试', () => {
 
     const result = analyzeEmpireWareFlow([station], (id) => cache.get(id) || null)
 
-    expect(result.empireGroups.products[0].contributions.length).toBe(1)
+    const products = getProducts(result)
+    expect(products[0].contributions.length).toBe(1)
     
-    const contribution = result.empireGroups.products[0].contributions[0]
+    const contribution = products[0].contributions[0]
     expect(contribution.stationId).toBe('station-1')
     expect(contribution.stationName).toBe('Test Station')
     expect(contribution.stationCount).toBe(2)

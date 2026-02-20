@@ -213,3 +213,61 @@ describe('EmpireStore - 站内补给开关', () => {
     expect(updatedStation?.settings.considerWorkforceForAutoFill).toBe(true)
   })
 })
+
+describe('EmpireStore - 分站标签排序与持久化边界', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    localStorage.clear()
+    sessionStorage.clear()
+  })
+
+  it('运行时重排应立即更新 activeEmpire.stations 顺序', async () => {
+    const store = useEmpireStore()
+    await vi.waitFor(() => expect(store.isReady).toBe(true), { timeout: 3000 })
+
+    store.createStation('A', 'industrial')
+    store.createStation('B', 'industrial')
+    store.createStation('C', 'industrial')
+
+    const beforeOrder = store.activeEmpire!.stations.map(s => s.name)
+    expect(beforeOrder).toEqual(['A', 'B', 'C'])
+
+    const moved = store.activeEmpire!.stations.splice(2, 1)[0]!
+    store.activeEmpire!.stations.splice(0, 0, moved)
+
+    const afterOrder = store.activeEmpire!.stations.map(s => s.name)
+    expect(afterOrder).toEqual(['C', 'A', 'B'])
+  })
+
+  it('重排不会自动保存，需显式调用 saveEmpire 才会持久化', async () => {
+    const store = useEmpireStore()
+    await vi.waitFor(() => expect(store.isReady).toBe(true), { timeout: 3000 })
+
+    store.createStation('A', 'industrial')
+    store.createStation('B', 'industrial')
+    store.createStation('C', 'industrial')
+    store.saveEmpire()
+
+    const savedBeforeReorder = JSON.parse(localStorage.getItem('x4_empire_data')!)
+    const savedOrderBefore = savedBeforeReorder.list[0].stations.map((s: { name: string }) => s.name)
+    expect(savedOrderBefore).toEqual(['A', 'B', 'C'])
+    expect(store.isDirty).toBe(false)
+
+    const moved = store.activeEmpire!.stations.splice(2, 1)[0]!
+    store.activeEmpire!.stations.splice(0, 0, moved)
+
+    expect(store.activeEmpire!.stations.map(s => s.name)).toEqual(['C', 'A', 'B'])
+    expect(store.isDirty).toBe(true)
+
+    const snapshotWithoutSave = JSON.parse(localStorage.getItem('x4_empire_data')!)
+    const orderWithoutSave = snapshotWithoutSave.list[0].stations.map((s: { name: string }) => s.name)
+    expect(orderWithoutSave).toEqual(['A', 'B', 'C'])
+
+    store.saveEmpire()
+    expect(store.isDirty).toBe(false)
+
+    const snapshotAfterSave = JSON.parse(localStorage.getItem('x4_empire_data')!)
+    const orderAfterSave = snapshotAfterSave.list[0].stations.map((s: { name: string }) => s.name)
+    expect(orderAfterSave).toEqual(['C', 'A', 'B'])
+  })
+})

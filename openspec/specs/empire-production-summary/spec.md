@@ -78,11 +78,11 @@
 - **并且** 按 `wareId` 汇总所有补给数据
 - **并且** 数据 SHALL 乘以各站的 `count`
 
-### Requirement: 产品组与运营组聚合 (Products and Operations Aggregation)
-系统 SHALL 从各空间站的 `rateGroups.operations` 和 `rateGroups.positive`（过滤 `warePriority > 0`）中获取候选数据，并在归类时先判断补给归属：
+### Requirement: 运营组聚合 (Operations Aggregation)
+系统 SHALL 从各空间站的 `rateGroups.operations` 和 `rateGroups.positive`（过滤 `warePriority > 0`）中获取候选数据，并在聚合层产出统一的“运营组”：
 - 如果 `wareId` 属于 `supply`，SHALL 优先归入补给组
-- `netRate > 0` 归为产品组
-- `netRate < 0` 归为运营组
+- 非补给资源统一归入运营组（不在聚合层拆分为产品/运营）
+- 运营组与补给组 SHALL 在聚合层完成排序
 - 跳过 `count` 为 `0` 的空间站
 - 数据乘以 `count` 倍数
 
@@ -92,21 +92,14 @@
 - **那么** 该 `wareId` SHALL 归入补给组
 - **并且** SHALL 不参与产品组与运营组的 `netRate` 判定
 
-#### Scenario: 产品组数据聚合
+#### Scenario: 运营组数据聚合
 - **前提** 某物品在多个空间站有产出和消耗
-- **当** 系统计算帝国级产品组
+- **当** 系统计算帝国级运营组
 - **那么** 系统 SHALL 从各站的 `rateGroups.operations` 获取数据
 - **并且** 从各站的 `rateGroups.positive` 中过滤 `warePriority > 0` 的数据
-- **并且** 仅当该物品 `wareId` 不属于 `supply` 时参与产品组判定
-- **并且** 汇总后 `netRate > 0` 的物品 SHALL 归为产品组
+- **并且** 仅当该物品 `wareId` 不属于 `supply` 时参与运营组聚合
 - **并且** 数据 SHALL 乘以各站的 `count`
-
-#### Scenario: 运营组数据聚合
-- **前提** 某物品在多个空间站有消耗
-- **当** 系统计算帝国级运营组
-- **那么** 系统 SHALL 使用与产品组相同的数据源
-- **并且** 仅当该物品 `wareId` 不属于 `supply` 时参与运营组判定
-- **并且** 汇总后 `netRate < 0` 的物品 SHALL 归为运营组
+- **并且** 聚合结果 SHALL 在聚合层排序
 
 ### Requirement: 帝国视图组件 (Empire View Component)
 系统 SHALL 提供 `EmpireWareFlowsDashboard` 组件，复制 `StationWareFlowsDashboard` 的两级子模块结构：
@@ -119,35 +112,53 @@
 - **那么** 系统 SHALL 渲染 `EmpireWareFlowsDashboard` 组件
 - **并且** 组件 SHALL 显示产品组、运营组、补给组三个分组
 
+### Requirement: 帝国总览运营拆分展示 (Operations Split Display in Empire Overview)
+系统 SHALL 在帝国总览展示层将聚合层产出的运营组按 `netRate` 拆分为产品组与运营组：
+- `netRate > 0` 显示在产品组
+- `netRate <= 0` 显示在运营组
+- 拆分展示 SHALL 不执行额外排序（沿用聚合层顺序）
+
+#### Scenario: 按净产量拆分运营组
+- **前提** 运营组中同时存在 `netRate > 0` 与 `netRate <= 0` 的资源
+- **当** 用户查看帝国总览数量视图
+- **那么** 系统 SHALL 将 `netRate > 0` 显示在产品组
+- **并且** 将 `netRate <= 0` 显示在运营组
+- **并且** 拆分后显示顺序 SHALL 与聚合层顺序一致
+
 ### Requirement: 双视图切换 (Dual View Switching)
 系统 SHALL 在帝国视图中提供数量视图和经济视图切换：
 - 数量视图：显示净产量（/h）
 - 经济视图：显示经济价值（Credits/h）
+- 标题文案：数量视图显示“资源视图”，经济视图显示“经济视图”
+- 头部不显示“每小时流量”标签
 
 #### Scenario: 数量视图显示
 - **前提** 用户在帝国总览界面
 - **当** 用户选择数量视图
 - **那么** 系统 SHALL 显示每个物品的净产量
+- **并且** 标题 SHALL 显示为“资源视图”
+- **并且** 头部 SHALL 不显示“每小时流量”标签
 - **并且** 分组标题 SHALL 显示为"产品"、"运营"、"补给"
 
 #### Scenario: 经济视图显示
 - **前提** 用户在帝国总览界面
 - **当** 用户选择经济视图
 - **那么** 系统 SHALL 显示每个物品的经济价值
+- **并且** 标题 SHALL 显示为“经济视图”
+- **并且** 头部 SHALL 不显示“每小时流量”标签
 - **并且** 分组标题 SHALL 显示为"产品收入"、"运营支出"、"补给"
 
 ### Requirement: 产物明细展示 (Contribution Details Display)
 系统 SHALL 在展开物品明细时显示各空间站的贡献：
-- 空间站名称
-- 空间站数量（如果大于 1）
+- 空间站数量 + x + 空间站名称（三段式）
 - 该空间站对该物品的产出/消耗量
 
 #### Scenario: 展开明细
 - **前提** 用户点击某个物品
 - **当** 明细面板展开
 - **那么** 系统 SHALL 显示所有贡献该物品的空间站
-- **并且** 每个空间站 SHALL 显示名称和产出/消耗量
-- **并且** 如果空间站 `count > 1`，SHALL 显示数量倍数
+- **并且** 每个空间站 SHALL 显示“数量 + x + 名称”和产出/消耗量
+- **并且** 数量展示样式 SHALL 与 `StationWareFlow.vue` 一致
 
 ### Requirement: 补给组收支显示 (Supply Group Income/Expense Display)
 补给组 SHALL 根据净产量的正负显示为"补给收入"或"补给支出"：

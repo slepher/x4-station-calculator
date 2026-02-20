@@ -28,11 +28,11 @@
 - [ ] 开启后，空间站视图顶部显示缺口分组
 - [ ] 分组**仅在资源视图显示**，经济视图与体积视图不显示
 - [ ] 显示顺序：帝国运营 → 帝国补给 → 产品 → 运营 → 补给 → 资源
-- [ ] 帝国运营：来自 `empireGroupedFlows.operations` + `empireGroupedFlows.products` 的合并结果
+- [ ] 帝国运营：来自 `empireGroupedFlows.empireGroups.operations`
 - [ ] 帝国运营过滤：`netRate < 0` **或** 当前有效 `priority > 0` 的项
 - [ ] priority 使用空间站内“修正后的优先级”计算结果（非原始覆盖值）
-- [ ] 帝国运营内部排序：tier 高的在前，同 tier 以字母序排序
-- [ ] 帝国补给：来自 `empireGroupedFlows.supply`，**不再按 netRate 过滤**，全部显示
+- [ ] 帝国运营分组直接使用 `empireStore` 的数据顺序，不在页面层额外排序
+- [ ] 帝国补给：来自 `empireGroupedFlows.supply`，过滤规则为 `netRate < 0`，或 `netRate > 0` 且在当前站 `plannedModules` 中存在对应模块
 - [ ] 如果某组过滤后为空，则不显示该组
 - [ ] 缺口项支持展开明细（显示各空间站贡献）
 

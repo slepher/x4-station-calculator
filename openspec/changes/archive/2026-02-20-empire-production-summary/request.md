@@ -164,7 +164,7 @@ for each station in stations:
       candidates[wareId].push(flow * multiplier)
 ```
 
-#### Step 3: 聚合后归类
+#### Step 3: 聚合后归类（聚合层）
 
 ```typescript
 for each wareId in candidates:
@@ -173,21 +173,23 @@ for each wareId in candidates:
     归为补给组
     continue
 
-  netRate = sum(flow.netRate)
-  
-  if netRate > 0:
-    归为产品组
-  else:
-    归为运营组
+  归为运营组
 ```
 
 ### 分组逻辑
 
 | 组别 | 数据来源 | 条件 |
 |------|---------|------|
-| 补给组 | `rateGroups.supply` + candidates 中 `wareId ∈ supplyWareSet` | 优先归类，乘以 count |
-| 产品组 | `rateGroups.operations` + `rateGroups.positive`（过滤 priority>0） | `wareId ∉ supplyWareSet` 且汇总后 netRate > 0 |
-| 运营组 | `rateGroups.operations` + `rateGroups.positive`（过滤 priority>0） | `wareId ∉ supplyWareSet` 且汇总后 netRate < 0 |
+| 补给组（聚合层） | `rateGroups.supply` + candidates 中 `wareId ∈ supplyWareSet` | 优先归类，乘以 count，聚合层排序 |
+| 运营组（聚合层） | `rateGroups.operations` + `rateGroups.positive`（过滤 priority>0） | `wareId ∉ supplyWareSet`，乘以 count，聚合层排序 |
+
+### 帝国总览展示拆分逻辑
+
+帝国总览页面从聚合层结果读取数据，并将“运营组（聚合层）”按 `netRate` 拆分为显示层的“产品/运营”：
+
+- 产品组：`netRate > 0`
+- 运营组：`netRate <= 0`
+- 此拆分过程不做额外排序，沿用聚合层顺序
 
 ### 视图设计
 
@@ -291,9 +293,8 @@ interface EmpireFlowAtom extends ModuleFlowAtom {
 interface EmpireGroupedFlows {
   flows: EmpireWareFlow[];
   empireGroups: {
-    products: EmpireWareFlow[];   // 产品组
-    operations: EmpireWareFlow[]; // 运营组
-    supply: EmpireWareFlow[];     // 补给组
+    operations: EmpireWareFlow[]; // 聚合层运营组
+    supply: EmpireWareFlow[];     // 聚合层补给组
   };
 }
 ```
@@ -357,10 +358,10 @@ function refreshStationFlowCache(stationId: string) {
 
 | priorityLevel | netRate > 0 | 处理方式 |
 |---------------|-------------|---------|
-| 0 | 是 | 忽略（不进 products，不进 operations） |
-| 1 | 是 | 进入 products（副产物） |
-| 2 | 是 | 进入 products（主产物） |
-| 任意 | 否 | 进入 operations |
+| 0 | 是 | 忽略（不进入运营聚合结果） |
+| 1 | 是 | 进入 operations（总览展示层再按 `netRate > 0` 归入产品组） |
+| 2 | 是 | 进入 operations（总览展示层再按 `netRate > 0` 归入产品组） |
+| 任意 | 否 | 进入 operations（总览展示层按 `netRate <= 0` 归入运营组） |
 
 ### 影响范围
 

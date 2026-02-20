@@ -151,6 +151,7 @@
   },
   "wareflow": {
     "resource_overview": "Resource Production",
+    "resource_view": "Resource View",
     "hourly_rate": "Hourly Rate",
     "quantity_view": "Quantity",
     "economy_view": "Economy",

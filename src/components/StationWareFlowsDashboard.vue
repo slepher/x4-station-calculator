@@ -65,11 +65,19 @@ const getModuleForWare = (wareId: string) =>
 const getPlannedModuleIndex = (moduleId: string) =>
   store.plannedModules.findIndex(module => module.id === moduleId)
 
+const empireFlowByWareId = computed(() => {
+  const map = new Map<string, any>()
+  const groups = empireStore.empireGroupedFlows.empireGroups
+  groups.operations.forEach(flow => map.set(flow.wareId, flow))
+  groups.supply.forEach(flow => map.set(flow.wareId, flow))
+  return map
+})
+
 const empireGaps = computed(() => {
   const flows = empireStore.empireGroupedFlows
   store.plannedModules
   locale.value
-  const operations = [...flows.empireGroups.operations, ...flows.empireGroups.products]
+  const operations = flows.empireGroups.operations
     .filter((flow: any) => flow.netRate < 0 || store.getResolvedLevel(flow.wareId) > 0)
     .map((flow: any) => {
       const module = getModuleForWare(flow.wareId)
@@ -80,22 +88,19 @@ const empireGaps = computed(() => {
         disableRemove: !module || plannedIndex === -1
       }
     })
-    .sort((a: any, b: any) => {
-      const tierDiff = (b.tier ?? 0) - (a.tier ?? 0)
-      if (tierDiff !== 0) return tierDiff
-      return a.name.localeCompare(b.name)
-    })
   return {
     operations,
-    supply: flows.empireGroups.supply.map((flow: any) => {
-      const module = getModuleForWare(flow.wareId)
-      const plannedIndex = module ? getPlannedModuleIndex(module.id) : -1
-      return {
-        ...wrapFlow(flow),
-        disableAdd: !module || flow.netRate > 0,
-        disableRemove: !module || plannedIndex === -1
-      }
-    })
+    supply: flows.empireGroups.supply
+      .map((flow: any) => {
+        const module = getModuleForWare(flow.wareId)
+        const plannedIndex = module ? getPlannedModuleIndex(module.id) : -1
+        return {
+          ...wrapFlow(flow),
+          disableAdd: !module || flow.netRate > 0,
+          disableRemove: !module || plannedIndex === -1
+        }
+      })
+      .filter((flow: any) => flow.netRate <= 0 || !flow.disableRemove)
   }
 })
 
@@ -115,9 +120,9 @@ const getGroupSymboledValue = (group: any[]) => {
 
 const title = () => {
   if (viewMode.value === 'quantity') {
-    return t('wareflow.resource_overview')
+    return t('wareflow.resource_view')
   } else if (viewMode.value === 'economy') {
-    return t('wareflow.profit_title')
+    return t('wareflow.economy_view')
   } else {
     return t('station.header_volume')
   }
@@ -162,9 +167,7 @@ const rateGroups = computed(() => ([
 const handleAddModule = (wareId: string) => {
   const module = getModuleForWare(wareId)
   if (!module) return
-  const flow = empireStore.empireGroupedFlows.empireGroups.operations
-    .concat(empireStore.empireGroupedFlows.empireGroups.products, empireStore.empireGroupedFlows.empireGroups.supply)
-    .find(item => item.wareId === wareId)
+  const flow = empireFlowByWareId.value.get(wareId)
   if (flow && flow.netRate > 0) return
   store.addModule(module.id, 1)
 }
@@ -200,9 +203,6 @@ const handleRemoveModule = (wareId: string) => {
           </button>
         </div>
 
-        <span class="header-badge">
-          {{ t('wareflow.hourly_rate') }}
-        </span>
       </div>
     </div>
 
