@@ -229,14 +229,57 @@ describe('EmpireStore - 分站标签排序与持久化边界', () => {
     store.createStation('B', 'industrial')
     store.createStation('C', 'industrial')
 
-    const beforeOrder = store.activeEmpire!.stations.map(s => s.name)
+    const beforeOrder = store.activeEmpire!.stations.map((s) => s.name)
     expect(beforeOrder).toEqual(['A', 'B', 'C'])
 
-    const moved = store.activeEmpire!.stations.splice(2, 1)[0]!
-    store.activeEmpire!.stations.splice(0, 0, moved)
+    const reordered = [
+      store.activeEmpire!.stations[2]!,
+      store.activeEmpire!.stations[0]!,
+      store.activeEmpire!.stations[1]!
+    ]
+    store.reorderStations(reordered)
 
-    const afterOrder = store.activeEmpire!.stations.map(s => s.name)
+    const afterOrder = store.activeEmpire!.stations.map((s) => s.name)
     expect(afterOrder).toEqual(['C', 'A', 'B'])
+  })
+
+  it('重排非法输入应被拒绝（长度不匹配、未知 ID、重复 ID）', async () => {
+    const store = useEmpireStore()
+    await vi.waitFor(() => expect(store.isReady).toBe(true), { timeout: 3000 })
+
+    store.createStation('A', 'industrial')
+    store.createStation('B', 'industrial')
+    store.createStation('C', 'industrial')
+
+    const originalOrder = store.activeEmpire!.stations.map((s) => s.id)
+    const stationA = store.activeEmpire!.stations[0]!
+    const stationB = store.activeEmpire!.stations[1]!
+
+    store.reorderStations([stationA, stationB])
+    expect(store.activeEmpire!.stations.map((s) => s.id)).toEqual(originalOrder)
+
+    const unknownStation = { ...store.activeEmpire!.stations[2]!, id: 'unknown-station-id' }
+    store.reorderStations([stationA, stationB, unknownStation as StationPlan])
+    expect(store.activeEmpire!.stations.map((s) => s.id)).toEqual(originalOrder)
+
+    store.reorderStations([stationA, stationA, store.activeEmpire!.stations[2]!])
+    expect(store.activeEmpire!.stations.map((s) => s.id)).toEqual(originalOrder)
+  })
+
+  it('重排后 activeStationId 应保持不变', async () => {
+    const store = useEmpireStore()
+    await vi.waitFor(() => expect(store.isReady).toBe(true), { timeout: 3000 })
+
+    const stationA = store.createStation('A', 'industrial')!
+    const stationB = store.createStation('B', 'industrial')!
+    const stationC = store.createStation('C', 'industrial')!
+
+    store.selectStation(stationB.id)
+    expect(store.activeStationId).toBe(stationB.id)
+
+    store.reorderStations([stationC, stationA, stationB])
+    expect(store.activeStationId).toBe(stationB.id)
+    expect(store.activeEmpire!.stations.map((s) => s.id)).toEqual([stationC.id, stationA.id, stationB.id])
   })
 
   it('重排不会自动保存，需显式调用 saveEmpire 才会持久化', async () => {
@@ -253,10 +296,14 @@ describe('EmpireStore - 分站标签排序与持久化边界', () => {
     expect(savedOrderBefore).toEqual(['A', 'B', 'C'])
     expect(store.isDirty).toBe(false)
 
-    const moved = store.activeEmpire!.stations.splice(2, 1)[0]!
-    store.activeEmpire!.stations.splice(0, 0, moved)
+    const reordered = [
+      store.activeEmpire!.stations[2]!,
+      store.activeEmpire!.stations[0]!,
+      store.activeEmpire!.stations[1]!
+    ]
+    store.reorderStations(reordered)
 
-    expect(store.activeEmpire!.stations.map(s => s.name)).toEqual(['C', 'A', 'B'])
+    expect(store.activeEmpire!.stations.map((s) => s.name)).toEqual(['C', 'A', 'B'])
     expect(store.isDirty).toBe(true)
 
     const snapshotWithoutSave = JSON.parse(localStorage.getItem('x4_empire_data')!)
@@ -269,5 +316,39 @@ describe('EmpireStore - 分站标签排序与持久化边界', () => {
     const snapshotAfterSave = JSON.parse(localStorage.getItem('x4_empire_data')!)
     const orderAfterSave = snapshotAfterSave.list[0].stations.map((s: { name: string }) => s.name)
     expect(orderAfterSave).toEqual(['C', 'A', 'B'])
+  })
+
+  it('重排后删除当前激活分站应回退到新顺序首站', async () => {
+    const store = useEmpireStore()
+    await vi.waitFor(() => expect(store.isReady).toBe(true), { timeout: 3000 })
+
+    const stationA = store.createStation('A', 'industrial')!
+    const stationB = store.createStation('B', 'industrial')!
+    const stationC = store.createStation('C', 'industrial')!
+
+    store.reorderStations([stationC, stationA, stationB])
+    store.selectStation(stationA.id)
+    store.deleteStation(stationA.id)
+
+    expect(store.activeEmpire!.stations.map((s) => s.id)).toEqual([stationC.id, stationB.id])
+    expect(store.activeStationId).toBe(stationC.id)
+  })
+
+  it('重排后复制分站应追加到末尾并激活新分站', async () => {
+    const store = useEmpireStore()
+    await vi.waitFor(() => expect(store.isReady).toBe(true), { timeout: 3000 })
+
+    const stationA = store.createStation('A', 'industrial')!
+    const stationB = store.createStation('B', 'industrial')!
+    const stationC = store.createStation('C', 'industrial')!
+    store.reorderStations([stationC, stationA, stationB])
+
+    const duplicated = store.duplicateStation(stationA.id)
+    expect(duplicated).toBeDefined()
+    expect(store.activeStationId).toBe(duplicated!.id)
+
+    const orderedIds = store.activeEmpire!.stations.map((s) => s.id)
+    expect(orderedIds.slice(0, 3)).toEqual([stationC.id, stationA.id, stationB.id])
+    expect(orderedIds[3]).toBe(duplicated!.id)
   })
 })

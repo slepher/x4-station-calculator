@@ -11,6 +11,7 @@ export default defineConfig({
   
   use: {
     baseURL: 'http://localhost:4173/x4-station-calculator/',
+    headless: true,
     trace: 'on-first-retry',
     locale: 'en-US',
     viewport: { width: 1920, height: 1080 },

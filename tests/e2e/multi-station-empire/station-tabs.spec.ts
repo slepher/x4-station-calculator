@@ -223,3 +223,128 @@ test.describe('多空间站帝国规划 - 分站视图数据绑定', () => {
     expect(activeAfterClick1b).toBe(false)
   })
 })
+
+test.describe('多空间站帝国规划 - 标签拖拽重排', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addStyleTag({
+      content: '*, *::before, *::after { transition: none !important; animation: none !important; }'
+    })
+    await page.goto('/')
+    await page.evaluate(() => {
+      localStorage.clear()
+      sessionStorage.clear()
+    })
+    await page.reload()
+    await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
+  })
+
+  const addStations = async (page: any, count: number) => {
+    const addBtn = page.locator('.add-btn')
+    for (let i = 0; i < count; i++) {
+      await addBtn.click()
+      await page.waitForTimeout(120)
+    }
+  }
+
+  const getStationOrder = async (page: any) => {
+    return await page.locator('.station-tab').evaluateAll((els) =>
+      els.map((el) => (el as HTMLElement).dataset.stationId || '')
+    )
+  }
+
+  const dragStationTab = async (page: any, fromIndex: number, toIndex: number) => {
+    const source = page.locator('.station-tab').nth(fromIndex)
+    const target = page.locator('.station-tab').nth(toIndex)
+
+    const sourceBox = await source.boundingBox()
+    const targetBox = await target.boundingBox()
+    if (!sourceBox || !targetBox) {
+      throw new Error('missing station tab bounding box')
+    }
+
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 20 })
+    await page.mouse.up()
+    await page.waitForTimeout(2000)
+  }
+
+  const dragWithRetry = async (page: any, fromIndex: number, toIndex: number) => {
+    const initialOrder = await getStationOrder(page)
+    for (let attempt = 0; attempt < 3; attempt++) {
+      await dragStationTab(page, fromIndex, toIndex)
+      const currentOrder = await getStationOrder(page)
+      if (currentOrder.join('|') !== initialOrder.join('|')) return
+    }
+    throw new Error('drag did not change station order after 3 attempts')
+  }
+
+  const getSavedEmpires = async (page: any) => {
+    return await page.evaluate(() => {
+      const data = localStorage.getItem('x4_empire_data')
+      if (!data) return null
+      return JSON.parse(data)
+    })
+  }
+
+  test('标签拖拽重排成功', async ({ page }) => {
+    await addStations(page, 3)
+    const beforeOrder = await getStationOrder(page)
+    expect(beforeOrder).toHaveLength(3)
+
+    await dragWithRetry(page, 2, 0)
+
+    const afterOrder = await getStationOrder(page)
+    expect(afterOrder).toHaveLength(3)
+    expect(afterOrder[0]).toBe(beforeOrder[2])
+    expect(afterOrder.join('|')).not.toBe(beforeOrder.join('|'))
+  })
+
+  test('帝国总览固定首位', async ({ page }) => {
+    await addStations(page, 3)
+    await dragWithRetry(page, 2, 0)
+
+    const firstTabClasses = await page.locator('.tabs-scroll-area > .tab-item').first().getAttribute('class')
+    expect(firstTabClasses || '').toContain('overview-tab')
+  })
+
+  test('保存并刷新后顺序保持', async ({ page }) => {
+    await addStations(page, 3)
+    await dragWithRetry(page, 2, 0)
+    const orderBeforeSave = await getStationOrder(page)
+
+    const saveBtn = page.locator('.btn-tool').filter({ hasText: /保存|Save/i }).first()
+    await saveBtn.click()
+    await page.waitForTimeout(200)
+
+    const savedEmpires = await getSavedEmpires(page)
+    const savedOrder = (savedEmpires?.list?.[0]?.stations ?? []).map((s: { id: string }) => s.id)
+    expect(savedOrder).toEqual(orderBeforeSave)
+
+    await page.reload()
+    await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
+
+    const orderAfterReload = await getStationOrder(page)
+    expect(orderAfterReload).toEqual(orderBeforeSave)
+  })
+
+  test('取消拖拽不改变顺序', async ({ page }) => {
+    await addStations(page, 3)
+    const beforeOrder = await getStationOrder(page)
+
+    const source = page.locator('.station-tab').nth(2)
+    const sourceBox = await source.boundingBox()
+    if (!sourceBox) {
+      throw new Error('missing source station tab bounding box')
+    }
+
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 40, sourceBox.y + sourceBox.height / 2 + 120, { steps: 12 })
+    await page.mouse.up()
+    await page.waitForTimeout(300)
+
+    const afterOrder = await getStationOrder(page)
+    expect(afterOrder).toEqual(beforeOrder)
+  })
+})

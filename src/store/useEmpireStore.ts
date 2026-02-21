@@ -304,8 +304,9 @@ export const useEmpireStore = defineStore('empire', () => {
     const currentStations = activeEmpire.value.stations
     if (reorderedStations.length !== currentStations.length) return
 
-    const currentIds = new Set(currentStations.map(station => station.id))
-    if (reorderedStations.some(station => !currentIds.has(station.id))) return
+    const reorderedIdSet = new Set(reorderedStations.map(station => station.id))
+    if (reorderedIdSet.size !== currentStations.length) return
+    if (currentStations.some(station => !reorderedIdSet.has(station.id))) return
 
     activeEmpire.value.stations = [...reorderedStations]
   }

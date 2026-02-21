@@ -110,7 +110,8 @@ test('drag item from candidate to planning zone', async ({ page }) => {
 
 1. **Use `steps` parameter**: `page.mouse.move(x, y, { steps: 20 })` ensures vuedraggable receives move events
 2. **Assert before `mouse.up()`**: Test hover/highlight states while dragging
-3. **Wait after drop**: `await page.waitForTimeout(300)` for data updates
+3. **Wait after drop**: Use change-specific wait policy; default to `await page.waitForTimeout(2000)` for station-tab drag flows. If a change defines another value, follow that change's docs.
+4. **Retry policy**: For flaky drag assertions, retry drag operation up to 2 times when the change doc requires it.
 
 ---
 
@@ -156,13 +157,15 @@ const handleDragEnd = () => {
 
 ---
 
-## Event Sequence Verification
+## Interaction Phase Verification
 
-| Scenario | Event Sequence |
-|----------|----------------|
-| 成功投放 | `dragstart` → `dragenter` → `drop` → `dragend` |
-| 取消拖拽 | `dragstart` → `dragend` (无 `drop`) |
-| 悬停后离开 | `dragstart` → `dragenter` → `dragleave` → `dragend` |
+Do not validate native HTML5 drag events directly. Validate interaction phases via UI/store-observable signals.
+
+| Scenario | Phase Sequence (UI/Store Observable) |
+|----------|--------------------------------------|
+| 成功投放 | pointer down → drag active → target hover → release → reorder applied |
+| 取消拖拽 | pointer down → drag active → release outside valid target → order unchanged |
+| 悬停后离开 | pointer down → drag active → target hover on → target hover off → release |
 
 ---
 

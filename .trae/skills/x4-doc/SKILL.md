@@ -15,10 +15,21 @@ User invokes `/x4:doc <change_name> [spec_name]`
 
 Update spec or documentation files based on discussion conclusions.
 
+## Document Detail Authority (MANDATORY)
+
+`x4-doc` is the single source of truth for document details used by both `/x4:new` and `/x4:ff`, including:
+- document structure and content conventions
+- writing style and localization rules
+- test documentation conventions (`test_tasks.md`, `ui_knowledge.md`)
+- documentation synchronization/update rules
+
+`x4-new` and `x4-ff` should orchestrate progression only and must not redefine these details.
+
 ## Parameters
 
 - `<change_name>`: The name of the change folder in `openspec/changes/` (e.g., `storage-auto-fill`). If it doesn't exist, create it.
 - `[spec_name]` (Optional): The sub-folder name for the spec (e.g., `storage-logic`). If provided, create `specs/<spec_name>/spec.md`. If omitted, use the change name or default location.
+- `<change_name>` accepts abbreviation token and must be resolved by `x4-user-workflow` "Change Name Resolution" rules.
 
 ## Input
 
@@ -82,6 +93,28 @@ When `/x4:doc` updates test-related docs, you **MUST** sync fixture-backed produ
   - Create `openspec/changes/<change-name>/ui_knowledge.md` and include the fixture mapping section
 - **Consistency rule**:
   - Keep naming in `test_tasks.md` and `ui_knowledge.md` aligned with fixture ids (avoid ad-hoc aliases unless explicitly documented)
+
+### 6. test_tasks Step Style (MANDATORY)
+
+When creating or updating `test_tasks.md` via `/x4:doc`, Web Integration items must use operation-level steps from the first draft:
+
+- Steps must be explicit UI actions in chronological order, e.g. click, input, rename, drag, save, refresh, wait for visible.
+- Steps must include concrete UI targets (button text/class, tab name, input field).
+- Do not use implementation wording in `步骤` (e.g. `mouse.move`, `boundingBox`, `locator()`, `evaluate()`, array diff logic).
+- If `test_tasks.md` step wording changes, sync equivalent operation wording to `ui_knowledge.md` in the same update.
+
+### 7. Task Scope Boundary (MANDATORY)
+
+When creating or updating planning artifacts:
+
+- `tasks.md` is implementation-only and MUST NOT include:
+  - writing test code
+  - running tests
+- Test work must be tracked in `test_tasks.md` and handled by test-phase skills.
+- `/x4:apply` scope MUST NOT include writing tests or running tests.
+- `/x4:apply` must include build validation after code writing is complete:
+  - `npm run build`
+  - if build has compile errors, fix code and rerun build until pass or explicit blocker
 
 ## Constraints
 

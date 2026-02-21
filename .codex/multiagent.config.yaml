@@ -21,8 +21,14 @@ routing:
     pipeline: [workflow_orchestrator, fast_forward_creator]
   "/x4:apply":
     pipeline: [workflow_orchestrator, implementer, bug_tracker]
+  "/x4:bug":
+    pipeline: [workflow_orchestrator, bug_tracker]
   "/x4:verify":
     pipeline: [workflow_orchestrator, verifier, test_engineer]
+  "/x4:test-impl":
+    pipeline: [workflow_orchestrator, test_engineer]
+  "/x4:test":
+    pipeline: [workflow_orchestrator, test_engineer]
   "/x4:archive":
     pipeline: [workflow_orchestrator, archiver]
   default:
@@ -37,13 +43,14 @@ agents:
       - "Parse command phase and choose agent pipeline."
       - "Enforce zero-code policy before /x4:apply."
       - "Require request.md as source of truth when entering /x4:new or /x4:ff from discuss."
-      - "Ensure language follows current user language."
+      - "Ensure responses follow user language inferred from conversation context by default; do not default to English when user input is empty."
+      - "If command includes language tag (e.g. #zh/#en), use tag language for that request."
       - "Ensure immutable spec headers remain English."
 
   discuss_analyst:
     role: "Discussion and requirement clarification"
     use_skills:
-      - openspec-explore
+      - x4-discuss
     inputs:
       - "User problem statement"
       - "Existing specs/code for analysis"
@@ -67,7 +74,7 @@ agents:
   change_creator:
     role: "Step-by-step artifact creation"
     use_skills:
-      - openspec-new-change
+      - x4-new
     required_inputs:
       - "change_name"
       - "request.md (if from discuss)"
@@ -78,7 +85,7 @@ agents:
     role: "One-pass artifact creation"
     use_skills:
       - x4-ff
-      - openspec-ff-change
+      - x4-doc
     required_outputs:
       - "request.md"
       - "proposal.md"
@@ -90,7 +97,7 @@ agents:
   implementer:
     role: "Code implementation"
     use_skills:
-      - openspec-apply-change
+      - x4-apply
     required_inputs:
       - "openspec/changes/<change>/tasks.md"
       - "openspec/changes/<change>/design.md"
@@ -109,7 +116,7 @@ agents:
   verifier:
     role: "Spec/task/code coherence verification"
     use_skills:
-      - openspec-verify-change
+      - x4-verify
     required_outputs:
       - "Static verification report"
       - "Completion status across tasks/spec/design"
@@ -117,6 +124,7 @@ agents:
   test_engineer:
     role: "Unit + E2E test author/runner"
     use_skills:
+      - x4-test-impl
       - x4-test
       - x4-drag-test
     required_inputs:
@@ -132,8 +140,7 @@ agents:
   archiver:
     role: "Archive completed change and promote specs"
     use_skills:
-      - openspec-archive-change
-      - openspec-bulk-archive-change
+      - x4-archive
     required_inputs:
       - "All test_tasks checklist items are [x]"
     required_outputs:
@@ -170,7 +177,7 @@ quality_gates:
     rule: "Reject any src/** or tests/** edits."
   - name: verify_no_skip
     when: ["/x4:verify"]
-    rule: "Reject completion if x4-test stage not executed."
+    rule: "Reject completion if x4-test-impl or x4-test stage not executed."
   - name: archive_no_skip
     when: ["/x4:archive"]
     rule: "Reject archive if any test_tasks item is unchecked."

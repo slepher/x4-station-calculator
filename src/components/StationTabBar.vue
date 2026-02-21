@@ -23,6 +23,7 @@ const stations = computed(() => {
 
 const activeStationId = computed(() => empireStore.activeStationId)
 const isDraggingTabs = ref(false)
+const lastTabDragEndAt = ref(0)
 
 const sortableStations = computed({
   get: () => stations.value,
@@ -44,6 +45,8 @@ const getStationIcon = (type?: StationType): string => {
 
 // 核心操作
 const selectStation = (stationId: string | null) => {
+  if (isDraggingTabs.value) return
+  if (Date.now() - lastTabDragEndAt.value < 180) return
   empireStore.selectStation(stationId)
 }
 
@@ -118,6 +121,15 @@ const cancelDelete = () => {
   showDeleteConfirm.value = false
   stationToDelete.value = null
 }
+
+const handleTabDragStart = () => {
+  isDraggingTabs.value = true
+}
+
+const handleTabDragEnd = () => {
+  isDraggingTabs.value = false
+  lastTabDragEndAt.value = Date.now()
+}
 </script>
 
 <template>
@@ -146,12 +158,13 @@ const cancelDelete = () => {
         chosen-class="tab-drag-chosen"
         drag-class="tab-dragging"
         :animation="160"
-        @start="isDraggingTabs = true"
-        @end="isDraggingTabs = false"
+        @start="handleTabDragStart"
+        @end="handleTabDragEnd"
       >
         <template #item="{ element: station }">
           <div
             class="tab-item station-tab"
+            :data-station-id="station.id"
             :class="{ 'active': activeStationId === station.id, 'is-dragging': isDraggingTabs }"
             @click="selectStation(station.id)"
             @contextmenu.stop="openMenu(station.id, $event)"

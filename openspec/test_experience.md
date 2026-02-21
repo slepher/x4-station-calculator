@@ -240,6 +240,9 @@ await expect(page.locator('.title')).toHaveText('新建');
     *   **解决方案**: 测试定位器应使用 `/仓储|Volume/` 以保持兼容性。
 *   **i18n Key 显示**: 翻译键显示为 `ui.key_name` 或 `!!key!!`。
     *   **解决方案**: 检查 i18n 配置，测试中使用正则 `/Name|名称/`。
+*   **Station Tab 拖拽断言迁移后的结论**: `station-tab-drag` 用例从 `.tab-label` 文本顺序迁移到 `.station-tab[data-station-id]` 后，W1/W3 仍在 `expect(success).toBe(true)` 失败，说明该轮失败根因不在文本读取，而在拖拽重排信号本身未稳定生效。(✅)
+    *   **排查建议**: 优先观察拖拽过程是否出现 `.tab-drag-ghost/.tab-drag-chosen`，并确认 `mouse.move(..., { steps: 20 })` 触发后目标位置发生可见插入反馈。
+*   **保存动作的状态提示检查**: 站点页点击工具栏保存按钮后，应检查右下角 `StatusMonitor` 的 `save` 分类消息（内容为“保存/Save”语义），再继续后续断言。(✅)
 
 ### 测试设计类
 
@@ -361,3 +364,11 @@ await expect(page.locator('.title')).toHaveText('新建');
 *   **资源预览容器**:
     *   定位器: `.resource-preview-container` (✅)
     *   行为: hover 时 opacity 变为 0 (✅)
+
+### 11. Station Tab Drag（station-tab-drag）
+*   **W1 拖拽重排未生效**:
+    *   现象: `tests/e2e/station-tab-drag/station-tab-drag.spec.ts:73` 中 `expect(success).toBe(true)` 失败，3 次拖拽后仍未达到目标顺序。(❌)
+    *   信号: 拖拽动作完成但顺序断言未变化，需优先核查断言口径与 DOM 稳定性。
+*   **W3 刷新后顺序读取为空**:
+    *   现象: `tests/e2e/station-tab-drag/station-tab-drag.spec.ts:98` 中期望数组非空，实际 `[]`。(❌)
+    *   建议: 刷新后先等待 `.station-tab` 可见或数量大于 0，再读取顺序，避免过早采样。

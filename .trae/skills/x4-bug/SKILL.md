@@ -7,6 +7,11 @@ description: "Track and manage bugs for X4 project. Invoke when a bug is discove
 
 This skill handles bug tracking and management for the X4 Station Calculator project.
 
+## Input
+
+- `change-name` (optional; supports abbreviation token such as `std`)
+- Resolve by `x4-user-workflow` "Change Name Resolution" rules
+
 ## Trigger
 
 - A bug is discovered during development or testing
@@ -16,6 +21,13 @@ This skill handles bug tracking and management for the X4 Station Calculator pro
 ## Purpose
 
 Record, reproduce, and verify bug fixes with proper documentation.
+
+## Target Resolution Priority (MANDATORY)
+
+When target descriptions are ambiguous or conflicting:
+- First apply `x4-user-workflow` change resolver.
+- If an explicit abbreviation token resolves uniquely, that resolved change is the final target.
+- If user prose describes a different change than the resolved abbreviation result, abbreviation result takes precedence.
 
 ## Bug Tracking File (`bugs.md`)
 

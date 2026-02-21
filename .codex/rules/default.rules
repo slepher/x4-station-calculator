@@ -1,0 +1,15 @@
+# 允许它随时运行 git 提交代码
+prefix_rule(
+    pattern = ["git", "add"],
+    decision = "allow",
+)
+prefix_rule(
+    pattern = ["git", "commit"],
+    decision = "allow",
+)
+
+# 只允许它运行 Playwright 测试验证你的组件逻辑，不允许它擅自装包
+prefix_rule(
+    pattern = ["npx", "playwright", "test"],
+    decision = "allow",
+)
