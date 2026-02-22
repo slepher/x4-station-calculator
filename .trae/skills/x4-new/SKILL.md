@@ -16,8 +16,10 @@ Create a new change iteratively with confirmation points.
 
 1. Resolve `change-name` and source context using `x4-user-workflow` change resolver.
 2. If coming from discuss, ensure conclusions are available as `request.md` source.
-3. Run step-by-step artifact creation flow.
-4. Keep progress visible and pause for user confirmation when needed.
+3. Validate `request.md` quality using `x4-doc` "request.md Positioning" standards before downstream generation.
+   If not satisfied, revise `request.md` first.
+4. Run step-by-step artifact creation flow.
+5. Keep progress visible and pause for user confirmation when needed.
 
 ## Delegation
 

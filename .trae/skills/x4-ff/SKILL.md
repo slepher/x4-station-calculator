@@ -37,7 +37,9 @@ Do not duplicate `x4-doc` writing standards in this skill.
 
 1. Resolve `change-name` using `x4-user-workflow` change resolver.
 2. If coming from `/x4:discuss`, ensure `openspec/changes/<change-name>/request.md` exists first.
-3. Build required artifact list (minimum):
+3. Before generating downstream artifacts, validate `request.md` against `x4-doc` "request.md Positioning" standards.
+   If not satisfied, revise `request.md` first.
+4. Build required artifact list (minimum):
    - `request.md` (if missing)
    - `spec.md` (or delta spec)
    - `design.md` (if needed)
@@ -45,9 +47,9 @@ Do not duplicate `x4-doc` writing standards in this skill.
    - `test_tasks.md` (for functional changes)
    - `ui_knowledge.md` (when Web Integration tests exist)
    - `bugs.md` (if bug-tracking is part of current scope)
-4. Execute artifact generation in dependency order by invoking `x4-doc`.
-5. After each artifact, report progress (`done/total`) and next artifact.
-6. Stop only when all required artifacts are generated or a blocker needs user input.
+5. Execute artifact generation in dependency order by invoking `x4-doc`.
+6. After each artifact, report progress (`done/total`) and next artifact.
+7. Stop only when all required artifacts are generated or a blocker needs user input.
 
 ## Constraints
 

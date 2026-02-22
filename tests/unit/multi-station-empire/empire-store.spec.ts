@@ -38,7 +38,8 @@ describe('EmpireStore - V2 数据结构', () => {
     expect(store.empires).toBeDefined()
     expect(store.activeStationId).toBe(null)
     expect(store.activeEmpireId).toBeDefined()
-    expect(store.empires.length).toBeGreaterThan(0)
+    // New empire is now in-memory until explicit save.
+    expect(store.empires.length).toBe(0)
   })
 
   it('V1 → V2 数据迁移测试', async () => {

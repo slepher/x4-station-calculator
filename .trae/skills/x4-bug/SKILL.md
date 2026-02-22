@@ -1,26 +1,35 @@
 ---
 name: x4-bug
-description: "Track and manage bugs for X4 project. Invoke when a bug is discovered during development or testing to record, reproduce, and verify fixes."
+description: "Report and track bugs for X4 project. Invoke /x4:bug to record issues and sync bug artifacts (no source-code fix in this skill)."
 ---
 
-# X4 Bug Tracking
+# X4 Bug Reporting
 
-This skill handles bug tracking and management for the X4 Station Calculator project.
+This skill is report-only for `/x4:bug`.
+It records bug artifacts and prepares reproduction tasks.
 
 ## Input
 
 - `change-name` (optional; supports abbreviation token such as `std`)
 - Resolve by `x4-user-workflow` "Change Name Resolution" rules
+- `bug-description` (optional free text)
 
 ## Trigger
 
+- `/x4:bug [change-name] [bug-description]`
 - A bug is discovered during development or testing
 - User reports a bug
 - Test fails and needs bug tracking
 
-## Purpose
+## Scope Boundary (MANDATORY)
 
-Record, reproduce, and verify bug fixes with proper documentation.
+- `/x4:bug` MUST:
+  - record or update bug entries in `bugs.md`
+  - add or refresh reproduction tasks in `test_tasks.md`
+  - sync `ui_knowledge.md` when reproduction is Web Integration
+- `/x4:bug` MUST NOT:
+  - implement source-code fixes in `src/**`
+  - run bug-fix verification as if code has changed
 
 ## Target Resolution Priority (MANDATORY)
 
@@ -44,117 +53,43 @@ When target descriptions are ambiguous or conflicting:
 - **Steps to Reproduce**: [Step-by-step instructions]
 - **Expected Behavior**: [What should happen]
 - **Actual Behavior**: [What actually happens]
-- **Status**: [New | Confirmed | Fixed | Verified]
+- **Status**: [New | Confirmed | Fixed | Verified | Rejected]
 - **Related Test**: [Link to test_tasks.md item]
 ```
 
-## Bug Workflow
+## Workflow (MANDATORY)
 
 ### Step 1: Record Bug
 
-When a bug is reported or discovered:
-1. Add bug entry to `bugs.md`
+1. Add or update bug entry in `bugs.md`
 2. Assign a unique ID (BUG-001, BUG-002, etc.)
-3. Set status to `New`
+3. Set status to `New` unless already in a later state
 
-### Step 2: Generate Reproduction Test
+### Step 2: Generate Reproduction Task
 
-1. Add reproduction test to `test_tasks.md`
-2. Link the test to the bug via `**Related Test**` field
+1. Add reproduction item to `test_tasks.md`
+2. Link the task to the bug via `**Related Test**`
 3. Include `**Bug现状**` to describe current broken behavior
 
-### Step 3: Update UI Knowledge (If Web Integration Test)
+### Step 3: Sync UI Knowledge (Web Integration only)
 
-**If the reproduction test is a Web Integration Test**, **YOU MUST** update `ui_knowledge.md`:
-- Add locators and flows for the new test steps
-- Follow the same scope limitation rules as defined in `x4-ff` skill
+If the reproduction task is Web Integration, update `ui_knowledge.md` with locator/flow additions.
+Follow `x4-doc` sync conventions for `test_tasks.md` and `ui_knowledge.md` consistency.
 
-### Step 4: Run Reproduction Test
+### Step 4: Handoff to Fix Phase
 
-```bash
-npm run test:unit           # For unit tests
-npx playwright test         # For E2E tests
-```
-
-- If test fails as expected: Bug is `Confirmed`
-- If test passes unexpectedly: Re-evaluate bug description
-
-### Step 5: Fix Bug
-
-- Implement the fix
-- Update bug status to `Fixed`
-
-### Step 6: Verify Fix
-
-- Run reproduction test again
-- If test passes: Bug is `Verified`
-- If test still fails: Continue fixing
+- Stop after report artifacts are updated.
+- If user requests fix, route to `/x4:bug-fix`.
 
 ## Unrelated Bug Handling
 
 If a reported bug is unrelated to any existing change:
 
 1. Create a new change: `fix-<bug-name>`
-2. The new change should contain:
-   - `bugs.md` (with the bug entry)
-   - `test_tasks.md` (with reproduction test)
-   - `ui_knowledge.md` (if Web Integration Test)
-3. Follow standard workflow for the fix
-
-## Sync Rules (MANDATORY)
-
-### test_tasks.md → ui_knowledge.md Sync
-
-Whenever `test_tasks.md` is updated with new Web Integration Tests:
-1. **YOU MUST** update `ui_knowledge.md` to include:
-   - Locators for new elements
-   - Flows for new actions
-   - Data bindings for new test data
-
-### Sync Scope
-
-- Only add content for elements/actions explicitly required by the new tests
-- Do NOT document unrelated UI elements
-- Follow the **Scope Limitation** rule from `x4-ff` skill
-
-## Status Transitions
-
-```
-New → Confirmed → Fixed → Verified
-  ↓         ↓         ↓
-  └─────────┴─────────┘──→ Rejected (if not a bug)
-```
-
-## Example
-
-### bugs.md
-```markdown
-## Bug: Hull Parts Not Calculating Correctly
-- **ID**: BUG-001
-- **Description**: When adding Hull Parts production line, the total output is calculated as 0
-- **Steps to Reproduce**:
-  1. Drag Hull Parts to a new production line
-  2. Observe the output calculation
-- **Expected Behavior**: Output should show 1176 units
-- **Actual Behavior**: Output shows 0 units
-- **Status**: New
-- **Related Test**: test_tasks.md - "Hull Parts Output Calculation"
-```
-
-### test_tasks.md (addition)
-```markdown
-## Unit Tests
-- [ ] Hull Parts Output Calculation
-  - **目标**: Verify Hull Parts production output is calculated correctly
-  - **步骤**:
-    1. Create a production line with Hull Parts module
-    2. Check the output calculation
-  - **Bug现状**: Output shows 0 instead of expected value
-  - **期待结果**: Output should match module's defined output (1176)
-```
+2. Create initial bug artifacts under that change (`bugs.md`, `test_tasks.md`, `ui_knowledge.md` if needed)
+3. Continue using standard workflow
 
 ## Constraints
 
-- **Always run reproduction test** before marking bug as `Confirmed`
-- **Always run reproduction test** after fix to mark as `Verified`
-- **Always sync `ui_knowledge.md`** when adding Web Integration Tests to `test_tasks.md`
+- Keep all edits scoped to current change documentation.
+- Do not run fix verification loops in this skill.

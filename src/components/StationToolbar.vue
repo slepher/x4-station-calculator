@@ -104,8 +104,8 @@ const handleNew = () => {
     return
   }
   
-  if (!empireStore.isDirty) {
-    empireStore.createEmpire(t('menu.default_empire_name'))
+  if (!empireStore.shouldConfirmBeforeEmpireReset()) {
+    empireStore.resetEmpireWithDefaultName(t('menu.default_empire_name'))
     return
   }
   smartDialog.intent = 'NEW'

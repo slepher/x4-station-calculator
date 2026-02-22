@@ -1,6 +1,6 @@
 ---
 name: x4-user-workflow
-description: "Orchestrate X4 Station Calculator workflow with OpenSpec. (Trigger: /x4:discuss, /x4:new, /x4:ff, /x4:doc, /x4:apply, /x4:bug, /x4:verify, /x4:archive)"
+description: "Orchestrate X4 Station Calculator workflow with OpenSpec. (Trigger: /x4:discuss, /x4:new, /x4:ff, /x4:doc, /x4:apply, /x4:bug, /x4:bug-fix, /x4:test-impl, /x4:test, /x4:verify, /x4:archive)"
 ---
 
 # X4 Workflow Orchestrator
@@ -16,8 +16,15 @@ It is orchestration-only and must not duplicate implementation details from phas
 - `/x4:doc`
 - `/x4:apply`
 - `/x4:bug`
+- `/x4:bug-fix`
+- `/x4:test-impl`
+- `/x4:test`
 - `/x4:verify`
 - `/x4:archive`
+
+Deprecated and out of active workflow scope:
+- `/x4:pipe`
+- `/x4:subdis`
 
 ## Orchestration Boundary (MANDATORY)
 
@@ -81,30 +88,46 @@ Conflict handling:
    - Note: keep openspec skill references through delegated phase skills.
 
 4. `/x4:doc`
-   - Goal: create/update OpenSpec documentation for a change.
+   - Goal: create/update OpenSpec planning artifacts for a change (`request/spec/design/tasks/test_tasks/ui_knowledge`) with consistency sync.
    - Delegate to: `x4-doc`.
 
 5. `/x4:apply`
    - Goal: implement code changes for current change.
    - Delegate to: `x4-apply`.
 
-6. `/x4:verify`
-   - Goal: run verification and testing workflow.
-   - Delegate to: `x4-verify`.
-
-7. `/x4:bug`
-   - Goal: track bug lifecycle for a change and maintain bug/test docs.
+6. `/x4:bug`
+   - Goal: report bug and maintain bug/test artifacts for a change.
    - Delegate to: `x4-bug`.
 
-8. `/x4:archive`
+7. `/x4:bug-fix`
+   - Goal: run bug-fix workflow for reported bug.
+   - Delegate to: `x4-bug-fix`.
+
+8. `/x4:test-impl`
+   - Goal: implement/supplement tests from `test_tasks.md`.
+   - Delegate to: `x4-test-impl`.
+
+9. `/x4:test`
+   - Goal: execute change-scoped tests and sync test docs.
+   - Delegate to: `x4-test`.
+
+10. `/x4:verify`
+   - Goal: run verification and testing workflow.
+   - Delegate to: `x4-verify`.
+   - Handoff contract to archive: must provide `verify_status`, `bug_gate`, `non_verified_bug_ids`, `bug_gate_summary`.
+
+11. `/x4:archive`
    - Goal: archive completed change and promote specs.
    - Delegate to: `x4-archive`.
+   - Gate dependency: consume `/x4:verify` handoff contract; archive is allowed only when `verify_status=pass` and `bug_gate=pass`.
 
 ## High-Level Prerequisites
 
 - Planning phases (`/x4:discuss`, `/x4:new`, `/x4:ff`, `/x4:doc`) must not edit source code.
 - `/x4:apply` should run after required planning artifacts are ready.
-- `/x4:verify` should run after `/x4:apply`.
+- `/x4:test-impl` and `/x4:test` are optional standalone phases for focused test iteration.
+- `/x4:verify` should run after `/x4:apply` and includes verification-stage test implementation/execution sequencing.
+- `/x4:archive` must consume `/x4:verify` gate output contract; missing gate fields are blockers.
 - `/x4:archive` should run only after verify passes.
 
 ## Handoff Sequence (Default)
@@ -113,9 +136,10 @@ Conflict handling:
 2. New or FF
 3. Doc updates (optional, any time during planning)
 4. Apply
-5. Bug (when defect is discovered)
-6. Verify
-7. Archive
+5. Bug report (`/x4:bug`)
+6. Bug fix (`/x4:bug-fix`)
+7. Verify
+8. Archive
 
 ## Output
 

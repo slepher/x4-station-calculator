@@ -640,9 +640,6 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       }
     })
 
-    if (source === 'manual' && result.newNodes.length > 0) {
-      updateGroupName(group)
-    }
   }
 
   /**
@@ -659,21 +656,6 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       }
     }
     group.nodes.splice(insertIndex, 0, node)
-  }
-
-  /**
-   * 辅助：更新组名称
-   */
-  function updateGroupName(group: ProductionLineGroup) {
-    const maxTierInGroup = Math.max(...group.nodes.map(n => n.column))
-    const highestTierManualNode = group.nodes
-      .filter(n => n.source === 'manual' && n.column === maxTierInGroup)
-      .sort((a, b) => b.column - a.column)[0]
-    
-    if (highestTierManualNode) {
-      const wareName = gameData.localizedWaresMap[highestTierManualNode.wareId]?.localeName || highestTierManualNode.wareId
-      group.name = wareName
-    }
   }
 
   /**
@@ -795,7 +777,6 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     if (node && node.source === 'auto') {
       node.source = 'manual'
       node.isAuto = false
-      updateGroupName(group)
     }
   }
 
@@ -830,7 +811,6 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       })
     }
 
-    updateGroupName(group)
   }
 
   /**

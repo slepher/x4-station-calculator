@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import draggable from 'vuedraggable'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
+import { getLogicFlowGroupDisplayName } from '@/store/logic/logicFlowGroupName'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -104,31 +105,7 @@ const handleDragEnd = () => {
  * 如果 name 为空，则动态计算默认名称（最高 tier 的 manual 产线名称）
  */
 const getGroupDisplayName = (group: any): string => {
-  if (group.name) {
-    return group.name
-  }
-  
-  // 动态计算：Find highest tier manual nodes
-  let maxTier = -1
-  group.nodes?.forEach((n: any) => {
-    if (n.source === 'manual' && n.column > maxTier) {
-      maxTier = n.column
-    }
-  })
-
-  if (maxTier === -1) return '空'
-
-  // Get manual nodes in the highest tier column
-  const highestTierNodes = group.nodes
-    ?.filter((n: any) => n.source === 'manual' && n.column === maxTier)
-    .sort((a: any, b: any) => {
-      if (a.isIsolated && !b.isIsolated) return 1
-      if (!a.isIsolated && b.isIsolated) return -1
-      return a.order - b.order
-    }) || []
-
-  const topNode = highestTierNodes[0]
-  return topNode ? gameData.getWareDisplayName(topNode.wareId) : '空'
+  return getLogicFlowGroupDisplayName(group, gameData.getWareDisplayName)
 }
 
 /**

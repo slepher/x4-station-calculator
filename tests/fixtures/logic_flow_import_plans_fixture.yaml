@@ -1,0 +1,65 @@
+logic_flow_import_plans:
+  version: 1
+  active_plan_id: lf_plan_shiptech_base
+
+  plans:
+    - id: lf_plan_shiptech_base
+      name: Shiptech Base Plan
+      groups:
+        - id: grp_shiptech_hightech
+          category: industrial
+          sub_category: default
+          manual_nodes:
+            - ware_id: hullparts
+              module_id: prod_gen_hullparts_macro
+            - ware_id: microchips
+              module_id: prod_gen_microchips_macro
+          isolated_upstreams:
+            - target_manual_ware_id: hullparts
+              ware_ids:
+                - graphene
+                - refinedmetals
+        - id: grp_shiptech_build_chain
+          category: industrial
+          sub_category: default
+          manual_nodes:
+            - ware_id: claytronics
+              module_id: prod_gen_claytronics_macro
+            - ware_id: quantumtubes
+              module_id: prod_gen_quantumtubes_macro
+          isolated_upstreams:
+            - target_manual_ware_id: claytronics
+              ware_ids:
+                - antimattercells
+                - microchips
+
+    - id: lf_plan_food_med_chain
+      name: Food Medical Chain
+      groups:
+        - id: grp_food_med_argon
+          category: agricultural
+          sub_category: argon
+          manual_nodes:
+            - ware_id: foodrations
+              module_id: prod_arg_foodrations_macro
+            - ware_id: medicalsupplies
+              module_id: prod_arg_medicalsupplies_macro
+          isolated_upstreams:
+            - target_manual_ware_id: foodrations
+              ware_ids:
+                - meat
+                - spices
+                - wheat
+        - id: grp_agri_inputs_argon
+          category: agricultural
+          sub_category: argon
+          manual_nodes:
+            - ware_id: foodrations
+              module_id: prod_arg_foodrations_macro
+            - ware_id: wheat
+              module_id: prod_arg_wheat_macro
+          isolated_upstreams:
+            - target_manual_ware_id: foodrations
+              ware_ids:
+                - meat
+                - spices

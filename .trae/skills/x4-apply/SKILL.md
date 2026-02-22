@@ -55,13 +55,13 @@ If a discovered bug is out of current change scope:
 
 ## Constraints
 
-- Follow the Zero-Contamination Principle from `x4-user-workflow`:
+- Zero-Contamination Principle (apply-local):
   - do not rewrite non-target logic
   - do not add/remove comments unless explicitly requested
   - do not reformat unrelated code
 - If implementation introduces new test scenarios, update:
   - `openspec/changes/<change-name>/test_tasks.md`
-  - `openspec/changes/<change-name>/ui_knowledge.md` (must sync together)
+  - `openspec/changes/<change-name>/ui_knowledge.md` (follow `x4-doc` sync rules)
 - For test implementation standards, use `x4-test-impl`.
 - For test execution and result sync, use `x4-test`.
 - Do not execute `npm run test:*` or `playwright` in `/x4:apply`.

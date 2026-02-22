@@ -4,6 +4,7 @@ import draggable from 'vuedraggable'
 import { useI18n } from 'vue-i18n'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import { getLogicFlowGroupDisplayName } from '@/store/logic/logicFlowGroupName'
 import ProductionLineGroupComponent from './ProductionLineGroup.vue'
 import type { ProductionLineGroup, FlowNode } from '@/types/x4'
 
@@ -218,37 +219,11 @@ const getCompactGroupTitle = (group: ProductionLineGroup): { title: string; t0Re
   // 获取 T0 资源（排除能量电池和隔离节点）
   const t0Nodes = group.nodes.filter(n => n.column === 0 && n.wareId !== 'energycells' && !n.isIsolated)
   const t0Resources = t0Nodes.map(n => gameData.getWareDisplayName(n.wareId))
-  
-  // 如果有用户自定义名称，直接返回
-  if (group.name) {
-    return { title: group.name, t0Resources }
+
+  return {
+    title: getLogicFlowGroupDisplayName(group, gameData.getWareDisplayName),
+    t0Resources
   }
-  
-  // 动态计算默认名称：Find highest tier manual nodes
-  let maxTier = -1
-  group.nodes.forEach(n => {
-    if (n.source === 'manual' && n.column > maxTier) {
-      maxTier = n.column
-    }
-  })
-
-  if (maxTier === -1) {
-    return { title: '空', t0Resources }
-  }
-
-  // Get manual nodes in the highest tier column
-  const highestTierNodes = group.nodes
-    .filter(n => n.source === 'manual' && n.column === maxTier)
-    .sort((a, b) => {
-      if (a.isIsolated && !b.isIsolated) return 1
-      if (!a.isIsolated && b.isIsolated) return -1
-      return a.order - b.order
-    })
-
-  const topNode = highestTierNodes[0]
-  const title = topNode ? gameData.getWareDisplayName(topNode.wareId) : '空'
-  
-  return { title, t0Resources }
 }
 
 /**

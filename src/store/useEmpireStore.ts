@@ -146,11 +146,14 @@ export const useEmpireStore = defineStore('empire', () => {
     })
   }
 
-  function takeSnapshot() {
-    lastSavedSnapshot.value = JSON.stringify({
-      activeEmpire: activeEmpire.value ? JSON.parse(JSON.stringify(activeEmpire.value)) : null,
-      activeStationId: activeStationId.value
+  function serializeEmpireForDirtyCheck() {
+    return JSON.stringify({
+      activeEmpire: activeEmpire.value ? JSON.parse(JSON.stringify(activeEmpire.value)) : null
     })
+  }
+
+  function takeSnapshot() {
+    lastSavedSnapshot.value = serializeEmpireForDirtyCheck()
   }
 
   function loadData(data: SavedEmpiresState) {
@@ -205,10 +208,9 @@ export const useEmpireStore = defineStore('empire', () => {
     const empire = createDefaultEmpire(name)
     activeEmpire.value = empire
     activeStationId.value = null
-    if (!savedEmpires.value.list.find(e => e.id === empire.id)) {
-      savedEmpires.value.list.push(JSON.parse(JSON.stringify(empire)))
-    }
-    savedEmpires.value.activeId = empire.id
+    // New empire stays in-memory until user explicitly saves.
+    // Avoid auto-persisting empty empires into saved list.
+    savedEmpires.value.activeId = null
     savedEmpires.value.activeStationId = null
     takeSnapshot()
     return empire
@@ -365,12 +367,17 @@ export const useEmpireStore = defineStore('empire', () => {
   }
 
   const isDirty = computed(() => {
-    const current = JSON.stringify({
-      activeEmpire: activeEmpire.value ? JSON.parse(JSON.stringify(activeEmpire.value)) : null,
-      activeStationId: activeStationId.value
-    })
+    const current = serializeEmpireForDirtyCheck()
     return current !== lastSavedSnapshot.value
   })
+
+  function shouldConfirmBeforeEmpireReset() {
+    return isDirty.value
+  }
+
+  function resetEmpireWithDefaultName(defaultName: string = 'New Empire') {
+    return createEmpire(defaultName)
+  }
 
   function migrateFromV1(v1Data: V1StorageState): SavedEmpiresState {
     const list: EmpirePlan[] = v1Data.list.map(plan => ({
@@ -478,6 +485,8 @@ export const useEmpireStore = defineStore('empire', () => {
     updateStationSettings,
     updateStationModules,
     updateEmpireName,
+    shouldConfirmBeforeEmpireReset,
+    resetEmpireWithDefaultName,
     takeSnapshot,
     initialize
   }

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
+import { getLogicFlowGroupDisplayName } from '@/store/logic/logicFlowGroupName'
 import type { SavedFlowGroup } from '@/types/x4'
 
 const props = defineProps<{
@@ -9,6 +11,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['close'])
 const { t } = useI18n()
+const gameData = useGameDataStore()
 const store = useLogicFlowStore()
 
 const formatDate = (ts: number) => new Date(ts).toLocaleString()
@@ -24,29 +27,7 @@ const handleLoadPlan = (index: number) => {
 }
 
 const getPlanDescription = (groups: SavedFlowGroup[]) => {
-  // 每个组显示其 name 或动态计算的默认名称
-  const groupNames = groups.map(g => {
-    if (g.name) return g.name
-    
-    // 动态计算默认名称
-    let maxTier = -1
-    g.nodes?.forEach(n => {
-      if (n.column > maxTier) maxTier = n.column
-    })
-    
-    if (maxTier === -1) return '空'
-    
-    const highestTierNodes = g.nodes
-      ?.filter(n => n.column === maxTier)
-      .sort((a, b) => {
-        if (a.isIsolated && !b.isIsolated) return 1
-        if (!a.isIsolated && b.isIsolated) return -1
-        return a.order - b.order
-      }) || []
-    
-    const topNode = highestTierNodes[0]
-    return topNode?.wareId || '空'
-  })
+  const groupNames = groups.map((group) => getLogicFlowGroupDisplayName(group, gameData.getWareDisplayName))
   
   if (groupNames.length <= 3) {
     return groupNames.join(', ')

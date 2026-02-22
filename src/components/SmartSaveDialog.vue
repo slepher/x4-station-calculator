@@ -10,9 +10,10 @@ const props = defineProps<{
   intent: 'NEW' | 'SAVE_AS'
   initialName?: string
   storeType?: 'station' | 'logicFlow'
+  mode?: 'default' | 'import'
 }>()
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'confirm-primary', 'confirm-secondary'])
 const logicFlowStore = useLogicFlowStore()
 const empireStore = useEmpireStore()
 const { t } = useI18n()
@@ -63,6 +64,9 @@ const currentPlanName = computed(() => {
 })
 
 const dialogTitle = computed(() => {
+  if (props.mode === 'import') {
+    return t('logicFlowImport.empire_confirm_title')
+  }
   if (props.intent === 'SAVE_AS') {
     return t('menu.dialog_title_save_as')
   }
@@ -74,6 +78,9 @@ const dialogTitle = computed(() => {
 })
 
 const dialogMessage = computed(() => {
+  if (props.mode === 'import') {
+    return t('logicFlowImport.empire_confirm_message')
+  }
   if (props.intent === 'SAVE_AS') return null
 
   if (!isNewPlan.value) {
@@ -83,6 +90,7 @@ const dialogMessage = computed(() => {
 })
 
 const showInput = computed(() => {
+  if (props.mode === 'import') return false
   if (props.intent === 'SAVE_AS') return true
   if (props.intent === 'NEW' && isNewPlan.value) return true
   if (props.intent === 'NEW' && !isNewPlan.value && isSaveAsExpanded.value) return true
@@ -90,6 +98,12 @@ const showInput = computed(() => {
 })
 
 const handlePrimaryAction = () => {
+  if (props.mode === 'import') {
+    emit('confirm-primary')
+    emit('close')
+    return
+  }
+
   const nameToSave = showInput.value ? inputName.value : currentPlanName.value
 
   if (!nameToSave.trim()) return
@@ -136,6 +150,12 @@ const handlePrimaryAction = () => {
 }
 
 const handleDiscard = () => {
+  if (props.mode === 'import') {
+    emit('confirm-secondary')
+    emit('close')
+    return
+  }
+
   if (props.storeType === 'logicFlow') {
     logicFlowStore.clearAll()
   } else {
@@ -191,7 +211,7 @@ const handleDiscard = () => {
             :placeholder="t('menu.placeholder_enter_name')" />
         </div>
 
-        <div v-if="intent === 'NEW' && !isNewPlan" class="flex items-center gap-2">
+        <div v-if="mode !== 'import' && intent === 'NEW' && !isNewPlan" class="flex items-center gap-2">
           <input type="checkbox" id="saveAsCopy" v-model="isSaveAsExpanded"
             class="w-4 h-4 accent-cyan-500 cursor-pointer" />
           <label for="saveAsCopy" class="text-sm text-slate-300 cursor-pointer select-none">
@@ -201,13 +221,17 @@ const handleDiscard = () => {
       </div>
 
       <div class="px-6 py-4 bg-slate-900/20 border-t border-slate-700 flex justify-end gap-3">
-        <button v-if="intent === 'NEW'" @click="handleDiscard"
+        <button v-if="intent === 'NEW' || mode === 'import'" @click="handleDiscard"
           class="btn-base bg-red-600 hover:bg-red-500 shadow-red-900/20">
-          {{ t('menu.btn_discard_and_new') }}
+          <span v-if="mode === 'import'">{{ t('logicFlowImport.empire_action_discard_import') }}</span>
+          <span v-else>{{ t('menu.btn_discard_and_new') }}</span>
         </button>
 
         <button @click="handlePrimaryAction" class="btn-base bg-cyan-600 hover:bg-cyan-500 shadow-cyan-900/20">
-          <span v-if="intent === 'NEW'">
+          <span v-if="mode === 'import'">
+            {{ t('logicFlowImport.empire_action_save_import') }}
+          </span>
+          <span v-else-if="intent === 'NEW'">
             {{ (showInput || isNewPlan) ? t('menu.btn_save_new_and_create') : t('menu.btn_overwrite_and_create') }}
           </span>
           <span v-else>

@@ -5,6 +5,9 @@ description: "Trigger with /x4:pipe to run X4 dual-subagent pipeline, and /x4:su
 
 # X4 Apply Verify Pipeline
 
+> Deprecated: this pipeline is kept for future redesign and is not part of the active `x4-user-workflow` scope.
+> Do not use `/x4:pipe` or `/x4:subdis` as default routing commands.
+
 此 skill 用于把实现与测试编排成一个固定流程，目标是先暴露问题，再在实现完成后做最终验证。
 
 ## Core Model

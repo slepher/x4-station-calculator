@@ -372,3 +372,69 @@ await expect(page.locator('.title')).toHaveText('新建');
 *   **W3 刷新后顺序读取为空**:
     *   现象: `tests/e2e/station-tab-drag/station-tab-drag.spec.ts:98` 中期望数组非空，实际 `[]`。(❌)
     *   建议: 刷新后先等待 `.station-tab` 可见或数量大于 0，再读取顺序，避免过早采样。
+
+### 12. Import Logic Flow（import-logic-flow）执行记录补充
+*   **E2E 方案列表文本定位 strict mode 冲突**:
+    *   现象: `getByText('ILF Valid Single Group')` 同时命中工具栏标题与弹窗列表项，触发 strict mode violation（`tests/e2e/import-logic-flow/import-logic-flow.spec.ts` 的 2.1 用例）。(❌)
+    *   建议: 在 `logicflow-import-modal` 或 `LoadFlowPlanModal` 容器内做作用域定位，优先 `data-testid` + scoped locator，避免全局 `getByText`。(✅)
+*   **导入链路稳定定位器可用**:
+    *   入口按钮: `[data-testid="logicflow-import-entry-station"]` / `[data-testid="logicflow-import-entry-empire"]` (✅)
+    *   选择弹窗: `[data-testid="logicflow-import-modal"]`、`[data-testid="logicflow-import-plan-select"]`、`[data-testid="logicflow-import-group-select"]`、`[data-testid="logicflow-import-continue"]` (✅)
+    *   站点确认弹窗: `[data-testid="station-import-confirm-modal"]`、`[data-testid="station-import-confirm-new"]`、`[data-testid="station-import-confirm-overwrite"]` (✅)
+    *   warning 汇总弹窗: `[data-testid="logicflow-import-warning-modal"]` (✅)
+*   **Unit 执行前置问题**:
+    *   现象: 定向执行 `tests/unit/import-logic-flow/import-logic-flow.spec.ts` 时，`vue-i18n` mock 缺少 `createI18n` 导出导致 suite 启动失败，显示 `0 test`。(❌)
+    *   建议: 参照仓库其他 unit 测试的 i18n mock，补齐 `createI18n`（或使用 partial mock）。(✅)
+
+### 13. Import Logic Flow（import-logic-flow）回归通过补充
+*   **Unit i18n mock 修复**:
+    *   问题: `vue-i18n` mock 仅提供 `useI18n`，在 `src/i18n.ts` 初始化路径下缺少 `createI18n` 导出导致 suite 启动失败。(❌)
+    *   修复: 在 unit mock 中补齐 `createI18n` 返回对象，定向 unit 恢复执行并通过（11/11）。(✅)
+*   **LoadFlowPlanModal 选择器稳定化**:
+    *   问题: 2.1 场景下全局文本定位与卡片按钮定位都可能误命中或空命中（toolbar 同名标题、卡片类名复用）。(❌)
+    *   修复: 先定位加载弹窗容器（`.fixed.inset-0` + `Load Flow Plan` 标题特征），再在弹窗作用域内定位 `Load Plan` 按钮并按顺序点击（A=first, B=nth(1)）。(✅)
+*   **定向回归结果**:
+    *   `vitest tests/unit/import-logic-flow/import-logic-flow.spec.ts`: 11 passed。(✅)
+    *   `playwright tests/e2e/import-logic-flow/import-logic-flow.spec.ts`: 11 passed。(✅)
+
+### 14. Import Logic Flow（import-logic-flow）二级内容区定位补充
+*   **二级选择控件形态变更**:
+    *   现象: `logicflow-import-group-select` 在运行时为 `div` 内容区而非 `<select>`，对其执行 `selectOption()` 会报错 “Element is not a <select> element”。(❌)
+    *   修复: 测试中先判断容器 tagName；`select` 分支走 `selectOption`，`div` 分支点击 `button[data-testid^="logicflow-import-group-item-"]`。(✅)
+*   **2.12/2.13 断言口径修正**:
+    *   现象: 用例原先等待 `[data-testid="logicflow-import-group-panel"]`，页面并无该 testid，导致误失败。(❌)
+    *   修复: 改为断言 `[data-testid="logicflow-import-group-select"]` 可见，且 `select[data-testid="logicflow-import-group-select"]` 不存在；继续断言无搜索/分页/排序控件。(✅)
+*   **回归结果**:
+    *   `playwright tests/e2e/import-logic-flow/import-logic-flow.spec.ts`: 16 passed。(✅)
+
+### 15. Import Logic Flow（import-logic-flow）新口径 2.11~2.20
+*   **导入主流程定位迁移**:
+    *   Station 二级容器: `[data-testid="logicflow-import-group-list"]` (✅)
+    *   Station 规划区卡片: `[data-testid^="logicflow-import-group-item-"]` (✅)
+    *   Station 直接导入: `[data-testid^="logicflow-import-group-direct-"]` (✅)
+    *   Empire 方案卡片区: `[data-testid="logicflow-import-plan-list"]`, `[data-testid^="logicflow-import-plan-item-"]` (✅)
+*   **底部继续按钮口径**:
+    *   新口径要求导入仅通过卡片动作触发；`[data-testid="logicflow-import-continue"]` 仅作为“应不存在”断言项。(✅)
+*   **2.20 弹框判定一致性**:
+    *   状态 S1：新建与导入均不弹 SmartSaveDialog。(✅)
+    *   状态 S2：新建与导入均弹 SmartSaveDialog。(✅)
+*   **定向回归结果**:
+    *   `vitest tests/unit/import-logic-flow/import-logic-flow.spec.ts`: 11 passed。(✅)
+    *   `playwright tests/e2e/import-logic-flow/import-logic-flow.spec.ts`: 22 passed。(✅)
+
+### 16. Import Logic Flow（import-logic-flow）状态/切换专项补充
+*   **`isDirty` 判定包含 `activeStationId`**:
+    *   历史现象: 保存后若立即切换到“帝国总览”（`activeStationId: stationId -> null`），`shouldConfirmBeforeEmpireReset()` 会变为 `true`，导致 `New` 触发 SmartSaveDialog。(⚠️)
+    *   新需求口径: `activeStationId` 变化不应引起 dirty；仅站点/总览切换不得单独触发保存确认。(✅)
+*   **状态/切换标题过滤命中**:
+    *   新增用例标题前缀:
+      *   `状态：帝国已保存基线态`
+      *   `状态：帝国待保存更改态`
+      *   `切换：帝国已保存基线态->帝国待保存更改态`
+      *   `切换：帝国待保存更改态->帝国已保存基线态`
+    *   命令结果:
+      *   `npx playwright test tests/e2e/import-logic-flow -g "状态："`: 2 passed。(✅)
+      *   `npx playwright test tests/e2e/import-logic-flow -g "切换："`: 2 passed。(✅)
+*   **本轮回归结果**:
+    *   `npx vitest run tests/unit/import-logic-flow`: 11 passed。(✅)
+    *   `npx playwright test tests/e2e/import-logic-flow`: 26 passed。(✅)

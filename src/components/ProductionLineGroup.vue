@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import draggable from 'vuedraggable'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import { getLogicFlowGroupDisplayName } from '@/store/logic/logicFlowGroupName'
 import { useI18n } from 'vue-i18n'
 import type { ProductionLineGroup, FlowNode } from '@/types/x4'
 import FlowNodeComponent from './FlowNode.vue'
@@ -166,36 +167,7 @@ const handleMoveDown = () => {
 }
 
 const getGroupName = computed(() => {
-  // 如果有用户自定义名称，直接显示
-  if (props.group.name) {
-    return props.group.name
-  }
-  
-  // 否则自动计算：Find highest tier manual nodes
-  let maxTier = -1
-  props.group.nodes.forEach(n => {
-    if (n.source === 'manual' && n.column > maxTier) {
-      maxTier = n.column
-    }
-  })
-
-  if (maxTier === -1) return '空'
-
-  // Get manual nodes in the highest tier column
-  const highestTierNodes = props.group.nodes
-    .filter(n => n.source === 'manual' && n.column === maxTier)
-    .sort((a, b) => {
-      // 1. 锁定状态（EXT/Locked）置底
-      if (a.isIsolated && !b.isIsolated) return 1
-      if (!a.isIsolated && b.isIsolated) return -1
-
-      return a.order - b.order
-    })
-
-  const topNode = highestTierNodes[0]
-  const wareName = topNode ? gameData.getWareDisplayName(topNode.wareId) : '空'
-  
-  return wareName
+  return getLogicFlowGroupDisplayName(props.group, gameData.getWareDisplayName)
 })
 
 // 标题编辑方法
