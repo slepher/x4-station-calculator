@@ -53,6 +53,9 @@ class X4PrecisionLoader:
         
         self.valid_macros = {}       
         self.all_modules = []        
+        self.ships_data = []
+        self.equipments_data = []
+        self.shipgroups_data = []
         self.wares_data = []         
         self.i18n_data = {}         
         self.recipes = {} 
@@ -62,6 +65,16 @@ class X4PrecisionLoader:
         self.all_methods = set()
         self.colors_db = {}
         self.mappings_db = {}
+        self.ware_index = {}
+        self.component_to_ware = {}
+        self.ship_connections = {}
+        self.ship_macros = {}
+        self.loadouts_map = {}
+        self.shipgroup_by_macro = {}
+        self.ship_type_counts = defaultdict(int)
+        self.ship_type_name_map = {}
+        self.ship_type_key_map = {}
+        self.ship_types_data = []
         
         # 收集需要翻译的原始名称 (Raw Key)
         self.needed_raw_names = set()
@@ -90,6 +103,19 @@ class X4PrecisionLoader:
                 transport = ware.get('transport')
                 raw_name = ware.get('name', '')
                 group = ware.get('group', '')
+                comp_node = ware.find('component')
+                if w_id:
+                    self.ware_index[w_id] = {
+                        "id": w_id,
+                        "nameId": raw_name,
+                        "group": group,
+                        "tags": tags,
+                        "transport": transport
+                    }
+                if comp_node is not None and comp_node.get('ref'):
+                    ref = comp_node.get('ref')
+                    if ref and ref not in self.component_to_ware:
+                        self.component_to_ware[ref] = w_id
                 
                 # 手动修正: BoGas 在游戏数据中被归类为 refined，但实际属于 agricultural
                 if w_id == 'bogas':
@@ -316,11 +342,11 @@ class X4PrecisionLoader:
     # 2. 扫描资产 (Assets) -> 改为读取聚合库
     # =======================================================
     def scan_assets(self):
-        print(f"🔍 [2/5] 从 macros_final.xml 读取宏定义...")
+        print(f"🔍 [2/5] 从 module_macros.xml 读取宏定义...")
         macro_race_set = set()
         macro_method_set = set()
         unmapped_types = defaultdict(list)
-        macros_path = os.path.join(self.raw_path, "libraries", "macros_final.xml")
+        macros_path = os.path.join(self.raw_path, "libraries", "module_macros.xml")
         
         if not os.path.exists(macros_path):
             print(f"❌ 错误: 找不到宏定义文件: {macros_path}")
@@ -476,6 +502,422 @@ class X4PrecisionLoader:
             print(f"   ❌ Macro Parse Error: {e}")
 
     # =======================================================
+    # 2.1 解析飞船与装备数据
+    # =======================================================
+    def parse_ship_and_equipment_data(self):
+        print(f"🚀 [2.1/5] 解析 ship/equipment 数据...")
+        self.shipgroup_by_macro = self._load_shipgroups()
+        self.ship_connections = self._load_ship_connections()
+        self.ship_macros = self._load_ship_macros()
+        self.loadouts_map = self._load_loadouts(self.ship_macros, self.ship_connections)
+        self._build_ships(self.ship_macros, self.ship_connections, self.loadouts_map, self.shipgroup_by_macro)
+        self._build_equipments()
+
+    def _split_tags(self, tags_str):
+        return [t for t in tags_str.split() if t]
+
+    def _detect_equipment_types(self, tags):
+        types = []
+        if "engine" in tags: types.append("engine")
+        if "shield" in tags: types.append("shield")
+        if "weapon" in tags or "primaryweapon" in tags: types.append("weapon")
+        if "turret" in tags: types.append("turret")
+        if "thruster" in tags: types.append("thruster")
+        return types
+
+    def _normalize_group(self, group, name):
+        group_key = (group or "").strip()
+        if not group_key:
+            return name, True
+        return group_key, False
+
+    def _build_cost(self, ware_id):
+        if not ware_id: return {}
+        recipe_group = self.recipes.get(ware_id, {})
+        cost = {}
+        for method, recipe in recipe_group.items():
+            cost[method] = recipe.get('inputs', {})
+        return cost
+
+    def _load_shipgroups(self):
+        shipgroups_path = os.path.join(self.raw_path, "libraries", "shipgroups_final.xml")
+        mapping = {}
+        if not os.path.exists(shipgroups_path):
+            print(f"   ⚠️ 警告: 找不到 shipgroups 文件: {shipgroups_path}")
+            return mapping
+        try:
+            tree = ET.parse(shipgroups_path)
+            root = tree.getroot()
+            for group in root.findall('group'):
+                group_name = group.get('name')
+                if not group_name: continue
+                for sel in group.findall('select'):
+                    macro = sel.get('macro')
+                    if macro:
+                        mapping[macro] = group_name
+            print(f"   ✅ 读取 {len(mapping)} 条 shipgroup 映射。")
+        except Exception as e:
+            print(f"   ❌ Shipgroups XML Error: {e}")
+        return mapping
+
+    def _load_ship_connections(self):
+        connections_path = os.path.join(self.raw_path, "libraries", "ship_connections.xml")
+        mapping = {}
+        if not os.path.exists(connections_path):
+            print(f"   ⚠️ 警告: 找不到 ship connections 文件: {connections_path}")
+            return mapping
+        try:
+            tree = ET.parse(connections_path)
+            root = tree.getroot()
+            comp_count = 0
+            conn_count = 0
+            for comp in root.findall('component'):
+                comp_name = comp.get('name')
+                if not comp_name: continue
+                connections = []
+                for conn in comp.findall('./connections/connection'):
+                    name = conn.get('name')
+                    if not name: continue
+                    tags = self._split_tags(conn.get('tags', ''))
+                    types = self._detect_equipment_types(tags)
+                    if not types:
+                        continue
+                    group_key, is_implicit = self._normalize_group(conn.get('group'), name)
+                    connections.append({
+                        "name": name,
+                        "group": group_key,
+                        "isImplicitGroup": is_implicit,
+                        "tags": tags,
+                        "types": types
+                    })
+                    conn_count += 1
+                if connections:
+                    mapping[comp_name] = connections
+                    comp_count += 1
+            print(f"   ✅ 读取 {comp_count} 个 ship components, {conn_count} 个装配连接点。")
+        except Exception as e:
+            print(f"   ❌ Ship connections XML Error: {e}")
+        return mapping
+
+    def _load_ship_macros(self):
+        macros_path = os.path.join(self.raw_path, "libraries", "ship_macros.xml")
+        mapping = {}
+        if not os.path.exists(macros_path):
+            print(f"   ⚠️ 警告: 找不到 ship macros 文件: {macros_path}")
+            return mapping
+        try:
+            tree = ET.parse(macros_path)
+            root = tree.getroot()
+            for macro in root.findall('macro'):
+                name = macro.get('name')
+                if not name: continue
+                if macro.get('class') == 'ship_xs':
+                    continue
+                comp_node = macro.find('component')
+                if comp_node is None or not comp_node.get('ref'):
+                    continue
+                comp_ref = comp_node.get('ref')
+                props = macro.find('properties')
+                ship_node = props.find('ship') if props is not None else None
+                storage_node = props.find('storage') if props is not None else None
+                people_node = props.find('people') if props is not None else None
+                hull_node = props.find('hull') if props is not None else None
+                physics_node = props.find('physics') if props is not None else None
+
+                storage = None
+                if storage_node is not None:
+                    storage = {
+                        "missile": int(storage_node.get('missile') or 0),
+                        "unit": int(storage_node.get('unit') or 0)
+                    }
+
+                crew = None
+                if people_node is not None:
+                    crew = {
+                        "capacity": int(people_node.get('capacity') or 0)
+                    }
+
+                physics = None
+                if physics_node is not None:
+                    drag = physics_node.find('drag')
+                    physics = {
+                        "mass": float(physics_node.get('mass') or 0),
+                        "drag": {
+                            "forward": float(drag.get('forward') or 0) if drag is not None else 0,
+                            "reverse": float(drag.get('reverse') or 0) if drag is not None else 0,
+                            "horizontal": float(drag.get('horizontal') or 0) if drag is not None else 0,
+                            "vertical": float(drag.get('vertical') or 0) if drag is not None else 0,
+                            "pitch": float(drag.get('pitch') or 0) if drag is not None else 0,
+                            "yaw": float(drag.get('yaw') or 0) if drag is not None else 0,
+                            "roll": float(drag.get('roll') or 0) if drag is not None else 0
+                        }
+                    }
+
+                mapping[name] = {
+                    "id": name,
+                    "class": macro.get('class'),
+                    "component": comp_ref,
+                    "shipType": ship_node.get('type') if ship_node is not None else None,
+                    "storage": storage,
+                    "crew": crew,
+                    "hull": int(hull_node.get('max') or 0) if hull_node is not None else 0,
+                    "physics": physics
+                }
+            print(f"   ✅ 读取 {len(mapping)} 个 ship macros。")
+        except Exception as e:
+            print(f"   ❌ Ship macros XML Error: {e}")
+        return mapping
+
+    def _load_loadouts(self, ship_macros, ship_connections):
+        loadouts_path = os.path.join(self.raw_path, "libraries", "loadouts_final.xml")
+        mapping = {}
+        if not os.path.exists(loadouts_path):
+            print(f"   ⚠️ 警告: 找不到 loadouts 文件: {loadouts_path}")
+            return mapping
+
+        def normalize_equip_type(tag_name):
+            tag = tag_name.lower()
+            if tag.endswith('s'):
+                tag = tag[:-1]
+            return tag
+
+        def add_entry(ship_macro, group_key, equip_type, macro_id, count, optional):
+            if not ship_macro or not group_key or not equip_type or not macro_id:
+                return
+            ship_entry = mapping.setdefault(ship_macro, {})
+            group_entry = ship_entry.setdefault(group_key, {})
+            type_entry = group_entry.setdefault(equip_type, {})
+            if macro_id not in type_entry:
+                type_entry[macro_id] = {"count": 0, "optional": 0}
+            type_entry[macro_id]["count"] += count
+            if optional:
+                type_entry[macro_id]["optional"] += count
+
+        try:
+            tree = ET.parse(loadouts_path)
+            root = tree.getroot()
+            for loadout in root.findall('loadout'):
+                ship_macro = loadout.get('macro')
+                if not ship_macro: continue
+                comp_ref = ship_macros.get(ship_macro, {}).get('component')
+                connection_map = {}
+                if comp_ref and comp_ref in ship_connections:
+                    for conn in ship_connections[comp_ref]:
+                        connection_map[conn['name']] = conn['group']
+
+                macros_node = loadout.find('macros')
+                if macros_node is not None:
+                    for entry in list(macros_node):
+                        equip_type = normalize_equip_type(entry.tag)
+                        macro_id = entry.get('macro')
+                        path = (entry.get('path') or "").strip()
+                        conn_name = path.split('/')[-1].strip() if path else ''
+                        group_key = connection_map.get(conn_name, conn_name) if conn_name else None
+                        count = 1
+                        optional = entry.get('optional') == '1'
+                        add_entry(ship_macro, group_key, equip_type, macro_id, count, optional)
+
+                groups_node = loadout.find('groups')
+                if groups_node is not None:
+                    for entry in list(groups_node):
+                        equip_type = normalize_equip_type(entry.tag)
+                        macro_id = entry.get('macro')
+                        group_key = entry.get('group')
+                        if not group_key: 
+                            continue
+                        count = int(entry.get('exact') or 1)
+                        optional = entry.get('optional') == '1'
+                        add_entry(ship_macro, group_key, equip_type, macro_id, count, optional)
+
+            print(f"   ✅ 读取 {len(mapping)} 个 loadout 配置。")
+        except Exception as e:
+            print(f"   ❌ Loadouts XML Error: {e}")
+        return mapping
+
+    def _build_ships(self, ship_macros, ship_connections, loadouts_map, shipgroup_by_macro):
+        for ship_macro, info in ship_macros.items():
+            comp_ref = info.get('component')
+            ware_id = self.component_to_ware.get(ship_macro)
+            if not ware_id:
+                continue
+            ware_info = self.ware_index.get(ware_id, {})
+            if ware_info.get('transport') != 'ship':
+                continue
+            name_id = ware_info.get('nameId', ware_id)
+            if name_id:
+                self.needed_raw_names.add(name_id)
+            ship_entry = {
+                "id": ship_macro,
+                "wareId": ware_id,
+                "nameId": name_id,
+                "name": name_id,
+                "class": info.get('class'),
+                "type": None,
+                "shipgroup": shipgroup_by_macro.get(ship_macro),
+                "cost": self._build_cost(ware_id),
+                "slots": {}
+            }
+            ship_type = info.get('shipType')
+            ship_entry["type"] = ship_type
+            if ship_type:
+                self.ship_type_counts[ship_type] += 1
+            if info.get('storage') is not None:
+                ship_entry["storage"] = info.get('storage')
+            if info.get('crew') is not None:
+                ship_entry["crew"] = info.get('crew')
+            if info.get('hull') is not None:
+                ship_entry["hull"] = info.get('hull')
+            if info.get('physics') is not None:
+                ship_entry["physics"] = info.get('physics')
+
+            groups = {}
+            for conn in ship_connections.get(comp_ref, []):
+                group_key = conn['group']
+                group_info = groups.setdefault(group_key, {
+                    "group": group_key,
+                    "isImplicitGroup": False,
+                    "slotTypes": [],
+                    "slotTags": [],
+                    "connections": []
+                })
+                group_info["isImplicitGroup"] = group_info["isImplicitGroup"] or conn.get('isImplicitGroup', False)
+                group_info["connections"].append({
+                    "name": conn['name'],
+                    "tags": conn['tags']
+                })
+                for t in conn['types']:
+                    if t not in group_info["slotTypes"]:
+                        group_info["slotTypes"].append(t)
+                for tag in conn['tags']:
+                    if tag not in group_info["slotTags"]:
+                        group_info["slotTags"].append(tag)
+
+            for group_key, group_info in groups.items():
+                slot_types = group_info["slotTypes"]
+                if not slot_types:
+                    continue
+                primary_type = next((t for t in slot_types if t != "shield"), slot_types[0])
+                group_info["primaryType"] = primary_type
+                group_info["count"] = len(group_info["connections"])
+                group_info["equipments"] = loadouts_map.get(ship_macro, {}).get(group_key, {})
+                ship_entry["slots"].setdefault(primary_type, {})[group_key] = group_info
+
+            self.ships_data.append(ship_entry)
+
+        print(f"   ✅ 生成 {len(self.ships_data)} 条 ships 数据。")
+
+    def _build_equipments(self):
+        macros_path = os.path.join(self.raw_path, "libraries", "equipment_macros.xml")
+        if not os.path.exists(macros_path):
+            print(f"   ⚠️ 警告: 找不到 equipment macros 文件: {macros_path}")
+            return
+
+        class_to_type = {
+            "engine": "engine",
+            "shieldgenerator": "shield",
+            "weapon": "weapon",
+            "turret": "turret"
+        }
+
+        def parse_ident(props):
+            if props is None: return {}
+            ident = props.find('identification')
+            if ident is None: return {}
+            return {
+                "mk": ident.get('mk'),
+                "race": ident.get('makerrace')
+            }
+
+        try:
+            tree = ET.parse(macros_path)
+            root = tree.getroot()
+            for macro in root.findall('macro'):
+                macro_name = macro.get('name')
+                m_class = macro.get('class')
+                equip_type = class_to_type.get(m_class)
+                if not macro_name or not equip_type:
+                    continue
+                ware_id = self.component_to_ware.get(macro_name)
+                if not ware_id:
+                    continue
+                ware_info = self.ware_index.get(ware_id, {})
+                name_id = ware_info.get('nameId', ware_id)
+                if name_id:
+                    self.needed_raw_names.add(name_id)
+
+                props = macro.find('properties')
+                ident_info = parse_ident(props)
+
+                equipment = {
+                    "id": macro_name,
+                    "wareId": ware_id,
+                    "nameId": name_id,
+                    "name": name_id,
+                    "type": equip_type,
+                    "class": m_class,
+                    "mk": ident_info.get('mk'),
+                    "race": ident_info.get('race'),
+                    "tags": self._split_tags(ware_info.get('tags', '')),
+                    "cost": self._build_cost(ware_id)
+                }
+
+                stats = {}
+                if equip_type == "engine" and props is not None:
+                    thrust = props.find('thrust')
+                    boost = props.find('boost')
+                    travel = props.find('travel')
+                    if thrust is not None:
+                        stats["thrust"] = {
+                            "forward": float(thrust.get('forward') or 0),
+                            "reverse": float(thrust.get('reverse') or 0)
+                        }
+                    if boost is not None:
+                        stats["boost"] = {
+                            "duration": float(boost.get('duration') or 0),
+                            "recharge": float(boost.get('recharge') or 0),
+                            "thrust": float(boost.get('thrust') or 0),
+                            "acceleration": float(boost.get('acceleration') or 0)
+                        }
+                    if travel is not None:
+                        stats["travel"] = {
+                            "charge": float(travel.get('charge') or 0),
+                            "thrust": float(travel.get('thrust') or 0),
+                            "attack": float(travel.get('attack') or 0),
+                            "release": float(travel.get('release') or 0)
+                        }
+
+                if equip_type == "shield" and props is not None:
+                    recharge = props.find('recharge')
+                    if recharge is not None:
+                        stats["recharge"] = {
+                            "max": float(recharge.get('max') or 0),
+                            "rate": float(recharge.get('rate') or 0),
+                            "delay": float(recharge.get('delay') or 0)
+                        }
+
+                if equip_type in {"weapon", "turret"} and props is not None:
+                    bullet = props.find('bullet')
+                    heat = props.find('heat')
+                    if bullet is not None:
+                        stats["bullet"] = bullet.get('class')
+                    if heat is not None:
+                        stats["heat"] = {
+                            "overheat": float(heat.get('overheat') or 0),
+                            "cooldelay": float(heat.get('cooldelay') or 0),
+                            "coolrate": float(heat.get('coolrate') or 0),
+                            "reenable": float(heat.get('reenable') or 0)
+                        }
+
+                if stats:
+                    equipment["stats"] = stats
+
+                self.equipments_data.append(equipment)
+
+            print(f"   ✅ 生成 {len(self.equipments_data)} 条 equipments 数据。")
+        except Exception as e:
+            print(f"   ❌ Equipment macros XML Error: {e}")
+
+    # =======================================================
     # 3. 语言提取 (Backend Translation)
     # =======================================================
     def extract_and_resolve_languages(self):
@@ -485,8 +927,10 @@ class X4PrecisionLoader:
         for x4_id, conf in X4_LANG_CONFIG.items():
             iso = conf['iso']
             self.i18n_data[iso] = {}
-            target_name = f"0001-L{x4_id}.xml" 
+            target_name = f"0001-L{x4_id}.xml"
             t_file = os.path.join(t_path, target_name)
+            if not os.path.exists(t_file):
+                t_file = os.path.join(t_path, f"0001-l{x4_id}.xml")
             
             # A. 加载查找表
             current_lang_db = {}
@@ -511,6 +955,10 @@ class X4PrecisionLoader:
 
             if not current_lang_db: continue
 
+            if iso == 'en' and not self.ship_type_name_map:
+                self.ship_type_name_map = self._load_ship_types_from_locale(t_file)
+                self._build_ship_type_key_map()
+
             # B. 递归清洗
             resolved_count = 0
             for raw_name in self.needed_raw_names:
@@ -520,6 +968,8 @@ class X4PrecisionLoader:
                     resolved_count += 1
             
             print(f"  ✅ [Done]  {iso:6} ({x4_id}) -> {resolved_count} 条")
+            if iso == 'en':
+                self.ship_type_name_map = self._load_ship_types_from_locale(t_file)
 
     def _resolve_name(self, raw_name, lang_db, depth=0):
         if not raw_name or depth > 5: return raw_name
@@ -531,6 +981,65 @@ class X4PrecisionLoader:
             return match.group(0)
         text = re.sub(r"\{\s*(\d+)\s*,\s*(\d+)\s*\}", replace_callback, text)
         return re.sub(r"\s+", " ", text).strip()
+
+    def _load_ship_types_from_locale(self, t_file):
+        if not t_file or not os.path.exists(t_file):
+            return {}
+        try:
+            tree = ET.parse(t_file)
+            root = tree.getroot()
+            page = root.find(".//page[@id='20221']")
+            if page is None:
+                return {}
+            type_map = {}
+            for t in page.findall('t'):
+                t_id = t.get('id')
+                if not t_id: 
+                    continue
+                text = "".join(t.itertext()).strip()
+                if not text:
+                    continue
+                type_map[t_id] = text
+            return type_map
+        except Exception:
+            return {}
+
+    def _build_ship_type_key_map(self):
+        if not self.ship_type_name_map:
+            return
+        def norm(text):
+            return re.sub(r"\s+", "", text.lower())
+        value_index = {}
+        for key, text in self.ship_type_name_map.items():
+            value_index[norm(text)] = key
+        lookup_overrides = {
+            "resupplier": "Auxiliary",
+            "largeminer": "Miner",
+            "expeditionary": "Expeditionary Ship"
+        }
+        for ship_type in self.ship_type_counts.keys():
+            lookup_text = lookup_overrides.get(ship_type, ship_type)
+            key = value_index.get(norm(lookup_text))
+            if key:
+                self.ship_type_key_map[ship_type] = f"{{20221,{key}}}"
+                self.needed_raw_names.add(f"{{20221,{key}}}")
+
+    def analyze_ship_types(self):
+        print(f"\n🛸 [4.1.1/5] 分析船只类型映射 (page 20221)...")
+        self._build_ship_type_key_map()
+        print(f"-" * 85)
+        print(f"{'Ship Type':<20} | {'i18n Key':<15} | {'状态':<10} | {'计数'}")
+        print(f"-" * 85)
+        for ship_type, count in sorted(self.ship_type_counts.items()):
+            key = self.ship_type_key_map.get(ship_type)
+            status = "✅ 已匹配" if key else "❌ 缺失"
+            print(f"{ship_type:<20} | {str(key or '---'):<15} | {status:<10} | {count}")
+        for ship_type, key in self.ship_type_key_map.items():
+            self.ship_types_data.append({
+                "id": ship_type,
+                "nameId": key,
+                "name": key
+            })
 
     # =======================================================
     # 🆕 4. 注入英文名称到数据对象
@@ -568,8 +1077,30 @@ class X4PrecisionLoader:
             if raw_key in en_map:
                 item['name'] = en_map[raw_key]
                 count_wg += 1
+
+        # 更新 ship/equipment/shipgroup 数据
+        count_ships = 0
+        for item in self.ships_data:
+            raw_key = item.get('nameId')
+            if raw_key in en_map:
+                item['name'] = en_map[raw_key]
+                count_ships += 1
+
+        count_equips = 0
+        for item in self.equipments_data:
+            raw_key = item.get('nameId')
+            if raw_key in en_map:
+                item['name'] = en_map[raw_key]
+                count_equips += 1
+
+        count_ship_types = 0
+        for item in self.ship_types_data:
+            raw_key = item.get('nameId')
+            if raw_key in en_map:
+                item['name'] = en_map[raw_key]
+                count_ship_types += 1
         
-        print(f"   ✅ 更新了 {count_wares} 个商品, {count_mods} 个模块, {count_wg} 个模块分组的英文名称。")
+        print(f"   ✅ 更新了 {count_wares} 个商品, {count_mods} 个模块, {count_wg} 个模块分组, {count_ships} 个飞船, {count_equips} 个装备, {count_ship_types} 个船只类型的英文名称。")
 
     # =======================================================
     # 🆕 4.1. 模块类型分析
@@ -678,6 +1209,12 @@ class X4PrecisionLoader:
             json.dump(self.module_groups_result, f, indent=2, ensure_ascii=False)
         with open(os.path.join(data_dir, "consumption.json"), 'w', encoding='utf-8') as f:
             json.dump(self.race_consumption, f, indent=2, ensure_ascii=False)
+        with open(os.path.join(data_dir, "ships.json"), 'w', encoding='utf-8') as f:
+            json.dump(self.ships_data, f, indent=2, ensure_ascii=False)
+        with open(os.path.join(data_dir, "equipments.json"), 'w', encoding='utf-8') as f:
+            json.dump(self.equipments_data, f, indent=2, ensure_ascii=False)
+        with open(os.path.join(data_dir, "ship_types.json"), 'w', encoding='utf-8') as f:
+            json.dump(self.ship_types_data, f, indent=2, ensure_ascii=False)
 
         # 保存语言包
         available_languages = []
@@ -698,7 +1235,9 @@ if __name__ == "__main__":
     loader.load_colors()  # 加载颜色定义
     loader.process_module_groups()
     loader.scan_assets()
+    loader.parse_ship_and_equipment_data()
     loader.extract_and_resolve_languages()
+    loader.analyze_ship_types()
     loader.inject_english_names() # 新增步骤
     loader.analyze_module_types()
     loader.generate_res_data() # 新增步骤: 生成资源元数据及缩写
