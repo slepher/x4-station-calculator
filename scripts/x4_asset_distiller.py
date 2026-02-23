@@ -49,20 +49,30 @@ def main():
         shutil.copytree(os.path.join(src, "t"), os.path.join(dest_root, "t"))
         print("✅ [1/4] 语言包已拷贝。")
 
-    # --- 步骤 2: 处理核心库文件 (wares & waregroups) ---
-    print("📂 [2/4] 正在处理核心库文件 (Wares & Waregroups)...")
+    # --- 步骤 2: 处理核心库文件 (wares/waregroups/colors/ships/shipgroups/loadouts) ---
+    print("📂 [2/6] 正在处理核心库文件 (Wares/Waregroups/Colors/Ships/Shipgroups/Loadouts)...")
     lib_dest_dir = os.path.join(dest_root, "libraries")
     os.makedirs(lib_dest_dir, exist_ok=True)
 
-    lib_files = ['wares.xml', 'waregroups.xml', 'colors.xml']
+    lib_files = [
+        { 'name': 'wares.xml', 'final': 'wares_final.xml' },
+        { 'name': 'waregroups.xml', 'final': 'waregroups_final.xml' },
+        { 'name': 'colors.xml', 'final': 'colors_final.xml' },
+        { 'name': 'ships.xml', 'final': 'ships_final.xml' },
+        { 'name': 'shipgroups.xml', 'final': 'shipgroups_final.xml' },
+        # loadouts 需要叠加 DLC
+        { 'name': 'loadouts.xml', 'final': 'loadouts_final.xml' },
+    ]
     parser = etree.XMLParser(remove_blank_text=True)
     dlc_order = v_config.get('dlc_order', [])
 
     for lib_file in lib_files:
-        print(f"   🔨 处理 {lib_file} ...")
+        lib_name = lib_file['name']
+        final_name = lib_file['final']
+        print(f"   🔨 处理 {lib_name} ...")
         # 1. 拷贝 Base
-        base_src = os.path.join(src, "libraries", lib_file)
-        target_path = os.path.join(lib_dest_dir, lib_file)
+        base_src = os.path.join(src, "libraries", lib_name)
+        target_path = os.path.join(lib_dest_dir, lib_name)
         
         if os.path.exists(base_src):
             shutil.copy2(base_src, target_path)
@@ -74,7 +84,7 @@ def main():
         base_tree = etree.parse(target_path, parser)
         for dlc_id in dlc_order:
             # Patch 位于 SOURCE 目录的 extensions 中
-            patch_path = os.path.join(src, "extensions", dlc_id, "libraries", lib_file)
+            patch_path = os.path.join(src, "extensions", dlc_id, "libraries", lib_name)
             if os.path.exists(patch_path):
                 print(f"      [+] 注入补丁 ({dlc_id})")
                 try:
@@ -84,12 +94,12 @@ def main():
                     print(f"      ⚠️ 警告: 补丁失败 {dlc_id}: {e}")
         
         # 3. 写入 Final
-        final_output_path = os.path.join(lib_dest_dir, lib_file.replace('.xml', '_final.xml'))
+        final_output_path = os.path.join(lib_dest_dir, final_name)
         base_tree.write(final_output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
         print(f"      ✨ 生成: {os.path.basename(final_output_path)}")
 
-    # --- 步骤 3: 聚合宏定义 (Macros) ---
-    print("∑ [3/4] 正在聚合空间站宏定义 (macros_final.xml)...")
+    # --- 步骤 3: 聚合空间站宏定义 (module_macros.xml) ---
+    print("∑ [3/6] 正在聚合空间站宏定义 (module_macros.xml)...")
     
     # 3.1 解析引用 (Needed Macros)
     needed_macros = set()
@@ -183,9 +193,183 @@ def main():
                 processed_count += 1
 
     # 3.4 保存
-    macros_final_path = os.path.join(lib_dest_dir, "macros_final.xml")
+    macros_final_path = os.path.join(lib_dest_dir, "module_macros.xml")
     etree.ElementTree(macros_root).write(macros_final_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
     print(f"✅ 聚合完成: 写入 {processed_count} 个宏定义到 macros_final.xml")
+
+    # --- 步骤 4: 聚合飞船宏定义 (ship_macros.xml) ---
+    print("∑ [4/6] 正在聚合飞船宏定义 (ship_macros.xml)...")
+
+    ship_macro_index = {}
+
+    def scan_macros_to_index(root_path, source_key, pattern):
+        for f in glob.glob(pattern, recursive=True):
+            fname = os.path.splitext(os.path.basename(f))[0]
+            if fname not in ship_macro_index:
+                ship_macro_index[fname] = {}
+            ship_macro_index[fname][source_key] = f
+
+    scan_macros_to_index(src, 'base', os.path.join(src, "assets", "**", "macros", "ship_*_macro.xml"))
+    for dlc_id in dlc_order:
+        p = os.path.join(src, "extensions", dlc_id)
+        if os.path.exists(p):
+            scan_macros_to_index(p, dlc_id, os.path.join(p, "assets", "**", "macros", "ship_*_macro.xml"))
+
+    ship_macros_root = etree.Element('macros')
+    ship_processed = 0
+
+    for macro_id, sources in ship_macro_index.items():
+        current_tree = None
+        if 'base' in sources:
+            try:
+                current_tree = etree.parse(sources['base'], parser)
+            except:
+                pass
+
+        for dlc_id in dlc_order:
+            if dlc_id in sources:
+                f_path = sources[dlc_id]
+                try:
+                    dlc_tree = etree.parse(f_path, parser)
+                    dlc_root = dlc_tree.getroot()
+                    if dlc_root.tag == 'diff':
+                        if current_tree:
+                            xml_diff.Apply_Patch(current_tree.getroot(), dlc_root)
+                    else:
+                        current_tree = dlc_tree
+                except Exception as e:
+                    print(f"      ⚠️ 处理出错 {macro_id} ({dlc_id}): {e}")
+
+        if current_tree:
+            root_node = current_tree.getroot()
+            macro_node = root_node if root_node.tag == 'macro' else root_node.find(f".//macro[@name='{macro_id}']")
+            if macro_node is not None:
+                ship_macros_root.append(macro_node)
+                ship_processed += 1
+
+    ship_macros_path = os.path.join(lib_dest_dir, "ship_macros.xml")
+    etree.ElementTree(ship_macros_root).write(ship_macros_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
+    print(f"✅ 聚合完成: 写入 {ship_processed} 个飞船宏定义到 ship_macros.xml")
+
+    # --- 步骤 5: 聚合飞船组件连接点 (ship_connections.xml) ---
+    print("∑ [5/6] 正在聚合飞船组件连接点 (ship_connections.xml)...")
+
+    ship_component_index = {}
+
+    def scan_components_to_index(root_path, source_key, pattern):
+        for f in glob.glob(pattern, recursive=True):
+            fname = os.path.splitext(os.path.basename(f))[0]
+            if fname not in ship_component_index:
+                ship_component_index[fname] = {}
+            ship_component_index[fname][source_key] = f
+
+    scan_components_to_index(src, 'base', os.path.join(src, "assets", "units", "**", "ship_*.xml"))
+    for dlc_id in dlc_order:
+        p = os.path.join(src, "extensions", dlc_id)
+        if os.path.exists(p):
+            scan_components_to_index(p, dlc_id, os.path.join(p, "assets", "units", "**", "ship_*.xml"))
+
+    components_root = etree.Element('components')
+    components_processed = 0
+
+    for comp_id, sources in ship_component_index.items():
+        current_tree = None
+        if 'base' in sources:
+            try:
+                current_tree = etree.parse(sources['base'], parser)
+            except:
+                pass
+
+        for dlc_id in dlc_order:
+            if dlc_id in sources:
+                f_path = sources[dlc_id]
+                try:
+                    dlc_tree = etree.parse(f_path, parser)
+                    dlc_root = dlc_tree.getroot()
+                    if dlc_root.tag == 'diff':
+                        if current_tree:
+                            xml_diff.Apply_Patch(current_tree.getroot(), dlc_root)
+                    else:
+                        current_tree = dlc_tree
+                except Exception as e:
+                    print(f"      ⚠️ 处理出错 {comp_id} ({dlc_id}): {e}")
+
+        if current_tree:
+            root_node = current_tree.getroot()
+            if root_node.tag == 'component':
+                components_root.append(root_node)
+                components_processed += 1
+            elif root_node.tag == 'components':
+                for node in root_node.findall('component'):
+                    components_root.append(node)
+                    components_processed += 1
+
+    connections_path = os.path.join(lib_dest_dir, "ship_connections.xml")
+    etree.ElementTree(components_root).write(connections_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
+    print(f"✅ 聚合完成: 写入 {components_processed} 个组件定义到 ship_connections.xml")
+
+    # --- 步骤 6: 聚合装备宏定义 (equipment_macros.xml) ---
+    print("∑ [6/6] 正在聚合装备宏定义 (equipment_macros.xml)...")
+
+    equipment_macro_index = {}
+
+    def scan_equipment_to_index(root_path, source_key, pattern):
+        for f in glob.glob(pattern, recursive=True):
+            fname = os.path.splitext(os.path.basename(f))[0]
+            if fname not in equipment_macro_index:
+                equipment_macro_index[fname] = {}
+            equipment_macro_index[fname][source_key] = f
+
+    equipment_patterns = [
+        os.path.join("assets", "props", "**", "macros", "*engine*_macro.xml"),
+        os.path.join("assets", "props", "**", "macros", "*shield*_macro.xml"),
+        os.path.join("assets", "props", "**", "macros", "*weapon*_macro.xml"),
+        os.path.join("assets", "props", "**", "macros", "*turret*_macro.xml"),
+    ]
+
+    for pattern in equipment_patterns:
+        scan_equipment_to_index(src, 'base', os.path.join(src, pattern))
+    for dlc_id in dlc_order:
+        p = os.path.join(src, "extensions", dlc_id)
+        if os.path.exists(p):
+            for pattern in equipment_patterns:
+                scan_equipment_to_index(p, dlc_id, os.path.join(p, pattern))
+
+    equipment_macros_root = etree.Element('macros')
+    equipment_processed = 0
+
+    for macro_id, sources in equipment_macro_index.items():
+        current_tree = None
+        if 'base' in sources:
+            try:
+                current_tree = etree.parse(sources['base'], parser)
+            except:
+                pass
+
+        for dlc_id in dlc_order:
+            if dlc_id in sources:
+                f_path = sources[dlc_id]
+                try:
+                    dlc_tree = etree.parse(f_path, parser)
+                    dlc_root = dlc_tree.getroot()
+                    if dlc_root.tag == 'diff':
+                        if current_tree:
+                            xml_diff.Apply_Patch(current_tree.getroot(), dlc_root)
+                    else:
+                        current_tree = dlc_tree
+                except Exception as e:
+                    print(f"      ⚠️ 处理出错 {macro_id} ({dlc_id}): {e}")
+
+        if current_tree:
+            root_node = current_tree.getroot()
+            macro_node = root_node if root_node.tag == 'macro' else root_node.find(f".//macro[@name='{macro_id}']")
+            if macro_node is not None:
+                equipment_macros_root.append(macro_node)
+                equipment_processed += 1
+
+    equipment_macros_path = os.path.join(lib_dest_dir, "equipment_macros.xml")
+    etree.ElementTree(equipment_macros_root).write(equipment_macros_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
+    print(f"✅ 聚合完成: 写入 {equipment_processed} 个装备宏定义到 equipment_macros.xml")
 
     print(f"✨ 全流程结束！资产已蒸馏至 {dest_root}")
 
