@@ -14,6 +14,13 @@ It executes the full fix loop for an existing or newly provided bug target.
 - Resolve by `x4-user-workflow` "Change Name Resolution" rules
 - `bug-description` (optional quick target text)
 
+## Change Name Resolution (MANDATORY)
+
+- Resolve `change-name` using `x4-user-workflow` rules before any action.
+- If multiple matches or no match, stop and ask the user to choose; list available active changes.
+- Do not auto-create a change on resolution failure.
+- After resolution, print: `Resolved change: <change-name>`.
+
 ## Trigger
 
 - `/x4:bug-fix [change-name] [bug-description(optional)]`
@@ -21,7 +28,7 @@ It executes the full fix loop for an existing or newly provided bug target.
 
 ## Target Resolution (MANDATORY)
 
-1. Resolve change using `x4-user-workflow` rules.
+1. Use the already-resolved `change-name` from the resolver.
 2. If no trailing bug text is provided, target the latest open bug in `bugs.md`.
 3. If trailing bug text is provided:
    - register/update this bug in `bugs.md` (status at least `New`)

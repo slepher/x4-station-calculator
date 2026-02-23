@@ -16,6 +16,13 @@ It does not write pass/fail results.
 - `change-name` (optional; supports abbreviation token such as `std`)
 - Resolve by `x4-user-workflow` "Change Name Resolution" rules
 
+## Change Name Resolution (MANDATORY)
+
+- Resolve `change-name` using `x4-user-workflow` rules before any action.
+- If multiple matches or no match, stop and ask the user to choose; list available active changes.
+- Do not auto-create a change on resolution failure.
+- After resolution, print: `Resolved change: <change-name>`.
+
 ## Positioning
 
 1. `/x4:test-impl` is a parallel acceleration track for test authoring.
@@ -49,6 +56,7 @@ It does not write pass/fail results.
    - Unit: Vitest + Pinia setup patterns
    - E2E: use project `test-setup`, prefer locators from `ui_knowledge.md`
    - Drag-and-drop cases: follow `x4-drag-test` conventions
+   - When tests require preloaded data, add `beforeEach` to load `tests/fixtures/db.json` (if present) to create a pre-seeded environment
    - Assertion quality (MANDATORY):
      - Do not use low-information pass/fail flags such as `let success = false` as the primary assertion target.
      - Assert concrete observable state directly (e.g., final DOM order, item IDs, counts, positions).

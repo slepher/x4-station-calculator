@@ -22,6 +22,13 @@ After discussion, quickly push documentation forward by generating required arti
 - Change name (kebab-case) or feature description
 - Discussion conclusions (if `/x4:ff` follows `/x4:discuss`)
 
+## Change Name Resolution (MANDATORY)
+
+- Resolve `change-name` using `x4-user-workflow` rules before any action.
+- If multiple matches or no match, stop and ask the user to choose; list available active changes.
+- Do not auto-create a change on resolution failure.
+- After resolution, print: `Resolved change: <change-name>`.
+
 ## Ownership Boundary (MANDATORY)
 
 - `x4-ff` owns:
@@ -35,7 +42,7 @@ Do not duplicate `x4-doc` writing standards in this skill.
 
 ## Workflow (MANDATORY)
 
-1. Resolve `change-name` using `x4-user-workflow` change resolver.
+1. Use the already-resolved `change-name` from the resolver.
 2. If coming from `/x4:discuss`, ensure `openspec/changes/<change-name>/request.md` exists first.
 3. Before generating downstream artifacts, validate `request.md` against `x4-doc` "request.md Positioning" standards.
    If not satisfied, revise `request.md` first.

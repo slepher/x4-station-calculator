@@ -247,7 +247,7 @@ test.describe('多空间站帝国规划 - 标签拖拽重排', () => {
   }
 
   const getStationOrder = async (page: any) => {
-    return await page.locator('.station-tab').evaluateAll((els) =>
+    return await page.locator('.station-tab').evaluateAll((els: Element[]) =>
       els.map((el) => (el as HTMLElement).dataset.stationId || '')
     )
   }

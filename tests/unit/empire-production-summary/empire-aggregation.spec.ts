@@ -23,7 +23,7 @@ vi.mock('@/store/useGameDataStore', () => ({
 
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { analyzeEmpireWareFlow } from '@/store/logic/analyzeEmpireWareFlow'
-import type { GroupedFlows, WareFlow, StationPlan } from '@/types/x4'
+import type { GroupedFlows, WareFlow, StationPlan, ModuleFlowAtom } from '@/types/x4'
 
 function createMockGroupedFlows(overrides: Partial<GroupedFlows> = {}): GroupedFlows {
   const defaultFlow: WareFlow = {
@@ -55,12 +55,22 @@ function createMockGroupedFlows(overrides: Partial<GroupedFlows> = {}): GroupedF
       positive: [],
       resources: []
     },
-    storageGroups: {
+    volumeGroups: {
       container: [],
       solid: [],
       liquid: []
     },
     ...overrides
+  }
+}
+
+function makeContribution(partial: Partial<ModuleFlowAtom> & Pick<ModuleFlowAtom, 'type' | 'amount' | 'bonusPercent'>): ModuleFlowAtom {
+  return {
+    moduleId: 'test-module',
+    count: 1,
+    volumeFlow: 0,
+    valueFlow: 0,
+    ...partial
   }
 }
 
@@ -128,7 +138,7 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
           totalOccupiedVolume: 0,
           unitPrice: 50,
           netValue: -5000,
-          contributions: [{ type: 'workforce', amount: 100, bonusPercent: 0 }]
+          contributions: [makeContribution({ type: 'consumption', amount: 100, bonusPercent: 0 })]
         }],
         operations: [],
         positive: [],
@@ -156,7 +166,7 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
           totalOccupiedVolume: 0,
           unitPrice: 50,
           netValue: -2500,
-          contributions: [{ type: 'workforce', amount: 50, bonusPercent: 0 }]
+          contributions: [makeContribution({ type: 'consumption', amount: 50, bonusPercent: 0 })]
         }],
         operations: [],
         positive: [],
@@ -171,9 +181,11 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
     const result = analyzeEmpireWareFlow([station1, station2], (id) => cache.get(id) || null)
 
     expect(result.empireGroups.supply.length).toBe(1)
-    expect(result.empireGroups.supply[0].wareId).toBe('foodrations')
-    expect(result.empireGroups.supply[0].consumption).toBe(200)
-    expect(result.empireGroups.supply[0].netRate).toBe(-200)
+    const firstSupply = result.empireGroups.supply[0]
+    expect(firstSupply).toBeDefined()
+    expect(firstSupply!.wareId).toBe('foodrations')
+    expect(firstSupply!.consumption).toBe(200)
+    expect(firstSupply!.netRate).toBe(-200)
   })
 
   it('产品组数据正确归类（netRate > 0）', () => {
@@ -200,7 +212,7 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
           totalOccupiedVolume: 0,
           unitPrice: 1000,
           netValue: 432000,
-          contributions: [{ type: 'production', amount: 432, bonusPercent: 0 }]
+          contributions: [makeContribution({ type: 'production', amount: 432, bonusPercent: 0 })]
         }],
         positive: [],
         resources: []
@@ -215,8 +227,10 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
     const products = getProducts(result)
     const operations = getOperations(result)
     expect(products.length).toBe(1)
-    expect(products[0].wareId).toBe('claytronics')
-    expect(products[0].netRate).toBe(432)
+    const firstProduct = products[0]
+    expect(firstProduct).toBeDefined()
+    expect(firstProduct!.wareId).toBe('claytronics')
+    expect(firstProduct!.netRate).toBe(432)
     expect(operations.length).toBe(0)
   })
 
@@ -245,8 +259,8 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
           unitPrice: 500,
           netValue: -35000,
           contributions: [
-            { type: 'production', amount: 70, bonusPercent: 0 },
-            { type: 'consumption', amount: -140, bonusPercent: 0 }
+            makeContribution({ type: 'production', amount: 70, bonusPercent: 0 }),
+            makeContribution({ type: 'consumption', amount: -140, bonusPercent: 0 })
           ]
         }],
         positive: [],
@@ -262,8 +276,10 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
     const products = getProducts(result)
     const operations = getOperations(result)
     expect(operations.length).toBe(1)
-    expect(operations[0].wareId).toBe('quantumtubes')
-    expect(operations[0].netRate).toBe(-70)
+    const firstOperation = operations[0]
+    expect(firstOperation).toBeDefined()
+    expect(firstOperation!.wareId).toBe('quantumtubes')
+    expect(firstOperation!.netRate).toBe(-70)
     expect(products.length).toBe(0)
   })
 
@@ -292,7 +308,7 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
           totalOccupiedVolume: 0,
           unitPrice: 1000,
           netValue: 432000,
-          contributions: [{ type: 'production', amount: 432, bonusPercent: 0 }]
+          contributions: [makeContribution({ type: 'production', amount: 432, bonusPercent: 0 })]
         }],
         positive: [],
         resources: []
@@ -320,7 +336,7 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
           totalOccupiedVolume: 0,
           unitPrice: 300,
           netValue: 60000,
-          contributions: [{ type: 'production', amount: 200, bonusPercent: 0 }]
+          contributions: [makeContribution({ type: 'production', amount: 200, bonusPercent: 0 })]
         }],
         positive: [],
         resources: []
@@ -335,8 +351,10 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
 
     const products = getProducts(result)
     expect(products.length).toBe(1)
-    expect(products[0].wareId).toBe('hullparts')
-    expect(products[0].production).toBe(200)
+    const firstProduct = products[0]
+    expect(firstProduct).toBeDefined()
+    expect(firstProduct!.wareId).toBe('hullparts')
+    expect(firstProduct!.production).toBe(200)
   })
 
   it('数量 > 1 的空间站数据正确乘以倍数', () => {
@@ -363,7 +381,7 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
           totalOccupiedVolume: 0,
           unitPrice: 1000,
           netValue: 100000,
-          contributions: [{ type: 'production', amount: 100, bonusPercent: 0 }]
+          contributions: [makeContribution({ type: 'production', amount: 100, bonusPercent: 0 })]
         }],
         positive: [],
         resources: []
@@ -376,9 +394,11 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
     const result = analyzeEmpireWareFlow([station], (id) => cache.get(id) || null)
 
     const products = getProducts(result)
-    expect(products[0].production).toBe(300)
-    expect(products[0].netRate).toBe(300)
-    expect(products[0].netValue).toBe(300000)
+    const firstProduct = products[0]
+    expect(firstProduct).toBeDefined()
+    expect(firstProduct!.production).toBe(300)
+    expect(firstProduct!.netRate).toBe(300)
+    expect(firstProduct!.netValue).toBe(300000)
   })
 
   it('候选数据中的 supply wareId 优先归入补给组', () => {
@@ -404,7 +424,7 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
           totalOccupiedVolume: 0,
           unitPrice: 50,
           netValue: -6000,
-          contributions: [{ type: 'workforce', amount: 120, bonusPercent: 0 }]
+          contributions: [makeContribution({ type: 'consumption', amount: 120, bonusPercent: 0 })]
         }],
         operations: [{
           wareId: 'foodrations',
@@ -424,7 +444,7 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
           totalOccupiedVolume: 0,
           unitPrice: 50,
           netValue: 1500,
-          contributions: [{ type: 'production', amount: 30, bonusPercent: 0 }]
+          contributions: [makeContribution({ type: 'production', amount: 30, bonusPercent: 0 })]
         }],
         positive: [],
         resources: []
@@ -437,8 +457,10 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
     const result = analyzeEmpireWareFlow([station], (id) => cache.get(id) || null)
 
     expect(result.empireGroups.supply.length).toBe(1)
-    expect(result.empireGroups.supply[0].wareId).toBe('foodrations')
-    expect(result.empireGroups.supply[0].netRate).toBe(-90)
+    const firstSupply = result.empireGroups.supply[0]
+    expect(firstSupply).toBeDefined()
+    expect(firstSupply!.wareId).toBe('foodrations')
+    expect(firstSupply!.netRate).toBe(-90)
     const products = getProducts(result)
     const operations = getOperations(result)
     expect(products.length).toBe(0)
@@ -469,7 +491,7 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
           totalOccupiedVolume: 0,
           unitPrice: 60,
           netValue: -4800,
-          contributions: [{ type: 'workforce', amount: 80, bonusPercent: 0 }]
+          contributions: [makeContribution({ type: 'consumption', amount: 80, bonusPercent: 0 })]
         }],
         operations: [{
           wareId: 'medicalsupplies',
@@ -489,7 +511,7 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
           totalOccupiedVolume: 0,
           unitPrice: 60,
           netValue: 600,
-          contributions: [{ type: 'production', amount: 10, bonusPercent: 0 }]
+          contributions: [makeContribution({ type: 'production', amount: 10, bonusPercent: 0 })]
         }],
         positive: [],
         resources: []
@@ -517,7 +539,7 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
           totalOccupiedVolume: 0,
           unitPrice: 60,
           netValue: 300,
-          contributions: [{ type: 'production', amount: 5, bonusPercent: 0 }]
+          contributions: [makeContribution({ type: 'production', amount: 5, bonusPercent: 0 })]
         }],
         positive: [],
         resources: []
@@ -608,7 +630,7 @@ describe('EmpireFlowAtom 数据结构测试', () => {
           totalOccupiedVolume: 0,
           unitPrice: 1000,
           netValue: 100000,
-          contributions: [{ type: 'production', amount: 100, bonusPercent: 10 }]
+          contributions: [makeContribution({ type: 'production', amount: 100, bonusPercent: 10 })]
         }],
         positive: [],
         resources: []
@@ -621,14 +643,17 @@ describe('EmpireFlowAtom 数据结构测试', () => {
     const result = analyzeEmpireWareFlow([station], (id) => cache.get(id) || null)
 
     const products = getProducts(result)
-    expect(products[0].contributions.length).toBe(1)
+    const firstProduct = products[0]
+    expect(firstProduct).toBeDefined()
+    expect(firstProduct!.contributions.length).toBe(1)
     
-    const contribution = products[0].contributions[0]
-    expect(contribution.stationId).toBe('station-1')
-    expect(contribution.stationName).toBe('Test Station')
-    expect(contribution.stationCount).toBe(2)
-    expect(contribution.netRate).toBe(200)
-    expect(contribution.production).toBe(200)
-    expect(contribution.consumption).toBe(0)
+    const contribution = firstProduct!.contributions[0]
+    expect(contribution).toBeDefined()
+    expect(contribution!.stationId).toBe('station-1')
+    expect(contribution!.stationName).toBe('Test Station')
+    expect(contribution!.stationCount).toBe(2)
+    expect(contribution!.netRate).toBe(200)
+    expect(contribution!.production).toBe(200)
+    expect(contribution!.consumption).toBe(0)
   })
 })

@@ -16,6 +16,13 @@ It does not execute test cases during apply.
 - `change-name` (optional; supports abbreviation token such as `std`)
 - Resolve by `x4-user-workflow` "Change Name Resolution" rules
 
+## Change Name Resolution (MANDATORY)
+
+- Resolve `change-name` using `x4-user-workflow` rules before any action.
+- If multiple matches or no match, stop and ask the user to choose; list available active changes.
+- Do not auto-create a change on resolution failure.
+- After resolution, print: `Resolved change: <change-name>`.
+
 ## Steps (MANDATORY)
 
 1. Read and follow `.trae/skills/openspec-apply-change/SKILL.md` as the base implementation workflow.

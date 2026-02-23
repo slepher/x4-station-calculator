@@ -63,7 +63,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
   };
 
   async function setupGroupWithNode(page: any, wareId: string, lineage: string = 'default') {
-    await page.evaluate((args) => {
+    await page.evaluate((args: { wareId: string; lineage: string }) => {
       const logicFlow = (window as any).logicFlowStore;
       logicFlow.clearAllGroups();
       const group = logicFlow.addGroup('industrial', args.lineage);
@@ -73,7 +73,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
   }
 
   async function isolateNode(page: any, wareId: string) {
-    await page.evaluate((wareId) => {
+    await page.evaluate((wareId: string) => {
       const logicFlow = (window as any).logicFlowStore;
       const group = logicFlow.groups[0];
       const node = group.nodes.find((n: any) => n.wareId === wareId);

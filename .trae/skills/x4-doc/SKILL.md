@@ -27,9 +27,16 @@ Update OpenSpec planning artifacts based on discussion conclusions, and keep req
 
 ## Parameters
 
-- `<change_name>`: The name of the change folder in `openspec/changes/` (e.g., `storage-auto-fill`). If it doesn't exist, create it.
+- `<change_name>`: The name of the change folder in `openspec/changes/` (e.g., `storage-auto-fill`).
 - `[spec_name]` (Optional): The sub-folder name for the spec (e.g., `storage-logic`). If provided, create `specs/<spec_name>/spec.md`. If omitted, use the change name or default location.
 - `<change_name>` accepts abbreviation token and must be resolved by `x4-user-workflow` "Change Name Resolution" rules.
+
+## Change Name Resolution (MANDATORY)
+
+- Resolve `change-name` using `x4-user-workflow` rules before any action.
+- If multiple matches or no match, stop and ask the user to choose; list available active changes.
+- Do not auto-create a change on resolution failure.
+- After resolution, print: `Resolved change: <change-name>`.
 
 ## Input
 
@@ -166,6 +173,12 @@ When creating or updating `test_tasks.md` via `/x4:doc`, use the following gener
    - If Web steps change, sync corresponding locator/flow updates to `ui_knowledge.md` in the same update.
 5. Avoid non-executable wording:
    - Do not use only “用例/验证” bullets without actionable steps.
+
+### 6.4 Test Environment Knowledge (MANDATORY)
+
+- When test implementation requires preloaded data, use `tests/fixtures/db.json` in `beforeEach` to seed the environment.
+- `db.json` is generated from `tests/seeds/*.yaml`. If dynamic UI elements need validation, derive expected data from the corresponding seed content.
+- This is knowledge for test implementation only; do NOT add it as checklist items in `test_tasks.md`.
 
 ### 6.1 Requirement-Change Test Migration (MANDATORY)
 

@@ -14,6 +14,29 @@ Optimize the interaction and content of Favorite and Lock buttons in StationWare
 - **那么** Tooltip 应当保持显示，并即时更新内容反映新状态
 - **并且** 只有当鼠标移开时 Tooltip 才消失
 
+### Requirement: Tooltip Placement
+当用户悬停在收藏按钮（FavoriteButton）上时，tooltip **MUST** 向左侧弹出；当用户悬停在锁定按钮（LockButton）上时，tooltip **MUST** 向右侧弹出。
+
+#### Scenario: Hover Favorite Button
+- **前提** StationWareFlow 页面已渲染收藏按钮
+- **当** 用户将鼠标悬停在收藏按钮上
+- **那么** tooltip 向左侧弹出
+- **并且** tooltip 内容与样式保持不变
+
+#### Scenario: Hover Lock Button
+- **前提** StationWareFlow 页面已渲染锁定按钮
+- **当** 用户将鼠标悬停在锁定按钮上
+- **那么** tooltip 向右侧弹出
+- **并且** tooltip 内容与样式保持不变
+
+### Requirement: No Behavior Regression
+变更 tooltip 弹出方向时，按钮点击与禁用行为 **MUST** 保持原有一致。
+
+#### Scenario: Button Interaction Unchanged
+- **前提** 收藏/锁定按钮具备可点击与禁用态
+- **当** 用户执行点击、切换状态或触发禁用态操作
+- **那么** 行为与变更前保持一致
+
 ### Requirement: Fav Tooltip 详细缓存信息
 系统SHALL在 Fav 按钮的 Tooltip 中增加一列显示具体的缓存小时数，并根据产出/消耗情况动态调整描述文本。
 

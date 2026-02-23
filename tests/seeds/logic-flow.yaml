@@ -1,0 +1,81 @@
+plans:
+  - name: Logic Flow 1
+    groups:
+      - name: E1-S1
+        category: industrial
+        subCategory: default
+        isLocked: true
+        lockedLineage: default
+        nodes:
+          - moduleId: prod_gen_claytronics_macro
+            isIsolated: false
+          - moduleId: prod_gen_hullparts_macro
+            isIsolated: false
+          - wareId: quantumtubes
+            isIsolated: true
+      - name: E1-S2
+        category: industrial
+        subCategory: default
+        isLocked: true
+        lockedLineage: default
+        nodes:
+          - moduleId: prod_gen_quantumtubes_macro
+            isIsolated: false
+      - name: E1-S3
+        category: agricultural
+        subCategory: argon
+        isLocked: true
+        lockedLineage: default
+        nodes:
+          - moduleId: prod_arg_foodrations_macro
+            isIsolated: false
+          - moduleId: prod_arg_medicalsupplies_macro
+            isIsolated: false
+  - name: Logic Flow 2
+    groups:
+      - name: E2-S1
+        category: industrial
+        subCategory: default
+        isLocked: true
+        lockedLineage: default
+        nodes:
+          - moduleId: prod_gen_advancedelectronics_macro
+            isIsolated: false
+          - moduleId: prod_gen_antimatterconverters_macro
+            isIsolated: false
+          - moduleId: prod_gen_dronecomponents_macro
+            isIsolated: false
+          - moduleId: prod_gen_fieldcoils_macro
+            isIsolated: false
+          - moduleId: prod_gen_missilecomponents_macro
+            isIsolated: false
+          - moduleId: prod_gen_shieldcomponents_macro
+            isIsolated: false
+          - moduleId: prod_gen_turretcomponents_macro
+            isIsolated: false
+          - moduleId: prod_gen_weaponcomponents_macro
+            isIsolated: false
+          - wareId: advancedcomposites
+            isIsolated: true
+          - wareId: engineparts
+            isIsolated: true
+          - wareId: hullparts
+            isIsolated: true
+          - wareId: microchips
+            isIsolated: true
+          - wareId: plasmaconductors
+            isIsolated: true
+          - wareId: quantumtubes
+            isIsolated: true
+          - wareId: scanningarrays
+            isIsolated: true
+      - name: E2-S2
+        category: industrial
+        subCategory: default
+        isLocked: true
+        lockedLineage: default
+        nodes:
+          - moduleId: prod_gen_claytronics_macro
+            isIsolated: false
+          - moduleId: prod_gen_hullparts_macro
+            isIsolated: false

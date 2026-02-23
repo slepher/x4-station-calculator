@@ -9,6 +9,13 @@ This skill owns `/x4:verify` sequencing.
 
 Change name input (if provided) supports abbreviation token and must be resolved by `x4-user-workflow` "Change Name Resolution" rules.
 
+## Change Name Resolution (MANDATORY)
+
+- Resolve `change-name` using `x4-user-workflow` rules before any action.
+- If multiple matches or no match, stop and ask the user to choose; list available active changes.
+- Do not auto-create a change on resolution failure.
+- After resolution, print: `Resolved change: <change-name>`.
+
 ## Workflow (MANDATORY)
 
 1. Run static verification via `openspec-verify-change`.

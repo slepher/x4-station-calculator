@@ -45,12 +45,19 @@ description: "Trigger with /x4:pipe to run X4 dual-subagent pipeline, and /x4:su
 - 当前会话中的变更上下文（若未提供 `change-name`）
 - `discussion-topic`（可选，用于临时新需求讨论）
 
+## Change Name Resolution (MANDATORY)
+
+- Resolve `change-name` using `x4-user-workflow` rules before any action.
+- If multiple matches or no match, stop and ask the user to choose; list available active changes.
+- Do not auto-create a change on resolution failure.
+- After resolution, print: `Resolved change: <change-name>`.
+
 ## Workflow (MANDATORY)
 
 ### Step 1: Resolve Change Context
 
-1. 解析当前目标 change（优先使用用户显式传入的 `change-name`）。
-2. 若上下文不明确，先询问用户，不要盲目执行。
+1. 使用已解析的 `change-name`。
+2. 若未解析，先询问用户，不要盲目执行。
 
 ### Step 1.2: Assign Subagent Roles Directly With Fallback (MANDATORY)
 

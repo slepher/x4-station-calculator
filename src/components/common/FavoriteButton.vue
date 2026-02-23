@@ -110,7 +110,7 @@ const tooltipLines = computed(() => {
 </script>
 
 <template>
-  <tippy theme="x4" :hide-on-click="false" interactive>
+  <tippy theme="x4" :hide-on-click="false" interactive placement="left">
     <div
       class="favorite-btn"
       :class="{

@@ -120,9 +120,9 @@ describe('LogicFlow Isolated Node Behavior', () => {
 
     const refinedMetals = group.nodes.find((n: any) => n.wareId === 'refinedmetals')
     expect(refinedMetals).toBeDefined()
-    expect(refinedMetals.isIsolated).toBe(false)
-    expect(refinedMetals.source).toBe('manual')
-    expect(refinedMetals.moduleId).toBe('prod_refinedmetals')
+    expect(refinedMetals!.isIsolated).toBe(false)
+    expect(refinedMetals!.source).toBe('manual')
+    expect(refinedMetals!.moduleId).toBe('prod_refinedmetals')
 
     const ore = group.nodes.find((n: any) => n.wareId === 'ore')
     expect(ore).toBeDefined() // Recursion continues

@@ -67,7 +67,7 @@ describe('LogicFlow Bug Regression Tests', () => {
       logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'default')
       logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'teladi')
       
-      const hullPartsNodes = group.nodes.filter(n => n.wareId === 'hullparts')
+      const hullPartsNodes = group.nodes.filter((n: any) => n.wareId === 'hullparts')
       expect(hullPartsNodes.length).toBe(2)
       expect(hullPartsNodes[0].lineage).not.toBe(hullPartsNodes[1].lineage)
     })
@@ -85,7 +85,7 @@ describe('LogicFlow Bug Regression Tests', () => {
       const group = logicFlow.addGroup('industrial', 'default')
       logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'teladi')
       
-      const node = group.nodes.find(n => n.wareId === 'hullparts')
+      const node = group.nodes.find((n: any) => n.wareId === 'hullparts')
       logicFlow.toggleNodeIsolation(group.id, node.id)
       
       expect(node.isIsolated).toBe(true)
@@ -102,7 +102,7 @@ describe('LogicFlow Bug Regression Tests', () => {
       const group = logicFlow.addGroup('industrial', 'default')
       logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'teladi')
       
-      const teladiNode = group.nodes.find(n => n.wareId === 'hullparts')
+      const teladiNode = group.nodes.find((n: any) => n.wareId === 'hullparts')
       logicFlow.toggleNodeIsolation(group.id, teladiNode.id)
       
       // 模拟 UI 调用路径
@@ -112,7 +112,7 @@ describe('LogicFlow Bug Regression Tests', () => {
       // UI 会调用 connectAndExpand，而不是直接调用 expandUpstream
       logicFlow.connectAndExpand(group.id, 'hullparts')
       
-      const hullPartsNodes = group.nodes.filter(n => n.wareId === 'hullparts')
+      const hullPartsNodes = group.nodes.filter((n: any) => n.wareId === 'hullparts')
       expect(hullPartsNodes.length).toBe(1)
       expect(hullPartsNodes[0].isIsolated).toBe(false)
       expect(hullPartsNodes[0].source).toBe('manual')
@@ -122,7 +122,7 @@ describe('LogicFlow Bug Regression Tests', () => {
       const group = logicFlow.addGroup('industrial', 'default')
       logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'teladi')
       
-      const node = group.nodes.find(n => n.wareId === 'hullparts')
+      const node = group.nodes.find((n: any) => n.wareId === 'hullparts')
       logicFlow.toggleNodeIsolation(group.id, node.id)
       
       const status = logicFlow.getWareGroupStatus(group.id, 'hullparts', 'teladi')
@@ -135,7 +135,7 @@ describe('LogicFlow Bug Regression Tests', () => {
       const group = logicFlow.addGroup('industrial', 'default')
       logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'default')
       
-      const grapheneNode = group.nodes.find(n => n.wareId === 'graphene')
+      const grapheneNode = group.nodes.find((n: any) => n.wareId === 'graphene')
       expect(grapheneNode.source).toBe('auto')
       
       logicFlow.promoteNode(group.id, grapheneNode.id)
@@ -146,7 +146,7 @@ describe('LogicFlow Bug Regression Tests', () => {
       const group = logicFlow.addGroup('industrial', 'default')
       logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'default')
       
-      const grapheneNode = group.nodes.find(n => n.wareId === 'graphene')
+      const grapheneNode = group.nodes.find((n: any) => n.wareId === 'graphene')
       expect(grapheneNode.source).toBe('auto')
       
       const status = logicFlow.getWareGroupStatus(group.id, 'graphene', 'default')
@@ -157,7 +157,7 @@ describe('LogicFlow Bug Regression Tests', () => {
       const group = logicFlow.addGroup('industrial', 'default')
       logicFlow.expandUpstream(group.id, 'weaponcomponents', 'manual', 'default')
       
-      const hullpartsNode = group.nodes.find(n => n.wareId === 'hullparts')
+      const hullpartsNode = group.nodes.find((n: any) => n.wareId === 'hullparts')
       expect(hullpartsNode.lineage).toBe('default')
       
       const status = logicFlow.getWareGroupStatus(group.id, 'hullparts', 'teladi')
@@ -168,7 +168,7 @@ describe('LogicFlow Bug Regression Tests', () => {
       const group = logicFlow.addGroup('industrial', 'default')
       logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'default')
       
-      const grapheneNode = group.nodes.find(n => n.wareId === 'graphene')
+      const grapheneNode = group.nodes.find((n: any) => n.wareId === 'graphene')
       expect(grapheneNode.lineage).toBe('default')
       
       logicFlow.replaceNodeWithLineage(group.id, 'graphene', 'teladi')
@@ -184,12 +184,12 @@ describe('LogicFlow Bug Regression Tests', () => {
       logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'default')
       logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'teladi')
       
-      expect(group.nodes.filter(n => n.wareId === 'hullparts').length).toBe(2)
+      expect(group.nodes.filter((n: any) => n.wareId === 'hullparts').length).toBe(2)
       
-      const defaultNode = group.nodes.find(n => n.wareId === 'hullparts' && n.lineage === 'default')
+      const defaultNode = group.nodes.find((n: any) => n.wareId === 'hullparts' && n.lineage === 'default')
       logicFlow.toggleNodeIsolation(group.id, defaultNode.id)
       
-      expect(group.nodes.filter(n => n.wareId === 'hullparts').length).toBe(1)
+      expect(group.nodes.filter((n: any) => n.wareId === 'hullparts').length).toBe(1)
     })
 
     it('7.2 should keep only one isolated node after isolation', () => {
@@ -197,10 +197,10 @@ describe('LogicFlow Bug Regression Tests', () => {
       logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'default')
       logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'teladi')
       
-      const defaultNode = group.nodes.find(n => n.wareId === 'hullparts' && n.lineage === 'default')
+      const defaultNode = group.nodes.find((n: any) => n.wareId === 'hullparts' && n.lineage === 'default')
       logicFlow.toggleNodeIsolation(group.id, defaultNode.id)
       
-      const isolatedNodes = group.nodes.filter(n => n.wareId === 'hullparts')
+      const isolatedNodes = group.nodes.filter((n: any) => n.wareId === 'hullparts')
       expect(isolatedNodes.length).toBe(1)
       expect(isolatedNodes[0].isIsolated).toBe(true)
     })
@@ -209,7 +209,7 @@ describe('LogicFlow Bug Regression Tests', () => {
       const group = logicFlow.addGroup('industrial', 'default')
       logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'teladi')
       
-      const node = group.nodes.find(n => n.wareId === 'hullparts')
+      const node = group.nodes.find((n: any) => n.wareId === 'hullparts')
       const originalLineage = node.lineage
       
       logicFlow.toggleNodeIsolation(group.id, node.id)
@@ -239,7 +239,7 @@ describe('LogicFlow Bug Regression Tests', () => {
       const group = logicFlow.addGroup('industrial', 'default')
       logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'default')
       
-      const node = group.nodes.find(n => n.wareId === 'hullparts')
+      const node = group.nodes.find((n: any) => n.wareId === 'hullparts')
       logicFlow.toggleNodeIsolation(group.id, node.id)
       
       const status = logicFlow.getWareGroupStatus(group.id, 'hullparts', 'default')
@@ -250,7 +250,7 @@ describe('LogicFlow Bug Regression Tests', () => {
       const group = logicFlow.addGroup('industrial', 'default')
       logicFlow.expandUpstream(group.id, 'weaponcomponents', 'manual', 'default')
       
-      const hullpartsNode = group.nodes.find(n => n.wareId === 'hullparts')
+      const hullpartsNode = group.nodes.find((n: any) => n.wareId === 'hullparts')
       expect(hullpartsNode.source).toBe('auto')
       
       const statusSame = logicFlow.getWareGroupStatus(group.id, 'hullparts', 'default')
@@ -277,20 +277,20 @@ describe('LogicFlow Bug Regression Tests', () => {
       logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'default')
       
       expect(group.nodes.length).toBeGreaterThan(0)
-      expect(group.nodes.some(n => n.wareId === 'hullparts')).toBe(true)
+      expect(group.nodes.some((n: any) => n.wareId === 'hullparts')).toBe(true)
     })
 
     it('10.2 should handle group with only isolated node', () => {
       const group = logicFlow.addGroup('industrial', 'default')
       logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'default')
       
-      const node = group.nodes.find(n => n.wareId === 'hullparts')
+      const node = group.nodes.find((n: any) => n.wareId === 'hullparts')
       logicFlow.toggleNodeIsolation(group.id, node.id)
       
-      const manualNodes = group.nodes.filter(n => n.source === 'manual')
+      const manualNodes = group.nodes.filter((n: any) => n.source === 'manual')
       expect(manualNodes.length).toBe(0)
       
-      const isolatedNodes = group.nodes.filter(n => n.isIsolated)
+      const isolatedNodes = group.nodes.filter((n: any) => n.isIsolated)
       expect(isolatedNodes.length).toBe(1)
     })
 
@@ -300,12 +300,12 @@ describe('LogicFlow Bug Regression Tests', () => {
       logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'default')
       logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'teladi')
       
-      const teladiNode = group.nodes.find(n => n.wareId === 'hullparts' && n.lineage === 'teladi')
+      const teladiNode = group.nodes.find((n: any) => n.wareId === 'hullparts' && n.lineage === 'teladi')
       logicFlow.toggleNodeIsolation(group.id, teladiNode.id)
       
-      const manualNodes = group.nodes.filter(n => n.source === 'manual')
-      const autoNodes = group.nodes.filter(n => n.source === 'auto' && !n.isIsolated)
-      const isolatedNodes = group.nodes.filter(n => n.isIsolated)
+      const manualNodes = group.nodes.filter((n: any) => n.source === 'manual')
+      const autoNodes = group.nodes.filter((n: any) => n.source === 'auto' && !n.isIsolated)
+      const isolatedNodes = group.nodes.filter((n: any) => n.isIsolated)
       
       expect(manualNodes.length).toBeGreaterThanOrEqual(0)
       expect(autoNodes.length).toBeGreaterThanOrEqual(0)
@@ -316,7 +316,7 @@ describe('LogicFlow Bug Regression Tests', () => {
       const group = logicFlow.addGroup('industrial', 'default')
       logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'default')
       
-      const node = group.nodes.find(n => n.wareId === 'hullparts')
+      const node = group.nodes.find((n: any) => n.wareId === 'hullparts')
       logicFlow.removeNode(group.id, node.id)
       
       expect(group.nodes.length).toBe(0)
@@ -328,7 +328,7 @@ describe('LogicFlow Bug Regression Tests', () => {
       logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'default')
       logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'teladi')
       
-      const energyCellsNodes = group.nodes.filter(n => n.wareId === 'energycells')
+      const energyCellsNodes = group.nodes.filter((n: any) => n.wareId === 'energycells')
       expect(energyCellsNodes.length).toBe(1)
     })
 
@@ -350,11 +350,11 @@ describe('LogicFlow Bug Regression Tests', () => {
       
       logicFlow.expandUpstream(group.id, 'weaponcomponents', 'manual', 'split')
       
-      const weaponNode = group.nodes.find(n => n.wareId === 'weaponcomponents')
+      const weaponNode = group.nodes.find((n: any) => n.wareId === 'weaponcomponents')
       expect(weaponNode).toBeDefined()
       expect(weaponNode?.lineage).toBe('teladi')
       
-      const hullNode = group.nodes.find(n => n.wareId === 'hullparts')
+      const hullNode = group.nodes.find((n: any) => n.wareId === 'hullparts')
       expect(hullNode?.lineage).toBe('teladi')
     })
   })

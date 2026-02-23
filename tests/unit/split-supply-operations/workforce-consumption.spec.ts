@@ -54,6 +54,9 @@ describe('Split Supply Operations - workforceConsumption', () => {
       defaultSettings,
       0,
       1,
+      defaultSettings.resourceBufferHours,
+      defaultSettings.primaryProductBufferHours,
+      defaultSettings.secondaryProductBufferHours,
       {},
     );
 
@@ -79,7 +82,9 @@ describe('Split Supply Operations - workforceConsumption', () => {
 
     const census = calculateWorkforceCensus(plannedModules, modules, actualWorkforce);
     expect(census.length).toBeGreaterThan(0);
-    expect(census[0].residents).toBe(100);
+    const firstCensus = census[0];
+    expect(firstCensus).toBeDefined();
+    expect(firstCensus!.residents).toBe(100);
 
     const result = analyzeWareFlow(
       plannedModules,
@@ -89,6 +94,9 @@ describe('Split Supply Operations - workforceConsumption', () => {
       defaultSettings,
       actualWorkforce,
       1,
+      defaultSettings.resourceBufferHours,
+      defaultSettings.primaryProductBufferHours,
+      defaultSettings.secondaryProductBufferHours,
       {},
     );
 
@@ -129,6 +137,9 @@ describe('Split Supply Operations - workforceConsumption', () => {
       defaultSettings,
       actualWorkforce,
       1,
+      defaultSettings.resourceBufferHours,
+      defaultSettings.primaryProductBufferHours,
+      defaultSettings.secondaryProductBufferHours,
       {},
     );
 
@@ -158,6 +169,9 @@ describe('Split Supply Operations - workforceConsumption', () => {
       defaultSettings,
       0,
       1,
+      defaultSettings.resourceBufferHours,
+      defaultSettings.primaryProductBufferHours,
+      defaultSettings.secondaryProductBufferHours,
       {},
     );
 
@@ -197,6 +211,9 @@ describe('Split Supply Operations - workforceConsumption', () => {
       defaultSettings,
       actualWorkforce,
       1,
+      defaultSettings.resourceBufferHours,
+      defaultSettings.primaryProductBufferHours,
+      defaultSettings.secondaryProductBufferHours,
       {},
     );
 

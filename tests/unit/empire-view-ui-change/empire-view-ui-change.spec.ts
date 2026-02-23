@@ -87,7 +87,8 @@ describe('Empire 标题渲染测试', () => {
     expect(wrapper.find('.header-badge').exists()).toBe(false)
 
     const buttons = wrapper.findAll('.view-mode-btn')
-    await buttons[1].trigger('click')
+    expect(buttons.length).toBeGreaterThan(1)
+    await buttons[1]!.trigger('click')
 
     expect(wrapper.find('.header-title').text()).toBe('经济视图')
     expect(wrapper.find('.header-badge').exists()).toBe(false)
@@ -102,7 +103,8 @@ describe('Station 标题渲染测试', () => {
     expect(wrapper.find('.header-badge').exists()).toBe(false)
 
     const buttons = wrapper.findAll('.view-mode-btn')
-    await buttons[1].trigger('click')
+    expect(buttons.length).toBeGreaterThan(1)
+    await buttons[1]!.trigger('click')
 
     expect(wrapper.find('.header-title').text()).toBe('经济视图')
     expect(wrapper.find('.header-badge').exists()).toBe(false)
@@ -129,11 +131,11 @@ describe('Empire 明细站点数量三段式渲染测试', () => {
 
     const rows = wrapper.findAll('.list-item')
     expect(rows.length).toBe(2)
-    expect(rows[0].find('.item-name .qty').text()).toBe('2')
-    expect(rows[0].find('.item-name .symbol').text()).toBe('x')
-    expect(rows[0].find('.item-name .name').text()).toBe('Alpha')
-    expect(rows[1].find('.item-name .qty').text()).toBe('1')
-    expect(rows[1].find('.item-name .symbol').text()).toBe('x')
-    expect(rows[1].find('.item-name .name').text()).toBe('Beta')
+    expect(rows[0]!.find('.item-name .qty').text()).toBe('2')
+    expect(rows[0]!.find('.item-name .symbol').text()).toBe('x')
+    expect(rows[0]!.find('.item-name .name').text()).toBe('Alpha')
+    expect(rows[1]!.find('.item-name .qty').text()).toBe('1')
+    expect(rows[1]!.find('.item-name .symbol').text()).toBe('x')
+    expect(rows[1]!.find('.item-name .name').text()).toBe('Beta')
   })
 })

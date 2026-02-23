@@ -359,8 +359,8 @@ test.describe('帝国缺口显示', () => {
     const quantumRow = opsGroup.locator('.flow-wrapper[data-resource-id="quantumtubes"]');
     await quantumRow.locator('.add-btn').click();
 
-    const ids = await opsGroup.locator('.flow-wrapper').evaluateAll(nodes =>
-      nodes.map(node => node.getAttribute('data-resource-id') || '')
+    const ids = await opsGroup.locator('.flow-wrapper').evaluateAll((nodes: Element[]) =>
+      nodes.map((node) => node.getAttribute('data-resource-id') || '')
     );
     const names = await opsGroup.locator('.flow-wrapper .header-name').allTextContents();
 
@@ -371,11 +371,11 @@ test.describe('帝国缺口显示', () => {
       clay: 1
     };
 
-    const items = ids.map((id, index) => ({
+    const items = (ids as string[]).map((id, index) => ({
       id,
       name: (names[index] || id).trim(),
       tier: tierMap[id]
-    })).filter(item => item.tier !== undefined);
+    })).filter((item): item is { id: string; name: string; tier: number } => item.tier !== undefined);
 
     expect(items.length).toBeGreaterThan(1);
 

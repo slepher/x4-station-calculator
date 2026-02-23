@@ -43,7 +43,7 @@ const tooltipLines = computed(() => {
     class="lock-btn-placeholder"
   ></div>
   <!-- Normal mode: render the lock button -->
-  <tippy v-else theme="x4" :hide-on-click="false" interactive>
+  <tippy v-else theme="x4" :hide-on-click="false" interactive placement="right">
     <div
       class="lock-btn"
       :class="{ 'is-locked': locked, 'non-operable': disabled }"

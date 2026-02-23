@@ -74,19 +74,19 @@ describe('LogicFlow Lineage & PK Verification', () => {
     // prod_tel_hullparts_macro vs prod_gen_hullparts_macro
     logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'teladi')
     
-    const teladiNode = group.nodes.find(n => n.wareId === 'hullparts' && n.lineage === 'teladi')
+    const teladiNode = group.nodes.find((n: any) => n.wareId === 'hullparts' && n.lineage === 'teladi')
     expect(teladiNode).toBeDefined()
     expect(teladiNode.moduleId).toContain('tel')
 
     // 2. Add Default Hull Parts
     logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'default')
     
-    const defaultNode = group.nodes.find(n => n.wareId === 'hullparts' && n.lineage === 'default')
+    const defaultNode = group.nodes.find((n: any) => n.wareId === 'hullparts' && n.lineage === 'default')
     expect(defaultNode).toBeDefined()
     expect(defaultNode.moduleId).not.toContain('teladi')
     
     // 3. Both should coexist because moduleId is the PK
-    expect(group.nodes.filter(n => n.wareId === 'hullparts').length).toBe(2)
+    expect(group.nodes.filter((n: any) => n.wareId === 'hullparts').length).toBe(2)
   })
 
   it('should merge T0 resources across different lineages', () => {
@@ -98,7 +98,7 @@ describe('LogicFlow Lineage & PK Verification', () => {
     logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'terran')
     
     // Verify T0 Energy Cells is merged (only 1 node)
-    const energyCellsNodes = group.nodes.filter(n => n.wareId === 'energycells')
+    const energyCellsNodes = group.nodes.filter((n: any) => n.wareId === 'energycells')
     expect(energyCellsNodes.length).toBe(1)
     expect(energyCellsNodes[0].lineage).toBe('default') // T0 always default
   })
@@ -107,7 +107,7 @@ describe('LogicFlow Lineage & PK Verification', () => {
     const group = logicFlow.addGroup('industrial', 'default')
     logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'default')
     
-    const grapheneNode = group.nodes.find(n => n.wareId === 'graphene')
+    const grapheneNode = group.nodes.find((n: any) => n.wareId === 'graphene')
     expect(grapheneNode.source).toBe('auto')
     
     logicFlow.promoteNode(group.id, grapheneNode.id)
@@ -144,7 +144,7 @@ describe('LogicFlow Lineage & PK Verification', () => {
     // Add Hull Parts without specifying lineage - should use group's locked lineage
     logicFlow.expandUpstream(group.id, 'hullparts', 'manual')
     
-    const node = group.nodes.find(n => n.wareId === 'hullparts')
+    const node = group.nodes.find((n: any) => n.wareId === 'hullparts')
     expect(node.lineage).toBe('terran')
   })
 
@@ -154,7 +154,7 @@ describe('LogicFlow Lineage & PK Verification', () => {
     // 1. Add default Hull Parts
     logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'default')
     
-    const defaultNode = group.nodes.find(n => n.wareId === 'hullparts')
+    const defaultNode = group.nodes.find((n: any) => n.wareId === 'hullparts')
     expect(defaultNode).toBeDefined()
     expect(defaultNode.source).toBe('manual')
     
@@ -166,6 +166,6 @@ describe('LogicFlow Lineage & PK Verification', () => {
     logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'teladi')
     
     // 4. Both should coexist
-    expect(group.nodes.filter(n => n.wareId === 'hullparts').length).toBe(2)
+    expect(group.nodes.filter((n: any) => n.wareId === 'hullparts').length).toBe(2)
   })
 })

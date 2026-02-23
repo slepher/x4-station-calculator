@@ -14,6 +14,13 @@ It records bug artifacts and prepares reproduction tasks.
 - Resolve by `x4-user-workflow` "Change Name Resolution" rules
 - `bug-description` (optional free text)
 
+## Change Name Resolution (MANDATORY)
+
+- Resolve `change-name` using `x4-user-workflow` rules before any action.
+- If multiple matches or no match, stop and ask the user to choose; list available active changes.
+- Do not auto-create a change on resolution failure.
+- After resolution, print: `Resolved change: <change-name>`.
+
 ## Trigger
 
 - `/x4:bug [change-name] [bug-description]`
@@ -85,9 +92,10 @@ Follow `x4-doc` sync conventions for `test_tasks.md` and `ui_knowledge.md` consi
 
 If a reported bug is unrelated to any existing change:
 
-1. Create a new change: `fix-<bug-name>`
-2. Create initial bug artifacts under that change (`bugs.md`, `test_tasks.md`, `ui_knowledge.md` if needed)
-3. Continue using standard workflow
+1. Stop and ask whether to create a new change: `fix-<bug-name>`.
+2. Only create the new change after user confirmation.
+3. If confirmed, create initial bug artifacts under that change (`bugs.md`, `test_tasks.md`, `ui_knowledge.md` if needed).
+4. Continue using standard workflow.
 
 ## Constraints
 
