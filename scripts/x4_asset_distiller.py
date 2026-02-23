@@ -254,6 +254,19 @@ def main():
     # --- 步骤 5: 聚合飞船组件连接点 (ship_connections.xml) ---
     print("∑ [5/6] 正在聚合飞船组件连接点 (ship_connections.xml)...")
 
+    # 5.1 从 ship_macros.xml 收集需要的 component refs
+    ship_components_needed = set()
+    ship_macros_path = os.path.join(lib_dest_dir, "ship_macros.xml")
+    if os.path.exists(ship_macros_path):
+        try:
+            ship_macros_tree = etree.parse(ship_macros_path, parser)
+            for comp in ship_macros_tree.findall(".//macro/component[@ref]"):
+                ship_components_needed.add(comp.get('ref'))
+        except Exception as e:
+            print(f"      ⚠️ 读取 ship_macros.xml 失败: {e}")
+    print(f"   🎯 识别到 {len(ship_components_needed)} 个飞船组件引用。")
+
+    # 5.2 建立索引 (只针对 ship_*.xml)
     ship_component_index = {}
 
     def scan_components_to_index(root_path, source_key, pattern):
@@ -269,10 +282,14 @@ def main():
         if os.path.exists(p):
             scan_components_to_index(p, dlc_id, os.path.join(p, "assets", "units", "**", "ship_*.xml"))
 
+    # 5.3 仅聚合被引用的组件
     components_root = etree.Element('components')
     components_processed = 0
 
-    for comp_id, sources in ship_component_index.items():
+    for comp_id in ship_components_needed:
+        if comp_id not in ship_component_index:
+            continue
+        sources = ship_component_index[comp_id]
         current_tree = None
         if 'base' in sources:
             try:
