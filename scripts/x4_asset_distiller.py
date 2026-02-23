@@ -282,7 +282,35 @@ def main():
         if os.path.exists(p):
             scan_components_to_index(p, dlc_id, os.path.join(p, "assets", "units", "**", "ship_*.xml"))
 
-    # 5.3 仅聚合被引用的组件
+    # 5.3 仅聚合被引用的组件，并按 tags 过滤连接点
+    keep_tag_keywords = [
+        'engine', 'shield', 'turret', 'weapon',
+        'thruster', 'dockingbay', 'dock', 'storage', 'cockpit'
+    ]
+
+    def should_keep_connection(conn):
+        tags = (conn.get('tags') or '').lower()
+        return any(key in tags for key in keep_tag_keywords)
+
+    def clone_component_with_filtered_connections(component):
+        new_comp = etree.Element('component')
+        for attr, value in component.attrib.items():
+            new_comp.set(attr, value)
+        connections = component.find('connections')
+        if connections is None:
+            return None
+        new_connections = etree.SubElement(new_comp, 'connections')
+        kept = 0
+        for conn in connections.findall('connection'):
+            if not should_keep_connection(conn):
+                continue
+            new_conn = etree.SubElement(new_connections, 'connection')
+            for attr in ['name', 'group', 'tags', 'value', 'optional', 'parent', 'ref']:
+                if conn.get(attr) is not None:
+                    new_conn.set(attr, conn.get(attr))
+            kept += 1
+        return new_comp if kept > 0 else None
+
     components_root = etree.Element('components')
     components_processed = 0
 
@@ -314,12 +342,16 @@ def main():
         if current_tree:
             root_node = current_tree.getroot()
             if root_node.tag == 'component':
-                components_root.append(root_node)
-                components_processed += 1
+                filtered = clone_component_with_filtered_connections(root_node)
+                if filtered is not None:
+                    components_root.append(filtered)
+                    components_processed += 1
             elif root_node.tag == 'components':
                 for node in root_node.findall('component'):
-                    components_root.append(node)
-                    components_processed += 1
+                    filtered = clone_component_with_filtered_connections(node)
+                    if filtered is not None:
+                        components_root.append(filtered)
+                        components_processed += 1
 
     connections_path = os.path.join(lib_dest_dir, "ship_connections.xml")
     etree.ElementTree(components_root).write(connections_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
