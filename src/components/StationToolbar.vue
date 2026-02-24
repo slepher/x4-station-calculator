@@ -32,21 +32,31 @@ const lastValidTitle = ref('')
 const editingValue = ref('')
 
 const isFlowView = computed(() => stationStore.activeView === 'flow')
+const isShipBuildView = computed(() => stationStore.activeView === 'ship-build')
 
 const themeColors = computed(() => {
-  return isFlowView.value
-    ? {
-        title: 'text-purple-400',
-        titleBorder: 'border-purple-500/50',
-        primary: 'btn-purple',
-        secondary: 'btn-fuchsia'
-      }
-    : {
-        title: 'text-sky-400',
-        titleBorder: 'border-sky-500/50',
-        primary: 'btn-blue',
-        secondary: 'btn-cyan'
-      }
+  if (isFlowView.value) {
+    return {
+      title: 'text-purple-400',
+      titleBorder: 'border-purple-500/50',
+      primary: 'btn-purple',
+      secondary: 'btn-fuchsia'
+    }
+  }
+  if (isShipBuildView.value) {
+    return {
+      title: 'text-emerald-400',
+      titleBorder: 'border-emerald-500/50',
+      primary: 'btn-green',
+      secondary: 'btn-emerald'
+    }
+  }
+  return {
+    title: 'text-sky-400',
+    titleBorder: 'border-sky-500/50',
+    primary: 'btn-blue',
+    secondary: 'btn-cyan'
+  }
 })
 
 const displayTitle = computed(() => {
@@ -273,6 +283,14 @@ const handleLoad = () => {
         <span class="w-2 h-2 rounded-full" :class="stationStore.activeView === 'flow' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'bg-transparent border border-white/20'"></span>
         {{ t('view.logical_flow') }}
       </button>
+      <button 
+        @click="stationStore.activeView = 'ship-build'"
+        class="px-4 py-1.5 rounded-full text-xs transition-all duration-300 flex items-center gap-2"
+        :class="stationStore.activeView === 'ship-build' ? 'bg-emerald-600 text-white shadow-lg' : 'text-white/40 hover:text-white/70'"
+      >
+        <span class="w-2 h-2 rounded-full" :class="stationStore.activeView === 'ship-build' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'bg-transparent border border-white/20'"></span>
+        {{ t('view.ship_build') }}
+      </button>
     </div>
 
     <div class="flex items-center gap-2 ml-2 mr-4">
@@ -309,8 +327,16 @@ const handleLoad = () => {
   @apply bg-fuchsia-500 hover:bg-fuchsia-400 text-slate-900;
 }
 
+.btn-emerald {
+  @apply bg-emerald-500 hover:bg-emerald-400 text-slate-900;
+}
+
 .btn-blue {
   @apply bg-blue-600 hover:bg-blue-500;
+}
+
+.btn-green {
+  @apply bg-emerald-600 hover:bg-emerald-500;
 }
 
 .btn-purple {

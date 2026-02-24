@@ -17,6 +17,119 @@ export interface X4Ware {
 }
 
 /**
+ * 飞船生产方式
+ */
+export interface X4ShipProduction {
+  method: string;
+  noplayerbuild: boolean;
+  cost: Record<string, number>;
+}
+
+export type EquipmentType = 'engine' | 'shield' | 'turret' | 'weapon' | 'thruster';
+export type ShipEquipmentSize = 'small' | 'medium' | 'large' | 'extralarge' | 'unknown';
+
+/**
+ * 飞船插槽连接点
+ */
+export interface X4ShipConnection {
+  size: ShipEquipmentSize;
+  tags: string[];
+  count: number;
+  shield?: X4ShipConnection;
+}
+
+/**
+ * 飞船插槽组
+ */
+export interface X4ShipSlotGroup {
+  group: string;
+  isImplicitGroup: boolean;
+  connection: X4ShipConnection;
+  equipments: Record<string, Record<string, { count: number; optional: number }>>;
+}
+
+/**
+ * 飞船接口 - 对应 ships.json
+ * shipgroup 允许为空，其它字段必须有值
+ */
+export interface X4Ship {
+  id: string;
+  nameId: string;
+  name: string;
+  class: 'ship_s' | 'ship_m' | 'ship_l' | 'ship_xl';
+  type: string;
+  race: string;
+  shipgroup?: string;
+  noplayerblueprint: boolean;
+  noplayerbuild: boolean;
+  production: X4ShipProduction[];
+  slots: Array<{
+    type: EquipmentType;
+    count: Record<string, number>;
+    groups: X4ShipSlotGroup[];
+  }>;
+  storage: { missile: number; unit: number };
+  crew: { capacity: number };
+  hull: number;
+  physics: {
+    mass: number;
+    drag: {
+      forward: number;
+      reverse: number;
+      horizontal: number;
+      vertical: number;
+      pitch: number;
+      yaw: number;
+      roll: number;
+    };
+  };
+}
+
+/**
+ * 装备接口 - 对应 equipments.json
+ */
+export interface X4Equipment {
+  id: string;
+  nameId: string;
+  name: string;
+  type: EquipmentType;
+  class: string;
+  size: ShipEquipmentSize;
+  mk: string | null;
+  race: string | null;
+  tags: string[];
+  cost: Record<string, Record<string, number>>;
+}
+
+/**
+ * 装备类型接口 - 对应 equipment_types.json
+ */
+export interface X4EquipmentType {
+  id: EquipmentType;
+  nameId: string;
+  name: string;
+}
+
+/**
+ * 船只类型接口 - 对应 ship_types.json
+ */
+export interface X4ShipType {
+  id: string;
+  nameId: string;
+  name: string;
+  class: Array<'ship_s' | 'ship_m' | 'ship_l' | 'ship_xl'>;
+}
+
+/**
+ * 船只种族聚合接口 - 对应 ship_races.json
+ */
+export interface X4ShipRace {
+  id: string;
+  noplayerblueprint: boolean;
+  noplayerbuild: boolean;
+}
+
+/**
  * 劳动力相关数据结构
  */
 export interface X4Workforce {

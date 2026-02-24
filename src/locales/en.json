@@ -48,7 +48,26 @@
   },
   "view": {
     "production": "Quantified",
-    "logical_flow": "Logical Flow"
+    "logical_flow": "Logical Flow",
+    "ship_build": "Ship Build"
+  },
+  "ship_build": {
+    "title": "Ship Build",
+    "select_ship": "Select Ship",
+    "filters": "Filters",
+    "filter_class": "Class",
+    "filter_race": "Race",
+    "filter_type": "Type",
+    "required": "Required",
+    "type_hint": "Select a class to view available types.",
+    "list_title": "Ship List",
+    "list_hint": "Select a class and at least one race or type.",
+    "empty_list": "No ships matched.",
+    "selected_ship": "Selected Ship",
+    "no_selection": "No Ship Selected",
+    "panel_fit": "Loadout",
+    "panel_stats": "Post-Loadout Hull Stats",
+    "panel_materials": "Build Materials"
   },
   "station": {
     "total_needed": "TOTAL NEEDED",
@@ -195,7 +214,11 @@
     "split": "Split",
     "terran": "Terran",
     "boron": "Boron",
-    "default": "Default"
+    "default": "Default",
+    "generic": "Generic",
+    "pirates": "Pirates",
+    "xenon": "Xenon",
+    "yaki": "Yaki"
   },
   "tooltip": {
     "priority_level_0_label": "Resource",

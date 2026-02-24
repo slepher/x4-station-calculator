@@ -48,7 +48,26 @@
   },
   "view": {
     "production": "量化生产",
-    "logical_flow": "逻辑组网"
+    "logical_flow": "逻辑组网",
+    "ship_build": "船只建造"
+  },
+  "ship_build": {
+    "title": "船只建造",
+    "select_ship": "选择船只",
+    "filters": "筛选条件",
+    "filter_class": "大小",
+    "filter_race": "种族",
+    "filter_type": "类型",
+    "required": "必选",
+    "type_hint": "请先选择大小以显示可用类型。",
+    "list_title": "飞船列表",
+    "list_hint": "请选择大小，并在种族或类型中至少选择一个。",
+    "empty_list": "暂无匹配的飞船。",
+    "selected_ship": "已选择飞船",
+    "no_selection": "尚未选择飞船",
+    "panel_fit": "配装",
+    "panel_stats": "配装后船体属性",
+    "panel_materials": "建造材料"
   },
   "station": {
     "total_needed": "总需求",
@@ -197,7 +216,11 @@
     "split": "Split",
     "terran": "Terran",
     "boron": "Boron",
-    "default": "通用"
+    "default": "通用",
+    "generic": "通用",
+    "pirates": "海盗",
+    "xenon": "Xenon",
+    "yaki": "Yaki"
   },
   "tooltip": {
     "priority_level_0_label": "资源",

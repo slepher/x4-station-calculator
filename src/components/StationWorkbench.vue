@@ -11,6 +11,7 @@ import EmpireWareFlowsDashboard from './EmpireWareFlowsDashboard.vue'
 import LogicFlowCandidateZone from './LogicFlowCandidateZone.vue'
 import LogicFlowPlanningZone from './LogicFlowPlanningZone.vue'
 import StatusMonitor from './StatusMonitor.vue'
+import ShipBuildView from './ShipBuildView.vue'
 
 const store = useStationStore()
 const empireStore = useEmpireStore()
@@ -21,6 +22,7 @@ watchEffect(() => {
 })
 
 const isProductionView = computed(() => store.activeView === 'production')
+const isShipBuildView = computed(() => store.activeView === 'ship-build')
 </script>
 
 <template>
@@ -64,6 +66,10 @@ const isProductionView = computed(() => store.activeView === 'production')
           <StationDashboard />
         </div>
       </div>
+    </template>
+
+    <template v-else-if="isShipBuildView">
+      <ShipBuildView />
     </template>
 
     <div v-else class="flow-layout flex flex-col gap-6">

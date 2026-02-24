@@ -37,7 +37,7 @@ export const useStationStore = defineStore('station', () => {
   const empireStore = useEmpireStore()
   logicFlow.init()
 
-  const activeView = ref<'production' | 'flow'>((localStorage.getItem('x4_station_active_view') as any) || 'production')
+  const activeView = ref<'production' | 'flow' | 'ship-build'>((localStorage.getItem('x4_station_active_view') as any) || 'production')
   const isReady = computed(() => empireStore.isReady && gameData.isReady)
   const savedPlans = ref<SavedPlansState>({ version: 1, activeId: null, list: [] })
   const buildPriceMultiplier = ref(0.5)
@@ -480,8 +480,8 @@ export const useStationStore = defineStore('station', () => {
       await gameData.initialize()
       logicFlow.init()
       const storedView = localStorage.getItem('x4_station_active_view')
-      if (storedView === 'production' || storedView === 'flow') {
-        activeView.value = storedView as 'production' | 'flow'
+      if (storedView === 'production' || storedView === 'flow' || storedView === 'ship-build') {
+        activeView.value = storedView as 'production' | 'flow' | 'ship-build'
       }
       syncStateFromActiveStation()
       console.log('[StationStore] Initialized. Ready:', isReady.value)

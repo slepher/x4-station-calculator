@@ -30,6 +30,19 @@
   - [x] 步骤 1：仅输出 `id/nameId/name`。
   - [x] 步骤 2：由 `x4_data_processor.py` 负责生成该输出。
 
+- [ ] 2.4 Ship 插槽结构补充规则（ship 数据）
+  - [ ] 步骤 1：插槽组级不输出 `slotTypes/slotTags`。
+  - [ ] 步骤 2：connection 按相同 `tags` 合并并输出 `count`，不保留 `name`。
+  - [ ] 步骤 3：connection 从 `tags` 提取 `type/size`，并从 `tags` 中移除已提取的 `type/size`。
+  - [ ] 步骤 4：`slots` 输出为数组并按 `engine → thruster → shield → weapon → turret` 顺序排列。
+  - [ ] 步骤 5：`shield` 内嵌为 `connection.shield`；`thruster` 由 `<thruster tags="...">` 生成。
+  - [ ] 步骤 6：ship 的 `name` 使用 `_` 分段提取第 2 段为 `race`。
+
+- [ ] 2.5 Ship/Eq JSON 字段与过滤规则
+  - [ ] 步骤 1：`ships.json` / `equipments.json` 的 `id` 使用 `wareId`，不输出 `wareId` 字段。
+  - [ ] 步骤 2：`production` 数组输出 `{ method, noplayerbuild, cost }`。
+  - [ ] 步骤 3：`noblueprint` 的 ship 不导出；`noplayerblueprint` 仅看 ware `tags`；`noplayerbuild` 仅当所有 production 方法均为 `noplayerbuild` 时为 true。
+
 ## 3. 解析规则与字段一致性检查
 
 - [x] 3.1 校验 name/nameId 注入逻辑与现有 ware/module 保持一致。

@@ -358,7 +358,7 @@ def main():
     print(f"✅ 聚合完成: 写入 {components_processed} 个组件定义到 ship_connections.xml")
 
     # --- 步骤 6: 聚合装备宏定义 (equipment_macros.xml) ---
-    print("∑ [6/6] 正在聚合装备宏定义 (equipment_macros.xml)...")
+    print("∑ [6/7] 正在聚合装备宏定义 (equipment_macros.xml)...")
 
     equipment_macro_index = {}
 
@@ -420,6 +420,134 @@ def main():
     equipment_macros_path = os.path.join(lib_dest_dir, "equipment_macros.xml")
     etree.ElementTree(equipment_macros_root).write(equipment_macros_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
     print(f"✅ 聚合完成: 写入 {equipment_processed} 个装备宏定义到 equipment_macros.xml")
+
+    # --- 步骤 7: 聚合装备 SurfaceElements 连接点 (equipment_surface.xml) ---
+    print("∑ [7/7] 正在聚合装备 SurfaceElements 连接点 (equipment_surface.xml)...")
+
+    # 7.1 从 equipment_macros.xml + wares_final.xml 收集需要的 equipment id。
+    # 匹配键仅使用 equipment id（ware id），不使用 macro 名称。
+    equipment_ids_needed = set()
+    equipment_macro_names = set()
+    if os.path.exists(equipment_macros_path):
+        try:
+            equipment_macros_tree = etree.parse(equipment_macros_path, parser)
+            for macro in equipment_macros_tree.findall(".//macro[@name]"):
+                macro_name = macro.get('name')
+                if macro_name:
+                    equipment_macro_names.add(macro_name)
+        except Exception as e:
+            print(f"      ⚠️ 读取 equipment_macros.xml 失败: {e}")
+    if os.path.exists(wares_final_path):
+        try:
+            wares_tree = etree.parse(wares_final_path, parser)
+            for ware in wares_tree.findall(".//ware[@id]"):
+                ware_id = ware.get('id')
+                comp = ware.find('component')
+                comp_ref = comp.get('ref') if comp is not None else None
+                if not ware_id or not comp_ref:
+                    continue
+                if comp_ref in equipment_macro_names:
+                    equipment_ids_needed.add(ware_id)
+        except Exception as e:
+            print(f"      ⚠️ 读取 wares_final.xml 失败: {e}")
+    print(f"   🎯 识别到 {len(equipment_ids_needed)} 个 equipment id 候选。")
+
+    # 7.2 建立 SurfaceElements 索引
+    surface_component_index = {}
+
+    def scan_surface_to_index(root_path, source_key, pattern):
+        for f in glob.glob(pattern, recursive=True):
+            fname = os.path.splitext(os.path.basename(f))[0]
+            if fname not in surface_component_index:
+                surface_component_index[fname] = {}
+            surface_component_index[fname][source_key] = f
+
+    # 仅扫描精确目录，不递归子目录。
+    surface_patterns = [
+        os.path.join("assets", "props", "SurfaceElements", "*.xml"),
+        os.path.join("assets", "props", "surfaceelements", "*.xml"),
+    ]
+    for pattern in surface_patterns:
+        scan_surface_to_index(src, 'base', os.path.join(src, pattern))
+    for dlc_id in dlc_order:
+        p = os.path.join(src, "extensions", dlc_id)
+        if os.path.exists(p):
+            for pattern in surface_patterns:
+                scan_surface_to_index(p, dlc_id, os.path.join(p, pattern))
+
+    # 7.3 仅保留 tags 含 component 的 connection
+    def should_keep_surface_connection(conn):
+        tags = (conn.get('tags') or '').lower().split()
+        return "component" in tags
+
+    def clone_surface_component_with_filtered_connections(component):
+        new_comp = etree.Element('component')
+        for attr, value in component.attrib.items():
+            new_comp.set(attr, value)
+        connections = component.find('connections')
+        if connections is None:
+            return None
+        new_connections = etree.SubElement(new_comp, 'connections')
+        kept = 0
+        for conn in connections.findall('connection'):
+            if not should_keep_surface_connection(conn):
+                continue
+            new_conn = etree.SubElement(new_connections, 'connection')
+            for attr, value in conn.attrib.items():
+                new_conn.set(attr, value)
+            kept += 1
+        return new_comp if kept > 0 else None
+
+    surface_root = etree.Element('components')
+    surface_processed = 0
+
+    for equipment_id in equipment_ids_needed:
+        if equipment_id not in surface_component_index:
+            continue
+        sources = surface_component_index[equipment_id]
+        current_tree = None
+        if 'base' in sources:
+            try:
+                current_tree = etree.parse(sources['base'], parser)
+            except:
+                pass
+
+        for dlc_id in dlc_order:
+            if dlc_id in sources:
+                f_path = sources[dlc_id]
+                try:
+                    dlc_tree = etree.parse(f_path, parser)
+                    dlc_root = dlc_tree.getroot()
+                    if dlc_root.tag == 'diff':
+                        if current_tree:
+                            xml_diff.Apply_Patch(current_tree.getroot(), dlc_root)
+                    else:
+                        current_tree = dlc_tree
+                except Exception as e:
+                    print(f"      ⚠️ 处理出错 {equipment_id} ({dlc_id}): {e}")
+
+        if current_tree:
+            root_node = current_tree.getroot()
+            if root_node.tag == 'component':
+                filtered = clone_surface_component_with_filtered_connections(root_node)
+                if filtered is not None:
+                    surface_root.append(filtered)
+                    surface_processed += 1
+            elif root_node.tag == 'components':
+                for node in root_node.findall('component'):
+                    filtered = clone_surface_component_with_filtered_connections(node)
+                    if filtered is not None:
+                        surface_root.append(filtered)
+                        surface_processed += 1
+
+    equipment_surface_path = os.path.join(lib_dest_dir, "equipment_surface.xml")
+    etree.ElementTree(surface_root).write(
+        equipment_surface_path,
+        encoding='utf-8',
+        xml_declaration=True,
+        pretty_print=True
+    )
+    print(f"✅ 聚合完成: 写入 {surface_processed} 个组件定义到 equipment_surface.xml")
 
     print(f"✨ 全流程结束！资产已蒸馏至 {dest_root}")
 
