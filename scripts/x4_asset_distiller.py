@@ -93,6 +93,19 @@ def main():
     if removed_test_entries:
         print(f"   🧹 已移除 {removed_test_entries} 个 assets/test entry。")
 
+    # 规范 value 中的双反斜杠，避免路径格式差异导致去重失败。
+    normalized_double_slash = 0
+    for entry in components_root.findall(".//entry[@value]"):
+        value = entry.get("value") or ""
+        normalized = value
+        while "\\\\" in normalized:
+            normalized = normalized.replace("\\\\", "\\")
+        if normalized != value:
+            entry.set("value", normalized)
+            normalized_double_slash += 1
+    if normalized_double_slash:
+        print(f"   🔧 已规范 {normalized_double_slash} 个 entry.value 双反斜杠。")
+
     # name 相同且内容完全一致的节点自动去重合并。
     merged_same_content = 0
     seen_name_and_content = set()
