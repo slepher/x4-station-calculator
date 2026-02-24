@@ -19,6 +19,11 @@
 13. **id 规则**：`ships.json` / `equipments.json` 的 `id` 使用 `wareId`，不再输出 `wareId` 字段。
 14. **noblueprint / noplayerbuild 规则**：`noblueprint` 直接不导出；`noplayerblueprint` 仅看 ware `tags`；`noplayerbuild` 需所有 production 方法都为 `noplayerbuild`。
 15. **装备尺寸**：`equipments.json` 新增 `size` 字段，从装备宏名称解析，未命中时为 `unknown`。
+16. **components 索引迁移**：distiller 输出 `index/components.xml`，按 base + DLC 叠加；写出前清理 `assets/test` 路径项、规范双反斜杠、同名同内容去重；同名不同内容写出后报错。
+17. **装备组件聚合**：distiller 输出 `equipment_components.xml`，来源链路为 `equipment_id -> index/components.xml(value path) -> component xml`，仅保留 `tags` 含 `component` 的 connection。
+18. **slotTags 数据源**：processor 中 `equipments.slotTags` 不做语义推断，完全来源于 `equipment_components.xml` 对应 component 的 connection tags 聚合去重。
+19. **slotTags 映射链路**：`equipment(ware id) -> ware.component(ref=macro) -> equipment_macro.component(ref=component) -> equipment_components.component(name=component)`。
+20. **装备 noplayerblueprint 字段**：`equipments.json` 输出 `noplayerblueprint: boolean`，从 `tags` 提取并从 `tags` 中删除原始标记。
 
 ## Non-Goals
 

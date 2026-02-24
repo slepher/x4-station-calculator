@@ -7,10 +7,12 @@
 
 ### Requirement: Distiller 输出清单
 系统 SHALL 生成以下蒸馏输出：
+- `index/components.xml`（`index/components.xml` + DLC 节点叠加）
 - `ships_final.xml`（`ships.xml` + DLC）
 - `ship_macros.xml`（所有 `ship_*_macro.xml`）
 - `ship_connections.xml`（仅保留装配相关连接点的 ship 组件）
 - `equipment_macros.xml`（engine/shield/weapon/turret 宏）
+- `equipment_components.xml`（由 components 索引路径解析出的装备组件连接点）
 - `loadouts_final.xml`（`loadouts.xml` + DLC）
 - `shipgroups_final.xml`（`shipgroups.xml` + DLC）
 - 继续使用 `wares_final.xml` / `waregroups_final.xml` / `colors_final.xml`
@@ -20,6 +22,14 @@
 - **前提** 运行 distiller
 - **当** 蒸馏流程完成
 - **那么** 系统 SHALL 在 raw 目录生成上述所有输出文件
+
+#### Scenario: Components 索引清洗与去重
+- **前提** 生成 `index/components.xml`
+- **当** 写出前执行清洗流程
+- **那么** 系统 SHALL 移除 `entry.value` 中 `assets/test` 路径项
+- **并且** 系统 SHALL 规范 `entry.value` 中重复反斜杠
+- **并且** 系统 SHALL 自动合并同名同内容节点
+- **并且** 若同名不同内容，系统 SHALL 在写出后报错退出
 
 ### Requirement: JSON 生成入口
 系统 SHALL 通过 `x4_data_processor.py` 生成新增的 JSON 文件。
@@ -120,6 +130,20 @@
 - **当** 解析装备宏名称
 - **那么** 系统 SHALL 解析尺寸为 `small/medium/large/extralarge`
 - **并且** 若无法解析尺寸，系统 SHALL 设为 `unknown`
+
+#### Scenario: 装备 slotTags 来源与映射链路
+- **前提** 生成 `equipments.json`
+- **当** 生成装备的 `slotTags`
+- **那么** 系统 SHALL 仅使用 `equipment_components.xml` 中对应 component 的 connection tags 聚合去重
+- **并且** 映射链路 SHALL 为 `equipment(ware id) -> ware.component(ref=macro) -> equipment_macro.component(ref=component) -> equipment_components.component(name=component)`
+- **并且** 系统 SHALL 不使用复杂语义判定或 `equipment id` 直接映射作为 `slotTags` 来源
+
+#### Scenario: 装备 noplayerblueprint 提取
+- **前提** ware `tags` 可能包含 `noplayerblueprint`
+- **当** 生成 `equipments.json`
+- **那么** 系统 SHALL 输出 `noplayerblueprint: boolean`
+- **并且** 若 `tags` 无该项则 `noplayerblueprint` SHALL 为 `false`
+- **并且** 输出 `tags` SHALL 移除 `noplayerblueprint`
 
 #### Scenario: blueprint 过滤与标记
 - **前提** ware `tags` 与 production 方法 tags 存在 blueprint 相关标记

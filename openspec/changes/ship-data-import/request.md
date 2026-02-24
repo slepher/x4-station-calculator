@@ -5,10 +5,15 @@
 
 ## 已确认方案（审核重点）
 1. **数据蒸馏（Distiller）阶段输出**
+   - `index/components.xml`：由 base `index/components.xml` 叠加 DLC `index/components.xml` 节点生成。
+     - 写出前清理 `entry.value` 中 `assets/test` 路径项。
+     - 写出前规范 `entry.value` 中重复反斜杠（`\\` -> `\`）。
+     - `name` 相同且内容相同的节点自动去重；同名不同内容写出后报错退出，便于人工检查。
    - `ships_final.xml`：由 `libraries/ships.xml` 叠加 DLC 生成。
    - `ship_macros.xml`：聚合所有 `ship_*_macro.xml`。
    - `ship_connections.xml`：聚合被 ship macro 引用的 `ship_*.xml`，并按 tags 过滤，仅保留与装配相关的连接点（去掉 `<offset>` 等内部元素）。
    - `equipment_macros.xml`：聚合装备宏（engine / shield / weapon / turret）。
+   - `equipment_components.xml`：由 `equipment_id -> index/components.xml(entry.value) -> 对应组件 xml` 聚合，且仅保留 `tags` 含 `component` 的 connection。
    - `loadouts_final.xml`：由 `libraries/loadouts.xml` 叠加 DLC 生成。
    - `shipgroups_final.xml`：由 `libraries/shipgroups.xml` 叠加 DLC 生成。
    - 现有 `wares_final.xml` / `waregroups_final.xml` / `colors_final.xml` 继续使用。
@@ -32,7 +37,10 @@
    - `noplayerblueprint` 仅从 ware 本体 `tags` 读取；`noplayerbuild` 仅当所有 production 方法都为 `noplayerbuild` 时为 true。
    - `noblueprint` 的 ship 直接不导出。
    - `ships.json` / `equipments.json` 的 `id` 使用 `wareId`；不再输出 `wareId` 字段。
-   - `equipments.json` 新增 `size` 字段：从装备宏名称中解析（`s/m/l/xl` 或 `small/medium/large/extralarge`），无法解析时为 `unknown`。
+  - `equipments.json` 新增 `size` 字段：从装备宏名称中解析（`s/m/l/xl` 或 `small/medium/large/extralarge`），无法解析时为 `unknown`。
+  - `equipments.json` 的 `slotTags` 不再走语义推断/复杂判定，而是直接由 `equipment_components.xml` 的 connection tags 聚合去重得到。
+    - 映射链路：`equipment(ware id) -> ware.component(ref=macro) -> equipment_macro.component(ref=component) -> equipment_components.component(name=component)`。
+  - `equipments.json` 新增 `noplayerblueprint`（bool）：从 ware tags 提取；若不存在则 `false`；并从 `tags` 数组中移除 `noplayerblueprint` 字段。
 
 3. **名称字段**
    - `ships.json`、`equipments.json`、`shipgroups.json` 都包含 `nameId` 与 `name`。
@@ -59,13 +67,16 @@
 - 自动化测试执行（由用户手动验证）。
 
 ## 验收标准（DoD）
-1. Distiller 输出包含：`ships_final.xml`、`ship_macros.xml`、`ship_connections.xml`（已过滤）、`equipment_macros.xml`、`loadouts_final.xml`、`shipgroups_final.xml`。
-2. `ships.json` 按 **插槽类型数组 → 组 → 装备** 结构生成，包含 `isImplicitGroup` 与 `connection.shield` 规则字段。
-3. `equipments.json` 与 `ships.json` 均包含 `nameId/name` 且按 `production` 输出成本数组。
-4. `equipments.json` 的 `size` 支持 `small/medium/large/extralarge/unknown`。
-4. `shipgroups.json` 仅保留 `id/nameId/name`，`ships.json` 内包含 `shipgroup`。
-5. `test_tasks.md` 明确记录“测试由用户手动完成”。
-6. `ships.json` 的 ship 数据：插槽组级不输出 `slotTypes/slotTags/primaryType`；connection 级合并同 `tags` 项、输出 `count`，并补充 `size`；`race` 由 ship `name` 分段获得。
+1. Distiller 输出包含：`index/components.xml`、`ships_final.xml`、`ship_macros.xml`、`ship_connections.xml`（已过滤）、`equipment_macros.xml`、`equipment_components.xml`、`loadouts_final.xml`、`shipgroups_final.xml`。
+2. `index/components.xml` 满足：`assets/test` 条目已移除、双反斜杠已规范、同名同内容已去重、同名不同内容会在写出后报错。
+3. `ships.json` 按 **插槽类型数组 → 组 → 装备** 结构生成，包含 `isImplicitGroup` 与 `connection.shield` 规则字段。
+4. `equipments.json` 与 `ships.json` 均包含 `nameId/name` 且按 `production` 输出成本数组。
+5. `equipments.json` 的 `size` 支持 `small/medium/large/extralarge/unknown`。
+6. `equipments.json` 的 `slotTags` 仅来源于 `equipment_components.xml` 的 connection tags 并去重聚合。
+7. `equipments.json` 输出 `noplayerblueprint` 布尔字段，且 `tags` 内不再包含该 tag。
+8. `shipgroups.json` 仅保留 `id/nameId/name`，`ships.json` 内包含 `shipgroup`。
+9. `test_tasks.md` 明确记录“测试由用户手动完成”。
+10. `ships.json` 的 ship 数据：插槽组级不输出 `slotTypes/slotTags/primaryType`；connection 级合并同 `tags` 项、输出 `count`，并补充 `size`；`race` 由 ship `name` 分段获得。
 
 ## 未决项
 无。
