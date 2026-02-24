@@ -1,0 +1,358 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<components>
+  <component name="shield_arg_xl_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="small_Con_shieldgen_01" tags="extralarge shield component  standard "/>
+    </connections>
+  </component>
+  <component name="shield_arg_m_standard_02_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component hittable standard "/>
+    </connections>
+  </component>
+  <component name="shield_spl_s_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="Connection01" tags="small shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_xen_l_standard_02_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield" tags="component large shield xenon "/>
+    </connections>
+  </component>
+  <component name="shield_par_l_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="small_Con_shieldgen_01" tags="component large shield standard "/>
+    </connections>
+  </component>
+  <component name="shield_bor_xl_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component extralarge shield "/>
+    </connections>
+  </component>
+  <component name="shield_bor_xl_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component extralarge shield "/>
+    </connections>
+  </component>
+  <component name="shield_ter_l_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="con_shieldgen_01" tags="large shield component standard "/>
+    </connections>
+  </component>
+  <component name="shield_ter_m_standard_02_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component hittable standard "/>
+    </connections>
+  </component>
+  <component name="shield_arg_s_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="Connection01" tags="small shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_spl_l_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="small_Con_shieldgen_01" tags="large shield component standard "/>
+    </connections>
+  </component>
+  <component name="shield_ter_m_standard_04_mk3" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component hittable medium shield "/>
+    </connections>
+  </component>
+  <component name="shield_ter_m_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_kha_l_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="component khaak large shield "/>
+    </connections>
+  </component>
+  <component name="shield_spl_m_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_ter_s_standard_01_mk3" class="shieldgenerator">
+    <connections>
+      <connection name="Connection01" tags="small shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_xen_s_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="Connection01" tags="small shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_kha_m_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="medium shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_spl_s_standard_01_mk3" class="shieldgenerator">
+    <connections>
+      <connection name="Connection01" tags="small shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_bor_l_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component large shield "/>
+    </connections>
+  </component>
+  <component name="shield_arg_m_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_spl_xl_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shieldgen_01" tags="extralarge shield component  standard "/>
+    </connections>
+  </component>
+  <component name="shield_ter_s_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="Connection01" tags="small shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_kha_m_standard_03_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="component khaak medium shield "/>
+    </connections>
+  </component>
+  <component name="shield_bor_m_standard_02_mk3" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component hittable medium shield "/>
+    </connections>
+  </component>
+  <component name="shield_kha_xl_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="component extralarge khaak shield "/>
+    </connections>
+  </component>
+  <component name="shield_ter_m_standard_04_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component hittable medium shield "/>
+    </connections>
+  </component>
+  <component name="shield_ter_xl_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shieldgen_01" tags="extralarge shield component  standard "/>
+    </connections>
+  </component>
+  <component name="shield_xen_s_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="Connection01" tags="small shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_arg_l_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="small_Con_shieldgen_01" tags="large shield component standard "/>
+    </connections>
+  </component>
+  <component name="shield_ter_m_standard_02_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component hittable standard "/>
+    </connections>
+  </component>
+  <component name="shield_arg_m_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_bor_m_standard_02_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component hittable medium shield "/>
+    </connections>
+  </component>
+  <component name="shield_xen_m_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_arg_m_standard_02_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component hittable standard "/>
+    </connections>
+  </component>
+  <component name="shield_spl_m_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_spl_m_standard_02_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component hittable standard "/>
+    </connections>
+  </component>
+  <component name="shield_ter_l_standard_01_mk3" class="shieldgenerator">
+    <connections>
+      <connection name="con_shieldgen_01" tags="large shield component standard "/>
+    </connections>
+  </component>
+  <component name="shield_ter_s_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="Connection01" tags="small shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_ter_l_standard_02_mk3" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield" tags="advanced component large shield "/>
+    </connections>
+  </component>
+  <component name="shield_spl_l_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="small_Con_shieldgen_01" tags="large shield component standard "/>
+    </connections>
+  </component>
+  <component name="shield_pir_xl_battleship_01_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="extralarge shield pir_battleship_01 component "/>
+    </connections>
+  </component>
+  <component name="shield_arg_s_standard_01_mk3" class="shieldgenerator">
+    <connections>
+      <connection name="Connection01" tags="small shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_ter_xl_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="con_shieldgen_01" tags="extralarge shield component  standard "/>
+    </connections>
+  </component>
+  <component name="shield_par_l_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="small_Con_shieldgen_01" tags="component large shield standard "/>
+    </connections>
+  </component>
+  <component name="shield_xen_l_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="small_Con_shieldgen_01" tags="large shield component standard "/>
+    </connections>
+  </component>
+  <component name="shield_xen_xl_mothership_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield" tags="component extralarge shield ship_xen_xl_mothership_01 "/>
+    </connections>
+  </component>
+  <component name="shield_ter_m_standard_04_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component hittable medium shield "/>
+    </connections>
+  </component>
+  <component name="shield_gen_m_yacht_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shieldgen_01" tags="component mandatory medium shield ship_gen_m_yacht_01 unhittable"/>
+    </connections>
+  </component>
+  <component name="shield_ter_m_standard_02_mk3" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component hittable standard "/>
+    </connections>
+  </component>
+  <component name="shield_xen_m_standard_02_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component hittable standard "/>
+    </connections>
+  </component>
+  <component name="shield_xen_l_standard_02_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield" tags="component large shield xenon "/>
+    </connections>
+  </component>
+  <component name="shield_xen_m_standard_02_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component hittable standard "/>
+    </connections>
+  </component>
+  <component name="shield_xen_l_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="small_Con_shieldgen_01" tags="large shield component standard "/>
+    </connections>
+  </component>
+  <component name="shield_bor_l_standard_01_mk3" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component large shield "/>
+    </connections>
+  </component>
+  <component name="shield_ter_m_standard_01_mk3" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_xen_m_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_arg_l_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="small_Con_shieldgen_01" tags="large shield component standard "/>
+    </connections>
+  </component>
+  <component name="shield_gen_s_racer_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="ParentConnection" tags="component shield ship_gen_s_racer_01 small"/>
+    </connections>
+  </component>
+  <component name="shield_ter_l_standard_02_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield" tags="advanced component large shield "/>
+    </connections>
+  </component>
+  <component name="shield_ter_l_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shieldgen_01" tags="large shield component standard "/>
+    </connections>
+  </component>
+  <component name="shield_spl_m_standard_02_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component hittable standard "/>
+    </connections>
+  </component>
+  <component name="shield_kha_m_standard_02_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="medium shield component hittable standard "/>
+    </connections>
+  </component>
+  <component name="shield_bor_m_standard_02_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component hittable medium shield "/>
+    </connections>
+  </component>
+  <component name="shield_xen_m_standard_04_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="component hittable medium shield xenon "/>
+    </connections>
+  </component>
+  <component name="shield_arg_s_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="Connection01" tags="small shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_ter_l_standard_02_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield" tags="advanced component large shield "/>
+    </connections>
+  </component>
+  <component name="shield_bor_l_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component large shield "/>
+    </connections>
+  </component>
+  <component name="shield_spl_s_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="Connection01" tags="small shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_xen_xl_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="small_Con_shieldgen_01" tags="extralarge shield component  standard "/>
+    </connections>
+  </component>
+  <component name="shield_ter_m_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component unhittable standard "/>
+    </connections>
+  </component>
+</components>
