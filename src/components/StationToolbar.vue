@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch, nextTick } from 'vue'
-import { useStationStore } from '@/store/useStationStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useStatusStore } from '@/store/useStatusStore'
+import { useShipBuildStore } from '@/store/useShipBuildStore'
 import LanguageSelector from './LanguageSelector.vue'
 import MissingTranslate from './MissingTranslate.vue'
 import LoadPlanModal from './LoadPlanModal.vue'
@@ -12,10 +12,10 @@ import ImportPlanModal from './ImportPlanModal.vue'
 import SmartSaveDialog from './SmartSaveDialog.vue'
 import { useI18n } from 'vue-i18n'
 
-const stationStore = useStationStore()
 const logicFlowStore = useLogicFlowStore()
 const empireStore = useEmpireStore()
 const statusStore = useStatusStore()
+const shipBuildStore = useShipBuildStore()
 const { t } = useI18n()
 
 const showLoadModal = ref(false)
@@ -31,8 +31,8 @@ const titleInputRef = ref<HTMLInputElement | null>(null)
 const lastValidTitle = ref('')
 const editingValue = ref('')
 
-const isFlowView = computed(() => stationStore.activeView === 'flow')
-const isShipBuildView = computed(() => stationStore.activeView === 'ship-build')
+const isFlowView = computed(() => shipBuildStore.activeView === 'flow')
+const isShipBuildView = computed(() => shipBuildStore.activeView === 'ship-build')
 
 const themeColors = computed(() => {
   if (isFlowView.value) {
@@ -268,27 +268,27 @@ const handleLoad = () => {
 
     <div class="flex items-center bg-black/40 p-1 rounded-full border border-white/10">
       <button 
-        @click="stationStore.activeView = 'production'"
+        @click="shipBuildStore.activeView = 'production'"
         class="px-4 py-1.5 rounded-full text-xs transition-all duration-300 flex items-center gap-2"
-        :class="stationStore.activeView === 'production' ? 'bg-blue-600 text-white shadow-lg' : 'text-white/40 hover:text-white/70'"
+        :class="shipBuildStore.activeView === 'production' ? 'bg-blue-600 text-white shadow-lg' : 'text-white/40 hover:text-white/70'"
       >
-        <span class="w-2 h-2 rounded-full" :class="stationStore.activeView === 'production' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'bg-transparent border border-white/20'"></span>
+        <span class="w-2 h-2 rounded-full" :class="shipBuildStore.activeView === 'production' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'bg-transparent border border-white/20'"></span>
         {{ t('view.production') }}
       </button>
       <button 
-        @click="stationStore.activeView = 'flow'"
+        @click="shipBuildStore.activeView = 'flow'"
         class="px-4 py-1.5 rounded-full text-xs transition-all duration-300 flex items-center gap-2"
-        :class="stationStore.activeView === 'flow' ? 'bg-purple-600 text-white shadow-lg' : 'text-white/40 hover:text-white/70'"
+        :class="shipBuildStore.activeView === 'flow' ? 'bg-purple-600 text-white shadow-lg' : 'text-white/40 hover:text-white/70'"
       >
-        <span class="w-2 h-2 rounded-full" :class="stationStore.activeView === 'flow' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'bg-transparent border border-white/20'"></span>
+        <span class="w-2 h-2 rounded-full" :class="shipBuildStore.activeView === 'flow' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'bg-transparent border border-white/20'"></span>
         {{ t('view.logical_flow') }}
       </button>
       <button 
-        @click="stationStore.activeView = 'ship-build'"
+        @click="shipBuildStore.activeView = 'ship-build'"
         class="px-4 py-1.5 rounded-full text-xs transition-all duration-300 flex items-center gap-2"
-        :class="stationStore.activeView === 'ship-build' ? 'bg-emerald-600 text-white shadow-lg' : 'text-white/40 hover:text-white/70'"
+        :class="shipBuildStore.activeView === 'ship-build' ? 'bg-emerald-600 text-white shadow-lg' : 'text-white/40 hover:text-white/70'"
       >
-        <span class="w-2 h-2 rounded-full" :class="stationStore.activeView === 'ship-build' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'bg-transparent border border-white/20'"></span>
+        <span class="w-2 h-2 rounded-full" :class="shipBuildStore.activeView === 'ship-build' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'bg-transparent border border-white/20'"></span>
         {{ t('view.ship_build') }}
       </button>
     </div>

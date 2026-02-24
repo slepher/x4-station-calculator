@@ -1,5 +1,5 @@
 import { useI18n } from 'vue-i18n';
-import type { X4Module, X4Ware, X4ModuleGroup, X4Ship, X4ShipType, X4EquipmentType } from '../types/x4';
+import type { X4Module, X4Ware, X4ModuleGroup, X4Ship, X4ShipType, X4EquipmentType, X4Equipment } from '../types/x4';
 import { useStatusStore } from '../store/useStatusStore';
 import { ref } from 'vue';
 
@@ -10,7 +10,7 @@ export function useX4I18n() {
   const { t, te } = useI18n();
   const statusStore = useStatusStore();
 
-  const translate = (id: string, nameId: string, category: 'module' | 'ware' | 'type' | 'ship' | 'ship_type' | 'equipment_type'): string => {
+  const translate = (id: string, nameId: string, category: 'module' | 'ware' | 'type' | 'ship' | 'ship_type' | 'equipment_type' | 'equipment'): string => {
     if (te(nameId)) {
       return t(nameId);
     }
@@ -65,6 +65,10 @@ export function useX4I18n() {
 
     translateEquipmentType: (equipmentType: X4EquipmentType) => {
       return translate(equipmentType.id, equipmentType.nameId || 'MISSING_NAME_ID', 'equipment_type');
+    },
+
+    translateEquipment: (equipment: X4Equipment) => {
+      return translate(equipment.id, equipment.nameId || 'MISSING_NAME_ID', 'equipment');
     },
 
     translate,

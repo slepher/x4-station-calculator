@@ -18,6 +18,7 @@
 12. **Thruster 插槽**：从 `ship_macros.xml` 的 `<thruster tags="...">` 提取为 `slots` 中 `thruster` 类型。
 13. **id 规则**：`ships.json` / `equipments.json` 的 `id` 使用 `wareId`，不再输出 `wareId` 字段。
 14. **noblueprint / noplayerbuild 规则**：`noblueprint` 直接不导出；`noplayerblueprint` 仅看 ware `tags`；`noplayerbuild` 需所有 production 方法都为 `noplayerbuild`。
+15. **装备尺寸**：`equipments.json` 新增 `size` 字段，从装备宏名称解析，未命中时为 `unknown`。
 
 ## Non-Goals
 

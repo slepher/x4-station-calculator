@@ -67,14 +67,16 @@ Resolution order:
 
 Conflict handling:
 - If multiple changes match, stop and ask user to choose from candidates.
-- If no change matches, stop and ask; include available active change names.
+- If no change matches:
+  - For `/x4:ff` only, auto-create `openspec/changes/<change-name>/` and proceed.
+  - For all other phases, stop and ask; include available active change names.
 - Exclude `openspec/changes/archive/` from candidate resolution.
 - If user description conflicts with an explicit abbreviation token that resolves uniquely, use abbreviation resolution result as final target.
 
 Enforcement:
 - All x4 phase skills that accept `change-name` MUST resolve before any action.
 - After resolution, MUST print: `Resolved change: <change-name>`.
-- If unresolved, MUST stop and ask (do not auto-create a change).
+- If unresolved, MUST stop and ask (except `/x4:ff` auto-create rule above).
 
 ## Phase Map
 

@@ -115,6 +115,12 @@
 - **当** 输出 `id`
 - **那么** 系统 SHALL 使用 `wareId` 作为 `id`，且不输出 `wareId` 字段
 
+#### Scenario: 装备尺寸解析
+- **前提** 生成 `equipments.json`
+- **当** 解析装备宏名称
+- **那么** 系统 SHALL 解析尺寸为 `small/medium/large/extralarge`
+- **并且** 若无法解析尺寸，系统 SHALL 设为 `unknown`
+
 #### Scenario: blueprint 过滤与标记
 - **前提** ware `tags` 与 production 方法 tags 存在 blueprint 相关标记
 - **当** 生成 ship JSON

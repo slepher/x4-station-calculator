@@ -523,17 +523,19 @@ def main():
     # --- 步骤 8: 聚合装备组件连接点 (equipment_components.xml) ---
     print("∑ [8/8] 正在聚合装备组件连接点 (equipment_components.xml)...")
 
-    # 8.1 从 equipment_macros.xml + wares_final.xml 收集需要的 equipment id。
-    # 匹配键仅使用 equipment id（ware id），不使用 macro 名称。
-    equipment_ids_needed = set()
-    equipment_macro_names = set()
+    # 8.1 从 equipment_macros.xml + wares_final.xml 收集 equipment -> component ref 映射。
+    # 映射链路: equipment(ware id) -> ware.component(ref=macro) -> equipment_macro.component(ref=component)
+    equipment_to_component_ref = {}
+    macro_to_component_ref = {}
     if os.path.exists(equipment_macros_path):
         try:
             equipment_macros_tree = etree.parse(equipment_macros_path, parser)
             for macro in equipment_macros_tree.findall(".//macro[@name]"):
                 macro_name = macro.get('name')
-                if macro_name:
-                    equipment_macro_names.add(macro_name)
+                comp = macro.find('component')
+                comp_ref = comp.get('ref') if comp is not None else None
+                if macro_name and comp_ref:
+                    macro_to_component_ref[macro_name] = comp_ref
         except Exception as e:
             print(f"      ⚠️ 读取 equipment_macros.xml 失败: {e}")
     if os.path.exists(wares_final_path):
@@ -545,11 +547,12 @@ def main():
                 comp_ref = comp.get('ref') if comp is not None else None
                 if not ware_id or not comp_ref:
                     continue
-                if comp_ref in equipment_macro_names:
-                    equipment_ids_needed.add(ware_id)
+                component_ref = macro_to_component_ref.get(comp_ref)
+                if component_ref:
+                    equipment_to_component_ref[ware_id] = component_ref
         except Exception as e:
             print(f"      ⚠️ 读取 wares_final.xml 失败: {e}")
-    print(f"   🎯 识别到 {len(equipment_ids_needed)} 个 equipment id 候选。")
+    print(f"   🎯 识别到 {len(equipment_to_component_ref)} 条 equipment -> component 映射。")
 
     # 8.2 从已整合的 index/components.xml 构建 equipment_id -> component_path 映射。
     component_path_by_equipment_id = {}
@@ -604,8 +607,11 @@ def main():
     components_root_out = etree.Element('components')
     components_processed_out = 0
 
-    for equipment_id in equipment_ids_needed:
-        path_value = component_path_by_equipment_id.get(equipment_id)
+    processed_component_refs = set()
+    for equipment_id, component_ref in equipment_to_component_ref.items():
+        if component_ref in processed_component_refs:
+            continue
+        path_value = component_path_by_equipment_id.get(component_ref)
         if not path_value:
             continue
         sources = resolve_component_sources(path_value)
@@ -640,12 +646,14 @@ def main():
                 if filtered is not None:
                     components_root_out.append(filtered)
                     components_processed_out += 1
+                    processed_component_refs.add(component_ref)
             elif root_node.tag == 'components':
                 for node in root_node.findall('component'):
                     filtered = clone_component_with_filtered_connections(node)
                     if filtered is not None:
                         components_root_out.append(filtered)
                         components_processed_out += 1
+                        processed_component_refs.add(component_ref)
 
     equipment_components_path = os.path.join(lib_dest_dir, "equipment_components.xml")
     etree.ElementTree(components_root_out).write(

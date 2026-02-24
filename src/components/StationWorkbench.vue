@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useStationStore } from '@/store/useStationStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
+import { useShipBuildStore } from '@/store/useShipBuildStore'
 import StationPlanningPanel from './StationPlanningPanel.vue'
 import StationDashboard from './StationDashboard.vue'
 import StationToolbar from './StationToolbar.vue'
@@ -15,14 +16,15 @@ import ShipBuildView from './ShipBuildView.vue'
 
 const store = useStationStore()
 const empireStore = useEmpireStore()
+const shipBuildStore = useShipBuildStore()
 
 import { watchEffect, computed } from 'vue'
 watchEffect(() => {
-  console.log('[StationWorkbench] isReady:', store.isReady, 'activeView:', store.activeView)
+  console.log('[StationWorkbench] isReady:', store.isReady, 'activeView:', shipBuildStore.activeView)
 })
 
-const isProductionView = computed(() => store.activeView === 'production')
-const isShipBuildView = computed(() => store.activeView === 'ship-build')
+const isProductionView = computed(() => shipBuildStore.activeView === 'production')
+const isShipBuildView = computed(() => shipBuildStore.activeView === 'ship-build')
 </script>
 
 <template>

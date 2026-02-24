@@ -42,6 +42,7 @@
   - [ ] 步骤 1：`ships.json` / `equipments.json` 的 `id` 使用 `wareId`，不输出 `wareId` 字段。
   - [ ] 步骤 2：`production` 数组输出 `{ method, noplayerbuild, cost }`。
   - [ ] 步骤 3：`noblueprint` 的 ship 不导出；`noplayerblueprint` 仅看 ware `tags`；`noplayerbuild` 仅当所有 production 方法均为 `noplayerbuild` 时为 true。
+  - [ ] 步骤 4：`equipments.json` 增加 `size` 字段，解析自装备宏名称，未命中为 `unknown`。
 
 ## 3. 解析规则与字段一致性检查
 

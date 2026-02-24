@@ -25,8 +25,8 @@ After discussion, quickly push documentation forward by generating required arti
 ## Change Name Resolution (MANDATORY)
 
 - Resolve `change-name` using `x4-user-workflow` rules before any action.
-- If multiple matches or no match, stop and ask the user to choose; list available active changes.
-- Do not auto-create a change on resolution failure.
+- If multiple matches, stop and ask the user to choose; list available active changes.
+- If no match, auto-create `openspec/changes/<change-name>/` and proceed.
 - After resolution, print: `Resolved change: <change-name>`.
 
 ## Ownership Boundary (MANDATORY)

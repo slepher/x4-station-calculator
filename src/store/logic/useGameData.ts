@@ -92,7 +92,7 @@ export function findModuleForWare(
   lineage: string,
   modulesByOutputMap: Record<string, X4Module[]>
 ): X4Module | null {
-  const producers = modulesByOutputMap[wareId] || []
+  const producers = (modulesByOutputMap[wareId] || []).filter(m => m.method !== 'recycling')
   if (producers.length === 0) return null
 
   let found = producers.find(m => m.race === lineage)

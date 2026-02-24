@@ -98,7 +98,10 @@ export interface X4Equipment {
   mk: string | null;
   race: string | null;
   tags: string[];
-  cost: Record<string, Record<string, number>>;
+  noplayerblueprint: boolean;
+  slotTags?: string[];
+  integrated: boolean;
+  cost: Record<string, Partial<Record<string, number>>>;
 }
 
 /**

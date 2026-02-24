@@ -10,6 +10,7 @@ import type {
 import { useGameDataStore } from './useGameDataStore'
 import { useLogicFlowStore } from './useLogicFlowStore'
 import { useEmpireStore } from './useEmpireStore'
+import { useShipBuildStore, type StationActiveView } from './useShipBuildStore'
 import { generateFilteredModulesGrouped } from './logic/searchModule'
 import {
   parseXmlBlueprint,
@@ -35,9 +36,15 @@ export const useStationStore = defineStore('station', () => {
   const gameData = useGameDataStore()
   const logicFlow = useLogicFlowStore()
   const empireStore = useEmpireStore()
+  const shipBuildStore = useShipBuildStore()
   logicFlow.init()
 
-  const activeView = ref<'production' | 'flow' | 'ship-build'>((localStorage.getItem('x4_station_active_view') as any) || 'production')
+  const activeView = computed<StationActiveView>({
+    get: () => shipBuildStore.activeView,
+    set: (value) => {
+      shipBuildStore.activeView = value
+    }
+  })
   const isReady = computed(() => empireStore.isReady && gameData.isReady)
   const savedPlans = ref<SavedPlansState>({ version: 1, activeId: null, list: [] })
   const buildPriceMultiplier = ref(0.5)
@@ -152,10 +159,6 @@ export const useStationStore = defineStore('station', () => {
       localizedModulesMap.value,
       localizedModuleGroupsMap.value
     )
-  })
-
-  watch(activeView, (val) => {
-    localStorage.setItem('x4_station_active_view', val)
   })
 
   watch(savedPlans, (val) => {
@@ -479,10 +482,6 @@ export const useStationStore = defineStore('station', () => {
     try {
       await gameData.initialize()
       logicFlow.init()
-      const storedView = localStorage.getItem('x4_station_active_view')
-      if (storedView === 'production' || storedView === 'flow' || storedView === 'ship-build') {
-        activeView.value = storedView as 'production' | 'flow' | 'ship-build'
-      }
       syncStateFromActiveStation()
       console.log('[StationStore] Initialized. Ready:', isReady.value)
     } catch (e) {
