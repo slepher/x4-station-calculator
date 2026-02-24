@@ -371,6 +371,7 @@ def main():
 
     equipment_patterns = [
         os.path.join("assets", "props", "**", "macros", "*engine*_macro.xml"),
+        os.path.join("assets", "props", "**", "macros", "*thruster*_macro.xml"),
         os.path.join("assets", "props", "**", "macros", "*shield*_macro.xml"),
         os.path.join("assets", "props", "**", "macros", "*weapon*_macro.xml"),
         os.path.join("assets", "props", "**", "macros", "*turret*_macro.xml"),
