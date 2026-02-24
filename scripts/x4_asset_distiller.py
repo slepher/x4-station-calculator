@@ -106,6 +106,13 @@ def main():
     if normalized_double_slash:
         print(f"   🔧 已规范 {normalized_double_slash} 个 entry.value 双反斜杠。")
 
+    def node_signature(node):
+        # 忽略纯空白 text/tail，避免 <entry></entry> 与 <entry/> 被视为不同。
+        attrs = tuple(sorted((k, v) for k, v in node.attrib.items()))
+        text = (node.text or '').strip()
+        children = tuple(node_signature(child) for child in list(node))
+        return (node.tag, attrs, text, children)
+
     # name 相同且内容完全一致的节点自动去重合并。
     merged_same_content = 0
     seen_name_and_content = set()
@@ -113,7 +120,7 @@ def main():
         name = node.get("name")
         if not name:
             continue
-        signature = etree.tostring(node, encoding='unicode', with_tail=False)
+        signature = node_signature(node)
         key = (name, signature)
         if key in seen_name_and_content:
             components_root.remove(node)
