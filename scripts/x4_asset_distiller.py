@@ -81,6 +81,18 @@ def main():
         except Exception as e:
             print(f"      ⚠️ 警告: 叠加失败 {dlc_id}: {e}")
 
+    # 过滤 value 路径包含 assets/test 的 entry 元素（兼容 / 与 \）。
+    removed_test_entries = 0
+    for entry in list(components_root.findall(".//entry[@value]")):
+        value = (entry.get("value") or "").lower().replace("\\", "/")
+        if "assets/test" in value:
+            parent = entry.getparent()
+            if parent is not None:
+                parent.remove(entry)
+                removed_test_entries += 1
+    if removed_test_entries:
+        print(f"   🧹 已移除 {removed_test_entries} 个 assets/test entry。")
+
     # 先写出文件，便于人工检查内容；随后再做重复校验并决定是否终止。
     components_tree.write(components_output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
     print(f"   ✨ 生成: index/components.xml")
