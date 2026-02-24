@@ -93,6 +93,23 @@ def main():
     if removed_test_entries:
         print(f"   🧹 已移除 {removed_test_entries} 个 assets/test entry。")
 
+    # name 相同且内容完全一致的节点自动去重合并。
+    merged_same_content = 0
+    seen_name_and_content = set()
+    for node in list(components_root):
+        name = node.get("name")
+        if not name:
+            continue
+        signature = etree.tostring(node, encoding='unicode', with_tail=False)
+        key = (name, signature)
+        if key in seen_name_and_content:
+            components_root.remove(node)
+            merged_same_content += 1
+        else:
+            seen_name_and_content.add(key)
+    if merged_same_content:
+        print(f"   ♻️ 已合并 {merged_same_content} 个同名同内容节点。")
+
     # 先写出文件，便于人工检查内容；随后再做重复校验并决定是否终止。
     components_tree.write(components_output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
     print(f"   ✨ 生成: index/components.xml")
