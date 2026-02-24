@@ -3,6 +3,7 @@ import shutil
 import glob
 import json
 import sys
+from copy import deepcopy
 from lxml import etree
 
 def load_all_configs():
@@ -47,10 +48,56 @@ def main():
     # --- 步骤 1: 拷贝语言包 (t/) ---
     if os.path.exists(os.path.join(src, "t")):
         shutil.copytree(os.path.join(src, "t"), os.path.join(dest_root, "t"))
-        print("✅ [1/4] 语言包已拷贝。")
+        print("✅ [1/8] 语言包已拷贝。")
 
-    # --- 步骤 2: 处理核心库文件 (wares/waregroups/colors/ships/shipgroups/loadouts) ---
-    print("📂 [2/6] 正在处理核心库文件 (Wares/Waregroups/Colors/Ships/Shipgroups/Loadouts)...")
+    # --- 步骤 2: 迁移并叠加 index/components.xml ---
+    print("📂 [2/7] 正在迁移 index/components.xml...")
+    index_dest_dir = os.path.join(dest_root, "index")
+    os.makedirs(index_dest_dir, exist_ok=True)
+
+    components_base_path = os.path.join(src, "index", "components.xml")
+    components_output_path = os.path.join(index_dest_dir, "components.xml")
+    parser = etree.XMLParser(remove_blank_text=True)
+    dlc_order = v_config.get('dlc_order', [])
+
+    components_tree = None
+    if os.path.exists(components_base_path):
+        components_tree = etree.parse(components_base_path, parser)
+    else:
+        print(f"      ⚠️ Base 文件不存在: {components_base_path}")
+        components_tree = etree.ElementTree(etree.Element("components"))
+
+    components_root = components_tree.getroot()
+    for dlc_id in dlc_order:
+        patch_path = os.path.join(src, "extensions", dlc_id, "index", "components.xml")
+        if not os.path.exists(patch_path):
+            continue
+        print(f"      [+] 叠加节点 ({dlc_id})")
+        try:
+            patch_tree = etree.parse(patch_path, parser)
+            patch_root = patch_tree.getroot()
+            for node in patch_root:
+                components_root.append(deepcopy(node))
+        except Exception as e:
+            print(f"      ⚠️ 警告: 叠加失败 {dlc_id}: {e}")
+
+    # 校验直接子节点中 name 属性是否重复。
+    names = [node.get("name") for node in components_root if node.get("name")]
+    name_counts = {}
+    for name in names:
+        name_counts[name] = name_counts.get(name, 0) + 1
+    dup_names = sorted([name for name, count in name_counts.items() if count > 1])
+    if dup_names:
+        sample = ", ".join(dup_names[:10])
+        more = f" ... (+{len(dup_names)-10} more)" if len(dup_names) > 10 else ""
+        raise RuntimeError(f"❌ index/components.xml 存在重复 name: {sample}{more}")
+    print(f"   ✅ name 去重校验通过，共 {len(names)} 个具名元素。")
+
+    components_tree.write(components_output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
+    print(f"   ✨ 生成: index/components.xml")
+
+    # --- 步骤 3: 处理核心库文件 (wares/waregroups/colors/ships/shipgroups/loadouts) ---
+    print("📂 [3/8] 正在处理核心库文件 (Wares/Waregroups/Colors/Ships/Shipgroups/Loadouts)...")
     lib_dest_dir = os.path.join(dest_root, "libraries")
     os.makedirs(lib_dest_dir, exist_ok=True)
 
@@ -98,8 +145,8 @@ def main():
         base_tree.write(final_output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
         print(f"      ✨ 生成: {os.path.basename(final_output_path)}")
 
-    # --- 步骤 3: 聚合空间站宏定义 (module_macros.xml) ---
-    print("∑ [3/6] 正在聚合空间站宏定义 (module_macros.xml)...")
+    # --- 步骤 4: 聚合空间站宏定义 (module_macros.xml) ---
+    print("∑ [4/8] 正在聚合空间站宏定义 (module_macros.xml)...")
     
     # 3.1 解析引用 (Needed Macros)
     needed_macros = set()
@@ -197,8 +244,8 @@ def main():
     etree.ElementTree(macros_root).write(macros_final_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
     print(f"✅ 聚合完成: 写入 {processed_count} 个宏定义到 macros_final.xml")
 
-    # --- 步骤 4: 聚合飞船宏定义 (ship_macros.xml) ---
-    print("∑ [4/6] 正在聚合飞船宏定义 (ship_macros.xml)...")
+    # --- 步骤 5: 聚合飞船宏定义 (ship_macros.xml) ---
+    print("∑ [5/8] 正在聚合飞船宏定义 (ship_macros.xml)...")
 
     ship_macro_index = {}
 
@@ -251,8 +298,8 @@ def main():
     etree.ElementTree(ship_macros_root).write(ship_macros_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
     print(f"✅ 聚合完成: 写入 {ship_processed} 个飞船宏定义到 ship_macros.xml")
 
-    # --- 步骤 5: 聚合飞船组件连接点 (ship_connections.xml) ---
-    print("∑ [5/6] 正在聚合飞船组件连接点 (ship_connections.xml)...")
+    # --- 步骤 6: 聚合飞船组件连接点 (ship_connections.xml) ---
+    print("∑ [6/8] 正在聚合飞船组件连接点 (ship_connections.xml)...")
 
     # 5.1 从 ship_macros.xml 收集需要的 component refs
     ship_components_needed = set()
@@ -357,8 +404,8 @@ def main():
     etree.ElementTree(components_root).write(connections_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
     print(f"✅ 聚合完成: 写入 {components_processed} 个组件定义到 ship_connections.xml")
 
-    # --- 步骤 6: 聚合装备宏定义 (equipment_macros.xml) ---
-    print("∑ [6/7] 正在聚合装备宏定义 (equipment_macros.xml)...")
+    # --- 步骤 7: 聚合装备宏定义 (equipment_macros.xml) ---
+    print("∑ [7/8] 正在聚合装备宏定义 (equipment_macros.xml)...")
 
     equipment_macro_index = {}
 
@@ -421,8 +468,8 @@ def main():
     etree.ElementTree(equipment_macros_root).write(equipment_macros_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
     print(f"✅ 聚合完成: 写入 {equipment_processed} 个装备宏定义到 equipment_macros.xml")
 
-    # --- 步骤 7: 聚合装备 SurfaceElements 连接点 (equipment_surface.xml) ---
-    print("∑ [7/7] 正在聚合装备 SurfaceElements 连接点 (equipment_surface.xml)...")
+    # --- 步骤 8: 聚合装备 SurfaceElements 连接点 (equipment_surface.xml) ---
+    print("∑ [8/8] 正在聚合装备 SurfaceElements 连接点 (equipment_surface.xml)...")
 
     # 7.1 从 equipment_macros.xml + wares_final.xml 收集需要的 equipment id。
     # 匹配键仅使用 equipment id（ware id），不使用 macro 名称。
