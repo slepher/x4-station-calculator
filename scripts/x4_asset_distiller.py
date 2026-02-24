@@ -520,10 +520,10 @@ def main():
     etree.ElementTree(equipment_macros_root).write(equipment_macros_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
     print(f"✅ 聚合完成: 写入 {equipment_processed} 个装备宏定义到 equipment_macros.xml")
 
-    # --- 步骤 8: 聚合装备 SurfaceElements 连接点 (equipment_surface.xml) ---
-    print("∑ [8/8] 正在聚合装备 SurfaceElements 连接点 (equipment_surface.xml)...")
+    # --- 步骤 8: 聚合装备组件连接点 (equipment_components.xml) ---
+    print("∑ [8/8] 正在聚合装备组件连接点 (equipment_components.xml)...")
 
-    # 7.1 从 equipment_macros.xml + wares_final.xml 收集需要的 equipment id。
+    # 8.1 从 equipment_macros.xml + wares_final.xml 收集需要的 equipment id。
     # 匹配键仅使用 equipment id（ware id），不使用 macro 名称。
     equipment_ids_needed = set()
     equipment_macro_names = set()
@@ -551,35 +551,25 @@ def main():
             print(f"      ⚠️ 读取 wares_final.xml 失败: {e}")
     print(f"   🎯 识别到 {len(equipment_ids_needed)} 个 equipment id 候选。")
 
-    # 7.2 建立 SurfaceElements 索引
-    surface_component_index = {}
+    # 8.2 从已整合的 index/components.xml 构建 equipment_id -> component_path 映射。
+    component_path_by_equipment_id = {}
+    if os.path.exists(components_output_path):
+        try:
+            components_index_tree = etree.parse(components_output_path, parser)
+            for entry in components_index_tree.findall(".//entry[@name][@value]"):
+                name = entry.get('name')
+                value = entry.get('value')
+                if name and value and name not in component_path_by_equipment_id:
+                    component_path_by_equipment_id[name] = value
+        except Exception as e:
+            print(f"      ⚠️ 读取 components.xml 失败: {e}")
 
-    def scan_surface_to_index(root_path, source_key, pattern):
-        for f in glob.glob(pattern, recursive=True):
-            fname = os.path.splitext(os.path.basename(f))[0]
-            if fname not in surface_component_index:
-                surface_component_index[fname] = {}
-            surface_component_index[fname][source_key] = f
-
-    # 仅扫描精确目录，不递归子目录。
-    surface_patterns = [
-        os.path.join("assets", "props", "SurfaceElements", "*.xml"),
-        os.path.join("assets", "props", "surfaceelements", "*.xml"),
-    ]
-    for pattern in surface_patterns:
-        scan_surface_to_index(src, 'base', os.path.join(src, pattern))
-    for dlc_id in dlc_order:
-        p = os.path.join(src, "extensions", dlc_id)
-        if os.path.exists(p):
-            for pattern in surface_patterns:
-                scan_surface_to_index(p, dlc_id, os.path.join(p, pattern))
-
-    # 7.3 仅保留 tags 含 component 的 connection
-    def should_keep_surface_connection(conn):
+    # 8.3 仅保留 tags 含 component 的 connection（逻辑保持与之前一致）。
+    def should_keep_component_connection(conn):
         tags = (conn.get('tags') or '').lower().split()
         return "component" in tags
 
-    def clone_surface_component_with_filtered_connections(component):
+    def clone_component_with_filtered_connections(component):
         new_comp = etree.Element('component')
         for attr, value in component.attrib.items():
             new_comp.set(attr, value)
@@ -589,7 +579,7 @@ def main():
         new_connections = etree.SubElement(new_comp, 'connections')
         kept = 0
         for conn in connections.findall('connection'):
-            if not should_keep_surface_connection(conn):
+            if not should_keep_component_connection(conn):
                 continue
             new_conn = etree.SubElement(new_connections, 'connection')
             for attr, value in conn.attrib.items():
@@ -597,13 +587,31 @@ def main():
             kept += 1
         return new_comp if kept > 0 else None
 
-    surface_root = etree.Element('components')
-    surface_processed = 0
+    def resolve_component_sources(path_value):
+        rel = (path_value or "").strip().replace("\\", "/").lstrip("./")
+        if not rel:
+            return {}
+        rel_xml = rel if rel.lower().endswith(".xml") else f"{rel}.xml"
+        rel_xml_os = rel_xml.replace("/", os.sep)
+
+        sources = {}
+        # 仅使用 components.xml 提供的路径（其本身可包含 DLC 前缀）。
+        root_path = os.path.join(src, rel_xml_os)
+        if os.path.exists(root_path):
+            sources['base'] = root_path
+        return sources
+
+    components_root_out = etree.Element('components')
+    components_processed_out = 0
 
     for equipment_id in equipment_ids_needed:
-        if equipment_id not in surface_component_index:
+        path_value = component_path_by_equipment_id.get(equipment_id)
+        if not path_value:
             continue
-        sources = surface_component_index[equipment_id]
+        sources = resolve_component_sources(path_value)
+        if not sources:
+            continue
+
         current_tree = None
         if 'base' in sources:
             try:
@@ -628,25 +636,25 @@ def main():
         if current_tree:
             root_node = current_tree.getroot()
             if root_node.tag == 'component':
-                filtered = clone_surface_component_with_filtered_connections(root_node)
+                filtered = clone_component_with_filtered_connections(root_node)
                 if filtered is not None:
-                    surface_root.append(filtered)
-                    surface_processed += 1
+                    components_root_out.append(filtered)
+                    components_processed_out += 1
             elif root_node.tag == 'components':
                 for node in root_node.findall('component'):
-                    filtered = clone_surface_component_with_filtered_connections(node)
+                    filtered = clone_component_with_filtered_connections(node)
                     if filtered is not None:
-                        surface_root.append(filtered)
-                        surface_processed += 1
+                        components_root_out.append(filtered)
+                        components_processed_out += 1
 
-    equipment_surface_path = os.path.join(lib_dest_dir, "equipment_surface.xml")
-    etree.ElementTree(surface_root).write(
-        equipment_surface_path,
+    equipment_components_path = os.path.join(lib_dest_dir, "equipment_components.xml")
+    etree.ElementTree(components_root_out).write(
+        equipment_components_path,
         encoding='utf-8',
         xml_declaration=True,
         pretty_print=True
     )
-    print(f"✅ 聚合完成: 写入 {surface_processed} 个组件定义到 equipment_surface.xml")
+    print(f"✅ 聚合完成: 写入 {components_processed_out} 个组件定义到 equipment_components.xml")
 
     print(f"✨ 全流程结束！资产已蒸馏至 {dest_root}")
 
