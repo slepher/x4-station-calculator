@@ -81,6 +81,10 @@ def main():
         except Exception as e:
             print(f"      ⚠️ 警告: 叠加失败 {dlc_id}: {e}")
 
+    # 先写出文件，便于人工检查内容；随后再做重复校验并决定是否终止。
+    components_tree.write(components_output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
+    print(f"   ✨ 生成: index/components.xml")
+
     # 校验直接子节点中 name 属性是否重复。
     names = [node.get("name") for node in components_root if node.get("name")]
     name_counts = {}
@@ -90,11 +94,10 @@ def main():
     if dup_names:
         sample = ", ".join(dup_names[:10])
         more = f" ... (+{len(dup_names)-10} more)" if len(dup_names) > 10 else ""
-        raise RuntimeError(f"❌ index/components.xml 存在重复 name: {sample}{more}")
+        raise RuntimeError(
+            f"❌ index/components.xml 已写出，但存在重复 name: {sample}{more}"
+        )
     print(f"   ✅ name 去重校验通过，共 {len(names)} 个具名元素。")
-
-    components_tree.write(components_output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
-    print(f"   ✨ 生成: index/components.xml")
 
     # --- 步骤 3: 处理核心库文件 (wares/waregroups/colors/ships/shipgroups/loadouts) ---
     print("📂 [3/8] 正在处理核心库文件 (Wares/Waregroups/Colors/Ships/Shipgroups/Loadouts)...")
