@@ -2778,6 +2778,174 @@
       </strafecurve>
     </properties>
   </macro>
+  <macro name="thruster_gen_l_allround_01_mk1_macro" class="engine">
+    <component ref="thruster_gen_l_allround_01_mk1"/>
+    <properties>
+      <identification name="{20107,12004}" basename="{20107,12001}" shortname="{20107,12005}" description="{20107,12002}" mk="1" type="thrustertypes"/>
+      <component virtual="1"/>
+      <thrust strafe="1360" pitch="704" yaw="704" roll="750"/>
+      <angular roll="20" pitch="60"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="thruster_gen_l_allround_01_mk2_macro" class="engine">
+    <component ref="thruster_gen_l_allround_01_mk2"/>
+    <properties>
+      <identification name="{20107,12014}" basename="{20107,12011}" shortname="{20107,12015}" description="{20107,12012}" mk="2" type="thrustertypes"/>
+      <component virtual="1"/>
+      <thrust strafe="1632" pitch="859" yaw="859" roll="915"/>
+      <angular roll="20" pitch="60"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="thruster_gen_l_allround_01_mk3_macro" class="engine">
+    <component ref="thruster_gen_l_allround_01_mk3"/>
+    <properties>
+      <identification name="{20107, 12024}" basename="{20107, 12021}" shortname="{20107, 12025}" description="{20107, 12022}" mk="3" type="thrustertypes"/>
+      <component virtual="1"/>
+      <thrust strafe="1836" pitch="972" yaw="972" roll="1035"/>
+      <angular roll="20" pitch="60"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="thruster_gen_m_allround_01_mk1_macro" class="engine">
+    <component ref="thruster_gen_m_allround_01_mk1"/>
+    <properties>
+      <identification name="{20107, 11004}" basename="{20107, 11001}" shortname="{20107, 11005}" description="{20107, 11002}" mk="1" type="thrustertypes"/>
+      <component virtual="1"/>
+      <thrust strafe="1010" pitch="240" yaw="240" roll="380"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="thruster_gen_m_allround_01_mk2_macro" class="engine">
+    <component ref="thruster_gen_m_allround_01_mk2"/>
+    <properties>
+      <identification name="{20107, 11014}" basename="{20107, 11011}" shortname="{20107, 11015}" description="{20107, 11012}" mk="2" type="thrustertypes"/>
+      <component virtual="1"/>
+      <thrust strafe="1212" pitch="293" yaw="293" roll="464"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="thruster_gen_m_allround_01_mk3_macro" class="engine">
+    <component ref="thruster_gen_m_allround_01_mk3"/>
+    <properties>
+      <identification name="{20107, 11024}" basename="{20107, 11021}" shortname="{20107, 11025}" description="{20107, 11022}" mk="3" type="thrustertypes"/>
+      <component virtual="1"/>
+      <thrust strafe="1364" pitch="331" yaw="331" roll="524"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="thruster_gen_m_combat_01_mk1_macro" class="engine">
+    <component ref="thruster_gen_m_combat_01_mk1"/>
+    <properties>
+      <identification name="{20107,11054}" basename="{20107,11051}" shortname="{20107,11055}" description="{20107,11052}" mk="1" type="thrustertypes"/>
+      <component virtual="1"/>
+      <thrust strafe="888" pitch="278.4" yaw="278.4" roll="440.8"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="thruster_gen_m_combat_01_mk2_macro" class="engine">
+    <component ref="thruster_gen_m_combat_01_mk2"/>
+    <properties>
+      <identification name="{20107,11064}" basename="{20107,11061}" shortname="{20107,11065}" description="{20107,11062}" mk="2" type="thrustertypes"/>
+      <component virtual="1"/>
+      <thrust strafe="1067" pitch="339.65" yaw="339.65" roll="537.8"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="thruster_gen_m_combat_01_mk3_macro" class="engine">
+    <component ref="thruster_gen_m_combat_01_mk3"/>
+    <properties>
+      <identification name="{20107, 11074}" basename="{20107, 11071}" shortname="{20107, 11075}" description="{20107, 11072}" mk="3" type="thrustertypes"/>
+      <component virtual="1"/>
+      <thrust strafe="1200" pitch="384.2" yaw="384.2" roll="608.3"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="thruster_gen_s_allround_01_mk1_macro" class="engine">
+    <component ref="thruster_gen_s_allround_01_mk1"/>
+    <properties>
+      <identification name="{20107,10004}" basename="{20107,10001}" shortname="{20107,10005}" description="{20107,10002}" mk="1" type="thrustertypes"/>
+      <component virtual="1"/>
+      <thrust strafe="400" pitch="160" yaw="160" roll="200"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="thruster_gen_s_allround_01_mk2_macro" class="engine">
+    <component ref="thruster_gen_s_allround_01_mk2"/>
+    <properties>
+      <identification name="{20107,10014}" basename="{20107,10011}" shortname="{20107,10015}" description="{20107,10012}" mk="2" type="thrustertypes"/>
+      <component virtual="1"/>
+      <thrust strafe="480" pitch="184" yaw="184" roll="230"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="thruster_gen_s_allround_01_mk3_macro" class="engine">
+    <component ref="thruster_gen_s_allround_01_mk3"/>
+    <properties>
+      <identification name="{20107, 10024}" basename="{20107, 10021}" shortname="{20107, 10025}" description="{20107, 10022}" mk="3" type="thrustertypes"/>
+      <component virtual="1"/>
+      <thrust strafe="540" pitch="200" yaw="200" roll="250"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="thruster_gen_s_combat_01_mk1_macro" class="engine">
+    <component ref="thruster_gen_s_combat_01_mk1"/>
+    <properties>
+      <identification name="{20107,10054}" basename="{20107,10051}" shortname="{20107,10055}" description="{20107,10052}" mk="1" type="thrustertypes"/>
+      <component virtual="1"/>
+      <thrust strafe="352" pitch="182.4" yaw="182.4" roll="228"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="thruster_gen_s_combat_01_mk2_macro" class="engine">
+    <component ref="thruster_gen_s_combat_01_mk2"/>
+    <properties>
+      <identification name="{20107,10064}" basename="{20107,10061}" shortname="{20107,10065}" description="{20107,10062}" mk="2" type="thrustertypes"/>
+      <component virtual="1"/>
+      <thrust strafe="422" pitch="210" yaw="210" roll="262"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="thruster_gen_s_combat_01_mk3_macro" class="engine">
+    <component ref="thruster_gen_s_combat_01_mk3"/>
+    <properties>
+      <identification name="{20107,10074}" basename="{20107,10071}" shortname="{20107,10075}" description="{20107,10072}" mk="3" type="thrustertypes"/>
+      <component virtual="1"/>
+      <thrust strafe="475" pitch="228" yaw="228" roll="285"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="thruster_gen_xl_allround_01_mk1_macro" class="engine">
+    <component ref="thruster_gen_xl_allround_01_mk1"/>
+    <properties>
+      <identification name="{20107,13004}" basename="{20107,13001}" shortname="{20107,13005}" description="{20107,13002}" mk="1" type="thrustertypes"/>
+      <component virtual="1"/>
+      <thrust strafe="2400" pitch="1360" yaw="1360" roll="1240"/>
+      <angular roll="20" pitch="60"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="thruster_gen_xl_allround_01_mk2_macro" class="engine">
+    <component ref="thruster_gen_xl_allround_01_mk2"/>
+    <properties>
+      <identification name="{20107,13014}" basename="{20107,13011}" shortname="{20107,13015}" description="{20107,13012}" mk="2" type="thrustertypes"/>
+      <component virtual="1"/>
+      <thrust strafe="2880" pitch="1659" yaw="1659" roll="1513"/>
+      <angular roll="20" pitch="60"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="thruster_gen_xl_allround_01_mk3_macro" class="engine">
+    <component ref="thruster_gen_xl_allround_01_mk3"/>
+    <properties>
+      <identification name="{20107, 13024}" basename="{20107, 13021}" shortname="{20107, 13025}" description="{20107, 13022}" mk="3" type="thrustertypes"/>
+      <component virtual="1"/>
+      <thrust strafe="3240" pitch="1877" yaw="1877" roll="1711"/>
+      <angular roll="20" pitch="60"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
   <macro name="props_adsign_gen_shieldcomponents_macro" class="adsign">
     <component ref="props_adsign_gen_shieldcomponents"/>
     <properties>
