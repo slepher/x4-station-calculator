@@ -69,7 +69,7 @@ def main():
     macros_base_path = os.path.join(src, "index", "macros.xml")
     macros_output_path = os.path.join(index_dest_dir, "macros.xml")
 
-    # 记录每个 entry 的来源: name -> [(source, path), ...]
+    # 记录每个 entry 的来源: name -> [(source, value), ...]
     entry_sources = {}
 
     macros_tree = None
@@ -78,10 +78,11 @@ def main():
         # 记录 base 来源
         for entry in macros_tree.getroot().findall(".//entry[@name]"):
             name = entry.get("name")
+            value = entry.get("value") or ""
             if name:
                 if name not in entry_sources:
                     entry_sources[name] = []
-                entry_sources[name].append(('base', macros_base_path))
+                entry_sources[name].append(('base', value))
     else:
         print(f"      ⚠️ Base 文件不存在: {macros_base_path}")
         macros_tree = etree.ElementTree(etree.Element("macros"))
@@ -99,10 +100,11 @@ def main():
                 # 记录 DLC 来源
                 if node.tag == 'entry':
                     name = node.get("name")
+                    value = node.get("value") or ""
                     if name:
                         if name not in entry_sources:
                             entry_sources[name] = []
-                        entry_sources[name].append((dlc_id, patch_path))
+                        entry_sources[name].append((dlc_id, value))
                 macros_root.append(deepcopy(node))
         except Exception as e:
             print(f"      ⚠️ 警告: 叠加失败 {dlc_id}: {e}")
@@ -160,7 +162,7 @@ def main():
             name_to_entries[name] = []
         name_to_entries[name].append(node)
 
-    dup_warnings = []
+    dup_entries = []
     for name, entries in name_to_entries.items():
         if len(entries) <= 1:
             continue
@@ -168,14 +170,23 @@ def main():
         sources = entry_sources.get(name, [])
         for old_node in entries[:-1]:
             macros_root.remove(old_node)
-        # 记录警告信息
-        source_info = " -> ".join([f"{s[0]}" for s in sources]) if sources else "unknown"
-        dup_warnings.append(f"   ⚠️ {name}: 历史来源 [{source_info}], 保留最后一条")
+        # 记录重复信息用于表格输出
+        dup_entries.append((name, sources))
 
-    if dup_warnings:
-        print(f"   ⚠️ 发现 {len(dup_warnings)} 个同名不同内容节点，已保留最后一条:")
-        for warning in dup_warnings:
-            print(warning)
+    if dup_entries:
+        print(f"   ⚠️ 发现 {len(dup_entries)} 个同名不同内容节点，已保留最后一条:")
+        # 计算列宽
+        name_width = max(len(name) for name, _ in dup_entries)
+        src_width = max(len(src) for _, srcs in dup_entries for src, _ in srcs) if any(srcs for _, srcs in dup_entries) else 6
+        # 表头
+        print(f"      {'Name':<{name_width}} | {'Source':<{src_width}} | Value")
+        print(f"      {'-' * name_width}-+-{'-' * src_width}-+--------------------------------")
+        # 表格内容
+        for name, sources in dup_entries:
+            for i, (src, val) in enumerate(sources):
+                name_col = name if i == 0 else ""
+                print(f"      {name_col:<{name_width}} | {src:<{src_width}} | {val}")
+            print(f"      {' ' * name_width} | {' ' * src_width} | (保留最后一条)")
 
     # 重新写入（含去重后的结果）
     macros_tree.write(macros_output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
@@ -339,7 +350,7 @@ def main():
     if os.path.exists(macros_output_path):
         try:
             macros_index_tree = etree.parse(macros_output_path, parser)
-            for entry in macros_index_tree.findall(".//macro[@name][@value]"):
+            for entry in macros_index_tree.findall(".//entry[@name][@value]"):
                 name = entry.get('name')
                 value = entry.get('value')
                 if name and value:
