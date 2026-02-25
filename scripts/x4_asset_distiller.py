@@ -597,6 +597,114 @@ def main():
     )
     print(f"✅ 聚合完成: 写入 {components_processed_out} 个组件定义到 equipment_components.xml")
 
+    # --- 步骤 11: 导出飞船 connections 引用的所有 macro ---
+    print("∑ [11/11] 正在导出飞船 connections 引用的 macro...")
+
+    ship_macro_path = os.path.join(src, "libraries", "ship_macros.xml")
+    connection_macro_refs = set()
+
+    if os.path.exists(ship_macro_path):
+        try:
+            tree = etree.parse(ship_macro_path, parser)
+            root = tree.getroot()
+            for macro in root.findall('macro'):
+                connections = macro.find('connections')
+                if connections is not None:
+                    for conn in connections:
+                        conn_macro = conn.find('macro')
+                        if conn_macro is not None:
+                            ref = conn_macro.get('ref')
+                            if ref:
+                                connection_macro_refs.add(ref)
+        except Exception as e:
+            print(f"   ⚠️ 读取 ship_macros.xml 失败: {e}")
+
+    print(f"   🎯 识别到 {len(connection_macro_refs)} 个 connection 引用的 macro。")
+
+    # 读取 macros index
+    connection_macro_path_map = {}
+    if os.path.exists(macros_output_path):
+        try:
+            macros_index_tree = etree.parse(macros_output_path, parser)
+            for entry in macros_index_tree.findall(".//entry[@name][@value]"):
+                name = entry.get('name')
+                value = entry.get('value')
+                if name and value:
+                    connection_macro_path_map[name] = value
+        except Exception as e:
+            print(f"   ⚠️ 读取 macros.xml 失败: {e}")
+
+    # 过滤出实际存在于 index 中的
+    valid_refs = [ref for ref in connection_macro_refs if ref in connection_macro_path_map]
+    print(f"   🎯 其中 {len(valid_refs)} 个在 index 中有记录。")
+
+    ship_connection_macros_path = os.path.join(lib_dest_dir, "ship_connection_macros.xml")
+    connection_macros_processed = export_ids_to_file(
+        valid_refs,
+        connection_macro_path_map,
+        ship_connection_macros_path,
+        root_tag='macros',
+        node_tag='macro'
+    )
+    print(f"✅ 聚合完成: 写入 {connection_macros_processed} 个 macro 到 ship_connection_macros.xml")
+
+    # --- 步骤 12: 检查未导出的 equipment wares ---
+    print("∑ [12/12] 正在检查未导出的 equipment wares...")
+
+    # 读取已导出的 equipment IDs
+    exported_equipment_ids = set()
+    if os.path.exists(equipment_macros_path):
+        try:
+            equip_tree = etree.parse(equipment_macros_path, parser)
+            for macro in equip_tree.findall(".//macro[@name]"):
+                exported_equipment_ids.add(macro.get('name'))
+        except Exception as e:
+            print(f"   ⚠️ 读取 equipment_macros.xml 失败: {e}")
+
+    # 读取 wares_final.xml 中 transport="equipment" 的 ID
+    unexported_equipment_wares = []
+    if os.path.exists(wares_final_path):
+        try:
+            wares_tree = etree.parse(wares_final_path, parser)
+            for ware in wares_tree.findall(".//ware[@transport='equipment']"):
+                ware_id = ware.get('id')
+                if ware_id:
+                    # 检查是否有对应的 macro
+                    comp = ware.find('component')
+                    if comp is not None:
+                        macro_ref = comp.get('ref')
+                        if macro_ref and macro_ref not in exported_equipment_ids:
+                            unexported_equipment_wares.append({
+                                'ware_id': ware_id,
+                                'macro_ref': macro_ref,
+                                'tags': ware.get('tags', '')
+                            })
+        except Exception as e:
+            print(f"   ⚠️ 读取 wares_final.xml 失败: {e}")
+
+    if unexported_equipment_wares:
+        print(f"   ⚠️ 发现 {len(unexported_equipment_wares)} 个未导出的 equipment wares:")
+        # 按 tags 分组统计
+        tags_count = {}
+        for item in unexported_equipment_wares:
+            # 提取主要类型标签
+            tags = item['tags'].split()
+            primary_tag = tags[0] if tags else 'unknown'
+            tags_count[primary_tag] = tags_count.get(primary_tag, 0) + 1
+
+        for tag, count in sorted(tags_count.items(), key=lambda x: -x[1]):
+            print(f"      - {tag}: {count} 个")
+
+        # 输出完整列表到文件
+        unexported_list_path = os.path.join(lib_dest_dir, "unexported_equipment_wares.txt")
+        with open(unexported_list_path, 'w', encoding='utf-8') as f:
+            f.write(f"# 未导出的 equipment wares (共 {len(unexported_equipment_wares)} 个)\n\n")
+            for item in unexported_equipment_wares:
+                f.write(f"{item['ware_id']} -> {item['macro_ref']} (tags: {item['tags']})\n")
+        print(f"   📄 完整列表已保存到: {os.path.basename(unexported_list_path)}")
+    else:
+        print(f"   ✅ 所有 equipment wares 都已导出！")
+
     print(f"✨ 全流程结束！资产已蒸馏至 {dest_root}")
 
 if __name__ == "__main__":
