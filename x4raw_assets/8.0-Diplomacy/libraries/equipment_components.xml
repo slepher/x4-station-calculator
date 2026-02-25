@@ -680,14 +680,14 @@
       <connection name="con_engine_01" tags="component engine extralarge ship_xen_xl_mothership_01 "/>
     </connections>
   </component>
-  <component name="generic_engine_spacesuit" class="engine">
-    <connections>
-      <connection name="spacesuit" tags="component engine spacesuit standard" optional="0"/>
-    </connections>
-  </component>
   <component name="generic_shieldgenerator" class="shieldgenerator">
     <connections>
       <connection name="ParentConnection" tags="component shield small unhittable standard" optional="1"/>
+    </connections>
+  </component>
+  <component name="scanner_gen_s_basic_01_mk1" class="destructible">
+    <connections>
+      <connection name="Connection01" tags="scanner mining longrange component"/>
     </connections>
   </component>
   <component name="shield_arg_l_standard_01_mk1" class="shieldgenerator">
@@ -1088,11 +1088,6 @@
   <component name="shield_xen_xl_standard_01_mk1" class="shieldgenerator">
     <connections>
       <connection name="small_Con_shieldgen_01" tags="extralarge shield component  standard "/>
-    </connections>
-  </component>
-  <component name="spacesuit_gen_repairweapon_01" class="weapon">
-    <connections>
-      <connection name="WeaponCon_01" tags="component weapon spacesuit repair "/>
     </connections>
   </component>
   <component name="thruster_gen_l_allround_01_mk1" class="engine">
