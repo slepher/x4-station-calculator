@@ -201,7 +201,9 @@ def main():
 
     # --- 步骤 3: 迁移并叠加 index/components.xml ---
     print("📂 [3/9] 正在迁移 index/components.xml...")
+    print(f"   DEBUG: src = {repr(src)}")
     components_base_path = os.path.join(src, "index", "components.xml")
+    print(f"   DEBUG: components_base_path = {repr(components_base_path)}")
     components_output_path = os.path.join(index_dest_dir, "components.xml")
 
     components_tree = None
