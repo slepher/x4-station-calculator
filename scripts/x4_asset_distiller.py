@@ -41,6 +41,8 @@ def main():
     dest_root = os.path.normpath(os.path.join(config_dir, v_config['raw_assets_dir'], v_config['folder_name']))
 
     print(f"🧪 开始资产蒸馏流: {v_config['folder_name']}")
+    print(f"   📁 SOURCE: {src}")
+    print(f"   📁 DEST:   {dest_root}")
 
     if os.path.exists(dest_root):
         shutil.rmtree(dest_root)
