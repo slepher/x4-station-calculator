@@ -186,9 +186,9 @@ def main():
         print(f"      {'-' * name_width}-+-{'-' * src_width}-+--------------------------------")
         # 表格内容
         for name, sources in dup_entries:
-            for i, (src, val) in enumerate(sources):
+            for i, (dlc_id, val) in enumerate(sources):
                 name_col = name if i == 0 else ""
-                print(f"      {name_col:<{name_width}} | {src:<{src_width}} | {val}")
+                print(f"      {name_col:<{name_width}} | {dlc_id:<{src_width}} | {val}")
             print(f"      {' ' * name_width} | {' ' * src_width} | (保留最后一条)")
 
     # 重新写入（含去重后的结果）
@@ -201,9 +201,7 @@ def main():
 
     # --- 步骤 3: 迁移并叠加 index/components.xml ---
     print("📂 [3/9] 正在迁移 index/components.xml...")
-    print(f"   DEBUG: src = {repr(src)}")
     components_base_path = os.path.join(src, "index", "components.xml")
-    print(f"   DEBUG: components_base_path = {repr(components_base_path)}")
     components_output_path = os.path.join(index_dest_dir, "components.xml")
 
     components_tree = None
