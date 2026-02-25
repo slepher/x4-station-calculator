@@ -460,13 +460,18 @@ def main():
         except Exception as e:
             print(f"      ⚠️ 读取 macros.xml 失败: {e}")
 
-    # 8.2 过滤出 equipment 相关的宏（engine, thruster, shield, weapon, turret）
-    equipment_keywords = ['engine', 'thruster', 'shield', 'weapon', 'turret']
-    equipment_macro_ids = [
-        k for k in equipment_macro_path_map.keys()
-        if any(kw in k.lower() for kw in equipment_keywords) and k.endswith('_macro')
-    ]
-    print(f"   🎯 识别到 {len(equipment_macro_ids)} 个装备宏引用。")
+    # 8.2 从 wares_final.xml 获取所有 transport="equipment" 的 macro ref
+    equipment_macro_ids = []
+    if os.path.exists(wares_final_path):
+        try:
+            wares_tree = etree.parse(wares_final_path, parser)
+            for ware in wares_tree.findall(".//ware[@transport='equipment']"):
+                comp = ware.find('component')
+                if comp is not None and comp.get('ref'):
+                    equipment_macro_ids.append(comp.get('ref'))
+        except Exception as e:
+            print(f"      ⚠️ 读取 wares_final.xml 失败: {e}")
+    print(f"   🎯 从 wares 中识别到 {len(equipment_macro_ids)} 个装备宏引用。")
 
     equipment_macros_path = os.path.join(lib_dest_dir, "equipment_macros.xml")
     equipment_processed = export_ids_to_file(equipment_macro_ids, equipment_macro_path_map, equipment_macros_path)
