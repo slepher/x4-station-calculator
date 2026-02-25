@@ -9,13 +9,14 @@ from lxml import etree
 def load_all_configs():
     config_file = 'x4-game.config.json'
     version_file = 'x4-station-calculator.config.json'
+    config_dir = os.path.dirname(os.path.abspath(config_file))
     if not os.path.exists(config_file) or not os.path.exists(version_file):
         raise FileNotFoundError("❌ 错误: 配置文件 x4-game.config.json 或 x4-station-calculator.config.json 缺失。")
     with open(config_file, 'r', encoding='utf-8') as f:
         m_config = json.load(f)
     with open(version_file, 'r', encoding='utf-8') as f:
         v_config = json.load(f)
-    return m_config, v_config
+    return m_config, v_config, config_dir
 
 def setup_customizer(m_config):
     paths = m_config.get('X4_PATHS', {})
@@ -32,11 +33,9 @@ def setup_customizer(m_config):
 
 def main():
     # 1. 加载配置与初始化
-    m_config, v_config = load_all_configs()
+    m_config, v_config, config_dir = load_all_configs()
     xml_diff = setup_customizer(m_config)
-    
-    # 获取配置文件所在目录，用于解析相对路径
-    config_dir = os.path.dirname(os.path.abspath(config_file))
+
     paths = m_config['X4_PATHS']
     src = os.path.normpath(os.path.join(config_dir, paths['SOURCE']))
     dest_root = os.path.normpath(os.path.join(config_dir, v_config['raw_assets_dir'], v_config['folder_name']))
