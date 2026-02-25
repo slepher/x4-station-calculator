@@ -48,6 +48,14 @@ def main():
     parser = etree.XMLParser(remove_blank_text=True)
     dlc_order = v_config.get('dlc_order', [])
 
+    # 辅助函数：计算节点签名（用于去重）
+    def node_signature(node):
+        # 忽略纯空白 text/tail，避免 <entry></entry> 与 <entry/> 被视为不同。
+        attrs = tuple(sorted((k, v) for k, v in node.attrib.items()))
+        text = (node.text or '').strip()
+        children = tuple(node_signature(child) for child in list(node))
+        return (node.tag, attrs, text, children)
+
     # --- 步骤 1: 拷贝语言包 (t/) ---
     if os.path.exists(os.path.join(src, "t")):
         shutil.copytree(os.path.join(src, "t"), os.path.join(dest_root, "t"))
@@ -108,18 +116,13 @@ def main():
         print(f"   🔧 已规范 {normalized_double_slash} 个 macro.value 双反斜杠。")
 
     # name 相同且内容完全一致的节点自动去重合并
-    # 注：node_signature 函数定义在 components 处理部分，这里直接复用
     merged_same_content = 0
     seen_name_and_content = set()
     for node in list(macros_root):
         name = node.get("name")
         if not name:
             continue
-        # 临时签名计算（与 components 的 node_signature 逻辑一致）
-        attrs = tuple(sorted((k, v) for k, v in node.attrib.items()))
-        text = (node.text or '').strip()
-        children = tuple((child.tag, tuple(sorted((k, v) for k, v in child.attrib.items())), (child.text or '').strip(), ()) for child in list(node))
-        signature = (node.tag, attrs, text, children)
+        signature = node_signature(node)
         key = (name, signature)
         if key in seen_name_and_content:
             macros_root.remove(node)
@@ -194,13 +197,6 @@ def main():
             normalized_double_slash += 1
     if normalized_double_slash:
         print(f"   🔧 已规范 {normalized_double_slash} 个 entry.value 双反斜杠。")
-
-    def node_signature(node):
-        # 忽略纯空白 text/tail，避免 <entry></entry> 与 <entry/> 被视为不同。
-        attrs = tuple(sorted((k, v) for k, v in node.attrib.items()))
-        text = (node.text or '').strip()
-        children = tuple(node_signature(child) for child in list(node))
-        return (node.tag, attrs, text, children)
 
     # name 相同且内容完全一致的节点自动去重合并。
     merged_same_content = 0
