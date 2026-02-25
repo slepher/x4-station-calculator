@@ -82,6 +82,28 @@ def main():
         except Exception as e:
             print(f"      ⚠️ 警告: 叠加失败 {dlc_id}: {e}")
 
+    # name 相同且内容完全一致的节点自动去重合并
+    # 注：node_signature 函数定义在 components 处理部分，这里直接复用
+    merged_same_content = 0
+    seen_name_and_content = set()
+    for node in list(macros_root):
+        name = node.get("name")
+        if not name:
+            continue
+        # 临时签名计算（与 components 的 node_signature 逻辑一致）
+        attrs = tuple(sorted((k, v) for k, v in node.attrib.items()))
+        text = (node.text or '').strip()
+        children = tuple((child.tag, tuple(sorted((k, v) for k, v in child.attrib.items())), (child.text or '').strip(), ()) for child in list(node))
+        signature = (node.tag, attrs, text, children)
+        key = (name, signature)
+        if key in seen_name_and_content:
+            macros_root.remove(node)
+            merged_same_content += 1
+        else:
+            seen_name_and_content.add(key)
+    if merged_same_content:
+        print(f"   ♻️ 已合并 {merged_same_content} 个同名同内容节点。")
+
     macros_tree.write(macros_output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
     print(f"   ✨ 生成: index/macros.xml")
 
