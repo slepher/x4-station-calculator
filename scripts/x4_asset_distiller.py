@@ -429,10 +429,10 @@ def main():
     etree.ElementTree(ship_macros_root).write(ship_macros_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
     print(f"✅ 聚合完成: 写入 {ship_processed} 个飞船宏定义到 ship_macros.xml")
 
-    # --- 步骤 7: 聚合飞船组件连接点 (ship_connections.xml) ---
-    print("∑ [7/9] 正在聚合飞船组件连接点 (ship_connections.xml)...")
+    # --- 步骤 7: 聚合飞船组件连接点 (ship_components.xml) ---
+    print("∑ [7/9] 正在聚合飞船组件连接点 (ship_components.xml)...")
 
-    # 5.1 从 ship_macros.xml 收集需要的 component refs
+    # 7.1 从 ship_macros.xml 收集需要的 component refs
     ship_components_needed = set()
     ship_macros_path = os.path.join(lib_dest_dir, "ship_macros.xml")
     if os.path.exists(ship_macros_path):
@@ -444,23 +444,43 @@ def main():
             print(f"      ⚠️ 读取 ship_macros.xml 失败: {e}")
     print(f"   🎯 识别到 {len(ship_components_needed)} 个飞船组件引用。")
 
-    # 5.2 建立索引 (只针对 ship_*.xml)
-    ship_component_index = {}
+    # 7.2 从 components.xml 读取路径映射
+    component_path_map = {}
+    if os.path.exists(components_output_path):
+        try:
+            components_index_tree = etree.parse(components_output_path, parser)
+            for entry in components_index_tree.findall(".//entry[@name][@value]"):
+                name = entry.get('name')
+                value = entry.get('value')
+                if name and value:
+                    component_path_map[name] = value
+        except Exception as e:
+            print(f"      ⚠️ 读取 components.xml 失败: {e}")
 
-    def scan_components_to_index(root_path, source_key, pattern):
-        for f in glob.glob(pattern, recursive=True):
-            fname = os.path.splitext(os.path.basename(f))[0]
-            if fname not in ship_component_index:
-                ship_component_index[fname] = {}
-            ship_component_index[fname][source_key] = f
+    # 7.3 路径解析函数
+    def resolve_component_sources(path_value):
+        rel = (path_value or "").strip().replace("\\", "/").lstrip("./")
+        if not rel:
+            return {}
+        rel_xml = rel if rel.lower().endswith(".xml") else f"{rel}.xml"
+        rel_xml_os = rel_xml.replace("/", os.sep)
 
-    scan_components_to_index(src, 'base', os.path.join(src, "assets", "units", "**", "ship_*.xml"))
-    for dlc_id in dlc_order:
-        p = os.path.join(src, "extensions", dlc_id)
-        if os.path.exists(p):
-            scan_components_to_index(p, dlc_id, os.path.join(p, "assets", "units", "**", "ship_*.xml"))
+        sources = {}
+        if rel_xml.lower().startswith("extensions/"):
+            parts = rel_xml.split("/", 2)
+            if len(parts) >= 3:
+                dlc_name = parts[1]
+                rest_path = parts[2].replace("/", os.sep)
+                full_path = os.path.join(src, "extensions", dlc_name, rest_path)
+                if os.path.exists(full_path):
+                    sources[dlc_name] = full_path
+        else:
+            base_path = os.path.join(src, rel_xml_os)
+            if os.path.exists(base_path):
+                sources['base'] = base_path
+        return sources
 
-    # 5.3 仅聚合被引用的组件，并按 tags 过滤连接点
+    # 7.4 过滤连接点
     keep_tag_keywords = [
         'engine', 'shield', 'turret', 'weapon',
         'thruster', 'dockingbay', 'dock', 'storage', 'cockpit'
@@ -493,9 +513,14 @@ def main():
     components_processed = 0
 
     for comp_id in ship_components_needed:
-        if comp_id not in ship_component_index:
+        if comp_id not in component_path_map:
             continue
-        sources = ship_component_index[comp_id]
+
+        path_value = component_path_map[comp_id]
+        sources = resolve_component_sources(path_value)
+        if not sources:
+            continue
+
         current_tree = None
         if 'base' in sources:
             try:
@@ -531,9 +556,9 @@ def main():
                         components_root.append(filtered)
                         components_processed += 1
 
-    connections_path = os.path.join(lib_dest_dir, "ship_connections.xml")
+    connections_path = os.path.join(lib_dest_dir, "ship_components.xml")
     etree.ElementTree(components_root).write(connections_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
-    print(f"✅ 聚合完成: 写入 {components_processed} 个组件定义到 ship_connections.xml")
+    print(f"✅ 聚合完成: 写入 {components_processed} 个组件定义到 ship_components.xml")
 
     # --- 步骤 8: 聚合装备宏定义 (equipment_macros.xml) ---
     print("∑ [8/9] 正在聚合装备宏定义 (equipment_macros.xml)...")
@@ -668,20 +693,6 @@ def main():
                 new_conn.set(attr, value)
             kept += 1
         return new_comp if kept > 0 else None
-
-    def resolve_component_sources(path_value):
-        rel = (path_value or "").strip().replace("\\", "/").lstrip("./")
-        if not rel:
-            return {}
-        rel_xml = rel if rel.lower().endswith(".xml") else f"{rel}.xml"
-        rel_xml_os = rel_xml.replace("/", os.sep)
-
-        sources = {}
-        # 仅使用 components.xml 提供的路径（其本身可包含 DLC 前缀）。
-        root_path = os.path.join(src, rel_xml_os)
-        if os.path.exists(root_path):
-            sources['base'] = root_path
-        return sources
 
     components_root_out = etree.Element('components')
     components_processed_out = 0
