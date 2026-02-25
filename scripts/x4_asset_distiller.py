@@ -477,21 +477,21 @@ def main():
     equipment_processed = export_ids_to_file(equipment_macro_ids, equipment_macro_path_map, equipment_macros_path)
     print(f"✅ 聚合完成: 写入 {equipment_processed} 个装备宏定义到 equipment_macros.xml")
 
-    # --- 步骤 9: 聚合子弹/导弹宏定义 (bullet_macros.xml) ---
-    print("∑ [9/10] 正在聚合子弹/导弹宏定义 (bullet_macros.xml)...")
+    # --- 步骤 9: 聚合子弹宏定义 (bullet_macros.xml) ---
+    print("∑ [9/10] 正在聚合子弹宏定义 (bullet_macros.xml)...")
 
-    # 9.1 从 wares_final.xml 收集 group="missiles" 的 missile ware
-    missile_macro_refs = set()
+    # 9.1 从 wares_final.xml 收集 group="missiles" 的 missile macro 名字
+    missile_macro_names = set()
     if os.path.exists(wares_final_path):
         try:
             wares_tree = etree.parse(wares_final_path, parser)
             for ware in wares_tree.findall(".//ware[@group='missiles']"):
                 comp = ware.find('component')
                 if comp is not None and comp.get('ref'):
-                    missile_macro_refs.add(comp.get('ref'))
+                    missile_macro_names.add(comp.get('ref'))
         except Exception as e:
             print(f"      ⚠️ 读取 wares_final.xml 失败: {e}")
-    print(f"   🎯 从 missile wares 识别到 {len(missile_macro_refs)} 个导弹宏引用。")
+    print(f"   🎯 从 missile wares 识别到 {len(missile_macro_names)} 个导弹宏引用。")
 
     # 9.2 从 equipment_macros.xml 收集所有 bullet class 引用的 macro
     bullet_macro_refs = set()
@@ -508,14 +508,14 @@ def main():
             print(f"      ⚠️ 读取 equipment_macros.xml 失败: {e}")
     print(f"   🎯 从 bullet class 识别到 {len(bullet_macro_refs)} 个子弹宏引用。")
 
-    # 9.3 合并去重
-    all_bullet_macro_ids = list(missile_macro_refs.union(bullet_macro_refs))
-    print(f"   🎯 合并后共 {len(all_bullet_macro_ids)} 个子弹/导弹宏。")
+    # 9.3 从 bullet_macro_refs 中剔除 missile 宏名字
+    bullet_macro_refs = bullet_macro_refs - missile_macro_names
+    print(f"   🎯 剔除 missile 后剩余 {len(bullet_macro_refs)} 个子弹宏引用。")
 
     # 9.4 导出 bullet_macros
     bullet_macros_path = os.path.join(lib_dest_dir, "bullet_macros.xml")
-    bullet_processed = export_ids_to_file(all_bullet_macro_ids, equipment_macro_path_map, bullet_macros_path)
-    print(f"✅ 聚合完成: 写入 {bullet_processed} 个子弹/导弹宏定义到 bullet_macros.xml")
+    bullet_processed = export_ids_to_file(list(bullet_macro_refs), equipment_macro_path_map, bullet_macros_path)
+    print(f"✅ 聚合完成: 写入 {bullet_processed} 个子弹宏定义到 bullet_macros.xml")
 
     # --- 步骤 10: 聚合装备组件连接点 (equipment_components.xml) ---
     print("∑ [10/10] 正在聚合装备组件连接点 (equipment_components.xml)...")
