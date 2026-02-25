@@ -30,16 +30,19 @@
      - 当同一 group 同时出现 `shield` 与其它类型时，`shield` 作为 `connection.shield` 内嵌到该组唯一的 `connection` 中。
      - **Ship 数据：插槽组级不保留 `slotTypes` / `slotTags` / `primaryType` 字段。**
      - **Ship 数据：connection 按相同 `tags` 合并，不保留 `name`，使用 `count` 计数。**
-     - **Ship 数据：connection 保留 `size` 字段；`tags` 中移除已提取的 `type/size`，保留其余标签。**
+     - **Ship 数据：connection 保留 `size` 字段；`tags` 中移除已提取的 `type/size/mandatory`，并额外移除 `platformcollision/envmap_cockpit`。**
+     - **Ship 数据：group 新增 `mandatory`（布尔），由连接点 tags 提取；不存在则为 `false`。**
      - **Ship 数据：ship 的 `name` 使用 `_` 分段，取第 2 段作为 `race`。**
      - **Ship 数据：从 `ship_macros.xml` 的 `<thruster tags="...">` 提取 thruster 插槽（作为 `slots` 中的 `thruster` 类型）。**
    - 生产方式按 `production` 数组输出：`[{ method, noplayerbuild, cost }]`。
    - `noplayerblueprint` 仅从 ware 本体 `tags` 读取；`noplayerbuild` 仅当所有 production 方法都为 `noplayerbuild` 时为 true。
    - `noblueprint` 的 ship 直接不导出。
    - `ships.json` / `equipments.json` 的 `id` 使用 `wareId`；不再输出 `wareId` 字段。
-  - `equipments.json` 新增 `size` 字段：从装备宏名称中解析（`s/m/l/xl` 或 `small/medium/large/extralarge`），无法解析时为 `unknown`。
+  - `equipments.json` 的 `type` 与 `size` 从 `slotTags` 提取；任一提取失败时记录失败并跳过该装备，不做 fallback。
   - `equipments.json` 的 `slotTags` 不再走语义推断/复杂判定，而是直接由 `equipment_components.xml` 的 connection tags 聚合去重得到。
     - 映射链路：`equipment(ware id) -> ware.component(ref=macro) -> equipment_macro.component(ref=component) -> equipment_components.component(name=component)`。
+    - 解析后 `slotTags` 移除 `component` 与已提取的 `type/size`。
+  - 若 `slotTags` 包含 `spacesuit`，该装备不写入 `equipments.json`。
   - `equipments.json` 新增 `noplayerblueprint`（bool）：从 ware tags 提取；若不存在则 `false`；并从 `tags` 数组中移除 `noplayerblueprint` 字段。
 
 3. **名称字段**
@@ -71,12 +74,12 @@
 2. `index/components.xml` 满足：`assets/test` 条目已移除、双反斜杠已规范、同名同内容已去重、同名不同内容会在写出后报错。
 3. `ships.json` 按 **插槽类型数组 → 组 → 装备** 结构生成，包含 `isImplicitGroup` 与 `connection.shield` 规则字段。
 4. `equipments.json` 与 `ships.json` 均包含 `nameId/name` 且按 `production` 输出成本数组。
-5. `equipments.json` 的 `size` 支持 `small/medium/large/extralarge/unknown`。
+5. `equipments.json` 的 `size` 仅支持 `small/medium/large/extralarge`，并由 `slotTags` 提取。
 6. `equipments.json` 的 `slotTags` 仅来源于 `equipment_components.xml` 的 connection tags 并去重聚合。
 7. `equipments.json` 输出 `noplayerblueprint` 布尔字段，且 `tags` 内不再包含该 tag。
 8. `shipgroups.json` 仅保留 `id/nameId/name`，`ships.json` 内包含 `shipgroup`。
 9. `test_tasks.md` 明确记录“测试由用户手动完成”。
-10. `ships.json` 的 ship 数据：插槽组级不输出 `slotTypes/slotTags/primaryType`；connection 级合并同 `tags` 项、输出 `count`，并补充 `size`；`race` 由 ship `name` 分段获得。
+10. `ships.json` 的 ship 数据：插槽组级不输出 `slotTypes/slotTags/primaryType`；connection 级合并同 `tags` 项、输出 `count`，并补充 `size`；group 级输出 `mandatory`；`race` 由 ship `name` 分段获得。
 
 ## 未决项
 无。

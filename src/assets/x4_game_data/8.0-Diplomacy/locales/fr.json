@@ -1143,5 +1143,11 @@
   "{20221,5051}": "Remorqueur",
   "{20221,5061}": "Compacteur",
   "{20221,5091}": "Vaisseau expéditionnaire",
-  "{20221,5101}": "Émissaire"
+  "{20221,5101}": "Émissaire",
+  "{20228,101}": "Standard",
+  "{20228,201}": "Missile",
+  "{20228,301}": "Minier",
+  "{20228,401}": "Haute-énergie",
+  "{20228,701}": "Xénon",
+  "{20228,801}": "Avancé"
 }

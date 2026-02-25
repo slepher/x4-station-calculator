@@ -104,6 +104,8 @@
 - **那么** 系统 SHALL 合并为单一 connection 并以 `count` 计数
 - **并且** 系统 SHALL 不输出 `name`
 - **并且** 系统 SHALL 从 `tags` 提取 `type` 与 `size`，并从 `tags` 中移除已提取的 `type/size`
+- **并且** 系统 SHALL 从 `tags` 提取 `mandatory` 到 group 级字段 `mandatory: boolean`（不存在时为 `false`）
+- **并且** 系统 SHALL 从输出 `tags` 中移除 `mandatory`、`platformcollision`、`envmap_cockpit`
 
 #### Scenario: Shield 内嵌
 - **前提** 同一插槽组内存在 `shield` 与其他类型连接点
@@ -125,11 +127,12 @@
 - **当** 输出 `id`
 - **那么** 系统 SHALL 使用 `wareId` 作为 `id`，且不输出 `wareId` 字段
 
-#### Scenario: 装备尺寸解析
+#### Scenario: 装备类型与尺寸解析
 - **前提** 生成 `equipments.json`
-- **当** 解析装备宏名称
-- **那么** 系统 SHALL 解析尺寸为 `small/medium/large/extralarge`
-- **并且** 若无法解析尺寸，系统 SHALL 设为 `unknown`
+- **当** 解析 `slotTags`
+- **那么** 系统 SHALL 从 `slotTags` 提取 `type` 与 `size`
+- **并且** 若 `type` 或 `size` 提取失败，系统 SHALL 记录失败并跳过该装备，不做 fallback
+- **并且** 解析后系统 SHALL 从输出 `slotTags` 中移除已提取的 `type/size` 与 `component`
 
 #### Scenario: 装备 slotTags 来源与映射链路
 - **前提** 生成 `equipments.json`
@@ -137,6 +140,7 @@
 - **那么** 系统 SHALL 仅使用 `equipment_components.xml` 中对应 component 的 connection tags 聚合去重
 - **并且** 映射链路 SHALL 为 `equipment(ware id) -> ware.component(ref=macro) -> equipment_macro.component(ref=component) -> equipment_components.component(name=component)`
 - **并且** 系统 SHALL 不使用复杂语义判定或 `equipment id` 直接映射作为 `slotTags` 来源
+- **并且** 若 `slotTags` 包含 `spacesuit`，系统 SHALL 跳过该装备，不写入 `equipments.json`
 
 #### Scenario: 装备 noplayerblueprint 提取
 - **前提** ware `tags` 可能包含 `noplayerblueprint`

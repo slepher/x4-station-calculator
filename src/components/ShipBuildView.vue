@@ -1,23 +1,23 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { computed, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
+import { useShipBuildStore } from '@/store/useShipBuildStore'
 import type {
   X4Ship,
   X4ShipRace,
   X4ShipType,
-  X4Equipment,
   X4EquipmentType,
   EquipmentType,
   ShipEquipmentSize
 } from '@/types/x4'
-import ShipBuildFitCandidateArsenal from '@/components/ship-build/ShipBuildFitCandidateArsenal.vue'
-import type { FitConnectionRow, FitGroupRow, FitMode } from '@/components/ship-build/fitTypes'
+import ShipBuildFitCandidate from '@/components/ShipBuildFitCandidate.vue'
+import type { FitMode } from '@/components/ship-build/fitTypes'
 
 import shipsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ships.json'
 import shipTypesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ship_types.json'
 import shipRacesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ship_races.json'
-import equipmentsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
 import equipmentTypesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipment_types.json'
 
 const { t } = useI18n()
@@ -26,8 +26,38 @@ const { translateShip, translateShipType, translateEquipmentType, translateEquip
 const ships = shipsRaw as unknown as X4Ship[]
 const shipTypes = shipTypesRaw as X4ShipType[]
 const shipRaces = shipRacesRaw as X4ShipRace[]
-const equipments = equipmentsRaw as X4Equipment[]
 const equipmentTypes = equipmentTypesRaw as X4EquipmentType[]
+const shipBuildStore = useShipBuildStore()
+const {
+  selectedClass,
+  selectedRaces,
+  selectedTypes,
+  selectedShipId,
+  statsViewMode,
+  fitMode,
+  selectedByConnection,
+  selectedShip,
+  connectionRows,
+  groupRows,
+  hasFitModeConflict,
+  canSwitchToGroupMode
+} = storeToRefs(shipBuildStore)
+const {
+  setSelectedShipId,
+  setSelectedClass,
+  toggleRace,
+  toggleType,
+  setSelectedTypes,
+  setFitMode: setFitModeStore,
+  applyConnectionAssignment: applyConnectionAssignmentStore,
+  applyGroupAssignment: applyGroupAssignmentStore,
+  setStatsViewMode,
+  setDisplayResolvers
+} = shipBuildStore
+setDisplayResolvers({
+  translateEquipment,
+  translateEquipmentType
+})
 
 const classOptions = [
   { id: 'ship_s', label: 'S' },
@@ -35,14 +65,6 @@ const classOptions = [
   { id: 'ship_l', label: 'L' },
   { id: 'ship_xl', label: 'XL' }
 ]
-
-const selectedClass = ref<'ship_s' | 'ship_m' | 'ship_l' | 'ship_xl' | null>(null)
-const selectedRaces = ref<string[]>([])
-const selectedTypes = ref<string[]>([])
-const selectedShipId = ref<string | null>(null)
-const statsViewMode = ref<'summary' | 'detail'>('summary')
-const fitMode = ref<FitMode>('connection')
-const selectedByConnection = ref<Record<string, string | null>>({})
 
 const raceOptions = computed(() => {
   return shipRaces.map(race => ({
@@ -79,8 +101,7 @@ const equipmentSizeLabelMap: Partial<Record<ShipEquipmentSize, string>> = {
   extralarge: 'XL',
   large: 'L',
   medium: 'M',
-  small: 'S',
-  unknown: ''
+  small: 'S'
 }
 
 const equipmentTypeShortMap: Record<EquipmentType, string> = {
@@ -99,8 +120,7 @@ const getEquipmentSummary = (ship: X4Ship, mode: 'short' | 'full') => {
       extralarge: 0,
       large: 0,
       medium: 0,
-      small: 0,
-      unknown: 0
+      small: 0
     }
     equipmentSizeOrder.forEach(size => {
       const value = slot.count?.[size]
@@ -178,214 +198,33 @@ const filteredShips = computed(() => {
 
 watch(selectedClass, () => {
   const allowed = new Set(availableTypes.value.map(type => type.id))
-  selectedTypes.value = selectedTypes.value.filter(typeId => allowed.has(typeId))
-})
-
-const selectedShip = computed(() => {
-  if (!selectedShipId.value) return null
-  return ships.find(ship => ship.id === selectedShipId.value) || null
+  setSelectedTypes(selectedTypes.value.filter(typeId => allowed.has(typeId)))
 })
 
 watch(filteredShips, (next) => {
   if (!selectedShipId.value) return
   if (!next.some(ship => ship.id === selectedShipId.value)) {
-    selectedShipId.value = null
+    setSelectedShipId(null)
   }
 })
-
-watch(selectedShipId, () => {
-  selectedByConnection.value = {}
-  fitMode.value = 'connection'
-})
-
-const toggleRace = (raceId: string) => {
-  if (selectedRaces.value.includes(raceId)) {
-    selectedRaces.value = selectedRaces.value.filter(id => id !== raceId)
-  } else {
-    selectedRaces.value = [...selectedRaces.value, raceId]
-  }
-}
-
-const toggleType = (typeId: string) => {
-  if (selectedTypes.value.includes(typeId)) {
-    selectedTypes.value = selectedTypes.value.filter(id => id !== typeId)
-  } else {
-    selectedTypes.value = [...selectedTypes.value, typeId]
-  }
-}
-
-const normalizeTagList = (tags: unknown): string[] => {
-  if (!Array.isArray(tags)) return []
-  return tags.filter((tag): tag is string => typeof tag === 'string')
-}
-
-const getEquipmentCandidates = (
-  slotType: EquipmentType,
-  size: ShipEquipmentSize,
-  connectionTags: string[]
-) => {
-  return equipments
-    .filter((equipment) => !equipment.noplayerblueprint)
-    .filter((equipment) => equipment.type === slotType && equipment.size === size)
-    .filter((equipment) => {
-      if (connectionTags.length === 0) return true
-      const equipmentTags = normalizeTagList(equipment.slotTags)
-      if (equipmentTags.length === 0) return false
-      const connectionSet = new Set(connectionTags)
-      const sharedTags = equipmentTags.filter(tag => connectionSet.has(tag))
-      if (sharedTags.length === 0) return false
-
-      const hasHittableConstraint = connectionSet.has('hittable') || connectionSet.has('unhittable')
-      if (!hasHittableConstraint) return true
-
-      const matchedHitTag = connectionSet.has('hittable') ? 'hittable' : 'unhittable'
-      if (!equipmentTags.includes(matchedHitTag)) return false
-
-      return sharedTags.some(tag => tag !== 'hittable' && tag !== 'unhittable')
-    })
-    .map((equipment) => ({
-      id: equipment.id,
-      name: translateEquipment(equipment),
-      mk: equipment.mk || null,
-      race: equipment.race || null,
-      tags: normalizeTagList(equipment.slotTags)
-    }))
-    .sort((a, b) => a.name.localeCompare(b.name))
-}
-
-const connectionRows = computed<FitConnectionRow[]>(() => {
-  if (!selectedShip.value) return []
-
-  const rows: FitConnectionRow[] = []
-  selectedShip.value.slots.forEach((slot, slotIndex) => {
-    slot.groups.forEach((group, groupIndex) => {
-      const connection = group.connection
-      const tags = normalizeTagList(connection?.tags)
-      const typeDef = equipmentTypeMap.value.get(slot.type)
-      const baseKey = `${selectedShip.value!.id}::${slot.type}::${slotIndex}::${groupIndex}`
-
-      rows.push({
-        connectionKey: `${selectedShip.value!.id}::${slot.type}::${slotIndex}::${groupIndex}`,
-        slotType: slot.type,
-        parentSlotType: slot.type,
-        parentConnectionSize: connection?.size || 'unknown',
-        parentConnectionTags: [...tags],
-        slotTypeLabel: typeDef ? translateEquipmentType(typeDef) : slot.type,
-        groupName: group.group,
-        size: connection?.size || 'unknown',
-        tags,
-        count: connection?.count || 0,
-        options: getEquipmentCandidates(
-          slot.type,
-          connection?.size || 'unknown',
-          tags
-        )
-      })
-
-      if (connection?.shield) {
-        const shieldTags = normalizeTagList(connection.shield.tags)
-        const shieldTypeDef = equipmentTypeMap.value.get('shield')
-        const shieldTypeLabel = shieldTypeDef ? translateEquipmentType(shieldTypeDef) : 'shield'
-        rows.push({
-          connectionKey: `${baseKey}::shield`,
-          slotType: 'shield',
-          parentSlotType: slot.type,
-          parentConnectionSize: connection?.size || 'unknown',
-          parentConnectionTags: [...tags],
-          slotTypeLabel: shieldTypeLabel,
-          groupName: group.group,
-          size: connection.shield.size || 'unknown',
-          tags: shieldTags,
-          count: connection.shield.count || 0,
-          options: getEquipmentCandidates('shield', connection.shield.size || 'unknown', shieldTags)
-        })
-      }
-    })
-  })
-
-  return rows
-})
-
-const buildTagSignature = (tags: string[]) => [...tags].sort().join('&')
-
-const groupRows = computed<FitGroupRow[]>(() => {
-  const grouped = new Map<string, FitGroupRow>()
-  connectionRows.value.forEach((row) => {
-    const tagSignature = buildTagSignature(row.tags)
-    const parentTagSignature = buildTagSignature(row.parentConnectionTags || [])
-    const groupKey = row.slotType === 'shield'
-      ? `${row.parentSlotType}|shield|${row.parentConnectionSize}|${parentTagSignature}|${row.size}|${tagSignature}`
-      : `${row.parentSlotType}|${row.slotType}|${row.size}|${tagSignature}`
-    const existing = grouped.get(groupKey)
-    if (!existing) {
-      grouped.set(groupKey, {
-        groupKey,
-        slotType: row.slotType,
-        parentSlotType: row.parentSlotType,
-        parentConnectionSize: row.parentConnectionSize,
-        parentConnectionTags: [...row.parentConnectionTags],
-        slotTypeLabel: row.slotTypeLabel,
-        groupName: tagSignature || 'default-tags',
-        size: row.size,
-        totalCount: row.count,
-        tags: [...row.tags],
-        options: [...row.options],
-        connectionKeys: [row.connectionKey]
-      })
-      return
-    }
-
-    existing.totalCount += row.count
-    existing.connectionKeys.push(row.connectionKey)
-    const tagSet = new Set([...existing.tags, ...row.tags])
-    existing.tags = Array.from(tagSet)
-
-    const optionMap = new Map(existing.options.map(item => [item.id, item]))
-    row.options.forEach((item) => optionMap.set(item.id, item))
-    existing.options = Array.from(optionMap.values()).sort((a, b) => a.name.localeCompare(b.name))
-  })
-
-  return Array.from(grouped.values())
-})
-
-const hasFitModeConflict = computed(() => {
-  const map = new Map<string, Set<string>>()
-  connectionRows.value.forEach((row) => {
-    const selected = selectedByConnection.value[row.connectionKey]
-    if (!selected) return
-    const conflictKey = row.slotType === 'shield'
-      ? `shield@${row.parentSlotType}`
-      : row.slotType
-    const set = map.get(conflictKey) || new Set<string>()
-    set.add(selected)
-    map.set(conflictKey, set)
-  })
-  return Array.from(map.values()).some(set => set.size > 1)
-})
-
-const canSwitchToGroupMode = computed(() => !hasFitModeConflict.value)
 const fitModeConflictReason = computed(() => hasFitModeConflict.value ? t('ship_build.fit_mode_disabled_reason') : '')
 
 const setFitMode = (mode: FitMode) => {
   if (mode === 'group' && !canSwitchToGroupMode.value) return
-  fitMode.value = mode
+  setFitModeStore(mode)
 }
 
 const applyConnectionAssignment = (payload: { connectionKey: string; equipmentId: string | null }) => {
-  selectedByConnection.value = {
-    ...selectedByConnection.value,
-    [payload.connectionKey]: payload.equipmentId
-  }
+  applyConnectionAssignmentStore(payload)
 }
 
 const applyGroupAssignment = (payload: { groupKey: string; equipmentId: string | null }) => {
   const target = groupRows.value.find(item => item.groupKey === payload.groupKey)
   if (!target) return
-  const nextState = { ...selectedByConnection.value }
-  target.connectionKeys.forEach((connectionKey) => {
-    nextState[connectionKey] = payload.equipmentId
+  applyGroupAssignmentStore({
+    connectionKeys: target.connectionKeys,
+    equipmentId: payload.equipmentId
   })
-  selectedByConnection.value = nextState
 }
 
 type ShipStatMetric = {
@@ -552,7 +391,7 @@ const visibleShipStats = computed<ShipStatDisplay[]>(() => {
                   :key="option.id"
                   class="filter-chip"
                   :class="selectedClass === option.id ? 'filter-chip-active' : 'filter-chip-idle'"
-                  @click="selectedClass = option.id as any"
+                  @click="setSelectedClass(option.id as any)"
                 >
                   {{ option.label }}
                 </button>
@@ -619,7 +458,7 @@ const visibleShipStats = computed<ShipStatDisplay[]>(() => {
                 :key="ship.id"
                 class="list-item"
                 :class="selectedShipId === ship.id ? 'list-item-active' : ''"
-                @click="selectedShipId = ship.id"
+                @click="setSelectedShipId(ship.id)"
               >
                 <div class="font-semibold text-slate-100 truncate" data-testid="ship-build-ship-name">{{ translateShip(ship) }}</div>
                 <div class="text-xs text-slate-300/90 equipment-line">
@@ -644,7 +483,7 @@ const visibleShipStats = computed<ShipStatDisplay[]>(() => {
               <span class="selection-title-label">{{ t('ship_build.selected_ship') }}</span>
               <span class="selection-title-name">{{ translateShip(selectedShip) }}</span>
             </div>
-            <button class="selection-change-btn" @click="selectedShipId = null">
+            <button class="selection-change-btn" @click="setSelectedShipId(null)">
               {{ t('ship_build.change_ship') }}
             </button>
           </div>
@@ -666,7 +505,7 @@ const visibleShipStats = computed<ShipStatDisplay[]>(() => {
           <span>{{ t('ship_build.panel_fit') }}</span>
         </div>
         <div class="fit-panel-content" data-testid="ship-build-fit-panel">
-          <ShipBuildFitCandidateArsenal
+          <ShipBuildFitCandidate
             :mode="fitMode"
             :can-switch-to-group="canSwitchToGroupMode"
             :conflict-reason="fitModeConflictReason"
@@ -689,7 +528,7 @@ const visibleShipStats = computed<ShipStatDisplay[]>(() => {
                 data-testid="ship-build-stats-mode-summary"
                 class="stats-mode-btn"
                 :class="statsViewMode === 'summary' ? 'stats-mode-btn-active' : 'stats-mode-btn-idle'"
-                @click="statsViewMode = 'summary'"
+                @click="setStatsViewMode('summary')"
               >
                 {{ t('ship_build.stats_mode_summary') }}
               </button>
@@ -697,7 +536,7 @@ const visibleShipStats = computed<ShipStatDisplay[]>(() => {
                 data-testid="ship-build-stats-mode-detail"
                 class="stats-mode-btn"
                 :class="statsViewMode === 'detail' ? 'stats-mode-btn-active' : 'stats-mode-btn-idle'"
-                @click="statsViewMode = 'detail'"
+                @click="setStatsViewMode('detail')"
               >
                 {{ t('ship_build.stats_mode_detail') }}
               </button>

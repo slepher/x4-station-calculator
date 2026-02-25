@@ -1143,5 +1143,11 @@
   "{20221,5051}": "Schleppschiff",
   "{20221,5061}": "Verdichterschiff",
   "{20221,5091}": "Expeditions -schiff",
-  "{20221,5101}": "Emissär"
+  "{20221,5101}": "Emissär",
+  "{20228,101}": "Standard",
+  "{20228,201}": "Raketen",
+  "{20228,301}": "Bergbau",
+  "{20228,401}": "Hochenergetisch",
+  "{20228,701}": "Xenon",
+  "{20228,801}": "Fortgeschritten"
 }

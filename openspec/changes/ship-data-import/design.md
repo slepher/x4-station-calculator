@@ -13,17 +13,18 @@
 7. **i18n 合并**：新增数据的 i18n 词条并入现有 i18n 输出。
 8. **Ship 插槽字段裁剪**：插槽组级不保留 `slotTypes/slotTags/primaryType`。
 9. **Connections 合并**：同一插槽组内按 `tags` 相同合并 connection；移除 `name`，改为 `count` 计数。
-10. **Connections 字段提取**：从 `tags` 中提取 `type/size`，并在 `tags` 中移除已提取的 `type/size`。
+10. **Connections 字段提取**：从 `tags` 中提取 `type/size`，并在 `tags` 中移除已提取的 `type/size`；额外提取 `mandatory` 到 group 级字段，且从 `tags` 中移除 `mandatory/platformcollision/envmap_cockpit`。
 11. **Race 识别**：ship 的 `name` 使用 `_` 分段，取第 2 段作为 `race`。
 12. **Thruster 插槽**：从 `ship_macros.xml` 的 `<thruster tags="...">` 提取为 `slots` 中 `thruster` 类型。
 13. **id 规则**：`ships.json` / `equipments.json` 的 `id` 使用 `wareId`，不再输出 `wareId` 字段。
 14. **noblueprint / noplayerbuild 规则**：`noblueprint` 直接不导出；`noplayerblueprint` 仅看 ware `tags`；`noplayerbuild` 需所有 production 方法都为 `noplayerbuild`。
-15. **装备尺寸**：`equipments.json` 新增 `size` 字段，从装备宏名称解析，未命中时为 `unknown`。
+15. **装备类型与尺寸**：`equipments.json` 的 `type/size` 从 `slotTags` 提取；任一提取失败时记录失败并跳过该装备，不做 fallback。
 16. **components 索引迁移**：distiller 输出 `index/components.xml`，按 base + DLC 叠加；写出前清理 `assets/test` 路径项、规范双反斜杠、同名同内容去重；同名不同内容写出后报错。
 17. **装备组件聚合**：distiller 输出 `equipment_components.xml`，来源链路为 `equipment_id -> index/components.xml(value path) -> component xml`，仅保留 `tags` 含 `component` 的 connection。
-18. **slotTags 数据源**：processor 中 `equipments.slotTags` 不做语义推断，完全来源于 `equipment_components.xml` 对应 component 的 connection tags 聚合去重。
+18. **slotTags 数据源**：processor 中 `equipments.slotTags` 不做语义推断，完全来源于 `equipment_components.xml` 对应 component 的 connection tags 聚合去重；提取后移除 `component` 与已提取的 `type/size`。
 19. **slotTags 映射链路**：`equipment(ware id) -> ware.component(ref=macro) -> equipment_macro.component(ref=component) -> equipment_components.component(name=component)`。
-20. **装备 noplayerblueprint 字段**：`equipments.json` 输出 `noplayerblueprint: boolean`，从 `tags` 提取并从 `tags` 中删除原始标记。
+20. **spacesuit 过滤**：若装备 `slotTags` 含 `spacesuit`，则不导出到 `equipments.json`，且不计入提取失败统计。
+21. **装备 noplayerblueprint 字段**：`equipments.json` 输出 `noplayerblueprint: boolean`，从 `tags` 提取并从 `tags` 中删除原始标记。
 
 ## Non-Goals
 

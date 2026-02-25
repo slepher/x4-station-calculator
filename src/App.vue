@@ -7,11 +7,13 @@ import { useStationStore } from '@/store/useStationStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
+import { useShipBuildStore } from '@/store/useShipBuildStore'
 
 const stationStore = useStationStore()
 const gameDataStore = useGameDataStore()
 const logicFlowStore = useLogicFlowStore()
 const empireStore = useEmpireStore()
+const shipBuildStore = useShipBuildStore()
 
 const currentView = ref<'main' | 'drag-test' | 'template-flow'>('main')
 
@@ -38,6 +40,7 @@ const checkExportStores = () => {
       (window as any).gameDataStore = gameDataStore;
       (window as any).logicFlowStore = logicFlowStore;
       (window as any).empireStore = empireStore;
+      (window as any).shipBuildStore = shipBuildStore;
       (window as any).store = stationStore;
     }
     

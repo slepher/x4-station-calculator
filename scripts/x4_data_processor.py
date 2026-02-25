@@ -43,6 +43,15 @@ SPECIAL_TYPE_MAPPING = {
     'moduletypes_venture': 'ventureplatform'
 }
 
+SLOT_TAG_I18N_TARGETS = {
+    "standard",
+    "advanced",
+    "xenon",
+    "mining",
+    "missile",
+    "highpower"
+}
+
 # =============================================================================
 
 class X4PrecisionLoader:
@@ -84,6 +93,10 @@ class X4PrecisionLoader:
         self.equipment_type_name_map = {}
         self.equipment_type_key_map = {}
         self.equipment_types_data = []
+        self.slot_tag_counts = defaultdict(int)
+        self.slot_tag_name_map = {}
+        self.slot_tag_key_map = {}
+        self.slot_tags_data = []
         
         # 收集需要翻译的原始名称 (Raw Key)
         self.needed_raw_names = set()
@@ -550,6 +563,11 @@ class X4PrecisionLoader:
     def _split_tags(self, tags_str):
         return [t for t in tags_str.split() if t]
 
+    def _collect_slot_tag_counts(self, tags):
+        for tag in tags or []:
+            if tag in SLOT_TAG_I18N_TARGETS:
+                self.slot_tag_counts[tag] += 1
+
     def _detect_equipment_types(self, tags):
         types = []
         if "engine" in tags: types.append("engine")
@@ -634,7 +652,7 @@ class X4PrecisionLoader:
                 return p
             if p in {"s", "m", "l", "xl"}:
                 return {"s": "small", "m": "medium", "l": "large", "xl": "extralarge"}[p]
-        return "unknown"
+        return None
 
     def _load_ship_connections_raw(self):
         connections_path = os.path.join(self.raw_path, "libraries", "ship_connections.xml")
@@ -917,6 +935,7 @@ class X4PrecisionLoader:
         return mapping
 
     def _build_ships(self, ship_macros, ship_connections, loadouts_map, shipgroup_by_macro):
+        ship_slot_extract_failures = []
         for ship_macro, info in ship_macros.items():
             comp_ref = info.get('component')
             ware_id = self.component_to_ware.get(ship_macro)
@@ -970,16 +989,37 @@ class X4PrecisionLoader:
                 group_info = groups.setdefault(group_key, {
                     "group": group_key,
                     "isImplicitGroup": False,
+                    "mandatory": False,
                     "connection": None,
                     "shieldConnection": None
                 })
                 group_info["isImplicitGroup"] = group_info["isImplicitGroup"] or conn.get('isImplicitGroup', False)
                 conn_type, conn_size = self._extract_type_size(conn['tags'], conn['types'])
+                group_info["mandatory"] = group_info["mandatory"] or ("mandatory" in conn['tags'])
+                missing_fields = []
+                if not conn_type:
+                    missing_fields.append("type")
+                if not conn_size:
+                    missing_fields.append("size")
+                if missing_fields:
+                    ship_slot_extract_failures.append({
+                        "shipMacro": ship_macro,
+                        "shipId": ware_id,
+                        "group": group_key,
+                        "connection": conn.get("name"),
+                        "missing": missing_fields,
+                        "tags": conn.get("tags", []),
+                        "types": conn.get("types", [])
+                    })
+                    continue
                 tag_blacklist = {conn_type, conn_size}
                 filtered_tags = sorted([
                     t for t in conn['tags']
-                    if t not in tag_blacklist and not t.startswith("symmetry")
+                    if t not in tag_blacklist
+                    and t not in {"mandatory", "platformcollision", "envmap_cockpit"}
+                    and not t.startswith("symmetry")
                 ])
+                self._collect_slot_tag_counts(filtered_tags)
                 conn_key = tuple(filtered_tags)
                 if conn_type == "shield":
                     if group_info["shieldConnection"] is None:
@@ -1021,7 +1061,7 @@ class X4PrecisionLoader:
                         group_info["connection"] = shield
                     else:
                         if group_info["connection"] is None:
-                            group_info["connection"] = {"size": None, "tags": [], "count": 0}
+                            group_info["connection"] = {"size": shield.get("size"), "tags": [], "count": 0}
                         group_info["connection"]["shield"] = shield
 
                 slots_by_type.setdefault(primary_type, []).append(group_info)
@@ -1029,16 +1069,31 @@ class X4PrecisionLoader:
             thruster_tags = info.get("thrusterTags") or []
             if thruster_tags:
                 size = self._extract_type_size(thruster_tags, ["thruster"])[1]
+                if not size:
+                    ship_slot_extract_failures.append({
+                        "shipMacro": ship_macro,
+                        "shipId": ware_id,
+                        "group": "thruster",
+                        "connection": "thruster",
+                        "missing": ["size"],
+                        "tags": thruster_tags,
+                        "types": ["thruster"]
+                    })
+                    continue
                 tag_blacklist = {"thruster", size}
                 if size == "extralarge":
                     tag_blacklist.add("xl")
                 filtered_tags = [
                     t for t in thruster_tags
-                    if t not in tag_blacklist and not t.startswith("symmetry")
+                    if t not in tag_blacklist
+                    and t not in {"mandatory", "platformcollision", "envmap_cockpit"}
+                    and not t.startswith("symmetry")
                 ]
+                self._collect_slot_tag_counts(filtered_tags)
                 thruster_group = {
                     "group": "thruster",
                     "isImplicitGroup": True,
+                    "mandatory": ("mandatory" in thruster_tags),
                     "connection": {
                         "size": size,
                         "tags": filtered_tags,
@@ -1081,6 +1136,19 @@ class X4PrecisionLoader:
             self.ships_data.append(ship_entry)
 
         print(f"   ✅ 生成 {len(self.ships_data)} 条 ships 数据。")
+        if ship_slot_extract_failures:
+            print(f"   ⚠️ 飞船 slot 提取失败 {len(ship_slot_extract_failures)} 条 (type/size, no fallback)。")
+            for failure in ship_slot_extract_failures:
+                missing = "/".join(failure["missing"])
+                tags_text = ", ".join(failure["tags"]) if failure["tags"] else "(none)"
+                types_text = ", ".join(failure["types"]) if failure["types"] else "(none)"
+                conn_name = failure["connection"] or "(unnamed)"
+                print(
+                    f"      - {failure['shipMacro']} (id={failure['shipId']}, group={failure['group']}, conn={conn_name}): "
+                    f"missing={missing}; tags=[{tags_text}]; types=[{types_text}]"
+                )
+        else:
+            print("   ✅ 飞船 slot 提取失败 0 条 (type/size, no fallback)。")
         print("   📌 槽位类型标签汇总:")
         report_order = ["engine", "thruster", "shield", "weapon", "turret"]
         all_slot_types = list(self.ship_slot_tags_by_type.keys())
@@ -1159,14 +1227,51 @@ class X4PrecisionLoader:
                 return []
             return sorted(self.equipment_component_tags_by_name.get(component_ref, set()))
 
+        def extract_type_size_from_slot_tags(slot_tags):
+            type_map = {
+                "engine": "engine",
+                "shield": "shield",
+                "weapon": "weapon",
+                "primaryweapon": "weapon",
+                "turret": "turret",
+                "thruster": "thruster"
+            }
+            size_map = {
+                "small": "small",
+                "medium": "medium",
+                "large": "large",
+                "extralarge": "extralarge",
+                "s": "small",
+                "m": "medium",
+                "l": "large",
+                "xl": "extralarge"
+            }
+            derived_type = None
+            derived_size = None
+            cleaned_slot_tags = []
+            for tag in slot_tags:
+                if tag == "component":
+                    continue
+                mapped_type = type_map.get(tag)
+                if mapped_type and derived_type is None:
+                    derived_type = mapped_type
+                    continue
+                mapped_size = size_map.get(tag)
+                if mapped_size and derived_size is None:
+                    derived_size = mapped_size
+                    continue
+                cleaned_slot_tags.append(tag)
+            return derived_type, derived_size, cleaned_slot_tags
+
         try:
             tree = ET.parse(macros_path)
             root = tree.getroot()
+            slot_extract_failures = []
             for macro in root.findall('macro'):
                 macro_name = macro.get('name')
                 m_class = macro.get('class')
-                equip_type = detect_equip_type(macro_name, m_class)
-                if not macro_name or not equip_type:
+                detected_type = detect_equip_type(macro_name, m_class)
+                if not macro_name or not detected_type:
                     continue
                 ware_id = self.component_to_ware.get(macro_name)
                 if not ware_id:
@@ -1184,8 +1289,30 @@ class X4PrecisionLoader:
                 if macro_component is not None:
                     macro_component_ref = macro_component.get('ref')
                 raw_tags = self._split_tags(ware_info.get('tags', ''))
+                raw_slot_tags = derive_slot_tags(macro_component_ref)
+                # 跳过宇航服相关装备，且不计入提取失败统计
+                if "spacesuit" in raw_slot_tags:
+                    continue
                 filtered_tags = [tag for tag in raw_tags if tag != "noplayerblueprint"]
                 no_player_blueprint = "noplayerblueprint" in raw_tags
+                equip_type, equip_size, slot_tags = extract_type_size_from_slot_tags(raw_slot_tags)
+                self._collect_slot_tag_counts(slot_tags)
+
+                missing_fields = []
+                if not equip_type:
+                    missing_fields.append("type")
+                if not equip_size:
+                    missing_fields.append("size")
+                if missing_fields:
+                    slot_extract_failures.append({
+                        "macro": macro_name,
+                        "id": ware_id,
+                        "class": m_class,
+                        "missing": missing_fields,
+                        "slotTagsRaw": raw_slot_tags,
+                        "slotTagsCleaned": slot_tags
+                    })
+                    continue
 
                 equipment = {
                     "id": ware_id,
@@ -1197,9 +1324,9 @@ class X4PrecisionLoader:
                     "race": ident_info.get('race'),
                     "tags": filtered_tags,
                     "noplayerblueprint": no_player_blueprint,
-                    "slotTags": derive_slot_tags(macro_component_ref),
+                    "slotTags": slot_tags,
                     "integrated": hull_integrated,
-                    "size": self._extract_equipment_size_from_id(macro_name),
+                    "size": equip_size,
                     "cost": self._build_cost(ware_id)
                 }
 
@@ -1254,10 +1381,21 @@ class X4PrecisionLoader:
                     equipment["stats"] = stats
 
                 self.equipments_data.append(equipment)
-                if equip_type:
-                    self.equipment_type_counts[equip_type] += 1
+                self.equipment_type_counts[equip_type] += 1
 
             print(f"   ✅ 生成 {len(self.equipments_data)} 条 equipments 数据。")
+            if slot_extract_failures:
+                print(f"   ⚠️ slotTags 提取失败 {len(slot_extract_failures)} 条 (type/size)。")
+                for failure in slot_extract_failures:
+                    missing = "/".join(failure["missing"])
+                    raw_tags_text = ", ".join(failure["slotTagsRaw"]) if failure["slotTagsRaw"] else "(none)"
+                    cleaned_tags_text = ", ".join(failure["slotTagsCleaned"]) if failure["slotTagsCleaned"] else "(none)"
+                    print(
+                        f"      - {failure['macro']} (id={failure['id']}, class={failure['class']}): "
+                        f"missing={missing}; rawTags=[{raw_tags_text}]; cleanedTags=[{cleaned_tags_text}]"
+                    )
+            else:
+                print("   ✅ slotTags 提取失败 0 条 (type/size)。")
         except Exception as e:
             print(f"   ❌ Equipment macros XML Error: {e}")
 
@@ -1305,6 +1443,9 @@ class X4PrecisionLoader:
             if iso == 'en' and not self.equipment_type_name_map:
                 self.equipment_type_name_map = self._load_equipment_types_from_locale(t_file)
                 self._build_equipment_type_key_map()
+            if iso == 'en' and not self.slot_tag_name_map:
+                self.slot_tag_name_map = self._load_slot_tags_from_locale(t_file)
+                self._build_slot_tag_key_map()
 
             # B. 递归清洗
             resolved_count = 0
@@ -1318,6 +1459,7 @@ class X4PrecisionLoader:
             if iso == 'en':
                 self.ship_type_name_map = self._load_ship_types_from_locale(t_file)
                 self.equipment_type_name_map = self._load_equipment_types_from_locale(t_file)
+                self.slot_tag_name_map = self._load_slot_tags_from_locale(t_file)
 
     def _resolve_name(self, raw_name, lang_db, depth=0):
         if not raw_name or depth > 5: return raw_name
@@ -1434,6 +1576,28 @@ class X4PrecisionLoader:
         except Exception:
             return {}
 
+    def _load_slot_tags_from_locale(self, t_file):
+        if not t_file or not os.path.exists(t_file):
+            return {}
+        try:
+            tree = ET.parse(t_file)
+            root = tree.getroot()
+            page = root.find(".//page[@id='20228']")
+            if page is None:
+                return {}
+            tag_map = {}
+            for t in page.findall('t'):
+                t_id = t.get('id')
+                if not t_id:
+                    continue
+                text = "".join(t.itertext()).strip()
+                if not text:
+                    continue
+                tag_map[t_id] = text
+            return tag_map
+        except Exception:
+            return {}
+
     def _build_ship_type_key_map(self):
         if not self.ship_type_name_map:
             return
@@ -1472,6 +1636,24 @@ class X4PrecisionLoader:
                 self.equipment_type_key_map[equip_type] = f"{{20109,{key}}}"
                 self.needed_raw_names.add(f"{{20109,{key}}}")
 
+    def _build_slot_tag_key_map(self):
+        if not self.slot_tag_name_map:
+            return
+        def norm(text):
+            return re.sub(r"[\s\-_]+", "", text.lower())
+        value_index = {}
+        for key, text in self.slot_tag_name_map.items():
+            value_index[norm(text)] = key
+        lookup_overrides = {
+            "highpower": "High-Energy"
+        }
+        for slot_tag in SLOT_TAG_I18N_TARGETS:
+            lookup_text = lookup_overrides.get(slot_tag, slot_tag)
+            key = value_index.get(norm(lookup_text))
+            if key:
+                self.slot_tag_key_map[slot_tag] = f"{{20228,{key}}}"
+                self.needed_raw_names.add(f"{{20228,{key}}}")
+
     def analyze_ship_types(self):
         print(f"\n🛸 [4.1.1/5] 分析船只类型映射 (page 20221)...")
         self._build_ship_type_key_map()
@@ -1505,6 +1687,30 @@ class X4PrecisionLoader:
                 "id": equip_type,
                 "nameId": key,
                 "name": key
+            })
+
+    def analyze_slot_tags(self):
+        print(f"\n🏷️ [4.1.3/5] 分析 slot tags 映射 (page 20228)...")
+        self._build_slot_tag_key_map()
+        self.slot_tags_data = []
+        print(f"-" * 95)
+        print(f"{'Slot Tag':<20} | {'Lookup':<20} | {'i18n Key':<15} | {'状态':<10} | {'计数'}")
+        print(f"-" * 95)
+        lookup_overrides = {
+            "highpower": "High-Energy"
+        }
+        ordered_tags = ["standard", "advanced", "xenon", "mining", "missile", "highpower"]
+        for slot_tag in ordered_tags:
+            lookup_text = lookup_overrides.get(slot_tag, slot_tag)
+            key = self.slot_tag_key_map.get(slot_tag)
+            count = self.slot_tag_counts.get(slot_tag, 0)
+            status = "✅ 已匹配" if key else "❌ 缺失"
+            print(f"{slot_tag:<20} | {lookup_text:<20} | {str(key or '---'):<15} | {status:<10} | {count}")
+            self.slot_tags_data.append({
+                "id": slot_tag,
+                "nameId": key or "",
+                "name": key or "",
+                "count": count
             })
 
     # =======================================================
@@ -1571,7 +1777,14 @@ class X4PrecisionLoader:
                 item['name'] = en_map[raw_key]
                 count_ship_types += 1
         
-        print(f"   ✅ 更新了 {count_wares} 个商品, {count_mods} 个模块, {count_wg} 个模块分组, {count_ships} 个飞船, {count_equips} 个装备, {count_ship_types} 个船只类型的英文名称。")
+        count_slot_tags = 0
+        for item in self.slot_tags_data:
+            raw_key = item.get('nameId')
+            if raw_key and raw_key in en_map:
+                item['name'] = en_map[raw_key]
+                count_slot_tags += 1
+        
+        print(f"   ✅ 更新了 {count_wares} 个商品, {count_mods} 个模块, {count_wg} 个模块分组, {count_ships} 个飞船, {count_equips} 个装备, {count_ship_types} 个船只类型, {count_slot_tags} 个 slot tag 的英文名称。")
 
     # =======================================================
     # 🆕 4.1. 模块类型分析
@@ -1690,6 +1903,8 @@ class X4PrecisionLoader:
             json.dump(self.ship_races_data, f, indent=2, ensure_ascii=False)
         with open(os.path.join(data_dir, "equipment_types.json"), 'w', encoding='utf-8') as f:
             json.dump(self.equipment_types_data, f, indent=2, ensure_ascii=False)
+        with open(os.path.join(data_dir, "slot_tags.json"), 'w', encoding='utf-8') as f:
+            json.dump(self.slot_tags_data, f, indent=2, ensure_ascii=False)
 
         # 保存语言包
         available_languages = []
@@ -1714,6 +1929,7 @@ if __name__ == "__main__":
     loader.extract_and_resolve_languages()
     loader.analyze_ship_types()
     loader.analyze_equipment_types()
+    loader.analyze_slot_tags()
     loader.inject_english_names() # 新增步骤
     loader.analyze_module_types()
     loader.generate_res_data() # 新增步骤: 生成资源元数据及缩写

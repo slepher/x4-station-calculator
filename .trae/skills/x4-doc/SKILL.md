@@ -173,6 +173,12 @@ When creating or updating `test_tasks.md` via `/x4:doc`, use the following gener
    - If Web steps change, sync corresponding locator/flow updates to `ui_knowledge.md` in the same update.
 5. Avoid non-executable wording:
    - Do not use only “用例/验证” bullets without actionable steps.
+6. Ban vague placeholder descriptions:
+   - MUST NOT use vague placeholders that cannot be executed or verified in both operation and assertion steps.
+   - Terms like `某个` / `任一` / `或` are allowed only when they remain rigorous:
+     - the selectable scope is explicitly defined;
+     - the selection condition is explicitly defined;
+     - the verification criterion is explicitly defined.
 
 ### 6.4 Test Environment Knowledge (MANDATORY)
 
@@ -191,7 +197,11 @@ When requirements change and existing `test_tasks.md` steps become unexecutable:
 
 ### 6.1.1 E2E Two-Chapter Layout (MANDATORY)
 
-When writing `test_tasks.md`, E2E MUST be split into two chapters:
+When writing `test_tasks.md`, E2E MUST be split into two chapters **at initial generation time** (not as a later patch):
+
+- Use **document-global chapter numbering**.
+- If E2E starts at chapter `N`, it MUST occupy chapter `N` and chapter `N+1`.
+- Any subsequent sections MUST be renumbered to keep chapter order continuous and non-overlapping.
 
 1. Bootstrapping & State chapter
    - startup checks
@@ -236,6 +246,22 @@ When requirements introduce reusable states, `x4-doc` MUST document both state t
 4. Multiple baselines rule:
    - multiple baseline states are allowed and independent.
    - each baseline and each baseline-related switch needs its own checklist entry.
+
+### 6.3.1 Standard State Update Scope (MANDATORY)
+
+When the user request **contains a test standard-state portion** (e.g. “标准状态”, state setup path, state-switch preconditions):
+
+1. For the standard-state portion, allowed files are strictly:
+   - `openspec/changes/<change-name>/test_tasks.md`
+   - `openspec/changes/<change-name>/ui_knowledge.md`
+2. For the standard-state portion, MUST NOT update:
+   - `request.md`, `design.md`, `tasks.md`, `specs/**/spec.md`
+   unless the user explicitly asks to change product requirements/design/spec at the same time.
+3. If the same request also includes non-standard-state changes, process those parts with normal `x4-doc` rules.
+4. Keep cross-file sync within test artifacts only:
+   - state checklist/steps in `test_tasks.md`
+   - state actions/probes/locators semantics in `ui_knowledge.md`
+5. Do not promote standard-state test detail into requirement/DoD narrative by default.
 
 ### 7. Task Scope Boundary (MANDATORY)
 

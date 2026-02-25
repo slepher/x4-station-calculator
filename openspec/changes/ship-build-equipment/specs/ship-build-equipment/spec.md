@@ -33,10 +33,10 @@
 - **那么**：系统 MUST 从全量 `equipments` 进行筛选。
 - **并且**：筛选条件 MUST 包含 `type` 与 `size` 精确匹配。
 
-#### Scenario: Tag Matching Uses Any-Hit Rule
+#### Scenario: Tag Matching Uses All-Inclusion Rule
 - **前提**：connection 含有 `tags`。
 - **当**：系统执行候选筛选。
-- **那么**：若 `equipment.slotTags` 与 `connection.tags` 命中任意一条，即 SHALL 视为标签匹配。
+- **那么**：系统 MUST 要求 `equipment.slotTags` 的每个标签都出现在 `connection.tags` 中才视为匹配。
 
 #### Scenario: Empty Connection Tags Fallback
 - **前提**：connection 的 `tags` 为空。
@@ -102,13 +102,13 @@
 - **那么**：系统 MUST 显示真实 `selected/total`。
 - **并且**：`total` 与该区实际槽位数量一致，不得固定为 `0/1`。
 
-### Requirement: Single Candidate View And Text-Only Card
+### Requirement: Standard Fit Component And Text-Only Card
 
-#### Scenario: Keep Arsenal As The Only Fit Candidate View
+#### Scenario: Keep Standard Fit Component As The Only Implementation
 - **前提**：用户进入配装区。
 - **当**：系统渲染候选界面。
-- **那么**：系统 SHALL 仅使用 Arsenal 视图。
-- **并且**：系统 MUST NOT 再提供 Nebula / Hangar / Tactical 切换控件。
+- **那么**：系统 SHALL 使用标准配装组件作为唯一实现。
+- **并且**：系统 MUST NOT 提供候选组件切换控件。
 
 #### Scenario: Candidate Cards Do Not Render Image Placeholder
 - **前提**：候选装备数据中无可用图片资源。
@@ -118,19 +118,44 @@
 
 ## MODIFIED Requirements
 
-### Requirement: Tag Matching With Hittable/Unhittable Guard
-
-#### Scenario: Require Additional Tag Beyond Hittable Or Unhittable
-- **前提**：connection tags 含 `hittable` 或 `unhittable`。
-- **当**：系统执行候选筛选。
-- **那么**：系统 MUST 在命中 `hittable/unhittable` 的同时，额外命中至少一个其他标签才视为匹配。
-- **并且**：`hittable` 与 `unhittable` 互斥，不得互相匹配。
+### Requirement: Unified Tag Matching Without Special Cases
 
 #### Scenario: Shield Integrated Rule Is Removed
 - **前提**：候选筛选针对 shield 连接。
 - **当**：系统执行标签匹配。
 - **那么**：系统 SHALL 使用统一的 slotTags 规则。
 - **并且**：系统 MUST NOT 使用 `integrated` 的额外命中特例。
+
+#### Scenario: No Hittable Or Unhittable Special Case
+- **前提**：connection 或 equipment 可能包含 `hittable` / `unhittable`。
+- **当**：系统执行标签匹配。
+- **那么**：系统 MUST NOT 对 `hittable/unhittable` 做专门分支判断。
+- **并且**：系统 SHALL 与其他标签一样按统一 ALL 规则匹配。
+
+### Requirement: Compatibility Tag Display Whitelist
+
+#### Scenario: Show Only Whitelisted Compatibility Tags
+- **前提**：系统渲染兼容性标签栏。
+- **当**：某候选装备包含多个标签。
+- **那么**：系统 SHALL 仅显示 `standard`、`advanced`、`xenon`、`mining`、`missile`、`highpower`。
+- **并且**：系统 MUST NOT 显示其他非白名单标签。
+
+#### Scenario: Hide Compatibility Tag Section When Empty
+- **前提**：某候选装备经过白名单过滤后无可显示标签。
+- **当**：系统渲染候选卡片。
+- **那么**：系统 SHALL 隐藏该候选的兼容性标签栏。
+
+#### Scenario: Render Compatibility Tag Text Via SlotTags i18n
+- **前提**：兼容性标签 `id` 可在 `slot_tags.json` 中找到对应 `nameId`。
+- **当**：系统渲染兼容性标签文本。
+- **那么**：系统 MUST 使用 `slot_tags.json.nameId` 对应的 i18n 文本。
+- **并且**：系统 MUST NOT 直接展示原始 tag id 作为常规显示文本。
+
+#### Scenario: SlotTags Type And i18n Adapter Are Explicitly Defined
+- **前提**：系统接入 `slot_tags.json`。
+- **当**：实现类型与翻译接口。
+- **那么**：系统 SHALL 在 `x4.ts` 定义 slot tag 类型。
+- **并且**：系统 SHALL 在 `UseX4I18n.ts` 提供 slot tag 翻译入口供页面调用。
 
 ### Requirement: Exclude No-Player-Blueprint Equipments
 
@@ -141,10 +166,10 @@
 
 ### Requirement: Candidate View Naming And Equipment I18n Consistency
 
-#### Scenario: Standardize Single Candidate View Name
-- **前提**：配装区仅保留一个候选视图。
-- **当**：系统渲染该视图名称。
-- **那么**：系统 SHALL 使用标准化后的唯一名称显示。
+#### Scenario: Standard Component Is Fixed
+- **前提**：配装区仅保留标准配装组件。
+- **当**：系统渲染候选区域。
+- **那么**：系统 SHALL 不暴露候选组件切换入口。
 
 #### Scenario: Equipment Name I18n In Both Modes
 - **前提**：标准/简化模式均展示装备名称。

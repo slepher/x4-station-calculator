@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { FitMode, FitPanelProps, FitConnectionRow, FitGroupRow } from './fitTypes'
+import type { FitMode, FitPanelProps, FitConnectionRow, FitGroupRow } from '@/components/ship-build/fitTypes'
+import { useX4I18n } from '@/utils/UseX4I18n'
+import type { X4SlotTag } from '@/types/x4'
+import slotTagsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/slot_tags.json'
 
 type OptionItem = { id: string; name: string; mk: string | null; race: string | null; tags: string[] }
 
@@ -19,6 +22,9 @@ type AggregatedGroup = {
 
 const props = defineProps<FitPanelProps>()
 const { t } = useI18n()
+const { translateSlotTag } = useX4I18n()
+const slotTags = slotTagsRaw as X4SlotTag[]
+const slotTagMap = new Map<string, X4SlotTag>(slotTags.map((tag) => [tag.id, tag]))
 
 const emit = defineEmits<{
   (e: 'update:mode', mode: FitMode): void
@@ -275,6 +281,23 @@ const compatibilityTags = computed(() => {
   return activePrimaryAggregate.value?.tags || []
 })
 
+const visibleCompatibilityTags = computed<X4SlotTag[]>(() => {
+  const unique = new Set<string>()
+  const visible: X4SlotTag[] = []
+  compatibilityTags.value.forEach((tag) => {
+    if (unique.has(tag)) return
+    const tagDef = slotTagMap.get(tag)
+    if (!tagDef) return
+    unique.add(tag)
+    visible.push(tagDef)
+  })
+  return visible
+})
+
+const visibleCompatibilityTagLabels = computed(() =>
+  visibleCompatibilityTags.value.map((tag) => translateSlotTag(tag))
+)
+
 const activePrimarySlotTypeLabel = computed(() => {
   if (props.mode === 'connection') return activeConnectionRow.value?.slotTypeLabel || activeSlotType.value
   if (!activePrimaryAggregate.value) return activeSlotType.value
@@ -305,6 +328,12 @@ const assignConnectionRow = (row: FitConnectionRow, equipmentId: string) => {
 }
 
 const assignAggregatedGroup = (group: AggregatedGroup, equipmentId: string) => {
+  if (group.groupRows.length === 0) {
+    group.connectionKeys.forEach((connectionKey) => {
+      emit('assign-connection', { connectionKey, equipmentId })
+    })
+    return
+  }
   group.groupRows.forEach((row) => {
     emit('assign-group', { groupKey: row.groupKey, equipmentId })
   })
@@ -348,9 +377,9 @@ const assignAggregatedGroup = (group: AggregatedGroup, equipmentId: string) => {
 
       <div v-if="!canSwitchToGroup" class="conflict-line">{{ conflictReason }}</div>
 
-      <section class="compatibility-box">
+      <section v-if="visibleCompatibilityTags.length > 0" class="compatibility-box">
         <div class="compatibility-title">{{ t('ship_build.fit_compatibility') }}:</div>
-        <div class="compatibility-line tags">{{ compatibilityTags.join(' / ') || t('ship_build.fit_no_tags') }}</div>
+        <div class="compatibility-line tags">{{ visibleCompatibilityTagLabels.join(' / ') }}</div>
         <div v-for="line in compatibilitySlotLines" :key="line" class="compatibility-line">{{ line }}</div>
       </section>
 
@@ -404,7 +433,7 @@ const assignAggregatedGroup = (group: AggregatedGroup, equipmentId: string) => {
         <template v-else-if="mode === 'group' && activePrimaryAggregate">
           <div class="wall-section">
             <div class="wall-header">
-              <span>{{ sizeShort(activePrimaryAggregate.size) }} {{ activePrimarySlotTypeLabel }}</span>
+              <span>{{ activePrimarySlotTypeLabel }}</span>
               <span class="picked">
                 {{ selectedCountForConnectionKeys(activePrimaryAggregate.connectionKeys) }}/{{ totalCountForConnectionKeys(activePrimaryAggregate.connectionKeys) }}
               </span>
@@ -426,7 +455,7 @@ const assignAggregatedGroup = (group: AggregatedGroup, equipmentId: string) => {
 
           <div v-for="shieldGroup in relatedShieldAggregates" :key="shieldGroup.key" class="wall-section">
             <div class="wall-header">
-              <span>{{ sizeShort(shieldGroup.size) }} {{ shieldGroup.slotTypeLabel }}</span>
+              <span>{{ shieldGroup.slotTypeLabel }}</span>
               <span class="picked">
                 {{ selectedCountForConnectionKeys(shieldGroup.connectionKeys) }}/{{ totalCountForConnectionKeys(shieldGroup.connectionKeys) }}
               </span>

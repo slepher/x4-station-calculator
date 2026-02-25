@@ -1143,5 +1143,11 @@
   "{20221,5051}": "Holownik",
   "{20221,5061}": "Zagęszczarka",
   "{20221,5091}": "Statek Ekspedycyjny",
-  "{20221,5101}": "Envoy"
+  "{20221,5101}": "Envoy",
+  "{20228,101}": "Standardowe",
+  "{20228,201}": "Rakiety",
+  "{20228,301}": "Górnicze",
+  "{20228,401}": "Wysokoenergetyczne",
+  "{20228,701}": "Xenońskie",
+  "{20228,801}": "Zaawansowane"
 }

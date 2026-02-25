@@ -248,6 +248,12 @@ await expect(page.locator('.title')).toHaveText('新建');
 
 *   **仅 Store 操作测试**: 测试仅通过 `page.evaluate` 操作 Store，没有 UI 验证。
     *   **解决方案**: 必须包含 UI 交互和断言。Store 操作可用于 setup，但不能作为唯一验证。
+*   **Pinia 未初始化导致单测全挂**: 组件迁移到 `useShipBuildStore()` 后，`@vue/test-utils` 挂载时若未注入 Pinia，会触发 `getActivePinia()` 错误并导致所有用例失败。
+    *   **解决方案**: 在 `mount` 前执行 `setActivePinia(createPinia())`，并在 `global.plugins` 注入同一个 pinia 实例。
+*   **Ship Build Equipment 当前稳定定位器**: `ship-build-equipment` E2E 在当前实现下可稳定使用 `.mode-tabs .mode-tab`、`.left-rail .slot-type-btn`、`.group-tabs .group-tab`、`.option-wall .option-card`。
+    *   **注意**: `ui_knowledge` 中建议的 `ship-build-*` testid 尚未全部落地，编写用例需先用现有 class 定位并控制作用域。
+*   **Ship Build Store 调试导出门槛**: 在 preview/e2e 下如果没有设置 `localStorage.isTestEnv=true`，`window.shipBuildStore` 不会导出，`page.evaluate` 读取 store 会报 `undefined`。
+    *   **解决方案**: 在测试初始化（清理存储后）先写入 `localStorage.setItem('isTestEnv', 'true')`，再 `reload` 进入页面。
 
 ### 7. 逻辑组网 (Logical Flow)
 *   **候选区 (Candidate Zone)**:

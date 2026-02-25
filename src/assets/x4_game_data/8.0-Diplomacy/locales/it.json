@@ -1143,5 +1143,11 @@
   "{20221,5051}": "Rimorchiatore",
   "{20221,5061}": "Compattatrice",
   "{20221,5091}": "Nave da Spedizione",
-  "{20221,5101}": "Envoy"
+  "{20221,5101}": "Envoy",
+  "{20228,101}": "Standard",
+  "{20228,201}": "Missili",
+  "{20228,301}": "Estrazione Mineraria",
+  "{20228,401}": "Alta Energia",
+  "{20228,701}": "Xenon",
+  "{20228,801}": "Avanzato"
 }

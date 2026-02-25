@@ -3,6 +3,7 @@
  */
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
 
 const mockShips = vi.hoisted(() => ([
   {
@@ -183,7 +184,15 @@ vi.mock('@/utils/UseX4I18n', () => ({
 
 import ShipBuildView from '@/components/ShipBuildView.vue'
 
-const mountView = () => mount(ShipBuildView)
+const mountView = () => {
+  const pinia = createPinia()
+  setActivePinia(pinia)
+  return mount(ShipBuildView, {
+    global: {
+      plugins: [pinia]
+    }
+  })
+}
 
 describe('ShipBuildView - Filters', () => {
   it('1.1 list hidden when class not selected', () => {

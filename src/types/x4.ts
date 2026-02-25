@@ -26,7 +26,18 @@ export interface X4ShipProduction {
 }
 
 export type EquipmentType = 'engine' | 'shield' | 'turret' | 'weapon' | 'thruster';
-export type ShipEquipmentSize = 'small' | 'medium' | 'large' | 'extralarge' | 'unknown';
+export type ShipEquipmentSize = 'small' | 'medium' | 'large' | 'extralarge';
+export type X4SlotTagId = 'standard' | 'advanced' | 'xenon' | 'mining' | 'missile' | 'highpower';
+
+/**
+ * 插槽标签接口 - 对应 slot_tags.json
+ */
+export interface X4SlotTag {
+  id: X4SlotTagId;
+  nameId: string;
+  name: string;
+  count: number;
+}
 
 /**
  * 飞船插槽连接点
@@ -44,6 +55,7 @@ export interface X4ShipConnection {
 export interface X4ShipSlotGroup {
   group: string;
   isImplicitGroup: boolean;
+  mandatory: boolean;
   connection: X4ShipConnection;
   equipments: Record<string, Record<string, { count: number; optional: number }>>;
 }
@@ -99,7 +111,7 @@ export interface X4Equipment {
   race: string | null;
   tags: string[];
   noplayerblueprint: boolean;
-  slotTags?: string[];
+  slotTags: string[];
   integrated: boolean;
   cost: Record<string, Partial<Record<string, number>>>;
 }
