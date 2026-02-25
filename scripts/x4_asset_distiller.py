@@ -60,7 +60,7 @@ def main():
         return (node.tag, attrs, text, children)
 
     # 通用函数：处理 index 文件（macros.xml / components.xml）
-    def process_index_file(src, index_name, root_element_name, dlc_order, dest_dir, parser, filter_test=False):
+    def process_index_file(src, index_name, root_element_name, dlc_order, dest_dir, parser):
         """
         处理 index 文件：读取 base、叠加 DLC、去重、写出
         :param src: 源数据根目录
@@ -69,7 +69,6 @@ def main():
         :param dlc_order: DLC 顺序列表
         :param dest_dir: 输出目录
         :param parser: XML 解析器
-        :param filter_test: 是否过滤 assets/test 路径
         :return: 输出文件路径
         """
         base_path = os.path.join(src, "index", index_name)
@@ -81,14 +80,6 @@ def main():
         tree = None
         if os.path.exists(base_path):
             tree = etree.parse(base_path, parser)
-            # 记录 base 来源
-            for entry in tree.getroot().findall(".//entry[@name]"):
-                name = entry.get("name")
-                value = entry.get("value") or ""
-                if name:
-                    # 只记录第一次出现的 name（避免 base 文件本身就有重复）
-                    if name not in entry_sources:
-                        entry_sources[name] = [('base', value)]
         else:
             print(f"      ⚠️ Base 文件不存在: {base_path}")
             tree = etree.ElementTree(etree.Element(root_element_name))
@@ -103,44 +94,30 @@ def main():
                 patch_tree = etree.parse(patch_path, parser)
                 patch_root = patch_tree.getroot()
                 for node in patch_root:
-                    # 记录 DLC 来源
-                    if node.tag == 'entry':
-                        name = node.get("name")
-                        value = node.get("value") or ""
-                        if name:
-                            # 只记录第一次出现的 name（避免 DLC 文件本身就有重复）
-                            if name not in entry_sources:
-                                entry_sources[name] = [(dlc_id, value)]
                     root.append(deepcopy(node))
             except Exception as e:
                 print(f"      ⚠️ 警告: 叠加失败 {dlc_id}: {e}")
 
-        # 可选：过滤 value 路径包含 assets/test 的 entry
-        if filter_test:
-            removed_test_entries = 0
-            for entry in list(root.findall(".//entry[@value]")):
-                value = (entry.get("value") or "").lower().replace("\\", "/")
-                if "assets/test" in value:
-                    parent = entry.getparent()
-                    if parent is not None:
-                        parent.remove(entry)
-                        removed_test_entries += 1
-            if removed_test_entries:
-                print(f"   🧹 已移除 {removed_test_entries} 个 assets/test entry。")
+        # 规范化 value 后再构建 entry_sources
+        entry_sources = {}
+        for node in root:
+            name = node.get("name")
+            value = node.get("value") or ""
+            if name and name not in entry_sources:
+                entry_sources[name] = [('base', value)]
 
-        # 规范 value 中的双反斜杠（仅在 filter_test 时）
-        if filter_test:
-            normalized_double_slash = 0
-            for entry in root.findall(".//entry[@value]"):
-                value = entry.get("value") or ""
-                normalized = value
-                while "\\\\" in normalized:
-                    normalized = normalized.replace("\\\\", "\\")
-                if normalized != value:
-                    entry.set("value", normalized)
-                    normalized_double_slash += 1
-            if normalized_double_slash:
-                print(f"   🔧 已规范 {normalized_double_slash} 个 entry.value 双反斜杠。")
+        # 规范 value 中的双反斜杠（始终执行，避免路径格式差异导致去重失败）
+        normalized_double_slash = 0
+        for entry in root.findall(".//entry[@value]"):
+            value = entry.get("value") or ""
+            normalized = value
+            while "\\\\" in normalized:
+                normalized = normalized.replace("\\\\", "\\")
+            if normalized != value:
+                entry.set("value", normalized)
+                normalized_double_slash += 1
+        if normalized_double_slash:
+            print(f"   🔧 已规范 {normalized_double_slash} 个 entry.value 双反斜杠。")
 
         # name 相同且内容完全一致的节点自动去重合并
         merged_same_content = 0
@@ -229,11 +206,11 @@ def main():
 
     # --- 步骤 2: 处理 index/macros.xml ---
     print("📂 [2/9] 正在处理 index/macros.xml...")
-    macros_output_path = process_index_file(src, "macros.xml", "macros", dlc_order, index_dest_dir, parser, filter_test=True)
+    macros_output_path = process_index_file(src, "macros.xml", "macros", dlc_order, index_dest_dir, parser)
 
     # --- 步骤 3: 处理 index/components.xml ---
     print("📂 [3/9] 正在处理 index/components.xml...")
-    components_output_path = process_index_file(src, "components.xml", "components", dlc_order, index_dest_dir, parser, filter_test=False)
+    components_output_path = process_index_file(src, "components.xml", "components", dlc_order, index_dest_dir, parser)
 
     # --- 步骤 4: 处理核心库文件 (wares/waregroups/colors/ships/shipgroups/loadouts) ---
     print("📂 [4/9] 正在处理核心库文件 (Wares/Waregroups/Colors/Ships/Shipgroups/Loadouts)...")
