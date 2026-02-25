@@ -298,6 +298,20 @@ def main():
             return full_path
         return None
 
+    # 通用函数：从 macro 文件中收集所有 component ref
+    def collect_component_refs_from_macros(macro_xml_path, xpath=".//macro/component[@ref]"):
+        component_refs = set()
+        if os.path.exists(macro_xml_path):
+            try:
+                tree = etree.parse(macro_xml_path, parser)
+                for comp in tree.findall(xpath):
+                    ref = comp.get('ref')
+                    if ref:
+                        component_refs.add(ref)
+            except Exception as e:
+                print(f"      ⚠️ 读取 {os.path.basename(macro_xml_path)} 失败: {e}")
+        return component_refs
+
     # 通用函数：根据 ID 列表导出 macro/component 文件
     # filter_fn: 过滤函数，接收节点返回是否保留，None 表示不过滤
     # transform_fn: 转换函数，在节点添加到根之前对其进行转换，None 表示不转换
@@ -382,13 +396,7 @@ def main():
     # 7.1 从 ship_macros.xml 收集需要的 component refs
     ship_components_needed = set()
     ship_macros_path = os.path.join(lib_dest_dir, "ship_macros.xml")
-    if os.path.exists(ship_macros_path):
-        try:
-            ship_macros_tree = etree.parse(ship_macros_path, parser)
-            for comp in ship_macros_tree.findall(".//macro/component[@ref]"):
-                ship_components_needed.add(comp.get('ref'))
-        except Exception as e:
-            print(f"      ⚠️ 读取 ship_macros.xml 失败: {e}")
+    ship_components_needed = collect_component_refs_from_macros(ship_macros_path)
     print(f"   🎯 识别到 {len(ship_components_needed)} 个飞船组件引用。")
 
     # 7.2 从 components.xml 读取路径映射
@@ -520,40 +528,11 @@ def main():
     # --- 步骤 10: 聚合装备组件连接点 (equipment_components.xml) ---
     print("∑ [10/10] 正在聚合装备组件连接点 (equipment_components.xml)...")
 
-    # 10.1 从 equipment_macros.xml + wares_final.xml 收集 equipment -> component ref 映射。
-    # 映射链路: equipment(ware id) -> ware.component(ref=macro) -> equipment_macro.component(ref=component)
-    equipment_to_component_ref = {}
-    macro_to_component_ref = {}
-    if os.path.exists(equipment_macros_path):
-        try:
-            equipment_macros_tree = etree.parse(equipment_macros_path, parser)
-            for macro in equipment_macros_tree.findall(".//macro[@name]"):
-                macro_name = macro.get('name')
-                comp = macro.find('component')
-                comp_ref = comp.get('ref') if comp is not None else None
-                if macro_name and comp_ref:
-                    macro_to_component_ref[macro_name] = comp_ref
-        except Exception as e:
-            print(f"      ⚠️ 读取 equipment_macros.xml 失败: {e}")
-    if os.path.exists(wares_final_path):
-        try:
-            wares_tree = etree.parse(wares_final_path, parser)
-            for ware in wares_tree.findall(".//ware[@id]"):
-                ware_id = ware.get('id')
-                comp = ware.find('component')
-                comp_ref = comp.get('ref') if comp is not None else None
-                if not ware_id or not comp_ref:
-                    continue
-                component_ref = macro_to_component_ref.get(comp_ref)
-                if component_ref:
-                    equipment_to_component_ref[ware_id] = component_ref
-        except Exception as e:
-            print(f"      ⚠️ 读取 wares_final.xml 失败: {e}")
-    print(f"   🎯 识别到 {len(equipment_to_component_ref)} 条 equipment -> component 映射。")
+    # 10.1 直接从 equipment_macros.xml 收集所有 component ref
+    all_component_refs = collect_component_refs_from_macros(equipment_macros_path, ".//macro/component[@ref]")
+    print(f"   🎯 从 equipment_macros.xml 识别到 {len(all_component_refs)} 个 component ref。")
 
-    # 10.2 提取唯一的 component refs（去重）
-    unique_component_refs = list(set(equipment_to_component_ref.values()))
-    print(f"   🎯 去重后共 {len(unique_component_refs)} 个唯一组件。")
+    unique_component_refs = list(all_component_refs)
 
     # 10.3 从已整合的 index/components.xml 构建 component_path 映射。
     component_path_map = {}
