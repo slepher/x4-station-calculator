@@ -605,7 +605,8 @@ def main():
     # --- 步骤 11: 导出飞船 connections 引用的所有 macro ---
     print("∑ [11/11] 正在导出飞船 connections 引用的 macro...")
 
-    ship_macro_path = os.path.join(src, "libraries", "ship_macros.xml")
+    # 使用 dest_root 下的 ship_macros.xml
+    ship_macro_path = os.path.join(lib_dest_dir, "ship_macros.xml")
     connection_macro_refs = set()
 
     if os.path.exists(ship_macro_path):
