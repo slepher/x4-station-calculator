@@ -40,25 +40,67 @@ def main():
     dest_root = os.path.join(v_config['raw_assets_dir'], v_config['folder_name'])
 
     print(f"🧪 开始资产蒸馏流: {v_config['folder_name']}")
-    
+
     if os.path.exists(dest_root):
         shutil.rmtree(dest_root)
     os.makedirs(dest_root, exist_ok=True)
 
+    parser = etree.XMLParser(remove_blank_text=True)
+    dlc_order = v_config.get('dlc_order', [])
+
     # --- 步骤 1: 拷贝语言包 (t/) ---
     if os.path.exists(os.path.join(src, "t")):
         shutil.copytree(os.path.join(src, "t"), os.path.join(dest_root, "t"))
-        print("✅ [1/8] 语言包已拷贝。")
+        print("✅ [1/9] 语言包已拷贝。")
 
-    # --- 步骤 2: 迁移并叠加 index/components.xml ---
-    print("📂 [2/7] 正在迁移 index/components.xml...")
+    # --- 步骤 2: 迁移并叠加 index/macros.xml ---
+    print("📂 [2/9] 正在迁移 index/macros.xml...")
     index_dest_dir = os.path.join(dest_root, "index")
     os.makedirs(index_dest_dir, exist_ok=True)
 
+    macros_base_path = os.path.join(src, "index", "macros.xml")
+    macros_output_path = os.path.join(index_dest_dir, "macros.xml")
+
+    macros_tree = None
+    if os.path.exists(macros_base_path):
+        macros_tree = etree.parse(macros_base_path, parser)
+    else:
+        print(f"      ⚠️ Base 文件不存在: {macros_base_path}")
+        macros_tree = etree.ElementTree(etree.Element("macros"))
+
+    macros_root = macros_tree.getroot()
+    for dlc_id in dlc_order:
+        patch_path = os.path.join(src, "extensions", dlc_id, "index", "macros.xml")
+        if not os.path.exists(patch_path):
+            continue
+        print(f"      [+] 叠加节点 ({dlc_id})")
+        try:
+            patch_tree = etree.parse(patch_path, parser)
+            patch_root = patch_tree.getroot()
+            for node in patch_root:
+                macros_root.append(deepcopy(node))
+        except Exception as e:
+            print(f"      ⚠️ 警告: 叠加失败 {dlc_id}: {e}")
+
+    macros_tree.write(macros_output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
+    print(f"   ✨ 生成: index/macros.xml")
+
+    # 校验重复 name
+    names = [node.get("name") for node in macros_root if node.get("name")]
+    name_counts = {}
+    for name in names:
+        name_counts[name] = name_counts.get(name, 0) + 1
+    dup_names = sorted([name for name, count in name_counts.items() if count > 1])
+    if dup_names:
+        sample = ", ".join(dup_names[:10])
+        more = f" ... (+{len(dup_names)-10} more)" if len(dup_names) > 10 else ""
+        raise RuntimeError(f"❌ index/macros.xml 存在重复 name: {sample}{more}")
+    print(f"   ✅ macros 去重校验通过，共 {len(names)} 个具名元素。")
+
+    # --- 步骤 3: 迁移并叠加 index/components.xml ---
+    print("📂 [3/9] 正在迁移 index/components.xml...")
     components_base_path = os.path.join(src, "index", "components.xml")
     components_output_path = os.path.join(index_dest_dir, "components.xml")
-    parser = etree.XMLParser(remove_blank_text=True)
-    dlc_order = v_config.get('dlc_order', [])
 
     components_tree = None
     if os.path.exists(components_base_path):
@@ -148,8 +190,8 @@ def main():
         )
     print(f"   ✅ name 去重校验通过，共 {len(names)} 个具名元素。")
 
-    # --- 步骤 3: 处理核心库文件 (wares/waregroups/colors/ships/shipgroups/loadouts) ---
-    print("📂 [3/8] 正在处理核心库文件 (Wares/Waregroups/Colors/Ships/Shipgroups/Loadouts)...")
+    # --- 步骤 4: 处理核心库文件 (wares/waregroups/colors/ships/shipgroups/loadouts) ---
+    print("📂 [4/9] 正在处理核心库文件 (Wares/Waregroups/Colors/Ships/Shipgroups/Loadouts)...")
     lib_dest_dir = os.path.join(dest_root, "libraries")
     os.makedirs(lib_dest_dir, exist_ok=True)
 
@@ -162,8 +204,6 @@ def main():
         # loadouts 需要叠加 DLC
         { 'name': 'loadouts.xml', 'final': 'loadouts_final.xml' },
     ]
-    parser = etree.XMLParser(remove_blank_text=True)
-    dlc_order = v_config.get('dlc_order', [])
 
     for lib_file in lib_files:
         lib_name = lib_file['name']
@@ -197,10 +237,10 @@ def main():
         base_tree.write(final_output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
         print(f"      ✨ 生成: {os.path.basename(final_output_path)}")
 
-    # --- 步骤 4: 聚合空间站宏定义 (module_macros.xml) ---
-    print("∑ [4/8] 正在聚合空间站宏定义 (module_macros.xml)...")
-    
-    # 3.1 解析引用 (Needed Macros)
+    # --- 步骤 5: 聚合空间站宏定义 (module_macros.xml) ---
+    print("∑ [5/9] 正在聚合空间站宏定义 (module_macros.xml)...")
+
+    # 5.1 解析引用 (Needed Macros)
     needed_macros = set()
     wares_final_path = os.path.join(lib_dest_dir, "wares_final.xml")
     if os.path.exists(wares_final_path):
@@ -213,48 +253,75 @@ def main():
                     needed_macros.add(comp.get('ref'))
     print(f"   🎯 识别到 {len(needed_macros)} 个空间站相关宏引用。")
 
-    # 3.2 建立索引 (Find files)
-    # macro_id -> { 'base': path, 'dlc_id': path, ... }
-    macro_index = {}
-    
-    def scan_to_index(root_path, source_key):
-        pattern = os.path.join(root_path, "assets", "structures", "**", "*.xml")
-        for f in glob.glob(pattern, recursive=True):
-            fname = os.path.splitext(os.path.basename(f))[0]
-            if fname not in macro_index: macro_index[fname] = {}
-            macro_index[fname][source_key] = f
+    # 5.2 从 index/macros.xml 读取路径映射
+    macro_path_map = {}
+    if os.path.exists(macros_output_path):
+        try:
+            macros_index_tree = etree.parse(macros_output_path, parser)
+            for entry in macros_index_tree.findall(".//macro[@name][@value]"):
+                name = entry.get('name')
+                value = entry.get('value')
+                if name and value:
+                    macro_path_map[name] = value
+        except Exception as e:
+            print(f"      ⚠️ 读取 macros.xml 失败: {e}")
 
-    # 扫描
-    scan_to_index(src, 'base')
-    for dlc_id in dlc_order:
-        p = os.path.join(src, "extensions", dlc_id)
-        if os.path.exists(p): scan_to_index(p, dlc_id)
+    # 5.3 路径解析函数
+    def resolve_macro_sources(path_value):
+        rel = (path_value or "").strip().replace("\\", "/").lstrip("./")
+        if not rel:
+            return {}
+        rel_xml = rel if rel.lower().endswith(".xml") else f"{rel}.xml"
+        rel_xml_os = rel_xml.replace("/", os.sep)
 
-    # 3.3 聚合与熔断检查
+        sources = {}
+        # 路径可能包含 extensions/dlc_name/ 前缀
+        if rel_xml.lower().startswith("extensions/"):
+            # DLC 路径: extensions/dlc_name/assets/...
+            parts = rel_xml.split("/", 2)  # ['extensions', 'dlc_name', 'assets/...']
+            if len(parts) >= 3:
+                dlc_name = parts[1]
+                rest_path = parts[2].replace("/", os.sep)
+                full_path = os.path.join(src, "extensions", dlc_name, rest_path)
+                if os.path.exists(full_path):
+                    sources[dlc_name] = full_path
+        else:
+            # Base 路径
+            base_path = os.path.join(src, rel_xml_os)
+            if os.path.exists(base_path):
+                sources['base'] = base_path
+        return sources
+
+    # 5.4 聚合与熔断检查
     macros_root = etree.Element('macros')
     processed_count = 0
 
     for macro_id in needed_macros:
-        if macro_id not in macro_index: continue
-        sources = macro_index[macro_id]
-        
-        # 加载 Base (如果存在)
+        if macro_id not in macro_path_map:
+            continue
+
+        path_value = macro_path_map[macro_id]
+        sources = resolve_macro_sources(path_value)
+        if not sources:
+            continue
+
+        # 加载 Base
         current_tree = None
         if 'base' in sources:
             try:
                 current_tree = etree.parse(sources['base'], parser)
-            except: pass
-        
+            except:
+                pass
+
         # 按顺序应用 DLC
         for dlc_id in dlc_order:
             if dlc_id in sources:
                 f_path = sources[dlc_id]
                 try:
                     # 🚨 安全熔断检查 🚨
-                    # 读取并解析以检查非法 patch
                     dlc_tree = etree.parse(f_path, parser)
                     dlc_root = dlc_tree.getroot()
-                    
+
                     # 检查所有 add, replace, remove 节点
                     for node in dlc_root.xpath("//*[self::add or self::replace or self::remove]"):
                         sel = node.get('sel', '')
@@ -268,36 +335,29 @@ def main():
                     # 合并逻辑
                     if dlc_root.tag == 'diff':
                         if current_tree:
-                            # Apply patch
                             xml_diff.Apply_Patch(current_tree.getroot(), dlc_root)
-                        else:
-                            # 只有 diff 没有 base? 跳过
-                            pass
                     else:
-                        # Full replacement (macro definition)
                         current_tree = dlc_tree
-                
+
                 except Exception as e:
-                    if "安全熔断" in str(e): raise # 抛出熔断
+                    if "安全熔断" in str(e): raise
                     print(f"      ⚠️ 处理出错 {macro_id} ({dlc_id}): {e}")
 
         # 添加到聚合根
         if current_tree:
             root_node = current_tree.getroot()
-            # 找到 macro 节点 (可能是 root，也可能在里面)
             macro_node = root_node if root_node.tag == 'macro' else root_node.find(f".//macro[@name='{macro_id}']")
-            
             if macro_node is not None:
                 macros_root.append(macro_node)
                 processed_count += 1
 
-    # 3.4 保存
+    # 5.5 保存
     macros_final_path = os.path.join(lib_dest_dir, "module_macros.xml")
     etree.ElementTree(macros_root).write(macros_final_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
-    print(f"✅ 聚合完成: 写入 {processed_count} 个宏定义到 macros_final.xml")
+    print(f"✅ 聚合完成: 写入 {processed_count} 个宏定义到 module_macros.xml")
 
-    # --- 步骤 5: 聚合飞船宏定义 (ship_macros.xml) ---
-    print("∑ [5/8] 正在聚合飞船宏定义 (ship_macros.xml)...")
+    # --- 步骤 6: 聚合飞船宏定义 (ship_macros.xml) ---
+    print("∑ [6/9] 正在聚合飞船宏定义 (ship_macros.xml)...")
 
     ship_macro_index = {}
 
@@ -350,8 +410,8 @@ def main():
     etree.ElementTree(ship_macros_root).write(ship_macros_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
     print(f"✅ 聚合完成: 写入 {ship_processed} 个飞船宏定义到 ship_macros.xml")
 
-    # --- 步骤 6: 聚合飞船组件连接点 (ship_connections.xml) ---
-    print("∑ [6/8] 正在聚合飞船组件连接点 (ship_connections.xml)...")
+    # --- 步骤 7: 聚合飞船组件连接点 (ship_connections.xml) ---
+    print("∑ [7/9] 正在聚合飞船组件连接点 (ship_connections.xml)...")
 
     # 5.1 从 ship_macros.xml 收集需要的 component refs
     ship_components_needed = set()
@@ -456,8 +516,8 @@ def main():
     etree.ElementTree(components_root).write(connections_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
     print(f"✅ 聚合完成: 写入 {components_processed} 个组件定义到 ship_connections.xml")
 
-    # --- 步骤 7: 聚合装备宏定义 (equipment_macros.xml) ---
-    print("∑ [7/8] 正在聚合装备宏定义 (equipment_macros.xml)...")
+    # --- 步骤 8: 聚合装备宏定义 (equipment_macros.xml) ---
+    print("∑ [8/9] 正在聚合装备宏定义 (equipment_macros.xml)...")
 
     equipment_macro_index = {}
 
@@ -520,8 +580,8 @@ def main():
     etree.ElementTree(equipment_macros_root).write(equipment_macros_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
     print(f"✅ 聚合完成: 写入 {equipment_processed} 个装备宏定义到 equipment_macros.xml")
 
-    # --- 步骤 8: 聚合装备组件连接点 (equipment_components.xml) ---
-    print("∑ [8/8] 正在聚合装备组件连接点 (equipment_components.xml)...")
+    # --- 步骤 9: 聚合装备组件连接点 (equipment_components.xml) ---
+    print("∑ [9/9] 正在聚合装备组件连接点 (equipment_components.xml)...")
 
     # 8.1 从 equipment_macros.xml + wares_final.xml 收集 equipment -> component ref 映射。
     # 映射链路: equipment(ware id) -> ware.component(ref=macro) -> equipment_macro.component(ref=component)
