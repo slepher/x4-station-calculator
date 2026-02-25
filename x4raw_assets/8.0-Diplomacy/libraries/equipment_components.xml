@@ -40,11 +40,6 @@
       <connection name="EngineConnection01" tags="engine medium component standard"/>
     </connections>
   </component>
-  <component name="engine_gen_m_corvette_01" class="engine">
-    <connections>
-      <connection name="ship" tags="component engine medium ship_gen_m_corvette_01"/>
-    </connections>
-  </component>
   <component name="engine_arg_m_travel_01_mk1" class="engine">
     <connections>
       <connection name="EngineConnection01" tags="engine medium component standard"/>
@@ -88,11 +83,6 @@
   <component name="engine_arg_s_combat_01_mk3" class="engine">
     <connections>
       <connection name="EngineConnection01" tags="engine small component standard"/>
-    </connections>
-  </component>
-  <component name="engine_gen_s_racer_02_mk1" class="engine">
-    <connections>
-      <connection name="EngineConnection01" tags="engine small component small_racer"/>
     </connections>
   </component>
   <component name="engine_arg_s_travel_01_mk1" class="engine ">
@@ -140,6 +130,11 @@
       <connection name="con_engine_01" tags="advanced component engine extralarge "/>
     </connections>
   </component>
+  <component name="engine_gen_m_corvette_01" class="engine">
+    <connections>
+      <connection name="ship" tags="component engine medium ship_gen_m_corvette_01"/>
+    </connections>
+  </component>
   <component name="engine_gen_m_yacht_01_mk1" class="engine">
     <connections>
       <connection name="con_engine_01" tags="engine medium ship_gen_m_yacht_01 mandatory component "/>
@@ -150,9 +145,9 @@
       <connection name="ship" tags="component engine ship_gen_s_racer_01 small"/>
     </connections>
   </component>
-  <component name="generic_engine_spacesuit" class="engine">
+  <component name="engine_gen_s_racer_02_mk1" class="engine">
     <connections>
-      <connection name="spacesuit" tags="component engine spacesuit standard" optional="0"/>
+      <connection name="EngineConnection01" tags="engine small component small_racer"/>
     </connections>
   </component>
   <component name="engine_kha_l_destroyer_01_allround_01_mk1" class="engine">
@@ -685,6 +680,16 @@
       <connection name="con_engine_01" tags="component engine extralarge ship_xen_xl_mothership_01 "/>
     </connections>
   </component>
+  <component name="generic_engine_spacesuit" class="engine">
+    <connections>
+      <connection name="spacesuit" tags="component engine spacesuit standard" optional="0"/>
+    </connections>
+  </component>
+  <component name="generic_shieldgenerator" class="shieldgenerator">
+    <connections>
+      <connection name="ParentConnection" tags="component shield small unhittable standard" optional="1"/>
+    </connections>
+  </component>
   <component name="shield_arg_l_standard_01_mk1" class="shieldgenerator">
     <connections>
       <connection name="small_Con_shieldgen_01" tags="large shield component standard "/>
@@ -713,11 +718,6 @@
   <component name="shield_arg_m_standard_02_mk2" class="shieldgenerator">
     <connections>
       <connection name="Con_shieldgen_01" tags="medium shield component hittable standard "/>
-    </connections>
-  </component>
-  <component name="shield_gen_s_racer_02_mk1" class="shieldgenerator">
-    <connections>
-      <connection name="Connection01" tags="small shield component unhittable small_racer"/>
     </connections>
   </component>
   <component name="shield_arg_s_standard_01_mk1" class="shieldgenerator">
@@ -805,6 +805,11 @@
       <connection name="ParentConnection" tags="component shield ship_gen_s_racer_01 small"/>
     </connections>
   </component>
+  <component name="shield_gen_s_racer_02_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="Connection01" tags="small shield component unhittable small_racer"/>
+    </connections>
+  </component>
   <component name="shield_kha_l_standard_01_mk1" class="shieldgenerator">
     <connections>
       <connection name="con_shield_01" tags="component khaak large shield "/>
@@ -823,11 +828,6 @@
   <component name="shield_kha_m_standard_03_mk1" class="shieldgenerator">
     <connections>
       <connection name="con_shield_01" tags="component khaak medium shield "/>
-    </connections>
-  </component>
-  <component name="generic_shieldgenerator" class="shieldgenerator">
-    <connections>
-      <connection name="ParentConnection" tags="component shield small unhittable standard" optional="1"/>
     </connections>
   </component>
   <component name="shield_kha_xl_standard_01_mk1" class="shieldgenerator">
@@ -1088,6 +1088,11 @@
   <component name="shield_xen_xl_standard_01_mk1" class="shieldgenerator">
     <connections>
       <connection name="small_Con_shieldgen_01" tags="extralarge shield component  standard "/>
+    </connections>
+  </component>
+  <component name="spacesuit_gen_repairweapon_01" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="component weapon spacesuit repair "/>
     </connections>
   </component>
   <component name="thruster_gen_l_allround_01_mk1" class="engine">
@@ -1865,11 +1870,6 @@
       <connection name="con_turret" tags="combat component large turret xenon "/>
     </connections>
   </component>
-  <component name="turret_xen_m_laser_02_mk1" class="turret">
-    <connections>
-      <connection name="con_laser_turret_01" tags="turret medium standard hittable component combat "/>
-    </connections>
-  </component>
   <component name="turret_xen_m_gatling_01_mk1" class="turret">
     <connections>
       <connection name="con_turret" tags="combat component medium turret unhittable xenon "/>
@@ -1883,6 +1883,11 @@
   <component name="turret_xen_m_laser_01_mk1" class="turret">
     <connections>
       <connection name="con_laser_turret_01" tags="turret medium standard unhittable component combat "/>
+    </connections>
+  </component>
+  <component name="turret_xen_m_laser_02_mk1" class="turret">
+    <connections>
+      <connection name="con_laser_turret_01" tags="turret medium standard hittable component combat "/>
     </connections>
   </component>
   <component name="turret_xen_xl_battleship_01_mk1" class="turret">
@@ -2208,11 +2213,6 @@
   <component name="weapon_gen_s_torpedo_01_mk2" class="missilelauncher">
     <connections>
       <connection name="WeaponCon_01" tags="component weapon small missile standard"/>
-    </connections>
-  </component>
-  <component name="spacesuit_gen_repairweapon_01" class="weapon">
-    <connections>
-      <connection name="WeaponCon_01" tags="component weapon spacesuit repair "/>
     </connections>
   </component>
   <component name="weapon_kha_l_beam_01_mk1" class="weapon">
