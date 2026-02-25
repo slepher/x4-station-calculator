@@ -35,9 +35,11 @@ def main():
     m_config, v_config = load_all_configs()
     xml_diff = setup_customizer(m_config)
     
+    # 获取配置文件所在目录，用于解析相对路径
+    config_dir = os.path.dirname(os.path.abspath(config_file))
     paths = m_config['X4_PATHS']
-    src = paths['SOURCE']
-    dest_root = os.path.join(v_config['raw_assets_dir'], v_config['folder_name'])
+    src = os.path.normpath(os.path.join(config_dir, paths['SOURCE']))
+    dest_root = os.path.normpath(os.path.join(config_dir, v_config['raw_assets_dir'], v_config['folder_name']))
 
     print(f"🧪 开始资产蒸馏流: {v_config['folder_name']}")
 
