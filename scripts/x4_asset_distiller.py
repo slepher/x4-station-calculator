@@ -90,9 +90,9 @@ def main():
         except Exception as e:
             print(f"      ⚠️ 警告: 叠加失败 {dlc_id}: {e}")
 
-    # 过滤 value 路径包含 assets/test 的 macro 元素（兼容 / 与 \）。
+    # 过滤 value 路径包含 assets/test 的 entry 元素（兼容 / 与 \）。
     removed_test_entries = 0
-    for entry in list(macros_root.findall(".//macro[@value]")):
+    for entry in list(macros_root.findall(".//entry[@value]")):
         value = (entry.get("value") or "").lower().replace("\\", "/")
         if "assets/test" in value:
             parent = entry.getparent()
@@ -104,7 +104,7 @@ def main():
 
     # 规范 value 中的双反斜杠，避免路径格式差异导致去重失败。
     normalized_double_slash = 0
-    for entry in macros_root.findall(".//macro[@value]"):
+    for entry in macros_root.findall(".//entry[@value]"):
         value = entry.get("value") or ""
         normalized = value
         while "\\\\" in normalized:
@@ -113,7 +113,7 @@ def main():
             entry.set("value", normalized)
             normalized_double_slash += 1
     if normalized_double_slash:
-        print(f"   🔧 已规范 {normalized_double_slash} 个 macro.value 双反斜杠。")
+        print(f"   🔧 已规范 {normalized_double_slash} 个 entry.value 双反斜杠。")
 
     # name 相同且内容完全一致的节点自动去重合并
     merged_same_content = 0
