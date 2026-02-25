@@ -82,6 +82,18 @@ def main():
             tree = etree.ElementTree(etree.Element(root_element_name))
 
         root = tree.getroot()
+
+        # 构建所有来源：先处理 base
+        all_entry_sources = {}
+        for node in root:
+            name = node.get("name")
+            value = node.get("value") or ""
+            if name:
+                if name not in all_entry_sources:
+                    all_entry_sources[name] = []
+                all_entry_sources[name].append(('base', value))
+
+        # 叠加 DLC，并在 all_entry_sources 中记录来源
         for dlc_id in dlc_order:
             patch_path = os.path.join(src, "extensions", dlc_id, "index", index_name)
             if not os.path.exists(patch_path):
@@ -91,6 +103,13 @@ def main():
                 patch_tree = etree.parse(patch_path, parser)
                 patch_root = patch_tree.getroot()
                 for node in patch_root:
+                    name = node.get("name")
+                    value = node.get("value") or ""
+                    # 记录 DLC 来源
+                    if name:
+                        if name not in all_entry_sources:
+                            all_entry_sources[name] = []
+                        all_entry_sources[name].append((dlc_id, value))
                     root.append(deepcopy(node))
             except Exception as e:
                 print(f"      ⚠️ 警告: 叠加失败 {dlc_id}: {e}")
@@ -107,16 +126,6 @@ def main():
                 normalized_double_slash += 1
         if normalized_double_slash:
             print(f"   🔧 已规范 {normalized_double_slash} 个 entry.value 双反斜杠。")
-
-        # 规范化后构建所有来源（用于后续警告输出）
-        all_entry_sources = {}
-        for node in root:
-            name = node.get("name")
-            value = node.get("value") or ""
-            if name:
-                if name not in all_entry_sources:
-                    all_entry_sources[name] = []
-                all_entry_sources[name].append(('base', value))
 
         # name 相同且内容完全一致的节点自动去重合并
         merged_same_content = 0
@@ -172,7 +181,6 @@ def main():
                 for i, (dlc_id, val) in enumerate(sources):
                     name_col = name if i == 0 else ""
                     print(f"      {name_col:<{name_width}} | {dlc_id:<{src_width}} | {val}")
-                print(f"      {' ' * name_width} | {' ' * src_width} | (保留最后一条)")
 
         # 写出文件
         tree.write(output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
