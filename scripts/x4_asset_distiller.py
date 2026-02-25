@@ -271,6 +271,7 @@ def main():
                 if comp is not None and comp.get('ref'):
                     needed_macros.add(comp.get('ref'))
     print(f"   🎯 识别到 {len(needed_macros)} 个空间站相关宏引用。")
+    needed_macros = sorted(needed_macros)
 
     # 5.2 从 index/macros.xml 读取路径映射
     macro_path_map = {}
@@ -389,7 +390,7 @@ def main():
             print(f"      ⚠️ 读取 macros.xml 失败: {e}")
 
     # 6.2 过滤出 ship_*_macro
-    ship_macro_ids = [k for k in ship_macro_path_map.keys() if k.startswith('ship_') and k.endswith('_macro')]
+    ship_macro_ids = sorted([k for k in ship_macro_path_map.keys() if k.startswith('ship_') and k.endswith('_macro')])
     print(f"   🎯 识别到 {len(ship_macro_ids)} 个飞船宏引用。")
 
     ship_macros_root = etree.Element('macros')
@@ -449,6 +450,7 @@ def main():
         except Exception as e:
             print(f"      ⚠️ 读取 ship_macros.xml 失败: {e}")
     print(f"   🎯 识别到 {len(ship_components_needed)} 个飞船组件引用。")
+    ship_components_needed = sorted(ship_components_needed)
 
     # 7.2 从 components.xml 读取路径映射
     component_path_map = {}
@@ -561,10 +563,10 @@ def main():
 
     # 8.2 过滤出 equipment 相关的宏（engine, thruster, shield, weapon, turret）
     equipment_keywords = ['engine', 'thruster', 'shield', 'weapon', 'turret']
-    equipment_macro_ids = [
+    equipment_macro_ids = sorted([
         k for k in equipment_macro_path_map.keys()
         if any(kw in k.lower() for kw in equipment_keywords) and k.endswith('_macro')
-    ]
+    ])
     print(f"   🎯 识别到 {len(equipment_macro_ids)} 个装备宏引用。")
 
     equipment_macros_root = etree.Element('macros')
@@ -641,8 +643,8 @@ def main():
             print(f"      ⚠️ 读取 equipment_macros.xml 失败: {e}")
     print(f"   🎯 从 bullet class 识别到 {len(bullet_macro_refs)} 个子弹宏引用。")
 
-    # 9.3 合并去重
-    all_bullet_macro_ids = missile_macro_refs.union(bullet_macro_refs)
+    # 9.3 合并去重并排序
+    all_bullet_macro_ids = sorted(missile_macro_refs.union(bullet_macro_refs))
     print(f"   🎯 合并后共 {len(all_bullet_macro_ids)} 个子弹/导弹宏。")
 
     # 9.4 导出 bullet_macros
@@ -763,7 +765,7 @@ def main():
     components_processed_out = 0
 
     processed_component_refs = set()
-    for equipment_id, component_ref in equipment_to_component_ref.items():
+    for equipment_id, component_ref in sorted(equipment_to_component_ref.items()):
         if component_ref in processed_component_refs:
             continue
         path_value = component_path_by_equipment_id.get(component_ref)
