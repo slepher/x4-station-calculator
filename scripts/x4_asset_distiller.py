@@ -285,8 +285,8 @@ def main():
         except Exception as e:
             print(f"      ⚠️ 读取 macros.xml 失败: {e}")
 
-    # 5.3 路径解析函数
-    def resolve_macro_sources(path_value):
+    # 5.3 路径解析函数（统一）
+    def resolve_sources(path_value):
         rel = (path_value or "").strip().replace("\\", "/").lstrip("./")
         if not rel:
             return {}
@@ -294,10 +294,8 @@ def main():
         rel_xml_os = rel_xml.replace("/", os.sep)
 
         sources = {}
-        # 路径可能包含 extensions/dlc_name/ 前缀
         if rel_xml.lower().startswith("extensions/"):
-            # DLC 路径: extensions/dlc_name/assets/...
-            parts = rel_xml.split("/", 2)  # ['extensions', 'dlc_name', 'assets/...']
+            parts = rel_xml.split("/", 2)
             if len(parts) >= 3:
                 dlc_name = parts[1]
                 rest_path = parts[2].replace("/", os.sep)
@@ -305,7 +303,6 @@ def main():
                 if os.path.exists(full_path):
                     sources[dlc_name] = full_path
         else:
-            # Base 路径
             base_path = os.path.join(src, rel_xml_os)
             if os.path.exists(base_path):
                 sources['base'] = base_path
@@ -320,7 +317,7 @@ def main():
             continue
 
         path_value = macro_path_map[macro_id]
-        sources = resolve_macro_sources(path_value)
+        sources = resolve_sources(path_value)
         if not sources:
             continue
 
@@ -378,25 +375,34 @@ def main():
     # --- 步骤 6: 聚合飞船宏定义 (ship_macros.xml) ---
     print("∑ [6/9] 正在聚合飞船宏定义 (ship_macros.xml)...")
 
-    ship_macro_index = {}
+    # 6.1 从 index/macros.xml 读取所有宏路径
+    ship_macro_path_map = {}
+    if os.path.exists(macros_output_path):
+        try:
+            macros_index_tree = etree.parse(macros_output_path, parser)
+            for entry in macros_index_tree.findall(".//entry[@name][@value]"):
+                name = entry.get('name')
+                value = entry.get('value')
+                if name and value:
+                    ship_macro_path_map[name] = value
+        except Exception as e:
+            print(f"      ⚠️ 读取 macros.xml 失败: {e}")
 
-    def scan_macros_to_index(root_path, source_key, pattern):
-        for f in glob.glob(pattern, recursive=True):
-            fname = os.path.splitext(os.path.basename(f))[0]
-            if fname not in ship_macro_index:
-                ship_macro_index[fname] = {}
-            ship_macro_index[fname][source_key] = f
-
-    scan_macros_to_index(src, 'base', os.path.join(src, "assets", "**", "macros", "ship_*_macro.xml"))
-    for dlc_id in dlc_order:
-        p = os.path.join(src, "extensions", dlc_id)
-        if os.path.exists(p):
-            scan_macros_to_index(p, dlc_id, os.path.join(p, "assets", "**", "macros", "ship_*_macro.xml"))
+    # 6.2 过滤出 ship_*_macro
+    ship_macro_ids = [k for k in ship_macro_path_map.keys() if k.startswith('ship_') and k.endswith('_macro')]
+    print(f"   🎯 识别到 {len(ship_macro_ids)} 个飞船宏引用。")
 
     ship_macros_root = etree.Element('macros')
     ship_processed = 0
 
-    for macro_id, sources in ship_macro_index.items():
+    for macro_id in ship_macro_ids:
+        path_value = ship_macro_path_map.get(macro_id)
+        if not path_value:
+            continue
+        sources = resolve_sources(path_value)
+        if not sources:
+            continue
+
         current_tree = None
         if 'base' in sources:
             try:
@@ -457,29 +463,6 @@ def main():
         except Exception as e:
             print(f"      ⚠️ 读取 components.xml 失败: {e}")
 
-    # 7.3 路径解析函数
-    def resolve_component_sources(path_value):
-        rel = (path_value or "").strip().replace("\\", "/").lstrip("./")
-        if not rel:
-            return {}
-        rel_xml = rel if rel.lower().endswith(".xml") else f"{rel}.xml"
-        rel_xml_os = rel_xml.replace("/", os.sep)
-
-        sources = {}
-        if rel_xml.lower().startswith("extensions/"):
-            parts = rel_xml.split("/", 2)
-            if len(parts) >= 3:
-                dlc_name = parts[1]
-                rest_path = parts[2].replace("/", os.sep)
-                full_path = os.path.join(src, "extensions", dlc_name, rest_path)
-                if os.path.exists(full_path):
-                    sources[dlc_name] = full_path
-        else:
-            base_path = os.path.join(src, rel_xml_os)
-            if os.path.exists(base_path):
-                sources['base'] = base_path
-        return sources
-
     # 7.4 过滤连接点
     keep_tag_keywords = [
         'engine', 'shield', 'turret', 'weapon',
@@ -517,7 +500,7 @@ def main():
             continue
 
         path_value = component_path_map[comp_id]
-        sources = resolve_component_sources(path_value)
+        sources = resolve_sources(path_value)
         if not sources:
             continue
 
@@ -563,35 +546,38 @@ def main():
     # --- 步骤 8: 聚合装备宏定义 (equipment_macros.xml) ---
     print("∑ [8/9] 正在聚合装备宏定义 (equipment_macros.xml)...")
 
-    equipment_macro_index = {}
+    # 8.1 从 index/macros.xml 读取所有宏路径
+    equipment_macro_path_map = {}
+    if os.path.exists(macros_output_path):
+        try:
+            macros_index_tree = etree.parse(macros_output_path, parser)
+            for entry in macros_index_tree.findall(".//entry[@name][@value]"):
+                name = entry.get('name')
+                value = entry.get('value')
+                if name and value:
+                    equipment_macro_path_map[name] = value
+        except Exception as e:
+            print(f"      ⚠️ 读取 macros.xml 失败: {e}")
 
-    def scan_equipment_to_index(root_path, source_key, pattern):
-        for f in glob.glob(pattern, recursive=True):
-            fname = os.path.splitext(os.path.basename(f))[0]
-            if fname not in equipment_macro_index:
-                equipment_macro_index[fname] = {}
-            equipment_macro_index[fname][source_key] = f
-
-    equipment_patterns = [
-        os.path.join("assets", "props", "**", "macros", "*engine*_macro.xml"),
-        os.path.join("assets", "props", "**", "macros", "*thruster*_macro.xml"),
-        os.path.join("assets", "props", "**", "macros", "*shield*_macro.xml"),
-        os.path.join("assets", "props", "**", "macros", "*weapon*_macro.xml"),
-        os.path.join("assets", "props", "**", "macros", "*turret*_macro.xml"),
+    # 8.2 过滤出 equipment 相关的宏（engine, thruster, shield, weapon, turret）
+    equipment_keywords = ['engine', 'thruster', 'shield', 'weapon', 'turret']
+    equipment_macro_ids = [
+        k for k in equipment_macro_path_map.keys()
+        if any(kw in k.lower() for kw in equipment_keywords) and k.endswith('_macro')
     ]
-
-    for pattern in equipment_patterns:
-        scan_equipment_to_index(src, 'base', os.path.join(src, pattern))
-    for dlc_id in dlc_order:
-        p = os.path.join(src, "extensions", dlc_id)
-        if os.path.exists(p):
-            for pattern in equipment_patterns:
-                scan_equipment_to_index(p, dlc_id, os.path.join(p, pattern))
+    print(f"   🎯 识别到 {len(equipment_macro_ids)} 个装备宏引用。")
 
     equipment_macros_root = etree.Element('macros')
     equipment_processed = 0
 
-    for macro_id, sources in equipment_macro_index.items():
+    for macro_id in equipment_macro_ids:
+        path_value = equipment_macro_path_map.get(macro_id)
+        if not path_value:
+            continue
+        sources = resolve_sources(path_value)
+        if not sources:
+            continue
+
         current_tree = None
         if 'base' in sources:
             try:
@@ -704,7 +690,7 @@ def main():
         path_value = component_path_by_equipment_id.get(component_ref)
         if not path_value:
             continue
-        sources = resolve_component_sources(path_value)
+        sources = resolve_sources(path_value)
         if not sources:
             continue
 
