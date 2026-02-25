@@ -74,9 +74,6 @@ def main():
         base_path = os.path.join(src, "index", index_name)
         output_path = os.path.join(dest_dir, index_name)
 
-        # 记录每个 entry 的来源: name -> [(source, value), ...]
-        entry_sources = {}
-
         tree = None
         if os.path.exists(base_path):
             tree = etree.parse(base_path, parser)
@@ -111,6 +108,16 @@ def main():
         if normalized_double_slash:
             print(f"   🔧 已规范 {normalized_double_slash} 个 entry.value 双反斜杠。")
 
+        # 规范化后构建所有来源（用于后续警告输出）
+        all_entry_sources = {}
+        for node in root:
+            name = node.get("name")
+            value = node.get("value") or ""
+            if name:
+                if name not in all_entry_sources:
+                    all_entry_sources[name] = []
+                all_entry_sources[name].append(('base', value))
+
         # name 相同且内容完全一致的节点自动去重合并
         merged_same_content = 0
         seen_name_and_content = set()
@@ -128,16 +135,6 @@ def main():
         if merged_same_content:
             print(f"   ♻️ 已合并 {merged_same_content} 个同名同内容节点。")
 
-        # 去重后重新构建 entry_sources（只保留还在 root 中的 entry 的来源）
-        entry_sources = {}
-        for node in root:
-            name = node.get("name")
-            value = node.get("value") or ""
-            if name:
-                if name not in entry_sources:
-                    entry_sources[name] = []
-                entry_sources[name].append(('base', value))
-
         # 处理重复 name（不同内容）：保留最后一条，警告并列出历史路径
         from collections import OrderedDict
         name_to_entries = OrderedDict()
@@ -154,23 +151,13 @@ def main():
             if len(entries) <= 1:
                 continue
             # 有重复，保留最后一个，删除前面的
-            # 获取保留节点的 value
-            remaining_value = entries[-1].get("value") or ""
-            # 从 entry_sources 中找到与保留节点 value 匹配的来源
-            sources = entry_sources.get(name, [])
-            kept_sources = []
-            for src, val in sources:
-                # 比较时考虑规范化
-                if val == remaining_value or val.replace("\\\\", "\\") == remaining_value.replace("\\\\", "\\"):
-                    kept_sources.append((src, val))
-            # 如果精确匹配没找到，取最后一个来源
-            if not kept_sources and sources:
-                kept_sources = [sources[-1]]
+            # 使用 all_entry_sources 显示所有冲突来源
+            sources = all_entry_sources.get(name, [])
 
             for old_node in entries[:-1]:
                 root.remove(old_node)
-            # 记录重复信息用于表格输出
-            dup_entries.append((name, kept_sources))
+            # 记录重复信息用于表格输出（显示所有来源）
+            dup_entries.append((name, sources))
 
         if dup_entries:
             print(f"   ⚠️ 发现 {len(dup_entries)} 个同名不同内容节点，已保留最后一条:")
