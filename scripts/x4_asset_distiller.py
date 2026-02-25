@@ -286,95 +286,74 @@ def main():
         except Exception as e:
             print(f"      ⚠️ 读取 macros.xml 失败: {e}")
 
-    # 5.3 路径解析函数（统一）
+    # 路径解析函数
     def resolve_sources(path_value):
         rel = (path_value or "").strip().replace("\\", "/").lstrip("./")
         if not rel:
-            return {}
+            return None
         rel_xml = rel if rel.lower().endswith(".xml") else f"{rel}.xml"
         rel_xml_os = rel_xml.replace("/", os.sep)
+        full_path = os.path.join(src, rel_xml_os)
+        if os.path.exists(full_path):
+            return full_path
+        return None
 
-        sources = {}
-        if rel_xml.lower().startswith("extensions/"):
-            parts = rel_xml.split("/", 2)
-            if len(parts) >= 3:
-                dlc_name = parts[1]
-                rest_path = parts[2].replace("/", os.sep)
-                full_path = os.path.join(src, "extensions", dlc_name, rest_path)
-                if os.path.exists(full_path):
-                    sources[dlc_name] = full_path
-        else:
-            base_path = os.path.join(src, rel_xml_os)
-            if os.path.exists(base_path):
-                sources['base'] = base_path
-        return sources
+    # 通用函数：根据 ID 列表导出 macro/component 文件
+    # filter_fn: 过滤函数，接收节点返回是否保留，None 表示不过滤
+    # transform_fn: 转换函数，在节点添加到根之前对其进行转换，None 表示不转换
+    def export_ids_to_file(id_list, path_map, output_path, root_tag='macros', node_tag='macro', filter_fn=None, transform_fn=None):
+        # 排序去重
+        sorted_ids = sorted(set(id_list))
+        print(f"   🎯 处理 {len(sorted_ids)} 个 {node_tag}。")
 
-    # 5.4 聚合与熔断检查
-    macros_root = etree.Element('macros')
-    processed_count = 0
+        root = etree.Element(root_tag)
+        processed = 0
 
-    for macro_id in needed_macros:
-        if macro_id not in macro_path_map:
-            continue
+        for node_id in sorted_ids:
+            path_value = path_map.get(node_id)
+            if not path_value:
+                continue
 
-        path_value = macro_path_map[macro_id]
-        sources = resolve_sources(path_value)
-        if not sources:
-            continue
+            file_path = resolve_sources(path_value)
+            if not file_path:
+                continue
 
-        # 加载 Base
-        current_tree = None
-        if 'base' in sources:
             try:
-                current_tree = etree.parse(sources['base'], parser)
-            except:
-                pass
+                tree = etree.parse(file_path, parser)
+                root_node = tree.getroot()
 
-        # 按顺序应用 DLC
-        for dlc_id in dlc_order:
-            if dlc_id in sources:
-                f_path = sources[dlc_id]
-                try:
-                    # 🚨 安全熔断检查 🚨
-                    dlc_tree = etree.parse(f_path, parser)
-                    dlc_root = dlc_tree.getroot()
+                # 提取目标节点
+                node = root_node if root_node.tag == node_tag else root_node.find(f".//{node_tag}[@name='{node_id}']")
+                if node is None:
+                    continue
 
-                    # 检查所有 add, replace, remove 节点
-                    for node in dlc_root.xpath("//*[self::add or self::replace or self::remove]"):
-                        sel = node.get('sel', '')
-                        # 检查 sel 是否指向 /wares (即修改全局配方)
-                        if sel and (sel.strip().startswith('/wares') or '/wares/' in sel):
-                            print(f"\n❌ 严重违规: DLC ({dlc_id}) 文件试图修改全局 wares 配方!")
-                            print(f"   文件: {f_path}")
-                            print(f"   节点: <{node.tag} sel='{sel}'>")
-                            raise RuntimeError("🛡️ 安全熔断触发: 检测到非法的全局配方修改操作。")
+                # 可选过滤
+                if filter_fn and not filter_fn(node):
+                    continue
 
-                    # 合并逻辑
-                    if dlc_root.tag == 'diff':
-                        if current_tree:
-                            xml_diff.Apply_Patch(current_tree.getroot(), dlc_root)
-                    else:
-                        current_tree = dlc_tree
+                # 可选转换（用于过滤 component 内部的连接点等）
+                if transform_fn:
+                    node = transform_fn(node)
+                    if node is None:
+                        continue
 
-                except Exception as e:
-                    if "安全熔断" in str(e): raise
-                    print(f"      ⚠️ 处理出错 {macro_id} ({dlc_id}): {e}")
+                root.append(node)
+                processed += 1
+            except Exception as e:
+                print(f"      ⚠️ 处理出错 {node_id}: {e}")
 
-        # 添加到聚合根
-        if current_tree:
-            root_node = current_tree.getroot()
-            macro_node = root_node if root_node.tag == 'macro' else root_node.find(f".//macro[@name='{macro_id}']")
-            if macro_node is not None:
-                macros_root.append(macro_node)
-                processed_count += 1
+        # 写入文件
+        etree.ElementTree(root).write(output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
+        return processed
 
-    # 5.5 保存
-    macros_final_path = os.path.join(lib_dest_dir, "module_macros.xml")
-    etree.ElementTree(macros_root).write(macros_final_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
+    # 5.4 导出 module_macros
+    print("∑ [5/10] 正在聚合空间站宏定义 (module_macros.xml)...")
+    module_macros_path = os.path.join(lib_dest_dir, "module_macros.xml")
+    processed_count = export_ids_to_file(needed_macros, macro_path_map, module_macros_path, 'macros', 'macro')
     print(f"✅ 聚合完成: 写入 {processed_count} 个宏定义到 module_macros.xml")
 
     # --- 步骤 6: 聚合飞船宏定义 (ship_macros.xml) ---
-    print("∑ [6/9] 正在聚合飞船宏定义 (ship_macros.xml)...")
+    print("∑ [6/10] 正在聚合飞船宏定义 (ship_macros.xml)...")
 
     # 6.1 从 index/macros.xml 读取所有宏路径
     ship_macro_path_map = {}
@@ -390,50 +369,11 @@ def main():
             print(f"      ⚠️ 读取 macros.xml 失败: {e}")
 
     # 6.2 过滤出 ship_*_macro
-    ship_macro_ids = sorted([k for k in ship_macro_path_map.keys() if k.startswith('ship_') and k.endswith('_macro')])
+    ship_macro_ids = [k for k in ship_macro_path_map.keys() if k.startswith('ship_') and k.endswith('_macro')]
     print(f"   🎯 识别到 {len(ship_macro_ids)} 个飞船宏引用。")
 
-    ship_macros_root = etree.Element('macros')
-    ship_processed = 0
-
-    for macro_id in ship_macro_ids:
-        path_value = ship_macro_path_map.get(macro_id)
-        if not path_value:
-            continue
-        sources = resolve_sources(path_value)
-        if not sources:
-            continue
-
-        current_tree = None
-        if 'base' in sources:
-            try:
-                current_tree = etree.parse(sources['base'], parser)
-            except:
-                pass
-
-        for dlc_id in dlc_order:
-            if dlc_id in sources:
-                f_path = sources[dlc_id]
-                try:
-                    dlc_tree = etree.parse(f_path, parser)
-                    dlc_root = dlc_tree.getroot()
-                    if dlc_root.tag == 'diff':
-                        if current_tree:
-                            xml_diff.Apply_Patch(current_tree.getroot(), dlc_root)
-                    else:
-                        current_tree = dlc_tree
-                except Exception as e:
-                    print(f"      ⚠️ 处理出错 {macro_id} ({dlc_id}): {e}")
-
-        if current_tree:
-            root_node = current_tree.getroot()
-            macro_node = root_node if root_node.tag == 'macro' else root_node.find(f".//macro[@name='{macro_id}']")
-            if macro_node is not None:
-                ship_macros_root.append(macro_node)
-                ship_processed += 1
-
     ship_macros_path = os.path.join(lib_dest_dir, "ship_macros.xml")
-    etree.ElementTree(ship_macros_root).write(ship_macros_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
+    ship_processed = export_ids_to_file(ship_macro_ids, ship_macro_path_map, ship_macros_path)
     print(f"✅ 聚合完成: 写入 {ship_processed} 个飞船宏定义到 ship_macros.xml")
 
     # --- 步骤 7: 聚合飞船组件连接点 (ship_components.xml) ---
@@ -450,7 +390,6 @@ def main():
         except Exception as e:
             print(f"      ⚠️ 读取 ship_macros.xml 失败: {e}")
     print(f"   🎯 识别到 {len(ship_components_needed)} 个飞船组件引用。")
-    ship_components_needed = sorted(ship_components_needed)
 
     # 7.2 从 components.xml 读取路径映射
     component_path_map = {}
@@ -465,7 +404,7 @@ def main():
         except Exception as e:
             print(f"      ⚠️ 读取 components.xml 失败: {e}")
 
-    # 7.4 过滤连接点
+    # 7.3 过滤连接点
     keep_tag_keywords = [
         'engine', 'shield', 'turret', 'weapon',
         'thruster', 'dockingbay', 'dock', 'storage', 'cockpit'
@@ -475,7 +414,7 @@ def main():
         tags = (conn.get('tags') or '').lower()
         return any(key in tags for key in keep_tag_keywords)
 
-    def clone_component_with_filtered_connections(component):
+    def transform_ship_component(component):
         new_comp = etree.Element('component')
         for attr, value in component.attrib.items():
             new_comp.set(attr, value)
@@ -494,55 +433,15 @@ def main():
             kept += 1
         return new_comp if kept > 0 else None
 
-    components_root = etree.Element('components')
-    components_processed = 0
-
-    for comp_id in ship_components_needed:
-        if comp_id not in component_path_map:
-            continue
-
-        path_value = component_path_map[comp_id]
-        sources = resolve_sources(path_value)
-        if not sources:
-            continue
-
-        current_tree = None
-        if 'base' in sources:
-            try:
-                current_tree = etree.parse(sources['base'], parser)
-            except:
-                pass
-
-        for dlc_id in dlc_order:
-            if dlc_id in sources:
-                f_path = sources[dlc_id]
-                try:
-                    dlc_tree = etree.parse(f_path, parser)
-                    dlc_root = dlc_tree.getroot()
-                    if dlc_root.tag == 'diff':
-                        if current_tree:
-                            xml_diff.Apply_Patch(current_tree.getroot(), dlc_root)
-                    else:
-                        current_tree = dlc_tree
-                except Exception as e:
-                    print(f"      ⚠️ 处理出错 {comp_id} ({dlc_id}): {e}")
-
-        if current_tree:
-            root_node = current_tree.getroot()
-            if root_node.tag == 'component':
-                filtered = clone_component_with_filtered_connections(root_node)
-                if filtered is not None:
-                    components_root.append(filtered)
-                    components_processed += 1
-            elif root_node.tag == 'components':
-                for node in root_node.findall('component'):
-                    filtered = clone_component_with_filtered_connections(node)
-                    if filtered is not None:
-                        components_root.append(filtered)
-                        components_processed += 1
-
     connections_path = os.path.join(lib_dest_dir, "ship_components.xml")
-    etree.ElementTree(components_root).write(connections_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
+    components_processed = export_ids_to_file(
+        list(ship_components_needed),
+        component_path_map,
+        connections_path,
+        root_tag='components',
+        node_tag='component',
+        transform_fn=transform_ship_component
+    )
     print(f"✅ 聚合完成: 写入 {components_processed} 个组件定义到 ship_components.xml")
 
     # --- 步骤 8: 聚合装备宏定义 (equipment_macros.xml) ---
@@ -563,53 +462,14 @@ def main():
 
     # 8.2 过滤出 equipment 相关的宏（engine, thruster, shield, weapon, turret）
     equipment_keywords = ['engine', 'thruster', 'shield', 'weapon', 'turret']
-    equipment_macro_ids = sorted([
+    equipment_macro_ids = [
         k for k in equipment_macro_path_map.keys()
         if any(kw in k.lower() for kw in equipment_keywords) and k.endswith('_macro')
-    ])
+    ]
     print(f"   🎯 识别到 {len(equipment_macro_ids)} 个装备宏引用。")
 
-    equipment_macros_root = etree.Element('macros')
-    equipment_processed = 0
-
-    for macro_id in equipment_macro_ids:
-        path_value = equipment_macro_path_map.get(macro_id)
-        if not path_value:
-            continue
-        sources = resolve_sources(path_value)
-        if not sources:
-            continue
-
-        current_tree = None
-        if 'base' in sources:
-            try:
-                current_tree = etree.parse(sources['base'], parser)
-            except:
-                pass
-
-        for dlc_id in dlc_order:
-            if dlc_id in sources:
-                f_path = sources[dlc_id]
-                try:
-                    dlc_tree = etree.parse(f_path, parser)
-                    dlc_root = dlc_tree.getroot()
-                    if dlc_root.tag == 'diff':
-                        if current_tree:
-                            xml_diff.Apply_Patch(current_tree.getroot(), dlc_root)
-                    else:
-                        current_tree = dlc_tree
-                except Exception as e:
-                    print(f"      ⚠️ 处理出错 {macro_id} ({dlc_id}): {e}")
-
-        if current_tree:
-            root_node = current_tree.getroot()
-            macro_node = root_node if root_node.tag == 'macro' else root_node.find(f".//macro[@name='{macro_id}']")
-            if macro_node is not None:
-                equipment_macros_root.append(macro_node)
-                equipment_processed += 1
-
     equipment_macros_path = os.path.join(lib_dest_dir, "equipment_macros.xml")
-    etree.ElementTree(equipment_macros_root).write(equipment_macros_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
+    equipment_processed = export_ids_to_file(equipment_macro_ids, equipment_macro_path_map, equipment_macros_path)
     print(f"✅ 聚合完成: 写入 {equipment_processed} 个装备宏定义到 equipment_macros.xml")
 
     # --- 步骤 9: 聚合子弹/导弹宏定义 (bullet_macros.xml) ---
@@ -643,58 +503,19 @@ def main():
             print(f"      ⚠️ 读取 equipment_macros.xml 失败: {e}")
     print(f"   🎯 从 bullet class 识别到 {len(bullet_macro_refs)} 个子弹宏引用。")
 
-    # 9.3 合并去重并排序
-    all_bullet_macro_ids = sorted(missile_macro_refs.union(bullet_macro_refs))
+    # 9.3 合并去重
+    all_bullet_macro_ids = list(missile_macro_refs.union(bullet_macro_refs))
     print(f"   🎯 合并后共 {len(all_bullet_macro_ids)} 个子弹/导弹宏。")
 
     # 9.4 导出 bullet_macros
-    bullet_macros_root = etree.Element('macros')
-    bullet_processed = 0
-
-    for macro_id in all_bullet_macro_ids:
-        path_value = equipment_macro_path_map.get(macro_id)
-        if not path_value:
-            continue
-        sources = resolve_sources(path_value)
-        if not sources:
-            continue
-
-        current_tree = None
-        if 'base' in sources:
-            try:
-                current_tree = etree.parse(sources['base'], parser)
-            except:
-                pass
-
-        for dlc_id in dlc_order:
-            if dlc_id in sources:
-                f_path = sources[dlc_id]
-                try:
-                    dlc_tree = etree.parse(f_path, parser)
-                    dlc_root = dlc_tree.getroot()
-                    if dlc_root.tag == 'diff':
-                        if current_tree:
-                            xml_diff.Apply_Patch(current_tree.getroot(), dlc_root)
-                    else:
-                        current_tree = dlc_tree
-                except Exception as e:
-                    print(f"      ⚠️ 处理出错 {macro_id} ({dlc_id}): {e}")
-
-        if current_tree:
-            root_node = current_tree.getroot()
-            macro_node = root_node if root_node.tag == 'macro' else root_node.find(f".//macro[@name='{macro_id}']")
-            if macro_node is not None:
-                bullet_macros_root.append(macro_node)
-                bullet_processed += 1
-
     bullet_macros_path = os.path.join(lib_dest_dir, "bullet_macros.xml")
-    etree.ElementTree(bullet_macros_root).write(bullet_macros_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
+    bullet_processed = export_ids_to_file(all_bullet_macro_ids, equipment_macro_path_map, bullet_macros_path)
     print(f"✅ 聚合完成: 写入 {bullet_processed} 个子弹/导弹宏定义到 bullet_macros.xml")
 
     # --- 步骤 10: 聚合装备组件连接点 (equipment_components.xml) ---
     print("∑ [10/10] 正在聚合装备组件连接点 (equipment_components.xml)...")
 
-    # 8.1 从 equipment_macros.xml + wares_final.xml 收集 equipment -> component ref 映射。
+    # 10.1 从 equipment_macros.xml + wares_final.xml 收集 equipment -> component ref 映射。
     # 映射链路: equipment(ware id) -> ware.component(ref=macro) -> equipment_macro.component(ref=component)
     equipment_to_component_ref = {}
     macro_to_component_ref = {}
@@ -725,25 +546,29 @@ def main():
             print(f"      ⚠️ 读取 wares_final.xml 失败: {e}")
     print(f"   🎯 识别到 {len(equipment_to_component_ref)} 条 equipment -> component 映射。")
 
-    # 8.2 从已整合的 index/components.xml 构建 equipment_id -> component_path 映射。
-    component_path_by_equipment_id = {}
+    # 10.2 提取唯一的 component refs（去重）
+    unique_component_refs = list(set(equipment_to_component_ref.values()))
+    print(f"   🎯 去重后共 {len(unique_component_refs)} 个唯一组件。")
+
+    # 10.3 从已整合的 index/components.xml 构建 component_path 映射。
+    component_path_map = {}
     if os.path.exists(components_output_path):
         try:
             components_index_tree = etree.parse(components_output_path, parser)
             for entry in components_index_tree.findall(".//entry[@name][@value]"):
                 name = entry.get('name')
                 value = entry.get('value')
-                if name and value and name not in component_path_by_equipment_id:
-                    component_path_by_equipment_id[name] = value
+                if name and value:
+                    component_path_map[name] = value
         except Exception as e:
             print(f"      ⚠️ 读取 components.xml 失败: {e}")
 
-    # 8.3 仅保留 tags 含 component 的 connection（逻辑保持与之前一致）。
+    # 10.4 过滤连接点：仅保留 tags 含 component 的 connection
     def should_keep_component_connection(conn):
         tags = (conn.get('tags') or '').lower().split()
         return "component" in tags
 
-    def clone_component_with_filtered_connections(component):
+    def transform_equipment_component(component):
         new_comp = etree.Element('component')
         for attr, value in component.attrib.items():
             new_comp.set(attr, value)
@@ -761,63 +586,14 @@ def main():
             kept += 1
         return new_comp if kept > 0 else None
 
-    components_root_out = etree.Element('components')
-    components_processed_out = 0
-
-    processed_component_refs = set()
-    for equipment_id, component_ref in sorted(equipment_to_component_ref.items()):
-        if component_ref in processed_component_refs:
-            continue
-        path_value = component_path_by_equipment_id.get(component_ref)
-        if not path_value:
-            continue
-        sources = resolve_sources(path_value)
-        if not sources:
-            continue
-
-        current_tree = None
-        if 'base' in sources:
-            try:
-                current_tree = etree.parse(sources['base'], parser)
-            except:
-                pass
-
-        for dlc_id in dlc_order:
-            if dlc_id in sources:
-                f_path = sources[dlc_id]
-                try:
-                    dlc_tree = etree.parse(f_path, parser)
-                    dlc_root = dlc_tree.getroot()
-                    if dlc_root.tag == 'diff':
-                        if current_tree:
-                            xml_diff.Apply_Patch(current_tree.getroot(), dlc_root)
-                    else:
-                        current_tree = dlc_tree
-                except Exception as e:
-                    print(f"      ⚠️ 处理出错 {equipment_id} ({dlc_id}): {e}")
-
-        if current_tree:
-            root_node = current_tree.getroot()
-            if root_node.tag == 'component':
-                filtered = clone_component_with_filtered_connections(root_node)
-                if filtered is not None:
-                    components_root_out.append(filtered)
-                    components_processed_out += 1
-                    processed_component_refs.add(component_ref)
-            elif root_node.tag == 'components':
-                for node in root_node.findall('component'):
-                    filtered = clone_component_with_filtered_connections(node)
-                    if filtered is not None:
-                        components_root_out.append(filtered)
-                        components_processed_out += 1
-                        processed_component_refs.add(component_ref)
-
     equipment_components_path = os.path.join(lib_dest_dir, "equipment_components.xml")
-    etree.ElementTree(components_root_out).write(
+    components_processed_out = export_ids_to_file(
+        unique_component_refs,
+        component_path_map,
         equipment_components_path,
-        encoding='utf-8',
-        xml_declaration=True,
-        pretty_print=True
+        root_tag='components',
+        node_tag='component',
+        transform_fn=transform_equipment_component
     )
     print(f"✅ 聚合完成: 写入 {components_processed_out} 个组件定义到 equipment_components.xml")
 
