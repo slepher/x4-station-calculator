@@ -111,16 +111,6 @@ def main():
         if normalized_double_slash:
             print(f"   🔧 已规范 {normalized_double_slash} 个 entry.value 双反斜杠。")
 
-        # 规范化后构建 entry_sources（使用规范化后的 value）
-        entry_sources = {}
-        for node in root:
-            name = node.get("name")
-            value = node.get("value") or ""
-            if name:
-                if name not in entry_sources:
-                    entry_sources[name] = []
-                entry_sources[name].append(('base', value))
-
         # name 相同且内容完全一致的节点自动去重合并
         merged_same_content = 0
         seen_name_and_content = set()
@@ -137,6 +127,16 @@ def main():
                 seen_name_and_content.add(key)
         if merged_same_content:
             print(f"   ♻️ 已合并 {merged_same_content} 个同名同内容节点。")
+
+        # 去重后重新构建 entry_sources（只保留还在 root 中的 entry 的来源）
+        entry_sources = {}
+        for node in root:
+            name = node.get("name")
+            value = node.get("value") or ""
+            if name:
+                if name not in entry_sources:
+                    entry_sources[name] = []
+                entry_sources[name].append(('base', value))
 
         # 处理重复 name（不同内容）：保留最后一条，警告并列出历史路径
         from collections import OrderedDict
