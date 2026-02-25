@@ -175,11 +175,23 @@ def main():
             if len(entries) <= 1:
                 continue
             # 有重复，保留最后一个，删除前面的
+            # 获取保留节点的 value
+            remaining_value = entries[-1].get("value") or ""
+            # 从 entry_sources 中找到与保留节点 value 匹配的来源
             sources = entry_sources.get(name, [])
+            kept_sources = []
+            for src, val in sources:
+                # 比较时考虑规范化
+                if val == remaining_value or val.replace("\\\\", "\\") == remaining_value.replace("\\\\", "\\"):
+                    kept_sources.append((src, val))
+            # 如果精确匹配没找到，取最后一个来源
+            if not kept_sources and sources:
+                kept_sources = [sources[-1]]
+
             for old_node in entries[:-1]:
                 root.remove(old_node)
             # 记录重复信息用于表格输出
-            dup_entries.append((name, sources))
+            dup_entries.append((name, kept_sources))
 
         if dup_entries:
             print(f"   ⚠️ 发现 {len(dup_entries)} 个同名不同内容节点，已保留最后一条:")
@@ -217,11 +229,11 @@ def main():
 
     # --- 步骤 2: 处理 index/macros.xml ---
     print("📂 [2/9] 正在处理 index/macros.xml...")
-    process_index_file(src, "macros.xml", "macros", dlc_order, index_dest_dir, parser, filter_test=True)
+    macros_output_path = process_index_file(src, "macros.xml", "macros", dlc_order, index_dest_dir, parser, filter_test=True)
 
     # --- 步骤 3: 处理 index/components.xml ---
     print("📂 [3/9] 正在处理 index/components.xml...")
-    process_index_file(src, "components.xml", "components", dlc_order, index_dest_dir, parser, filter_test=False)
+    components_output_path = process_index_file(src, "components.xml", "components", dlc_order, index_dest_dir, parser, filter_test=False)
 
     # --- 步骤 4: 处理核心库文件 (wares/waregroups/colors/ships/shipgroups/loadouts) ---
     print("📂 [4/9] 正在处理核心库文件 (Wares/Waregroups/Colors/Ships/Shipgroups/Loadouts)...")
