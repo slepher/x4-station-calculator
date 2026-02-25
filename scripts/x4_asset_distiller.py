@@ -69,9 +69,19 @@ def main():
     macros_base_path = os.path.join(src, "index", "macros.xml")
     macros_output_path = os.path.join(index_dest_dir, "macros.xml")
 
+    # 记录每个 entry 的来源: name -> [(source, path), ...]
+    entry_sources = {}
+
     macros_tree = None
     if os.path.exists(macros_base_path):
         macros_tree = etree.parse(macros_base_path, parser)
+        # 记录 base 来源
+        for entry in macros_tree.getroot().findall(".//entry[@name]"):
+            name = entry.get("name")
+            if name:
+                if name not in entry_sources:
+                    entry_sources[name] = []
+                entry_sources[name].append(('base', macros_base_path))
     else:
         print(f"      ⚠️ Base 文件不存在: {macros_base_path}")
         macros_tree = etree.ElementTree(etree.Element("macros"))
@@ -86,6 +96,13 @@ def main():
             patch_tree = etree.parse(patch_path, parser)
             patch_root = patch_tree.getroot()
             for node in patch_root:
+                # 记录 DLC 来源
+                if node.tag == 'entry':
+                    name = node.get("name")
+                    if name:
+                        if name not in entry_sources:
+                            entry_sources[name] = []
+                        entry_sources[name].append((dlc_id, patch_path))
                 macros_root.append(deepcopy(node))
         except Exception as e:
             print(f"      ⚠️ 警告: 叠加失败 {dlc_id}: {e}")
@@ -132,20 +149,41 @@ def main():
     if merged_same_content:
         print(f"   ♻️ 已合并 {merged_same_content} 个同名同内容节点。")
 
-    macros_tree.write(macros_output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
-    print(f"   ✨ 生成: index/macros.xml")
+    # 处理重复 name（不同内容）：保留最后一条，警告并列出历史路径
+    from collections import OrderedDict
+    name_to_entries = OrderedDict()
+    for node in list(macros_root):
+        name = node.get("name")
+        if not name:
+            continue
+        if name not in name_to_entries:
+            name_to_entries[name] = []
+        name_to_entries[name].append(node)
 
-    # 校验重复 name
-    names = [node.get("name") for node in macros_root if node.get("name")]
-    name_counts = {}
-    for name in names:
-        name_counts[name] = name_counts.get(name, 0) + 1
-    dup_names = sorted([name for name, count in name_counts.items() if count > 1])
-    if dup_names:
-        sample = ", ".join(dup_names[:10])
-        more = f" ... (+{len(dup_names)-10} more)" if len(dup_names) > 10 else ""
-        raise RuntimeError(f"❌ index/macros.xml 存在重复 name: {sample}{more}")
-    print(f"   ✅ macros 去重校验通过，共 {len(names)} 个具名元素。")
+    dup_warnings = []
+    for name, entries in name_to_entries.items():
+        if len(entries) <= 1:
+            continue
+        # 有重复，保留最后一个，删除前面的
+        sources = entry_sources.get(name, [])
+        for old_node in entries[:-1]:
+            macros_root.remove(old_node)
+        # 记录警告信息
+        source_info = " -> ".join([f"{s[0]}" for s in sources]) if sources else "unknown"
+        dup_warnings.append(f"   ⚠️ {name}: 历史来源 [{source_info}], 保留最后一条")
+
+    if dup_warnings:
+        print(f"   ⚠️ 发现 {len(dup_warnings)} 个同名不同内容节点，已保留最后一条:")
+        for warning in dup_warnings:
+            print(warning)
+
+    # 重新写入（含去重后的结果）
+    macros_tree.write(macros_output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
+
+    # 最终校验
+    final_names = [node.get("name") for node in macros_root if node.get("name")]
+    print(f"   ✨ 生成: index/macros.xml")
+    print(f"   ✅ macros 处理完成，共 {len(final_names)} 个具名元素。")
 
     # --- 步骤 3: 迁移并叠加 index/components.xml ---
     print("📂 [3/9] 正在迁移 index/components.xml...")
