@@ -98,14 +98,6 @@ def main():
             except Exception as e:
                 print(f"      ⚠️ 警告: 叠加失败 {dlc_id}: {e}")
 
-        # 规范化 value 后再构建 entry_sources
-        entry_sources = {}
-        for node in root:
-            name = node.get("name")
-            value = node.get("value") or ""
-            if name and name not in entry_sources:
-                entry_sources[name] = [('base', value)]
-
         # 规范 value 中的双反斜杠（始终执行，避免路径格式差异导致去重失败）
         normalized_double_slash = 0
         for entry in root.findall(".//entry[@value]"):
@@ -118,6 +110,16 @@ def main():
                 normalized_double_slash += 1
         if normalized_double_slash:
             print(f"   🔧 已规范 {normalized_double_slash} 个 entry.value 双反斜杠。")
+
+        # 规范化后构建 entry_sources（使用规范化后的 value）
+        entry_sources = {}
+        for node in root:
+            name = node.get("name")
+            value = node.get("value") or ""
+            if name:
+                if name not in entry_sources:
+                    entry_sources[name] = []
+                entry_sources[name].append(('base', value))
 
         # name 相同且内容完全一致的节点自动去重合并
         merged_same_content = 0
