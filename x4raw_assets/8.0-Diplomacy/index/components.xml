@@ -2330,9 +2330,16 @@
   <entry name="cluster_721_v2" value="assets\environments\cluster\cluster_721_v2"/>
   <entry name="cluster_722_v2" value="assets\environments\cluster\cluster_722_v2"/>
   <entry name="cluster_723_v2" value="assets\environments\cluster\cluster_723_v2"/>
+  <entry name="bubustation" value="assets\test\lino\bubustation"/>
   <entry name="radar_arg_dish_01" value="assets\structures\radar\radar_arg_dish_01"/>
   <entry name="effect_gen_l_alarmred_01" value="assets\fx\misc\effect_gen_l_alarmred_01"/>
   <entry name="effect_gen_l_alarmyellow_01" value="assets\fx\misc\effect_gen_l_alarmyellow_01"/>
+  <entry name="example_startmenu" value="assets\test\markus\example_startmenu"/>
+  <entry name="test_bridge_par_l_expeditionary_01_ycharles" value="assets\test\ycharles\test_bridge_par_l_expeditionary_01_ycharles"/>
+  <entry name="test_scs_gen_destructible_hatch_16_01" value="assets\test\unai\test_scs_gen_destructible_hatch_16_01"/>
+  <entry name="Test_scs_gen_destructible_hatch_32_01" value="assets\test\unai\test_scs_gen_destructible_hatch_32_01"/>
+  <entry name="test_scs_gen_destructible_hatch_viewer" value="assets\test\markus\test_scs_gen_destructible_hatch_viewer"/>
+  <entry name="ship_par_l_expeditionary_01_sounds" value="assets\test\markus\ship_par_l_expeditionary_01_sounds"/>
   <entry name="shield_par_l_standard_01_mk1" value="assets\props\SurfaceElements\shield_par_l_standard_01_mk1"/>
   <entry name="shield_par_l_standard_01_mk2" value="assets\props\SurfaceElements\shield_par_l_standard_01_mk2"/>
   <entry name="scs_gen_asteroid_32_corner_01" value="assets\structures\spacesuit_construction_set\scs_gen_asteroid_32_corner_01"/>
@@ -2355,36 +2362,83 @@
   <entry name="scs_gen_asteroid_32_intersection_01_a" value="assets\structures\spacesuit_construction_set\scs_gen_asteroid_32_intersection_01_a"/>
   <entry name="scs_gen_asteroid_32_end_01_a" value="assets\structures\spacesuit_construction_set\scs_gen_asteroid_32_end_01_a"/>
   <entry name="scs_gen_asteroid_32_corner_02_a" value="assets\structures\spacesuit_construction_set\scs_gen_asteroid_32_corner_02_a"/>
+  <entry name="test_ter_m_corvette_01" value="assets\test\markus\test_ter_m_corvette_01"/>
+  <entry name="test_bor_s_fighter_vartest_01" value="assets\test\markus\test_bor_s_fighter_vartest_01"/>
+  <entry name="test_bor_s_scout_01" value="assets\test\markustest_bor_s_scout_01"/>
+  <entry name="test_bor_s_scout_01_var2" value="assets\test\markustest_bor_s_scout_01_var2"/>
+  <entry name="test_bor_s_scout_02" value="assets\test\markustest_bor_s_scout_02"/>
+  <entry name="test_bor_s_scout_02_var2" value="assets\test\markustest_bor_s_scout_02_var2"/>
+  <entry name="test_bor_s_fighter_vartest_01_var2" value="assets\test\markus\test_bor_s_fighter_vartest_01_var2"/>
   <entry name="cluster_725" value="assets\environments\cluster\cluster_725"/>
+  <entry name="test_bor_s_fighter_vartest_02" value="assets\test\markus\test_bor_s_fighter_vartest_02"/>
+  <entry name="test_bor_s_fighter_vartest_02_var2" value="assets\test\markus\test_bor_s_fighter_vartest_02_var2"/>
   <entry name="scs_gen_spacesuit_32_roombase_01" value="assets\structures\spacesuit_construction_set\scs_gen_spacesuit_32_roombase_01"/>
   <entry name="scs_gen_spacesuit_32_room_01" value="assets\structures\spacesuit_construction_set\scs_gen_spacesuit_32_room_01"/>
   <entry name="scs_gen_spacesuit_32_roombase_02" value="assets\structures\spacesuit_construction_set\scs_gen_spacesuit_32_roombase_02"/>
   <entry name="scs_gen_spacesuit_32_room_02" value="assets\structures\spacesuit_construction_set\scs_gen_spacesuit_32_room_02"/>
   <entry name="scs_gen_asteroid_32_entrance_01" value="assets\structures\spacesuit_construction_set\scs_gen_asteroid_32_entrance_01"/>
+  <entry name="test_landmarks_gen_asteroidwharf_01_part_01" value="assets\test\unai\test_landmarks_gen_asteroidwharf_01_part_01"/>
+  <entry name="test_landmarks_gen_asteroidwharf_01_part_02" value="assets\test\unai\test_landmarks_gen_asteroidwharf_01_part_02"/>
+  <entry name="test_asteroid_maze_straight_02" value="assets\test\unai\test_asteroid_maze_straight_02"/>
+  <entry name="test_scs_gen_asteroid_maze_straight_01" value="assets\test\unai\test_scs_gen_asteroid_maze_straight_01"/>
+  <entry name="test_scs_gen_asteroid_maze_straight_02" value="assets\test\unai\test_scs_gen_asteroid_maze_straight_02"/>
   <entry name="scs_gen_spacesuit_32_roombase_03" value="assets\structures\spacesuit_construction_set\scs_gen_spacesuit_32_roombase_03"/>
   <entry name="scs_gen_spacesuit_32_roombase_04" value="assets\structures\spacesuit_construction_set\scs_gen_spacesuit_32_roombase_04"/>
   <entry name="scs_gen_spacesuit_32_roombase_05" value="assets\structures\spacesuit_construction_set\scs_gen_spacesuit_32_roombase_05"/>
   <entry name="scs_gen_spacesuit_32_room_05" value="assets\structures\spacesuit_construction_set\scs_gen_spacesuit_32_room_05"/>
   <entry name="scs_gen_spacesuit_32_room_04" value="assets\structures\spacesuit_construction_set\scs_gen_spacesuit_32_room_04"/>
   <entry name="scs_gen_spacesuit_32_room_03" value="assets\structures\spacesuit_construction_set\scs_gen_spacesuit_32_room_03"/>
+  <entry name="test_ship_gen_xs_lasertower_02" value="assets\test\unai\test_ship_gen_xs_lasertower_02"/>
+  <entry name="test_ship_gen_xs_lasertower_02_a" value="assets\test\unai\test_ship_gen_xs_lasertower_02_a"/>
+  <entry name="animationtest_blender_44" value="assets\test\markus\animationtest_blender_44"/>
+  <entry name="test_turret_gen_m_disabler_01_mk2" value="assets\test\unai\test_turret_gen_m_disabler_01_mk2"/>
   <entry name="sm_gen_lockbox_trap_01" value="assets\props\StorageModules\sm_gen_lockbox_trap_01"/>
+  <entry name="test_turret_gen_m_shieldpierce_01_mk1" value="assets\test\unai\test_turret_gen_m_shieldpierce_01_mk1"/>
+  <entry name="test_gen_turret_m_gatling_02_mk1" value="assets\test\markus\test_gen_turret_m_gatling_02_mk1"/>
   <entry name="struct_arg_cross_02" value="assets\structures\connectionmodules\struct_arg_cross_02"/>
   <entry name="struct_arg_cross_03" value="assets\structures\connectionmodules\struct_arg_cross_03"/>
   <entry name="struct_arg_cross_04" value="assets\structures\connectionmodules\struct_arg_cross_04"/>
   <entry name="struct_arg_cross_05" value="assets\structures\connectionmodules\struct_arg_cross_05"/>
   <entry name="struct_arg_arc_01" value="assets\structures\connectionmodules\struct_arg_arc_01"/>
+  <entry name="test_unai_turret_gen_m_shieldpierce_01_mk7" value="assets\test\unai\test_unai_turret_gen_m_shieldpierce_01_mk7"/>
+  <entry name="test_weapon_gen_m_disabler_01_mk1" value="assets\test\unai\test_weapon_gen_m_disabler_01_mk1"/>
+  <entry name="test_room_gen_crewquarter_01_ycharles" value="assets\test\ycharles\test_room_gen_crewquarter_01_ycharles"/>
   <entry name="room_gen_crewquarter_01" value="assets\interiors\rooms\room_gen_crewquarter_01"/>
+  <entry name="test_room_gen_captainsquarter_01_ycharles" value="assets\test\ycharles\test_room_gen_captainsquarter_01_ycharles"/>
   <entry name="room_gen_captainsquarter_01" value="assets\interiors\rooms\room_gen_captainsquarter_01"/>
+  <entry name="test_weapon_gen_m_shieldpierce_01_mk1" value="assets\test\unai\test_weapon_gen_m_shieldpierce_01_mk1"/>
+  <entry name="fogpattern_smoke" value="assets\test\markus\fogpattern_smoke">
+  </entry>
+  <entry name="test_ship_gen_s_lasertower_01" value="assets\test\unai\test_ship_gen_s_lasertower_01"/>
   <entry name="scs_gen_asteroid_destructible_hatch_32_01" value="assets\structures\spacesuit_construction_set\scs_gen_asteroid_destructible_hatch_32_01"/>
   <entry name="scs_gen_asteroid_destructible_hatch_16_01" value="assets\structures\spacesuit_construction_set\scs_gen_asteroid_destructible_hatch_16_01"/>
+  <entry name="test_scs_gen_asteroid_32_straight_01_a" value="assets\test\unai\test_scs_gen_asteroid_32_straight_01_a"/>
+  <entry name="test_scs_gen_asteroid_32_straight_01_b" value="assets\test\unai\test_scs_gen_asteroid_32_straight_01_b"/>
+  <entry name="test_scs_gen_asteroid_destructible_hatch_16_01" value="assets\test\unai\test_scs_gen_asteroid_destructible_hatch_16_01"/>
+  <entry name="test_scs_gen_asteroid_destructible_hatch_32_01" value="assets\test\unai\test_scs_gen_asteroid_destructible_hatch_32_01"/>
+  <entry name="test_scs_gen_asteroid_16_straight_01_a" value="assets\test\unai\test_scs_gen_asteroid_16_straight_01_a"/>
+  <entry name="testcluster_stars_14" value="assets\test\markus\testcluster_stars_14">
+  </entry>
   <entry name="scs_gen_asteroid_32_straight_01_a" value="assets\structures\spacesuit_construction_set\scs_gen_asteroid_32_straight_01_a"/>
   <entry name="scs_gen_asteroid_16_straight_01_a" value="assets\structures\spacesuit_construction_set\scs_gen_asteroid_16_straight_01_a"/>
+  <entry name="testcluster_stars_14_export" value="assets\test\markus\testcluster_stars_14_export">
+  </entry>
   <entry name="env_asteroid_hot_xl_01" value="assets\environments\asteroids\env_asteroid_hot_xl_01"/>
   <entry name="env_asteroid_hot_xl_02" value="assets\environments\asteroids\env_asteroid_hot_xl_02"/>
   <entry name="env_asteroid_hot_xl_03" value="assets\environments\asteroids\env_asteroid_hot_xl_03"/>
   <entry name="env_asteroid_hot_l_01" value="assets\environments\asteroids\env_asteroid_hot_l_01"/>
   <entry name="env_asteroid_hot_l_02" value="assets\environments\asteroids\env_asteroid_hot_l_02"/>
   <entry name="env_asteroid_hot_l_03" value="assets\environments\asteroids\env_asteroid_hot_l_03"/>
+  <entry name="contraband" value="assets\test\unai\lockboxes\contraband"/>
+  <entry name="general wares" value="assets\test\unai\lockboxes\general wares"/>
+  <entry name="hardware" value="assets\test\unai\lockboxes\hardware"/>
+  <entry name="luxury" value="assets\test\unai\lockboxes\luxury"/>
+  <entry name="curiosities" value="assets\test\unai\lockboxes\curiosities"/>
+  <entry name="test_lino_materials_01" value="assets\test\lino\test_lino_materials_01"/>
+  <entry name="test_dockingbay_gen_s_showroom_01" value="assets\test\lino\test_dockingbay_gen_s_showroom_01"/>
+  <entry name="test_room_gen_showroom_01" value="assets\test\lino\test_room_gen_showroom_01"/>
+  <entry name="test_dockarea_gen_showroom_01" value="assets\test\lino\test_dockarea_gen_showroom_01"/>
+  <entry name="test_habitat_arg_s_luxury_03" value="assets\test\unai\test_habitat_arg_s_luxury_03"/>
   <entry name="effect_gen_s_travelbubble_01_exterior" value="assets\fx\misc\effect_gen_s_travelbubble_01_exterior"/>
   <entry name="effect_gen_m_travelbubble_01_exterior" value="assets\fx\misc\effect_gen_m_travelbubble_01_exterior"/>
   <entry name="effect_gen_l_travelbubble_01_exterior" value="assets\fx\misc\effect_gen_l_travelbubble_01_exterior"/>
@@ -2393,6 +2447,9 @@
   <entry name="effect_gen_m_travelbubble_01_cockpit" value="assets\fx\misc\effect_gen_m_travelbubble_01_cockpit"/>
   <entry name="effect_gen_l_travelbubble_01_cockpit" value="assets\fx\misc\effect_gen_l_travelbubble_01_cockpit"/>
   <entry name="effect_gen_xl_travelbubble_01_cockpit" value="assets\fx\misc\effect_gen_xl_travelbubble_01_cockpit"/>
+  <entry name="test_habitat_arg_s_luxury_06" value="assets\test\unai\test_habitat_arg_s_luxury_06"/>
+  <entry name="test_habitat_arg_s_luxury_08" value="assets\test\unai\test_habitat_arg_s_luxury_08"/>
+  <entry name="test_landmark_asteroid_onboarding_01" value="assets\test\lino\test_landmark_asteroid_onboarding_01"/>
   <entry name="effect_gen_s_traveldriveexhaust_01" value="assets\fx\misc\effect_gen_s_traveldriveexhaust_01"/>
   <entry name="effect_gen_m_traveldriveexhaust_01" value="assets\fx\misc\effect_gen_m_traveldriveexhaust_01"/>
   <entry name="effect_gen_l_traveldriveexhaust_01" value="assets\fx\misc\effect_gen_l_traveldriveexhaust_01"/>
@@ -2401,6 +2458,8 @@
   <entry name="effect_gen_s_traveldriveexhaust_03" value="assets\fx\misc\effect_gen_s_traveldriveexhaust_03"/>
   <entry name="effect_gen_m_traveldriveexhaust_02" value="assets\fx\misc\effect_gen_m_traveldriveexhaust_02"/>
   <entry name="effect_gen_m_traveldriveexhaust_03" value="assets\fx\misc\effect_gen_m_traveldriveexhaust_03"/>
+  <entry name="test_gate" value="assets\test\jan\test_gate"/>
+  <entry name="test_gate2" value="assets\test\jan\test_gate2"/>
   <entry name="station_spl_tradestation_base_01" value="extensions\ego_dlc_split\assets\structures\station_spl_tradestation_base_01"/>
   <entry name="defence_spl_claim_01" value="extensions\ego_dlc_split\assets\structures\defence\defence_spl_claim_01"/>
   <entry name="defence_spl_disc_01" value="extensions\ego_dlc_split\assets\structures\defence\defence_spl_disc_01"/>
@@ -3210,6 +3269,8 @@
   <entry name="cluster_606_v3" value="extensions\ego_dlc_boron\assets\environments\clusters\cluster_606_v3"/>
   <entry name="props_bor_standard_terminalkeyboard_01" value="extensions\ego_dlc_boron\assets\interiors\xref_parts\standard\props_bor_standard_terminalkeyboard_01"/>
   <entry name="room_bor_managersoffice_01" value="extensions\ego_dlc_boron\assets\interiors\rooms\room_bor_managersoffice_01"/>
+  <entry name="test_bor_s_fighter_02" value="extensions\ego_dlc_boron\assets\test\Markus\test_bor_s_fighter_02"/>
+  <entry name="test_ship_bor_s_scout_02_lukas" value="extensions\ego_dlc_boron\assets\test\lukas\test_ship_bor_s_scout_02_lukas"/>
   <entry name="cluster_701" value="extensions\ego_dlc_timelines\assets\environments\cluster\cluster_701"/>
   <entry name="ship_ter_s_fighter_04" value="extensions\ego_dlc_timelines\assets\units\size_s\ship_ter_s_fighter_04"/>
   <entry name="room_gen_livingquarter_01" value="extensions\ego_dlc_timelines\assets\interiors\rooms\room_gen_livingquarter_01"/>
@@ -3398,6 +3459,8 @@
   <entry name="engine_gen_m_corvette_01" value="extensions\ego_dlc_mini_02\assets\props\engines\engine_gen_m_corvette_01"/>
   <entry name="muzzle_gen_turret_m_shieldpierce_01_mk1" value="extensions\ego_dlc_mini_02\assets\fx\weaponfx\muzzle_gen_turret_m_shieldpierce_01_mk1"/>
   <entry name="muzzle_gen_turret_m_disabler_01_mk1" value="extensions\ego_dlc_mini_02\assets\fx\weaponfx\muzzle_gen_turret_m_disabler_01_mk1"/>
+  <entry name="test_gen_m_disabler_01_mk1" value="extensions\ego_dlc_mini_02\assets\test\markus\test_gen_m_disabler_01_mk1"/>
+  <entry name="test_gen_turret_m_disabler_01_mk1" value="extensions\ego_dlc_mini_02\assets\test\markus\test_gen_turret_m_disabler_01_mk1"/>
   <entry name="shield_gen_m_corvette_01_mk1_video" value="extensions\ego_dlc_mini_02\assets\props\surfaceelements\shield_gen_m_corvette_01_mk1_video"/>
   <entry name="engine_arg_m_corvette_01_mk1_video" value="extensions\ego_dlc_mini_02\assets\props\engines\engine_arg_m_corvette_01_mk1_video"/>
   <entry name="engine_arg_m_corvette_01_mk2_video" value="extensions\ego_dlc_mini_02\assets\props\engines\engine_arg_m_corvette_01_mk2_video"/>

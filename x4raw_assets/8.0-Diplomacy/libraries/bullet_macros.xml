@@ -1,0 +1,3200 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<macros>
+  <macro name="bullet_arg_l_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_arg_l_laser_01_mk1"/>
+    <properties>
+      <ammunition value="3" reload="2"/>
+      <bullet speed="1659" lifetime="6.3" amount="1" barrelamount="1" icon="weapon_laser_mk1" timediff="0.002" angle="0.03" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="486"/>
+      <reload rate="1.2"/>
+      <damage value="2588" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_l_laser_01_mk1" inside="impact_gen_l_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_l_laser_01_mk1_bigobject" inside="impact_gen_l_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_l_laser_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_arg_m_ion_01_mk1_macro" class="bullet">
+    <component ref="bullet_arg_m_ion_01_mk1"/>
+    <properties>
+      <bullet speed="2496" lifetime="1.85" amount="1" barrelamount="1" icon="weapon_ion_mk1" timediff="0.013" angle="0.04" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="190"/>
+      <reload rate="3"/>
+      <damage value="15" shield="228" repair="0"/>
+      <effects>
+        <impact ref="impact_arg_m_ion_01_mk1" inside="impact_arg_m_ion_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_arg_m_ion_01_mk1_bigobject" inside="impact_arg_m_ion_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_arg_m_ion_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_arg_m_ion_01_mk2_macro" class="bullet">
+    <component ref="bullet_arg_m_ion_01_mk2"/>
+    <properties>
+      <bullet speed="2496" lifetime="1.85" amount="1" barrelamount="1" icon="weapon_ion_mk2" timediff="0.008" angle="0.03" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="284"/>
+      <reload rate="2"/>
+      <damage value="12" shield="826" repair="0"/>
+      <effects>
+        <impact ref="impact_arg_m_ion_01_mk1" inside="impact_arg_m_ion_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_arg_m_ion_01_mk1_bigobject" inside="impact_arg_m_ion_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_arg_m_ion_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_arg_s_ion_01_mk1_macro" class="bullet">
+    <component ref="bullet_arg_s_ion_01_mk1"/>
+    <properties>
+      <bullet speed="1920" lifetime="1.5" amount="1" barrelamount="1" icon="weapon_ion_mk1" timediff="0.021" angle="0.07" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="122"/>
+      <reload rate="5"/>
+      <damage value="10" shield="72" repair="0"/>
+      <effects>
+        <impact ref="impact_arg_s_ion_01_mk1" inside="impact_arg_s_ion_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_arg_s_ion_01_mk1_bigobject" inside="impact_arg_s_ion_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_arg_s_ion_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_arg_s_ion_01_mk2_macro" class="bullet">
+    <component ref="bullet_arg_s_ion_01_mk2"/>
+    <properties>
+      <bullet speed="1920" lifetime="1.5" amount="1" barrelamount="1" icon="weapon_ion_mk2" timediff="0.017" angle="0.06" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="151"/>
+      <reload rate="4"/>
+      <damage value="8" shield="256" repair="0"/>
+      <effects>
+        <impact ref="impact_arg_s_ion_01_mk1"/>
+        <bigobjectimpact ref="impact_arg_s_ion_01_mk1_bigobject" inside="impact_arg_s_ion_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_arg_s_ion_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_arg_turret_l_beam_01_mk1_macro" class="bullet">
+    <component ref="bullet_arg_l_beam_01_mk1"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="3" range="5000" amount="1" barrelamount="1" icon="weapon_beam_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="5"/>
+      <damage value="147" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_beam_01_mk1" inside="impact_gen_m_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_beam_01_mk1_bigobject" inside="impact_gen_m_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_turret_gen_m_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="turret_beam_muzzle"/>
+      </sounds>
+      <weapon system="turret_shortrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_arg_turret_l_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_arg_l_laser_01_mk1"/>
+    <properties>
+      <ammunition value="3" reload="0.5"/>
+      <bullet speed="2041" lifetime="3.219" amount="1" barrelamount="2" icon="weapon_laser_mk1" timediff="0.001" angle="0.02" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <reload time="2.4"/>
+      <damage value="367" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_l_laser_01_mk1" inside="impact_gen_l_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_l_laser_01_mk1_bigobject" inside="impact_gen_l_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_turret_gen_l_laser_01_mk1"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_arg_turret_l_mining_01_mk1_macro" class="bullet">
+    <component ref="bullet_arg_l_mining_01_mk1"/>
+    <properties>
+      <bullet speed="7000" lifetime="4" range="7000" amount="1" barrelamount="1" icon="weapon_mining_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="4"/>
+      <damage value="2" hull="1" delay="1" repair="0">
+        <multiplier mining="450"/>
+      </damage>
+      <effects>
+        <impact ref="impact_gen_l_mining_01_mk1" inside="impact_gen_l_mining_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_l_mining_01_mk1_bigobject" inside="impact_gen_l_mining_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_l_mining_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="turret_beam_muzzle"/>
+      </sounds>
+      <weapon system="weapon_mining"/>
+    </properties>
+  </macro>
+  <macro name="bullet_arg_turret_l_plasma_01_mk1_macro" class="bullet">
+    <component ref="bullet_arg_l_plasma_01_mk1"/>
+    <properties>
+      <bullet speed="440" lifetime="19.474" amount="1" barrelamount="2" icon="weapon_plasma_mk1" timediff="0" angle="0.01" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <reload time="4.7"/>
+      <damage value="2420" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_plasma_01_mk1" inside="impact_gen_m_plasma_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_mining_01_mk1_bigobject" inside="impact_gen_m_plasma_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_turret_gen_m_plasma_01_mk1"/>
+      </effects>
+      <weapon system="turret_longrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_atf_xl_beam_01_mk1_macro" class="bullet">
+    <component ref="bullet_atf_xl_beam_01_mk1"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="7" range="14000" amount="1" barrelamount="1" icon="weapon_beam_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <heat value="3460"/>
+      <reload time="7.3"/>
+      <damage value="330426" repair="0"/>
+      <effects>
+        <impact ref="impact_ter_xl_laser_01_mk1" inside="impact_ter_xl_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_ter_xl_laser_01_mk1_bigobject" inside="impact_ter_xl_laser_01_mk1_bigobject_inside"/>
+      </effects>
+      <sounds>
+        <firing ref="weapon_atf_xl_battleship_01_mk1_loop"/>
+      </sounds>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_bor_l_beam_01_mk1_macro" class="bullet">
+    <component ref="bullet_bor_l_beam_01_mk1"/>
+    <properties>
+      <bullet speed="60000" lifetime="4" range="11000" amount="1" barrelamount="1" icon="weapon_beam_mk1" angle="0" maxhits="1" ricochet="0" restitution="1" scale="1" attach="1" chargetime="4" heatwhilecharging="0" requirefullcharge="1" firewhenfullcharge="1" forcecooldownaftershot="1" influencelist="heavy_drive_disrupt"/>
+      <heat value="2500"/>
+      <reload time="4.1"/>
+      <damage value="4000" shield="3300" repair="0"/>
+      <effects>
+        <impact ref="impact_bor_l_beam_01_mk1" inside="impact_bor_l_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_bor_l_beam_01_mk1_bigobject" inside="impact_bor_l_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_bor_l_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="weapon_bor_l_beam_01_mk1_loop"/>
+      </sounds>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_bor_m_flak_01_mk1_macro" class="bullet">
+    <component ref="bullet_bor_m_flak_01_mk1"/>
+    <properties>
+      <ammunition value="4" reload="1.5"/>
+      <bullet speed="1500" lifetime="3.1" barrelamount="1" icon="weapon_bor_flak_mk1" timediff="0.004" angle="1" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0" selfdestruct="1" plannedselfdestruct="1" selfdestructtimediff="0.12" selfdestructmintime="0.2" influencelist="medium_drive_disrupt"/>
+      <heat value="350"/>
+      <reload rate="1"/>
+      <areadamage value="100" shield="220" time="1" lifetime="1"/>
+      <damage value="100" shield="100" repair="0"/>
+      <effects>
+        <impact ref="impact_bor_m_flak_01_mk1" inside="impact_bor_m_flak_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_bor_m_flak_01_mk1_bigobject" inside="impact_bor_m_railgun_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_bor_m_flak_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_bor_m_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_bor_m_laser_01_mk1"/>
+    <properties>
+      <bullet speed="3250" lifetime="1.5" barrelamount="1" icon="weapon_laser_mk1" timediff="0.002" angle="0.2" mass="10" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0"/>
+      <heat value="500"/>
+      <reload rate="0.75"/>
+      <damage value="170" noshield="310" repair="0"/>
+      <effects>
+        <impact ref="impact_bor_m_laser_01_mk1" inside="impact_bor_m_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_bor_m_laser_01_mk1_bigobject" inside="impact_bor_m_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_bor_m_laser_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_bor_m_mining_01_mk1_macro" class="bullet">
+    <component ref="bullet_bor_m_mining_01_mk1"/>
+    <properties>
+      <bullet speed="7000" lifetime="4" range="4364" amount="1" barrelamount="1" icon="weapon_mining_mk1" maxhits="1" scale="1" attach="1"/>
+      <reload time="4"/>
+      <damage value="4" repair="0">
+        <multiplier mining="300"/>
+      </damage>
+      <effects>
+        <impact ref="impact_gen_m_mining_01_mk1" inside="impact_gen_m_mining_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_mining_01_mk1_bigobject" inside="impact_gen_m_mining_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_bor_m_mining_01_mk1"/>
+      </effects>
+      <weapon system="weapon_mining"/>
+    </properties>
+  </macro>
+  <macro name="bullet_bor_m_railgun_01_mk1_macro" class="bullet">
+    <component ref="bullet_bor_m_railgun_01_mk1"/>
+    <properties>
+      <bullet speed="8000" lifetime="1.1" icon="weapon_bor_railgun_mk1" timediff="0.001" angle="0.1" mass="150" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0" heatwhilecharging="0" requirefullcharge="1"/>
+      <heat value="2000"/>
+      <reload rate="0.333"/>
+      <damage value="920" shield="500" repair="0"/>
+      <effects>
+        <impact ref="impact_bor_m_railgun_01_mk1" inside="impact_bor_m_railgun_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_bor_m_railgun_01_mk1_bigobject" inside="impact_bor_m_railgun_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_bor_m_railgun_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_bor_s_arc_01_mk1_macro" class="bullet">
+    <component ref="bullet_bor_s_arc_01_mk1"/>
+    <properties>
+      <bullet speed="4000" lifetime="0.52" barrelamount="1" icon="weapon_bor_arc_mk1" angle="0.02" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0" influencelist="light_thruster_disrupt"/>
+      <heat value="350"/>
+      <reload rate="1.5"/>
+      <damage value="120" shield="30" repair="0"/>
+      <effects>
+        <impact ref="impact_bor_s_arc_01_mk1" inside="impact_bor_s_arc_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_bor_s_arc_01_mk1_bigobject" inside="impact_bor_s_arc_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_bor_s_arc_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_bor_s_gatling_01_mk1_macro" class="bullet">
+    <component ref="bullet_bor_s_gatling_01_mk1"/>
+    <properties>
+      <ammunition value="36" reload="1.5"/>
+      <bullet speed="3200" lifetime="1" amount="1" barrelamount="1" icon="weapon_gatling_mk1" timediff="0.023" angle="0.2" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0" influencelist="light_drive_disrupt"/>
+      <heat value="40"/>
+      <reload rate="9"/>
+      <damage value="14" shield="26" repair="0"/>
+      <effects>
+        <impact ref="impact_bor_s_gatling_01_mk1" inside="impact_bor_s_gatling_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_bor_s_gatling_01_mk1_bigobject" inside="impact_bor_s_gatling_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_bor_s_gatling_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_bor_s_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_bor_s_laser_01_mk1"/>
+    <properties>
+      <ammunition value="10" reload="1.5"/>
+      <bullet speed="2800" lifetime="1.14" amount="1" barrelamount="1" icon="weapon_laser_mk1" timediff="0.01" angle="0.15" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0"/>
+      <heat value="120"/>
+      <reload rate="2"/>
+      <damage value="64" noshield="80" repair="0"/>
+      <effects>
+        <impact ref="impact_bor_s_laser_01_mk1" inside="impact_bor_s_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_bor_s_laser_01_mk1_bigobject" inside="impact_bor_s_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_bor_s_laser_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_bor_s_mining_01_mk1_macro" class="bullet">
+    <component ref="bullet_bor_s_mining_01_mk1"/>
+    <properties>
+      <bullet speed="7000" lifetime="4" range="3000" amount="1" barrelamount="1" icon="weapon_mining_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="4"/>
+      <damage value="2" repair="0">
+        <multiplier mining="300"/>
+      </damage>
+      <effects>
+        <impact ref="impact_gen_s_mining_01_mk1" inside="impact_gen_s_mining_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_mining_01_mk1_bigobject" inside="impact_gen_s_mining_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_bor_s_mining_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="wpn_beam_muzzle"/>
+      </sounds>
+      <weapon system="weapon_mining"/>
+    </properties>
+  </macro>
+  <macro name="bullet_bor_turret_l_disruptor_01_mk1_macro" class="bullet">
+    <component ref="bullet_bor_l_disruptor_01_mk1"/>
+    <properties>
+      <ammunition value="3" reload="15"/>
+      <bullet speed="7100" lifetime="1.5" barrelamount="1" icon="weapon_bor_disruptor_mk1" timediff="0.008" angle="2" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0" selfdestruct="1" plannedselfdestruct="1" selfdestructtimediff="0.15" selfdestructmintime="0.2" influencelist="heavy_mam_thruster_disrupt"/>
+      <reload rate="2.5"/>
+      <areadamage value="150" shield="1350"/>
+      <damage value="400" repair="0"/>
+      <effects>
+        <impact ref="impact_bor_l_disruptor_01_mk1" inside="impact_bor_l_disruptor_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_bor_l_disruptor_01_mk1_bigobject" inside="impact_bor_l_disruptor_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_bor_l_disruptor_01_mk1"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_bor_turret_l_flak_01_mk1_macro" class="bullet">
+    <component ref="bullet_bor_l_flak_01_mk1"/>
+    <properties>
+      <ammunition value="3" reload="1.5"/>
+      <bullet speed="4660" lifetime="1.25" barrelamount="1" icon="weapon_bor_flak_mk1" timediff="0.001" angle="2.1" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0" selfdestruct="1" plannedselfdestruct="1" selfdestructtimediff="0.06" selfdestructmintime="0.15" influencelist="light_drive_disrupt_flak"/>
+      <reload rate="0.4"/>
+      <areadamage value="400" shield="700"/>
+      <damage value="50" shield="200" repair="0"/>
+      <effects>
+        <impact ref="impact_bor_l_flak_01_mk1" inside="impact_bor_l_flak_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_bor_l_flak_01_mk1_bigobject" inside="impact_bor_l_flak_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_bor_l_flak_01_mk1"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_bor_turret_l_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_bor_m_laser_01_mk1"/>
+    <properties>
+      <ammunition value="6" reload="1"/>
+      <bullet speed="3000" lifetime="2.4" barrelamount="1" icon="weapon_laser_mk1" timediff="0.003" angle="0.25" mass="300" maxhits="1" ricochet="0" restitution="0" scale="0" attach="0"/>
+      <reload rate="0.8"/>
+      <damage value="200" noshield="350" repair="0"/>
+      <effects>
+        <impact ref="impact_bor_m_laser_01_mk1" inside="impact_bor_m_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_bor_m_laser_01_mk1_bigobject" inside="impact_bor_m_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_bor_m_laser_mk1"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_bor_turret_l_mining_01_mk1_macro" class="bullet">
+    <component ref="bullet_bor_l_mining_01_mk1"/>
+    <properties>
+      <bullet speed="7000" lifetime="4" range="7000" amount="1" barrelamount="1" icon="weapon_mining_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="4"/>
+      <damage value="2" hull="1" delay="1" repair="0">
+        <multiplier mining="450"/>
+      </damage>
+      <effects>
+        <impact ref="impact_gen_l_mining_01_mk1" inside="impact_gen_l_mining_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_l_mining_01_mk1_bigobject" inside="impact_gen_l_mining_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_bor_l_mining_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="turret_beam_muzzle"/>
+      </sounds>
+      <weapon system="weapon_mining"/>
+    </properties>
+  </macro>
+  <macro name="bullet_bor_turret_m_arc_01_mk1_macro" class="bullet">
+    <component ref="bullet_bor_s_arc_01_mk1"/>
+    <properties>
+      <bullet speed="3300" lifetime="0.72" amount="1" barrelamount="1" icon="weapon_bor_arc_mk1" timediff="0.003" angle="0.05" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0" influencelist="light_thruster_disrupt"/>
+      <reload rate="1.1"/>
+      <damage value="90" shield="110" repair="0"/>
+      <effects>
+        <impact ref="impact_bor_s_arc_01_mk1" inside="impact_bor_s_arc_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_bor_s_arc_01_mk1_bigobject" inside="impact_bor_s_arc_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_bor_s_arc_01_mk1"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_bor_turret_m_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_bor_s_laser_01_mk1"/>
+    <properties>
+      <ammunition value="5" reload="1.5"/>
+      <bullet speed="2100" lifetime="1.5" amount="1" barrelamount="1" icon="weapon_laser_mk1" angle="0.25" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0" selfdestructtimediff="0.0008"/>
+      <reload rate="2.5"/>
+      <damage value="45" noshield="65" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_laser_01_mk1" inside="impact_gen_s_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_laser_01_mk1_bigobject" inside="impact_gen_s_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_bor_s_laser_mk1"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_bor_turret_m_mining_01_mk1_macro" class="bullet">
+    <component ref="bullet_bor_s_mining_01_mk1"/>
+    <properties>
+      <bullet speed="7000" lifetime="4" range="2700" amount="1" barrelamount="1" icon="weapon_mining_mk1" maxhits="1" ricochet="0" restitution="1" scale="1" attach="1"/>
+      <reload time="4"/>
+      <damage value="1" repair="0">
+        <multiplier mining="300"/>
+      </damage>
+      <effects>
+        <impact ref="impact_gen_s_mining_01_mk1" inside="impact_gen_s_mining_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_mining_01_mk1_bigobject" inside="impact_gen_s_mining_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_s_mining_01_mk1"/>
+      </effects>
+      <weapon system="weapon_mining"/>
+    </properties>
+  </macro>
+  <macro name="bullet_bor_turret_m_railgun_01_mk1_macro" class="bullet">
+    <component ref="bullet_bor_s_railgun_01_mk1"/>
+    <properties>
+      <bullet speed="5500" lifetime="0.85" amount="1" barrelamount="1" icon="weapon_bor_railgun_mk1" timediff="0.001" angle="0.5" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0"/>
+      <reload rate="0.3"/>
+      <damage value="300" shield="350" repair="0"/>
+      <effects>
+        <impact ref="impact_bor_m_railgun_01_mk1" inside="impact_bor_m_railgun_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_bor_m_railgun_01_mk1_bigobject" inside="impact_bor_m_railgun_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_bor_m_railgun_01_mk1"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_m_beam_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_m_beam_01_mk1"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="4" range="4364" amount="1" barrelamount="1" icon="weapon_beam_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <heat initial="1000" value="292"/>
+      <reload time="6"/>
+      <damage value="120" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_beam_01_mk1" inside="impact_gen_m_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_beam_01_mk1_bigobject" inside="impact_gen_m_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="wpn_beam_gen_01"/>
+      </sounds>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_m_beam_01_mk2_macro" class="bullet">
+    <component ref="bullet_gen_m_beam_01_mk2"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="4" range="4364" amount="1" barrelamount="1" icon="weapon_beam_mk2" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <heat initial="1000" value="234"/>
+      <reload time="8"/>
+      <damage value="314" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_beam_01_mk1" inside="impact_gen_m_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_beam_01_mk1_bigobject" inside="impact_gen_m_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="wpn_beam_gen_01"/>
+      </sounds>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_m_disabler_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_m_disabler_01_mk1"/>
+    <properties>
+      <ammunition value="2" reload="3.4"/>
+      <bullet speed="10000" lifetime="2.4" amount="1" barrelamount="1" icon="weapon_railgun_mk1" maxhits="1" ricochet="0" scale="1" attach="0" influencelist="envoy_distortion"/>
+      <heat value="1000"/>
+      <reload rate="3"/>
+      <damage value="1" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_disabling_01"/>
+        <launch ref="muzzle_gen_m_disabling_01"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_m_flak_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_m_flak_01_mk1"/>
+    <properties>
+      <ammunition value="9" reload="3"/>
+      <bullet speed="1500" lifetime="2" amount="1" barrelamount="1" icon="weapon_cannon_mk1" timediff="0.005" angle="0.09" maxhits="1" ricochet="0" scale="0" attach="0" selfdestruct="1"/>
+      <reload rate="3"/>
+      <areadamage value="55" time="1" lifetime="1"/>
+      <damage value="55" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_flak_01_mk1"/>
+        <launch ref="muzzle_turret_gen_m_flak_01_mk1"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_m_gatling_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_m_gatling_01_mk1"/>
+    <properties>
+      <ammunition value="21" reload="1"/>
+      <bullet speed="1920" lifetime="2.5" amount="1" barrelamount="1" icon="weapon_gatling_mk1" timediff="0.02" angle="0.34" maxhits="2" ricochet="0.01" restitution="0.3" scale="0" attach="0"/>
+      <heat value="75"/>
+      <reload rate="8"/>
+      <damage value="33" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_gatling_01_mk1" inside="impact_gen_m_gatling_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_gatling_01_mk1_bigobject" inside="impact_gen_m_gatling_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_gatling_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_m_gatling_01_mk2_macro" class="bullet">
+    <component ref="bullet_gen_m_gatling_01_mk2"/>
+    <properties>
+      <ammunition value="24" reload="1"/>
+      <bullet speed="1920" lifetime="2.5" amount="1" barrelamount="1" icon="weapon_gatling_mk2" timediff="0.015" angle="0.26" maxhits="2" ricochet="0.01" restitution="0.3" scale="0" attach="0"/>
+      <heat value="100"/>
+      <reload rate="6"/>
+      <damage value="78" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_gatling_01_mk1" inside="impact_gen_m_gatling_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_gatling_01_mk1_bigobject" inside="impact_gen_m_gatling_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_gatling_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_m_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_m_laser_01_mk1"/>
+    <properties>
+      <ammunition value="2" reload="0.5"/>
+      <bullet speed="4562" lifetime="1.1" amount="1" barrelamount="1" icon="weapon_laser_mk1" timediff="0.013" angle="0.21" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="73"/>
+      <reload rate="5"/>
+      <damage value="58" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_laser_01_mk1" inside="impact_gen_m_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_laser_01_mk1_bigobject" inside="impact_gen_m_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_laser_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_m_laser_01_mk2_macro" class="bullet">
+    <component ref="bullet_gen_m_laser_01_mk2"/>
+    <properties>
+      <ammunition value="4" reload="0.7"/>
+      <bullet speed="4562" lifetime="1.1" amount="1" barrelamount="1" icon="weapon_laser_mk2" timediff="0.015" angle="0.26" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="61"/>
+      <reload rate="6"/>
+      <damage value="86" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_laser_01_mk1" inside="impact_gen_m_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_laser_01_mk1_bigobject" inside="impact_gen_m_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_laser_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_m_mining_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_m_mining_01_mk1"/>
+    <properties>
+      <bullet speed="7000" lifetime="4" range="4364" amount="1" barrelamount="1" icon="weapon_mining_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="4"/>
+      <damage value="2" repair="0">
+        <multiplier mining="300"/>
+      </damage>
+      <effects>
+        <impact ref="impact_gen_m_mining_01_mk1" inside="impact_gen_m_mining_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_mining_01_mk1_bigobject" inside="impact_gen_m_mining_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_mining_01_mk1"/>
+      </effects>
+      <weapon system="weapon_mining"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_m_mining_01_mk2_macro" class="bullet">
+    <component ref="bullet_gen_m_mining_01_mk2"/>
+    <properties>
+      <bullet speed="7000" lifetime="4" range="4364" amount="1" barrelamount="1" icon="weapon_mining_mk2" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="4"/>
+      <damage value="6" repair="0">
+        <multiplier mining="300"/>
+      </damage>
+      <effects>
+        <impact ref="impact_gen_m_mining_01_mk1" inside="impact_gen_m_mining_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_mining_01_mk1_bigobject" inside="impact_gen_m_mining_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_mining_01_mk1"/>
+      </effects>
+      <weapon system="weapon_mining"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_m_plasma_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_m_plasma_01_mk1"/>
+    <properties>
+      <bullet speed="983" lifetime="6.6" amount="1" barrelamount="1" icon="weapon_plasma_mk1" timediff="0" angle="0" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="5756"/>
+      <reload time="4"/>
+      <damage value="1841" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_plasma_01_mk1" inside="impact_gen_m_plasma_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_plasma_01_mk1_bigobject" inside="impact_gen_m_plasma_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_plasma_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_m_plasma_01_mk2_macro" class="bullet">
+    <component ref="bullet_gen_m_plasma_01_mk2"/>
+    <properties>
+      <bullet speed="983" lifetime="6.6" amount="1" barrelamount="1" icon="weapon_plasma_mk2" timediff="0" angle="0" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="3836"/>
+      <reload time="3"/>
+      <damage value="2393" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_plasma_01_mk1" inside="impact_gen_m_plasma_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_plasma_01_mk1_bigobject" inside="impact_gen_m_plasma_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_plasma_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_m_scrapbeam_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_m_scrapbeam_01_mk1"/>
+    <properties>
+      <identification name="{20105,9023}"/>
+      <bullet speed="2.997925e+08" lifetime="4" range="4364" amount="1" barrelamount="1" icon="weapon_tug_mk1" maxhits="1" ricochet="0" scale="1" attach="1" tug="1"/>
+      <reload time="4"/>
+      <damage repair="0"/>
+      <effects>
+        <launch ref="muzzle_gen_m_tug_01_mk1"/>
+      </effects>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_m_shieldpierce_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_m_shieldpierce_01_mk1"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="4" range="5236.8" amount="1" barrelamount="1" icon="weapon_beam_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <heat initial="1000" value="550"/>
+      <reload time="4"/>
+      <damage hull="307"/>
+      <effects>
+        <impact ref="impact_gen_m_shieldpierce_01"/>
+        <launch ref="muzzle_gen_m_shieldpierce_01"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_m_shotgun_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_m_shotgun_01_mk1"/>
+    <properties>
+      <bullet speed="4032" lifetime="0.914" amount="6" barrelamount="1" icon="weapon_shotgun_mk1" timediff="0.003" angle="1.25" maxhits="3" ricochet="0.5" restitution="1" scale="0" attach="0"/>
+      <heat value="244"/>
+      <reload rate="0.8"/>
+      <damage value="78" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_shotgun_01_mk1" inside="impact_gen_m_shotgun_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_shotgun_01_mk1_bigobject" inside="impact_gen_m_shotgun_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_shotgun_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_m_shotgun_01_mk2_macro" class="bullet">
+    <component ref="bullet_gen_m_shotgun_01_mk2"/>
+    <properties>
+      <bullet speed="4838" lifetime="0.762" amount="5" barrelamount="1" icon="weapon_shotgun_mk2" timediff="0.004" angle="1" maxhits="3" ricochet="0.5" restitution="1" scale="0" attach="0"/>
+      <heat value="234"/>
+      <reload rate="1"/>
+      <damage value="146" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_shotgun_01_mk1" inside="impact_gen_m_shotgun_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_shotgun_01_mk1_bigobject" inside="impact_gen_m_shotgun_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_shotgun_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_m_yacht_beam_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_m_yacht_beam_01_mk1"/>
+    <properties>
+      <bullet speed="45000" lifetime="4" range="4500" amount="1" barrelamount="1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <heat value="100"/>
+      <reload time="4"/>
+      <damage value="120" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_yacht_beam_01_mk1" inside="impact_gen_m_yacht_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_yacht_beam_01_mk1_bigobject" inside="impact_gen_m_yacht_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_yacht_beam_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_m_yacht_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_m_yacht_laser_01_mk1"/>
+    <properties>
+      <ammunition value="1" reload="0.1"/>
+      <bullet speed="4500" lifetime="1.1" amount="1" barrelamount="1" timediff="0.01" angle="0.3" maxhits="1" ricochet="0.8" restitution="0.5" scale="0" attach="0"/>
+      <heat value="10"/>
+      <reload rate="10"/>
+      <damage value="10" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_yacht_laser_01_mk1" inside="impact_gen_m_yacht_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_yacht_laser_01_mk1_bigobject" inside="impact_gen_m_yacht_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_yacht_laser_01_mk1_base"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_s_beam_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_s_beam_01_mk1"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="4" range="3000" amount="1" barrelamount="1" icon="weapon_beam_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <heat initial="1000" value="110"/>
+      <reload time="4"/>
+      <damage value="50" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_beam_01_mk1" inside="impact_gen_s_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_beam_01_mk1_bigobject" inside="impact_gen_s_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_s_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="wpn_beam_gen_01"/>
+      </sounds>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_s_beam_01_mk2_macro" class="bullet">
+    <component ref="bullet_gen_s_beam_01_mk2"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="4" range="3000" amount="1" barrelamount="1" icon="weapon_beam_mk2" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <heat initial="1000" value="159"/>
+      <reload time="5"/>
+      <damage value="122" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_beam_01_mk1" inside="impact_gen_s_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_beam_01_mk1_bigobject" inside="impact_gen_s_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_s_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="wpn_beam_gen_01"/>
+      </sounds>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_s_burst_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_s_burst_01_mk1"/>
+    <properties>
+      <ammunition value="3" reload="1.3"/>
+      <bullet speed="96000" lifetime="0.15" range="2100" amount="1" barrelamount="1" delay="0.2" icon="weapon_burst_mk1" timediff="0.05" angle="2" maxhits="1" ricochet="0" restitution="1" scale="1" attach="1"/>
+      <heat value="718"/>
+      <reload rate="6"/>
+      <damage value="74" hull="30" repair="0">
+        <multiplier surfaceelement="7"/>
+      </damage>
+      <effects>
+        <impact ref="impact_gen_s_burst_01_mk1"/>
+        <launch ref="muzzle_gen_s_burst_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_s_burst_01_mk2_macro" class="bullet">
+    <component ref="bullet_gen_s_burst_01_mk2"/>
+    <properties>
+      <ammunition value="7" reload="0.5"/>
+      <bullet speed="96000" lifetime="0.15" range="2100" amount="1" barrelamount="1" delay="0.2" icon="weapon_burst_mk2" timediff="0.05" angle="2" maxhits="1" ricochet="0" restitution="1" scale="1" attach="1"/>
+      <heat value="720"/>
+      <reload rate="6"/>
+      <damage value="47" hull="30" repair="0">
+        <multiplier surfaceelement="13"/>
+      </damage>
+      <effects>
+        <impact ref="impact_gen_s_burst_01_mk1"/>
+        <launch ref="muzzle_gen_s_burst_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_s_cannon_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_s_cannon_01_mk1"/>
+    <properties>
+      <bullet speed="1440" lifetime="2.3" amount="1" barrelamount="1" icon="weapon_cannon_mk1" timediff="0.001" angle="0.02" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0" selfdestruct="1"/>
+      <heat value="2216"/>
+      <reload time="2.3"/>
+      <areadamage value="443" range="100" falloff="1" lifetime="1"/>
+      <damage value="443" repair="0"/>
+      <effects>
+        <impact ref="explosion_flak"/>
+        <launch ref="muzzle_gen_s_flak_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_s_cannon_01_mk2_macro" class="bullet">
+    <component ref="bullet_gen_s_cannon_01_mk2"/>
+    <properties>
+      <bullet speed="1440" lifetime="2.3" amount="1" barrelamount="1" icon="weapon_cannon_mk2" timediff="0.001" angle="0.02" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0" selfdestruct="1"/>
+      <heat value="2216"/>
+      <reload time="2.3"/>
+      <areadamage value="864" range="120" falloff="1" lifetime="1"/>
+      <damage value="864" repair="0"/>
+      <effects>
+        <impact ref="explosion_flak"/>
+        <launch ref="muzzle_gen_s_flak_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_s_gatling_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_s_gatling_01_mk1"/>
+    <properties>
+      <ammunition value="18" reload="1"/>
+      <bullet speed="2400" lifetime="1.25" amount="1" barrelamount="1" icon="weapon_gatling_mk1" timediff="0.017" angle="0.17" maxhits="2" ricochet="0.01" restitution="0.3" scale="0" attach="0"/>
+      <heat value="45"/>
+      <reload rate="12"/>
+      <damage value="15" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_gatling_01_mk1" inside="impact_gen_s_gatling_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_gatling_01_mk1_bigobject" inside="impact_gen_s_gatling_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_s_gatling_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_s_gatling_01_mk2_macro" class="bullet">
+    <component ref="bullet_gen_s_gatling_01_mk2"/>
+    <properties>
+      <ammunition value="20" reload="1"/>
+      <bullet speed="2400" lifetime="1.25" amount="1" barrelamount="1" icon="weapon_gatling_mk2" timediff="0.014" angle="0.14" maxhits="2" ricochet="0.01" restitution="0.3" scale="0" attach="0"/>
+      <heat value="55"/>
+      <reload rate="10"/>
+      <damage value="32" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_gatling_01_mk1" inside="impact_gen_s_gatling_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_gatling_01_mk1_bigobject" inside="impact_gen_s_gatling_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_s_gatling_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_s_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_s_laser_01_mk1"/>
+    <properties>
+      <ammunition value="2" reload="0.5"/>
+      <bullet speed="4147" lifetime="0.75" amount="1" barrelamount="1" icon="weapon_laser_mk1" timediff="0.018" angle="0.3" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="53"/>
+      <reload rate="7"/>
+      <damage value="32" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_laser_01_mk1" inside="impact_gen_s_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_laser_01_mk1_bigobject" inside="impact_gen_s_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_s_laser_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_s_laser_01_mk2_macro" class="bullet">
+    <component ref="bullet_gen_s_laser_01_mk2"/>
+    <properties>
+      <ammunition value="4" reload="0.7"/>
+      <bullet speed="4147" lifetime="0.75" amount="1" barrelamount="1" icon="weapon_laser_mk2" timediff="0.02" angle="0.34" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="46"/>
+      <reload rate="8"/>
+      <damage value="47" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_laser_01_mk1" inside="impact_gen_s_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_laser_01_mk1_bigobject" inside="impact_gen_s_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_s_laser_01_mk2"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_s_mining_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_s_mining_01_mk1"/>
+    <properties>
+      <bullet speed="7000" lifetime="4" range="3000" amount="1" barrelamount="1" icon="weapon_mining_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="4"/>
+      <damage value="1" repair="0">
+        <multiplier mining="300"/>
+      </damage>
+      <effects>
+        <impact ref="impact_gen_s_mining_01_mk1" inside="impact_gen_s_mining_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_mining_01_mk1_bigobject" inside="impact_gen_s_mining_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_s_mining_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="wpn_beam_muzzle"/>
+      </sounds>
+      <weapon system="weapon_mining"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_s_mining_01_mk2_macro" class="bullet">
+    <component ref="bullet_gen_s_mining_01_mk2"/>
+    <properties>
+      <bullet speed="7000" lifetime="4" range="3000" amount="1" barrelamount="1" icon="weapon_mining_mk2" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="4"/>
+      <damage value="3" repair="0">
+        <multiplier mining="300"/>
+      </damage>
+      <effects>
+        <impact ref="impact_gen_s_mining_01_mk1" inside="impact_gen_s_mining_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_mining_01_mk1_bigobject" inside="impact_gen_s_mining_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_s_mining_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="wpn_beam_mining_muzzle"/>
+      </sounds>
+      <weapon system="weapon_mining"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_s_plasma_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_s_plasma_01_mk1"/>
+    <properties>
+      <bullet speed="1229" lifetime="3.3" amount="1" barrelamount="1" icon="weapon_plasma_mk1" timediff="0" angle="0" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="5122"/>
+      <reload time="4"/>
+      <damage value="1024" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_plasma_01_mk1" inside="impact_gen_s_plasma_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_plasma_01_mk1_bigobject" inside="impact_gen_s_plasma_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_s_plasma_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_s_plasma_01_mk2_macro" class="bullet">
+    <component ref="bullet_gen_s_plasma_01_mk2"/>
+    <properties>
+      <bullet speed="1229" lifetime="3.3" amount="1" barrelamount="1" icon="weapon_plasma_mk2" timediff="0" angle="0.01" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="3414"/>
+      <reload time="3"/>
+      <damage value="1331" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_plasma_01_mk1" inside="impact_gen_s_plasma_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_plasma_01_mk1_bigobject" inside="impact_gen_s_plasma_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_s_plasma_01_mk2"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_s_shotgun_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_s_shotgun_01_mk1"/>
+    <properties>
+      <bullet speed="2880" lifetime="0.8" amount="5" barrelamount="1" icon="weapon_shotgun_mk1" timediff="0.004" angle="1.25" maxhits="3" ricochet="0.5" restitution="0.5" scale="0" attach="0"/>
+      <heat value="245"/>
+      <reload rate="1"/>
+      <damage value="49" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_shotgun_01_mk1" inside="impact_gen_s_shotgun_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_shotgun_01_mk1_bigobject" inside="impact_gen_s_shotgun_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_s_shotgun_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_s_shotgun_01_mk2_macro" class="bullet">
+    <component ref="bullet_gen_s_shotgun_01_mk2"/>
+    <properties>
+      <bullet speed="3456" lifetime="0.667" amount="4" barrelamount="1" icon="weapon_shotgun_mk2" timediff="0.005" angle="1" maxhits="3" ricochet="0.5" restitution="0.5" scale="0" attach="0"/>
+      <heat value="244"/>
+      <reload rate="1.25"/>
+      <damage value="95" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_shotgun_01_mk1" inside="impact_gen_s_shotgun_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_shotgun_01_mk1_bigobject" inside="impact_gen_s_shotgun_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_s_shotgun_01_mk2"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_turret_m_beam_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_s_beam_01_mk1"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="1" range="2550" amount="1" barrelamount="1" icon="weapon_beam_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="3"/>
+      <damage value="72" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_beam_01_mk1" inside="impact_gen_m_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_beam_01_mk1_bigobject" inside="impact_gen_m_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_turret_gen_m_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="turret_beam_muzzle"/>
+      </sounds>
+      <weapon system="turret_shortrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_turret_m_disabler_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_turret_m_disabler_01_mk1"/>
+    <properties>
+      <bullet speed="10000" lifetime="0.31" amount="1" barrelamount="1" icon="weapon_railgun_mk1" maxhits="1" ricochet="0" restitution="1" scale="1" attach="0" influencelist="envoy_distortion_light"/>
+      <reload time="3.4"/>
+      <damage value="1" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_disabling_01"/>
+        <launch ref="muzzle_gen_turret_m_disabling_01"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_turret_m_gatling_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_s_gatling_01_mk1"/>
+    <properties>
+      <ammunition value="15" reload="1"/>
+      <bullet speed="1074" lifetime="3.074" amount="1" barrelamount="2" icon="weapon_gatling_mk1" timediff="0.032" angle="0.54" maxhits="2" ricochet="0.01" restitution="0.3" scale="0" attach="0"/>
+      <reload rate="10"/>
+      <damage value="9" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_gatling_01_mk1" inside="impact_gen_s_gatling_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_gatling_01_mk1_bigobject" inside="impact_gen_s_gatling_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_turret_gen_m_gatling_01_mk1"/>
+      </effects>
+      <weapon system="turret_shortrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_turret_m_gatling_02_mk1_macro" class="bullet">
+    <component ref="bullet_gen_turret_m_gatling_02_mk1"/>
+    <properties>
+      <ammunition value="3" reload="3.1"/>
+      <bullet speed="2469.5" lifetime="1.229" amount="1" barrelamount="1" icon="weapon_gatling_mk1" timediff="0.005" angle="0.09" maxhits="2" ricochet="1" restitution="0.7" scale="0" attach="0"/>
+      <reload rate="6.7"/>
+      <damage value="336" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_gatling_02_diplomacy"/>
+        <launch ref="muzzle_gen_m_gatling_02_diplomacy"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_turret_m_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_s_laser_01_mk1"/>
+    <properties>
+      <ammunition value="3" reload="0.5"/>
+      <bullet speed="1855" lifetime="1.844" amount="1" barrelamount="2" icon="weapon_laser_mk1" timediff="0.019" angle="0.32" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <reload rate="6"/>
+      <damage value="12" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_laser_01_mk1" inside="impact_gen_s_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_laser_01_mk1_bigobject" inside="impact_gen_s_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_turret_gen_m_laser_01_mk1"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_turret_m_laser_story_mk1_macro" class="bullet">
+    <component ref="bullet_gen_turret_m_laser_story_mk1"/>
+    <properties>
+      <ammunition value="3" reload="0.5"/>
+      <bullet speed="342" lifetime="10" amount="1" barrelamount="2" icon="weapon_laser_mk1" timediff="0.019" angle="0.32" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <reload rate="3"/>
+      <damage value="63" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_laser_01_mk1" inside="impact_gen_s_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_laser_01_mk1_bigobject" inside="impact_gen_s_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_turret_gen_m_laser_01_mk1"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_turret_m_mining_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_s_mining_01_mk1"/>
+    <properties>
+      <bullet speed="7000" lifetime="4" range="2550" amount="1" barrelamount="1" icon="weapon_mining_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="4"/>
+      <damage value="1" repair="0">
+        <multiplier mining="300"/>
+      </damage>
+      <effects>
+        <impact ref="impact_gen_s_mining_01_mk1" inside="impact_gen_s_mining_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_mining_01_mk1_bigobject" inside="impact_gen_s_mining_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_s_mining_01_mk1"/>
+      </effects>
+      <weapon system="weapon_mining"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_turret_m_plasma_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_s_plasma_01_mk1"/>
+    <properties>
+      <bullet speed="550" lifetime="8.114" amount="1" barrelamount="2" icon="weapon_plasma_mk1" timediff="0" angle="0.01" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <reload time="4.7"/>
+      <damage value="741" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_plasma_01_mk1" inside="impact_gen_s_plasma_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_plasma_01_mk1_bigobject" inside="impact_gen_s_plasma_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_turret_gen_m_plasma_01_mk1"/>
+      </effects>
+      <weapon system="turret_longrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_turret_m_shieldpierce_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_turret_m_shieldpierce_01_mk1"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="4" range="2156.3" amount="1" barrelamount="1" icon="weapon_beam_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="4"/>
+      <damage hull="148" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_shieldpierce_01"/>
+        <launch ref="muzzle_gen_turret_m_shieldpierce_01"/>
+      </effects>
+      <weapon system="turret_shortrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_gen_turret_m_shotgun_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_s_shotgun_01_mk1"/>
+    <properties>
+      <bullet speed="1288" lifetime="1.967" amount="5" barrelamount="2" icon="weapon_shotgun_mk1" timediff="0.003" angle="1.25" maxhits="3" ricochet="0.5" restitution="0.5" scale="0" attach="0"/>
+      <reload rate="0.85"/>
+      <damage value="29" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_shotgun_01_mk1" inside="impact_gen_s_shotgun_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_shotgun_01_mk1_bigobject" inside="impact_gen_s_shotgun_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_turret_gen_m_shotgun_01_mk1"/>
+      </effects>
+      <weapon system="turret_shortrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_kha_l_beam_02_mk1_macro" class="bullet">
+    <component ref="bullet_kha_l_beam_02_mk1"/>
+    <properties>
+      <bullet speed="30000" lifetime="4" range="14000" amount="1" barrelamount="1" angle="0" maxhits="1" ricochet="0" restitution="1" scale="1" attach="1" chargetime="5.5" heatwhilecharging="0" firewhenfullcharge="1" forcecooldownaftershot="1"/>
+      <heat value="2000"/>
+      <reload time="10"/>
+      <damage value="90000" repair="0"/>
+      <effects>
+        <impact ref="impact_kha_l_beam_01_mk1" inside="impact_kha_l_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_kha_l_beam_01_mk1_bigobject" inside="impact_kha_l_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_kha_l_destroyer_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="weapon_kha_l_beam_01_mk1_loop"/>
+      </sounds>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_kha_l_scenariobeam_02_mk1_macro" class="bullet" ref="bullet_kha_l_beam_02_mk1_macro">
+    <component ref="bullet_kha_l_beam_02_mk1"/>
+    <properties>
+      <reload time="4"/>
+      <effects>
+        <impact ref="impact_kha_l_beam_01_mk1" inside="impact_kha_l_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_kha_l_beam_01_mk1_bigobject" inside="impact_kha_l_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_kha_l_destroyer_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="weapon_kha_l_beam_01_mk1_loop"/>
+      </sounds>
+    </properties>
+  </macro>
+  <macro name="bullet_kha_m_beam_01_macro" class="bullet">
+    <component ref="bullet_kha_m_beam_01"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="0.7" range="4500" amount="1" barrelamount="1" icon="weapon_beam_mk2" timediff="1.7" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <heat initial="1000" value="204"/>
+      <reload time="1.911"/>
+      <damage value="314" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_beam_01_mk1" inside="impact_gen_m_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_beam_01_mk1_bigobject" inside="impact_gen_m_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="wpn_beam_khaak"/>
+      </sounds>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_kha_s_beam_01_macro" class="bullet">
+    <component ref="bullet_kha_s_beam_01"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="0.3" range="3000" amount="1" barrelamount="1" icon="weapon_beam_mk1" timediff="0.5" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <heat initial="1000" value="138"/>
+      <reload time="0.711"/>
+      <damage value="170" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_beam_01_mk1" inside="impact_gen_s_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_beam_01_mk1_bigobject" inside="impact_gen_s_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_s_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="wpn_beam_khaak"/>
+      </sounds>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_kha_turret_l_beam_01_mk1_macro" class="bullet">
+    <component ref="bullet_kha_l_beam_01_mk1"/>
+    <properties>
+      <bullet speed="16000" lifetime="1.5" range="8000" amount="1" barrelamount="1" maxhits="1" ricochet="0" restitution="1" scale="1" attach="1"/>
+      <reload time="3"/>
+      <damage value="1600" repair="0"/>
+      <effects>
+        <impact ref="impact_kha_l_beam_01_mk1" inside="impact_kha_l_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_kha_l_beam_01_mk1_bigobject" inside="impact_kha_l_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_kha_l_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="wpn_beam_khaak"/>
+      </sounds>
+    </properties>
+  </macro>
+  <macro name="bullet_kha_turret_l_beam_01_mk1_scenario_macro" class="bullet" ref="bullet_kha_turret_l_beam_01_mk1_macro">
+    <component ref="bullet_kha_l_beam_01_mk1"/>
+    <properties>
+      <bullet scale="1" attach="1"/>
+      <damage value="300"/>
+    </properties>
+  </macro>
+  <macro name="bullet_kha_turret_m_beam_01_macro" class="bullet">
+    <component ref="bullet_kha_m_beam_01"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="0.7" range="4500" amount="1" barrelamount="1" icon="weapon_beam_mk1" timediff="1.7" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="1.911"/>
+      <damage value="314" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_beam_01_mk1" inside="impact_gen_m_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_beam_01_mk1_bigobject" inside="impact_gen_m_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="wpn_beam_khaak"/>
+      </sounds>
+      <weapon system="turret_shortrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_kha_xl_beam_01_mk1_macro" class="bullet">
+    <component ref="bullet_kha_xl_beam_01_mk1"/>
+    <properties>
+      <bullet speed="100000" lifetime="6" range="20000" amount="1" barrelamount="1" angle="0" maxhits="1" ricochet="0" restitution="1" scale="1" attach="1" chargetime="10" heatwhilecharging="0" requirefullcharge="1" firewhenfullcharge="1" forcecooldownaftershot="1"/>
+      <heat value="1666"/>
+      <reload time="10.1"/>
+      <damage value="1000000" repair="0"/>
+      <effects>
+        <impact ref="impact_kha_xl_beam_01_mk1" inside="impact_kha_xl_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_kha_xl_beam_01_mk1_bigobject" inside="impact_kha_xl_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_kha_xl_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="weapon_kha_xl_beam_01_mk1_loop"/>
+      </sounds>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_par_l_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_par_l_laser_01_mk1"/>
+    <properties>
+      <bullet speed="2157" lifetime="5.04" amount="1" barrelamount="1" icon="weapon_laser_mk1" timediff="0.001" angle="0.01" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="2301"/>
+      <reload time="2.833"/>
+      <damage value="5669" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_l_laser_01_mk1" inside="impact_gen_l_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_l_laser_01_mk1_bigobject" inside="impact_gen_l_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_l_laser_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_par_l_laser_02_mk1_macro" class="bullet">
+    <component ref="bullet_par_l_laser_02_mk1"/>
+    <properties>
+      <bullet speed="3333" lifetime="2.18" amount="1" barrelamount="1" icon="weapon_laser_mk1" timediff="0.02" angle="0.05" maxhits="1" ricochet="0" scale="0" attach="0" sticktime="0.1"/>
+      <heat value="920"/>
+      <reload rate="0.65"/>
+      <damage value="800" repair="0">
+        <multiplier surfaceelement="1.5"/>
+      </damage>
+      <effects>
+        <impact ref="impact_par_l_laser_02_mk1" inside="impact_par_l_laser_02_mk1_inside"/>
+        <bigobjectimpact ref="impact_par_l_laser_02_mk1_bigobject" inside="impact_par_l_laser_02_mk1_bigobject_inside"/>
+        <launch ref="muzzle_par_l_laser_02_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_par_m_railgun_01_mk1_macro" class="bullet">
+    <component ref="bullet_par_m_railgun_01_mk1"/>
+    <properties>
+      <bullet speed="10000" lifetime="1.6" amount="1" barrelamount="1" icon="weapon_railgun_mk1" maxhits="3" ricochet="0" scale="1" attach="0" chargetime="0.1"/>
+      <heat initial="8000"/>
+      <reload time="3.4"/>
+      <damage value="800" repair="0"/>
+      <effects>
+        <impact ref="impact_par_m_railgun_01_mk1" inside="impact_par_m_railgun_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_par_m_railgun_01_mk1_bigobject" inside="impact_par_m_railgun_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_par_m_railgun_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_par_m_railgun_01_mk2_macro" class="bullet">
+    <component ref="bullet_par_m_railgun_01_mk2"/>
+    <properties>
+      <bullet speed="10000" lifetime="1.6" amount="1" barrelamount="1" icon="weapon_railgun_mk2" maxhits="3" ricochet="0" scale="1" attach="0" chargetime="0.1"/>
+      <heat initial="4500"/>
+      <reload time="3.4"/>
+      <damage value="800" repair="0"/>
+      <effects>
+        <impact ref="impact_par_m_railgun_01_mk1" inside="impact_par_m_railgun_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_par_m_railgun_01_mk1_bigobject" inside="impact_par_m_railgun_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_par_m_railgun_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_par_s_railgun_01_mk1_macro" class="bullet">
+    <component ref="bullet_par_s_railgun_01_mk1"/>
+    <properties>
+      <bullet speed="10000" lifetime="1.2" amount="1" barrelamount="1" icon="weapon_railgun_mk1" maxhits="3" ricochet="0" scale="1" attach="0" chargetime="0.1"/>
+      <heat initial="8000"/>
+      <reload time="3.4"/>
+      <damage value="500" repair="0"/>
+      <effects>
+        <impact ref="impact_par_s_railgun_01_mk1" inside="impact_par_s_railgun_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_par_s_railgun_01_mk1_bigobject" inside="impact_par_s_railgun_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_par_s_railgun_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_par_s_railgun_01_mk2_macro" class="bullet">
+    <component ref="bullet_par_s_railgun_01_mk2"/>
+    <properties>
+      <bullet speed="10000" lifetime="1.2" amount="1" barrelamount="1" icon="weapon_railgun_mk2" maxhits="3" ricochet="0" scale="1" attach="0" chargetime="0.1"/>
+      <heat initial="4500"/>
+      <reload time="3.4"/>
+      <damage value="500" repair="0"/>
+      <effects>
+        <impact ref="impact_par_s_railgun_01_mk1" inside="impact_par_s_railgun_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_par_s_railgun_01_mk1_bigobject" inside="impact_par_s_railgun_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_par_s_railgun_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_par_turret_l_beam_01_mk1_macro" class="bullet">
+    <component ref="bullet_par_l_beam_01_mk1"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="3" range="5000" amount="1" barrelamount="1" icon="weapon_beam_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="5"/>
+      <damage value="147" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_beam_01_mk1" inside="impact_gen_m_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_beam_01_mk1_bigobject" inside="impact_gen_m_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_turret_gen_m_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="turret_beam_muzzle"/>
+      </sounds>
+      <weapon system="turret_shortrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_par_turret_l_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_par_l_laser_01_mk1"/>
+    <properties>
+      <bullet speed="2653" lifetime="2.575" amount="1" barrelamount="2" icon="weapon_laser_mk1" timediff="0.001" angle="0.02" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <reload time="3.4"/>
+      <damage value="501" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_l_laser_01_mk1" inside="impact_gen_l_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_l_laser_01_mk1_bigobject" inside="impact_gen_l_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_turret_gen_l_laser_01_mk1"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_par_turret_l_mining_01_mk1_macro" class="bullet">
+    <component ref="bullet_par_l_mining_01_mk1"/>
+    <properties>
+      <bullet speed="7000" lifetime="4" range="7000" amount="1" barrelamount="1" icon="weapon_mining_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="4"/>
+      <damage value="2" hull="1" delay="1" repair="0">
+        <multiplier mining="450"/>
+      </damage>
+      <effects>
+        <impact ref="impact_gen_l_mining_01_mk1" inside="impact_gen_l_mining_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_l_mining_01_mk1_bigobject" inside="impact_gen_l_mining_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_l_mining_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="turret_beam_muzzle"/>
+      </sounds>
+      <weapon system="weapon_mining"/>
+    </properties>
+  </macro>
+  <macro name="bullet_par_turret_l_plasma_01_mk1_macro" class="bullet">
+    <component ref="bullet_par_l_plasma_01_mk1"/>
+    <properties>
+      <bullet speed="572" lifetime="15.579" amount="1" barrelamount="2" icon="weapon_plasma_mk1" timediff="0" angle="0" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <reload time="7.1"/>
+      <damage value="3751" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_plasma_01_mk1" inside="impact_gen_m_plasma_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_plasma_01_mk1_bigobject" inside="impact_gen_m_plasma_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_plasma_01_mk1"/>
+      </effects>
+      <weapon system="turret_longrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_pir_turret_l_battleship_01_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_pir_l_laser_01_mk1"/>
+    <properties>
+      <ammunition value="2" reload="0.5"/>
+      <bullet speed="2040.9" lifetime="4.518" amount="1" barrelamount="2" icon="weapon_laser_mk1" timediff="0.001" angle="0.02" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0"/>
+      <reload time="2.3"/>
+      <damage value="2652" repair="0"/>
+      <effects>
+        <impact ref="impact_pir_l_laser_01_mk1" inside="impact_pir_l_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_pir_l_laser_01_mk1_bigobject" inside="impact_pir_l_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_pir_l_laser_01_mk1"/>
+      </effects>
+      <damagecurves>
+        <time>
+          <point position="0.2" value="1"/>
+          <point position="0.5" value="0.7"/>
+          <point position="1" value="0.1"/>
+        </time>
+        <distance>
+          <point position="0.2" value="1"/>
+          <point position="0.5" value="0.7"/>
+          <point position="1" value="0.1"/>
+        </distance>
+      </damagecurves>
+    </properties>
+  </macro>
+  <macro name="bullet_pir_turret_m_battleship_01_gatling_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_m_gatling_01_mk1"/>
+    <properties>
+      <ammunition value="15" reload="1"/>
+      <bullet speed="3221.1" lifetime="2.863" amount="1" barrelamount="2" icon="weapon_gatling_mk1" timediff="0.025" angle="0.43" maxhits="2" ricochet="0.01" restitution="0.3" scale="0" attach="0"/>
+      <reload rate="8"/>
+      <damage value="26" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_gatling_01_mk1" inside="impact_gen_s_gatling_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_gatling_01_mk1_bigobject" inside="impact_gen_s_gatling_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_turret_gen_m_gatling_01_mk1"/>
+      </effects>
+      <weapon system="turret_shortrange"/>
+      <damagecurves>
+        <time>
+          <point position="0.2" value="1"/>
+          <point position="0.5" value="0.8"/>
+          <point position="1" value="0.1"/>
+        </time>
+        <distance>
+          <point position="0.2" value="1"/>
+          <point position="0.5" value="0.7"/>
+          <point position="1" value="0.1"/>
+        </distance>
+      </damagecurves>
+    </properties>
+  </macro>
+  <macro name="bullet_pir_xl_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_pir_xl_laser_01_mk1"/>
+    <properties>
+      <ammunition value="1" reload="0"/>
+      <bullet speed="2488.3" lifetime="3.706" amount="1" barrelamount="1" icon="weapon_laser_mk1" timediff="0.001" angle="0.03" maxhits="1" ricochet="0" scale="0" attach="0" chargetime="1"/>
+      <heat value="915"/>
+      <reload time="1.7"/>
+      <damage value="12979" repair="0"/>
+      <effects>
+        <impact ref="impact_pir_xl_laser_01_mk1" inside="impact_pir_xl_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_pir_xl_laser_01_mk1_bigobject" inside="impact_pir_xl_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_pir_xl_laser_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spacesuit_repairlaser_01_mk1_macro" class="bullet">
+    <component ref="bullet_spacesuit_repairlaser_01_mk1"/>
+    <properties>
+      <bullet speed="800" lifetime="4" range="25" icon="weapon_repairlaser_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="4"/>
+      <damage hull="2" repair="1"/>
+      <effects>
+        <impact ref="impact_spacesuit_repair_01_mk1"/>
+        <launch ref="muzzle_gen_s_repair_01_mk1"/>
+      </effects>
+      <sounds>
+        <ambient ref="wpn_beam_repair"/>
+      </sounds>
+      <weapon system="weapon_repair"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_l_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_spl_l_laser_01_mk1"/>
+    <properties>
+      <ammunition value="5" reload="1"/>
+      <bullet speed="1327" lifetime="5.04" amount="1" barrelamount="1" timediff="0.002" angle="0.15" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="464"/>
+      <reload rate="2.04"/>
+      <damage value="1608" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_l_laser_01_mk1"/>
+        <bigobjectimpact ref="impact_gen_l_laser_01_mk1_bigobject" inside="impact_gen_l_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_l_laser_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_m_flak_01_mk1_macro" class="bullet">
+    <component ref="bullet_spl_m_flak_01_mk1"/>
+    <properties>
+      <ammunition value="13" reload="2.3"/>
+      <bullet speed="1350" lifetime="1.9" amount="1" barrelamount="1" icon="weapon_cannon_mk1" timediff="0.007" angle="0.61" maxhits="1" ricochet="0" scale="0" attach="0" selfdestruct="1"/>
+      <reload rate="4"/>
+      <areadamage value="44" time="1" lifetime="1"/>
+      <damage value="44" repair="0"/>
+      <effects>
+        <impact ref="impact_spl_m_flak_01_mk1"/>
+        <launch ref="muzzle_turret_spl_m_flak_01_mk1"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_m_gatling_01_mk1_macro" class="bullet">
+    <component ref="bullet_spl_m_gatling_01_mk1"/>
+    <properties>
+      <bullet speed="1728" lifetime="2.5" amount="1" barrelamount="1" icon="weapon_gatling_mk1" timediff="0.018" angle="0.92" maxhits="2" ricochet="0.01" restitution="0.3" scale="0" attach="0"/>
+      <heat value="106"/>
+      <reload rate="7"/>
+      <damage value="34" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_gatling_01_mk1" inside="impact_gen_m_gatling_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_gatling_01_mk1_bigobject" inside="impact_gen_m_gatling_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_spl_s_gatling_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_m_gatling_01_mk2_macro" class="bullet">
+    <component ref="bullet_spl_m_gatling_01_mk2"/>
+    <properties>
+      <bullet speed="1728" lifetime="2.5" amount="1" barrelamount="1" icon="weapon_gatling_mk2" timediff="0.028" angle="1.45" maxhits="2" ricochet="0.01" restitution="0.3" scale="0" attach="0"/>
+      <heat value="69"/>
+      <reload rate="11"/>
+      <damage value="43" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_gatling_01_mk1" inside="impact_gen_m_gatling_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_gatling_01_mk1_bigobject" inside="impact_gen_m_gatling_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_spl_s_gatling_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_m_railgun_01_mk1_macro" class="bullet">
+    <component ref="bullet_spl_m_railgun_01_mk1"/>
+    <properties>
+      <bullet speed="10000" lifetime="0.7" amount="1" barrelamount="1" icon="weapon_railgun_mk1" maxhits="3" ricochet="0" scale="1" attach="0" chargetime="0.1"/>
+      <heat initial="8000"/>
+      <reload time="1.5"/>
+      <damage value="1000" repair="0"/>
+      <effects>
+        <impact ref="impact_par_m_railgun_01_mk1" inside="impact_par_m_railgun_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_par_m_railgun_01_mk1_bigobject" inside="impact_par_m_railgun_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_par_m_railgun_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_m_railgun_01_mk2_macro" class="bullet">
+    <component ref="bullet_spl_m_railgun_01_mk2"/>
+    <properties>
+      <bullet speed="10000" lifetime="0.7" amount="1" barrelamount="1" icon="weapon_railgun_mk2" maxhits="3" ricochet="0" scale="1" attach="0" chargetime="0.1"/>
+      <heat initial="8000"/>
+      <reload time="1.2"/>
+      <damage value="1600" repair="0"/>
+      <effects>
+        <impact ref="impact_par_m_railgun_01_mk1" inside="impact_par_m_railgun_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_par_m_railgun_01_mk1_bigobject" inside="impact_par_m_railgun_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_par_m_railgun_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_m_shotgun_01_mk1_macro" class="bullet">
+    <component ref="bullet_spl_m_shotgun_01_mk1"/>
+    <properties>
+      <bullet speed="3266" lifetime="0.9" amount="3" barrelamount="1" icon="weapon_shotgun_mk1" timediff="0.003" angle="1.25" maxhits="3" ricochet="0.5" restitution="1" scale="0" attach="0"/>
+      <heat value="216"/>
+      <reload rate="2"/>
+      <damage value="69" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_shotgun_01_mk1" inside="impact_gen_m_shotgun_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_shotgun_01_mk1_bigobject" inside="impact_gen_m_shotgun_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_shotgun_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_m_shotgun_01_mk2_macro" class="bullet">
+    <component ref="bullet_spl_m_shotgun_01_mk2"/>
+    <properties>
+      <bullet speed="3919" lifetime="0.76" amount="3" barrelamount="1" icon="weapon_shotgun_mk2" timediff="0.004" angle="1" maxhits="3" ricochet="0.5" restitution="1" scale="0" attach="0"/>
+      <heat value="173"/>
+      <reload rate="2.5"/>
+      <damage value="108" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_shotgun_01_mk1" inside="impact_gen_m_shotgun_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_shotgun_01_mk1_bigobject" inside="impact_gen_m_shotgun_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_shotgun_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_m_sticky_01_mk1_macro" class="bullet">
+    <component ref="bullet_spl_m_sticky_01_mk1"/>
+    <properties>
+      <ammunition value="3" reload="1.1"/>
+      <bullet speed="1901" lifetime="2.182" amount="1" barrelamount="1" icon="weapon_sticky_mk1" timediff="0.014" angle="0.75" maxhits="1" ricochet="0" scale="0" attach="0" sticktime="2"/>
+      <heat value="56"/>
+      <reload rate="10"/>
+      <damage value="63" hull="14" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_laser_01_mk1" inside="impact_gen_m_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_laser_01_mk1_bigobject" inside="impact_gen_m_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_laser_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_m_sticky_01_mk2_macro" class="bullet">
+    <component ref="bullet_spl_m_sticky_01_mk2"/>
+    <properties>
+      <ammunition value="7" reload="0.9"/>
+      <bullet speed="1901" lifetime="2.182" amount="1" barrelamount="1" icon="weapon_sticky_mk2" timediff="0.017" angle="0.69" maxhits="1" ricochet="0" scale="0" attach="0" sticktime="3"/>
+      <heat value="80"/>
+      <reload rate="7"/>
+      <damage value="76" hull="14" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_laser_01_mk1" inside="impact_gen_m_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_laser_01_mk1_bigobject" inside="impact_gen_m_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_s_laser_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_s_gatling_01_mk1_macro" class="bullet">
+    <component ref="bullet_spl_s_gatling_01_mk1"/>
+    <properties>
+      <bullet speed="2160" lifetime="1.25" amount="1" barrelamount="1" icon="weapon_gatling_mk1" timediff="0.024" angle="1.28" maxhits="2" ricochet="0.01" restitution="0.3" scale="0" attach="0"/>
+      <heat value="40"/>
+      <reload rate="17"/>
+      <damage value="8" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_gatling_01_mk1" inside="impact_gen_s_gatling_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_gatling_01_mk1_bigobject" inside="impact_gen_s_gatling_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_spl_s_gatling_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_s_gatling_01_mk2_macro" class="bullet">
+    <component ref="bullet_spl_s_gatling_01_mk2"/>
+    <properties>
+      <bullet speed="2160" lifetime="1.25" amount="1" barrelamount="1" icon="weapon_gatling_mk2" timediff="0.033" angle="1.73" maxhits="2" ricochet="0.01" restitution="0.3" scale="0" attach="0"/>
+      <heat value="31"/>
+      <reload rate="23"/>
+      <damage value="12" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_gatling_01_mk1" inside="impact_gen_s_gatling_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_gatling_01_mk1_bigobject" inside="impact_gen_s_gatling_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_spl_s_gatling_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_s_railgun_01_mk1_macro" class="bullet">
+    <component ref="bullet_spl_s_railgun_01_mk1"/>
+    <properties>
+      <bullet speed="10000" lifetime="0.5" amount="1" barrelamount="1" icon="weapon_railgun_mk1" maxhits="3" ricochet="0" scale="1" attach="0" chargetime="0.1"/>
+      <heat initial="8000"/>
+      <reload time="1.5"/>
+      <damage value="625" repair="0"/>
+      <effects>
+        <impact ref="impact_par_s_railgun_01_mk1" inside="impact_par_s_railgun_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_par_s_railgun_01_mk1_bigobject" inside="impact_par_s_railgun_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_par_s_railgun_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_s_railgun_01_mk2_macro" class="bullet">
+    <component ref="bullet_spl_s_railgun_01_mk2"/>
+    <properties>
+      <bullet speed="10000" lifetime="0.5" amount="1" barrelamount="1" icon="weapon_railgun_mk2" maxhits="3" ricochet="0" scale="1" attach="0" chargetime="0.1"/>
+      <heat initial="8000"/>
+      <reload time="1.2"/>
+      <damage value="1000" repair="0"/>
+      <effects>
+        <impact ref="impact_par_s_railgun_01_mk1" inside="impact_par_s_railgun_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_par_s_railgun_01_mk1_bigobject" inside="impact_par_s_railgun_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_par_s_railgun_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_s_shotgun_01_mk1_macro" class="bullet">
+    <component ref="bullet_spl_s_shotgun_01_mk1"/>
+    <properties>
+      <bullet speed="2592" lifetime="0.8" amount="3" barrelamount="1" icon="weapon_shotgun_mk1" timediff="0.004" angle="1.25" maxhits="3" ricochet="0.5" restitution="0.5" scale="0" attach="0"/>
+      <heat value="150"/>
+      <reload rate="3"/>
+      <damage value="30" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_shotgun_01_mk1" inside="impact_gen_s_shotgun_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_shotgun_01_mk1_bigobject" inside="impact_gen_s_shotgun_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_s_shotgun_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_s_shotgun_01_mk2_macro" class="bullet">
+    <component ref="bullet_spl_s_shotgun_01_mk2"/>
+    <properties>
+      <bullet speed="3110" lifetime="0.667" amount="3" barrelamount="1" icon="weapon_shotgun_mk2" timediff="0.005" angle="1" maxhits="3" ricochet="0.5" restitution="0.5" scale="0" attach="0"/>
+      <heat value="128"/>
+      <reload rate="3.5"/>
+      <damage value="50" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_shotgun_01_mk1" inside="impact_gen_s_shotgun_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_shotgun_01_mk1_bigobject" inside="impact_gen_s_shotgun_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_s_shotgun_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_s_sticky_01_mk1_macro" class="bullet">
+    <component ref="bullet_spl_s_sticky_01_mk1"/>
+    <properties>
+      <ammunition value="5" reload="0.7"/>
+      <bullet speed="1728" lifetime="1.5" amount="1" barrelamount="1" icon="weapon_sticky_mk1" timediff="0.01" angle="0.53" maxhits="1" ricochet="0" scale="0" attach="0" sticktime="2"/>
+      <heat value="83"/>
+      <reload rate="7"/>
+      <damage value="20" hull="8" repair="0"/>
+      <effects>
+        <impact ref="impact_spl_s_sticky_01_mk1" inside="impact_gen_s_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_laser_01_mk1_bigobject" inside="impact_gen_s_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_s_laser_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_s_sticky_01_mk2_macro" class="bullet">
+    <component ref="bullet_spl_s_sticky_01_mk2"/>
+    <properties>
+      <ammunition value="11" reload="0.3"/>
+      <bullet speed="1728" lifetime="1.5" amount="1" barrelamount="1" icon="weapon_sticky_mk2" timediff="0.011" angle="0.5" maxhits="1" ricochet="0" scale="0" attach="0" sticktime="3"/>
+      <heat value="73"/>
+      <reload rate="8"/>
+      <damage value="18" hull="10" repair="0"/>
+      <effects>
+        <impact ref="impact_spl_s_sticky_01_mk1" inside="impact_gen_s_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_laser_01_mk1_bigobject" inside="impact_gen_s_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_s_laser_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_turret_l_beam_01_mk1_macro" class="bullet">
+    <component ref="bullet_spl_l_beam_01_mk1"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="3" range="5000" amount="1" barrelamount="1" icon="weapon_beam_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="5"/>
+      <damage value="147" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_beam_01_mk1" inside="impact_gen_m_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_beam_01_mk1_bigobject" inside="impact_gen_m_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_turret_gen_m_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="turret_beam_muzzle"/>
+      </sounds>
+      <weapon system="turret_shortrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_turret_l_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_spl_l_laser_01_mk1"/>
+    <properties>
+      <ammunition value="4" reload="0.7"/>
+      <bullet speed="1837" lifetime="3.219" amount="1" barrelamount="2" icon="weapon_laser_mk1" timediff="0.002" angle="0.09" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <reload time="1.9"/>
+      <damage value="334" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_l_laser_01_mk1" inside="impact_gen_l_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_l_laser_01_mk1_bigobject" inside="impact_gen_l_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_l_laser_01_mk1"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_turret_l_mining_01_mk1_macro" class="bullet">
+    <component ref="bullet_spl_l_mining_01_mk1"/>
+    <properties>
+      <bullet speed="7000" lifetime="4" range="7000" amount="1" barrelamount="1" icon="weapon_mining_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="4"/>
+      <damage value="2" hull="1" delay="1" repair="0">
+        <multiplier mining="450"/>
+      </damage>
+      <effects>
+        <impact ref="impact_gen_l_mining_01_mk1" inside="impact_gen_l_mining_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_l_mining_01_mk1_bigobject" inside="impact_gen_l_mining_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_l_mining_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="turret_beam_muzzle"/>
+      </sounds>
+      <weapon system="weapon_mining"/>
+    </properties>
+  </macro>
+  <macro name="bullet_spl_turret_l_plasma_01_mk1_macro" class="bullet">
+    <component ref="bullet_spl_l_plasma_01_mk1"/>
+    <properties>
+      <bullet speed="440" lifetime="15.579" amount="1" barrelamount="2" icon="weapon_plasma_mk1" timediff="0" angle="0.02" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <reload time="3.6"/>
+      <damage value="1985" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_plasma_01_mk1" inside="impact_gen_m_plasma_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_plasma_01_mk1_bigobject" inside="impact_gen_m_plasma_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_plasma_01_mk1"/>
+      </effects>
+      <weapon system="turret_longrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_tel_l_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_tel_l_laser_01_mk1"/>
+    <properties>
+      <bullet speed="1659" lifetime="6.3" amount="1" barrelamount="1" icon="weapon_laser_mk1" timediff="0.002" angle="0.03" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="475"/>
+      <reload rate="1.44"/>
+      <damage value="1169" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_l_laser_01_mk1"/>
+        <bigobjectimpact ref="impact_gen_l_laser_01_mk1_bigobject" inside="impact_gen_l_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_l_laser_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_tel_m_charge_01_mk1_macro" class="bullet">
+    <component ref="bullet_tel_m_charge_01_mk1"/>
+    <properties>
+      <bullet speed="1257" lifetime="3" amount="3" barrelamount="1" icon="weapon_charge_mk1" timediff="0.16" angle="0.09" maxhits="1" ricochet="0" scale="0" attach="0" sticktime="1" chargetime="1"/>
+      <heat value="129"/>
+      <reload rate="2"/>
+      <damage value="165" repair="0"/>
+      <effects>
+        <impact ref="impact_tel_m_charge_01_mk1" inside="impact_tel_m_charge_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_tel_m_charge_01_mk1_bigobject" inside="impact_tel_m_charge_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_tel_m_charge_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_tel_m_charge_01_mk2_macro" class="bullet">
+    <component ref="bullet_tel_m_charge_01_mk2"/>
+    <properties>
+      <bullet speed="1257" lifetime="3" amount="3" barrelamount="1" icon="weapon_charge_mk2" timediff="0.16" angle="0.09" maxhits="1" ricochet="0" scale="0" attach="0" sticktime="1" chargetime="1"/>
+      <heat value="129"/>
+      <reload rate="2"/>
+      <damage value="322" repair="0"/>
+      <effects>
+        <impact ref="impact_tel_m_charge_01_mk1" inside="impact_tel_m_charge_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_tel_m_charge_01_mk1_bigobject" inside="impact_tel_m_charge_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_tel_m_charge_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_tel_s_charge_01_mk1_macro" class="bullet">
+    <component ref="bullet_tel_s_charge_01_mk1"/>
+    <properties>
+      <bullet speed="1571" lifetime="1.5" amount="3" barrelamount="1" icon="weapon_charge_mk1" timediff="0.16" angle="0.13" maxhits="1" ricochet="0" scale="0" attach="0" sticktime="1" chargetime="1"/>
+      <heat value="75"/>
+      <reload rate="3"/>
+      <damage value="91" repair="0"/>
+      <effects>
+        <impact ref="impact_tel_s_charge_01_mk1" inside="impact_tel_s_charge_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_tel_s_charge_01_mk1_bigobject" inside="impact_tel_s_charge_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_tel_s_charge_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_tel_s_charge_01_mk2_macro" class="bullet">
+    <component ref="bullet_tel_s_charge_01_mk2"/>
+    <properties>
+      <bullet speed="1571" lifetime="1.5" amount="3" barrelamount="1" icon="weapon_charge_mk2" timediff="0.16" angle="0.13" maxhits="1" ricochet="0" scale="0" attach="0" sticktime="1" chargetime="1"/>
+      <heat value="75"/>
+      <reload rate="3"/>
+      <damage value="176" repair="0"/>
+      <effects>
+        <impact ref="impact_tel_s_charge_01_mk1" inside="impact_tel_s_charge_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_tel_s_charge_01_mk1_bigobject" inside="impact_tel_s_charge_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_tel_s_charge_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_tel_turret_l_beam_01_mk1_macro" class="bullet">
+    <component ref="bullet_tel_l_beam_01_mk1"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="3" range="5000" amount="1" barrelamount="1" icon="weapon_beam_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="5"/>
+      <damage value="147" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_beam_01_mk1" inside="impact_gen_m_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_beam_01_mk1_bigobject" inside="impact_gen_m_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_turret_gen_m_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="turret_beam_muzzle"/>
+      </sounds>
+      <weapon system="turret_shortrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_tel_turret_l_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_tel_l_laser_01_mk1"/>
+    <properties>
+      <ammunition value="3" reload="0.5"/>
+      <bullet speed="2041" lifetime="3.219" amount="1" barrelamount="2" icon="weapon_laser_mk1" timediff="0.002" angle="0.03" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <reload time="2"/>
+      <damage value="293" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_l_laser_01_mk1" inside="impact_gen_l_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_l_laser_01_mk1_bigobject" inside="impact_gen_l_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_turret_gen_l_laser_01_mk1"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_tel_turret_l_mining_01_mk1_macro" class="bullet">
+    <component ref="bullet_tel_l_mining_01_mk1"/>
+    <properties>
+      <bullet speed="7000" lifetime="4" range="7000" amount="1" barrelamount="1" icon="weapon_mining_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="4"/>
+      <damage value="2" hull="1" delay="1" repair="0">
+        <multiplier mining="450"/>
+      </damage>
+      <effects>
+        <impact ref="impact_gen_l_mining_01_mk1" inside="impact_gen_l_mining_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_l_mining_01_mk1_bigobject" inside="impact_gen_l_mining_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_l_mining_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="turret_beam_muzzle"/>
+      </sounds>
+      <weapon system="weapon_mining"/>
+    </properties>
+  </macro>
+  <macro name="bullet_tel_turret_l_plasma_01_mk1_macro" class="bullet">
+    <component ref="bullet_tel_l_plasma_01_mk1"/>
+    <properties>
+      <bullet speed="440" lifetime="19.474" amount="1" barrelamount="2" icon="weapon_plasma_mk1" timediff="0" angle="0.01" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <reload time="3.9"/>
+      <damage value="1855" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_plasma_01_mk1" inside="impact_gen_m_plasma_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_plasma_01_mk1_bigobject" inside="impact_gen_m_plasma_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_gen_m_plasma_01_mk1"/>
+      </effects>
+      <weapon system="turret_longrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_l_gatling_01_mk1_macro" class="bullet">
+    <component ref="bullet_ter_l_gatling_01_mk1"/>
+    <properties>
+      <ammunition value="18" reload="2"/>
+      <bullet speed="1440" lifetime="6.176" amount="1" barrelamount="1" icon="weapon_gatling_mk1" timediff="0.012" angle="0.21" maxhits="2" ricochet="0.01" restitution="0.3" scale="0" attach="0"/>
+      <heat value="183"/>
+      <reload rate="4.896"/>
+      <damage value="988" repair="0"/>
+      <effects>
+        <impact ref="impact_ter_l_gatling_01_mk1" inside="impact_ter_l_gatling_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_ter_m_gatling_01_mk1_bigobject" inside="impact_ter_l_gatling_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_l_gatling_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_m_beam_01_mk1_macro" class="bullet">
+    <component ref="bullet_ter_m_beam_01_mk1"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="1.75" range="6800" amount="1" barrelamount="1" icon="weapon_beam_mk1" maxhits="3" ricochet="0" scale="1" attach="1"/>
+      <heat initial="6500" value="2000"/>
+      <reload time="2.05"/>
+      <damage value="3590" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_beam_01_mk1" inside="impact_gen_m_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_beam_01_mk1_bigobject" inside="impact_gen_m_beam_01_mk1_bigobject_inside"/>
+      </effects>
+      <sounds>
+        <firing ref="weapon_ter_m_beam_loop"/>
+      </sounds>
+      <weapon system="weapon_standard"/>
+      <damagecurves>
+        <distance>
+          <point position="0" value="1"/>
+          <point position="0.6" value="1"/>
+          <point position="1" value="0.1"/>
+        </distance>
+      </damagecurves>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_m_beam_01_mk2_macro" class="bullet">
+    <component ref="bullet_ter_m_beam_01_mk2"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="1.75" range="6800" amount="1" barrelamount="1" icon="weapon_beam_mk2" maxhits="3" ricochet="0" scale="1" attach="1"/>
+      <heat initial="6500" value="2000"/>
+      <reload time="2.05"/>
+      <damage value="7000" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_beam_01_mk1" inside="impact_gen_m_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_beam_01_mk1_bigobject" inside="impact_gen_m_beam_01_mk1_bigobject_inside"/>
+      </effects>
+      <sounds>
+        <firing ref="weapon_ter_m_beam_loop"/>
+      </sounds>
+      <weapon system="weapon_standard"/>
+      <damagecurves>
+        <distance>
+          <point position="0" value="1"/>
+          <point position="0.6" value="1"/>
+          <point position="1" value="0.1"/>
+        </distance>
+      </damagecurves>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_m_gatling_01_mk1_macro" class="bullet">
+    <component ref="bullet_ter_m_gatling_01_mk1"/>
+    <properties>
+      <ammunition value="21" reload="1"/>
+      <bullet speed="2880" lifetime="1.471" amount="1" barrelamount="1" icon="weapon_gatling_mk1" timediff="0.013" angle="0.23" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="100"/>
+      <reload rate="5.3"/>
+      <damage value="52" repair="0"/>
+      <effects>
+        <impact ref="impact_ter_m_gatling_01_mk1" inside="impact_ter_m_gatling_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_ter_m_gatling_01_mk1_bigobject" inside="impact_ter_m_gatling_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_m_gatling_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_m_gatling_01_mk2_macro" class="bullet">
+    <component ref="bullet_ter_m_gatling_01_mk2"/>
+    <properties>
+      <ammunition value="24" reload="1"/>
+      <bullet speed="2880" lifetime="1.471" amount="1" barrelamount="1" icon="weapon_gatling_mk2" timediff="0.011" angle="0.19" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="117"/>
+      <reload rate="4.5"/>
+      <damage value="113" repair="0"/>
+      <effects>
+        <impact ref="impact_ter_m_gatling_01_mk1_inside" inside="impact_ter_m_gatling_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_ter_m_gatling_01_mk1_bigobject" inside="impact_ter_m_gatling_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_m_gatling_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_m_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_ter_m_laser_01_mk1"/>
+    <properties>
+      <ammunition value="2" reload="0.5"/>
+      <bullet speed="6842.9" lifetime="0.642" amount="1" barrelamount="1" icon="weapon_laser_mk1" timediff="0.004" angle="0.06" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="194"/>
+      <reload rate="1.5"/>
+      <damage value="122" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_laser_01_mk1" inside="impact_gen_m_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_laser_01_mk1_bigobject" inside="impact_gen_m_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_m_laser_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_m_laser_01_mk2_macro" class="bullet">
+    <component ref="bullet_ter_m_laser_01_mk2"/>
+    <properties>
+      <ammunition value="4" reload="0.7"/>
+      <bullet speed="6842.9" lifetime="0.642" amount="1" barrelamount="1" icon="weapon_laser_mk2" timediff="0.004" angle="0.07" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="168"/>
+      <reload rate="1.725"/>
+      <damage value="195" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_m_laser_01_mk1" inside="impact_gen_m_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_m_laser_01_mk1_bigobject" inside="impact_gen_m_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_m_laser_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_m_laser_02_mk1_macro" class="bullet">
+    <component ref="bullet_ter_m_laser_02_mk1"/>
+    <properties>
+      <bullet speed="3250" lifetime="1.5" amount="1" barrelamount="1" timediff="0.002" angle="0.2" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0"/>
+      <heat value="500"/>
+      <reload rate="0.75"/>
+      <damage value="600" repair="0"/>
+      <effects>
+        <impact ref="impact_ter_m_laser_02_mk1" inside="impact_ter_m_laser_02_mk1_inside"/>
+        <bigobjectimpact ref="impact_ter_m_laser_02_mk1_bigobject" inside="impact_ter_m_laser_02_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_m_laser_02_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_s_beam_01_mk1_macro" class="bullet">
+    <component ref="bullet_ter_s_beam_01_mk1"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="1" range="4200" amount="1" barrelamount="1" icon="weapon_beam_mk1" maxhits="3" ricochet="0" scale="1" attach="1"/>
+      <heat initial="6500" value="3000"/>
+      <reload time="1.3"/>
+      <damage value="2911" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_beam_01_mk1" inside="impact_gen_s_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_beam_01_mk1_bigobject" inside="impact_gen_s_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_s_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="weapon_ter_s_beam_loop"/>
+      </sounds>
+      <weapon system="weapon_standard"/>
+      <damagecurves>
+        <distance>
+          <point position="0" value="1"/>
+          <point position="0.6" value="1"/>
+          <point position="1" value="0.1"/>
+        </distance>
+      </damagecurves>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_s_beam_01_mk2_macro" class="bullet">
+    <component ref="bullet_ter_s_beam_01_mk2"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="1" range="4200" amount="1" barrelamount="1" icon="weapon_beam_mk2" maxhits="3" ricochet="0" scale="1" attach="1"/>
+      <heat initial="6500" value="3000"/>
+      <reload time="1.3"/>
+      <damage value="5675" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_beam_01_mk1" inside="impact_gen_s_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_beam_01_mk1_bigobject" inside="impact_gen_s_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_s_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="weapon_ter_s_beam_loop"/>
+      </sounds>
+      <weapon system="weapon_standard"/>
+      <damagecurves>
+        <distance>
+          <point position="0" value="1"/>
+          <point position="0.6" value="1"/>
+          <point position="1" value="0.1"/>
+        </distance>
+      </damagecurves>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_s_gatling_01_mk1_macro" class="bullet">
+    <component ref="bullet_ter_s_gatling_01_mk1"/>
+    <properties>
+      <ammunition value="18" reload="1"/>
+      <bullet speed="3600" lifetime="0.735" amount="1" barrelamount="1" icon="weapon_gatling_mk1" timediff="0.01" angle="0.17" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="132"/>
+      <reload rate="4"/>
+      <damage value="42" repair="0"/>
+      <effects>
+        <impact ref="impact_ter_s_gatling_01_mk1" inside="impact_ter_s_gatling_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_ter_s_gatling_01_mk1_bigobject" inside="impact_ter_s_gatling_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_s_gatling_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_s_gatling_01_mk2_macro" class="bullet">
+    <component ref="bullet_ter_s_gatling_01_mk2"/>
+    <properties>
+      <ammunition value="20" reload="1"/>
+      <bullet speed="3600" lifetime="0.735" amount="1" barrelamount="1" icon="weapon_gatling_mk2" timediff="0.008" angle="0.14" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="161"/>
+      <reload rate="3.3"/>
+      <damage value="95" repair="0"/>
+      <effects>
+        <impact ref="impact_ter_s_gatling_01_mk1" inside="impact_ter_s_gatling_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_ter_s_gatling_01_mk1_bigobject" inside="impact_ter_s_gatling_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_s_gatling_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_s_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_ter_s_laser_01_mk1"/>
+    <properties>
+      <ammunition value="2" reload="0.5"/>
+      <bullet speed="6220.8" lifetime="0.44" amount="1" barrelamount="1" icon="weapon_laser_mk1" timediff="0.005" angle="0.09" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="145"/>
+      <reload rate="2"/>
+      <damage value="62" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_laser_01_mk1" inside="impact_gen_s_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_laser_01_mk1_bigobject" inside="impact_gen_s_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_s_laser_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_s_laser_01_mk2_macro" class="bullet">
+    <component ref="bullet_ter_s_laser_01_mk2"/>
+    <properties>
+      <ammunition value="4" reload="0.7"/>
+      <bullet speed="6220.8" lifetime="0.44" amount="1" barrelamount="1" icon="weapon_laser_mk2" timediff="0.006" angle="0.1" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="127"/>
+      <reload rate="2.3"/>
+      <damage value="99" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_laser_01_mk1" inside="impact_gen_s_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_laser_01_mk1_bigobject" inside="impact_gen_s_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_s_laser_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_s_laser_02_mk1_macro" class="bullet">
+    <component ref="bullet_ter_s_laser_02_mk1"/>
+    <properties>
+      <bullet speed="3000" lifetime="1" barrelamount="1" timediff="0.002" angle="0.04" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0"/>
+      <heat value="180"/>
+      <reload rate="1.5"/>
+      <damage value="220" repair="0"/>
+      <effects>
+        <impact ref="impact_ter_s_laser_02_mk1" inside="impact_ter_s_laser_02_mk1_inside"/>
+        <bigobjectimpact ref="impact_ter_s_laser_02_mk1_bigobject" inside="impact_ter_s_laser_02_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_s_laser_02_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_s_plasma_01_mk1_macro" class="bullet">
+    <component ref="bullet_ter_s_plasma_01_mk1"/>
+    <properties>
+      <bullet speed="2300" lifetime="1.7" amount="1" barrelamount="1" icon="weapon_plasma_mk1" timediff="0.1" angle="0.15" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0" recoil="75"/>
+      <heat value="160"/>
+      <reload rate="9"/>
+      <damage value="50" repair="0"/>
+      <effects>
+        <impact ref="impact_ter_s_plasma_01_mk1" inside="impact_ter_s_plasma_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_ter_s_plasma_01_mk1_bigobject" inside="impact_ter_s_plasma_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_s_plasma_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="weapon_ter_s_plasma_01_mk1_loop"/>
+      </sounds>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_s_plasma_01_mk1_story_macro" class="bullet" ref="bullet_ter_s_plasma_01_mk1_macro">
+    <component ref="bullet_ter_s_plasma_01_mk1"/>
+    <properties>
+      <bullet angle="0.2" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0" recoil="100"/>
+      <heat value="320"/>
+      <damage value="150"/>
+      <effects>
+        <impact ref="impact_ter_s_plasma_01_mk1" inside="impact_ter_s_plasma_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_ter_s_plasma_01_mk1_bigobject" inside="impact_ter_s_plasma_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_s_plasma_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="weapon_ter_s_plasma_01_mk1_loop"/>
+      </sounds>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_turret_l_beam_01_mk1_macro" class="bullet">
+    <component ref="bullet_ter_l_beam_01_mk1"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="3" range="4615" amount="1" barrelamount="1" icon="weapon_beam_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="5"/>
+      <damage value="176" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_l_laser_01_mk1" inside="impact_gen_l_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_l_laser_01_mk1_bigobject" inside="impact_gen_l_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_l_beam_01_mk1"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_turret_l_gatling_01_mk1_macro" class="bullet">
+    <component ref="bullet_ter_l_gatling_01_mk1"/>
+    <properties>
+      <ammunition value="18" reload="1"/>
+      <bullet speed="1288.4" lifetime="4.339" amount="1" barrelamount="1" icon="weapon_gatling_mk1" timediff="0.002" angle="0.04" maxhits="2" ricochet="0.01" restitution="0.3" scale="0" attach="0"/>
+      <reload time="1.3"/>
+      <damage value="625" repair="0"/>
+      <effects>
+        <impact ref="impact_ter_l_gatling_01_mk1" inside="impact_ter_l_gatling_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_ter_l_gatling_01_mk1_bigobject" inside="impact_ter_l_gatling_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_l_gatling_01_mk1"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_turret_l_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_ter_l_laser_01_mk1"/>
+    <properties>
+      <ammunition value="3" reload="0.5"/>
+      <bullet speed="2449" lifetime="2.476" amount="1" barrelamount="2" icon="weapon_laser_mk1" timediff="0.001" angle="0.02" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <reload time="3.1"/>
+      <damage value="619" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_l_laser_01_mk1" inside="impact_gen_l_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_l_laser_01_mk1_bigobject" inside="impact_gen_l_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_l_laser_01_mk1"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_turret_l_mining_01_mk1_macro" class="bullet">
+    <component ref="bullet_ter_l_mining_01_mk1"/>
+    <properties>
+      <bullet speed="7000" lifetime="4" range="7000" amount="1" barrelamount="1" icon="weapon_mining_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="4"/>
+      <damage value="2" hull="1" delay="1" repair="0">
+        <multiplier mining="450"/>
+      </damage>
+      <effects>
+        <impact ref="impact_gen_l_mining_01_mk1" inside="impact_gen_l_mining_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_l_mining_01_mk1_bigobject" inside="impact_gen_l_mining_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_l_mining_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="turret_beam_muzzle"/>
+      </sounds>
+      <weapon system="weapon_mining"/>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_turret_m_beam_01_mk1_macro" class="bullet">
+    <component ref="bullet_ter_turret_m_beam_01_mk1"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="1" range="2550" amount="1" barrelamount="1" icon="weapon_beam_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="3"/>
+      <damage value="72" repair="0"/>
+      <effects>
+        <impact ref="impact_gen_s_beam_01_mk1" inside="impact_gen_s_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_gen_s_beam_01_mk1_bigobject" inside="impact_gen_s_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_s_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="weapon_ter_s_beam_loop"/>
+      </sounds>
+      <weapon system="turret_shortrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_turret_m_gatling_01_mk1_macro" class="bullet">
+    <component ref="bullet_ter_turret_m_gatling_01_mk1"/>
+    <properties>
+      <ammunition value="15" reload="1"/>
+      <bullet speed="1074" lifetime="3.074" amount="1" barrelamount="2" timediff="0.032" angle="0.54" maxhits="2" ricochet="0.01" restitution="0.3" scale="0" attach="0"/>
+      <reload rate="10"/>
+      <damage value="9" repair="0"/>
+      <effects>
+        <impact ref="impact_ter_s_gatling_01_mk1" inside="impact_ter_s_gatling_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_ter_s_gatling_01_mk1_bigobject" inside="impact_ter_s_gatling_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_s_gatling_01_mk1"/>
+      </effects>
+      <weapon system="turret_shortrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_ter_turret_m_laser_02_mk1_macro" class="bullet">
+    <component ref="bullet_ter_s_laser_02_mk1"/>
+    <properties>
+      <bullet speed="1800" lifetime="2.2" amount="1" barrelamount="1" timediff="0.003" angle="0.06" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0"/>
+      <reload rate="1.1"/>
+      <damage value="200" repair="0"/>
+      <effects>
+        <impact ref="impact_ter_s_laser_02_mk1" inside="impact_ter_s_laser_02_mk1_inside"/>
+        <bigobjectimpact ref="impact_ter_s_laser_02_mk1_bigobject" inside="impact_ter_s_laser_02_mk1_bigobject_inside"/>
+        <launch ref="muzzle_ter_s_laser_02_mk1"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_xen_m_beam_01_mk1_macro" class="bullet">
+    <component ref="bullet_xen_m_beam_01_mk1"/>
+    <properties>
+      <bullet speed="30000" lifetime="2" range="2750" amount="1" barrelamount="1" maxhits="1" ricochet="0" restitution="1" scale="1" attach="1"/>
+      <heat value="2500"/>
+      <reload time="5"/>
+      <damage value="600" repair="0"/>
+      <effects>
+        <impact ref="impact_xen_m_beam_01_01_mk1_bigobject" inside="impact_xen_m_beam_01_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_xen_m_beam_01_01_mk1_bigobject" inside="impact_xen_m_beam_01_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_xen_m_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="weapon_xen_m_beam_01_mk1_loop"/>
+      </sounds>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_xen_m_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_xen_m_laser_01_mk1"/>
+    <properties>
+      <ammunition value="8" reload="0.65"/>
+      <bullet speed="2304" lifetime="2.5" amount="1" barrelamount="1" icon="weapon_laser_mk1" timediff="0.029" angle="0.14" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="52"/>
+      <reload rate="22"/>
+      <damage value="28" repair="0"/>
+      <effects>
+        <impact ref="impact_xen_m_laser_01_mk1" inside="impact_xen_m_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_xen_m_laser_01_mk1_bigobject" inside="impact_xen_m_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_xen_m_laser_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_xen_m_mining_01_mk1_macro" class="bullet">
+    <component ref="bullet_xen_m_mining_01_mk1"/>
+    <properties>
+      <bullet speed="7000" lifetime="4" range="3960" amount="1" barrelamount="1" icon="weapon_mining_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="4"/>
+      <damage value="2" repair="0">
+        <multiplier mining="300"/>
+      </damage>
+      <effects>
+        <activation ref="muzzle_xen_m_mining_01_mk1"/>
+        <impact ref="impact_xen_m_mining_01_mk1" inside="impact_xen_m_mining_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_xen_m_mining_01_mk1_bigobject" inside="impact_xen_m_mining_01_mk1_bigobject_inside"/>
+      </effects>
+      <weapon system="weapon_mining"/>
+    </properties>
+  </macro>
+  <macro name="bullet_xen_m_mining_02_mk1_macro" class="bullet" ref="bullet_xen_m_mining_01_mk1_macro">
+    <component ref="bullet_xen_m_mining_02_mk1"/>
+    <properties>
+      <bullet scale="1" attach="1"/>
+    </properties>
+  </macro>
+  <macro name="bullet_xen_s_gatling_01_mk1_macro" class="bullet">
+    <component ref="bullet_xen_s_gatling_01_mk1"/>
+    <properties>
+      <ammunition value="8" reload="0.3"/>
+      <bullet speed="3400" lifetime="1" amount="1" barrelamount="1" timediff="0.1" angle="0.17" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0"/>
+      <heat value="120"/>
+      <reload rate="4"/>
+      <damage value="40" repair="0"/>
+      <effects>
+        <impact ref="impact_xen_s_gatling_01_mk1" inside="impact_xen_s_gatling_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_xen_s_gatling_01_mk1_bigobject" inside="impact_xen_s_gatling_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_xen_s_gatling_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_xen_s_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_xen_s_laser_01_mk1"/>
+    <properties>
+      <ammunition value="7" reload="0.65"/>
+      <bullet speed="2880" lifetime="1.25" amount="1" barrelamount="1" icon="weapon_laser_mk1" timediff="0.025" angle="0.2" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <heat value="54"/>
+      <reload rate="13"/>
+      <damage min="16" max="24" value="18" repair="0"/>
+      <effects>
+        <impact ref="impact_xen_s_laser_01_mk1" inside="impact_xen_s_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_xen_s_laser_01_mk1_bigobject" inside="impact_xen_s_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_xen_s_laser_01_mk1"/>
+      </effects>
+      <weapon system="weapon_standard"/>
+    </properties>
+  </macro>
+  <macro name="bullet_xen_turret_l_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_xen_l_laser_01_mk1"/>
+    <properties>
+      <bullet speed="1958" lifetime="2.647" amount="1" barrelamount="2" icon="weapon_laser_mk1" timediff="0.025" angle="0.51" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <reload time="3"/>
+      <damage value="3229" repair="0"/>
+      <effects>
+        <impact ref="impact_xen_l_laser_01_mk1" inside="impact_xen_l_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_xen_l_laser_01_mk1_bigobject" inside="impact_xen_l_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_turret_xen_l_laser_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="turret_xen_l_laser_01_mk1_flyby" repeat="-1"/>
+      </sounds>
+      <weapon system="turret_longrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_xen_turret_l_laser_01_mk1_scenario_macro" class="bullet">
+    <component ref="bullet_xen_l_laser_01_mk1"/>
+    <properties>
+      <bullet speed="1958" lifetime="2.647" amount="1" barrelamount="2" icon="weapon_laser_mk1" timediff="0.025" angle="1" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <reload time="3"/>
+      <damage value="3229" repair="0"/>
+      <weapon system="turret_longrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_xen_turret_l_plasma_01_mk1_macro" class="bullet">
+    <component ref="bullet_xen_l_plasma_01_mk1"/>
+    <properties>
+      <bullet speed="1100" lifetime="5" amount="1" barrelamount="1" timediff="0.001" angle="0.15" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0" selfdestruct="1" plannedselfdestruct="1" selfdestructtimediff="0.02" selfdestructmintime="1.5"/>
+      <reload rate="0.25"/>
+      <areadamage value="1000" shield="1000"/>
+      <damage value="3500" repair="0"/>
+      <effects>
+        <impact ref="impact_xen_l_plasma_01_mk1" inside="impact_xen_l_plasma_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_xen_l_plasma_01_mk1_bigobject" inside="impact_xen_l_plasma_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_xen_l_plasma_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="turret_xen_l_plasma_01_mk1_flyby" repeat="-1"/>
+      </sounds>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_xen_turret_l_plasma_01_mk1_story_macro" class="bullet" alias="bullet_xen_turret_l_plasma_01_mk1_macro" ref="bullet_xen_turret_l_plasma_01_mk1_macro">
+    <component ref="bullet_xen_l_plasma_01_mk1"/>
+    <properties>
+      <bullet speed="900" lifetime="4" scale="0" attach="0" selfdestructmintime="2"/>
+      <areadamage value="500"/>
+      <damage value="2100" repair="0"/>
+      <effects>
+        <impact ref="impact_xen_l_plasma_01_mk1" inside="impact_xen_l_plasma_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_xen_l_plasma_01_mk1_bigobject" inside="impact_xen_l_plasma_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_xen_l_plasma_01_mk1"/>
+      </effects>
+    </properties>
+  </macro>
+  <macro name="bullet_xen_turret_m_beam_01_mk1_macro" class="bullet">
+    <component ref="bullet_gen_m_beam_01_mk1"/>
+    <properties>
+      <bullet speed="2.997925e+08" lifetime="1" range="2200" amount="1" barrelamount="1" icon="weapon_beam_mk1" maxhits="1" ricochet="0" scale="1" attach="1"/>
+      <reload time="3"/>
+      <damage value="60" repair="0"/>
+      <effects>
+        <launch ref="muzzle_turret_gen_m_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="turret_beam_muzzle"/>
+      </sounds>
+      <weapon system="turret_shortrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_xen_turret_m_gatling_01_mk1_macro" class="bullet">
+    <component ref="bullet_xen_s_gatling_01_mk1"/>
+    <properties>
+      <ammunition value="8" reload="0.5"/>
+      <bullet speed="2500" lifetime="1.3" amount="1" barrelamount="1" timediff="0.1" angle="0.21" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0"/>
+      <reload rate="4"/>
+      <damage value="50" repair="0"/>
+      <effects>
+        <impact ref="impact_xen_s_gatling_01_mk1" inside="impact_xen_s_gatling_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_xen_s_gatling_01_mk1_bigobject" inside="impact_xen_s_gatling_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_xen_s_gatling_01_mk1"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_xen_turret_m_laser_01_mk1_macro" class="bullet">
+    <component ref="bullet_xen_s_laser_01_mk1"/>
+    <properties>
+      <bullet speed="2448" lifetime="1.324" amount="1" barrelamount="2" timediff="0.021" angle="0.21" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <reload rate="5"/>
+      <damage value="14" repair="0"/>
+      <effects>
+        <impact ref="impact_xen_s_laser_01_mk1" inside="impact_xen_s_laser_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_xen_s_laser_01_mk1_bigobject" inside="impact_xen_s_laser_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_turret_xen_m_laser_01_mk1"/>
+      </effects>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="bullet_xen_turret_xl_beam_01_mk1_macro" class="bullet">
+    <component ref="bullet_xen_xl_beam_01_mk1"/>
+    <properties>
+      <bullet speed="50000" lifetime="4" range="30000" amount="1" barrelamount="1" maxhits="1" ricochet="0" restitution="1" scale="1" attach="1" chargetime="5" requirefullcharge="1" firewhenfullcharge="1"/>
+      <reload time="15"/>
+      <damage value="40000" repair="0"/>
+      <effects>
+        <impact ref="impact_xen_xl_beam_01_mk1" inside="impact_xen_xl_beam_01_mk1_inside"/>
+        <bigobjectimpact ref="impact_xen_xl_beam_01_mk1_bigobject" inside="impact_xen_xl_beam_01_mk1_bigobject_inside"/>
+        <launch ref="muzzle_xen_xl_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="turret_xen_xl_beam_01_mk1_loop"/>
+      </sounds>
+      <weapon system="turret_midrange"/>
+    </properties>
+  </macro>
+  <macro name="missile_cluster_heavy_mk1_macro" class="missile">
+    <component ref="missile_cluster_heavy_mk1"/>
+    <properties>
+      <identification name="{20105,6114}" basename="{20105,6111}" description="{20105,6112}"/>
+      <ammunition value="1"/>
+      <missile amount="1" barrelamount="1" lifetime="129.6" range="7000" distribute="1" guided="0" icon="hud_ms_cluster_heavy_mk1" tags="dumbfire"/>
+      <explosiondamage value="12141"/>
+      <reload time="45"/>
+      <hull max="2"/>
+      <effects>
+        <explosion ref="missile_explosion_medium_01"/>
+        <launch ref="missile_dumbfire_muzzle"/>
+      </effects>
+      <detach macro="missile_swarm_heavy_mk1_macro"/>
+      <weapon system="missile_dumbfire"/>
+      <countermeasure resilience="1"/>
+      <physics mass="38.258">
+        <inertia pitch="76.915" yaw="76.915" roll="76.915"/>
+        <drag forward="1.607" reverse="6.427" horizontal="38.258" vertical="38.258" pitch="19.229" yaw="19.229" roll="19.229"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine01">
+        <macro ref="engine_missile_dumbfire_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_cluster_light_mk1_macro" class="missile">
+    <component ref="missile_cluster_light_mk1"/>
+    <properties>
+      <identification name="{20105,6104}" basename="{20105,6101}" description="{20105,6102}"/>
+      <ammunition value="1"/>
+      <missile amount="1" barrelamount="1" lifetime="30" range="5500" distribute="1" guided="0" icon="hud_ms_cluster_light_mk1" tags="dumbfire"/>
+      <explosiondamage value="2361"/>
+      <reload time="15"/>
+      <hull max="1"/>
+      <effects>
+        <explosion ref="missile_explosion_light_01"/>
+        <launch ref="missile_dumbfire_muzzle"/>
+      </effects>
+      <detach macro="missile_swarm_light_mk1_macro"/>
+      <weapon system="missile_dumbfire"/>
+      <countermeasure resilience="1"/>
+      <physics mass="8.317">
+        <inertia pitch="4.258" yaw="4.258" roll="4.258"/>
+        <drag forward="0.349" reverse="1.397" horizontal="14.056" vertical="14.056" pitch="4.258" yaw="4.258" roll="4.258"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine01">
+        <macro ref="engine_missile_dumbfire_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_disruptor_light_mk1_macro" class="missile">
+    <component ref="missile_disruptor_light_mk1"/>
+    <properties>
+      <identification name="{20105,6184}" basename="{20105,6181}" description="{20105,6182}"/>
+      <ammunition value="1"/>
+      <missile amount="1" barrelamount="1" lifetime="15" range="5000" influencelist="disruptor_missile" guided="1" icon="hud_ms_disruptor_mk1" retarget="0" tags="guided"/>
+      <explosiondamage value="896"/>
+      <reload time="10"/>
+      <hull max="1"/>
+      <effects>
+        <explosion ref="disruptor_impact"/>
+        <launch ref="missile_guided_muzzle"/>
+      </effects>
+      <lock time="3" range="5000"/>
+      <longrangescan minlevel="15"/>
+      <weapon system="missile_guided"/>
+      <countermeasure resilience="0.963"/>
+      <physics mass="1.2">
+        <inertia pitch="0.8" yaw="1" roll="0.8"/>
+        <drag forward="0.06" reverse="0.25" horizontal="0.5" vertical="0.4" pitch="0.5" yaw="0.6" roll="0.4"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine01">
+        <macro ref="engine_missile_guided_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_dumbfire_heavy_mk1_macro" class="missile">
+    <component ref="missile_dumbfire_heavy_mk1"/>
+    <properties>
+      <identification name="{20105,6024}" basename="{20105,6021}" description="{20105,6022}"/>
+      <ammunition value="1"/>
+      <missile amount="1" barrelamount="1" lifetime="25.92" range="9000" guided="0" icon="hud_ms_dumbfire_heavy_mk1" tags="dumbfire"/>
+      <explosiondamage value="3960"/>
+      <reload time="4.5"/>
+      <hull max="2"/>
+      <effects>
+        <explosion ref="missile_explosion_medium_01"/>
+        <launch ref="missile_dumbfire_muzzle"/>
+      </effects>
+      <weapon system="missile_dumbfire"/>
+      <countermeasure resilience="1"/>
+      <physics mass="1.241">
+        <inertia pitch="1.519" yaw="1.519" roll="1.519"/>
+        <drag forward="0.248" reverse="0.993" horizontal="1.782" vertical="1.782" pitch="0.721" yaw="0.721" roll="0.721"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine01">
+        <macro ref="engine_missile_dumbfire_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_dumbfire_heavy_mk2_macro" class="missile">
+    <component ref="missile_dumbfire_heavy_mk2"/>
+    <properties>
+      <identification name="{20105,6034}" basename="{20105,6031}" description="{20105,6032}"/>
+      <ammunition value="1"/>
+      <missile amount="1" barrelamount="1" lifetime="25.92" range="10000" guided="0" icon="hud_ms_dumbfire_heavy_mk2" tags="dumbfire"/>
+      <explosiondamage value="4320"/>
+      <reload time="4.5"/>
+      <hull max="3"/>
+      <effects>
+        <explosion ref="missile_explosion_medium_01"/>
+        <launch ref="missile_dumbfire_muzzle"/>
+      </effects>
+      <weapon system="missile_dumbfire"/>
+      <countermeasure resilience="1"/>
+      <physics mass="1.117">
+        <inertia pitch="1.388" yaw="1.388" roll="1.388"/>
+        <drag forward="0.223" reverse="0.894" horizontal="1.604" vertical="1.604" pitch="0.659" yaw="0.659" roll="0.659"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine01">
+        <macro ref="engine_missile_dumbfire_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_dumbfire_light_mk1_macro" class="missile">
+    <component ref="missile_dumbfire_light_mk1"/>
+    <properties>
+      <identification name="{20105,6004}" basename="{20105,6001}" description="{20105,6002}"/>
+      <ammunition value="1"/>
+      <missile amount="1" barrelamount="1" lifetime="6" range="7000" guided="0" icon="hud_ms_dumbfire_light_mk1" tags="dumbfire"/>
+      <explosiondamage value="1100"/>
+      <reload time="1.5"/>
+      <hull max="1"/>
+      <effects>
+        <explosion ref="missile_explosion_light_01"/>
+        <launch ref="missile_dumbfire_muzzle"/>
+      </effects>
+      <weapon system="missile_dumbfire"/>
+      <countermeasure resilience="1"/>
+      <physics mass="0.27">
+        <inertia pitch="0.495" yaw="0.495" roll="0.495"/>
+        <drag forward="0.054" reverse="0.216" horizontal="0.387" vertical="0.387" pitch="0.235" yaw="0.235" roll="0.235"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine01">
+        <macro ref="engine_missile_dumbfire_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_dumbfire_light_mk2_macro" class="missile">
+    <component ref="missile_dumbfire_light_mk2"/>
+    <properties>
+      <identification name="{20105,6014}" basename="{20105,6011}" description="{20105,6012}"/>
+      <ammunition value="1"/>
+      <missile amount="1" barrelamount="1" lifetime="6" range="8000" guided="0" icon="hud_ms_dumbfire_light_mk2" tags="dumbfire"/>
+      <explosiondamage value="1200"/>
+      <reload time="1.5"/>
+      <hull max="1"/>
+      <effects>
+        <explosion ref="missile_explosion_light_01"/>
+        <launch ref="missile_dumbfire_muzzle"/>
+      </effects>
+      <weapon system="missile_dumbfire"/>
+      <countermeasure resilience="1"/>
+      <physics mass="0.243">
+        <inertia pitch="0.467" yaw="0.467" roll="0.467"/>
+        <drag forward="0.049" reverse="0.194" horizontal="0.349" vertical="0.349" pitch="0.221" yaw="0.221" roll="0.221"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine01">
+        <macro ref="engine_missile_dumbfire_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_emp_mk1_macro" class="missile">
+    <component ref="missile_emp_mk1"/>
+    <properties>
+      <identification name="{20105,6164}" basename="{20105,6161}" description="{20105,6162}"/>
+      <ammunition value="1"/>
+      <missile amount="1" barrelamount="1" lifetime="10" range="20000" influencelist="emp_missile" guided="1" icon="hud_ms_emp_mk1" retarget="0" tags="guided"/>
+      <explosiondamage value="1"/>
+      <reload time="22.5"/>
+      <hull max="1"/>
+      <effects>
+        <explosion ref="missile_explosion_emp"/>
+        <launch ref="missile_guided_muzzle"/>
+      </effects>
+      <lock time="2" range="20000"/>
+      <longrangescan minlevel="15"/>
+      <weapon system="missile_guided"/>
+      <countermeasure resilience="0.951"/>
+      <physics mass="0.309">
+        <inertia pitch="0.254" yaw="0.254" roll="0.254"/>
+        <drag forward="0.001" reverse="0.247" horizontal="0.522" vertical="0.522" pitch="0.254" yaw="0.254" roll="0.254"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine01">
+        <macro ref="engine_missile_guided_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_flagship_heavy_mk1_macro" class="missile">
+    <component ref="missile_flagship_heavy_mk1"/>
+    <properties>
+      <identification name="{20105,6304}" basename="{20105,6301}" description="{20105,6302}"/>
+      <ammunition value="6" reload="15"/>
+      <missile amount="1" barrelamount="4" lifetime="22" range="9000" guided="1" icon="hud_ms_ter_l_flagship_01_heavy_mk1" retarget="1" tags="ship_ter_l_flagship_01"/>
+      <explosiondamage value="1100"/>
+      <reload time="0.25"/>
+      <hull max="20"/>
+      <effects>
+        <explosion ref="missile_explosion_flagship"/>
+        <launch ref="missile_flagship_muzzle"/>
+      </effects>
+      <weapon system="missile_guided"/>
+      <countermeasure resilience="0.99"/>
+      <physics mass="1">
+        <inertia pitch="1.807" yaw="1.807" roll="1.807"/>
+        <drag forward="0.12" reverse="1.211" horizontal="2.173" vertical="2.173" pitch="0.9" yaw="0.9" roll="0.9"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine_01">
+        <macro ref="engine_missile_guided_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_flagship_light_mk1_macro" class="missile">
+    <component ref="missile_flagship_light_mk1"/>
+    <properties>
+      <identification name="{20105,6314}" basename="{20105,6311}" description="{20105,6312}"/>
+      <ammunition value="6" reload="15"/>
+      <missile amount="1" barrelamount="4" lifetime="15" range="9000" guided="1" icon="hud_ms_ter_l_flagship_01_light_mk1" retarget="1" tags="ship_ter_l_flagship_01"/>
+      <explosiondamage value="550"/>
+      <reload time="0.25"/>
+      <hull max="10"/>
+      <effects>
+        <explosion ref="missile_explosion_flagship"/>
+        <launch ref="missile_flagship_muzzle"/>
+      </effects>
+      <weapon system="missile_guided"/>
+      <countermeasure resilience="0.99"/>
+      <physics mass="1">
+        <inertia pitch="1" yaw="1" roll="1"/>
+        <drag forward="0.05" reverse="0.7" horizontal="2" vertical="2.173" pitch="0.3" yaw="0.3" roll="0.3"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine_01">
+        <macro ref="engine_missile_guided_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_guided_heavy_mk1_macro" class="missile">
+    <component ref="missile_guided_heavy_mk1"/>
+    <properties>
+      <identification name="{20105,6054}" basename="{20105,6051}" description="{20105,6052}"/>
+      <ammunition value="1"/>
+      <missile amount="1" barrelamount="1" lifetime="43.2" range="6000" guided="1" icon="hud_ms_guided_heavy_mk1" retarget="0" tags="guided"/>
+      <explosiondamage value="3520"/>
+      <reload time="6"/>
+      <hull max="3"/>
+      <effects>
+        <explosion ref="missile_explosion_heavy_01"/>
+        <launch ref="missile_guided_muzzle"/>
+      </effects>
+      <lock time="3" range="5500" angle="12.5"/>
+      <weapon system="missile_guided"/>
+      <countermeasure resilience="0.977"/>
+      <physics mass="1.514">
+        <inertia pitch="1.807" yaw="1.807" roll="1.807"/>
+        <drag forward="0.303" reverse="1.211" horizontal="2.173" vertical="2.173" pitch="0.857" yaw="0.857" roll="0.857"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine01">
+        <macro ref="engine_missile_guided_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_guided_light_mk1_macro" class="missile">
+    <component ref="missile_guided_light_mk1"/>
+    <properties>
+      <identification name="{20105,6044}" basename="{20105,6041}" description="{20105,6042}"/>
+      <ammunition value="1"/>
+      <missile amount="1" barrelamount="1" lifetime="10" range="4500" guided="1" icon="hud_ms_guided_light_mk1" retarget="0" tags="guided"/>
+      <explosiondamage value="685"/>
+      <reload time="2"/>
+      <hull max="1"/>
+      <effects>
+        <explosion ref="missile_explosion_light_01"/>
+        <launch ref="missile_guided_muzzle"/>
+      </effects>
+      <lock time="2" range="4500"/>
+      <longrangescan minlevel="15"/>
+      <weapon system="missile_guided"/>
+      <countermeasure resilience="0.977"/>
+      <physics mass="0.329">
+        <inertia pitch="0.264" yaw="0.264" roll="0.264"/>
+        <drag forward="0.066" reverse="0.263" horizontal="0.472" vertical="0.472" pitch="0.125" yaw="0.125" roll="0.125"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine01">
+        <macro ref="engine_missile_guided_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_heatseeker_heavy_mk1_macro" class="missile">
+    <component ref="missile_heatseeker_heavy_mk1"/>
+    <properties>
+      <identification name="{20105,6094}" basename="{20105,6091}" description="{20105,6092}"/>
+      <ammunition value="1"/>
+      <missile amount="1" barrelamount="1" lifetime="43.2" range="7000" guided="1" icon="hud_ms_heatseeker_heavy_mk1" retarget="0" tags="guided"/>
+      <explosiondamage value="3592"/>
+      <reload time="6"/>
+      <hull max="2"/>
+      <effects>
+        <explosion ref="missile_explosion_medium_01"/>
+        <launch ref="missile_guided_muzzle"/>
+      </effects>
+      <weapon system="missile_guided"/>
+      <countermeasure resilience="0.965"/>
+      <physics mass="1.328">
+        <inertia pitch="1.611" yaw="1.611" roll="1.611"/>
+        <drag forward="0.266" reverse="1.063" horizontal="1.906" vertical="1.906" pitch="0.764" yaw="0.764" roll="0.764"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine01">
+        <macro ref="engine_missile_guided_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_heatseeker_light_mk1_macro" class="missile">
+    <component ref="missile_heatseeker_light_mk1"/>
+    <properties>
+      <identification name="{20105,6084}" basename="{20105,6081}" description="{20105,6082}"/>
+      <ammunition value="1"/>
+      <missile amount="1" barrelamount="1" lifetime="10" range="5000" guided="1" icon="hud_ms_heatseeker_light_mk1" retarget="0" tags="guided"/>
+      <explosiondamage value="698"/>
+      <reload time="2"/>
+      <hull max="1"/>
+      <effects>
+        <explosion ref="missile_explosion_light_01"/>
+        <launch ref="missile_guided_muzzle"/>
+      </effects>
+      <weapon system="missile_guided"/>
+      <countermeasure resilience="0.965"/>
+      <physics mass="0.289">
+        <inertia pitch="0.258" yaw="0.258" roll="0.258"/>
+        <drag forward="0.058" reverse="0.231" horizontal="0.414" vertical="0.414" pitch="0.122" yaw="0.122" roll="0.122"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine01">
+        <macro ref="engine_missile_guided_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_interceptor_light_mk1_macro" class="missile">
+    <component ref="missile_interceptor_light_mk1"/>
+    <properties>
+      <identification name="{20105,6204}" basename="{20105,6201}" description="{20105,6202}"/>
+      <ammunition/>
+      <missile amount="5" barrelamount="1" delay="1" timediff="0.5" lifetime="30" range="39000" swarm="1" influencelist="emp_missile" guided="1" icon="hud_ms_interceptor_light_mk1" retarget="0" tags="guided"/>
+      <explosiondamage value="100"/>
+      <reload time="2"/>
+      <hull max="1"/>
+      <effects>
+        <explosion ref="missile_explosion_light_01"/>
+        <launch ref="missile_guided_muzzle"/>
+      </effects>
+      <lock time="2" range="29500"/>
+      <longrangescan minlevel="15"/>
+      <weapon system="missile_guided"/>
+      <countermeasure resilience="0.953"/>
+      <physics mass="0.133">
+        <inertia pitch="0.26" yaw="0.26" roll="0.26"/>
+        <drag forward="0.0125" reverse="0.263" horizontal="0.47" vertical="0.472" pitch="0.125" yaw="0.125" roll="0.125"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine01">
+        <macro ref="engine_missile_guided_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_scatter_heavy_mk1_macro" class="missile">
+    <component ref="missile_scatter_heavy_mk1"/>
+    <properties>
+      <identification name="{20105,6274}" basename="{20105,6271}" description="{20105,6272}"/>
+      <ammunition/>
+      <missile amount="12" angle="2.5" barrelamount="1" lifetime="15" range="3500" swarm="0" guided="0" icon="hud_ms_scatter_heavy_mk1" retarget="0" tags="dumbfire"/>
+      <explosiondamage value="400"/>
+      <reload time="4"/>
+      <hull max="20"/>
+      <effects>
+        <explosion ref="missile_explosion_light_01"/>
+        <launch ref="missile_guided_muzzle"/>
+      </effects>
+      <longrangescan minlevel="15"/>
+      <weapon system="missile_dumbfire"/>
+      <countermeasure resilience="1"/>
+      <physics mass="0.2">
+        <inertia pitch="0.6" yaw="0.6" roll="0.6"/>
+        <drag forward="0.063" reverse="1" horizontal="0.2" vertical="0.2" pitch="0.7" yaw="0.7" roll="0.7"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine01">
+        <macro ref="engine_missile_guided_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_smart_heavy_mk1_macro" class="missile">
+    <component ref="missile_smart_heavy_mk1"/>
+    <properties>
+      <identification name="{20105,6134}" basename="{20105,6131}" description="{20105,6132}"/>
+      <ammunition value="1"/>
+      <missile amount="1" barrelamount="1" lifetime="43.2" range="5500" guided="1" icon="hud_ms_smart_heavy_mk1" retarget="1" tags="guided"/>
+      <explosiondamage value="3378"/>
+      <reload time="6"/>
+      <hull max="3"/>
+      <effects>
+        <explosion ref="missile_explosion_medium_01"/>
+        <launch ref="missile_guided_muzzle"/>
+      </effects>
+      <weapon system="missile_guided"/>
+      <countermeasure resilience="1"/>
+      <physics mass="1.7">
+        <inertia pitch="2.003" yaw="2.003" roll="2.003"/>
+        <drag forward="0.34" reverse="1.36" horizontal="2.44" vertical="2.44" pitch="0.95" yaw="0.95" roll="0.95"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine01">
+        <macro ref="engine_missile_guided_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_smart_light_mk1_macro" class="missile">
+    <component ref="missile_smart_light_mk1"/>
+    <properties>
+      <identification name="{20105,6124}" basename="{20105,6121}" description="{20105,6122}"/>
+      <ammunition value="1"/>
+      <missile amount="1" barrelamount="1" lifetime="10" range="4000" guided="1" icon="hud_ms_smart_heavy_mk1" retarget="1" tags="guided"/>
+      <explosiondamage value="657"/>
+      <reload time="2"/>
+      <hull max="1"/>
+      <effects>
+        <explosion ref="missile_explosion_light_01"/>
+        <launch ref="missile_guided_muzzle"/>
+      </effects>
+      <weapon system="missile_guided"/>
+      <countermeasure resilience="1"/>
+      <physics mass="0.37">
+        <inertia pitch="0.271" yaw="0.271" roll="0.271"/>
+        <drag forward="0.074" reverse="0.296" horizontal="0.53" vertical="0.53" pitch="0.128" yaw="0.128" roll="0.128"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine01">
+        <macro ref="engine_missile_guided_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_starburst_heavy_mk1_macro" class="missile">
+    <component ref="missile_starburst_heavy_mk1"/>
+    <properties>
+      <identification name="{20105,6234}" basename="{20105,6231}" description="{20105,6232}"/>
+      <ammunition value="1"/>
+      <missile amount="1" barrelamount="1" lifetime="43.2" range="6000" guided="1" icon="hud_ms_starburst_heavy_mk1" retarget="0" tags="guided"/>
+      <explosiondamage value="3800"/>
+      <reload time="8"/>
+      <hull max="3"/>
+      <effects>
+        <explosion ref="missile_explosion_heavy_01"/>
+        <launch ref="missile_guided_muzzle"/>
+      </effects>
+      <lock time="3" range="5500" angle="10"/>
+      <longrangescan minlevel="15"/>
+      <weapon system="missile_guided"/>
+      <countermeasure resilience="0.977"/>
+      <physics mass="3">
+        <inertia pitch="1.8" yaw="1.8" roll="1.8"/>
+        <drag forward="0.3" reverse="1.2" horizontal="2.1" vertical="2.1" pitch="0.85" yaw="0.85" roll="0.85"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine01">
+        <macro ref="engine_missile_guided_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_swarm_heavy_mk1_macro" class="missile">
+    <component ref="missile_swarm_heavy_mk1"/>
+    <properties>
+      <identification name="{20105,6074}" basename="{20105,6071}" description="{20105,6072}"/>
+      <ammunition value="1"/>
+      <missile amount="8" barrelamount="1" lifetime="43.2" range="5500" swarm="1" guided="1" icon="hud_ms_swarm_heavy_mk1" retarget="1" tags="guided"/>
+      <explosiondamage value="690"/>
+      <reload time="12"/>
+      <hull max="3"/>
+      <effects>
+        <explosion ref="missile_explosion_medium_01"/>
+        <launch ref="missile_guided_muzzle"/>
+      </effects>
+      <weapon system="missile_guided"/>
+      <countermeasure resilience="0.975"/>
+      <physics mass="1.607">
+        <inertia pitch="0.904" yaw="0.904" roll="0.904"/>
+        <drag forward="0.321" reverse="1.286" horizontal="2.716" vertical="2.716" pitch="0.904" yaw="0.904" roll="0.904"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine01">
+        <macro ref="engine_missile_swarm_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_swarm_light_mk1_macro" class="missile">
+    <component ref="missile_swarm_light_mk1"/>
+    <properties>
+      <identification name="{20105,6064}" basename="{20105,6061}" description="{20105,6062}"/>
+      <ammunition value="1"/>
+      <missile amount="8" barrelamount="1" lifetime="10" range="4000" swarm="1" guided="1" icon="hud_ms_swarm_light_mk1" retarget="1" tags="guided"/>
+      <explosiondamage value="134"/>
+      <reload time="4"/>
+      <hull max="1"/>
+      <effects>
+        <explosion ref="missile_explosion_light_01"/>
+        <launch ref="missile_guided_muzzle"/>
+      </effects>
+      <weapon system="missile_guided"/>
+      <countermeasure resilience="0.975"/>
+      <physics mass="0.349">
+        <inertia pitch="0.275" yaw="0.275" roll="0.275"/>
+        <drag forward="0.07" reverse="0.28" horizontal="0.591" vertical="0.591" pitch="0.275" yaw="0.275" roll="0.275"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine01">
+        <macro ref="engine_missile_swarm_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_torpedo_heavy_mk1_macro" class="missile">
+    <component ref="missile_torpedo_heavy_mk1"/>
+    <properties>
+      <identification name="{20105,6154}" basename="{20105,6151}" description="{20105,6152}"/>
+      <ammunition value="1"/>
+      <missile amount="1" barrelamount="1" lifetime="180" range="9000" guided="1" icon="hud_ms_torpedo_heavy_mk1" retarget="0" tags="torpedo"/>
+      <explosiondamage value="17246"/>
+      <reload time="30"/>
+      <hull max="38"/>
+      <effects>
+        <explosion ref="missile_explosion_heavy_01"/>
+        <launch ref="missile_torpedo_muzzle"/>
+      </effects>
+      <weapon system="torpedo"/>
+      <countermeasure resilience="0.996"/>
+      <physics mass="20.337">
+        <inertia pitch="21.646" yaw="21.646" roll="21.646"/>
+        <drag forward="0.854" reverse="3.417" horizontal="29.188" vertical="29.188" pitch="10.269" yaw="10.269" roll="10.269"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine01">
+        <macro ref="engine_missile_guided_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="missile_torpedo_light_mk1_macro" class="missile">
+    <component ref="missile_torpedo_light_mk1"/>
+    <properties>
+      <identification name="{20105,6144}" basename="{20105,6141}" description="{20105,6142}"/>
+      <ammunition value="1"/>
+      <missile amount="1" barrelamount="1" lifetime="50" range="3000" guided="1" icon="hud_ms_torpedo_light_mk1" retarget="0" tags="torpedo"/>
+      <explosiondamage value="4791"/>
+      <reload time="10"/>
+      <hull max="8"/>
+      <effects>
+        <explosion ref="missile_explosion_heavy_01"/>
+        <launch ref="missile_torpedo_muzzle"/>
+      </effects>
+      <weapon system="torpedo"/>
+      <countermeasure resilience="0.996"/>
+      <physics mass="4.421">
+        <inertia pitch="2.311" yaw="2.311" roll="2.311"/>
+        <drag forward="0.575" reverse="2.299" horizontal="7.472" vertical="7.472" pitch="2.311" yaw="2.311" roll="2.311"/>
+      </physics>
+    </properties>
+    <connections>
+      <connection ref="con_engine01">
+        <macro ref="engine_missile_guided_mk1_macro" connection="ship"/>
+      </connection>
+    </connections>
+  </macro>
+</macros>

@@ -2601,9 +2601,11 @@
   <entry name="scs_gen_asteroid_16_straight_01_macro" value="assets\structures\spacesuit_construction_set\macros\scs_gen_asteroid_16_straight_01_macro"/>
   <entry name="scs_gen_asteroid_16_straight_02_macro" value="assets\structures\spacesuit_construction_set\macros\scs_gen_asteroid_16_straight_02_macro"/>
   <entry name="scs_gen_asteroid_16_straight_03_macro" value="assets\structures\spacesuit_construction_set\macros\scs_gen_asteroid_16_straight_03_macro"/>
+  <entry name="bubustation_macro" value="assets\test\lino\macros\bubustation_macro"/>
   <entry name="radar_arg_dish_01_macro" value="assets\structures\radar\macros\radar_arg_dish_01_macro"/>
   <entry name="effect_gen_l_alarmyellow_01_macro" value="assets\fx\misc\macros\effect_gen_l_alarmyellow_01_macro"/>
   <entry name="effect_gen_l_alarmred_01_macro" value="assets\fx\misc\macros\effect_gen_l_alarmred_01_macro"/>
+  <entry name="example_startmenu_macro" value="assets\test\markus\macros\example_startmenu_macro"/>
   <entry name="scs_gen_asteroid_32_corner_01_macro" value="assets\structures\spacesuit_construction_set\macros\scs_gen_asteroid_32_corner_01_macro"/>
   <entry name="scs_gen_asteroid_32_corner_02_macro" value="assets\structures\spacesuit_construction_set\macros\scs_gen_asteroid_32_corner_02_macro"/>
   <entry name="scs_gen_asteroid_32_end_01_macro" value="assets\structures\spacesuit_construction_set\macros\scs_gen_asteroid_32_end_01_macro"/>
@@ -2635,6 +2637,7 @@
   <entry name="scs_gen_spacesuit_32_room_05_macro" value="assets\structures\spacesuit_construction_set\macros\scs_gen_spacesuit_32_room_05_macro"/>
   <entry name="scs_gen_spacesuit_32_room_04_macro" value="assets\structures\spacesuit_construction_set\macros\scs_gen_spacesuit_32_room_04_macro"/>
   <entry name="scs_gen_spacesuit_32_room_03_macro" value="assets\structures\spacesuit_construction_set\macros\scs_gen_spacesuit_32_room_03_macro"/>
+  <entry name="test_ship_gen_xs_lasertower_02_a_macro" value="assets\test\unai\macros\test_ship_gen_xs_lasertower_02_a_macro"/>
   <entry name="sm_gen_lockbox_trap_01_macro" value="assets\props\StorageModules\macros\sm_gen_lockbox_trap_01_macro"/>
   <entry name="sm_gen_wares_common_03_macro" value="assets\props\storagemodules\macros\sm_gen_wares_common_03_macro"/>
   <entry name="sm_gen_wares_luxury_01_macro" value="assets\props\storagemodules\macros\sm_gen_wares_luxury_01_macro"/>
@@ -2646,6 +2649,7 @@
   <entry name="shipstorage_gen_sm_hidden_sixtyfour_macro" value="assets\props\surfaceelements\macros\shipstorage_gen_sm_hidden_sixtyfour_macro"/>
   <entry name="room_gen_crewquarter_01_macro" value="assets\interiors\rooms\macros\room_gen_crewquarter_01_macro"/>
   <entry name="room_gen_captainsquarter_01_macro" value="assets\interiors\rooms\macros\room_gen_captainsquarter_01_macro"/>
+  <entry name="fogpattern_smoke_macro" value="assets\test\markus\macros\fogpattern_smoke_macro"/>
   <entry name="scs_gen_asteroid_16_straight_01_a_macro" value="assets\structures\spacesuit_construction_set\macros\scs_gen_asteroid_16_straight_01_a_macro"/>
   <entry name="scs_gen_asteroid_32_straight_01_a_macro" value="assets\structures\spacesuit_construction_set\macros\scs_gen_asteroid_32_straight_01_a_macro"/>
   <entry name="scs_gen_asteroid_destructible_hatch_16_01_macro" value="assets\structures\spacesuit_construction_set\macros\scs_gen_asteroid_destructible_hatch_16_01_macro"/>
@@ -2656,6 +2660,9 @@
   <entry name="env_asteroid_hot_xl_01_macro" value="assets\environments\asteroids\macros\env_asteroid_hot_xl_01_macro"/>
   <entry name="env_asteroid_hot_xl_02_macro" value="assets\environments\asteroids\macros\env_asteroid_hot_xl_02_macro"/>
   <entry name="env_asteroid_hot_xl_03_macro" value="assets\environments\asteroids\macros\env_asteroid_hot_xl_03_macro"/>
+  <entry name="test_dockingbay_gen_s_showroom_01_macro" value="assets\test\lino\macros\test_dockingbay_gen_s_showroom_01_macro"/>
+  <entry name="test_room_gen_showroom_01_macro" value="assets\test\lino\macros\test_room_gen_showroom_01_macro"/>
+  <entry name="test_dockarea_gen_showroom_01_macro" value="assets\test\lino\macros\test_dockarea_gen_showroom_01_macro"/>
   <entry name="effect_gen_l_travelbubble_01_cockpit_macro" value="assets\fx\misc\macros\effect_gen_l_travelbubble_01_cockpit_macro"/>
   <entry name="effect_gen_l_travelbubble_01_exterior_macro" value="assets\fx\misc\macros\effect_gen_l_travelbubble_01_exterior_macro"/>
   <entry name="effect_gen_m_travelbubble_01_cockpit_macro" value="assets\fx\misc\macros\effect_gen_m_travelbubble_01_cockpit_macro"/>
