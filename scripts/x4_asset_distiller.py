@@ -610,8 +610,87 @@ def main():
     etree.ElementTree(equipment_macros_root).write(equipment_macros_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
     print(f"✅ 聚合完成: 写入 {equipment_processed} 个装备宏定义到 equipment_macros.xml")
 
-    # --- 步骤 9: 聚合装备组件连接点 (equipment_components.xml) ---
-    print("∑ [9/9] 正在聚合装备组件连接点 (equipment_components.xml)...")
+    # --- 步骤 9: 聚合子弹/导弹宏定义 (bullet_macros.xml) ---
+    print("∑ [9/10] 正在聚合子弹/导弹宏定义 (bullet_macros.xml)...")
+
+    # 9.1 从 wares_final.xml 收集 group="missiles" 的 missile ware
+    missile_macro_refs = set()
+    if os.path.exists(wares_final_path):
+        try:
+            wares_tree = etree.parse(wares_final_path, parser)
+            for ware in wares_tree.findall(".//ware[@group='missiles']"):
+                comp = ware.find('component')
+                if comp is not None and comp.get('ref'):
+                    missile_macro_refs.add(comp.get('ref'))
+        except Exception as e:
+            print(f"      ⚠️ 读取 wares_final.xml 失败: {e}")
+    print(f"   🎯 从 missile wares 识别到 {len(missile_macro_refs)} 个导弹宏引用。")
+
+    # 9.2 从 equipment_macros.xml 收集所有 bullet class 引用的 macro
+    bullet_macro_refs = set()
+    if os.path.exists(equipment_macros_path):
+        try:
+            equip_tree = etree.parse(equipment_macros_path, parser)
+            for macro in equip_tree.findall(".//macro"):
+                bullet = macro.find('.//bullet')
+                if bullet is not None:
+                    bullet_class = bullet.get('class')
+                    if bullet_class:
+                        bullet_macro_refs.add(bullet_class)
+        except Exception as e:
+            print(f"      ⚠️ 读取 equipment_macros.xml 失败: {e}")
+    print(f"   🎯 从 bullet class 识别到 {len(bullet_macro_refs)} 个子弹宏引用。")
+
+    # 9.3 合并去重
+    all_bullet_macro_ids = missile_macro_refs.union(bullet_macro_refs)
+    print(f"   🎯 合并后共 {len(all_bullet_macro_ids)} 个子弹/导弹宏。")
+
+    # 9.4 导出 bullet_macros
+    bullet_macros_root = etree.Element('macros')
+    bullet_processed = 0
+
+    for macro_id in all_bullet_macro_ids:
+        path_value = equipment_macro_path_map.get(macro_id)
+        if not path_value:
+            continue
+        sources = resolve_sources(path_value)
+        if not sources:
+            continue
+
+        current_tree = None
+        if 'base' in sources:
+            try:
+                current_tree = etree.parse(sources['base'], parser)
+            except:
+                pass
+
+        for dlc_id in dlc_order:
+            if dlc_id in sources:
+                f_path = sources[dlc_id]
+                try:
+                    dlc_tree = etree.parse(f_path, parser)
+                    dlc_root = dlc_tree.getroot()
+                    if dlc_root.tag == 'diff':
+                        if current_tree:
+                            xml_diff.Apply_Patch(current_tree.getroot(), dlc_root)
+                    else:
+                        current_tree = dlc_tree
+                except Exception as e:
+                    print(f"      ⚠️ 处理出错 {macro_id} ({dlc_id}): {e}")
+
+        if current_tree:
+            root_node = current_tree.getroot()
+            macro_node = root_node if root_node.tag == 'macro' else root_node.find(f".//macro[@name='{macro_id}']")
+            if macro_node is not None:
+                bullet_macros_root.append(macro_node)
+                bullet_processed += 1
+
+    bullet_macros_path = os.path.join(lib_dest_dir, "bullet_macros.xml")
+    etree.ElementTree(bullet_macros_root).write(bullet_macros_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
+    print(f"✅ 聚合完成: 写入 {bullet_processed} 个子弹/导弹宏定义到 bullet_macros.xml")
+
+    # --- 步骤 10: 聚合装备组件连接点 (equipment_components.xml) ---
+    print("∑ [10/10] 正在聚合装备组件连接点 (equipment_components.xml)...")
 
     # 8.1 从 equipment_macros.xml + wares_final.xml 收集 equipment -> component ref 映射。
     # 映射链路: equipment(ware id) -> ware.component(ref=macro) -> equipment_macro.component(ref=component)
