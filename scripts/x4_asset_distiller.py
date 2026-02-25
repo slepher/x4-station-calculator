@@ -86,9 +86,9 @@ def main():
                 name = entry.get("name")
                 value = entry.get("value") or ""
                 if name:
+                    # 只记录第一次出现的 name（避免 base 文件本身就有重复）
                     if name not in entry_sources:
-                        entry_sources[name] = []
-                    entry_sources[name].append(('base', value))
+                        entry_sources[name] = [('base', value)]
         else:
             print(f"      ⚠️ Base 文件不存在: {base_path}")
             tree = etree.ElementTree(etree.Element(root_element_name))
@@ -108,9 +108,9 @@ def main():
                         name = node.get("name")
                         value = node.get("value") or ""
                         if name:
+                            # 只记录第一次出现的 name（避免 DLC 文件本身就有重复）
                             if name not in entry_sources:
-                                entry_sources[name] = []
-                            entry_sources[name].append((dlc_id, value))
+                                entry_sources[name] = [(dlc_id, value)]
                     root.append(deepcopy(node))
             except Exception as e:
                 print(f"      ⚠️ 警告: 叠加失败 {dlc_id}: {e}")
