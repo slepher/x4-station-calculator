@@ -59,231 +59,169 @@ def main():
         children = tuple(node_signature(child) for child in list(node))
         return (node.tag, attrs, text, children)
 
+    # 通用函数：处理 index 文件（macros.xml / components.xml）
+    def process_index_file(src, index_name, root_element_name, dlc_order, dest_dir, parser, filter_test=False):
+        """
+        处理 index 文件：读取 base、叠加 DLC、去重、写出
+        :param src: 源数据根目录
+        :param index_name: index 文件名（如 "macros.xml"）
+        :param root_element_name: 根元素名（如 "macros" / "components"）
+        :param dlc_order: DLC 顺序列表
+        :param dest_dir: 输出目录
+        :param parser: XML 解析器
+        :param filter_test: 是否过滤 assets/test 路径
+        :return: 输出文件路径
+        """
+        base_path = os.path.join(src, "index", index_name)
+        output_path = os.path.join(dest_dir, index_name)
+
+        # 记录每个 entry 的来源: name -> [(source, value), ...]
+        entry_sources = {}
+
+        tree = None
+        if os.path.exists(base_path):
+            tree = etree.parse(base_path, parser)
+            # 记录 base 来源
+            for entry in tree.getroot().findall(".//entry[@name]"):
+                name = entry.get("name")
+                value = entry.get("value") or ""
+                if name:
+                    if name not in entry_sources:
+                        entry_sources[name] = []
+                    entry_sources[name].append(('base', value))
+        else:
+            print(f"      ⚠️ Base 文件不存在: {base_path}")
+            tree = etree.ElementTree(etree.Element(root_element_name))
+
+        root = tree.getroot()
+        for dlc_id in dlc_order:
+            patch_path = os.path.join(src, "extensions", dlc_id, "index", index_name)
+            if not os.path.exists(patch_path):
+                continue
+            print(f"      [+] 叠加节点 ({dlc_id})")
+            try:
+                patch_tree = etree.parse(patch_path, parser)
+                patch_root = patch_tree.getroot()
+                for node in patch_root:
+                    # 记录 DLC 来源
+                    if node.tag == 'entry':
+                        name = node.get("name")
+                        value = node.get("value") or ""
+                        if name:
+                            if name not in entry_sources:
+                                entry_sources[name] = []
+                            entry_sources[name].append((dlc_id, value))
+                    root.append(deepcopy(node))
+            except Exception as e:
+                print(f"      ⚠️ 警告: 叠加失败 {dlc_id}: {e}")
+
+        # 可选：过滤 value 路径包含 assets/test 的 entry
+        if filter_test:
+            removed_test_entries = 0
+            for entry in list(root.findall(".//entry[@value]")):
+                value = (entry.get("value") or "").lower().replace("\\", "/")
+                if "assets/test" in value:
+                    parent = entry.getparent()
+                    if parent is not None:
+                        parent.remove(entry)
+                        removed_test_entries += 1
+            if removed_test_entries:
+                print(f"   🧹 已移除 {removed_test_entries} 个 assets/test entry。")
+
+        # 规范 value 中的双反斜杠（仅在 filter_test 时）
+        if filter_test:
+            normalized_double_slash = 0
+            for entry in root.findall(".//entry[@value]"):
+                value = entry.get("value") or ""
+                normalized = value
+                while "\\\\" in normalized:
+                    normalized = normalized.replace("\\\\", "\\")
+                if normalized != value:
+                    entry.set("value", normalized)
+                    normalized_double_slash += 1
+            if normalized_double_slash:
+                print(f"   🔧 已规范 {normalized_double_slash} 个 entry.value 双反斜杠。")
+
+        # name 相同且内容完全一致的节点自动去重合并
+        merged_same_content = 0
+        seen_name_and_content = set()
+        for node in list(root):
+            name = node.get("name")
+            if not name:
+                continue
+            signature = node_signature(node)
+            key = (name, signature)
+            if key in seen_name_and_content:
+                root.remove(node)
+                merged_same_content += 1
+            else:
+                seen_name_and_content.add(key)
+        if merged_same_content:
+            print(f"   ♻️ 已合并 {merged_same_content} 个同名同内容节点。")
+
+        # 处理重复 name（不同内容）：保留最后一条，警告并列出历史路径
+        from collections import OrderedDict
+        name_to_entries = OrderedDict()
+        for node in list(root):
+            name = node.get("name")
+            if not name:
+                continue
+            if name not in name_to_entries:
+                name_to_entries[name] = []
+            name_to_entries[name].append(node)
+
+        dup_entries = []
+        for name, entries in name_to_entries.items():
+            if len(entries) <= 1:
+                continue
+            # 有重复，保留最后一个，删除前面的
+            sources = entry_sources.get(name, [])
+            for old_node in entries[:-1]:
+                root.remove(old_node)
+            # 记录重复信息用于表格输出
+            dup_entries.append((name, sources))
+
+        if dup_entries:
+            print(f"   ⚠️ 发现 {len(dup_entries)} 个同名不同内容节点，已保留最后一条:")
+            # 计算列宽
+            name_width = max(len(name) for name, _ in dup_entries)
+            src_width = max(len(src) for _, srcs in dup_entries for src, _ in srcs) if any(srcs for _, srcs in dup_entries) else 6
+            # 表头
+            print(f"      {'Name':<{name_width}} | {'Source':<{src_width}} | Value")
+            print(f"      {'-' * name_width}-+-{'-' * src_width}-+--------------------------------")
+            # 表格内容
+            for name, sources in dup_entries:
+                for i, (dlc_id, val) in enumerate(sources):
+                    name_col = name if i == 0 else ""
+                    print(f"      {name_col:<{name_width}} | {dlc_id:<{src_width}} | {val}")
+                print(f"      {' ' * name_width} | {' ' * src_width} | (保留最后一条)")
+
+        # 写出文件
+        tree.write(output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
+
+        # 最终统计
+        final_names = [node.get("name") for node in root if node.get("name")]
+        print(f"   ✨ 生成: index/{index_name}")
+        print(f"   ✅ {root_element_name} 处理完成，共 {len(final_names)} 个具名元素。")
+
+        return output_path
+
     # --- 步骤 1: 拷贝语言包 (t/) ---
     if os.path.exists(os.path.join(src, "t")):
         shutil.copytree(os.path.join(src, "t"), os.path.join(dest_root, "t"))
         print("✅ [1/9] 语言包已拷贝。")
 
-    # --- 步骤 2: 迁移并叠加 index/macros.xml ---
-    print("📂 [2/9] 正在迁移 index/macros.xml...")
+    # 创建 index 输出目录
     index_dest_dir = os.path.join(dest_root, "index")
     os.makedirs(index_dest_dir, exist_ok=True)
 
-    macros_base_path = os.path.join(src, "index", "macros.xml")
-    macros_output_path = os.path.join(index_dest_dir, "macros.xml")
+    # --- 步骤 2: 处理 index/macros.xml ---
+    print("📂 [2/9] 正在处理 index/macros.xml...")
+    process_index_file(src, "macros.xml", "macros", dlc_order, index_dest_dir, parser, filter_test=True)
 
-    # 记录每个 entry 的来源: name -> [(source, value), ...]
-    entry_sources = {}
-
-    macros_tree = None
-    if os.path.exists(macros_base_path):
-        macros_tree = etree.parse(macros_base_path, parser)
-        # 记录 base 来源
-        for entry in macros_tree.getroot().findall(".//entry[@name]"):
-            name = entry.get("name")
-            value = entry.get("value") or ""
-            if name:
-                if name not in entry_sources:
-                    entry_sources[name] = []
-                entry_sources[name].append(('base', value))
-    else:
-        print(f"      ⚠️ Base 文件不存在: {macros_base_path}")
-        macros_tree = etree.ElementTree(etree.Element("macros"))
-
-    macros_root = macros_tree.getroot()
-    for dlc_id in dlc_order:
-        patch_path = os.path.join(src, "extensions", dlc_id, "index", "macros.xml")
-        if not os.path.exists(patch_path):
-            continue
-        print(f"      [+] 叠加节点 ({dlc_id})")
-        try:
-            patch_tree = etree.parse(patch_path, parser)
-            patch_root = patch_tree.getroot()
-            for node in patch_root:
-                # 记录 DLC 来源
-                if node.tag == 'entry':
-                    name = node.get("name")
-                    value = node.get("value") or ""
-                    if name:
-                        if name not in entry_sources:
-                            entry_sources[name] = []
-                        entry_sources[name].append((dlc_id, value))
-                macros_root.append(deepcopy(node))
-        except Exception as e:
-            print(f"      ⚠️ 警告: 叠加失败 {dlc_id}: {e}")
-
-    # 过滤 value 路径包含 assets/test 的 entry 元素（兼容 / 与 \）。
-    removed_test_entries = 0
-    for entry in list(macros_root.findall(".//entry[@value]")):
-        value = (entry.get("value") or "").lower().replace("\\", "/")
-        if "assets/test" in value:
-            parent = entry.getparent()
-            if parent is not None:
-                parent.remove(entry)
-                removed_test_entries += 1
-    if removed_test_entries:
-        print(f"   🧹 已移除 {removed_test_entries} 个 assets/test entry。")
-
-    # 规范 value 中的双反斜杠，避免路径格式差异导致去重失败。
-    normalized_double_slash = 0
-    for entry in macros_root.findall(".//entry[@value]"):
-        value = entry.get("value") or ""
-        normalized = value
-        while "\\\\" in normalized:
-            normalized = normalized.replace("\\\\", "\\")
-        if normalized != value:
-            entry.set("value", normalized)
-            normalized_double_slash += 1
-    if normalized_double_slash:
-        print(f"   🔧 已规范 {normalized_double_slash} 个 entry.value 双反斜杠。")
-
-    # name 相同且内容完全一致的节点自动去重合并
-    merged_same_content = 0
-    seen_name_and_content = set()
-    for node in list(macros_root):
-        name = node.get("name")
-        if not name:
-            continue
-        signature = node_signature(node)
-        key = (name, signature)
-        if key in seen_name_and_content:
-            macros_root.remove(node)
-            merged_same_content += 1
-        else:
-            seen_name_and_content.add(key)
-    if merged_same_content:
-        print(f"   ♻️ 已合并 {merged_same_content} 个同名同内容节点。")
-
-    # 处理重复 name（不同内容）：保留最后一条，警告并列出历史路径
-    from collections import OrderedDict
-    name_to_entries = OrderedDict()
-    for node in list(macros_root):
-        name = node.get("name")
-        if not name:
-            continue
-        if name not in name_to_entries:
-            name_to_entries[name] = []
-        name_to_entries[name].append(node)
-
-    dup_entries = []
-    for name, entries in name_to_entries.items():
-        if len(entries) <= 1:
-            continue
-        # 有重复，保留最后一个，删除前面的
-        sources = entry_sources.get(name, [])
-        for old_node in entries[:-1]:
-            macros_root.remove(old_node)
-        # 记录重复信息用于表格输出
-        dup_entries.append((name, sources))
-
-    if dup_entries:
-        print(f"   ⚠️ 发现 {len(dup_entries)} 个同名不同内容节点，已保留最后一条:")
-        # 计算列宽
-        name_width = max(len(name) for name, _ in dup_entries)
-        src_width = max(len(src) for _, srcs in dup_entries for src, _ in srcs) if any(srcs for _, srcs in dup_entries) else 6
-        # 表头
-        print(f"      {'Name':<{name_width}} | {'Source':<{src_width}} | Value")
-        print(f"      {'-' * name_width}-+-{'-' * src_width}-+--------------------------------")
-        # 表格内容
-        for name, sources in dup_entries:
-            for i, (dlc_id, val) in enumerate(sources):
-                name_col = name if i == 0 else ""
-                print(f"      {name_col:<{name_width}} | {dlc_id:<{src_width}} | {val}")
-            print(f"      {' ' * name_width} | {' ' * src_width} | (保留最后一条)")
-
-    # 重新写入（含去重后的结果）
-    macros_tree.write(macros_output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
-
-    # 最终校验
-    final_names = [node.get("name") for node in macros_root if node.get("name")]
-    print(f"   ✨ 生成: index/macros.xml")
-    print(f"   ✅ macros 处理完成，共 {len(final_names)} 个具名元素。")
-
-    # --- 步骤 3: 迁移并叠加 index/components.xml ---
-    print("📂 [3/9] 正在迁移 index/components.xml...")
-    components_base_path = os.path.join(src, "index", "components.xml")
-    components_output_path = os.path.join(index_dest_dir, "components.xml")
-
-    components_tree = None
-    if os.path.exists(components_base_path):
-        components_tree = etree.parse(components_base_path, parser)
-    else:
-        print(f"      ⚠️ Base 文件不存在: {components_base_path}")
-        components_tree = etree.ElementTree(etree.Element("components"))
-
-    components_root = components_tree.getroot()
-    for dlc_id in dlc_order:
-        patch_path = os.path.join(src, "extensions", dlc_id, "index", "components.xml")
-        if not os.path.exists(patch_path):
-            continue
-        print(f"      [+] 叠加节点 ({dlc_id})")
-        try:
-            patch_tree = etree.parse(patch_path, parser)
-            patch_root = patch_tree.getroot()
-            for node in patch_root:
-                components_root.append(deepcopy(node))
-        except Exception as e:
-            print(f"      ⚠️ 警告: 叠加失败 {dlc_id}: {e}")
-
-    # 过滤 value 路径包含 assets/test 的 entry 元素（兼容 / 与 \）。
-    removed_test_entries = 0
-    for entry in list(components_root.findall(".//entry[@value]")):
-        value = (entry.get("value") or "").lower().replace("\\", "/")
-        if "assets/test" in value:
-            parent = entry.getparent()
-            if parent is not None:
-                parent.remove(entry)
-                removed_test_entries += 1
-    if removed_test_entries:
-        print(f"   🧹 已移除 {removed_test_entries} 个 assets/test entry。")
-
-    # 规范 value 中的双反斜杠，避免路径格式差异导致去重失败。
-    normalized_double_slash = 0
-    for entry in components_root.findall(".//entry[@value]"):
-        value = entry.get("value") or ""
-        normalized = value
-        while "\\\\" in normalized:
-            normalized = normalized.replace("\\\\", "\\")
-        if normalized != value:
-            entry.set("value", normalized)
-            normalized_double_slash += 1
-    if normalized_double_slash:
-        print(f"   🔧 已规范 {normalized_double_slash} 个 entry.value 双反斜杠。")
-
-    # name 相同且内容完全一致的节点自动去重合并。
-    merged_same_content = 0
-    seen_name_and_content = set()
-    for node in list(components_root):
-        name = node.get("name")
-        if not name:
-            continue
-        signature = node_signature(node)
-        key = (name, signature)
-        if key in seen_name_and_content:
-            components_root.remove(node)
-            merged_same_content += 1
-        else:
-            seen_name_and_content.add(key)
-    if merged_same_content:
-        print(f"   ♻️ 已合并 {merged_same_content} 个同名同内容节点。")
-
-    # 先写出文件，便于人工检查内容；随后再做重复校验并决定是否终止。
-    components_tree.write(components_output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
-    print(f"   ✨ 生成: index/components.xml")
-
-    # 校验直接子节点中 name 属性是否重复。
-    names = [node.get("name") for node in components_root if node.get("name")]
-    name_counts = {}
-    for name in names:
-        name_counts[name] = name_counts.get(name, 0) + 1
-    dup_names = sorted([name for name, count in name_counts.items() if count > 1])
-    if dup_names:
-        sample = ", ".join(dup_names[:10])
-        more = f" ... (+{len(dup_names)-10} more)" if len(dup_names) > 10 else ""
-        raise RuntimeError(
-            f"❌ index/components.xml 已写出，但存在重复 name: {sample}{more}"
-        )
-    print(f"   ✅ name 去重校验通过，共 {len(names)} 个具名元素。")
+    # --- 步骤 3: 处理 index/components.xml ---
+    print("📂 [3/9] 正在处理 index/components.xml...")
+    process_index_file(src, "components.xml", "components", dlc_order, index_dest_dir, parser, filter_test=False)
 
     # --- 步骤 4: 处理核心库文件 (wares/waregroups/colors/ships/shipgroups/loadouts) ---
     print("📂 [4/9] 正在处理核心库文件 (Wares/Waregroups/Colors/Ships/Shipgroups/Loadouts)...")
