@@ -222,6 +222,7 @@ def main():
         { 'name': 'shipgroups.xml', 'final': 'shipgroups_final.xml' },
         # loadouts 需要叠加 DLC
         { 'name': 'loadouts.xml', 'final': 'loadouts_final.xml' },
+        { 'name': 'defaults.xml', 'final': 'defaults_final.xml' }
     ]
 
     for lib_file in lib_files:
