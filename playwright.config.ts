@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
+// 1. 读取终端传进来的 PORT，如果没有传，就默认使用 4173
+const port = process.env.PORT || 4173;
+
 export default defineConfig({
   testDir: './tests',
   testIgnore: '**/unit/**',
@@ -10,7 +13,7 @@ export default defineConfig({
   reporter: 'list',
   
   use: {
-    baseURL: 'http://127.0.0.1:4173/x4-station-calculator/',
+    baseURL: 'http://127.0.0.1:${port}/x4-station-calculator/',
     headless: true,
     trace: 'on-first-retry',
     locale: 'en-US',
@@ -33,8 +36,8 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'npm run preview',
-    url: 'http://127.0.0.1:4173/x4-station-calculator/',
+    command: 'pnpm run preview',
+    url: 'http://127.0.0.1:${port}/x4-station-calculator/',
     reuseExistingServer: !process.env.CI,
     timeout: 30000,
   }

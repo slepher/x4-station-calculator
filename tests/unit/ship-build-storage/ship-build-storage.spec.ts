@@ -170,6 +170,23 @@ describe('ship-build-storage: selectedByConnection', () => {
     localStorage.clear()
   })
 
+  it('1.4.1 批量设置装备', () => {
+    const store = useShipBuildStore()
+    store.setSelectedShipId(ODACHI_ID)
+
+    // 模拟批量设置 - 同一个装备设置到多个 group
+    store.setEquipment('engine', 'group_back_up_mid', 'engine_am', 3)
+    store.setEquipment('engine', 'group_back_up_mid', 'engine_am', 3)
+
+    const bp = store.blueprint
+    expect(bp).toBeTruthy()
+    const engineConn = bp!.connections.find(c => c.slot_type === 'engine')
+    expect(engineConn).toBeTruthy()
+    // 批量设置应该更新同一 group
+    const groups = engineConn!.group.filter(g => g.group === 'group_back_up_mid')
+    expect(groups.length).toBe(1)
+  })
+
   it('1.5.1 从 blueprint 计算 selectedByConnection', () => {
     const store = useShipBuildStore()
     store.setSelectedShipId(ODACHI_ID)
