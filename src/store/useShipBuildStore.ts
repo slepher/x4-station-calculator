@@ -924,6 +924,12 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   }
 
   return {
+    // 全局字典数据
+    ships,
+    wares,
+    equipments,
+    equipmentTypes,
+    // 状态
     activeView,
     selectedClass,
     selectedRaces,

@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useShipBuildStore } from '@/store/useShipBuildStore'
 import type { X4Ship, X4Equipment } from '@/types/x4'
 
 const props = defineProps<{
+  // 当前上下文状态 - 通过 props 传入
   selectedShip: X4Ship | null
   connectionRows: any[]
   selectedByConnection: Record<string, string | null>
-  ships: X4Ship[]
-  equipments: X4Equipment[]
-  wares: any[]
   statsViewMode: 'summary' | 'detail'
 }>()
 
@@ -19,14 +18,15 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const equipmentMap = new Map<string, X4Equipment>()
-props.equipments.forEach((eq) => {
-  equipmentMap.set(eq.id, eq)
-})
+// 全局字典数据 - 直接从 store 读取
+const store = useShipBuildStore()
 
-const wareMap = new Map<string, any>()
-props.wares.forEach((ware) => {
-  wareMap.set(ware.id, ware)
+const equipmentMap = computed(() => {
+  const map = new Map<string, X4Equipment>()
+  store.equipments.forEach((eq) => {
+    map.set(eq.id, eq)
+  })
+  return map
 })
 
 type ShipStatMetric = {
@@ -63,7 +63,7 @@ const getShieldStats = () => {
     if (row.slotType !== 'shield') return
     const equipmentId = props.selectedByConnection[row.connectionKey]
     if (!equipmentId) return
-    const equipment = equipmentMap.get(equipmentId)
+    const equipment = equipmentMap.value.get(equipmentId)
     if (!equipment?.stats?.recharge) return
     max += equipment.stats.recharge.max || 0
     rate += equipment.stats.recharge.rate || 0
@@ -101,7 +101,7 @@ const getEngineStats = () => {
   engineRows.forEach(row => {
     const equipmentId = props.selectedByConnection[row.connectionKey]
     if (!equipmentId) return
-    const equipment = equipmentMap.get(equipmentId)
+    const equipment = equipmentMap.value.get(equipmentId)
     if (!equipment?.stats) return
     if (equipment.stats.thrust?.forward) thrustForward += equipment.stats.thrust.forward
     if (equipment.stats.boost?.thrust) boostMultiplier = equipment.stats.boost.thrust
@@ -227,7 +227,7 @@ const buildDetailStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
 
 // Calculate max values for bar ratios
 const calculateMaxStats = (ship: X4Ship) => {
-  const classShips = props.ships.filter(s => s.class === ship.class)
+  const classShips = store.ships.filter(s => s.class === ship.class)
   const summaryMax: Record<string, number> = {}
   const detailMax: Record<string, number> = {}
 

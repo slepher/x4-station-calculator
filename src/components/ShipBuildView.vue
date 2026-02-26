@@ -79,7 +79,7 @@ const {
   groupRows,
   hasFitModeConflict,
   canSwitchToGroupMode,
-  shipBuildMaterialAnalysis
+  blueprint
 } = storeToRefs(shipBuildStore)
 const {
   setSelectedShipId,
@@ -91,8 +91,6 @@ const {
   applyConnectionAssignment: applyConnectionAssignmentStore,
   applyGroupAssignment: applyGroupAssignmentStore,
   setStatsViewMode,
-  setMaterialMethod,
-  setMaterialPriceMultiplier,
   setDisplayResolvers
 } = shipBuildStore
 setDisplayResolvers({
@@ -187,19 +185,11 @@ const applyGroupAssignment = (payload: { groupKey: string; equipmentId: string |
         :selected-ship="selectedShip"
         :connection-rows="connectionRows"
         :selected-by-connection="selectedByConnection"
-        :ships="ships"
-        :equipments="equipments"
-        :wares="wares"
         :stats-view-mode="statsViewMode"
         @set-stats-view-mode="setStatsViewMode"
       />
       <ShipBuildPanelMaterials
-        :ship-build-material-analysis="shipBuildMaterialAnalysis"
-        :selected-ship="selectedShip"
-        :wares="wares"
-        :ships="ships"
-        @set-material-method="setMaterialMethod"
-        @set-material-price-multiplier="setMaterialPriceMultiplier"
+        :ship-blueprint="blueprint"
       />
     </div>
   </div>
