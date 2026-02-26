@@ -29,6 +29,10 @@ const mockShip = vi.hoisted(() => ({
     { type: 'liquid', capacity: 3000 },
     { type: 'condensed', capacity: 2000 }
   ],
+  dockarea: [
+    { size: 'dock_m', capacity: 1 },
+    { size: 'dock_s', capacity: 2 }
+  ],
   crew: { capacity: 25 },
   hull: 62500,
   shipstorage: [
