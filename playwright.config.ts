@@ -13,7 +13,7 @@ export default defineConfig({
   reporter: 'list',
   
   use: {
-    baseURL: 'http://127.0.0.1:${port}/x4-station-calculator/',
+    baseURL: `http://127.0.0.1:${port}/x4-station-calculator/`,
     headless: true,
     trace: 'on-first-retry',
     locale: 'en-US',
@@ -37,7 +37,7 @@ export default defineConfig({
 
   webServer: {
     command: 'pnpm run preview',
-    url: 'http://127.0.0.1:${port}/x4-station-calculator/',
+    url: `http://127.0.0.1:${port}/x4-station-calculator/`,
     reuseExistingServer: !process.env.CI,
     timeout: 30000,
   }
