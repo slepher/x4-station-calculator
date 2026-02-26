@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
@@ -10,14 +10,14 @@ import type {
   X4ShipType,
   X4EquipmentType,
   X4Equipment,
-  X4Ware,
-  EquipmentType,
-  ShipEquipmentSize
+  X4Ware
 } from '@/types/x4'
 import ShipBuildPanelFit from '@/components/ship-build/ShipBuildPanelFit.vue'
 import ShipBuildPanelStats from '@/components/ship-build/ShipBuildPanelStats.vue'
 import ShipBuildPanelMaterials from '@/components/ship-build/ShipBuildPanelMaterials.vue'
+import ShipBuildSelector from '@/components/ship-build/ShipBuildSelector.vue'
 import type { FitMode } from '@/components/ship-build/fitTypes'
+import type { ShipBuildClass } from '@/store/useShipBuildStore'
 
 import shipsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ships.json'
 import shipTypesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ship_types.json'
@@ -30,7 +30,7 @@ import consumablesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/consumables
 import waresRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/wares.json'
 
 const { t } = useI18n()
-const { translateShip, translateShipType, translateEquipmentType, translateEquipment } = useX4I18n()
+const { translateEquipmentType, translateEquipment } = useX4I18n()
 
 const ships = shipsRaw as unknown as X4Ship[]
 const shipTypes = shipTypesRaw as X4ShipType[]
@@ -100,154 +100,27 @@ setDisplayResolvers({
   translateEquipmentType
 })
 
-const classOptions = [
-  { id: 'ship_s', label: 'S' },
-  { id: 'ship_m', label: 'M' },
-  { id: 'ship_l', label: 'L' },
-  { id: 'ship_xl', label: 'XL' }
-]
-
-const raceOptions = computed(() => {
-  return shipRaces.map(race => ({
-    id: race.id,
-    label: race.id
-  }))
-})
-
-const availableTypes = computed(() => {
-  if (!selectedClass.value) return []
-  return shipTypes.filter(type => type.class.includes(selectedClass.value!))
-})
-
-const isTypeSingleRow = computed(() => availableTypes.value.length > 0 && availableTypes.value.length <= 5)
-
-const typeLabelMap = computed(() => {
-  const map = new Map<string, string>()
-  shipTypes.forEach(type => {
-    map.set(type.id, translateShipType(type))
-  })
-  return map
-})
-
-const equipmentTypeMap = computed(() => {
-  const map = new Map<EquipmentType, X4EquipmentType>()
-  equipmentTypes.forEach(type => {
-    map.set(type.id, type)
-  })
-  return map
-})
-
-const equipmentSizeOrder: ShipEquipmentSize[] = ['extralarge', 'large', 'medium', 'small']
-const equipmentSizeLabelMap: Partial<Record<ShipEquipmentSize, string>> = {
-  extralarge: 'XL',
-  large: 'L',
-  medium: 'M',
-  small: 'S'
+// Wrapper functions to cast types for ShipBuildSelector
+const handleSelectedClassChange = (value: string | null) => {
+  setSelectedClass(value as ShipBuildClass | null)
 }
 
-const equipmentTypeShortMap: Record<EquipmentType, string> = {
-  engine: 'E',
-  shield: 'S',
-  weapon: 'W',
-  turret: 'T',
-  thruster: ''
+const handleRaceToggle = (value: string) => {
+  toggleRace(value)
 }
 
-const getEquipmentSummary = (ship: X4Ship, mode: 'short' | 'full') => {
-  if (!ship.slots || ship.slots.length === 0) return ''
-  const typeCounts = new Map<EquipmentType, Record<ShipEquipmentSize, number>>()
-  ship.slots.forEach(slot => {
-    const entry = typeCounts.get(slot.type) || {
-      extralarge: 0,
-      large: 0,
-      medium: 0,
-      small: 0
-    }
-    equipmentSizeOrder.forEach(size => {
-      const value = slot.count?.[size]
-      if (value) entry[size] += value
-    })
-    typeCounts.set(slot.type, entry)
-  })
-
-  const parts: string[] = []
-  typeCounts.forEach((counts, type) => {
-    if (type === 'thruster') return
-    const sizeText = equipmentSizeOrder
-      .map(size => counts[size] ? `${equipmentSizeLabelMap[size] || ''}${counts[size]}` : '')
-      .filter(Boolean)
-      .join('')
-    if (!sizeText) return
-    const typeDef = equipmentTypeMap.value.get(type)
-    const fullName = typeDef ? translateEquipmentType(typeDef) : type
-    const shortName = equipmentTypeShortMap[type] || type
-    const typeName = mode === 'short' ? shortName : fullName
-    parts.push(`${typeName}:${sizeText}`)
-  })
-
-  return parts.join(', ')
+const handleTypeToggle = (value: string) => {
+  toggleType(value)
 }
 
-const canShowList = computed(() => {
-  return Boolean(selectedClass.value) && (selectedRaces.value.length > 0 || selectedTypes.value.length > 0)
-})
+const handleSelectedTypesChange = (value: string[]) => {
+  setSelectedTypes(value)
+}
 
-const shipsByClass = computed(() => {
-  if (!selectedClass.value) return []
-  return ships.filter(ship => ship.class === selectedClass.value)
-})
+const handleSelectedShipIdChange = (value: string | null) => {
+  setSelectedShipId(value)
+}
 
-const raceCountMap = computed(() => {
-  const counts = new Map<string, number>()
-  const base = shipsByClass.value
-  const filtered = selectedTypes.value.length > 0
-    ? base.filter(ship => selectedTypes.value.includes(ship.type))
-    : base
-  filtered.forEach(ship => {
-    counts.set(ship.race, (counts.get(ship.race) || 0) + 1)
-  })
-  return counts
-})
-
-const typeCountMap = computed(() => {
-  const counts = new Map<string, number>()
-  const base = shipsByClass.value
-  const filtered = selectedRaces.value.length > 0
-    ? base.filter(ship => selectedRaces.value.includes(ship.race))
-    : base
-  filtered.forEach(ship => {
-    counts.set(ship.type, (counts.get(ship.type) || 0) + 1)
-  })
-  return counts
-})
-
-const filteredShips = computed(() => {
-  if (!canShowList.value || !selectedClass.value) return []
-
-  let result = shipsByClass.value
-  if (selectedRaces.value.length > 0) {
-    result = result.filter(ship => selectedRaces.value.includes(ship.race))
-  }
-  if (selectedTypes.value.length > 0) {
-    result = result.filter(ship => selectedTypes.value.includes(ship.type))
-  }
-
-  return result
-    .slice()
-    .sort((a, b) => translateShip(a).localeCompare(translateShip(b)))
-})
-
-watch(selectedClass, () => {
-  const allowed = new Set(availableTypes.value.map(type => type.id))
-  setSelectedTypes(selectedTypes.value.filter(typeId => allowed.has(typeId)))
-})
-
-watch(filteredShips, (next) => {
-  if (!selectedShipId.value) return
-  if (!next.some(ship => ship.id === selectedShipId.value)) {
-    setSelectedShipId(null)
-  }
-})
 const fitModeConflictReason = computed(() => hasFitModeConflict.value ? t('ship_build.fit_mode_disabled_reason') : '')
 
 const setFitMode = (mode: FitMode) => {
@@ -280,126 +153,22 @@ const applyGroupAssignment = (payload: { groupKey: string; equipmentId: string |
         <div class="text-xs text-slate-500">{{ t('ship_build.filters') }}</div>
       </div>
 
-      <div v-if="!selectedShip" class="panel-body grid grid-cols-1 lg:grid-cols-[4fr_6fr] gap-6">
-        <div class="flex flex-col gap-5">
-          <div class="filter-card" data-testid="ship-build-filter-class">
-            <div class="filter-card-header">
-              <span>{{ t('ship_build.filter_class') }}</span>
-              <span class="filter-required">{{ t('ship_build.required') }}</span>
-            </div>
-            <div class="filter-card-body">
-              <div class="flex flex-wrap gap-2">
-                <button
-                  v-for="option in classOptions"
-                  :key="option.id"
-                  class="filter-chip"
-                  :class="selectedClass === option.id ? 'filter-chip-active' : 'filter-chip-idle'"
-                  @click="setSelectedClass(option.id as any)"
-                >
-                  {{ option.label }}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="filter-card" data-testid="ship-build-filter-race">
-            <div class="filter-card-header">{{ t('ship_build.filter_race') }}</div>
-            <div class="filter-card-body">
-              <div class="race-grid">
-                <button
-                  v-for="option in raceOptions"
-                  :key="option.id"
-                  class="filter-chip"
-                  :class="selectedRaces.includes(option.id) ? 'filter-chip-active' : 'filter-chip-idle'"
-                  @click="toggleRace(option.id)"
-                >
-                  <span>{{ option.label }}</span>
-                  <span class="filter-count" data-testid="ship-build-race-count">({{ raceCountMap.get(option.id) || 0 }})</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="filter-card" data-testid="ship-build-filter-type">
-            <div class="filter-card-header">{{ t('ship_build.filter_type') }}</div>
-            <div class="filter-card-body">
-              <div v-if="!selectedClass" class="text-xs text-slate-500">
-                {{ t('ship_build.type_hint') }}
-              </div>
-              <div v-else :class="['type-grid', isTypeSingleRow ? 'type-grid-single' : '']">
-                <button
-                  v-for="type in availableTypes"
-                  :key="type.id"
-                  class="filter-chip"
-                  :class="selectedTypes.includes(type.id) ? 'filter-chip-active' : 'filter-chip-idle'"
-                  @click="toggleType(type.id)"
-                >
-                  <span>{{ typeLabelMap.get(type.id) || type.id }}</span>
-                  <span class="filter-count" data-testid="ship-build-type-count">({{ typeCountMap.get(type.id) || 0 }})</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <div data-testid="ship-build-list">
-          <div class="list-card">
-            <div class="list-header">
-              <span>{{ t('ship_build.list_title') }}</span>
-              <span v-if="canShowList" class="text-xs text-slate-500">{{ filteredShips.length }}</span>
-            </div>
-            <div v-if="!canShowList" class="list-empty" data-testid="ship-build-list-empty">
-              {{ t('ship_build.list_hint') }}
-            </div>
-            <div v-else-if="filteredShips.length === 0" class="list-empty" data-testid="ship-build-list-empty">
-              {{ t('ship_build.empty_list') }}
-            </div>
-            <ul v-else class="list-body list-grid custom-scrollbar">
-              <li
-                v-for="ship in filteredShips"
-                :key="ship.id"
-                class="list-item"
-                :class="selectedShipId === ship.id ? 'list-item-active' : ''"
-                @click="setSelectedShipId(ship.id)"
-              >
-                <div class="font-semibold text-slate-100 truncate" data-testid="ship-build-ship-name">{{ translateShip(ship) }}</div>
-                <div class="text-xs text-slate-300/90 equipment-line">
-                  {{ getEquipmentSummary(ship, 'short') }}
-                </div>
-                <div class="text-xs text-slate-400">
-                  {{ typeLabelMap.get(ship.type) || ship.type }} · {{ ship.race }}
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div v-else class="panel-body">
-        <div
-          class="selection-expanded"
-          data-testid="ship-build-selection"
-        >
-          <div class="selection-expanded-header">
-            <div class="selection-title">
-              <span class="selection-title-label">{{ t('ship_build.selected_ship') }}</span>
-              <span class="selection-title-name">{{ translateShip(selectedShip) }}</span>
-            </div>
-            <button class="selection-change-btn" @click="setSelectedShipId(null)">
-              {{ t('ship_build.change_ship') }}
-            </button>
-          </div>
-          <div class="selection-expanded-body">
-            <div class="selection-expanded-line equipment-line">
-              {{ getEquipmentSummary(selectedShip, 'full') }}
-            </div>
-            <div class="selection-expanded-line text-xs text-slate-400">
-              {{ typeLabelMap.get(selectedShip.type) || selectedShip.type }} · {{ selectedShip.race }}
-            </div>
-          </div>
-        </div>
-      </div>
+      <ShipBuildSelector
+        :selected-ship-id="selectedShipId"
+        :selected-ship="selectedShip"
+        :selected-class="selectedClass"
+        :selected-races="selectedRaces"
+        :selected-types="selectedTypes"
+        :ships="ships"
+        :ship-types="shipTypes"
+        :ship-races="shipRaces"
+        :equipment-types="equipmentTypes"
+        @update:selected-class="handleSelectedClassChange"
+        @toggle-race="handleRaceToggle"
+        @toggle-type="handleTypeToggle"
+        @update:selected-types="handleSelectedTypesChange"
+        @update:selected-ship-id="handleSelectedShipIdChange"
+      />
     </div>
 
     <div v-if="selectedShip" class="grid grid-cols-12 gap-8" data-testid="ship-build-panels">
