@@ -985,6 +985,126 @@
       </connection>
     </connections>
   </macro>
+  <macro name="dockingbay_arg_m_01_hightech_macro" class="dockingbay">
+    <component ref="dockingbay_arg_m_01_hightech"/>
+    <properties>
+      <identification name="{20104,73001}" shortname="{20104,73003}" description="{20104,73002}"/>
+      <translationspeed max="10"/>
+      <translationacceleration max="3"/>
+      <effects>
+        <cargotube attach="dock_m_cargotube_attach" detach="dock_m_cargotube_detach"/>
+        <landing ref="ship_blowout_size_m">
+          <curve>
+            <point position="0" value="0"/>
+            <point position="1" value="1"/>
+            <point position="40" value="0"/>
+          </curve>
+        </landing>
+      </effects>
+      <dock external="1"/>
+      <docksize tags="dock_m"/>
+    </properties>
+  </macro>
+  <macro name="dockingbay_arg_m_01_lowtech_macro" class="dockingbay">
+    <component ref="dockingbay_arg_m_01_lowtech"/>
+    <properties>
+      <identification name="{20104,72801}" shortname="{20104,72803}" description="{20104,72802}"/>
+      <translationspeed max="10"/>
+      <translationacceleration max="3"/>
+      <effects>
+        <cargotube attach="dock_m_cargotube_attach" detach="dock_m_cargotube_detach"/>
+        <landing ref="ship_blowout_size_m">
+          <curve>
+            <point position="0" value="0"/>
+            <point position="1" value="1"/>
+            <point position="40" value="0"/>
+          </curve>
+        </landing>
+      </effects>
+      <dock external="1"/>
+      <docksize tags="dock_m"/>
+    </properties>
+  </macro>
+  <macro name="dockingbay_arg_m_01_macro" class="dockingbay">
+    <component ref="dockingbay_arg_m_01"/>
+    <properties>
+      <identification name="{20104,72901}" shortname="{20104,72903}" description="{20104,72902}"/>
+      <translationspeed max="10"/>
+      <translationacceleration max="3"/>
+      <effects>
+        <cargotube attach="dock_m_cargotube_attach" detach="dock_m_cargotube_detach"/>
+        <landing ref="ship_blowout_size_m">
+          <curve>
+            <point position="0" value="0"/>
+            <point position="1" value="1"/>
+            <point position="40" value="0"/>
+          </curve>
+        </landing>
+      </effects>
+      <dock external="1"/>
+      <docksize tags="dock_m"/>
+    </properties>
+  </macro>
+  <macro name="dockingbay_arg_s_01_hightech_macro" class="dockingbay">
+    <component ref="dockingbay_arg_s_01_hightech"/>
+    <properties>
+      <identification name="{20104,72701}" shortname="{20104,72703}" description="{20104,72702}"/>
+      <translationspeed max="5"/>
+      <translationacceleration max="2"/>
+      <effects>
+        <cargotube attach="dock_s_cargotube_attach" detach="dock_s_cargotube_detach"/>
+        <landing ref="ship_blowout_size_s">
+          <curve>
+            <point position="0" value="0"/>
+            <point position="1" value="1"/>
+            <point position="40" value="0"/>
+          </curve>
+        </landing>
+      </effects>
+      <dock external="1"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="dockingbay_arg_s_01_lowtech_macro" class="dockingbay">
+    <component ref="dockingbay_arg_s_01_lowtech"/>
+    <properties>
+      <identification name="{20104,72501}" shortname="{20104,72503}" description="{20104,72502}"/>
+      <translationspeed max="5"/>
+      <translationacceleration max="2"/>
+      <effects>
+        <cargotube attach="dock_s_cargotube_attach" detach="dock_s_cargotube_detach"/>
+        <landing ref="ship_blowout_size_s">
+          <curve>
+            <point position="0" value="0"/>
+            <point position="1" value="1"/>
+            <point position="40" value="0"/>
+          </curve>
+        </landing>
+      </effects>
+      <dock external="1"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="dockingbay_arg_s_01_macro" class="dockingbay">
+    <component ref="dockingbay_arg_s_01"/>
+    <properties>
+      <identification name="{20104,72601}" shortname="{20104,72603}" description="{20104,72602}"/>
+      <translationspeed max="5"/>
+      <translationacceleration max="2"/>
+      <effects>
+        <cargotube attach="dock_s_cargotube_attach" detach="dock_s_cargotube_detach"/>
+        <landing ref="ship_blowout_size_s">
+          <curve>
+            <point position="0" value="0"/>
+            <point position="1" value="1"/>
+            <point position="40" value="0"/>
+          </curve>
+        </landing>
+      </effects>
+      <dock external="1"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
   <macro name="engine_gen_spacesuit_01_mk1_macro" class="engine">
     <component ref="generic_engine_spacesuit"/>
     <properties>
