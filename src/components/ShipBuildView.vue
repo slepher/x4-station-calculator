@@ -45,6 +45,10 @@ const wareMap = new Map<string, X4Ware>()
 wares.forEach((ware) => {
   wareMap.set(ware.id, ware)
 })
+const shipMap = new Map<string, X4Ship>()
+ships.forEach((ship) => {
+  shipMap.set(ship.id, ship)
+})
 const equipmentMap = new Map<string, X4Equipment>()
 equipments.forEach((eq) => {
   equipmentMap.set(eq.id, eq)
@@ -557,6 +561,12 @@ const getMaterialName = (wareId: string) => {
   const ware = wareMap.get(wareId)
   return ware ? translateWare(ware) : wareId
 }
+
+const getShipName = (shipId: string | undefined) => {
+  if (!shipId) return ''
+  const ship = shipMap.get(shipId)
+  return ship ? translateShip(ship) : shipId
+}
 </script>
 
 <template>
@@ -812,6 +822,32 @@ const getMaterialName = (wareId: string) => {
               </template>
               <template #header>
                 <span class="material-summary-value">{{ formatCrValue(shipBuildMaterialAnalysis.totalValue) }}</span>
+              </template>
+              <template #row="{ item }">
+                <div class="material-item-row">
+                  <span class="material-item-count">{{ formatMaterialCount(item.count) }}</span>
+                  <span class="material-item-symbol">x</span>
+                  <span class="material-item-name">{{ getMaterialName(item.wareId) }}</span>
+                </div>
+                <span class="material-item-value">{{ formatCrValue(item.value) }}</span>
+              </template>
+            </CollapsibleDetailList>
+
+            <!-- Hull group as separate item -->
+            <CollapsibleDetailList
+              v-if="shipBuildMaterialAnalysis.hullGroup"
+              :data="shipBuildMaterialAnalysis.hullGroup.items"
+              :main-row-testid="'ship-build-material-hull-group'"
+              :list-testid="'ship-build-material-hull-list'"
+            >
+              <template #title>
+                <div class="material-equipment-title">
+                  <span class="material-equipment-name">{{ getShipName(shipBuildMaterialAnalysis.hullGroup?.shipId) }}</span>
+                  <span class="material-equipment-count">x 1</span>
+                </div>
+              </template>
+              <template #header>
+                <span class="material-summary-value">{{ formatCrValue(shipBuildMaterialAnalysis.hullGroup?.value || 0) }}</span>
               </template>
               <template #row="{ item }">
                 <div class="material-item-row">

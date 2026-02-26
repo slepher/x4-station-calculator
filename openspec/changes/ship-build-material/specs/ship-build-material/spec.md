@@ -5,6 +5,21 @@
 
 ## ADDED Requirements
 
+### Requirement: Data Source Migration to ShipBlueprint
+
+#### Scenario: Use ShipBlueprint as Equipment Data Source
+- **前提**：用户已保存或加载 ShipBlueprint。
+- **当**：材料面板计算装备材料。
+- **那么**：系统 SHALL 从 `blueprint.connections` 中获取装备配置信息，而非从 `selectedByConnection` computed 获取。
+
+### Requirement: Ship Hull Material Calculation
+
+#### Scenario: Include Ship Hull Materials in Total
+- **前提**：用户已选择飞船并存在 ShipBlueprint。
+- **当**：系统计算总材料。
+- **那么**：总材料 SHALL 包含飞船船体材料（从 ShipBlueprint 的 `hull` 配置获取）。
+- **并且**：船体材料独立于飞船 production cost 计算。
+
 ### Requirement: Build Material Method Selector
 
 #### Scenario: Aggregate And Render Method Options
@@ -45,10 +60,13 @@
 - **并且**：每个分项显示 `装备名 x 数量 + 分项金额`。
 - **并且**：分项可展开显示该装备组内材料明细。
 
-#### Scenario: Total Material Includes Ship And Equipment
-- **前提**：用户已选飞船，且存在装备选择。
+#### Scenario: Total Material Includes Ship Hull, Production And Equipment
+- **前提**：用户已选飞船，且存在装备选择，且 ShipBlueprint 包含 hull 配置。
 - **当**：系统计算总材料。
-- **那么**：总材料 SHALL 同时包含飞船基础建造成本与装备成本。
+- **那么**：总材料 SHALL 同时包含：
+  1. 飞船船体材料（ShipBlueprint hull 配置）
+  2. 飞船基础建造成本（production cost）
+  3. 已选装备成本
 
 ### Requirement: Price Slider Affects Value Only
 

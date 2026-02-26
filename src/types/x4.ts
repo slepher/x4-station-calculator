@@ -671,11 +671,18 @@ export interface ShipBlueprintConnection {
   group: ShipBlueprintGroup[]
 }
 
+export interface ShipBlueprintHull {
+  /** Hull material components required for building the ship hull */
+  materials: Record<string, number>
+}
+
 export interface ShipBlueprint {
   id: string
   name: string
   shipId: string
   connections: ShipBlueprintConnection[]
+  /** Hull material configuration - separate from production cost */
+  hull?: ShipBlueprintHull
   lastUpdated: number
 }
 

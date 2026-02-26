@@ -35,6 +35,12 @@ export type ShipBuildMaterialShipGroup = {
   items: ShipBuildMaterialItem[]
 }
 
+export type ShipBuildMaterialHullGroup = {
+  shipId: string
+  value: number
+  items: ShipBuildMaterialItem[]
+}
+
 export type ShipBuildMaterialEquipmentGroup = {
   equipmentId: string
   equipmentName: string
@@ -50,6 +56,7 @@ export type ShipBuildMaterialAnalysis = {
   totalValue: number
   summaryItems: ShipBuildMaterialItem[]
   shipGroup: ShipBuildMaterialShipGroup | null
+  hullGroup: ShipBuildMaterialHullGroup | null
   equipmentGroups: ShipBuildMaterialEquipmentGroup[]
 }
 
@@ -801,6 +808,18 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     }
   })
 
+  // Hull material from ShipBlueprint hull configuration
+  const hullMaterialGroup = computed<ShipBuildMaterialHullGroup | null>(() => {
+    if (!selectedShip.value || !blueprint.value?.hull) return null
+    const hullMaterials = blueprint.value.hull.materials
+    const items = mapCostToMaterialItems(hullMaterials)
+    return {
+      shipId: selectedShip.value.id,
+      value: items.reduce((sum, item) => sum + item.value, 0),
+      items
+    }
+  })
+
   const equipmentMaterialGroups = computed<ShipBuildMaterialEquipmentGroup[]>(() => {
     const groups = selectedEquipmentGroups.value.map(({ equipment, quantity }) => {
       const equipmentCost = resolveCostByMethod(equipment.cost, materialMethod.value)
@@ -830,9 +849,15 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       })
     }
 
+    // Merge hull materials first (from ShipBlueprint hull configuration)
+    if (hullMaterialGroup.value) {
+      mergeItems(hullMaterialGroup.value.items)
+    }
+    // Merge ship production cost
     if (shipMaterialGroup.value) {
       mergeItems(shipMaterialGroup.value.items)
     }
+    // Merge equipment materials
     equipmentMaterialGroups.value.forEach((group) => mergeItems(group.items))
     return Array.from(grouped.values()).sort((a, b) => b.value - a.value)
   })
@@ -846,6 +871,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       totalValue,
       summaryItems: materialSummaryItems.value,
       shipGroup: shipMaterialGroup.value,
+      hullGroup: hullMaterialGroup.value,
       equipmentGroups: equipmentMaterialGroups.value
     }
   })

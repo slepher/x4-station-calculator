@@ -5,12 +5,20 @@
 面板风格对标 `StationDashboard`，明细复用 `CollapsibleDetailList`。
 同时提供独立的材料价格滑条，并新增 method 下拉用于切换材料计算方法。
 
+**本次新增需求**：
+1. 计算材料时需加上船体本身的材料（ShipBlueprint 船体配置）。
+2. 船体材料需作为独立分项显示在材料明细中（类似装备分项），显示格式为"船体名称 x 1"。
+3. 数据源已由 computed 改为 ShipBlueprint（参考 ship-build-storage 变更）。
+
 ## 已确认方案（审核重点）
-1. **method 下拉选择**
+1. **数据源变更：ShipBlueprint**
+   - 参考 ship-build-storage 变更，`ship-build-material` 数据源从 `selectedByConnection` (computed) 改为 `ShipBlueprint`。
+   - 装备信息从 `blueprint.connections` 中获取，而非从 store 的 computed 状态获取。
+2. **method 下拉选择**
    - 在材料面板提供 method 下拉框。
    - 下拉选项为“飞船 `production.method` + 装备 `cost.method`”的去重聚合集合。
    - method 键名以游戏数据真实键为准（例如 `closedloop`、`terran`、`default`）。
-2. **method 回退规则**
+3. **method 回退规则**
    - 计算任一飞船/装备成本时，若当前选中 method 不存在，则回退到 `default`。
    - 回退规则对飞船与装备统一生效。
 3. **材料聚合结构**
@@ -18,7 +26,9 @@
    - 再展示各装备明细，按“装备 ID 聚合”显示（`装备A x N xxxCr（可展开）`）。
    - 各装备展开后显示该装备组内材料明细（`N x 材料A: xxxCr`）。
 4. **数据构成**
-   - 总材料由“飞船基础建造成本 + 已选装备成本”共同组成。
+   - 总材料由“飞船船体材料 + 飞船基础建造成本 + 已选装备成本”共同组成。
+   - 飞船船体材料从 ShipBlueprint 的 `hull` 配置中获取（独立于 production 成本）。
+   - 船体材料作为独立分项显示，显示格式为"船体名称 x 1"（如"Odachi x 1"）。
    - 装备成本按当前配装选择统计数量后参与计算。
 5. **样式与组件复用**
    - 面板视觉风格对标 `StationDashboard`。
@@ -38,6 +48,9 @@
 - 总材料与装备分项明细的折叠展示。
 - 底部独立材料价格拖动条。
 - 对应 i18n 文案与测试文档更新。
+- 数据源改为 ShipBlueprint（参考 ship-build-storage 变更）。
+- 新增飞船船体材料计算（ShipBlueprint hull 配置）。
+- 船体材料作为独立分项显示在材料明细中（格式："船体名称 x 1"）。
 
 ### Out of Scope
 - 新增远程数据源或后端接口。
@@ -53,6 +66,9 @@
 6. 面板交互样式与 `StationDashboard` 风格一致，折叠行为复用 `CollapsibleDetailList`。
 7. 文案使用独立 i18n 键，支持中英文。
 8. 测试任务可基于 `ship-build-equipment` 的标准状态路径稳定执行。
+9. 数据源改为 ShipBlueprint，装备信息从 blueprint.connections 获取。
+10. 总材料计算需包含飞船船体材料（ShipBlueprint hull 配置）。
+11. 船体材料需作为独立分项显示在材料明细中，显示格式为"船体名称 x 1"。
 
 ## 未决项
 无。
