@@ -1,19 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
-import type { X4Ship, X4Equipment } from '@/types/x4'
+import type { X4Ship, X4Equipment, ShipBlueprint } from '@/types/x4'
 
 const props = defineProps<{
-  // 当前上下文状态 - 通过 props 传入
-  selectedShip: X4Ship | null
-  connectionRows: any[]
-  selectedByConnection: Record<string, string | null>
-  statsViewMode: 'summary' | 'detail'
-}>()
-
-const emit = defineEmits<{
-  setStatsViewMode: [mode: 'summary' | 'detail']
+  shipBlueprint: ShipBlueprint | null
 }>()
 
 const { t } = useI18n()
@@ -21,12 +13,30 @@ const { t } = useI18n()
 // 全局字典数据 - 直接从 store 读取
 const store = useShipBuildStore()
 
+// ============ 内部状态 ============
+const statsViewMode = ref<'summary' | 'detail'>('summary')
+
+// ============ Store 数据映射 ============
+const shipMap = computed(() => {
+  const map = new Map<string, X4Ship>()
+  store.ships.forEach((ship) => {
+    map.set(ship.id, ship)
+  })
+  return map
+})
+
 const equipmentMap = computed(() => {
   const map = new Map<string, X4Equipment>()
   store.equipments.forEach((eq) => {
     map.set(eq.id, eq)
   })
   return map
+})
+
+// ============ 从 Blueprint 派生数据 ============
+const selectedShip = computed(() => {
+  if (!props.shipBlueprint) return null
+  return shipMap.value.get(props.shipBlueprint.shipId) || null
 })
 
 type ShipStatMetric = {
@@ -54,24 +64,28 @@ const placeholderKeys = new Set([
 
 // Get aggregated shield stats from selected shield equipment
 const getShieldStats = () => {
-  if (!props.selectedShip) return { max: 0, rate: 0, delay: 0, groupAvg: 0 }
+  if (!selectedShip.value || !props.shipBlueprint) return { max: 0, rate: 0, delay: 0, groupAvg: 0 }
   let max = 0
   let rate = 0
   let delay = 0
 
-  props.connectionRows.forEach(row => {
-    if (row.slotType !== 'shield') return
-    const equipmentId = props.selectedByConnection[row.connectionKey]
-    if (!equipmentId) return
-    const equipment = equipmentMap.value.get(equipmentId)
-    if (!equipment?.stats?.recharge) return
-    max += equipment.stats.recharge.max || 0
-    rate += equipment.stats.recharge.rate || 0
-    delay = Math.max(delay, equipment.stats.recharge.delay || 0)
+  // 遍历 blueprint.connections 找到 shield 槽位
+  props.shipBlueprint.connections.forEach((conn) => {
+    if (conn.slot_type !== 'shield') return
+    conn.group.forEach((g) => {
+      if (!g.equipment_id) return
+      const equipment = equipmentMap.value.get(g.equipment_id)
+      if (!equipment?.stats?.recharge) return
+      max += equipment.stats.recharge.max || 0
+      rate += equipment.stats.recharge.rate || 0
+      delay = Math.max(delay, equipment.stats.recharge.delay || 0)
+    })
   })
 
+  // 计算总 shield 槽位数
   let totalShieldSlots = 0
-  props.selectedShip.slots.forEach(slot => {
+  selectedShip.value.slots.forEach(slot => {
+    if (slot.type !== 'shield') return
     slot.groups.forEach(group => {
       const connShield = group.connection?.shield
       if (connShield) {
@@ -88,9 +102,23 @@ const getShieldStats = () => {
 
 // Get aggregated engine stats from selected engine equipment
 const getEngineStats = () => {
-  if (!props.selectedShip) return null
-  const engineRows = props.connectionRows.filter(row => row.slotType === 'engine')
-  if (engineRows.length === 0) return null
+  if (!selectedShip.value || !props.shipBlueprint) return null
+
+  // 收集所有 engine 装备
+  const engineEquipments: Array<{ equipment: X4Equipment; count: number }> = []
+  props.shipBlueprint.connections.forEach((conn) => {
+    if (conn.slot_type !== 'engine') return
+    conn.group.forEach((g) => {
+      if (!g.equipment_id) return
+      const equipment = equipmentMap.value.get(g.equipment_id)
+      if (equipment) {
+        engineEquipments.push({ equipment, count: g.count })
+      }
+    })
+  })
+
+  if (engineEquipments.length === 0) return null
+
   let thrustForward = 0
   let boostMultiplier = 1
   let boostDuration = 0
@@ -98,10 +126,7 @@ const getEngineStats = () => {
   let travelMultiplier = 1
   let travelCharge = 0
 
-  engineRows.forEach(row => {
-    const equipmentId = props.selectedByConnection[row.connectionKey]
-    if (!equipmentId) return
-    const equipment = equipmentMap.value.get(equipmentId)
+  engineEquipments.forEach(({ equipment }) => {
     if (!equipment?.stats) return
     if (equipment.stats.thrust?.forward) thrustForward += equipment.stats.thrust.forward
     if (equipment.stats.boost?.thrust) boostMultiplier = equipment.stats.boost.thrust
@@ -263,9 +288,9 @@ const calculateMaxStats = (ship: X4Ship) => {
 const formatStatValue = (value: number) => value.toLocaleString()
 
 const summaryShipStats = computed<ShipStatDisplay[]>(() => {
-  if (!props.selectedShip) return []
-  const stats = buildSummaryStats(props.selectedShip)
-  const { summaryMax } = calculateMaxStats(props.selectedShip)
+  if (!selectedShip.value) return []
+  const stats = buildSummaryStats(selectedShip.value)
+  const { summaryMax } = calculateMaxStats(selectedShip.value)
 
   return stats.map(metric => ({
     key: metric.key,
@@ -278,9 +303,9 @@ const summaryShipStats = computed<ShipStatDisplay[]>(() => {
 })
 
 const detailedShipStats = computed<ShipStatDisplay[]>(() => {
-  if (!props.selectedShip) return []
-  const stats = buildDetailStats(props.selectedShip)
-  const { detailMax } = calculateMaxStats(props.selectedShip)
+  if (!selectedShip.value) return []
+  const stats = buildDetailStats(selectedShip.value)
+  const { detailMax } = calculateMaxStats(selectedShip.value)
 
   return stats.map(metric => ({
     key: metric.key,
@@ -293,11 +318,11 @@ const detailedShipStats = computed<ShipStatDisplay[]>(() => {
 })
 
 const visibleShipStats = computed<ShipStatDisplay[]>(() => {
-  return props.statsViewMode === 'summary' ? summaryShipStats.value : detailedShipStats.value
+  return statsViewMode.value === 'summary' ? summaryShipStats.value : detailedShipStats.value
 })
 
 const setStatsViewMode = (mode: 'summary' | 'detail') => {
-  emit('setStatsViewMode', mode)
+  statsViewMode.value = mode
 }
 </script>
 

@@ -71,7 +71,6 @@ const {
   selectedRaces,
   selectedTypes,
   selectedShipId,
-  statsViewMode,
   fitMode,
   selectedByConnection,
   selectedShip,
@@ -90,7 +89,6 @@ const {
   setFitMode: setFitModeStore,
   applyConnectionAssignment: applyConnectionAssignmentStore,
   applyGroupAssignment: applyGroupAssignmentStore,
-  setStatsViewMode,
   setDisplayResolvers
 } = shipBuildStore
 setDisplayResolvers({
@@ -182,11 +180,7 @@ const applyGroupAssignment = (payload: { groupKey: string; equipmentId: string |
         @assign-group="applyGroupAssignment"
       />
       <ShipBuildPanelStats
-        :selected-ship="selectedShip"
-        :connection-rows="connectionRows"
-        :selected-by-connection="selectedByConnection"
-        :stats-view-mode="statsViewMode"
-        @set-stats-view-mode="setStatsViewMode"
+        :ship-blueprint="blueprint"
       />
       <ShipBuildPanelMaterials
         :ship-blueprint="blueprint"
