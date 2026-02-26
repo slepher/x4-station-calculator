@@ -621,12 +621,16 @@ def main():
 
     print(f"   🎯 macros.xml 索引共 {len(macro_path_map)} 个 macro。")
 
-    # 从所有文件中筛选 class="dockarea" 的 macro，获取它们的 connection 引用
+    # 从 ship_connection_refs 对应的文件中筛选 class="dockarea" 的 macro，获取它们的 connection 引用
     dockarea_connection_refs = set()
-    source_files = set(macro_path_map.values())
+    # 只获取 ship_connection_refs 中涉及的文件
+    ref_files = set(macro_path_map[ref] for ref in ship_connection_refs if ref in macro_path_map)
 
-    for src_file in source_files:
+    for src_file in ref_files:
         if not os.path.exists(src_file):
+            # 找出哪些 id 指向这个不存在的文件
+            missing_ids = [ref for ref in ship_connection_refs if macro_path_map.get(ref) == src_file]
+            print(f"   ⚠️ 文件不存在: {src_file}, 缺失 ID: {missing_ids}")
             continue
         try:
             tree = etree.parse(src_file, parser)
