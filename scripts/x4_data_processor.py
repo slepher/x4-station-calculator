@@ -97,7 +97,12 @@ class X4PrecisionLoader:
         self.slot_tag_name_map = {}
         self.slot_tag_key_map = {}
         self.slot_tags_data = []
-        
+        self.missiles_data = []  # 从 wares 导出的 missiles
+        self.missile_macro_ids_from_ware = set()  # 记录从 ware 导出的 missile macro id
+        self.bullets_data = []
+        self.drones_data = []     # ship_xs, ship_s
+        self.consumables_data = [] # mine, satellite, scanner, countermeasure, etc.
+
         # 收集需要翻译的原始名称 (Raw Key)
         self.needed_raw_names = set()
 
@@ -555,9 +560,11 @@ class X4PrecisionLoader:
         self.ship_connections = self._load_ship_connections()
         self.ship_connections_raw = self._load_ship_connections_raw()
         self.ship_macros = self._load_ship_macros()
+        self.ship_connection_macros = self._load_ship_connection_macros()
+        self.ship_defaults = self._load_ship_defaults()
         self.loadouts_map = self._load_loadouts(self.ship_macros, self.ship_connections)
         self.equipment_component_tags_by_name = self._load_equipment_component_tags()
-        self._build_ships(self.ship_macros, self.ship_connections, self.loadouts_map, self.shipgroup_by_macro)
+        self._build_ships(self.ship_macros, self.ship_connections, self.loadouts_map, self.shipgroup_by_macro, self.ship_connection_macros, self.ship_defaults)
         self._build_equipments()
 
     def _split_tags(self, tags_str):
@@ -607,6 +614,54 @@ class X4PrecisionLoader:
         }
         return race_map.get(abbrev, abbrev)
 
+    def _build_ship_connection_storage(self, ship_entry, ship_macro_info, ship_connection_macros):
+        """从 ship_connection_macros 构建 storage/dockarea/shipstorage"""
+        connection_macro_refs = ship_macro_info.get('connectionMacroRefs', [])
+        storage_list = []      # [{type, capacity}]
+        dockarea_list = []     # [{size, capacity}]
+        shipstorage_list = []  # [{size, capacity}]
+
+        def process_macro(macro_ref, visited=None):
+            if visited is None:
+                visited = set()
+            if macro_ref in visited:
+                return
+            visited.add(macro_ref)
+
+            macro_info = ship_connection_macros.get(macro_ref)
+            if not macro_info:
+                return
+            macro_class = macro_info.get('class')
+
+            if macro_class == "storage":
+                for item in macro_info.get('storage', []):
+                    storage_list.append(item)
+            elif macro_class == "dockingbay":
+                for item in macro_info.get('dockarea', []):
+                    dockarea_list.append(item)
+                for item in macro_info.get('shipstorage', []):
+                    shipstorage_list.append(item)
+            elif macro_class == "dockarea":
+                dockingbay_refs = macro_info.get('dockingbayRefs', [])
+                for db_ref in dockingbay_refs:
+                    process_macro(db_ref, visited)
+
+        for macro_ref in connection_macro_refs:
+            process_macro(macro_ref)
+
+        # 合并 entries
+        def merge_entries(entries, key):
+            merged = {}
+            for entry in entries:
+                val = entry.get(key)
+                if val:
+                    merged[val] = merged.get(val, 0) + entry.get('capacity', 1)
+            return [{key: k, "capacity": v} for k, v in merged.items()] if merged else []
+
+        ship_entry["cargo"] = merge_entries(storage_list, 'type')
+        ship_entry["dockarea"] = merge_entries(dockarea_list, 'size')
+        ship_entry["shipstorage"] = merge_entries(shipstorage_list, 'size')
+
     def _extract_type_size(self, tags, types):
         size = None
         for t in tags:
@@ -655,7 +710,7 @@ class X4PrecisionLoader:
         return None
 
     def _load_ship_connections_raw(self):
-        connections_path = os.path.join(self.raw_path, "libraries", "ship_connections.xml")
+        connections_path = os.path.join(self.raw_path, "libraries", "ship_components.xml")
         mapping = {}
         if not os.path.exists(connections_path):
             print(f"   ⚠️ 警告: 找不到 ship connections 文件: {connections_path}")
@@ -755,7 +810,7 @@ class X4PrecisionLoader:
         return mapping
 
     def _load_ship_connections(self):
-        connections_path = os.path.join(self.raw_path, "libraries", "ship_connections.xml")
+        connections_path = os.path.join(self.raw_path, "libraries", "ship_components.xml")
         mapping = {}
         if not os.path.exists(connections_path):
             print(f"   ⚠️ 警告: 找不到 ship connections 文件: {connections_path}")
@@ -793,6 +848,110 @@ class X4PrecisionLoader:
             print(f"   ❌ Ship connections XML Error: {e}")
         return mapping
 
+    def _load_ship_connection_macros(self):
+        """加载 ship_connection_macros.xml 中的 storage/dockingbay/dockarea 数据"""
+        macros_path = os.path.join(self.raw_path, "libraries", "ship_connection_macros.xml")
+        mapping = {}
+        if not os.path.exists(macros_path):
+            print(f"   ⚠️ 警告: 找不到 ship_connection_macros 文件: {macros_path}")
+            return mapping
+        try:
+            tree = ET.parse(macros_path)
+            root = tree.getroot()
+            for macro in root.findall('macro'):
+                name = macro.get('name')
+                if not name:
+                    continue
+                macro_class = macro.get('class')
+                props = macro.find('properties')
+                if props is None:
+                    continue
+                info = {"class": macro_class}
+                if macro_class == "storage":
+                    # storage: [{type: container/liquid/solid, capacity: Value}]
+                    cargo_node = props.find('cargo')
+                    if cargo_node is not None:
+                        tags = self._split_tags(cargo_node.get('tags', ''))
+                        max_val = int(cargo_node.get('max') or 0)
+                        for cargo_type in tags:
+                            info.setdefault("storage", []).append({
+                                "type": cargo_type,
+                                "capacity": max_val
+                            })
+                elif macro_class == "dockingbay":
+                    # dockingbay: [{size: dock_xs/s/m/l/xl, capacity: Value}]
+                    dock_node = props.find('dock')
+                    docksize_node = props.find('docksize')
+                    if dock_node is not None and docksize_node is not None:
+                        capacity = int(dock_node.get('capacity') or 1)
+                        storage_flag = dock_node.get('storage', '0') == '1'
+                        size_tags = self._split_tags(docksize_node.get('tags', ''))
+                        for size in size_tags:
+                            entry = {"size": size, "capacity": capacity}
+                            if storage_flag:
+                                info.setdefault("shipstorage", []).append(entry)
+                            else:
+                                info.setdefault("dockarea", []).append(entry)
+                elif macro_class == "dockarea":
+                    # dockarea: 收集 connections 中的 dockingbay 引用
+                    connections_node = macro.find('connections')
+                    if connections_node is not None:
+                        dockingbay_refs = []
+                        for conn in connections_node.findall('connection'):
+                            macro_ref = conn.find('macro')
+                            if macro_ref is not None and macro_ref.get('ref'):
+                                dockingbay_refs.append(macro_ref.get('ref'))
+                        if dockingbay_refs:
+                            info["dockingbayRefs"] = dockingbay_refs
+                mapping[name] = info
+            print(f"   ✅ 读取 {len(mapping)} 个 ship connection macros 的 storage/dockingbay/dockarea 数据。")
+        except Exception as e:
+            print(f"   ❌ Ship connection macros XML Error: {e}")
+        return mapping
+
+    def _load_ship_defaults(self):
+        """加载 defaults_final.xml 中各 ship class 的默认属性"""
+        defaults_path = os.path.join(self.raw_path, "libraries", "defaults_final.xml")
+        mapping = {}
+        if not os.path.exists(defaults_path):
+            print(f"   ⚠️ 警告: 找不到 defaults 文件: {defaults_path}")
+            return mapping
+        try:
+            tree = ET.parse(defaults_path)
+            root = tree.getroot()
+            for dataset in root.findall('dataset'):
+                class_name = dataset.get('class')
+                if not class_name or not class_name.startswith('ship_'):
+                    continue
+                props = dataset.find('properties')
+                if props is None:
+                    continue
+
+                info = {}
+                # radar range
+                radar_node = props.find('radar')
+                if radar_node is not None:
+                    info['radarRange'] = int(radar_node.get('range') or 0)
+
+                # storage (countermeasure, deployable)
+                storage_node = props.find('storage')
+                if storage_node is not None:
+                    info['countermeasure'] = int(storage_node.get('countermeasure') or 0)
+                    info['deployable'] = int(storage_node.get('deployable') or 0)
+
+                # docksize
+                docksize_node = props.find('docksize')
+                if docksize_node is not None:
+                    info['docksize'] = docksize_node.get('tag')
+
+                if info:
+                    mapping[class_name] = info
+
+            print(f"   ✅ 读取 {len(mapping)} 个 ship class 的默认属性。")
+        except Exception as e:
+            print(f"   ❌ Ship defaults XML Error: {e}")
+        return mapping
+
     def _load_ship_macros(self):
         macros_path = os.path.join(self.raw_path, "libraries", "ship_macros.xml")
         mapping = {}
@@ -818,6 +977,7 @@ class X4PrecisionLoader:
                 hull_node = props.find('hull') if props is not None else None
                 physics_node = props.find('physics') if props is not None else None
                 thruster_node = props.find('thruster') if props is not None else None
+                radar_node = props.find('radar') if props is not None else None
 
                 storage = None
                 if storage_node is not None:
@@ -852,6 +1012,19 @@ class X4PrecisionLoader:
                 if thruster_node is not None:
                     thruster_tags = self._split_tags(thruster_node.get('tags', ''))
 
+                radar_range = None
+                if radar_node is not None:
+                    radar_range = int(radar_node.get('range') or 0)
+
+                # 收集所有 connections 中的 macro 引用
+                connection_macro_refs = []
+                connections_node = macro.find('connections')
+                if connections_node is not None:
+                    for conn in connections_node.findall('connection'):
+                        macro_ref = conn.find('macro')
+                        if macro_ref is not None and macro_ref.get('ref'):
+                            connection_macro_refs.append(macro_ref.get('ref'))
+
                 mapping[name] = {
                     "id": name,
                     "class": macro.get('class'),
@@ -861,7 +1034,9 @@ class X4PrecisionLoader:
                     "crew": crew,
                     "hull": int(hull_node.get('max') or 0) if hull_node is not None else 0,
                     "physics": physics,
-                    "thrusterTags": thruster_tags
+                    "thrusterTags": thruster_tags,
+                    "radarRange": radar_range,
+                    "connectionMacroRefs": connection_macro_refs
                 }
             print(f"   ✅ 读取 {len(mapping)} 个 ship macros。")
         except Exception as e:
@@ -934,10 +1109,16 @@ class X4PrecisionLoader:
             print(f"   ❌ Loadouts XML Error: {e}")
         return mapping
 
-    def _build_ships(self, ship_macros, ship_connections, loadouts_map, shipgroup_by_macro):
+    def _build_ships(self, ship_macros, ship_connections, loadouts_map, shipgroup_by_macro, ship_connection_macros=None, ship_defaults=None):
+        if ship_connection_macros is None:
+            ship_connection_macros = {}
+        if ship_defaults is None:
+            ship_defaults = {}
         ship_slot_extract_failures = []
         for ship_macro, info in ship_macros.items():
             comp_ref = info.get('component')
+            ship_class = info.get('class')
+            defaults = ship_defaults.get(ship_class, {})
             ware_id = self.component_to_ware.get(ship_macro)
             if not ware_id:
                 continue
@@ -973,14 +1154,27 @@ class X4PrecisionLoader:
                 ship_class = info.get('class')
                 if ship_class:
                     self.ship_type_class_map[ship_type].add(ship_class)
+
+            # 构建 storage/dockarea/shipstorage
+            self._build_ship_connection_storage(ship_entry, info, ship_connection_macros)
+
+            # storage: 总是包含 countermeasure 和 deployable，默认为 0
             if info.get('storage') is not None:
-                ship_entry["storage"] = info.get('storage')
+                storage_data = dict(info.get('storage'))  # 复制一份
+                storage_data['countermeasure'] = defaults.get('countermeasure', 0)
+                storage_data['deployable'] = defaults.get('deployable', 0)
+                ship_entry["storage"] = storage_data
             if info.get('crew') is not None:
                 ship_entry["crew"] = info.get('crew')
             if info.get('hull') is not None:
                 ship_entry["hull"] = info.get('hull')
             if info.get('physics') is not None:
                 ship_entry["physics"] = info.get('physics')
+
+            # radarRange: 当前数据优先，defaults 备用
+            # radarRange: 当前数据优先，defaults 备用，默认为 0
+            radar_range = info.get('radarRange') or defaults.get('radarRange') or 0
+            ship_entry["radarRange"] = radar_range
 
             groups = {}
             group_types = defaultdict(list)
@@ -1368,7 +1562,10 @@ class X4PrecisionLoader:
                     bullet = props.find('bullet')
                     heat = props.find('heat')
                     if bullet is not None:
-                        stats["bullet"] = bullet.get('class')
+                        bullet_class = bullet.get('class')
+                        stats["bullet"] = bullet_class
+                        # 在顶层也导出 bullet 属性，便于直接引用
+                        equipment["bullet"] = bullet_class
                     if heat is not None:
                         stats["heat"] = {
                             "overheat": float(heat.get('overheat') or 0),
@@ -1398,6 +1595,207 @@ class X4PrecisionLoader:
                 print("   ✅ slotTags 提取失败 0 条 (type/size)。")
         except Exception as e:
             print(f"   ❌ Equipment macros XML Error: {e}")
+
+    # =======================================================
+    # 2.5 构建无人机和消耗品数据 (Drones/Consumables)
+    # =======================================================
+    def _build_drones_and_consumables(self):
+        print(f"\n🛸 [2.5/5] 构建无人机和消耗品数据...")
+
+        macros_path = os.path.join(self.raw_path, "libraries", "equipment_macros.xml")
+        if not os.path.exists(macros_path):
+            print(f"   ⚠️ 警告: 找不到 equipment macros 文件: {macros_path}")
+            return
+
+        # class 到类型/分类的映射
+        drone_classes = {'ship_xs', 'ship_s'}
+        consumable_classes = {'mine', 'satellite', 'scanner', 'countermeasure', 'navbeacon', 'resourceprobe'}
+
+        try:
+            tree = ET.parse(macros_path)
+            root = tree.getroot()
+
+            for macro in root.findall('macro'):
+                macro_name = macro.get('name')
+                m_class = macro.get('class')
+
+                # 跳过已处理的类型
+                if m_class in {'engine', 'shieldgenerator', 'weapon', 'turret',
+                               'missilelauncher', 'missileturret', 'missile'}:
+                    continue
+
+                # 获取 ware_id
+                ware_id = self.component_to_ware.get(macro_name)
+                if not ware_id:
+                    continue
+
+                ware_info = self.ware_index.get(ware_id, {})
+                name_id = ware_info.get('nameId', ware_id)
+                if name_id:
+                    self.needed_raw_names.add(name_id)
+
+                props = macro.find('properties')
+                ident_info = {}
+                if props is not None:
+                    ident = props.find('identification')
+                    if ident is not None:
+                        ident_info = {
+                            "mk": ident.get('mk'),
+                            "race": ident.get('makerrace'),
+                            "deployable": ident.get('deployable', '0') == '1'
+                        }
+
+                item = {
+                    "id": ware_id,
+                    "nameId": name_id,
+                    "name": name_id,
+                    "macro": macro_name,
+                    "class": m_class,
+                    "mk": ident_info.get('mk'),
+                    "race": ident_info.get('race'),
+                    "deployable": ident_info.get('deployable', False),
+                    "tags": self._split_tags(ware_info.get('tags', '')),
+                    "cost": self._build_cost(ware_id)
+                }
+
+                # 根据 class 分类
+                if m_class in drone_classes:
+                    self.drones_data.append(item)
+                elif m_class in consumable_classes:
+                    self.consumables_data.append(item)
+
+            print(f"   ✅ 生成 {len(self.drones_data)} 条 drones 数据。")
+            print(f"   ✅ 生成 {len(self.consumables_data)} 条 consumables 数据。")
+        except Exception as e:
+            print(f"   ❌ Drones/Consumables XML Error: {e}")
+
+    # =======================================================
+    # 2.6 构建导弹数据 (Missiles)
+    # =======================================================
+    def _build_missiles(self):
+        print(f"\n🚀 [2.5/5] 构建导弹数据 (missiles.json)...")
+        wares_path = os.path.join(self.raw_path, "libraries", "wares_final.xml")
+        bullet_macros_path = os.path.join(self.raw_path, "libraries", "bullet_macros.xml")
+
+        # 先读取 bullet_macros.xml 构建 macro_name -> missile 属性映射
+        missile_props_map = {}
+        if os.path.exists(bullet_macros_path):
+            try:
+                bullet_tree = ET.parse(bullet_macros_path)
+                bullet_root = bullet_tree.getroot()
+                for macro in bullet_root.findall('macro'):
+                    macro_name = macro.get('name')
+                    props = macro.find('properties')
+                    if props is not None:
+                        missile_node = props.find('missile')
+                        if missile_node is not None:
+                            missile_props_map[macro_name] = {
+                                "hull": float(missile_node.get('hull') or 0),
+                                "shield": float(missile_node.get('shield') or 0),
+                                "explosive": float(missile_node.get('explosive') or 0),
+                                "homing": missile_node.get('homing') == 'true'
+                            }
+            except Exception as e:
+                print(f"   ⚠️ 警告: 读取 bullet_macros 失败: {e}")
+
+        if not os.path.exists(wares_path):
+            print(f"   ⚠️ 警告: 找不到 wares 文件: {wares_path}")
+            return
+
+        try:
+            tree = ET.parse(wares_path)
+            root = tree.getroot()
+            for ware in root.findall('ware'):
+                w_id = ware.get('id')
+                group = ware.get('group', '')
+                if group != 'missiles':
+                    continue
+
+                tags = ware.get('tags', '')
+                raw_name = ware.get('name', '')
+                transport = ware.get('transport')
+
+                name_id = raw_name or w_id
+                if name_id:
+                    self.needed_raw_names.add(name_id)
+
+                comp_node = ware.find('component')
+                macro_id = comp_node.get('ref') if comp_node is not None else None
+
+                missile = {
+                    "id": w_id,
+                    "nameId": name_id,
+                    "name": name_id,
+                    "group": group,
+                    "tags": self._split_tags(tags),
+                    "transport": transport,
+                    "macroId": macro_id,
+                    "cost": self._build_cost(w_id)
+                }
+
+                # 合并 bullet_macros.xml 中的 missile 属性
+                if macro_id and macro_id in missile_props_map:
+                    missile.update(missile_props_map[macro_id])
+
+                self.missiles_data.append(missile)
+
+            print(f"   ✅ 生成 {len(self.missiles_data)} 条 missiles 数据。")
+        except Exception as e:
+            print(f"   ❌ Missiles XML Error: {e}")
+
+    # =======================================================
+    # 2.6 构建子弹/导弹宏数据 (Bullets)
+    # =======================================================
+    def _build_bullets(self):
+        print(f"\n💥 [2.6/5] 构建子弹/导弹宏数据 (bullet.json)...")
+        bullet_macros_path = os.path.join(self.raw_path, "libraries", "bullet_macros.xml")
+        if not os.path.exists(bullet_macros_path):
+            print(f"   ⚠️ 警告: 找不到 bullet_macros 文件: {bullet_macros_path}")
+            return
+
+        try:
+            tree = ET.parse(bullet_macros_path)
+            root = tree.getroot()
+            for macro in root.findall('macro'):
+                macro_name = macro.get('name')
+                m_class = macro.get('class')
+
+                props = macro.find('properties')
+                ident_info = {}
+                name_id = None
+                if props is not None:
+                    ident = props.find('identification')
+                    if ident is not None:
+                        ident_info = {
+                            "mk": ident.get('mk'),
+                            "race": ident.get('makerrace')
+                        }
+                        name_id = ident.get('name')
+
+                bullet = {
+                    "id": macro_name,
+                    "class": m_class,
+                    "mk": ident_info.get('mk'),
+                    "race": ident_info.get('race')
+                }
+
+                # 提取伤害属性（只导出 bullet 类型，missile 类型已在 missiles.json 中）
+                if props is not None:
+                    # 查找 bullet 节点
+                    bullet_node = props.find('bullet')
+
+                    if bullet_node is not None:
+                        bullet["type"] = "bullet"
+                        bullet["speed"] = float(bullet_node.get('speed') or 0)
+                        bullet["lifetime"] = float(bullet_node.get('lifetime') or 0)
+                        bullet["hull"] = float(bullet_node.get('hull') or 0)
+                        bullet["shield"] = float(bullet_node.get('shield') or 0)
+                        self.bullets_data.append(bullet)
+                    # 跳过 missile 节点
+
+            print(f"   ✅ 生成 {len(self.bullets_data)} 条 bullets 数据。")
+        except Exception as e:
+            print(f"   ❌ Bullets macros XML Error: {e}")
 
     # =======================================================
     # 3. 语言提取 (Backend Translation)
@@ -1905,6 +2303,14 @@ class X4PrecisionLoader:
             json.dump(self.equipment_types_data, f, indent=2, ensure_ascii=False)
         with open(os.path.join(data_dir, "slot_tags.json"), 'w', encoding='utf-8') as f:
             json.dump(self.slot_tags_data, f, indent=2, ensure_ascii=False)
+        with open(os.path.join(data_dir, "missiles.json"), 'w', encoding='utf-8') as f:
+            json.dump(self.missiles_data, f, indent=2, ensure_ascii=False)
+        with open(os.path.join(data_dir, "bullets.json"), 'w', encoding='utf-8') as f:
+            json.dump(self.bullets_data, f, indent=2, ensure_ascii=False)
+        with open(os.path.join(data_dir, "drones.json"), 'w', encoding='utf-8') as f:
+            json.dump(self.drones_data, f, indent=2, ensure_ascii=False)
+        with open(os.path.join(data_dir, "consumables.json"), 'w', encoding='utf-8') as f:
+            json.dump(self.consumables_data, f, indent=2, ensure_ascii=False)
 
         # 保存语言包
         available_languages = []
@@ -1926,6 +2332,9 @@ if __name__ == "__main__":
     loader.process_module_groups()
     loader.scan_assets()
     loader.parse_ship_and_equipment_data()
+    loader._build_missiles()
+    loader._build_drones_and_consumables()
+    loader._build_bullets()
     loader.extract_and_resolve_languages()
     loader.analyze_ship_types()
     loader.analyze_equipment_types()

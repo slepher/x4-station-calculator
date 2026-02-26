@@ -5,23 +5,23 @@
     "name": "Engine"
   },
   {
-    "id": "thruster",
-    "nameId": "{20109,15201}",
-    "name": "Thruster"
-  },
-  {
     "id": "shield",
     "nameId": "{20109,15501}",
     "name": "Shield Generator"
   },
   {
-    "id": "weapon",
-    "nameId": "{20109,15301}",
-    "name": "Weapon"
+    "id": "thruster",
+    "nameId": "{20109,15201}",
+    "name": "Thruster"
   },
   {
     "id": "turret",
     "nameId": "{20109,15401}",
     "name": "Turret"
+  },
+  {
+    "id": "weapon",
+    "nameId": "{20109,15301}",
+    "name": "Weapon"
   }
 ]

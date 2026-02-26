@@ -9,24 +9,58 @@ import type {
   X4ShipRace,
   X4ShipType,
   X4EquipmentType,
+  X4Equipment,
+  X4Ware,
   EquipmentType,
   ShipEquipmentSize
 } from '@/types/x4'
 import ShipBuildFitCandidate from '@/components/ShipBuildFitCandidate.vue'
+import CollapsibleDetailList from '@/components/common/CollapsibleDetailList.vue'
+import PriceSlider from '@/components/common/PriceSlider.vue'
 import type { FitMode } from '@/components/ship-build/fitTypes'
 
 import shipsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ships.json'
 import shipTypesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ship_types.json'
 import shipRacesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ship_races.json'
 import equipmentTypesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipment_types.json'
+import equipmentsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
+import bulletsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/bullets.json'
+import missilesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/missiles.json'
+import consumablesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/consumables.json'
+import waresRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/wares.json'
 
 const { t } = useI18n()
-const { translateShip, translateShipType, translateEquipmentType, translateEquipment } = useX4I18n()
+const { translateShip, translateShipType, translateEquipmentType, translateEquipment, translateWare } = useX4I18n()
 
 const ships = shipsRaw as unknown as X4Ship[]
 const shipTypes = shipTypesRaw as X4ShipType[]
 const shipRaces = shipRacesRaw as X4ShipRace[]
 const equipmentTypes = equipmentTypesRaw as X4EquipmentType[]
+const equipments = equipmentsRaw as X4Equipment[]
+const bullets = bulletsRaw as any[]
+const missiles = missilesRaw as any[]
+const consumables = consumablesRaw as any[]
+const wares = waresRaw as X4Ware[]
+const wareMap = new Map<string, X4Ware>()
+wares.forEach((ware) => {
+  wareMap.set(ware.id, ware)
+})
+const equipmentMap = new Map<string, X4Equipment>()
+equipments.forEach((eq) => {
+  equipmentMap.set(eq.id, eq)
+})
+const bulletMap = new Map<string, any>()
+bullets.forEach((b) => {
+  bulletMap.set(b.id, b)
+})
+const missileMap = new Map<string, any>()
+missiles.forEach((m) => {
+  missileMap.set(m.id, m)
+})
+const consumableMap = new Map<string, any>()
+consumables.forEach((c) => {
+  consumableMap.set(c.id, c)
+})
 const shipBuildStore = useShipBuildStore()
 const {
   selectedClass,
@@ -40,7 +74,8 @@ const {
   connectionRows,
   groupRows,
   hasFitModeConflict,
-  canSwitchToGroupMode
+  canSwitchToGroupMode,
+  shipBuildMaterialAnalysis
 } = storeToRefs(shipBuildStore)
 const {
   setSelectedShipId,
@@ -52,6 +87,8 @@ const {
   applyConnectionAssignment: applyConnectionAssignmentStore,
   applyGroupAssignment: applyGroupAssignmentStore,
   setStatsViewMode,
+  setMaterialMethod,
+  setMaterialPriceMultiplier,
   setDisplayResolvers
 } = shipBuildStore
 setDisplayResolvers({
@@ -235,79 +272,222 @@ type ShipStatMetric = {
   ratio: number;
 }
 
-const getSlotCountByType = (ship: X4Ship, type: EquipmentType) => {
-  const slot = ship.slots.find(item => item.type === type)
-  if (!slot?.count) return 0
-  return Object.values(slot.count).reduce((sum, count) => sum + (count || 0), 0)
+// Get aggregated shield stats from selected shield equipment
+const getShieldStats = () => {
+  if (!selectedShip.value) return { max: 0, rate: 0, delay: 0, groupAvg: 0 }
+  let max = 0
+  let rate = 0
+  let delay = 0
+
+  // Get total shield capacity from equipped shields
+  connectionRows.value.forEach(row => {
+    if (row.slotType !== 'shield') return
+    const equipmentId = selectedByConnection.value[row.connectionKey]
+    if (!equipmentId) return
+    const equipment = equipmentMap.get(equipmentId)
+    if (!equipment?.stats?.recharge) return
+    max += equipment.stats.recharge.max || 0
+    rate += equipment.stats.recharge.rate || 0
+    delay = Math.max(delay, equipment.stats.recharge.delay || 0)
+  })
+
+  // Calculate total shield slot count from all ship slots
+  let totalShieldSlots = 0
+  selectedShip.value.slots.forEach(slot => {
+    slot.groups.forEach(group => {
+      const connShield = group.connection?.shield
+      if (connShield) {
+        totalShieldSlots += connShield.count || 0
+      }
+    })
+  })
+
+  // Calculate group average: equipped shield capacity / total shield slots
+  const groupAvg = totalShieldSlots > 0 ? max / totalShieldSlots : 0
+
+  return { max, rate, delay, groupAvg }
 }
 
-const buildShipStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => [
-  {
-    key: 'hull',
-    labelKey: 'ship_build.stats_hull',
-    unit: 'MJ',
-    value: ship.hull || 0
-  },
-  {
-    key: 'storage_unit',
-    labelKey: 'ship_build.stats_storage_unit',
-    unit: 'm3',
-    value: ship.storage?.unit || 0
-  },
-  {
-    key: 'crew',
-    labelKey: 'ship_build.stats_crew',
-    unit: '',
-    value: ship.crew?.capacity || 0
-  },
-  {
-    key: 'missile',
-    labelKey: 'ship_build.stats_missile',
-    unit: '',
-    value: ship.storage?.missile || 0
-  },
-  {
-    key: 'weapon_slots',
-    labelKey: 'ship_build.stats_weapon_slots',
-    unit: '',
-    value: getSlotCountByType(ship, 'weapon')
-  },
-  {
-    key: 'turret_slots',
-    labelKey: 'ship_build.stats_turret_slots',
-    unit: '',
-    value: getSlotCountByType(ship, 'turret')
-  },
-  {
-    key: 'shield_slots',
-    labelKey: 'ship_build.stats_shield_slots',
-    unit: '',
-    value: getSlotCountByType(ship, 'shield')
-  },
-  {
-    key: 'engine_slots',
-    labelKey: 'ship_build.stats_engine_slots',
-    unit: '',
-    value: getSlotCountByType(ship, 'engine')
+
+// Get aggregated engine stats from selected engine equipment
+const getEngineStats = () => {
+  if (!selectedShip.value) return null
+  const engineRows = connectionRows.value.filter(row => row.slotType === 'engine')
+  if (engineRows.length === 0) return null
+  let thrustForward = 0
+  let boostMultiplier = 1
+  let boostDuration = 0
+  let boostRecharge = 0
+  let travelMultiplier = 1
+  let travelCharge = 0
+
+  engineRows.forEach(row => {
+    const equipmentId = selectedByConnection.value[row.connectionKey]
+    if (!equipmentId) return
+    const equipment = equipmentMap.get(equipmentId)
+    if (!equipment?.stats) return
+    if (equipment.stats.thrust?.forward) thrustForward += equipment.stats.thrust.forward
+    // boost.thrust is a multiplier, use the value directly (all engines of same type should have similar multiplier)
+    if (equipment.stats.boost?.thrust) boostMultiplier = equipment.stats.boost.thrust
+    if (equipment.stats.boost?.duration) boostDuration = Math.max(boostDuration, equipment.stats.boost.duration)
+    if (equipment.stats.boost?.recharge) boostRecharge = Math.max(boostRecharge, equipment.stats.boost.recharge)
+    // travel.thrust is a multiplier
+    if (equipment.stats.travel?.thrust) travelMultiplier = equipment.stats.travel.thrust
+    if (equipment.stats.travel?.charge) travelCharge = Math.max(travelCharge, equipment.stats.travel.charge)
+  })
+
+  if (thrustForward === 0) return null
+  return {
+    thrustForward,
+    boostMultiplier,
+    boostDuration,
+    boostRecharge,
+    travelMultiplier,
+    travelCharge
   }
-]
+}
 
-const shipStats = computed<ShipStatMetric[]>(() => {
-  if (!selectedShip.value) return []
-  const classShips = ships.filter(ship => ship.class === selectedShip.value!.class)
-  const selectedMetrics = buildShipStats(selectedShip.value)
+// Calculate speed from thrust and ship physics
+const calculateSpeed = (thrust: number, mass: number, drag: number) => {
+  if (!mass || !drag) return 0
+  return Math.round((thrust * 1000) / (mass * drag))
+}
 
-  return selectedMetrics.map(metric => {
+// Calculate acceleration from thrust and mass
+const calculateAcceleration = (thrust: number, mass: number) => {
+  if (!mass) return 0
+  return Math.round((thrust * 1000) / mass)
+}
+
+// Helper to get cargo capacity by type
+const getCargoCapacity = (ship: X4Ship, type: string) => {
+  const cargo = ship.cargo.find(c => c.type === type)
+  return cargo?.capacity || 0
+}
+
+// Helper to get dock count by size
+const getDockCount = (ship: X4Ship, size: string) => {
+  const dockarea = ship.dockarea.find(d => d.size === size)
+  return dockarea?.capacity || 0
+}
+
+// Helper to get ship storage capacity by size
+const getShipStorageCapacity = (ship: X4Ship, size: string) => {
+  const storage = ship.shipstorage.find(s => s.size === size)
+  return storage?.capacity || 0
+}
+
+// Build summary stats (对齐截图2)
+const buildSummaryStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
+  const shieldStats = getShieldStats()
+  const engineStats = getEngineStats()
+  const mass = ship.physics?.mass || 1
+  const dragForward = ship.physics?.drag?.forward || 1
+
+  // Calculate base speed from thrust
+  const baseSpeed = engineStats ? calculateSpeed(engineStats.thrustForward, mass, dragForward) : 0
+  // Boost/travel speeds are multipliers of base speed
+  const boostSpeed = engineStats && baseSpeed > 0 ? Math.round(baseSpeed * engineStats.boostMultiplier) : 0
+  const travelSpeed = engineStats && baseSpeed > 0 ? Math.round(baseSpeed * engineStats.travelMultiplier) : 0
+
+  return [
+    { key: 'hull', labelKey: 'ship_build.stats_hull', unit: 'MJ', value: ship.hull || 0 },
+    { key: 'shield', labelKey: 'ship_build.stats_shield', unit: 'MJ', value: shieldStats.max },
+    { key: 'radar_range', labelKey: 'ship_build.stats_radar_range', unit: 'km', value: 0 }, // Placeholder - radar data not in current assets
+    { key: 'weapon_burst', labelKey: 'ship_build.stats_weapon_burst', unit: 'MW', value: 0 }, // Placeholder - needs bullet data
+    { key: 'turret_avg', labelKey: 'ship_build.stats_turret_avg', unit: 'MW', value: 0 }, // Placeholder - needs bullet data
+    { key: 'storage_container', labelKey: 'ship_build.stats_storage_container', unit: 'm3', value: getCargoCapacity(ship, 'container') },
+    { key: 'dock_m_count', labelKey: 'ship_build.stats_dock_m_count', unit: '', value: getDockCount(ship, 'dock_m') },
+    { key: 'dock_m_capacity', labelKey: 'ship_build.stats_dock_m_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_m') },
+    { key: 'dock_s_count', labelKey: 'ship_build.stats_dock_s_count', unit: '', value: getDockCount(ship, 'dock_s') },
+    { key: 'dock_s_capacity', labelKey: 'ship_build.stats_dock_s_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_s') },
+    { key: 'speed', labelKey: 'ship_build.stats_speed', unit: 'm/s', value: baseSpeed },
+    { key: 'boost_speed', labelKey: 'ship_build.stats_boost_speed', unit: 'm/s', value: boostSpeed },
+    { key: 'travel_speed', labelKey: 'ship_build.stats_travel_speed', unit: 'm/s', value: travelSpeed },
+    { key: 'crew', labelKey: 'ship_build.stats_crew', unit: '', value: ship.crew?.capacity || 0 },
+    { key: 'storage_unit', labelKey: 'ship_build.stats_storage_unit', unit: '', value: ship.storage?.unit || 0 },
+    { key: 'missile', labelKey: 'ship_build.stats_missile', unit: '', value: ship.storage?.missile || 0 },
+    { key: 'deployable', labelKey: 'ship_build.stats_deployable', unit: '', value: 0 }, // Placeholder
+    { key: 'countermeasure', labelKey: 'ship_build.stats_countermeasure', unit: '', value: 0 } // Placeholder
+  ]
+}
+
+// Build detail stats (对齐截图1 - includes all summary fields plus extras)
+const buildDetailStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
+  const summaryStats = buildSummaryStats(ship)
+  const shieldStats = getShieldStats()
+  const engineStats = getEngineStats()
+  const mass = ship.physics?.mass || 1
+  const dragForward = ship.physics?.drag?.forward || 1
+  const dragHorizontal = ship.physics?.drag?.horizontal || 1
+  const pitch = ship.physics?.drag?.pitch || 0
+  const yaw = ship.physics?.drag?.yaw || 0
+  const roll = ship.physics?.drag?.roll || 0
+
+  const baseSpeed = engineStats ? calculateSpeed(engineStats.thrustForward, mass, dragForward) : 0
+  const baseAcceleration = engineStats ? calculateAcceleration(engineStats.thrustForward, mass) : 0
+  const boostAcceleration = engineStats && baseSpeed > 0 ? Math.round(baseAcceleration * engineStats.boostMultiplier) : 0
+
+  const extraStats: Omit<ShipStatMetric, 'ratio'>[] = [
+    { key: 'shield_recharge_rate', labelKey: 'ship_build.stats_shield_recharge_rate', unit: 'MW', value: shieldStats.rate },
+    { key: 'shield_recharge_delay', labelKey: 'ship_build.stats_shield_recharge_delay', unit: 's', value: shieldStats.delay },
+    { key: 'shield_group_avg', labelKey: 'ship_build.stats_shield', unit: 'MJ', value: 0 }, // Placeholder - group average calculation
+    { key: 'weapon_sustained', labelKey: 'ship_build.stats_weapon_sustained', unit: 'MW', value: 0 }, // Placeholder
+    { key: 'storage_solid', labelKey: 'ship_build.stats_storage_solid', unit: 'm3', value: getCargoCapacity(ship, 'solid') },
+    { key: 'storage_liquid', labelKey: 'ship_build.stats_storage_liquid', unit: 'm3', value: getCargoCapacity(ship, 'liquid') },
+    { key: 'storage_condensed', labelKey: 'ship_build.stats_storage_condensed', unit: 'm3', value: getCargoCapacity(ship, 'condensed') },
+    { key: 'acceleration', labelKey: 'ship_build.stats_acceleration', unit: 'm/s2', value: baseAcceleration },
+    { key: 'boost_acceleration', labelKey: 'ship_build.stats_boost_acceleration', unit: 'm/s2', value: boostAcceleration },
+    { key: 'boost_duration', labelKey: 'ship_build.stats_boost_duration', unit: 's', value: engineStats?.boostDuration || 0 },
+    { key: 'boost_recharge', labelKey: 'ship_build.stats_boost_recharge', unit: '%/s', value: engineStats?.boostRecharge || 0 },
+    { key: 'travel_acceleration', labelKey: 'ship_build.stats_travel_acceleration', unit: 'm/s2', value: 0 }, // Placeholder - needs calculation
+    { key: 'travel_charge_time', labelKey: 'ship_build.stats_travel_charge_time', unit: 's', value: engineStats?.travelCharge || 0 },
+    { key: 'strafe_speed', labelKey: 'ship_build.stats_strafe_speed', unit: 'm/s', value: engineStats ? calculateSpeed(Math.round(engineStats.thrustForward * 0.5), mass, dragHorizontal) : 0 },
+    { key: 'strafe_acceleration', labelKey: 'ship_build.stats_strafe_acceleration', unit: 'm/s2', value: engineStats ? calculateAcceleration(Math.round(engineStats.thrustForward * 0.5), mass) : 0 },
+    { key: 'yaw', labelKey: 'ship_build.stats_yaw', unit: 'deg/s', value: yaw },
+    { key: 'pitch', labelKey: 'ship_build.stats_pitch', unit: 'deg/s', value: pitch },
+    { key: 'roll', labelKey: 'ship_build.stats_roll', unit: 'deg/s', value: roll }
+  ]
+
+  return [...summaryStats, ...extraStats]
+}
+
+// Calculate max values for bar ratios
+const calculateMaxStats = (ship: X4Ship) => {
+  const classShips = ships.filter(s => s.class === ship.class)
+  const summaryMax: Record<string, number> = {}
+  const detailMax: Record<string, number> = {}
+
+  // For summary stats, calculate max across class
+  const sampleSummary = buildSummaryStats(ship)
+  sampleSummary.forEach(metric => {
     const maxValue = Math.max(
-      ...classShips.map(ship => buildShipStats(ship).find(item => item.key === metric.key)?.value || 0),
+      ...classShips.map(s => {
+        const stats = buildSummaryStats(s)
+        const match = stats.find(item => item.key === metric.key)
+        return match?.value || 0
+      }),
       1
     )
-    return {
-      ...metric,
-      ratio: Math.max(0.03, Math.min(1, metric.value / maxValue))
-    }
+    summaryMax[metric.key] = maxValue
   })
-})
+
+  // For detail stats, use same approach
+  const sampleDetail = buildDetailStats(ship)
+  sampleDetail.forEach(metric => {
+    const maxValue = Math.max(
+      ...classShips.map(s => {
+        const stats = buildDetailStats(s)
+        const match = stats.find(item => item.key === metric.key)
+        return match?.value || 0
+      }),
+      1
+    )
+    detailMax[metric.key] = maxValue
+  })
+
+  return { summaryMax, detailMax }
+}
 
 const formatStatValue = (value: number) => value.toLocaleString()
 
@@ -320,50 +500,63 @@ type ShipStatDisplay = {
   placeholder?: boolean;
 }
 
-const detailPlaceholderMetrics: Array<{ key: string; labelKey: string; unit: string }> = [
-  { key: 'speed', labelKey: 'ship_build.stats_speed', unit: 'm/s' },
-  { key: 'acceleration', labelKey: 'ship_build.stats_acceleration', unit: 'm/s2' },
-  { key: 'boost_speed', labelKey: 'ship_build.stats_boost_speed', unit: 'm/s' },
-  { key: 'boost_acceleration', labelKey: 'ship_build.stats_boost_acceleration', unit: 'm/s2' },
-  { key: 'boost_duration', labelKey: 'ship_build.stats_boost_duration', unit: 's' },
-  { key: 'travel_speed', labelKey: 'ship_build.stats_travel_speed', unit: 'm/s' },
-  { key: 'travel_charge_time', labelKey: 'ship_build.stats_travel_charge_time', unit: 's' },
-  { key: 'strafe_speed', labelKey: 'ship_build.stats_strafe_speed', unit: 'm/s' },
-  { key: 'pitch', labelKey: 'ship_build.stats_pitch', unit: 'deg/s' },
-  { key: 'yaw', labelKey: 'ship_build.stats_yaw', unit: 'deg/s' },
-  { key: 'roll', labelKey: 'ship_build.stats_roll', unit: 'deg/s' },
-  { key: 'storage_container', labelKey: 'ship_build.stats_storage_container', unit: 'm3' },
-  { key: 'storage_solid', labelKey: 'ship_build.stats_storage_solid', unit: 'm3' },
-  { key: 'storage_liquid', labelKey: 'ship_build.stats_storage_liquid', unit: 'm3' }
-]
+// Placeholder fields that don't have data sources yet
+const placeholderKeys = new Set([
+  'radar_range', 'weapon_burst', 'turret_avg', 'weapon_sustained',
+  'deployable', 'countermeasure', 'shield_group_avg', 'travel_acceleration'
+])
 
 const summaryShipStats = computed<ShipStatDisplay[]>(() => {
-  return shipStats.value.map(metric => ({
+  if (!selectedShip.value) return []
+  const stats = buildSummaryStats(selectedShip.value)
+  const { summaryMax } = calculateMaxStats(selectedShip.value)
+
+  return stats.map(metric => ({
     key: metric.key,
     labelKey: metric.labelKey,
     unit: metric.unit,
     valueText: formatStatValue(metric.value),
-    ratio: metric.ratio
+    ratio: Math.max(0.03, Math.min(1, metric.value / (summaryMax[metric.key] || 1))),
+    placeholder: placeholderKeys.has(metric.key)
   }))
 })
 
 const detailedShipStats = computed<ShipStatDisplay[]>(() => {
-  return [
-    ...summaryShipStats.value,
-    ...detailPlaceholderMetrics.map(metric => ({
-      key: metric.key,
-      labelKey: metric.labelKey,
-      unit: metric.unit,
-      valueText: '--',
-      ratio: null,
-      placeholder: true
-    }))
-  ]
+  if (!selectedShip.value) return []
+  const stats = buildDetailStats(selectedShip.value)
+  const { detailMax } = calculateMaxStats(selectedShip.value)
+
+  return stats.map(metric => ({
+    key: metric.key,
+    labelKey: metric.labelKey,
+    unit: metric.unit,
+    valueText: placeholderKeys.has(metric.key) ? '--' : formatStatValue(metric.value),
+    ratio: placeholderKeys.has(metric.key) ? null : Math.max(0.03, Math.min(1, metric.value / (detailMax[metric.key] || 1))),
+    placeholder: placeholderKeys.has(metric.key)
+  }))
 })
 
 const visibleShipStats = computed<ShipStatDisplay[]>(() => {
   return statsViewMode.value === 'summary' ? summaryShipStats.value : detailedShipStats.value
 })
+
+const materialMethodModel = computed({
+  get: () => shipBuildMaterialAnalysis.value.selectedMethod,
+  set: (method: string) => setMaterialMethod(method)
+})
+
+const materialPriceMultiplierModel = computed({
+  get: () => shipBuildMaterialAnalysis.value.priceMultiplier,
+  set: (multiplier: number) => setMaterialPriceMultiplier(multiplier)
+})
+
+const formatCrValue = (value: number) => `${new Intl.NumberFormat('en-US').format(Math.round(value))} Cr`
+const formatMaterialCount = (count: number) => new Intl.NumberFormat('en-US').format(Math.round(count))
+
+const getMaterialName = (wareId: string) => {
+  const ware = wareMap.get(wareId)
+  return ware ? translateWare(ware) : wareId
+}
 </script>
 
 <template>
@@ -545,20 +738,39 @@ const visibleShipStats = computed<ShipStatDisplay[]>(() => {
           <div v-if="statsViewMode === 'detail'" class="stats-pending">
             {{ t('ship_build.stats_detail_pending') }}
           </div>
-          <div class="stats-list">
-            <div
-              v-for="metric in visibleShipStats"
-              :key="metric.key"
-              class="stats-row"
-              :class="{ 'stats-row-placeholder': metric.placeholder }"
-            >
-              <span class="stats-label">{{ t(metric.labelKey) }}</span>
-              <span class="stats-value">
-                {{ metric.valueText }}
-                <span v-if="metric.unit" class="stats-unit">{{ metric.unit }}</span>
-              </span>
-              <div v-if="metric.ratio !== null" class="stats-bar">
-                <div class="stats-bar-fill" :style="{ width: `${Math.round(metric.ratio * 100)}%` }"></div>
+          <div class="stats-list-container">
+            <div class="stats-column">
+              <div
+                v-for="metric in visibleShipStats.filter((_, i) => i % 2 === 0)"
+                :key="metric.key"
+                class="stats-row"
+                :class="{ 'stats-row-placeholder': metric.placeholder }"
+              >
+                <span class="stats-label">{{ t(metric.labelKey) }}</span>
+                <span class="stats-value">
+                  {{ metric.valueText }}
+                  <span v-if="metric.unit" class="stats-unit">{{ metric.unit }}</span>
+                </span>
+                <div v-if="metric.ratio !== null" class="stats-bar">
+                  <div class="stats-bar-fill" :style="{ width: `${Math.round(metric.ratio * 100)}%` }"></div>
+                </div>
+              </div>
+            </div>
+            <div class="stats-column">
+              <div
+                v-for="metric in visibleShipStats.filter((_, i) => i % 2 === 1)"
+                :key="metric.key"
+                class="stats-row"
+                :class="{ 'stats-row-placeholder': metric.placeholder }"
+              >
+                <span class="stats-label">{{ t(metric.labelKey) }}</span>
+                <span class="stats-value">
+                  {{ metric.valueText }}
+                  <span v-if="metric.unit" class="stats-unit">{{ metric.unit }}</span>
+                </span>
+                <div v-if="metric.ratio !== null" class="stats-bar">
+                  <div class="stats-bar-fill" :style="{ width: `${Math.round(metric.ratio * 100)}%` }"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -566,7 +778,86 @@ const visibleShipStats = computed<ShipStatDisplay[]>(() => {
       </div>
       <div class="col-span-12 lg:col-span-4 panel-card" data-testid="ship-build-panel-materials">
         <div class="panel-header">{{ t('ship_build.panel_materials') }}</div>
-        <div class="panel-placeholder"></div>
+        <div class="material-panel" data-testid="ship-build-materials-panel">
+          <div class="material-method-row">
+            <label class="material-method-label" for="ship-build-material-method-select">
+              {{ t('ship_build.material_method') }}
+            </label>
+            <select
+              id="ship-build-material-method-select"
+              v-model="materialMethodModel"
+              class="material-method-select"
+              data-testid="ship-build-material-method-select"
+            >
+              <option
+                v-for="method in shipBuildMaterialAnalysis.methodOptions"
+                :key="method"
+                :value="method"
+              >
+                {{ method }}
+              </option>
+            </select>
+          </div>
+
+          <div class="material-groups custom-scrollbar">
+            <CollapsibleDetailList
+              :data="shipBuildMaterialAnalysis.summaryItems"
+              main-row-testid="ship-build-material-summary"
+              list-testid="ship-build-material-summary-list"
+            >
+              <template #title>
+                <span class="material-summary-title">
+                  {{ t('ship_build.material_total') }}
+                </span>
+              </template>
+              <template #header>
+                <span class="material-summary-value">{{ formatCrValue(shipBuildMaterialAnalysis.totalValue) }}</span>
+              </template>
+              <template #row="{ item }">
+                <div class="material-item-row">
+                  <span class="material-item-count">{{ formatMaterialCount(item.count) }}</span>
+                  <span class="material-item-symbol">x</span>
+                  <span class="material-item-name">{{ getMaterialName(item.wareId) }}</span>
+                </div>
+                <span class="material-item-value">{{ formatCrValue(item.value) }}</span>
+              </template>
+            </CollapsibleDetailList>
+
+            <CollapsibleDetailList
+              v-for="group in shipBuildMaterialAnalysis.equipmentGroups"
+              :key="group.equipmentId"
+              :data="group.items"
+              :main-row-testid="`ship-build-material-equipment-group-${group.equipmentId}`"
+              :list-testid="`ship-build-material-equipment-list-${group.equipmentId}`"
+            >
+              <template #title>
+                <div class="material-equipment-title">
+                  <span class="material-equipment-name">{{ group.equipmentName }}</span>
+                  <span class="material-equipment-count">x {{ group.quantity }}</span>
+                </div>
+              </template>
+              <template #header>
+                <span class="material-summary-value">{{ formatCrValue(group.value) }}</span>
+              </template>
+              <template #row="{ item }">
+                <div class="material-item-row">
+                  <span class="material-item-count">{{ formatMaterialCount(item.count) }}</span>
+                  <span class="material-item-symbol">x</span>
+                  <span class="material-item-name">{{ getMaterialName(item.wareId) }}</span>
+                </div>
+                <span class="material-item-value">{{ formatCrValue(item.value) }}</span>
+              </template>
+            </CollapsibleDetailList>
+          </div>
+
+          <div class="material-footer" data-testid="ship-build-material-price-slider">
+            <PriceSlider
+              v-model="materialPriceMultiplierModel"
+              :label="t('ship_build.material_price')"
+              type="buy"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -655,7 +946,71 @@ const visibleShipStats = computed<ShipStatDisplay[]>(() => {
 }
 
 .panel-placeholder {
-  @apply h-48 bg-slate-900/30 border border-dashed border-slate-700 rounded-lg m-4;
+  @apply bg-slate-900/30 border border-dashed border-slate-700 rounded-lg m-4;
+}
+
+.material-panel {
+  @apply p-4 flex flex-col gap-3;
+}
+
+.material-method-row {
+  @apply flex items-center justify-between gap-3;
+}
+
+.material-method-label {
+  @apply text-[11px] uppercase tracking-wide text-slate-400 font-semibold;
+}
+
+.material-method-select {
+  @apply bg-slate-900/70 border border-slate-700 text-slate-100 text-xs rounded px-2.5 py-1.5 focus:outline-none focus:border-emerald-400;
+}
+
+.material-groups {
+  @apply flex-1 overflow-y-auto pr-1;
+}
+
+.material-summary-title {
+  @apply text-sm text-slate-200 font-semibold;
+}
+
+.material-summary-value {
+  @apply text-xs text-red-300 font-mono font-semibold;
+}
+
+.material-item-row {
+  @apply flex items-center gap-1 min-w-0;
+}
+
+.material-item-count {
+  @apply text-xs text-slate-400 font-mono;
+}
+
+.material-item-symbol {
+  @apply text-[10px] text-slate-500;
+}
+
+.material-item-name {
+  @apply text-xs text-slate-300 truncate;
+}
+
+.material-item-value {
+  @apply text-xs text-red-300/90 font-mono;
+}
+
+.material-equipment-title {
+  @apply flex items-center gap-1 min-w-0;
+}
+
+.material-equipment-name {
+  @apply text-xs text-slate-200 truncate;
+}
+
+.material-equipment-count {
+  @apply text-xs text-slate-400 font-mono;
+}
+
+.material-footer {
+  @apply mt-auto pt-2 border-t border-slate-800/80;
 }
 
 .fit-panel-content {
@@ -694,8 +1049,12 @@ const visibleShipStats = computed<ShipStatDisplay[]>(() => {
   @apply text-[11px] text-amber-300/80 mb-3;
 }
 
-.stats-list {
-  @apply flex flex-col gap-2;
+.stats-list-container {
+  @apply grid grid-cols-2 gap-x-4 gap-y-1;
+}
+
+.stats-column {
+  @apply flex flex-col gap-1;
 }
 
 .stats-row {

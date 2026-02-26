@@ -1,7 +1,7 @@
 # Ship Build Stat Specification
 
 ## Purpose
-为“船只建造”中列属性区新增双档位展示（简略/详细），并将字段集合分别对齐到两张参考截图；在无详细数据源阶段提供可回归的占位展示，同时移除固定高度限制。
+为“船只建造”中列属性区新增双档位展示（简略/详细），并将字段集合分别对齐到两张参考截图；优先接入可由现有 XML 抽取产物计算的字段真实值，对暂缺底层数据的字段提供可回归的占位展示，同时移除固定高度限制。
 
 ## ADDED Requirements
 
@@ -38,14 +38,40 @@
 ### Requirement: Detail Placeholder Without Data Source
 
 #### Scenario: Show Placeholder Values In Detail Mode
-- **前提**：详细属性数据源尚未接入。
+- **前提**：当前字段无法由现有数据模型计算。
 - **当**：用户切换到 `详细` 档位。
 - **那么**：详细字段按“字段名 + 单位 + 占位值（如 `--`）”展示。
 
 #### Scenario: Show Pending Hint In Detail Mode
-- **前提**：详细属性数据源尚未接入。
+- **前提**：当前字段无法由现有数据模型计算。
 - **当**：用户处于 `详细` 档位。
 - **那么**：界面显示“详细属性待接入”提示文案。
+
+### Requirement: XML-Backed Metrics For Calculable Fields
+
+#### Scenario: Resolve Ship Base Metrics From Processed Ship Data
+- **前提**：已选飞船存在于 `ships.json`（来源 `ship_macros.xml + ship_connections.xml`）。
+- **当**：渲染属性列表。
+- **那么**：`船体/仓储/船员/泊位与容量/基础机动参数` SHALL 使用该飞船真实值。
+
+#### Scenario: Resolve Equipment-Dependent Metrics From Processed Equipment Data
+- **前提**：已选飞船存在可匹配装备槽位与装备参数，且装备数据来自 `equipments.json`（来源 `equipment_macros.xml`）。
+- **当**：渲染护盾和速度链路相关字段。
+- **那么**：`护盾容量/再充率/再充延迟/速度/助推/巡航` SHALL 使用可计算结果，不使用占位值。
+
+### Requirement: Track Unavailable Weapon Output Metrics Explicitly
+
+#### Scenario: Keep Weapon Output Metrics Pending When Bullet-Level Data Is Missing
+- **前提**：武器与炮塔缺少可用于精确输出计算的弹体参数。
+- **当**：渲染 `武器爆发输出值/武器持续性输出值/炮塔平均输出值`。
+- **那么**：字段 SHALL 保持占位，并保留“待接入”提示。
+
+### Requirement: Heron Sample Traceability
+
+#### Scenario: Provide Deterministic Sample For Data-Source Regression
+- **前提**：使用“苍鹭级运输船（Heron Vanguard, `ship_tel_l_trans_container_02_a`）”作为样本。
+- **当**：执行回归验证。
+- **那么**：样本字段值来源 SHALL 可追溯到 `ships.json` 与 `equipments.json` 的对应节点。
 
 ### Requirement: Adaptive Height In Stats And Selection Areas
 

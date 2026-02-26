@@ -10,6 +10,7 @@ import LoadPlanModal from './LoadPlanModal.vue'
 import LoadFlowPlanModal from './LoadFlowPlanModal.vue'
 import ImportPlanModal from './ImportPlanModal.vue'
 import SmartSaveDialog from './SmartSaveDialog.vue'
+import LoadShipBlueprintModal from './LoadShipBlueprintModal.vue'
 import { useI18n } from 'vue-i18n'
 
 const logicFlowStore = useLogicFlowStore()
@@ -20,6 +21,7 @@ const { t } = useI18n()
 
 const showLoadModal = ref(false)
 const showLoadFlowModal = ref(false)
+const showLoadBlueprintModal = ref(false)
 const showImportModal = ref(false)
 const smartDialog = reactive({
   isOpen: false,
@@ -103,6 +105,17 @@ watch(displayTitle, (newVal) => {
 }, { immediate: true })
 
 const handleNew = () => {
+  if (isShipBuildView.value) {
+    if (shipBuildStore.isDirty) {
+      if (!confirm(t('shipBuild.confirm_new_with_unsaved'))) {
+        return
+      }
+    }
+    shipBuildStore.blueprint = null
+    shipBuildStore.selectedShipId = null
+    return
+  }
+
   if (isFlowView.value) {
     const isEmpty = logicFlowStore.groups.length === 0
     if (isEmpty || !logicFlowStore.isDirty) {
@@ -113,7 +126,7 @@ const handleNew = () => {
     smartDialog.isOpen = true
     return
   }
-  
+
   if (!empireStore.shouldConfirmBeforeEmpireReset()) {
     empireStore.resetEmpireWithDefaultName(t('menu.default_empire_name'))
     return
@@ -123,6 +136,21 @@ const handleNew = () => {
 }
 
 const handleSave = () => {
+  if (isShipBuildView.value) {
+    if (!shipBuildStore.selectedShipId) {
+      statusStore.pushMessage('warning', 'save', t('menu.cannot_save_empty_plan'))
+      return
+    }
+    if (!shipBuildStore.blueprint) {
+      // No existing blueprint, prompt for name
+      handleSaveAs()
+      return
+    }
+    shipBuildStore.saveBlueprint()
+    statusStore.pushMessage('success', 'save', t('menu.save'))
+    return
+  }
+
   if (isFlowView.value) {
     if (logicFlowStore.groups.length === 0) {
       statusStore.pushMessage('warning', 'save', t('menu.cannot_save_empty_plan'))
@@ -149,6 +177,16 @@ const handleSave = () => {
 }
 
 const handleSaveAs = () => {
+  if (isShipBuildView.value) {
+    if (!shipBuildStore.selectedShipId) {
+      statusStore.pushMessage('warning', 'save', t('menu.cannot_save_empty_plan'))
+      return
+    }
+    smartDialog.intent = 'SAVE_AS'
+    smartDialog.isOpen = true
+    return
+  }
+
   if (isFlowView.value) {
     if (logicFlowStore.groups.length === 0) {
       statusStore.pushMessage('warning', 'save', t('menu.cannot_save_empty_plan'))
@@ -169,6 +207,10 @@ const handleSaveAs = () => {
 }
 
 const handleLoad = () => {
+  if (isShipBuildView.value) {
+    showLoadBlueprintModal.value = true
+    return
+  }
   if (isFlowView.value) {
     showLoadFlowModal.value = true
   } else {
@@ -300,6 +342,7 @@ const handleLoad = () => {
 
     <LoadPlanModal :isOpen="showLoadModal" @close="showLoadModal = false" />
     <LoadFlowPlanModal :isOpen="showLoadFlowModal" @close="showLoadFlowModal = false" />
+    <LoadShipBlueprintModal :isOpen="showLoadBlueprintModal" @close="showLoadBlueprintModal = false" />
 
     <ImportPlanModal :isOpen="showImportModal" @close="showImportModal = false" />
 
@@ -307,7 +350,7 @@ const handleLoad = () => {
       :isOpen="smartDialog.isOpen" 
       :intent="smartDialog.intent" 
       :initialName="displayTitle"
-      :storeType="isFlowView ? 'logicFlow' : 'station'"
+      :storeType="isShipBuildView ? 'ship-build' : (isFlowView ? 'logicFlow' : 'station')"
       @close="smartDialog.isOpen = false" 
     />
   </div>

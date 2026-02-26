@@ -66,22 +66,6 @@
     ]
   },
   {
-    "id": "tug",
-    "nameId": "{20221,5051}",
-    "name": "Tug",
-    "class": [
-      "ship_m"
-    ]
-  },
-  {
-    "id": "corvette",
-    "nameId": "{20221,3021}",
-    "name": "Corvette",
-    "class": [
-      "ship_m"
-    ]
-  },
-  {
     "id": "fighter",
     "nameId": "{20221,2011}",
     "name": "Fighter",
@@ -147,11 +131,27 @@
     ]
   },
   {
-    "id": "compactor",
-    "nameId": "{20221,5061}",
-    "name": "Compactor",
+    "id": "corvette",
+    "nameId": "{20221,3021}",
+    "name": "Corvette",
     "class": [
-      "ship_l"
+      "ship_m"
+    ]
+  },
+  {
+    "id": "envoy",
+    "nameId": "{20221,5101}",
+    "name": "Envoy",
+    "class": [
+      "ship_m"
+    ]
+  },
+  {
+    "id": "tug",
+    "nameId": "{20221,5051}",
+    "name": "Tug",
+    "class": [
+      "ship_m"
     ]
   },
   {
@@ -163,11 +163,11 @@
     ]
   },
   {
-    "id": "envoy",
-    "nameId": "{20221,5101}",
-    "name": "Envoy",
+    "id": "compactor",
+    "nameId": "{20221,5061}",
+    "name": "Compactor",
     "class": [
-      "ship_m"
+      "ship_l"
     ]
   }
 ]

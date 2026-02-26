@@ -2,6 +2,7 @@
 import { ref, computed, watch, nextTick } from 'vue'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
+import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { useI18n } from 'vue-i18n'
 import type { LogicFlowPlan } from '@/types/x4';
 
@@ -9,22 +10,25 @@ const props = defineProps<{
   isOpen: boolean
   intent: 'NEW' | 'SAVE_AS'
   initialName?: string
-  storeType?: 'station' | 'logicFlow'
+  storeType?: 'station' | 'logicFlow' | 'ship-build'
   mode?: 'default' | 'import'
 }>()
 
 const emit = defineEmits(['close', 'confirm-primary', 'confirm-secondary'])
 const logicFlowStore = useLogicFlowStore()
 const empireStore = useEmpireStore()
+const shipBuildStore = useShipBuildStore()
 const { t } = useI18n()
 
 const isSaveAsExpanded = ref(false)
 const inputName = ref('')
 const inputRef = ref<HTMLInputElement | null>(null)
 
-const defaultNameKey = computed(() => 
-  props.storeType === 'logicFlow' ? 'menu.default_flow_name' : 'empire.new_empire_name'
-)
+const defaultNameKey = computed(() => {
+  if (props.storeType === 'ship-build') return 'shipBuild.default_blueprint_name'
+  if (props.storeType === 'logicFlow') return 'menu.default_flow_name'
+  return 'empire.new_empire_name'
+})
 
 watch(() => props.isOpen, (val) => {
   if (val) {
@@ -47,6 +51,9 @@ watch(() => props.isOpen, (val) => {
 })
 
 const isNewPlan = computed(() => {
+  if (props.storeType === 'ship-build') {
+    return !shipBuildStore.blueprint
+  }
   if (props.storeType === 'logicFlow') {
     return !logicFlowStore.savedPlans.activeId
   }
@@ -54,6 +61,9 @@ const isNewPlan = computed(() => {
 })
 
 const currentPlanName = computed(() => {
+  if (props.storeType === 'ship-build') {
+    return shipBuildStore.blueprint?.name || ''
+  }
   if (props.storeType === 'logicFlow') {
     if (logicFlowStore.savedPlans.activeId) {
       return logicFlowStore.savedPlans.list.find((l: LogicFlowPlan) => l.id === logicFlowStore.savedPlans.activeId)?.name || ''
@@ -107,6 +117,16 @@ const handlePrimaryAction = () => {
   const nameToSave = showInput.value ? inputName.value : currentPlanName.value
 
   if (!nameToSave.trim()) return
+
+  if (props.storeType === 'ship-build') {
+    if (props.intent === 'SAVE_AS' || isNewPlan.value) {
+      shipBuildStore.saveAsBlueprint(nameToSave)
+    } else {
+      shipBuildStore.saveBlueprint()
+    }
+    emit('close')
+    return
+  }
 
   if (props.storeType === 'logicFlow') {
     if (isNewPlan.value || showInput.value) {
@@ -207,7 +227,7 @@ const handleDiscard = () => {
             {{ t('menu.label_layout_name') }}
           </label>
           <input ref="inputRef" v-model="inputName" @keyup.enter="handlePrimaryAction" type="text"
-            class="w-full bg-slate-900 border border-slate-600 text-white rounded px-4 py-2 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition placeholder-slate-600"
+            class="dialog-input w-full bg-slate-900 border border-slate-600 text-white rounded px-4 py-2 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition placeholder-slate-600"
             :placeholder="t('menu.placeholder_enter_name')" />
         </div>
 

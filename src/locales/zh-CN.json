@@ -69,6 +69,9 @@
     "panel_fit": "配装",
     "panel_stats": "配装后船体属性",
     "panel_materials": "建造材料",
+    "material_method": "计算方式",
+    "material_total": "总材料",
+    "material_price": "船只建造材料价格",
     "fit_mode_disabled_reason": "同类型已存在多种装备，无法切换到简化模式",
     "fit_mode_connection": "标准",
     "fit_mode_group": "简化",
@@ -102,7 +105,24 @@
     "stats_strafe_speed": "平移速度",
     "stats_pitch": "俯仰",
     "stats_yaw": "水平转向",
-    "stats_roll": "横滚"
+    "stats_roll": "横滚",
+    "stats_shield": "护盾",
+    "stats_shield_recharge_rate": "再充率",
+    "stats_shield_recharge_delay": "再充延迟",
+    "stats_radar_range": "雷达范围",
+    "stats_weapon_burst": "武器爆发输出值",
+    "stats_weapon_sustained": "武器持续性输出值",
+    "stats_turret_avg": "炮塔平均输出值",
+    "stats_dock_m_count": "M级泊位数量",
+    "stats_dock_m_capacity": "M级飞船容量",
+    "stats_dock_s_count": "S级泊位数量",
+    "stats_dock_s_capacity": "S级飞船容量",
+    "stats_deployable": "可投放设备",
+    "stats_countermeasure": "干扰弹",
+    "stats_boost_recharge": "助推回充率",
+    "stats_travel_acceleration": "巡航加速度",
+    "stats_strafe_acceleration": "平移加速度",
+    "stats_pending_hint": "待接入"
   },
   "station": {
     "total_needed": "总需求",
@@ -204,6 +224,17 @@
     "confirm_load_with_unsaved": "当前方案有未保存的修改，确定要加载新方案吗？",
     "groups_count": "个产线组",
     "nodes_count": "个节点"
+  },
+  "shipBuild": {
+    "load_blueprint": "载入飞船配装",
+    "no_saved_blueprints": "暂无保存的配装方案",
+    "action_load_blueprint": "载入",
+    "action_delete": "删除",
+    "confirm_delete_blueprint": "确定要删除这个配装方案吗？",
+    "confirm_load_with_unsaved": "当前配置有未保存的修改，确定要载入吗？",
+    "confirm_new_with_unsaved": "当前配置有未保存的修改，确定要新建吗？",
+    "connections_count": "个槽位",
+    "default_blueprint_name": "新配装方案"
   },
   "wareflow": {
     "resource_overview": "资源产出",

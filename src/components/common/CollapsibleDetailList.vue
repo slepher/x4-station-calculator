@@ -3,6 +3,7 @@
     <div 
       :class="['main-row', isPositive ? 'status-pos' : 'status-neg', (!isEmpty && isExpandable) ? 'main-row-hover cursor-pointer' : 'cursor-default', { 'is-active': isOpen && !isEmpty && isExpandable }]"
       @click="isExpandable && (isOpen = !isOpen)"
+      :data-testid="mainRowTestid"
     >
       <div class="label-group">
         <span class="arrow" :class="{ 'arrow-open': isOpen }" v-if="!isEmpty && isExpandable">▶</span>
@@ -14,7 +15,7 @@
     </div>
 
     <Transition name="expand">
-      <div v-if="isOpen && !isEmpty" class="list-box">
+      <div v-if="isOpen && !isEmpty" class="list-box" :data-testid="listTestid">
         <div 
           v-for="(item, index) in data" 
           :key="index" 
@@ -34,11 +35,15 @@ import { ref, computed } from 'vue'
 const props = withDefaults(defineProps<{
   data?: any[],
   isPositive?: boolean,
-  isExpandable?: boolean
+  isExpandable?: boolean,
+  mainRowTestid?: string,
+  listTestid?: string
 }>(), {
   data: () => [],
   isPositive: true,
-  isExpandable: true
+  isExpandable: true,
+  mainRowTestid: '',
+  listTestid: ''
 })
 
 const isEmpty = computed(() => props.data.length == 0);

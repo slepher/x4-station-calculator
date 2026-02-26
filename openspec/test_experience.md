@@ -444,3 +444,17 @@ await expect(page.locator('.title')).toHaveText('新建');
 *   **本轮回归结果**:
     *   `npx vitest run tests/unit/import-logic-flow`: 11 passed。(✅)
     *   `npx playwright test tests/e2e/import-logic-flow`: 26 passed。(✅)
+
+### 17. Ship Build Material（ship-build-material）执行补充
+*   **材料 method 下拉 `terran` 选项缺失（大阪基线）**:
+    *   现象: `tests/e2e/ship-build-material/ship-build-material.spec.ts` 的 `2.3` 与 `3.4` 在执行 `selectOption('terran')` 时失败，提示 option 不存在。(❌)
+    *   归类: 产品缺陷（当前产品行为与测试文档中的 `default -> closedloop -> terran` 路径不一致）。(⚠️)
+*   **装备赋值定位稳定方案**:
+    *   现象: 通过 option-card 文案（装备名/ID）定位在不同语言与文案形态下不稳定。(❌)
+    *   修复: 在 E2E 中通过 `window.shipBuildStore` 直接按 `groupName -> equipmentId` 赋值，之后只验证可见结果（分项数量/材料数量）。(✅)
+*   **材料明细断言口径**:
+    *   现象: 使用 wareId（如 `energycells`）匹配 UI 文本会失败，因为 UI 展示为本地化名称。(❌)
+    *   修复: 在 `data-testid` 对应列表容器下按 `.list-item` 行文本断言 `数量 x 物料名`，避免依赖 wareId 直出。(✅)
+*   **价格滑条交互口径**:
+    *   现象: 对 `data-testid=\"ship-build-material-price-slider\"` 容器派发事件不会改变值。(❌)
+    *   修复: 必须定位容器内真实 `input[type=\"range\"]` 并派发 `input/change`，再断言金额变化与数量不变。(✅)

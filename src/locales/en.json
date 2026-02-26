@@ -69,6 +69,9 @@
     "panel_fit": "Loadout",
     "panel_stats": "Post-Loadout Hull Stats",
     "panel_materials": "Build Materials",
+    "material_method": "Method",
+    "material_total": "Total Materials",
+    "material_price": "SHIP BUILD MATERIAL PRICE",
     "fit_mode_disabled_reason": "Multiple equipment selected for same type. Simplified mode is disabled.",
     "fit_mode_connection": "Standard",
     "fit_mode_group": "Simplified",
@@ -102,7 +105,24 @@
     "stats_strafe_speed": "Strafe Speed",
     "stats_pitch": "Pitch",
     "stats_yaw": "Yaw",
-    "stats_roll": "Roll"
+    "stats_roll": "Roll",
+    "stats_shield": "Shield",
+    "stats_shield_recharge_rate": "Recharge Rate",
+    "stats_shield_recharge_delay": "Recharge Delay",
+    "stats_radar_range": "Radar Range",
+    "stats_weapon_burst": "Weapon Burst Output",
+    "stats_weapon_sustained": "Weapon Sustained Output",
+    "stats_turret_avg": "Turret Avg Output",
+    "stats_dock_m_count": "M Dock Count",
+    "stats_dock_m_capacity": "M Ship Capacity",
+    "stats_dock_s_count": "S Dock Count",
+    "stats_dock_s_capacity": "S Ship Capacity",
+    "stats_deployable": "Deployable",
+    "stats_countermeasure": "Countermeasure",
+    "stats_boost_recharge": "Boost Recharge",
+    "stats_travel_acceleration": "Travel Acceleration",
+    "stats_strafe_acceleration": "Strafe Acceleration",
+    "stats_pending_hint": "Pending"
   },
   "station": {
     "total_needed": "TOTAL NEEDED",
@@ -202,6 +222,17 @@
     "confirm_load_with_unsaved": "Current plan has unsaved changes. Load new plan anyway?",
     "groups_count": "groups",
     "nodes_count": "nodes"
+  },
+  "shipBuild": {
+    "load_blueprint": "Load Ship Blueprint",
+    "no_saved_blueprints": "No saved blueprints found.",
+    "action_load_blueprint": "Load",
+    "action_delete": "Delete",
+    "confirm_delete_blueprint": "Are you sure you want to delete this blueprint?",
+    "confirm_load_with_unsaved": "Current configuration has unsaved changes. Load anyway?",
+    "confirm_new_with_unsaved": "Current configuration has unsaved changes. Create new anyway?",
+    "connections_count": "connections",
+    "default_blueprint_name": "New Blueprint"
   },
   "wareflow": {
     "resource_overview": "Resource Production",

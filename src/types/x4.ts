@@ -80,9 +80,16 @@ export interface X4Ship {
     count: Record<string, number>;
     groups: X4ShipSlotGroup[];
   }>;
-  storage: { missile: number; unit: number };
+  storage: { missile: number; unit: number; countermeasure: number; deployable: number };
+  /** 货物存储 - 从 ship_connection_macros class=storage 汇总 */
+  cargo: Array<{ type: 'container' | 'solid' | 'liquid' | 'condensate'; capacity: number }>;
+  /** 外部停机坪 - 从 ship_connection_macros class=dockingbay/dockarea 汇总 */
+  dockarea: Array<{ size: 'dock_xs' | 'dock_s' | 'dock_m' | 'spacesuit'; capacity: number }>;
+  /** 内部停机坪 - 从 ship_connection_macros class=dockingbay(storage=1) 汇总 */
+  shipstorage: Array<{ size: 'dock_xs' | 'dock_s' | 'dock_m'; capacity: number }>;
   crew: { capacity: number };
   hull: number;
+  radarRange: number;
   physics: {
     mass: number;
     drag: {
@@ -113,6 +120,94 @@ export interface X4Equipment {
   noplayerblueprint: boolean;
   slotTags: string[];
   integrated: boolean;
+  cost: Record<string, Partial<Record<string, number>>>;
+  bullet?: string;  // 武器装备的 bullet class 引用
+  stats?: {
+    thrust?: {
+      forward?: number;
+      reverse?: number;
+    };
+    boost?: {
+      duration?: number;
+      recharge?: number;
+      thrust?: number;
+      acceleration?: number;
+    };
+    travel?: {
+      charge?: number;
+      thrust?: number;
+      attack?: number;
+      release?: number;
+    };
+    recharge?: {
+      max?: number;
+      rate?: number;
+      delay?: number;
+    };
+  };
+}
+
+/**
+ * 导弹接口 - 对应 missiles.json
+ */
+export interface X4Missile {
+  id: string;
+  nameId: string;
+  name: string;
+  group: string;
+  tags: string[];
+  transport: string;
+  macroId: string | null;
+  cost: Record<string, Partial<Record<string, number>>>;
+  hull?: number;
+  shield?: number;
+  explosive?: number;
+  homing?: boolean;
+}
+
+/**
+ * 子弹接口 - 对应 bullet.json
+ */
+export interface X4Bullet {
+  id: string;
+  class: string;
+  mk: string | null;
+  race: string | null;
+  type: string;
+  speed?: number;
+  lifetime?: number;
+  hull?: number;
+  shield?: number;
+}
+
+/**
+ * 无人机接口 - 对应 drones.json
+ */
+export interface X4Drone {
+  id: string;
+  nameId: string;
+  name: string;
+  macro: string;
+  class: 'ship_xs' | 'ship_s';
+  mk: string | null;
+  race: string | null;
+  tags: string[];
+  cost: Record<string, Partial<Record<string, number>>>;
+}
+
+/**
+ * 消耗品接口 - 对应 consumables.json
+ */
+export interface X4Consumable {
+  id: string;
+  nameId: string;
+  name: string;
+  macro: string;
+  class: string;
+  mk: string | null;
+  race: string | null;
+  deployable: boolean;
+  tags: string[];
   cost: Record<string, Partial<Record<string, number>>>;
 }
 
@@ -556,4 +651,42 @@ export interface SavedFlowPlansState {
   version: 1
   activeId: string | null
   list: LogicFlowPlan[]
+}
+
+// Ship Blueprint Storage Types
+export interface ShipBlueprintShield {
+  equipment_id: string
+  count: number
+}
+
+export interface ShipBlueprintGroup {
+  group: string
+  equipment_id: string
+  count: number
+  shield?: ShipBlueprintShield
+}
+
+export interface ShipBlueprintConnection {
+  slot_type: string
+  group: ShipBlueprintGroup[]
+}
+
+export interface ShipBlueprint {
+  id: string
+  name: string
+  shipId: string
+  connections: ShipBlueprintConnection[]
+  lastUpdated: number
+}
+
+export interface SavedShipBlueprintsState {
+  version: 1
+  activeId: string | null
+  list: ShipBlueprint[]
+}
+
+// View layer type for selectedByConnection
+export interface ConnectionValue {
+  equipmentId: string | null
+  count: number
 }

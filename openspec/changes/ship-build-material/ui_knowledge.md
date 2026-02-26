@@ -49,6 +49,9 @@
       - `turret_arg_m_beam_02_mk1` 显示 `closedloop` 材料集（`claytronics/energycells/hullparts`）。
     - `terran` 下：
       - `turret_arg_m_beam_02_mk1` 回退并显示 `default` 材料集（`advancedelectronics/energycells/turretcomponents`）。
+  - 本轮执行备注（2026-02-25）：
+    - 在大阪基线下，`ship-build-material-method-select` 未出现 `terran` 选项，导致 `default -> closedloop -> terran` 路径在最后一步被阻塞。
+    - 该问题在 `2.3` 与 `3.4` 中稳定复现，归类为产品缺陷（非测试定位器问题）。
 
 ## 建议测试定位（新增）
 
@@ -96,6 +99,7 @@
 - 聚合性：同装备 ID 仅出现一个分项，数量为合计值。
 - 多模块正确性：在“大阪-多模块聚合”状态下，总览数量与固定期望值一致。
 - 鲁棒性：在 method 不全覆盖场景下无报错且仍有稳定输出（fallback 生效）。
+- 定位稳定性：材料明细断言应基于 `.list-item` 行文本（`数量 x 名称`）与 `data-testid` 容器，不依赖 wareId 字段直出。
 
 ## 数据样本来源说明
 
