@@ -31,7 +31,9 @@ async function getFreePort(startPort = 4173): Promise<number> {
 }
 
 // 3. 优先使用终端传入的 PORT，如果没有，则动态寻找空闲端口 (利用 ESM 的顶层 await)
-const port = process.env.PORT ? parseInt(process.env.PORT, 10) : await getFreePort(4173);
+const port = process.env.PORT ? parseInt(process.env.PORT, 10) : await getFreePort(4173);// 👇 加上这行极其关键的补丁：将找到的端口写回全局环境变量！
+// 这样后续生成的 Worker 进程再次读取 config 时，就会直接使用这个环境变量，而不会去寻找下一个端口。
+process.env.PORT = String(port);
 
 // =====================================================================
 // 4. Playwright 配置导出
@@ -76,6 +78,8 @@ export default defineConfig({
     url: `http://127.0.0.1:${port}/x4-station-calculator/`,
     reuseExistingServer: !process.env.CI,
     timeout: 30000,
-    // stdout: 'pipe', // 如果你需要看 vite 的启动日志，可以取消注释这一行
+    // 👇 添加这两行，把 webserver 的日志直接打印到控制台
+    stdout: 'pipe',
+    stderr: 'pipe',
   }
 });
