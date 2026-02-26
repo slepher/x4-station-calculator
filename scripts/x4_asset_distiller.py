@@ -586,7 +586,7 @@ def main():
 
     # 使用 dest_root 下的 ship_macros.xml
     ship_macro_path = os.path.join(lib_dest_dir, "ship_macros.xml")
-    connection_macro_refs = set()
+    ship_connection_refs = set()
 
     if os.path.exists(ship_macro_path):
         try:
@@ -600,14 +600,14 @@ def main():
                         if conn_macro is not None:
                             ref = conn_macro.get('ref')
                             if ref:
-                                connection_macro_refs.add(ref)
+                                ship_connection_refs.add(ref)
         except Exception as e:
             print(f"   ⚠️ 读取 ship_macros.xml 失败: {e}")
 
-    print(f"   🎯 识别到 {len(connection_macro_refs)} 个 connection 引用的 macro。")
+    print(f"   🎯 从 ship_macros.xml 识别到 {len(ship_connection_refs)} 个 connection 引用。")
 
-    # 读取 macros index
-    connection_macro_path_map = {}
+    # 读取 macros index 构建完整映射
+    macro_path_map = {}
     if os.path.exists(macros_output_path):
         try:
             macros_index_tree = etree.parse(macros_output_path, parser)
@@ -615,18 +615,49 @@ def main():
                 name = entry.get('name')
                 value = entry.get('value')
                 if name and value:
-                    connection_macro_path_map[name] = value
+                    macro_path_map[name] = value
         except Exception as e:
             print(f"   ⚠️ 读取 macros.xml 失败: {e}")
 
+    print(f"   🎯 macros.xml 索引共 {len(macro_path_map)} 个 macro。")
+
+    # 从所有文件中筛选 class="dockarea" 的 macro，获取它们的 connection 引用
+    dockarea_connection_refs = set()
+    source_files = set(macro_path_map.values())
+
+    for src_file in source_files:
+        if not os.path.exists(src_file):
+            continue
+        try:
+            tree = etree.parse(src_file, parser)
+            root = tree.getroot()
+            for macro in root.findall('macro'):
+                if macro.get('class') == 'dockarea':
+                    connections = macro.find('connections')
+                    if connections is not None:
+                        for conn in connections:
+                            conn_macro = conn.find('macro')
+                            if conn_macro is not None:
+                                ref = conn_macro.get('ref')
+                                if ref:
+                                    dockarea_connection_refs.add(ref)
+        except Exception as e:
+            print(f"   ⚠️ 读取 {src_file} 失败: {e}")
+
+    print(f"   🎯 从 dockarea macros 识别到 {len(dockarea_connection_refs)} 个 connection 引用。")
+
+    # 合并两批 refs
+    all_connection_refs = ship_connection_refs | dockarea_connection_refs
+    print(f"   🎯 合并后共 {len(all_connection_refs)} 个 refs。")
+
     # 过滤出实际存在于 index 中的
-    valid_refs = [ref for ref in connection_macro_refs if ref in connection_macro_path_map]
+    valid_refs = [ref for ref in all_connection_refs if ref in macro_path_map]
     print(f"   🎯 其中 {len(valid_refs)} 个在 index 中有记录。")
 
     ship_connection_macros_path = os.path.join(lib_dest_dir, "ship_connection_macros.xml")
     connection_macros_processed = export_ids_to_file(
         valid_refs,
-        connection_macro_path_map,
+        macro_path_map,
         ship_connection_macros_path,
         root_tag='macros',
         node_tag='macro'
