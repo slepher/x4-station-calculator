@@ -107,12 +107,12 @@ watch(displayTitle, (newVal) => {
 const handleNew = () => {
   if (isShipBuildView.value) {
     if (shipBuildStore.isDirty) {
-      if (!confirm(t('shipBuild.confirm_new_with_unsaved'))) {
-        return
-      }
+      // Use smartDialog like empire/flow for consistency
+      smartDialog.intent = 'NEW'
+      smartDialog.isOpen = true
+      return
     }
-    shipBuildStore.blueprint = null
-    shipBuildStore.selectedShipId = null
+    shipBuildStore.resetAll()
     return
   }
 
@@ -216,6 +216,31 @@ const handleLoad = () => {
   } else {
     showLoadModal.value = true
   }
+}
+
+// Handle SmartSaveDialog events for ship-build
+const handleSmartDialogClose = () => {
+  smartDialog.isOpen = false
+}
+
+const handleSmartDialogPrimary = () => {
+  // Primary action: Save current state
+  if (isShipBuildView.value) {
+    handleSave()
+  }
+  smartDialog.isOpen = false
+}
+
+const handleSmartDialogSecondary = () => {
+  // Secondary action: Discard and create new
+  if (isShipBuildView.value) {
+    shipBuildStore.resetAll()
+  } else if (isFlowView.value) {
+    logicFlowStore.clearAll()
+  } else {
+    empireStore.resetEmpireWithDefaultName(t('menu.default_empire_name'))
+  }
+  smartDialog.isOpen = false
 }
 </script>
 
@@ -346,12 +371,14 @@ const handleLoad = () => {
 
     <ImportPlanModal :isOpen="showImportModal" @close="showImportModal = false" />
 
-    <SmartSaveDialog 
-      :isOpen="smartDialog.isOpen" 
-      :intent="smartDialog.intent" 
+    <SmartSaveDialog
+      :isOpen="smartDialog.isOpen"
+      :intent="smartDialog.intent"
       :initialName="displayTitle"
       :storeType="isShipBuildView ? 'ship-build' : (isFlowView ? 'logicFlow' : 'station')"
-      @close="smartDialog.isOpen = false" 
+      @close="handleSmartDialogClose"
+      @confirm-primary="handleSmartDialogPrimary"
+      @confirm-secondary="handleSmartDialogSecondary"
     />
   </div>
 </template>

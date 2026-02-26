@@ -1674,68 +1674,85 @@ class X4PrecisionLoader:
     # =======================================================
     def _build_missiles(self):
         print(f"\n🚀 [2.5/5] 构建导弹数据 (missiles.json)...")
-        wares_path = os.path.join(self.raw_path, "libraries", "wares_final.xml")
-        bullet_macros_path = os.path.join(self.raw_path, "libraries", "bullet_macros.xml")
-
-        # 先读取 bullet_macros.xml 构建 macro_name -> missile 属性映射
-        missile_props_map = {}
-        if os.path.exists(bullet_macros_path):
-            try:
-                bullet_tree = ET.parse(bullet_macros_path)
-                bullet_root = bullet_tree.getroot()
-                for macro in bullet_root.findall('macro'):
-                    macro_name = macro.get('name')
-                    props = macro.find('properties')
-                    if props is not None:
-                        missile_node = props.find('missile')
-                        if missile_node is not None:
-                            missile_props_map[macro_name] = {
-                                "hull": float(missile_node.get('hull') or 0),
-                                "shield": float(missile_node.get('shield') or 0),
-                                "explosive": float(missile_node.get('explosive') or 0),
-                                "homing": missile_node.get('homing') == 'true'
-                            }
-            except Exception as e:
-                print(f"   ⚠️ 警告: 读取 bullet_macros 失败: {e}")
-
-        if not os.path.exists(wares_path):
-            print(f"   ⚠️ 警告: 找不到 wares 文件: {wares_path}")
+        # 从 equipment_macros.xml 读取 missile class 的数据
+        macros_path = os.path.join(self.raw_path, "libraries", "equipment_macros.xml")
+        if not os.path.exists(macros_path):
+            print(f"   ⚠️ 警告: 找不到 equipment macros 文件: {macros_path}")
             return
 
         try:
-            tree = ET.parse(wares_path)
+            tree = ET.parse(macros_path)
             root = tree.getroot()
-            for ware in root.findall('ware'):
-                w_id = ware.get('id')
-                group = ware.get('group', '')
-                if group != 'missiles':
+            for macro in root.findall('macro'):
+                macro_name = macro.get('name')
+                m_class = macro.get('class')
+
+                if m_class != 'missile':
                     continue
 
-                tags = ware.get('tags', '')
-                raw_name = ware.get('name', '')
-                transport = ware.get('transport')
+                props = macro.find('properties')
+                if props is None:
+                    continue
 
-                name_id = raw_name or w_id
+                # 获取 ware 信息
+                ware_id = self.component_to_ware.get(macro_name)
+                if not ware_id:
+                    continue
+
+                ware_info = self.ware_index.get(ware_id, {})
+                name_id = ware_info.get('nameId', ware_id)
                 if name_id:
                     self.needed_raw_names.add(name_id)
 
-                comp_node = ware.find('component')
-                macro_id = comp_node.get('ref') if comp_node is not None else None
-
                 missile = {
-                    "id": w_id,
+                    "id": ware_id,
                     "nameId": name_id,
                     "name": name_id,
-                    "group": group,
-                    "tags": self._split_tags(tags),
-                    "transport": transport,
-                    "macroId": macro_id,
-                    "cost": self._build_cost(w_id)
+                    "macro": macro_name,
+                    "class": m_class,
+                    "tags": self._split_tags(ware_info.get('tags', '')),
+                    "cost": self._build_cost(ware_id),
+                    "amount": 0,
+                    "lifetime": 0,
+                    "range": 0,
+                    "explosive": 0,
+                    "reload": 0,
+                    "hull": 0,
+                    "resilience": 0,
+                    "ammunition": 0
                 }
 
-                # 合并 bullet_macros.xml 中的 missile 属性
-                if macro_id and macro_id in missile_props_map:
-                    missile.update(missile_props_map[macro_id])
+                # 读取 missile 属性
+                missile_node = props.find('missile')
+                if missile_node is not None:
+                    missile["amount"] = int(missile_node.get('amount') or 0)
+                    missile["lifetime"] = float(missile_node.get('lifetime') or 0)
+                    missile["range"] = float(missile_node.get('range') or 0)
+
+                # 读取爆炸伤害
+                explosion_node = props.find('explosiondamage')
+                if explosion_node is not None:
+                    missile["explosive"] = float(explosion_node.get('value') or 0)
+
+                # 读取 reload
+                reload_node = props.find('reload')
+                if reload_node is not None:
+                    missile["reload"] = float(reload_node.get('time') or 0)
+
+                # 读取 hull
+                hull_node = props.find('hull')
+                if hull_node is not None:
+                    missile["hull"] = float(hull_node.get('max') or 0)
+
+                # 读取 countermeasure
+                countermeasure_node = props.find('countermeasure')
+                if countermeasure_node is not None:
+                    missile["resilience"] = float(countermeasure_node.get('resilience') or 0)
+
+                # 读取 ammo
+                ammo_node = props.find('ammunition')
+                if ammo_node is not None:
+                    missile["ammunition"] = int(ammo_node.get('value') or 0)
 
                 self.missiles_data.append(missile)
 
@@ -1761,37 +1778,41 @@ class X4PrecisionLoader:
                 m_class = macro.get('class')
 
                 props = macro.find('properties')
-                ident_info = {}
-                name_id = None
-                if props is not None:
-                    ident = props.find('identification')
-                    if ident is not None:
-                        ident_info = {
-                            "mk": ident.get('mk'),
-                            "race": ident.get('makerrace')
-                        }
-                        name_id = ident.get('name')
 
                 bullet = {
                     "id": macro_name,
                     "class": m_class,
-                    "mk": ident_info.get('mk'),
-                    "race": ident_info.get('race')
+                    "type": "bullet",
+                    "speed": 0,
+                    "lifetime": 0,
+                    "heat": 0,
+                    "reload": 0,
+                    "damage": 0,
+                    "repair": 0
                 }
 
                 # 提取伤害属性（只导出 bullet 类型，missile 类型已在 missiles.json 中）
                 if props is not None:
-                    # 查找 bullet 节点
                     bullet_node = props.find('bullet')
+                    heat_node = props.find('heat')
+                    reload_node = props.find('reload')
+                    damage_node = props.find('damage')
 
                     if bullet_node is not None:
-                        bullet["type"] = "bullet"
                         bullet["speed"] = float(bullet_node.get('speed') or 0)
                         bullet["lifetime"] = float(bullet_node.get('lifetime') or 0)
-                        bullet["hull"] = float(bullet_node.get('hull') or 0)
-                        bullet["shield"] = float(bullet_node.get('shield') or 0)
-                        self.bullets_data.append(bullet)
-                    # 跳过 missile 节点
+
+                    if heat_node is not None:
+                        bullet["heat"] = float(heat_node.get('value') or 0)
+
+                    if reload_node is not None:
+                        bullet["reload"] = float(reload_node.get('rate') or 0)
+
+                    if damage_node is not None:
+                        bullet["damage"] = float(damage_node.get('value') or 0)
+                        bullet["repair"] = float(damage_node.get('repair') or 0)
+
+                    self.bullets_data.append(bullet)
 
             print(f"   ✅ 生成 {len(self.bullets_data)} 条 bullets 数据。")
         except Exception as e:

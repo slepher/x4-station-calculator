@@ -51,7 +51,7 @@ export default defineConfig({
   webServer: {
     // 💡 修复点 1：放弃 pnpm run，直接使用 pnpm exec 唤起底层 vite，确保参数 100% 传达！
     command: `vite preview --port ${port} --host 127.0.0.1 --strictPort`,
-    reuseExistingServer: false,
+    reuseExistingServer: true,
     timeout: 30000,
     
     // 💡 修复点 2：火力全开，把 Vite 的所有日志直接打印到你的终端里

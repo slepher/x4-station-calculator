@@ -131,6 +131,38 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     })
   }
 
+  // If activeId exists, auto-load the corresponding blueprint after a tick
+  if (savedBlueprints.value.activeId) {
+    const activeBlueprint = savedBlueprints.value.list.find(b => b.id === savedBlueprints.value.activeId)
+    if (activeBlueprint) {
+      // Use queueMicrotask to defer the update until after current execution context
+      queueMicrotask(() => {
+        // Find ship to get race and type info
+        const ship = ships.find(s => s.id === activeBlueprint.shipId)
+
+        // Determine class from ship ID pattern (same logic as loadBlueprint)
+        let shipClass: ShipBuildClass | null = null
+        if (activeBlueprint.shipId.includes('_s_')) shipClass = 'ship_s'
+        else if (activeBlueprint.shipId.includes('_m_')) shipClass = 'ship_m'
+        else if (activeBlueprint.shipId.includes('_l_')) shipClass = 'ship_l'
+        else if (activeBlueprint.shipId.includes('_xl_')) shipClass = 'ship_xl'
+
+        // Set filters (same as loadBlueprint)
+        selectedClass.value = shipClass
+        selectedRaces.value = ship?.race ? [ship.race] : []
+        selectedTypes.value = ship?.type ? [ship.type] : []
+        selectedShipId.value = activeBlueprint.shipId
+        blueprint.value = { ...activeBlueprint }
+
+        // Set dirty to false by directly setting lastSavedSnapshot
+        lastSavedSnapshot.value = JSON.stringify({
+          shipId: activeBlueprint.shipId,
+          blueprint: activeBlueprint
+        })
+      })
+    }
+  }
+
   // isDirty computed
   const isDirty = computed(() => {
     if (!lastSavedSnapshot.value) return false
@@ -416,6 +448,11 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
   const setSelectedShipId = (shipId: string | null) => {
     if (selectedShipId.value === shipId) return
+    // When changing ship (setting to null), clear the blueprint
+    if (shipId === null) {
+      blueprint.value = null
+      lastSavedSnapshot.value = null
+    }
     selectedShipId.value = shipId
     selectedByConnection.value = {}
     fitMode.value = 'connection'
@@ -850,6 +887,16 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     }
   })
 
+  // Reset all filters and blueprint (for New action)
+  const resetAll = () => {
+    blueprint.value = null
+    selectedShipId.value = null
+    selectedClass.value = null
+    selectedRaces.value = []
+    selectedTypes.value = []
+    lastSavedSnapshot.value = null
+  }
+
   return {
     activeView,
     selectedClass,
@@ -881,6 +928,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     loadBlueprint,
     deleteBlueprint,
     loadBlueprintsFromStorage,
+    resetAll,
     // Legacy methods (keep for backward compatibility)
     setSelectedShipId,
     setSelectedClass,
