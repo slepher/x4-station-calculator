@@ -14,7 +14,7 @@ import type {
   EquipmentType,
   ShipEquipmentSize
 } from '@/types/x4'
-import ShipBuildFitCandidate from '@/components/ShipBuildFitCandidate.vue'
+import ShipBuildPanelFit from '@/components/ship-build/ShipBuildPanelFit.vue'
 import ShipBuildPanelStats from '@/components/ship-build/ShipBuildPanelStats.vue'
 import ShipBuildPanelMaterials from '@/components/ship-build/ShipBuildPanelMaterials.vue'
 import type { FitMode } from '@/components/ship-build/fitTypes'
@@ -403,24 +403,17 @@ const applyGroupAssignment = (payload: { groupKey: string; equipmentId: string |
     </div>
 
     <div v-if="selectedShip" class="grid grid-cols-12 gap-8" data-testid="ship-build-panels">
-      <div class="col-span-12 lg:col-span-4 panel-card" data-testid="ship-build-panel-fit">
-        <div class="panel-header">
-          <span>{{ t('ship_build.panel_fit') }}</span>
-        </div>
-        <div class="fit-panel-content" data-testid="ship-build-fit-panel">
-          <ShipBuildFitCandidate
-            :mode="fitMode"
-            :can-switch-to-group="canSwitchToGroupMode"
-            :conflict-reason="fitModeConflictReason"
-            :connection-rows="connectionRows"
-            :group-rows="groupRows"
-            :selected-by-connection="selectedByConnection"
-            @update:mode="setFitMode"
-            @assign-connection="applyConnectionAssignment"
-            @assign-group="applyGroupAssignment"
-          />
-        </div>
-      </div>
+      <ShipBuildPanelFit
+        :mode="fitMode"
+        :can-switch-to-group="canSwitchToGroupMode"
+        :conflict-reason="fitModeConflictReason"
+        :connection-rows="connectionRows"
+        :group-rows="groupRows"
+        :selected-by-connection="selectedByConnection"
+        @update:mode="setFitMode"
+        @assign-connection="applyConnectionAssignment"
+        @assign-group="applyGroupAssignment"
+      />
       <ShipBuildPanelStats
         :selected-ship="selectedShip"
         :connection-rows="connectionRows"
