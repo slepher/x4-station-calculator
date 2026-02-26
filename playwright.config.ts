@@ -76,7 +76,7 @@ export default defineConfig({
     // 💡 将计算好的端口强制传给 Vite，并用 --strictPort 禁止它自己乱跑
     command: `pnpm run preview -- --port ${port} --strictPort`,
     url: `http://127.0.0.1:${port}/x4-station-calculator/`,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 30000,
     // 👇 添加这两行，把 webserver 的日志直接打印到控制台
     stdout: 'pipe',
