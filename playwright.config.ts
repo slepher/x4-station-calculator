@@ -1,43 +1,28 @@
 import { defineConfig, devices } from '@playwright/test';
-import net from 'node:net';
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import { execSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 
-// =====================================================================
-// 1. 自动化环境准备：检查 dist 目录，如果没有则自动触发构建
-// =====================================================================
+// 1. 防呆：Agent 忘了 build 时自动补救
 if (!fs.existsSync('./dist')) {
-  console.log('🚧 检测到全新 worktree 环境，未找到 dist 目录。正在自动执行构建...');
+  console.log('🚧 未检测到 dist 目录，正在自动构建...');
   execSync('pnpm build', { stdio: 'inherit' });
-  console.log('✅ 自动构建完成，准备启动测试！\n');
 }
 
-// =====================================================================
-// 2. 核心逻辑：利用 Node.js 原生 net 模块探测真实的空闲端口
-// =====================================================================
-async function getFreePort(startPort = 4173): Promise<number> {
-  return new Promise((resolve) => {
-    const server = net.createServer();
-    // 尝试监听指定的端口
-    server.listen(startPort, '127.0.0.1', () => {
-      const port = (server.address() as net.AddressInfo).port;
-      server.close(() => resolve(port)); // 监听成功说明空闲，关闭并返回该端口
-    });
-    // 如果抛出错误（通常是 EADDRINUSE 被占用），则递归顺延检查下一个
-    server.on('error', () => {
-      resolve(getFreePort(startPort + 1));
-    });
-  });
+// 2. 核心魔法：根据当前工作区绝对路径，生成专属固定端口 (10000 ~ 50000 之间)
+function getDirectoryPort(): number {
+  const dir = process.cwd();
+  // 对路径进行 MD5 哈希，取前 4 位十六进制转化为数字
+  const hash = createHash('md5').update(dir).digest('hex');
+  const portOffset = parseInt(hash.substring(0, 4), 16) % 40000;
+  return 10000 + portOffset;
 }
 
-// 3. 优先使用终端传入的 PORT，如果没有，则动态寻找空闲端口 (利用 ESM 的顶层 await)
-const port = process.env.PORT ? parseInt(process.env.PORT, 10) : await getFreePort(4173);// 👇 加上这行极其关键的补丁：将找到的端口写回全局环境变量！
-// 这样后续生成的 Worker 进程再次读取 config 时，就会直接使用这个环境变量，而不会去寻找下一个端口。
-process.env.PORT = String(port);
+// 3. 计算端口：支持外部传入，默认使用路径专属端口
+const port = process.env.PORT ? parseInt(process.env.PORT, 10) : getDirectoryPort();
 
-// =====================================================================
-// 4. Playwright 配置导出
-// =====================================================================
+// 4. Playwright 最终配置
 export default defineConfig({
   testDir: './tests',
   testIgnore: '**/unit/**',
@@ -48,7 +33,6 @@ export default defineConfig({
   reporter: 'list',
   
   use: {
-    // 💡 动态注入计算好的端口
     baseURL: `http://127.0.0.1:${port}/x4-station-calculator/`,
     headless: true,
     trace: 'on-first-retry',
@@ -58,27 +42,19 @@ export default defineConfig({
     navigationTimeout: 30000  
   },
   
-  expect: {
-    timeout: 5000,
-  },
+  expect: { timeout: 5000 },
 
   projects: [
-    {
-      name: 'chromium',
-      use: { 
-        ...devices['Desktop Chrome'],
-        viewport: { width: 1920, height: 1080 },
-      },
-    }
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } }
   ],
 
   webServer: {
-    // 💡 将计算好的端口强制传给 Vite，并用 --strictPort 禁止它自己乱跑
-    command: `pnpm run preview -- --port ${port} --strictPort`,
-    url: `http://127.0.0.1:${port}/x4-station-calculator/`,
-    reuseExistingServer: true,
+    // 💡 修复点 1：放弃 pnpm run，直接使用 pnpm exec 唤起底层 vite，确保参数 100% 传达！
+    command: `vite preview --port ${port} --host 127.0.0.1 --strictPort`,
+    reuseExistingServer: false,
     timeout: 30000,
-    // 👇 添加这两行，把 webserver 的日志直接打印到控制台
+    
+    // 💡 修复点 2：火力全开，把 Vite 的所有日志直接打印到你的终端里
     stdout: 'pipe',
     stderr: 'pipe',
   }
