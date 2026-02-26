@@ -154,15 +154,18 @@ export interface X4Missile {
   id: string;
   nameId: string;
   name: string;
-  group: string;
+  macro: string;
+  class: string;
   tags: string[];
-  transport: string;
-  macroId: string | null;
   cost: Record<string, Partial<Record<string, number>>>;
-  hull?: number;
-  shield?: number;
-  explosive?: number;
-  homing?: boolean;
+  amount: number;
+  lifetime: number;
+  range: number;
+  explosive: number;
+  reload: number;
+  hull: number;
+  resilience: number;
+  ammunition: number;
 }
 
 /**
@@ -171,13 +174,13 @@ export interface X4Missile {
 export interface X4Bullet {
   id: string;
   class: string;
-  mk: string | null;
-  race: string | null;
   type: string;
-  speed?: number;
-  lifetime?: number;
-  hull?: number;
-  shield?: number;
+  speed: number;
+  lifetime: number;
+  heat: number;
+  reload: number;
+  damage: number;
+  repair: number;
 }
 
 /**

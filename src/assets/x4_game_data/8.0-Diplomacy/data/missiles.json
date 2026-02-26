@@ -3,13 +3,12 @@
     "id": "missile_cluster_heavy_mk1",
     "nameId": "{20105,6114}",
     "name": "{20105,6114}",
-    "group": "missiles",
+    "macro": "missile_cluster_heavy_mk1_macro",
+    "class": "missile",
     "tags": [
       "equipment",
       "missile"
     ],
-    "transport": "equipment",
-    "macroId": "missile_cluster_heavy_mk1_macro",
     "cost": {
       "default": {
         "energycells": 30.0,
@@ -27,19 +26,26 @@
       "closedloop": {
         "energycells": 37.0
       }
-    }
+    },
+    "amount": 1,
+    "lifetime": 129.6,
+    "range": 7000.0,
+    "explosive": 12141.0,
+    "reload": 45.0,
+    "hull": 2.0,
+    "resilience": 1.0,
+    "ammunition": 1
   },
   {
     "id": "missile_cluster_light_mk1",
     "nameId": "{20105,6104}",
     "name": "{20105,6104}",
-    "group": "missiles",
+    "macro": "missile_cluster_light_mk1_macro",
+    "class": "missile",
     "tags": [
       "equipment",
       "missile"
     ],
-    "transport": "equipment",
-    "macroId": "missile_cluster_light_mk1_macro",
     "cost": {
       "default": {
         "energycells": 15.0,
@@ -57,19 +63,55 @@
       "closedloop": {
         "energycells": 17.0
       }
-    }
+    },
+    "amount": 1,
+    "lifetime": 30.0,
+    "range": 5500.0,
+    "explosive": 2361.0,
+    "reload": 15.0,
+    "hull": 1.0,
+    "resilience": 1.0,
+    "ammunition": 1
+  },
+  {
+    "id": "missile_disruptor_light_mk1",
+    "nameId": "{20105,6184}",
+    "name": "{20105,6184}",
+    "macro": "missile_disruptor_light_mk1_macro",
+    "class": "missile",
+    "tags": [
+      "equipment",
+      "missile"
+    ],
+    "cost": {
+      "default": {
+        "energycells": 15.0,
+        "missilecomponents": 3.0,
+        "smartchips": 2.0
+      },
+      "closedloop": {
+        "energycells": 24.0
+      }
+    },
+    "amount": 1,
+    "lifetime": 15.0,
+    "range": 5000.0,
+    "explosive": 896.0,
+    "reload": 10.0,
+    "hull": 1.0,
+    "resilience": 0.963,
+    "ammunition": 1
   },
   {
     "id": "missile_dumbfire_heavy_mk1",
     "nameId": "{20105,6024}",
     "name": "{20105,6024}",
-    "group": "missiles",
+    "macro": "missile_dumbfire_heavy_mk1_macro",
+    "class": "missile",
     "tags": [
       "equipment",
       "missile"
     ],
-    "transport": "equipment",
-    "macroId": "missile_dumbfire_heavy_mk1_macro",
     "cost": {
       "default": {
         "energycells": 7.0,
@@ -87,19 +129,26 @@
       "closedloop": {
         "energycells": 10.0
       }
-    }
+    },
+    "amount": 1,
+    "lifetime": 25.92,
+    "range": 9000.0,
+    "explosive": 3960.0,
+    "reload": 4.5,
+    "hull": 2.0,
+    "resilience": 1.0,
+    "ammunition": 1
   },
   {
     "id": "missile_dumbfire_heavy_mk2",
     "nameId": "{20105,6034}",
     "name": "{20105,6034}",
-    "group": "missiles",
+    "macro": "missile_dumbfire_heavy_mk2_macro",
+    "class": "missile",
     "tags": [
       "equipment",
       "missile"
     ],
-    "transport": "equipment",
-    "macroId": "missile_dumbfire_heavy_mk2_macro",
     "cost": {
       "default": {
         "energycells": 14.0,
@@ -117,19 +166,26 @@
       "closedloop": {
         "energycells": 28.0
       }
-    }
+    },
+    "amount": 1,
+    "lifetime": 25.92,
+    "range": 10000.0,
+    "explosive": 4320.0,
+    "reload": 4.5,
+    "hull": 3.0,
+    "resilience": 1.0,
+    "ammunition": 1
   },
   {
     "id": "missile_dumbfire_light_mk1",
     "nameId": "{20105,6004}",
     "name": "{20105,6004}",
-    "group": "missiles",
+    "macro": "missile_dumbfire_light_mk1_macro",
+    "class": "missile",
     "tags": [
       "equipment",
       "missile"
     ],
-    "transport": "equipment",
-    "macroId": "missile_dumbfire_light_mk1_macro",
     "cost": {
       "default": {
         "energycells": 5.0,
@@ -147,19 +203,26 @@
       "closedloop": {
         "energycells": 6.0
       }
-    }
+    },
+    "amount": 1,
+    "lifetime": 6.0,
+    "range": 7000.0,
+    "explosive": 1100.0,
+    "reload": 1.5,
+    "hull": 1.0,
+    "resilience": 1.0,
+    "ammunition": 1
   },
   {
     "id": "missile_dumbfire_light_mk2",
     "nameId": "{20105,6014}",
     "name": "{20105,6014}",
-    "group": "missiles",
+    "macro": "missile_dumbfire_light_mk2_macro",
+    "class": "missile",
     "tags": [
       "equipment",
       "missile"
     ],
-    "transport": "equipment",
-    "macroId": "missile_dumbfire_light_mk2_macro",
     "cost": {
       "default": {
         "energycells": 10.0,
@@ -177,19 +240,26 @@
       "closedloop": {
         "energycells": 13.0
       }
-    }
+    },
+    "amount": 1,
+    "lifetime": 6.0,
+    "range": 8000.0,
+    "explosive": 1200.0,
+    "reload": 1.5,
+    "hull": 1.0,
+    "resilience": 1.0,
+    "ammunition": 1
   },
   {
     "id": "missile_emp_mk1",
     "nameId": "{20105,6164}",
     "name": "{20105,6164}",
-    "group": "missiles",
+    "macro": "missile_emp_mk1_macro",
+    "class": "missile",
     "tags": [
       "equipment",
       "missile"
     ],
-    "transport": "equipment",
-    "macroId": "missile_emp_mk1_macro",
     "cost": {
       "default": {
         "energycells": 10.0,
@@ -207,19 +277,96 @@
       "closedloop": {
         "energycells": 16.0
       }
-    }
+    },
+    "amount": 1,
+    "lifetime": 10.0,
+    "range": 20000.0,
+    "explosive": 1.0,
+    "reload": 22.5,
+    "hull": 1.0,
+    "resilience": 0.951,
+    "ammunition": 1
+  },
+  {
+    "id": "missile_flagship_heavy_mk1",
+    "nameId": "{20105,6304}",
+    "name": "{20105,6304}",
+    "macro": "missile_flagship_heavy_mk1_macro",
+    "class": "missile",
+    "tags": [
+      "equipment",
+      "missile"
+    ],
+    "cost": {
+      "default": {
+        "energycells": 8.0,
+        "missilecomponents": 10.0,
+        "smartchips": 3.0
+      },
+      "closedloop": {
+        "energycells": 7.0,
+        "hullparts": 1.0
+      },
+      "terran": {
+        "energycells": 8.0,
+        "metallicmicrolattice": 6.0,
+        "siliconcarbide": 1.0
+      }
+    },
+    "amount": 1,
+    "lifetime": 22.0,
+    "range": 9000.0,
+    "explosive": 1100.0,
+    "reload": 0.25,
+    "hull": 20.0,
+    "resilience": 0.99,
+    "ammunition": 6
+  },
+  {
+    "id": "missile_flagship_light_mk1",
+    "nameId": "{20105,6314}",
+    "name": "{20105,6314}",
+    "macro": "missile_flagship_light_mk1_macro",
+    "class": "missile",
+    "tags": [
+      "equipment",
+      "missile"
+    ],
+    "cost": {
+      "default": {
+        "energycells": 8.0,
+        "missilecomponents": 8.0,
+        "smartchips": 3.0
+      },
+      "closedloop": {
+        "energycells": 4.0,
+        "hullparts": 1.0
+      },
+      "terran": {
+        "energycells": 8.0,
+        "metallicmicrolattice": 5.0,
+        "siliconcarbide": 1.0
+      }
+    },
+    "amount": 1,
+    "lifetime": 15.0,
+    "range": 9000.0,
+    "explosive": 550.0,
+    "reload": 0.25,
+    "hull": 10.0,
+    "resilience": 0.99,
+    "ammunition": 6
   },
   {
     "id": "missile_guided_heavy_mk1",
     "nameId": "{20105,6054}",
     "name": "{20105,6054}",
-    "group": "missiles",
+    "macro": "missile_guided_heavy_mk1_macro",
+    "class": "missile",
     "tags": [
       "equipment",
       "missile"
     ],
-    "transport": "equipment",
-    "macroId": "missile_guided_heavy_mk1_macro",
     "cost": {
       "default": {
         "energycells": 16.0,
@@ -239,19 +386,26 @@
       "closedloop": {
         "energycells": 28.0
       }
-    }
+    },
+    "amount": 1,
+    "lifetime": 43.2,
+    "range": 6000.0,
+    "explosive": 3520.0,
+    "reload": 6.0,
+    "hull": 3.0,
+    "resilience": 0.977,
+    "ammunition": 1
   },
   {
     "id": "missile_guided_light_mk1",
     "nameId": "{20105,6044}",
     "name": "{20105,6044}",
-    "group": "missiles",
+    "macro": "missile_guided_light_mk1_macro",
+    "class": "missile",
     "tags": [
       "equipment",
       "missile"
     ],
-    "transport": "equipment",
-    "macroId": "missile_guided_light_mk1_macro",
     "cost": {
       "default": {
         "energycells": 8.0,
@@ -270,19 +424,26 @@
       "closedloop": {
         "energycells": 12.0
       }
-    }
+    },
+    "amount": 1,
+    "lifetime": 10.0,
+    "range": 4500.0,
+    "explosive": 685.0,
+    "reload": 2.0,
+    "hull": 1.0,
+    "resilience": 0.977,
+    "ammunition": 1
   },
   {
     "id": "missile_heatseeker_heavy_mk1",
     "nameId": "{20105,6094}",
     "name": "{20105,6094}",
-    "group": "missiles",
+    "macro": "missile_heatseeker_heavy_mk1_macro",
+    "class": "missile",
     "tags": [
       "equipment",
       "missile"
     ],
-    "transport": "equipment",
-    "macroId": "missile_heatseeker_heavy_mk1_macro",
     "cost": {
       "default": {
         "energycells": 20.0,
@@ -302,19 +463,26 @@
       "closedloop": {
         "energycells": 34.0
       }
-    }
+    },
+    "amount": 1,
+    "lifetime": 43.2,
+    "range": 7000.0,
+    "explosive": 3592.0,
+    "reload": 6.0,
+    "hull": 2.0,
+    "resilience": 0.965,
+    "ammunition": 1
   },
   {
     "id": "missile_heatseeker_light_mk1",
     "nameId": "{20105,6084}",
     "name": "{20105,6084}",
-    "group": "missiles",
+    "macro": "missile_heatseeker_light_mk1_macro",
+    "class": "missile",
     "tags": [
       "equipment",
       "missile"
     ],
-    "transport": "equipment",
-    "macroId": "missile_heatseeker_light_mk1_macro",
     "cost": {
       "default": {
         "energycells": 10.0,
@@ -333,19 +501,83 @@
       "closedloop": {
         "energycells": 15.0
       }
-    }
+    },
+    "amount": 1,
+    "lifetime": 10.0,
+    "range": 5000.0,
+    "explosive": 698.0,
+    "reload": 2.0,
+    "hull": 1.0,
+    "resilience": 0.965,
+    "ammunition": 1
+  },
+  {
+    "id": "missile_interceptor_light_mk1",
+    "nameId": "{20105,6204}",
+    "name": "{20105,6204}",
+    "macro": "missile_interceptor_light_mk1_macro",
+    "class": "missile",
+    "tags": [
+      "equipment",
+      "missile"
+    ],
+    "cost": {
+      "default": {
+        "energycells": 12.0,
+        "missilecomponents": 11.0,
+        "smartchips": 1.0
+      },
+      "closedloop": {
+        "energycells": 22.0
+      }
+    },
+    "amount": 5,
+    "lifetime": 30.0,
+    "range": 39000.0,
+    "explosive": 100.0,
+    "reload": 2.0,
+    "hull": 1.0,
+    "resilience": 0.953,
+    "ammunition": 0
+  },
+  {
+    "id": "missile_scatter_heavy_mk1",
+    "nameId": "{20105,6274}",
+    "name": "{20105,6274}",
+    "macro": "missile_scatter_heavy_mk1_macro",
+    "class": "missile",
+    "tags": [
+      "equipment",
+      "missile"
+    ],
+    "cost": {
+      "default": {
+        "energycells": 5.0,
+        "missilecomponents": 24.0
+      },
+      "closedloop": {
+        "energycells": 19.0
+      }
+    },
+    "amount": 12,
+    "lifetime": 15.0,
+    "range": 3500.0,
+    "explosive": 400.0,
+    "reload": 4.0,
+    "hull": 20.0,
+    "resilience": 1.0,
+    "ammunition": 0
   },
   {
     "id": "missile_smart_heavy_mk1",
     "nameId": "{20105,6134}",
     "name": "{20105,6134}",
-    "group": "missiles",
+    "macro": "missile_smart_heavy_mk1_macro",
+    "class": "missile",
     "tags": [
       "equipment",
       "missile"
     ],
-    "transport": "equipment",
-    "macroId": "missile_smart_heavy_mk1_macro",
     "cost": {
       "default": {
         "energycells": 20.0,
@@ -365,19 +597,26 @@
       "closedloop": {
         "energycells": 36.0
       }
-    }
+    },
+    "amount": 1,
+    "lifetime": 43.2,
+    "range": 5500.0,
+    "explosive": 3378.0,
+    "reload": 6.0,
+    "hull": 3.0,
+    "resilience": 1.0,
+    "ammunition": 1
   },
   {
     "id": "missile_smart_light_mk1",
     "nameId": "{20105,6124}",
     "name": "{20105,6124}",
-    "group": "missiles",
+    "macro": "missile_smart_light_mk1_macro",
+    "class": "missile",
     "tags": [
       "equipment",
       "missile"
     ],
-    "transport": "equipment",
-    "macroId": "missile_smart_light_mk1_macro",
     "cost": {
       "default": {
         "energycells": 10.0,
@@ -396,19 +635,55 @@
       "closedloop": {
         "energycells": 18.0
       }
-    }
+    },
+    "amount": 1,
+    "lifetime": 10.0,
+    "range": 4000.0,
+    "explosive": 657.0,
+    "reload": 2.0,
+    "hull": 1.0,
+    "resilience": 1.0,
+    "ammunition": 1
+  },
+  {
+    "id": "missile_starburst_heavy_mk1",
+    "nameId": "{20105,6234}",
+    "name": "{20105,6234}",
+    "macro": "missile_starburst_heavy_mk1_macro",
+    "class": "missile",
+    "tags": [
+      "equipment",
+      "missile"
+    ],
+    "cost": {
+      "default": {
+        "energycells": 17.0,
+        "missilecomponents": 9.0,
+        "smartchips": 2.0
+      },
+      "closedloop": {
+        "energycells": 29.0
+      }
+    },
+    "amount": 1,
+    "lifetime": 43.2,
+    "range": 6000.0,
+    "explosive": 3800.0,
+    "reload": 8.0,
+    "hull": 3.0,
+    "resilience": 0.977,
+    "ammunition": 1
   },
   {
     "id": "missile_swarm_heavy_mk1",
     "nameId": "{20105,6074}",
     "name": "{20105,6074}",
-    "group": "missiles",
+    "macro": "missile_swarm_heavy_mk1_macro",
+    "class": "missile",
     "tags": [
       "equipment",
       "missile"
     ],
-    "transport": "equipment",
-    "macroId": "missile_swarm_heavy_mk1_macro",
     "cost": {
       "default": {
         "energycells": 20.0,
@@ -428,19 +703,26 @@
       "closedloop": {
         "energycells": 33.0
       }
-    }
+    },
+    "amount": 8,
+    "lifetime": 43.2,
+    "range": 5500.0,
+    "explosive": 690.0,
+    "reload": 12.0,
+    "hull": 3.0,
+    "resilience": 0.975,
+    "ammunition": 1
   },
   {
     "id": "missile_swarm_light_mk1",
     "nameId": "{20105,6064}",
     "name": "{20105,6064}",
-    "group": "missiles",
+    "macro": "missile_swarm_light_mk1_macro",
+    "class": "missile",
     "tags": [
       "equipment",
       "missile"
     ],
-    "transport": "equipment",
-    "macroId": "missile_swarm_light_mk1_macro",
     "cost": {
       "default": {
         "energycells": 10.0,
@@ -459,19 +741,26 @@
       "closedloop": {
         "energycells": 16.0
       }
-    }
+    },
+    "amount": 8,
+    "lifetime": 10.0,
+    "range": 4000.0,
+    "explosive": 134.0,
+    "reload": 4.0,
+    "hull": 1.0,
+    "resilience": 0.975,
+    "ammunition": 1
   },
   {
     "id": "missile_torpedo_heavy_mk1",
     "nameId": "{20105,6154}",
     "name": "{20105,6154}",
-    "group": "missiles",
+    "macro": "missile_torpedo_heavy_mk1_macro",
+    "class": "missile",
     "tags": [
       "equipment",
       "missile"
     ],
-    "transport": "equipment",
-    "macroId": "missile_torpedo_heavy_mk1_macro",
     "cost": {
       "default": {
         "energycells": 40.0,
@@ -493,19 +782,26 @@
         "energycells": 122.0,
         "hullparts": 5.0
       }
-    }
+    },
+    "amount": 1,
+    "lifetime": 180.0,
+    "range": 9000.0,
+    "explosive": 17246.0,
+    "reload": 30.0,
+    "hull": 38.0,
+    "resilience": 0.996,
+    "ammunition": 1
   },
   {
     "id": "missile_torpedo_light_mk1",
     "nameId": "{20105,6144}",
     "name": "{20105,6144}",
-    "group": "missiles",
+    "macro": "missile_torpedo_light_mk1_macro",
+    "class": "missile",
     "tags": [
       "equipment",
       "missile"
     ],
-    "transport": "equipment",
-    "macroId": "missile_torpedo_light_mk1_macro",
     "cost": {
       "default": {
         "energycells": 20.0,
@@ -526,149 +822,14 @@
         "energycells": 36.0,
         "hullparts": 1.0
       }
-    }
-  },
-  {
-    "id": "missile_disruptor_light_mk1",
-    "nameId": "{20105,6184}",
-    "name": "{20105,6184}",
-    "group": "missiles",
-    "tags": [
-      "equipment",
-      "missile"
-    ],
-    "transport": "equipment",
-    "macroId": "missile_disruptor_light_mk1_macro",
-    "cost": {
-      "default": {
-        "energycells": 15.0,
-        "missilecomponents": 3.0,
-        "smartchips": 2.0
-      },
-      "closedloop": {
-        "energycells": 24.0
-      }
-    }
-  },
-  {
-    "id": "missile_interceptor_light_mk1",
-    "nameId": "{20105,6204}",
-    "name": "{20105,6204}",
-    "group": "missiles",
-    "tags": [
-      "equipment",
-      "missile"
-    ],
-    "transport": "equipment",
-    "macroId": "missile_interceptor_light_mk1_macro",
-    "cost": {
-      "default": {
-        "energycells": 12.0,
-        "missilecomponents": 11.0,
-        "smartchips": 1.0
-      },
-      "closedloop": {
-        "energycells": 22.0
-      }
-    }
-  },
-  {
-    "id": "missile_scatter_heavy_mk1",
-    "nameId": "{20105,6274}",
-    "name": "{20105,6274}",
-    "group": "missiles",
-    "tags": [
-      "equipment",
-      "missile"
-    ],
-    "transport": "equipment",
-    "macroId": "missile_scatter_heavy_mk1_macro",
-    "cost": {
-      "default": {
-        "energycells": 5.0,
-        "missilecomponents": 24.0
-      },
-      "closedloop": {
-        "energycells": 19.0
-      }
-    }
-  },
-  {
-    "id": "missile_starburst_heavy_mk1",
-    "nameId": "{20105,6234}",
-    "name": "{20105,6234}",
-    "group": "missiles",
-    "tags": [
-      "equipment",
-      "missile"
-    ],
-    "transport": "equipment",
-    "macroId": "missile_starburst_heavy_mk1_macro",
-    "cost": {
-      "default": {
-        "energycells": 17.0,
-        "missilecomponents": 9.0,
-        "smartchips": 2.0
-      },
-      "closedloop": {
-        "energycells": 29.0
-      }
-    }
-  },
-  {
-    "id": "missile_flagship_heavy_mk1",
-    "nameId": "{20105,6304}",
-    "name": "{20105,6304}",
-    "group": "missiles",
-    "tags": [
-      "equipment",
-      "missile"
-    ],
-    "transport": "equipment",
-    "macroId": "missile_flagship_heavy_mk1_macro",
-    "cost": {
-      "default": {
-        "energycells": 8.0,
-        "missilecomponents": 10.0,
-        "smartchips": 3.0
-      },
-      "closedloop": {
-        "energycells": 7.0,
-        "hullparts": 1.0
-      },
-      "terran": {
-        "energycells": 8.0,
-        "metallicmicrolattice": 6.0,
-        "siliconcarbide": 1.0
-      }
-    }
-  },
-  {
-    "id": "missile_flagship_light_mk1",
-    "nameId": "{20105,6314}",
-    "name": "{20105,6314}",
-    "group": "missiles",
-    "tags": [
-      "equipment",
-      "missile"
-    ],
-    "transport": "equipment",
-    "macroId": "missile_flagship_light_mk1_macro",
-    "cost": {
-      "default": {
-        "energycells": 8.0,
-        "missilecomponents": 8.0,
-        "smartchips": 3.0
-      },
-      "closedloop": {
-        "energycells": 4.0,
-        "hullparts": 1.0
-      },
-      "terran": {
-        "energycells": 8.0,
-        "metallicmicrolattice": 5.0,
-        "siliconcarbide": 1.0
-      }
-    }
+    },
+    "amount": 1,
+    "lifetime": 50.0,
+    "range": 3000.0,
+    "explosive": 4791.0,
+    "reload": 10.0,
+    "hull": 8.0,
+    "resilience": 0.996,
+    "ammunition": 1
   }
 ]
