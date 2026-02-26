@@ -1,0 +1,1433 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- read XSD reference, when the XSD-file is there - xsi:noNamespaceSchemaLocation="defaults.xsd" -->
+
+<!-- // XML syntax of relation node for reference
+<relation>
+  <attack>
+    // NOTE: Attack values are only valid for objects, i.e. ships and stations, not for single sub-components.
+    // NOTE: absolute and change values can be combined: absolute is applied before change, unless the relation is already lower
+    <tolerance threshold="-1" change="-0.15" decay="0.01" delay="10" />
+    <boost absolute="0.0" change="-0.0001" decay="0.02" delay="540" />
+    // NOTE: scan and hack are penalties when player is detected and found guilty of scanning/hacking a station
+    <faction scan="-0.001" hack="-0.001" />
+  </attack>
+  <kill>
+    // NOTE: bonus is a relation bonus from another faction which considers the killed object (ship/station) as enemy
+    // NOTE: <boost> has no effect on ships/stations as they are dead anyway, but it can be used on sub-components like turrets
+    <faction change="-0.001" bonus="0.00096" />
+    <boost change="-0.1" decay="0.02" delay="540" />
+  </kill>
+  <killchild>
+    // NOTE: This element is used for killed contained components (e.g. surface elements of a station) that
+    // do not have their own <kill> definition. The rules for <killchild> are the same as for <kill>.
+    // NOTE: <faction> and <boost> can be placed in <minsize>/<maxsize> to make the effect dependent on the
+    // killed component's size. The attribute values are interpolated for sizes between min and max.
+    <minsize size="10">
+      <faction change="-0.001" />
+    </minsize>
+    <maxsize size="1000">
+      <faction change="-0.01" />
+    </maxsize>
+    <boost change="-0.1" decay="0.02" delay="540" />
+  </killchild>
+  // NOTE: change is penalty when the player is reported to the police, scan and hack are penalties corresponding illegal activities, bounty is money for killed enemy in Cr
+  <police change="-0.001" scan="-0.001" hack="-0.001" bounty="100" />
+  <repair>
+    // NOTE: Not implemented yet
+    <faction change="0.001" />
+    <boost change="0.01" />
+  </repair>
+</relation>
+-->
+
+<defaults xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <dataset class="positional">
+    <connections>
+      <connection name="ConnectionRE" tags="rendereffect" />
+      <connection name="storage" tags="storage" match="exact" />
+      <connection name="ConnectionUI" tags="ui" match="exact" />
+      <connection name="cameraanchorscene" tags="cameraanchorscene" />
+      <connection name="stickybullet" tags="stickybullet" />
+      <connection name="timeprofilesource" tags="timeprofilesource" />
+    </connections>
+    <properties>
+      <!--<effects>
+        <surface ref="surface_sparks" />
+      </effects>-->
+    </properties>
+  </dataset>
+  <dataset class="asteroid">
+    <properties>
+      <wreck deceleration="6" />
+      <glow default="0.0"/>
+      <identification icon="mapob_asteroid" />
+      <effects>
+        <surface ref="rock_surface_impact" />
+      </effects>
+    </properties>
+    <connections>
+      <connection name="miningnodes" tags="miningnode" />
+    </connections>
+  </dataset>
+  <dataset class="miningnode">
+    <properties>
+      <effects>
+        <surface ref="explosion_asteroid_a_xxs" />
+        <explosion ref="explosion_asteroid_a_xs" />
+      </effects>
+    </properties>
+  </dataset>
+  <dataset class="adsign">
+    <properties>
+      <explosioneffect strength="620" />
+      <hull module="false"/>
+      <relation>
+        <kill>
+          <faction change="-0.001" />
+        </kill>
+      </relation>
+    </properties>
+  </dataset>
+  <dataset class="turret">
+    <properties>
+      <identification type="weapons_turrets" surfaceelement="true" />
+      <effects>
+        <explosion ref="surfacemodule_explosion_generator" />
+        <sefx_damage_low ref="surfacemodule_damage_m_low" />
+        <sefx_damage_medium ref="surfacemodule_damage_m_medium" />
+        <sefx_damage_high ref="surfacemodule_damage_m_high" />
+        <activation ref="" />
+      </effects>
+      <explosioneffect strength="1000" />
+      <relation>
+        <kill>
+          <faction change="-0.0005" />
+          <boost absolute="-1.0" decay="0.02" delay="540" />
+        </kill>
+      </relation>
+    </properties>
+  </dataset>
+  <dataset class="shieldgenerator">
+    <properties>
+      <identification type="shieldgentypes" surfaceelement="true" />
+      <hack hackable="true" />
+      <explosioneffect strength="1000" />
+      <effects>
+        <explosion ref="surfacemodule_explosion_generator" />
+        <sefx_damage_low ref="surfacemodule_damage_m_low" />
+        <sefx_damage_medium ref="surfacemodule_damage_m_medium" />
+        <sefx_damage_high ref="surfacemodule_damage_m_high" />
+        <!-- <sefx_shield ref="sefx_shield_s_01" /> -->
+      </effects>
+      <relation>
+        <kill>
+          <faction change="-0.0005" />
+          <boost absolute="-1.0" decay="0.02" delay="540" />
+        </kill>
+      </relation>
+    </properties>
+  </dataset>
+  <dataset class="zone">
+    <connections>
+      <connection name="regions" tags="region" match="exact" />
+      <connection name="stardust" tags="stardust" match="exact" />
+      <connection name="highwayentrygates" tags="highwayentrygate" />
+      <connection name="highwayexitgates" tags="highwayexitgate" />
+      <connection name="adsigns" tags="adsign" value="0" match="exact" />
+      <connection name="mines" tags="mine" value="0" match="exact" />
+      <connection name="drops" tags="drop" />
+      <connection name="lockboxes" tags="lockbox" />
+      <connection name="buildstorages" tags="buildstorage" />
+      <connection name="satellites" tags="satellite" />
+      <connection name="navbeacon" tags="navbeacon" />
+      <connection name="resourceprobe" tags="resourceprobe" />
+      <connection name="signalleaks" tags="signalleak" />
+      <connection name="objects" tags="object" />
+      <connection name="triggerobjects" tags="triggerobject" />
+      <connection name="recyclables" tags="recyclable" />
+    </connections>
+    <properties>
+      <identification name="{20006,601}"/>
+      <visible distance="25000" />
+    </properties>
+  </dataset>
+  <dataset class="drop">
+    <properties>
+      <identification icon="mapob_drop" />
+    </properties>
+  </dataset>
+  <dataset class="lock">
+    <properties>
+      <hull wreckintegrated="false" />
+    </properties>
+  </dataset>
+  <dataset class="lockbox">
+    <properties>
+      <identification icon="mapob_lockbox" />
+      <explosioneffect strength="1000" />
+      <effects>
+        <explosion ref="ship_explosion_generator" />
+      </effects>
+      <longrangescan maxrange="50000" />
+    </properties>
+  </dataset>
+  <dataset class="navbeacon">
+    <properties>
+      <identification type="navbeacons" />
+      <deployable timeout="7200" />
+      <explosioneffect strength="50" />
+      <effects>
+        <explosion ref="ship_explosion_generator" />
+      </effects>
+    </properties>
+  </dataset>
+  <dataset class="navcontext">
+    <properties>
+      <hull integrated="1" />
+    </properties>
+  </dataset>
+  <dataset class="recyclable">
+    <properties>
+      <wreck removaltime="3600"/>
+      <identification icon="mapob_scrap_tow" dismantleicon="mapob_scrap_dismantle" />
+      <effects>
+        <surface ref="rock_surface_impact" />
+      </effects>
+      <cargo max="150000" />
+    </properties>
+    <connections>
+      <connection name="ejecting" tags="ejecting" value="1" />
+    </connections>
+  </dataset>
+  <dataset class="resourceprobe">
+    <properties>
+      <identification type="resourceprobes" />
+      <deployable timeout="7200" />
+      <explosioneffect strength="50" />
+      <effects>
+        <explosion ref="ship_explosion_generator" />
+      </effects>
+      <resourceprobe range="1" />
+    </properties>
+  </dataset>
+  <dataset class="mine">
+    <properties>
+      <identification type="mines" />
+      <deployable timeout="14400" />
+    </properties>
+  </dataset>
+  <dataset class="satellite">
+    <properties>
+      <identification type="satellites" />
+      <deployable timeout="7200" />
+    </properties>
+  </dataset>
+  <dataset class="scanner">
+    <properties>
+      <identification type="software" />
+    </properties>
+  </dataset>
+  <dataset class="crate">
+    <connections>
+      <connection name="roomconnection" tags="crate" value="1" />
+    </connections>
+  </dataset>
+  <dataset class="signalleak">
+    <connections>
+      <connection name="slotconnection" tags="info mission" value="1" />
+    </connections>
+    <properties>
+      <indicator range="1000" />
+    </properties>
+  </dataset>
+  <dataset class="ship">
+    <properties>
+      <hull threshold="0.05" />
+      <relation>
+        <killchild>
+          <minsize size="10">
+            <faction change="-0.0005" />
+            <boost absolute="-1.0" decay="0.02" delay="540" />
+          </minsize>
+          <maxsize size="1000">
+            <faction change="-0.01" />
+            <boost absolute="-1.0" decay="0.02" delay="540" />
+          </maxsize>
+        </killchild>
+      </relation>
+      <secrecy level="-1" />
+      <sounds>
+        <shipdetail ref="shipdetail_ship_01" />
+      </sounds>
+      <effects>
+        <highspeed ref="highspeed_effect" />
+        <soundcontext entered="soundcontext_entered" left="soundcontext_left" />
+        <longrangescan>
+          <claimable ref="scfx_result_good_01"/>
+        </longrangescan>
+      </effects>
+      <theme ref="painttheme_race_default" />
+      <claim signalleak="dataleak_xs_claim_01_macro" />
+      <steeringcurve>
+        <point position="0" value="1"/>
+        <point position="1" value="1"/>
+        <point position="1.9" value="0.25"/>
+        <point position="2.6" value="0.25"/>
+        <point position="2.9" value="0.1"/>
+      </steeringcurve>
+      <jerk>
+        <forward accel="0.8" decel="0.8" ratio="4"/>
+        <forward_boost accel="0.8" decel="1" ratio="3"/>
+        <forward_travel accel="0.5" decel="0.8" ratio="3"/>
+        <strafe value="1" ratio="1"/>
+        <angular value="0.7" ratio="1"/>
+      </jerk>
+      <threatscore default="0.5"/>
+      <boost threshold="10" rechargedelay="1" minduration="0.25"/>
+      <jpm allow="true"/>
+    </properties>
+    <connections>
+      <connection name="docking" tags="docking" />
+      <connection name="dock" tags="dock" />
+      <connection name="limpet" tags="limpet" />
+      <!--<connection name="pilotnpc" tags="pilot" value="-1" match="all" />-->
+      <!--connection name="scannerconnection" tags="scanner"/-->
+      <connection name="waiting" tags="waiting"/>
+      <connection name="constructionvessel" tags="constructionvessel" value="1"/>
+      <connection name="towing" tags="towing" value="1" />
+      <connection name="diplomacyagent" tags="diplomacyship" value="1"/>
+      <connection name="thrustersound_left" tags="straferight yawright wallleft">
+        <offset>
+          <position x="-10" y="0" z="0"/>
+        </offset>
+      </connection>
+      <connection name="thrustersound_right" tags="strafeleft yawleft wallright">
+        <offset>
+          <position x="10" y="0" z="0"/>
+        </offset>
+      </connection>
+      <connection name="thrustersound_up" tags="strafedown pitchdown wallabove">
+        <offset>
+          <position x="0" y="10" z="0"/>
+        </offset>
+      </connection>
+      <connection name="thrustersound_down" tags="strafeup pitchup wallbelow">
+        <offset>
+          <position x="0" y="-10" z="0"/>
+        </offset>
+      </connection>
+      <connection name="thrustersound_up_left" tags="wallaboveleft">
+        <offset>
+          <position x="-7" y="7" z="0"/>
+        </offset>
+      </connection>
+      <connection name="thrustersound_up_right" tags="wallaboveright">
+        <offset>
+          <position x="7" y="7" z="0"/>
+        </offset>
+      </connection>
+      <connection name="thrustersound_down_left" tags="wallbelowleft">
+        <offset>
+          <position x="-7" y="-7" z="0"/>
+        </offset>
+      </connection>
+      <connection name="thrustersound_down_right" tags="wallbelowright">
+        <offset>
+          <position x="7" y="-7" z="0"/>
+        </offset>
+      </connection>
+    </connections>
+  </dataset>
+  <!--TODO @Owen #EntityTypes Remove passenger capacity defaults-->
+  <dataset class="ship_xl">
+    <properties>
+      <identification type="shiptypes_xl" />
+      <radar range="40000"/>
+      <explosioneffect strength="20000" />
+      <effects>
+        <scuttle ref="scuttle_l" />
+        <collision light="light_collision_l" medium="medium_collision_l" strong="strong_collision_l" />
+        <!--commented out: sustain="ongoing_collision_l" -->
+        <explosion ref="ship_explosion_generator" />
+        <damage>
+          <effect chance="0.25" threshold="75" location="hull" ref="sparkles_l" />
+          <effect chance="0.5"  threshold="70" location="hull" ref="ref_surfaceexplosion_xl_01" />
+          <effect chance="0.25" threshold="65" location="hull" ref="ref_smoke_light_xl_01" />
+          <effect chance="1.0"  threshold="60" location="hull" ref="ref_smoke_light_xl_01" />
+          <effect chance="0.5"  threshold="55" location="hull" ref="ref_smoke_xl_01" />
+          <effect chance="1.0"  threshold="50" location="hull" ref="ref_surfaceexplosion_xl_01" />
+          <effect chance="0.5"  threshold="45" location="hull" ref="ref_fire_xl_01" />
+          <effect chance="1.0"  threshold="40" location="hull" ref="ref_smoke_xl_01" />
+          <effect chance="0.75" threshold="40" location="hull" ref="ref_surfaceexplosion_xl_01" />
+          <effect chance="1.0"  threshold="37" location="hull" ref="ref_ship_damage_xl_medium" />
+          <effect chance="0.75" threshold="35" location="hull" ref="ref_fire_xl_01" />
+          <effect chance="1.0"  threshold="35" location="hull" ref="ref_smoke_light_xl_01" />
+          <effect chance="0.75" threshold="30" location="hull" ref="ref_smoke_xl_01" />
+          <effect chance="1.0"  threshold="30" location="hull" ref="ref_surfaceexplosion_xl_01" />
+          <effect chance="1.0"  threshold="25" location="hull" ref="ref_fire_xl_01" />
+          <effect chance="0.5"  threshold="25" location="hull" ref="ref_surfaceexplosion_xl_01" />
+          <effect chance="0.75" threshold="20" location="hull" ref="ref_fire_xl_01" />
+          <effect chance="1.0"  threshold="20" location="hull" ref="ref_smoke_xl_01" />
+          <effect chance="0.75" threshold="15" location="hull" ref="ref_fire_xl_01" />
+          <effect chance="1.0"  threshold="10" location="hull" ref="ref_fire_xl_01" />
+          <effect chance="1.0"  threshold="10" location="hull" ref="ref_surfaceexplosion_xl_01" />
+          <effect chance="1.0"  threshold="10" location="hull" ref="ref_ship_damage_xl_high" />
+          <effect chance="1.0"  threshold="5"  location="hull" ref="ref_fire_xl_01" />
+          <effect chance="1.0"  threshold="5"  location="hull" ref="ref_surfaceexplosion_xl_01" />
+        </damage>
+        <sefx_damage_low    ref="ref_ship_persistentdamage_xl_low" />
+        <sefx_damage_medium ref="ref_ship_persistentdamage_xl_medium" />
+        <sefx_damage_high   ref="ref_ship_persistentdamage_xl_high" />
+        <traveling ref="gen_xl_travelbubble_01_exterior" inside="gen_xl_travelbubble_01_cockpit"/>
+      </effects>
+      <capture allow="true" />
+      <docksize tag="dock_xl" />
+      <relation>
+        <attack>
+          <tolerance threshold="-1.0" change="-0.125" decay="0.25" delay="5" />
+          <boost absolute="-1.0" decay="0.02" delay="540" />
+        </attack>
+        <kill>
+          <faction change="-0.02" bonus="0.01" />
+        </kill>
+        <police change="-0.0025" bounty="600000"/>
+      </relation>
+      <wreck deceleration="60" removaltime="3600"/>
+      <people capacity="100"/>
+      <storage countermeasure="40" deployable="450"/>
+      <statistics>
+        <max>
+          <hull value="1795200.071335" />
+          <shield value="1376898.038621" delay="0.000000" rate="5473.000000" />
+          <weapon burst="971276.826851" sustained="361404.097522" />
+          <turret burst="0.000000" sustained="0.000000" />
+          <groups>
+            <shield value="54734.051535" delay="0.600000" rate="350.349976" />
+            <turret burst="24729.218926" sustained="24729.218926" />
+          </groups>
+          <dock ship_m="4" ship_s="21" />
+          <engine forward="654.197083" acceleration="287.002594" yaw="0.106501" pitch="0.106501" roll="0.097083"/>
+          <boost speed="3687.281982" acceleration="730.522644" duration="46.000000" recharge="3.333333"/>
+          <travel speed="29777.242188" acceleration="423.971191" chargetime="30.000000"/>
+          <thruster>
+            <horizontal speed="57.453602" acceleration="25.483452"/>
+            <vertical speed="57.453602" acceleration="25.483452"/>
+          </thruster>
+          <capacity crew="406" container="56000" solid="0" liquid="0" condensate="0" ship_m="8" ship_s="100" unit="247" missile="6144" countermeasure="44" deployable="454" />
+          <radar range="48000.000000" />
+        </max>
+      </statistics>
+      <internalsound engine="0.50" />
+      <modification>
+        <paint scale="32.0" />
+      </modification>
+      <threatscore default="12">
+        <purpose purpose="fight" value="23"/>
+        <purpose purpose="trade" value="14"/>
+        <purpose purpose="build" value="12"/>
+        <purpose purpose="mine" value="14"/>
+        <purpose purpose="auxiliary" value="16"/>
+        <purpose purpose="salvage" value="12"/>
+        <purpose purpose="dismantling" value="12"/>
+      </threatscore>
+      <deployable speed="25"/>
+      <physics collisionmassmultiplier="100000.0">
+        <maxspeed angular="30" />
+      </physics>
+      <oldjerk>
+        <forward ramp_in="0.2" ramp_out="0.4"/>
+        <forward_boost ramp_in="0.2" ramp_out="0.4"/>
+        <forward_travel ramp_in="0.1" ramp_out="0.4"/>
+        <strafe ramp_in="0.3" ramp_out="0.3"/>
+        <angular ramp_in="0.4" ramp_out="0.4"/>
+      </oldjerk>
+      <jerk>
+        <forward accel="0.1" decel="0.8" ratio="3"/>
+        <forward_boost accel="0.2" ratio="2"/>
+        <forward_travel accel="0.5" decel="0.9" ratio="3"/>
+        <strafe value="0.8" ratio="1"/>
+        <angular value="0.7" ratio="1"/>
+      </jerk>
+      <steeringcurve>
+        <point position="0" value="1"/>
+        <point position="1" value="1"/>
+        <point position="2" value="0.4"/>
+        <point position="2.6" value="0.15"/>
+        <point position="2.9" value="0.1"/>
+      </steeringcurve>
+    </properties>
+    <connections>
+      <connection name="con_playercontrol" tags="playercontrol" value="-1" match="all" />
+      <connection name="defencenpc" tags="defence" value="-1" match="all" />
+      <connection name="engineernpc" tags="engineer" value="-1" match="all" />
+      <connection name="parking" tags="parking" value="1" />
+      <connection name="tradecomputer" tags="tradecomputer" value="-1" match="all" />
+    </connections>
+  </dataset>
+  <dataset class="ship_l">
+    <properties>
+      <identification type="shiptypes_l" />
+      <radar range="40000"/>
+      <explosioneffect strength="15000" />
+      <effects>
+        <scuttle ref="scuttle_l" />
+        <collision light="light_collision_l" medium="medium_collision_l" strong="strong_collision_l" />
+        <!--commented out: sustain="ongoing_collision_l" -->
+        <explosion ref="ship_explosion_generator" />
+        <damage>
+          <effect chance="0.25" threshold="75" location="hull" ref="sparkles_l" />
+          <effect chance="0.5"  threshold="70" location="hull" ref="ref_surfaceexplosion_l_01" />
+          <effect chance="0.25" threshold="65" location="hull" ref="ref_smoke_light_l_01" />
+          <effect chance="0.5"  threshold="60" location="hull" ref="ref_smoke_light_l_01" />
+          <effect chance="1.0"  threshold="55" location="hull" ref="ref_smoke_light_l_01" />
+          <effect chance="1.0"  threshold="50" location="hull" ref="ref_surfaceexplosion_l_01" />
+          <effect chance="0.5"  threshold="45" location="hull" ref="ref_fire_l_01" />
+          <effect chance="1.0"  threshold="40" location="hull" ref="ref_smoke_l_01" />
+          <effect chance="0.75" threshold="40" location="hull" ref="ref_surfaceexplosion_l_01" />
+          <effect chance="1.0"  threshold="37" location="hull" ref="ref_ship_damage_l_medium" />
+          <effect chance="0.75" threshold="35" location="hull" ref="ref_fire_l_01" />
+          <effect chance="0.75" threshold="30" location="hull" ref="ref_smoke_l_01" />
+          <effect chance="1.0"  threshold="25" location="hull" ref="ref_fire_l_01" />
+          <effect chance="0.5"  threshold="25" location="hull" ref="ref_surfaceexplosion_l_01" />
+          <effect chance="0.75" threshold="20" location="hull" ref="ref_fire_l_01" />
+          <effect chance="1.0"  threshold="20" location="hull" ref="ref_smoke_l_01" />
+          <effect chance="0.75" threshold="15" location="hull" ref="ref_fire_l_01" />
+          <effect chance="1.0"  threshold="10" location="hull" ref="ref_fire_l_01" />
+          <effect chance="1.0"  threshold="10" location="hull" ref="ref_ship_damage_l_high" />
+          <effect chance="1.0"  threshold="5"  location="hull" ref="ref_surfaceexplosion_l_01" />
+        </damage>
+        <sefx_damage_low    ref="ref_ship_persistentdamage_l_low" />
+        <sefx_damage_medium ref="ref_ship_persistentdamage_l_medium" />
+        <sefx_damage_high   ref="ref_ship_persistentdamage_l_high" />
+        <traveling ref="gen_l_travelbubble_01_exterior" inside="gen_l_travelbubble_01_cockpit"/>
+      </effects>
+      <capture allow="true" />
+      <docksize tag="dock_l" />
+      <relation>
+        <attack>
+          <tolerance threshold="-1.0" change="-0.125" decay="0.25" delay="5" />
+          <boost absolute="-1.0" decay="0.02" delay="540" />
+        </attack>
+        <kill>
+          <faction change="-0.01" bonus="0.005" />
+        </kill>
+        <police change="-0.002" bounty="300000"/>
+      </relation>
+      <wreck deceleration="40" removaltime="3600"/>
+      <people capacity="70"/>
+      <storage countermeasure="20" deployable="250"/>
+      <statistics>
+        <max>
+          <hull value="253200.010061" />
+          <shield value="765000.021458" delay="0.000000" rate="2194.399902" />
+          <weapon burst="69816.773087" sustained="25322.685899" />
+          <turret burst="0.000000" sustained="0.000000" />
+          <groups>
+            <shield value="36489.367690" delay="0.600000" rate="233.566650" />
+            <turret burst="9259.787974" sustained="9259.787974" />
+          </groups>
+          <dock ship_m="1" ship_s="8" />
+          <engine forward="719.769653" acceleration="199.581970" yaw="0.563873" pitch="0.563873" roll="0.704714"/>
+          <boost speed="5130.219727" acceleration="640.880249" duration="46.000000" recharge="3.333333"/>
+          <travel speed="30203.595703" acceleration="557.803650" chargetime="20.000000"/>
+          <thruster>
+            <horizontal speed="119.375816" acceleration="43.431068"/>
+            <vertical speed="119.375816" acceleration="43.431068"/>
+          </thruster>
+          <capacity crew="226" container="62000" solid="57600" liquid="54000" condensate="0" ship_m="2" ship_s="16" unit="74" missile="2684" countermeasure="24" deployable="254" />
+          <radar range="96000.000000" />
+        </max>
+      </statistics>
+      <internalsound engine="0.50" />
+      <modification>
+        <paint scale="16.0" />
+      </modification>
+      <threatscore default="7">
+        <purpose purpose="fight" value="14"/>
+        <purpose purpose="trade" value="8"/>
+        <purpose purpose="build" value="7"/>
+        <purpose purpose="mine" value="8"/>
+        <purpose purpose="auxiliary" value="10"/>
+        <purpose purpose="salvage" value="7"/>
+        <purpose purpose="dismantling" value="7"/>
+      </threatscore>
+      <deployable speed="25"/>
+      <physics collisionmassmultiplier="100000.0">
+        <maxspeed angular="30" />
+      </physics>
+      <oldjerk>
+        <forward ramp_in="0.3" ramp_out="0.6"/>
+        <forward_boost ramp_in="0.2" ramp_out="0.75"/>
+        <forward_travel ramp_in="0.4" ramp_out="0.4"/>
+        <strafe ramp_in="0.35" ramp_out="0.35"/>
+        <angular ramp_in="0.35" ramp_out="0.35"/>
+      </oldjerk>
+      <jerk>
+        <forward accel="0.1" decel="0.8" ratio="3"/>
+        <forward_boost accel="0.2" ratio="2"/>
+        <forward_travel accel="0.5" decel="0.9" ratio="3"/>
+        <strafe value="0.8" ratio="1"/>
+        <angular value="0.7" ratio="1"/>
+      </jerk>
+      <steeringcurve>
+        <point position="0" value="1"/>
+        <point position="1" value="1"/>
+        <point position="1.3" value="0.5"/>
+        <point position="2" value="0.3" />
+        <point position="2.6" value="0.1" />
+        <point position="3" value="0.075" />
+      </steeringcurve>
+    </properties>
+    <connections>
+      <connection name="con_playercontrol" tags="playercontrol" value="-1" match="all" />
+      <connection name="defencenpc" tags="defence" value="-1" match="all" />
+      <connection name="engineernpc" tags="engineer" value="-1" match="all" />
+      <connection name="parking" tags="parking" value="1" />
+      <connection name="tradecomputer" tags="tradecomputer" value="-1" match="all" />
+    </connections>
+  </dataset>
+  <dataset class="ship_m">
+    <properties>
+      <identification type="shiptypes_m" />
+      <explosioneffect strength="2000" />
+      <radar range="40000"/>
+      <effects>
+        <explosion ref="ship_explosion_generator" />
+        <scuttle ref="scuttle_s" />
+        <damage>
+          <effect chance="0.25" threshold="75" location="weapon" ref="sparkles_m" />
+          <effect chance="0.75" threshold="65" location="turret" ref="sparkles_m" />
+          <effect chance="1.0"  threshold="64" location="hull"   ref="ref_ship_damage_m_low" />
+          <effect chance="1.0"  threshold="50" location="weapon" ref="smoketrail_m" />
+          <effect chance="0.5"  threshold="45" location="shield" ref="firetrail_s" />
+          <effect chance="0.6"  threshold="40" location="hull"   ref="surfaceexplosions_m" />
+          <effect chance="1.0"  threshold="37" location="hull"   ref="ref_ship_damage_m_medium" />
+          <effect chance="1.0"  threshold="15" location="turret" ref="smoketrail_m" />
+          <effect chance="1.0"  threshold="10" location="hull"   ref="surfaceexplosions_m" />
+          <effect chance="1.0"  threshold="10" location="hull"   ref="ref_ship_damage_m_high" />
+        </damage>
+        <sefx_damage_low    ref="ref_ship_persistentdamage_m_low" />
+        <sefx_damage_medium ref="ref_ship_persistentdamage_m_medium" />
+        <sefx_damage_high   ref="ref_ship_persistentdamage_m_high" />
+        <traveling ref="gen_m_travelbubble_01_exterior" inside="gen_m_travelbubble_01_cockpit"/>
+        <!--<surface ref="impact_units_m" />-->
+        <collision light="light_collision_m" medium="medium_collision_m" strong="strong_collision_m" />
+        <!--commented out: sustain="ongoing_collision_m" -->
+      </effects>
+      <capture allow="true" />
+      <docksize tag="dock_m" />
+      <relation>
+        <attack>
+          <tolerance threshold="-1.00" change="-0.50" decay="0.05" delay="10" />
+          <boost absolute="-1.0" decay="0.02" delay="540" />
+        </attack>
+        <kill>
+          <faction change="-0.004" bonus="0.002" />
+        </kill>
+        <police change="-0.0015" bounty="60000"/>
+      </relation>
+      <wreck deceleration="10" removaltime="1800"/>
+      <people capacity="5"/>
+      <storage countermeasure="8" deployable="100"/>
+      <statistics>
+        <max>
+          <hull value="46800.001860" />
+          <shield value="86548.702428" delay="0.570000" rate="921.699951" />
+          <weapon burst="71850.734423" sustained="21291.648469" />
+          <turret burst="947.849395" sustained="947.849395" />
+          <groups>
+            <shield value="0.000000" delay="0.000000" rate="0.000000" />
+            <turret burst="0.000000" sustained="0.000000" />
+          </groups>
+          <dock ship_m="0" ship_s="1" />
+          <engine forward="1958.642334" acceleration="435.427673" yaw="2.012270" pitch="2.515338" roll="3.340169"/>
+          <boost speed="14855.317383" acceleration="3247.662109" duration="31.680000" recharge="2.000000"/>
+          <travel speed="24723.839844" acceleration="1065.411865" chargetime="8.000000"/>
+          <thruster>
+            <horizontal speed="403.771149" acceleration="201.885574"/>
+            <vertical speed="403.771149" acceleration="201.885574"/>
+          </thruster>
+          <capacity crew="26" container="15100" solid="12000" liquid="12960" condensate="4300" ship_m="0" ship_s="1" unit="21" missile="120" countermeasure="12" deployable="104" />
+          <radar range="48000.000000" />
+        </max>
+      </statistics>
+      <theme ref="painttheme_race_ship" />
+      <internalsound engine="0.50" />
+      <modification>
+        <paint scale="4.0" />
+      </modification>
+      <threatscore default="2">
+        <purpose purpose="fight" value="3"/>
+      </threatscore>
+      <deployable speed="10"/>
+      <oldjerk>
+        <forward ramp_in="0.1" ramp_out="0.6"/>
+        <forward_boost ramp_in="0.1" ramp_out="0.8"/>
+        <forward_travel ramp_in="0.4" ramp_out="0.4"/>
+        <strafe ramp_in="0.5" ramp_out="0.5"/>
+        <angular ramp_in="0.1" ramp_out="0.1"/>
+      </oldjerk>
+      <jerk>
+        <forward accel="0.1" decel="0.8" ratio="3"/>
+        <forward_boost accel="0.2" ratio="2"/>
+        <forward_travel accel="0.5" decel="0.9" ratio="3"/>
+        <strafe value="0.8" ratio="1"/>
+        <angular value="0.7" ratio="1"/>
+      </jerk>
+      <steeringcurve>
+        <point position="0" value="1"/>
+        <point position="1" value="1"/>
+        <point position="1.6" value="0.75"/>
+        <point position="2" value="0.3" />
+        <point position="2.6" value="0.15" />
+        <point position="3" value="0.1" />
+      </steeringcurve>
+    </properties>
+    <connections>
+      <connection name="con_playercontrol" tags="playercontrol" value="-1" match="all" />
+      <connection name="defencenpc" tags="defence" value="-1" match="all" />
+      <connection name="engineernpc" tags="engineer" value="-1" match="all" />
+      <connection name="tradecomputer" tags="tradecomputer" value="-1" match="all" />
+      <connection name="storage" tags="storage" match="exact" />
+    </connections>
+  </dataset>
+  <dataset class="ship_s">
+    <properties>
+      <identification type="shiptypes_s" />
+      <!-- deployabletimeout for mk2 laser towers -->
+      <deployable timeout="14400" />
+      <explosioneffect strength="1000" />
+      <radar range="40000"/>
+      <effects>
+        <explosion ref="ship_explosion_generator" />
+        <scuttle ref="scuttle_s" />
+        <damage>
+          <effect chance="0.20" threshold="75" location="weapon" ref="sparkles_s" />
+          <effect chance="1.0"  threshold="64" location="hull"   ref="ref_ship_damage_s_low" />
+          <effect chance="0.50" threshold="50" location="engine" ref="smoketrail_s" />
+          <effect chance="1.0"  threshold="37" location="hull"   ref="ref_ship_damage_s_medium" />
+          <effect chance="0.30" threshold="40" location="hull"   ref="surfaceexplosions_s" />
+          <effect chance="1.0"  threshold="15" location="hull"   ref="surfaceexplosions_s" />
+          <effect chance="1.0"  threshold="10" location="hull"   ref="ref_ship_damage_s_high" />
+        </damage>
+        <sefx_damage_low    ref="ref_ship_persistentdamage_s_low" />
+        <sefx_damage_medium ref="ref_ship_persistentdamage_s_medium" />
+        <sefx_damage_high   ref="ref_ship_persistentdamage_s_high" />
+        <traveling ref="gen_s_travelbubble_01_exterior" inside="gen_s_travelbubble_01_cockpit"/>
+        <!--<surface ref="impact_units_s" />-->
+      </effects>
+      <capture allow="true" />
+      <docksize tag="dock_s" />
+      <relation>
+        <attack>
+          <tolerance threshold="-1.0" change="-1.00" decay="0.05" delay="10" />
+          <boost absolute="-1.0" decay="0.02" delay="540" />
+        </attack>
+        <kill>
+          <faction change="-0.002" bonus="0.001" />
+        </kill>
+        <police change="-0.001" bounty="30000" />
+      </relation>
+      <wreck deceleration="5" removaltime="1800"/>
+      <people capacity="1"/>
+      <storage countermeasure="4" deployable="50"/>
+      <statistics>
+        <max>
+          <hull value="8040.000319" />
+          <shield value="10553.600296" delay="13.900000" rate="1258.399902" />
+          <weapon burst="52489.386287" sustained="13235.204810" />
+          <turret burst="0.000000" sustained="0.000000" />
+          <groups>
+            <shield value="0.000000" delay="0.000000" rate="0.000000" />
+            <turret burst="0.000000" sustained="0.000000" />
+          </groups>
+          <dock ship_m="0" ship_s="0" />
+          <engine forward="2145.435303" acceleration="1557.477295" yaw="4.312257" pitch="4.312257" roll="5.095892"/>
+          <boost speed="18604.121094" acceleration="9850.830078" duration="26.400000" recharge="10.000000"/>
+          <travel speed="41859.273438" acceleration="3160.025146" chargetime="6.000000"/>
+          <thruster>
+            <horizontal speed="421.326385" acceleration="1053.316040"/>
+            <vertical speed="1068.920654" acceleration="1053.316040"/>
+          </thruster>
+          <capacity crew="8" container="4120" solid="5480" liquid="510" condensate="250" ship_m="0" ship_s="0" unit="4" missile="41" countermeasure="8" deployable="54" />
+          <radar range="48000.000000" />
+        </max>
+      </statistics>
+      <theme ref="painttheme_race_ship" />
+      <internalsound engine="0.50" />
+      <modification>
+        <paint scale="1.0" />
+      </modification>
+      <threatscore default="0.5">
+        <purpose purpose="fight" value="1"/>
+      </threatscore>
+      <oldjerk>
+        <forward ramp_in="0.1" ramp_out="0.6"/>
+        <forward_boost ramp_in="0.1" ramp_out="0.6"/>
+        <forward_travel ramp_in="0.4" ramp_out="0.4"/>
+        <strafe ramp_in="0.5" ramp_out="0.5"/>
+        <angular ramp_in="0.1" ramp_out="0.1"/>
+      </oldjerk>
+      <!--<jerk>
+        <forward accel="0.1" decel="0.8" ratio="3"/>
+        <forward_boost accel="0.2" ratio="2"/>
+        <forward_travel accel="0.5" decel="0.9" ratio="3"/>
+        <strafe value="0.8" ratio="1"/>
+        <angular value="0.7" ratio="1"/>
+      </jerk>-->
+      <!-- S SWIFT -->
+      <!--<jerk>
+        <forward accel="0.2" decel="0.8" ratio="3"/>
+        <forward_boost accel="0.5" ratio="2"/>
+        <forward_travel accel="0.5" decel="0.9" ratio="3"/>
+        <strafe value="1" ratio="1"/>
+        <angular value="0.8" ratio="1"/>
+      </jerk>-->
+      <!-- S FIGHTER -->
+      <jerk>
+        <forward accel="0.8" decel="0.8" ratio="4"/>
+        <forward_boost accel="0.8" decel="0.8" ratio="3"/>
+        <forward_travel accel="0.5" decel="0.8" ratio="3"/>
+        <strafe value="1" ratio="1"/>
+        <angular value="0.7" ratio="1"/>
+      </jerk>
+      <steeringcurve>
+        <point position="0" value="1"/>
+        <point position="1" value="1"/>
+        <point position="1.6" value="0.8"/>
+        <point position="2" value="0.4"/>
+        <point position="2.6" value="0.15"/>
+        <point position="3" value="0.075"/>
+      </steeringcurve>
+    </properties>
+    <connections>
+      <connection name="con_playercontrol" tags="playercontrol" value="-1" match="all" />
+      <connection name="tradecomputer" tags="tradecomputer" value="-1" match="all" />
+    </connections>
+  </dataset>
+  <dataset class="ship_xs">
+    <properties>
+      <identification type="shiptypes_xs" />
+      <!-- deployabletimeout for mk1 laser towers -->
+      <deployable timeout="7200" />
+      <explosioneffect strength="500" />
+      <effects>
+        <explosion ref="ship_explosion_generator" />
+        <damage>
+          <effect chance="0.60" threshold="75" location="hull" ref="sparkles_xs" />
+          <effect chance="0.5"  threshold="40" location="hull" ref="surfaceexplosions_xs" />
+          <effect chance="1.0"  threshold="25" location="hull" ref="sparkles_xs" />
+          <effect chance="1.0"  threshold="15" location="hull" ref="surfaceexplosions_xs" />
+        </damage>
+      </effects>
+      <radar range="40000"/>
+      <capture allow="false" />
+      <docksize tag="dock_xs" />
+      <relation>
+        <attack>
+          <tolerance threshold="0" />
+          <boost absolute="-1.0" decay="0.02" delay="540" />
+        </attack>
+        <kill>
+          <faction change="-0.001" bonus="0.00064" />
+        </kill>
+        <police change="-0.00064" bounty="1500" />
+      </relation>
+      <wreck deceleration="5" removaltime="0"/>
+      <internalsound engine="0.50" />
+      <oldjerk>
+        <forward ramp_in="0.1" ramp_out="0.6"/>
+        <forward_boost ramp_in="0.1" ramp_out="0.6"/>
+        <forward_travel ramp_in="0.4" ramp_out="0.4"/>
+        <strafe ramp_in="0.5" ramp_out="0.5"/>
+        <angular ramp_in="0.1" ramp_out="0.1"/>
+      </oldjerk>
+      <jerk>
+        <forward accel="0.1" decel="0.8" ratio="3"/>
+        <forward_boost accel="0.2" ratio="2"/>
+        <forward_travel accel="0.5" decel="0.9" ratio="3"/>
+        <strafe value="0.8" ratio="1"/>
+        <angular value="0.7" ratio="1"/>
+      </jerk>
+      <steeringcurve>
+        <point position="0" value="1"/>
+        <point position="1" value="1"/>
+        <point position="1.6" value="0.8"/>
+        <point position="2" value="0.4"/>
+        <point position="2.6" value="0.15"/>
+        <point position="3" value="0.075"/>
+      </steeringcurve>
+    </properties>
+  </dataset>
+  <dataset class="spacesuit">
+    <properties>
+      <oxygen maxtime="30" />
+      <radar range="40000"/>
+      <capture allow="false" />
+      <docksize tag="spacesuit" />
+      <relation>
+        <attack>
+          <tolerance threshold="0" />
+          <boost absolute="-1.0" decay="0.02" delay="540" />
+        </attack>
+        <kill>
+          <faction change="-0.001" bonus="0.00064" />
+        </kill>
+        <police change="-0.00064" bounty="1500" />
+      </relation>
+      <wreck deceleration="5" />
+      <explosioneffect strength="500" />
+      <effects>
+        <explosion ref="ship_explosion_generator" />
+        <damage>
+          <effect chance="0.10" threshold="75" location="weapon" ref="sparkles_s" />
+          <effect chance="0.20" threshold="50" location="engine" ref="smoketrail_s" />
+          <effect chance="0.10" threshold="40" location="hull" ref="surfaceexplosions_s" />
+          <effect chance="0.20" threshold="25" location="engine" ref="firetrail_s" />
+          <effect chance="0.50" threshold="15" location="hull" ref="surfaceexplosions_s" />
+        </damage>
+      </effects>
+      <internalsound engine="0.75" />
+    </properties>
+  </dataset>
+  <dataset class="collectablewares">
+    <properties>
+      <explosioneffect strength="10" />
+      <effects>
+        <explosion ref="ship_explosion_generator" />
+      </effects>
+    </properties>
+  </dataset>
+  <dataset class="collectableblueprints">
+    <properties>
+      <explosioneffect strength="10" />
+      <effects>
+        <explosion ref="ship_explosion_generator" />
+      </effects>
+    </properties>
+  </dataset>
+  <dataset class="collectableammo">
+    <properties>
+      <identification icon="mapob_collectableammo" />
+    </properties>
+  </dataset>
+  <dataset class="region">
+    <connections>
+      <connection name="zones" tags="zone" match="exact" />
+      <connection name="adjacentsectors" tags="adjacentregion" />
+    </connections>
+  </dataset>
+  <dataset class="dockingbay">
+    <properties>
+      <undock launchspread="30.0"/>
+    </properties>
+    <connections>
+      <connection name="docking" tags="docking" />
+      <connection name="dock" tags="dock" />
+    </connections>
+  </dataset>
+  <dataset class="cargobay">
+    <properties>
+      <cargo single="false" />
+    </properties>
+  </dataset>
+  <dataset class="station">
+    <properties>
+      <wreck removaltime="3600"/>
+      <identification type="stationtypes" />
+      <radar range="40000"/>
+      <capture allow="true" />
+      <hull max="0" modular="true" threshold="0.05" />
+      <!--effects>
+        <surface ref="surface_sparks" />
+      </effects-->
+      <relation>
+        <attack>
+          <tolerance threshold="-1.0" change="-0.125" decay="0.25" delay="5" />
+          <boost absolute="-1.0" decay="0.02" delay="540" />
+          <faction scan="-0.0032" hack="-0.0032" />
+        </attack>
+        <kill>
+          <faction change="-0.1" bonus="0.02"/>
+        </kill>
+        <killchild>
+          <!-- Keep the same boost delay/decay values as in <attack> -->
+          <minsize size="10">
+            <faction change="-0.0005" />
+            <boost absolute="-1.0" decay="0.02" delay="540" />
+          </minsize>
+          <maxsize size="1000">
+            <faction change="-0.01" />
+            <boost absolute="-1.0" decay="0.02" delay="540" />
+          </maxsize>
+        </killchild>
+        <police change="-0.0032" scan="-0.0032" hack="-0.0032" bounty="40000" />
+      </relation>
+      <build plotsize="5000" />
+      <people capacity="100"/>
+      <threatscore default="2"/>
+    </properties>
+    <connections>
+      <!--connection name="position" tags="position" value="1" optional="1" />
+      <connection name="space" tags="station" />
+      <connection name="rendereffect" tags="rendereffect"/-->
+      <!--connection name="controlroom" tags="room  defence"/-->
+      <connection name="storage" tags="storage" match="exact" />
+      <connection name="tradenpc" tags="tradenpc" value="-1" match="all" />
+      <connection name="defencenpc" tags="defence" value="-1" match="all" />
+      <connection name="engineernpc" tags="engineer" value="-1" match="all" />
+      <connection name="shadyguy" tags="shadyguy" value="-1" match="all" />
+      <connection name="shiptradernpc" tags="shiptrader" value="-1" match="all" />
+      <connection name="tradeagent" tags="tradeagent" value="1" />
+      <connection name="trainee" tags="trainee" value="1" />
+      <connection name="region" tags="stationregion" value="1" />
+      <connection name="virtual_npc_transport" tags="npc_waypoint npctransport virtual_waypoint" />
+    </connections>
+  </dataset>
+  <dataset class="buildstorage">
+    <connections>
+      <connection name="tradenpc" tags="tradenpc" value="-1" />
+    </connections>
+  </dataset>
+  <dataset class="storage">
+    <properties>
+      <identification type="moduletypes_storage" />
+      <purpose primary="storage" />
+    </properties>
+  </dataset>
+  <dataset class="production">
+    <properties>
+      <identification type="moduletypes_production" />
+      <explosioneffect strength="20000" />
+      <explosiondamage value="1000" shield="5000" />
+      <purpose primary="production" />
+      <storage unit="10" />
+    </properties>
+  </dataset>
+  <dataset class="processingmodule">
+    <connections>
+      <connection name="processing" tags="processing" />
+    </connections>
+    <properties>
+      <identification type="moduletypes_processing" />
+      <explosioneffect strength="20000" />
+      <explosiondamage value="1000" shield="5000" />
+      <product ware="scrapmetal" amount="150" />
+      <purpose primary="processing" />
+    </properties>
+  </dataset>
+  <dataset class="habitation">
+    <properties>
+      <identification type="moduletypes_habitation" />
+      <hack hackable="false" />
+      <explosiondamage value="1000" shield="5000" />
+      <explosioneffect strength="14000" />
+      <purpose primary="habitation" />
+    </properties>
+  </dataset>
+  <dataset class="welfaremodule">
+    <properties>
+      <identification type="moduletypes_welfare" />
+      <purpose primary="welfare" />
+    </properties>
+  </dataset>
+  <dataset class="connectionmodule">
+    <properties>
+      <identification type="moduletypes_other" />
+      <purpose primary="connection" />
+    </properties>
+  </dataset>
+  <dataset class="ventureplatform">
+    <properties>
+      <identification type="moduletypes_venture" />
+      <purpose primary="venture" />
+    </properties>
+  </dataset>
+  <dataset class="defencemodule">
+    <properties>
+      <identification type="moduletypes_defence" />
+      <purpose primary="defence" />
+    </properties>
+  </dataset>
+  <dataset class="dockarea">
+    <properties>
+      <identification type="moduletypes_dock" />
+      <purpose primary="docking" />
+    </properties>
+  </dataset>
+  <dataset class="pier">
+    <properties>
+      <identification type="moduletypes_dock" />
+      <purpose primary="docking" />
+      <explosioneffect strength="20000" />
+      <explosiondamage value="1000" shield="5000" />
+    </properties>
+  </dataset>
+  <dataset class="radar">
+    <properties>
+      <identification type="moduletypes_radar" />
+      <explosiondamage value="1000" shield="5000" />
+      <explosioneffect strength="14000" />
+      <purpose primary="radar" />
+    </properties>
+  </dataset>
+  <dataset class="highway">
+    <connections>
+      <connection name="highwayscene" tags="highwayscene" value="1" match="exact" />
+      <connection name="entryjumpgate" tags="entryjumpgate" value="-1" />
+      <connection name="exitjumpgate" tags="exitjumpgate" value="1" />
+    </connections>
+    <properties>
+      <controls>
+        <linear>
+          <time min="3" max="6" />
+        </linear>
+      </controls>
+      <sounds>
+        <ambient ref="highway_edges_outside" />
+      </sounds>
+    </properties>
+  </dataset>
+  <dataset class="highwayscene">
+    <connections>
+      <connection name="highway" tags="highwayscene" value="-1" />
+      <connection name="ships" tags="ship" />
+      <connection name="bullets" tags="bullet" value="0" optional="1" />
+      <connection name="missiles" tags="missile" value="0" optional="1" />
+      <connection name="blockers" tags="blocker" />
+      <connection name="boosters" tags="booster" />
+    </connections>
+  </dataset>
+  <dataset class="highwayblocker">
+    <connections>
+      <connection name="highwayscene" tags="blocker" />
+    </connections>
+  </dataset>
+  <dataset class="highwaybooster">
+    <connections>
+      <connection name="highwayscene" tags="booster" />
+    </connections>
+  </dataset>
+  <dataset class="room">
+    <connections>
+      <connection name="entities" tags="entity"/>
+      <connection name="player" value="-1" tags="player " />
+      <connection name="TEMPHoloMapConnection" value="0" tags="holomap" />
+      <connection name="lensflares" tags="lensflare" />
+    </connections>
+  </dataset>
+  <dataset class="destructible">
+    <connections>
+      <connection name="bomb" tags="bomb" />
+      <connection name="targetpoints" tags="targetpoint" />
+      <connection name="signalleaks" tags="signalleak" />
+      <connection name="destructible" tags="destructible" />
+    </connections>
+    <properties>
+      <areadamage value="200" />
+      <explosioneffect strength="2000" />
+      <effects>
+        <!--explosion ref="surfaceexplosions_stest" /-->
+        <explosion ref="ship_explosion_generator" />
+        <damage>
+          <effect chance="0.20" threshold="75" location="weapon" ref="sparkles_s" />
+          <effect chance="0.30" threshold="40" location="hull" ref="surfaceexplosions_s" />
+          <effect chance="1.0" threshold="15" location="hull" ref="surfaceexplosions_s" />
+        </damage>
+        <areadamage>
+          <hull ref="dmgfx_cockpit_radiation_01_spacesuit" />
+          <shield ref="dmgfx_cockpit_electrostatic_01" />
+        </areadamage>
+        <collision light="light_collision_s" medium="medium_collision_s" strong="strong_collision_s" />
+        <!--commented out: sustain="ongoing_collision_s" -->
+        <shieldedsurface ref="shield_surface_impact" />
+      </effects>
+      <threatscore default="0" />
+    </properties>
+  </dataset>
+  <dataset class="controllable">
+    <connections>
+      <connection name="commander" tags="commander" value="1" />
+      <connection name="subordinates" tags="commander" value="-256" />
+      <connection name="dynamicrooms" tags="dynamicroom" />
+      <connection name="roleentities" tags="roleentity" value="0" />
+    </connections>
+  </dataset>
+  <dataset class="defensible">
+    <properties>
+      <weapongroups>
+        <primary max="4" />
+        <secondary max="4" />
+      </weapongroups>
+    </properties>
+    <connections>
+      <connection name="ejecting" tags="ejecting" value="-1" />
+      <connection name="claimedsalvage" tags="salvageclaim" value="1" />
+    </connections>
+  </dataset>
+  <dataset class="object">
+    <connections>
+      <connection name="attachments" tags="attachment" />
+      <connection name="processing" tags="processing" />
+      <connection name="towed" tags="towing" value="-1" />
+      <connection name="dismantleprocessor" tags="dismantle" value="1"/>
+      <connection name="salvageclaimants" tags="salvageclaim" value="-16" />
+    </connections>
+    <properties>
+      <effects>
+        <longrangescan ref="scfx_result_bad_01" />
+      </effects>
+      <wreck deceleration="5" removaltime="300"/>
+    </properties>
+  </dataset>
+  <dataset class="container">
+    <connections>
+      <connection name="buildingmodule" tags="construction" />
+    </connections>
+    <properties>
+      <hack hackable="true" />
+    </properties>
+  </dataset>
+  <dataset class="buildmodule">
+    <properties>
+      <identification type="moduletypes_build" />
+      <purpose primary="build" />
+    </properties>
+    <connections>
+      <connection name="buildprocessorconnection" tags="buildprocessor" />
+      <connection name="constructionvessel" tags="constructionvessel" value="-1"/>
+    </connections>
+  </dataset>
+  <dataset class="buildprocessor">
+    <connections>
+      <connection name="buildanchor" tags="construction" />
+    </connections>
+  </dataset>
+  <dataset class="dismantleprocessor">
+    <connections>
+      <connection name="dismantletarget" tags="dismantle" value="-1"/>
+    </connections>
+  </dataset>
+  <dataset class="galaxy">
+    <properties>
+      <sounds>
+        <fightmusic>
+          <entry smallfight="music_fight_old_1" bigfight="music_fight_old_4" weight="1" />
+          <entry smallfight="music_fight_old_2" bigfight="music_fight_old_5" weight="1" />
+          <entry smallfight="music_fight_old_6" bigfight="music_fight_old_3" weight="1" />
+          <entry smallfight="music_smallfight_1" bigfight="music_bigfight_1" weight="3" />
+          <entry smallfight="music_smallfight_2" bigfight="music_bigfight_2" weight="3" />
+          <entry smallfight="music_smallfight_3" bigfight="music_bigfight_3" weight="3" />
+          <entry smallfight="music_smallfight_4" bigfight="music_bigfight_4" weight="3" />
+          <entry smallfight="music_bigfight_5" bigfight="music_bigfight_5" weight="3" />
+        </fightmusic>
+      </sounds>
+    </properties>
+  </dataset>
+  <dataset class="engine">
+    <properties>
+      <identification type="enginetypes" surfaceelement="true" />
+      <hack hackable="true" />
+      <effects>
+        <boosting ref="boostfx_engine_player_01" />
+        <explosion ref="surfacemodule_explosion_generator" />
+        <sefx_damage_medium ref="surfacemodule_engine_damage_m_medium" />
+        <sefx_damage_high ref="surfacemodule_engine_damage_m_high" />
+        <sefx_damage_low ref="surfacemodule_damage_m_low" />
+      </effects>
+      <explosioneffect strength="2001" />
+      <sounds>
+        <highwayambient ref="engineambient_highway" />
+      </sounds>
+      <throttle increaserate="2.0" decreaserate="3.0" />
+      <areadamage value="200"/>
+      <boost recharge="30"/>
+      <decelerationcurve>
+        <point position="1" value="1"/>
+        <point position="1.01" value="1"/>
+        <point position="1.25" value="4"/>
+        <point position="1.75" value="6"/>
+        <point position="2.1" value="8"/>
+        <point position="2.5" value="15"/>
+      </decelerationcurve>
+      <strafecurve>
+        <point position="1" value="1"/>
+        <point position="1.01" value="1"/>
+        <point position="1.25" value="4"/>
+        <point position="1.75" value="6"/>
+        <point position="2.1" value="8"/>
+        <point position="2.5" value="15"/>
+      </strafecurve>
+    </properties>
+  </dataset>
+  <dataset class="entity">
+    <connections>
+      <connection name="parentconnection" tags="component entity" />
+      <connection name="roomposition" tags="room" value="1" optional="0" />
+      <connection name="roleobject" tags="roleentity" value="1" optional="0" />
+    </connections>
+    <properties>
+      <sounds>
+        <walking ref="footstep_player_walking_noise_01" />
+        <running ref="footstep_player_running_noise_01" />
+        <crouching ref="" />
+        <walkstep ref="footstep_player_walking_01" />
+        <runstep ref="footstep_player_walking_01" />
+        <crouchstep ref="footstep_player_crouching_01" />
+        <jump ref="footstep_player_jump_01" />
+        <fallstep ref="footstep_player_fallslow_01" />
+        <heavyfallstep ref="footstep_player_fallfast_01" />
+        <tocrouch ref="footstep_player_tocrouch_01" />
+        <fromcrouch ref="footstep_player_fromcrouch_01" />
+      </sounds>
+      <state known="true" />
+    </properties>
+  </dataset>
+  <dataset class="player">
+    <connections>
+      <connection name="roomposition" tags="room" value="1" optional="0" />
+    </connections>
+  </dataset>
+  <dataset class="nonplayer">
+    <connections>
+      <connection name="commandslot" tags="defence pilot tradenpc engineer shadyguy shiptrader tradecomputer tradeagent trainee" value="1" optional="0" />
+    </connections>
+  </dataset>
+  <dataset class="npc">
+    <connections>
+      <connection name="roomtarget" tags="npc_waypoint" value="0" optional="0" />
+      <connection name="currentchair" tags="chair" value="0" optional="0" />
+      <connection name="tempconn" tags="player" value="1" />
+      <connection name="diplomacyship" tags="diplomacyship" value="-1"/>
+    </connections>
+  </dataset>
+  <dataset class="computer">
+    <properties>
+      <identification commable="false" />
+    </properties>
+  </dataset>
+  <dataset class="bullet">
+    <properties>
+      <weapon system="weapon_standard" />
+      <bullet icon="default_bullet_icon" mass="0.01" />
+    </properties>
+  </dataset>
+  <dataset class="explosive">
+    <properties>
+      <weapon system="missile_dumbfire" />
+      <missile selfdestruct="true" />
+    </properties>
+  </dataset>
+  <dataset class="anomaly">
+    <properties>
+      <force range="2000" strength="100000000" pow="2" />
+    </properties>
+    <connections>
+      <connection name="origin" tags="origin" />
+      <connection name="destination" tags="destination" />
+    </connections>
+  </dataset>
+  <dataset class="gate">
+    <connections>
+      <connection name="waiting" tags="waiting" />
+      <connection name="highwayentry" tags="entryjumpgate" value="1" />
+      <connection name="highwayexit" tags="exitjumpgate" value="-1" />
+    </connections>
+  </dataset>
+  <dataset class="highwayentrygate">
+    <connections>
+      <connection name="waiting" tags="waiting" />
+    </connections>
+  </dataset>
+  <dataset class="weapon">
+    <properties>
+      <identification type="weapons_lasers" />
+      <weapon primary="true" />
+      <hack hackable="true" />
+      <effects>
+        <activation ref="activate_wpn_gen" />
+        <deactivation ref="deactivate_wpn_gen" />
+      </effects>
+    </properties>
+  </dataset>
+  <dataset class="missilelauncher">
+    <properties>
+      <identification type="weapons_missilelaunchers" />
+      <weapon primary="false" />
+    </properties>
+  </dataset>
+  <dataset class="missileturret">
+    <properties>
+      <identification type="weapons_missileturrets" />
+      <weapon primary="false" />
+    </properties>
+  </dataset>
+  <dataset class="bomblauncher">
+    <properties>
+      <weapon primary="true" />
+    </properties>
+  </dataset>
+  <dataset class="bomb">
+    <properties>
+      <identification type="bombs" />
+    </properties>
+  </dataset>
+  <dataset class="missile">
+    <properties>
+      <identification type="missiletypes" />
+    </properties>
+  </dataset>
+  <dataset class="module">
+    <properties>
+      <hack hackable="true" />
+      <explosioneffect strength="19000" />
+      <wreck hazardtime="450"/>
+      <effects>
+        <sefx_red_alert ref="effect_gen_l_alarmred_01" />
+        <sefx_yellow_alert ref="effect_gen_l_alarmyellow_01" />
+        <explosion ref="ship_explosion_generator" />
+        <damage>
+          <effect chance="0.25" threshold="75" location="hull" ref="sparkles_l" />
+          <effect chance="0.5" threshold="70" location="hull" ref="ref_surfaceexplosion_xl_01" />
+          <effect chance="0.25" threshold="65" location="hull" ref="ref_smoke_light_xl_01" />
+          <effect chance="0.5" threshold="60" location="hull" ref="ref_smoke_light_xl_01" />
+          <effect chance="1.0" threshold="55" location="hull" ref="ref_smoke_light_xl_01" />
+          <effect chance="0.5" threshold="50" location="hull" ref="ref_smoke_xl_01" />
+          <effect chance="1.0" threshold="50" location="hull" ref="ref_surfaceexplosion_xl_01" />
+          <effect chance="0.5" threshold="45" location="hull" ref="ref_fire_xl_01" />
+          <effect chance="1.0" threshold="40" location="hull" ref="ref_smoke_xl_01" />
+          <effect chance="0.75" threshold="40" location="hull" ref="ref_surfaceexplosion_xl_01" />
+          <effect chance="0.75" threshold="35" location="hull" ref="ref_fire_xl_01" />
+          <effect chance="1.0" threshold="35" location="hull" ref="ref_smoke_light_xl_01" />
+          <effect chance="0.75" threshold="30" location="hull" ref="ref_smoke_xl_01" />
+          <effect chance="1.0" threshold="30" location="hull" ref="ref_surfaceexplosion_xl_01" />
+          <effect chance="1.0" threshold="25" location="hull" ref="ref_fire_xl_01" />
+          <effect chance="0.5" threshold="25" location="hull" ref="ref_surfaceexplosion_xl_01" />
+          <effect chance="0.75" threshold="20" location="hull" ref="ref_fire_xl_01" />
+          <effect chance="1.0" threshold="20" location="hull" ref="ref_smoke_xl_01" />
+          <effect chance="0.75" threshold="15" location="hull" ref="ref_fire_xl_01" />
+          <effect chance="1.0" threshold="10" location="hull" ref="ref_fire_xl_01" />
+          <effect chance="1.0" threshold="10" location="hull" ref="ref_surfaceexplosion_xl_01" />
+          <effect chance="1.0" threshold="5" location="hull" ref="ref_fire_xl_01" />
+          <effect chance="1.0" threshold="5" location="hull" ref="ref_surfaceexplosion_xl_01" />
+        </damage>
+        <sefx_damage_low ref="ref_ship_persistentdamage_xl_low" />
+        <sefx_damage_medium ref="ref_ship_persistentdamage_xl_medium" />
+        <sefx_damage_high ref="ref_ship_persistentdamage_xl_high" />
+      </effects>
+      <threatscore default="1">
+        <purpose purpose="defence" value="3"/>
+      </threatscore>
+    </properties>
+  </dataset>
+  <dataset class="forceemitter">
+    <properties>
+      <wrapper macro="forceemitterobject_macro" />
+    </properties>
+  </dataset>
+  <dataset class="datavault">
+    <properties>
+      <identification datavault="1" icon="mapob_vault_closed" partiallyunlockedicon="mapob_vault_partial" unlockedicon="mapob_vault_completed" />
+    </properties>
+  </dataset>
+</defaults>
