@@ -627,13 +627,15 @@ def main():
     ref_files = set(macro_path_map[ref] for ref in ship_connection_refs if ref in macro_path_map)
 
     for src_file in ref_files:
-        if not os.path.exists(src_file):
+        # 使用 resolve_sources 解析文件路径（与 export_ids_to_file 一致）
+        actual_file = resolve_sources(src_file)
+        if not actual_file:
             # 找出哪些 id 指向这个不存在的文件
             missing_ids = [ref for ref in ship_connection_refs if macro_path_map.get(ref) == src_file]
             print(f"   ⚠️ 文件不存在: {src_file}, 缺失 ID: {missing_ids}")
             continue
         try:
-            tree = etree.parse(src_file, parser)
+            tree = etree.parse(actual_file, parser)
             root = tree.getroot()
             for macro in root.findall('macro'):
                 if macro.get('class') == 'dockarea':
@@ -646,7 +648,7 @@ def main():
                                 if ref:
                                     dockarea_connection_refs.add(ref)
         except Exception as e:
-            print(f"   ⚠️ 读取 {src_file} 失败: {e}")
+            print(f"   ⚠️ 读取 {actual_file} 失败: {e}")
 
     print(f"   🎯 从 dockarea macros 识别到 {len(dockarea_connection_refs)} 个 connection 引用。")
 
