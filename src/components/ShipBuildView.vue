@@ -167,7 +167,7 @@ const applyGroupAssignment = (payload: { groupKey: string; equipmentId: string |
       />
     </div>
 
-    <div v-if="selectedShip" class="grid grid-cols-12 gap-8" data-testid="ship-build-panels">
+    <div v-if="selectedShip" class="grid grid-cols-12 gap-8 items-start" data-testid="ship-build-panels">
       <ShipBuildPanelFit
         :mode="fitMode"
         :can-switch-to-group="canSwitchToGroupMode"
