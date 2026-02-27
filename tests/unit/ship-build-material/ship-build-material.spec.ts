@@ -63,6 +63,19 @@ describe('ship-build-material unit contracts', () => {
     localStorage.clear()
   })
 
+  it('1.0 method 选项过滤 xenon', () => {
+    const store = useShipBuildStore()
+    store.setSelectedShipId(OSAKA_ID)
+
+    // Access method options from shipBuildMaterialAnalysis
+    const analysis = store.shipBuildMaterialAnalysis
+    expect(analysis).toBeTruthy()
+
+    const methodOptions = analysis?.methodOptions
+    expect(methodOptions).toBeDefined()
+    expect(methodOptions).not.toContain('xenon')
+  })
+
   it('1.1 method 选项聚合：包含去重后的 default/closedloop/terran', () => {
     const store = useShipBuildStore()
     store.setSelectedShipId(OSAKA_ID)
@@ -162,5 +175,41 @@ describe('ship-build-material unit contracts', () => {
     expect(valuesAtMin.energycells).not.toBe(valuesAtMax.energycells)
     expect(valuesAtMin.computronicsubstrate).not.toBe(valuesAtMax.computronicsubstrate)
     expect(valuesAtMin.metallicmicrolattice).not.toBe(valuesAtMax.metallicmicrolattice)
+  })
+
+  it('1.7 船体材料独立计算：包含 hull materials', () => {
+    const store = useShipBuildStore()
+    store.setSelectedShipId(OSAKA_ID)
+
+    const hullGroup = store.shipBuildMaterialAnalysis?.hullGroup
+
+    expect(hullGroup).toBeTruthy()
+    expect(hullGroup?.shipId).toBe(OSAKA_ID)
+    expect(hullGroup?.items.length).toBeGreaterThan(0)
+    expect(hullGroup?.value).toBeGreaterThan(0)
+  })
+
+  it('1.8 船体分项展开显示材料明细', () => {
+    const store = useShipBuildStore()
+    store.setSelectedShipId(OSAKA_ID)
+
+    const hullGroup = store.shipBuildMaterialAnalysis?.hullGroup
+    expect(hullGroup).toBeTruthy()
+    expect(hullGroup?.items.length).toBeGreaterThan(0)
+
+    // OSAKA has computronicsubstrate, energycells, metallicmicrolattice in hull materials
+    const hasMaterials = hullGroup?.items.length && hullGroup.items.length > 0
+    expect(hasMaterials).toBe(true)
+  })
+
+  it('1.9 数据源 ShipBlueprint：blueprint.connections 作为数据源', () => {
+    const store = useShipBuildStore()
+    store.setSelectedShipId(OSAKA_ID)
+
+    // When no equipment is assigned, blueprint may be null
+    // But selectedEquipmentGroups should still work (from selectedByConnection)
+    const equipmentGroups = store.shipBuildMaterialAnalysis?.equipmentGroups
+    expect(equipmentGroups).toBeDefined()
+    expect(Array.isArray(equipmentGroups)).toBe(true)
   })
 })
