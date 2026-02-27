@@ -70,3 +70,5 @@ backupspecs
 # Playwright 测试报告和结果
 playwright-report/
 test-results/
+
+server-*.log
