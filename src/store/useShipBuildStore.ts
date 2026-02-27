@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import type { ConnectionValue, EquipmentType, ShipBlueprint, ShipBlueprintConnection, ShipEquipmentSize, X4Equipment, X4EquipmentType, X4Ship, X4Ware } from '@/types/x4'
 import type { FitConnectionRow, FitGroupRow, FitMode } from '@/components/ship-build/fitTypes'
-import { getPriceByMultiplier } from '@/store/logic/calculatorUtils'
 import shipsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ships.json'
 import equipmentsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
 import equipmentTypesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipment_types.json'
@@ -84,8 +83,6 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
   const selectedByConnection = ref<Record<string, string | null>>({})
   const mockTagPatch = ref<ShipBuildMockTagPatch | null>(null)
-  const materialMethod = ref('default')
-  const materialPriceMultiplier = ref(0.5)
   const translateEquipmentFn = ref<(equipment: X4Equipment) => string>((equipment) => equipment.name || equipment.id)
   const translateEquipmentTypeFn = ref<(type: X4EquipmentType) => string>((type) => type.name || type.id)
   const equipmentTypeMap = new Map<EquipmentType, X4EquipmentType>()
@@ -246,10 +243,16 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     const connection = findOrCreateConnection(slotType)
     let groupData = findGroup(connection, groupName)
 
-    // Ensure group exists
+    // Create group if it doesn't exist (similar to setEquipment)
     if (!groupData && equipmentId !== null) {
-      // Need to find existing equipment first, or this is a new group
-      // For shield, we assume the main equipment is already set
+      // Create a new group with the shield - main equipment can be added later
+      // Required fields: group, equipment_id, count
+      connection.group.push({
+        group: groupName,
+        equipment_id: '', // Placeholder - main equipment not set yet
+        count: 0, // Placeholder - will be updated when main equipment is set
+        shield: { equipment_id: equipmentId, count }
+      })
       return
     }
 
@@ -458,6 +461,15 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     if (shipId === null) {
       blueprint.value = null
       lastSavedSnapshot.value = null
+    } else {
+      // Create blueprint immediately when ship is selected
+      blueprint.value = {
+        id: '',
+        name: '',
+        shipId: shipId,
+        connections: [],
+        lastUpdated: Date.now()
+      }
     }
     selectedShipId.value = shipId
     selectedByConnection.value = {}
@@ -543,14 +555,6 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
   const setStatsViewMode = (mode: ShipBuildStatsViewMode) => {
     statsViewMode.value = mode
-  }
-
-  const setMaterialMethod = (method: string) => {
-    materialMethod.value = method
-  }
-
-  const setMaterialPriceMultiplier = (multiplier: number) => {
-    materialPriceMultiplier.value = Math.max(0, Math.min(1, multiplier))
   }
 
   const setMockTagPatch = (patch: ShipBuildMockTagPatch | null) => {
@@ -750,154 +754,6 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
   const canSwitchToGroupMode = computed(() => !hasFitModeConflict.value)
 
-  const selectedEquipmentGroups = computed(() => {
-    const grouped = new Map<string, { equipment: X4Equipment; quantity: number }>()
-    connectionRows.value.forEach((row) => {
-      const equipmentId = selectedByConnection.value[row.connectionKey]
-      if (!equipmentId) return
-      const equipment = equipmentMap.get(equipmentId)
-      if (!equipment) return
-      const existing = grouped.get(equipmentId)
-      if (existing) {
-        existing.quantity += row.count
-      } else {
-        grouped.set(equipmentId, {
-          equipment,
-          quantity: row.count
-        })
-      }
-    })
-    return Array.from(grouped.values())
-  })
-
-  const materialMethodOptions = computed(() => {
-    const options: string[] = []
-    const optionSet = new Set<string>()
-    selectedShip.value?.production.forEach((item) => {
-      if (optionSet.has(item.method)) return
-      if (item.method === 'xenon') return // Filter out xenon
-      optionSet.add(item.method)
-      options.push(item.method)
-    })
-    selectedEquipmentGroups.value.forEach(({ equipment }) => {
-      Object.keys(equipment.cost || {}).forEach((method) => {
-        if (optionSet.has(method)) return
-        if (method === 'xenon') return // Filter out xenon
-        optionSet.add(method)
-        options.push(method)
-      })
-    })
-    if (options.length === 0) {
-      options.push('default')
-    }
-    return options
-  })
-
-  watch(materialMethodOptions, (options) => {
-    if (options.includes(materialMethod.value)) return
-    if (options.includes('default')) {
-      materialMethod.value = 'default'
-      return
-    }
-    materialMethod.value = options[0] || 'default'
-  }, { immediate: true })
-
-  const resolveCostByMethod = (
-    source: Record<string, Partial<Record<string, number>>> | undefined,
-    method: string
-  ): Partial<Record<string, number>> => {
-    if (!source) return {}
-    return source[method] || source.default || {}
-  }
-
-  const resolveShipCostByMethod = (ship: X4Ship, method: string): Record<string, number> => {
-    const target = ship.production.find((item) => item.method === method)
-      || ship.production.find((item) => item.method === 'default')
-    return target?.cost || {}
-  }
-
-  const mapCostToMaterialItems = (
-    cost: Partial<Record<string, number>>,
-    quantity = 1
-  ): ShipBuildMaterialItem[] => {
-    return Object.entries(cost)
-      .map(([wareId, rawCount]) => {
-        const count = (rawCount || 0) * quantity
-        const ware = waresMap.get(wareId)
-        const unitPrice = ware ? getPriceByMultiplier(ware, materialPriceMultiplier.value) : 0
-        return {
-          wareId,
-          count,
-          value: count * unitPrice
-        }
-      })
-      .filter((item) => item.count > 0)
-      .sort((a, b) => b.value - a.value)
-  }
-
-  const shipMaterialGroup = computed<ShipBuildMaterialShipGroup | null>(() => {
-    if (!selectedShip.value) return null
-    const shipCost = resolveShipCostByMethod(selectedShip.value, materialMethod.value)
-    const items = mapCostToMaterialItems(shipCost)
-    return {
-      shipId: selectedShip.value.id,
-      value: items.reduce((sum, item) => sum + item.value, 0),
-      items
-    }
-  })
-
-
-  const equipmentMaterialGroups = computed<ShipBuildMaterialEquipmentGroup[]>(() => {
-    const groups = selectedEquipmentGroups.value.map(({ equipment, quantity }) => {
-      const equipmentCost = resolveCostByMethod(equipment.cost, materialMethod.value)
-      const items = mapCostToMaterialItems(equipmentCost, quantity)
-      return {
-        equipmentId: equipment.id,
-        equipmentName: translateEquipmentFn.value(equipment),
-        quantity,
-        value: items.reduce((sum, item) => sum + item.value, 0),
-        items
-      }
-    })
-    return groups.sort((a, b) => a.equipmentName.localeCompare(b.equipmentName))
-  })
-
-  const materialSummaryItems = computed<ShipBuildMaterialItem[]>(() => {
-    const grouped = new Map<string, ShipBuildMaterialItem>()
-    const mergeItems = (items: ShipBuildMaterialItem[]) => {
-      items.forEach((item) => {
-        const existing = grouped.get(item.wareId)
-        if (existing) {
-          existing.count += item.count
-          existing.value += item.value
-        } else {
-          grouped.set(item.wareId, { ...item })
-        }
-      })
-    }
-
-    // Merge ship production cost
-    if (shipMaterialGroup.value) {
-      mergeItems(shipMaterialGroup.value.items)
-    }
-    // Merge equipment materials
-    equipmentMaterialGroups.value.forEach((group) => mergeItems(group.items))
-    return Array.from(grouped.values()).sort((a, b) => b.value - a.value)
-  })
-
-  const shipBuildMaterialAnalysis = computed<ShipBuildMaterialAnalysis>(() => {
-    const totalValue = materialSummaryItems.value.reduce((sum, item) => sum + item.value, 0)
-    return {
-      methodOptions: materialMethodOptions.value,
-      selectedMethod: materialMethod.value,
-      priceMultiplier: materialPriceMultiplier.value,
-      totalValue,
-      summaryItems: materialSummaryItems.value,
-      shipGroup: shipMaterialGroup.value,
-      equipmentGroups: equipmentMaterialGroups.value
-    }
-  })
-
   // Reset all filters and blueprint (for New action)
   const resetAll = () => {
     blueprint.value = null
@@ -924,14 +780,11 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     fitMode,
     selectedByConnection,
     mockTagPatch,
-    materialMethod,
-    materialPriceMultiplier,
     selectedShip,
     connectionRows,
     groupRows,
     hasFitModeConflict,
     canSwitchToGroupMode,
-    shipBuildMaterialAnalysis,
     // Blueprint persistence
     blueprint,
     savedBlueprints,
@@ -956,8 +809,6 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     applyConnectionAssignment,
     applyGroupAssignment,
     setStatsViewMode,
-    setMaterialMethod,
-    setMaterialPriceMultiplier,
     setMockTagPatch,
     setDisplayResolvers
   }

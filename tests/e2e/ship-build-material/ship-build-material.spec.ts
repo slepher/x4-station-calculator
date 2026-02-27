@@ -48,7 +48,7 @@ const selectDaitachiShip = async (page: Page) => {
   await expect(page.getByTestId('ship-build-panel-fit')).toBeVisible()
 }
 
-const switchToSlotTab = async (page: Page, label: 'E' | 'S' | 'W' | 'T') => {
+const switchToSlotTab = async (page: Page, label: 'E' | 'S' | 'W' | 'T' | 'R') => {
   const slotTypeBtn = page.locator('.left-rail .slot-type-btn').filter({ hasText: new RegExp(`^${label}$`) }).first()
   await expect(slotTypeBtn).toBeVisible()
   await slotTypeBtn.click()
@@ -119,11 +119,12 @@ const setPriceSlider = async (page: Page, value: number) => {
   const rangeInput = slider.locator('input[type="range"]').first()
   await expect(rangeInput).toBeVisible()
   // Use evaluate to set value directly for range inputs
-  await rangeInput.evaluate((el: HTMLInputElement) => {
-    el.value = String(value / 100)
+  const normalizedValue = value / 100
+  await rangeInput.evaluate((el: HTMLInputElement, v: number) => {
+    el.value = String(v)
     el.dispatchEvent(new Event('input', { bubbles: true }))
     el.dispatchEvent(new Event('change', { bubbles: true }))
-  })
+  }, normalizedValue)
 }
 
 const buildStateMultiModule = async (page: Page) => {
@@ -144,6 +145,37 @@ const buildStateMultiModule = async (page: Page) => {
 test.describe('ship-build-material', () => {
   test('2.1.1 验证：method 下拉不包含 xenon 选项', async ({ page }) => {
     await buildStateMethodAggregation(page)
+    const methodSelect = page.getByTestId('ship-build-material-method-select')
+    await expect(methodSelect).toBeVisible()
+    await methodSelect.click()
+    const options = await methodSelect.locator('option').allTextContents()
+    expect(options.map(o => o.trim().toLowerCase())).not.toContain('xenon')
+    await page.keyboard.press('Escape')
+  })
+
+  // 4.1.2 验证：各类型飞船选择推进器后均过滤 xenon
+  test('4.1.2 验证：各类型飞船选择推进器后均过滤 xenon', async ({ page }) => {
+    // 测试 Terran 飞船
+    await openShipBuild(page)
+    const changeShip = page.getByRole('button', { name: /Change Ship|更换飞船/ })
+    if (await changeShip.isVisible().catch(() => false)) {
+      await changeShip.click()
+    }
+    await page.getByTestId('ship-build-filter-class').getByRole('button', { name: 'L', exact: true }).click()
+    await page.getByTestId('ship-build-filter-race').getByRole('button', { name: /terran/i }).click()
+    const terranShip = page.locator('.list-item').filter({ hasText: /Osaka|大阪/ }).first()
+    await expect(terranShip).toBeVisible()
+    await terranShip.click()
+    await expect(page.getByTestId('ship-build-panel-fit')).toBeVisible()
+
+    // 选择推进器 (R槽)
+    await switchToSlotTab(page, 'R')
+    await assignFirstEquipment(page)
+
+    // 等待数据更新
+    await page.waitForTimeout(500)
+
+    // 检查 method 下拉
     const methodSelect = page.getByTestId('ship-build-material-method-select')
     await expect(methodSelect).toBeVisible()
     await methodSelect.click()
@@ -403,6 +435,8 @@ test.describe('ship-build-material', () => {
 
   test('3.8 场景：飞船材料计入总材料', async ({ page }) => {
     await selectOsakaShip(page)
+    // 等待材料面板加载完成
+    await expect(page.getByTestId('ship-build-materials-panel')).toBeVisible()
     const summary = page.getByTestId('ship-build-material-summary')
     await expect(summary).toBeVisible()
     await expand(summary)
@@ -412,6 +446,8 @@ test.describe('ship-build-material', () => {
 
   test('3.9 场景：飞船作为独立分项显示', async ({ page }) => {
     await selectOsakaShip(page)
+    // 等待材料面板加载完成
+    await expect(page.getByTestId('ship-build-materials-panel')).toBeVisible()
     const shipGroup = page.getByTestId('ship-build-material-ship-group')
     await expect(shipGroup).toBeVisible()
     await expand(shipGroup)
@@ -434,5 +470,207 @@ test.describe('ship-build-material', () => {
     await buildStateStandardOsaka(page)
     const summaryAfterReload = await page.getByTestId('ship-build-material-summary').textContent()
     expect(summary).toBe(summaryAfterReload)
+  })
+
+  // ========== BUG-003: 槽位附带护盾统计验证 ==========
+
+  // 大阪飞船 turret 槽位分析:
+  // - 部分炮塔组有附带护盾定义 (connection.shield 存在)
+  // - group_front_mid_mid: shield.size=medium, shield.count=2
+  // - group_up_mid_mid: shield.size=medium, shield.count=2
+  // - 需要在选择炮塔后才显示附带护盾选项 (relatedShieldConnectionRows)
+
+  test('4.3.1 验证：turret 槽位护盾材料统计', async ({ page }) => {
+    await selectOsakaShip(page)
+
+    // 切换到 turret 槽位
+    await switchToSlotTab(page, 'T')
+
+    // 等待 group tabs 加载
+    await page.waitForSelector('.group-tabs .group-tab')
+    const groupTabs = page.locator('.group-tabs .group-tab')
+    const groupCount = await groupTabs.count()
+
+    let foundShieldWithEquipment = false
+
+    for (let i = 0; i < groupCount; i++) {
+      const tab = groupTabs.nth(i)
+      const tabLabel = await tab.textContent()
+      console.log(`Testing group ${i}: ${tabLabel}`)
+
+      await tab.click()
+      await page.waitForTimeout(200) // 等待 UI 更新
+
+      // 检查是否有装备选项
+      const optionCards = page.locator('.option-wall .option-card')
+      const optionCount = await optionCards.count()
+      console.log(`  Found ${optionCount} options`)
+
+      if (optionCount > 0) {
+        await optionCards.first().click()
+        await page.waitForTimeout(300) // 等待 relatedShieldConnectionRows 渲染
+
+        // 检查是否出现护盾选项 (relatedShieldConnectionRows)
+        // 这是炮塔附带的护盾，不是独立的 shield 槽位
+        const wallSections = page.locator('.option-wall .wall-section')
+        const sectionCount = await wallSections.count()
+        console.log(`  After selecting equipment, found ${sectionCount} wall sections`)
+
+        for (let s = 0; s < sectionCount; s++) {
+          const section = wallSections.nth(s)
+          const sectionText = await section.textContent()
+          console.log(`  Section ${s}: ${sectionText?.substring(0, 50)}`)
+
+          if (sectionText?.toLowerCase().includes('shield')) {
+            console.log('  -> Found shield section!')
+            const shieldOption = section.locator('.option-card').first()
+            if (await shieldOption.isVisible().catch(() => false)) {
+              const shieldText = await shieldOption.textContent()
+              console.log(`  Shield option: ${shieldText}`)
+              const shieldIdMatch = shieldText?.match(/shield_[\w_]+/)
+
+              // 找到护盾选项，直接点击选择
+              // UI显示名称是 "ARG M Shield Generator Mk1"，不是 shield_xxx 格式
+              console.log(`  Selecting shield option`)
+
+              // 检查当前 shield 区域的选择状态
+              const shieldSectionText = await section.textContent()
+              console.log(`  Shield section text before click: ${shieldSectionText}`)
+
+              await shieldOption.click()
+              await page.waitForTimeout(2000) // 等待 store 更新和 UI 重渲染
+
+              // 检查选择后的状态
+              const shieldSectionTextAfter = await section.textContent()
+              console.log(`  Shield section text after click: ${shieldSectionTextAfter}`)
+
+              // 验证材料面板中存在护盾分项
+              await expect(page.getByTestId('ship-build-materials-panel')).toBeVisible()
+
+              // 等待足够长让 store 更新并触发重渲染
+              await page.waitForTimeout(2000)
+
+              // 查找材料面板中所有分项
+              const allGroups = page.locator('[data-testid^="ship-build-material-equipment-group-"]')
+              const groupCount = await allGroups.count()
+              console.log(`  Found ${groupCount} equipment groups in materials`)
+
+              // 打印所有分项的详细信息
+              for (let g = 0; g < groupCount; g++) {
+                const group = allGroups.nth(g)
+                const testId = await group.getAttribute('data-testid')
+                const text = await group.textContent()
+                console.log(`  Group ${g}: ${testId} -> ${text?.substring(0, 80)}`)
+              }
+
+              // 特别检查是否有 shield 开头的 testid
+              const shieldGroups = page.locator('[data-testid^="ship-build-material-equipment-group-shield"]')
+              const shieldCount = await shieldGroups.count()
+              console.log(`  Shield groups count: ${shieldCount}`)
+
+              let foundShieldGroup = false
+              for (let g = 0; g < groupCount; g++) {
+                const group = allGroups.nth(g)
+                const groupText = await group.textContent()
+                console.log(`  Group ${g}: ${groupText?.substring(0, 50)}`)
+
+                if (groupText?.toLowerCase().includes('shield')) {
+                  foundShieldGroup = true
+
+                  // 展开护盾分项，验证材料明细
+                  await group.click()
+                  await page.waitForTimeout(200)
+
+                  // 找到对应的材料列表
+                  const groupTestId = await group.getAttribute('data-testid')
+                  const equipmentId = groupTestId?.replace('ship-build-material-equipment-group-', '')
+                  console.log(`  Equipment ID: ${equipmentId}`)
+
+                  const shieldList = page.getByTestId(`ship-build-material-equipment-list-${equipmentId}`)
+                  await expect(shieldList).toBeVisible()
+                  const shieldListText = await shieldList.textContent()
+                  console.log(`  Shield list text: ${shieldListText?.substring(0, 100)}`)
+                  expect(shieldListText).toMatch(/Field Coils|Shield Components|Energy Cells/i)
+
+                  foundShieldWithEquipment = true
+                  break
+                }
+              }
+
+              expect(foundShieldGroup).toBe(true)
+
+              if (foundShieldWithEquipment) break
+            }
+          }
+        }
+
+        if (foundShieldWithEquipment) break
+
+        // 按 Escape 取消当前选择，继续下一个 group
+        await page.keyboard.press('Escape')
+        await page.waitForTimeout(100)
+      }
+    }
+
+    // 必须找到护盾选项，否则测试失败
+    expect(foundShieldWithEquipment).toBe(true)
+  })
+
+  // 4.3.2 测试与 4.3.1 相同逻辑，验证多次选择不同组的护盾
+  // 由于大阪只有 turret 槽位有附带护盾，此测试复用 4.3.1 的验证逻辑
+  test('4.3.2 验证：多种槽位类型附带护盾', async ({ page }) => {
+    await selectOsakaShip(page)
+
+    // 切换到 turret 槽位
+    await switchToSlotTab(page, 'T')
+
+    // 等待 group tabs 加载
+    await page.waitForSelector('.group-tabs .group-tab')
+    const groupTabs = page.locator('.group-tabs .group-tab')
+    const groupCount = await groupTabs.count()
+
+    let foundShieldWithEquipment = false
+
+    // 遍历所有 group，寻找有附带护盾的 group
+    for (let i = 0; i < groupCount; i++) {
+      const tab = groupTabs.nth(i)
+      await tab.click()
+      await page.waitForTimeout(200)
+
+      const optionCards = page.locator('.option-wall .option-card')
+      if (await optionCards.first().isVisible().catch(() => false)) {
+        await optionCards.first().click()
+        await page.waitForTimeout(300)
+
+        // 找到护盾区域
+        const shieldSection = page.locator('.option-wall .wall-section').filter({ hasText: /shield/i })
+        const shieldVisible = await shieldSection.isVisible().catch(() => false)
+
+        if (shieldVisible) {
+          const shieldOption = shieldSection.locator('.option-card').first()
+          if (await shieldOption.isVisible().catch(() => false)) {
+            await shieldOption.click()
+            await page.waitForTimeout(2000)
+
+            // 验证材料面板
+            await expect(page.getByTestId('ship-build-materials-panel')).toBeVisible()
+
+            // 查找护盾分项
+            const shieldGroups = page.locator('[data-testid^="ship-build-material-equipment-group-shield"]')
+            const shieldCount = await shieldGroups.count()
+
+            if (shieldCount > 0) {
+              foundShieldWithEquipment = true
+              break
+            }
+          }
+        }
+
+        await page.keyboard.press('Escape')
+        await page.waitForTimeout(100)
+      }
+    }
+
+    expect(foundShieldWithEquipment).toBe(true)
   })
 })

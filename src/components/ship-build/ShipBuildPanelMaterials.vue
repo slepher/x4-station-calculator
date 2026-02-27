@@ -19,7 +19,7 @@ const store = useShipBuildStore()
 
 // ============ 内部状态 ============
 const materialMethod = ref('default')
-const materialPriceMultiplier = ref(1)
+const materialPriceMultiplier = ref(0.5)
 
 // ============ Store 数据映射 ============
 const wareMap = computed(() => {
@@ -66,6 +66,12 @@ const resolveCostByMethod = (
   return source[method] || source.default || {}
 }
 
+const resolveShipCostByMethod = (ship: X4Ship, method: string): Record<string, number> => {
+  const target = ship.production.find((item) => item.method === method)
+    || ship.production.find((item) => item.method === 'default')
+  return target?.cost || {}
+}
+
 const mapCostToMaterialItems = (
   cost: Partial<Record<string, number>>,
   quantity = 1
@@ -93,6 +99,7 @@ const materialMethodOptions = computed(() => {
   // 从 ship production 获取方法
   selectedShip.value?.production.forEach((item) => {
     if (optionSet.has(item.method)) return
+    if (item.method === 'xenon') return // Filter out xenon
     optionSet.add(item.method)
     options.push(item.method)
   })
@@ -100,14 +107,30 @@ const materialMethodOptions = computed(() => {
   // 从 blueprint.connections 中的 equipment 获取方法
   props.shipBlueprint?.connections.forEach((conn) => {
     conn.group.forEach((g) => {
-      if (!g.equipment_id) return
-      const equipment = equipmentMap.value.get(g.equipment_id)
-      if (!equipment) return
-      Object.keys(equipment.cost || {}).forEach((method) => {
-        if (optionSet.has(method)) return
-        optionSet.add(method)
-        options.push(method)
-      })
+      // 主装备
+      if (g.equipment_id) {
+        const equipment = equipmentMap.value.get(g.equipment_id)
+        if (equipment) {
+          Object.keys(equipment.cost || {}).forEach((method) => {
+            if (optionSet.has(method)) return
+            if (method === 'xenon') return // Filter out xenon
+            optionSet.add(method)
+            options.push(method)
+          })
+        }
+      }
+      // 附带护盾
+      if (g.shield && g.shield.equipment_id) {
+        const shieldEquipment = equipmentMap.value.get(g.shield.equipment_id)
+        if (shieldEquipment) {
+          Object.keys(shieldEquipment.cost || {}).forEach((method) => {
+            if (optionSet.has(method)) return
+            if (method === 'xenon') return // Filter out xenon
+            optionSet.add(method)
+            options.push(method)
+          })
+        }
+      }
     })
   })
 
@@ -123,8 +146,14 @@ if (materialMethodOptions.value.length > 0 && !materialMethodOptions.value.inclu
 }
 
 const shipMaterialGroup = computed(() => {
-  // Use ship production cost from store (with method fallback)
-  return useShipBuildStore().shipBuildMaterialAnalysis?.shipGroup || null
+  if (!selectedShip.value) return null
+  const shipCost = resolveShipCostByMethod(selectedShip.value, materialMethod.value)
+  const items = mapCostToMaterialItems(shipCost)
+  return {
+    shipId: selectedShip.value.id,
+    value: items.reduce((sum, item) => sum + item.value, 0),
+    items
+  }
 })
 
 const equipmentMaterialGroups = computed(() => {
@@ -134,18 +163,36 @@ const equipmentMaterialGroups = computed(() => {
 
   props.shipBlueprint.connections.forEach((conn) => {
     conn.group.forEach((g) => {
-      if (!g.equipment_id) return
-      const equipment = equipmentMap.value.get(g.equipment_id)
-      if (!equipment) return
+      // Handle main equipment
+      if (g.equipment_id) {
+        const equipment = equipmentMap.value.get(g.equipment_id)
+        if (equipment) {
+          const existing = grouped.get(g.equipment_id)
+          if (existing) {
+            existing.quantity += g.count
+          } else {
+            grouped.set(g.equipment_id, {
+              equipment,
+              quantity: g.count
+            })
+          }
+        }
+      }
 
-      const existing = grouped.get(g.equipment_id)
-      if (existing) {
-        existing.quantity += g.count
-      } else {
-        grouped.set(g.equipment_id, {
-          equipment,
-          quantity: g.count
-        })
+      // Handle attached shield (stored in group.shield)
+      if (g.shield && g.shield.equipment_id) {
+        const shieldEquipment = equipmentMap.value.get(g.shield.equipment_id)
+        if (shieldEquipment) {
+          const existing = grouped.get(g.shield.equipment_id)
+          if (existing) {
+            existing.quantity += g.shield.count
+          } else {
+            grouped.set(g.shield.equipment_id, {
+              equipment: shieldEquipment,
+              quantity: g.shield.count
+            })
+          }
+        }
       }
     })
   })

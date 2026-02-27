@@ -236,3 +236,61 @@
   - [x] 步骤 1：保存当前配装为 ShipBlueprint。
   - [x] 步骤 2：刷新页面后加载该 ShipBlueprint。
   - [x] 步骤 3：断言材料面板数据与保存前一致（blueprint.connections 数据源正常）。
+
+## 4. Bug 修复验证
+
+### BUG-001: method 选项过滤 xenon 验证
+
+- [x] 4.1.1 验证：method 下拉不包含 xenon 选项
+  - [x] 步骤 1：进入 Ship Build 界面，选择任意飞船（如大阪）和装备。
+  - [x] 步骤 2：打开 method 下拉。
+  - [x] 步骤 3：断言下拉选项中不包含 `xenon`。
+  - **Bug现状**: 计算方式下拉框中仍旧存在xeon
+  - **测试状态**: PASSED (测试 2.1.1)
+
+- [x] 4.1.2 验证：各类型飞船选择推进器后均过滤 xenon
+  - [x] 步骤 1：选择 Terran 飞船（大阪）。
+  - [x] 步骤 2：切换到 E 槽（推进器）并选择任意推进器。
+  - [x] 步骤 3：打开 method 下拉，断言不包含 `xenon`。
+  - **测试状态**: PASSED (测试 4.1.2)
+
+### BUG-003: 槽位附带护盾统计验证
+
+大阪飞船 turret 槽位有附带护盾的 group:
+- `group_front_mid_mid`: shield.size=medium, shield.count=2
+- `group_up_mid_mid`: shield.size=medium, shield.count=2
+
+- [x] 4.3.1 验证：turret 槽位护盾材料统计
+  - [x] 步骤 1：进入 Ship Build 界面，选择大阪飞船。
+  - [x] 步骤 2：切换到 `slotType=turret`。
+  - [x] 步骤 3：遍历所有 group，寻找有附带护盾的 group。
+  - [x] 步骤 4：选择炮塔装备。
+  - [x] 步骤 5：炮塔选择后，UI显示该炮塔附带的护盾选项（relatedShieldConnectionRows）。
+  - [x] 步骤 6：选择护盾装备。
+  - [x] 步骤 7：切换到材料面板，断言存在护盾分项。
+  - [x] 步骤 8：展开护盾分项，验证显示护盾的材料明细（如 Field Coils、Shield Components、Energy Cells）。
+  - **Bug现状**: 没有将slot下面附带的shield包含在内, 比如weapon下的护盾
+  - **测试状态**: PASSED
+
+- [x] 4.3.2 验证：多种槽位类型附带护盾
+  - [x] 步骤 1：进入 Ship Build 界面，选择大阪飞船。
+  - [x] 步骤 2：切换到 `slotType=turret`。
+  - [x] 步骤 3：遍历 groups，寻找有附带护盾的 group。
+  - [x] 步骤 4：选择炮塔和护盾装备。
+  - [x] 步骤 5：验证护盾分项存在于材料面板。
+  - **备注**: 大阪飞船 weapon 槽位没有附带护盾定义，只有 turret 槽位有
+  - **测试状态**: PASSED
+
+### BUG-004: 价格滑动条默认值验证
+
+- [ ] 4.4.1 验证：滑动条默认在 50% 位置
+  - [ ] 步骤 1：进入 Ship Build 界面。
+  - [ ] 步骤 2：查看材料价格滑动条位置。
+  - [ ] 步骤 3：断言滑动条默认在 50% 位置（中间）。
+  - **Bug现状**: 船只建造材料价格滑动条默认应该在中间就是50%
+
+- [ ] 4.4.2 验证：滑动条拖动后金额正确变化
+  - [ ] 步骤 1：在默认值 50% 状态下记录金额。
+  - [ ] 步骤 2：拖动滑动条到其他位置。
+  - [ ] 步骤 3：断言金额随滑动条位置正确变化。
+  - [ ] 步骤 4：断言材料数量不变，只有金额变化。
