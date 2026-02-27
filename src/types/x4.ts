@@ -101,6 +101,10 @@ export interface X4Ship {
       yaw: number;
       roll: number;
     };
+    accfactors?: {
+      horizontal: number;
+      vertical: number;
+    };
   };
 }
 
@@ -121,29 +125,39 @@ export interface X4Equipment {
   slotTags: string[];
   integrated: boolean;
   cost: Record<string, Partial<Record<string, number>>>;
-  bullet?: string;  // 武器装备的 bullet class 引用
-  stats?: {
-    thrust?: {
-      forward?: number;
-      reverse?: number;
-    };
-    boost?: {
-      duration?: number;
-      recharge?: number;
-      thrust?: number;
-      acceleration?: number;
-    };
-    travel?: {
-      charge?: number;
-      thrust?: number;
-      attack?: number;
-      release?: number;
-    };
-    recharge?: {
-      max?: number;
-      rate?: number;
-      delay?: number;
-    };
+  // 引擎数据 (engine)
+  thrust?: {
+    forward?: number;
+    reverse?: number;
+    pitch?: number;
+    yaw?: number;
+    roll?: number;
+    strafe?: number;
+  };
+  boost?: {
+    duration?: number;
+    recharge?: number;
+    thrust?: number;
+    acceleration?: number;
+  };
+  travel?: {
+    charge?: number;
+    thrust?: number;
+    attack?: number;
+    release?: number;
+  };
+  // 护盾数据 (shield)
+  recharge?: {
+    max?: number;
+    rate?: number;
+    delay?: number;
+  };
+  // 武器数据 (weapon/turret)
+  bullet?: string;
+  heat?: {
+    overheat?: number;
+    cooldelay?: number;
+    coolrate?: number;
   };
 }
 
@@ -170,17 +184,23 @@ export interface X4Missile {
 
 /**
  * 子弹接口 - 对应 bullet.json
+ * 区分Beam vs 子弹: speed ≈ 299792500 为Beam
  */
 export interface X4Bullet {
   id: string;
-  class: string;
-  type: string;
+  type: 'bullet' | 'beam';
   speed: number;
   lifetime: number;
-  heat: number;
+  range: number;       // 子弹=lifetime×speed, beam=直接使用range
   reload: number;
-  damage: number;
+  damage: number;      // 子弹=单发伤害, beam=DPS
   repair: number;
+  chargetime: number;  // 充能时间，默认0
+  amount: number;      // 弹片数，默认1
+  shotHeat: number;   // 子弹=heat.value(单发热量), beam=heat.initial(初始热量)
+  heat: number;        // 子弹=0, beam=每秒持续热量
+  ammo: number;        // 弹匣数量，默认0
+  ammoreload: number;  // 弹匣重装时间，默认0
 }
 
 /**

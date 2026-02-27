@@ -995,6 +995,7 @@ class X4PrecisionLoader:
                 physics = None
                 if physics_node is not None:
                     drag = physics_node.find('drag')
+                    accfactors = physics_node.find('accfactors')
                     physics = {
                         "mass": float(physics_node.get('mass') or 0),
                         "drag": {
@@ -1005,6 +1006,10 @@ class X4PrecisionLoader:
                             "pitch": float(drag.get('pitch') or 0) if drag is not None else 0,
                             "yaw": float(drag.get('yaw') or 0) if drag is not None else 0,
                             "roll": float(drag.get('roll') or 0) if drag is not None else 0
+                        },
+                        "accfactors": {
+                            "horizontal": float(accfactors.get('horizontal') or 1) if accfactors is not None else 1,
+                            "vertical": float(accfactors.get('vertical') or 1) if accfactors is not None else 1
                         }
                     }
 
@@ -1524,35 +1529,45 @@ class X4PrecisionLoader:
                     "cost": self._build_cost(ware_id)
                 }
 
-                stats = {}
+                # 提取各类型装备数据到顶层
                 if equip_type == "engine" and props is not None:
                     thrust = props.find('thrust')
                     boost = props.find('boost')
                     travel = props.find('travel')
                     if thrust is not None:
-                        stats["thrust"] = {
+                        equipment["thrust"] = {
                             "forward": float(thrust.get('forward') or 0),
                             "reverse": float(thrust.get('reverse') or 0)
                         }
                     if boost is not None:
-                        stats["boost"] = {
+                        equipment["boost"] = {
                             "duration": float(boost.get('duration') or 0),
                             "recharge": float(boost.get('recharge') or 0),
                             "thrust": float(boost.get('thrust') or 0),
                             "acceleration": float(boost.get('acceleration') or 0)
                         }
                     if travel is not None:
-                        stats["travel"] = {
+                        equipment["travel"] = {
                             "charge": float(travel.get('charge') or 0),
                             "thrust": float(travel.get('thrust') or 0),
                             "attack": float(travel.get('attack') or 0),
                             "release": float(travel.get('release') or 0)
                         }
 
+                if equip_type == "thruster" and props is not None:
+                    thrust = props.find('thrust')
+                    if thrust is not None:
+                        equipment["thrust"] = {
+                            "pitch": float(thrust.get('pitch') or 0),
+                            "yaw": float(thrust.get('yaw') or 0),
+                            "roll": float(thrust.get('roll') or 0),
+                            "strafe": float(thrust.get('strafe') or 0)
+                        }
+
                 if equip_type == "shield" and props is not None:
                     recharge = props.find('recharge')
                     if recharge is not None:
-                        stats["recharge"] = {
+                        equipment["recharge"] = {
                             "max": float(recharge.get('max') or 0),
                             "rate": float(recharge.get('rate') or 0),
                             "delay": float(recharge.get('delay') or 0)
@@ -1562,20 +1577,13 @@ class X4PrecisionLoader:
                     bullet = props.find('bullet')
                     heat = props.find('heat')
                     if bullet is not None:
-                        bullet_class = bullet.get('class')
-                        stats["bullet"] = bullet_class
-                        # 在顶层也导出 bullet 属性，便于直接引用
-                        equipment["bullet"] = bullet_class
+                        equipment["bullet"] = bullet.get('class')
                     if heat is not None:
-                        stats["heat"] = {
+                        equipment["heat"] = {
                             "overheat": float(heat.get('overheat') or 0),
                             "cooldelay": float(heat.get('cooldelay') or 0),
-                            "coolrate": float(heat.get('coolrate') or 0),
-                            "reenable": float(heat.get('reenable') or 0)
+                            "coolrate": float(heat.get('coolrate') or 0)
                         }
-
-                if stats:
-                    equipment["stats"] = stats
 
                 self.equipments_data.append(equipment)
                 self.equipment_type_counts[equip_type] += 1
@@ -1781,14 +1789,18 @@ class X4PrecisionLoader:
 
                 bullet = {
                     "id": macro_name,
-                    "class": m_class,
-                    "type": "bullet",
                     "speed": 0,
                     "lifetime": 0,
-                    "heat": 0,
+                    "range": 0,
                     "reload": 0,
                     "damage": 0,
-                    "repair": 0
+                    "repair": 0,
+                    "chargetime": 0,    # 充能时间，默认0
+                    "amount": 1,        # 弹片数，默认1
+                    "shotHeat": 0,      # 子弹=heat.value(单发热量), beam=heat.initial(初始热量)
+                    "heat": 0,          # 子弹=0, beam=每秒持续热量
+                    "ammo": 0,          # 弹匣数量，默认0
+                    "ammoreload": 0     # 弹匣重装时间，默认0
                 }
 
                 # 提取伤害属性（只导出 bullet 类型，missile 类型已在 missiles.json 中）
@@ -1797,16 +1809,67 @@ class X4PrecisionLoader:
                     heat_node = props.find('heat')
                     reload_node = props.find('reload')
                     damage_node = props.find('damage')
+                    ammo_node = props.find('ammunition')
+
+                    # 速度判断：光速 ≈ 299792500，beam类
+                    speed = 0
+                    lifetime = 0
 
                     if bullet_node is not None:
-                        bullet["speed"] = float(bullet_node.get('speed') or 0)
-                        bullet["lifetime"] = float(bullet_node.get('lifetime') or 0)
+                        speed = float(bullet_node.get('speed') or 0)
+                        lifetime = float(bullet_node.get('lifetime') or 0)
+                        bullet["speed"] = speed
+                        bullet["lifetime"] = lifetime
+
+                        # chargetime: 充能时间
+                        bullet["chargetime"] = float(bullet_node.get('chargetime') or 0)
+
+                        # amount: 弹片数（霰弹类）
+                        bullet["amount"] = int(bullet_node.get('amount') or 1)
+
+                    # ammo: 弹匣数量和重装时间
+                    if ammo_node is not None:
+                        bullet["ammo"] = int(ammo_node.get('value') or 0)
+                        bullet["ammoreload"] = float(ammo_node.get('reload') or 0)
+
+                        # range: Beam直接使用range属性，子弹=lifetime×speed
+                        bullet_range = bullet_node.get('range')
+                        if bullet_range:
+                            bullet["range"] = float(bullet_range)
+                        else:
+                            # 子弹：range = lifetime × speed
+                            bullet["range"] = lifetime * speed
+
+                    # 热量处理
+                    # 区分beam和子弹：光速 = 299792500（容差1000）
+                    is_beam = abs(speed - 299792500) <= 1000
+                    bullet["type"] = "beam" if is_beam else "bullet"
 
                     if heat_node is not None:
-                        bullet["heat"] = float(heat_node.get('value') or 0)
+                        heat_initial = float(heat_node.get('initial') or 0)
+                        heat_value = float(heat_node.get('value') or 0)
+
+                        if is_beam:
+                            # Beam: shotHeat=heat.initial(初始热量), heat=heat.value(每秒热量)
+                            bullet["shotHeat"] = heat_initial
+                            bullet["heat"] = heat_value
+                            # Beam的range已经在上面处理
+                        else:
+                            # 子弹: shotHeat=heat.value(单发热量), heat=0
+                            bullet["shotHeat"] = heat_value
+                            bullet["heat"] = 0
 
                     if reload_node is not None:
-                        bullet["reload"] = float(reload_node.get('rate') or 0)
+                        # XML 中 reload 可能用 time 或 rate 属性
+                        # 统一转换为 time: time = 1/rate
+                        reload_time = reload_node.get('time')
+                        reload_rate = reload_node.get('rate')
+                        if reload_time:
+                            bullet["reload"] = float(reload_time)
+                        elif reload_rate:
+                            bullet["reload"] = 1.0 / float(reload_rate) if float(reload_rate) != 0 else 0
+                        else:
+                            bullet["reload"] = 0
 
                     if damage_node is not None:
                         bullet["damage"] = float(damage_node.get('value') or 0)

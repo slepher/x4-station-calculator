@@ -35,12 +35,8 @@
 - **`武器爆发输出值(MW)`**：从 `blueprint.connections` 获取已装备设备，根据 `equipment.class` 决定弹药：
   - `class=weapon` → `equipment.bullet` → `bullets.json` → `damage * count`
   - `class=missilelauncher` → `equipment.bullet` → `missiles.json` → `explosive * count`
-- **`武器持续输出值(MW)`**：同上，根据 `equipment.class`：
-  - `class=weapon` → `damage / reload * count`
-  - `class=missilelauncher` → `explosive / reload * count`
-- **`炮塔平均输出值(MW)`**：从 `blueprint.connections` 获取已装备设备，根据 `equipment.class`：
-  - `class=turret` → `bullets.json` → `damage / reload`
-  - `class=missileturret` → `missiles.json` → `explosive / reload`
+- **`武器持续输出值(MW)`**：根据精确公式计算（见下方 5.2.3）
+- **`炮塔平均输出值(MW)`**：根据精确公式计算（见下方 5.2.3）
 - **注**：根据 equipment.class 决定使用 bullets.json 还是 missiles.json
 
 ### 数据源架构
@@ -232,6 +228,108 @@ const turretAvg = getTurretDamageStats()
 { key: 'turret_avg', labelKey: 'ship_build.stats_turret_avg', unit: 'MW', value: turretAvg },
 ```
 
+### 5.2.3 子弹/Beam 数据结构与伤害计算公式
+
+#### 区分 Beam vs 子弹
+- **Beam**：`speed ≈ 299792500` (光速)
+- **子弹**：`speed < 299792500`
+
+#### X4Bullet 数据模型
+
+```typescript
+interface X4Bullet {
+  id: string;
+  class: 'bullet' | 'beam';   // 根据 speed ≈ 光速区分
+  speed: number;
+  lifetime: number;
+  range: number;              // 子弹=lifetime×speed, beam=直接使用range
+  reload: number;
+  damage: number;             // 子弹=单发伤害, beam=DPS
+  repair: number;
+  chargetime: number;         // 默认 0，必选
+  amount: number;             // 默认 1，必选（霰弹弹片数）
+  shotHeat: number;           // 子弹=heat.value(单发热量), beam=heat.initial(初始热量)
+  heat: number;               // 子弹=0, beam=每秒持续热量
+}
+```
+
+#### X4Equipment 热数据（外层）
+
+```typescript
+interface X4Equipment {
+  // ... 现有字段 ...
+  heat?: {
+    overheat: number;   // 过热阈值，通常 10000
+    cooldelay: number;  // 冷却延迟时间
+    coolrate: number;   // 冷却速率（每秒）
+  };
+}
+```
+
+#### 武器伤害计算公式
+
+**通用常量：**
+- `overheatThreshold = 10000` (过热阈值)
+
+##### Beam 类
+
+```
+range = range (来自XML)
+实际伤害 = damage × lifetime              // damage 是 DPS，lifetime 是照射秒数
+实际热量 = shotHeat + (heat × lifetime)  // shotHeat=初始热量, heat=每秒热量
+单次射击时间 = chargetime + max(lifetime, reload)
+爆发DPS = 实际伤害 / 单次射击时间
+
+// 持续DPS计算
+shotsInCycle = max(1, floor(overheatThreshold / 实际热量))
+totalShotTime = shotsInCycle × 单次射击时间
+totalHeat = max(overheatThreshold, 实际热量)
+cycleTime = totalShotTime + cooldelay + (totalHeat / coolrate)
+cycleDamage = 实际伤害 × shotsInCycle
+sustainedDPS = cycleDamage / cycleTime
+```
+
+##### 子弹 类（标准/霰弹）
+
+```
+range = lifetime × speed
+单发伤害 = damage × amount              // 单发伤害 × 弹片数
+单发热量 = shotHeat                      // heat 为 0
+单次射击时间 = chargetime + reload
+
+// 有弹匣时使用弹匣作为作战单元
+if (ammo > 0) {
+  magazineDamage = ammo × 单发伤害
+  magazineHeat = ammo × 单发热量
+  magazineTime = ammo × 单次射击时间 + ammoReload  // 弹匣发射时间 + 换弹时间
+
+  // 爆发DPS
+  爆发DPS = magazineDamage / magazineTime
+
+  // 持续DPS
+  magazineCount = max(1, floor(overheatThreshold / magazineHeat))
+  totalShotTime = magazineCount × magazineTime
+  totalHeat = max(overheatThreshold, magazineHeat)
+  cycleTime = totalShotTime + cooldelay + (totalHeat / coolrate)
+  cycleDamage = magazineDamage × magazineCount
+  sustainedDPS = cycleDamage / cycleTime
+} else {
+  // 无弹匣：按单发计算
+  实际伤害 = 单发伤害
+  实际热量 = 单发热量
+  实际射击时间 = 单次射击时间
+  爆发DPS = 实际伤害 / 实际射击时间
+
+  // 持续DPS
+  shotsInCycle = max(1, floor(overheatThreshold / 实际热量))
+  totalShotTime = shotsInCycle × 实际射击时间
+  totalHeat = max(overheatThreshold, 实际热量)
+  cycleTime = totalShotTime + cooldelay + (totalHeat / coolrate)
+  cycleDamage = 实际伤害 × shotsInCycle
+  sustainedDPS = cycleDamage / cycleTime
+}
+```
+
 ### 5.3 Blueprint 数据源重构（tasks 6.1-6.3）
 
 #### 5.3.1 修改 getShieldStats
@@ -260,64 +358,154 @@ const getShieldStats = () => {
     })
   }
 
-  // 计算 totalShieldSlots（从 ship.slots）
-  let totalShieldSlots = 0
-  selectedShip.value.slots.forEach(slot => {
-    slot.groups.forEach(group => {
-      // 查找 blueprint 中的 shield 配置
-      const shieldConn = blueprint.value?.connections.find(c => c.slot_type === slot.type)
-      const groupData = shieldConn?.group.find(g => g.group === group.group)
-      if (groupData?.shield) {
-        totalShieldSlots += groupData.shield.count || 0
-      }
+  // 计算挂载护盾（shield on equipment）：非专用 shield 槽位上挂载的护盾
+  // 护盾：保护船体的护盾，装在专用 shield 槽位上
+  // 挂载护盾：装在其他槽位（engine、weapon 等）上，保护被挂载的装备
+  let mountedShieldMax = 0
+  let mountedShieldGroups = 0
+
+  blueprint.value.connections.forEach(conn => {
+    // 跳过专用 shield 槽
+    if (conn.slot_type === 'shield') return
+    conn.group.forEach(g => {
+      if (!g.shield) return
+      const shieldEquipment = equipmentMap.get(g.shield.equipment_id)
+      if (!shieldEquipment?.stats?.recharge) return
+      mountedShieldMax += (shieldEquipment.stats.recharge.max || 0) * (g.shield.count || 0)
+      mountedShieldGroups++
     })
   })
 
-  const groupAvg = totalShieldSlots > 0 ? max / totalShieldSlots : 0
-  return { max, rate, delay, groupAvg }
+  // 编组平均护盾容量 = 非护盾槽位上挂载的护盾容量总和 / 有护盾挂载的非护盾槽位 group 数量
+  const groupAvg = mountedShieldGroups > 0 ? mountedShieldMax / mountedShieldGroups : 0
+  return { max, rate, delay, groupAvg, mountedShieldMax }
 }
 ```
 
 #### 5.3.2 修改 getEngineStats
 
 ```typescript
-// 当前：从 connectionRows + selectedByConnection 获取
-// 改为：从 blueprint.connections 获取
-
 const getEngineStats = () => {
-  if (!selectedShip.value || !blueprint.value) return null
+  if (!selectedShip.value || !props.shipBlueprint) return null
 
-  const engineConnection = blueprint.value.connections.find(c => c.slot_type === 'engine')
-  if (!engineConnection || engineConnection.group.length === 0) return null
+  const engineEquipments = []
+  props.shipBlueprint.connections.forEach((conn) => {
+    if (conn.slot_type !== 'engine') return
+    conn.group.forEach((g) => {
+      if (!g.equipment_id) return
+      const equipment = equipmentMap.value.get(g.equipment_id)
+      if (equipment) {
+        engineEquipments.push({ equipment, count: g.count })
+      }
+    })
+  })
+
+  if (engineEquipments.length === 0) return null
 
   let thrustForward = 0
   let boostMultiplier = 1
+  let boostAcceleration = 1
   let boostDuration = 0
   let boostRecharge = 0
-  let travelMultiplier = 1
+  let travelThrust = 0
+  let travelAttack = 0
   let travelCharge = 0
+  let engineCount = 0
 
-  engineConnection.group.forEach(g => {
-    const equipment = equipmentMap.get(g.equipment_id)
+  engineEquipments.forEach(({ equipment, count }) => {
     if (!equipment?.stats) return
-
-    const count = g.count || 1
-    if (equipment.stats.thrust?.forward) thrustForward += equipment.stats.thrust.forward * count
+    engineCount += count
+    const fwd = equipment.stats.thrust?.forward || 0
+    const travelT = equipment.stats.travel?.thrust || 0
+    thrustForward += fwd * count
+    // 巡航推力 = 前向推力 × 巡航乘数 × 数量
+    travelThrust += fwd * travelT * count
     if (equipment.stats.boost?.thrust) boostMultiplier = equipment.stats.boost.thrust
+    if (equipment.stats.boost?.acceleration) boostAcceleration = equipment.stats.boost.acceleration
     if (equipment.stats.boost?.duration) boostDuration = Math.max(boostDuration, equipment.stats.boost.duration)
     if (equipment.stats.boost?.recharge) boostRecharge = Math.max(boostRecharge, equipment.stats.boost.recharge)
-    if (equipment.stats.travel?.thrust) travelMultiplier = equipment.stats.travel.thrust
+    if (equipment.stats.travel?.attack) travelAttack = Math.max(travelAttack, equipment.stats.travel.attack)
     if (equipment.stats.travel?.charge) travelCharge = Math.max(travelCharge, equipment.stats.travel.charge)
   })
 
   if (thrustForward === 0) return null
-  return { thrustForward, boostMultiplier, boostDuration, boostRecharge, travelMultiplier, travelCharge }
+  return {
+    thrustForward, boostMultiplier, boostAcceleration, boostDuration,
+    boostRecharge, travelThrust, travelAttack, travelCharge, engineCount
+  }
 }
 ```
 
-#### 5.3.3 移除 selectedByConnection 依赖
+#### 5.3.3 新增 getThrusterStats
 
-属性计算函数（getShieldStats、getEngineStats、getWeaponDamageStats、getTurretDamageStats）全部改为从 `blueprint.value.connections` 获取数据，不再使用 `selectedByConnection`。
+```typescript
+const getThrusterStats = () => {
+  if (!selectedShip.value || !props.shipBlueprint) return null
+
+  const thrusterEquipments = []
+  props.shipBlueprint.connections.forEach((conn) => {
+    if (conn.slot_type !== 'thruster') return
+    conn.group.forEach((g) => {
+      if (!g.equipment_id) return
+      const equipment = equipmentMap.value.get(g.equipment_id)
+      if (equipment) {
+        thrusterEquipments.push({ equipment, count: g.count })
+      }
+    })
+  })
+
+  if (thrusterEquipments.length === 0) return null
+
+  let pitch = 0, yaw = 0, roll = 0, strafe = 0
+
+  thrusterEquipments.forEach(({ equipment, count }) => {
+    if (!equipment?.stats?.thrust) return
+    const c = count || 1
+    if (equipment.stats.thrust.pitch) pitch += equipment.stats.thrust.pitch * c
+    if (equipment.stats.thrust.yaw) yaw += equipment.stats.thrust.yaw * c
+    if (equipment.stats.thrust.roll) roll += equipment.stats.thrust.roll * c
+    if (equipment.stats.thrust.strafe) strafe += equipment.stats.thrust.strafe * c
+  })
+
+  if (pitch === 0 && yaw === 0 && roll === 0 && strafe === 0) return null
+  return { pitch, yaw, roll, strafe }
+}
+```
+
+#### 5.3.4 速度与加速度计算公式
+
+**数据来源：**
+- `ship.physics.mass` - 船体质量
+- `ship.physics.drag.forward/horizontal` - 船体阻力
+- `ship.physics.accfactors.horizontal` - 水平加速度修正系数
+- `engine.stats.thrust.forward` - 引擎前向推力
+- `engine.stats.boost.acceleration` - 助推加速度乘数
+- `engine.stats.travel.thrust` - 巡航推力乘数
+- `engine.stats.travel.attack` - 巡航加速时间（秒）
+- `engine.stats.boost.recharge` - 助推回充率（需除以100）
+- `thruster.stats.thrust.strafe` - 推进器平移推力
+- `ship.radarRange` - 雷达范围（单位：米，需除以1000转换为km）
+
+**公式：**
+| 指标 | 公式 |
+|------|------|
+| 最高速度 | `thrustForward / drag.forward` |
+| 加速度 | `thrustForward / mass` |
+| 助推加速度 | `加速度 × boost.acceleration` |
+| 巡航速度 | `travelThrust / drag.forward` |
+| 巡航加速度 | `巡航速度 / travel.attack` |
+| 助推回充率 | `boost.recharge / 100` |
+| 平移速度 | `thruster.strafe / drag.horizontal` |
+| 平移加速度 | `thruster.strafe / mass × accfactors.horizontal` |
+| 转向率 (Pitch/Yaw/Roll) | `thruster.thrust / drag` |
+| 雷达范围 | `radarRange / 1000` (km) |
+
+**示例：大阪 + L均衡推进器Mk3**
+- 推进器：pitch=972, yaw=972, roll=1035
+- 船体阻力：pitch=90, yaw=107, roll=70
+- 俯仰：972/90 = 10.8 rad/s
+- 水平转向：972/107 = 9.08 rad/s
+- 翻滚：1035/70 = 14.79 rad/s
 
 ### 6. Store 层暴露 blueprint
 

@@ -330,13 +330,13 @@ const globalMocks = {
     const detailBtn = wrapper.find('[data-testid="ship-build-stats-mode-detail"]')
     await detailBtn.trigger('click')
 
-    // Check for pending message
+    // Check no pending message (all data sources are now available)
     const pendingMsg = wrapper.find('.stats-pending')
-    expect(pendingMsg.exists()).toBe(true)
+    expect(pendingMsg.exists()).toBe(false)
 
-    // Check placeholder rows
+    // Check no placeholder rows (all fields have data sources)
     const placeholderRows = wrapper.findAll('.stats-row-placeholder')
-    expect(placeholderRows.length).toBeGreaterThan(0)
+    expect(placeholderRows.length).toBe(0)
   })
 
   // 1.7 高度限制回归
@@ -364,5 +364,39 @@ const globalMocks = {
       expect(selectionStyle).not.toContain('h-48')
       expect(selectionStyle).not.toContain('72px')
     }
+  })
+})
+
+describe('ShipBuildStats - Turn Rate Calculation', () => {
+  // 转向率公式测试：转向率 = 推进器单轴推力 / 船体单轴阻力 (单位: rad/s)
+
+  it('大阪 + L均衡推进器Mk3 转向率计算正确', () => {
+    // 数据来源：Osaka (ship_ter_l_destroyer_01_a) + thruster_gen_l_allround_01_mk3
+    const thruster = { pitch: 972, yaw: 972, roll: 1035 }
+    const drag = { pitch: 90, yaw: 107, roll: 70 }
+
+    // 转向率 = 推进器推力 / 船体阻力
+    const pitchRate = thruster.pitch / drag.pitch
+    const yawRate = thruster.yaw / drag.yaw
+    const rollRate = thruster.roll / drag.roll
+
+    // 验证计算结果 (rad/s)
+    expect(Math.round(pitchRate * 100) / 100).toBe(10.8)
+    expect(Math.round(yawRate * 100) / 100).toBe(9.08)
+    expect(Math.round(rollRate * 100) / 100).toBe(14.79)
+  })
+
+  it('mk1 推进器转向率计算正确', () => {
+    // thruster_gen_l_allround_01_mk1
+    const thruster = { pitch: 704, yaw: 704, roll: 750 }
+    const drag = { pitch: 90, yaw: 107, roll: 70 }
+
+    const pitchRate = thruster.pitch / drag.pitch
+    const yawRate = thruster.yaw / drag.yaw
+    const rollRate = thruster.roll / drag.roll
+
+    expect(Math.round(pitchRate * 100) / 100).toBe(7.82)
+    expect(Math.round(yawRate * 100) / 100).toBe(6.58)
+    expect(Math.round(rollRate * 100) / 100).toBe(10.71)
   })
 })

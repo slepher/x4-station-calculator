@@ -351,6 +351,10 @@
         "pitch": 106.203,
         "yaw": 106.203,
         "roll": 106.203
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -833,6 +837,10 @@
         "pitch": 114.044,
         "yaw": 114.044,
         "roll": 114.044
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -1435,6 +1443,10 @@
         "pitch": 119.094,
         "yaw": 119.094,
         "roll": 119.094
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -1721,6 +1733,10 @@
         "pitch": 140.897,
         "yaw": 140.897,
         "roll": 140.897
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -2028,6 +2044,10 @@
         "pitch": 155.677,
         "yaw": 155.677,
         "roll": 155.677
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -2446,6 +2466,10 @@
         "pitch": 140.528,
         "yaw": 140.528,
         "roll": 140.528
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -2755,6 +2779,10 @@
         "pitch": 155.234,
         "yaw": 155.234,
         "roll": 155.234
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -3038,6 +3066,10 @@
         "pitch": 135.0,
         "yaw": 135.0,
         "roll": 100.0
+      },
+      "accfactors": {
+        "horizontal": 0.85,
+        "vertical": 0.85
       }
     },
     "radarRange": 40000
@@ -3300,6 +3332,10 @@
         "pitch": 150.0,
         "yaw": 150.0,
         "roll": 130.0
+      },
+      "accfactors": {
+        "horizontal": 0.85,
+        "vertical": 0.85
       }
     },
     "radarRange": 40000
@@ -3562,6 +3598,10 @@
         "pitch": 149.63,
         "yaw": 149.63,
         "roll": 149.63
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -3824,6 +3864,10 @@
         "pitch": 166.156,
         "yaw": 166.156,
         "roll": 166.156
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -4086,6 +4130,10 @@
         "pitch": 172.0,
         "yaw": 172.0,
         "roll": 186.76
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -4348,6 +4396,10 @@
         "pitch": 190.0,
         "yaw": 190.0,
         "roll": 210.712
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -4658,6 +4710,10 @@
         "pitch": 185.0,
         "yaw": 185.0,
         "roll": 197.083
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -4968,6 +5024,10 @@
         "pitch": 200.0,
         "yaw": 200.0,
         "roll": 223.1
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -5278,6 +5338,10 @@
         "pitch": 144.0,
         "yaw": 144.0,
         "roll": 152.0
+      },
+      "accfactors": {
+        "horizontal": 1.2,
+        "vertical": 1.2
       }
     },
     "radarRange": 40000
@@ -5588,6 +5652,10 @@
         "pitch": 153.0,
         "yaw": 153.0,
         "roll": 184.0
+      },
+      "accfactors": {
+        "horizontal": 1.2,
+        "vertical": 1.2
       }
     },
     "radarRange": 40000
@@ -5953,6 +6021,10 @@
         "pitch": 9.897,
         "yaw": 9.897,
         "roll": 9.897
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -6250,6 +6322,10 @@
         "pitch": 11.376,
         "yaw": 11.376,
         "roll": 11.376
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -6470,6 +6546,10 @@
         "pitch": 8.241,
         "yaw": 8.241,
         "roll": 8.241
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -6860,6 +6940,10 @@
         "pitch": 8.4,
         "yaw": 8.4,
         "roll": 9.0
+      },
+      "accfactors": {
+        "horizontal": 0.95,
+        "vertical": 0.95
       }
     },
     "radarRange": 40000
@@ -7145,6 +7229,10 @@
         "pitch": 9.4,
         "yaw": 9.4,
         "roll": 9.8
+      },
+      "accfactors": {
+        "horizontal": 0.95,
+        "vertical": 0.95
       }
     },
     "radarRange": 40000
@@ -7313,6 +7401,10 @@
         "pitch": 16.132,
         "yaw": 16.132,
         "roll": 16.132
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -7481,6 +7573,10 @@
         "pitch": 18.858,
         "yaw": 18.858,
         "roll": 18.858
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -7734,6 +7830,10 @@
         "pitch": 17.097,
         "yaw": 17.097,
         "roll": 17.097
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -7928,6 +8028,10 @@
         "pitch": 20.017,
         "yaw": 20.017,
         "roll": 20.017
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -8136,6 +8240,10 @@
         "pitch": 13.242,
         "yaw": 13.242,
         "roll": 13.242
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -8340,6 +8448,10 @@
         "pitch": 15.39,
         "yaw": 15.39,
         "roll": 15.39
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -8540,6 +8652,10 @@
         "pitch": 10.4,
         "yaw": 10.4,
         "roll": 11.0
+      },
+      "accfactors": {
+        "horizontal": 1.15,
+        "vertical": 1.15
       }
     },
     "radarRange": 40000
@@ -8708,6 +8824,10 @@
         "pitch": 11.4,
         "yaw": 11.4,
         "roll": 12.0
+      },
+      "accfactors": {
+        "horizontal": 1.15,
+        "vertical": 1.15
       }
     },
     "radarRange": 40000
@@ -8956,6 +9076,10 @@
         "pitch": 2.3,
         "yaw": 2.694,
         "roll": 2.6
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -9184,6 +9308,10 @@
         "pitch": 2.4,
         "yaw": 3.064,
         "roll": 2.8
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -9394,6 +9522,10 @@
         "pitch": 2.585,
         "yaw": 2.585,
         "roll": 2.585
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -9547,6 +9679,10 @@
         "pitch": 2.821,
         "yaw": 2.821,
         "roll": 2.821
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -9801,6 +9937,10 @@
         "pitch": 3.419,
         "yaw": 3.419,
         "roll": 3.419
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -10137,6 +10277,10 @@
         "pitch": 3.586,
         "yaw": 3.586,
         "roll": 3.586
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -10362,6 +10506,10 @@
         "pitch": 3.845,
         "yaw": 3.845,
         "roll": 3.845
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -10587,6 +10735,10 @@
         "pitch": 4.427,
         "yaw": 4.427,
         "roll": 4.427
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -10964,6 +11116,10 @@
         "pitch": 3.564,
         "yaw": 3.9,
         "roll": 3.5
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -11211,6 +11367,10 @@
         "pitch": 6.1,
         "yaw": 6.1,
         "roll": 6.1
+      },
+      "accfactors": {
+        "horizontal": 1.1,
+        "vertical": 1.1
       }
     },
     "radarRange": 40000
@@ -11487,6 +11647,10 @@
         "pitch": 3.388,
         "yaw": 3.388,
         "roll": 3.388
+      },
+      "accfactors": {
+        "horizontal": 0.9,
+        "vertical": 0.9
       }
     },
     "radarRange": 40000
@@ -11668,6 +11832,10 @@
         "pitch": 3.785,
         "yaw": 3.785,
         "roll": 3.785
+      },
+      "accfactors": {
+        "horizontal": 0.8,
+        "vertical": 0.8
       }
     },
     "radarRange": 40000
@@ -11882,6 +12050,10 @@
         "pitch": 6.299,
         "yaw": 6.299,
         "roll": 6.299
+      },
+      "accfactors": {
+        "horizontal": 1.2,
+        "vertical": 1.2
       }
     },
     "radarRange": 40000
@@ -12061,6 +12233,10 @@
         "pitch": 7.371,
         "yaw": 7.371,
         "roll": 7.371
+      },
+      "accfactors": {
+        "horizontal": 1.2,
+        "vertical": 1.2
       }
     },
     "radarRange": 40000
@@ -12242,6 +12418,10 @@
         "pitch": 4.95,
         "yaw": 4.95,
         "roll": 5.8
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -12452,6 +12632,10 @@
         "pitch": 5.8,
         "yaw": 5.8,
         "roll": 6.8
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -12722,6 +12906,10 @@
         "pitch": 877.145,
         "yaw": 877.145,
         "roll": 877.145
+      },
+      "accfactors": {
+        "horizontal": 1.25,
+        "vertical": 1.25
       }
     },
     "radarRange": 40000
@@ -12992,6 +13180,10 @@
         "pitch": 912.574,
         "yaw": 912.574,
         "roll": 912.574
+      },
+      "accfactors": {
+        "horizontal": 1.25,
+        "vertical": 1.25
       }
     },
     "radarRange": 40000
@@ -13395,6 +13587,10 @@
         "pitch": 800.0,
         "yaw": 800.0,
         "roll": 800.0
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -13942,6 +14138,10 @@
         "pitch": 835.0,
         "yaw": 835.0,
         "roll": 835.0
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -14588,6 +14788,10 @@
         "pitch": 760.0,
         "yaw": 760.0,
         "roll": 760.0
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -14913,6 +15117,10 @@
         "pitch": 878.326,
         "yaw": 878.326,
         "roll": 878.326
+      },
+      "accfactors": {
+        "horizontal": 1.25,
+        "vertical": 1.25
       }
     },
     "radarRange": 40000
@@ -15278,6 +15486,10 @@
         "pitch": 913.991,
         "yaw": 913.991,
         "roll": 913.991
+      },
+      "accfactors": {
+        "horizontal": 1.25,
+        "vertical": 1.25
       }
     },
     "radarRange": 40000
@@ -15738,6 +15950,10 @@
         "pitch": 112.0,
         "yaw": 112.0,
         "roll": 100.0
+      },
+      "accfactors": {
+        "horizontal": 0.85,
+        "vertical": 0.85
       }
     },
     "radarRange": 40000
@@ -16252,6 +16468,10 @@
         "pitch": 717.73,
         "yaw": 717.73,
         "roll": 717.73
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -16744,6 +16964,10 @@
         "pitch": 125.0,
         "yaw": 125.0,
         "roll": 114.0
+      },
+      "accfactors": {
+        "horizontal": 1.35,
+        "vertical": 1.35
       }
     },
     "radarRange": 40000
@@ -17248,6 +17472,10 @@
         "pitch": 106.378,
         "yaw": 106.378,
         "roll": 106.378
+      },
+      "accfactors": {
+        "horizontal": 1.35,
+        "vertical": 1.35
       }
     },
     "radarRange": 40000
@@ -17476,6 +17704,10 @@
         "pitch": 103.531,
         "yaw": 103.531,
         "roll": 103.531
+      },
+      "accfactors": {
+        "horizontal": 1.35,
+        "vertical": 1.35
       }
     },
     "radarRange": 40000
@@ -17749,6 +17981,10 @@
         "pitch": 103.531,
         "yaw": 103.531,
         "roll": 103.531
+      },
+      "accfactors": {
+        "horizontal": 1.35,
+        "vertical": 1.35
       }
     },
     "radarRange": 40000
@@ -18071,6 +18307,10 @@
         "pitch": 125.0,
         "yaw": 125.0,
         "roll": 114.0
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -18468,6 +18708,10 @@
         "pitch": 6.6,
         "yaw": 7.8,
         "roll": 7.0
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -18868,6 +19112,10 @@
         "pitch": 10.678,
         "yaw": 10.678,
         "roll": 10.678
+      },
+      "accfactors": {
+        "horizontal": 1.15,
+        "vertical": 1.15
       }
     },
     "radarRange": 40000
@@ -19077,6 +19325,10 @@
         "pitch": 10.485,
         "yaw": 10.485,
         "roll": 10.485
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -19310,6 +19562,10 @@
         "pitch": 10.485,
         "yaw": 10.485,
         "roll": 10.485
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -19504,6 +19760,10 @@
         "pitch": 17.388,
         "yaw": 17.388,
         "roll": 17.388
+      },
+      "accfactors": {
+        "horizontal": 1.2,
+        "vertical": 1.2
       }
     },
     "radarRange": 40000
@@ -19745,6 +20005,10 @@
         "pitch": 1.904,
         "yaw": 2.2,
         "roll": 1.904
+      },
+      "accfactors": {
+        "horizontal": 1.05,
+        "vertical": 1.05
       }
     },
     "radarRange": 40000
@@ -20010,6 +20274,10 @@
         "pitch": 2.361,
         "yaw": 2.8,
         "roll": 2.361
+      },
+      "accfactors": {
+        "horizontal": 0.8,
+        "vertical": 0.8
       }
     },
     "radarRange": 40000
@@ -20178,6 +20446,10 @@
         "pitch": 3.653,
         "yaw": 4.0,
         "roll": 3.653
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -20373,6 +20645,10 @@
         "pitch": 4.088,
         "yaw": 4.4,
         "roll": 4.088
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -20553,6 +20829,10 @@
         "pitch": 1.8,
         "yaw": 1.8,
         "roll": 2.0
+      },
+      "accfactors": {
+        "horizontal": 1.05,
+        "vertical": 1.05
       }
     },
     "radarRange": 40000
@@ -20697,6 +20977,10 @@
         "pitch": 5.825,
         "yaw": 6.4,
         "roll": 5.825
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -21016,6 +21300,10 @@
         "pitch": 600.0,
         "yaw": 600.0,
         "roll": 600.0
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -21574,6 +21862,10 @@
         "pitch": 696.643,
         "yaw": 696.643,
         "roll": 696.643
+      },
+      "accfactors": {
+        "horizontal": 1.1,
+        "vertical": 1.1
       }
     },
     "radarRange": 40000
@@ -21906,6 +22198,10 @@
         "pitch": 750.584,
         "yaw": 750.584,
         "roll": 750.584
+      },
+      "accfactors": {
+        "horizontal": 1.15,
+        "vertical": 1.15
       }
     },
     "radarRange": 40000
@@ -22299,6 +22595,10 @@
         "pitch": 9.618,
         "yaw": 9.618,
         "roll": 9.618
+      },
+      "accfactors": {
+        "horizontal": 1.45,
+        "vertical": 1.45
       }
     },
     "radarRange": 40000
@@ -22594,6 +22894,10 @@
         "pitch": 7.113,
         "yaw": 7.113,
         "roll": 7.113
+      },
+      "accfactors": {
+        "horizontal": 1.35,
+        "vertical": 1.35
       }
     },
     "radarRange": 40000
@@ -22835,6 +23139,10 @@
         "pitch": 18.39,
         "yaw": 18.39,
         "roll": 18.39
+      },
+      "accfactors": {
+        "horizontal": 1.15,
+        "vertical": 1.15
       }
     },
     "radarRange": 40000
@@ -23071,6 +23379,10 @@
         "pitch": 3.126,
         "yaw": 3.126,
         "roll": 3.126
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -23265,6 +23577,10 @@
         "pitch": 3.582,
         "yaw": 3.582,
         "roll": 3.582
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -23687,6 +24003,10 @@
         "pitch": 108.95,
         "yaw": 108.95,
         "roll": 108.95
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -24267,6 +24587,10 @@
         "pitch": 117.34,
         "yaw": 117.34,
         "roll": 117.34
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -25011,6 +25335,10 @@
         "pitch": 118.0,
         "yaw": 138.0,
         "roll": 50.0
+      },
+      "accfactors": {
+        "horizontal": 1.1,
+        "vertical": 1.1
       }
     },
     "radarRange": 40000
@@ -25510,6 +25838,10 @@
         "pitch": 52.816,
         "yaw": 52.816,
         "roll": 52.816
+      },
+      "accfactors": {
+        "horizontal": 0.85,
+        "vertical": 0.85
       }
     },
     "radarRange": 60000
@@ -25735,6 +26067,10 @@
         "pitch": 132.14,
         "yaw": 132.14,
         "roll": 132.14
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -25960,6 +26296,10 @@
         "pitch": 145.168,
         "yaw": 145.168,
         "roll": 145.168
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -26185,6 +26525,10 @@
         "pitch": 110.0,
         "yaw": 125.0,
         "roll": 90.0
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -26437,6 +26781,10 @@
         "pitch": 132.14,
         "yaw": 132.14,
         "roll": 132.14
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -26689,6 +27037,10 @@
         "pitch": 145.168,
         "yaw": 145.168,
         "roll": 145.168
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -27007,6 +27359,10 @@
         "pitch": 110.0,
         "yaw": 125.0,
         "roll": 90.0
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -27280,6 +27636,10 @@
         "pitch": 124.575,
         "yaw": 124.575,
         "roll": 124.575
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -27553,6 +27913,10 @@
         "pitch": 136.09,
         "yaw": 136.09,
         "roll": 136.09
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -27826,6 +28190,10 @@
         "pitch": 118.817,
         "yaw": 118.817,
         "roll": 118.817
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -28099,6 +28467,10 @@
         "pitch": 129.181,
         "yaw": 129.181,
         "roll": 129.181
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -28465,6 +28837,10 @@
         "pitch": 160.0,
         "yaw": 180.0,
         "roll": 145.0
+      },
+      "accfactors": {
+        "horizontal": 1.1,
+        "vertical": 1.1
       }
     },
     "radarRange": 40000
@@ -28848,6 +29224,10 @@
         "pitch": 7.739,
         "yaw": 7.739,
         "roll": 7.739
+      },
+      "accfactors": {
+        "horizontal": 1.15,
+        "vertical": 1.15
       }
     },
     "radarRange": 40000
@@ -29203,6 +29583,10 @@
         "pitch": 8.836,
         "yaw": 8.836,
         "roll": 8.836
+      },
+      "accfactors": {
+        "horizontal": 1.15,
+        "vertical": 1.15
       }
     },
     "radarRange": 40000
@@ -29563,6 +29947,10 @@
         "pitch": 9.4,
         "yaw": 11.6,
         "roll": 9.0
+      },
+      "accfactors": {
+        "horizontal": 1.33,
+        "vertical": 1.33
       }
     },
     "radarRange": 40000
@@ -29903,6 +30291,10 @@
         "pitch": 10.4,
         "yaw": 12.6,
         "roll": 10.0
+      },
+      "accfactors": {
+        "horizontal": 1.33,
+        "vertical": 1.33
       }
     },
     "radarRange": 40000
@@ -30071,6 +30463,10 @@
         "pitch": 17.332,
         "yaw": 17.332,
         "roll": 17.332
+      },
+      "accfactors": {
+        "horizontal": 1.2,
+        "vertical": 1.2
       }
     },
     "radarRange": 40000
@@ -30239,6 +30635,10 @@
         "pitch": 20.299,
         "yaw": 20.299,
         "roll": 20.299
+      },
+      "accfactors": {
+        "horizontal": 1.2,
+        "vertical": 1.2
       }
     },
     "radarRange": 40000
@@ -30468,6 +30868,10 @@
         "pitch": 17.332,
         "yaw": 17.332,
         "roll": 17.332
+      },
+      "accfactors": {
+        "horizontal": 1.2,
+        "vertical": 1.2
       }
     },
     "radarRange": 40000
@@ -30662,6 +31066,10 @@
         "pitch": 20.299,
         "yaw": 20.299,
         "roll": 20.299
+      },
+      "accfactors": {
+        "horizontal": 1.2,
+        "vertical": 1.2
       }
     },
     "radarRange": 40000
@@ -30836,6 +31244,10 @@
         "pitch": 13.702,
         "yaw": 13.702,
         "roll": 13.702
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -30989,6 +31401,10 @@
         "pitch": 15.942,
         "yaw": 15.942,
         "roll": 15.942
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -31142,6 +31558,10 @@
         "pitch": 12.582,
         "yaw": 12.582,
         "roll": 12.582
+      },
+      "accfactors": {
+        "horizontal": 1.2,
+        "vertical": 1.2
       }
     },
     "radarRange": 40000
@@ -31295,6 +31715,10 @@
         "pitch": 14.598,
         "yaw": 14.598,
         "roll": 14.598
+      },
+      "accfactors": {
+        "horizontal": 1.2,
+        "vertical": 1.2
       }
     },
     "radarRange": 40000
@@ -31545,6 +31969,10 @@
         "pitch": 8.2,
         "yaw": 9.0,
         "roll": 8.2
+      },
+      "accfactors": {
+        "horizontal": 1.15,
+        "vertical": 1.15
       }
     },
     "radarRange": 40000
@@ -31813,6 +32241,10 @@
         "pitch": 2.7,
         "yaw": 3.025,
         "roll": 3.025
+      },
+      "accfactors": {
+        "horizontal": 1.15,
+        "vertical": 1.15
       }
     },
     "radarRange": 40000
@@ -32007,6 +32439,10 @@
         "pitch": 3.0,
         "yaw": 3.461,
         "roll": 3.461
+      },
+      "accfactors": {
+        "horizontal": 1.15,
+        "vertical": 1.15
       }
     },
     "radarRange": 40000
@@ -32289,6 +32725,10 @@
         "pitch": 3.297,
         "yaw": 3.297,
         "roll": 3.297
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -32547,6 +32987,10 @@
         "pitch": 3.788,
         "yaw": 3.788,
         "roll": 3.788
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -32973,6 +33417,10 @@
         "pitch": 4.464,
         "yaw": 4.699,
         "roll": 4.699
+      },
+      "accfactors": {
+        "horizontal": 1.25,
+        "vertical": 1.25
       }
     },
     "radarRange": 40000
@@ -33211,6 +33659,10 @@
         "pitch": 6.186,
         "yaw": 6.186,
         "roll": 6.186
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -33445,6 +33897,10 @@
         "pitch": 3.208,
         "yaw": 3.208,
         "roll": 3.208
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -33659,6 +34115,10 @@
         "pitch": 3.568,
         "yaw": 3.568,
         "roll": 3.568
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -33853,6 +34313,10 @@
         "pitch": 6.186,
         "yaw": 6.186,
         "roll": 6.186
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -34047,6 +34511,10 @@
         "pitch": 7.236,
         "yaw": 7.236,
         "roll": 7.236
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -34317,6 +34785,10 @@
         "pitch": 927.52,
         "yaw": 927.52,
         "roll": 927.52
+      },
+      "accfactors": {
+        "horizontal": 1.25,
+        "vertical": 1.25
       }
     },
     "radarRange": 40000
@@ -34587,6 +35059,10 @@
         "pitch": 973.024,
         "yaw": 973.024,
         "roll": 973.024
+      },
+      "accfactors": {
+        "horizontal": 1.25,
+        "vertical": 1.25
       }
     },
     "radarRange": 40000
@@ -35001,6 +35477,10 @@
         "pitch": 842.923,
         "yaw": 842.923,
         "roll": 842.923
+      },
+      "accfactors": {
+        "horizontal": 1.25,
+        "vertical": 1.25
       }
     },
     "radarRange": 40000
@@ -35415,6 +35895,10 @@
         "pitch": 871.508,
         "yaw": 871.508,
         "roll": 871.508
+      },
+      "accfactors": {
+        "horizontal": 1.25,
+        "vertical": 1.25
       }
     },
     "radarRange": 40000
@@ -36070,6 +36554,10 @@
         "pitch": 854.38,
         "yaw": 854.38,
         "roll": 854.38
+      },
+      "accfactors": {
+        "horizontal": 1.25,
+        "vertical": 1.25
       }
     },
     "radarRange": 40000
@@ -36340,6 +36828,10 @@
         "pitch": 899.948,
         "yaw": 899.948,
         "roll": 899.948
+      },
+      "accfactors": {
+        "horizontal": 1.15,
+        "vertical": 1.15
       }
     },
     "radarRange": 40000
@@ -36610,6 +37102,10 @@
         "pitch": 939.937,
         "yaw": 939.937,
         "roll": 939.937
+      },
+      "accfactors": {
+        "horizontal": 1.15,
+        "vertical": 1.15
       }
     },
     "radarRange": 40000
@@ -36975,6 +37471,10 @@
         "pitch": 931.356,
         "yaw": 931.356,
         "roll": 931.356
+      },
+      "accfactors": {
+        "horizontal": 1.2,
+        "vertical": 1.2
       }
     },
     "radarRange": 40000
@@ -37245,6 +37745,10 @@
         "pitch": 100.649,
         "yaw": 100.649,
         "roll": 100.649
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -37588,6 +38092,10 @@
         "pitch": 128.0,
         "yaw": 128.0,
         "roll": 128.0
+      },
+      "accfactors": {
+        "horizontal": 1.2,
+        "vertical": 1.2
       }
     },
     "radarRange": 40000
@@ -37789,6 +38297,10 @@
         "pitch": 168.082,
         "yaw": 168.082,
         "roll": 168.082
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -38041,6 +38553,10 @@
         "pitch": 3.5,
         "yaw": 3.5,
         "roll": 3.5
+      },
+      "accfactors": {
+        "horizontal": 0.9,
+        "vertical": 0.9
       }
     },
     "radarRange": 40000
@@ -38289,6 +38805,10 @@
         "pitch": 3.4,
         "yaw": 3.4,
         "roll": 3.4
+      },
+      "accfactors": {
+        "horizontal": 1.05,
+        "vertical": 1.05
       }
     },
     "radarRange": 40000
@@ -38623,6 +39143,10 @@
         "pitch": 4.9,
         "yaw": 4.9,
         "roll": 5.8
+      },
+      "accfactors": {
+        "horizontal": 0.9,
+        "vertical": 0.9
       }
     },
     "radarRange": 40000
@@ -38789,6 +39313,10 @@
         "pitch": 6.6,
         "yaw": 7.8,
         "roll": 5.8
+      },
+      "accfactors": {
+        "horizontal": 0.9,
+        "vertical": 0.9
       }
     },
     "radarRange": 40000
@@ -38983,6 +39511,10 @@
         "pitch": 6.6,
         "yaw": 7.8,
         "roll": 5.8
+      },
+      "accfactors": {
+        "horizontal": 0.9,
+        "vertical": 0.9
       }
     },
     "radarRange": 40000
@@ -39574,6 +40106,10 @@
         "pitch": 683.179,
         "yaw": 683.179,
         "roll": 683.179
+      },
+      "accfactors": {
+        "horizontal": 1.25,
+        "vertical": 1.25
       }
     },
     "radarRange": 40000
@@ -39844,6 +40380,10 @@
         "pitch": 877.145,
         "yaw": 877.145,
         "roll": 877.145
+      },
+      "accfactors": {
+        "horizontal": 1.25,
+        "vertical": 1.25
       }
     },
     "radarRange": 40000
@@ -40398,6 +40938,10 @@
         "pitch": 110.0,
         "yaw": 110.0,
         "roll": 110.0
+      },
+      "accfactors": {
+        "horizontal": 1.15,
+        "vertical": 1.15
       }
     },
     "radarRange": 40000
@@ -40647,6 +41191,10 @@
         "pitch": 102.0,
         "yaw": 92.0,
         "roll": 98.855
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -40941,6 +41489,10 @@
         "pitch": 102.0,
         "yaw": 92.0,
         "roll": 98.855
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -41364,6 +41916,10 @@
         "pitch": 85.0,
         "yaw": 90.0,
         "roll": 90.0
+      },
+      "accfactors": {
+        "horizontal": 0.9,
+        "vertical": 0.9
       }
     },
     "radarRange": 40000
@@ -41630,6 +42186,10 @@
         "pitch": 11.298,
         "yaw": 11.298,
         "roll": 11.298
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -41896,6 +42456,10 @@
         "pitch": 9.317,
         "yaw": 9.317,
         "roll": 9.317
+      },
+      "accfactors": {
+        "horizontal": 1.1,
+        "vertical": 1.1
       }
     },
     "radarRange": 40000
@@ -42251,6 +42815,10 @@
         "pitch": 11.0,
         "yaw": 11.0,
         "roll": 14.0
+      },
+      "accfactors": {
+        "horizontal": 1.15,
+        "vertical": 1.15
       }
     },
     "radarRange": 40000
@@ -42432,6 +43000,10 @@
         "pitch": 11.4,
         "yaw": 11.4,
         "roll": 11.4
+      },
+      "accfactors": {
+        "horizontal": 1.3,
+        "vertical": 1.3
       }
     },
     "radarRange": 40000
@@ -42655,6 +43227,10 @@
         "pitch": 11.4,
         "yaw": 11.4,
         "roll": 11.4
+      },
+      "accfactors": {
+        "horizontal": 1.3,
+        "vertical": 1.3
       }
     },
     "radarRange": 40000
@@ -42836,6 +43412,10 @@
         "pitch": 16.572,
         "yaw": 16.572,
         "roll": 16.572
+      },
+      "accfactors": {
+        "horizontal": 1.28,
+        "vertical": 1.28
       }
     },
     "radarRange": 40000
@@ -43073,6 +43653,10 @@
         "pitch": 3.3,
         "yaw": 3.3,
         "roll": 3.6
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -43269,6 +43853,10 @@
         "pitch": 2.9,
         "yaw": 2.9,
         "roll": 3.2
+      },
+      "accfactors": {
+        "horizontal": 0.8,
+        "vertical": 0.8
       }
     },
     "radarRange": 40000
@@ -43465,6 +44053,10 @@
         "pitch": 2.2,
         "yaw": 2.2,
         "roll": 2.549
+      },
+      "accfactors": {
+        "horizontal": 0.92,
+        "vertical": 0.92
       }
     },
     "radarRange": 40000
@@ -43863,6 +44455,10 @@
         "pitch": 4.096,
         "yaw": 4.096,
         "roll": 4.096
+      },
+      "accfactors": {
+        "horizontal": 0.95,
+        "vertical": 0.95
       }
     },
     "radarRange": 40000
@@ -44087,6 +44683,10 @@
         "pitch": 3.288,
         "yaw": 3.288,
         "roll": 3.288
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -44283,6 +44883,10 @@
         "pitch": 4.1,
         "yaw": 3.815,
         "roll": 3.815
+      },
+      "accfactors": {
+        "horizontal": 0.95,
+        "vertical": 0.95
       }
     },
     "radarRange": 40000
@@ -44436,6 +45040,10 @@
         "pitch": 3.015,
         "yaw": 3.015,
         "roll": 3.015
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -44630,6 +45238,10 @@
         "pitch": 6.33,
         "yaw": 5.8,
         "roll": 6.33
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -44900,6 +45512,10 @@
         "pitch": 930.37,
         "yaw": 930.37,
         "roll": 930.37
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -45781,6 +46397,10 @@
         "pitch": 867.348,
         "yaw": 867.348,
         "roll": 867.348
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -46086,6 +46706,10 @@
         "pitch": 949.078,
         "yaw": 949.078,
         "roll": 949.078
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -46493,6 +47117,10 @@
         "pitch": 110.883,
         "yaw": 110.883,
         "roll": 110.883
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -46900,6 +47528,10 @@
         "pitch": 119.66,
         "yaw": 119.66,
         "roll": 119.66
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -47456,6 +48088,10 @@
         "pitch": 100.0,
         "yaw": 100.0,
         "roll": 90.0
+      },
+      "accfactors": {
+        "horizontal": 1.3,
+        "vertical": 1.3
       }
     },
     "radarRange": 40000
@@ -47782,6 +48418,10 @@
         "pitch": 151.607,
         "yaw": 151.607,
         "roll": 151.607
+      },
+      "accfactors": {
+        "horizontal": 1.15,
+        "vertical": 1.15
       }
     },
     "radarRange": 40000
@@ -48108,6 +48748,10 @@
         "pitch": 168.528,
         "yaw": 168.528,
         "roll": 168.528
+      },
+      "accfactors": {
+        "horizontal": 1.1,
+        "vertical": 1.1
       }
     },
     "radarRange": 40000
@@ -48431,6 +49075,10 @@
         "pitch": 120.343,
         "yaw": 120.343,
         "roll": 120.343
+      },
+      "accfactors": {
+        "horizontal": 1.1,
+        "vertical": 1.1
       }
     },
     "radarRange": 40000
@@ -48757,6 +49405,10 @@
         "pitch": 151.607,
         "yaw": 151.607,
         "roll": 151.607
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -49083,6 +49735,10 @@
         "pitch": 168.528,
         "yaw": 168.528,
         "roll": 168.528
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -49406,6 +50062,10 @@
         "pitch": 120.427,
         "yaw": 120.427,
         "roll": 120.427
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -49844,6 +50504,10 @@
         "pitch": 147.412,
         "yaw": 147.412,
         "roll": 147.412
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -50170,6 +50834,10 @@
         "pitch": 163.494,
         "yaw": 163.494,
         "roll": 163.494
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -50496,6 +51164,10 @@
         "pitch": 140.5,
         "yaw": 140.5,
         "roll": 140.5
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -50822,6 +51494,10 @@
         "pitch": 155.2,
         "yaw": 155.2,
         "roll": 155.2
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -51145,6 +51821,10 @@
         "pitch": 165.106,
         "yaw": 165.106,
         "roll": 165.106
+      },
+      "accfactors": {
+        "horizontal": 1.15,
+        "vertical": 1.15
       }
     },
     "radarRange": 40000
@@ -51499,6 +52179,10 @@
         "pitch": 9.609,
         "yaw": 9.609,
         "roll": 9.609
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -51825,6 +52509,10 @@
         "pitch": 11.03,
         "yaw": 11.03,
         "roll": 11.03
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -52263,6 +52951,10 @@
         "pitch": 13.8,
         "yaw": 13.8,
         "roll": 15.0
+      },
+      "accfactors": {
+        "horizontal": 1.15,
+        "vertical": 1.15
       }
     },
     "radarRange": 40000
@@ -52625,6 +53317,10 @@
         "pitch": 16.173,
         "yaw": 16.173,
         "roll": 16.173
+      },
+      "accfactors": {
+        "horizontal": 1.1,
+        "vertical": 1.1
       }
     },
     "radarRange": 40000
@@ -52807,6 +53503,10 @@
         "pitch": 15.426,
         "yaw": 15.426,
         "roll": 15.426
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -52989,6 +53689,10 @@
         "pitch": 18.011,
         "yaw": 18.011,
         "roll": 18.011
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -53239,6 +53943,10 @@
         "pitch": 15.426,
         "yaw": 15.426,
         "roll": 15.426
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -53447,6 +54155,10 @@
         "pitch": 18.011,
         "yaw": 18.011,
         "roll": 18.011
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -53642,6 +54354,10 @@
         "pitch": 18.283,
         "yaw": 18.283,
         "roll": 18.283
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -53809,6 +54525,10 @@
         "pitch": 13.8,
         "yaw": 13.8,
         "roll": 16.0
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -54004,6 +54724,10 @@
         "pitch": 16.704,
         "yaw": 16.704,
         "roll": 16.704
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -54199,6 +54923,10 @@
         "pitch": 19.545,
         "yaw": 19.545,
         "roll": 19.545
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -54417,6 +55145,10 @@
         "pitch": 19.0,
         "yaw": 19.0,
         "roll": 21.0
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -54670,6 +55402,10 @@
         "pitch": 2.5,
         "yaw": 3.4,
         "roll": 2.4
+      },
+      "accfactors": {
+        "horizontal": 0.92,
+        "vertical": 0.92
       }
     },
     "radarRange": 40000
@@ -54907,6 +55643,10 @@
         "pitch": 2.9,
         "yaw": 3.7,
         "roll": 2.8
+      },
+      "accfactors": {
+        "horizontal": 0.92,
+        "vertical": 0.92
       }
     },
     "radarRange": 40000
@@ -55178,6 +55918,10 @@
         "pitch": 3.4,
         "yaw": 3.656,
         "roll": 3.656
+      },
+      "accfactors": {
+        "horizontal": 1.17,
+        "vertical": 1.17
       }
     },
     "radarRange": 40000
@@ -55485,6 +56229,10 @@
         "pitch": 4.0,
         "yaw": 4.199,
         "roll": 4.199
+      },
+      "accfactors": {
+        "horizontal": 1.17,
+        "vertical": 1.17
       }
     },
     "radarRange": 40000
@@ -55701,6 +56449,10 @@
         "pitch": 6.0,
         "yaw": 6.708,
         "roll": 6.708
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -55927,6 +56679,10 @@
         "pitch": 3.1,
         "yaw": 3.472,
         "roll": 3.6
+      },
+      "accfactors": {
+        "horizontal": 1.22,
+        "vertical": 1.22
       }
     },
     "radarRange": 40000
@@ -56121,6 +56877,10 @@
         "pitch": 3.5,
         "yaw": 3.885,
         "roll": 4.1
+      },
+      "accfactors": {
+        "horizontal": 1.22,
+        "vertical": 1.22
       }
     },
     "radarRange": 40000
@@ -56355,6 +57115,10 @@
         "pitch": 4.0,
         "yaw": 4.9,
         "roll": 3.8
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -56589,6 +57353,10 @@
         "pitch": 4.6,
         "yaw": 5.5,
         "roll": 4.1
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -56769,6 +57537,10 @@
         "pitch": 6.0,
         "yaw": 6.708,
         "roll": 6.708
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -56949,6 +57721,10 @@
         "pitch": 7.0,
         "yaw": 7.862,
         "roll": 7.862
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -57219,6 +57995,10 @@
         "pitch": 896.589,
         "yaw": 896.589,
         "roll": 896.589
+      },
+      "accfactors": {
+        "horizontal": 1.1,
+        "vertical": 1.1
       }
     },
     "radarRange": 40000
@@ -57489,6 +58269,10 @@
         "pitch": 935.907,
         "yaw": 935.907,
         "roll": 935.907
+      },
+      "accfactors": {
+        "horizontal": 1.1,
+        "vertical": 1.1
       }
     },
     "radarRange": 40000
@@ -57903,6 +58687,10 @@
         "pitch": 821.68,
         "yaw": 821.68,
         "roll": 821.68
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -58474,6 +59262,10 @@
         "pitch": 846.016,
         "yaw": 846.016,
         "roll": 846.016
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -58864,6 +59656,10 @@
         "pitch": 879.37,
         "yaw": 879.37,
         "roll": 879.37
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -59354,6 +60150,10 @@
         "pitch": 915.244,
         "yaw": 915.244,
         "roll": 915.244
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -60011,6 +60811,10 @@
         "pitch": 90.0,
         "yaw": 107.0,
         "roll": 70.0
+      },
+      "accfactors": {
+        "horizontal": 1.2,
+        "vertical": 1.2
       }
     },
     "radarRange": 40000
@@ -60389,6 +61193,10 @@
         "pitch": 89.2,
         "yaw": 89.2,
         "roll": 89.2
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 80000
@@ -60663,6 +61471,10 @@
         "pitch": 100.0,
         "yaw": 108.0,
         "roll": 80.0
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -60960,6 +61772,10 @@
         "pitch": 100.0,
         "yaw": 108.0,
         "roll": 80.0
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -61247,6 +62063,10 @@
         "pitch": 122.532,
         "yaw": 122.532,
         "roll": 122.532
+      },
+      "accfactors": {
+        "horizontal": 1.15,
+        "vertical": 1.15
       }
     },
     "radarRange": 40000
@@ -61609,6 +62429,10 @@
         "pitch": 11.5,
         "yaw": 13.5,
         "roll": 11.0
+      },
+      "accfactors": {
+        "horizontal": 1.45,
+        "vertical": 1.45
       }
     },
     "radarRange": 40000
@@ -61868,6 +62692,10 @@
         "pitch": 5.2,
         "yaw": 6.7,
         "roll": 6.2
+      },
+      "accfactors": {
+        "horizontal": 1.15,
+        "vertical": 1.15
       }
     },
     "radarRange": 40000
@@ -62294,6 +63122,10 @@
         "pitch": 10.7,
         "yaw": 10.7,
         "roll": 13.0
+      },
+      "accfactors": {
+        "horizontal": 1.35,
+        "vertical": 1.35
       }
     },
     "radarRange": 40000
@@ -62574,6 +63406,10 @@
         "pitch": 11.034,
         "yaw": 11.034,
         "roll": 11.034
+      },
+      "accfactors": {
+        "horizontal": 1.25,
+        "vertical": 1.25
       }
     },
     "radarRange": 40000
@@ -62756,6 +63592,10 @@
         "pitch": 11.945,
         "yaw": 11.945,
         "roll": 11.945
+      },
+      "accfactors": {
+        "horizontal": 1.18,
+        "vertical": 1.18
       }
     },
     "radarRange": 40000
@@ -62964,6 +63804,10 @@
         "pitch": 11.945,
         "yaw": 11.945,
         "roll": 11.945
+      },
+      "accfactors": {
+        "horizontal": 1.18,
+        "vertical": 1.18
       }
     },
     "radarRange": 40000
@@ -63146,6 +63990,10 @@
         "pitch": 20.64,
         "yaw": 20.64,
         "roll": 20.64
+      },
+      "accfactors": {
+        "horizontal": 1.35,
+        "vertical": 1.35
       }
     },
     "radarRange": 40000
@@ -63368,6 +64216,10 @@
         "pitch": 2.5,
         "yaw": 3.05,
         "roll": 2.8
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -63594,6 +64446,10 @@
         "pitch": 2.9,
         "yaw": 3.3,
         "roll": 3.162
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -63805,6 +64661,10 @@
         "pitch": 2.8,
         "yaw": 3.4,
         "roll": 2.907
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -63996,6 +64856,10 @@
         "pitch": 2.5,
         "yaw": 3.5,
         "roll": 2.3
+      },
+      "accfactors": {
+        "horizontal": 0.85,
+        "vertical": 0.85
       }
     },
     "radarRange": 40000
@@ -64302,6 +65166,10 @@
         "pitch": 3.6,
         "yaw": 4.4,
         "roll": 4.0
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -64457,6 +65325,10 @@
         "pitch": 5.3,
         "yaw": 5.3,
         "roll": 6.3
+      },
+      "accfactors": {
+        "horizontal": 0.5,
+        "vertical": 0.5
       }
     },
     "radarRange": 40000
@@ -64612,6 +65484,10 @@
         "pitch": 3.232,
         "yaw": 3.232,
         "roll": 3.232
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -64794,6 +65670,10 @@
         "pitch": 3.866,
         "yaw": 3.866,
         "roll": 3.866
+      },
+      "accfactors": {
+        "horizontal": 1.2,
+        "vertical": 1.2
       }
     },
     "radarRange": 40000
@@ -64925,6 +65805,10 @@
         "pitch": 5.3,
         "yaw": 5.3,
         "roll": 6.3
+      },
+      "accfactors": {
+        "horizontal": 0.5,
+        "vertical": 0.5
       }
     },
     "radarRange": 40000
@@ -65171,6 +66055,10 @@
         "pitch": 2.3,
         "yaw": 3.5,
         "roll": 2.5
+      },
+      "accfactors": {
+        "horizontal": 0.9,
+        "vertical": 0.9
       }
     },
     "radarRange": 40000
@@ -65442,6 +66330,10 @@
         "pitch": 934.085,
         "yaw": 934.085,
         "roll": 934.085
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -66090,6 +66982,10 @@
         "pitch": 808.528,
         "yaw": 808.528,
         "roll": 808.528
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -66420,6 +67316,10 @@
         "pitch": 939.968,
         "yaw": 939.968,
         "roll": 939.968
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -66832,6 +67732,10 @@
         "pitch": 114.684,
         "yaw": 114.684,
         "roll": 114.684
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -67031,6 +67935,10 @@
         "pitch": 10.584,
         "yaw": 10.584,
         "roll": 10.584
+      },
+      "accfactors": {
+        "horizontal": 0.85,
+        "vertical": 0.85
       }
     },
     "radarRange": 40000
@@ -67354,6 +68262,10 @@
         "pitch": 8.659,
         "yaw": 8.659,
         "roll": 8.659
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -67542,6 +68454,10 @@
         "pitch": 14.159,
         "yaw": 14.159,
         "roll": 14.159
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -67779,6 +68695,10 @@
         "pitch": 3.6,
         "yaw": 5.8,
         "roll": 2.8
+      },
+      "accfactors": {
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -68052,6 +68972,10 @@
         "pitch": 9.032,
         "yaw": 9.032,
         "roll": 9.032
+      },
+      "accfactors": {
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -68271,6 +69195,10 @@
         "pitch": 3.292,
         "yaw": 3.292,
         "roll": 3.292
+      },
+      "accfactors": {
+        "horizontal": 1.1,
+        "vertical": 1.1
       }
     },
     "radarRange": 40000
