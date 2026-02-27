@@ -52,7 +52,7 @@ def main():
         print(f"📁 路径: {path}")
 
         # 2. 启动 portless
-        print(f"🌐 目标域名: http://{domain}.localhost:1355/x4-station-calculator/") 
+        print(f"🌐 目标域名: http://{domain}.localhost:1355/") 
         try:
             # 运行: portless ${domain} npm run dev
             cmd = ['portless', domain, 'npm', 'run', 'dev']
