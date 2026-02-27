@@ -53,17 +53,22 @@ def main():
 
         # 2. 启动 portless
         print(f"🌐 目标域名: http://{domain}.localhost:1355/") 
+        log_path = os.path.join(path, f'server-{domain}.log')
+        
         try:
-            # 运行: portless ${domain} npm run dev
             cmd = ['portless', domain, 'npm', 'run', 'dev']
+            
+            # 打开文件用于写入日志
+            log_file = open(log_path, 'w')
+            
             process = subprocess.Popen(
                 cmd, 
                 cwd=path,
-                stdout=subprocess.DEVNULL, 
-                stderr=subprocess.DEVNULL
+                stdin=subprocess.DEVNULL,   # 👈 核心修复：明确切断标准输入流，防止 EIO 报错
+                stdout=log_file,            # 标准输出写入文件
+                stderr=subprocess.STDOUT    # 错误输出合并到标准输出
             )
-            print(f"✅ 服务已在后台启动 (PID: {process.pid})")
-            print(f"命令: {' '.join(cmd)}")
+            print(f"✅ 服务已启动 (PID: {process.pid})，日志保存在: {log_path}")
         except FileNotFoundError:
             print("❌ 错误: 未找到 portless 或 npm 命令。请确保它们已在 PATH 中。")
             sys.exit(1)

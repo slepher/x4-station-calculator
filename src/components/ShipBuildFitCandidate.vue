@@ -67,7 +67,7 @@ const sizeShort = (size: string) => {
 const mergeOptions = (rows: Array<{ options: OptionItem[] }>) => {
   const optionMap = new Map<string, OptionItem>()
   rows.forEach((row) => row.options.forEach((opt) => optionMap.set(opt.id, opt)))
-  return Array.from(optionMap.values()).sort((a, b) => a.name.localeCompare(b.name))
+  return Array.from(optionMap.values()).sort((a, b) => a.id.localeCompare(b.id))
 }
 
 const mergeTags = (rows: Array<{ tags: string[] }>) => {
