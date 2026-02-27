@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "wdev": "python3 scripts/wortree-server.py",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
     "test:e2e": "pnpm exec playwright test",

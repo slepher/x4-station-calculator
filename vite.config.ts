@@ -2,12 +2,14 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path' // 需引入 path 模块
 
+const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 5174;
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
   base: '/x4-station-calculator/', // 你的 GitHub 仓库名
   preview: {
-    port: 4173,
+    port: port,
     strictPort: true,
   },
   resolve: {
@@ -17,6 +19,7 @@ export default defineConfig({
     }
   },
   server: {
+    port: port,
     watch: {
       // 排除 openspec, tests 文件夹
       ignored: ['openspec/**', 'tests/**']
