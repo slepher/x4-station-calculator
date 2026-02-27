@@ -66,12 +66,6 @@ const resolveCostByMethod = (
   return source[method] || source.default || {}
 }
 
-const resolveShipCostByMethod = (ship: X4Ship, method: string): Record<string, number> => {
-  const target = ship.production.find((item) => item.method === method)
-    || ship.production.find((item) => item.method === 'default')
-  return target?.cost || {}
-}
-
 const mapCostToMaterialItems = (
   cost: Partial<Record<string, number>>,
   quantity = 1
@@ -129,25 +123,8 @@ if (materialMethodOptions.value.length > 0 && !materialMethodOptions.value.inclu
 }
 
 const shipMaterialGroup = computed(() => {
-  if (!selectedShip.value) return null
-  const shipCost = resolveShipCostByMethod(selectedShip.value, materialMethod.value)
-  const items = mapCostToMaterialItems(shipCost)
-  return {
-    shipId: selectedShip.value.id,
-    value: items.reduce((sum, item) => sum + item.value, 0),
-    items
-  }
-})
-
-const hullMaterialGroup = computed(() => {
-  if (!selectedShip.value || !props.shipBlueprint?.hull) return null
-  const hullMaterials = props.shipBlueprint.hull.materials
-  const items = mapCostToMaterialItems(hullMaterials)
-  return {
-    shipId: selectedShip.value.id,
-    value: items.reduce((sum, item) => sum + item.value, 0),
-    items
-  }
+  // Use ship production cost from store (with method fallback)
+  return useShipBuildStore().shipBuildMaterialAnalysis?.shipGroup || null
 })
 
 const equipmentMaterialGroups = computed(() => {
@@ -203,10 +180,6 @@ const materialSummaryItems = computed(() => {
     })
   }
 
-  // Merge hull materials first (from ShipBlueprint hull configuration)
-  if (hullMaterialGroup.value) {
-    mergeItems(hullMaterialGroup.value.items)
-  }
   // Merge ship production cost
   if (shipMaterialGroup.value) {
     mergeItems(shipMaterialGroup.value.items)
@@ -285,21 +258,21 @@ const getShipName = (shipId: string | undefined) => {
           </template>
         </CollapsibleDetailList>
 
-        <!-- Hull group as separate item -->
+        <!-- Ship production cost as separate item -->
         <CollapsibleDetailList
-          v-if="hullMaterialGroup"
-          :data="hullMaterialGroup.items"
-          main-row-testid="ship-build-material-hull-group"
-          list-testid="ship-build-material-hull-list"
+          v-if="shipMaterialGroup"
+          :data="shipMaterialGroup.items"
+          main-row-testid="ship-build-material-ship-group"
+          list-testid="ship-build-material-ship-list"
         >
           <template #title>
             <div class="material-equipment-title">
-              <span class="material-equipment-name">{{ getShipName(hullMaterialGroup?.shipId) }}</span>
+              <span class="material-equipment-name">{{ getShipName(shipMaterialGroup?.shipId) }}</span>
               <span class="material-equipment-count">x 1</span>
             </div>
           </template>
           <template #header>
-            <span class="material-summary-value">{{ formatCrValue(hullMaterialGroup?.value || 0) }}</span>
+            <span class="material-summary-value">{{ formatCrValue(shipMaterialGroup?.value || 0) }}</span>
           </template>
           <template #row="{ item }">
             <div class="material-item-row">

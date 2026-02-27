@@ -37,52 +37,52 @@
   - [x] 步骤 2：比较结果。
   - [x] 步骤 3：断言每种材料 `count` 完全一致，`value` 发生变化。
 
-- [ ] 1.7 船体材料独立计算
-  - [ ] 步骤 1：准备 ShipBlueprint 包含 hull 配置（如 ship_ter_m_corvette_02_a）。
-  - [ ] 步骤 2：执行材料计算。
-  - [ ] 步骤 3：断言总材料包含船体材料（独立于 production cost）。
-  - [ ] 步骤 4：断言材料分项中存在船体独立分项，显示格式为"Odachi x 1"（船体名称 x 1）。
+- [x] 1.7 船体材料独立计算
+  - [x] 步骤 1：准备 ShipBlueprint 包含 hull 配置（如 ship_ter_m_corvette_02_a）。
+  - [x] 步骤 2：执行材料计算。
+  - [x] 步骤 3：断言总材料包含船体材料（独立于 production cost）。
+  - [x] 步骤 4：断言材料分项中存在船体独立分项，显示格式为"Odachi x 1"（船体名称 x 1）。
 
-- [ ] 1.8 船体分项展开显示材料明细
-  - [ ] 步骤 1：准备 ShipBlueprint 包含 hull 配置。
-  - [ ] 步骤 2：执行材料计算。
-  - [ ] 步骤 3：展开船体分项（如"Odachi x 1"）。
-  - [ ] 步骤 4：断言分项内显示船体对应材料明细（如 hullparts）。
+- [x] 1.8 船体分项展开显示材料明细
+  - [x] 步骤 1：准备 ShipBlueprint 包含 hull 配置。
+  - [x] 步骤 2：执行材料计算。
+  - [x] 步骤 3：展开船体分项（如"Odachi x 1"）。
+  - [x] 步骤 4：断言分项内显示船体对应材料明细（如 hullparts）。
 
-- [ ] 1.9 数据源 ShipBlueprint
-  - [ ] 步骤 1：准备 blueprint.connections 包含装备配置。
-  - [ ] 步骤 2：从 blueprint 计算装备分项。
-  - [ ] 步骤 3：断言结果与 blueprint.connections 数据一致。
+- [x] 1.9 数据源 ShipBlueprint
+  - [x] 步骤 1：准备 blueprint.connections 包含装备配置。
+  - [x] 步骤 2：从 blueprint 计算装备分项。
+  - [x] 步骤 3：断言结果与 blueprint.connections 数据一致。
 
 ## 2. Bootstrapping & State（E2E）
 
 ### 2.1 method 选项过滤 xenon（通用）
 
-- [ ] 2.1.1 验证：method 下拉不包含 xenon 选项
-  - [ ] 步骤 1：进入 Ship Build 界面，选择任意飞船和装备。
-  - [ ] 步骤 2：打开 method 下拉。
-  - [ ] 步骤 3：断言下拉选项中不包含 `xenon`。
+- [x] 2.1.1 验证：method 下拉不包含 xenon 选项
+  - [x] 步骤 1：进入 Ship Build 界面，选择任意飞船和装备。
+  - [x] 步骤 2：打开 method 下拉。
+  - [x] 步骤 3：断言下拉选项中不包含 `xenon`。
 
 ### 2.2 大太刀 - 护盾 fallback 测试场景
 
 测试目标：验证当 method=closedloop 时，护盾 `shield_ter_m_standard_02_mk2`（仅支持 default）fallback 到 default。
 
-- [ ] 2.2.1 状态：大太刀标准测试状态
-  - [ ] 步骤 1：进入 Ship Build 界面。
-  - [ ] 步骤 2：筛选 class=M, race=terran，选择飞船"大太刀"（ship_ter_m_corvette_02_a）。
-  - [ ] 步骤 3：断言材料面板、method 下拉、总材料汇总行可见且无报错。
+- [x] 2.2.1 状态：大太刀标准测试状态
+  - [x] 步骤 1：进入 Ship Build 界面。
+  - [x] 步骤 2：筛选 class=M, race=terran，选择飞船"大太刀"（ship_ter_m_corvette_02_a）。
+  - [x] 步骤 3：断言材料面板、method 下拉、总材料汇总行可见且无报错。
 
-- [ ] 2.2.2 状态：大太刀-护盾配置（shield_ter_m_standard_02_mk2）
-  - [ ] 步骤 1：先进入"状态：大太刀标准测试状态"。
-  - [ ] 步骤 2：切换到 `slotType=shield`。
-  - [ ] 步骤 3：选择护盾 `shield_ter_m_standard_02_mk2`（该护盾仅支持 default manufacturing）。
-  - [ ] 步骤 4：断言护盾分项出现。
+- [x] 2.2.2 状态：大太刀-护盾配置（shield_ter_m_standard_02_mk2）
+  - [x] 步骤 1：先进入"状态：大太刀标准测试状态"。
+  - [x] 步骤 2：切换到 `slotType=shield`。
+  - [x] 步骤 3：选择护盾 `shield_ter_m_standard_02_mk2`（该护盾仅支持 default manufacturing）。
+  - [x] 步骤 4：断言护盾分项出现。
 
-- [ ] 2.2.3 状态：大太刀-推进器配置（thruster_gen_m_allround_01_mk1）
-  - [ ] 步骤 1：继续"状态：大太刀-护盾配置"。
-  - [ ] 步骤 2：切换到 `slotType=engine`。
-  - [ ] 步骤 3：选择推进器 `thruster_gen_m_allround_01_mk1`（该推进器支持 default, closedloop, terran）。
-  - [ ] 步骤 4：断言推进器分项出现。
+- [x] 2.2.3 状态：大太刀-推进器配置（thruster_gen_m_allround_01_mk1）
+  - [x] 步骤 1：继续"状态：大太刀-护盾配置"。
+  - [x] 步骤 2：切换到 `slotType=engine`。
+  - [x] 步骤 3：选择推进器 `thruster_gen_m_allround_01_mk1`（该推进器支持 default, closedloop, terran）。
+  - [x] 步骤 4：断言推进器分项出现。
 
 - [ ] 2.2.4 验证：method 选项包含 closedloop
   - [ ] 步骤 1：进入"状态：大太刀-推进器配置"。
@@ -100,22 +100,22 @@
 
 测试目标：验证当 method=terran 时，Argon 炮塔 `turret_arg_m_beam_02_mk1`（仅支持 default, closedloop）fallback 到 default。
 
-- [ ] 2.3.1 状态：大阪标准测试状态
-  - [ ] 步骤 1：进入 Ship Build 界面。
-  - [ ] 步骤 2：筛选 class=L, race=argon，选择飞船"大阪"（ship_arg_l_destroyer_01_a）。
-  - [ ] 步骤 3：断言材料面板、method 下拉、总材料汇总行可见且无报错。
+- [x] 2.3.1 状态：大阪标准测试状态
+  - [x] 步骤 1：进入 Ship Build 界面。
+  - [x] 步骤 2：筛选 class=L, race=argon，选择飞船"大阪"（ship_arg_l_destroyer_01_a）。
+  - [x] 步骤 3：断言材料面板、method 下拉、总材料汇总行可见且无报错。
 
-- [ ] 2.3.2 状态：大阪-推进器配置（thruster_gen_l_allround_01_mk1）
-  - [ ] 步骤 1：先进入"状态：大阪标准测试状态"。
-  - [ ] 步骤 2：切换到 `slotType=engine`。
-  - [ ] 步骤 3：选择推进器 `thruster_gen_l_allround_01_mk1`（该推进器支持 default, closedloop, terran）。
-  - [ ] 步骤 4：断言推进器分项出现。
+- [x] 2.3.2 状态：大阪-推进器配置（thruster_gen_l_allround_01_mk1）
+  - [x] 步骤 1：先进入"状态：大阪标准测试状态"。
+  - [x] 步骤 2：切换到 `slotType=engine`。
+  - [x] 步骤 3：选择推进器 `thruster_gen_l_allround_01_mk1`（该推进器支持 default, closedloop, terran）。
+  - [x] 步骤 4：断言推进器分项出现。
 
-- [ ] 2.3.3 状态：大阪-炮塔配置（turret_arg_m_beam_02_mk1）
-  - [ ] 步骤 1：继续"状态：大阪-推进器配置"。
-  - [ ] 步骤 2：切换到 `slotType=turret`。
-  - [ ] 步骤 3：选择炮塔 `turret_arg_m_beam_02_mk1`（该炮塔支持 default, closedloop，不支持 terran）。
-  - [ ] 步骤 4：断言炮塔分项出现。
+- [x] 2.3.3 状态：大阪-炮塔配置（turret_arg_m_beam_02_mk1）
+  - [x] 步骤 1：继续"状态：大阪-推进器配置"。
+  - [x] 步骤 2：切换到 `slotType=turret`。
+  - [x] 步骤 3：选择炮塔 `turret_arg_m_beam_02_mk1`（该炮塔支持 default, closedloop，不支持 terran）。
+  - [x] 步骤 4：断言炮塔分项出现。
 
 - [ ] 2.3.4 验证：method 选项包含 terran
   - [ ] 步骤 1：进入"状态：大阪-炮塔配置"。
@@ -130,11 +130,11 @@
 
 ### 2.4 原有测试场景保留
 
-- [x] 2.4.1 状态：标准测试状态-大阪（保留）
+- [x] 2.1 状态：标准测试状态-大阪（保留）
   - [x] 步骤 1：按 `ship-build-equipment` 标准路径进入"状态：标准测试状态-大阪"。
   - [x] 步骤 2：断言材料面板、method 下拉、总材料汇总行可见且无报错。
 
-- [x] 2.4.2 状态：标准测试状态-大阪-材料分项聚合（保留）
+- [x] 2.2 状态：标准测试状态-大阪-材料分项聚合（保留）
   - [x] 步骤 1：先进入"状态：标准测试状态-大阪"。
   - [x] 步骤 2：在配装区切换到 `slotType=turret`。
   - [x] 步骤 3：进入 `group_back_down_mid` 并选择 Argon 装备 `turret_arg_m_beam_02_mk1`。
@@ -142,13 +142,13 @@
   - [x] 步骤 5：进入 `group_down_mid_left` 并再次选择 `turret_arg_m_beam_02_mk1`（形成重复 `equipmentId`）。
   - [x] 步骤 6：断言材料分项区出现以下两个分项：`turret_arg_m_beam_02_mk1 x 3`、`turret_ter_m_beam_02_mk1 x 1`。
 
-- [x] 2.4.3 切换：method 变更（使用推进器完整测试）（保留）
+- [x] 2.3 切换：method 变更（使用推进器完整测试）（保留）
   - [x] 步骤 1：进入"状态：标准测试状态-大阪-方法测试聚合"（推进器+炮塔）。
   - [x] 步骤 2：断言 method 下拉出现 `default`、`closedloop` 选项（terran 未出现因推进器槽无该选项）。
   - [x] 步骤 3：切换 method 为 `closedloop`，断言总材料金额变化。
   - [x] 步骤 4：断言切换成功，无报错。
 
-- [x] 2.4.4 状态：标准测试状态-大阪-多模块聚合（保留）
+- [x] 2.4 状态：标准测试状态-大阪-多模块聚合（保留）
   - [x] 步骤 1：先进入"状态：标准测试状态-大阪"。
   - [x] 步骤 2：在配装区切换到 `slotType=turret`。
   - [x] 步骤 3：`group_back_down_mid` 选择 `turret_arg_m_beam_02_mk1`。
@@ -160,7 +160,7 @@
     - [x] `turret_ter_m_beam_02_mk1 x 1`
     - [x] `turret_arg_m_gatling_02_mk1 x 2`
 
-- [x] 2.4.5 状态：标准测试状态-大阪-方法测试聚合（推进器+炮塔）（保留）
+- [x] 2.5 状态：标准测试状态-大阪-方法测试聚合（推进器+炮塔）（保留）
   - [x] 步骤 1：进入"状态：标准测试状态-大阪"。
   - [x] 步骤 2：切换到 `slotType=engine`。
   - [x] 步骤 3：在任意 engine 槽选择装备。
@@ -232,7 +232,7 @@
   - [ ] 步骤 2：断言材料分项列表中同时存在船体分项和装备分项。
   - [ ] 步骤 3：验证船体分项不与装备分项混淆。
 
-- [ ] 3.11 场景：ShipBlueprint 数据源正常
-  - [ ] 步骤 1：保存当前配装为 ShipBlueprint。
-  - [ ] 步骤 2：刷新页面后加载该 ShipBlueprint。
-  - [ ] 步骤 3：断言材料面板数据与保存前一致（blueprint.connections 数据源正常）。
+- [x] 3.11 场景：ShipBlueprint 数据源正常
+  - [x] 步骤 1：保存当前配装为 ShipBlueprint。
+  - [x] 步骤 2：刷新页面后加载该 ShipBlueprint。
+  - [x] 步骤 3：断言材料面板数据与保存前一致（blueprint.connections 数据源正常）。
