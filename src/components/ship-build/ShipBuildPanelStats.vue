@@ -241,61 +241,59 @@ const calculateWeaponDPS = (equipment: any, bullet: any, missile: any, count: nu
 
     if (isBeam) {
       // Beam 类
-      const lifetime = bullet.lifetime || 0
-      const damage = bullet.damage || 0
-      const reload = bullet.reload || 0
-      const chargetime = bullet.chargetime || 0
+      const lifetime = bullet.lifetime
+      const damage = bullet.damage
+      const reload = bullet.reload
+      const chargetime = bullet.chargetime
+      const ammo = bullet.ammo
+      const ammoReload = bullet.ammoreload
 
       singleDamage = damage * lifetime
-      singleHeat = (bullet.shotHeat || 0) + ((bullet.heat || 0) * lifetime)
       singleShotTime = chargetime + Math.max(lifetime, reload)
+
+      // Beam 使用原始计算（近似公式）
+      const avgShotTime = (ammo * singleShotTime + ammoReload) / Math.max(ammo, 1)
+      const burstDPS = avgShotTime > 0 ? (singleDamage / avgShotTime) * count : 0
+
+      // 持续 DPS
+      singleHeat = bullet.shotHeat + bullet.heat * lifetime
+      let sustainedDPS = burstDPS
+      if (weaponHeat?.overheat && weaponHeat?.coolrate && singleHeat > 0) {
+        const avgHeatPerSec = burstDPS / singleDamage * singleHeat
+        const timeToOverheat = avgHeatPerSec > 0 ? overheatThreshold / avgHeatPerSec : 0
+        const cycleTime = timeToOverheat + weaponHeat.cooldelay + (overheatThreshold / weaponHeat.coolrate)
+        sustainedDPS = cycleTime > 0 ? burstDPS * (timeToOverheat / cycleTime) * count : 0
+      }
+
+      return { burstDPS, sustainedDPS }
     } else {
       // 子弹类
-      const damage = bullet.damage || 0
-      const amount = bullet.amount || 1
-      const reload = bullet.reload || 0
-      const chargetime = bullet.chargetime || 0
+      const damage = bullet.damage
+      const amount = bullet.amount
+      const reload = bullet.reload
+      const chargetime = bullet.chargetime
+      const ammo = bullet.ammo
+      const ammoReload = bullet.ammoreload
 
       singleDamage = damage * amount
-      singleHeat = bullet.shotHeat || 0
+      singleHeat = bullet.shotHeat
       singleShotTime = chargetime + reload
+
+      // 爆发 DPS（统一公式：换弹时间平摊到每发）
+      const avgShotTime = (ammo * singleShotTime + ammoReload) / Math.max(ammo, 1)
+      const burstDPS = avgShotTime > 0 ? (singleDamage / avgShotTime) * count : 0
+
+      // 持续 DPS（近似计算：换弹时间平摊）
+      let sustainedDPS = burstDPS
+      if (weaponHeat?.overheat && weaponHeat?.coolrate && singleHeat > 0) {
+        const avgHeatPerSec = burstDPS / singleDamage * singleHeat
+        const timeToOverheat = avgHeatPerSec > 0 ? overheatThreshold / avgHeatPerSec : 0
+        const cycleTime = timeToOverheat + weaponHeat.cooldelay + (overheatThreshold / weaponHeat.coolrate)
+        sustainedDPS = cycleTime > 0 ? burstDPS * (timeToOverheat / cycleTime) * count : 0
+      }
+
+      return { burstDPS, sustainedDPS }
     }
-
-    // 有弹匣时使用弹匣作为作战单元
-    const ammo = bullet.ammo || 0
-    const ammoReload = bullet.ammoreload || 0
-
-    let actualDamage: number
-    let actualHeat: number
-    let shotTime: number
-
-    if (ammo > 0) {
-      // 有弹匣：按弹匣计算
-      actualDamage = ammo * singleDamage
-      actualHeat = ammo * singleHeat
-      shotTime = ammo * singleShotTime + ammoReload
-    } else {
-      // 无弹匣：按单发计算
-      actualDamage = singleDamage
-      actualHeat = singleHeat
-      shotTime = singleShotTime
-    }
-
-    // 爆发 DPS
-    const burstDPS = shotTime > 0 ? (actualDamage / shotTime) * count : 0
-
-    // 持续 DPS
-    let sustainedDPS = burstDPS
-    if (weaponHeat?.overheat && weaponHeat?.coolrate && actualHeat > 0) {
-      const shotsInCycle = Math.max(1, Math.floor(overheatThreshold / actualHeat))
-      const totalShotTime = shotsInCycle * shotTime
-      const totalHeat = Math.max(overheatThreshold, actualHeat)
-      const cycleTime = totalShotTime + (weaponHeat.cooldelay || 0) + (totalHeat / weaponHeat.coolrate)
-      const cycleDamage = actualDamage * shotsInCycle
-      sustainedDPS = cycleTime > 0 ? (cycleDamage / cycleTime) * count : 0
-    }
-
-    return { burstDPS, sustainedDPS }
   }
 
   // 处理 missiles.json (missilelauncher/missileturret)

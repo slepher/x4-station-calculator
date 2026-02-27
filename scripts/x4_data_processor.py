@@ -1799,7 +1799,7 @@ class X4PrecisionLoader:
                     "amount": 1,        # 弹片数，默认1
                     "shotHeat": 0,      # 子弹=heat.value(单发热量), beam=heat.initial(初始热量)
                     "heat": 0,          # 子弹=0, beam=每秒持续热量
-                    "ammo": 0,          # 弹匣数量，默认0
+                    "ammo": 1,          # 弹匣数量，默认1
                     "ammoreload": 0     # 弹匣重装时间，默认0
                 }
 
@@ -1829,7 +1829,9 @@ class X4PrecisionLoader:
 
                     # ammo: 弹匣数量和重装时间
                     if ammo_node is not None:
-                        bullet["ammo"] = int(ammo_node.get('value') or 0)
+                        ammo_val = int(ammo_node.get('value') or 0)
+                        if ammo_val > 0:
+                            bullet["ammo"] = ammo_val
                         bullet["ammoreload"] = float(ammo_node.get('reload') or 0)
 
                         # range: Beam直接使用range属性，子弹=lifetime×speed
