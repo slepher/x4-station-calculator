@@ -604,7 +604,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
         race: equipment.race || null,
         tags: normalizeTagList(equipment.slotTags)
       }))
-      .sort((a, b) => a.name.localeCompare(b.name))
+      .sort((a, b) => a.name > b.name ? 1 : a.name < b.name ? -1 : 0)
   }
 
   const selectedShip = computed(() => {
@@ -735,7 +735,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
       const optionMap = new Map(existing.options.map((item) => [item.id, item]))
       row.options.forEach((item) => optionMap.set(item.id, item))
-      existing.options = Array.from(optionMap.values()).sort((a, b) => a.name.localeCompare(b.name))
+      existing.options = Array.from(optionMap.values()).sort((a, b) => a.name > b.name ? 1 : a.name < b.name ? -1 : 0)
     })
 
     return Array.from(grouped.values())
