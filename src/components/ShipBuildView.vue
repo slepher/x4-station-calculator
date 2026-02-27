@@ -59,7 +59,7 @@ bullets.forEach((b) => {
 })
 const missileMap = new Map<string, any>()
 missiles.forEach((m) => {
-  missileMap.set(m.id, m)
+  missileMap.set(m.macro, m)
 })
 const consumableMap = new Map<string, any>()
 consumables.forEach((c) => {

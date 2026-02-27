@@ -28,19 +28,19 @@
 
 ## 5. 修正占位字段
 
-- [ ] 5.1 修正雷达范围(radar_range)：从 `ship.radarRange` 获取
-- [ ] 5.2 修正可投放设备(deployable)：从 `ship.storage.deployable` 获取
-- [ ] 5.3 修正干扰弹(countermeasure)：从 `ship.storage.countermeasure` 获取
-- [ ] 5.4 实现武器爆发输出值：从 blueprint.connections + bullets.json 计算
-- [ ] 5.5 实现武器持续输出值：从 blueprint.connections + bullets.json 计算
-- [ ] 5.6 实现炮塔平均输出值：从 blueprint.connections + bullets.json 计算
+- [x] 5.1 修正雷达范围(radar_range)：从 `ship.radarRange` 获取
+- [x] 5.2 修正可投放设备(deployable)：从 `ship.storage.deployable` 获取
+- [x] 5.3 修正干扰弹(countermeasure)：从 `ship.storage.countermeasure` 获取
+- [x] 5.4 实现武器爆发输出值：从 blueprint.connections + bullets.json 计算
+- [x] 5.5 实现武器持续输出值：从 blueprint.connections + bullets.json 计算
+- [x] 5.6 实现炮塔平均输出值：从 blueprint.connections + bullets.json 计算
 
 ## 6. Blueprint 数据源重构
 
-- [ ] 6.1 将 getShieldStats() 改为从 blueprint.connections 获取已选护盾设备
-- [ ] 6.2 将 getEngineStats() 改为从 blueprint.connections 获取已选引擎设备
-- [ ] 6.3 移除对 selectedByConnection ref 的属性计算依赖
+- [x] 6.1 将 getShieldStats() 改为从 blueprint.connections 获取已选护盾设备
+- [x] 6.2 将 getEngineStats() 改为从 blueprint.connections 获取已选引擎设备
+- [x] 6.3 移除对 selectedByConnection ref 的属性计算依赖
 
 ## 7. 构建验证
 
-- [ ] 7.1 完成改动后执行 `npm run build` 并通过。
+- [x] 7.1 完成改动后执行 `npm run build` 并通过。

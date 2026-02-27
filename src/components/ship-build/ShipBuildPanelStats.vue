@@ -3,6 +3,8 @@ import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import type { X4Ship, X4Equipment, ShipBlueprint } from '@/types/x4'
+import bulletsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/bullets.json'
+import missilesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/missiles.json'
 
 const props = defineProps<{
   shipBlueprint: ShipBlueprint | null
@@ -12,6 +14,18 @@ const { t } = useI18n()
 
 // 全局字典数据 - 直接从 store 读取
 const store = useShipBuildStore()
+
+// Bullet map - use id as key
+const bulletMap = new Map<string, any>()
+bulletsRaw.forEach((b: any) => {
+  bulletMap.set(b.id, b)
+})
+
+// Missile map - use macro as key (equipment.bullet stores macro value)
+const missileMap = new Map<string, any>()
+missilesRaw.forEach((m: any) => {
+  missileMap.set(m.macro, m)
+})
 
 // ============ 内部状态 ============
 const statsViewMode = ref<'summary' | 'detail'>('summary')
@@ -34,9 +48,12 @@ const equipmentMap = computed(() => {
 })
 
 // ============ 从 Blueprint 派生数据 ============
+// 优先从 blueprint 获取 shipId，如果没有 blueprint 则从 store 获取
 const selectedShip = computed(() => {
-  if (!props.shipBlueprint) return null
-  return shipMap.value.get(props.shipBlueprint.shipId) || null
+  // 优先从 blueprint 获取 shipId
+  const shipId = props.shipBlueprint?.shipId || store.selectedShipId
+  if (!shipId) return null
+  return shipMap.value.get(shipId) || null
 })
 
 type ShipStatMetric = {
@@ -58,8 +75,7 @@ type ShipStatDisplay = {
 
 // Placeholder fields that don't have data sources yet
 const placeholderKeys = new Set([
-  'radar_range', 'weapon_burst', 'turret_avg', 'weapon_sustained',
-  'deployable', 'countermeasure', 'shield_group_avg', 'travel_acceleration'
+  'shield_group_avg', 'travel_acceleration'
 ])
 
 // Get aggregated shield stats from selected shield equipment
@@ -147,6 +163,83 @@ const getEngineStats = () => {
   }
 }
 
+// Get weapon damage stats from blueprint.connections (根据 equipment.class 决定弹药类型)
+const getWeaponDamageStats = () => {
+  if (!selectedShip.value || !props.shipBlueprint) return { burst: 0, sustained: 0 }
+
+  let totalBurst = 0
+  let totalSustained = 0
+
+  // 遍历 blueprint.connections 获取所有已装备设备
+  props.shipBlueprint.connections.forEach((conn) => {
+    conn.group.forEach((g) => {
+      if (!g.equipment_id) return
+      const equipment = equipmentMap.value.get(g.equipment_id)
+      if (!equipment?.bullet) return
+
+      const equipmentClass = equipment.class
+      const count = g.count || 1
+
+      // 根据 equipment.class 决定使用 bullets.json 还是 missiles.json
+      if (equipmentClass === 'weapon' || equipmentClass === 'turret') {
+        // 常规武器/炮台：使用 bullets.json
+        const bullet = bulletMap.get(equipment.bullet)
+        if (!bullet) return
+        totalBurst += (bullet.damage || 0) * count * 5
+        totalSustained += ((bullet.damage || 0) / (bullet.reload || 1)) * count
+      } else if (equipmentClass === 'missilelauncher' || equipmentClass === 'missileturret') {
+        // 导弹发射器：使用 missiles.json
+        const missile = missileMap.get(equipment.bullet)
+        if (!missile) return
+        // 爆发：使用 explosive 作为单发伤害，假设前 5 秒
+        totalBurst += (missile.explosive || 0) * count * 5
+        // 持续：DPS = explosive / reload
+        totalSustained += ((missile.explosive || 0) / (missile.reload || 1)) * count
+      }
+    })
+  })
+
+  return { burst: totalBurst, sustained: totalSustained }
+}
+
+// Get turret average damage (只计算 turret 和 missileturret class)
+const getTurretDamageStats = () => {
+  if (!selectedShip.value || !props.shipBlueprint) return 0
+
+  let totalDamage = 0
+  let turretCount = 0
+
+  props.shipBlueprint.connections.forEach((conn) => {
+    conn.group.forEach((g) => {
+      if (!g.equipment_id) return
+      const equipment = equipmentMap.value.get(g.equipment_id)
+      if (!equipment?.bullet) return
+
+      const equipmentClass = equipment.class
+      // 只计算 turret 和 missileturret class
+      if (equipmentClass !== 'turret' && equipmentClass !== 'missileturret') return
+
+      const count = g.count || 1
+
+      if (equipmentClass === 'turret') {
+        // 常规炮台：使用 bullets.json
+        const bullet = bulletMap.get(equipment.bullet)
+        if (!bullet) return
+        totalDamage += ((bullet.damage || 0) / (bullet.reload || 1)) * count
+        turretCount += count
+      } else if (equipmentClass === 'missileturret') {
+        // 导弹发射器：使用 missiles.json
+        const missile = missileMap.get(equipment.bullet)
+        if (!missile) return
+        totalDamage += ((missile.explosive || 0) / (missile.reload || 1)) * count
+        turretCount += count
+      }
+    })
+  })
+
+  return turretCount > 0 ? totalDamage / turretCount : 0
+}
+
 // Calculate speed from thrust and ship physics
 const calculateSpeed = (thrust: number, mass: number, drag: number) => {
   if (!mass || !drag) return 0
@@ -181,6 +274,8 @@ const getShipStorageCapacity = (ship: X4Ship, size: string) => {
 const buildSummaryStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
   const shieldStats = getShieldStats()
   const engineStats = getEngineStats()
+  const weaponStats = getWeaponDamageStats()
+  const turretAvg = getTurretDamageStats()
   const mass = ship.physics?.mass || 1
   const dragForward = ship.physics?.drag?.forward || 1
 
@@ -191,9 +286,9 @@ const buildSummaryStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
   return [
     { key: 'hull', labelKey: 'ship_build.stats_hull', unit: 'MJ', value: ship.hull || 0 },
     { key: 'shield', labelKey: 'ship_build.stats_shield', unit: 'MJ', value: shieldStats.max },
-    { key: 'radar_range', labelKey: 'ship_build.stats_radar_range', unit: 'km', value: 0 },
-    { key: 'weapon_burst', labelKey: 'ship_build.stats_weapon_burst', unit: 'MW', value: 0 },
-    { key: 'turret_avg', labelKey: 'ship_build.stats_turret_avg', unit: 'MW', value: 0 },
+    { key: 'radar_range', labelKey: 'ship_build.stats_radar_range', unit: 'km', value: ship.radarRange || 0 },
+    { key: 'weapon_burst', labelKey: 'ship_build.stats_weapon_burst', unit: 'MW', value: weaponStats.burst },
+    { key: 'turret_avg', labelKey: 'ship_build.stats_turret_avg', unit: 'MW', value: turretAvg },
     { key: 'storage_container', labelKey: 'ship_build.stats_storage_container', unit: 'm3', value: getCargoCapacity(ship, 'container') },
     { key: 'dock_m_count', labelKey: 'ship_build.stats_dock_m_count', unit: '', value: getDockCount(ship, 'dock_m') },
     { key: 'dock_m_capacity', labelKey: 'ship_build.stats_dock_m_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_m') },
@@ -205,8 +300,8 @@ const buildSummaryStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
     { key: 'crew', labelKey: 'ship_build.stats_crew', unit: '', value: ship.crew?.capacity || 0 },
     { key: 'storage_unit', labelKey: 'ship_build.stats_storage_unit', unit: '', value: ship.storage?.unit || 0 },
     { key: 'missile', labelKey: 'ship_build.stats_missile', unit: '', value: ship.storage?.missile || 0 },
-    { key: 'deployable', labelKey: 'ship_build.stats_deployable', unit: '', value: 0 },
-    { key: 'countermeasure', labelKey: 'ship_build.stats_countermeasure', unit: '', value: 0 }
+    { key: 'deployable', labelKey: 'ship_build.stats_deployable', unit: '', value: ship.storage?.deployable || 0 },
+    { key: 'countermeasure', labelKey: 'ship_build.stats_countermeasure', unit: '', value: ship.storage?.countermeasure || 0 }
   ]
 }
 
@@ -215,6 +310,7 @@ const buildDetailStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
   const summaryStats = buildSummaryStats(ship)
   const shieldStats = getShieldStats()
   const engineStats = getEngineStats()
+  const weaponStats = getWeaponDamageStats()
   const mass = ship.physics?.mass || 1
   const dragForward = ship.physics?.drag?.forward || 1
   const dragHorizontal = ship.physics?.drag?.horizontal || 1
@@ -229,8 +325,8 @@ const buildDetailStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
   const extraStats: Omit<ShipStatMetric, 'ratio'>[] = [
     { key: 'shield_recharge_rate', labelKey: 'ship_build.stats_shield_recharge_rate', unit: 'MW', value: shieldStats.rate },
     { key: 'shield_recharge_delay', labelKey: 'ship_build.stats_shield_recharge_delay', unit: 's', value: shieldStats.delay },
-    { key: 'shield_group_avg', labelKey: 'ship_build.stats_shield', unit: 'MJ', value: 0 },
-    { key: 'weapon_sustained', labelKey: 'ship_build.stats_weapon_sustained', unit: 'MW', value: 0 },
+    { key: 'shield_group_avg', labelKey: 'ship_build.stats_shield', unit: 'MJ', value: shieldStats.groupAvg },
+    { key: 'weapon_sustained', labelKey: 'ship_build.stats_weapon_sustained', unit: 'MW', value: weaponStats.sustained },
     { key: 'storage_solid', labelKey: 'ship_build.stats_storage_solid', unit: 'm3', value: getCargoCapacity(ship, 'solid') },
     { key: 'storage_liquid', labelKey: 'ship_build.stats_storage_liquid', unit: 'm3', value: getCargoCapacity(ship, 'liquid') },
     { key: 'storage_condensed', labelKey: 'ship_build.stats_storage_condensed', unit: 'm3', value: getCargoCapacity(ship, 'condensed') },

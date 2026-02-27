@@ -150,11 +150,43 @@ describe('ShipBuildStats - Unit Tests', () => {
     if (listItem) await listItem.trigger('click')
   }
 
+  // Mock $t globally for all components
+const mockT = (key: string) => {
+  const map: Record<string, string> = {
+    'ship_build.stats_mode_summary': 'Summary',
+    'ship_build.stats_mode_detail': 'Detail',
+    'ship_build.stats_detail_pending': 'Detailed stats data source is not wired yet. Placeholder fields are shown.',
+    'ship_build.stats_hull': 'Hull',
+    'ship_build.stats_shield': 'Shield',
+    'ship_build.stats_speed': 'Speed',
+    'ship_build.stats_boost_speed': 'Boost Speed',
+    'ship_build.stats_travel_speed': 'Travel Speed',
+    'ship_build.stats_crew': 'Crew',
+    'ship_build.stats_storage_container': 'Container Storage',
+    'ship_build.stats_weapon_burst': 'Weapon Burst Output',
+    'ship_build.stats_turret_avg': 'Turret Avg Output',
+    'ship_build.stats_weapon_sustained': 'Weapon Sustained Output',
+    'ship_build.title': 'Ship Build',
+    'ship_build.select_ship': 'Select Ship',
+    'ship_build.filters': 'Filters',
+    'ship_build.panel_fit': 'Fit',
+    'ship_build.panel_stats': 'Stats',
+    'ship_build.panel_materials': 'Materials',
+    'ship_build.stats_preview': 'Preview'
+  }
+  return map[key] || key
+}
+
+const globalMocks = {
+  $t: mockT
+}
+
   // 1.1 档位默认状态
   it('1.1 默认档位为简略', async () => {
     const wrapper = mount(ShipBuildView, {
       global: {
-        plugins: [createPinia()]
+        plugins: [createPinia()],
+        mocks: globalMocks
       }
     })
 
@@ -171,7 +203,8 @@ describe('ShipBuildStats - Unit Tests', () => {
   it('1.2 点击详细按钮切换到详细档位', async () => {
     const wrapper = mount(ShipBuildView, {
       global: {
-        plugins: [createPinia()]
+        plugins: [createPinia()],
+        mocks: globalMocks
       }
     })
 
@@ -189,7 +222,8 @@ describe('ShipBuildStats - Unit Tests', () => {
   it('1.2 点击简略按钮切回简略档位', async () => {
     const wrapper = mount(ShipBuildView, {
       global: {
-        plugins: [createPinia()]
+        plugins: [createPinia()],
+        mocks: globalMocks
       }
     })
 
@@ -212,7 +246,8 @@ describe('ShipBuildStats - Unit Tests', () => {
   it('1.3 简略档位显示正确的字段', async () => {
     const wrapper = mount(ShipBuildView, {
       global: {
-        plugins: [createPinia()]
+        plugins: [createPinia()],
+        mocks: globalMocks
       }
     })
 
@@ -232,7 +267,8 @@ describe('ShipBuildStats - Unit Tests', () => {
   it('1.4 详细档位包含更多字段', async () => {
     const wrapper = mount(ShipBuildView, {
       global: {
-        plugins: [createPinia()]
+        plugins: [createPinia()],
+        mocks: globalMocks
       }
     })
 
@@ -256,7 +292,8 @@ describe('ShipBuildStats - Unit Tests', () => {
   it('1.5 详细档位显示真实值', async () => {
     const wrapper = mount(ShipBuildView, {
       global: {
-        plugins: [createPinia()]
+        plugins: [createPinia()],
+        mocks: globalMocks
       }
     })
 
@@ -281,7 +318,8 @@ describe('ShipBuildStats - Unit Tests', () => {
   it('1.6 详细档位显示占位符', async () => {
     const wrapper = mount(ShipBuildView, {
       global: {
-        plugins: [createPinia()]
+        plugins: [createPinia()],
+        mocks: globalMocks
       }
     })
 
@@ -305,7 +343,8 @@ describe('ShipBuildStats - Unit Tests', () => {
   it('1.7 属性区无固定高度样式', async () => {
     const wrapper = mount(ShipBuildView, {
       global: {
-        plugins: [createPinia()]
+        plugins: [createPinia()],
+        mocks: globalMocks
       }
     })
 
