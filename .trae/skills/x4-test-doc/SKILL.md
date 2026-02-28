@@ -51,6 +51,23 @@ Update `test_tasks.md` and `ui_knowledge.md` based on discussion conclusions or 
 
 ## Project Standards (MANDATORY)
 
+### 0. Document Responsibilities (MANDATORY)
+
+**test_tasks.md** (测试任务结构):
+- 任务标记: `[✓]` 成功 / `[✗]` 失败 / `[ ]` 未开始
+- 步骤结构: `步骤 <n>: <描述>`
+- 子断言: `<field>: <value>`
+- **不包含**: locators、selectors、fixture ids、semantics 等实现细节
+
+**ui_knowledge.md** (测试知识库):
+- Locators / Selectors / data-testid
+- Fixture IDs 映射表
+- State/Transition 语义
+- Build/Assert 动作定义
+- 自动化实现细节
+
+**分离原则**: test_tasks.md 描述"测什么"，ui_knowledge.md 描述"怎么测"
+
 ### 1. UI Knowledge Baseline (MANDATORY)
 
 For every `/x4:test-doc` run, `openspec/changes/<change-name>/ui_knowledge.md` is a required artifact:
@@ -137,36 +154,110 @@ When requirements change and existing `test_tasks.md` steps become unexecutable:
   - Structure: 前提 -> 触发操作 -> 预期错误结果 -> 预期修复结果
   - Combines bug reproduction and regression in a single section
 
-Use **document-global chapter numbering** (e.g., `## 1 单元测试`, `## 2 E2E 标准状态与状态迁移`, `## 3 E2E 测试场景`, `## 4 Bug 测试`). Each test item within chapters is a separate section, not a checklist item.
+Use **document-global chapter numbering** (e.g., `## 1 单元测试`, `## 2 E2E 标准状态与状态迁移`, `## 3 E2E 测试场景`, `## 4 Bug 测试`, `## 5 失败原因及可能的推断`). Each test item within chapters is a separate section, not a checklist item.
 
-### 3.2 Test Section Internal Structure (MANDATORY)
+### 3.2 Task Marker for Each Test Case (MANDATORY)
 
-Each test section (`### [Test Name]`) MUST contain:
+Each test case in `test_tasks.md` MUST have a task marker for tracking:
 
-1. **详细前提 (Detailed Preconditions)**:
-   - 明确指定测试所需的初始状态、数据、配置
-   - 禁止模糊描述如"选择一艘舰船"、"选择一项装备"
-   - 必须指定具体对象（如：选择舰船 `ship_azeroth` / 选择装备 `weapon_plasma_01`）
+- **成功**: `- [✓] <Test Case Name>` - 测试通过
+- **失败**: `- [✗] <Test Case Name>` - 测试失败（失败原因见第五章）
+- **未开始**: `- [ ] <Test Case Name>` - 尚未执行
+- **Placement**: At the beginning of each test section
+- **注意**: 不再在其他章节保留失败注释，失败原因统一在第五章记录
 
-2. **操作步骤作为子任务 (Operation Steps as Subtasks)**:
-   ```
-   #### 步骤 1: [操作描述]
-   - 具体动作
-   - 预期中间结果
+Example:
+```markdown
+## 1 单元测试
 
-   #### 步骤 2: [操作描述]
-   - 具体动作
-   - 预期中间结果
-   ```
+- [ ] 档位默认状态
 
-3. **结果断言 (Result Assertions)**:
-   - 明确的预期结果
-   - 可观测的验证点
+### 档位默认状态
 
-**禁止的模糊描述示例**:
-- ❌ "选择一艘舰船" -> ✅ "点击选择 ID 为 `ship_azeroth` 的舰船"
-- ❌ "选择一项装备" -> ✅ "从装备列表中选择 `weapon_plasma_01`"
-- ❌ "点击某个按钮" -> ✅ "点击标记为 `确认` 的按钮（data-testid: confirm-btn）"
+- [ ] 任务：档位默认状态
+    - [ ] 前提
+    - [ ] 步骤 1：渲染属性区
+    - [ ] 步骤 2：读取档位状态
+    - [ ] 步骤 3：断言默认档位
+
+#### 前提
+- 具体前提描述
+
+#### 步骤 1：渲染属性区
+- 调用渲染函数
+
+## 2 E2E 标准状态与状态迁移
+
+- [ ] 状态: empty-ship-build
+- [ ] 切换: empty-ship-build -> heron-vanguard-selected
+
+### 状态: empty-ship-build
+...
+```
+
+### 3.2.1 Step Task Markers (MANDATORY)
+
+Each step under a test case MUST have a task marker:
+
+- **Format**: `- [ ] 步骤 <n>: <description>` or `- [x] 步骤 <n>: <description>`
+- **Placement**: Immediately after the case task marker, at greater indentation than case
+- **Steps must be contiguous**: No blank lines between step markers at the same level
+
+**缩进结构示例**:
+```markdown
+- [ ] 任务：档位默认状态
+    - [ ] 步骤 1：渲染属性区
+    - [ ] 步骤 2：读取档位状态
+    - [ ] 步骤 3：断言默认档位
+```
+- Case 任务标记: indent 0 (基线)
+- 步骤标记: indent 4 (比 case 多 4 空格)
+- 步骤下的子断言: indent 8 (比步骤多 4 空格)
+
+### 3.2.2 Subtask/Assertion Task Markers (MANDATORY)
+
+子任务/断言标记必须比步骤标记多缩进一级:
+
+- **Format**: `- [ ] <Field>: <value>` or `- [x] <Field>: <value>`
+- **Placement**: 必须比对应的步骤标记多缩进 (indent = step_indent + 4 或更多)
+- **数据描述行**: 描述输入/设置数据的行不应有任务标记
+- **断言行**: 验证预期结果的行必须有任务标记
+- **必须紧挨**: 同一级别的子任务标记之间不能有空行
+
+**完整示例**:
+```markdown
+- [ ] 任务：大太刀满装备DPS计算
+    - [x] 步骤 1：进入船只建造视图
+    - [x] 步骤 2：选择大太刀
+    - [x] 步骤 3：配置满装备
+    - [x] 步骤 4：切换到详细档位
+    - [x] 步骤 5：验证所有属性值
+      - [x] 船体: **16,100 MJ**
+      - [x] 护盾: **12,878 MJ**
+      - 引擎: `engine_ter_m_allround_01_mk1` × 1
+      - [x] 速度: **198 m/s**
+```
+Note:
+- `引擎: ...` 是数据描述 (无标记)
+- `船体:`, `护盾:`, `速度:` 是断言 (有标记)
+
+### 3.3 Test Section Internal Structure (MANDATORY)
+
+Each test section (`### [Test Name]`) in test_tasks.md MUST contain:
+
+1. **任务标记与步骤 (Task Markers & Steps)**:
+   - 任务标记: 成功 `[✓]` / 失败 `[✗]` / 未开始 `[ ]`
+   - 步骤标记: `步骤 <n>: <描述>`
+   - 子断言标记: 验证点 `<field>: <value>`
+
+2. **禁止模糊描述**:
+   - test_tasks.md 只包含可执行的步骤结构
+   - 具体的 locators、selectors、fixture ids 等知识性内容，参考 `ui_knowledge.md`
+   - 禁止在 test_tasks.md 中写入 `data-testid`、`xpath` 等实现细节
+
+3. **知识分离原则**:
+   - test_tasks.md: 测试结构、步骤、断言
+   - ui_knowledge.md: locators、semantics、fixture mapping、自动化细节
 
 ### 3.3 State/Transition Reference Integrity (MANDATORY)
 
@@ -259,10 +350,10 @@ Every state/transition in **Chapter 2** MUST be referenced:
    - **Python Validation Script** (`skill-scripts/validate_test_tasks_refs.py`):
      ```bash
      # By change name
-     python skill-scripts/validate_test_tasks_refs.py <change-name>
+     python3 skill-scripts/validate_test_tasks_refs.py <change-name>
 
      # By file path
-     python skill-scripts/validate_test_tasks_refs.py --file <path-to-test_tasks.md>
+     python3 skill-scripts/validate_test_tasks_refs.py --file <path-to-test_tasks.md>
 
      # Exit code 0 = pass, 1 = fail with report
      ```
@@ -327,7 +418,35 @@ When the user request **contains a test standard-state portion** (e.g. "标准�
    - state actions/probes/locators semantics in `ui_knowledge.md`
 5. Do not promote standard-state test detail into requirement/DoD narrative by default.
 
-### 5. Localization (Match User Language)
+### 5. Chapter 5: 失败原因及可能的推断 (MANDATORY)
+
+记录所有测试失败用例的原因和教训:
+
+- **格式**: `[ ] <Case名称> -> <子格式>: <教训以及心得>`
+- **子格式**: 可为 `原因`, `教训`, `心得`, `推断` 等
+- **规则**:
+  - 每个失败的 Case 对应一条或多条心得
+  - 禁止重复心得
+  - 禁止过期心得（已修复的问题应删除对应记录）
+  - 心得之间必须紧挨，不能有空行
+  - 与 Case 保持相同缩进
+  - 成功或未开始的 Case 不出现在本章
+- **与其他章节的关系**: 失败原因不再在其他章节（步骤/子任务）保留注释
+
+示例:
+```markdown
+## 5 失败原因及可能的推断
+
+- [ ] 档位切换行为
+    - [ ] 原因: 状态管理未正确触发重新渲染
+    - [ ] 教训: 档位切换后需要强制刷新属性区组件
+
+- [ ] 简略字段对齐
+    - [ ] 原因: 字段映射表缺少简略模式配置
+    - [ ] 推断: 可能需要在 gameData 中添加 simpleFields 配置
+```
+
+### 6. Localization (Match User Language)
 
 - **Body Content**: The content **MUST** be written in the user's current conversation language (e.g., Chinese).
 - **Keywords**: Keep technical terms, code references, and keywords (`SHALL`, `MUST`) in English.

@@ -2,14 +2,38 @@
 name: x4-test-impl
 description: "Implement and supplement Unit/E2E test code for X4 Station Calculator. Trigger with /x4:test-impl <change-name>."
 metadata:
-  version: "1.9"
+  version: "2.0"
 ---
 
 # X4 Test Implementation
 
 This skill focuses on implementing test code and can run in parallel with code implementation. It is not a mandatory gate before `/x4:test` and does not write pass/fail results.
 
-## 1. STRICT PATH RESOLUTION (MANDATORY)
+## 1. TEST FILE NAMING CONVENTION (MANDATORY)
+
+Test files MUST follow this naming pattern:
+
+| Test Type | File Pattern | Example |
+|-----------|--------------|---------|
+| Unit Tests | `<change-name>.spec.test` | `ship-build-stat.spec.test` |
+| E2E Tests | `<change-name>.spec.test` | `ship-build-stat.spec.test` |
+| Bug Reproduction | `bug-<change-name>.spec.test` | `bug-ship-build-stat.spec.test` |
+| Bug Fix Tests | `bugfix-<change-name>.spec.test` | `bugfix-ship-build-stat.spec.test` |
+
+**Directory Structure:**
+```
+tests/
+├── unit/
+│   └── <change-name>/
+│       └── <change-name>.spec.test
+├── e2e/
+│   └── <change-name>/
+│       ├── <change-name>.spec.test          # E2E scenarios
+│       ├── bug-<change-name>.spec.test       # Bug reproduction
+│       └── bugfix-<change-name>.spec.test    # Bug fix verification
+```
+
+## 2. STRICT PATH RESOLUTION (MANDATORY)
 
 - Resolve `change-name` using `x4-user-workflow` rules before any action. Stop and ask if multiple/no matches.
 - Print: `Resolved change: <change-name>`.
@@ -55,7 +79,49 @@ When `test_tasks.md` defines reusable states, strictly implement:
 4. **Scenarios:** Reuse helpers; avoid ad-hoc setup.
 5. **Boundary:** Semantics come from `ui_knowledge.md`. If missing/ambiguous, report blocker.
 
-## 5. GUARDRAILS
+## 5. TEST CASE CORRESPONDENCE VALIDATION (MANDATORY)
+
+Every test case in test files MUST correspond to a test item in `test_tasks.md`:
+
+### Correspondence Rules:
+
+1. **Chapter 1 (单元测试)** → Unit test file `<change-name>.spec.test`
+   - Each `### <Test Name>` in Chapter 1 MUST have a corresponding test case
+   - Test case name format: `describe('<Test Name>')` or `it('<Test Name>')`
+
+2. **Chapter 2 (E2E 标准状态与状态迁移)** → E2E test file `<change-name>.spec.test`
+   - Each `### 状态: <id>` in Chapter 2 MUST have a corresponding test case
+   - Each `### 切换: <from> -> <to>` in Chapter 2 MUST have a corresponding test case
+
+3. **Chapter 3 (E2E 测试场景)** → E2E test file `<change-name>.spec.test`
+   - Each `### <Test Scenario Name>` in Chapter 3 MUST have a corresponding test case
+
+4. **Chapter 4 (Bug 测试)** → Bug test files
+   - Bug reproduction: `bug-<change-name>.spec.test`
+   - Bug fix verification: `bugfix-<change-name>.spec.test`
+   - Each `### BUG-<id> <Description>` in Chapter 4 MUST have corresponding test cases in both files
+
+### Validation Script
+
+Run the validation script to verify correspondence:
+
+```bash
+# By change name
+python3 skill-scripts/validate_test_case_refs.py <change-name>
+
+# By file paths
+python3 skill-scripts/validate_test_case_refs.py --change <change-name> --test-dir tests
+
+# Exit code 0 = pass, 1 = fail with report
+```
+
+### Error Examples:
+
+- ❌ Test case "档位默认状态" exists but no corresponding `### 档位默认状态` in Chapter 1
+- ❌ Chapter 2 has `### 状态: empty-ship-build` but no test case for it
+- ❌ Chapter 4 has `### BUG-001` but no corresponding test in `bug-<change-name>.spec.test` or `bugfix-<change-name>.spec.test`
+
+## 6. GUARDRAILS
 
 - DO NOT run `npm run build` or `npx playwright test`.
 - DO NOT run full test execution for verification pass/fail.

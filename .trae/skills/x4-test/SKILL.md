@@ -1,8 +1,8 @@
 ---
 name: x4-test
-description: "Execute tests, triage failures, and sync documents. Mandatorily delegates all test authoring/fixing to x4-test-impl."
+description: "Execute tests, triage failures, and sync documents. Mandatorily delegates all test authoring/fixing to x4-test-impl and document updates to x4-test-doc."
 metadata:
-  version: "5.1"
+  version: "6.2"
 ---
 
 # X4 Test Execution Pipeline
@@ -28,11 +28,19 @@ This skill owns the end-to-end test execution and document synchronization. It o
    - *Test Defect*: Delegate to `x4-test-impl` to fix, then re-run.
    - *Product Defect*: Leave test as failed, record blocker, do not patch source code, and continue running remaining cases.
 
-## 4. Document Synchronization
-Update documents based STRICTLY on the final run results.
-- **`test_tasks.md`**: Mark `[x]` for passes, `` for failures.
-  - Checkbox ownership is strict: `状态：` checkboxes are ONLY ticked by state tests. `切换：` checkboxes ONLY by transition tests. Scenario tests do not backfill them.
-- **`test_experience.md` & `ui_knowledge.md`**: Append any new locator discoveries or updates.
+## 4. Document Synchronization (MANDATORY)
+
+**Delegates to x4-test-doc for change-specific document updates.**
+
+After test run completes, invoke `x4-test-doc <change-name>` to:
+- Update test_tasks.md with pass/fail markers (`[✓]` / `[✗]` / `[ ]`)
+- Update ui_knowledge.md with new locator discoveries
+- Update Chapter 5 (失败原因及可能的推断) with failure lessons
+- Remove stale records when previously failed cases now pass
+
+**Global Experience Update:**
+- If new learnings are NOT specific to the current change (general test patterns, reusable locators, framework insights), update `openspec/test_experience.md` instead.
+- Change-specific learnings go to `openspec/changes/<change-name>/ui_knowledge.md`.
 
 ## 5. Final Output
 Return a single execution summary: Pass/Fail counts, failed cases with Triage classification (Product Defect blockers), and a list of synced files. Do not terminate early after doc sync.
