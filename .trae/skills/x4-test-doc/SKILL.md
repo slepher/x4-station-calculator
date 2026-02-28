@@ -51,23 +51,6 @@ Update `test_tasks.md` and `ui_knowledge.md` based on discussion conclusions or 
 
 ## Project Standards (MANDATORY)
 
-### 0. Document Responsibilities (MANDATORY)
-
-**test_tasks.md** (测试任务结构):
-- 任务标记: `[✓]` 成功 / `[✗]` 失败 / `[ ]` 未开始
-- 步骤结构: `步骤 <n>: <描述>`
-- 子断言: `<field>: <value>`
-- **不包含**: locators、selectors、fixture ids、semantics 等实现细节
-
-**ui_knowledge.md** (测试知识库):
-- Locators / Selectors / data-testid
-- Fixture IDs 映射表
-- State/Transition 语义
-- Build/Assert 动作定义
-- 自动化实现细节
-
-**分离原则**: test_tasks.md 描述"测什么"，ui_knowledge.md 描述"怎么测"
-
 ### 1. UI Knowledge Baseline (MANDATORY)
 
 For every `/x4:test-doc` run, `openspec/changes/<change-name>/ui_knowledge.md` is a required artifact:
@@ -137,7 +120,7 @@ When requirements change and existing `test_tasks.md` steps become unexecutable:
 
 ### 3.1 test_tasks.md Four-Chapter Structure (MANDATORY)
 
-`test_tasks.md` MUST use a four-chapter structure:
+`test_tasks.md` MUST use a five-chapter structure:
 
 - **Chapter 1: 单元测试 (Unit Tests)**
   - Each unit test as a separate section (`### [Test Name]`)
@@ -156,110 +139,136 @@ When requirements change and existing `test_tasks.md` steps become unexecutable:
 
 Use **document-global chapter numbering** (e.g., `## 1 单元测试`, `## 2 E2E 标准状态与状态迁移`, `## 3 E2E 测试场景`, `## 4 Bug 测试`, `## 5 失败原因及可能的推断`). Each test item within chapters is a separate section, not a checklist item.
 
-### 3.2 Task Marker for Each Test Case (MANDATORY)
+### 3.1.1 test_tasks.md Content Restriction (MANDATORY)
 
-Each test case in `test_tasks.md` MUST have a task marker for tracking:
+**test_tasks.md 只能包含五章内容，不允许包含额外知识说明**：
 
-- **成功**: `- [✓] <Test Case Name>` - 测试通过
-- **失败**: `- [✗] <Test Case Name>` - 测试失败（失败原因见第五章）
-- **未开始**: `- [ ] <Test Case Name>` - 尚未执行
-- **Placement**: At the beginning of each test section
-- **注意**: 不再在其他章节保留失败注释，失败原因统一在第五章记录
+- ✅ 允许：五章结构（单元测试、E2E标准状态与状态迁移、E2E测试场景、Bug测试、失败原因及可能的推断）
+- ✅ 允许：任务、步骤、子行为/子断言的 checkbox 结构
+- ❌ 禁止：计算公式、技术说明、参考表格等知识性内容
+- ❌ 禁止：子章节（如 `### 2.5 装备映射`）
+- ❌ 禁止：非测试步骤的说明性文本块
 
-Example:
-```markdown
-## 1 单元测试
+**知识唯一性原则**：
+- 所有测试相关的知识（如装备配置、计算公式、数据来源）应放在 `ui_knowledge.md`
+- `test_tasks.md` 只描述"要测什么"，不描述"怎么测"或"为什么这样"
 
-- [ ] 档位默认状态
+### 3.2 Test Section Internal Structure (MANDATORY)
 
-### 档位默认状态
+Each test section (`### [Test Name]`) MUST contain:
 
-- [ ] 任务：档位默认状态
-    - [ ] 前提
-    - [ ] 步骤 1：渲染属性区
-    - [ ] 步骤 2：读取档位状态
-    - [ ] 步骤 3：断言默认档位
+1. **详细前提 (Detailed Preconditions)**:
+   - 明确指定测试所需的初始状态、数据、配置
+   - 禁止模糊描述如"选择一艘舰船"、"选择一项装备"
+   - 必须指定具体对象（如：选择舰船 `ship_azeroth` / 选择装备 `weapon_plasma_01`）
 
-#### 前提
-- 具体前提描述
+2. **操作步骤作为子任务 (Operation Steps as Subtasks)**:
+   ```
+   #### 步骤 1: [操作描述]
+   - 具体动作
+   - 预期中间结果
 
-#### 步骤 1：渲染属性区
-- 调用渲染函数
+   #### 步骤 2: [操作描述]
+   - 具体动作
+   - 预期中间结果
+   ```
 
-## 2 E2E 标准状态与状态迁移
+3. **结果断言 (Result Assertions)**:
+   - 明确的预期结果
+   - 可观测的验证点
+   - **必须使用实际断言方法**: 直接写出测试中使用的断言，如 `toBe(1000)`, `greaterThan(300)`, `toContain('text')`, `toHaveCount(5)` 等
+   - 禁止仅描述预期值而不写断言方法
 
-- [ ] 状态: empty-ship-build
-- [ ] 切换: empty-ship-build -> heron-vanguard-selected
+**禁止的模糊描述示例**:
+- ❌ "选择一艘舰船" -> ✅ "点击选择 ID 为 `ship_azeroth` 的舰船"
+- ❌ "选择一项装备" -> ✅ "从装备列表中选择 `weapon_plasma_01`"
+- ❌ "点击某个按钮" -> ✅ "点击标记为 `确认` 的按钮（data-testid: confirm-btn）"
 
-### 状态: empty-ship-build
-...
+### 3.3 Task Numbering & Format (MANDATORY - STRICT ENFORCEMENT)
+
+**CRITICAL**: Each task MUST have a number in format `<章节号>.<序号>`
+
+#### Checkbox State Format
+
+test_tasks.md 使用三种状态标记测试执行结果：
+
+| 状态 | 符号 | 含义 | 使用场景 |
+|------|------|------|----------|
+| 通过 | `[✓]` | 测试通过 | 测试运行后由 x4-test 更新 |
+| 失败 | `[✗]` | 测试失败 | 测试运行后由 x4-test 更新 |
+| 待处理 | `[ ] | 未执行/未更新 | 初始状态 |
+
+**注意**：
+- test-doc 创建文档时使用 `[ ]`（待处理状态）
+- x4-test 运行测试后更新为 `[✓]` 或 `[✗]`
+- 验证脚本根据这三种状态进行验证
+
+#### Task Format: `- [ ] <章节号>.<序号> <描述>`
+
+| 章节 | 允许的描述类型 | 正确示例 |
+|------|---------------|----------|
+| 1 单元测试 | 任意描述 | `- [ ] 1.1 档位默认状态` |
+| 2 E2E标准状态与状态迁移 | `状态:` 或 `切换:` | `- [ ] 2.1 状态: heron-selected`<br>`- [ ] 2.2 切换: heron-selected -> detail-mode` |
+| 3 E2E测试场景 | `Case:` | `- [ ] 3.1 Case: 中列属性区双档位渲染` |
+| 4 Bug测试 | `Bug:` | `- [ ] 4.1 Bug: 点击保存无响应` |
+
+**标号规则**:
+- 格式：`<章节号>.<序号>`，如 `1.1`, `1.2`, `2.1`
+- `<序号>` 从 1 开始连续递增
+- 标号位于 `[ ]` 之后，描述之前
+
+**错误格式**:
+- ❌ `- [ ] 档位默认状态` (缺少标号)
+- ❌ `- [ ] 1.1.1 档位默认状态` (序号有多层)
+- ❌ `- [ ] 3.1 场景: xxx` (第三章应用 `Case:`)
+- ❌ `- [ ] 2.1 Case: xxx` (第二章只能用 `状态:` 或 `切换:`)
+
+#### Step Format (Nested under tasks):
+```
+- [ ] 1.1 档位默认状态
+  - [ ] 步骤 1: 读取当前档位状态
+  - [ ] 步骤 2: 断言默认档位为 "summary"
 ```
 
-### 3.2.1 Step Task Markers (MANDATORY)
-
-Each step under a test case MUST have a task marker:
-
-- **Format**: `- [ ] 步骤 <n>: <description>` or `- [x] 步骤 <n>: <description>`
-- **Placement**: Immediately after the case task marker, at greater indentation than case
-- **Steps must be contiguous**: No blank lines between step markers at the same level
-
-**缩进结构示例**:
-```markdown
-- [ ] 任务：档位默认状态
-    - [ ] 步骤 1：渲染属性区
-    - [ ] 步骤 2：读取档位状态
-    - [ ] 步骤 3：断言默认档位
+#### Sub-behaviors Format (Nested under Steps):
+- 子项目与步骤之间采用两格缩进，总共缩进为四格
+- 子行为/子断言使用 checkbox 格式
+- **子项目断言必须包含期望值**: 使用 `（期望 toBe('16,100 MJ')）` 格式记录断言
 ```
-- Case 任务标记: indent 0 (基线)
-- 步骤标记: indent 4 (比 case 多 4 空格)
-- 步骤下的子断言: indent 8 (比步骤多 4 空格)
-
-### 3.2.2 Subtask/Assertion Task Markers (MANDATORY)
-
-子任务/断言标记必须比步骤标记多缩进一级:
-
-- **Format**: `- [ ] <Field>: <value>` or `- [x] <Field>: <value>`
-- **Placement**: 必须比对应的步骤标记多缩进 (indent = step_indent + 4 或更多)
-- **数据描述行**: 描述输入/设置数据的行不应有任务标记
-- **断言行**: 验证预期结果的行必须有任务标记
-- **必须紧挨**: 同一级别的子任务标记之间不能有空行
-
-**完整示例**:
-```markdown
-- [ ] 任务：大太刀满装备DPS计算
-    - [x] 步骤 1：进入船只建造视图
-    - [x] 步骤 2：选择大太刀
-    - [x] 步骤 3：配置满装备
-    - [x] 步骤 4：切换到详细档位
-    - [x] 步骤 5：验证所有属性值
-      - [x] 船体: **16,100 MJ**
-      - [x] 护盾: **12,878 MJ**
-      - 引擎: `engine_ter_m_allround_01_mk1` × 1
-      - [x] 速度: **198 m/s**
+- [ ] 3.1 Case: 大太刀满装备DPS计算
+  - [ ] 步骤 1: 配置装备
+    - [ ] 引擎: engine_ter_m_allround_01_mk1 × 1
+    - [ ] 护盾: shield_ter_m_standard_02_mk2 × 2
+  - [ ] 步骤 2: 验证属性值
+    - [x] 船体: **16,100 MJ**（期望 toBe('16,100 MJ')）
+    - [x] 护盾: **12,878 MJ**（期望 toBe('12,878 MJ')）
 ```
-Note:
-- `引擎: ...` 是数据描述 (无标记)
-- `船体:`, `护盾:`, `速度:` 是断言 (有标记)
 
-### 3.3 Test Section Internal Structure (MANDATORY)
+### 3.4 Chapter 2 Content Restriction (MANDATORY)
 
-Each test section (`### [Test Name]`) in test_tasks.md MUST contain:
+**Chapter 2 只能包含**:
+- `- [ ] 2.x 状态: <state-id>`
+- `- [ ] 2.x 切换: <from> -> <to>`
 
-1. **任务标记与步骤 (Task Markers & Steps)**:
-   - 任务标记: 成功 `[✓]` / 失败 `[✗]` / 未开始 `[ ]`
-   - 步骤标记: `步骤 <n>: <描述>`
-   - 子断言标记: 验证点 `<field>: <value>`
+**禁止内容**:
+- ❌ 测试用例 (`Case:`, `场景:`, `任务:`)
+- ❌ 子章节 (`### 2.1`)
 
-2. **禁止模糊描述**:
-   - test_tasks.md 只包含可执行的步骤结构
-   - 具体的 locators、selectors、fixture ids 等知识性内容，参考 `ui_knowledge.md`
-   - 禁止在 test_tasks.md 中写入 `data-testid`、`xpath` 等实现细节
+### 3.5 Chapter 3 Content Restriction (MANDATORY)
 
-3. **知识分离原则**:
-   - test_tasks.md: 测试结构、步骤、断言
-   - ui_knowledge.md: locators、semantics、fixture mapping、自动化细节
+**Chapter 3 只能包含**:
+- `- [ ] 3.x Case: <test-scenario-name>`
 
-### 3.3 State/Transition Reference Integrity (MANDATORY)
+**禁止内容**:
+- ❌ 状态/切换定义
+- ❌ 场景: 等其他格式
+
+### 3.6 Chapter 4 Content Restriction (MANDATORY)
+
+**Chapter 4 只能包含**:
+- `- [ ] 4.x Bug: <bug-description>`
+
+### 3.7 State/Transition Reference Integrity (MANDATORY)
 
 Every state/transition in **Chapter 2** MUST be referenced:
 
@@ -359,13 +368,28 @@ Every state/transition in **Chapter 2** MUST be referenced:
      ```
 
 7. **Format Migration Note**:
-   - The validation script expects the NEW four-chapter format with explicit state/transition markers:
+   - The validation script expects the NEW five-chapter format with explicit state/transition markers:
      - `### 状态: <id>` for states
      - `### 切换: <from> -> <to>` for transitions
      - `- 前提: 状态 <id>` for state references in Chapter 3 or 4
      - `- 前提: 切换 <from> -> <to>` for transition references in Chapter 3 or 4
      - `### BUG-[数字] <描述>` for bug tests (Chapter 4)
    - Legacy checkbox format (`- [ ] 状态：xxx`) will NOT pass validation - this is expected
+
+### 3.8 Chapter 5: 失败原因及可能的推断 (MANDATORY)
+
+After test run completes:
+1. Collect all failed test cases from current run
+2. For each failed case, add/update entry in Chapter 5:
+   ```markdown
+   ## 5 失败原因及可能的推断
+
+   - [ ] <Failed Case Name>
+       - [ ] <子格式>: <教训/心得/推断>
+   ```
+3. If a previously failed case now passes:
+   - Remove its Chapter 5 entry (no stale records)
+   - Mark as `[✓]` in the respective chapter
 
 ### 4. State + Transition Chapter in `test_tasks.md` (MANDATORY)
 
@@ -381,8 +405,8 @@ When tests depend on reusable states, `test_tasks.md` must use a simplified mode
 4. Keep `test_tasks.md` concise:
    - no locator/probe/automation details in `test_tasks.md`
    - detailed semantics belong to `ui_knowledge.md`
-5. Do not add meta checklist items (e.g., consumer-scope note, checkbox-ownership note) in `test_tasks.md`;
-   checkbox ownership rules are maintained by `x4-test` skill.
+5. Do not add meta checklist items (e.g., consumer-scope note) in `test_tasks.md`;
+   State management rules are defined in `x4-test` skill.
 
 ### 4.1 Standard State Task Contract (MANDATORY)
 
@@ -418,39 +442,37 @@ When the user request **contains a test standard-state portion** (e.g. "标准�
    - state actions/probes/locators semantics in `ui_knowledge.md`
 5. Do not promote standard-state test detail into requirement/DoD narrative by default.
 
-### 5. Chapter 5: 失败原因及可能的推断 (MANDATORY)
-
-记录所有测试失败用例的原因和教训:
-
-- **格式**: `[ ] <Case名称> -> <子格式>: <教训以及心得>`
-- **子格式**: 可为 `原因`, `教训`, `心得`, `推断` 等
-- **规则**:
-  - 每个失败的 Case 对应一条或多条心得
-  - 禁止重复心得
-  - 禁止过期心得（已修复的问题应删除对应记录）
-  - 心得之间必须紧挨，不能有空行
-  - 与 Case 保持相同缩进
-  - 成功或未开始的 Case 不出现在本章
-- **与其他章节的关系**: 失败原因不再在其他章节（步骤/子任务）保留注释
-
-示例:
-```markdown
-## 5 失败原因及可能的推断
-
-- [ ] 档位切换行为
-    - [ ] 原因: 状态管理未正确触发重新渲染
-    - [ ] 教训: 档位切换后需要强制刷新属性区组件
-
-- [ ] 简略字段对齐
-    - [ ] 原因: 字段映射表缺少简略模式配置
-    - [ ] 推断: 可能需要在 gameData 中添加 simpleFields 配置
-```
-
-### 6. Localization (Match User Language)
+### 5. Localization (Match User Language)
 
 - **Body Content**: The content **MUST** be written in the user's current conversation language (e.g., Chinese).
-- **Keywords**: Keep technical terms, code references, and keywords (`SHALL`, `MUST`) in English.
-- **Scenario Keywords (Chinese)**: `**前提**` (Given), `**当**` (When), `**那么**` (Then), `**并且**` (And).
+
+## Validation Workflow (MANDATORY)
+
+Follow this order when creating/updating test documentation:
+
+1. **Write documentation following rules in Sections 1-5**:
+   - Five-chapter structure: 单元测试、E2E标准状态与状态迁移、E2E测试场景、Bug测试、失败原因及可能的推断
+   - Task format: `- [ ] <章节号>.<序号> <描述>`
+   - Step format: `- [ ] 步骤 <n>: <description>`
+   - Sub-item indent: 4 spaces total (task at 0, step at 2, sub-item at 4)
+   - No extra knowledge content (knowledge goes to ui_knowledge.md)
+   - **Steps must be concrete and executable** - avoid vague descriptions like "选择一艘舰船" or "点击某个按钮"
+   - **禁止模糊描述**: Must use specific identifiers (e.g., `ship_azeroth`, `weapon_plasma_01`, `data-testid: confirm-btn`)
+
+2. **Python validation (first pass)**:
+   ```bash
+   python3 skill-scripts/validate_test_tasks_refs.py <change-name>
+   ```
+   - Fix any format errors
+   - Repeat until Python validation passes
+
+3. **Agent validation (second pass)**:
+   - Verify all chapters are present and correctly structured
+   - Verify task numbering is sequential within each chapter
+   - Verify steps are concrete and executable (no vague descriptions)
+   - Verify assertions use actual test methods (e.g., `toBe(1000)`, `greaterThan(300)`, not just expected values)
+   - Verify state/transition reference integrity (Chapter 2 items must be referenced by Chapter 3 or 4)
+   - Verify cross-file consistency between test_tasks.md and ui_knowledge.md
 
 ## Constraints
 

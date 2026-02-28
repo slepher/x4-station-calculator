@@ -27,7 +27,7 @@
     "amount": 1,
     "shotHeat": 190.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -43,7 +43,7 @@
     "amount": 1,
     "shotHeat": 284.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -59,7 +59,7 @@
     "amount": 1,
     "shotHeat": 122.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -75,7 +75,7 @@
     "amount": 1,
     "shotHeat": 151.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -91,7 +91,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -123,7 +123,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -139,7 +139,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -155,7 +155,7 @@
     "amount": 1,
     "shotHeat": 0.0,
     "heat": 3460.0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -171,7 +171,7 @@
     "amount": 1,
     "shotHeat": 2500.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -203,7 +203,7 @@
     "amount": 1,
     "shotHeat": 500.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -219,7 +219,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -235,7 +235,7 @@
     "amount": 1,
     "shotHeat": 2000.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -251,7 +251,7 @@
     "amount": 1,
     "shotHeat": 350.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -299,7 +299,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -363,7 +363,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -379,7 +379,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -411,7 +411,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -427,7 +427,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -443,7 +443,7 @@
     "amount": 1,
     "shotHeat": 1000.0,
     "heat": 292.0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -459,7 +459,7 @@
     "amount": 1,
     "shotHeat": 1000.0,
     "heat": 234.0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -571,7 +571,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -587,7 +587,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -603,7 +603,7 @@
     "amount": 1,
     "shotHeat": 5756.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -619,7 +619,7 @@
     "amount": 1,
     "shotHeat": 3836.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -635,7 +635,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -651,7 +651,7 @@
     "amount": 1,
     "shotHeat": 1000.0,
     "heat": 550.0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -667,7 +667,7 @@
     "amount": 6,
     "shotHeat": 244.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -683,7 +683,7 @@
     "amount": 5,
     "shotHeat": 234.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -699,7 +699,7 @@
     "amount": 1,
     "shotHeat": 100.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -731,7 +731,7 @@
     "amount": 1,
     "shotHeat": 1000.0,
     "heat": 110.0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -747,7 +747,7 @@
     "amount": 1,
     "shotHeat": 1000.0,
     "heat": 159.0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -795,7 +795,7 @@
     "amount": 1,
     "shotHeat": 2216.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -811,7 +811,7 @@
     "amount": 1,
     "shotHeat": 2216.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -891,7 +891,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -907,7 +907,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -923,7 +923,7 @@
     "amount": 1,
     "shotHeat": 5122.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -939,7 +939,7 @@
     "amount": 1,
     "shotHeat": 3414.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -955,7 +955,7 @@
     "amount": 5,
     "shotHeat": 245.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -971,7 +971,7 @@
     "amount": 4,
     "shotHeat": 244.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -987,7 +987,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -1003,7 +1003,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1067,7 +1067,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1083,7 +1083,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1099,7 +1099,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -1115,7 +1115,7 @@
     "amount": 5,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1131,7 +1131,7 @@
     "amount": 1,
     "shotHeat": 2000.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1147,7 +1147,7 @@
     "amount": 1,
     "shotHeat": 1000.0,
     "heat": 204.0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -1163,7 +1163,7 @@
     "amount": 1,
     "shotHeat": 1000.0,
     "heat": 138.0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -1179,7 +1179,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1195,7 +1195,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -1211,7 +1211,7 @@
     "amount": 1,
     "shotHeat": 1666.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1227,7 +1227,7 @@
     "amount": 1,
     "shotHeat": 2301.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1243,7 +1243,7 @@
     "amount": 1,
     "shotHeat": 920.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1259,7 +1259,7 @@
     "amount": 1,
     "shotHeat": 0.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1275,7 +1275,7 @@
     "amount": 1,
     "shotHeat": 0.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1291,7 +1291,7 @@
     "amount": 1,
     "shotHeat": 0.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1307,7 +1307,7 @@
     "amount": 1,
     "shotHeat": 0.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1323,7 +1323,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -1339,7 +1339,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1355,7 +1355,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1371,7 +1371,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1467,7 +1467,7 @@
     "amount": 1,
     "shotHeat": 106.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1483,7 +1483,7 @@
     "amount": 1,
     "shotHeat": 69.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1499,7 +1499,7 @@
     "amount": 1,
     "shotHeat": 0.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1515,7 +1515,7 @@
     "amount": 1,
     "shotHeat": 0.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1531,7 +1531,7 @@
     "amount": 3,
     "shotHeat": 216.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1547,7 +1547,7 @@
     "amount": 3,
     "shotHeat": 173.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1595,7 +1595,7 @@
     "amount": 1,
     "shotHeat": 40.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1611,7 +1611,7 @@
     "amount": 1,
     "shotHeat": 31.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1627,7 +1627,7 @@
     "amount": 1,
     "shotHeat": 0.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1643,7 +1643,7 @@
     "amount": 1,
     "shotHeat": 0.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1659,7 +1659,7 @@
     "amount": 3,
     "shotHeat": 150.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1675,7 +1675,7 @@
     "amount": 3,
     "shotHeat": 128.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1723,7 +1723,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -1755,7 +1755,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1771,7 +1771,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1787,7 +1787,7 @@
     "amount": 1,
     "shotHeat": 475.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1803,7 +1803,7 @@
     "amount": 3,
     "shotHeat": 129.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1819,7 +1819,7 @@
     "amount": 3,
     "shotHeat": 129.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1835,7 +1835,7 @@
     "amount": 3,
     "shotHeat": 75.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1851,7 +1851,7 @@
     "amount": 3,
     "shotHeat": 75.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1867,7 +1867,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -1899,7 +1899,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1915,7 +1915,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -1947,7 +1947,7 @@
     "amount": 1,
     "shotHeat": 6500.0,
     "heat": 2000.0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -1963,7 +1963,7 @@
     "amount": 1,
     "shotHeat": 6500.0,
     "heat": 2000.0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -2043,7 +2043,7 @@
     "amount": 1,
     "shotHeat": 500.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -2059,7 +2059,7 @@
     "amount": 1,
     "shotHeat": 6500.0,
     "heat": 3000.0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -2075,7 +2075,7 @@
     "amount": 1,
     "shotHeat": 6500.0,
     "heat": 3000.0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -2155,7 +2155,7 @@
     "amount": 1,
     "shotHeat": 180.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -2171,7 +2171,7 @@
     "amount": 1,
     "shotHeat": 160.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -2187,7 +2187,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -2235,7 +2235,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -2251,7 +2251,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -2283,7 +2283,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -2299,7 +2299,7 @@
     "amount": 1,
     "shotHeat": 2500.0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -2331,7 +2331,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -2347,7 +2347,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -2395,7 +2395,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -2411,7 +2411,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -2427,7 +2427,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "beam"
   },
@@ -2459,7 +2459,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   },
@@ -2475,7 +2475,7 @@
     "amount": 1,
     "shotHeat": 0,
     "heat": 0,
-    "ammo": 0,
+    "ammo": 1,
     "ammoreload": 0,
     "type": "bullet"
   }

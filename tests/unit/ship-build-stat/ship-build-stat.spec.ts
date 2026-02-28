@@ -314,8 +314,8 @@ const globalMocks = {
     expect(hasRealValues).toBe(true)
   })
 
-  // 1.6 不可计算字段占位显示
-  it('1.6 详细档位显示占位符', async () => {
+  // 1.6 可计算字段真实值显示（不可计算字段已接入数据源，不再显示占位）
+  it('1.6 详细档位显示真实值（武器字段已接入）', async () => {
     const wrapper = mount(ShipBuildView, {
       global: {
         plugins: [createPinia()],
@@ -330,13 +330,21 @@ const globalMocks = {
     const detailBtn = wrapper.find('[data-testid="ship-build-stats-mode-detail"]')
     await detailBtn.trigger('click')
 
-    // Check no pending message (all data sources are now available)
-    const pendingMsg = wrapper.find('.stats-pending')
-    expect(pendingMsg.exists()).toBe(false)
+    // Check stats panel has fields
+    const statsPanel = wrapper.find('[data-testid="ship-build-stats-panel"]')
+    expect(statsPanel.exists()).toBe(true)
 
-    // Check no placeholder rows (all fields have data sources)
+    // Verify no placeholder rows (all fields now have data sources)
     const placeholderRows = wrapper.findAll('.stats-row-placeholder')
     expect(placeholderRows.length).toBe(0)
+
+    // Verify all stat values are real (not '--')
+    const statsValues = wrapper.findAll('.stats-value')
+    const valueTexts = statsValues.map((v: any) => v.text())
+    // All values should be real numbers, not placeholders
+    valueTexts.forEach((text: string) => {
+      expect(text).not.toBe('--')
+    })
   })
 
   // 1.7 高度限制回归

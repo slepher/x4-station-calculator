@@ -297,37 +297,15 @@ range = lifetime × speed
 单发热量 = shotHeat                      // heat 为 0
 单次射击时间 = chargetime + reload
 
-// 有弹匣时使用弹匣作为作战单元
-if (ammo > 0) {
-  magazineDamage = ammo × 单发伤害
-  magazineHeat = ammo × 单发热量
-  magazineTime = ammo × 单次射击时间 + ammoReload  // 弹匣发射时间 + 换弹时间
+// 爆发DPS（统一公式：换弹时间平摊到每发）
+avgShotTime = (ammo × 单次射击时间 + ammoReload) / max(ammo, 1)  // 无弹匣时ammo=0, 用1避免除零
+avgBurstDPS = 单发伤害 / avgShotTime
 
-  // 爆发DPS
-  爆发DPS = magazineDamage / magazineTime
-
-  // 持续DPS
-  magazineCount = max(1, floor(overheatThreshold / magazineHeat))
-  totalShotTime = magazineCount × magazineTime
-  totalHeat = max(overheatThreshold, magazineHeat)
-  cycleTime = totalShotTime + cooldelay + (totalHeat / coolrate)
-  cycleDamage = magazineDamage × magazineCount
-  sustainedDPS = cycleDamage / cycleTime
-} else {
-  // 无弹匣：按单发计算
-  实际伤害 = 单发伤害
-  实际热量 = 单发热量
-  实际射击时间 = 单次射击时间
-  爆发DPS = 实际伤害 / 实际射击时间
-
-  // 持续DPS
-  shotsInCycle = max(1, floor(overheatThreshold / 实际热量))
-  totalShotTime = shotsInCycle × 实际射击时间
-  totalHeat = max(overheatThreshold, 实际热量)
-  cycleTime = totalShotTime + cooldelay + (totalHeat / coolrate)
-  cycleDamage = 实际伤害 × shotsInCycle
-  sustainedDPS = cycleDamage / cycleTime
-}
+// 持续DPS（近似计算：换弹时间平摊）
+avgHeatPerSec = avgBurstDPS / 单发伤害 × 单发热量
+timeToOverheat = overheatThreshold / avgHeatPerSec
+cycleTime = timeToOverheat + cooldelay + ammoReload
+sustainedDPS = avgBurstDPS × (timeToOverheat / cycleTime)
 ```
 
 ### 5.3 Blueprint 数据源重构（tasks 6.1-6.3）
