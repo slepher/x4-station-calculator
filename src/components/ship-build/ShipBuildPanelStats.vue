@@ -92,8 +92,9 @@ const getShieldStats = () => {
       if (!g.equipment_id) return
       const equipment = equipmentMap.value.get(g.equipment_id)
       if (!equipment?.recharge) return
-      max += equipment.recharge.max || 0
-      rate += equipment.recharge.rate || 0
+      // 护盾 = 专用槽护盾，含 count
+      max += (equipment.recharge.max || 0) * (g.count || 1)
+      rate += (equipment.recharge.rate || 0) * (g.count || 1)
       delay = Math.max(delay, equipment.recharge.delay || 0)
     })
   })

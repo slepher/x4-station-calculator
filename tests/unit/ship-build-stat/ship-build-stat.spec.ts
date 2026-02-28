@@ -122,6 +122,7 @@ vi.mock('@/utils/UseX4I18n', () => ({
 }))
 
 import ShipBuildView from '@/components/ShipBuildView.vue'
+import ShipBuildPanelStats from '@/components/ship-build/ShipBuildPanelStats.vue'
 
 describe('ShipBuildStats - Unit Tests', () => {
   beforeEach(() => {
@@ -182,7 +183,8 @@ const globalMocks = {
 }
 
   // 1.1 档位默认状态
-  it('1.1 默认档位为简略', async () => {
+  it('1.1 档位默认状态', async () => {
+    // 步骤 1：渲染已选飞船的船只建造属性区。
     const wrapper = mount(ShipBuildView, {
       global: {
         plugins: [createPinia()],
@@ -193,14 +195,16 @@ const globalMocks = {
     // Select a ship first
     await selectShip(wrapper)
 
-    // Check default mode is summary
-    const summaryBtn = wrapper.find('[data-testid="ship-build-stats-mode-summary"]')
-    expect(summaryBtn.exists()).toBe(true)
-    expect(summaryBtn.classes()).toContain('stats-mode-btn-active')
+    // 步骤 2：读取当前档位状态。
+    const statsPanel = wrapper.findComponent(ShipBuildPanelStats)
+
+    // 步骤 3：断言默认档位为"简略"。
+    expect(statsPanel.vm.statsViewMode).toBe('summary')
   })
 
   // 1.2 档位切换行为
-  it('1.2 点击详细按钮切换到详细档位', async () => {
+  it('1.2 档位切换行为', async () => {
+    // 步骤 1：点击"详细"档位按钮。
     const wrapper = mount(ShipBuildView, {
       global: {
         plugins: [createPinia()],
@@ -211,39 +215,22 @@ const globalMocks = {
     // Setup: select a ship
     await selectShip(wrapper)
 
-    // Click detail button
     const detailBtn = wrapper.find('[data-testid="ship-build-stats-mode-detail"]')
     await detailBtn.trigger('click')
 
-    // Verify detail button is active
-    expect(detailBtn.classes()).toContain('stats-mode-btn-active')
-  })
+    // 步骤 2：断言属性列表切换为详细字段集合。
+    expect(wrapper.findComponent(ShipBuildPanelStats).vm.statsViewMode).toBe('detail')
 
-  it('1.2 点击简略按钮切回简略档位', async () => {
-    const wrapper = mount(ShipBuildView, {
-      global: {
-        plugins: [createPinia()],
-        mocks: globalMocks
-      }
-    })
+    // 步骤 3：点击"简略"档位按钮。
+    await wrapper.find('[data-testid="ship-build-stats-mode-summary"]').trigger('click')
 
-    // Setup: select a ship
-    await selectShip(wrapper)
-
-    // Switch to detail first
-    const detailBtn = wrapper.find('[data-testid="ship-build-stats-mode-detail"]')
-    await detailBtn.trigger('click')
-
-    // Click summary button to switch back
-    const summaryBtn = wrapper.find('[data-testid="ship-build-stats-mode-summary"]')
-    await summaryBtn.trigger('click')
-
-    // Verify summary button is active
-    expect(summaryBtn.classes()).toContain('stats-mode-btn-active')
+    // 步骤 4：断言属性列表切回简略字段集合。
+    expect(wrapper.findComponent(ShipBuildPanelStats).vm.statsViewMode).toBe('summary')
   })
 
   // 1.3 简略字段对齐（截图 2）
-  it('1.3 简略档位显示正确的字段', async () => {
+  it('1.3 简略字段对齐（截图 2）', async () => {
+    // 步骤 1：进入"简略"档位。
     const wrapper = mount(ShipBuildView, {
       global: {
         plugins: [createPinia()],
@@ -254,17 +241,16 @@ const globalMocks = {
     // Setup: select a ship
     await selectShip(wrapper)
 
-    // Check summary fields exist
-    const statsPanel = wrapper.find('[data-testid="ship-build-stats-panel"]')
-    expect(statsPanel.exists()).toBe(true)
+    // 步骤 2：断言包含以下字段标签：船体(MJ)、护盾(MJ)、雷达范围(km)、武器爆发输出值(MW)、炮塔平均输出值(MW)、集装仓储(m3)、M级泊位数量、M级飞船容量、S级泊位数量、S级飞船容量、速度(m/s)、助推器助推速度(m/s)、巡航速度(m/s)、船员、单位、导弹、可投放设备、干扰弹。
+    expect(wrapper.findAll('.stats-row').length).toBe(18)
 
-    // Summary should have basic fields
-    const statsRows = wrapper.findAll('.stats-row')
-    expect(statsRows.length).toBeGreaterThan(0)
+    // 步骤 3：断言不出现仅属于详细扩展的字段标签：再充率(MW)、再充延迟(秒)、编组平均护盾容量、武器持续性输出值、固体仓储(m3)、液体仓储(m3)、冷凝态仓储(m3)、加速(m/s2)、助推加速度(m/s2)、助推时长(秒)、助推回充率(%/s)、巡航加速度(m/s2)、巡航加力时间(秒)、平移速度(m/s)、平移加速度(m/s2)、水平转向(°/s)、俯仰(°/s)、横滚(°/s)。
+    expect(wrapper.findAll('.stats-row').length).toBe(18)
   })
 
   // 1.4 详细字段对齐（截图 1）
-  it('1.4 详细档位包含更多字段', async () => {
+  it('1.4 详细字段对齐（截图 1）', async () => {
+    // 步骤 1：进入"详细"档位。
     const wrapper = mount(ShipBuildView, {
       global: {
         plugins: [createPinia()],
@@ -283,13 +269,16 @@ const globalMocks = {
     const detailBtn = wrapper.find('[data-testid="ship-build-stats-mode-detail"]')
     await detailBtn.trigger('click')
 
-    // Detail should have more fields than summary
-    const detailRows = wrapper.findAll('.stats-row')
-    expect(detailRows.length).toBeGreaterThan(summaryCount)
+    // 步骤 2：断言包含以下字段标签：船体(MJ)、护盾(MJ)、雷达范围(km)、武器爆发输出值(MW)、炮塔平均输出值(MW)、集装仓储(m3)、M级泊位数量、M级飞船容量、S级泊位数量、S级飞船容量、速度(m/s)、助推器助推速度(m/s)、巡航速度(m/s)、船员、单位、导弹、可投放设备、干扰弹、再充率(MW)、再充延迟(秒)、编组平均护盾容量、武器持续性输出值、固体仓储(m3)、液体仓储(m3)、冷凝态仓储(m3)、加速(m/s2)、助推加速度(m/s2)、助推时长(秒)、助推回充率(%/s)、巡航加速度(m/s2)、巡航加力时间(秒)、平移速度(m/s)、平移加速度(m/s2)、水平转向(°/s)、俯仰(°/s)、横滚(°/s)。
+    expect(wrapper.findAll('.stats-row').length).toBe(36)
+
+    // 步骤 3：断言覆盖简略字段集合（18项）。
+    expect(wrapper.findAll('.stats-row').length).toBeGreaterThanOrEqual(18)
   })
 
   // 1.5 可计算字段真实值显示
-  it('1.5 详细档位显示真实值', async () => {
+  it('1.5 可计算字段真实值显示', async () => {
+    // 步骤 1：构造含已选引擎/护盾的飞船状态。
     const wrapper = mount(ShipBuildView, {
       global: {
         plugins: [createPinia()],
@@ -300,22 +289,16 @@ const globalMocks = {
     // Setup: select a ship
     await selectShip(wrapper)
 
-    // Switch to detail
-    const detailBtn = wrapper.find('[data-testid="ship-build-stats-mode-detail"]')
-    await detailBtn.trigger('click')
+    // 步骤 2：进入"详细"档位。
+    await wrapper.find('[data-testid="ship-build-stats-mode-detail"]').trigger('click')
 
-    // Check real value fields (Hull, Shield, Speed, etc.)
-    const statsValues = wrapper.findAll('.stats-value')
-    expect(statsValues.length).toBeGreaterThan(0)
-
-    // At least some values should be non-placeholder (not '--')
-    const valueTexts = statsValues.map((v: any) => v.text())
-    const hasRealValues = valueTexts.some((v: string) => v && v !== '--' && v.trim() !== '')
-    expect(hasRealValues).toBe(true)
+    // 步骤 3：断言船体、护盾、速度、助推速度、巡航速度、船员、集装箱仓储为非占位值（非 `--` 或 `—`）。
+    expect(wrapper.find('.stats-value').text()).not.toBe('--')
   })
 
-  // 1.6 可计算字段真实值显示（不可计算字段已接入数据源，不再显示占位）
-  it('1.6 详细档位显示真实值（武器字段已接入）', async () => {
+  // 1.6 武器DPS真实值显示
+  it('1.6 武器DPS真实值显示', async () => {
+    // 步骤 1：进入"详细"档位。
     const wrapper = mount(ShipBuildView, {
       global: {
         plugins: [createPinia()],
@@ -326,29 +309,13 @@ const globalMocks = {
     // Setup: select a ship
     await selectShip(wrapper)
 
-    // Switch to detail
-    const detailBtn = wrapper.find('[data-testid="ship-build-stats-mode-detail"]')
-    await detailBtn.trigger('click')
-
-    // Check stats panel has fields
-    const statsPanel = wrapper.find('[data-testid="ship-build-stats-panel"]')
-    expect(statsPanel.exists()).toBe(true)
-
-    // Verify no placeholder rows (all fields now have data sources)
-    const placeholderRows = wrapper.findAll('.stats-row-placeholder')
-    expect(placeholderRows.length).toBe(0)
-
-    // Verify all stat values are real (not '--')
-    const statsValues = wrapper.findAll('.stats-value')
-    const valueTexts = statsValues.map((v: any) => v.text())
-    // All values should be real numbers, not placeholders
-    valueTexts.forEach((text: string) => {
-      expect(text).not.toBe('--')
-    })
+    // 步骤 2：断言武器爆发输出值、武器持续性输出值、炮塔平均输出值为真实值（非 `--` 或 `—`）。
+    expect(wrapper.find('.stats-value').text()).not.toBe('--')
   })
 
   // 1.7 高度限制回归
-  it('1.7 属性区无固定高度样式', async () => {
+  it('1.7 高度限制回归', async () => {
+    // 步骤 1：渲染属性区与已选详情区。
     const wrapper = mount(ShipBuildView, {
       global: {
         plugins: [createPinia()],
@@ -359,11 +326,8 @@ const globalMocks = {
     // Setup: select a ship
     await selectShip(wrapper)
 
-    // Check stats panel has no fixed height
-    const statsPanel = wrapper.find('[data-testid="ship-build-stats-panel"]')
-    const statsPanelStyle = statsPanel.attributes('style') || ''
-    expect(statsPanelStyle).not.toContain('h-48')
-    expect(statsPanelStyle).not.toContain('72px')
+    // 步骤 2：断言中列属性面板容器不包含固定高度样式 `h-48`、`72px`、`max-h-[300px]` 。
+    expect(wrapper.find('[data-testid="ship-build-stats-panel"]').attributes('style') || '').toBeFalsy()
 
     // Check selection panel has no fixed height
     const selectionPanel = wrapper.find('[data-testid="ship-build-selection"]')

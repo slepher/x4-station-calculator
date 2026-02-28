@@ -14,33 +14,36 @@ test.describe('Ship Build Stats Panel', () => {
     await page.waitForSelector('.toolbar-panel', { state: 'visible' })
   })
 
-  // 2.1 Bootstrapping & State - 状态：船只建造已选 Heron Vanguard
-  test('状态：船只建造已选 Heron Vanguard', async ({ page }) => {
+  // 2.1 状态: heron-selected
+  test('2.1 状态: heron-selected', async ({ page }) => {
+    // 步骤 1：启动应用并进入"船只建造"视图。
     await shipBuildButton(page).click()
 
-    // Select class=L
+    // 步骤 2：点击选择 `class=L` 筛选条件。
     const classFilter = page.getByTestId('ship-build-filter-class')
     await classFilter.getByRole('button', { name: 'L', exact: true }).click()
 
-    // Select race=teladi
+    // 步骤 3：点击选择 `race=teladi` 筛选条件。
     const raceFilter = page.getByTestId('ship-build-filter-race')
     await raceFilter.locator('button').first().click()
 
-    // Select type=freighter
+    // 步骤 4：点击选择 `type=freighter` 筛选条件。
     const typeFilter = page.getByTestId('ship-build-filter-type')
     await typeFilter.locator('button').first().click()
 
-    // Select Heron Vanguard from list
+    // 步骤 5：在列表中点击选择 `Heron Vanguard`（ship_tel_l_trans_container_02_a）。
     const listItems = page.locator('.list-item')
     await listItems.first().click()
 
-    // Assert both stats panel and selection are visible
+    // 步骤 6：断言中列属性面板可见。（期望）expect().toBeVisible()
     await expect(page.getByTestId('ship-build-panel-stats')).toBeVisible()
+
+    // 步骤 7：断言已选详情区可见。（期望）expect().toBeVisible()
     await expect(page.getByTestId('ship-build-selection')).toBeVisible()
   })
 
-  // 2.1 Bootstrapping & State - 切换：状态->详细档位
-  test('切换：已选 Heron Vanguard -> 详细档位', async ({ page }) => {
+  // 2.2 切换: heron-selected -> detail-mode
+  test('2.2 切换: heron-selected -> detail-mode', async ({ page }) => {
     await shipBuildButton(page).click()
 
     // Setup state: select Heron Vanguard
@@ -55,17 +58,24 @@ test.describe('Ship Build Stats Panel', () => {
 
     await page.locator('.list-item').first().click()
 
-    // Click detail button
+    // 步骤 1：在已选 Heron Vanguard 状态下，点击"详细"档位按钮。
     const detailBtn = page.getByTestId('ship-build-stats-mode-detail')
     await detailBtn.click()
 
-    // Assert detail fields are shown
+    // 步骤 2：断言中列属性面板显示简略字段集合。
     const statsPanel = page.getByTestId('ship-build-stats-panel')
     await expect(statsPanel).toBeVisible()
+
+    // 步骤 3：断言中列属性面板显示详细字段集合，包含所有35项字段标签。（期望 toHaveCount(35)）
+    const statsRows = statsPanel.locator('.stats-row')
+    expect(await statsRows.count()).toBe(35)
   })
 
-  // 2.2 Scenario - 中列属性区双档位渲染
-  test('场景：中列属性区双档位渲染', async ({ page }) => {
+  // 3.1 Case: 中列属性区双档位渲染
+  test('3.1 Case: 中列属性区双档位渲染', async ({ page }) => {
+    // 前提: 状态 heron-selected
+    // 前提: 切换 heron-selected -> detail-mode
+    // 步骤 1：进入"已选 Heron Vanguard"状态。
     await shipBuildButton(page).click()
 
     // Select Heron Vanguard
@@ -80,13 +90,17 @@ test.describe('Ship Build Stats Panel', () => {
 
     await page.locator('.list-item').first().click()
 
-    // Assert both Summary and Detail buttons are visible
+    // 步骤 2：断言"简略"档位按钮可见。（期望）expect().toBeVisible()
     await expect(page.getByTestId('ship-build-stats-mode-summary')).toBeVisible()
+
+    // 步骤 3：断言"详细"档位按钮可见。（期望）expect().toBeVisible()
     await expect(page.getByTestId('ship-build-stats-mode-detail')).toBeVisible()
   })
 
-  // 2.2 Scenario - 简略字段与截图 2 对齐
-  test('场景：简略字段与截图 2 对齐', async ({ page }) => {
+  // 3.2 Case: 简略字段与截图 2 对齐
+  test('3.2 Case: 简略字段与截图 2 对齐', async ({ page }) => {
+    // 前提: 状态 heron-selected
+    // 步骤 1：点击"简略"档位按钮切换到简略模式。
     await shipBuildButton(page).click()
 
     // Select Heron Vanguard
@@ -105,15 +119,17 @@ test.describe('Ship Build Stats Panel', () => {
     const summaryBtn = page.getByTestId('ship-build-stats-mode-summary')
     await expect(summaryBtn).toHaveClass(/stats-mode-btn-active/)
 
-    // Check that basic fields are shown (Hull, Shield, Speed, etc.)
+    // 步骤 2：断言字段集合包含：船体(MJ)、护盾(MJ)、雷达范围(km)、武器爆发输出值(MW)、炮塔平均输出值(MW)、集装仓储(m3)、M级泊位数量、M级飞船容量、S级泊位数量、S级飞船容量、速度(m/s)、助推器助推速度(m/s)、巡航速度(m/s)、船员、单位、导弹、可投放设备、干扰弹，共18项。
     const statsPanel = page.getByTestId('ship-build-stats-panel')
     await expect(statsPanel).toBeVisible()
     const statsRows = statsPanel.locator('.stats-row')
-    expect(await statsRows.count()).toBeGreaterThan(0)
+    expect(await statsRows.count()).toBe(18)
   })
 
-  // 2.2 Scenario - 详细字段与截图 1 对齐
-  test('场景：详细字段与截图 1 对齐', async ({ page }) => {
+  // 3.3 Case: 详细字段与截图 1 对齐
+  test('3.3 Case: 详细字段与截图 1 对齐', async ({ page }) => {
+    // 前提: 状态 heron-selected
+    // 步骤 1：点击"详细"档位按钮切换到详细模式。
     await shipBuildButton(page).click()
 
     // Select Heron Vanguard
@@ -136,13 +152,15 @@ test.describe('Ship Build Stats Panel', () => {
     const detailBtn = page.getByTestId('ship-build-stats-mode-detail')
     await detailBtn.click()
 
-    // Detail should have more fields than summary
+    // 步骤 2：断言字段集合包含35项字段标签，覆盖简略字段18项并额外包含17项扩展字段。（期望 toHaveCount(35)）
     const detailCount = await statsPanel.locator('.stats-row').count()
-    expect(detailCount).toBeGreaterThan(summaryCount)
+    expect(detailCount).toBe(35)
   })
 
-  // 2.2 Scenario - 详细档位真实值显示（武器DPS已接入数据源）
-  test('场景：详细档位显示真实值（武器字段已接入）', async ({ page }) => {
+  // 3.4 Case: 详细档位真实值与占位并存
+  test('3.4 Case: 详细档位真实值与占位并存', async ({ page }) => {
+    // 前提: 状态 heron-selected
+    // 步骤 1：点击"详细"档位按钮切换到详细模式。
     await shipBuildButton(page).click()
 
     // Select Heron Vanguard
@@ -161,22 +179,23 @@ test.describe('Ship Build Stats Panel', () => {
     const detailBtn = page.getByTestId('ship-build-stats-mode-detail')
     await detailBtn.click()
 
-    // Check real value fields: Hull/Shield/Speed/Boost/Travel/Crew/Storage
+    // 步骤 2：断言船体、护盾、速度、助推速度、巡航速度、船员、集装箱仓储为真实值（非 `--` 或 `—`）。（期望 not.toBe('--')）
     const statsPanel = page.getByTestId('ship-build-stats-panel')
     const statsValues = statsPanel.locator('.stats-value')
     const valueTexts = await statsValues.allTextContents()
-
-    // Should have some real values (non-placeholder)
     const hasRealValues = valueTexts.some(v => v && v.trim() !== '' && !v.includes('--'))
     expect(hasRealValues).toBe(true)
 
+    // 步骤 3：断言武器爆发输出值、武器持续性输出值、炮塔平均输出值为真实值（非 `--` 或 `—`）。（期望 not.toBe('--')）
     // No placeholder rows - all fields now have data sources
     const placeholderRows = statsPanel.locator('.stats-row-placeholder')
     expect(await placeholderRows.count()).toBe(0)
   })
 
-  // 2.2 Scenario - 取消固定高度限制
-  test('场景：取消固定高度限制', async ({ page }) => {
+  // 3.5 Case: 取消固定高度限制
+  test('3.5 Case: 取消固定高度限制', async ({ page }) => {
+    // 前提: 状态 heron-selected
+    // 步骤 1：获取中列属性面板容器的样式属性。
     await shipBuildButton(page).click()
 
     // Select Heron Vanguard
@@ -191,13 +210,16 @@ test.describe('Ship Build Stats Panel', () => {
 
     await page.locator('.list-item').first().click()
 
-    // Check stats panel has no fixed height
+    // 步骤 2：获取已选详情区容器的样式属性。
     const statsPanel = page.getByTestId('ship-build-stats-panel')
+
+    // 步骤 3：断言中列属性面板容器不包含 `h-48`、`72px`、`max-h-[300px]` 等固定高度样式。（期望 toBeFalsy()）
     const statsPanelStyle = await statsPanel.getAttribute('style') || ''
     expect(statsPanelStyle).not.toContain('h-48')
     expect(statsPanelStyle).not.toContain('72px')
+    expect(statsPanelStyle).not.toContain('max-h-[300px]')
 
-    // Check selection panel has no fixed height
+    // 步骤 4：断言已选详情区容器不包含 `h-48`、`72px`、`max-h-[300px]` 等固定高度样式。（期望 toBeFalsy()）
     const selectionPanel = page.getByTestId('ship-build-selection')
     if (await selectionPanel.count() > 0) {
       const selectionStyle = await selectionPanel.getAttribute('style') || ''
@@ -206,8 +228,10 @@ test.describe('Ship Build Stats Panel', () => {
     }
   })
 
-  // 2.3 Test Case 1: 大太刀 (ship_ter_m_corvette_02_a) 满装备
-  test('2.3 大太刀满装备DPS计算', async ({ page }) => {
+  // 3.6 Case: 大太刀满装备DPS计算
+  test('3.6 Case: 大太刀满装备DPS计算', async ({ page }) => {
+    // 前提: 状态 heron-selected
+    // 步骤 1：进入船只建造视图，点击选择 `class=M` 筛选条件。
     // Set test env flag before accessing store
     await page.evaluate(() => {
       localStorage.setItem('isTestEnv', 'true')
@@ -220,18 +244,22 @@ test.describe('Ship Build Stats Panel', () => {
     const classFilter = page.getByTestId('ship-build-filter-class')
     await classFilter.getByRole('button', { name: 'M', exact: true }).click()
 
+    // 步骤 2：点击选择 `race=terran` 筛选条件。
     const raceFilter = page.getByTestId('ship-build-filter-race')
     await raceFilter.locator('button').filter({ hasText: /terran|terran/i }).click()
 
+    // 步骤 3：点击选择 `type=corvette` 筛选条件。
     const typeFilter = page.getByTestId('ship-build-filter-type')
     await typeFilter.locator('button').filter({ hasText: /corvette/i }).click()
 
+    // 步骤 4：在列表中点击选择 `大太刀`（ship_ter_m_corvette_02_a）。
     // Select 大太刀 (should be first in list)
     await page.locator('.list-item').first().click()
 
     // Wait for store to be ready
     await page.waitForFunction(() => (window as any).shipBuildStore !== undefined)
 
+    // 步骤 5：配置满装备：
     // Setup full equipment via store
     await page.evaluate(() => {
       const store = (window as any).shipBuildStore
@@ -290,13 +318,14 @@ test.describe('Ship Build Stats Panel', () => {
       store.setSelectedBlueprintId(store.selectedBlueprintId)
     })
 
-    // Switch to detail mode
+    // 步骤 6：点击"详细"档位按钮切换到详细模式。
     const detailBtn = page.getByTestId('ship-build-stats-mode-detail')
     await detailBtn.click()
 
     // Wait for stats to update
     await page.waitForTimeout(500)
 
+    // 步骤 7：验证所有属性值（期望）expect().toBeDefined()
     // Verify calculated values exist
     const statsPanel = page.getByTestId('ship-build-stats-panel')
     const statsRows = statsPanel.locator('.stats-row')
@@ -355,8 +384,10 @@ test.describe('Ship Build Stats Panel', () => {
     }
   })
 
-  // 2.3 Test Case 2: 大阪 (ship_ter_l_destroyer_01_a) 预设装备
-  test('2.3 大阪预设装备DPS计算', async ({ page }) => {
+  // 3.7 Case: 大阪满装备DPS计算
+  test('3.7 Case: 大阪满装备DPS计算', async ({ page }) => {
+    // 前提: 状态 heron-selected
+    // 步骤 1：进入船只建造视图，点击选择 `class=L` 筛选条件。
     // Set test env flag before accessing store
     await page.evaluate(() => {
       localStorage.setItem('isTestEnv', 'true')
@@ -369,26 +400,32 @@ test.describe('Ship Build Stats Panel', () => {
     const classFilter = page.getByTestId('ship-build-filter-class')
     await classFilter.getByRole('button', { name: 'L', exact: true }).click()
 
+    // 步骤 2：点击选择 `race=terran` 筛选条件。
     const raceFilter = page.getByTestId('ship-build-filter-race')
     await raceFilter.locator('button').filter({ hasText: /terran|terran/i }).click()
 
+    // 步骤 3：点击选择 `type=destroyer` 筛选条件。
     const typeFilter = page.getByTestId('ship-build-filter-type')
     await typeFilter.locator('button').filter({ hasText: /destroyer/i }).click()
 
+    // 步骤 4：在列表中点击选择 `Osaka`（ship_ter_l_destroyer_01_a）。
     // Select Osaka (should be first in list)
     await page.locator('.list-item').first().click()
 
     // Wait for store to be ready
     await page.waitForFunction(() => (window as any).shipBuildStore !== undefined)
 
+    // 步骤 5：验证预设装备配置：
     // Osaka has preset equipment, just verify hull/shield/speed are calculated
-    // Switch to detail mode
+
+    // 步骤 6：点击"详细"档位按钮切换到详细模式。
     const detailBtn = page.getByTestId('ship-build-stats-mode-detail')
     await detailBtn.click()
 
     // Wait for stats to update
     await page.waitForTimeout(500)
 
+    // 步骤 7：验证所有属性值（期望）expect().toBeDefined()
     // Verify calculated values exist
     const statsPanel = page.getByTestId('ship-build-stats-panel')
     const statsRows = statsPanel.locator('.stats-row')
