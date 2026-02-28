@@ -25,6 +25,9 @@ Validation rules (authoritative):
    - `状态:` task must have at least 4 subtasks.
    - `切换:` task must have at least 3 subtasks.
    - If not, agent should inline that behavior into Case steps instead of over-modeling.
+9) Placeholder assertion values are forbidden:
+   - Do not use placeholders like `expectedValue`/`unexpectedValue` in assertion arguments.
+   - Assertions must use concrete, reproducible business values.
 
 Usage:
     python skill-scripts/validate_test_tasks_refs.py <change-name>
@@ -44,10 +47,13 @@ from typing import Dict, List, Set, Tuple
 
 ASSERTION_METHOD_PATTERN = re.compile(
     r"(expect\s*\(|\btoBe\(|\btoEqual\(|\btoStrictEqual\(|\btoContain\(|\btoHaveCount\(|"
-    r"\btoHaveText\(|\btoHaveValue\(|\btoBeTruthy\(|\btoBeFalsy\(|\btoBeGreaterThan\(|"
+    r"\btoHaveText\(|\btoHaveValue\(|\btoBeDefined\(|\btoBeNull\(|\btoBeTruthy\(|\btoBeFalsy\(|\btoBeGreaterThan\(|"
     r"\btoBeGreaterThanOrEqual\(|\btoBeLessThan\(|\btoBeLessThanOrEqual\(|\bgreaterThan\(|\blessThan\()"
 )
 FORBIDDEN_BOOLEAN_TOBE_PATTERN = re.compile(r"\btoBe\s*\(\s*(true|false)\s*\)")
+PLACEHOLDER_ASSERTION_TOKEN_PATTERN = re.compile(
+    r"\b(expectedValue|unexpectedValue|actualValue|someValue|anyValue)\b"
+)
 
 VAGUE_BLACKLIST_TERMS = [
     "某个",
@@ -668,6 +674,10 @@ def validate_test_tasks(
             if FORBIDDEN_BOOLEAN_TOBE_PATTERN.search(step_content):
                 errors.append(
                     f"任务 `{task_name}` - 禁止使用 toBe(true/false)：{step_content}；请改为具语义断言"
+                )
+            if ASSERTION_METHOD_PATTERN.search(step_content) and PLACEHOLDER_ASSERTION_TOKEN_PATTERN.search(step_content):
+                errors.append(
+                    f"任务 `{task_name}` - 禁止使用占位断言参数（expectedValue/unexpectedValue 等）：{step_content}；请使用可复现的业务值或真实数据标识"
                 )
             if "期望" in step_content and not ASSERTION_METHOD_PATTERN.search(step_content):
                 errors.append(

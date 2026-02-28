@@ -39,11 +39,22 @@ export interface FitGroupRow {
   connectionKeys: string[]
 }
 
-export interface FitPanelProps {
-  mode: FitMode
-  canSwitchToGroup: boolean
-  conflictReason: string
-  connectionRows: FitConnectionRow[]
-  groupRows: FitGroupRow[]
-  selectedByConnection: Record<string, string | null | undefined>
+export interface EquipmentPickerState {
+  expanded: boolean
+  slotKey: string | null
+  highlightedEquipmentId: string | null
+}
+
+export interface FilterTag {
+  id: string
+  label: string
+  count: number
+}
+
+export interface EquipmentPickerProps {
+  open: boolean
+  slotKey: string
+  slotLabel: string
+  options: FitEquipmentOption[]
+  initialEquipmentId: string | null
 }

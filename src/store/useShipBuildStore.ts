@@ -200,6 +200,18 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     return connection.group.find(g => g.group === groupName)
   }
 
+  const cleanupEmptyGroups = () => {
+    if (!blueprint.value) return
+    blueprint.value.connections.forEach((connection) => {
+      connection.group = connection.group.filter((group) => {
+        const hasEquipment = Boolean(group.equipment_id)
+        const hasShield = Boolean(group.shield?.equipment_id)
+        return hasEquipment || hasShield
+      })
+    })
+    blueprint.value.connections = blueprint.value.connections.filter((connection) => connection.group.length > 0)
+  }
+
   // setEquipment: set equipment for a single group
   const setEquipment = (
     slotType: string,
@@ -211,11 +223,9 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     const groupData = findGroup(connection, groupName)
 
     if (equipmentId === null) {
-      // Remove the group entry entirely
-      connection.group = connection.group.filter(g => g.group !== groupName)
-      // If connection.group is empty, remove the connection
-      if (connection.group.length === 0) {
-        blueprint.value!.connections = blueprint.value!.connections.filter(c => c.slot_type !== slotType)
+      if (groupData) {
+        groupData.equipment_id = ''
+        groupData.count = count
       }
     } else {
       // Set or update equipment
@@ -231,6 +241,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     if (blueprint.value && selectedShipId.value) {
       blueprint.value.shipId = selectedShipId.value
     }
+    cleanupEmptyGroups()
   }
 
   // setShield: set shield for a group
@@ -258,12 +269,12 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
     if (groupData) {
       if (equipmentId === null) {
-        // Remove shield
-        delete groupData.shield
+        groupData.shield = { equipment_id: '', count }
       } else {
         groupData.shield = { equipment_id: equipmentId, count }
       }
     }
+    cleanupEmptyGroups()
   }
 
   // setGroupEquipment: batch set equipment for multiple connections (for group mode)
@@ -503,7 +514,6 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   }
 
   const setFitMode = (mode: FitMode) => {
-    if (mode === 'group' && hasFitModeConflict.value) return
     fitMode.value = mode
   }
 
@@ -780,11 +790,8 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     selectedShipId,
     statsViewMode,
     fitMode,
-    selectedByConnection,
     mockTagPatch,
     selectedShip,
-    connectionRows,
-    groupRows,
     hasFitModeConflict,
     canSwitchToGroupMode,
     // Blueprint persistence

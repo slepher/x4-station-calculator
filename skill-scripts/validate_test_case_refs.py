@@ -365,7 +365,21 @@ def parse_step_comments_from_test_file(content: str) -> Dict[str, List[Tuple[str
     return result
 
 
-def validate_test_file(file_path: Path, change_name: str) -> Tuple[bool, List[str]]:
+def filter_expected_steps_by_file_type(
+    expected_steps: Dict[str, List[str]],
+    file_type: str,
+) -> Dict[str, List[str]]:
+    """Filter expected steps by test file type to avoid cross-file false positives."""
+    if file_type == 'unit':
+        return {k: v for k, v in expected_steps.items() if re.match(r"^1\.\d+\s+", k)}
+    if file_type == 'e2e':
+        return {k: v for k, v in expected_steps.items() if re.match(r"^[23]\.\d+\s+", k)}
+    if file_type in {'bug', 'bugfix'}:
+        return {k: v for k, v in expected_steps.items() if re.match(r"^4\.\d+\s+", k)}
+    return expected_steps
+
+
+def validate_test_file(file_path: Path, change_name: str, file_type: str) -> Tuple[bool, List[str]]:
     """Validate a single test file's step comments and assertions."""
     errors = []
 
@@ -381,6 +395,7 @@ def validate_test_file(file_path: Path, change_name: str) -> Tuple[bool, List[st
 
     tasks_content = test_tasks_path.read_text(encoding="utf-8")
     expected_steps = parse_steps_from_test_tasks(tasks_content)
+    expected_steps = filter_expected_steps_by_file_type(expected_steps, file_type)
     actual_comments = parse_step_comments_from_test_file(content)
 
     # Validate each test case
@@ -652,7 +667,7 @@ def main():
     # Validate step comments in each test file
     print(f"\n=== Step Comment Validation ===")
     for file_type, file_path in files.items():
-        step_valid, step_errors = validate_test_file(file_path, change_name)
+        step_valid, step_errors = validate_test_file(file_path, change_name, file_type)
         if not step_valid:
             is_valid = False
             errors.extend(step_errors)
