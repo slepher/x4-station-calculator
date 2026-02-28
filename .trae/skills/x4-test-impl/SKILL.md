@@ -2,7 +2,7 @@
 name: x4-test-impl
 description: "Implement and supplement Unit/E2E test code for X4 Station Calculator. Trigger with /x4:test-impl <change-name>."
 metadata:
-  version: "1.9"
+  version: "1.10"
 ---
 
 # X4 Test Implementation
@@ -66,6 +66,8 @@ python3 skill-scripts/validate_test_case_refs.py <change-name>
 **Validation covers:**
 1. **Case Name Correspondence**: Test case names in files must match task names in test_tasks.md by prefix (e.g., `1.1` matches `1.1 档位默认状态`)
 2. **Step Comment Correspondence**: Each subtask in test_tasks.md must have a corresponding comment in the test file, matching by prefix (e.g., `1.1.1` matches `1.1.1 读取当前档位状态`)
+3. **Step Has Code**: Each step comment must be followed by at least one line of actual code (operation or assertion). Empty steps (comments without code) will fail validation.
+4. **Assertion Match**: For steps with expectations (e.g., `（期望 toBe('summary')）`), the test file must contain corresponding assertions. For sub-item assertions, all assertion values must be verified.
 
 ### Validation Rules
 
@@ -122,11 +124,14 @@ it("1.1 档位默认状态", async ({ page }) => {
 ### Rules
 1. **One-to-one mapping**: Each step in test_tasks.md must have a corresponding comment in the test case
 2. **No empty blocks**: Comments must be immediately followed by actual code (no empty lines between comment and code)
+   - **Every step must have at least one line of code**: Operations (e.g., `await page.click(...)`, `const x = ...`) OR assertions (e.g., `expect(...).toBe(...)`)
+   - Steps without code will fail validation
 3. **宽松匹配 (标号开头)**: Step comments只需以对应标号开头即可:
    - test_tasks.md: `- [ ] 1.1.1 渲染已选飞船的船只建造属性区。`
    - test comment: `// 1.1.1 渲染已选飞船的船只建造属性区。` 或 `// 1.1.1: 渲染已选飞船的船只建造属性区。`
 4. **Assertion must match exactly**: The assertion code under the step comment must match the assertion documented in test_tasks.md exactly (e.g., `toBe(1000)`, `greaterThan(300)`, `toContain('text')`). Do not change assertion values or methods.
-5. **Order matters**: Steps must appear in the same order as in test_tasks.md
+5. **Sub-item assertions must be verified**: For steps with sub-items containing expectations (e.g., `  - [ ] 船体: 16,100 MJ（期望 toBe('16,100 MJ')）`), all assertions must be present in the test file
+6. **Order matters**: Steps must appear in the same order as in test_tasks.md
 
 ### Example - Complex Steps with Sub-items
 ```typescript
@@ -167,6 +172,7 @@ Follow this order when implementing tests:
    - Exact directory paths (UNIT_DIR, E2E_DIR)
    - Test case names只需以对应标号开头即可 (宽松匹配)
    - Step comments只需以对应标号开头即可 (宽松匹配)
+   - **Every step must have at least one line of code** (operations or assertions)
    - Assertions under step comments must EXACTLY match assertions documented in test_tasks.md
 
 2. **Python validation (first pass)**:
@@ -175,7 +181,8 @@ Follow this order when implementing tests:
    ```
    - Fix any case name mismatches
    - Fix any step comment mismatches
-   - Fix any assertion mismatches
+   - **Fix steps without code**: Every step comment must have corresponding code
+   - Fix any assertion mismatches (including sub-item assertions)
    - Repeat until Python validation passes
 
 3. **Agent validation (second pass)**:
@@ -183,6 +190,7 @@ Follow this order when implementing tests:
    - Verify syntax/type correctness: `npx tsc -p tsconfig.test-check.json --noEmit`
    - Verify all test_tasks.md items have corresponding test cases
    - Verify step comments are present and correctly placed (no empty lines between comment and code)
+   - Verify every step has at least one line of code
    - Verify assertions under step comments exactly match assertions in test_tasks.md (e.g., `toBe(1000)`, `greaterThan(300)`)
 
 ## 9. GUARDRAILS

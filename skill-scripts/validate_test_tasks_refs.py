@@ -19,7 +19,7 @@ Validation rules (authoritative):
    states/transitions should be connected to Chapter 3 or 4 reference paths.
 6) Two independent structure rules are enforced:
    - Rule A (Case-subtask rule, Chapter 3 only):
-     Case direct subtasks can only be 前提:状态 / 前提:切换 / 步骤 / 期望
+     Case direct subtasks can only be 状态:/切换:/步骤:/期望:
    - Rule B (Five-chapter tree-only rule):
      In chapters 1..5, only task tree nodes are allowed (task/subtask/grandchild-subtask).
 7) Assertion style rule:
@@ -127,8 +127,13 @@ def parse_test_tasks(content: str) -> Tuple[Dict, Dict, Set, Set, Dict, Dict, Li
     transition_pattern = re.compile(r"^-\s*\[\s*\]\s*切换[:：]\s*(.+)\s*->\s*(.+)$")
 
     # Reference patterns in Chapter 3 or 4 (checkbox subtask required)
-    state_ref_pattern = re.compile(r"^\s*-\s*\[[ ✓✗x]\]\s*前提:\s*状态\s*(\S+)$")
-    transition_ref_pattern = re.compile(r"^\s*-\s*\[[ ✓✗x]\]\s*前提:\s*切换\s*(\S+)\s*->\s*(\S+)$")
+    # Supports formats with or without numbering:
+    # - [ ] 状态: xxx
+    # - [ ] 切换: xxx -> yyy
+    # - [ ] 3.1.1 状态: xxx
+    # - [ ] 3.1.1 切换: xxx -> yyy
+    state_ref_pattern = re.compile(r"^\s*-\s*\[[ ✓✗x]\]\s*(?:\d+\.\d+\.\d+\s+)?状态:\s*(\S+)$")
+    transition_ref_pattern = re.compile(r"^\s*-\s*\[[ ✓✗x]\]\s*(?:\d+\.\d+\.\d+\s+)?切换:\s*(\S+)\s*->\s*(\S+)$")
 
     # Bug ID pattern: ### BUG-<数字> <描述>
     bug_id_pattern = re.compile(r"^###\s*(BUG-\d+)\s+(.+)$")
@@ -208,6 +213,26 @@ def parse_test_tasks(content: str) -> Tuple[Dict, Dict, Set, Set, Dict, Dict, Li
                     'is_failure': is_failure,
                     'chapter': current_chapter
                 })
+                # Extract state/transition references from step markers in Chapter 3/4
+                # Format: - [ ] 3.1.1 状态: xxx or - [ ] 3.1.1 切换: xxx -> yyy
+                if current_chapter in (3, 4):
+                    ref_line = line.strip()
+                    state_ref_match = state_ref_pattern.match(ref_line)
+                    if state_ref_match:
+                        state_id = state_ref_match.group(1)
+                        if current_chapter == 3:
+                            chapter3_references.add(state_id)
+                        else:
+                            chapter4_references.add(state_id)
+                    trans_ref_match = transition_ref_pattern.match(ref_line)
+                    if trans_ref_match:
+                        from_state = trans_ref_match.group(1)
+                        to_state = trans_ref_match.group(2)
+                        trans_id = f"{from_state} -> {to_state}"
+                        if current_chapter == 3:
+                            chapter3_references.add(trans_id)
+                        else:
+                            chapter4_references.add(trans_id)
                 continue
 
             # Then try subtask (more indented than step, has checkbox)
@@ -229,8 +254,8 @@ def parse_test_tasks(content: str) -> Tuple[Dict, Dict, Set, Set, Dict, Dict, Li
                     'chapter': current_chapter
                 })
                 # Chapter 3/4 reference extraction from checkbox subtasks, e.g.:
-                # - [ ] 前提: 状态 xxx
-                # - [ ] 前提: 切换 aaa -> bbb
+                # - [ ] 状态: xxx
+                # - [ ] 切换: xxx -> yyy
                 if current_chapter in (3, 4):
                     ref_line = line.strip()
                     state_ref_match = state_ref_pattern.match(ref_line)
@@ -730,8 +755,8 @@ def validate_test_tasks(
     # 1) Each case must contain at least one step.
     # 2) Any bullet line at task child-indent (task indent + 2) is a subtask and MUST use checkbox format.
     # 3) At task child-indent, only these direct subtask types are allowed:
-    #    - 前提: 状态 ...
-    #    - 前提: 切换 ... -> ...
+    #    - 状态: ...
+    #    - 切换: ... -> ...
     #    - 步骤 n: ...
     #    - 期望: ...
     # 4) Any non-empty non-bullet line inside Case block is illegal text.
@@ -766,20 +791,22 @@ def validate_test_tasks(
                 )
                 continue
             # Only enforce allowed type list on direct child subtasks.
-            # Allow both old format (前提:/步骤:/期望:) and new numbered format (3.1.1)
+            # Allow format: 状态:/切换:/步骤:/期望: or numbered format (3.1.1)
             if current_indent == subtask_indent:
                 child_content_match = re.match(r"^\s*-\s*\[[ ✓✗x]\]\s*(.+)$", ln)
                 child_content = child_content_match.group(1).strip() if child_content_match else ""
                 if not (
-                    re.match(r"^前提:\s*状态\s+\S+", child_content)
-                    or re.match(r"^前提:\s*切换\s+\S+\s*->\s*\S+", child_content)
+                    re.match(r"^状态:\s+\S+", child_content)
+                    or re.match(r"^切换:\s+\S+\s*->\s*\S+", child_content)
                     or re.match(r"^(步骤|Step)\s*\d+[:：]\s*.+", child_content)
                     or re.match(r"^期望[:：]\s*.+", child_content)
-                    or re.match(r"^\d+\.\d+\.\d+\s+", child_content)  # Allow numbered format like 3.1.1
+                    or re.match(r"^\d+\.\d+\.\d+\s+状态:\s+\S+", child_content)
+                    or re.match(r"^\d+\.\d+\.\d+\s+切换:\s+\S+\s*->\s*\S+", child_content)
+                    or re.match(r"^\d+\.\d+\.\d+\s+", child_content)
                 ):
                     errors.append(
                         f"任务 `{task_name}` - 第 {abs_line} 行 Case 子任务类型非法：{child_content}；"
-                        "仅允许 前提:状态 / 前提:切换 / 步骤 / 期望 / 数字编号(如3.1.1)"
+                        "仅允许 状态:/切换:/步骤:/期望:/数字编号(如3.1.1)"
                     )
 
         has_step_subtask = any(
@@ -950,14 +977,16 @@ def validate_step_format(content: str) -> Tuple[bool, List[str]]:
             if indent == 2:
                 child_content = re.sub(r"^-\s*\[[ ✓✗x]\]\s+", "", stripped)
                 if not (
-                    re.match(r"^前提:\s*状态\s+\S+", child_content)
-                    or re.match(r"^前提:\s*切换\s+\S+\s*->\s*\S+", child_content)
+                    re.match(r"^状态:\s+\S+", child_content)
+                    or re.match(r"^切换:\s+\S+\s*->\s*\S+", child_content)
                     or re.match(r"^(步骤|Step)\s*\d+[:：]\s*.+", child_content)
                     or re.match(r"^期望[:：]\s*.+", child_content)
+                    or re.match(r"^\d+\.\d+\.\d+\s+状态:\s+\S+", child_content)  # 3.1.1 状态: xxx
+                    or re.match(r"^\d+\.\d+\.\d+\s+切换:\s+\S+\s*->\s*\S+", child_content)  # 3.1.1 切换: xxx -> yyy
                     or re.match(r"^\d+\.\d+\.\d+\s+.+", child_content)  # Allow numbered format like 3.1.1
                 ):
                     errors.append(
-                        f"第 {i} 行: 第三章 Case 直接子任务类型非法（仅允许 前提:状态/前提:切换/步骤/期望）：{stripped}"
+                        f"第 {i} 行: 第三章 Case 直接子任务类型非法（仅允许 状态:/切换:/步骤/期望/标号）：{stripped}"
                     )
 
     # ========================================

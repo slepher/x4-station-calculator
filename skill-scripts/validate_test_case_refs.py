@@ -252,15 +252,16 @@ def parse_steps_from_test_tasks(content: str) -> Dict[str, List[str]]:
 
         # Check for sub-items (indented at 4 or 6 spaces)
         # This runs for ALL lines, not just under steps
+        # NOTE: Must use original 'line' not 'stripped' because pattern expects leading spaces
         if in_task and current_task:
             # 4-space indent sub-items
-            subitem_match = re.match(r"^    -\s*\[[ ✓✗]\]\s*(.+)$", stripped)
+            subitem_match = re.match(r"^    -\s*\[[ ✓✗]\]\s*(.+)$", line)
             if subitem_match and result[current_task]:
                 result[current_task][-1] += " " + subitem_match.group(1)
 
             # 6-space indent (sub-sub-items)
-            elif re.match(r"^      -\s*\[[ ✓✗]\]\s*(.+)$", stripped):
-                subitem_match = re.match(r"^      -\s*\[[ ✓✗]\]\s*(.+)$", stripped)
+            elif re.match(r"^      -\s*\[[ ✓✗]\]\s*(.+)$", line):
+                subitem_match = re.match(r"^      -\s*\[[ ✓✗]\]\s*(.+)$", line)
                 result[current_task][-1] += " " + subitem_match.group(1)
 
     return result
@@ -280,9 +281,10 @@ def extract_subitem_assertions(step_content: str) -> List[str]:
     assertions = []
 
     # Pattern for Chinese: （期望 toBe(...)）
-    cn_pattern = re.compile(r"（期望\s+(toBe\([^)]+\)|greaterThan\([^)]+\)|lessThan\([^)]+\)|toContain\([^)]+\)|toHaveCount\([^)]+\)|toEqual\([^)]+\)|toBeTruthy\(\)|toBeFalsy\(\))\)")
+    # Note: Use .+? (non-greedy) to handle values containing ) like '95,000 MJ'
+    cn_pattern = re.compile(r"（期望\s+(toBe\(.+?\)|greaterThan\(.+?\)|lessThan\(.+?\)|toContain\(.+?\)|toHaveCount\(.+?\)|toEqual\(.+?\)|toBeTruthy\(\)|toBeFalsy\(\))\)")
     # Pattern for parentheses assertion: (toBe(...))
-    paren_pattern = re.compile(r"\(toBe\([^)]+\)|\(greaterThan\([^)]+\)|\(lessThan\([^)]+\)")
+    paren_pattern = re.compile(r"\(toBe\(.+?\)|\(greaterThan\(.+?\)|\(lessThan\(.+?\)")
 
     for match in cn_pattern.finditer(step_content):
         assertions.append(match.group(1))
@@ -338,8 +340,8 @@ def parse_step_comments_from_test_file(content: str) -> Dict[str, List[Tuple[str
     # Also support old format: "步骤 1:" for backward compatibility
     step_comment_pattern = re.compile(r"^\s*//\s*((\d+\.\d+\.\d+)\s+.+|步骤\s*\d+[:：].+)$")
 
-    # Pattern to match assertion lines (expect, assert, etc.)
-    assertion_pattern = re.compile(r"^\s*(expect|assert|chai\.expect).*$")
+    # Pattern to match assertion lines (expect, assert, chai.expect, await expect)
+    assertion_pattern = re.compile(r"^\s*(expect|assert|chai\.expect|await\s+expect).*$")
 
     # Pattern to detect step comment lines (to find the range)
     step_start_pattern = re.compile(r"^\s*//\s*(\d+\.\d+\.\d+|步骤\s*\d+)")
@@ -360,31 +362,38 @@ def parse_step_comments_from_test_file(content: str) -> Dict[str, List[Tuple[str
         step_match = step_comment_pattern.match(line)
         if step_match:
             step_comment = step_match.group(1)
-            # Look for assertion from current position to next step comment or end of test
+            # Look for code (operation or assertion) from current position to next step comment or end of test
+            # Only need first code line to check if step has code
+            has_code = False
             assertion = ""
             for j in range(i + 1, len(lines)):
                 next_line = lines[j].strip()
                 # Skip empty lines
                 if not next_line:
                     continue
-                # Skip lines that are still comments
+                # Skip lines that are still comments (but not step comments)
                 if next_line.startswith("//"):
                     # Check if it's another step comment (new step starts)
                     if step_start_pattern.match(next_line):
                         break
+                    # Skip other comments (e.g., // some note)
                     continue
-                # Check if it's an assertion line
+                # Found first code line - record it and stop looking
+                if not has_code:
+                    has_code = True
+                    assertion = next_line
+                    # Continue looking for more assertions (for steps with multiple assertions)
+                    continue
+                # Already have first code, look for assertion lines only
                 if assertion_pattern.match(next_line):
-                    # Add this assertion and continue looking for more
                     if assertion:
                         assertion += " " + next_line
                     else:
                         assertion = next_line
-                    continue
-                # If we hit other code, stop looking for assertions for this step
+                # Stop after first code line (don't merge multiple code lines)
                 break
 
-            result[current_task].append((step_comment, assertion))
+            result[current_task].append((step_comment, assertion if has_code else ""))
 
     return result
 
@@ -485,6 +494,14 @@ def validate_test_file(file_path: Path, change_name: str, file_type: str = None)
                     continue
 
             act_comment, act_assertion = act_tuple
+
+            # Check if step has any code (operation or assertion)
+            # Each step comment should have at least one line of code after it
+            if not act_assertion:
+                errors.append(
+                    f"测试用例 '{test_name}' 步骤 {i+1} - 缺少对应操作代码: '{exp_step[:50]}...'"
+                )
+                continue
 
             # Normalize step comment for comparison: use prefix matching
             # Expected comes from test_tasks.md like: "1.1.1 读取当前档位状态"
