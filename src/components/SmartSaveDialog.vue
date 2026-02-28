@@ -176,7 +176,9 @@ const handleDiscard = () => {
     return
   }
 
-  if (props.storeType === 'logicFlow') {
+  if (props.storeType === 'ship-build') {
+    shipBuildStore.resetAll()
+  } else if (props.storeType === 'logicFlow') {
     logicFlowStore.clearAll()
   } else {
     empireStore.createEmpire(t('menu.default_empire_name'))
