@@ -202,7 +202,9 @@
     "btn_discard_and_new": "丢弃并新建",
     "btn_save_new_and_create": "保存并新建",
     "btn_overwrite_and_create": "覆盖并新建",
-    "btn_save": "保存"
+    "btn_save": "保存",
+    "default_blueprint_name": "新配装方案",
+    "blueprint": "蓝图"
   },
   "planning": {
     "module_list": "模块列表",
@@ -235,8 +237,7 @@
     "confirm_delete_blueprint": "确定要删除这个配装方案吗？",
     "confirm_load_with_unsaved": "当前配置有未保存的修改，确定要载入吗？",
     "confirm_new_with_unsaved": "当前配置有未保存的修改，确定要新建吗？",
-    "connections_count": "个槽位",
-    "default_blueprint_name": "新配装方案"
+    "connections_count": "个槽位"
   },
   "wareflow": {
     "resource_overview": "资源产出",

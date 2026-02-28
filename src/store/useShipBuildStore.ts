@@ -374,7 +374,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     } else {
       // No active blueprint, create new one
       blueprint.value.id = crypto.randomUUID()
-      blueprint.value.name = blueprint.value.name || 'Unnamed Blueprint'
+      // name 保持为空，UI 会显示默认名称
       savedBlueprints.value.list.push(JSON.parse(JSON.stringify(blueprint.value)))
     }
 
@@ -470,6 +470,8 @@ export const useShipBuildStore = defineStore('ship-build', () => {
         connections: [],
         lastUpdated: Date.now()
       }
+      // Initialize snapshot for dirty check
+      takeSnapshot()
     }
     selectedShipId.value = shipId
     selectedByConnection.value = {}
