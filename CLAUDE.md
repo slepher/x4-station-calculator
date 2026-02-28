@@ -45,6 +45,14 @@ This is a Vue 3 + TypeScript + Vite application for X4: Foundations station plan
 - **Playwright** for E2E testing
 - **Vitest** for unit testing
 
+### Data Locations
+
+- **App UI texts**: `src/locales/en.json`, `src/locales/zh-CN.json`
+- **Game data**: `src/assets/x4_game_data/8.0-Diplomacy/data/*.json`
+- **Game locale texts**: `src/assets/x4_game_data/8.0-Diplomacy/locales/`
+  - Locale keys correspond to `nameId` field in game entities (e.g., `{20101,60201}`)
+  - Format: `{page,id}` where page is the text page number
+
 ### Store Architecture
 
 The application uses a hierarchical store structure with four main stores:

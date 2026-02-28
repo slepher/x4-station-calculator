@@ -224,11 +224,29 @@ const isBeamWeapon = (bullet: any): boolean => {
   return bullet.type === 'beam'
 }
 
+// 持久 DPS 计算函数（bullet 和 Beam 通用）
+const calculateSustainedDPS = (
+  burstDPS: number,
+  singleDamage: number,
+  singleHeat: number,
+  weaponHeat: any,
+  count: number
+): number => {
+  const overheatThreshold = 10000
+
+  if (!weaponHeat?.overheat || !weaponHeat?.coolrate || singleHeat <= 0) {
+    return burstDPS
+  }
+
+  const avgHeatPerSec = burstDPS / singleDamage * singleHeat
+  const timeToOverheat = avgHeatPerSec > 0 ? overheatThreshold / avgHeatPerSec : 0
+  const cycleTime = timeToOverheat + weaponHeat.cooldelay + (overheatThreshold / weaponHeat.coolrate)
+  return cycleTime > 0 ? burstDPS * (timeToOverheat / cycleTime) * count : 0
+}
+
 // 通用武器 DPS 计算函数
 // 返回 { burstDPS, sustainedDPS }，如果不支持则返回 null
 const calculateWeaponDPS = (equipment: any, bullet: any, missile: any, count: number) => {
-  const overheatThreshold = 10000
-
   // 处理 bullets.json (weapon/turret)
   if (bullet) {
     const weaponHeat = equipment.heat
@@ -251,19 +269,13 @@ const calculateWeaponDPS = (equipment: any, bullet: any, missile: any, count: nu
       singleDamage = damage * lifetime
       singleShotTime = chargetime + Math.max(lifetime, reload)
 
-      // Beam 使用原始计算（近似公式）
+      // Beam 使用近似公式
       const avgShotTime = (ammo * singleShotTime + ammoReload) / Math.max(ammo, 1)
       const burstDPS = avgShotTime > 0 ? (singleDamage / avgShotTime) * count : 0
 
       // 持续 DPS
       singleHeat = bullet.shotHeat + bullet.heat * lifetime
-      let sustainedDPS = burstDPS
-      if (weaponHeat?.overheat && weaponHeat?.coolrate && singleHeat > 0) {
-        const avgHeatPerSec = burstDPS / singleDamage * singleHeat
-        const timeToOverheat = avgHeatPerSec > 0 ? overheatThreshold / avgHeatPerSec : 0
-        const cycleTime = timeToOverheat + weaponHeat.cooldelay + (overheatThreshold / weaponHeat.coolrate)
-        sustainedDPS = cycleTime > 0 ? burstDPS * (timeToOverheat / cycleTime) * count : 0
-      }
+      const sustainedDPS = calculateSustainedDPS(burstDPS, singleDamage, singleHeat, weaponHeat, count)
 
       return { burstDPS, sustainedDPS }
     } else {
@@ -283,14 +295,8 @@ const calculateWeaponDPS = (equipment: any, bullet: any, missile: any, count: nu
       const avgShotTime = (ammo * singleShotTime + ammoReload) / Math.max(ammo, 1)
       const burstDPS = avgShotTime > 0 ? (singleDamage / avgShotTime) * count : 0
 
-      // 持续 DPS（近似计算：换弹时间平摊）
-      let sustainedDPS = burstDPS
-      if (weaponHeat?.overheat && weaponHeat?.coolrate && singleHeat > 0) {
-        const avgHeatPerSec = burstDPS / singleDamage * singleHeat
-        const timeToOverheat = avgHeatPerSec > 0 ? overheatThreshold / avgHeatPerSec : 0
-        const cycleTime = timeToOverheat + weaponHeat.cooldelay + (overheatThreshold / weaponHeat.coolrate)
-        sustainedDPS = cycleTime > 0 ? burstDPS * (timeToOverheat / cycleTime) * count : 0
-      }
+      // 持续 DPS（使用通用函数）
+      const sustainedDPS = calculateSustainedDPS(burstDPS, singleDamage, singleHeat, weaponHeat, count)
 
       return { burstDPS, sustainedDPS }
     }
