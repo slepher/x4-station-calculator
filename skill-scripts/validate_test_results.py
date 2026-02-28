@@ -16,10 +16,10 @@ Usage:
     python3 skill-scripts/validate_test_results.py <change-name> --passed <n> --failed 0
 
     # Full run - some tests failed at specific steps
-    python3 skill-scripts/validate_test_results.py <change-name> --passed <n> --failed <n> --failures "1.3,3.5" --fail-steps "步骤 2,步骤 3"
+    python3 skill-scripts/validate_test_results.py <change-name> --passed <n> --failed <n> --failures "1.3,3.5" --fail-steps "1.1.2,3.1.2"
 
-    # Example: 1.3 failed at step 2, 3.5 failed at step 3
-    python3 skill-scripts/validate_test_results.py ship-build-stat --passed 14 --failed 2 --failures "1.3,3.5" --fail-steps "步骤 2,步骤 3"
+    # Example: 1.3 failed at step 1.1.2, 3.5 failed at step 3.1.2
+    python3 skill-scripts/validate_test_results.py ship-build-stat --passed 14 --failed 2 --failures "1.3,3.5" --fail-steps "1.1.2,3.1.2"
 
     # Partial run - only some tests executed
     python3 skill-scripts/validate_test_results.py <change-name> --passed <n> --failed <n> --failures "1.3" --executed "1.1,1.2,1.3"
@@ -36,7 +36,7 @@ def parse_args():
     parser.add_argument('--passed', type=int, required=True, help='Number of passed tests')
     parser.add_argument('--failed', type=int, required=True, help='Number of failed tests')
     parser.add_argument('--failures', type=str, default='', help='Comma-separated list of failed test IDs (e.g., "1.3,3.5")')
-    parser.add_argument('--fail-steps', type=str, default='', help='Comma-separated list of failed steps for each failed test (e.g., "步骤 2,步骤 3")')
+    parser.add_argument('--fail-steps', type=str, default='', help='Comma-separated list of failed steps for each failed test (e.g., "1.1.2,3.1.2")')
     parser.add_argument('--executed', type=str, default='', help='Comma-separated list of executed test IDs (e.g., "1.1,1.2,2.1"). If empty, validates all tests.')
     return parser.parse_args()
 
@@ -89,8 +89,10 @@ def extract_tasks_with_steps(content: str) -> dict:
             current_step_info = None
             continue
 
-        # Check for step checkbox: - [✓] 步骤 or - [✗] 步骤 or - [ ] 步骤
-        step_match = re.match(r'^  (- \[([✓✗ ])\] )(步骤\s*\d+[:：].+)$', line)
+        # Check for step checkbox: support both old format (步骤) and new format (1.1.1)
+        # New format: - [✓] 1.1.1 描述
+        # Old format: - [✓] 步骤 1: 描述
+        step_match = re.match(r'^  (- \[([✓✗ ])\] )((步骤\s*\d+[:：].+|\d+\.\d+\.\d+.+))$', line)
         if step_match and current_task_info:
             symbol = step_match.group(2).strip()
             step_text = step_match.group(3).strip()

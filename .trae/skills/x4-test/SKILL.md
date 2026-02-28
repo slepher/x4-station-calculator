@@ -61,13 +61,13 @@ The following rules define how checkbox states should be updated in `test_tasks.
 **Agent 必须更新 test_tasks.md 中的所有 checkbox 级别：**
 
 1. **Test Case 级别** - 任务项
-2. **Step 级别** - 步骤（如 `步骤 1:`）
-3. **Sub-task 级别** - 子任务（如 `- [ ] 引擎槽位：选择装备...`）
+2. **Subtask 级别** - 子任务（如 `1.1.1`、`1.1.2`）
+3. **Sub-subtask 级别** - 子子任务（如 `- [ ] 引擎槽位：选择装备...`）
 
 **更新规则：**
 
-| 结果 | Case 标记 | Step 标记 | Sub-task 标记 |
-|------|-----------|-----------|---------------|
+| 结果 | Case 标记 | Subtask 标记 | Sub-subtask 标记 |
+|------|-----------|-------------|-----------------|
 | Pass | `[✓]` | `[✓]` | `[✓]` |
 | Fail at step N | `[✗]` | step N `[✗]`, steps < N `[✓]`, steps > N `[ ]` | sub-tasks < N `[✓]`, sub-task N `[✗]`, sub-tasks > N `[ ]` |
 
@@ -75,21 +75,21 @@ The following rules define how checkbox states should be updated in `test_tasks.
 ```markdown
 # Test passes - all levels marked [✓]
 - [✓] 3.6 Case: 大太刀满装备DPS计算
-  - [✓] 步骤 1：进入船只建造视图...
-  - [✓] 步骤 2：点击选择 `class=M`...
-  - [✓] 步骤 5：配置满装备：
+  - [✓] 3.6.1 进入船只建造视图...
+  - [✓] 3.6.2 点击选择 `class=M`...
+  - [✓] 3.6.3 配置满装备：
     - [✓] 引擎槽位：选择装备 `engine_ter_m_allround_01_mk1` 数量1
     - [✓] 护盾槽位：选择装备 `shield_ter_m_standard_02_mk2` 数量2
 
-# Test fails at step 5, sub-task 2
+# Test fails at step 3, sub-task 2
 - [✗] 3.6 Case: 大太刀满装备DPS计算
-  - [✓] 步骤 1：进入船只建造视图...
-  - [✓] 步骤 2：点击选择 `class=M`...
-  - [✗] 步骤 5：配置满装备：
+  - [✓] 3.6.1 进入船只建造视图...
+  - [✓] 3.6.2 点击选择 `class=M`...
+  - [✗] 3.6.3 配置满装备：
     - [✓] 引擎槽位：选择装备 `engine_ter_m_allround_01_mk1` 数量1
     - [✗] 护盾槽位：选择装备 `shield_ter_m_standard_02_mk2` 数量2
     - [ ] 武器槽位：选择装备 `weapon_ter_m_beam_01_mk2` 数量4
-  - [ ] 步骤 6：点击"详细"档位按钮...
+  - [ ] 3.6.4 点击"详细"档位按钮...
 ```
 
 2. **Chapter 5 Failure Lessons (MANDATORY)**:
@@ -124,7 +124,7 @@ After test execution, you MUST validate that `test_tasks.md` has been correctly 
 python3 skill-scripts/validate_test_results.py <change-name> --passed <n> --failed 0
 
 # Full run - tests failed at specific steps
-python3 skill-scripts/validate_test_results.py <change-name> --passed <n> --failed <n> --failures "1.3,3.5" --fail-steps "步骤 2,步骤 3"
+python3 skill-scripts/validate_test_results.py <change-name> --passed <n> --failed <n> --failures "1.3,3.5" --fail-steps "1.1.2,3.1.2"
 
 # Partial run - only some tests executed
 python3 skill-scripts/validate_test_results.py <change-name> --passed <n> --failed <n> --failures "1.3" --executed "1.1,1.2,1.3"
@@ -132,11 +132,11 @@ python3 skill-scripts/validate_test_results.py <change-name> --passed <n> --fail
 
 **Step-level Parameters**:
 - `--failures`: Comma-separated list of failed test IDs (e.g., "1.3,3.5")
-- `--fail-steps`: Comma-separated list of failed steps for each failed test (e.g., "步骤 2,步骤 3")
+- `--fail-steps`: Comma-separated list of failed steps for each failed test (e.g., "1.1.2,3.1.2")
   - Order must match --failures order
-  - Example: `--failures "1.3,3.5" --fail-steps "步骤 2,步骤 3"` means:
-    - Test 1.3 failed at step 2
-    - Test 3.5 failed at step 3
+  - Example: `--failures "1.3,3.5" --fail-steps "1.1.2,3.1.2"` means:
+    - Test 1.3 failed at step 1.1.2
+    - Test 3.5 failed at step 3.1.2
 
 ### What the Validation Script Checks
 
