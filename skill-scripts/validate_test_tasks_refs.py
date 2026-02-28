@@ -676,10 +676,27 @@ def validate_test_tasks(
                 errors.append(
                     f"任务 `{task_name}` - 含“期望”的步骤必须内联断言方法（如 expect(...) / toBe(...)），不允许仅写期望描述"
                 )
-        last_step_content = steps[-1].get('content', '')
-        if "期望" not in last_step_content:
+        # Check if last step or its subtasks contain "期望"
+        last_step = steps[-1]
+        last_step_line = last_step.get('line_num')
+        last_step_content = last_step.get('content', '')
+
+        # Check if last step itself contains "期望"
+        has_expectation = "期望" in last_step_content
+
+        # If not, check if there's a subtask under this step that contains "期望"
+        if not has_expectation and subtask_markers:
+            for subtask in subtask_markers:
+                subtask_line = subtask.get('line_num', 0)
+                subtask_name = subtask.get('name', '')
+                # Check if this subtask is under the last step (line number greater than step's line)
+                if subtask_line > last_step_line and "期望" in subtask_name:
+                    has_expectation = True
+                    break
+
+        if not has_expectation:
             errors.append(
-                f"任务 `{task_name}` - 最后一个步骤子任务必须是“期望”"
+                f"任务 `{task_name}` - 最后一步或其子任务必须包含“期望”"
             )
 
     # Rule A (independent): Validate Chapter 3 case internal subtasks:
