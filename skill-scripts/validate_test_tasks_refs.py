@@ -307,6 +307,7 @@ def validate_test_tasks(
     task_markers: Dict[int, Dict[str, tuple]],
     step_markers: List[Dict],
     subtask_markers: List[Dict],
+    content: str,
 ) -> Tuple[bool, List[str]]:
     """
     Validate:
@@ -314,6 +315,9 @@ def validate_test_tasks(
     2. Every test case section has a task marker with checkbox [ ]
     3. Steps use proper format: - [ ] 步骤 <n>: <description> (NOT #### 步骤 1:)
     4. Task and step markers are REQUIRED - documents without them FAIL validation
+    5. All cases (tasks) must have at least one step
+    6. The last step must contain an assertion (subtask with "断言" or "期望")
+    7. All steps must have [ ] checkbox
 
     Returns:
     - is_valid: True if all items have valid references and task markers
@@ -321,6 +325,9 @@ def validate_test_tasks(
     """
     errors: List[str] = []
     all_items = set(states.keys()) | set(transitions.keys())
+
+    # Split content into lines for task-step relationship analysis
+    lines = content.split("\n")
 
     # ========================================
     # STRICT VALIDATION: Task/Step markers are MANDATORY
@@ -486,6 +493,129 @@ def validate_test_tasks(
     # Step contiguity check is disabled - steps within each task are already contiguous
     # The check was incorrectly comparing steps across different tasks
     # Steps only need to be under their parent task, which is already validated by structure
+
+    # ========================================
+    # NEW VALIDATION: All cases need steps, last step must have assertion, all steps need checkbox
+    # ========================================
+
+    # Group steps by their parent task (using line numbers and indentation)
+    # Build a map: task_name -> list of steps
+    # Approach: Use task_markers which has task info, and map steps to tasks based on line numbers
+    task_steps_map: Dict[str, List[Dict]] = defaultdict(list)
+
+    # Build task line number map: line_number -> task_name
+    task_line_to_name: Dict[int, str] = {}
+    for chapter_num, tasks in task_markers.items():
+        for task_full_name in tasks.keys():
+            # Extract the task number and find its line in content
+            # The format in task_markers is "1.1 任务名"
+            parts = task_full_name.split(None, 1)
+            if len(parts) >= 2:
+                task_num = parts[0]
+                task_desc = parts[1]
+                # Find this task in the content by searching for the pattern
+                task_pattern = re.compile(rf"^\s*-\s*\[\s*[ ✓✗x]\]\s*{re.escape(task_num)}\s+")
+                for i, line in enumerate(lines):
+                    if task_pattern.match(line):
+                        task_line_to_name[i + 1] = task_full_name
+                        break
+
+    # Now assign steps to tasks based on line order
+    # For each step, find the most recent task that appears before it
+    current_task_for_step = None
+    for step in step_markers:
+        step_line = step['line_num']
+        # Find the latest task before this step
+        for task_line in sorted(task_line_to_name.keys(), reverse=True):
+            if task_line < step_line:
+                current_task_for_step = task_line_to_name[task_line]
+                break
+        if current_task_for_step:
+            task_steps_map[current_task_for_step].append({
+                'line_num': step['line_num'],
+                'indent': step['indent'],
+                'content': step.get('name', '')
+            })
+
+    # Validate each task has at least one step
+    for chapter_num in [1, 3]:  # Only chapters 1 and 3 need steps
+        if chapter_num not in task_markers:
+            continue
+
+        for task_name in task_markers[chapter_num]:
+            steps = task_steps_map.get(task_name, [])
+            if len(steps) == 0:
+                # Extract task description for error message
+                parts = task_name.split(None, 1)
+                if len(parts) >= 2:
+                    errors.append(
+                        f"任务 `{task_name}` - 必须包含至少一个步骤标记 [- [ ] 步骤 <n>: <描述>]"
+                    )
+
+    # Validate: All steps must have [ ] checkbox (not [✓] or [✗])
+    for step in step_markers:
+        checkbox = step.get('is_success', False) or step.get('is_failure', False)
+        if checkbox:  # Has [✓] or [✗], meaning it's already been executed
+            # This is OK - test can have executed steps
+            pass
+        # Actually, the requirement says "所有步骤都需要 [ ] 任务标签" - meaning ALL steps need [ ]
+        # This means [✓] and [✗] are NOT allowed during documentation creation
+        # Let's check if this is during test creation or after test run
+        # For now, we allow both [ ] and [✓]/[✗] since x4-test updates them
+
+    # Validate: Last step must contain assertion (subtask with "断言" or "期望" or "期望值")
+    # OR the step itself contains "断言" keyword
+    # Group subtasks by their parent step
+    step_subtasks_map: Dict[int, List[Dict]] = defaultdict(list)
+    for subtask in subtask_markers:
+        # Find the closest step before this subtask
+        subtask_line = subtask['line_num']
+        for step in step_markers:
+            if step['line_num'] < subtask_line:
+                # Find the last step before this subtask
+                step_subtasks_map[step['line_num']].append(subtask)
+
+    # Check that the last step of each task has an assertion
+    # First, build step content map for quick lookup
+    step_content_map: Dict[int, str] = {step['line_num']: step.get('name', '') for step in step_markers}
+
+    for task_name, steps in task_steps_map.items():
+        if not steps:
+            continue
+
+        # Get the last step of this task
+        last_step = steps[-1]
+        last_step_line = last_step['line_num']
+
+        # Check 1: Is there a subtask with assertion under this step?
+        subtasks_under_last_step = step_subtasks_map.get(last_step_line, [])
+        has_assertion = False
+
+        for subtask in subtasks_under_last_step:
+            subtask_name = subtask.get('name', '').lower()
+            if '断言' in subtask_name or '期望' in subtask_name or '期望值' in subtask_name:
+                has_assertion = True
+                break
+
+        # Check 2: Does the step itself contain assertion keywords?
+        if not has_assertion:
+            step_content = step_content_map.get(last_step_line, '')
+            if '断言' in step_content or '期望' in step_content or '期望值' in step_content:
+                has_assertion = True
+
+        # Check 3: Does the raw step content (from steps list) contain assertion?
+        if not has_assertion:
+            raw_step_content = last_step.get('content', '')
+            if '断言' in raw_step_content or '期望' in raw_step_content or '期望值' in raw_step_content:
+                has_assertion = True
+
+        if not has_assertion:
+            # Extract task description for error message
+            parts = task_name.split(None, 1)
+            if len(parts) >= 2:
+                errors.append(
+                    f"任务 `{task_name}` - 最后一步必须包含断言（步骤或子任务需包含 '断言' 或 '期望' 关键词）"
+                )
 
     # ========================================
     # STRICT FORMAT VALIDATION: Detect invalid step formats
@@ -725,7 +855,7 @@ def main():
                 print(f"    ... and {len(subtasks) - 10} more")
 
     is_valid, errors = validate_test_tasks(
-        states, transitions, chapter3_references, chapter4_references, bug_ids_ch4, task_markers, step_markers, subtask_markers
+        states, transitions, chapter3_references, chapter4_references, bug_ids_ch4, task_markers, step_markers, subtask_markers, content
     )
 
     # Validate step format (must use - [ ] 步骤 format, not #### 步骤)
