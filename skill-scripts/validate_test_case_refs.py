@@ -242,21 +242,25 @@ def parse_steps_from_test_tasks(content: str) -> Dict[str, List[str]]:
             step_match = re.match(r"^-\s*\[[ ✓✗]\]\s*(\d+\.\d+\.\d+)\s+(.+)$", stripped)
             if step_match:
                 result[current_task].append(f"{step_match.group(1)} {step_match.group(2)}")
-                continue
+                # 不要 continue，让它继续检查 4 空格的子项目
 
             # Also support old "步骤 1:" format for backward compatibility
-            step_match = re.match(r"^-\s*\[[ ✓✗]\]\s*(步骤\s*\d+[:：].+)$", stripped)
-            if step_match:
+            elif re.match(r"^-\s*\[[ ✓✗]\]\s*(步骤\s*\d+[:：].+)$", stripped):
+                step_match = re.match(r"^-\s*\[[ ✓✗]\]\s*(步骤\s*\d+[:：].+)$", stripped)
                 result[current_task].append(step_match.group(1))
-                continue
+                # 不要 continue
 
-            # Check for sub-items (indented at 4 spaces under steps)
-            # e.g., "    - [x] 引擎: engine_ter_m_allround_01_mk1 × 1"
-            # OR with assertion: "    - [x] 船体: **16,100 MJ**（期望 toBe('16,100 MJ')）"
-            # Support three states: [✓]=passed, [✗]=failed, [ ]=pending
+        # Check for sub-items (indented at 4 or 6 spaces)
+        # This runs for ALL lines, not just under steps
+        if in_task and current_task:
+            # 4-space indent sub-items
             subitem_match = re.match(r"^    -\s*\[[ ✓✗]\]\s*(.+)$", stripped)
             if subitem_match and result[current_task]:
-                # Append to last step
+                result[current_task][-1] += " " + subitem_match.group(1)
+
+            # 6-space indent (sub-sub-items)
+            elif re.match(r"^      -\s*\[[ ✓✗]\]\s*(.+)$", stripped):
+                subitem_match = re.match(r"^      -\s*\[[ ✓✗]\]\s*(.+)$", stripped)
                 result[current_task][-1] += " " + subitem_match.group(1)
 
     return result
