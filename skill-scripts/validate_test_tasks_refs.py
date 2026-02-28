@@ -161,10 +161,11 @@ def parse_test_tasks(content: str) -> Tuple[Dict, Dict, Set, Set, Dict, Dict, Li
     # Chapter 4: must start with Bug:
     task_pattern = re.compile(r"^(\s*)-\s*\[([ ✓✗x])\]\s*(\d+)\.(\d+)\s+(.+)$")
 
-    # Step marker pattern (REQUIRED with checkbox): - [✓] 步骤 <n>: <description>
-    # Supports: 步骤 1:, 步骤 1：, Step 1:, Step 1：
+    # Step/Subtask marker pattern: - [✓] <number>.<subnumber> <description>
+    # New format: - [ ] 1.1.1 读取当前档位状态
+    # Supports nested numbering like 1.1.1, 1.1.2, 3.1.1, etc.
     # Can have leading spaces for nested steps
-    step_marker_pattern = re.compile(r"^(\s*)-\s*\[([ ✓✗x])\]\s*(步骤|Step)\s*(\d+)[:：]\s*(.+)$")
+    step_marker_pattern = re.compile(r"^(\s*)-\s*\[([ ✓✗x])\]\s*(\d+\.\d+)\s+(.+)$")
 
     # Subtask/Assertion marker pattern: - [✓] <field>: <value> or - [✗] <field>: <value>
     # This handles sub-behaviors with checkbox
@@ -187,20 +188,20 @@ def parse_test_tasks(content: str) -> Tuple[Dict, Dict, Set, Set, Dict, Dict, Li
 
         # Parse task markers for all chapters
         if current_chapter > 0 and line.strip():
-            # First try step marker (must have "步骤" or "Step" keyword)
+            # First try step marker (new format: - [ ] 1.1.1 描述)
             step_match = step_marker_pattern.match(line)
             if step_match:
                 leading_spaces = step_match.group(1)
                 checkbox = step_match.group(2)
                 is_success = checkbox in ('✓', 'x')
                 is_failure = checkbox == '✗'
-                step_num = step_match.group(4)  # group(4) is the step number
-                step_desc = step_match.group(5).strip()  # group(5) is the description
+                step_num = step_match.group(3)  # group(3) is the step number like "1.1"
+                step_desc = step_match.group(4).strip()  # group(4) is the description
                 step_markers.append({
                     'line_num': i + 1,
                     'indent': indent,
                     'step_num': step_num,
-                    'name': f"步骤 {step_num}: {step_desc}",
+                    'name': f"{step_num} {step_desc}",
                     'has_checkbox': True,
                     'is_success': is_success,
                     'is_failure': is_failure,
@@ -443,7 +444,7 @@ def validate_test_tasks(
             # Has tasks but no steps
             if chapter_num in chapters_require_steps_if_tasks:
                 errors.append(
-                    f"Chapter {chapter_num} ({chapter_name}) - 测试用例必须包含步骤标记 [- [ ] 步骤 <n>: <描述>]"
+                    f"Chapter {chapter_num} ({chapter_name}) - 测试用例必须包含子任务标记 [- [ ] <标号> <描述>]"
                 )
 
     # Validate Chapter 2 reference integrity
@@ -625,7 +626,7 @@ def validate_test_tasks(
                 parts = task_name.split(None, 1)
                 if len(parts) >= 2:
                     errors.append(
-                        f"任务 `{task_name}` - 必须包含至少一个步骤标记 [- [ ] 步骤 <n>: <描述>]"
+                        f"任务 `{task_name}` - 必须包含至少一个子任务标记 [- [ ] <标号> <描述>]"
                     )
 
             # Chapter 2 granularity control:
@@ -655,12 +656,37 @@ def validate_test_tasks(
     # Validate all chapters:
     # 1) For every x.x task (chapter 1-4), the last step must contain "期望".
     # 2) Any step containing "期望" must include assertion method inline.
+    # 3) Subtask numbering must be sequential and start from parent task number
     for task_name, steps in task_steps_map.items():
         task_chapter = int(task_name.split(".", 1)[0])
         if task_chapter not in (1, 2, 3, 4):
             continue
         if not steps:
             continue
+
+        # Validate subtask numbering
+        parent_num = task_name.split(".", 1)[0]  # e.g., "1" from "1.1"
+        expected_sub_num = 1
+        for step in steps:
+            step_num = step.get('step_num', '')
+            # Step number format: "1.1.1", "1.1.2", etc.
+            if '.' in step_num:
+                parts = step_num.split('.')
+                if len(parts) >= 3:
+                    # Check prefix matches parent (e.g., "1.1" should have children "1.1.1", "1.1.2")
+                    prefix = '.'.join(parts[:-1])  # "1.1" from "1.1.1"
+                    if prefix != task_name:
+                        errors.append(
+                            f"任务 `{task_name}` - 子任务标号 `{step_num}` 前缀不匹配，应为 `{task_name}.X` 格式"
+                        )
+                    # Check sequential numbering
+                    actual_sub_num = int(parts[-1])
+                    if actual_sub_num != expected_sub_num:
+                        errors.append(
+                            f"任务 `{task_name}` - 子任务标号不连续，当前为 `{step_num}`，期望 `{prefix}.{expected_sub_num}`"
+                        )
+                    expected_sub_num = actual_sub_num + 1
+
         for step in steps:
             step_content = step.get('content', '')
             for term in VAGUE_BLACKLIST_TERMS:
@@ -674,7 +700,7 @@ def validate_test_tasks(
                 )
             if "期望" in step_content and not ASSERTION_METHOD_PATTERN.search(step_content):
                 errors.append(
-                    f"任务 `{task_name}` - 含“期望”的步骤必须内联断言方法（如 expect(...) / toBe(...)），不允许仅写期望描述"
+                    f"任务 `{task_name}` - 含期望的步骤必须内联断言方法(如 expect(...) / toBe(...))，不允许仅写期望描述"
                 )
         # Check if last step or its subtasks contain "期望"
         last_step = steps[-1]
@@ -696,7 +722,7 @@ def validate_test_tasks(
 
         if not has_expectation:
             errors.append(
-                f"任务 `{task_name}` - 最后一步或其子任务必须包含“期望”"
+                f"任务 `{task_name}` - 最后一步或其子任务必须包含期望"
             )
 
     # Rule A (independent): Validate Chapter 3 case internal subtasks:
@@ -754,20 +780,20 @@ def validate_test_tasks(
                     )
 
         has_step_subtask = any(
-            re.match(r"^\s*-\s*\[[ ✓✗x]\]\s*(步骤|Step)\s*\d+[:：]", ln.strip())
+            re.match(r'^\s*-\s*\[[ ✓✗x]\]\s*\d+\.\d+\.\d+', ln.strip())
             for ln in block
         )
         if not has_step_subtask:
-            errors.append(f"任务 `{task_name}` - Chapter 3 Case 缺少“步骤”子任务（需 `- [ ] 步骤 n:`）")
+            errors.append(f"任务 `{task_name}` - Chapter 3 Case 缺少子任务(需 `- [ ] {task_name}.1 ...` 格式)")
 
     # ========================================
     # STRICT FORMAT VALIDATION: Detect invalid step formats
     # ========================================
 
-    # This requires raw content - we'll validate this externally
+    # This requires raw content - we validate this externally
     # The validation script expects the NEW format:
     # - Task: - [ ] <task name>
-    # - Step: - [ ] 步骤 <n>: <description>
+    # - Subtask: - [ ] <parent>.<number> <description> (e.g., 1.1.1, 3.1.1)
     # INVALID formats that will be rejected:
     # - #### 步骤 <n>:
     # - ### 步骤 <n>:
@@ -840,23 +866,20 @@ def validate_step_format(content: str) -> Tuple[bool, List[str]]:
                 f"而非子章节格式 `### 切换: xxx`"
             )
 
-        # Invalid patterns (markdown headers used as steps)
+        # Invalid patterns (markdown headers used as subtasks)
         if re.match(r"^#{1,6}\s+步骤", stripped):
-            errors.append(f"第 {i} 行: 检测到 Markdown 标题格式 - 必须使用 `- [ ] 步骤 <n>:` 格式")
+            errors.append(f"第 {i} 行: 检测到 Markdown 标题格式 - 必须使用 checkbox 格式 `- [ ] <标号> <描述>`")
 
-        # Check for "步骤" without checkbox (strict)
-        # e.g. "- 步骤 1: ..." must fail; required format is "- [ ] 步骤 1: ..."
-        if re.match(r"^\s*-\s*步骤\s*\d*[:：]?", line):
-            errors.append(f"第 {i} 行: 步骤必须使用 checkbox 格式 `- [ ] 步骤 <n>:`")
-
-        if "步骤" in stripped and not stripped.startswith("#"):
-            # Steps MUST have checkbox format: - [ ] 步骤 <n>:
-            if not re.match(r"^-\s\[[ ✓✗x]\]\s*步骤", stripped):
-                if not re.match(r"^-\s*步骤", stripped):
-                    errors.append(f"第 {i} 行: 步骤必须使用 checkbox 格式 `- [ ] 步骤 <n>:`")
+        # Check for subtask without checkbox
+        # e.g. "- 1.1.1 ..." must have checkbox; required format is "- [ ] 1.1.1 ..."
+        # New format: - [ ] 1.1.1 描述 (no "步骤" keyword needed)
+        if re.match(r"^\s*-\s*\d+\.\d+\.\d+\s+", line):
+            # This line looks like a numbered subtask but might be missing checkbox
+            if not re.match(r"^\s*-\s*\[\s*[ ✓✗x]\s*\]\s*\d+\.\d+\.\d+", line):
+                errors.append(f"第 {i} 行: 子任务必须使用 checkbox 格式 `- [ ] <标号> <描述>`")
 
         # Track step positions for sub-behavior validation
-        if re.match(r"^-\s\[[ ✓✗x]\]\s*步骤", stripped):
+        if re.match(r"^-\s\[[ ✓✗x]\]\s*\d+\.\d+\.\d+", stripped):
             indent = len(line) - len(line.lstrip())
             step_indent_map[i] = indent
 
