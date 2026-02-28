@@ -1,9 +1,30 @@
 #!/usr/bin/env python3
 """
-Validate test_tasks.md state/transition reference integrity and bug test structure.
+Validate test_tasks.md structure and checklist quality.
 
-Validates that every state/transition in Chapter 2 (E2E Standard States & Transitions)
-has a reference path to Chapter 3 (E2E Test Scenarios) or Chapter 4 (Bug Tests).
+Validation rules (authoritative):
+1) Every x.x task in Chapter 1/2/3/4 must contain at least one step subtask:
+   - [ ] 步骤 <n>: <description>
+2) For every x.x task in Chapter 1/2/3/4, the LAST step subtask must contain "期望".
+3) Any step containing "期望" must include assertion method inline
+   (for example: expect(...), toBe(...), toEqual(...), toContain(...)).
+4) Step format is strict:
+   - valid:   - [ ] 步骤 <n>: ...
+   - invalid: - 步骤 <n>: ...
+   - invalid: ### 步骤 <n>
+5) Chapter 2 state/transition reference integrity is checked:
+   states/transitions should be connected to Chapter 3 or 4 reference paths.
+6) Two independent structure rules are enforced:
+   - Rule A (Case-subtask rule, Chapter 3 only):
+     Case direct subtasks can only be 前提:状态 / 前提:切换 / 步骤 / 期望
+   - Rule B (Five-chapter tree-only rule):
+     In chapters 1..5, only task tree nodes are allowed (task/subtask/grandchild-subtask).
+7) Assertion style rule:
+   - `toBe(true)` and `toBe(false)` are forbidden; use explicit assertions instead.
+8) Chapter 2 granularity rule:
+   - `状态:` task must have at least 4 subtasks.
+   - `切换:` task must have at least 3 subtasks.
+   - If not, agent should inline that behavior into Case steps instead of over-modeling.
 
 Usage:
     python skill-scripts/validate_test_tasks_refs.py <change-name>
@@ -20,6 +41,21 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, Set, Tuple
+
+ASSERTION_METHOD_PATTERN = re.compile(
+    r"(expect\s*\(|\btoBe\(|\btoEqual\(|\btoStrictEqual\(|\btoContain\(|\btoHaveCount\(|"
+    r"\btoHaveText\(|\btoHaveValue\(|\btoBeTruthy\(|\btoBeFalsy\(|\btoBeGreaterThan\(|"
+    r"\btoBeGreaterThanOrEqual\(|\btoBeLessThan\(|\btoBeLessThanOrEqual\(|\bgreaterThan\(|\blessThan\()"
+)
+FORBIDDEN_BOOLEAN_TOBE_PATTERN = re.compile(r"\btoBe\s*\(\s*(true|false)\s*\)")
+
+VAGUE_BLACKLIST_TERMS = [
+    "某个",
+    "任一",
+    "任意",
+    "随便",
+    "选择一",
+]
 
 
 def parse_args() -> argparse.Namespace:
@@ -87,9 +123,9 @@ def parse_test_tasks(content: str) -> Tuple[Dict, Dict, Set, Set, Dict, Dict, Li
     state_pattern = re.compile(r"^-\s*\[\s*\]\s*状态[:：]\s*(.+)$")
     transition_pattern = re.compile(r"^-\s*\[\s*\]\s*切换[:：]\s*(.+)\s*->\s*(.+)$")
 
-    # Reference patterns in Chapter 3 or 4
-    state_ref_pattern = re.compile(r"^\s*-\s*前提:\s*状态\s*(\S+)$")
-    transition_ref_pattern = re.compile(r"^\s*-\s*前提:\s*切换\s*(\S+)\s*->\s*(\S+)$")
+    # Reference patterns in Chapter 3 or 4 (checkbox subtask required)
+    state_ref_pattern = re.compile(r"^\s*-\s*\[[ ✓✗x]\]\s*前提:\s*状态\s*(\S+)$")
+    transition_ref_pattern = re.compile(r"^\s*-\s*\[[ ✓✗x]\]\s*前提:\s*切换\s*(\S+)\s*->\s*(\S+)$")
 
     # Bug ID pattern: ### BUG-<数字> <描述>
     bug_id_pattern = re.compile(r"^###\s*(BUG-\d+)\s+(.+)$")
@@ -187,6 +223,27 @@ def parse_test_tasks(content: str) -> Tuple[Dict, Dict, Set, Set, Dict, Dict, Li
                     'is_failure': is_failure,
                     'chapter': current_chapter
                 })
+                # Chapter 3/4 reference extraction from checkbox subtasks, e.g.:
+                # - [ ] 前提: 状态 xxx
+                # - [ ] 前提: 切换 aaa -> bbb
+                if current_chapter in (3, 4):
+                    ref_line = line.strip()
+                    state_ref_match = state_ref_pattern.match(ref_line)
+                    if state_ref_match:
+                        state_id = state_ref_match.group(1)
+                        if current_chapter == 3:
+                            chapter3_references.add(state_id)
+                        else:
+                            chapter4_references.add(state_id)
+                    trans_ref_match = transition_ref_pattern.match(ref_line)
+                    if trans_ref_match:
+                        from_state = trans_ref_match.group(1)
+                        to_state = trans_ref_match.group(2)
+                        trans_id = f"{from_state} -> {to_state}"
+                        if current_chapter == 3:
+                            chapter3_references.add(trans_id)
+                        else:
+                            chapter4_references.add(trans_id)
                 continue
 
             # Then try regular task marker (test case names - WITH checkbox and numbering)
@@ -205,6 +262,19 @@ def parse_test_tasks(content: str) -> Tuple[Dict, Dict, Set, Set, Dict, Dict, Li
                 full_task_name = f"{chapter_num}.{task_num} {task_name}"
                 task_markers[current_chapter][full_task_name] = (True, is_success, is_failure)
                 current_task_indent = indent
+                # Chapter 2 state/transition extraction from numbered task format:
+                # - [ ] 2.x 状态: xxx
+                # - [ ] 2.x 切换: aaa -> bbb
+                if current_chapter == 2:
+                    if task_name.startswith("状态:"):
+                        state_id = task_name.split("状态:", 1)[1].strip()
+                        states[state_id] = line.strip()
+                    elif task_name.startswith("切换:"):
+                        transition_body = task_name.split("切换:", 1)[1].strip()
+                        parts = [p.strip() for p in transition_body.split("->", 1)]
+                        if len(parts) == 2 and parts[0] and parts[1]:
+                            trans_id = f"{parts[0]} -> {parts[1]}"
+                            transitions[trans_id] = line.strip()
                 continue
 
         # Parse state definitions (Chapter 2) - format: - [ ] 状态: xxx
@@ -355,9 +425,12 @@ def validate_test_tasks(
         steps_count_by_chapter[step['chapter']] += 1
 
     # Check that steps exist for chapters with tasks
+    # Chapter 1/2/3 must have steps when tasks exist.
+    # Chapter 4 can be empty, but if bug tasks are present they also need steps.
+    chapters_require_steps_if_tasks = {1, 2, 3, 4}
     for chapter_num, chapter_name in chapter_names.items():
-        # Chapter 4 and 5 can be empty (no bug tests / no failures yet)
-        if chapter_num == 4 or chapter_num == 5:
+        # Chapter 5 is summary-only and does not contain steps.
+        if chapter_num == 5:
             continue
 
         task_count = len(task_markers.get(chapter_num, {}))
@@ -365,7 +438,7 @@ def validate_test_tasks(
 
         if task_count > 0 and step_count == 0:
             # Has tasks but no steps
-            if chapter_num in (1, 3):  # Unit tests and E2E scenarios need steps
+            if chapter_num in chapters_require_steps_if_tasks:
                 errors.append(
                     f"Chapter {chapter_num} ({chapter_name}) - 测试用例必须包含步骤标记 [- [ ] 步骤 <n>: <描述>]"
                 )
@@ -495,7 +568,7 @@ def validate_test_tasks(
     # Steps only need to be under their parent task, which is already validated by structure
 
     # ========================================
-    # NEW VALIDATION: All cases need steps, last step must have assertion, all steps need checkbox
+    # NEW VALIDATION: All tasks need steps; last subtask(step) must be expectation
     # ========================================
 
     # Group steps by their parent task (using line numbers and indentation)
@@ -538,7 +611,7 @@ def validate_test_tasks(
             })
 
     # Validate each task has at least one step
-    for chapter_num in [1, 3]:  # Only chapters 1 and 3 need steps
+    for chapter_num in [1, 2, 3, 4]:
         if chapter_num not in task_markers:
             continue
 
@@ -552,6 +625,19 @@ def validate_test_tasks(
                         f"任务 `{task_name}` - 必须包含至少一个步骤标记 [- [ ] 步骤 <n>: <描述>]"
                     )
 
+            # Chapter 2 granularity control:
+            # 状态: >= 4 subtasks, 切换: >= 3 subtasks; otherwise recommend inlining into Case.
+            if chapter_num == 2 and len(task_name.split(None, 1)) >= 2:
+                desc = task_name.split(None, 1)[1]
+                if desc.startswith("状态:") and len(steps) < 4:
+                    errors.append(
+                        f"任务 `{task_name}` - 状态子任务不足（当前 {len(steps)}，至少 4）；请补充子任务或将该行为内联到 Case 步骤"
+                    )
+                if desc.startswith("切换:") and len(steps) < 3:
+                    errors.append(
+                        f"任务 `{task_name}` - 切换子任务不足（当前 {len(steps)}，至少 3）；请补充子任务或将该行为内联到 Case 步骤"
+                    )
+
     # Validate: All steps must have [ ] checkbox (not [✓] or [✗])
     for step in step_markers:
         checkbox = step.get('is_success', False) or step.get('is_failure', False)
@@ -563,59 +649,96 @@ def validate_test_tasks(
         # Let's check if this is during test creation or after test run
         # For now, we allow both [ ] and [✓]/[✗] since x4-test updates them
 
-    # Validate: Last step must contain assertion (subtask with "断言" or "期望" or "期望值")
-    # OR the step itself contains "断言" keyword
-    # Group subtasks by their parent step
-    step_subtasks_map: Dict[int, List[Dict]] = defaultdict(list)
-    for subtask in subtask_markers:
-        # Find the closest step before this subtask
-        subtask_line = subtask['line_num']
-        for step in step_markers:
-            if step['line_num'] < subtask_line:
-                # Find the last step before this subtask
-                step_subtasks_map[step['line_num']].append(subtask)
-
-    # Check that the last step of each task has an assertion
-    # First, build step content map for quick lookup
-    step_content_map: Dict[int, str] = {step['line_num']: step.get('name', '') for step in step_markers}
-
+    # Validate all chapters:
+    # 1) For every x.x task (chapter 1-4), the last step must contain "期望".
+    # 2) Any step containing "期望" must include assertion method inline.
     for task_name, steps in task_steps_map.items():
+        task_chapter = int(task_name.split(".", 1)[0])
+        if task_chapter not in (1, 2, 3, 4):
+            continue
         if not steps:
             continue
-
-        # Get the last step of this task
-        last_step = steps[-1]
-        last_step_line = last_step['line_num']
-
-        # Check 1: Is there a subtask with assertion under this step?
-        subtasks_under_last_step = step_subtasks_map.get(last_step_line, [])
-        has_assertion = False
-
-        for subtask in subtasks_under_last_step:
-            subtask_name = subtask.get('name', '').lower()
-            if '断言' in subtask_name or '期望' in subtask_name or '期望值' in subtask_name:
-                has_assertion = True
-                break
-
-        # Check 2: Does the step itself contain assertion keywords?
-        if not has_assertion:
-            step_content = step_content_map.get(last_step_line, '')
-            if '断言' in step_content or '期望' in step_content or '期望值' in step_content:
-                has_assertion = True
-
-        # Check 3: Does the raw step content (from steps list) contain assertion?
-        if not has_assertion:
-            raw_step_content = last_step.get('content', '')
-            if '断言' in raw_step_content or '期望' in raw_step_content or '期望值' in raw_step_content:
-                has_assertion = True
-
-        if not has_assertion:
-            # Extract task description for error message
-            parts = task_name.split(None, 1)
-            if len(parts) >= 2:
+        for step in steps:
+            step_content = step.get('content', '')
+            for term in VAGUE_BLACKLIST_TERMS:
+                if term in step_content:
+                    errors.append(
+                        f"任务 `{task_name}` - 步骤包含黑名单模糊词 `{term}`：{step_content}；请使用代码/数据中的实际标识（真实 ship/equipment id、真实 data-testid），禁止编造数据"
+                    )
+            if FORBIDDEN_BOOLEAN_TOBE_PATTERN.search(step_content):
                 errors.append(
-                    f"任务 `{task_name}` - 最后一步必须包含断言（步骤或子任务需包含 '断言' 或 '期望' 关键词）"
+                    f"任务 `{task_name}` - 禁止使用 toBe(true/false)：{step_content}；请改为具语义断言"
                 )
+            if "期望" in step_content and not ASSERTION_METHOD_PATTERN.search(step_content):
+                errors.append(
+                    f"任务 `{task_name}` - 含“期望”的步骤必须内联断言方法（如 expect(...) / toBe(...)），不允许仅写期望描述"
+                )
+        last_step_content = steps[-1].get('content', '')
+        if "期望" not in last_step_content:
+            errors.append(
+                f"任务 `{task_name}` - 最后一个步骤子任务必须是“期望”"
+            )
+
+    # Rule A (independent): Validate Chapter 3 case internal subtasks:
+    # 1) Each case must contain at least one step.
+    # 2) Any bullet line at task child-indent (task indent + 2) is a subtask and MUST use checkbox format.
+    # 3) At task child-indent, only these direct subtask types are allowed:
+    #    - 前提: 状态 ...
+    #    - 前提: 切换 ... -> ...
+    #    - 步骤 n: ...
+    #    - 期望: ...
+    # 4) Any non-empty non-bullet line inside Case block is illegal text.
+    sorted_task_lines = sorted(task_line_to_name.items(), key=lambda x: x[0])
+    for idx, (start_line, task_name) in enumerate(sorted_task_lines):
+        task_chapter = int(task_name.split(".", 1)[0])
+        if task_chapter != 3:
+            continue
+
+        end_line = len(lines) if idx == len(sorted_task_lines) - 1 else sorted_task_lines[idx + 1][0] - 1
+        block = lines[start_line:end_line]
+        task_line = lines[start_line - 1] if start_line - 1 < len(lines) else ""
+        task_indent = len(task_line) - len(task_line.lstrip(" "))
+        subtask_indent = task_indent + 2
+
+        for rel_idx, ln in enumerate(block):
+            abs_line = start_line + rel_idx
+            if not ln.strip():
+                continue
+            current_indent = len(ln) - len(ln.lstrip(" "))
+            if current_indent < subtask_indent:
+                continue
+            if not re.match(r"^\s*-\s+", ln):
+                errors.append(
+                    f"任务 `{task_name}` - 第 {abs_line} 行存在非法文本（Case 内仅允许子任务项）"
+                )
+                continue
+            if not re.match(r"^\s*-\s*\[[ ✓✗x]\]\s+", ln):
+                errors.append(
+                    f"任务 `{task_name}` - 第 {abs_line} 行为 Case 子任务但缺少 checkbox，"
+                    "需使用 `- [ ] ...` 格式"
+                )
+                continue
+            # Only enforce allowed type list on direct child subtasks.
+            if current_indent == subtask_indent:
+                child_content_match = re.match(r"^\s*-\s*\[[ ✓✗x]\]\s*(.+)$", ln)
+                child_content = child_content_match.group(1).strip() if child_content_match else ""
+                if not (
+                    re.match(r"^前提:\s*状态\s+\S+", child_content)
+                    or re.match(r"^前提:\s*切换\s+\S+\s*->\s*\S+", child_content)
+                    or re.match(r"^(步骤|Step)\s*\d+[:：]\s*.+", child_content)
+                    or re.match(r"^期望[:：]\s*.+", child_content)
+                ):
+                    errors.append(
+                        f"任务 `{task_name}` - 第 {abs_line} 行 Case 子任务类型非法：{child_content}；"
+                        "仅允许 前提:状态 / 前提:切换 / 步骤 / 期望"
+                    )
+
+        has_step_subtask = any(
+            re.match(r"^\s*-\s*\[[ ✓✗x]\]\s*(步骤|Step)\s*\d+[:：]", ln.strip())
+            for ln in block
+        )
+        if not has_step_subtask:
+            errors.append(f"任务 `{task_name}` - Chapter 3 Case 缺少“步骤”子任务（需 `- [ ] 步骤 n:`）")
 
     # ========================================
     # STRICT FORMAT VALIDATION: Detect invalid step formats
@@ -663,6 +786,11 @@ def validate_step_format(content: str) -> Tuple[bool, List[str]]:
     subchapter_pattern = re.compile(r"^###\s*\d+\.\d+")
 
     step_indent_map: Dict[int, int] = {}  # line_number -> indent level
+    ch3_in_case_block = False
+
+    chapter_header_pattern = re.compile(r"^##\s*\d+\.?\s*.+$")
+    top_task_pattern = re.compile(r"^-\s*\[[ ✓✗x]\]\s*\d+\.\d+\s+.+$")
+    subtask_checkbox_pattern = re.compile(r"^-\s*\[[ ✓✗x]\]\s+.+$")
 
     for i, line in enumerate(lines, 1):
         stripped = line.strip()
@@ -696,13 +824,15 @@ def validate_step_format(content: str) -> Tuple[bool, List[str]]:
         if re.match(r"^#{1,6}\s+步骤", stripped):
             errors.append(f"第 {i} 行: 检测到 Markdown 标题格式 - 必须使用 `- [ ] 步骤 <n>:` 格式")
 
-        # Check for "步骤" without checkbox (in any position)
+        # Check for "步骤" without checkbox (strict)
+        # e.g. "- 步骤 1: ..." must fail; required format is "- [ ] 步骤 1: ..."
+        if re.match(r"^\s*-\s*步骤\s*\d*[:：]?", line):
+            errors.append(f"第 {i} 行: 步骤必须使用 checkbox 格式 `- [ ] 步骤 <n>:`")
+
         if "步骤" in stripped and not stripped.startswith("#"):
             # Steps MUST have checkbox format: - [ ] 步骤 <n>:
             if not re.match(r"^-\s\[[ ✓✗x]\]\s*步骤", stripped):
-                # Exception: sub-instructions (more indented) don't need checkbox
-                indent = len(line) - len(line.lstrip())
-                if indent == 0 or (not re.match(r"^\s+- ", line) and not re.match(r"^\s+[^\-]", line)):
+                if not re.match(r"^-\s*步骤", stripped):
                     errors.append(f"第 {i} 行: 步骤必须使用 checkbox 格式 `- [ ] 步骤 <n>:`")
 
         # Track step positions for sub-behavior validation
@@ -715,6 +845,73 @@ def validate_step_format(content: str) -> Tuple[bool, List[str]]:
         if current_chapter > 0 and re.match(r"^\d+\.\s+", stripped) and not stripped.startswith("-"):
             # This looks like a task without checkbox
             errors.append(f"第 {i} 行: 任务（测试用例）必须使用 checkbox，格式应该是 `- [ ] 1.1 <任务名>`")
+
+    # Rule B (independent): Five-chapter strict tree-only rule:
+    # within chapter 1..5, only task -> subtask -> grandchild-subtask structure is allowed.
+        if current_chapter in (1, 2, 3, 4, 5) and stripped:
+            if chapter_header_pattern.match(stripped):
+                continue
+
+            indent = len(line) - len(line.lstrip())
+            if indent == 0:
+                if not top_task_pattern.match(stripped):
+                    errors.append(
+                        f"第 {i} 行: 章节内仅允许顶层任务 `- [ ] x.x ...`，检测到非法文本：{stripped}"
+                    )
+                continue
+            if indent in (2, 4):
+                if not subtask_checkbox_pattern.match(stripped):
+                    errors.append(
+                        f"第 {i} 行: 章节内子任务仅允许 checkbox 条目（`- [ ] ...`），检测到非法文本：{stripped}"
+                    )
+                continue
+
+            errors.append(
+                f"第 {i} 行: 章节内仅允许 0/2/4 空格缩进的任务树结构，检测到非法缩进：{stripped}"
+            )
+
+        # Chapter 3 strict tree-only rule:
+        # only Case task -> child subtasks -> grandchild subtasks are allowed.
+        if current_chapter == 3 and stripped:
+            if re.match(r"^##\s+", stripped):
+                continue
+            indent = len(line) - len(line.lstrip())
+            case_task_match = re.match(r"^-\s*\[[ ✓✗x]\]\s*3\.\d+\s+Case:\s*.+$", stripped)
+
+            if case_task_match and indent == 0:
+                ch3_in_case_block = True
+                continue
+
+            if not ch3_in_case_block:
+                errors.append(
+                    f"第 {i} 行: 第三章仅允许 Case 树结构（Case/子任务/子任务的子任务），检测到非法文本：{stripped}"
+                )
+                continue
+
+            # Under a Case block, only level-1 (2 spaces) and level-2 (4 spaces) are allowed
+            if indent not in (2, 4):
+                errors.append(
+                    f"第 {i} 行: 第三章 Case 内缩进层级非法（仅允许 2 或 4 空格）：{stripped}"
+                )
+                continue
+
+            if not re.match(r"^-\s*\[[ ✓✗x]\]\s+.+$", stripped):
+                errors.append(
+                    f"第 {i} 行: 第三章 Case 子任务必须使用 checkbox（`- [ ] ...`）：{stripped}"
+                )
+                continue
+
+            if indent == 2:
+                child_content = re.sub(r"^-\s*\[[ ✓✗x]\]\s+", "", stripped)
+                if not (
+                    re.match(r"^前提:\s*状态\s+\S+", child_content)
+                    or re.match(r"^前提:\s*切换\s+\S+\s*->\s*\S+", child_content)
+                    or re.match(r"^(步骤|Step)\s*\d+[:：]\s*.+", child_content)
+                    or re.match(r"^期望[:：]\s*.+", child_content)
+                ):
+                    errors.append(
+                        f"第 {i} 行: 第三章 Case 直接子任务类型非法（仅允许 前提:状态/前提:切换/步骤/期望）：{stripped}"
+                    )
 
     # ========================================
     # Validate sub-behavior format (indented under steps)
