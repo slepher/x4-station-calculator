@@ -56,19 +56,53 @@ The following rules define how checkbox states should be updated in `test_tasks.
 - Scenario tests (Chapter 3) do NOT backfill state/transition checkboxes
 - State/transition tests do NOT backfill scenario checkboxes
 
-### 4.3 Checkbox Update Rules
+### 4.3 Checkbox Update Rules (MANDATORY)
 
-1. **After each test run**, update `test_tasks.md`:
-   - Pass → Mark as `[✓]`
-   - Fail → Mark as `[✗]`
+**Agent 必须更新 test_tasks.md 中的所有 checkbox 级别：**
 
-2. **Chapter 5 Failure Lessons**:
-   - For each failed test, add/update entry in Chapter 5
+1. **Test Case 级别** - 任务项
+2. **Step 级别** - 步骤（如 `步骤 1:`）
+3. **Sub-task 级别** - 子任务（如 `- [ ] 引擎槽位：选择装备...`）
+
+**更新规则：**
+
+| 结果 | Case 标记 | Step 标记 | Sub-task 标记 |
+|------|-----------|-----------|---------------|
+| Pass | `[✓]` | `[✓]` | `[✓]` |
+| Fail at step N | `[✗]` | step N `[✗]`, steps < N `[✓]`, steps > N `[ ]` | sub-tasks < N `[✓]`, sub-task N `[✗]`, sub-tasks > N `[ ]` |
+
+**示例：**
+```markdown
+# Test passes - all levels marked [✓]
+- [✓] 3.6 Case: 大太刀满装备DPS计算
+  - [✓] 步骤 1：进入船只建造视图...
+  - [✓] 步骤 2：点击选择 `class=M`...
+  - [✓] 步骤 5：配置满装备：
+    - [✓] 引擎槽位：选择装备 `engine_ter_m_allround_01_mk1` 数量1
+    - [✓] 护盾槽位：选择装备 `shield_ter_m_standard_02_mk2` 数量2
+
+# Test fails at step 5, sub-task 2
+- [✗] 3.6 Case: 大太刀满装备DPS计算
+  - [✓] 步骤 1：进入船只建造视图...
+  - [✓] 步骤 2：点击选择 `class=M`...
+  - [✗] 步骤 5：配置满装备：
+    - [✓] 引擎槽位：选择装备 `engine_ter_m_allround_01_mk1` 数量1
+    - [✗] 护盾槽位：选择装备 `shield_ter_m_standard_02_mk2` 数量2
+    - [ ] 武器槽位：选择装备 `weapon_ter_m_beam_01_mk2` 数量4
+  - [ ] 步骤 6：点击"详细"档位按钮...
+```
+
+2. **Chapter 5 Failure Lessons (MANDATORY)**:
+   - For each failed test, agent MUST add/update entry in Chapter 5
+   - **Agent 负责**：在测试失败后，agent 必须将失败测试的 lesson 添加到第五章
    - Format:
      ```markdown
-     - [ ] <test-id>
-         - [ ] <lesson/推断>
+     ## 5 失败原因及可能的推断
+
+     - [ ] 1.2 档位切换行为
+         - [ ] 断言护盾计算值与预期不符，排查发现护盾再充率计算未乘以装备数量
      ```
+   - **重要**：只有当测试失败时才需要在第五章添加记录
 
 3. **Never backfill**:
    - Do NOT mark a test as passed if it wasn't executed
@@ -86,27 +120,45 @@ After test execution, you MUST validate that `test_tasks.md` has been correctly 
 ### Validation Script Usage
 
 ```bash
-# Full run - all tests executed
-python3 skill-scripts/validate_test_results.py <change-name> --passed <n> --failed <n> --failures "<failure1>,<failure2>,..."
+# Full run - all tests passed
+python3 skill-scripts/validate_test_results.py <change-name> --passed <n> --failed 0
+
+# Full run - tests failed at specific steps
+python3 skill-scripts/validate_test_results.py <change-name> --passed <n> --failed <n> --failures "1.3,3.5" --fail-steps "步骤 2,步骤 3"
 
 # Partial run - only some tests executed
-python3 skill-scripts/validate_test_results.py <change-name> --passed <n> --failed <n> --failures "<failure1>,<failure2>,..." --executed "1.1,1.2,2.1,3.1"
+python3 skill-scripts/validate_test_results.py <change-name> --passed <n> --failed <n> --failures "1.3" --executed "1.1,1.2,1.3"
 ```
+
+**Step-level Parameters**:
+- `--failures`: Comma-separated list of failed test IDs (e.g., "1.3,3.5")
+- `--fail-steps`: Comma-separated list of failed steps for each failed test (e.g., "步骤 2,步骤 3")
+  - Order must match --failures order
+  - Example: `--failures "1.3,3.5" --fail-steps "步骤 2,步骤 3"` means:
+    - Test 1.3 failed at step 2
+    - Test 3.5 failed at step 3
 
 ### What the Validation Script Checks
 
 1. **Checkbox Count Match**:
-   - Number of `[x]` (checked) tasks matches `--passed` count
-   - Number of `[ ]` (unchecked) tasks matches `--failed` count
+   - Number of `[✓]` (checked) tasks matches `--passed` count
+   - Number of `[✗]` (failed) tasks matches `--failed` count
 
 2. **Failed Test Status**:
-   - All failed test IDs are unchecked `[ ]` in test_tasks.md
+   - Failed test IDs are marked as `[✗]` in test_tasks.md
+   - `--fail-steps` specifies which step failed
 
-3. **Chapter 5 Validation** (失败原因及可能的推断):
+3. **Step-level Marking** (when `--fail-steps` provided):
+   - Failed test case → `[✗]`
+   - Failed step → `[✗]`
+   - Previous steps → `[✓]`
+   - Subsequent steps → `[ ]`
+
+4. **Chapter 5 Validation** (失败原因及可能的推断):
    - Each failed test ID has a corresponding lesson entry in Chapter 5
    - Lessons are not empty (contain actual content)
 
-4. **Partial Run Support**:
+5. **Partial Run Support**:
    - If `--executed` is provided, only validates the executed tests
    - Useful for validating incremental test runs
 
