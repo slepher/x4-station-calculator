@@ -5,22 +5,24 @@ Test Results Validation Script
 Validates that test_tasks.md has been correctly updated after test execution,
 matching the actual test run results (pass/fail) with the checkbox states.
 
-Supports partial test runs - only validates the tests that were executed.
+Supports step-level marking:
+- Pass: All steps become [✓]
+- Fail: Test case becomes [✗], failed step becomes [✗], previous steps become [✓], subsequent steps stay [ ]
 
 Format: [✓] for passed, [✗] for failed
 
 Usage:
-    # Full run - all tests executed
-    python3 skill-scripts/validate_test_results.py <change-name> --passed <n> --failed <n> --failures "<failure1>,<failure2>,..."
+    # Full run - all tests passed
+    python3 skill-scripts/validate_test_results.py <change-name> --passed <n> --failed 0
+
+    # Full run - some tests failed at specific steps
+    python3 skill-scripts/validate_test_results.py <change-name> --passed <n> --failed <n> --failures "1.3,3.5" --fail-steps "步骤 2,步骤 3"
+
+    # Example: 1.3 failed at step 2, 3.5 failed at step 3
+    python3 skill-scripts/validate_test_results.py ship-build-stat --passed 14 --failed 2 --failures "1.3,3.5" --fail-steps "步骤 2,步骤 3"
 
     # Partial run - only some tests executed
-    python3 skill-scripts/validate_test_results.py <change-name> --passed <n> --failed <n> --failures "<failure1>,<failure2>,..." --executed "1.1,1.2,2.1,3.1"
-
-    # Example: ship-build-stat with 15 passed, 2 failed (1.3 and 3.5)
-    python3 skill-scripts/validate_test_results.py ship-build-stat --passed 15 --failed 2 --failures "1.3,3.5"
-
-    # Example: Only ran Chapter 1 and 2 tests
-    python3 skill-scripts/validate_test_results.py ship-build-stat --passed 6 --failed 1 --failures "1.3" --executed "1.1,1.2,1.3,1.4,1.5,1.6,1.7,2.1,2.2"
+    python3 skill-scripts/validate_test_results.py <change-name> --passed <n> --failed <n> --failures "1.3" --executed "1.1,1.2,1.3"
 """
 
 import sys
@@ -34,6 +36,7 @@ def parse_args():
     parser.add_argument('--passed', type=int, required=True, help='Number of passed tests')
     parser.add_argument('--failed', type=int, required=True, help='Number of failed tests')
     parser.add_argument('--failures', type=str, default='', help='Comma-separated list of failed test IDs (e.g., "1.3,3.5")')
+    parser.add_argument('--fail-steps', type=str, default='', help='Comma-separated list of failed steps for each failed test (e.g., "步骤 2,步骤 3")')
     parser.add_argument('--executed', type=str, default='', help='Comma-separated list of executed test IDs (e.g., "1.1,1.2,2.1"). If empty, validates all tests.')
     return parser.parse_args()
 
@@ -45,14 +48,86 @@ def load_test_tasks(change_name: str) -> str:
         sys.exit(1)
     return base_path.read_text(encoding='utf-8')
 
+def save_test_tasks(change_name: str, content: str):
+    """Save test_tasks.md content."""
+    base_path = Path(f'openspec/changes/{change_name}/test_tasks.md')
+    base_path.write_text(content, encoding='utf-8')
+
+def extract_tasks_with_steps(content: str) -> dict:
+    """
+    Extract all tasks with their step and sub-task information from test_tasks.md.
+    Returns a dict with task_id -> {symbol, description, steps: [{symbol, text, sub_tasks: [{symbol, text}]}]}
+    """
+    tasks = {}
+
+    # Split content by task (tasks start with - [x] or - [ ] at the beginning of a line)
+    lines = content.split('\n')
+
+    current_task_id = None
+    current_task_info = None
+    current_step_info = None
+
+    for i, line in enumerate(lines):
+        # Check for task checkbox: - [✓] 1.1 description or - [✗] 1.1 description or - [ ] 1.1 description
+        task_match = re.match(r'^(- \[([✓✗ ])\] )(\d+\.\d+)\s+(.+)$', line)
+        if task_match:
+            # Save previous task
+            if current_task_id and current_task_info:
+                tasks[current_task_id] = current_task_info
+
+            symbol = task_match.group(2).strip()
+            task_id = task_match.group(3).strip()
+            description = task_match.group(4).strip()
+
+            current_task_id = task_id
+            current_task_info = {
+                'symbol': symbol,
+                'description': description,
+                'steps': [],
+                'line_index': i
+            }
+            current_step_info = None
+            continue
+
+        # Check for step checkbox: - [✓] 步骤 or - [✗] 步骤 or - [ ] 步骤
+        step_match = re.match(r'^  (- \[([✓✗ ])\] )(步骤\s*\d+[:：].+)$', line)
+        if step_match and current_task_info:
+            symbol = step_match.group(2).strip()
+            step_text = step_match.group(3).strip()
+            current_step_info = {
+                'symbol': symbol,
+                'text': step_text,
+                'sub_tasks': [],
+                'line_index': i
+            }
+            current_task_info['steps'].append(current_step_info)
+            continue
+
+        # Check for sub-task checkbox: - [✓] sub-task or - [✗] sub-task or - [ ] sub-task
+        # Sub-tasks have 4-space indent (2 spaces for task + 2 spaces for step + 2 spaces for sub-task)
+        sub_task_match = re.match(r'^    (- \[([✓✗ ])\] )(.+)$', line)
+        if sub_task_match and current_step_info:
+            symbol = sub_task_match.group(2).strip()
+            sub_task_text = sub_task_match.group(3).strip()
+            current_step_info['sub_tasks'].append({
+                'symbol': symbol,
+                'text': sub_task_text,
+                'line_index': i
+            })
+            continue
+
+    # Save last task
+    if current_task_id and current_task_info:
+        tasks[current_task_id] = current_task_info
+
+    return tasks
+
 def extract_tasks(content: str) -> dict:
-    """Extract all tasks with their checkbox status from test_tasks.md."""
+    """Extract all tasks with their checkbox status from test_tasks.md (simple version)."""
     tasks = {}
 
     # Match checkbox lines: - [✓], - [✗], or - [ ]
     # Format: - [✓] 1.1 任务描述
-    #         - [✗] 1.2 任务描述
-    #         - [ ] 1.3 任务描述
     pattern = r'- \[([✓✗ ])\] (\d+\.\d+)\s+(.+?)(?=\n- \[|$)'
 
     for match in re.finditer(pattern, content, re.DOTALL):
@@ -60,7 +135,7 @@ def extract_tasks(content: str) -> dict:
         if symbol == '✓':
             checked = True
         elif symbol == '✗':
-            checked = False  # Failed = unchecked for test result purposes
+            checked = False  # Failed
         else:
             checked = None  # Not executed or pending
 
@@ -102,9 +177,13 @@ def extract_chapter5_lessons(content: str) -> dict:
 
     return lessons
 
-def validate_results(change_name: str, passed: int, failed: int, failure_ids: list, executed_ids: list) -> bool:
+def validate_results(change_name: str, passed: int, failed: int, failure_ids: list, fail_steps: list, executed_ids: list, auto_fix: bool = False) -> bool:
     """
     Validate that test_tasks.md checkbox states match the provided test results.
+
+    Supports step-level marking:
+    - Pass: All steps become [✓]
+    - Fail: Test case becomes [✗], failed step becomes [✗], previous steps become [✓], subsequent steps stay [ ]
 
     Supports partial test runs - only validates the tests that were executed.
 
@@ -116,6 +195,7 @@ def validate_results(change_name: str, passed: int, failed: int, failure_ids: li
     """
     content = load_test_tasks(change_name)
     tasks = extract_tasks(content)
+    tasks_with_steps = extract_tasks_with_steps(content)
     chapter5_lessons = extract_chapter5_lessons(content)
 
     if not tasks:
@@ -129,6 +209,8 @@ def validate_results(change_name: str, passed: int, failed: int, failure_ids: li
     print(f"Format: [✓]=passed, [✗]=failed, [ ]=pending")
     print(f"Reported: Passed={passed}, Failed={failed}")
     print(f"Failed IDs: {failure_ids}")
+    if fail_steps:
+        print(f"Failed Steps: {fail_steps}")
     if executed_ids:
         print(f"Executed IDs: {executed_ids}")
 
@@ -219,6 +301,67 @@ def validate_results(change_name: str, passed: int, failed: int, failure_ids: li
                 if not found:
                     errors.append(f"Failed test ID {fail_id} not found in test_tasks.md")
 
+    # ===== Step-level and Sub-task validation =====
+    print(f"\n{'='*50}")
+    print(f"Step-level Validation (including Sub-tasks)")
+    print(f"{'='*50}")
+
+    # Check step-level marking for failed tests
+    for i, fail_id in enumerate(failure_ids):
+        fail_step = fail_steps[i] if i < len(fail_steps) else None
+
+        if fail_id in tasks_with_steps:
+            task_info = tasks_with_steps[fail_id]
+            steps = task_info['steps']
+
+            if fail_step:
+                # Find the failed step
+                fail_step_found = False
+                for j, step in enumerate(steps):
+                    if fail_step in step['text']:
+                        fail_step_found = True
+                        # Check: test case should be [✗], this step [✗], previous [✓], subsequent [ ]
+                        if task_info['symbol'] != '✗':
+                            errors.append(f"Test {fail_id}: test case should be [✗] but is [{task_info['symbol']}]")
+                        if step['symbol'] != '✗':
+                            errors.append(f"Test {fail_id}: failed step '{step['text']}' should be [✗] but is [{step['symbol']}]")
+
+                        # Check previous steps are [✓]
+                        for k in range(j):
+                            if steps[k]['symbol'] != '✓':
+                                errors.append(f"Test {fail_id}: step '{steps[k]['text']}' should be [✓] but is [{steps[k]['symbol']}]")
+
+                        # Check subsequent steps are [ ] (not executed yet)
+                        for k in range(j + 1, len(steps)):
+                            if steps[k]['symbol'] != ' ':
+                                errors.append(f"Test {fail_id}: step '{steps[k]['text']}' should be [ ] but is [{steps[k]['symbol']}]")
+                        break
+
+                if not fail_step_found:
+                    errors.append(f"Test {fail_id}: failed step '{fail_step}' not found in test_tasks.md")
+            else:
+                # No fail step specified - just check test case is [✗]
+                if task_info['symbol'] != '✗':
+                    errors.append(f"Test {fail_id}: test case should be [✗] but is [{task_info['symbol']}]")
+        else:
+            errors.append(f"Test {fail_id}: not found in test_tasks.md")
+
+    # Check step-level and sub-task marking for passed tests
+    for task_id, task_info in tasks_with_steps.items():
+        if task_id in failure_ids:
+            continue  # Already checked above
+
+        if task_info['symbol'] == '✓':
+            # All steps should be [✓]
+            for step in task_info['steps']:
+                if step['symbol'] != '✓':
+                    errors.append(f"Test {task_id}: passed test should have all steps [✓], but step '{step['text']}' is [{step['symbol']}]")
+
+                # All sub-tasks should be [✓]
+                for sub_task in step.get('sub_tasks', []):
+                    if sub_task['symbol'] != '✓':
+                        errors.append(f"Test {task_id}: passed test should have all sub-tasks [✓], but sub-task '{sub_task['text']}' is [{sub_task['symbol']}]")
+
     # ===== Chapter 5 Validation =====
     print(f"\n{'='*50}")
     print(f"Chapter 5 Validation (失败原因及可能的推断)")
@@ -264,6 +407,16 @@ def validate_results(change_name: str, passed: int, failed: int, failure_ids: li
         symbol = tasks[task_id]['symbol']
         print(f"  {task_id}: [{symbol}] {tasks[task_id]['description'][:50]}")
 
+    # Show step details
+    print(f"\n{'='*50}")
+    print(f"Step Details")
+    print(f"{'='*50}")
+    for task_id in sorted(tasks_with_steps.keys(), key=lambda x: [int(y) for y in x.split('.')]):
+        task_info = tasks_with_steps[task_id]
+        print(f"  {task_id} [{task_info['symbol']}]: {task_info['description'][:40]}")
+        for step in task_info['steps']:
+            print(f"    [{step['symbol']}] {step['text'][:60]}")
+
     print(f"\n{'='*50}")
     if errors:
         print("✗ FAIL - Validation errors found:")
@@ -282,6 +435,11 @@ def main():
     if args.failures:
         failure_ids = [f.strip() for f in args.failures.split(',') if f.strip()]
 
+    # Parse fail steps
+    fail_steps = []
+    if args.fail_steps:
+        fail_steps = [s.strip() for s in args.fail_steps.split(',') if s.strip()]
+
     # Parse executed IDs
     executed_ids = []
     if args.executed:
@@ -292,6 +450,7 @@ def main():
         args.passed,
         args.failed,
         failure_ids,
+        fail_steps,
         executed_ids
     )
 
