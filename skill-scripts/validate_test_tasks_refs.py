@@ -82,9 +82,10 @@ def parse_test_tasks(content: str) -> Tuple[Dict, Dict, Set, Set, Dict, Dict, Li
     # Track current task indent for nesting
     current_task_indent = 0
 
-    # State/Transition definition patterns
-    state_pattern = re.compile(r"^###\s*状态:\s*(\S+)$")
-    transition_pattern = re.compile(r"^###\s*切换:\s*(\S+)\s*->\s*(\S+)$")
+    # State/Transition definition patterns (task format with checkbox, NOT markdown header)
+    # Valid format: - [ ] 状态: xxx or - [ ] 状态：xxx or - [ ] 切换: xxx -> xxx
+    state_pattern = re.compile(r"^-\s*\[\s*\]\s*状态[:：]\s*(.+)$")
+    transition_pattern = re.compile(r"^-\s*\[\s*\]\s*切换[:：]\s*(.+)\s*->\s*(.+)$")
 
     # Reference patterns in Chapter 3 or 4
     state_ref_pattern = re.compile(r"^\s*-\s*前提:\s*状态\s*(\S+)$")
@@ -93,51 +94,69 @@ def parse_test_tasks(content: str) -> Tuple[Dict, Dict, Set, Set, Dict, Dict, Li
     # Bug ID pattern: ### BUG-<数字> <描述>
     bug_id_pattern = re.compile(r"^###\s*(BUG-\d+)\s+(.+)$")
 
-    # Task marker pattern: - [✓] <name> or - [✗] <name> or - [ ] <name> or - [x] <name>
-    task_marker_pattern = re.compile(r"^-\s*\[([ ✓✗x])\]\s*(.+)$")
+    # Chapter detection patterns (more flexible to match variations)
+    # Match: ## 1 单元测试, ## 1. Unit Tests, ## 2. Web Integration / E2E, etc.
+    chapter_patterns = [
+        # Chapter 1 - Unit Tests
+        (re.compile(r"^##\s*\d+\.?\s*单元测试"), 1),
+        (re.compile(r"^##\s*\d+\.?\s*Unit\s+Tests"), 1),
+        # Chapter 2 - E2E Standard States & Transitions
+        (re.compile(r"^##\s*\d+\.?\s*E2E\s+标准状态与状态迁移"), 2),
+        (re.compile(r"^##\s*\d+\.?\s*E2E\s+标准状态"), 2),
+        (re.compile(r"^##\s*\d+\.?\s*Web\s+Integration"), 2),  # English alternative
+        # Chapter 3 - E2E Test Scenarios
+        (re.compile(r"^##\s*\d+\.?\s*E2E\s+测试场景"), 3),
+        (re.compile(r"^##\s*\d+\.?\s*Scenario"), 3),
+        # Chapter 4 - Bug Tests
+        (re.compile(r"^##\s*\d+\.?\s*Bug\s+测试"), 4),
+    ]
 
-    # Step marker pattern: - [✓] 步骤 <n>: <description> or - [✗] 步骤 <n>: <description>
-    step_marker_pattern = re.compile(r"^-\s*\[([ ✓✗x])\]\s*步骤\s*(\d+)[:：]\s*(.+)$")
+    # Sub-chapter patterns (should NOT exist in valid documents)
+    subchapter_pattern = re.compile(r"^###\s*\d+\.\d+")
+
+    # Task marker pattern - WITH NUMBERING:
+    # Format: - [ ] <chapter>.<number> <description>
+    # Chapter 1: any description
+    # Chapter 2: must start with 状态: or 切换:
+    # Chapter 3: must start with Case:
+    # Chapter 4: must start with Bug:
+    task_pattern = re.compile(r"^(\s*)-\s*\[([ ✓✗x])\]\s*(\d+)\.(\d+)\s+(.+)$")
+
+    # Step marker pattern (REQUIRED with checkbox): - [✓] 步骤 <n>: <description>
+    # Supports: 步骤 1:, 步骤 1：, Step 1:, Step 1：
+    # Can have leading spaces for nested steps
+    step_marker_pattern = re.compile(r"^(\s*)-\s*\[([ ✓✗x])\]\s*(步骤|Step)\s*(\d+)[:：]\s*(.+)$")
 
     # Subtask/Assertion marker pattern: - [✓] <field>: <value> or - [✗] <field>: <value>
-    subtask_marker_pattern = re.compile(r"^(\s*)- \[([ ✓✗x])\] (.+): (.+)$")
+    # This handles sub-behaviors with checkbox
+    subtask_marker_pattern = re.compile(r"^(\s*)- \[([ ✓✗x])\] (.+)$")
 
     for i, line in enumerate(lines):
         # Calculate indent
         indent = len(line) - len(line.lstrip()) if line.strip() else 0
 
-        # Detect chapter headers
-        if re.match(r"^##\s*\d+\s+单元测试", line):
-            current_chapter = 1
-            task_markers[1] = {}
-            current_task_indent = 0
-            continue
-        elif re.match(r"^##\s*\d+\s+E2E\s+标准状态与状态迁移", line):
-            current_chapter = 2
-            task_markers[2] = {}
-            current_task_indent = 0
-            continue
-        elif re.match(r"^##\s*\d+\s+E2E\s+测试场景", line):
-            current_chapter = 3
-            task_markers[3] = {}
-            current_task_indent = 0
-            continue
-        elif re.match(r"^##\s*\d+\s+Bug\s+测试", line):
-            current_chapter = 4
-            task_markers[4] = {}
-            current_task_indent = 0
-            continue
+        # Detect chapter headers using flexible patterns
+        for pattern, chapter_num in chapter_patterns:
+            if pattern.match(line):
+                current_chapter = chapter_num
+                task_markers[chapter_num] = {}
+                current_task_indent = 0
+                break
+        else:
+            # No chapter header matched, continue processing
+            pass
 
         # Parse task markers for all chapters
         if current_chapter > 0 and line.strip():
-            # First try step marker (must have "步骤" keyword)
+            # First try step marker (must have "步骤" or "Step" keyword)
             step_match = step_marker_pattern.match(line)
             if step_match:
-                checkbox = step_match.group(1)
+                leading_spaces = step_match.group(1)
+                checkbox = step_match.group(2)
                 is_success = checkbox in ('✓', 'x')
                 is_failure = checkbox == '✗'
-                step_num = step_match.group(2)
-                step_desc = step_match.group(3).strip()
+                step_num = step_match.group(4)  # group(4) is the step number
+                step_desc = step_match.group(5).strip()  # group(5) is the description
                 step_markers.append({
                     'line_num': i + 1,
                     'indent': indent,
@@ -157,13 +176,12 @@ def parse_test_tasks(content: str) -> Tuple[Dict, Dict, Set, Set, Dict, Dict, Li
                 checkbox = subtask_match.group(2)
                 is_success = checkbox in ('✓', 'x')
                 is_failure = checkbox == '✗'
-                field = subtask_match.group(3).strip()
-                value = subtask_match.group(4).strip()
+                content = subtask_match.group(3).strip()
                 subtask_markers.append({
                     'line_num': i + 1,
                     'indent': subtask_indent,
                     'parent_indent': current_task_indent,
-                    'name': f"{field}: {value}",
+                    'name': content,
                     'has_checkbox': True,
                     'is_success': is_success,
                     'is_failure': is_failure,
@@ -171,33 +189,36 @@ def parse_test_tasks(content: str) -> Tuple[Dict, Dict, Set, Set, Dict, Dict, Li
                 })
                 continue
 
-            # Then try regular task marker
-            task_match = task_marker_pattern.match(line)
-            if task_match:
+            # Then try regular task marker (test case names - WITH checkbox and numbering)
+            # Format: - [ ] <chapter>.<number> <description>
+            task_match = task_pattern.match(line)
+            if task_match and indent == 0:  # Task should be at top level (no indent)
                 if current_chapter not in task_markers:
                     task_markers[current_chapter] = {}
-                checkbox = task_match.group(1)
+                # Extract checkbox status
+                checkbox = task_match.group(2)
                 is_success = checkbox in ('✓', 'x')
                 is_failure = checkbox == '✗'
-                task_name = task_match.group(2).strip()
-                task_markers[current_chapter][task_name] = (True, is_success, is_failure)
-                # Track task indent for nesting
-                if '任务：' in task_name or task_name.startswith('步骤'):
-                    current_task_indent = indent
+                chapter_num = int(task_match.group(3))
+                task_num = int(task_match.group(4))
+                task_name = task_match.group(5).strip()
+                full_task_name = f"{chapter_num}.{task_num} {task_name}"
+                task_markers[current_chapter][full_task_name] = (True, is_success, is_failure)
+                current_task_indent = indent
                 continue
 
-        # Parse state definitions (Chapter 2)
+        # Parse state definitions (Chapter 2) - format: - [ ] 状态: xxx
         if current_chapter == 2:
             state_match = state_pattern.match(line)
             if state_match:
-                state_id = state_match.group(1)
+                state_id = state_match.group(1).strip()
                 states[state_id] = line.strip()
                 continue
 
             trans_match = transition_pattern.match(line)
             if trans_match:
-                from_state = trans_match.group(1)
-                to_state = trans_match.group(2)
+                from_state = trans_match.group(1).strip()
+                to_state = trans_match.group(2).strip()
                 trans_id = f"{from_state} -> {to_state}"
                 transitions[trans_id] = line.strip()
                 continue
@@ -290,9 +311,9 @@ def validate_test_tasks(
     """
     Validate:
     1. Every Chapter 2 item has a reference path to Chapter 3 or 4
-    2. Every test case has a task marker [ ]
-    3. Steps under test cases have task markers
-    4. Subtasks/assertions under steps have task markers
+    2. Every test case section has a task marker with checkbox [ ]
+    3. Steps use proper format: - [ ] 步骤 <n>: <description> (NOT #### 步骤 1:)
+    4. Task and step markers are REQUIRED - documents without them FAIL validation
 
     Returns:
     - is_valid: True if all items have valid references and task markers
@@ -300,6 +321,47 @@ def validate_test_tasks(
     """
     errors: List[str] = []
     all_items = set(states.keys()) | set(transitions.keys())
+
+    # ========================================
+    # STRICT VALIDATION: Task/Step markers are MANDATORY
+    # ========================================
+
+    # Check that task markers exist for each chapter (except Chapter 4 which can be empty)
+    # If no task markers found, it's a FAILURE (not just a warning)
+    chapter_names = {1: "单元测试", 2: "E2E标准状态与状态迁移", 3: "E2E测试场景", 4: "Bug测试", 5: "失败原因及可能的推断"}
+
+    for chapter_num, chapter_name in chapter_names.items():
+        # Chapter 4 (Bug测试) can be empty - no tasks required
+        if chapter_num == 4 or chapter_num == 5:
+            continue
+
+        if chapter_num not in task_markers or len(task_markers[chapter_num]) == 0:
+            # Chapter exists but has no task markers - this is a FAILURE
+            errors.append(
+                f"Chapter {chapter_num} ({chapter_name}) - 必须包含任务标记 [- [ ] <任务名>]，当前文档缺少任务标记"
+            )
+
+    # Check that step markers exist for chapters with test cases
+    # Count steps per chapter
+    steps_count_by_chapter: Dict[int, int] = defaultdict(int)
+    for step in step_markers:
+        steps_count_by_chapter[step['chapter']] += 1
+
+    # Check that steps exist for chapters with tasks
+    for chapter_num, chapter_name in chapter_names.items():
+        # Chapter 4 and 5 can be empty (no bug tests / no failures yet)
+        if chapter_num == 4 or chapter_num == 5:
+            continue
+
+        task_count = len(task_markers.get(chapter_num, {}))
+        step_count = steps_count_by_chapter.get(chapter_num, 0)
+
+        if task_count > 0 and step_count == 0:
+            # Has tasks but no steps
+            if chapter_num in (1, 3):  # Unit tests and E2E scenarios need steps
+                errors.append(
+                    f"Chapter {chapter_num} ({chapter_name}) - 测试用例必须包含步骤标记 [- [ ] 步骤 <n>: <描述>]"
+                )
 
     # Validate Chapter 2 reference integrity
     if all_items:
@@ -348,59 +410,219 @@ def validate_test_tasks(
                         "只在章节2内部引用，但从未连接到章节3或4"
                     )
 
-    # Validate task markers for each chapter
-    chapter_names = {1: "单元测试", 2: "E2E标准状态与状态迁移", 3: "E2E测试场景", 4: "Bug测试"}
+    # ========================================
+    # Validate task numbering and chapter restrictions
+    # ========================================
+    chapter_names = {1: "单元测试", 2: "E2E标准状态与状态迁移", 3: "E2E测试场景", 4: "Bug测试", 5: "失败原因及可能的推断"}
 
-    for chapter_num, chapter_name in chapter_names.items():
-        if chapter_num in task_markers:
-            for task_name, (has_marker, is_success, is_failure) in task_markers[chapter_num].items():
-                if not has_marker:
-                    errors.append(
-                        f"Chapter {chapter_num} ({chapter_name}) - 测试用例 '{task_name}' 缺少任务标记 [ ]"
-                    )
-                # Check if failed steps have failure reason comments
-                if is_failure:
-                    # TODO: Check for failure reason subtask after step
-                    pass
-
-    # Validate step markers exist and are contiguous
-    # Group step markers by chapter
-    steps_by_chapter: Dict[int, List[Dict]] = defaultdict(list)
-    for step in step_markers:
-        steps_by_chapter[step['chapter']].append(step)
-
-    # Check that steps are contiguous (no non-step lines between step markers at same level)
-    for chapter_num, steps in steps_by_chapter.items():
-        if not steps:
+    for chapter_num in [1, 2, 3, 4]:
+        if chapter_num not in task_markers:
             continue
-        # Sort by line number
-        steps_sorted = sorted(steps, key=lambda x: x['line_num'])
-        # Get base indentation level (should be consistent for steps under a case)
-        base_indent = steps_sorted[0]['indent'] if steps_sorted else 0
 
-        # Group steps by their parent indent level (steps with same indent belong to same case)
-        steps_by_indent: Dict[int, List[Dict]] = defaultdict(list)
-        for step in steps_sorted:
-            steps_by_indent[step['indent']].append(step)
+        tasks = task_markers[chapter_num]
+        if not tasks:
+            continue
 
-        # For each group of steps at same indent level, check contiguity
-        for indent, indent_steps in steps_by_indent.items():
-            indent_steps_sorted = sorted(indent_steps, key=lambda x: x['line_num'])
-            # Check for gaps - any non-step lines between step markers
-            for j in range(len(indent_steps_sorted) - 1):
-                curr_line = indent_steps_sorted[j]['line_num']
-                next_line = indent_steps_sorted[j + 1]['line_num']
-                if next_line - curr_line > 1:
+        # Extract task numbers and validate sequential numbering
+        task_numbers = []
+        for task_name in tasks.keys():
+            # Format: "1.1 Description" or "2.3 状态: xxx"
+            parts = task_name.split()
+            if parts:
+                num_part = parts[0]
+                if '.' in num_part:
+                    try:
+                        ch, num = num_part.split('.')
+                        task_numbers.append((int(ch), int(num), task_name))
+                    except:
+                        errors.append(f"Chapter {chapter_num} - 任务标号格式错误: {task_name}")
+
+        # Sort by task number
+        task_numbers.sort(key=lambda x: x[1])
+
+        # Check sequential numbering starting from 1
+        expected_num = 1
+        for ch, num, task_name in task_numbers:
+            if ch != chapter_num:
+                errors.append(
+                    f"Chapter {chapter_num} - 任务 {task_name} 的章节号应为 {chapter_num}，当前为 {ch}"
+                )
+            if num != expected_num:
+                errors.append(
+                    f"Chapter {chapter_num} - 任务序号应连续，当前任务 {task_name} 序号为 {num}，期望 {expected_num}"
+                )
+            expected_num = num + 1
+
+        # Check chapter-specific restrictions
+        for task_name in tasks.keys():
+            # Find the description part after the number
+            parts = task_name.split(None, 1)  # Split into 2 parts max
+            if len(parts) < 2:
+                continue
+            desc = parts[1]
+
+            if chapter_num == 2:
+                # Chapter 2: only 状态: or 切换:
+                if not (desc.startswith("状态:") or desc.startswith("切换:")):
                     errors.append(
-                        f"Chapter {chapter_num} ({chapter_names.get(chapter_num, '')}) - "
-                        f"步骤 '{indent_steps_sorted[j]['name']}' 和 '{indent_steps_sorted[j+1]['name']}' "
-                        f"之间有间隔，步骤标记必须紧挨"
+                        f"Chapter {chapter_num} ({chapter_names[chapter_num]}) - "
+                        f"第二章只允许 `状态:` 或 `切换:`，当前任务: {task_name}"
+                    )
+            elif chapter_num == 3:
+                # Chapter 3: only Case:
+                if not desc.startswith("Case:"):
+                    errors.append(
+                        f"Chapter {chapter_num} ({chapter_names[chapter_num]}) - "
+                        f"第三章只允许 `Case:`，当前任务: {task_name}"
+                    )
+            elif chapter_num == 4:
+                # Chapter 4: only Bug:
+                if not desc.startswith("Bug:"):
+                    errors.append(
+                        f"Chapter {chapter_num} ({chapter_names[chapter_num]}) - "
+                        f"第四章只允许 `Bug:`，当前任务: {task_name}"
                     )
 
-    # Validate that assertions under steps have markers
-    # We check that lines immediately after a step (at higher indent) have task markers
-    lines = []  # Would need to pass lines in for full validation
-    # This is a simplified check - we verify step markers exist in general
+    # Step contiguity check is disabled - steps within each task are already contiguous
+    # The check was incorrectly comparing steps across different tasks
+    # Steps only need to be under their parent task, which is already validated by structure
+
+    # ========================================
+    # STRICT FORMAT VALIDATION: Detect invalid step formats
+    # ========================================
+
+    # This requires raw content - we'll validate this externally
+    # The validation script expects the NEW format:
+    # - Task: - [ ] <task name>
+    # - Step: - [ ] 步骤 <n>: <description>
+    # INVALID formats that will be rejected:
+    # - #### 步骤 <n>:
+    # - ### 步骤 <n>:
+    # - 步骤 <n>: (without checkbox)
+
+    return len(errors) == 0, errors
+
+
+def validate_step_format(content: str) -> Tuple[bool, List[str]]:
+    """
+    Validate that steps use proper checkbox format, not markdown headers.
+    Also validates subtask/subinstruction formatting.
+
+    Returns:
+    - is_valid: True if all steps use proper format
+    - errors: List of error messages
+    """
+    errors: List[str] = []
+
+    lines = content.split("\n")
+
+    # Track current chapter to apply different rules
+    current_chapter = 0
+    chapter_patterns = [
+        (re.compile(r"^##\s*\d+\.?\s*单元测试"), 1),
+        (re.compile(r"^##\s*\d+\.?\s*Unit\s+Tests"), 1),
+        (re.compile(r"^##\s*\d+\.?\s*E2E\s+标准状态与状态迁移"), 2),
+        (re.compile(r"^##\s*\d+\.?\s*Web\s+Integration"), 2),
+        (re.compile(r"^##\s*\d+\.?\s*E2E\s+测试场景"), 3),
+        (re.compile(r"^##\s*\d+\.?\s*Scenario"), 3),
+        (re.compile(r"^##\s*\d+\.?\s*Bug\s+测试"), 4),
+        (re.compile(r"^##\s*\d+\.?\s*失败原因及可能的推断"), 5),
+    ]
+
+    # Sub-chapter pattern (should NOT exist - e.g., ### 2.1, ### 3.5)
+    subchapter_pattern = re.compile(r"^###\s*\d+\.\d+")
+
+    step_indent_map: Dict[int, int] = {}  # line_number -> indent level
+
+    for i, line in enumerate(lines, 1):
+        stripped = line.strip()
+
+        # Detect chapter headers
+        for pattern, chapter_num in chapter_patterns:
+            if pattern.match(stripped):
+                current_chapter = chapter_num
+                break
+
+        # Check for sub-chapters (should NOT exist in valid format)
+        if subchapter_pattern.match(stripped):
+            errors.append(
+                f"第 {i} 行: 检测到子章节 `{stripped}`。"
+                f"四章格式不允许子章节（如 ### 2.1），请使用任务/步骤结构。"
+            )
+
+        # Check for invalid state/transition format (markdown header style)
+        if re.match(r"^#{1,3}\s*状态[:：]", stripped):
+            errors.append(
+                f"第 {i} 行: 状态定义应使用任务格式 `- [ ] 状态: xxx`，"
+                f"而非子章节格式 `### 状态: xxx`"
+            )
+        if re.match(r"^#{1,3}\s*切换[:：]", stripped):
+            errors.append(
+                f"第 {i} 行: 切换定义应使用任务格式 `- [ ] 切换: xxx -> yyy`，"
+                f"而非子章节格式 `### 切换: xxx`"
+            )
+
+        # Invalid patterns (markdown headers used as steps)
+        if re.match(r"^#{1,6}\s+步骤", stripped):
+            errors.append(f"第 {i} 行: 检测到 Markdown 标题格式 - 必须使用 `- [ ] 步骤 <n>:` 格式")
+
+        # Check for "步骤" without checkbox (in any position)
+        if "步骤" in stripped and not stripped.startswith("#"):
+            # Steps MUST have checkbox format: - [ ] 步骤 <n>:
+            if not re.match(r"^-\s\[[ ✓✗x]\]\s*步骤", stripped):
+                # Exception: sub-instructions (more indented) don't need checkbox
+                indent = len(line) - len(line.lstrip())
+                if indent == 0 or (not re.match(r"^\s+- ", line) and not re.match(r"^\s+[^\-]", line)):
+                    errors.append(f"第 {i} 行: 步骤必须使用 checkbox 格式 `- [ ] 步骤 <n>:`")
+
+        # Track step positions for sub-behavior validation
+        if re.match(r"^-\s\[[ ✓✗x]\]\s*步骤", stripped):
+            indent = len(line) - len(line.lstrip())
+            step_indent_map[i] = indent
+
+        # Check for task WITHOUT checkbox (WRONG - tasks MUST have checkbox)
+        # Task format: - [ ] 1.1 档位默认状态
+        if current_chapter > 0 and re.match(r"^\d+\.\s+", stripped) and not stripped.startswith("-"):
+            # This looks like a task without checkbox
+            errors.append(f"第 {i} 行: 任务（测试用例）必须使用 checkbox，格式应该是 `- [ ] 1.1 <任务名>`")
+
+    # ========================================
+    # Validate sub-behavior format (indented under steps)
+    # ========================================
+    for step_line_idx, step_indent in step_indent_map.items():
+        # Check next lines for sub-behaviors
+        for j in range(step_line_idx, min(step_line_idx + 20, len(lines))):
+            if j == step_line_idx:
+                continue  # Skip the step itself
+
+            next_line = lines[j]
+
+            # Skip empty lines
+            if not next_line.strip():
+                continue
+
+            next_indent = len(next_line) - len(next_line.lstrip())
+
+            # Stop if we hit another step at same or lower indent
+            if re.match(r"^-\s\[[ ✓✗x]\]\s*步骤", next_line.strip()):
+                if next_indent <= step_indent:
+                    break
+                continue
+
+            # If more indented than step, it's a sub-behavior/sub-instruction
+            if next_indent > step_indent:
+                # Sub-behaviors/sub-assertions MUST have checkbox: - [ ] or - [x] or - [✓]
+                # OR sub-instructions can be plain text: "      - 引擎: xxx"
+                is_valid_sub = (
+                    re.match(r"^-\s\[[ ✓✗x]\]\s+", next_line.strip()) or  # With checkbox
+                    re.match(r"^-\s+[^[]", next_line.strip())  # Plain text (e.g., "      - 引擎: xxx")
+                )
+
+                if not is_valid_sub:
+                    errors.append(
+                        f"第 {j+1} 行: 子行为/子断言/子说明格式不正确。"
+                        f"格式：`      - [ ] <子行为>` 或 `      - <子说明>`"
+                    )
 
     return len(errors) == 0, errors
 
@@ -448,7 +670,7 @@ def main():
         print(f"  - {bug_id}")
 
     # Print task markers
-    chapter_names = {1: "单元测试", 2: "E2E标准状态与状态迁移", 3: "E2E测试场景", 4: "Bug测试"}
+    chapter_names = {1: "单元测试", 2: "E2E标准状态与状态迁移", 3: "E2E测试场景", 4: "Bug测试", 5: "失败原因及可能的推断"}
     print(f"\nTask Markers:")
     for chapter_num, chapter_name in chapter_names.items():
         if chapter_num in task_markers:
@@ -505,6 +727,12 @@ def main():
     is_valid, errors = validate_test_tasks(
         states, transitions, chapter3_references, chapter4_references, bug_ids_ch4, task_markers, step_markers, subtask_markers
     )
+
+    # Validate step format (must use - [ ] 步骤 format, not #### 步骤)
+    format_valid, format_errors = validate_step_format(content)
+    if not format_valid:
+        is_valid = False
+        errors.extend(format_errors)
 
     print(f"\n=== Validation Result ===")
     if is_valid:
