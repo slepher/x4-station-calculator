@@ -161,11 +161,10 @@ def parse_test_tasks(content: str) -> Tuple[Dict, Dict, Set, Set, Dict, Dict, Li
     # Chapter 4: must start with Bug:
     task_pattern = re.compile(r"^(\s*)-\s*\[([ ✓✗x])\]\s*(\d+)\.(\d+)\s+(.+)$")
 
-    # Step/Subtask marker pattern: - [✓] <number>.<subnumber> <description>
+    # Step/Subtask marker pattern: - [✓] <number>.<subnumber>.<subsubnumber> <description>
     # New format: - [ ] 1.1.1 读取当前档位状态
-    # Supports nested numbering like 1.1.1, 1.1.2, 3.1.1, etc.
-    # Can have leading spaces for nested steps
-    step_marker_pattern = re.compile(r"^(\s*)-\s*\[([ ✓✗x])\]\s*(\d+\.\d+)\s+(.+)$")
+    # Only matches 3+ level numbers (e.g., 1.1.1, 1.1.2, 3.6.5) to distinguish from task markers (2-level like 1.1)
+    step_marker_pattern = re.compile(r"^(\s*)-\s*\[([ ✓✗x])\]\s*(\d+\.\d+\.\d+)\s+(.+)$")
 
     # Subtask/Assertion marker pattern: - [✓] <field>: <value> or - [✗] <field>: <value>
     # This handles sub-behaviors with checkbox
@@ -187,7 +186,9 @@ def parse_test_tasks(content: str) -> Tuple[Dict, Dict, Set, Set, Dict, Dict, Li
             pass
 
         # Parse task markers for all chapters
-        if current_chapter > 0 and line.strip():
+        # Skip chapter headers - they should not be treated as steps/tasks
+        is_chapter_header = line.strip().startswith('##')
+        if current_chapter > 0 and line.strip() and not is_chapter_header:
             # First try step marker (new format: - [ ] 1.1.1 描述)
             step_match = step_marker_pattern.match(line)
             if step_match:
@@ -195,7 +196,7 @@ def parse_test_tasks(content: str) -> Tuple[Dict, Dict, Set, Set, Dict, Dict, Li
                 checkbox = step_match.group(2)
                 is_success = checkbox in ('✓', 'x')
                 is_failure = checkbox == '✗'
-                step_num = step_match.group(3)  # group(3) is the step number like "1.1"
+                step_num = step_match.group(3)  # group(3) is the step number like "1.1.1"
                 step_desc = step_match.group(4).strip()  # group(4) is the description
                 step_markers.append({
                     'line_num': i + 1,
@@ -765,6 +766,7 @@ def validate_test_tasks(
                 )
                 continue
             # Only enforce allowed type list on direct child subtasks.
+            # Allow both old format (前提:/步骤:/期望:) and new numbered format (3.1.1)
             if current_indent == subtask_indent:
                 child_content_match = re.match(r"^\s*-\s*\[[ ✓✗x]\]\s*(.+)$", ln)
                 child_content = child_content_match.group(1).strip() if child_content_match else ""
@@ -773,10 +775,11 @@ def validate_test_tasks(
                     or re.match(r"^前提:\s*切换\s+\S+\s*->\s*\S+", child_content)
                     or re.match(r"^(步骤|Step)\s*\d+[:：]\s*.+", child_content)
                     or re.match(r"^期望[:：]\s*.+", child_content)
+                    or re.match(r"^\d+\.\d+\.\d+\s+", child_content)  # Allow numbered format like 3.1.1
                 ):
                     errors.append(
                         f"任务 `{task_name}` - 第 {abs_line} 行 Case 子任务类型非法：{child_content}；"
-                        "仅允许 前提:状态 / 前提:切换 / 步骤 / 期望"
+                        "仅允许 前提:状态 / 前提:切换 / 步骤 / 期望 / 数字编号(如3.1.1)"
                     )
 
         has_step_subtask = any(
@@ -951,6 +954,7 @@ def validate_step_format(content: str) -> Tuple[bool, List[str]]:
                     or re.match(r"^前提:\s*切换\s+\S+\s*->\s*\S+", child_content)
                     or re.match(r"^(步骤|Step)\s*\d+[:：]\s*.+", child_content)
                     or re.match(r"^期望[:：]\s*.+", child_content)
+                    or re.match(r"^\d+\.\d+\.\d+\s+.+", child_content)  # Allow numbered format like 3.1.1
                 ):
                     errors.append(
                         f"第 {i} 行: 第三章 Case 直接子任务类型非法（仅允许 前提:状态/前提:切换/步骤/期望）：{stripped}"

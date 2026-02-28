@@ -16,29 +16,29 @@ test.describe('Ship Build Stats Panel', () => {
 
   // 2.1 状态: heron-selected
   test('2.1 状态: heron-selected', async ({ page }) => {
-    // 步骤 1：启动应用并进入"船只建造"视图。
+    // 2.1.1 启动应用并进入"船只建造"视图
     await shipBuildButton(page).click()
 
-    // 步骤 2：点击选择 `class=L` 筛选条件。
+    // 2.1.2 点击选择 `class=L` 筛选条件
     const classFilter = page.getByTestId('ship-build-filter-class')
     await classFilter.getByRole('button', { name: 'L', exact: true }).click()
 
-    // 步骤 3：点击选择 `race=teladi` 筛选条件。
+    // 2.1.3 点击选择 `race=teladi` 筛选条件
     const raceFilter = page.getByTestId('ship-build-filter-race')
     await raceFilter.locator('button').first().click()
 
-    // 步骤 4：点击选择 `type=freighter` 筛选条件。
+    // 2.1.4 点击选择 `type=freighter` 筛选条件
     const typeFilter = page.getByTestId('ship-build-filter-type')
     await typeFilter.locator('button').first().click()
 
-    // 步骤 5：在列表中点击选择 `Heron Vanguard`（ship_tel_l_trans_container_02_a）。
+    // 2.1.5 在列表中点击选择 `Heron Vanguard`（ship_tel_l_trans_container_02_a）
     const listItems = page.locator('.list-item')
     await listItems.first().click()
 
-    // 步骤 6：断言中列属性面板可见。（期望）expect().toBeVisible()
+    // 2.1.6 断言中列属性面板可见
     await expect(page.getByTestId('ship-build-panel-stats')).toBeVisible()
 
-    // 步骤 7：断言已选详情区可见。（期望）expect().toBeVisible()
+    // 2.1.7 断言已选详情区可见
     await expect(page.getByTestId('ship-build-selection')).toBeVisible()
   })
 
@@ -58,15 +58,15 @@ test.describe('Ship Build Stats Panel', () => {
 
     await page.locator('.list-item').first().click()
 
-    // 步骤 1：在已选 Heron Vanguard 状态下，点击"详细"档位按钮。
+    // 2.2.1 在已选 Heron Vanguard 状态下，点击"详细"档位按钮
     const detailBtn = page.getByTestId('ship-build-stats-mode-detail')
     await detailBtn.click()
 
-    // 步骤 2：断言中列属性面板显示简略字段集合。
+    // 2.2.2 断言中列属性面板显示简略字段集合
     const statsPanel = page.getByTestId('ship-build-stats-panel')
     await expect(statsPanel).toBeVisible()
 
-    // 步骤 3：断言中列属性面板显示详细字段集合，包含所有35项字段标签。（期望 toHaveCount(35)）
+    // 2.2.3 断言中列属性面板显示详细字段集合，包含所有35项字段标签
     const statsRows = statsPanel.locator('.stats-row')
     expect(await statsRows.count()).toBe(35)
   })
@@ -90,10 +90,10 @@ test.describe('Ship Build Stats Panel', () => {
 
     await page.locator('.list-item').first().click()
 
-    // 步骤 2：断言"简略"档位按钮可见。（期望）expect().toBeVisible()
+    // 步骤 2：断言"简略"档位按钮可见。
     await expect(page.getByTestId('ship-build-stats-mode-summary')).toBeVisible()
 
-    // 步骤 3：断言"详细"档位按钮可见。（期望）expect().toBeVisible()
+    // 步骤 3：断言"详细"档位按钮可见。
     await expect(page.getByTestId('ship-build-stats-mode-detail')).toBeVisible()
   })
 
@@ -152,7 +152,7 @@ test.describe('Ship Build Stats Panel', () => {
     const detailBtn = page.getByTestId('ship-build-stats-mode-detail')
     await detailBtn.click()
 
-    // 步骤 2：断言字段集合包含35项字段标签，覆盖简略字段18项并额外包含17项扩展字段。（期望 toHaveCount(35)）
+    // 步骤 2：断言字段集合包含35项字段标签，覆盖简略字段18项并额外包含17项扩展字段。
     const detailCount = await statsPanel.locator('.stats-row').count()
     expect(detailCount).toBe(35)
   })
@@ -179,14 +179,14 @@ test.describe('Ship Build Stats Panel', () => {
     const detailBtn = page.getByTestId('ship-build-stats-mode-detail')
     await detailBtn.click()
 
-    // 步骤 2：断言船体、护盾、速度、助推速度、巡航速度、船员、集装箱仓储为真实值（非 `--` 或 `—`）。（期望 not.toBe('--')）
+    // 步骤 2：断言船体、护盾、速度、助推速度、巡航速度、船员、集装箱仓储为真实值（非 `--` 或 `—`）。
     const statsPanel = page.getByTestId('ship-build-stats-panel')
     const statsValues = statsPanel.locator('.stats-value')
     const valueTexts = await statsValues.allTextContents()
     const hasRealValues = valueTexts.some(v => v && v.trim() !== '' && !v.includes('--'))
     expect(hasRealValues).toBe(true)
 
-    // 步骤 3：断言武器爆发输出值、武器持续性输出值、炮塔平均输出值为真实值（非 `--` 或 `—`）。（期望 not.toBe('--')）
+    // 步骤 3：断言武器爆发输出值、武器持续性输出值、炮塔平均输出值为真实值（非 `--` 或 `—`）。
     // No placeholder rows - all fields now have data sources
     const placeholderRows = statsPanel.locator('.stats-row-placeholder')
     expect(await placeholderRows.count()).toBe(0)
@@ -213,13 +213,13 @@ test.describe('Ship Build Stats Panel', () => {
     // 步骤 2：获取已选详情区容器的样式属性。
     const statsPanel = page.getByTestId('ship-build-stats-panel')
 
-    // 步骤 3：断言中列属性面板容器不包含 `h-48`、`72px`、`max-h-[300px]` 等固定高度样式。（期望 toBeFalsy()）
+    // 步骤 3：断言中列属性面板容器不包含 `h-48`、`72px`、`max-h-[300px]` 等固定高度样式。
     const statsPanelStyle = await statsPanel.getAttribute('style') || ''
     expect(statsPanelStyle).not.toContain('h-48')
     expect(statsPanelStyle).not.toContain('72px')
     expect(statsPanelStyle).not.toContain('max-h-[300px]')
 
-    // 步骤 4：断言已选详情区容器不包含 `h-48`、`72px`、`max-h-[300px]` 等固定高度样式。（期望 toBeFalsy()）
+    // 步骤 4：断言已选详情区容器不包含 `h-48`、`72px`、`max-h-[300px]` 等固定高度样式。
     const selectionPanel = page.getByTestId('ship-build-selection')
     if (await selectionPanel.count() > 0) {
       const selectionStyle = await selectionPanel.getAttribute('style') || ''
@@ -325,7 +325,7 @@ test.describe('Ship Build Stats Panel', () => {
     // Wait for stats to update
     await page.waitForTimeout(500)
 
-    // 步骤 7：验证所有属性值（期望）expect().toBeDefined()
+    // 步骤 7：验证所有属性值：
     // Verify calculated values exist
     const statsPanel = page.getByTestId('ship-build-stats-panel')
     const statsRows = statsPanel.locator('.stats-row')
@@ -425,7 +425,7 @@ test.describe('Ship Build Stats Panel', () => {
     // Wait for stats to update
     await page.waitForTimeout(500)
 
-    // 步骤 7：验证所有属性值（期望）expect().toBeDefined()
+    // 步骤 7：验证所有属性值：
     // Verify calculated values exist
     const statsPanel = page.getByTestId('ship-build-stats-panel')
     const statsRows = statsPanel.locator('.stats-row')

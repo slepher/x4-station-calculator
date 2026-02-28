@@ -184,7 +184,7 @@ const globalMocks = {
 
   // 1.1 档位默认状态
   it('1.1 档位默认状态', async () => {
-    // 步骤 1：渲染已选飞船的船只建造属性区。
+    // 1.1.1 渲染已选飞船的船只建造属性区
     const wrapper = mount(ShipBuildView, {
       global: {
         plugins: [createPinia()],
@@ -195,16 +195,16 @@ const globalMocks = {
     // Select a ship first
     await selectShip(wrapper)
 
-    // 步骤 2：读取当前档位状态。
+    // 1.1.2 读取当前档位状态
     const statsPanel = wrapper.findComponent(ShipBuildPanelStats)
 
-    // 步骤 3：断言默认档位为"简略"。
+    // 1.1.3 断言默认档位为"简略"
     expect(statsPanel.vm.statsViewMode).toBe('summary')
   })
 
   // 1.2 档位切换行为
   it('1.2 档位切换行为', async () => {
-    // 步骤 1：点击"详细"档位按钮。
+    // 1.2.1 点击"详细"档位按钮
     const wrapper = mount(ShipBuildView, {
       global: {
         plugins: [createPinia()],
@@ -218,19 +218,19 @@ const globalMocks = {
     const detailBtn = wrapper.find('[data-testid="ship-build-stats-mode-detail"]')
     await detailBtn.trigger('click')
 
-    // 步骤 2：断言属性列表切换为详细字段集合。
+    // 1.2.2 断言属性列表切换为详细字段集合
     expect(wrapper.findComponent(ShipBuildPanelStats).vm.statsViewMode).toBe('detail')
 
-    // 步骤 3：点击"简略"档位按钮。
+    // 1.2.3 点击"简略"档位按钮
     await wrapper.find('[data-testid="ship-build-stats-mode-summary"]').trigger('click')
 
-    // 步骤 4：断言属性列表切回简略字段集合。
+    // 1.2.4 断言属性列表切回简略字段集合
     expect(wrapper.findComponent(ShipBuildPanelStats).vm.statsViewMode).toBe('summary')
   })
 
   // 1.3 简略字段对齐（截图 2）
   it('1.3 简略字段对齐（截图 2）', async () => {
-    // 步骤 1：进入"简略"档位。
+    // 1.3.1 进入"简略"档位
     const wrapper = mount(ShipBuildView, {
       global: {
         plugins: [createPinia()],
@@ -241,16 +241,16 @@ const globalMocks = {
     // Setup: select a ship
     await selectShip(wrapper)
 
-    // 步骤 2：断言包含以下字段标签：船体(MJ)、护盾(MJ)、雷达范围(km)、武器爆发输出值(MW)、炮塔平均输出值(MW)、集装仓储(m3)、M级泊位数量、M级飞船容量、S级泊位数量、S级飞船容量、速度(m/s)、助推器助推速度(m/s)、巡航速度(m/s)、船员、单位、导弹、可投放设备、干扰弹。
+    // 1.3.2 断言包含以下字段标签：船体(MJ)、护盾(MJ)、雷达范围(km)、武器爆发输出值(MW)、炮塔平均输出值(MW)、集装仓储(m3)、M级泊位数量、M级飞船容量、S级泊位数量、S级飞船容量、速度(m/s)、助推器助推速度(m/s)、巡航速度(m/s)、船员、单位、导弹、可投放设备、干扰弹（期望 toHaveCount(18)）
     expect(wrapper.findAll('.stats-row').length).toBe(18)
 
-    // 步骤 3：断言不出现仅属于详细扩展的字段标签：再充率(MW)、再充延迟(秒)、编组平均护盾容量、武器持续性输出值、固体仓储(m3)、液体仓储(m3)、冷凝态仓储(m3)、加速(m/s2)、助推加速度(m/s2)、助推时长(秒)、助推回充率(%/s)、巡航加速度(m/s2)、巡航加力时间(秒)、平移速度(m/s)、平移加速度(m/s2)、水平转向(°/s)、俯仰(°/s)、横滚(°/s)。
-    expect(wrapper.findAll('.stats-row').length).toBe(18)
+    // 1.3.3 断言不出现仅属于详细扩展的字段标签：再充率(MW)、再充延迟(秒)、编组平均护盾容量、武器持续性输出值、固体仓储(m3)、液体仓储(m3)、冷凝态仓储(m3)、加速(m/s2)、助推加速度(m/s2)、助推时长(秒)、助推回充率(%/s)、巡航加速度(m/s2)、巡航加力时间(秒)、平移速度(m/s)、平移加速度(m/s2)、水平转向(°/s)、俯仰(°/s)、横滚(°/s)（期望 toHaveCount(0)）
+    expect(wrapper.findAll('.stats-row').length).toBe(0)
   })
 
   // 1.4 详细字段对齐（截图 1）
   it('1.4 详细字段对齐（截图 1）', async () => {
-    // 步骤 1：进入"详细"档位。
+    // 1.4.1 进入"详细"档位
     const wrapper = mount(ShipBuildView, {
       global: {
         plugins: [createPinia()],
@@ -269,16 +269,16 @@ const globalMocks = {
     const detailBtn = wrapper.find('[data-testid="ship-build-stats-mode-detail"]')
     await detailBtn.trigger('click')
 
-    // 步骤 2：断言包含以下字段标签：船体(MJ)、护盾(MJ)、雷达范围(km)、武器爆发输出值(MW)、炮塔平均输出值(MW)、集装仓储(m3)、M级泊位数量、M级飞船容量、S级泊位数量、S级飞船容量、速度(m/s)、助推器助推速度(m/s)、巡航速度(m/s)、船员、单位、导弹、可投放设备、干扰弹、再充率(MW)、再充延迟(秒)、编组平均护盾容量、武器持续性输出值、固体仓储(m3)、液体仓储(m3)、冷凝态仓储(m3)、加速(m/s2)、助推加速度(m/s2)、助推时长(秒)、助推回充率(%/s)、巡航加速度(m/s2)、巡航加力时间(秒)、平移速度(m/s)、平移加速度(m/s2)、水平转向(°/s)、俯仰(°/s)、横滚(°/s)。
-    expect(wrapper.findAll('.stats-row').length).toBe(36)
+    // 1.4.2 断言包含以下字段标签：船体(MJ)、护盾(MJ)、雷达范围(km)、武器爆发输出值(MW)、炮塔平均输出值(MW)、集装仓储(m3)、M级泊位数量、M级飞船容量、S级泊位数量、S级飞船容量、速度(m/s)、助推器助推速度(m/s)、巡航速度(m/s)、船员、单位、导弹、可投放设备、干扰弹、再充率(MW)、再充延迟(秒)、编组平均护盾容量、武器持续性输出值、固体仓储(m3)、液体仓储(m3)、冷凝态仓储(m3)、加速(m/s2)、助推加速度(m/s2)、助推时长(秒)、助推回充率(%/s)、巡航加速度(m/s2)、巡航加力时间(秒)、平移速度(m/s)、平移加速度(m/s2)、水平转向(°/s)、俯仰(°/s)、横滚(°/s)（期望 toHaveCount(35)）
+    expect(wrapper.findAll('.stats-row').length).toBe(35)
 
-    // 步骤 3：断言覆盖简略字段集合（18项）。
+    // 1.4.3 断言覆盖简略字段集合（18项）（期望 toBeGreaterThanOrEqual(18)）
     expect(wrapper.findAll('.stats-row').length).toBeGreaterThanOrEqual(18)
   })
 
   // 1.5 可计算字段真实值显示
   it('1.5 可计算字段真实值显示', async () => {
-    // 步骤 1：构造含已选引擎/护盾的飞船状态。
+    // 1.5.1 构造含已选引擎/护盾的飞船状态
     const wrapper = mount(ShipBuildView, {
       global: {
         plugins: [createPinia()],
@@ -289,16 +289,16 @@ const globalMocks = {
     // Setup: select a ship
     await selectShip(wrapper)
 
-    // 步骤 2：进入"详细"档位。
+    // 1.5.2 进入"详细"档位
     await wrapper.find('[data-testid="ship-build-stats-mode-detail"]').trigger('click')
 
-    // 步骤 3：断言船体、护盾、速度、助推速度、巡航速度、船员、集装箱仓储为非占位值（非 `--` 或 `—`）。
+    // 1.5.3 断言船体、护盾、速度、助推速度、巡航速度、船员、集装箱仓储为非占位值（非 `--` 或 `—`）（期望 not.toBe('--')）
     expect(wrapper.find('.stats-value').text()).not.toBe('--')
   })
 
   // 1.6 武器DPS真实值显示
   it('1.6 武器DPS真实值显示', async () => {
-    // 步骤 1：进入"详细"档位。
+    // 1.6.1 进入"详细"档位
     const wrapper = mount(ShipBuildView, {
       global: {
         plugins: [createPinia()],
@@ -309,13 +309,13 @@ const globalMocks = {
     // Setup: select a ship
     await selectShip(wrapper)
 
-    // 步骤 2：断言武器爆发输出值、武器持续性输出值、炮塔平均输出值为真实值（非 `--` 或 `—`）。
+    // 1.6.2 断言武器爆发输出值、武器持续性输出值、炮塔平均输出值为真实值（非 `--` 或 `—`）（期望 not.toBe('--')）
     expect(wrapper.find('.stats-value').text()).not.toBe('--')
   })
 
   // 1.7 高度限制回归
   it('1.7 高度限制回归', async () => {
-    // 步骤 1：渲染属性区与已选详情区。
+    // 1.7.1 渲染属性区与已选详情区
     const wrapper = mount(ShipBuildView, {
       global: {
         plugins: [createPinia()],
@@ -326,7 +326,7 @@ const globalMocks = {
     // Setup: select a ship
     await selectShip(wrapper)
 
-    // 步骤 2：断言中列属性面板容器不包含固定高度样式 `h-48`、`72px`、`max-h-[300px]` 。
+    // 1.7.2 断言中列属性面板容器不包含固定高度样式 `h-48`、`72px`、`max-h-[300px]`（期望 toBeFalsy()）
     expect(wrapper.find('[data-testid="ship-build-stats-panel"]').attributes('style') || '').toBeFalsy()
 
     // Check selection panel has no fixed height

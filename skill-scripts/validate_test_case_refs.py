@@ -455,7 +455,8 @@ def validate_test_file(file_path: Path, change_name: str) -> Tuple[bool, List[st
         for i, exp_step in enumerate(expected):
             # Find matching actual step by prefix
             act_tuple = None
-            for j, act_comment in enumerate(actual):
+            for j, act_item in enumerate(actual):
+                act_comment = act_item[0] if isinstance(act_item, tuple) else act_item
                 if step_matches(exp_step, act_comment):
                     act_tuple = actual[j]
                     break
