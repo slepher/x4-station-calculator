@@ -594,6 +594,9 @@ def validate_correspondence(
 
 
 def main():
+    import os
+    DEBUG = os.environ.get('DEBUG', '0') == '1'
+
     args = parse_args()
 
     change_name = args.change_name or args.change
@@ -610,57 +613,61 @@ def main():
 
     files = find_test_files(change_name, args.test_dir)
 
-    print(f"=== Test Case Correspondence Validation ===")
-    print(f"Change: {change_name}")
-    print(f"Test Tasks: {test_tasks_path}")
-    print(f"\nFound test files:")
-    for file_type, file_path in files.items():
-        print(f"  - {file_type}: {file_path}")
+    if DEBUG:
+        print(f"=== Test Case Correspondence Validation ===")
+        print(f"Change: {change_name}")
+        print(f"Test Tasks: {test_tasks_path}")
+        print(f"\nFound test files:")
+        for file_type, file_path in files.items():
+            print(f"  - {file_type}: {file_path}")
 
-    # Parse and display test_tasks.md items
-    content = test_tasks_path.read_text(encoding="utf-8")
-    tasks = parse_test_tasks(content)
+        # Parse and display test_tasks.md items
+        content = test_tasks_path.read_text(encoding="utf-8")
+        tasks = parse_test_tasks(content)
 
-    print(f"\nTest tasks from test_tasks.md:")
-    print(f"  Chapter 1 (单元测试): {len(tasks['chapter1'])} items")
-    for item in tasks['chapter1']:
-        print(f"    - {item}")
-    print(f"  Chapter 2 (状态): {len(tasks['chapter2_states'])} items")
-    for item in tasks['chapter2_states']:
-        print(f"    - 状态: {item}")
-    print(f"  Chapter 2 (切换): {len(tasks['chapter2_transitions'])} items")
-    for item in tasks['chapter2_transitions']:
-        print(f"    - 切换: {item}")
-    print(f"  Chapter 3 (E2E测试场景): {len(tasks['chapter3'])} items")
-    for item in tasks['chapter3']:
-        print(f"    - {item}")
-    print(f"  Chapter 4 (Bug测试): {len(tasks['chapter4_bugs'])} items")
-    for item in tasks['chapter4_bugs']:
-        print(f"    - {item}")
-    print(f"  Chapter 5 (失败原因及可能的推断): {len(tasks['chapter5_failures'])} items (无需验证，无对应测试文件)")
+        print(f"\nTest tasks from test_tasks.md:")
+        print(f"  Chapter 1 (单元测试): {len(tasks['chapter1'])} items")
+        for item in tasks['chapter1']:
+            print(f"    - {item}")
+        print(f"  Chapter 2 (状态): {len(tasks['chapter2_states'])} items")
+        for item in tasks['chapter2_states']:
+            print(f"    - 状态: {item}")
+        print(f"  Chapter 2 (切换): {len(tasks['chapter2_transitions'])} items")
+        for item in tasks['chapter2_transitions']:
+            print(f"    - 切换: {item}")
+        print(f"  Chapter 3 (E2E测试场景): {len(tasks['chapter3'])} items")
+        for item in tasks['chapter3']:
+            print(f"    - {item}")
+        print(f"  Chapter 4 (Bug测试): {len(tasks['chapter4_bugs'])} items")
+        for item in tasks['chapter4_bugs']:
+            print(f"    - {item}")
+        print(f"  Chapter 5 (失败原因及可能的推断): {len(tasks['chapter5_failures'])} items (无需验证，无对应测试文件)")
 
-    # Display test file cases
-    print(f"\nTest cases from files:")
-    for file_type, file_path in files.items():
-        cases = parse_test_file(file_path)
-        print(f"  {file_type} ({file_path.name}): {len(cases)} cases")
-        for case in cases:
-            print(f"    - {case}")
+        # Display test file cases
+        print(f"\nTest cases from files:")
+        for file_type, file_path in files.items():
+            cases = parse_test_file(file_path)
+            print(f"  {file_type} ({file_path.name}): {len(cases)} cases")
+            for case in cases:
+                print(f"    - {case}")
 
     is_valid, errors = validate_correspondence(change_name, args.test_dir, test_tasks_path, files)
 
     # Validate step comments in each test file
-    print(f"\n=== Step Comment Validation ===")
+    if DEBUG:
+        print(f"\n=== Step Comment Validation ===")
     for file_type, file_path in files.items():
         step_valid, step_errors = validate_test_file(file_path, change_name)
         if not step_valid:
             is_valid = False
             errors.extend(step_errors)
-            print(f"  {file_type}: ✗ FAILED")
-            for error in step_errors:
-                print(f"    - {error}")
+            if DEBUG:
+                print(f"  {file_type}: ✗ FAILED")
+                for error in step_errors:
+                    print(f"    - {error}")
         else:
-            print(f"  {file_type}: ✓ PASSED")
+            if DEBUG:
+                print(f"  {file_type}: ✓ PASSED")
 
     print(f"\n=== Validation Result ===")
     if is_valid:

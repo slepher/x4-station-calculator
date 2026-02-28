@@ -164,19 +164,32 @@ def validate_change(change_name: str, strict: bool) -> Tuple[bool, List[str], Li
 
 
 def main() -> None:
+    import os
+    DEBUG = os.environ.get('DEBUG', '0') == '1'
+
     args = parse_args()
     ok, errors, warnings = validate_change(args.change_name, args.strict)
 
-    print("=== Evidence Validation Report ===")
-    if warnings:
-        print("\nWarnings:")
-        for w in warnings:
-            print(f"  - {w}")
+    if DEBUG:
+        print("=== Evidence Validation Report ===")
+        if warnings:
+            print("\nWarnings:")
+            for w in warnings:
+                print(f"  - {w}")
+        if errors:
+            print("\nErrors:")
+            for e in errors:
+                print(f"  - {e}")
+
     if errors:
-        print("\nErrors:")
-        for e in errors:
-            print(f"  - {e}")
-        print("\n✗ FAIL - Evidence validation failed")
+        if DEBUG:
+            print("\n✗ FAIL - Evidence validation failed")
+        else:
+            print("=== Evidence Validation Report ===")
+            print("\nErrors:")
+            for e in errors:
+                print(f"  - {e}")
+            print("\n✗ FAIL - Evidence validation failed")
         sys.exit(1)
 
     print("\n✓ PASS - Evidence validation passed")

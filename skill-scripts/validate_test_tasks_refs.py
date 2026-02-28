@@ -2,6 +2,9 @@
 """
 Validate test_tasks.md structure and checklist quality.
 
+Environment:
+    DEBUG=1   Enable verbose debug output
+
 Validation rules (authoritative):
 1) Every x.x task in Chapter 1/2/3/4 must contain at least one step subtask:
    - [ ] 步骤 <n>: <description>
@@ -955,6 +958,9 @@ def validate_step_format(content: str) -> Tuple[bool, List[str]]:
 
 
 def main():
+    import os
+    DEBUG = os.environ.get('DEBUG', '0') == '1'
+
     args = parse_args()
 
     if not args.change_name and not args.file:
@@ -979,77 +985,78 @@ def main():
 
     states, transitions, chapter3_references, chapter4_references, bug_ids_ch4, task_markers, step_markers, subtask_markers = parse_test_tasks(content)
 
-    print(f"=== Validation Report ===")
-    print(f"States found in Chapter 2: {len(states)}")
-    for state_id in sorted(states.keys()):
-        print(f"  - 状态: {state_id}")
-    print(f"\nTransitions found in Chapter 2: {len(transitions)}")
-    for trans_id in sorted(transitions.keys()):
-        print(f"  - 切换: {trans_id}")
-    print(f"\nReferences found in Chapter 3: {len(chapter3_references)}")
-    for ref in sorted(chapter3_references):
-        print(f"  - {ref}")
-    print(f"\nReferences found in Chapter 4: {len(chapter4_references)}")
-    for ref in sorted(chapter4_references):
-        print(f"  - {ref}")
-    print(f"\nBug IDs in Chapter 4 (Bug 测试): {len(bug_ids_ch4)}")
-    for bug_id in sorted(bug_ids_ch4.keys()):
-        print(f"  - {bug_id}")
+    if DEBUG:
+        print(f"=== Validation Report ===")
+        print(f"States found in Chapter 2: {len(states)}")
+        for state_id in sorted(states.keys()):
+            print(f"  - 状态: {state_id}")
+        print(f"\nTransitions found in Chapter 2: {len(transitions)}")
+        for trans_id in sorted(transitions.keys()):
+            print(f"  - 切换: {trans_id}")
+        print(f"\nReferences found in Chapter 3: {len(chapter3_references)}")
+        for ref in sorted(chapter3_references):
+            print(f"  - {ref}")
+        print(f"\nReferences found in Chapter 4: {len(chapter4_references)}")
+        for ref in sorted(chapter4_references):
+            print(f"  - {ref}")
+        print(f"\nBug IDs in Chapter 4 (Bug 测试): {len(bug_ids_ch4)}")
+        for bug_id in sorted(bug_ids_ch4.keys()):
+            print(f"  - {bug_id}")
 
-    # Print task markers
-    chapter_names = {1: "单元测试", 2: "E2E标准状态与状态迁移", 3: "E2E测试场景", 4: "Bug测试", 5: "失败原因及可能的推断"}
-    print(f"\nTask Markers:")
-    for chapter_num, chapter_name in chapter_names.items():
-        if chapter_num in task_markers:
-            print(f"  Chapter {chapter_num} ({chapter_name}): {len(task_markers[chapter_num])} tasks")
-            for task_name, (has_marker, is_success, is_failure) in sorted(task_markers[chapter_num].items()):
-                if is_success:
-                    status = "[✓]"
-                elif is_failure:
-                    status = "[✗]"
-                else:
-                    status = "[ ]"
-                print(f"    - {status} {task_name}")
+        # Print task markers
+        chapter_names = {1: "单元测试", 2: "E2E标准状态与状态迁移", 3: "E2E测试场景", 4: "Bug测试", 5: "失败原因及可能的推断"}
+        print(f"\nTask Markers:")
+        for chapter_num, chapter_name in chapter_names.items():
+            if chapter_num in task_markers:
+                print(f"  Chapter {chapter_num} ({chapter_name}): {len(task_markers[chapter_num])} tasks")
+                for task_name, (has_marker, is_success, is_failure) in sorted(task_markers[chapter_num].items()):
+                    if is_success:
+                        status = "[✓]"
+                    elif is_failure:
+                        status = "[✗]"
+                    else:
+                        status = "[ ]"
+                    print(f"    - {status} {task_name}")
 
-    # Print step markers
-    print(f"\nStep Markers:")
-    steps_by_chapter = defaultdict(list)
-    for step in step_markers:
-        steps_by_chapter[step['chapter']].append(step)
-    for chapter_num, chapter_name in chapter_names.items():
-        if chapter_num in steps_by_chapter:
-            steps = sorted(steps_by_chapter[chapter_num], key=lambda x: x['line_num'])
-            print(f"  Chapter {chapter_num} ({chapter_name}): {len(steps)} steps")
-            for step in steps[:10]:  # Show first 10
-                if step['is_success']:
-                    status = "[✓]"
-                elif step['is_failure']:
-                    status = "[✗]"
-                else:
-                    status = "[ ]"
-                print(f"    - {status} {step['name']} (line {step['line_num']}, indent {step['indent']})")
-            if len(steps) > 10:
-                print(f"    ... and {len(steps) - 10} more")
+        # Print step markers
+        print(f"\nStep Markers:")
+        steps_by_chapter = defaultdict(list)
+        for step in step_markers:
+            steps_by_chapter[step['chapter']].append(step)
+        for chapter_num, chapter_name in chapter_names.items():
+            if chapter_num in steps_by_chapter:
+                steps = sorted(steps_by_chapter[chapter_num], key=lambda x: x['line_num'])
+                print(f"  Chapter {chapter_num} ({chapter_name}): {len(steps)} steps")
+                for step in steps[:10]:  # Show first 10
+                    if step['is_success']:
+                        status = "[✓]"
+                    elif step['is_failure']:
+                        status = "[✗]"
+                    else:
+                        status = "[ ]"
+                    print(f"    - {status} {step['name']} (line {step['line_num']}, indent {step['indent']})")
+                if len(steps) > 10:
+                    print(f"    ... and {len(steps) - 10} more")
 
-    # Print subtask markers
-    print(f"\nSubtask/Assertion Markers:")
-    subtasks_by_chapter = defaultdict(list)
-    for subtask in subtask_markers:
-        subtasks_by_chapter[subtask['chapter']].append(subtask)
-    for chapter_num, chapter_name in chapter_names.items():
-        if chapter_num in subtasks_by_chapter:
-            subtasks = sorted(subtasks_by_chapter[chapter_num], key=lambda x: x['line_num'])
-            print(f"  Chapter {chapter_num} ({chapter_name}): {len(subtasks)} subtasks")
-            for subtask in subtasks[:10]:  # Show first 10
-                if subtask['is_success']:
-                    status = "[✓]"
-                elif subtask['is_failure']:
-                    status = "[✗]"
-                else:
-                    status = "[ ]"
-                print(f"    - {status} {subtask['name']} (line {subtask['line_num']}, indent {subtask['indent']})")
-            if len(subtasks) > 10:
-                print(f"    ... and {len(subtasks) - 10} more")
+        # Print subtask markers
+        print(f"\nSubtask/Assertion Markers:")
+        subtasks_by_chapter = defaultdict(list)
+        for subtask in subtask_markers:
+            subtasks_by_chapter[subtask['chapter']].append(subtask)
+        for chapter_num, chapter_name in chapter_names.items():
+            if chapter_num in subtasks_by_chapter:
+                subtasks = sorted(subtasks_by_chapter[chapter_num], key=lambda x: x['line_num'])
+                print(f"  Chapter {chapter_num} ({chapter_name}): {len(subtasks)} subtasks")
+                for subtask in subtasks[:10]:  # Show first 10
+                    if subtask['is_success']:
+                        status = "[✓]"
+                    elif subtask['is_failure']:
+                        status = "[✗]"
+                    else:
+                        status = "[ ]"
+                    print(f"    - {status} {subtask['name']} (line {subtask['line_num']}, indent {subtask['indent']})")
+                if len(subtasks) > 10:
+                    print(f"    ... and {len(subtasks) - 10} more")
 
     is_valid, errors = validate_test_tasks(
         states, transitions, chapter3_references, chapter4_references, bug_ids_ch4, task_markers, step_markers, subtask_markers, content

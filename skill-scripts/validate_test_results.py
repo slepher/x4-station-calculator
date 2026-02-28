@@ -202,39 +202,41 @@ def validate_results(change_name: str, passed: int, failed: int, failure_ids: li
         print("ERROR: No tasks found in test_tasks.md")
         return False
 
-    print(f"\n{'='*50}")
-    print(f"Test Results Validation")
-    print(f"{'='*50}")
-    print(f"Change: {change_name}")
-    print(f"Format: [✓]=passed, [✗]=failed, [ ]=pending")
-    print(f"Reported: Passed={passed}, Failed={failed}")
-    print(f"Failed IDs: {failure_ids}")
-    if fail_steps:
-        print(f"Failed Steps: {fail_steps}")
-    if executed_ids:
-        print(f"Executed IDs: {executed_ids}")
+    if DEBUG:
+        print(f"\n{'='*50}")
+        print(f"Test Results Validation")
+        print(f"{'='*50}")
+        print(f"Change: {change_name}")
+        print(f"Format: [✓]=passed, [✗]=failed, [ ]=pending")
+        print(f"Reported: Passed={passed}, Failed={failed}")
+        print(f"Failed IDs: {failure_ids}")
+        if fail_steps:
+            print(f"Failed Steps: {fail_steps}")
+        if executed_ids:
+            print(f"Executed IDs: {executed_ids}")
 
     # Count tasks in each state
     passed_count = sum(1 for t in tasks.values() if t['checked'] is True)
     failed_count = sum(1 for t in tasks.values() if t['checked'] is False)
     pending_count = sum(1 for t in tasks.values() if t['checked'] is None)
 
-    print(f"\n{'='*50}")
-    print(f"test_tasks.md Current Status")
-    print(f"{'='*50}")
-    print(f"Total tasks: {len(tasks)}")
-    print(f"[✓] Passed: {passed_count}")
-    print(f"[✗] Failed: {failed_count}")
-    print(f"[ ] Pending: {pending_count}")
+    if DEBUG:
+        print(f"\n{'='*50}")
+        print(f"test_tasks.md Current Status")
+        print(f"{'='*50}")
+        print(f"Total tasks: {len(tasks)}")
+        print(f"[✓] Passed: {passed_count}")
+        print(f"[✗] Failed: {failed_count}")
+        print(f"[ ] Pending: {pending_count}")
 
-    # Chapter 5 status
-    print(f"\n{'='*50}")
-    print(f"Chapter 5 (失败原因及可能的推断) Status")
-    print(f"{'='*50}")
-    print(f"Lessons recorded: {len(chapter5_lessons)}")
-    for test_id, lesson_info in sorted(chapter5_lessons.items()):
-        status = "[✓]" if lesson_info['checked'] else "[ ]"
-        print(f"  {test_id}: {status} {lesson_info['lesson'][:60]}")
+        # Chapter 5 status
+        print(f"\n{'='*50}")
+        print(f"Chapter 5 (失败原因及可能的推断) Status")
+        print(f"{'='*50}")
+        print(f"Lessons recorded: {len(chapter5_lessons)}")
+        for test_id, lesson_info in sorted(chapter5_lessons.items()):
+            status = "[✓]" if lesson_info['checked'] else "[ ]"
+            print(f"  {test_id}: {status} {lesson_info['lesson'][:60]}")
 
     # Filter to executed tasks if specified
     if executed_ids:
@@ -245,9 +247,10 @@ def validate_results(change_name: str, passed: int, failed: int, failure_ids: li
     executed_passed = sum(1 for t in tasks_to_validate.values() if t['checked'] is True)
     executed_failed = sum(1 for t in tasks_to_validate.values() if t['checked'] is False)
 
-    print(f"\nTasks to validate: {len(tasks_to_validate)}")
-    print(f"  [✓] Passed: {executed_passed}")
-    print(f"  [✗] Failed: {executed_failed}")
+    if DEBUG:
+        print(f"\nTasks to validate: {len(tasks_to_validate)}")
+        print(f"  [✓] Passed: {executed_passed}")
+        print(f"  [✗] Failed: {executed_failed}")
 
     errors = []
 
@@ -260,15 +263,16 @@ def validate_results(change_name: str, passed: int, failed: int, failure_ids: li
                     errors.append(f"FAILED test {fail_id} should be marked [✗] in test_tasks.md")
 
         # Report status of executed tests
-        print(f"\n{'='*50}")
-        print(f"Executed Test Status")
-        print(f"{'='*50}")
-        for task_id in sorted(tasks_to_validate.keys(), key=lambda x: [int(y) for y in x.split('.')]):
-            symbol = tasks_to_validate[task_id]['symbol']
-            expected = "PASS" if task_id not in failure_ids else "FAIL"
-            actual_symbol = "[✓]" if tasks_to_validate[task_id]['checked'] is True else "[✗]" if tasks_to_validate[task_id]['checked'] is False else "[ ]"
-            match = "✓" if (task_id not in failure_ids) == (tasks_to_validate[task_id]['checked'] is True) else "✗"
-            print(f"  {match} {task_id}: {actual_symbol} (expected: {expected})")
+        if DEBUG:
+            print(f"\n{'='*50}")
+            print(f"Executed Test Status")
+            print(f"{'='*50}")
+            for task_id in sorted(tasks_to_validate.keys(), key=lambda x: [int(y) for y in x.split('.')]):
+                symbol = tasks_to_validate[task_id]['symbol']
+                expected = "PASS" if task_id not in failure_ids else "FAIL"
+                actual_symbol = "[✓]" if tasks_to_validate[task_id]['checked'] is True else "[✗]" if tasks_to_validate[task_id]['checked'] is False else "[ ]"
+                match = "✓" if (task_id not in failure_ids) == (tasks_to_validate[task_id]['checked'] is True) else "✗"
+                print(f"  {match} {task_id}: {actual_symbol} (expected: {expected})")
 
         # Additional validation: if we know total passed/failed, check global consistency
         if executed_passed + executed_failed == len(tasks):
@@ -302,9 +306,10 @@ def validate_results(change_name: str, passed: int, failed: int, failure_ids: li
                     errors.append(f"Failed test ID {fail_id} not found in test_tasks.md")
 
     # ===== Step-level and Sub-task validation =====
-    print(f"\n{'='*50}")
-    print(f"Step-level Validation (including Sub-tasks)")
-    print(f"{'='*50}")
+    if DEBUG:
+        print(f"\n{'='*50}")
+        print(f"Step-level Validation (including Sub-tasks)")
+        print(f"{'='*50}")
 
     # Check step-level marking for failed tests
     for i, fail_id in enumerate(failure_ids):
@@ -363,9 +368,10 @@ def validate_results(change_name: str, passed: int, failed: int, failure_ids: li
                         errors.append(f"Test {task_id}: passed test should have all sub-tasks [✓], but sub-task '{sub_task['text']}' is [{sub_task['symbol']}]")
 
     # ===== Chapter 5 Validation =====
-    print(f"\n{'='*50}")
-    print(f"Chapter 5 Validation (失败原因及可能的推断)")
-    print(f"{'='*50}")
+    if DEBUG:
+        print(f"\n{'='*50}")
+        print(f"Chapter 5 Validation (失败原因及可能的推断)")
+        print(f"{'='*50}")
 
     # Check if failed tests have corresponding lessons in Chapter 5
     if failure_ids:
@@ -385,7 +391,8 @@ def validate_results(change_name: str, passed: int, failed: int, failure_ids: li
         if missing_lessons:
             errors.append(f"Failed tests missing Chapter 5 lessons: {', '.join(missing_lessons)}")
         else:
-            print(f"✓ All {len(failure_ids)} failed tests have corresponding Chapter 5 lessons")
+            if DEBUG:
+                print(f"✓ All {len(failure_ids)} failed tests have corresponding Chapter 5 lessons")
 
         # Check that lessons have actual content (not empty)
         empty_lessons = []
@@ -397,25 +404,27 @@ def validate_results(change_name: str, passed: int, failed: int, failure_ids: li
         if empty_lessons:
             errors.append(f"Chapter 5 lessons with empty content: {', '.join(empty_lessons)}")
     else:
-        print("No failed tests to validate Chapter 5 lessons")
+        if DEBUG:
+            print("No failed tests to validate Chapter 5 lessons")
 
     # Show all task status
-    print(f"\n{'='*50}")
-    print(f"All Tasks Status")
-    print(f"{'='*50}")
-    for task_id in sorted(tasks.keys(), key=lambda x: [int(y) for y in x.split('.')]):
-        symbol = tasks[task_id]['symbol']
-        print(f"  {task_id}: [{symbol}] {tasks[task_id]['description'][:50]}")
+    if DEBUG:
+        print(f"\n{'='*50}")
+        print(f"All Tasks Status")
+        print(f"{'='*50}")
+        for task_id in sorted(tasks.keys(), key=lambda x: [int(y) for y in x.split('.')]):
+            symbol = tasks[task_id]['symbol']
+            print(f"  {task_id}: [{symbol}] {tasks[task_id]['description'][:50]}")
 
-    # Show step details
-    print(f"\n{'='*50}")
-    print(f"Step Details")
-    print(f"{'='*50}")
-    for task_id in sorted(tasks_with_steps.keys(), key=lambda x: [int(y) for y in x.split('.')]):
-        task_info = tasks_with_steps[task_id]
-        print(f"  {task_id} [{task_info['symbol']}]: {task_info['description'][:40]}")
-        for step in task_info['steps']:
-            print(f"    [{step['symbol']}] {step['text'][:60]}")
+        # Show step details
+        print(f"\n{'='*50}")
+        print(f"Step Details")
+        print(f"{'='*50}")
+        for task_id in sorted(tasks_with_steps.keys(), key=lambda x: [int(y) for y in x.split('.')]):
+            task_info = tasks_with_steps[task_id]
+            print(f"  {task_id} [{task_info['symbol']}]: {task_info['description'][:40]}")
+            for step in task_info['steps']:
+                print(f"    [{step['symbol']}] {step['text'][:60]}")
 
     print(f"\n{'='*50}")
     if errors:
@@ -428,6 +437,9 @@ def validate_results(change_name: str, passed: int, failed: int, failure_ids: li
         return True
 
 def main():
+    import os
+    DEBUG = os.environ.get('DEBUG', '0') == '1'
+
     args = parse_args()
 
     # Parse failure IDs
