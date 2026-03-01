@@ -286,6 +286,9 @@ test_tasks.md 使用三种状态标记测试执行结果：
    - `状态:` 任务至少包含 4 条子任务
    - `切换:` 任务至少包含 3 条子任务
    - 若达不到该粒度，优先将该行为内联到第三章 `Case` 步骤，不单独建模为状态/切换
+7. **禁止占位断言参数**
+   - 不允许在断言参数中使用占位词：`expectedValue` / `unexpectedValue` / `actualValue` / `someValue` / `anyValue`
+   - 断言必须使用可复现的业务值或真实数据标识（来自代码/数据文件）
 
 #### Sub-behaviors Format (Nested under Steps):
 - 子项目与步骤之间采用两格缩进，总共缩进为四格

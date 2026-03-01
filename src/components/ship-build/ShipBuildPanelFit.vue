@@ -1,52 +1,966 @@
 <script setup lang="ts">
-import ShipBuildFitCandidate from '@/components/ShipBuildFitCandidate.vue'
-import type { FitMode, FitConnectionRow, FitGroupRow } from '@/components/ship-build/fitTypes'
+import { computed, ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
+import type { FitMode, FitConnectionRow, FitGroupRow, FitEquipmentOption } from '@/components/ship-build/fitTypes'
+import { useX4I18n } from '@/utils/UseX4I18n'
+import { useShipBuildStore } from '@/store/useShipBuildStore'
+import type { EquipmentType, ShipEquipmentSize, X4Equipment, X4EquipmentType, X4SlotTag } from '@/types/x4'
+import slotTagsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/slot_tags.json'
+import equipmentsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
+import equipmentTypesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipment_types.json'
+
+type AggregatedGroup = {
+  key: string
+  size: string
+  label: string
+  slotTypeLabel: string
+  totalCount: number
+  tags: string[]
+  connectionKeys: string[]
+  options: FitEquipmentOption[]
+  groupRows: FitGroupRow[]
+}
+
+type SlotTarget = {
+  key: string
+  label: string
+  size: string
+  slotTypeLabel: string
+  count: number
+  totalCount: number
+  tags: string[]
+  options: FitEquipmentOption[]
+  connectionKeys: string[]
+}
+
+type PickerCandidateItem = {
+  id: string | null
+  name: string
+  mk: string | null
+  race: string | null
+  tags: string[]
+}
 
 const props = defineProps<{
-  mode: FitMode
-  canSwitchToGroup: boolean
-  conflictReason: string
-  connectionRows: FitConnectionRow[]
-  groupRows: FitGroupRow[]
-  selectedByConnection: Record<string, string | null>
+  wide?: boolean
 }>()
 
 const emit = defineEmits<{
-  'update:mode': [mode: FitMode]
-  'assign-connection': [payload: { connectionKey: string; equipmentId: string | null }]
-  'assign-group': [payload: { groupKey: string; equipmentId: string | null }]
+  'picker-open-change': [open: boolean]
 }>()
 
-const setFitMode = (mode: FitMode) => {
-  emit('update:mode', mode)
+const shipBuildStore = useShipBuildStore()
+const { selectedShip, blueprint, mockTagPatch } = storeToRefs(shipBuildStore)
+const { applyConnectionAssignment } = shipBuildStore
+
+const handlePickerOpenChange = (open: boolean) => {
+  emit('picker-open-change', open)
 }
 
-const applyConnectionAssignment = (payload: { connectionKey: string; equipmentId: string | null }) => {
-  emit('assign-connection', payload)
+const { t } = useI18n()
+const { translateSlotTag, translateEquipment, translateEquipmentType } = useX4I18n()
+const slotTags = slotTagsRaw as X4SlotTag[]
+const slotTagMap = new Map<string, X4SlotTag>(slotTags.map((tag) => [tag.id, tag]))
+const equipments = equipmentsRaw as X4Equipment[]
+const equipmentTypes = equipmentTypesRaw as X4EquipmentType[]
+const equipmentTypeMap = new Map<EquipmentType, X4EquipmentType>()
+equipmentTypes.forEach((type) => {
+  equipmentTypeMap.set(type.id, type)
+})
+
+const normalizeTagList = (tags: unknown): string[] => {
+  if (!Array.isArray(tags)) return []
+  return tags.filter((tag): tag is string => typeof tag === 'string')
 }
 
-const applyGroupAssignment = (payload: { groupKey: string; equipmentId: string | null }) => {
-  emit('assign-group', payload)
+const resolveSize = (
+  primary?: ShipEquipmentSize,
+  fallback?: ShipEquipmentSize
+): ShipEquipmentSize | null => primary ?? fallback ?? null
+
+const getEquipmentCandidates = (
+  slotType: EquipmentType,
+  size: ShipEquipmentSize,
+  connectionTags: string[]
+) => {
+  return equipments
+    .filter((equipment) => !equipment.noplayerblueprint)
+    .filter((equipment) => equipment.type === slotType && equipment.size === size)
+    .filter((equipment) => {
+      if (connectionTags.length === 0) return true
+      const equipmentTags = normalizeTagList(equipment.slotTags)
+      const connectionSet = new Set(connectionTags)
+      return equipmentTags.every((tag) => connectionSet.has(tag))
+    })
+    .map((equipment) => ({
+      id: equipment.id,
+      name: translateEquipment(equipment),
+      mk: equipment.mk || null,
+      race: equipment.race || null,
+      tags: normalizeTagList(equipment.slotTags)
+    }))
+    .sort((a, b) => a.id > b.id ? 1 : a.id < b.id ? -1 : 0)
 }
+
+const connectionRows = computed<FitConnectionRow[]>(() => {
+  if (!selectedShip.value) return []
+
+  const rows: FitConnectionRow[] = []
+  selectedShip.value.slots.forEach((slot, slotIndex) => {
+    slot.groups.forEach((group, groupIndex) => {
+      const baseKey = `${selectedShip.value!.id}::${slot.type}::${slotIndex}::${groupIndex}`
+      const patch = mockTagPatch.value
+      const patchItem = patch?.targetShipId === selectedShip.value!.id ? patch.connections[baseKey] : null
+      const connection = group.connection
+      const connectionSize = resolveSize(patchItem?.size, connection?.size)
+      if (!connectionSize) return
+      const sourceTags = patchItem?.tags || connection?.tags || []
+      const tags = normalizeTagList(sourceTags)
+      const typeDef = equipmentTypeMap.get(slot.type)
+
+      rows.push({
+        connectionKey: baseKey,
+        slotType: slot.type,
+        parentSlotType: slot.type,
+        parentConnectionSize: connectionSize,
+        parentConnectionTags: [...tags],
+        slotTypeLabel: typeDef ? translateEquipmentType(typeDef) : slot.type,
+        groupName: patchItem?.groupName || group.group,
+        size: connectionSize,
+        tags,
+        count: connection?.count || 0,
+        options: getEquipmentCandidates(slot.type, connectionSize, tags)
+      })
+
+      const shieldConnection = connection?.shield
+      const shieldKey = `${baseKey}::shield`
+      const shieldPatchItem = patch?.targetShipId === selectedShip.value!.id ? patch.connections[shieldKey] : null
+      const shieldDef = shieldConnection || group.connection?.shield
+      const shieldTags = shieldPatchItem
+        ? normalizeTagList(shieldPatchItem.tags)
+        : (shieldDef ? normalizeTagList(shieldDef.tags) : [])
+      const shieldSize = shieldPatchItem
+        ? resolveSize(shieldPatchItem.size, shieldDef?.size)
+        : resolveSize(undefined, shieldDef?.size)
+      if (!shieldSize) return
+      const shieldTypeDef = equipmentTypeMap.get('shield')
+      const shieldTypeLabel = shieldTypeDef ? translateEquipmentType(shieldTypeDef) : 'shield'
+      rows.push({
+        connectionKey: shieldKey,
+        slotType: 'shield',
+        parentSlotType: slot.type,
+        parentConnectionSize: connectionSize,
+        parentConnectionTags: [...tags],
+        slotTypeLabel: shieldTypeLabel,
+        groupName: shieldPatchItem?.groupName || group.group,
+        size: shieldSize,
+        tags: shieldTags,
+        count: shieldDef?.count || 0,
+        options: getEquipmentCandidates('shield', shieldSize, shieldTags)
+      })
+    })
+  })
+
+  return rows
+})
+
+const selectedByConnection = computed<Record<string, string | null>>(() => {
+  const result: Record<string, string | null> = {}
+  if (!blueprint.value || !selectedShip.value) return result
+
+  const ship = selectedShip.value
+  ship.slots.forEach((slot, slotIndex) => {
+    slot.groups.forEach((group, groupIndex) => {
+      const groupData = blueprint.value!.connections
+        .find(c => c.slot_type === slot.type)
+        ?.group.find(g => g.group === group.group)
+      const baseKey = `${ship.id}::${slot.type}::${slotIndex}::${groupIndex}`
+
+      if (groupData) {
+        result[baseKey] = groupData.equipment_id || null
+        if (groupData.shield) {
+          result[`${baseKey}::shield`] = groupData.shield.equipment_id || null
+        }
+      } else {
+        result[baseKey] = null
+        if (group.connection?.shield) {
+          result[`${baseKey}::shield`] = null
+        }
+      }
+    })
+  })
+
+  return result
+})
+
+const groupRows = computed<FitGroupRow[]>(() => {
+  const grouped = new Map<string, FitGroupRow>()
+  connectionRows.value.forEach((row) => {
+    const tagSignature = buildTagSignature(row.tags)
+    const parentTagSignature = buildTagSignature(row.parentConnectionTags || [])
+    const groupKey = row.slotType === 'shield'
+      ? `${row.parentSlotType}|shield|${row.parentConnectionSize}|${parentTagSignature}|${row.size}|${tagSignature}`
+      : `${row.parentSlotType}|${row.slotType}|${row.size}|${tagSignature}`
+    const existing = grouped.get(groupKey)
+    if (!existing) {
+      grouped.set(groupKey, {
+        groupKey,
+        slotType: row.slotType,
+        parentSlotType: row.parentSlotType,
+        parentConnectionSize: row.parentConnectionSize,
+        parentConnectionTags: [...row.parentConnectionTags],
+        slotTypeLabel: row.slotTypeLabel,
+        groupName: tagSignature || 'default-tags',
+        size: row.size,
+        totalCount: row.count,
+        tags: [...row.tags],
+        options: [...row.options],
+        connectionKeys: [row.connectionKey]
+      })
+      return
+    }
+
+    existing.totalCount += row.count
+    existing.connectionKeys.push(row.connectionKey)
+    const tagSet = new Set([...existing.tags, ...row.tags])
+    existing.tags = Array.from(tagSet)
+    const optionMap = new Map(existing.options.map((item) => [item.id, item]))
+    row.options.forEach((item) => optionMap.set(item.id, item))
+    existing.options = Array.from(optionMap.values()).sort((a, b) => a.id > b.id ? 1 : a.id < b.id ? -1 : 0)
+  })
+
+  return Array.from(grouped.values())
+})
+
+const fitMode = ref<FitMode>('connection')
+const activeSlotType = ref<'engine' | 'shield' | 'weapon' | 'turret' | 'thruster' | ''>('')
+const activeTabKey = ref('')
+const expandedSlotKey = ref<string | null>(null)
+const pendingExpandedConnectionKeys = ref<string[] | null>(null)
+const selectedRaceIds = ref<string[]>([])
+const selectedMkIds = ref<string[]>([])
+const selectedTagIds = ref<string[]>([])
+const currentPage = ref(1)
+const highlightedEquipmentId = ref<string | null>(null)
+
+const slotTypeDefs = [
+  { id: 'engine', label: 'E' },
+  { id: 'shield', label: 'S' },
+  { id: 'weapon', label: 'W' },
+  { id: 'turret', label: 'T' },
+  { id: 'thruster', label: 'R' }
+] as const
+
+const sourceRows = computed(() => (fitMode.value === 'connection' ? connectionRows.value : groupRows.value))
+
+const sizeRank = (size: string) => {
+  if (size === 'extralarge') return 0
+  if (size === 'large') return 1
+  if (size === 'medium') return 2
+  if (size === 'small') return 3
+  return 4
+}
+
+const buildTagSignature = (tags: string[]) => [...tags].sort().join('&')
+
+const sizeShort = (size: string) => {
+  if (size === 'small') return 'S'
+  if (size === 'medium') return 'M'
+  if (size === 'large') return 'L'
+  if (size === 'extralarge') return 'XL'
+  return size.toUpperCase()
+}
+
+const mergeOptions = (rows: Array<{ options: FitEquipmentOption[] }>) => {
+  const optionMap = new Map<string, FitEquipmentOption>()
+  rows.forEach((row) => row.options.forEach((opt) => optionMap.set(opt.id, opt)))
+  return Array.from(optionMap.values()).sort((a, b) => (a.id > b.id ? 1 : a.id < b.id ? -1 : 0))
+}
+
+const mergeTags = (rows: Array<{ tags: string[] }>) => {
+  const set = new Set<string>()
+  rows.forEach((row) => row.tags.forEach((tag) => set.add(tag)))
+  return Array.from(set)
+}
+
+const getSlotBucket = (row: FitConnectionRow | FitGroupRow) => {
+  if (row.slotType === 'shield') return row.parentSlotType
+  return row.slotType
+}
+
+const setMode = (mode: FitMode) => {
+  if (expandedSlotKey.value) {
+    const current = slotTargets.value.find((item) => item.key === expandedSlotKey.value)
+    pendingExpandedConnectionKeys.value = current ? [...current.connectionKeys] : null
+  }
+  fitMode.value = mode
+}
+
+const availableSlotTypes = computed(() => {
+  const set = new Set(sourceRows.value.map((row) => getSlotBucket(row as FitConnectionRow | FitGroupRow)))
+  return slotTypeDefs.filter((item) => set.has(item.id))
+})
+
+watch(
+  [availableSlotTypes, () => fitMode.value],
+  ([types]) => {
+    const firstType = types[0]?.id || ''
+    if (!types.some((item) => item.id === activeSlotType.value)) {
+      activeSlotType.value = firstType
+    }
+  },
+  { immediate: true }
+)
+
+const slotScopedRows = computed(() => {
+  return sourceRows.value.filter((row) => !activeSlotType.value || getSlotBucket(row as FitConnectionRow | FitGroupRow) === activeSlotType.value)
+})
+
+const primaryConnectionRows = computed(() => {
+  if (fitMode.value !== 'connection') return [] as FitConnectionRow[]
+  return (slotScopedRows.value as FitConnectionRow[]).filter((row) => row.slotType === activeSlotType.value)
+})
+
+const primaryGroupRows = computed(() => {
+  if (fitMode.value !== 'group') return [] as FitGroupRow[]
+  return (slotScopedRows.value as FitGroupRow[]).filter((row) => row.slotType === activeSlotType.value)
+})
+
+const aggregatedPrimaryGroups = computed<AggregatedGroup[]>(() => {
+  const bySemanticKey = new Map<string, FitGroupRow[]>()
+  primaryGroupRows.value.forEach((row) => {
+    const tagSignature = buildTagSignature(row.tags || [])
+    const semanticKey = `${row.size}|${tagSignature}`
+    const list = bySemanticKey.get(semanticKey) || []
+    list.push(row)
+    bySemanticKey.set(semanticKey, list)
+  })
+
+  const baseGroups = Array.from(bySemanticKey.entries())
+    .sort((a, b) => {
+      const aSize = a[1][0]?.size || 'unknown'
+      const bSize = b[1][0]?.size || 'unknown'
+      if (sizeRank(aSize) !== sizeRank(bSize)) return sizeRank(aSize) - sizeRank(bSize)
+      return a[0].localeCompare(b[0])
+    })
+    .map(([semanticKey, rows]) => ({
+      key: `agg-primary-${semanticKey}`,
+      size: rows[0]?.size || 'unknown',
+      label: '',
+      slotTypeLabel: rows[0]?.slotTypeLabel || '',
+      totalCount: rows.reduce((sum, row) => sum + row.totalCount, 0),
+      tags: mergeTags(rows),
+      connectionKeys: rows.flatMap((row) => row.connectionKeys),
+      options: mergeOptions(rows),
+      groupRows: rows
+    }))
+
+  const countBySize = new Map<string, number>()
+  baseGroups.forEach((group) => countBySize.set(group.size, (countBySize.get(group.size) || 0) + 1))
+  const seenBySize = new Map<string, number>()
+
+  return baseGroups.map((group) => {
+    const seen = (seenBySize.get(group.size) || 0) + 1
+    seenBySize.set(group.size, seen)
+    const total = countBySize.get(group.size) || 0
+    const suffix = total > 1 ? String(seen) : ''
+    return {
+      ...group,
+      label: `${sizeShort(group.size)}${suffix}`
+    }
+  })
+})
+
+const groupTabs = computed(() => {
+  if (fitMode.value === 'group') {
+    return aggregatedPrimaryGroups.value.map((group) => ({ key: group.key, label: group.label }))
+  }
+
+  const rows = primaryConnectionRows.value
+  const totalBySize = new Map<string, number>()
+  rows.forEach((row) => totalBySize.set(row.size, (totalBySize.get(row.size) || 0) + 1))
+
+  const seenBySize = new Map<string, number>()
+  return rows.map((row) => {
+    const seen = (seenBySize.get(row.size) || 0) + 1
+    seenBySize.set(row.size, seen)
+    const total = totalBySize.get(row.size) || 0
+    const suffix = total > 1 ? String(seen) : ''
+    return {
+      key: row.connectionKey,
+      label: `${sizeShort(row.size)}${suffix}`
+    }
+  })
+})
+
+watch(
+  [groupTabs, () => fitMode.value],
+  ([tabs]) => {
+    if (!tabs.some((tab) => tab.key === activeTabKey.value)) {
+      activeTabKey.value = tabs[0]?.key || ''
+    }
+  },
+  { immediate: true }
+)
+
+const activeConnectionRow = computed<FitConnectionRow | null>(() => {
+  if (fitMode.value !== 'connection') return null
+  return primaryConnectionRows.value.find((row) => row.connectionKey === activeTabKey.value) || null
+})
+
+const activePrimaryAggregate = computed<AggregatedGroup | null>(() => {
+  if (fitMode.value !== 'group') return null
+  return aggregatedPrimaryGroups.value.find((group) => group.key === activeTabKey.value) || null
+})
+
+const selectedForConnectionKeys = (keys: string[]) => {
+  const selected = keys
+    .map((key) => selectedByConnection.value[key])
+    .filter((item): item is string => Boolean(item))
+  if (selected.length === 0) return ''
+  const first = selected[0]
+  if (!first) return ''
+  return selected.every((item) => item === first) ? first : '__mixed__'
+}
+
+const connectionCountMap = computed(() => {
+  const map = new Map<string, number>()
+  connectionRows.value.forEach((row) => map.set(row.connectionKey, row.count))
+  return map
+})
+
+const selectedCountForConnectionKeys = (keys: string[]) => {
+  return keys.reduce((sum, key) => {
+    const selected = selectedByConnection.value[key]
+    if (!selected) return sum
+    return sum + (connectionCountMap.value.get(key) || 0)
+  }, 0)
+}
+
+const totalCountForConnectionKeys = (keys: string[]) => {
+  return keys.reduce((sum, key) => sum + (connectionCountMap.value.get(key) || 0), 0)
+}
+
+const relatedShieldConnectionRows = computed<FitConnectionRow[]>(() => {
+  if (fitMode.value !== 'connection' || !activeConnectionRow.value) return []
+  const targetShieldKey = `${activeConnectionRow.value.connectionKey}::shield`
+  return connectionRows.value.filter((row) => row.connectionKey === targetShieldKey)
+})
+
+const relatedShieldAggregates = computed<AggregatedGroup[]>(() => {
+  if (fitMode.value !== 'group' || !activePrimaryAggregate.value) return []
+
+  const shieldRows = activePrimaryAggregate.value.connectionKeys
+    .map((key) => connectionRows.value.find((row) => row.connectionKey === `${key}::shield`))
+    .filter((row): row is FitConnectionRow => Boolean(row))
+
+  const bySemanticKey = new Map<string, FitConnectionRow[]>()
+  shieldRows.forEach((row) => {
+    const parentTagSignature = buildTagSignature(row.parentConnectionTags || [])
+    const shieldTagSignature = buildTagSignature(row.tags || [])
+    const semanticKey = `${row.parentConnectionSize}|${parentTagSignature}|${row.size}|${shieldTagSignature}`
+    const list = bySemanticKey.get(semanticKey) || []
+    list.push(row)
+    bySemanticKey.set(semanticKey, list)
+  })
+
+  return Array.from(bySemanticKey.entries())
+    .sort((a, b) => {
+      const aSize = a[1][0]?.size || 'unknown'
+      const bSize = b[1][0]?.size || 'unknown'
+      return sizeRank(aSize) - sizeRank(bSize)
+    })
+    .map(([semanticKey, rows]) => ({
+      key: `agg-shield-${semanticKey}`,
+      size: rows[0]?.size || 'unknown',
+      label: sizeShort(rows[0]?.size || 'unknown'),
+      slotTypeLabel: rows[0]?.slotTypeLabel || '',
+      totalCount: rows.reduce((sum, row) => sum + row.count, 0),
+      tags: mergeTags(rows),
+      connectionKeys: rows.map((row) => row.connectionKey),
+      options: mergeOptions(rows),
+      groupRows: []
+    }))
+})
+
+const slotTargets = computed<SlotTarget[]>(() => {
+  if (fitMode.value === 'connection') {
+    const targets: SlotTarget[] = []
+    if (activeConnectionRow.value) {
+      targets.push({
+        key: activeConnectionRow.value.connectionKey,
+        label: `${sizeShort(activeConnectionRow.value.size)} ${activeConnectionRow.value.slotTypeLabel}`,
+        size: activeConnectionRow.value.size,
+        slotTypeLabel: activeConnectionRow.value.slotTypeLabel,
+        count: activeConnectionRow.value.count,
+        totalCount: activeConnectionRow.value.count,
+        tags: activeConnectionRow.value.tags,
+        options: activeConnectionRow.value.options,
+        connectionKeys: [activeConnectionRow.value.connectionKey]
+      })
+    }
+
+    relatedShieldConnectionRows.value.forEach((row) => {
+      targets.push({
+        key: row.connectionKey,
+        label: `${sizeShort(row.size)} ${row.slotTypeLabel}`,
+        size: row.size,
+        slotTypeLabel: row.slotTypeLabel,
+        count: row.count,
+        totalCount: row.count,
+        tags: row.tags,
+        options: row.options,
+        connectionKeys: [row.connectionKey]
+      })
+    })
+
+    return targets
+  }
+
+  const targets: SlotTarget[] = []
+  if (activePrimaryAggregate.value) {
+    targets.push({
+      key: activePrimaryAggregate.value.key,
+      label: `${sizeShort(activePrimaryAggregate.value.size)} ${activePrimaryAggregate.value.slotTypeLabel}`,
+      size: activePrimaryAggregate.value.size,
+      slotTypeLabel: activePrimaryAggregate.value.slotTypeLabel,
+      count: selectedCountForConnectionKeys(activePrimaryAggregate.value.connectionKeys),
+      totalCount: totalCountForConnectionKeys(activePrimaryAggregate.value.connectionKeys),
+      tags: activePrimaryAggregate.value.tags,
+      options: activePrimaryAggregate.value.options,
+      connectionKeys: activePrimaryAggregate.value.connectionKeys
+    })
+  }
+
+  relatedShieldAggregates.value.forEach((group) => {
+    targets.push({
+      key: group.key,
+      label: `${sizeShort(group.size)} ${group.slotTypeLabel}`,
+      size: group.size,
+      slotTypeLabel: group.slotTypeLabel,
+      count: selectedCountForConnectionKeys(group.connectionKeys),
+      totalCount: totalCountForConnectionKeys(group.connectionKeys),
+      tags: group.tags,
+      options: group.options,
+      connectionKeys: group.connectionKeys
+    })
+  })
+
+  return targets
+})
+
+const activeTarget = computed(() => slotTargets.value[0] || null)
+const visibleCompatibilityTags = computed<X4SlotTag[]>(() => {
+  const tags = activeTarget.value?.tags || []
+  const unique = new Set<string>()
+  const visible: X4SlotTag[] = []
+  tags.forEach((tag) => {
+    if (unique.has(tag)) return
+    const def = slotTagMap.get(tag)
+    if (!def) return
+    unique.add(tag)
+    visible.push(def)
+  })
+  return visible
+})
+const visibleCompatibilityTagLabels = computed(() => visibleCompatibilityTags.value.map((tag) => translateSlotTag(tag)))
+const compatibilitySlotLines = computed(() => slotTargets.value.map((item) => `${item.label} x${item.totalCount}`))
+
+const pickerTarget = computed(() => slotTargets.value.find((item) => item.key === expandedSlotKey.value) || null)
+const pickerInitialEquipmentId = computed<string | null>(() => {
+  if (!pickerTarget.value) return null
+  const selected = selectedForConnectionKeys(pickerTarget.value.connectionKeys)
+  if (!selected || selected === '__mixed__') return null
+  return selected
+})
+const pickerOptions = computed(() => pickerTarget.value?.options || [])
+const isPickerLayout = computed(() => Boolean(pickerTarget.value))
+
+const normalizeRace = (option: FitEquipmentOption) => option.race || 'gen'
+const normalizeMk = (option: FitEquipmentOption) => option.mk || ''
+const normalizeTags = (option: FitEquipmentOption) => option.tags || []
+const tagDefs = ['standard', 'advanced', 'xenon', 'mining', 'missile', 'highpower']
+
+const filterByRace = (candidates: FitEquipmentOption[], raceIds: string[]) => {
+  if (raceIds.length === 0) return candidates
+  return candidates.filter((item) => raceIds.includes(normalizeRace(item)))
+}
+const filterByMk = (candidates: FitEquipmentOption[], mkIds: string[]) => {
+  if (mkIds.length === 0) return candidates
+  return candidates.filter((item) => mkIds.includes(normalizeMk(item)))
+}
+const filterByTags = (candidates: FitEquipmentOption[], tagIds: string[]) => {
+  if (tagIds.length === 0) return candidates
+  return candidates.filter((item) => tagIds.every((tagId) => normalizeTags(item).includes(tagId)))
+}
+
+const availableRaceIds = computed(() => new Set(pickerOptions.value.map((item) => normalizeRace(item))))
+const availableMkIds = computed(() => new Set(pickerOptions.value.map((item) => normalizeMk(item)).filter(Boolean)))
+const availableTagIds = computed(() => new Set(pickerOptions.value.flatMap((item) => normalizeTags(item))))
+
+const raceCountMap = computed(() => {
+  const pool = filterByMk(filterByTags(pickerOptions.value, selectedTagIds.value), selectedMkIds.value)
+  const counts = new Map<string, number>()
+  pool.forEach((item) => {
+    const raceId = normalizeRace(item)
+    counts.set(raceId, (counts.get(raceId) || 0) + 1)
+  })
+  return counts
+})
+const mkCountMap = computed(() => {
+  const pool = filterByRace(filterByTags(pickerOptions.value, selectedTagIds.value), selectedRaceIds.value)
+  const counts = new Map<string, number>()
+  pool.forEach((item) => {
+    const mkId = normalizeMk(item)
+    if (!mkId) return
+    counts.set(mkId, (counts.get(mkId) || 0) + 1)
+  })
+  return counts
+})
+const tagCountMap = computed(() => {
+  const pool = filterByRace(filterByMk(pickerOptions.value, selectedMkIds.value), selectedRaceIds.value)
+  const counts = new Map<string, number>()
+  pool.forEach((item) => {
+    normalizeTags(item).forEach((tagId) => counts.set(tagId, (counts.get(tagId) || 0) + 1))
+  })
+  return counts
+})
+
+const raceTags = computed(() => Array.from(availableRaceIds.value)
+  .sort((a, b) => a.localeCompare(b))
+  .map((id) => ({ id, label: id.toUpperCase(), count: raceCountMap.value.get(id) || 0 })))
+const mkTags = computed(() => Array.from(availableMkIds.value)
+  .sort((a, b) => Number(a) - Number(b))
+  .map((id) => ({ id, label: `MK${id}`, count: mkCountMap.value.get(id) || 0 })))
+const featureTags = computed(() => tagDefs
+  .filter((id) => availableTagIds.value.has(id))
+  .map((id) => {
+    const def = slotTagMap.get(id)
+    return {
+      id,
+      label: def ? translateSlotTag(def) : id.toUpperCase(),
+      count: tagCountMap.value.get(id) || 0
+    }
+  }))
+
+const filteredCandidates = computed(() => {
+  const byRace = filterByRace(pickerOptions.value, selectedRaceIds.value)
+  const byMk = filterByMk(byRace, selectedMkIds.value)
+  return filterByTags(byMk, selectedTagIds.value)
+})
+const pageSize = 10
+const listWithEmptyOption = computed<PickerCandidateItem[]>(() => [
+  { id: null, name: t('ship_build.fit_empty_slot'), mk: null, race: null, tags: [] },
+  ...filteredCandidates.value
+])
+const totalPages = computed(() => {
+  const total = Math.ceil(listWithEmptyOption.value.length / pageSize)
+  return total > 0 ? total : 1
+})
+const pagedCandidates = computed(() => {
+  const start = (currentPage.value - 1) * pageSize
+  return listWithEmptyOption.value.slice(start, start + pageSize)
+})
+
+const toggleTag = (items: string[], setItems: (next: string[]) => void, id: string) => {
+  if (items.includes(id)) return setItems(items.filter((item) => item !== id))
+  return setItems([...items, id])
+}
+const toggleRace = (id: string) => {
+  toggleTag(selectedRaceIds.value, (next) => { selectedRaceIds.value = next }, id)
+  currentPage.value = 1
+}
+const toggleMk = (id: string) => {
+  toggleTag(selectedMkIds.value, (next) => { selectedMkIds.value = next }, id)
+  currentPage.value = 1
+}
+const toggleFeatureTag = (id: string) => {
+  toggleTag(selectedTagIds.value, (next) => { selectedTagIds.value = next }, id)
+  currentPage.value = 1
+}
+
+const selectedNameForTarget = (target: SlotTarget) => {
+  const selectedId = selectedForConnectionKeys(target.connectionKeys)
+  if (!selectedId) {
+    if (isSingleCandidate(target) && target.options[0]) return target.options[0].name
+    return t('ship_build.fit_empty_slot')
+  }
+  if (selectedId === '__mixed__') return t('ship_build.fit_mixed_selection')
+  return target.options.find((item) => item.id === selectedId)?.name || selectedId
+}
+const isMixedSelectionInGroup = (target: SlotTarget) => fitMode.value === 'group' && selectedForConnectionKeys(target.connectionKeys) === '__mixed__'
+
+const getCandidateCount = (target: SlotTarget) => target.options.length
+const isSingleCandidate = (target: SlotTarget) => getCandidateCount(target) === 1
+const isSingleCandidateSelected = (target: SlotTarget) => {
+  if (!isSingleCandidate(target)) return false
+  const selectedId = selectedForConnectionKeys(target.connectionKeys)
+  return selectedId !== '' && selectedId === target.options[0]?.id
+}
+
+const openPicker = (slotKey: string) => {
+  expandedSlotKey.value = slotKey
+  handlePickerOpenChange(true)
+}
+
+const closePicker = () => {
+  expandedSlotKey.value = null
+  handlePickerOpenChange(false)
+}
+
+const handleSlotClick = (target: SlotTarget) => {
+  if (isSingleCandidate(target)) {
+    const candidateId = target.options[0]?.id || null
+    const selectedId = selectedForConnectionKeys(target.connectionKeys)
+    const nextId = selectedId === candidateId ? null : candidateId
+    target.connectionKeys.forEach((connectionKey) => {
+      applyConnectionAssignment({ connectionKey, equipmentId: nextId })
+    })
+    return
+  }
+  openPicker(target.key)
+}
+
+const handleSlotTypeClick = (slotType: typeof activeSlotType.value) => {
+  activeSlotType.value = slotType
+  if (expandedSlotKey.value) closePicker()
+}
+
+const jumpToTab = (tabKey: string) => {
+  if (expandedSlotKey.value) {
+    const current = slotTargets.value.find((item) => item.key === expandedSlotKey.value)
+    pendingExpandedConnectionKeys.value = current ? [...current.connectionKeys] : null
+  }
+  activeTabKey.value = tabKey
+}
+
+const handlePickerConfirm = (equipmentId: string | null) => {
+  if (!pickerTarget.value) return
+  pickerTarget.value.connectionKeys.forEach((connectionKey) => {
+    applyConnectionAssignment({ connectionKey, equipmentId })
+  })
+  closePicker()
+}
+
+watch(pickerTarget, () => {
+  selectedRaceIds.value = []
+  selectedMkIds.value = []
+  selectedTagIds.value = []
+  currentPage.value = 1
+  highlightedEquipmentId.value = pickerInitialEquipmentId.value
+})
+
+watch(filteredCandidates, () => {
+  if (currentPage.value > totalPages.value) currentPage.value = 1
+})
+
+watch(slotTargets, () => {
+  if (pendingExpandedConnectionKeys.value && pendingExpandedConnectionKeys.value.length > 0) {
+    const anchor = new Set(pendingExpandedConnectionKeys.value)
+    const mapped = slotTargets.value.find((target) => target.connectionKeys.some((key) => anchor.has(key)))
+    expandedSlotKey.value = mapped?.key || slotTargets.value[0]?.key || null
+    pendingExpandedConnectionKeys.value = null
+  }
+
+  if (expandedSlotKey.value && !slotTargets.value.some((target) => target.key === expandedSlotKey.value)) {
+    expandedSlotKey.value = slotTargets.value[0]?.key || null
+    if (!expandedSlotKey.value) handlePickerOpenChange(false)
+  }
+})
 </script>
 
 <template>
-  <div class="col-span-12 lg:col-span-4 panel-card" data-testid="ship-build-panel-fit">
+  <div class="col-span-12 panel-card" :class="wide ? 'lg:col-span-8' : 'lg:col-span-4'" data-testid="ship-build-panel-fit">
     <div class="panel-header">
       <span>{{ $t('ship_build.panel_fit') }}</span>
     </div>
     <div class="fit-panel-content" data-testid="ship-build-fit-panel">
-      <ShipBuildFitCandidate
-        :mode="mode"
-        :can-switch-to-group="canSwitchToGroup"
-        :conflict-reason="conflictReason"
-        :connection-rows="connectionRows"
-        :group-rows="groupRows"
-        :selected-by-connection="selectedByConnection"
-        @update:mode="setFitMode"
-        @assign-connection="applyConnectionAssignment"
-        @assign-group="applyGroupAssignment"
-      />
+      <div class="arsenal-shell">
+        <aside class="left-rail">
+          <button
+            v-for="slotType in availableSlotTypes"
+            :key="slotType.id"
+            class="slot-type-btn"
+            :class="activeSlotType === slotType.id ? 'slot-type-btn-active' : ''"
+            @click="handleSlotTypeClick(slotType.id)"
+          >
+            {{ slotType.label }}
+          </button>
+        </aside>
+
+        <div class="arsenal-content">
+          <main class="arsenal-main">
+            <template v-if="isPickerLayout">
+              <section class="picker-grid-row picker-grid-row-compact">
+                <div class="picker-cell">
+                  <div class="mode-tabs">
+                    <button class="mode-tab mode-tab-tall" :class="fitMode === 'connection' ? 'active' : ''" @click="setMode('connection')">{{ t('ship_build.fit_mode_connection') }}</button>
+                    <button class="mode-tab mode-tab-tall" :class="fitMode === 'group' ? 'active' : ''" @click="setMode('group')">{{ t('ship_build.fit_mode_group') }}</button>
+                  </div>
+                </div>
+                <div class="picker-cell picker-right">
+                  <div class="picker-actions-inline">
+                    <button class="mode-tab mode-tab-tall mr-1" data-testid="picker-cancel" @click="closePicker">{{ t('ui.cancel') }}</button>
+                    <button class="mode-tab mode-tab-tall" data-testid="picker-confirm" @click="handlePickerConfirm(highlightedEquipmentId)">{{ t('ship_build.fit_picker_confirm') }}</button>
+                  </div>
+                </div>
+              </section>
+
+              <section class="picker-grid-row picker-grid-row-compact">
+                <div class="picker-cell">
+                  <div class="group-tabs picker-row-slot-tabs">
+                    <button
+                      v-for="tab in groupTabs"
+                      :key="tab.key"
+                      class="group-tab"
+                      :class="activeTabKey === tab.key ? 'group-tab-active' : ''"
+                      @click="jumpToTab(tab.key)"
+                    >
+                      {{ tab.label }}
+                    </button>
+                  </div>
+                </div>
+                <div class="picker-cell picker-right">
+                  <div v-if="totalPages > 1" class="pager">
+                    <button class="pager-btn" :disabled="currentPage === 1" @click="currentPage = currentPage - 1">&lt;</button>
+                    <button
+                      v-for="page in totalPages"
+                      :key="page"
+                      class="pager-btn"
+                      :class="currentPage === page ? 'pager-btn-active' : ''"
+                      :data-testid="`page-${page}`"
+                      @click="currentPage = page"
+                    >
+                      {{ page }}
+                    </button>
+                    <button class="pager-btn" :disabled="currentPage === totalPages" @click="currentPage = currentPage + 1">&gt;</button>
+                  </div>
+                </div>
+              </section>
+
+              <section class="picker-grid-row">
+                <div class="picker-cell">
+                  <div class="picker-row3-left">
+                    <section class="compatibility-box picker-compat-box">
+                      <div class="filter-block">
+                        <div class="filter-line">
+                          <span class="filter-group">RACE</span>
+                          <button v-for="tag in raceTags" :key="`race-${tag.id}`" class="filter-chip" :class="selectedRaceIds.includes(tag.id) ? 'filter-chip-active' : ''" :data-testid="`race-${tag.id}`" @click="toggleRace(tag.id)">
+                            {{ tag.label }} <span class="chip-count">{{ tag.count }}</span>
+                          </button>
+                        </div>
+                        <div class="filter-line">
+                          <span class="filter-group">MK</span>
+                          <button v-for="tag in mkTags" :key="`mk-${tag.id}`" class="filter-chip" :class="selectedMkIds.includes(tag.id) ? 'filter-chip-active' : ''" :data-testid="`mk-${tag.id}`" @click="toggleMk(tag.id)">
+                            {{ tag.label }} <span class="chip-count">{{ tag.count }}</span>
+                          </button>
+                        </div>
+                        <div class="filter-line">
+                          <span class="filter-group">TAG</span>
+                          <button v-for="tag in featureTags" :key="`tag-${tag.id}`" class="filter-chip" :class="selectedTagIds.includes(tag.id) ? 'filter-chip-active' : ''" :data-testid="`tag-${tag.id}`" @click="toggleFeatureTag(tag.id)">
+                            {{ tag.label }} <span class="chip-count">{{ tag.count }}</span>
+                          </button>
+                        </div>
+                      </div>
+                    </section>
+                    <section class="slot-wall picker-row3-slot-wall">
+                      <button
+                        v-for="target in slotTargets"
+                        :key="target.key"
+                        class="slot-row"
+                        :class="[
+                          isSingleCandidateSelected(target) ? 'slot-row-highlight' : '',
+                          expandedSlotKey === target.key ? 'slot-row-expanded' : ''
+                        ]"
+                        :data-testid="`slot-${target.key}`"
+                        @click="handleSlotClick(target)"
+                      >
+                        <div class="slot-row-main">
+                          <div class="slot-row-title">{{ target.label }}</div>
+                          <div class="slot-row-value" :class="isMixedSelectionInGroup(target) ? 'slot-row-value-mixed' : ''">{{ selectedNameForTarget(target) }}</div>
+                        </div>
+                        <div class="slot-row-side">
+                          <span class="slot-row-count">{{ target.count }}/{{ target.totalCount }}</span>
+                          <span class="slot-row-candidate">{{ getCandidateCount(target) }}</span>
+                        </div>
+                      </button>
+                      <div v-if="slotTargets.length === 0" class="empty-card">{{ t('ship_build.fit_no_equipment') }}</div>
+                    </section>
+                  </div>
+                </div>
+                <div class="picker-cell picker-right">
+                  <div class="candidate-list picker-candidate-list" data-testid="equipment-picker">
+                    <button
+                      v-for="item in pagedCandidates"
+                      :key="item.id || '__empty__'"
+                      class="candidate-item"
+                      :class="highlightedEquipmentId === item.id ? 'candidate-item-active' : ''"
+                      :data-testid="`candidate-${item.id || 'empty'}`"
+                      @click="highlightedEquipmentId = item.id"
+                    >
+                      <div class="candidate-name">{{ item.name }}</div>
+                      <div class="candidate-meta">{{ item.race || 'GEN' }} · {{ item.mk ? `MK${item.mk}` : '-' }}</div>
+                    </button>
+                  </div>
+                </div>
+              </section>
+            </template>
+
+            <template v-else>
+              <div class="toolbar-row">
+                <div class="mode-tabs">
+                  <button class="mode-tab" :class="fitMode === 'connection' ? 'active' : ''" @click="setMode('connection')">{{ t('ship_build.fit_mode_connection') }}</button>
+                  <button class="mode-tab" :class="fitMode === 'group' ? 'active' : ''" @click="setMode('group')">{{ t('ship_build.fit_mode_group') }}</button>
+                </div>
+              </div>
+
+              <div class="group-tabs">
+                <button
+                  v-for="tab in groupTabs"
+                  :key="tab.key"
+                  class="group-tab"
+                  :class="activeTabKey === tab.key ? 'group-tab-active' : ''"
+                  @click="jumpToTab(tab.key)"
+                >
+                  {{ tab.label }}
+                </button>
+              </div>
+
+              <section v-if="visibleCompatibilityTags.length > 0" class="compatibility-box">
+                <div class="compatibility-title">{{ t('ship_build.fit_compatibility') }}:</div>
+                <div class="compatibility-line tags">{{ visibleCompatibilityTagLabels.join(' / ') }}</div>
+                <div v-for="line in compatibilitySlotLines" :key="line" class="compatibility-line">{{ line }}</div>
+              </section>
+
+              <section class="slot-wall">
+                <button
+                  v-for="target in slotTargets"
+                  :key="target.key"
+                  class="slot-row"
+                  :class="[
+                    isSingleCandidateSelected(target) ? 'slot-row-highlight' : '',
+                    expandedSlotKey === target.key ? 'slot-row-expanded' : ''
+                  ]"
+                  :data-testid="`slot-${target.key}`"
+                  @click="handleSlotClick(target)"
+                >
+                  <div class="slot-row-main">
+                    <div class="slot-row-title">{{ target.label }}</div>
+                    <div class="slot-row-value" :class="isMixedSelectionInGroup(target) ? 'slot-row-value-mixed' : ''">{{ selectedNameForTarget(target) }}</div>
+                  </div>
+                  <div class="slot-row-side">
+                    <span class="slot-row-count">{{ target.count }}/{{ target.totalCount }}</span>
+                    <span class="slot-row-candidate">{{ getCandidateCount(target) }}</span>
+                  </div>
+                </button>
+
+                <div v-if="slotTargets.length === 0" class="empty-card">{{ t('ship_build.fit_no_equipment') }}</div>
+              </section>
+            </template>
+          </main>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -62,5 +976,71 @@ const applyGroupAssignment = (payload: { groupKey: string; equipmentId: string |
 
 .fit-panel-content {
   @apply p-4;
+}
+
+.arsenal-shell { @apply rounded-lg border border-sky-700/40 bg-[#032042] p-2 flex gap-2; }
+.left-rail { @apply w-9 rounded bg-[#00152f] border border-sky-900/70 flex flex-col items-center gap-2 py-2; }
+.left-rail.locked { @apply opacity-60; }
+.slot-type-btn { @apply w-6 h-6 rounded-full border border-slate-500/70 bg-slate-800/80 text-[10px] font-bold text-slate-200; }
+.slot-type-btn-active { @apply border-cyan-300 bg-[#2a86dd] text-white; }
+.arsenal-content { @apply flex-1 min-w-0; }
+.arsenal-main { @apply min-w-0; }
+.toolbar-row { @apply flex items-center justify-between gap-2; }
+.mode-tabs { @apply inline-flex items-center gap-1; }
+.mode-tab { @apply px-2.5 py-1 text-xs font-semibold text-slate-200 bg-[#0d315f] border border-sky-500/60 rounded; }
+.mode-tab.active { @apply bg-[#1f73c6] text-white; }
+.mode-tab:disabled { @apply opacity-40 cursor-not-allowed; }
+.mode-tab-tall { @apply h-[25.6px] px-2 flex items-center; }
+.group-tabs { @apply flex items-center gap-1 mt-2; }
+.group-tab { @apply px-2.5 py-0.5 text-[11px] border border-sky-500/60 rounded bg-[#07264a] text-slate-200; }
+.group-tab-active { @apply bg-[#2a86dd] text-white; }
+.compatibility-box { @apply mt-2 rounded border border-sky-700/60 bg-[#04254a] px-2 py-1.5; }
+.compatibility-title { @apply text-xs text-slate-100 font-semibold mb-0.5; }
+.compatibility-line { @apply text-[11px] text-slate-200; }
+.compatibility-line.tags { @apply text-sky-200; }
+.slot-wall { @apply min-w-0 mt-2 grid gap-1.5; }
+.slot-row { @apply rounded border border-sky-700 bg-[#0a3c73] px-2 py-2 flex items-center justify-between text-left; }
+.slot-row-highlight { @apply border-emerald-300 ring-1 ring-emerald-400; }
+.slot-row-expanded { @apply border-cyan-300 ring-1 ring-cyan-400; }
+.slot-row-main { @apply min-w-0; }
+.slot-row-title { @apply text-xs text-slate-100 font-semibold; }
+.slot-row-value { @apply text-[11px] text-slate-300 mt-0.5 truncate; }
+.slot-row-value-mixed { @apply text-amber-300 font-semibold; }
+.slot-row-side { @apply flex items-center gap-2 ml-2; }
+.slot-row-count { @apply text-[10px] text-emerald-300; }
+.slot-row-candidate { @apply rounded border border-sky-500/70 px-1.5 py-0.5 text-[10px] text-slate-200; }
+.empty-card { @apply rounded border border-dashed border-sky-700 p-3 text-xs text-slate-300 text-center; }
+
+.picker-grid-row { @apply grid grid-cols-[1fr_1fr] gap-2 mt-2; }
+.picker-cell { @apply min-h-20; }
+.picker-right { @apply flex items-start justify-end; }
+.picker-row3-left { @apply flex flex-col gap-2; }
+.picker-grid-row-compact { @apply h-[25.6px] items-center; }
+.picker-grid-row-compact .picker-cell { @apply min-h-0 h-[25.6px] flex items-center; }
+.picker-actions-inline { @apply inline-flex items-center gap-1.5 justify-end; }
+.picker-row-slot-tabs { @apply mt-0 h-[25.6px] items-center; }
+.pager { @apply inline-flex items-center gap-1; }
+.pager-btn { @apply h-[25.6px] rounded border border-sky-600 px-1.5 py-0 text-[10px] text-slate-200 inline-flex items-center; }
+.pager-btn-active { @apply border-emerald-300 text-emerald-100; }
+.pager-btn:disabled { @apply opacity-40 cursor-not-allowed; }
+.picker-compat-box { @apply mt-0; }
+.picker-row3-slot-wall { @apply mt-0; }
+.filter-block { @apply mt-2 flex flex-col gap-2; }
+.filter-line { @apply flex flex-wrap items-center gap-1.5; }
+.filter-group { @apply text-[10px] uppercase text-slate-300 font-semibold min-w-8; }
+.filter-chip { @apply rounded border border-slate-600 px-2 py-1 text-[10px] text-slate-200 bg-slate-900/50; }
+.filter-chip-active { @apply border-emerald-300 bg-emerald-500/20 text-emerald-100; }
+.chip-count { @apply text-[10px] text-slate-300 ml-1; }
+.picker-candidate-list { @apply mt-0 w-full; }
+.candidate-list { @apply grid grid-cols-1 gap-1.5; }
+.candidate-item { @apply rounded border border-sky-700 bg-[#0a3c73] px-2 py-1.5 text-left; }
+.candidate-item-active { @apply border-emerald-300 ring-1 ring-emerald-400; }
+.candidate-name { @apply text-xs text-slate-100; }
+.candidate-meta { @apply text-[10px] text-slate-300 mt-0.5; }
+
+@media (max-width: 1023px) {
+  .picker-grid-row { @apply grid-cols-1; }
+  .picker-right { @apply justify-start; }
+  .picker-row3-left { @apply h-auto; }
 }
 </style>
