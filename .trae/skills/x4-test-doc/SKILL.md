@@ -49,7 +49,11 @@ Update `test_tasks.md` and `ui_knowledge.md` based on discussion conclusions or 
 3. Ensure localization matches user language.
 4. Enforce cross-file consistency between test artifacts.
 
-## Execution Baseline (MANDATORY)
+## Mandatory Requirements
+
+### Chapter A: Agent-Only Mandatory
+
+#### A.1 Execution Baseline (MANDATORY)
 
 1. 建模策略
    - 先算候选再写文档
@@ -59,16 +63,12 @@ Update `test_tasks.md` and `ui_knowledge.md` based on discussion conclusions or 
 3. 产出质量标准
    - 用词具体、可执行、可复现
    - cross-file 同步（`test_tasks.md` 与 `ui_knowledge.md` 同步）
-4. 操作流程
-   - 写文档 -> 跑脚本 -> 修复 -> 再跑
-5. 失败处理优先级
+4. 失败处理优先级
    - 先修结构/规则类失败
    - 再修证据类失败
    - 最后修表达类失败
 
-## Project Standards (MANDATORY)
-
-### 1. UI Knowledge Baseline (MANDATORY)
+#### A.2 UI Knowledge Baseline (MANDATORY)
 
 For every `/x4:test-doc` run, `openspec/changes/<change-name>/ui_knowledge.md` is a required artifact:
 
@@ -76,7 +76,7 @@ For every `/x4:test-doc` run, `openspec/changes/<change-name>/ui_knowledge.md` i
 - If missing, create it in the same documentation pass.
 - MUST keep it synchronized with `test_tasks.md` whenever test-relevant semantics change.
 
-### 1.1 Fixture-to-UI Knowledge Sync (MANDATORY)
+#### A.3 Fixture-to-UI Knowledge Sync (MANDATORY)
 
 When `/x4:test-doc` updates test-related docs, you MUST sync fixture-backed product/module data into `openspec/changes/<change-name>/ui_knowledge.md`:
 
@@ -93,11 +93,32 @@ When `/x4:test-doc` updates test-related docs, you MUST sync fixture-backed prod
 - Consistency rule:
   - Keep naming in `test_tasks.md` and `ui_knowledge.md` aligned with fixture ids
 
-### 2. test_tasks.md Format Contract (MANDATORY)
+#### A.4 Cross-File Sync Rules (MANDATORY)
+
+When `test_tasks.md` changes:
+- Sync relevant test semantics in `ui_knowledge.md` in the same pass.
+- Keep ids/names consistent across the two files.
+- Keep implementation-level locator/probe details in `ui_knowledge.md`, not in task descriptions.
+
+#### A.5 Quality Rules (MANDATORY)
+
+- Avoid vague placeholders in operation/assertion descriptions.
+- In Chapter 2 subtasks, avoid placeholder wording (e.g., `TODO`, `待补充`) as an agent writing-quality requirement.
+- Use concrete, reproducible identifiers from code/assets/fixtures.
+- Keep wording executable and reviewable.
+
+### Chapter B: Agent+Verify Mandatory
+
+#### B.1 Execution Flow With Verify (MANDATORY)
+
+- 操作流程固定：写文档 -> 跑脚本 -> 修复 -> 再跑。
+- `x4-test-doc` 输出必须可被 `validate_test_tasks_refs.py` 校验。
+
+#### B.2 test_tasks.md Format Contract (MANDATORY)
 
 `test_tasks.md` MUST follow this structure and numbering model.
 
-#### 2.1 Four-Chapter Structure (MANDATORY)
+##### B.2.1 Four-Chapter Structure (MANDATORY)
 
 The document MUST include exactly 4 chapters, in order:
 
@@ -111,7 +132,7 @@ Rules:
 - Chapter content can be empty (no forced minimum items per chapter).
 - Do NOT create chapter 5.
 
-#### 2.2 Task Tree Structure (MANDATORY)
+##### B.2.2 Task Tree Structure (MANDATORY)
 
 Only checklist task-tree structure is allowed in chapters 1..4:
 
@@ -124,16 +145,17 @@ Only checklist task-tree structure is allowed in chapters 1..4:
 
 Indent levels are fixed to 0 / 2 / 4 spaces.
 
-#### 2.3 Numbering Rules (MANDATORY)
+##### B.2.3 Numbering Rules (MANDATORY)
 
 - Top-level tasks use 2-level numbering: `x.x`
 - Subtasks use 3-level numbering: `x.x.x`
 - Third-level children, when used, must use 4-level numbering: `x.x.x.n`
 - Subtasks under the same parent MUST start from `.1` and increment continuously.
 - Third-level child numbering under the same parent subtask MUST start from `.1` and increment continuously.
-- Top-level checkbox state in `test_tasks.md` is `[ ]` when produced by `/x4:test-doc`.
+- Top-level checkbox state in `test_tasks.md` MUST be `[ ]` when produced by `/x4:test-doc`.
+- Validator compatibility note: historical docs MAY contain other checkbox states, but this does not change the output requirement above.
 
-#### 2.4 Chapter-Specific Top-Level Task Types (MANDATORY)
+##### B.2.4 Chapter-Specific Top-Level Task Types (MANDATORY)
 
 - Chapter 1: `- [ ] 1.x <description>`
 - Chapter 2: only
@@ -144,7 +166,7 @@ Indent levels are fixed to 0 / 2 / 4 spaces.
 - Chapter 4: only
   - `- [ ] 4.x BUG-<number>: <bug-description>`
 
-#### 2.5 Required/Forbidden Formats (MANDATORY)
+##### B.2.5 Required/Forbidden Formats (MANDATORY)
 
 Required:
 - Use numbered subtasks (`x.x.x`) under each top-level task.
@@ -156,12 +178,11 @@ Required:
 - UI existence/visibility expectations are descriptive examples only; the unified marker remains `#期望: [...]`.
 
 Forbidden:
-- `- [ ] 步骤 <n>: ...` (deprecated old format)
 - Markdown sub-chapters for test items (e.g., `### 2.1`, `### BUG-001 ...`)
 - Unnumbered top-level task lines
 - Top-level `x.x.x` numbering
 
-#### 2.6 Top-Level Last-Subtask Expectation Rule (MANDATORY)
+##### B.2.6 Top-Level Last-Subtask Expectation Rule (MANDATORY)
 
 Applies to all top-level tasks (`x.x`) in Chapter 1/2/3/4:
 
@@ -169,12 +190,12 @@ Applies to all top-level tasks (`x.x`) in Chapter 1/2/3/4:
 - If the last subtask itself already contains expectation semantics, it is valid.
 - If the last subtask itself does NOT contain expectation semantics, then ALL third-level child items under that last subtask MUST contain expectation semantics.
 
-#### 2.7 Chapter 2-4 Task Description Semantics (MANDATORY)
+##### B.2.7 Chapter 2-4 Task Description Semantics (MANDATORY)
 
 - Chapter 2 top-level descriptions MUST be canonical state/transition declarations only:
-  - `状态: <state-id>` uses stable, reusable state identifiers (no prose sentence as id).
+  - `状态: <state-id>` uses canonical state declaration syntax.
   - `切换: <from-state> -> <to-state>` must be directional and keep `from/to` ids consistent with state declarations.
-- Chapter 2 subtasks MUST describe verifiable preconditions/actions/assertions tied to that state/transition, and MUST avoid generic placeholders.
+- Chapter 2 subtasks MUST describe verifiable preconditions/actions/assertions tied to that state/transition.
 
 - Chapter 3 top-level descriptions MUST be `Case: <scenario-name>`:
   - `<scenario-name>` MUST be concise and uniquely distinguishable within Chapter 3.
@@ -182,33 +203,25 @@ Applies to all top-level tasks (`x.x`) in Chapter 1/2/3/4:
 
 - Chapter 4 top-level descriptions MUST be `BUG-<number>: <bug-description>`:
   - `<bug-description>` MUST state observable failure behavior, not root-cause speculation.
-  - Bug subtasks MUST include reproducible steps and expectation assertions using the same `#期望: [...]` convention.
+  - Bug subtasks MUST include:
+    - at least one reproducible step item (without `#期望`);
+    - at least one `修复前` assertion item (with `#期望: [...]`);
+    - at least one `修复后` assertion item (with `#期望: [...]`).
+  - Numbering special case (MANDATORY): `修复前` assertion and `修复后` assertion MUST use the same task number (same step id pair).
+  - In Chapter 4, this is the only allowed same-number duplication; other numbering must still follow contiguous increment rules.
 
-### 3. Chapter 2 State/Transition Reference Integrity (MANDATORY)
+#### B.3 Chapter 2 State/Transition Reference Integrity (MANDATORY)
 
 - Every Chapter 2 state/transition item must be connected to Chapter 3 or Chapter 4 usage path.
 - Write references in checklist subtask lines under cases/bug tasks with explicit `状态:` / `切换:` wording.
 - After updating `test_tasks.md`, run validator and ensure no isolated Chapter 2 items remain.
 
-### 4. Cross-File Sync Rules (MANDATORY)
-
-When `test_tasks.md` changes:
-- Sync relevant test semantics in `ui_knowledge.md` in the same pass.
-- Keep ids/names consistent across the two files.
-- Keep implementation-level locator/probe details in `ui_knowledge.md`, not in task descriptions.
-
-### 5. Quality Rules (MANDATORY)
-
-- Avoid vague placeholders in operation/assertion descriptions.
-- Use concrete, reproducible identifiers from code/assets/fixtures.
-- Keep wording executable and reviewable.
-
-## Validation Workflow (MANDATORY)
+#### B.4 Validation Workflow (MANDATORY)
 
 1. Write/update docs per this skill.
 2. Run:
    ```bash
-   python3 skill-scripts/validate_test_tasks_refs.py <change-name>
+   python3 skill-scripts/validate_test_tasks_refs.py <change-name> --json
    ```
 3. Fix all failures and rerun until pass.
 4. Perform final agent check for cross-file consistency (`test_tasks.md` <-> `ui_knowledge.md`).

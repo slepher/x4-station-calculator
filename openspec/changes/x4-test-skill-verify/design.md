@@ -1,60 +1,63 @@
 ## Context
 
-本 change 的目标不是实现业务功能，而是把 `x4-test-doc` 文档格式从“历史混合口径”收敛为“单一契约口径”，以便后续脚本调试有稳定输入。
-
-当前痛点：
-- 文档中同时存在旧步骤格式（`步骤 n`）与新编号格式（`x.x.x`）。
-- Bug 章节既有标题式写法（`### BUG-001`）又有任务树写法。
-- 是否需要第 5 章在不同文档版本中不一致。
-- 脚本稳定性不足时，文档流程常被校验 gate 阻断。
+本 change 仅聚焦验证脚本，并拆分为两条能力线：
+- test-doc verify（文档结构/语义）
+- test-impl verify（文档到测试实现映射）
 
 ## Decisions
 
-1. **结构决策**
-   - `test_tasks.md` 固定四章（1~4），不再要求第 5 章。
-   - 四章必须存在，允许空章。
+1. 验证边界
+- `validate_test_tasks_refs.py` 只处理 `test_tasks.md` 合法性。
+- `validate_test_case_refs.py` 只处理 `test_tasks.md` 与 `spec.ts` 映射一致性。
 
-2. **编号树决策**
-   - 顶层任务统一 `x.x`。
-   - 子任务统一 `x.x.x`。
-   - 子任务同父级连续递增。
+2. test-impl verify 核心模型
+- 顶层编号映射到 case 名标号。
+- 二/三级编号映射到 case 注释标号。
+- 以“标号区间”校验代码内容与断言完整性。
+- 对 `#期望: [...]` 做值级断言匹配。
 
-3. **Bug 章节决策**
-   - 顶层仅接受 `- [ ] 4.x BUG-<number>: <description>`。
-   - 禁止 `### BUG-...` 作为测试项主体。
+3. Chapter 4 专项模型
+- 采用 bug 与 bugfix 双文件映射。
+- 修复前/修复后期望分别归属不同文件通道。
+- 对“修复后已勾选”场景支持根任务不强制映射 bug 文件。
 
-4. **层级决策**
-   - 允许第三级 checklist 子项，用于子行为/子断言。
-   - 第三级若出现，必须使用 `x.x.x.n` 编号并在同父级下连续递增。
-   - 缩进固定为 0/2/4。
-   - 所有一级任务（`x.x`）的最后子任务必须满足期望规则：
-     - 子任务本身包含“期望”，或
-     - 子任务本身不含“期望”时，其所有第三级子项全部包含“期望”。
+## Test Strategy
 
-5. **阶段策略决策**
-   - 本次 `/x4:ff` 不执行脚本校验 gate。
-   - 待脚本 debug 稳定后，再恢复校验门禁。
-
-6. **期望标注决策**
-   - 具体值期望（数值/确定字符串）统一使用 `#期望: [...]`。
-   - UI 存在性/可见性期望仅作为描述示例，规范仍统一使用 `#期望: [...]`。
-
-## Consistency Contract
-
-- `request.md` 记录需求与裁决口径。
-- `spec.md` 作为可审查行为契约。
-- `tasks.md` 跟踪推进项。
-- `test_tasks.md` 提供可执行检查清单。
-- `ui_knowledge.md` 提供规则到文档写作动作的映射说明。
+1. test-doc verify：维持现有 `tests/skills/data/tasks` 覆盖。
+2. test-impl verify：在 `tests/skills/data/impls` 维护样例集（`test_tasks-*.md` + 四类 spec：`test-unit-*`、`test-e2e-*`、`test-bug-*`、`test-bug-fix-*`），并在 `tests/skills/unit` 编写真正执行校验的单测。
+3. 命名统一两位 `N`，保持稳定排序与可扩展性。
 
 ## Risks
 
-1. 脚本未同步到新契约前，可能对新格式误报。
-2. 历史 change 文档仍有旧格式，迁移期会出现“双轨样式”。
-3. 跳过 gate 会降低自动化兜底，需要人工审查补位。
+1. 两条 verify 线混淆导致职责重叠。
+2. 期望值断言匹配若不统一，误报率会升高。
+3. x4-test 运行结果回写若与 verify 校验混用，职责边界会再次模糊。
 
 ## Mitigations
 
-1. 在 `test_tasks.md` 明确固定格式并给出标准样例。
-2. 将“临时跳过 gate”限定在本 change，避免扩散。
-3. 脚本稳定后执行一次全量回归迁移与校验恢复。
+1. 在 request/spec/tasks 明确职责边界。
+2. 使用分目录样例（tasks/impls）与分命名单测隔离回归。
+3. 新增 x4-test verify 章节，定义“回写器”而非“校验器”。
+4. 为 x4-test verify 的 `--mode=test` 引入 `tests/skills/data/runs/` 与 `test_tasks_run-*` 基准输出，确保不修改输入样例文件。
+
+## X4-Test Verify Extension
+
+1. 职责定义
+- x4-test verify 脚本只负责根据运行结果回写 `test_tasks` 勾选状态，不做一致性校验。
+
+2. 输入输出模型
+- 输入必须包含成功 case 与失败 case（失败附失败标号）。
+- 未提及 case 保持不变。
+- 更新采用“每次测试”为单位（一次测试可含多个 case），在测试完成后统一更新。
+- 多次测试按测试执行顺序串行应用。
+
+3. 回写规则
+- 失败位置 `[✗]`，同级前 `[✓]`，同级后 `[ ]`，父链路 `[✗]`；
+- 规则同时作用于二级与三级；
+- 成功 case 顶层及其二/三级子任务全部 `[✓]`。
+
+4. 单测模式
+- `--mode=test` 使用 `tests/skills/data/runs/`；
+- 输入样例沿用四类 spec 命名；
+- 期望输出基准为 `test_tasks_run-NN-<case-name>.md`；
+- 该模式仅用于单元测试，且不改输入 `test_tasks-NN-<case-name>.md`。

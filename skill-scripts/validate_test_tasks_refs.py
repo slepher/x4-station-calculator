@@ -20,8 +20,13 @@ from collections import defaultdict, deque
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
-CHAPTER_HEADER_RE = re.compile(r"^##\s*(\d+)\.?\s+.+$")
-SUBCHAPTER_RE = re.compile(r"^###\s+")
+CHAPTER_HEADER_RE = re.compile(r"^##\s*(\d+)\.?\s+(.+)$")
+EXPECTED_CHAPTER_TITLES = {
+    1: "单元测试",
+    2: "E2E 标准状态与状态迁移",
+    3: "E2E 测试场景",
+    4: "Bug 测试",
+}
 
 TOP_TASK_RE = re.compile(r"^(\s*)-\s*\[([ ✓✗x])\]\s*(\d+)\.(\d+)\s+(.+)$")
 SUBTASK_RE = re.compile(r"^(\s{2})-\s*\[([ ✓✗x])\]\s*(\d+)\.(\d+)\.(\d+)\s+(.+)$")
@@ -31,14 +36,13 @@ STATE_TASK_RE = re.compile(r"^状态:\s*(\S+)\s*$")
 TRANS_TASK_RE = re.compile(r"^切换:\s*(.+?)\s*->\s*(.+)$")
 CASE_TASK_RE = re.compile(r"^Case:\s+(.+)$")
 BUG_TASK_RE = re.compile(r"^BUG-(\d+):\s+(.+)$")
-STATE_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
-GENERIC_PLACEHOLDER_RE = re.compile(r"(待补充|待完善|TODO|TBD|N/?A|占位)", re.IGNORECASE)
 ROOT_CAUSE_HINT_RE = re.compile(r"(因为|由于|根因|源码|代码问题|实现问题|逻辑错误)")
 
 STATE_REF_RE = re.compile(r"^状态:\s*(\S+)\s*$")
 TRANS_REF_RE = re.compile(r"^切换:\s*(.+?)\s*->\s*(.+)$")
 
 EXPECT_MARKER_RE = re.compile(r"#期望:\s*\[(.+)\]\s*$")
+CHECKLIST_NUMBER_RE = re.compile(r"^-\\s*\\[[ ✓✗x]\\]\\s*(\\d+(?:\\.\\d+){1,3})\\s*(.*)$")
 
 
 class Node:
@@ -72,6 +76,20 @@ def resolve_path(change_name: Optional[str], file_path: Optional[str]) -> Path:
 
 def has_expectation_semantics(text: str) -> bool:
     return "期望" in text or "#期望:" in text
+
+
+def is_before_assertion(text: str) -> bool:
+    return ("修复前" in text) and (EXPECT_MARKER_RE.search(text) is not None)
+
+
+def is_after_assertion(text: str) -> bool:
+    return ("修复后" in text) and (EXPECT_MARKER_RE.search(text) is not None)
+
+
+def is_before_after_pair(a: str, b: str) -> bool:
+    return (is_before_assertion(a) and is_after_assertion(b)) or (
+        is_after_assertion(a) and is_before_assertion(b)
+    )
 
 
 def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
@@ -129,13 +147,13 @@ def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
         )
 
     # 1) Chapter structure: exactly 1..4 in order.
-    chapter_lines: List[Tuple[int, int]] = []
+    chapter_lines: List[Tuple[int, int, str]] = []
     for idx, line in enumerate(lines, 1):
         m = CHAPTER_HEADER_RE.match(line.strip())
         if m:
-            chapter_lines.append((int(m.group(1)), idx))
+            chapter_lines.append((int(m.group(1)), idx, m.group(2).strip()))
 
-    nums = [n for n, _ in chapter_lines]
+    nums = [n for n, _, _ in chapter_lines]
     if nums != [1, 2, 3, 4]:
         add_error(
             "CHAPTER_ORDER_INVALID",
@@ -143,6 +161,16 @@ def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
             case="global",
             desc="chapter headers",
         )
+    for n, line_no, title in chapter_lines:
+        expected_title = EXPECTED_CHAPTER_TITLES.get(n)
+        if expected_title is not None and title != expected_title:
+            add_error(
+                "CHAPTER_TITLE_INVALID",
+                f"Chapter {n} title must be `{expected_title}`, got `{title}`",
+                case=str(n),
+                desc=f"## {n} {title}",
+                line=line_no,
+            )
 
     # 2) Parse task tree and structure constraints.
     current_chapter = 0
@@ -156,13 +184,6 @@ def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
 
         if not stripped:
             continue
-
-        if SUBCHAPTER_RE.match(stripped):
-            add_error(
-                "SUBCHAPTER_FORBIDDEN",
-                f"sub-chapter headings are forbidden: {stripped}",
-                line=idx,
-            )
 
         chm = CHAPTER_HEADER_RE.match(stripped)
         if chm:
@@ -212,10 +233,16 @@ def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
         sm = SUBTASK_RE.match(line)
         if sm:
             if current_task is None:
+                ch = int(sm.group(3))
+                t = int(sm.group(4))
+                s = int(sm.group(5))
+                desc = sm.group(6).strip()
                 add_error(
                     "SUBTASK_WITHOUT_PARENT",
                     "subtask without parent top-level task",
                     line=idx,
+                    case=f"{ch}.{t}.{s}",
+                    desc=desc,
                 )
                 continue
 
@@ -241,10 +268,17 @@ def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
         cm = CHILD_RE.match(line)
         if cm:
             if current_subtask is None:
+                ch = int(cm.group(3))
+                t = int(cm.group(4))
+                s = int(cm.group(5))
+                n = int(cm.group(6))
+                desc = cm.group(7).strip()
                 add_error(
                     "THIRD_LEVEL_WITHOUT_PARENT",
                     "third-level item without parent subtask",
                     line=idx,
+                    case=f"{ch}.{t}.{s}.{n}",
+                    desc=desc,
                 )
                 continue
 
@@ -268,10 +302,19 @@ def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
             )
             continue
 
+        inferred_case = None
+        inferred_desc = None
+        nm = CHECKLIST_NUMBER_RE.match(stripped)
+        if nm:
+            inferred_case = nm.group(1)
+            inferred_desc = nm.group(2).strip()
+
         add_error(
             "CHAPTER_CONTENT_INVALID",
             f"invalid line in chapter content: {stripped}",
             line=idx,
+            case=inferred_case,
+            desc=inferred_desc,
         )
 
     # 3) Numbering and chapter type restrictions.
@@ -309,30 +352,6 @@ def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
                     desc=t.desc,
                     line=t.line_no,
                 )
-            elif chapter == 2:
-                sm = STATE_TASK_RE.match(t.desc)
-                tm = TRANS_TASK_RE.match(t.desc)
-                if sm:
-                    state_id = sm.group(1).strip()
-                    if not STATE_ID_RE.match(state_id):
-                        add_error(
-                            "CHAPTER2_STATE_ID_INVALID",
-                            "Chapter 2 状态: <state-id> must use stable id (letters/digits/._- only, no prose)",
-                            case=t.task_no,
-                            desc=t.desc,
-                            line=t.line_no,
-                        )
-                elif tm:
-                    src = tm.group(1).strip()
-                    dst = tm.group(2).strip()
-                    if not STATE_ID_RE.match(src) or not STATE_ID_RE.match(dst):
-                        add_error(
-                            "CHAPTER2_TRANSITION_ID_INVALID",
-                            "Chapter 2 切换 ids must use stable id (letters/digits/._- only, no prose)",
-                            case=t.task_no,
-                            desc=t.desc,
-                            line=t.line_no,
-                        )
             elif chapter == 3 and not CASE_TASK_RE.match(t.desc):
                 add_error(
                     "CHAPTER3_TOP_TYPE_INVALID",
@@ -393,6 +412,8 @@ def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
 
             expected_sub = 1
             parent_top_no = int(t.task_no.split(".")[1])
+            prev_sub_no: Optional[int] = None
+            prev_sub_desc: Optional[str] = None
             for s in t.subtasks:
                 if s["chapter"] != chapter or s["task"] != parent_top_no:
                     add_error(
@@ -402,7 +423,14 @@ def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
                         desc=s["desc"],
                         line=s["line"],
                     )
-                if s["sub"] != expected_sub:
+                is_ch4_before_after_dup = (
+                    chapter == 4
+                    and prev_sub_no is not None
+                    and s["sub"] == prev_sub_no
+                    and prev_sub_desc is not None
+                    and is_before_after_pair(prev_sub_desc, s["desc"])
+                )
+                if s["sub"] != expected_sub and not is_ch4_before_after_dup:
                     add_error(
                         "SUBTASK_NUMBER_NOT_CONTIGUOUS",
                         f"subtask numbering must be contiguous under {t.task_no}, expected .{expected_sub}",
@@ -411,18 +439,14 @@ def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
                         line=s["line"],
                     )
                     expected_sub = s["sub"]
-                expected_sub += 1
-
-                if chapter == 2 and GENERIC_PLACEHOLDER_RE.search(s["desc"]):
-                    add_error(
-                        "CHAPTER2_SUBTASK_PLACEHOLDER_FORBIDDEN",
-                        "Chapter 2 subtask must be verifiable and cannot be placeholder text",
-                        case=f"{s['chapter']}.{s['task']}.{s['sub']}",
-                        desc=s["desc"],
-                        line=s["line"],
-                    )
+                if not is_ch4_before_after_dup:
+                    expected_sub += 1
+                prev_sub_no = s["sub"]
+                prev_sub_desc = s["desc"]
 
                 expected_child_n = 1
+                prev_child_n: Optional[int] = None
+                prev_child_desc: Optional[str] = None
                 for c in s["children"]:
                     if c["chapter"] != chapter or c["task"] != parent_top_no or c["sub"] != s["sub"]:
                         add_error(
@@ -432,7 +456,14 @@ def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
                             desc=c["desc"],
                             line=c["line"],
                         )
-                    if c["n"] != expected_child_n:
+                    is_ch4_before_after_child_dup = (
+                        chapter == 4
+                        and prev_child_n is not None
+                        and c["n"] == prev_child_n
+                        and prev_child_desc is not None
+                        and is_before_after_pair(prev_child_desc, c["desc"])
+                    )
+                    if c["n"] != expected_child_n and not is_ch4_before_after_child_dup:
                         add_error(
                             "THIRD_LEVEL_NUMBER_NOT_CONTIGUOUS",
                             f"third-level numbering must be contiguous under {chapter}.{parent_top_no}.{s['sub']}, expected .{expected_child_n}",
@@ -441,16 +472,10 @@ def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
                             line=c["line"],
                         )
                         expected_child_n = c["n"]
-                    expected_child_n += 1
-
-                    if chapter == 2 and GENERIC_PLACEHOLDER_RE.search(c["desc"]):
-                        add_error(
-                            "CHAPTER2_CHILD_PLACEHOLDER_FORBIDDEN",
-                            "Chapter 2 third-level subtask must be verifiable and cannot be placeholder text",
-                            case=f"{c['chapter']}.{c['task']}.{c['sub']}.{c['n']}",
-                            desc=c["desc"],
-                            line=c["line"],
-                        )
+                    if not is_ch4_before_after_child_dup:
+                        expected_child_n += 1
+                    prev_child_n = c["n"]
+                    prev_child_desc = c["desc"]
 
     # 4) Top-level last-subtask expectation rule.
     for chapter in (1, 2, 3, 4):
@@ -530,30 +555,28 @@ def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
                         refs_ch34.add(f"{tm.group(1).strip()} -> {tm.group(2).strip()}")
                         if chapter == 3:
                             has_ch2_ref = True
-            if chapter == 3 and not has_ch2_ref:
-                add_error(
-                    "CHAPTER3_CASE_REFERENCE_MISSING",
-                    "Chapter 3 case must explicitly reference Chapter 2 状态: or 切换:",
-                    case=t.task_no,
-                    desc=t.desc,
-                    line=t.line_no,
-                )
             if chapter == 4:
                 bug_texts: List[str] = []
+                before_ids: Set[str] = set()
+                after_ids: Set[str] = set()
                 for s in t.subtasks:
                     bug_texts.append(s["desc"])
+                    sub_id = f"{s['chapter']}.{s['task']}.{s['sub']}"
+                    if is_before_assertion(s["desc"]):
+                        before_ids.add(sub_id)
+                    if is_after_assertion(s["desc"]):
+                        after_ids.add(sub_id)
                     for c in s["children"]:
                         bug_texts.append(c["desc"])
+                        child_id = f"{c['chapter']}.{c['task']}.{c['sub']}.{c['n']}"
+                        if is_before_assertion(c["desc"]):
+                            before_ids.add(child_id)
+                        if is_after_assertion(c["desc"]):
+                            after_ids.add(child_id)
                 if bug_texts:
                     has_step = any(EXPECT_MARKER_RE.search(x) is None for x in bug_texts)
-                    has_before_assert = any(
-                        ("修复前" in x) and (EXPECT_MARKER_RE.search(x) is not None)
-                        for x in bug_texts
-                    )
-                    has_after_assert = any(
-                        ("修复后" in x) and (EXPECT_MARKER_RE.search(x) is not None)
-                        for x in bug_texts
-                    )
+                    has_before_assert = len(before_ids) > 0
+                    has_after_assert = len(after_ids) > 0
                     if not has_step:
                         add_error(
                             "CHAPTER4_BUG_REPRO_STEP_MISSING",
@@ -574,6 +597,14 @@ def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
                         add_error(
                             "CHAPTER4_BUG_AFTER_ASSERT_MISSING",
                             "Chapter 4 bug task must include at least one 修复后断言 with #期望: [...]",
+                            case=t.task_no,
+                            desc=t.desc,
+                            line=t.line_no,
+                        )
+                    if has_before_assert and has_after_assert and before_ids != after_ids:
+                        add_error(
+                            "CHAPTER4_BUG_BEFORE_AFTER_NUMBER_MISMATCH",
+                            "Chapter 4 修复前/修复后 assertion must use the same task number",
                             case=t.task_no,
                             desc=t.desc,
                             line=t.line_no,

@@ -92,6 +92,46 @@
   - [ ] 1.18.2 执行格式校验
   - [ ] 1.18.3 断言使用统一 `#期望: [...]` 形式即可通过（期望 toBe(true)）
 
+- [ ] 1.19 test-impl 顶层任务与四类 spec 映射校验
+  - [ ] 1.19.1 构造 `test_tasks-N-<case-name>.md` 与 `test-unit/test-e2e/test-bug/test-bug-fix` 四类样例 spec
+  - [ ] 1.19.2 执行 `validate_test_case_refs.py --mode=test --file ... --json`
+  - [ ] 1.19.3 断言输出仅包含 `case/desc/error_code/error_msg` 且映射结果稳定（期望 toBe(true)）
+
+- [ ] 1.20 一级编号到 case 描述编号映射校验
+  - [ ] 1.20.1 构造顶层 `1.1/2.1/3.1/4.1` 与 case 名编号一致样本
+  - [ ] 1.20.2 构造顶层编号与 case 名编号不一致样本
+  - [ ] 1.20.3 断言不一致时返回 `CASE_MISSING` 且 `case` 指向顶层编号（期望 toContain('CASE_MISSING')）
+
+- [ ] 1.21 二级/三级编号到注释编号映射校验
+  - [ ] 1.21.1 构造二级或三级任务缺少对应注释标号样本
+  - [ ] 1.21.2 执行映射校验
+  - [ ] 1.21.3 断言返回 `COMMENT_MISSING` 且 `case` 指向缺失标号（期望 toContain('COMMENT_MISSING')）
+
+- [ ] 1.22 仅二层任务的区间内容校验
+  - [ ] 1.22.1 构造 `x.x.x` 注释存在但到下一同层标号前无实际内容样本
+  - [ ] 1.22.2 执行区间内容校验
+  - [ ] 1.22.3 断言返回 `BLOCK_CONTENT_MISSING` 且 `case` 为该二层标号（期望 toContain('BLOCK_CONTENT_MISSING')）
+
+- [ ] 1.23 含三层任务的区间内容校验
+  - [ ] 1.23.1 构造 `x.x.x.n` 注释存在但到下一同层标号前无实际内容样本
+  - [ ] 1.23.2 执行区间内容校验
+  - [ ] 1.23.3 断言返回 `BLOCK_CONTENT_MISSING` 且 `case` 为该三级标号（期望 toContain('BLOCK_CONTENT_MISSING')）
+
+- [ ] 1.24 期望断言存在与值匹配校验
+  - [ ] 1.24.1 构造含 `#期望: [...]` 但无断言样本
+  - [ ] 1.24.2 构造含断言但断言值与 `#期望` 不一致样本
+  - [ ] 1.24.3 断言分别返回 `EXPECT_ASSERTION_MISSING` 与 `EXPECT_VALUE_MISMATCH`（期望 toContain('EXPECT_')）
+
+- [ ] 1.25 Chapter4 bug/bug-fix 路由校验
+  - [ ] 1.25.1 构造 `修复前` 仅出现在 bug、`修复后` 仅出现在 bug-fix 的正例样本
+  - [ ] 1.25.2 构造 `修复后` 出现在 bug 路由或 `修复前` 出现在 bug-fix 路由的反例样本
+  - [ ] 1.25.3 断言反例返回 `CH4_ROUTE_CONFLICT` 并可定位到具体 `case`（期望 toContain('CH4_ROUTE_CONFLICT')）
+
+- [ ] 1.26 Chapter4 修复后勾选例外校验
+  - [ ] 1.26.1 构造“修复后项勾选、无 bug case、存在 bug-fix case”的样本
+  - [ ] 1.26.2 构造“修复后项勾选、无 bug-fix case”的样本
+  - [ ] 1.26.3 断言前者通过、后者返回 `CASE_MISSING`（期望 toBe(true)）
+
 ## 2 E2E 标准状态与状态迁移
 
 ## 3 E2E 测试场景

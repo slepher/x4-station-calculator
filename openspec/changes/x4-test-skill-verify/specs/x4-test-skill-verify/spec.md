@@ -1,93 +1,119 @@
 # X4 Test Skill Verify Specification
 
 ## Purpose
-定义 `x4-test-doc` 的 `test_tasks.md` 统一格式契约，确保文档产出在结构与编号层面可预测、可迁移，并允许在脚本不稳定阶段先完成文档流转。
+定义两类验证脚本的职责与行为：
+- test-doc verify（`validate_test_tasks_refs.py`）
+- test-impl verify（`validate_test_case_refs.py`）
 
 ## ADDED Requirements
 
-### Requirement: Four-Chapter Test Tasks Structure
+### Requirement: Test-Doc Verify Contract
 
-#### Scenario: Require Chapters 1 Through 4
-- **前提**：创建或更新 `test_tasks.md`。
-- **当**：文档结构被检查。
-- **那么**：文档 MUST 包含且仅包含 `## 1` 到 `## 4` 四章。
-- **并且**：四章顺序固定。
+#### Scenario: Validate Four Chapters And Fixed Titles
+- **当**：执行 `validate_test_tasks_refs.py`。
+- **那么**：文档 MUST 包含且仅包含 `## 1 单元测试`、`## 2 E2E 标准状态与状态迁移`、`## 3 E2E 测试场景`、`## 4 Bug 测试`。
+- **并且**：四章顺序固定，空章允许。
 
-#### Scenario: Allow Empty Chapter Content
-- **前提**：某章节尚未规划测试项。
-- **当**：文档保存。
-- **那么**：该章节 MAY 为空，不因空章而判定格式失败。
+#### Scenario: Validate Task Tree Levels And Indentation
+- **那么**：脚本 MUST 仅接受 `x.x` / `x.x.x` / `x.x.x.n` 三级任务树。
+- **并且**：缩进 MUST 固定为 0/2/4 空格。
 
-### Requirement: Numbered Checklist Task Tree
+#### Scenario: Validate Contiguous Numbering
+- **那么**：顶层、二级、三级编号在同父级下 MUST 从 `.1` 连续递增。
 
-#### Scenario: Top-Level Tasks Use x.x Numbering
-- **前提**：在任一章节添加顶层任务。
-- **当**：编写顶层任务行。
-- **那么**：格式 SHALL 为 `- [ ] x.x <description>`。
+#### Scenario: Validate Chapter-Specific Top Types
+- **那么**：
+  - Chapter 2 顶层 MUST 为 `状态:` 或 `切换:`；
+  - Chapter 3 顶层 MUST 为 `Case:`，且 case 名 MUST 唯一且长度 <= 64；
+  - Chapter 4 顶层 MUST 为 `BUG-<number>: <bug-description>`。
 
-#### Scenario: Subtasks Use x.x.x Numbering With Continuous Sequence
-- **前提**：顶层任务下添加子任务。
-- **当**：编写子任务行。
-- **那么**：格式 SHALL 为 `- [ ] x.x.x <description>`。
-- **并且**：同一父任务下子任务编号 SHALL 从 `.1` 开始并连续递增。
+#### Scenario: Validate Top-Level Subtask Presence
+- **那么**：每个顶层任务 MUST 至少包含一个二级子任务。
 
-### Requirement: Third-Level Child Checklist Support
+#### Scenario: Validate Last-Subtask Expectation Rule
+- **那么**：顶层任务最后一个二级子任务 MUST 含期望语义；若其本身不含，则其全部三级子任务 MUST 含期望语义。
 
-#### Scenario: Allow Child Items Under Subtasks
-- **前提**：子任务需要拆分子行为或子断言。
-- **当**：编写第三级条目。
-- **那么**：第三级条目 SHALL 使用 checklist 格式并保持 4 空格缩进。
-- **并且**：第三级条目 SHALL 使用 `x.x.x.n` 编号格式。
-- **并且**：同一父子任务下 `n` SHALL 从 1 开始连续递增。
+#### Scenario: Validate Unified Expectation Marker
+- **那么**：凡含期望语义的条目 MUST 使用 `#期望: [...]`。
 
-### Requirement: Bug Chapter Top-Level Contract
+#### Scenario: Validate Chapter2 Reference Integrity
+- **那么**：Chapter 2 的 `状态/切换` MUST 在 Chapter 3 或 Chapter 4 子任务中被显式引用。
 
-#### Scenario: Enforce Bug Top-Level Format
-- **前提**：在 Chapter 4 添加 Bug 测试项。
-- **当**：编写顶层任务。
-- **那么**：格式 SHALL 为 `- [ ] 4.x BUG-<number>: <description>`。
+#### Scenario: Validate Chapter4 Bug Child Semantics
+- **那么**：每个 BUG 任务 MUST 同时包含复现步骤、`修复前` 断言、`修复后` 断言。
+- **并且**：`修复前` 与 `修复后` 断言 MUST 使用同一任务编号。
+- **并且**：Chapter 4 中仅该场景允许同号重复，其他编号仍 MUST 连续递增。
 
-#### Scenario: Reject Header-Style Bug Blocks
-- **前提**：存在标题式 Bug 写法。
-- **当**：进行格式审查。
-- **那么**：`### BUG-...` SHALL NOT 作为 Chapter 4 的测试项主体。
+#### Scenario: Validate Structured JSON Output
+- **当**：使用 `--json`。
+- **那么**：输出 MUST 为 `[{case, desc, error_code, error_msg}]`。
 
-### Requirement: Deprecated Step-Keyword Format Removal
+### Requirement: Test-Impl Verify Mapping Contract
 
-#### Scenario: Reject Old Step Prefix Format
-- **前提**：文档中出现旧格式步骤。
-- **当**：进行格式审查。
-- **那么**：`- [ ] 步骤 <n>: ...` SHALL NOT 被使用。
+#### Scenario: Validate Task-To-Spec Case Mapping
+- **当**：执行 `validate_test_case_refs.py`。
+- **那么**：脚本 MUST 校验 `test_tasks.md` 顶层任务与四类 `spec.ts`（unit/e2e/bug/bug-fix）的 case 映射。
 
-### Requirement: Top-Level Task Last-Subtask Expectation Rule
+#### Scenario: Validate Number Mapping Granularity
+- **那么**：一级标号 MUST 对应 case desc 标号；二/三级标号 MUST 对应 case 内注释标号。
 
-#### Scenario: Last Subtask Contains Expectation Directly
-- **前提**：任意一级任务（`x.x`）存在至少一个子任务。
-- **当**：检查该一级任务的最后一个子任务。
-- **那么**：最后一个子任务 SHOULD 直接包含“期望”语义。
+#### Scenario: Validate Content In Numbered Blocks
+- **那么**：
+  - 仅二层任务时，二层区间 MUST 有实际内容；
+  - 含三层任务时，三层区间 MUST 有实际内容。
 
-#### Scenario: Last Subtask Uses Third-Level Assertions
-- **前提**：最后一个子任务本身不包含“期望”文本。
-- **当**：该子任务下存在第三级子项。
-- **那么**：该一级任务最后子任务下所有第三级子项 SHALL 全部包含“期望”语义。
+#### Scenario: Validate Expectation Assertion Value Match
+- **那么**：含 `#期望: [...]` 的任务块 MUST 存在断言，且断言值 MUST 与期望值匹配。
 
-### Requirement: Concrete Expectation Annotation Format
+#### Scenario: Validate Chapter4 Bug/Bugfix Routing
+- **那么**：Chapter 4 MUST 使用 bug 与 bugfix 双文件映射。
+- **并且**：`修复前` 期望仅匹配 bug 文件，`修复后` 期望仅匹配 bugfix 文件。
+- **并且**：若 `修复后` 期望项已勾选，根任务 MAY 不要求映射 bug 文件，但仍 MUST 映射 bugfix 文件。
 
-#### Scenario: Concrete Value Expectation Uses #期望 Marker
-- **前提**：断言目标是具体值（数值或确定字符串值）。
-- **当**：编写期望描述。
-- **那么**：期望格式 SHALL 使用 `#期望: [...]`。
-- **并且**：示例可写为 `再充延迟: 1 s #期望: ['1 s']`、`断言字段集合包含36项字段标签 #期望: [36]`。
+### Requirement: Unit Test Asset Layout
 
-#### Scenario: UI Existence Expectation Uses Unified Marker
-- **前提**：断言目标是 UI 存在性/可见性（非具体值）。
-- **当**：编写期望描述。
-- **那么**：该条目 SHALL follow the unified marker format `#期望: [...]`。
+#### Scenario: Enforce Impl Test Naming Convention
+- **那么**：数据样例 MUST 放在 `tests/skills/data/impls/`，命名 `test_tasks-N-<case-name>.md`。
+- **并且**：对应样例 spec MUST 也放在 `tests/skills/data/impls/`，并拆分为：
+  - `test-unit-N-<case-name>.spec.ts`
+  - `test-e2e-N-<case-name>.spec.ts`
+  - `test-bug-N-<case-name>.spec.ts`
+  - `test-bug-fix-N-<case-name>.spec.ts`
+- **并且**：真正执行校验的单测 MUST 放在 `tests/skills/unit/`。
+- **并且**：`N` MUST 为两位数字。
 
-### Requirement: FF Phase Can Skip Validation Gate Temporarily
+### Requirement: X4-Test Verify Run-Result Apply Contract
 
-#### Scenario: Skip Script Gate While Validator Is Unstable
-- **前提**：`validate_test_tasks_refs.py` 处于 debug 阶段且稳定性未达标。
-- **当**：执行 `/x4:ff x4-test-skill-verify`。
-- **那么**：流程 MAY 先产出文档，不以脚本校验作为阻断 gate。
-- **并且**：文档中 MUST 明确该阶段策略是临时安排。
+#### Scenario: Apply Run Results Instead Of Validating
+- **当**：执行 x4-test verify 脚本。
+- **那么**：脚本 MUST 基于运行结果回写 `test_tasks.md`，而非执行一致性校验判定。
+
+#### Scenario: Apply Explicit Success And Failure Inputs
+- **那么**：输入 MUST 显式包含成功 case 集合与失败 case 集合。
+- **并且**：失败 case MUST 包含失败标号（`x.x.x` 或 `x.x.x.n`）。
+- **并且**：未提及 case MUST 视为未运行并保持不变。
+
+#### Scenario: Apply Sequential Immediate Updates
+- **那么**：脚本 MUST 以“每次测试”为更新单位（一次测试可包含多个 case），在该次测试完成后统一更新。
+- **并且**：多次测试更新 MUST 按测试执行顺序串行应用，不得并发批量更新。
+
+#### Scenario: Apply Failure Marking Rules At L2 And L3
+- **那么**：失败标号位置 MUST 标记为 `[✗]`。
+- **并且**：同级中失败项之前 MUST 标记 `[✓]`，之后 MUST 标记 `[ ]`。
+- **并且**：失败项父任务链路 MUST 标记 `[✗]`。
+- **并且**：上述规则 MUST 同时适用于二级与三级任务。
+
+#### Scenario: Apply Success Marking Rules
+- **那么**：成功 case 的顶层与其已定义二级/三级任务 MUST 标记为 `[✓]`。
+
+#### Scenario: Support Mode Test Fixtures For Run Apply
+- **当**：使用 `--mode=test`。
+- **那么**：样例目录 MUST 为 `tests/skills/data/runs/`。
+- **并且**：输入文件命名 MUST 兼容：
+  - `test_tasks-NN-<case-name>.md`
+  - `test-unit-NN-<case-name>.spec.ts|.spec.test`
+  - `test-e2e-NN-<case-name>.spec.ts|.spec.test`
+  - `test-bug-NN-<case-name>.spec.ts|.spec.test`
+  - `test-bug-fix-NN-<case-name>.spec.ts|.spec.test`
+- **并且**：期望输出基准 MUST 为 `test_tasks_run-NN-<case-name>.md`。
+- **并且**：`--mode=test` 下 MUST NOT 修改原始 `test_tasks-NN-<case-name>.md`。

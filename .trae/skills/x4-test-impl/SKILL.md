@@ -2,199 +2,173 @@
 name: x4-test-impl
 description: "Implement and supplement Unit/E2E test code for X4 Station Calculator. Trigger with /x4:test-impl <change-name>."
 metadata:
-  version: "1.10"
+  version: "1.12"
 ---
 
 # X4 Test Implementation
 
-This skill focuses on implementing test code and can run in parallel with code implementation. It is not a mandatory gate before `/x4:test` and does not write pass/fail results.
+This skill handles test implementation updates for the X4 Station Calculator project.
 
-## 1. STRICT PATH RESOLUTION (MANDATORY)
+## Trigger
 
-- Resolve `change-name` using `x4-user-workflow` rules before any action. Stop and ask if multiple/no matches.
-- Print: `Resolved change: <change-name>`.
-- **DIR_VARS:** Target directories are strictly defined as:
-  - `UNIT_DIR` = `tests/unit/${CHANGE_NAME}`
-  - `E2E_DIR` = `tests/e2e/${CHANGE_NAME}`
-- **FATAL CONSTRAINT:** NEVER read, write, or fallback to any directories outside the exact `UNIT_DIR` and `E2E_DIR`.
-- **NO FUZZY MATCHING:** Substrings or similar names (e.g., `ship-build` vs `ship-build-equipment`) are strictly DIFFERENT.
-- **ACTION:** If `UNIT_DIR` or `E2E_DIR` does not exist, `mkdir` them immediately. Do not ask for confirmation.
+User invokes `/x4:test-impl <change_name>`
 
-## 2. EXECUTION STEPS
+## Purpose
 
-1. Read requirements:
-   - `openspec/changes/${CHANGE_NAME}/test_tasks.md`
-   - `openspec/changes/${CHANGE_NAME}/ui_knowledge.md`
-   - `openspec/test_experience.md`
-2. Inspect existing tests in exact `UNIT_DIR` and `E2E_DIR`.
-3. Apply 1:1 mapping from `test_tasks.md` to test cases:
-   - Implement missing assertions for every unchecked verifiable checklist item (including A/B branches).
-   - Keep existing passing structure unchanged.
-   - Enforce E2E chapter split: `#2` -> state/transition tests; `#3` -> scenario tests.
-4. Run syntax/type validation: `npx tsc -p tsconfig.test-check.json --noEmit`
-5. Fix type errors and loop until clean or blocked.
-6. Return summary: added/updated files, mapped items count, remaining unmapped items (with exact IDs like `2.3`), and syntax status. If 100% mapped, print: `coverage gate ready for /x4:test`.
+Implement and supplement Unit/E2E/Bug/Bug-fix test code based on `test_tasks.md`, with mandatory task-to-test correspondence that can be validated by script.
 
-## 3. TEST AUTHORING STANDARDS
+## Parameters
 
-- **Unit:** Use Vitest + Pinia setup patterns. Add `beforeEach` to load `tests/fixtures/db.json` if preloaded data is required.
-- **E2E:** Use project `test-setup`, prefer locators from `ui_knowledge.md`. 
-- **Assertions:** - Assert concrete observable state directly (e.g., DOM order, IDs, counts).
-  - NO low-information flags (e.g., `let success = false`).
-  - E2E visible checks must include positive state assertions AND explicit absence-of-error assertions.
-  - Multi-plan tasks (Plan A, Plan B) require assertions repeated for each plan.
-- **Drag-and-Drop:** Follow `x4-drag-test` conventions. Capture per-attempt diagnostics (order snapshots, positions). Use stable identity locators (`data-*`), avoid `nth()`.
+- `<change_name>`: The name of the change folder in `openspec/changes/` (e.g., `storage-auto-fill`).
+- `<change_name>` accepts abbreviation token and must be resolved by `x4-user-workflow` "Change Name Resolution" rules.
 
-## 4. STANDARD STATE + TRANSITION AUTHORING
+## Change Name Resolution (MANDATORY)
 
-When `test_tasks.md` defines reusable states, strictly implement:
-1. **Helpers:** `buildStateX(...)`, `assertStateX(...)`, `switchFromXToY(...)` (apply only the transition actions).
-2. **Cases:** - One `状态：<id>` case per state item (even baseline/empty states).
-   - One `切换：<from>-><to>` case per transition item.
-3. **Contract:** `切换：` must execute: build -> assert(from) -> switch -> assert(to).
-4. **Scenarios:** Reuse helpers; avoid ad-hoc setup.
-5. **Boundary:** Semantics come from `ui_knowledge.md`. If missing/ambiguous, report blocker.
+- Resolve `change-name` using `x4-user-workflow` rules before any action.
+- If multiple matches or no match, stop and ask the user to choose; list available active changes.
+- Do not auto-create a change on resolution failure.
+- After resolution, print: `Resolved change: <change-name>`.
 
-## 6. TEST CASE NAME + STEP COMMENTS VALIDATION (MANDATORY)
+## Input
 
-### Validation Script
-Use `validate_test_case_refs.py` to validate correspondence (python is fallback, prefer python3):
+- `openspec/changes/<change-name>/test_tasks.md`
+- `openspec/changes/<change-name>/ui_knowledge.md`
+- `openspec/test_experience.md`
+- Existing tests under `tests/unit/<change-name>/` and `tests/e2e/<change-name>/`
+
+## Actions
+
+1. Resolve change target and load test planning inputs.
+2. Implement or update missing Unit/E2E/Bug/Bug-fix tests with 1:1 task mapping.
+3. Run validation script and fix mapping issues.
+4. Run syntax/type check and fix type-level issues.
+
+## Mandatory Requirements
+
+### Chapter A: Agent-Only Mandatory
+
+#### A.1 Execution Baseline (MANDATORY)
+
+1. 路径与目录约束
+   - `UNIT_DIR = tests/unit/<change-name>`
+   - `E2E_DIR = tests/e2e/<change-name>`
+   - 禁止读写或兜底到其他目录
+2. 目录处理
+   - 如果 `UNIT_DIR` 或 `E2E_DIR` 不存在，立即创建
+3. 映射原则
+   - 严格按 `test_tasks.md` 进行 1:1 用例映射
+   - 仅补足缺失断言/步骤，不破坏既有通过结构
+4. 结果回传
+   - 返回新增/修改文件、映射数量、未映射项（精确到任务编号）
+
+#### A.2 Test Authoring Standards (MANDATORY)
+
+- Unit 使用 Vitest + Pinia 既有模式。
+- E2E 使用项目 `test-setup` 与 `ui_knowledge.md` 提供的定位语义。
+- 断言必须是可观测结果断言，禁止低信息量布尔旗标式断言。
+- 多分支任务（A/B）必须分别落地断言。
+- 拖拽类场景遵循 `x4-drag-test` 规范，优先稳定 identity locator（`data-*`）。
+
+#### A.3 State/Transition Authoring (MANDATORY)
+
+当任务定义了状态/切换语义时，必须：
+
+1. 提供可复用 helper（建态、断态、切换）。
+2. 状态项有对应状态 case，切换项有对应切换 case。
+3. 切换 case 执行顺序为：build -> assert(from) -> switch -> assert(to)。
+4. 场景 case 复用 helper，避免散落式重复 setup。
+
+#### A.4 Guardrails (MANDATORY)
+
+- 不运行 `npm run build` 或完整 `npx playwright test` 作为本 skill 的默认动作。
+- 不在 `test_tasks.md` 写入通过/失败标记。
+- 禁止为了通过验证脚本而修改 `test_tasks.md`。
+
+#### A.5 Mapping Semantics (MANDATORY)
+
+- 规范要求 case/注释中“标号后的文本语义”应与 `test_tasks.md` 对应项一致。
+- 即使 verify 当前不自动判定全文语义一致性，agent 仍必须按语义一致原则实现与维护测试代码。
+
+### Chapter B: Agent+Verify Mandatory
+
+#### B.1 Execution Flow With Verify (MANDATORY)
+
+固定流程：实现测试 -> 跑脚本 -> 修复 -> 再跑。
+
+命令：
+
 ```bash
-python3 skill-scripts/validate_test_case_refs.py <change-name>
+python3 skill-scripts/validate_test_case_refs.py <change-name> --json
 ```
 
-**Validation covers:**
-1. **Case Name Correspondence**: Test case names in files must match task names in test_tasks.md by prefix (e.g., `1.1` matches `1.1 档位默认状态`)
-2. **Step Comment Correspondence**: Each subtask in test_tasks.md must have a corresponding comment in the test file, matching by prefix (e.g., `1.1.1` matches `1.1.1 读取当前档位状态`)
-3. **Step Has Code**: Each step comment must be followed by at least one line of actual code (operation or assertion). Empty steps (comments without code) will fail validation.
-4. **Assertion Match**: For steps with expectations (e.g., `（期望 toBe('summary')）`), the test file must contain corresponding assertions. For sub-item assertions, all assertion values must be verified.
+#### B.2 Mapping Contract (MANDATORY)
 
-### Validation Rules
+验证只覆盖任务到测试实现的对应关系：
 
-**Test case names只需以对应标号开头即可:**
+1. 任务文件与测试文件对应。
+   - 对应关系为双向：缺失映射与多余映射（case/comment）都应报错。
+2. 顶层任务编号（`x.x`）对应 case 描述前缀编号。
+3. 二级/三级任务编号（`x.x.x` / `x.x.x.n`）对应 case 内注释编号。
+4. 若任务含 `#期望: [...]`，则对应代码块必须存在断言，且断言值覆盖期望值。
+5. spec 文件内 case 标号必须按编号递增顺序出现。
+6. 单个 case 内注释标号必须按编号递增顺序出现（同级与层级展开均需满足顺序约束）。
+7. 当前 verify 脚本仅强制校验标号映射与顺序，不对“标号后全文语义一致性”做自动判定。
 
-| test_tasks.md 任务项 | 测试文件用例名（宽松匹配） |
-|---------------------|-------------------------|
-| `- [ ] 1.1 档位默认状态` | `it("1.1 ...", ...)` 或 `it("1.1 档位默认状态", ...)` |
-| `- [ ] 2.1 状态: heron-selected` | `it("2.1 ...", ...)` |
-| `- [ ] 2.2 切换: heron-selected -> detail-mode` | `it("2.2 ...", ...)` |
-| `- [ ] 3.1 Case: 中列属性区双档位渲染` | `it("3.1 ...", ...)` |
+#### B.3 File Discovery Rules (MANDATORY)
 
-**子任务注释只需以对应标号开头即可:**
-- test_tasks.md: `- [ ] 1.1.1 读取当前档位状态`
-- test comment: `// 1.1.1 读取当前档位状态` 或 `// 1.1.1: 读取当前档位状态`
+- 变更模式（`change`）文件发现：
+  - Unit: `tests/unit/<change-name>/<change-name>.spec.ts|.spec.test`
+  - E2E: `tests/e2e/<change-name>/<change-name>.spec.ts|.spec.test`
+  - Bug: `tests/e2e/<change-name>/bug-<change-name>.spec.ts|.spec.test`
+  - Bug-fix: `tests/e2e/<change-name>/bugfix-<change-name>.spec.ts|.spec.test`
 
-### ⚠️ MANDATORY: 禁止修改 test_tasks.md
+#### B.4 Step Content Rules (MANDATORY)
 
-**x4-test-impl 严格禁止为了通过脚本验证而修改 test_tasks.md。**
+- 每个任务子项必须有同编号注释块。
+- 注释块后必须有实际代码（不能只有空行/注释/符号）。
+- 对纯二层任务：每个 `x.x.x` 注释块到下一个同级注释、上级注释或 case 结束之间，必须有实际内容。
+- 对含三层任务：每个 `x.x.x.n` 注释块到下一个同级注释、上级注释或 case 结束之间，必须有实际内容。
 
-- test_tasks.md 的修改只能由 x4-test-doc 负责
-- 如果验证脚本报告不通过，应检查测试代码是否正确实现，而非修改文档
-- 修改 test_tasks.md 属于违规行为，将导致验证失败
+#### B.5 Chapter 4 Route Rules (MANDATORY)
 
-### Bidirectional Validation
-- **test_tasks.md → 测试文件**: 每个任务项在测试文件中有对应用例
-- **测试文件 → test_tasks.md**: 每个用例在 test_tasks.md 中有对应任务项
-- **第五章说明**: 第五章（失败原因及可能的推断）不需要验证，无对应测试文件，仅用于记录测试失败原因
+Chapter 4 需要同时映射 `bug` 与 `bug-fix` 两类文件，并按语义拆分校验：
 
-### Test File Naming Convention
-- Unit tests: `tests/unit/${CHANGE_NAME}/${CHANGE_NAME}.spec.test`
-- E2E tests: `tests/e2e/${CHANGE_NAME}/${CHANGE_NAME}.spec.test`
-- Bug reproduction: `tests/e2e/${CHANGE_NAME}/bug-${CHANGE_NAME}.spec.test`
-- Bug fix: `tests/e2e/${CHANGE_NAME}/bugfix-${CHANGE_NAME}.spec.test`
+- `修复前` 期望只对应 `bug` 文件，不要求对应 `bug-fix`。
+- `修复后` 期望只对应 `bug-fix` 文件，不要求对应 `bug`。
+- 若 `修复后` 期望项为已勾选（`[x]`/`[✓]`），顶层项可不要求 `bug` case，但必须有 `bug-fix` case。
 
-## 7. TEST STEP COMMENTS (MANDATORY)
+#### B.6 JSON Output Contract (MANDATORY)
 
-Every test case must have step comments that map 1:1 to steps in test_tasks.md.
+验证脚本在 `--json` 下输出数组项：
 
-### Step Comment Format (新格式: 标号开头)
-```typescript
-it("1.1 档位默认状态", async ({ page }) => {
-  // 1.1.1 渲染已选飞船的船只建造属性区。
-  await page.waitForSelector('.ship-build-stats')
-
-  // 1.1.2 读取当前档位状态。
-  const currentMode = await page.evaluate(() => ...)
-
-  // 1.1.3 断言默认档位为 "summary"。
-  expect(currentMode).toBe('summary')
-})
+```json
+[{"case":"1"|"1.1"|"1.1.1"|"1.1.1.1"|"global","desc":"Desc","error_code":"CODE","error_msg":"Message"}]
 ```
 
-### Rules
-1. **One-to-one mapping**: Each step in test_tasks.md must have a corresponding comment in the test case
-2. **No empty blocks**: Comments must be immediately followed by actual code (no empty lines between comment and code)
-   - **Every step must have at least one line of code**: Operations (e.g., `await page.click(...)`, `const x = ...`) OR assertions (e.g., `expect(...).toBe(...)`)
-   - Steps without code will fail validation
-3. **宽松匹配 (标号开头)**: Step comments只需以对应标号开头即可:
-   - test_tasks.md: `- [ ] 1.1.1 渲染已选飞船的船只建造属性区。`
-   - test comment: `// 1.1.1 渲染已选飞船的船只建造属性区。` 或 `// 1.1.1: 渲染已选飞船的船只建造属性区。`
-4. **Assertion must match exactly**: The assertion code under the step comment must match the assertion documented in test_tasks.md exactly (e.g., `toBe(1000)`, `greaterThan(300)`, `toContain('text')`). Do not change assertion values or methods.
-5. **Sub-item assertions must be verified**: For steps with sub-items containing expectations (e.g., `  - [ ] 船体: 16,100 MJ（期望 toBe('16,100 MJ')）`), all assertions must be present in the test file
-6. **Order matters**: Steps must appear in the same order as in test_tasks.md
+要求：
+- `case="1"` 表示章节级错误（非任务树节点定位）。
+- `case="global"` 表示无法归因的全局错误（如路径解析失败）。
+- 对单元测试断言建议至少校验 `case` 与 `error_code`。
 
-### Example - Complex Steps with Sub-items
-```typescript
-it("3.6 Case: 大太刀满装备DPS计算", async ({ page }) => {
-  // 3.6.1 进入船只建造视图，选择 class=M、race=terran、type=corvette。
-  await page.click('[data-testid="ship-build-btn"]')
-  await page.click('[data-testid="class-M"]')
+#### B.7 Validation Workflow (MANDATORY)
 
-  // 3.6.2 选择大太刀（ship_ter_m_corvette_02_a）。
-  await page.click('[data-testid="ship-ter-m-corvette-02-a"]')
+1. 按 Chapter A 规则实现测试。
+2. 运行 `validate_test_case_refs.py`（推荐 `--json`）。
+3. 修复所有映射/注释/内容/期望值问题直至通过。
+4. 运行 `npx tsc -p tsconfig.test-check.json --noEmit`，修复类型错误。
 
-  // 3.6.3 配置满装备：
-  //   - 引擎: engine_ter_m_allround_01_mk1 × 1
-  await page.selectEquipment('engine', 'engine_ter_m_allround_01_mk1')
-  //   - 护盾: shield_ter_m_standard_02_mk2 × 2
-  await page.selectEquipment('shield', 'shield_ter_m_standard_02_mk2', 2)
-  //   - 武器: weapon_ter_m_beam_01_mk2 × 4
-  await page.selectEquipment('weapon', 'weapon_ter_m_beam_01_mk2', 4)
+## Constraints
 
-  // 3.6.4 切换到"详细"档位。
-  await page.click('[data-testid="stats-mode-detail"]')
+- 仅修改测试实现与本 change 相关文档。
+- 禁止将实现缺陷通过放宽 `test_tasks.md` 规则来规避。
 
-  // 3.6.5 验证属性值：
-  //   - 船体: 16,100 MJ
-  const hull = await page.getStatValue('hull')
-  expect(hull).toBe('16,100 MJ')
-  //   - 护盾: 12,878 MJ
-  const shield = await page.getStatValue('shield')
-  expect(shield).toBe('12,878 MJ')
-})
+## Output
+
+- Updated test implementation files under `tests/unit/<change-name>/` and `tests/e2e/<change-name>/`
+- Validation outcome summary (mapping + syntax/type status)
+
+## Example Usage
+
 ```
-
-## 8. VALIDATION WORKFLOW (MANDATORY)
-
-Follow this order when implementing tests:
-
-1. **Write tests following rules in Sections 1-7**:
-   - Exact directory paths (UNIT_DIR, E2E_DIR)
-   - Test case names只需以对应标号开头即可 (宽松匹配)
-   - Step comments只需以对应标号开头即可 (宽松匹配)
-   - **Every step must have at least one line of code** (operations or assertions)
-   - Assertions under step comments must EXACTLY match assertions documented in test_tasks.md
-
-2. **Python validation (first pass)**:
-   ```bash
-   python3 skill-scripts/validate_test_case_refs.py <change-name>
-   ```
-   - Fix any case name mismatches
-   - Fix any step comment mismatches
-   - **Fix steps without code**: Every step comment must have corresponding code
-   - Fix any assertion mismatches (including sub-item assertions)
-   - Repeat until Python validation passes
-
-3. **Agent validation (second pass)**:
-   - Verify test files exist in correct locations
-   - Verify syntax/type correctness: `npx tsc -p tsconfig.test-check.json --noEmit`
-   - Verify all test_tasks.md items have corresponding test cases
-   - Verify step comments are present and correctly placed (no empty lines between comment and code)
-   - Verify every step has at least one line of code
-   - Verify assertions under step comments exactly match assertions in test_tasks.md (e.g., `toBe(1000)`, `greaterThan(300)`)
-
-## 9. GUARDRAILS
-
-- DO NOT run `npm run build` or `npx playwright test`.
-- DO NOT run full test execution for verification pass/fail.
-- DO NOT write pass/fail markers to `test_tasks.md`.
+/x4:test-impl storage-auto-fill
+```
