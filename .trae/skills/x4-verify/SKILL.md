@@ -20,16 +20,18 @@ Change name input (if provided) supports abbreviation token and must be resolved
 
 1. Run static verification via `openspec-verify-change`.
 2. Ensure test implementation coverage via `x4-test-impl`.
-3. Execute tests and result sync via `x4-test`.
-4. Validate bug closure gate:
+3. Execute tests through `x4-test` orchestration.
+4. For bug-fix verification runs, test execution and result-apply entry MUST use `x4:test-run`.
+5. Validate bug closure gate:
    - If `openspec/changes/<change-name>/bugs.md` exists, every tracked bug must be `Verified` or `Rejected`.
    - Any bug in `New`, `Confirmed`, or `Fixed` blocks verify pass.
-5. Produce combined pass/fail report.
+6. Produce combined pass/fail report.
 
 ## Constraints
 
 - Do not mark verification complete if any required test fails.
 - Do not skip `x4-test-impl` or `x4-test` stages.
+- Do not bypass `x4:test-run` for bug-fix verification execution/result-apply.
 - Do not mark verification complete when bug closure gate fails.
 - `bugs.md` is the only source of truth for bug status. Do not infer bug closure from test output alone.
 

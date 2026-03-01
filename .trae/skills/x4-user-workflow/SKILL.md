@@ -1,6 +1,6 @@
 ---
 name: x4-user-workflow
-description: "Orchestrate X4 Station Calculator workflow with OpenSpec. (Trigger: /x4:discuss, /x4:new, /x4:ff, /x4:doc, /x4:apply, /x4:bug, /x4:bug-fix, /x4:test-impl, /x4:test, /x4:verify, /x4:archive)"
+description: "Orchestrate X4 Station Calculator workflow with OpenSpec. (Trigger: /x4:discuss, /x4:new, /x4:ff, /x4:doc, /x4:apply, /x4:bug, /x4:bug-fix, /x4:test-impl, /x4:test, /x4:test-run, /x4:verify, /x4:archive)"
 ---
 
 # X4 Workflow Orchestrator
@@ -19,6 +19,7 @@ It is orchestration-only and must not duplicate implementation details from phas
 - `/x4:bug-fix`
 - `/x4:test-impl`
 - `/x4:test`
+- `/x4:test-run`
 - `/x4:verify`
 - `/x4:archive`
 
@@ -115,15 +116,19 @@ Enforcement:
    - Delegate to: `x4-test-impl`.
 
 9. `/x4:test`
-   - Goal: execute change-scoped tests and sync test docs.
+   - Goal: orchestrate test workflow (`x4-test-doc`, `x4-test-impl`, `x4-test-run`).
    - Delegate to: `x4-test`.
 
-10. `/x4:verify`
+10. `/x4:test-run`
+   - Goal: execute change-scoped tests and apply run-result updates.
+   - Delegate to: `x4-test-run`.
+
+11. `/x4:verify`
    - Goal: run verification and testing workflow.
    - Delegate to: `x4-verify`.
    - Handoff contract to archive: must provide `verify_status`, `bug_gate`, `non_verified_bug_ids`, `bug_gate_summary`.
 
-11. `/x4:archive`
+12. `/x4:archive`
    - Goal: archive completed change and promote specs.
    - Delegate to: `x4-archive`.
    - Gate dependency: consume `/x4:verify` handoff contract; archive is allowed only when `verify_status=pass` and `bug_gate=pass`.

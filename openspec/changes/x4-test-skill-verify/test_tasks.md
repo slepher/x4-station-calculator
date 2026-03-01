@@ -132,6 +132,26 @@
   - [ ] 1.26.2 构造“修复后项勾选、无 bug-fix case”的样本
   - [ ] 1.26.3 断言前者通过、后者返回 `CASE_MISSING`（期望 toBe(true)）
 
+- [ ] 1.27 test-run 更新脚本成功回写校验
+  - [ ] 1.27.1 构造 batch 成功 case 输入并执行 `validate_test_results.py --mode=test --json`
+  - [ ] 1.27.2 对比 `test_tasks_run-*` 期望输出文件
+  - [ ] 1.27.3 断言脚本在 `--mode=test` 下不修改原始 `test_tasks-*` 输入文件（期望 toBe(true)）
+
+- [ ] 1.28 test-run 更新脚本二级失败回写校验
+  - [ ] 1.28.1 构造失败标号为 `x.x.x` 的样本
+  - [ ] 1.28.2 执行脚本并校验“失败点 `[✗]`、同级前 `[✓]`、同级后 `[ ]`、父链路 `[✗]`”
+  - [ ] 1.28.3 断言输出与 `test_tasks_run-*` 一致（期望 toBe(true)）
+
+- [ ] 1.29 test-run 更新脚本三级失败回写校验
+  - [ ] 1.29.1 构造失败标号为 `x.x.x.n` 的样本
+  - [ ] 1.29.2 执行脚本并校验三级同级规则及父链路回写
+  - [ ] 1.29.3 断言输出与 `test_tasks_run-*` 一致（期望 toBe(true)）
+
+- [ ] 1.30 test-run 更新脚本输入错误 JSON 报告校验
+  - [ ] 1.30.1 构造 `--failures` 与 `--fail-steps` 数量不一致样本
+  - [ ] 1.30.2 执行 `--json` 输出并解析错误数组
+  - [ ] 1.30.3 断言错误点包含 `case/error_code` 且 `error_code=INPUT_MISMATCH`（期望 toContain('INPUT_MISMATCH')）
+
 ## 2 E2E 标准状态与状态迁移
 
 ## 3 E2E 测试场景
