@@ -2,74 +2,103 @@
 
 ## 代码与数据来源
 
-- 主要实现：`src/components/ShipBuildFitCandidate.vue`
-- 模式守卫与布局联动：`src/components/ShipBuildView.vue`
-- 空 group 清理：`src/store/useShipBuildStore.ts`
-- 船体数据：`src/assets/x4_game_data/8.0-Diplomacy/data/ships.json`
-- 槽位标签定义：`src/assets/x4_game_data/8.0-Diplomacy/data/slot_tags.json`
+- 核心实现：`src/components/ship-build/ShipBuildPanelFit.vue`
+- 拖动条组件：`src/components/common/X4DualPhaseRangeSlider.vue`
+- 蓝图写入与清理：`src/store/useShipBuildStore.ts`
+- 统计与材料：
+  - `src/components/ship-build/ShipBuildPanelStats.vue`
+  - `src/components/ship-build/ShipBuildPanelMaterials.vue`
+- 数据源：
+  - `src/assets/x4_game_data/8.0-Diplomacy/data/ships.json`
+  - `src/assets/x4_game_data/8.0-Diplomacy/data/equipments.json`
+  - `src/assets/x4_game_data/8.0-Diplomacy/data/equipment_types.json`
+  - `src/assets/x4_game_data/8.0-Diplomacy/data/slot_tags.json`
 
-## 组件映射
+## 当前架构事实
 
-| UI 区域 | 文件 | 关键标识 |
-|------|------|------|
-| 配装主交互 | `ShipBuildFitCandidate.vue` | `slot-*`, `equipment-picker`, `picker-confirm`, `picker-cancel` |
-| 页面容器与面板显隐 | `ShipBuildView.vue` | `showMaterial`, `setFitMode` |
-| 选船入口 | `ship-build/ShipBuildSelector.vue` | `ship-build-list`, `ship-build-ship-name`, `ship-build-selection` |
+### 1. 组件关系
+- `ShipBuildFitCandidate.vue` 已删除。
+- 配装交互完全在 `ShipBuildPanelFit.vue` 内完成。
+- 拖动条已抽取为通用组件 `X4DualPhaseRangeSlider`，当前由 `ShipBuildPanelFit` 接入。
 
-## 展开态行为事实
+### 2. 状态归属
+- `fitMode` 在 `PanelFit` 本地管理。
+- `connectionRows/groupRows/selectedByConnection` 在 `PanelFit` 本地计算。
+- `draftCountByTarget` 在 `PanelFit` 本地维护拖动中的显示值。
+- `ShipBuildView` 只保留 `showMaterial` 与 `picker-open-change` 联动。
 
-### 1. 候选数量分流
-- `isSingleCandidate(target)` 为真时：点击直接 `assign-connection`；已选同一候选时置 `null`。
-- 非单候选时：`openPicker(target.key)`。
+### 3. 调用链
+- 槽位点击/确认时，`PanelFit` 直接调用 store `applyConnectionAssignment`。
+- 拖动提交时，`PanelFit` 调用 store `setConnectionAssignmentCount`，仅更新数量，不改装备 ID。
 
-### 2. 三行布局
-- Row1: 模式按钮 + 确认取消。
-- Row2: 槽位签 + 分页。
-- Row3: 左 `compatibility-box(filter)` + `slot-wall`，右候选列表。
-- Row1/Row2 高度常量：`25.6px`（`mode-tab-tall` 与 `picker-grid-row-compact`）。
+## 交互行为事实
 
-### 3. 过滤来源
-- Race/MK 来源：`pickerOptions` 实时候选。
-- Tag 来源：`tagDefs=['standard','advanced','xenon','mining','missile','highpower']`。
-- Tag 文本：`slotTagMap + translateSlotTag`。
+### 1. 单候选点击
+- 默认：未选点击装备；已选满数量点击清空。
+- 简化模式特例：
+  - 条件：`fitMode='group' && selectedId===candidateId && count<totalCount`
+  - 行为：点击补齐到满数量，不清空。
 
-### 4. 展开态交互
-- `canSwitchToGroupInCurrentState = props.canSwitchToGroup || isPickerLayout`，因此展开后允许切换 group。
-- `jumpToTab` 与 `setMode` 都会缓存当前展开项 `connectionKeys`，后续在 `watch(slotTargets)` 做锚点重映射。
-- 点击 slot.type（E/S/W/T/R）时执行 `closePicker()`。
+### 2. 拖动条行为
+- 每个槽位上方均有拖动条，宽度与槽位按钮一致。
+- 拖动两阶段：
+  - 实时阶段：只更新显示数量（draft）。
+  - 提交阶段：鼠标松开后一次性写回蓝图。
+- 简化模式步进：`step = target.totalCount`。
+- 当前样式事实：
+  - 拖动条可见轨道高度：`8px`
+  - 未填充轨道背景：`bg-slate-800`
 
-### 5. 关闭回退
-- `closePicker()` 中若 `!props.canSwitchToGroup && props.mode === 'group'`，发出 `update:mode('connection')`。
-- `ShipBuildView.setFitMode` 仅在 `showMaterial=true`（关闭态）时阻止冲突切换到 group。
+### 3. 数量为 0 的语义
+- 蓝图数量允许 `0`，不删除装备 ID。
+- `stats/material` 计算时过滤 `count<=0` 项，不计入贡献。
 
-## 大阪路径与候选证据
+### 4. 展开态布局与过滤
+- 三行两列结构保持。
+- 第一列宽度公式：`minmax(0, calc(50% - 4rem))`。
+- Race/MK：候选动态集合。
+- Tag：`standard/advanced/xenon/mining/missile/highpower` + i18n。
+- `raceTags.length > 3` 时，RACE 标签区为两行。
 
-### 1. 选择大阪的可达路径
-- 数据 ID：`ship_ter_l_destroyer_01_a`（`ships.json`，name=`Osaka`）。
+## 大阪路径与证据
+
+### 1. 大阪 ID 与可达路径
+- 船体 ID：`ship_ter_l_destroyer_01_a`（`ships.json`）
 - UI 路径：
-  - 打开选船列表 `data-testid=ship-build-list`
-  - 找到 `ship-build-ship-name` 文本 `Osaka/大阪`
-  - 点击后触发 `setSelectedShipId(ship.id)`
-  - 到位探针：`data-testid=ship-build-selection` 可见且 store `selectedShipId=ship_ter_l_destroyer_01_a`
+  - `data-testid=ship-build-list`
+  - 点击文本 `Osaka/大阪` 的 `ship-build-ship-name`
+  - 到位：`data-testid=ship-build-selection` 可见，`selectedShipId` 为大阪 ID
 
-### 2. 槽位候选计数（用于测试定位）
-- 计算逻辑来源：store 候选过滤（type/size/tags 与可用蓝图条件）。
-- 已固定可复现槽位：
-  - `ship_ter_l_destroyer_01_a::weapon::3::0` -> 候选 `1`
-  - `ship_ter_l_destroyer_01_a::weapon::3::1` -> 候选 `1`
-  - `ship_ter_l_destroyer_01_a::turret::4::3` -> 候选 `35`
-- 结论：`>1` 用 `turret::4::3`，`=1` 用 `weapon::3::0`。
+### 2. 固定槽位证据（用于测试）
+- `ship_ter_l_destroyer_01_a::weapon::3::0` -> 候选 `1`
+- `ship_ter_l_destroyer_01_a::weapon::3::1` -> 候选 `1`
+- `ship_ter_l_destroyer_01_a::turret::4::3` -> 候选 `35`
 
-## 测试定位建议（非臆测）
+## 与 test_tasks.md 同步映射
+
+### 1. Chapter 2 状态与切换
+- 状态 `osaka-selected`：已选中大阪并展示 `ship-build-selection`。
+- 状态 `osaka-picker-open-turret-4-3`：`slot-ship_ter_l_destroyer_01_a::turret::4::3` 打开 `equipment-picker`。
+- 切换 `osaka-picker-open-turret-4-3 -> osaka-picker-open-group-anchor-mapped`：展开态切简化后保持 picker 展开且锚点映射稳定。
+- 状态 `osaka-slot-slider-visible`：目标槽位上方拖动条可见且宽度对齐。
+- 切换 `osaka-slot-slider-dragging -> osaka-slot-slider-committed`：拖动阶段仅显示变化，提交阶段一次性落蓝图。
+
+### 2. Chapter 3 场景定位
+- `Case: 拖动条可见高度为 8px`：读取轨道高度样式。
+- `Case: 拖动条未填充背景色保持默认`：校验轨道未填充背景样式。
+- `Case: 简化模式步进等于聚合总数`：读取 `step` 与 `totalCount` 对齐关系。
+- `Case: 数量设为 0 后不删装备且不计入统计材料`：校验蓝图保留与计算排除双语义。
+
+### 3. Chapter 4 Bug 场景
+- `BUG-001` 可观察失败：点击简化模式后 `fitMode` 未进入 `group`。
+- 修复前/修复后断言均围绕 `fitMode` 状态或可见分组 UI 标识。
+
+## 测试定位建议
 
 - 槽位：`data-testid=slot-${connectionKey}`
+- 拖动条：通过 `slot-stack` 下第一个 `input[type=range]` 或 `.slider-track-bg`
 - Picker：`data-testid=equipment-picker`
-- 候选项：`data-testid=candidate-${equipmentId|empty}`
-- 过滤按钮：`race-*` / `mk-*` / `tag-*`
+- 候选：`data-testid=candidate-${equipmentId|empty}`
+- 过滤：`race-*` / `mk-*` / `tag-*`
 - 分页：`page-${n}`
-- 确认取消：`picker-confirm` / `picker-cancel`
-
-## 与 test_tasks 的同步约束
-
-- Case 中涉及大阪与槽位 ID 时，只能使用本文件已给出的可证实 ID。
-- 出现需求冲突时，以最新脚本规则与当前代码实现为准并回写两份文档。
+- 按钮：`picker-confirm` / `picker-cancel`

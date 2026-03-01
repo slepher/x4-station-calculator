@@ -90,11 +90,12 @@ const getShieldStats = () => {
     if (conn.slot_type !== 'shield') return
     conn.group.forEach((g) => {
       if (!g.equipment_id) return
+      if (g.count <= 0) return
       const equipment = equipmentMap.value.get(g.equipment_id)
       if (!equipment?.recharge) return
       // 护盾 = 专用槽护盾，含 count
-      max += (equipment.recharge.max || 0) * (g.count || 1)
-      rate += (equipment.recharge.rate || 0) * (g.count || 1)
+      max += (equipment.recharge.max || 0) * g.count
+      rate += (equipment.recharge.rate || 0) * g.count
       delay = Math.max(delay, equipment.recharge.delay || 0)
     })
   })
@@ -107,10 +108,11 @@ const getShieldStats = () => {
     // 跳过专用 shield 槽
     if (conn.slot_type === 'shield') return
     conn.group.forEach((g) => {
-      if (!g.shield) return
+      if (!g.shield?.equipment_id) return
+      if (g.shield.count <= 0) return
       const shieldEquipment = equipmentMap.value.get(g.shield.equipment_id)
       if (!shieldEquipment?.recharge) return
-      mountedShieldMax += (shieldEquipment.recharge.max || 0) * (g.shield.count || 0)
+      mountedShieldMax += (shieldEquipment.recharge.max || 0) * g.shield.count
       mountedShieldGroups++
     })
   })
@@ -132,6 +134,7 @@ const getEngineStats = () => {
     if (conn.slot_type !== 'engine') return
     conn.group.forEach((g) => {
       if (!g.equipment_id) return
+      if (g.count <= 0) return
       const equipment = equipmentMap.value.get(g.equipment_id)
       if (equipment) {
         engineEquipments.push({ equipment, count: g.count })
@@ -193,6 +196,7 @@ const getThrusterStats = () => {
     if (conn.slot_type !== 'thruster') return
     conn.group.forEach((g) => {
       if (!g.equipment_id) return
+      if (g.count <= 0) return
       const equipment = equipmentMap.value.get(g.equipment_id)
       if (equipment) {
         thrusterEquipments.push({ equipment, count: g.count })
@@ -209,7 +213,7 @@ const getThrusterStats = () => {
 
   thrusterEquipments.forEach(({ equipment, count }) => {
     if (!equipment?.thrust) return
-    const c = count || 1
+    const c = count
     if (equipment.thrust.pitch) pitch += equipment.thrust.pitch * c
     if (equipment.thrust.yaw) yaw += equipment.thrust.yaw * c
     if (equipment.thrust.roll) roll += equipment.thrust.roll * c
@@ -325,11 +329,12 @@ const getWeaponDamageStats = () => {
   props.shipBlueprint.connections.forEach((conn) => {
     conn.group.forEach((g) => {
       if (!g.equipment_id) return
+      if (g.count <= 0) return
       const equipment = equipmentMap.value.get(g.equipment_id)
       if (!equipment?.bullet) return
 
       const equipmentClass = equipment.class
-      const count = g.count || 1
+      const count = g.count
 
       // 只处理 weapon 和 missilelauncher
       if (equipmentClass !== 'weapon' && equipmentClass !== 'missilelauncher') return
@@ -358,6 +363,7 @@ const getTurretDamageStats = () => {
   props.shipBlueprint.connections.forEach((conn) => {
     conn.group.forEach((g) => {
       if (!g.equipment_id) return
+      if (g.count <= 0) return
       const equipment = equipmentMap.value.get(g.equipment_id)
       if (!equipment?.bullet) return
 
@@ -365,7 +371,7 @@ const getTurretDamageStats = () => {
       // 只计算 turret 和 missileturret class
       if (equipmentClass !== 'turret' && equipmentClass !== 'missileturret') return
 
-      const count = g.count || 1
+      const count = g.count
       const bullet = equipmentClass === 'turret' ? bulletMap.get(equipment.bullet) : null
       const missile = equipmentClass === 'missileturret' ? missileMap.get(equipment.bullet) : null
 

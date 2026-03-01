@@ -98,3 +98,10 @@ await page.locator('.result-item').first().click();
 ### 模块数据结构注意
 - `X4Module.wareId` 是模块内部 ID，不是产品 ID
 - 产品 ID 在 `X4Module.outputs` 的 key 中
+
+---
+
+## 运行环境补充（2026-03-01）
+
+- 在当前 CI/沙箱环境执行 Playwright 时，可能出现 Chromium 启动错误：`sandbox_host_linux.cc ... Operation not permitted`。
+- 处理方式：在允许提权的前提下运行 `bash skill-scripts/playwright-isolated.sh ...` 进行验证，避免将环境权限问题误判为产品缺陷。

@@ -87,6 +87,225 @@ class CommentEntry:
     line_idx: int
 
 
+def _scan_with_states(text: str, start: int = 0):
+    i = start
+    n = len(text)
+    in_sq = False
+    in_dq = False
+    in_bq = False
+    in_line_comment = False
+    in_block_comment = False
+    escaped = False
+    while i < n:
+        ch = text[i]
+        nxt = text[i + 1] if i + 1 < n else ""
+
+        if in_line_comment:
+            if ch == "\n":
+                in_line_comment = False
+            yield i, ch, in_sq, in_dq, in_bq, in_line_comment, in_block_comment
+            i += 1
+            continue
+
+        if in_block_comment:
+            if ch == "*" and nxt == "/":
+                yield i, ch, in_sq, in_dq, in_bq, in_line_comment, in_block_comment
+                i += 1
+                yield i, text[i], in_sq, in_dq, in_bq, in_line_comment, in_block_comment
+                in_block_comment = False
+                i += 1
+                continue
+            yield i, ch, in_sq, in_dq, in_bq, in_line_comment, in_block_comment
+            i += 1
+            continue
+
+        if in_sq:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == "'":
+                in_sq = False
+            yield i, ch, in_sq, in_dq, in_bq, in_line_comment, in_block_comment
+            i += 1
+            continue
+
+        if in_dq:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == '"':
+                in_dq = False
+            yield i, ch, in_sq, in_dq, in_bq, in_line_comment, in_block_comment
+            i += 1
+            continue
+
+        if in_bq:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == "`":
+                in_bq = False
+            yield i, ch, in_sq, in_dq, in_bq, in_line_comment, in_block_comment
+            i += 1
+            continue
+
+        # normal state
+        if ch == "/" and nxt == "/":
+            in_line_comment = True
+            yield i, ch, in_sq, in_dq, in_bq, in_line_comment, in_block_comment
+            i += 1
+            yield i, text[i], in_sq, in_dq, in_bq, in_line_comment, in_block_comment
+            i += 1
+            continue
+        if ch == "/" and nxt == "*":
+            in_block_comment = True
+            yield i, ch, in_sq, in_dq, in_bq, in_line_comment, in_block_comment
+            i += 1
+            yield i, text[i], in_sq, in_dq, in_bq, in_line_comment, in_block_comment
+            i += 1
+            continue
+        if ch == "'":
+            in_sq = True
+        elif ch == '"':
+            in_dq = True
+        elif ch == "`":
+            in_bq = True
+
+        yield i, ch, in_sq, in_dq, in_bq, in_line_comment, in_block_comment
+        i += 1
+
+
+def _find_call_bounds(text: str, call_start: int) -> Optional[Tuple[int, int]]:
+    open_paren = text.find("(", call_start)
+    if open_paren == -1:
+        return None
+
+    depth = 0
+    for i, ch, in_sq, in_dq, in_bq, in_line_comment, in_block_comment in _scan_with_states(text, open_paren):
+        if in_sq or in_dq or in_bq or in_line_comment or in_block_comment:
+            continue
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+            if depth == 0:
+                return open_paren, i
+    return None
+
+
+def _split_top_level_args(text: str, open_paren: int, close_paren: int) -> List[Tuple[int, int]]:
+    args: List[Tuple[int, int]] = []
+    seg_start = open_paren + 1
+    p_depth = 0
+    b_depth = 0
+    s_depth = 0
+
+    for i, ch, in_sq, in_dq, in_bq, in_line_comment, in_block_comment in _scan_with_states(text, open_paren + 1):
+        if i >= close_paren:
+            break
+        if in_sq or in_dq or in_bq or in_line_comment or in_block_comment:
+            continue
+        if ch == "(":
+            p_depth += 1
+        elif ch == ")":
+            p_depth -= 1
+        elif ch == "{":
+            b_depth += 1
+        elif ch == "}":
+            b_depth -= 1
+        elif ch == "[":
+            s_depth += 1
+        elif ch == "]":
+            s_depth -= 1
+        elif ch == "," and p_depth == 0 and b_depth == 0 and s_depth == 0:
+            args.append((seg_start, i))
+            seg_start = i + 1
+
+    args.append((seg_start, close_paren))
+    return args
+
+
+def _trim_span(text: str, span: Tuple[int, int]) -> Optional[Tuple[int, int]]:
+    start, end = span
+    while start < end and text[start].isspace():
+        start += 1
+    while end > start and text[end - 1].isspace():
+        end -= 1
+    if start >= end:
+        return None
+    return start, end
+
+
+def _find_callback_body_open(text: str, arg_span: Tuple[int, int]) -> Optional[int]:
+    start, end = arg_span
+    i = start
+    while i < end - 1:
+        ch = text[i]
+        nxt = text[i + 1]
+        # skip strings/comments quickly
+        if ch in ("'", '"', "`"):
+            quote = ch
+            i += 1
+            escaped = False
+            while i < end:
+                c = text[i]
+                if escaped:
+                    escaped = False
+                elif c == "\\":
+                    escaped = True
+                elif c == quote:
+                    i += 1
+                    break
+                i += 1
+            continue
+        if ch == "/" and nxt == "/":
+            i += 2
+            while i < end and text[i] != "\n":
+                i += 1
+            continue
+        if ch == "/" and nxt == "*":
+            i += 2
+            while i < end - 1:
+                if text[i] == "*" and text[i + 1] == "/":
+                    i += 2
+                    break
+                i += 1
+            continue
+
+        if ch == "=" and nxt == ">":
+            j = i + 2
+            while j < end and text[j].isspace():
+                j += 1
+            if j < end and text[j] == "{":
+                return j
+        i += 1
+
+    # function (...) { ... }
+    fn_pos = text.find("function", start, end)
+    if fn_pos != -1:
+        brace = text.find("{", fn_pos, end)
+        if brace != -1:
+            return brace
+    return None
+
+
+def _find_matching_brace(text: str, open_brace: int) -> Optional[int]:
+    depth = 0
+    for i, ch, in_sq, in_dq, in_bq, in_line_comment, in_block_comment in _scan_with_states(text, open_brace):
+        if in_sq or in_dq or in_bq or in_line_comment or in_block_comment:
+            continue
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return i
+    return None
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate test case refs")
     parser.add_argument("change_name", nargs="?", help="change name")
@@ -174,22 +393,28 @@ def parse_case_blocks(spec_path: Path) -> Dict[str, CaseBlock]:
             continue
         case_id = idm.group(1)
 
-        open_brace = text.find("{", m.end())
-        if open_brace == -1:
+        bounds = _find_call_bounds(text, m.start())
+        if bounds is None:
+            continue
+        open_paren, close_paren = bounds
+
+        arg_spans = _split_top_level_args(text, open_paren, close_paren)
+        if not arg_spans:
             continue
 
-        depth = 0
-        end = -1
-        for i in range(open_brace, len(text)):
-            ch = text[i]
-            if ch == "{":
-                depth += 1
-            elif ch == "}":
-                depth -= 1
-                if depth == 0:
-                    end = i
-                    break
-        if end == -1:
+        last_arg = _trim_span(text, arg_spans[-1])
+        if last_arg is None:
+            continue
+
+        open_brace = _find_callback_body_open(text, last_arg)
+        if open_brace is None:
+            # fallback to legacy behavior for uncommon signatures
+            open_brace = text.find("{", m.end(), close_paren + 1)
+            if open_brace == -1:
+                continue
+
+        end = _find_matching_brace(text, open_brace)
+        if end is None:
             continue
 
         body = text[open_brace + 1:end]

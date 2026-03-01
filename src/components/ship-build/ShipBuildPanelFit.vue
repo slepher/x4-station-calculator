@@ -9,6 +9,7 @@ import type { EquipmentType, ShipEquipmentSize, X4Equipment, X4EquipmentType, X4
 import slotTagsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/slot_tags.json'
 import equipmentsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
 import equipmentTypesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipment_types.json'
+import X4DualPhaseRangeSlider from '@/components/common/X4DualPhaseRangeSlider.vue'
 
 type AggregatedGroup = {
   key: string
@@ -52,7 +53,7 @@ const emit = defineEmits<{
 
 const shipBuildStore = useShipBuildStore()
 const { selectedShip, blueprint, mockTagPatch } = storeToRefs(shipBuildStore)
-const { applyConnectionAssignment } = shipBuildStore
+const { applyConnectionAssignment, setConnectionAssignmentCount } = shipBuildStore
 
 const handlePickerOpenChange = (open: boolean) => {
   emit('picker-open-change', open)
@@ -194,6 +195,29 @@ const selectedByConnection = computed<Record<string, string | null>>(() => {
   return result
 })
 
+const equippedCountByConnection = computed<Record<string, number>>(() => {
+  const result: Record<string, number> = {}
+  if (!selectedShip.value) return result
+
+  const ship = selectedShip.value
+  ship.slots.forEach((slot, slotIndex) => {
+    slot.groups.forEach((group, groupIndex) => {
+      const groupData = blueprint.value?.connections
+        .find(c => c.slot_type === slot.type)
+        ?.group.find(g => g.group === group.group)
+      const baseKey = `${ship.id}::${slot.type}::${slotIndex}::${groupIndex}`
+
+      result[baseKey] = groupData?.equipment_id ? Math.max(0, groupData.count || 0) : 0
+      if (group.connection?.shield) {
+        const shieldKey = `${baseKey}::shield`
+        result[shieldKey] = groupData?.shield?.equipment_id ? Math.max(0, groupData.shield.count || 0) : 0
+      }
+    })
+  })
+
+  return result
+})
+
 const groupRows = computed<FitGroupRow[]>(() => {
   const grouped = new Map<string, FitGroupRow>()
   connectionRows.value.forEach((row) => {
@@ -243,6 +267,7 @@ const selectedMkIds = ref<string[]>([])
 const selectedTagIds = ref<string[]>([])
 const currentPage = ref(1)
 const highlightedEquipmentId = ref<string | null>(null)
+const draftCountByTarget = ref<Record<string, number>>({})
 
 const slotTypeDefs = [
   { id: 'engine', label: 'E' },
@@ -431,11 +456,7 @@ const connectionCountMap = computed(() => {
 })
 
 const selectedCountForConnectionKeys = (keys: string[]) => {
-  return keys.reduce((sum, key) => {
-    const selected = selectedByConnection.value[key]
-    if (!selected) return sum
-    return sum + (connectionCountMap.value.get(key) || 0)
-  }, 0)
+  return keys.reduce((sum, key) => sum + (equippedCountByConnection.value[key] || 0), 0)
 }
 
 const totalCountForConnectionKeys = (keys: string[]) => {
@@ -493,7 +514,7 @@ const slotTargets = computed<SlotTarget[]>(() => {
         label: `${sizeShort(activeConnectionRow.value.size)} ${activeConnectionRow.value.slotTypeLabel}`,
         size: activeConnectionRow.value.size,
         slotTypeLabel: activeConnectionRow.value.slotTypeLabel,
-        count: activeConnectionRow.value.count,
+        count: selectedCountForConnectionKeys([activeConnectionRow.value.connectionKey]),
         totalCount: activeConnectionRow.value.count,
         tags: activeConnectionRow.value.tags,
         options: activeConnectionRow.value.options,
@@ -507,7 +528,7 @@ const slotTargets = computed<SlotTarget[]>(() => {
         label: `${sizeShort(row.size)} ${row.slotTypeLabel}`,
         size: row.size,
         slotTypeLabel: row.slotTypeLabel,
-        count: row.count,
+        count: selectedCountForConnectionKeys([row.connectionKey]),
         totalCount: row.count,
         tags: row.tags,
         options: row.options,
@@ -713,7 +734,10 @@ const handleSlotClick = (target: SlotTarget) => {
   if (isSingleCandidate(target)) {
     const candidateId = target.options[0]?.id || null
     const selectedId = selectedForConnectionKeys(target.connectionKeys)
-    const nextId = selectedId === candidateId ? null : candidateId
+    const shouldFillToFullInGroup = fitMode.value === 'group' && selectedId === candidateId && target.count < target.totalCount
+    const nextId = shouldFillToFullInGroup
+      ? candidateId
+      : selectedId === candidateId ? null : candidateId
     target.connectionKeys.forEach((connectionKey) => {
       applyConnectionAssignment({ connectionKey, equipmentId: nextId })
     })
@@ -743,6 +767,87 @@ const handlePickerConfirm = (equipmentId: string | null) => {
   closePicker()
 }
 
+const clampToTargetCount = (target: SlotTarget, raw: number) => {
+  const safe = Number.isFinite(raw) ? raw : 0
+  return Math.max(0, Math.min(target.totalCount, Math.round(safe)))
+}
+
+const sliderStepForTarget = (target: SlotTarget) => {
+  if (fitMode.value === 'group') return Math.max(1, target.totalCount)
+  return 1
+}
+
+const isCountSliderDisabled = (target: SlotTarget) => {
+  const selectedId = selectedForConnectionKeys(target.connectionKeys)
+  if (selectedId === '' || selectedId === '__mixed__') return true
+  return target.totalCount <= 0
+}
+
+const getDisplayedCount = (target: SlotTarget) => {
+  return draftCountByTarget.value[target.key] ?? target.count
+}
+
+const distributeCountByCapacity = (connectionKeys: string[], total: number) => {
+  const maxByKey = connectionKeys.map((key) => ({
+    key,
+    max: Math.max(0, connectionCountMap.value.get(key) || 0)
+  }))
+  const sumMax = maxByKey.reduce((sum, item) => sum + item.max, 0)
+  const clampedTotal = Math.max(0, Math.min(total, sumMax))
+
+  if (sumMax === 0 || clampedTotal === 0) {
+    return Object.fromEntries(connectionKeys.map((key) => [key, 0]))
+  }
+  if (clampedTotal === sumMax) {
+    return Object.fromEntries(maxByKey.map((item) => [item.key, item.max]))
+  }
+
+  const allocations = maxByKey.map((item) => {
+    const exact = (clampedTotal * item.max) / sumMax
+    const base = Math.min(item.max, Math.floor(exact))
+    return { ...item, exact, base, frac: exact - Math.floor(exact) }
+  })
+
+  let remaining = clampedTotal - allocations.reduce((sum, item) => sum + item.base, 0)
+  allocations
+    .sort((a, b) => b.frac - a.frac)
+    .forEach((item) => {
+      if (remaining <= 0) return
+      if (item.base >= item.max) return
+      item.base += 1
+      remaining -= 1
+    })
+
+  return Object.fromEntries(allocations.map((item) => [item.key, item.base]))
+}
+
+const handleCountSliderRealtime = (target: SlotTarget, value: number) => {
+  draftCountByTarget.value = {
+    ...draftCountByTarget.value,
+    [target.key]: clampToTargetCount(target, value)
+  }
+}
+
+const handleCountSliderCommit = (target: SlotTarget, value: number) => {
+  if (isCountSliderDisabled(target)) return
+  const committed = clampToTargetCount(target, value)
+  draftCountByTarget.value = {
+    ...draftCountByTarget.value,
+    [target.key]: committed
+  }
+
+  if (fitMode.value === 'group') {
+    const distributed = distributeCountByCapacity(target.connectionKeys, committed)
+    target.connectionKeys.forEach((connectionKey) => {
+      setConnectionAssignmentCount({ connectionKey, count: distributed[connectionKey] || 0 })
+    })
+  } else {
+    target.connectionKeys.forEach((connectionKey) => {
+      setConnectionAssignmentCount({ connectionKey, count: committed })
+    })
+  }
+}
+
 watch(pickerTarget, () => {
   selectedRaceIds.value = []
   selectedMkIds.value = []
@@ -756,6 +861,17 @@ watch(filteredCandidates, () => {
 })
 
 watch(slotTargets, () => {
+  const validTargetKeys = new Set(slotTargets.value.map((target) => target.key))
+  const cleanedDrafts: Record<string, number> = {}
+  Object.entries(draftCountByTarget.value).forEach(([key, val]) => {
+    if (!validTargetKeys.has(key)) return
+    const target = slotTargets.value.find((item) => item.key === key)
+    if (!target) return
+    if (val === target.count) return
+    cleanedDrafts[key] = val
+  })
+  draftCountByTarget.value = cleanedDrafts
+
   if (pendingExpandedConnectionKeys.value && pendingExpandedConnectionKeys.value.length > 0) {
     const anchor = new Set(pendingExpandedConnectionKeys.value)
     const mapped = slotTargets.value.find((target) => target.connectionKeys.some((key) => anchor.has(key)))
@@ -846,9 +962,11 @@ watch(slotTargets, () => {
                       <div class="filter-block">
                         <div class="filter-line">
                           <span class="filter-group">RACE</span>
-                          <button v-for="tag in raceTags" :key="`race-${tag.id}`" class="filter-chip" :class="selectedRaceIds.includes(tag.id) ? 'filter-chip-active' : ''" :data-testid="`race-${tag.id}`" @click="toggleRace(tag.id)">
-                            {{ tag.label }} <span class="chip-count">{{ tag.count }}</span>
-                          </button>
+                          <div class="filter-items-race" :class="raceTags.length > 3 ? 'filter-items-race-two-rows' : ''">
+                            <button v-for="tag in raceTags" :key="`race-${tag.id}`" class="filter-chip" :class="selectedRaceIds.includes(tag.id) ? 'filter-chip-active' : ''" :data-testid="`race-${tag.id}`" @click="toggleRace(tag.id)">
+                              {{ tag.label }} <span class="chip-count">{{ tag.count }}</span>
+                            </button>
+                          </div>
                         </div>
                         <div class="filter-line">
                           <span class="filter-group">MK</span>
@@ -865,26 +983,36 @@ watch(slotTargets, () => {
                       </div>
                     </section>
                     <section class="slot-wall picker-row3-slot-wall">
-                      <button
-                        v-for="target in slotTargets"
-                        :key="target.key"
-                        class="slot-row"
-                        :class="[
-                          isSingleCandidateSelected(target) ? 'slot-row-highlight' : '',
-                          expandedSlotKey === target.key ? 'slot-row-expanded' : ''
-                        ]"
-                        :data-testid="`slot-${target.key}`"
-                        @click="handleSlotClick(target)"
-                      >
-                        <div class="slot-row-main">
-                          <div class="slot-row-title">{{ target.label }}</div>
-                          <div class="slot-row-value" :class="isMixedSelectionInGroup(target) ? 'slot-row-value-mixed' : ''">{{ selectedNameForTarget(target) }}</div>
-                        </div>
-                        <div class="slot-row-side">
-                          <span class="slot-row-count">{{ target.count }}/{{ target.totalCount }}</span>
-                          <span class="slot-row-candidate">{{ getCandidateCount(target) }}</span>
-                        </div>
-                      </button>
+                      <div v-for="target in slotTargets" :key="target.key" class="slot-stack">
+                        <X4DualPhaseRangeSlider
+                          class="slot-count-slider"
+                          :model-value="getDisplayedCount(target)"
+                          :min="0"
+                          :max="target.totalCount"
+                          :step="sliderStepForTarget(target)"
+                          :disabled="isCountSliderDisabled(target)"
+                          @update:model-value="handleCountSliderRealtime(target, $event)"
+                          @commit="handleCountSliderCommit(target, $event)"
+                        />
+                        <button
+                          class="slot-row"
+                          :class="[
+                            isSingleCandidateSelected(target) ? 'slot-row-highlight' : '',
+                            expandedSlotKey === target.key ? 'slot-row-expanded' : ''
+                          ]"
+                          :data-testid="`slot-${target.key}`"
+                          @click="handleSlotClick(target)"
+                        >
+                          <div class="slot-row-main">
+                            <div class="slot-row-title">{{ target.label }}</div>
+                            <div class="slot-row-value" :class="isMixedSelectionInGroup(target) ? 'slot-row-value-mixed' : ''">{{ selectedNameForTarget(target) }}</div>
+                          </div>
+                          <div class="slot-row-side">
+                            <span class="slot-row-count">{{ getDisplayedCount(target) }}/{{ target.totalCount }}</span>
+                            <span class="slot-row-candidate">{{ getCandidateCount(target) }}</span>
+                          </div>
+                        </button>
+                      </div>
                       <div v-if="slotTargets.length === 0" class="empty-card">{{ t('ship_build.fit_no_equipment') }}</div>
                     </section>
                   </div>
@@ -934,26 +1062,36 @@ watch(slotTargets, () => {
               </section>
 
               <section class="slot-wall">
-                <button
-                  v-for="target in slotTargets"
-                  :key="target.key"
-                  class="slot-row"
-                  :class="[
-                    isSingleCandidateSelected(target) ? 'slot-row-highlight' : '',
-                    expandedSlotKey === target.key ? 'slot-row-expanded' : ''
-                  ]"
-                  :data-testid="`slot-${target.key}`"
-                  @click="handleSlotClick(target)"
-                >
-                  <div class="slot-row-main">
-                    <div class="slot-row-title">{{ target.label }}</div>
-                    <div class="slot-row-value" :class="isMixedSelectionInGroup(target) ? 'slot-row-value-mixed' : ''">{{ selectedNameForTarget(target) }}</div>
-                  </div>
-                  <div class="slot-row-side">
-                    <span class="slot-row-count">{{ target.count }}/{{ target.totalCount }}</span>
-                    <span class="slot-row-candidate">{{ getCandidateCount(target) }}</span>
-                  </div>
-                </button>
+                <div v-for="target in slotTargets" :key="target.key" class="slot-stack">
+                  <X4DualPhaseRangeSlider
+                    class="slot-count-slider"
+                    :model-value="getDisplayedCount(target)"
+                    :min="0"
+                    :max="target.totalCount"
+                    :step="sliderStepForTarget(target)"
+                    :disabled="isCountSliderDisabled(target)"
+                    @update:model-value="handleCountSliderRealtime(target, $event)"
+                    @commit="handleCountSliderCommit(target, $event)"
+                  />
+                  <button
+                    class="slot-row"
+                    :class="[
+                      isSingleCandidateSelected(target) ? 'slot-row-highlight' : '',
+                      expandedSlotKey === target.key ? 'slot-row-expanded' : ''
+                    ]"
+                    :data-testid="`slot-${target.key}`"
+                    @click="handleSlotClick(target)"
+                  >
+                    <div class="slot-row-main">
+                      <div class="slot-row-title">{{ target.label }}</div>
+                      <div class="slot-row-value" :class="isMixedSelectionInGroup(target) ? 'slot-row-value-mixed' : ''">{{ selectedNameForTarget(target) }}</div>
+                    </div>
+                    <div class="slot-row-side">
+                      <span class="slot-row-count">{{ getDisplayedCount(target) }}/{{ target.totalCount }}</span>
+                      <span class="slot-row-candidate">{{ getCandidateCount(target) }}</span>
+                    </div>
+                  </button>
+                </div>
 
                 <div v-if="slotTargets.length === 0" class="empty-card">{{ t('ship_build.fit_no_equipment') }}</div>
               </section>
@@ -998,7 +1136,9 @@ watch(slotTargets, () => {
 .compatibility-title { @apply text-xs text-slate-100 font-semibold mb-0.5; }
 .compatibility-line { @apply text-[11px] text-slate-200; }
 .compatibility-line.tags { @apply text-sky-200; }
-.slot-wall { @apply min-w-0 mt-2 grid gap-1.5; }
+.slot-wall { @apply min-w-0 mt-2 grid gap-2; }
+.slot-stack { @apply grid gap-1; }
+.slot-count-slider { @apply w-full; }
 .slot-row { @apply rounded border border-sky-700 bg-[#0a3c73] px-2 py-2 flex items-center justify-between text-left; }
 .slot-row-highlight { @apply border-emerald-300 ring-1 ring-emerald-400; }
 .slot-row-expanded { @apply border-cyan-300 ring-1 ring-cyan-400; }
@@ -1011,8 +1151,8 @@ watch(slotTargets, () => {
 .slot-row-candidate { @apply rounded border border-sky-500/70 px-1.5 py-0.5 text-[10px] text-slate-200; }
 .empty-card { @apply rounded border border-dashed border-sky-700 p-3 text-xs text-slate-300 text-center; }
 
-.picker-grid-row { @apply grid grid-cols-[1fr_1fr] gap-2 mt-2; }
-.picker-cell { @apply min-h-20; }
+.picker-grid-row { @apply grid gap-2 mt-2; grid-template-columns: minmax(0, calc(50% - 4rem)) minmax(0, 1fr); }
+.picker-cell { @apply min-h-20 min-w-0; }
 .picker-right { @apply flex items-start justify-end; }
 .picker-row3-left { @apply flex flex-col gap-2; }
 .picker-grid-row-compact { @apply h-[25.6px] items-center; }
@@ -1028,6 +1168,8 @@ watch(slotTargets, () => {
 .filter-block { @apply mt-2 flex flex-col gap-2; }
 .filter-line { @apply flex flex-wrap items-center gap-1.5; }
 .filter-group { @apply text-[10px] uppercase text-slate-300 font-semibold min-w-8; }
+.filter-items-race { @apply flex flex-wrap items-center gap-1.5; }
+.filter-items-race-two-rows { display: grid; grid-template-rows: repeat(2, minmax(0, auto)); grid-auto-flow: column; align-items: center; gap: 0.375rem; }
 .filter-chip { @apply rounded border border-slate-600 px-2 py-1 text-[10px] text-slate-200 bg-slate-900/50; }
 .filter-chip-active { @apply border-emerald-300 bg-emerald-500/20 text-emerald-100; }
 .chip-count { @apply text-[10px] text-slate-300 ml-1; }
