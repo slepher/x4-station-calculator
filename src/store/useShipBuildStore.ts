@@ -522,6 +522,8 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     const info = connectionKeyMap.value.get(payload.connectionKey)
     if (!info) return
 
+    const resolvedCount = selectedByConnectionComputed.value[payload.connectionKey]?.count ?? info.count
+
     if (info.isShield) {
       // For shield slots, there are two cases:
       // 1. Direct shield slot (ship has dedicated shield slots): 4 parts - shipId::shield::slotIndex::groupIndex
@@ -531,7 +533,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       // Case 1: Direct shield slot (slotType = 'shield' and parentSlotType = 'shield')
       if (parts.length === 4 && parts[1] === 'shield') {
         // For direct shield slot, use setEquipment with slotType='shield'
-        setEquipment(info.slotType, info.groupName, payload.equipmentId, info.count)
+        setEquipment(info.slotType, info.groupName, payload.equipmentId, resolvedCount)
         return
       }
 
@@ -549,12 +551,48 @@ export const useShipBuildStore = defineStore('ship-build', () => {
         )
         const firstParentRow = parentRows[0]
         if (firstParentRow) {
-          setShield(parentSlotType, firstParentRow.groupName, payload.equipmentId, info.count)
+          setShield(parentSlotType, firstParentRow.groupName, payload.equipmentId, resolvedCount)
         }
       }
     } else {
-      setEquipment(info.slotType, info.groupName, payload.equipmentId, info.count)
+      setEquipment(info.slotType, info.groupName, payload.equipmentId, resolvedCount)
     }
+  }
+
+  const setConnectionAssignmentCount = (payload: { connectionKey: string; count: number }) => {
+    const info = connectionKeyMap.value.get(payload.connectionKey)
+    if (!info) return
+
+    const nextCount = Math.max(0, Math.round(payload.count))
+    const currentEquipmentId = selectedByConnectionComputed.value[payload.connectionKey]?.equipmentId || null
+
+    if (info.isShield) {
+      const parts = payload.connectionKey.split('::')
+
+      if (parts.length === 4 && parts[1] === 'shield') {
+        setEquipment(info.slotType, info.groupName, currentEquipmentId, nextCount)
+        return
+      }
+
+      if (parts.length >= 5 && parts[4] === 'shield') {
+        const shipId = parts[0]
+        const parentSlotType = parts[1]
+        const slotIndex = parts[2]
+        const groupIndex = parts[3]
+        if (!shipId || !parentSlotType || !slotIndex || !groupIndex) return
+        const parentRows = connectionRows.value.filter(r =>
+          r.slotType === parentSlotType &&
+          r.connectionKey === `${shipId}::${parentSlotType}::${slotIndex}::${groupIndex}`
+        )
+        const firstParentRow = parentRows[0]
+        if (firstParentRow) {
+          setShield(parentSlotType, firstParentRow.groupName, currentEquipmentId, nextCount)
+        }
+      }
+      return
+    }
+
+    setEquipment(info.slotType, info.groupName, currentEquipmentId, nextCount)
   }
 
   const applyGroupAssignment = (payload: { connectionKeys: string[]; equipmentId: string | null }) => {
@@ -816,6 +854,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     setSelectedTypes,
     setFitMode,
     applyConnectionAssignment,
+    setConnectionAssignmentCount,
     applyGroupAssignment,
     setStatsViewMode,
     setMockTagPatch,

@@ -6,104 +6,112 @@
 
 ```
 ShipBuildView
-├── ShipBuildPanelFit
-│   └── ShipBuildFitCandidate  # 槽位、展开 picker、过滤、分页、确认主逻辑
+├── ShipBuildPanelFit      # 配装主逻辑（已内聚）
 ├── ShipBuildPanelStats
-└── ShipBuildPanelMaterials     # 由 showMaterial 控制显隐
+└── ShipBuildPanelMaterials
 ```
 
-当前实现以 `ShipBuildFitCandidate.vue` 为主承载，未走独立 picker 子组件装配。
+`ShipBuildFitCandidate.vue` 已删除，原逻辑迁入 `ShipBuildPanelFit.vue`。
 
-### 关键状态
+### 状态归属
 
-| 状态 | 位置 | 作用 |
+| 状态 | 位置 | 说明 |
 |------|------|------|
-| `showMaterial` | `ShipBuildView.vue` | picker 打开时隐藏材料面板，关闭时恢复 |
-| `expandedSlotKey` | `ShipBuildFitCandidate.vue` | 当前展开槽位 |
-| `pendingExpandedConnectionKeys` | `ShipBuildFitCandidate.vue` | 模式/分组切换时的展开锚点重映射 |
-| `selectedRaceIds/selectedMkIds/selectedTagIds` | `ShipBuildFitCandidate.vue` | 三组过滤状态 |
-| `highlightedEquipmentId` | `ShipBuildFitCandidate.vue` | 当前候选高亮项（确认前） |
+| `fitMode` | `ShipBuildPanelFit.vue` | 本地模式切换（connection/group） |
+| `expandedSlotKey` | `ShipBuildPanelFit.vue` | 当前展开槽位 |
+| `pendingExpandedConnectionKeys` | `ShipBuildPanelFit.vue` | 切换锚点映射 |
+| `selectedRaceIds/selectedMkIds/selectedTagIds` | `ShipBuildPanelFit.vue` | 过滤器选择 |
+| `draftCountByTarget` | `ShipBuildPanelFit.vue` | 拖动实时阶段显示数量草稿 |
+| `showMaterial` | `ShipBuildView.vue` | picker 开关联动 materials 显隐 |
 
-## 核心行为
+## 数据流
 
-### 1. 候选数分流
+### 1. PanelFit 内部构建展示数据
 
-- `candidateCount = 0`：显示空槽。
-- `candidateCount = 1`：显示唯一候选名，点击执行装备/取消切换。
-- `candidateCount > 1`：点击后 `openPicker(target.key)`。
+`ShipBuildPanelFit` 直接读取 store 原始状态（`selectedShip/blueprint/mockTagPatch`），在本地计算：
+- `connectionRows`
+- `groupRows`
+- `selectedByConnection`
 
-核心逻辑（简化）：
+这三项不再由 `ShipBuildView` 透传，不再作为 store 对外 return 字段。
+
+### 2. 赋值调用
+
+配装赋值由 `ShipBuildPanelFit` 直接调用 store 的 `applyConnectionAssignment`，不再经过 `ShipBuildView` 事件转发。
+
+数量提交由 `ShipBuildPanelFit` 调用 store 的 `setConnectionAssignmentCount`，用于“仅改数量不改装备 ID”的场景。
+
+## 核心逻辑
+
+### 1. 单候选点击补满语义
 
 ```ts
-if (isSingleCandidate(target)) {
-  const candidateId = target.options[0]?.id || null
-  const selectedId = selectedForConnectionKeys(target.connectionKeys)
-  const nextId = selectedId === candidateId ? null : candidateId
-  target.connectionKeys.forEach((connectionKey) => {
-    emit('assign-connection', { connectionKey, equipmentId: nextId })
-  })
-} else {
-  openPicker(target.key)
+const shouldFillToFullInGroup =
+  fitMode.value === 'group' &&
+  selectedId === candidateId &&
+  target.count < target.totalCount
+
+const nextId = shouldFillToFullInGroup
+  ? candidateId
+  : selectedId === candidateId ? null : candidateId
+```
+
+- 简化模式下“已选但未满”点击会补满。
+- 满数量点击仍可清空。
+
+### 2. 计数计算修正
+
+标准模式 slot target 的 `count` 改为基于 `selectedCountForConnectionKeys(...)`，确保清空后显示 `0/1`。
+
+### 3. 展开态列宽防抖
+
+使用纯 CSS 固定第一列宽度关系（不使用 JS 存宽）：
+
+```css
+.picker-grid-row {
+  grid-template-columns: minmax(0, calc(50% - 4rem)) minmax(0, 1fr);
 }
 ```
 
-### 2. 展开态三行布局
+目的：展开时第一列视觉宽度稳定，避免抖动。
 
-- Row1: `mode-tabs` + `picker-confirm/cancel`，按钮高度 `25.6px`。
-- Row2: `group-tabs` + `pager`，行高 `25.6px`。
-- Row3: 左 `compatibility-box(filter-block)` + `slot-wall`；右 `candidate-list`。
+### 4. Race 标签多行
 
-样式上通过：
-- `.picker-grid-row-compact { h-[25.6px] }`
-- `.mode-tab-tall { h-[25.6px] }`
-- `cancel` 按钮 `mr-1`
+当 `raceTags.length > 3`，RACE 标签容器启用两行网格布局；否则保持单行流式布局。
 
-### 3. 过滤来源与计数
+### 5. 槽位数量拖动条与二阶段写回
 
-- Race/MK: 来自 `pickerOptions` 实际候选。
-- Tag: `tagDefs = ['standard','advanced','xenon','mining','missile','highpower']`，再与 `availableTagIds` 交集，文本使用 `translateSlotTag`。
-- 计数：每一组在“其他两组已过滤”结果上统计。
+- UI 组件：`X4DualPhaseRangeSlider`（`src/components/common/X4DualPhaseRangeSlider.vue`）
+- 接入方式：每个槽位使用 `slot-stack` 包裹，拖动条位于 `slot-row` 上方，宽度 `w-full` 跟随槽位。
+- 交互分层：
+  - `@update:model-value` -> `handleCountSliderRealtime`：仅更新 `draftCountByTarget`。
+  - `@commit` -> `handleCountSliderCommit`：一次性写回蓝图。
+- 标准模式：直接按 connectionKey 提交数量。
+- 简化模式：先按 connection capacity 分配（`distributeCountByCapacity`），再逐 connection 一次性提交。
+- 步进规则：
+  - `connection` 模式：`step=1`
+  - `group` 模式：`step=Math.max(1, target.totalCount)`
 
-### 4. 展开态交互策略
+### 6. 蓝图 `count=0` 保留与计算排除
 
-- `canSwitchToGroupInCurrentState = props.canSwitchToGroup || isPickerLayout`。
-- 展开时允许 `connection <-> group` 切换。
-- 展开时允许 group/tab 切换，且保持展开。
-- 点击 slot.type 会触发 `closePicker()`。
+- store `setConnectionAssignmentCount` 支持 `count=0`，不会移除已选装备 ID。
+- `ShipBuildPanelMaterials` 聚合时过滤 `count<=0` 的主装备与挂载护盾。
+- `ShipBuildPanelStats` 在护盾、引擎、推进器、武器、炮塔统计中统一过滤 `count<=0`，避免 `count || 1` 误计入。
 
-### 5. 展开锚点重映射
+## 已移除逻辑
 
-模式或 tab 切换前缓存当前展开项的 `connectionKeys`：
-
-```ts
-pendingExpandedConnectionKeys.value = [...current.connectionKeys]
-```
-
-`slotTargets` 变更后按锚点查找新目标并恢复展开：
-
-```ts
-const anchor = new Set(pendingExpandedConnectionKeys.value)
-const mapped = slotTargets.value.find((target) => target.connectionKeys.some((key) => anchor.has(key)))
-expandedSlotKey.value = mapped?.key || slotTargets.value[0]?.key || null
-```
-
-### 6. 关闭回退
-
-`closePicker()` 中执行：
-- 关闭展开。
-- 通知父层恢复 `showMaterial`。
-- 若当前为 `group` 且 `!props.canSwitchToGroup`，发出 `update:mode('connection')` 回退。
-
-`ShipBuildView.setFitMode` 仅在关闭态（`showMaterial = true`）阻止非法切换到 group；展开态不阻止。
-
-### 7. 确认与清理
-
-确认时按 `pickerTarget.connectionKeys` 批量 emit `assign-connection`，并关闭 picker。
-后续清理由 store 负责：`equipment_id` 与 `shield.equipment_id` 同空时移除 group。
+- 冲突守卫禁止切到 group。
+- picker 关闭后强制回退到 connection。
+- `ShipBuildFitCandidate` 组件及其事件链。
+- `ShipBuildView` 对 `mode/rows/selectedByConnection` 的透传。
 
 ## 依赖文件
 
-- `src/components/ShipBuildFitCandidate.vue`
+- `src/components/ship-build/ShipBuildPanelFit.vue`
+- `src/components/common/X4DualPhaseRangeSlider.vue`
 - `src/components/ShipBuildView.vue`
 - `src/store/useShipBuildStore.ts`
+- `src/components/ship-build/ShipBuildPanelStats.vue`
+- `src/components/ship-build/ShipBuildPanelMaterials.vue`
 - `src/assets/x4_game_data/8.0-Diplomacy/data/slot_tags.json`
+- `src/assets/x4_game_data/8.0-Diplomacy/data/equipments.json`
