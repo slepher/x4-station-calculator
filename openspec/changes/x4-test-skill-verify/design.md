@@ -10,6 +10,11 @@
 - `validate_test_tasks_refs.py` 只处理 `test_tasks.md` 合法性。
 - `validate_test_case_refs.py` 只处理 `test_tasks.md` 与 `spec.ts` 映射一致性。
 
+2. `--cases` 参数过滤
+- 支持 `--cases` 参数指定验证的 case 标号（如 `1.1`、`1.1,2.1`）。
+- 使用该参数时，跳过 EXTRA_CASE_UNMAPPED 和 EXTRA_COMMENT_UNMAPPED 检查（检查 test 中哪些任务 tasks 中没有）。
+- 保留 CASE_MISSING、COMMENT_MISSING、位置验证等核心检查。
+
 2. test-impl verify 核心模型
 - 顶层编号映射到 case 名标号。
 - 二/三级编号映射到 case 注释标号。

@@ -36,7 +36,47 @@
 
 - `船体/船员/仓储/泊位与容量/基础机动参数`：`ships.json`
 - `护盾容量/再充率/再充延迟/速度与助推巡航链路`：`equipments.json` + 已选装备
-- `武器爆发输出值/武器持续性输出值/炮塔平均输出值`：当前为待接入字段（占位 + 提示）
+- `武器爆发输出值/武器持续性输出值/炮塔平均输出值`：通过 `useEquipmentStats` composable 计算
+
+## useEquipmentStats Composable
+
+### 概述
+`useEquipmentStats` 位于 `src/composables/useEquipmentStats.ts`，用于计算单个装备的属性数据。
+
+### 函数签名
+```typescript
+function useEquipmentStats(equipment: X4Equipment, ship: X4Ship): {
+  summary: ComputedRef<EquipmentSummary | undefined>
+  details: ComputedRef<EquipmentDetail | undefined>
+}
+```
+
+### 导出类型
+
+| 类型 | 说明 |
+|------|------|
+| `WeaponSummary` | `{ burstDPS, range }` |
+| `TurretSummary` | `{ sustainedDPS, range }` |
+| `ShieldSummary` | `{ shieldMax, shieldDelay }` |
+| `EngineSummary` | `{ speed, travelSpeed, travelCharge }` |
+| `ThrusterSummary` | `{ strafeSpeed, yawRate }` |
+| `WeaponDetail` | 包含 burstDPS, sustainedDPS, range, singleDamage, singleShotTime, avgShotTime, ammo, ammoReload, chargetime, timeToOverheat, cooldelay, coolTime, cycleTime |
+| `ShieldDetail` | `{ shieldMax, shieldRate, shieldDelay }` |
+| `EngineDetail` | 包含 thrustForward, boostMultiplier, boostAcceleration, boostDuration, boostRecharge, travelThrust, travelAttack, travelCharge, travelSpeed, travelAcceleration, speed, acceleration, boostSpeed, boostAccel |
+| `ThrusterDetail` | 包含 pitch, yaw, roll, strafe, pitchRate, yawRate, rollRate, strafeSpeed, strafeAcceleration |
+
+### 数据源
+- 弹体数据：`bullets.json` (from `bullet_macros.xml`)
+- 导弹数据：`missiles.json` (from `missile_macros.xml`)
+- 装备数据：`equipments.json` (from `equipment_macros.xml`)
+
+### 计算公式
+- **武器 burstDPS**: `(damage * amount / avgShotTime) * count`
+- **武器 sustainedDPS**: 考虑过热机制的持续 DPS
+- **Beam 武器**: `damage * lifetime` 作为单发伤害
+- **引擎速度**: `thrustForward / dragForward`
+- **引擎加速度**: `thrustForward / mass`
+- **推进器转向率**: `thrust / drag`
 
 ## 断言建议
 

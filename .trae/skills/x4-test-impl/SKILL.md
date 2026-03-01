@@ -107,12 +107,15 @@ python3 skill-scripts/validate_test_case_refs.py <change-name> --json
 
 1. 任务文件与测试文件对应。
    - 对应关系为双向：缺失映射与多余映射（case/comment）都应报错。
-2. 顶层任务编号（`x.x`）对应 case 描述前缀编号。
+2. 顶层任务编号（`x.x`）对应 test/it 名称前缀编号。
+   - 格式：`it('1.1 描述', () => { ... })` 或 `test('1.1 描述', async ...)`
+   - 顶层编号必须出现在 test/it 名称中
 3. 二级/三级任务编号（`x.x.x` / `x.x.x.n`）对应 case 内注释编号。
+   - 格式：`// 1.1.1 步骤描述`
 4. 若任务含 `#期望: [...]`，则对应代码块必须存在断言，且断言值覆盖期望值。
 5. spec 文件内 case 标号必须按编号递增顺序出现。
 6. 单个 case 内注释标号必须按编号递增顺序出现（同级与层级展开均需满足顺序约束）。
-7. 当前 verify 脚本仅强制校验标号映射与顺序，不对“标号后全文语义一致性”做自动判定。
+7. 当前 verify 脚本仅强制校验标号映射与顺序，不对”标号后全文语义一致性”做自动判定。
 
 #### B.3 File Discovery Rules (MANDATORY)
 
@@ -156,6 +159,12 @@ Chapter 4 需要同时映射 `bug` 与 `bug-fix` 两类文件，并按语义拆�
 2. 运行 `validate_test_case_refs.py`（推荐 `--json`）。
 3. 修复所有映射/注释/内容/期望值问题直至通过。
 4. 运行 `npx tsc -p tsconfig.test-check.json --noEmit`，修复类型错误。
+
+**可选参数 `--cases`**:
+- 支持指定验证的 case 标号（如 `1.1`、`1.1,2.1`）
+- 使用该参数时，跳过 EXTRA_CASE_UNMAPPED/EXTRA_COMMENT_UNMAPPED 检查
+- 适用于只想验证部分 case 有效性的场景
+- 示例: `python3 skill-scripts/validate_test_case_refs.py --mode=test --file tests/skills/data/impls/test_tasks-01-foo.md --cases 1.1`
 
 ## Constraints
 

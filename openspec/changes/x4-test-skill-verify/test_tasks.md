@@ -152,6 +152,11 @@
   - [ ] 1.30.2 执行 `--json` 输出并解析错误数组
   - [ ] 1.30.3 断言错误点包含 `case/error_code` 且 `error_code=INPUT_MISMATCH`（期望 toContain('INPUT_MISMATCH')）
 
+- [ ] 1.31 validate --cases 参数过滤校验
+  - [ ] 1.31.1 执行 `validate_test_case_refs.py --mode=test --file <test_tasks> --cases 1.1`
+  - [ ] 1.31.2 执行 `validate_test_case_refs.py --mode=test --file <test_tasks> --cases 1.1,2.1`
+  - [ ] 1.31.3 断言仅验证指定 case，跳过 EXTRA_CASE_UNMAPPED 检查（期望 toBe(true)）
+
 ## 2 E2E 标准状态与状态迁移
 
 ## 3 E2E 测试场景
