@@ -17,12 +17,20 @@
 
 ## 状态与切换语义
 
-- 状态：`已选 Heron Vanguard`
-  - 进入路径：`class=L` -> `race=teladi` -> `type=freighter` -> 点击 `Heron Vanguard`
+- 状态：`大太刀已选`
+  - 进入路径：`class=M` -> `race=terran` -> `type=corvette` -> 点击 `大太刀` (ship_ter_m_corvette_02_a)
   - 可观察结果：`ship-build-panel-stats`、`ship-build-selection` 可见
-- 切换：`已选 Heron Vanguard -> 详细档位`
+  - 预设装备：引擎1、推进器1、护盾2、武器4、炮塔2
+- 状态：`大阪已选`
+  - 进入路径：`class=L` -> `race=terran` -> `type=destroyer` -> 点击 `大阪` (ship_ter_l_destroyer_01_a)
+  - 可观察结果：`ship-build-panel-stats`、`ship-build-selection` 可见
+  - 预设装备：引擎6、护盾4(专用)+挂载M、武器6、炮塔9
+- 切换：`大太刀已选 -> 详细档位`
   - 操作：点击 `ship-build-stats-mode-detail`
   - 可观察结果：详细字段集合可见，且包含真实值与占位值并存
+- 切换：`详细档位 -> 简略档位`
+  - 操作：点击 `ship-build-stats-mode-summary`
+  - 可观察结果：简略字段集合可见（18项）
 
 ## 字段对齐矩阵（按截图）
 

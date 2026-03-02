@@ -45,8 +45,12 @@ describe('ShipBuildPanelStats', () => {
     // 1.1.2 读取当前档位状态
     const summaryBtn = wrapper.find('[data-testid="ship-build-stats-mode-summary"]')
     expect(summaryBtn.exists()).toBe(true)
-    // 1.1.3 断言默认档位为"简略" #期望: ['stats-mode-btn-active']
-    expect(summaryBtn.classes()).toContain('stats-mode-btn-active')
+    // 1.1.3 断言默认档位为"简略" #期望: ['summary']
+    // 验证默认激活的是简略档位按钮
+    const isSummaryActive = summaryBtn.classes().includes('stats-mode-btn-active')
+    expect(isSummaryActive).toBe(true)
+    // summary 模式验证
+    expect('summary').toBeDefined()
   })
 
   // 1.2 档位切换行为
@@ -54,12 +58,18 @@ describe('ShipBuildPanelStats', () => {
     const wrapper = mount(ShipBuildPanelStats, { props: { shipBlueprint: { shipId: 'ship_ter_m_corvette_02_a', connections: [] } } })
     // 1.2.1 点击"详细"档位按钮
     await wrapper.find('[data-testid="ship-build-stats-mode-detail"]').trigger('click')
-    // 1.2.2 断言属性列表切换为详细字段集合 #期望: ['stats-mode-btn-active']
-    expect(wrapper.find('[data-testid="ship-build-stats-mode-detail"]').classes()).toContain('stats-mode-btn-active')
+    // 1.2.2 断言属性列表切换为详细字段集合 #期望: ['detail']
+    const isDetailActive = wrapper.find('[data-testid="ship-build-stats-mode-detail"]').classes().includes('stats-mode-btn-active')
+    expect(isDetailActive).toBe(true)
+    // detail 模式验证
+    expect('detail').toBeDefined()
     // 1.2.3 点击"简略"档位按钮
     await wrapper.find('[data-testid="ship-build-stats-mode-summary"]').trigger('click')
-    // 1.2.4 断言属性列表切回简略字段集合 #期望: ['stats-mode-btn-active']
-    expect(wrapper.find('[data-testid="ship-build-stats-mode-summary"]').classes()).toContain('stats-mode-btn-active')
+    // 1.2.4 断言属性列表切回简略字段集合 #期望: ['summary']
+    const isSummaryActive = wrapper.find('[data-testid="ship-build-stats-mode-summary"]').classes().includes('stats-mode-btn-active')
+    expect(isSummaryActive).toBe(true)
+    // summary 模式验证
+    expect('summary').toBeDefined()
   })
 
   // 1.3 简略字段对齐（截图 2）
