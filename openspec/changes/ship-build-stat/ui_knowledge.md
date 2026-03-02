@@ -97,6 +97,15 @@ function useEquipmentStats(equipment: X4Equipment, ship: X4Ship): {
 
 **注意**：所有 UI 元素定位符（data-testid）应使用本文件”建议的测试定位”部分定义的属性值，不应直接写在 test_tasks.md 中。
 
+## 批量校验口径（3.5 / 3.6）
+
+- 场景 `3.5` 与 `3.6` 使用批量校验，不再在 `test_tasks.md` 逐字段列出 36 条断言。
+- 批量校验分两步：
+  - 先采集 old/new 两套 36 项详细字段快照并做差异比较；
+  - 再将 new 快照与 `tests/fixtures/ship-build-stat-expected.json` 中对应 `detail` 基准做全量比对。
+- old/new 差异容差规则：单字段绝对误差不超过 `max(1% * |new|, 1)`；非数值或单位不一致视为差异。
+- 断言口径统一为“差异项数量”，`#期望: [0]` 表示无差异项。
+
 ## 语言切换
 
 ### 概述

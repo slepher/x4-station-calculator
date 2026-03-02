@@ -10,6 +10,22 @@ const expectSlotRowsVisibleByType = async (page: any, shipId: string, slotType: 
   await expect(page.locator(`[data-testid^="slot-${shipId}::${slotType}::"]`).first()).toBeVisible()
 }
 
+const getBlueprintEquipmentIds = async (page: any): Promise<string[]> => {
+  return page.evaluate(() => {
+    const store = (window as any).shipBuildStore
+    const blueprint = store?.blueprint
+    if (!blueprint?.connections) return []
+    const ids: string[] = []
+    for (const conn of blueprint.connections) {
+      for (const group of conn.group || []) {
+        if (group.equipment_id) ids.push(group.equipment_id)
+        if (group.shield?.equipment_id) ids.push(group.shield.equipment_id)
+      }
+    }
+    return ids
+  })
+}
+
 const statKeys = [
   'hull',
   'shield',
@@ -56,6 +72,14 @@ const expectedStats = JSON.parse(
   fs.readFileSync('tests/fixtures/ship-build-stat-expected.json', 'utf8')
 ) as Record<string, { detail: StatMap }>
 
+const getExpectedDetail = (shipName: 'Odachi' | 'Osaka'): StatMap => {
+  const ship = expectedStats[shipName]
+  if (!ship) {
+    throw new Error(`Missing expected stats fixture for ${shipName}`)
+  }
+  return ship.detail
+}
+
 const setStatsLogic = async (page: any, logic: 'old' | 'new') => {
   await page.getByTestId(`ship-build-stats-logic-${logic}`).click()
 }
@@ -73,9 +97,9 @@ const parseNumberWithUnit = (raw: string): { num: number; unit: string } | null 
   const normalized = raw.trim()
   const m = normalized.match(/^(-?[\d,]+(?:\.\d+)?)\s*(.*)$/)
   if (!m) return null
-  const num = Number(m[1].replace(/,/g, ''))
+  const num = Number(m[1]!.replace(/,/g, ''))
   if (Number.isNaN(num)) return null
-  return { num, unit: (m[2] || '').trim() }
+  return { num, unit: (m[2] ?? '').trim() }
 }
 
 const diffOldVsNew = (oldStats: StatMap, newStats: StatMap): string[] => {
@@ -115,11 +139,11 @@ const diffAgainstExpected = (actual: StatMap, expected: StatMap): string[] => {
 // 2.1.3 在模态框中选择 "Odachi" 蓝图
 // 2.1.4 点击确认
 // 2.1.5 断言飞船信息区显示大太刀名称 #期望: ['大太刀']
-// 2.1.6 切换到引擎槽位类型(E)，按 testid 断言存在引擎槽位行 #期望: ['slot-ship_ter_m_corvette_02_a::engine::']
-// 2.1.7 切换到推进器槽位类型(R)，按 testid 断言存在推进器槽位行 #期望: ['slot-ship_ter_m_corvette_02_a::thruster::']
-// 2.1.8 切换到护盾槽位类型(S)，按 testid 断言存在护盾槽位行 #期望: ['slot-ship_ter_m_corvette_02_a::shield::']
-// 2.1.9 切换到武器槽位类型(W)，按 testid 断言存在武器槽位行 #期望: ['slot-ship_ter_m_corvette_02_a::weapon::']
-// 2.1.10 切换到炮塔槽位类型(T)，按 testid 断言存在炮塔槽位行 #期望: ['slot-ship_ter_m_corvette_02_a::turret::']
+// 2.1.6 切换到引擎槽位类型(E)，断言引擎槽位有装备名称 #期望: ['engine_ter_m_virtual_01_mk1']
+// 2.1.7 切换到推进器槽位类型(R)，断言推进器槽位有装备名称 #期望: ['thruster_gen_m_combat_01_mk3']
+// 2.1.8 切换到护盾槽位类型(S)，断言护盾槽位有装备名称 #期望: ['shield_ter_m_virtual_01_mk3']
+// 2.1.9 切换到武器槽位类型(W)，断言武器槽位有装备名称 #期望: ['weapon_ter_m_laser_02_mk1']
+// 2.1.10 切换到炮塔槽位类型(T)，断言炮塔槽位有装备名称 #期望: ['turret_ter_m_laser_03_mk1']
 const buildOdachiState = async (page: any) => {
   // 2.1.1 打开Ship Build页面（beforeEach 已加载fixture并设置语言）
   await page.getByRole('button', { name: /Ship Build|船只建造/ }).click()
@@ -140,25 +164,35 @@ const buildOdachiState = async (page: any) => {
   // 2.1.5 断言飞船信息区显示大太刀名称 #期望: ['大太刀']
   await expect(page.getByTestId('ship-build-selection')).toContainText('大太刀')
 
-  // 2.1.6 切换到引擎槽位类型(E)，按 testid 断言存在引擎槽位行 #期望: ['slot-ship_ter_m_corvette_02_a::engine::']
+  // 2.1.6 切换到引擎槽位类型(E)，断言引擎槽位有装备名称 #期望: ['engine_ter_m_virtual_01_mk1']
   await clickSlotType(page, 'engine')
   await expectSlotRowsVisibleByType(page, 'ship_ter_m_corvette_02_a', 'engine')
+  const odachiEngineIds = await getBlueprintEquipmentIds(page)
+  expect(odachiEngineIds).toContain('engine_ter_m_virtual_01_mk1')
 
-  // 2.1.7 切换到推进器槽位类型(R)，按 testid 断言存在推进器槽位行 #期望: ['slot-ship_ter_m_corvette_02_a::thruster::']
+  // 2.1.7 切换到推进器槽位类型(R)，断言推进器槽位有装备名称 #期望: ['thruster_gen_m_combat_01_mk3']
   await clickSlotType(page, 'thruster')
   await expectSlotRowsVisibleByType(page, 'ship_ter_m_corvette_02_a', 'thruster')
+  const odachiThrusterIds = await getBlueprintEquipmentIds(page)
+  expect(odachiThrusterIds).toContain('thruster_gen_m_combat_01_mk3')
 
-  // 2.1.8 切换到护盾槽位类型(S)，按 testid 断言存在护盾槽位行 #期望: ['slot-ship_ter_m_corvette_02_a::shield::']
+  // 2.1.8 切换到护盾槽位类型(S)，断言护盾槽位有装备名称 #期望: ['shield_ter_m_virtual_01_mk3']
   await clickSlotType(page, 'shield')
   await expectSlotRowsVisibleByType(page, 'ship_ter_m_corvette_02_a', 'shield')
+  const odachiShieldIds = await getBlueprintEquipmentIds(page)
+  expect(odachiShieldIds).toContain('shield_ter_m_virtual_01_mk3')
 
-  // 2.1.9 切换到武器槽位类型(W)，按 testid 断言存在武器槽位行 #期望: ['slot-ship_ter_m_corvette_02_a::weapon::']
+  // 2.1.9 切换到武器槽位类型(W)，断言武器槽位有装备名称 #期望: ['weapon_ter_m_laser_02_mk1']
   await clickSlotType(page, 'weapon')
   await expectSlotRowsVisibleByType(page, 'ship_ter_m_corvette_02_a', 'weapon')
+  const odachiWeaponIds = await getBlueprintEquipmentIds(page)
+  expect(odachiWeaponIds).toContain('weapon_ter_m_laser_02_mk1')
 
-  // 2.1.10 切换到炮塔槽位类型(T)，按 testid 断言存在炮塔槽位行 #期望: ['slot-ship_ter_m_corvette_02_a::turret::']
+  // 2.1.10 切换到炮塔槽位类型(T)，断言炮塔槽位有装备名称 #期望: ['turret_ter_m_laser_03_mk1']
   await clickSlotType(page, 'turret')
   await expectSlotRowsVisibleByType(page, 'ship_ter_m_corvette_02_a', 'turret')
+  const odachiTurretIds = await getBlueprintEquipmentIds(page)
+  expect(odachiTurretIds).toContain('turret_ter_m_laser_03_mk1')
 }
 
 // 2.2 状态: 仅载入大阪
@@ -167,11 +201,11 @@ const buildOdachiState = async (page: any) => {
 // 2.2.3 在模态框中选择 "Osaka" 蓝图
 // 2.2.4 点击确认
 // 2.2.5 断言飞船信息区显示大阪名称 #期望: ['大阪']
-// 2.2.6 切换到引擎槽位类型(E)，按 testid 断言存在引擎槽位行 #期望: ['slot-ship_ter_l_destroyer_01_a::engine::']
-// 2.2.7 切换到推进器槽位类型(R)，按 testid 断言存在推进器槽位行 #期望: ['slot-ship_ter_l_destroyer_01_a::thruster::']
-// 2.2.8 切换到护盾槽位类型(S)，按 testid 断言存在护盾槽位行 #期望: ['slot-ship_ter_l_destroyer_01_a::shield::']
-// 2.2.9 切换到武器槽位类型(W)，按 testid 断言存在武器槽位行 #期望: ['slot-ship_ter_l_destroyer_01_a::weapon::']
-// 2.2.10 切换到炮塔槽位类型(T)，按 testid 断言存在炮塔槽位行 #期望: ['slot-ship_ter_l_destroyer_01_a::turret::']
+// 2.2.6 切换到引擎槽位类型(E)，断言引擎槽位有装备名称 #期望: ['engine_ter_l_allround_01_mk1']
+// 2.2.7 切换到推进器槽位类型(R)，断言推进器槽位有装备名称 #期望: ['thruster_gen_l_allround_01_mk3']
+// 2.2.8 切换到护盾槽位类型(S)，断言护盾槽位有装备名称 #期望: ['shield_ter_l_standard_01_mk3']
+// 2.2.9 切换到武器槽位类型(W)，断言武器槽位有装备名称 #期望: ['weapon_ter_l_destroyer_01_mk1']
+// 2.2.10 切换到炮塔槽位类型(T)，断言炮塔槽位有装备名称 #期望: ['turret_arg_l_plasma_01_mk1', 'turret_arg_m_flak_01_mk1']
 const buildOsakaState = async (page: any) => {
   // 2.2.1 打开Ship Build页面（beforeEach 已加载fixture并设置语言）
   await page.getByRole('button', { name: /Ship Build|船只建造/ }).click()
@@ -196,25 +230,36 @@ const buildOsakaState = async (page: any) => {
   // 2.2.5 断言飞船信息区显示大阪名称 #期望: ['大阪']
   await expect(page.getByTestId('ship-build-selection')).toContainText('大阪')
 
-  // 2.2.6 切换到引擎槽位类型(E)，按 testid 断言存在引擎槽位行 #期望: ['slot-ship_ter_l_destroyer_01_a::engine::']
+  // 2.2.6 切换到引擎槽位类型(E)，断言引擎槽位有装备名称 #期望: ['engine_ter_l_allround_01_mk1']
   await clickSlotType(page, 'engine')
   await expectSlotRowsVisibleByType(page, 'ship_ter_l_destroyer_01_a', 'engine')
+  const osakaEngineIds = await getBlueprintEquipmentIds(page)
+  expect(osakaEngineIds).toContain('engine_ter_l_allround_01_mk1')
 
-  // 2.2.7 切换到推进器槽位类型(R)，按 testid 断言存在推进器槽位行 #期望: ['slot-ship_ter_l_destroyer_01_a::thruster::']
+  // 2.2.7 切换到推进器槽位类型(R)，断言推进器槽位有装备名称 #期望: ['thruster_gen_l_allround_01_mk3']
   await clickSlotType(page, 'thruster')
   await expectSlotRowsVisibleByType(page, 'ship_ter_l_destroyer_01_a', 'thruster')
+  const osakaThrusterIds = await getBlueprintEquipmentIds(page)
+  expect(osakaThrusterIds).toContain('thruster_gen_l_allround_01_mk3')
 
-  // 2.2.8 切换到护盾槽位类型(S)，按 testid 断言存在护盾槽位行 #期望: ['slot-ship_ter_l_destroyer_01_a::shield::']
+  // 2.2.8 切换到护盾槽位类型(S)，断言护盾槽位有装备名称 #期望: ['shield_ter_l_standard_01_mk3']
   await clickSlotType(page, 'shield')
   await expectSlotRowsVisibleByType(page, 'ship_ter_l_destroyer_01_a', 'shield')
+  const osakaShieldIds = await getBlueprintEquipmentIds(page)
+  expect(osakaShieldIds).toContain('shield_ter_l_standard_01_mk3')
 
-  // 2.2.9 切换到武器槽位类型(W)，按 testid 断言存在武器槽位行 #期望: ['slot-ship_ter_l_destroyer_01_a::weapon::']
+  // 2.2.9 切换到武器槽位类型(W)，断言武器槽位有装备名称 #期望: ['weapon_ter_l_destroyer_01_mk1']
   await clickSlotType(page, 'weapon')
   await expectSlotRowsVisibleByType(page, 'ship_ter_l_destroyer_01_a', 'weapon')
+  const osakaWeaponIds = await getBlueprintEquipmentIds(page)
+  expect(osakaWeaponIds).toContain('weapon_ter_l_destroyer_01_mk1')
 
-  // 2.2.10 切换到炮塔槽位类型(T)，按 testid 断言存在炮塔槽位行 #期望: ['slot-ship_ter_l_destroyer_01_a::turret::']
+  // 2.2.10 切换到炮塔槽位类型(T)，断言炮塔槽位有装备名称 #期望: ['turret_arg_l_plasma_01_mk1', 'turret_arg_m_flak_01_mk1']
   await clickSlotType(page, 'turret')
   await expectSlotRowsVisibleByType(page, 'ship_ter_l_destroyer_01_a', 'turret')
+  const osakaTurretIds = await getBlueprintEquipmentIds(page)
+  expect(osakaTurretIds).toContain('turret_arg_l_plasma_01_mk1')
+  expect(osakaTurretIds).toContain('turret_arg_m_flak_01_mk1')
 }
 
 const statKeyByLabel: Record<string, string> = {
@@ -385,39 +430,51 @@ test.describe('ship-build-stat', () => {
 
   // 3.5 Case: 大太刀满装备DPS计算
   test('3.5 Case: 大太刀满装备DPS计算', async ({ page }) => {
+    // 3.5.1 状态: 仅载入大太刀
     await buildOdachiState(page)
+    // 3.5.2 点击"详细"档位按钮
     await page.getByTestId('ship-build-stats-mode-detail').click()
+    // 3.5.3 切换到 old 统计逻辑并采集 36 项详细字段快照
     await setStatsLogic(page, 'old')
     const oldStats = await captureStatGroup(page)
+    // 3.5.4 切换到 new 统计逻辑并采集 36 项详细字段快照
     await setStatsLogic(page, 'new')
     const newStats = await captureStatGroup(page)
 
-    // 先比对旧值和新值（允许 1% 或最小 1 单位的显示容差）
+    // 3.5.5 批量比对 old/new 快照差异在容差内（1% 或最小 1 单位） #期望: [0]
     const oldNewDiffs = diffOldVsNew(oldStats, newStats)
     expect(oldNewDiffs, `Old/New diffs (Odachi):\n${oldNewDiffs.join('\n')}`).toEqual([])
+    expect(oldNewDiffs.length).toBe(0)
 
-    // 再比对新值和期待值
-    const expected = expectedStats.Odachi.detail
+    // 3.5.6 批量比对 new 快照与 `tests/fixtures/ship-build-stat-expected.json` 的 Odachi.detail 全量一致 #期望: [0]
+    const expected = getExpectedDetail('Odachi')
     const expectedDiffs = diffAgainstExpected(newStats, expected)
     expect(expectedDiffs, `New/Expected diffs (Odachi):\n${expectedDiffs.join('\n')}`).toEqual([])
+    expect(expectedDiffs.length).toBe(0)
   })
 
   // 3.6 Case: 大阪满装备DPS计算
   test('3.6 Case: 大阪满装备DPS计算', async ({ page }) => {
+    // 3.6.1 状态: 仅载入大阪
     await buildOsakaState(page)
+    // 3.6.2 点击"详细"档位按钮
     await page.getByTestId('ship-build-stats-mode-detail').click()
+    // 3.6.3 切换到 old 统计逻辑并采集 36 项详细字段快照
     await setStatsLogic(page, 'old')
     const oldStats = await captureStatGroup(page)
+    // 3.6.4 切换到 new 统计逻辑并采集 36 项详细字段快照
     await setStatsLogic(page, 'new')
     const newStats = await captureStatGroup(page)
 
-    // 先比对旧值和新值（允许 1% 或最小 1 单位的显示容差）
+    // 3.6.5 批量比对 old/new 快照差异在容差内（1% 或最小 1 单位） #期望: [0]
     const oldNewDiffs = diffOldVsNew(oldStats, newStats)
     expect(oldNewDiffs, `Old/New diffs (Osaka):\n${oldNewDiffs.join('\n')}`).toEqual([])
+    expect(oldNewDiffs.length).toBe(0)
 
-    // 再比对新值和期待值
-    const expected = expectedStats.Osaka.detail
+    // 3.6.6 批量比对 new 快照与 `tests/fixtures/ship-build-stat-expected.json` 的 Osaka.detail 全量一致 #期望: [0]
+    const expected = getExpectedDetail('Osaka')
     const expectedDiffs = diffAgainstExpected(newStats, expected)
     expect(expectedDiffs, `New/Expected diffs (Osaka):\n${expectedDiffs.join('\n')}`).toEqual([])
+    expect(expectedDiffs.length).toBe(0)
   })
 })
