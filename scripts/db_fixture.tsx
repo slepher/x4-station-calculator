@@ -114,6 +114,54 @@ type SavedEmpiresState = {
   list: EmpirePlan[]
 }
 
+// ============ Ship Build Types ============
+type SeedShipBuildShip = {
+  id: string
+  name: string
+  class: string
+  type: string
+  race: string
+  blueprint: SeedShipBuildBlueprint | null
+}
+
+type SeedShipBuildBlueprintGroup = {
+  group: string
+  equipment_id: string
+  count: number
+  shield?: {
+    equipment_id: string
+    count: number
+  }
+}
+
+type SeedShipBuildBlueprintConnection = {
+  slot_type: string
+  group: SeedShipBuildBlueprintGroup[]
+}
+
+type SeedShipBuildBlueprint = {
+  shipId: string
+  connections: SeedShipBuildBlueprintConnection[]
+}
+
+type SeedShipBuild = {
+  ships: SeedShipBuildShip[]
+}
+
+type ShipBlueprint = {
+  id: string
+  name: string
+  shipId: string
+  connections: SeedShipBuildBlueprintConnection[]
+  lastUpdated: number
+}
+
+type SavedShipBlueprintsState = {
+  version: 1
+  activeId: string | null
+  list: ShipBlueprint[]
+}
+
 type StationSettings = {
   sunlight: number
   useHQ: boolean
@@ -166,6 +214,7 @@ const loadYaml = async <T,>(file: string): Promise<T> => {
 
 const isEmpireSeed = (seed: any): seed is SeedEmpire => Boolean(seed?.empires)
 const isLogicFlowSeed = (seed: any): seed is SeedLogicFlow => Boolean(seed?.plans)
+const isShipBuildSeed = (seed: any): seed is SeedShipBuild => Boolean(seed?.ships)
 
 const pickPrimaryOutput = (module: X4Module): string => {
   const keys = Object.keys(module.outputs ?? {})
@@ -285,6 +334,25 @@ const buildEmpireState = (seed: SeedEmpire): SavedEmpiresState => {
   }
 }
 
+const buildShipBuildState = (seed: SeedShipBuild): SavedShipBlueprintsState => {
+  const now = Date.now()
+  const list: ShipBlueprint[] = seed.ships
+    .filter((ship) => ship.blueprint)
+    .map((ship) => ({
+      id: crypto.randomUUID(),
+      name: ship.name,
+      shipId: ship.id,
+      connections: ship.blueprint!.connections,
+      lastUpdated: now
+    }))
+
+  return {
+    version: 1,
+    activeId: list[0]?.id ?? null,
+    list
+  }
+}
+
 const readCurrentVsn = async (): Promise<number | null> => {
   try {
     const raw = await readFile(DB_PATH, 'utf8')
@@ -317,6 +385,10 @@ const main = async () => {
     }
     if (isEmpireSeed(seed)) {
       dbPayload.x4_empire_data = buildEmpireState(seed)
+      continue
+    }
+    if (isShipBuildSeed(seed)) {
+      dbPayload.x4_ship_blueprints = buildShipBuildState(seed)
     }
   }
 
