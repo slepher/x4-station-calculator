@@ -96,3 +96,25 @@ Use this template to confirm scope; remove items the user says are not needed.
 - Created/updated seed file path.
 - Summary of included fields.
 - Any open questions or ambiguities blocking minimal seed definition.
+
+## Lessons Learned
+
+### 1. Confirm data source before coding
+- **Counterexample**: Assumed Jian's ship ID without searching first
+- **Correct approach**: Query the game data to confirm correct IDs before writing the generation script
+
+### 2. Design data model for complete data flow
+- **Counterexample**: Added `name` field to seed but hardcoded `name: ''` in db_fixture script
+- **Lesson**: When adding new fields, update the entire pipeline (seed → script → fixture → store)
+
+### 3. Analyze input data structure before complex logic
+- **Counterexample**: Wrote wrong Osaka shield config because didn't understand the slot structure
+- **Correct approach**: Explore the game data structure first, understand slot types and max counts before writing transformation logic
+
+### 4. Validate user input against business rules
+- **Counterexample**: User said "shield Mk2 x3 + Mk3 x2" but there are only 3 slot groups, wrote it anyway
+- **Correct approach**: User input may be incorrect. Validate against business rules (slot count, max capacity). When conflicts found, propose modifications instead of blindly executing
+
+### 5. Output verifiable summaries from automation scripts
+- **Counterexample**: Generated seed and fixture multiple times before noticing config errors
+- **Correct approach**: Script should output key configuration summary for quick human verification
