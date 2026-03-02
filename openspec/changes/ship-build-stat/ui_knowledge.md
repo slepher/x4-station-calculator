@@ -89,6 +89,41 @@ function useEquipmentStats(equipment: X4Equipment, ship: X4Ship): {
 
 **注意**：所有 UI 元素定位符（data-testid）应使用本文件”建议的测试定位”部分定义的属性值，不应直接写在 test_tasks.md 中。
 
+## 装备选择器 (Equipment Picker) UI 模式
+
+### 概述
+装备选择器是一个弹窗式界面，用于为飞船槽位选择装备。
+
+### 定位符
+
+| 元素 | data-testid | 说明 |
+|------|--------------|------|
+| 配装面板 | `ship-build-panel-fit` | 整个配装区域 |
+| 左轨槽位类型按钮 | `.left-rail .slot-type-btn` | E(引擎)/S(护盾)/W(武器)/T(炮塔) |
+| 槽位按钮 | `slot-{key}` | 具体槽位，如 `slot-engine-0` |
+| 装备选择器 | `equipment-picker` | 装备候选列表容器 |
+| 装备候选项 | `candidate-{id}` | 单个装备选项，`id` 为装备ID或 `empty` |
+| 确认按钮 | `picker-confirm` | 确认选择 |
+| 取消按钮 | `picker-cancel` | 取消选择 |
+
+### 选择装备流程
+
+1. 点击左轨槽位类型按钮 (E/S/W/T) 切换到对应槽位类型
+2. 点击目标槽位按钮（如 `slot-engine-0`）打开选择器
+3. 在装备候选列表中找到目标装备并点击
+4. 点击确认按钮完成选择
+
+### 筛选功能
+
+选择器支持以下筛选：
+
+| 筛选类型 | data-testid 模式 | 说明 |
+|----------|------------------|------|
+| 种族筛选 | `race-{id}` | 按种族筛选，如 `race-terran` |
+| MK筛选 | `mk-{id}` | 按MK版本筛选，如 `mk-mk1` |
+| 特性标签 | `tag-{id}` | 按特性筛选 |
+| 分页 | `page-{n}` | 当装备过多时分页 |
+
 ## 测试用例装备配置
 
 ### 测试用例1: 大太刀 满装备

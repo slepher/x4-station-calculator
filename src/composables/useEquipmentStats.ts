@@ -359,28 +359,46 @@ export function useEquipmentStats(equipment: X4Equipment, ship: X4Ship) {
 
   // 计算详情
   const details = computed(() => {
+    const equipmentType = equipment.type
     const equipmentClass = equipment.class
 
-    if (equipmentClass === 'weapon' || equipmentClass === 'turret') {
-      if (!bullet) return undefined
-      return calculateWeaponDPS(equipment, bullet, null, 1)
-    }
-
-    if (equipmentClass === 'missilelauncher' || equipmentClass === 'missileturret') {
+    // 导弹发射器：type=weapon 且 class=missilelauncher (必须在普通weapon之前)
+    if (equipmentType === 'weapon' && equipmentClass === 'missilelauncher') {
       if (!missile) return undefined
       return calculateWeaponDPS(equipment, null, missile, 1)
     }
 
-    if (equipmentClass === 'shield') {
+    // 导弹炮塔：type=turret 且 class=missileturret (必须在普通turret之前)
+    if (equipmentType === 'turret' && equipmentClass === 'missileturret') {
+      if (!missile) return undefined
+      return calculateWeaponDPS(equipment, null, missile, 1)
+    }
+
+    // 武器：type=weapon
+    if (equipmentType === 'weapon') {
+      if (!bullet) return undefined
+      return calculateWeaponDPS(equipment, bullet, null, 1)
+    }
+
+    // 炮塔：type=turret
+    if (equipmentType === 'turret') {
+      if (!bullet) return undefined
+      return calculateWeaponDPS(equipment, bullet, null, 1)
+    }
+
+    // 护盾
+    if (equipmentType === 'shield') {
       return calculateShieldDetail(equipment)
     }
 
-    if (equipmentClass === 'engine') {
-      return calculateEngineDetail(equipment, ship)
+    // 推进器
+    if (equipmentType === 'thruster') {
+      return calculateThrusterDetail(equipment, ship)
     }
 
-    if (equipmentClass === 'thruster') {
-      return calculateThrusterDetail(equipment, ship)
+    // 引擎
+    if (equipmentType === 'engine') {
+      return calculateEngineDetail(equipment, ship)
     }
 
     return undefined
@@ -388,10 +406,10 @@ export function useEquipmentStats(equipment: X4Equipment, ship: X4Ship) {
 
   // 计算汇总
   const summary = computed(() => {
-    const equipmentClass = equipment.class
+    const equipmentType = equipment.type
 
     // 武器
-    if (equipmentClass === 'weapon') {
+    if (equipmentType === 'weapon') {
       const detail = details.value as WeaponDetail | undefined
       if (!detail) return undefined
       return {
@@ -401,27 +419,7 @@ export function useEquipmentStats(equipment: X4Equipment, ship: X4Ship) {
     }
 
     // 炮塔
-    if (equipmentClass === 'turret') {
-      const detail = details.value as TurretDetail | undefined
-      if (!detail) return undefined
-      return {
-        sustainedDPS: detail.sustainedDPS,
-        range: detail.range
-      }
-    }
-
-    // 导弹发射器
-    if (equipmentClass === 'missilelauncher') {
-      const detail = details.value as WeaponDetail | undefined
-      if (!detail) return undefined
-      return {
-        burstDPS: detail.burstDPS,
-        range: detail.range
-      }
-    }
-
-    // 导弹炮塔
-    if (equipmentClass === 'missileturret') {
+    if (equipmentType === 'turret') {
       const detail = details.value as TurretDetail | undefined
       if (!detail) return undefined
       return {
@@ -431,7 +429,7 @@ export function useEquipmentStats(equipment: X4Equipment, ship: X4Ship) {
     }
 
     // 护盾
-    if (equipmentClass === 'shield') {
+    if (equipmentType === 'shield') {
       const detail = details.value as ShieldDetail | undefined
       if (!detail) return undefined
       return {
@@ -441,7 +439,7 @@ export function useEquipmentStats(equipment: X4Equipment, ship: X4Ship) {
     }
 
     // 引擎
-    if (equipmentClass === 'engine') {
+    if (equipmentType === 'engine') {
       const detail = details.value as EngineDetail | undefined
       if (!detail) return undefined
       return {
@@ -452,7 +450,7 @@ export function useEquipmentStats(equipment: X4Equipment, ship: X4Ship) {
     }
 
     // 推进器
-    if (equipmentClass === 'thruster') {
+    if (equipmentType === 'thruster') {
       const detail = details.value as ThrusterDetail | undefined
       if (!detail) return undefined
       return {

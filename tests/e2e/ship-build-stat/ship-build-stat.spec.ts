@@ -3,13 +3,16 @@ import { test, expect } from '@playwright/test'
 // Helper functions
 const openShipBuild = async (page: any) => {
   await page.goto('/')
+
   await page.evaluate(() => {
     localStorage.clear()
     sessionStorage.clear()
+    localStorage.setItem('isTestEnv', 'true')
   })
   await page.reload()
   await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; animation: none !important; }' })
-  await page.waitForSelector('.toolbar-panel', { state: 'visible' })
+  await page.getByRole('button', { name: /Ship Build|船只建造/ }).click()
+  await expect(page.getByTestId('ship-build-filters')).toBeVisible()
 }
 
 const enterShipState = async (page: any, config: { classLabel: string; racePattern: RegExp; shipPattern: RegExp }) => {
@@ -30,32 +33,36 @@ const enterOsakaState = async (page: any) => {
 }
 
 const switchToSlotTab = async (page: any, label: string) => {
+  // Click on slot type button in left rail (E/S/W/T)
   const slotTypeBtn = page.locator('.left-rail .slot-type-btn').filter({ hasText: new RegExp(`^${label}$`) }).first()
   await expect(slotTypeBtn).toBeVisible()
   await slotTypeBtn.click()
-  const firstGroup = page.locator('.group-tabs .group-tab').first()
-  await expect(firstGroup).toBeVisible()
-  await firstGroup.click()
 }
 
-const selectEquipmentByName = async (page: any, equipmentName: string) => {
-  const optionCards = page.locator('.option-wall .option-card')
-  await expect(optionCards.first()).toBeVisible()
-  const targetEquipment = optionCards.filter({ hasText: new RegExp(equipmentName, 'i') }).first()
-  await expect(targetEquipment).toBeVisible()
-  await targetEquipment.click()
-}
-
-const selectEquipment = async (page: any, slotLabel: string, equipmentName: string) => {
+const selectEquipment = async (page: any, slotLabel: string, equipmentNamePattern: RegExp) => {
+  // 1. Switch to the slot type tab (E/S/W/T)
   await switchToSlotTab(page, slotLabel)
-  await selectEquipmentByName(page, equipmentName)
+
+  // 2. Click the first slot button to open the picker
+  const slotButton = page.locator('[data-testid^="slot-"]').first()
+  await expect(slotButton).toBeVisible()
+  await slotButton.click()
+
+  // 3. Wait for picker to open and find the equipment candidate
+  const picker = page.getByTestId('equipment-picker')
+  await expect(picker).toBeVisible()
+
+  // 4. Click on the matching equipment candidate
+  const candidate = picker.locator('[data-testid^="candidate-"]').filter({ hasText: equipmentNamePattern }).first()
+  await expect(candidate).toBeVisible()
+  await candidate.click()
+
+  // 5. Confirm the selection
+  const confirmBtn = page.getByTestId('picker-confirm')
+  await expect(confirmBtn).toBeVisible()
+  await confirmBtn.click()
 }
 
-const selectMultipleEquipment = async (page: any, slotLabel: string, equipmentName: string, count: number) => {
-  for (let i = 0; i < count; i++) {
-    await selectEquipment(page, slotLabel, equipmentName)
-  }
-}
 
 const getStatValue = async (page: any, labelText: string) => {
   const label = page.locator('.stats-label').filter({ hasText: new RegExp(labelText) }).first()
@@ -73,7 +80,7 @@ test.describe('ship-build-stat', () => {
     // 2.1.1 启动应用并进入"船只建造"视图
     await openShipBuild(page)
     // 2.1.2 点击选择 `class=L` 筛选条件
-    await page.getByTestId('ship-build-filter-class').getByRole('button', { name: 'L' }).click()
+    await page.getByTestId('ship-build-filter-class').getByRole('button', { name: 'L', exact: true }).click()
     // 2.1.3 点击选择 `race=teladi` 筛选条件
     await page.getByTestId('ship-build-filter-race').getByRole('button', { name: /teladi/i }).click()
     // 2.1.4 点击选择 `type=freighter` 筛选条件
@@ -182,19 +189,19 @@ test.describe('ship-build-stat', () => {
     const panelFit = page.getByTestId('ship-build-panel-fit')
     await expect(panelFit).toBeVisible()
     // 3.6.7 引擎槽位：选择装备 `engine_ter_m_allround_01_mk1` 数量1
-    await selectEquipment(page, 'E', 'mk1')
+    await selectEquipment(page, 'E', /Mk1/i)
     // 3.6.8 推进器槽位：选择装备 `thruster_gen_m_allround_01_mk1` 数量1
-    await selectEquipment(page, 'T', 'mk1')
+    await selectEquipment(page, 'T', /Mk1/i)
     // 3.6.9 护盾槽位：选择装备 `shield_ter_m_standard_02_mk2` 数量2
-    await selectEquipment(page, 'S', 'mk2')
+    await selectEquipment(page, 'S', /Mk2/i)
     // 3.6.10 武器槽位：选择装备 `weapon_ter_m_beam_01_mk2` 数量4
-    await selectEquipment(page, 'W', 'mk2')
-    await selectEquipment(page, 'W', 'mk2')
-    await selectEquipment(page, 'W', 'mk2')
-    await selectEquipment(page, 'W', 'mk2')
+    await selectEquipment(page, 'W', /Mk2/i)
+    await selectEquipment(page, 'W', /Mk2/i)
+    await selectEquipment(page, 'W', /Mk2/i)
+    await selectEquipment(page, 'W', /Mk2/i)
     // 3.6.11 炮塔槽位：选择装备 `turret_ter_m_beam_01_mk1` 数量2
-    await selectEquipment(page, 'T', 'mk1')
-    await selectEquipment(page, 'T', 'mk1')
+    await selectEquipment(page, 'T', /Mk1/i)
+    await selectEquipment(page, 'T', /Mk1/i)
     // 3.6.12 点击"详细"档位按钮切换到详细模式
     await page.getByTestId('ship-build-stats-mode-detail').click()
     // 3.6.13 验证所有属性值
@@ -294,97 +301,97 @@ test.describe('ship-build-stat', () => {
     const panelFit = page.getByTestId('ship-build-panel-fit')
     await expect(panelFit).toBeVisible()
     // 3.7.7 引擎槽位：装备 `engine_ter_l_allround_01_mk1` 数量6
-    await selectEquipment(page, 'E', 'mk1')
-    await selectEquipment(page, 'E', 'mk1')
-    await selectEquipment(page, 'E', 'mk1')
-    await selectEquipment(page, 'E', 'mk1')
-    await selectEquipment(page, 'E', 'mk1')
-    await selectEquipment(page, 'E', 'mk1')
+    await selectEquipment(page, 'E', /Mk1/i)
+    await selectEquipment(page, 'E', /Mk1/i)
+    await selectEquipment(page, 'E', /Mk1/i)
+    await selectEquipment(page, 'E', /Mk1/i)
+    await selectEquipment(page, 'E', /Mk1/i)
+    await selectEquipment(page, 'E', /Mk1/i)
     // 3.7.8 推进器槽位：装备 `thruster_gen_l_allround_01_mk1` 数量1
-    await selectEquipment(page, 'T', 'mk1')
+    await selectEquipment(page, 'T', /Mk1/i)
     // 3.7.9 护盾槽位(专用L)：装备 `shield_ter_l_standard_01_mk2` 数量3
-    await selectEquipment(page, 'S', 'mk2')
-    await selectEquipment(page, 'S', 'mk2')
-    await selectEquipment(page, 'S', 'mk2')
+    await selectEquipment(page, 'S', /Mk2/i)
+    await selectEquipment(page, 'S', /Mk2/i)
+    await selectEquipment(page, 'S', /Mk2/i)
     // 3.7.10 护盾槽位(专用L)：装备 `shield_ter_l_standard_01_mk3` 数量2
-    await selectEquipment(page, 'S', 'mk3')
-    await selectEquipment(page, 'S', 'mk3')
+    await selectEquipment(page, 'S', /Mk3/i)
+    await selectEquipment(page, 'S', /Mk3/i)
     // 3.7.11 护盾槽位(挂载M)：装备 `shield_ter_m_standard_02_mk1` 数量16
-    await selectEquipment(page, 'S', 'mk1')
-    await selectEquipment(page, 'S', 'mk1')
-    await selectEquipment(page, 'S', 'mk1')
-    await selectEquipment(page, 'S', 'mk1')
-    await selectEquipment(page, 'S', 'mk1')
-    await selectEquipment(page, 'S', 'mk1')
-    await selectEquipment(page, 'S', 'mk1')
-    await selectEquipment(page, 'S', 'mk1')
-    await selectEquipment(page, 'S', 'mk1')
-    await selectEquipment(page, 'S', 'mk1')
-    await selectEquipment(page, 'S', 'mk1')
-    await selectEquipment(page, 'S', 'mk1')
-    await selectEquipment(page, 'S', 'mk1')
-    await selectEquipment(page, 'S', 'mk1')
-    await selectEquipment(page, 'S', 'mk1')
-    await selectEquipment(page, 'S', 'mk1')
+    await selectEquipment(page, 'S', /Mk1/i)
+    await selectEquipment(page, 'S', /Mk1/i)
+    await selectEquipment(page, 'S', /Mk1/i)
+    await selectEquipment(page, 'S', /Mk1/i)
+    await selectEquipment(page, 'S', /Mk1/i)
+    await selectEquipment(page, 'S', /Mk1/i)
+    await selectEquipment(page, 'S', /Mk1/i)
+    await selectEquipment(page, 'S', /Mk1/i)
+    await selectEquipment(page, 'S', /Mk1/i)
+    await selectEquipment(page, 'S', /Mk1/i)
+    await selectEquipment(page, 'S', /Mk1/i)
+    await selectEquipment(page, 'S', /Mk1/i)
+    await selectEquipment(page, 'S', /Mk1/i)
+    await selectEquipment(page, 'S', /Mk1/i)
+    await selectEquipment(page, 'S', /Mk1/i)
+    await selectEquipment(page, 'S', /Mk1/i)
     // 3.7.12 护盾槽位(挂载M)：装备 `shield_ter_m_standard_02_mk2` 数量20
-    await selectEquipment(page, 'S', 'mk2')
-    await selectEquipment(page, 'S', 'mk2')
-    await selectEquipment(page, 'S', 'mk2')
-    await selectEquipment(page, 'S', 'mk2')
-    await selectEquipment(page, 'S', 'mk2')
-    await selectEquipment(page, 'S', 'mk2')
-    await selectEquipment(page, 'S', 'mk2')
-    await selectEquipment(page, 'S', 'mk2')
-    await selectEquipment(page, 'S', 'mk2')
-    await selectEquipment(page, 'S', 'mk2')
-    await selectEquipment(page, 'S', 'mk2')
-    await selectEquipment(page, 'S', 'mk2')
-    await selectEquipment(page, 'S', 'mk2')
-    await selectEquipment(page, 'S', 'mk2')
-    await selectEquipment(page, 'S', 'mk2')
-    await selectEquipment(page, 'S', 'mk2')
-    await selectEquipment(page, 'S', 'mk2')
-    await selectEquipment(page, 'S', 'mk2')
-    await selectEquipment(page, 'S', 'mk2')
-    await selectEquipment(page, 'S', 'mk2')
+    await selectEquipment(page, 'S', /Mk2/i)
+    await selectEquipment(page, 'S', /Mk2/i)
+    await selectEquipment(page, 'S', /Mk2/i)
+    await selectEquipment(page, 'S', /Mk2/i)
+    await selectEquipment(page, 'S', /Mk2/i)
+    await selectEquipment(page, 'S', /Mk2/i)
+    await selectEquipment(page, 'S', /Mk2/i)
+    await selectEquipment(page, 'S', /Mk2/i)
+    await selectEquipment(page, 'S', /Mk2/i)
+    await selectEquipment(page, 'S', /Mk2/i)
+    await selectEquipment(page, 'S', /Mk2/i)
+    await selectEquipment(page, 'S', /Mk2/i)
+    await selectEquipment(page, 'S', /Mk2/i)
+    await selectEquipment(page, 'S', /Mk2/i)
+    await selectEquipment(page, 'S', /Mk2/i)
+    await selectEquipment(page, 'S', /Mk2/i)
+    await selectEquipment(page, 'S', /Mk2/i)
+    await selectEquipment(page, 'S', /Mk2/i)
+    await selectEquipment(page, 'S', /Mk2/i)
+    await selectEquipment(page, 'S', /Mk2/i)
     // 3.7.13 主炮槽位：装备 `weapon_ter_l_destroyer_01_mk1` 数量6
-    await selectEquipment(page, 'W', 'mk1')
-    await selectEquipment(page, 'W', 'mk1')
-    await selectEquipment(page, 'W', 'mk1')
-    await selectEquipment(page, 'W', 'mk1')
-    await selectEquipment(page, 'W', 'mk1')
-    await selectEquipment(page, 'W', 'mk1')
+    await selectEquipment(page, 'W', /Mk1/i)
+    await selectEquipment(page, 'W', /Mk1/i)
+    await selectEquipment(page, 'W', /Mk1/i)
+    await selectEquipment(page, 'W', /Mk1/i)
+    await selectEquipment(page, 'W', /Mk1/i)
+    await selectEquipment(page, 'W', /Mk1/i)
     // 3.7.14 炮塔槽位：装备 `turret_ter_l_beam_01_mk1` 数量6
-    await selectEquipment(page, 'T', 'mk1')
-    await selectEquipment(page, 'T', 'mk1')
-    await selectEquipment(page, 'T', 'mk1')
-    await selectEquipment(page, 'T', 'mk1')
-    await selectEquipment(page, 'T', 'mk1')
-    await selectEquipment(page, 'T', 'mk1')
+    await selectEquipment(page, 'T', /Mk1/i)
+    await selectEquipment(page, 'T', /Mk1/i)
+    await selectEquipment(page, 'T', /Mk1/i)
+    await selectEquipment(page, 'T', /Mk1/i)
+    await selectEquipment(page, 'T', /Mk1/i)
+    await selectEquipment(page, 'T', /Mk1/i)
     // 3.7.15 炮塔槽位：装备 `turret_tel_l_plasma_01_mk1` 数量3
-    await selectEquipment(page, 'T', 'Plasma')
-    await selectEquipment(page, 'T', 'Plasma')
-    await selectEquipment(page, 'T', 'Plasma')
+    await selectEquipment(page, 'T', /Plasma/i)
+    await selectEquipment(page, 'T', /Plasma/i)
+    await selectEquipment(page, 'T', /Plasma/i)
     // 3.7.16 炮塔槽位：装备 `turret_ter_m_gatling_02_mk1` 数量8
-    await selectEquipment(page, 'T', 'Gatling')
-    await selectEquipment(page, 'T', 'Gatling')
-    await selectEquipment(page, 'T', 'Gatling')
-    await selectEquipment(page, 'T', 'Gatling')
-    await selectEquipment(page, 'T', 'Gatling')
-    await selectEquipment(page, 'T', 'Gatling')
-    await selectEquipment(page, 'T', 'Gatling')
-    await selectEquipment(page, 'T', 'Gatling')
+    await selectEquipment(page, 'T', /Gatling/i)
+    await selectEquipment(page, 'T', /Gatling/i)
+    await selectEquipment(page, 'T', /Gatling/i)
+    await selectEquipment(page, 'T', /Gatling/i)
+    await selectEquipment(page, 'T', /Gatling/i)
+    await selectEquipment(page, 'T', /Gatling/i)
+    await selectEquipment(page, 'T', /Gatling/i)
+    await selectEquipment(page, 'T', /Gatling/i)
     // 3.7.17 炮塔槽位：装备 `turret_ter_m_laser_02_mk1` 数量10
-    await selectEquipment(page, 'T', 'Laser')
-    await selectEquipment(page, 'T', 'Laser')
-    await selectEquipment(page, 'T', 'Laser')
-    await selectEquipment(page, 'T', 'Laser')
-    await selectEquipment(page, 'T', 'Laser')
-    await selectEquipment(page, 'T', 'Laser')
-    await selectEquipment(page, 'T', 'Laser')
-    await selectEquipment(page, 'T', 'Laser')
-    await selectEquipment(page, 'T', 'Laser')
-    await selectEquipment(page, 'T', 'Laser')
+    await selectEquipment(page, 'T', /Laser/i)
+    await selectEquipment(page, 'T', /Laser/i)
+    await selectEquipment(page, 'T', /Laser/i)
+    await selectEquipment(page, 'T', /Laser/i)
+    await selectEquipment(page, 'T', /Laser/i)
+    await selectEquipment(page, 'T', /Laser/i)
+    await selectEquipment(page, 'T', /Laser/i)
+    await selectEquipment(page, 'T', /Laser/i)
+    await selectEquipment(page, 'T', /Laser/i)
+    await selectEquipment(page, 'T', /Laser/i)
     // 3.7.18 点击"详细"档位按钮切换到详细模式
     await page.getByTestId('ship-build-stats-mode-detail').click()
     // 3.7.19 验证所有属性值
