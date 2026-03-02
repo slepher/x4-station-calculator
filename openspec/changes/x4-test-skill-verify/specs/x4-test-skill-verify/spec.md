@@ -55,15 +55,39 @@
 - **那么**：脚本 MUST 校验 `test_tasks.md` 顶层任务与四类 `spec.ts`（unit/e2e/bug/bug-fix）的 case 映射。
 
 #### Scenario: Validate Number Mapping Granularity
-- **那么**：一级标号 MUST 对应 case desc 标号；二/三级标号 MUST 对应 case 内注释标号。
+- **那么**：一级标号 MUST 对应 case desc 标号。
+- **并且**：Chapter 1/4 的二/三级标号 MUST 对应 case 内注释标号。
+- **并且**：Chapter 2 的二/三级标号 MUST 对应其映射 helper 内注释标号。
 
 #### Scenario: Validate Content In Numbered Blocks
 - **那么**：
-  - 仅二层任务时，二层区间 MUST 有实际内容；
-  - 含三层任务时，三层区间 MUST 有实际内容。
+  - Chapter 1/4 仅二层任务时，二层区间 MUST 有实际内容；
+  - Chapter 1/4 含三层任务时，三层区间 MUST 有实际内容；
+  - Chapter 2 对应规则 MUST 在 helper 函数体内生效，而非 `2.x` case 体内。
 
 #### Scenario: Validate Expectation Assertion Value Match
 - **那么**：含 `#期望: [...]` 的任务块 MUST 存在断言，且断言值 MUST 与期望值匹配。
+- **并且**：Chapter 2 的 `#期望` 校验 MUST 在映射 helper 的对应步骤块内完成。
+
+#### Scenario: Enforce Chapter2 Strict Helper-Only Cases
+- **那么**：`2.x` 为 `状态:` 时，MUST 且仅可调用一个状态 helper。
+- **并且**：`2.x` 为 `切换:` 时，MUST 调用两个 helper，且顺序为状态(from) helper 后切换 helper。
+- **并且**：`2.x` case 体内 MUST NOT 出现 `2.x.x...` 步骤注释。
+- **并且**：`2.x` case 体内 MUST NOT 出现业务断言（`expect(`）或内联业务操作步骤。
+
+#### Scenario: Resolve Helper By Case Call Chain
+- **那么**：helper 定位 MUST 基于 `case -> helper` 实际调用链解析，不得依赖 helper 命名推断。
+- **并且**：helper 可以位于同文件任意位置（包括 `describe` 内），但 MUST 可静态解析。
+
+#### Scenario: Enforce Chapter3 State/Transition Helper Reuse
+- **那么**：Chapter 3 子步骤为 `状态: A` 时，MUST 调用 Chapter 2 中语义匹配的状态 helper。
+- **并且**：Chapter 3 子步骤为 `切换: A -> B` 时，MUST 调用 Chapter 2 中语义匹配的切换 helper。
+- **并且**：同一场景内调用顺序 MUST 为先状态 helper、后切换 helper。
+- **并且**：若 Chapter 3 引用了未在 Chapter 2 定义或未解析到的 helper，脚本 MUST 报错。
+
+#### Scenario: Enforce Transition Helper Responsibility Split
+- **那么**：状态 helper MUST 负责 `build + assert(state ready)`。
+- **并且**：切换 helper MUST 负责 `assert(from) + switch + assert(to)`，且 MUST NOT 负责建态。
 
 #### Scenario: Validate Chapter4 Bug/Bugfix Routing
 - **那么**：Chapter 4 MUST 使用 bug 与 bugfix 双文件映射。

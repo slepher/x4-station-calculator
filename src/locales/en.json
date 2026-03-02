@@ -240,7 +240,8 @@
     "confirm_delete_blueprint": "Are you sure you want to delete this blueprint?",
     "confirm_load_with_unsaved": "Current configuration has unsaved changes. Load anyway?",
     "confirm_new_with_unsaved": "Current configuration has unsaved changes. Create new anyway?",
-    "connections_count": "connections"
+    "connections_count": "connections",
+    "shield_secondary": "Shield (Secondary)"
   },
   "wareflow": {
     "resource_overview": "Resource Production",

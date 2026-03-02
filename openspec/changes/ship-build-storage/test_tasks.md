@@ -254,6 +254,48 @@
   - 步骤 3：选择另一艘飞船（如 Osaka）。
   - 步骤 4：断言配装栏中没有选中的装备（is-selected 数量为 0）。
 
+- [ ] 3.15 Case: Load弹窗显示本地化飞船名称
+  - 步骤 1：localStorage 包含已保存的 blueprint（如 ship_s_gen_explosive01a）。
+  - 步骤 2：点击 Load 按钮打开弹窗。
+  - 步骤 3：断言列表中 blueprint 显示飞船名称（如”响尾蛇”），而非原始 shipId。
+
+- [ ] 3.16 Case: Load弹窗装备按类型+大小分组显示
+  - 步骤 1：保存包含多种装备的 blueprint（如 XL引擎、L炮塔、M武器）。
+  - 步骤 2：打开 Load 弹窗。
+  - 步骤 3：断言显示格式为 “XL引擎x1, L炮塔x2, M武器x3”。
+
+- [ ] 3.17 Case: Load弹窗装备大小排序XL>L>M>S
+  - 步骤 1：保存包含 S/M/L 三种大小引擎的 blueprint。
+  - 步骤 2：打开 Load 弹窗。
+  - 步骤 3：断言显示顺序为 “L引擎, M引擎, S引擎”。
+
+- [ ] 3.18 Case: Load弹窗副盾单独显示且排最后
+  - 步骤 1：保存包含副盾（挂载在引擎上）的 blueprint。
+  - 步骤 2：打开 Load 弹窗。
+  - 步骤 3：断言显示”副盾”（或本地化名称），且在最后位置。
+
+- [ ] 3.19 Case: Load弹窗副盾按大小分组
+  - 步骤 1：保存包含不同大小副盾的 blueprint。
+  - 步骤 2：打开 Load 弹窗。
+  - 步骤 3：断言显示 “L副盾x1, M副盾x2” 格式。
+
+- [ ] 3.20 Case: 保存后connections按固定顺序排列
+  - 步骤 1：依次配置 engine、weapon、shield、thruster、turret 装备。
+  - 步骤 2：保存 blueprint。
+  - 步骤 3：重新载入 blueprint，检查 connections 顺序。
+  - 步骤 4：断言顺序为 engine→thruster→shield→weapon→turret。
+
+- [ ] 3.21 Case: 载入后connections保持正确顺序
+  - 步骤 1：已有保存的 blueprint（connections 顺序可能乱序）。
+  - 步骤 2：载入 blueprint。
+  - 步骤 3：断言 connections 已重新排序为 engine→thruster→shield→weapon→turret。
+
+- [ ] 3.22 Case: Load弹窗飞船名称和装备统计分两行显示
+  - 步骤 1：打开 Load 弹窗。
+  - 步骤 2：断言第一行显示飞船名称。
+  - 步骤 3：断言第二行显示装备统计。
+  - 步骤 4：断言两行内容在不同的 DOM 元素中。
+
 ## 4. State & Transition
 
 ### 状态列表

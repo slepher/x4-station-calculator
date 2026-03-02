@@ -51,17 +51,33 @@
     - `--json` 模式输出 `[{case, desc, error_code, error_msg}]`。
 
 ## 4. test-impl verify 章节（实现映射校验）
-`validate_test_case_refs.py` 仅检查以下内容：
-1. `test_tasks.md` 顶层任务与四类 `spec.ts` 文件中的 case 对应关系。
-2. 一级任务标号对应 case `desc` 的标号。
-3. 二级/三级任务标号对应 case 内注释标号。
-4. 区间内容规则：
-   - 若仅有二级任务：每个二级标号到下一个二级标号（或 case 结束）之间必须有实际内容。
-   - 若二级下有三级任务：每个三级标号到下一个三级标号（或 case 结束）之间必须有实际内容。
-5. 期望断言规则：
-   - 若任务含 `#期望: [...]`，对应区间必须存在断言；
-   - 断言值必须对应 `#期望` 中的值。
-6. Chapter 4 双文件规则：
+`validate_test_case_refs.py` 检查以下内容：
+1. 基础映射（全章通用）
+   - `test_tasks.md` 顶层任务与四类 `spec.ts` 文件中的 case 对应关系。
+   - 一级任务标号对应 case `desc` 标号。
+2. Chapter 1 与 Chapter 4（沿用注释区间模型）
+   - 二级/三级任务标号对应 case 内注释标号。
+   - 若仅有二级任务：每个二级标号到下一个同级标号（或 case 结束）之间必须有实际内容。
+   - 若二级下有三级任务：每个三级标号到下一个同级标号（或 case 结束）之间必须有实际内容。
+   - 若任务含 `#期望: [...]`，对应区间必须存在断言且断言值匹配期望值。
+3. Chapter 2 严格 helper 化规则（新增）
+   - 顶层 `2.x` case 体内禁止步骤注释（`// 2.x.x...`）。
+   - 顶层 `2.x` case 体内禁止业务操作与断言（`expect(`）。
+   - 顶层 `2.x` 为 `状态:` 时，必须且仅调用一个状态 helper。
+   - 顶层 `2.x` 为 `切换:` 时，必须调用两个 helper，且顺序为：状态(from) helper -> 切换(from->to) helper。
+   - `2.x` 对应的全部步骤注释与代码、`#期望` 断言必须落在该 helper 内完成校验。
+4. Chapter 3 场景复用规则（新增）
+   - `3.x` 中子步骤若为 `状态: A`，必须调用 Chapter 2 已映射的状态 helper。
+   - `3.x` 中子步骤若为 `切换: A -> B`，必须调用 Chapter 2 已映射的切换 helper。
+   - 调用顺序强制为：先状态 helper，再切换 helper。
+   - 若引用了 Chapter 2 未定义/未解析到的 helper，必须报错。
+5. 切换语义约束（新增）
+   - 状态 helper 职责为 `build + assert(state ready)`。
+   - 切换 helper 职责为 `assert(from) + switch + assert(to)`，不负责建态。
+6. helper 定位约束（新增）
+   - 采用 `case -> helper` 调用链定位，不依赖命名约定推断。
+   - helper 可位于同文件任意位置（包括 `describe` 内部），但必须可静态解析。
+7. Chapter 4 双文件规则（保持）
    - 每个 BUG 任务同时对应 `bug-*.spec.ts` 与 `bugfix-*.spec.ts`；
    - `修复前` 期望只对应 `bug` 文件，不要求对应 `bugfix`；
    - `修复后` 期望只对应 `bugfix` 文件，不要求对应 `bug`；
@@ -80,8 +96,9 @@
 
 ## 6. 验收标准（DoD）
 1. `request/spec/design/tasks` 明确区分 `test-doc verify` 与 `test-impl verify`。
-2. `test-impl verify` 仅包含第 4 章定义的校验项。
-3. `tests/skills/unit` 与 `tests/skills/data/impls` 已建立命名规范对应样例。
+2. `test-impl verify` 已落地 Chapter 2 严格 helper 化与 Chapter 3 helper 复用顺序校验。
+3. `test-impl verify` 的校验项与第 4 章定义一致，不存在额外隐式约束。
+4. `tests/skills/unit` 与 `tests/skills/data/impls` 已建立命名规范对应样例。
 
 ## 7. x4-test verify 章节（运行结果回写）
 `x4-test` 的 verify 脚本改为“运行结果回写器”，不再做一致性校验：

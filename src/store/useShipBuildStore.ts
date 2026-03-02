@@ -210,6 +210,13 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       })
     })
     blueprint.value.connections = blueprint.value.connections.filter((connection) => connection.group.length > 0)
+    // Sort connections by fixed order: engine -> thruster -> shield -> weapon -> turret
+    const slotOrder = ['engine', 'thruster', 'shield', 'weapon', 'turret']
+    blueprint.value.connections.sort((a, b) => {
+      const orderA = slotOrder.indexOf(a.slot_type)
+      const orderB = slotOrder.indexOf(b.slot_type)
+      return (orderA === -1 ? 999 : orderA) - (orderB === -1 ? 999 : orderB)
+    })
   }
 
   // setEquipment: set equipment for a single group
@@ -437,6 +444,15 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
     // Load blueprint
     blueprint.value = JSON.parse(JSON.stringify(bp))
+    // Sort connections by fixed order: engine -> thruster -> shield -> weapon -> turret
+    if (blueprint.value) {
+      const slotOrder = ['engine', 'thruster', 'shield', 'weapon', 'turret']
+      blueprint.value.connections.sort((a, b) => {
+        const orderA = slotOrder.indexOf(a.slot_type)
+        const orderB = slotOrder.indexOf(b.slot_type)
+        return (orderA === -1 ? 999 : orderA) - (orderB === -1 ? 999 : orderB)
+      })
+    }
     savedBlueprints.value.activeId = id
     takeSnapshot()
   }

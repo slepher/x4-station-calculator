@@ -12,11 +12,17 @@
 
 2. test-impl verify 核心模型
 - 顶层编号映射到 case 名标号。
-- 二/三级编号映射到 case 注释标号。
-- 以“标号区间”校验代码内容与断言完整性。
+- Chapter 1/4 维持“二/三级编号映射到 case 注释标号”与“标号区间”内容校验。
+- Chapter 2 改为严格 helper 模型：`2.x` case 仅做编排调用，步骤注释与断言下沉到 helper。
+- Chapter 3 对 `状态/切换` 子步骤执行 helper 调用链校验，并强制“先状态后切换”顺序。
 - 对 `#期望: [...]` 做值级断言匹配。
+- helper 定位采用 `case -> helper` 实际调用链，不依赖命名猜测；helper 可位于同文件任意位置（含 `describe` 内）。
 
-3. Chapter 4 专项模型
+3. 状态/切换职责拆分（新增）
+- 状态 helper：`build + assert(state ready)`。
+- 切换 helper：`assert(from) + switch + assert(to)`，不负责建态。
+- 任何切换使用点都要求先调用状态 helper，再调用切换 helper。
+4. Chapter 4 专项模型
 - 采用 bug 与 bugfix 双文件映射。
 - 修复前/修复后期望分别归属不同文件通道。
 - 对“修复后已勾选”场景支持根任务不强制映射 bug 文件。

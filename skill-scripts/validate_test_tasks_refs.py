@@ -16,7 +16,7 @@ import argparse
 import json
 import re
 import sys
-from collections import defaultdict, deque
+from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
@@ -612,40 +612,23 @@ def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
 
     all_items = set(states.keys()) | set(transitions.keys())
     if all_items:
-        graph: Dict[str, List[str]] = defaultdict(list)
-        for tr in transitions.keys():
-            parts = tr.split(" -> ")
-            if len(parts) == 2:
-                graph[tr].append(parts[0])
-                graph[tr].append(parts[1])
-
-        reachable: Set[str] = set()
-        queue = deque([x for x in refs_ch34 if x in all_items])
-        visited = set(queue)
-        while queue:
-            cur = queue.popleft()
-            reachable.add(cur)
-            for item, refs in graph.items():
-                if cur in refs and item not in visited:
-                    visited.add(item)
-                    queue.append(item)
-
         for item in sorted(all_items):
-            if item not in reachable and item not in refs_ch34:
-                if item in states:
-                    add_error(
-                        "CHAPTER2_STATE_ISOLATED",
-                        f"Chapter 2 state `{item}` is isolated (no path to Chapter 3/4)",
-                        case=states[item]["task_no"],
-                        desc=states[item]["desc"],
-                    )
-                else:
-                    add_error(
-                        "CHAPTER2_TRANSITION_ISOLATED",
-                        f"Chapter 2 transition `{item}` is isolated (no path to Chapter 3/4)",
-                        case=transitions[item]["task_no"],
-                        desc=transitions[item]["desc"],
-                    )
+            if item in refs_ch34:
+                continue
+            if item in states:
+                add_error(
+                    "CHAPTER2_STATE_ISOLATED",
+                    f"Chapter 2 state `{item}` is isolated (not explicitly referenced in Chapter 3/4)",
+                    case=states[item]["task_no"],
+                    desc=states[item]["desc"],
+                )
+            else:
+                add_error(
+                    "CHAPTER2_TRANSITION_ISOLATED",
+                    f"Chapter 2 transition `{item}` is isolated (not explicitly referenced in Chapter 3/4)",
+                    case=transitions[item]["task_no"],
+                    desc=transitions[item]["desc"],
+                )
 
     return len(errors) == 0, errors
 

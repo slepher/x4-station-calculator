@@ -242,7 +242,8 @@
     "confirm_delete_blueprint": "确定要删除这个配装方案吗？",
     "confirm_load_with_unsaved": "当前配置有未保存的修改，确定要载入吗？",
     "confirm_new_with_unsaved": "当前配置有未保存的修改，确定要新建吗？",
-    "connections_count": "个槽位"
+    "connections_count": "个槽位",
+    "shield_secondary": "副盾"
   },
   "wareflow": {
     "resource_overview": "资源产出",
