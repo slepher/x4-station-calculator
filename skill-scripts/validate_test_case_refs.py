@@ -899,6 +899,13 @@ def validate(task_path: Path, files: Dict[str, Optional[Path]]) -> Tuple[bool, L
         "bugfix": chapter4_ids,
     }
 
+    def allowed_comment_ids_for_task(task: TopTask) -> set[str]:
+        allowed = {l2.id for l2 in task.l2}
+        for l2 in task.l2:
+            for c in l2.children:
+                allowed.add(c.id)
+        return allowed
+
     for route in ("unit", "e2e", "bug", "bugfix"):
         for cid, case_block in cases[route].items():
             if cid not in route_allowed_top[route]:
@@ -914,10 +921,12 @@ def validate(task_path: Path, files: Dict[str, Optional[Path]]) -> Tuple[bool, L
             if task is None:
                 continue
 
-            allowed_comment_ids = {l2.id for l2 in task.l2}
-            for l2 in task.l2:
-                for c in l2.children:
-                    allowed_comment_ids.add(c.id)
+            # Chapter 2 comment mapping is validated in mapped helper bodies.
+            # Case body only enforces orchestration guardrails (no step comments/ops/assertions).
+            if route == "e2e" and task.chapter == 2:
+                continue
+
+            allowed_comment_ids = allowed_comment_ids_for_task(task)
 
             for comment_id in parse_comment_id_sequence(case_block.body):
                 if comment_id not in allowed_comment_ids:
@@ -1061,6 +1070,18 @@ def validate(task_path: Path, files: Dict[str, Optional[Path]]) -> Tuple[bool, L
         helper_case = CaseBlock(name=f"{t.id}::{helper_name}", id=t.id, body=helper.body)
         check_comment_order(helper_case, errors)
         check_case_comments_for_task(t, helper_case, route="e2e", errors=errors)
+        allowed_comment_ids = allowed_comment_ids_for_task(t)
+        for comment_id in parse_comment_id_sequence(helper.body):
+            if comment_id not in allowed_comment_ids:
+                errors.append(ValidationError(
+                    case=comment_id,
+                    desc=helper_case.name,
+                    error_code="EXTRA_COMMENT_UNMAPPED",
+                    error_msg=(
+                        f"extra comment `{comment_id}` in helper `{helper_name}` "
+                        f"has no mapping in test_tasks.md for case `{t.id}`"
+                    ),
+                ))
 
     # Chapter 3 must reuse chapter2 state/transition helpers and keep call order.
     for t in chapter3_tasks:
