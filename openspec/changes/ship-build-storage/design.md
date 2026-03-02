@@ -80,3 +80,46 @@
   - **缓解**: 如果 connectionKey 对应的槽位不存在，跳过该条记录
 - **风险**: View 层修改 count 功能未实现，但数据结构已预留
   - **缓解**: count 字段 blueprint已存在于 和 selectedByConnection 中，后续可直接启用
+
+---
+
+## LoadShipBlueprintModal 显示优化设计
+
+## Goals / Non-Goals
+
+**Goals:**
+- 明细1显示飞船本地化名称
+- 明细2显示装备统计（类型+数量）
+- 护盾装备统一显示为"副盾"
+
+**Non-Goals:**
+- 不显示装备具体名称（只显示类型）
+- 不支持点击跳转到对应装备
+
+## Decisions
+
+### D9: 飞船名称获取
+- **决定**: 在 LoadShipBlueprintModal 组件内部定义 `getShipName(shipId)` 函数
+- **理由**: 组件已经引入 useShipBuildStore，可以直接访问 ships 数组
+- **实现**: 遍历 ships.find(s => s.id === shipId)，返回 ship.name
+
+### D10: 装备类型映射
+- **决定**: 使用固定映射表从 slot_type 获取显示名称
+- **理由**: slot_type 是预定义的枚举值，映射关系简单明确
+- **映射表**:
+  - engine → 引擎
+  - weapon → 武器
+  - shield → 护盾
+  - thruster → 推进器
+  - turret → 炮塔
+  - 其他 → 使用原始值
+
+### D11: 副盾显示逻辑
+- **决定**: 判断 shield 是否为"副盾"（挂载在其他装备上）
+- **判断依据**: 如果 blueprint.group 中的 equipment_id 不是直接的 shield 类型装备，而是通过 shield 字段挂载，则显示为"副盾"
+- **理由**: 副盾是挂载在引擎/武器等装备上的护盾，与独立护盾槽不同
+
+### D12: 统计格式
+- **决定**: 格式为 "类型x数量, 类型x数量, ..."
+- **理由**: 简洁明了，符合用户习惯
+- **过滤**: 只显示数量 > 0 的类型

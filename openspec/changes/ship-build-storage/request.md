@@ -112,3 +112,69 @@
 
 ## 未决项
 无。
+
+---
+
+## 需求说明：LoadShipBlueprintModal 显示优化
+
+## 目标
+在 LoadShipBlueprintModal 界面中，明细1显示飞船名称，明细2显示飞船装备统计。
+
+## 已确认方案（审核重点）
+
+### 1. 显示布局
+- 飞船名称和装备统计分两行显示
+- 第一行：飞船名称（本地化）
+- 第二行：装备统计
+
+### 2. 明细1 - 飞船名称显示
+- 通过 `shipId` 在 `ships` 数组中查找对应的 `X4Ship`
+- 使用 `translateShip()` 进行本地化，显示飞船本地化名称（如"响尾蛇"）
+
+### 3. 明细2 - 装备统计显示
+- 遍历 `blueprint.connections`，按类型和大小分组统计
+- 装备类型使用 `translateEquipmentType()` 本地化
+- **特殊映射规则**：挂载在其他装备上的护盾（shield），统一显示为"副盾"
+
+### 4. Connections 排序规则
+- Store 层 connections 按固定顺序排序：engine → thruster → shield → weapon → turret
+- 在 `cleanupEmptyGroups()` 和 `loadBlueprint()` 时排序
+
+### 5. 装备统计排序规则
+- 同一类型按大小排序：XL > L > M > S
+- 显示格式：`XL引擎x2, L炮塔x1, M炮塔x3, 副盾x1`
+- 副盾（off_shield）排最后
+
+### 6. 装备类型映射表
+| slot_type | 显示名称 |
+|-----------|----------|
+| engine    | 引擎     |
+| weapon    | 武器     |
+| shield    | 护盾     |
+| thruster  | 推进器   |
+| turret    | 炮塔     |
+| off_shield| 副盾    |
+| 其他      | 使用 slot_type 原值 |
+
+## 边界
+
+### In Scope
+- LoadShipBlueprintModal 界面显示优化
+- 飞船名称本地化显示
+- 装备统计按类型+大小分组显示
+- Connections 排序
+- 副盾排最后
+
+### Out of Scope
+- 不显示装备具体名称（只显示类型+数量）
+
+## 验收标准（DoD）
+1. 飞船名称本地化显示（如"响尾蛇"），与装备统计分两行显示。
+2. 装备统计按类型+大小分组显示（XL > L > M > S）。
+3. 副盾（挂载在其他装备上的护盾）统一显示为"副盾"，排最后。
+4. Connections 在 Store 层按 engine→thruster→shield→weapon→turret 排序。
+5. 只显示有装备的类型（数量 > 0）。
+6. npm run build 无编译错误。
+
+## 未决项
+无。

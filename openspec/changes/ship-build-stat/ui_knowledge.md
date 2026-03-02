@@ -189,3 +189,49 @@ function useEquipmentStats(equipment: X4Equipment, ship: X4Ship): {
 | turret (large) | `turret_tel_l_plasma_01_mk1` | TEL L 等离子炮塔 Mk1 | 3 |
 | turret (medium) | `turret_ter_m_gatling_02_mk1` | TER M 闪电炮塔 Mk1 | 多个 |
 | turret (medium) | `turret_ter_m_laser_02_mk1` | TER M 脉冲炮塔 Mk1 | 多个 |
+
+## 测试运行
+
+### 2026-03-02 (首次运行)
+
+#### 状态测试
+
+- [ ] 2.1 状态: 大太刀已选 [✗]
+  - 失败原因：stats panel 未正确渲染，`ship-build-ship-name` 元素不可见
+  - 分类：product_bug
+- [ ] 2.2 状态: 大阪已选 [✗]
+  - 失败原因：stats panel 未正确渲染，`ship-build-ship-name` 元素不可见
+  - 分类：product_bug
+
+#### 切换测试
+
+- [ ] 2.3 切换: 大太刀已选 -> 详细档位 [✓]
+- [ ] 2.4 切换: 详细档位 -> 简略档位 [✓]
+
+#### 场景测试
+
+- [ ] 3.1 Case: 简略字段对齐 [✗]
+  - 失败原因：stats panel 中的 `.stats-label` 元素（如 `船体`）不可见
+  - 分类：product_bug
+- [ ] 3.2 Case: 详细字段对齐 [✓]
+- [ ] 3.3 Case: 详细档位真实值 [✓]
+- [ ] 3.4 Case: 取消固定高度限制 [✓]
+- [ ] 3.5 Case: 大太刀满装备DPS计算 [✗]
+  - 失败原因：stats panel 未渲染，无法获取字段值
+  - 分类：product_bug
+- [ ] 3.6 Case: 大阪满装备DPS计算 [✗]
+  - 失败原因：stats panel 未渲染，无法获取字段值
+  - 分类：product_bug
+
+#### 问题分析
+
+**共性问题**：stats panel 在飞船选择后未正确渲染
+- `ship-build-ship-name` 元素超时不可见
+- `.stats-label` 元素不可见，导致所有依赖 stats panel 的断言失败
+- 档位切换功能正常工作（2.3, 2.4 通过），说明组件结构存在
+- 详细档位模式的部分测试通过（3.2, 3.3），说明在特定条件下 stats panel 可以渲染
+
+**待调查**：
+- ShipBuildPanelStats 组件与父组件的数据传递是否正常
+- `selectedShip` computed 属性是否正确返回数据
+- `shipBlueprint` prop 是否正确传入

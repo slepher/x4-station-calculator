@@ -117,6 +117,22 @@ const cases: CaseDef[] = [
       { case: '4.1.1', error_code: 'COMMENT_MISSING' },
     ],
   },
+  {
+    name: 'transition-two-helper-required',
+    file: 'test_tasks-16-transition-two-helper-required.md',
+    expectedPoints: [
+      { case: '2.2', error_code: 'CH2_HELPER_CALL_COUNT_INVALID' },
+      { case: '4.1.1', error_code: 'COMMENT_MISSING' },
+    ],
+  },
+  {
+    name: 'ch3-transition-order-invalid',
+    file: 'test_tasks-17-ch3-transition-order-invalid.md',
+    expectedPoints: [
+      { case: '3.1.2', error_code: 'CH3_HELPER_CALL_ORDER_INVALID' },
+      { case: '4.1.1', error_code: 'COMMENT_MISSING' },
+    ],
+  },
 ]
 
 describe('validate_test_case_refs impl verify rules', () => {

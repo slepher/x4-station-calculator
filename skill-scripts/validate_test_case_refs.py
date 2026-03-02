@@ -32,6 +32,9 @@ L3_RE = re.compile(r"^(\s{4})-\s*\[([ ✓✗x])\]\s*(\d+\.\d+\.\d+\.\d+)\s+(.+)$
 CASE_START_RE = re.compile(r"\b(?:it|test)\s*\(\s*(['\"])(.*?)\1")
 COMMENT_ID_RE = re.compile(r"^\s*//\s*(\d+\.\d+\.\d+(?:\.\d+)?)\b")
 EXPECT_RE = re.compile(r"#期望:\s*(\[[^\]]*\])")
+STATE_DESC_RE = re.compile(r"^状态:\s*(\S+)\s*$")
+TRANS_DESC_RE = re.compile(r"^切换:\s*(.+?)\s*->\s*(.+)$")
+DIRECT_CALL_RE = re.compile(r"^(?:await\s+|void\s+)?([A-Za-z_$][\w$]*)\s*\(")
 
 
 @dataclass
@@ -62,6 +65,12 @@ class TopTask:
 class CaseBlock:
     name: str
     id: str
+    body: str
+
+
+@dataclass
+class HelperBlock:
+    name: str
     body: str
 
 
@@ -422,6 +431,76 @@ def parse_case_blocks(spec_path: Path) -> Dict[str, CaseBlock]:
         out[case_id] = CaseBlock(name=case_name, id=case_id, body=body)
 
     return out
+
+
+def parse_helper_blocks(spec_path: Optional[Path]) -> Dict[str, HelperBlock]:
+    if spec_path is None or not spec_path.exists():
+        return {}
+    text = spec_path.read_text(encoding="utf-8")
+    out: Dict[str, HelperBlock] = {}
+
+    fn_patterns = [
+        re.compile(r"\b(?:async\s+)?function\s+([A-Za-z_$][\w$]*)\s*\("),
+        re.compile(r"\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s+)?\([^)]*\)\s*=>\s*\{"),
+        re.compile(r"\blet\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s+)?\([^)]*\)\s*=>\s*\{"),
+        re.compile(r"\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s+)?function\s*\([^)]*\)\s*\{"),
+        re.compile(r"\blet\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s+)?function\s*\([^)]*\)\s*\{"),
+    ]
+
+    for pat in fn_patterns:
+        for m in pat.finditer(text):
+            name = m.group(1)
+            brace_open = text.find("{", m.end() - 1)
+            if brace_open == -1:
+                continue
+            brace_close = _find_matching_brace(text, brace_open)
+            if brace_close is None:
+                continue
+            out[name] = HelperBlock(name=name, body=text[brace_open + 1:brace_close])
+    return out
+
+
+def parse_state_key(desc: str) -> Optional[str]:
+    m = STATE_DESC_RE.match(desc.strip())
+    if not m:
+        return None
+    return m.group(1).strip()
+
+
+def parse_transition_key(desc: str) -> Optional[Tuple[str, str, str]]:
+    m = TRANS_DESC_RE.match(desc.strip())
+    if not m:
+        return None
+    from_state = m.group(1).strip()
+    to_state = m.group(2).strip()
+    return from_state, to_state, f"{from_state}->{to_state}"
+
+
+def extract_direct_call_names(block_text: str) -> List[str]:
+    names: List[str] = []
+    for raw in block_text.splitlines():
+        s = raw.strip()
+        if not s or s.startswith("//"):
+            continue
+        if s in ("{", "}", ");"):
+            continue
+        m = DIRECT_CALL_RE.match(s)
+        if m:
+            names.append(m.group(1))
+    return names
+
+
+def has_non_call_statement(block_text: str) -> bool:
+    for raw in block_text.splitlines():
+        s = raw.strip()
+        if not s or s.startswith("//"):
+            continue
+        if s in ("{", "}", ");"):
+            continue
+        if DIRECT_CALL_RE.match(s):
+            continue
+        return True
+    return False
 
 
 def parse_case_id_sequence(spec_path: Optional[Path]) -> List[Tuple[str, str]]:
@@ -858,6 +937,7 @@ def validate(task_path: Path, files: Dict[str, Optional[Path]], cases_filter: Op
         "bug": filter_cases(parse_case_blocks(files["bug"]) if files.get("bug") else {}),
         "bugfix": filter_cases(parse_case_blocks(files["bugfix"]) if files.get("bugfix") else {}),
     }
+    e2e_helpers = parse_helper_blocks(files.get("e2e"))
 
     # 当指定 cases_filter 时，只检查过滤后的 tasks
     tasks_to_check = [t for t in tasks if cases_filter is None or t.id in cases_filter]
@@ -874,6 +954,8 @@ def validate(task_path: Path, files: Dict[str, Optional[Path]], cases_filter: Op
     chapter23_ids = {t.id for t in tasks if t.chapter in (2, 3)}
     chapter4_ids = {t.id for t in tasks if t.chapter == 4}
     task_by_id = {t.id: t for t in tasks}
+    chapter2_tasks = [t for t in tasks if t.chapter == 2]
+    chapter3_tasks = [t for t in tasks if t.chapter == 3]
 
     route_allowed_top = {
         "unit": chapter1_ids,
@@ -913,6 +995,217 @@ def validate(task_path: Path, files: Dict[str, Optional[Path]], cases_filter: Op
                             error_msg=f"extra comment `{comment_id}` in case `{cid}` has no mapping in test_tasks.md",
                         ))
 
+    # Chapter 2 strict helper model:
+    # - 状态: exactly 1 helper call
+    # - 切换: exactly 2 helper calls (state(from) -> transition)
+    state_task_by_key: Dict[str, TopTask] = {}
+    transition_task_by_key: Dict[str, TopTask] = {}
+    state_case_present: Dict[str, bool] = {}
+    transition_case_present: Dict[str, bool] = {}
+    state_helper_by_key: Dict[str, str] = {}
+    transition_helper_by_key: Dict[str, str] = {}
+
+    for t in chapter2_tasks:
+        state_key = parse_state_key(t.desc)
+        if state_key is not None:
+            state_task_by_key[state_key] = t
+            state_case_present[state_key] = t.id in cases["e2e"]
+        trans = parse_transition_key(t.desc)
+        if trans is not None:
+            _, _, trans_key = trans
+            transition_task_by_key[trans_key] = t
+            transition_case_present[trans_key] = t.id in cases["e2e"]
+
+    for t in chapter2_tasks:
+        if t.id not in cases["e2e"]:
+            continue
+        case = cases["e2e"][t.id]
+        case_calls = extract_direct_call_names(case.body)
+        case_comments = parse_comment_id_sequence(case.body)
+
+        if any(c.startswith("2.") for c in case_comments):
+            errors.append(ValidationError(
+                case=t.id,
+                desc=t.desc,
+                error_code="CH2_CASE_STEP_COMMENT_FORBIDDEN",
+                error_msg=f"chapter2 case `{t.id}` must not contain numbered step comments",
+            ))
+        if "expect(" in case.body:
+            errors.append(ValidationError(
+                case=t.id,
+                desc=t.desc,
+                error_code="CH2_CASE_ASSERTION_FORBIDDEN",
+                error_msg=f"chapter2 case `{t.id}` must not contain assertions",
+            ))
+        if has_non_call_statement(case.body):
+            errors.append(ValidationError(
+                case=t.id,
+                desc=t.desc,
+                error_code="CH2_CASE_NON_HELPER_STATEMENT",
+                error_msg=f"chapter2 case `{t.id}` must only orchestrate helper calls",
+            ))
+
+        state_key = parse_state_key(t.desc)
+        if state_key is not None:
+            if len(case_calls) == 0:
+                errors.append(ValidationError(
+                    case=t.id,
+                    desc=t.desc,
+                    error_code="CH2_HELPER_CALL_MISSING",
+                    error_msg=f"state case `{t.id}` must call exactly one state helper",
+                ))
+                continue
+            if len(case_calls) != 1:
+                errors.append(ValidationError(
+                    case=t.id,
+                    desc=t.desc,
+                    error_code="CH2_HELPER_CALL_COUNT_INVALID",
+                    error_msg=f"state case `{t.id}` must call exactly one helper, got {len(case_calls)}",
+                ))
+                continue
+            state_helper_by_key[state_key] = case_calls[0]
+            continue
+
+        trans = parse_transition_key(t.desc)
+        if trans is not None:
+            from_state, _, trans_key = trans
+            if len(case_calls) == 0:
+                errors.append(ValidationError(
+                    case=t.id,
+                    desc=t.desc,
+                    error_code="CH2_HELPER_CALL_MISSING",
+                    error_msg=f"transition case `{t.id}` must call state helper then transition helper",
+                ))
+                continue
+            if len(case_calls) != 2:
+                errors.append(ValidationError(
+                    case=t.id,
+                    desc=t.desc,
+                    error_code="CH2_HELPER_CALL_COUNT_INVALID",
+                    error_msg=f"transition case `{t.id}` must call exactly two helpers, got {len(case_calls)}",
+                ))
+                continue
+
+            expected_state_helper = state_helper_by_key.get(from_state)
+            if expected_state_helper is not None and case_calls[0] != expected_state_helper:
+                errors.append(ValidationError(
+                    case=t.id,
+                    desc=t.desc,
+                    error_code="CH2_TRANSITION_HELPER_ORDER_INVALID",
+                    error_msg=f"transition case `{t.id}` must call state helper `{expected_state_helper}` before transition helper",
+                ))
+                continue
+            transition_helper_by_key[trans_key] = case_calls[1]
+
+    # Chapter 2 numbered block + expectation checks must run inside helper body
+    for t in chapter2_tasks:
+        if t.id not in cases["e2e"]:
+            continue
+        helper_name: Optional[str] = None
+        state_key = parse_state_key(t.desc)
+        if state_key is not None:
+            helper_name = state_helper_by_key.get(state_key)
+        else:
+            trans = parse_transition_key(t.desc)
+            if trans is not None:
+                helper_name = transition_helper_by_key.get(trans[2])
+
+        if helper_name is None:
+            continue
+        helper = e2e_helpers.get(helper_name)
+        if helper is None:
+            errors.append(ValidationError(
+                case=t.id,
+                desc=t.desc,
+                error_code="CH2_HELPER_UNRESOLVED",
+                error_msg=f"chapter2 case `{t.id}` helper `{helper_name}` is not statically resolvable",
+            ))
+            continue
+
+        helper_case = CaseBlock(name=f"{t.id}::{helper_name}", id=t.id, body=helper.body)
+        check_comment_order(helper_case, errors)
+        check_case_comments_for_task(t, helper_case, route="e2e", errors=errors)
+
+    # Chapter 3 must reuse chapter2 state/transition helpers and keep call order.
+    for t in chapter3_tasks:
+        if t.id not in cases["e2e"]:
+            continue
+        case = cases["e2e"][t.id]
+        call_sequence = extract_direct_call_names(case.body)
+        call_pos: Dict[str, int] = {}
+        for idx, name in enumerate(call_sequence):
+            if name not in call_pos:
+                call_pos[name] = idx
+
+        for l2 in t.l2:
+            targets = l2.children if l2.children else [l2]
+            for item in targets:
+                state_key = parse_state_key(item.desc)
+                if state_key is not None:
+                    expected_helper = state_helper_by_key.get(state_key)
+                    state_task = state_task_by_key.get(state_key)
+                    if expected_helper is None:
+                        if state_task is not None and state_case_present.get(state_key, False):
+                            errors.append(ValidationError(
+                                case=item.id,
+                                desc=item.desc,
+                                error_code="CH3_REF_HELPER_UNRESOLVED",
+                                error_msg=f"chapter3 references state `{state_key}` but mapped helper is unresolved",
+                            ))
+                        continue
+                    if expected_helper not in call_pos:
+                        errors.append(ValidationError(
+                            case=item.id,
+                            desc=item.desc,
+                            error_code="CH3_STATE_HELPER_CALL_MISSING",
+                            error_msg=f"chapter3 state item `{item.id}` must call helper `{expected_helper}`",
+                        ))
+                    continue
+
+                trans = parse_transition_key(item.desc)
+                if trans is None:
+                    continue
+
+                from_state, _, trans_key = trans
+                expected_transition_helper = transition_helper_by_key.get(trans_key)
+                transition_task = transition_task_by_key.get(trans_key)
+                if expected_transition_helper is None:
+                    if transition_task is not None and transition_case_present.get(trans_key, False):
+                        errors.append(ValidationError(
+                            case=item.id,
+                            desc=item.desc,
+                            error_code="CH3_REF_HELPER_UNRESOLVED",
+                            error_msg=f"chapter3 references transition `{trans_key}` but mapped helper is unresolved",
+                        ))
+                    continue
+                if expected_transition_helper not in call_pos:
+                    errors.append(ValidationError(
+                        case=item.id,
+                        desc=item.desc,
+                        error_code="CH3_TRANSITION_HELPER_CALL_MISSING",
+                        error_msg=f"chapter3 transition item `{item.id}` must call helper `{expected_transition_helper}`",
+                    ))
+                    continue
+
+                expected_state_helper = state_helper_by_key.get(from_state)
+                if expected_state_helper is not None and expected_state_helper not in call_pos:
+                    errors.append(ValidationError(
+                        case=item.id,
+                        desc=item.desc,
+                        error_code="CH3_STATE_HELPER_CALL_MISSING",
+                        error_msg=f"chapter3 transition `{item.id}` must call state helper `{expected_state_helper}` before transition",
+                    ))
+                    continue
+
+                if expected_state_helper is not None:
+                    if call_pos[expected_state_helper] >= call_pos[expected_transition_helper]:
+                        errors.append(ValidationError(
+                            case=item.id,
+                            desc=item.desc,
+                            error_code="CH3_HELPER_CALL_ORDER_INVALID",
+                            error_msg=f"chapter3 transition `{item.id}` must call state helper before transition helper",
+                        ))
+
     # per chapter comment/block/assertion checks
     # 当指定 cases_filter 时，只检查过滤后的 tasks
     tasks_to_check = [t for t in tasks if cases_filter is None or t.id in cases_filter]
@@ -921,7 +1214,7 @@ def validate(task_path: Path, files: Dict[str, Optional[Path]], cases_filter: Op
         if t.chapter == 1 and t.id in cases["unit"]:
             check_comment_order(cases["unit"][t.id], errors)
             check_case_comments_for_task(t, cases["unit"][t.id], route="unit", errors=errors)
-        elif t.chapter in (2, 3) and t.id in cases["e2e"]:
+        elif t.chapter == 3 and t.id in cases["e2e"]:
             check_comment_order(cases["e2e"][t.id], errors)
             check_case_comments_for_task(t, cases["e2e"][t.id], route="e2e", errors=errors)
         elif t.chapter == 4:

@@ -103,19 +103,21 @@ python3 skill-scripts/validate_test_case_refs.py <change-name> --json
 
 #### B.2 Mapping Contract (MANDATORY)
 
-验证只覆盖任务到测试实现的对应关系：
+验证覆盖“任务编号 -> 测试实现”的强约束：
 
-1. 任务文件与测试文件对应。
-   - 对应关系为双向：缺失映射与多余映射（case/comment）都应报错。
-2. 顶层任务编号（`x.x`）对应 test/it 名称前缀编号。
-   - 格式：`it('1.1 描述', () => { ... })` 或 `test('1.1 描述', async ...)`
-   - 顶层编号必须出现在 test/it 名称中
-3. 二级/三级任务编号（`x.x.x` / `x.x.x.n`）对应 case 内注释编号。
-   - 格式：`// 1.1.1 步骤描述`
-4. 若任务含 `#期望: [...]`，则对应代码块必须存在断言，且断言值覆盖期望值。
-5. spec 文件内 case 标号必须按编号递增顺序出现。
-6. 单个 case 内注释标号必须按编号递增顺序出现（同级与层级展开均需满足顺序约束）。
-7. 当前 verify 脚本仅强制校验标号映射与顺序，不对”标号后全文语义一致性”做自动判定。
+1. 顶层编号（`x.x`）必须映射到同编号 case；缺失/多余 case 都报错。
+2. Chapter 1/4：`x.x.x` / `x.x.x.n` 注释在 case 内校验。
+3. Chapter 2（严格）：
+   - `状态` case：只允许 1 个 helper 调用。
+   - `切换` case：只允许 2 个 helper 调用，顺序为状态 helper -> 切换 helper。
+   - `2.x` case 内禁止步骤注释、业务操作、断言。
+   - `2.x` 的步骤注释与 `#期望` 断言必须写在 helper 内。
+4. Chapter 3：`状态/切换` 子步骤必须调用 Chapter 2 对应 helper；切换必须先状态后切换。
+5. `#期望: [...]` 必须有断言且断言值匹配。
+6. case 编号顺序与注释编号顺序都必须递增。
+7. Chapter 2 引用完整性（test-doc 规则）按单向语义处理：
+   - `状态` 与 `切换` 都必须在 Chapter 3/4 被显式引用才算可达；
+   - 不做可达推导：`状态` 不反推 `切换`，`切换` 也不反推 `from/to` 状态。
 
 #### B.3 File Discovery Rules (MANDATORY)
 
@@ -127,10 +129,46 @@ python3 skill-scripts/validate_test_case_refs.py <change-name> --json
 
 #### B.4 Step Content Rules (MANDATORY)
 
-- 每个任务子项必须有同编号注释块。
-- 注释块后必须有实际代码（不能只有空行/注释/符号）。
-- 对纯二层任务：每个 `x.x.x` 注释块到下一个同级注释、上级注释或 case 结束之间，必须有实际内容。
-- 对含三层任务：每个 `x.x.x.n` 注释块到下一个同级注释、上级注释或 case 结束之间，必须有实际内容。
+- 每个任务子项都要有同编号注释块，且注释块后必须有实际代码。
+- 对纯二层任务：`x.x.x` 块必须有内容。
+- 对含三层任务：`x.x.x.n` 块必须有内容。
+- Chapter 2 的编号块检查目标是 helper 函数体，不是 `2.x` case 体。
+
+示例（推荐写法）：
+
+```ts
+test('2.1 状态: A', async ({ page }) => {
+  await buildA(page)
+})
+
+test('2.2 切换: A -> B', async ({ page }) => {
+  await buildA(page)
+  await transitionAtoB(page)
+})
+
+async function buildA(page: Page) {
+  // 2.1.1 进入 A 所需的初始操作
+  await page.goto('/a')
+  // 2.1.2 断言处于 A #期望: ['A']
+  await expect(page.getByTestId('state-label')).toHaveText('A')
+}
+
+async function transitionAtoB(page: Page) {
+  // 2.2.1 断言当前处于 A #期望: ['A']
+  await expect(page.getByTestId('state-label')).toHaveText('A')
+  // 2.2.2 执行切换 A -> B
+  await page.getByTestId('switch-a-to-b').click()
+  // 2.2.3 断言切换后处于 B #期望: ['B']
+  await expect(page.getByTestId('state-label')).toHaveText('B')
+}
+
+test('3.1 Case: flow', async ({ page }) => {
+  // 3.1.1 状态: A
+  await buildA(page)
+  // 3.1.2 切换: A -> B
+  await transitionAtoB(page)
+})
+```
 
 #### B.5 Chapter 4 Route Rules (MANDATORY)
 
@@ -159,12 +197,6 @@ Chapter 4 需要同时映射 `bug` 与 `bug-fix` 两类文件，并按语义拆�
 2. 运行 `validate_test_case_refs.py`（推荐 `--json`）。
 3. 修复所有映射/注释/内容/期望值问题直至通过。
 4. 运行 `npx tsc -p tsconfig.test-check.json --noEmit`，修复类型错误。
-
-**可选参数 `--cases`**:
-- 支持指定验证的 case 标号（如 `1.1`、`1.1,2.1`）
-- 使用该参数时，跳过 EXTRA_CASE_UNMAPPED/EXTRA_COMMENT_UNMAPPED 检查
-- 适用于只想验证部分 case 有效性的场景
-- 示例: `python3 skill-scripts/validate_test_case_refs.py --mode=test --file tests/skills/data/impls/test_tasks-01-foo.md --cases 1.1`
 
 ## Constraints
 

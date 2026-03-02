@@ -34,16 +34,6 @@ const statsViewMode = ref<'summary' | 'detail'>('summary')
 // 控制使用哪种逻辑: true = useEquipmentStats (新), false = 原有逻辑 (旧)
 const useNewLogic = ref(true)
 
-// ============ 使用 useEquipmentStats 计算装备属性 ============
-/**
- * 使用 useEquipmentStats 计算单个装备的属性
- */
-const getEquipmentStatsByUseEquipmentStats = (equipment: X4Equipment) => {
-  if (!selectedShip.value) return null
-  const { summary, details } = useEquipmentStats(equipment, selectedShip.value)
-  return { summary: summary.value, details: details.value }
-}
-
 /**
  * 聚合所有已装备的武器 DPS (使用 useEquipmentStats)
  */
@@ -62,10 +52,11 @@ const getWeaponStatsByUseEquipmentStats = () => {
       const equipmentClass = equipment.class
       if (equipmentClass !== 'weapon' && equipmentClass !== 'missilelauncher') return
 
-      const { details } = useEquipmentStats(equipment, selectedShip.value)
+      const { details } = useEquipmentStats(equipment, selectedShip.value!)
       if (details.value) {
-        totalBurst += details.value.burstDPS * g.count
-        totalSustained += details.value.sustainedDPS * g.count
+        const d = details.value as any
+        totalBurst += d.burstDPS * g.count
+        totalSustained += d.sustainedDPS * g.count
       }
     })
   })
@@ -91,9 +82,10 @@ const getTurretStatsByUseEquipmentStats = () => {
       const equipmentClass = equipment.class
       if (equipmentClass !== 'turret' && equipmentClass !== 'missileturret') return
 
-      const { details } = useEquipmentStats(equipment, selectedShip.value)
+      const { details } = useEquipmentStats(equipment, selectedShip.value!)
       if (details.value) {
-        totalDamage += details.value.sustainedDPS * g.count
+        const d = details.value as any
+        totalDamage += d.sustainedDPS * g.count
         turretCount += g.count
       }
     })
@@ -120,11 +112,12 @@ const getShieldStatsByUseEquipmentStats = () => {
       const equipment = equipmentMap.value.get(g.equipment_id)
       if (!equipment?.recharge) return
 
-      const { details } = useEquipmentStats(equipment, selectedShip.value)
+      const { details } = useEquipmentStats(equipment, selectedShip.value!)
       if (details.value) {
-        max += (details.value.shieldMax || 0) * g.count
-        rate += (details.value.shieldRate || 0) * g.count
-        delay = Math.max(delay, details.value.shieldDelay || 0)
+        const d = details.value as any
+        max += (d.shieldMax || 0) * g.count
+        rate += (d.shieldRate || 0) * g.count
+        delay = Math.max(delay, d.shieldDelay || 0)
       }
     })
   })
@@ -140,9 +133,10 @@ const getShieldStatsByUseEquipmentStats = () => {
       const shieldEquipment = equipmentMap.value.get(g.shield.equipment_id)
       if (!shieldEquipment?.recharge) return
 
-      const { details } = useEquipmentStats(shieldEquipment, selectedShip.value)
+      const { details } = useEquipmentStats(shieldEquipment, selectedShip.value!)
       if (details.value) {
-        mountedShieldMax += (details.value.shieldMax || 0) * g.shield.count
+        const d = details.value as any
+        mountedShieldMax += (d.shieldMax || 0) * g.shield.count
         mountedShieldGroups++
       }
     })
@@ -175,7 +169,7 @@ const getEngineStatsByUseEquipmentStats = () => {
       const equipment = equipmentMap.value.get(g.equipment_id)
       if (!equipment) return
 
-      const { details } = useEquipmentStats(equipment, selectedShip.value)
+      const { details } = useEquipmentStats(equipment, selectedShip.value!)
       if (details.value) {
         const d = details.value as any
         thrustForward += (d.thrustForward || 0) * g.count
@@ -221,7 +215,7 @@ const getThrusterStatsByUseEquipmentStats = () => {
       const equipment = equipmentMap.value.get(g.equipment_id)
       if (!equipment) return
 
-      const { details } = useEquipmentStats(equipment, selectedShip.value)
+      const { details } = useEquipmentStats(equipment, selectedShip.value!)
       if (details.value) {
         const d = details.value as any
         pitch += (d.pitch || 0) * g.count
