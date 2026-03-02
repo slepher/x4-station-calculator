@@ -81,3 +81,66 @@
 
 ## 未决项
 无。
+
+## 附录
+
+### PanelStats 与 default_maxes.json 字段配对表
+
+数值条的 max 值来源：`default_maxes.json`（从 `defaults.xml` 提取的各飞船 class 最大值）
+
+| PanelStats Key | Label EN | default_maxes 字段 | xl | l | m | s |
+|---------------|----------|-------------------|-----|-----|-----|-----|
+| hull | Hull | hull | 1,795,200 | 253,200 | 46,800 | 8,040 |
+| shield | Shield | shield_value | 1,376,898 | 765,000 | 86,549 | 10,554 |
+| shield_recharge_rate | Recharge Rate | shield_rate | 5,473 | 2,194 | 922 | 1,258 |
+| shield_recharge_delay | Recharge Delay | shield_delay | 0 | 0 | 0.57 | 13.9 |
+| shield_group_avg | Group Avg Shield | group_shield_value | 54,734 | 36,489 | 86,549 | 10,554 |
+| radar_range | Radar Range | radar_range | 48,000 | 96,000 | 48,000 | 48,000 |
+| weapon_burst | Weapon Burst Output | weapon_burst | 971,277 | 69,817 | 71,851 | 52,489 |
+| weapon_sustained | Weapon Sustained Output | weapon_sustained | 361,404 | 25,323 | 21,292 | 13,235 |
+| turret_avg | Turret Avg Output | turret_burst | 24,729 | 9,260 | 948 | 0 |
+| speed | Speed | engine_forward | 654 | 720 | 1,959 | 2,145 |
+| acceleration | Acceleration | engine_acceleration | 287 | 200 | 435 | 1,557 |
+| boost_speed | Boost Speed | boost_speed | 3,687 | 5,130 | 14,855 | 18,604 |
+| boost_acceleration | Boost Acceleration | boost_acceleration | 731 | 641 | 3,248 | 9,851 |
+| boost_duration | Boost Duration | boost_duration | 46 | 46 | 31.7 | 26.4 |
+| boost_recharge | Boost Recharge | boost_recharge | 3.3 | 3.3 | 2.0 | 10.0 |
+| travel_speed | Travel Speed | travel_speed | 29,777 | 30,204 | 24,724 | 41,859 |
+| travel_acceleration | Travel Acceleration | travel_acceleration | 424 | 558 | 1,065 | 3,160 |
+| travel_charge_time | Travel Drive Charge Time | travel_charge_time | 30 | 20 | 8 | 6 |
+| strafe_speed | Strafe Speed | thruster_horizontal_speed | 57 | 119 | 404 | 421 |
+| strafe_acceleration | Strafe Acceleration | thruster_horizontal_acceleration | 25 | 43 | 202 | 1,053 |
+| yaw | Yaw | engine_yaw | 0.11 | 0.56 | 2.0 | 4.3 |
+| pitch | Pitch | engine_pitch | 0.11 | 0.56 | 2.5 | 4.3 |
+| roll | Roll | engine_roll | 0.10 | 0.70 | 3.3 | 5.1 |
+| crew | Crew | capacity_crew | 406 | 226 | 26 | 8 |
+| storage_container | Container Storage | capacity_container | 56,000 | 62,000 | 15,100 | 4,120 |
+| storage_solid | Solid Storage | capacity_solid | 0 | 57,600 | 12,000 | 5,480 |
+| storage_liquid | Liquid Storage | capacity_liquid | 0 | 54,000 | 12,960 | 510 |
+| storage_condensed | Condensed Storage | capacity_condensate | 0 | 0 | 4,300 | 250 |
+| storage_unit | Drone Storage | capacity_unit | 247 | 74 | 21 | 4 |
+| missile | Missile Capacity | capacity_missile | 6,144 | 2,684 | 120 | 41 |
+| deployable | Deployable | capacity_deployable | 454 | 254 | 104 | 54 |
+| countermeasure | Countermeasure | capacity_countermeasure | 44 | 24 | 12 | 8 |
+| dock_m_count | M Dock Count | dock_ship_m | 4 | 1 | 0 | 0 |
+| dock_m_capacity | M Ship Capacity | capacity_ship_m | 8 | 2 | 0 | 0 |
+| dock_s_count | S Dock Count | dock_ship_s | 21 | 8 | 1 | 0 |
+| dock_s_capacity | S Ship Capacity | capacity_ship_s | 100 | 16 | 1 | 0 |
+
+### 数值条 Max 值计算规则
+
+1. **根据飞船 class (ship_xl / ship_l / ship_m / ship_s) 确定使用哪一列的 max 值**
+   - 例如：选择的飞船 class 为 `ship_l`，则使用 `l` 列的数值作为 max
+
+2. **max 值来源**：`default_maxes.json` 中对应字段的值
+
+3. **视觉表现**：
+   - 进度条比例 = `当前值 / max值`
+   - **如果当前值 >= max，视觉上占满整个进度条即可（100%），不需要超出显示**
+
+4. **字段特殊说明**：
+   - `shield` → `shield_value`（外层护盾最大值）
+   - `shield_group_avg` → `group_shield_value`（护盾组平均值）
+   - `shield_recharge_rate` → `shield_rate`
+   - `shield_recharge_delay` → `shield_delay`
+

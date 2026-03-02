@@ -102,6 +102,7 @@ class X4PrecisionLoader:
         self.bullets_data = []
         self.drones_data = []     # ship_xs, ship_s
         self.consumables_data = [] # mine, satellite, scanner, countermeasure, etc.
+        self.ship_max_stats = {}  # ship class max statistics from defaults.xml
 
         # 收集需要翻译的原始名称 (Raw Key)
         self.needed_raw_names = set()
@@ -950,6 +951,173 @@ class X4PrecisionLoader:
             print(f"   ✅ 读取 {len(mapping)} 个 ship class 的默认属性。")
         except Exception as e:
             print(f"   ❌ Ship defaults XML Error: {e}")
+        return mapping
+
+    def _load_ship_max_statistics(self):
+        """加载 defaults.xml 中各 ship class 的最大统计数据 (statistics.max)"""
+        defaults_path = os.path.join(self.raw_path, "libraries", "defaults.xml")
+        mapping = {}
+        if not os.path.exists(defaults_path):
+            print(f"   ⚠️ 警告: 找不到 defaults 文件: {defaults_path}")
+            return mapping
+
+        try:
+            tree = ET.parse(defaults_path)
+            root = tree.getroot()
+            for dataset in root.findall('dataset'):
+                class_name = dataset.get('class')
+                if not class_name or class_name not in ('ship_xl', 'ship_l', 'ship_m', 'ship_s'):
+                    continue
+
+                props = dataset.find('properties')
+                if props is None:
+                    continue
+
+                stats = props.find('statistics')
+                if stats is None:
+                    continue
+
+                max_node = stats.find('max')
+                if max_node is None:
+                    continue
+
+                info = {}
+
+                # hull
+                hull = max_node.find('hull')
+                if hull is not None:
+                    info['hull'] = float(hull.get('value', 0))
+
+                # weapon
+                weapon = max_node.find('weapon')
+                if weapon is not None:
+                    info['weapon_burst'] = float(weapon.get('burst', 0))
+                    info['weapon_sustained'] = float(weapon.get('sustained', 0))
+
+                # 外层 shield (始终保留)
+                shield_node = max_node.find('shield')
+                if shield_node is not None:
+                    info['shield_value'] = float(shield_node.get('value', 0))
+                    info['shield_delay'] = float(shield_node.get('delay', 0))
+                    info['shield_rate'] = float(shield_node.get('rate', 0))
+
+                # 外层 turret (始终保留)
+                turret_node = max_node.find('turret')
+                if turret_node is not None:
+                    info['turret_value'] = float(turret_node.get('burst', 0))
+                    info['turret_sustained_value'] = float(turret_node.get('sustained', 0))
+
+                # groups (始终设置 group_shield_* 和 turret_*)
+                groups = max_node.find('groups')
+                if groups is not None:
+                    # groups.shield -> group_shield_* (始终设置)
+                    group_shield = groups.find('shield')
+                    if group_shield is not None:
+                        gs_value = float(group_shield.get('value', 0))
+                        if gs_value > 0:
+                            info['group_shield_value'] = gs_value
+                            info['group_shield_delay'] = float(group_shield.get('delay', 0))
+                            info['group_shield_rate'] = float(group_shield.get('rate', 0))
+                        else:
+                            # groups.shield.value = 0，使用外层的值
+                            info['group_shield_value'] = info.get('shield_value', 0)
+                            info['group_shield_delay'] = info.get('shield_delay', 0)
+                            info['group_shield_rate'] = info.get('shield_rate', 0)
+                    else:
+                        # 没有 groups.shield，使用外层的值
+                        info['group_shield_value'] = info.get('shield_value', 0)
+                        info['group_shield_delay'] = info.get('shield_delay', 0)
+                        info['group_shield_rate'] = info.get('shield_rate', 0)
+
+                    # groups.turret -> turret_* (始终设置)
+                    group_turret = groups.find('turret')
+                    if group_turret is not None:
+                        gt_burst = float(group_turret.get('burst', 0))
+                        if gt_burst > 0:
+                            info['turret_burst'] = gt_burst
+                            info['turret_sustained'] = float(group_turret.get('sustained', 0))
+                        else:
+                            info['turret_burst'] = info.get('turret_value', 0)
+                            info['turret_sustained'] = info.get('turret_sustained_value', 0)
+                    else:
+                        info['turret_burst'] = info.get('turret_value', 0)
+                        info['turret_sustained'] = info.get('turret_sustained_value', 0)
+                else:
+                    # 没有 groups 节点，使用外层的值
+                    info['group_shield_value'] = info.get('shield_value', 0)
+                    info['group_shield_delay'] = info.get('shield_delay', 0)
+                    info['group_shield_rate'] = info.get('shield_rate', 0)
+                    info['turret_burst'] = info.get('turret_value', 0)
+                    info['turret_sustained'] = info.get('turret_sustained_value', 0)
+
+                # dock
+                dock = max_node.find('dock')
+                if dock is not None:
+                    info['dock_ship_m'] = int(dock.get('ship_m', 0))
+                    info['dock_ship_s'] = int(dock.get('ship_s', 0))
+
+                # engine
+                engine = max_node.find('engine')
+                if engine is not None:
+                    info['engine_forward'] = float(engine.get('forward', 0))
+                    info['engine_acceleration'] = float(engine.get('acceleration', 0))
+                    info['engine_yaw'] = float(engine.get('yaw', 0))
+                    info['engine_pitch'] = float(engine.get('pitch', 0))
+                    info['engine_roll'] = float(engine.get('roll', 0))
+
+                # boost
+                boost = max_node.find('boost')
+                if boost is not None:
+                    info['boost_speed'] = float(boost.get('speed', 0))
+                    info['boost_acceleration'] = float(boost.get('acceleration', 0))
+                    info['boost_duration'] = float(boost.get('duration', 0))
+                    info['boost_recharge'] = float(boost.get('recharge', 0))
+
+                # travel
+                travel = max_node.find('travel')
+                if travel is not None:
+                    info['travel_speed'] = float(travel.get('speed', 0))
+                    info['travel_acceleration'] = float(travel.get('acceleration', 0))
+                    info['travel_charge_time'] = float(travel.get('chargetime', 0))
+
+                # thruster
+                thruster = max_node.find('thruster')
+                if thruster is not None:
+                    horizontal = thruster.find('horizontal')
+                    if horizontal is not None:
+                        info['thruster_horizontal_speed'] = float(horizontal.get('speed', 0))
+                        info['thruster_horizontal_acceleration'] = float(horizontal.get('acceleration', 0))
+                    vertical = thruster.find('vertical')
+                    if vertical is not None:
+                        info['thruster_vertical_speed'] = float(vertical.get('speed', 0))
+                        info['thruster_vertical_acceleration'] = float(vertical.get('acceleration', 0))
+
+                # capacity
+                capacity = max_node.find('capacity')
+                if capacity is not None:
+                    info['capacity_crew'] = int(capacity.get('crew', 0))
+                    info['capacity_container'] = int(capacity.get('container', 0))
+                    info['capacity_solid'] = int(capacity.get('solid', 0))
+                    info['capacity_liquid'] = int(capacity.get('liquid', 0))
+                    info['capacity_condensate'] = int(capacity.get('condensate', 0))
+                    info['capacity_ship_m'] = int(capacity.get('ship_m', 0))
+                    info['capacity_ship_s'] = int(capacity.get('ship_s', 0))
+                    info['capacity_unit'] = int(capacity.get('unit', 0))
+                    info['capacity_missile'] = int(capacity.get('missile', 0))
+                    info['capacity_countermeasure'] = int(capacity.get('countermeasure', 0))
+                    info['capacity_deployable'] = int(capacity.get('deployable', 0))
+
+                # radar (in max)
+                radar = max_node.find('radar')
+                if radar is not None:
+                    info['radar_range'] = float(radar.get('range', 0))
+
+                if info:
+                    mapping[class_name] = info
+
+            print(f"   ✅ 读取 {len(mapping)} 个 ship class 的最大统计数据。")
+        except Exception as e:
+            print(f"   ❌ Ship max statistics XML Error: {e}")
         return mapping
 
     def _load_ship_macros(self):
@@ -2380,6 +2548,8 @@ class X4PrecisionLoader:
             json.dump(self.race_consumption, f, indent=2, ensure_ascii=False)
         with open(os.path.join(data_dir, "ships.json"), 'w', encoding='utf-8') as f:
             json.dump(self.ships_data, f, indent=2, ensure_ascii=False)
+        with open(os.path.join(data_dir, "default_maxes.json"), 'w', encoding='utf-8') as f:
+            json.dump(self.ship_max_stats, f, indent=2, ensure_ascii=False)
         with open(os.path.join(data_dir, "equipments.json"), 'w', encoding='utf-8') as f:
             json.dump(self.equipments_data, f, indent=2, ensure_ascii=False)
         with open(os.path.join(data_dir, "ship_types.json"), 'w', encoding='utf-8') as f:
@@ -2419,6 +2589,7 @@ if __name__ == "__main__":
     loader.process_module_groups()
     loader.scan_assets()
     loader.parse_ship_and_equipment_data()
+    loader.ship_max_stats = loader._load_ship_max_statistics()
     loader._build_missiles()
     loader._build_drones_and_consumables()
     loader._build_bullets()
