@@ -43,7 +43,7 @@
               "secondaryProductBufferHours": 2,
               "transportShipCapacity": 62000
             },
-            "lastUpdated": 1772421374957,
+            "lastUpdated": 1772453451902,
             "lockedWares": [
               "quantumtubes"
             ],
@@ -79,7 +79,7 @@
               "secondaryProductBufferHours": 2,
               "transportShipCapacity": 62000
             },
-            "lastUpdated": 1772421374957,
+            "lastUpdated": 1772453451902,
             "lockedWares": [],
             "warePriority": {}
           },
@@ -117,7 +117,7 @@
               "secondaryProductBufferHours": 2,
               "transportShipCapacity": 62000
             },
-            "lastUpdated": 1772421374957,
+            "lastUpdated": 1772453451902,
             "lockedWares": [],
             "warePriority": {}
           }
@@ -185,7 +185,7 @@
               "secondaryProductBufferHours": 2,
               "transportShipCapacity": 62000
             },
-            "lastUpdated": 1772421374957,
+            "lastUpdated": 1772453451902,
             "lockedWares": [
               "advancedcomposites",
               "engineparts",
@@ -231,7 +231,7 @@
               "secondaryProductBufferHours": 2,
               "transportShipCapacity": 62000
             },
-            "lastUpdated": 1772421374957,
+            "lastUpdated": 1772453451902,
             "lockedWares": [],
             "warePriority": {}
           }
@@ -352,7 +352,7 @@
         "settings": {
           "isDefaultLocked": true
         },
-        "lastUpdated": 1772421374960
+        "lastUpdated": 1772453451902
       },
       {
         "id": "logic-flow-2",
@@ -579,16 +579,16 @@
         "settings": {
           "isDefaultLocked": true
         },
-        "lastUpdated": 1772421374960
+        "lastUpdated": 1772453451902
       }
     ]
   },
   "x4_ship_blueprints": {
     "version": 1,
-    "activeId": "bf0b6e57-ea2c-456d-9b21-f8b105852672",
+    "activeId": "d111f259-6c0d-f519-aa82-10829f684cbb",
     "list": [
       {
-        "id": "bf0b6e57-ea2c-456d-9b21-f8b105852672",
+        "id": "d111f259-6c0d-f519-aa82-10829f684cbb",
         "name": "Katana",
         "shipId": "ship_ter_m_corvette_01_a",
         "connections": [
@@ -673,10 +673,10 @@
             ]
           }
         ],
-        "lastUpdated": 1772421374972
+        "lastUpdated": 1772453451902
       },
       {
-        "id": "4da320a6-4cfb-4c31-a3df-35f149ccc3b1",
+        "id": "b2540610-0c02-698f-4451-3d8ce1183c49",
         "name": "Odachi",
         "shipId": "ship_ter_m_corvette_02_a",
         "connections": [
@@ -685,7 +685,7 @@
             "group": [
               {
                 "group": "con_engine_01",
-                "equipment_id": "engine_ter_m_allround_01_mk1",
+                "equipment_id": "engine_ter_m_virtual_01_mk1",
                 "count": 1
               }
             ]
@@ -695,7 +695,7 @@
             "group": [
               {
                 "group": "thruster",
-                "equipment_id": "thruster_gen_m_allround_01_mk1",
+                "equipment_id": "thruster_gen_m_combat_01_mk3",
                 "count": 1
               }
             ]
@@ -705,13 +705,13 @@
             "group": [
               {
                 "group": "con_shield_01",
-                "equipment_id": "shield_ter_m_standard_02_mk2",
-                "count": 2
+                "equipment_id": "shield_ter_m_virtual_01_mk3",
+                "count": 1
               },
               {
                 "group": "con_shield_02",
-                "equipment_id": "shield_ter_m_standard_02_mk2",
-                "count": 2
+                "equipment_id": "shield_ter_m_virtual_01_mk3",
+                "count": 1
               }
             ]
           },
@@ -720,23 +720,23 @@
             "group": [
               {
                 "group": "con_weapon_01",
-                "equipment_id": "weapon_ter_m_beam_01_mk2",
-                "count": 4
+                "equipment_id": "weapon_ter_m_laser_02_mk1",
+                "count": 1
               },
               {
                 "group": "con_weapon_02",
-                "equipment_id": "weapon_ter_m_beam_01_mk2",
-                "count": 4
+                "equipment_id": "weapon_ter_m_laser_02_mk1",
+                "count": 1
               },
               {
                 "group": "con_weapon_03",
-                "equipment_id": "weapon_ter_m_beam_01_mk2",
-                "count": 4
+                "equipment_id": "weapon_ter_m_laser_02_mk1",
+                "count": 1
               },
               {
                 "group": "con_weapon_04",
-                "equipment_id": "weapon_ter_m_beam_01_mk2",
-                "count": 4
+                "equipment_id": "weapon_ter_m_laser_02_mk1",
+                "count": 1
               }
             ]
           },
@@ -745,21 +745,21 @@
             "group": [
               {
                 "group": "con_turret_m_01",
-                "equipment_id": "turret_ter_m_beam_01_mk1",
-                "count": 2
+                "equipment_id": "turret_ter_m_laser_03_mk1",
+                "count": 1
               },
               {
                 "group": "con_turret_m_02",
-                "equipment_id": "turret_ter_m_beam_01_mk1",
-                "count": 2
+                "equipment_id": "turret_ter_m_laser_03_mk1",
+                "count": 1
               }
             ]
           }
         ],
-        "lastUpdated": 1772421374972
+        "lastUpdated": 1772453451902
       },
       {
-        "id": "ef43c2b0-7ba2-486e-a6dd-a2d6df60c9aa",
+        "id": "820168b5-01fa-ea26-6318-7a4e56f501d4",
         "name": "Osaka",
         "shipId": "ship_ter_l_destroyer_01_a",
         "connections": [
@@ -827,7 +827,7 @@
             "group": [
               {
                 "group": "group_front_down_mid",
-                "equipment_id": "turret_arg_m_flak_01_mk1",
+                "equipment_id": "turret_arg_l_plasma_01_mk1",
                 "count": 1,
                 "shield": {
                   "equipment_id": "shield_ter_m_standard_01_mk3",
@@ -836,7 +836,7 @@
               },
               {
                 "group": "group_mid_right_up_2",
-                "equipment_id": "turret_arg_m_flak_01_mk1",
+                "equipment_id": "turret_arg_l_plasma_01_mk1",
                 "count": 1,
                 "shield": {
                   "equipment_id": "shield_ter_m_standard_01_mk3",
@@ -845,7 +845,7 @@
               },
               {
                 "group": "group_mid_up_left_2",
-                "equipment_id": "turret_arg_m_flak_01_mk1",
+                "equipment_id": "turret_arg_l_plasma_01_mk1",
                 "count": 1,
                 "shield": {
                   "equipment_id": "shield_ter_m_standard_01_mk3",
@@ -909,10 +909,10 @@
             ]
           }
         ],
-        "lastUpdated": 1772421374972
+        "lastUpdated": 1772453451902
       },
       {
-        "id": "1b134be3-f189-490b-b0ef-1a6b238ba2bc",
+        "id": "edef6ce2-1fb6-f1c3-3ae4-a3ce35598fa9",
         "name": "Osaka 2",
         "shipId": "ship_ter_l_destroyer_01_a",
         "connections": [
@@ -922,10 +922,10 @@
               {
                 "group": "group_back_mid_mid",
                 "equipment_id": "engine_ter_l_allround_01_mk1",
-                "count": 6,
+                "count": 2,
                 "shield": {
                   "equipment_id": "shield_ter_m_standard_01_mk3",
-                  "count": 8
+                  "count": 4
                 }
               }
             ]
@@ -966,12 +966,12 @@
               {
                 "group": "con_weapon_01",
                 "equipment_id": "weapon_ter_l_destroyer_01_mk1",
-                "count": 6
+                "count": 1
               },
               {
                 "group": "con_weapon_02",
                 "equipment_id": "weapon_ter_l_destroyer_01_mk1",
-                "count": 6
+                "count": 1
               }
             ]
           },
@@ -1007,7 +1007,7 @@
               },
               {
                 "group": "group_back_down_mid",
-                "equipment_id": "turret_ter_l_beam_01_mk1",
+                "equipment_id": "turret_tel_l_plasma_01_mk1",
                 "count": 1,
                 "shield": {
                   "equipment_id": "shield_ter_m_standard_01_mk3",
@@ -1016,7 +1016,7 @@
               },
               {
                 "group": "group_back_mid_up",
-                "equipment_id": "turret_ter_l_beam_01_mk1",
+                "equipment_id": "turret_tel_l_plasma_01_mk1",
                 "count": 1,
                 "shield": {
                   "equipment_id": "shield_ter_m_standard_01_mk3",
@@ -1025,11 +1025,11 @@
               },
               {
                 "group": "group_down_mid_left",
-                "equipment_id": "turret_ter_l_beam_01_mk1",
+                "equipment_id": "turret_tel_l_plasma_01_mk1",
                 "count": 2,
                 "shield": {
                   "equipment_id": "shield_ter_m_standard_01_mk3",
-                  "count": 2
+                  "count": 1
                 }
               },
               {
@@ -1058,56 +1058,11 @@
                   "equipment_id": "shield_ter_m_standard_01_mk3",
                   "count": 1
                 }
-              },
-              {
-                "group": "group_down_mid_left",
-                "equipment_id": "turret_ter_m_gatling_02_mk1",
-                "count": 2
-              },
-              {
-                "group": "group_back_down_mid",
-                "equipment_id": "turret_ter_m_gatling_02_mk1",
-                "count": 2
-              },
-              {
-                "group": "group_back_mid_up",
-                "equipment_id": "turret_ter_m_gatling_02_mk1",
-                "count": 2
-              },
-              {
-                "group": "group_mid_up_left",
-                "equipment_id": "turret_ter_m_gatling_02_mk1",
-                "count": 2
-              },
-              {
-                "group": "group_down_mid_right",
-                "equipment_id": "turret_ter_m_laser_02_mk1",
-                "count": 2
-              },
-              {
-                "group": "group_mid_right_up",
-                "equipment_id": "turret_ter_m_laser_02_mk1",
-                "count": 2
-              },
-              {
-                "group": "group_mid_up_left",
-                "equipment_id": "turret_ter_m_laser_02_mk1",
-                "count": 2
-              },
-              {
-                "group": "group_down_mid_left",
-                "equipment_id": "turret_ter_m_laser_02_mk1",
-                "count": 2
-              },
-              {
-                "group": "group_back_down_mid",
-                "equipment_id": "turret_ter_m_laser_02_mk1",
-                "count": 2
               }
             ]
           }
         ],
-        "lastUpdated": 1772421374972
+        "lastUpdated": 1772453451902
       }
     ]
   }

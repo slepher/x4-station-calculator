@@ -899,6 +899,7 @@ watch(slotTargets, () => {
             :key="slotType.id"
             class="slot-type-btn"
             :class="activeSlotType === slotType.id ? 'slot-type-btn-active' : ''"
+            :data-testid="`slot-type-${slotType.id}`"
             @click="handleSlotTypeClick(slotType.id)"
           >
             {{ slotType.label }}

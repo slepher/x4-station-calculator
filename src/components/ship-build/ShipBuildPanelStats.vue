@@ -31,8 +31,8 @@ missilesRaw.forEach((m: any) => {
 // ============ 内部状态 ============
 const statsViewMode = ref<'summary' | 'detail'>('summary')
 
-// 控制使用哪种逻辑: true = useEquipmentStats (新), false = 原有逻辑 (旧)
-const useNewLogic = ref(true)
+// 控制使用哪种逻辑: true = useEquipmentStats (composable), false = Vue 内原有计算
+const useNewLogic = ref(false)
 
 /**
  * 聚合所有已装备的武器 DPS (使用 useEquipmentStats)
@@ -935,6 +935,22 @@ const calculateMaxStatsByUseEquipmentStats = (ship: X4Ship) => {
       <div class="stats-toolbar">
         <div class="stats-caption">{{ t('ship_build.stats_preview') }}</div>
         <div class="stats-mode-switch">
+          <button
+            data-testid="ship-build-stats-logic-old"
+            class="stats-mode-btn"
+            :class="!useNewLogic ? 'stats-mode-btn-active' : 'stats-mode-btn-idle'"
+            @click="useNewLogic = false"
+          >
+            旧值
+          </button>
+          <button
+            data-testid="ship-build-stats-logic-new"
+            class="stats-mode-btn"
+            :class="useNewLogic ? 'stats-mode-btn-active' : 'stats-mode-btn-idle'"
+            @click="useNewLogic = true"
+          >
+            新值
+          </button>
           <button
             data-testid="ship-build-stats-mode-summary"
             class="stats-mode-btn"
