@@ -753,6 +753,16 @@ def check_case_comments_for_task(
 ):
     comments = parse_comment_blocks(case.body)
 
+    def missing_comment_msg(item_id: str) -> str:
+        if task.chapter == 2 and route == "e2e":
+            return (
+                f"missing comment `{item_id}`: Chapter 2 step comments must be written in the mapped helper "
+                f"function body (not in case `{task.id}`)"
+            )
+        if task.chapter == 3 and route == "e2e":
+            return f"missing comment `{item_id}`: Chapter 3 step comments must be written inside case `{task.id}` body"
+        return f"missing comment `{item_id}` in case {task.id}"
+
     def should_require_item(desc: str) -> bool:
         if task.chapter != 4:
             return True
@@ -776,7 +786,12 @@ def check_case_comments_for_task(
         if not should_require_item(l2.desc) and not l2.children:
             continue
         if l2.id not in comments:
-            errors.append(ValidationError(case=l2.id, desc=l2.desc, error_code="COMMENT_MISSING", error_msg=f"missing comment {l2.id} in case {task.id}"))
+            errors.append(ValidationError(
+                case=l2.id,
+                desc=l2.desc,
+                error_code="COMMENT_MISSING",
+                error_msg=missing_comment_msg(l2.id),
+            ))
             continue
         l2_block = comments[l2.id]
 
@@ -799,7 +814,12 @@ def check_case_comments_for_task(
             if not should_require_item(c.desc):
                 continue
             if c.id not in comments:
-                errors.append(ValidationError(case=c.id, desc=c.desc, error_code="COMMENT_MISSING", error_msg=f"missing comment {c.id} in case {task.id}"))
+                errors.append(ValidationError(
+                    case=c.id,
+                    desc=c.desc,
+                    error_code="COMMENT_MISSING",
+                    error_msg=missing_comment_msg(c.id),
+                ))
                 continue
             c_block = comments[c.id]
             if not has_actual_content(c_block.text):
@@ -941,7 +961,10 @@ def validate(task_path: Path, files: Dict[str, Optional[Path]]) -> Tuple[bool, L
                 case=t.id,
                 desc=t.desc,
                 error_code="CH2_CASE_STEP_COMMENT_FORBIDDEN",
-                error_msg=f"chapter2 case `{t.id}` must not contain numbered step comments",
+                error_msg=(
+                    f"chapter2 case `{t.id}` contains `2.x.x` comments in case body; "
+                    f"move these comments into the mapped helper function body"
+                ),
             ))
         if "expect(" in case.body:
             errors.append(ValidationError(
