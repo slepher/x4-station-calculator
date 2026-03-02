@@ -144,6 +144,49 @@ Key testing patterns:
 - `data-testid` attributes preferred for stable selectors
 - i18n-aware locators using regex: `/文本|Text/i`
 
+### E2E Test beforeEach Requirements
+
+E2E 测试的 `beforeEach` 必须包含以下内容：
+
+1. **加载 fixture**: 读取 `tests/fixtures/db.json`（除 vsn 字段外）到 `localStorage`
+2. **reload**: 重新加载页面以初始化 store
+3. **设置语言**: 通过 UI 选择器设置当前语言（不能直接操作 localStorage/Cookie）
+
+示例：
+
+```typescript
+test.beforeEach(async ({ page }) => {
+  await page.goto('/')
+
+  // 1. 加载 fixture 到 localStorage（排除 vsn 字段）
+  const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
+  const dbData = JSON.parse(JSON.stringify(dbFixture.default))
+  // 移除 vsn 字段
+  delete dbData.vsn
+  // 根据需要修改 dbData（如设置 activeId）
+
+  await page.evaluate((data) => {
+    // 逐个设置 localStorage key
+    Object.entries(data).forEach(([key, value]) => {
+      localStorage.setItem(key, JSON.stringify(value))
+    })
+    localStorage.setItem('isTestEnv', 'true')
+  }, dbData)
+
+  // 2. reload
+  await page.reload()
+
+  // 3. 通过 UI 设置语言（必须通过 UI 触发翻译更新）
+  const langSelect = page.locator('select').filter({ hasText: /简体中文|English/ })
+  await langSelect.selectOption('zh-CN')
+})
+```
+
+**注意**：
+- 禁止使用 `localStorage.clear()`，会清除语言设置
+- 语言存储使用 Cookie (`user_locale`)，但翻译更新必须通过 UI 触发
+- fixture 路径应使用相对于测试文件的路径
+
 ### Skills & Workflow
 
 The `.trae/skills/` directory contains markdown skill definitions for the Trae IDE:

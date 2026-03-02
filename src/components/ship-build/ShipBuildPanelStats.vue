@@ -960,13 +960,14 @@ const calculateMaxStatsByUseEquipmentStats = (ship: X4Ship) => {
             :key="metric.key"
             class="stats-row"
             :class="{ 'stats-row-placeholder': metric.placeholder }"
+            :data-testid="`ship-build-stats-row-${metric.key}`"
           >
-            <span class="stats-label">{{ t(metric.labelKey) }}</span>
-            <span class="stats-value">
+            <span class="stats-label" :data-testid="`ship-build-stats-label-${metric.key}`">{{ t(metric.labelKey) }}</span>
+            <span class="stats-value" :data-testid="`ship-build-stats-value-${metric.key}`">
               {{ metric.valueText }}
-              <span v-if="metric.unit" class="stats-unit">{{ metric.unit }}</span>
+              <span v-if="metric.unit" class="stats-unit" :data-testid="`ship-build-stats-unit-${metric.key}`">{{ metric.unit }}</span>
             </span>
-            <div v-if="metric.ratio !== null" class="stats-bar">
+            <div v-if="metric.ratio !== null" class="stats-bar" :data-testid="`ship-build-stats-bar-${metric.key}`">
               <div class="stats-bar-fill" :style="{ width: `${Math.round(metric.ratio * 100)}%` }"></div>
             </div>
           </div>
@@ -977,13 +978,14 @@ const calculateMaxStatsByUseEquipmentStats = (ship: X4Ship) => {
             :key="metric.key"
             class="stats-row"
             :class="{ 'stats-row-placeholder': metric.placeholder }"
+            :data-testid="`ship-build-stats-row-${metric.key}`"
           >
-            <span class="stats-label">{{ t(metric.labelKey) }}</span>
-            <span class="stats-value">
+            <span class="stats-label" :data-testid="`ship-build-stats-label-${metric.key}`">{{ t(metric.labelKey) }}</span>
+            <span class="stats-value" :data-testid="`ship-build-stats-value-${metric.key}`">
               {{ metric.valueText }}
-              <span v-if="metric.unit" class="stats-unit">{{ metric.unit }}</span>
+              <span v-if="metric.unit" class="stats-unit" :data-testid="`ship-build-stats-unit-${metric.key}`">{{ metric.unit }}</span>
             </span>
-            <div v-if="metric.ratio !== null" class="stats-bar">
+            <div v-if="metric.ratio !== null" class="stats-bar" :data-testid="`ship-build-stats-bar-${metric.key}`">
               <div class="stats-bar-fill" :style="{ width: `${Math.round(metric.ratio * 100)}%` }"></div>
             </div>
           </div>

@@ -97,6 +97,58 @@ function useEquipmentStats(equipment: X4Equipment, ship: X4Ship): {
 
 **注意**：所有 UI 元素定位符（data-testid）应使用本文件”建议的测试定位”部分定义的属性值，不应直接写在 test_tasks.md 中。
 
+## 语言切换
+
+### 概述
+应用使用 Cookie (`user_locale`) 存储语言偏好，而非 localStorage。语言切换需要通过 UI 操作触发，不能直接设置 localStorage/Cookie。
+
+### 切换方法
+使用页面上的语言选择器 `<select>` 元素：
+
+```typescript
+// 通过 UI 选择器切换到中文
+const langSelect = page.locator('select').filter({ hasText: /简体中文|English/ })
+await langSelect.selectOption('zh-CN')
+```
+
+### 注意事项
+- 直接设置 `localStorage.setItem('locale', ...)` 或 Cookie 不会触发翻译更新
+- 语言选择器位于 Toolbar 区域
+- 切换语言后，应用会动态加载语言包并重新渲染 UI
+
+## 槽位状态检查
+
+### 概述
+槽位状态在配装面板的左轨槽位类型切换后显示，每个槽位按钮显示已选装备名称和数量。
+
+### 定位符
+
+| 元素 | 选择器 | 说明 |
+|------|--------|------|
+| 槽位按钮 | `[data-testid^="slot-"]` | 槽位按钮，key 如 `slot-engine-0` |
+| 槽位已选装备名 | `.slot-row-value` | 槽位按钮内的已选装备名称 |
+| 槽位数量显示 | `.slot-row-count` | 格式如 `1/1`，表示当前数量/总数 |
+| 槽位候选数 | `.slot-row-candidate` | 可用候选装备数量 |
+
+### 检查槽位装备状态
+
+```typescript
+// 检查引擎槽位是否装备了指定装备
+const slotEngine = page.locator('[data-testid="slot-engine-0"]')
+await expect(slotEngine.locator('.slot-row-value')).toContainText('TER M 均衡引擎 Mk1')
+
+// 检查护盾槽位数量
+const slotShield = page.locator('[data-testid="slot-shield-0"]')
+await expect(slotShield.locator('.slot-row-count')).toContainText('2/2')
+```
+
+### 蓝图/飞船信息检查
+
+| 元素 | 选择器 | 说明 |
+|------|--------|------|
+| 飞船名称 | `[data-testid="ship-build-ship-name"]` | 已选飞船/蓝图名称 |
+| 已选详情区 | `[data-testid="ship-build-selection"]` | 包含飞船信息和装备概览 |
+
 ## 装备选择器 (Equipment Picker) UI 模式
 
 ### 概述

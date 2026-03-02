@@ -22,7 +22,7 @@ import re
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Tuple
 
 CHAPTER_RE = re.compile(r"^##\s*(\d+)\.?\s+(.+)$")
 TOP_RE = re.compile(r"^(\s*)-\s*\[([ ✓✗x])\]\s*(\d+\.\d+)\s+(.+)$")
@@ -323,7 +323,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--mode", choices=["change", "test"], default="change")
     parser.add_argument("--file", help="path to test_tasks.md when --mode=test")
     parser.add_argument("--json", action="store_true", help="output structured errors as JSON array")
-    parser.add_argument("--cases", help="comma-separated case IDs to validate (e.g., 1.1,1.2,2.1). When set, only validates these cases and skips checking for extra cases in test that are not in tasks.")
     return parser.parse_args()
 
 
@@ -398,7 +397,7 @@ def parse_case_blocks(spec_path: Path) -> Dict[str, CaseBlock]:
 
     for m in CASE_START_RE.finditer(text):
         case_name = m.group(2)
-        idm = re.match(r"\s*(\d+(?:\.\d+)+)\b", case_name)
+        idm = re.match(r"\s*(\d+\.\d+)\b", case_name)
         if not idm:
             continue
         case_id = idm.group(1)
@@ -511,7 +510,7 @@ def parse_case_id_sequence(spec_path: Optional[Path]) -> List[Tuple[str, str]]:
     out: List[Tuple[str, str]] = []
     for m in CASE_START_RE.finditer(text):
         case_name = m.group(2)
-        idm = re.match(r"\s*(\d+(?:\.\d+)+)\b", case_name)
+        idm = re.match(r"\s*(\d+\.\d+)\b", case_name)
         if not idm:
             continue
         out.append((idm.group(1), case_name))
@@ -745,78 +744,6 @@ def check_top_case_mapping(tasks: List[TopTask], cases: Dict[str, Dict[str, Case
                 errors.append(ValidationError(case=t.id, desc=t.desc, error_code="CASE_MISSING", error_msg=f"missing bug case for {prefix}"))
 
 
-def check_reverse_mapping(tasks: List[TopTask], cases: Dict[str, Dict[str, CaseBlock]], errors: List[ValidationError]):
-    """反向验证：检查顶层任务是否出现在 test/it 中，二三级任务是否出现在注释中"""
-
-    # 收集所有顶层任务标号
-    top_level_ids: Set[str] = set()  # x.x 格式
-    all_l2_ids: Set[str] = set()     # x.x.x 格式
-    all_l3_ids: Set[str] = set()     # x.x.x.n 格式
-
-    for t in tasks:
-        top_level_ids.add(t.id)
-        for l2 in t.l2:
-            all_l2_ids.add(l2.id)
-            for l3 in l2.children:
-                all_l3_ids.add(l3.id)
-
-    # 收集 spec 文件中出现在 test/it 名称中的顶层编号
-    case_ids_in_tests: Set[str] = set()
-    for route_cases in cases.values():
-        for cid, case_block in route_cases.items():
-            case_ids_in_tests.add(cid)
-
-    # 检查顶层任务是否出现在 test/it 中
-    missing_top_cases = top_level_ids - case_ids_in_tests
-    for missing_id in missing_top_cases:
-        task = next((t for t in tasks if t.id == missing_id), None)
-        task_desc = task.desc if task else missing_id
-        errors.append(ValidationError(
-            case=missing_id,
-            desc=task_desc,
-            error_code="CASE_POSITION_INVALID",
-            error_msg=f"顶层任务 `{missing_id}` 未出现在任何 test/it 名称中，应写在 test/it 名称中，如: it('{missing_id} 描述', () => {{ ... }})",
-        ))
-
-    # 收集 spec 文件中出现在注释中的二三级编号
-    l2_ids_in_comments: Set[str] = set()
-    l3_ids_in_comments: Set[str] = set()
-
-    for route_cases in cases.values():
-        for case_block in route_cases.values():
-            comment_ids = parse_comment_id_sequence(case_block.body)
-            for comment_id in comment_ids:
-                parts = comment_id.split(".")
-                if len(parts) == 3:
-                    l2_ids_in_comments.add(comment_id)
-                elif len(parts) == 4:
-                    l3_ids_in_comments.add(comment_id)
-
-    # 检查二级任务是否出现在注释中
-    missing_l2 = all_l2_ids - l2_ids_in_comments
-    for missing_id in missing_l2:
-        task = next((t for t in tasks for l2 in t.l2 if l2.id == missing_id), None)
-        task_desc = task.desc if task else missing_id
-        errors.append(ValidationError(
-            case=missing_id,
-            desc=task_desc,
-            error_code="COMMENT_POSITION_INVALID",
-            error_msg=f"二级任务 `{missing_id}` 未出现在任何注释中，应写在注释中，如: // {missing_id} 步骤描述",
-        ))
-
-    # 检查三级任务是否出现在注释中
-    missing_l3 = all_l3_ids - l3_ids_in_comments
-    for missing_id in missing_l3:
-        task = next((t for t in tasks for l2 in t.l2 for l3 in l2.children if l3.id == missing_id), None)
-        task_desc = task.desc if task else missing_id
-        errors.append(ValidationError(
-            case=missing_id,
-            desc=task_desc,
-            error_code="COMMENT_POSITION_INVALID",
-            error_msg=f"三级任务 `{missing_id}` 未出现在任何注释中，应写在注释中，如: // {missing_id} 子步骤描述",
-        ))
-
-
 def check_case_comments_for_task(
     task: TopTask,
     case: CaseBlock,
@@ -941,34 +868,22 @@ def ensure_opposite_route_not_matched(
                     ))
 
 
-def validate(task_path: Path, files: Dict[str, Optional[Path]], cases_filter: Optional[Set[str]] = None) -> Tuple[bool, List[ValidationError]]:
+def validate(task_path: Path, files: Dict[str, Optional[Path]]) -> Tuple[bool, List[ValidationError]]:
     tasks = parse_test_tasks(task_path)
     errors: List[ValidationError] = []
 
-    # 如果指定了 cases_filter，只保留匹配的 case
-    def filter_cases(case_blocks: Dict[str, CaseBlock]) -> Dict[str, CaseBlock]:
-        if cases_filter is None:
-            return case_blocks
-        return {k: v for k, v in case_blocks.items() if k in cases_filter}
-
     cases = {
-        "unit": filter_cases(parse_case_blocks(files["unit"]) if files.get("unit") else {}),
-        "e2e": filter_cases(parse_case_blocks(files["e2e"]) if files.get("e2e") else {}),
-        "bug": filter_cases(parse_case_blocks(files["bug"]) if files.get("bug") else {}),
-        "bugfix": filter_cases(parse_case_blocks(files["bugfix"]) if files.get("bugfix") else {}),
+        "unit": parse_case_blocks(files["unit"]) if files.get("unit") else {},
+        "e2e": parse_case_blocks(files["e2e"]) if files.get("e2e") else {},
+        "bug": parse_case_blocks(files["bug"]) if files.get("bug") else {},
+        "bugfix": parse_case_blocks(files["bugfix"]) if files.get("bugfix") else {},
     }
     e2e_helpers = parse_helper_blocks(files.get("e2e"))
-
-    # 当指定 cases_filter 时，只检查过滤后的 tasks
-    tasks_to_check = [t for t in tasks if cases_filter is None or t.id in cases_filter]
 
     for key in ("unit", "e2e", "bug", "bugfix"):
         check_case_order(files.get(key), errors)
 
-    check_top_case_mapping(tasks_to_check, cases, errors)
-
-    # 反向验证：检查任务是否出现在正确的位置（始终执行）
-    check_reverse_mapping(tasks_to_check, cases, errors)
+    check_top_case_mapping(tasks, cases, errors)
 
     chapter1_ids = {t.id for t in tasks if t.chapter == 1}
     chapter23_ids = {t.id for t in tasks if t.chapter in (2, 3)}
@@ -984,36 +899,43 @@ def validate(task_path: Path, files: Dict[str, Optional[Path]], cases_filter: Op
         "bugfix": chapter4_ids,
     }
 
-    # 只有未指定 cases_filter 时才检查 test 中是否有 extra cases（不在 tasks 中）
-    if cases_filter is None:
-        for route in ("unit", "e2e", "bug", "bugfix"):
-            for cid, case_block in cases[route].items():
-                if cid not in route_allowed_top[route]:
+    def allowed_comment_ids_for_task(task: TopTask) -> set[str]:
+        allowed = {l2.id for l2 in task.l2}
+        for l2 in task.l2:
+            for c in l2.children:
+                allowed.add(c.id)
+        return allowed
+
+    for route in ("unit", "e2e", "bug", "bugfix"):
+        for cid, case_block in cases[route].items():
+            if cid not in route_allowed_top[route]:
+                errors.append(ValidationError(
+                    case=cid,
+                    desc=case_block.name,
+                    error_code="EXTRA_CASE_UNMAPPED",
+                    error_msg=f"extra case `{cid}` in {route} file has no mapping in test_tasks.md",
+                ))
+                continue
+
+            task = task_by_id.get(cid)
+            if task is None:
+                continue
+
+            # Chapter 2 comment mapping is validated in mapped helper bodies.
+            # Case body only enforces orchestration guardrails (no step comments/ops/assertions).
+            if route == "e2e" and task.chapter == 2:
+                continue
+
+            allowed_comment_ids = allowed_comment_ids_for_task(task)
+
+            for comment_id in parse_comment_id_sequence(case_block.body):
+                if comment_id not in allowed_comment_ids:
                     errors.append(ValidationError(
-                        case=cid,
+                        case=comment_id,
                         desc=case_block.name,
-                        error_code="EXTRA_CASE_UNMAPPED",
-                        error_msg=f"extra case `{cid}` in {route} file has no mapping in test_tasks.md",
+                        error_code="EXTRA_COMMENT_UNMAPPED",
+                        error_msg=f"extra comment `{comment_id}` in case `{cid}` has no mapping in test_tasks.md",
                     ))
-                    continue
-
-                task = task_by_id.get(cid)
-                if task is None:
-                    continue
-
-                allowed_comment_ids = {l2.id for l2 in task.l2}
-                for l2 in task.l2:
-                    for c in l2.children:
-                        allowed_comment_ids.add(c.id)
-
-                for comment_id in parse_comment_id_sequence(case_block.body):
-                    if comment_id not in allowed_comment_ids:
-                        errors.append(ValidationError(
-                            case=comment_id,
-                            desc=case_block.name,
-                            error_code="EXTRA_COMMENT_UNMAPPED",
-                            error_msg=f"extra comment `{comment_id}` in case `{cid}` has no mapping in test_tasks.md",
-                        ))
 
     # Chapter 2 strict helper model:
     # - 状态: exactly 1 helper call
@@ -1148,6 +1070,18 @@ def validate(task_path: Path, files: Dict[str, Optional[Path]], cases_filter: Op
         helper_case = CaseBlock(name=f"{t.id}::{helper_name}", id=t.id, body=helper.body)
         check_comment_order(helper_case, errors)
         check_case_comments_for_task(t, helper_case, route="e2e", errors=errors)
+        allowed_comment_ids = allowed_comment_ids_for_task(t)
+        for comment_id in parse_comment_id_sequence(helper.body):
+            if comment_id not in allowed_comment_ids:
+                errors.append(ValidationError(
+                    case=comment_id,
+                    desc=helper_case.name,
+                    error_code="EXTRA_COMMENT_UNMAPPED",
+                    error_msg=(
+                        f"extra comment `{comment_id}` in helper `{helper_name}` "
+                        f"has no mapping in test_tasks.md for case `{t.id}`"
+                    ),
+                ))
 
     # Chapter 3 must reuse chapter2 state/transition helpers and keep call order.
     for t in chapter3_tasks:
@@ -1230,10 +1164,7 @@ def validate(task_path: Path, files: Dict[str, Optional[Path]], cases_filter: Op
                         ))
 
     # per chapter comment/block/assertion checks
-    # 当指定 cases_filter 时，只检查过滤后的 tasks
-    tasks_to_check = [t for t in tasks if cases_filter is None or t.id in cases_filter]
-
-    for t in tasks_to_check:
+    for t in tasks:
         if t.chapter == 1 and t.id in cases["unit"]:
             check_comment_order(cases["unit"][t.id], errors)
             check_case_comments_for_task(t, cases["unit"][t.id], route="unit", errors=errors)
@@ -1265,13 +1196,6 @@ def validate(task_path: Path, files: Dict[str, Optional[Path]], cases_filter: Op
 
 def main() -> None:
     args = parse_args()
-
-    # 解析 cases_filter
-    cases_filter: Optional[Set[str]] = None
-    if args.cases:
-        cases_filter = set(args.cases.split(","))
-        print(f"Validating only cases: {', '.join(sorted(cases_filter))}")
-
     try:
         task_path, files = resolve_paths(args)
     except Exception as e:
@@ -1281,7 +1205,7 @@ def main() -> None:
             print(f"Error: {e}")
         sys.exit(1)
 
-    ok, errs = validate(task_path, files, cases_filter)
+    ok, errs = validate(task_path, files)
     if args.json:
         payload = [{"case": e.case, "desc": e.desc, "error_code": e.error_code, "error_msg": e.error_msg} for e in errs]
         print(json.dumps(payload, ensure_ascii=False))
