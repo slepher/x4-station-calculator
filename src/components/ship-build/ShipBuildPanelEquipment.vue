@@ -382,14 +382,14 @@ function getDiffStartPercent(currentValue: number, candidateValue: number, max: 
             <template v-if="viewMode === 'single' || item.diff === 0">
               <span class="stats-value">
                 <span class="current-value">
-                  {{ formatValue(item.candidateValue || item.currentValue) }}
+                  {{ formatValue(item.candidateValue ?? item.currentValue) }}
                 </span>
                 <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
               </span>
               <div class="stats-bar">
                 <div
                   class="stats-bar-fill stats-bar-neutral"
-                  :style="{ width: getProgressPercent(item.candidateValue || item.currentValue, item.max) + '%' }"
+                  :style="{ width: getProgressPercent(item.candidateValue ?? item.currentValue, item.max) + '%' }"
                 ></div>
               </div>
             </template>
@@ -445,14 +445,14 @@ function getDiffStartPercent(currentValue: number, candidateValue: number, max: 
             <template v-if="viewMode === 'single' || item.diff === 0">
               <span class="stats-value">
                 <span class="current-value">
-                  {{ formatValue(item.candidateValue || item.currentValue) }}
+                  {{ formatValue(item.candidateValue ?? item.currentValue) }}
                 </span>
                 <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
               </span>
               <div class="stats-bar">
                 <div
                   class="stats-bar-fill stats-bar-neutral"
-                  :style="{ width: getProgressPercent(item.candidateValue || item.currentValue, item.max) + '%' }"
+                  :style="{ width: getProgressPercent(item.candidateValue ?? item.currentValue, item.max) + '%' }"
                 ></div>
               </div>
             </template>
