@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed, watch, nextTick } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useStatusStore } from '@/store/useStatusStore'
@@ -12,12 +12,15 @@ import ImportPlanModal from './ImportPlanModal.vue'
 import SmartSaveDialog from './SmartSaveDialog.vue'
 import LoadShipBlueprintModal from './LoadShipBlueprintModal.vue'
 import { useI18n } from 'vue-i18n'
+import { useX4I18n } from '@/utils/UseX4I18n'
+import { useTitleEditor } from '@/composables/useTitleEditor'
 
 const logicFlowStore = useLogicFlowStore()
 const empireStore = useEmpireStore()
 const statusStore = useStatusStore()
 const shipBuildStore = useShipBuildStore()
 const { t } = useI18n()
+const { translateShip } = useX4I18n()
 
 const showLoadModal = ref(false)
 const showLoadFlowModal = ref(false)
@@ -28,13 +31,54 @@ const smartDialog = reactive({
   intent: 'NEW' as 'NEW' | 'SAVE_AS'
 })
 
-const isEditingTitle = ref(false)
-const titleInputRef = ref<HTMLInputElement | null>(null)
-const lastValidTitle = ref('')
-const editingValue = ref('')
-
 const isFlowView = computed(() => shipBuildStore.activeView === 'flow')
 const isShipBuildView = computed(() => shipBuildStore.activeView === 'ship-build')
+
+// 根据视图类型获取当前配置
+const currentConfig = computed(() => {
+  if (isFlowView.value) {
+    return {
+      getName: () => logicFlowStore.currentPlanName,
+      setName: (name: string) => { logicFlowStore.currentPlanName = name },
+      getDefaultName: () => t('menu.default_flow_name')
+    }
+  }
+  if (isShipBuildView.value) {
+    return {
+      getName: () => shipBuildStore.blueprint?.name || '',
+      setName: (name: string) => {
+        if (shipBuildStore.blueprint) {
+          shipBuildStore.blueprint.name = name
+        }
+      },
+      getDefaultName: () => {
+        const ship = shipBuildStore.selectedShip
+        const shipName = ship ? translateShip(ship) : ''
+        return shipName ? `${shipName} ${t('menu.blueprint')}` : t('menu.default_blueprint_name')
+      }
+    }
+  }
+  return {
+    getName: () => empireStore.activeEmpire?.name || '',
+    setName: (name: string) => {
+      if (empireStore.activeEmpire) {
+        empireStore.activeEmpire.name = name
+      }
+    },
+    getDefaultName: () => t('empire.new_empire_name')
+  }
+})
+
+// 创建 titleEditor
+const titleEditor = useTitleEditor(currentConfig)
+const isEditingTitle = titleEditor.isEditing
+// @ts-ignore - used in template via ref="titleInputRef"
+const titleInputRef = titleEditor.inputRef
+const displayTitle = titleEditor.displayTitle
+const editingValue = titleEditor.editingValue
+const startEditing = titleEditor.startEditing
+const cancelEditing = titleEditor.cancelEditing
+const confirmEditing = titleEditor.confirmEditing
 
 const themeColors = computed(() => {
   if (isFlowView.value) {
@@ -61,43 +105,16 @@ const themeColors = computed(() => {
   }
 })
 
-const displayTitle = computed(() => {
-  if (isFlowView.value) {
-    return logicFlowStore.currentPlanName || t('menu.default_flow_name')
-  }
-  return empireStore.activeEmpire?.name || t('empire.new_empire_name')
-})
-
-const startEditing = async () => {
-  lastValidTitle.value = displayTitle.value
-  editingValue.value = displayTitle.value
-  isEditingTitle.value = true
-  await nextTick()
-  titleInputRef.value?.focus()
-  titleInputRef.value?.select()
+const startEdit = async () => {
+  await startEditing()
 }
 
-const finishEditing = () => {
-  isEditingTitle.value = false
-  editingValue.value = ''
+const finishEdit = () => {
+  cancelEditing()
 }
 
-const confirmEditing = () => {
-  isEditingTitle.value = false
-  const defaultName = isFlowView.value ? t('menu.default_flow_name') : t('empire.new_empire_name')
-  if (!editingValue.value.trim()) {
-    if (isFlowView.value) {
-      logicFlowStore.currentPlanName = lastValidTitle.value === defaultName ? '' : lastValidTitle.value
-    } else if (empireStore.activeEmpire) {
-      empireStore.activeEmpire.name = lastValidTitle.value === defaultName ? t('empire.new_empire_name') : lastValidTitle.value
-    }
-  } else {
-    if (isFlowView.value) {
-      logicFlowStore.currentPlanName = editingValue.value
-    } else if (empireStore.activeEmpire) {
-      empireStore.activeEmpire.name = editingValue.value
-    }
-  }
+const confirmEdit = () => {
+  confirmEditing()
 }
 
 watch(displayTitle, (newVal) => {
@@ -145,6 +162,10 @@ const handleSave = () => {
       // No existing blueprint, prompt for name
       handleSaveAs()
       return
+    }
+    // 保存时，如果 name 为空，使用当前显示名称作为默认值
+    if (!shipBuildStore.blueprint.name) {
+      shipBuildStore.blueprint.name = titleEditor.displayTitle.value
     }
     shipBuildStore.saveBlueprint()
     statusStore.pushMessage('success', 'save', t('menu.save'))
@@ -309,11 +330,11 @@ const handleSmartDialogSecondary = () => {
           ref="titleInputRef"
           v-model="editingValue"
           :class="['bg-slate-700 font-bold text-2xl px-2 py-0.5 rounded border outline-none w-3/4 min-w-[300px] text-center transition-all h-[40px]', themeColors.title, themeColors.titleBorder]"
-          @blur="finishEditing"
-          @keydown.enter="confirmEditing"
+          @blur="finishEdit"
+          @keydown.enter="confirmEdit"
         />
-        <button 
-          @mousedown.prevent="confirmEditing" 
+        <button
+          @mousedown.prevent="confirmEdit" 
           class="text-green-400 hover:text-green-300 transition-colors p-1 rounded hover:bg-slate-700 h-[40px] w-[40px] flex items-center justify-center"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -324,7 +345,7 @@ const handleSmartDialogSecondary = () => {
       <div 
         v-else 
         class="group flex items-center gap-2 cursor-pointer hover:bg-slate-700/50 px-4 py-1 rounded transition-colors max-w-full truncate"
-        @click="startEditing"
+        @click="startEdit"
       >
         <h2 :class="['toolbar-title', themeColors.title]">{{ displayTitle }}</h2>
         <svg class="w-4 h-4 text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">

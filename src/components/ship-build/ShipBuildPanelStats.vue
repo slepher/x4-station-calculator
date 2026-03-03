@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { useEquipmentStats } from '@/composables/useEquipmentStats'
 import type { X4Ship, X4Equipment, ShipBlueprint } from '@/types/x4'
 import bulletsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/bullets.json'
 import missilesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/missiles.json'
@@ -29,6 +30,205 @@ missilesRaw.forEach((m: any) => {
 
 // ============ 内部状态 ============
 const statsViewMode = ref<'summary' | 'detail'>('summary')
+
+// 控制使用哪种逻辑: true = useEquipmentStats (composable), false = Vue 内原有计算
+const useNewLogic = ref(false)
+
+/**
+ * 聚合所有已装备的武器 DPS (使用 useEquipmentStats)
+ */
+const getWeaponStatsByUseEquipmentStats = () => {
+  if (!selectedShip.value || !props.shipBlueprint) return { burst: 0, sustained: 0 }
+
+  let totalBurst = 0
+  let totalSustained = 0
+
+  props.shipBlueprint.connections.forEach((conn) => {
+    conn.group.forEach((g) => {
+      if (!g.equipment_id || g.count <= 0) return
+      const equipment = equipmentMap.value.get(g.equipment_id)
+      if (!equipment?.bullet) return
+
+      const equipmentClass = equipment.class
+      if (equipmentClass !== 'weapon' && equipmentClass !== 'missilelauncher') return
+
+      const { details } = useEquipmentStats(equipment, selectedShip.value!)
+      if (details.value) {
+        const d = details.value as any
+        totalBurst += d.burstDPS * g.count
+        totalSustained += d.sustainedDPS * g.count
+      }
+    })
+  })
+
+  return { burst: totalBurst, sustained: totalSustained }
+}
+
+/**
+ * 聚合所有已装备的炮塔 DPS (使用 useEquipmentStats)
+ */
+const getTurretStatsByUseEquipmentStats = () => {
+  if (!selectedShip.value || !props.shipBlueprint) return 0
+
+  let totalDamage = 0
+  let turretCount = 0
+
+  props.shipBlueprint.connections.forEach((conn) => {
+    conn.group.forEach((g) => {
+      if (!g.equipment_id || g.count <= 0) return
+      const equipment = equipmentMap.value.get(g.equipment_id)
+      if (!equipment?.bullet) return
+
+      const equipmentClass = equipment.class
+      if (equipmentClass !== 'turret' && equipmentClass !== 'missileturret') return
+
+      const { details } = useEquipmentStats(equipment, selectedShip.value!)
+      if (details.value) {
+        const d = details.value as any
+        totalDamage += d.sustainedDPS * g.count
+        turretCount += g.count
+      }
+    })
+  })
+
+  return turretCount > 0 ? totalDamage / turretCount : 0
+}
+
+/**
+ * 聚合护盾属性 (使用 useEquipmentStats)
+ */
+const getShieldStatsByUseEquipmentStats = () => {
+  if (!selectedShip.value || !props.shipBlueprint) return { max: 0, rate: 0, delay: 0, groupAvg: 0 }
+
+  let max = 0
+  let rate = 0
+  let delay = 0
+
+  // 专用 shield 槽位
+  props.shipBlueprint.connections.forEach((conn) => {
+    if (conn.slot_type !== 'shield') return
+    conn.group.forEach((g) => {
+      if (!g.equipment_id || g.count <= 0) return
+      const equipment = equipmentMap.value.get(g.equipment_id)
+      if (!equipment?.recharge) return
+
+      const { details } = useEquipmentStats(equipment, selectedShip.value!)
+      if (details.value) {
+        const d = details.value as any
+        max += (d.shieldMax || 0) * g.count
+        rate += (d.shieldRate || 0) * g.count
+        delay = Math.max(delay, d.shieldDelay || 0)
+      }
+    })
+  })
+
+  // 挂载护盾
+  let mountedShieldMax = 0
+  let mountedShieldGroups = 0
+
+  props.shipBlueprint.connections.forEach((conn) => {
+    if (conn.slot_type === 'shield') return
+    conn.group.forEach((g) => {
+      if (!g.shield?.equipment_id || g.shield.count <= 0) return
+      const shieldEquipment = equipmentMap.value.get(g.shield.equipment_id)
+      if (!shieldEquipment?.recharge) return
+
+      const { details } = useEquipmentStats(shieldEquipment, selectedShip.value!)
+      if (details.value) {
+        const d = details.value as any
+        mountedShieldMax += (d.shieldMax || 0) * g.shield.count
+        mountedShieldGroups++
+      }
+    })
+  })
+
+  const groupAvg = mountedShieldGroups > 0 ? mountedShieldMax / mountedShieldGroups : 0
+
+  return { max, rate, delay, groupAvg }
+}
+
+/**
+ * 聚合引擎属性 (使用 useEquipmentStats)
+ */
+const getEngineStatsByUseEquipmentStats = () => {
+  if (!selectedShip.value || !props.shipBlueprint) return null
+
+  let thrustForward = 0
+  let boostMultiplier = 1
+  let boostAcceleration = 1
+  let boostDuration = 0
+  let boostRecharge = 0
+  let travelThrust = 0
+  let travelAttack = 0
+  let travelCharge = 0
+
+  props.shipBlueprint.connections.forEach((conn) => {
+    if (conn.slot_type !== 'engine') return
+    conn.group.forEach((g) => {
+      if (!g.equipment_id || g.count <= 0) return
+      const equipment = equipmentMap.value.get(g.equipment_id)
+      if (!equipment) return
+
+      const { details } = useEquipmentStats(equipment, selectedShip.value!)
+      if (details.value) {
+        const d = details.value as any
+        thrustForward += (d.thrustForward || 0) * g.count
+        if (d.boostMultiplier) boostMultiplier = d.boostMultiplier
+        if (d.boostAcceleration) boostAcceleration = d.boostAcceleration
+        if (d.boostDuration) boostDuration = Math.max(boostDuration, d.boostDuration)
+        if (d.boostRecharge) boostRecharge = Math.max(boostRecharge, d.boostRecharge)
+        if (d.travelThrust) travelThrust += d.travelThrust * g.count
+        if (d.travelAttack) travelAttack = Math.max(travelAttack, d.travelAttack)
+        if (d.travelCharge) travelCharge = Math.max(travelCharge, d.travelCharge)
+      }
+    })
+  })
+
+  if (thrustForward === 0) return null
+  return {
+    thrustForward,
+    boostMultiplier,
+    boostAcceleration,
+    boostDuration,
+    boostRecharge,
+    travelThrust,
+    travelAttack,
+    travelCharge
+  }
+}
+
+/**
+ * 聚合推进器属性 (使用 useEquipmentStats)
+ */
+const getThrusterStatsByUseEquipmentStats = () => {
+  if (!selectedShip.value || !props.shipBlueprint) return null
+
+  let pitch = 0
+  let yaw = 0
+  let roll = 0
+  let strafe = 0
+
+  props.shipBlueprint.connections.forEach((conn) => {
+    if (conn.slot_type !== 'thruster') return
+    conn.group.forEach((g) => {
+      if (!g.equipment_id || g.count <= 0) return
+      const equipment = equipmentMap.value.get(g.equipment_id)
+      if (!equipment) return
+
+      const { details } = useEquipmentStats(equipment, selectedShip.value!)
+      if (details.value) {
+        const d = details.value as any
+        pitch += (d.pitch || 0) * g.count
+        yaw += (d.yaw || 0) * g.count
+        roll += (d.roll || 0) * g.count
+        strafe += (d.strafe || 0) * g.count
+      }
+    })
+  })
+
+  if (pitch === 0 && yaw === 0 && roll === 0 && strafe === 0) return null
+  return { pitch, yaw, roll, strafe }
+}
 
 // ============ Store 数据映射 ============
 const shipMap = computed(() => {
@@ -74,45 +274,53 @@ type ShipStatDisplay = {
 }
 
 // Placeholder fields that don't have data sources yet
-const placeholderKeys = new Set([
-  'shield_group_avg', 'travel_acceleration'
-])
+const placeholderKeys = new Set<string>([])
 
 // Get aggregated shield stats from selected shield equipment
+// 护盾 (shield)：保护船体的护盾，装在专用 shield 槽位上
+// 挂载护盾 (shield on equipment)：装在其他槽位（engine、weapon 等）上，保护被挂载的装备
 const getShieldStats = () => {
-  if (!selectedShip.value || !props.shipBlueprint) return { max: 0, rate: 0, delay: 0, groupAvg: 0 }
+  if (!selectedShip.value || !props.shipBlueprint) return { max: 0, rate: 0, delay: 0, groupAvg: 0, mountedShieldMax: 0 }
   let max = 0
   let rate = 0
   let delay = 0
 
-  // 遍历 blueprint.connections 找到 shield 槽位
+  // 遍历 blueprint.connections 找到专用 shield 槽位
   props.shipBlueprint.connections.forEach((conn) => {
     if (conn.slot_type !== 'shield') return
     conn.group.forEach((g) => {
       if (!g.equipment_id) return
+      if (g.count <= 0) return
       const equipment = equipmentMap.value.get(g.equipment_id)
-      if (!equipment?.stats?.recharge) return
-      max += equipment.stats.recharge.max || 0
-      rate += equipment.stats.recharge.rate || 0
-      delay = Math.max(delay, equipment.stats.recharge.delay || 0)
+      if (!equipment?.recharge) return
+      // 护盾 = 专用槽护盾，含 count
+      max += (equipment.recharge.max || 0) * g.count
+      rate += (equipment.recharge.rate || 0) * g.count
+      delay = Math.max(delay, equipment.recharge.delay || 0)
     })
   })
 
-  // 计算总 shield 槽位数
-  let totalShieldSlots = 0
-  selectedShip.value.slots.forEach(slot => {
-    if (slot.type !== 'shield') return
-    slot.groups.forEach(group => {
-      const connShield = group.connection?.shield
-      if (connShield) {
-        totalShieldSlots += connShield.count || 0
-      }
+  // 计算挂载护盾（shield on equipment）：非专用 shield 槽位上挂载的护盾
+  let mountedShieldMax = 0
+  let mountedShieldGroups = 0
+
+  props.shipBlueprint.connections.forEach((conn) => {
+    // 跳过专用 shield 槽
+    if (conn.slot_type === 'shield') return
+    conn.group.forEach((g) => {
+      if (!g.shield?.equipment_id) return
+      if (g.shield.count <= 0) return
+      const shieldEquipment = equipmentMap.value.get(g.shield.equipment_id)
+      if (!shieldEquipment?.recharge) return
+      mountedShieldMax += (shieldEquipment.recharge.max || 0) * g.shield.count
+      mountedShieldGroups++
     })
   })
 
-  const groupAvg = totalShieldSlots > 0 ? max / totalShieldSlots : 0
+  // 编组平均护盾容量 = 非护盾槽位上挂载的护盾容量总和 / 有护盾挂载的非护盾槽位 group 数量
+  const groupAvg = mountedShieldGroups > 0 ? mountedShieldMax / mountedShieldGroups : 0
 
-  return { max, rate, delay, groupAvg }
+  return { max, rate, delay, groupAvg, mountedShieldMax }
 }
 
 
@@ -126,6 +334,7 @@ const getEngineStats = () => {
     if (conn.slot_type !== 'engine') return
     conn.group.forEach((g) => {
       if (!g.equipment_id) return
+      if (g.count <= 0) return
       const equipment = equipmentMap.value.get(g.equipment_id)
       if (equipment) {
         engineEquipments.push({ equipment, count: g.count })
@@ -137,30 +346,176 @@ const getEngineStats = () => {
 
   let thrustForward = 0
   let boostMultiplier = 1
+  let boostAcceleration = 1  // boost.acceleration 乘数
   let boostDuration = 0
-  let boostRecharge = 0
-  let travelMultiplier = 1
+  let boostRecharge = 0  // 需要除以100转换
+  let travelThrust = 0  // thrustForward × travel.thrust × count 累积值
+  let travelAttack = 0  // travel.attack 用于计算巡航加速度
   let travelCharge = 0
+  let engineCount = 0
 
-  engineEquipments.forEach(({ equipment }) => {
-    if (!equipment?.stats) return
-    if (equipment.stats.thrust?.forward) thrustForward += equipment.stats.thrust.forward
-    if (equipment.stats.boost?.thrust) boostMultiplier = equipment.stats.boost.thrust
-    if (equipment.stats.boost?.duration) boostDuration = Math.max(boostDuration, equipment.stats.boost.duration)
-    if (equipment.stats.boost?.recharge) boostRecharge = Math.max(boostRecharge, equipment.stats.boost.recharge)
-    if (equipment.stats.travel?.thrust) travelMultiplier = equipment.stats.travel.thrust
-    if (equipment.stats.travel?.charge) travelCharge = Math.max(travelCharge, equipment.stats.travel.charge)
+  engineEquipments.forEach(({ equipment, count }) => {
+    if (!equipment) return
+    engineCount += count
+    const fwd = equipment.thrust?.forward || 0
+    const travelT = equipment.travel?.thrust || 0
+    thrustForward += fwd * count
+    // 巡航推力 = 前向推力 × 巡航乘数 × 数量
+    travelThrust += fwd * travelT * count
+    if (equipment.boost?.thrust) boostMultiplier = equipment.boost.thrust
+    if (equipment.boost?.acceleration) boostAcceleration = equipment.boost.acceleration
+    if (equipment.boost?.duration) boostDuration = Math.max(boostDuration, equipment.boost.duration)
+    if (equipment.boost?.recharge) boostRecharge = Math.max(boostRecharge, equipment.boost.recharge)
+    if (equipment.travel?.attack) travelAttack = Math.max(travelAttack, equipment.travel.attack)
+    if (equipment.travel?.charge) travelCharge = Math.max(travelCharge, equipment.travel.charge)
   })
 
   if (thrustForward === 0) return null
   return {
     thrustForward,
     boostMultiplier,
+    boostAcceleration,
     boostDuration,
     boostRecharge,
-    travelMultiplier,
-    travelCharge
+    travelThrust,
+    travelMultiplier: travelThrust,
+    travelAttack,
+    travelCharge,
+    engineCount
   }
+}
+
+// Get aggregated thruster stats from selected thruster equipment
+// 转向率 = 推进器单轴推力 / 船体单轴阻力
+const getThrusterStats = () => {
+  if (!selectedShip.value || !props.shipBlueprint) return null
+
+  // 收集所有 thruster 装备
+  const thrusterEquipments: Array<{ equipment: X4Equipment; count: number }> = []
+  props.shipBlueprint.connections.forEach((conn) => {
+    if (conn.slot_type !== 'thruster') return
+    conn.group.forEach((g) => {
+      if (!g.equipment_id) return
+      if (g.count <= 0) return
+      const equipment = equipmentMap.value.get(g.equipment_id)
+      if (equipment) {
+        thrusterEquipments.push({ equipment, count: g.count })
+      }
+    })
+  })
+
+  if (thrusterEquipments.length === 0) return null
+
+  let pitch = 0
+  let yaw = 0
+  let roll = 0
+  let strafe = 0
+
+  thrusterEquipments.forEach(({ equipment, count }) => {
+    if (!equipment?.thrust) return
+    const c = count
+    if (equipment.thrust.pitch) pitch += equipment.thrust.pitch * c
+    if (equipment.thrust.yaw) yaw += equipment.thrust.yaw * c
+    if (equipment.thrust.roll) roll += equipment.thrust.roll * c
+    if (equipment.thrust.strafe) strafe += equipment.thrust.strafe * c
+  })
+
+  if (pitch === 0 && yaw === 0 && roll === 0 && strafe === 0) return null
+  return { pitch, yaw, roll, strafe }
+}
+
+// 判断是否为 Beam 武器
+const isBeamWeapon = (bullet: any): boolean => {
+  return bullet.type === 'beam'
+}
+
+// 持久 DPS 计算函数（bullet 和 Beam 通用）
+const calculateSustainedDPS = (
+  burstDPS: number,
+  singleDamage: number,
+  singleHeat: number,
+  weaponHeat: any,
+  count: number
+): number => {
+  const overheatThreshold = 10000
+
+  if (!weaponHeat?.overheat || !weaponHeat?.coolrate || singleHeat <= 0) {
+    return burstDPS
+  }
+
+  const avgHeatPerSec = burstDPS / singleDamage * singleHeat
+  const timeToOverheat = avgHeatPerSec > 0 ? overheatThreshold / avgHeatPerSec : 0
+  const cycleTime = timeToOverheat + weaponHeat.cooldelay + (overheatThreshold / weaponHeat.coolrate)
+  return cycleTime > 0 ? burstDPS * (timeToOverheat / cycleTime) * count : 0
+}
+
+// 通用武器 DPS 计算函数
+// 返回 { burstDPS, sustainedDPS }，如果不支持则返回 null
+const calculateWeaponDPS = (equipment: any, bullet: any, missile: any, count: number) => {
+  // 处理 bullets.json (weapon/turret)
+  if (bullet) {
+    const weaponHeat = equipment.heat
+    const isBeam = isBeamWeapon(bullet)
+
+    // 子弹类变量
+    let singleDamage: number      // 单发伤害
+    let singleHeat: number       // 单发热量
+    let singleShotTime: number   // 单发射击时间
+
+    if (isBeam) {
+      // Beam 类
+      const lifetime = bullet.lifetime
+      const damage = bullet.damage
+      const reload = bullet.reload
+      const chargetime = bullet.chargetime
+      const ammo = bullet.ammo
+      const ammoReload = bullet.ammoreload
+
+      singleDamage = damage * lifetime
+      singleShotTime = chargetime + Math.max(lifetime, reload)
+
+      // Beam 使用近似公式
+      const avgShotTime = (ammo * singleShotTime + ammoReload) / Math.max(ammo, 1)
+      const burstDPS = avgShotTime > 0 ? (singleDamage / avgShotTime) * count : 0
+
+      // 持续 DPS
+      singleHeat = bullet.shotHeat + bullet.heat * lifetime
+      const sustainedDPS = calculateSustainedDPS(burstDPS, singleDamage, singleHeat, weaponHeat, count)
+
+      return { burstDPS, sustainedDPS }
+    } else {
+      // 子弹类
+      const damage = bullet.damage
+      const amount = bullet.amount
+      const reload = bullet.reload
+      const chargetime = bullet.chargetime
+      const ammo = bullet.ammo
+      const ammoReload = bullet.ammoreload
+
+      singleDamage = damage * amount
+      singleHeat = bullet.shotHeat
+      singleShotTime = chargetime + reload
+
+      // 爆发 DPS（统一公式：换弹时间平摊到每发）
+      const avgShotTime = (ammo * singleShotTime + ammoReload) / Math.max(ammo, 1)
+      const burstDPS = avgShotTime > 0 ? (singleDamage / avgShotTime) * count : 0
+
+      // 持续 DPS（使用通用函数）
+      const sustainedDPS = calculateSustainedDPS(burstDPS, singleDamage, singleHeat, weaponHeat, count)
+
+      return { burstDPS, sustainedDPS }
+    }
+  }
+
+  // 处理 missiles.json (missilelauncher/missileturret)
+  if (missile) {
+    const explosive = missile.explosive || 0
+    const reload = missile.reload || 1
+    const dps = (explosive / reload) * count
+    return { burstDPS: dps, sustainedDPS: dps }
+  }
+
+  return null
 }
 
 // Get weapon damage stats from blueprint.connections (根据 equipment.class 决定弹药类型)
@@ -174,27 +529,23 @@ const getWeaponDamageStats = () => {
   props.shipBlueprint.connections.forEach((conn) => {
     conn.group.forEach((g) => {
       if (!g.equipment_id) return
+      if (g.count <= 0) return
       const equipment = equipmentMap.value.get(g.equipment_id)
       if (!equipment?.bullet) return
 
       const equipmentClass = equipment.class
-      const count = g.count || 1
+      const count = g.count
 
-      // 根据 equipment.class 决定使用 bullets.json 还是 missiles.json
-      if (equipmentClass === 'weapon' || equipmentClass === 'turret') {
-        // 常规武器/炮台：使用 bullets.json
-        const bullet = bulletMap.get(equipment.bullet)
-        if (!bullet) return
-        totalBurst += (bullet.damage || 0) * count * 5
-        totalSustained += ((bullet.damage || 0) / (bullet.reload || 1)) * count
-      } else if (equipmentClass === 'missilelauncher' || equipmentClass === 'missileturret') {
-        // 导弹发射器：使用 missiles.json
-        const missile = missileMap.get(equipment.bullet)
-        if (!missile) return
-        // 爆发：使用 explosive 作为单发伤害，假设前 5 秒
-        totalBurst += (missile.explosive || 0) * count * 5
-        // 持续：DPS = explosive / reload
-        totalSustained += ((missile.explosive || 0) / (missile.reload || 1)) * count
+      // 只处理 weapon 和 missilelauncher
+      if (equipmentClass !== 'weapon' && equipmentClass !== 'missilelauncher') return
+
+      const bullet = equipmentClass === 'weapon' ? bulletMap.get(equipment.bullet) : null
+      const missile = equipmentClass === 'missilelauncher' ? missileMap.get(equipment.bullet) : null
+
+      const result = calculateWeaponDPS(equipment, bullet, missile, count)
+      if (result) {
+        totalBurst += result.burstDPS
+        totalSustained += result.sustainedDPS
       }
     })
   })
@@ -212,6 +563,7 @@ const getTurretDamageStats = () => {
   props.shipBlueprint.connections.forEach((conn) => {
     conn.group.forEach((g) => {
       if (!g.equipment_id) return
+      if (g.count <= 0) return
       const equipment = equipmentMap.value.get(g.equipment_id)
       if (!equipment?.bullet) return
 
@@ -219,19 +571,13 @@ const getTurretDamageStats = () => {
       // 只计算 turret 和 missileturret class
       if (equipmentClass !== 'turret' && equipmentClass !== 'missileturret') return
 
-      const count = g.count || 1
+      const count = g.count
+      const bullet = equipmentClass === 'turret' ? bulletMap.get(equipment.bullet) : null
+      const missile = equipmentClass === 'missileturret' ? missileMap.get(equipment.bullet) : null
 
-      if (equipmentClass === 'turret') {
-        // 常规炮台：使用 bullets.json
-        const bullet = bulletMap.get(equipment.bullet)
-        if (!bullet) return
-        totalDamage += ((bullet.damage || 0) / (bullet.reload || 1)) * count
-        turretCount += count
-      } else if (equipmentClass === 'missileturret') {
-        // 导弹发射器：使用 missiles.json
-        const missile = missileMap.get(equipment.bullet)
-        if (!missile) return
-        totalDamage += ((missile.explosive || 0) / (missile.reload || 1)) * count
+      const result = calculateWeaponDPS(equipment, bullet, missile, count)
+      if (result) {
+        totalDamage += result.sustainedDPS
         turretCount += count
       }
     })
@@ -241,15 +587,17 @@ const getTurretDamageStats = () => {
 }
 
 // Calculate speed from thrust and ship physics
-const calculateSpeed = (thrust: number, mass: number, drag: number) => {
-  if (!mass || !drag) return 0
-  return Math.round((thrust * 1000) / (mass * drag))
+// 最高速度 = 引擎前向推力 / 船体前向阻力
+const calculateSpeed = (thrust: number, drag: number) => {
+  if (!drag) return 0
+  return Math.round(thrust / drag)
 }
 
 // Calculate acceleration from thrust and mass
+// 加速度 = 引擎前向推力 / 飞船总质量
 const calculateAcceleration = (thrust: number, mass: number) => {
   if (!mass) return 0
-  return Math.round((thrust * 1000) / mass)
+  return Math.round(thrust / mass)
 }
 
 // Helper to get cargo capacity by type
@@ -276,18 +624,19 @@ const buildSummaryStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
   const engineStats = getEngineStats()
   const weaponStats = getWeaponDamageStats()
   const turretAvg = getTurretDamageStats()
-  const mass = ship.physics?.mass || 1
   const dragForward = ship.physics?.drag?.forward || 1
 
-  const baseSpeed = engineStats ? calculateSpeed(engineStats.thrustForward, mass, dragForward) : 0
+  const baseSpeed = engineStats ? calculateSpeed(engineStats.thrustForward, dragForward) : 0
+  // 巡航速度 = (引擎前向推力 * 引擎巡航推力乘数) / 船体前向阻力
+  const travelSpeed = engineStats ? calculateSpeed(engineStats.travelThrust, dragForward) : 0
+  // 助推速度 = 最高速度 * 助推推力乘数
   const boostSpeed = engineStats && baseSpeed > 0 ? Math.round(baseSpeed * engineStats.boostMultiplier) : 0
-  const travelSpeed = engineStats && baseSpeed > 0 ? Math.round(baseSpeed * engineStats.travelMultiplier) : 0
 
   return [
     { key: 'hull', labelKey: 'ship_build.stats_hull', unit: 'MJ', value: ship.hull || 0 },
     { key: 'shield', labelKey: 'ship_build.stats_shield', unit: 'MJ', value: shieldStats.max },
-    { key: 'radar_range', labelKey: 'ship_build.stats_radar_range', unit: 'km', value: ship.radarRange || 0 },
-    { key: 'weapon_burst', labelKey: 'ship_build.stats_weapon_burst', unit: 'MW', value: weaponStats.burst },
+    { key: 'radar_range', labelKey: 'ship_build.stats_radar_range', unit: 'km', value: Math.round((ship.radarRange || 0) / 1000) },
+    { key: 'weapon_burst', labelKey: 'ship_build.stats_weapon_burst', unit: 'MW', value: Math.round(weaponStats.burst * 10) / 10 },
     { key: 'turret_avg', labelKey: 'ship_build.stats_turret_avg', unit: 'MW', value: turretAvg },
     { key: 'storage_container', labelKey: 'ship_build.stats_storage_container', unit: 'm3', value: getCargoCapacity(ship, 'container') },
     { key: 'dock_m_count', labelKey: 'ship_build.stats_dock_m_count', unit: '', value: getDockCount(ship, 'dock_m') },
@@ -314,33 +663,49 @@ const buildDetailStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
   const mass = ship.physics?.mass || 1
   const dragForward = ship.physics?.drag?.forward || 1
   const dragHorizontal = ship.physics?.drag?.horizontal || 1
-  const pitch = ship.physics?.drag?.pitch || 0
-  const yaw = ship.physics?.drag?.yaw || 0
-  const roll = ship.physics?.drag?.roll || 0
+  const dragPitch = ship.physics?.drag?.pitch || 1
+  const dragYaw = ship.physics?.drag?.yaw || 1
+  const dragRoll = ship.physics?.drag?.roll || 1
+  const accfactorsHorizontal = ship.physics?.accfactors?.horizontal || 1
 
-  const baseSpeed = engineStats ? calculateSpeed(engineStats.thrustForward, mass, dragForward) : 0
   const baseAcceleration = engineStats ? calculateAcceleration(engineStats.thrustForward, mass) : 0
-  const boostAcceleration = engineStats && baseSpeed > 0 ? Math.round(baseAcceleration * engineStats.boostMultiplier) : 0
+  // 助推加速度 = 基础加速度 × boost.acceleration
+  const boostAcceleration = engineStats ? Math.round(baseAcceleration * engineStats.boostAcceleration) : 0
+  // 巡航加速度 = 巡航速度 / travel.attack
+  const travelSpeed = engineStats ? calculateSpeed(engineStats.travelThrust, dragForward) : 0
+  const travelAcceleration = engineStats && engineStats.travelAttack ? Math.round(travelSpeed / engineStats.travelAttack) : 0
+  // 助推回充率 = boost.recharge / 100
+  const boostRecharge = engineStats ? engineStats.boostRecharge / 100 : 0
+
+  // 转向率 = 推进器单轴推力 / 船体单轴阻力
+  const thrusterStats = getThrusterStats()
+  const pitchRate = thrusterStats ? thrusterStats.pitch / dragPitch : 0
+  const yawRate = thrusterStats ? thrusterStats.yaw / dragYaw : 0
+  const rollRate = thrusterStats ? thrusterStats.roll / dragRoll : 0
+  // 平移速度 = thruster.strafe / 船体水平阻力
+  const strafeSpeed = thrusterStats ? Math.round(thrusterStats.strafe / dragHorizontal) : 0
+  // 平移加速度 = thruster.strafe / 船体质量 × accfactors.horizontal
+  const strafeAcceleration = thrusterStats ? Math.round(thrusterStats.strafe / mass * accfactorsHorizontal) : 0
 
   const extraStats: Omit<ShipStatMetric, 'ratio'>[] = [
     { key: 'shield_recharge_rate', labelKey: 'ship_build.stats_shield_recharge_rate', unit: 'MW', value: shieldStats.rate },
     { key: 'shield_recharge_delay', labelKey: 'ship_build.stats_shield_recharge_delay', unit: 's', value: shieldStats.delay },
-    { key: 'shield_group_avg', labelKey: 'ship_build.stats_shield', unit: 'MJ', value: shieldStats.groupAvg },
-    { key: 'weapon_sustained', labelKey: 'ship_build.stats_weapon_sustained', unit: 'MW', value: weaponStats.sustained },
+    { key: 'shield_group_avg', labelKey: 'ship_build.stats_shield_group_avg', unit: 'MJ', value: shieldStats.groupAvg },
+    { key: 'weapon_sustained', labelKey: 'ship_build.stats_weapon_sustained', unit: 'MW', value: Math.round(weaponStats.sustained * 10) / 10 },
     { key: 'storage_solid', labelKey: 'ship_build.stats_storage_solid', unit: 'm3', value: getCargoCapacity(ship, 'solid') },
     { key: 'storage_liquid', labelKey: 'ship_build.stats_storage_liquid', unit: 'm3', value: getCargoCapacity(ship, 'liquid') },
     { key: 'storage_condensed', labelKey: 'ship_build.stats_storage_condensed', unit: 'm3', value: getCargoCapacity(ship, 'condensed') },
     { key: 'acceleration', labelKey: 'ship_build.stats_acceleration', unit: 'm/s2', value: baseAcceleration },
     { key: 'boost_acceleration', labelKey: 'ship_build.stats_boost_acceleration', unit: 'm/s2', value: boostAcceleration },
     { key: 'boost_duration', labelKey: 'ship_build.stats_boost_duration', unit: 's', value: engineStats?.boostDuration || 0 },
-    { key: 'boost_recharge', labelKey: 'ship_build.stats_boost_recharge', unit: '%/s', value: engineStats?.boostRecharge || 0 },
-    { key: 'travel_acceleration', labelKey: 'ship_build.stats_travel_acceleration', unit: 'm/s2', value: 0 },
+    { key: 'boost_recharge', labelKey: 'ship_build.stats_boost_recharge', unit: '%/s', value: boostRecharge },
+    { key: 'travel_acceleration', labelKey: 'ship_build.stats_travel_acceleration', unit: 'm/s2', value: travelAcceleration },
     { key: 'travel_charge_time', labelKey: 'ship_build.stats_travel_charge_time', unit: 's', value: engineStats?.travelCharge || 0 },
-    { key: 'strafe_speed', labelKey: 'ship_build.stats_strafe_speed', unit: 'm/s', value: engineStats ? calculateSpeed(Math.round(engineStats.thrustForward * 0.5), mass, dragHorizontal) : 0 },
-    { key: 'strafe_acceleration', labelKey: 'ship_build.stats_strafe_acceleration', unit: 'm/s2', value: engineStats ? calculateAcceleration(Math.round(engineStats.thrustForward * 0.5), mass) : 0 },
-    { key: 'yaw', labelKey: 'ship_build.stats_yaw', unit: 'deg/s', value: yaw },
-    { key: 'pitch', labelKey: 'ship_build.stats_pitch', unit: 'deg/s', value: pitch },
-    { key: 'roll', labelKey: 'ship_build.stats_roll', unit: 'deg/s', value: roll }
+    { key: 'strafe_speed', labelKey: 'ship_build.stats_strafe_speed', unit: 'm/s', value: strafeSpeed },
+    { key: 'strafe_acceleration', labelKey: 'ship_build.stats_strafe_acceleration', unit: 'm/s2', value: strafeAcceleration },
+    { key: 'yaw', labelKey: 'ship_build.stats_yaw', unit: 'rad/s', value: Math.round(yawRate * 100) / 100 },
+    { key: 'pitch', labelKey: 'ship_build.stats_pitch', unit: 'rad/s', value: Math.round(pitchRate * 100) / 100 },
+    { key: 'roll', labelKey: 'ship_build.stats_roll', unit: 'rad/s', value: Math.round(rollRate * 100) / 100 }
   ]
 
   return [...summaryStats, ...extraStats]
@@ -385,30 +750,52 @@ const formatStatValue = (value: number) => value.toLocaleString()
 
 const summaryShipStats = computed<ShipStatDisplay[]>(() => {
   if (!selectedShip.value) return []
-  const stats = buildSummaryStats(selectedShip.value)
-  const { summaryMax } = calculateMaxStats(selectedShip.value)
+
+  let stats: Omit<ShipStatMetric, 'ratio'>[]
+  let maxStats: Record<string, number>
+
+  if (useNewLogic.value) {
+    stats = buildSummaryStatsByUseEquipmentStats(selectedShip.value)
+    const result = calculateMaxStatsByUseEquipmentStats(selectedShip.value)
+    maxStats = result.summaryMax
+  } else {
+    stats = buildSummaryStats(selectedShip.value)
+    const result = calculateMaxStats(selectedShip.value)
+    maxStats = result.summaryMax
+  }
 
   return stats.map(metric => ({
     key: metric.key,
     labelKey: metric.labelKey,
     unit: metric.unit,
     valueText: formatStatValue(metric.value),
-    ratio: Math.max(0.03, Math.min(1, metric.value / (summaryMax[metric.key] || 1))),
+    ratio: Math.max(0.03, Math.min(1, metric.value / (maxStats[metric.key] || 1))),
     placeholder: placeholderKeys.has(metric.key)
   }))
 })
 
 const detailedShipStats = computed<ShipStatDisplay[]>(() => {
   if (!selectedShip.value) return []
-  const stats = buildDetailStats(selectedShip.value)
-  const { detailMax } = calculateMaxStats(selectedShip.value)
+
+  let stats: Omit<ShipStatMetric, 'ratio'>[]
+  let maxStats: Record<string, number>
+
+  if (useNewLogic.value) {
+    stats = buildDetailStatsByUseEquipmentStats(selectedShip.value)
+    const result = calculateMaxStatsByUseEquipmentStats(selectedShip.value)
+    maxStats = result.detailMax
+  } else {
+    stats = buildDetailStats(selectedShip.value)
+    const result = calculateMaxStats(selectedShip.value)
+    maxStats = result.detailMax
+  }
 
   return stats.map(metric => ({
     key: metric.key,
     labelKey: metric.labelKey,
     unit: metric.unit,
     valueText: placeholderKeys.has(metric.key) ? '--' : formatStatValue(metric.value),
-    ratio: placeholderKeys.has(metric.key) ? null : Math.max(0.03, Math.min(1, metric.value / (detailMax[metric.key] || 1))),
+    ratio: placeholderKeys.has(metric.key) ? null : Math.max(0.03, Math.min(1, metric.value / (maxStats[metric.key] || 1))),
     placeholder: placeholderKeys.has(metric.key)
   }))
 })
@@ -420,6 +807,125 @@ const visibleShipStats = computed<ShipStatDisplay[]>(() => {
 const setStatsViewMode = (mode: 'summary' | 'detail') => {
   statsViewMode.value = mode
 }
+
+// ============ 使用 useEquipmentStats 构建统计数据 (新逻辑) ============
+// 使用 useEquipmentStats composable 计算属性
+const buildSummaryStatsByUseEquipmentStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
+  const shieldStats = getShieldStatsByUseEquipmentStats()
+  const engineStats = getEngineStatsByUseEquipmentStats()
+  const weaponStats = getWeaponStatsByUseEquipmentStats()
+  const turretAvg = getTurretStatsByUseEquipmentStats()
+  const dragForward = ship.physics?.drag?.forward || 1
+
+  const baseSpeed = engineStats ? (engineStats.thrustForward / dragForward) : 0
+  const travelSpeed = engineStats ? (engineStats.travelThrust / dragForward) : 0
+  const boostSpeed = engineStats && baseSpeed > 0 ? Math.round(baseSpeed * engineStats.boostMultiplier) : 0
+
+  return [
+    { key: 'hull', labelKey: 'ship_build.stats_hull', unit: 'MJ', value: ship.hull || 0 },
+    { key: 'shield', labelKey: 'ship_build.stats_shield', unit: 'MJ', value: shieldStats.max },
+    { key: 'radar_range', labelKey: 'ship_build.stats_radar_range', unit: 'km', value: Math.round((ship.radarRange || 0) / 1000) },
+    { key: 'weapon_burst', labelKey: 'ship_build.stats_weapon_burst', unit: 'MW', value: Math.round(weaponStats.burst * 10) / 10 },
+    { key: 'turret_avg', labelKey: 'ship_build.stats_turret_avg', unit: 'MW', value: turretAvg },
+    { key: 'storage_container', labelKey: 'ship_build.stats_storage_container', unit: 'm3', value: getCargoCapacity(ship, 'container') },
+    { key: 'dock_m_count', labelKey: 'ship_build.stats_dock_m_count', unit: '', value: getDockCount(ship, 'dock_m') },
+    { key: 'dock_m_capacity', labelKey: 'ship_build.stats_dock_m_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_m') },
+    { key: 'dock_s_count', labelKey: 'ship_build.stats_dock_s_count', unit: '', value: getDockCount(ship, 'dock_s') },
+    { key: 'dock_s_capacity', labelKey: 'ship_build.stats_dock_s_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_s') },
+    { key: 'speed', labelKey: 'ship_build.stats_speed', unit: 'm/s', value: Math.round(baseSpeed) },
+    { key: 'boost_speed', labelKey: 'ship_build.stats_boost_speed', unit: 'm/s', value: boostSpeed },
+    { key: 'travel_speed', labelKey: 'ship_build.stats_travel_speed', unit: 'm/s', value: Math.round(travelSpeed) },
+    { key: 'crew', labelKey: 'ship_build.stats_crew', unit: '', value: ship.crew?.capacity || 0 },
+    { key: 'storage_unit', labelKey: 'ship_build.stats_storage_unit', unit: '', value: ship.storage?.unit || 0 },
+    { key: 'missile', labelKey: 'ship_build.stats_missile', unit: '', value: ship.storage?.missile || 0 },
+    { key: 'deployable', labelKey: 'ship_build.stats_deployable', unit: '', value: ship.storage?.deployable || 0 },
+    { key: 'countermeasure', labelKey: 'ship_build.stats_countermeasure', unit: '', value: ship.storage?.countermeasure || 0 }
+  ]
+}
+
+const buildDetailStatsByUseEquipmentStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
+  const summaryStats = buildSummaryStatsByUseEquipmentStats(ship)
+  const shieldStats = getShieldStatsByUseEquipmentStats()
+  const engineStats = getEngineStatsByUseEquipmentStats()
+  const weaponStats = getWeaponStatsByUseEquipmentStats()
+  const mass = ship.physics?.mass || 1
+  const dragForward = ship.physics?.drag?.forward || 1
+  const dragHorizontal = ship.physics?.drag?.horizontal || 1
+  const dragPitch = ship.physics?.drag?.pitch || 1
+  const dragYaw = ship.physics?.drag?.yaw || 1
+  const dragRoll = ship.physics?.drag?.roll || 1
+  const accfactorsHorizontal = ship.physics?.accfactors?.horizontal || 1
+
+  const baseAcceleration = engineStats ? engineStats.thrustForward / mass : 0
+  const boostAcceleration = engineStats ? Math.round(baseAcceleration * engineStats.boostAcceleration) : 0
+  const travelSpeed = engineStats ? engineStats.travelThrust / dragForward : 0
+  const travelAcceleration = engineStats && engineStats.travelAttack ? Math.round(travelSpeed / engineStats.travelAttack) : 0
+  const boostRecharge = engineStats ? engineStats.boostRecharge / 100 : 0
+
+  const thrusterStats = getThrusterStatsByUseEquipmentStats()
+  const pitchRate = thrusterStats ? thrusterStats.pitch / dragPitch : 0
+  const yawRate = thrusterStats ? thrusterStats.yaw / dragYaw : 0
+  const rollRate = thrusterStats ? thrusterStats.roll / dragRoll : 0
+  const strafeSpeed = thrusterStats ? Math.round(thrusterStats.strafe / dragHorizontal) : 0
+  const strafeAcceleration = thrusterStats ? Math.round(thrusterStats.strafe / mass * accfactorsHorizontal) : 0
+
+  const extraStats: Omit<ShipStatMetric, 'ratio'>[] = [
+    { key: 'shield_recharge_rate', labelKey: 'ship_build.stats_shield_recharge_rate', unit: 'MW', value: shieldStats.rate },
+    { key: 'shield_recharge_delay', labelKey: 'ship_build.stats_shield_recharge_delay', unit: 's', value: shieldStats.delay },
+    { key: 'shield_group_avg', labelKey: 'ship_build.stats_shield_group_avg', unit: 'MJ', value: shieldStats.groupAvg },
+    { key: 'weapon_sustained', labelKey: 'ship_build.stats_weapon_sustained', unit: 'MW', value: Math.round(weaponStats.sustained * 10) / 10 },
+    { key: 'storage_solid', labelKey: 'ship_build.stats_storage_solid', unit: 'm3', value: getCargoCapacity(ship, 'solid') },
+    { key: 'storage_liquid', labelKey: 'ship_build.stats_storage_liquid', unit: 'm3', value: getCargoCapacity(ship, 'liquid') },
+    { key: 'storage_condensed', labelKey: 'ship_build.stats_storage_condensed', unit: 'm3', value: getCargoCapacity(ship, 'condensed') },
+    { key: 'acceleration', labelKey: 'ship_build.stats_acceleration', unit: 'm/s2', value: Math.round(baseAcceleration) },
+    { key: 'boost_acceleration', labelKey: 'ship_build.stats_boost_acceleration', unit: 'm/s2', value: boostAcceleration },
+    { key: 'boost_duration', labelKey: 'ship_build.stats_boost_duration', unit: 's', value: engineStats?.boostDuration || 0 },
+    { key: 'boost_recharge', labelKey: 'ship_build.stats_boost_recharge', unit: '%/s', value: boostRecharge },
+    { key: 'travel_acceleration', labelKey: 'ship_build.stats_travel_acceleration', unit: 'm/s2', value: travelAcceleration },
+    { key: 'travel_charge_time', labelKey: 'ship_build.stats_travel_charge_time', unit: 's', value: engineStats?.travelCharge || 0 },
+    { key: 'strafe_speed', labelKey: 'ship_build.stats_strafe_speed', unit: 'm/s', value: strafeSpeed },
+    { key: 'strafe_acceleration', labelKey: 'ship_build.stats_strafe_acceleration', unit: 'm/s2', value: strafeAcceleration },
+    { key: 'yaw', labelKey: 'ship_build.stats_yaw', unit: 'rad/s', value: Math.round(yawRate * 100) / 100 },
+    { key: 'pitch', labelKey: 'ship_build.stats_pitch', unit: 'rad/s', value: Math.round(pitchRate * 100) / 100 },
+    { key: 'roll', labelKey: 'ship_build.stats_roll', unit: 'rad/s', value: Math.round(rollRate * 100) / 100 }
+  ]
+
+  return [...summaryStats, ...extraStats]
+}
+
+const calculateMaxStatsByUseEquipmentStats = (ship: X4Ship) => {
+  const classShips = store.ships.filter(s => s.class === ship.class)
+  const summaryMax: Record<string, number> = {}
+  const detailMax: Record<string, number> = {}
+
+  const sampleSummary = buildSummaryStatsByUseEquipmentStats(ship)
+  sampleSummary.forEach(metric => {
+    const maxValue = Math.max(
+      ...classShips.map(s => {
+        const stats = buildSummaryStatsByUseEquipmentStats(s)
+        const match = stats.find(item => item.key === metric.key)
+        return match?.value || 0
+      }),
+      1
+    )
+    summaryMax[metric.key] = maxValue
+  })
+
+  const sampleDetail = buildDetailStatsByUseEquipmentStats(ship)
+  sampleDetail.forEach(metric => {
+    const maxValue = Math.max(
+      ...classShips.map(s => {
+        const stats = buildDetailStatsByUseEquipmentStats(s)
+        const match = stats.find(item => item.key === metric.key)
+        return match?.value || 0
+      }),
+      1
+    )
+    detailMax[metric.key] = maxValue
+  })
+
+  return { summaryMax, detailMax }
+}
 </script>
 
 <template>
@@ -429,6 +935,22 @@ const setStatsViewMode = (mode: 'summary' | 'detail') => {
       <div class="stats-toolbar">
         <div class="stats-caption">{{ t('ship_build.stats_preview') }}</div>
         <div class="stats-mode-switch">
+          <button
+            data-testid="ship-build-stats-logic-old"
+            class="stats-mode-btn"
+            :class="!useNewLogic ? 'stats-mode-btn-active' : 'stats-mode-btn-idle'"
+            @click="useNewLogic = false"
+          >
+            旧值
+          </button>
+          <button
+            data-testid="ship-build-stats-logic-new"
+            class="stats-mode-btn"
+            :class="useNewLogic ? 'stats-mode-btn-active' : 'stats-mode-btn-idle'"
+            @click="useNewLogic = true"
+          >
+            新值
+          </button>
           <button
             data-testid="ship-build-stats-mode-summary"
             class="stats-mode-btn"
@@ -447,9 +969,6 @@ const setStatsViewMode = (mode: 'summary' | 'detail') => {
           </button>
         </div>
       </div>
-      <div v-if="statsViewMode === 'detail'" class="stats-pending">
-        {{ t('ship_build.stats_detail_pending') }}
-      </div>
       <div class="stats-list-container">
         <div class="stats-column">
           <div
@@ -457,13 +976,14 @@ const setStatsViewMode = (mode: 'summary' | 'detail') => {
             :key="metric.key"
             class="stats-row"
             :class="{ 'stats-row-placeholder': metric.placeholder }"
+            :data-testid="`ship-build-stats-row-${metric.key}`"
           >
-            <span class="stats-label">{{ t(metric.labelKey) }}</span>
-            <span class="stats-value">
+            <span class="stats-label" :data-testid="`ship-build-stats-label-${metric.key}`">{{ t(metric.labelKey) }}</span>
+            <span class="stats-value" :data-testid="`ship-build-stats-value-${metric.key}`">
               {{ metric.valueText }}
-              <span v-if="metric.unit" class="stats-unit">{{ metric.unit }}</span>
+              <span v-if="metric.unit" class="stats-unit" :data-testid="`ship-build-stats-unit-${metric.key}`">{{ metric.unit }}</span>
             </span>
-            <div v-if="metric.ratio !== null" class="stats-bar">
+            <div v-if="metric.ratio !== null" class="stats-bar" :data-testid="`ship-build-stats-bar-${metric.key}`">
               <div class="stats-bar-fill" :style="{ width: `${Math.round(metric.ratio * 100)}%` }"></div>
             </div>
           </div>
@@ -474,13 +994,14 @@ const setStatsViewMode = (mode: 'summary' | 'detail') => {
             :key="metric.key"
             class="stats-row"
             :class="{ 'stats-row-placeholder': metric.placeholder }"
+            :data-testid="`ship-build-stats-row-${metric.key}`"
           >
-            <span class="stats-label">{{ t(metric.labelKey) }}</span>
-            <span class="stats-value">
+            <span class="stats-label" :data-testid="`ship-build-stats-label-${metric.key}`">{{ t(metric.labelKey) }}</span>
+            <span class="stats-value" :data-testid="`ship-build-stats-value-${metric.key}`">
               {{ metric.valueText }}
-              <span v-if="metric.unit" class="stats-unit">{{ metric.unit }}</span>
+              <span v-if="metric.unit" class="stats-unit" :data-testid="`ship-build-stats-unit-${metric.key}`">{{ metric.unit }}</span>
             </span>
-            <div v-if="metric.ratio !== null" class="stats-bar">
+            <div v-if="metric.ratio !== null" class="stats-bar" :data-testid="`ship-build-stats-bar-${metric.key}`">
               <div class="stats-bar-fill" :style="{ width: `${Math.round(metric.ratio * 100)}%` }"></div>
             </div>
           </div>

@@ -200,6 +200,25 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     return connection.group.find(g => g.group === groupName)
   }
 
+  const cleanupEmptyGroups = () => {
+    if (!blueprint.value) return
+    blueprint.value.connections.forEach((connection) => {
+      connection.group = connection.group.filter((group) => {
+        const hasEquipment = Boolean(group.equipment_id)
+        const hasShield = Boolean(group.shield?.equipment_id)
+        return hasEquipment || hasShield
+      })
+    })
+    blueprint.value.connections = blueprint.value.connections.filter((connection) => connection.group.length > 0)
+    // Sort connections by fixed order: engine -> thruster -> shield -> weapon -> turret
+    const slotOrder = ['engine', 'thruster', 'shield', 'weapon', 'turret']
+    blueprint.value.connections.sort((a, b) => {
+      const orderA = slotOrder.indexOf(a.slot_type)
+      const orderB = slotOrder.indexOf(b.slot_type)
+      return (orderA === -1 ? 999 : orderA) - (orderB === -1 ? 999 : orderB)
+    })
+  }
+
   // setEquipment: set equipment for a single group
   const setEquipment = (
     slotType: string,
@@ -211,11 +230,9 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     const groupData = findGroup(connection, groupName)
 
     if (equipmentId === null) {
-      // Remove the group entry entirely
-      connection.group = connection.group.filter(g => g.group !== groupName)
-      // If connection.group is empty, remove the connection
-      if (connection.group.length === 0) {
-        blueprint.value!.connections = blueprint.value!.connections.filter(c => c.slot_type !== slotType)
+      if (groupData) {
+        groupData.equipment_id = ''
+        groupData.count = count
       }
     } else {
       // Set or update equipment
@@ -231,6 +248,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     if (blueprint.value && selectedShipId.value) {
       blueprint.value.shipId = selectedShipId.value
     }
+    cleanupEmptyGroups()
   }
 
   // setShield: set shield for a group
@@ -258,12 +276,12 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
     if (groupData) {
       if (equipmentId === null) {
-        // Remove shield
-        delete groupData.shield
+        groupData.shield = { equipment_id: '', count }
       } else {
         groupData.shield = { equipment_id: equipmentId, count }
       }
     }
+    cleanupEmptyGroups()
   }
 
   // setGroupEquipment: batch set equipment for multiple connections (for group mode)
@@ -374,7 +392,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     } else {
       // No active blueprint, create new one
       blueprint.value.id = crypto.randomUUID()
-      blueprint.value.name = blueprint.value.name || 'Unnamed Blueprint'
+      // name 保持为空，UI 会显示默认名称
       savedBlueprints.value.list.push(JSON.parse(JSON.stringify(blueprint.value)))
     }
 
@@ -426,6 +444,15 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
     // Load blueprint
     blueprint.value = JSON.parse(JSON.stringify(bp))
+    // Sort connections by fixed order: engine -> thruster -> shield -> weapon -> turret
+    if (blueprint.value) {
+      const slotOrder = ['engine', 'thruster', 'shield', 'weapon', 'turret']
+      blueprint.value.connections.sort((a, b) => {
+        const orderA = slotOrder.indexOf(a.slot_type)
+        const orderB = slotOrder.indexOf(b.slot_type)
+        return (orderA === -1 ? 999 : orderA) - (orderB === -1 ? 999 : orderB)
+      })
+    }
     savedBlueprints.value.activeId = id
     takeSnapshot()
   }
@@ -470,6 +497,8 @@ export const useShipBuildStore = defineStore('ship-build', () => {
         connections: [],
         lastUpdated: Date.now()
       }
+      // Initialize snapshot for dirty check
+      takeSnapshot()
     }
     selectedShipId.value = shipId
     selectedByConnection.value = {}
@@ -501,7 +530,6 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   }
 
   const setFitMode = (mode: FitMode) => {
-    if (mode === 'group' && hasFitModeConflict.value) return
     fitMode.value = mode
   }
 
@@ -509,6 +537,8 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     // Use connectionKeyMap to get slotType and groupName, then update blueprint via setEquipment/setShield
     const info = connectionKeyMap.value.get(payload.connectionKey)
     if (!info) return
+
+    const resolvedCount = selectedByConnectionComputed.value[payload.connectionKey]?.count ?? info.count
 
     if (info.isShield) {
       // For shield slots, there are two cases:
@@ -519,7 +549,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       // Case 1: Direct shield slot (slotType = 'shield' and parentSlotType = 'shield')
       if (parts.length === 4 && parts[1] === 'shield') {
         // For direct shield slot, use setEquipment with slotType='shield'
-        setEquipment(info.slotType, info.groupName, payload.equipmentId, info.count)
+        setEquipment(info.slotType, info.groupName, payload.equipmentId, resolvedCount)
         return
       }
 
@@ -537,12 +567,48 @@ export const useShipBuildStore = defineStore('ship-build', () => {
         )
         const firstParentRow = parentRows[0]
         if (firstParentRow) {
-          setShield(parentSlotType, firstParentRow.groupName, payload.equipmentId, info.count)
+          setShield(parentSlotType, firstParentRow.groupName, payload.equipmentId, resolvedCount)
         }
       }
     } else {
-      setEquipment(info.slotType, info.groupName, payload.equipmentId, info.count)
+      setEquipment(info.slotType, info.groupName, payload.equipmentId, resolvedCount)
     }
+  }
+
+  const setConnectionAssignmentCount = (payload: { connectionKey: string; count: number }) => {
+    const info = connectionKeyMap.value.get(payload.connectionKey)
+    if (!info) return
+
+    const nextCount = Math.max(0, Math.round(payload.count))
+    const currentEquipmentId = selectedByConnectionComputed.value[payload.connectionKey]?.equipmentId || null
+
+    if (info.isShield) {
+      const parts = payload.connectionKey.split('::')
+
+      if (parts.length === 4 && parts[1] === 'shield') {
+        setEquipment(info.slotType, info.groupName, currentEquipmentId, nextCount)
+        return
+      }
+
+      if (parts.length >= 5 && parts[4] === 'shield') {
+        const shipId = parts[0]
+        const parentSlotType = parts[1]
+        const slotIndex = parts[2]
+        const groupIndex = parts[3]
+        if (!shipId || !parentSlotType || !slotIndex || !groupIndex) return
+        const parentRows = connectionRows.value.filter(r =>
+          r.slotType === parentSlotType &&
+          r.connectionKey === `${shipId}::${parentSlotType}::${slotIndex}::${groupIndex}`
+        )
+        const firstParentRow = parentRows[0]
+        if (firstParentRow) {
+          setShield(parentSlotType, firstParentRow.groupName, currentEquipmentId, nextCount)
+        }
+      }
+      return
+    }
+
+    setEquipment(info.slotType, info.groupName, currentEquipmentId, nextCount)
   }
 
   const applyGroupAssignment = (payload: { connectionKeys: string[]; equipmentId: string | null }) => {
@@ -604,7 +670,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
         race: equipment.race || null,
         tags: normalizeTagList(equipment.slotTags)
       }))
-      .sort((a, b) => a.name.localeCompare(b.name))
+      .sort((a, b) => a.id > b.id ? 1 : a.id < b.id ? -1 : 0)
   }
 
   const selectedShip = computed(() => {
@@ -735,7 +801,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
       const optionMap = new Map(existing.options.map((item) => [item.id, item]))
       row.options.forEach((item) => optionMap.set(item.id, item))
-      existing.options = Array.from(optionMap.values()).sort((a, b) => a.name.localeCompare(b.name))
+      existing.options = Array.from(optionMap.values()).sort((a, b) => a.id > b.id ? 1 : a.id < b.id ? -1 : 0)
     })
 
     return Array.from(grouped.values())
@@ -778,11 +844,8 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     selectedShipId,
     statsViewMode,
     fitMode,
-    selectedByConnection,
     mockTagPatch,
     selectedShip,
-    connectionRows,
-    groupRows,
     hasFitModeConflict,
     canSwitchToGroupMode,
     // Blueprint persistence
@@ -807,6 +870,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     setSelectedTypes,
     setFitMode,
     applyConnectionAssignment,
+    setConnectionAssignmentCount,
     applyGroupAssignment,
     setStatsViewMode,
     setMockTagPatch,

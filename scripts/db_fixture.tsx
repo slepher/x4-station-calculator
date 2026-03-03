@@ -1,5 +1,6 @@
 import { readFile, writeFile, mkdir, rename, readdir } from 'node:fs/promises'
 import path from 'node:path'
+import { createHash } from 'node:crypto'
 import { parse } from 'yaml'
 
 const ROOT = process.cwd()
@@ -9,6 +10,7 @@ const DB_DIR = path.join(FIXTURE_DIR, 'db')
 const DB_PATH = path.join(FIXTURE_DIR, 'db.json')
 
 const DATA_DIR = path.join(ROOT, 'src/assets/x4_game_data/8.0-Diplomacy/data')
+const FIXTURE_TIMESTAMP = Number(process.env.DB_FIXTURE_TIMESTAMP ?? 1772453451902)
 
 type SeedEmpire = {
   empires: Array<{
@@ -114,6 +116,117 @@ type SavedEmpiresState = {
   list: EmpirePlan[]
 }
 
+// ============ Ship Blueprint Seed Types ============
+type SeedShipBuildShip = {
+  id: string
+  name: string
+  class: string
+  type: string
+  race: string
+  blueprint: SeedShipBuildBlueprint | null
+}
+
+type SeedShipBuildBlueprintGroup = {
+  group: string
+  equipment_id: string
+  count?: number
+  shield?: {
+    equipment_id: string
+    count?: number
+  }
+}
+
+type SeedShipBuildBlueprintConnectionByGroup = {
+  slot_type: string
+  group: SeedShipBuildBlueprintGroup[]
+}
+
+type SeedShipBuildBlueprintConnectionBySize = {
+  slot_type: string
+  size: Array<{
+    size: string
+    equipment_id: string
+    shield?: {
+      equipment_id: string
+    }
+  }>
+}
+
+type SeedShipBuildBlueprintConnectionBySlot = {
+  slot_type: string
+  equipment_id: string
+  shield?: {
+    equipment_id: string
+  }
+}
+
+type SeedShipBuildBlueprintConnection =
+  | SeedShipBuildBlueprintConnectionByGroup
+  | SeedShipBuildBlueprintConnectionBySize
+  | SeedShipBuildBlueprintConnectionBySlot
+
+type SeedShipBuildBlueprint = {
+  shipId: string
+  connections: SeedShipBuildBlueprintConnection[]
+}
+
+type SeedShipBuild = {
+  ships: SeedShipBuildShip[]
+}
+
+type ShipBlueprint = {
+  id: string
+  name: string
+  shipId: string
+  connections: ResolvedShipBuildBlueprintConnection[]
+  lastUpdated: number
+}
+
+type ResolvedShipBuildBlueprintGroup = {
+  group: string
+  equipment_id: string
+  count: number
+  shield?: {
+    equipment_id: string
+    count: number
+  }
+}
+
+type ResolvedShipBuildBlueprintConnection = {
+  slot_type: string
+  group: ResolvedShipBuildBlueprintGroup[]
+}
+
+type SavedShipBlueprintsState = {
+  version: 1
+  activeId: string | null
+  list: ShipBlueprint[]
+}
+
+type X4ShipConnection = {
+  size?: string
+  count: number
+  shield?: {
+    size?: string
+    count: number
+  }
+}
+
+type X4ShipSlotGroup = {
+  group: string
+  connection: X4ShipConnection
+}
+
+type X4ShipSlot = {
+  type: string
+  groups: X4ShipSlotGroup[]
+}
+
+type X4Ship = {
+  id: string
+  slots: X4ShipSlot[]
+}
+
 type StationSettings = {
   sunlight: number
   useHQ: boolean
@@ -166,6 +279,7 @@ const loadYaml = async <T,>(file: string): Promise<T> => {
 
 const isEmpireSeed = (seed: any): seed is SeedEmpire => Boolean(seed?.empires)
 const isLogicFlowSeed = (seed: any): seed is SeedLogicFlow => Boolean(seed?.plans)
+const isShipBlueprintSeed = (seed: any): seed is SeedShipBuild => Boolean(seed?.ships)
 
 const pickPrimaryOutput = (module: X4Module): string => {
   const keys = Object.keys(module.outputs ?? {})
@@ -175,12 +289,17 @@ const pickPrimaryOutput = (module: X4Module): string => {
   return keys[0]
 }
 
+const stableId = (...parts: string[]): string => {
+  const hex = createHash('sha1').update(parts.join('::')).digest('hex')
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`
+}
+
 const buildLogicFlowState = (
   seed: SeedLogicFlow,
   wares: Map<string, X4Ware>,
-  modules: Map<string, X4Module>
+  modules: Map<string, X4Module>,
+  now: number
 ): SavedFlowPlansState => {
-  const now = Date.now()
   const plans: LogicFlowPlan[] = seed.plans.map((plan, planIndex) => {
     const groups: SavedFlowGroup[] = plan.groups.map((group, groupIndex) => {
       const nodes: SavedFlowNode[] = []
@@ -252,8 +371,7 @@ const buildLogicFlowState = (
   }
 }
 
-const buildEmpireState = (seed: SeedEmpire): SavedEmpiresState => {
-  const now = Date.now()
+const buildEmpireState = (seed: SeedEmpire, now: number): SavedEmpiresState => {
   const empires: EmpirePlan[] = seed.empires.map((empire, empireIndex) => {
     const stations: StationPlan[] = empire.stations.map((station, stationIndex) => {
       const settings = { ...DEFAULT_STATION_SETTINGS, ...(station.settings || {}) }
@@ -285,6 +403,168 @@ const buildEmpireState = (seed: SeedEmpire): SavedEmpiresState => {
   }
 }
 
+const buildShipSlotCountMap = (ships: X4Ship[]): Map<string, X4ShipConnection> => {
+  const m = new Map<string, X4ShipConnection>()
+  for (const ship of ships) {
+    for (const slot of ship.slots || []) {
+      for (const g of slot.groups || []) {
+        m.set(`${ship.id}::${slot.type}::${g.group}`, g.connection)
+      }
+    }
+  }
+  return m
+}
+
+const buildShipSlotGroupsMap = (ships: X4Ship[]): Map<string, X4ShipSlotGroup[]> => {
+  const m = new Map<string, X4ShipSlotGroup[]>()
+  for (const ship of ships) {
+    for (const slot of ship.slots || []) {
+      m.set(`${ship.id}::${slot.type}`, slot.groups || [])
+    }
+  }
+  return m
+}
+
+const injectShipConnectionCounts = (
+  shipId: string,
+  connections: SeedShipBuildBlueprintConnection[],
+  slotCountMap: Map<string, X4ShipConnection>,
+  slotGroupsMap: Map<string, X4ShipSlotGroup[]>
+): ResolvedShipBuildBlueprintConnection[] => {
+  return connections.map((connection) => {
+    if ('group' in connection) {
+      return {
+        slot_type: connection.slot_type,
+        group: connection.group.map((group) => {
+          const key = `${shipId}::${connection.slot_type}::${group.group}`
+          const slotConnection = slotCountMap.get(key)
+          if (!slotConnection) {
+            throw new Error(`Missing ship slot connection for ${key}`)
+          }
+
+          const resolved: ResolvedShipBuildBlueprintGroup = {
+            group: group.group,
+            equipment_id: group.equipment_id,
+            count: slotConnection.count
+          }
+
+          if (group.shield) {
+            if (!slotConnection.shield) {
+              throw new Error(`Missing shield slot connection for ${key}`)
+            }
+            resolved.shield = {
+              equipment_id: group.shield.equipment_id,
+              count: slotConnection.shield.count
+            }
+          }
+          return resolved
+        })
+      }
+    }
+
+    if ('size' in connection) {
+      const slotKey = `${shipId}::${connection.slot_type}`
+      const slotGroups = slotGroupsMap.get(slotKey)
+      if (!slotGroups || slotGroups.length === 0) {
+        throw new Error(`Missing ship slot groups for ${slotKey}`)
+      }
+
+      const resolvedGroups: ResolvedShipBuildBlueprintGroup[] = []
+      for (const sizeRow of connection.size) {
+        const matched = slotGroups.filter(
+          (slotGroup) => slotGroup.connection.size === sizeRow.size
+        )
+        if (matched.length === 0) {
+          throw new Error(`No slot groups matched size ${sizeRow.size} for ${slotKey}`)
+        }
+
+        for (const slotGroup of matched) {
+          const resolved: ResolvedShipBuildBlueprintGroup = {
+            group: slotGroup.group,
+            equipment_id: sizeRow.equipment_id,
+            count: slotGroup.connection.count
+          }
+
+          if (sizeRow.shield) {
+            if (!slotGroup.connection.shield) {
+              throw new Error(`Missing shield slot connection for ${slotKey}::${slotGroup.group}`)
+            }
+            resolved.shield = {
+              equipment_id: sizeRow.shield.equipment_id,
+              count: slotGroup.connection.shield.count
+            }
+          }
+
+          resolvedGroups.push(resolved)
+        }
+      }
+
+      return {
+        slot_type: connection.slot_type,
+        group: resolvedGroups
+      }
+    }
+
+    const slotKey = `${shipId}::${connection.slot_type}`
+    const slotGroups = slotGroupsMap.get(slotKey)
+    if (!slotGroups || slotGroups.length === 0) {
+      throw new Error(`Missing ship slot groups for ${slotKey}`)
+    }
+
+    return {
+      slot_type: connection.slot_type,
+      group: slotGroups.map((slotGroup) => {
+        const resolved: ResolvedShipBuildBlueprintGroup = {
+          group: slotGroup.group,
+          equipment_id: connection.equipment_id,
+          count: slotGroup.connection.count
+        }
+
+        if (connection.shield) {
+          if (!slotGroup.connection.shield) {
+            throw new Error(`Missing shield slot connection for ${slotKey}::${slotGroup.group}`)
+          }
+          resolved.shield = {
+            equipment_id: connection.shield.equipment_id,
+            count: slotGroup.connection.shield.count
+          }
+        }
+
+        return resolved
+      })
+    }
+  })
+}
+
+const buildShipBlueprintState = (
+  seed: SeedShipBuild,
+  ships: X4Ship[],
+  now: number
+): SavedShipBlueprintsState => {
+  const slotCountMap = buildShipSlotCountMap(ships)
+  const slotGroupsMap = buildShipSlotGroupsMap(ships)
+  const list: ShipBlueprint[] = seed.ships
+    .filter((ship) => ship.blueprint)
+    .map((ship, index) => ({
+      id: stableId('x4_ship_blueprints', ship.id, ship.name, String(index)),
+      name: ship.name,
+      shipId: ship.id,
+      connections: injectShipConnectionCounts(
+        ship.blueprint!.shipId,
+        ship.blueprint!.connections,
+        slotCountMap,
+        slotGroupsMap
+      ),
+      lastUpdated: now
+    }))
+
+  return {
+    version: 1,
+    activeId: list[0]?.id ?? null,
+    list
+  }
+}
+
 const readCurrentVsn = async (): Promise<number | null> => {
   try {
     const raw = await readFile(DB_PATH, 'utf8')
@@ -303,20 +583,26 @@ const main = async () => {
 
   const wares = await loadJson<X4Ware[]>(path.join(DATA_DIR, 'wares.json'))
   const modules = await loadJson<X4Module[]>(path.join(DATA_DIR, 'modules.json'))
+  const ships = await loadJson<X4Ship[]>(path.join(DATA_DIR, 'ships.json'))
   const wareMap = new Map(wares.map((ware) => [ware.id, ware]))
   const moduleMap = new Map(modules.map((module) => [module.id, module]))
 
   const dbPayload: Record<string, any> = {}
+  const now = FIXTURE_TIMESTAMP
 
   for (const seedFile of seedFiles) {
     const seedPath = path.join(SEED_DIR, seedFile)
     const seed = await loadYaml<any>(seedPath)
     if (isLogicFlowSeed(seed)) {
-      dbPayload.x4_logic_flow_plans = buildLogicFlowState(seed, wareMap, moduleMap)
+      dbPayload.x4_logic_flow_plans = buildLogicFlowState(seed, wareMap, moduleMap, now)
       continue
     }
     if (isEmpireSeed(seed)) {
-      dbPayload.x4_empire_data = buildEmpireState(seed)
+      dbPayload.x4_empire_data = buildEmpireState(seed, now)
+      continue
+    }
+    if (isShipBlueprintSeed(seed)) {
+      dbPayload.x4_ship_blueprints = buildShipBlueprintState(seed, ships, now)
     }
   }
 

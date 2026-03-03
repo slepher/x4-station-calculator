@@ -1,7 +1,7 @@
 # ==========================
 # 1. Node.js & 前端构建
 # ==========================
-node_modules/
+node_modules
 .pnpm-store/
 dist/
 dist-ssr/
@@ -70,3 +70,6 @@ backupspecs
 # Playwright 测试报告和结果
 playwright-report/
 test-results/
+
+server-*.log
+pnpm-*.yaml

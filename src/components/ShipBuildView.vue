@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
@@ -16,7 +16,6 @@ import ShipBuildPanelFit from '@/components/ship-build/ShipBuildPanelFit.vue'
 import ShipBuildPanelStats from '@/components/ship-build/ShipBuildPanelStats.vue'
 import ShipBuildPanelMaterials from '@/components/ship-build/ShipBuildPanelMaterials.vue'
 import ShipBuildSelector from '@/components/ship-build/ShipBuildSelector.vue'
-import type { FitMode } from '@/components/ship-build/fitTypes'
 import type { ShipBuildClass } from '@/store/useShipBuildStore'
 
 import shipsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ships.json'
@@ -71,13 +70,7 @@ const {
   selectedRaces,
   selectedTypes,
   selectedShipId,
-  fitMode,
-  selectedByConnection,
   selectedShip,
-  connectionRows,
-  groupRows,
-  hasFitModeConflict,
-  canSwitchToGroupMode,
   blueprint
 } = storeToRefs(shipBuildStore)
 const {
@@ -86,9 +79,6 @@ const {
   toggleRace,
   toggleType,
   setSelectedTypes,
-  setFitMode: setFitModeStore,
-  applyConnectionAssignment: applyConnectionAssignmentStore,
-  applyGroupAssignment: applyGroupAssignmentStore,
   setDisplayResolvers
 } = shipBuildStore
 setDisplayResolvers({
@@ -117,24 +107,10 @@ const handleSelectedShipIdChange = (value: string | null) => {
   setSelectedShipId(value)
 }
 
-const fitModeConflictReason = computed(() => hasFitModeConflict.value ? t('ship_build.fit_mode_disabled_reason') : '')
+const showMaterial = ref(true)
 
-const setFitMode = (mode: FitMode) => {
-  if (mode === 'group' && !canSwitchToGroupMode.value) return
-  setFitModeStore(mode)
-}
-
-const applyConnectionAssignment = (payload: { connectionKey: string; equipmentId: string | null }) => {
-  applyConnectionAssignmentStore(payload)
-}
-
-const applyGroupAssignment = (payload: { groupKey: string; equipmentId: string | null }) => {
-  const target = groupRows.value.find(item => item.groupKey === payload.groupKey)
-  if (!target) return
-  applyGroupAssignmentStore({
-    connectionKeys: target.connectionKeys,
-    equipmentId: payload.equipmentId
-  })
+const handlePickerOpenChange = (open: boolean) => {
+  showMaterial.value = !open
 }
 </script>
 
@@ -167,22 +143,17 @@ const applyGroupAssignment = (payload: { groupKey: string; equipmentId: string |
       />
     </div>
 
-    <div v-if="selectedShip" class="grid grid-cols-12 gap-8" data-testid="ship-build-panels">
+    <div v-if="selectedShip" class="grid grid-cols-12 gap-8 items-start" data-testid="ship-build-panels">
       <ShipBuildPanelFit
-        :mode="fitMode"
-        :can-switch-to-group="canSwitchToGroupMode"
-        :conflict-reason="fitModeConflictReason"
-        :connection-rows="connectionRows"
-        :group-rows="groupRows"
-        :selected-by-connection="selectedByConnection"
-        @update:mode="setFitMode"
-        @assign-connection="applyConnectionAssignment"
-        @assign-group="applyGroupAssignment"
+        :key="selectedShipId || 'no-ship'"
+        :wide="!showMaterial"
+        @picker-open-change="handlePickerOpenChange"
       />
       <ShipBuildPanelStats
         :ship-blueprint="blueprint"
       />
       <ShipBuildPanelMaterials
+        v-if="showMaterial"
         :ship-blueprint="blueprint"
       />
     </div>

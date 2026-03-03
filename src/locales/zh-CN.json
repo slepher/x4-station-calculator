@@ -79,16 +79,22 @@
     "fit_compatibility": "装备兼容性",
     "fit_no_tags": "无 tags",
     "fit_no_equipment": "无可用装备",
+    "fit_empty_slot": "空槽位",
+    "fit_mixed_selection": "多种类型",
+    "fit_picker_title": "装备选择器",
+    "fit_candidate_list": "候选列表",
+    "fit_picker_confirm": "确认",
     "fit_shield_generator": "护盾发生器",
     "stats_preview": "飞船属性预览",
     "stats_mode_summary": "简略",
     "stats_mode_detail": "详细",
     "stats_detail_pending": "详细属性数据源暂未接入，当前以占位字段展示。",
     "stats_hull": "船体",
-    "stats_storage_unit": "单位仓储",
+    "stats_storage_unit": "无人机单位仓储",
     "stats_storage_container": "集装箱仓储",
     "stats_storage_solid": "固体仓储",
     "stats_storage_liquid": "液体仓储",
+    "stats_storage_condensed": "冷凝仓储",
     "stats_crew": "船员",
     "stats_missile": "导弹容量",
     "stats_weapon_slots": "武器位",
@@ -109,6 +115,7 @@
     "stats_shield": "护盾",
     "stats_shield_recharge_rate": "再充率",
     "stats_shield_recharge_delay": "再充延迟",
+    "stats_shield_group_avg": "编组平均护盾容量",
     "stats_radar_range": "雷达范围",
     "stats_weapon_burst": "武器爆发输出值",
     "stats_weapon_sustained": "武器持续性输出值",
@@ -200,7 +207,9 @@
     "btn_discard_and_new": "丢弃并新建",
     "btn_save_new_and_create": "保存并新建",
     "btn_overwrite_and_create": "覆盖并新建",
-    "btn_save": "保存"
+    "btn_save": "保存",
+    "default_blueprint_name": "新配装方案",
+    "blueprint": "蓝图"
   },
   "planning": {
     "module_list": "模块列表",
@@ -234,7 +243,7 @@
     "confirm_load_with_unsaved": "当前配置有未保存的修改，确定要载入吗？",
     "confirm_new_with_unsaved": "当前配置有未保存的修改，确定要新建吗？",
     "connections_count": "个槽位",
-    "default_blueprint_name": "新配装方案"
+    "shield_secondary": "副盾"
   },
   "wareflow": {
     "resource_overview": "资源产出",

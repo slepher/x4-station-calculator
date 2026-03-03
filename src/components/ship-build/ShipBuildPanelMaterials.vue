@@ -119,7 +119,7 @@ const materialMethodOptions = computed(() => {
   props.shipBlueprint?.connections.forEach((conn) => {
     conn.group.forEach((g) => {
       // 主装备
-      if (g.equipment_id) {
+      if (g.equipment_id && g.count > 0) {
         const equipment = equipmentMap.value.get(g.equipment_id)
         if (equipment) {
           Object.keys(equipment.cost || {}).forEach((method) => {
@@ -131,7 +131,7 @@ const materialMethodOptions = computed(() => {
         }
       }
       // 附带护盾
-      if (g.shield && g.shield.equipment_id) {
+      if (g.shield && g.shield.equipment_id && g.shield.count > 0) {
         const shieldEquipment = equipmentMap.value.get(g.shield.equipment_id)
         if (shieldEquipment) {
           Object.keys(shieldEquipment.cost || {}).forEach((method) => {
@@ -175,7 +175,7 @@ const equipmentMaterialGroups = computed(() => {
   props.shipBlueprint.connections.forEach((conn) => {
     conn.group.forEach((g) => {
       // Handle main equipment
-      if (g.equipment_id) {
+      if (g.equipment_id && g.count > 0) {
         const equipment = equipmentMap.value.get(g.equipment_id)
         if (equipment) {
           const existing = grouped.get(g.equipment_id)
@@ -191,7 +191,7 @@ const equipmentMaterialGroups = computed(() => {
       }
 
       // Handle attached shield (stored in group.shield)
-      if (g.shield && g.shield.equipment_id) {
+      if (g.shield && g.shield.equipment_id && g.shield.count > 0) {
         const shieldEquipment = equipmentMap.value.get(g.shield.equipment_id)
         if (shieldEquipment) {
           const existing = grouped.get(g.shield.equipment_id)

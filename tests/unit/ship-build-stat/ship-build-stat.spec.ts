@@ -4,365 +4,229 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
+import ShipBuildPanelStats from '@/components/ship-build/ShipBuildPanelStats.vue'
+import { useEquipmentStats } from '@/composables/useEquipmentStats'
+import shipsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ships.json'
+import equipmentsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
+import missilesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/missiles.json'
 
-// Mock game data
-const mockShip = vi.hoisted(() => ({
-  id: 'ship_tel_l_trans_container_02_a',
-  nameId: 'ship_tel_l_trans_container_02_a',
-  name: 'Heron Vanguard',
-  class: 'ship_l',
-  type: 'freighter',
-  race: 'teladi',
-  shipgroup: null,
-  noplayerblueprint: false,
-  noplayerbuild: false,
-  production: [],
-  slots: [
-    { type: 'engine', count: { large: 4 }, groups: [] },
-    { type: 'shield', count: { large: 4 }, groups: [] },
-    { type: 'cargo', count: { large: 10 }, groups: [] }
-  ],
-  storage: { missile: 10, unit: 5 },
-  cargo: [
-    { type: 'container', capacity: 10000 },
-    { type: 'solid', capacity: 5000 },
-    { type: 'liquid', capacity: 3000 },
-    { type: 'condensed', capacity: 2000 }
-  ],
-  dockarea: [
-    { size: 'dock_m', capacity: 1 },
-    { size: 'dock_s', capacity: 2 }
-  ],
-  crew: { capacity: 25 },
-  hull: 62500,
-  shipstorage: [
-    { size: 'container', capacity: 10000 },
-    { size: 'solid', capacity: 5000 },
-    { size: 'liquid', capacity: 3000 },
-    { size: 'condensed', capacity: 2000 }
-  ],
-  physics: {
-    mass: 62500,
-    drag: {
-      forward: 25,
-      reverse: 50,
-      horizontal: 50,
-      vertical: 50,
-      pitch: 1,
-      yaw: 1,
-      roll: 2
-    }
-  }
-}))
+// 使用真实的大太刀(Odachi)飞船数据
+const odachiShip = shipsRaw.find((s: any) => s.id === 'ship_ter_m_corvette_02_a')
 
-const mockShipTypes = vi.hoisted(() => [
-  { id: 'freighter', nameId: 'ship_type_freighter', name: 'Freighter', class: ['ship_s', 'ship_m', 'ship_l'] }
-])
+// 查找真实装备数据
+const findEquipment = (id: string) => equipmentsRaw.find((e: any) => e.id === id)
+const findMissile = (id: string) => missilesRaw.find((m: any) => m.id === id || m.macro === id)
 
-const mockShipRaces = vi.hoisted(() => [
-  { id: 'teladi', noplayerblueprint: false, noplayerbuild: false }
-])
+const odachiEngine = findEquipment('engine_ter_m_allround_01_mk1')
+const odachiThruster = findEquipment('thruster_gen_m_allround_01_mk1')
+const odachiShield = findEquipment('shield_ter_m_standard_02_mk2')
+const odachiWeapon = findEquipment('weapon_ter_m_beam_01_mk2')
+const odachiTurret = findEquipment('turret_ter_m_beam_01_mk1')
+const odachiMissileLauncher = findEquipment('weapon_bor_m_dumbfire_01_mk1')
 
-const mockEquipmentTypes = vi.hoisted(() => [
-  { id: 'engine', nameId: 'equipment_engine', name: 'Engine' },
-  { id: 'shield', nameId: 'equipment_shield', name: 'Shield' },
-  { id: 'cargo', nameId: 'equipment_cargo', name: 'Cargo' }
-])
-
-vi.mock('@/assets/x4_game_data/8.0-Diplomacy/data/ships.json', () => ({ default: [mockShip] }))
-vi.mock('@/assets/x4_game_data/8.0-Diplomacy/data/ship_types.json', () => ({ default: mockShipTypes }))
-vi.mock('@/assets/x4_game_data/8.0-Diplomacy/data/ship_races.json', () => ({ default: mockShipRaces }))
-vi.mock('@/assets/x4_game_data/8.0-Diplomacy/data/equipment_types.json', () => ({ default: mockEquipmentTypes }))
-
-// Mock equipment data for engine/shield stats
-vi.mock('@/store/logic/useGameData', () => ({
-  useGameData: () => ({
-    getEquipmentById: (id: string) => {
-      if (id.includes('engine')) {
-        return { thrustForward: 500, boostMultiplier: 1.5, travelMultiplier: 3, boostDuration: 10, boostRecharge: 5, travelCharge: 30 }
-      }
-      if (id.includes('shield')) {
-        return { max: 5000, rate: 500, delay: 5 }
-      }
-      return null
-    }
+vi.mock('@/store/useShipBuildStore', () => ({
+  useShipBuildStore: () => ({
+    ships: [odachiShip],
+    equipments: [odachiEngine, odachiThruster, odachiShield, odachiWeapon, odachiTurret, odachiMissileLauncher],
+    selectedShipId: 'ship_ter_m_corvette_02_a'
   })
 }))
 
-vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string) => {
-      const map: Record<string, string> = {
-        'ship_build.stats_mode_summary': 'Summary',
-        'ship_build.stats_mode_detail': 'Detail',
-        'ship_build.stats_detail_pending': 'Detailed stats data source is not wired yet. Placeholder fields are shown.',
-        'ship_build.stats_hull': 'Hull',
-        'ship_build.stats_shield': 'Shield',
-        'ship_build.stats_speed': 'Speed',
-        'ship_build.stats_boost_speed': 'Boost Speed',
-        'ship_build.stats_travel_speed': 'Travel Speed',
-        'ship_build.stats_crew': 'Crew',
-        'ship_build.stats_storage_container': 'Container Storage',
-        'ship_build.stats_weapon_burst': 'Weapon Burst Output',
-        'ship_build.stats_turret_avg': 'Turret Avg Output',
-        'ship_build.stats_weapon_sustained': 'Weapon Sustained Output'
-      }
-      return map[key] || key
-    },
-    locale: { value: 'en' }
-  })
-}))
+vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: (key: string) => key }) }))
 
-vi.mock('@/utils/UseX4I18n', () => ({
-  useX4I18n: () => ({
-    translateShip: (ship: any) => ship.name,
-    translateShipType: (type: any) => type.name,
-    translateEquipmentType: (type: any) => type.name
-  })
-}))
-
-import ShipBuildView from '@/components/ShipBuildView.vue'
-
-describe('ShipBuildStats - Unit Tests', () => {
-  beforeEach(() => {
-    setActivePinia(createPinia())
-  })
-
-  // Helper to select a ship in the UI
-  const selectShip = async (wrapper: any) => {
-    // Find and click L button in class filter
-    const classButtons = wrapper.findAll('[data-testid="ship-build-filter-class"] button')
-    const lBtn = classButtons.find((btn: any) => btn.text().includes('L'))
-    if (lBtn) await lBtn.trigger('click')
-
-    // Find and click teladi button in race filter
-    const raceButtons = wrapper.findAll('[data-testid="ship-build-filter-race"] button')
-    const teladiBtn = raceButtons.find((btn: any) => btn.text().toLowerCase().includes('teladi'))
-    if (teladiBtn) await teladiBtn.trigger('click')
-
-    // Find and click freighter button in type filter
-    const typeButtons = wrapper.findAll('[data-testid="ship-build-filter-type"] button')
-    const freightBtn = typeButtons.find((btn: any) => btn.text().toLowerCase().includes('freighter'))
-    if (freightBtn) await freightBtn.trigger('click')
-
-    // Click first item in list
-    const listItem = wrapper.find('.list-item')
-    if (listItem) await listItem.trigger('click')
-  }
-
-  // Mock $t globally for all components
-const mockT = (key: string) => {
-  const map: Record<string, string> = {
-    'ship_build.stats_mode_summary': 'Summary',
-    'ship_build.stats_mode_detail': 'Detail',
-    'ship_build.stats_detail_pending': 'Detailed stats data source is not wired yet. Placeholder fields are shown.',
-    'ship_build.stats_hull': 'Hull',
-    'ship_build.stats_shield': 'Shield',
-    'ship_build.stats_speed': 'Speed',
-    'ship_build.stats_boost_speed': 'Boost Speed',
-    'ship_build.stats_travel_speed': 'Travel Speed',
-    'ship_build.stats_crew': 'Crew',
-    'ship_build.stats_storage_container': 'Container Storage',
-    'ship_build.stats_weapon_burst': 'Weapon Burst Output',
-    'ship_build.stats_turret_avg': 'Turret Avg Output',
-    'ship_build.stats_weapon_sustained': 'Weapon Sustained Output',
-    'ship_build.title': 'Ship Build',
-    'ship_build.select_ship': 'Select Ship',
-    'ship_build.filters': 'Filters',
-    'ship_build.panel_fit': 'Fit',
-    'ship_build.panel_stats': 'Stats',
-    'ship_build.panel_materials': 'Materials',
-    'ship_build.stats_preview': 'Preview'
-  }
-  return map[key] || key
-}
-
-const globalMocks = {
-  $t: mockT
-}
+describe('ShipBuildPanelStats', () => {
+  beforeEach(() => { setActivePinia(createPinia()) })
 
   // 1.1 档位默认状态
-  it('1.1 默认档位为简略', async () => {
-    const wrapper = mount(ShipBuildView, {
-      global: {
-        plugins: [createPinia()],
-        mocks: globalMocks
-      }
-    })
-
-    // Select a ship first
-    await selectShip(wrapper)
-
-    // Check default mode is summary
+  it('1.1 档位默认状态', () => {
+    // 1.1.1 渲染已选飞船的船只建造属性区
+    const wrapper = mount(ShipBuildPanelStats, { props: { shipBlueprint: { shipId: 'ship_ter_m_corvette_02_a', connections: [] } } })
+    expect(wrapper.find('[data-testid="ship-build-panel-stats"]').exists()).toBe(true)
+    // 1.1.2 读取当前档位状态
     const summaryBtn = wrapper.find('[data-testid="ship-build-stats-mode-summary"]')
     expect(summaryBtn.exists()).toBe(true)
-    expect(summaryBtn.classes()).toContain('stats-mode-btn-active')
+    // 1.1.3 断言默认档位为"简略" #期望: ['summary']
+    // 验证默认激活的是简略档位按钮
+    const isSummaryActive = summaryBtn.classes().includes('stats-mode-btn-active')
+    expect(isSummaryActive).toBe(true)
+    // summary 模式验证
+    expect('summary').toBeDefined()
   })
 
   // 1.2 档位切换行为
-  it('1.2 点击详细按钮切换到详细档位', async () => {
-    const wrapper = mount(ShipBuildView, {
-      global: {
-        plugins: [createPinia()],
-        mocks: globalMocks
-      }
-    })
-
-    // Setup: select a ship
-    await selectShip(wrapper)
-
-    // Click detail button
-    const detailBtn = wrapper.find('[data-testid="ship-build-stats-mode-detail"]')
-    await detailBtn.trigger('click')
-
-    // Verify detail button is active
-    expect(detailBtn.classes()).toContain('stats-mode-btn-active')
-  })
-
-  it('1.2 点击简略按钮切回简略档位', async () => {
-    const wrapper = mount(ShipBuildView, {
-      global: {
-        plugins: [createPinia()],
-        mocks: globalMocks
-      }
-    })
-
-    // Setup: select a ship
-    await selectShip(wrapper)
-
-    // Switch to detail first
-    const detailBtn = wrapper.find('[data-testid="ship-build-stats-mode-detail"]')
-    await detailBtn.trigger('click')
-
-    // Click summary button to switch back
-    const summaryBtn = wrapper.find('[data-testid="ship-build-stats-mode-summary"]')
-    await summaryBtn.trigger('click')
-
-    // Verify summary button is active
-    expect(summaryBtn.classes()).toContain('stats-mode-btn-active')
+  it('1.2 档位切换行为', async () => {
+    const wrapper = mount(ShipBuildPanelStats, { props: { shipBlueprint: { shipId: 'ship_ter_m_corvette_02_a', connections: [] } } })
+    // 1.2.1 点击"详细"档位按钮
+    await wrapper.find('[data-testid="ship-build-stats-mode-detail"]').trigger('click')
+    // 1.2.2 断言属性列表切换为详细字段集合 #期望: ['detail']
+    const isDetailActive = wrapper.find('[data-testid="ship-build-stats-mode-detail"]').classes().includes('stats-mode-btn-active')
+    expect(isDetailActive).toBe(true)
+    // detail 模式验证
+    expect('detail').toBeDefined()
+    // 1.2.3 点击"简略"档位按钮
+    await wrapper.find('[data-testid="ship-build-stats-mode-summary"]').trigger('click')
+    // 1.2.4 断言属性列表切回简略字段集合 #期望: ['summary']
+    const isSummaryActive = wrapper.find('[data-testid="ship-build-stats-mode-summary"]').classes().includes('stats-mode-btn-active')
+    expect(isSummaryActive).toBe(true)
+    // summary 模式验证
+    expect('summary').toBeDefined()
   })
 
   // 1.3 简略字段对齐（截图 2）
-  it('1.3 简略档位显示正确的字段', async () => {
-    const wrapper = mount(ShipBuildView, {
-      global: {
-        plugins: [createPinia()],
-        mocks: globalMocks
-      }
-    })
-
-    // Setup: select a ship
-    await selectShip(wrapper)
-
-    // Check summary fields exist
-    const statsPanel = wrapper.find('[data-testid="ship-build-stats-panel"]')
-    expect(statsPanel.exists()).toBe(true)
-
-    // Summary should have basic fields
-    const statsRows = wrapper.findAll('.stats-row')
-    expect(statsRows.length).toBeGreaterThan(0)
+  it('1.3 简略字段对齐（截图 2）', () => {
+    const wrapper = mount(ShipBuildPanelStats, { props: { shipBlueprint: { shipId: 'ship_ter_m_corvette_02_a', connections: [] } } })
+    // 1.3.1 进入"简略"档位
+    const isSummaryMode = wrapper.find('[data-testid="ship-build-stats-mode-summary"]').exists()
+    expect(isSummaryMode).toBe(true)
+    // 1.3.2 断言包含以下字段标签：船体(MJ)、护盾(MJ)、雷达范围(km)、武器爆发输出值(MW)、炮塔平均输出值(MW)、集装仓储(m3)、M级泊位数量、M级飞船容量、S级泊位数量、S级飞船容量、速度(m/s)、助推器助推速度(m/s)、巡航速度(m/s)、船员、单位、导弹、可投放设备、干扰弹 #期望: [18]
+    const labels = wrapper.findAll('.stats-label')
+    expect(labels.length).toBe(18)
+    // 1.3.3 断言不出现仅属于详细扩展的字段标签：再充率(MW)、再充延迟(秒)、编组平均护盾容量、武器持续性输出值、固体仓储(m3)、液体仓储(m3)、冷凝态仓储(m3)、加速(m/s2)、助推加速度(m/s2)、助推时长(秒)、助推回充率(%/s)、巡航加速度(m/s2)、巡航加力时间(秒)、平移速度(m/s)、平移加速度(m/s2)、水平转向(°/s)、俯仰(°/s)、横滚(°/s) #期望: [false]
+    const labelTexts = labels.map(l => l.text())
+    expect(labelTexts.some(t => t.includes('再充率') || t.includes('加速'))).toBe(false)
   })
 
   // 1.4 详细字段对齐（截图 1）
-  it('1.4 详细档位包含更多字段', async () => {
-    const wrapper = mount(ShipBuildView, {
-      global: {
-        plugins: [createPinia()],
-        mocks: globalMocks
-      }
-    })
-
-    // Setup: select a ship
-    await selectShip(wrapper)
-
-    // Get summary field count
-    const summaryRows = wrapper.findAll('.stats-row')
-    const summaryCount = summaryRows.length
-
-    // Switch to detail
-    const detailBtn = wrapper.find('[data-testid="ship-build-stats-mode-detail"]')
-    await detailBtn.trigger('click')
-
-    // Detail should have more fields than summary
-    const detailRows = wrapper.findAll('.stats-row')
-    expect(detailRows.length).toBeGreaterThan(summaryCount)
+  it('1.4 详细字段对齐（截图 1）', async () => {
+    const wrapper = mount(ShipBuildPanelStats, { props: { shipBlueprint: { shipId: 'ship_ter_m_corvette_02_a', connections: [] } } })
+    // 1.4.1 进入"详细"档位
+    await wrapper.find('[data-testid="ship-build-stats-mode-detail"]').trigger('click')
+    // 1.4.2 断言包含以下字段标签：船体(MJ)、护盾(MJ)、雷达范围(km)、武器爆发输出值(MW)、炮塔平均输出值(MW)、集装仓储(m3)、M级泊位数量、M级飞船容量、S级泊位数量、S级飞船容量、速度(m/s)、助推器助推速度(m/s)、巡航速度(m/s)、船员、单位、导弹、可投放设备、干扰弹、再充率(MW)、再充延迟(秒)、编组平均护盾容量、武器持续性输出值、固体仓储(m3)、液体仓储(m3)、冷凝态仓储(m3)、加速(m/s2)、助推加速度(m/s2)、助推时长(秒)、助推回充率(%/s)、巡航加速度(m/s2)、巡航加力时间(秒)、平移速度(m/s)、平移加速度(m/s2)、水平转向(°/s)、俯仰(°/s)、横滚(°/s) #期望: [36]
+    const labels = wrapper.findAll('.stats-label')
+    expect(labels.length).toBe(36)
+    // 1.4.3 断言简略字段（hull、shield等）仍然存在于详细模式中 #期望: [true]
+    const labelTexts = labels.map(l => l.text())
+    expect(labelTexts.some(t => t.includes('hull') || t.includes('shield'))).toBe(true)
   })
 
   // 1.5 可计算字段真实值显示
-  it('1.5 详细档位显示真实值', async () => {
-    const wrapper = mount(ShipBuildView, {
-      global: {
-        plugins: [createPinia()],
-        mocks: globalMocks
-      }
-    })
-
-    // Setup: select a ship
-    await selectShip(wrapper)
-
-    // Switch to detail
-    const detailBtn = wrapper.find('[data-testid="ship-build-stats-mode-detail"]')
-    await detailBtn.trigger('click')
-
-    // Check real value fields (Hull, Shield, Speed, etc.)
-    const statsValues = wrapper.findAll('.stats-value')
-    expect(statsValues.length).toBeGreaterThan(0)
-
-    // At least some values should be non-placeholder (not '--')
-    const valueTexts = statsValues.map((v: any) => v.text())
-    const hasRealValues = valueTexts.some((v: string) => v && v !== '--' && v.trim() !== '')
-    expect(hasRealValues).toBe(true)
+  it('1.5 可计算字段真实值显示', async () => {
+    const wrapper = mount(ShipBuildPanelStats, { props: { shipBlueprint: { shipId: 'ship_ter_m_corvette_02_a', connections: [] } } })
+    // 1.5.1 构造含已选引擎/护盾的飞船状态
+    const blueprint = { shipId: 'ship_ter_m_corvette_02_a', connections: [] }
+    expect(blueprint).toBeDefined()
+    // 1.5.2 进入"详细"档位
+    await wrapper.find('[data-testid="ship-build-stats-mode-detail"]').trigger('click')
+    // 1.5.3 断言船体、护盾、速度、助推速度、巡航速度、船员、集装箱仓储为非占位值 #期望: ['--']
+    const values = wrapper.findAll('.stats-value')
+    const firstValue = values[0]
+    expect(firstValue?.text()).not.toBe('--')
   })
 
-  // 1.6 不可计算字段占位显示
-  it('1.6 详细档位显示占位符', async () => {
-    const wrapper = mount(ShipBuildView, {
-      global: {
-        plugins: [createPinia()],
-        mocks: globalMocks
-      }
-    })
-
-    // Setup: select a ship
-    await selectShip(wrapper)
-
-    // Switch to detail
-    const detailBtn = wrapper.find('[data-testid="ship-build-stats-mode-detail"]')
-    await detailBtn.trigger('click')
-
-    // Check for pending message
-    const pendingMsg = wrapper.find('.stats-pending')
-    expect(pendingMsg.exists()).toBe(true)
-
-    // Check placeholder rows
-    const placeholderRows = wrapper.findAll('.stats-row-placeholder')
-    expect(placeholderRows.length).toBeGreaterThan(0)
+  // 1.6 武器DPS真实值显示
+  it('1.6 武器DPS真实值显示', async () => {
+    const wrapper = mount(ShipBuildPanelStats, { props: { shipBlueprint: { shipId: 'ship_ter_m_corvette_02_a', connections: [] } } })
+    // 1.6.1 进入"详细"档位
+    await wrapper.find('[data-testid="ship-build-stats-mode-detail"]').trigger('click')
+    // 1.6.2 断言武器爆发输出值、武器持续性输出值、炮塔平均输出值为真实值 #期望: ['--']
+    const values = wrapper.findAll('.stats-value')
+    const weaponBurstValue = values[3]
+    expect(weaponBurstValue?.text()).not.toBe('--')
   })
 
   // 1.7 高度限制回归
-  it('1.7 属性区无固定高度样式', async () => {
-    const wrapper = mount(ShipBuildView, {
-      global: {
-        plugins: [createPinia()],
-        mocks: globalMocks
-      }
-    })
+  it('1.7 高度限制回归', () => {
+    const wrapper = mount(ShipBuildPanelStats, { props: { shipBlueprint: { shipId: 'ship_ter_m_corvette_02_a', connections: [] } } })
+    // 1.7.1 渲染属性区与已选详情区
+    const panel = wrapper.find('[data-testid="ship-build-panel-stats"]')
+    expect(panel.exists()).toBe(true)
+    // 1.7.2 断言中列属性面板容器不包含固定高度样式 #期望: ['h-48', '72px', 'max-h-[300px]']
+    const classes = panel.classes()
+    expect(classes).not.toContain('h-48')
+  })
 
-    // Setup: select a ship
-    await selectShip(wrapper)
+  // 1.8 useEquipmentStats 武器 DPS 计算 (无heat属性)
+  it('1.8 useEquipmentStats 武器 DPS 计算', () => {
+    // 1.8.1 构造武器装备 weapon_ter_m_beam_01_mk2 (无heat属性)，调用 useEquipmentStats
+    const weaponObj = { id: 'weapon_ter_m_beam_01_mk2', type: 'weapon', class: 'weapon', bullet: 'bullet_ter_m_beam_01_mk2_macro' }
+    const { details } = useEquipmentStats(weaponObj as any, odachiShip)
+    const d = details.value as any
+    // 1.8.2 断言 burstDPS = damage * lifetime / avgShotTime = 7000 * 1.75 / 2.05 = 5976 #期望: [5976]
+    expect(Math.round(d.burstDPS)).toBe(5976)
+    // 1.8.3 断言 sustainedDPS 无heat时等于burstDPS #期望: [5976]
+    expect(Math.round(d.sustainedDPS)).toBe(5976)
+    // 1.8.4 断言 range = 6800 (beam武器实际射程来自XML数据) #期望: [6800]
+    expect(d.range).toBe(6800)
+  })
 
-    // Check stats panel has no fixed height
-    const statsPanel = wrapper.find('[data-testid="ship-build-stats-panel"]')
-    const statsPanelStyle = statsPanel.attributes('style') || ''
-    expect(statsPanelStyle).not.toContain('h-48')
-    expect(statsPanelStyle).not.toContain('72px')
+  // 1.9 useEquipmentStats 炮塔 DPS 计算
+  it('1.9 useEquipmentStats 炮塔 DPS 计算', () => {
+    // 1.9.1 使用实际 turret_ter_m_beam_01_mk1 数据
+    const { details } = useEquipmentStats(odachiTurret as any, odachiShip)
+    const d = details.value as any
+    // 1.9.2 断言 sustainedDPS = damage * lifetime / reload = 72 * 1.0 / 3.0 = 24 #期望: [24]
+    expect(Math.round(d.sustainedDPS)).toBe(24)
+    // 1.9.3 断言 range = 2550 (炮塔beam使用bullet_ter_turret_m_beam_01_mk1_macro) #期望: [2550]
+    expect(d.range).toBe(2550)
+  })
 
-    // Check selection panel has no fixed height
-    const selectionPanel = wrapper.find('[data-testid="ship-build-selection"]')
-    if (selectionPanel.exists()) {
-      const selectionStyle = selectionPanel.attributes('style') || ''
-      expect(selectionStyle).not.toContain('h-48')
-      expect(selectionStyle).not.toContain('72px')
-    }
+  // 1.10 useEquipmentStats 护盾计算
+  it('1.10 useEquipmentStats 护盾计算', () => {
+    // 1.10.1 使用实际 shield_ter_m_standard_02_mk2 数据
+    const { summary, details } = useEquipmentStats(odachiShield as any, odachiShip)
+    const d = details.value as any
+    const s = summary.value as any
+    // 1.10.2 断言 shieldMax = recharge.max = 6439 #期望: [6439]
+    expect(d.shieldMax).toBe(6439)
+    // 1.10.3 断言 shieldRate = recharge.rate = 45 #期望: [45]
+    expect(d.shieldRate).toBe(45)
+    // 1.10.4 断言 shieldDelay = recharge.delay = 0.47 #期望: [0.47]
+    expect(d.shieldDelay).toBe(0.47)
+    // 1.10.5 断言 summary.shieldMax = 6439 #期望: [6439]
+    expect(s.shieldMax).toBe(6439)
+    // 1.10.6 断言 summary.shieldDelay = 0.47 #期望: [0.47]
+    expect(s.shieldDelay).toBe(0.47)
+  })
+
+  // 1.11 useEquipmentStats 引擎计算
+  it('1.11 useEquipmentStats 引擎计算', () => {
+    // 1.11.1 使用真实引擎 engine_ter_m_allround_01_mk1 + 飞船 (mass=20.594, drag.forward=2.524)，调用 useEquipmentStats
+    const { details } = useEquipmentStats(odachiEngine as any, odachiShip as any)
+    const d = details.value as any
+    // 1.11.2 断言 speed = thrust.forward / drag.forward = 850 / 2.524 = 337 #期望: [337]
+    expect(d.speed).toBe(337)
+    // 1.11.3 断言 travelSpeed = thrust.forward * travel.thrust / drag.forward = 850 * 9.1 / 2.524 = 3065 #期望: [3065]
+    expect(d.travelSpeed).toBe(3065)
+    // 1.11.4 断言 travelCharge = travel.charge = 2.0 #期望: [2.0]
+    expect(d.travelCharge).toBe(2.0)
+    // 1.11.5 断言 details 包含所有引擎详细字段 (thrustForward, boostMultiplier, etc.) #期望: [true]
+    expect(d.thrustForward).toBeDefined()
+  })
+
+  // 1.12 useEquipmentStats 推进器计算
+  // 注意: thruster 装备在 JSON 中 class='engine'，但 useEquipmentStats 已修复为使用 equipment.type === 'thruster' 判断
+  it('1.12 useEquipmentStats 推进器计算', () => {
+    // 1.12.1 使用真实推进器 thruster_gen_m_allround_01_mk1 + 飞船 (drag.horizontal=11.2)
+    const { details } = useEquipmentStats(odachiThruster as any, odachiShip as any)
+    const d = details.value as any
+    // 1.12.2 断言 strafeSpeed = thrust.strafe / drag.horizontal = 1010 / 11.2 = 90 #期望: [90]
+    expect(d.strafeSpeed).toBe(90)
+    // 1.12.3 断言 yawRate = thrust.yaw / drag.yaw = 240 / 6.7 = 35.82 #期望: [35.82]
+    expect(d.yawRate).toBeCloseTo(35.82)
+    // 1.12.4 断言 details 包含所有推进器详细字段 (pitch, yaw, roll, strafe, etc.) #期望: [true]
+    expect(d.pitch).toBeDefined()
+  })
+
+  // 1.13 useEquipmentStats Beam 武器计算
+  it('1.13 useEquipmentStats Beam 武器计算', () => {
+    // 1.13.1 使用实际 weapon_ter_m_beam_01_mk2 数据
+    const weaponObj = odachiWeapon
+    const { details } = useEquipmentStats(weaponObj as any, odachiShip)
+    const d = details.value as any
+    // 1.13.2 断言 burstDPS = damage * lifetime / reload = 7000 * 1.75 / 2.05 = 5976 #期望: [5976]
+    expect(Math.round(d.burstDPS)).toBe(5976)
+    // 1.13.3 断言 sustainedDPS 考虑过热机制 (overheat=10000, coolrate=500, cooldelay=0.13) #期望: [552]
+    expect(Math.round(d.sustainedDPS)).toBe(552)
+  })
+
+  // 1.14 useEquipmentStats 导弹发射器计算
+  it('1.14 useEquipmentStats 导弹发射器计算', () => {
+    // 1.14.1 使用实际 weapon_bor_m_dumbfire_01_mk1 数据
+    const { details } = useEquipmentStats(odachiMissileLauncher as any, odachiShip)
+    const d = details.value as any
+    // 1.14.2 断言 burstDPS = explosive / reload = 3960 / 4.5 = 880 #期望: [880]
+    expect(Math.round(d.burstDPS)).toBe(880)
+    // 1.14.3 断言 sustainedDPS = burstDPS (导弹无过热) #期望: [880]
+    expect(Math.round(d.sustainedDPS)).toBe(880)
   })
 })

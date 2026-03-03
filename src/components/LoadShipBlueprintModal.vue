@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { useX4I18n } from '@/utils/UseX4I18n'
 import { computed, watch } from 'vue'
+
+const { translateShip, translateEquipmentType } = useX4I18n()
 
 const props = defineProps<{
   isOpen: boolean
@@ -23,9 +26,71 @@ watch(() => props.isOpen, (isOpen) => {
 const blueprints = computed(() => store.savedBlueprints?.list || [])
 
 const getShipName = (shipId: string) => {
-  // Try to get translated ship name from game data
-  // For now, return the ship ID
-  return shipId
+  // 从 ships 数组中查找飞船并本地化
+  const ship = store.ships.find(s => s.id === shipId)
+  return ship ? translateShip(ship) : shipId
+}
+
+const getEquipmentStats = (blueprint: typeof store.savedBlueprints.list[0]) => {
+  // 按 slot_type + size 分组统计
+  const stats: Record<string, Record<string, number>> = {}
+  const sizeOrder = ['extralarge', 'large', 'medium', 'small']
+  const sizePrefix: Record<string, string> = {
+    extralarge: 'XL',
+    large: 'L',
+    medium: 'M',
+    small: 'S'
+  }
+  const offShieldKey = 'off_shield'
+
+  blueprint.connections.forEach(conn => {
+    const slotType = conn.slot_type
+
+    // 获取本地化的装备类型名称
+    const equipmentType = store.equipmentTypes.find(et => et.id === slotType)
+    const typeName = equipmentType ? translateEquipmentType(equipmentType) : slotType
+
+    conn.group.forEach(g => {
+      // 主装备统计，按大小分组
+      if (g.equipment_id) {
+        const equip = store.equipments.find(e => e.id === g.equipment_id)
+        const size = equip?.size || 'medium'
+        if (!stats[typeName]) {
+          stats[typeName] = {}
+        }
+        stats[typeName][size] = (stats[typeName][size] || 0) + g.count
+      }
+      // 副盾统计（护盾挂载在其他装备上），按大小分组
+      if (g.shield && g.shield.equipment_id) {
+        const shieldEquip = store.equipments.find(e => e.id === g.shield!.equipment_id)
+        const shieldSize = shieldEquip?.size || 'medium'
+        if (!stats[offShieldKey]) {
+          stats[offShieldKey] = {}
+        }
+        stats[offShieldKey][shieldSize] = (stats[offShieldKey][shieldSize] || 0) + g.shield.count
+      }
+    })
+  })
+
+  // 转换为显示字符串，按大小顺序 XL > L > M > S，副盾排最后
+  const parts: string[] = []
+  const sortedEntries = Object.entries(stats).sort(([a], [b]) => {
+    if (a === offShieldKey) return 1
+    if (b === offShieldKey) return -1
+    return 0
+  })
+  sortedEntries.forEach(([typeKey, sizeCounts]) => {
+    // 将 off_shield 键转换为本地化名称
+    const typeName = typeKey === offShieldKey ? t('shipBuild.shield_secondary') : typeKey
+    sizeOrder.forEach(size => {
+      const count = sizeCounts?.[size]
+      if (count && count > 0) {
+        parts.push(`${sizePrefix[size]}${typeName}x${count}`)
+      }
+    })
+  })
+
+  return parts.join(', ') || '-'
 }
 
 const getConnectionCount = (blueprint: typeof store.savedBlueprints.list[0]) => {
@@ -92,9 +157,13 @@ const handleDeleteBlueprint = (id: string) => {
             </div>
           </div>
 
-          <div
-            class="text-sm text-slate-300 mb-4 line-clamp-2 leading-relaxed bg-slate-800/50 p-2 rounded border border-slate-700/50">
-            {{ getShipName(bp.shipId) }}
+          <div class="space-y-1 mb-4">
+            <div class="text-sm text-slate-300 leading-relaxed bg-slate-800/50 p-2 rounded border border-slate-700/50">
+              {{ getShipName(bp.shipId) }}
+            </div>
+            <div class="text-sm text-slate-400 leading-relaxed bg-slate-800/50 p-2 rounded border border-slate-700/50">
+              {{ getEquipmentStats(bp) }}
+            </div>
           </div>
 
           <div class="flex items-center gap-3 pt-2 border-t border-slate-700/50">

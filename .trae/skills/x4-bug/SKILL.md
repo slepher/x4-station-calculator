@@ -6,7 +6,7 @@ description: "Report and track bugs for X4 project. Invoke /x4:bug to record iss
 # X4 Bug Reporting
 
 This skill is report-only for `/x4:bug`.
-It records bug artifacts and prepares reproduction tasks.
+It records bug artifacts and owns bug tracking state.
 
 ## Input
 
@@ -32,11 +32,16 @@ It records bug artifacts and prepares reproduction tasks.
 
 - `/x4:bug` MUST:
   - record or update bug entries in `bugs.md`
-  - add or refresh reproduction tasks in `test_tasks.md`
-  - sync `ui_knowledge.md` when reproduction is Web Integration
+  - maintain bug id/status lifecycle and test linkage metadata
 - `/x4:bug` MUST NOT:
+  - directly edit `test_tasks.md` / `ui_knowledge.md`
+  - redefine test documentation formats
   - implement source-code fixes in `src/**`
   - run bug-fix verification as if code has changed
+
+Documentation ownership rule:
+- If reproduction tasks or UI test knowledge must be added/updated, delegate to `/x4:test-doc`.
+- `x4-test-doc` remains the authority for `test_tasks.md` / `ui_knowledge.md`.
 
 ## Target Resolution Priority (MANDATORY)
 
@@ -74,14 +79,13 @@ When target descriptions are ambiguous or conflicting:
 
 ### Step 2: Generate Reproduction Task
 
-1. Add reproduction item to `test_tasks.md`
-2. Link the task to the bug via `**Related Test**`
-3. Include `**Bug现状**` to describe current broken behavior
+1. Request/update reproduction task via `/x4:test-doc` (do not edit directly in this skill)
+2. Link bug entry to target test id in `bugs.md` via `**Related Test**`
+3. Keep bug-side reproduction description in `bugs.md` only
 
 ### Step 3: Sync UI Knowledge (Web Integration only)
 
-If the reproduction task is Web Integration, update `ui_knowledge.md` with locator/flow additions.
-Follow `x4-doc` sync conventions for `test_tasks.md` and `ui_knowledge.md` consistency.
+If the reproduction task is Web Integration, delegate `ui_knowledge.md` updates to `/x4:test-doc`.
 
 ### Step 4: Handoff to Fix Phase
 
@@ -94,10 +98,12 @@ If a reported bug is unrelated to any existing change:
 
 1. Stop and ask whether to create a new change: `fix-<bug-name>`.
 2. Only create the new change after user confirmation.
-3. If confirmed, create initial bug artifacts under that change (`bugs.md`, `test_tasks.md`, `ui_knowledge.md` if needed).
-4. Continue using standard workflow.
+3. If confirmed, create initial bug artifact `bugs.md` under that change.
+4. If test docs are needed, delegate to `/x4:test-doc`.
+5. Continue using standard workflow.
 
 ## Constraints
 
 - Keep all edits scoped to current change documentation.
+- Keep `bugs.md` as primary bug-tracking source; avoid duplicating full bug state in test docs.
 - Do not run fix verification loops in this skill.

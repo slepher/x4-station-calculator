@@ -78,3 +78,27 @@
 
 - [x] 10.1 Run `npm run build` to verify no compile errors
 - [x] 10.2 Fix any build errors if they occur
+
+## 11. LoadShipBlueprintModal Display Optimization
+
+- [x] 11.1 Add `getShipName(shipId)` function to LoadShipBlueprintModal
+  - Find X4Ship from ships array by shipId
+  - Return ship.name (localized name) using translateShip()
+- [x] 11.2 Add `getEquipmentStats(blueprint)` function to LoadShipBlueprintModal
+  - Iterate blueprint.connections to collect equipment counts by type and size
+  - Use translateEquipmentType() for localized type names
+  - Group by size: XL > L > M > S
+  - Special rule: shield attached to other equipment displays as "副盾"
+  - Sort connections by fixed order: engine→thruster→shield→weapon→turret
+  - Off-shield (副盾) displayed last
+- [x] 11.3 Update LoadShipBlueprintModal template:
+  - Ship name and equipment stats in two separate rows
+- [x] 11.4 Add i18n keys (shipBuild.shield_secondary)
+- [x] 11.5 Sort connections by fixed order in store layer
+  - Add sorting in cleanupEmptyGroups() and loadBlueprint()
+  - Order: engine→thruster→shield→weapon→turret
+
+## 12. Build Validation (New Feature)
+
+- [x] 12.1 Run `npm run build` to verify no compile errors
+- [x] 12.2 Fix any build errors if they occur

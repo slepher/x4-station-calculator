@@ -1,6 +1,6 @@
 ---
 name: x4-doc
-description: "Update OpenSpec planning artifacts for X4 (`request/spec/design/tasks/test_tasks/ui_knowledge`) based on discussion conclusions, with mandatory cross-file sync."
+description: "Update OpenSpec planning artifacts for X4 (`request/spec/design/tasks`) based on discussion conclusions, with mandatory cross-file sync. Test docs delegated to x4-test-doc."
 ---
 
 # X4 Documentation Update
@@ -20,10 +20,11 @@ Update OpenSpec planning artifacts based on discussion conclusions, and keep req
 `x4-doc` is the single source of truth for document details used by both `/x4:new` and `/x4:ff`, including:
 - document structure and content conventions
 - writing style and localization rules
-- test documentation conventions (`test_tasks.md`, `ui_knowledge.md`)
 - documentation synchronization/update rules
 
 `x4-new` and `x4-ff` should orchestrate progression only and must not redefine these details.
+
+**Test Documentation Authority**: Test documentation details (`test_tasks.md`, `ui_knowledge.md`) are delegated to `/x4:test-doc` skill.
 
 ## Parameters
 
@@ -46,13 +47,13 @@ Update OpenSpec planning artifacts based on discussion conclusions, and keep req
 ## Actions
 
 1. Resolve change target and load existing planning artifacts in `openspec/changes/<change-name>/`.
-2. Create or update affected artifacts: `request.md`, `design.md`, `tasks.md`, `test_tasks.md`, `ui_knowledge.md`, and `specs/<feature>/spec.md` when applicable.
-3. Apply Delta Structures if modifying existing specs.
+2. Create or update affected artifacts: `request.md`, `design.md`, `tasks.md`, `specs/<feature>/spec.md` when applicable.
+3. For test documentation updates (`test_tasks.md`, `ui_knowledge.md`), delegate to `/x4:test-doc` skill.
+4. Apply Delta Structures if modifying existing specs.
 4. Ensure localization matches user language.
 5. Enforce cross-file consistency:
-   - requirement/DoD changes must be reflected in `tasks.md` and `test_tasks.md`;
-   - Web Integration test changes must be synced into `ui_knowledge.md`;
-   - fixture-backed product/module mentions must sync into `ui_knowledge.md`.
+   - requirement/DoD changes must be reflected in `tasks.md`;
+   - Test documentation updates are delegated to `/x4:test-doc`.
 
 ## Project Standards (MANDATORY)
 
@@ -128,142 +129,13 @@ When generating or translating spec documents (`.md` in `openspec/`), **YOU MUST
 
 - **Feature Folders**: All specs MUST reside in a feature-specific subdirectory under `specs/` (e.g., `specs/title-as-plan-title/spec.md`). Do NOT place spec files directly in `specs/`.
 
-### 5. UI Knowledge Baseline + Fixture Sync (MANDATORY)
+### 5. Test Documentation Delegation (MANDATORY)
 
-For every `/x4:doc` run, `openspec/changes/<change-name>/ui_knowledge.md` is a required artifact:
+For test documentation updates (`test_tasks.md`, `ui_knowledge.md`), delegate to `/x4:test-doc` skill:
+- Do NOT directly modify `test_tasks.md` or `ui_knowledge.md` in `/x4:doc`.
+- Use `/x4:test-doc` for all test documentation changes.
 
-- MUST ensure `ui_knowledge.md` exists for the current change.
-- If missing, create it in the same documentation pass.
-- MUST keep it synchronized with `test_tasks.md` whenever test-relevant semantics change.
-
-### 5.1 Fixture-to-UI Knowledge Sync (MANDATORY)
-
-When `/x4:doc` updates test-related docs, you **MUST** sync fixture-backed product/module data into `openspec/changes/<change-name>/ui_knowledge.md`:
-
-- **Source files**:
-  - `tests/fixtures/ware_fixtures.yaml`
-  - `tests/fixtures/module_fixtures.yaml`
-- **Trigger condition**:
-  - `test_tasks.md` (or discussion conclusions) mentions specific products/modules
-- **Required update**:
-  - Add or update a section in `ui_knowledge.md` that maps:
-    - Test keyword → fixture ware/module id
-    - Display name (EN/CN if available)
-    - Recommended locator/assertion target used in tests
-- **If `ui_knowledge.md` does not exist**:
-  - Create `openspec/changes/<change-name>/ui_knowledge.md` and include the fixture mapping section
-- **Consistency rule**:
-  - Keep naming in `test_tasks.md` and `ui_knowledge.md` aligned with fixture ids (avoid ad-hoc aliases unless explicitly documented)
-
-### 6. test_tasks Step Style (MANDATORY)
-
-When creating or updating `test_tasks.md` via `/x4:doc`, use the following generation rules:
-
-1. Generate from requirements, not summaries:
-   - Split each DoD / scenario into independent test items.
-   - Keep branch paths separate (e.g., 覆盖导入 / 新建导入 / 帝国导入).
-2. Write operation-level steps (`步骤 1..n`) for every item:
-   - Unit: 输入准备 -> 函数调用 -> 结果断言。
-   - Web: 页面入口 -> 用户操作 -> 可观察结果断言。
-3. Keep `test_tasks.md` human-review oriented:
-   - Describe user-facing operations and expected results.
-   - Do NOT include locator/API/automation implementation details.
-4. Put implementation details in `ui_knowledge.md`:
-   - Locators, scoped selectors, fixture ids, and automation notes belong to `ui_knowledge.md`.
-   - If Web steps change, sync corresponding locator/flow updates to `ui_knowledge.md` in the same update.
-5. Avoid non-executable wording:
-   - Do not use only “用例/验证” bullets without actionable steps.
-6. Ban vague placeholder descriptions:
-   - MUST NOT use vague placeholders that cannot be executed or verified in both operation and assertion steps.
-   - Terms like `某个` / `任一` / `或` are allowed only when they remain rigorous:
-     - the selectable scope is explicitly defined;
-     - the selection condition is explicitly defined;
-     - the verification criterion is explicitly defined.
-
-### 6.4 Test Environment Knowledge (MANDATORY)
-
-- When test implementation requires preloaded data, use `tests/fixtures/db.json` in `beforeEach` to seed the environment.
-- `db.json` is generated from `tests/seeds/*.yaml`. If dynamic UI elements need validation, derive expected data from the corresponding seed content.
-- This is knowledge for test implementation only; do NOT add it as checklist items in `test_tasks.md`.
-
-### 6.1 Requirement-Change Test Migration (MANDATORY)
-
-When requirements change and existing `test_tasks.md` steps become unexecutable:
-
-1. Replace obsolete interaction steps with executable steps for the new flow in the same update.
-2. Do NOT leave contradictory old wording (e.g., removed controls such as old “继续” flow) in active checklist items.
-3. Keep historical execution records, but add a migration note that defines the new valid regression scope.
-4. If old `[x]` items no longer represent the current behavior, add corresponding new regression items as unchecked and explicitly mark them as the current baseline.
-
-### 6.1.1 E2E Two-Chapter Layout (MANDATORY)
-
-When writing `test_tasks.md`, E2E MUST be split into two chapters **at initial generation time** (not as a later patch):
-
-- Use **document-global chapter numbering**.
-- If E2E starts at chapter `N`, it MUST occupy chapter `N` and chapter `N+1`.
-- Any subsequent sections MUST be renumbered to keep chapter order continuous and non-overlapping.
-
-1. Bootstrapping & State chapter
-   - startup checks
-   - fixture/data preloading checks
-   - initial state checks (`状态：` mapped items)
-   - state-switch checks (`切换：` mapped items)
-2. Scenario Content chapter
-   - business behavior and user-flow assertions
-   - all non-state scenario coverage
-
-### 6.2 State + Transition Chapter in `test_tasks.md` (MANDATORY)
-
-When tests depend on reusable states, `test_tasks.md` must use a simplified model: explicit states and explicit state-switch paths.
-
-1. `test_tasks.md` state/switch section MUST include:
-   - state list (`状态：<id>`)
-   - state-switch list (`切换：<from>-><to>`)
-   - only include necessary state-switch items that are consumed by scenario tests; do not model full pairwise transitions.
-2. Do not use complex dependency-loading graphs as the primary mechanism.
-   - keep execution intent explicit via switch paths.
-3. Scenario items should clearly indicate required state/switch prerequisites when needed.
-4. Keep `test_tasks.md` concise:
-   - no locator/probe/automation details in `test_tasks.md`
-   - detailed semantics belong to `ui_knowledge.md`
-5. Do not add meta checklist items (e.g., consumer-scope note, checkbox-ownership note) in `test_tasks.md`;
-   checkbox ownership rules are maintained by `x4-test` skill.
-
-### 6.3 Standard State Task Contract (MANDATORY)
-
-When requirements introduce reusable states, `x4-doc` MUST document both state tests and state-switch tests as first-class checklist items.
-
-1. State item structure in `test_tasks.md`:
-   - keep state ids and switch ids as executable checklist units
-   - avoid implicit inference wording
-2. Transition wording:
-   - each transition item should be expressible as:
-     - assert from-state -> execute switch actions -> assert to-state
-3. Mid-run insertion rule:
-   - if a new state or switch is introduced, update both files in one pass:
-     - `test_tasks.md`: add state/switch checklist entries and scenario references
-     - `ui_knowledge.md`: add corresponding build/assert/switch semantics
-4. Multiple baselines rule:
-   - multiple baseline states are allowed and independent.
-   - each baseline and each baseline-related switch needs its own checklist entry.
-
-### 6.3.1 Standard State Update Scope (MANDATORY)
-
-When the user request **contains a test standard-state portion** (e.g. “标准状态”, state setup path, state-switch preconditions):
-
-1. For the standard-state portion, allowed files are strictly:
-   - `openspec/changes/<change-name>/test_tasks.md`
-   - `openspec/changes/<change-name>/ui_knowledge.md`
-2. For the standard-state portion, MUST NOT update:
-   - `request.md`, `design.md`, `tasks.md`, `specs/**/spec.md`
-   unless the user explicitly asks to change product requirements/design/spec at the same time.
-3. If the same request also includes non-standard-state changes, process those parts with normal `x4-doc` rules.
-4. Keep cross-file sync within test artifacts only:
-   - state checklist/steps in `test_tasks.md`
-   - state actions/probes/locators semantics in `ui_knowledge.md`
-5. Do not promote standard-state test detail into requirement/DoD narrative by default.
-
-### 7. Task Scope Boundary (MANDATORY)
+### 6. Task Scope Boundary (MANDATORY)
 
 When creating or updating planning artifacts:
 

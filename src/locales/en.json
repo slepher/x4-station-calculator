@@ -79,16 +79,22 @@
     "fit_compatibility": "Equipment Compatibility",
     "fit_no_tags": "No tags",
     "fit_no_equipment": "No available equipment",
+    "fit_empty_slot": "Empty Slot",
+    "fit_mixed_selection": "Mixed Types",
+    "fit_picker_title": "Equipment Picker",
+    "fit_candidate_list": "Candidates",
+    "fit_picker_confirm": "Confirm",
     "fit_shield_generator": "Shield Generator",
     "stats_preview": "Ship Stats Preview",
     "stats_mode_summary": "Summary",
     "stats_mode_detail": "Detail",
     "stats_detail_pending": "Detailed stats data source is not wired yet. Placeholder fields are shown.",
     "stats_hull": "Hull",
-    "stats_storage_unit": "Unit Storage",
+    "stats_storage_unit": "Drone Storage",
     "stats_storage_container": "Container Storage",
     "stats_storage_solid": "Solid Storage",
     "stats_storage_liquid": "Liquid Storage",
+    "stats_storage_condensed": "Condensed Storage",
     "stats_crew": "Crew",
     "stats_missile": "Missile Capacity",
     "stats_weapon_slots": "Weapon Slots",
@@ -109,6 +115,7 @@
     "stats_shield": "Shield",
     "stats_shield_recharge_rate": "Recharge Rate",
     "stats_shield_recharge_delay": "Recharge Delay",
+    "stats_shield_group_avg": "Group Avg Shield",
     "stats_radar_range": "Radar Range",
     "stats_weapon_burst": "Weapon Burst Output",
     "stats_weapon_sustained": "Weapon Sustained Output",
@@ -198,7 +205,9 @@
     "btn_discard_and_new": "Discard & New",
     "btn_save_new_and_create": "Save & Create New",
     "btn_overwrite_and_create": "Overwrite & Create New",
-    "btn_save": "Save"
+    "btn_save": "Save",
+    "default_blueprint_name": "New Blueprint",
+    "blueprint": "Blueprint"
   },
   "planning": {
     "module_list": "Station Modules",
@@ -232,7 +241,7 @@
     "confirm_load_with_unsaved": "Current configuration has unsaved changes. Load anyway?",
     "confirm_new_with_unsaved": "Current configuration has unsaved changes. Create new anyway?",
     "connections_count": "connections",
-    "default_blueprint_name": "New Blueprint"
+    "shield_secondary": "Shield (Secondary)"
   },
   "wareflow": {
     "resource_overview": "Resource Production",

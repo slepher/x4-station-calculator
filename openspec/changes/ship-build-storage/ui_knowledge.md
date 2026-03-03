@@ -221,6 +221,12 @@ localStorage.removeItem('x4_ship_blueprints')
 // blueprint 名称
 '.blueprint-item .blueprint-name'
 
+// 飞船名称（第一行）
+'.blueprint-item > div:first-child'
+
+// 装备统计（第二行）
+'.blueprint-item > div:nth-child(2)'
+
 // 删除按钮（动态 ID）
 '[data-testid="load-blueprint-modal"] .blueprint-delete-btn[data-blueprint-id="${id}"]'
 
@@ -314,3 +320,23 @@ localStorage.removeItem('x4_ship_blueprints')
 - `test_tasks.md` 的场景步骤基于本文件的"建立动作"实现
 - 本 change 依赖 `ship-build-equipment` 的飞船选择和配装操作基线
 - 本 change 不涉及 `tests/fixtures/ware_fixtures.yaml` 与 `module_fixtures.yaml` 的产品/模块映射要求
+
+---
+
+## 测试运行
+
+### LoadShipBlueprintModal 显示优化测试结果
+
+- [✓] 3.15 Load弹窗显示本地化飞船名称
+- [✓] 3.16 Load弹窗装备按类型+大小分组显示
+- [✓] 3.17 Load弹窗装备大小排序XL>L>M>S
+- [✓] 3.18 Load弹窗副盾单独显示且排最后
+- [✓] 3.19 Load弹窗副盾按大小分组
+- [✓] 3.20 保存后connections按固定顺序排列
+- [✗] 3.21 载入后connections保持正确顺序（store API 访问问题）
+- [✓] 3.22 Load弹窗飞船名称和装备统计分两行显示
+
+### 历史遗留问题（与新功能无关）
+
+- 2.4-2.6, 3.1-3.11 等测试失败：Save 按钮状态转换问题
+- 3.12 Bug测试失败：shield 标签切换问题
