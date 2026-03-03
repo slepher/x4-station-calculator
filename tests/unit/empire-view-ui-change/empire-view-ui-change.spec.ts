@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 import { describe, it, expect, vi } from 'vitest'
-import { mount, shallowMount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
@@ -81,7 +81,7 @@ import EmpireWareFlow from '@/components/EmpireWareFlow.vue'
 
 describe('Empire 标题渲染测试', () => {
   it('资源/经济标题显示且不显示每小时流量标签', async () => {
-    const wrapper = shallowMount(EmpireWareFlowsDashboard)
+    const wrapper = mount(EmpireWareFlowsDashboard)
 
     expect(wrapper.find('.header-title').text()).toBe('资源视图')
     expect(wrapper.find('.header-badge').exists()).toBe(false)
@@ -97,7 +97,7 @@ describe('Empire 标题渲染测试', () => {
 
 describe('Station 标题渲染测试', () => {
   it('资源/经济标题显示且不显示每小时流量标签', async () => {
-    const wrapper = shallowMount(StationWareFlowsDashboard)
+    const wrapper = mount(StationWareFlowsDashboard)
 
     expect(wrapper.find('.header-title').text()).toBe('资源视图')
     expect(wrapper.find('.header-badge').exists()).toBe(false)

@@ -6,6 +6,7 @@ import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
 import EmpireWareFlowGroup from './EmpireWareFlowGroup.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
+import ViewTabUi from '@/components/common/ViewTabUI.vue'
 
 const empireStore = useEmpireStore()
 const gameData = useGameDataStore()
@@ -47,9 +48,9 @@ const title = () => {
   }
 }
 
-const modes = computed<{key: ViewMode; title: string}[]>(() => [
-  { key: 'quantity', title: t('wareflow.quantity_view') },
-  { key: 'economy', title: t('wareflow.economy_view') }
+const views = computed<{key: ViewMode; label: string}[]>(() => [
+  { key: 'quantity', label: t('wareflow.quantity_view') },
+  { key: 'economy', label: t('wareflow.economy_view') }
 ])
 
 const empireGroups = computed(() => {
@@ -95,14 +96,7 @@ const empireGroups = computed(() => {
       </h3>
 
       <div class="header-right-group">
-        <div class="view-mode-switcher">
-          <button v-for="(item, index) in modes" :key="index"
-            :class="['view-mode-btn', viewMode === item.key ? 'active' : '']"
-            @click="viewMode = item.key">
-            {{ item.title }}
-          </button>
-        </div>
-
+        <ViewTabUi v-model="viewMode" :views="views" color-style="sky" ui-key="empire-wareflow" />
       </div>
     </div>
 
@@ -156,18 +150,6 @@ const empireGroups = computed(() => {
 
 .header-right-group {
   @apply flex items-center gap-3;
-}
-
-.view-mode-switcher {
-  @apply flex items-center gap-1 bg-slate-900/60 p-0.5 rounded-md border border-slate-700/30;
-}
-
-.view-mode-btn {
-  @apply px-3 py-1 text-[10px] font-bold uppercase tracking-tighter rounded transition-all duration-200 text-slate-500 hover:text-slate-300;
-}
-
-.view-mode-btn.active {
-  @apply bg-sky-500/20 text-sky-400 shadow-[0_0_12px_rgba(14,165,233,0.15)];
 }
 
 .header-badge {

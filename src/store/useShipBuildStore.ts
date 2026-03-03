@@ -678,6 +678,8 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     return ships.find((ship) => ship.id === selectedShipId.value) || null
   })
 
+  const hasSelectedShip = computed(() => selectedShipId.value !== null)
+
   const connectionRows = computed<FitConnectionRow[]>(() => {
     if (!selectedShip.value) return []
 
@@ -791,6 +793,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     fitMode,
     mockTagPatch,
     selectedShip,
+    hasSelectedShip,
     // Blueprint persistence
     blueprint,
     savedBlueprints,

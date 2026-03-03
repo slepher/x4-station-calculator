@@ -522,3 +522,87 @@ const {
 3. 为飞船装备武器，验证 weapon_burst / weapon_sustained 正确计算
 4. 为飞船装备炮塔，验证 turret_avg 正确计算
 5. 保存 blueprint 后重新加载，验证属性值保持一致
+
+---
+
+## Panel Stats 数据分组方案
+
+### 分组原则
+
+1. **每个组包含 1 个或多个 summary 数据**：在 summary 状态下显示
+2. **每个组包含 0 个或多个 detail 数据**：在 detail 状态下额外显示
+3. **同组数据按顺序显示**：summary1 → summary2 → ... → detail1 → detail2 → ... → detailN
+4. **同组数据显示在同一列**
+
+### 分组表格
+
+| 序号 | 组名 | 中文名称 | Summary 数据 (摘要显示) | Detail 数据 (详情额外显示) |
+|------|------|----------|------------------------|--------------------------|
+| 1 | Defense | 防御 | 护盾 (Shield) | 护盾充能率 (Shield Recharge Rate), 护盾充能延迟 (Shield Recharge Delay), 护盾组平均 (Shield Group Avg) |
+| 2 | Weapons | 武器 | 武器爆发伤害 (Weapon Burst), 炮塔平均伤害 (Turret Avg) | 武器持续伤害 (Weapon Sustained) |
+| 3 | Storage | 存储 | 容器存储 (Container Storage) | 固体存储 (Solid Storage), 液体存储 (Liquid Storage), 压缩存储 (Condensed Storage) |
+| 4 | Docks | 船坞 | M船坞数量 (M Dock Count), M船坞容量 (M Dock Capacity), S船坞数量 (S Dock Count), S船坞容量 (S Dock Capacity) | — |
+| 5 | Speed | 基础速度 | 速度 (Speed) | 加速度 (Acceleration) |
+| 6 | Boost | 助推 | 助推速度 (Boost Speed) | 助推加速度 (Boost Acceleration), 助推持续时间 (Boost Duration), 助推回充率 (Boost Recharge) |
+| 7 | Travel | 巡航 | 巡航速度 (Travel Speed) | 巡航加速度 (Travel Acceleration), 巡航充能时间 (Travel Charge Time) |
+| 8 | Maneuver | 机动 | — | 平移速度 (Strafe Speed), 平移加速度 (Strafe Acceleration), 偏航 (Yaw), 俯仰 (Pitch), 翻滚 (Roll) |
+| 9 | Crew | 乘员 | 船员 (Crew) | — |
+| 10 | Hull | 船体 | 船体 (Hull) | — |
+| 11 | Radar | 雷达 | 雷达范围 (Radar Range) | — |
+| 12 | Cargo | 装载 | 动态决定（见下表） | 动态决定（见下表） |
+
+### Cargo 组动态逻辑
+
+Cargo 组的 summary/detail 分配根据实际值动态决定：
+
+| 条件 | Summary (摘要显示) | Detail (详情额外显示) |
+|------|-------------------|----------------------|
+| 所有值都为 0 | Container Storage | Solid, Liquid, Condensed |
+| Container > 0 | Container Storage | Solid, Liquid, Condensed |
+| Container = 0, Solid > 0 | Solid Storage | Container, Liquid, Condensed |
+| Container = 0, Solid = 0, Liquid > 0 | Liquid Storage | Container, Solid, Condensed |
+| Container = 0, Solid = 0, Liquid = 0, Condensed > 0 | Condensed Storage | Container, Solid, Liquid |
+| Container = 0, Solid = 0, Liquid = 0, Condensed = 0 | Container Storage | Solid, Liquid, Condensed |
+
+**优先顺序**：Container → Solid → Liquid → Condensed
+
+### 预期列布局
+
+#### 18x2 排布（Summary + Detail 模式，四列表格 - 组名不重复）
+
+| 行 | 左列组名 | 左列数据 | 右列数据 | 右列组名 |
+|----|---------|----------|----------|---------|
+| 1 | Hull | Hull | Weapon Burst | Weapons |
+| 2 | Defense | Shield | Turret Avg | |
+| 3 | | Recharge Rate | Sustained | |
+| 4 | | Recharge Delay | Speed | Speed |
+| 5 | | Group Avg | Acceleration | |
+| 6 | Storage | Container | Boost Speed | Boost |
+| 7 | | Solid | Acceleration | |
+| 8 | | Liquid | Duration | |
+| 9 | | Condensed | Recharge | |
+| 10 | Attitude | Yaw | Travel Speed | Travel |
+| 11 | | Pitch | Acceleration | |
+| 12 | | Roll | Charge Time | |
+| 13 | Radar | Radar Range | Strafe Speed | Maneuver |
+| 14 | Crew | Crew | Strafe Accel | |
+| 15 | Cargo | Unit Storage | M Dock Count | Docks |
+| 16 | | Missile | M Dock Capacity | |
+| 17 | | Deployable | S Dock Count | |
+| 18 | | Countermeasure | S Dock Capacity | |
+
+#### 9x2 排布（Summary 模式）
+
+| 行 | 左列组名 | 左列数据 | 右列数据 | 右列组名 |
+|----|---------|----------|----------|---------|
+| 1 | Hull | Hull | Weapon Burst | Weapons |
+| 2 | Defense | Shield | Turret Avg | |
+| 3 | Storage | Container | Speed | Speed |
+| 4 | Radar | Radar Range | Boost Speed | Boost |
+| 5 | Crew | Crew | Travel Speed | Travel |
+| 6 | Cargo | Unit Storage | M Dock Count | Docks |
+| 7 | | Missile | M Dock Capacity | |
+| 8 | | Deployable | S Dock Count | |
+| 9 | | Countermeasure | S Dock Capacity | |
+
+注：Attitude 和 Maneuver 在 Summary 模式下无数据，不显示。

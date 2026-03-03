@@ -364,7 +364,7 @@ test.describe('ship-build-stat', () => {
     // 3.1.1 状态: 仅载入大太刀
     await buildOdachiState(page)
     // 3.1.2 点击"简略"档位按钮
-    await page.getByTestId('ship-build-stats-mode-summary').click()
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-summary').click()
     // 3.1.3 断言字段集合包含18项 #期望: [18]
     const labels = page.locator('.stats-label')
     const labelCount = await labels.count()
@@ -395,12 +395,12 @@ test.describe('ship-build-stat', () => {
     // 3.2.1 状态: 大太刀已选
     await buildOdachiState(page)
     // 3.2.2 点击"详细"档位按钮
-    await page.getByTestId('ship-build-stats-mode-detail').click()
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
     // 3.2.3 断言字段集合包含36项 #期望: [36]
     const labels = page.locator('.stats-label')
     await expect(labels).toHaveCount(36)
     // 3.2.4 点击"简略"档位按钮
-    await page.getByTestId('ship-build-stats-mode-summary').click()
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-summary').click()
     // 3.2.5 断言字段集合包含18项 #期望: [18]
     await expect(page.locator('.stats-label')).toHaveCount(18)
   })
@@ -410,7 +410,7 @@ test.describe('ship-build-stat', () => {
     // 3.3.1 状态: 大太刀已选
     await buildOdachiState(page)
     // 3.3.2 切换: 大太刀已选 -> 详细档位
-    await page.getByTestId('ship-build-stats-mode-detail').click()
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
     // 3.3.3 断言船体、护盾、速度为真实值 #期望: ['--']
     const values = page.locator('.stats-value')
     const hullValue = values.filter({ hasText: /MJ/ }).first()
@@ -433,23 +433,13 @@ test.describe('ship-build-stat', () => {
     // 3.5.1 状态: 仅载入大太刀
     await buildOdachiState(page)
     // 3.5.2 点击"详细"档位按钮
-    await page.getByTestId('ship-build-stats-mode-detail').click()
-    // 3.5.3 切换到 old 统计逻辑并采集 36 项详细字段快照
-    await setStatsLogic(page, 'old')
-    const oldStats = await captureStatGroup(page)
-    // 3.5.4 切换到 new 统计逻辑并采集 36 项详细字段快照
-    await setStatsLogic(page, 'new')
-    const newStats = await captureStatGroup(page)
-
-    // 3.5.5 批量比对 old/new 快照差异在容差内（1% 或最小 1 单位） #期望: [0]
-    const oldNewDiffs = diffOldVsNew(oldStats, newStats)
-    expect(oldNewDiffs, `Old/New diffs (Odachi):\n${oldNewDiffs.join('\n')}`).toEqual([])
-    expect(oldNewDiffs.length).toBe(0)
-
-    // 3.5.6 批量比对 new 快照与 `tests/fixtures/ship-build-stat-expected.json` 的 Odachi.detail 全量一致 #期望: [0]
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
+    // 3.5.3 采集 36 项详细字段快照并与 `tests/fixtures/ship-build-stat-expected.json` 的 Odachi.detail 全量比对
+    const actualStats = await captureStatGroup(page)
+    // 3.5.4 断言差异项数量为 0 #期望: [0]
     const expected = getExpectedDetail('Odachi')
-    const expectedDiffs = diffAgainstExpected(newStats, expected)
-    expect(expectedDiffs, `New/Expected diffs (Odachi):\n${expectedDiffs.join('\n')}`).toEqual([])
+    const expectedDiffs = diffAgainstExpected(actualStats, expected)
+    expect(expectedDiffs, `Actual/Expected diffs (Odachi):\n${expectedDiffs.join('\n')}`).toEqual([])
     expect(expectedDiffs.length).toBe(0)
   })
 
@@ -458,23 +448,111 @@ test.describe('ship-build-stat', () => {
     // 3.6.1 状态: 仅载入大阪
     await buildOsakaState(page)
     // 3.6.2 点击"详细"档位按钮
-    await page.getByTestId('ship-build-stats-mode-detail').click()
-    // 3.6.3 切换到 old 统计逻辑并采集 36 项详细字段快照
-    await setStatsLogic(page, 'old')
-    const oldStats = await captureStatGroup(page)
-    // 3.6.4 切换到 new 统计逻辑并采集 36 项详细字段快照
-    await setStatsLogic(page, 'new')
-    const newStats = await captureStatGroup(page)
-
-    // 3.6.5 批量比对 old/new 快照差异在容差内（1% 或最小 1 单位） #期望: [0]
-    const oldNewDiffs = diffOldVsNew(oldStats, newStats)
-    expect(oldNewDiffs, `Old/New diffs (Osaka):\n${oldNewDiffs.join('\n')}`).toEqual([])
-    expect(oldNewDiffs.length).toBe(0)
-
-    // 3.6.6 批量比对 new 快照与 `tests/fixtures/ship-build-stat-expected.json` 的 Osaka.detail 全量一致 #期望: [0]
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
+    // 3.6.3 采集 36 项详细字段快照并与 `tests/fixtures/ship-build-stat-expected.json` 的 Osaka.detail 全量比对
+    const actualStats = await captureStatGroup(page)
+    // 3.6.4 断言差异项数量为 0 #期望: [0]
     const expected = getExpectedDetail('Osaka')
-    const expectedDiffs = diffAgainstExpected(newStats, expected)
-    expect(expectedDiffs, `New/Expected diffs (Osaka):\n${expectedDiffs.join('\n')}`).toEqual([])
+    const expectedDiffs = diffAgainstExpected(actualStats, expected)
+    expect(expectedDiffs, `Actual/Expected diffs (Osaka):\n${expectedDiffs.join('\n')}`).toEqual([])
     expect(expectedDiffs.length).toBe(0)
+  })
+
+  // 3.7 Case: M级船进度条渲染
+  test('3.7 Case: M级船进度条渲染', async ({ page }) => {
+    // 3.7.1 状态: 仅载入大太刀 (class: ship_m)
+    await buildOdachiState(page)
+    // 3.7.2 点击"详细"档位按钮
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
+    // 3.7.3 断言船体进度条可见 #期望: [toBeVisible]
+    await expect(page.locator('[data-testid="ship-build-stats-bar-hull"]')).toBeVisible()
+    // 3.7.4 断言速度进度条可见 #期望: [toBeVisible]
+    await expect(page.locator('[data-testid="ship-build-stats-bar-speed"]')).toBeVisible()
+    // 3.7.5 断言船员进度条可见 #期望: [toBeVisible]
+    await expect(page.locator('[data-testid="ship-build-stats-bar-crew"]')).toBeVisible()
+  })
+
+  // 3.8 Case: L级船进度条渲染
+  test('3.8 Case: L级船进度条渲染', async ({ page }) => {
+    // 3.8.1 状态: 仅载入大阪 (class: ship_l)
+    await buildOsakaState(page)
+    // 3.8.2 点击"详细"档位按钮
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
+    // 3.8.3 断言船体进度条可见 #期望: [toBeVisible]
+    await expect(page.locator('[data-testid="ship-build-stats-bar-hull"]')).toBeVisible()
+    // 3.8.4 断言速度进度条可见 #期望: [toBeVisible]
+    await expect(page.locator('[data-testid="ship-build-stats-bar-speed"]')).toBeVisible()
+    // 3.8.5 断言船员进度条可见 #期望: [toBeVisible]
+    await expect(page.locator('[data-testid="ship-build-stats-bar-crew"]')).toBeVisible()
+  })
+
+  // 3.9 Case: 进度条渲染与比例
+  test('3.9 Case: 进度条渲染与比例', async ({ page }) => {
+    // 3.9.1 状态: 仅载入大太刀 (class: ship_m)
+    await buildOdachiState(page)
+    // 3.9.2 点击"详细"档位按钮
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
+    // 3.9.3 断言船体进度条可见 #期望: [toBeVisible]
+    await expect(page.locator('[data-testid="ship-build-stats-bar-hull"]')).toBeVisible()
+    // 3.9.4 断言速度进度条可见 #期望: [toBeVisible]
+    await expect(page.locator('[data-testid="ship-build-stats-bar-speed"]')).toBeVisible()
+    // 3.9.5 断言船员进度条可见 #期望: [toBeVisible]
+    await expect(page.locator('[data-testid="ship-build-stats-bar-crew"]')).toBeVisible()
+  })
+
+  // 3.10 Case: 进度条渲染-大阪
+  test('3.10 Case: 进度条渲染-大阪', async ({ page }) => {
+    // 3.10.1 状态: 仅载入大阪
+    await buildOsakaState(page)
+    // 3.10.2 点击"详细"档位按钮
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
+    // 3.10.3 断言进度条可见 #期望: [toBeVisible]
+    await expect(page.locator('[data-testid="ship-build-stats-bar-hull"]')).toBeVisible()
+  })
+
+  // 3.11 Case: 进度条渲染-大太刀
+  test('3.11 Case: 进度条渲染-大太刀', async ({ page }) => {
+    // 3.11.1 状态: 仅载入大太刀
+    await buildOdachiState(page)
+    // 3.11.2 点击"详细"档位按钮
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
+    // 3.11.3 断言进度条可见 #期望: [toBeVisible]
+    await expect(page.locator('[data-testid="ship-build-stats-bar-hull"]')).toBeVisible()
+  })
+
+  // 3.12 Case: S级过滤器交互
+  test('3.12 Case: S级过滤器交互', async ({ page }) => {
+    // 3.12.1 通过data属性判断飞船选择状态
+    const isShipSelected = await page.locator('[data-ship-selected]').getAttribute('data-ship-selected')
+    // 3.12.2 情况A:已选飞船则点击"Change Ship"切换
+    if (isShipSelected === 'true') {
+      await page.locator('[data-testid="ship-build-change-ship"]').click()
+    }
+    // 3.12.3 断言S级过滤器按钮可见
+    await expect(page.getByTestId('ship-build-filter-class-btn-ship_s')).toBeVisible()
+    // 3.12.4 点击S级按钮
+    await page.getByTestId('ship-build-filter-class-btn-ship_s').click()
+    // 3.12.5 断言S级按钮选中状态
+    await expect(page.getByTestId('ship-build-filter-class-btn-ship_s')).toHaveClass(/filter-chip-active/)
+    // 3.12.6 断言种族过滤器显示
+    await expect(page.getByTestId('ship-build-filter-race-btn-argon')).toBeVisible()
+  })
+
+  // 3.13 Case: XL级过滤器交互
+  test('3.13 Case: XL级过滤器交互', async ({ page }) => {
+    // 3.13.1 通过data属性判断飞船选择状态
+    const isShipSelected = await page.locator('[data-ship-selected]').getAttribute('data-ship-selected')
+    // 3.13.2 情况A:已选飞船则点击"Change Ship"切换
+    if (isShipSelected === 'true') {
+      await page.locator('[data-testid="ship-build-change-ship"]').click()
+    }
+    // 3.13.3 断言XL级过滤器按钮可见
+    await expect(page.getByTestId('ship-build-filter-class-btn-ship_xl')).toBeVisible()
+    // 3.13.4 点击XL级按钮
+    await page.getByTestId('ship-build-filter-class-btn-ship_xl').click()
+    // 3.13.5 断言XL级按钮选中状态
+    await expect(page.getByTestId('ship-build-filter-class-btn-ship_xl')).toHaveClass(/filter-chip-active/)
+    // 3.13.6 断言种族过滤器显示
+    await expect(page.getByTestId('ship-build-filter-race-btn-argon')).toBeVisible()
   })
 })

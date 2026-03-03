@@ -195,3 +195,25 @@ The `.trae/skills/` directory contains markdown skill definitions for the Trae I
 - `x4-verify` - Verification pipeline
 
 These define the development workflow patterns used in this codebase.
+
+## Working Guidelines
+
+### When User Asks for Understanding/Analysis
+- Provide explanation first, do not modify code without confirmation
+- Wait for user to confirm understanding is correct before proceeding
+- Never jump straight to code changes
+
+### Handling TypeScript Errors
+- **Never delete code to fix compilation errors**
+- If TypeScript reports "is declared but its value is never read", investigate whether the code is actually used before removing
+- The error might indicate the code path is conditional or behind a feature flag
+- Correct approaches:
+  - Keep the code and investigate usage
+  - Add `// @ts-ignore` if truly unused but kept for future use
+  - Add comment explaining why it's kept as备用代码
+  - Or actually verify the code is truly unused before removing
+
+### Code Modification Principles
+- Get explicit confirmation before making changes
+- When asked to explain/understand, provide explanation first
+- Don't modify code without approval, even if the changes seem obvious

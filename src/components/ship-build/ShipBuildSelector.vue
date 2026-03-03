@@ -202,9 +202,10 @@ const setSelectedShipId = (value: string | null) => {
 </script>
 
 <template>
-  <div v-if="!selectedShip" class="panel-body grid grid-cols-1 lg:grid-cols-[4fr_6fr] gap-6">
-    <div class="flex flex-col gap-5">
-      <div class="filter-card" data-testid="ship-build-filter-class">
+  <div :data-ship-selected="selectedShip ? 'true' : 'false'">
+    <div v-if="!selectedShip" class="panel-body grid grid-cols-1 lg:grid-cols-[4fr_6fr] gap-6">
+      <div class="flex flex-col gap-5">
+        <div class="filter-card" data-testid="ship-build-filter-class">
         <div class="filter-card-header">
           <span>{{ t('ship_build.filter_class') }}</span>
           <span class="filter-required">{{ t('ship_build.required') }}</span>
@@ -214,6 +215,7 @@ const setSelectedShipId = (value: string | null) => {
             <button
               v-for="option in classOptions"
               :key="option.id"
+              :data-testid="`ship-build-filter-class-btn-${option.id}`"
               class="filter-chip"
               :class="selectedClass === option.id ? 'filter-chip-active' : 'filter-chip-idle'"
               @click="setSelectedClass(option.id as any)"
@@ -231,6 +233,7 @@ const setSelectedShipId = (value: string | null) => {
             <button
               v-for="option in raceOptions"
               :key="option.id"
+              :data-testid="`ship-build-filter-race-btn-${option.id}`"
               class="filter-chip"
               :class="selectedRaces.includes(option.id) ? 'filter-chip-active' : 'filter-chip-idle'"
               @click="toggleRace(option.id)"
@@ -252,6 +255,7 @@ const setSelectedShipId = (value: string | null) => {
             <button
               v-for="type in availableTypes"
               :key="type.id"
+              :data-testid="`ship-build-filter-type-btn-${type.id}`"
               class="filter-chip"
               :class="selectedTypes.includes(type.id) ? 'filter-chip-active' : 'filter-chip-idle'"
               @click="toggleType(type.id)"
@@ -308,7 +312,7 @@ const setSelectedShipId = (value: string | null) => {
           <span class="selection-title-label">{{ t('ship_build.selected_ship') }}</span>
           <span class="selection-title-name">{{ translateShip(selectedShip) }}</span>
         </div>
-        <button class="selection-change-btn" @click="setSelectedShipId(null)">
+        <button class="selection-change-btn" data-testid="ship-build-change-ship" @click="setSelectedShipId(null)">
           {{ t('ship_build.change_ship') }}
         </button>
       </div>
@@ -322,6 +326,7 @@ const setSelectedShipId = (value: string | null) => {
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <style scoped>
