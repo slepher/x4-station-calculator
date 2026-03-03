@@ -52,6 +52,17 @@ const viewMode = computed(() => {
   return 'diff'
 })
 
+// SingleView 时显示的装备（优先级：候选 > 当前）
+const viewEquipment = computed(() => {
+  return candidateEquipment.value || currentEquipment.value
+})
+
+// SingleView 时显示的装备的属性
+const viewStats = computed(() => {
+  if (!viewEquipment.value || !props.selectedShip) return null
+  return useEquipmentStats(viewEquipment.value, props.selectedShip).details.value
+})
+
 // 显示用的装备（候选优先，没有则用当前）- 用于头部名称显示
 const displayEquipment = computed(() => {
   return candidateEquipment.value || currentEquipment.value
@@ -378,8 +389,23 @@ function getDiffStartPercent(currentValue: number, candidateValue: number, max: 
             class="stats-row"
           >
             <span class="stats-label">{{ t(item.labelKey) }}</span>
-            <!-- SingleView 或 DiffView 且 diff=0: 复用单一视图逻辑 -->
-            <template v-if="viewMode === 'single' || item.diff === 0">
+            <!-- SingleView: 使用 viewStats 的单一值 -->
+            <template v-if="viewMode === 'single'">
+              <span class="stats-value">
+                <span class="current-value">
+                  {{ formatValue((viewStats as any)?.[item.key]) }}
+                </span>
+                <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
+              </span>
+              <div class="stats-bar">
+                <div
+                  class="stats-bar-fill stats-bar-neutral"
+                  :style="{ width: getProgressPercent((viewStats as any)?.[item.key], item.max) + '%' }"
+                ></div>
+              </div>
+            </template>
+            <!-- DiffView 且 diff=0: 复用单一视图逻辑 -->
+            <template v-else-if="item.diff === 0">
               <span class="stats-value">
                 <span class="current-value">
                   {{ formatValue(item.candidateValue ?? item.currentValue) }}
@@ -441,8 +467,23 @@ function getDiffStartPercent(currentValue: number, candidateValue: number, max: 
             class="stats-row"
           >
             <span class="stats-label">{{ t(item.labelKey) }}</span>
-            <!-- SingleView 或 DiffView 且 diff=0: 复用单一视图逻辑 -->
-            <template v-if="viewMode === 'single' || item.diff === 0">
+            <!-- SingleView: 使用 viewStats 的单一值 -->
+            <template v-if="viewMode === 'single'">
+              <span class="stats-value">
+                <span class="current-value">
+                  {{ formatValue((viewStats as any)?.[item.key]) }}
+                </span>
+                <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
+              </span>
+              <div class="stats-bar">
+                <div
+                  class="stats-bar-fill stats-bar-neutral"
+                  :style="{ width: getProgressPercent((viewStats as any)?.[item.key], item.max) + '%' }"
+                ></div>
+              </div>
+            </template>
+            <!-- DiffView 且 diff=0: 复用单一视图逻辑 -->
+            <template v-else-if="item.diff === 0">
               <span class="stats-value">
                 <span class="current-value">
                   {{ formatValue(item.candidateValue ?? item.currentValue) }}
