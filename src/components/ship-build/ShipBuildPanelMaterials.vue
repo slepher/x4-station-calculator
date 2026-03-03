@@ -88,7 +88,18 @@ const mapCostToMaterialItems = (
       }
     })
     .filter((item) => item.count > 0)
-    .sort((a, b) => b.value - a.value)
+    .sort((a, b) => {
+      const wareA = wareMap.value.get(a.wareId)
+      const wareB = wareMap.value.get(b.wareId)
+      const tierA = wareA?.tier ?? 0
+      const tierB = wareB?.tier ?? 0
+      // 先按 tier 从高到低
+      if (tierB !== tierA) return tierB - tierA
+      // tier 相同则按英文 name 字母序从小到大
+      const nameA = wareA?.name || a.wareId
+      const nameB = wareB?.name || b.wareId
+      return nameA.localeCompare(nameB)
+    })
 }
 
 // ============ Material Groups 计算 ============
@@ -234,7 +245,18 @@ const materialSummaryItems = computed(() => {
   // Merge equipment materials
   equipmentMaterialGroups.value.forEach((group) => mergeItems(group.items))
 
-  return Array.from(grouped.values()).sort((a, b) => b.value - a.value)
+  return Array.from(grouped.values()).sort((a, b) => {
+    const wareA = wareMap.value.get(a.wareId)
+    const wareB = wareMap.value.get(b.wareId)
+    const tierA = wareA?.tier ?? 0
+    const tierB = wareB?.tier ?? 0
+    // 先按 tier 从高到低
+    if (tierB !== tierA) return tierB - tierA
+    // tier 相同则按英文 name 字母序从小到大
+    const nameA = wareA?.name || a.wareId
+    const nameB = wareB?.name || b.wareId
+    return nameA.localeCompare(nameB)
+  })
 })
 
 const totalValue = computed(() => {
