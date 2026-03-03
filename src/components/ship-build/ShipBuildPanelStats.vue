@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { useEquipmentStats } from '@/composables/useEquipmentStats'
+import ViewTabUI from '@/components/common/ViewTabUI.vue'
 import type { X4Ship, X4Equipment, ShipBlueprint } from '@/types/x4'
 import bulletsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/bullets.json'
 import missilesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/missiles.json'
@@ -74,6 +75,11 @@ const STAT_KEY_TO_MAX_FIELD: Record<string, string> = {
 
 // ============ 内部状态 ============
 const statsViewMode = ref<'summary' | 'detail'>('summary')
+
+const statsViewTabs = [
+  { key: 'summary', label: t('ship_build.stats_mode_summary') },
+  { key: 'detail', label: t('ship_build.stats_mode_detail') }
+]
 
 // 控制使用哪种逻辑: true = useEquipmentStats (composable), false = Vue 内原有计算
 const useNewLogic = ref(true)
@@ -663,7 +669,8 @@ const getShipStorageCapacity = (ship: X4Ship, size: string) => {
   return storage?.capacity || 0
 }
 
-// Build summary stats (对齐截图2)
+// Build summary stats (按设计文档 9x2 排布)
+// 数据按左右交叉排列: [左1, 右1, 左2, 右2, ...]
 const buildSummaryStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
   const shieldStats = getShieldStats()
   const engineStats = getEngineStats()
@@ -677,34 +684,46 @@ const buildSummaryStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
   // 助推速度 = 最高速度 * 助推推力乘数
   const boostSpeed = engineStats && baseSpeed > 0 ? Math.round(baseSpeed * engineStats.boostMultiplier) : 0
 
+  // 9x2 排布: 交叉排列 [左1, 右1, 左2, 右2, ...]
   return [
+    // 行1: Hull | Weapon Burst
     { key: 'hull', labelKey: 'ship_build.stats_hull', unit: 'MJ', value: ship.hull || 0 },
-    { key: 'shield', labelKey: 'ship_build.stats_shield', unit: 'MJ', value: shieldStats.max },
-    { key: 'radar_range', labelKey: 'ship_build.stats_radar_range', unit: 'km', value: Math.round((ship.radarRange || 0) / 1000) },
     { key: 'weapon_burst', labelKey: 'ship_build.stats_weapon_burst', unit: 'MW', value: Math.round(weaponStats.burst * 10) / 10 },
+    // 行2: Shield | Turret Avg
+    { key: 'shield', labelKey: 'ship_build.stats_shield', unit: 'MJ', value: shieldStats.max },
     { key: 'turret_avg', labelKey: 'ship_build.stats_turret_avg', unit: 'MW', value: turretAvg },
+    // 行3: Container | Speed
     { key: 'storage_container', labelKey: 'ship_build.stats_storage_container', unit: 'm3', value: getCargoCapacity(ship, 'container') },
-    { key: 'dock_m_count', labelKey: 'ship_build.stats_dock_m_count', unit: '', value: getDockCount(ship, 'dock_m') },
-    { key: 'dock_m_capacity', labelKey: 'ship_build.stats_dock_m_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_m') },
-    { key: 'dock_s_count', labelKey: 'ship_build.stats_dock_s_count', unit: '', value: getDockCount(ship, 'dock_s') },
-    { key: 'dock_s_capacity', labelKey: 'ship_build.stats_dock_s_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_s') },
     { key: 'speed', labelKey: 'ship_build.stats_speed', unit: 'm/s', value: baseSpeed },
+    // 行4: Radar Range | Boost Speed
+    { key: 'radar_range', labelKey: 'ship_build.stats_radar_range', unit: 'km', value: Math.round((ship.radarRange || 0) / 1000) },
     { key: 'boost_speed', labelKey: 'ship_build.stats_boost_speed', unit: 'm/s', value: boostSpeed },
-    { key: 'travel_speed', labelKey: 'ship_build.stats_travel_speed', unit: 'm/s', value: travelSpeed },
+    // 行5: Crew | Travel Speed
     { key: 'crew', labelKey: 'ship_build.stats_crew', unit: '', value: ship.crew?.capacity || 0 },
+    { key: 'travel_speed', labelKey: 'ship_build.stats_travel_speed', unit: 'm/s', value: travelSpeed },
+    // 行6: Unit Storage | M Dock Count
     { key: 'storage_unit', labelKey: 'ship_build.stats_storage_unit', unit: '', value: ship.storage?.unit || 0 },
+    { key: 'dock_m_count', labelKey: 'ship_build.stats_dock_m_count', unit: '', value: getDockCount(ship, 'dock_m') },
+    // 行7: Missile | M Dock Capacity
     { key: 'missile', labelKey: 'ship_build.stats_missile', unit: '', value: ship.storage?.missile || 0 },
+    { key: 'dock_m_capacity', labelKey: 'ship_build.stats_dock_m_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_m') },
+    // 行8: Deployable | S Dock Count
     { key: 'deployable', labelKey: 'ship_build.stats_deployable', unit: '', value: ship.storage?.deployable || 0 },
-    { key: 'countermeasure', labelKey: 'ship_build.stats_countermeasure', unit: '', value: ship.storage?.countermeasure || 0 }
+    { key: 'dock_s_count', labelKey: 'ship_build.stats_dock_s_count', unit: '', value: getDockCount(ship, 'dock_s') },
+    // 行9: Countermeasure | S Dock Capacity
+    { key: 'countermeasure', labelKey: 'ship_build.stats_countermeasure', unit: '', value: ship.storage?.countermeasure || 0 },
+    { key: 'dock_s_capacity', labelKey: 'ship_build.stats_dock_s_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_s') }
   ]
 }
 
 // Build detail stats
+// Build detail stats (按设计文档 18x2 排布)
+// 完整 36 个数据点 (18行 x 2列)
 const buildDetailStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
-  const summaryStats = buildSummaryStats(ship)
   const shieldStats = getShieldStats()
   const engineStats = getEngineStats()
   const weaponStats = getWeaponDamageStats()
+  const turretAvg = getTurretDamageStats()
   const mass = ship.physics?.mass || 1
   const dragForward = ship.physics?.drag?.forward || 1
   const dragHorizontal = ship.physics?.drag?.horizontal || 1
@@ -713,47 +732,78 @@ const buildDetailStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
   const dragRoll = ship.physics?.drag?.roll || 1
   const accfactorsHorizontal = ship.physics?.accfactors?.horizontal || 1
 
-  const baseAcceleration = engineStats ? calculateAcceleration(engineStats.thrustForward, mass) : 0
-  // 助推加速度 = 基础加速度 × boost.acceleration
-  const boostAcceleration = engineStats ? Math.round(baseAcceleration * engineStats.boostAcceleration) : 0
-  // 巡航加速度 = 巡航速度 / travel.attack
+  const baseSpeed = engineStats ? calculateSpeed(engineStats.thrustForward, dragForward) : 0
   const travelSpeed = engineStats ? calculateSpeed(engineStats.travelThrust, dragForward) : 0
+  const boostSpeed = engineStats && baseSpeed > 0 ? Math.round(baseSpeed * engineStats.boostMultiplier) : 0
+  const baseAcceleration = engineStats ? calculateAcceleration(engineStats.thrustForward, mass) : 0
+  const boostAcceleration = engineStats ? Math.round(baseAcceleration * engineStats.boostAcceleration) : 0
   const travelAcceleration = engineStats && engineStats.travelAttack ? Math.round(travelSpeed / engineStats.travelAttack) : 0
-  // 助推回充率 = boost.recharge / 100
   const boostRecharge = engineStats ? engineStats.boostRecharge / 100 : 0
 
-  // 转向率 = 推进器单轴推力 / 船体单轴阻力
   const thrusterStats = getThrusterStats()
   const pitchRate = thrusterStats ? thrusterStats.pitch / dragPitch : 0
   const yawRate = thrusterStats ? thrusterStats.yaw / dragYaw : 0
   const rollRate = thrusterStats ? thrusterStats.roll / dragRoll : 0
-  // 平移速度 = thruster.strafe / 船体水平阻力
   const strafeSpeed = thrusterStats ? Math.round(thrusterStats.strafe / dragHorizontal) : 0
-  // 平移加速度 = thruster.strafe / 船体质量 × accfactors.horizontal
   const strafeAcceleration = thrusterStats ? Math.round(thrusterStats.strafe / mass * accfactorsHorizontal) : 0
 
-  const extraStats: Omit<ShipStatMetric, 'ratio'>[] = [
+  // 18x2 排布: 完整数据 [左1, 右1, 左2, 右2, ...]
+  return [
+    // 行1: Hull | Weapon Burst
+    { key: 'hull', labelKey: 'ship_build.stats_hull', unit: 'MJ', value: ship.hull || 0 },
+    { key: 'weapon_burst', labelKey: 'ship_build.stats_weapon_burst', unit: 'MW', value: Math.round(weaponStats.burst * 10) / 10 },
+    // 行2: Shield | Turret Avg
+    { key: 'shield', labelKey: 'ship_build.stats_shield', unit: 'MJ', value: shieldStats.max },
+    { key: 'turret_avg', labelKey: 'ship_build.stats_turret_avg', unit: 'MW', value: turretAvg },
+    // 行3: Shield Recharge Rate | Weapon Sustained
     { key: 'shield_recharge_rate', labelKey: 'ship_build.stats_shield_recharge_rate', unit: 'MW', value: shieldStats.rate },
-    { key: 'shield_recharge_delay', labelKey: 'ship_build.stats_shield_recharge_delay', unit: 's', value: shieldStats.delay },
-    { key: 'shield_group_avg', labelKey: 'ship_build.stats_shield_group_avg', unit: 'MJ', value: shieldStats.groupAvg },
     { key: 'weapon_sustained', labelKey: 'ship_build.stats_weapon_sustained', unit: 'MW', value: Math.round(weaponStats.sustained * 10) / 10 },
-    { key: 'storage_solid', labelKey: 'ship_build.stats_storage_solid', unit: 'm3', value: getCargoCapacity(ship, 'solid') },
-    { key: 'storage_liquid', labelKey: 'ship_build.stats_storage_liquid', unit: 'm3', value: getCargoCapacity(ship, 'liquid') },
-    { key: 'storage_condensed', labelKey: 'ship_build.stats_storage_condensed', unit: 'm3', value: getCargoCapacity(ship, 'condensed') },
+    // 行4: Shield Recharge Delay | Speed
+    { key: 'shield_recharge_delay', labelKey: 'ship_build.stats_shield_recharge_delay', unit: 's', value: shieldStats.delay },
+    { key: 'speed', labelKey: 'ship_build.stats_speed', unit: 'm/s', value: baseSpeed },
+    // 行5: Shield Group Avg | Acceleration
+    { key: 'shield_group_avg', labelKey: 'ship_build.stats_shield_group_avg', unit: 'MJ', value: shieldStats.groupAvg },
     { key: 'acceleration', labelKey: 'ship_build.stats_acceleration', unit: 'm/s2', value: baseAcceleration },
+    // 行6: Container | Boost Speed
+    { key: 'storage_container', labelKey: 'ship_build.stats_storage_container', unit: 'm3', value: getCargoCapacity(ship, 'container') },
+    { key: 'boost_speed', labelKey: 'ship_build.stats_boost_speed', unit: 'm/s', value: boostSpeed },
+    // 行7: Solid | Boost Acceleration
+    { key: 'storage_solid', labelKey: 'ship_build.stats_storage_solid', unit: 'm3', value: getCargoCapacity(ship, 'solid') },
     { key: 'boost_acceleration', labelKey: 'ship_build.stats_boost_acceleration', unit: 'm/s2', value: boostAcceleration },
+    // 行8: Liquid | Boost Duration
+    { key: 'storage_liquid', labelKey: 'ship_build.stats_storage_liquid', unit: 'm3', value: getCargoCapacity(ship, 'liquid') },
     { key: 'boost_duration', labelKey: 'ship_build.stats_boost_duration', unit: 's', value: engineStats?.boostDuration || 0 },
+    // 行9: Condensed | Boost Recharge
+    { key: 'storage_condensed', labelKey: 'ship_build.stats_storage_condensed', unit: 'm3', value: getCargoCapacity(ship, 'condensed') },
     { key: 'boost_recharge', labelKey: 'ship_build.stats_boost_recharge', unit: '%/s', value: boostRecharge },
-    { key: 'travel_acceleration', labelKey: 'ship_build.stats_travel_acceleration', unit: 'm/s2', value: travelAcceleration },
-    { key: 'travel_charge_time', labelKey: 'ship_build.stats_travel_charge_time', unit: 's', value: engineStats?.travelCharge || 0 },
-    { key: 'strafe_speed', labelKey: 'ship_build.stats_strafe_speed', unit: 'm/s', value: strafeSpeed },
-    { key: 'strafe_acceleration', labelKey: 'ship_build.stats_strafe_acceleration', unit: 'm/s2', value: strafeAcceleration },
+    // 行10: Yaw | Travel Speed
     { key: 'yaw', labelKey: 'ship_build.stats_yaw', unit: 'rad/s', value: Math.round(yawRate * 100) / 100 },
+    { key: 'travel_speed', labelKey: 'ship_build.stats_travel_speed', unit: 'm/s', value: travelSpeed },
+    // 行11: Pitch | Travel Acceleration
     { key: 'pitch', labelKey: 'ship_build.stats_pitch', unit: 'rad/s', value: Math.round(pitchRate * 100) / 100 },
-    { key: 'roll', labelKey: 'ship_build.stats_roll', unit: 'rad/s', value: Math.round(rollRate * 100) / 100 }
+    { key: 'travel_acceleration', labelKey: 'ship_build.stats_travel_acceleration', unit: 'm/s2', value: travelAcceleration },
+    // 行12: Roll | Travel Charge Time
+    { key: 'roll', labelKey: 'ship_build.stats_roll', unit: 'rad/s', value: Math.round(rollRate * 100) / 100 },
+    { key: 'travel_charge_time', labelKey: 'ship_build.stats_travel_charge_time', unit: 's', value: engineStats?.travelCharge || 0 },
+    // 行13: Radar Range | Strafe Speed
+    { key: 'radar_range', labelKey: 'ship_build.stats_radar_range', unit: 'km', value: Math.round((ship.radarRange || 0) / 1000) },
+    { key: 'strafe_speed', labelKey: 'ship_build.stats_strafe_speed', unit: 'm/s', value: strafeSpeed },
+    // 行14: Crew | Strafe Acceleration
+    { key: 'crew', labelKey: 'ship_build.stats_crew', unit: '', value: ship.crew?.capacity || 0 },
+    { key: 'strafe_acceleration', labelKey: 'ship_build.stats_strafe_acceleration', unit: 'm/s2', value: strafeAcceleration },
+    // 行15: Unit Storage | M Dock Count
+    { key: 'storage_unit', labelKey: 'ship_build.stats_storage_unit', unit: '', value: ship.storage?.unit || 0 },
+    { key: 'dock_m_count', labelKey: 'ship_build.stats_dock_m_count', unit: '', value: getDockCount(ship, 'dock_m') },
+    // 行16: Missile | M Dock Capacity
+    { key: 'missile', labelKey: 'ship_build.stats_missile', unit: '', value: ship.storage?.missile || 0 },
+    { key: 'dock_m_capacity', labelKey: 'ship_build.stats_dock_m_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_m') },
+    // 行17: Deployable | S Dock Count
+    { key: 'deployable', labelKey: 'ship_build.stats_deployable', unit: '', value: ship.storage?.deployable || 0 },
+    { key: 'dock_s_count', labelKey: 'ship_build.stats_dock_s_count', unit: '', value: getDockCount(ship, 'dock_s') },
+    // 行18: Countermeasure | S Dock Capacity
+    { key: 'countermeasure', labelKey: 'ship_build.stats_countermeasure', unit: '', value: ship.storage?.countermeasure || 0 },
+    { key: 'dock_s_capacity', labelKey: 'ship_build.stats_dock_s_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_s') }
   ]
-
-  return [...summaryStats, ...extraStats]
 }
 
 // 获取 default_maxes 中的 max 值
@@ -867,12 +917,9 @@ const visibleShipStats = computed<ShipStatDisplay[]>(() => {
   return statsViewMode.value === 'summary' ? summaryShipStats.value : detailedShipStats.value
 })
 
-const setStatsViewMode = (mode: 'summary' | 'detail') => {
-  statsViewMode.value = mode
-}
-
 // ============ 使用 useEquipmentStats 构建统计数据 (新逻辑) ============
 // 使用 useEquipmentStats composable 计算属性
+// 9x2 排布: 交叉排列 [左1, 右1, 左2, 右2, ...]
 const buildSummaryStatsByUseEquipmentStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
   const shieldStats = getShieldStatsByUseEquipmentStats()
   const engineStats = getEngineStatsByUseEquipmentStats()
@@ -884,33 +931,44 @@ const buildSummaryStatsByUseEquipmentStats = (ship: X4Ship): Omit<ShipStatMetric
   const travelSpeed = engineStats ? (engineStats.travelThrust / dragForward) : 0
   const boostSpeed = engineStats && baseSpeed > 0 ? Math.round(baseSpeed * engineStats.boostMultiplier) : 0
 
+  // 9x2 排布: 交叉排列 [左1, 右1, 左2, 右2, ...]
   return [
+    // 行1: Hull | Weapon Burst
     { key: 'hull', labelKey: 'ship_build.stats_hull', unit: 'MJ', value: ship.hull || 0 },
-    { key: 'shield', labelKey: 'ship_build.stats_shield', unit: 'MJ', value: shieldStats.max },
-    { key: 'radar_range', labelKey: 'ship_build.stats_radar_range', unit: 'km', value: Math.round((ship.radarRange || 0) / 1000) },
     { key: 'weapon_burst', labelKey: 'ship_build.stats_weapon_burst', unit: 'MW', value: Math.round(weaponStats.burst * 10) / 10 },
+    // 行2: Shield | Turret Avg
+    { key: 'shield', labelKey: 'ship_build.stats_shield', unit: 'MJ', value: shieldStats.max },
     { key: 'turret_avg', labelKey: 'ship_build.stats_turret_avg', unit: 'MW', value: turretAvg },
+    // 行3: Container | Speed
     { key: 'storage_container', labelKey: 'ship_build.stats_storage_container', unit: 'm3', value: getCargoCapacity(ship, 'container') },
-    { key: 'dock_m_count', labelKey: 'ship_build.stats_dock_m_count', unit: '', value: getDockCount(ship, 'dock_m') },
-    { key: 'dock_m_capacity', labelKey: 'ship_build.stats_dock_m_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_m') },
-    { key: 'dock_s_count', labelKey: 'ship_build.stats_dock_s_count', unit: '', value: getDockCount(ship, 'dock_s') },
-    { key: 'dock_s_capacity', labelKey: 'ship_build.stats_dock_s_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_s') },
     { key: 'speed', labelKey: 'ship_build.stats_speed', unit: 'm/s', value: Math.round(baseSpeed) },
+    // 行4: Radar Range | Boost Speed
+    { key: 'radar_range', labelKey: 'ship_build.stats_radar_range', unit: 'km', value: Math.round((ship.radarRange || 0) / 1000) },
     { key: 'boost_speed', labelKey: 'ship_build.stats_boost_speed', unit: 'm/s', value: boostSpeed },
-    { key: 'travel_speed', labelKey: 'ship_build.stats_travel_speed', unit: 'm/s', value: Math.round(travelSpeed) },
+    // 行5: Crew | Travel Speed
     { key: 'crew', labelKey: 'ship_build.stats_crew', unit: '', value: ship.crew?.capacity || 0 },
+    { key: 'travel_speed', labelKey: 'ship_build.stats_travel_speed', unit: 'm/s', value: Math.round(travelSpeed) },
+    // 行6: Unit Storage | M Dock Count
     { key: 'storage_unit', labelKey: 'ship_build.stats_storage_unit', unit: '', value: ship.storage?.unit || 0 },
+    { key: 'dock_m_count', labelKey: 'ship_build.stats_dock_m_count', unit: '', value: getDockCount(ship, 'dock_m') },
+    // 行7: Missile | M Dock Capacity
     { key: 'missile', labelKey: 'ship_build.stats_missile', unit: '', value: ship.storage?.missile || 0 },
+    { key: 'dock_m_capacity', labelKey: 'ship_build.stats_dock_m_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_m') },
+    // 行8: Deployable | S Dock Count
     { key: 'deployable', labelKey: 'ship_build.stats_deployable', unit: '', value: ship.storage?.deployable || 0 },
-    { key: 'countermeasure', labelKey: 'ship_build.stats_countermeasure', unit: '', value: ship.storage?.countermeasure || 0 }
+    { key: 'dock_s_count', labelKey: 'ship_build.stats_dock_s_count', unit: '', value: getDockCount(ship, 'dock_s') },
+    // 行9: Countermeasure | S Dock Capacity
+    { key: 'countermeasure', labelKey: 'ship_build.stats_countermeasure', unit: '', value: ship.storage?.countermeasure || 0 },
+    { key: 'dock_s_capacity', labelKey: 'ship_build.stats_dock_s_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_s') }
   ]
 }
 
+// 完整 36 个数据点 (18行 x 2列)
 const buildDetailStatsByUseEquipmentStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
-  const summaryStats = buildSummaryStatsByUseEquipmentStats(ship)
   const shieldStats = getShieldStatsByUseEquipmentStats()
   const engineStats = getEngineStatsByUseEquipmentStats()
   const weaponStats = getWeaponStatsByUseEquipmentStats()
+  const turretAvg = getTurretStatsByUseEquipmentStats()
   const mass = ship.physics?.mass || 1
   const dragForward = ship.physics?.drag?.forward || 1
   const dragHorizontal = ship.physics?.drag?.horizontal || 1
@@ -919,9 +977,11 @@ const buildDetailStatsByUseEquipmentStats = (ship: X4Ship): Omit<ShipStatMetric,
   const dragRoll = ship.physics?.drag?.roll || 1
   const accfactorsHorizontal = ship.physics?.accfactors?.horizontal || 1
 
+  const baseSpeed = engineStats ? engineStats.thrustForward / dragForward : 0
+  const travelSpeed = engineStats ? engineStats.travelThrust / dragForward : 0
+  const boostSpeed = engineStats && baseSpeed > 0 ? Math.round(baseSpeed * engineStats.boostMultiplier) : 0
   const baseAcceleration = engineStats ? engineStats.thrustForward / mass : 0
   const boostAcceleration = engineStats ? Math.round(baseAcceleration * engineStats.boostAcceleration) : 0
-  const travelSpeed = engineStats ? engineStats.travelThrust / dragForward : 0
   const travelAcceleration = engineStats && engineStats.travelAttack ? Math.round(travelSpeed / engineStats.travelAttack) : 0
   const boostRecharge = engineStats ? engineStats.boostRecharge / 100 : 0
 
@@ -932,28 +992,63 @@ const buildDetailStatsByUseEquipmentStats = (ship: X4Ship): Omit<ShipStatMetric,
   const strafeSpeed = thrusterStats ? Math.round(thrusterStats.strafe / dragHorizontal) : 0
   const strafeAcceleration = thrusterStats ? Math.round(thrusterStats.strafe / mass * accfactorsHorizontal) : 0
 
-  const extraStats: Omit<ShipStatMetric, 'ratio'>[] = [
+  // 18x2 排布: 完整数据 [左1, 右1, 左2, 右2, ...]
+  return [
+    // 行1: Hull | Weapon Burst
+    { key: 'hull', labelKey: 'ship_build.stats_hull', unit: 'MJ', value: ship.hull || 0 },
+    { key: 'weapon_burst', labelKey: 'ship_build.stats_weapon_burst', unit: 'MW', value: Math.round(weaponStats.burst * 10) / 10 },
+    // 行2: Shield | Turret Avg
+    { key: 'shield', labelKey: 'ship_build.stats_shield', unit: 'MJ', value: shieldStats.max },
+    { key: 'turret_avg', labelKey: 'ship_build.stats_turret_avg', unit: 'MW', value: turretAvg },
+    // 行3: Shield Recharge Rate | Weapon Sustained
     { key: 'shield_recharge_rate', labelKey: 'ship_build.stats_shield_recharge_rate', unit: 'MW', value: shieldStats.rate },
-    { key: 'shield_recharge_delay', labelKey: 'ship_build.stats_shield_recharge_delay', unit: 's', value: shieldStats.delay },
-    { key: 'shield_group_avg', labelKey: 'ship_build.stats_shield_group_avg', unit: 'MJ', value: shieldStats.groupAvg },
     { key: 'weapon_sustained', labelKey: 'ship_build.stats_weapon_sustained', unit: 'MW', value: Math.round(weaponStats.sustained * 10) / 10 },
-    { key: 'storage_solid', labelKey: 'ship_build.stats_storage_solid', unit: 'm3', value: getCargoCapacity(ship, 'solid') },
-    { key: 'storage_liquid', labelKey: 'ship_build.stats_storage_liquid', unit: 'm3', value: getCargoCapacity(ship, 'liquid') },
-    { key: 'storage_condensed', labelKey: 'ship_build.stats_storage_condensed', unit: 'm3', value: getCargoCapacity(ship, 'condensed') },
+    // 行4: Shield Recharge Delay | Speed
+    { key: 'shield_recharge_delay', labelKey: 'ship_build.stats_shield_recharge_delay', unit: 's', value: shieldStats.delay },
+    { key: 'speed', labelKey: 'ship_build.stats_speed', unit: 'm/s', value: Math.round(baseSpeed) },
+    // 行5: Shield Group Avg | Acceleration
+    { key: 'shield_group_avg', labelKey: 'ship_build.stats_shield_group_avg', unit: 'MJ', value: shieldStats.groupAvg },
     { key: 'acceleration', labelKey: 'ship_build.stats_acceleration', unit: 'm/s2', value: Math.round(baseAcceleration) },
+    // 行6: Container | Boost Speed
+    { key: 'storage_container', labelKey: 'ship_build.stats_storage_container', unit: 'm3', value: getCargoCapacity(ship, 'container') },
+    { key: 'boost_speed', labelKey: 'ship_build.stats_boost_speed', unit: 'm/s', value: boostSpeed },
+    // 行7: Solid | Boost Acceleration
+    { key: 'storage_solid', labelKey: 'ship_build.stats_storage_solid', unit: 'm3', value: getCargoCapacity(ship, 'solid') },
     { key: 'boost_acceleration', labelKey: 'ship_build.stats_boost_acceleration', unit: 'm/s2', value: boostAcceleration },
+    // 行8: Liquid | Boost Duration
+    { key: 'storage_liquid', labelKey: 'ship_build.stats_storage_liquid', unit: 'm3', value: getCargoCapacity(ship, 'liquid') },
     { key: 'boost_duration', labelKey: 'ship_build.stats_boost_duration', unit: 's', value: engineStats?.boostDuration || 0 },
+    // 行9: Condensed | Boost Recharge
+    { key: 'storage_condensed', labelKey: 'ship_build.stats_storage_condensed', unit: 'm3', value: getCargoCapacity(ship, 'condensed') },
     { key: 'boost_recharge', labelKey: 'ship_build.stats_boost_recharge', unit: '%/s', value: boostRecharge },
-    { key: 'travel_acceleration', labelKey: 'ship_build.stats_travel_acceleration', unit: 'm/s2', value: travelAcceleration },
-    { key: 'travel_charge_time', labelKey: 'ship_build.stats_travel_charge_time', unit: 's', value: engineStats?.travelCharge || 0 },
-    { key: 'strafe_speed', labelKey: 'ship_build.stats_strafe_speed', unit: 'm/s', value: strafeSpeed },
-    { key: 'strafe_acceleration', labelKey: 'ship_build.stats_strafe_acceleration', unit: 'm/s2', value: strafeAcceleration },
+    // 行10: Yaw | Travel Speed
     { key: 'yaw', labelKey: 'ship_build.stats_yaw', unit: 'rad/s', value: Math.round(yawRate * 100) / 100 },
+    { key: 'travel_speed', labelKey: 'ship_build.stats_travel_speed', unit: 'm/s', value: Math.round(travelSpeed) },
+    // 行11: Pitch | Travel Acceleration
     { key: 'pitch', labelKey: 'ship_build.stats_pitch', unit: 'rad/s', value: Math.round(pitchRate * 100) / 100 },
-    { key: 'roll', labelKey: 'ship_build.stats_roll', unit: 'rad/s', value: Math.round(rollRate * 100) / 100 }
+    { key: 'travel_acceleration', labelKey: 'ship_build.stats_travel_acceleration', unit: 'm/s2', value: travelAcceleration },
+    // 行12: Roll | Travel Charge Time
+    { key: 'roll', labelKey: 'ship_build.stats_roll', unit: 'rad/s', value: Math.round(rollRate * 100) / 100 },
+    { key: 'travel_charge_time', labelKey: 'ship_build.stats_travel_charge_time', unit: 's', value: engineStats?.travelCharge || 0 },
+    // 行13: Radar Range | Strafe Speed
+    { key: 'radar_range', labelKey: 'ship_build.stats_radar_range', unit: 'km', value: Math.round((ship.radarRange || 0) / 1000) },
+    { key: 'strafe_speed', labelKey: 'ship_build.stats_strafe_speed', unit: 'm/s', value: strafeSpeed },
+    // 行14: Crew | Strafe Acceleration
+    { key: 'crew', labelKey: 'ship_build.stats_crew', unit: '', value: ship.crew?.capacity || 0 },
+    { key: 'strafe_acceleration', labelKey: 'ship_build.stats_strafe_acceleration', unit: 'm/s2', value: strafeAcceleration },
+    // 行15: Unit Storage | M Dock Count
+    { key: 'storage_unit', labelKey: 'ship_build.stats_storage_unit', unit: '', value: ship.storage?.unit || 0 },
+    { key: 'dock_m_count', labelKey: 'ship_build.stats_dock_m_count', unit: '', value: getDockCount(ship, 'dock_m') },
+    // 行16: Missile | M Dock Capacity
+    { key: 'missile', labelKey: 'ship_build.stats_missile', unit: '', value: ship.storage?.missile || 0 },
+    { key: 'dock_m_capacity', labelKey: 'ship_build.stats_dock_m_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_m') },
+    // 行17: Deployable | S Dock Count
+    { key: 'deployable', labelKey: 'ship_build.stats_deployable', unit: '', value: ship.storage?.deployable || 0 },
+    { key: 'dock_s_count', labelKey: 'ship_build.stats_dock_s_count', unit: '', value: getDockCount(ship, 'dock_s') },
+    // 行18: Countermeasure | S Dock Capacity
+    { key: 'countermeasure', labelKey: 'ship_build.stats_countermeasure', unit: '', value: ship.storage?.countermeasure || 0 },
+    { key: 'dock_s_capacity', labelKey: 'ship_build.stats_dock_s_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_s') }
   ]
-
-  return [...summaryStats, ...extraStats]
 }
 </script>
 
@@ -961,24 +1056,12 @@ const buildDetailStatsByUseEquipmentStats = (ship: X4Ship): Omit<ShipStatMetric,
   <div class="col-span-12 lg:col-span-4 panel-card" data-testid="ship-build-panel-stats">
     <div class="panel-header">
       <span>{{ t('ship_build.panel_stats') }}</span>
-      <div class="stats-mode-switch">
-        <button
-          data-testid="ship-build-stats-mode-summary"
-          class="stats-mode-btn"
-          :class="statsViewMode === 'summary' ? 'stats-mode-btn-active' : 'stats-mode-btn-idle'"
-          @click="setStatsViewMode('summary')"
-        >
-          {{ t('ship_build.stats_mode_summary') }}
-        </button>
-        <button
-          data-testid="ship-build-stats-mode-detail"
-          class="stats-mode-btn"
-          :class="statsViewMode === 'detail' ? 'stats-mode-btn-active' : 'stats-mode-btn-idle'"
-          @click="setStatsViewMode('detail')"
-        >
-          {{ t('ship_build.stats_mode_detail') }}
-        </button>
-      </div>
+      <ViewTabUI
+        v-model="statsViewMode"
+        :views="statsViewTabs"
+        color-style="emerald"
+        ui-key="ship-build-stats-mode"
+      />
     </div>
     <div class="stats-panel" data-testid="ship-build-stats-panel">
       <div class="stats-list-container">
@@ -1042,22 +1125,6 @@ const buildDetailStatsByUseEquipmentStats = (ship: X4Ship): Omit<ShipStatMetric,
 
 .stats-caption {
   @apply text-[11px] uppercase tracking-wide text-emerald-300/80;
-}
-
-.stats-mode-switch {
-  @apply flex items-center gap-2;
-}
-
-.stats-mode-btn {
-  @apply px-2.5 py-1 rounded-md text-[11px] font-semibold border transition-colors;
-}
-
-.stats-mode-btn-idle {
-  @apply text-slate-300 border-slate-700 bg-slate-800/60 hover:text-emerald-200 hover:border-emerald-400/60;
-}
-
-.stats-mode-btn-active {
-  @apply text-white border-emerald-400 bg-emerald-600/70;
 }
 
 .stats-pending {

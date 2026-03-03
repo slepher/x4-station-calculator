@@ -364,7 +364,7 @@ test.describe('ship-build-stat', () => {
     // 3.1.1 状态: 仅载入大太刀
     await buildOdachiState(page)
     // 3.1.2 点击"简略"档位按钮
-    await page.getByTestId('ship-build-stats-mode-summary').click()
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-summary').click()
     // 3.1.3 断言字段集合包含18项 #期望: [18]
     const labels = page.locator('.stats-label')
     const labelCount = await labels.count()
@@ -395,12 +395,12 @@ test.describe('ship-build-stat', () => {
     // 3.2.1 状态: 大太刀已选
     await buildOdachiState(page)
     // 3.2.2 点击"详细"档位按钮
-    await page.getByTestId('ship-build-stats-mode-detail').click()
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
     // 3.2.3 断言字段集合包含36项 #期望: [36]
     const labels = page.locator('.stats-label')
     await expect(labels).toHaveCount(36)
     // 3.2.4 点击"简略"档位按钮
-    await page.getByTestId('ship-build-stats-mode-summary').click()
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-summary').click()
     // 3.2.5 断言字段集合包含18项 #期望: [18]
     await expect(page.locator('.stats-label')).toHaveCount(18)
   })
@@ -410,7 +410,7 @@ test.describe('ship-build-stat', () => {
     // 3.3.1 状态: 大太刀已选
     await buildOdachiState(page)
     // 3.3.2 切换: 大太刀已选 -> 详细档位
-    await page.getByTestId('ship-build-stats-mode-detail').click()
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
     // 3.3.3 断言船体、护盾、速度为真实值 #期望: ['--']
     const values = page.locator('.stats-value')
     const hullValue = values.filter({ hasText: /MJ/ }).first()
@@ -433,7 +433,7 @@ test.describe('ship-build-stat', () => {
     // 3.5.1 状态: 仅载入大太刀
     await buildOdachiState(page)
     // 3.5.2 点击"详细"档位按钮
-    await page.getByTestId('ship-build-stats-mode-detail').click()
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
     // 3.5.3 采集 36 项详细字段快照并与 `tests/fixtures/ship-build-stat-expected.json` 的 Odachi.detail 全量比对
     const actualStats = await captureStatGroup(page)
     // 3.5.4 断言差异项数量为 0 #期望: [0]
@@ -448,7 +448,7 @@ test.describe('ship-build-stat', () => {
     // 3.6.1 状态: 仅载入大阪
     await buildOsakaState(page)
     // 3.6.2 点击"详细"档位按钮
-    await page.getByTestId('ship-build-stats-mode-detail').click()
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
     // 3.6.3 采集 36 项详细字段快照并与 `tests/fixtures/ship-build-stat-expected.json` 的 Osaka.detail 全量比对
     const actualStats = await captureStatGroup(page)
     // 3.6.4 断言差异项数量为 0 #期望: [0]
@@ -463,7 +463,7 @@ test.describe('ship-build-stat', () => {
     // 3.7.1 状态: 仅载入大太刀 (class: ship_m)
     await buildOdachiState(page)
     // 3.7.2 点击"详细"档位按钮
-    await page.getByTestId('ship-build-stats-mode-detail').click()
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
     // 3.7.3 断言船体进度条可见 #期望: [toBeVisible]
     await expect(page.locator('[data-testid="ship-build-stats-bar-hull"]')).toBeVisible()
     // 3.7.4 断言速度进度条可见 #期望: [toBeVisible]
@@ -477,7 +477,7 @@ test.describe('ship-build-stat', () => {
     // 3.8.1 状态: 仅载入大阪 (class: ship_l)
     await buildOsakaState(page)
     // 3.8.2 点击"详细"档位按钮
-    await page.getByTestId('ship-build-stats-mode-detail').click()
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
     // 3.8.3 断言船体进度条可见 #期望: [toBeVisible]
     await expect(page.locator('[data-testid="ship-build-stats-bar-hull"]')).toBeVisible()
     // 3.8.4 断言速度进度条可见 #期望: [toBeVisible]
@@ -491,7 +491,7 @@ test.describe('ship-build-stat', () => {
     // 3.9.1 状态: 仅载入大太刀 (class: ship_m)
     await buildOdachiState(page)
     // 3.9.2 点击"详细"档位按钮
-    await page.getByTestId('ship-build-stats-mode-detail').click()
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
     // 3.9.3 断言船体进度条可见 #期望: [toBeVisible]
     await expect(page.locator('[data-testid="ship-build-stats-bar-hull"]')).toBeVisible()
     // 3.9.4 断言速度进度条可见 #期望: [toBeVisible]
@@ -505,7 +505,7 @@ test.describe('ship-build-stat', () => {
     // 3.10.1 状态: 仅载入大阪
     await buildOsakaState(page)
     // 3.10.2 点击"详细"档位按钮
-    await page.getByTestId('ship-build-stats-mode-detail').click()
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
     // 3.10.3 断言进度条可见 #期望: [toBeVisible]
     await expect(page.locator('[data-testid="ship-build-stats-bar-hull"]')).toBeVisible()
   })
@@ -515,7 +515,7 @@ test.describe('ship-build-stat', () => {
     // 3.11.1 状态: 仅载入大太刀
     await buildOdachiState(page)
     // 3.11.2 点击"详细"档位按钮
-    await page.getByTestId('ship-build-stats-mode-detail').click()
+    await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
     // 3.11.3 断言进度条可见 #期望: [toBeVisible]
     await expect(page.locator('[data-testid="ship-build-stats-bar-hull"]')).toBeVisible()
   })
