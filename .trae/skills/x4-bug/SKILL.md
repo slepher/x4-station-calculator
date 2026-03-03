@@ -43,6 +43,11 @@ Status note:
   - implement source-code fixes in `src/**`
   - run bug-fix verification as if code has changed
 
+Single-phase execution rule:
+- `/x4:bug` is report-only and single-phase.
+- In one `/x4:bug` invocation, do not continue into `/x4:bug-fix` behavior (root-cause implementation, source edits, fix verification).
+- If user asks to "继续修复" in the same message, finish report artifacts first, then stop and instruct next command: `/x4:bug-fix`.
+
 Documentation ownership rule:
 - If reproduction tasks or UI test knowledge must be added/updated, delegate to `/x4:test-doc`.
 - `x4-test-doc` remains the authority for `test_tasks.md` / `ui_knowledge.md`.
@@ -96,6 +101,32 @@ If the reproduction task is Web Integration, delegate `ui_knowledge.md` updates 
 - Stop after report artifacts are updated.
 - If user requests fix, route to `/x4:bug-fix`.
 
+### Step 5: Compliance Gate (MANDATORY)
+
+Run a final scope check before responding (delta-only, not whole dirty tree):
+
+```bash
+# At start of /x4:bug invocation
+git status --porcelain > /tmp/x4_bug_before.txt
+
+# Before final response
+git status --porcelain > /tmp/x4_bug_after.txt
+python3 - <<'PY'
+from pathlib import Path
+before = set(Path('/tmp/x4_bug_before.txt').read_text().splitlines())
+after = set(Path('/tmp/x4_bug_after.txt').read_text().splitlines())
+delta = sorted(after - before)
+print('\n'.join(delta))
+PY
+```
+
+Pass condition:
+- Delta files are limited to bug-report artifacts for current change (for example: `openspec/changes/<change-name>/bugs.md`).
+
+Fail condition:
+- Any delta change appears in `src/**`, `tests/**`, or non-target change docs during `/x4:bug`.
+- On failure: output `BLOCKED: scope violation`, list offending files, and stop without claiming bug fixed.
+
 ## Unrelated Bug Handling
 
 If a reported bug is unrelated to any existing change:
@@ -111,3 +142,16 @@ If a reported bug is unrelated to any existing change:
 - Keep all edits scoped to current change documentation.
 - Keep `bugs.md` as bug catalog/reference; avoid using its status as execution gate.
 - Do not run fix verification loops in this skill.
+- Do not include language implying fix completion such as "已修复" in `/x4:bug` output.
+- If `Related Test` is unknown after report step, mark as `PENDING (/x4:test-doc)` instead of vague placeholders like `待添加`.
+
+## Output (MANDATORY)
+
+- Must print `Resolved change: <change-name>`.
+- Must list updated bug IDs and their status.
+- Must include `Related Test` linkage result per bug:
+  - linked test id; or
+  - `PENDING (/x4:test-doc)` when not yet linked.
+- Must include next-step routing:
+  - `/x4:test-doc` for reproduction/task linkage
+  - `/x4:bug-fix` for implementation phase

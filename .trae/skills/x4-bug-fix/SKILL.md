@@ -26,6 +26,10 @@ It executes the fix loop for a tracked bug target.
 - `/x4:bug-fix [change-name] [bug-description(optional)]`
 - User asks to fix a tracked bug
 
+Phase isolation:
+- This skill must run only when the explicit command is `/x4:bug-fix`.
+- If current invocation is `/x4:bug`, do not execute any step in this skill; return handoff instruction only.
+
 ## Target Resolution (MANDATORY)
 
 1. Use the already-resolved `change-name` from the resolver.

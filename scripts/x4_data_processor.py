@@ -1215,7 +1215,7 @@ class X4PrecisionLoader:
                 filtered_tags = sorted([
                     t for t in conn['tags']
                     if t not in tag_blacklist
-                    and t not in {"mandatory", "platformcollision", "envmap_cockpit"}
+                    and t not in {"platformcollision", "envmap_cockpit"}
                     and not t.startswith("symmetry")
                 ])
                 self._collect_slot_tag_counts(filtered_tags)
@@ -1285,7 +1285,7 @@ class X4PrecisionLoader:
                 filtered_tags = [
                     t for t in thruster_tags
                     if t not in tag_blacklist
-                    and t not in {"mandatory", "platformcollision", "envmap_cockpit"}
+                    and t not in {"platformcollision", "envmap_cockpit"}
                     and not t.startswith("symmetry")
                 ]
                 self._collect_slot_tag_counts(filtered_tags)

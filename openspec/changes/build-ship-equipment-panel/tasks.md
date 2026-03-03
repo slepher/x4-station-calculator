@@ -92,9 +92,9 @@
 
 ## 14. 进度条优化
 
-- [ ] 14.1 diff > 0: 0到currentValue青色, currentValue到candidateValue蓝色
-- [ ] 14.2 diff < 0: 0到candidateValue青色, candidateValue到currentValue粉色
-- [ ] 14.3 diff = 0: 全部青色
+- [x] 14.1 diff > 0: 0到currentValue青色, currentValue到candidateValue蓝色
+- [x] 14.2 diff < 0: 0到candidateValue青色, candidateValue到currentValue粉色
+- [x] 14.3 diff = 0: 全部青色
 - [x] 13.8 EngineSummary 接口修改：`speed: number, travelSpeed: number`（替代原 `travel: string`）
 - [x] 13.9 Picker 候选卡片两列布局：左边装备信息（名称+tag），右边 Summary（Label Value Unit 格式）
 - [x] 13.10 Summary Label/Value/Unit 颜色字体与 PanelEquipment 一致：
@@ -102,3 +102,12 @@
   - Value: `text-xs text-emerald-300 tabular-nums`
   - Unit: `text-[10px] text-slate-400`
 - [x] 13.11 i18n 与 Stats 统一（除 burst_dps/sustained_dps 保持较短形式外，其他字段使用 Stats i18n）
+
+## 15. 标准模式 Group 排列优化
+
+仅在**标准模式（connection 模式）**下生效。简化模式（group 模式）已按 size/tag 聚合，不会超过 8。
+
+- [x] 15.1 触发条件：所有槽位位置数量 > 8
+- [x] 15.2 第一层分组：按 size (extralarge > large > medium > small) 分为 N 行
+- [x] 15.3 第二层分组：在每个 size 行内，如果某个槽位的 count > 8，将其内部数量平分为两行显示
+- [x] 15.4 简化模式（group 模式）不应用此逻辑，保持原有聚合排列

@@ -163,3 +163,55 @@ Picker 展开 AND (当前装备存在 OR 候选装备存在)
 2. **两列布局**：使用 `grid grid-cols-2` 实现，与 Stats 风格一致
 3. **Header 显示候选名称**：直接使用 `candidateEquipment.name`
 4. **样式复用**：复、用 Stats 组件的样式类（`.stats-list-container`, `.stats-column`, `.stats-row`, `.stats-bar` 等）
+
+## 非简化模式 Group 排列优化
+
+### 10.1 概述
+
+当飞船槽位很多时（如驱逐舰、战列舰），所有 group 会挤在一起显示。需要按规则重新分组排列。
+
+### 10.2 触发条件
+
+- **生效模式**：仅标准模式（非简化模式，即 showAllSlots=true）
+- **简化模式**：showAllSlots=false 时保持原有紧凑排列
+- **数量阈值**：所有 group 位置数量 > 8
+
+### 10.3 排列规则
+
+#### 第一层分组：按 Size 分行
+
+按装备尺寸分为 N 行，优先级顺序：
+1. extralarge
+2. large
+3. medium
+4. small
+
+#### 第二层分组：Group 内部分行
+
+在每个 size 行内，如果某个 group 的 count > 8：
+- 将其内部数量**平分**为两行显示
+- 例如：count=16 → 分成两行，每行 8 个
+
+### 10.4 数据结构
+
+需要新增计算逻辑，将原有的 flat group 列表转换为层级结构：
+
+```typescript
+interface SizeGroupRow {
+  size: 'extralarge' | 'large' | 'medium' | 'small'
+  groups: GroupRow[]
+}
+
+interface GroupRow {
+  groupKey: string
+  count: number
+  // 如果 count > 8，平分后的行
+  splitRows?: { start: number; end: number }[]
+}
+```
+
+### 10.5 实现位置
+
+- 组件：`ShipBuildPanelFit.vue`
+- 计算属性：`slotTargets` 或新增专门的计算属性
+- 渲染逻辑：根据模式（简化/标准）选择不同的渲染方式

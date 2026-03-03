@@ -42,6 +42,14 @@ Deprecated and out of active workflow scope:
 
 Do not copy detailed standards into this file. Always delegate to phase skills.
 
+## Single-Command Phase Isolation (MANDATORY)
+
+- A single command invocation must execute exactly one phase skill.
+- Do not auto-chain into a second phase in the same response unless user explicitly issues the second command.
+- Enforcement example:
+  - `/x4:bug` cannot auto-advance to `/x4:bug-fix` in the same invocation.
+  - `/x4:bug` may only output handoff instruction for next phase.
+
 ## Cross-Skill Authority (MANDATORY)
 
 - For `/x4:new` and `/x4:ff`, all document detail interpretation and update rules must be sourced from `x4-doc`.
@@ -141,6 +149,7 @@ Enforcement:
 - `/x4:verify` should run after `/x4:apply` and includes verification-stage test implementation/execution sequencing.
 - `/x4:archive` must consume `/x4:verify` gate output contract; missing gate fields are blockers.
 - `/x4:archive` should run only after verify passes.
+- `/x4:bug` is report-only and must never execute code-fix actions from `/x4:bug-fix`.
 
 ## Handoff Sequence (Default)
 
