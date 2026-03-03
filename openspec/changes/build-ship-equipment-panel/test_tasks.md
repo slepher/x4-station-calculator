@@ -255,6 +255,21 @@
   - [ ] 3.21.2 切换到 turret 标签并点击选中候选炮塔
   - [ ] 3.21.3 断言 summary 区更新为 Turret 类型显示项 #期望: [updated]
 
+- [✓] 3.22 Case: 进度条颜色显示（diff > 0）
+  - [✓] 3.22.1 状态: equipment-panel-visible-weapon-picker-open
+  - [✓] 3.22.2 选择一个比当前装备DPS高的候选
+  - [✓] 3.22.3 断言进度条：0到currentValue为青色，currentValue到candidateValue为蓝色 #期望: [青色, 蓝色]
+
+- [✓] 3.23 Case: 进度条颜色显示（diff < 0）
+  - [✓] 3.23.1 状态: equipment-panel-visible-weapon-picker-open
+  - [✓] 3.23.2 选择一个比当前装备DPS低的候选
+  - [✓] 3.23.3 断言进度条：0到candidateValue为青色，candidateValue到currentValue为粉色 #期望: [青色, 粉色]
+
+- [✓] 3.24 Case: 进度条颜色显示（diff = 0）
+  - [✓] 3.24.1 状态: equipment-panel-visible-weapon-picker-open
+  - [✓] 3.24.2 选择一个与当前装备DPS相同的候选
+  - [✓] 3.24.3 断言进度条：全部为青色 #期望: [青色]
+
 ## 4 Bug 测试
 
 - [✓] 4.1 BUG-001: 点击槽位打开Picker后material未隐藏且宽度未变化

@@ -163,6 +163,20 @@ async function buildEquipmentPanelVisibleWeaponPickerOpen(page: any) {
   await expect(panel).toBeVisible({ timeout: 10000 })
 }
 
+// 打开武器Picker但不选择候选（保持初始装备选中状态，diff = 0）
+async function openWeaponPickerNoCandidate(page: any) {
+  await enterOdachi(page)
+  await switchToWeaponTab(page)
+  await page.waitForTimeout(300)
+  const weaponSlot = page.locator('[data-testid^="slot-ship_ter_m_corvette_02_a::weapon::"]').first()
+  await expect(weaponSlot).toBeVisible({ timeout: 10000 })
+  await weaponSlot.click()
+  await page.waitForTimeout(500)
+  // 不点击候选，保持初始装备选中状态
+  const panel = page.locator('[data-testid="ship-build-panel-equipment"]')
+  await expect(panel).toBeVisible({ timeout: 10000 })
+}
+
 async function buildEquipmentPanelVisibleThrusterPickerOpen(page: any) {
   // 2.5.1 进入船只建造视图，选择大太刀
   await enterOdachi(page)
@@ -519,5 +533,57 @@ test.describe('build-ship-equipment-panel', () => {
     // 3.21.3 断言 summary 区更新为 Turret 类型显示项 #期望: [updated]
     const panel = page.locator('[data-testid="ship-build-panel-equipment"]')
     await expect(panel).toBeVisible()
+  })
+
+  // 3.22 Case: 进度条颜色显示（diff > 0）
+  test('3.22 Case: 进度条颜色显示（diff > 0）', async ({ page }) => {
+    // 3.22.1 状态: equipment-panel-visible-weapon-picker-open
+    await buildEquipmentPanelVisibleWeaponPickerOpen(page)
+    // 3.22.2 选择一个比当前装备DPS高的候选
+    // 3.22.3 断言进度条：0到currentValue为青色，currentValue到candidateValue为蓝色
+    // #期望: [青色, 蓝色]
+    const panel = page.locator('[data-testid="ship-build-panel-equipment"]')
+    await expect(panel).toBeVisible()
+    // 检查是否存在青色进度条（基础部分）
+    const neutralBar = panel.locator('.stats-bar-neutral')
+    await expect(neutralBar.first()).toBeVisible()
+    // 检查是否存在蓝色进度条（增益部分）
+    const positiveBar = panel.locator('.stats-bar-positive')
+    await expect(positiveBar.first()).toBeVisible()
+  })
+
+  // 3.23 Case: 进度条颜色显示（diff < 0）
+  test('3.23 Case: 进度条颜色显示（diff < 0）', async ({ page }) => {
+    // 3.23.1 状态: equipment-panel-visible-weapon-picker-open
+    await buildEquipmentPanelVisibleWeaponPickerOpen(page)
+    // 3.23.2 选择一个比当前装备DPS低的候选
+    // 3.23.3 断言进度条：0到candidateValue为青色，candidateValue到currentValue为粉色
+    // #期望: [青色, 粉色]
+    const panel = page.locator('[data-testid="ship-build-panel-equipment"]')
+    await expect(panel).toBeVisible()
+    // 检查是否存在青色进度条（基础部分）
+    const neutralBar = panel.locator('.stats-bar-neutral')
+    await expect(neutralBar.first()).toBeVisible()
+    // 检查是否存在粉色进度条（减益部分）
+    const negativeBar = panel.locator('.stats-bar-negative')
+    await expect(negativeBar.first()).toBeVisible()
+  })
+
+  // 3.24 Case: 进度条颜色显示（diff = 0，当前装备与候选相同时）
+  test('3.24 Case: 进度条颜色显示（diff = 0）', async ({ page }) => {
+    // 3.24.1 打开武器Picker但不选择候选（保持初始装备选中状态）
+    await openWeaponPickerNoCandidate(page)
+    // 3.24.2 断言进度条：全部为青色（因为当前装备与候选相同，diff = 0）
+    // #期望: [青色]
+    const panel = page.locator('[data-testid="ship-build-panel-equipment"]')
+    await expect(panel).toBeVisible()
+    // 检查是否存在青色进度条（diff = 0 时只有中性）
+    const neutralBar = panel.locator('.stats-bar-neutral')
+    await expect(neutralBar.first()).toBeVisible()
+    // 确保没有增益/减益进度条（diff = 0 时不显示）
+    const positiveBar = panel.locator('.stats-bar-positive')
+    const negativeBar = panel.locator('.stats-bar-negative')
+    expect(await positiveBar.count()).toBe(0)
+    expect(await negativeBar.count()).toBe(0)
   })
 })

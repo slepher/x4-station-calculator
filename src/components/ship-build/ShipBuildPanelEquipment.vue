@@ -131,9 +131,9 @@ const comparisonData = computed(() => {
     })
 
     return fields.map(field => {
-      const currentValue = (current as any)?.[field.key] || 0
+      const currentValue = (current as any)?.[field.key]
       const candidateValue = (candidate as any)?.[field.key] || 0
-      const diff = candidateValue - currentValue
+      const diff = currentValue !== undefined ? candidateValue - currentValue : undefined
       return {
         key: field.key,
         labelKey: field.labelKey,
@@ -166,9 +166,9 @@ const comparisonData = computed(() => {
     })
 
     return fields.map(field => {
-      const currentValue = (current as any)?.[field.key] || 0
+      const currentValue = (current as any)?.[field.key]
       const candidateValue = (candidate as any)?.[field.key] || 0
-      const diff = candidateValue - currentValue
+      const diff = currentValue !== undefined ? candidateValue - currentValue : undefined
       return {
         key: field.key,
         labelKey: field.labelKey,
@@ -212,9 +212,9 @@ const comparisonData = computed(() => {
     })
 
     return fields.map(field => {
-      const currentValue = (current as any)?.[field.key] || 0
+      const currentValue = (current as any)?.[field.key]
       const candidateValue = (candidate as any)?.[field.key] || 0
-      const diff = candidateValue - currentValue
+      const diff = currentValue !== undefined ? candidateValue - currentValue : undefined
       return {
         key: field.key,
         labelKey: field.labelKey,
@@ -253,9 +253,9 @@ const comparisonData = computed(() => {
     })
 
     return fields.map(field => {
-      const currentValue = (current as any)?.[field.key] || 0
+      const currentValue = (current as any)?.[field.key]
       const candidateValue = (candidate as any)?.[field.key] || 0
-      const diff = candidateValue - currentValue
+      const diff = currentValue !== undefined ? candidateValue - currentValue : undefined
       return {
         key: field.key,
         labelKey: field.labelKey,
@@ -295,6 +295,24 @@ function getProgressPercent(value: number, max: number | undefined): number {
   if (!max || max === 0) return 0
   return Math.min(100, (value / max) * 100)
 }
+
+// 计算基础进度条（较小值，固定青色）
+function getBasePercent(currentValue: number, candidateValue: number, max: number | undefined): number {
+  const base = Math.min(currentValue, candidateValue)
+  return getProgressPercent(base, max)
+}
+
+// 计算差值进度条（较大值-较小值）
+function getDiffPercent(currentValue: number, candidateValue: number, max: number | undefined): number {
+  const diff = Math.abs(candidateValue - currentValue)
+  return getProgressPercent(diff, max)
+}
+
+// 计算差值起始位置（较小值的位置）
+function getDiffStartPercent(currentValue: number, candidateValue: number, max: number | undefined): number {
+  const base = Math.min(currentValue, candidateValue)
+  return getProgressPercent(base, max)
+}
 </script>
 
 <template>
@@ -330,18 +348,48 @@ function getProgressPercent(value: number, max: number | undefined): number {
               <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
             </span>
             <div class="stats-bar">
-              <!-- 当前值进度条 -->
-              <div
-                v-if="item.currentValue !== undefined"
-                class="stats-bar-fill stats-bar-current"
-                :style="{ width: getProgressPercent(item.currentValue, item.max) + '%' }"
-              ></div>
-              <!-- 候选值进度条 -->
-              <div
-                class="stats-bar-fill"
-                :class="getDiffClass(item.diff)"
-                :style="{ width: getProgressPercent(item.candidateValue, item.max) + '%' }"
-              ></div>
+              <!-- 只有候选值，没有当前值 -->
+              <template v-if="item.currentValue === undefined">
+                <div
+                  class="stats-bar-fill stats-bar-neutral"
+                  :style="{ width: getProgressPercent(item.candidateValue, item.max) + '%' }"
+                ></div>
+              </template>
+              <!-- diff = 0: 全部青色 -->
+              <template v-else-if="item.diff === 0">
+                <div
+                  class="stats-bar-fill stats-bar-neutral"
+                  :style="{ width: getBasePercent(item.currentValue, item.candidateValue, item.max) + '%' }"
+                ></div>
+              </template>
+              <!-- diff > 0: 0到currentValue青色, currentValue到candidateValue蓝色 -->
+              <template v-else-if="item.diff > 0">
+                <div
+                  class="stats-bar-fill stats-bar-neutral"
+                  :style="{ width: getBasePercent(item.currentValue, item.candidateValue, item.max) + '%' }"
+                ></div>
+                <div
+                  class="stats-bar-fill stats-bar-positive"
+                  :style="{
+                    width: getDiffPercent(item.currentValue, item.candidateValue, item.max) + '%',
+                    left: getDiffStartPercent(item.currentValue, item.candidateValue, item.max) + '%'
+                  }"
+                ></div>
+              </template>
+              <!-- diff < 0: 0到candidateValue青色, candidateValue到currentValue粉色 -->
+              <template v-else-if="item.diff < 0">
+                <div
+                  class="stats-bar-fill stats-bar-neutral"
+                  :style="{ width: getBasePercent(item.currentValue, item.candidateValue, item.max) + '%' }"
+                ></div>
+                <div
+                  class="stats-bar-fill stats-bar-negative"
+                  :style="{
+                    width: getDiffPercent(item.currentValue, item.candidateValue, item.max) + '%',
+                    left: getDiffStartPercent(item.currentValue, item.candidateValue, item.max) + '%'
+                  }"
+                ></div>
+              </template>
             </div>
           </div>
         </div>
@@ -364,18 +412,48 @@ function getProgressPercent(value: number, max: number | undefined): number {
               <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
             </span>
             <div class="stats-bar">
-              <!-- 当前值进度条 -->
-              <div
-                v-if="item.currentValue !== undefined"
-                class="stats-bar-fill stats-bar-current"
-                :style="{ width: getProgressPercent(item.currentValue, item.max) + '%' }"
-              ></div>
-              <!-- 候选值进度条 -->
-              <div
-                class="stats-bar-fill"
-                :class="getDiffClass(item.diff)"
-                :style="{ width: getProgressPercent(item.candidateValue, item.max) + '%' }"
-              ></div>
+              <!-- 只有候选值，没有当前值 -->
+              <template v-if="item.currentValue === undefined">
+                <div
+                  class="stats-bar-fill stats-bar-neutral"
+                  :style="{ width: getProgressPercent(item.candidateValue, item.max) + '%' }"
+                ></div>
+              </template>
+              <!-- diff = 0: 全部青色 -->
+              <template v-else-if="item.diff === 0">
+                <div
+                  class="stats-bar-fill stats-bar-neutral"
+                  :style="{ width: getBasePercent(item.currentValue, item.candidateValue, item.max) + '%' }"
+                ></div>
+              </template>
+              <!-- diff > 0: 0到currentValue青色, currentValue到candidateValue蓝色 -->
+              <template v-else-if="item.diff > 0">
+                <div
+                  class="stats-bar-fill stats-bar-neutral"
+                  :style="{ width: getBasePercent(item.currentValue, item.candidateValue, item.max) + '%' }"
+                ></div>
+                <div
+                  class="stats-bar-fill stats-bar-positive"
+                  :style="{
+                    width: getDiffPercent(item.currentValue, item.candidateValue, item.max) + '%',
+                    left: getDiffStartPercent(item.currentValue, item.candidateValue, item.max) + '%'
+                  }"
+                ></div>
+              </template>
+              <!-- diff < 0: 0到candidateValue青色, candidateValue到currentValue粉色 -->
+              <template v-else-if="item.diff < 0">
+                <div
+                  class="stats-bar-fill stats-bar-neutral"
+                  :style="{ width: getBasePercent(item.currentValue, item.candidateValue, item.max) + '%' }"
+                ></div>
+                <div
+                  class="stats-bar-fill stats-bar-negative"
+                  :style="{
+                    width: getDiffPercent(item.currentValue, item.candidateValue, item.max) + '%',
+                    left: getDiffStartPercent(item.currentValue, item.candidateValue, item.max) + '%'
+                  }"
+                ></div>
+              </template>
             </div>
           </div>
         </div>
@@ -449,30 +527,21 @@ function getProgressPercent(value: number, max: number | undefined): number {
 
 .stats-bar-fill {
   @apply absolute h-full;
-  width: 100%;
 }
 
-.stats-bar-current {
-  @apply bg-slate-500/80;
+.stats-bar-neutral {
+  @apply bg-emerald-500/80;
   left: 0;
   z-index: 1;
 }
 
-.stats-bar-fill.diff-positive {
+.stats-bar-positive {
   @apply bg-blue-500/80;
-  left: 0;
   z-index: 2;
 }
 
-.stats-bar-fill.diff-negative {
+.stats-bar-negative {
   @apply bg-pink-500/80;
-  left: 0;
-  z-index: 2;
-}
-
-.stats-bar-fill.diff-neutral {
-  @apply bg-emerald-500/80;
-  left: 0;
   z-index: 2;
 }
 </style>

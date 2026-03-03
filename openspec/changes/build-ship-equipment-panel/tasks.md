@@ -89,6 +89,12 @@
 - [x] 13.5 进度条：数值都为0时显示空条
 - [x] 13.6 字段补充：Engine 补充 4 项缺失字段 (boostDuration, boostRecharge, travelAttack, boostAcceleration)，Weapon 补充 1 项 (singleShotTime)
 - [x] 13.7 i18n 更新：所有 label 添加 labelKey，使用 t() 翻译
+
+## 14. 进度条优化
+
+- [ ] 14.1 diff > 0: 0到currentValue青色, currentValue到candidateValue蓝色
+- [ ] 14.2 diff < 0: 0到candidateValue青色, candidateValue到currentValue粉色
+- [ ] 14.3 diff = 0: 全部青色
 - [x] 13.8 EngineSummary 接口修改：`speed: number, travelSpeed: number`（替代原 `travel: string`）
 - [x] 13.9 Picker 候选卡片两列布局：左边装备信息（名称+tag），右边 Summary（Label Value Unit 格式）
 - [x] 13.10 Summary Label/Value/Unit 颜色字体与 PanelEquipment 一致：
