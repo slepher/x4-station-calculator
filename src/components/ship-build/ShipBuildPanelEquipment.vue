@@ -166,12 +166,16 @@ const comparisonData = computed(() => {
     })
 
     return fields.map(field => {
+      const currentValue = (current as any)?.[field.key] || 0
       const candidateValue = (candidate as any)?.[field.key] || 0
+      const diff = candidateValue - currentValue
       return {
         key: field.key,
         labelKey: field.labelKey,
         unit: field.unit,
+        currentValue,
         candidateValue,
+        diff,
         max: maxValues[field.key]
       }
     })
@@ -208,12 +212,16 @@ const comparisonData = computed(() => {
     })
 
     return fields.map(field => {
+      const currentValue = (current as any)?.[field.key] || 0
       const candidateValue = (candidate as any)?.[field.key] || 0
+      const diff = candidateValue - currentValue
       return {
         key: field.key,
         labelKey: field.labelKey,
         unit: field.unit,
+        currentValue,
         candidateValue,
+        diff,
         max: maxValues[field.key]
       }
     })
@@ -245,12 +253,16 @@ const comparisonData = computed(() => {
     })
 
     return fields.map(field => {
+      const currentValue = (current as any)?.[field.key] || 0
       const candidateValue = (candidate as any)?.[field.key] || 0
+      const diff = candidateValue - currentValue
       return {
         key: field.key,
         labelKey: field.labelKey,
         unit: field.unit,
+        currentValue,
         candidateValue,
+        diff,
         max: maxValues[field.key]
       }
     })
@@ -262,6 +274,20 @@ const comparisonData = computed(() => {
 // 格式化数字
 function formatValue(value: number): string {
   return value.toLocaleString()
+}
+
+// 格式化显示值（候选值 + 差值）
+function formatDisplayValue(candidateValue: number, diff: number): string {
+  const sign = diff > 0 ? '+' : ''
+  const diffStr = diff !== 0 ? `(${sign}${formatValue(diff)})` : ''
+  return `${formatValue(candidateValue)}${diffStr}`
+}
+
+// 获取差值颜色类
+function getDiffClass(diff: number): string {
+  if (diff > 0) return 'diff-positive'
+  if (diff < 0) return 'diff-negative'
+  return 'diff-neutral'
 }
 
 // 计算进度条百分比
@@ -293,12 +319,27 @@ function getProgressPercent(value: number, max: number | undefined): number {
           >
             <span class="stats-label">{{ t(item.labelKey) }}</span>
             <span class="stats-value">
-              {{ formatValue(item.candidateValue) }}
+              <!-- 当前值 -->
+              <span v-if="item.currentValue !== undefined" class="current-value">
+                {{ formatValue(item.currentValue) }}
+              </span>
+              <!-- 候选值 + 差值 -->
+              <span :class="getDiffClass(item.diff)">
+                {{ formatDisplayValue(item.candidateValue, item.diff) }}
+              </span>
               <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
             </span>
             <div class="stats-bar">
+              <!-- 当前值进度条 -->
+              <div
+                v-if="item.currentValue !== undefined"
+                class="stats-bar-fill stats-bar-current"
+                :style="{ width: getProgressPercent(item.currentValue, item.max) + '%' }"
+              ></div>
+              <!-- 候选值进度条 -->
               <div
                 class="stats-bar-fill"
+                :class="getDiffClass(item.diff)"
                 :style="{ width: getProgressPercent(item.candidateValue, item.max) + '%' }"
               ></div>
             </div>
@@ -312,12 +353,27 @@ function getProgressPercent(value: number, max: number | undefined): number {
           >
             <span class="stats-label">{{ t(item.labelKey) }}</span>
             <span class="stats-value">
-              {{ formatValue(item.candidateValue) }}
+              <!-- 当前值 -->
+              <span v-if="item.currentValue !== undefined" class="current-value">
+                {{ formatValue(item.currentValue) }}
+              </span>
+              <!-- 候选值 + 差值 -->
+              <span :class="getDiffClass(item.diff)">
+                {{ formatDisplayValue(item.candidateValue, item.diff) }}
+              </span>
               <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
             </span>
             <div class="stats-bar">
+              <!-- 当前值进度条 -->
+              <div
+                v-if="item.currentValue !== undefined"
+                class="stats-bar-fill stats-bar-current"
+                :style="{ width: getProgressPercent(item.currentValue, item.max) + '%' }"
+              ></div>
+              <!-- 候选值进度条 -->
               <div
                 class="stats-bar-fill"
+                :class="getDiffClass(item.diff)"
                 :style="{ width: getProgressPercent(item.candidateValue, item.max) + '%' }"
               ></div>
             </div>
@@ -361,7 +417,23 @@ function getProgressPercent(value: number, max: number | undefined): number {
 }
 
 .stats-value {
-  @apply text-xs text-emerald-300 tabular-nums;
+  @apply text-xs tabular-nums;
+}
+
+.current-value {
+  @apply text-slate-400 mr-1;
+}
+
+.diff-positive {
+  @apply text-blue-400;
+}
+
+.diff-negative {
+  @apply text-pink-400;
+}
+
+.diff-neutral {
+  @apply text-emerald-300;
 }
 
 .stats-unit {
@@ -371,11 +443,36 @@ function getProgressPercent(value: number, max: number | undefined): number {
 .stats-bar {
   grid-column: 1 / -1;
   @apply bg-slate-800 rounded-sm overflow-hidden border border-slate-700/70;
-  height: 6px;
+  height: 8px;
+  position: relative;
 }
 
 .stats-bar-fill {
+  @apply absolute h-full;
+  width: 100%;
+}
+
+.stats-bar-current {
+  @apply bg-slate-500/80;
+  left: 0;
+  z-index: 1;
+}
+
+.stats-bar-fill.diff-positive {
+  @apply bg-blue-500/80;
+  left: 0;
+  z-index: 2;
+}
+
+.stats-bar-fill.diff-negative {
+  @apply bg-pink-500/80;
+  left: 0;
+  z-index: 2;
+}
+
+.stats-bar-fill.diff-neutral {
   @apply bg-emerald-500/80;
-  height: 100%;
+  left: 0;
+  z-index: 2;
 }
 </style>

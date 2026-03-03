@@ -207,3 +207,10 @@ ShipBuildView
 
 - [✗] 2.1 - 2.7 状态测试 - 需修复 selectors
 - [✗] 3.1 - 3.21 场景测试 - 需修复 selectors
+
+### BUG-001 测试运行
+
+- [✓] 4.1 BUG-001: Picker展开后material未隐藏且宽度未变化
+  - bug 测试：失败（实际 picker 已展开，宽度变为 lg:col-span-8）
+  - bugfix 测试：通过
+  - 结论：修复已生效

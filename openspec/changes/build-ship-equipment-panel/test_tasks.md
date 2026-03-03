@@ -256,3 +256,11 @@
   - [ ] 3.21.3 断言 summary 区更新为 Turret 类型显示项 #期望: [updated]
 
 ## 4 Bug 测试
+
+- [✓] 4.1 BUG-001: 点击槽位打开Picker后material未隐藏且宽度未变化
+  - [✓] 4.1.1 进入船只建造视图，选择大太刀
+  - [✓] 4.1.2 点击任一空槽位（如 con_weapon_01）打开 Picker
+  - [✓] 4.1.3 修复前：断言 Picker 宽度为 col-span-4（未变化）#期望: ['col-span-4']
+  - [✓] 4.1.3 修复后：断言 Picker 宽度为 col-span-8（已变化）#期望: ['col-span-8']
+  - [✓] 4.1.4 修复前：断言 Material 面板仍显示 #期望: [visible]
+  - [✓] 4.1.4 修复后：断言 Material 面板隐藏 #期望: [hidden]

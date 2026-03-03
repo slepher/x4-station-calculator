@@ -105,17 +105,33 @@ function getEquipmentSummary2(equipmentId: string): { labelKey: string; value: s
   return { labelKey: '', value: '', unit: '' }
 }
 
+// 本地 connectionKeyMap：从 connectionRows 构建
+const localConnectionKeyMap = computed(() => {
+  const map = new Map<string, { slotType: string; groupName: string; isShield: boolean; count: number }>()
+  connectionRows.value.forEach((row) => {
+    map.set(row.connectionKey, {
+      slotType: row.slotType,
+      groupName: row.groupName,
+      isShield: row.slotType === 'shield',
+      count: row.count
+    })
+  })
+  return map
+})
+
 const handlePickerOpenChange = (open: boolean) => {
   if (open) {
     // 打开时，获取当前槽位的 slotType, 已选装备ID, 是否为 shield
     const target = slotTargets.value.find(t => t.key === expandedSlotKey.value)
-    if (target) {
-      const connectionKey = target.connectionKeys[0]
-      const info = connectionKeyMap.value.get(connectionKey)
-      const equipmentId = selectedForConnectionKeys(target.connectionKeys) || null
-      const isShield = info?.isShield ?? false
-      emit('picker-open', info?.slotType || '', equipmentId, isShield)
-    }
+    const connectionKey = target?.connectionKeys?.[0] || ''
+    const slotType = target
+      ? localConnectionKeyMap.value.get(connectionKey)?.slotType || ''
+      : expandedSlotKey.value?.split('::')[1] || ''  // 从 expandedSlotKey 解析 slotType
+    const equipmentId = target ? selectedForConnectionKeys(target.connectionKeys) || null : null
+    const isShield = target
+      ? localConnectionKeyMap.value.get(connectionKey)?.isShield ?? false
+      : expandedSlotKey.value?.includes('::shield') || false
+    emit('picker-open', slotType, equipmentId, isShield)
   } else {
     emit('picker-close')
   }

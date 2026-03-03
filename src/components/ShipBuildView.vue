@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
@@ -122,11 +122,6 @@ const highlightedEquipmentId = ref<string | null>(null)
 const currentSlotType = ref('')
 const currentEquipmentId = ref<string | null>(null)
 const currentIsShield = ref(false)
-
-// 从 store 获取当前装备状态
-const selectedByConnection = computed(() => {
-  return blueprint.value?.connections || {}
-})
 
 // Picker 事件处理
 const handlePickerOpen = (slotType: string, equipmentId: string | null, isShield: boolean) => {
