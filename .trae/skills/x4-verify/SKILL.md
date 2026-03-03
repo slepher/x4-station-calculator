@@ -22,9 +22,12 @@ Change name input (if provided) supports abbreviation token and must be resolved
 2. Ensure test implementation coverage via `x4-test-impl`.
 3. Execute tests through `x4-test` orchestration.
 4. For bug-fix verification runs, test execution and result-apply entry MUST use `x4:test-run`.
-5. Validate bug closure gate:
-   - If `openspec/changes/<change-name>/bugs.md` exists, every tracked bug must be `Verified` or `Rejected`.
-   - Any bug in `New`, `Confirmed`, or `Fixed` blocks verify pass.
+5. Validate bug closure gate from `test_tasks.md` (Chapter 4) via:
+   ```bash
+   python3 skill-scripts/verify_bug_sync.py <change-name> --json
+   ```
+   - any returned issue blocks verify pass
+   - bug status in `bugs.md` is informational and does not drive gate decisions
 6. Produce combined pass/fail report.
 
 ## Constraints
@@ -33,7 +36,7 @@ Change name input (if provided) supports abbreviation token and must be resolved
 - Do not skip `x4-test-impl` or `x4-test` stages.
 - Do not bypass `x4:test-run` for bug-fix verification execution/result-apply.
 - Do not mark verification complete when bug closure gate fails.
-- `bugs.md` is the only source of truth for bug status. Do not infer bug closure from test output alone.
+- `test_tasks.md` Chapter 4 is the source of truth for bug closure gate.
 
 ## Gate Output Contract (MANDATORY)
 
@@ -48,14 +51,14 @@ bug_gate_summary: string
 ```
 
 Rules:
-- `bug_gate=pass` only when all bugs are `Verified` or `Rejected`, or `bugs.md` does not exist.
-- `bug_gate=fail` when any bug is `New`, `Confirmed`, or `Fixed`.
-- `non_verified_bug_ids` must list all blocking bug IDs when `bug_gate=fail`.
+- `bug_gate=pass` only when `verify_bug_sync.py` returns no issues.
+- `bug_gate=fail` when `verify_bug_sync.py` reports any issue.
+- `non_verified_bug_ids` must list all blocking bug IDs/cases reported by `verify_bug_sync.py` when `bug_gate=fail`.
 
 ## Output
 
 - Static verification summary
 - Test execution summary
-- Bug closure summary from `bugs.md` (if present)
+- Bug closure summary from `test_tasks.md` Chapter 4 + `verify_bug_sync.py` output
 - Gate output contract fields (`verify_status`, `bug_gate`, `non_verified_bug_ids`, `bug_gate_summary`)
 - Final verification status and remaining blockers

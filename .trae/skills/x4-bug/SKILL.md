@@ -8,6 +8,10 @@ description: "Report and track bugs for X4 project. Invoke /x4:bug to record iss
 This skill is report-only for `/x4:bug`.
 It records bug artifacts and owns bug tracking state.
 
+Status note:
+- `bugs.md` status is informational metadata for human readability.
+- Execution/closure decisions are driven by `test_tasks.md` and test results, not by bug status text.
+
 ## Input
 
 - `change-name` (optional; supports abbreviation token such as `std`)
@@ -32,7 +36,7 @@ It records bug artifacts and owns bug tracking state.
 
 - `/x4:bug` MUST:
   - record or update bug entries in `bugs.md`
-  - maintain bug id/status lifecycle and test linkage metadata
+  - maintain bug id and test linkage metadata
 - `/x4:bug` MUST NOT:
   - directly edit `test_tasks.md` / `ui_knowledge.md`
   - redefine test documentation formats
@@ -105,5 +109,5 @@ If a reported bug is unrelated to any existing change:
 ## Constraints
 
 - Keep all edits scoped to current change documentation.
-- Keep `bugs.md` as primary bug-tracking source; avoid duplicating full bug state in test docs.
+- Keep `bugs.md` as bug catalog/reference; avoid using its status as execution gate.
 - Do not run fix verification loops in this skill.

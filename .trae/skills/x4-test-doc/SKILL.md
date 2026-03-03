@@ -153,6 +153,8 @@ Indent levels are fixed to 0 / 2 / 4 spaces.
 - Subtasks under the same parent MUST start from `.1` and increment continuously.
 - Third-level child numbering under the same parent subtask MUST start from `.1` and increment continuously.
 - Top-level checkbox state in `test_tasks.md` MUST be `[ ]` when produced by `/x4:test-doc`.
+- Newly added or backfilled checklist items (top-level/subtask/child) MUST default to `[ ]`; do not write `[✓]`/`[x]` manually in doc-update phase.
+- Do not infer completion from `bugs.md` status (e.g., `Verified`): `/x4:test-doc` never marks completion based on bug status.
 - Validator compatibility note: historical docs MAY contain other checkbox states, but this does not change the output requirement above.
 
 ##### B.2.4 Chapter-Specific Top-Level Task Types (MANDATORY)
@@ -231,6 +233,7 @@ Applies to all top-level tasks (`x.x`) in Chapter 1/2/3/4:
 - ENFORCE Zero-Code Policy: Do not touch source code.
 - Only modify files within `openspec/changes/<change-name>/`.
 - Do not update `request.md`, `design.md`, `tasks.md`, or `specs/**/spec.md` unless explicitly required by user.
+- Do not change checklist completion states for existing test items in this skill; status updates must come from test execution apply flow (`/x4:test-run`).
 
 ## Output
 
