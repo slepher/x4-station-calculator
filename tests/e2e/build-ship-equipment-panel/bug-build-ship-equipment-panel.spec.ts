@@ -151,3 +151,59 @@ test('4.3 BUG-003: 无装备槽位打开Picker后候选槽无法点击', async (
   const panel = page.locator('[data-testid="ship-build-panel-equipment"]')
   await expect(panel).not.toBeVisible()
 })
+
+// Helper: 切换到 engine 标签
+const switchToEngineTab = async (page: any) => {
+  const engineTab = page.locator('[data-testid="slot-type-engine"]')
+  await expect(engineTab).toBeVisible({ timeout: 10000 })
+  await engineTab.click()
+}
+
+// 4.4 BUG-004: 空候选槽数值为0时样式显示错误
+test('4.4 BUG-004: 空候选槽数值为0时样式显示错误', async ({ page }) => {
+  // 4.4.1 进入船只建造视图，选择大太刀
+  await enterOdachi(page)
+  // 4.4.2 选择修改引擎（engine槽位）
+  await switchToEngineTab(page)
+  await page.waitForTimeout(300)
+  // 4.4.3 点击引擎槽位打开Picker
+  const engineSlots = page.locator('[data-testid^="slot-ship_ter_m_corvette_02_a::engine::"]')
+  const slotCount = await engineSlots.count()
+  const targetSlot = engineSlots.nth(0)
+  await expect(targetSlot).toBeVisible({ timeout: 10000 })
+  await targetSlot.click()
+  await page.waitForTimeout(500)
+  // 4.4.4 选择空候选槽（取消装备）
+  await clickEmptyCandidate(page)
+  await page.waitForTimeout(300)
+  // 4.4.5 修复前：断言巡航加力时间显示为绿色 #期望: [green]
+  // 查找 boostDuration 行（巡航加力时间）
+  const boostDurationRow = page.locator('.stats-row').filter({ hasText: /巡航加力时间|boost duration/i }).first()
+  await expect(boostDurationRow).toBeVisible({ timeout: 5000 })
+  // 检查数值显示是否为绿色 (diff-neutral class，在 stats-value 内的 span 元素)
+  const valueElement = boostDurationRow.locator('.stats-value > span').first()
+  await expect(valueElement).toHaveClass(/diff-neutral/)
+})
+
+// 4.5 BUG-005: 空槽位选择新引擎后属性值为0时样式显示错误
+test('4.5 BUG-005: 空槽位选择新引擎后属性值为0时样式显示错误', async ({ page }) => {
+  // 4.5.1 进入船只建造视图，使用 Change Ship 选择大太刀（确保槽位为空）
+  await enterOdachiEmpty(page)
+  // 4.5.2 切换到引擎标签
+  await switchToEngineTab(page)
+  await page.waitForTimeout(300)
+  // 4.5.3 点击引擎槽位打开Picker
+  const engineSlots = page.locator('[data-testid^="slot-ship_ter_m_corvette_02_a::engine::"]')
+  const targetSlot = engineSlots.nth(0)
+  await expect(targetSlot).toBeVisible({ timeout: 10000 })
+  await targetSlot.click()
+  await page.waitForTimeout(500)
+  // 4.5.4 选择一个非空引擎（候选）
+  await clickRealCandidate(page)
+  await page.waitForTimeout(300)
+  // 4.5.5 修复前：断言巡航加力时间显示为绿色 #期望: [green]
+  const boostDurationRow = page.locator('.stats-row').filter({ hasText: /巡航加力时间|boost duration/i }).first()
+  await expect(boostDurationRow).toBeVisible({ timeout: 5000 })
+  const valueElement = boostDurationRow.locator('.stats-value > span').first()
+  await expect(valueElement).toHaveClass(/diff-neutral/)
+})

@@ -42,6 +42,11 @@ const candidateEquipment = computed(() => {
   return equipmentMap.get(props.highlightedEquipmentId) || null
 })
 
+// 显示用的装备（候选优先，没有则用当前）- 用于头部名称显示
+const displayEquipment = computed(() => {
+  return candidateEquipment.value || currentEquipment.value
+})
+
 // 隐藏条件
 const shouldHide = computed(() => {
   return !props.isPickerOpen ||
@@ -91,6 +96,7 @@ interface ComparisonItem {
   candidateValue: number
   diff: number
   max: number | undefined
+  showCurrentOnly: boolean // 候选为空时只显示当前值
 }
 
 // 对比数据 - 根据装备类型生成（两列布局）
@@ -140,6 +146,8 @@ const comparisonData = computed(() => {
       const diff = currentValue !== undefined && rawCandidateValue !== undefined
         ? candidateValue - currentValue
         : undefined
+      // 候选为空但当前有值时，只显示当前值
+      const showCurrentOnly = rawCandidateValue === undefined && currentValue !== undefined
       return {
         key: field.key,
         labelKey: field.labelKey,
@@ -147,7 +155,8 @@ const comparisonData = computed(() => {
         currentValue,
         candidateValue,
         diff,
-        max: maxValues[field.key]
+        max: maxValues[field.key],
+        showCurrentOnly
       }
     })
   }
@@ -179,6 +188,8 @@ const comparisonData = computed(() => {
       const diff = currentValue !== undefined && rawCandidateValue !== undefined
         ? candidateValue - currentValue
         : undefined
+      // 候选为空但当前有值时，只显示当前值
+      const showCurrentOnly = rawCandidateValue === undefined && currentValue !== undefined
       return {
         key: field.key,
         labelKey: field.labelKey,
@@ -186,7 +197,8 @@ const comparisonData = computed(() => {
         currentValue,
         candidateValue,
         diff,
-        max: maxValues[field.key]
+        max: maxValues[field.key],
+        showCurrentOnly
       }
     })
   }
@@ -229,6 +241,8 @@ const comparisonData = computed(() => {
       const diff = currentValue !== undefined && rawCandidateValue !== undefined
         ? candidateValue - currentValue
         : undefined
+      // 候选为空但当前有值时，只显示当前值
+      const showCurrentOnly = rawCandidateValue === undefined && currentValue !== undefined
       return {
         key: field.key,
         labelKey: field.labelKey,
@@ -236,7 +250,8 @@ const comparisonData = computed(() => {
         currentValue,
         candidateValue,
         diff,
-        max: maxValues[field.key]
+        max: maxValues[field.key],
+        showCurrentOnly
       }
     })
   }
@@ -274,6 +289,8 @@ const comparisonData = computed(() => {
       const diff = currentValue !== undefined && rawCandidateValue !== undefined
         ? candidateValue - currentValue
         : undefined
+      // 候选为空但当前有值时，只显示当前值
+      const showCurrentOnly = rawCandidateValue === undefined && currentValue !== undefined
       return {
         key: field.key,
         labelKey: field.labelKey,
@@ -281,7 +298,8 @@ const comparisonData = computed(() => {
         currentValue,
         candidateValue,
         diff,
-        max: maxValues[field.key]
+        max: maxValues[field.key],
+        showCurrentOnly
       }
     })
   }
@@ -344,9 +362,9 @@ function getDiffStartPercent(currentValue: number, candidateValue: number, max: 
     class="equipment-card"
     data-testid="ship-build-panel-equipment"
   >
-    <!-- Header: 直接显示候选装备名称 (i18n) -->
+    <!-- Header: 显示装备名称（候选优先，没有则用当前）- i18n -->
     <div class="equipment-header">
-      {{ candidateEquipment ? translateEquipment(candidateEquipment) : '' }}
+      {{ displayEquipment ? translateEquipment(displayEquipment) : '' }}
     </div>
 
     <!-- 内容区域: 两列布局 -->
@@ -360,19 +378,26 @@ function getDiffStartPercent(currentValue: number, candidateValue: number, max: 
           >
             <span class="stats-label">{{ t(item.labelKey) }}</span>
             <span class="stats-value">
-              <!-- 只有没有当前装备时才显示 current 值 -->
-              <span v-if="item.diff === undefined" class="current-value">
-                {{ formatValue(item.currentValue) }}
+              <!-- diff=undefined 或 diff=0 时显示灰色（无比较差异） -->
+              <span v-if="item.diff === undefined || item.diff === 0" class="current-value">
+                {{ formatValue(item.showCurrentOnly ? item.currentValue : item.candidateValue) }}
               </span>
-              <!-- 候选值 + 差值（存在比较时不显示 current 值） -->
-              <span :class="getDiffClass(item.diff)">
+              <!-- 有比较差异时显示候选值 + 差值 -->
+              <span v-else :class="getDiffClass(item.diff)">
                 {{ formatDisplayValue(item.candidateValue, item.diff) }}
               </span>
               <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
             </span>
             <div class="stats-bar">
+              <!-- 候选为空但当前有值时，只显示当前值的单一进度条 -->
+              <template v-if="item.showCurrentOnly">
+                <div
+                  class="stats-bar-fill stats-bar-neutral"
+                  :style="{ width: getProgressPercent(item.currentValue, item.max) + '%' }"
+                ></div>
+              </template>
               <!-- 只有候选值，没有当前值 -->
-              <template v-if="item.currentValue === undefined">
+              <template v-else-if="item.currentValue === undefined">
                 <div
                   class="stats-bar-fill stats-bar-neutral"
                   :style="{ width: getProgressPercent(item.candidateValue, item.max) + '%' }"
@@ -424,19 +449,26 @@ function getDiffStartPercent(currentValue: number, candidateValue: number, max: 
           >
             <span class="stats-label">{{ t(item.labelKey) }}</span>
             <span class="stats-value">
-              <!-- 只有没有当前装备时才显示 current 值 -->
-              <span v-if="item.diff === undefined" class="current-value">
-                {{ formatValue(item.currentValue) }}
+              <!-- diff=undefined 或 diff=0 时显示灰色（无比较差异） -->
+              <span v-if="item.diff === undefined || item.diff === 0" class="current-value">
+                {{ formatValue(item.showCurrentOnly ? item.currentValue : item.candidateValue) }}
               </span>
-              <!-- 候选值 + 差值（存在比较时不显示 current 值） -->
-              <span :class="getDiffClass(item.diff)">
+              <!-- 有比较差异时显示候选值 + 差值 -->
+              <span v-else :class="getDiffClass(item.diff)">
                 {{ formatDisplayValue(item.candidateValue, item.diff) }}
               </span>
               <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
             </span>
             <div class="stats-bar">
+              <!-- 候选为空但当前有值时，只显示当前值的单一进度条 -->
+              <template v-if="item.showCurrentOnly">
+                <div
+                  class="stats-bar-fill stats-bar-neutral"
+                  :style="{ width: getProgressPercent(item.currentValue, item.max) + '%' }"
+                ></div>
+              </template>
               <!-- 只有候选值，没有当前值 -->
-              <template v-if="item.currentValue === undefined">
+              <template v-else-if="item.currentValue === undefined">
                 <div
                   class="stats-bar-fill stats-bar-neutral"
                   :style="{ width: getProgressPercent(item.candidateValue, item.max) + '%' }"
