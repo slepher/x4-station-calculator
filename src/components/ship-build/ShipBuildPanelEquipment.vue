@@ -337,11 +337,11 @@ function getDiffStartPercent(currentValue: number, candidateValue: number, max: 
           >
             <span class="stats-label">{{ t(item.labelKey) }}</span>
             <span class="stats-value">
-              <!-- 当前值 -->
-              <span v-if="item.currentValue !== undefined" class="current-value">
+              <!-- 只有没有当前装备时才显示 current 值 -->
+              <span v-if="item.diff === undefined" class="current-value">
                 {{ formatValue(item.currentValue) }}
               </span>
-              <!-- 候选值 + 差值 -->
+              <!-- 候选值 + 差值（存在比较时不显示 current 值） -->
               <span :class="getDiffClass(item.diff)">
                 {{ formatDisplayValue(item.candidateValue, item.diff) }}
               </span>
@@ -401,11 +401,11 @@ function getDiffStartPercent(currentValue: number, candidateValue: number, max: 
           >
             <span class="stats-label">{{ t(item.labelKey) }}</span>
             <span class="stats-value">
-              <!-- 当前值 -->
-              <span v-if="item.currentValue !== undefined" class="current-value">
+              <!-- 只有没有当前装备时才显示 current 值 -->
+              <span v-if="item.diff === undefined" class="current-value">
                 {{ formatValue(item.currentValue) }}
               </span>
-              <!-- 候选值 + 差值 -->
+              <!-- 候选值 + 差值（存在比较时不显示 current 值） -->
               <span :class="getDiffClass(item.diff)">
                 {{ formatDisplayValue(item.candidateValue, item.diff) }}
               </span>
