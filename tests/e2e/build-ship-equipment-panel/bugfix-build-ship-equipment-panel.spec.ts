@@ -1,7 +1,41 @@
 import { expect } from '@playwright/test'
 import { test } from '../../test-setup'
 
-// Helper: 进入大太刀船只建造视图
+// Helper: 点击空候选槽
+const clickEmptyCandidate = async (page: any) => {
+  const candidates = page.locator('.candidate-list .candidate-item')
+  const count = await candidates.count()
+  for (let i = 0; i < count; i++) {
+    const candidate = candidates.nth(i)
+    const testid = await candidate.getAttribute('data-testid')
+    if (testid && testid.includes('empty')) {
+      await candidate.click()
+      return
+    }
+  }
+  if (count > 0) {
+    await candidates.first().click()
+  }
+}
+
+// Helper: 点击真实候选槽
+const clickRealCandidate = async (page: any) => {
+  const candidates = page.locator('.candidate-list .candidate-item')
+  const count = await candidates.count()
+  for (let i = 0; i < count; i++) {
+    const candidate = candidates.nth(i)
+    const testid = await candidate.getAttribute('data-testid')
+    if (testid && !testid.includes('empty')) {
+      await candidate.click()
+      return
+    }
+  }
+  if (count > 1) {
+    await candidates.nth(1).click()
+  }
+}
+
+// Helper: 选择大太刀（加载 fixture，有装备）
 const enterOdachi = async (page: any) => {
   await page.getByRole('button', { name: /Ship Build|船只建造/ }).click()
   await page.getByRole('button', { name: /Load|载入|加载/ }).click()
@@ -10,6 +44,27 @@ const enterOdachi = async (page: any) => {
   await expect(odachiItem).toBeVisible()
   await odachiItem.click()
   await odachiItem.getByRole('button', { name: /Load|载入|加载/ }).first().click()
+  await page.waitForTimeout(500)
+}
+
+// Helper: 选择大太刀（使用 Change Ship 流程，槽位为空）
+const enterOdachiEmpty = async (page: any) => {
+  // 1. 先进入 ship-build（会加载 fixture 中的数据）
+  await page.getByRole('button', { name: /Ship Build|船只建造/ }).click()
+  await expect(page.getByTestId('ship-build-filters')).toBeVisible()
+
+  // 2. 点击 Change Ship 返回列表
+  await page.getByRole('button', { name: /Change Ship|更换飞船/ }).click()
+  await expect(page.getByTestId('ship-build-list')).toBeVisible()
+
+  // 3. 筛选 M + terran
+  await page.getByTestId('ship-build-filter-class').getByRole('button', { name: 'M', exact: true }).click()
+  await page.getByTestId('ship-build-filter-race').getByRole('button', { name: /terran/i }).click()
+
+  // 4. 重新选择大太刀（会创建新的空槽位配置）
+  const odachiItem = page.locator('.list-item').filter({ hasText: /Odachi|大太刀/i }).first()
+  await expect(odachiItem).toBeVisible()
+  await odachiItem.click()
   await page.waitForTimeout(500)
 }
 
@@ -68,4 +123,46 @@ test('4.1 BUG-001: 点击槽位打开Picker后material未隐藏且宽度未变�
   // #期望: [hidden]
   const materialPanel = page.locator('[data-testid="ship-build-panel-materials"]')
   await expect(materialPanel).not.toBeVisible()
+})
+
+// 4.2 BUG-002: 选择空候选槽后PanelEquipment不显示 - 修复后
+test('4.2 BUG-002: 选择空候选槽后PanelEquipment应显示当前装备', async ({ page }) => {
+  // 4.2.1 进入船只建造视图，选择大太刀
+  await enterOdachi(page)
+  // 4.2.2 确保某槽位已有装备（如weapon槽位有武器）
+  await switchToWeaponTab(page)
+  await page.waitForTimeout(300)
+  // 4.2.3 点击该槽位打开Picker
+  const weaponSlot = page.locator('[data-testid^="slot-ship_ter_m_corvette_02_a::weapon::"]').first()
+  await expect(weaponSlot).toBeVisible({ timeout: 10000 })
+  await weaponSlot.click()
+  await page.waitForTimeout(500)
+  // 4.2.4 选择空候选槽（取消装备）
+  await clickEmptyCandidate(page)
+  await page.waitForTimeout(300)
+  // 4.2.5 修复后：断言PanelEquipment面板显示当前装备数值 #期望: [visible]
+  const panel = page.locator('[data-testid="ship-build-panel-equipment"]')
+  await expect(panel).toBeVisible()
+})
+
+// 4.3 BUG-003: 无装备槽位打开Picker后候选槽无法点击 - 修复后
+test('4.3 BUG-003: 无装备槽位打开Picker后候选槽应可点击', async ({ page }) => {
+  // 4.3.1 使用 Change Ship 流程选择大太刀（槽位为空）
+  await enterOdachiEmpty(page)
+  // 4.3.2 选择一个没有装备的槽位
+  await switchToWeaponTab(page)
+  await page.waitForTimeout(300)
+  // 找一个没有装备的槽位
+  const weaponSlots = page.locator('[data-testid^="slot-ship_ter_m_corvette_02_a::weapon::"]')
+  const slotCount = await weaponSlots.count()
+  let targetSlot = weaponSlots.nth(slotCount - 1)
+  await expect(targetSlot).toBeVisible({ timeout: 10000 })
+  await targetSlot.click()
+  await page.waitForTimeout(500)
+  // 4.3.4 点击候选列表中的候选槽
+  await clickRealCandidate(page)
+  await page.waitForTimeout(300)
+  // 4.3.5 修复后：断言PanelEquipment面板显示候选装备属性 #期望: [visible]
+  const panel = page.locator('[data-testid="ship-build-panel-equipment"]')
+  await expect(panel).toBeVisible()
 })

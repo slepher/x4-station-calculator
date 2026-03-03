@@ -97,9 +97,11 @@ interface ComparisonItem {
 const comparisonData = computed(() => {
   const current = currentStats.value?.details.value
   const candidate = candidateStats.value?.details.value
-  const type = candidateEquipment.value?.type
+  // 有候选用候选类型，无候选但有当前装备则用当前装备类型
+  const type = candidateEquipment.value?.type || currentEquipment.value?.type
 
-  if (!type || !candidate) return []
+  // 无任何装备数据时隐藏
+  if (!type || (!current && !candidate)) return []
 
   // Weapon/Turret
   if (type === 'weapon' || type === 'turret') {
@@ -132,8 +134,12 @@ const comparisonData = computed(() => {
 
     return fields.map(field => {
       const currentValue = (current as any)?.[field.key]
-      const candidateValue = (candidate as any)?.[field.key] || 0
-      const diff = currentValue !== undefined ? candidateValue - currentValue : undefined
+      // 无候选时（即选择了空候选），使用当前值作为候选值
+      const rawCandidateValue = (candidate as any)?.[field.key]
+      const candidateValue = rawCandidateValue !== undefined ? rawCandidateValue : currentValue
+      const diff = currentValue !== undefined && rawCandidateValue !== undefined
+        ? candidateValue - currentValue
+        : undefined
       return {
         key: field.key,
         labelKey: field.labelKey,
@@ -167,8 +173,12 @@ const comparisonData = computed(() => {
 
     return fields.map(field => {
       const currentValue = (current as any)?.[field.key]
-      const candidateValue = (candidate as any)?.[field.key] || 0
-      const diff = currentValue !== undefined ? candidateValue - currentValue : undefined
+      // 无候选时（即选择了空候选），使用当前值作为候选值
+      const rawCandidateValue = (candidate as any)?.[field.key]
+      const candidateValue = rawCandidateValue !== undefined ? rawCandidateValue : currentValue
+      const diff = currentValue !== undefined && rawCandidateValue !== undefined
+        ? candidateValue - currentValue
+        : undefined
       return {
         key: field.key,
         labelKey: field.labelKey,
@@ -213,8 +223,12 @@ const comparisonData = computed(() => {
 
     return fields.map(field => {
       const currentValue = (current as any)?.[field.key]
-      const candidateValue = (candidate as any)?.[field.key] || 0
-      const diff = currentValue !== undefined ? candidateValue - currentValue : undefined
+      // 无候选时（即选择了空候选），使用当前值作为候选值
+      const rawCandidateValue = (candidate as any)?.[field.key]
+      const candidateValue = rawCandidateValue !== undefined ? rawCandidateValue : currentValue
+      const diff = currentValue !== undefined && rawCandidateValue !== undefined
+        ? candidateValue - currentValue
+        : undefined
       return {
         key: field.key,
         labelKey: field.labelKey,
@@ -254,8 +268,12 @@ const comparisonData = computed(() => {
 
     return fields.map(field => {
       const currentValue = (current as any)?.[field.key]
-      const candidateValue = (candidate as any)?.[field.key] || 0
-      const diff = currentValue !== undefined ? candidateValue - currentValue : undefined
+      // 无候选时（即选择了空候选），使用当前值作为候选值
+      const rawCandidateValue = (candidate as any)?.[field.key]
+      const candidateValue = rawCandidateValue !== undefined ? rawCandidateValue : currentValue
+      const diff = currentValue !== undefined && rawCandidateValue !== undefined
+        ? candidateValue - currentValue
+        : undefined
       return {
         key: field.key,
         labelKey: field.labelKey,
@@ -272,19 +290,24 @@ const comparisonData = computed(() => {
 })
 
 // 格式化数字
-function formatValue(value: number): string {
+function formatValue(value: number | undefined): string {
+  if (value === undefined) return ''
   return value.toLocaleString()
 }
 
 // 格式化显示值（候选值 + 差值）
-function formatDisplayValue(candidateValue: number, diff: number): string {
+function formatDisplayValue(candidateValue: number, diff: number | undefined): string {
+  // 无当前装备时（diff = undefined），只显示候选值
+  if (diff === undefined || diff === 0) {
+    return formatValue(candidateValue)
+  }
   const sign = diff > 0 ? '+' : ''
-  const diffStr = diff !== 0 ? `(${sign}${formatValue(diff)})` : ''
-  return `${formatValue(candidateValue)}${diffStr}`
+  return `${formatValue(candidateValue)}(${sign}${formatValue(diff)})`
 }
 
 // 获取差值颜色类
-function getDiffClass(diff: number): string {
+function getDiffClass(diff: number | undefined): string {
+  if (diff === undefined) return 'diff-neutral'
   if (diff > 0) return 'diff-positive'
   if (diff < 0) return 'diff-negative'
   return 'diff-neutral'

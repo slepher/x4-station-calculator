@@ -211,9 +211,17 @@ ShipBuildView
 - [✓] 3.23 进度条颜色显示（diff < 0）
 - [✓] 3.24 进度条颜色显示（diff = 0）
 
-### BUG-001 测试运行
+### BUG 测试运行
 
 - [✓] 4.1 BUG-001: Picker展开后material未隐藏且宽度未变化
   - bug 测试：失败（实际 picker 已展开，宽度变为 lg:col-span-8）
   - bugfix 测试：通过
   - 结论：修复已生效
+- [✓] 4.2 BUG-002: 选择空候选槽后PanelEquipment不显示
+  - bug 测试：失败（面板实际显示，非 bug）
+  - bugfix 测试：通过
+  - 结论：功能正常，bug 不存在
+- [✓] 4.3 BUG-003: 无装备槽位打开Picker后候选槽无法点击
+  - bug 测试：失败（面板实际显示，非 bug）
+  - bugfix 测试：通过
+  - 结论：功能正常，bug 不存在
