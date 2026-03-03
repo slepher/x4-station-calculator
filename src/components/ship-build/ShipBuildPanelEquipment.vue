@@ -580,7 +580,7 @@ function getDiffStartPercent(currentValue: number, candidateValue: number, max: 
 }
 
 .current-value {
-  @apply text-slate-400 mr-1;
+  @apply text-slate-400;
 }
 
 .diff-positive {
