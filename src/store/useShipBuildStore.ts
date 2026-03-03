@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import type { ConnectionValue, EquipmentType, ShipBlueprint, ShipBlueprintConnection, ShipEquipmentSize, X4Equipment, X4EquipmentType, X4Ship, X4Ware } from '@/types/x4'
-import type { FitConnectionRow, FitGroupRow, FitMode } from '@/components/ship-build/fitTypes'
+import type { FitConnectionRow, FitMode } from '@/components/ship-build/fitTypes'
 import shipsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ships.json'
 import equipmentsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
 import equipmentTypesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipment_types.json'
@@ -765,61 +765,6 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     return map
   })
 
-  const buildTagSignature = (tags: string[]) => [...tags].sort().join('&')
-
-  const groupRows = computed<FitGroupRow[]>(() => {
-    const grouped = new Map<string, FitGroupRow>()
-    connectionRows.value.forEach((row) => {
-      const tagSignature = buildTagSignature(row.tags)
-      const parentTagSignature = buildTagSignature(row.parentConnectionTags || [])
-      const groupKey = row.slotType === 'shield'
-        ? `${row.parentSlotType}|shield|${row.parentConnectionSize}|${parentTagSignature}|${row.size}|${tagSignature}`
-        : `${row.parentSlotType}|${row.slotType}|${row.size}|${tagSignature}`
-      const existing = grouped.get(groupKey)
-      if (!existing) {
-        grouped.set(groupKey, {
-          groupKey,
-          slotType: row.slotType,
-          parentSlotType: row.parentSlotType,
-          parentConnectionSize: row.parentConnectionSize,
-          parentConnectionTags: [...row.parentConnectionTags],
-          slotTypeLabel: row.slotTypeLabel,
-          groupName: tagSignature || 'default-tags',
-          size: row.size,
-          totalCount: row.count,
-          tags: [...row.tags],
-          options: [...row.options],
-          connectionKeys: [row.connectionKey]
-        })
-        return
-      }
-
-      existing.totalCount += row.count
-      existing.connectionKeys.push(row.connectionKey)
-      const tagSet = new Set([...existing.tags, ...row.tags])
-      existing.tags = Array.from(tagSet)
-
-      const optionMap = new Map(existing.options.map((item) => [item.id, item]))
-      row.options.forEach((item) => optionMap.set(item.id, item))
-      existing.options = Array.from(optionMap.values()).sort((a, b) => a.id > b.id ? 1 : a.id < b.id ? -1 : 0)
-    })
-
-    return Array.from(grouped.values())
-  })
-
-  const hasFitModeConflict = computed(() => {
-    return groupRows.value.some((group) => {
-      const selectedSet = new Set(
-        group.connectionKeys
-          .map((key) => selectedByConnection.value[key])
-          .filter((value): value is string => Boolean(value))
-      )
-      return selectedSet.size > 1
-    })
-  })
-
-  const canSwitchToGroupMode = computed(() => !hasFitModeConflict.value)
-
   // Reset all filters and blueprint (for New action)
   const resetAll = () => {
     blueprint.value = null
@@ -846,8 +791,6 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     fitMode,
     mockTagPatch,
     selectedShip,
-    hasFitModeConflict,
-    canSwitchToGroupMode,
     // Blueprint persistence
     blueprint,
     savedBlueprints,

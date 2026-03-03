@@ -17,7 +17,9 @@ const props = defineProps<{
   } | null
   highlightedEquipmentId: string | null
   selectedShip: X4Ship | null
-  selectedByConnection: Record<string, string | null>
+  slotType: string
+  currentEquipmentId: string | null
+  isShield: boolean
 }>()
 
 const equipmentMap = new Map<string, X4Equipment>()
@@ -25,18 +27,13 @@ const equipmentMap = new Map<string, X4Equipment>()
   equipmentMap.set(eq.id, eq)
 })
 
-// 当前装备 ID
-const currentEquipmentId = computed(() => {
-  if (!props.pickerTarget?.connectionKeys?.length) return null
-  const firstKey = props.pickerTarget.connectionKeys[0]
-  if (!firstKey) return null
-  return props.selectedByConnection[firstKey] || null
-})
+// 当前装备 ID（直接使用 props）
+const currentEquipmentIdLocal = computed(() => props.currentEquipmentId)
 
 // 当前装备
 const currentEquipment = computed(() => {
-  if (!currentEquipmentId.value) return null
-  return equipmentMap.get(currentEquipmentId.value) || null
+  if (!currentEquipmentIdLocal.value) return null
+  return equipmentMap.get(currentEquipmentIdLocal.value) || null
 })
 
 // 候选装备
@@ -47,9 +44,8 @@ const candidateEquipment = computed(() => {
 
 // 隐藏条件
 const shouldHide = computed(() => {
-  if (!props.isPickerOpen) return true
-  if (!currentEquipment.value && !candidateEquipment.value) return true
-  return false
+  return !props.isPickerOpen ||
+    (!currentEquipment.value && !candidateEquipment.value)
 })
 
 // 候选装备列表（用于计算最大值）

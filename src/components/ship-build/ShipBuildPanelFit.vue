@@ -49,7 +49,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  'picker-open-change': [open: boolean]
+  'picker-open': [slotType: string, equipmentId: string | null, isShield: boolean]
+  'picker-close': []
   'update:highlightedEquipmentId': [id: string | null]
   'update:pickerTarget': [target: SlotTarget | null]
 }>()
@@ -105,7 +106,19 @@ function getEquipmentSummary2(equipmentId: string): { labelKey: string; value: s
 }
 
 const handlePickerOpenChange = (open: boolean) => {
-  emit('picker-open-change', open)
+  if (open) {
+    // 打开时，获取当前槽位的 slotType, 已选装备ID, 是否为 shield
+    const target = slotTargets.value.find(t => t.key === expandedSlotKey.value)
+    if (target) {
+      const connectionKey = target.connectionKeys[0]
+      const info = connectionKeyMap.value.get(connectionKey)
+      const equipmentId = selectedForConnectionKeys(target.connectionKeys) || null
+      const isShield = info?.isShield ?? false
+      emit('picker-open', info?.slotType || '', equipmentId, isShield)
+    }
+  } else {
+    emit('picker-close')
+  }
 }
 
 const { t } = useI18n()

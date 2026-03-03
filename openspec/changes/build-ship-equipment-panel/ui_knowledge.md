@@ -33,17 +33,17 @@ ShipBuildView
 | weapon | burstDPS, range | `1500, 800m` |
 | turret | sustainedDPS, range | `800, 600m` |
 | shield | shieldMax, shieldDelay | `5000, 5s` |
-| engine | speed, travel | `580, 580:45` |
+| engine | speed, travelSpeed | `580, 450` |
 | thruster | strafeSpeed, yawRate | `120, 45` |
 
 ### Details 字段（Panel 对比面板，完整属性列表）
 
 | 装备类型 | Details 字段数量 | 示例字段 |
 |----------|------------------|----------|
-| weapon | 12 项 | burstDPS, sustainedDPS, range, singleDamage, avgShotTime, ammo, ammoReload, chargetime, timeToOverheat, cooldelay, coolTime, cycleTime |
-| turret | 12 项 | 同 weapon |
+| weapon | 13 项 | burstDPS, sustainedDPS, range, singleDamage, singleShotTime, avgShotTime, ammo, ammoReload, chargetime, timeToOverheat, cooldelay, coolTime, cycleTime |
+| turret | 13 项 | 同 weapon |
 | shield | 3 项 | shieldMax, shieldRate, shieldDelay |
-| engine | 10 项 | thrustForward, speed, acceleration, boostMultiplier, boostSpeed, boostAccel, travelThrust, travelSpeed, travelCharge, travelAcceleration |
+| engine | 14 项 | thrustForward, boostMultiplier, boostAcceleration, boostDuration, boostRecharge, travelThrust, travelAttack, travelCharge, travelSpeed, travelAcceleration, speed, acceleration, boostSpeed, boostAccel |
 | thruster | 9 项 | pitch, yaw, roll, strafe, pitchRate, yawRate, rollRate, strafeSpeed, strafeAcceleration |
 
 ## UI 定位器
@@ -167,7 +167,43 @@ ShipBuildView
 - **Summary**：Picker 候选卡片右侧显示，2 项关键数据
 - **Details**：Panel 对比面板显示，完整属性列表
 
-### Engine travel 格式
+### Engine Summary 格式
 
-- 正确: `580:45` (巡航速度:充能时间)
+- speed: 数字类型，如 `580`
+- travelSpeed: 数字类型，如 `450`
 - 错误: `[object Object]`, `undefined`, 空值
+
+## 测试运行
+
+### 2.x 状态测试 Selectors
+
+| 测试步骤 | Selector | 说明 |
+|---------|---------|------|
+| 切换到 turret 标签 | `getByTestId('slot-type-turret')` | 使用 data-testid |
+| 切换到 engine 标签 | `getByTestId('slot-type-engine')` | 同上 |
+| 切换到 shield 标签 | `getByTestId('slot-type-shield')` | 同上 |
+| 切换到 weapon 标签 | `getByTestId('slot-type-weapon')` | 同上 |
+| 切换到 thruster 标签 | `getByTestId('slot-type-thruster')` | 同上 |
+| 点击槽位打开 Picker | `locator('[data-testid^="slot-"]').filter({ hasText: /M.*T/i })` | 使用 data-testid 前缀匹配 + 文本过滤 |
+| Picker 候选列表 | `.candidate-list .candidate-item` | CSS 类选择器 |
+| 确认按钮 | `getByTestId('picker-confirm')` | data-testid |
+
+### 进入船只建造视图流程
+
+正确流程：
+1. `getByRole('button', { name: /Load|载入|加载/ }).click()` - 点击 Load 按钮
+2. `locator('.blueprint-item').filter({ hasText: /Odachi|odachi/i }).first().click()` - 选择大太刀蓝图
+3. `odachiItem.getByRole('button', { name: /Load|载入|加载/ }).first().click()` - 点击确认加载
+
+错误方式：直接使用 "Change Ship" 按钮，该方式在某些 fixture 状态下不工作。
+
+### 产品功能验证
+
+- `ShipBuildPanelEquipment` 组件已实现，状态传递正确
+- 显示条件：`isPickerOpen && (currentEquipment || candidateEquipment)`
+- 组件有 `data-testid="ship-build-panel-equipment"` 属性
+
+### 测试状态
+
+- [✗] 2.1 - 2.7 状态测试 - 需修复 selectors
+- [✗] 3.1 - 3.21 场景测试 - 需修复 selectors

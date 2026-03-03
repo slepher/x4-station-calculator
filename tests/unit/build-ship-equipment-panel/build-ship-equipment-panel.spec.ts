@@ -23,17 +23,15 @@ describe('build-ship-equipment-panel', () => {
     // 1.1.1 导入 EngineSummary 类型定义
     expect(useEquipmentStats).toBeDefined()
 
-    // 1.1.2 断言字段包含 speed: number 和 travel: string
+    // 1.1.2 断言字段包含 speed: number 和 travelSpeed: number
     const { summary } = useEquipmentStats(engine, odachi)
-    const engineSummary = summary.value as any as any
+    const engineSummary = summary.value as any
     expect(engineSummary).toBeDefined()
-    expect(engineSummary?.engine).toBeDefined()
-    expect(typeof engineSummary!.engine!.speed).toBe('number')
-    expect(typeof engineSummary!.engine!.travel).toBe('string')
+    expect(typeof engineSummary.speed).toBe('number')
+    expect(typeof engineSummary.travelSpeed).toBe('number')
 
-    // 1.1.3 断言 travel 格式为 ${number}:${number} #期望: [/^\d+:\d+$/]
-    const travelValue = engineSummary?.engine?.travel
-    expect(travelValue).toContain('/^\d+:\d+$/')
+    // 1.1.3 断言 travelSpeed 为数字类型 #期望: [number]
+    expect(engineSummary.travelSpeed).toBeDefined()
   })
 
   // 1.2 叠加显示进度条最大值计算 - 需要组件实现后才能测试
@@ -157,8 +155,8 @@ describe('build-ship-equipment-panel', () => {
     const weaponSummary = summary.value as any
 
     // 1.10.3 断言包含 burstDPS 和 range 字段 #期望: ['burstDPS', 'range']
-    expect(weaponSummary?.weapon).toHaveProperty('burstDPS')
-    expect(weaponSummary?.weapon).toHaveProperty('range')
+    expect(weaponSummary).toHaveProperty('burstDPS')
+    expect(weaponSummary).toHaveProperty('range')
   })
 
   // 1.11 Turret Summary 计算
@@ -172,8 +170,8 @@ describe('build-ship-equipment-panel', () => {
     const turretSummary = summary.value as any
 
     // 1.11.3 断言包含 sustainedDPS 和 range 字段 #期望: ['sustainedDPS', 'range']
-    expect(turretSummary?.turret).toHaveProperty('sustainedDPS')
-    expect(turretSummary?.turret).toHaveProperty('range')
+    expect(turretSummary).toHaveProperty('sustainedDPS')
+    expect(turretSummary).toHaveProperty('range')
   })
 
   // 1.12 Shield Summary 计算
@@ -187,8 +185,8 @@ describe('build-ship-equipment-panel', () => {
     const shieldSummary = summary.value as any
 
     // 1.12.3 断言包含 shieldMax 和 shieldDelay 字段 #期望: ['shieldMax', 'shieldDelay']
-    expect(shieldSummary?.shield).toHaveProperty('shieldMax')
-    expect(shieldSummary?.shield).toHaveProperty('shieldDelay')
+    expect(shieldSummary).toHaveProperty('shieldMax')
+    expect(shieldSummary).toHaveProperty('shieldDelay')
   })
 
   // 1.13 Engine Summary 计算
@@ -201,11 +199,11 @@ describe('build-ship-equipment-panel', () => {
     // 1.13.2 获取 summary 输出
     const engineSummary = summary.value as any
 
-    // 1.13.3 断言包含 speed: number 和 travel: string #期望: ['speed', 'travel']
-    expect(engineSummary?.engine).toHaveProperty('speed')
-    expect(engineSummary?.engine).toHaveProperty('travel')
-    expect(typeof engineSummary!.engine!.speed).toBe('number')
-    expect(typeof engineSummary!.engine!.travel).toBe('string')
+    // 1.13.3 断言包含 speed 和 travelSpeed #期望: ['speed', 'travelSpeed']
+    expect(engineSummary).toHaveProperty('speed')
+    expect(engineSummary).toHaveProperty('travelSpeed')
+    expect(typeof engineSummary.speed).toBe('number')
+    expect(typeof engineSummary.travelSpeed).toBe('number')
   })
 
   // 1.14 Thruster Summary 计算
@@ -219,8 +217,8 @@ describe('build-ship-equipment-panel', () => {
     const thrusterSummary = summary.value as any
 
     // 1.14.3 断言包含 strafeSpeed 和 yawRate 字段 #期望: ['strafeSpeed', 'yawRate']
-    expect(thrusterSummary?.thruster).toHaveProperty('strafeSpeed')
-    expect(thrusterSummary?.thruster).toHaveProperty('yawRate')
+    expect(thrusterSummary).toHaveProperty('strafeSpeed')
+    expect(thrusterSummary).toHaveProperty('yawRate')
   })
 
   // 1.15 Weapon Details 计算
@@ -232,15 +230,15 @@ describe('build-ship-equipment-panel', () => {
     // 1.15.2 获取 details 输出
     const weaponDetails = details.value as any
 
-    // 1.15.3 断言包含 12 项属性 #期望: [12项]
+    // 1.15.3 断言包含 13 项属性 #期望: [13项]
     const expectedFields = [
-      'burstDPS', 'sustainedDPS', 'range', 'singleDamage', 'avgShotTime',
+      'burstDPS', 'sustainedDPS', 'range', 'singleDamage', 'singleShotTime', 'avgShotTime',
       'ammo', 'ammoReload', 'chargetime', 'timeToOverheat', 'cooldelay', 'coolTime', 'cycleTime'
     ]
     expectedFields.forEach((field) => {
       expect(weaponDetails).toHaveProperty(field)
     })
-    expect(Object.keys(weaponDetails).length).toBe(12)
+    expect(Object.keys(weaponDetails).length).toBe(13)
   })
 
   // 1.16 Turret Details 计算
@@ -252,15 +250,15 @@ describe('build-ship-equipment-panel', () => {
     // 1.16.2 获取 details 输出
     const turretDetails = details.value as any
 
-    // 1.16.3 断言包含 12 项属性 #期望: [12项]
+    // 1.16.3 断言包含 13 项属性 #期望: [13项]
     const expectedFields = [
-      'burstDPS', 'sustainedDPS', 'range', 'singleDamage', 'avgShotTime',
+      'burstDPS', 'sustainedDPS', 'range', 'singleDamage', 'singleShotTime', 'avgShotTime',
       'ammo', 'ammoReload', 'chargetime', 'timeToOverheat', 'cooldelay', 'coolTime', 'cycleTime'
     ]
     expectedFields.forEach((field) => {
       expect(turretDetails).toHaveProperty(field)
     })
-    expect(Object.keys(turretDetails).length).toBe(12)
+    expect(Object.keys(turretDetails).length).toBe(13)
   })
 
   // 1.17 Shield Details 计算
@@ -288,15 +286,16 @@ describe('build-ship-equipment-panel', () => {
     // 1.18.2 获取 details 输出
     const engineDetails = details.value as any
 
-    // 1.18.3 断言包含 10 项属性 #期望: [10项]
+    // 1.18.3 断言包含 14 项属性 #期望: [14项]
     const expectedFields = [
-      'thrustForward', 'speed', 'acceleration', 'boostMultiplier', 'boostSpeed', 'boostAccel',
-      'travelThrust', 'travelSpeed', 'travelCharge', 'travelAcceleration'
+      'thrustForward', 'boostMultiplier', 'boostAcceleration', 'boostDuration', 'boostRecharge',
+      'travelThrust', 'travelAttack', 'travelCharge', 'travelSpeed', 'travelAcceleration',
+      'speed', 'acceleration', 'boostSpeed', 'boostAccel'
     ]
     expectedFields.forEach((field) => {
       expect(engineDetails).toHaveProperty(field)
     })
-    expect(Object.keys(engineDetails).length).toBe(10)
+    expect(Object.keys(engineDetails).length).toBe(14)
   })
 
   // 1.19 Thruster Details 计算

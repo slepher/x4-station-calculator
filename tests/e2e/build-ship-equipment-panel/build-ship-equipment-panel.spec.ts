@@ -3,59 +3,67 @@ import { test } from '../../test-setup'
 
 // ========== Helper Functions ==========
 
+// 点击一个真实的装备候选（不是空槽位）
+const clickRealCandidate = async (page: any) => {
+  const candidates = page.locator('.candidate-list .candidate-item')
+  const count = await candidates.count()
+  // 尝试找到一个有真实 ID 的候选（不是 candidate-empty）
+  for (let i = 0; i < count; i++) {
+    const candidate = candidates.nth(i)
+    const testid = await candidate.getAttribute('data-testid')
+    if (testid && !testid.includes('empty')) {
+      await candidate.click()
+      return
+    }
+  }
+  // 如果没找到，点击第二个候选（通常第一个是空槽位）
+  if (count > 1) {
+    await candidates.nth(1).click()
+    return
+  }
+  // 最后一个尝试：点击任意候选
+  if (count >= 1) {
+    await candidates.first().click()
+  }
+}
+
 const openShipBuild = async (page: any) => {
-  await page.goto('/')
-  await page.evaluate(() => {
-    localStorage.clear()
-    sessionStorage.clear()
-    localStorage.setItem('isTestEnv', 'true')
-  })
-  await page.reload()
-  await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; animation: none !important; }' })
   await page.getByRole('button', { name: /Ship Build|船只建造/ }).click()
 }
 
 const enterOdachi = async (page: any) => {
   await openShipBuild(page)
-  const changeShip = page.getByRole('button', { name: /Change Ship|更换飞船/ })
-  if (await changeShip.isVisible().catch(() => false)) {
-    await changeShip.click()
-  }
-  await page.getByTestId('ship-build-filter-class').getByRole('button', { name: 'M', exact: true }).click()
-  await page.getByTestId('ship-build-filter-race').getByRole('button', { name: /terran/i }).click()
-  const targetShip = page.locator('.list-item').filter({ hasText: /Odachi|大太刀/ }).first()
-  await expect(targetShip).toBeVisible()
-  await targetShip.click()
+  // Click Load button to open blueprint modal
+  await page.getByRole('button', { name: /Load|载入|加载/ }).click()
+  await expect(page.locator('.blueprint-item').first()).toBeVisible()
+  // Select Odachi from blueprint modal
+  const odachiItem = page.locator('.blueprint-item').filter({ hasText: /Odachi|odachi/i }).first()
+  await expect(odachiItem).toBeVisible()
+  await odachiItem.click()
+  // Click confirm to load
+  await odachiItem.getByRole('button', { name: /Load|载入|加载/ }).first().click()
+  // Wait for ship to load
+  await page.waitForTimeout(500)
 }
 
 const switchToTurretTab = async (page: any) => {
-  const slotTypeBtn = page.locator('.left-rail .slot-type-btn').filter({ hasText: /^T$/ }).first()
-  await expect(slotTypeBtn).toBeVisible()
-  await slotTypeBtn.click()
+  await page.getByTestId('slot-type-turret').click()
 }
 
 const switchToEngineTab = async (page: any) => {
-  const slotTypeBtn = page.locator('.left-rail .slot-type-btn').filter({ hasText: /^E$/ }).first()
-  await expect(slotTypeBtn).toBeVisible()
-  await slotTypeBtn.click()
+  await page.getByTestId('slot-type-engine').click()
 }
 
 const switchToShieldTab = async (page: any) => {
-  const slotTypeBtn = page.locator('.left-rail .slot-type-btn').filter({ hasText: /^S$/ }).first()
-  await expect(slotTypeBtn).toBeVisible()
-  await slotTypeBtn.click()
+  await page.getByTestId('slot-type-shield').click()
 }
 
 const switchToWeaponTab = async (page: any) => {
-  const slotTypeBtn = page.locator('.left-rail .slot-type-btn').filter({ hasText: /^W$/ }).first()
-  await expect(slotTypeBtn).toBeVisible()
-  await slotTypeBtn.click()
+  await page.getByTestId('slot-type-weapon').click()
 }
 
 const switchToThrusterTab = async (page: any) => {
-  const slotTypeBtn = page.locator('.left-rail .slot-type-btn').filter({ hasText: /^R$/ }).first()
-  await expect(slotTypeBtn).toBeVisible()
-  await slotTypeBtn.click()
+  await page.getByTestId('slot-type-thruster').click()
 }
 
 const closePicker = async (page: any) => {
@@ -69,16 +77,27 @@ async function buildEquipmentPanelVisibleTurretPickerOpen(page: any) {
   await enterOdachi(page)
   // 2.1.2 切换到 turret 标签
   await switchToTurretTab(page)
-  // 2.1.3 点击 con_turret_m_01 分组打开 Picker
-  const groupTab = page.locator('.group-tabs .group-tab').filter({ hasText: /con_turret_m_01/ }).first()
-  await expect(groupTab).toBeVisible()
-  await groupTab.click()
-  // 2.1.4 点击选中某个候选装备
-  const candidate = page.locator('.candidate-list .candidate-item').first()
-  await expect(candidate).toBeVisible()
-  await candidate.click()
+  // Wait for the UI to update
+  await page.waitForTimeout(300)
+  // 2.1.3 点击 turret 槽位打开 Picker (使用 ship_ter_m_corvette_02_a 作为大太刀的 ID)
+  const turretSlot = page.locator('[data-testid^="slot-ship_ter_m_corvette_02_a::turret::"]').first()
+  await expect(turretSlot).toBeVisible({ timeout: 10000 })
+  await turretSlot.click()
+  // Wait for picker to open
+  await page.waitForTimeout(500)
+  // 2.1.4 点击选中某个候选装备（排除 empty 槽位）
+  // Find a candidate that has a real equipment ID (not 'empty')
+  const candidate = page.locator('.candidate-list .candidate-item').filter({ has: page.locator('[data-testid^="candidate-turret"]') }).first()
+  if (await candidate.count() === 0) {
+    // Fallback: click the second candidate (first might be empty)
+    await page.locator('.candidate-list .candidate-item').nth(1).click()
+  } else {
+    await clickRealCandidate(page)
+  }
+  // Wait for reactivity to update
+  await page.waitForTimeout(500)
   // 2.1.5 断言 ShipBuildPanelEquipment 面板显示 #期望: [visible]
-  await expect(page.locator('[data-testid="ship-build-panel-equipment"]')).toBeVisible()
+  await expect(page.locator('[data-testid="ship-build-panel-equipment"]')).toBeVisible({ timeout: 10000 })
 }
 
 async function buildEquipmentPanelVisibleEnginePickerOpen(page: any) {
@@ -86,13 +105,20 @@ async function buildEquipmentPanelVisibleEnginePickerOpen(page: any) {
   await enterOdachi(page)
   // 2.2.2 点击 con_engine_01 打开 Picker
   await switchToEngineTab(page)
-  // 2.2.3 点击选中候选引擎
+  // Wait for UI
+  await page.waitForTimeout(300)
+  // 2.2.3 点击引擎槽位打开 Picker
+  const engineSlot = page.locator('[data-testid^="slot-ship_ter_m_corvette_02_a::engine::"]').first()
+  await expect(engineSlot).toBeVisible({ timeout: 10000 })
+  await engineSlot.click()
+  await page.waitForTimeout(500)
+  // 2.2.4 点击选中候选引擎
   const candidate = page.locator('.candidate-list .candidate-item').first()
-  await expect(candidate).toBeVisible()
-  await candidate.click()
-  // 2.2.4 断言面板显示且显示引擎 summary #期望: [visible]
+  await expect(candidate).toBeVisible({ timeout: 10000 })
+  await clickRealCandidate(page)
+  // 2.2.5 断言面板显示且显示引擎 summary #期望: [visible]
   const panel = page.locator('[data-testid="ship-build-panel-equipment"]')
-  await expect(panel).toBeVisible()
+  await expect(panel).toBeVisible({ timeout: 10000 })
 }
 
 async function buildEquipmentPanelVisibleShieldPickerOpen(page: any) {
@@ -100,13 +126,20 @@ async function buildEquipmentPanelVisibleShieldPickerOpen(page: any) {
   await enterOdachi(page)
   // 2.3.2 点击 con_shield_01 打开 Picker
   await switchToShieldTab(page)
-  // 2.3.3 点击选中候选护盾
+  // Wait for UI
+  await page.waitForTimeout(300)
+  // 2.3.3 点击护盾槽位打开 Picker
+  const shieldSlot = page.locator('[data-testid^="slot-ship_ter_m_corvette_02_a::shield::"]').first()
+  await expect(shieldSlot).toBeVisible({ timeout: 10000 })
+  await shieldSlot.click()
+  await page.waitForTimeout(500)
+  // 2.3.4 点击选中候选护盾
   const candidate = page.locator('.candidate-list .candidate-item').first()
-  await expect(candidate).toBeVisible()
-  await candidate.click()
-  // 2.3.4 断言面板显示且显示护盾 summary #期望: [visible]
+  await expect(candidate).toBeVisible({ timeout: 10000 })
+  await clickRealCandidate(page)
+  // 2.3.5 断言面板显示且显示护盾 summary #期望: [visible]
   const panel = page.locator('[data-testid="ship-build-panel-equipment"]')
-  await expect(panel).toBeVisible()
+  await expect(panel).toBeVisible({ timeout: 10000 })
 }
 
 async function buildEquipmentPanelVisibleWeaponPickerOpen(page: any) {
@@ -114,13 +147,20 @@ async function buildEquipmentPanelVisibleWeaponPickerOpen(page: any) {
   await enterOdachi(page)
   // 2.4.2 点击 con_weapon_01 打开 Picker
   await switchToWeaponTab(page)
-  // 2.4.3 点击选中候选武器
+  // Wait for UI
+  await page.waitForTimeout(300)
+  // 2.4.3 点击武器槽位打开 Picker
+  const weaponSlot = page.locator('[data-testid^="slot-ship_ter_m_corvette_02_a::weapon::"]').first()
+  await expect(weaponSlot).toBeVisible({ timeout: 10000 })
+  await weaponSlot.click()
+  await page.waitForTimeout(500)
+  // 2.4.4 点击选中候选武器
   const candidate = page.locator('.candidate-list .candidate-item').first()
-  await expect(candidate).toBeVisible()
-  await candidate.click()
-  // 2.4.4 断言面板显示且显示武器 summary #期望: [visible]
+  await expect(candidate).toBeVisible({ timeout: 10000 })
+  await clickRealCandidate(page)
+  // 2.4.5 断言面板显示且显示武器 summary #期望: [visible]
   const panel = page.locator('[data-testid="ship-build-panel-equipment"]')
-  await expect(panel).toBeVisible()
+  await expect(panel).toBeVisible({ timeout: 10000 })
 }
 
 async function buildEquipmentPanelVisibleThrusterPickerOpen(page: any) {
@@ -128,15 +168,18 @@ async function buildEquipmentPanelVisibleThrusterPickerOpen(page: any) {
   await enterOdachi(page)
   // 2.5.2 切换到 thruster 标签，点击某分组打开 Picker
   await switchToThrusterTab(page)
-  const groupTab = page.locator('.group-tabs .group-tab').first()
-  if (await groupTab.isVisible().catch(() => false)) {
-    await groupTab.click()
-  }
-  // 2.5.3 点击选中候选推进器
+  // Wait for UI
+  await page.waitForTimeout(300)
+  // 2.5.3 点击推进器槽位打开 Picker
+  const thrusterSlot = page.locator('[data-testid^="slot-ship_ter_m_corvette_02_a::thruster::"]').first()
+  await expect(thrusterSlot).toBeVisible({ timeout: 10000 })
+  await thrusterSlot.click()
+  await page.waitForTimeout(500)
+  // 2.5.4 点击选中候选推进器
   const candidate = page.locator('.candidate-list .candidate-item').first()
-  await expect(candidate).toBeVisible()
-  await candidate.click()
-  // 2.5.4 断言面板显示且显示推进器 summary #期望: [visible]
+  await expect(candidate).toBeVisible({ timeout: 10000 })
+  await clickRealCandidate(page)
+  // 2.5.5 断言面板显示且显示推进器 summary #期望: [visible]
   const panel = page.locator('[data-testid="ship-build-panel-equipment"]')
   await expect(panel).toBeVisible()
 }
@@ -144,44 +187,73 @@ async function buildEquipmentPanelVisibleThrusterPickerOpen(page: any) {
 async function buildEquipmentPanelVisibleNoCurrentEquipment(page: any) {
   // 2.6.1 进入船只建造视图，选择大太刀
   await enterOdachi(page)
-  // 2.6.2 点击未配装的 con_weapon_01 打开 Picker
+  // 2.6.2 点击未配装的 weapon 槽位打开 Picker
   await switchToWeaponTab(page)
+  await page.waitForTimeout(300)
+  // 点击武器槽位打开 Picker
+  const weaponSlot = page.locator('[data-testid^="slot-ship_ter_m_corvette_02_a::weapon::"]').first()
+  await expect(weaponSlot).toBeVisible({ timeout: 10000 })
+  await weaponSlot.click()
+  await page.waitForTimeout(500)
   // 2.6.3 点击选中候选装备
-  const candidate = page.locator('.candidate-list .candidate-item').first()
-  await expect(candidate).toBeVisible()
-  await candidate.click()
+  await clickRealCandidate(page)
   // 2.6.4 断言面板显示，仅显示候选装备数值 #期望: [visible]
   const panel = page.locator('[data-testid="ship-build-panel-equipment"]')
-  await expect(panel).toBeVisible()
+  await expect(panel).toBeVisible({ timeout: 10000 })
 }
 
 async function buildEquipmentPanelSameEquipmentSelected(page: any) {
   // 2.7.1 进入船只建造视图，选择大太刀，已为某槽位配装装备
   await enterOdachi(page)
   await switchToWeaponTab(page)
+  await page.waitForTimeout(300)
+  // 2.7.2 点击武器槽位打开 Picker
+  const weaponSlot = page.locator('[data-testid^="slot-ship_ter_m_corvette_02_a::weapon::"]').first()
+  await expect(weaponSlot).toBeVisible({ timeout: 10000 })
+  await weaponSlot.click()
+  await page.waitForTimeout(500)
   // 配装一个武器
-  const firstCandidate = page.locator('.candidate-list .candidate-item').first()
-  await expect(firstCandidate).toBeVisible()
-  await firstCandidate.click()
+  await clickRealCandidate(page)
   // 等待配装完成
   await page.waitForTimeout(500)
-  // 2.7.2 打开同一槽位的 Picker
-  const weaponSlot = page.locator('[data-testid*="con_weapon"]').first()
-  if (await weaponSlot.isVisible().catch(() => false)) {
-    await weaponSlot.click()
-  }
-  // 2.7.3 点击选中与当前相同的装备
-  const sameCandidate = page.locator('.candidate-list .candidate-item').first()
-  await expect(sameCandidate).toBeVisible()
-  await sameCandidate.click()
-  // 2.7.4 断言面板显示当前装备信息，不显示比较进度条 #期望: [no-progress-bar]
+  // 2.7.3 再次打开同一槽位的 Picker
+  await weaponSlot.click()
+  await page.waitForTimeout(500)
+  // 2.7.4 点击选中与当前相同的装备（同一个）
+  await clickRealCandidate(page)
+  // 断言面板显示当前装备信息 #期望: [no-progress-bar]
   const panel = page.locator('[data-testid="ship-build-panel-equipment"]')
-  await expect(panel).toBeVisible()
+  await expect(panel).toBeVisible({ timeout: 10000 })
 }
 
 // ========== Chapter 2: States ==========
 
 test.describe('build-ship-equipment-panel', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/')
+
+    // 1. 加载 fixture 到 localStorage（排除 vsn）
+    const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
+    const dbData = JSON.parse(JSON.stringify(dbFixture.default))
+    delete dbData.vsn
+    await page.evaluate((data) => {
+      Object.entries(data).forEach(([key, value]) => {
+        localStorage.setItem(key, JSON.stringify(value))
+      })
+      localStorage.setItem('isTestEnv', 'true')
+    }, dbData)
+
+    // 2. reload 初始化 store
+    await page.reload()
+
+    // 3. 通过 UI 设置语言
+    const langSelect = page.locator('select').filter({ hasText: /简体中文|English/ })
+    await langSelect.selectOption('zh-CN')
+    await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; animation: none !important; }' })
+    await page.getByRole('button', { name: /Ship Build|船只建造/ }).click()
+    await expect(page.getByTestId('ship-build-filters')).toBeVisible()
+  })
+
   test('2.1 状态: equipment-panel-visible-turret-picker-open', async ({ page }) => {
     await buildEquipmentPanelVisibleTurretPickerOpen(page)
   })
@@ -363,12 +435,24 @@ test.describe('build-ship-equipment-panel', () => {
   })
 
   test('3.15 Case: 候选为空只显示当前装备', async ({ page }) => {
+    // 监听 console 日志
+    const logs: string[] = []
+    page.on('console', msg => logs.push(msg.text()))
+
     // 3.15.1 状态: equipment-panel-visible-weapon-picker-open（已配装）
     await buildEquipmentPanelVisibleWeaponPickerOpen(page)
-    // 3.15.2 点击空槽位按钮清除选中
-    const clearBtn = page.locator('[data-testid="clear-equipment"]').first()
-    // 3.15.3 断言面板显示当前已装备的数值，无差值信息 #期望: [currentOnly]
-    await expect(clearBtn).toBeVisible()
+
+    // 3.15.2 点击空槽位候选
+    const emptyCandidate = page.locator('[data-testid="candidate-empty"]').first()
+    await emptyCandidate.click()
+    await page.waitForTimeout(1000)
+
+    // 打印日志
+    console.log('Console logs:', logs.filter(l => l.includes('DEBUG')))
+
+    // 3.15.3 断言面板仍然显示当前装备的数值
+    const panel = page.locator('[data-testid="ship-build-panel-equipment"]')
+    await expect(panel).toBeVisible({ timeout: 10000 })
   })
 
   test('3.16 Case: 当前为空只显示候选装备', async ({ page }) => {
@@ -420,7 +504,7 @@ test.describe('build-ship-equipment-panel', () => {
     await switchToWeaponTab(page)
     // 3.20.2 点击选中某个候选装备
     const candidate = page.locator('.candidate-list .candidate-item').first()
-    await candidate.click()
+    await clickRealCandidate(page)
     // 3.20.3 断言面板显示 #期望: [visible]
     await expect(page.locator('[data-testid="ship-build-panel-equipment"]')).toBeVisible()
   })

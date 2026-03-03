@@ -118,15 +118,28 @@ const pickerTarget = ref<{
 } | null>(null)
 const highlightedEquipmentId = ref<string | null>(null)
 
+// picker-open 事件参数
+const currentSlotType = ref('')
+const currentEquipmentId = ref<string | null>(null)
+const currentIsShield = ref(false)
+
 // 从 store 获取当前装备状态
 const selectedByConnection = computed(() => {
   return blueprint.value?.connections || {}
 })
 
 // Picker 事件处理
-const handlePickerOpenChangeInternal = (open: boolean) => {
-  isPickerOpen.value = open
-  showMaterial.value = !open
+const handlePickerOpen = (slotType: string, equipmentId: string | null, isShield: boolean) => {
+  isPickerOpen.value = true
+  showMaterial.value = false
+  currentSlotType.value = slotType
+  currentEquipmentId.value = equipmentId
+  currentIsShield.value = isShield
+}
+
+const handlePickerClose = () => {
+  isPickerOpen.value = false
+  showMaterial.value = true
 }
 
 const handleHighlightedEquipmentIdChange = (id: string | null) => {
@@ -172,7 +185,8 @@ const handlePickerTargetChange = (target: typeof pickerTarget.value) => {
       <ShipBuildPanelFit
         :key="selectedShipId || 'no-ship'"
         :wide="!showMaterial"
-        @picker-open-change="handlePickerOpenChangeInternal"
+        @picker-open="handlePickerOpen"
+        @picker-close="handlePickerClose"
         @update:highlightedEquipmentId="handleHighlightedEquipmentIdChange"
         @update:pickerTarget="handlePickerTargetChange"
       />
@@ -188,7 +202,9 @@ const handlePickerTargetChange = (target: typeof pickerTarget.value) => {
             :picker-target="pickerTarget"
             :highlighted-equipment-id="highlightedEquipmentId"
             :selected-ship="selectedShip"
-            :selected-by-connection="selectedByConnection"
+            :slot-type="currentSlotType"
+            :current-equipment-id="currentEquipmentId"
+            :is-shield="currentIsShield"
           />
           <ShipBuildPanelStats
             :ship-blueprint="blueprint"
