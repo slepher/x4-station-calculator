@@ -42,6 +42,16 @@ const candidateEquipment = computed(() => {
   return equipmentMap.get(props.highlightedEquipmentId) || null
 })
 
+// View Mode: single 或 diff
+// single: currentEquipmentId == highlightedEquipmentId || currentEquipmentId == null || highlightedEquipmentId == null
+// diff: currentEquipmentId != highlightedEquipmentId 且两者都不为 null
+const viewMode = computed(() => {
+  if (!props.currentEquipmentId || !props.highlightedEquipmentId || props.currentEquipmentId === props.highlightedEquipmentId) {
+    return 'single'
+  }
+  return 'diff'
+})
+
 // 显示用的装备（候选优先，没有则用当前）- 用于头部名称显示
 const displayEquipment = computed(() => {
   return candidateEquipment.value || currentEquipment.value
@@ -96,7 +106,6 @@ interface ComparisonItem {
   candidateValue: number
   diff: number
   max: number | undefined
-  showCurrentOnly: boolean // 候选为空时只显示当前值
 }
 
 // 对比数据 - 根据装备类型生成（两列布局）
@@ -147,7 +156,6 @@ const comparisonData = computed(() => {
         ? candidateValue - currentValue
         : undefined
       // 候选为空但当前有值时，只显示当前值
-      const showCurrentOnly = rawCandidateValue === undefined && currentValue !== undefined
       return {
         key: field.key,
         labelKey: field.labelKey,
@@ -155,8 +163,7 @@ const comparisonData = computed(() => {
         currentValue,
         candidateValue,
         diff,
-        max: maxValues[field.key],
-        showCurrentOnly
+        max: maxValues[field.key]
       }
     })
   }
@@ -189,7 +196,6 @@ const comparisonData = computed(() => {
         ? candidateValue - currentValue
         : undefined
       // 候选为空但当前有值时，只显示当前值
-      const showCurrentOnly = rawCandidateValue === undefined && currentValue !== undefined
       return {
         key: field.key,
         labelKey: field.labelKey,
@@ -197,8 +203,7 @@ const comparisonData = computed(() => {
         currentValue,
         candidateValue,
         diff,
-        max: maxValues[field.key],
-        showCurrentOnly
+        max: maxValues[field.key]
       }
     })
   }
@@ -242,7 +247,6 @@ const comparisonData = computed(() => {
         ? candidateValue - currentValue
         : undefined
       // 候选为空但当前有值时，只显示当前值
-      const showCurrentOnly = rawCandidateValue === undefined && currentValue !== undefined
       return {
         key: field.key,
         labelKey: field.labelKey,
@@ -250,8 +254,7 @@ const comparisonData = computed(() => {
         currentValue,
         candidateValue,
         diff,
-        max: maxValues[field.key],
-        showCurrentOnly
+        max: maxValues[field.key]
       }
     })
   }
@@ -290,7 +293,6 @@ const comparisonData = computed(() => {
         ? candidateValue - currentValue
         : undefined
       // 候选为空但当前有值时，只显示当前值
-      const showCurrentOnly = rawCandidateValue === undefined && currentValue !== undefined
       return {
         key: field.key,
         labelKey: field.labelKey,
@@ -298,8 +300,7 @@ const comparisonData = computed(() => {
         currentValue,
         candidateValue,
         diff,
-        max: maxValues[field.key],
-        showCurrentOnly
+        max: maxValues[field.key]
       }
     })
   }
@@ -377,68 +378,60 @@ function getDiffStartPercent(currentValue: number, candidateValue: number, max: 
             class="stats-row"
           >
             <span class="stats-label">{{ t(item.labelKey) }}</span>
-            <span class="stats-value">
-              <!-- diff=undefined 或 diff=0 时显示灰色（无比较差异） -->
-              <span v-if="item.diff === undefined || item.diff === 0" class="current-value">
-                {{ formatValue(item.showCurrentOnly ? item.currentValue : item.candidateValue) }}
+            <!-- SingleView 或 DiffView 且 diff=0: 复用单一视图逻辑 -->
+            <template v-if="viewMode === 'single' || item.diff === 0">
+              <span class="stats-value">
+                <span class="current-value">
+                  {{ formatValue(item.candidateValue || item.currentValue) }}
+                </span>
+                <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
               </span>
-              <!-- 有比较差异时显示候选值 + 差值 -->
-              <span v-else :class="getDiffClass(item.diff)">
-                {{ formatDisplayValue(item.candidateValue, item.diff) }}
+              <div class="stats-bar">
+                <div
+                  class="stats-bar-fill stats-bar-neutral"
+                  :style="{ width: getProgressPercent(item.candidateValue || item.currentValue, item.max) + '%' }"
+                ></div>
+              </div>
+            </template>
+            <!-- DiffView 且 diff!=0: 对比视图 -->
+            <template v-else>
+              <span class="stats-value">
+                <span :class="getDiffClass(item.diff)">
+                  {{ formatDisplayValue(item.candidateValue, item.diff) }}
+                </span>
+                <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
               </span>
-              <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
-            </span>
-            <div class="stats-bar">
-              <!-- 候选为空但当前有值时，只显示当前值的单一进度条 -->
-              <template v-if="item.showCurrentOnly">
-                <div
-                  class="stats-bar-fill stats-bar-neutral"
-                  :style="{ width: getProgressPercent(item.currentValue, item.max) + '%' }"
-                ></div>
-              </template>
-              <!-- 只有候选值，没有当前值 -->
-              <template v-else-if="item.currentValue === undefined">
-                <div
-                  class="stats-bar-fill stats-bar-neutral"
-                  :style="{ width: getProgressPercent(item.candidateValue, item.max) + '%' }"
-                ></div>
-              </template>
-              <!-- diff = 0: 全部青色 -->
-              <template v-else-if="item.diff === 0">
-                <div
-                  class="stats-bar-fill stats-bar-neutral"
-                  :style="{ width: getBasePercent(item.currentValue, item.candidateValue, item.max) + '%' }"
-                ></div>
-              </template>
-              <!-- diff > 0: 0到currentValue青色, currentValue到candidateValue蓝色 -->
-              <template v-else-if="item.diff > 0">
-                <div
-                  class="stats-bar-fill stats-bar-neutral"
-                  :style="{ width: getBasePercent(item.currentValue, item.candidateValue, item.max) + '%' }"
-                ></div>
-                <div
-                  class="stats-bar-fill stats-bar-positive"
-                  :style="{
-                    width: getDiffPercent(item.currentValue, item.candidateValue, item.max) + '%',
-                    left: getDiffStartPercent(item.currentValue, item.candidateValue, item.max) + '%'
-                  }"
-                ></div>
-              </template>
-              <!-- diff < 0: 0到candidateValue青色, candidateValue到currentValue粉色 -->
-              <template v-else-if="item.diff < 0">
-                <div
-                  class="stats-bar-fill stats-bar-neutral"
-                  :style="{ width: getBasePercent(item.currentValue, item.candidateValue, item.max) + '%' }"
-                ></div>
-                <div
-                  class="stats-bar-fill stats-bar-negative"
-                  :style="{
-                    width: getDiffPercent(item.currentValue, item.candidateValue, item.max) + '%',
-                    left: getDiffStartPercent(item.currentValue, item.candidateValue, item.max) + '%'
-                  }"
-                ></div>
-              </template>
-            </div>
+              <div class="stats-bar">
+                <!-- diff > 0: 0到currentValue青色, currentValue到candidateValue蓝色 -->
+                <template v-if="item.diff > 0">
+                  <div
+                    class="stats-bar-fill stats-bar-neutral"
+                    :style="{ width: getBasePercent(item.currentValue, item.candidateValue, item.max) + '%' }"
+                  ></div>
+                  <div
+                    class="stats-bar-fill stats-bar-positive"
+                    :style="{
+                      width: getDiffPercent(item.currentValue, item.candidateValue, item.max) + '%',
+                      left: getDiffStartPercent(item.currentValue, item.candidateValue, item.max) + '%'
+                    }"
+                  ></div>
+                </template>
+                <!-- diff < 0: 0到candidateValue青色, candidateValue到currentValue粉色 -->
+                <template v-else-if="item.diff < 0">
+                  <div
+                    class="stats-bar-fill stats-bar-neutral"
+                    :style="{ width: getBasePercent(item.currentValue, item.candidateValue, item.max) + '%' }"
+                  ></div>
+                  <div
+                    class="stats-bar-fill stats-bar-negative"
+                    :style="{
+                      width: getDiffPercent(item.currentValue, item.candidateValue, item.max) + '%',
+                      left: getDiffStartPercent(item.currentValue, item.candidateValue, item.max) + '%'
+                    }"
+                  ></div>
+                </template>
+              </div>
+            </template>
           </div>
         </div>
         <div class="stats-column">
@@ -448,68 +441,60 @@ function getDiffStartPercent(currentValue: number, candidateValue: number, max: 
             class="stats-row"
           >
             <span class="stats-label">{{ t(item.labelKey) }}</span>
-            <span class="stats-value">
-              <!-- diff=undefined 或 diff=0 时显示灰色（无比较差异） -->
-              <span v-if="item.diff === undefined || item.diff === 0" class="current-value">
-                {{ formatValue(item.showCurrentOnly ? item.currentValue : item.candidateValue) }}
+            <!-- SingleView 或 DiffView 且 diff=0: 复用单一视图逻辑 -->
+            <template v-if="viewMode === 'single' || item.diff === 0">
+              <span class="stats-value">
+                <span class="current-value">
+                  {{ formatValue(item.candidateValue || item.currentValue) }}
+                </span>
+                <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
               </span>
-              <!-- 有比较差异时显示候选值 + 差值 -->
-              <span v-else :class="getDiffClass(item.diff)">
-                {{ formatDisplayValue(item.candidateValue, item.diff) }}
+              <div class="stats-bar">
+                <div
+                  class="stats-bar-fill stats-bar-neutral"
+                  :style="{ width: getProgressPercent(item.candidateValue || item.currentValue, item.max) + '%' }"
+                ></div>
+              </div>
+            </template>
+            <!-- DiffView 且 diff!=0: 对比视图 -->
+            <template v-else>
+              <span class="stats-value">
+                <span :class="getDiffClass(item.diff)">
+                  {{ formatDisplayValue(item.candidateValue, item.diff) }}
+                </span>
+                <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
               </span>
-              <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
-            </span>
-            <div class="stats-bar">
-              <!-- 候选为空但当前有值时，只显示当前值的单一进度条 -->
-              <template v-if="item.showCurrentOnly">
-                <div
-                  class="stats-bar-fill stats-bar-neutral"
-                  :style="{ width: getProgressPercent(item.currentValue, item.max) + '%' }"
-                ></div>
-              </template>
-              <!-- 只有候选值，没有当前值 -->
-              <template v-else-if="item.currentValue === undefined">
-                <div
-                  class="stats-bar-fill stats-bar-neutral"
-                  :style="{ width: getProgressPercent(item.candidateValue, item.max) + '%' }"
-                ></div>
-              </template>
-              <!-- diff = 0: 全部青色 -->
-              <template v-else-if="item.diff === 0">
-                <div
-                  class="stats-bar-fill stats-bar-neutral"
-                  :style="{ width: getBasePercent(item.currentValue, item.candidateValue, item.max) + '%' }"
-                ></div>
-              </template>
-              <!-- diff > 0: 0到currentValue青色, currentValue到candidateValue蓝色 -->
-              <template v-else-if="item.diff > 0">
-                <div
-                  class="stats-bar-fill stats-bar-neutral"
-                  :style="{ width: getBasePercent(item.currentValue, item.candidateValue, item.max) + '%' }"
-                ></div>
-                <div
-                  class="stats-bar-fill stats-bar-positive"
-                  :style="{
-                    width: getDiffPercent(item.currentValue, item.candidateValue, item.max) + '%',
-                    left: getDiffStartPercent(item.currentValue, item.candidateValue, item.max) + '%'
-                  }"
-                ></div>
-              </template>
-              <!-- diff < 0: 0到candidateValue青色, candidateValue到currentValue粉色 -->
-              <template v-else-if="item.diff < 0">
-                <div
-                  class="stats-bar-fill stats-bar-neutral"
-                  :style="{ width: getBasePercent(item.currentValue, item.candidateValue, item.max) + '%' }"
-                ></div>
-                <div
-                  class="stats-bar-fill stats-bar-negative"
-                  :style="{
-                    width: getDiffPercent(item.currentValue, item.candidateValue, item.max) + '%',
-                    left: getDiffStartPercent(item.currentValue, item.candidateValue, item.max) + '%'
-                  }"
-                ></div>
-              </template>
-            </div>
+              <div class="stats-bar">
+                <!-- diff > 0: 0到currentValue青色, currentValue到candidateValue蓝色 -->
+                <template v-if="item.diff > 0">
+                  <div
+                    class="stats-bar-fill stats-bar-neutral"
+                    :style="{ width: getBasePercent(item.currentValue, item.candidateValue, item.max) + '%' }"
+                  ></div>
+                  <div
+                    class="stats-bar-fill stats-bar-positive"
+                    :style="{
+                      width: getDiffPercent(item.currentValue, item.candidateValue, item.max) + '%',
+                      left: getDiffStartPercent(item.currentValue, item.candidateValue, item.max) + '%'
+                    }"
+                  ></div>
+                </template>
+                <!-- diff < 0: 0到candidateValue青色, candidateValue到currentValue粉色 -->
+                <template v-else-if="item.diff < 0">
+                  <div
+                    class="stats-bar-fill stats-bar-neutral"
+                    :style="{ width: getBasePercent(item.currentValue, item.candidateValue, item.max) + '%' }"
+                  ></div>
+                  <div
+                    class="stats-bar-fill stats-bar-negative"
+                    :style="{
+                      width: getDiffPercent(item.currentValue, item.candidateValue, item.max) + '%',
+                      left: getDiffStartPercent(item.currentValue, item.candidateValue, item.max) + '%'
+                    }"
+                  ></div>
+                </template>
+              </div>
+            </template>
           </div>
         </div>
       </div>
