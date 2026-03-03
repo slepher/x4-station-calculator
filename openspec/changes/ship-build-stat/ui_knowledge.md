@@ -330,17 +330,50 @@ await expect(slotShield.locator('.slot-row-count')).toContainText('2/2')
 
 ## 测试运行
 
-### 待测试用例 (进度条 Max 值)
+### 2026-03-03 (第三次运行)
 
-新增进度条最大值相关测试用例：
+#### 单元测试
 
-- [ ] 3.7 Case: M级船最大值映射
-- [ ] 3.8 Case: L级船最大值映射
-- [ ] 3.9 Case: 进度条比例计算
-- [ ] 3.10 Case: 进度条边界-当前值等于max
-- [ ] 3.11 Case: 进度条边界-当前值超过max
-- [ ] 3.12 Case: S级船最大值映射
-- [ ] 3.13 Case: XL级船最大值映射
+- [✓] 1.1 档位默认状态
+- [✓] 1.2 档位切换行为
+- [✓] 1.3 简略字段对齐
+- [✓] 1.4 详细字段对齐
+- [✓] 1.5 可计算字段真实值显示
+- [✓] 1.6 武器DPS真实值显示
+- [✓] 1.7 高度限制回归
+- [✓] 1.8 useEquipmentStats 武器 DPS 计算 (无heat属性)
+- [✓] 1.9 useEquipmentStats 炮塔 DPS 计算
+- [✓] 1.10 useEquipmentStats 护盾计算
+- [✓] 1.11 useEquipmentStats 引擎计算
+- [✓] 1.12 useEquipmentStats 推进器计算
+- [✓] 1.13 useEquipmentStats Beam 武器计算 (有heat属性)
+- [✓] 1.14 useEquipmentStats 导弹发射器计算
+
+#### 状态测试
+
+- [✓] 2.1 状态: 仅载入大太刀
+- [✓] 2.2 状态: 仅载入大阪
+
+#### 场景测试
+
+- [✗] 3.1 Case: 简略字段对齐 - product_bug: buildSummaryStats 缺少 missile, deployable, countermeasure 字段
+- [✓] 3.2 Case: 详细字段对齐
+- [✓] 3.3 Case: 详细档位真实值
+- [✓] 3.4 Case: 取消固定高度限制
+- [✓] 3.5 Case: 大太刀满装备DPS计算
+- [✓] 3.6 Case: 大阪满装备DPS计算
+- [✓] 3.7 Case: M级船进度条渲染
+- [✓] 3.8 Case: L级船进度条渲染
+- [✓] 3.9 Case: 进度条渲染与比例
+- [✓] 3.10 Case: 进度条渲染-大阪
+- [✓] 3.11 Case: 进度条渲染-大太刀
+- [✓] 3.12 Case: S级过滤器交互
+- [✓] 3.13 Case: XL级过滤器交互
+
+**product_bug 分析**:
+- 测试 3.1 期望在简略(summary)模式下显示 18 个字段，包括：船体、护盾、雷达范围、武器爆发输出值、炮塔平均输出值、集装仓储、M级泊位数量、M级飞船容量、S级泊位数量、S级飞船容量、速度、助推速度、巡航速度、船员、单位、导弹、可投放设备、干扰弹
+- 当前 `buildSummaryStats` 函数缺少 missile、deployable、countermeasure 三个字段
+- 需要在 `src/components/ship-build/ShipBuildPanelStats.vue` 的 `buildSummaryStats` 函数中添加这三个字段
 
 ### 2026-03-03 (第二次运行)
 
@@ -357,6 +390,13 @@ await expect(slotShield.locator('.slot-row-count')).toContainText('2/2')
 - [✓] 3.4 Case: 取消固定高度限制
 - [✓] 3.5 Case: 大太刀满装备DPS计算
 - [✓] 3.6 Case: 大阪满装备DPS计算
+- [✓] 3.7 Case: M级船进度条渲染
+- [✓] 3.8 Case: L级船进度条渲染
+- [✓] 3.9 Case: 进度条渲染与比例
+- [✓] 3.10 Case: 进度条渲染-大阪
+- [✓] 3.11 Case: 进度条渲染-大太刀
+- [x] 3.12 Case: S级过滤器交互
+- [x] 3.13 Case: XL级过滤器交互
 
 ### 2026-03-02 (首次运行)
 
@@ -367,3 +407,27 @@ await expect(slotShield.locator('.slot-row-count')).toContainText('2/2')
 
 **遗留问题**：
 - 3.5, 3.6 的 old/new 统计逻辑切换功能未实现（test_defect）
+
+### Bug 跟踪
+
+- [✗] 4.1 BUG-001: Summary模式缺少导弹/可投放设备/干扰弹字段
+
+**Bug 描述**:
+- 测试 3.1 期望在简略(summary)模式下显示 18 个字段，包括：船体、护盾、雷达范围、武器爆发输出值、炮塔平均输出值、集装仓储、M级泊位数量、M级飞船容量、S级泊位数量、S级飞船容量、速度、助推速度、巡航速度、船员、单位、导弹、可投放设备、干扰弹
+- 当前 `buildSummaryStatsByUseEquipmentStats` 函数（src/components/ship-build/ShipBuildPanelStats.vue）缺少 missile、deployable、countermeasure 三个字段
+- 这三个字段存在于 detail 模式（buildDetailStatsByUseEquipmentStats 第1108-1115行），但未包含在 summary 模式中
+
+**修复前断言**:
+- 字段数量为 15（缺少 missile, deployable, countermeasure）
+- missile 字段不可见
+- deployable 字段不可见
+- countermeasure 字段不可见
+
+**修复后断言**:
+- 字段数量为 18
+- missile 字段可见（label: 导弹）
+- deployable 字段可见（label: 可投放设备）
+- countermeasure 字段可见（label: 干扰弹）
+
+**相关测试用例**:
+- 3.1 Case: 简略字段对齐（关联测试）

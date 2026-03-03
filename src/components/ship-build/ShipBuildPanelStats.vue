@@ -721,12 +721,6 @@ const buildSummaryStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
       : summaryKey === 'storage_liquid' ? liquid
       : condensed
   }
-  const storageDetailItems = [
-    { key: 'storage_container', labelKey: 'ship_build.stats_storage_container', unit: 'm3', value: container },
-    { key: 'storage_solid', labelKey: 'ship_build.stats_storage_solid', unit: 'm3', value: solid },
-    { key: 'storage_liquid', labelKey: 'ship_build.stats_storage_liquid', unit: 'm3', value: liquid },
-    { key: 'storage_condensed', labelKey: 'ship_build.stats_storage_condensed', unit: 'm3', value: condensed }
-  ].filter(item => item.key !== summaryKey)
 
   // 9x2 排布: 交叉排列 [左1, 右1, 左2, 右2, ...]
   return [
@@ -745,18 +739,18 @@ const buildSummaryStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
     // 行5: Crew | Travel Speed
     { key: 'crew', labelKey: 'ship_build.stats_crew', unit: '', value: ship.crew?.capacity || 0 },
     { key: 'travel_speed', labelKey: 'ship_build.stats_travel_speed', unit: 'm/s', value: travelSpeed },
-    // 行6: Storage Detail 1 | M Dock Count
-    storageDetailItems[0] || null,
+    // 行6: M Dock Count | M Dock Capacity
     { key: 'dock_m_count', labelKey: 'ship_build.stats_dock_m_count', unit: '', value: getDockCount(ship, 'dock_m') },
-    // 行7: Storage Detail 2 | M Dock Capacity
-    storageDetailItems[1] || null,
     { key: 'dock_m_capacity', labelKey: 'ship_build.stats_dock_m_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_m') },
-    // 行8: Storage Detail 3 | S Dock Count
-    storageDetailItems[2] || null,
+    // 行7: S Dock Count | S Dock Capacity
     { key: 'dock_s_count', labelKey: 'ship_build.stats_dock_s_count', unit: '', value: getDockCount(ship, 'dock_s') },
-    // 行9: Cargo: Unit Storage | S Dock Capacity
+    { key: 'dock_s_capacity', labelKey: 'ship_build.stats_dock_s_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_s') },
+    // 行8: Unit Storage | Missile
     { key: 'storage_unit', labelKey: 'ship_build.stats_storage_unit', unit: '', value: ship.storage?.unit || 0 },
-    { key: 'dock_s_capacity', labelKey: 'ship_build.stats_dock_s_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_s') }
+    { key: 'missile', labelKey: 'ship_build.stats_missile', unit: '', value: ship.storage?.missile || 0 },
+    // 行9: Deployable | Countermeasure
+    { key: 'deployable', labelKey: 'ship_build.stats_deployable', unit: '', value: ship.storage?.deployable || 0 },
+    { key: 'countermeasure', labelKey: 'ship_build.stats_countermeasure', unit: '', value: ship.storage?.countermeasure || 0 }
   ].filter((item): item is Omit<ShipStatMetric, 'ratio'> => item !== null)
 }
 
@@ -979,7 +973,7 @@ const buildSummaryStatsByUseEquipmentStats = (ship: X4Ship): Omit<ShipStatMetric
   // 优先顺序: Container → Solid → Liquid → Condensed
   const { container, solid, liquid, condensed, summaryKey } = getCargoSummaryKeys(ship)
 
-  // 构建 Storage 组的 summary/detail 数据
+  // 构建 Storage 组的 summary 数据
   const storageSummaryItem = {
     key: summaryKey,
     labelKey: `ship_build.stats_${summaryKey}`,
@@ -989,12 +983,6 @@ const buildSummaryStatsByUseEquipmentStats = (ship: X4Ship): Omit<ShipStatMetric
       : summaryKey === 'storage_liquid' ? liquid
       : condensed
   }
-  const storageDetailItems = [
-    { key: 'storage_container', labelKey: 'ship_build.stats_storage_container', unit: 'm3', value: container },
-    { key: 'storage_solid', labelKey: 'ship_build.stats_storage_solid', unit: 'm3', value: solid },
-    { key: 'storage_liquid', labelKey: 'ship_build.stats_storage_liquid', unit: 'm3', value: liquid },
-    { key: 'storage_condensed', labelKey: 'ship_build.stats_storage_condensed', unit: 'm3', value: condensed }
-  ].filter(item => item.key !== summaryKey)
 
   // 9x2 排布: 交叉排列 [左1, 右1, 左2, 右2, ...]
   return [
@@ -1013,18 +1001,18 @@ const buildSummaryStatsByUseEquipmentStats = (ship: X4Ship): Omit<ShipStatMetric
     // 行5: Crew | Travel Speed
     { key: 'crew', labelKey: 'ship_build.stats_crew', unit: '', value: ship.crew?.capacity || 0 },
     { key: 'travel_speed', labelKey: 'ship_build.stats_travel_speed', unit: 'm/s', value: Math.round(travelSpeed) },
-    // 行6: Storage Detail 1 | M Dock Count
-    storageDetailItems[0] || null,
+    // 行6: M Dock Count | M Dock Capacity
     { key: 'dock_m_count', labelKey: 'ship_build.stats_dock_m_count', unit: '', value: getDockCount(ship, 'dock_m') },
-    // 行7: Storage Detail 2 | M Dock Capacity
-    storageDetailItems[1] || null,
     { key: 'dock_m_capacity', labelKey: 'ship_build.stats_dock_m_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_m') },
-    // 行8: Storage Detail 3 | S Dock Count
-    storageDetailItems[2] || null,
+    // 行7: S Dock Count | S Dock Capacity
     { key: 'dock_s_count', labelKey: 'ship_build.stats_dock_s_count', unit: '', value: getDockCount(ship, 'dock_s') },
-    // 行9: Cargo: Unit Storage | S Dock Capacity
+    { key: 'dock_s_capacity', labelKey: 'ship_build.stats_dock_s_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_s') },
+    // 行8: Unit Storage | Missile
     { key: 'storage_unit', labelKey: 'ship_build.stats_storage_unit', unit: '', value: ship.storage?.unit || 0 },
-    { key: 'dock_s_capacity', labelKey: 'ship_build.stats_dock_s_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_s') }
+    { key: 'missile', labelKey: 'ship_build.stats_missile', unit: '', value: ship.storage?.missile || 0 },
+    // 行9: Deployable | Countermeasure
+    { key: 'deployable', labelKey: 'ship_build.stats_deployable', unit: '', value: ship.storage?.deployable || 0 },
+    { key: 'countermeasure', labelKey: 'ship_build.stats_countermeasure', unit: '', value: ship.storage?.countermeasure || 0 }
   ].filter((item): item is Omit<ShipStatMetric, 'ratio'> => item !== null)
 }
 
