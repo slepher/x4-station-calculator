@@ -141,6 +141,41 @@ On apply failure, script supports `--json` and returns:
 [{"case":"1"|"1.1"|"1.1.1"|"1.1.1.1"|"global","desc":"Desc","error_code":"CODE","error_msg":"Message"}]
 ```
 
+#### B.6 Apply Script Commands (MANDATORY)
+
+**Apply Test Results to test_tasks.md:**
+
+```bash
+# Apply success cases only
+python skill-scripts/apply_test_results.py <change-name> \
+  --successes "1.1,1.2,2.1"
+
+# Apply failure cases with fail markers
+python skill-scripts/apply_test_results.py <change-name> \
+  --failures "1.1" \
+  --fail-steps "1.1.1"
+
+# Apply mixed success and failure cases
+python skill-scripts/apply_test_results.py <change-name> \
+  --successes "1.2,2.1" \
+  --failures "1.1" \
+  --fail-steps "1.1.2"
+
+# Apply with JSON output for error handling
+python skill-scripts/apply_test_results.py <change-name> \
+  --successes "1.1" \
+  --failures "1.2" \
+  --fail-steps "1.2.1" \
+  --json
+```
+
+**Parameter Description:**
+- `<change-name>`: target change directory name (e.g., `storage-auto-fill`)
+- `--successes`: comma-separated case IDs that passed (format: `x.x`)
+- `--failures`: comma-separated case IDs that failed (format: `x.x`)
+- `--fail-steps`: comma-separated failure marker IDs (format: `x.x.x` or `x.x.x.n`)
+- `--json`: output errors in JSON format for programmatic parsing
+
 ## Output
 
 - Batch test run summary (pass/fail/product-defect)
