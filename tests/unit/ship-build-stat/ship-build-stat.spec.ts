@@ -11,11 +11,11 @@ import equipmentsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.j
 import missilesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/missiles.json'
 
 // 使用真实的大太刀(Odachi)飞船数据
-const odachiShip = shipsRaw.find((s: any) => s.id === 'ship_ter_m_corvette_02_a')
+const odachiShip = shipsRaw.find((s: any) => s.id === 'ship_ter_m_corvette_02_a') as any
 
 // 查找真实装备数据
-const findEquipment = (id: string) => equipmentsRaw.find((e: any) => e.id === id)
-const findMissile = (id: string) => missilesRaw.find((m: any) => m.id === id || m.macro === id)
+const findEquipment = (id: string) => equipmentsRaw.find((e: any) => e.id === id) as any
+const findMissile = (id: string) => missilesRaw.find((m: any) => m.id === id || m.macro === id) as any
 
 const odachiEngine = findEquipment('engine_ter_m_allround_01_mk1')
 const odachiThruster = findEquipment('thruster_gen_m_allround_01_mk1')
