@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
@@ -13,6 +13,7 @@ import type {
   X4Ware
 } from '@/types/x4'
 import ShipBuildPanelFit from '@/components/ship-build/ShipBuildPanelFit.vue'
+import ShipBuildPanelEquipment from '@/components/ship-build/ShipBuildPanelEquipment.vue'
 import ShipBuildPanelStats from '@/components/ship-build/ShipBuildPanelStats.vue'
 import ShipBuildPanelMaterials from '@/components/ship-build/ShipBuildPanelMaterials.vue'
 import ShipBuildSelector from '@/components/ship-build/ShipBuildSelector.vue'
@@ -109,8 +110,31 @@ const handleSelectedShipIdChange = (value: string | null) => {
 
 const showMaterial = ref(true)
 
-const handlePickerOpenChange = (open: boolean) => {
+// Picker 状态
+const isPickerOpen = ref(false)
+const pickerTarget = ref<{
+  connectionKeys: string[]
+  options: { id: string; name: string; mk: string | null; race: string | null; tags: string[] }[]
+} | null>(null)
+const highlightedEquipmentId = ref<string | null>(null)
+
+// 从 store 获取当前装备状态
+const selectedByConnection = computed(() => {
+  return blueprint.value?.connections || {}
+})
+
+// Picker 事件处理
+const handlePickerOpenChangeInternal = (open: boolean) => {
+  isPickerOpen.value = open
   showMaterial.value = !open
+}
+
+const handleHighlightedEquipmentIdChange = (id: string | null) => {
+  highlightedEquipmentId.value = id
+}
+
+const handlePickerTargetChange = (target: typeof pickerTarget.value) => {
+  pickerTarget.value = target
 }
 </script>
 
@@ -144,18 +168,42 @@ const handlePickerOpenChange = (open: boolean) => {
     </div>
 
     <div v-if="selectedShip" class="grid grid-cols-12 gap-8 items-start" data-testid="ship-build-panels">
+      <!-- Left: Fit (Picker) - 根据 wide prop 控制 col-span-8 或 col-span-4 -->
       <ShipBuildPanelFit
         :key="selectedShipId || 'no-ship'"
         :wide="!showMaterial"
-        @picker-open-change="handlePickerOpenChange"
+        @picker-open-change="handlePickerOpenChangeInternal"
+        @update:highlightedEquipmentId="handleHighlightedEquipmentIdChange"
+        @update:pickerTarget="handlePickerTargetChange"
       />
-      <ShipBuildPanelStats
-        :ship-blueprint="blueprint"
-      />
-      <ShipBuildPanelMaterials
-        v-if="showMaterial"
-        :ship-blueprint="blueprint"
-      />
+
+      <!-- Right Column -->
+      <!-- 展开时: Equipment(上) + Stats(下), 材料隐藏 -->
+      <!-- 收起时: Stats + Materials 并排 -->
+      <template v-if="isPickerOpen">
+        <!-- 展开后: Equipment 在上，Stats 在下 -->
+        <div class="col-span-4 flex flex-col gap-4">
+          <ShipBuildPanelEquipment
+            :is-picker-open="isPickerOpen"
+            :picker-target="pickerTarget"
+            :highlighted-equipment-id="highlightedEquipmentId"
+            :selected-ship="selectedShip"
+            :selected-by-connection="selectedByConnection"
+          />
+          <ShipBuildPanelStats
+            :ship-blueprint="blueprint"
+          />
+        </div>
+      </template>
+      <template v-else>
+        <!-- 展开前: Stats 和 Materials 并排 -->
+        <ShipBuildPanelStats
+          :ship-blueprint="blueprint"
+        />
+        <ShipBuildPanelMaterials
+          :ship-blueprint="blueprint"
+        />
+      </template>
     </div>
   </div>
 </template>

@@ -1,0 +1,173 @@
+# UI Knowledge: build-ship-equipment-panel
+
+本文档记录装备对比面板相关的 UI 知识和测试定位信息。
+
+## 组件结构
+
+### 组件层级
+
+```
+ShipBuildView
+  └── ShipBuildPanelFit (Picker 控制)
+        └── Picker 候选卡片（显示 summary 信息）
+  └── ShipBuildPanelEquipment (新增对比面板，显示 details 信息)
+  └── ShipBuildPanelStats
+  └── ShipBuildPanelMaterials
+```
+
+### 组件名称
+
+- `ShipBuildPanelEquipment` - 装备对比面板组件
+
+### UI 区域划分
+
+1. **Picker 候选卡片**：右侧固定信息区显示 `summary`（2 项关键数据）
+2. **Panel Details**：对比面板显示完整属性列表（详细数据）
+
+## 数据属性映射
+
+### Summary 字段（Picker 候选卡片，2 项）
+
+| 装备类型 | Summary 字段 | 示例值 |
+|----------|--------------|--------|
+| weapon | burstDPS, range | `1500, 800m` |
+| turret | sustainedDPS, range | `800, 600m` |
+| shield | shieldMax, shieldDelay | `5000, 5s` |
+| engine | speed, travel | `580, 580:45` |
+| thruster | strafeSpeed, yawRate | `120, 45` |
+
+### Details 字段（Panel 对比面板，完整属性列表）
+
+| 装备类型 | Details 字段数量 | 示例字段 |
+|----------|------------------|----------|
+| weapon | 12 项 | burstDPS, sustainedDPS, range, singleDamage, avgShotTime, ammo, ammoReload, chargetime, timeToOverheat, cooldelay, coolTime, cycleTime |
+| turret | 12 项 | 同 weapon |
+| shield | 3 项 | shieldMax, shieldRate, shieldDelay |
+| engine | 10 项 | thrustForward, speed, acceleration, boostMultiplier, boostSpeed, boostAccel, travelThrust, travelSpeed, travelCharge, travelAcceleration |
+| thruster | 9 项 | pitch, yaw, roll, strafe, pitchRate, yawRate, rollRate, strafeSpeed, strafeAcceleration |
+
+## UI 定位器
+
+### 面板可见性
+
+- **Picker 展开状态**: 检测 Picker 容器是否可见
+- **对比面板可见**: 检测 `ShipBuildPanelEquipment` 组件根元素 `visible` 状态
+- **无装备时隐藏**: 对比面板 `display: none` 或从 DOM 移除
+
+### Picker 候选卡片 Summary
+
+- **容器**: `.candidate-summary`
+- **Weapon 项**: `.summary-weapon`
+- **Turret 项**: `.summary-turret`
+- **Shield 项**: `.summary-shield`
+- **Engine 项**: `.summary-engine`
+- **Thruster 项**: `.summary-thruster`
+
+### Panel 对比面板 Details
+
+- **容器**: `.equipment-details`
+- **进度条容器**: `.equipment-comparison-progress`
+- **当前值标记**: `.progress-current`
+- **候选值标记**: `.progress-candidate`
+- **正差值样式**: 蓝色 (`text-blue-500` 或 CSS 类)
+- **无比较时**: 只显示当前装备信息，无进度条
+
+### 数值显示
+
+- **数字格式**: 包含 `(+` 或 `(-` 的文本节点
+- **示例**: `100(+20)`, `80(-20)`
+
+## 测试数据
+
+### 测试飞船
+
+| 飞船名称 | class | race | type | 用途 |
+|----------|-------|------|------|------|
+| 大太刀 | M | terran | 轻型护卫舰 | 标准测试状态 |
+| 大阪 | L | terran | 驱逐舰 | 多炮塔测试 |
+| 苍鹭 | L | teladi | 货船 | 跨种族测试 |
+
+### 测试 Slot/Connection
+
+| 飞船 | slotType | connection | 用途 |
+|------|----------|------------|------|
+| 大太刀 | engine | con_engine_01 | 引擎测试 |
+| 大太刀 | shield | con_shield_01 | 护盾测试 |
+| 大太刀 | weapon | con_weapon_01 | 武器测试 |
+| 大太刀 | turret | con_turret_m_01 | 炮塔测试 |
+| 大太刀 | thruster | con_thruster_xx | 推进器测试 |
+
+## 状态定义
+
+### 2.1 equipment-panel-visible-turret-picker-open
+- 船只建造视图已选择大太刀
+- 切换到 turret 标签
+- 点击 con_turret_m_01 打开 Picker
+- 点击选中某个候选装备
+- ShipBuildPanelEquipment 面板显示
+
+### 2.2 equipment-panel-visible-engine-picker-open
+- 船只建造视图已选择大太刀
+- 点击 con_engine_01 打开 Picker
+- 点击选中候选引擎
+- 面板显示且显示引擎 summary
+
+### 2.3 equipment-panel-visible-shield-picker-open
+- 船只建造视图已选择大太刀
+- 点击 con_shield_01 打开 Picker
+- 点击选中候选护盾
+- 面板显示且显示护盾 summary
+
+### 2.4 equipment-panel-visible-weapon-picker-open
+- 船只建造视图已选择大太刀
+- 点击 con_weapon_01 打开 Picker
+- 点击选中候选武器
+- 面板显示且显示武器 summary
+
+### 2.5 equipment-panel-visible-thruster-picker-open
+- 船只建造视图已选择大太刀
+- 切换到 thruster 标签，点击某分组打开 Picker
+- 点击选中候选推进器
+- 面板显示且显示推进器 summary
+
+### 2.6 equipment-panel-visible-no-current-equipment
+- 船只建造视图已选择大太刀
+- 点击未配装的 con_weapon_01 打开 Picker
+- 点击选中候选装备
+- 面板显示，仅显示候选装备数值
+
+### 2.7 equipment-panel-same-equipment-selected
+- 船只建造视图已选择大太刀，已为某槽位配装装备
+- 打开同一槽位的 Picker
+- 点击选中与当前相同的装备
+- 面板显示当前装备信息，不显示比较进度条
+
+## 视觉检查点
+
+### 显示条件
+
+1. Picker 展开（Picker 容器可见）
+2. 点击选中候选装备
+3. 当前装备或候选装备至少有一个存在
+
+### 隐藏条件
+
+1. Picker 收起
+2. 当前装备和候选装备都为空
+
+### 比较进度条
+
+- 蓝色表示候选 > 当前（正差值）
+- 粉色表示候选 < 当前（负差值）
+- 灰色表示当前值基准
+- 候选与当前相同时：不显示比较进度条
+
+### Summary vs Details
+
+- **Summary**：Picker 候选卡片右侧显示，2 项关键数据
+- **Details**：Panel 对比面板显示，完整属性列表
+
+### Engine travel 格式
+
+- 正确: `580:45` (巡航速度:充能时间)
+- 错误: `[object Object]`, `undefined`, 空值

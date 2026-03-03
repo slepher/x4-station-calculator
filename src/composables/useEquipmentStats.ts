@@ -35,7 +35,6 @@ export interface ShieldSummary {
 export interface EngineSummary {
   speed: number
   travelSpeed: number
-  travelCharge: number
 }
 
 export interface ThrusterSummary {
@@ -444,8 +443,7 @@ export function useEquipmentStats(equipment: X4Equipment, ship: X4Ship) {
       if (!detail) return undefined
       return {
         speed: detail.speed,
-        travelSpeed: detail.travelSpeed,
-        travelCharge: detail.travelCharge
+        travelSpeed: detail.travelSpeed
       }
     }
 

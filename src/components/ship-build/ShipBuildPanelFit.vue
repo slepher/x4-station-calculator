@@ -5,7 +5,8 @@ import { useI18n } from 'vue-i18n'
 import type { FitMode, FitConnectionRow, FitGroupRow, FitEquipmentOption } from '@/components/ship-build/fitTypes'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
-import type { EquipmentType, ShipEquipmentSize, X4Equipment, X4EquipmentType, X4SlotTag } from '@/types/x4'
+import { useEquipmentStats } from '@/composables/useEquipmentStats'
+import type { EquipmentType, ShipEquipmentSize, X4Equipment, X4EquipmentType, X4Ship, X4SlotTag } from '@/types/x4'
 import slotTagsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/slot_tags.json'
 import equipmentsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
 import equipmentTypesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipment_types.json'
@@ -49,11 +50,59 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'picker-open-change': [open: boolean]
+  'update:highlightedEquipmentId': [id: string | null]
+  'update:pickerTarget': [target: SlotTarget | null]
 }>()
 
 const shipBuildStore = useShipBuildStore()
 const { selectedShip, blueprint, mockTagPatch } = storeToRefs(shipBuildStore)
 const { applyConnectionAssignment, setConnectionAssignmentCount } = shipBuildStore
+
+// Equipment map for stats lookup
+const equipmentMap = new Map<string, X4Equipment>()
+;(equipmentsRaw as X4Equipment[]).forEach((eq) => {
+  equipmentMap.set(eq.id, eq)
+})
+
+// Get first summary (Label Value Unit, right column, top row)
+function getEquipmentSummary1(equipmentId: string): { labelKey: string; value: string; unit: string } {
+  const equipment = equipmentMap.get(equipmentId)
+  if (!equipment || !selectedShip.value) return { labelKey: '', value: '', unit: '' }
+
+  const { summary } = useEquipmentStats(equipment, selectedShip.value as X4Ship)
+  if (!summary.value) return { labelKey: '', value: '', unit: '' }
+
+  const s = summary.value as any
+  const type = equipment.type
+
+  if (type === 'weapon') return { labelKey: 'ship_build.equipment_burst_dps', value: String(Math.round(s.burstDPS)), unit: 'MW' }
+  if (type === 'turret') return { labelKey: 'ship_build.equipment_sustained_dps', value: String(Math.round(s.sustainedDPS)), unit: 'MW' }
+  if (type === 'shield') return { labelKey: 'ship_build.equipment_shield_max', value: String(Math.round(s.shieldMax)), unit: 'MJ' }
+  if (type === 'engine') return { labelKey: 'ship_build.equipment_speed', value: String(s.speed), unit: 'm/s' }
+  if (type === 'thruster') return { labelKey: 'ship_build.equipment_strafe_speed', value: String(s.strafeSpeed), unit: 'm/s' }
+
+  return { labelKey: '', value: '', unit: '' }
+}
+
+// Get second summary (Label Value Unit, right column, bottom row)
+function getEquipmentSummary2(equipmentId: string): { labelKey: string; value: string; unit: string } {
+  const equipment = equipmentMap.get(equipmentId)
+  if (!equipment || !selectedShip.value) return { labelKey: '', value: '', unit: '' }
+
+  const { summary } = useEquipmentStats(equipment, selectedShip.value as X4Ship)
+  if (!summary.value) return { labelKey: '', value: '', unit: '' }
+
+  const s = summary.value as any
+  const type = equipment.type
+
+  if (type === 'weapon') return { labelKey: 'ship_build.equipment_range', value: String(Math.round(s.range)), unit: 'm' }
+  if (type === 'turret') return { labelKey: 'ship_build.equipment_range', value: String(Math.round(s.range)), unit: 'm' }
+  if (type === 'shield') return { labelKey: 'ship_build.equipment_shield_delay', value: String(s.shieldDelay), unit: 's' }
+  if (type === 'engine') return { labelKey: 'ship_build.equipment_travel_speed', value: String(s.travelSpeed), unit: 'm/s' }
+  if (type === 'thruster') return { labelKey: 'ship_build.equipment_yaw_rate', value: s.yawRate.toFixed(2), unit: 'rad/s' }
+
+  return { labelKey: '', value: '', unit: '' }
+}
 
 const handlePickerOpenChange = (open: boolean) => {
   emit('picker-open-change', open)
@@ -848,12 +897,17 @@ const handleCountSliderCommit = (target: SlotTarget, value: number) => {
   }
 }
 
-watch(pickerTarget, () => {
+watch(pickerTarget, (newTarget) => {
   selectedRaceIds.value = []
   selectedMkIds.value = []
   selectedTagIds.value = []
   currentPage.value = 1
   highlightedEquipmentId.value = pickerInitialEquipmentId.value
+  emit('update:pickerTarget', newTarget)
+})
+
+watch(highlightedEquipmentId, (newId) => {
+  emit('update:highlightedEquipmentId', newId)
 })
 
 watch(filteredCandidates, () => {
@@ -1028,8 +1082,22 @@ watch(slotTargets, () => {
                       :data-testid="`candidate-${item.id || 'empty'}`"
                       @click="highlightedEquipmentId = item.id"
                     >
-                      <div class="candidate-name">{{ item.name }}</div>
-                      <div class="candidate-meta">{{ item.race || 'GEN' }} · {{ item.mk ? `MK${item.mk}` : '-' }}</div>
+                      <div class="candidate-left">
+                        <div class="candidate-name">{{ item.name }}</div>
+                        <div class="candidate-meta">{{ item.race || 'GEN' }} · {{ item.mk ? `MK${item.mk}` : '-' }}</div>
+                      </div>
+                      <div v-if="item.id" class="candidate-right">
+                        <div class="candidate-summary-1">
+                          <span class="summary-label">{{ t(getEquipmentSummary1(item.id).labelKey) }}</span>
+                          <span class="summary-value">{{ getEquipmentSummary1(item.id).value }}</span>
+                          <span class="summary-unit">{{ getEquipmentSummary1(item.id).unit }}</span>
+                        </div>
+                        <div class="candidate-summary-2">
+                          <span class="summary-label">{{ t(getEquipmentSummary2(item.id).labelKey) }}</span>
+                          <span class="summary-value">{{ getEquipmentSummary2(item.id).value }}</span>
+                          <span class="summary-unit">{{ getEquipmentSummary2(item.id).unit }}</span>
+                        </div>
+                      </div>
                     </button>
                   </div>
                 </div>
@@ -1180,6 +1248,14 @@ watch(slotTargets, () => {
 .candidate-item-active { @apply border-emerald-300 ring-1 ring-emerald-400; }
 .candidate-name { @apply text-xs text-slate-100; }
 .candidate-meta { @apply text-[10px] text-slate-300 mt-0.5; }
+.candidate-item { display: flex; justify-content: space-between; align-items: flex-start; }
+.candidate-left { flex: 1; min-width: 0; }
+.candidate-right { text-align: right; flex-shrink: 0; margin-left: 0.5rem; display: flex; flex-direction: column; justify-content: center; }
+.candidate-summary-1 { @apply flex gap-1 justify-end items-center; }
+.candidate-summary-2 { @apply flex gap-1 justify-end items-center; }
+.summary-label { @apply text-xs text-slate-300; }
+.summary-value { @apply text-xs text-emerald-300 tabular-nums; }
+.summary-unit { @apply text-[10px] text-slate-400; }
 
 @media (max-width: 1023px) {
   .picker-grid-row { @apply grid-cols-1; }
