@@ -236,18 +236,27 @@ const selectAsgard = async (page: any) => {
   await expect(listContainer).toBeVisible({ timeout: 10000 })
   await page.waitForTimeout(500)
 
-  // 3. 先只筛选 XL
+  // 3. 筛选 XL
   const xlButton = page.getByTestId('ship-build-filter-class').getByRole('button', { name: 'XL', exact: true })
   await xlButton.click()
-  await page.waitForTimeout(1000)
+  await page.waitForTimeout(400)
 
-  // 4. 查找阿斯加德（不筛选种族）
-  const asgardItem = page.locator('.list-item').filter({ hasText: /阿斯加德|Asgard|asgard/i }).first()
+  // 4. 筛选战列舰（若存在该筛选项）
+  const battleshipType = page.getByTestId('ship-build-filter-type').getByRole('button', { name: /战列舰|Battleship/i })
+  if (await battleshipType.count()) {
+    await battleshipType.first().click()
+    await page.waitForTimeout(300)
+  }
+
+  // 5. 选择阿斯加德
+  const asgardItem = page.locator('.list-item').filter({
+    has: page.getByTestId('ship-build-ship-name').filter({ hasText: /阿斯加德|Asgard|asgard/i })
+  }).first()
   await expect(asgardItem).toBeVisible({ timeout: 10000 })
   await asgardItem.click()
 
-  // 等待页面完全加载
-  await page.waitForTimeout(2000)
+  // 等待页面状态稳定
+  await page.waitForTimeout(600)
 }
 
 // Helper: 切换到 turret 标签
@@ -257,47 +266,30 @@ const switchToTurretTab = async (page: any) => {
   await turretTab.click()
 }
 
-// 4.6 BUG-006: 标准模式槽位数量 > 8 时应按 size 分组显示 - 修复后
-test('4.6 BUG-006: 标准模式槽位数量 > 8 时应按 size 分组显示', async ({ page }) => {
+// 4.6 BUG-001: 标准模式 Group 排列应按 size 分行 - 修复后
+test('4.6 BUG-001: 标准模式 Group 排列应按 size 分行显示', async ({ page }) => {
   // 4.6.1 进入船只建造视图，选择 XL 战列舰阿斯加德
   await selectAsgard(page)
 
-  // 等待页面加载完成
-  await page.waitForTimeout(1000)
-
   // 4.6.2 确保在标准模式（connection 模式）
-  // 查找标准模式按钮并点击
-  const connectionModeBtn = page.locator('button').filter({ hasText: /标准/i }).first()
+  const connectionModeBtn = page.locator('button').filter({ hasText: /标准|connection/i }).first()
   await connectionModeBtn.click()
-  await page.waitForTimeout(500)
+  await page.waitForTimeout(300)
 
   // 4.6.3 切换到 T (turret) 槽位类型
   await switchToTurretTab(page)
-  await page.waitForTimeout(1000)
+  await page.waitForTimeout(400)
 
-  // 打印当前页面内容用于调试
-  const slotContent = await page.locator('.slot-wall').textContent()
-  console.log('Slot wall content:', slotContent?.substring(0, 500))
+  // 4.6.4 断言：group tabs 已按 size 分为多行（至少 large + medium 两行）
+  const allRows = page.locator('[data-testid^="group-tab-row-"]')
+  await expect(allRows).toHaveCount(2)
 
-  // 打印所有 slot 行
-  const slotRows = await page.locator('.slot-row-title').allTextContents()
-  console.log('Slot rows after switch to T:', slotRows)
+  const largeRow = page.getByTestId('group-tab-row-large')
+  const mediumRow = page.getByTestId('group-tab-row-medium')
+  await expect(largeRow).toBeVisible()
+  await expect(mediumRow).toBeVisible()
 
-  // 打印连接行数量
-  const connectionCount = await page.locator('[data-testid^="slot-"]').count()
-  console.log(`Found ${connectionCount} connection slots`)
-
-  // 4.6.4 断言：应该存在 size 分组标题（因为阿斯加德有 16 large + 6 medium = 22 个 turret 槽位）
-  const sizeGroupHeaders = page.locator('.size-group-header')
-  const headerCount = await sizeGroupHeaders.count()
-  console.log(`Found ${headerCount} size group headers`)
-  expect(headerCount).toBeGreaterThanOrEqual(2)
-
-  // 验证有 LARGE 分组
-  const largeHeader = sizeGroupHeaders.filter({ hasText: /L.*LARGE/i })
-  await expect(largeHeader).toBeVisible()
-
-  // 验证有 MEDIUM 分组
-  const mediumHeader = sizeGroupHeaders.filter({ hasText: /M.*MEDIUM/i })
-  await expect(mediumHeader).toBeVisible()
+  // #期望: ['L1~L8 在 large 行', 'M1~M3 在 medium 行']
+  await expect(largeRow.getByRole('button', { name: /^L\d+$/ })).toHaveCount(8)
+  await expect(mediumRow.getByRole('button', { name: /^M\d+$/ })).toHaveCount(3)
 })

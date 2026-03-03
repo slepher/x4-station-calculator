@@ -12,9 +12,6 @@
   5. 观察槽位显示（显示 L1-L8, M1-M3 共 11 个）
 - **Expected Behavior**: 当槽位数量 > 8 时，应按 size 分成多行显示（large 一行，medium 一行）
 - **Actual Behavior**: 11 个槽位全部显示在 1 行内
-- **Status**: Confirmed
-- **Related Test**: 待添加
-- **Fix Notes**: 问题在于使用了 `slotTargets`（只包含当前激活的槽位），应改为使用 `connectionRows`（包含所有槽位）
 
 ## Bug: 候选数为0时的逻辑判断错误
 

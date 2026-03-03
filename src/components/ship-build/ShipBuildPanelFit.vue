@@ -36,6 +36,19 @@ type SlotTarget = {
   connectionKeys: string[]
 }
 
+type GroupTabItem = {
+  key: string
+  label: string
+  size: string
+  count: number
+}
+
+type GroupTabRow = {
+  key: string
+  size: string
+  tabs: GroupTabItem[]
+}
+
 type PickerCandidateItem = {
   id: string | null
   name: string
@@ -475,12 +488,22 @@ const aggregatedPrimaryGroups = computed<AggregatedGroup[]>(() => {
   })
 })
 
-const groupTabs = computed(() => {
+const groupTabs = computed<GroupTabItem[]>(() => {
   if (fitMode.value === 'group') {
-    return aggregatedPrimaryGroups.value.map((group) => ({ key: group.key, label: group.label }))
+    return aggregatedPrimaryGroups.value.map((group) => ({
+      key: group.key,
+      label: group.label,
+      size: group.size,
+      count: group.totalCount
+    }))
   }
 
-  const rows = primaryConnectionRows.value
+  const rows = [...primaryConnectionRows.value]
+    .sort((a, b) => {
+      const rankDiff = sizeRank(a.size) - sizeRank(b.size)
+      if (rankDiff !== 0) return rankDiff
+      return a.connectionKey.localeCompare(b.connectionKey)
+    })
   const totalBySize = new Map<string, number>()
   rows.forEach((row) => totalBySize.set(row.size, (totalBySize.get(row.size) || 0) + 1))
 
@@ -492,9 +515,45 @@ const groupTabs = computed(() => {
     const suffix = total > 1 ? String(seen) : ''
     return {
       key: row.connectionKey,
-      label: `${sizeShort(row.size)}${suffix}`
+      label: `${sizeShort(row.size)}${suffix}`,
+      size: row.size,
+      count: row.count
     }
   })
+})
+
+const groupedConnectionTabRows = computed<GroupTabRow[]>(() => {
+  if (fitMode.value !== 'connection') return []
+  const totalPositions = primaryConnectionRows.value.reduce((sum, row) => sum + row.count, 0)
+  if (totalPositions <= 8) {
+    return [{
+      key: 'size-mixed',
+      size: 'mixed',
+      tabs: groupTabs.value
+    }]
+  }
+
+  const sizeOrder = ['extralarge', 'large', 'medium', 'small']
+  const grouped: GroupTabRow[] = []
+  sizeOrder.forEach((size) => {
+    const tabs = groupTabs.value.filter((tab) => tab.size === size)
+    if (tabs.length === 0) return
+    grouped.push({
+      key: `size-${size}`,
+      size,
+      tabs
+    })
+  })
+  return grouped
+})
+
+const renderGroupTabRows = computed<GroupTabRow[]>(() => {
+  if (fitMode.value === 'connection') return groupedConnectionTabRows.value
+  return [{
+    key: 'size-all',
+    size: 'all',
+    tabs: groupTabs.value
+  }]
 })
 
 watch(
@@ -1010,15 +1069,22 @@ watch(slotTargets, () => {
               <section class="picker-grid-row picker-grid-row-compact">
                 <div class="picker-cell">
                   <div class="group-tabs picker-row-slot-tabs">
-                    <button
-                      v-for="tab in groupTabs"
-                      :key="tab.key"
-                      class="group-tab"
-                      :class="activeTabKey === tab.key ? 'group-tab-active' : ''"
-                      @click="jumpToTab(tab.key)"
+                    <div
+                      v-for="row in renderGroupTabRows"
+                      :key="row.key"
+                      class="group-tab-row"
+                      :data-testid="`group-tab-row-${row.size}`"
                     >
-                      {{ tab.label }}
-                    </button>
+                      <button
+                        v-for="tab in row.tabs"
+                        :key="tab.key"
+                        class="group-tab"
+                        :class="activeTabKey === tab.key ? 'group-tab-active' : ''"
+                        @click="jumpToTab(tab.key)"
+                      >
+                        {{ tab.label }}
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <div class="picker-cell picker-right">
@@ -1142,15 +1208,22 @@ watch(slotTargets, () => {
               </div>
 
               <div class="group-tabs">
-                <button
-                  v-for="tab in groupTabs"
-                  :key="tab.key"
-                  class="group-tab"
-                  :class="activeTabKey === tab.key ? 'group-tab-active' : ''"
-                  @click="jumpToTab(tab.key)"
+                <div
+                  v-for="row in renderGroupTabRows"
+                  :key="row.key"
+                  class="group-tab-row"
+                  :data-testid="`group-tab-row-${row.size}`"
                 >
-                  {{ tab.label }}
-                </button>
+                  <button
+                    v-for="tab in row.tabs"
+                    :key="tab.key"
+                    class="group-tab"
+                    :class="activeTabKey === tab.key ? 'group-tab-active' : ''"
+                    @click="jumpToTab(tab.key)"
+                  >
+                    {{ tab.label }}
+                  </button>
+                </div>
               </div>
 
               <section v-if="visibleCompatibilityTags.length > 0" class="compatibility-box">
@@ -1227,7 +1300,8 @@ watch(slotTargets, () => {
 .mode-tab.active { @apply bg-[#1f73c6] text-white; }
 .mode-tab:disabled { @apply opacity-40 cursor-not-allowed; }
 .mode-tab-tall { @apply h-[25.6px] px-2 flex items-center; }
-.group-tabs { @apply flex items-center gap-1 mt-2; }
+.group-tabs { @apply flex flex-col gap-1 mt-2; }
+.group-tab-row { @apply flex flex-wrap items-center gap-1; }
 .group-tab { @apply px-2.5 py-0.5 text-[11px] border border-sky-500/60 rounded bg-[#07264a] text-slate-200; }
 .group-tab-active { @apply bg-[#2a86dd] text-white; }
 .compatibility-box { @apply mt-2 rounded border border-sky-700/60 bg-[#04254a] px-2 py-1.5; }
