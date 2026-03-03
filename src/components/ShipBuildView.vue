@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
@@ -144,6 +144,18 @@ const handleHighlightedEquipmentIdChange = (id: string | null) => {
 const handlePickerTargetChange = (target: typeof pickerTarget.value) => {
   pickerTarget.value = target
 }
+
+// 更换飞船时强制回到未展开布局，避免旧 picker 状态残留导致 Fit 面板仍保持宽布局
+watch(selectedShipId, (next, prev) => {
+  if (next === prev) return
+  isPickerOpen.value = false
+  showMaterial.value = true
+  pickerTarget.value = null
+  highlightedEquipmentId.value = null
+  currentSlotType.value = ''
+  currentEquipmentId.value = null
+  currentIsShield.value = false
+})
 </script>
 
 <template>

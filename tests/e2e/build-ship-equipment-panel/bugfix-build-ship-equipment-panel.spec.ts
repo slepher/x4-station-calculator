@@ -35,6 +35,29 @@ const clickRealCandidate = async (page: any) => {
   }
 }
 
+// Helper: 统计非空候选数量
+const countNonEmptyCandidates = async (page: any) => {
+  const candidates = page.locator('.candidate-list .candidate-item')
+  const count = await candidates.count()
+  let nonEmpty = 0
+  for (let i = 0; i < count; i++) {
+    const testid = await candidates.nth(i).getAttribute('data-testid')
+    if (testid && !testid.includes('empty')) nonEmpty += 1
+  }
+  return nonEmpty
+}
+
+// Helper: 从 Change Ship 列表选择一个与当前不同的飞船
+const selectAnotherShipFromList = async (page: any) => {
+  await page.getByRole('button', { name: /Change Ship|更换飞船/i }).click()
+  await expect(page.getByTestId('ship-build-list')).toBeVisible({ timeout: 10000 })
+
+  const nextShip = page.locator('.list-item:not(.list-item-active)').first()
+  await expect(nextShip).toBeVisible({ timeout: 10000 })
+  await nextShip.click()
+  await page.waitForTimeout(500)
+}
+
 // Helper: 选择大太刀（加载 fixture，有装备）
 const enterOdachi = async (page: any) => {
   await page.getByRole('button', { name: /Ship Build|船只建造/ }).click()
@@ -259,6 +282,33 @@ const selectAsgard = async (page: any) => {
   await page.waitForTimeout(600)
 }
 
+// Helper: 选择东京（Tokyo）
+const selectTokyo = async (page: any) => {
+  await page.getByRole('button', { name: /Ship Build|船只建造/ }).click()
+  await expect(page.getByTestId('ship-build-filters')).toBeVisible()
+
+  await page.getByRole('button', { name: /Change Ship|更换飞船/ }).click()
+  await expect(page.getByTestId('ship-build-list')).toBeVisible({ timeout: 10000 })
+  await page.waitForTimeout(500)
+
+  const xlButton = page.getByTestId('ship-build-filter-class').getByRole('button', { name: 'XL', exact: true })
+  await xlButton.click()
+  await page.waitForTimeout(300)
+
+  const carrierType = page.getByTestId('ship-build-filter-type').getByRole('button', { name: /航母|Carrier/i })
+  if (await carrierType.count()) {
+    await carrierType.first().click()
+    await page.waitForTimeout(300)
+  }
+
+  const tokyoItem = page.locator('.list-item').filter({
+    has: page.getByTestId('ship-build-ship-name').filter({ hasText: /东京|Tokyo/i })
+  }).first()
+  await expect(tokyoItem).toBeVisible({ timeout: 10000 })
+  await tokyoItem.click()
+  await page.waitForTimeout(600)
+}
+
 // Helper: 切换到 turret 标签
 const switchToTurretTab = async (page: any) => {
   const turretTab = page.locator('[data-testid="slot-type-turret"]')
@@ -292,4 +342,73 @@ test('4.6 BUG-001: 标准模式 Group 排列应按 size 分行显示', async ({ 
   // #期望: ['L1~L8 在 large 行', 'M1~M3 在 medium 行']
   await expect(largeRow.getByRole('button', { name: /^L\d+$/ })).toHaveCount(8)
   await expect(mediumRow.getByRole('button', { name: /^M\d+$/ })).toHaveCount(3)
+})
+
+// 4.7 BUG-003: Tag 组合过滤后候选缺失（修复后）
+test('4.7 BUG-003: Tag 组合过滤后应显示7个武器+导弹候选 - 修复后', async ({ page }) => {
+  await enterOdachi(page)
+  await switchToWeaponTab(page)
+  await page.waitForTimeout(300)
+
+  const weaponSlot = page.locator('[data-testid^="slot-ship_ter_m_corvette_02_a::weapon::"]').first()
+  await expect(weaponSlot).toBeVisible({ timeout: 10000 })
+  await weaponSlot.click()
+  await page.waitForTimeout(500)
+
+  await page.getByTestId('tag-missile').click()
+  await page.getByTestId('tag-advanced').click()
+  await page.waitForTimeout(300)
+
+  // 修复后：并集过滤，展示 7 个候选（武器 + 导弹）
+  const nonEmpty = await countNonEmptyCandidates(page)
+  expect(nonEmpty).toBe(7)
+})
+
+// 4.8 BUG-004: 更换飞船后应回到未展开模式（修复后）
+test('4.8 BUG-004: 更换飞船后应取消展开并恢复窄布局 - 修复后', async ({ page }) => {
+  await enterOdachi(page)
+  await switchToWeaponTab(page)
+  await page.waitForTimeout(300)
+
+  const weaponSlot = page.locator('[data-testid^="slot-ship_ter_m_corvette_02_a::weapon::"]').first()
+  await expect(weaponSlot).toBeVisible({ timeout: 10000 })
+  await weaponSlot.click()
+  await page.waitForTimeout(400)
+
+  const fitPanel = page.getByTestId('ship-build-panel-fit')
+  await expect(fitPanel).toBeVisible()
+  const expandedClass = await fitPanel.getAttribute('class')
+  expect(expandedClass || '').toContain('col-span-8')
+
+  await selectAnotherShipFromList(page)
+
+  // 修复后：收起并回到未展开布局
+  await expect(page.getByTestId('equipment-picker')).not.toBeVisible()
+  const collapsedClass = await fitPanel.getAttribute('class')
+  expect(collapsedClass || '').toContain('col-span-4')
+  await expect(page.getByTestId('ship-build-panel-materials')).toBeVisible()
+})
+
+// 4.9 同 size 的 group-tab 分两行应平均分配（东京航母 T 槽）
+test('4.9 同 size group-tab 两行平均分配（东京航母炮塔）', async ({ page }) => {
+  await selectTokyo(page)
+
+  const connectionModeBtn = page.locator('button').filter({ hasText: /标准|connection/i }).first()
+  await connectionModeBtn.click()
+  await page.waitForTimeout(300)
+
+  await switchToTurretTab(page)
+  await page.waitForTimeout(400)
+
+  const mediumRow1 = page.getByTestId('group-tab-row-medium-1')
+  const mediumRow2 = page.getByTestId('group-tab-row-medium-2')
+  await expect(mediumRow1).toBeVisible()
+  await expect(mediumRow2).toBeVisible()
+
+  const count1 = await mediumRow1.getByRole('button', { name: /^M\d+$/ }).count()
+  const count2 = await mediumRow2.getByRole('button', { name: /^M\d+$/ }).count()
+
+  // 东京航母 medium 炮塔共 10 个，应均分为 5 + 5
+  expect(count1 + count2).toBe(10)
+  expect(Math.abs(count1 - count2)).toBeLessThanOrEqual(1)
 })

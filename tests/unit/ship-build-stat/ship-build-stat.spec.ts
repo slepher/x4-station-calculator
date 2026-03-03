@@ -8,6 +8,7 @@ import ShipBuildPanelStats from '@/components/ship-build/ShipBuildPanelStats.vue
 import { useEquipmentStats } from '@/composables/useEquipmentStats'
 import shipsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ships.json'
 import equipmentsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
+import bulletsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/bullets.json'
 import missilesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/missiles.json'
 
 // 使用真实的大太刀(Odachi)飞船数据
@@ -22,12 +23,13 @@ const odachiThruster = findEquipment('thruster_gen_m_allround_01_mk1')
 const odachiShield = findEquipment('shield_ter_m_standard_02_mk2')
 const odachiWeapon = findEquipment('weapon_ter_m_beam_01_mk2')
 const odachiTurret = findEquipment('turret_ter_m_beam_01_mk1')
+const shotgunTurret = findEquipment('turret_arg_m_shotgun_01_mk1')
 const odachiMissileLauncher = findEquipment('weapon_bor_m_dumbfire_01_mk1')
 
 vi.mock('@/store/useShipBuildStore', () => ({
   useShipBuildStore: () => ({
     ships: [odachiShip],
-    equipments: [odachiEngine, odachiThruster, odachiShield, odachiWeapon, odachiTurret, odachiMissileLauncher],
+    equipments: [odachiEngine, odachiThruster, odachiShield, odachiWeapon, odachiTurret, shotgunTurret, odachiMissileLauncher],
     selectedShipId: 'ship_ter_m_corvette_02_a'
   })
 }))
@@ -228,5 +230,21 @@ describe('ShipBuildPanelStats', () => {
     expect(Math.round(d.burstDPS)).toBe(880)
     // 1.14.3 断言 sustainedDPS = burstDPS (导弹无过热) #期望: [880]
     expect(Math.round(d.sustainedDPS)).toBe(880)
+  })
+
+  // 1.15 useEquipmentStats 炮塔单发与DPS系数计算
+  it('1.15 useEquipmentStats 炮塔单发与DPS系数计算', () => {
+    const { details } = useEquipmentStats(shotgunTurret as any, odachiShip)
+    const d = details.value as any
+    const bullet = bulletsRaw.find((b: any) => b.id === shotgunTurret?.bullet)
+
+    expect(bullet).toBeDefined()
+    const expectedSingleDamage = bullet.damage
+    const expectedBurst = (bullet.damage * bullet.amount * bullet.barrelamount) / bullet.reload
+
+    // 单发伤害不乘 amount / barrelamount
+    expect(d.singleDamage).toBe(expectedSingleDamage)
+    // DPS 需要乘 amount * barrelamount
+    expect(Math.round(d.burstDPS)).toBe(Math.round(expectedBurst))
   })
 })

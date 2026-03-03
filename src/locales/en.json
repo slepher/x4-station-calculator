@@ -138,6 +138,7 @@
     "equipment_single_shot_time": "Single Shot Time",
     "equipment_avg_shot_time": "Avg Shot Time",
     "equipment_ammo": "Ammo",
+    "equipment_barrel_amount": "Barrel Amount",
     "equipment_ammo_reload": "Ammo Reload",
     "equipment_charge_time": "Charge Time",
     "equipment_time_to_overheat": "Time to Overheat",

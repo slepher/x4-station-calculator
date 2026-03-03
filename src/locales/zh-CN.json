@@ -138,6 +138,7 @@
     "equipment_single_shot_time": "单发射击时间",
     "equipment_avg_shot_time": "平均射击时间",
     "equipment_ammo": "弹药量",
+    "equipment_barrel_amount": "炮管数量",
     "equipment_ammo_reload": "弹药装填",
     "equipment_charge_time": "充能时间",
     "equipment_time_to_overheat": "过热时间",

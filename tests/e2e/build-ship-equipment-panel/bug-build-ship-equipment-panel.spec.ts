@@ -18,6 +18,29 @@ const clickEmptyCandidate = async (page: any) => {
   }
 }
 
+// Helper: 统计非空候选数量
+const countNonEmptyCandidates = async (page: any) => {
+  const candidates = page.locator('.candidate-list .candidate-item')
+  const count = await candidates.count()
+  let nonEmpty = 0
+  for (let i = 0; i < count; i++) {
+    const testid = await candidates.nth(i).getAttribute('data-testid')
+    if (testid && !testid.includes('empty')) nonEmpty += 1
+  }
+  return nonEmpty
+}
+
+// Helper: 从 Change Ship 列表选择一个与当前不同的飞船
+const selectAnotherShipFromList = async (page: any) => {
+  await page.getByRole('button', { name: /Change Ship|更换飞船/i }).click()
+  await expect(page.getByTestId('ship-build-list')).toBeVisible({ timeout: 10000 })
+
+  const nextShip = page.locator('.list-item:not(.list-item-active)').first()
+  await expect(nextShip).toBeVisible({ timeout: 10000 })
+  await nextShip.click()
+  await page.waitForTimeout(500)
+}
+
 // Helper: 选择大太刀（加载 fixture，有装备）
 const enterOdachi = async (page: any) => {
   await page.getByRole('button', { name: /Ship Build|船只建造/ }).click()
@@ -206,4 +229,49 @@ test('4.5 BUG-005: 空槽位选择新引擎后属性值为0时样式显示错误
   await expect(boostDurationRow).toBeVisible({ timeout: 5000 })
   const valueElement = boostDurationRow.locator('.stats-value > span').first()
   await expect(valueElement).toHaveClass(/diff-neutral/)
+})
+
+// 4.6 BUG-003: Tag 组合过滤后候选缺失（修复前）
+test('4.6 BUG-003: Tag 组合过滤后候选缺失 - 修复前', async ({ page }) => {
+  await enterOdachi(page)
+  await switchToWeaponTab(page)
+  await page.waitForTimeout(300)
+
+  const weaponSlot = page.locator('[data-testid^="slot-ship_ter_m_corvette_02_a::weapon::"]').first()
+  await expect(weaponSlot).toBeVisible({ timeout: 10000 })
+  await weaponSlot.click()
+  await page.waitForTimeout(500)
+
+  await page.getByTestId('tag-missile').click()
+  await page.getByTestId('tag-advanced').click()
+  await page.waitForTimeout(300)
+
+  // 修复前复现：仅剩 3 个导弹发射器
+  const nonEmpty = await countNonEmptyCandidates(page)
+  expect(nonEmpty).toBe(3)
+})
+
+// 4.8 BUG-004: 更换飞船后 Picker 收起但 Fit 面板仍保持展开宽度（修复前）
+test('4.8 BUG-004: 更换飞船后宽度未回退 - 修复前', async ({ page }) => {
+  await enterOdachi(page)
+  await switchToWeaponTab(page)
+  await page.waitForTimeout(300)
+
+  const weaponSlot = page.locator('[data-testid^="slot-ship_ter_m_corvette_02_a::weapon::"]').first()
+  await expect(weaponSlot).toBeVisible({ timeout: 10000 })
+  await weaponSlot.click()
+  await page.waitForTimeout(400)
+
+  // 展开态：Fit 为宽布局
+  const fitPanel = page.getByTestId('ship-build-panel-fit')
+  await expect(fitPanel).toBeVisible()
+  const expandedClass = await fitPanel.getAttribute('class')
+  expect(expandedClass || '').toContain('col-span-8')
+
+  await selectAnotherShipFromList(page)
+
+  // 修复前复现：Picker 已收起，但 Fit 仍保持宽布局
+  await expect(page.getByTestId('equipment-picker')).not.toBeVisible()
+  const stillWideClass = await fitPanel.getAttribute('class')
+  expect(stillWideClass || '').toContain('col-span-8')
 })

@@ -197,6 +197,7 @@ export interface X4Bullet {
   repair: number;
   chargetime: number;  // 充能时间，默认0
   amount: number;      // 弹片数，默认1
+  barrelamount: number; // 炮管数，默认1
   shotHeat: number;   // 子弹=heat.value(单发热量), beam=heat.initial(初始热量)
   heat: number;        // 子弹=0, beam=每秒持续热量
   ammo: number;        // 弹匣数量，默认1

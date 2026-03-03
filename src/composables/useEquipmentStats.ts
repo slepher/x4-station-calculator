@@ -59,6 +59,7 @@ export interface WeaponDetail {
   singleShotTime: number
   avgShotTime: number
   ammo: number
+  barrelamount: number
   ammoReload: number
   chargetime: number
   timeToOverheat: number
@@ -122,10 +123,9 @@ function isBeamWeapon(bullet: any): boolean {
 // 持久 DPS 计算函数
 function calculateSustainedDPS(
   burstDPS: number,
-  singleDamage: number,
   singleHeat: number,
   weaponHeat: any,
-  count: number
+  salvosPerSecond: number
 ): number {
   const overheatThreshold = 10000
 
@@ -133,10 +133,10 @@ function calculateSustainedDPS(
     return burstDPS
   }
 
-  const avgHeatPerSec = burstDPS / singleDamage * singleHeat
+  const avgHeatPerSec = salvosPerSecond * singleHeat
   const timeToOverheat = avgHeatPerSec > 0 ? overheatThreshold / avgHeatPerSec : 0
   const cycleTime = timeToOverheat + weaponHeat.cooldelay + (overheatThreshold / weaponHeat.coolrate)
-  return cycleTime > 0 ? burstDPS * (timeToOverheat / cycleTime) * count : 0
+  return cycleTime > 0 ? burstDPS * (timeToOverheat / cycleTime) : 0
 }
 
 // 计算武器 DPS
@@ -145,6 +145,9 @@ function calculateWeaponDPS(equipment: X4Equipment, bullet: any, missile: any, c
 
   if (bullet) {
     const isBeam = isBeamWeapon(bullet)
+    const amount = Math.max(1, Number(bullet.amount || 1))
+    const barrelAmount = Math.max(1, Number(bullet.barrelamount || 1))
+    const damageMultiplier = amount * barrelAmount
     let singleDamage: number
     let singleHeat: number
     let singleShotTime: number
@@ -160,14 +163,15 @@ function calculateWeaponDPS(equipment: X4Equipment, bullet: any, missile: any, c
       singleDamage = damage * lifetime
       singleShotTime = chargetime + Math.max(lifetime, reload)
       const avgShotTime = (ammo * singleShotTime + ammoReload) / Math.max(ammo, 1)
-      const burstDPS = avgShotTime > 0 ? (singleDamage / avgShotTime) * count : 0
+      const salvosPerSecond = avgShotTime > 0 ? (damageMultiplier * count) / avgShotTime : 0
+      const burstDPS = salvosPerSecond * singleDamage
 
       singleHeat = bullet.shotHeat + bullet.heat * lifetime
-      const sustainedDPS = calculateSustainedDPS(burstDPS, singleDamage, singleHeat, weaponHeat, count)
+      const sustainedDPS = calculateSustainedDPS(burstDPS, singleHeat, weaponHeat, salvosPerSecond)
 
       // 计算详细字段
       const overheatThreshold = 10000
-      const avgHeatPerSec = burstDPS / singleDamage * singleHeat
+      const avgHeatPerSec = salvosPerSecond * singleHeat
       const timeToOverheat = avgHeatPerSec > 0 ? overheatThreshold / avgHeatPerSec : 0
       const coolTime = weaponHeat?.coolrate ? overheatThreshold / weaponHeat.coolrate : 0
       const cycleTime = timeToOverheat + (weaponHeat?.cooldelay || 0) + coolTime
@@ -180,6 +184,7 @@ function calculateWeaponDPS(equipment: X4Equipment, bullet: any, missile: any, c
         singleShotTime,
         avgShotTime,
         ammo,
+        barrelamount: barrelAmount,
         ammoReload,
         chargetime,
         timeToOverheat,
@@ -189,23 +194,23 @@ function calculateWeaponDPS(equipment: X4Equipment, bullet: any, missile: any, c
       }
     } else {
       const damage = bullet.damage
-      const amount = bullet.amount
       const reload = bullet.reload
       const chargetime = bullet.chargetime
       const ammo = bullet.ammo
       const ammoReload = bullet.ammoreload
 
-      singleDamage = damage * amount
+      singleDamage = damage
       singleHeat = bullet.shotHeat
       singleShotTime = chargetime + reload
 
       const avgShotTime = (ammo * singleShotTime + ammoReload) / Math.max(ammo, 1)
-      const burstDPS = avgShotTime > 0 ? (singleDamage / avgShotTime) * count : 0
-      const sustainedDPS = calculateSustainedDPS(burstDPS, singleDamage, singleHeat, weaponHeat, count)
+      const salvosPerSecond = avgShotTime > 0 ? (damageMultiplier * count) / avgShotTime : 0
+      const burstDPS = salvosPerSecond * singleDamage
+      const sustainedDPS = calculateSustainedDPS(burstDPS, singleHeat, weaponHeat, salvosPerSecond)
 
       // 计算详细字段
       const overheatThreshold = 10000
-      const avgHeatPerSec2 = burstDPS / singleDamage * singleHeat
+      const avgHeatPerSec2 = salvosPerSecond * singleHeat
       const timeToOverheat2 = avgHeatPerSec2 > 0 ? overheatThreshold / avgHeatPerSec2 : 0
       const coolTime = weaponHeat?.coolrate ? overheatThreshold / weaponHeat.coolrate : 0
       const cycleTime = timeToOverheat2 + (weaponHeat?.cooldelay || 0) + coolTime
@@ -218,6 +223,7 @@ function calculateWeaponDPS(equipment: X4Equipment, bullet: any, missile: any, c
         singleShotTime,
         avgShotTime,
         ammo,
+        barrelamount: barrelAmount,
         ammoReload,
         chargetime,
         timeToOverheat: timeToOverheat2,
@@ -240,6 +246,7 @@ function calculateWeaponDPS(equipment: X4Equipment, bullet: any, missile: any, c
       singleShotTime: reload,
       avgShotTime: reload,
       ammo: missile.ammo || 1,
+      barrelamount: 1,
       ammoReload: 0,
       chargetime: 0,
       timeToOverheat: 0,

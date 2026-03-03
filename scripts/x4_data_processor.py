@@ -1797,6 +1797,7 @@ class X4PrecisionLoader:
                     "repair": 0,
                     "chargetime": 0,    # 充能时间，默认0
                     "amount": 1,        # 弹片数，默认1
+                    "barrelamount": 1,  # 炮管数，默认1
                     "shotHeat": 0,      # 子弹=heat.value(单发热量), beam=heat.initial(初始热量)
                     "heat": 0,          # 子弹=0, beam=每秒持续热量
                     "ammo": 1,          # 弹匣数量，默认1
@@ -1826,6 +1827,8 @@ class X4PrecisionLoader:
 
                         # amount: 弹片数（霰弹类）
                         bullet["amount"] = int(bullet_node.get('amount') or 1)
+                        # barrelamount: 炮管数（默认1）
+                        bullet["barrelamount"] = int(bullet_node.get('barrelamount') or 1)
 
                         # range: Beam直接使用range属性，子弹=lifetime×speed
                         # 注意：range处理独立于ammo节点，与ammunition无关

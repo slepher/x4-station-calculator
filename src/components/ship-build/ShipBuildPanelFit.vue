@@ -46,6 +46,7 @@ type GroupTabItem = {
 type GroupTabRow = {
   key: string
   size: string
+  testId: string
   tabs: GroupTabItem[]
 }
 
@@ -529,6 +530,7 @@ const groupedConnectionTabRows = computed<GroupTabRow[]>(() => {
     return [{
       key: 'size-mixed',
       size: 'mixed',
+      testId: 'group-tab-row-mixed',
       tabs: groupTabs.value
     }]
   }
@@ -538,9 +540,27 @@ const groupedConnectionTabRows = computed<GroupTabRow[]>(() => {
   sizeOrder.forEach((size) => {
     const tabs = groupTabs.value.filter((tab) => tab.size === size)
     if (tabs.length === 0) return
+    if (tabs.length > 8) {
+      // 同一 size 超过 8 个时分两行，按平均值分配（不是前8后剩余）
+      const firstRowCount = Math.ceil(tabs.length / 2)
+      grouped.push({
+        key: `size-${size}-1`,
+        size,
+        testId: `group-tab-row-${size}-1`,
+        tabs: tabs.slice(0, firstRowCount)
+      })
+      grouped.push({
+        key: `size-${size}-2`,
+        size,
+        testId: `group-tab-row-${size}-2`,
+        tabs: tabs.slice(firstRowCount)
+      })
+      return
+    }
     grouped.push({
       key: `size-${size}`,
       size,
+      testId: `group-tab-row-${size}`,
       tabs
     })
   })
@@ -552,6 +572,7 @@ const renderGroupTabRows = computed<GroupTabRow[]>(() => {
   return [{
     key: 'size-all',
     size: 'all',
+    testId: 'group-tab-row-all',
     tabs: groupTabs.value
   }]
 })
@@ -750,7 +771,8 @@ const filterByMk = (candidates: FitEquipmentOption[], mkIds: string[]) => {
 }
 const filterByTags = (candidates: FitEquipmentOption[], tagIds: string[]) => {
   if (tagIds.length === 0) return candidates
-  return candidates.filter((item) => tagIds.every((tagId) => normalizeTags(item).includes(tagId)))
+  // Tag 多选使用并集语义：命中任一已选 Tag 即保留
+  return candidates.filter((item) => tagIds.some((tagId) => normalizeTags(item).includes(tagId)))
 }
 
 const availableRaceIds = computed(() => new Set(pickerOptions.value.map((item) => normalizeRace(item))))
@@ -1066,14 +1088,14 @@ watch(slotTargets, () => {
                 </div>
               </section>
 
-              <section class="picker-grid-row picker-grid-row-compact">
+              <section class="picker-grid-row picker-grid-row-tabs">
                 <div class="picker-cell">
                   <div class="group-tabs picker-row-slot-tabs">
                     <div
                       v-for="row in renderGroupTabRows"
                       :key="row.key"
                       class="group-tab-row"
-                      :data-testid="`group-tab-row-${row.size}`"
+                      :data-testid="row.testId"
                     >
                       <button
                         v-for="tab in row.tabs"
@@ -1087,7 +1109,7 @@ watch(slotTargets, () => {
                     </div>
                   </div>
                 </div>
-                <div class="picker-cell picker-right">
+                <div class="picker-cell picker-right picker-right-tabs">
                   <div v-if="totalPages > 1" class="pager">
                     <button class="pager-btn" :disabled="currentPage === 1" @click="currentPage = currentPage - 1">&lt;</button>
                     <button
@@ -1212,7 +1234,7 @@ watch(slotTargets, () => {
                   v-for="row in renderGroupTabRows"
                   :key="row.key"
                   class="group-tab-row"
-                  :data-testid="`group-tab-row-${row.size}`"
+                  :data-testid="row.testId"
                 >
                   <button
                     v-for="tab in row.tabs"
@@ -1329,8 +1351,12 @@ watch(slotTargets, () => {
 .picker-row3-left { @apply flex flex-col gap-2; }
 .picker-grid-row-compact { @apply h-[25.6px] items-center; }
 .picker-grid-row-compact .picker-cell { @apply min-h-0 h-[25.6px] flex items-center; }
+.picker-grid-row-tabs { @apply items-start; }
+.picker-grid-row-tabs .picker-cell { @apply min-h-0; }
 .picker-actions-inline { @apply inline-flex items-center gap-1.5 justify-end; }
-.picker-row-slot-tabs { @apply mt-0 h-[25.6px] items-center; }
+.picker-row-slot-tabs { @apply mt-0 h-auto items-start; }
+.picker-right-tabs { @apply h-full items-end; }
+.picker-right-tabs .pager { @apply self-end; }
 .pager { @apply inline-flex items-center gap-1; }
 .pager-btn { @apply h-[25.6px] rounded border border-sky-600 px-1.5 py-0 text-[10px] text-slate-200 inline-flex items-center; }
 .pager-btn-active { @apply border-emerald-300 text-emerald-100; }

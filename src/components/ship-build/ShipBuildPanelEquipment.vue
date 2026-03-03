@@ -132,19 +132,26 @@ const comparisonData = computed(() => {
   // Weapon/Turret
   if (type === 'weapon' || type === 'turret') {
     const fields: FieldDef[] = [
-      { key: 'burstDPS', labelKey: 'ship_build.equipment_burst_dps', unit: 'MW' },
+      ...(type === 'weapon'
+        ? [{ key: 'burstDPS', labelKey: 'ship_build.equipment_burst_dps', unit: 'MW' } as FieldDef]
+        : []),
       { key: 'sustainedDPS', labelKey: 'ship_build.equipment_sustained_dps', unit: 'MW' },
       { key: 'range', labelKey: 'ship_build.equipment_range', unit: 'm' },
       { key: 'singleDamage', labelKey: 'ship_build.equipment_single_damage', unit: '' },
       { key: 'singleShotTime', labelKey: 'ship_build.equipment_single_shot_time', unit: 's' },
       { key: 'avgShotTime', labelKey: 'ship_build.equipment_avg_shot_time', unit: 's' },
       { key: 'ammo', labelKey: 'ship_build.equipment_ammo', unit: '' },
+      { key: 'barrelamount', labelKey: 'ship_build.equipment_barrel_amount', unit: '' },
       { key: 'ammoReload', labelKey: 'ship_build.equipment_ammo_reload', unit: 's' },
-      { key: 'chargetime', labelKey: 'ship_build.equipment_charge_time', unit: 's' },
-      { key: 'timeToOverheat', labelKey: 'ship_build.equipment_time_to_overheat', unit: 's' },
-      { key: 'cooldelay', labelKey: 'ship_build.equipment_cool_delay', unit: 's' },
-      { key: 'coolTime', labelKey: 'ship_build.equipment_cool_time', unit: 's' },
-      { key: 'cycleTime', labelKey: 'ship_build.equipment_cycle_time', unit: 's' }
+      ...(type === 'weapon'
+        ? [
+          { key: 'chargetime', labelKey: 'ship_build.equipment_charge_time', unit: 's' },
+          { key: 'timeToOverheat', labelKey: 'ship_build.equipment_time_to_overheat', unit: 's' },
+          { key: 'cooldelay', labelKey: 'ship_build.equipment_cool_delay', unit: 's' },
+          { key: 'coolTime', labelKey: 'ship_build.equipment_cool_time', unit: 's' },
+          { key: 'cycleTime', labelKey: 'ship_build.equipment_cycle_time', unit: 's' }
+        ]
+        : [])
     ]
 
     const maxValues: Record<string, number> = {}
@@ -319,20 +326,34 @@ const comparisonData = computed(() => {
   return []
 })
 
+const roundedWeaponTurretKeys = new Set(['burstDPS', 'sustainedDPS', 'range'])
+
+function normalizeDisplayValue(key: string, value: number): number {
+  if (roundedWeaponTurretKeys.has(key)) return Math.round(value)
+  return value
+}
+
 // 格式化数字
-function formatValue(value: number | undefined): string {
+function formatValue(key: string, value: number | undefined): string {
   if (value === undefined) return ''
-  return value.toLocaleString()
+  return normalizeDisplayValue(key, value).toLocaleString()
 }
 
 // 格式化显示值（候选值 + 差值）
-function formatDisplayValue(candidateValue: number, diff: number | undefined): string {
+function formatDisplayValue(item: ComparisonItem): string {
+  const candidateValue = item.candidateValue
+  let diff = item.diff
+  if (item.currentValue !== undefined) {
+    const normalizedCurrent = normalizeDisplayValue(item.key, item.currentValue)
+    const normalizedCandidate = normalizeDisplayValue(item.key, candidateValue)
+    diff = normalizedCandidate - normalizedCurrent
+  }
   // 无当前装备时（diff = undefined），只显示候选值
   if (diff === undefined || diff === 0) {
-    return formatValue(candidateValue)
+    return formatValue(item.key, candidateValue)
   }
   const sign = diff > 0 ? '+' : ''
-  return `${formatValue(candidateValue)}(${sign}${formatValue(diff)})`
+  return `${formatValue(item.key, candidateValue)}(${sign}${formatValue(item.key, diff)})`
 }
 
 // 获取差值颜色类
@@ -391,12 +412,12 @@ function getDiffStartPercent(currentValue: number, candidateValue: number, max: 
             <span class="stats-label">{{ t(item.labelKey) }}</span>
             <!-- SingleView: 使用 viewStats 的单一值 -->
             <template v-if="viewMode === 'single'">
-              <span class="stats-value">
-                <span class="current-value">
-                  {{ formatValue((viewStats as any)?.[item.key]) }}
+                <span class="stats-value">
+                  <span class="current-value">
+                  {{ formatValue(item.key, (viewStats as any)?.[item.key]) }}
+                  </span>
+                  <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
                 </span>
-                <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
-              </span>
               <div class="stats-bar">
                 <div
                   class="stats-bar-fill stats-bar-neutral"
@@ -406,12 +427,12 @@ function getDiffStartPercent(currentValue: number, candidateValue: number, max: 
             </template>
             <!-- DiffView 且 diff=0: 复用单一视图逻辑 -->
             <template v-else-if="item.diff === 0">
-              <span class="stats-value">
-                <span class="current-value">
-                  {{ formatValue(item.candidateValue ?? item.currentValue) }}
+                <span class="stats-value">
+                  <span class="current-value">
+                  {{ formatValue(item.key, item.candidateValue ?? item.currentValue) }}
+                  </span>
+                  <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
                 </span>
-                <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
-              </span>
               <div class="stats-bar">
                 <div
                   class="stats-bar-fill stats-bar-neutral"
@@ -423,7 +444,7 @@ function getDiffStartPercent(currentValue: number, candidateValue: number, max: 
             <template v-else>
               <span class="stats-value">
                 <span :class="getDiffClass(item.diff)">
-                  {{ formatDisplayValue(item.candidateValue, item.diff) }}
+                  {{ formatDisplayValue(item) }}
                 </span>
                 <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
               </span>
@@ -469,12 +490,12 @@ function getDiffStartPercent(currentValue: number, candidateValue: number, max: 
             <span class="stats-label">{{ t(item.labelKey) }}</span>
             <!-- SingleView: 使用 viewStats 的单一值 -->
             <template v-if="viewMode === 'single'">
-              <span class="stats-value">
-                <span class="current-value">
-                  {{ formatValue((viewStats as any)?.[item.key]) }}
+                <span class="stats-value">
+                  <span class="current-value">
+                  {{ formatValue(item.key, (viewStats as any)?.[item.key]) }}
+                  </span>
+                  <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
                 </span>
-                <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
-              </span>
               <div class="stats-bar">
                 <div
                   class="stats-bar-fill stats-bar-neutral"
@@ -484,12 +505,12 @@ function getDiffStartPercent(currentValue: number, candidateValue: number, max: 
             </template>
             <!-- DiffView 且 diff=0: 复用单一视图逻辑 -->
             <template v-else-if="item.diff === 0">
-              <span class="stats-value">
-                <span class="current-value">
-                  {{ formatValue(item.candidateValue ?? item.currentValue) }}
+                <span class="stats-value">
+                  <span class="current-value">
+                  {{ formatValue(item.key, item.candidateValue ?? item.currentValue) }}
+                  </span>
+                  <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
                 </span>
-                <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
-              </span>
               <div class="stats-bar">
                 <div
                   class="stats-bar-fill stats-bar-neutral"
@@ -501,7 +522,7 @@ function getDiffStartPercent(currentValue: number, candidateValue: number, max: 
             <template v-else>
               <span class="stats-value">
                 <span :class="getDiffClass(item.diff)">
-                  {{ formatDisplayValue(item.candidateValue, item.diff) }}
+                  {{ formatDisplayValue(item) }}
                 </span>
                 <span v-if="item.unit" class="stats-unit">{{ item.unit }}</span>
               </span>

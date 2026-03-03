@@ -230,15 +230,15 @@ describe('build-ship-equipment-panel', () => {
     // 1.15.2 获取 details 输出
     const weaponDetails = details.value as any
 
-    // 1.15.3 断言包含 13 项属性 #期望: [13项]
+    // 1.15.3 断言包含 14 项属性 #期望: [14项]
     const expectedFields = [
       'burstDPS', 'sustainedDPS', 'range', 'singleDamage', 'singleShotTime', 'avgShotTime',
-      'ammo', 'ammoReload', 'chargetime', 'timeToOverheat', 'cooldelay', 'coolTime', 'cycleTime'
+      'ammo', 'barrelamount', 'ammoReload', 'chargetime', 'timeToOverheat', 'cooldelay', 'coolTime', 'cycleTime'
     ]
     expectedFields.forEach((field) => {
       expect(weaponDetails).toHaveProperty(field)
     })
-    expect(Object.keys(weaponDetails).length).toBe(13)
+    expect(Object.keys(weaponDetails).length).toBe(14)
   })
 
   // 1.16 Turret Details 计算
@@ -250,15 +250,15 @@ describe('build-ship-equipment-panel', () => {
     // 1.16.2 获取 details 输出
     const turretDetails = details.value as any
 
-    // 1.16.3 断言包含 13 项属性 #期望: [13项]
+    // 1.16.3 断言包含 14 项属性 #期望: [14项]
     const expectedFields = [
       'burstDPS', 'sustainedDPS', 'range', 'singleDamage', 'singleShotTime', 'avgShotTime',
-      'ammo', 'ammoReload', 'chargetime', 'timeToOverheat', 'cooldelay', 'coolTime', 'cycleTime'
+      'ammo', 'barrelamount', 'ammoReload', 'chargetime', 'timeToOverheat', 'cooldelay', 'coolTime', 'cycleTime'
     ]
     expectedFields.forEach((field) => {
       expect(turretDetails).toHaveProperty(field)
     })
-    expect(Object.keys(turretDetails).length).toBe(13)
+    expect(Object.keys(turretDetails).length).toBe(14)
   })
 
   // 1.17 Shield Details 计算
