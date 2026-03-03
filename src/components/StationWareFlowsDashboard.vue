@@ -11,6 +11,7 @@ import VolumeControlSlider from '@/components/common/VolumeControlSlider.vue'
 import StationWareFlowGroup from './StationWareFlowGroup.vue'
 import EmpireWareFlowGroup from './EmpireWareFlowGroup.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
+import ViewTabUi from '@/components/common/ViewTabUI.vue'
 
 const store = useStationStore()
 const empireStore = useEmpireStore()
@@ -128,12 +129,12 @@ const title = () => {
   }
 }
 
-const modes = computed<{"key": ViewMode; title: string}[]>(() => {
+const views = computed<{key: ViewMode; label: string}[]>(() => {
   locale.value
   return [
-  {key: 'quantity', title: t('wareflow.quantity_view')},
-  {key: 'economy', title: t('wareflow.economy_view')},
-  {key: 'volume', title: t('wareflow.volume_view')}
+  {key: 'quantity', label: t('wareflow.quantity_view')},
+  {key: 'economy', label: t('wareflow.economy_view')},
+  {key: 'volume', label: t('wareflow.volume_view')}
 ]})
 
 const volumeGroups = computed(() => [
@@ -194,15 +195,7 @@ const handleRemoveModule = (wareId: string) => {
       </h3>
 
       <div class="header-right-group">
-        <!-- 视图模式切换按钮 -->
-        <div class="view-mode-switcher">
-          <button v-for="(item, index) in modes" :key="index"
-            :class="['view-mode-btn', viewMode === item.key ? 'active' : '']"
-            @click="viewMode = item.key">
-            {{ item.title }}
-          </button>
-        </div>
-
+        <ViewTabUi v-model="viewMode" :views="views" color-style="sky" ui-key="station-wareflow" />
       </div>
     </div>
 
@@ -330,22 +323,6 @@ const handleRemoveModule = (wareId: string) => {
 
 .header-right-group {
   @apply flex items-center gap-3;
-}
-
-.view-mode-switcher {
-  @apply flex items-center gap-1 bg-slate-900/60 p-0.5 rounded-md border border-slate-700/30;
-}
-
-.view-mode-btn {
-  @apply px-3 py-1 text-[10px] font-bold uppercase tracking-tighter rounded transition-all duration-200 text-slate-500 hover:text-slate-300;
-}
-
-.view-mode-btn.active {
-  @apply bg-sky-500/20 text-sky-400 shadow-[0_0_12px_rgba(14,165,233,0.15)];
-}
-
-.view-mode-btn:disabled {
-  @apply opacity-30 cursor-not-allowed hover:bg-transparent hover:text-slate-500;
 }
 
 .header-badge {

@@ -8,12 +8,19 @@ import StationModuleDetail from './StationModuleDetail.vue'
 import X4NumberInput from '@/components/common/X4NumberInput.vue'
 import VolumeControlSlider from '@/components/common/VolumeControlSlider.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
+import ViewTabUi from '@/components/common/ViewTabUI.vue'
 
 const store = useStationStore()
 const { translateModule, translateWare, translate } = useX4I18n()
 const { t } = useI18n()
 
 const viewMode = ref<'materials' | 'time' | 'workers' | 'volume'>('materials')
+const views = computed(() => [
+  { key: 'materials', label: t('station.view_cost') },
+  { key: 'volume', label: t('station.view_volume') },
+  { key: 'time', label: t('station.view_time') },
+  { key: 'workers', label: t('station.view_workers') }
+])
 const transportShipCapacity = computed({
   get: () => store.settings.transportShipCapacity,
   set: (val) => store.updateSetting('transportShipCapacity', val)
@@ -276,36 +283,7 @@ const headerTitle = computed(() => {
       <h3 class="header-title">{{ headerTitle }}</h3>
       
       <div class="header-right-group">
-        <div class="view-mode-switcher">
-          <button 
-            class="view-mode-btn" 
-            :class="{ active: viewMode === 'materials' }"
-            @click="viewMode = 'materials'"
-          >
-            {{ t('station.view_cost') }}
-          </button>
-          <button 
-            class="view-mode-btn" 
-            :class="{ active: viewMode === 'volume' }"
-            @click="viewMode = 'volume'"
-          >
-            {{ t('station.view_volume') }}
-          </button>
-          <button 
-            class="view-mode-btn" 
-            :class="{ active: viewMode === 'time' }"
-            @click="viewMode = 'time'"
-          >
-            {{ t('station.view_time') }}
-          </button>
-          <button 
-            class="view-mode-btn" 
-            :class="{ active: viewMode === 'workers' }"
-            @click="viewMode = 'workers'"
-          >
-            {{ t('station.view_workers') }}
-          </button>
-        </div>
+        <ViewTabUi v-model="viewMode" :views="views" color-style="sky" ui-key="station-dashboard" />
       </div>
     </div>
 
@@ -461,22 +439,6 @@ const headerTitle = computed(() => {
 
 .header-right-group {
   @apply flex items-center gap-4;
-}
-
-.view-mode-switcher {
-  @apply flex bg-slate-900/60 p-0.5 rounded-md border border-slate-700/30;
-}
-
-.view-mode-btn {
-  @apply px-3 py-1 text-[10px] font-bold uppercase tracking-tighter rounded transition-all duration-200 text-slate-500 hover:text-slate-300;
-}
-
-.view-mode-btn.active {
-  @apply bg-sky-500/20 text-sky-400 shadow-[0_0_12px_rgba(14,165,233,0.15)];
-}
-
-.view-mode-btn.disabled {
-  @apply opacity-30 cursor-not-allowed grayscale;
 }
 
 .stats-bar {
