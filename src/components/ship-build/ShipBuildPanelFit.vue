@@ -791,7 +791,7 @@ const selectedNameForTarget = (target: SlotTarget) => {
 const isMixedSelectionInGroup = (target: SlotTarget) => fitMode.value === 'group' && selectedForConnectionKeys(target.connectionKeys) === '__mixed__'
 
 const getCandidateCount = (target: SlotTarget) => target.options.length
-const isSingleCandidate = (target: SlotTarget) => getCandidateCount(target) === 1
+const isSingleCandidate = (target: SlotTarget) => getCandidateCount(target) === 0
 const isSingleCandidateSelected = (target: SlotTarget) => {
   if (!isSingleCandidate(target)) return false
   const selectedId = selectedForConnectionKeys(target.connectionKeys)
