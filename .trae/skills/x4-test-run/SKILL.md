@@ -147,22 +147,22 @@ On apply failure, script supports `--json` and returns:
 
 ```bash
 # Apply success cases only
-python skill-scripts/apply_test_results.py <change-name> \
+python3 skill-scripts/apply_test_results.py <change-name> \
   --successes "1.1,1.2,2.1"
 
 # Apply failure cases with fail markers
-python skill-scripts/apply_test_results.py <change-name> \
+python3 skill-scripts/apply_test_results.py <change-name> \
   --failures "1.1" \
   --fail-steps "1.1.1"
 
 # Apply mixed success and failure cases
-python skill-scripts/apply_test_results.py <change-name> \
+python3 skill-scripts/apply_test_results.py <change-name> \
   --successes "1.2,2.1" \
   --failures "1.1" \
   --fail-steps "1.1.2"
 
 # Apply with JSON output for error handling
-python skill-scripts/apply_test_results.py <change-name> \
+python3 skill-scripts/apply_test_results.py <change-name> \
   --successes "1.1" \
   --failures "1.2" \
   --fail-steps "1.2.1" \
