@@ -1,6 +1,6 @@
 ---
 name: x4-doc
-description: "Update OpenSpec planning artifacts for X4 (`request/spec/design/tasks`) based on discussion conclusions, with mandatory cross-file sync. Test docs delegated to x4-test-doc."
+description: "Update OpenSpec planning artifacts for X4 (`request/spec/design/tasks`) based on discussion conclusions, with mandatory cross-file sync. Test docs delegated to x4-test-doc + x4-test-doc-viewer gate."
 ---
 
 # X4 Documentation Update
@@ -24,7 +24,7 @@ Update OpenSpec planning artifacts based on discussion conclusions, and keep req
 
 `x4-new` and `x4-ff` should orchestrate progression only and must not redefine these details.
 
-**Test Documentation Authority**: Test documentation details (`test_tasks.md`, `ui_knowledge.md`) are delegated to `/x4:test-doc` skill.
+**Test Documentation Authority**: Test documentation details (`test_tasks.md`, `ui_knowledge.md`) are delegated to `/x4:test-doc` skill, and final draft approval is gated by `/x4:test-doc-viewer`.
 
 ## Parameters
 
@@ -49,11 +49,13 @@ Update OpenSpec planning artifacts based on discussion conclusions, and keep req
 1. Resolve change target and load existing planning artifacts in `openspec/changes/<change-name>/`.
 2. Create or update affected artifacts: `request.md`, `design.md`, `tasks.md`, `specs/<feature>/spec.md` when applicable.
 3. For test documentation updates (`test_tasks.md`, `ui_knowledge.md`), delegate to `/x4:test-doc` skill.
-4. Apply Delta Structures if modifying existing specs.
-4. Ensure localization matches user language.
-5. Enforce cross-file consistency:
+4. Require `/x4:test-doc-viewer` review pass for the final test-doc draft before considering test-doc update complete (must run in dedicated isolated reviewer subagent).
+5. If reviewer returns `review_status=rewrite_required`, route back to `/x4:test-doc` rewrite and resubmit to viewer until pass.
+6. Apply Delta Structures if modifying existing specs.
+7. Ensure localization matches user language.
+8. Enforce cross-file consistency:
    - requirement/DoD changes must be reflected in `tasks.md`;
-   - Test documentation updates are delegated to `/x4:test-doc`.
+   - test documentation updates are delegated to `/x4:test-doc` and gated by `/x4:test-doc-viewer`.
 
 ## Project Standards (MANDATORY)
 
@@ -131,9 +133,22 @@ When generating or translating spec documents (`.md` in `openspec/`), **YOU MUST
 
 ### 5. Test Documentation Delegation (MANDATORY)
 
-For test documentation updates (`test_tasks.md`, `ui_knowledge.md`), delegate to `/x4:test-doc` skill:
+For test documentation updates (`test_tasks.md`, `ui_knowledge.md`), delegate to `/x4:test-doc` skill and enforce `/x4:test-doc-viewer` review pass:
 - Do NOT directly modify `test_tasks.md` or `ui_knowledge.md` in `/x4:doc`.
 - Use `/x4:test-doc` for all test documentation changes.
+- Use `/x4:test-doc-viewer` as final reviewer gate for test documentation.
+
+### 5.1 Test-Doc Review Loop (MANDATORY)
+
+When `/x4:doc` flow includes test documentation:
+
+1. Run `/x4:test-doc <change-name>` to produce/update final draft.
+2. Run `/x4:test-doc-viewer <change-name>` as reviewer gate in a dedicated isolated reviewer subagent.
+3. If reviewer returns `review_status=rewrite_required`:
+   - route back to `/x4:test-doc` with blocking rewrite items;
+   - rerun `/x4:test-doc-viewer` after rewrite.
+4. `/x4:doc` must not report test-doc complete until reviewer returns `review_status=pass`.
+5. If isolated reviewer subagent cannot be created, stop and report blocker; do not perform in-thread review fallback.
 
 ### 6. Task Scope Boundary (MANDATORY)
 
