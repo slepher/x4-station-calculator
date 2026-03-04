@@ -42,7 +42,7 @@ STATE_REF_RE = re.compile(r"^状态:\s*(\S+)\s*$")
 TRANS_REF_RE = re.compile(r"^切换:\s*(.+?)\s*->\s*(.+)$")
 
 EXPECT_MARKER_RE = re.compile(r"#期望:\s*\[(.+)\]\s*$")
-CHECKLIST_NUMBER_RE = re.compile(r"^-\\s*\\[[ ✓✗x]\\]\\s*(\\d+(?:\\.\\d+){1,3})\\s*(.*)$")
+CHECKLIST_NUMBER_RE = re.compile(r"^-\s*\[[ ✓✗x]\]\s*(\d+(?:\.\d+){1,3})\s*(.*)$")
 
 
 class Node:
@@ -90,6 +90,17 @@ def is_before_after_pair(a: str, b: str) -> bool:
     return (is_before_assertion(a) and is_after_assertion(b)) or (
         is_after_assertion(a) and is_before_assertion(b)
     )
+
+
+def count_non_expectation_steps(task: Node) -> int:
+    count = 0
+    for sub in task.subtasks:
+        if not has_expectation_semantics(sub["desc"]):
+            count += 1
+        for child in sub["children"]:
+            if not has_expectation_semantics(child["desc"]):
+                count += 1
+    return count
 
 
 def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
@@ -410,6 +421,25 @@ def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
                 )
                 continue
 
+            if chapter == 2:
+                non_expectation_steps = count_non_expectation_steps(t)
+                if STATE_TASK_RE.match(t.desc) and non_expectation_steps < 3:
+                    add_error(
+                        "CHAPTER2_STATE_STEP_COUNT_INSUFFICIENT",
+                        "Chapter 2 state must contain at least 3 non-expectation steps; rewrite referenced Chapter 3 cases and re-extract this state.",
+                        case=t.task_no,
+                        desc=t.desc,
+                        line=t.line_no,
+                    )
+                if TRANS_TASK_RE.match(t.desc) and non_expectation_steps < 2:
+                    add_error(
+                        "CHAPTER2_TRANSITION_STEP_COUNT_INSUFFICIENT",
+                        "Chapter 2 transition must contain at least 2 non-expectation steps; rewrite referenced Chapter 3 cases and re-extract this transition.",
+                        case=t.task_no,
+                        desc=t.desc,
+                        line=t.line_no,
+                    )
+
             expected_sub = 1
             parent_top_no = int(t.task_no.split(".")[1])
             prev_sub_no: Optional[int] = None
@@ -539,22 +569,44 @@ def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
             transitions[trans_id] = {"task_no": t.task_no, "desc": t.desc}
 
     refs_ch34: Set[str] = set()
+    refs_ch34_count: Dict[str, int] = defaultdict(int)
     for chapter in (3, 4):
         for t in tasks_by_chapter.get(chapter, []):
-            if chapter == 3:
-                has_ch2_ref = False
+            ordered_items: List[Dict[str, str | int]] = []
+            for s in t.subtasks:
+                ordered_items.append({"desc": s["desc"], "line": s["line"], "case": f"{s['chapter']}.{s['task']}.{s['sub']}"})
+                for c in s["children"]:
+                    ordered_items.append(
+                        {
+                            "desc": c["desc"],
+                            "line": c["line"],
+                            "case": f"{c['chapter']}.{c['task']}.{c['sub']}.{c['n']}",
+                        }
+                    )
+
+            state_ref_items = [item for item in ordered_items if STATE_REF_RE.match(str(item["desc"]))]
+            if len(state_ref_items) > 1:
+                for item in state_ref_items[1:]:
+                    add_error(
+                        "CHAPTER34_STATE_REF_COUNT_EXCEEDED",
+                        "Each Chapter 3/4 top-level case can contain at most one `状态:` reference line; rewrite case steps and re-extract Chapter 2.",
+                        case=str(item["case"]),
+                        desc=str(item["desc"]),
+                        line=int(item["line"]),
+                    )
+
             for s in t.subtasks:
                 for text in [s["desc"]] + [c["desc"] for c in s["children"]]:
                     sm = STATE_REF_RE.match(text)
                     if sm:
-                        refs_ch34.add(sm.group(1).strip())
-                        if chapter == 3:
-                            has_ch2_ref = True
+                        state_id = sm.group(1).strip()
+                        refs_ch34.add(state_id)
+                        refs_ch34_count[state_id] += 1
                     tm = TRANS_REF_RE.match(text)
                     if tm:
-                        refs_ch34.add(f"{tm.group(1).strip()} -> {tm.group(2).strip()}")
-                        if chapter == 3:
-                            has_ch2_ref = True
+                        trans_id = f"{tm.group(1).strip()} -> {tm.group(2).strip()}"
+                        refs_ch34.add(trans_id)
+                        refs_ch34_count[trans_id] += 1
             if chapter == 4:
                 bug_texts: List[str] = []
                 before_ids: Set[str] = set()
@@ -613,19 +665,35 @@ def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
     all_items = set(states.keys()) | set(transitions.keys())
     if all_items:
         for item in sorted(all_items):
-            if item in refs_ch34:
+            if item not in refs_ch34:
+                if item in states:
+                    add_error(
+                        "CHAPTER2_STATE_ISOLATED",
+                        f"Chapter 2 state `{item}` is isolated (not explicitly referenced in Chapter 3/4)",
+                        case=states[item]["task_no"],
+                        desc=states[item]["desc"],
+                    )
+                else:
+                    add_error(
+                        "CHAPTER2_TRANSITION_ISOLATED",
+                        f"Chapter 2 transition `{item}` is isolated (not explicitly referenced in Chapter 3/4)",
+                        case=transitions[item]["task_no"],
+                        desc=transitions[item]["desc"],
+                    )
                 continue
-            if item in states:
+
+            ref_count = refs_ch34_count.get(item, 0)
+            if ref_count < 2 and item in states:
                 add_error(
-                    "CHAPTER2_STATE_ISOLATED",
-                    f"Chapter 2 state `{item}` is isolated (not explicitly referenced in Chapter 3/4)",
+                    "CHAPTER2_STATE_REFERENCE_COUNT_INSUFFICIENT",
+                    f"Chapter 2 state `{item}` must be referenced at least 2 times in Chapter 3/4 (current: {ref_count}); rewrite related Chapter 3 cases and re-extract.",
                     case=states[item]["task_no"],
                     desc=states[item]["desc"],
                 )
-            else:
+            elif ref_count < 2:
                 add_error(
-                    "CHAPTER2_TRANSITION_ISOLATED",
-                    f"Chapter 2 transition `{item}` is isolated (not explicitly referenced in Chapter 3/4)",
+                    "CHAPTER2_TRANSITION_REFERENCE_COUNT_INSUFFICIENT",
+                    f"Chapter 2 transition `{item}` must be referenced at least 2 times in Chapter 3/4 (current: {ref_count}); rewrite related Chapter 3 cases and re-extract.",
                     case=transitions[item]["task_no"],
                     desc=transitions[item]["desc"],
                 )

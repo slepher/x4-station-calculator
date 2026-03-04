@@ -15,6 +15,20 @@ User invokes `/x4:test-doc <change_name>`
 
 Update `test_tasks.md` and `ui_knowledge.md` based on discussion conclusions or requirement changes, with mandatory cross-file synchronization.
 
+## P0 Execution Block (READ FIRST, MANDATORY)
+
+1. Actionable-step rule (Chapter 3/4):
+   - For non-reference subtask lines in Chapter 3/4, write executable steps with concrete target/action/assertion.
+   - Reference lines (`状态:` / `切换:`) are the only allowed short-form exception.
+2. Vague wording ban:
+   - Forbidden vague phrasing in task steps: `抽样`, `检查`, `验证`, `变化`, `某一个`, `选一个`, `合理即可`.
+3. Blocked protocol:
+   - If key data is missing, ask one consolidated blocking-question batch and mark blocked.
+   - After user feedback, continue with direct file edits; do not return to abstract advisory mode.
+4. Chapter order gate:
+   - Chapter 2 generation is blocked until Chapter 3 case-first draft is complete.
+   - If Chapter 2 is generated before Chapter 3 case-first draft, Chapter 2 must be fully rewritten; patch-fix on existing Chapter 2 is forbidden.
+
 ## Document Detail Authority (MANDATORY)
 
 `x4-test-doc` is the single source of truth for test documentation details, including:
@@ -103,9 +117,94 @@ When `test_tasks.md` changes:
 #### A.5 Quality Rules (MANDATORY)
 
 - Avoid vague placeholders in operation/assertion descriptions.
-- In Chapter 2 subtasks, avoid placeholder wording (e.g., `TODO`, `待补充`) as an agent writing-quality requirement.
+- Avoid placeholder wording (e.g., `TODO`, `待补充`) in any chapter.
 - Use concrete, reproducible identifiers from code/assets/fixtures.
 - Keep wording executable and reviewable.
+- In Chapter 3/4, for non-reference subtasks (not standalone `状态:` / `切换:` lines), use executable step wording:
+  - include scope (`在 <scope>`), target (`对 <target>`), action (`执行 <action>`), observable assertion (`断言 <result>`).
+- Do not use vague-only statements as standalone subtask lines.
+- Anti-patterns (forbidden):
+  - Do not add low-business-value `状态:` / `切换:` only to satisfy reference count.
+  - Do not use undefined action verbs such as `抽样`, `检查`, `确认` as operation placeholders.
+- Minimal executable syntax (mandatory for non-reference subtasks):
+  - Each step must include: scope + action + target + assertion.
+  - Assertion must include `#期望: [...]` for deterministic outcomes.
+  - Exception: Chapter 4 reproducible-step items follow B.2.7 and may omit `#期望: [...]`.
+
+#### A.6 Chapter 3 Planning Gate (MANDATORY)
+
+Before drafting Chapter 3, run this preparation workflow:
+
+1. One-pass high-level thinking first:
+   - Read `AGENTS.md` before Chapter 3 planning.
+   - Build a planning table for candidate `3.x` cases:
+     - case goal
+     - target UI/scope
+     - action chain
+     - assertion intent
+     - required data
+     - data source path
+2. Data provenance first:
+   - For each planned case, identify where concrete data comes from before writing final task lines.
+   - Prefer existing artifacts and fixtures over assumptions.
+3. Fast-fail unknowns:
+   - If key data source cannot be found quickly, collect blocking questions and ask the user once in a consolidated batch.
+   - Questions must focus on missing data needed to make task steps concrete and executable.
+4. Then per-task deepening:
+   - After user feedback, perform detailed per-task thinking and fetch concrete data for each task.
+   - Do not write vague operation text if concrete data is still missing.
+5. Drafting gate:
+   - Draft Chapter 3 concrete case flows first, without `状态:` / `切换:` reference lines at this stage.
+   - Once Chapter 3 concrete content is ready, execute extraction via A.7.
+
+#### A.7 Case-First Extraction Strategy (MANDATORY)
+
+Use the following extraction workflow to reduce abstract wording and improve reachable E2E flow quality:
+
+1. Prerequisites:
+   - Chapter 1 and Chapter 3 concrete content is already drafted (per A.6).
+   - Do not draft Chapter 2 directly before those concrete contents exist.
+   - Until Chapter 3 case-first draft is complete, Chapter 2 generation is forbidden.
+   - If Chapter 2 is created early, discard and rewrite Chapter 2 from extraction output; do not patch old Chapter 2.
+2. Chapter 2 generation gate:
+   - Every Chapter 2 item must come from extracted shared blocks in Chapter 3.
+   - If no shared block meets extraction thresholds, keep flow details in Chapter 3 and do not force-create Chapter 2 abstraction.
+3. Extract shared blocks from Chapter 3 to Chapter 2:
+   - If the same flow block is reused by at least 2 cases and contains at least 3 action steps, extract it to Chapter 2.
+4. Promote Chapter 2 shared blocks to canonical state/transition:
+   - If a Chapter 2 block still contains repeated patterns with at least 3 action steps, normalize it as `状态:` or `切换:`.
+   - Run this normalization pass once only; do not perform iterative re-extraction loops.
+5. Inline low-value transition back to Chapter 3:
+   - If a `切换:` block has only 1 action step after normalization, remove that transition and inline the action step back into Chapter 3 case flow.
+6. Extraction scope and step counting:
+   - When extracting shared blocks, include both action steps and observation/assertion points to keep semantic integrity.
+   - For all `>=3 steps` decisions, count action steps only.
+   - Observation/assertion items (including `#期望: [...]`) are not counted as steps.
+7. Observation backfill after extraction:
+   - After finalizing Chapter 2 `状态:`/`切换:`, if an item lacks observable checks, add at least one observation/assertion line.
+   - Shared observation points should live in Chapter 2 item body; case-specific assertions remain in Chapter 3.
+8. Post-extraction execution:
+   - Replace reusable Chapter 3 blocks with Chapter 2 references in the same extraction pass.
+   - After extraction completes, run validation directly; do not run an additional standalone rewrite phase for Chapter 3.
+
+#### A.8 Execution Evidence Block (MANDATORY)
+
+Before final delivery in each `/x4:test-doc` run, output an explicit evidence block:
+
+1. `Case 抽取表`:
+   - Include: case id, reused block id/description, extractable-as-state decision (`yes/no`).
+2. `抽取决策`:
+   - For each reusable block, state keep-inline vs extract-to-state/transition and concrete reason.
+- Missing either section is failure for this run.
+
+#### A.9 Repeat-Failure Rollback Strategy (MANDATORY)
+
+If the same issue category is reported more than once in the same run:
+
+1. Discard current `test_tasks.md` draft.
+2. Restart from Chapter 3 case-first drafting.
+3. Re-run extraction to regenerate Chapter 2.
+4. Do not reuse old numbering patches to repair previous draft.
 
 ### Chapter B: Agent+Verify Mandatory
 
@@ -152,7 +251,7 @@ Indent levels are fixed to 0 / 2 / 4 spaces.
 - Third-level children, when used, must use 4-level numbering: `x.x.x.n`
 - Subtasks under the same parent MUST start from `.1` and increment continuously.
 - Third-level child numbering under the same parent subtask MUST start from `.1` and increment continuously.
-- Top-level checkbox state in `test_tasks.md` MUST be `[ ]` when produced by `/x4:test-doc`.
+- For newly created top-level tasks by `/x4:test-doc`, checkbox state MUST be `[ ]`.
 - Newly added or backfilled checklist items (top-level/subtask/child) MUST default to `[ ]`; do not write `[✓]`/`[x]` manually in doc-update phase.
 - Do not infer completion from `bugs.md` status (e.g., `Verified`): `/x4:test-doc` never marks completion based on bug status.
 - Validator compatibility note: historical docs MAY contain other checkbox states, but this does not change the output requirement above.
@@ -201,7 +300,7 @@ Applies to all top-level tasks (`x.x`) in Chapter 1/2/3/4:
 
 - Chapter 3 top-level descriptions MUST be `Case: <scenario-name>`:
   - `<scenario-name>` MUST be concise and uniquely distinguishable within Chapter 3.
-  - Case subtasks MUST explicitly reference Chapter 2 semantics via `状态:` / `切换:` text where applicable.
+  - Case subtasks MUST explicitly reference Chapter 2 semantics via standalone `状态:` / `切换:` lines where applicable.
 
 - Chapter 4 top-level descriptions MUST be `BUG-<number>: <bug-description>`:
   - `<bug-description>` MUST state observable failure behavior, not root-cause speculation.
@@ -215,18 +314,29 @@ Applies to all top-level tasks (`x.x`) in Chapter 1/2/3/4:
 #### B.3 Chapter 2 State/Transition Reference Integrity (MANDATORY)
 
 - Every Chapter 2 state/transition item must be connected to Chapter 3 or Chapter 4 usage path.
-- Write references in checklist subtask lines under cases/bug tasks with explicit `状态:` / `切换:` wording.
+- Write references in checklist subtask/child lines under cases/bug tasks using exact standalone forms:
+  - `状态: <state-id>`
+  - `切换: <from-state> -> <to-state>`
+- Do not prepend/append extra text on those reference lines.
+- Chapter 2 `状态:` must contain at least 3 non-expectation steps (`#期望` lines are excluded from step count).
+- Chapter 2 `切换:` must contain at least 2 non-expectation steps (`#期望` lines are excluded from step count).
+- Every Chapter 2 state/transition must be referenced at least 2 times in Chapter 3/4.
+- In Chapter 3/4, each top-level case (each `3.x Case` / `4.x BUG`) can contain at most one `状态:` reference line.
+- If the above checks fail, rewrite the corresponding Chapter 3 case steps and re-extract Chapter 2 items.
 - After updating `test_tasks.md`, run validator and ensure no isolated Chapter 2 items remain.
 
 #### B.4 Validation Workflow (MANDATORY)
 
 1. Write/update docs per this skill.
-2. Run:
+2. Pre-delivery lint (mandatory):
    ```bash
    python3 skill-scripts/validate_test_tasks_refs.py <change-name> --json
    ```
-3. Fix all failures and rerun until pass.
-4. Perform final agent check for cross-file consistency (`test_tasks.md` <-> `ui_knowledge.md`).
+3. If lint fails:
+   - Return to Chapter 3 case rewrite and re-extract Chapter 2.
+   - Do not fix by only adding references in Chapter 3/4.
+4. Rerun lint until pass.
+5. Perform final agent check for cross-file consistency (`test_tasks.md` <-> `ui_knowledge.md`).
 
 ## Constraints
 
@@ -239,6 +349,9 @@ Applies to all top-level tasks (`x.x`) in Chapter 1/2/3/4:
 
 - Updated test documentation artifacts (`test_tasks.md`, `ui_knowledge.md`)
 - Confirmation of changes made
+- `Execution Evidence Block` (from A.8) must be included before completion claim.
+- Must include actual edited file paths for this run.
+- If no file edit is possible due to missing required data, output `BLOCKED` with one consolidated question batch.
 
 ## Example Usage
 

@@ -15,7 +15,11 @@ const scriptPath = path.join(repoRoot, 'skill-scripts', 'validate_test_tasks_ref
 const dataDir = path.join(repoRoot, 'tests', 'skills', 'data', 'tasks')
 
 const cases: CaseDef[] = [
-  { name: 'valid-minimal', file: 'test_tasks-01-valid-minimal.md', expectedPoints: [] },
+  {
+    name: 'valid-minimal',
+    file: 'test_tasks-01-valid-minimal.md',
+    expectedPoints: [{ case: '2.1', error_code: 'CHAPTER2_STATE_REFERENCE_COUNT_INSUFFICIENT' }],
+  },
   {
     name: 'missing-chapter-3',
     file: 'test_tasks-02-missing-chapter-3.md',
@@ -28,9 +32,10 @@ const cases: CaseDef[] = [
     name: 'invalid-top-level-numbering',
     file: 'test_tasks-03-invalid-top-level-numbering.md',
     expectedPoints: [
-      { case: '1', error_code: 'CHAPTER_CONTENT_INVALID' },
+      { case: '1.1.1', error_code: 'CHAPTER_CONTENT_INVALID' },
       { case: '1.1.1', error_code: 'SUBTASK_WITHOUT_PARENT' },
       { case: '1.1.2', error_code: 'SUBTASK_WITHOUT_PARENT' },
+      { case: '2.1', error_code: 'CHAPTER2_STATE_REFERENCE_COUNT_INSUFFICIENT' },
     ],
   },
   {
@@ -41,19 +46,24 @@ const cases: CaseDef[] = [
       { case: '1.1', error_code: 'TOP_LEVEL_SUBTASK_MISSING' },
       { case: '1.1', error_code: 'TOP_LEVEL_NUMBER_NOT_CONTIGUOUS' },
       { case: '1.1', error_code: 'TOP_LEVEL_SUBTASK_MISSING' },
+      { case: '2.1', error_code: 'CHAPTER2_STATE_REFERENCE_COUNT_INSUFFICIENT' },
     ],
   },
   {
     name: 'non-contiguous-subtask',
     file: 'test_tasks-05-non-contiguous-subtask.md',
-    expectedPoints: [{ case: '1.1.3', error_code: 'SUBTASK_NUMBER_NOT_CONTIGUOUS' }],
+    expectedPoints: [
+      { case: '1.1.3', error_code: 'SUBTASK_NUMBER_NOT_CONTIGUOUS' },
+      { case: '2.1', error_code: 'CHAPTER2_STATE_REFERENCE_COUNT_INSUFFICIENT' },
+    ],
   },
   {
     name: 'invalid-indent',
     file: 'test_tasks-06-invalid-indent.md',
     expectedPoints: [
-      { case: '1', error_code: 'CHAPTER_CONTENT_INVALID' },
+      { case: '1.1.1', error_code: 'CHAPTER_CONTENT_INVALID' },
       { case: '1.1', error_code: 'TOP_LEVEL_SUBTASK_MISSING' },
+      { case: '2.1', error_code: 'CHAPTER2_STATE_REFERENCE_COUNT_INSUFFICIENT' },
     ],
   },
   {
@@ -62,6 +72,7 @@ const cases: CaseDef[] = [
     expectedPoints: [
       { case: '1', error_code: 'CHAPTER_CONTENT_INVALID' },
       { case: '1.1', error_code: 'TOP_LEVEL_SUBTASK_MISSING' },
+      { case: '2.1', error_code: 'CHAPTER2_STATE_REFERENCE_COUNT_INSUFFICIENT' },
     ],
   },
   {
@@ -73,14 +84,22 @@ const cases: CaseDef[] = [
       { case: '4.1', error_code: 'CHAPTER4_BUG_REPRO_STEP_MISSING' },
       { case: '4.1', error_code: 'CHAPTER4_BUG_BEFORE_ASSERT_MISSING' },
       { case: '4.1', error_code: 'CHAPTER4_BUG_AFTER_ASSERT_MISSING' },
+      { case: '2.1', error_code: 'CHAPTER2_STATE_REFERENCE_COUNT_INSUFFICIENT' },
     ],
   },
   {
     name: 'plain-text-in-chapter',
     file: 'test_tasks-09-plain-text-in-chapter.md',
-    expectedPoints: [{ case: '1', error_code: 'CHAPTER_CONTENT_INVALID' }],
+    expectedPoints: [
+      { case: '1', error_code: 'CHAPTER_CONTENT_INVALID' },
+      { case: '2.1', error_code: 'CHAPTER2_STATE_REFERENCE_COUNT_INSUFFICIENT' },
+    ],
   },
-  { name: 'mixed-checkbox-states', file: 'test_tasks-10-mixed-checkbox-states.md', expectedPoints: [] },
+  {
+    name: 'mixed-checkbox-states',
+    file: 'test_tasks-10-mixed-checkbox-states.md',
+    expectedPoints: [{ case: '2.1', error_code: 'CHAPTER2_STATE_REFERENCE_COUNT_INSUFFICIENT' }],
+  },
   {
     name: 'empty-file',
     file: 'test_tasks-11-empty-file.md',
@@ -90,7 +109,7 @@ const cases: CaseDef[] = [
     name: 'multi-errors',
     file: 'test_tasks-12-multi-errors.md',
     expectedPoints: [
-      { case: '1', error_code: 'CHAPTER_CONTENT_INVALID' },
+      { case: '1.1.1', error_code: 'CHAPTER_CONTENT_INVALID' },
       { case: '1', error_code: 'CHAPTER_CONTENT_INVALID' },
       { case: '4', error_code: 'CHAPTER_CONTENT_INVALID' },
       { case: '2.1', error_code: 'CHAPTER2_TOP_TYPE_INVALID' },
@@ -99,13 +118,28 @@ const cases: CaseDef[] = [
       { case: '3.1', error_code: 'TOP_LEVEL_SUBTASK_MISSING' },
     ],
   },
-  { name: 'regression-stable', file: 'test_tasks-13-regression-stable.md', expectedPoints: [] },
-  { name: 'top-level-last-expect-direct', file: 'test_tasks-14-top-level-last-expect-direct.md', expectedPoints: [] },
-  { name: 'top-level-last-expect-children-all', file: 'test_tasks-15-top-level-last-expect-children-all.md', expectedPoints: [] },
+  {
+    name: 'regression-stable',
+    file: 'test_tasks-13-regression-stable.md',
+    expectedPoints: [{ case: '2.1', error_code: 'CHAPTER2_STATE_REFERENCE_COUNT_INSUFFICIENT' }],
+  },
+  {
+    name: 'top-level-last-expect-direct',
+    file: 'test_tasks-14-top-level-last-expect-direct.md',
+    expectedPoints: [{ case: '2.1', error_code: 'CHAPTER2_STATE_REFERENCE_COUNT_INSUFFICIENT' }],
+  },
+  {
+    name: 'top-level-last-expect-children-all',
+    file: 'test_tasks-15-top-level-last-expect-children-all.md',
+    expectedPoints: [{ case: '2.1', error_code: 'CHAPTER2_STATE_REFERENCE_COUNT_INSUFFICIENT' }],
+  },
   {
     name: 'top-level-last-expect-children-mixed',
     file: 'test_tasks-16-top-level-last-expect-children-mixed.md',
-    expectedPoints: [{ case: '1.1.3.2', error_code: 'LAST_SUBTASK_CHILD_EXPECTATION_MISSING' }],
+    expectedPoints: [
+      { case: '1.1.3.2', error_code: 'LAST_SUBTASK_CHILD_EXPECTATION_MISSING' },
+      { case: '2.1', error_code: 'CHAPTER2_STATE_REFERENCE_COUNT_INSUFFICIENT' },
+    ],
   },
   { name: 'expectation-marker-concrete', file: 'test_tasks-17-expectation-marker-concrete.md', expectedPoints: [] },
   { name: 'expectation-marker-ui-unified', file: 'test_tasks-18-expectation-marker-ui-unified.md', expectedPoints: [] },
@@ -113,6 +147,8 @@ const cases: CaseDef[] = [
     name: 'bug-missing-colon',
     file: 'test_tasks-19-bug-missing-colon.md',
     expectedPoints: [
+      { case: '2.1', error_code: 'CHAPTER2_STATE_STEP_COUNT_INSUFFICIENT' },
+      { case: '2.1', error_code: 'CHAPTER2_STATE_REFERENCE_COUNT_INSUFFICIENT' },
       { case: '4.1', error_code: 'CHAPTER4_TOP_TYPE_INVALID' },
       { case: '4.1', error_code: 'CHAPTER4_BUG_BEFORE_ASSERT_MISSING' },
       { case: '4.1', error_code: 'CHAPTER4_BUG_AFTER_ASSERT_MISSING' },
@@ -121,27 +157,59 @@ const cases: CaseDef[] = [
   {
     name: 'case-name-duplicated',
     file: 'test_tasks-20-case-name-duplicated.md',
-    expectedPoints: [{ case: '3.2', error_code: 'CHAPTER3_CASE_NAME_DUPLICATED' }],
+    expectedPoints: [
+      { case: '2.1', error_code: 'CHAPTER2_STATE_STEP_COUNT_INSUFFICIENT' },
+      { case: '3.2', error_code: 'CHAPTER3_CASE_NAME_DUPLICATED' },
+    ],
   },
   {
     name: 'case-ref-missing',
     file: 'test_tasks-21-case-ref-missing.md',
-    expectedPoints: [{ case: '2.1', error_code: 'CHAPTER2_STATE_ISOLATED' }],
+    expectedPoints: [
+      { case: '2.1', error_code: 'CHAPTER2_STATE_STEP_COUNT_INSUFFICIENT' },
+      { case: '2.1', error_code: 'CHAPTER2_STATE_ISOLATED' },
+    ],
   },
   {
     name: 'bug-root-cause-desc',
     file: 'test_tasks-22-bug-root-cause-desc.md',
     expectedPoints: [
+      { case: '2.1', error_code: 'CHAPTER2_STATE_STEP_COUNT_INSUFFICIENT' },
+      { case: '2.1', error_code: 'CHAPTER2_STATE_REFERENCE_COUNT_INSUFFICIENT' },
       { case: '4.1', error_code: 'CHAPTER4_BUG_DESC_SHOULD_BE_OBSERVABLE' },
       { case: '4.1', error_code: 'CHAPTER4_BUG_BEFORE_ASSERT_MISSING' },
       { case: '4.1', error_code: 'CHAPTER4_BUG_AFTER_ASSERT_MISSING' },
     ],
   },
-  { name: 'bug-before-after-same-number', file: 'test_tasks-23-bug-before-after-same-number.md', expectedPoints: [] },
+  {
+    name: 'bug-before-after-same-number',
+    file: 'test_tasks-23-bug-before-after-same-number.md',
+    expectedPoints: [
+      { case: '2.1', error_code: 'CHAPTER2_STATE_STEP_COUNT_INSUFFICIENT' },
+      { case: '2.1', error_code: 'CHAPTER2_STATE_REFERENCE_COUNT_INSUFFICIENT' },
+    ],
+  },
   {
     name: 'bug-before-after-number-mismatch',
     file: 'test_tasks-24-bug-before-after-number-mismatch.md',
-    expectedPoints: [{ case: '4.1', error_code: 'CHAPTER4_BUG_BEFORE_AFTER_NUMBER_MISMATCH' }],
+    expectedPoints: [
+      { case: '2.1', error_code: 'CHAPTER2_STATE_STEP_COUNT_INSUFFICIENT' },
+      { case: '2.1', error_code: 'CHAPTER2_STATE_REFERENCE_COUNT_INSUFFICIENT' },
+      { case: '4.1', error_code: 'CHAPTER4_BUG_BEFORE_AFTER_NUMBER_MISMATCH' },
+    ],
+  },
+  {
+    name: 'transition-step-and-reference-threshold',
+    file: 'test_tasks-25-transition-step-and-reference-threshold.md',
+    expectedPoints: [
+      { case: '2.1', error_code: 'CHAPTER2_TRANSITION_STEP_COUNT_INSUFFICIENT' },
+      { case: '2.1', error_code: 'CHAPTER2_TRANSITION_REFERENCE_COUNT_INSUFFICIENT' },
+    ],
+  },
+  {
+    name: 'chapter34-state-ref-count-exceeded',
+    file: 'test_tasks-26-consecutive-state-refs.md',
+    expectedPoints: [{ case: '3.1.2', error_code: 'CHAPTER34_STATE_REF_COUNT_EXCEEDED' }],
   },
 ]
 
