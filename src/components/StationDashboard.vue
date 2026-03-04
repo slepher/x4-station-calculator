@@ -274,6 +274,10 @@ const headerTitle = computed(() => {
   if (viewMode.value === 'time') return t('station.header_time')
   return t('station.header_costs')
 })
+
+const hasDashboardData = computed(() => {
+  return data.value.moduleGroups.length > 0 || (viewMode.value === 'workers' && store.settings.useHQ)
+})
 </script>
 
 <template>
@@ -325,7 +329,7 @@ const headerTitle = computed(() => {
 
     <!-- Scrollable Content Area -->
     <div class="dashboard-content custom-scrollbar">
-      <div v-if="data.moduleGroups.length > 0 || (viewMode === 'workers' && store.settings.useHQ)">
+      <div v-if="hasDashboardData">
         <!-- Summary Group -->
         <StationModuleDetail 
           v-if="viewMode !== 'time'"
@@ -359,7 +363,7 @@ const headerTitle = computed(() => {
     </div>
 
     <!-- Footer with Controls -->
-    <div class="dashboard-footer" v-if="viewMode === 'materials' || viewMode === 'workers' || viewMode === 'volume'">
+    <div class="dashboard-footer" v-if="hasDashboardData && (viewMode === 'materials' || viewMode === 'workers' || viewMode === 'volume')">
       <div v-if="viewMode === 'materials'" class="simulation-controls">
         <PriceSlider 
           v-model="buildPriceMultiplier" 
