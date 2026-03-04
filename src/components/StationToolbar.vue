@@ -8,9 +8,10 @@ import LanguageSelector from './LanguageSelector.vue'
 import MissingTranslate from './MissingTranslate.vue'
 import LoadPlanModal from './LoadPlanModal.vue'
 import LoadFlowPlanModal from './LoadFlowPlanModal.vue'
-import ImportPlanModal from './ImportPlanModal.vue'
 import SmartSaveDialog from './SmartSaveDialog.vue'
 import LoadShipBlueprintModal from './LoadShipBlueprintModal.vue'
+import StorageImportWizard from './StorageImportWizard.vue'
+import StorageExportWizard from './StorageExportWizard.vue'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useTitleEditor } from '@/composables/useTitleEditor'
@@ -25,7 +26,8 @@ const { translateShip } = useX4I18n()
 const showLoadModal = ref(false)
 const showLoadFlowModal = ref(false)
 const showLoadBlueprintModal = ref(false)
-const showImportModal = ref(false)
+const showImportWizard = ref(false)
+const showExportWizard = ref(false)
 const smartDialog = reactive({
   isOpen: false,
   intent: 'NEW' as 'NEW' | 'SAVE_AS'
@@ -263,6 +265,10 @@ const handleSmartDialogSecondary = () => {
   }
   smartDialog.isOpen = false
 }
+
+const handleExport = () => {
+  showExportWizard.value = true
+}
 </script>
 
 <template>
@@ -303,16 +309,16 @@ const handleSmartDialogSecondary = () => {
         </svg>
         <span>{{ t('menu.load') }}</span>
       </button>
-      <button class="btn-tool btn-gray">
+      <button class="btn-tool btn-gray" data-testid="toolbar-export-btn" @click="handleExport">
         <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
           <polyline points="16 6 12 2 8 6" />
           <line x1="12" x2="12" y1="2" y2="15" />
         </svg>
-        <span>{{ t('menu.share') }}</span>
+        <span>{{ t('menu.export') }}</span>
       </button>
-      <button class="btn-tool btn-amber" @click="showImportModal = true">
+      <button class="btn-tool btn-amber" data-testid="toolbar-import-btn" @click="showImportWizard = true">
         <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
@@ -389,8 +395,8 @@ const handleSmartDialogSecondary = () => {
     <LoadPlanModal :isOpen="showLoadModal" @close="showLoadModal = false" />
     <LoadFlowPlanModal :isOpen="showLoadFlowModal" @close="showLoadFlowModal = false" />
     <LoadShipBlueprintModal :isOpen="showLoadBlueprintModal" @close="showLoadBlueprintModal = false" />
-
-    <ImportPlanModal :isOpen="showImportModal" @close="showImportModal = false" />
+    <StorageImportWizard :isOpen="showImportWizard" @close="showImportWizard = false" />
+    <StorageExportWizard :isOpen="showExportWizard" @close="showExportWizard = false" />
 
     <SmartSaveDialog
       :isOpen="smartDialog.isOpen"
