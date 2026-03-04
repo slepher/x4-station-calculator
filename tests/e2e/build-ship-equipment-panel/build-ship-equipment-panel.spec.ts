@@ -610,10 +610,10 @@ test.describe('build-ship-equipment-panel', () => {
     const panel = page.locator('[data-testid="ship-build-panel-equipment"]')
     await expect(panel).toBeVisible()
     // 检查是否存在青色进度条（基础部分）
-    const neutralBar = panel.locator('.stats-bar-neutral')
+    const neutralBar = panel.locator('.metric-bar-neutral')
     await expect(neutralBar.first()).toBeVisible()
     // 检查是否存在蓝色进度条（增益部分）
-    const positiveBar = panel.locator('.stats-bar-positive')
+    const positiveBar = panel.locator('.metric-bar-positive')
     await expect(positiveBar.first()).toBeVisible()
   })
 
@@ -627,10 +627,10 @@ test.describe('build-ship-equipment-panel', () => {
     const panel = page.locator('[data-testid="ship-build-panel-equipment"]')
     await expect(panel).toBeVisible()
     // 检查是否存在青色进度条（基础部分）
-    const neutralBar = panel.locator('.stats-bar-neutral')
+    const neutralBar = panel.locator('.metric-bar-neutral')
     await expect(neutralBar.first()).toBeVisible()
     // 检查是否存在粉色进度条（减益部分）
-    const negativeBar = panel.locator('.stats-bar-negative')
+    const negativeBar = panel.locator('.metric-bar-negative')
     await expect(negativeBar.first()).toBeVisible()
   })
 
@@ -643,11 +643,11 @@ test.describe('build-ship-equipment-panel', () => {
     const panel = page.locator('[data-testid="ship-build-panel-equipment"]')
     await expect(panel).toBeVisible()
     // 检查是否存在青色进度条（diff = 0 时只有中性）
-    const neutralBar = panel.locator('.stats-bar-neutral')
+    const neutralBar = panel.locator('.metric-bar-neutral')
     await expect(neutralBar.first()).toBeVisible()
     // 确保没有增益/减益进度条（diff = 0 时不显示）
-    const positiveBar = panel.locator('.stats-bar-positive')
-    const negativeBar = panel.locator('.stats-bar-negative')
+    const positiveBar = panel.locator('.metric-bar-positive')
+    const negativeBar = panel.locator('.metric-bar-negative')
     expect(await positiveBar.count()).toBe(0)
     expect(await negativeBar.count()).toBe(0)
   })

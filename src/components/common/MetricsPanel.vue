@@ -124,7 +124,7 @@ const labelText = (labelKey: string) => labelKey
 }
 
 .metrics-panel-content {
-  @apply p-4 bg-slate-900/30 border border-slate-800/80 rounded-lg m-4;
+  @apply p-2 bg-slate-900/30 rounded-lg m-2;
 }
 
 .metrics-grid {
