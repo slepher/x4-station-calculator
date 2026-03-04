@@ -1,26 +1,19 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useEmpireStore } from '@/store/useEmpireStore'
-import { useGameDataStore } from '@/store/useGameDataStore'
-import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useStationStore } from '@/store/useStationStore'
-import { useStatusStore } from '@/store/useStatusStore'
-import { buildEmpireImportTargets, buildStationImportPayload, type LogicFlowImportWarning } from '@/store/logic/logicFlowImport'
-import { getLogicFlowGroupDisplayName } from '@/store/logic/logicFlowGroupName'
 import { useI18n } from 'vue-i18n'
 import type { StationType } from '@/types/x4'
 import X4NumberInput from '@/components/common/X4NumberInput.vue'
-import LogicFlowImportModal from './LogicFlowImportModal.vue'
-import LogicFlowImportWarningModal from './LogicFlowImportWarningModal.vue'
-import StationImportConfirmDialog from './StationImportConfirmDialog.vue'
-import SmartSaveDialog from './SmartSaveDialog.vue'
 
 const { t } = useI18n()
 const empireStore = useEmpireStore()
-const gameDataStore = useGameDataStore()
-const logicFlowStore = useLogicFlowStore()
 const stationStore = useStationStore()
-const statusStore = useStatusStore()
+const emit = defineEmits<{
+  (e: 'open-import', payload?: {
+    initialTab?: 'logic-flow' | 'game-blueprint' | 'x4-station'
+  }): void
+}>()
 
 // --- 状态判断 ---
 const isOverview = computed(() => empireStore.activeStationId === null)
@@ -113,141 +106,10 @@ const races = computed(() => [
   { value: 'split', label: t('toolbar.races.split') }
 ])
 
-const showImportSelector = ref(false)
-const showStationImportConfirm = ref(false)
-const showEmpireImportConfirm = ref(false)
-const showWarningModal = ref(false)
-const importMode = ref<'station' | 'empire'>('station')
-const pendingImportSelection = ref<{ planId: string; groupId?: string } | null>(null)
-const pendingStationGroupName = ref('')
-const warningSummary = ref<LogicFlowImportWarning[]>([])
-
-const openLogicFlowImport = (mode: 'station' | 'empire') => {
-  importMode.value = mode
-  pendingImportSelection.value = null
-  pendingStationGroupName.value = ''
-  showImportSelector.value = true
-}
-
-const shouldConfirmBeforeEmpireImport = () => {
-  return empireStore.shouldConfirmBeforeEmpireReset()
-}
-
-const resetEmpireForImport = () => {
-  empireStore.resetEmpireWithDefaultName(t('menu.default_empire_name'))
-}
-
-const getSelectedPlan = () => {
-  const selection = pendingImportSelection.value
-  if (!selection) return null
-  return logicFlowStore.savedPlans.list.find((plan) => plan.id === selection.planId) || null
-}
-
-const applyImportPayloadToStation = (stationId: string, payload: { plannedModules: { id: string; count: number }[]; lockedWares: string[] }) => {
-  const station = empireStore.getStationById(stationId)
-  if (!station) return
-  station.modules = payload.plannedModules.map((module) => ({ ...module }))
-  station.lockedWares = [...payload.lockedWares]
-  station.warePriority = {}
-  station.lastUpdated = Date.now()
-  empireStore.refreshStationFlowCache(station.id)
-}
-
-const executeStationImport = (mode: 'new' | 'overwrite') => {
-  const plan = getSelectedPlan()
-  const selection = pendingImportSelection.value
-  if (!plan || !selection?.groupId) return
-
-  const group = plan.groups.find((item) => item.id === selection.groupId)
-  if (!group) return
-
-  const payload = buildStationImportPayload(group, gameDataStore.waresMap, gameDataStore.getWareDisplayName)
-  if (payload.manualModuleCount === 0) {
-    statusStore.pushMessage('warning', 'system', t('logicFlowImport.error_empty_group'))
-    showStationImportConfirm.value = false
-    return
-  }
-
-  if (mode === 'overwrite') {
-    const stationId = empireStore.activeStation?.id
-    if (!stationId) {
-      statusStore.pushMessage('warning', 'system', t('logicFlowImport.error_no_active_station'))
-      showStationImportConfirm.value = false
-      return
-    }
-    applyImportPayloadToStation(stationId, payload)
-  } else {
-    const newStation = empireStore.createStation(payload.groupName || t('empire.new_station_name'))
-    if (!newStation) {
-      showStationImportConfirm.value = false
-      return
-    }
-    applyImportPayloadToStation(newStation.id, payload)
-  }
-
-  warningSummary.value = payload.warnings
-  showWarningModal.value = payload.warnings.length > 0
-  showStationImportConfirm.value = false
-  pendingImportSelection.value = null
-}
-
-const executeEmpireImport = () => {
-  const plan = getSelectedPlan()
-  if (!plan) return
-
-  const result = buildEmpireImportTargets(plan.groups, gameDataStore.waresMap, gameDataStore.getWareDisplayName)
-  if (result.targets.length === 0) {
-    statusStore.pushMessage('warning', 'system', t('logicFlowImport.error_empty_plan'))
-    return
-  }
-
-  result.targets.forEach((target) => {
-    const station = empireStore.createStation(target.groupName || t('empire.new_station_name'))
-    if (!station) return
-    applyImportPayloadToStation(station.id, target)
+const handleOpenImport = () => {
+  emit('open-import', {
+    initialTab: 'logic-flow'
   })
-
-  warningSummary.value = result.warnings
-  showWarningModal.value = result.warnings.length > 0
-  pendingImportSelection.value = null
-}
-
-const handleImportSelected = (selection: { planId: string; groupId?: string }) => {
-  pendingImportSelection.value = selection
-  showImportSelector.value = false
-
-  if (importMode.value === 'station') {
-    const plan = getSelectedPlan()
-    const group = plan?.groups.find((item) => item.id === selection.groupId)
-    pendingStationGroupName.value = group
-      ? getLogicFlowGroupDisplayName(group, gameDataStore.getWareDisplayName)
-      : ''
-    showStationImportConfirm.value = true
-    return
-  }
-
-  if (shouldConfirmBeforeEmpireImport()) {
-    showEmpireImportConfirm.value = true
-    return
-  }
-
-  resetEmpireForImport()
-  executeEmpireImport()
-}
-
-const handleEmpireSaveAndImport = () => {
-  showEmpireImportConfirm.value = false
-  if (empireStore.activeEmpire) {
-    empireStore.saveEmpire()
-  }
-  resetEmpireForImport()
-  executeEmpireImport()
-}
-
-const handleEmpireDiscardAndImport = () => {
-  showEmpireImportConfirm.value = false
-  resetEmpireForImport()
-  executeEmpireImport()
 }
 </script>
 
@@ -381,42 +243,11 @@ const handleEmpireDiscardAndImport = () => {
         class="icon-btn"
         :title="t('logicFlowImport.entry_title')"
         :data-testid="isOverview ? 'logicflow-import-entry-empire' : 'logicflow-import-entry-station'"
-        @click="openLogicFlowImport(isOverview ? 'empire' : 'station')"
+        @click="handleOpenImport"
       >
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
       </button>
     </div>
-
-    <LogicFlowImportModal
-      :isOpen="showImportSelector"
-      :mode="importMode"
-      @close="showImportSelector = false"
-      @confirm="handleImportSelected"
-    />
-
-    <StationImportConfirmDialog
-      :isOpen="showStationImportConfirm"
-      :groupName="pendingStationGroupName"
-      @close="showStationImportConfirm = false"
-      @confirm-new-station="executeStationImport('new')"
-      @confirm-overwrite="executeStationImport('overwrite')"
-    />
-
-    <SmartSaveDialog
-      :isOpen="showEmpireImportConfirm"
-      intent="NEW"
-      storeType="station"
-      mode="import"
-      @confirm-primary="handleEmpireSaveAndImport"
-      @confirm-secondary="handleEmpireDiscardAndImport"
-      @close="showEmpireImportConfirm = false"
-    />
-
-    <LogicFlowImportWarningModal
-      :isOpen="showWarningModal"
-      :warnings="warningSummary"
-      @close="showWarningModal = false"
-    />
   </div>
 </template>
 

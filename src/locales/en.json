@@ -274,7 +274,7 @@
     "blueprint_action_new_station": "New Station",
     "x4_station_description": "Paste x4-game station share content to restore module configuration.",
     "x4_station_placeholder": "https://x4-game.com/#/station-calculator?l=@$module-module_gen_prod_water_01,count:1;...",
-    "x4_station_failed": "Import failed. Please check x4-station JSON format."
+    "x4_station_failed": "Import failed. Please check x4-station URL format."
   },
   "planning": {
     "module_list": "Station Modules",

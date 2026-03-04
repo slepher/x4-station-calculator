@@ -47,6 +47,7 @@ const blueprintFileName = ref('')
 const blueprintStationName = ref('')
 const blueprintModules = ref<BlueprintModule[]>([])
 const blueprintModuleTotal = ref(0)
+const x4StationPlaceholder = 'https://x4-game.com/#/station-calculator?l=@$module-module_gen_prod_water_01,count:1;...'
 const blueprintInputRef = ref<HTMLInputElement | null>(null)
 const showBlueprintStrategyDialog = ref(false)
 
@@ -130,8 +131,7 @@ const handleImportX4StationString = () => {
     x4StationContent.value = ''
     x4StationHasError.value = false
     emit('close')
-  } catch (e) {
-    console.error(e)
+  } catch {
     x4StationHasError.value = true
   }
 }
@@ -482,7 +482,7 @@ const handleBlueprintActionNew = () => {
             v-model="x4StationContent"
             class="w-full h-64 bg-slate-900/50 border border-slate-600 rounded p-4 text-xs font-mono text-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 outline-none resize-none custom-scrollbar"
             data-testid="import-x4-station-input"
-            :placeholder="t('importView.x4_station_placeholder')"
+            :placeholder="x4StationPlaceholder"
           ></textarea>
 
           <div v-if="x4StationHasError" class="text-red-400 text-sm flex items-center gap-2">

@@ -1,0 +1,18 @@
+# x4-import-move 实现任务
+
+- [x] 抽离顶部视图切换按钮为独立组件，并接入 StationToolbar
+- [x] 将导入 modal 改造为统一 3-tab 结构（logic-flow / 游戏蓝图 / x4-station 字符串）
+- [x] 保持原入口按钮不变，仅改为进入新导入流程
+- [x] 复用现有 logic-flow 导入链路（选择/确认/warning）
+- [x] 补齐 i18n 文案（en / zh-CN）
+- [x] 添加/调整稳定 data-testid
+- [x] 运行构建与关键测试，记录结果
+- [x] 去除 logic-flow 目标手动切换入口，改为按当前页面自动判定导入目标
+- [x] 游戏蓝图导入改为 XML 文件上传，解析后展示模块数量并确认导入
+- [x] 实现空间站非空时的蓝图导入策略弹窗（覆盖/添加/新空间站）
+- [x] 实现新空间站命名规则（XML 名优先，否则文件名前 20 字）
+- [x] 更新测试与验证结果（覆盖新增导入策略）
+- [x] 将 logic-flow 导入主体内嵌到 ImportPlanModal 的 logic-flow Tab（不再按钮弹旧 modal）
+- [x] 抽出并复用 `LogicFlowImportBody`，保留 `LogicFlowImportModal` 壳层兼容
+- [x] x4-station 导入改为仅支持 x4-game 分享串格式
+- [x] x4-station 导入新建站命名对齐“新建空间站”按钮逻辑（`empire.new_station_name`）

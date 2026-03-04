@@ -2,6 +2,7 @@
 import { useStationStore } from '@/store/useStationStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { reactive } from 'vue'
 import StationPlanningPanel from './StationPlanningPanel.vue'
 import StationDashboard from './StationDashboard.vue'
 import StationToolbar from './StationToolbar.vue'
@@ -13,6 +14,7 @@ import LogicFlowCandidateZone from './LogicFlowCandidateZone.vue'
 import LogicFlowPlanningZone from './LogicFlowPlanningZone.vue'
 import StatusMonitor from './StatusMonitor.vue'
 import ShipBuildView from './ShipBuildView.vue'
+import ImportPlanModal from './ImportPlanModal.vue'
 
 const store = useStationStore()
 const empireStore = useEmpireStore()
@@ -25,17 +27,32 @@ watchEffect(() => {
 
 const isProductionView = computed(() => shipBuildStore.activeView === 'production')
 const isShipBuildView = computed(() => shipBuildStore.activeView === 'ship-build')
+
+const importModalState = reactive<{
+  isOpen: boolean
+  initialTab: 'logic-flow' | 'game-blueprint' | 'x4-station'
+}>({
+  isOpen: false,
+  initialTab: 'game-blueprint'
+})
+
+const openImportModal = (payload?: {
+  initialTab?: 'logic-flow' | 'game-blueprint' | 'x4-station'
+}) => {
+  importModalState.initialTab = payload?.initialTab || 'game-blueprint'
+  importModalState.isOpen = true
+}
 </script>
 
 <template>
   <div class="station-workbench w-full max-w-[1600px] mx-auto p-4 text-sm relative min-h-screen">
     <div id="debug-ready-marker" v-if="store.isReady" class="hidden">READY</div>
 
-    <StationToolbar />
+    <StationToolbar @open-import="openImportModal" />
     
     <template v-if="isProductionView">
       <StationTabBar />
-      <ContextToolbar />
+      <ContextToolbar @open-import="openImportModal" />
       
       <div v-if="empireStore.activeStationId === null" class="main-layout mt-6">
         <div class="col-span-12 lg:col-span-3">
@@ -80,6 +97,12 @@ const isShipBuildView = computed(() => shipBuildStore.activeView === 'ship-build
     </div>
 
     <StatusMonitor />
+
+    <ImportPlanModal
+      :isOpen="importModalState.isOpen"
+      :initialTab="importModalState.initialTab"
+      @close="importModalState.isOpen = false"
+    />
   </div>
 </template>
 

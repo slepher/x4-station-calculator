@@ -276,7 +276,7 @@
     "blueprint_action_new_station": "新空间站",
     "x4_station_description": "粘贴 x4-game 空间站分享内容以恢复模块配置。",
     "x4_station_placeholder": "https://x4-game.com/#/station-calculator?l=@$module-module_gen_prod_water_01,count:1;...",
-    "x4_station_failed": "导入失败，请检查 x4-station JSON 格式。"
+    "x4_station_failed": "导入失败，请检查 x4-station URL 格式。"
   },
   "planning": {
     "module_list": "模块列表",

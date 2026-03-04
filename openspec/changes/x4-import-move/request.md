@@ -1,0 +1,65 @@
+# x4-import-move 需求说明
+
+## 目标
+将现有导入相关能力迁移到统一的 3-tab 导入视图中，并将 StationToolbar 顶部视图切换按钮抽成可复用组件，保持入口路径不变。
+
+## 已确认方案（审核重点）
+- 保留原有入口按钮位置与可见性：
+  - StationToolbar 的 `Import` 按钮仍在原位置。
+  - ContextToolbar 的 logic-flow 导入按钮仍在原位置，`data-testid` 保持原值。
+- 引入统一导入 modal：
+  - Tab1: 导入 logic-flow
+  - Tab2: 导入游戏蓝图
+  - Tab3: 导入 x4-station 字符串
+- logic-flow 导入目标自动判定：
+  - 不提供“当前分站/整个帝国”手动切换入口。
+  - 按当前页面自动决定导入目标，逻辑与原行为一致。
+- logic-flow 导入展示方式：
+  - 不通过按钮弹出旧 flow 导入弹窗。
+  - 直接将 flow 导入 body 内嵌到当前导入视图的 logic-flow Tab 中。
+- 3-tab 样式与位置要求：
+  - 3-tab 必须复用顶部抽取组件（TopViewSwitch）风格，不使用 ViewTabUI 风格。
+  - 3-tab 放在导入 modal 标题栏同一行并靠右排布。
+- logic-flow 导入复用现有流程与组件逻辑（选择/确认/warning），并保留 Vue 模块化拆分。
+- 游戏蓝图导入改造（文件上传）：
+  - 使用上传 XML 文件的方式导入。
+  - 上传并解析后显示模块数量，再由用户确认导入。
+  - 若当前在帝国界面：自动新建空间站并导入。
+  - 若当前在空间站界面且当前空间站不为空：弹窗提供 `覆盖 / 添加 / 新空间站` 三个选项。
+  - 新空间站命名规则：
+    - 优先使用 XML 自带名字；
+    - 若 XML 无名字，使用文件名（去扩展名）并截取前 20 字符。
+- x4-station 字符串导入规则：
+  - 仅支持 x4-game 分享链接/串格式（`l=@$module-...`），不再支持 JSON。
+  - 当导入过程需要新建空间站时，命名逻辑与“新建空间站”按钮一致（使用 `empire.new_station_name`）。
+- 还原要求：
+  - 恢复空间站/帝国导入子页面的既有视觉风格与交互，不做额外视觉改造。
+- 顶部 production/flow/ship-build 切换按钮从 `StationToolbar.vue` 抽离为独立组件，交互/样式/文案保持一致，并补稳定 testid。
+- i18n 需补齐中英文新增文案。
+
+## 边界
+### In Scope
+- `src/components/StationToolbar.vue`
+- `src/components/ContextToolbar.vue`
+- `src/components/ImportPlanModal.vue`
+- `src/components/StationWorkbench.vue`
+- 新增通用组件（顶部切换）
+- `src/locales/en.json`、`src/locales/zh-CN.json`
+
+### Out of Scope
+- `db.json` 导入相关能力
+- 与本 change 无关的存储结构改造
+- 无关业务模块
+
+## 验收标准（DoD）
+- 顶部视图切换已抽成独立组件，并在原位置工作正常。
+- 导入视图是 3-tab，三个导入类型均可切换并可用。
+- 原导入入口按钮不移动、不隐藏，点击后进入新的导入流程。
+- logic-flow 导入按当前页面自动匹配目标，不提供额外目标切换入口。
+- logic-flow 导入在 Tab 内直接内嵌展示，不再通过按钮弹旧 modal。
+- 游戏蓝图文件上传后可显示模块数量，并按上下文执行导入策略（含覆盖/添加/新空间站）。
+- x4-station 仅接受 x4-game 分享格式，且新建站命名遵循“新建空间站”按钮同逻辑。
+- 关键路径无回归（至少通过 build 与关键测试验证）。
+
+## 未决项
+无
