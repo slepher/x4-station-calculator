@@ -1,0 +1,2 @@
+export const CURRENT_EMPIRE_VERSION = 3
+export const CURRENT_FLOW_VERSION = 2

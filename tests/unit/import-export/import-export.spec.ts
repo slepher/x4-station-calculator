@@ -9,12 +9,13 @@ import {
   normalizeImportPayload,
   type ImportModuleKey
 } from '@/store/logic/importExport'
+import { CURRENT_EMPIRE_VERSION, CURRENT_FLOW_VERSION } from '@/store/logic/storageVersions'
 import type { SavedEmpiresState } from '@/store/useEmpireStore'
 import type { SavedFlowPlansState, SavedShipBlueprintsState } from '@/types/x4'
 
 function createEmpireState(): SavedEmpiresState {
   return {
-    version: 2,
+    version: CURRENT_EMPIRE_VERSION,
     activeId: 'empire-a',
     activeStationId: 'station-a',
     list: [
@@ -59,7 +60,7 @@ function createEmpireState(): SavedEmpiresState {
 
 function createFlowState(): SavedFlowPlansState {
   return {
-    version: 1,
+    version: CURRENT_FLOW_VERSION,
     activeId: 'flow-a',
     list: [
       {
@@ -157,7 +158,16 @@ function createStores(overrides?: {
     loadBlueprint: vi.fn()
   }
 
-  return { empireStore, logicFlowStore, shipBuildStore }
+  const gameDataStore = {
+    modulesMap: {
+      m1: { id: 'm1', macroId: 'm1_macro', wareId: 'm1' }
+    },
+    modulesByMacroId: {
+      m1_macro: { id: 'm1', macroId: 'm1_macro', wareId: 'm1' }
+    }
+  } as any
+
+  return { empireStore, logicFlowStore, shipBuildStore, gameDataStore }
 }
 
 function allSelected(): Record<ImportModuleKey, boolean> {
@@ -195,7 +205,7 @@ describe('import-export logic', () => {
 
   it('1.2 overwrite import applies all selected modules', () => {
     // 1.2.1 overwrite 模式写入 empire/flow/ship 并刷新对应 store #期望: ["applied"]
-    const { empireStore, logicFlowStore, shipBuildStore } = createStores()
+    const { empireStore, logicFlowStore, shipBuildStore, gameDataStore } = createStores()
 
     const incomingEmpire = createEmpireState()
     incomingEmpire.activeId = 'imp-empire'
@@ -220,6 +230,7 @@ describe('import-export logic', () => {
         x4_logic_flow_plans: incomingFlow,
         x4_ship_blueprints: incomingShip
       }),
+      gameDataStore,
       empireStore,
       logicFlowStore,
       shipBuildStore
@@ -236,7 +247,7 @@ describe('import-export logic', () => {
 
   it('1.3 incremental import keeps flow activeId when current is dirty', () => {
     // 1.3.1 incremental 且 flow isDirty=true 时保持现有 activeId #期望: ["unchanged"]
-    const { empireStore, logicFlowStore, shipBuildStore } = createStores({ flowDirty: true })
+    const { empireStore, logicFlowStore, shipBuildStore, gameDataStore } = createStores({ flowDirty: true })
 
     const incomingFlow = createFlowState()
     incomingFlow.activeId = 'flow-incoming'
@@ -250,6 +261,7 @@ describe('import-export logic', () => {
       },
       currentView: 'flow',
       payload: normalizeImportPayload({ x4_logic_flow_plans: incomingFlow }),
+      gameDataStore,
       empireStore,
       logicFlowStore,
       shipBuildStore
@@ -262,7 +274,7 @@ describe('import-export logic', () => {
 
   it('1.4 incremental ship import regenerates ids to avoid collisions', () => {
     // 1.4.1 incremental 导入 ship 时冲突 id 重生且无冲突 #期望: ["no-id-collision"]
-    const { empireStore, logicFlowStore, shipBuildStore } = createStores()
+    const { empireStore, logicFlowStore, shipBuildStore, gameDataStore } = createStores()
 
     const incomingShip = createShipState()
     incomingShip.activeId = 'bp-a'
@@ -277,6 +289,7 @@ describe('import-export logic', () => {
       },
       currentView: 'ship-build',
       payload: normalizeImportPayload({ x4_ship_blueprints: incomingShip }),
+      gameDataStore,
       empireStore,
       logicFlowStore,
       shipBuildStore
@@ -294,6 +307,8 @@ describe('import-export logic', () => {
     const payload = buildExportPayload(createEmpireState(), createFlowState(), createShipState())
     expect(payload.format).toBe('x4-import-export')
     expect(payload.version).toBe(1)
+    expect(payload.data.x4_empire_data.version).toBe(CURRENT_EMPIRE_VERSION)
+    expect(payload.data.x4_logic_flow_plans.version).toBe(CURRENT_FLOW_VERSION)
     expect(payload.data.x4_empire_data.list.length).toBe(1)
     expect(payload.data.x4_logic_flow_plans.list.length).toBe(1)
     expect(payload.data.x4_ship_blueprints.list.length).toBe(1)

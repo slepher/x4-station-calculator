@@ -84,7 +84,7 @@ type LogicFlowPlan = {
 }
 
 type SavedFlowPlansState = {
-  version: 1
+  version: number
   activeId: string | null
   list: LogicFlowPlan[]
 }
@@ -365,7 +365,7 @@ const buildLogicFlowState = (
   })
 
   return {
-    version: 1,
+    version: 2,
     activeId: plans[0]?.id ?? null,
     list: plans
   }
@@ -396,7 +396,7 @@ const buildEmpireState = (seed: SeedEmpire, now: number): SavedEmpiresState => {
   })
 
   return {
-    version: 2,
+    version: 3,
     activeId: empires[0]?.id ?? null,
     activeStationId: empires[0]?.stations[0]?.id ?? null,
     list: empires

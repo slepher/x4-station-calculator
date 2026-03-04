@@ -1,6 +1,9 @@
 import type {
+  SavedEmpiresState,
   SavedFlowPlansState,
   SavedShipBlueprintsState,
+  V1StorageState,
+  X4Module,
   EmpirePlan,
   StationPlan,
   LogicFlowPlan,
@@ -8,7 +11,8 @@ import type {
   SavedFlowNode,
   ShipBlueprint
 } from '@/types/x4'
-import type { SavedEmpiresState } from '@/store/useEmpireStore'
+import { migrateEmpireStateToCurrent, migrateFlowStateToCurrent } from './stateMigrations'
+import { CURRENT_EMPIRE_VERSION, CURRENT_FLOW_VERSION } from './storageVersions'
 
 export type ImportMode = 'overwrite' | 'incremental'
 export type ImportModuleKey = 'x4_empire_data' | 'x4_logic_flow_plans' | 'x4_ship_blueprints'
@@ -37,6 +41,7 @@ export interface ImportApplyOptions {
   selectedModules: Partial<Record<ImportModuleKey, boolean>>
   currentView: 'production' | 'flow' | 'ship-build'
   payload: NormalizedImportPayload
+  gameDataStore: GameDataStoreLike
   empireStore: EmpireStoreLike
   logicFlowStore: LogicFlowStoreLike
   shipBuildStore: ShipBuildStoreLike
@@ -71,6 +76,11 @@ interface ShipBuildStoreLike {
   loadBlueprint: (id: string) => void
 }
 
+interface GameDataStoreLike {
+  modulesMap: Record<string, X4Module>
+  modulesByMacroId?: Record<string, X4Module>
+}
+
 function deepClone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value))
 }
@@ -91,24 +101,38 @@ function isShipState(value: unknown): value is SavedShipBlueprintsState {
   return isObject(value) && Array.isArray(value.list)
 }
 
-function coerceEmpireState(value: unknown): SavedEmpiresState | null {
+type CoercedEmpireState = SavedEmpiresState | V1StorageState
+
+function coerceEmpireState(value: unknown): CoercedEmpireState | null {
   if (!isEmpireState(value)) return null
-  const raw = value as unknown as SavedEmpiresState
+
+  const raw = value as unknown as Record<string, unknown>
+  const version = typeof raw.version === 'number' ? raw.version : 1
+  const list = deepClone((raw.list as unknown[]) || [])
+
+  if (version <= 1) {
+    return {
+      version: 1,
+      activeId: typeof raw.activeId === 'string' ? raw.activeId : null,
+      list: list as V1StorageState['list']
+    }
+  }
+
   return {
-    version: typeof raw.version === 'number' ? raw.version : 2,
-    activeId: raw.activeId || null,
-    activeStationId: raw.activeStationId || null,
-    list: deepClone(raw.list || [])
+    version,
+    activeId: typeof raw.activeId === 'string' ? raw.activeId : null,
+    activeStationId: typeof raw.activeStationId === 'string' ? raw.activeStationId : null,
+    list: list as SavedEmpiresState['list']
   }
 }
 
 function coerceFlowState(value: unknown): SavedFlowPlansState | null {
   if (!isFlowState(value)) return null
-  const raw = value as unknown as SavedFlowPlansState
+  const raw = value as unknown as Record<string, unknown>
   return {
-    version: 1,
-    activeId: raw.activeId || null,
-    list: deepClone(raw.list || [])
+    version: typeof raw.version === 'number' ? raw.version : 1,
+    activeId: typeof raw.activeId === 'string' ? raw.activeId : null,
+    list: deepClone((raw.list as unknown[]) || []) as SavedFlowPlansState['list']
   }
 }
 
@@ -122,30 +146,18 @@ function coerceShipState(value: unknown): SavedShipBlueprintsState | null {
   }
 }
 
-function migrateEmpireState(input: SavedEmpiresState): SavedEmpiresState {
-  const cloned = deepClone(input)
-
-  // Existing app migration rule: accept v1/v2; normalize to v2 shape.
-  if (cloned.version !== 2) {
-    cloned.version = 2
-  }
-
-  cloned.list = (cloned.list || []).map((empire) => ({
-    ...empire,
-    stations: (empire.stations || []).map((station) => ({
-      ...station,
-      type: station.type || 'industrial',
-      count: station.count ?? 1,
-      lockedWares: station.lockedWares || [],
-      warePriority: station.warePriority || {}
-    }))
-  }))
-
-  return cloned
+function migrateEmpireState(input: CoercedEmpireState, gameDataStore: GameDataStoreLike): { state: SavedEmpiresState; warnings: string[] } {
+  return migrateEmpireStateToCurrent(input, {
+    modulesMap: gameDataStore.modulesMap,
+    modulesByMacroId: gameDataStore.modulesByMacroId
+  })
 }
 
-function migrateFlowState(input: SavedFlowPlansState): SavedFlowPlansState {
-  return deepClone(input)
+function migrateFlowState(input: SavedFlowPlansState, gameDataStore: GameDataStoreLike): { state: SavedFlowPlansState; warnings: string[] } {
+  return migrateFlowStateToCurrent(input, {
+    modulesMap: gameDataStore.modulesMap,
+    modulesByMacroId: gameDataStore.modulesByMacroId
+  })
 }
 
 function migrateShipState(input: SavedShipBlueprintsState): SavedShipBlueprintsState {
@@ -182,7 +194,7 @@ function remapEmpireIds(input: SavedEmpiresState): { state: SavedEmpiresState; a
 
   return {
     state: {
-      version: 2,
+      version: CURRENT_EMPIRE_VERSION,
       activeId: mappedActiveEmpireId,
       activeStationId: mappedActiveStationId,
       list
@@ -227,7 +239,7 @@ function remapFlowIds(input: SavedFlowPlansState): { state: SavedFlowPlansState;
 
   return {
     state: {
-      version: 1,
+      version: CURRENT_FLOW_VERSION,
       activeId: mappedActive,
       list
     },
@@ -288,7 +300,7 @@ function isShipActiveEmpty(state: SavedShipBlueprintsState): boolean {
 
 function mergeEmpireState(current: SavedEmpiresState, incoming: SavedEmpiresState): SavedEmpiresState {
   return {
-    version: 2,
+    version: CURRENT_EMPIRE_VERSION,
     activeId: current.activeId,
     activeStationId: current.activeStationId,
     list: [...deepClone(current.list), ...deepClone(incoming.list)]
@@ -297,7 +309,7 @@ function mergeEmpireState(current: SavedEmpiresState, incoming: SavedEmpiresStat
 
 function mergeFlowState(current: SavedFlowPlansState, incoming: SavedFlowPlansState): SavedFlowPlansState {
   return {
-    version: 1,
+    version: CURRENT_FLOW_VERSION,
     activeId: current.activeId,
     list: [...deepClone(current.list), ...deepClone(incoming.list)]
   }
@@ -353,14 +365,31 @@ export function getModuleImportStats(payload: NormalizedImportPayload): ModuleIm
   return stats
 }
 
-export function buildExportPayload(empire: SavedEmpiresState, flow: SavedFlowPlansState, ship: SavedShipBlueprintsState) {
+export function buildExportPayload(
+  empire: SavedEmpiresState,
+  flow: SavedFlowPlansState,
+  ship: SavedShipBlueprintsState,
+  gameDataStore?: GameDataStoreLike
+) {
+  const lookup = gameDataStore || { modulesMap: {}, modulesByMacroId: {} }
+  const empireCoerced = coerceEmpireState(empire)
+  const flowCoerced = coerceFlowState(flow)
+  const migratedEmpire = empireCoerced ? migrateEmpireState(empireCoerced, lookup).state : {
+    ...deepClone(empire),
+    version: CURRENT_EMPIRE_VERSION
+  }
+  const migratedFlow = flowCoerced ? migrateFlowState(flowCoerced, lookup).state : {
+    ...deepClone(flow),
+    version: CURRENT_FLOW_VERSION
+  }
+
   return {
     format: 'x4-import-export',
     version: 1,
     exportedAt: new Date().toISOString(),
     data: {
-      [EMPIRE_KEY]: deepClone(empire),
-      [FLOW_KEY]: deepClone(flow),
+      [EMPIRE_KEY]: deepClone(migratedEmpire),
+      [FLOW_KEY]: deepClone(migratedFlow),
       [SHIP_KEY]: deepClone(ship)
     }
   }
@@ -383,7 +412,9 @@ function applyEmpireImport(options: ImportApplyOptions, warnings: string[]): boo
   const incomingRaw = coerceEmpireState(raw)
   if (!incomingRaw) return false
 
-  const migrated = migrateEmpireState(incomingRaw)
+  const migratedResult = migrateEmpireState(incomingRaw, options.gameDataStore)
+  warnings.push(...migratedResult.warnings)
+  const migrated = migratedResult.state
   const current = deepClone(options.empireStore.savedEmpires)
 
   let next: SavedEmpiresState
@@ -426,7 +457,9 @@ function applyFlowImport(options: ImportApplyOptions, warnings: string[]): boole
   const incomingRaw = coerceFlowState(raw)
   if (!incomingRaw) return false
 
-  const migrated = migrateFlowState(incomingRaw)
+  const migratedResult = migrateFlowState(incomingRaw, options.gameDataStore)
+  warnings.push(...migratedResult.warnings)
+  const migrated = migratedResult.state
   const current = deepClone(options.logicFlowStore.savedPlans)
 
   let next: SavedFlowPlansState

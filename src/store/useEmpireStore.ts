@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type {
   EmpirePlan,
+  SavedEmpiresState,
   StationPlan,
   StationType,
   V1StorageState,
@@ -12,7 +13,9 @@ import type {
 } from '@/types/x4'
 import { useGameDataStore } from './useGameDataStore'
 import { analyzeEmpireWareFlow } from './logic/analyzeEmpireWareFlow'
+import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
 import { stationStateMap, DEFAULT_STATION_SETTINGS, migrateStationSettings } from './state/StationStateMap'
+import { CURRENT_EMPIRE_VERSION } from './logic/storageVersions'
 
 const STORAGE_KEY = 'x4_empire_data'
 const V1_STORAGE_KEY = 'x4_station_data'
@@ -40,12 +43,7 @@ function createDefaultEmpire(name: string = 'New Empire'): EmpirePlan {
   }
 }
 
-export interface SavedEmpiresState {
-  version: number
-  activeId: string | null
-  activeStationId: string | null
-  list: EmpirePlan[]
-}
+export type { SavedEmpiresState } from '@/types/x4'
 
 export const useEmpireStore = defineStore('empire', () => {
   const gameData = useGameDataStore()
@@ -53,7 +51,7 @@ export const useEmpireStore = defineStore('empire', () => {
   const isReady = ref(false)
   const lastSavedSnapshot = ref<string>('')
 
-  const savedEmpires = ref<SavedEmpiresState>({ version: 2, activeId: null, activeStationId: null, list: [] })
+  const savedEmpires = ref<SavedEmpiresState>({ version: CURRENT_EMPIRE_VERSION, activeId: null, activeStationId: null, list: [] })
   const version = computed(() => savedEmpires.value.version)
   const empires = computed(() => savedEmpires.value.list)
   const activeEmpireId = computed(() => savedEmpires.value.activeId)
@@ -156,10 +154,20 @@ export const useEmpireStore = defineStore('empire', () => {
     lastSavedSnapshot.value = serializeEmpireForDirtyCheck()
   }
 
-  function loadData(data: SavedEmpiresState) {
-    savedEmpires.value = data
-    if (data.activeId) {
-      const empire = data.list.find(e => e.id === data.activeId)
+  function getModuleLookup() {
+    return {
+      modulesMap: gameData.modulesMap,
+      modulesByMacroId: gameData.modulesByMacroId
+    }
+  }
+
+  function loadData(data: SavedEmpiresState | V1StorageState) {
+    const migrated = migrateEmpireStateToCurrent(data, getModuleLookup())
+    migrated.warnings.forEach((warning) => console.warn('[EmpireStore][Migration]', warning))
+
+    savedEmpires.value = migrated.state
+    if (migrated.state.activeId) {
+      const empire = migrated.state.list.find(e => e.id === migrated.state.activeId)
       if (empire) {
         empire.stations.forEach(station => {
           if (station.count === null || station.count === undefined) {
@@ -172,8 +180,8 @@ export const useEmpireStore = defineStore('empire', () => {
         const sessionTabId = sessionStorage.getItem(SESSION_ACTIVE_STATION_KEY)
         if (sessionTabId && empire.stations.find(s => s.id === sessionTabId)) {
           activeStationId.value = sessionTabId
-        } else if (data.activeStationId && empire.stations.find(s => s.id === data.activeStationId)) {
-          activeStationId.value = data.activeStationId
+        } else if (migrated.state.activeStationId && empire.stations.find(s => s.id === migrated.state.activeStationId)) {
+          activeStationId.value = migrated.state.activeStationId
         } else {
           activeStationId.value = empire.stations[0]?.id || null
         }
@@ -379,24 +387,6 @@ export const useEmpireStore = defineStore('empire', () => {
     return createEmpire(defaultName)
   }
 
-  function migrateFromV1(v1Data: V1StorageState): SavedEmpiresState {
-    const list: EmpirePlan[] = v1Data.list.map(plan => ({
-      id: crypto.randomUUID(),
-      name: plan.name,
-      stations: [{
-        ...plan,
-        type: 'industrial' as StationType
-      }]
-    }))
-    
-    return {
-      version: 2,
-      activeId: list[0]?.id || null,
-      activeStationId: list[0]?.stations[0]?.id || null,
-      list
-    }
-  }
-
   async function initialize() {
     console.log('[EmpireStore] Initializing...')
     isReady.value = false
@@ -407,9 +397,10 @@ export const useEmpireStore = defineStore('empire', () => {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
         try {
-          const data = JSON.parse(stored) as SavedEmpiresState
-          if ((data.version === 2 || data.version === 1) && data.list) {
+          const data = JSON.parse(stored) as SavedEmpiresState | V1StorageState
+          if (data && Array.isArray((data as SavedEmpiresState).list)) {
             loadData(data)
+            saveToStorage()
             initializeAllStationCaches()
             isReady.value = true
             console.log('[EmpireStore] Loaded saved empires')
@@ -426,8 +417,7 @@ export const useEmpireStore = defineStore('empire', () => {
           const v1Data = JSON.parse(v1Stored) as V1StorageState
           if (v1Data.version === 1) {
             console.log('[EmpireStore] Migrating V1 data...')
-            const data = migrateFromV1(v1Data)
-            loadData(data)
+            loadData(v1Data)
             saveToStorage()
             localStorage.removeItem(V1_STORAGE_KEY)
             initializeAllStationCaches()

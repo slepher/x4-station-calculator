@@ -130,4 +130,21 @@ describe('x4-import-move unit mapping', () => {
     expect(consoleErrorSpy).not.toHaveBeenCalled()
     consoleErrorSpy.mockRestore()
   })
+
+  it('1.5 x4-station 非法输入不输出 console error', async () => {
+    // 1.5.1 挂载 `ImportPlanModal` 并切换到 `x4-station` tab
+    const wrapper = mountImportModal('x4-station')
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    // 1.5.2 输入 JSON 字符串执行导入并监听 `console.error`
+    await wrapper.get('[data-testid="top-view-btn-import-view-x4-station"]').trigger('click')
+    await wrapper.get('[data-testid="import-x4-station-input"]').setValue('{"invalid":true}')
+    await wrapper.get('[data-testid="import-view-action-import"]').trigger('click')
+
+    // 1.5.3 断言仅展示错误提示且未触发 `console.error` #期望: [true]
+    const hasErrorText = wrapper.text().includes('导入失败')
+    const noConsoleError = !consoleErrorSpy.mock.calls.length
+    expect(hasErrorText && noConsoleError).toBe(true)
+    consoleErrorSpy.mockRestore()
+  })
 })

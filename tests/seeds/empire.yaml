@@ -7,24 +7,24 @@ empires:
         lockedWares:
           - quantumtubes
         modules:
-          - id: prod_gen_claytronics_macro
+          - id: module_gen_prod_claytronics_01
             count: 6
-          - id: prod_gen_hullparts_macro
+          - id: module_gen_prod_hullparts_01
             count: 12
       - name: E1-S2
         settings:
           workforceAuto: true
           showEmpireGaps: true
         modules:
-          - id: prod_gen_quantumtubes_macro
+          - id: module_gen_prod_quantumtubes_01
             count: 4
       - name: E1-S3
         settings:
           workforceAuto: true
         modules:
-          - id: prod_arg_foodrations_macro
+          - id: module_arg_prod_foodrations_01
             count: 5
-          - id: prod_arg_medicalsupplies_macro
+          - id: module_arg_prod_medicalsupplies_01
             count: 9
   - name: Empire 2
     stations:
@@ -40,27 +40,27 @@ empires:
           - quantumtubes
           - scanningarrays
         modules:
-          - id: prod_gen_advancedelectronics_macro
+          - id: module_gen_prod_advancedelectronics_01
             count: 1
-          - id: prod_gen_antimatterconverters_macro
+          - id: module_gen_prod_antimatterconverters_01
             count: 1
-          - id: prod_gen_dronecomponents_macro
+          - id: module_gen_prod_dronecomponents_01
             count: 1
-          - id: prod_gen_fieldcoils_macro
+          - id: module_gen_prod_fieldcoils_01
             count: 1
-          - id: prod_gen_missilecomponents_macro
+          - id: module_gen_prod_missilecomponents_01
             count: 1
-          - id: prod_gen_shieldcomponents_macro
+          - id: module_gen_prod_shieldcomponents_01
             count: 1
-          - id: prod_gen_turretcomponents_macro
+          - id: module_gen_prod_turretcomponents_01
             count: 1
-          - id: prod_gen_weaponcomponents_macro
+          - id: module_gen_prod_weaponcomponents_01
             count: 1
       - name: E2-S2
         settings:
           workforceAuto: true
         modules:
-          - id: prod_gen_claytronics_macro
+          - id: module_gen_prod_claytronics_01
             count: 1
-          - id: prod_gen_hullparts_macro
+          - id: module_gen_prod_hullparts_01
             count: 1

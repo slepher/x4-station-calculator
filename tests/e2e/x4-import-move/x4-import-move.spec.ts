@@ -9,6 +9,7 @@ const loadDbFixtureWithoutVsn = () => {
   delete fixture.vsn
   return fixture
 }
+const importFullFixturePath = path.join(process.cwd(), 'tests', 'fixtures', 'import-export', 'import-full.json')
 
 const applyFixture = async (page: any, data: Record<string, unknown>) => {
   await page.evaluate((dbData: Record<string, unknown>) => {
@@ -31,18 +32,55 @@ const closeImportModalIfOpen = async (page: any) => {
   }
 }
 
+const ensureStationMode = async (page: any) => {
+  const stationTab = page.locator('.station-tab').first()
+  for (let i = 0; i < 3; i += 1) {
+    await stationTab.click({ force: true })
+    const isStation = await page.evaluate(() => {
+      const empireStore = (window as any).empireStore
+      return empireStore?.activeStationId !== null
+    })
+    if (isStation) return
+    await page.waitForTimeout(120)
+  }
+
+  await expect.poll(async () => {
+    const empireStore = await page.evaluate(() => (window as any).empireStore?.activeStationId ?? null)
+    return empireStore !== null
+  }).toBe(true)
+}
+
+const ensureOverviewMode = async (page: any) => {
+  const overviewTab = page.locator('.overview-tab').first()
+  for (let i = 0; i < 3; i += 1) {
+    await overviewTab.click({ force: true })
+    const isOverview = await page.evaluate(() => {
+      const empireStore = (window as any).empireStore
+      return empireStore?.activeStationId === null
+    })
+    if (isOverview) return
+    await page.waitForTimeout(120)
+  }
+
+  await expect.poll(async () => {
+    return page.evaluate(() => (window as any).empireStore?.activeStationId === null)
+  }).toBe(true)
+}
+
 const openFromStationToolbar = async (page: any) => {
-  await page.locator('.station-tab').first().click({ force: true })
-  await page.locator('button.btn-amber').filter({ hasText: /导入|Import/i }).first().click({ force: true })
-  await expect(page.locator('[data-testid="import-view-modal"]')).toBeVisible()
+  await ensureStationMode(page)
+  await page.locator('[data-testid="toolbar-import-btn"]').click({ force: true })
+  await expect(page.locator('[data-testid="storage-import-wizard"]')).toBeVisible()
 }
 
 const openFromContextToolbar = async (page: any, mode: 'station' | 'empire') => {
   if (mode === 'station') {
-    await page.locator('.station-tab').first().click({ force: true })
+    await ensureStationMode(page)
+    await expect(page.locator('[data-testid="logicflow-import-entry-station"]')).toBeVisible()
     await page.locator('[data-testid="logicflow-import-entry-station"]').click({ force: true })
   } else {
-    await page.locator('.overview-tab').click({ force: true })
+    await ensureOverviewMode(page)
+    await expect(page.locator('[data-testid="logicflow-import-entry-empire"]')).toBeVisible()
     await page.locator('[data-testid="logicflow-import-entry-empire"]').click({ force: true })
   }
   await expect(page.locator('[data-testid="import-view-modal"]')).toBeVisible()
@@ -59,20 +97,22 @@ test.describe('x4-import-move e2e mapping', () => {
     await setLanguageByUi(page)
   })
 
-  test('3.1 Case: StationToolbar Import 打开统一 3-tab 导入视图', async ({ page }) => {
-    // 3.1.1 点击 StationToolbar `Import` 按钮并打开 `import-view-modal`
+test('3.1 Case: StationToolbar Import 打开 storage-import 向导', async ({ page }) => {
+    // 3.1.1 点击 StationToolbar `Import` 按钮并打开 `storage-import-wizard`
     await openFromStationToolbar(page)
 
-    // 3.1.2 断言 `logic-flow / game-blueprint / x4-station` 三个 tab 均存在
-    await expect(page.locator('[data-testid="top-view-btn-import-view-logic-flow"]')).toBeVisible()
-    await expect(page.locator('[data-testid="top-view-btn-import-view-game-blueprint"]')).toBeVisible()
-    await expect(page.locator('[data-testid="top-view-btn-import-view-x4-station"]')).toBeVisible()
+    // 3.1.2 上传合法导入文件后，断言 Empire/Flow/Ship 三个模块复选项存在
+    await page.locator('[data-testid="storage-import-file-input"]').setInputFiles(importFullFixturePath)
+    await expect(page.locator('[data-testid="storage-import-config"]')).toBeVisible()
+    await expect(page.locator('[data-testid="storage-import-module-x4_empire_data"]')).toBeVisible()
+    await expect(page.locator('[data-testid="storage-import-module-x4_logic_flow_plans"]')).toBeVisible()
+    await expect(page.locator('[data-testid="storage-import-module-x4_ship_blueprints"]')).toBeVisible()
 
-    // 3.1.3 切换到 logic-flow tab 后显示 `logicflow-import-body` 且不显示旧 `logicflow-import-modal` #期望: [true]
-    await page.locator('[data-testid="top-view-btn-import-view-logic-flow"]').click({ force: true })
-    const isEmbeddedBodyVisible = await page.locator('[data-testid="logicflow-import-body"]').isVisible()
-    const isLegacyModalVisible = await page.locator('[data-testid="logicflow-import-modal"]').isVisible().catch(() => false)
-    expect(isEmbeddedBodyVisible && !isLegacyModalVisible).toBe(true)
+    // 3.1.3 断言覆盖/增量模式切换可见且不显示 `import-view-modal` #期望: [true]
+    const hasOverwrite = await page.locator('[data-testid="storage-import-mode-overwrite"]').isVisible()
+    const hasIncremental = await page.locator('[data-testid="storage-import-mode-incremental"]').isVisible()
+    const hasImportViewModal = await page.locator('[data-testid="import-view-modal"]').isVisible().catch(() => false)
+    expect(hasOverwrite && hasIncremental && !hasImportViewModal).toBe(true)
   })
 
   test('3.2 Case: ContextToolbar logic-flow 入口按当前页面自动判定导入目标', async ({ page }) => {
@@ -93,8 +133,9 @@ test.describe('x4-import-move e2e mapping', () => {
   })
 
   test('3.3 Case: 游戏蓝图上传后展示模块数且在非空站点弹策略弹窗', async ({ page }) => {
-    // 3.3.1 在站点页打开导入视图并上传 XML 蓝图文件
-    await openFromStationToolbar(page)
+    // 3.3.1 在站点页通过 ContextToolbar 入口打开 `import-view-modal` 并切到 game-blueprint tab
+    await openFromContextToolbar(page, 'station')
+    await page.locator('[data-testid="top-view-btn-import-view-game-blueprint"]').click({ force: true })
     const xml = '<plan name="Alpha Station"><entry macro="prod_gen_energycells_macro" /><entry macro="prod_gen_refinedmetals_macro" /></plan>'
     await page.locator('[data-testid="import-blueprint-file-upload"] input[type="file"]').setInputFiles({
       name: 'alpha.xml',

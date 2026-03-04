@@ -288,7 +288,8 @@ export interface X4ModuleGroup {
  * 空间站模块接口 - 对应 modules.json
  */
 export interface X4Module {
-  id: string;         // 宏 ID (如 prod_gen_plasmaconductors_macro)
+  id: string;         // 模块 ID (wares.xml id, 如 module_gen_prod_plasmaconductors_01)
+  macroId: string;    // 宏 ID (如 prod_gen_plasmaconductors_macro)
   wareId: string;     // 对应的商品 ID (用于关联图标和建造费)
   nameId: string;     // 国际化文本 ID (如 {20104,12101})
   name: string;
@@ -414,6 +415,16 @@ export interface EmpirePlan {
   id: string;
   name: string;
   stations: StationPlan[];
+}
+
+/**
+ * Empire 持久化存储状态
+ */
+export interface SavedEmpiresState {
+  version: number;
+  activeId: string | null;
+  activeStationId: string | null;
+  list: EmpirePlan[];
 }
 
 /**
@@ -672,7 +683,7 @@ export interface LogicFlowPlan {
 }
 
 export interface SavedFlowPlansState {
-  version: 1
+  version: number
   activeId: string | null
   list: LogicFlowPlan[]
 }

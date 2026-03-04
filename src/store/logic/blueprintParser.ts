@@ -96,28 +96,44 @@ export function parseGameComLink(urlContent: string): Record<string, number> {
  */
 export function resolveModuleId(
   parsedId: string,
-  modulesMap: Record<string, X4Module>
+  modulesMap: Record<string, X4Module>,
+  modulesByMacroId?: Record<string, X4Module>
 ): string | null {
-  // 策略1: 直接匹配
-  if (modulesMap[parsedId]) {
-    return parsedId
+  const raw = parsedId.trim()
+  if (!raw) return null
+
+  if (modulesMap[raw]) return raw
+
+  const macroMap = modulesByMacroId || Object.values(modulesMap).reduce<Record<string, X4Module>>((acc, module) => {
+    if (module.macroId) acc[module.macroId] = module
+    return acc
+  }, {})
+  const modulesList = Object.values(modulesMap)
+
+  const byMacro = macroMap[raw]
+  if (byMacro) return byMacro.id
+
+  const candidates = new Set<string>()
+  candidates.add(raw)
+  candidates.add(raw.replace(/^@/, ''))
+  candidates.add(raw.replace(/^module-/, ''))
+  if (!raw.endsWith('_macro')) candidates.add(`${raw}_macro`)
+  if (raw.startsWith('module_')) {
+    const stripped = raw.replace(/^module_/, '')
+    candidates.add(stripped)
+    candidates.add(`${stripped}_macro`)
+  }
+  if (raw.endsWith('_macro')) {
+    candidates.add(raw.slice(0, -6))
   }
 
-  // 策略2: 尝试标准后缀
-  if (modulesMap[`${parsedId}_macro`]) {
-    return `${parsedId}_macro`
-  }
-
-  // 策略3: 简单转换 (module_X -> X_macro)
-  const simpleConverted = parsedId.replace('module_', '') + '_macro'
-  if (modulesMap[simpleConverted]) {
-    return simpleConverted
-  }
-
-  // 策略4: wareId 兜底
-  const target = Object.values(modulesMap).find(m => m.wareId === parsedId)
-  if (target) {
-    return target.id
+  for (const candidate of candidates) {
+    if (!candidate) continue
+    if (modulesMap[candidate]) return candidate
+    const matchedMacro = macroMap[candidate]
+    if (matchedMacro) return matchedMacro.id
+    const matchedWare = modulesList.find(module => module.wareId === candidate)
+    if (matchedWare) return matchedWare.id
   }
 
   return null

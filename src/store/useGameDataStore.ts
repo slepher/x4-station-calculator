@@ -15,6 +15,7 @@ import { generateFilteredModulesGrouped } from './logic/searchModule'
 import {
   buildWaresMap,
   buildModulesMap,
+  buildModulesByMacroIdMap,
   buildModulesByOutputMap,
   buildMedicalConsumptionMap,
   buildLocalizedModulesMap,
@@ -31,6 +32,7 @@ export const useGameDataStore = defineStore('gameData', () => {
   const searchQuery = ref('')
   const waresMap = ref<Record<string, X4Ware>>({})
   const modulesMap = ref<Record<string, X4Module>>({})
+  const modulesByMacroId = ref<Record<string, X4Module>>({})
   const modulesByOutputMap = ref<Record<string, X4Module[]>>({})
   const localizedModulesMap = ref<Record<string, LocalizedX4Module>>({})
   const localizedWaresMap = ref<Record<string, { id: string, localeName: string }>>({})
@@ -117,6 +119,7 @@ export const useGameDataStore = defineStore('gameData', () => {
 
     waresMap.value = buildWaresMap()
     modulesMap.value = buildModulesMap()
+    modulesByMacroId.value = buildModulesByMacroIdMap(modulesMap.value)
     modulesByOutputMap.value = buildModulesByOutputMap(modulesMap.value)
     medicalConsumptionMap.value = buildMedicalConsumptionMap()
 
@@ -185,6 +188,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     searchQuery,
     waresMap,
     modulesMap,
+    modulesByMacroId,
     modulesByOutputMap,
     localizedModulesMap,
     localizedWaresMap,
