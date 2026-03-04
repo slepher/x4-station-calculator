@@ -4,13 +4,15 @@ import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
+import type { FitMode } from '@/components/ship-build/fitTypes'
 import type {
   X4Ship,
   X4ShipRace,
   X4ShipType,
   X4EquipmentType,
   X4Equipment,
-  X4Ware
+  X4Ware,
+  ShipBlueprint
 } from '@/types/x4'
 import ShipBuildPanelFit from '@/components/ship-build/ShipBuildPanelFit.vue'
 import ShipBuildPanelEquipment from '@/components/ship-build/ShipBuildPanelEquipment.vue'
@@ -80,7 +82,8 @@ const {
   toggleRace,
   toggleType,
   setSelectedTypes,
-  setDisplayResolvers
+  setDisplayResolvers,
+  buildPreviewBlueprint
 } = shipBuildStore
 setDisplayResolvers({
   translateEquipment,
@@ -113,10 +116,15 @@ const showMaterial = ref(true)
 // Picker 状态
 const isPickerOpen = ref(false)
 const pickerTarget = ref<{
+  key: string
+  count: number
+  totalCount: number
   connectionKeys: string[]
   options: { id: string; name: string; mk: string | null; race: string | null; tags: string[] }[]
 } | null>(null)
 const highlightedEquipmentId = ref<string | null>(null)
+const pickerMode = ref<FitMode>('connection')
+const targetBlueprint = ref<ShipBlueprint | null>(null)
 
 // picker-open 事件参数
 const currentSlotType = ref('')
@@ -135,6 +143,7 @@ const handlePickerOpen = (slotType: string, equipmentId: string | null, isShield
 const handlePickerClose = () => {
   isPickerOpen.value = false
   showMaterial.value = true
+  targetBlueprint.value = null
 }
 
 const handleHighlightedEquipmentIdChange = (id: string | null) => {
@@ -144,6 +153,27 @@ const handleHighlightedEquipmentIdChange = (id: string | null) => {
 const handlePickerTargetChange = (target: typeof pickerTarget.value) => {
   pickerTarget.value = target
 }
+
+const handlePickerModeChange = (mode: FitMode) => {
+  pickerMode.value = mode
+}
+
+watch(
+  [isPickerOpen, highlightedEquipmentId, pickerTarget, blueprint, pickerMode],
+  ([open, highlightedId, target, currentBlueprint, mode]) => {
+    if (!open || !highlightedId || !target || !currentBlueprint) {
+      targetBlueprint.value = null
+      return
+    }
+    targetBlueprint.value = buildPreviewBlueprint({
+      connectionKeys: target.connectionKeys,
+      equipmentId: highlightedId,
+      mode,
+      targetCount: mode === 'group' ? target.totalCount : undefined
+    })
+  },
+  { deep: true }
+)
 
 // 更换飞船时强制回到未展开布局，避免旧 picker 状态残留导致 Fit 面板仍保持宽布局
 watch(selectedShipId, (next, prev) => {
@@ -155,6 +185,8 @@ watch(selectedShipId, (next, prev) => {
   currentSlotType.value = ''
   currentEquipmentId.value = null
   currentIsShield.value = false
+  pickerMode.value = 'connection'
+  targetBlueprint.value = null
 })
 </script>
 
@@ -196,6 +228,7 @@ watch(selectedShipId, (next, prev) => {
         @picker-close="handlePickerClose"
         @update:highlightedEquipmentId="handleHighlightedEquipmentIdChange"
         @update:pickerTarget="handlePickerTargetChange"
+        @update:pickerMode="handlePickerModeChange"
       />
 
       <!-- Right Column -->
@@ -215,6 +248,7 @@ watch(selectedShipId, (next, prev) => {
           />
           <ShipBuildPanelStats
             :ship-blueprint="blueprint"
+            :target-blueprint="targetBlueprint"
           />
         </div>
       </template>
@@ -222,6 +256,7 @@ watch(selectedShipId, (next, prev) => {
         <!-- 展开前: Stats 和 Materials 并排 -->
         <ShipBuildPanelStats
           :ship-blueprint="blueprint"
+          :target-blueprint="targetBlueprint"
         />
         <ShipBuildPanelMaterials
           :ship-blueprint="blueprint"
