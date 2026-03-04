@@ -9,8 +9,8 @@
 ## 建议的测试定位
 
 - 中列属性面板：`ship-build-stats-panel`
-- 档位切换（简略）：`ship-build-stats-mode-summary`
-- 档位切换（详细）：`ship-build-stats-mode-detail`
+- 档位切换（简略）：`view-tab-btn-metrics-panel-ship-build-stats-panel-summary`
+- 档位切换（详细）：`view-tab-btn-metrics-panel-ship-build-stats-panel-detail`
 - 已选详情区：`ship-build-selection`
 - 飞船名称项：`ship-build-ship-name`
 - 筛选区：`ship-build-filter-class` / `ship-build-filter-race` / `ship-build-filter-type`
@@ -26,10 +26,10 @@
   - 可观察结果：`ship-build-panel-stats`、`ship-build-selection` 可见
   - 预设装备：引擎6、护盾4(专用)+挂载M、武器6、炮塔9
 - 切换：`大太刀已选 -> 详细档位`
-  - 操作：点击 `ship-build-stats-mode-detail`
+  - 操作：点击 `view-tab-btn-metrics-panel-ship-build-stats-panel-detail`
   - 可观察结果：详细字段集合可见，且包含真实值与占位值并存
 - 切换：`详细档位 -> 简略档位`
-  - 操作：点击 `ship-build-stats-mode-summary`
+  - 操作：点击 `view-tab-btn-metrics-panel-ship-build-stats-panel-summary`
   - 可观察结果：简略字段集合可见（18项）
 
 ## 字段对齐矩阵（按截图）
@@ -88,7 +88,7 @@ function useEquipmentStats(equipment: X4Equipment, ship: X4Ship): {
 
 ## 断言建议
 
-- 档位显示：断言中列同时可见”简略/详细”切换按钮。（使用定位符 `ship-build-stats-mode-summary` / `ship-build-stats-mode-detail`）
+- 档位显示：断言中列同时可见”简略/详细”切换按钮。（使用定位符 `view-tab-btn-metrics-panel-ship-build-stats-panel-summary` / `view-tab-btn-metrics-panel-ship-build-stats-panel-detail`）
 - 档位切换：点击后断言属性列表内容发生变化（简略清单 vs 详细清单）。
 - 字段对齐：按字段矩阵逐项断言标签存在性；并断言详细覆盖简略。
 - 真实值字段：断言 `船体/护盾/速度/助推/巡航/船员/仓储` 非 `--`。

@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { useEquipmentStats } from '@/composables/useEquipmentStats'
 import MetricsPanel from '@/components/common/MetricsPanel.vue'
-import ViewTabUI from '@/components/common/ViewTabUI.vue'
-import type { MetricSchema, MetricValueMap } from '@/components/common/metricsPanelTypes'
+import type { MetricSchema, MetricValueMap, MetricsPanelViewTab } from '@/components/common/metricsPanelTypes'
 import type { X4Ship, X4Equipment, ShipBlueprint } from '@/types/x4'
 import bulletsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/bullets.json'
 import missilesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/missiles.json'
@@ -74,14 +73,6 @@ const STAT_KEY_TO_MAX_FIELD: Record<string, string> = {
   dock_s_count: 'dock_ship_s',
   dock_s_capacity: 'capacity_ship_s',
 }
-
-// ============ 内部状态 ============
-const statsViewMode = ref<'summary' | 'detail'>('summary')
-
-const statsViewTabs = [
-  { key: 'summary', label: t('ship_build.stats_mode_summary') },
-  { key: 'detail', label: t('ship_build.stats_mode_detail') }
-]
 
 /**
  * 聚合所有已装备的武器 DPS (使用 useEquipmentStats)
@@ -387,22 +378,13 @@ const getDefaultMax = (shipClass: string, statKey: string): number => {
   return value
 }
 
-// Calculate max values for bar ratios using default_maxes
 const calculateMaxStatsFromDefaults = (ship: X4Ship) => {
-  const summaryMax: Record<string, number> = {}
   const detailMax: Record<string, number> = {}
-
-  const sampleSummary = buildSummaryStatsByUseEquipmentStats(ship)
-  sampleSummary.forEach(metric => {
-    summaryMax[metric.key] = getDefaultMax(ship.class, metric.key)
-  })
-
   const sampleDetail = buildDetailStatsByUseEquipmentStats(ship)
-  sampleDetail.forEach(metric => {
+  sampleDetail.forEach((metric) => {
     detailMax[metric.key] = getDefaultMax(ship.class, metric.key)
   })
-
-  return { summaryMax, detailMax }
+  return detailMax
 }
 
 // 计算进度条比例
@@ -419,36 +401,11 @@ const calculateRatio = (value: number, max: number): number => {
 
 const formatStatValue = (value: number) => value.toLocaleString()
 
-const summaryShipStats = computed<ShipStatDisplay[]>(() => {
-  if (!selectedShip.value) return []
-
-  const stats = buildSummaryStatsByUseEquipmentStats(selectedShip.value)
-  const result = calculateMaxStatsFromDefaults(selectedShip.value)
-  const maxStats = result.summaryMax
-
-  return stats.map(metric => {
-    const max = maxStats[metric.key] || 1
-    const ratio = calculateRatio(metric.value, max)
-    return {
-      key: metric.key,
-      labelKey: metric.labelKey,
-      unit: metric.unit,
-      value: metric.value,
-      valueText: formatStatValue(metric.value),
-      max,
-      ratio,
-      placeholder: placeholderKeys.has(metric.key),
-      isZero: metric.value === 0
-    }
-  })
-})
-
 const detailedShipStats = computed<ShipStatDisplay[]>(() => {
   if (!selectedShip.value) return []
 
   const stats = buildDetailStatsByUseEquipmentStats(selectedShip.value)
-  const result = calculateMaxStatsFromDefaults(selectedShip.value)
-  const maxStats = result.detailMax
+  const maxStats = calculateMaxStatsFromDefaults(selectedShip.value)
 
   return stats.map(metric => {
     const max = maxStats[metric.key] || 1
@@ -467,12 +424,41 @@ const detailedShipStats = computed<ShipStatDisplay[]>(() => {
   })
 })
 
-const visibleShipStats = computed<ShipStatDisplay[]>(() => {
-  return statsViewMode.value === 'summary' ? summaryShipStats.value : detailedShipStats.value
+const summaryKeys = computed<string[]>(() => {
+  if (!selectedShip.value) return []
+  const { summaryKey } = getCargoSummaryKeys(selectedShip.value)
+  return [
+    'hull',
+    'weapon_burst',
+    'shield',
+    'turret_avg',
+    summaryKey,
+    'speed',
+    'radar_range',
+    'boost_speed',
+    'crew',
+    'travel_speed',
+    'dock_m_count',
+    'dock_m_capacity',
+    'dock_s_count',
+    'dock_s_capacity',
+    'storage_unit',
+    'missile',
+    'deployable',
+    'countermeasure'
+  ]
 })
 
+const panelViewTab = computed<MetricsPanelViewTab>(() => ({
+  style: 'emerald',
+  views: [
+    { mode: 'summary', label: t('ship_build.stats_mode_summary'), keys: summaryKeys.value },
+    { mode: 'detail', label: t('ship_build.stats_mode_detail'), keys: 'all' }
+  ]
+}))
+
 const panelSchema = computed<MetricSchema>(() => {
-  const items = visibleShipStats.value
+  const items = detailedShipStats.value
   const rows: MetricSchema = []
   for (let i = 0; i < items.length; i += 2) {
     const left = items[i]
@@ -500,74 +486,13 @@ const panelSchema = computed<MetricSchema>(() => {
 })
 
 const panelCurrentValues = computed<MetricValueMap | null>(() => {
-  if (!visibleShipStats.value.length) return null
+  if (!detailedShipStats.value.length) return null
   const map: MetricValueMap = {}
-  visibleShipStats.value.forEach((metric) => {
+  detailedShipStats.value.forEach((metric) => {
     map[metric.key] = metric.value
   })
   return map
 })
-
-// ============ 使用 useEquipmentStats 构建统计数据 (新逻辑) ============
-// 使用 useEquipmentStats composable 计算属性
-// 9x2 排布: 交叉排列 [左1, 右1, 左2, 右2, ...]
-const buildSummaryStatsByUseEquipmentStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
-  const shieldStats = getShieldStatsByUseEquipmentStats()
-  const engineStats = getEngineStatsByUseEquipmentStats()
-  const weaponStats = getWeaponStatsByUseEquipmentStats()
-  const turretAvg = getTurretStatsByUseEquipmentStats()
-  const dragForward = ship.physics?.drag?.forward || 1
-
-  const baseSpeed = engineStats ? (engineStats.thrustForward / dragForward) : 0
-  const travelSpeed = engineStats ? (engineStats.travelThrust / dragForward) : 0
-  const boostSpeed = engineStats && baseSpeed > 0 ? Math.round(baseSpeed * engineStats.boostMultiplier) : 0
-
-  // Storage 组动态 summary: 根据实际容量选择
-  // 优先顺序: Container → Solid → Liquid → Condensed
-  const { container, solid, liquid, condensed, summaryKey } = getCargoSummaryKeys(ship)
-
-  // 构建 Storage 组的 summary 数据
-  const storageSummaryItem = {
-    key: summaryKey,
-    labelKey: `ship_build.stats_${summaryKey}`,
-    unit: 'm3',
-    value: summaryKey === 'storage_container' ? container
-      : summaryKey === 'storage_solid' ? solid
-      : summaryKey === 'storage_liquid' ? liquid
-      : condensed
-  }
-
-  // 9x2 排布: 交叉排列 [左1, 右1, 左2, 右2, ...]
-  return [
-    // 行1: Hull | Weapon Burst
-    { key: 'hull', labelKey: 'ship_build.stats_hull', unit: 'MJ', value: ship.hull || 0 },
-    { key: 'weapon_burst', labelKey: 'ship_build.stats_weapon_burst', unit: 'MW', value: Math.round(weaponStats.burst * 10) / 10 },
-    // 行2: Shield | Turret Avg
-    { key: 'shield', labelKey: 'ship_build.stats_shield', unit: 'MJ', value: shieldStats.max },
-    { key: 'turret_avg', labelKey: 'ship_build.stats_turret_avg', unit: 'MW', value: turretAvg },
-    // 行3: Storage Summary (动态) | Speed
-    storageSummaryItem,
-    { key: 'speed', labelKey: 'ship_build.stats_speed', unit: 'm/s', value: Math.round(baseSpeed) },
-    // 行4: Radar Range | Boost Speed
-    { key: 'radar_range', labelKey: 'ship_build.stats_radar_range', unit: 'km', value: Math.round((ship.radarRange || 0) / 1000) },
-    { key: 'boost_speed', labelKey: 'ship_build.stats_boost_speed', unit: 'm/s', value: boostSpeed },
-    // 行5: Crew | Travel Speed
-    { key: 'crew', labelKey: 'ship_build.stats_crew', unit: '', value: ship.crew?.capacity || 0 },
-    { key: 'travel_speed', labelKey: 'ship_build.stats_travel_speed', unit: 'm/s', value: Math.round(travelSpeed) },
-    // 行6: M Dock Count | M Dock Capacity
-    { key: 'dock_m_count', labelKey: 'ship_build.stats_dock_m_count', unit: '', value: getDockCount(ship, 'dock_m') },
-    { key: 'dock_m_capacity', labelKey: 'ship_build.stats_dock_m_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_m') },
-    // 行7: S Dock Count | S Dock Capacity
-    { key: 'dock_s_count', labelKey: 'ship_build.stats_dock_s_count', unit: '', value: getDockCount(ship, 'dock_s') },
-    { key: 'dock_s_capacity', labelKey: 'ship_build.stats_dock_s_capacity', unit: '', value: getShipStorageCapacity(ship, 'dock_s') },
-    // 行8: Unit Storage | Missile
-    { key: 'storage_unit', labelKey: 'ship_build.stats_storage_unit', unit: '', value: ship.storage?.unit || 0 },
-    { key: 'missile', labelKey: 'ship_build.stats_missile', unit: '', value: ship.storage?.missile || 0 },
-    // 行9: Deployable | Countermeasure
-    { key: 'deployable', labelKey: 'ship_build.stats_deployable', unit: '', value: ship.storage?.deployable || 0 },
-    { key: 'countermeasure', labelKey: 'ship_build.stats_countermeasure', unit: '', value: ship.storage?.countermeasure || 0 }
-  ].filter((item): item is Omit<ShipStatMetric, 'ratio'> => item !== null)
-}
 
 // 完整 36 个数据点 (18行 x 2列)
 const buildDetailStatsByUseEquipmentStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
@@ -659,50 +584,19 @@ const buildDetailStatsByUseEquipmentStats = (ship: X4Ship): Omit<ShipStatMetric,
 </script>
 
 <template>
-  <div class="col-span-12 lg:col-span-4 panel-card" data-testid="ship-build-panel-stats">
-    <div class="panel-header">
-      <span>{{ t('ship_build.panel_stats') }}</span>
-      <ViewTabUI
-        v-model="statsViewMode"
-        :views="statsViewTabs"
-        color-style="emerald"
-        ui-key="ship-build-stats-mode"
-      />
-    </div>
-    <div class="stats-panel" data-testid="ship-build-stats-panel">
+  <div class="col-span-12 lg:col-span-4" data-testid="ship-build-panel-stats">
     <MetricsPanel
       panel-id="ship-build-stats-panel"
-      title=""
-      hide-header
+      :title="t('ship_build.panel_stats')"
       :obj-current="panelCurrentValues"
       :obj-target="null"
       :schema="panelSchema"
       order="row"
-      :view-tab="null"
+      :view-tab="panelViewTab"
       :rounded-keys="[]"
     />
-    </div>
   </div>
 </template>
 
 <style scoped>
-.panel-card {
-  @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden;
-}
-
-.panel-header {
-  @apply flex items-center justify-between px-4 py-3 text-slate-200 text-sm font-semibold border-b border-slate-800/70 bg-slate-900/50;
-}
-
-.stats-panel {
-  @apply p-2 bg-slate-900/30 rounded-lg m-2;
-}
-
-.stats-panel :deep(.metrics-panel) {
-  @apply bg-transparent border-0 shadow-none;
-}
-
-.stats-panel :deep(.metrics-panel-content) {
-  @apply m-0 p-0 bg-transparent;
-}
 </style>
