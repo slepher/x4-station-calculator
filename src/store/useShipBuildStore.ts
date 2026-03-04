@@ -611,6 +611,213 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     setEquipment(info.slotType, info.groupName, currentEquipmentId, nextCount)
   }
 
+  const cloneBlueprintForPreview = (source: ShipBlueprint | null): ShipBlueprint => {
+    if (!source) {
+      return {
+        id: '',
+        name: '',
+        shipId: selectedShipId.value || '',
+        connections: [],
+        lastUpdated: Date.now()
+      }
+    }
+    return JSON.parse(JSON.stringify(source)) as ShipBlueprint
+  }
+
+  const findOrCreateConnectionInBlueprint = (target: ShipBlueprint, slotType: string): ShipBlueprintConnection => {
+    let connection = target.connections.find(c => c.slot_type === slotType)
+    if (!connection) {
+      connection = { slot_type: slotType, group: [] }
+      target.connections.push(connection)
+    }
+    return connection
+  }
+
+  const resolveGroupNameByConnectionKey = (connectionKey: string): string | null => {
+    const parts = connectionKey.split('::')
+    const slotIndex = Number(parts[2])
+    const groupIndex = Number(parts[3])
+    if (!selectedShip.value || Number.isNaN(slotIndex) || Number.isNaN(groupIndex)) return null
+    const slot = selectedShip.value.slots[slotIndex]
+    const group = slot?.groups[groupIndex]
+    return group?.group || null
+  }
+
+  const resolveConnectionCapacityByKey = (connectionKey: string): number => {
+    const parts = connectionKey.split('::')
+    const slotIndex = Number(parts[2])
+    const groupIndex = Number(parts[3])
+    if (!selectedShip.value || Number.isNaN(slotIndex) || Number.isNaN(groupIndex)) return 0
+    const slot = selectedShip.value.slots[slotIndex]
+    const group = slot?.groups[groupIndex]
+    if (!slot || !group) return 0
+    if (parts.length >= 5 && parts[4] === 'shield') {
+      return group.connection?.shield?.count || 0
+    }
+    return group.connection?.count || 0
+  }
+
+  const applyAssignmentOnBlueprint = (
+    target: ShipBlueprint,
+    payload: { connectionKey: string; equipmentId: string | null; count: number }
+  ) => {
+    const parts = payload.connectionKey.split('::')
+    if (parts.length < 4) return
+    const slotType = parts[1]
+    if (!slotType) return
+    const groupName = resolveGroupNameByConnectionKey(payload.connectionKey)
+    if (!groupName) return
+
+    const setEquipmentOnTarget = (targetSlotType: string) => {
+      const connection = findOrCreateConnectionInBlueprint(target, targetSlotType)
+      const groupData = connection.group.find(g => g.group === groupName)
+      if (payload.equipmentId === null || payload.count <= 0) {
+        if (groupData) {
+          groupData.equipment_id = ''
+          groupData.count = 0
+        }
+        return
+      }
+      if (groupData) {
+        groupData.equipment_id = payload.equipmentId
+        groupData.count = payload.count
+      } else {
+        connection.group.push({
+          group: groupName,
+          equipment_id: payload.equipmentId,
+          count: payload.count
+        })
+      }
+    }
+
+    const setShieldOnTarget = (parentSlotType: string) => {
+      const connection = findOrCreateConnectionInBlueprint(target, parentSlotType)
+      let groupData = connection.group.find(g => g.group === groupName)
+      if (!groupData) {
+        groupData = {
+          group: groupName,
+          equipment_id: '',
+          count: 0
+        }
+        connection.group.push(groupData)
+      }
+      if (payload.equipmentId === null || payload.count <= 0) {
+        groupData.shield = { equipment_id: '', count: 0 }
+        return
+      }
+      groupData.shield = { equipment_id: payload.equipmentId, count: payload.count }
+    }
+
+    if (parts.length >= 5 && parts[4] === 'shield') {
+      setShieldOnTarget(slotType)
+      return
+    }
+
+    if (parts.length === 4 && slotType === 'shield') {
+      setEquipmentOnTarget('shield')
+      return
+    }
+
+    setEquipmentOnTarget(slotType)
+  }
+
+  const cleanupPreviewBlueprint = (target: ShipBlueprint) => {
+    target.connections.forEach((connection) => {
+      connection.group = connection.group.filter((group) => {
+        const hasEquipment = Boolean(group.equipment_id)
+        const hasShield = Boolean(group.shield?.equipment_id)
+        return hasEquipment || hasShield
+      })
+    })
+    target.connections = target.connections.filter((connection) => connection.group.length > 0)
+    const slotOrder = ['engine', 'thruster', 'shield', 'weapon', 'turret']
+    target.connections.sort((a, b) => {
+      const orderA = slotOrder.indexOf(a.slot_type)
+      const orderB = slotOrder.indexOf(b.slot_type)
+      return (orderA === -1 ? 999 : orderA) - (orderB === -1 ? 999 : orderB)
+    })
+  }
+
+  const distributeCountByCapacity = (connectionKeys: string[], total: number) => {
+    const maxByKey = connectionKeys.map((key) => ({
+      key,
+      max: Math.max(0, resolveConnectionCapacityByKey(key))
+    }))
+    const sumMax = maxByKey.reduce((sum, item) => sum + item.max, 0)
+    const clampedTotal = Math.max(0, Math.min(total, sumMax))
+
+    if (sumMax === 0 || clampedTotal === 0) {
+      return Object.fromEntries(connectionKeys.map((key) => [key, 0]))
+    }
+    if (clampedTotal === sumMax) {
+      return Object.fromEntries(maxByKey.map((item) => [item.key, item.max]))
+    }
+
+    const allocations = maxByKey.map((item) => {
+      const exact = (clampedTotal * item.max) / sumMax
+      const base = Math.min(item.max, Math.floor(exact))
+      return { ...item, base, frac: exact - Math.floor(exact) }
+    })
+
+    let remaining = clampedTotal - allocations.reduce((sum, item) => sum + item.base, 0)
+    allocations
+      .sort((a, b) => b.frac - a.frac)
+      .forEach((item) => {
+        if (remaining <= 0) return
+        if (item.base >= item.max) return
+        item.base += 1
+        remaining -= 1
+      })
+
+    return Object.fromEntries(allocations.map((item) => [item.key, item.base]))
+  }
+
+  const buildPreviewBlueprint = (payload: {
+    connectionKeys: string[]
+    equipmentId: string | null
+    mode: FitMode
+    targetCount?: number
+  }): ShipBlueprint | null => {
+    if (!selectedShip.value || !selectedShipId.value) return null
+    const keys = payload.connectionKeys.filter((key) => typeof key === 'string' && key.length > 0)
+    if (keys.length === 0) return cloneBlueprintForPreview(blueprint.value)
+
+    const target = cloneBlueprintForPreview(blueprint.value)
+    target.shipId = selectedShipId.value
+
+    if (payload.mode === 'group') {
+      const fallbackCount = keys.reduce((sum, key) => {
+        const current = selectedByConnectionComputed.value[key]?.count ?? 0
+        return sum + current
+      }, 0)
+      const requested = payload.targetCount ?? fallbackCount
+      const distributed = distributeCountByCapacity(keys, Math.max(0, Math.round(requested)))
+      keys.forEach((connectionKey) => {
+        const nextCount = distributed[connectionKey] || 0
+        applyAssignmentOnBlueprint(target, {
+          connectionKey,
+          equipmentId: nextCount > 0 ? payload.equipmentId : null,
+          count: nextCount
+        })
+      })
+      cleanupPreviewBlueprint(target)
+      return target
+    }
+
+    keys.forEach((connectionKey) => {
+      const currentCount = selectedByConnectionComputed.value[connectionKey]?.count
+      const nextCount = currentCount ?? resolveConnectionCapacityByKey(connectionKey)
+      applyAssignmentOnBlueprint(target, {
+        connectionKey,
+        equipmentId: payload.equipmentId,
+        count: Math.max(0, nextCount)
+      })
+    })
+
+    cleanupPreviewBlueprint(target)
+    return target
+  }
+
   const applyGroupAssignment = (payload: { connectionKeys: string[]; equipmentId: string | null }) => {
     // Group assignment updates multiple connections at once
     // For simplicity, call applyConnectionAssignment for each key
@@ -817,6 +1024,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     setFitMode,
     applyConnectionAssignment,
     setConnectionAssignmentCount,
+    buildPreviewBlueprint,
     applyGroupAssignment,
     setStatsViewMode,
     setMockTagPatch,

@@ -67,6 +67,7 @@ const emit = defineEmits<{
   'picker-close': []
   'update:highlightedEquipmentId': [id: string | null]
   'update:pickerTarget': [target: SlotTarget | null]
+  'update:pickerMode': [mode: FitMode]
 }>()
 
 const shipBuildStore = useShipBuildStore()
@@ -1019,6 +1020,10 @@ watch(pickerTarget, (newTarget) => {
 watch(highlightedEquipmentId, (newId) => {
   emit('update:highlightedEquipmentId', newId)
 })
+
+watch(fitMode, (mode) => {
+  emit('update:pickerMode', mode)
+}, { immediate: true })
 
 watch(filteredCandidates, () => {
   if (currentPage.value > totalPages.value) currentPage.value = 1

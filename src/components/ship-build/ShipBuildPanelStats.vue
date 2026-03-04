@@ -12,6 +12,7 @@ import defaultMaxesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/default_ma
 
 const props = defineProps<{
   shipBlueprint: ShipBlueprint | null
+  targetBlueprint?: ShipBlueprint | null
 }>()
 
 const { t } = useI18n()
@@ -77,13 +78,13 @@ const STAT_KEY_TO_MAX_FIELD: Record<string, string> = {
 /**
  * 聚合所有已装备的武器 DPS (使用 useEquipmentStats)
  */
-const getWeaponStatsByUseEquipmentStats = () => {
-  if (!selectedShip.value || !props.shipBlueprint) return { burst: 0, sustained: 0 }
+const getWeaponStatsByUseEquipmentStats = (blueprintData: ShipBlueprint | null) => {
+  if (!selectedShip.value || !blueprintData) return { burst: 0, sustained: 0 }
 
   let totalBurst = 0
   let totalSustained = 0
 
-  props.shipBlueprint.connections.forEach((conn) => {
+  blueprintData.connections.forEach((conn) => {
     conn.group.forEach((g) => {
       if (!g.equipment_id || g.count <= 0) return
       const equipment = equipmentMap.value.get(g.equipment_id)
@@ -107,13 +108,13 @@ const getWeaponStatsByUseEquipmentStats = () => {
 /**
  * 聚合所有已装备的炮塔 DPS (使用 useEquipmentStats)
  */
-const getTurretStatsByUseEquipmentStats = () => {
-  if (!selectedShip.value || !props.shipBlueprint) return 0
+const getTurretStatsByUseEquipmentStats = (blueprintData: ShipBlueprint | null) => {
+  if (!selectedShip.value || !blueprintData) return 0
 
   let totalDamage = 0
   let turretCount = 0
 
-  props.shipBlueprint.connections.forEach((conn) => {
+  blueprintData.connections.forEach((conn) => {
     conn.group.forEach((g) => {
       if (!g.equipment_id || g.count <= 0) return
       const equipment = equipmentMap.value.get(g.equipment_id)
@@ -137,15 +138,15 @@ const getTurretStatsByUseEquipmentStats = () => {
 /**
  * 聚合护盾属性 (使用 useEquipmentStats)
  */
-const getShieldStatsByUseEquipmentStats = () => {
-  if (!selectedShip.value || !props.shipBlueprint) return { max: 0, rate: 0, delay: 0, groupAvg: 0 }
+const getShieldStatsByUseEquipmentStats = (blueprintData: ShipBlueprint | null) => {
+  if (!selectedShip.value || !blueprintData) return { max: 0, rate: 0, delay: 0, groupAvg: 0 }
 
   let max = 0
   let rate = 0
   let delay = 0
 
   // 专用 shield 槽位
-  props.shipBlueprint.connections.forEach((conn) => {
+  blueprintData.connections.forEach((conn) => {
     if (conn.slot_type !== 'shield') return
     conn.group.forEach((g) => {
       if (!g.equipment_id || g.count <= 0) return
@@ -166,7 +167,7 @@ const getShieldStatsByUseEquipmentStats = () => {
   let mountedShieldMax = 0
   let mountedShieldGroups = 0
 
-  props.shipBlueprint.connections.forEach((conn) => {
+  blueprintData.connections.forEach((conn) => {
     if (conn.slot_type === 'shield') return
     conn.group.forEach((g) => {
       if (!g.shield?.equipment_id || g.shield.count <= 0) return
@@ -190,8 +191,8 @@ const getShieldStatsByUseEquipmentStats = () => {
 /**
  * 聚合引擎属性 (使用 useEquipmentStats)
  */
-const getEngineStatsByUseEquipmentStats = () => {
-  if (!selectedShip.value || !props.shipBlueprint) return null
+const getEngineStatsByUseEquipmentStats = (blueprintData: ShipBlueprint | null) => {
+  if (!selectedShip.value || !blueprintData) return null
 
   let thrustForward = 0
   let boostMultiplier = 1
@@ -202,7 +203,7 @@ const getEngineStatsByUseEquipmentStats = () => {
   let travelAttack = 0
   let travelCharge = 0
 
-  props.shipBlueprint.connections.forEach((conn) => {
+  blueprintData.connections.forEach((conn) => {
     if (conn.slot_type !== 'engine') return
     conn.group.forEach((g) => {
       if (!g.equipment_id || g.count <= 0) return
@@ -240,15 +241,15 @@ const getEngineStatsByUseEquipmentStats = () => {
 /**
  * 聚合推进器属性 (使用 useEquipmentStats)
  */
-const getThrusterStatsByUseEquipmentStats = () => {
-  if (!selectedShip.value || !props.shipBlueprint) return null
+const getThrusterStatsByUseEquipmentStats = (blueprintData: ShipBlueprint | null) => {
+  if (!selectedShip.value || !blueprintData) return null
 
   let pitch = 0
   let yaw = 0
   let roll = 0
   let strafe = 0
 
-  props.shipBlueprint.connections.forEach((conn) => {
+  blueprintData.connections.forEach((conn) => {
     if (conn.slot_type !== 'thruster') return
     conn.group.forEach((g) => {
       if (!g.equipment_id || g.count <= 0) return
@@ -380,7 +381,7 @@ const getDefaultMax = (shipClass: string, statKey: string): number => {
 
 const calculateMaxStatsFromDefaults = (ship: X4Ship) => {
   const detailMax: Record<string, number> = {}
-  const sampleDetail = buildDetailStatsByUseEquipmentStats(ship)
+  const sampleDetail = buildDetailStatsByUseEquipmentStats(ship, props.shipBlueprint)
   sampleDetail.forEach((metric) => {
     detailMax[metric.key] = getDefaultMax(ship.class, metric.key)
   })
@@ -401,12 +402,7 @@ const calculateRatio = (value: number, max: number): number => {
 
 const formatStatValue = (value: number) => value.toLocaleString()
 
-const detailedShipStats = computed<ShipStatDisplay[]>(() => {
-  if (!selectedShip.value) return []
-
-  const stats = buildDetailStatsByUseEquipmentStats(selectedShip.value)
-  const maxStats = calculateMaxStatsFromDefaults(selectedShip.value)
-
+const buildShipStatDisplay = (stats: Omit<ShipStatMetric, 'ratio'>[], maxStats: Record<string, number>): ShipStatDisplay[] => {
   return stats.map(metric => {
     const max = maxStats[metric.key] || 1
     const ratio = placeholderKeys.has(metric.key) ? null : calculateRatio(metric.value, max)
@@ -422,6 +418,21 @@ const detailedShipStats = computed<ShipStatDisplay[]>(() => {
       isZero: !placeholderKeys.has(metric.key) && metric.value === 0
     }
   })
+}
+
+const currentDetailedShipStats = computed<ShipStatDisplay[]>(() => {
+  if (!selectedShip.value) return []
+
+  const stats = buildDetailStatsByUseEquipmentStats(selectedShip.value, props.shipBlueprint)
+  const maxStats = calculateMaxStatsFromDefaults(selectedShip.value)
+  return buildShipStatDisplay(stats, maxStats)
+})
+
+const targetDetailedShipStats = computed<ShipStatDisplay[]>(() => {
+  if (!selectedShip.value || !props.targetBlueprint) return []
+  const stats = buildDetailStatsByUseEquipmentStats(selectedShip.value, props.targetBlueprint)
+  const maxStats = calculateMaxStatsFromDefaults(selectedShip.value)
+  return buildShipStatDisplay(stats, maxStats)
 })
 
 const summaryKeys = computed<string[]>(() => {
@@ -458,7 +469,7 @@ const panelViewTab = computed<MetricsPanelViewTab>(() => ({
 }))
 
 const panelSchema = computed<MetricSchema>(() => {
-  const items = detailedShipStats.value
+  const items = currentDetailedShipStats.value
   const rows: MetricSchema = []
   for (let i = 0; i < items.length; i += 2) {
     const left = items[i]
@@ -486,20 +497,29 @@ const panelSchema = computed<MetricSchema>(() => {
 })
 
 const panelCurrentValues = computed<MetricValueMap | null>(() => {
-  if (!detailedShipStats.value.length) return null
+  if (!currentDetailedShipStats.value.length) return null
   const map: MetricValueMap = {}
-  detailedShipStats.value.forEach((metric) => {
+  currentDetailedShipStats.value.forEach((metric) => {
+    map[metric.key] = metric.value
+  })
+  return map
+})
+
+const panelTargetValues = computed<MetricValueMap | null>(() => {
+  if (!targetDetailedShipStats.value.length) return null
+  const map: MetricValueMap = {}
+  targetDetailedShipStats.value.forEach((metric) => {
     map[metric.key] = metric.value
   })
   return map
 })
 
 // 完整 36 个数据点 (18行 x 2列)
-const buildDetailStatsByUseEquipmentStats = (ship: X4Ship): Omit<ShipStatMetric, 'ratio'>[] => {
-  const shieldStats = getShieldStatsByUseEquipmentStats()
-  const engineStats = getEngineStatsByUseEquipmentStats()
-  const weaponStats = getWeaponStatsByUseEquipmentStats()
-  const turretAvg = getTurretStatsByUseEquipmentStats()
+const buildDetailStatsByUseEquipmentStats = (ship: X4Ship, blueprintData: ShipBlueprint | null): Omit<ShipStatMetric, 'ratio'>[] => {
+  const shieldStats = getShieldStatsByUseEquipmentStats(blueprintData)
+  const engineStats = getEngineStatsByUseEquipmentStats(blueprintData)
+  const weaponStats = getWeaponStatsByUseEquipmentStats(blueprintData)
+  const turretAvg = getTurretStatsByUseEquipmentStats(blueprintData)
   const mass = ship.physics?.mass || 1
   const dragForward = ship.physics?.drag?.forward || 1
   const dragHorizontal = ship.physics?.drag?.horizontal || 1
@@ -516,7 +536,7 @@ const buildDetailStatsByUseEquipmentStats = (ship: X4Ship): Omit<ShipStatMetric,
   const travelAcceleration = engineStats && engineStats.travelAttack ? Math.round(travelSpeed / engineStats.travelAttack) : 0
   const boostRecharge = engineStats ? engineStats.boostRecharge / 100 : 0
 
-  const thrusterStats = getThrusterStatsByUseEquipmentStats()
+  const thrusterStats = getThrusterStatsByUseEquipmentStats(blueprintData)
   const pitchRate = thrusterStats ? thrusterStats.pitch / dragPitch : 0
   const yawRate = thrusterStats ? thrusterStats.yaw / dragYaw : 0
   const rollRate = thrusterStats ? thrusterStats.roll / dragRoll : 0
@@ -589,7 +609,7 @@ const buildDetailStatsByUseEquipmentStats = (ship: X4Ship): Omit<ShipStatMetric,
       panel-id="ship-build-stats-panel"
       :title="t('ship_build.panel_stats')"
       :obj-current="panelCurrentValues"
-      :obj-target="null"
+      :obj-target="panelTargetValues"
       :schema="panelSchema"
       order="row"
       :view-tab="panelViewTab"
