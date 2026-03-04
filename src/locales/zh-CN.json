@@ -447,5 +447,27 @@
     "ore": "矿",
     "rawscrap": "废",
     "silicon": "硅"
+  },
+  "importExport": {
+    "title": "导入数据",
+    "export_title": "导出数据",
+    "export_filename": "导出文件名",
+    "upload": "上传文件",
+    "select_file": "选择 JSON 文件",
+    "no_file": "未选择文件",
+    "mode": "导入模式",
+    "mode_overwrite": "覆盖",
+    "mode_incremental": "增量",
+    "modules": "模块",
+    "module_empire": "帝国",
+    "module_flow": "Flow",
+    "module_ship": "Ship",
+    "module_count": "{count} 条数据",
+    "action_apply": "执行导入",
+    "action_download": "下载",
+    "import_success": "导入完成：已应用 {count} 个模块。",
+    "error_parse_failed": "JSON 文件解析失败。",
+    "error_no_module": "上传文件中未找到可导入模块。",
+    "error_no_selection": "请至少选择一个模块。"
   }
 }

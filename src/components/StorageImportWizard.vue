@@ -1,0 +1,260 @@
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useEmpireStore } from '@/store/useEmpireStore'
+import { useLogicFlowStore } from '@/store/useLogicFlowStore'
+import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { useStatusStore } from '@/store/useStatusStore'
+import {
+  applyImportPayload,
+  getModuleImportStats,
+  normalizeImportPayload,
+  type ImportModuleKey,
+  type ModuleImportStats,
+  type NormalizedImportPayload
+} from '@/store/logic/importExport'
+
+const props = defineProps<{
+  isOpen: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'close'): void
+}>()
+
+const { t } = useI18n()
+const empireStore = useEmpireStore()
+const logicFlowStore = useLogicFlowStore()
+const shipBuildStore = useShipBuildStore()
+const statusStore = useStatusStore()
+
+const fileName = ref('')
+const parseError = ref('')
+const parsedPayload = ref<NormalizedImportPayload | null>(null)
+const moduleStats = ref<ModuleImportStats[]>([])
+const mode = ref<'overwrite' | 'incremental'>('overwrite')
+const selectedModules = ref<Record<ImportModuleKey, boolean>>({
+  x4_empire_data: false,
+  x4_logic_flow_plans: false,
+  x4_ship_blueprints: false
+})
+
+const hasParsedPayload = computed(() => parsedPayload.value !== null)
+const availableKeys = computed(() => moduleStats.value.map((item) => item.key))
+
+const setDefaultSelections = (selectAll: boolean) => {
+  const keys = new Set(availableKeys.value)
+  ;(['x4_empire_data', 'x4_logic_flow_plans', 'x4_ship_blueprints'] as ImportModuleKey[]).forEach((key) => {
+    selectedModules.value[key] = selectAll ? keys.has(key) : selectedModules.value[key] && keys.has(key)
+  })
+}
+
+watch(
+  () => props.isOpen,
+  (open) => {
+    if (!open) return
+    fileName.value = ''
+    parseError.value = ''
+    parsedPayload.value = null
+    moduleStats.value = []
+    mode.value = 'overwrite'
+    selectedModules.value = {
+      x4_empire_data: false,
+      x4_logic_flow_plans: false,
+      x4_ship_blueprints: false
+    }
+  }
+)
+
+watch(mode, (nextMode) => {
+  if (!parsedPayload.value) return
+  if (nextMode === 'overwrite') {
+    setDefaultSelections(true)
+  }
+})
+
+const moduleTitle = (key: ImportModuleKey) => {
+  switch (key) {
+    case 'x4_empire_data':
+      return t('importExport.module_empire')
+    case 'x4_logic_flow_plans':
+      return t('importExport.module_flow')
+    case 'x4_ship_blueprints':
+      return t('importExport.module_ship')
+    default:
+      return key
+  }
+}
+
+const onPickFile = async (event: Event) => {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+
+  fileName.value = file.name
+  parseError.value = ''
+
+  try {
+    const rawText = await file.text()
+    const raw = JSON.parse(rawText)
+    const normalized = normalizeImportPayload(raw)
+    const stats = getModuleImportStats(normalized)
+
+    if (stats.length === 0) {
+      parseError.value = t('importExport.error_no_module')
+      parsedPayload.value = null
+      moduleStats.value = []
+      return
+    }
+
+    parsedPayload.value = normalized
+    moduleStats.value = stats
+    setDefaultSelections(true)
+  } catch (error) {
+    parseError.value = t('importExport.error_parse_failed')
+    parsedPayload.value = null
+    moduleStats.value = []
+  }
+}
+
+const handleApplyImport = () => {
+  if (!parsedPayload.value) return
+
+  const result = applyImportPayload({
+    mode: mode.value,
+    selectedModules: selectedModules.value,
+    currentView: shipBuildStore.activeView,
+    payload: parsedPayload.value,
+    empireStore,
+    logicFlowStore,
+    shipBuildStore
+  })
+
+  if (result.applied.length === 0) {
+    statusStore.pushMessage('warning', 'system', t('importExport.error_no_selection'))
+    return
+  }
+
+  if (result.warnings.length > 0) {
+    statusStore.pushMessage('warning', 'system', result.warnings.join(' '))
+  }
+
+  statusStore.pushMessage('success', 'system', t('importExport.import_success', { count: result.applied.length }))
+  emit('close')
+}
+
+</script>
+
+<template>
+  <div v-if="isOpen" class="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" data-testid="storage-import-wizard">
+    <div class="w-full max-w-3xl bg-slate-800 border border-slate-600 rounded-lg shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+      <div class="flex justify-between items-center px-6 py-4 border-b border-slate-700 bg-slate-900/30">
+        <h3 class="text-lg font-bold text-white tracking-wide">{{ t('importExport.title') }}</h3>
+        <button class="text-slate-400 hover:text-white transition p-1 hover:bg-slate-700 rounded" @click="emit('close')">
+          <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-5 overflow-y-auto custom-scrollbar">
+        <div>
+          <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">{{ t('importExport.upload') }}</div>
+          <label class="flex items-center gap-3 px-4 py-3 bg-slate-900/40 border border-slate-700 rounded cursor-pointer hover:border-slate-500 transition">
+            <input
+              type="file"
+              class="hidden"
+              accept="application/json,.json"
+              data-testid="storage-import-file-input"
+              @change="onPickFile"
+            />
+            <span class="text-sm font-bold text-slate-100">{{ t('importExport.select_file') }}</span>
+            <span class="text-xs text-slate-400 truncate">{{ fileName || t('importExport.no_file') }}</span>
+          </label>
+          <p v-if="parseError" class="text-red-300 text-sm mt-2" data-testid="storage-import-parse-error">{{ parseError }}</p>
+        </div>
+
+        <div v-if="hasParsedPayload" class="space-y-4" data-testid="storage-import-config">
+          <div>
+            <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">{{ t('importExport.mode') }}</div>
+            <div class="flex gap-2">
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded text-xs font-bold transition"
+                :class="mode === 'overwrite' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'"
+                data-testid="storage-import-mode-overwrite"
+                @click="mode = 'overwrite'"
+              >
+                {{ t('importExport.mode_overwrite') }}
+              </button>
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded text-xs font-bold transition"
+                :class="mode === 'incremental' ? 'bg-sky-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'"
+                data-testid="storage-import-mode-incremental"
+                @click="mode = 'incremental'"
+              >
+                {{ t('importExport.mode_incremental') }}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">{{ t('importExport.modules') }}</div>
+            <div class="space-y-2">
+              <label
+                v-for="entry in moduleStats"
+                :key="entry.key"
+                class="flex items-center justify-between px-3 py-2 rounded border border-slate-700 bg-slate-900/40"
+                :data-testid="`storage-import-module-${entry.key}`"
+              >
+                <div class="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    :checked="selectedModules[entry.key]"
+                    @change="selectedModules[entry.key] = !selectedModules[entry.key]"
+                  />
+                  <span class="text-sm text-slate-100">{{ moduleTitle(entry.key) }}</span>
+                </div>
+                <span class="text-xs text-slate-400">{{ t('importExport.module_count', { count: entry.count }) }}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-6 py-4 border-t border-slate-700 bg-slate-900/30 flex justify-end gap-3">
+        <button class="px-4 py-2 rounded text-sm font-bold bg-slate-600 hover:bg-slate-500 text-white transition" @click="emit('close')">
+          {{ t('ui.cancel') }}
+        </button>
+        <button
+          class="px-5 py-2 rounded text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="!hasParsedPayload"
+          data-testid="storage-import-apply-btn"
+          @click="handleApplyImport"
+        >
+          {{ t('importExport.action_apply') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.5);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(71, 85, 105, 0.8);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 1);
+}
+</style>

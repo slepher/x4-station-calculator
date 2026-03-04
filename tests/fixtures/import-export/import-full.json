@@ -1,0 +1,98 @@
+{
+  "meta": {
+    "format": "x4-import-export",
+    "version": 1
+  },
+  "x4_empire_data": {
+    "version": 2,
+    "activeId": "imp-empire-1",
+    "activeStationId": "imp-station-1",
+    "list": [
+      {
+        "id": "imp-empire-1",
+        "name": "Imported Empire",
+        "stations": [
+          {
+            "id": "imp-station-1",
+            "name": "Imported Station",
+            "type": "industrial",
+            "count": 1,
+            "modules": [
+              { "id": "prod_gen_hullparts_macro", "count": 1 }
+            ],
+            "settings": {
+              "sunlight": 100,
+              "useHQ": false,
+              "manualWorkforce": 0,
+              "workforcePercent": 100,
+              "workforceAuto": true,
+              "considerWorkforceForAutoFill": false,
+              "supplyWorkforceBonus": false,
+              "buyMultiplier": 0.5,
+              "sellMultiplier": 0.5,
+              "minersEnabled": false,
+              "internalSupply": false,
+              "showEmpireGaps": false,
+              "racePreference": "argon",
+              "resourceBufferHours": 1,
+              "primaryProductBufferHours": 12,
+              "secondaryProductBufferHours": 2,
+              "transportShipCapacity": 62000
+            },
+            "lastUpdated": 1772453451902,
+            "lockedWares": [],
+            "warePriority": {}
+          }
+        ]
+      }
+    ]
+  },
+  "x4_logic_flow_plans": {
+    "version": 1,
+    "activeId": "imp-flow-1",
+    "list": [
+      {
+        "id": "imp-flow-1",
+        "name": "Imported Flow",
+        "groups": [
+          {
+            "id": "imp-group-1",
+            "name": "Imported Group",
+            "category": "industrial",
+            "subCategory": "default",
+            "isLocked": false,
+            "lockedLineage": "default",
+            "nodes": [
+              {
+                "id": "imp-node-1",
+                "wareId": "energycells",
+                "race": "argon",
+                "lineage": "default",
+                "column": 0,
+                "isIsolated": true,
+                "source": "manual",
+                "isRoot": true,
+                "order": 0
+              }
+            ]
+          }
+        ],
+        "settings": { "isDefaultLocked": true },
+        "lastUpdated": 1772453451902
+      }
+    ]
+  },
+  "x4_ship_blueprints": {
+    "version": 1,
+    "activeId": "imp-ship-1",
+    "list": [
+      {
+        "id": "imp-ship-1",
+        "name": "Imported Blueprint",
+        "shipId": "ship_ter_m_corvette_02_a",
+        "connections": [],
+        "lastUpdated": 1772453451902
+      }
+    ]
+  }
+}
