@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import StationWorkbench from './components/StationWorkbench.vue'
 import DragTestPage from './components/test/DragTestPage.vue'
 import TestTemplateFlow from './components/test/GLM-Parent.vue'
+import MetricPanelPlayground from './components/test/MetricPanelPlayground.vue'
 import { useStationStore } from '@/store/useStationStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
@@ -15,7 +16,7 @@ const logicFlowStore = useLogicFlowStore()
 const empireStore = useEmpireStore()
 const shipBuildStore = useShipBuildStore()
 
-const currentView = ref<'main' | 'drag-test' | 'template-flow'>('main')
+const currentView = ref<'main' | 'drag-test' | 'template-flow' | 'metric-panel-test'>('main')
 
 onMounted(() => {
   const params = new URLSearchParams(window.location.search)
@@ -24,6 +25,8 @@ onMounted(() => {
     currentView.value = 'drag-test'
   } else if (view === 'template-flow') {
     currentView.value = 'template-flow'
+  } else if (view === 'metric-panel-test') {
+    currentView.value = 'metric-panel-test'
   }
 })
 
@@ -65,6 +68,7 @@ setTimeout(checkExportStores, 500);
   <div id="app-root">
     <DragTestPage v-if="currentView === 'drag-test'" />
     <TestTemplateFlow v-else-if="currentView === 'template-flow'" />
+    <MetricPanelPlayground v-else-if="currentView === 'metric-panel-test'" />
     <StationWorkbench v-else-if="stationStore.isReady"/>
     <div v-else class="loading-gate">Initializing Station Store...</div>
   </div>
