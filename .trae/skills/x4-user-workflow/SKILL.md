@@ -1,6 +1,6 @@
 ---
 name: x4-user-workflow
-description: "Orchestrate X4 Station Calculator workflow with OpenSpec. (Trigger: /x4:discuss, /x4:new, /x4:ff, /x4:doc, /x4:apply, /x4:bug, /x4:bug-fix, /x4:test-impl, /x4:test, /x4:test-run, /x4:verify, /x4:archive)"
+description: "Orchestrate X4 Station Calculator workflow with OpenSpec. (Trigger: /x4:discuss, /x4:new, /x4:ff, /x4:doc, /x4:test-doc, /x4:test-doc-viewer, /x4:apply, /x4:bug, /x4:bug-fix, /x4:test-impl, /x4:test, /x4:test-run, /x4:verify, /x4:archive)"
 ---
 
 # X4 Workflow Orchestrator
@@ -14,6 +14,8 @@ It is orchestration-only and must not duplicate implementation details from phas
 - `/x4:new`
 - `/x4:ff`
 - `/x4:doc`
+- `/x4:test-doc`
+- `/x4:test-doc-viewer`
 - `/x4:apply`
 - `/x4:bug`
 - `/x4:bug-fix`
@@ -49,6 +51,15 @@ Do not copy detailed standards into this file. Always delegate to phase skills.
 - Enforcement example:
   - `/x4:bug` cannot auto-advance to `/x4:bug-fix` in the same invocation.
   - `/x4:bug` may only output handoff instruction for next phase.
+
+## Reviewer Subagent Isolation (MANDATORY)
+
+For test-doc review phase:
+
+- `/x4:test-doc-viewer` must run in a dedicated isolated reviewer subagent.
+- Do not execute reviewer in the main thread context used by writer/orchestrator phases.
+- Pass minimal review-only payload (`change-name`, target doc paths, optional prior issue ids).
+- If reviewer subagent creation fails, stop with blocker; do not fallback to in-thread review.
 
 ## Cross-Skill Authority (MANDATORY)
 
@@ -111,32 +122,41 @@ Enforcement:
    - Goal: implement code changes for current change.
    - Delegate to: `x4-apply`.
 
-6. `/x4:bug`
+6. `/x4:test-doc`
+   - Goal: create/update test documentation artifacts.
+   - Delegate to: `x4-test-doc`.
+
+7. `/x4:test-doc-viewer`
+   - Goal: review final test documentation draft and return pass/rewrite gate decision.
+   - Delegate to: `x4-test-doc-viewer`.
+   - Execution mode: dedicated isolated reviewer subagent.
+
+8. `/x4:bug`
    - Goal: report bug and maintain bug/test artifacts for a change.
    - Delegate to: `x4-bug`.
 
-7. `/x4:bug-fix`
+9. `/x4:bug-fix`
    - Goal: run bug-fix workflow for reported bug.
    - Delegate to: `x4-bug-fix`.
 
-8. `/x4:test-impl`
+10. `/x4:test-impl`
    - Goal: implement/supplement tests from `test_tasks.md`.
    - Delegate to: `x4-test-impl`.
 
-9. `/x4:test`
-   - Goal: orchestrate test workflow (`x4-test-doc`, `x4-test-impl`, `x4-test-run`).
+11. `/x4:test`
+   - Goal: orchestrate test workflow (`x4-test-doc`, `x4-test-doc-viewer`, `x4-test-impl`, `x4-test-run`).
    - Delegate to: `x4-test`.
 
-10. `/x4:test-run`
+12. `/x4:test-run`
    - Goal: execute change-scoped tests and apply run-result updates.
    - Delegate to: `x4-test-run`.
 
-11. `/x4:verify`
+13. `/x4:verify`
    - Goal: run verification and testing workflow.
    - Delegate to: `x4-verify`.
    - Handoff contract to archive: must provide `verify_status`, `bug_gate`, `non_verified_bug_ids`, `bug_gate_summary`.
 
-12. `/x4:archive`
+14. `/x4:archive`
    - Goal: archive completed change and promote specs.
    - Delegate to: `x4-archive`.
    - Gate dependency: consume `/x4:verify` handoff contract; archive is allowed only when `verify_status=pass` and `bug_gate=pass`.
@@ -146,6 +166,8 @@ Enforcement:
 - Planning phases (`/x4:discuss`, `/x4:new`, `/x4:ff`, `/x4:doc`) must not edit source code.
 - `/x4:apply` should run after required planning artifacts are ready.
 - `/x4:test-impl` and `/x4:test` are optional standalone phases for focused test iteration.
+- When test docs are updated, `/x4:test-doc-viewer` review gate should pass before `/x4:test-impl`.
+- Reviewer gate execution must be isolated subagent mode (no in-thread reviewer fallback).
 - `/x4:verify` should run after `/x4:apply` and includes verification-stage test implementation/execution sequencing.
 - `/x4:archive` must consume `/x4:verify` gate output contract; missing gate fields are blockers.
 - `/x4:archive` should run only after verify passes.

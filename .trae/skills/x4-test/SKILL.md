@@ -1,6 +1,6 @@
 ---
 name: x4-test
-description: "Orchestrate test workflow across x4-test-doc, x4-test-impl, x4-test-run, x4-bug, and x4-bug-fix. Trigger with /x4:test <change-name>."
+description: "Orchestrate test workflow across x4-test-doc, x4-test-doc-viewer, x4-test-impl, x4-test-run, x4-bug, and x4-bug-fix. Trigger with /x4:test <change-name>."
 metadata:
   version: "1.0"
 ---
@@ -18,10 +18,11 @@ User invokes `/x4:test <change_name>`
 Coordinate test-related workflow for a change by sequencing:
 
 1. `x4-test-doc` (test docs)
-2. `x4-test-impl` (test implementation)
-3. `x4-test-run` (test execution + result apply)
-4. `x4-bug` (bug registration when new product defects are found)
-5. `x4-bug-fix` (product bug fix loop and re-verify)
+2. `x4-test-doc-viewer` (final test-doc review gate)
+3. `x4-test-impl` (test implementation)
+4. `x4-test-run` (test execution + result apply)
+5. `x4-bug` (bug registration when new product defects are found)
+6. `x4-bug-fix` (product bug fix loop and re-verify)
 
 ## Parameters
 
@@ -46,25 +47,28 @@ Coordinate test-related workflow for a change by sequencing:
 #### A.2 Delegation Map (MANDATORY)
 
 1. Test documentation changes -> delegate to `x4-test-doc`.
-2. Test authoring/fixing -> delegate to `x4-test-impl`.
-3. Test run and result apply -> delegate to `x4-test-run`.
-4. New product bug registration -> delegate to `x4-bug`.
-5. Product bug fixing workflow -> delegate to `x4-bug-fix`.
+2. Test documentation final review gate -> delegate to `x4-test-doc-viewer` via dedicated isolated reviewer subagent.
+3. Test authoring/fixing -> delegate to `x4-test-impl`.
+4. Test run and result apply -> delegate to `x4-test-run`.
+5. New product bug registration -> delegate to `x4-bug`.
+6. Product bug fixing workflow -> delegate to `x4-bug-fix`.
 
 #### A.3 Sequencing (MANDATORY)
 
 Default sequence:
 
 1. Ensure docs are current (`x4-test-doc`) when requirements changed.
-2. Ensure implementation coverage (`x4-test-impl`) when tests missing/stale.
-3. Execute and apply run results (`x4-test-run`).
-4. Failure branch handling:
+2. Run reviewer gate (`x4-test-doc-viewer`) for final doc draft in a dedicated isolated reviewer subagent.
+3. If reviewer rejects (`review_status=rewrite_required`), route back to `x4-test-doc` and repeat doc-review loop until pass.
+4. Ensure implementation coverage (`x4-test-impl`) when tests missing/stale.
+5. Execute and apply run results (`x4-test-run`).
+6. Failure branch handling:
    - `test_defect` -> route back to `x4-test-impl`, then rerun `x4-test-run`.
    - `product_bug`:
      - if no existing bug record -> run `x4-bug` first,
      - then run `x4-bug-fix`,
      - then rerun `x4-test-run` for bug-targeted verification.
-5. Repeat branch loop until no unresolved blockers or user stops.
+7. Repeat branch loop until no unresolved blockers or user stops.
 
 ### Chapter B: Update Mandatory
 
@@ -72,6 +76,7 @@ Default sequence:
 
 - Report delegated phase status in order:
   - `x4-test-doc`
+  - `x4-test-doc-viewer`
   - `x4-test-impl`
   - `x4-test-run`
   - `x4-bug` (when triggered)
@@ -81,6 +86,7 @@ Default sequence:
 #### B.2 Handoff Integrity (MANDATORY)
 
 - Pass consistent change target to all delegated phases.
+- For `x4-test-doc-viewer`, pass minimal review-only handoff payload and keep it isolated from main thread context.
 - Preserve run-result context when handing off into `x4-test-run`.
 - Preserve failure classification context (`test_defect` / `product_bug`) for branch routing.
 - Ensure product bug branch always maps to a bug id before entering `x4-bug-fix`.
@@ -89,7 +95,7 @@ Default sequence:
 ## Output
 
 - Delegation plan and executed phase order
-- Per-phase summary (`x4-test-doc`, `x4-test-impl`, `x4-test-run`, `x4-bug`, `x4-bug-fix`)
+- Per-phase summary (`x4-test-doc`, `x4-test-doc-viewer`, `x4-test-impl`, `x4-test-run`, `x4-bug`, `x4-bug-fix`)
 - Final blockers and next step
 
 ## Example Usage
