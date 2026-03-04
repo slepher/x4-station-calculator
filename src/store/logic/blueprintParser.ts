@@ -1,5 +1,10 @@
 import type { X4Module } from '@/types/x4'
 
+export interface ParsedXmlBlueprint {
+  counts: Record<string, number>
+  name: string
+}
+
 /**
  * 从 XML 内容中提取模块宏定义
  * @param xmlContent XML 字符串内容
@@ -23,6 +28,21 @@ export function parseXmlBlueprint(xmlContent: string): Record<string, number> {
   }
 
   return counts
+}
+
+/**
+ * 从 XML 内容中提取模块与蓝图名称
+ * 名称优先从顶层 plan/entry 标签读取
+ */
+export function parseXmlBlueprintMeta(xmlContent: string): ParsedXmlBlueprint {
+  const counts = parseXmlBlueprint(xmlContent)
+
+  const nameMatch =
+    /<(?:plan|entry)\b[^>]*\bname="([^"]+)"/i.exec(xmlContent)
+    || /<(?:blueprint)\b[^>]*\bname="([^"]+)"/i.exec(xmlContent)
+
+  const name = (nameMatch?.[1] || '').trim()
+  return { counts, name }
 }
 
 /**

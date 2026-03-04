@@ -185,6 +185,8 @@ const handleRemoveModule = (wareId: string) => {
     store.updateModuleCount(plannedIndex, current - 1)
   }
 }
+
+const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
 </script>
 
 <template>
@@ -262,7 +264,7 @@ const handleRemoveModule = (wareId: string) => {
     </div>
 
     <!-- 体积控件部分 -->
-    <div class="volume-controls-section" v-if="viewMode === 'volume'">
+    <div class="volume-controls-section" v-if="hasFlowData && viewMode === 'volume'">
       <div class="simulation-controls flex flex-row gap-4">
         <VolumeControlSlider
           v-model="resourceBufferHours"
@@ -286,7 +288,7 @@ const handleRemoveModule = (wareId: string) => {
     </div>
 
     <!-- 利润分析部分 -->
-    <div class="profit-section" v-if="viewMode === 'economy'">
+    <div class="profit-section" v-if="hasFlowData && viewMode === 'economy'">
       <div class="simulation-controls flex flex-row gap-4">
         <PriceSlider v-model="buyMultiplier" :label="t('wareflow.res_price')" type="buy" />
         <PriceSlider v-model="sellMultiplier" :label="t('wareflow.prod_price')" type="sell" />

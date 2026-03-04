@@ -1,6 +1,6 @@
 ---
 name: x4-test-doc
-description: "Update test documentation artifacts (`test_tasks.md`, `ui_knowledge.md`) for X4 changes with mandatory cross-file sync. Trigger with /x4:test-doc <change-name>."
+description: "Update test documentation artifacts (`test_tasks.md`, `ui_knowledge.md`) for X4 changes with mandatory cross-file sync, then pass x4-test-doc-viewer gate. Trigger with /x4:test-doc <change-name>."
 ---
 
 # X4 Test Documentation Update
@@ -62,6 +62,8 @@ Update `test_tasks.md` and `ui_knowledge.md` based on discussion conclusions or 
 2. Create or update affected test artifacts: `test_tasks.md`, `ui_knowledge.md`.
 3. Ensure localization matches user language.
 4. Enforce cross-file consistency between test artifacts.
+5. Submit final draft to `/x4:test-doc-viewer` for approval.
+6. If reviewer rejects, rewrite in this skill and resubmit until reviewer passes.
 
 ## Mandatory Requirements
 
@@ -338,6 +340,23 @@ Applies to all top-level tasks (`x.x`) in Chapter 1/2/3/4:
 4. Rerun lint until pass.
 5. Perform final agent check for cross-file consistency (`test_tasks.md` <-> `ui_knowledge.md`).
 
+#### B.5 Reviewer Gate Workflow (MANDATORY)
+
+`x4-test-doc` final output is blocked by `x4-test-doc-viewer` review gate:
+
+1. After B.4 passes, run `/x4:test-doc-viewer <change-name>` in a dedicated isolated reviewer subagent.
+2. Reviewer handoff must be minimal and review-only:
+   - resolved `change-name`
+   - target file paths (`test_tasks.md`, `ui_knowledge.md`)
+   - optional previous blocking issue ids
+3. If reviewer result is `review_status: rewrite_required`, `x4-test-doc` MUST:
+   - apply all blocking rewrite items to `test_tasks.md` and `ui_knowledge.md`;
+   - rerun `validate_test_tasks_refs.py` until pass;
+   - resubmit to `/x4:test-doc-viewer` using a fresh isolated reviewer subagent.
+4. Only when reviewer returns `review_status: pass` can this skill be considered complete.
+5. Do not bypass reviewer gate, even if validator already passes.
+6. If reviewer subagent cannot be started, stop and report blocker; do not downgrade to in-thread reviewer mode.
+
 ## Constraints
 
 - ENFORCE Zero-Code Policy: Do not touch source code.
@@ -348,6 +367,7 @@ Applies to all top-level tasks (`x.x`) in Chapter 1/2/3/4:
 ## Output
 
 - Updated test documentation artifacts (`test_tasks.md`, `ui_knowledge.md`)
+- Viewer gate result from `/x4:test-doc-viewer` (`review_status: pass`)
 - Confirmation of changes made
 - `Execution Evidence Block` (from A.8) must be included before completion claim.
 - Must include actual edited file paths for this run.

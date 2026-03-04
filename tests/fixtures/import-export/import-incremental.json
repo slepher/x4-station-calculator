@@ -1,0 +1,98 @@
+{
+  "meta": {
+    "format": "x4-import-export",
+    "version": 1
+  },
+  "x4_empire_data": {
+    "version": 2,
+    "activeId": "empire-1",
+    "activeStationId": "empire-1-station-1",
+    "list": [
+      {
+        "id": "empire-1",
+        "name": "Duplicate Empire Id",
+        "stations": [
+          {
+            "id": "empire-1-station-1",
+            "name": "Duplicate Station Id",
+            "type": "industrial",
+            "count": 1,
+            "modules": [
+              { "id": "prod_gen_claytronics_macro", "count": 1 }
+            ],
+            "settings": {
+              "sunlight": 100,
+              "useHQ": false,
+              "manualWorkforce": 0,
+              "workforcePercent": 100,
+              "workforceAuto": true,
+              "considerWorkforceForAutoFill": false,
+              "supplyWorkforceBonus": false,
+              "buyMultiplier": 0.5,
+              "sellMultiplier": 0.5,
+              "minersEnabled": false,
+              "internalSupply": false,
+              "showEmpireGaps": false,
+              "racePreference": "argon",
+              "resourceBufferHours": 1,
+              "primaryProductBufferHours": 12,
+              "secondaryProductBufferHours": 2,
+              "transportShipCapacity": 62000
+            },
+            "lastUpdated": 1772453451902,
+            "lockedWares": [],
+            "warePriority": {}
+          }
+        ]
+      }
+    ]
+  },
+  "x4_logic_flow_plans": {
+    "version": 1,
+    "activeId": "logic-flow-1",
+    "list": [
+      {
+        "id": "logic-flow-1",
+        "name": "Duplicate Flow Id",
+        "groups": [
+          {
+            "id": "lf-1-g1",
+            "name": "Duplicate Group Id",
+            "category": "industrial",
+            "subCategory": "default",
+            "isLocked": false,
+            "lockedLineage": "default",
+            "nodes": [
+              {
+                "id": "lf-1-g1-m1",
+                "wareId": "energycells",
+                "race": "argon",
+                "lineage": "default",
+                "column": 0,
+                "isIsolated": true,
+                "source": "manual",
+                "isRoot": true,
+                "order": 0
+              }
+            ]
+          }
+        ],
+        "settings": { "isDefaultLocked": true },
+        "lastUpdated": 1772453451902
+      }
+    ]
+  },
+  "x4_ship_blueprints": {
+    "version": 1,
+    "activeId": "d111f259-6c0d-f519-aa82-10829f684cbb",
+    "list": [
+      {
+        "id": "d111f259-6c0d-f519-aa82-10829f684cbb",
+        "name": "Duplicate Blueprint Id",
+        "shipId": "ship_ter_m_corvette_02_a",
+        "connections": [],
+        "lastUpdated": 1772453451902
+      }
+    ]
+  }
+}

@@ -105,3 +105,10 @@ await page.locator('.result-item').first().click();
 
 - 在当前 CI/沙箱环境执行 Playwright 时，可能出现 Chromium 启动错误：`sandbox_host_linux.cc ... Operation not permitted`。
 - 处理方式：在允许提权的前提下运行 `bash skill-scripts/playwright-isolated.sh ...` 进行验证，避免将环境权限问题误判为产品缺陷。
+
+
+## 运行时异常排查补充（2026-03-04）
+
+- 在 `ImportPlanModal` 切换到 `x4-station` tab 的路径上，若出现 `SyntaxError: 10`，`tests/test-setup.ts` 会将该 console error 提升为测试失败。
+- 定位建议：优先检查该 tab 切换时触发的 i18n 文案解析与模板绑定，确认是否存在 message format 解析异常。
+- 当 e2e 基于 `vite preview` 运行时，若代码已改但 `dist` 未重建，可能持续复现旧异常；先执行 `npm run build` 再重跑可避免误判。
