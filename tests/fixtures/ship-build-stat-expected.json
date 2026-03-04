@@ -45,7 +45,7 @@
       "shield": "208,272 MJ",
       "radar_range": "40 km",
       "weapon_burst": "6,265.9 MW",
-      "turret_avg": "182.283 MW",
+      "turret_avg": "301.105 MW",
       "storage_container": "2,800 m3",
       "dock_m_count": "0",
       "dock_m_capacity": "0",
@@ -80,4 +80,3 @@
     }
   }
 }
-

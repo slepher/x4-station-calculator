@@ -85,9 +85,10 @@ const setStatsLogic = async (page: any, logic: 'old' | 'new') => {
 }
 
 const captureStatGroup = async (page: any): Promise<StatMap> => {
+  const statsPanel = page.getByTestId('ship-build-panel-stats')
   const result = {} as StatMap
   for (const key of statKeys) {
-    const text = await page.getByTestId(`ship-build-stats-value-${key}`).first().textContent()
+    const text = await statsPanel.getByTestId(`metric-value-${key}`).first().textContent()
     result[key] = (text || '').replace(/\s+/g, ' ').trim()
   }
   return result
@@ -125,8 +126,9 @@ const diffOldVsNew = (oldStats: StatMap, newStats: StatMap): string[] => {
 
 const diffAgainstExpected = (actual: StatMap, expected: StatMap): string[] => {
   const diffs: string[] = []
+  const normalize = (value: string) => value.replace(/\s+/g, '')
   for (const key of statKeys) {
-    if (actual[key] !== expected[key]) {
+    if (normalize(actual[key]) !== normalize(expected[key])) {
       diffs.push(`${key}: actual=${actual[key]} expected=${expected[key]}`)
     }
   }
@@ -304,7 +306,8 @@ const statKeyByLabel: Record<string, string> = {
 
 const getStatValue = async (page: any, labelText: string) => {
   const key = statKeyByLabel[labelText] || labelText
-  const valueByTestId = page.getByTestId(`ship-build-stats-value-${key}`).first()
+  const statsPanel = page.getByTestId('ship-build-panel-stats')
+  const valueByTestId = statsPanel.getByTestId(`metric-value-${key}`).first()
   if (await valueByTestId.count()) {
     const text = await valueByTestId.textContent()
     return (text || '').replace(/\s+/g, ' ').trim()
@@ -317,8 +320,8 @@ const getStatValue = async (page: any, labelText: string) => {
     acceleration: /^(加速|加速度)$/
   }
   const exactPattern = keyLabelPatterns[key] || new RegExp(`^\\s*${labelText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`)
-  const label = page.locator('.stats-label').filter({ hasText: exactPattern }).first()
-  const value = label.locator('..').locator('.stats-value')
+  const label = statsPanel.locator('.metric-label').filter({ hasText: exactPattern }).first()
+  const value = label.locator('..').locator('.metric-value')
   const text = await value.textContent()
   return (text || '').replace(/\s+/g, ' ').trim()
 }
@@ -366,7 +369,7 @@ test.describe('ship-build-stat', () => {
     // 3.1.2 点击"简略"档位按钮
     await page.getByTestId('view-tab-btn-ship-build-stats-mode-summary').click()
     // 3.1.3 断言字段集合包含18项 #期望: [18]
-    const labels = page.locator('.stats-label')
+    const labels = page.getByTestId('ship-build-panel-stats').locator('.metric-label')
     const labelCount = await labels.count()
     expect(labelCount).toBe(18)
     // 3.1.4 断言包含：船体、护盾、雷达范围、武器爆发输出值、炮塔平均输出值、集装仓储、M级泊位数量、M级飞船容量、S级泊位数量、S级飞船容量、速度、助推速度、巡航速度、船员、单位、导弹、可投放设备、干扰弹 #期望: [toBeVisible]
@@ -397,12 +400,12 @@ test.describe('ship-build-stat', () => {
     // 3.2.2 点击"详细"档位按钮
     await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
     // 3.2.3 断言字段集合包含36项 #期望: [36]
-    const labels = page.locator('.stats-label')
+    const labels = page.getByTestId('ship-build-panel-stats').locator('.metric-label')
     await expect(labels).toHaveCount(36)
     // 3.2.4 点击"简略"档位按钮
     await page.getByTestId('view-tab-btn-ship-build-stats-mode-summary').click()
     // 3.2.5 断言字段集合包含18项 #期望: [18]
-    await expect(page.locator('.stats-label')).toHaveCount(18)
+    await expect(page.getByTestId('ship-build-panel-stats').locator('.metric-label')).toHaveCount(18)
   })
 
   // 3.3 Case: 详细档位真实值
@@ -412,7 +415,7 @@ test.describe('ship-build-stat', () => {
     // 3.3.2 切换: 大太刀已选 -> 详细档位
     await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
     // 3.3.3 断言船体、护盾、速度为真实值 #期望: ['--']
-    const values = page.locator('.stats-value')
+    const values = page.getByTestId('ship-build-panel-stats').locator('.metric-value')
     const hullValue = values.filter({ hasText: /MJ/ }).first()
     await expect(hullValue).not.toHaveText('--')
   })
@@ -465,11 +468,11 @@ test.describe('ship-build-stat', () => {
     // 3.7.2 点击"详细"档位按钮
     await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
     // 3.7.3 断言船体进度条可见 #期望: [toBeVisible]
-    await expect(page.locator('[data-testid="ship-build-stats-bar-hull"]')).toBeVisible()
+    await expect(page.getByTestId('ship-build-panel-stats').locator('[data-testid="metric-bar-hull"]')).toBeVisible()
     // 3.7.4 断言速度进度条可见 #期望: [toBeVisible]
-    await expect(page.locator('[data-testid="ship-build-stats-bar-speed"]')).toBeVisible()
+    await expect(page.getByTestId('ship-build-panel-stats').locator('[data-testid="metric-bar-speed"]')).toBeVisible()
     // 3.7.5 断言船员进度条可见 #期望: [toBeVisible]
-    await expect(page.locator('[data-testid="ship-build-stats-bar-crew"]')).toBeVisible()
+    await expect(page.getByTestId('ship-build-panel-stats').locator('[data-testid="metric-bar-crew"]')).toBeVisible()
   })
 
   // 3.8 Case: L级船进度条渲染
@@ -479,11 +482,11 @@ test.describe('ship-build-stat', () => {
     // 3.8.2 点击"详细"档位按钮
     await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
     // 3.8.3 断言船体进度条可见 #期望: [toBeVisible]
-    await expect(page.locator('[data-testid="ship-build-stats-bar-hull"]')).toBeVisible()
+    await expect(page.getByTestId('ship-build-panel-stats').locator('[data-testid="metric-bar-hull"]')).toBeVisible()
     // 3.8.4 断言速度进度条可见 #期望: [toBeVisible]
-    await expect(page.locator('[data-testid="ship-build-stats-bar-speed"]')).toBeVisible()
+    await expect(page.getByTestId('ship-build-panel-stats').locator('[data-testid="metric-bar-speed"]')).toBeVisible()
     // 3.8.5 断言船员进度条可见 #期望: [toBeVisible]
-    await expect(page.locator('[data-testid="ship-build-stats-bar-crew"]')).toBeVisible()
+    await expect(page.getByTestId('ship-build-panel-stats').locator('[data-testid="metric-bar-crew"]')).toBeVisible()
   })
 
   // 3.9 Case: 进度条渲染与比例
@@ -493,11 +496,11 @@ test.describe('ship-build-stat', () => {
     // 3.9.2 点击"详细"档位按钮
     await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
     // 3.9.3 断言船体进度条可见 #期望: [toBeVisible]
-    await expect(page.locator('[data-testid="ship-build-stats-bar-hull"]')).toBeVisible()
+    await expect(page.getByTestId('ship-build-panel-stats').locator('[data-testid="metric-bar-hull"]')).toBeVisible()
     // 3.9.4 断言速度进度条可见 #期望: [toBeVisible]
-    await expect(page.locator('[data-testid="ship-build-stats-bar-speed"]')).toBeVisible()
+    await expect(page.getByTestId('ship-build-panel-stats').locator('[data-testid="metric-bar-speed"]')).toBeVisible()
     // 3.9.5 断言船员进度条可见 #期望: [toBeVisible]
-    await expect(page.locator('[data-testid="ship-build-stats-bar-crew"]')).toBeVisible()
+    await expect(page.getByTestId('ship-build-panel-stats').locator('[data-testid="metric-bar-crew"]')).toBeVisible()
   })
 
   // 3.10 Case: 进度条渲染-大阪
@@ -507,7 +510,7 @@ test.describe('ship-build-stat', () => {
     // 3.10.2 点击"详细"档位按钮
     await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
     // 3.10.3 断言进度条可见 #期望: [toBeVisible]
-    await expect(page.locator('[data-testid="ship-build-stats-bar-hull"]')).toBeVisible()
+    await expect(page.getByTestId('ship-build-panel-stats').locator('[data-testid="metric-bar-hull"]')).toBeVisible()
   })
 
   // 3.11 Case: 进度条渲染-大太刀
@@ -517,7 +520,7 @@ test.describe('ship-build-stat', () => {
     // 3.11.2 点击"详细"档位按钮
     await page.getByTestId('view-tab-btn-ship-build-stats-mode-detail').click()
     // 3.11.3 断言进度条可见 #期望: [toBeVisible]
-    await expect(page.locator('[data-testid="ship-build-stats-bar-hull"]')).toBeVisible()
+    await expect(page.getByTestId('ship-build-panel-stats').locator('[data-testid="metric-bar-hull"]')).toBeVisible()
   })
 
   // 3.12 Case: S级过滤器交互

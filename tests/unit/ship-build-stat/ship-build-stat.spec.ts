@@ -81,7 +81,7 @@ describe('ShipBuildPanelStats', () => {
     const isSummaryMode = wrapper.find('[data-testid="view-tab-btn-ship-build-stats-mode-summary"]').exists()
     expect(isSummaryMode).toBe(true)
     // 1.3.2 断言包含以下字段标签：船体(MJ)、护盾(MJ)、雷达范围(km)、武器爆发输出值(MW)、炮塔平均输出值(MW)、集装仓储(m3)、M级泊位数量、M级飞船容量、S级泊位数量、S级飞船容量、速度(m/s)、助推器助推速度(m/s)、巡航速度(m/s)、船员、单位、导弹、可投放设备、干扰弹 #期望: [18]
-    const labels = wrapper.findAll('.stats-label')
+    const labels = wrapper.findAll('.metric-label')
     expect(labels.length).toBe(18)
     // 1.3.3 断言不出现仅属于详细扩展的字段标签：再充率(MW)、再充延迟(秒)、编组平均护盾容量、武器持续性输出值、固体仓储(m3)、液体仓储(m3)、冷凝态仓储(m3)、加速(m/s2)、助推加速度(m/s2)、助推时长(秒)、助推回充率(%/s)、巡航加速度(m/s2)、巡航加力时间(秒)、平移速度(m/s)、平移加速度(m/s2)、水平转向(°/s)、俯仰(°/s)、横滚(°/s) #期望: [false]
     const labelTexts = labels.map(l => l.text())
@@ -94,7 +94,7 @@ describe('ShipBuildPanelStats', () => {
     // 1.4.1 进入"详细"档位
     await wrapper.find('[data-testid="view-tab-btn-ship-build-stats-mode-detail"]').trigger('click')
     // 1.4.2 断言包含以下字段标签：船体(MJ)、护盾(MJ)、雷达范围(km)、武器爆发输出值(MW)、炮塔平均输出值(MW)、集装仓储(m3)、M级泊位数量、M级飞船容量、S级泊位数量、S级飞船容量、速度(m/s)、助推器助推速度(m/s)、巡航速度(m/s)、船员、单位、导弹、可投放设备、干扰弹、再充率(MW)、再充延迟(秒)、编组平均护盾容量、武器持续性输出值、固体仓储(m3)、液体仓储(m3)、冷凝态仓储(m3)、加速(m/s2)、助推加速度(m/s2)、助推时长(秒)、助推回充率(%/s)、巡航加速度(m/s2)、巡航加力时间(秒)、平移速度(m/s)、平移加速度(m/s2)、水平转向(°/s)、俯仰(°/s)、横滚(°/s) #期望: [36]
-    const labels = wrapper.findAll('.stats-label')
+    const labels = wrapper.findAll('.metric-label')
     expect(labels.length).toBe(36)
     // 1.4.3 断言简略字段（hull、shield等）仍然存在于详细模式中 #期望: [true]
     const labelTexts = labels.map(l => l.text())
@@ -110,7 +110,7 @@ describe('ShipBuildPanelStats', () => {
     // 1.5.2 进入"详细"档位
     await wrapper.find('[data-testid="view-tab-btn-ship-build-stats-mode-detail"]').trigger('click')
     // 1.5.3 断言船体、护盾、速度、助推速度、巡航速度、船员、集装箱仓储为非占位值 #期望: ['--']
-    const values = wrapper.findAll('.stats-value')
+    const values = wrapper.findAll('.metric-value')
     const firstValue = values[0]
     expect(firstValue?.text()).not.toBe('--')
   })
@@ -121,7 +121,7 @@ describe('ShipBuildPanelStats', () => {
     // 1.6.1 进入"详细"档位
     await wrapper.find('[data-testid="view-tab-btn-ship-build-stats-mode-detail"]').trigger('click')
     // 1.6.2 断言武器爆发输出值、武器持续性输出值、炮塔平均输出值为真实值 #期望: ['--']
-    const values = wrapper.findAll('.stats-value')
+    const values = wrapper.findAll('.metric-value')
     const weaponBurstValue = values[3]
     expect(weaponBurstValue?.text()).not.toBe('--')
   })

@@ -3,7 +3,9 @@ import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { useEquipmentStats } from '@/composables/useEquipmentStats'
+import MetricsPanel from '@/components/common/MetricsPanel.vue'
 import ViewTabUI from '@/components/common/ViewTabUI.vue'
+import type { MetricSchema, MetricValueMap } from '@/components/common/metricsPanelTypes'
 import type { X4Ship, X4Equipment, ShipBlueprint } from '@/types/x4'
 import bulletsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/bullets.json'
 import missilesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/missiles.json'
@@ -315,7 +317,9 @@ type ShipStatDisplay = {
   key: string;
   labelKey: string;
   unit: string;
+  value: number;
   valueText: string;
+  max: number;
   ratio: number | null;
   placeholder?: boolean;
   isZero?: boolean;
@@ -423,12 +427,15 @@ const summaryShipStats = computed<ShipStatDisplay[]>(() => {
   const maxStats = result.summaryMax
 
   return stats.map(metric => {
-    const ratio = calculateRatio(metric.value, maxStats[metric.key] || 1)
+    const max = maxStats[metric.key] || 1
+    const ratio = calculateRatio(metric.value, max)
     return {
       key: metric.key,
       labelKey: metric.labelKey,
       unit: metric.unit,
+      value: metric.value,
       valueText: formatStatValue(metric.value),
+      max,
       ratio,
       placeholder: placeholderKeys.has(metric.key),
       isZero: metric.value === 0
@@ -444,12 +451,15 @@ const detailedShipStats = computed<ShipStatDisplay[]>(() => {
   const maxStats = result.detailMax
 
   return stats.map(metric => {
-    const ratio = placeholderKeys.has(metric.key) ? null : calculateRatio(metric.value, maxStats[metric.key] || 1)
+    const max = maxStats[metric.key] || 1
+    const ratio = placeholderKeys.has(metric.key) ? null : calculateRatio(metric.value, max)
     return {
       key: metric.key,
       labelKey: metric.labelKey,
       unit: metric.unit,
+      value: metric.value,
       valueText: placeholderKeys.has(metric.key) ? '--' : formatStatValue(metric.value),
+      max,
       ratio,
       placeholder: placeholderKeys.has(metric.key),
       isZero: !placeholderKeys.has(metric.key) && metric.value === 0
@@ -459,6 +469,43 @@ const detailedShipStats = computed<ShipStatDisplay[]>(() => {
 
 const visibleShipStats = computed<ShipStatDisplay[]>(() => {
   return statsViewMode.value === 'summary' ? summaryShipStats.value : detailedShipStats.value
+})
+
+const panelSchema = computed<MetricSchema>(() => {
+  const items = visibleShipStats.value
+  const rows: MetricSchema = []
+  for (let i = 0; i < items.length; i += 2) {
+    const left = items[i]
+    const right = items[i + 1]
+    if (!left) continue
+    const row = [
+      {
+        key: left.key,
+        labelKey: t(left.labelKey),
+        unit: left.unit,
+        max: left.max
+      }
+    ]
+    if (right) {
+      row.push({
+        key: right.key,
+        labelKey: t(right.labelKey),
+        unit: right.unit,
+        max: right.max
+      })
+    }
+    rows.push(row)
+  }
+  return rows
+})
+
+const panelCurrentValues = computed<MetricValueMap | null>(() => {
+  if (!visibleShipStats.value.length) return null
+  const map: MetricValueMap = {}
+  visibleShipStats.value.forEach((metric) => {
+    map[metric.key] = metric.value
+  })
+  return map
 })
 
 // ============ 使用 useEquipmentStats 构建统计数据 (新逻辑) ============
@@ -623,44 +670,17 @@ const buildDetailStatsByUseEquipmentStats = (ship: X4Ship): Omit<ShipStatMetric,
       />
     </div>
     <div class="stats-panel" data-testid="ship-build-stats-panel">
-      <div class="stats-list-container">
-        <div class="stats-column">
-          <div
-            v-for="metric in visibleShipStats.filter((_, i) => i % 2 === 0)"
-            :key="metric.key"
-            class="stats-row"
-            :class="{ 'stats-row-placeholder': metric.placeholder }"
-            :data-testid="`ship-build-stats-row-${metric.key}`"
-          >
-            <span class="stats-label" :data-testid="`ship-build-stats-label-${metric.key}`">{{ t(metric.labelKey) }}</span>
-            <span class="stats-value" :class="{ 'stats-value-zero': metric.isZero }" :data-testid="`ship-build-stats-value-${metric.key}`">
-              {{ metric.valueText }}
-              <span v-if="metric.unit" class="stats-unit" :data-testid="`ship-build-stats-unit-${metric.key}`">{{ metric.unit }}</span>
-            </span>
-            <div v-if="metric.ratio !== null" class="stats-bar" :data-testid="`ship-build-stats-bar-${metric.key}`">
-              <div class="stats-bar-fill" :style="{ width: `${Math.round(metric.ratio * 100)}%` }"></div>
-            </div>
-          </div>
-        </div>
-        <div class="stats-column">
-          <div
-            v-for="metric in visibleShipStats.filter((_, i) => i % 2 === 1)"
-            :key="metric.key"
-            class="stats-row"
-            :class="{ 'stats-row-placeholder': metric.placeholder }"
-            :data-testid="`ship-build-stats-row-${metric.key}`"
-          >
-            <span class="stats-label" :data-testid="`ship-build-stats-label-${metric.key}`">{{ t(metric.labelKey) }}</span>
-            <span class="stats-value" :class="{ 'stats-value-zero': metric.isZero }" :data-testid="`ship-build-stats-value-${metric.key}`">
-              {{ metric.valueText }}
-              <span v-if="metric.unit" class="stats-unit" :data-testid="`ship-build-stats-unit-${metric.key}`">{{ metric.unit }}</span>
-            </span>
-            <div v-if="metric.ratio !== null" class="stats-bar" :data-testid="`ship-build-stats-bar-${metric.key}`">
-              <div class="stats-bar-fill" :style="{ width: `${Math.round(metric.ratio * 100)}%` }"></div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <MetricsPanel
+      panel-id="ship-build-stats-panel"
+      title=""
+      hide-header
+      :obj-current="panelCurrentValues"
+      :obj-target="null"
+      :schema="panelSchema"
+      order="row"
+      :view-tab="null"
+      :rounded-keys="[]"
+    />
     </div>
   </div>
 </template>
@@ -675,68 +695,14 @@ const buildDetailStatsByUseEquipmentStats = (ship: X4Ship): Omit<ShipStatMetric,
 }
 
 .stats-panel {
-  @apply p-4 bg-slate-900/30 border border-slate-800/80 rounded-lg m-4;
+  @apply p-2 bg-slate-900/30 rounded-lg m-2;
 }
 
-.stats-toolbar {
-  @apply flex items-center justify-between gap-3 mb-3;
+.stats-panel :deep(.metrics-panel) {
+  @apply bg-transparent border-0 shadow-none;
 }
 
-.stats-caption {
-  @apply text-[11px] uppercase tracking-wide text-emerald-300/80;
-}
-
-.stats-pending {
-  @apply text-[11px] text-amber-300/80 mb-3;
-}
-
-.stats-list-container {
-  @apply grid grid-cols-2 gap-x-4 gap-y-1;
-}
-
-.stats-column {
-  @apply flex flex-col gap-1;
-}
-
-.stats-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  column-gap: 0.5rem;
-  row-gap: 0.25rem;
-}
-
-.stats-label {
-  @apply text-xs text-slate-300 truncate;
-}
-
-.stats-value {
-  @apply text-xs text-emerald-300 tabular-nums;
-}
-
-.stats-value-zero {
-  @apply text-slate-400;
-}
-
-.stats-row-placeholder .stats-label {
-  @apply text-slate-400;
-}
-
-.stats-row-placeholder .stats-value {
-  @apply text-slate-500;
-}
-
-.stats-unit {
-  @apply text-[10px] text-slate-400 ml-1;
-}
-
-.stats-bar {
-  grid-column: 1 / -1;
-  height: 6px;
-  @apply bg-slate-800 rounded-sm overflow-hidden border border-slate-700/70;
-}
-
-.stats-bar-fill {
-  height: 100%;
-  @apply bg-emerald-500/80;
+.stats-panel :deep(.metrics-panel-content) {
+  @apply m-0 p-0 bg-transparent;
 }
 </style>

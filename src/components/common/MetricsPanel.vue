@@ -19,12 +19,14 @@ const props = withDefaults(defineProps<{
   order?: MetricsOrder
   viewTab?: MetricsPanelViewTab | null
   roundedKeys?: string[]
+  hideHeader?: boolean
 }>(), {
   title: 'Metrics Panel',
   panelId: 'default',
   order: 'row',
   viewTab: null,
-  roundedKeys: () => []
+  roundedKeys: () => [],
+  hideHeader: false
 })
 
 const currentMode = ref(props.viewTab?.views[0]?.mode || '')
@@ -81,7 +83,7 @@ const labelText = (labelKey: string) => labelKey
 
 <template>
   <div class="metrics-panel" :data-testid="`metrics-panel-${panelId}`">
-    <div class="metrics-panel-header" :data-testid="`metrics-panel-header-${panelId}`">
+    <div v-if="!hideHeader" class="metrics-panel-header" :data-testid="`metrics-panel-header-${panelId}`">
       <span class="metrics-panel-title">{{ title }}</span>
       <ViewTabUI
         v-if="viewTab && viewTab.views.length > 0"

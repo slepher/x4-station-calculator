@@ -94,7 +94,7 @@ function useEquipmentStats(equipment: X4Equipment, ship: X4Ship): {
 - 真实值字段：断言 `船体/护盾/速度/助推/巡航/船员/仓储` 非 `--`。
 - 武器DPS字段：断言 `武器爆发输出值/武器持续性输出值/炮塔平均输出值` 为真实值（非 `--`）。
 - 高度策略：断言中列属性区（`ship-build-stats-panel`）与已选详情区（`ship-build-selection`）无固定高度样式（不含 `h-48`、`72px`、`max-h-[300px]` 等）。
-- 进度条比例：断言进度条元素的宽度或计算比例值正确。进度条容器通常有 `data-testid` 属性，格式为 `ship-build-stats-bar-{statKey}`。
+- 进度条比例：断言进度条元素的宽度或计算比例值正确。进度条容器通常有 `data-testid` 属性，格式为 `metric-bar-{statKey}`（作用域：`ship-build-panel-stats`）。
 
 **注意**：所有 UI 元素定位符（data-testid）应使用本文件”建议的测试定位”部分定义的属性值，不应直接写在 test_tasks.md 中。
 
@@ -158,9 +158,9 @@ function useEquipmentStats(equipment: X4Equipment, ship: X4Ship): {
 
 | 元素 | data-testid 模式 | 说明 |
 |------|------------------|------|
-| 进度条容器 | `ship-build-stats-bar-{statKey}` | 进度条外层容器 |
-| 进度条填充 | `.stats-bar-fill` | 进度条填充元素（通过 class 选择） |
-| 进度条数值 | `ship-build-stats-value-{statKey}` | 显示当前值的元素 |
+| 进度条容器 | `metric-bar-{statKey}` | 进度条外层容器（作用域：`ship-build-panel-stats`） |
+| 进度条填充 | `.metric-bar-fill` | 进度条填充元素（通过 class 选择） |
+| 进度条数值 | `metric-value-{statKey}` | 显示当前值的元素（作用域：`ship-build-panel-stats`） |
 
 ### 测试样本
 
