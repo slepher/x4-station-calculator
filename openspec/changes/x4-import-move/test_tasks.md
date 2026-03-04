@@ -31,10 +31,10 @@
 
 ## 3 E2E 测试场景
 
-- [✓] 3.1 Case: StationToolbar Import 打开统一 3-tab 导入视图
-  - [✓] 3.1.1 点击 StationToolbar `Import` 按钮并打开 `import-view-modal`
-  - [✓] 3.1.2 断言 `logic-flow / game-blueprint / x4-station` 三个 tab 均存在
-  - [✓] 3.1.3 切换到 logic-flow tab 后显示 `logicflow-import-body` 且不显示旧 `logicflow-import-modal` #期望: [true]
+- [✓] 3.1 Case: StationToolbar Import 打开 storage-import 向导
+  - [✓] 3.1.1 点击 StationToolbar `Import` 按钮并打开 `storage-import-wizard`
+  - [✓] 3.1.2 上传合法导入文件后断言 Empire/Flow/Ship 三个模块复选项存在
+  - [✓] 3.1.3 断言覆盖/增量模式切换可见且不显示 `import-view-modal` #期望: [true]
 
 - [✓] 3.2 Case: ContextToolbar logic-flow 入口按当前页面自动判定导入目标
   - [✓] 3.2.1 站点页点击 `logicflow-import-entry-station` 后显示 `logicflow-import-group-list`
@@ -42,7 +42,7 @@
   - [✓] 3.2.3 两种入口均进入统一 `import-view-modal` #期望: [true]
 
 - [✓] 3.3 Case: 游戏蓝图上传后展示模块数且在非空站点弹策略弹窗
-  - [✓] 3.3.1 在站点页打开导入视图并上传 XML 蓝图文件
+  - [✓] 3.3.1 在站点页通过 ContextToolbar 入口打开 `import-view-modal` 并切到 game-blueprint tab
   - [✓] 3.3.2 断言 `import-blueprint-module-count` 显示模块总数 `2`
   - [✓] 3.3.3 点击导入后弹出 `blueprint-import-strategy-modal` 且包含覆盖/添加/新空间站按钮 #期望: [true]
 

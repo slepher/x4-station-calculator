@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEmpireStore } from '@/store/useEmpireStore'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { useStatusStore } from '@/store/useStatusStore'
@@ -24,6 +25,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const empireStore = useEmpireStore()
+const gameDataStore = useGameDataStore()
 const logicFlowStore = useLogicFlowStore()
 const shipBuildStore = useShipBuildStore()
 const statusStore = useStatusStore()
@@ -125,6 +127,7 @@ const handleApplyImport = () => {
     selectedModules: selectedModules.value,
     currentView: shipBuildStore.activeView,
     payload: parsedPayload.value,
+    gameDataStore,
     empireStore,
     logicFlowStore,
     shipBuildStore

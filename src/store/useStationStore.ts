@@ -37,7 +37,6 @@ export const useStationStore = defineStore('station', () => {
   const logicFlow = useLogicFlowStore()
   const empireStore = useEmpireStore()
   const shipBuildStore = useShipBuildStore()
-  logicFlow.init()
 
   const activeView = computed<StationActiveView>({
     get: () => shipBuildStore.activeView,
@@ -454,7 +453,11 @@ export const useStationStore = defineStore('station', () => {
       const totalFound = Object.values(counts).reduce((sum, count) => sum + count, 0)
       if (totalFound > 0) {
         clearAll()
-        Object.entries(counts).forEach(([id, count]) => addModule(id, count))
+        Object.entries(counts).forEach(([id, count]) => {
+          const resolvedId = resolveModuleId(id, modulesMap.value, gameData.modulesByMacroId)
+          if (resolvedId) addModule(resolvedId, count)
+          else console.warn(`[StationStore][Import] unresolved module id in XML: ${id}`)
+        })
         return
       }
     }
@@ -463,15 +466,16 @@ export const useStationStore = defineStore('station', () => {
     if (Object.keys(counts).length > 0) {
       clearAll()
       Object.entries(counts).forEach(([id, count]) => {
-        const resolvedId = resolveModuleId(id, modulesMap.value)
+        const resolvedId = resolveModuleId(id, modulesMap.value, gameData.modulesByMacroId)
         if (resolvedId) addModule(resolvedId, count)
+        else console.warn(`[StationStore][Import] unresolved module id in x4-game link: ${id}`)
       })
     }
   }
 
   function getModuleInfo(id: string): X4Module {
     return modulesMap.value[id] || {
-      id, wareId: '', nameId: id, type: 'unknown', group: 'others', race: 'unknown', buildTime: 0,
+      id, macroId: '', wareId: '', nameId: id, type: 'unknown', group: 'others', race: 'unknown', buildTime: 0,
       buildCost: {}, cycleTime: 0, outputs: {}, inputs: {},
       workforce: { capacity: 0, needed: 0, maxBonus: 0 }
     } as X4Module

@@ -7,9 +7,9 @@ plans:
         isLocked: true
         lockedLineage: default
         nodes:
-          - moduleId: prod_gen_claytronics_macro
+          - moduleId: module_gen_prod_claytronics_01
             isIsolated: false
-          - moduleId: prod_gen_hullparts_macro
+          - moduleId: module_gen_prod_hullparts_01
             isIsolated: false
           - wareId: quantumtubes
             isIsolated: true
@@ -19,7 +19,7 @@ plans:
         isLocked: true
         lockedLineage: default
         nodes:
-          - moduleId: prod_gen_quantumtubes_macro
+          - moduleId: module_gen_prod_quantumtubes_01
             isIsolated: false
       - name: E1-S3
         category: agricultural
@@ -27,9 +27,9 @@ plans:
         isLocked: true
         lockedLineage: default
         nodes:
-          - moduleId: prod_arg_foodrations_macro
+          - moduleId: module_arg_prod_foodrations_01
             isIsolated: false
-          - moduleId: prod_arg_medicalsupplies_macro
+          - moduleId: module_arg_prod_medicalsupplies_01
             isIsolated: false
   - name: Logic Flow 2
     groups:
@@ -39,21 +39,21 @@ plans:
         isLocked: true
         lockedLineage: default
         nodes:
-          - moduleId: prod_gen_advancedelectronics_macro
+          - moduleId: module_gen_prod_advancedelectronics_01
             isIsolated: false
-          - moduleId: prod_gen_antimatterconverters_macro
+          - moduleId: module_gen_prod_antimatterconverters_01
             isIsolated: false
-          - moduleId: prod_gen_dronecomponents_macro
+          - moduleId: module_gen_prod_dronecomponents_01
             isIsolated: false
-          - moduleId: prod_gen_fieldcoils_macro
+          - moduleId: module_gen_prod_fieldcoils_01
             isIsolated: false
-          - moduleId: prod_gen_missilecomponents_macro
+          - moduleId: module_gen_prod_missilecomponents_01
             isIsolated: false
-          - moduleId: prod_gen_shieldcomponents_macro
+          - moduleId: module_gen_prod_shieldcomponents_01
             isIsolated: false
-          - moduleId: prod_gen_turretcomponents_macro
+          - moduleId: module_gen_prod_turretcomponents_01
             isIsolated: false
-          - moduleId: prod_gen_weaponcomponents_macro
+          - moduleId: module_gen_prod_weaponcomponents_01
             isIsolated: false
           - wareId: advancedcomposites
             isIsolated: true
@@ -75,7 +75,7 @@ plans:
         isLocked: true
         lockedLineage: default
         nodes:
-          - moduleId: prod_gen_claytronics_macro
+          - moduleId: module_gen_prod_claytronics_01
             isIsolated: false
-          - moduleId: prod_gen_hullparts_macro
+          - moduleId: module_gen_prod_hullparts_01
             isIsolated: false

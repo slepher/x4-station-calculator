@@ -269,7 +269,7 @@ const toBlueprintModules = (counts: Record<string, number>) => {
   const resolvedMap = new Map<string, number>()
 
   Object.entries(counts).forEach(([id, count]) => {
-    const resolved = resolveModuleId(id, gameDataStore.modulesMap)
+    const resolved = resolveModuleId(id, gameDataStore.modulesMap, gameDataStore.modulesByMacroId)
     if (!resolved) return
     resolvedMap.set(resolved, (resolvedMap.get(resolved) || 0) + count)
   })

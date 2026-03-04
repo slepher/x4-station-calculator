@@ -27,6 +27,7 @@ export function buildModulesMap(): Record<string, X4Module> {
     if(!m.isPlayerBlueprint) return
     map[m.id] = {
       ...m,
+      macroId: m.macroId || '',
       buildCost: m.buildCost || {},
       outputs: m.outputs || {},
       inputs: m.inputs || {},
@@ -37,6 +38,15 @@ export function buildModulesMap(): Record<string, X4Module> {
         maxBonus: m.workforce?.maxBonus || 0
       }
     }
+  })
+  return map
+}
+
+export function buildModulesByMacroIdMap(modulesMap: Record<string, X4Module>): Record<string, X4Module> {
+  const map: Record<string, X4Module> = {}
+  Object.values(modulesMap).forEach((module) => {
+    if (!module.macroId) return
+    map[module.macroId] = module
   })
   return map
 }
@@ -67,6 +77,7 @@ export function buildLocalizedModulesMap(
     if(!m.isPlayerBlueprint) return
     map[m.id] = {
       ...m,
+      macroId: m.macroId || '',
       localeName: isEn ? (m.name || '') : translateModule(m as X4Module)
     }
   })

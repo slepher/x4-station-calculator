@@ -431,7 +431,8 @@ class X4PrecisionLoader:
                 wf_cap = int(wf_node.get('capacity') or 0) if wf_node is not None else 0
 
                 module_data = {
-                    "id": fname, 
+                    "id": info['module_ware_id'],
+                    "macroId": fname,
                     "wareId": info['module_ware_id'], 
                     "nameId": info['name_id'], 
                     "name": info['name_id'], 

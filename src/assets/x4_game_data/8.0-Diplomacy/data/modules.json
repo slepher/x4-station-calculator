@@ -1,6 +1,7 @@
 [
   {
-    "id": "buildmodule_bor_equip_l_macro",
+    "id": "module_bor_equip_l_01",
+    "macroId": "buildmodule_bor_equip_l_macro",
     "wareId": "module_bor_equip_l_01",
     "nameId": "{20104,62301}",
     "name": "Boron L Ship Maintenance Bay",
@@ -29,7 +30,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_bor_equip_m_dockarea_01_macro",
+    "id": "module_bor_equip_dockarea_m_01",
+    "macroId": "buildmodule_bor_equip_m_dockarea_01_macro",
     "wareId": "module_bor_equip_dockarea_m_01",
     "nameId": "{20104,62201}",
     "name": "Boron S/M Ship Maintenance Bay",
@@ -58,7 +60,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_bor_equip_xl_macro",
+    "id": "module_bor_equip_xl_01",
+    "macroId": "buildmodule_bor_equip_xl_macro",
     "wareId": "module_bor_equip_xl_01",
     "nameId": "{20104,62401}",
     "name": "Boron XL Ship Maintenance Bay",
@@ -87,7 +90,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_bor_ships_l_macro",
+    "id": "module_bor_build_l_01",
+    "macroId": "buildmodule_bor_ships_l_macro",
     "wareId": "module_bor_build_l_01",
     "nameId": "{20104,62601}",
     "name": "Boron L Ship Fabrication Bay",
@@ -116,7 +120,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_bor_ships_m_dockarea_01_macro",
+    "id": "module_bor_build_dockarea_m_01",
+    "macroId": "buildmodule_bor_ships_m_dockarea_01_macro",
     "wareId": "module_bor_build_dockarea_m_01",
     "nameId": "{20104,62501}",
     "name": "Boron S/M Ship Fabrication Bay",
@@ -145,7 +150,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_bor_ships_xl_macro",
+    "id": "module_bor_build_xl_01",
+    "macroId": "buildmodule_bor_ships_xl_macro",
     "wareId": "module_bor_build_xl_01",
     "nameId": "{20104,62701}",
     "name": "Boron XL Ship Fabrication Bay",
@@ -174,7 +180,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_gen_equip_l_macro",
+    "id": "module_gen_equip_l_01",
+    "macroId": "buildmodule_gen_equip_l_macro",
     "wareId": "module_gen_equip_l_01",
     "nameId": "{20104,60601}",
     "name": "L Ship Maintenance Bay",
@@ -202,7 +209,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_gen_equip_m_dockarea_01_macro",
+    "id": "module_gen_equip_dockarea_m_01",
+    "macroId": "buildmodule_gen_equip_m_dockarea_01_macro",
     "wareId": "module_gen_equip_dockarea_m_01",
     "nameId": "{20104,61401}",
     "name": "S/M Ship Maintenance Bay",
@@ -230,7 +238,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_gen_equip_xl_macro",
+    "id": "module_gen_equip_xl_01",
+    "macroId": "buildmodule_gen_equip_xl_macro",
     "wareId": "module_gen_equip_xl_01",
     "nameId": "{20104,60701}",
     "name": "XL Ship Maintenance Bay",
@@ -258,7 +267,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_gen_ships_l_macro",
+    "id": "module_gen_build_l_01",
+    "macroId": "buildmodule_gen_ships_l_macro",
     "wareId": "module_gen_build_l_01",
     "nameId": "{20104,60301}",
     "name": "L Ship Fabrication Bay",
@@ -286,7 +296,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_gen_ships_m_dockarea_01_macro",
+    "id": "module_gen_build_dockarea_m_01",
+    "macroId": "buildmodule_gen_ships_m_dockarea_01_macro",
     "wareId": "module_gen_build_dockarea_m_01",
     "nameId": "{20104,61301}",
     "name": "S/M Ship Fabrication Bay",
@@ -314,7 +325,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_gen_ships_m_macro",
+    "id": "module_gen_build_m_01",
+    "macroId": "buildmodule_gen_ships_m_macro",
     "wareId": "module_gen_build_m_01",
     "nameId": "{20104,60201}",
     "name": "M Ship Fabrication Bay",
@@ -342,7 +354,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_gen_ships_s_macro",
+    "id": "module_gen_build_s_01",
+    "macroId": "buildmodule_gen_ships_s_macro",
     "wareId": "module_gen_build_s_01",
     "nameId": "{20104,60101}",
     "name": "S Ship Fabrication Bay",
@@ -370,7 +383,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_gen_ships_xl_macro",
+    "id": "module_gen_build_xl_01",
+    "macroId": "buildmodule_gen_ships_xl_macro",
     "wareId": "module_gen_build_xl_01",
     "nameId": "{20104,60401}",
     "name": "XL Ship Fabrication Bay",
@@ -398,7 +412,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_ter_equip_l_macro",
+    "id": "module_ter_equip_l_01",
+    "macroId": "buildmodule_ter_equip_l_macro",
     "wareId": "module_ter_equip_l_01",
     "nameId": "{20104,61701}",
     "name": "Terran L Ship Maintenance Bay",
@@ -426,7 +441,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_ter_equip_m_dockarea_01_macro",
+    "id": "module_ter_equip_dockarea_m_01",
+    "macroId": "buildmodule_ter_equip_m_dockarea_01_macro",
     "wareId": "module_ter_equip_dockarea_m_01",
     "nameId": "{20104,61601}",
     "name": "Terran S/M Ship Maintenance Bay",
@@ -454,7 +470,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_ter_equip_xl_macro",
+    "id": "module_ter_equip_xl_01",
+    "macroId": "buildmodule_ter_equip_xl_macro",
     "wareId": "module_ter_equip_xl_01",
     "nameId": "{20104,61801}",
     "name": "Terran XL Ship Maintenance Bay",
@@ -482,7 +499,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_ter_ships_l_macro",
+    "id": "module_ter_build_l_01",
+    "macroId": "buildmodule_ter_ships_l_macro",
     "wareId": "module_ter_build_l_01",
     "nameId": "{20104,62001}",
     "name": "Terran L Ship Fabrication Bay",
@@ -510,7 +528,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_ter_ships_m_dockarea_01_macro",
+    "id": "module_ter_build_dockarea_m_01",
+    "macroId": "buildmodule_ter_ships_m_dockarea_01_macro",
     "wareId": "module_ter_build_dockarea_m_01",
     "nameId": "{20104,61901}",
     "name": "Terran S/M Ship Fabrication Bay",
@@ -538,7 +557,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_ter_ships_xl_macro",
+    "id": "module_ter_build_xl_01",
+    "macroId": "buildmodule_ter_ships_xl_macro",
     "wareId": "module_ter_build_xl_01",
     "nameId": "{20104,62101}",
     "name": "Terran XL Ship Fabrication Bay",
@@ -566,7 +586,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_xen_ships_m_macro",
+    "id": "module_xen_build_m_01",
+    "macroId": "buildmodule_xen_ships_m_macro",
     "wareId": "module_xen_build_m_01",
     "nameId": "{20104,61101}",
     "name": "M Ship Assembly Matrix",
@@ -594,7 +615,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_xen_ships_s_macro",
+    "id": "module_xen_build_s_01",
+    "macroId": "buildmodule_xen_ships_s_macro",
     "wareId": "module_xen_build_s_01",
     "nameId": "{20104,61001}",
     "name": "S Ship Assembly Matrix",
@@ -622,7 +644,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "buildmodule_xen_ships_xl_macro",
+    "id": "module_xen_build_xl_01",
+    "macroId": "buildmodule_xen_ships_xl_macro",
     "wareId": "module_xen_build_xl_01",
     "nameId": "{20104,61201}",
     "name": "XL Ship Assembly Matrix",
@@ -650,7 +673,8 @@
     "color_rgb": "#FFBF00"
   },
   {
-    "id": "defence_arg_claim_01_macro",
+    "id": "module_arg_def_claim_01",
+    "macroId": "defence_arg_claim_01_macro",
     "wareId": "module_arg_def_claim_01",
     "nameId": "{20104,40101}",
     "name": "Argon Administrative Centre",
@@ -678,7 +702,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "defence_arg_disc_01_macro",
+    "id": "module_arg_def_disc_01",
+    "macroId": "defence_arg_disc_01_macro",
     "wareId": "module_arg_def_disc_01",
     "nameId": "{20104,40601}",
     "name": "Argon Disc Defence Platform",
@@ -706,7 +731,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "defence_arg_tube_01_macro",
+    "id": "module_arg_def_tube_01",
+    "macroId": "defence_arg_tube_01_macro",
     "wareId": "module_arg_def_tube_01",
     "nameId": "{20104,41101}",
     "name": "Argon Bridge Defence Platform",
@@ -734,7 +760,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "defence_bor_claim_01_macro",
+    "id": "module_bor_def_claim_01",
+    "macroId": "defence_bor_claim_01_macro",
     "wareId": "module_bor_def_claim_01",
     "nameId": "{20104,95301}",
     "name": "Boron Administrative Centre",
@@ -763,7 +790,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "defence_bor_disc_01_macro",
+    "id": "module_bor_def_disc_01",
+    "macroId": "defence_bor_disc_01_macro",
     "wareId": "module_bor_def_disc_01",
     "nameId": "{20104,95401}",
     "name": "Boron Disc Defence Platform",
@@ -792,7 +820,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "defence_bor_tube_01_macro",
+    "id": "module_bor_def_tube_01",
+    "macroId": "defence_bor_tube_01_macro",
     "wareId": "module_bor_def_tube_01",
     "nameId": "{20104,95501}",
     "name": "Boron Bridge Defence Platform",
@@ -821,7 +850,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "defence_par_claim_01_macro",
+    "id": "module_par_def_claim_01",
+    "macroId": "defence_par_claim_01_macro",
     "wareId": "module_par_def_claim_01",
     "nameId": "{20104,40201}",
     "name": "Paranid Administrative Centre",
@@ -849,7 +879,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "defence_par_claim_story_01_macro",
+    "id": "module_par_def_claim_story_01",
+    "macroId": "defence_par_claim_story_01_macro",
     "wareId": "module_par_def_claim_story_01",
     "nameId": "{20104,41601}",
     "name": "Paranid Faction Capital",
@@ -877,7 +908,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "defence_par_disc_01_macro",
+    "id": "module_par_def_disc_01",
+    "macroId": "defence_par_disc_01_macro",
     "wareId": "module_par_def_disc_01",
     "nameId": "{20104,40701}",
     "name": "Paranid Disc Defence Platform",
@@ -905,7 +937,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "defence_par_tube_01_macro",
+    "id": "module_par_def_tube_01",
+    "macroId": "defence_par_tube_01_macro",
     "wareId": "module_par_def_tube_01",
     "nameId": "{20104,41201}",
     "name": "Paranid Bridge Defence Platform",
@@ -933,7 +966,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "defence_spl_claim_01_macro",
+    "id": "module_spl_def_claim_01",
+    "macroId": "defence_spl_claim_01_macro",
     "wareId": "module_spl_def_claim_01",
     "nameId": "{20104,40401}",
     "name": "Split Administrative Centre",
@@ -961,7 +995,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "defence_spl_disc_01_macro",
+    "id": "module_spl_def_disc_01",
+    "macroId": "defence_spl_disc_01_macro",
     "wareId": "module_spl_def_disc_01",
     "nameId": "{20104,40901}",
     "name": "Split Disc Defence Platform",
@@ -989,7 +1024,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "defence_spl_tube_01_macro",
+    "id": "module_spl_def_tube_01",
+    "macroId": "defence_spl_tube_01_macro",
     "wareId": "module_spl_def_tube_01",
     "nameId": "{20104,41401}",
     "name": "Split Bridge Defence Platform",
@@ -1017,7 +1053,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "defence_tel_claim_01_macro",
+    "id": "module_tel_def_claim_01",
+    "macroId": "defence_tel_claim_01_macro",
     "wareId": "module_tel_def_claim_01",
     "nameId": "{20104,40301}",
     "name": "Teladi Administrative Centre",
@@ -1045,7 +1082,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "defence_tel_disc_01_macro",
+    "id": "module_tel_def_disc_01",
+    "macroId": "defence_tel_disc_01_macro",
     "wareId": "module_tel_def_disc_01",
     "nameId": "{20104,40801}",
     "name": "Teladi Disc Defence Platform",
@@ -1073,7 +1111,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "defence_tel_tube_01_macro",
+    "id": "module_tel_def_tube_01",
+    "macroId": "defence_tel_tube_01_macro",
     "wareId": "module_tel_def_tube_01",
     "nameId": "{20104,41301}",
     "name": "Teladi Bridge Defence Platform",
@@ -1101,7 +1140,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "defence_ter_claim_01_macro",
+    "id": "module_ter_def_claim_01",
+    "macroId": "defence_ter_claim_01_macro",
     "wareId": "module_ter_def_claim_01",
     "nameId": "{20104,95001}",
     "name": "Terran Administrative Centre",
@@ -1129,7 +1169,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "defence_ter_disc_01_macro",
+    "id": "module_ter_def_disc_01",
+    "macroId": "defence_ter_disc_01_macro",
     "wareId": "module_ter_def_disc_01",
     "nameId": "{20104,95101}",
     "name": "Terran Disc Defence Platform",
@@ -1157,7 +1198,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "defence_ter_tube_01_macro",
+    "id": "module_ter_def_tube_01",
+    "macroId": "defence_ter_tube_01_macro",
     "wareId": "module_ter_def_tube_01",
     "nameId": "{20104,95201}",
     "name": "Terran Bridge Defence Platform",
@@ -1185,7 +1227,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "dockarea_arg_m_02_tradestation_01_macro",
+    "id": "module_arg_dock_tradestation_02",
+    "macroId": "dockarea_arg_m_02_tradestation_01_macro",
     "wareId": "module_arg_dock_tradestation_02",
     "nameId": "{20104,73301}",
     "name": "8M Luxury Dock Area",
@@ -1213,7 +1256,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "dockarea_arg_m_station_01_hightech_macro",
+    "id": "module_arg_dock_m_01_hightech",
+    "macroId": "dockarea_arg_m_station_01_hightech_macro",
     "wareId": "module_arg_dock_m_01_hightech",
     "nameId": "{20104,70301}",
     "name": "1M6S Luxury Dock Area",
@@ -1241,7 +1285,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "dockarea_arg_m_station_01_lowtech_macro",
+    "id": "module_arg_dock_m_01_lowtech",
+    "macroId": "dockarea_arg_m_station_01_lowtech_macro",
     "wareId": "module_arg_dock_m_01_lowtech",
     "nameId": "{20104,70101}",
     "name": "1M6S Basic Dock Area",
@@ -1269,7 +1314,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "dockarea_arg_m_station_01_macro",
+    "id": "module_arg_dock_m_01",
+    "macroId": "dockarea_arg_m_station_01_macro",
     "wareId": "module_arg_dock_m_01",
     "nameId": "{20104,70201}",
     "name": "1M6S Standard Dock Area",
@@ -1297,7 +1343,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "dockarea_arg_m_station_02_hightech_macro",
+    "id": "module_arg_dock_m_02_hightech",
+    "macroId": "dockarea_arg_m_station_02_hightech_macro",
     "wareId": "module_arg_dock_m_02_hightech",
     "nameId": "{20104,70601}",
     "name": "3M6S Luxury Dock Area",
@@ -1325,7 +1372,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "dockarea_arg_m_station_02_lowtech_macro",
+    "id": "module_arg_dock_m_02_lowtech",
+    "macroId": "dockarea_arg_m_station_02_lowtech_macro",
     "wareId": "module_arg_dock_m_02_lowtech",
     "nameId": "{20104,70401}",
     "name": "3M6S Basic Dock Area",
@@ -1353,7 +1401,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "dockarea_arg_m_station_02_macro",
+    "id": "module_arg_dock_m_02",
+    "macroId": "dockarea_arg_m_station_02_macro",
     "wareId": "module_arg_dock_m_02",
     "nameId": "{20104,70501}",
     "name": "3M6S Standard Dock Area",
@@ -1381,7 +1430,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "dockarea_bor_m_station_01_standard_macro",
+    "id": "module_bor_dock_m_01_standard",
+    "macroId": "dockarea_bor_m_station_01_standard_macro",
     "wareId": "module_bor_dock_m_01_standard",
     "nameId": "{20104,74701}",
     "name": "Boron 4M14S Luxury Dock Area",
@@ -1410,7 +1460,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "dockarea_gen_m_venturer_01_macro",
+    "id": "module_gen_dock_m_venturer_01",
+    "macroId": "dockarea_gen_m_venturer_01_macro",
     "wareId": "module_gen_dock_m_venturer_01",
     "nameId": "{20104,70801}",
     "name": "S/M Venture Sendoff Dock",
@@ -1438,7 +1489,8 @@
     "color_rgb": "#B300B3"
   },
   {
-    "id": "dockarea_gen_xl_venturer_01_macro",
+    "id": "module_gen_dock_xl_venturer_01",
+    "macroId": "dockarea_gen_xl_venturer_01_macro",
     "wareId": "module_gen_dock_xl_venturer_01",
     "nameId": "{20104,70901}",
     "name": "L/XL Venture Sendoff Dock",
@@ -1466,7 +1518,8 @@
     "color_rgb": "#B300B3"
   },
   {
-    "id": "dockarea_ter_m_station_01_hightech_macro",
+    "id": "module_ter_dock_m_01_hightech",
+    "macroId": "dockarea_ter_m_station_01_hightech_macro",
     "wareId": "module_ter_dock_m_01_hightech",
     "nameId": "{20104,74101}",
     "name": "Terran 4M10S Luxury Dock Area",
@@ -1494,7 +1547,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "dockarea_xen_m_station_01_macro",
+    "id": "module_xen_dock_m_01",
+    "macroId": "dockarea_xen_m_station_01_macro",
     "wareId": "module_xen_dock_m_01",
     "nameId": "{20104,71001}",
     "name": "Xenon Dock",
@@ -1522,7 +1576,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "hab_arg_l_01_macro",
+    "id": "module_arg_hab_l_01",
+    "macroId": "hab_arg_l_01_macro",
     "wareId": "module_arg_hab_l_01",
     "nameId": "{20104,30301}",
     "name": "Argon L Habitat",
@@ -1550,7 +1605,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "hab_arg_m_01_macro",
+    "id": "module_arg_hab_m_01",
+    "macroId": "hab_arg_m_01_macro",
     "wareId": "module_arg_hab_m_01",
     "nameId": "{20104,30201}",
     "name": "Argon M Habitat",
@@ -1578,7 +1634,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "hab_arg_s_01_macro",
+    "id": "module_arg_hab_s_01",
+    "macroId": "hab_arg_s_01_macro",
     "wareId": "module_arg_hab_s_01",
     "nameId": "{20104,30101}",
     "name": "Argon S Habitat",
@@ -1606,7 +1663,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "hab_bor_l_01_macro",
+    "id": "module_bor_hab_l_01",
+    "macroId": "hab_bor_l_01_macro",
     "wareId": "module_bor_hab_l_01",
     "nameId": "{20104,32101}",
     "name": "Boron L Oasis",
@@ -1635,7 +1693,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "hab_bor_m_01_macro",
+    "id": "module_bor_hab_m_01",
+    "macroId": "hab_bor_m_01_macro",
     "wareId": "module_bor_hab_m_01",
     "nameId": "{20104,32001}",
     "name": "Boron M Oasis",
@@ -1664,7 +1723,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "hab_bor_s_01_macro",
+    "id": "module_bor_hab_s_01",
+    "macroId": "hab_bor_s_01_macro",
     "wareId": "module_bor_hab_s_01",
     "nameId": "{20104,31901}",
     "name": "Boron S Oasis",
@@ -1693,7 +1753,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "hab_par_l_01_macro",
+    "id": "module_par_hab_l_01",
+    "macroId": "hab_par_l_01_macro",
     "wareId": "module_par_hab_l_01",
     "nameId": "{20104,30601}",
     "name": "Paranid L Dome",
@@ -1721,7 +1782,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "hab_par_m_01_macro",
+    "id": "module_par_hab_m_01",
+    "macroId": "hab_par_m_01_macro",
     "wareId": "module_par_hab_m_01",
     "nameId": "{20104,30501}",
     "name": "Paranid M Dome",
@@ -1749,7 +1811,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "hab_par_s_01_macro",
+    "id": "module_par_hab_s_01",
+    "macroId": "hab_par_s_01_macro",
     "wareId": "module_par_hab_s_01",
     "nameId": "{20104,30401}",
     "name": "Paranid S Dome",
@@ -1777,7 +1840,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "hab_pir_l_01_macro",
+    "id": "module_pir_hab_l_01",
+    "macroId": "hab_pir_l_01_macro",
     "wareId": "module_pir_hab_l_01",
     "nameId": "{20104,31801}",
     "name": "Argon L Dormitory",
@@ -1805,7 +1869,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "hab_pir_m_01_macro",
+    "id": "module_pir_hab_m_01",
+    "macroId": "hab_pir_m_01_macro",
     "wareId": "module_pir_hab_m_01",
     "nameId": "{20104,31701}",
     "name": "Argon M Dormitory",
@@ -1833,7 +1898,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "hab_pir_s_01_macro",
+    "id": "module_pir_hab_s_01",
+    "macroId": "hab_pir_s_01_macro",
     "wareId": "module_pir_hab_s_01",
     "nameId": "{20104,31601}",
     "name": "Argon S Dormitory",
@@ -1861,7 +1927,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "hab_spl_l_01_macro",
+    "id": "module_spl_hab_l_01",
+    "macroId": "hab_spl_l_01_macro",
     "wareId": "module_spl_hab_l_01",
     "nameId": "{20104,31201}",
     "name": "Split L Parlour",
@@ -1889,7 +1956,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "hab_spl_m_01_macro",
+    "id": "module_spl_hab_m_01",
+    "macroId": "hab_spl_m_01_macro",
     "wareId": "module_spl_hab_m_01",
     "nameId": "{20104,31101}",
     "name": "Split M Parlour",
@@ -1917,7 +1985,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "hab_spl_s_01_macro",
+    "id": "module_spl_hab_s_01",
+    "macroId": "hab_spl_s_01_macro",
     "wareId": "module_spl_hab_s_01",
     "nameId": "{20104,31001}",
     "name": "Split S Parlour",
@@ -1945,7 +2014,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "hab_tel_l_01_macro",
+    "id": "module_tel_hab_l_01",
+    "macroId": "hab_tel_l_01_macro",
     "wareId": "module_tel_hab_l_01",
     "nameId": "{20104,30901}",
     "name": "Teladi L Biome",
@@ -1973,7 +2043,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "hab_tel_m_01_macro",
+    "id": "module_tel_hab_m_01",
+    "macroId": "hab_tel_m_01_macro",
     "wareId": "module_tel_hab_m_01",
     "nameId": "{20104,30801}",
     "name": "Teladi M Biome",
@@ -2001,7 +2072,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "hab_tel_s_01_macro",
+    "id": "module_tel_hab_s_01",
+    "macroId": "hab_tel_s_01_macro",
     "wareId": "module_tel_hab_s_01",
     "nameId": "{20104,30701}",
     "name": "Teladi S Biome",
@@ -2029,7 +2101,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "hab_ter_l_01_macro",
+    "id": "module_ter_hab_l_01",
+    "macroId": "hab_ter_l_01_macro",
     "wareId": "module_ter_hab_l_01",
     "nameId": "{20104,31501}",
     "name": "Terran L Living Quarters",
@@ -2057,7 +2130,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "hab_ter_m_01_macro",
+    "id": "module_ter_hab_m_01",
+    "macroId": "hab_ter_m_01_macro",
     "wareId": "module_ter_hab_m_01",
     "nameId": "{20104,31401}",
     "name": "Terran M Living Quarters",
@@ -2085,7 +2159,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "hab_ter_s_01_macro",
+    "id": "module_ter_hab_s_01",
+    "macroId": "hab_ter_s_01_macro",
     "wareId": "module_ter_hab_s_01",
     "nameId": "{20104,31301}",
     "name": "Terran S Living Quarters",
@@ -2113,7 +2188,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "landmarks_arg_antigonearc_01_macro",
+    "id": "module_conn_arg_antigonearc_01",
+    "macroId": "landmarks_arg_antigonearc_01_macro",
     "wareId": "module_conn_arg_antigonearc_01",
     "nameId": "{20104,55101}",
     "name": "Argon Arc Connection Structure 02",
@@ -2141,7 +2217,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "landmarks_arg_antigonepillar_01_macro",
+    "id": "module_hab_arg_antigonepillar_01",
+    "macroId": "landmarks_arg_antigonepillar_01_macro",
     "wareId": "module_hab_arg_antigonepillar_01",
     "nameId": "{20104,32201}",
     "name": "Argon L Housing Spire",
@@ -2169,7 +2246,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "landmarks_arg_antigonescaffolding_01_macro",
+    "id": "module_conn_arg_antigonescaffolding_01",
+    "macroId": "landmarks_arg_antigonescaffolding_01_macro",
     "wareId": "module_conn_arg_antigonescaffolding_01",
     "nameId": "{20104,55401}",
     "name": "Argon Span Connection Structure 02",
@@ -2197,7 +2275,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "landmarks_arg_antigonespire_01_macro",
+    "id": "module_hab_arg_antigonespire_01",
+    "macroId": "landmarks_arg_antigonespire_01_macro",
     "wareId": "module_hab_arg_antigonespire_01",
     "nameId": "{20104,32301}",
     "name": "Argon XL Housing Spire",
@@ -2225,7 +2304,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "landmarks_arg_antigonestraight_01_macro",
+    "id": "module_conn_arg_antigonestraight_01",
+    "macroId": "landmarks_arg_antigonestraight_01_macro",
     "wareId": "module_conn_arg_antigonestraight_01",
     "nameId": "{20104,55301}",
     "name": "Argon Span Connection Structure 01",
@@ -2253,7 +2333,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "landmarks_gen_piratestation_01_core_01_macro",
+    "id": "module_conn_lndm_piratestation_01_core_01",
+    "macroId": "landmarks_gen_piratestation_01_core_01_macro",
     "wareId": "module_conn_lndm_piratestation_01_core_01",
     "nameId": "{20104,102601}",
     "name": "Drill Support Structure",
@@ -2281,7 +2362,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "landmarks_gen_piratestation_01_exit_01_macro",
+    "id": "module_conn_lndm_piratestation_01_exit_01",
+    "macroId": "landmarks_gen_piratestation_01_exit_01_macro",
     "wareId": "module_conn_lndm_piratestation_01_exit_01",
     "nameId": "{20104,102701}",
     "name": "Drill Access Module",
@@ -2309,7 +2391,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "landmarks_gen_piratestation_01_port_01_macro",
+    "id": "module_hab_lndm_piratestation_01_port_01",
+    "macroId": "landmarks_gen_piratestation_01_port_01_macro",
     "wareId": "module_hab_lndm_piratestation_01_port_01",
     "nameId": "{20104,102901}",
     "name": "Dormitory Module",
@@ -2337,7 +2420,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "landmarks_gen_piratestation_01_ring_01_macro",
+    "id": "module_stor_lndm_piratestation_01_ring_01",
+    "macroId": "landmarks_gen_piratestation_01_ring_01_macro",
     "wareId": "module_stor_lndm_piratestation_01_ring_01",
     "nameId": "{20104,103101}",
     "name": "Storage Ring",
@@ -2369,7 +2453,8 @@
     }
   },
   {
-    "id": "landmarks_gen_piratestation_02_port_01_macro",
+    "id": "module_hab_lndm_piratestation_02_port_01",
+    "macroId": "landmarks_gen_piratestation_02_port_01_macro",
     "wareId": "module_hab_lndm_piratestation_02_port_01",
     "nameId": "{20104,102901}",
     "name": "Dormitory Module",
@@ -2397,7 +2482,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "landmarks_gen_piratestation_02_ring_01_macro",
+    "id": "module_def_lndm_piratestation_02_ring_01",
+    "macroId": "landmarks_gen_piratestation_02_ring_01_macro",
     "wareId": "module_def_lndm_piratestation_02_ring_01",
     "nameId": "{20104,102801}",
     "name": "Defence Array",
@@ -2425,7 +2511,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "landmarks_gen_piratestation_02_ring_02_macro",
+    "id": "module_hab_lndm_piratestation_02_ring_02",
+    "macroId": "landmarks_gen_piratestation_02_ring_02_macro",
     "wareId": "module_hab_lndm_piratestation_02_ring_02",
     "nameId": "{20104,103001}",
     "name": "Half-Ring Dormitory",
@@ -2453,7 +2540,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "landmarks_gen_piratestation_02_storage_01_macro",
+    "id": "module_stor_lndm_piratestation_02_storage_01",
+    "macroId": "landmarks_gen_piratestation_02_storage_01_macro",
     "wareId": "module_stor_lndm_piratestation_02_storage_01",
     "nameId": "{20104,103201}",
     "name": "Storage Arm",
@@ -2481,7 +2569,8 @@
     "color_rgb": "#00AFB3"
   },
   {
-    "id": "landmarks_gen_piratestation_02_storage_02_macro",
+    "id": "module_stor_lndm_piratestation_02_storage_02",
+    "macroId": "landmarks_gen_piratestation_02_storage_02_macro",
     "wareId": "module_stor_lndm_piratestation_02_storage_02",
     "nameId": "{20104,103201}",
     "name": "Storage Arm",
@@ -2509,7 +2598,8 @@
     "color_rgb": "#00AFB3"
   },
   {
-    "id": "landmarks_par_storage_01_macro",
+    "id": "module_par_stor_landmark_l_01",
+    "macroId": "landmarks_par_storage_01_macro",
     "wareId": "module_par_stor_landmark_l_01",
     "nameId": "{20104,20301}",
     "name": "Argon L Container Storage",
@@ -2541,7 +2631,8 @@
     }
   },
   {
-    "id": "landmarks_player_hq_01_research_macro",
+    "id": "module_player_prod_hq_01_macro",
+    "macroId": "landmarks_player_hq_01_research_macro",
     "wareId": "module_player_prod_hq_01_macro",
     "nameId": "{20104,101601}",
     "name": "Unknown Module",
@@ -2565,7 +2656,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "landmarks_tel_tradestation_01_bridge_01_macro",
+    "id": "module_tel_tradestation_conn_bridge_01",
+    "macroId": "landmarks_tel_tradestation_01_bridge_01_macro",
     "wareId": "module_tel_tradestation_conn_bridge_01",
     "nameId": "{20104,100701}",
     "name": "Habitat Bridge",
@@ -2593,7 +2685,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "landmarks_tel_tradestation_01_center_01_macro",
+    "id": "module_tel_tradestation_def_center_01",
+    "macroId": "landmarks_tel_tradestation_01_center_01_macro",
     "wareId": "module_tel_tradestation_def_center_01",
     "nameId": "{20104,100301}",
     "name": "Habitat Centre Complex",
@@ -2621,7 +2714,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "landmarks_tel_tradestation_01_centercylinder_01_macro",
+    "id": "module_tel_tradestation_conn_centercylinder_01",
+    "macroId": "landmarks_tel_tradestation_01_centercylinder_01_macro",
     "wareId": "module_tel_tradestation_conn_centercylinder_01",
     "nameId": "{20104,100801}",
     "name": "Sensor Array",
@@ -2649,7 +2743,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "landmarks_tel_tradestation_01_centerend_01_macro",
+    "id": "module_tel_tradestation_def_centerend_01",
+    "macroId": "landmarks_tel_tradestation_01_centerend_01_macro",
     "wareId": "module_tel_tradestation_def_centerend_01",
     "nameId": "{20104,100901}",
     "name": "Maintenance Area",
@@ -2677,7 +2772,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "landmarks_tel_tradestation_01_centerfill_01_macro",
+    "id": "module_tel_tradestation_conn_centerfill_01",
+    "macroId": "landmarks_tel_tradestation_01_centerfill_01_macro",
     "wareId": "module_tel_tradestation_conn_centerfill_01",
     "nameId": "{20104,101001}",
     "name": "Ventilation",
@@ -2705,7 +2801,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "landmarks_tel_tradestation_01_column_01_macro",
+    "id": "module_tel_tradestation_conn_column_01",
+    "macroId": "landmarks_tel_tradestation_01_column_01_macro",
     "wareId": "module_tel_tradestation_conn_column_01",
     "nameId": "{20104,100201}",
     "name": "Habitat Ring Column",
@@ -2733,7 +2830,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "landmarks_tel_tradestation_01_column_02_macro",
+    "id": "module_tel_tradestation_conn_column_02",
+    "macroId": "landmarks_tel_tradestation_01_column_02_macro",
     "wareId": "module_tel_tradestation_conn_column_02",
     "nameId": "{20104,101101}",
     "name": "Support Structure",
@@ -2761,7 +2859,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "landmarks_tel_tradestation_01_dockarea_m_01_macro",
+    "id": "module_tel_tradestation_dock_m_dockarea_01",
+    "macroId": "landmarks_tel_tradestation_01_dockarea_m_01_macro",
     "wareId": "module_tel_tradestation_dock_m_dockarea_01",
     "nameId": "{20104,102001}",
     "name": "Habitat Dock Area",
@@ -2789,7 +2888,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "landmarks_tel_tradestation_01_extension_01_macro",
+    "id": "module_tel_tradestation_def_extension_01",
+    "macroId": "landmarks_tel_tradestation_01_extension_01_macro",
     "wareId": "module_tel_tradestation_def_extension_01",
     "nameId": "{20104,100101}",
     "name": "Habitat Ring Extension",
@@ -2817,7 +2917,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "landmarks_tel_tradestation_01_radar_01_macro",
+    "id": "module_tel_tradestation_conn_radar_01",
+    "macroId": "landmarks_tel_tradestation_01_radar_01_macro",
     "wareId": "module_tel_tradestation_conn_radar_01",
     "nameId": "{20104,101201}",
     "name": "Command Relay",
@@ -2845,7 +2946,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "landmarks_tel_tradestation_01_ring_01_macro",
+    "id": "module_tel_tradestation_conn_ring_01",
+    "macroId": "landmarks_tel_tradestation_01_ring_01_macro",
     "wareId": "module_tel_tradestation_conn_ring_01",
     "nameId": "{20104,101401}",
     "name": "Habitat Ring",
@@ -2873,7 +2975,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "landmarks_tel_tradestation_01_ring_inside_01_macro",
+    "id": "module_tel_tradestation_hab_inside_ring_01",
+    "macroId": "landmarks_tel_tradestation_01_ring_inside_01_macro",
     "wareId": "module_tel_tradestation_hab_inside_ring_01",
     "nameId": "{20104,100401}",
     "name": "Habitat City",
@@ -2901,7 +3004,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "landmarks_tel_tradestation_01_ring_inside_02_macro",
+    "id": "module_tel_tradestation_hab_inside_ring_02",
+    "macroId": "landmarks_tel_tradestation_01_ring_inside_02_macro",
     "wareId": "module_tel_tradestation_hab_inside_ring_02",
     "nameId": "{20104,100401}",
     "name": "Habitat City",
@@ -2929,7 +3033,8 @@
     "color_rgb": "#0069B3"
   },
   {
-    "id": "landmarks_tel_tradestation_01_ring_inside_03_macro",
+    "id": "module_tel_tradestation_conn_inside_ring_03",
+    "macroId": "landmarks_tel_tradestation_01_ring_inside_03_macro",
     "wareId": "module_tel_tradestation_conn_inside_ring_03",
     "nameId": "{20104,102201}",
     "name": "Habitat Service Section",
@@ -2957,7 +3062,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "landmarks_tel_tradestation_01_ring_storage_01_macro",
+    "id": "module_tel_tradestation_stor_storage_ring_01",
+    "macroId": "landmarks_tel_tradestation_01_ring_storage_01_macro",
     "wareId": "module_tel_tradestation_stor_storage_ring_01",
     "nameId": "{20104,101305}",
     "name": "Habitat Storage A",
@@ -2989,7 +3095,8 @@
     }
   },
   {
-    "id": "landmarks_tel_tradestation_01_ringcenter_01_macro",
+    "id": "module_tel_tradestation_def_ringcenter_01",
+    "macroId": "landmarks_tel_tradestation_01_ringcenter_01_macro",
     "wareId": "module_tel_tradestation_def_ringcenter_01",
     "nameId": "{20104,100501}",
     "name": "Habitat Centre Ring",
@@ -3017,7 +3124,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "landmarks_tel_tradestation_01_ringclamp_01_macro",
+    "id": "module_tel_tradestation_def_ringclamp_01",
+    "macroId": "landmarks_tel_tradestation_01_ringclamp_01_macro",
     "wareId": "module_tel_tradestation_def_ringclamp_01",
     "nameId": "{20104,102101}",
     "name": "Habitat Ring Clamp",
@@ -3045,7 +3153,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "landmarks_tel_tradestation_01_ringclamp_02_macro",
+    "id": "module_tel_tradestation_def_ringclamp_02",
+    "macroId": "landmarks_tel_tradestation_01_ringclamp_02_macro",
     "wareId": "module_tel_tradestation_def_ringclamp_02",
     "nameId": "{20104,102101}",
     "name": "Habitat Ring Clamp",
@@ -3073,7 +3182,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "landmarks_tel_tradestation_01_storage_01_macro",
+    "id": "module_tel_tradestation_stor_storage_01",
+    "macroId": "landmarks_tel_tradestation_01_storage_01_macro",
     "wareId": "module_tel_tradestation_stor_storage_01",
     "nameId": "{20104,101306}",
     "name": "Habitat Storage B",
@@ -3105,7 +3215,8 @@
     }
   },
   {
-    "id": "landmarks_tel_tradestation_01_tradelocation_01_macro",
+    "id": "module_tel_tradestation_pier_tradelocation_01",
+    "macroId": "landmarks_tel_tradestation_01_tradelocation_01_macro",
     "wareId": "module_tel_tradestation_pier_tradelocation_01",
     "nameId": "{20104,100601}",
     "name": "Habitat Trade Centre",
@@ -3133,7 +3244,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_arg_harbor_01_macro",
+    "id": "module_arg_pier_l_01",
+    "macroId": "pier_arg_harbor_01_macro",
     "wareId": "module_arg_pier_l_01",
     "nameId": "{20104,71301}",
     "name": "Argon 3-Dock T Pier",
@@ -3161,7 +3273,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_arg_harbor_02_macro",
+    "id": "module_arg_pier_l_02",
+    "macroId": "pier_arg_harbor_02_macro",
     "wareId": "module_arg_pier_l_02",
     "nameId": "{20104,71201}",
     "name": "Argon 1-Dock Pier",
@@ -3189,7 +3302,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_arg_harbor_03_macro",
+    "id": "module_arg_pier_l_03",
+    "macroId": "pier_arg_harbor_03_macro",
     "wareId": "module_arg_pier_l_03",
     "nameId": "{20104,71401}",
     "name": "Argon 3-Dock E Pier",
@@ -3217,7 +3331,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_arg_harbor_04_macro",
+    "id": "module_arg_pier_l_04",
+    "macroId": "pier_arg_harbor_04_macro",
     "wareId": "module_arg_pier_l_04",
     "nameId": "{20104,74901}",
     "name": "Argon 1-Dock Short Pier",
@@ -3245,7 +3360,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_arg_single_01_tradestation_01_macro",
+    "id": "module_arg_pier_tradestation_01",
+    "macroId": "pier_arg_single_01_tradestation_01_macro",
     "wareId": "module_arg_pier_tradestation_01",
     "nameId": "{20104,73401}",
     "name": "Argon Trading Station 1-Dock Pier",
@@ -3273,7 +3389,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_bor_harbor_01_macro",
+    "id": "module_bor_pier_l_01",
+    "macroId": "pier_bor_harbor_01_macro",
     "wareId": "module_bor_pier_l_01",
     "nameId": "{20104,74301}",
     "name": "Boron 4-Dock T Pier",
@@ -3302,7 +3419,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_bor_harbor_02_macro",
+    "id": "module_bor_pier_l_02",
+    "macroId": "pier_bor_harbor_02_macro",
     "wareId": "module_bor_pier_l_02",
     "nameId": "{20104,74201}",
     "name": "Boron 1-Dock Pier",
@@ -3331,7 +3449,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_bor_harbor_03_macro",
+    "id": "module_bor_pier_l_03",
+    "macroId": "pier_bor_harbor_03_macro",
     "wareId": "module_bor_pier_l_03",
     "nameId": "{20104,74401}",
     "name": "Boron 3-Dock E Pier",
@@ -3360,7 +3479,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_bor_harbor_04_macro",
+    "id": "module_bor_pier_l_04",
+    "macroId": "pier_bor_harbor_04_macro",
     "wareId": "module_bor_pier_l_04",
     "nameId": "{20104,74501}",
     "name": "Boron Trading Station 4-Dock Pier",
@@ -3389,7 +3509,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_bor_tradestation_01_macro",
+    "id": "module_bor_pier_tradestation_01",
+    "macroId": "pier_bor_tradestation_01_macro",
     "wareId": "module_bor_pier_tradestation_01",
     "nameId": "{20104,74801}",
     "name": "Boron Trading Station Hexa-Dock Pier",
@@ -3418,7 +3539,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_par_harbor_01_macro",
+    "id": "module_par_pier_l_01",
+    "macroId": "pier_par_harbor_01_macro",
     "wareId": "module_par_pier_l_01",
     "nameId": "{20104,71601}",
     "name": "Paranid 3-Dock T Pier",
@@ -3446,7 +3568,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_par_harbor_02_macro",
+    "id": "module_par_pier_l_02",
+    "macroId": "pier_par_harbor_02_macro",
     "wareId": "module_par_pier_l_02",
     "nameId": "{20104,71501}",
     "name": "Paranid 1-Dock Pier",
@@ -3474,7 +3597,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_par_harbor_03_macro",
+    "id": "module_par_pier_l_03",
+    "macroId": "pier_par_harbor_03_macro",
     "wareId": "module_par_pier_l_03",
     "nameId": "{20104,71701}",
     "name": "Paranid 3-Dock E Pier",
@@ -3502,7 +3626,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_spl_harbor_01_macro",
+    "id": "module_spl_pier_l_01",
+    "macroId": "pier_spl_harbor_01_macro",
     "wareId": "module_spl_pier_l_01",
     "nameId": "{20104,72201}",
     "name": "Split 4-Dock T Pier",
@@ -3530,7 +3655,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_spl_harbor_02_macro",
+    "id": "module_spl_pier_l_02",
+    "macroId": "pier_spl_harbor_02_macro",
     "wareId": "module_spl_pier_l_02",
     "nameId": "{20104,72101}",
     "name": "Split 1-Dock Pier",
@@ -3558,7 +3684,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_spl_harbor_03_macro",
+    "id": "module_spl_pier_l_03",
+    "macroId": "pier_spl_harbor_03_macro",
     "wareId": "module_spl_pier_l_03",
     "nameId": "{20104,72301}",
     "name": "Split 3-Dock E Pier",
@@ -3586,7 +3713,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_tel_harbor_01_macro",
+    "id": "module_tel_pier_l_01",
+    "macroId": "pier_tel_harbor_01_macro",
     "wareId": "module_tel_pier_l_01",
     "nameId": "{20104,71901}",
     "name": "Teladi 3-Dock T Pier",
@@ -3614,7 +3742,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_tel_harbor_02_macro",
+    "id": "module_tel_pier_l_02",
+    "macroId": "pier_tel_harbor_02_macro",
     "wareId": "module_tel_pier_l_02",
     "nameId": "{20104,71801}",
     "name": "Teladi 1-Dock Pier",
@@ -3642,7 +3771,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_tel_harbor_03_macro",
+    "id": "module_tel_pier_l_03",
+    "macroId": "pier_tel_harbor_03_macro",
     "wareId": "module_tel_pier_l_03",
     "nameId": "{20104,72001}",
     "name": "Teladi 3-Dock E Pier",
@@ -3670,7 +3800,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_ter_harbor_01_macro",
+    "id": "module_ter_pier_01",
+    "macroId": "pier_ter_harbor_01_macro",
     "wareId": "module_ter_pier_01",
     "nameId": "{20104,73701}",
     "name": "Terran 3-Dock T Pier",
@@ -3698,7 +3829,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_ter_harbor_02_macro",
+    "id": "module_ter_pier_02",
+    "macroId": "pier_ter_harbor_02_macro",
     "wareId": "module_ter_pier_02",
     "nameId": "{20104,73601}",
     "name": "Terran 1-Dock Pier",
@@ -3726,7 +3858,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_ter_harbor_03_macro",
+    "id": "module_ter_pier_03",
+    "macroId": "pier_ter_harbor_03_macro",
     "wareId": "module_ter_pier_03",
     "nameId": "{20104,73801}",
     "name": "Terran 3-Dock E Pier",
@@ -3754,7 +3887,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_ter_harbor_04_macro",
+    "id": "module_ter_pier_04",
+    "macroId": "pier_ter_harbor_04_macro",
     "wareId": "module_ter_pier_04",
     "nameId": "{20104,73901}",
     "name": "Terran 4-Dock T Pier",
@@ -3782,7 +3916,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "pier_ter_tradestation_01_macro",
+    "id": "module_ter_pier_tradestation_01",
+    "macroId": "pier_ter_tradestation_01_macro",
     "wareId": "module_ter_pier_tradestation_01",
     "nameId": "{20104,74001}",
     "name": "Terran Trading Station Hexa-Dock Pier",
@@ -3810,7 +3945,8 @@
     "color_rgb": "#FFFF00"
   },
   {
-    "id": "proc_gen_scrapworks_macro",
+    "id": "module_gen_proc_scrapworks",
+    "macroId": "proc_gen_scrapworks_macro",
     "wareId": "module_gen_proc_scrapworks",
     "nameId": "{20104,120101}",
     "name": "Scrap Processor",
@@ -3838,7 +3974,8 @@
     "color_rgb": "#A0A0A0"
   },
   {
-    "id": "prod_arg_foodrations_macro",
+    "id": "module_arg_prod_foodrations_01",
+    "macroId": "prod_arg_foodrations_macro",
     "wareId": "module_arg_prod_foodrations_01",
     "nameId": "{20104,13401}",
     "name": "Food Ration Production",
@@ -3873,7 +4010,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_arg_meat_macro",
+    "id": "module_arg_prod_meat_01",
+    "macroId": "prod_arg_meat_macro",
     "wareId": "module_arg_prod_meat_01",
     "nameId": "{20104,13501}",
     "name": "Meat Production",
@@ -3906,7 +4044,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_arg_medicalsupplies_macro",
+    "id": "module_arg_prod_medicalsupplies_01",
+    "macroId": "prod_arg_medicalsupplies_macro",
     "wareId": "module_arg_prod_medicalsupplies_01",
     "nameId": "{20104,11601}",
     "name": "Argon Medical Supply Production",
@@ -3941,7 +4080,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_arg_spacefuel_macro",
+    "id": "module_arg_prod_spacefuel_01",
+    "macroId": "prod_arg_spacefuel_macro",
     "wareId": "module_arg_prod_spacefuel_01",
     "nameId": "{20104,13601}",
     "name": "Spacefuel Production",
@@ -3975,7 +4115,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_arg_wheat_macro",
+    "id": "module_arg_prod_wheat_01",
+    "macroId": "prod_arg_wheat_macro",
     "wareId": "module_arg_prod_wheat_01",
     "nameId": "{20104,13701}",
     "name": "Wheat Production",
@@ -4008,7 +4149,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_bor_bofu_macro",
+    "id": "module_bor_prod_bofu_01",
+    "macroId": "prod_bor_bofu_macro",
     "wareId": "module_bor_prod_bofu_01",
     "nameId": "{20104,16201}",
     "name": "BoFu Production",
@@ -4043,7 +4185,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_bor_bogas_macro",
+    "id": "module_bor_prod_bogas_01",
+    "macroId": "prod_bor_bogas_macro",
     "wareId": "module_bor_prod_bogas_01",
     "nameId": "{20104,16001}",
     "name": "BoGas Production",
@@ -4077,7 +4220,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_bor_medicalsupplies_macro",
+    "id": "module_bor_prod_medicalsupplies_01",
+    "macroId": "prod_bor_medicalsupplies_macro",
     "wareId": "module_bor_prod_medicalsupplies_01",
     "nameId": "{20104,15901}",
     "name": "Boron Medical Supply Production",
@@ -4112,7 +4256,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_bor_plankton_macro",
+    "id": "module_bor_prod_plankton_01",
+    "macroId": "prod_bor_plankton_macro",
     "wareId": "module_bor_prod_plankton_01",
     "nameId": "{20104,16101}",
     "name": "Plankton Production",
@@ -4146,7 +4291,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_advancedcomposites_macro",
+    "id": "module_gen_prod_advancedcomposites_01",
+    "macroId": "prod_gen_advancedcomposites_macro",
     "wareId": "module_gen_prod_advancedcomposites_01",
     "nameId": "{20104,10001}",
     "name": "Advanced Composite Production",
@@ -4180,7 +4326,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_advancedelectronics_macro",
+    "id": "module_gen_prod_advancedelectronics_01",
+    "macroId": "prod_gen_advancedelectronics_macro",
     "wareId": "module_gen_prod_advancedelectronics_01",
     "nameId": "{20104,10201}",
     "name": "Advanced Electronics Production",
@@ -4214,7 +4361,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_antimattercells_macro",
+    "id": "module_gen_prod_antimattercells_01",
+    "macroId": "prod_gen_antimattercells_macro",
     "wareId": "module_gen_prod_antimattercells_01",
     "nameId": "{20104,10301}",
     "name": "Antimatter Cell Production",
@@ -4247,7 +4395,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_antimatterconverters_macro",
+    "id": "module_gen_prod_antimatterconverters_01",
+    "macroId": "prod_gen_antimatterconverters_macro",
     "wareId": "module_gen_prod_antimatterconverters_01",
     "nameId": "{20104,10401}",
     "name": "Antimatter Converter Production",
@@ -4281,7 +4430,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_claytronics_macro",
+    "id": "module_gen_prod_claytronics_01",
+    "macroId": "prod_gen_claytronics_macro",
     "wareId": "module_gen_prod_claytronics_01",
     "nameId": "{20104,10501}",
     "name": "Claytronics Production",
@@ -4316,7 +4466,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_dronecomponents_macro",
+    "id": "module_gen_prod_dronecomponents_01",
+    "macroId": "prod_gen_dronecomponents_macro",
     "wareId": "module_gen_prod_dronecomponents_01",
     "nameId": "{20104,10701}",
     "name": "Drone Component Production",
@@ -4352,7 +4503,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_energycells_macro",
+    "id": "module_gen_prod_energycells_01",
+    "macroId": "prod_gen_energycells_macro",
     "wareId": "module_gen_prod_energycells_01",
     "nameId": "{20104,10801}",
     "name": "Energy Cell Production",
@@ -4382,7 +4534,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_engineparts_macro",
+    "id": "module_gen_prod_engineparts_01",
+    "macroId": "prod_gen_engineparts_macro",
     "wareId": "module_gen_prod_engineparts_01",
     "nameId": "{20104,10901}",
     "name": "Engine Part Production",
@@ -4416,7 +4569,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_fieldcoils_macro",
+    "id": "module_gen_prod_fieldcoils_01",
+    "macroId": "prod_gen_fieldcoils_macro",
     "wareId": "module_gen_prod_fieldcoils_01",
     "nameId": "{20104,11101}",
     "name": "Field Coil Production",
@@ -4450,7 +4604,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_graphene_macro",
+    "id": "module_gen_prod_graphene_01",
+    "macroId": "prod_gen_graphene_macro",
     "wareId": "module_gen_prod_graphene_01",
     "nameId": "{20104,11201}",
     "name": "Graphene Production",
@@ -4483,7 +4638,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_hullparts_macro",
+    "id": "module_gen_prod_hullparts_01",
+    "macroId": "prod_gen_hullparts_macro",
     "wareId": "module_gen_prod_hullparts_01",
     "nameId": "{20104,11301}",
     "name": "Hull Part Production",
@@ -4517,7 +4673,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_microchips_macro",
+    "id": "module_gen_prod_microchips_01",
+    "macroId": "prod_gen_microchips_macro",
     "wareId": "module_gen_prod_microchips_01",
     "nameId": "{20104,11901}",
     "name": "Microchip Production",
@@ -4550,7 +4707,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_missilecomponents_macro",
+    "id": "module_gen_prod_missilecomponents_01",
+    "macroId": "prod_gen_missilecomponents_macro",
     "wareId": "module_gen_prod_missilecomponents_01",
     "nameId": "{20104,12001}",
     "name": "Missile Component Production",
@@ -4584,7 +4742,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_plasmaconductors_macro",
+    "id": "module_gen_prod_plasmaconductors_01",
+    "macroId": "prod_gen_plasmaconductors_macro",
     "wareId": "module_gen_prod_plasmaconductors_01",
     "nameId": "{20104,12101}",
     "name": "Plasma Conductor Production",
@@ -4618,7 +4777,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_quantumtubes_macro",
+    "id": "module_gen_prod_quantumtubes_01",
+    "macroId": "prod_gen_quantumtubes_macro",
     "wareId": "module_gen_prod_quantumtubes_01",
     "nameId": "{20104,12201}",
     "name": "Quantum Tube Production",
@@ -4652,7 +4812,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_refinedmetals_macro",
+    "id": "module_gen_prod_refinedmetals_01",
+    "macroId": "prod_gen_refinedmetals_macro",
     "wareId": "module_gen_prod_refinedmetals_01",
     "nameId": "{20104,12301}",
     "name": "Refined Metal Production",
@@ -4685,7 +4846,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_scanningarrays_macro",
+    "id": "module_gen_prod_scanningarrays_01",
+    "macroId": "prod_gen_scanningarrays_macro",
     "wareId": "module_gen_prod_scanningarrays_01",
     "nameId": "{20104,12401}",
     "name": "Scanning Array Production",
@@ -4719,7 +4881,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_scrap_recycler_macro",
+    "id": "module_gen_prod_scrap_recycler",
+    "macroId": "prod_gen_scrap_recycler_macro",
     "wareId": "module_gen_prod_scrap_recycler",
     "nameId": "{20104,130101}",
     "name": "Scrap Recycler",
@@ -4753,7 +4916,8 @@
     "color_rgb": "#A0A0A0"
   },
   {
-    "id": "prod_gen_shieldcomponents_macro",
+    "id": "module_gen_prod_shieldcomponents_01",
+    "macroId": "prod_gen_shieldcomponents_macro",
     "wareId": "module_gen_prod_shieldcomponents_01",
     "nameId": "{20104,12601}",
     "name": "Shield Component Production",
@@ -4787,7 +4951,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_siliconwafers_macro",
+    "id": "module_gen_prod_siliconwafers_01",
+    "macroId": "prod_gen_siliconwafers_macro",
     "wareId": "module_gen_prod_siliconwafers_01",
     "nameId": "{20104,12701}",
     "name": "Silicon Wafer Production",
@@ -4820,7 +4985,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_smartchips_macro",
+    "id": "module_gen_prod_smartchips_01",
+    "macroId": "prod_gen_smartchips_macro",
     "wareId": "module_gen_prod_smartchips_01",
     "nameId": "{20104,12801}",
     "name": "Smart Chip Production",
@@ -4853,7 +5019,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_spices_macro",
+    "id": "module_gen_prod_spices_01",
+    "macroId": "prod_gen_spices_macro",
     "wareId": "module_gen_prod_spices_01",
     "nameId": "{20104,12901}",
     "name": "Spice Production",
@@ -4886,7 +5053,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_superfluidcoolant_macro",
+    "id": "module_gen_prod_superfluidcoolant_01",
+    "macroId": "prod_gen_superfluidcoolant_macro",
     "wareId": "module_gen_prod_superfluidcoolant_01",
     "nameId": "{20104,13001}",
     "name": "Superfluid Coolant Production",
@@ -4919,7 +5087,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_turretcomponents_macro",
+    "id": "module_gen_prod_turretcomponents_01",
+    "macroId": "prod_gen_turretcomponents_macro",
     "wareId": "module_gen_prod_turretcomponents_01",
     "nameId": "{20104,13101}",
     "name": "Turret Component Production",
@@ -4954,7 +5123,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_water_macro",
+    "id": "module_gen_prod_water_01",
+    "macroId": "prod_gen_water_macro",
     "wareId": "module_gen_prod_water_01",
     "nameId": "{20104,13201}",
     "name": "Water Production",
@@ -4987,7 +5157,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_gen_weaponcomponents_macro",
+    "id": "module_gen_prod_weaponcomponents_01",
+    "macroId": "prod_gen_weaponcomponents_macro",
     "wareId": "module_gen_prod_weaponcomponents_01",
     "nameId": "{20104,13301}",
     "name": "Weapon Component Production",
@@ -5021,7 +5192,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_par_majadust_macro",
+    "id": "module_par_prod_majadust_01",
+    "macroId": "prod_par_majadust_macro",
     "wareId": "module_par_prod_majadust_01",
     "nameId": "{20104,13801}",
     "name": "Maja Dust Production",
@@ -5055,7 +5227,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_par_majasnails_macro",
+    "id": "module_par_prod_majasnails_01",
+    "macroId": "prod_par_majasnails_macro",
     "wareId": "module_par_prod_majasnails_01",
     "nameId": "{20104,13901}",
     "name": "Maja Snail Production",
@@ -5088,7 +5261,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_par_medicalsupplies_macro",
+    "id": "module_par_prod_medicalsupplies_01",
+    "macroId": "prod_par_medicalsupplies_macro",
     "wareId": "module_par_prod_medicalsupplies_01",
     "nameId": "{20104,11701}",
     "name": "Paranid Medical Supply Production",
@@ -5123,7 +5297,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_par_sojabeans_macro",
+    "id": "module_par_prod_sojabeans_01",
+    "macroId": "prod_par_sojabeans_macro",
     "wareId": "module_par_prod_sojabeans_01",
     "nameId": "{20104,14001}",
     "name": "Soja Bean Production",
@@ -5156,7 +5331,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_par_sojahusk_macro",
+    "id": "module_par_prod_sojahusk_01",
+    "macroId": "prod_par_sojahusk_macro",
     "wareId": "module_par_prod_sojahusk_01",
     "nameId": "{20104,14101}",
     "name": "Soja Husk Production",
@@ -5191,7 +5367,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_spl_cheltmeat_macro",
+    "id": "module_spl_prod_cheltmeat_01",
+    "macroId": "prod_spl_cheltmeat_macro",
     "wareId": "module_spl_prod_cheltmeat_01",
     "nameId": "{20104,14901}",
     "name": "Chelt Production",
@@ -5224,7 +5401,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_spl_medicalsupplies_macro",
+    "id": "module_spl_prod_medicalsupplies_01",
+    "macroId": "prod_spl_medicalsupplies_macro",
     "wareId": "module_spl_prod_medicalsupplies_01",
     "nameId": "{20104,15001}",
     "name": "Split Medical Supply Production",
@@ -5259,7 +5437,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_spl_scruffinfruit_macro",
+    "id": "module_spl_prod_scruffinfruits_01",
+    "macroId": "prod_spl_scruffinfruit_macro",
     "wareId": "module_spl_prod_scruffinfruits_01",
     "nameId": "{20104,14801}",
     "name": "Scruffin Production",
@@ -5292,7 +5471,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_tel_advancedcomposites_macro",
+    "id": "module_tel_prod_advancedcomposites_01",
+    "macroId": "prod_tel_advancedcomposites_macro",
     "wareId": "module_tel_prod_advancedcomposites_01",
     "nameId": "{20104,10101}",
     "name": "Teladi Advanced Composite Production",
@@ -5326,7 +5506,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_tel_engineparts_macro",
+    "id": "module_tel_prod_engineparts_01",
+    "macroId": "prod_tel_engineparts_macro",
     "wareId": "module_tel_prod_engineparts_01",
     "nameId": "{20104,11001}",
     "name": "Teladi Engine Part Production",
@@ -5360,7 +5541,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_tel_hullparts_macro",
+    "id": "module_tel_prod_hullparts_01",
+    "macroId": "prod_tel_hullparts_macro",
     "wareId": "module_tel_prod_hullparts_01",
     "nameId": "{20104,11401}",
     "name": "Teladi Hull Part Production",
@@ -5394,7 +5576,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_tel_medicalsupplies_macro",
+    "id": "module_tel_prod_medicalsupplies_01",
+    "macroId": "prod_tel_medicalsupplies_macro",
     "wareId": "module_tel_prod_medicalsupplies_01",
     "nameId": "{20104,11801}",
     "name": "Teladi Medical Supply Production",
@@ -5429,7 +5612,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_tel_nostropoil_macro",
+    "id": "module_tel_prod_nostropoil_01",
+    "macroId": "prod_tel_nostropoil_macro",
     "wareId": "module_tel_prod_nostropoil_01",
     "nameId": "{20104,14201}",
     "name": "Nostrop Oil Production",
@@ -5464,7 +5648,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_tel_scanningarrays_macro",
+    "id": "module_tel_prod_scanningarrays_01",
+    "macroId": "prod_tel_scanningarrays_macro",
     "wareId": "module_tel_prod_scanningarrays_01",
     "nameId": "{20104,12501}",
     "name": "Teladi Scanning Array Production",
@@ -5498,7 +5683,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_tel_spaceweed_macro",
+    "id": "module_tel_prod_spaceweed_01",
+    "macroId": "prod_tel_spaceweed_macro",
     "wareId": "module_tel_prod_spaceweed_01",
     "nameId": "{20104,14301}",
     "name": "Spaceweed Production",
@@ -5532,7 +5718,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_tel_sunriseflowers_macro",
+    "id": "module_tel_prod_sunriseflowers_01",
+    "macroId": "prod_tel_sunriseflowers_macro",
     "wareId": "module_tel_prod_sunriseflowers_01",
     "nameId": "{20104,14401}",
     "name": "Sunrise Flower Production",
@@ -5565,7 +5752,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_tel_swampplant_macro",
+    "id": "module_tel_prod_swampplant_01",
+    "macroId": "prod_tel_swampplant_macro",
     "wareId": "module_tel_prod_swampplant_01",
     "nameId": "{20104,14501}",
     "name": "Swamp Plant Production",
@@ -5598,7 +5786,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_tel_teladianium_macro",
+    "id": "module_tel_prod_teladianium_01",
+    "macroId": "prod_tel_teladianium_macro",
     "wareId": "module_tel_prod_teladianium_01",
     "nameId": "{20104,14601}",
     "name": "Teladianium Production",
@@ -5631,7 +5820,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_ter_computronicsubstrate_macro",
+    "id": "module_ter_prod_computronicsubstrate_01",
+    "macroId": "prod_ter_computronicsubstrate_macro",
     "wareId": "module_ter_prod_computronicsubstrate_01",
     "nameId": "{20104,15101}",
     "name": "Computronic Substrate Production",
@@ -5666,7 +5856,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_ter_energycells_macro",
+    "id": "module_ter_prod_energycells_01",
+    "macroId": "prod_ter_energycells_macro",
     "wareId": "module_ter_prod_energycells_01",
     "nameId": "{20104,15201}",
     "name": "Terran Energy Cell Production",
@@ -5696,7 +5887,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_ter_medicalsupplies_macro",
+    "id": "module_ter_prod_medicalsupplies_01",
+    "macroId": "prod_ter_medicalsupplies_macro",
     "wareId": "module_ter_prod_medicalsupplies_01",
     "nameId": "{20104,15301}",
     "name": "Terran Medical Supply Production",
@@ -5730,7 +5922,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_ter_metallicmicrolattice_macro",
+    "id": "module_ter_prod_metallicmicrolattice_01",
+    "macroId": "prod_ter_metallicmicrolattice_macro",
     "wareId": "module_ter_prod_metallicmicrolattice_01",
     "nameId": "{20104,15401}",
     "name": "Metallic Microlattice Production",
@@ -5764,7 +5957,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_ter_mre_macro",
+    "id": "module_ter_prod_terranmre_01",
+    "macroId": "prod_ter_mre_macro",
     "wareId": "module_ter_prod_terranmre_01",
     "nameId": "{20104,15501}",
     "name": "Terran MRE Production",
@@ -5797,7 +5991,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_ter_proteinpaste_macro",
+    "id": "module_ter_prod_proteinpaste_01",
+    "macroId": "prod_ter_proteinpaste_macro",
     "wareId": "module_ter_prod_proteinpaste_01",
     "nameId": "{20104,15601}",
     "name": "Protein Paste Production",
@@ -5831,7 +6026,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_ter_scrap_recycler_macro",
+    "id": "module_ter_prod_scrap_recycler",
+    "macroId": "prod_ter_scrap_recycler_macro",
     "wareId": "module_ter_prod_scrap_recycler",
     "nameId": "{20104,140101}",
     "name": "Terran Scrap Recycler",
@@ -5865,7 +6061,8 @@
     "color_rgb": "#A0A0A0"
   },
   {
-    "id": "prod_ter_siliconcarbide_macro",
+    "id": "module_ter_prod_siliconcarbide_01",
+    "macroId": "prod_ter_siliconcarbide_macro",
     "wareId": "module_ter_prod_siliconcarbide_01",
     "nameId": "{20104,15701}",
     "name": "Silicon Carbide Production",
@@ -5900,7 +6097,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "prod_ter_stimulants_macro",
+    "id": "module_ter_prod_stimulants_01",
+    "macroId": "prod_ter_stimulants_macro",
     "wareId": "module_ter_prod_stimulants_01",
     "nameId": "{20104,15801}",
     "name": "Stimulant Production",
@@ -5934,7 +6132,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "radar_arg_dish_01_macro",
+    "id": "module_arg_radar_dish_01",
+    "macroId": "radar_arg_dish_01_macro",
     "wareId": "module_arg_radar_dish_01",
     "nameId": "{20104,150101}",
     "name": "Wide Area Sensor Array",
@@ -5962,7 +6161,8 @@
     "color_rgb": "#4DFF4D"
   },
   {
-    "id": "storage_arg_l_container_01_macro",
+    "id": "module_arg_stor_container_l_01",
+    "macroId": "storage_arg_l_container_01_macro",
     "wareId": "module_arg_stor_container_l_01",
     "nameId": "{20104,20301}",
     "name": "Argon L Container Storage",
@@ -5994,7 +6194,8 @@
     }
   },
   {
-    "id": "storage_arg_l_liquid_01_macro",
+    "id": "module_arg_stor_liquid_l_01",
+    "macroId": "storage_arg_l_liquid_01_macro",
     "wareId": "module_arg_stor_liquid_l_01",
     "nameId": "{20104,21301}",
     "name": "Argon L Liquid Storage",
@@ -6026,7 +6227,8 @@
     }
   },
   {
-    "id": "storage_arg_l_solid_01_macro",
+    "id": "module_arg_stor_solid_l_01",
+    "macroId": "storage_arg_l_solid_01_macro",
     "wareId": "module_arg_stor_solid_l_01",
     "nameId": "{20104,22301}",
     "name": "Argon L Solid Storage",
@@ -6058,7 +6260,8 @@
     }
   },
   {
-    "id": "storage_arg_l_tradestation_01_macro",
+    "id": "module_arg_stor_tradestation_l_01",
+    "macroId": "storage_arg_l_tradestation_01_macro",
     "wareId": "module_arg_stor_tradestation_l_01",
     "nameId": "{20104,23301}",
     "name": "Argon L Universal Storage",
@@ -6090,7 +6293,8 @@
     }
   },
   {
-    "id": "storage_arg_m_container_01_macro",
+    "id": "module_arg_stor_container_m_01",
+    "macroId": "storage_arg_m_container_01_macro",
     "wareId": "module_arg_stor_container_m_01",
     "nameId": "{20104,20201}",
     "name": "Argon M Container Storage",
@@ -6122,7 +6326,8 @@
     }
   },
   {
-    "id": "storage_arg_m_liquid_01_macro",
+    "id": "module_arg_stor_liquid_m_01",
+    "macroId": "storage_arg_m_liquid_01_macro",
     "wareId": "module_arg_stor_liquid_m_01",
     "nameId": "{20104,21201}",
     "name": "Argon M Liquid Storage",
@@ -6154,7 +6359,8 @@
     }
   },
   {
-    "id": "storage_arg_m_solid_01_macro",
+    "id": "module_arg_stor_solid_m_01",
+    "macroId": "storage_arg_m_solid_01_macro",
     "wareId": "module_arg_stor_solid_m_01",
     "nameId": "{20104,22201}",
     "name": "Argon M Solid Storage",
@@ -6186,7 +6392,8 @@
     }
   },
   {
-    "id": "storage_arg_s_container_01_macro",
+    "id": "module_arg_stor_container_s_01",
+    "macroId": "storage_arg_s_container_01_macro",
     "wareId": "module_arg_stor_container_s_01",
     "nameId": "{20104,20101}",
     "name": "Argon S Container Storage",
@@ -6218,7 +6425,8 @@
     }
   },
   {
-    "id": "storage_arg_s_liquid_01_macro",
+    "id": "module_arg_stor_liquid_s_01",
+    "macroId": "storage_arg_s_liquid_01_macro",
     "wareId": "module_arg_stor_liquid_s_01",
     "nameId": "{20104,21101}",
     "name": "Argon S Liquid Storage",
@@ -6250,7 +6458,8 @@
     }
   },
   {
-    "id": "storage_arg_s_solid_01_macro",
+    "id": "module_arg_stor_solid_s_01",
+    "macroId": "storage_arg_s_solid_01_macro",
     "wareId": "module_arg_stor_solid_s_01",
     "nameId": "{20104,22101}",
     "name": "Argon S Solid Storage",
@@ -6282,7 +6491,8 @@
     }
   },
   {
-    "id": "storage_bor_l_container_01_macro",
+    "id": "module_bor_stor_container_l_01",
+    "macroId": "storage_bor_l_container_01_macro",
     "wareId": "module_bor_stor_container_l_01",
     "nameId": "{20104,92901}",
     "name": "Boron L Container Storage",
@@ -6315,7 +6525,8 @@
     }
   },
   {
-    "id": "storage_bor_l_liquid_01_macro",
+    "id": "module_bor_stor_liquid_l_01",
+    "macroId": "storage_bor_l_liquid_01_macro",
     "wareId": "module_bor_stor_liquid_l_01",
     "nameId": "{20104,93201}",
     "name": "Boron L Liquid Storage",
@@ -6348,7 +6559,8 @@
     }
   },
   {
-    "id": "storage_bor_l_solid_01_macro",
+    "id": "module_bor_stor_solid_l_01",
+    "macroId": "storage_bor_l_solid_01_macro",
     "wareId": "module_bor_stor_solid_l_01",
     "nameId": "{20104,93501}",
     "name": "Boron L Solid Storage",
@@ -6381,7 +6593,8 @@
     }
   },
   {
-    "id": "storage_bor_m_container_01_macro",
+    "id": "module_bor_stor_container_m_01",
+    "macroId": "storage_bor_m_container_01_macro",
     "wareId": "module_bor_stor_container_m_01",
     "nameId": "{20104,92801}",
     "name": "Boron M Container Storage",
@@ -6414,7 +6627,8 @@
     }
   },
   {
-    "id": "storage_bor_m_liquid_01_macro",
+    "id": "module_bor_stor_liquid_m_01",
+    "macroId": "storage_bor_m_liquid_01_macro",
     "wareId": "module_bor_stor_liquid_m_01",
     "nameId": "{20104,93101}",
     "name": "Boron M Liquid Storage",
@@ -6447,7 +6661,8 @@
     }
   },
   {
-    "id": "storage_bor_m_solid_01_macro",
+    "id": "module_bor_stor_solid_m_01",
+    "macroId": "storage_bor_m_solid_01_macro",
     "wareId": "module_bor_stor_solid_m_01",
     "nameId": "{20104,93401}",
     "name": "Boron M Solid Storage",
@@ -6480,7 +6695,8 @@
     }
   },
   {
-    "id": "storage_bor_s_container_01_macro",
+    "id": "module_bor_stor_container_s_01",
+    "macroId": "storage_bor_s_container_01_macro",
     "wareId": "module_bor_stor_container_s_01",
     "nameId": "{20104,92701}",
     "name": "Boron S Container Storage",
@@ -6513,7 +6729,8 @@
     }
   },
   {
-    "id": "storage_bor_s_liquid_01_macro",
+    "id": "module_bor_stor_liquid_s_01",
+    "macroId": "storage_bor_s_liquid_01_macro",
     "wareId": "module_bor_stor_liquid_s_01",
     "nameId": "{20104,93001}",
     "name": "Boron S Liquid Storage",
@@ -6546,7 +6763,8 @@
     }
   },
   {
-    "id": "storage_bor_s_solid_01_macro",
+    "id": "module_bor_stor_solid_s_01",
+    "macroId": "storage_bor_s_solid_01_macro",
     "wareId": "module_bor_stor_solid_s_01",
     "nameId": "{20104,93301}",
     "name": "Boron S Solid Storage",
@@ -6579,7 +6797,8 @@
     }
   },
   {
-    "id": "storage_par_l_container_01_macro",
+    "id": "module_par_stor_container_l_01",
+    "macroId": "storage_par_l_container_01_macro",
     "wareId": "module_par_stor_container_l_01",
     "nameId": "{20104,20601}",
     "name": "Paranid L Container Storage",
@@ -6611,7 +6830,8 @@
     }
   },
   {
-    "id": "storage_par_l_liquid_01_macro",
+    "id": "module_par_stor_liquid_l_01",
+    "macroId": "storage_par_l_liquid_01_macro",
     "wareId": "module_par_stor_liquid_l_01",
     "nameId": "{20104,21601}",
     "name": "Paranid L Liquid Storage",
@@ -6643,7 +6863,8 @@
     }
   },
   {
-    "id": "storage_par_l_solid_01_macro",
+    "id": "module_par_stor_solid_l_01",
+    "macroId": "storage_par_l_solid_01_macro",
     "wareId": "module_par_stor_solid_l_01",
     "nameId": "{20104,22601}",
     "name": "Paranid L Solid Storage",
@@ -6675,7 +6896,8 @@
     }
   },
   {
-    "id": "storage_par_m_container_01_macro",
+    "id": "module_par_stor_container_m_01",
+    "macroId": "storage_par_m_container_01_macro",
     "wareId": "module_par_stor_container_m_01",
     "nameId": "{20104,20501}",
     "name": "Paranid M Container Storage",
@@ -6707,7 +6929,8 @@
     }
   },
   {
-    "id": "storage_par_m_liquid_01_macro",
+    "id": "module_par_stor_liquid_m_01",
+    "macroId": "storage_par_m_liquid_01_macro",
     "wareId": "module_par_stor_liquid_m_01",
     "nameId": "{20104,21501}",
     "name": "Paranid M Liquid Storage",
@@ -6739,7 +6962,8 @@
     }
   },
   {
-    "id": "storage_par_m_solid_01_macro",
+    "id": "module_par_stor_solid_m_01",
+    "macroId": "storage_par_m_solid_01_macro",
     "wareId": "module_par_stor_solid_m_01",
     "nameId": "{20104,22501}",
     "name": "Paranid M Solid Storage",
@@ -6771,7 +6995,8 @@
     }
   },
   {
-    "id": "storage_par_s_container_01_macro",
+    "id": "module_par_stor_container_s_01",
+    "macroId": "storage_par_s_container_01_macro",
     "wareId": "module_par_stor_container_s_01",
     "nameId": "{20104,20401}",
     "name": "Paranid S Container Storage",
@@ -6803,7 +7028,8 @@
     }
   },
   {
-    "id": "storage_par_s_liquid_01_macro",
+    "id": "module_par_stor_liquid_s_01",
+    "macroId": "storage_par_s_liquid_01_macro",
     "wareId": "module_par_stor_liquid_s_01",
     "nameId": "{20104,21401}",
     "name": "Paranid S Liquid Storage",
@@ -6835,7 +7061,8 @@
     }
   },
   {
-    "id": "storage_par_s_solid_01_macro",
+    "id": "module_par_stor_solid_s_01",
+    "macroId": "storage_par_s_solid_01_macro",
     "wareId": "module_par_stor_solid_s_01",
     "nameId": "{20104,22401}",
     "name": "Paranid S Solid Storage",
@@ -6867,7 +7094,8 @@
     }
   },
   {
-    "id": "storage_pir_l_condensate_01_macro",
+    "id": "module_pir_stor_condensate_l_01",
+    "macroId": "storage_pir_l_condensate_01_macro",
     "wareId": "module_pir_stor_condensate_l_01",
     "nameId": "{20104,92501}",
     "name": "Protectyon Shield Generator",
@@ -6899,7 +7127,8 @@
     }
   },
   {
-    "id": "storage_pir_s_condensate_01_macro",
+    "id": "module_pir_stor_condensate_s_01",
+    "macroId": "storage_pir_s_condensate_01_macro",
     "wareId": "module_pir_stor_condensate_s_01",
     "nameId": "{20104,92601}",
     "name": "Condensate Containment Facility",
@@ -6931,7 +7160,8 @@
     }
   },
   {
-    "id": "storage_spl_l_container_01_macro",
+    "id": "module_spl_stor_container_l_01",
+    "macroId": "storage_spl_l_container_01_macro",
     "wareId": "module_spl_stor_container_l_01",
     "nameId": "{20104,25301}",
     "name": "Split L Container Storage",
@@ -6963,7 +7193,8 @@
     }
   },
   {
-    "id": "storage_spl_l_liquid_01_macro",
+    "id": "module_spl_stor_liquid_l_01",
+    "macroId": "storage_spl_l_liquid_01_macro",
     "wareId": "module_spl_stor_liquid_l_01",
     "nameId": "{20104,26301}",
     "name": "Split L Liquid Storage",
@@ -6995,7 +7226,8 @@
     }
   },
   {
-    "id": "storage_spl_l_solid_01_macro",
+    "id": "module_spl_stor_solid_l_01",
+    "macroId": "storage_spl_l_solid_01_macro",
     "wareId": "module_spl_stor_solid_l_01",
     "nameId": "{20104,27301}",
     "name": "Split L Solid Storage",
@@ -7027,7 +7259,8 @@
     }
   },
   {
-    "id": "storage_spl_m_container_01_macro",
+    "id": "module_spl_stor_container_m_01",
+    "macroId": "storage_spl_m_container_01_macro",
     "wareId": "module_spl_stor_container_m_01",
     "nameId": "{20104,25201}",
     "name": "Split M Container Storage",
@@ -7059,7 +7292,8 @@
     }
   },
   {
-    "id": "storage_spl_m_liquid_01_macro",
+    "id": "module_spl_stor_liquid_m_01",
+    "macroId": "storage_spl_m_liquid_01_macro",
     "wareId": "module_spl_stor_liquid_m_01",
     "nameId": "{20104,26201}",
     "name": "Split M Liquid Storage",
@@ -7091,7 +7325,8 @@
     }
   },
   {
-    "id": "storage_spl_m_solid_01_macro",
+    "id": "module_spl_stor_solid_m_01",
+    "macroId": "storage_spl_m_solid_01_macro",
     "wareId": "module_spl_stor_solid_m_01",
     "nameId": "{20104,27201}",
     "name": "Split M Solid Storage",
@@ -7123,7 +7358,8 @@
     }
   },
   {
-    "id": "storage_spl_s_container_01_macro",
+    "id": "module_spl_stor_container_s_01",
+    "macroId": "storage_spl_s_container_01_macro",
     "wareId": "module_spl_stor_container_s_01",
     "nameId": "{20104,25101}",
     "name": "Split S Container Storage",
@@ -7155,7 +7391,8 @@
     }
   },
   {
-    "id": "storage_spl_s_liquid_01_macro",
+    "id": "module_spl_stor_liquid_s_01",
+    "macroId": "storage_spl_s_liquid_01_macro",
     "wareId": "module_spl_stor_liquid_s_01",
     "nameId": "{20104,26101}",
     "name": "Split S Liquid Storage",
@@ -7187,7 +7424,8 @@
     }
   },
   {
-    "id": "storage_spl_s_solid_01_macro",
+    "id": "module_spl_stor_solid_s_01",
+    "macroId": "storage_spl_s_solid_01_macro",
     "wareId": "module_spl_stor_solid_s_01",
     "nameId": "{20104,27101}",
     "name": "Split S Solid Storage",
@@ -7219,7 +7457,8 @@
     }
   },
   {
-    "id": "storage_tel_l_container_01_macro",
+    "id": "module_tel_stor_container_l_01",
+    "macroId": "storage_tel_l_container_01_macro",
     "wareId": "module_tel_stor_container_l_01",
     "nameId": "{20104,20901}",
     "name": "Teladi L Container Storage",
@@ -7251,7 +7490,8 @@
     }
   },
   {
-    "id": "storage_tel_l_liquid_01_macro",
+    "id": "module_tel_stor_liquid_l_01",
+    "macroId": "storage_tel_l_liquid_01_macro",
     "wareId": "module_tel_stor_liquid_l_01",
     "nameId": "{20104,21901}",
     "name": "Teladi L Liquid Storage",
@@ -7283,7 +7523,8 @@
     }
   },
   {
-    "id": "storage_tel_l_solid_01_macro",
+    "id": "module_tel_stor_solid_l_01",
+    "macroId": "storage_tel_l_solid_01_macro",
     "wareId": "module_tel_stor_solid_l_01",
     "nameId": "{20104,22901}",
     "name": "Teladi L Solid Storage",
@@ -7315,7 +7556,8 @@
     }
   },
   {
-    "id": "storage_tel_m_container_01_macro",
+    "id": "module_tel_stor_container_m_01",
+    "macroId": "storage_tel_m_container_01_macro",
     "wareId": "module_tel_stor_container_m_01",
     "nameId": "{20104,20801}",
     "name": "Teladi M Container Storage",
@@ -7347,7 +7589,8 @@
     }
   },
   {
-    "id": "storage_tel_m_liquid_01_macro",
+    "id": "module_tel_stor_liquid_m_01",
+    "macroId": "storage_tel_m_liquid_01_macro",
     "wareId": "module_tel_stor_liquid_m_01",
     "nameId": "{20104,21801}",
     "name": "Teladi M Liquid Storage",
@@ -7379,7 +7622,8 @@
     }
   },
   {
-    "id": "storage_tel_m_solid_01_macro",
+    "id": "module_tel_stor_solid_m_01",
+    "macroId": "storage_tel_m_solid_01_macro",
     "wareId": "module_tel_stor_solid_m_01",
     "nameId": "{20104,22801}",
     "name": "Teladi M Solid Storage",
@@ -7411,7 +7655,8 @@
     }
   },
   {
-    "id": "storage_tel_s_container_01_macro",
+    "id": "module_tel_stor_container_s_01",
+    "macroId": "storage_tel_s_container_01_macro",
     "wareId": "module_tel_stor_container_s_01",
     "nameId": "{20104,20701}",
     "name": "Teladi S Container Storage",
@@ -7443,7 +7688,8 @@
     }
   },
   {
-    "id": "storage_tel_s_liquid_01_macro",
+    "id": "module_tel_stor_liquid_s_01",
+    "macroId": "storage_tel_s_liquid_01_macro",
     "wareId": "module_tel_stor_liquid_s_01",
     "nameId": "{20104,21701}",
     "name": "Teladi S Liquid Storage",
@@ -7475,7 +7721,8 @@
     }
   },
   {
-    "id": "storage_tel_s_solid_01_macro",
+    "id": "module_tel_stor_solid_s_01",
+    "macroId": "storage_tel_s_solid_01_macro",
     "wareId": "module_tel_stor_solid_s_01",
     "nameId": "{20104,22701}",
     "name": "Teladi S Solid Storage",
@@ -7507,7 +7754,8 @@
     }
   },
   {
-    "id": "storage_ter_l_container_01_macro",
+    "id": "module_ter_stor_container_l_01",
+    "macroId": "storage_ter_l_container_01_macro",
     "wareId": "module_ter_stor_container_l_01",
     "nameId": "{20104,90301}",
     "name": "Terran L Container Storage",
@@ -7539,7 +7787,8 @@
     }
   },
   {
-    "id": "storage_ter_l_liquid_01_macro",
+    "id": "module_ter_stor_liquid_l_01",
+    "macroId": "storage_ter_l_liquid_01_macro",
     "wareId": "module_ter_stor_liquid_l_01",
     "nameId": "{20104,90601}",
     "name": "Terran L Liquid Storage",
@@ -7571,7 +7820,8 @@
     }
   },
   {
-    "id": "storage_ter_l_solid_01_macro",
+    "id": "module_ter_stor_solid_l_01",
+    "macroId": "storage_ter_l_solid_01_macro",
     "wareId": "module_ter_stor_solid_l_01",
     "nameId": "{20104,90901}",
     "name": "Terran L Solid Storage",
@@ -7603,7 +7853,8 @@
     }
   },
   {
-    "id": "storage_ter_m_container_01_macro",
+    "id": "module_ter_stor_container_m_01",
+    "macroId": "storage_ter_m_container_01_macro",
     "wareId": "module_ter_stor_container_m_01",
     "nameId": "{20104,90201}",
     "name": "Terran M Container Storage",
@@ -7635,7 +7886,8 @@
     }
   },
   {
-    "id": "storage_ter_m_container_tradestation_01_macro",
+    "id": "module_ter_stor_container_m_tradestation",
+    "macroId": "storage_ter_m_container_tradestation_01_macro",
     "wareId": "module_ter_stor_container_m_tradestation",
     "nameId": "{20104,91701}",
     "name": "Terran M Trading Station Container Storage",
@@ -7667,7 +7919,8 @@
     }
   },
   {
-    "id": "storage_ter_m_liquid_01_macro",
+    "id": "module_ter_stor_liquid_m_01",
+    "macroId": "storage_ter_m_liquid_01_macro",
     "wareId": "module_ter_stor_liquid_m_01",
     "nameId": "{20104,90501}",
     "name": "Terran M Liquid Storage",
@@ -7699,7 +7952,8 @@
     }
   },
   {
-    "id": "storage_ter_m_solid_01_macro",
+    "id": "module_ter_stor_solid_m_01",
+    "macroId": "storage_ter_m_solid_01_macro",
     "wareId": "module_ter_stor_solid_m_01",
     "nameId": "{20104,90801}",
     "name": "Terran M Solid Storage",
@@ -7731,7 +7985,8 @@
     }
   },
   {
-    "id": "storage_ter_s_container_01_macro",
+    "id": "module_ter_stor_container_s_01",
+    "macroId": "storage_ter_s_container_01_macro",
     "wareId": "module_ter_stor_container_s_01",
     "nameId": "{20104,90101}",
     "name": "Terran S Container Storage",
@@ -7763,7 +8018,8 @@
     }
   },
   {
-    "id": "storage_ter_s_liquid_01_macro",
+    "id": "module_ter_stor_liquid_s_01",
+    "macroId": "storage_ter_s_liquid_01_macro",
     "wareId": "module_ter_stor_liquid_s_01",
     "nameId": "{20104,90401}",
     "name": "Terran S Liquid Storage",
@@ -7795,7 +8051,8 @@
     }
   },
   {
-    "id": "storage_ter_s_liquid_tradestation_01_macro",
+    "id": "module_ter_stor_liquid_s_tradestation",
+    "macroId": "storage_ter_s_liquid_tradestation_01_macro",
     "wareId": "module_ter_stor_liquid_s_tradestation",
     "nameId": "{20104,91901}",
     "name": "Terran S Trading Station Liquid Storage",
@@ -7827,7 +8084,8 @@
     }
   },
   {
-    "id": "storage_ter_s_solid_01_macro",
+    "id": "module_ter_stor_solid_s_01",
+    "macroId": "storage_ter_s_solid_01_macro",
     "wareId": "module_ter_stor_solid_s_01",
     "nameId": "{20104,90701}",
     "name": "Terran S Solid Storage",
@@ -7859,7 +8117,8 @@
     }
   },
   {
-    "id": "struct_arg_arc_01_macro",
+    "id": "module_arg_conn_arc_01",
+    "macroId": "struct_arg_arc_01_macro",
     "wareId": "module_arg_conn_arc_01",
     "nameId": "{20104,55501}",
     "name": "Argon Arc Connection Structure 01",
@@ -7887,7 +8146,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_arg_base_01_macro",
+    "id": "module_arg_conn_base_01",
+    "macroId": "struct_arg_base_01_macro",
     "wareId": "module_arg_conn_base_01",
     "nameId": "{20104,50101}",
     "name": "Argon Base Connection Structure 01",
@@ -7915,7 +8175,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_arg_base_02_macro",
+    "id": "module_arg_conn_base_02",
+    "macroId": "struct_arg_base_02_macro",
     "wareId": "module_arg_conn_base_02",
     "nameId": "{20104,50201}",
     "name": "Argon Base Connection Structure 02",
@@ -7943,7 +8204,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_arg_base_03_macro",
+    "id": "module_arg_conn_base_03",
+    "macroId": "struct_arg_base_03_macro",
     "wareId": "module_arg_conn_base_03",
     "nameId": "{20104,50301}",
     "name": "Argon Base Connection Structure 03",
@@ -7971,7 +8233,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_arg_cross_01_macro",
+    "id": "module_arg_conn_cross_01",
+    "macroId": "struct_arg_cross_01_macro",
     "wareId": "module_arg_conn_cross_01",
     "nameId": "{20104,51401}",
     "name": "Argon Cross Connection Structure 01",
@@ -7999,7 +8262,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_arg_cross_02_macro",
+    "id": "module_arg_conn_cross_02",
+    "macroId": "struct_arg_cross_02_macro",
     "wareId": "module_arg_conn_cross_02",
     "nameId": "{20104,55701}",
     "name": "Argon Cross Connection Structure 02",
@@ -8027,7 +8291,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_arg_cross_03_macro",
+    "id": "module_arg_conn_cross_03",
+    "macroId": "struct_arg_cross_03_macro",
     "wareId": "module_arg_conn_cross_03",
     "nameId": "{20104,55601}",
     "name": "Argon Cross Connection Structure 03",
@@ -8055,7 +8320,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_arg_cross_04_macro",
+    "id": "module_arg_conn_cross_04",
+    "macroId": "struct_arg_cross_04_macro",
     "wareId": "module_arg_conn_cross_04",
     "nameId": "{20104,56101}",
     "name": "Argon T Connection Structure 01",
@@ -8083,7 +8349,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_arg_cross_05_macro",
+    "id": "module_arg_conn_cross_05",
+    "macroId": "struct_arg_cross_05_macro",
     "wareId": "module_arg_conn_cross_05",
     "nameId": "{20104,55901}",
     "name": "Argon L Connection Structure 01",
@@ -8111,7 +8378,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_arg_vertical_01_macro",
+    "id": "module_arg_conn_vertical_01",
+    "macroId": "struct_arg_vertical_01_macro",
     "wareId": "module_arg_conn_vertical_01",
     "nameId": "{20104,52101}",
     "name": "Argon Vertical Connection Structure 01",
@@ -8139,7 +8407,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_arg_vertical_02_macro",
+    "id": "module_arg_conn_vertical_02",
+    "macroId": "struct_arg_vertical_02_macro",
     "wareId": "module_arg_conn_vertical_02",
     "nameId": "{20104,52201}",
     "name": "Argon Vertical Connection Structure 02",
@@ -8167,7 +8436,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_bor_base_01_macro",
+    "id": "module_bor_conn_base_01",
+    "macroId": "struct_bor_base_01_macro",
     "wareId": "module_bor_conn_base_01",
     "nameId": "{20104,54101}",
     "name": "Boron Base Connection Structure 01",
@@ -8196,7 +8466,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_bor_base_02_macro",
+    "id": "module_bor_conn_base_02",
+    "macroId": "struct_bor_base_02_macro",
     "wareId": "module_bor_conn_base_02",
     "nameId": "{20104,54201}",
     "name": "Boron Base Connection Structure 02",
@@ -8225,7 +8496,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_bor_base_03_macro",
+    "id": "module_bor_conn_base_03",
+    "macroId": "struct_bor_base_03_macro",
     "wareId": "module_bor_conn_base_03",
     "nameId": "{20104,54301}",
     "name": "Boron Base Connection Structure 03",
@@ -8254,7 +8526,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_bor_base_04_macro",
+    "id": "module_bor_conn_base_04",
+    "macroId": "struct_bor_base_04_macro",
     "wareId": "module_bor_conn_base_04",
     "nameId": "{20104,54401}",
     "name": "Boron Base Connection Structure 04",
@@ -8283,7 +8556,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_bor_base_05_macro",
+    "id": "module_bor_conn_base_05",
+    "macroId": "struct_bor_base_05_macro",
     "wareId": "module_bor_conn_base_05",
     "nameId": "{20104,54501}",
     "name": "Boron Base Connection Structure 05",
@@ -8312,7 +8586,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_bor_cross_01_macro",
+    "id": "module_bor_conn_cross_01",
+    "macroId": "struct_bor_cross_01_macro",
     "wareId": "module_bor_conn_cross_01",
     "nameId": "{20104,54601}",
     "name": "Boron Y Connection Structure 01",
@@ -8341,7 +8616,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_bor_cross_02_macro",
+    "id": "module_bor_conn_cross_02",
+    "macroId": "struct_bor_cross_02_macro",
     "wareId": "module_bor_conn_cross_02",
     "nameId": "{20104,54701}",
     "name": "Boron Hex Connection Structure 01",
@@ -8370,7 +8646,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_bor_vertical_01_macro",
+    "id": "module_bor_conn_vertical_01",
+    "macroId": "struct_bor_vertical_01_macro",
     "wareId": "module_bor_conn_vertical_01",
     "nameId": "{20104,54801}",
     "name": "Boron Vertical Connection Structure 01",
@@ -8399,7 +8676,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_bor_vertical_02_macro",
+    "id": "module_bor_conn_vertical_02",
+    "macroId": "struct_bor_vertical_02_macro",
     "wareId": "module_bor_conn_vertical_02",
     "nameId": "{20104,54901}",
     "name": "Boron Vertical Connection Structure 02",
@@ -8428,7 +8706,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_gen_observationdeck_01_macro",
+    "id": "module_gen_conn_observationdeck_01",
+    "macroId": "struct_gen_observationdeck_01_macro",
     "wareId": "module_gen_conn_observationdeck_01",
     "nameId": "{20104,103701}",
     "name": "Conservatory Observation Deck",
@@ -8456,7 +8735,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_gen_observationdeck_02_macro",
+    "id": "module_gen_conn_observationdeck_02",
+    "macroId": "struct_gen_observationdeck_02_macro",
     "wareId": "module_gen_conn_observationdeck_02",
     "nameId": "{20104,103801}",
     "name": "Pavilion Observation Deck",
@@ -8484,7 +8764,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_gen_observationdeck_03_macro",
+    "id": "module_gen_conn_observationdeck_03",
+    "macroId": "struct_gen_observationdeck_03_macro",
     "wareId": "module_gen_conn_observationdeck_03",
     "nameId": "{20104,103601}",
     "name": "Penthouse Observation Deck",
@@ -8512,7 +8793,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_gen_venturerbase_01_macro",
+    "id": "module_gen_conn_venturerbase_01",
+    "macroId": "struct_gen_venturerbase_01_macro",
     "wareId": "module_gen_conn_venturerbase_01",
     "nameId": "{20104,52901}",
     "name": "Venture Base Connection Structure 01",
@@ -8540,7 +8822,8 @@
     "color_rgb": "#B300B3"
   },
   {
-    "id": "struct_gen_venturerbase_02_macro",
+    "id": "module_gen_conn_venturerbase_02",
+    "macroId": "struct_gen_venturerbase_02_macro",
     "wareId": "module_gen_conn_venturerbase_02",
     "nameId": "{20104,53001}",
     "name": "Venture Base Connection Structure 02",
@@ -8568,7 +8851,8 @@
     "color_rgb": "#B300B3"
   },
   {
-    "id": "struct_gen_venturerbase_03_macro",
+    "id": "module_gen_conn_venturerbase_03",
+    "macroId": "struct_gen_venturerbase_03_macro",
     "wareId": "module_gen_conn_venturerbase_03",
     "nameId": "{20104,53101}",
     "name": "Venture Base Connection Structure 03",
@@ -8596,7 +8880,8 @@
     "color_rgb": "#B300B3"
   },
   {
-    "id": "struct_gen_venturercross_01_macro",
+    "id": "module_gen_conn_venturercross_01",
+    "macroId": "struct_gen_venturercross_01_macro",
     "wareId": "module_gen_conn_venturercross_01",
     "nameId": "{20104,53201}",
     "name": "Venture Cross Connection Structure 01",
@@ -8624,7 +8909,8 @@
     "color_rgb": "#B300B3"
   },
   {
-    "id": "struct_gen_venturervertical_01_macro",
+    "id": "module_gen_conn_venturervertical_01",
+    "macroId": "struct_gen_venturervertical_01_macro",
     "wareId": "module_gen_conn_venturervertical_01",
     "nameId": "{20104,53301}",
     "name": "Venture Vertical Connection Structure 01",
@@ -8652,7 +8938,8 @@
     "color_rgb": "#B300B3"
   },
   {
-    "id": "struct_gen_venturervertical_02_macro",
+    "id": "module_gen_conn_venturervertical_02",
+    "macroId": "struct_gen_venturervertical_02_macro",
     "wareId": "module_gen_conn_venturervertical_02",
     "nameId": "{20104,53401}",
     "name": "Venture Vertical Connection Structure 02",
@@ -8680,7 +8967,8 @@
     "color_rgb": "#B300B3"
   },
   {
-    "id": "struct_par_base_01_macro",
+    "id": "module_par_conn_base_01",
+    "macroId": "struct_par_base_01_macro",
     "wareId": "module_par_conn_base_01",
     "nameId": "{20104,50401}",
     "name": "Paranid Base Connection Structure 01",
@@ -8708,7 +8996,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_par_base_02_macro",
+    "id": "module_par_conn_base_02",
+    "macroId": "struct_par_base_02_macro",
     "wareId": "module_par_conn_base_02",
     "nameId": "{20104,50501}",
     "name": "Paranid Base Connection Structure 02",
@@ -8736,7 +9025,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_par_base_03_macro",
+    "id": "module_par_conn_base_03",
+    "macroId": "struct_par_base_03_macro",
     "wareId": "module_par_conn_base_03",
     "nameId": "{20104,50601}",
     "name": "Paranid Base Connection Structure 03",
@@ -8764,7 +9054,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_par_cross_01_macro",
+    "id": "module_par_conn_cross_01",
+    "macroId": "struct_par_cross_01_macro",
     "wareId": "module_par_conn_cross_01",
     "nameId": "{20104,51501}",
     "name": "Paranid Cross Connection Structure 01",
@@ -8792,7 +9083,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_par_cross_02_macro",
+    "id": "module_par_conn_cross_02",
+    "macroId": "struct_par_cross_02_macro",
     "wareId": "module_par_conn_cross_02",
     "nameId": "{20104,51601}",
     "name": "Paranid Cross Connection Structure 02",
@@ -8820,7 +9112,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_par_cross_03_macro",
+    "id": "module_par_conn_cross_03",
+    "macroId": "struct_par_cross_03_macro",
     "wareId": "module_par_conn_cross_03",
     "nameId": "{20104,51701}",
     "name": "Paranid Y Connection Structure 01",
@@ -8848,7 +9141,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_par_vertical_01_macro",
+    "id": "module_par_conn_vertical_01",
+    "macroId": "struct_par_vertical_01_macro",
     "wareId": "module_par_conn_vertical_01",
     "nameId": "{20104,52301}",
     "name": "Paranid Vertical Connection Structure 01",
@@ -8876,7 +9170,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_par_vertical_02_macro",
+    "id": "module_par_conn_vertical_02",
+    "macroId": "struct_par_vertical_02_macro",
     "wareId": "module_par_conn_vertical_02",
     "nameId": "{20104,52401}",
     "name": "Paranid Vertical Connection Structure 02",
@@ -8904,7 +9199,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_spl_base_01_macro",
+    "id": "module_spl_conn_base_01",
+    "macroId": "struct_spl_base_01_macro",
     "wareId": "module_spl_conn_base_01",
     "nameId": "{20104,51001}",
     "name": "Split Base Connection Structure 01",
@@ -8932,7 +9228,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_spl_base_02_macro",
+    "id": "module_spl_conn_base_02",
+    "macroId": "struct_spl_base_02_macro",
     "wareId": "module_spl_conn_base_02",
     "nameId": "{20104,51101}",
     "name": "Split Base Connection Structure 02",
@@ -8960,7 +9257,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_spl_base_03_macro",
+    "id": "module_spl_conn_base_03",
+    "macroId": "struct_spl_base_03_macro",
     "wareId": "module_spl_conn_base_03",
     "nameId": "{20104,51201}",
     "name": "Split Base Connection Structure 03",
@@ -8988,7 +9286,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_spl_cross_01_macro",
+    "id": "module_spl_conn_cross_01",
+    "macroId": "struct_spl_cross_01_macro",
     "wareId": "module_spl_conn_cross_01",
     "nameId": "{20104,51901}",
     "name": "Split Y Connection Structure 01",
@@ -9016,7 +9315,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_spl_vertical_01_macro",
+    "id": "module_spl_conn_vertical_01",
+    "macroId": "struct_spl_vertical_01_macro",
     "wareId": "module_spl_conn_vertical_01",
     "nameId": "{20104,52701}",
     "name": "Split Vertical Connection Structure 01",
@@ -9044,7 +9344,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_spl_vertical_02_macro",
+    "id": "module_spl_conn_vertical_02",
+    "macroId": "struct_spl_vertical_02_macro",
     "wareId": "module_spl_conn_vertical_02",
     "nameId": "{20104,52801}",
     "name": "Split Vertical Connection Structure 02",
@@ -9072,7 +9373,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_tel_base_01_macro",
+    "id": "module_tel_conn_base_01",
+    "macroId": "struct_tel_base_01_macro",
     "wareId": "module_tel_conn_base_01",
     "nameId": "{20104,50701}",
     "name": "Teladi Base Connection Structure 01",
@@ -9100,7 +9402,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_tel_base_02_macro",
+    "id": "module_tel_conn_base_02",
+    "macroId": "struct_tel_base_02_macro",
     "wareId": "module_tel_conn_base_02",
     "nameId": "{20104,50801}",
     "name": "Teladi Base Connection Structure 02",
@@ -9128,7 +9431,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_tel_base_03_macro",
+    "id": "module_tel_conn_base_03",
+    "macroId": "struct_tel_base_03_macro",
     "wareId": "module_tel_conn_base_03",
     "nameId": "{20104,50901}",
     "name": "Teladi Base Connection Structure 03",
@@ -9156,7 +9460,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_tel_cross_01_macro",
+    "id": "module_tel_conn_cross_01",
+    "macroId": "struct_tel_cross_01_macro",
     "wareId": "module_tel_conn_cross_01",
     "nameId": "{20104,51801}",
     "name": "Teladi Cross Connection Structure 01",
@@ -9184,7 +9489,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_tel_vertical_01_macro",
+    "id": "module_tel_conn_vertical_01",
+    "macroId": "struct_tel_vertical_01_macro",
     "wareId": "module_tel_conn_vertical_01",
     "nameId": "{20104,52501}",
     "name": "Teladi Vertical Connection Structure 01",
@@ -9212,7 +9518,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_tel_vertical_02_macro",
+    "id": "module_tel_conn_vertical_02",
+    "macroId": "struct_tel_vertical_02_macro",
     "wareId": "module_tel_conn_vertical_02",
     "nameId": "{20104,52601}",
     "name": "Teladi Vertical Connection Structure 02",
@@ -9240,7 +9547,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_ter_base_01_macro",
+    "id": "module_ter_conn_base_01",
+    "macroId": "struct_ter_base_01_macro",
     "wareId": "module_ter_conn_base_01",
     "nameId": "{20104,53801}",
     "name": "Terran Base Connection Structure 01",
@@ -9268,7 +9576,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_ter_base_02_macro",
+    "id": "module_ter_conn_base_02",
+    "macroId": "struct_ter_base_02_macro",
     "wareId": "module_ter_conn_base_02",
     "nameId": "{20104,53901}",
     "name": "Terran Base Connection Structure 02",
@@ -9296,7 +9605,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_ter_base_03_macro",
+    "id": "module_ter_conn_base_03",
+    "macroId": "struct_ter_base_03_macro",
     "wareId": "module_ter_conn_base_03",
     "nameId": "{20104,54001}",
     "name": "Terran Base Connection Structure 03",
@@ -9324,7 +9634,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_ter_cross_01_macro",
+    "id": "module_ter_conn_cross_01",
+    "macroId": "struct_ter_cross_01_macro",
     "wareId": "module_ter_conn_cross_01",
     "nameId": "{20104,53701}",
     "name": "Terran Cross Connection Structure 01",
@@ -9352,7 +9663,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_ter_vertical_01_macro",
+    "id": "module_ter_conn_vertical_01",
+    "macroId": "struct_ter_vertical_01_macro",
     "wareId": "module_ter_conn_vertical_01",
     "nameId": "{20104,53501}",
     "name": "Terran Vertical Connection Structure 01",
@@ -9380,7 +9692,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "struct_ter_vertical_02_macro",
+    "id": "module_ter_conn_vertical_02",
+    "macroId": "struct_ter_vertical_02_macro",
     "wareId": "module_ter_conn_vertical_02",
     "nameId": "{20104,53601}",
     "name": "Terran Vertical Connection Structure 02",
@@ -9408,7 +9721,8 @@
     "color_rgb": "#99FDFF"
   },
   {
-    "id": "ventureplatform_gen_cross_01_macro",
+    "id": "module_gen_ventureplatform_cross_01",
+    "macroId": "ventureplatform_gen_cross_01_macro",
     "wareId": "module_gen_ventureplatform_cross_01",
     "nameId": "{20104,101901}",
     "name": "Venture Platform",
@@ -9436,7 +9750,8 @@
     "color_rgb": "#B300B3"
   },
   {
-    "id": "welfare_bor_artacademy_01_macro",
+    "id": "welfare_bor_artacademy_01",
+    "macroId": "welfare_bor_artacademy_01_macro",
     "wareId": "welfare_bor_artacademy_01",
     "nameId": "{20104,110301}",
     "name": "Pheromone Art Gallery",
@@ -9465,7 +9780,8 @@
     "color_rgb": "#4DB5FF"
   },
   {
-    "id": "welfare_gen_casino_01_macro",
+    "id": "module_gen_welfare_casino_01",
+    "macroId": "welfare_gen_casino_01_macro",
     "wareId": "module_gen_welfare_casino_01",
     "nameId": "{20104,110101}",
     "name": "Casino",
@@ -9493,7 +9809,8 @@
     "color_rgb": "#4DB5FF"
   },
   {
-    "id": "welfare_gen_gamblinghall_01_macro",
+    "id": "module_gen_welfare_gamblinghall_01",
+    "macroId": "welfare_gen_gamblinghall_01_macro",
     "wareId": "module_gen_welfare_gamblinghall_01",
     "nameId": "{20104,110201}",
     "name": "Gambling Den",
@@ -9521,7 +9838,8 @@
     "color_rgb": "#4DB5FF"
   },
   {
-    "id": "xenon_small_station_01_base_macro",
+    "id": "module_xen_def_base_01",
+    "macroId": "xenon_small_station_01_base_macro",
     "wareId": "module_xen_def_base_01",
     "nameId": "{20104,101801}",
     "name": "Xenon Base Module",
@@ -9549,7 +9867,8 @@
     "color_rgb": "#FF0000"
   },
   {
-    "id": "xenon_small_station_01_solarpanel_01_macro",
+    "id": "module_xen_prod_energycells_01",
+    "macroId": "xenon_small_station_01_solarpanel_01_macro",
     "wareId": "module_xen_prod_energycells_01",
     "nameId": "{20104,14701}",
     "name": "Matrix Solar Panel",
@@ -9579,7 +9898,8 @@
     "color_rgb": "#FF8B00"
   },
   {
-    "id": "xenon_small_station_01_storage_01_macro",
+    "id": "module_xen_stor_01",
+    "macroId": "xenon_small_station_01_storage_01_macro",
     "wareId": "module_xen_stor_01",
     "nameId": "{20104,24001}",
     "name": "Matrix Storage",

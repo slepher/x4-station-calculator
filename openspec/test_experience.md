@@ -112,3 +112,18 @@ await page.locator('.result-item').first().click();
 - 在 `ImportPlanModal` 切换到 `x4-station` tab 的路径上，若出现 `SyntaxError: 10`，`tests/test-setup.ts` 会将该 console error 提升为测试失败。
 - 定位建议：优先检查该 tab 切换时触发的 i18n 文案解析与模板绑定，确认是否存在 message format 解析异常。
 - 当 e2e 基于 `vite preview` 运行时，若代码已改但 `dist` 未重建，可能持续复现旧异常；先执行 `npm run build` 再重跑可避免误判。
+
+
+## 页签切换稳定性补充（2026-03-04）
+
+- 站点页与帝国总览之间切换时，单次点击 `.overview-tab`/`.station-tab` 在并发 E2E 下可能偶发未生效。
+- 推荐做法：点击后用状态校验再继续后续定位，例如轮询 `window.empireStore.activeStationId === null`（overview）或 `!== null`（station），避免将未切换导致的 locator miss 误判为产品缺陷。
+
+
+## Storage Import 打开稳定性补充（2026-03-04）
+
+- 在 `StationToolbar` 上，若标题进入编辑态（中间标题区变为 input），`toolbar-import-btn` 的一次点击可能未触发 `storage-import-wizard` 打开。
+- 推荐做法：在导入 helper 中增加“编辑态收敛 + fallback”链路：
+  - 先尝试 `Enter/Escape` 退出编辑态，并在可见时点击 `.toolbar-panel input + button`；
+  - 再执行常规 `toolbar-import-btn` 点击；
+  - 若仍未出现弹窗，执行 `document.querySelector('[data-testid="toolbar-import-btn"]')?.click()` 的 DOM fallback，并配合短重试。

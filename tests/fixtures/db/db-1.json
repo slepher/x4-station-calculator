@@ -1,7 +1,7 @@
 {
-  "vsn": 2,
+  "vsn": 1,
   "x4_empire_data": {
-    "version": 3,
+    "version": 2,
     "activeId": "empire-1",
     "activeStationId": "empire-1-station-1",
     "list": [
@@ -16,11 +16,11 @@
             "count": 1,
             "modules": [
               {
-                "id": "module_gen_prod_claytronics_01",
+                "id": "prod_gen_claytronics_macro",
                 "count": 6
               },
               {
-                "id": "module_gen_prod_hullparts_01",
+                "id": "prod_gen_hullparts_macro",
                 "count": 12
               }
             ],
@@ -56,7 +56,7 @@
             "count": 1,
             "modules": [
               {
-                "id": "module_gen_prod_quantumtubes_01",
+                "id": "prod_gen_quantumtubes_macro",
                 "count": 4
               }
             ],
@@ -90,11 +90,11 @@
             "count": 1,
             "modules": [
               {
-                "id": "module_arg_prod_foodrations_01",
+                "id": "prod_arg_foodrations_macro",
                 "count": 5
               },
               {
-                "id": "module_arg_prod_medicalsupplies_01",
+                "id": "prod_arg_medicalsupplies_macro",
                 "count": 9
               }
             ],
@@ -134,35 +134,35 @@
             "count": 1,
             "modules": [
               {
-                "id": "module_gen_prod_advancedelectronics_01",
+                "id": "prod_gen_advancedelectronics_macro",
                 "count": 1
               },
               {
-                "id": "module_gen_prod_antimatterconverters_01",
+                "id": "prod_gen_antimatterconverters_macro",
                 "count": 1
               },
               {
-                "id": "module_gen_prod_dronecomponents_01",
+                "id": "prod_gen_dronecomponents_macro",
                 "count": 1
               },
               {
-                "id": "module_gen_prod_fieldcoils_01",
+                "id": "prod_gen_fieldcoils_macro",
                 "count": 1
               },
               {
-                "id": "module_gen_prod_missilecomponents_01",
+                "id": "prod_gen_missilecomponents_macro",
                 "count": 1
               },
               {
-                "id": "module_gen_prod_shieldcomponents_01",
+                "id": "prod_gen_shieldcomponents_macro",
                 "count": 1
               },
               {
-                "id": "module_gen_prod_turretcomponents_01",
+                "id": "prod_gen_turretcomponents_macro",
                 "count": 1
               },
               {
-                "id": "module_gen_prod_weaponcomponents_01",
+                "id": "prod_gen_weaponcomponents_macro",
                 "count": 1
               }
             ],
@@ -204,11 +204,11 @@
             "count": 1,
             "modules": [
               {
-                "id": "module_gen_prod_claytronics_01",
+                "id": "prod_gen_claytronics_macro",
                 "count": 1
               },
               {
-                "id": "module_gen_prod_hullparts_01",
+                "id": "prod_gen_hullparts_macro",
                 "count": 1
               }
             ],
@@ -240,7 +240,7 @@
     ]
   },
   "x4_logic_flow_plans": {
-    "version": 2,
+    "version": 1,
     "activeId": "logic-flow-1",
     "list": [
       {
@@ -258,7 +258,7 @@
               {
                 "id": "lf-1-g1-m1",
                 "wareId": "claytronics",
-                "moduleId": "module_gen_prod_claytronics_01",
+                "moduleId": "prod_gen_claytronics_macro",
                 "race": "default",
                 "lineage": "default",
                 "column": 3,
@@ -270,7 +270,7 @@
               {
                 "id": "lf-1-g1-m2",
                 "wareId": "hullparts",
-                "moduleId": "module_gen_prod_hullparts_01",
+                "moduleId": "prod_gen_hullparts_macro",
                 "race": "default",
                 "lineage": "default",
                 "column": 2,
@@ -303,7 +303,7 @@
               {
                 "id": "lf-1-g2-m1",
                 "wareId": "quantumtubes",
-                "moduleId": "module_gen_prod_quantumtubes_01",
+                "moduleId": "prod_gen_quantumtubes_macro",
                 "race": "default",
                 "lineage": "default",
                 "column": 2,
@@ -325,7 +325,7 @@
               {
                 "id": "lf-1-g3-m1",
                 "wareId": "foodrations",
-                "moduleId": "module_arg_prod_foodrations_01",
+                "moduleId": "prod_arg_foodrations_macro",
                 "race": "argon",
                 "lineage": "argon",
                 "column": 3,
@@ -337,7 +337,7 @@
               {
                 "id": "lf-1-g3-m2",
                 "wareId": "medicalsupplies",
-                "moduleId": "module_arg_prod_medicalsupplies_01",
+                "moduleId": "prod_arg_medicalsupplies_macro",
                 "race": "argon",
                 "lineage": "argon",
                 "column": 3,
@@ -369,7 +369,7 @@
               {
                 "id": "lf-2-g1-m1",
                 "wareId": "advancedelectronics",
-                "moduleId": "module_gen_prod_advancedelectronics_01",
+                "moduleId": "prod_gen_advancedelectronics_macro",
                 "race": "default",
                 "lineage": "default",
                 "column": 3,
@@ -381,7 +381,7 @@
               {
                 "id": "lf-2-g1-m2",
                 "wareId": "antimatterconverters",
-                "moduleId": "module_gen_prod_antimatterconverters_01",
+                "moduleId": "prod_gen_antimatterconverters_macro",
                 "race": "default",
                 "lineage": "default",
                 "column": 3,
@@ -393,7 +393,7 @@
               {
                 "id": "lf-2-g1-m3",
                 "wareId": "dronecomponents",
-                "moduleId": "module_gen_prod_dronecomponents_01",
+                "moduleId": "prod_gen_dronecomponents_macro",
                 "race": "default",
                 "lineage": "default",
                 "column": 3,
@@ -405,7 +405,7 @@
               {
                 "id": "lf-2-g1-m4",
                 "wareId": "fieldcoils",
-                "moduleId": "module_gen_prod_fieldcoils_01",
+                "moduleId": "prod_gen_fieldcoils_macro",
                 "race": "default",
                 "lineage": "default",
                 "column": 3,
@@ -417,7 +417,7 @@
               {
                 "id": "lf-2-g1-m5",
                 "wareId": "missilecomponents",
-                "moduleId": "module_gen_prod_missilecomponents_01",
+                "moduleId": "prod_gen_missilecomponents_macro",
                 "race": "default",
                 "lineage": "default",
                 "column": 3,
@@ -429,7 +429,7 @@
               {
                 "id": "lf-2-g1-m6",
                 "wareId": "shieldcomponents",
-                "moduleId": "module_gen_prod_shieldcomponents_01",
+                "moduleId": "prod_gen_shieldcomponents_macro",
                 "race": "default",
                 "lineage": "default",
                 "column": 3,
@@ -441,7 +441,7 @@
               {
                 "id": "lf-2-g1-m7",
                 "wareId": "turretcomponents",
-                "moduleId": "module_gen_prod_turretcomponents_01",
+                "moduleId": "prod_gen_turretcomponents_macro",
                 "race": "default",
                 "lineage": "default",
                 "column": 3,
@@ -453,7 +453,7 @@
               {
                 "id": "lf-2-g1-m8",
                 "wareId": "weaponcomponents",
-                "moduleId": "module_gen_prod_weaponcomponents_01",
+                "moduleId": "prod_gen_weaponcomponents_macro",
                 "race": "default",
                 "lineage": "default",
                 "column": 3,
@@ -552,7 +552,7 @@
               {
                 "id": "lf-2-g2-m1",
                 "wareId": "claytronics",
-                "moduleId": "module_gen_prod_claytronics_01",
+                "moduleId": "prod_gen_claytronics_macro",
                 "race": "default",
                 "lineage": "default",
                 "column": 3,
@@ -564,7 +564,7 @@
               {
                 "id": "lf-2-g2-m2",
                 "wareId": "hullparts",
-                "moduleId": "module_gen_prod_hullparts_01",
+                "moduleId": "prod_gen_hullparts_macro",
                 "race": "default",
                 "lineage": "default",
                 "column": 2,

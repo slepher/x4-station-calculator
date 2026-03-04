@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useGameDataStore } from './useGameDataStore'
 import { computeExpandUpstream, type ExpandContext, type GroupSnapshot } from './logic/logicFlowStream'
+import { migrateFlowStateToCurrent } from './logic/stateMigrations'
+import { CURRENT_FLOW_VERSION } from './logic/storageVersions'
 import type { FlowNode, ProductionLineGroup, SavedFlowNode, SavedFlowGroup, LogicFlowPlan, SavedFlowPlansState, LogicFlowSettings } from '@/types/x4'
 
 export const useLogicFlowStore = defineStore('logicFlow', () => {
@@ -21,7 +23,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
 
   // --- Plan Management State ---
   const currentPlanName = ref<string>('')
-  const savedPlans = ref<SavedFlowPlansState>({ version: 1, activeId: null, list: [] })
+  const savedPlans = ref<SavedFlowPlansState>({ version: CURRENT_FLOW_VERSION, activeId: null, list: [] })
   const lastSavedSnapshot = ref<string>('')
   const settings = ref<LogicFlowSettings>({ isDefaultLocked: true })
 
@@ -1102,8 +1104,14 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     const stored = localStorage.getItem('x4_logic_flow_plans')
     if (stored) {
       try {
-        const data = JSON.parse(stored)
-        savedPlans.value = data
+        const data = JSON.parse(stored) as SavedFlowPlansState
+        const migrated = migrateFlowStateToCurrent(data, {
+          modulesMap: gameData.modulesMap,
+          modulesByMacroId: gameData.modulesByMacroId
+        })
+        migrated.warnings.forEach((warning) => console.warn('[LogicFlowStore][Migration]', warning))
+        savedPlans.value = migrated.state
+        savePlansToStorage()
       } catch (e) {
         console.error('[LogicFlowStore] Failed to load plans:', e)
       }
