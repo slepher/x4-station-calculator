@@ -166,7 +166,8 @@ Enforcement:
 - Planning phases (`/x4:discuss`, `/x4:new`, `/x4:ff`, `/x4:doc`) must not edit source code.
 - `/x4:apply` should run after required planning artifacts are ready.
 - `/x4:test-impl` and `/x4:test` are optional standalone phases for focused test iteration.
-- When test docs are updated, `/x4:test-doc-viewer` review gate should pass before `/x4:test-impl`.
+- `/x4:doc` should run test-doc audit by default (`/x4:test-doc` -> `/x4:test-doc-viewer`) before reporting phase completion.
+- For test implementation phases, `/x4:test-doc-viewer` review gate should pass before `/x4:test-impl`.
 - Reviewer gate execution must be isolated subagent mode (no in-thread reviewer fallback).
 - `/x4:verify` should run after `/x4:apply` and includes verification-stage test implementation/execution sequencing.
 - `/x4:archive` must consume `/x4:verify` gate output contract; missing gate fields are blockers.
