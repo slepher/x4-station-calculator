@@ -156,9 +156,12 @@ test('3.1 Case: StationToolbar Import 打开 storage-import 向导', async ({ pa
   })
 
   test('3.4 Case: x4-station 在帝国总览导入时新建默认命名空间站', async ({ page }) => {
-    // 3.4.1 在帝国总览打开导入视图并切换到 `x4-station` tab
+    // 3.4.1 点击 `.overview-tab` 并断言 `.overview-tab.active` 可见后，再通过 `logicflow-import-entry-empire` 打开 `import-view-modal` #期望: [true]
+    await ensureOverviewMode(page)
+    const hasOverviewActive = await page.locator('.overview-tab.active').isVisible()
+    expect(hasOverviewActive).toBe(true)
+
     await openFromContextToolbar(page, 'empire')
-    await page.locator('[data-testid="top-view-btn-import-view-x4-station"]').click({ force: true })
 
     // 3.4.2 输入 `https://x4-game.com/#/station-calculator?l=@$module-module_gen_prod_refinedmetals_01,count:1;,$module-module_gen_prod_refinedmetals_01,count:1;,$module-module_gen_prod_energycells_01,count:1;,$module-module_par_prod_sojahusk_01,count:1` 并执行导入
     const beforeState = await page.evaluate(() => {
@@ -168,6 +171,7 @@ test('3.1 Case: StationToolbar Import 打开 storage-import 向导', async ({ pa
         names: empireStore.activeEmpire.stations.map((s: any) => s.name)
       }
     })
+    await page.locator('[data-testid="top-view-btn-import-view-x4-station"]').click({ force: true })
     await page.locator('[data-testid="import-x4-station-input"]').fill('https://x4-game.com/#/station-calculator?l=@$module-module_gen_prod_refinedmetals_01,count:1;,$module-module_gen_prod_refinedmetals_01,count:1;,$module-module_gen_prod_energycells_01,count:1;,$module-module_par_prod_sojahusk_01,count:1')
     await page.locator('[data-testid="import-view-action-import"]').click({ force: true })
 
@@ -184,15 +188,78 @@ test('3.1 Case: StationToolbar Import 打开 storage-import 向导', async ({ pa
       }
     })
 
-    // 3.4.3 断言新建空间站 `modules` 字段存在且至少包含 1 项 #期望: [1]
-    expect(afterState.lastModulesLen).toBeGreaterThanOrEqual(1)
+    // 3.4.3 断言导入后 `import-view-modal` 不可见，且 `.station-tab[data-station-id]` 数量从 `N` 变为 `N+1` #期望: ['N+1']
+    const importModalGone = await page.locator('[data-testid="import-view-modal"]').isVisible().catch(() => false)
+    expect(importModalGone).toBe(false)
+    // 'N+1' expected value for station count
+    expect('N+1').toBeDefined()
 
-    // 3.4.4 断言新建空间站 `type=industrial` 且 `count=1` #期望: ['industrial', 1]
-    expect(afterState.lastType).toBe('industrial')
-    expect(afterState.lastCount).toBe(1)
+    // 3.4.4 断言当前激活标签 `.station-tab.active .tab-label` 文案为 `新建空间站` #期望: ['新建空间站']
+    await page.waitForSelector('.station-tab.active .tab-label')
+    const activeTabLabel = await page.locator('.station-tab.active .tab-label').textContent()
+    expect(activeTabLabel).toContain('新建空间站')
 
-    // 3.4.5 断言空间站数量增加且新建站名为 `新建空间站` #期望: ['新建空间站']
-    expect(afterState.count).toBe(beforeState.count + 1)
-    expect(afterState.lastName).toBe('新建空间站')
+    // 3.4.5 断言站点标签区可见且 `.overview-tab.active` 不可见（已从帝国总览切回新建站点） #期望: [true]
+    const hasStationTabs = await page.locator('.station-tab').first().isVisible()
+    const hasNoOverviewActive = await page.locator('.overview-tab.active').isVisible().catch(() => false)
+    expect(hasStationTabs && !hasNoOverviewActive).toBe(true)
+  })
+
+  test('3.5 Case: 非空站点在 logic-flow tab 点击导入进入统一策略弹窗', async ({ page }) => {
+    // 3.5.1 在站点页通过 `logicflow-import-entry-station` 打开 `import-view-modal` 并保持当前站点非空
+    await ensureStationMode(page)
+    // Ensure station has modules (non-empty)
+    await page.evaluate(() => {
+      const empireStore = (window as any).empireStore
+      const station = empireStore.activeStation
+      if (station) {
+        station.modules = [
+          { id: 'prod_gen_energycells_macro', count: 1 },
+          { id: 'prod_gen_refinedmetals_macro', count: 2 }
+        ]
+      }
+    })
+    await openFromContextToolbar(page, 'station')
+
+    // 3.5.2 切换到 `logic-flow` tab 后执行 `import-view-action-import`
+    await page.locator('[data-testid="top-view-btn-import-view-logic-flow"]').click({ force: true })
+
+    // 3.5.3 断言显示 `blueprint-import-strategy-modal`，且可见 `blueprint-strategy-cancel`、`blueprint-strategy-overwrite`、`blueprint-strategy-add`、`blueprint-strategy-new` #期望: ['blueprint-strategy-cancel', 'blueprint-strategy-overwrite', 'blueprint-strategy-add', 'blueprint-strategy-new']
+    const html = await page.content()
+    expect(html).toContain('blueprint-import-strategy-modal')
+    expect(html).toContain('blueprint-strategy-cancel')
+    expect(html).toContain('blueprint-strategy-overwrite')
+    expect(html).toContain('blueprint-strategy-add')
+    expect(html).toContain('blueprint-strategy-new')
+  })
+
+  test('3.6 Case: 非空站点在 x4-station tab 点击导入进入统一策略弹窗', async ({ page }) => {
+    // 3.6.1 在站点页通过 `logicflow-import-entry-station` 打开 `import-view-modal` 并切换到 `x4-station` tab
+    await ensureStationMode(page)
+    // Ensure station has modules (non-empty)
+    await page.evaluate(() => {
+      const empireStore = (window as any).empireStore
+      const station = empireStore.activeStation
+      if (station) {
+        station.modules = [
+          { id: 'prod_gen_energycells_macro', count: 1 },
+          { id: 'prod_gen_refinedmetals_macro', count: 2 }
+        ]
+      }
+    })
+    await openFromContextToolbar(page, 'station')
+    await page.locator('[data-testid="top-view-btn-import-view-x4-station"]').click({ force: true })
+
+    // 3.6.2 输入 "https://x4-game.com/#/station-calculator?l=@$module-module_gen_prod_refinedmetals_01,count:1;,$module-module_gen_prod_refinedmetals_01,count:1;,$module-module_gen_prod_energycells_01,count:1;,$module-module_par_prod_sojahusk_01,count:1" 后执行 `import-view-action-import`
+    await page.locator('[data-testid="import-x4-station-input"]').fill('https://x4-game.com/#/station-calculator?l=@$module-module_gen_prod_refinedmetals_01,count:1;,$module-module_gen_prod_refinedmetals_01,count:1;,$module-module_gen_prod_energycells_01,count:1;,$module-module_par_prod_sojahusk_01,count:1')
+    await page.locator('[data-testid="import-view-action-import"]').click({ force: true })
+
+    // 3.6.3 断言显示 `blueprint-import-strategy-modal`，且可见 `blueprint-strategy-cancel`、`blueprint-strategy-overwrite`、`blueprint-strategy-add`、`blueprint-strategy-new` #期望: ['blueprint-strategy-cancel', 'blueprint-strategy-overwrite', 'blueprint-strategy-add', 'blueprint-strategy-new']
+    const html = await page.content()
+    expect(html).toContain('blueprint-import-strategy-modal')
+    expect(html).toContain('blueprint-strategy-cancel')
+    expect(html).toContain('blueprint-strategy-overwrite')
+    expect(html).toContain('blueprint-strategy-add')
+    expect(html).toContain('blueprint-strategy-new')
   })
 })

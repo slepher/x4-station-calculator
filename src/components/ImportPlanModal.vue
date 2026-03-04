@@ -5,7 +5,7 @@ import { useEmpireStore } from '@/store/useEmpireStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useStatusStore } from '@/store/useStatusStore'
-import { buildEmpireImportTargets, buildStationImportPayload, type LogicFlowImportWarning } from '@/store/logic/logicFlowImport'
+import { buildEmpireImportTargets, buildStationImportPayload, type LogicFlowImportWarning, type StationImportPayload } from '@/store/logic/logicFlowImport'
 import { getLogicFlowGroupDisplayName } from '@/store/logic/logicFlowGroupName'
 import { parseGameComLink, parseXmlBlueprintMeta, resolveModuleId } from '@/store/logic/blueprintParser'
 import TopViewSwitch from '@/components/common/TopViewSwitch.vue'
@@ -41,6 +41,8 @@ const showWarningModal = ref(false)
 const pendingImportSelection = ref<{ planId: string; groupId?: string } | null>(null)
 const pendingStationGroupName = ref('')
 const warningSummary = ref<LogicFlowImportWarning[]>([])
+const pendingLogicFlowModules = ref<StationImportPayload | null>(null)
+const pendingX4StationModules = ref<BlueprintModule[]>([])
 
 const blueprintUploadError = ref('')
 const blueprintFileName = ref('')
@@ -125,7 +127,14 @@ const handleImportX4StationString = () => {
       if (!stationId) {
         throw new Error('No active station for import')
       }
-      applyBlueprintOverwrite(stationId, modules)
+      // Unified strategy dialog for non-empty station
+      if (isStationEmpty()) {
+        applyBlueprintOverwrite(stationId, modules)
+      } else {
+        pendingX4StationModules.value = modules
+        showBlueprintStrategyDialog.value = true
+        return
+      }
     }
 
     x4StationContent.value = ''
@@ -150,7 +159,7 @@ const getSelectedPlan = () => {
   return logicFlowStore.savedPlans.list.find((plan) => plan.id === selection.planId) || null
 }
 
-const applyImportPayloadToStation = (stationId: string, payload: { plannedModules: { id: string; count: number }[]; lockedWares: string[] }) => {
+const applyImportPayloadToStation = (stationId: string, payload: StationImportPayload) => {
   const station = empireStore.getStationById(stationId)
   if (!station) return
   station.modules = payload.plannedModules.map((module) => ({ ...module }))
@@ -160,42 +169,51 @@ const applyImportPayloadToStation = (stationId: string, payload: { plannedModule
   empireStore.refreshStationFlowCache(station.id)
 }
 
-const executeStationImport = (mode: 'new' | 'overwrite') => {
-  const plan = getSelectedPlan()
+const executeStationImport = (mode: 'new' | 'overwrite', payload?: StationImportPayload) => {
   const selection = pendingImportSelection.value
-  if (!plan || !selection?.groupId) return
+  let importPayload = payload
 
-  const group = plan.groups.find((item) => item.id === selection.groupId)
-  if (!group) return
+  // If no payload provided, build from selection
+  if (!importPayload && selection?.groupId) {
+    const plan = getSelectedPlan()
+    const group = plan?.groups.find((item) => item.id === selection.groupId)
+    if (!group) return
 
-  const payload = buildStationImportPayload(group, gameDataStore.waresMap, gameDataStore.getWareDisplayName)
-  if (payload.manualModuleCount === 0) {
-    statusStore.pushMessage('warning', 'system', t('logicFlowImport.error_empty_group'))
-    showStationImportConfirm.value = false
-    return
+    importPayload = buildStationImportPayload(group, gameDataStore.waresMap, gameDataStore.getWareDisplayName)
+    if (importPayload.manualModuleCount === 0) {
+      statusStore.pushMessage('warning', 'system', t('logicFlowImport.error_empty_group'))
+      showStationImportConfirm.value = false
+      return
+    }
   }
+
+  if (!importPayload) return
 
   if (mode === 'overwrite') {
     const stationId = empireStore.activeStation?.id
     if (!stationId) {
       statusStore.pushMessage('warning', 'system', t('logicFlowImport.error_no_active_station'))
       showStationImportConfirm.value = false
+      showBlueprintStrategyDialog.value = false
       return
     }
-    applyImportPayloadToStation(stationId, payload)
+    applyImportPayloadToStation(stationId, importPayload)
   } else {
-    const newStation = empireStore.createStation(payload.groupName || t('empire.new_station_name'))
+    const newStation = empireStore.createStation(importPayload.groupName || t('empire.new_station_name'))
     if (!newStation) {
       showStationImportConfirm.value = false
+      showBlueprintStrategyDialog.value = false
       return
     }
-    applyImportPayloadToStation(newStation.id, payload)
+    applyImportPayloadToStation(newStation.id, importPayload)
   }
 
-  warningSummary.value = payload.warnings
-  showWarningModal.value = payload.warnings.length > 0
+  warningSummary.value = importPayload.warnings
+  showWarningModal.value = importPayload.warnings.length > 0
   showStationImportConfirm.value = false
+  showBlueprintStrategyDialog.value = false
   pendingImportSelection.value = null
+  pendingLogicFlowModules.value = null
 }
 
 const executeEmpireImport = () => {
@@ -225,10 +243,24 @@ const handleImportSelected = (selection: { planId: string; groupId?: string }) =
   if (logicFlowImportMode.value === 'station') {
     const plan = getSelectedPlan()
     const group = plan?.groups.find((item) => item.id === selection.groupId)
-    pendingStationGroupName.value = group
-      ? getLogicFlowGroupDisplayName(group, gameDataStore.getWareDisplayName)
-      : ''
-    showStationImportConfirm.value = true
+    if (!group) return
+
+    const payload = buildStationImportPayload(group, gameDataStore.waresMap, gameDataStore.getWareDisplayName)
+    if (payload.manualModuleCount === 0) {
+      statusStore.pushMessage('warning', 'system', t('logicFlowImport.error_empty_group'))
+      return
+    }
+
+    pendingStationGroupName.value = getLogicFlowGroupDisplayName(group, gameDataStore.getWareDisplayName)
+
+    // Unified strategy dialog for non-empty station
+    if (isStationEmpty()) {
+      pendingLogicFlowModules.value = payload
+      showStationImportConfirm.value = true
+    } else {
+      pendingLogicFlowModules.value = payload
+      showBlueprintStrategyDialog.value = true
+    }
     return
   }
 
@@ -379,6 +411,30 @@ const handleImportBlueprint = () => {
 const handleBlueprintActionOverwrite = () => {
   const stationId = empireStore.activeStation?.id
   if (!stationId) return
+
+  // Handle logic-flow import
+  if (pendingLogicFlowModules.value) {
+    applyImportPayloadToStation(stationId, pendingLogicFlowModules.value)
+    warningSummary.value = pendingLogicFlowModules.value.warnings
+    showWarningModal.value = pendingLogicFlowModules.value.warnings?.length > 0
+    pendingLogicFlowModules.value = null
+    pendingImportSelection.value = null
+    showBlueprintStrategyDialog.value = false
+    return
+  }
+
+  // Handle x4-station import
+  if (pendingX4StationModules.value.length > 0) {
+    applyBlueprintOverwrite(stationId, pendingX4StationModules.value)
+    pendingX4StationModules.value = []
+    showBlueprintStrategyDialog.value = false
+    x4StationContent.value = ''
+    x4StationHasError.value = false
+    emit('close')
+    return
+  }
+
+  // Handle game-blueprint import
   applyBlueprintOverwrite(stationId, blueprintModules.value)
   showBlueprintStrategyDialog.value = false
   finalizeBlueprintImport()
@@ -387,12 +443,65 @@ const handleBlueprintActionOverwrite = () => {
 const handleBlueprintActionAdd = () => {
   const stationId = empireStore.activeStation?.id
   if (!stationId) return
+
+  // Handle logic-flow import
+  if (pendingLogicFlowModules.value) {
+    applyImportPayloadToStation(stationId, pendingLogicFlowModules.value)
+    warningSummary.value = pendingLogicFlowModules.value.warnings
+    showWarningModal.value = pendingLogicFlowModules.value.warnings?.length > 0
+    pendingLogicFlowModules.value = null
+    pendingImportSelection.value = null
+    showBlueprintStrategyDialog.value = false
+    return
+  }
+
+  // Handle x4-station import
+  if (pendingX4StationModules.value.length > 0) {
+    applyBlueprintAdd(stationId, pendingX4StationModules.value)
+    pendingX4StationModules.value = []
+    showBlueprintStrategyDialog.value = false
+    x4StationContent.value = ''
+    x4StationHasError.value = false
+    emit('close')
+    return
+  }
+
+  // Handle game-blueprint import
   applyBlueprintAdd(stationId, blueprintModules.value)
   showBlueprintStrategyDialog.value = false
   finalizeBlueprintImport()
 }
 
 const handleBlueprintActionNew = () => {
+  // Handle logic-flow import
+  if (pendingLogicFlowModules.value) {
+    const newStation = empireStore.createStation(pendingStationGroupName.value || t('empire.new_station_name'))
+    if (newStation) {
+      applyImportPayloadToStation(newStation.id, pendingLogicFlowModules.value)
+      warningSummary.value = pendingLogicFlowModules.value.warnings
+      showWarningModal.value = pendingLogicFlowModules.value.warnings?.length > 0
+    }
+    pendingLogicFlowModules.value = null
+    pendingImportSelection.value = null
+    showBlueprintStrategyDialog.value = false
+    return
+  }
+
+  // Handle x4-station import
+  if (pendingX4StationModules.value.length > 0) {
+    const station = createStationWithDefaultName()
+    if (station) {
+      applyBlueprintOverwrite(station.id, pendingX4StationModules.value)
+    }
+    pendingX4StationModules.value = []
+    showBlueprintStrategyDialog.value = false
+    x4StationContent.value = ''
+    x4StationHasError.value = false
+    emit('close')
+    return
+  }
+
+  // Handle game-blueprint import
   createStationAndImportBlueprint(blueprintModules.value)
   showBlueprintStrategyDialog.value = false
   finalizeBlueprintImport()
@@ -553,7 +662,7 @@ const handleBlueprintActionNew = () => {
         </div>
 
         <div class="px-6 py-4 bg-slate-900/20 border-t border-slate-700 flex justify-end gap-3">
-          <button class="px-4 py-2 rounded text-sm font-bold bg-slate-600 hover:bg-slate-500 text-white transition" @click="showBlueprintStrategyDialog = false">
+          <button class="px-4 py-2 rounded text-sm font-bold bg-slate-600 hover:bg-slate-500 text-white transition" data-testid="blueprint-strategy-cancel" @click="showBlueprintStrategyDialog = false">
             {{ t('ui.cancel') }}
           </button>
           <button class="px-4 py-2 rounded text-sm font-bold bg-cyan-600 hover:bg-cyan-500 text-white transition" data-testid="blueprint-strategy-overwrite" @click="handleBlueprintActionOverwrite">

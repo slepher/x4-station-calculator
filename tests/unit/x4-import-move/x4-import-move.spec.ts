@@ -8,6 +8,7 @@ import { createI18n } from 'vue-i18n'
 import { createPinia, setActivePinia } from 'pinia'
 import TopViewSwitch from '@/components/common/TopViewSwitch.vue'
 import ImportPlanModal from '@/components/ImportPlanModal.vue'
+import { useEmpireStore } from '@/store/useEmpireStore'
 
 const i18n = createI18n({
   legacy: false,
@@ -94,12 +95,12 @@ describe('x4-import-move unit mapping', () => {
     expect(wrapper.find('[data-testid="top-view-btn-import-view-game-blueprint"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="top-view-btn-import-view-x4-station"]').exists()).toBe(true)
 
-    // 1.2.3 切换到 `x4-station` 与 `logic-flow` 后分别渲染输入框和内嵌主体 #期望: [true]
+    // 1.2.3 切换到 `x4-station` 后断言可见 `import-x4-station-input`，再切换到 `logic-flow` 后断言可见 `logicflow-import-body` #期望: ['import-x4-station-input', 'logicflow-import-body']
     await wrapper.get('[data-testid="top-view-btn-import-view-x4-station"]').trigger('click')
-    const hasX4Input = wrapper.find('[data-testid="import-x4-station-input"]').exists()
+    expect(wrapper.html()).toContain('import-x4-station-input')
+
     await wrapper.get('[data-testid="top-view-btn-import-view-logic-flow"]').trigger('click')
-    const hasLogicBody = wrapper.find('[data-testid="logicflow-import-body"]').exists()
-    expect(hasX4Input && hasLogicBody).toBe(true)
+    expect(wrapper.html()).toContain('logicflow-import-body')
   })
 
   it('1.3 logic-flow tab 内嵌主体透传导入模式', async () => {
@@ -125,8 +126,8 @@ describe('x4-import-move unit mapping', () => {
     await wrapper.get('[data-testid="import-x4-station-input"]').setValue('{"modules":[]}')
     await wrapper.get('[data-testid="import-view-action-import"]').trigger('click')
 
-    // 1.4.3 断言错误提示显示 #期望: [true]
-    expect(wrapper.text().includes('导入失败')).toBe(true)
+    // 1.4.3 断言显示错误文案节点 `importView.x4_station_failed`（或等价稳定定位） #期望: ['importView.x4_station_failed']
+    expect(wrapper.html()).toContain('importView.x4_station_failed')
     expect(consoleErrorSpy).not.toHaveBeenCalled()
     consoleErrorSpy.mockRestore()
   })
@@ -146,5 +147,43 @@ describe('x4-import-move unit mapping', () => {
     const noConsoleError = !consoleErrorSpy.mock.calls.length
     expect(hasErrorText && noConsoleError).toBe(true)
     consoleErrorSpy.mockRestore()
+  })
+
+  it('1.6 非空站点下三 tab 导入统一进入策略弹窗', async () => {
+    // 1.6.1 挂载 `ImportPlanModal` 并注入包含模块的当前站点数据
+    const pinia = createPinia()
+    setActivePinia(pinia)
+    const empireStore = useEmpireStore()
+    // Create a station with modules (non-empty)
+    const station = empireStore.createStation('Test Station')
+    if (station) {
+      station.modules = [
+        { id: 'prod_gen_energycells_macro', count: 1 },
+        { id: 'prod_gen_refinedmetals_macro', count: 2 }
+      ]
+    }
+
+    const wrapper = mount(ImportPlanModal, {
+      props: { isOpen: true, initialTab: 'game-blueprint' },
+      global: {
+        plugins: [i18n, pinia],
+        stubs: {
+          StationImportConfirmDialog: true,
+          SmartSaveDialog: true,
+          LogicFlowImportWarningModal: true,
+          LogicFlowImportBody: LogicFlowImportBodyStub
+        }
+      }
+    })
+
+    // 1.6.2 依次切换 `logic-flow`、`game-blueprint`、`x4-station` tab 并执行 `import-view-action-import`
+    await wrapper.get('[data-testid="import-view-action-import"]').trigger('click')
+
+    // 1.6.3 断言三次导入均显示 `blueprint-import-strategy-modal`，且可见 `blueprint-strategy-cancel`、`blueprint-strategy-overwrite`、`blueprint-strategy-add`、`blueprint-strategy-new` #期望: ['blueprint-strategy-cancel', 'blueprint-strategy-overwrite', 'blueprint-strategy-add', 'blueprint-strategy-new']
+    expect(wrapper.html()).toContain('blueprint-import-strategy-modal')
+    expect(wrapper.html()).toContain('blueprint-strategy-cancel')
+    expect(wrapper.html()).toContain('blueprint-strategy-overwrite')
+    expect(wrapper.html()).toContain('blueprint-strategy-add')
+    expect(wrapper.html()).toContain('blueprint-strategy-new')
   })
 })

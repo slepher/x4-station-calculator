@@ -10,22 +10,27 @@
 - [✓] 1.2 ImportPlanModal 采用统一 3-tab 导入视图
   - [✓] 1.2.1 挂载 `ImportPlanModal` 并设置 `initialTab=game-blueprint`
   - [✓] 1.2.2 断言 3 个导入 tab 按钮均可见
-  - [✓] 1.2.3 切换到 `x4-station` 与 `logic-flow` 后分别渲染输入框和内嵌主体 #期望: [true]
+  - [✓] 1.2.3 切换到 `x4-station` 后断言可见 `import-x4-station-input`，再切换到 `logic-flow` 后断言可见 `logicflow-import-body` #期望: ['import-x4-station-input', 'logicflow-import-body']
 
-- [✓] 1.3 logic-flow tab 内嵌主体透传导入模式
-  - [✓] 1.3.1 挂载 `ImportPlanModal` 并切换到 `logic-flow` tab
+- [✓] 1.3 logic-flow tab 内嵌主体固定为站点模式壳层
+  - [✓] 1.3.1 挂载 `ImportPlanModal`（固定前置：`activeStationId` 非空）并切换到 `logic-flow` tab
   - [✓] 1.3.2 断言渲染 `logicflow-import-body` 内嵌主体
-  - [✓] 1.3.3 断言内嵌主体收到 `mode` 属性且值属于 `station|empire` #期望: [true]
+  - [✓] 1.3.3 断言可见 `logicflow-import-body[data-mode="station"]` 站点模式壳层 #期望: ['logicflow-import-body[data-mode="station"]']
 
 - [✓] 1.4 x4-station 字符串拒绝 JSON 输入
   - [✓] 1.4.1 挂载 `ImportPlanModal` 并切换到 `x4-station` tab
   - [✓] 1.4.2 输入 JSON 字符串并执行导入
-  - [✓] 1.4.3 断言错误提示显示 #期望: [true]
+  - [✓] 1.4.3 断言显示错误文案节点 `importView.x4_station_failed`（或等价稳定定位） #期望: ['importView.x4_station_failed']
 
 - [✓] 1.5 x4-station 非法输入不输出 console error
   - [✓] 1.5.1 挂载 `ImportPlanModal` 并切换到 `x4-station` tab
   - [✓] 1.5.2 输入 JSON 字符串执行导入并监听 `console.error`
   - [✓] 1.5.3 断言仅展示错误提示且未触发 `console.error` #期望: [true]
+
+- [ ] 1.6 非空站点下三 tab 导入统一进入策略弹窗
+  - [ ] 1.6.1 挂载 `ImportPlanModal` 并注入包含模块的当前站点数据
+  - [ ] 1.6.2 依次切换 `logic-flow`、`game-blueprint`、`x4-station` tab 并执行 `import-view-action-import`
+  - [ ] 1.6.3 断言三次导入均显示 `blueprint-import-strategy-modal`，且可见 `blueprint-strategy-cancel`、`blueprint-strategy-overwrite`、`blueprint-strategy-add`、`blueprint-strategy-new` #期望: ['blueprint-strategy-cancel', 'blueprint-strategy-overwrite', 'blueprint-strategy-add', 'blueprint-strategy-new']
 
 ## 2 E2E 标准状态与状态迁移
 
@@ -44,13 +49,23 @@
 - [✓] 3.3 Case: 游戏蓝图上传后展示模块数且在非空站点弹策略弹窗
   - [✓] 3.3.1 在站点页通过 ContextToolbar 入口打开 `import-view-modal` 并切到 game-blueprint tab
   - [✓] 3.3.2 断言 `import-blueprint-module-count` 显示模块总数 `2`
-  - [✓] 3.3.3 点击导入后弹出 `blueprint-import-strategy-modal` 且包含覆盖/添加/新空间站按钮 #期望: [true]
+  - [✓] 3.3.3 点击导入后弹出 `blueprint-import-strategy-modal` 且显示取消/覆盖/添加/新空间站四按钮 #期望: [true]
 
 - [✓] 3.4 Case: x4-station 在帝国总览导入时新建默认命名空间站
-  - [✓] 3.4.1 在帝国总览打开导入视图并切换到 `x4-station` tab
-  - [✓] 3.4.2 输入 "https://x4-game.com/#/station-calculator?l=@$module-module_gen_prod_refinedmetals_01,count:1;,$module-module_gen_prod_refinedmetals_01,count:1;,$module-module_gen_prod_energycells_01,count:1;,$module-module_par_prod_sojahusk_01,count:1" 并执行导入
-  - [✓] 3.4.3 断言新建空间站 `modules` 字段存在且至少包含 1 项 #期望: [1]
-  - [✓] 3.4.4 断言新建空间站 `type=industrial` 且 `count=1` #期望: ['industrial', 1]
-  - [✓] 3.4.5 断言空间站数量增加且新建站名为 `新建空间站` #期望: ['新建空间站']
+  - [✓] 3.4.1 点击 `.overview-tab` 并断言 `.overview-tab.active` 可见后，再通过 `logicflow-import-entry-empire` 打开 `import-view-modal` #期望: [true]
+  - [✓] 3.4.2 记录导入前 `.station-tab[data-station-id]` 数量为 `N`，切换到 `x4-station` tab，输入 "https://x4-game.com/#/station-calculator?l=@$module-module_gen_prod_refinedmetals_01,count:1;,$module-module_gen_prod_refinedmetals_01,count:1;,$module-module_gen_prod_energycells_01,count:1;,$module-module_par_prod_sojahusk_01,count:1" 并执行导入
+  - [✓] 3.4.3 断言导入后 `import-view-modal` 不可见，且 `.station-tab[data-station-id]` 数量从 `N` 变为 `N+1` #期望: ['N+1']
+  - [✓] 3.4.4 断言当前激活标签 `.station-tab.active .tab-label` 文案为 `新建空间站` #期望: ['新建空间站']
+  - [✓] 3.4.5 断言站点标签区可见且 `.overview-tab.active` 不可见（已从帝国总览切回新建站点） #期望: [true]
+
+- [ ] 3.5 Case: 非空站点在 logic-flow tab 点击导入进入统一策略弹窗
+  - [ ] 3.5.1 在站点页通过 `logicflow-import-entry-station` 打开 `import-view-modal` 并保持当前站点非空
+  - [ ] 3.5.2 切换到 `logic-flow` tab 后执行 `import-view-action-import`
+  - [ ] 3.5.3 断言显示 `blueprint-import-strategy-modal`，且可见 `blueprint-strategy-cancel`、`blueprint-strategy-overwrite`、`blueprint-strategy-add`、`blueprint-strategy-new` #期望: ['blueprint-strategy-cancel', 'blueprint-strategy-overwrite', 'blueprint-strategy-add', 'blueprint-strategy-new']
+
+- [ ] 3.6 Case: 非空站点在 x4-station tab 点击导入进入统一策略弹窗
+  - [ ] 3.6.1 在站点页通过 `logicflow-import-entry-station` 打开 `import-view-modal` 并切换到 `x4-station` tab
+  - [ ] 3.6.2 输入 "https://x4-game.com/#/station-calculator?l=@$module-module_gen_prod_refinedmetals_01,count:1;,$module-module_gen_prod_refinedmetals_01,count:1;,$module-module_gen_prod_energycells_01,count:1;,$module-module_par_prod_sojahusk_01,count:1" 后执行 `import-view-action-import`
+  - [ ] 3.6.3 断言显示 `blueprint-import-strategy-modal`，且可见 `blueprint-strategy-cancel`、`blueprint-strategy-overwrite`、`blueprint-strategy-add`、`blueprint-strategy-new` #期望: ['blueprint-strategy-cancel', 'blueprint-strategy-overwrite', 'blueprint-strategy-add', 'blueprint-strategy-new']
 
 ## 4 Bug 测试

@@ -48,7 +48,8 @@
 #### Scenario: Station Context With Non-Empty Station
 **Given** 当前在空间站界面且当前空间站非空并上传有效 XML 蓝图
 **When** 用户确认导入
-**Then** 系统弹出覆盖/添加/新空间站三选项供用户选择
+**Then** 系统弹出统一导入策略弹窗
+**And** 弹窗提供取消/覆盖/添加/新空间站四按钮供用户选择
 
 #### Scenario: New Station Naming Rule
 **Given** 用户选择“新空间站”导入
@@ -68,7 +69,25 @@
 #### Scenario: Import by x4-game Link in Station Context
 **Given** 当前在空间站界面且输入有效 x4-game 分享串
 **When** 用户确认导入
-**Then** 系统覆盖当前活动空间站模块配置
+**Then** 若当前空间站为空则覆盖当前活动空间站模块配置
+**And** 若当前空间站非空则弹出统一导入策略弹窗
+**And** 该弹窗提供取消/覆盖/添加/新空间站四按钮
+
+### Requirement: Unified Non-Empty Station Strategy Dialog Across Three Tabs
+系统 MUST 在空间站界面且当前空间站非空时，对 `logic-flow / 游戏蓝图 / x4-station` 三个导入标签统一使用同一导入策略弹窗。
+
+#### Scenario: Three Tabs Share One Strategy Dialog
+**Given** 当前在空间站界面且当前空间站非空
+**When** 用户分别在 logic-flow、游戏蓝图、x4-station 三个标签点击导入
+**Then** 系统展示同一风格与结构的导入策略弹窗
+**And** 弹窗标题与提示文案与游戏蓝图导入策略弹窗一致
+**And** 弹窗固定包含取消/覆盖/添加/新空间站四按钮
+
+#### Scenario: Cancel Keeps Station Unchanged
+**Given** 当前在空间站界面且当前空间站非空并打开统一导入策略弹窗
+**When** 用户点击取消
+**Then** 系统关闭弹窗且不执行导入
+**And** 当前空间站数据保持不变
 
 ### Requirement: Extract Top View Switch Component
 系统 MUST 将 StationToolbar 顶部 production/flow/ship-build 切换按钮抽离为独立可复用组件。
