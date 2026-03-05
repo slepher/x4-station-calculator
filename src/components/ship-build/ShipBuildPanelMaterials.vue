@@ -6,6 +6,9 @@ import { useShipBuildStore } from '@/store/useShipBuildStore'
 import CollapsibleDetailList from '@/components/common/CollapsibleDetailList.vue'
 import PriceSlider from '@/components/common/PriceSlider.vue'
 import type { X4Ship, X4Ware, X4Equipment, ShipBlueprint } from '@/types/x4'
+import consumablesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/consumables.json'
+import dronesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/drones.json'
+import missilesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/missiles.json'
 
 const props = defineProps<{
   shipBlueprint: ShipBlueprint | null
@@ -20,6 +23,38 @@ const store = useShipBuildStore()
 // ============ 内部状态 ============
 const materialMethod = ref('default')
 const materialPriceMultiplier = ref(0.5)
+
+// ============ Storage 物品数据映射 ============
+type StorageItem = {
+  id: string
+  nameId: string
+  name: string
+  cost?: Record<string, Record<string, number>>
+}
+
+const consumablesMap = computed(() => {
+  const map = new Map<string, StorageItem>()
+  ;(consumablesRaw as any[]).forEach((item: any) => {
+    map.set(item.id, item)
+  })
+  return map
+})
+
+const dronesMap = computed(() => {
+  const map = new Map<string, StorageItem>()
+  ;(dronesRaw as any[]).forEach((item: any) => {
+    map.set(item.id, item)
+  })
+  return map
+})
+
+const missilesMap = computed(() => {
+  const map = new Map<string, StorageItem>()
+  ;(missilesRaw as any[]).forEach((item: any) => {
+    map.set(item.id, item)
+  })
+  return map
+})
 
 // ============ Store 数据映射 ============
 const wareMap = computed(() => {
@@ -145,6 +180,59 @@ const materialMethodOptions = computed(() => {
     })
   })
 
+  // 从 blueprint.storage 中的 consumables/drones/missiles 获取方法
+  const storage = props.shipBlueprint?.storage
+  if (storage) {
+    // 可部署
+    storage.deployables.forEach((item) => {
+      const data = consumablesMap.value.get(item.id)
+      if (data?.cost) {
+        Object.keys(data.cost).forEach((method) => {
+          if (optionSet.has(method)) return
+          if (method === 'xenon') return
+          optionSet.add(method)
+          options.push(method)
+        })
+      }
+    })
+    // 诱导弹
+    if (storage.countermeasure) {
+      const data = consumablesMap.value.get(storage.countermeasure.id)
+      if (data?.cost) {
+        Object.keys(data.cost).forEach((method) => {
+          if (optionSet.has(method)) return
+          if (method === 'xenon') return
+          optionSet.add(method)
+          options.push(method)
+        })
+      }
+    }
+    // 无人机
+    storage.drones.forEach((item) => {
+      const data = dronesMap.value.get(item.id)
+      if (data?.cost) {
+        Object.keys(data.cost).forEach((method) => {
+          if (optionSet.has(method)) return
+          if (method === 'xenon') return
+          optionSet.add(method)
+          options.push(method)
+        })
+      }
+    })
+    // 导弹
+    storage.missiles.forEach((item) => {
+      const data = missilesMap.value.get(item.id)
+      if (data?.cost) {
+        Object.keys(data.cost).forEach((method) => {
+          if (optionSet.has(method)) return
+          if (method === 'xenon') return
+          optionSet.add(method)
+          options.push(method)
+        })
+      }
+    })
+  }
+
   if (options.length === 0) {
     options.push('default')
   }
@@ -223,6 +311,96 @@ const equipmentMaterialGroups = computed(() => {
   return groups.sort((a, b) => a.equipmentName.localeCompare(b.equipmentName))
 })
 
+// ============ Storage 物品材料计算 ============
+const storageMaterialGroups = computed(() => {
+  if (!props.shipBlueprint?.storage) return []
+
+  const storage = props.shipBlueprint.storage
+  const groups: Array<{
+    category: string
+    categoryName: string
+    items: Array<{ wareId: string; count: number; value: number }>
+  }> = []
+
+  // 可部署物品
+  if (storage.deployables.length > 0) {
+    const items: Array<{ wareId: string; count: number; value: number }> = []
+    storage.deployables.forEach((item) => {
+      const data = consumablesMap.value.get(item.id)
+      if (data?.cost) {
+        const cost = resolveCostByMethod(data.cost, materialMethod.value)
+        const materialItems = mapCostToMaterialItems(cost, item.count)
+        items.push(...materialItems)
+      }
+    })
+    if (items.length > 0) {
+      groups.push({
+        category: 'deployables',
+        categoryName: t('ship_build.storage_deployable'),
+        items
+      })
+    }
+  }
+
+  // 诱导弹
+  if (storage.countermeasure) {
+    const data = consumablesMap.value.get(storage.countermeasure.id)
+    if (data?.cost) {
+      const cost = resolveCostByMethod(data.cost, materialMethod.value)
+      const items = mapCostToMaterialItems(cost, storage.countermeasure.count)
+      if (items.length > 0) {
+        groups.push({
+          category: 'countermeasure',
+          categoryName: t('ship_build.storage_countermeasure'),
+          items
+        })
+      }
+    }
+  }
+
+  // 无人机
+  if (storage.drones.length > 0) {
+    const items: Array<{ wareId: string; count: number; value: number }> = []
+    storage.drones.forEach((item) => {
+      const data = dronesMap.value.get(item.id)
+      if (data?.cost) {
+        const cost = resolveCostByMethod(data.cost, materialMethod.value)
+        const materialItems = mapCostToMaterialItems(cost, item.count)
+        items.push(...materialItems)
+      }
+    })
+    if (items.length > 0) {
+      groups.push({
+        category: 'drones',
+        categoryName: t('ship_build.storage_drone'),
+        items
+      })
+    }
+  }
+
+  // 导弹
+  if (storage.missiles.length > 0) {
+    const items: Array<{ wareId: string; count: number; value: number }> = []
+    storage.missiles.forEach((item) => {
+      const data = missilesMap.value.get(item.id)
+      if (data?.cost) {
+        const cost = resolveCostByMethod(data.cost, materialMethod.value)
+        const materialItems = mapCostToMaterialItems(cost, item.count)
+        items.push(...materialItems)
+      }
+    })
+    if (items.length > 0) {
+      groups.push({
+        category: 'missiles',
+        categoryName: t('ship_build.storage_missile'),
+        items
+      })
+    }
+  }
+
+  return groups
+})
+
 const materialSummaryItems = computed(() => {
   const grouped = new Map<string, { wareId: string; count: number; value: number }>()
 
@@ -244,6 +422,8 @@ const materialSummaryItems = computed(() => {
   }
   // Merge equipment materials
   equipmentMaterialGroups.value.forEach((group) => mergeItems(group.items))
+  // Merge storage (consumables/drones/missiles) materials
+  storageMaterialGroups.value.forEach((group) => mergeItems(group.items))
 
   return Array.from(grouped.values()).sort((a, b) => {
     const wareA = wareMap.value.get(a.wareId)
