@@ -409,6 +409,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       name,
       shipId: selectedShipId.value,
       connections: blueprint.value ? JSON.parse(JSON.stringify(blueprint.value.connections)) : [],
+      storage: blueprint.value?.storage ? JSON.parse(JSON.stringify(blueprint.value.storage)) : undefined,
       lastUpdated: Date.now()
     }
 
@@ -738,6 +739,12 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     })
   }
 
+  const updateBlueprintStorage = (storage: ShipBlueprint['storage']) => {
+    if (!blueprint.value) return
+    blueprint.value.storage = storage
+    saveBlueprint()
+  }
+
   const distributeCountByCapacity = (connectionKeys: string[], total: number) => {
     const maxByKey = connectionKeys.map((key) => ({
       key,
@@ -1014,6 +1021,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     loadBlueprint,
     deleteBlueprint,
     loadBlueprintsFromStorage,
+    updateBlueprintStorage,
     resetAll,
     // Legacy methods (keep for backward compatibility)
     setSelectedShipId,

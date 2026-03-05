@@ -170,7 +170,22 @@
     "equipment_yaw_rate": "Yaw",
     "equipment_roll_rate": "Roll Rate",
     "equipment_strafe_speed": "Strafe Speed",
-    "equipment_strafe_acceleration": "Strafe Acceleration"
+    "equipment_strafe_acceleration": "Strafe Acceleration",
+    "slot_engine": "Engine",
+    "slot_thruster": "Thruster",
+    "slot_shield": "Shield",
+    "slot_weapon": "Weapon",
+    "slot_turret": "Turret",
+    "slot_consumables": "Consumables (Deployable + Countermeasure)",
+    "slot_units": "Units (Drone + Missile)",
+    "storage_deployable": "Deployable",
+    "storage_countermeasure": "Countermeasure",
+    "storage_drone": "Drone",
+    "storage_missile": "Missile",
+    "storage_no_deployable": "No deployable storage",
+    "storage_no_countermeasure": "No countermeasure storage",
+    "storage_no_drone": "No drone storage",
+    "storage_no_missile": "No missile storage"
   },
   "station": {
     "total_needed": "TOTAL NEEDED",

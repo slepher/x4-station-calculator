@@ -85,7 +85,9 @@ const equipmentTypeShortMap: Record<EquipmentType, string> = {
   shield: 'S',
   weapon: 'W',
   turret: 'T',
-  thruster: ''
+  thruster: '',
+  consumables: '',
+  units: ''
 }
 
 const getEquipmentSummary = (ship: X4Ship, mode: 'short' | 'full') => {

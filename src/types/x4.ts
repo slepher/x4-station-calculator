@@ -25,7 +25,7 @@ export interface X4ShipProduction {
   cost: Record<string, number>;
 }
 
-export type EquipmentType = 'engine' | 'shield' | 'turret' | 'weapon' | 'thruster';
+export type EquipmentType = 'engine' | 'shield' | 'turret' | 'weapon' | 'thruster' | 'consumables' | 'units';
 export type ShipEquipmentSize = 'small' | 'medium' | 'large' | 'extralarge';
 export type X4SlotTagId = 'standard' | 'advanced' | 'xenon' | 'mining' | 'missile' | 'highpower';
 
@@ -711,6 +711,21 @@ export interface ShipBlueprintHull {
   materials: Record<string, number>
 }
 
+export interface ShipBlueprintStorageItem {
+  id: string
+  name: string
+  count: number
+}
+
+export interface ShipBlueprintStorage {
+  // C 槽
+  deployables: ShipBlueprintStorageItem[]
+  countermeasure: ShipBlueprintStorageItem | null
+  // U 槽
+  drones: ShipBlueprintStorageItem[]
+  missiles: ShipBlueprintStorageItem[]
+}
+
 export interface ShipBlueprint {
   id: string
   name: string
@@ -718,6 +733,8 @@ export interface ShipBlueprint {
   connections: ShipBlueprintConnection[]
   /** Hull material configuration - separate from production cost */
   hull?: ShipBlueprintHull
+  /** Storage configuration for C 槽 and U 槽 */
+  storage?: ShipBlueprintStorage
   lastUpdated: number
 }
 

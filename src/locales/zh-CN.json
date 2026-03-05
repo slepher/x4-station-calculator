@@ -170,7 +170,22 @@
     "equipment_yaw_rate": "水平转向",
     "equipment_roll_rate": "翻滚率",
     "equipment_strafe_speed": "平移速度",
-    "equipment_strafe_acceleration": "平移加速度"
+    "equipment_strafe_acceleration": "平移加速度",
+    "slot_engine": "引擎 (Engine)",
+    "slot_thruster": "推进器 (Thruster)",
+    "slot_shield": "护盾 (Shield)",
+    "slot_weapon": "武器 (Weapon)",
+    "slot_turret": "炮塔 (Turret)",
+    "slot_consumables": "消耗品 (可部署 + 诱导弹)",
+    "slot_units": "单位 (无人机 + 导弹)",
+    "storage_deployable": "可部署",
+    "storage_countermeasure": "诱导弹",
+    "storage_drone": "无人机",
+    "storage_missile": "导弹",
+    "storage_no_deployable": "无可部署存储",
+    "storage_no_countermeasure": "无诱导弹存储",
+    "storage_no_drone": "无无人机存储",
+    "storage_no_missile": "无导弹存储"
   },
   "station": {
     "total_needed": "总需求",
