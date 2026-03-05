@@ -28,7 +28,25 @@ const countermeasureItems = computed(() => {
 })
 
 const droneItems = computed(() => {
-  return dronesRaw.slice(0, 3)
+  const shipPurpose = props.selectedShip?.purposePrimary || ''
+  const specialPurposes = ['build', 'mine_liquid', 'mine_solid']
+
+  // Filter drones based on ship's purposePrimary
+  const matched = (dronesRaw as any[]).filter((drone) => {
+    const dronePurpose = drone.purposePrimary || ''
+    const isNoBlueprint = drone.noplayerblueprint === true
+
+    if (specialPurposes.includes(shipPurpose)) {
+      // If ship has special purpose, match drones with same purpose OR noplayerblueprint=false
+      return dronePurpose === shipPurpose || !isNoBlueprint
+    } else {
+      // If ship has other purpose, match drones with noplayerblueprint=false and not in special purposes
+      return !isNoBlueprint && !specialPurposes.includes(dronePurpose)
+    }
+  })
+
+  // Return matched drones (max 10 to avoid too many options)
+  return matched.slice(0, 10)
 })
 
 const missileItems = computed(() => {
