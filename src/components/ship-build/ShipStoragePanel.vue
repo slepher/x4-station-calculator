@@ -99,7 +99,7 @@ const missileItems = computed(() => {
   const matched = (missilesRaw as any[]).filter((missile) => {
     const missileTags = missile.missileTags || []
     // Match if missile has all the ship's ammunitionTags
-    return ammoTags.every((tag: string) => missileTags.includes(tag))
+    return ammoTags.some((tag: string) => missileTags.includes(tag))
   })
 
   return matched.slice(0, 10)
@@ -331,7 +331,7 @@ const getItemName = (item: any) => {
         </div>
       </div>
 
-      <div v-if="missileLimit > 0" class="storage-section">
+      <div v-if="missileLimit > 0 && missileItems.length > 0" class="storage-section">
         <div class="storage-section-header">
           <span class="storage-section-title">{{ t('ship_build.storage_missile') }}</span>
           <span class="storage-section-info">{{ Object.values(localMissiles).reduce((s, v) => s + v, 0) }} / {{ missileLimit }}</span>
