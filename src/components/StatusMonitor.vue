@@ -1,6 +1,6 @@
 <template>
   <div v-if="statusStore.messages.length > 0"
-    class="fixed bottom-6 right-6 z-[9999] w-85 flex flex-col gap-3 pointer-events-none">
+    class="fixed bottom-6 right-6 z-[9999] w-[340px] flex flex-col gap-3 pointer-events-none">
 
     <TransitionGroup name="status-list">
       <div v-for="msg in statusStore.messages" :key="msg.id" :class="[
