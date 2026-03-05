@@ -32,7 +32,7 @@ Implement and supplement Unit/E2E/Bug/Bug-fix test code based on `test_tasks.md`
 ## Input
 
 - `openspec/changes/<change-name>/test_tasks.md`
-- `openspec/changes/<change-name>/ui_knowledge.md`
+- `openspec/changes/<change-name>/knowledge.md`
 - `openspec/test_experience.md`
 - Existing tests under `tests/unit/<change-name>/` and `tests/e2e/<change-name>/`
 
@@ -64,7 +64,7 @@ Implement and supplement Unit/E2E/Bug/Bug-fix test code based on `test_tasks.md`
 #### A.2 Test Authoring Standards (MANDATORY)
 
 - Unit 使用 Vitest + Pinia 既有模式。
-- E2E 使用项目 `test-setup` 与 `ui_knowledge.md` 提供的定位语义。
+- E2E 使用项目 `test-setup` 与 `knowledge.md` 提供的定位语义。
 - 断言必须是可观测结果断言，禁止低信息量布尔旗标式断言。
 - 多分支任务（A/B）必须分别落地断言。
 - 拖拽类场景遵循 `x4-drag-test` 规范，优先稳定 identity locator（`data-*`）。

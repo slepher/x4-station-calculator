@@ -8,7 +8,7 @@ metadata:
 # X4 Apply
 
 This skill is the single implementation entry for `/x4:apply`.
-It extends `openspec-apply-change` with X4-specific bug and test-task discipline.
+It extends `openspec-apply-change` with X4-specific bug discipline.
 It does not execute test cases during apply.
 
 ## Input
@@ -37,14 +37,13 @@ It does not execute test cases during apply.
 ## Bug Loop (MANDATORY when bug found)
 
 ```text
-发现 Bug -> 记录到 bugs.md -> 添加复现测试到 test_tasks.md
--> 修复 Bug（实现层）-> 在 /x4:verify 执行复现与回归测试
+发现 Bug -> 记录到 bugs.md -> 修复 Bug（实现层）
+-> 在 /x4:verify 执行验证
 ```
 
 Required actions:
 - Add bug record to `openspec/changes/<change-name>/bugs.md`.
-- Add 1:1 reproduction item to `openspec/changes/<change-name>/test_tasks.md`.
-- Do not run tests in `/x4:apply`; execute reproduction and regression in `/x4:verify`.
+- Do not run tests in `/x4:apply`; execute verification in `/x4:verify`.
 
 ## Unrelated Bug Handling
 
@@ -66,15 +65,10 @@ If a discovered bug is out of current change scope:
   - do not rewrite non-target logic
   - do not add/remove comments unless explicitly requested
   - do not reformat unrelated code
-- If implementation introduces new test scenarios, update:
-  - `openspec/changes/<change-name>/test_tasks.md`
-  - `openspec/changes/<change-name>/ui_knowledge.md` (follow `x4-doc` sync rules)
-- For test implementation standards, use `x4-test-impl`.
-- For test execution and result sync, use `x4-test`.
 - Do not execute `npm run test:*` or `playwright` in `/x4:apply`.
 
 ## Output
 
 - Implemented code changes.
 - Updated `openspec/changes/<change-name>/tasks.md`.
-- Updated `bugs.md` and test artifacts when bug workflow was triggered.
+- Updated `bugs.md` when bug workflow was triggered.

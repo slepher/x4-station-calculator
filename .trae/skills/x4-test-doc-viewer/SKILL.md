@@ -5,7 +5,7 @@ description: "Review final test documentation draft for X4 and gate x4-test-doc 
 
 # X4 Test Documentation Reviewer
 
-This skill is review-only. It audits the final `test_tasks.md` and `ui_knowledge.md` draft and returns pass/rewrite decision.
+This skill is review-only. It audits the final `test_tasks.md` and `knowledge.md` draft and returns pass/rewrite decision.
 
 ## Trigger
 
@@ -24,7 +24,7 @@ If review fails, return actionable rewrite items and hand back to `/x4:test-doc`
 2. Do not inherit full parent thread context; pass minimal handoff payload only.
 3. Recommended handoff payload:
    - resolved `change-name`
-   - target file paths (`test_tasks.md`, `ui_knowledge.md`)
+   - target file paths (`test_tasks.md`, `knowledge.md`)
    - optional prior blocking issues id list (if this is a resubmission round)
 4. If reviewer subagent cannot be started, stop with blocker; do not downgrade to in-thread review.
 
@@ -43,7 +43,7 @@ If review fails, return actionable rewrite items and hand back to `/x4:test-doc`
 ## Input
 
 - `openspec/changes/<change-name>/test_tasks.md`
-- `openspec/changes/<change-name>/ui_knowledge.md`
+- `openspec/changes/<change-name>/knowledge.md`
 - Fixture/context references required by the docs (when needed for audit).
 
 ## Actions
@@ -53,7 +53,7 @@ If review fails, return actionable rewrite items and hand back to `/x4:test-doc`
    ```bash
    python3 skill-scripts/validate_test_tasks_refs.py <change-name> --json
    ```
-3. Perform semantic review on `test_tasks.md` and cross-file sync check with `ui_knowledge.md`.
+3. Perform semantic review on `test_tasks.md` and cross-file sync check with `knowledge.md`.
 4. Output gate decision:
    - `review_status: pass`
    - or `review_status: rewrite_required` with blocking issue list.
@@ -70,7 +70,7 @@ Any hit below MUST produce `review_status: rewrite_required`:
 3. Missing stable locator target for operation/assertion steps that require UI interaction.
 4. Weak metric assertion without explicit stable metric key/value/format when metric diff is the target.
 5. Ambiguous close/submit action path for popup/picker-like flows.
-6. Cross-file inconsistency between `test_tasks.md` and `ui_knowledge.md` identifiers/naming.
+6. Cross-file inconsistency between `test_tasks.md` and `knowledge.md` identifiers/naming.
 
 ### B. Ship-Build Focus Rules
 
@@ -90,7 +90,7 @@ execution_mode: isolated_subagent
 blocking_issues:
   - id: TDRV-001
     severity: high|medium|low
-    file: openspec/changes/<change-name>/test_tasks.md|openspec/changes/<change-name>/ui_knowledge.md
+    file: openspec/changes/<change-name>/test_tasks.md|openspec/changes/<change-name>/knowledge.md
     task_id: "2.2.1" # optional when applicable
     rule: short-rule-name
     issue: short problem statement
@@ -108,7 +108,7 @@ Rules:
 ## Constraints
 
 - ENFORCE Zero-Code Policy: do not touch source code.
-- This skill is reviewer-only: do not directly rewrite `test_tasks.md` / `ui_knowledge.md`.
+- This skill is reviewer-only: do not directly rewrite `test_tasks.md` / `knowledge.md`.
 - Do not alter checklist completion status.
 - Reviewer subagent must not be reused for non-review phases (`x4-test-doc`, `x4-test-impl`, `x4-test-run`).
 

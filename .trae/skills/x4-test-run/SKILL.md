@@ -15,7 +15,7 @@ User invokes `/x4:test-run <change_name>`
 
 ## Purpose
 
-Run tests, classify failures, apply result updates to `test_tasks.md` via script, and maintain agent-side experience sedimentation in `ui_knowledge.md`.
+Run tests, classify failures, apply result updates to `test_tasks.md` via script, and maintain agent-side experience sedimentation in `knowledge.md`.
 
 ## Parameters
 
@@ -30,7 +30,7 @@ Run tests, classify failures, apply result updates to `test_tasks.md` via script
 ## Input
 
 - `openspec/changes/<change-name>/test_tasks.md`
-- `openspec/changes/<change-name>/ui_knowledge.md`
+- `openspec/changes/<change-name>/knowledge.md`
 - `openspec/test_experience.md`
 - Existing tests in `tests/unit/<change-name>/` and `tests/e2e/<change-name>/`
 
@@ -39,7 +39,7 @@ Run tests, classify failures, apply result updates to `test_tasks.md` via script
 1. Resolve change and load test artifacts.
 2. Execute tests in ordered batches and classify failures.
 3. Aggregate batch run outputs and invoke result-apply script.
-4. Maintain experience sedimentation in `ui_knowledge.md` and global discoveries in `test_experience.md`.
+4. Maintain experience sedimentation in `knowledge.md` and global discoveries in `test_experience.md`.
 
 ## Mandatory Requirements
 
@@ -81,7 +81,7 @@ Failure classification rules (MANDATORY):
 
 #### A.3 Experience Sedimentation (MANDATORY)
 
-1. Agent maintains `经验沉淀` in `ui_knowledge.md`.
+1. Agent maintains `经验沉淀` in `knowledge.md`.
 2. Keep a dedicated chapter `# 测试运行` with task-tree style entries.
 3. Keep only cases that failed at least once in history.
 4. Sort case entries by case id ascending.
@@ -89,7 +89,7 @@ Failure classification rules (MANDATORY):
    - latest pass -> `[✓]`
    - latest still fail -> `[✗]`
 6. Not simple append: remove obsolete/wrong conclusions, keep accumulated valid conclusions, deduplicate.
-7. Keep existing `ui_knowledge.md` anchor structure unchanged; `# 测试运行` is additive.
+7. Keep existing `knowledge.md` anchor structure unchanged; `# 测试运行` is additive.
 8. Global/non-case discoveries go to `test_experience.md`.
 
 ### Chapter B: Update Mandatory
@@ -180,7 +180,7 @@ python3 skill-scripts/apply_test_results.py <change-name> \
 
 - Batch test run summary (pass/fail/product-defect)
 - `test_tasks.md` apply summary (script result)
-- Experience sedimentation updates in `ui_knowledge.md`
+- Experience sedimentation updates in `knowledge.md`
 - Global discoveries appended to `test_experience.md`
 - Remaining blockers
 

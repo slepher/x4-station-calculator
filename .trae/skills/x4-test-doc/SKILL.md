@@ -1,6 +1,6 @@
 ---
 name: x4-test-doc
-description: "Update test documentation artifacts (`test_tasks.md`, `ui_knowledge.md`) for X4 changes with mandatory cross-file sync, then pass x4-test-doc-viewer gate. Trigger with /x4:test-doc <change-name>."
+description: "Update test documentation artifacts (`test_tasks.md`, `knowledge.md`) for X4 changes with mandatory cross-file sync, then pass x4-test-doc-viewer gate. Trigger with /x4:test-doc <change-name>."
 ---
 
 # X4 Test Documentation Update
@@ -13,7 +13,7 @@ User invokes `/x4:test-doc <change_name>`
 
 ## Purpose
 
-Update `test_tasks.md` and `ui_knowledge.md` based on discussion conclusions or requirement changes, with mandatory cross-file synchronization.
+Update `test_tasks.md` and `knowledge.md` based on discussion conclusions or requirement changes, with mandatory cross-file synchronization.
 
 ## P0 Execution Block (READ FIRST, MANDATORY)
 
@@ -32,11 +32,11 @@ Update `test_tasks.md` and `ui_knowledge.md` based on discussion conclusions or 
 ## Document Detail Authority (MANDATORY)
 
 `x4-test-doc` is the single source of truth for test documentation details, including:
-- test documentation conventions (`test_tasks.md`, `ui_knowledge.md`)
+- test documentation conventions (`test_tasks.md`, `knowledge.md`)
 - test step generation rules
 - fixture-to-UI knowledge synchronization rules
 
-`x4-doc` should delegate to `x4-test-doc` for test documentation updates and must not redefine these details.
+Test-documentation commands (for example `/x4:test` and `/x4:test-doc`) should rely on this skill for test documentation updates and must not redefine these details.
 
 ## Parameters
 
@@ -59,7 +59,7 @@ Update `test_tasks.md` and `ui_knowledge.md` based on discussion conclusions or 
 ## Actions
 
 1. Resolve change target and load existing test artifacts in `openspec/changes/<change-name>/`.
-2. Create or update affected test artifacts: `test_tasks.md`, `ui_knowledge.md`.
+2. Create or update affected test artifacts: `test_tasks.md`, `knowledge.md`.
 3. Ensure localization matches user language.
 4. Enforce cross-file consistency between test artifacts.
 5. Submit final draft to `/x4:test-doc-viewer` for approval.
@@ -78,7 +78,7 @@ Update `test_tasks.md` and `ui_knowledge.md` based on discussion conclusions or 
    - 出现冲突时以最新规则/脚本为准
 3. 产出质量标准
    - 用词具体、可执行、可复现
-   - cross-file 同步（`test_tasks.md` 与 `ui_knowledge.md` 同步）
+   - cross-file 同步（`test_tasks.md` 与 `knowledge.md` 同步）
 4. 失败处理优先级
    - 先修结构/规则类失败
    - 再修证据类失败
@@ -86,15 +86,15 @@ Update `test_tasks.md` and `ui_knowledge.md` based on discussion conclusions or 
 
 #### A.2 UI Knowledge Baseline (MANDATORY)
 
-For every `/x4:test-doc` run, `openspec/changes/<change-name>/ui_knowledge.md` is a required artifact:
+For every `/x4:test-doc` run, `openspec/changes/<change-name>/knowledge.md` is a required artifact:
 
-- MUST ensure `ui_knowledge.md` exists for the current change.
+- MUST ensure `knowledge.md` exists for the current change.
 - If missing, create it in the same documentation pass.
 - MUST keep it synchronized with `test_tasks.md` whenever test-relevant semantics change.
 
 #### A.3 Fixture-to-UI Knowledge Sync (MANDATORY)
 
-When `/x4:test-doc` updates test-related docs, you MUST sync fixture-backed product/module data into `openspec/changes/<change-name>/ui_knowledge.md`:
+When `/x4:test-doc` updates test-related docs, you MUST sync fixture-backed product/module data into `openspec/changes/<change-name>/knowledge.md`:
 
 - Source files:
   - `tests/fixtures/ware_fixtures.yaml`
@@ -102,19 +102,19 @@ When `/x4:test-doc` updates test-related docs, you MUST sync fixture-backed prod
 - Trigger condition:
   - `test_tasks.md` (or discussion conclusions) mentions specific products/modules
 - Required update:
-  - Add or update a section in `ui_knowledge.md` that maps:
+  - Add or update a section in `knowledge.md` that maps:
     - Test keyword -> fixture ware/module id
     - Display name (EN/CN if available)
     - Recommended locator/assertion target used in tests
 - Consistency rule:
-  - Keep naming in `test_tasks.md` and `ui_knowledge.md` aligned with fixture ids
+  - Keep naming in `test_tasks.md` and `knowledge.md` aligned with fixture ids
 
 #### A.4 Cross-File Sync Rules (MANDATORY)
 
 When `test_tasks.md` changes:
-- Sync relevant test semantics in `ui_knowledge.md` in the same pass.
+- Sync relevant test semantics in `knowledge.md` in the same pass.
 - Keep ids/names consistent across the two files.
-- Keep implementation-level locator/probe details in `ui_knowledge.md`, not in task descriptions.
+- Keep implementation-level locator/probe details in `knowledge.md`, not in task descriptions.
 
 #### A.5 Quality Rules (MANDATORY)
 
@@ -338,7 +338,7 @@ Applies to all top-level tasks (`x.x`) in Chapter 1/2/3/4:
    - Return to Chapter 3 case rewrite and re-extract Chapter 2.
    - Do not fix by only adding references in Chapter 3/4.
 4. Rerun lint until pass.
-5. Perform final agent check for cross-file consistency (`test_tasks.md` <-> `ui_knowledge.md`).
+5. Perform final agent check for cross-file consistency (`test_tasks.md` <-> `knowledge.md`).
 
 #### B.5 Reviewer Gate Workflow (MANDATORY)
 
@@ -347,10 +347,10 @@ Applies to all top-level tasks (`x.x`) in Chapter 1/2/3/4:
 1. After B.4 passes, run `/x4:test-doc-viewer <change-name>` in a dedicated isolated reviewer subagent.
 2. Reviewer handoff must be minimal and review-only:
    - resolved `change-name`
-   - target file paths (`test_tasks.md`, `ui_knowledge.md`)
+   - target file paths (`test_tasks.md`, `knowledge.md`)
    - optional previous blocking issue ids
 3. If reviewer result is `review_status: rewrite_required`, `x4-test-doc` MUST:
-   - apply all blocking rewrite items to `test_tasks.md` and `ui_knowledge.md`;
+   - apply all blocking rewrite items to `test_tasks.md` and `knowledge.md`;
    - rerun `validate_test_tasks_refs.py` until pass;
    - resubmit to `/x4:test-doc-viewer` using a fresh isolated reviewer subagent.
 4. Only when reviewer returns `review_status: pass` can this skill be considered complete.
@@ -366,7 +366,7 @@ Applies to all top-level tasks (`x.x`) in Chapter 1/2/3/4:
 
 ## Output
 
-- Updated test documentation artifacts (`test_tasks.md`, `ui_knowledge.md`)
+- Updated test documentation artifacts (`test_tasks.md`, `knowledge.md`)
 - Viewer gate result from `/x4:test-doc-viewer` (`review_status: pass`)
 - Confirmation of changes made
 - `Execution Evidence Block` (from A.8) must be included before completion claim.

@@ -4,7 +4,7 @@ Validate evidence quality for test-doc artifacts.
 
 Goal:
 1) Reduce hallucinated IDs by checking mentioned ship/equipment IDs against source data.
-2) Enforce that key claim lines in ui_knowledge.md carry traceable code/data references.
+2) Enforce that key claim lines in knowledge.md carry traceable code/data references.
 
 Usage:
   python3 skill-scripts/validate_doc_evidence.py <change-name>
@@ -125,20 +125,31 @@ def validate_change(change_name: str, strict: bool) -> Tuple[bool, List[str], Li
 
     base = Path("openspec/changes") / change_name
     test_tasks = base / "test_tasks.md"
-    ui_knowledge = base / "ui_knowledge.md"
+    knowledge = base / "knowledge.md"
+    legacy_ui_knowledge = base / "ui_knowledge.md"
     if not test_tasks.exists():
         errors.append(f"Missing file: {test_tasks}")
         return False, errors, warnings
-    if not ui_knowledge.exists():
-        errors.append(f"Missing file: {ui_knowledge}")
+    # Prefer new file name. Keep backward compatibility for archived/legacy changes.
+    if knowledge.exists():
+        knowledge_file = knowledge
+        knowledge_label = "knowledge.md"
+    elif legacy_ui_knowledge.exists():
+        knowledge_file = legacy_ui_knowledge
+        knowledge_label = "ui_knowledge.md"
+        warnings.append(
+            f"Using legacy file name: {legacy_ui_knowledge}; please migrate to {knowledge}"
+        )
+    else:
+        errors.append(f"Missing file: {knowledge}")
         return False, errors, warnings
 
     ship_ids, eq_ids = collect_known_ids()
     tt_text = test_tasks.read_text(encoding="utf-8")
-    uk_text = ui_knowledge.read_text(encoding="utf-8")
+    knowledge_text = knowledge_file.read_text(encoding="utf-8")
 
     # 1) ID existence check
-    for source_name, text in (("test_tasks.md", tt_text), ("ui_knowledge.md", uk_text)):
+    for source_name, text in (("test_tasks.md", tt_text), (knowledge_label, knowledge_text)):
         mentioned_ship_ids, mentioned_equip_ids = extract_ids(text)
         for sid in sorted(mentioned_ship_ids):
             if sid not in ship_ids:
@@ -147,12 +158,12 @@ def validate_change(change_name: str, strict: bool) -> Tuple[bool, List[str], Li
             if eid not in eq_ids:
                 errors.append(f"{source_name}: unknown equipment id `{eid}` (not found in equipments.json)")
 
-    # 2) ui_knowledge claim-line evidence check
-    uk_lines = uk_text.splitlines()
-    for line_no, claim in iter_claim_lines(uk_lines):
-        if not has_local_source_ref(uk_lines, line_no):
+    # 2) knowledge claim-line evidence check
+    knowledge_lines = knowledge_text.splitlines()
+    for line_no, claim in iter_claim_lines(knowledge_lines):
+        if not has_local_source_ref(knowledge_lines, line_no):
             msg = (
-                f"ui_knowledge.md:{line_no} claim lacks source ref: `{claim}`; "
+                f"{knowledge_label}:{line_no} claim lacks source ref: `{claim}`; "
                 "add `[src: path:line]` or backticked file path"
             )
             if strict:

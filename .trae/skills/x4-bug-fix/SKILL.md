@@ -43,7 +43,7 @@ Phase isolation:
 
 - Only modify code and docs required to fix the target bug.
 - Do not broaden refactors outside bug impact area.
-- Do not directly edit `test_tasks.md` / `ui_knowledge.md` in this skill.
+- Do not directly edit `test_tasks.md` / `knowledge.md` in this skill.
 - For documentation updates, delegate to `/x4:test-doc`.
 
 ## Single Source Rule (MANDATORY)
@@ -87,7 +87,7 @@ Phase isolation:
     - task not completed: use `/x4:test-run` apply flow; do not edit checklist states manually
     - missing/invalid test task entry: delegate to `/x4:test-doc` and backfill as unchecked (`[ ]`) tasks first, then rerun step 8 via `/x4:test-run` for result-apply
     - do not "force-pass" sync by manually toggling checklist states
-    - do not directly edit `test_tasks.md` / `ui_knowledge.md` in this skill
+    - do not directly edit `test_tasks.md` / `knowledge.md` in this skill
 11. Update `bugs.md` status note to `Verified` (reference only, non-gating).
 
 ## Sync Recovery Subflow (MANDATORY)

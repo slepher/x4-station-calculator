@@ -38,7 +38,7 @@ Status note:
   - record or update bug entries in `bugs.md`
   - maintain bug id and test linkage metadata
 - `/x4:bug` MUST NOT:
-  - directly edit `test_tasks.md` / `ui_knowledge.md`
+  - directly edit `test_tasks.md` / `knowledge.md`
   - redefine test documentation formats
   - implement source-code fixes in `src/**`
   - run bug-fix verification as if code has changed
@@ -50,7 +50,7 @@ Single-phase execution rule:
 
 Documentation ownership rule:
 - If reproduction tasks or UI test knowledge must be added/updated, delegate to `/x4:test-doc`.
-- `x4-test-doc` remains the authority for `test_tasks.md` / `ui_knowledge.md`.
+- `x4-test-doc` remains the authority for `test_tasks.md` / `knowledge.md`.
 
 ## Target Resolution Priority (MANDATORY)
 
@@ -94,7 +94,7 @@ When target descriptions are ambiguous or conflicting:
 
 ### Step 3: Sync UI Knowledge (Web Integration only)
 
-If the reproduction task is Web Integration, delegate `ui_knowledge.md` updates to `/x4:test-doc`.
+If the reproduction task is Web Integration, delegate `knowledge.md` updates to `/x4:test-doc`.
 
 ### Step 4: Handoff to Fix Phase
 

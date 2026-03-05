@@ -1,12 +1,12 @@
 ---
 name: x4-user-workflow
-description: "Orchestrate X4 Station Calculator workflow with OpenSpec. (Trigger: /x4:discuss, /x4:new, /x4:ff, /x4:doc, /x4:test-doc, /x4:test-doc-viewer, /x4:apply, /x4:bug, /x4:bug-fix, /x4:test-impl, /x4:test, /x4:test-run, /x4:verify, /x4:archive)"
+description: "Describe command-to-skill relationships for X4 workflow."
 ---
 
-# X4 Workflow Orchestrator
+# X4 Workflow Command Map
 
-This skill defines the end-to-end workflow and routing for X4.
-It is orchestration-only and must not duplicate implementation details from phase skills.
+This skill only defines command relationships and routing boundaries.
+It does not arrange concrete execution work inside phase skills.
 
 ## Trigger
 
@@ -29,163 +29,62 @@ Deprecated and out of active workflow scope:
 - `/x4:pipe`
 - `/x4:subdis`
 
-## Orchestration Boundary (MANDATORY)
+## Scope Boundary (MANDATORY)
 
 - `x4-user-workflow` owns:
-  - phase selection
+  - command recognition
   - command routing
-  - high-level prerequisites between phases
-  - handoff sequencing
-- Phase skills own all detailed rules:
-  - document writing/update rules
-  - code implementation rules
-  - test writing/execution rules
-  - archive detail rules
+  - command-to-skill relationship definition
+- Phase skills own all execution details:
+  - document writing/updating details
+  - implementation details
+  - test writing/running details
+  - verification/archive gate details
 
-Do not copy detailed standards into this file. Always delegate to phase skills.
+## Command Relations
 
-## Single-Command Phase Isolation (MANDATORY)
+- `/x4:discuss` -> `x4-discuss`
+- `/x4:new` -> `x4-new`
+- `/x4:ff` -> `x4-ff`
+- `/x4:doc` -> `x4-doc`
+- `/x4:test-doc` -> `x4-test-doc`
+- `/x4:test-doc-viewer` -> `x4-test-doc-viewer`
+- `/x4:apply` -> `x4-apply`
+- `/x4:bug` -> `x4-bug`
+- `/x4:bug-fix` -> `x4-bug-fix`
+- `/x4:test-impl` -> `x4-test-impl`
+- `/x4:test` -> `x4-test`
+- `/x4:test-run` -> `x4-test-run`
+- `/x4:verify` -> `x4-verify`
+- `/x4:archive` -> `x4-archive`
 
-- A single command invocation must execute exactly one phase skill.
-- Do not auto-chain into a second phase in the same response unless user explicitly issues the second command.
-- Enforcement example:
-  - `/x4:bug` cannot auto-advance to `/x4:bug-fix` in the same invocation.
-  - `/x4:bug` may only output handoff instruction for next phase.
+## Shared Change Name Resolution Reference
 
-## Reviewer Subagent Isolation (MANDATORY)
+For commands that accept `change-name`, phase skills should use the shared resolver policy:
 
-For test-doc review phase:
-
-- `/x4:test-doc-viewer` must run in a dedicated isolated reviewer subagent.
-- Do not execute reviewer in the main thread context used by writer/orchestrator phases.
-- Pass minimal review-only payload (`change-name`, target doc paths, optional prior issue ids).
-- If reviewer subagent creation fails, stop with blocker; do not fallback to in-thread review.
-
-## Cross-Skill Authority (MANDATORY)
-
-- For `/x4:new` and `/x4:ff`, all document detail interpretation and update rules must be sourced from `x4-doc`.
-- Keep openspec skill references in phase skills. X4 skills may orchestrate and wrap, but should not remove required openspec dependencies.
-
-## Language Policy (MANDATORY)
-
-- Responses and generated docs must follow the user's language inferred from conversation context by default.
-- Do not fall back to English when the user has not provided new text input.
-- Switch language only when the user explicitly requests a language change.
-- Support explicit language tags in command text (e.g. `#zh`, `#en`); when present, tag selection overrides context language for that request.
-
-## Change Name Resolution (MANDATORY)
-
-All phase skills that accept `change-name` must use this same resolver.
-
-Resolution order:
-1. Exact match against `openspec/changes/<change-name>`.
-2. Abbreviation match:
-   - Build abbreviation from each hyphen-separated segment initial.
-   - Example: `station-tab-drag -> std`.
-   - Command `/x4:test-impl std` should resolve to `station-tab-drag` when unique.
-3. Prefix match on full change name (e.g. `station-tab` -> `station-tab-drag` if unique).
+1. exact match against `openspec/changes/<change-name>`
+2. abbreviation match from hyphen-segment initials
+3. full-name prefix match
 
 Conflict handling:
-- If multiple changes match, stop and ask user to choose from candidates.
-- If no change matches:
-  - For `/x4:ff` only, auto-create `openspec/changes/<change-name>/` and proceed.
-  - For all other phases, stop and ask; include available active change names.
-- Exclude `openspec/changes/archive/` from candidate resolution.
-- If user description conflicts with an explicit abbreviation token that resolves uniquely, use abbreviation resolution result as final target.
+- multiple matches: stop and ask user to choose
+- no match:
+  - `/x4:ff` may auto-create `openspec/changes/<change-name>/`
+  - other commands should stop and ask user
+- exclude `openspec/changes/archive/`
 
-Enforcement:
-- All x4 phase skills that accept `change-name` MUST resolve before any action.
-- After resolution, MUST print: `Resolved change: <change-name>`.
-- If unresolved, MUST stop and ask (except `/x4:ff` auto-create rule above).
+## Non-Responsibilities
 
-## Phase Map
+`x4-user-workflow` must not define:
+- phase execution sequence
+- per-phase prerequisites
+- reviewer gate loops
+- implementation/test verification procedures
 
-1. `/x4:discuss`
-   - Goal: clarify requirements and produce discussion conclusions.
-   - Delegate to: `x4-discuss`.
-
-2. `/x4:new`
-   - Goal: create artifacts step-by-step with confirmations.
-   - Delegate to: `x4-new`.
-   - Note: document details are governed by `x4-doc`; base creation may rely on openspec skills.
-
-3. `/x4:ff`
-   - Goal: fast-forward artifact progression after discussion.
-   - Delegate to: `x4-ff` (sequencing) + `x4-doc` (document content/update rules).
-   - Note: keep openspec skill references through delegated phase skills.
-
-4. `/x4:doc`
-   - Goal: create/update OpenSpec planning artifacts for a change (`request/spec/design/tasks/test_tasks/ui_knowledge`) with consistency sync.
-   - Delegate to: `x4-doc`.
-
-5. `/x4:apply`
-   - Goal: implement code changes for current change.
-   - Delegate to: `x4-apply`.
-
-6. `/x4:test-doc`
-   - Goal: create/update test documentation artifacts.
-   - Delegate to: `x4-test-doc`.
-
-7. `/x4:test-doc-viewer`
-   - Goal: review final test documentation draft and return pass/rewrite gate decision.
-   - Delegate to: `x4-test-doc-viewer`.
-   - Execution mode: dedicated isolated reviewer subagent.
-
-8. `/x4:bug`
-   - Goal: report bug and maintain bug/test artifacts for a change.
-   - Delegate to: `x4-bug`.
-
-9. `/x4:bug-fix`
-   - Goal: run bug-fix workflow for reported bug.
-   - Delegate to: `x4-bug-fix`.
-
-10. `/x4:test-impl`
-   - Goal: implement/supplement tests from `test_tasks.md`.
-   - Delegate to: `x4-test-impl`.
-
-11. `/x4:test`
-   - Goal: orchestrate test workflow (`x4-test-doc`, `x4-test-doc-viewer`, `x4-test-impl`, `x4-test-run`).
-   - Delegate to: `x4-test`.
-
-12. `/x4:test-run`
-   - Goal: execute change-scoped tests and apply run-result updates.
-   - Delegate to: `x4-test-run`.
-
-13. `/x4:verify`
-   - Goal: run verification and testing workflow.
-   - Delegate to: `x4-verify`.
-   - Handoff contract to archive: must provide `verify_status`, `bug_gate`, `non_verified_bug_ids`, `bug_gate_summary`.
-
-14. `/x4:archive`
-   - Goal: archive completed change and promote specs.
-   - Delegate to: `x4-archive`.
-   - Gate dependency: consume `/x4:verify` handoff contract; archive is allowed only when `verify_status=pass` and `bug_gate=pass`.
-
-## High-Level Prerequisites
-
-- Planning phases (`/x4:discuss`, `/x4:new`, `/x4:ff`, `/x4:doc`) must not edit source code.
-- `/x4:apply` should run after required planning artifacts are ready.
-- `/x4:test-impl` and `/x4:test` are optional standalone phases for focused test iteration.
-- `/x4:doc` should run test-doc audit by default (`/x4:test-doc` -> `/x4:test-doc-viewer`) before reporting phase completion.
-- For test implementation phases, `/x4:test-doc-viewer` review gate should pass before `/x4:test-impl`.
-- Reviewer gate execution must be isolated subagent mode (no in-thread reviewer fallback).
-- `/x4:verify` should run after `/x4:apply` and includes verification-stage test implementation/execution sequencing.
-- `/x4:archive` must consume `/x4:verify` gate output contract; missing gate fields are blockers.
-- `/x4:archive` should run only after verify passes.
-- `/x4:bug` is report-only and must never execute code-fix actions from `/x4:bug-fix`.
-
-## Handoff Sequence (Default)
-
-1. Discuss
-2. New or FF
-3. Doc updates (optional, any time during planning)
-4. Apply
-5. Bug report (`/x4:bug`)
-6. Bug fix (`/x4:bug-fix`)
-7. Verify
-8. Archive
+Those rules must stay in each delegated phase skill.
 
 ## Output
 
-- Selected phase and delegated skill(s)
-- Current workflow status and next recommended phase
+- selected command
+- routed phase skill
+- brief relation note when needed
