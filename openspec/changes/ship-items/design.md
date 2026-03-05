@@ -79,7 +79,7 @@ Props 控制：
 | 可部署 | ship.storage.deployable |
 | 诱导弹 | ship.storage.countermeasure |
 | 无人机 | ship.storage.unit |
-| 导弹 | 固定 20 |
+| 导弹 | ship.storage.missile |
 
 ## 候选物品过滤规则
 
@@ -93,14 +93,56 @@ items.filter(item => item.deployable === true)
 items.filter(item => item.class === 'countermeasure')
 ```
 
-### 无人机 (drones.json)
+### 无人机 (drones.json) - 匹配规则
+
 ```typescript
-items.slice(0, 3)
+// 1. 过滤 noplayerblueprint=false
+// 2. 排除 deployable=true
+// 3. 匹配逻辑
+const shipDroneTags = selectedShip.droneTags || []
+const matched = drones.filter(drone => {
+  if (drone.noplayerblueprint === true) return false
+  if (drone.deployable === true) return false
+
+  const droneTags = drone.droneTags || []
+
+  if (shipDroneTags.length === 0) {
+    // 飞船 droneTags 为空，匹配 droneTags 为空的无人机
+    return droneTags.length === 0
+  } else {
+    // 飞船 droneTags 非空，匹配包含所有 tags 或 tags 为空的无人机
+    const hasAllTags = shipDroneTags.every(tag => droneTags.includes(tag))
+    return hasAllTags || droneTags.length === 0
+  }
+}).slice(0, 10)
 ```
 
-### 导弹 (missiles.json)
+### 导弹 (missiles.json) - 匹配规则
+
 ```typescript
-items.slice(0, 3)
+// 1. 从 blueprint 的 weapon/turret 槽位获取所有 ammunitionTags
+const ammoTags = new Set<string>()
+blueprint.connections.forEach(conn => {
+  if (conn.slot_type === 'weapon' || conn.slot_type === 'turret') {
+    conn.group.forEach(g => {
+      const equipment = equipments.find(e => e.id === g.equipment_id)
+      if (equipment?.ammunitionTags) {
+        equipment.ammunitionTags.forEach(tag => ammoTags.add(tag))
+      }
+    })
+  }
+})
+
+// 2. 匹配逻辑
+if (ammoTags.size === 0) {
+  return [] // 不显示导弹
+}
+
+const matched = missiles.filter(missile => {
+  const missileTags = missile.missileTags || []
+  // 匹配任一 tag
+  return ammoTags.some(tag => missileTags.includes(tag))
+})
 ```
 
 ## 持久化格式

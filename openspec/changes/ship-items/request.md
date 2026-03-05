@@ -34,11 +34,29 @@ E → R → S → W → T → C → U
 
 | 类型 | 数据源 | 候选数量 | 存储上限 |
 |------|--------|----------|----------|
-| 无人机 | drones.json | 前3个 | ship.storage.unit |
-| 导弹 | missiles.json | 前3个 | 固定20（临时） |
+| 无人机 | drones.json（匹配规则） | ≤10 | ship.storage.unit |
+| 导弹 | missiles.json（匹配规则） | ≤10 | ship.storage.missile |
 
-- 无人机各物品数量总和 ≤ unit 上限
-- 导弹数量 ≤ 20
+- 无人机各物品数量总和 ≤ unit 上限（使用 dragMax 限制）
+- 导弹各物品数量总和 ≤ missile 上限（使用 dragMax 限制）
+
+#### 无人机匹配规则
+
+1. 首先过滤 `noplayerblueprint=false`
+2. 额外排除 `deployable=true` 的无人机
+3. 如果飞船 `droneTags` 为空数组：
+   - 匹配所有 `droneTags` 为空数组的无人机
+4. 如果飞船 `droneTags` 非空：
+   - 匹配 `droneTags` 包含飞船所有 `droneTags`（every）的无人机
+   - 或者 `droneTags` 为空数组的无人机
+
+#### 导弹匹配规则
+
+1. 从 blueprint 的 weapon 和 turret 槽位获取所有装备的 `ammunitionTags`，合并为一个集合
+2. 如果 ammunitionTags 为空：
+   - 不显示导弹条目
+3. 如果 ammunitionTags 非空：
+   - 匹配导弹的 `missilTags` 包含任一 ammunitionTags（some）的导弹
 
 ## ShipBlueprint 扩展
 

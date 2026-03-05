@@ -102,7 +102,7 @@ const missileItems = computed(() => {
     return ammoTags.some((tag: string) => missileTags.includes(tag))
   })
 
-  return matched.slice(0, 10)
+  return matched
 })
 
 // Current storage state from blueprint

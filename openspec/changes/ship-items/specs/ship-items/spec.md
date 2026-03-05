@@ -57,9 +57,9 @@
 - 界面加载时
 
 **那么**
-- 显示无人机列表（drones.json，显示前3个）
-- 显示导弹列表（missiles.json，显示前3个）
-- 显示各物品的拖动条
+- 根据飞船 droneTags 显示匹配的无人机列表（最多10个）
+- 根据 blueprint 中武器/炮塔的 ammunitionTags 显示匹配的导弹列表（最多10个）
+- 如果没有匹配的导弹，不显示导弹条目
 
 **当**
 - 用户调整无人机物品的拖动条
@@ -74,7 +74,40 @@
 
 **那么**
 - 导弹数量更新
-- 不能超过固定上限 20
+- 导弹总量不能超过 ship.storage.missile 上限
+- 使用 dragMax 限制单个物品的最大拖动值
+
+#### Scenario: 无人机匹配规则
+
+**前提**
+- 飞船已选择
+
+**当**
+- 计算候选无人机列表
+
+**那么**
+- 首先过滤 noplayerblueprint=false 的无人机
+- 额外排除 deployable=true 的无人机
+- 如果飞船 droneTags 为空：
+  - 匹配 droneTags 为空的无人机
+- 如果飞船 droneTags 非空：
+  - 匹配 droneTags 包含飞船所有 droneTags 的无人机
+  - 或 droneTags 为空的无人机
+
+#### Scenario: 导弹匹配规则
+
+**前提**
+- 飞船已选择，且 blueprint 中已配置武器/炮塔
+
+**当**
+- 计算候选导弹列表
+
+**那么**
+- 从 blueprint 的 weapon 和 turret 槽位获取所有装备的 ammunitionTags
+- 如果 ammunitionTags 为空：
+  - 不显示导弹条目
+- 如果 ammunitionTags 非空：
+  - 匹配 missileTags 包含任一 ammunitionTags 的导弹
 
 #### Scenario: 数据持久化
 

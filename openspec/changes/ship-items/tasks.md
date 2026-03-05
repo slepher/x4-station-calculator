@@ -62,6 +62,19 @@
 - [x] 10.3 修复拖动条出现禁用图标问题
 - [x] 10.4 修复蓝色填充延迟问题
 
-## 11. 构建验证
+## 11. 匹配规则实现
 
-- [x] 11.1 运行 `npm run build` 验证编译通过
+- [x] 11.1 实现无人机匹配规则（droneTags + noplayerblueprint + deployable）
+- [x] 11.2 实现导弹匹配规则（ammunitionTags from blueprint weapons/turrets）
+- [x] 11.3 导弹使用 ship.storage.missile 作为上限
+- [x] 11.4 导弹添加 dragMax 实现总量限制
+- [x] 11.5 导弹无匹配时隐藏导弹条目
+
+## 12. 数据加载修复
+
+- [x] 12.1 修复刷新页面后存储数据不加载问题
+- [x] 12.2 使用 deep watch 监听 blueprint 嵌套变化
+
+## 13. 构建验证
+
+- [x] 13.1 运行 `npm run build` 验证编译通过
