@@ -15,7 +15,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
-const { translateShip, translateWare, translateEquipment } = useX4I18n()
+const { translateShip, translateWare, translateEquipment, translate } = useX4I18n()
 
 // 全局字典数据 - 直接从 store 读取
 const store = useShipBuildStore()
@@ -317,89 +317,90 @@ const storageMaterialGroups = computed(() => {
 
   const storage = props.shipBlueprint.storage
   const groups: Array<{
-    category: string
-    categoryName: string
+    storageId: string
+    storageName: string
+    quantity: number
     items: Array<{ wareId: string; count: number; value: number }>
   }> = []
 
-  // 可部署物品
-  if (storage.deployables.length > 0) {
-    const items: Array<{ wareId: string; count: number; value: number }> = []
-    storage.deployables.forEach((item) => {
-      const data = consumablesMap.value.get(item.id)
-      if (data?.cost) {
-        const cost = resolveCostByMethod(data.cost, materialMethod.value)
-        const materialItems = mapCostToMaterialItems(cost, item.count)
-        items.push(...materialItems)
+  // 可部署物品 - 每项单独显示
+  storage.deployables.forEach((item) => {
+    const data = consumablesMap.value.get(item.id)
+    if (data?.cost) {
+      const cost = resolveCostByMethod(data.cost, materialMethod.value)
+      const materialItems = mapCostToMaterialItems(cost, item.count)
+      if (materialItems.length > 0) {
+        groups.push({
+          storageId: `deployable_${item.id}`,
+          storageName: data.nameId || item.id,
+          quantity: item.count,
+          items: materialItems
+        })
       }
-    })
-    if (items.length > 0) {
-      groups.push({
-        category: 'deployables',
-        categoryName: t('ship_build.storage_deployable'),
-        items
-      })
     }
-  }
+  })
 
   // 诱导弹
   if (storage.countermeasure) {
     const data = consumablesMap.value.get(storage.countermeasure.id)
     if (data?.cost) {
       const cost = resolveCostByMethod(data.cost, materialMethod.value)
-      const items = mapCostToMaterialItems(cost, storage.countermeasure.count)
-      if (items.length > 0) {
+      const materialItems = mapCostToMaterialItems(cost, storage.countermeasure.count)
+      if (materialItems.length > 0) {
         groups.push({
-          category: 'countermeasure',
-          categoryName: t('ship_build.storage_countermeasure'),
-          items
+          storageId: `countermeasure_${storage.countermeasure.id}`,
+          storageName: data.nameId || storage.countermeasure.id,
+          quantity: storage.countermeasure.count,
+          items: materialItems
         })
       }
     }
   }
 
-  // 无人机
-  if (storage.drones.length > 0) {
-    const items: Array<{ wareId: string; count: number; value: number }> = []
-    storage.drones.forEach((item) => {
-      const data = dronesMap.value.get(item.id)
-      if (data?.cost) {
-        const cost = resolveCostByMethod(data.cost, materialMethod.value)
-        const materialItems = mapCostToMaterialItems(cost, item.count)
-        items.push(...materialItems)
+  // 无人机 - 每项单独显示
+  storage.drones.forEach((item) => {
+    const data = dronesMap.value.get(item.id)
+    if (data?.cost) {
+      const cost = resolveCostByMethod(data.cost, materialMethod.value)
+      const materialItems = mapCostToMaterialItems(cost, item.count)
+      if (materialItems.length > 0) {
+        groups.push({
+          storageId: `drone_${item.id}`,
+          storageName: data.nameId || item.id,
+          quantity: item.count,
+          items: materialItems
+        })
       }
-    })
-    if (items.length > 0) {
-      groups.push({
-        category: 'drones',
-        categoryName: t('ship_build.storage_drone'),
-        items
-      })
     }
-  }
+  })
 
-  // 导弹
-  if (storage.missiles.length > 0) {
-    const items: Array<{ wareId: string; count: number; value: number }> = []
-    storage.missiles.forEach((item) => {
-      const data = missilesMap.value.get(item.id)
-      if (data?.cost) {
-        const cost = resolveCostByMethod(data.cost, materialMethod.value)
-        const materialItems = mapCostToMaterialItems(cost, item.count)
-        items.push(...materialItems)
+  // 导弹 - 每项单独显示
+  storage.missiles.forEach((item) => {
+    const data = missilesMap.value.get(item.id)
+    if (data?.cost) {
+      const cost = resolveCostByMethod(data.cost, materialMethod.value)
+      const materialItems = mapCostToMaterialItems(cost, item.count)
+      if (materialItems.length > 0) {
+        groups.push({
+          storageId: `missile_${item.id}`,
+          storageName: data.nameId || item.id,
+          quantity: item.count,
+          items: materialItems
+        })
       }
-    })
-    if (items.length > 0) {
-      groups.push({
-        category: 'missiles',
-        categoryName: t('ship_build.storage_missile'),
-        items
-      })
     }
-  }
+  })
 
   return groups
 })
+
+// 翻译 storage 物品名称
+const getStorageItemName = (nameId: string) => {
+  const ware = wareMap.value.get(nameId)
+  if (ware) return translateWare(ware)
+  // 尝试翻译 nameId
+  return translate(nameId, nameId, 'ware')
+}
 
 const materialSummaryItems = computed(() => {
   const grouped = new Map<string, { wareId: string; count: number; value: number }>()
@@ -548,6 +549,33 @@ const getShipName = (shipId: string | undefined) => {
           </template>
           <template #header>
             <span class="material-summary-value">{{ formatCrValue(group.value) }}</span>
+          </template>
+          <template #row="{ item }">
+            <div class="material-item-row">
+              <span class="material-item-count">{{ formatMaterialCount(item.count) }}</span>
+              <span class="material-item-symbol">x</span>
+              <span class="material-item-name">{{ getMaterialName(item.wareId) }}</span>
+            </div>
+            <span class="material-item-value">{{ formatCrValue(item.value) }}</span>
+          </template>
+        </CollapsibleDetailList>
+
+        <!-- Storage items (consumables/drones/missiles) -->
+        <CollapsibleDetailList
+          v-for="group in storageMaterialGroups"
+          :key="group.storageId"
+          :data="group.items"
+          :main-row-testid="`ship-build-material-storage-group-${group.storageId}`"
+          :list-testid="`ship-build-material-storage-list-${group.storageId}`"
+        >
+          <template #title>
+            <div class="material-equipment-title">
+              <span class="material-equipment-name">{{ getStorageItemName(group.storageName) }}</span>
+              <span class="material-equipment-count">x {{ group.quantity }}</span>
+            </div>
+          </template>
+          <template #header>
+            <span class="material-summary-value">{{ formatCrValue(group.items.reduce((sum, i) => sum + i.value, 0)) }}</span>
           </template>
           <template #row="{ item }">
             <div class="material-item-row">
