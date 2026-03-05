@@ -217,3 +217,9 @@ These define the development workflow patterns used in this codebase.
 - Get explicit confirmation before making changes
 - When asked to explain/understand, provide explanation first
 - Don't modify code without approval, even if the changes seem obvious
+
+### Git Worktree Merge
+When merging a worktree branch into develop:
+- Run `git merge <branch-name>` directly in the develop working directory
+- Do NOT push to remote unless explicitly requested
+- Example workflow: commit on branch → switch to develop → merge branch
