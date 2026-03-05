@@ -616,6 +616,21 @@ class X4PrecisionLoader:
         }
         return race_map.get(abbrev, abbrev)
 
+    def _build_drone_tags(self, purpose_primary, cargo_entries, build_engine_macro=None):
+        tags = []
+        if purpose_primary == 'build':
+            if build_engine_macro == 'engine_gen_xs_repairdrone_01_macro':
+                return []
+            return ['build']
+        if purpose_primary == 'mine':
+            tags.append(purpose_primary)
+            cargo_types = {entry.get('type') for entry in (cargo_entries or [])}
+            if 'liquid' in cargo_types:
+                tags.append('liquid')
+            if 'solid' in cargo_types:
+                tags.append('solid')
+        return tags
+
     def _build_ship_connection_storage(self, ship_entry, ship_macro_info, ship_connection_macros):
         """从 ship_connection_macros 构建 storage/dockarea/shipstorage"""
         connection_macro_refs = ship_macro_info.get('connectionMacroRefs', [])
@@ -1147,6 +1162,7 @@ class X4PrecisionLoader:
                 physics_node = props.find('physics') if props is not None else None
                 thruster_node = props.find('thruster') if props is not None else None
                 radar_node = props.find('radar') if props is not None else None
+                purpose_node = props.find('purpose') if props is not None else None
 
                 storage = None
                 if storage_node is not None:
@@ -1204,6 +1220,7 @@ class X4PrecisionLoader:
                     "class": macro.get('class'),
                     "component": comp_ref,
                     "shipType": ship_node.get('type') if ship_node is not None else None,
+                    "purposePrimary": purpose_node.get('primary') if purpose_node is not None else None,
                     "storage": storage,
                     "crew": crew,
                     "hull": int(hull_node.get('max') or 0) if hull_node is not None else 0,
@@ -1311,6 +1328,8 @@ class X4PrecisionLoader:
                 "name": name_id,
                 "class": info.get('class'),
                 "type": None,
+                "purposePrimary": info.get('purposePrimary'),
+                "droneTags": [],
                 "race": self._extract_ship_race(ship_macro),
                 "shipgroup": shipgroup_by_macro.get(ship_macro),
                 "noplayerblueprint": "noplayerblueprint" in tags,
@@ -1331,6 +1350,10 @@ class X4PrecisionLoader:
 
             # 构建 storage/dockarea/shipstorage
             self._build_ship_connection_storage(ship_entry, info, ship_connection_macros)
+            ship_entry["droneTags"] = self._build_drone_tags(
+                ship_entry.get("purposePrimary"),
+                ship_entry.get("cargo", [])
+            )
 
             # storage: 总是包含 countermeasure 和 deployable，默认为 0
             if info.get('storage') is not None:
@@ -1693,6 +1716,7 @@ class X4PrecisionLoader:
                     "tags": filtered_tags,
                     "noplayerblueprint": no_player_blueprint,
                     "slotTags": slot_tags,
+                    "ammunitionTags": [],
                     "integrated": hull_integrated,
                     "size": equip_size,
                     "cost": self._build_cost(ware_id)
@@ -1745,6 +1769,7 @@ class X4PrecisionLoader:
                 if equip_type in {"weapon", "turret"} and props is not None:
                     bullet = props.find('bullet')
                     heat = props.find('heat')
+                    ammunition = props.find('ammunition')
                     if bullet is not None:
                         equipment["bullet"] = bullet.get('class')
                     if heat is not None:
@@ -1753,6 +1778,8 @@ class X4PrecisionLoader:
                             "cooldelay": float(heat.get('cooldelay') or 0),
                             "coolrate": float(heat.get('coolrate') or 0)
                         }
+                    if ammunition is not None:
+                        equipment["ammunitionTags"] = self._split_tags(ammunition.get('tags', ''))
 
                 self.equipments_data.append(equipment)
                 self.equipment_type_counts[equip_type] += 1
@@ -1788,6 +1815,20 @@ class X4PrecisionLoader:
         drone_classes = {'ship_xs', 'ship_s'}
         consumable_classes = {'mine', 'satellite', 'scanner', 'countermeasure', 'navbeacon', 'resourceprobe'}
 
+        def derive_drone_cargo(props, purpose_primary):
+            # 仅基于 XML 属性推导 cargo，不依赖宏名字符串
+            storage_node = props.find('storage') if props is not None else None
+            unit_capacity = int(storage_node.get('unit') or 0) if storage_node is not None else 0
+            if purpose_primary == 'trade':
+                return [{"type": "container", "capacity": unit_capacity}]
+            if purpose_primary != 'mine':
+                return []
+            gatherrate = props.find('gatherrate') if props is not None else None
+            gas = float(gatherrate.get('gas') or 0) if gatherrate is not None else 0
+            if gas > 0:
+                return [{"type": "liquid", "capacity": unit_capacity}]
+            return [{"type": "solid", "capacity": unit_capacity}]
+
         try:
             tree = ET.parse(macros_path)
             root = tree.getroot()
@@ -1813,6 +1854,7 @@ class X4PrecisionLoader:
 
                 props = macro.find('properties')
                 ident_info = {}
+                purpose_primary = None
                 if props is not None:
                     ident = props.find('identification')
                     if ident is not None:
@@ -1821,6 +1863,11 @@ class X4PrecisionLoader:
                             "race": ident.get('makerrace'),
                             "deployable": ident.get('deployable', '0') == '1'
                         }
+                    purpose = props.find('purpose')
+                    if purpose is not None:
+                        purpose_primary = purpose.get('primary')
+
+                noplayerblueprint = 'noplayerblueprint' in self._split_tags(ware_info.get('tags', ''))
 
                 item = {
                     "id": ware_id,
@@ -1837,6 +1884,16 @@ class X4PrecisionLoader:
 
                 # 根据 class 分类
                 if m_class in drone_classes:
+                    drone_cargo = derive_drone_cargo(props, purpose_primary)
+                    build_engine_macro = None
+                    if props is not None:
+                        build_engine = props.find('./loadouts/loadout/macros/engine')
+                        if build_engine is not None:
+                            build_engine_macro = build_engine.get('macro')
+                    item["purposePrimary"] = purpose_primary
+                    item["droneTags"] = self._build_drone_tags(purpose_primary, drone_cargo, build_engine_macro)
+                    item["noplayerblueprint"] = noplayerblueprint
+                    item["cargo"] = drone_cargo
                     self.drones_data.append(item)
                 elif m_class in consumable_classes:
                     self.consumables_data.append(item)
@@ -1888,6 +1945,7 @@ class X4PrecisionLoader:
                     "macro": macro_name,
                     "class": m_class,
                     "tags": self._split_tags(ware_info.get('tags', '')),
+                    "missileTags": [],
                     "cost": self._build_cost(ware_id),
                     "amount": 0,
                     "lifetime": 0,
@@ -1905,6 +1963,7 @@ class X4PrecisionLoader:
                     missile["amount"] = int(missile_node.get('amount') or 0)
                     missile["lifetime"] = float(missile_node.get('lifetime') or 0)
                     missile["range"] = float(missile_node.get('range') or 0)
+                    missile["missileTags"] = self._split_tags(missile_node.get('tags', ''))
 
                 # 读取爆炸伤害
                 explosion_node = props.find('explosiondamage')

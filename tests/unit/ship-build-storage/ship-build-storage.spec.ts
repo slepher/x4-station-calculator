@@ -122,6 +122,50 @@ describe('ship-build-storage: setEquipment', () => {
       expect(group).toBeUndefined()
     }
   })
+
+  it('1.2.4 store层仅更新装备，不直接清理导弹（由面板watch处理）', () => {
+    const store = useShipBuildStore()
+    store.setSelectedShipId(ODACHI_ID)
+
+    // 初始挂载 guided 导弹发射器
+    store.setEquipment('weapon', 'group_test_weapon', 'weapon_bor_m_guided_01_mk1', 1)
+    store.updateBlueprintStorage({
+      deployables: [],
+      countermeasure: null,
+      drones: [],
+      missiles: [
+        { id: 'missile_guided_light_mk1', name: '', count: 10 },
+        { id: 'missile_dumbfire_light_mk1', name: '', count: 10 }
+      ]
+    })
+
+    // 切换为 dumbfire 发射器后，store 层不直接清理导弹
+    store.setEquipment('weapon', 'group_test_weapon', 'weapon_bor_m_dumbfire_01_mk1', 1)
+
+    const missiles = store.blueprint?.storage?.missiles || []
+    expect(missiles.map(m => m.id)).toEqual(['missile_guided_light_mk1', 'missile_dumbfire_light_mk1'])
+  })
+
+  it('1.2.5 store层清空weapon后不直接清理导弹（由面板watch处理）', () => {
+    const store = useShipBuildStore()
+    store.setSelectedShipId(ODACHI_ID)
+
+    store.setEquipment('weapon', 'group_test_weapon', 'weapon_bor_m_guided_01_mk1', 1)
+    store.updateBlueprintStorage({
+      deployables: [],
+      countermeasure: null,
+      drones: [],
+      missiles: [
+        { id: 'missile_guided_light_mk1', name: '', count: 10 }
+      ]
+    })
+
+    // 清空武器后，store 层不直接清理导弹
+    store.setEquipment('weapon', 'group_test_weapon', null, 0)
+
+    const missiles = store.blueprint?.storage?.missiles || []
+    expect(missiles.map(m => m.id)).toEqual(['missile_guided_light_mk1'])
+  })
 })
 
 describe('ship-build-storage: setShield', () => {

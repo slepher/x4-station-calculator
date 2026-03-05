@@ -61,9 +61,9 @@ const countermeasureLimit = computed(() => props.selectedShip?.storage?.counterm
 const unitLimit = computed(() => props.selectedShip?.storage?.unit || 0)
 const missileLimit = computed(() => props.selectedShip?.storage?.missile || 0)
 
-// Get all ammunitionTags from ship's weapons and turrets
+// Get all ammunitionTags from ship blueprint's weapons and turrets
 const shipAmmunitionTags = computed(() => {
-  const bp = store.blueprint
+  const bp = props.selectedShip ? store.blueprint : null
   if (!bp) return []
 
   const tagSet = new Set<string>()
@@ -153,10 +153,43 @@ const initFromBlueprint = () => {
   })
 }
 
-// Watch for blueprint or selectedShip changes
+// Watch deeply so weapon/turret nested mutations re-initialize local slider state.
 watch([() => store.blueprint, () => props.selectedShip], () => {
   initFromBlueprint()
-}, { immediate: true })
+}, { immediate: true, deep: true })
+
+// Ensure missile candidates refresh immediately when weapon/turret ammo tags change.
+watch(shipAmmunitionTags, () => {
+  const bp = store.blueprint
+  if (props.slotType === 'units' && bp?.storage?.missiles?.length) {
+    const ammoTags = shipAmmunitionTags.value
+    const currentMissiles = bp.storage.missiles
+    const filteredMissiles = ammoTags.length === 0
+      ? []
+      : currentMissiles.filter((item) => {
+        const missile = (missilesRaw as any[]).find((m) => m.id === item.id)
+        if (!missile) return false
+        const missileTags: string[] = missile.missileTags || []
+        return ammoTags.some((tag: string) => missileTags.includes(tag))
+      })
+
+    const changed = filteredMissiles.length !== currentMissiles.length
+      || filteredMissiles.some((item, index) => {
+        const original = currentMissiles[index]
+        return !original || original.id !== item.id || original.count !== item.count
+      })
+
+    if (changed) {
+      store.updateBlueprintStorage({
+        deployables: bp.storage.deployables || [],
+        countermeasure: bp.storage.countermeasure || null,
+        drones: bp.storage.drones || [],
+        missiles: filteredMissiles
+      })
+    }
+  }
+  initFromBlueprint()
+})
 
 // Calculate totals
 const deployableTotal = computed(() => {

@@ -15,6 +15,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -62,6 +63,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -109,6 +111,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -155,6 +158,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -202,6 +206,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -249,6 +254,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -295,6 +301,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -342,6 +349,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -391,6 +399,7 @@
     "slotTags": [
       "ship_gen_m_corvette_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -440,6 +449,7 @@
     "slotTags": [
       "ship_gen_m_corvette_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -487,6 +497,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -533,6 +544,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -580,6 +592,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -627,6 +640,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -672,6 +686,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -719,6 +734,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -766,6 +782,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -811,6 +828,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -858,6 +876,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -905,6 +924,7 @@
     "slotTags": [
       "small_racer"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -947,6 +967,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -992,6 +1013,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -1039,6 +1061,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -1086,6 +1109,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -1133,6 +1157,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -1180,6 +1205,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -1222,6 +1248,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -1263,6 +1290,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -1305,6 +1333,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -1347,6 +1376,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -1388,6 +1418,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -1430,6 +1461,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -1472,6 +1504,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -1515,6 +1548,7 @@
       "mandatory",
       "ship_gen_m_yacht_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -1562,6 +1596,7 @@
     "slotTags": [
       "ship_gen_s_racer_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -1604,6 +1639,7 @@
     "slotTags": [
       "ship_gen_s_racer_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -1648,6 +1684,7 @@
       "khaak",
       "ship_kha_l_destroyer_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {},
@@ -1673,6 +1710,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {},
@@ -1710,6 +1748,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {},
@@ -1747,6 +1786,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {},
@@ -1785,6 +1825,7 @@
       "khaak",
       "ship_kha_xl_battleship_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {},
@@ -1809,6 +1850,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -1851,6 +1893,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -1893,6 +1936,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -1935,6 +1979,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -1977,6 +2022,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -2019,6 +2065,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -2061,6 +2108,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -2103,6 +2151,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -2145,6 +2194,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -2187,6 +2237,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -2229,6 +2280,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -2271,6 +2323,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -2312,6 +2365,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -2354,6 +2408,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -2396,6 +2451,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -2437,6 +2493,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -2479,6 +2536,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -2521,6 +2579,7 @@
     "slotTags": [
       "small_racer"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -2563,6 +2622,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -2604,6 +2664,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -2646,6 +2707,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -2688,6 +2750,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -2730,6 +2793,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -2772,6 +2836,7 @@
     "slotTags": [
       "pir_battleship_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -2814,6 +2879,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -2856,6 +2922,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -2898,6 +2965,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -2939,6 +3007,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -2981,6 +3050,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -3023,6 +3093,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -3064,6 +3135,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -3106,6 +3178,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -3148,6 +3221,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -3190,6 +3264,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -3231,6 +3306,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -3273,6 +3349,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -3315,6 +3392,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -3356,6 +3434,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -3398,6 +3477,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -3440,6 +3520,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -3481,6 +3562,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -3523,6 +3605,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -3565,6 +3648,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -3607,6 +3691,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -3648,6 +3733,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -3690,6 +3776,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -3732,6 +3819,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -3774,6 +3862,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -3816,6 +3905,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -3858,6 +3948,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -3900,6 +3991,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -3942,6 +4034,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -3989,6 +4082,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -4031,6 +4125,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -4077,6 +4172,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -4119,6 +4215,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -4163,6 +4260,7 @@
     "slotTags": [
       "ship_gen_m_corvette_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -4212,6 +4310,7 @@
     "slotTags": [
       "ship_gen_m_corvette_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -4259,6 +4358,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -4301,6 +4401,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -4343,6 +4444,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -4390,6 +4492,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -4431,6 +4534,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -4473,6 +4577,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -4515,6 +4620,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -4556,6 +4662,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -4598,6 +4705,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -4640,6 +4748,7 @@
     "slotTags": [
       "small_racer"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -4682,6 +4791,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -4723,6 +4833,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -4765,6 +4876,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -4807,6 +4919,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -4849,6 +4962,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -4891,6 +5005,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -4936,6 +5051,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -4984,6 +5100,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -5027,6 +5144,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -5070,6 +5188,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -5113,6 +5232,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -5156,6 +5276,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -5199,6 +5320,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -5242,6 +5364,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -5285,6 +5408,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -5328,6 +5452,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -5371,6 +5496,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -5416,6 +5542,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -5464,6 +5591,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -5506,6 +5634,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -5549,6 +5678,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -5592,6 +5722,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -5634,6 +5765,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -5677,6 +5809,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -5720,6 +5853,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -5762,6 +5896,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -5805,6 +5940,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -5850,6 +5986,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -5896,6 +6033,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -5939,6 +6077,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -5982,6 +6121,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -6024,6 +6164,7 @@
     "slotTags": [
       "xenon"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -6071,6 +6212,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -6113,6 +6255,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -6155,6 +6298,7 @@
     "slotTags": [
       "xenon"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -6202,6 +6346,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -6244,6 +6389,7 @@
     "slotTags": [
       "xenon"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -6291,6 +6437,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -6333,6 +6480,7 @@
     "slotTags": [
       "ship_xen_xl_mothership_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -6363,6 +6511,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -6399,6 +6548,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -6436,6 +6586,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -6472,6 +6623,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -6509,6 +6661,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -6545,6 +6698,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -6582,6 +6736,7 @@
       "small_racer",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -6614,6 +6769,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -6648,6 +6804,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -6684,6 +6841,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -6720,6 +6878,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -6756,6 +6915,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -6787,6 +6947,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -6818,6 +6979,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -6850,6 +7012,7 @@
       "advanced",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -6882,6 +7045,7 @@
       "advanced",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -6914,6 +7078,7 @@
       "advanced",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -6946,6 +7111,7 @@
       "advanced",
       "hittable"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -6978,6 +7144,7 @@
       "advanced",
       "hittable"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -7010,6 +7177,7 @@
       "advanced",
       "hittable"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -7042,6 +7210,7 @@
       "advanced",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -7073,6 +7242,7 @@
       "advanced",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -7105,6 +7275,7 @@
       "advanced",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -7136,6 +7307,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -7167,6 +7339,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -7201,6 +7374,7 @@
       "ship_gen_m_corvette_01",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -7239,6 +7413,7 @@
       "ship_gen_m_yacht_01",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -7275,6 +7450,7 @@
     "slotTags": [
       "ship_gen_s_racer_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -7307,6 +7483,7 @@
     "slotTags": [
       "khaak"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {},
@@ -7334,6 +7511,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {},
@@ -7361,6 +7539,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {},
@@ -7387,6 +7566,7 @@
     "slotTags": [
       "khaak"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {},
@@ -7414,6 +7594,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {},
@@ -7440,6 +7621,7 @@
     "slotTags": [
       "khaak"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {},
@@ -7465,6 +7647,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -7496,6 +7679,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -7528,6 +7712,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -7560,6 +7745,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -7592,6 +7778,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -7624,6 +7811,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -7656,6 +7844,7 @@
       "small_racer",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -7688,6 +7877,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -7719,6 +7909,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -7751,6 +7942,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -7782,6 +7974,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -7813,6 +8006,7 @@
     "slotTags": [
       "pir_battleship_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -7844,6 +8038,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -7875,6 +8070,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -7907,6 +8103,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -7939,6 +8136,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -7971,6 +8169,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -8003,6 +8202,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -8035,6 +8235,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -8066,6 +8267,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -8098,6 +8300,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -8129,6 +8332,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -8160,6 +8364,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -8191,6 +8396,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -8223,6 +8429,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -8259,6 +8466,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -8296,6 +8504,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -8332,6 +8541,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -8369,6 +8579,7 @@
       "small_racer",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -8401,6 +8612,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -8432,6 +8644,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -8464,6 +8677,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -8495,6 +8709,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -8526,6 +8741,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -8558,6 +8774,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -8590,6 +8807,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -8624,6 +8842,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -8661,6 +8880,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -8699,6 +8919,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -8737,6 +8958,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -8770,6 +8992,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -8803,6 +9026,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -8836,6 +9060,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -8869,6 +9094,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -8902,6 +9128,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -8936,6 +9163,7 @@
       "advanced",
       "hittable"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -8975,6 +9203,7 @@
       "advanced",
       "hittable"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -9014,6 +9243,7 @@
       "advanced",
       "hittable"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -9053,6 +9283,7 @@
       "advanced",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -9092,6 +9323,7 @@
       "advanced",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -9131,6 +9363,7 @@
       "advanced",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -9169,6 +9402,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -9200,6 +9434,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -9232,6 +9467,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -9265,6 +9501,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -9302,6 +9539,7 @@
     "slotTags": [
       "ship_ter_s_xperimental_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -9339,6 +9577,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -9371,6 +9610,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -9403,6 +9643,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -9439,6 +9680,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -9475,6 +9717,7 @@
     "slotTags": [
       "xenon"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -9511,6 +9754,7 @@
     "slotTags": [
       "xenon"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -9548,6 +9792,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -9580,6 +9825,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -9612,6 +9858,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -9639,6 +9886,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -9671,6 +9919,7 @@
       "hittable",
       "xenon"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -9708,6 +9957,7 @@
       "unhittable",
       "xenon"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -9745,6 +9995,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -9777,6 +10028,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -9808,6 +10060,7 @@
     "slotTags": [
       "xenon"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -9844,6 +10097,7 @@
     "slotTags": [
       "ship_xen_xl_mothership_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -9875,6 +10129,7 @@
     "slotTags": [
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -9904,6 +10159,7 @@
     ],
     "noplayerblueprint": false,
     "slotTags": [],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -9950,6 +10206,7 @@
     ],
     "noplayerblueprint": false,
     "slotTags": [],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -9996,6 +10253,7 @@
     ],
     "noplayerblueprint": false,
     "slotTags": [],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -10042,6 +10300,7 @@
     ],
     "noplayerblueprint": false,
     "slotTags": [],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -10087,6 +10346,7 @@
     ],
     "noplayerblueprint": false,
     "slotTags": [],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -10133,6 +10393,7 @@
     ],
     "noplayerblueprint": false,
     "slotTags": [],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -10179,6 +10440,7 @@
     ],
     "noplayerblueprint": false,
     "slotTags": [],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -10224,6 +10486,7 @@
     ],
     "noplayerblueprint": false,
     "slotTags": [],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -10270,6 +10533,7 @@
     ],
     "noplayerblueprint": false,
     "slotTags": [],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -10316,6 +10580,7 @@
     ],
     "noplayerblueprint": false,
     "slotTags": [],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -10359,6 +10624,7 @@
     ],
     "noplayerblueprint": false,
     "slotTags": [],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -10405,6 +10671,7 @@
     ],
     "noplayerblueprint": false,
     "slotTags": [],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -10451,6 +10718,7 @@
     ],
     "noplayerblueprint": false,
     "slotTags": [],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -10495,6 +10763,7 @@
     ],
     "noplayerblueprint": false,
     "slotTags": [],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -10541,6 +10810,7 @@
     ],
     "noplayerblueprint": false,
     "slotTags": [],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -10587,6 +10857,7 @@
     ],
     "noplayerblueprint": false,
     "slotTags": [],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -10633,6 +10904,7 @@
     ],
     "noplayerblueprint": false,
     "slotTags": [],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -10679,6 +10951,7 @@
     ],
     "noplayerblueprint": false,
     "slotTags": [],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -10728,6 +11001,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -10760,6 +11034,9 @@
     "slotTags": [
       "missile",
       "standard"
+    ],
+    "ammunitionTags": [
+      "dumbfire"
     ],
     "integrated": true,
     "size": "large",
@@ -10794,6 +11071,9 @@
       "missile",
       "standard"
     ],
+    "ammunitionTags": [
+      "guided"
+    ],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -10827,6 +11107,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -10860,6 +11141,7 @@
       "mining",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -10892,6 +11174,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -10926,6 +11209,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -10960,6 +11244,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -10992,6 +11277,9 @@
       "missile",
       "standard",
       "unhittable"
+    ],
+    "ammunitionTags": [
+      "dumbfire"
     ],
     "integrated": true,
     "size": "medium",
@@ -11027,6 +11315,9 @@
       "missile",
       "standard"
     ],
+    "ammunitionTags": [
+      "dumbfire"
+    ],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -11061,6 +11352,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -11095,6 +11387,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -11129,6 +11422,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -11163,6 +11457,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -11195,6 +11490,9 @@
       "missile",
       "standard",
       "unhittable"
+    ],
+    "ammunitionTags": [
+      "guided"
     ],
     "integrated": true,
     "size": "medium",
@@ -11230,6 +11528,9 @@
       "missile",
       "standard"
     ],
+    "ammunitionTags": [
+      "guided"
+    ],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -11264,6 +11565,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -11298,6 +11600,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -11332,6 +11635,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -11364,6 +11668,7 @@
       "mining",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -11396,6 +11701,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -11430,6 +11736,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -11464,6 +11771,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -11498,6 +11806,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -11531,6 +11840,7 @@
       "advanced",
       "combat"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "large",
     "cost": {
@@ -11559,6 +11869,7 @@
       "advanced",
       "combat"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "large",
     "cost": {
@@ -11587,6 +11898,7 @@
       "advanced",
       "combat"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "large",
     "cost": {
@@ -11615,6 +11927,7 @@
       "advanced",
       "mining"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -11643,6 +11956,7 @@
       "combat",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -11672,6 +11986,7 @@
       "combat",
       "hittable"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -11700,6 +12015,9 @@
       "advanced",
       "hittable",
       "missile"
+    ],
+    "ammunitionTags": [
+      "dumbfire"
     ],
     "integrated": false,
     "size": "medium",
@@ -11730,6 +12048,9 @@
       "hittable",
       "missile"
     ],
+    "ammunitionTags": [
+      "guided"
+    ],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -11759,6 +12080,7 @@
       "combat",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -11788,6 +12110,7 @@
       "combat",
       "hittable"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -11817,6 +12140,7 @@
       "mining",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -11845,6 +12169,7 @@
       "hittable",
       "mining"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -11873,6 +12198,7 @@
       "combat",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -11902,6 +12228,7 @@
       "combat",
       "hittable"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -11933,6 +12260,7 @@
       "combat",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -11967,6 +12295,7 @@
       "combat",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -12001,6 +12330,7 @@
       "ship_gen_m_tugboat_01",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -12042,6 +12372,7 @@
       "combat",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -12076,6 +12407,7 @@
       "ship_gen_m_yacht_01",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -12110,6 +12442,7 @@
       "combat",
       "khaak"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {},
@@ -12134,6 +12467,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {},
@@ -12156,6 +12490,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -12183,6 +12518,9 @@
     "slotTags": [
       "missile",
       "standard"
+    ],
+    "ammunitionTags": [
+      "dumbfire"
     ],
     "integrated": true,
     "size": "large",
@@ -12212,6 +12550,9 @@
       "missile",
       "standard"
     ],
+    "ammunitionTags": [
+      "guided"
+    ],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -12240,6 +12581,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -12268,6 +12610,7 @@
       "mining",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -12295,6 +12638,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -12324,6 +12668,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -12353,6 +12698,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -12380,6 +12726,9 @@
       "missile",
       "standard",
       "unhittable"
+    ],
+    "ammunitionTags": [
+      "dumbfire"
     ],
     "integrated": true,
     "size": "medium",
@@ -12410,6 +12759,9 @@
       "missile",
       "standard"
     ],
+    "ammunitionTags": [
+      "dumbfire"
+    ],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -12439,6 +12791,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -12468,6 +12821,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -12495,6 +12849,9 @@
       "missile",
       "standard",
       "unhittable"
+    ],
+    "ammunitionTags": [
+      "guided"
     ],
     "integrated": true,
     "size": "medium",
@@ -12525,6 +12882,9 @@
       "missile",
       "standard"
     ],
+    "ammunitionTags": [
+      "guided"
+    ],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -12554,6 +12914,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -12583,6 +12944,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -12612,6 +12974,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -12640,6 +13003,7 @@
       "mining",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -12668,6 +13032,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -12697,6 +13062,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -12726,6 +13092,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -12755,6 +13122,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -12782,6 +13150,7 @@
     "slotTags": [
       "pir_battleship_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -12810,6 +13179,7 @@
       "hittable",
       "pir_battleship_01"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -12838,6 +13208,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -12865,6 +13236,9 @@
     "slotTags": [
       "missile",
       "standard"
+    ],
+    "ammunitionTags": [
+      "dumbfire"
     ],
     "integrated": true,
     "size": "large",
@@ -12894,6 +13268,9 @@
       "missile",
       "standard"
     ],
+    "ammunitionTags": [
+      "guided"
+    ],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -12922,6 +13299,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -12950,6 +13328,7 @@
       "mining",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -12977,6 +13356,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -13006,6 +13386,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -13035,6 +13416,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -13062,6 +13444,9 @@
       "missile",
       "standard",
       "unhittable"
+    ],
+    "ammunitionTags": [
+      "dumbfire"
     ],
     "integrated": true,
     "size": "medium",
@@ -13091,6 +13476,9 @@
       "missile",
       "standard"
     ],
+    "ammunitionTags": [
+      "dumbfire"
+    ],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -13119,6 +13507,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -13148,6 +13537,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -13177,6 +13567,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -13205,6 +13596,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -13231,6 +13623,9 @@
       "missile",
       "standard",
       "unhittable"
+    ],
+    "ammunitionTags": [
+      "guided"
     ],
     "integrated": true,
     "size": "medium",
@@ -13261,6 +13656,9 @@
       "missile",
       "standard"
     ],
+    "ammunitionTags": [
+      "guided"
+    ],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -13290,6 +13688,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -13318,6 +13717,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -13346,6 +13746,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -13374,6 +13775,7 @@
       "mining",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -13402,6 +13804,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -13431,6 +13834,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -13460,6 +13864,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -13488,6 +13893,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -13515,6 +13921,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -13542,6 +13949,9 @@
     "slotTags": [
       "missile",
       "standard"
+    ],
+    "ammunitionTags": [
+      "dumbfire"
     ],
     "integrated": true,
     "size": "large",
@@ -13571,6 +13981,9 @@
       "missile",
       "standard"
     ],
+    "ammunitionTags": [
+      "guided"
+    ],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -13599,6 +14012,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -13627,6 +14041,7 @@
       "mining",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -13654,6 +14069,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -13683,6 +14099,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -13712,6 +14129,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -13739,6 +14157,9 @@
       "missile",
       "standard",
       "unhittable"
+    ],
+    "ammunitionTags": [
+      "dumbfire"
     ],
     "integrated": true,
     "size": "medium",
@@ -13769,6 +14190,9 @@
       "missile",
       "standard"
     ],
+    "ammunitionTags": [
+      "dumbfire"
+    ],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -13798,6 +14222,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -13832,6 +14257,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -13865,6 +14291,9 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [
+      "guided"
+    ],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -13893,6 +14322,9 @@
       "hittable",
       "missile",
       "standard"
+    ],
+    "ammunitionTags": [
+      "guided"
     ],
     "integrated": true,
     "size": "medium",
@@ -13923,6 +14355,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -13957,6 +14390,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -13991,6 +14425,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -14019,6 +14454,7 @@
       "mining",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -14047,6 +14483,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -14076,6 +14513,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -14105,6 +14543,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -14139,6 +14578,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -14172,6 +14612,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -14200,6 +14641,9 @@
     "slotTags": [
       "missile",
       "standard"
+    ],
+    "ammunitionTags": [
+      "dumbfire"
     ],
     "integrated": true,
     "size": "large",
@@ -14230,6 +14674,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -14258,6 +14703,9 @@
     "slotTags": [
       "missile",
       "standard"
+    ],
+    "ammunitionTags": [
+      "guided"
     ],
     "integrated": true,
     "size": "large",
@@ -14288,6 +14736,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -14317,6 +14766,7 @@
       "mining",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -14347,6 +14797,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -14377,6 +14828,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -14405,6 +14857,9 @@
       "missile",
       "standard",
       "unhittable"
+    ],
+    "ammunitionTags": [
+      "dumbfire"
     ],
     "integrated": true,
     "size": "medium",
@@ -14436,6 +14891,9 @@
       "missile",
       "standard"
     ],
+    "ammunitionTags": [
+      "dumbfire"
+    ],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -14466,6 +14924,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -14496,6 +14955,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -14524,6 +14984,9 @@
       "missile",
       "standard",
       "unhittable"
+    ],
+    "ammunitionTags": [
+      "guided"
     ],
     "integrated": true,
     "size": "medium",
@@ -14555,6 +15018,9 @@
       "missile",
       "standard"
     ],
+    "ammunitionTags": [
+      "guided"
+    ],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -14585,6 +15051,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -14615,6 +15082,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -14646,6 +15114,7 @@
       "combat",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -14682,6 +15151,7 @@
       "combat",
       "hittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -14717,6 +15187,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -14747,6 +15218,7 @@
       "mining",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -14776,6 +15248,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -14804,6 +15277,7 @@
       "combat",
       "xenon"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -14838,6 +15312,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -14867,6 +15342,7 @@
       "unhittable",
       "xenon"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -14901,6 +15377,7 @@
       "hittable",
       "xenon"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -14935,6 +15412,7 @@
       "standard",
       "unhittable"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -14964,6 +15442,7 @@
       "hittable",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": false,
     "size": "medium",
     "cost": {
@@ -14991,6 +15470,7 @@
     "slotTags": [
       "ship_xen_xl_mothership_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -15018,6 +15498,7 @@
     "slotTags": [
       "arg_destroyer_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -15051,6 +15532,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -15084,6 +15566,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -15118,6 +15601,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -15151,6 +15635,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -15187,6 +15672,7 @@
       "atf_battleship_01",
       "mandatory"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -15220,6 +15706,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -15254,6 +15741,9 @@
       "combat",
       "missile"
     ],
+    "ammunitionTags": [
+      "dumbfire"
+    ],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -15281,6 +15771,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -15315,6 +15806,9 @@
       "combat",
       "missile"
     ],
+    "ammunitionTags": [
+      "guided"
+    ],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -15343,6 +15837,7 @@
       "advanced",
       "combat"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -15376,6 +15871,7 @@
       "advanced",
       "mining"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -15402,6 +15898,7 @@
     "slotTags": [
       "advanced"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -15437,6 +15934,9 @@
       "combat",
       "missile"
     ],
+    "ammunitionTags": [
+      "torpedo"
+    ],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -15465,6 +15965,7 @@
       "advanced",
       "combat"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -15499,6 +16000,9 @@
       "combat",
       "missile"
     ],
+    "ammunitionTags": [
+      "dumbfire"
+    ],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -15527,6 +16031,7 @@
       "advanced",
       "combat"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -15561,6 +16066,9 @@
       "combat",
       "missile"
     ],
+    "ammunitionTags": [
+      "guided"
+    ],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -15589,6 +16097,7 @@
       "advanced",
       "combat"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -15622,6 +16131,7 @@
       "advanced",
       "mining"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -15649,6 +16159,9 @@
       "advanced",
       "combat",
       "missile"
+    ],
+    "ammunitionTags": [
+      "torpedo"
     ],
     "integrated": true,
     "size": "small",
@@ -15678,6 +16191,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -15722,6 +16236,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -15768,6 +16283,7 @@
       "mandatory",
       "ship_gen_m_corvette_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -15805,6 +16321,9 @@
     "slotTags": [
       "missile",
       "standard"
+    ],
+    "ammunitionTags": [
+      "dumbfire"
     ],
     "integrated": true,
     "size": "medium",
@@ -15845,6 +16364,9 @@
       "missile",
       "standard"
     ],
+    "ammunitionTags": [
+      "dumbfire"
+    ],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -15884,6 +16406,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -15928,6 +16451,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -15972,6 +16496,9 @@
       "missile",
       "standard"
     ],
+    "ammunitionTags": [
+      "guided"
+    ],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -16010,6 +16537,9 @@
     "slotTags": [
       "missile",
       "standard"
+    ],
+    "ammunitionTags": [
+      "guided"
     ],
     "integrated": true,
     "size": "medium",
@@ -16050,6 +16580,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -16094,6 +16625,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -16138,6 +16670,7 @@
       "mining",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -16175,6 +16708,7 @@
       "mining",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -16214,6 +16748,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -16258,6 +16793,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -16304,6 +16840,7 @@
       "mandatory",
       "ship_gen_m_corvette_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -16342,6 +16879,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -16386,6 +16924,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -16430,6 +16969,9 @@
       "missile",
       "standard"
     ],
+    "ammunitionTags": [
+      "torpedo"
+    ],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -16468,6 +17010,9 @@
     "slotTags": [
       "missile",
       "standard"
+    ],
+    "ammunitionTags": [
+      "torpedo"
     ],
     "integrated": true,
     "size": "medium",
@@ -16508,6 +17053,7 @@
       "mandatory",
       "ship_gen_m_yacht_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -16546,6 +17092,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -16590,6 +17137,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -16634,6 +17182,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -16672,6 +17221,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -16710,6 +17260,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -16748,6 +17299,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -16786,6 +17338,9 @@
       "missile",
       "standard"
     ],
+    "ammunitionTags": [
+      "dumbfire"
+    ],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -16822,6 +17377,9 @@
     "slotTags": [
       "missile",
       "standard"
+    ],
+    "ammunitionTags": [
+      "dumbfire"
     ],
     "integrated": true,
     "size": "small",
@@ -16861,6 +17419,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -16905,6 +17464,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -16949,6 +17509,9 @@
       "missile",
       "standard"
     ],
+    "ammunitionTags": [
+      "guided"
+    ],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -16985,6 +17548,9 @@
     "slotTags": [
       "missile",
       "standard"
+    ],
+    "ammunitionTags": [
+      "guided"
     ],
     "integrated": true,
     "size": "small",
@@ -17025,6 +17591,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -17069,6 +17636,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -17113,6 +17681,7 @@
       "mining",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -17149,6 +17718,7 @@
       "mining",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -17188,6 +17758,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -17231,6 +17802,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -17275,6 +17847,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -17319,6 +17892,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -17363,6 +17937,9 @@
       "missile",
       "standard"
     ],
+    "ammunitionTags": [
+      "torpedo"
+    ],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -17401,6 +17978,9 @@
     "slotTags": [
       "missile",
       "standard"
+    ],
+    "ammunitionTags": [
+      "torpedo"
     ],
     "integrated": true,
     "size": "small",
@@ -17443,6 +18023,7 @@
       "mandatory",
       "ship_kha_l_destroyer_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {},
@@ -17471,6 +18052,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {},
@@ -17499,6 +18081,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {},
@@ -17528,6 +18111,7 @@
       "mandatory",
       "ship_kha_xl_battleship_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {},
@@ -17554,6 +18138,7 @@
     "slotTags": [
       "par_destroyer_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -17587,6 +18172,7 @@
     "slotTags": [
       "ship_par_l_expeditionary_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -17620,6 +18206,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -17653,6 +18240,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -17687,6 +18275,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -17720,6 +18309,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -17753,6 +18343,7 @@
     "slotTags": [
       "pir_battleship_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "extralarge",
     "cost": {
@@ -17785,6 +18376,7 @@
     "slotTags": [
       "spl_destroyer_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -17818,6 +18410,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -17850,6 +18443,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -17883,6 +18477,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -17916,6 +18511,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -17950,6 +18546,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -17983,6 +18580,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -18016,6 +18614,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -18049,6 +18648,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -18082,6 +18682,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -18114,6 +18715,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -18147,6 +18749,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -18180,6 +18783,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -18214,6 +18818,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -18247,6 +18852,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -18280,6 +18886,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -18312,6 +18919,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -18344,6 +18952,7 @@
     "slotTags": [
       "tel_destroyer_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -18377,6 +18986,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -18410,6 +19020,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -18443,6 +19054,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -18476,6 +19088,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -18508,6 +19121,7 @@
     "slotTags": [
       "ter_destroyer_01"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -18543,6 +19157,9 @@
       "mandatory",
       "ship_ter_l_flagship_01"
     ],
+    "ammunitionTags": [
+      "ship_ter_l_flagship_01"
+    ],
     "integrated": true,
     "size": "large",
     "cost": {
@@ -18576,6 +19193,7 @@
     "slotTags": [
       "highpower"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -18609,6 +19227,7 @@
     "slotTags": [
       "highpower"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -18642,6 +19261,7 @@
     "slotTags": [
       "highpower"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -18675,6 +19295,7 @@
     "slotTags": [
       "highpower"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -18709,6 +19330,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -18743,6 +19365,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -18778,6 +19401,7 @@
       "advanced",
       "combat"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -18816,6 +19440,7 @@
     "slotTags": [
       "highpower"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -18849,6 +19474,7 @@
     "slotTags": [
       "highpower"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -18882,6 +19508,7 @@
     "slotTags": [
       "highpower"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -18915,6 +19542,7 @@
     "slotTags": [
       "highpower"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -18949,6 +19577,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -18983,6 +19612,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -19018,6 +19648,7 @@
       "advanced",
       "combat"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -19058,6 +19689,7 @@
       "advanced",
       "combat"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -19097,6 +19729,7 @@
       "combat",
       "xenon"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -19135,6 +19768,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -19168,6 +19802,7 @@
       "combat",
       "xenon"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -19206,6 +19841,7 @@
       "mining",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -19234,6 +19870,7 @@
       "mining",
       "xenon"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "medium",
     "cost": {
@@ -19267,6 +19904,7 @@
       "combat",
       "xenon"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {
@@ -19305,6 +19943,7 @@
       "combat",
       "standard"
     ],
+    "ammunitionTags": [],
     "integrated": true,
     "size": "small",
     "cost": {

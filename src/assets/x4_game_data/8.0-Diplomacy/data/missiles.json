@@ -9,6 +9,9 @@
       "equipment",
       "missile"
     ],
+    "missileTags": [
+      "dumbfire"
+    ],
     "cost": {
       "default": {
         "energycells": 30.0,
@@ -45,6 +48,9 @@
     "tags": [
       "equipment",
       "missile"
+    ],
+    "missileTags": [
+      "dumbfire"
     ],
     "cost": {
       "default": {
@@ -83,6 +89,9 @@
       "equipment",
       "missile"
     ],
+    "missileTags": [
+      "guided"
+    ],
     "cost": {
       "default": {
         "energycells": 15.0,
@@ -111,6 +120,9 @@
     "tags": [
       "equipment",
       "missile"
+    ],
+    "missileTags": [
+      "dumbfire"
     ],
     "cost": {
       "default": {
@@ -149,6 +161,9 @@
       "equipment",
       "missile"
     ],
+    "missileTags": [
+      "dumbfire"
+    ],
     "cost": {
       "default": {
         "energycells": 14.0,
@@ -185,6 +200,9 @@
     "tags": [
       "equipment",
       "missile"
+    ],
+    "missileTags": [
+      "dumbfire"
     ],
     "cost": {
       "default": {
@@ -223,6 +241,9 @@
       "equipment",
       "missile"
     ],
+    "missileTags": [
+      "dumbfire"
+    ],
     "cost": {
       "default": {
         "energycells": 10.0,
@@ -259,6 +280,9 @@
     "tags": [
       "equipment",
       "missile"
+    ],
+    "missileTags": [
+      "guided"
     ],
     "cost": {
       "default": {
@@ -297,6 +321,9 @@
       "equipment",
       "missile"
     ],
+    "missileTags": [
+      "ship_ter_l_flagship_01"
+    ],
     "cost": {
       "default": {
         "energycells": 8.0,
@@ -332,6 +359,9 @@
       "equipment",
       "missile"
     ],
+    "missileTags": [
+      "ship_ter_l_flagship_01"
+    ],
     "cost": {
       "default": {
         "energycells": 8.0,
@@ -366,6 +396,9 @@
     "tags": [
       "equipment",
       "missile"
+    ],
+    "missileTags": [
+      "guided"
     ],
     "cost": {
       "default": {
@@ -406,6 +439,9 @@
       "equipment",
       "missile"
     ],
+    "missileTags": [
+      "guided"
+    ],
     "cost": {
       "default": {
         "energycells": 8.0,
@@ -443,6 +479,9 @@
     "tags": [
       "equipment",
       "missile"
+    ],
+    "missileTags": [
+      "guided"
     ],
     "cost": {
       "default": {
@@ -483,6 +522,9 @@
       "equipment",
       "missile"
     ],
+    "missileTags": [
+      "guided"
+    ],
     "cost": {
       "default": {
         "energycells": 10.0,
@@ -521,6 +563,9 @@
       "equipment",
       "missile"
     ],
+    "missileTags": [
+      "guided"
+    ],
     "cost": {
       "default": {
         "energycells": 12.0,
@@ -550,6 +595,9 @@
       "equipment",
       "missile"
     ],
+    "missileTags": [
+      "dumbfire"
+    ],
     "cost": {
       "default": {
         "energycells": 5.0,
@@ -577,6 +625,9 @@
     "tags": [
       "equipment",
       "missile"
+    ],
+    "missileTags": [
+      "guided"
     ],
     "cost": {
       "default": {
@@ -617,6 +668,9 @@
       "equipment",
       "missile"
     ],
+    "missileTags": [
+      "guided"
+    ],
     "cost": {
       "default": {
         "energycells": 10.0,
@@ -655,6 +709,9 @@
       "equipment",
       "missile"
     ],
+    "missileTags": [
+      "guided"
+    ],
     "cost": {
       "default": {
         "energycells": 17.0,
@@ -683,6 +740,9 @@
     "tags": [
       "equipment",
       "missile"
+    ],
+    "missileTags": [
+      "guided"
     ],
     "cost": {
       "default": {
@@ -723,6 +783,9 @@
       "equipment",
       "missile"
     ],
+    "missileTags": [
+      "guided"
+    ],
     "cost": {
       "default": {
         "energycells": 10.0,
@@ -760,6 +823,9 @@
     "tags": [
       "equipment",
       "missile"
+    ],
+    "missileTags": [
+      "torpedo"
     ],
     "cost": {
       "default": {
@@ -801,6 +867,9 @@
     "tags": [
       "equipment",
       "missile"
+    ],
+    "missileTags": [
+      "torpedo"
     ],
     "cost": {
       "default": {

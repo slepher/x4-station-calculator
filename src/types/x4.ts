@@ -70,6 +70,8 @@ export interface X4Ship {
   name: string;
   class: 'ship_s' | 'ship_m' | 'ship_l' | 'ship_xl';
   type: string;
+  purposePrimary: string;
+  droneTags: string[];
   race: string;
   shipgroup?: string;
   noplayerblueprint: boolean;
@@ -123,6 +125,7 @@ export interface X4Equipment {
   tags: string[];
   noplayerblueprint: boolean;
   slotTags: string[];
+  ammunitionTags: string[];
   integrated: boolean;
   cost: Record<string, Partial<Record<string, number>>>;
   // 引擎数据 (engine)
@@ -171,6 +174,7 @@ export interface X4Missile {
   macro: string;
   class: string;
   tags: string[];
+  missileTags: string[];
   cost: Record<string, Partial<Record<string, number>>>;
   amount: number;
   lifetime: number;
@@ -215,6 +219,10 @@ export interface X4Drone {
   class: 'ship_xs' | 'ship_s';
   mk: string | null;
   race: string | null;
+  purposePrimary: string;
+  droneTags: string[];
+  noplayerblueprint: boolean;
+  cargo: Array<{ type: 'container' | 'solid' | 'liquid' | 'condensate'; capacity: number }>;
   tags: string[];
   cost: Record<string, Partial<Record<string, number>>>;
 }
