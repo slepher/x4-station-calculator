@@ -1060,8 +1060,7 @@ watch(slotTargets, () => {
     <div class="panel-header">
       <span>{{ $t('ship_build.panel_fit') }}</span>
     </div>
-    <div class="fit-panel-content" data-testid="ship-build-fit-panel">
-      <div class="arsenal-shell">
+    <div class="arsenal-shell" data-testid="ship-build-fit-panel">
         <aside class="left-rail">
           <button
             v-for="slotType in availableSlotTypes"
@@ -1296,7 +1295,6 @@ watch(slotTargets, () => {
             </template>
           </main>
         </div>
-      </div>
     </div>
   </div>
 </template>
@@ -1310,11 +1308,7 @@ watch(slotTargets, () => {
   @apply flex items-center justify-between px-4 py-3 text-slate-200 text-sm font-semibold border-b border-slate-800/70 bg-slate-900/50;
 }
 
-.fit-panel-content {
-  @apply p-4;
-}
-
-.arsenal-shell { @apply rounded-lg border border-sky-700/40 bg-[#032042] p-2 flex gap-2; }
+.arsenal-shell { @apply bg-[#032042] p-2 flex gap-2; }
 .left-rail { @apply w-9 rounded bg-[#00152f] border border-sky-900/70 flex flex-col items-center gap-2 py-2; }
 .left-rail.locked { @apply opacity-60; }
 .slot-type-btn { @apply w-6 h-6 rounded-full border border-slate-500/70 bg-slate-800/80 text-[10px] font-bold text-slate-200; }
