@@ -2530,6 +2530,50 @@ class X4PrecisionLoader:
             json.dump(res_list, f, indent=2, ensure_ascii=False)
         print(f"   ✅ Written res.json with {len(res_list)} items.")
 
+    def _build_ship_slots_maxes(self):
+        ship_class_order = ["ship_s", "ship_m", "ship_l", "ship_xl"]
+        slot_order = ["engine", "shield", "thruster", "turret", "weapon"]
+        size_order = ["small", "medium", "large", "extralarge"]
+
+        maxes = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
+
+        for ship in self.ships_data:
+            ship_class = ship.get("class")
+            if ship_class not in ship_class_order:
+                continue
+
+            for slot in ship.get("slots", []):
+                slot_type = slot.get("type")
+                if slot_type not in slot_order:
+                    continue
+
+                count_map = slot.get("count") or {}
+                for size, count in count_map.items():
+                    if size not in size_order:
+                        continue
+                    n = int(count or 0)
+                    if n > maxes[ship_class][slot_type][size]:
+                        maxes[ship_class][slot_type][size] = n
+
+        result = {}
+        for ship_class in ship_class_order:
+            items = []
+            slot_map = maxes.get(ship_class, {})
+            for slot_type in slot_order:
+                size_map = slot_map.get(slot_type, {})
+                for size in size_order:
+                    count = int(size_map.get(size, 0))
+                    if count <= 0:
+                        continue
+                    items.append({
+                        "slot": slot_type,
+                        "size": size,
+                        "count": count
+                    })
+            result[ship_class] = items
+
+        return result
+
     # =======================================================
     # 5. 保存结果
     # =======================================================
@@ -2552,6 +2596,8 @@ class X4PrecisionLoader:
             json.dump(self.race_consumption, f, indent=2, ensure_ascii=False)
         with open(os.path.join(data_dir, "ships.json"), 'w', encoding='utf-8') as f:
             json.dump(self.ships_data, f, indent=2, ensure_ascii=False)
+        with open(os.path.join(data_dir, "ship_slots.json"), 'w', encoding='utf-8') as f:
+            json.dump(self._build_ship_slots_maxes(), f, indent=2, ensure_ascii=False)
         with open(os.path.join(data_dir, "default_maxes.json"), 'w', encoding='utf-8') as f:
             json.dump(self.ship_max_stats, f, indent=2, ensure_ascii=False)
         with open(os.path.join(data_dir, "equipments.json"), 'w', encoding='utf-8') as f:
