@@ -153,8 +153,10 @@ const initFromBlueprint = () => {
   })
 }
 
-// Watch for blueprint changes
-watch(() => store.blueprint, initFromBlueprint, { immediate: true })
+// Watch for blueprint or selectedShip changes
+watch([() => store.blueprint, () => props.selectedShip], () => {
+  initFromBlueprint()
+}, { immediate: true })
 
 // Calculate totals
 const deployableTotal = computed(() => {
@@ -178,6 +180,13 @@ const getDroneDragMax = (excludeId?: string) => {
     .filter(([id]) => id !== excludeId)
     .reduce((sum, [_, count]) => sum + count, 0)
   return Math.max(0, unitLimit.value - used)
+}
+
+const getMissileDragMax = (excludeId?: string) => {
+  const used = Object.entries(localMissiles.value)
+    .filter(([id]) => id !== excludeId)
+    .reduce((sum, [_, count]) => sum + count, 0)
+  return Math.max(0, missileLimit.value - used)
 }
 
 // Save to blueprint
@@ -346,9 +355,11 @@ const getItemName = (item: any) => {
               :model-value="localMissiles[item.id] || 0"
               :min="0"
               :max="missileLimit"
+              :drag-max="getMissileDragMax(item.id)"
               :step="1"
               track-bg-color="rgb(30 41 59 / 1)"
               track-border-color="rgb(51 65 85 / 0.7)"
+              fill-color="rgb(59 130 246 / 0.8)"
               @update:model-value="handleMissileChange(item.id, $event)"
               @commit="handleMissileChange(item.id, $event)"
             />
