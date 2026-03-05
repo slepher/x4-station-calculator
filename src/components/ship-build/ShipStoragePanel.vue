@@ -33,10 +33,12 @@ const droneItems = computed(() => {
   // Filter drones based on matching rules
   const matched = (dronesRaw as any[]).filter((drone) => {
     const droneNoBlueprint = drone.noplayerblueprint === true
+    const droneDeployable = drone.deployable === true
     const droneTags = drone.droneTags || []
 
-    // First filter: noplayerblueprint=false
+    // First filter: noplayerblueprint=false and deployable=false
     if (droneNoBlueprint) return false
+    if (droneDeployable) return false
 
     // If ship droneTags is empty, match all drones with empty tags
     if (shipDroneTags.length === 0) {
