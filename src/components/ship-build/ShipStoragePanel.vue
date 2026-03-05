@@ -8,6 +8,7 @@ import X4DualPhaseRangeSlider from '@/components/common/X4DualPhaseRangeSlider.v
 import consumablesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/consumables.json'
 import dronesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/drones.json'
 import missilesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/missiles.json'
+import equipmentsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
 
 const { t } = useI18n()
 const { translate } = useX4I18n()
@@ -54,15 +55,55 @@ const droneItems = computed(() => {
   return matched.slice(0, 10)
 })
 
-const missileItems = computed(() => {
-  return missilesRaw.slice(0, 3)
-})
-
 // Storage limits from ship
 const deployableLimit = computed(() => props.selectedShip?.storage?.deployable || 0)
 const countermeasureLimit = computed(() => props.selectedShip?.storage?.countermeasure || 0)
 const unitLimit = computed(() => props.selectedShip?.storage?.unit || 0)
-const missileLimit = 20
+const missileLimit = computed(() => props.selectedShip?.storage?.missile || 0)
+
+// Get all ammunitionTags from ship's weapons and turrets
+const shipAmmunitionTags = computed(() => {
+  const bp = store.blueprint
+  if (!bp) return []
+
+  const tagSet = new Set<string>()
+
+  bp.connections.forEach((conn) => {
+    // Skip non-weapon slot types
+    if (conn.slot_type !== 'weapon' && conn.slot_type !== 'turret') return
+
+    conn.group.forEach((g) => {
+      if (!g.equipment_id) return
+
+      const equipment = (equipmentsRaw as any[]).find(e => e.id === g.equipment_id)
+      if (!equipment) return
+
+      const ammoTags: string[] = equipment.ammunitionTags || []
+      ammoTags.forEach((tag: string) => tagSet.add(tag))
+    })
+  })
+
+  return Array.from(tagSet)
+})
+
+// Missile matching based on ship's ammunitionTags
+const missileItems = computed(() => {
+  const ammoTags: string[] = shipAmmunitionTags.value
+
+  // If no ammunitionTags, return empty
+  if (ammoTags.length === 0) {
+    return []
+  }
+
+  // Match missiles that have all ammunitionTags
+  const matched = (missilesRaw as any[]).filter((missile) => {
+    const missileTags = missile.missileTags || []
+    // Match if missile has all the ship's ammunitionTags
+    return ammoTags.every((tag: string) => missileTags.includes(tag))
+  })
+
+  return matched.slice(0, 10)
+})
 
 // Current storage state from blueprint
 const currentStorage = computed(() => {
