@@ -28,21 +28,24 @@ const countermeasureItems = computed(() => {
 })
 
 const droneItems = computed(() => {
-  const shipPurpose = props.selectedShip?.purposePrimary || ''
-  const specialPurposes = ['build', 'mine_liquid', 'mine_solid']
+  const shipDroneTags = props.selectedShip?.droneTags || []
 
-  // Filter drones based on ship's purposePrimary
+  // Filter drones based on matching rules
   const matched = (dronesRaw as any[]).filter((drone) => {
-    const dronePurpose = drone.purposePrimary || ''
-    const isNoBlueprint = drone.noplayerblueprint === true
+    const droneNoBlueprint = drone.noplayerblueprint === true
+    const droneTags = drone.tags || []
 
-    if (specialPurposes.includes(shipPurpose)) {
-      // If ship has special purpose, match drones with same purpose OR noplayerblueprint=false
-      return dronePurpose === shipPurpose || !isNoBlueprint
-    } else {
-      // If ship has other purpose, match drones with noplayerblueprint=false and not in special purposes
-      return !isNoBlueprint && !specialPurposes.includes(dronePurpose)
+    // First filter: noplayerblueprint=false
+    if (droneNoBlueprint) return false
+
+    // If ship droneTags is empty, match all drones with empty tags
+    if (shipDroneTags.length === 0) {
+      return droneTags.length === 0
     }
+
+    // If ship droneTags is non-empty, match drones with all tags included OR empty tags
+    const hasMatchingTag = shipDroneTags.length > 0 && shipDroneTags.every((tag: string) => droneTags.includes(tag))
+    return hasMatchingTag || droneTags.length === 0
   })
 
   // Return matched drones (max 10 to avoid too many options)
