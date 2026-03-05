@@ -33,7 +33,7 @@ const droneItems = computed(() => {
   // Filter drones based on matching rules
   const matched = (dronesRaw as any[]).filter((drone) => {
     const droneNoBlueprint = drone.noplayerblueprint === true
-    const droneTags = drone.tags || []
+    const droneTags = drone.droneTags || []
 
     // First filter: noplayerblueprint=false
     if (droneNoBlueprint) return false
