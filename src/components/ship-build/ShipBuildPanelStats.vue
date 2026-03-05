@@ -608,6 +608,7 @@ const buildDetailStatsByUseEquipmentStats = (ship: X4Ship, blueprintData: ShipBl
     <MetricsPanel
       panel-id="ship-build-stats-panel"
       :title="t('ship_build.panel_stats')"
+      header-height="48px"
       :obj-current="panelCurrentValues"
       :obj-target="panelTargetValues"
       :schema="panelSchema"

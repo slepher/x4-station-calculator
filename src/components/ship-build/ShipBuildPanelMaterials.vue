@@ -397,7 +397,7 @@ const getShipName = (shipId: string | undefined) => {
 }
 
 .panel-header {
-  @apply flex items-center justify-between px-4 py-3 text-slate-200 text-sm font-semibold border-b border-slate-800/70 bg-slate-900/50;
+  @apply h-12 flex items-center justify-between px-4 py-0 text-slate-200 text-sm font-semibold border-b border-slate-800/70 bg-slate-900/50;
 }
 
 .material-panel {

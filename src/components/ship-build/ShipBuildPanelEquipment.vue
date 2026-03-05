@@ -333,6 +333,7 @@ const panelTargetValues = computed<MetricValueMap | null>(() => {
     <MetricsPanel
       panel-id="ship-build-equipment"
       :title="displayEquipment ? translateEquipment(displayEquipment) : ''"
+      header-height="48px"
       :obj-current="panelCurrentValues"
       :obj-target="panelTargetValues"
       :schema="panelSchema"

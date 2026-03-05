@@ -7,11 +7,17 @@ const props = withDefaults(defineProps<{
   max?: number
   step?: number
   disabled?: boolean
+  trackBgColor?: string
+  trackBorderColor?: string
+  fillColor?: string
 }>(), {
   min: 0,
   max: 100,
   step: 1,
   disabled: false,
+  trackBgColor: '#1e293b',
+  trackBorderColor: '#334155',
+  fillColor: '#0a3c73',
 })
 
 const emit = defineEmits<{
@@ -33,8 +39,16 @@ const fillStyle = computed(() => {
   const span = props.max - props.min
   if (span <= 0) return { width: '0%' }
   const percent = ((normalizedValue.value - props.min) / span) * 100
-  return { width: `${Math.min(100, Math.max(0, percent))}%` }
+  return {
+    width: `${Math.min(100, Math.max(0, percent))}%`,
+    backgroundColor: props.fillColor,
+  }
 })
+
+const trackStyle = computed(() => ({
+  backgroundColor: props.trackBgColor,
+  borderColor: props.trackBorderColor,
+}))
 
 const toNumber = (event: Event): number => {
   const input = event.target as HTMLInputElement
@@ -101,7 +115,7 @@ onBeforeUnmount(() => {
       @input="handleInput"
       @change="handleChange"
     >
-    <div class="slider-track-bg">
+    <div class="slider-track-bg" :style="trackStyle">
       <div class="slider-fill" :style="fillStyle"></div>
     </div>
   </div>
@@ -117,10 +131,10 @@ onBeforeUnmount(() => {
 }
 
 .slider-track-bg {
-  @apply w-full h-[8px] bg-slate-800 rounded border border-slate-700 overflow-hidden;
+  @apply w-full h-[8px] rounded border overflow-hidden;
 }
 
 .slider-fill {
-  @apply h-full bg-[#0a3c73] transition-all duration-200;
+  @apply h-full transition-all duration-200;
 }
 </style>

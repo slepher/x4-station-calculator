@@ -20,13 +20,15 @@ const props = withDefaults(defineProps<{
   viewTab?: MetricsPanelViewTab | null
   roundedKeys?: string[]
   hideHeader?: boolean
+  headerHeight?: string
 }>(), {
   title: 'Metrics Panel',
   panelId: 'default',
   order: 'row',
   viewTab: null,
   roundedKeys: () => [],
-  hideHeader: false
+  hideHeader: false,
+  headerHeight: ''
 })
 
 const currentMode = ref(props.viewTab?.views[0]?.mode || '')
@@ -79,11 +81,25 @@ const gridStyle = computed(() => ({
 }))
 
 const labelText = (labelKey: string) => labelKey
+
+const headerStyle = computed(() => {
+  if (!props.headerHeight) return undefined
+  return {
+    height: props.headerHeight,
+    paddingTop: '0',
+    paddingBottom: '0',
+  }
+})
 </script>
 
 <template>
   <div class="metrics-panel" :data-testid="`metrics-panel-${panelId}`">
-    <div v-if="!hideHeader" class="metrics-panel-header" :data-testid="`metrics-panel-header-${panelId}`">
+    <div
+      v-if="!hideHeader"
+      class="metrics-panel-header"
+      :style="headerStyle"
+      :data-testid="`metrics-panel-header-${panelId}`"
+    >
       <span class="metrics-panel-title">{{ title }}</span>
       <ViewTabUI
         v-if="viewTab && viewTab.views.length > 0"

@@ -192,7 +192,7 @@ watch(selectedShipId, (next, prev) => {
 
 <template>
   <div class="ship-build-view flex flex-col gap-6">
-    <div class="panel-card" data-testid="ship-build-filters">
+    <div v-if="!selectedShip" class="panel-card" data-testid="ship-build-filters">
       <div class="panel-header">
         <div class="flex items-center gap-2">
           <span class="text-emerald-300 text-xs font-semibold">{{ t('ship_build.title') }}</span>

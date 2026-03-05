@@ -72,7 +72,7 @@ const emit = defineEmits<{
 
 const shipBuildStore = useShipBuildStore()
 const { selectedShip, blueprint, mockTagPatch } = storeToRefs(shipBuildStore)
-const { applyConnectionAssignment, setConnectionAssignmentCount } = shipBuildStore
+const { applyConnectionAssignment, setConnectionAssignmentCount, setSelectedShipId } = shipBuildStore
 
 // Equipment map for stats lookup
 const equipmentMap = new Map<string, X4Equipment>()
@@ -153,7 +153,7 @@ const handlePickerOpenChange = (open: boolean) => {
 }
 
 const { t } = useI18n()
-const { translateSlotTag, translateEquipment, translateEquipmentType } = useX4I18n()
+const { translateSlotTag, translateEquipment, translateEquipmentType, translateShip } = useX4I18n()
 const slotTags = slotTagsRaw as X4SlotTag[]
 const slotTagMap = new Map<string, X4SlotTag>(slotTags.map((tag) => [tag.id, tag]))
 const equipments = equipmentsRaw as X4Equipment[]
@@ -1058,7 +1058,15 @@ watch(slotTargets, () => {
 <template>
   <div class="col-span-12 panel-card" :class="wide ? 'lg:col-span-8' : 'lg:col-span-4'" data-testid="ship-build-panel-fit">
     <div class="panel-header">
-      <span>{{ $t('ship_build.panel_fit') }}</span>
+      <span>{{ selectedShip ? translateShip(selectedShip) : $t('ship_build.panel_fit') }}</span>
+      <button
+        v-if="selectedShip"
+        class="selection-change-btn"
+        data-testid="ship-build-change-ship-fit-header"
+        @click="setSelectedShipId(null)"
+      >
+        {{ t('ship_build.change_ship') }}
+      </button>
     </div>
     <div class="arsenal-shell" data-testid="ship-build-fit-panel">
         <aside class="left-rail">
@@ -1086,8 +1094,8 @@ watch(slotTargets, () => {
                 </div>
                 <div class="picker-cell picker-right">
                   <div class="picker-actions-inline">
-                    <button class="mode-tab mode-tab-tall mr-1" data-testid="picker-cancel" @click="closePicker">{{ t('ui.cancel') }}</button>
-                    <button class="mode-tab mode-tab-tall" data-testid="picker-confirm" @click="handlePickerConfirm(highlightedEquipmentId)">{{ t('ship_build.fit_picker_confirm') }}</button>
+                    <button class="mode-tab mode-tab-tall picker-action-btn mr-1" data-testid="picker-cancel" @click="closePicker">{{ t('ui.cancel') }}</button>
+                    <button class="mode-tab mode-tab-tall picker-action-btn" data-testid="picker-confirm" @click="handlePickerConfirm(highlightedEquipmentId)">{{ t('ship_build.fit_picker_confirm') }}</button>
                   </div>
                 </div>
               </section>
@@ -1166,6 +1174,9 @@ watch(slotTargets, () => {
                           :min="0"
                           :max="target.totalCount"
                           :step="sliderStepForTarget(target)"
+                          track-bg-color="rgb(30 41 59 / 1)"
+                          track-border-color="rgb(51 65 85 / 0.7)"
+                          fill-color="rgb(16 185 129 / 0.8)"
                           :disabled="isCountSliderDisabled(target)"
                           @update:model-value="handleCountSliderRealtime(target, $event)"
                           @commit="handleCountSliderCommit(target, $event)"
@@ -1266,6 +1277,9 @@ watch(slotTargets, () => {
                     :min="0"
                     :max="target.totalCount"
                     :step="sliderStepForTarget(target)"
+                    track-bg-color="rgb(30 41 59 / 1)"
+                    track-border-color="rgb(51 65 85 / 0.7)"
+                    fill-color="rgb(16 185 129 / 0.8)"
                     :disabled="isCountSliderDisabled(target)"
                     @update:model-value="handleCountSliderRealtime(target, $event)"
                     @commit="handleCountSliderCommit(target, $event)"
@@ -1301,48 +1315,53 @@ watch(slotTargets, () => {
 
 <style scoped>
 .panel-card {
-  @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden;
+  @apply rounded-lg border border-slate-800 shadow-xl overflow-hidden;
 }
 
 .panel-header {
-  @apply flex items-center justify-between px-4 py-3 text-slate-200 text-sm font-semibold border-b border-slate-800/70 bg-slate-900/50;
+  @apply h-12 flex items-center justify-between px-4 py-0 text-slate-200 text-sm font-semibold border-b border-slate-800/70;
 }
 
-.arsenal-shell { @apply bg-[#032042] p-2 flex gap-2; }
-.left-rail { @apply w-9 rounded bg-[#00152f] border border-sky-900/70 flex flex-col items-center gap-2 py-2; }
+.selection-change-btn {
+  @apply px-3 py-1.5 rounded-full text-xs font-semibold border border-emerald-400/60 text-emerald-200 hover:bg-emerald-500/10 transition-colors;
+}
+
+.arsenal-shell { @apply p-2 flex gap-2; }
+.left-rail { @apply w-9 rounded border border-slate-700/70 flex flex-col items-center gap-2 py-2; }
 .left-rail.locked { @apply opacity-60; }
-.slot-type-btn { @apply w-6 h-6 rounded-full border border-slate-500/70 bg-slate-800/80 text-[10px] font-bold text-slate-200; }
-.slot-type-btn-active { @apply border-cyan-300 bg-[#2a86dd] text-white; }
+.slot-type-btn { @apply w-6 h-6 rounded-full border border-slate-500/70 text-[10px] font-bold text-slate-200; }
+.slot-type-btn-active { @apply border-emerald-300 text-emerald-100; }
 .arsenal-content { @apply flex-1 min-w-0; }
 .arsenal-main { @apply min-w-0; }
 .toolbar-row { @apply flex items-center justify-between gap-2; }
 .mode-tabs { @apply inline-flex items-center gap-1; }
-.mode-tab { @apply px-2.5 py-1 text-xs font-semibold text-slate-200 bg-[#0d315f] border border-sky-500/60 rounded; }
-.mode-tab.active { @apply bg-[#1f73c6] text-white; }
+.mode-tab { @apply px-2.5 py-1 text-xs font-semibold text-slate-200 border border-slate-700/60 rounded; }
+.mode-tab.active { @apply border-emerald-300 text-emerald-100; }
 .mode-tab:disabled { @apply opacity-40 cursor-not-allowed; }
 .mode-tab-tall { @apply h-[25.6px] px-2 flex items-center; }
+.picker-action-btn { @apply border-emerald-300 text-emerald-100; }
 .group-tabs { @apply flex flex-col gap-1 mt-2; }
 .group-tab-row { @apply flex flex-wrap items-center gap-1; }
-.group-tab { @apply px-2.5 py-0.5 text-[11px] border border-sky-500/60 rounded bg-[#07264a] text-slate-200; }
-.group-tab-active { @apply bg-[#2a86dd] text-white; }
-.compatibility-box { @apply mt-2 rounded border border-sky-700/60 bg-[#04254a] px-2 py-1.5; }
+.group-tab { @apply px-2.5 py-0.5 text-[11px] border border-slate-700/60 rounded text-slate-200; }
+.group-tab-active { @apply border-emerald-300 text-emerald-100; }
+.compatibility-box { @apply mt-2 rounded border border-slate-700/60 px-2 py-1.5; }
 .compatibility-title { @apply text-xs text-slate-100 font-semibold mb-0.5; }
 .compatibility-line { @apply text-[11px] text-slate-200; }
 .compatibility-line.tags { @apply text-sky-200; }
 .slot-wall { @apply min-w-0 mt-2 grid gap-2; }
 .slot-stack { @apply grid gap-1; }
 .slot-count-slider { @apply w-full; }
-.slot-row { @apply rounded border border-sky-700 bg-[#0a3c73] px-2 py-2 flex items-center justify-between text-left; }
-.slot-row-highlight { @apply border-emerald-300 ring-1 ring-emerald-400; }
-.slot-row-expanded { @apply border-cyan-300 ring-1 ring-cyan-400; }
+.slot-row { @apply rounded border border-slate-700 px-2 py-2 flex items-center justify-between text-left; }
+.slot-row-highlight { @apply border-lime-300 ring-1 ring-lime-400; }
+.slot-row-expanded { @apply border-emerald-200 ring-1 ring-emerald-300; }
 .slot-row-main { @apply min-w-0; }
 .slot-row-title { @apply text-xs text-slate-100 font-semibold; }
 .slot-row-value { @apply text-[11px] text-slate-300 mt-0.5 truncate; }
 .slot-row-value-mixed { @apply text-amber-300 font-semibold; }
 .slot-row-side { @apply flex items-center gap-2 ml-2; }
 .slot-row-count { @apply text-[10px] text-emerald-300; }
-.slot-row-candidate { @apply rounded border border-sky-500/70 px-1.5 py-0.5 text-[10px] text-slate-200; }
-.empty-card { @apply rounded border border-dashed border-sky-700 p-3 text-xs text-slate-300 text-center; }
+.slot-row-candidate { @apply rounded border border-slate-600/70 px-1.5 py-0.5 text-[10px] text-slate-200; }
+.empty-card { @apply rounded border border-dashed border-slate-700 p-3 text-xs text-slate-300 text-center; }
 
 .picker-grid-row { @apply grid gap-2 mt-2; grid-template-columns: minmax(0, calc(50% - 4rem)) minmax(0, 1fr); }
 .picker-cell { @apply min-h-20 min-w-0; }
@@ -1357,7 +1376,7 @@ watch(slotTargets, () => {
 .picker-right-tabs { @apply h-full items-end; }
 .picker-right-tabs .pager { @apply self-end; }
 .pager { @apply inline-flex items-center gap-1; }
-.pager-btn { @apply h-[25.6px] rounded border border-sky-600 px-1.5 py-0 text-[10px] text-slate-200 inline-flex items-center; }
+.pager-btn { @apply h-[25.6px] rounded border border-slate-600 px-1.5 py-0 text-[10px] text-slate-200 inline-flex items-center; }
 .pager-btn-active { @apply border-emerald-300 text-emerald-100; }
 .pager-btn:disabled { @apply opacity-40 cursor-not-allowed; }
 .picker-compat-box { @apply mt-0; }
@@ -1367,13 +1386,14 @@ watch(slotTargets, () => {
 .filter-group { @apply text-[10px] uppercase text-slate-300 font-semibold min-w-8; }
 .filter-items-race { @apply flex flex-wrap items-center gap-1.5; }
 .filter-items-race-two-rows { display: grid; grid-template-rows: repeat(2, minmax(0, auto)); grid-auto-flow: column; align-items: center; gap: 0.375rem; }
-.filter-chip { @apply rounded border border-slate-600 px-2 py-1 text-[10px] text-slate-200 bg-slate-900/50; }
-.filter-chip-active { @apply border-emerald-300 bg-emerald-500/20 text-emerald-100; }
+.filter-chip { @apply rounded border border-slate-600 px-2 py-1 text-[10px] text-slate-200; }
+.filter-chip-active { @apply border-emerald-300 text-emerald-100; }
 .chip-count { @apply text-[10px] text-slate-300 ml-1; }
 .picker-candidate-list { @apply mt-0 w-full; }
 .candidate-list { @apply grid grid-cols-1 gap-1.5; }
-.candidate-item { @apply rounded border border-sky-700 bg-[#0a3c73] px-2 py-1.5 text-left; }
-.candidate-item-active { @apply border-emerald-300 ring-1 ring-emerald-400; }
+.candidate-item { @apply rounded border border-slate-700 px-2 py-1.5 text-left; }
+.candidate-item-active { @apply border-emerald-200 ring-1 ring-emerald-300; }
+.candidate-item:focus-visible { @apply outline-none border-emerald-200 ring-1 ring-emerald-300; }
 .candidate-name { @apply text-xs text-slate-100; }
 .candidate-meta { @apply text-[10px] text-slate-300 mt-0.5; }
 .candidate-item { display: flex; justify-content: space-between; align-items: flex-start; }
