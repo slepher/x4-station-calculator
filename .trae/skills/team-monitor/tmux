@@ -1,0 +1,92 @@
+#!/bin/bash
+# tmux wrapper for Windows Terminal integration
+# Intercepts Claude Code's tmux calls and converts to wt.exe split-pane
+
+# Get current directory directly (inherited from parent process)
+CURRENT_DIR="$PWD"
+
+# Debug: log all invocations
+LOG_FILE="/tmp/tmux_wrapper.log"
+echo "=== $(date) ===" >> "$LOG_FILE"
+echo "Current dir: $CURRENT_DIR" >> "$LOG_FILE"
+echo "Args: $@" >> "$LOG_FILE"
+
+# Parse the command to understand what tmux operation is being requested
+# Claude typically calls: tmux split-window [-h] [-v] [-t <target>] -- <command>
+
+# Check if this is a split-window command
+if echo "$@" | grep -q "split-window"; then
+    echo "Detected split-window command" >> "$LOG_FILE"
+
+    # Determine split direction
+    SPLIT_H=""
+    if echo "$@" | grep -q "\-h"; then
+        SPLIT_H="true"
+        echo "Horizontal split (left/right)" >> "$LOG_FILE"
+    else
+        echo "Vertical split (top/bottom)" >> "$LOG_FILE"
+    fi
+
+    # Extract the actual command to run (everything after -- at the end)
+    CMD=""
+    if echo "$@" | grep -q " -- "; then
+        CMD=$(echo "$@" | sed 's/.* -- //')
+        echo "Command to run: $CMD" >> "$LOG_FILE"
+    fi
+
+    # Build wt.exe command with current directory
+    WT_CMD="wt.exe -w 0"
+
+    if [ -n "$SPLIT_H" ]; then
+        WT_CMD="$WT_CMD split-pane -H"
+    else
+        WT_CMD="$WT_CMD split-pane -V"
+    fi
+
+    # Add wsl.exe with command using current directory
+    if [ -n "$CMD" ]; then
+        # Use bash -ic to source profile and cd to directory
+        WT_CMD="$WT_CMD wsl.exe -e bash -ic \"cd '$CURRENT_DIR' && $CMD; exec bash\""
+    else
+        WT_CMD="$WT_CMD wsl.exe -e bash -ic \"cd '$CURRENT_DIR'; exec bash\""
+    fi
+
+    echo "Executing: $WT_CMD" >> "$LOG_FILE"
+
+    # Execute the converted command
+    eval $WT_CMD
+    exit $?
+fi
+
+# Check if this is a new-session command
+if echo "$@" | grep -q "new-session"; then
+    echo "Detected new-session command" >> "$LOG_FILE"
+
+    # Extract command
+    CMD=""
+    if echo "$@" | grep -q " -- "; then
+        CMD=$(echo "$@" | sed 's/.* -- //')
+    fi
+
+    # For new session, use current directory
+    if [ -n "$CMD" ]; then
+        wt.exe -w 0 new-tab wsl.exe -e bash -ic "cd '$CURRENT_DIR' && $CMD; exec bash"
+    else
+        wt.exe -w 0 new-tab wsl.exe -e bash -ic "cd '$CURRENT_DIR'; exec bash"
+    fi
+    exit $?
+fi
+
+# Fallback: open wsl with current directory
+echo "Unknown tmux command, falling back" >> "$LOG_FILE"
+
+if [ $# -gt 0 ]; then
+    if echo "$@" | grep -q " -- "; then
+        CMD=$(echo "$@" | sed 's/.* -- //')
+        wt.exe -w 0 new-tab wsl.exe -e bash -ic "cd '$CURRENT_DIR' && $CMD; exec bash"
+    else
+        wt.exe -w 0 new-tab wsl.exe -e bash -ic "cd '$CURRENT_DIR'; exec bash"
+    fi
+else
+    wt.exe -w 0 new-tab wsl.exe -e bash -ic "cd '$CURRENT_DIR'; exec bash"
+fi
