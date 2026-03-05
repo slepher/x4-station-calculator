@@ -127,3 +127,9 @@ await page.locator('.result-item').first().click();
   - 先尝试 `Enter/Escape` 退出编辑态，并在可见时点击 `.toolbar-panel input + button`；
   - 再执行常规 `toolbar-import-btn` 点击；
   - 若仍未出现弹窗，执行 `document.querySelector('[data-testid="toolbar-import-btn"]')?.click()` 的 DOM fallback，并配合短重试。
+
+
+## Ship Selector Helper 约束补充（2026-03-05）
+
+- 在 `ship-build` selector 模式下，不应读取仅存在于 workspace 的头部定位器（如 `ship-build-change-ship-fit-header`）；应先基于 selector 内控件（`ship-build-confirm-ship` / `ship-build-cancel-ship-change`）做前置断言。
+- Chapter 2 transition helper 复用于 Chapter 3 时，优先保证 helper 内部前置定位器与当前视图一致，可显著降低跨 case 复用时的超时波动。

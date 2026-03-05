@@ -72,7 +72,7 @@ const emit = defineEmits<{
 
 const shipBuildStore = useShipBuildStore()
 const { selectedShip, blueprint, mockTagPatch } = storeToRefs(shipBuildStore)
-const { applyConnectionAssignment, setConnectionAssignmentCount, setSelectedShipId } = shipBuildStore
+const { applyConnectionAssignment, setConnectionAssignmentCount, enterShipSelector } = shipBuildStore
 
 // Equipment map for stats lookup
 const equipmentMap = new Map<string, X4Equipment>()
@@ -1063,7 +1063,7 @@ watch(slotTargets, () => {
         v-if="selectedShip"
         class="selection-change-btn"
         data-testid="ship-build-change-ship-fit-header"
-        @click="setSelectedShipId(null)"
+        @click="enterShipSelector"
       >
         {{ t('ship_build.change_ship') }}
       </button>

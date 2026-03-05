@@ -1,0 +1,120 @@
+{
+  "ship_s": [
+    {
+      "slot": "engine",
+      "size": "small",
+      "count": 4
+    },
+    {
+      "slot": "shield",
+      "size": "small",
+      "count": 4
+    },
+    {
+      "slot": "thruster",
+      "size": "small",
+      "count": 1
+    },
+    {
+      "slot": "weapon",
+      "size": "small",
+      "count": 6
+    }
+  ],
+  "ship_m": [
+    {
+      "slot": "engine",
+      "size": "medium",
+      "count": 6
+    },
+    {
+      "slot": "shield",
+      "size": "medium",
+      "count": 3
+    },
+    {
+      "slot": "thruster",
+      "size": "medium",
+      "count": 1
+    },
+    {
+      "slot": "turret",
+      "size": "medium",
+      "count": 8
+    },
+    {
+      "slot": "weapon",
+      "size": "medium",
+      "count": 6
+    }
+  ],
+  "ship_l": [
+    {
+      "slot": "engine",
+      "size": "large",
+      "count": 7
+    },
+    {
+      "slot": "shield",
+      "size": "large",
+      "count": 4
+    },
+    {
+      "slot": "thruster",
+      "size": "large",
+      "count": 1
+    },
+    {
+      "slot": "turret",
+      "size": "medium",
+      "count": 16
+    },
+    {
+      "slot": "turret",
+      "size": "large",
+      "count": 8
+    },
+    {
+      "slot": "weapon",
+      "size": "large",
+      "count": 6
+    }
+  ],
+  "ship_xl": [
+    {
+      "slot": "engine",
+      "size": "extralarge",
+      "count": 5
+    },
+    {
+      "slot": "shield",
+      "size": "extralarge",
+      "count": 5
+    },
+    {
+      "slot": "thruster",
+      "size": "extralarge",
+      "count": 1
+    },
+    {
+      "slot": "turret",
+      "size": "medium",
+      "count": 93
+    },
+    {
+      "slot": "turret",
+      "size": "large",
+      "count": 16
+    },
+    {
+      "slot": "weapon",
+      "size": "large",
+      "count": 2
+    },
+    {
+      "slot": "weapon",
+      "size": "extralarge",
+      "count": 1
+    }
+  ]
+}

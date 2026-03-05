@@ -7,7 +7,7 @@ import ShipBuildWorkspaceView from '@/components/ship-build/ShipBuildWorkspaceVi
 
 const { translateEquipmentType, translateEquipment } = useX4I18n()
 const shipBuildStore = useShipBuildStore()
-const { selectedShip } = storeToRefs(shipBuildStore)
+const { viewMode } = storeToRefs(shipBuildStore)
 const { setDisplayResolvers } = shipBuildStore
 setDisplayResolvers({
   translateEquipment,
@@ -17,7 +17,7 @@ setDisplayResolvers({
 
 <template>
   <div class="ship-build-view flex flex-col gap-6">
-    <ShipBuildSelectorView v-if="!selectedShip" />
+    <ShipBuildSelectorView v-if="viewMode === 'selector'" />
     <ShipBuildWorkspaceView v-else />
   </div>
 </template>

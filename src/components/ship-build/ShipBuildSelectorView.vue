@@ -19,8 +19,8 @@ const shipRaces = shipRacesRaw as X4ShipRace[]
 const equipmentTypes = equipmentTypesRaw as X4EquipmentType[]
 
 const shipBuildStore = useShipBuildStore()
-const { selectedClass, selectedRaces, selectedTypes, selectedShipId, selectedShip } = storeToRefs(shipBuildStore)
-const { setSelectedShipId, setSelectedClass, toggleRace, toggleType, setSelectedTypes } = shipBuildStore
+const { selectedClass, selectedRaces, selectedTypes, selectedShipId, selectedShip, blueprint } = storeToRefs(shipBuildStore)
+const { setSelectedShipId, setSelectedClass, toggleRace, toggleType, setSelectedTypes, cancelShipSelector } = shipBuildStore
 
 const handleSelectedClassChange = (value: string | null) => {
   setSelectedClass(value as ShipBuildClass | null)
@@ -41,6 +41,10 @@ const handleSelectedTypesChange = (value: string[]) => {
 const handleSelectedShipIdChange = (value: string | null) => {
   setSelectedShipId(value)
 }
+
+const handleCancelShipChange = () => {
+  cancelShipSelector()
+}
 </script>
 
 <template>
@@ -59,6 +63,7 @@ const handleSelectedShipIdChange = (value: string | null) => {
       :selected-class="selectedClass"
       :selected-races="selectedRaces"
       :selected-types="selectedTypes"
+      :blueprint-ship-id="blueprint?.shipId || null"
       :ships="ships"
       :ship-types="shipTypes"
       :ship-races="shipRaces"
@@ -68,6 +73,7 @@ const handleSelectedShipIdChange = (value: string | null) => {
       @toggle-type="handleTypeToggle"
       @update:selected-types="handleSelectedTypesChange"
       @update:selected-ship-id="handleSelectedShipIdChange"
+      @cancel-ship-change="handleCancelShipChange"
     />
   </div>
 </template>

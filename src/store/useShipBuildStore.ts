@@ -12,6 +12,7 @@ const STORAGE_KEY = 'x4_ship_blueprints'
 export type StationActiveView = 'production' | 'flow' | 'ship-build'
 export type ShipBuildClass = 'ship_s' | 'ship_m' | 'ship_l' | 'ship_xl'
 export type ShipBuildStatsViewMode = 'summary' | 'detail'
+export type ShipBuildViewMode = 'selector' | 'workspace'
 export type ShipBuildMockTagPatch = {
   targetShipId: string
   slotType?: EquipmentType
@@ -70,6 +71,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   const selectedRaces = ref<string[]>([])
   const selectedTypes = ref<string[]>([])
   const selectedShipId = ref<string | null>(null)
+  const viewMode = ref<ShipBuildViewMode>('selector')
   const statsViewMode = ref<ShipBuildStatsViewMode>('summary')
   const fitMode = ref<FitMode>('connection')
   // Blueprint persistence state
@@ -155,6 +157,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
         selectedRaces.value = ship?.race ? [ship.race] : []
         selectedTypes.value = ship?.type ? [ship.type] : []
         selectedShipId.value = activeBlueprint.shipId
+        viewMode.value = 'workspace'
         blueprint.value = { ...activeBlueprint }
 
         // Set dirty to false by directly setting lastSavedSnapshot
@@ -483,26 +486,54 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   }, { immediate: true, deep: true })
 
   const setSelectedShipId = (shipId: string | null) => {
-    if (selectedShipId.value === shipId) return
-    // When changing ship (setting to null), clear the blueprint
-    if (shipId === null) {
-      blueprint.value = null
-      lastSavedSnapshot.value = null
-    } else {
-      // Create blueprint immediately when ship is selected
-      blueprint.value = {
-        id: '',
-        name: '',
-        shipId: shipId,
-        connections: [],
-        lastUpdated: Date.now()
+    if (selectedShipId.value === shipId) {
+      if (shipId !== null && viewMode.value === 'selector') {
+        viewMode.value = 'workspace'
       }
-      // Initialize snapshot for dirty check
-      takeSnapshot()
+      return
     }
+    // Keep current selection data and just switch to selector mode.
+    if (shipId === null) {
+      viewMode.value = 'selector'
+      return
+    }
+
+    // If selecting the same ship as current blueprint, restore it directly.
+    if (blueprint.value?.shipId === shipId) {
+      selectedShipId.value = shipId
+      fitMode.value = 'connection'
+      viewMode.value = 'workspace'
+      return
+    }
+
+    // Switching to a different ship: reset blueprint and start fresh.
+    blueprint.value = {
+      id: '',
+      name: '',
+      shipId: shipId,
+      connections: [],
+      lastUpdated: Date.now()
+    }
+    // Initialize snapshot for dirty check
+    takeSnapshot()
     selectedShipId.value = shipId
     selectedByConnection.value = {}
     fitMode.value = 'connection'
+    viewMode.value = 'workspace'
+  }
+
+  const enterShipSelector = () => {
+    viewMode.value = 'selector'
+  }
+
+  const cancelShipSelector = () => {
+    const currentShipEntity = selectedShip.value
+    if (currentShipEntity && selectedClass.value !== currentShipEntity.class) {
+      selectedClass.value = currentShipEntity.class
+      selectedRaces.value = currentShipEntity.race ? [currentShipEntity.race] : []
+      selectedTypes.value = currentShipEntity.type ? [currentShipEntity.type] : []
+    }
+    viewMode.value = 'workspace'
   }
 
   const setSelectedClass = (shipClass: ShipBuildClass | null) => {
@@ -978,6 +1009,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   const resetAll = () => {
     blueprint.value = null
     selectedShipId.value = null
+    viewMode.value = 'selector'
     selectedClass.value = null
     selectedRaces.value = []
     selectedTypes.value = []
@@ -996,6 +1028,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     selectedRaces,
     selectedTypes,
     selectedShipId,
+    viewMode,
     statsViewMode,
     fitMode,
     mockTagPatch,
@@ -1017,6 +1050,8 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     resetAll,
     // Legacy methods (keep for backward compatibility)
     setSelectedShipId,
+    enterShipSelector,
+    cancelShipSelector,
     setSelectedClass,
     toggleRace,
     toggleType,
