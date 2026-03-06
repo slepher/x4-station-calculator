@@ -11,6 +11,7 @@ import slotTagsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/slot_tags.json
 import equipmentsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
 import equipmentTypesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipment_types.json'
 import X4DualPhaseRangeSlider from '@/components/common/X4DualPhaseRangeSlider.vue'
+import ShipStoragePanel from '@/components/ship-build/ShipStoragePanel.vue'
 
 type AggregatedGroup = {
   key: string
@@ -351,7 +352,7 @@ const groupRows = computed<FitGroupRow[]>(() => {
 })
 
 const fitMode = ref<FitMode>('connection')
-const activeSlotType = ref<'engine' | 'shield' | 'weapon' | 'turret' | 'thruster' | ''>('')
+const activeSlotType = ref<'engine' | 'shield' | 'weapon' | 'turret' | 'thruster' | 'consumables' | 'units' | ''>('')
 const activeTabKey = ref('')
 const expandedSlotKey = ref<string | null>(null)
 const pendingExpandedConnectionKeys = ref<string[] | null>(null)
@@ -363,11 +364,13 @@ const highlightedEquipmentId = ref<string | null>(null)
 const draftCountByTarget = ref<Record<string, number>>({})
 
 const slotTypeDefs = [
-  { id: 'engine', label: 'E' },
-  { id: 'shield', label: 'S' },
-  { id: 'weapon', label: 'W' },
-  { id: 'turret', label: 'T' },
-  { id: 'thruster', label: 'R' }
+  { id: 'engine', label: 'E', tooltip: 'ship_build.slot_engine' },
+  { id: 'thruster', label: 'R', tooltip: 'ship_build.slot_thruster' },
+  { id: 'shield', label: 'S', tooltip: 'ship_build.slot_shield' },
+  { id: 'weapon', label: 'W', tooltip: 'ship_build.slot_weapon' },
+  { id: 'turret', label: 'T', tooltip: 'ship_build.slot_turret' },
+  { id: 'consumables', label: 'C', tooltip: 'ship_build.slot_consumables' },
+  { id: 'units', label: 'U', tooltip: 'ship_build.slot_units' }
 ] as const
 
 const sourceRows = computed(() => (fitMode.value === 'connection' ? connectionRows.value : groupRows.value))
@@ -417,7 +420,9 @@ const setMode = (mode: FitMode) => {
 
 const availableSlotTypes = computed(() => {
   const set = new Set(sourceRows.value.map((row) => getSlotBucket(row as FitConnectionRow | FitGroupRow)))
-  return slotTypeDefs.filter((item) => set.has(item.id))
+  // Always include consumables (C) and units (U) slot types for storage panel
+  const storageSlotTypes = ['consumables', 'units']
+  return slotTypeDefs.filter((item) => set.has(item.id) || storageSlotTypes.includes(item.id))
 })
 
 watch(
@@ -1070,16 +1075,23 @@ watch(slotTargets, () => {
     </div>
     <div class="arsenal-shell" data-testid="ship-build-fit-panel">
         <aside class="left-rail">
-          <button
+          <tippy
             v-for="slotType in availableSlotTypes"
             :key="slotType.id"
-            class="slot-type-btn"
-            :class="activeSlotType === slotType.id ? 'slot-type-btn-active' : ''"
-            :data-testid="`slot-type-${slotType.id}`"
-            @click="handleSlotTypeClick(slotType.id)"
+            theme="x4"
+            :content="t(slotType.tooltip)"
+            placement="right"
+            :delay="[200, 0]"
           >
-            {{ slotType.label }}
-          </button>
+            <button
+              class="slot-type-btn"
+              :class="activeSlotType === slotType.id ? 'slot-type-btn-active' : ''"
+              :data-testid="`slot-type-${slotType.id}`"
+              @click="handleSlotTypeClick(slotType.id)"
+            >
+              {{ slotType.label }}
+            </button>
+          </tippy>
         </aside>
 
         <div class="arsenal-content">
@@ -1237,14 +1249,21 @@ watch(slotTargets, () => {
             </template>
 
             <template v-else>
-              <div class="toolbar-row">
+              <!-- C 槽 and U 槽: Storage Panel -->
+              <ShipStoragePanel
+                v-if="activeSlotType === 'consumables' || activeSlotType === 'units'"
+                :selected-ship="selectedShip"
+                :slot-type="activeSlotType as 'consumables' | 'units'"
+              />
+
+              <div v-else class="toolbar-row">
                 <div class="mode-tabs">
                   <button class="mode-tab" :class="fitMode === 'connection' ? 'active' : ''" @click="setMode('connection')">{{ t('ship_build.fit_mode_connection') }}</button>
                   <button class="mode-tab" :class="fitMode === 'group' ? 'active' : ''" @click="setMode('group')">{{ t('ship_build.fit_mode_group') }}</button>
                 </div>
               </div>
 
-              <div class="group-tabs">
+              <div class="group-tabs" v-if="activeSlotType !== 'consumables' && activeSlotType !== 'units'">
                 <div
                   v-for="row in renderGroupTabRows"
                   :key="row.key"
@@ -1263,13 +1282,13 @@ watch(slotTargets, () => {
                 </div>
               </div>
 
-              <section v-if="visibleCompatibilityTags.length > 0" class="compatibility-box">
+              <section v-if="activeSlotType !== 'consumables' && activeSlotType !== 'units' && visibleCompatibilityTags.length > 0" class="compatibility-box">
                 <div class="compatibility-title">{{ t('ship_build.fit_compatibility') }}:</div>
                 <div class="compatibility-line tags">{{ visibleCompatibilityTagLabels.join(' / ') }}</div>
                 <div v-for="line in compatibilitySlotLines" :key="line" class="compatibility-line">{{ line }}</div>
               </section>
 
-              <section class="slot-wall">
+              <section v-if="activeSlotType !== 'consumables' && activeSlotType !== 'units'" class="slot-wall">
                 <div v-for="target in slotTargets" :key="target.key" class="slot-stack">
                   <X4DualPhaseRangeSlider
                     class="slot-count-slider"
