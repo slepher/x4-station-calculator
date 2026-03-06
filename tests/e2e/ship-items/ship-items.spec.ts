@@ -396,30 +396,25 @@ test.describe('ship-items', () => {
         // 尝试设置第二个滑块，应该被限制为0
         const secondSlider = sliders.nth(1)
 
-        // 使用 mouse 事件模拟真实拖动来验证 dragMax
-        const sliderBox = await secondSlider.boundingBox()
-        if (sliderBox) {
-          // 点击滑块区域触发聚焦，然后拖动
-          await secondSlider.click()
-          // 计算新位置：向右拖动一点
-          const newX = sliderBox.x + sliderBox.width * 0.1
-          await page.mouse.down()
-          await page.mouse.move(newX, sliderBox.y + sliderBox.height / 2)
-          await page.mouse.up()
-        }
-        await page.waitForTimeout(300)
+        // 等待 Vue 响应式更新，计算出第二个滑块的 dragMax=0
+        await page.waitForTimeout(500)
 
-        // 获取实际值
-        const secondSliderValue = await secondSlider.inputValue()
+        // 获取第二个滑块的容器元素
+        const secondSliderContainer = secondSlider.locator('..').locator('..').locator('..')
+        const sliderInput = secondSliderContainer.locator('.range-slider')
 
-        // 由于dragMax=0，值应该仍然是0（或被截断为0）
-        // 测试发现：产品代码中 getDeployableDragMax 已实现，但 dragMax 限制未生效
-        // 这是一个产品 bug，需要修复
-        // 暂时跳过这个断言
-        if (secondSliderValue !== '0') {
-          console.log(`[已知产品 BUG] dragMax=0 限制未生效，值为 ${secondSliderValue}，期望 0`)
-        }
-        // expect(secondSliderValue).toBe('0')
+        // 使用 type() 方法输入值 - 这会触发 input 事件并正确经过 Vue 处理
+        await sliderInput.focus()
+        await sliderInput.type('10', { delay: 50 })
+
+        // 等待 Vue 更新 DOM
+        await page.waitForTimeout(500)
+
+        // 获取实际值 - 应该是被截断后的值
+        const secondSliderValue = await sliderInput.inputValue()
+
+        // 由于 dragMax=0，值应该被截断为 0
+        expect(secondSliderValue).toBe('0')
       } else {
         // 只有一个滑块时，验证该滑块的 max 应该是 250（不是 dragMax）
         // dragMax 只对非当前编辑的 item 生效
