@@ -74,7 +74,13 @@ watch(
   { deep: true }
 )
 
-watch(selectedShipId, (next, prev) => {
+const currentShipId = () => {
+  const blueprintShipId = blueprint.value?.shipId
+  if (blueprintShipId) return blueprintShipId
+  return selectedShipId.value
+}
+
+watch(currentShipId, (next, prev) => {
   if (next === prev) return
   isPickerOpen.value = false
   showMaterial.value = true
@@ -91,7 +97,7 @@ watch(selectedShipId, (next, prev) => {
 <template>
   <div v-if="selectedShip" class="grid grid-cols-12 gap-8 items-start" data-testid="ship-build-panels">
     <ShipBuildPanelFit
-      :key="selectedShipId || 'no-ship'"
+      :key="currentShipId() || 'no-ship'"
       :wide="!showMaterial"
       @picker-open="handlePickerOpen"
       @picker-close="handlePickerClose"

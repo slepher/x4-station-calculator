@@ -84,12 +84,12 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   const selectedClass = ref<ShipBuildClass | null>(null)
   const selectedRaces = ref<string[]>([])
   const selectedTypes = ref<string[]>([])
-  const selectedShipId = ref<string | null>(null)
   const viewMode = ref<ShipBuildViewMode>('selector')
   const statsViewMode = ref<ShipBuildStatsViewMode>('summary')
   const fitMode = ref<FitMode>('connection')
   // Blueprint persistence state
   const blueprint = ref<ShipBlueprint | null>(null)
+  const selectedShipId = computed<string | null>(() => blueprint.value?.shipId || null)
   const savedBlueprints = ref<SavedShipBlueprintsState>({
     version: CURRENT_SHIP_BLUEPRINT_VERSION,
     activeShipId: null,
@@ -189,10 +189,23 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     return getBucketByShipId(shipId)?.blueprints || []
   }
 
+  const resolveCurrentShipId = (): string | null => {
+    return blueprint.value?.shipId || null
+  }
+
+  const createEmptyBlueprintForShip = (shipId: string): ShipBlueprint => ({
+    id: '',
+    name: '',
+    shipId,
+    connections: [],
+    lastUpdated: Date.now()
+  })
+
   // Take snapshot for dirty check
   const takeSnapshot = () => {
+    const shipId = resolveCurrentShipId()
     lastSavedSnapshot.value = JSON.stringify({
-      shipId: selectedShipId.value,
+      shipId,
       blueprint: blueprint.value
     })
   }
@@ -217,7 +230,6 @@ export const useShipBuildStore = defineStore('ship-build', () => {
         selectedClass.value = shipClass
         selectedRaces.value = ship?.race ? [ship.race] : []
         selectedTypes.value = ship?.type ? [ship.type] : []
-        selectedShipId.value = savedBlueprints.value.activeShipId || activeBlueprint.shipId
         viewMode.value = 'workspace'
         blueprint.value = { ...activeBlueprint }
 
@@ -233,17 +245,18 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   // isDirty computed
   const isDirty = computed(() => {
     if (!lastSavedSnapshot.value) return false
+    const shipId = resolveCurrentShipId()
     const current = JSON.stringify({
-      shipId: selectedShipId.value,
+      shipId,
       blueprint: blueprint.value
     })
     return current !== lastSavedSnapshot.value
   })
 
-  const isEditable = () => !selectedShipId.value
+  const isEditable = () => !resolveCurrentShipId()
 
   const isEmptyForSave = () => {
-    if (!selectedShipId.value) return true
+    if (!resolveCurrentShipId()) return true
     if (!blueprint.value) return true
 
     const hasConnectionEquipment = blueprint.value.connections.some((connection) =>
@@ -264,10 +277,11 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   // Find connection in blueprint, create if not exists
   const findOrCreateConnection = (slotType: string): ShipBlueprintConnection => {
     if (!blueprint.value) {
+      const shipId = resolveCurrentShipId()
       blueprint.value = {
         id: '',
         name: '',
-        shipId: selectedShipId.value || '',
+        shipId: shipId || '',
         connections: [],
         lastUpdated: Date.now()
       }
@@ -330,8 +344,9 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     }
 
     // Update shipId if changed
-    if (blueprint.value && selectedShipId.value) {
-      blueprint.value.shipId = selectedShipId.value
+    if (blueprint.value) {
+      const shipId = resolveCurrentShipId()
+      if (shipId) blueprint.value.shipId = shipId
     }
     cleanupEmptyGroups()
   }
@@ -466,11 +481,13 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
   // CRUD Operations
   const saveBlueprint = () => {
-    if (!blueprint.value || !selectedShipId.value) return
+    if (!blueprint.value) return
+    const shipId = resolveCurrentShipId()
+    if (!shipId) return
 
-    const bucket = getOrCreateBucketByShipId(selectedShipId.value)
+    const bucket = getOrCreateBucketByShipId(shipId)
     const idx = bucket.blueprints.findIndex((b) => b.id === blueprint.value!.id)
-    blueprint.value.shipId = selectedShipId.value
+    blueprint.value.shipId = shipId
     blueprint.value.lastUpdated = Date.now()
 
     if (idx !== -1) {
@@ -482,27 +499,28 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       bucket.blueprints.push(JSON.parse(JSON.stringify(blueprint.value)))
     }
 
-    savedBlueprints.value.activeShipId = selectedShipId.value
+    savedBlueprints.value.activeShipId = shipId
     savedBlueprints.value.activeBlueprintId = blueprint.value.id
     saveBlueprintsToStorage()
     takeSnapshot()
   }
 
   const saveAsBlueprint = (name: string) => {
-    if (!selectedShipId.value) return
+    const shipId = resolveCurrentShipId()
+    if (!shipId) return
 
     const newBlueprint: ShipBlueprint = {
       id: crypto.randomUUID(),
       name,
-      shipId: selectedShipId.value,
+      shipId,
       connections: blueprint.value ? JSON.parse(JSON.stringify(blueprint.value.connections)) : [],
       storage: blueprint.value?.storage ? JSON.parse(JSON.stringify(blueprint.value.storage)) : undefined,
       lastUpdated: Date.now()
     }
 
-    const bucket = getOrCreateBucketByShipId(selectedShipId.value)
+    const bucket = getOrCreateBucketByShipId(shipId)
     bucket.blueprints.push(newBlueprint)
-    savedBlueprints.value.activeShipId = selectedShipId.value
+    savedBlueprints.value.activeShipId = shipId
     savedBlueprints.value.activeBlueprintId = newBlueprint.id
     blueprint.value = newBlueprint
     saveBlueprintsToStorage()
@@ -543,8 +561,6 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     selectedClass.value = shipClass
     selectedRaces.value = ship.race ? [ship.race] : []
     selectedTypes.value = ship.type ? [ship.type] : []
-    selectedShipId.value = bp.shipId
-
     // Load blueprint
     blueprint.value = JSON.parse(JSON.stringify(bp))
     // Sort connections by fixed order: engine -> thruster -> shield -> weapon -> turret
@@ -596,6 +612,9 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
   const setSelectedShipId = (shipId: string | null) => {
     if (selectedShipId.value === shipId) {
+      if (shipId !== null && !blueprint.value) {
+        blueprint.value = createEmptyBlueprintForShip(shipId)
+      }
       if (shipId !== null && viewMode.value === 'selector') {
         viewMode.value = 'workspace'
       }
@@ -603,30 +622,21 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     }
     // Keep current selection data and just switch to selector mode.
     if (shipId === null) {
-      selectedShipId.value = null
       viewMode.value = 'selector'
       return
     }
 
     // If selecting the same ship as current blueprint, restore it directly.
     if (blueprint.value?.shipId === shipId) {
-      selectedShipId.value = shipId
       fitMode.value = 'connection'
       viewMode.value = 'workspace'
       return
     }
 
     // Switching to a different ship: reset blueprint and start fresh.
-    blueprint.value = {
-      id: '',
-      name: '',
-      shipId: shipId,
-      connections: [],
-      lastUpdated: Date.now()
-    }
+    blueprint.value = createEmptyBlueprintForShip(shipId)
     // Initialize snapshot for dirty check
     takeSnapshot()
-    selectedShipId.value = shipId
     selectedByConnection.value = {}
     fitMode.value = 'connection'
     viewMode.value = 'workspace'
@@ -753,11 +763,12 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   }
 
   const cloneBlueprintForPreview = (source: ShipBlueprint | null): ShipBlueprint => {
+    const shipId = resolveCurrentShipId()
     if (!source) {
       return {
         id: '',
         name: '',
-        shipId: selectedShipId.value || '',
+        shipId: shipId || '',
         connections: [],
         lastUpdated: Date.now()
       }
@@ -925,12 +936,13 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     mode: FitMode
     targetCount?: number
   }): ShipBlueprint | null => {
-    if (!selectedShip.value || !selectedShipId.value) return null
+    const shipId = resolveCurrentShipId()
+    if (!selectedShip.value || !shipId) return null
     const keys = payload.connectionKeys.filter((key) => typeof key === 'string' && key.length > 0)
     if (keys.length === 0) return cloneBlueprintForPreview(blueprint.value)
 
     const target = cloneBlueprintForPreview(blueprint.value)
-    target.shipId = selectedShipId.value
+    target.shipId = shipId
 
     if (payload.mode === 'group') {
       const fallbackCount = keys.reduce((sum, key) => {
@@ -1028,11 +1040,12 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   }
 
   const selectedShip = computed(() => {
-    if (!selectedShipId.value) return null
-    return ships.find((ship) => ship.id === selectedShipId.value) || null
+    const shipId = resolveCurrentShipId()
+    if (!shipId) return null
+    return ships.find((ship) => ship.id === shipId) || null
   })
 
-  const hasSelectedShip = computed(() => selectedShipId.value !== null)
+  const hasSelectedShip = computed(() => Boolean(resolveCurrentShipId()))
 
   const connectionRows = computed<FitConnectionRow[]>(() => {
     if (!selectedShip.value) return []
@@ -1123,12 +1136,14 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
   // Clear current fitting but keep selected ship (for New action in ship-build view)
   const clearLoadoutForCurrentShip = () => {
-    if (!selectedShipId.value) return
-    blueprint.value = null
+    const currentBlueprint = blueprint.value
+    if (!currentBlueprint?.shipId) return
+    const shipId = currentBlueprint.shipId
+    blueprint.value = createEmptyBlueprintForShip(shipId)
     selectedByConnection.value = {}
     fitMode.value = 'connection'
     viewMode.value = 'workspace'
-    savedBlueprints.value.activeShipId = selectedShipId.value
+    savedBlueprints.value.activeShipId = shipId
     savedBlueprints.value.activeBlueprintId = null
     saveBlueprintsToStorage()
     takeSnapshot()
@@ -1137,7 +1152,6 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   // Reset all filters and blueprint
   const resetAll = () => {
     blueprint.value = null
-    selectedShipId.value = null
     viewMode.value = 'selector'
     selectedClass.value = null
     selectedRaces.value = []

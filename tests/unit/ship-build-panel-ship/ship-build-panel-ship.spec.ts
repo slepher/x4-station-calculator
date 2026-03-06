@@ -80,7 +80,6 @@ describe('ship-build-panel-ship unit mapping', () => {
   it('1.2 setSelectedShipId 同船确认不重建 blueprint', () => {
     const store = useShipBuildStore()
     // 1.2.1 在 store 中准备 `viewMode=\'selector\'` 与 `selectedShipId=\'ship_ter_m_corvette_02_a\'`，并保留已有 blueprint connections
-    store.selectedShipId = 'ship_ter_m_corvette_02_a'
     store.viewMode = 'selector'
     store.blueprint = {
       id: 'bp-1',
@@ -102,7 +101,6 @@ describe('ship-build-panel-ship unit mapping', () => {
   it('1.3 setSelectedShipId 不同船确认重建 blueprint', () => {
     const store = useShipBuildStore()
     // 1.3.1 在 store 中准备 `selectedShipId=\'ship_ter_m_corvette_02_a\'` 与非空 blueprint connections
-    store.selectedShipId = 'ship_ter_m_corvette_02_a'
     store.blueprint = {
       id: 'bp-2',
       name: 'bp-2',
@@ -122,7 +120,13 @@ describe('ship-build-panel-ship unit mapping', () => {
   it('1.4 cancelShipSelector 船级回填规则', () => {
     const store = useShipBuildStore()
     // 1.4.1 在 store 中准备 `selectedShip.class=\'ship_m\'`，先设置筛选 class 为 `ship_l`
-    store.selectedShipId = 'ship_ter_m_corvette_01_a'
+    store.blueprint = {
+      id: '',
+      name: '',
+      shipId: 'ship_ter_m_corvette_01_a',
+      connections: [],
+      lastUpdated: Date.now()
+    }
     store.selectedClass = 'ship_l'
     store.selectedRaces = ['argon']
     store.selectedTypes = ['destroyer']

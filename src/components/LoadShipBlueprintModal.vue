@@ -24,7 +24,13 @@ watch(() => props.isOpen, (isOpen) => {
   }
 })
 
-const blueprints = computed(() => store.getBlueprintsForShip(store.selectedShipId))
+const currentShipId = computed(() => {
+  const blueprintShipId = store.blueprint?.shipId
+  if (blueprintShipId) return blueprintShipId
+  return store.selectedShipId
+})
+
+const blueprints = computed(() => store.getBlueprintsForShip(currentShipId.value))
 
 const getShipName = (shipId: string) => {
   // 从 ships 数组中查找飞船并本地化

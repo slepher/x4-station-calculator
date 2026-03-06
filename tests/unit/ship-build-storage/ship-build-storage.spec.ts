@@ -204,7 +204,7 @@ describe('ship-build-storage: setShield', () => {
     const bp = store.blueprint
     const engineConn = bp!.connections.find(c => c.slot_type === 'engine')
     const group = engineConn!.group.find(g => g.group === 'group_back_up_mid')
-    expect(group!.shield).toBeUndefined()
+    expect(group!.shield).toEqual({ equipment_id: '', count: 0 })
   })
 })
 
@@ -237,9 +237,12 @@ describe('ship-build-storage: selectedByConnection', () => {
 
     store.setEquipment('engine', 'group_back_up_mid', 'engine_am', 3)
 
-    // 检查 connectionRows 的 options 是否可用
-    const engineRows = store.connectionRows.filter(r => r.slotType === 'engine')
-    expect(engineRows.length).toBeGreaterThan(0)
+    const bp = store.blueprint
+    expect(bp).toBeTruthy()
+    const engineConn = bp!.connections.find(c => c.slot_type === 'engine')
+    expect(engineConn).toBeTruthy()
+    const group = engineConn!.group.find(g => g.group === 'group_back_up_mid')
+    expect(group?.equipment_id).toBe('engine_am')
   })
 
   it('1.5.2 无装备时返回 null', () => {
@@ -281,9 +284,11 @@ describe('ship-build-storage: persistence CRUD', () => {
     expect(data).toBeTruthy()
 
     const parsed = JSON.parse(data!)
-    expect(parsed.list).toHaveLength(1)
-    expect(parsed.list[0].shipId).toBe(ODACHI_ID)
-    expect(parsed.activeId).toBeTruthy()
+    expect(parsed.ships).toHaveLength(1)
+    expect(parsed.ships[0].shipId).toBe(ODACHI_ID)
+    expect(parsed.ships[0].blueprints).toHaveLength(1)
+    expect(parsed.activeShipId).toBe(ODACHI_ID)
+    expect(parsed.activeBlueprintId).toBeTruthy()
   })
 
   it('1.6.2 saveAsBlueprint 创建新 blueprint', () => {
@@ -300,8 +305,9 @@ describe('ship-build-storage: persistence CRUD', () => {
     // 检查
     const data = localStorage.getItem(STORAGE_KEY)
     const parsed = JSON.parse(data!)
-    expect(parsed.list).toHaveLength(2)
-    expect(parsed.activeId).toBeDefined()
+    expect(parsed.ships).toHaveLength(1)
+    expect(parsed.ships[0].blueprints).toHaveLength(2)
+    expect(parsed.activeBlueprintId).toBeDefined()
   })
 
   it('1.6.3 deleteBlueprint 删除', () => {
@@ -314,15 +320,16 @@ describe('ship-build-storage: persistence CRUD', () => {
 
     const dataBefore = localStorage.getItem(STORAGE_KEY)
     const parsedBefore = JSON.parse(dataBefore!)
-    const idToDelete = parsedBefore.list[0].id
+    const idToDelete = parsedBefore.ships[0].blueprints[0].id
 
     // 删除
     store.deleteBlueprint(idToDelete)
 
     const dataAfter = localStorage.getItem(STORAGE_KEY)
     const parsedAfter = JSON.parse(dataAfter!)
-    expect(parsedAfter.list).toHaveLength(1)
-    expect(parsedAfter.list.find((b: any) => b.id === idToDelete)).toBeUndefined()
+    expect(parsedAfter.ships).toHaveLength(1)
+    expect(parsedAfter.ships[0].blueprints).toHaveLength(1)
+    expect(parsedAfter.ships[0].blueprints.find((b: any) => b.id === idToDelete)).toBeUndefined()
   })
 
   it('1.6.4 loadBlueprint 自动设置筛选', () => {
@@ -411,7 +418,9 @@ describe('ship-build-storage: dirty state', () => {
     store.clearLoadoutForCurrentShip()
 
     expect(store.selectedShipId).toBe(ODACHI_ID)
-    expect(store.blueprint).toBeNull()
+    expect(store.blueprint).toBeTruthy()
+    expect(store.blueprint?.shipId).toBe(ODACHI_ID)
+    expect(store.blueprint?.connections).toEqual([])
     expect(store.isDirty).toBe(false)
   })
 })
