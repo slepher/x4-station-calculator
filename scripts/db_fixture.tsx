@@ -559,10 +559,21 @@ const buildShipBlueprintState = (
       lastUpdated: now
     }))
 
+  const shipsBuckets = Array.from(
+    list.reduce((map, blueprint) => {
+      const bucket = map.get(blueprint.shipId) || []
+      bucket.push(blueprint)
+      map.set(blueprint.shipId, bucket)
+      return map
+    }, new Map<string, ShipBlueprint[]>()).entries()
+  ).map(([shipId, blueprints]) => ({ shipId, blueprints }))
+
+  const activeBlueprint = list[0] || null
   return {
     version: CURRENT_SHIP_BLUEPRINT_VERSION,
-    activeId: list[0]?.id ?? null,
-    list
+    activeShipId: activeBlueprint?.shipId ?? null,
+    activeBlueprintId: activeBlueprint?.id ?? null,
+    ships: shipsBuckets
   }
 }
 

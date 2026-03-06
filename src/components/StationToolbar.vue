@@ -36,6 +36,7 @@ const smartDialog = reactive({
 
 const isFlowView = computed(() => shipBuildStore.activeView === 'flow')
 const isShipBuildView = computed(() => shipBuildStore.activeView === 'ship-build')
+const isShipActionDisabled = computed(() => isShipBuildView.value && !shipBuildStore.selectedShipId)
 
 // 根据视图类型获取当前配置
 const currentConfig = computed(() => {
@@ -126,6 +127,7 @@ watch(displayTitle, (newVal) => {
 
 const handleNew = () => {
   if (isShipBuildView.value) {
+    if (!shipBuildStore.selectedShipId) return
     if (shipBuildStore.isDirty) {
       // Use smartDialog like empire/flow for consistency
       smartDialog.intent = 'NEW'
@@ -161,6 +163,7 @@ const handleSave = () => {
       statusStore.pushMessage('warning', 'save', t('menu.cannot_save_empty_plan'))
       return
     }
+    if (!shipBuildStore.isDirty) return
     if (!shipBuildStore.blueprint) {
       // No existing blueprint, prompt for name
       handleSaveAs()
@@ -232,6 +235,7 @@ const handleSaveAs = () => {
 
 const handleLoad = () => {
   if (isShipBuildView.value) {
+    if (!shipBuildStore.selectedShipId) return
     showLoadBlueprintModal.value = true
     return
   }
@@ -275,7 +279,7 @@ const handleExport = () => {
 <template>
   <div class="toolbar-panel">
     <div class="flex items-center gap-1.5 ml-4">
-      <button :class="['btn-tool', themeColors.secondary]" @click="handleNew">
+      <button :class="['btn-tool', themeColors.secondary]" :disabled="isShipActionDisabled" @click="handleNew">
         <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
@@ -283,7 +287,7 @@ const handleExport = () => {
         </svg>
         <span>{{ t('menu.new') }}</span>
       </button>
-      <button :class="['btn-tool', themeColors.primary]" @click="handleSave">
+      <button :class="['btn-tool', themeColors.primary]" :disabled="isShipActionDisabled" @click="handleSave">
         <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
@@ -292,7 +296,7 @@ const handleExport = () => {
         </svg>
         <span>{{ t('menu.save') }}</span>
       </button>
-      <button :class="['btn-tool', themeColors.primary]" @click="handleSaveAs">
+      <button :class="['btn-tool', themeColors.primary]" :disabled="isShipActionDisabled" @click="handleSaveAs">
         <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M7 21h10" />
@@ -303,7 +307,7 @@ const handleExport = () => {
         </svg>
         <span>{{ t('menu.save_as') }}</span>
       </button>
-      <button :class="['btn-tool', themeColors.secondary]" @click="handleLoad">
+      <button :class="['btn-tool', themeColors.secondary]" :disabled="isShipActionDisabled" @click="handleLoad">
         <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />

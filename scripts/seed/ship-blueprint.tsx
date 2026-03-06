@@ -171,6 +171,13 @@ const main = async () => {
     ]
   }
 
+  // Enforce ship-scoped blueprint ownership in seed output.
+  seed.ships = seed.ships.map((ship) => (
+    ship.blueprint
+      ? { ...ship, blueprint: { ...ship.blueprint, shipId: ship.id } }
+      : ship
+  ))
+
   await mkdir(OUTPUT_DIR, { recursive: true })
   const content = stringify(seed, { indent: 2 })
   await writeFile(OUTPUT_PATH, content, 'utf8')

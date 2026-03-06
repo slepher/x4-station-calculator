@@ -6,6 +6,7 @@ import type {
   SavedFlowNode,
   SavedFlowPlansState,
   SavedShipBlueprintsState,
+  ShipBlueprintBucket,
   SavedModule,
   ShipBlueprint,
   StationPlan,
@@ -261,10 +262,11 @@ export function migrateFlowStateToCurrent(
   return { state: working, warnings }
 }
 
-function normalizeShipBlueprintShape(input: SavedShipBlueprintsState): SavedShipBlueprintsState {
-  const rawList = Array.isArray(input.list) ? input.list : []
-  const list: ShipBlueprint[] = rawList.map((item, index) => {
+function normalizeShipBlueprintShape(input: SavedShipBlueprintsState & { list?: unknown[] }): MigrationResult<SavedShipBlueprintsState> {
+  const warnings: string[] = []
+  const normalizeBlueprintList = (rawList: unknown[], context: string, forcedShipId?: string): ShipBlueprint[] => rawList.map((item, index) => {
     const blueprint: Record<string, unknown> = isObject(item) ? item : {}
+    const shipId = forcedShipId || (typeof blueprint.shipId === 'string' ? blueprint.shipId : '')
     const storage = isObject(blueprint.storage)
       ? (deepClone(blueprint.storage) as unknown as ShipBlueprint['storage'])
       : undefined
@@ -274,39 +276,100 @@ function normalizeShipBlueprintShape(input: SavedShipBlueprintsState): SavedShip
     return {
       id: typeof blueprint.id === 'string' && blueprint.id ? blueprint.id : crypto.randomUUID(),
       name: typeof blueprint.name === 'string' ? blueprint.name : '',
-      shipId: typeof blueprint.shipId === 'string' ? blueprint.shipId : '',
+      shipId,
       connections: Array.isArray(blueprint.connections) ? deepClone(blueprint.connections) : [],
       storage,
       hull,
       lastUpdated: Number(blueprint.lastUpdated) || Date.now() + index
     }
-  }).filter((blueprint) => Boolean(blueprint.shipId))
+  }).filter((blueprint) => {
+    if (blueprint.shipId) return true
+    warnings.push(`[${context}] dropped blueprint without shipId: ${blueprint.id}`)
+    return false
+  })
 
-  const activeId = input.activeId && list.some((item) => item.id === input.activeId)
-    ? input.activeId
-    : list[0]?.id || null
+  const raw = input as unknown as Record<string, unknown>
+  const legacyList = Array.isArray(raw.list) ? raw.list : []
+  const rawShips = Array.isArray(raw.ships) ? raw.ships : []
+
+  let ships: ShipBlueprintBucket[]
+  if (rawShips.length > 0) {
+    ships = rawShips
+      .map((bucket, bucketIndex) => {
+        if (!isObject(bucket)) return null
+        const shipId = typeof bucket.shipId === 'string' ? bucket.shipId : ''
+        if (!shipId) {
+          warnings.push(`[ship-blueprint] dropped bucket without shipId at index ${bucketIndex}`)
+          return null
+        }
+        const blueprintsRaw = Array.isArray(bucket.blueprints) ? bucket.blueprints : []
+        const blueprints = normalizeBlueprintList(blueprintsRaw, `ship-blueprint.bucket[${bucketIndex}]`, shipId)
+        return { shipId, blueprints }
+      })
+      .filter((bucket): bucket is ShipBlueprintBucket => Boolean(bucket))
+      .filter((bucket) => bucket.blueprints.length > 0)
+  } else {
+    const list = normalizeBlueprintList(legacyList, 'ship-blueprint.legacy')
+    const buckets = new Map<string, ShipBlueprint[]>()
+    list.forEach((blueprint) => {
+      const bucket = buckets.get(blueprint.shipId) || []
+      bucket.push(blueprint)
+      buckets.set(blueprint.shipId, bucket)
+    })
+    ships = Array.from(buckets.entries()).map(([shipId, blueprints]) => ({ shipId, blueprints }))
+  }
+
+  const activeBlueprintIdRaw = typeof raw.activeBlueprintId === 'string'
+    ? raw.activeBlueprintId
+    : (typeof raw.activeId === 'string' ? raw.activeId : null)
+
+  const flattened = ships.flatMap((bucket) => bucket.blueprints)
+  const activeBlueprint = activeBlueprintIdRaw
+    ? flattened.find((item) => item.id === activeBlueprintIdRaw) || null
+    : null
+  const fallbackBlueprint = flattened[0] || null
+  const activeBlueprintId = activeBlueprint?.id || fallbackBlueprint?.id || null
+
+  const activeShipIdRaw = typeof raw.activeShipId === 'string' ? raw.activeShipId : null
+  const activeShipId = activeBlueprint?.shipId
+    || (activeShipIdRaw && ships.some((bucket) => bucket.shipId === activeShipIdRaw) ? activeShipIdRaw : null)
+    || fallbackBlueprint?.shipId
+    || ships[0]?.shipId
+    || null
 
   return {
-    version: input.version,
-    activeId,
-    list
+    state: {
+      version: input.version,
+      activeShipId,
+      activeBlueprintId,
+      ships
+    },
+    warnings
   }
 }
 
 export function migrateShipBlueprintStateToCurrent(
   input: unknown
 ): MigrationResult<SavedShipBlueprintsState> {
-  const warnings: string[] = []
+  let warnings: string[] = []
   const raw = isObject(input) ? input : {}
   const version = typeof raw.version === 'number' ? raw.version : 1
-  const activeId = typeof raw.activeId === 'string' ? raw.activeId : null
+  const activeBlueprintId = typeof raw.activeBlueprintId === 'string'
+    ? raw.activeBlueprintId
+    : (typeof raw.activeId === 'string' ? raw.activeId : null)
+  const activeShipId = typeof raw.activeShipId === 'string' ? raw.activeShipId : null
   const list = Array.isArray(raw.list) ? deepClone(raw.list) : []
+  const ships = Array.isArray(raw.ships) ? deepClone(raw.ships) : []
 
-  const working = normalizeShipBlueprintShape({
+  const normalized = normalizeShipBlueprintShape({
     version,
-    activeId,
+    activeShipId,
+    activeBlueprintId,
+    ships,
     list
   })
+  const working = normalized.state
+  warnings = warnings.concat(normalized.warnings)
 
   if (working.version > CURRENT_SHIP_BLUEPRINT_VERSION) {
     warnings.push(

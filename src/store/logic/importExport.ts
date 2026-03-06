@@ -9,7 +9,8 @@ import type {
   LogicFlowPlan,
   SavedFlowGroup,
   SavedFlowNode,
-  ShipBlueprint
+  ShipBlueprint,
+  ShipBlueprintBucket
 } from '@/types/x4'
 import { migrateEmpireStateToCurrent, migrateFlowStateToCurrent, migrateShipBlueprintStateToCurrent } from './stateMigrations'
 import { CURRENT_EMPIRE_VERSION, CURRENT_FLOW_VERSION, CURRENT_SHIP_BLUEPRINT_VERSION } from './storageVersions'
@@ -97,8 +98,9 @@ function isFlowState(value: unknown): value is SavedFlowPlansState {
   return isObject(value) && Array.isArray(value.list)
 }
 
-function isShipState(value: unknown): value is SavedShipBlueprintsState {
-  return isObject(value) && Array.isArray(value.list)
+function isShipState(value: unknown): value is Record<string, unknown> {
+  if (!isObject(value)) return false
+  return Array.isArray(value.list) || Array.isArray(value.ships)
 }
 
 type CoercedEmpireState = SavedEmpiresState | V1StorageState
@@ -136,14 +138,9 @@ function coerceFlowState(value: unknown): SavedFlowPlansState | null {
   }
 }
 
-function coerceShipState(value: unknown): SavedShipBlueprintsState | null {
+function coerceShipState(value: unknown): Record<string, unknown> | null {
   if (!isShipState(value)) return null
-  const raw = value as unknown as Record<string, unknown>
-  return {
-    version: typeof raw.version === 'number' ? raw.version : CURRENT_SHIP_BLUEPRINT_VERSION,
-    activeId: typeof raw.activeId === 'string' ? raw.activeId : null,
-    list: deepClone((raw.list as unknown[]) || []) as SavedShipBlueprintsState['list']
-  }
+  return deepClone(value as Record<string, unknown>)
 }
 
 function migrateEmpireState(input: CoercedEmpireState, gameDataStore: GameDataStoreLike): { state: SavedEmpiresState; warnings: string[] } {
@@ -246,23 +243,29 @@ function remapFlowIds(input: SavedFlowPlansState): { state: SavedFlowPlansState;
 function remapShipIds(input: SavedShipBlueprintsState): { state: SavedShipBlueprintsState; activeChangedTo: string | null } {
   const idMap = new Map<string, string>()
 
-  const list: ShipBlueprint[] = input.list.map((blueprint) => {
-    const newId = crypto.randomUUID()
-    idMap.set(blueprint.id, newId)
-    return {
-      ...deepClone(blueprint),
-      id: newId,
-      lastUpdated: Date.now()
-    }
-  })
+  const ships: ShipBlueprintBucket[] = input.ships.map((bucket) => ({
+    shipId: bucket.shipId,
+    blueprints: bucket.blueprints.map((blueprint) => {
+      const newId = crypto.randomUUID()
+      idMap.set(blueprint.id, newId)
+      return {
+        ...deepClone(blueprint),
+        id: newId,
+        lastUpdated: Date.now()
+      }
+    })
+  }))
 
-  const mappedActive = input.activeId ? idMap.get(input.activeId) || null : null
+  const mappedActive = input.activeBlueprintId ? idMap.get(input.activeBlueprintId) || null : null
 
   return {
     state: {
       version: CURRENT_SHIP_BLUEPRINT_VERSION,
-      activeId: mappedActive,
-      list
+      activeShipId: mappedActive
+        ? (ships.find((bucket) => bucket.blueprints.some((item) => item.id === mappedActive))?.shipId || null)
+        : null,
+      activeBlueprintId: mappedActive,
+      ships
     },
     activeChangedTo: mappedActive
   }
@@ -288,10 +291,12 @@ function isFlowActiveEmpty(state: SavedFlowPlansState): boolean {
 }
 
 function isShipActiveEmpty(state: SavedShipBlueprintsState): boolean {
-  if (!state.activeId) return true
-  const blueprint = state.list.find((item) => item.id === state.activeId)
-  if (!blueprint) return true
-  return (blueprint.connections || []).length === 0
+  if (!state.activeBlueprintId) return true
+  const active = state.ships
+    .flatMap((bucket) => bucket.blueprints)
+    .find((item) => item.id === state.activeBlueprintId)
+  if (!active) return true
+  return (active.connections || []).length === 0
 }
 
 function mergeEmpireState(current: SavedEmpiresState, incoming: SavedEmpiresState): SavedEmpiresState {
@@ -312,10 +317,20 @@ function mergeFlowState(current: SavedFlowPlansState, incoming: SavedFlowPlansSt
 }
 
 function mergeShipState(current: SavedShipBlueprintsState, incoming: SavedShipBlueprintsState): SavedShipBlueprintsState {
+  const mergedMap = new Map<string, ShipBlueprint[]>()
+  current.ships.forEach((bucket) => {
+    mergedMap.set(bucket.shipId, [...deepClone(bucket.blueprints)])
+  })
+  incoming.ships.forEach((bucket) => {
+    const existing = mergedMap.get(bucket.shipId) || []
+    mergedMap.set(bucket.shipId, [...existing, ...deepClone(bucket.blueprints)])
+  })
+
   return {
     version: CURRENT_SHIP_BLUEPRINT_VERSION,
-    activeId: current.activeId,
-    list: [...deepClone(current.list), ...deepClone(incoming.list)]
+    activeShipId: current.activeShipId,
+    activeBlueprintId: current.activeBlueprintId,
+    ships: Array.from(mergedMap.entries()).map(([shipId, blueprints]) => ({ shipId, blueprints }))
   }
 }
 
@@ -356,7 +371,11 @@ export function getModuleImportStats(payload: NormalizedImportPayload): ModuleIm
 
   if (empire) stats.push({ key: EMPIRE_KEY, count: empire.list.length })
   if (flow) stats.push({ key: FLOW_KEY, count: flow.list.length })
-  if (ship) stats.push({ key: SHIP_KEY, count: ship.list.length })
+  if (ship) {
+    const migrated = migrateShipBlueprintStateToCurrent(ship)
+    const count = migrated.state.ships.reduce((sum, bucket) => sum + bucket.blueprints.length, 0)
+    stats.push({ key: SHIP_KEY, count })
+  }
 
   return stats
 }
@@ -498,32 +517,36 @@ function applyShipImport(options: ImportApplyOptions, warnings: string[]): boole
   const current = deepClone(options.shipBuildStore.savedBlueprints)
 
   let next: SavedShipBlueprintsState
-  let incomingActiveId: string | null = migrated.activeId || null
+  let incomingActiveId: string | null = migrated.activeBlueprintId || null
 
   if (options.mode === 'overwrite') {
     next = migrated
   } else {
     const remapped = remapShipIds(migrated)
-    incomingActiveId = remapped.state.activeId
+    incomingActiveId = remapped.state.activeBlueprintId
     next = mergeShipState(current, remapped.state)
 
-    const canUpdate = shouldUpdateActiveIncremental(current.activeId, isShipActiveEmpty(current), options.shipBuildStore.isDirty)
+    const canUpdate = shouldUpdateActiveIncremental(current.activeBlueprintId, isShipActiveEmpty(current), options.shipBuildStore.isDirty)
     if (canUpdate && incomingActiveId) {
-      next.activeId = incomingActiveId
+      next.activeBlueprintId = incomingActiveId
+      next.activeShipId = remapped.state.activeShipId
     } else {
-      next.activeId = current.activeId
+      next.activeBlueprintId = current.activeBlueprintId
+      next.activeShipId = current.activeShipId
     }
   }
 
-  if (options.mode === 'overwrite' && !next.activeId && next.list.length > 0) {
-    next.activeId = next.list[0]?.id || null
+  const firstBlueprint = next.ships.flatMap((bucket) => bucket.blueprints)[0] || null
+  if (options.mode === 'overwrite' && !next.activeBlueprintId && firstBlueprint) {
+    next.activeBlueprintId = firstBlueprint.id
+    next.activeShipId = firstBlueprint.shipId
     warnings.push('Ship-build activeId was missing; fallback to first blueprint.')
   }
 
   persistModule(SHIP_KEY, next)
   options.shipBuildStore.loadBlueprintsFromStorage()
-  if (next.activeId && options.currentView === 'ship-build') {
-    options.shipBuildStore.loadBlueprint(next.activeId)
+  if (next.activeBlueprintId && options.currentView === 'ship-build') {
+    options.shipBuildStore.loadBlueprint(next.activeBlueprintId)
   }
   return true
 }

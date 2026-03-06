@@ -746,10 +746,16 @@ export interface ShipBlueprint {
   lastUpdated: number
 }
 
+export interface ShipBlueprintBucket {
+  shipId: string
+  blueprints: ShipBlueprint[]
+}
+
 export interface SavedShipBlueprintsState {
   version: number
-  activeId: string | null
-  list: ShipBlueprint[]
+  activeShipId: string | null
+  activeBlueprintId: string | null
+  ships: ShipBlueprintBucket[]
 }
 
 // View layer type for selectedByConnection

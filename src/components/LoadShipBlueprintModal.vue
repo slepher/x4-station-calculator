@@ -2,6 +2,7 @@
 import { useI18n } from 'vue-i18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
+import type { ShipBlueprint } from '@/types/x4'
 import { computed, watch } from 'vue'
 
 const { translateShip, translateEquipmentType } = useX4I18n()
@@ -23,7 +24,7 @@ watch(() => props.isOpen, (isOpen) => {
   }
 })
 
-const blueprints = computed(() => store.savedBlueprints?.list || [])
+const blueprints = computed(() => store.getBlueprintsForShip(store.selectedShipId))
 
 const getShipName = (shipId: string) => {
   // 从 ships 数组中查找飞船并本地化
@@ -31,7 +32,7 @@ const getShipName = (shipId: string) => {
   return ship ? translateShip(ship) : shipId
 }
 
-const getEquipmentStats = (blueprint: typeof store.savedBlueprints.list[0]) => {
+const getEquipmentStats = (blueprint: ShipBlueprint) => {
   // 按 slot_type + size 分组统计
   const stats: Record<string, Record<string, number>> = {}
   const sizeOrder = ['extralarge', 'large', 'medium', 'small']
@@ -93,7 +94,7 @@ const getEquipmentStats = (blueprint: typeof store.savedBlueprints.list[0]) => {
   return parts.join(', ') || '-'
 }
 
-const getConnectionCount = (blueprint: typeof store.savedBlueprints.list[0]) => {
+const getConnectionCount = (blueprint: ShipBlueprint) => {
   let count = 0
   blueprint.connections.forEach(conn => {
     count += conn.group.length
