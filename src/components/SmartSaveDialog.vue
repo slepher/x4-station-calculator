@@ -3,6 +3,8 @@ import { ref, computed, watch, nextTick } from 'vue'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { useSmartSaveRunner } from '@/composables/useSmartSaveRunner'
+import { buildSmartSavePlan } from '@/utils/smartSavePolicy'
 import { useI18n } from 'vue-i18n'
 import type { LogicFlowPlan } from '@/types/x4';
 
@@ -18,6 +20,7 @@ const emit = defineEmits(['close', 'confirm-primary', 'confirm-secondary'])
 const logicFlowStore = useLogicFlowStore()
 const empireStore = useEmpireStore()
 const shipBuildStore = useShipBuildStore()
+const { runSmartSavePlan } = useSmartSaveRunner()
 const { t } = useI18n()
 
 const isSaveAsExpanded = ref(false)
@@ -114,57 +117,18 @@ const handlePrimaryAction = () => {
     return
   }
 
-  const nameToSave = showInput.value ? inputName.value : currentPlanName.value
+  const policy = buildSmartSavePlan({
+    intent: props.intent,
+    showInput: showInput.value,
+    inputName: showInput.value ? inputName.value : currentPlanName.value
+  })
+  if (!policy.ok) return
 
-  if (!nameToSave.trim()) return
-
-  if (props.storeType === 'ship-build') {
-    if (props.intent === 'SAVE_AS' || isNewPlan.value) {
-      shipBuildStore.saveAsBlueprint(nameToSave)
-    } else {
-      shipBuildStore.saveBlueprint()
-    }
-    emit('close')
-    return
-  }
-
-  if (props.storeType === 'logicFlow') {
-    if (isNewPlan.value || showInput.value) {
-      const originalId = logicFlowStore.savedPlans.activeId
-      if (showInput.value) {
-        logicFlowStore.savedPlans.activeId = null
-      }
-      try {
-        logicFlowStore.saveCurrentPlan(nameToSave)
-      } catch (e) {
-        logicFlowStore.savedPlans.activeId = originalId
-      }
-    } else {
-      logicFlowStore.saveCurrentPlan(nameToSave)
-    }
-
-    if (props.intent === 'NEW') {
-      logicFlowStore.clearAll()
-    }
-  } else {
-    if (props.intent === 'SAVE_AS') {
-      if (empireStore.activeEmpire) {
-        const newEmpire = JSON.parse(JSON.stringify(empireStore.activeEmpire))
-        newEmpire.id = crypto.randomUUID()
-        newEmpire.name = nameToSave
-        newEmpire.stations.forEach((s: any) => { s.id = crypto.randomUUID() })
-        
-        empireStore.activeEmpire = newEmpire
-        empireStore.saveEmpire()
-      }
-    } else if (props.intent === 'NEW') {
-      if (empireStore.activeEmpire) {
-        empireStore.updateEmpireName(nameToSave)
-        empireStore.saveEmpire()
-      }
-      empireStore.createEmpire(t('menu.default_empire_name'))
-    }
-  }
+  runSmartSavePlan({
+    storeType: props.storeType ?? 'station',
+    steps: policy.steps,
+    defaultEmpireName: t('menu.default_empire_name')
+  })
 
   emit('close')
 }
@@ -176,13 +140,11 @@ const handleDiscard = () => {
     return
   }
 
-  if (props.storeType === 'ship-build') {
-    shipBuildStore.resetAll()
-  } else if (props.storeType === 'logicFlow') {
-    logicFlowStore.clearAll()
-  } else {
-    empireStore.createEmpire(t('menu.default_empire_name'))
-  }
+  runSmartSavePlan({
+    storeType: props.storeType ?? 'station',
+    steps: [{ type: 'NEW' }],
+    defaultEmpireName: t('menu.default_empire_name')
+  })
   emit('close')
 }
 

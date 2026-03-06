@@ -398,4 +398,20 @@ describe('ship-build-storage: dirty state', () => {
     store.saveBlueprint()
     expect(store.isDirty).toBe(false)
   })
+
+  it('1.7.3 新建仅清空配装并保留当前飞船，且 isDirty = false', () => {
+    const store = useShipBuildStore()
+    store.setSelectedShipId(ODACHI_ID)
+
+    store.setEquipment('engine', 'group_back_up_mid', 'engine_am', 3)
+    store.saveBlueprint()
+    store.setEquipment('engine', 'group_back_up_mid', 'engine_pm', 5)
+    expect(store.isDirty).toBe(true)
+
+    store.clearLoadoutForCurrentShip()
+
+    expect(store.selectedShipId).toBe(ODACHI_ID)
+    expect(store.blueprint).toBeNull()
+    expect(store.isDirty).toBe(false)
+  })
 })

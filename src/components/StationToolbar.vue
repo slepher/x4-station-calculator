@@ -16,6 +16,7 @@ import TopViewSwitch from './common/TopViewSwitch.vue'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useTitleEditor } from '@/composables/useTitleEditor'
+import { useSmartSaveRunner } from '@/composables/useSmartSaveRunner'
 
 const logicFlowStore = useLogicFlowStore()
 const empireStore = useEmpireStore()
@@ -23,6 +24,7 @@ const statusStore = useStatusStore()
 const shipBuildStore = useShipBuildStore()
 const { t } = useI18n()
 const { translateShip } = useX4I18n()
+const { runSmartSavePlan } = useSmartSaveRunner()
 
 const showLoadModal = ref(false)
 const showLoadFlowModal = ref(false)
@@ -134,14 +136,22 @@ const handleNew = () => {
       smartDialog.isOpen = true
       return
     }
-    shipBuildStore.resetAll()
+    runSmartSavePlan({
+      storeType: 'ship-build',
+      steps: [{ type: 'NEW' }],
+      defaultEmpireName: t('menu.default_empire_name')
+    })
     return
   }
 
   if (isFlowView.value) {
     const isEmpty = logicFlowStore.groups.length === 0
     if (isEmpty || !logicFlowStore.isDirty) {
-      logicFlowStore.clearAll()
+      runSmartSavePlan({
+        storeType: 'logicFlow',
+        steps: [{ type: 'NEW' }],
+        defaultEmpireName: t('menu.default_empire_name')
+      })
       return
     }
     smartDialog.intent = 'NEW'
@@ -150,7 +160,11 @@ const handleNew = () => {
   }
 
   if (!empireStore.shouldConfirmBeforeEmpireReset()) {
-    empireStore.resetEmpireWithDefaultName(t('menu.default_empire_name'))
+    runSmartSavePlan({
+      storeType: 'station',
+      steps: [{ type: 'NEW' }],
+      defaultEmpireName: t('menu.default_empire_name')
+    })
     return
   }
   smartDialog.intent = 'NEW'
@@ -173,7 +187,11 @@ const handleSave = () => {
     if (!shipBuildStore.blueprint.name) {
       shipBuildStore.blueprint.name = titleEditor.displayTitle.value
     }
-    shipBuildStore.saveBlueprint()
+    runSmartSavePlan({
+      storeType: 'ship-build',
+      steps: [{ type: 'SAVE' }],
+      defaultEmpireName: t('menu.default_empire_name')
+    })
     statusStore.pushMessage('success', 'save', t('menu.save'))
     return
   }
@@ -186,7 +204,11 @@ const handleSave = () => {
     if (logicFlowStore.savedPlans.activeId) {
       const current = logicFlowStore.savedPlans.list.find((l: any) => l.id === logicFlowStore.savedPlans.activeId)
       if (current) {
-        logicFlowStore.saveCurrentPlan()
+        runSmartSavePlan({
+          storeType: 'logicFlow',
+          steps: [{ type: 'SAVE' }],
+          defaultEmpireName: t('menu.default_empire_name')
+        })
         return
       }
     }
@@ -199,7 +221,11 @@ const handleSave = () => {
     statusStore.pushMessage('warning', 'save', t('menu.cannot_save_empty_plan'))
     return
   }
-  empireStore.saveEmpire()
+  runSmartSavePlan({
+    storeType: 'station',
+    steps: [{ type: 'SAVE' }],
+    defaultEmpireName: t('menu.default_empire_name')
+  })
   statusStore.pushMessage('success', 'save', t('menu.save'))
 }
 
@@ -262,11 +288,23 @@ const handleSmartDialogPrimary = () => {
 const handleSmartDialogSecondary = () => {
   // Secondary action: Discard and create new
   if (isShipBuildView.value) {
-    shipBuildStore.resetAll()
+    runSmartSavePlan({
+      storeType: 'ship-build',
+      steps: [{ type: 'NEW' }],
+      defaultEmpireName: t('menu.default_empire_name')
+    })
   } else if (isFlowView.value) {
-    logicFlowStore.clearAll()
+    runSmartSavePlan({
+      storeType: 'logicFlow',
+      steps: [{ type: 'NEW' }],
+      defaultEmpireName: t('menu.default_empire_name')
+    })
   } else {
-    empireStore.resetEmpireWithDefaultName(t('menu.default_empire_name'))
+    runSmartSavePlan({
+      storeType: 'station',
+      steps: [{ type: 'NEW' }],
+      defaultEmpireName: t('menu.default_empire_name')
+    })
   }
   smartDialog.isOpen = false
 }

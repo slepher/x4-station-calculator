@@ -1087,7 +1087,20 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     return map
   })
 
-  // Reset all filters and blueprint (for New action)
+  // Clear current fitting but keep selected ship (for New action in ship-build view)
+  const clearLoadoutForCurrentShip = () => {
+    if (!selectedShipId.value) return
+    blueprint.value = null
+    selectedByConnection.value = {}
+    fitMode.value = 'connection'
+    viewMode.value = 'workspace'
+    savedBlueprints.value.activeShipId = selectedShipId.value
+    savedBlueprints.value.activeBlueprintId = null
+    saveBlueprintsToStorage()
+    takeSnapshot()
+  }
+
+  // Reset all filters and blueprint
   const resetAll = () => {
     blueprint.value = null
     selectedShipId.value = null
@@ -1131,6 +1144,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     getBlueprintsForShip,
     loadBlueprintsFromStorage,
     updateBlueprintStorage,
+    clearLoadoutForCurrentShip,
     resetAll,
     // Legacy methods (keep for backward compatibility)
     setSelectedShipId,
