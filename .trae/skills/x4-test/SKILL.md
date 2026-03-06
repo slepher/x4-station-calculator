@@ -70,6 +70,15 @@ Default sequence:
      - then rerun `x4-test-run` for bug-targeted verification.
 7. Repeat branch loop until no unresolved blockers or user stops.
 
+#### A.4 Execution Agent Mode (MANDATORY)
+
+When the runtime supports delegated execution capabilities:
+
+1. If Agent Team / team-member execution is supported, `x4-test` MUST start and use team members for delegated phases.
+2. If Agent Team is not supported but subagent execution is supported, `x4-test` MUST start and use subagents for delegated phases.
+3. `x4-test-doc-viewer` remains a dedicated isolated reviewer execution and MUST stay isolated under either mode.
+4. If neither Agent Team nor subagent capability is available, stop and report `BLOCKED` with the missing capability.
+
 ### Chapter B: Update Mandatory
 
 #### B.1 Progress Reporting (MANDATORY)
