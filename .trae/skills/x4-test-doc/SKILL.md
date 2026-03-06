@@ -231,6 +231,8 @@ The document MUST include exactly 4 chapters, in order:
 Rules:
 - All four chapters MUST exist.
 - Chapter content can be empty (no forced minimum items per chapter).
+- If a chapter has zero checklist items, it is still valid and must not be backfilled with placeholder tasks.
+- This rule has higher priority than chapter-specific task-type rules below.
 - Do NOT create chapter 5.
 
 ##### B.2.2 Task Tree Structure (MANDATORY)
@@ -268,6 +270,10 @@ Indent levels are fixed to 0 / 2 / 4 spaces.
   - `- [ ] 3.x Case: <scenario-name>`
 - Chapter 4: only
   - `- [ ] 4.x BUG-<number>: <bug-description>`
+
+Note:
+- The above type constraints apply only when a chapter contains top-level tasks.
+- They do not imply any minimum item count for any chapter.
 
 ##### B.2.5 Required/Forbidden Formats (MANDATORY)
 
@@ -312,6 +318,7 @@ Applies to all top-level tasks (`x.x`) in Chapter 1/2/3/4:
     - at least one `修复后` assertion item (with `#期望: [...]`).
   - Numbering special case (MANDATORY): `修复前` assertion and `修复后` assertion MUST use the same task number (same step id pair).
   - In Chapter 4, this is the only allowed same-number duplication; other numbering must still follow contiguous increment rules.
+  - If Chapter 4 has no bug items, this section is non-applicable (valid empty chapter).
 
 #### B.3 Chapter 2 State/Transition Reference Integrity (MANDATORY)
 

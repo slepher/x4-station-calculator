@@ -101,6 +101,73 @@ controller 新增 import 编排：
 5. controller 按实际执行结果统一发 toast（成功/拦截/错误）。
 6. empire-import 经 controller.import 路径执行：`SAVE_AND_IMPORT` 或 `DISCARD_AND_IMPORT`，最终通过 `IMPORT_DATA` 完成落盘。
 
+## 操作点清单
+
+### A. 模组与按钮操作点（Toolbar）
+- station（empire）
+  - `NEW`：空方案直接新建；非空且 dirty 进入 SmartSave；非空且 non-dirty 直接新建
+  - `SAVE`：空方案拦截 warning；未保存对象转 `SAVE_AS`；已保存且 dirty 执行保存
+  - `SAVE_AS`：空方案拦截 warning；非空打开输入并保存
+- logicFlow
+  - `NEW`：与 station 同语义
+  - `SAVE`：与 station 同语义
+  - `SAVE_AS`：与 station 同语义
+- ship-build
+  - `NEW`：与 station 同语义（落到 ship-build 的 clear/new 语义）
+  - `SAVE`：与 station 同语义（落到 ship-build 的 save 语义）
+  - `SAVE_AS`：与 station 同语义（落到 ship-build 的 saveAs 语义）
+
+### A.1 分支状态维度（必须进入测试矩阵）
+- dirty / non-dirty
+- 新建未保存对象（new）/ 非新建已存在对象（non-new）
+- 空方案（empty）/ 非空方案（non-empty）
+
+要求：
+- 每个模组的每个按钮（`NEW/SAVE/SAVE_AS`）都要覆盖上述关键分支组合。
+- 用例断言必须是可观察行为（弹窗、按钮可见性、流程完成状态、消息触发次数）。
+
+### B. 导入操作点（Import）
+- empire 模式 direct import：
+  - `SAVE_AND_IMPORT = SAVE -> RESET -> IMPORT_DATA`
+  - `DISCARD_AND_IMPORT = RESET -> IMPORT_DATA`
+- 非 station import handler（`logicFlow` / `ship-build`）：
+  - 固定返回 unsupported，并走统一 warning 出口
+
+### C. 统一横切操作点
+- `isEmptyForSave`：三模组统一前置判定（影响 NEW/SAVE/SAVE_AS）
+- `requiresSaveAsOnSave`：三模组未保存对象触发 SAVE 时进入 SAVE_AS 意图
+- `getDefaultName`：三模组默认名策略统一入口
+- message strategy：保存成功 success 仅一次；拦截 warning 统一出口；纯 NEW 不发 success
+
+## 测试计划（按操作点映射）
+
+### 1) 单元测试主覆盖（完整矩阵）
+- 覆盖 `station / logicFlow / ship-build` 三模组的 `NEW/SAVE/SAVE_AS` 全组合。
+- 覆盖三模组的未保存对象 `SAVE -> SAVE_AS` 分流。
+- 覆盖 SmartSave 三类组合动作：
+  - `OVERWRITE_AND_NEW = SAVE -> NEW`
+  - `SAVE_AS_AND_NEW = SAVE_AS(name) -> NEW`
+  - `DISCARD_AND_NEW = NEW`
+- 覆盖 message strategy（success/warning）与 defaultName 口径。
+- 覆盖 import 编排序列和 unsupported handler 分支。
+
+### 2) E2E 集成覆盖（关键流程）
+- Toolbar 分支矩阵：`3 模组 x 3 按钮 x 4 状态(dirty/new)` = 36 个 case。
+- empire 入口导入流程：
+  - 打开导入弹窗 -> 进入导入确认 -> 保存并导入完成
+  - 打开导入弹窗 -> 进入导入确认 -> 放弃并导入完成
+  - 打开与关闭可交互性、保存/放弃后的动作按钮消失断言
+- 合计 Chapter 3 目标规模：36（Toolbar）+ 导入矩阵 case（>=6）。
+- 断言统一采用可观察 UI 信号：
+  - modal/dialog 可见性
+  - action 按钮可操作性
+  - 流程结束后的弹窗关闭状态
+
+### 3) 章节落地规则
+- `test_tasks.md` 第 1 章承载“模组 x 按钮 x 导入”完整单元矩阵。
+- `test_tasks.md` 第 2/3 章承载关键 E2E 状态与流程回归。
+- 第 4 章保留章节结构；如无已登记缺陷可为空。
+
 ## Risks
 1. 若保留旧分支消息触发，会出现重复 toast。
 2. 若 `isEmptyForSave()` 仍在 UI 层判断，语义会再次分散。
