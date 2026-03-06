@@ -240,6 +240,27 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     return current !== lastSavedSnapshot.value
   })
 
+  const isEditable = () => !selectedShipId.value
+
+  const isEmptyForSave = () => {
+    if (!selectedShipId.value) return true
+    if (!blueprint.value) return true
+
+    const hasConnectionEquipment = blueprint.value.connections.some((connection) =>
+      connection.group.some((group) => Boolean(group.equipment_id) || Boolean(group.shield?.equipment_id))
+    )
+    if (hasConnectionEquipment) return false
+
+    const storage = blueprint.value.storage
+    if (!storage) return true
+
+    const hasDeployables = storage.deployables?.some((item) => item.count > 0) || false
+    const hasDrones = storage.drones?.some((item) => item.count > 0) || false
+    const hasMissiles = storage.missiles?.some((item) => item.count > 0) || false
+    const hasCountermeasure = (storage.countermeasure?.count || 0) > 0
+    return !(hasDeployables || hasDrones || hasMissiles || hasCountermeasure)
+  }
+
   // Find connection in blueprint, create if not exists
   const findOrCreateConnection = (slotType: string): ShipBlueprintConnection => {
     if (!blueprint.value) {
@@ -486,6 +507,19 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     blueprint.value = newBlueprint
     saveBlueprintsToStorage()
     takeSnapshot()
+  }
+
+  const saveBlueprintWithFallbackName = (name: string) => {
+    if (blueprint.value && !blueprint.value.name) {
+      blueprint.value.name = name
+    }
+    saveBlueprint()
+  }
+
+  const requiresSaveAsOnSave = () => {
+    if (!blueprint.value) return true
+    if (!blueprint.value.id) return true
+    return !savedBlueprints.value.activeBlueprintId
   }
 
   const loadBlueprint = (id: string) => {
@@ -1133,12 +1167,16 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     blueprint,
     savedBlueprints,
     isDirty,
+    isEditable,
+    isEmptyForSave,
     setEquipment,
     setShield,
     setGroupEquipment,
     setGroupShield,
     saveBlueprint,
+    saveBlueprintWithFallbackName,
     saveAsBlueprint,
+    requiresSaveAsOnSave,
     loadBlueprint,
     deleteBlueprint,
     getBlueprintsForShip,

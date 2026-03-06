@@ -5,6 +5,7 @@ import { useEmpireStore } from '@/store/useEmpireStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useStatusStore } from '@/store/useStatusStore'
+import { useToolbarWorkflowController } from '@/composables/useToolbarWorkflowController'
 import { buildEmpireImportTargets, buildStationImportPayload, type LogicFlowImportWarning, type StationImportPayload } from '@/store/logic/logicFlowImport'
 import { getLogicFlowGroupDisplayName } from '@/store/logic/logicFlowGroupName'
 import { parseGameComLink, parseXmlBlueprintMeta, resolveModuleId } from '@/store/logic/blueprintParser'
@@ -30,6 +31,10 @@ const empireStore = useEmpireStore()
 const gameDataStore = useGameDataStore()
 const logicFlowStore = useLogicFlowStore()
 const statusStore = useStatusStore()
+const toolbarWorkflow = useToolbarWorkflowController({
+  t,
+  translateShip: (ship) => ship.name || ship.id
+})
 
 const activeTab = ref<ImportTabKey>('game-blueprint')
 const x4StationContent = ref('')
@@ -145,14 +150,6 @@ const handleImportX4StationString = () => {
   }
 }
 
-const shouldConfirmBeforeEmpireImport = () => {
-  return empireStore.shouldConfirmBeforeEmpireReset()
-}
-
-const resetEmpireForImport = () => {
-  empireStore.resetEmpireWithDefaultName(t('menu.default_empire_name'))
-}
-
 const getSelectedPlan = () => {
   const selection = pendingImportSelection.value
   if (!selection) return null
@@ -264,28 +261,27 @@ const handleImportSelected = (selection: { planId: string; groupId?: string }) =
     return
   }
 
-  if (shouldConfirmBeforeEmpireImport()) {
+  if (toolbarWorkflow.shouldConfirmBeforeImport('station')) {
     showEmpireImportConfirm.value = true
     return
   }
 
-  resetEmpireForImport()
-  executeEmpireImport()
+  toolbarWorkflow.runImportAction({
+    storeType: 'station',
+    choice: 'DISCARD_AND_IMPORT',
+    defaultEmpireName: t('menu.default_empire_name'),
+    importData: () => executeEmpireImport()
+  })
 }
 
-const handleEmpireSaveAndImport = () => {
+const handleEmpireImportSubmit = (payload: { choice: 'SAVE_AND_IMPORT' | 'DISCARD_AND_IMPORT' }) => {
   showEmpireImportConfirm.value = false
-  if (empireStore.activeEmpire) {
-    empireStore.saveEmpire()
-  }
-  resetEmpireForImport()
-  executeEmpireImport()
-}
-
-const handleEmpireDiscardAndImport = () => {
-  showEmpireImportConfirm.value = false
-  resetEmpireForImport()
-  executeEmpireImport()
+  toolbarWorkflow.runImportAction({
+    storeType: 'station',
+    choice: payload.choice,
+    defaultEmpireName: t('menu.default_empire_name'),
+    importData: () => executeEmpireImport()
+  })
 }
 
 const getFileStationName = (xmlName: string, fileName: string) => {
@@ -635,8 +631,7 @@ const handleBlueprintActionNew = () => {
       intent="NEW"
       storeType="station"
       mode="import"
-      @confirm-primary="handleEmpireSaveAndImport"
-      @confirm-secondary="handleEmpireDiscardAndImport"
+      @submit-import="handleEmpireImportSubmit"
       @close="showEmpireImportConfirm = false"
     />
 

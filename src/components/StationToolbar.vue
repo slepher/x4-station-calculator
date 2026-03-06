@@ -2,7 +2,6 @@
 import { ref, reactive, computed, watch } from 'vue'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
-import { useStatusStore } from '@/store/useStatusStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import LanguageSelector from './LanguageSelector.vue'
 import MissingTranslate from './MissingTranslate.vue'
@@ -16,15 +15,15 @@ import TopViewSwitch from './common/TopViewSwitch.vue'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useTitleEditor } from '@/composables/useTitleEditor'
-import { useSmartSaveRunner } from '@/composables/useSmartSaveRunner'
+import { useToolbarWorkflowController } from '@/composables/useToolbarWorkflowController'
+import type { SmartSaveStep } from '@/utils/smartSavePolicy'
 
 const logicFlowStore = useLogicFlowStore()
 const empireStore = useEmpireStore()
-const statusStore = useStatusStore()
 const shipBuildStore = useShipBuildStore()
 const { t } = useI18n()
 const { translateShip } = useX4I18n()
-const { runSmartSavePlan } = useSmartSaveRunner()
+const toolbarWorkflow = useToolbarWorkflowController({ t, translateShip })
 
 const showLoadModal = ref(false)
 const showLoadFlowModal = ref(false)
@@ -39,6 +38,12 @@ const smartDialog = reactive({
 const isFlowView = computed(() => shipBuildStore.activeView === 'flow')
 const isShipBuildView = computed(() => shipBuildStore.activeView === 'ship-build')
 const isShipActionDisabled = computed(() => isShipBuildView.value && !shipBuildStore.selectedShipId)
+const activeToolbarStoreType = computed(() => (
+  isShipBuildView.value ? 'ship-build' : (isFlowView.value ? 'logicFlow' : 'station')
+))
+const isToolbarActionDisabled = computed(() => (
+  isShipActionDisabled.value || toolbarWorkflow.isEditableFor(activeToolbarStoreType.value)
+))
 
 // 根据视图类型获取当前配置
 const currentConfig = computed(() => {
@@ -46,7 +51,7 @@ const currentConfig = computed(() => {
     return {
       getName: () => logicFlowStore.currentPlanName,
       setName: (name: string) => { logicFlowStore.currentPlanName = name },
-      getDefaultName: () => t('menu.default_flow_name')
+      getDefaultName: () => toolbarWorkflow.getDefaultName('logicFlow')
     }
   }
   if (isShipBuildView.value) {
@@ -57,11 +62,7 @@ const currentConfig = computed(() => {
           shipBuildStore.blueprint.name = name
         }
       },
-      getDefaultName: () => {
-        const ship = shipBuildStore.selectedShip
-        const shipName = ship ? translateShip(ship) : ''
-        return shipName ? `${shipName} ${t('menu.blueprint')}` : t('menu.default_blueprint_name')
-      }
+      getDefaultName: () => toolbarWorkflow.getDefaultName('ship-build', { selectedShip: shipBuildStore.selectedShip })
     }
   }
   return {
@@ -71,7 +72,7 @@ const currentConfig = computed(() => {
         empireStore.activeEmpire.name = name
       }
     },
-    getDefaultName: () => t('empire.new_empire_name')
+    getDefaultName: () => toolbarWorkflow.getDefaultName('station')
   }
 })
 
@@ -128,135 +129,39 @@ watch(displayTitle, (newVal) => {
 }, { immediate: true })
 
 const handleNew = () => {
-  if (isShipBuildView.value) {
-    if (!shipBuildStore.selectedShipId) return
-    if (shipBuildStore.isDirty) {
-      // Use smartDialog like empire/flow for consistency
-      smartDialog.intent = 'NEW'
-      smartDialog.isOpen = true
-      return
-    }
-    runSmartSavePlan({
-      storeType: 'ship-build',
-      steps: [{ type: 'NEW' }],
-      defaultEmpireName: t('menu.default_empire_name')
-    })
-    return
-  }
-
-  if (isFlowView.value) {
-    const isEmpty = logicFlowStore.groups.length === 0
-    if (isEmpty || !logicFlowStore.isDirty) {
-      runSmartSavePlan({
-        storeType: 'logicFlow',
-        steps: [{ type: 'NEW' }],
-        defaultEmpireName: t('menu.default_empire_name')
-      })
-      return
-    }
-    smartDialog.intent = 'NEW'
+  const result = toolbarWorkflow.runAction({
+    storeType: activeToolbarStoreType.value,
+    action: 'NEW',
+    defaultEmpireName: t('menu.default_empire_name')
+  })
+  if (result.kind === 'open-smart-save') {
+    smartDialog.intent = result.intent
     smartDialog.isOpen = true
-    return
   }
-
-  if (!empireStore.shouldConfirmBeforeEmpireReset()) {
-    runSmartSavePlan({
-      storeType: 'station',
-      steps: [{ type: 'NEW' }],
-      defaultEmpireName: t('menu.default_empire_name')
-    })
-    return
-  }
-  smartDialog.intent = 'NEW'
-  smartDialog.isOpen = true
 }
 
 const handleSave = () => {
-  if (isShipBuildView.value) {
-    if (!shipBuildStore.selectedShipId) {
-      statusStore.pushMessage('warning', 'save', t('menu.cannot_save_empty_plan'))
-      return
-    }
-    if (!shipBuildStore.isDirty) return
-    if (!shipBuildStore.blueprint) {
-      // No existing blueprint, prompt for name
-      handleSaveAs()
-      return
-    }
-    // 保存时，如果 name 为空，使用当前显示名称作为默认值
-    if (!shipBuildStore.blueprint.name) {
-      shipBuildStore.blueprint.name = titleEditor.displayTitle.value
-    }
-    runSmartSavePlan({
-      storeType: 'ship-build',
-      steps: [{ type: 'SAVE' }],
-      defaultEmpireName: t('menu.default_empire_name')
-    })
-    statusStore.pushMessage('success', 'save', t('menu.save'))
-    return
-  }
-
-  if (isFlowView.value) {
-    if (logicFlowStore.groups.length === 0) {
-      statusStore.pushMessage('warning', 'save', t('menu.cannot_save_empty_plan'))
-      return
-    }
-    if (logicFlowStore.savedPlans.activeId) {
-      const current = logicFlowStore.savedPlans.list.find((l: any) => l.id === logicFlowStore.savedPlans.activeId)
-      if (current) {
-        runSmartSavePlan({
-          storeType: 'logicFlow',
-          steps: [{ type: 'SAVE' }],
-          defaultEmpireName: t('menu.default_empire_name')
-        })
-        return
-      }
-    }
-    handleSaveAs()
-    return
-  }
-  
-  const hasStations = empireStore.activeEmpire?.stations.some(s => s.modules.length > 0)
-  if (!hasStations) {
-    statusStore.pushMessage('warning', 'save', t('menu.cannot_save_empty_plan'))
-    return
-  }
-  runSmartSavePlan({
-    storeType: 'station',
-    steps: [{ type: 'SAVE' }],
+  const result = toolbarWorkflow.runAction({
+    storeType: activeToolbarStoreType.value,
+    action: 'SAVE',
     defaultEmpireName: t('menu.default_empire_name')
   })
-  statusStore.pushMessage('success', 'save', t('menu.save'))
+  if (result.kind === 'open-smart-save') {
+    smartDialog.intent = result.intent
+    smartDialog.isOpen = true
+  }
 }
 
 const handleSaveAs = () => {
-  if (isShipBuildView.value) {
-    if (!shipBuildStore.selectedShipId) {
-      statusStore.pushMessage('warning', 'save', t('menu.cannot_save_empty_plan'))
-      return
-    }
-    smartDialog.intent = 'SAVE_AS'
+  const result = toolbarWorkflow.runAction({
+    storeType: activeToolbarStoreType.value,
+    action: 'SAVE_AS',
+    defaultEmpireName: t('menu.default_empire_name')
+  })
+  if (result.kind === 'open-smart-save') {
+    smartDialog.intent = result.intent
     smartDialog.isOpen = true
-    return
   }
-
-  if (isFlowView.value) {
-    if (logicFlowStore.groups.length === 0) {
-      statusStore.pushMessage('warning', 'save', t('menu.cannot_save_empty_plan'))
-      return
-    }
-    smartDialog.intent = 'SAVE_AS'
-    smartDialog.isOpen = true
-    return
-  }
-  
-  const hasStations = empireStore.activeEmpire?.stations.some(s => s.modules.length > 0)
-  if (!hasStations) {
-    statusStore.pushMessage('warning', 'save', t('menu.cannot_save_empty_plan'))
-    return
-  }
-  smartDialog.intent = 'SAVE_AS'
-  smartDialog.isOpen = true
 }
 
 const handleLoad = () => {
@@ -277,36 +182,19 @@ const handleSmartDialogClose = () => {
   smartDialog.isOpen = false
 }
 
-const handleSmartDialogPrimary = () => {
-  // Primary action: Save current state
-  if (isShipBuildView.value) {
-    handleSave()
-  }
+const handleSmartDialogSubmitDefault = ({ steps }: { steps: SmartSaveStep[] }) => {
+  toolbarWorkflow.runSmartSaveSteps({
+    storeType: activeToolbarStoreType.value,
+    steps,
+    defaultEmpireName: t('menu.default_empire_name')
+  })
   smartDialog.isOpen = false
 }
 
-const handleSmartDialogSecondary = () => {
-  // Secondary action: Discard and create new
-  if (isShipBuildView.value) {
-    runSmartSavePlan({
-      storeType: 'ship-build',
-      steps: [{ type: 'NEW' }],
-      defaultEmpireName: t('menu.default_empire_name')
-    })
-  } else if (isFlowView.value) {
-    runSmartSavePlan({
-      storeType: 'logicFlow',
-      steps: [{ type: 'NEW' }],
-      defaultEmpireName: t('menu.default_empire_name')
-    })
-  } else {
-    runSmartSavePlan({
-      storeType: 'station',
-      steps: [{ type: 'NEW' }],
-      defaultEmpireName: t('menu.default_empire_name')
-    })
+const handleSmartDialogInvalid = (payload: { reason: 'EMPTY_NAME' }) => {
+  if (payload.reason === 'EMPTY_NAME') {
+    toolbarWorkflow.pushEmptyNameBlocked()
   }
-  smartDialog.isOpen = false
 }
 
 const handleExport = () => {
@@ -317,7 +205,7 @@ const handleExport = () => {
 <template>
   <div class="toolbar-panel">
     <div class="flex items-center gap-1.5 ml-4">
-      <button :class="['btn-tool', themeColors.secondary]" :disabled="isShipActionDisabled" @click="handleNew">
+      <button :class="['btn-tool', themeColors.secondary]" :disabled="isToolbarActionDisabled" @click="handleNew">
         <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
@@ -325,7 +213,7 @@ const handleExport = () => {
         </svg>
         <span>{{ t('menu.new') }}</span>
       </button>
-      <button :class="['btn-tool', themeColors.primary]" :disabled="isShipActionDisabled" @click="handleSave">
+      <button :class="['btn-tool', themeColors.primary]" :disabled="isToolbarActionDisabled" @click="handleSave">
         <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
@@ -334,7 +222,7 @@ const handleExport = () => {
         </svg>
         <span>{{ t('menu.save') }}</span>
       </button>
-      <button :class="['btn-tool', themeColors.primary]" :disabled="isShipActionDisabled" @click="handleSaveAs">
+      <button :class="['btn-tool', themeColors.primary]" :disabled="isToolbarActionDisabled" @click="handleSaveAs">
         <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M7 21h10" />
@@ -422,8 +310,8 @@ const handleExport = () => {
       :initialName="displayTitle"
       :storeType="isShipBuildView ? 'ship-build' : (isFlowView ? 'logicFlow' : 'station')"
       @close="handleSmartDialogClose"
-      @confirm-primary="handleSmartDialogPrimary"
-      @confirm-secondary="handleSmartDialogSecondary"
+      @submit-default="handleSmartDialogSubmitDefault"
+      @invalid="handleSmartDialogInvalid"
     />
   </div>
 </template>

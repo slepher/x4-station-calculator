@@ -35,7 +35,7 @@ function createDefaultStation(name: string, type: StationType = 'industrial'): S
   }
 }
 
-function createDefaultEmpire(name: string = 'New Empire'): EmpirePlan {
+function createDefaultEmpire(name: string = ''): EmpirePlan {
   return {
     id: crypto.randomUUID(),
     name,
@@ -212,7 +212,22 @@ export const useEmpireStore = defineStore('empire', () => {
     takeSnapshot()
   }
 
-  function createEmpire(name: string = 'New Empire'): EmpirePlan {
+  function saveEmpireAs(name: string) {
+    if (!activeEmpire.value) return false
+    const newEmpire = JSON.parse(JSON.stringify(activeEmpire.value))
+    newEmpire.id = crypto.randomUUID()
+    newEmpire.name = name
+    newEmpire.stations.forEach((s: { id: string }) => { s.id = crypto.randomUUID() })
+    activeEmpire.value = newEmpire
+    saveEmpire()
+    return true
+  }
+
+  function requiresSaveAsOnSave() {
+    return !savedEmpires.value.activeId
+  }
+
+  function createEmpire(name: string = ''): EmpirePlan {
     const empire = createDefaultEmpire(name)
     activeEmpire.value = empire
     activeStationId.value = null
@@ -379,11 +394,19 @@ export const useEmpireStore = defineStore('empire', () => {
     return current !== lastSavedSnapshot.value
   })
 
+  function isEmptyForSave() {
+    return !activeEmpire.value || activeEmpire.value.stations.length === 0
+  }
+
+  function isEditable() {
+    return false
+  }
+
   function shouldConfirmBeforeEmpireReset() {
     return isDirty.value
   }
 
-  function resetEmpireWithDefaultName(defaultName: string = 'New Empire') {
+  function resetEmpireWithDefaultName(defaultName: string = '') {
     return createEmpire(defaultName)
   }
 
@@ -444,6 +467,8 @@ export const useEmpireStore = defineStore('empire', () => {
   return {
     isReady,
     isDirty,
+    isEditable,
+    isEmptyForSave,
     version,
     empires,
     activeEmpireId,
@@ -462,6 +487,8 @@ export const useEmpireStore = defineStore('empire', () => {
     loadData,
     saveToStorage,
     saveEmpire,
+    saveEmpireAs,
+    requiresSaveAsOnSave,
     loadEmpire,
     deleteEmpire,
     createEmpire,

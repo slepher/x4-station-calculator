@@ -924,6 +924,14 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     return current !== lastSavedSnapshot.value
   })
 
+  function isEmptyForSave() {
+    return groups.value.length === 0
+  }
+
+  function isEditable() {
+    return false
+  }
+
   /**
    * 将 FlowNode 转换为 SavedFlowNode（仅保存 manual 和 isolated 节点）
    */
@@ -994,6 +1002,23 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     lastSavedSnapshot.value = JSON.stringify({ groups: groups.value, settings: settings.value })
     savePlansToStorage()
     return true
+  }
+
+  /**
+   * 另存为当前方案（强制创建新方案）
+   */
+  function saveCurrentPlanAs(name: string): boolean {
+    const originalId = savedPlans.value.activeId
+    savedPlans.value.activeId = null
+    const saved = saveCurrentPlan(name)
+    if (!saved) {
+      savedPlans.value.activeId = originalId
+    }
+    return saved
+  }
+
+  function requiresSaveAsOnSave() {
+    return !savedPlans.value.activeId
   }
 
   /**
@@ -1172,7 +1197,11 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     lastSavedSnapshot,
     settings,
     isDirty,
+    isEditable,
+    isEmptyForSave,
     saveCurrentPlan,
+    saveCurrentPlanAs,
+    requiresSaveAsOnSave,
     loadPlan,
     applyPlan,
     deletePlan,

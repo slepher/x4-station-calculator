@@ -3,8 +3,7 @@ import { ref, computed, watch, nextTick } from 'vue'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
-import { useSmartSaveRunner } from '@/composables/useSmartSaveRunner'
-import { buildSmartSavePlan } from '@/utils/smartSavePolicy'
+import { buildSmartSavePlan, type SmartSaveStep } from '@/utils/smartSavePolicy'
 import { useI18n } from 'vue-i18n'
 import type { LogicFlowPlan } from '@/types/x4';
 
@@ -16,11 +15,15 @@ const props = defineProps<{
   mode?: 'default' | 'import'
 }>()
 
-const emit = defineEmits(['close', 'confirm-primary', 'confirm-secondary'])
+const emit = defineEmits<{
+  (e: 'close'): void
+  (e: 'submit-default', payload: { steps: SmartSaveStep[] }): void
+  (e: 'submit-import', payload: { choice: 'SAVE_AND_IMPORT' | 'DISCARD_AND_IMPORT' }): void
+  (e: 'invalid', payload: { reason: 'EMPTY_NAME' }): void
+}>()
 const logicFlowStore = useLogicFlowStore()
 const empireStore = useEmpireStore()
 const shipBuildStore = useShipBuildStore()
-const { runSmartSavePlan } = useSmartSaveRunner()
 const { t } = useI18n()
 
 const isSaveAsExpanded = ref(false)
@@ -112,7 +115,7 @@ const showInput = computed(() => {
 
 const handlePrimaryAction = () => {
   if (props.mode === 'import') {
-    emit('confirm-primary')
+    emit('submit-import', { choice: 'SAVE_AND_IMPORT' })
     emit('close')
     return
   }
@@ -122,29 +125,23 @@ const handlePrimaryAction = () => {
     showInput: showInput.value,
     inputName: showInput.value ? inputName.value : currentPlanName.value
   })
-  if (!policy.ok) return
+  if (!policy.ok) {
+    emit('invalid', { reason: policy.reason })
+    return
+  }
 
-  runSmartSavePlan({
-    storeType: props.storeType ?? 'station',
-    steps: policy.steps,
-    defaultEmpireName: t('menu.default_empire_name')
-  })
-
+  emit('submit-default', { steps: policy.steps })
   emit('close')
 }
 
 const handleDiscard = () => {
   if (props.mode === 'import') {
-    emit('confirm-secondary')
+    emit('submit-import', { choice: 'DISCARD_AND_IMPORT' })
     emit('close')
     return
   }
 
-  runSmartSavePlan({
-    storeType: props.storeType ?? 'station',
-    steps: [{ type: 'NEW' }],
-    defaultEmpireName: t('menu.default_empire_name')
-  })
+  emit('submit-default', { steps: [{ type: 'NEW' }] })
   emit('close')
 }
 
