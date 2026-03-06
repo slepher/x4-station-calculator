@@ -1,11 +1,13 @@
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
-import type { ConnectionValue, EquipmentType, ShipBlueprint, ShipBlueprintConnection, ShipEquipmentSize, X4Equipment, X4EquipmentType, X4Ship, X4Ware } from '@/types/x4'
+import type { ConnectionValue, EquipmentType, SavedShipBlueprintsState, ShipBlueprint, ShipBlueprintConnection, ShipEquipmentSize, X4Equipment, X4EquipmentType, X4Ship, X4Ware } from '@/types/x4'
 import type { FitConnectionRow, FitMode } from '@/components/ship-build/fitTypes'
 import shipsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ships.json'
 import equipmentsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
 import equipmentTypesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipment_types.json'
 import waresRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/wares.json'
+import { migrateShipBlueprintStateToCurrent } from './logic/stateMigrations'
+import { CURRENT_SHIP_BLUEPRINT_VERSION } from './logic/storageVersions'
 
 const STORAGE_KEY = 'x4_ship_blueprints'
 
@@ -76,8 +78,8 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   const fitMode = ref<FitMode>('connection')
   // Blueprint persistence state
   const blueprint = ref<ShipBlueprint | null>(null)
-  const savedBlueprints = ref<{ version: 1; activeId: string | null; list: ShipBlueprint[] }>({
-    version: 1,
+  const savedBlueprints = ref<SavedShipBlueprintsState>({
+    version: CURRENT_SHIP_BLUEPRINT_VERSION,
     activeId: null,
     list: []
   })
@@ -109,7 +111,11 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     try {
       const data = localStorage.getItem(STORAGE_KEY)
       if (data) {
-        savedBlueprints.value = JSON.parse(data)
+        const parsed = JSON.parse(data)
+        const migrated = migrateShipBlueprintStateToCurrent(parsed)
+        migrated.warnings.forEach((warning) => console.warn('[ShipBuildStore][Migration]', warning))
+        savedBlueprints.value = migrated.state
+        saveBlueprintsToStorage()
       }
     } catch (e) {
       console.error('Failed to load blueprints from storage:', e)

@@ -5,13 +5,15 @@ import type {
   SavedFlowGroup,
   SavedFlowNode,
   SavedFlowPlansState,
+  SavedShipBlueprintsState,
   SavedModule,
+  ShipBlueprint,
   StationPlan,
   V1StorageState,
   X4Module
 } from '@/types/x4'
 import { resolveModuleId } from './blueprintParser'
-import { CURRENT_EMPIRE_VERSION, CURRENT_FLOW_VERSION } from './storageVersions'
+import { CURRENT_EMPIRE_VERSION, CURRENT_FLOW_VERSION, CURRENT_SHIP_BLUEPRINT_VERSION } from './storageVersions'
 
 type ModuleLookup = {
   modulesMap: Record<string, X4Module>
@@ -256,5 +258,62 @@ export function migrateFlowStateToCurrent(
   }
 
   working.version = CURRENT_FLOW_VERSION
+  return { state: working, warnings }
+}
+
+function normalizeShipBlueprintShape(input: SavedShipBlueprintsState): SavedShipBlueprintsState {
+  const rawList = Array.isArray(input.list) ? input.list : []
+  const list: ShipBlueprint[] = rawList.map((item, index) => {
+    const blueprint: Record<string, unknown> = isObject(item) ? item : {}
+    const storage = isObject(blueprint.storage)
+      ? (deepClone(blueprint.storage) as unknown as ShipBlueprint['storage'])
+      : undefined
+    const hull = isObject(blueprint.hull)
+      ? (deepClone(blueprint.hull) as unknown as ShipBlueprint['hull'])
+      : undefined
+    return {
+      id: typeof blueprint.id === 'string' && blueprint.id ? blueprint.id : crypto.randomUUID(),
+      name: typeof blueprint.name === 'string' ? blueprint.name : '',
+      shipId: typeof blueprint.shipId === 'string' ? blueprint.shipId : '',
+      connections: Array.isArray(blueprint.connections) ? deepClone(blueprint.connections) : [],
+      storage,
+      hull,
+      lastUpdated: Number(blueprint.lastUpdated) || Date.now() + index
+    }
+  }).filter((blueprint) => Boolean(blueprint.shipId))
+
+  const activeId = input.activeId && list.some((item) => item.id === input.activeId)
+    ? input.activeId
+    : list[0]?.id || null
+
+  return {
+    version: input.version,
+    activeId,
+    list
+  }
+}
+
+export function migrateShipBlueprintStateToCurrent(
+  input: unknown
+): MigrationResult<SavedShipBlueprintsState> {
+  const warnings: string[] = []
+  const raw = isObject(input) ? input : {}
+  const version = typeof raw.version === 'number' ? raw.version : 1
+  const activeId = typeof raw.activeId === 'string' ? raw.activeId : null
+  const list = Array.isArray(raw.list) ? deepClone(raw.list) : []
+
+  const working = normalizeShipBlueprintShape({
+    version,
+    activeId,
+    list
+  })
+
+  if (working.version > CURRENT_SHIP_BLUEPRINT_VERSION) {
+    warnings.push(
+      `[ship-blueprint] input version ${working.version} is newer than supported ${CURRENT_SHIP_BLUEPRINT_VERSION}; fallback to best-effort migration`
+    )
+  }
+
+  working.version = CURRENT_SHIP_BLUEPRINT_VERSION
   return { state: working, warnings }
 }

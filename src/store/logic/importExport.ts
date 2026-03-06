@@ -11,8 +11,8 @@ import type {
   SavedFlowNode,
   ShipBlueprint
 } from '@/types/x4'
-import { migrateEmpireStateToCurrent, migrateFlowStateToCurrent } from './stateMigrations'
-import { CURRENT_EMPIRE_VERSION, CURRENT_FLOW_VERSION } from './storageVersions'
+import { migrateEmpireStateToCurrent, migrateFlowStateToCurrent, migrateShipBlueprintStateToCurrent } from './stateMigrations'
+import { CURRENT_EMPIRE_VERSION, CURRENT_FLOW_VERSION, CURRENT_SHIP_BLUEPRINT_VERSION } from './storageVersions'
 
 export type ImportMode = 'overwrite' | 'incremental'
 export type ImportModuleKey = 'x4_empire_data' | 'x4_logic_flow_plans' | 'x4_ship_blueprints'
@@ -138,11 +138,11 @@ function coerceFlowState(value: unknown): SavedFlowPlansState | null {
 
 function coerceShipState(value: unknown): SavedShipBlueprintsState | null {
   if (!isShipState(value)) return null
-  const raw = value as unknown as SavedShipBlueprintsState
+  const raw = value as unknown as Record<string, unknown>
   return {
-    version: 1,
-    activeId: raw.activeId || null,
-    list: deepClone(raw.list || [])
+    version: typeof raw.version === 'number' ? raw.version : CURRENT_SHIP_BLUEPRINT_VERSION,
+    activeId: typeof raw.activeId === 'string' ? raw.activeId : null,
+    list: deepClone((raw.list as unknown[]) || []) as SavedShipBlueprintsState['list']
   }
 }
 
@@ -158,10 +158,6 @@ function migrateFlowState(input: SavedFlowPlansState, gameDataStore: GameDataSto
     modulesMap: gameDataStore.modulesMap,
     modulesByMacroId: gameDataStore.modulesByMacroId
   })
-}
-
-function migrateShipState(input: SavedShipBlueprintsState): SavedShipBlueprintsState {
-  return deepClone(input)
 }
 
 function remapEmpireIds(input: SavedEmpiresState): { state: SavedEmpiresState; activeChangedTo: string | null } {
@@ -264,7 +260,7 @@ function remapShipIds(input: SavedShipBlueprintsState): { state: SavedShipBluepr
 
   return {
     state: {
-      version: 1,
+      version: CURRENT_SHIP_BLUEPRINT_VERSION,
       activeId: mappedActive,
       list
     },
@@ -317,7 +313,7 @@ function mergeFlowState(current: SavedFlowPlansState, incoming: SavedFlowPlansSt
 
 function mergeShipState(current: SavedShipBlueprintsState, incoming: SavedShipBlueprintsState): SavedShipBlueprintsState {
   return {
-    version: 1,
+    version: CURRENT_SHIP_BLUEPRINT_VERSION,
     activeId: current.activeId,
     list: [...deepClone(current.list), ...deepClone(incoming.list)]
   }
@@ -382,6 +378,7 @@ export function buildExportPayload(
     ...deepClone(flow),
     version: CURRENT_FLOW_VERSION
   }
+  const migratedShip = migrateShipBlueprintStateToCurrent(ship)
 
   return {
     format: 'x4-import-export',
@@ -390,7 +387,7 @@ export function buildExportPayload(
     data: {
       [EMPIRE_KEY]: deepClone(migratedEmpire),
       [FLOW_KEY]: deepClone(migratedFlow),
-      [SHIP_KEY]: deepClone(ship)
+      [SHIP_KEY]: deepClone(migratedShip.state)
     }
   }
 }
@@ -495,7 +492,9 @@ function applyShipImport(options: ImportApplyOptions, warnings: string[]): boole
   const incomingRaw = coerceShipState(raw)
   if (!incomingRaw) return false
 
-  const migrated = migrateShipState(incomingRaw)
+  const migratedResult = migrateShipBlueprintStateToCurrent(incomingRaw)
+  warnings.push(...migratedResult.warnings)
+  const migrated = migratedResult.state
   const current = deepClone(options.shipBuildStore.savedBlueprints)
 
   let next: SavedShipBlueprintsState

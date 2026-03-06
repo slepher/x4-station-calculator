@@ -2,6 +2,7 @@ import { readFile, writeFile, mkdir, rename, readdir } from 'node:fs/promises'
 import path from 'node:path'
 import { createHash } from 'node:crypto'
 import { parse } from 'yaml'
+import { CURRENT_EMPIRE_VERSION, CURRENT_FLOW_VERSION, CURRENT_SHIP_BLUEPRINT_VERSION } from '../src/store/logic/storageVersions'
 
 const ROOT = process.cwd()
 const SEED_DIR = path.join(ROOT, 'tests/seeds')
@@ -198,7 +199,7 @@ type ResolvedShipBuildBlueprintConnection = {
 }
 
 type SavedShipBlueprintsState = {
-  version: 1
+  version: number
   activeId: string | null
   list: ShipBlueprint[]
 }
@@ -365,7 +366,7 @@ const buildLogicFlowState = (
   })
 
   return {
-    version: 2,
+    version: CURRENT_FLOW_VERSION,
     activeId: plans[0]?.id ?? null,
     list: plans
   }
@@ -396,7 +397,7 @@ const buildEmpireState = (seed: SeedEmpire, now: number): SavedEmpiresState => {
   })
 
   return {
-    version: 3,
+    version: CURRENT_EMPIRE_VERSION,
     activeId: empires[0]?.id ?? null,
     activeStationId: empires[0]?.stations[0]?.id ?? null,
     list: empires
@@ -559,7 +560,7 @@ const buildShipBlueprintState = (
     }))
 
   return {
-    version: 1,
+    version: CURRENT_SHIP_BLUEPRINT_VERSION,
     activeId: list[0]?.id ?? null,
     list
   }

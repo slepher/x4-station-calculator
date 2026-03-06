@@ -747,7 +747,7 @@ export interface ShipBlueprint {
 }
 
 export interface SavedShipBlueprintsState {
-  version: 1
+  version: number
   activeId: string | null
   list: ShipBlueprint[]
 }
