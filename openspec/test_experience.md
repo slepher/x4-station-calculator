@@ -133,3 +133,17 @@ await page.locator('.result-item').first().click();
 
 - 在 `ship-build` selector 模式下，不应读取仅存在于 workspace 的头部定位器（如 `ship-build-change-ship-fit-header`）；应先基于 selector 内控件（`ship-build-confirm-ship` / `ship-build-cancel-ship-change`）做前置断言。
 - Chapter 2 transition helper 复用于 Chapter 3 时，优先保证 helper 内部前置定位器与当前视图一致，可显著降低跨 case 复用时的超时波动。
+
+
+## Ship Build 入口前置补充（2026-03-06）
+
+- 在 `ship-level-blueprint` 跑批中，多个 case 同时失败于 `top-view-btn-ship-build` 点击后的 `ship-build-filters` 可见性断言，表现为“入口点击成功但未进入 selector 视图”。
+- 建议将 `gotoShipBuild` 设计为“视图收敛 helper”：先判断当前在 workspace 还是 selector，再执行必要切换，避免把固定 `ship-build-filters` 可见作为唯一入口成功条件。
+- 对共享状态 helper（如 `ship-toolbar-no-selected-ship` / `ship-toolbar-selected-ship-and-dirty`）应在失败日志中输出当前视图判定信息，降低批量失败时的排障成本。
+
+
+## Ship Toolbar 切换与任务编号补充（2026-03-06）
+
+- `ship-level-blueprint` 第二轮中，`2.3/3.2/3.3/3.4` 失败集中在同一 `test_defect`：case 先通过 `Discard & New` 回到 selector，再直接执行 fit 面板操作会因未回到 workspace 导致 `ship-build-panel-fit` 不可见。
+- 建议将“执行 fit 操作”的 helper 统一增加 selector->workspace 收敛步骤（例如点击目标 ship 并 confirm，或显式切回 panels）后再操作槽位。
+- `test_tasks.md` 若存在重复 marker（如同一 case 同时出现两条 `4.1.3`），`apply_test_results.py` 无法区分子项并会同时打标；建议保持 marker 全局唯一（如 `4.1.3` / `4.1.4`）以避免回写歧义。
