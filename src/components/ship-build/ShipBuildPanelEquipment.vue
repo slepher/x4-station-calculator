@@ -194,20 +194,17 @@ const comparisonData = computed<ComparisonItem[]>(() => {
 
   if (type === 'engine') {
     const fields: FieldDef[] = [
-      { key: 'thrustForward', labelKey: 'ship_build.equipment_thrust_forward', unit: '' },
       { key: 'speed', labelKey: 'ship_build.equipment_speed', unit: 'm/s' },
       { key: 'acceleration', labelKey: 'ship_build.equipment_acceleration', unit: 'm/s²' },
-      { key: 'boostMultiplier', labelKey: 'ship_build.equipment_boost_multiplier', unit: '' },
       { key: 'boostSpeed', labelKey: 'ship_build.equipment_boost_speed', unit: 'm/s' },
       { key: 'boostAccel', labelKey: 'ship_build.equipment_boost_accel', unit: 'm/s²' },
       { key: 'boostDuration', labelKey: 'ship_build.equipment_boost_duration', unit: 's' },
       { key: 'boostRecharge', labelKey: 'ship_build.equipment_boost_recharge', unit: 's' },
-      { key: 'travelThrust', labelKey: 'ship_build.equipment_travel_thrust', unit: '' },
       { key: 'travelSpeed', labelKey: 'ship_build.equipment_travel_speed', unit: 'm/s' },
-      { key: 'travelCharge', labelKey: 'ship_build.equipment_travel_charge', unit: 's' },
       { key: 'travelAcceleration', labelKey: 'ship_build.equipment_travel_acceleration', unit: 'm/s²' },
-      { key: 'travelAttack', labelKey: 'ship_build.equipment_travel_attack', unit: '' },
-      { key: 'boostAcceleration', labelKey: 'ship_build.equipment_boost_acceleration', unit: 'm/s²' }
+      { key: 'travelCharge', labelKey: 'ship_build.equipment_travel_charge', unit: 's' },
+      { key: 'travelAttack', labelKey: 'ship_build.equipment_travel_attack', unit: 's' },
+      { key: 'travelRelease', labelKey: 'ship_build.equipment_travel_release', unit: 's' },
     ]
 
     const maxValues: Record<string, number> = {}

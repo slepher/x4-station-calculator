@@ -132,7 +132,8 @@ const getTurretStatsByUseEquipmentStats = (blueprintData: ShipBlueprint | null) 
     })
   })
 
-  return turretCount > 0 ? totalDamage / turretCount : 0
+  // 按六个方向平均，返回“每方向持续 DPS”
+  return turretCount > 0 ? (totalDamage / turretCount) / 6 : 0
 }
 
 /**
@@ -517,7 +518,7 @@ const buildDetailStatsByUseEquipmentStats = (ship: X4Ship, blueprintData: ShipBl
   const baseAcceleration = engineStats ? engineStats.thrustForward / mass : 0
   const boostAcceleration = engineStats ? Math.round(baseAcceleration * engineStats.boostAcceleration) : 0
   const travelAcceleration = engineStats && engineStats.travelAttack ? Math.round(travelSpeed / engineStats.travelAttack) : 0
-  const boostRecharge = engineStats ? engineStats.boostRecharge / 100 : 0
+  const boostRecharge = engineStats ? engineStats.boostRecharge : 0
 
   const thrusterStats = getThrusterStatsByUseEquipmentStats(blueprintData)
   const pitchRate = thrusterStats ? thrusterStats.pitch / dragPitch : 0
@@ -554,7 +555,7 @@ const buildDetailStatsByUseEquipmentStats = (ship: X4Ship, blueprintData: ShipBl
     { key: 'boost_duration', labelKey: 'ship_build.stats_boost_duration', unit: 's', value: engineStats?.boostDuration || 0 },
     // 行9: Condensed | Boost Recharge
     { key: 'storage_condensed', labelKey: 'ship_build.stats_storage_condensed', unit: 'm3', value: getCargoCapacity(ship, 'condensed') },
-    { key: 'boost_recharge', labelKey: 'ship_build.stats_boost_recharge', unit: '%/s', value: boostRecharge },
+    { key: 'boost_recharge', labelKey: 'ship_build.stats_boost_recharge', unit: 's', value: boostRecharge },
     // 行10: Yaw | Travel Speed
     { key: 'yaw', labelKey: 'ship_build.stats_yaw', unit: 'rad/s', value: Math.round(yawRate * 100) / 100 },
     { key: 'travel_speed', labelKey: 'ship_build.stats_travel_speed', unit: 'm/s', value: Math.round(travelSpeed) },

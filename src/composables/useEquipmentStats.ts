@@ -84,6 +84,7 @@ export interface EngineDetail {
   boostRecharge: number
   travelThrust: number
   travelAttack: number
+  travelRelease: number
   travelCharge: number
   travelSpeed: number
   travelAcceleration: number
@@ -308,6 +309,7 @@ function calculateEngineDetail(equipment: X4Equipment, ship: X4Ship): EngineDeta
     boostRecharge,
     travelThrust,
     travelAttack: travelAttack,
+    travelRelease: equipment.travel?.release || 0,
     travelCharge: equipment.travel?.charge || 0,
     travelSpeed,
     travelAcceleration,
