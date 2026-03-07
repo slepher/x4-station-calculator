@@ -5,6 +5,7 @@ import type {
   EquipmentType,
   SavedShipBlueprintsState,
   ShipBlueprint,
+  ShipBlueprintStorage,
   ShipBlueprintBucket,
   ShipBlueprintConnection,
   ShipEquipmentSize,
@@ -22,6 +23,12 @@ import { CURRENT_SHIP_BLUEPRINT_VERSION } from './logic/storageVersions'
 import { buildConsumableDatas, buildShipBuildDatas, getShipBuildRawData } from './logic/useGameData'
 
 const STORAGE_KEY = 'x4_ship_blueprints'
+const EMPTY_SHIP_STORAGE: ShipBlueprintStorage = {
+  deployables: [],
+  countermeasure: null,
+  drones: [],
+  missiles: []
+}
 
 export type StationActiveView = 'production' | 'flow' | 'ship-build'
 export type ShipBuildStatsViewMode = 'summary' | 'detail'
@@ -233,6 +240,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     name: '',
     shipId,
     connections: [],
+    storage: JSON.parse(JSON.stringify(EMPTY_SHIP_STORAGE)),
     lastUpdated: Date.now()
   })
 
@@ -572,7 +580,11 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     }
 
     // Load blueprint
-    blueprint.value = JSON.parse(JSON.stringify(bp))
+    const nextBlueprint = JSON.parse(JSON.stringify(bp)) as ShipBlueprint
+    nextBlueprint.storage = nextBlueprint.storage
+      ? JSON.parse(JSON.stringify(nextBlueprint.storage))
+      : JSON.parse(JSON.stringify(EMPTY_SHIP_STORAGE))
+    blueprint.value = nextBlueprint
     // Sort connections by fixed order: engine -> thruster -> shield -> weapon -> turret
     if (blueprint.value) {
       const slotOrder = ['engine', 'thruster', 'shield', 'weapon', 'turret']
