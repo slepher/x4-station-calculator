@@ -65,6 +65,13 @@ Test-documentation commands (for example `/x4:test` and `/x4:test-doc`) should r
 5. Submit final draft to `/x4:test-doc-viewer` for approval.
 6. If reviewer rejects, rewrite in this skill and resubmit until reviewer passes.
 
+## Missing Artifact Policy (MANDATORY)
+
+- If `openspec/changes/<change-name>/test_tasks.md` is missing, create it in the same run.
+- If `openspec/changes/<change-name>/knowledge.md` is missing, create it in the same run.
+- Missing files are **not** a blocker condition for `/x4:test-doc`; the skill MUST bootstrap required files first, then continue.
+- Do not ask the user to create these files manually.
+
 ## Mandatory Requirements
 
 ### Chapter A: Agent-Only Mandatory
@@ -91,6 +98,14 @@ For every `/x4:test-doc` run, `openspec/changes/<change-name>/knowledge.md` is a
 - MUST ensure `knowledge.md` exists for the current change.
 - If missing, create it in the same documentation pass.
 - MUST keep it synchronized with `test_tasks.md` whenever test-relevant semantics change.
+
+#### A.2.1 Test Tasks Baseline (MANDATORY)
+
+For every `/x4:test-doc` run, `openspec/changes/<change-name>/test_tasks.md` is a required artifact:
+
+- MUST ensure `test_tasks.md` exists for the current change.
+- If missing, create it in the same documentation pass.
+- MUST keep it synchronized with `knowledge.md` whenever test-relevant semantics change.
 
 #### A.3 Fixture-to-UI Knowledge Sync (MANDATORY)
 
