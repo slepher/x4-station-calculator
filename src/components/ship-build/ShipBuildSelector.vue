@@ -13,18 +13,9 @@ import type {
 
 const props = defineProps<{
   selectedShipId: string | null
-  selectedShip: X4Ship | null
-  selectedClass: string | null
-  selectedRaces: string[]
-  selectedTypes: string[]
-  blueprintShipId?: string | null
 }>()
 
 const emit = defineEmits<{
-  'update:selectedClass': [value: string | null]
-  'toggleRace': [value: string]
-  'toggleType': [value: string]
-  'update:selectedTypes': [value: string[]]
   'update:selectedShipId': [value: string | null]
   'cancel-ship-change': []
 }>()
@@ -34,6 +25,9 @@ const { translateShip, translateShipType } = useX4I18n()
 const shipBuildStore = useShipBuildStore()
 
 const pendingShipId = ref<string | null>(null)
+const selectedClass = ref<X4Ship['class'] | null>(null)
+const selectedRaces = ref<string[]>([])
+const selectedTypes = ref<string[]>([])
 
 const classOptions = [
   { id: 'ship_s', label: 'S' },
@@ -43,7 +37,7 @@ const classOptions = [
 ]
 
 const currentShip = computed<X4Ship | null>(() => {
-  const shipId = props.blueprintShipId || props.selectedShipId
+  const shipId = props.selectedShipId
   if (!shipId) return null
   return shipBuildStore.shipMap.get(shipId) || null
 })
@@ -69,7 +63,7 @@ const raceOptions = computed(() => {
 const availableTypes = computed(() => {
   return filterTypesByClass(
     shipBuildStore.shipTypes,
-    props.selectedClass as X4Ship['class'] | null
+    selectedClass.value
   )
 })
 
@@ -135,15 +129,15 @@ const getEquipmentSummary = (ship: X4Ship, mode: 'short' | 'full') => {
 }
 
 const canShowList = computed(() => {
-  return Boolean(props.selectedClass) && (props.selectedRaces.length > 0 || props.selectedTypes.length > 0)
+  return Boolean(selectedClass.value) && (selectedRaces.value.length > 0 || selectedTypes.value.length > 0)
 })
 
 const shipCandidateResult = computed(() => extractShipCandidates({
   shipMap: shipBuildStore.shipMap,
   filters: {
-    shipClass: props.selectedClass as X4Ship['class'] | null,
-    races: props.selectedRaces,
-    types: props.selectedTypes
+    shipClass: selectedClass.value,
+    races: selectedRaces.value,
+    types: selectedTypes.value
   }
 }))
 
@@ -156,7 +150,7 @@ const typeCountMap = computed(() => {
 })
 
 const filteredShips = computed(() => {
-  if (!canShowList.value || !props.selectedClass) return []
+  if (!canShowList.value || !selectedClass.value) return []
   return shipCandidateResult.value.items
 })
 
@@ -167,18 +161,18 @@ const pagedShips = computed(() => {
   return filteredShips.value.slice(start, start + pageSize)
 })
 
-watch(() => props.selectedClass, () => {
+watch(selectedClass, () => {
   const allowed = new Set(availableTypes.value.map(type => type.id))
-  emit('update:selectedTypes', props.selectedTypes.filter(typeId => allowed.has(typeId)))
+  selectedTypes.value = selectedTypes.value.filter(typeId => allowed.has(typeId))
 })
 
 const syncPendingShip = (candidates: X4Ship[]) => {
   const pendingId = pendingShipId.value
   if (pendingId && candidates.some(ship => ship.id === pendingId)) return
 
-  const blueprintShipId = props.blueprintShipId || null
-  if (blueprintShipId && candidates.some(ship => ship.id === blueprintShipId)) {
-    pendingShipId.value = blueprintShipId
+  const currentShipId = props.selectedShipId || null
+  if (currentShipId && candidates.some(ship => ship.id === currentShipId)) {
+    pendingShipId.value = currentShipId
     return
   }
 
@@ -186,9 +180,25 @@ const syncPendingShip = (candidates: X4Ship[]) => {
 }
 
 watch(
-  [filteredShips, () => props.blueprintShipId],
+  [filteredShips, () => props.selectedShipId],
   ([next]) => {
     syncPendingShip(next)
+  },
+  { immediate: true }
+)
+watch(
+  () => props.selectedShipId,
+  (shipId) => {
+    const ship = shipId ? shipBuildStore.findShip(shipId) : null
+    if (!ship) {
+      selectedClass.value = null
+      selectedRaces.value = []
+      selectedTypes.value = []
+      return
+    }
+    selectedClass.value = ship.class
+    selectedRaces.value = ship.race ? [ship.race] : []
+    selectedTypes.value = ship.type ? [ship.type] : []
   },
   { immediate: true }
 )
@@ -203,15 +213,23 @@ watch(filteredShips, (next) => {
 })
 
 const setSelectedClass = (value: string | null) => {
-  emit('update:selectedClass', value)
+  selectedClass.value = value as X4Ship['class'] | null
 }
 
 const toggleRace = (value: string) => {
-  emit('toggleRace', value)
+  if (selectedRaces.value.includes(value)) {
+    selectedRaces.value = selectedRaces.value.filter((id) => id !== value)
+    return
+  }
+  selectedRaces.value = [...selectedRaces.value, value]
 }
 
 const toggleType = (value: string) => {
-  emit('toggleType', value)
+  if (selectedTypes.value.includes(value)) {
+    selectedTypes.value = selectedTypes.value.filter((id) => id !== value)
+    return
+  }
+  selectedTypes.value = [...selectedTypes.value, value]
 }
 
 const setPendingShipId = (value: string | null) => {
@@ -329,7 +347,7 @@ const goNextPage = () => {
             <button
               class="confirm-btn cancel-btn"
               data-testid="ship-build-cancel-ship-change"
-              :disabled="!blueprintShipId"
+              :disabled="!selectedShipId"
               @click="cancelShipChange"
             >
               {{ t('ui.cancel') }}

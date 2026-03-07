@@ -24,7 +24,6 @@ import { buildConsumableDatas, buildShipBuildDatas, getShipBuildRawData } from '
 const STORAGE_KEY = 'x4_ship_blueprints'
 
 export type StationActiveView = 'production' | 'flow' | 'ship-build'
-export type ShipBuildClass = 'ship_s' | 'ship_m' | 'ship_l' | 'ship_xl'
 export type ShipBuildStatsViewMode = 'summary' | 'detail'
 export type ShipBuildViewMode = 'selector' | 'workspace'
 export type ShipBuildMockTagPatch = {
@@ -104,9 +103,6 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   const activeView = ref<StationActiveView>(
     (localStorage.getItem('x4_station_active_view') as StationActiveView) || 'production'
   )
-  const selectedClass = ref<ShipBuildClass | null>(null)
-  const selectedRaces = ref<string[]>([])
-  const selectedTypes = ref<string[]>([])
   const viewMode = ref<ShipBuildViewMode>('selector')
   const statsViewMode = ref<ShipBuildStatsViewMode>('summary')
   const fitMode = ref<FitMode>('connection')
@@ -255,20 +251,6 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     if (activeBlueprint) {
       // Use queueMicrotask to defer the update until after current execution context
       queueMicrotask(() => {
-        // Find ship to get race and type info
-        const ship = findShip(activeBlueprint.shipId)
-
-        // Determine class from ship ID pattern (same logic as loadBlueprint)
-        let shipClass: ShipBuildClass | null = null
-        if (activeBlueprint.shipId.includes('_s_')) shipClass = 'ship_s'
-        else if (activeBlueprint.shipId.includes('_m_')) shipClass = 'ship_m'
-        else if (activeBlueprint.shipId.includes('_l_')) shipClass = 'ship_l'
-        else if (activeBlueprint.shipId.includes('_xl_')) shipClass = 'ship_xl'
-
-        // Set filters (same as loadBlueprint)
-        selectedClass.value = shipClass
-        selectedRaces.value = ship?.race ? [ship.race] : []
-        selectedTypes.value = ship?.type ? [ship.type] : []
         viewMode.value = 'workspace'
         blueprint.value = { ...activeBlueprint }
 
@@ -589,17 +571,6 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       return
     }
 
-    // Auto-set filters based on ship
-    // Determine class from ship ID pattern
-    let shipClass: ShipBuildClass | null = null
-    if (bp.shipId.includes('_s_')) shipClass = 'ship_s'
-    else if (bp.shipId.includes('_m_')) shipClass = 'ship_m'
-    else if (bp.shipId.includes('_l_')) shipClass = 'ship_l'
-    else if (bp.shipId.includes('_xl_')) shipClass = 'ship_xl'
-
-    selectedClass.value = shipClass
-    selectedRaces.value = ship.race ? [ship.race] : []
-    selectedTypes.value = ship.type ? [ship.type] : []
     // Load blueprint
     blueprint.value = JSON.parse(JSON.stringify(bp))
     // Sort connections by fixed order: engine -> thruster -> shield -> weapon -> turret
@@ -686,37 +657,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   }
 
   const cancelShipSelector = () => {
-    const currentShipEntity = selectedShip.value
-    if (currentShipEntity && selectedClass.value !== currentShipEntity.class) {
-      selectedClass.value = currentShipEntity.class
-      selectedRaces.value = currentShipEntity.race ? [currentShipEntity.race] : []
-      selectedTypes.value = currentShipEntity.type ? [currentShipEntity.type] : []
-    }
     viewMode.value = 'workspace'
-  }
-
-  const setSelectedClass = (shipClass: ShipBuildClass | null) => {
-    selectedClass.value = shipClass
-  }
-
-  const toggleRace = (raceId: string) => {
-    if (selectedRaces.value.includes(raceId)) {
-      selectedRaces.value = selectedRaces.value.filter((id) => id !== raceId)
-    } else {
-      selectedRaces.value = [...selectedRaces.value, raceId]
-    }
-  }
-
-  const toggleType = (typeId: string) => {
-    if (selectedTypes.value.includes(typeId)) {
-      selectedTypes.value = selectedTypes.value.filter((id) => id !== typeId)
-    } else {
-      selectedTypes.value = [...selectedTypes.value, typeId]
-    }
-  }
-
-  const setSelectedTypes = (types: string[]) => {
-    selectedTypes.value = types
   }
 
   const setFitMode = (mode: FitMode) => {
@@ -1191,9 +1132,6 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   const resetAll = () => {
     blueprint.value = null
     viewMode.value = 'selector'
-    selectedClass.value = null
-    selectedRaces.value = []
-    selectedTypes.value = []
     lastSavedSnapshot.value = null
   }
 
@@ -1218,9 +1156,6 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     missilesMap,
     // 状态
     activeView,
-    selectedClass,
-    selectedRaces,
-    selectedTypes,
     selectedShipId,
     viewMode,
     statsViewMode,
@@ -1257,10 +1192,6 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     setSelectedShipId,
     enterShipSelector,
     cancelShipSelector,
-    setSelectedClass,
-    toggleRace,
-    toggleType,
-    setSelectedTypes,
     setFitMode,
     applyConnectionAssignment,
     setConnectionAssignmentCount,

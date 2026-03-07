@@ -3,29 +3,12 @@ import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import ShipBuildSelector from '@/components/ship-build/ShipBuildSelector.vue'
-import type { ShipBuildClass } from '@/store/useShipBuildStore'
 
 const { t } = useI18n()
 
 const shipBuildStore = useShipBuildStore()
-const { selectedClass, selectedRaces, selectedTypes, selectedShipId, selectedShip, blueprint } = storeToRefs(shipBuildStore)
-const { setSelectedShipId, setSelectedClass, toggleRace, toggleType, setSelectedTypes, cancelShipSelector } = shipBuildStore
-
-const handleSelectedClassChange = (value: string | null) => {
-  setSelectedClass(value as ShipBuildClass | null)
-}
-
-const handleRaceToggle = (value: string) => {
-  toggleRace(value)
-}
-
-const handleTypeToggle = (value: string) => {
-  toggleType(value)
-}
-
-const handleSelectedTypesChange = (value: string[]) => {
-  setSelectedTypes(value)
-}
+const { selectedShipId } = storeToRefs(shipBuildStore)
+const { setSelectedShipId, cancelShipSelector } = shipBuildStore
 
 const handleSelectedShipIdChange = (value: string | null) => {
   setSelectedShipId(value)
@@ -48,15 +31,6 @@ const handleCancelShipChange = () => {
 
     <ShipBuildSelector
       :selected-ship-id="selectedShipId"
-      :selected-ship="selectedShip"
-      :selected-class="selectedClass"
-      :selected-races="selectedRaces"
-      :selected-types="selectedTypes"
-      :blueprint-ship-id="blueprint?.shipId || null"
-      @update:selected-class="handleSelectedClassChange"
-      @toggle-race="handleRaceToggle"
-      @toggle-type="handleTypeToggle"
-      @update:selected-types="handleSelectedTypesChange"
       @update:selected-ship-id="handleSelectedShipIdChange"
       @cancel-ship-change="handleCancelShipChange"
     />
