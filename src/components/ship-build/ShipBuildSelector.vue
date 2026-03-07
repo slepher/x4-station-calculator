@@ -2,12 +2,11 @@
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
+import { extractShipCandidates, filterTypesByClass } from '@/store/logic/shipEquipmentPicker'
+import { useShipBuildStore } from '@/store/useShipBuildStore'
 import ShipBuildPanelShip from '@/components/ship-build/ShipBuildPanelShip.vue'
 import type {
   X4Ship,
-  X4ShipRace,
-  X4ShipType,
-  X4EquipmentType,
   EquipmentType,
   ShipEquipmentSize
 } from '@/types/x4'
@@ -19,10 +18,6 @@ const props = defineProps<{
   selectedRaces: string[]
   selectedTypes: string[]
   blueprintShipId?: string | null
-  ships: X4Ship[]
-  shipTypes: X4ShipType[]
-  shipRaces: X4ShipRace[]
-  equipmentTypes: X4EquipmentType[]
 }>()
 
 const emit = defineEmits<{
@@ -35,7 +30,8 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const { translateShip, translateShipType, translateEquipmentType } = useX4I18n()
+const { translateShip, translateShipType } = useX4I18n()
+const shipBuildStore = useShipBuildStore()
 
 const pendingShipId = ref<string | null>(null)
 
@@ -46,23 +42,15 @@ const classOptions = [
   { id: 'ship_xl', label: 'XL' }
 ]
 
-const shipsMap = computed(() => {
-  const map = new Map<string, X4Ship>()
-  props.ships.forEach((ship) => {
-    map.set(ship.id, ship)
-  })
-  return map
-})
-
 const currentShip = computed<X4Ship | null>(() => {
   const shipId = props.blueprintShipId || props.selectedShipId
   if (!shipId) return null
-  return shipsMap.value.get(shipId) || null
+  return shipBuildStore.shipMap.get(shipId) || null
 })
 
 const pendingShip = computed<X4Ship | null>(() => {
   if (!pendingShipId.value) return null
-  return shipsMap.value.get(pendingShipId.value) || null
+  return shipBuildStore.shipMap.get(pendingShipId.value) || null
 })
 
 const confirmShipId = computed<string | null>(() => {
@@ -72,32 +60,25 @@ const pageSize = 10
 const currentPage = ref(1)
 
 const raceOptions = computed(() => {
-  return props.shipRaces.map(race => ({
+  return shipBuildStore.shipRaces.map(race => ({
     id: race.id,
     label: race.id
   }))
 })
 
 const availableTypes = computed(() => {
-  if (!props.selectedClass) return []
-  const selectedClass = props.selectedClass as 'ship_s' | 'ship_m' | 'ship_l' | 'ship_xl'
-  return props.shipTypes.filter(type => type.class.includes(selectedClass))
+  return filterTypesByClass(
+    shipBuildStore.shipTypes,
+    props.selectedClass as X4Ship['class'] | null
+  )
 })
 
 const isTypeSingleRow = computed(() => availableTypes.value.length > 0 && availableTypes.value.length <= 5)
 
 const typeLabelMap = computed(() => {
   const map = new Map<string, string>()
-  props.shipTypes.forEach(type => {
+  shipBuildStore.shipTypes.forEach(type => {
     map.set(type.id, translateShipType(type))
-  })
-  return map
-})
-
-const equipmentTypeMap = computed(() => {
-  const map = new Map<EquipmentType, X4EquipmentType>()
-  props.equipmentTypes.forEach(type => {
-    map.set(type.id, type)
   })
   return map
 })
@@ -145,10 +126,8 @@ const getEquipmentSummary = (ship: X4Ship, mode: 'short' | 'full') => {
       .filter(Boolean)
       .join('')
     if (!sizeText) return
-    const typeDef = equipmentTypeMap.value.get(type)
-    const fullName = typeDef ? translateEquipmentType(typeDef) : type
     const shortName = equipmentTypeShortMap[type] || type
-    const typeName = mode === 'short' ? shortName : fullName
+    const typeName = mode === 'short' ? shortName : type
     parts.push(`${typeName}:${sizeText}`)
   })
 
@@ -159,50 +138,28 @@ const canShowList = computed(() => {
   return Boolean(props.selectedClass) && (props.selectedRaces.length > 0 || props.selectedTypes.length > 0)
 })
 
-const shipsByClass = computed(() => {
-  if (!props.selectedClass) return []
-  return props.ships.filter(ship => ship.class === props.selectedClass)
-})
+const shipCandidateResult = computed(() => extractShipCandidates({
+  shipMap: shipBuildStore.shipMap,
+  filters: {
+    shipClass: props.selectedClass as X4Ship['class'] | null,
+    races: props.selectedRaces,
+    types: props.selectedTypes
+  }
+}))
 
 const raceCountMap = computed(() => {
-  const counts = new Map<string, number>()
-  const base = shipsByClass.value
-  const filtered = props.selectedTypes.length > 0
-    ? base.filter(ship => props.selectedTypes.includes(ship.type))
-    : base
-  filtered.forEach(ship => {
-    counts.set(ship.race, (counts.get(ship.race) || 0) + 1)
-  })
-  return counts
+  return shipCandidateResult.value.raceCountMap
 })
 
 const typeCountMap = computed(() => {
-  const counts = new Map<string, number>()
-  const base = shipsByClass.value
-  const filtered = props.selectedRaces.length > 0
-    ? base.filter(ship => props.selectedRaces.includes(ship.race))
-    : base
-  filtered.forEach(ship => {
-    counts.set(ship.type, (counts.get(ship.type) || 0) + 1)
-  })
-  return counts
+  return shipCandidateResult.value.typeCountMap
 })
 
 const filteredShips = computed(() => {
   if (!canShowList.value || !props.selectedClass) return []
-
-  let result = shipsByClass.value
-  if (props.selectedRaces.length > 0) {
-    result = result.filter(ship => props.selectedRaces.includes(ship.race))
-  }
-  if (props.selectedTypes.length > 0) {
-    result = result.filter(ship => props.selectedTypes.includes(ship.type))
-  }
-
-  return result
-    .slice()
-    .sort((a, b) => translateShip(a).localeCompare(translateShip(b)))
+  return shipCandidateResult.value.items
 })
+
 const totalPages = computed(() => Math.max(1, Math.ceil(filteredShips.value.length / pageSize)))
 const showPager = computed(() => filteredShips.value.length > pageSize)
 const pagedShips = computed(() => {

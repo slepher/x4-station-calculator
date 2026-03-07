@@ -4,19 +4,8 @@ import { useI18n } from 'vue-i18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import ShipBuildSelector from '@/components/ship-build/ShipBuildSelector.vue'
 import type { ShipBuildClass } from '@/store/useShipBuildStore'
-import type { X4EquipmentType, X4Ship, X4ShipRace, X4ShipType } from '@/types/x4'
-
-import shipsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ships.json'
-import shipTypesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ship_types.json'
-import shipRacesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ship_races.json'
-import equipmentTypesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipment_types.json'
 
 const { t } = useI18n()
-
-const ships = shipsRaw as unknown as X4Ship[]
-const shipTypes = shipTypesRaw as X4ShipType[]
-const shipRaces = shipRacesRaw as X4ShipRace[]
-const equipmentTypes = equipmentTypesRaw as X4EquipmentType[]
 
 const shipBuildStore = useShipBuildStore()
 const { selectedClass, selectedRaces, selectedTypes, selectedShipId, selectedShip, blueprint } = storeToRefs(shipBuildStore)
@@ -64,10 +53,6 @@ const handleCancelShipChange = () => {
       :selected-races="selectedRaces"
       :selected-types="selectedTypes"
       :blueprint-ship-id="blueprint?.shipId || null"
-      :ships="ships"
-      :ship-types="shipTypes"
-      :ship-races="shipRaces"
-      :equipment-types="equipmentTypes"
       @update:selected-class="handleSelectedClassChange"
       @toggle-race="handleRaceToggle"
       @toggle-type="handleTypeToggle"

@@ -21,7 +21,7 @@ export interface FitConnectionRow {
   size: ShipEquipmentSize
   tags: string[]
   count: number
-  options: FitEquipmentOption[]
+  options?: FitEquipmentOption[]
 }
 
 export interface FitGroupRow {
@@ -35,7 +35,7 @@ export interface FitGroupRow {
   size: ShipEquipmentSize
   totalCount: number
   tags: string[]
-  options: FitEquipmentOption[]
+  options?: FitEquipmentOption[]
   connectionKeys: string[]
 }
 

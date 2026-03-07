@@ -18,10 +18,11 @@ const showMaterial = ref(true)
 const isPickerOpen = ref(false)
 const pickerTarget = ref<{
   key: string
+  size: string
+  tags: string[]
   count: number
   totalCount: number
   connectionKeys: string[]
-  options: { id: string; name: string; mk: string | null; race: string | null; tags: string[] }[]
 } | null>(null)
 const highlightedEquipmentId = ref<string | null>(null)
 const pickerMode = ref<FitMode>('connection')

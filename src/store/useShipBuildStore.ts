@@ -11,15 +11,15 @@ import type {
   X4Equipment,
   X4EquipmentType,
   X4Ship,
+  X4ShipRace,
+  X4ShipType,
+  X4SlotTag,
   X4Ware
 } from '@/types/x4'
 import type { FitConnectionRow, FitMode } from '@/components/ship-build/fitTypes'
-import shipsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ships.json'
-import equipmentsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
-import equipmentTypesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipment_types.json'
-import waresRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/wares.json'
 import { migrateShipBlueprintStateToCurrent } from './logic/stateMigrations'
 import { CURRENT_SHIP_BLUEPRINT_VERSION } from './logic/storageVersions'
+import { buildConsumableDatas, buildShipBuildDatas, getShipBuildRawData } from './logic/useGameData'
 
 const STORAGE_KEY = 'x4_ship_blueprints'
 
@@ -74,10 +74,33 @@ export type ShipBuildMaterialAnalysis = {
 }
 
 export const useShipBuildStore = defineStore('ship-build', () => {
-  const ships = shipsRaw as unknown as X4Ship[]
-  const equipments = equipmentsRaw as X4Equipment[]
-  const equipmentTypes = equipmentTypesRaw as X4EquipmentType[]
-  const wares = waresRaw as X4Ware[]
+  const shipBuildRaw = getShipBuildRawData()
+  const ships = shipBuildRaw.ships as X4Ship[]
+  const equipments = shipBuildRaw.equipments as X4Equipment[]
+  const equipmentTypes = shipBuildRaw.equipmentTypes as X4EquipmentType[]
+  const slotTags = shipBuildRaw.slotTags as X4SlotTag[]
+  const wares = shipBuildRaw.wares as X4Ware[]
+  const {
+    shipMap,
+    raceMap,
+    typeMap,
+    equipmentMap,
+    shipTypes,
+    shipRaces
+  } = buildShipBuildDatas({
+    ships,
+    races: shipBuildRaw.races as X4ShipRace[],
+    types: shipBuildRaw.types as X4ShipType[],
+    equipments
+  })
+  const {
+    consumables,
+    drones,
+    missiles,
+    consumablesMap,
+    dronesMap,
+    missilesMap
+  } = buildConsumableDatas()
   const activeView = ref<StationActiveView>(
     (localStorage.getItem('x4_station_active_view') as StationActiveView) || 'production'
   )
@@ -103,13 +126,9 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   const translateEquipmentFn = ref<(equipment: X4Equipment) => string>((equipment) => equipment.name || equipment.id)
   const translateEquipmentTypeFn = ref<(type: X4EquipmentType) => string>((type) => type.name || type.id)
   const equipmentTypeMap = new Map<EquipmentType, X4EquipmentType>()
-  const equipmentMap = new Map<string, X4Equipment>()
   const waresMap = new Map<string, X4Ware>()
   equipmentTypes.forEach((type) => {
     equipmentTypeMap.set(type.id, type)
-  })
-  equipments.forEach((equipment) => {
-    equipmentMap.set(equipment.id, equipment)
   })
   wares.forEach((ware) => {
     waresMap.set(ware.id, ware)
@@ -184,6 +203,26 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     return null
   }
 
+  const findShip = (shipId: string | null | undefined): X4Ship | null => {
+    if (!shipId) return null
+    return shipMap.get(shipId) || null
+  }
+
+  const findEquipmentType = (typeId: EquipmentType | string | null | undefined): X4EquipmentType | null => {
+    if (!typeId) return null
+    return equipmentTypeMap.get(typeId as EquipmentType) || null
+  }
+
+  const findEquipment = (equipmentId: string | null | undefined): X4Equipment | null => {
+    if (!equipmentId) return null
+    return equipmentMap.get(equipmentId) || null
+  }
+
+  const findWare = (wareId: string | null | undefined): X4Ware | null => {
+    if (!wareId) return null
+    return waresMap.get(wareId) || null
+  }
+
   const getBlueprintsForShip = (shipId: string | null): ShipBlueprint[] => {
     if (!shipId) return []
     return getBucketByShipId(shipId)?.blueprints || []
@@ -217,7 +256,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       // Use queueMicrotask to defer the update until after current execution context
       queueMicrotask(() => {
         // Find ship to get race and type info
-        const ship = ships.find(s => s.id === activeBlueprint.shipId)
+        const ship = findShip(activeBlueprint.shipId)
 
         // Determine class from ship ID pattern (same logic as loadBlueprint)
         let shipClass: ShipBuildClass | null = null
@@ -544,7 +583,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     const bp = findBlueprintById(id)
     if (!bp) return
 
-    const ship = ships.find(s => s.id === bp.shipId)
+    const ship = findShip(bp.shipId)
     if (!ship) {
       console.error('Ship not found for blueprint:', bp.shipId)
       return
@@ -1041,8 +1080,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
   const selectedShip = computed(() => {
     const shipId = resolveCurrentShipId()
-    if (!shipId) return null
-    return ships.find((ship) => ship.id === shipId) || null
+    return findShip(shipId)
   })
 
   const hasSelectedShip = computed(() => Boolean(resolveCurrentShipId()))
@@ -1165,6 +1203,19 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     wares,
     equipments,
     equipmentTypes,
+    shipTypes,
+    shipRaces,
+    slotTags,
+    consumables,
+    drones,
+    missiles,
+    shipMap,
+    raceMap,
+    typeMap,
+    equipmentMap,
+    consumablesMap,
+    dronesMap,
+    missilesMap,
     // 状态
     activeView,
     selectedClass,
@@ -1177,6 +1228,10 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     mockTagPatch,
     selectedShip,
     hasSelectedShip,
+    findShip,
+    findEquipmentType,
+    findEquipment,
+    findWare,
     // Blueprint persistence
     blueprint,
     savedBlueprints,

@@ -5,7 +5,7 @@ import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { useEquipmentStats } from '@/composables/useEquipmentStats'
 import MetricsPanel from '@/components/common/MetricsPanel.vue'
 import type { MetricSchema, MetricValueMap, MetricsPanelViewTab } from '@/components/common/metricsPanelTypes'
-import type { X4Ship, X4Equipment, ShipBlueprint } from '@/types/x4'
+import type { X4Ship, ShipBlueprint } from '@/types/x4'
 import bulletsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/bullets.json'
 import missilesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/missiles.json'
 import defaultMaxesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/default_maxes.json'
@@ -87,7 +87,7 @@ const getWeaponStatsByUseEquipmentStats = (blueprintData: ShipBlueprint | null) 
   blueprintData.connections.forEach((conn) => {
     conn.group.forEach((g) => {
       if (!g.equipment_id || g.count <= 0) return
-      const equipment = equipmentMap.value.get(g.equipment_id)
+      const equipment = store.findEquipment(g.equipment_id)
       if (!equipment?.bullet) return
 
       const equipmentClass = equipment.class
@@ -117,7 +117,7 @@ const getTurretStatsByUseEquipmentStats = (blueprintData: ShipBlueprint | null) 
   blueprintData.connections.forEach((conn) => {
     conn.group.forEach((g) => {
       if (!g.equipment_id || g.count <= 0) return
-      const equipment = equipmentMap.value.get(g.equipment_id)
+      const equipment = store.findEquipment(g.equipment_id)
       if (!equipment?.bullet) return
 
       const equipmentClass = equipment.class
@@ -150,7 +150,7 @@ const getShieldStatsByUseEquipmentStats = (blueprintData: ShipBlueprint | null) 
     if (conn.slot_type !== 'shield') return
     conn.group.forEach((g) => {
       if (!g.equipment_id || g.count <= 0) return
-      const equipment = equipmentMap.value.get(g.equipment_id)
+      const equipment = store.findEquipment(g.equipment_id)
       if (!equipment?.recharge) return
 
       const { details } = useEquipmentStats(equipment, selectedShip.value!)
@@ -171,7 +171,7 @@ const getShieldStatsByUseEquipmentStats = (blueprintData: ShipBlueprint | null) 
     if (conn.slot_type === 'shield') return
     conn.group.forEach((g) => {
       if (!g.shield?.equipment_id || g.shield.count <= 0) return
-      const shieldEquipment = equipmentMap.value.get(g.shield.equipment_id)
+      const shieldEquipment = store.findEquipment(g.shield.equipment_id)
       if (!shieldEquipment?.recharge) return
 
       const { details } = useEquipmentStats(shieldEquipment, selectedShip.value!)
@@ -207,7 +207,7 @@ const getEngineStatsByUseEquipmentStats = (blueprintData: ShipBlueprint | null) 
     if (conn.slot_type !== 'engine') return
     conn.group.forEach((g) => {
       if (!g.equipment_id || g.count <= 0) return
-      const equipment = equipmentMap.value.get(g.equipment_id)
+      const equipment = store.findEquipment(g.equipment_id)
       if (!equipment) return
 
       const { details } = useEquipmentStats(equipment, selectedShip.value!)
@@ -253,7 +253,7 @@ const getThrusterStatsByUseEquipmentStats = (blueprintData: ShipBlueprint | null
     if (conn.slot_type !== 'thruster') return
     conn.group.forEach((g) => {
       if (!g.equipment_id || g.count <= 0) return
-      const equipment = equipmentMap.value.get(g.equipment_id)
+      const equipment = store.findEquipment(g.equipment_id)
       if (!equipment) return
 
       const { details } = useEquipmentStats(equipment, selectedShip.value!)
@@ -271,30 +271,13 @@ const getThrusterStatsByUseEquipmentStats = (blueprintData: ShipBlueprint | null
   return { pitch, yaw, roll, strafe }
 }
 
-// ============ Store 数据映射 ============
-const shipMap = computed(() => {
-  const map = new Map<string, X4Ship>()
-  store.ships.forEach((ship) => {
-    map.set(ship.id, ship)
-  })
-  return map
-})
-
-const equipmentMap = computed(() => {
-  const map = new Map<string, X4Equipment>()
-  store.equipments.forEach((eq) => {
-    map.set(eq.id, eq)
-  })
-  return map
-})
-
 // ============ 从 Blueprint 派生数据 ============
 // 优先从 blueprint 获取 shipId，如果没有 blueprint 则从 store 获取
 const selectedShip = computed(() => {
   // 优先从 blueprint 获取 shipId
   const shipId = props.shipBlueprint?.shipId || store.selectedShipId
   if (!shipId) return null
-  return shipMap.value.get(shipId) || null
+  return store.findShip(shipId)
 })
 
 type ShipStatMetric = {

@@ -5,10 +5,7 @@ import { useX4I18n } from '@/utils/UseX4I18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import CollapsibleDetailList from '@/components/common/CollapsibleDetailList.vue'
 import PriceSlider from '@/components/common/PriceSlider.vue'
-import type { X4Ship, X4Ware, X4Equipment, ShipBlueprint } from '@/types/x4'
-import consumablesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/consumables.json'
-import dronesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/drones.json'
-import missilesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/missiles.json'
+import type { X4Equipment, X4Ship, X4Ware, ShipBlueprint } from '@/types/x4'
 
 const props = defineProps<{
   shipBlueprint: ShipBlueprint | null
@@ -25,66 +22,14 @@ const materialMethod = ref('default')
 const materialPriceMultiplier = ref(0.5)
 
 // ============ Storage 物品数据映射 ============
-type StorageItem = {
-  id: string
-  nameId: string
-  name: string
-  cost?: Record<string, Record<string, number>>
-}
-
-const consumablesMap = computed(() => {
-  const map = new Map<string, StorageItem>()
-  ;(consumablesRaw as any[]).forEach((item: any) => {
-    map.set(item.id, item)
-  })
-  return map
-})
-
-const dronesMap = computed(() => {
-  const map = new Map<string, StorageItem>()
-  ;(dronesRaw as any[]).forEach((item: any) => {
-    map.set(item.id, item)
-  })
-  return map
-})
-
-const missilesMap = computed(() => {
-  const map = new Map<string, StorageItem>()
-  ;(missilesRaw as any[]).forEach((item: any) => {
-    map.set(item.id, item)
-  })
-  return map
-})
-
-// ============ Store 数据映射 ============
-const wareMap = computed(() => {
-  const map = new Map<string, X4Ware>()
-  store.wares.forEach((ware) => {
-    map.set(ware.id, ware)
-  })
-  return map
-})
-
-const shipMap = computed(() => {
-  const map = new Map<string, X4Ship>()
-  store.ships.forEach((ship) => {
-    map.set(ship.id, ship)
-  })
-  return map
-})
-
-const equipmentMap = computed(() => {
-  const map = new Map<string, X4Equipment>()
-  store.equipments.forEach((eq) => {
-    map.set(eq.id, eq)
-  })
-  return map
-})
+const consumablesMap = store.consumablesMap
+const dronesMap = store.dronesMap
+const missilesMap = store.missilesMap
 
 // ============ 从 Blueprint 派生数据 ============
 const selectedShip = computed(() => {
   if (!props.shipBlueprint) return null
-  return shipMap.value.get(props.shipBlueprint.shipId) || null
+  return store.findShip(props.shipBlueprint.shipId)
 })
 
 // ============ 计算辅助函数 ============
@@ -114,7 +59,7 @@ const mapCostToMaterialItems = (
   return Object.entries(cost)
     .map(([wareId, rawCount]) => {
       const count = (rawCount || 0) * quantity
-      const ware = wareMap.value.get(wareId)
+      const ware = store.findWare(wareId)
       const unitPrice = ware ? getPriceByMultiplier(ware, materialPriceMultiplier.value) : 0
       return {
         wareId,
@@ -124,8 +69,8 @@ const mapCostToMaterialItems = (
     })
     .filter((item) => item.count > 0)
     .sort((a, b) => {
-      const wareA = wareMap.value.get(a.wareId)
-      const wareB = wareMap.value.get(b.wareId)
+      const wareA = store.findWare(a.wareId)
+      const wareB = store.findWare(b.wareId)
       const tierA = wareA?.tier ?? 0
       const tierB = wareB?.tier ?? 0
       // 先按 tier 从高到低
@@ -155,7 +100,7 @@ const materialMethodOptions = computed(() => {
     conn.group.forEach((g) => {
       // 主装备
       if (g.equipment_id && g.count > 0) {
-        const equipment = equipmentMap.value.get(g.equipment_id)
+        const equipment = store.findEquipment(g.equipment_id)
         if (equipment) {
           Object.keys(equipment.cost || {}).forEach((method) => {
             if (optionSet.has(method)) return
@@ -167,7 +112,7 @@ const materialMethodOptions = computed(() => {
       }
       // 附带护盾
       if (g.shield && g.shield.equipment_id && g.shield.count > 0) {
-        const shieldEquipment = equipmentMap.value.get(g.shield.equipment_id)
+        const shieldEquipment = store.findEquipment(g.shield.equipment_id)
         if (shieldEquipment) {
           Object.keys(shieldEquipment.cost || {}).forEach((method) => {
             if (optionSet.has(method)) return
@@ -185,7 +130,7 @@ const materialMethodOptions = computed(() => {
   if (storage) {
     // 可部署
     storage.deployables.forEach((item) => {
-      const data = consumablesMap.value.get(item.id)
+      const data = consumablesMap.get(item.id)
       if (data?.cost) {
         Object.keys(data.cost).forEach((method) => {
           if (optionSet.has(method)) return
@@ -197,7 +142,7 @@ const materialMethodOptions = computed(() => {
     })
     // 诱导弹
     if (storage.countermeasure) {
-      const data = consumablesMap.value.get(storage.countermeasure.id)
+      const data = consumablesMap.get(storage.countermeasure.id)
       if (data?.cost) {
         Object.keys(data.cost).forEach((method) => {
           if (optionSet.has(method)) return
@@ -209,7 +154,7 @@ const materialMethodOptions = computed(() => {
     }
     // 无人机
     storage.drones.forEach((item) => {
-      const data = dronesMap.value.get(item.id)
+      const data = dronesMap.get(item.id)
       if (data?.cost) {
         Object.keys(data.cost).forEach((method) => {
           if (optionSet.has(method)) return
@@ -221,7 +166,7 @@ const materialMethodOptions = computed(() => {
     })
     // 导弹
     storage.missiles.forEach((item) => {
-      const data = missilesMap.value.get(item.id)
+      const data = missilesMap.get(item.id)
       if (data?.cost) {
         Object.keys(data.cost).forEach((method) => {
           if (optionSet.has(method)) return
@@ -264,7 +209,7 @@ const equipmentMaterialGroups = computed(() => {
     conn.group.forEach((g) => {
       // Handle main equipment
       if (g.equipment_id && g.count > 0) {
-        const equipment = equipmentMap.value.get(g.equipment_id)
+        const equipment = store.findEquipment(g.equipment_id)
         if (equipment) {
           const existing = grouped.get(g.equipment_id)
           if (existing) {
@@ -280,7 +225,7 @@ const equipmentMaterialGroups = computed(() => {
 
       // Handle attached shield (stored in group.shield)
       if (g.shield && g.shield.equipment_id && g.shield.count > 0) {
-        const shieldEquipment = equipmentMap.value.get(g.shield.equipment_id)
+        const shieldEquipment = store.findEquipment(g.shield.equipment_id)
         if (shieldEquipment) {
           const existing = grouped.get(g.shield.equipment_id)
           if (existing) {
@@ -325,7 +270,7 @@ const storageMaterialGroups = computed(() => {
 
   // 可部署物品 - 每项单独显示
   storage.deployables.forEach((item) => {
-    const data = consumablesMap.value.get(item.id)
+    const data = consumablesMap.get(item.id)
     if (data?.cost) {
       const cost = resolveCostByMethod(data.cost, materialMethod.value)
       const materialItems = mapCostToMaterialItems(cost, item.count)
@@ -342,7 +287,7 @@ const storageMaterialGroups = computed(() => {
 
   // 诱导弹
   if (storage.countermeasure) {
-    const data = consumablesMap.value.get(storage.countermeasure.id)
+    const data = consumablesMap.get(storage.countermeasure.id)
     if (data?.cost) {
       const cost = resolveCostByMethod(data.cost, materialMethod.value)
       const materialItems = mapCostToMaterialItems(cost, storage.countermeasure.count)
@@ -359,7 +304,7 @@ const storageMaterialGroups = computed(() => {
 
   // 无人机 - 每项单独显示
   storage.drones.forEach((item) => {
-    const data = dronesMap.value.get(item.id)
+    const data = dronesMap.get(item.id)
     if (data?.cost) {
       const cost = resolveCostByMethod(data.cost, materialMethod.value)
       const materialItems = mapCostToMaterialItems(cost, item.count)
@@ -376,7 +321,7 @@ const storageMaterialGroups = computed(() => {
 
   // 导弹 - 每项单独显示
   storage.missiles.forEach((item) => {
-    const data = missilesMap.value.get(item.id)
+    const data = missilesMap.get(item.id)
     if (data?.cost) {
       const cost = resolveCostByMethod(data.cost, materialMethod.value)
       const materialItems = mapCostToMaterialItems(cost, item.count)
@@ -396,7 +341,7 @@ const storageMaterialGroups = computed(() => {
 
 // 翻译 storage 物品名称
 const getStorageItemName = (nameId: string) => {
-  const ware = wareMap.value.get(nameId)
+  const ware = store.findWare(nameId)
   if (ware) return translateWare(ware)
   // 尝试翻译 nameId
   return translate(nameId, nameId, 'ware')
@@ -427,8 +372,8 @@ const materialSummaryItems = computed(() => {
   storageMaterialGroups.value.forEach((group) => mergeItems(group.items))
 
   return Array.from(grouped.values()).sort((a, b) => {
-    const wareA = wareMap.value.get(a.wareId)
-    const wareB = wareMap.value.get(b.wareId)
+    const wareA = store.findWare(a.wareId)
+    const wareB = store.findWare(b.wareId)
     const tierA = wareA?.tier ?? 0
     const tierB = wareB?.tier ?? 0
     // 先按 tier 从高到低
@@ -449,13 +394,13 @@ const formatCrValue = (value: number) => `${new Intl.NumberFormat('en-US').forma
 const formatMaterialCount = (count: number) => new Intl.NumberFormat('en-US').format(Math.round(count))
 
 const getMaterialName = (wareId: string) => {
-  const ware = wareMap.value.get(wareId)
+  const ware = store.findWare(wareId)
   return ware ? translateWare(ware) : wareId
 }
 
 const getShipName = (shipId: string | undefined) => {
   if (!shipId) return ''
-  const ship = shipMap.value.get(shipId)
+  const ship = store.findShip(shipId)
   return ship ? translateShip(ship) : shipId
 }
 </script>

@@ -33,8 +33,7 @@ const currentShipId = computed(() => {
 const blueprints = computed(() => store.getBlueprintsForShip(currentShipId.value))
 
 const getShipName = (shipId: string) => {
-  // 从 ships 数组中查找飞船并本地化
-  const ship = store.ships.find(s => s.id === shipId)
+  const ship = store.findShip(shipId)
   return ship ? translateShip(ship) : shipId
 }
 
@@ -53,15 +52,15 @@ const getEquipmentStats = (blueprint: ShipBlueprint) => {
   blueprint.connections.forEach(conn => {
     const slotType = conn.slot_type
 
-    // 获取本地化的装备类型名称
-    const equipmentType = store.equipmentTypes.find(et => et.id === slotType)
+    const equipmentType = store.findEquipmentType(slotType)
     const typeName = equipmentType ? translateEquipmentType(equipmentType) : slotType
 
     conn.group.forEach(g => {
       // 主装备统计，按大小分组
       if (g.equipment_id) {
-        const equip = store.equipments.find(e => e.id === g.equipment_id)
-        const size = equip?.size || 'medium'
+        const equip = store.findEquipment(g.equipment_id)
+        if (!equip) return
+        const size = equip.size
         if (!stats[typeName]) {
           stats[typeName] = {}
         }
@@ -69,8 +68,9 @@ const getEquipmentStats = (blueprint: ShipBlueprint) => {
       }
       // 副盾统计（护盾挂载在其他装备上），按大小分组
       if (g.shield && g.shield.equipment_id) {
-        const shieldEquip = store.equipments.find(e => e.id === g.shield!.equipment_id)
-        const shieldSize = shieldEquip?.size || 'medium'
+        const shieldEquip = store.findEquipment(g.shield.equipment_id)
+        if (!shieldEquip) return
+        const shieldSize = shieldEquip.size
         if (!stats[offShieldKey]) {
           stats[offShieldKey] = {}
         }

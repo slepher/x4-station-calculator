@@ -6,10 +6,8 @@ import type { FitMode, FitConnectionRow, FitGroupRow, FitEquipmentOption } from 
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { useEquipmentStats } from '@/composables/useEquipmentStats'
-import type { EquipmentType, ShipEquipmentSize, X4Equipment, X4EquipmentType, X4Ship, X4SlotTag } from '@/types/x4'
-import slotTagsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/slot_tags.json'
-import equipmentsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
-import equipmentTypesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipment_types.json'
+import { extractEquipmentSlotCandidatesWithFacets } from '@/store/logic/shipEquipmentPicker'
+import type { EquipmentType, ShipEquipmentSize, X4SlotTag } from '@/types/x4'
 import X4DualPhaseRangeSlider from '@/components/common/X4DualPhaseRangeSlider.vue'
 import ShipStoragePanel from '@/components/ship-build/ShipStoragePanel.vue'
 
@@ -21,7 +19,6 @@ type AggregatedGroup = {
   totalCount: number
   tags: string[]
   connectionKeys: string[]
-  options: FitEquipmentOption[]
   groupRows: FitGroupRow[]
 }
 
@@ -33,7 +30,6 @@ type SlotTarget = {
   count: number
   totalCount: number
   tags: string[]
-  options: FitEquipmentOption[]
   connectionKeys: string[]
 }
 
@@ -75,18 +71,12 @@ const shipBuildStore = useShipBuildStore()
 const { selectedShip, blueprint, mockTagPatch } = storeToRefs(shipBuildStore)
 const { applyConnectionAssignment, setConnectionAssignmentCount, enterShipSelector } = shipBuildStore
 
-// Equipment map for stats lookup
-const equipmentMap = new Map<string, X4Equipment>()
-;(equipmentsRaw as X4Equipment[]).forEach((eq) => {
-  equipmentMap.set(eq.id, eq)
-})
-
 // Get first summary (Label Value Unit, right column, top row)
 function getEquipmentSummary1(equipmentId: string): { labelKey: string; value: string; unit: string } {
-  const equipment = equipmentMap.get(equipmentId)
+  const equipment = shipBuildStore.findEquipment(equipmentId)
   if (!equipment || !selectedShip.value) return { labelKey: '', value: '', unit: '' }
 
-  const { summary } = useEquipmentStats(equipment, selectedShip.value as X4Ship)
+  const { summary } = useEquipmentStats(equipment, selectedShip.value)
   if (!summary.value) return { labelKey: '', value: '', unit: '' }
 
   const s = summary.value as any
@@ -103,10 +93,10 @@ function getEquipmentSummary1(equipmentId: string): { labelKey: string; value: s
 
 // Get second summary (Label Value Unit, right column, bottom row)
 function getEquipmentSummary2(equipmentId: string): { labelKey: string; value: string; unit: string } {
-  const equipment = equipmentMap.get(equipmentId)
+  const equipment = shipBuildStore.findEquipment(equipmentId)
   if (!equipment || !selectedShip.value) return { labelKey: '', value: '', unit: '' }
 
-  const { summary } = useEquipmentStats(equipment, selectedShip.value as X4Ship)
+  const { summary } = useEquipmentStats(equipment, selectedShip.value)
   if (!summary.value) return { labelKey: '', value: '', unit: '' }
 
   const s = summary.value as any
@@ -155,14 +145,8 @@ const handlePickerOpenChange = (open: boolean) => {
 
 const { t } = useI18n()
 const { translateSlotTag, translateEquipment, translateEquipmentType, translateShip } = useX4I18n()
-const slotTags = slotTagsRaw as X4SlotTag[]
+const slotTags = shipBuildStore.slotTags as X4SlotTag[]
 const slotTagMap = new Map<string, X4SlotTag>(slotTags.map((tag) => [tag.id, tag]))
-const equipments = equipmentsRaw as X4Equipment[]
-const equipmentTypes = equipmentTypesRaw as X4EquipmentType[]
-const equipmentTypeMap = new Map<EquipmentType, X4EquipmentType>()
-equipmentTypes.forEach((type) => {
-  equipmentTypeMap.set(type.id, type)
-})
 
 const normalizeTagList = (tags: unknown): string[] => {
   if (!Array.isArray(tags)) return []
@@ -173,30 +157,6 @@ const resolveSize = (
   primary?: ShipEquipmentSize,
   fallback?: ShipEquipmentSize
 ): ShipEquipmentSize | null => primary ?? fallback ?? null
-
-const getEquipmentCandidates = (
-  slotType: EquipmentType,
-  size: ShipEquipmentSize,
-  connectionTags: string[]
-) => {
-  return equipments
-    .filter((equipment) => !equipment.noplayerblueprint)
-    .filter((equipment) => equipment.type === slotType && equipment.size === size)
-    .filter((equipment) => {
-      if (connectionTags.length === 0) return true
-      const equipmentTags = normalizeTagList(equipment.slotTags)
-      const connectionSet = new Set(connectionTags)
-      return equipmentTags.every((tag) => connectionSet.has(tag))
-    })
-    .map((equipment) => ({
-      id: equipment.id,
-      name: translateEquipment(equipment),
-      mk: equipment.mk || null,
-      race: equipment.race || null,
-      tags: normalizeTagList(equipment.slotTags)
-    }))
-    .sort((a, b) => a.id > b.id ? 1 : a.id < b.id ? -1 : 0)
-}
 
 const connectionRows = computed<FitConnectionRow[]>(() => {
   if (!selectedShip.value) return []
@@ -212,7 +172,7 @@ const connectionRows = computed<FitConnectionRow[]>(() => {
       if (!connectionSize) return
       const sourceTags = patchItem?.tags || connection?.tags || []
       const tags = normalizeTagList(sourceTags)
-      const typeDef = equipmentTypeMap.get(slot.type)
+      const typeDef = shipBuildStore.findEquipmentType(slot.type)
 
       rows.push({
         connectionKey: baseKey,
@@ -224,8 +184,7 @@ const connectionRows = computed<FitConnectionRow[]>(() => {
         groupName: patchItem?.groupName || group.group,
         size: connectionSize,
         tags,
-        count: connection?.count || 0,
-        options: getEquipmentCandidates(slot.type, connectionSize, tags)
+        count: connection?.count || 0
       })
 
       const shieldConnection = connection?.shield
@@ -239,7 +198,7 @@ const connectionRows = computed<FitConnectionRow[]>(() => {
         ? resolveSize(shieldPatchItem.size, shieldDef?.size)
         : resolveSize(undefined, shieldDef?.size)
       if (!shieldSize) return
-      const shieldTypeDef = equipmentTypeMap.get('shield')
+      const shieldTypeDef = shipBuildStore.findEquipmentType('shield')
       const shieldTypeLabel = shieldTypeDef ? translateEquipmentType(shieldTypeDef) : 'shield'
       rows.push({
         connectionKey: shieldKey,
@@ -251,8 +210,7 @@ const connectionRows = computed<FitConnectionRow[]>(() => {
         groupName: shieldPatchItem?.groupName || group.group,
         size: shieldSize,
         tags: shieldTags,
-        count: shieldDef?.count || 0,
-        options: getEquipmentCandidates('shield', shieldSize, shieldTags)
+        count: shieldDef?.count || 0
       })
     })
   })
@@ -333,7 +291,6 @@ const groupRows = computed<FitGroupRow[]>(() => {
         size: row.size,
         totalCount: row.count,
         tags: [...row.tags],
-        options: [...row.options],
         connectionKeys: [row.connectionKey]
       })
       return
@@ -343,9 +300,6 @@ const groupRows = computed<FitGroupRow[]>(() => {
     existing.connectionKeys.push(row.connectionKey)
     const tagSet = new Set([...existing.tags, ...row.tags])
     existing.tags = Array.from(tagSet)
-    const optionMap = new Map(existing.options.map((item) => [item.id, item]))
-    row.options.forEach((item) => optionMap.set(item.id, item))
-    existing.options = Array.from(optionMap.values()).sort((a, b) => a.id > b.id ? 1 : a.id < b.id ? -1 : 0)
   })
 
   return Array.from(grouped.values())
@@ -391,12 +345,6 @@ const sizeShort = (size: string) => {
   if (size === 'large') return 'L'
   if (size === 'extralarge') return 'XL'
   return size.toUpperCase()
-}
-
-const mergeOptions = (rows: Array<{ options: FitEquipmentOption[] }>) => {
-  const optionMap = new Map<string, FitEquipmentOption>()
-  rows.forEach((row) => row.options.forEach((opt) => optionMap.set(opt.id, opt)))
-  return Array.from(optionMap.values()).sort((a, b) => (a.id > b.id ? 1 : a.id < b.id ? -1 : 0))
 }
 
 const mergeTags = (rows: Array<{ tags: string[] }>) => {
@@ -475,7 +423,6 @@ const aggregatedPrimaryGroups = computed<AggregatedGroup[]>(() => {
       totalCount: rows.reduce((sum, row) => sum + row.totalCount, 0),
       tags: mergeTags(rows),
       connectionKeys: rows.flatMap((row) => row.connectionKeys),
-      options: mergeOptions(rows),
       groupRows: rows
     }))
 
@@ -664,7 +611,6 @@ const relatedShieldAggregates = computed<AggregatedGroup[]>(() => {
       totalCount: rows.reduce((sum, row) => sum + row.count, 0),
       tags: mergeTags(rows),
       connectionKeys: rows.map((row) => row.connectionKey),
-      options: mergeOptions(rows),
       groupRows: []
     }))
 })
@@ -681,7 +627,6 @@ const slotTargets = computed<SlotTarget[]>(() => {
         count: selectedCountForConnectionKeys([activeConnectionRow.value.connectionKey]),
         totalCount: activeConnectionRow.value.count,
         tags: activeConnectionRow.value.tags,
-        options: activeConnectionRow.value.options,
         connectionKeys: [activeConnectionRow.value.connectionKey]
       })
     }
@@ -695,7 +640,6 @@ const slotTargets = computed<SlotTarget[]>(() => {
         count: selectedCountForConnectionKeys([row.connectionKey]),
         totalCount: row.count,
         tags: row.tags,
-        options: row.options,
         connectionKeys: [row.connectionKey]
       })
     })
@@ -713,7 +657,6 @@ const slotTargets = computed<SlotTarget[]>(() => {
       count: selectedCountForConnectionKeys(activePrimaryAggregate.value.connectionKeys),
       totalCount: totalCountForConnectionKeys(activePrimaryAggregate.value.connectionKeys),
       tags: activePrimaryAggregate.value.tags,
-      options: activePrimaryAggregate.value.options,
       connectionKeys: activePrimaryAggregate.value.connectionKeys
     })
   }
@@ -727,7 +670,6 @@ const slotTargets = computed<SlotTarget[]>(() => {
       count: selectedCountForConnectionKeys(group.connectionKeys),
       totalCount: totalCountForConnectionKeys(group.connectionKeys),
       tags: group.tags,
-      options: group.options,
       connectionKeys: group.connectionKeys
     })
   })
@@ -759,7 +701,6 @@ const pickerInitialEquipmentId = computed<string | null>(() => {
   if (!selected || selected === '__mixed__') return null
   return selected
 })
-const pickerOptions = computed(() => pickerTarget.value?.options || [])
 const isPickerLayout = computed(() => Boolean(pickerTarget.value))
 
 const normalizeRace = (option: FitEquipmentOption) => option.race || 'gen'
@@ -767,51 +708,60 @@ const normalizeMk = (option: FitEquipmentOption) => option.mk || ''
 const normalizeTags = (option: FitEquipmentOption) => option.tags || []
 const tagDefs = ['standard', 'advanced', 'xenon', 'mining', 'missile', 'highpower']
 
-const filterByRace = (candidates: FitEquipmentOption[], raceIds: string[]) => {
-  if (raceIds.length === 0) return candidates
-  return candidates.filter((item) => raceIds.includes(normalizeRace(item)))
-}
-const filterByMk = (candidates: FitEquipmentOption[], mkIds: string[]) => {
-  if (mkIds.length === 0) return candidates
-  return candidates.filter((item) => mkIds.includes(normalizeMk(item)))
-}
-const filterByTags = (candidates: FitEquipmentOption[], tagIds: string[]) => {
-  if (tagIds.length === 0) return candidates
-  // Tag 多选使用并集语义：命中任一已选 Tag 即保留
-  return candidates.filter((item) => tagIds.some((tagId) => normalizeTags(item).includes(tagId)))
+const pickerShipId = computed(() => {
+  const firstKey = pickerTarget.value?.connectionKeys[0]
+  return firstKey ? firstKey.split('::')[0] || '' : ''
+})
+
+const pickerSlotType = computed(() => {
+  const firstKey = pickerTarget.value?.connectionKeys[0]
+  if (!firstKey) return ''
+  return localConnectionKeyMap.value.get(firstKey)?.slotType || ''
+})
+
+const extractPickerCandidates = (filters: {
+  races: string[]
+  mks: string[]
+  tags: string[]
+}) => {
+  if (!pickerTarget.value) {
+    return {
+      items: [] as FitEquipmentOption[],
+      raceCountMap: new Map<string, number>(),
+      mkCountMap: new Map<string, number>(),
+      tagCountMap: new Map<string, number>()
+    }
+  }
+  return extractEquipmentSlotCandidatesWithFacets({
+    shipMap: shipBuildStore.shipMap,
+    equipmentMap: shipBuildStore.equipmentMap,
+    shipId: pickerShipId.value,
+    slotType: pickerSlotType.value as EquipmentType,
+    size: pickerTarget.value.size as ShipEquipmentSize,
+    tagsAll: pickerTarget.value.tags,
+    filters
+  })
 }
 
-const availableRaceIds = computed(() => new Set(pickerOptions.value.map((item) => normalizeRace(item))))
-const availableMkIds = computed(() => new Set(pickerOptions.value.map((item) => normalizeMk(item)).filter(Boolean)))
-const availableTagIds = computed(() => new Set(pickerOptions.value.flatMap((item) => normalizeTags(item))))
+const basePickerCandidates = computed(() => extractPickerCandidates({
+  races: [],
+  mks: [],
+  tags: []
+}).items)
 
-const raceCountMap = computed(() => {
-  const pool = filterByMk(filterByTags(pickerOptions.value, selectedTagIds.value), selectedMkIds.value)
-  const counts = new Map<string, number>()
-  pool.forEach((item) => {
-    const raceId = normalizeRace(item)
-    counts.set(raceId, (counts.get(raceId) || 0) + 1)
-  })
-  return counts
-})
-const mkCountMap = computed(() => {
-  const pool = filterByRace(filterByTags(pickerOptions.value, selectedTagIds.value), selectedRaceIds.value)
-  const counts = new Map<string, number>()
-  pool.forEach((item) => {
-    const mkId = normalizeMk(item)
-    if (!mkId) return
-    counts.set(mkId, (counts.get(mkId) || 0) + 1)
-  })
-  return counts
-})
-const tagCountMap = computed(() => {
-  const pool = filterByRace(filterByMk(pickerOptions.value, selectedMkIds.value), selectedRaceIds.value)
-  const counts = new Map<string, number>()
-  pool.forEach((item) => {
-    normalizeTags(item).forEach((tagId) => counts.set(tagId, (counts.get(tagId) || 0) + 1))
-  })
-  return counts
-})
+const availableRaceIds = computed(() => new Set(basePickerCandidates.value.map((item) => normalizeRace(item))))
+const availableMkIds = computed(() => new Set(basePickerCandidates.value.map((item) => normalizeMk(item)).filter(Boolean)))
+const availableTagIds = computed(() => new Set(basePickerCandidates.value.flatMap((item) => normalizeTags(item))))
+
+const pickerCandidateResult = computed(() => extractPickerCandidates({
+  races: selectedRaceIds.value,
+  mks: selectedMkIds.value,
+  tags: selectedTagIds.value
+}))
+
+const raceCountMap = computed(() => pickerCandidateResult.value.raceCountMap)
+const mkCountMap = computed(() => pickerCandidateResult.value.mkCountMap)
+const tagCountMap = computed(() => pickerCandidateResult.value.tagCountMap)
 
 const raceTags = computed(() => Array.from(availableRaceIds.value)
   .sort((a, b) => a.localeCompare(b))
@@ -830,11 +780,7 @@ const featureTags = computed(() => tagDefs
     }
   }))
 
-const filteredCandidates = computed(() => {
-  const byRace = filterByRace(pickerOptions.value, selectedRaceIds.value)
-  const byMk = filterByMk(byRace, selectedMkIds.value)
-  return filterByTags(byMk, selectedTagIds.value)
-})
+const filteredCandidates = computed(() => pickerCandidateResult.value.items)
 const pageSize = 10
 const listWithEmptyOption = computed<PickerCandidateItem[]>(() => [
   { id: null, name: t('ship_build.fit_empty_slot'), mk: null, race: null, tags: [] },
@@ -868,22 +814,12 @@ const toggleFeatureTag = (id: string) => {
 
 const selectedNameForTarget = (target: SlotTarget) => {
   const selectedId = selectedForConnectionKeys(target.connectionKeys)
-  if (!selectedId) {
-    if (isSingleCandidate(target) && target.options[0]) return target.options[0].name
-    return t('ship_build.fit_empty_slot')
-  }
+  if (!selectedId) return t('ship_build.fit_empty_slot')
   if (selectedId === '__mixed__') return t('ship_build.fit_mixed_selection')
-  return target.options.find((item) => item.id === selectedId)?.name || selectedId
+  const equipment = shipBuildStore.findEquipment(selectedId)
+  return equipment ? translateEquipment(equipment) : selectedId
 }
 const isMixedSelectionInGroup = (target: SlotTarget) => fitMode.value === 'group' && selectedForConnectionKeys(target.connectionKeys) === '__mixed__'
-
-const getCandidateCount = (target: SlotTarget) => target.options.length
-const isSingleCandidate = (target: SlotTarget) => getCandidateCount(target) === 0
-const isSingleCandidateSelected = (target: SlotTarget) => {
-  if (!isSingleCandidate(target)) return false
-  const selectedId = selectedForConnectionKeys(target.connectionKeys)
-  return selectedId !== '' && selectedId === target.options[0]?.id
-}
 
 const openPicker = (slotKey: string) => {
   expandedSlotKey.value = slotKey
@@ -896,18 +832,6 @@ const closePicker = () => {
 }
 
 const handleSlotClick = (target: SlotTarget) => {
-  if (isSingleCandidate(target)) {
-    const candidateId = target.options[0]?.id || null
-    const selectedId = selectedForConnectionKeys(target.connectionKeys)
-    const shouldFillToFullInGroup = fitMode.value === 'group' && selectedId === candidateId && target.count < target.totalCount
-    const nextId = shouldFillToFullInGroup
-      ? candidateId
-      : selectedId === candidateId ? null : candidateId
-    target.connectionKeys.forEach((connectionKey) => {
-      applyConnectionAssignment({ connectionKey, equipmentId: nextId })
-    })
-    return
-  }
   openPicker(target.key)
 }
 
@@ -938,7 +862,7 @@ const clampToTargetCount = (target: SlotTarget, raw: number) => {
 }
 
 const sliderStepForTarget = (target: SlotTarget) => {
-  if (fitMode.value === 'group') return Math.max(1, target.totalCount)
+  if (fitMode.value === 'group') return Math.max(1, target.connectionKeys.length)
   return 1
 }
 
@@ -1002,9 +926,16 @@ const handleCountSliderCommit = (target: SlotTarget, value: number) => {
   }
 
   if (fitMode.value === 'group') {
+    const selectedId = selectedForConnectionKeys(target.connectionKeys)
+    if (!selectedId || selectedId === '__mixed__') return
     const distributed = distributeCountByCapacity(target.connectionKeys, committed)
     target.connectionKeys.forEach((connectionKey) => {
-      setConnectionAssignmentCount({ connectionKey, count: distributed[connectionKey] || 0 })
+      const nextCount = distributed[connectionKey] || 0
+      applyConnectionAssignment({
+        connectionKey,
+        equipmentId: nextCount > 0 ? selectedId : null
+      })
+      setConnectionAssignmentCount({ connectionKey, count: nextCount })
     })
   } else {
     target.connectionKeys.forEach((connectionKey) => {
@@ -1196,7 +1127,6 @@ watch(slotTargets, () => {
                         <button
                           class="slot-row"
                           :class="[
-                            isSingleCandidateSelected(target) ? 'slot-row-highlight' : '',
                             expandedSlotKey === target.key ? 'slot-row-expanded' : ''
                           ]"
                           :data-testid="`slot-${target.key}`"
@@ -1208,7 +1138,6 @@ watch(slotTargets, () => {
                           </div>
                           <div class="slot-row-side">
                             <span class="slot-row-count">{{ getDisplayedCount(target) }}/{{ target.totalCount }}</span>
-                            <span class="slot-row-candidate">{{ getCandidateCount(target) }}</span>
                           </div>
                         </button>
                       </div>
@@ -1306,7 +1235,6 @@ watch(slotTargets, () => {
                   <button
                     class="slot-row"
                     :class="[
-                      isSingleCandidateSelected(target) ? 'slot-row-highlight' : '',
                       expandedSlotKey === target.key ? 'slot-row-expanded' : ''
                     ]"
                     :data-testid="`slot-${target.key}`"
@@ -1318,7 +1246,6 @@ watch(slotTargets, () => {
                     </div>
                     <div class="slot-row-side">
                       <span class="slot-row-count">{{ getDisplayedCount(target) }}/{{ target.totalCount }}</span>
-                      <span class="slot-row-candidate">{{ getCandidateCount(target) }}</span>
                     </div>
                   </button>
                 </div>
@@ -1371,7 +1298,6 @@ watch(slotTargets, () => {
 .slot-stack { @apply grid gap-1; }
 .slot-count-slider { @apply w-full; }
 .slot-row { @apply rounded border border-slate-700 px-2 py-2 flex items-center justify-between text-left; }
-.slot-row-highlight { @apply border-lime-300 ring-1 ring-lime-400; }
 .slot-row-expanded { @apply border-emerald-200 ring-1 ring-emerald-300; }
 .slot-row-main { @apply min-w-0; }
 .slot-row-title { @apply text-xs text-slate-100 font-semibold; }
@@ -1379,7 +1305,6 @@ watch(slotTargets, () => {
 .slot-row-value-mixed { @apply text-amber-300 font-semibold; }
 .slot-row-side { @apply flex items-center gap-2 ml-2; }
 .slot-row-count { @apply text-[10px] text-emerald-300; }
-.slot-row-candidate { @apply rounded border border-slate-600/70 px-1.5 py-0.5 text-[10px] text-slate-200; }
 .empty-card { @apply rounded border border-dashed border-slate-700 p-3 text-xs text-slate-300 text-center; }
 
 .picker-grid-row { @apply grid gap-2 mt-2; grid-template-columns: minmax(0, calc(50% - 4rem)) minmax(0, 1fr); }

@@ -3,19 +3,22 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEquipmentStats } from '@/composables/useEquipmentStats'
 import { useX4I18n } from '@/utils/UseX4I18n'
+import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { extractEquipmentSlotCandidatesWithFacets } from '@/store/logic/shipEquipmentPicker'
 import MetricsPanel from '@/components/common/MetricsPanel.vue'
 import type { MetricSchema, MetricValueMap } from '@/components/common/metricsPanelTypes'
-import type { X4Equipment, X4Ship } from '@/types/x4'
-import equipmentsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
+import type { EquipmentType, ShipEquipmentSize, X4Equipment, X4Ship } from '@/types/x4'
 
 const { t } = useI18n()
 const { translateEquipment } = useX4I18n()
+const shipBuildStore = useShipBuildStore()
 
 const props = defineProps<{
   isPickerOpen: boolean
   pickerTarget: {
     connectionKeys: string[]
-    options: { id: string; name: string; mk: string | null; race: string | null; tags: string[] }[]
+    size: string
+    tags: string[]
   } | null
   highlightedEquipmentId: string | null
   selectedShip: X4Ship | null
@@ -24,10 +27,7 @@ const props = defineProps<{
   isShield: boolean
 }>()
 
-const equipmentMap = new Map<string, X4Equipment>()
-;(equipmentsRaw as X4Equipment[]).forEach((eq) => {
-  equipmentMap.set(eq.id, eq)
-})
+const equipmentMap = shipBuildStore.equipmentMap
 
 const currentEquipment = computed(() => {
   if (!props.currentEquipmentId) return null
@@ -60,8 +60,17 @@ const shouldHide = computed(() => {
 })
 
 const candidateEquipmentList = computed(() => {
-  if (!props.pickerTarget?.options) return []
-  return props.pickerTarget.options
+  if (!props.pickerTarget || !props.selectedShip) return []
+  const result = extractEquipmentSlotCandidatesWithFacets({
+    shipMap: shipBuildStore.shipMap,
+    equipmentMap: shipBuildStore.equipmentMap,
+    shipId: props.selectedShip.id,
+    slotType: props.slotType as EquipmentType,
+    size: props.pickerTarget.size as ShipEquipmentSize,
+    tagsAll: props.pickerTarget.tags,
+    filters: { races: [], mks: [], tags: [] }
+  })
+  return result.items
     .map((opt) => equipmentMap.get(opt.id))
     .filter((eq): eq is X4Equipment => !!eq)
 })
