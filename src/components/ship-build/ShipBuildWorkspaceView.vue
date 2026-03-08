@@ -11,9 +11,7 @@ import ShipBuildPanelMaterials from '@/components/ship-build/ShipBuildPanelMater
 
 const shipBuildStore = useShipBuildStore()
 const { selectedShip, selectedShipId, blueprint } = storeToRefs(shipBuildStore)
-const { buildPreviewBlueprint } = shipBuildStore
-
-const showMaterial = ref(true)
+const { buildPreviewBlueprint, applyConnectionAssignment } = shipBuildStore
 
 const isPickerOpen = ref(false)
 const pickerTarget = ref<{
@@ -34,7 +32,6 @@ const currentIsShield = ref(false)
 
 const handlePickerOpen = (slotType: string, equipmentId: string | null, isShield: boolean) => {
   isPickerOpen.value = true
-  showMaterial.value = false
   currentSlotType.value = slotType
   currentEquipmentId.value = equipmentId
   currentIsShield.value = isShield
@@ -42,8 +39,20 @@ const handlePickerOpen = (slotType: string, equipmentId: string | null, isShield
 
 const handlePickerClose = () => {
   isPickerOpen.value = false
-  showMaterial.value = true
   targetBlueprint.value = null
+}
+
+const handlePickerCancel = () => {
+  handlePickerClose()
+}
+
+const handlePickerConfirm = () => {
+  if (!pickerTarget.value) return
+  const equipmentId = highlightedEquipmentId.value ?? null
+  pickerTarget.value.connectionKeys.forEach((connectionKey) => {
+    applyConnectionAssignment({ connectionKey, equipmentId })
+  })
+  handlePickerClose()
 }
 
 const handleHighlightedEquipmentIdChange = (id: string | null) => {
@@ -84,7 +93,6 @@ const currentShipId = () => {
 watch(currentShipId, (next, prev) => {
   if (next === prev) return
   isPickerOpen.value = false
-  showMaterial.value = true
   pickerTarget.value = null
   highlightedEquipmentId.value = null
   currentSlotType.value = ''
@@ -99,7 +107,9 @@ watch(currentShipId, (next, prev) => {
   <div v-if="selectedShip" class="grid grid-cols-12 gap-8 items-start" data-testid="ship-build-panels">
     <ShipBuildPanelFit
       :key="currentShipId() || 'no-ship'"
-      :wide="!showMaterial"
+      :wide="false"
+      :external-highlighted-equipment-id="highlightedEquipmentId"
+      :picker-open-external="isPickerOpen"
       @picker-open="handlePickerOpen"
       @picker-close="handlePickerClose"
       @update:highlightedEquipmentId="handleHighlightedEquipmentIdChange"
@@ -108,8 +118,24 @@ watch(currentShipId, (next, prev) => {
     />
 
     <template v-if="isPickerOpen">
-      <div class="col-span-4 flex flex-col gap-4">
+      <div class="col-span-12 lg:col-span-4">
         <ShipBuildPanelEquipment
+          panel-mode="picker"
+          :is-picker-open="isPickerOpen"
+          :picker-target="pickerTarget"
+          :highlighted-equipment-id="highlightedEquipmentId"
+          :selected-ship="selectedShip"
+          :slot-type="currentSlotType"
+          :current-equipment-id="currentEquipmentId"
+          :is-shield="currentIsShield"
+          @update:highlightedEquipmentId="handleHighlightedEquipmentIdChange"
+          @cancel="handlePickerCancel"
+          @confirm="handlePickerConfirm"
+        />
+      </div>
+      <div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
+        <ShipBuildPanelEquipment
+          panel-mode="equipment"
           :is-picker-open="isPickerOpen"
           :picker-target="pickerTarget"
           :highlighted-equipment-id="highlightedEquipmentId"

@@ -676,7 +676,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     void i18n.global.locale.value
     if (!loadedBuiltInPreset.value || !loadedBuiltInConnectionsSnapshot.value || !blueprint.value) {
       if (!blueprint.value) return ''
-      if (!blueprint.value.name && forceDirty.value && !savedBlueprints.value.activeBlueprintId) {
+      if (!blueprint.value.name && isDirty.value) {
         return i18n.global.t('shipBuild.status_custom')
       }
       return blueprint.value.name || ''
@@ -986,6 +986,31 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     if (builtIn) {
       const bp = buildBuiltInBlueprintForShip(builtIn.shipId, builtIn.preset)
       if (!bp) return
+      const activeId = savedBlueprints.value.activeBlueprintId
+      const shouldApplyToCurrentSaved =
+        Boolean(activeId) &&
+        Boolean(blueprint.value) &&
+        blueprint.value!.id === activeId &&
+        !isBuiltInBlueprintId(activeId) &&
+        blueprint.value!.shipId === builtIn.shipId
+
+      if (shouldApplyToCurrentSaved && blueprint.value) {
+        const currentId = blueprint.value.id
+        const currentName = blueprint.value.name
+        const currentLastUpdated = blueprint.value.lastUpdated
+        blueprint.value = {
+          ...JSON.parse(JSON.stringify(bp)),
+          id: currentId,
+          name: currentName,
+          shipId: builtIn.shipId,
+          lastUpdated: currentLastUpdated
+        }
+        loadedBuiltInPreset.value = null
+        loadedBuiltInConnectionsSnapshot.value = null
+        forceDirty.value = false
+        return
+      }
+
       bp.name = ''
       blueprint.value = JSON.parse(JSON.stringify(bp))
       savedBlueprints.value.activeShipId = builtIn.shipId
@@ -1106,6 +1131,8 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
     // Switching to a different ship: reset blueprint and start fresh.
     blueprint.value = createEmptyBlueprintForShip(shipId)
+    savedBlueprints.value.activeShipId = shipId
+    savedBlueprints.value.activeBlueprintId = null
     // Initialize snapshot for dirty check
     takeSnapshot()
     selectedByConnection.value = {}

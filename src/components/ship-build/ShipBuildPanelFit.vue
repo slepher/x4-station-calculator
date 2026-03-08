@@ -2,12 +2,10 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
-import type { FitMode, FitConnectionRow, FitGroupRow, FitEquipmentOption } from '@/components/ship-build/fitTypes'
+import type { FitMode, FitConnectionRow, FitGroupRow } from '@/components/ship-build/fitTypes'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
-import { useEquipmentStats } from '@/composables/useEquipmentStats'
-import { extractEquipmentSlotCandidatesWithFacets } from '@/store/logic/shipEquipmentPicker'
-import type { EquipmentType, ShipEquipmentSize, X4SlotTag } from '@/types/x4'
+import type { ShipEquipmentSize, X4SlotTag } from '@/types/x4'
 import X4DualPhaseRangeSlider from '@/components/common/X4DualPhaseRangeSlider.vue'
 import ShipStoragePanel from '@/components/ship-build/ShipStoragePanel.vue'
 
@@ -47,16 +45,10 @@ type GroupTabRow = {
   tabs: GroupTabItem[]
 }
 
-type PickerCandidateItem = {
-  id: string | null
-  name: string
-  mk: string | null
-  race: string | null
-  tags: string[]
-}
-
 const props = defineProps<{
   wide?: boolean
+  externalHighlightedEquipmentId?: string | null
+  pickerOpenExternal?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -70,46 +62,6 @@ const emit = defineEmits<{
 const shipBuildStore = useShipBuildStore()
 const { selectedShip, blueprint, mockTagPatch, isDirty, activeBlueprintStatusLabel, isBuiltInPresetUnchanged } = storeToRefs(shipBuildStore)
 const { applyConnectionAssignment, setConnectionAssignmentCount, enterShipSelector } = shipBuildStore
-
-// Get first summary (Label Value Unit, right column, top row)
-function getEquipmentSummary1(equipmentId: string): { labelKey: string; value: string; unit: string } {
-  const equipment = shipBuildStore.findEquipment(equipmentId)
-  if (!equipment || !selectedShip.value) return { labelKey: '', value: '', unit: '' }
-
-  const { summary } = useEquipmentStats(equipment, selectedShip.value)
-  if (!summary.value) return { labelKey: '', value: '', unit: '' }
-
-  const s = summary.value as any
-  const type = equipment.type
-
-  if (type === 'weapon') return { labelKey: 'ship_build.equipment_burst_dps', value: String(Math.round(s.burstDPS)), unit: 'MW' }
-  if (type === 'turret') return { labelKey: 'ship_build.equipment_sustained_dps', value: String(Math.round(s.sustainedDPS)), unit: 'MW' }
-  if (type === 'shield') return { labelKey: 'ship_build.equipment_shield_max', value: String(Math.round(s.shieldMax)), unit: 'MJ' }
-  if (type === 'engine') return { labelKey: 'ship_build.equipment_speed', value: String(s.speed), unit: 'm/s' }
-  if (type === 'thruster') return { labelKey: 'ship_build.equipment_strafe_speed', value: String(s.strafeSpeed), unit: 'm/s' }
-
-  return { labelKey: '', value: '', unit: '' }
-}
-
-// Get second summary (Label Value Unit, right column, bottom row)
-function getEquipmentSummary2(equipmentId: string): { labelKey: string; value: string; unit: string } {
-  const equipment = shipBuildStore.findEquipment(equipmentId)
-  if (!equipment || !selectedShip.value) return { labelKey: '', value: '', unit: '' }
-
-  const { summary } = useEquipmentStats(equipment, selectedShip.value)
-  if (!summary.value) return { labelKey: '', value: '', unit: '' }
-
-  const s = summary.value as any
-  const type = equipment.type
-
-  if (type === 'weapon') return { labelKey: 'ship_build.equipment_range', value: String(Math.round(s.range)), unit: 'm' }
-  if (type === 'turret') return { labelKey: 'ship_build.equipment_range', value: String(Math.round(s.range)), unit: 'm' }
-  if (type === 'shield') return { labelKey: 'ship_build.equipment_shield_delay', value: String(s.shieldDelay), unit: 's' }
-  if (type === 'engine') return { labelKey: 'ship_build.equipment_travel_speed', value: String(s.travelSpeed), unit: 'm/s' }
-  if (type === 'thruster') return { labelKey: 'ship_build.equipment_yaw_rate', value: s.yawRate.toFixed(2), unit: 'rad/s' }
-
-  return { labelKey: '', value: '', unit: '' }
-}
 
 // 本地 connectionKeyMap：从 connectionRows 构建
 const localConnectionKeyMap = computed(() => {
@@ -310,10 +262,6 @@ const activeSlotType = ref<'engine' | 'shield' | 'weapon' | 'turret' | 'thruster
 const activeTabKey = ref('')
 const expandedSlotKey = ref<string | null>(null)
 const pendingExpandedConnectionKeys = ref<string[] | null>(null)
-const selectedRaceIds = ref<string[]>([])
-const selectedMkIds = ref<string[]>([])
-const selectedTagIds = ref<string[]>([])
-const currentPage = ref(1)
 const highlightedEquipmentId = ref<string | null>(null)
 const draftCountByTarget = ref<Record<string, number>>({})
 const blueprintMenuOpen = ref(false)
@@ -795,121 +743,6 @@ const pickerInitialEquipmentId = computed<string | null>(() => {
 })
 const isPickerLayout = computed(() => Boolean(pickerTarget.value))
 
-const normalizeRace = (option: FitEquipmentOption) => option.race || 'gen'
-const normalizeMk = (option: FitEquipmentOption) => option.mk || ''
-const normalizeTags = (option: FitEquipmentOption) => option.tags || []
-const tagDefs = ['standard', 'advanced', 'xenon', 'mining', 'missile', 'highpower']
-
-const pickerShipId = computed(() => {
-  const firstKey = pickerTarget.value?.connectionKeys[0]
-  return firstKey ? firstKey.split('::')[0] || '' : ''
-})
-
-const pickerSlotType = computed(() => {
-  const firstKey = pickerTarget.value?.connectionKeys[0]
-  if (!firstKey) return ''
-  return localConnectionKeyMap.value.get(firstKey)?.slotType || ''
-})
-
-const extractPickerCandidates = (filters: {
-  races: string[]
-  mks: string[]
-  tags: string[]
-}) => {
-  if (!pickerTarget.value) {
-    return {
-      items: [] as FitEquipmentOption[],
-      raceCountMap: new Map<string, number>(),
-      mkCountMap: new Map<string, number>(),
-      tagCountMap: new Map<string, number>()
-    }
-  }
-  return extractEquipmentSlotCandidatesWithFacets({
-    shipMap: shipBuildStore.shipMap,
-    equipmentMap: shipBuildStore.equipmentMap,
-    shipId: pickerShipId.value,
-    slotType: pickerSlotType.value as EquipmentType,
-    size: pickerTarget.value.size as ShipEquipmentSize,
-    tagsAll: pickerTarget.value.tags,
-    filters
-  })
-}
-
-const basePickerCandidates = computed(() => extractPickerCandidates({
-  races: [],
-  mks: [],
-  tags: []
-}).items)
-
-const availableRaceIds = computed(() => new Set(basePickerCandidates.value.map((item) => normalizeRace(item))))
-const availableMkIds = computed(() => new Set(basePickerCandidates.value.map((item) => normalizeMk(item)).filter(Boolean)))
-const availableTagIds = computed(() => new Set(basePickerCandidates.value.flatMap((item) => normalizeTags(item))))
-
-const pickerCandidateResult = computed(() => extractPickerCandidates({
-  races: selectedRaceIds.value,
-  mks: selectedMkIds.value,
-  tags: selectedTagIds.value
-}))
-
-const raceCountMap = computed(() => pickerCandidateResult.value.raceCountMap)
-const mkCountMap = computed(() => pickerCandidateResult.value.mkCountMap)
-const tagCountMap = computed(() => pickerCandidateResult.value.tagCountMap)
-
-const raceTags = computed(() => Array.from(availableRaceIds.value)
-  .sort((a, b) => a.localeCompare(b))
-  .map((id) => ({ id, label: id.toUpperCase(), count: raceCountMap.value.get(id) || 0 })))
-const mkTags = computed(() => Array.from(availableMkIds.value)
-  .sort((a, b) => Number(a) - Number(b))
-  .map((id) => ({ id, label: `MK${id}`, count: mkCountMap.value.get(id) || 0 })))
-const featureTags = computed(() => tagDefs
-  .filter((id) => availableTagIds.value.has(id))
-  .map((id) => {
-    const def = slotTagMap.get(id)
-    return {
-      id,
-      label: def ? translateSlotTag(def) : id.toUpperCase(),
-      count: tagCountMap.value.get(id) || 0
-    }
-  }))
-
-const filteredCandidates = computed(() => pickerCandidateResult.value.items.map((item) => {
-  const equipment = item.id ? shipBuildStore.findEquipment(item.id) : null
-  return {
-    ...item,
-    name: equipment ? translateEquipment(equipment) : item.name
-  }
-}))
-const pageSize = 10
-const listWithEmptyOption = computed<PickerCandidateItem[]>(() => [
-  { id: null, name: t('ship_build.fit_empty_slot'), mk: null, race: null, tags: [] },
-  ...filteredCandidates.value
-])
-const totalPages = computed(() => {
-  const total = Math.ceil(listWithEmptyOption.value.length / pageSize)
-  return total > 0 ? total : 1
-})
-const pagedCandidates = computed(() => {
-  const start = (currentPage.value - 1) * pageSize
-  return listWithEmptyOption.value.slice(start, start + pageSize)
-})
-
-const toggleTag = (items: string[], setItems: (next: string[]) => void, id: string) => {
-  if (items.includes(id)) return setItems(items.filter((item) => item !== id))
-  return setItems([...items, id])
-}
-const toggleRace = (id: string) => {
-  toggleTag(selectedRaceIds.value, (next) => { selectedRaceIds.value = next }, id)
-  currentPage.value = 1
-}
-const toggleMk = (id: string) => {
-  toggleTag(selectedMkIds.value, (next) => { selectedMkIds.value = next }, id)
-  currentPage.value = 1
-}
-const toggleFeatureTag = (id: string) => {
-  toggleTag(selectedTagIds.value, (next) => { selectedTagIds.value = next }, id)
-  currentPage.value = 1
-}
-
 const selectedNameForTarget = (target: SlotTarget) => {
   const selectedId = selectedForConnectionKeys(target.connectionKeys)
   if (!selectedId) return t('ship_build.fit_empty_slot')
@@ -944,14 +777,6 @@ const jumpToTab = (tabKey: string) => {
     pendingExpandedConnectionKeys.value = current ? [...current.connectionKeys] : null
   }
   activeTabKey.value = tabKey
-}
-
-const handlePickerConfirm = (equipmentId: string | null) => {
-  if (!pickerTarget.value) return
-  pickerTarget.value.connectionKeys.forEach((connectionKey) => {
-    applyConnectionAssignment({ connectionKey, equipmentId })
-  })
-  closePicker()
 }
 
 const clampToTargetCount = (target: SlotTarget, raw: number) => {
@@ -1043,10 +868,6 @@ const handleCountSliderCommit = (target: SlotTarget, value: number) => {
 }
 
 watch(pickerTarget, (newTarget) => {
-  selectedRaceIds.value = []
-  selectedMkIds.value = []
-  selectedTagIds.value = []
-  currentPage.value = 1
   highlightedEquipmentId.value = pickerInitialEquipmentId.value
   emit('update:pickerTarget', newTarget)
 })
@@ -1055,13 +876,27 @@ watch(highlightedEquipmentId, (newId) => {
   emit('update:highlightedEquipmentId', newId)
 })
 
+watch(
+  () => props.externalHighlightedEquipmentId,
+  (newId) => {
+    if (newId === undefined) return
+    if (highlightedEquipmentId.value === newId) return
+    highlightedEquipmentId.value = newId
+  }
+)
+
+watch(
+  () => props.pickerOpenExternal,
+  (open) => {
+    if (open === false && expandedSlotKey.value) {
+      closePicker()
+    }
+  }
+)
+
 watch(fitMode, (mode) => {
   emit('update:pickerMode', mode)
 }, { immediate: true })
-
-watch(filteredCandidates, () => {
-  if (currentPage.value > totalPages.value) currentPage.value = 1
-})
 
 watch(slotTargets, () => {
   const validTargetKeys = new Set(slotTargets.value.map((target) => target.key))
@@ -1208,12 +1043,6 @@ watch(slotTargets, () => {
                     <button class="mode-tab mode-tab-tall" :class="fitMode === 'group' ? 'active' : ''" @click="setMode('group')">{{ t('ship_build.fit_mode_group') }}</button>
                   </div>
                 </div>
-                <div class="picker-cell picker-right">
-                  <div class="picker-actions-inline">
-                    <button class="mode-tab mode-tab-tall picker-action-btn mr-1" data-testid="picker-cancel" @click="closePicker">{{ t('ui.cancel') }}</button>
-                    <button class="mode-tab mode-tab-tall picker-action-btn" data-testid="picker-confirm" @click="handlePickerConfirm(highlightedEquipmentId)">{{ t('ship_build.fit_picker_confirm') }}</button>
-                  </div>
-                </div>
               </section>
 
               <section class="picker-grid-row picker-grid-row-tabs">
@@ -1237,50 +1066,15 @@ watch(slotTargets, () => {
                     </div>
                   </div>
                 </div>
-                <div class="picker-cell picker-right picker-right-tabs">
-                  <div v-if="totalPages > 1" class="pager">
-                    <button class="pager-btn" :disabled="currentPage === 1" @click="currentPage = currentPage - 1">&lt;</button>
-                    <button
-                      v-for="page in totalPages"
-                      :key="page"
-                      class="pager-btn"
-                      :class="currentPage === page ? 'pager-btn-active' : ''"
-                      :data-testid="`page-${page}`"
-                      @click="currentPage = page"
-                    >
-                      {{ page }}
-                    </button>
-                    <button class="pager-btn" :disabled="currentPage === totalPages" @click="currentPage = currentPage + 1">&gt;</button>
-                  </div>
-                </div>
               </section>
 
-              <section class="picker-grid-row">
+              <section class="picker-grid-row picker-grid-row-fit-only">
                 <div class="picker-cell">
                   <div class="picker-row3-left">
-                    <section class="compatibility-box picker-compat-box">
-                      <div class="filter-block">
-                        <div class="filter-line">
-                          <span class="filter-group">RACE</span>
-                          <div class="filter-items-race" :class="raceTags.length > 3 ? 'filter-items-race-two-rows' : ''">
-                            <button v-for="tag in raceTags" :key="`race-${tag.id}`" class="filter-chip" :class="selectedRaceIds.includes(tag.id) ? 'filter-chip-active' : ''" :data-testid="`race-${tag.id}`" @click="toggleRace(tag.id)">
-                              {{ tag.label }} <span class="chip-count">{{ tag.count }}</span>
-                            </button>
-                          </div>
-                        </div>
-                        <div class="filter-line">
-                          <span class="filter-group">MK</span>
-                          <button v-for="tag in mkTags" :key="`mk-${tag.id}`" class="filter-chip" :class="selectedMkIds.includes(tag.id) ? 'filter-chip-active' : ''" :data-testid="`mk-${tag.id}`" @click="toggleMk(tag.id)">
-                            {{ tag.label }} <span class="chip-count">{{ tag.count }}</span>
-                          </button>
-                        </div>
-                        <div class="filter-line">
-                          <span class="filter-group">TAG</span>
-                          <button v-for="tag in featureTags" :key="`tag-${tag.id}`" class="filter-chip" :class="selectedTagIds.includes(tag.id) ? 'filter-chip-active' : ''" :data-testid="`tag-${tag.id}`" @click="toggleFeatureTag(tag.id)">
-                            {{ tag.label }} <span class="chip-count">{{ tag.count }}</span>
-                          </button>
-                        </div>
-                      </div>
+                    <section v-if="visibleCompatibilityTags.length > 0" class="compatibility-box picker-compat-box">
+                      <div class="compatibility-title">{{ t('ship_build.fit_compatibility') }}:</div>
+                      <div class="compatibility-line tags">{{ visibleCompatibilityTagLabels.join(' / ') }}</div>
+                      <div v-for="line in compatibilitySlotLines" :key="line" class="compatibility-line">{{ line }}</div>
                     </section>
                     <section class="slot-wall picker-row3-slot-wall">
                       <div v-for="target in slotTargets" :key="target.key" class="slot-stack">
@@ -1316,35 +1110,6 @@ watch(slotTargets, () => {
                       </div>
                       <div v-if="slotTargets.length === 0" class="empty-card">{{ t('ship_build.fit_no_equipment') }}</div>
                     </section>
-                  </div>
-                </div>
-                <div class="picker-cell picker-right">
-                  <div class="candidate-list picker-candidate-list" data-testid="equipment-picker">
-                    <button
-                      v-for="item in pagedCandidates"
-                      :key="item.id || '__empty__'"
-                      class="candidate-item"
-                      :class="highlightedEquipmentId === item.id ? 'candidate-item-active' : ''"
-                      :data-testid="`candidate-${item.id || 'empty'}`"
-                      @click="highlightedEquipmentId = item.id"
-                    >
-                      <div class="candidate-left">
-                        <div class="candidate-name">{{ item.name }}</div>
-                        <div class="candidate-meta">{{ item.race || 'GEN' }} · {{ item.mk ? `MK${item.mk}` : '-' }}</div>
-                      </div>
-                      <div v-if="item.id" class="candidate-right">
-                        <div class="candidate-summary-1">
-                          <span class="summary-label">{{ t(getEquipmentSummary1(item.id).labelKey) }}</span>
-                          <span class="summary-value">{{ getEquipmentSummary1(item.id).value }}</span>
-                          <span class="summary-unit">{{ getEquipmentSummary1(item.id).unit }}</span>
-                        </div>
-                        <div class="candidate-summary-2">
-                          <span class="summary-label">{{ t(getEquipmentSummary2(item.id).labelKey) }}</span>
-                          <span class="summary-value">{{ getEquipmentSummary2(item.id).value }}</span>
-                          <span class="summary-unit">{{ getEquipmentSummary2(item.id).unit }}</span>
-                        </div>
-                      </div>
-                    </button>
                   </div>
                 </div>
               </section>
@@ -1583,6 +1348,7 @@ watch(slotTargets, () => {
 .empty-card { @apply rounded border border-dashed border-slate-700 p-3 text-xs text-slate-300 text-center; }
 
 .picker-grid-row { @apply grid gap-2 mt-2; grid-template-columns: minmax(0, calc(50% - 4rem)) minmax(0, 1fr); }
+.picker-grid-row-fit-only { grid-template-columns: minmax(0, 1fr); }
 .picker-cell { @apply min-h-20 min-w-0; }
 .picker-right { @apply flex items-start justify-end; }
 .picker-row3-left { @apply flex flex-col gap-2; }
