@@ -1444,7 +1444,6 @@ class X4PrecisionLoader:
                 if not slot_types:
                     continue
                 primary_type = next((t for t in slot_types if t != "shield"), slot_types[0])
-                group_info["equipments"] = loadouts_map.get(ship_macro, {}).get(group_key, {})
                 shield = group_info.pop("shieldConnection", None)
                 if shield:
                     if primary_type == "shield":
