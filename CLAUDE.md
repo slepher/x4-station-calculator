@@ -196,10 +196,6 @@ The `.trae/skills/` directory contains markdown skill definitions for the Trae I
 
 These define the development workflow patterns used in this codebase.
 
-Local Codex skill override rule:
-- If `.codex/skills/<skill-name>/SKILL.md` exists, it must be used as the only source for that skill.
-- Do not read or fallback to `~/.codex/.../<skill-name>/SKILL.md` for the same skill in this project.
-
 ## Working Guidelines
 
 ### When User Asks for Understanding/Analysis
