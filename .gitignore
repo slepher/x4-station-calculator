@@ -71,5 +71,9 @@ backupspecs
 playwright-report/
 test-results/
 
+# Worktrees
+worktrees/
+
+
 server-*.log
 pnpm-*.yaml
