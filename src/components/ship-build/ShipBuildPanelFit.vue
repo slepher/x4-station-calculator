@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import type { FitMode, FitConnectionRow, FitGroupRow, FitEquipmentOption } from '@/components/ship-build/fitTypes'
@@ -68,7 +68,7 @@ const emit = defineEmits<{
 }>()
 
 const shipBuildStore = useShipBuildStore()
-const { selectedShip, blueprint, mockTagPatch } = storeToRefs(shipBuildStore)
+const { selectedShip, blueprint, mockTagPatch, isDirty, activeBlueprintStatusLabel, isBuiltInPresetUnchanged } = storeToRefs(shipBuildStore)
 const { applyConnectionAssignment, setConnectionAssignmentCount, enterShipSelector } = shipBuildStore
 
 // Get first summary (Label Value Unit, right column, top row)
@@ -316,6 +316,88 @@ const selectedTagIds = ref<string[]>([])
 const currentPage = ref(1)
 const highlightedEquipmentId = ref<string | null>(null)
 const draftCountByTarget = ref<Record<string, number>>({})
+const blueprintMenuOpen = ref(false)
+const blueprintMenuRef = ref<HTMLElement | null>(null)
+const fitPanelRef = ref<HTMLElement | null>(null)
+const blueprintTriggerRef = ref<HTMLElement | null>(null)
+const blueprintMenuStyle = ref<Record<string, string>>({})
+
+const currentBlueprintLabel = computed(() => {
+  const label = activeBlueprintStatusLabel.value || ''
+  return label || t('shipBuild.built_in_empty')
+})
+
+const shouldShowBlueprintDirtyDot = computed(() => {
+  return isDirty.value && !isBuiltInPresetUnchanged.value
+})
+
+const loadableBlueprintItems = computed(() => {
+  if (!selectedShip.value) return []
+  return shipBuildStore.getLoadableBlueprintsForShip(selectedShip.value.id).map((bp) => ({
+    id: bp.id,
+    label: bp.name,
+    isBuiltIn: shipBuildStore.isBuiltInBlueprintId(bp.id),
+    isCurrentSaved: shipBuildStore.savedBlueprints.activeBlueprintId === bp.id
+  }))
+})
+
+const closeBlueprintMenu = () => {
+  blueprintMenuOpen.value = false
+}
+
+const updateBlueprintMenuPosition = () => {
+  const panel = fitPanelRef.value
+  const trigger = blueprintTriggerRef.value
+  const rect = panel?.getBoundingClientRect() || trigger?.getBoundingClientRect()
+  if (!rect) return
+  blueprintMenuStyle.value = {
+    top: `${rect.top}px`,
+    left: `${rect.right + 8}px`
+  }
+}
+
+const toggleBlueprintMenu = () => {
+  blueprintMenuOpen.value = !blueprintMenuOpen.value
+  if (blueprintMenuOpen.value) updateBlueprintMenuPosition()
+}
+
+const handleBlueprintSelect = (id: string) => {
+  shipBuildStore.loadBlueprint(id)
+  closeBlueprintMenu()
+}
+
+const handleBlueprintDelete = (id: string) => {
+  if (shipBuildStore.isBuiltInBlueprintId(id)) return
+  if (!confirm(t('shipBuild.confirm_delete_blueprint'))) return
+  shipBuildStore.deleteBlueprint(id)
+  closeBlueprintMenu()
+}
+
+const onGlobalPointerDown = (event: MouseEvent) => {
+  if (!blueprintMenuOpen.value) return
+  const menuRoot = blueprintMenuRef.value
+  if (!menuRoot) return
+  if (!(event.target instanceof Node)) return
+  if (menuRoot.contains(event.target)) return
+  closeBlueprintMenu()
+}
+
+const onViewportChange = () => {
+  if (!blueprintMenuOpen.value) return
+  updateBlueprintMenuPosition()
+}
+
+onMounted(() => {
+  document.addEventListener('mousedown', onGlobalPointerDown)
+  window.addEventListener('resize', onViewportChange)
+  window.addEventListener('scroll', onViewportChange, true)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('mousedown', onGlobalPointerDown)
+  window.removeEventListener('resize', onViewportChange)
+  window.removeEventListener('scroll', onViewportChange, true)
+})
 
 const slotTypeDefs = [
   { id: 'engine', label: 'E', tooltip: 'ship_build.slot_engine' },
@@ -780,7 +862,13 @@ const featureTags = computed(() => tagDefs
     }
   }))
 
-const filteredCandidates = computed(() => pickerCandidateResult.value.items)
+const filteredCandidates = computed(() => pickerCandidateResult.value.items.map((item) => {
+  const equipment = item.id ? shipBuildStore.findEquipment(item.id) : null
+  return {
+    ...item,
+    name: equipment ? translateEquipment(equipment) : item.name
+  }
+}))
 const pageSize = 10
 const listWithEmptyOption = computed<PickerCandidateItem[]>(() => [
   { id: null, name: t('ship_build.fit_empty_slot'), mk: null, race: null, tags: [] },
@@ -992,17 +1080,84 @@ watch(slotTargets, () => {
 </script>
 
 <template>
-  <div class="col-span-12 panel-card" :class="wide ? 'lg:col-span-8' : 'lg:col-span-4'" data-testid="ship-build-panel-fit">
+  <div
+    class="col-span-12 panel-card"
+    :class="wide ? 'lg:col-span-8' : 'lg:col-span-4'"
+    data-testid="ship-build-panel-fit"
+    ref="fitPanelRef"
+  >
     <div class="panel-header">
-      <span>{{ selectedShip ? translateShip(selectedShip) : $t('ship_build.panel_fit') }}</span>
-      <button
-        v-if="selectedShip"
-        class="selection-change-btn"
-        data-testid="ship-build-change-ship-fit-header"
-        @click="enterShipSelector"
-      >
-        {{ t('ship_build.change_ship') }}
-      </button>
+      <template v-if="selectedShip">
+        <div class="ship-switcher" role="group" :aria-label="t('ship_build.change_ship')">
+          <div class="ship-switcher-main">
+            <span class="ship-switcher-name">{{ translateShip(selectedShip) }}</span>
+          </div>
+          <button
+            class="ship-switcher-action"
+            data-testid="ship-build-change-ship-fit-header"
+            :title="t('ship_build.change_ship')"
+            @click="enterShipSelector"
+          >
+            <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 3h6v6" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10 14L21 3" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+            </svg>
+          </button>
+        </div>
+        <div class="ship-blueprint-picker" ref="blueprintMenuRef">
+          <button
+            class="ship-blueprint-trigger"
+            data-testid="ship-build-blueprint-menu-trigger"
+            :title="t('shipBuild.load_blueprint')"
+            @click="toggleBlueprintMenu"
+            ref="blueprintTriggerRef"
+          >
+            <span class="ship-blueprint-status">
+              {{ currentBlueprintLabel }}
+              <span v-if="shouldShowBlueprintDirtyDot" class="ship-blueprint-dirty-dot" />
+            </span>
+            <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
+            </svg>
+          </button>
+          <div
+            v-if="blueprintMenuOpen"
+            class="ship-blueprint-menu ship-blueprint-menu-floating"
+            :style="blueprintMenuStyle"
+            data-testid="ship-build-blueprint-menu"
+          >
+            <div
+              v-for="item in loadableBlueprintItems"
+              :key="item.id"
+              class="ship-blueprint-menu-row group"
+              :class="[
+                item.isBuiltIn ? 'ship-blueprint-menu-item-built-in' : '',
+                item.isCurrentSaved ? 'ship-blueprint-menu-item-current' : ''
+              ]"
+            >
+              <button
+                class="ship-blueprint-menu-item"
+                @click="handleBlueprintSelect(item.id)"
+              >
+                <span>{{ item.label }}</span>
+              </button>
+              <button
+                v-if="!item.isBuiltIn"
+                class="ship-blueprint-delete-btn"
+                :title="t('shipBuild.action_delete')"
+                @click.stop="handleBlueprintDelete(item.id)"
+              >
+                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </template>
+      <span v-else>{{ $t('ship_build.panel_fit') }}</span>
     </div>
     <div class="arsenal-shell" data-testid="ship-build-fit-panel">
         <aside class="left-rail">
@@ -1268,8 +1423,99 @@ watch(slotTargets, () => {
   @apply h-12 flex items-center justify-between px-4 py-0 text-slate-200 text-sm font-semibold border-b border-slate-800/70;
 }
 
-.selection-change-btn {
-  @apply px-3 py-1.5 rounded-full text-xs font-semibold border border-emerald-400/60 text-emerald-200 hover:bg-emerald-500/10 transition-colors;
+.ship-switcher {
+  @apply inline-flex items-center rounded-md border border-emerald-400/50 overflow-hidden transition-colors;
+}
+
+.ship-switcher:hover,
+.ship-switcher:focus-within {
+  @apply border-emerald-300 bg-emerald-500/10;
+}
+
+.ship-switcher-main {
+  @apply px-3 py-1.5 text-left text-slate-100;
+}
+
+.ship-switcher-name {
+  @apply block whitespace-nowrap text-sm font-semibold;
+}
+
+.ship-switcher-action {
+  @apply relative inline-flex items-center px-2.5 py-1.5 text-emerald-200;
+}
+
+.ship-switcher-action::before {
+  content: '';
+  @apply absolute left-0 top-1/4 h-1/2 w-px bg-emerald-400/40;
+}
+
+.ship-blueprint-picker {
+  @apply relative;
+}
+
+.ship-blueprint-trigger {
+  @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-emerald-400/50 text-emerald-200 hover:bg-emerald-500/10 transition-colors;
+}
+
+.ship-blueprint-status {
+  @apply inline-flex items-center gap-1 text-sm font-semibold text-slate-100 whitespace-nowrap;
+}
+
+.ship-blueprint-dirty-dot {
+  @apply inline-block h-1.5 w-1.5 rounded-full bg-red-500;
+}
+
+.ship-blueprint-menu {
+  @apply absolute top-0 left-full ml-2 z-40 w-max min-w-44 max-h-64 overflow-y-auto rounded-md border border-emerald-400/40 bg-slate-900/95 p-1 shadow-2xl;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(52, 211, 153, 0.65) rgba(15, 23, 42, 0.85);
+}
+
+.ship-blueprint-menu-floating {
+  @apply fixed top-0 left-0 ml-0 z-[120];
+}
+
+.ship-blueprint-menu-row {
+  @apply relative;
+}
+
+.ship-blueprint-menu-item {
+  @apply block h-8 w-full text-left px-2.5 pr-9 py-1.5 rounded text-xs text-slate-200 hover:bg-emerald-500/15 transition-colors whitespace-nowrap;
+}
+
+.ship-blueprint-menu-item-built-in {
+  @apply text-emerald-200;
+}
+
+.ship-blueprint-menu-item-current .ship-blueprint-menu-item {
+  @apply text-emerald-100 bg-emerald-500/15 border border-emerald-400/50;
+}
+
+.ship-blueprint-delete-btn {
+  @apply absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 flex items-center justify-center rounded text-red-300 hover:text-red-200 hover:bg-red-500/20 opacity-0 pointer-events-none transition-opacity;
+}
+
+.ship-blueprint-menu-row:hover .ship-blueprint-delete-btn {
+  @apply opacity-100 pointer-events-auto;
+}
+
+.ship-blueprint-menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ship-blueprint-menu::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.85);
+  border-radius: 9999px;
+}
+
+.ship-blueprint-menu::-webkit-scrollbar-thumb {
+  background: rgba(52, 211, 153, 0.65);
+  border-radius: 9999px;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.ship-blueprint-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(52, 211, 153, 0.9);
 }
 
 .arsenal-shell { @apply p-2 flex gap-2; }
