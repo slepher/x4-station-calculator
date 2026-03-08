@@ -5,7 +5,7 @@ import { useX4I18n } from '@/utils/UseX4I18n'
 import type { ShipBlueprint } from '@/types/x4'
 import { computed, watch } from 'vue'
 
-const { translateShip, translateEquipmentType } = useX4I18n()
+const { translateEquipmentType } = useX4I18n()
 
 const props = defineProps<{
   isOpen: boolean
@@ -30,17 +30,19 @@ const currentShipId = computed(() => {
   return store.selectedShipId
 })
 
-const blueprints = computed(() => store.getBlueprintsForShip(currentShipId.value))
+const blueprints = computed(() => store.getLoadableBlueprintsForShip(currentShipId.value))
 
-const getShipName = (shipId: string) => {
-  const ship = store.findShip(shipId)
-  return ship ? translateShip(ship) : shipId
+const getSlotTypeLabel = (slotType: string) => {
+  const equipmentType = store.findEquipmentType(slotType)
+  if (equipmentType) return translateEquipmentType(equipmentType)
+  return slotType
 }
 
 const getEquipmentStats = (blueprint: ShipBlueprint) => {
-  // 按 slot_type + size 分组统计
+  // 按 slot_type + size 分组统计，避免依赖装备类型翻译导致槽位聚合错误
   const stats: Record<string, Record<string, number>> = {}
   const sizeOrder = ['extralarge', 'large', 'medium', 'small']
+  const slotOrder = ['engine', 'thruster', 'shield', 'weapon', 'turret']
   const sizePrefix: Record<string, string> = {
     extralarge: 'XL',
     large: 'L',
@@ -52,19 +54,16 @@ const getEquipmentStats = (blueprint: ShipBlueprint) => {
   blueprint.connections.forEach(conn => {
     const slotType = conn.slot_type
 
-    const equipmentType = store.findEquipmentType(slotType)
-    const typeName = equipmentType ? translateEquipmentType(equipmentType) : slotType
-
     conn.group.forEach(g => {
       // 主装备统计，按大小分组
       if (g.equipment_id) {
         const equip = store.findEquipment(g.equipment_id)
         if (!equip) return
         const size = equip.size
-        if (!stats[typeName]) {
-          stats[typeName] = {}
+        if (!stats[slotType]) {
+          stats[slotType] = {}
         }
-        stats[typeName][size] = (stats[typeName][size] || 0) + g.count
+        stats[slotType][size] = (stats[slotType][size] || 0) + g.count
       }
       // 副盾统计（护盾挂载在其他装备上），按大小分组
       if (g.shield && g.shield.equipment_id) {
@@ -84,11 +83,11 @@ const getEquipmentStats = (blueprint: ShipBlueprint) => {
   const sortedEntries = Object.entries(stats).sort(([a], [b]) => {
     if (a === offShieldKey) return 1
     if (b === offShieldKey) return -1
-    return 0
+    return slotOrder.indexOf(a) - slotOrder.indexOf(b)
   })
   sortedEntries.forEach(([typeKey, sizeCounts]) => {
     // 将 off_shield 键转换为本地化名称
-    const typeName = typeKey === offShieldKey ? t('shipBuild.shield_secondary') : typeKey
+    const typeName = typeKey === offShieldKey ? t('shipBuild.shield_secondary') : getSlotTypeLabel(typeKey)
     sizeOrder.forEach(size => {
       const count = sizeCounts?.[size]
       if (count && count > 0) {
@@ -119,6 +118,7 @@ const handleLoadBlueprint = (id: string) => {
 }
 
 const handleDeleteBlueprint = (id: string) => {
+  if (store.isBuiltInBlueprintId(id)) return
   if (confirm(t('shipBuild.confirm_delete_blueprint'))) {
     store.deleteBlueprint(id)
   }
@@ -152,28 +152,25 @@ const handleDeleteBlueprint = (id: string) => {
         </div>
 
         <div v-for="bp in blueprints" :key="bp.id"
-          class="blueprint-item group bg-slate-700/40 border border-slate-600/50 rounded-md p-4 hover:border-blue-500/50 hover:bg-slate-700/60 transition-all duration-200">
-          <div class="flex justify-between items-start mb-2">
-            <div>
-              <div class="font-bold text-lg text-blue-100 mb-1 group-hover:text-blue-400 transition-colors">{{
-                bp.name }}</div>
-              <div class="text-xs text-slate-500 font-mono">{{ formatDate(bp.lastUpdated) }}</div>
+          class="blueprint-item group bg-slate-700/40 border border-slate-600/50 rounded-md px-3 py-2 hover:border-blue-500/50 hover:bg-slate-700/60 transition-all duration-200">
+          <div class="flex items-start justify-between gap-3 min-h-7">
+            <div class="text-sm leading-6 text-slate-100 truncate">
+              <span class="font-bold text-blue-100 group-hover:text-blue-400 transition-colors">{{ bp.name }}</span>
             </div>
-            <div class="text-xs text-slate-400 bg-slate-800/50 px-2 py-1 rounded">
+            <div class="text-xs text-slate-400 shrink-0 whitespace-nowrap">
               {{ getConnectionCount(bp) }} {{ t('shipBuild.connections_count') }}
+              <template v-if="!store.isBuiltInBlueprintId(bp.id)">
+                · {{ formatDate(bp.lastUpdated) }}
+              </template>
             </div>
           </div>
 
-          <div class="space-y-1 mb-4">
-            <div class="text-sm text-slate-300 leading-relaxed bg-slate-800/50 p-2 rounded border border-slate-700/50">
-              {{ getShipName(bp.shipId) }}
-            </div>
-            <div class="text-sm text-slate-400 leading-relaxed bg-slate-800/50 p-2 rounded border border-slate-700/50">
-              {{ getEquipmentStats(bp) }}
-            </div>
+          <div
+            class="mt-1 text-sm text-slate-300 leading-6 bg-slate-800/45 px-2 py-1 rounded border border-slate-700/40 truncate">
+            {{ getEquipmentStats(bp) }}
           </div>
 
-          <div class="flex items-center gap-3 pt-2 border-t border-slate-700/50">
+          <div class="mt-2 pt-2 border-t border-slate-700/50 flex items-center gap-3">
             <button @click="handleLoadBlueprint(bp.id)"
               class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-blue-400 hover:text-blue-300 hover:bg-blue-900/30 px-3 py-1.5 rounded transition">
               <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -184,9 +181,9 @@ const handleDeleteBlueprint = (id: string) => {
               {{ t('shipBuild.action_load_blueprint') }}
             </button>
 
-            <div class="flex-1"></div>
+            <div class="flex-1" />
 
-            <button @click="handleDeleteBlueprint(bp.id)"
+            <button v-if="!store.isBuiltInBlueprintId(bp.id)" @click="handleDeleteBlueprint(bp.id)"
               class="blueprint-delete-btn flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-red-400 hover:text-red-300 hover:bg-red-900/30 px-3 py-1.5 rounded transition">
               <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6" />

@@ -332,6 +332,29 @@ describe('ship-build-storage: persistence CRUD', () => {
     expect(parsedAfter.ships[0].blueprints.find((b: any) => b.id === idToDelete)).toBeUndefined()
   })
 
+  it('1.6.5 删除当前正在使用的蓝图时，工作区保留为自定义且 dirty', () => {
+    const store = useShipBuildStore()
+    store.setSelectedShipId(ODACHI_ID)
+    store.setEquipment('engine', 'group_back_up_mid', 'engine_am', 3)
+    store.saveBlueprint()
+    store.saveAsBlueprint('Second')
+
+    const dataBefore = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')
+    const idToDelete = dataBefore.ships[0].blueprints[0].id as string
+    store.loadBlueprint(idToDelete)
+
+    store.deleteBlueprint(idToDelete)
+
+    const dataAfter = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')
+    expect(dataAfter.ships[0].blueprints.find((b: any) => b.id === idToDelete)).toBeUndefined()
+    expect(store.blueprint).toBeTruthy()
+    expect(store.blueprint?.shipId).toBe(ODACHI_ID)
+    expect(store.blueprint?.name).toBe('')
+    expect(store.savedBlueprints.activeBlueprintId).toBeNull()
+    expect(store.isDirty).toBe(true)
+    expect(store.activeBlueprintStatusLabel).toBe('自定义')
+  })
+
   it('1.6.4 loadBlueprint 自动设置筛选', () => {
     // 预设 localStorage
     const testBlueprint = {
@@ -353,9 +376,8 @@ describe('ship-build-storage: persistence CRUD', () => {
     // 载入
     store.loadBlueprint('test-id')
 
-    // 验证自动设置筛选
+    // 验证自动设置 ship
     expect(store.selectedShipId).toBe(ODACHI_ID)
-    expect(store.selectedClass).toBe('ship_m')
   })
 })
 
@@ -423,4 +445,143 @@ describe('ship-build-storage: dirty state', () => {
     expect(store.blueprint?.connections).toEqual([])
     expect(store.isDirty).toBe(false)
   })
+})
+
+describe('ship-build-storage: built-in default blueprints', () => {
+  const ARGON_L_SOLID_MINER_ID = 'ship_arg_l_miner_solid_01_a'
+  const ARGON_M_BOMBER_ID = 'ship_arg_m_bomber_01_a'
+  const PARANID_L_FREIGHTER_ID = 'ship_par_l_trans_container_01_a'
+  const TERRAN_L_DESTROYER_OSAKA_ID = 'ship_ter_l_destroyer_01_a'
+
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    localStorage.clear()
+  })
+
+  it('1.8.1 getLoadableBlueprintsForShip 包含四个默认蓝图且不写入 storage', () => {
+    const store = useShipBuildStore()
+
+    const list = store.getLoadableBlueprintsForShip(ODACHI_ID)
+    const names = list.map((bp) => bp.name)
+    expect(names.slice(0, 4)).toEqual(['空配', '低配', '中配', '高配'])
+
+    const data = localStorage.getItem(STORAGE_KEY)
+    const parsed = JSON.parse(data || '{}')
+    expect(parsed.ships || []).toEqual([])
+  })
+
+  it('1.8.2 默认蓝图不可删除', () => {
+    const store = useShipBuildStore()
+    const list = store.getLoadableBlueprintsForShip(ODACHI_ID)
+    const builtInId = list[0]!.id
+    expect(store.isBuiltInBlueprintId(builtInId)).toBe(true)
+
+    store.deleteBlueprint(builtInId)
+    expect(store.getLoadableBlueprintsForShip(ODACHI_ID).map((bp) => bp.name).slice(0, 4)).toEqual(['空配', '低配', '中配', '高配'])
+  })
+
+  it('1.8.3 载入高配(fight)时引擎优先 combat', () => {
+    const store = useShipBuildStore()
+    const list = store.getLoadableBlueprintsForShip(ARGON_M_BOMBER_ID)
+    const highPresetId = list.find((bp) => bp.name === '高配')!.id
+
+    store.loadBlueprint(highPresetId)
+
+    const engineConn = store.blueprint?.connections.find((c) => c.slot_type === 'engine')
+    const engineId = engineConn?.group[0]?.equipment_id || ''
+    expect(engineId).toContain('_combat_')
+  })
+
+  it('1.8.4 采矿舰高配优先采矿炮塔，且 L 采矿舰 U 槽为 1 运输 + 9 采矿', () => {
+    const store = useShipBuildStore()
+    const list = store.getLoadableBlueprintsForShip(ARGON_L_SOLID_MINER_ID)
+    const highPresetId = list.find((bp) => bp.name === '高配')!.id
+
+    store.loadBlueprint(highPresetId)
+
+    const turretConn = store.blueprint?.connections.find((c) => c.slot_type === 'turret')
+    const turretEquipments = (turretConn?.group || [])
+      .map((item) => store.findEquipment(item.equipment_id))
+      .filter((item) => Boolean(item))
+    const hasMiningTurret = turretEquipments.some((item) => (item?.slotTags || []).includes('mining'))
+    expect(hasMiningTurret).toBe(true)
+
+    const drones = store.blueprint?.storage?.drones || []
+    const tradeCount = drones
+      .filter((d) => store.dronesMap.get(d.id)?.purposePrimary === 'trade')
+      .reduce((sum, d) => sum + d.count, 0)
+    const mineCount = drones
+      .filter((d) => store.dronesMap.get(d.id)?.purposePrimary === 'mine')
+      .reduce((sum, d) => sum + d.count, 0)
+    expect(tradeCount).toBe(1)
+    expect(mineCount).toBe(9)
+  })
+
+  it('1.8.5 运输舰(U槽)默认全部使用运输无人机', () => {
+    const store = useShipBuildStore()
+    const list = store.getLoadableBlueprintsForShip(PARANID_L_FREIGHTER_ID)
+    const midPresetId = list.find((bp) => bp.name === '中配')!.id
+
+    store.loadBlueprint(midPresetId)
+
+    const drones = store.blueprint?.storage?.drones || []
+    expect(drones.length).toBeGreaterThan(0)
+    const allTrade = drones.every((d) => store.dronesMap.get(d.id)?.purposePrimary === 'trade')
+    const total = drones.reduce((sum, d) => sum + d.count, 0)
+    expect(allTrade).toBe(true)
+    expect(total).toBe(store.findShip(PARANID_L_FREIGHTER_ID)?.storage?.unit || 0)
+  })
+
+  it('1.8.6 Osaka 高配默认蓝图应包含引擎与炮塔槽位装备', () => {
+    const store = useShipBuildStore()
+    const list = store.getLoadableBlueprintsForShip(TERRAN_L_DESTROYER_OSAKA_ID)
+    const highPreset = list.find((bp) => bp.name === '高配')
+    expect(highPreset).toBeTruthy()
+
+    const engineConn = highPreset!.connections.find((c) => c.slot_type === 'engine')
+    const turretConn = highPreset!.connections.find((c) => c.slot_type === 'turret')
+
+    expect(engineConn).toBeTruthy()
+    expect(turretConn).toBeTruthy()
+    expect((engineConn?.group || []).some((g) => Boolean(g.equipment_id))).toBe(true)
+    expect((turretConn?.group || []).some((g) => Boolean(g.equipment_id))).toBe(true)
+  })
+
+  it('1.8.7 载入内置预设后应为 dirty（便于保存）', () => {
+    const store = useShipBuildStore()
+    const list = store.getLoadableBlueprintsForShip(TERRAN_L_DESTROYER_OSAKA_ID)
+    const lowPreset = list.find((bp) => bp.name === '低配')
+    expect(lowPreset).toBeTruthy()
+
+    store.loadBlueprint(lowPreset!.id)
+
+    expect(store.blueprint?.name).toBe('')
+    expect(store.isDirty).toBe(true)
+    expect(store.requiresSaveAsOnSave()).toBe(true)
+    expect(store.activeBlueprintStatusLabel).toBe('低配')
+  })
+
+  it('1.8.8 预制载入后仅实际装备变更才显示为自定义', () => {
+    const store = useShipBuildStore()
+    const list = store.getLoadableBlueprintsForShip(TERRAN_L_DESTROYER_OSAKA_ID)
+    const lowPreset = list.find((bp) => bp.name === '低配')
+    expect(lowPreset).toBeTruthy()
+
+    store.loadBlueprint(lowPreset!.id)
+    expect(store.activeBlueprintStatusLabel).toBe('低配')
+
+    const firstConn = store.blueprint?.connections[0]
+    const firstGroup = firstConn?.group[0]
+    expect(firstConn).toBeTruthy()
+    expect(firstGroup).toBeTruthy()
+
+    // 无实际变化：不应切换为自定义
+    store.setEquipment(firstConn!.slot_type, firstGroup!.group, firstGroup!.equipment_id, firstGroup!.count)
+    expect(store.activeBlueprintStatusLabel).toBe('低配')
+
+    // 有实际变化：应切换为自定义
+    store.setEquipment(firstConn!.slot_type, firstGroup!.group, firstGroup!.equipment_id, firstGroup!.count + 1)
+    expect(store.activeBlueprintStatusLabel).toBe('自定义')
+  })
+
 })

@@ -1,0 +1,992 @@
+{
+  "format": "x4-import-export",
+  "version": 1,
+  "exportedAt": "2026-03-08T08:05:33.001Z",
+  "data": {
+    "x4_empire_data": {
+      "version": 3,
+      "activeId": "7522d1c1-e9d0-4b90-939c-97676c9d87f3",
+      "activeStationId": "4bca3720-669d-4f0b-b21f-97ac7b6533ab",
+      "list": [
+        {
+          "id": "7522d1c1-e9d0-4b90-939c-97676c9d87f3",
+          "name": "普通站点",
+          "stations": [
+            {
+              "id": "4bca3720-669d-4f0b-b21f-97ac7b6533ab",
+              "name": "建筑材料",
+              "type": "industrial",
+              "count": 1,
+              "modules": [
+                {
+                  "id": "module_gen_prod_claytronics_01",
+                  "count": 6
+                },
+                {
+                  "id": "module_gen_prod_hullparts_01",
+                  "count": 12
+                }
+              ],
+              "settings": {
+                "sunlight": 100,
+                "useHQ": false,
+                "manualWorkforce": 0,
+                "workforcePercent": 100,
+                "workforceAuto": true,
+                "considerWorkforceForAutoFill": true,
+                "supplyWorkforceBonus": false,
+                "buyMultiplier": 0.5,
+                "sellMultiplier": 0.5,
+                "minersEnabled": false,
+                "internalSupply": false,
+                "showEmpireGaps": false,
+                "racePreference": "argon",
+                "resourceBufferHours": 1,
+                "primaryProductBufferHours": 12,
+                "secondaryProductBufferHours": 2,
+                "transportShipCapacity": 62000
+              },
+              "lastUpdated": 1772899498717,
+              "lockedWares": [
+                "quantumtubes"
+              ],
+              "warePriority": {}
+            },
+            {
+              "id": "525c7b3c-be6d-493b-87d8-b74b31761971",
+              "name": "量子管",
+              "type": "industrial",
+              "count": 1,
+              "modules": [
+                {
+                  "id": "module_gen_prod_quantumtubes_01",
+                  "count": 4
+                }
+              ],
+              "settings": {
+                "sunlight": 100,
+                "useHQ": false,
+                "manualWorkforce": 0,
+                "workforcePercent": 100,
+                "workforceAuto": true,
+                "considerWorkforceForAutoFill": true,
+                "supplyWorkforceBonus": false,
+                "buyMultiplier": 0.5,
+                "sellMultiplier": 0.5,
+                "minersEnabled": false,
+                "internalSupply": false,
+                "showEmpireGaps": true,
+                "racePreference": "argon",
+                "resourceBufferHours": 1,
+                "primaryProductBufferHours": 12,
+                "secondaryProductBufferHours": 2,
+                "transportShipCapacity": 62000
+              },
+              "lastUpdated": 1772899498717,
+              "lockedWares": [],
+              "warePriority": {}
+            },
+            {
+              "id": "3a9cd4d9-bdcf-4023-9951-6d854acd5930",
+              "name": "补给",
+              "type": "industrial",
+              "count": 1,
+              "modules": [
+                {
+                  "id": "module_arg_prod_foodrations_01",
+                  "count": 5
+                },
+                {
+                  "id": "module_arg_prod_medicalsupplies_01",
+                  "count": 9
+                }
+              ],
+              "settings": {
+                "sunlight": 100,
+                "useHQ": false,
+                "manualWorkforce": 0,
+                "workforcePercent": 100,
+                "workforceAuto": true,
+                "considerWorkforceForAutoFill": true,
+                "supplyWorkforceBonus": false,
+                "buyMultiplier": 0.5,
+                "sellMultiplier": 0.5,
+                "minersEnabled": false,
+                "internalSupply": false,
+                "showEmpireGaps": true,
+                "racePreference": "argon",
+                "resourceBufferHours": 1,
+                "primaryProductBufferHours": 12,
+                "secondaryProductBufferHours": 2,
+                "transportShipCapacity": 62000
+              },
+              "lastUpdated": 1772899498717,
+              "lockedWares": [],
+              "warePriority": {}
+            }
+          ]
+        }
+      ]
+    },
+    "x4_logic_flow_plans": {
+      "version": 2,
+      "activeId": "99c5008c-f1f2-4cc8-8b96-db59605960bb",
+      "list": [
+        {
+          "id": "99c5008c-f1f2-4cc8-8b96-db59605960bb",
+          "name": "我的逻辑组网",
+          "groups": [
+            {
+              "id": "3b31fc34-7e9b-4626-a438-740bbc03da63",
+              "name": "T3",
+              "category": "industrial",
+              "subCategory": "default",
+              "isLocked": true,
+              "lockedLineage": "default",
+              "nodes": [
+                {
+                  "id": "57ccb831-60ef-49a4-b436-753389526f30",
+                  "wareId": "weaponcomponents",
+                  "moduleId": "module_gen_prod_weaponcomponents_01",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 3,
+                  "isIsolated": false,
+                  "source": "manual",
+                  "isRoot": true,
+                  "order": 0
+                },
+                {
+                  "id": "5136eabe-49ca-46ab-8d9a-7691ab6cda98",
+                  "wareId": "turretcomponents",
+                  "moduleId": "module_gen_prod_turretcomponents_01",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 3,
+                  "isIsolated": false,
+                  "source": "manual",
+                  "isRoot": true,
+                  "order": 0
+                },
+                {
+                  "id": "2ac4dd43-38ca-4ca8-ad02-65624da72779",
+                  "wareId": "shieldcomponents",
+                  "moduleId": "module_gen_prod_shieldcomponents_01",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 3,
+                  "isIsolated": false,
+                  "source": "manual",
+                  "isRoot": true,
+                  "order": 0
+                },
+                {
+                  "id": "8bfc27fb-02f6-452a-842f-fb0d0ff2f1b1",
+                  "wareId": "missilecomponents",
+                  "moduleId": "module_gen_prod_missilecomponents_01",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 3,
+                  "isIsolated": false,
+                  "source": "manual",
+                  "isRoot": true,
+                  "order": 0
+                },
+                {
+                  "id": "5362e3fd-b446-46e3-9382-e13b59b3a621",
+                  "wareId": "fieldcoils",
+                  "moduleId": "module_gen_prod_fieldcoils_01",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 3,
+                  "isIsolated": false,
+                  "source": "manual",
+                  "isRoot": true,
+                  "order": 0
+                },
+                {
+                  "id": "5b8ffaf8-af9d-44a6-845b-06505cf166a3",
+                  "wareId": "dronecomponents",
+                  "moduleId": "module_gen_prod_dronecomponents_01",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 3,
+                  "isIsolated": false,
+                  "source": "manual",
+                  "isRoot": true,
+                  "order": 0
+                },
+                {
+                  "id": "fdec132e-de88-44af-8a27-2463e1aba6a0",
+                  "wareId": "advancedelectronics",
+                  "moduleId": "module_gen_prod_advancedelectronics_01",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 3,
+                  "isIsolated": false,
+                  "source": "manual",
+                  "isRoot": true,
+                  "order": 0
+                },
+                {
+                  "id": "0faf90fe-8761-4db1-bcaa-9db147849e48",
+                  "wareId": "antimatterconverters",
+                  "moduleId": "module_gen_prod_antimatterconverters_01",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 3,
+                  "isIsolated": false,
+                  "source": "manual",
+                  "isRoot": true,
+                  "order": 0
+                },
+                {
+                  "id": "2d835791-54e9-4b4f-b8cd-770fac052fc5",
+                  "wareId": "hullparts",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 2,
+                  "isIsolated": true,
+                  "source": "manual",
+                  "isRoot": false,
+                  "order": 0
+                },
+                {
+                  "id": "12f3915e-8172-4a40-abbe-e5e0e44644bf",
+                  "wareId": "plasmaconductors",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 2,
+                  "isIsolated": true,
+                  "source": "manual",
+                  "isRoot": false,
+                  "order": 0
+                },
+                {
+                  "id": "0bde2348-6f00-478e-a3b6-1151811c4dfc",
+                  "wareId": "microchips",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 2,
+                  "isIsolated": true,
+                  "source": "manual",
+                  "isRoot": false,
+                  "order": 0
+                },
+                {
+                  "id": "0b35a984-42fd-4f99-9099-8db74601d7c9",
+                  "wareId": "quantumtubes",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 2,
+                  "isIsolated": true,
+                  "source": "manual",
+                  "isRoot": false,
+                  "order": 0
+                },
+                {
+                  "id": "393f5b9a-088e-4e2a-bfd2-fc5d22fa88a4",
+                  "wareId": "scanningarrays",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 2,
+                  "isIsolated": true,
+                  "source": "manual",
+                  "isRoot": false,
+                  "order": 0
+                },
+                {
+                  "id": "74d22ef3-3168-47e7-84b8-4f8f640bffc3",
+                  "wareId": "advancedcomposites",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 2,
+                  "isIsolated": true,
+                  "source": "manual",
+                  "isRoot": false,
+                  "order": 0
+                },
+                {
+                  "id": "11ec9bd3-da35-456d-b686-85042a9e2a61",
+                  "wareId": "engineparts",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 2,
+                  "isIsolated": true,
+                  "source": "manual",
+                  "isRoot": false,
+                  "order": 0
+                }
+              ]
+            },
+            {
+              "id": "bb5bfa33-da9d-4c93-9cb8-93b01ade9c57",
+              "name": "T2",
+              "category": "industrial",
+              "subCategory": "default",
+              "isLocked": true,
+              "lockedLineage": "default",
+              "nodes": [
+                {
+                  "id": "645d8097-cf89-44f4-9aca-638520e47591",
+                  "wareId": "claytronics",
+                  "moduleId": "module_gen_prod_claytronics_01",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 3,
+                  "isIsolated": false,
+                  "source": "manual",
+                  "isRoot": true,
+                  "order": 0
+                },
+                {
+                  "id": "e00fed6e-0d7a-4a96-9333-c09ef37940b0",
+                  "wareId": "advancedcomposites",
+                  "moduleId": "module_gen_prod_advancedcomposites_01",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 2,
+                  "isIsolated": false,
+                  "source": "manual",
+                  "isRoot": true,
+                  "order": 0
+                },
+                {
+                  "id": "9d7f2c0f-e9ff-4291-a143-83db0d9c8ec9",
+                  "wareId": "smartchips",
+                  "moduleId": "module_gen_prod_smartchips_01",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 2,
+                  "isIsolated": false,
+                  "source": "manual",
+                  "isRoot": true,
+                  "order": 0
+                },
+                {
+                  "id": "7c99980f-fb85-42d2-b80c-247fe4cbaa76",
+                  "wareId": "scanningarrays",
+                  "moduleId": "module_gen_prod_scanningarrays_01",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 2,
+                  "isIsolated": false,
+                  "source": "manual",
+                  "isRoot": true,
+                  "order": 0
+                },
+                {
+                  "id": "fb26d814-0807-4862-a59d-7b6b76bff49b",
+                  "wareId": "plasmaconductors",
+                  "moduleId": "module_gen_prod_plasmaconductors_01",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 2,
+                  "isIsolated": false,
+                  "source": "manual",
+                  "isRoot": true,
+                  "order": 0
+                },
+                {
+                  "id": "7f0abeb7-68bf-4243-a7af-d50b982d58aa",
+                  "wareId": "hullparts",
+                  "moduleId": "module_gen_prod_hullparts_01",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 2,
+                  "isIsolated": false,
+                  "source": "manual",
+                  "isRoot": true,
+                  "order": 0
+                },
+                {
+                  "id": "64ac3707-8e0e-4c06-ac9e-7b368626bc0a",
+                  "wareId": "engineparts",
+                  "moduleId": "module_gen_prod_engineparts_01",
+                  "race": "default",
+                  "lineage": "default",
+                  "column": 2,
+                  "isIsolated": false,
+                  "source": "manual",
+                  "isRoot": true,
+                  "order": 0
+                }
+              ]
+            },
+            {
+              "id": "550007a2-d371-42ee-bc12-24d25dfe7557",
+              "name": "补给",
+              "category": "agricultural",
+              "subCategory": "argon",
+              "isLocked": true,
+              "lockedLineage": "argon",
+              "nodes": [
+                {
+                  "id": "369326d1-0d4d-4170-a613-1f81810676a1",
+                  "wareId": "medicalsupplies",
+                  "moduleId": "module_arg_prod_medicalsupplies_01",
+                  "race": "argon",
+                  "lineage": "argon",
+                  "column": 3,
+                  "isIsolated": false,
+                  "source": "manual",
+                  "isRoot": true,
+                  "order": 0
+                },
+                {
+                  "id": "4b2ba951-b5a0-4145-af57-2440ffa18594",
+                  "wareId": "foodrations",
+                  "moduleId": "module_arg_prod_foodrations_01",
+                  "race": "argon",
+                  "lineage": "argon",
+                  "column": 3,
+                  "isIsolated": false,
+                  "source": "manual",
+                  "isRoot": true,
+                  "order": 0
+                }
+              ]
+            }
+          ],
+          "settings": {
+            "isDefaultLocked": true
+          },
+          "lastUpdated": 1772899498728
+        }
+      ]
+    },
+    "x4_ship_blueprints": {
+      "version": 2,
+      "activeShipId": "ship_ter_l_destroyer_01_a",
+      "activeBlueprintId": "ecf8d964-c5fa-4339-bb8a-249b29f57230",
+      "ships": [
+        {
+          "shipId": "ship_ter_l_destroyer_01_a",
+          "blueprints": [
+            {
+              "id": "b55585c0-3f70-4cdb-b8be-c1881227ea96",
+              "name": "大阪 蓝图",
+              "shipId": "ship_ter_l_destroyer_01_a",
+              "connections": [
+                {
+                  "slot_type": "thruster",
+                  "group": [
+                    {
+                      "group": "thruster",
+                      "equipment_id": "thruster_gen_l_allround_01_mk1",
+                      "count": 1
+                    }
+                  ]
+                },
+                {
+                  "slot_type": "turret",
+                  "group": [
+                    {
+                      "group": "group_front_down_mid",
+                      "equipment_id": "turret_arg_l_beam_01_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_arg_m_standard_02_mk1",
+                        "count": 2
+                      }
+                    },
+                    {
+                      "group": "group_mid_right_up_2",
+                      "equipment_id": "turret_arg_l_beam_01_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_arg_m_standard_02_mk1",
+                        "count": 2
+                      }
+                    },
+                    {
+                      "group": "group_mid_up_left_2",
+                      "equipment_id": "turret_arg_l_beam_01_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_arg_m_standard_02_mk1",
+                        "count": 2
+                      }
+                    },
+                    {
+                      "group": "group_back_down_mid",
+                      "equipment_id": "turret_arg_m_beam_02_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_arg_m_standard_02_mk1",
+                        "count": 1
+                      }
+                    },
+                    {
+                      "group": "group_back_mid_up",
+                      "equipment_id": "turret_arg_m_beam_02_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_arg_m_standard_02_mk1",
+                        "count": 1
+                      }
+                    },
+                    {
+                      "group": "group_down_mid_left",
+                      "equipment_id": "turret_arg_m_beam_02_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_arg_m_standard_02_mk1",
+                        "count": 1
+                      }
+                    },
+                    {
+                      "group": "group_down_mid_right",
+                      "equipment_id": "turret_arg_m_beam_02_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_arg_m_standard_02_mk1",
+                        "count": 1
+                      }
+                    },
+                    {
+                      "group": "group_mid_right_up",
+                      "equipment_id": "turret_arg_m_beam_02_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_arg_m_standard_02_mk1",
+                        "count": 1
+                      }
+                    },
+                    {
+                      "group": "group_mid_up_left",
+                      "equipment_id": "turret_arg_m_beam_02_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_arg_m_standard_02_mk1",
+                        "count": 1
+                      }
+                    }
+                  ]
+                },
+                {
+                  "slot_type": "weapon",
+                  "group": [
+                    {
+                      "group": "con_weapon_01",
+                      "equipment_id": "weapon_ter_l_destroyer_01_mk1",
+                      "count": 1
+                    },
+                    {
+                      "group": "con_weapon_02",
+                      "equipment_id": "weapon_ter_l_destroyer_01_mk1",
+                      "count": 1
+                    }
+                  ]
+                },
+                {
+                  "slot_type": "engine",
+                  "group": [
+                    {
+                      "group": "group_back_mid_mid",
+                      "equipment_id": "engine_arg_l_allround_01_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_arg_m_standard_02_mk1",
+                        "count": 4
+                      }
+                    }
+                  ]
+                },
+                {
+                  "slot_type": "shield",
+                  "group": [
+                    {
+                      "group": "con_shieldgen_l_01",
+                      "equipment_id": "shield_arg_l_standard_01_mk1",
+                      "count": 1
+                    },
+                    {
+                      "group": "con_shieldgen_l_02",
+                      "equipment_id": "shield_arg_l_standard_01_mk1",
+                      "count": 1
+                    },
+                    {
+                      "group": "con_shieldgen_l_03",
+                      "equipment_id": "shield_arg_l_standard_01_mk1",
+                      "count": 1
+                    }
+                  ]
+                }
+              ],
+              "lastUpdated": 1772424029053
+            },
+            {
+              "id": "5ad2c27a-7ff0-48f7-a10e-a04c6c91e56c",
+              "name": "大阪 蓝图",
+              "shipId": "ship_ter_l_destroyer_01_a",
+              "connections": [
+                {
+                  "slot_type": "engine",
+                  "group": [
+                    {
+                      "group": "group_back_mid_mid",
+                      "equipment_id": "engine_par_l_travel_01_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_par_m_standard_02_mk2",
+                        "count": 4
+                      }
+                    }
+                  ]
+                },
+                {
+                  "slot_type": "thruster",
+                  "group": [
+                    {
+                      "group": "thruster",
+                      "equipment_id": "thruster_gen_l_allround_01_mk1",
+                      "count": 1
+                    }
+                  ]
+                },
+                {
+                  "slot_type": "shield",
+                  "group": [
+                    {
+                      "group": "con_shieldgen_l_01",
+                      "equipment_id": "shield_arg_l_standard_01_mk1",
+                      "count": 1
+                    },
+                    {
+                      "group": "con_shieldgen_l_02",
+                      "equipment_id": "shield_arg_l_standard_01_mk1",
+                      "count": 1
+                    },
+                    {
+                      "group": "con_shieldgen_l_03",
+                      "equipment_id": "shield_arg_l_standard_01_mk1",
+                      "count": 1
+                    }
+                  ]
+                },
+                {
+                  "slot_type": "weapon",
+                  "group": [
+                    {
+                      "group": "con_weapon_01",
+                      "equipment_id": "weapon_ter_l_destroyer_01_mk1",
+                      "count": 1
+                    }
+                  ]
+                },
+                {
+                  "slot_type": "turret",
+                  "group": [
+                    {
+                      "group": "group_front_down_mid",
+                      "equipment_id": "turret_arg_l_beam_01_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_arg_m_standard_02_mk1",
+                        "count": 2
+                      }
+                    },
+                    {
+                      "group": "group_mid_right_up_2",
+                      "equipment_id": "turret_arg_l_beam_01_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_arg_m_standard_02_mk1",
+                        "count": 2
+                      }
+                    },
+                    {
+                      "group": "group_mid_up_left_2",
+                      "equipment_id": "turret_arg_l_beam_01_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_arg_m_standard_02_mk1",
+                        "count": 2
+                      }
+                    },
+                    {
+                      "group": "group_back_down_mid",
+                      "equipment_id": "turret_arg_m_beam_02_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_arg_m_standard_02_mk1",
+                        "count": 1
+                      }
+                    },
+                    {
+                      "group": "group_back_mid_up",
+                      "equipment_id": "turret_arg_m_beam_02_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_arg_m_standard_02_mk1",
+                        "count": 1
+                      }
+                    },
+                    {
+                      "group": "group_down_mid_left",
+                      "equipment_id": "turret_arg_m_beam_02_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_arg_m_standard_02_mk1",
+                        "count": 1
+                      }
+                    },
+                    {
+                      "group": "group_down_mid_right",
+                      "equipment_id": "turret_arg_m_beam_02_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_arg_m_standard_02_mk1",
+                        "count": 1
+                      }
+                    },
+                    {
+                      "group": "group_mid_right_up",
+                      "equipment_id": "turret_arg_m_beam_02_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_arg_m_standard_02_mk1",
+                        "count": 1
+                      }
+                    },
+                    {
+                      "group": "group_mid_up_left",
+                      "equipment_id": "turret_arg_m_beam_02_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_arg_m_standard_02_mk1",
+                        "count": 1
+                      }
+                    }
+                  ]
+                }
+              ],
+              "storage": {
+                "deployables": [],
+                "countermeasure": null,
+                "drones": [
+                  {
+                    "id": "ship_gen_xs_repairdrone_01_a",
+                    "name": "",
+                    "count": 10
+                  }
+                ],
+                "missiles": []
+              },
+              "lastUpdated": 1772876437892
+            },
+            {
+              "id": "7e5ae203-3dad-4db5-b592-be88ba23d69f",
+              "name": "大阪 蓝图",
+              "shipId": "ship_ter_l_destroyer_01_a",
+              "connections": [
+                {
+                  "slot_type": "engine",
+                  "group": [
+                    {
+                      "group": "group_back_mid_mid",
+                      "equipment_id": "engine_ter_l_travel_01_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 4
+                      }
+                    }
+                  ]
+                },
+                {
+                  "slot_type": "thruster",
+                  "group": [
+                    {
+                      "group": "thruster",
+                      "equipment_id": "thruster_gen_l_allround_01_mk3",
+                      "count": 1
+                    }
+                  ]
+                },
+                {
+                  "slot_type": "shield",
+                  "group": [
+                    {
+                      "group": "con_shieldgen_l_01",
+                      "equipment_id": "shield_ter_l_standard_01_mk3",
+                      "count": 1
+                    },
+                    {
+                      "group": "con_shieldgen_l_02",
+                      "equipment_id": "shield_ter_l_standard_01_mk3",
+                      "count": 1
+                    },
+                    {
+                      "group": "con_shieldgen_l_03",
+                      "equipment_id": "shield_ter_l_standard_01_mk3",
+                      "count": 1
+                    }
+                  ]
+                },
+                {
+                  "slot_type": "weapon",
+                  "group": [
+                    {
+                      "group": "con_weapon_01",
+                      "equipment_id": "weapon_ter_l_destroyer_01_mk1",
+                      "count": 1
+                    },
+                    {
+                      "group": "con_weapon_02",
+                      "equipment_id": "weapon_ter_l_destroyer_01_mk1",
+                      "count": 1
+                    }
+                  ]
+                },
+                {
+                  "slot_type": "turret",
+                  "group": [
+                    {
+                      "group": "group_front_down_mid",
+                      "equipment_id": "turret_arg_l_plasma_01_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 2
+                      }
+                    },
+                    {
+                      "group": "group_mid_right_up_2",
+                      "equipment_id": "turret_arg_l_plasma_01_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 2
+                      }
+                    },
+                    {
+                      "group": "group_mid_up_left_2",
+                      "equipment_id": "turret_arg_l_plasma_01_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 2
+                      }
+                    },
+                    {
+                      "group": "group_back_down_mid",
+                      "equipment_id": "turret_arg_m_flak_02_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 1
+                      }
+                    },
+                    {
+                      "group": "group_back_mid_up",
+                      "equipment_id": "turret_arg_m_flak_02_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 1
+                      }
+                    },
+                    {
+                      "group": "group_down_mid_left",
+                      "equipment_id": "turret_arg_m_flak_02_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 1
+                      }
+                    },
+                    {
+                      "group": "group_down_mid_right",
+                      "equipment_id": "turret_arg_m_flak_02_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 1
+                      }
+                    },
+                    {
+                      "group": "group_mid_right_up",
+                      "equipment_id": "turret_arg_m_flak_02_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 1
+                      }
+                    },
+                    {
+                      "group": "group_mid_up_left",
+                      "equipment_id": "turret_arg_m_flak_02_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 1
+                      }
+                    }
+                  ]
+                }
+              ],
+              "lastUpdated": 1772899498730
+            },
+            {
+              "id": "ecf8d964-c5fa-4339-bb8a-249b29f57230",
+              "name": "空配",
+              "shipId": "ship_ter_l_destroyer_01_a",
+              "connections": [
+                {
+                  "slot_type": "engine",
+                  "group": [
+                    {
+                      "group": "group_back_mid_mid",
+                      "equipment_id": "",
+                      "count": 0,
+                      "shield": {
+                        "equipment_id": "shield_par_m_standard_02_mk2",
+                        "count": 4
+                      }
+                    }
+                  ]
+                }
+              ],
+              "storage": {
+                "deployables": [],
+                "countermeasure": null,
+                "drones": [],
+                "missiles": []
+              },
+              "lastUpdated": 1772957064833
+            }
+          ]
+        },
+        {
+          "shipId": "ship_xen_l_terraformer_01_a",
+          "blueprints": [
+            {
+              "id": "914c9475-e97a-4dbf-bc46-14e502258762",
+              "name": "H 蓝图",
+              "shipId": "ship_xen_l_terraformer_01_a",
+              "connections": [
+                {
+                  "slot_type": "engine",
+                  "group": [
+                    {
+                      "group": "group_engines",
+                      "equipment_id": "engine_xen_l_allround_02_mk1",
+                      "count": 6,
+                      "shield": {
+                        "equipment_id": "shield_xen_m_standard_04_mk1",
+                        "count": 6
+                      }
+                    }
+                  ]
+                }
+              ],
+              "lastUpdated": 1772887406281
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
