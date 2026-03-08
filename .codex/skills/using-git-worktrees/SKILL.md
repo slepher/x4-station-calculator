@@ -11,6 +11,19 @@ description: Use before any implementation to enforce isolated git worktree setu
 
 ## Hard Gate (Fail-Close)
 No code edits, no formatting, no test runs that may write files until all checks below pass.
+This gate also applies to `apply_patch`, any file-writing shell command, and any test command.
+
+## Execution Order Lock (Mandatory)
+The following order is strict and cannot be reordered:
+1. Run mandatory pre-edit checks.
+2. Evaluate block conditions.
+3. If blocked, create/switch to worktree.
+4. Re-run mandatory pre-edit checks inside worktree.
+5. Run baseline setup and minimal baseline test.
+6. Send Worktree-Ready Report.
+7. Start implementation.
+
+If step 1-6 are not complete, implementation must not start.
 
 ### Mandatory Pre-Edit Checks (must print results)
 ```bash
@@ -18,6 +31,13 @@ git rev-parse --abbrev-ref HEAD
 pwd
 git worktree list
 ```
+
+### Mandatory Self-Check Before Any Edit
+Confirm all are true:
+- Current branch is not `develop` or `main`.
+- Current path is a worktree path.
+- Current path appears in `git worktree list`.
+- Worktree-Ready Report has been sent in this session.
 
 ### Block Conditions
 Stop immediately if any condition is true:
@@ -56,6 +76,11 @@ After creation, `cd` into worktree and rerun mandatory pre-edit checks.
 Run setup by project type (Node/Rust/Python/Go), then run a minimal baseline test command.
 If baseline fails, report and ask before implementation.
 
+Node baseline recommendation for this repo:
+```bash
+pnpm exec vitest run tests/unit/ship-build-storage/ship-build-storage.spec.ts --reporter=dot
+```
+
 ## Required Worktree-Ready Report
 Before implementation, report:
 - worktree path
@@ -68,3 +93,10 @@ Never:
 - Edit files before passing pre-edit checks.
 - Continue in `develop`/`main` for feature work.
 - Skip ignore verification for project-local worktree dirs.
+
+## Violation Recovery
+If any edit/test/write happens before worktree-ready:
+1. Stop immediately.
+2. Report violation cause in one concise message.
+3. Create/switch to worktree and complete all gates.
+4. Restart implementation from worktree only.
