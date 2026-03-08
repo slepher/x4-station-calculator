@@ -534,7 +534,7 @@ const buildDetailStatsByUseEquipmentStats = (ship: X4Ship, blueprintData: ShipBl
     { key: 'weapon_burst', labelKey: 'ship_build.stats_weapon_burst', unit: 'MW', value: Math.round(weaponStats.burst * 10) / 10 },
     // 行2: Shield | Turret Avg
     { key: 'shield', labelKey: 'ship_build.stats_shield', unit: 'MJ', value: shieldStats.max },
-    { key: 'turret_avg', labelKey: 'ship_build.stats_turret_avg', unit: 'MW', value: turretAvg },
+    { key: 'turret_avg', labelKey: 'ship_build.stats_turret_avg', unit: 'MW', value: Math.round(turretAvg * 10) / 10 },
     // 行3: Shield Recharge Rate | Weapon Sustained
     { key: 'shield_recharge_rate', labelKey: 'ship_build.stats_shield_recharge_rate', unit: 'MW', value: shieldStats.rate },
     { key: 'weapon_sustained', labelKey: 'ship_build.stats_weapon_sustained', unit: 'MW', value: Math.round(weaponStats.sustained * 10) / 10 },

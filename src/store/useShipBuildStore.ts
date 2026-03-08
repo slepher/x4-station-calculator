@@ -649,7 +649,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       // Use queueMicrotask to defer the update until after current execution context
       queueMicrotask(() => {
         viewMode.value = 'workspace'
-        blueprint.value = { ...activeBlueprint }
+        blueprint.value = JSON.parse(JSON.stringify(activeBlueprint)) as ShipBlueprint
 
         // Set dirty to false by directly setting lastSavedSnapshot
         lastSavedSnapshot.value = JSON.stringify({
@@ -1361,7 +1361,6 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   const updateBlueprintStorage = (storage: ShipBlueprint['storage']) => {
     if (!blueprint.value) return
     blueprint.value.storage = storage
-    saveBlueprint()
   }
 
   const distributeCountByCapacity = (connectionKeys: string[], total: number) => {

@@ -741,8 +741,6 @@ const pickerInitialEquipmentId = computed<string | null>(() => {
   if (!selected || selected === '__mixed__') return null
   return selected
 })
-const isPickerLayout = computed(() => Boolean(pickerTarget.value))
-
 const selectedNameForTarget = (target: SlotTarget) => {
   const selectedId = selectedForConnectionKeys(target.connectionKeys)
   if (!selectedId) return t('ship_build.fit_empty_slot')
@@ -1035,162 +1033,80 @@ watch(slotTargets, () => {
 
         <div class="arsenal-content">
           <main class="arsenal-main">
-            <template v-if="isPickerLayout">
-              <section class="picker-grid-row picker-grid-row-compact">
-                <div class="picker-cell">
-                  <div class="mode-tabs">
-                    <button class="mode-tab mode-tab-tall" :class="fitMode === 'connection' ? 'active' : ''" @click="setMode('connection')">{{ t('ship_build.fit_mode_connection') }}</button>
-                    <button class="mode-tab mode-tab-tall" :class="fitMode === 'group' ? 'active' : ''" @click="setMode('group')">{{ t('ship_build.fit_mode_group') }}</button>
-                  </div>
-                </div>
-              </section>
+            <!-- C 槽 and U 槽: Storage Panel -->
+            <ShipStoragePanel
+              v-if="activeSlotType === 'consumables' || activeSlotType === 'units'"
+              :selected-ship="selectedShip"
+              :slot-type="activeSlotType as 'consumables' | 'units'"
+            />
 
-              <section class="picker-grid-row picker-grid-row-tabs">
-                <div class="picker-cell">
-                  <div class="group-tabs picker-row-slot-tabs">
-                    <div
-                      v-for="row in renderGroupTabRows"
-                      :key="row.key"
-                      class="group-tab-row"
-                      :data-testid="row.testId"
-                    >
-                      <button
-                        v-for="tab in row.tabs"
-                        :key="tab.key"
-                        class="group-tab"
-                        :class="activeTabKey === tab.key ? 'group-tab-active' : ''"
-                        @click="jumpToTab(tab.key)"
-                      >
-                        {{ tab.label }}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              <section class="picker-grid-row picker-grid-row-fit-only">
-                <div class="picker-cell">
-                  <div class="picker-row3-left">
-                    <section v-if="visibleCompatibilityTags.length > 0" class="compatibility-box picker-compat-box">
-                      <div class="compatibility-title">{{ t('ship_build.fit_compatibility') }}:</div>
-                      <div class="compatibility-line tags">{{ visibleCompatibilityTagLabels.join(' / ') }}</div>
-                      <div v-for="line in compatibilitySlotLines" :key="line" class="compatibility-line">{{ line }}</div>
-                    </section>
-                    <section class="slot-wall picker-row3-slot-wall">
-                      <div v-for="target in slotTargets" :key="target.key" class="slot-stack">
-                        <X4DualPhaseRangeSlider
-                          class="slot-count-slider"
-                          :model-value="getDisplayedCount(target)"
-                          :min="0"
-                          :max="target.totalCount"
-                          :step="sliderStepForTarget(target)"
-                          track-bg-color="rgb(30 41 59 / 1)"
-                          track-border-color="rgb(51 65 85 / 0.7)"
-                          fill-color="rgb(16 185 129 / 0.8)"
-                          :disabled="isCountSliderDisabled(target)"
-                          @update:model-value="handleCountSliderRealtime(target, $event)"
-                          @commit="handleCountSliderCommit(target, $event)"
-                        />
-                        <button
-                          class="slot-row"
-                          :class="[
-                            expandedSlotKey === target.key ? 'slot-row-expanded' : ''
-                          ]"
-                          :data-testid="`slot-${target.key}`"
-                          @click="handleSlotClick(target)"
-                        >
-                          <div class="slot-row-main">
-                            <div class="slot-row-title">{{ target.label }}</div>
-                            <div class="slot-row-value" :class="isMixedSelectionInGroup(target) ? 'slot-row-value-mixed' : ''">{{ selectedNameForTarget(target) }}</div>
-                          </div>
-                          <div class="slot-row-side">
-                            <span class="slot-row-count">{{ getDisplayedCount(target) }}/{{ target.totalCount }}</span>
-                          </div>
-                        </button>
-                      </div>
-                      <div v-if="slotTargets.length === 0" class="empty-card">{{ t('ship_build.fit_no_equipment') }}</div>
-                    </section>
-                  </div>
-                </div>
-              </section>
-            </template>
-
-            <template v-else>
-              <!-- C 槽 and U 槽: Storage Panel -->
-              <ShipStoragePanel
-                v-if="activeSlotType === 'consumables' || activeSlotType === 'units'"
-                :selected-ship="selectedShip"
-                :slot-type="activeSlotType as 'consumables' | 'units'"
-              />
-
-              <div v-else class="toolbar-row">
-                <div class="mode-tabs">
-                  <button class="mode-tab" :class="fitMode === 'connection' ? 'active' : ''" @click="setMode('connection')">{{ t('ship_build.fit_mode_connection') }}</button>
-                  <button class="mode-tab" :class="fitMode === 'group' ? 'active' : ''" @click="setMode('group')">{{ t('ship_build.fit_mode_group') }}</button>
-                </div>
+            <div v-else class="toolbar-row">
+              <div class="mode-tabs">
+                <button class="mode-tab" :class="fitMode === 'connection' ? 'active' : ''" @click="setMode('connection')">{{ t('ship_build.fit_mode_connection') }}</button>
+                <button class="mode-tab" :class="fitMode === 'group' ? 'active' : ''" @click="setMode('group')">{{ t('ship_build.fit_mode_group') }}</button>
               </div>
+            </div>
 
-              <div class="group-tabs" v-if="activeSlotType !== 'consumables' && activeSlotType !== 'units'">
-                <div
-                  v-for="row in renderGroupTabRows"
-                  :key="row.key"
-                  class="group-tab-row"
-                  :data-testid="row.testId"
+            <div class="group-tabs" v-if="activeSlotType !== 'consumables' && activeSlotType !== 'units'">
+              <div
+                v-for="row in renderGroupTabRows"
+                :key="row.key"
+                class="group-tab-row"
+                :data-testid="row.testId"
+              >
+                <button
+                  v-for="tab in row.tabs"
+                  :key="tab.key"
+                  class="group-tab"
+                  :class="activeTabKey === tab.key ? 'group-tab-active' : ''"
+                  @click="jumpToTab(tab.key)"
                 >
-                  <button
-                    v-for="tab in row.tabs"
-                    :key="tab.key"
-                    class="group-tab"
-                    :class="activeTabKey === tab.key ? 'group-tab-active' : ''"
-                    @click="jumpToTab(tab.key)"
-                  >
-                    {{ tab.label }}
-                  </button>
-                </div>
+                  {{ tab.label }}
+                </button>
+              </div>
+            </div>
+
+            <section v-if="activeSlotType !== 'consumables' && activeSlotType !== 'units' && visibleCompatibilityTags.length > 0" class="compatibility-box">
+              <div class="compatibility-title">{{ t('ship_build.fit_compatibility') }}:</div>
+              <div class="compatibility-line tags">{{ visibleCompatibilityTagLabels.join(' / ') }}</div>
+              <div v-for="line in compatibilitySlotLines" :key="line" class="compatibility-line">{{ line }}</div>
+            </section>
+
+            <section v-if="activeSlotType !== 'consumables' && activeSlotType !== 'units'" class="slot-wall">
+              <div v-for="target in slotTargets" :key="target.key" class="slot-stack">
+                <X4DualPhaseRangeSlider
+                  class="slot-count-slider"
+                  :model-value="getDisplayedCount(target)"
+                  :min="0"
+                  :max="target.totalCount"
+                  :step="sliderStepForTarget(target)"
+                  track-bg-color="rgb(30 41 59 / 1)"
+                  track-border-color="rgb(51 65 85 / 0.7)"
+                  fill-color="rgb(16 185 129 / 0.8)"
+                  :disabled="isCountSliderDisabled(target)"
+                  @update:model-value="handleCountSliderRealtime(target, $event)"
+                  @commit="handleCountSliderCommit(target, $event)"
+                />
+                <button
+                  class="slot-row"
+                  :class="[
+                    expandedSlotKey === target.key ? 'slot-row-expanded' : ''
+                  ]"
+                  :data-testid="`slot-${target.key}`"
+                  @click="handleSlotClick(target)"
+                >
+                  <div class="slot-row-main">
+                    <div class="slot-row-title">{{ target.label }}</div>
+                    <div class="slot-row-value" :class="isMixedSelectionInGroup(target) ? 'slot-row-value-mixed' : ''">{{ selectedNameForTarget(target) }}</div>
+                  </div>
+                  <div class="slot-row-side">
+                    <span class="slot-row-count">{{ getDisplayedCount(target) }}/{{ target.totalCount }}</span>
+                  </div>
+                </button>
               </div>
 
-              <section v-if="activeSlotType !== 'consumables' && activeSlotType !== 'units' && visibleCompatibilityTags.length > 0" class="compatibility-box">
-                <div class="compatibility-title">{{ t('ship_build.fit_compatibility') }}:</div>
-                <div class="compatibility-line tags">{{ visibleCompatibilityTagLabels.join(' / ') }}</div>
-                <div v-for="line in compatibilitySlotLines" :key="line" class="compatibility-line">{{ line }}</div>
-              </section>
-
-              <section v-if="activeSlotType !== 'consumables' && activeSlotType !== 'units'" class="slot-wall">
-                <div v-for="target in slotTargets" :key="target.key" class="slot-stack">
-                  <X4DualPhaseRangeSlider
-                    class="slot-count-slider"
-                    :model-value="getDisplayedCount(target)"
-                    :min="0"
-                    :max="target.totalCount"
-                    :step="sliderStepForTarget(target)"
-                    track-bg-color="rgb(30 41 59 / 1)"
-                    track-border-color="rgb(51 65 85 / 0.7)"
-                    fill-color="rgb(16 185 129 / 0.8)"
-                    :disabled="isCountSliderDisabled(target)"
-                    @update:model-value="handleCountSliderRealtime(target, $event)"
-                    @commit="handleCountSliderCommit(target, $event)"
-                  />
-                  <button
-                    class="slot-row"
-                    :class="[
-                      expandedSlotKey === target.key ? 'slot-row-expanded' : ''
-                    ]"
-                    :data-testid="`slot-${target.key}`"
-                    @click="handleSlotClick(target)"
-                  >
-                    <div class="slot-row-main">
-                      <div class="slot-row-title">{{ target.label }}</div>
-                      <div class="slot-row-value" :class="isMixedSelectionInGroup(target) ? 'slot-row-value-mixed' : ''">{{ selectedNameForTarget(target) }}</div>
-                    </div>
-                    <div class="slot-row-side">
-                      <span class="slot-row-count">{{ getDisplayedCount(target) }}/{{ target.totalCount }}</span>
-                    </div>
-                  </button>
-                </div>
-
-                <div v-if="slotTargets.length === 0" class="empty-card">{{ t('ship_build.fit_no_equipment') }}</div>
-              </section>
-            </template>
+              <div v-if="slotTargets.length === 0" class="empty-card">{{ t('ship_build.fit_no_equipment') }}</div>
+            </section>
           </main>
         </div>
     </div>
@@ -1325,7 +1241,6 @@ watch(slotTargets, () => {
 .mode-tab.active { @apply border-emerald-300 text-emerald-100; }
 .mode-tab:disabled { @apply opacity-40 cursor-not-allowed; }
 .mode-tab-tall { @apply h-[25.6px] px-2 flex items-center; }
-.picker-action-btn { @apply border-emerald-300 text-emerald-100; }
 .group-tabs { @apply flex flex-col gap-1 mt-2; }
 .group-tab-row { @apply flex flex-wrap items-center gap-1; }
 .group-tab { @apply px-2.5 py-0.5 text-[11px] border border-slate-700/60 rounded text-slate-200; }
@@ -1347,25 +1262,10 @@ watch(slotTargets, () => {
 .slot-row-count { @apply text-[10px] text-emerald-300; }
 .empty-card { @apply rounded border border-dashed border-slate-700 p-3 text-xs text-slate-300 text-center; }
 
-.picker-grid-row { @apply grid gap-2 mt-2; grid-template-columns: minmax(0, calc(50% - 4rem)) minmax(0, 1fr); }
-.picker-grid-row-fit-only { grid-template-columns: minmax(0, 1fr); }
-.picker-cell { @apply min-h-20 min-w-0; }
-.picker-right { @apply flex items-start justify-end; }
-.picker-row3-left { @apply flex flex-col gap-2; }
-.picker-grid-row-compact { @apply h-[25.6px] items-center; }
-.picker-grid-row-compact .picker-cell { @apply min-h-0 h-[25.6px] flex items-center; }
-.picker-grid-row-tabs { @apply items-start; }
-.picker-grid-row-tabs .picker-cell { @apply min-h-0; }
-.picker-actions-inline { @apply inline-flex items-center gap-1.5 justify-end; }
-.picker-row-slot-tabs { @apply mt-0 h-auto items-start; }
-.picker-right-tabs { @apply h-full items-end; }
-.picker-right-tabs .pager { @apply self-end; }
 .pager { @apply inline-flex items-center gap-1; }
 .pager-btn { @apply h-[25.6px] rounded border border-slate-600 px-1.5 py-0 text-[10px] text-slate-200 inline-flex items-center; }
 .pager-btn-active { @apply border-emerald-300 text-emerald-100; }
 .pager-btn:disabled { @apply opacity-40 cursor-not-allowed; }
-.picker-compat-box { @apply mt-0; }
-.picker-row3-slot-wall { @apply mt-0; }
 .filter-block { @apply mt-2 flex flex-col gap-2; }
 .filter-line { @apply flex flex-wrap items-center gap-1.5; }
 .filter-group { @apply text-[10px] uppercase text-slate-300 font-semibold min-w-8; }
@@ -1390,9 +1290,4 @@ watch(slotTargets, () => {
 .summary-value { @apply text-xs text-emerald-300 tabular-nums; }
 .summary-unit { @apply text-[10px] text-slate-400; }
 
-@media (max-width: 1023px) {
-  .picker-grid-row { @apply grid-cols-1; }
-  .picker-right { @apply justify-start; }
-  .picker-row3-left { @apply h-auto; }
-}
 </style>
