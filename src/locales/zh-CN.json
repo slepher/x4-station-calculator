@@ -333,6 +333,8 @@
     "built_in_mid": "中配",
     "built_in_high": "高配",
     "status_custom": "自定义",
+    "blueprint_group_preset": "预设配装",
+    "blueprint_group_user": "蓝图配装",
     "connections_count": "个槽位",
     "shield_secondary": "副盾"
   },

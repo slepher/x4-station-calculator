@@ -438,7 +438,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       return storage
     }
 
-    if (ship.purposePrimary === 'trade' && isBuilderShip) {
+    if (isBuilderShip) {
       const buildDrone = pickDroneByPurpose(ship, 'build', preset)
       if (buildDrone) {
         storage.drones.push({ id: buildDrone.id, name: buildDrone.name || buildDrone.id, count: unitCapacity })

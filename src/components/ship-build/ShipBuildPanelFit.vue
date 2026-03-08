@@ -341,6 +341,15 @@ const loadableBlueprintItems = computed(() => {
   }))
 })
 
+const groupedLoadableBlueprintItems = computed(() => {
+  const builtInItems = loadableBlueprintItems.value.filter((item) => item.isBuiltIn)
+  const userItems = loadableBlueprintItems.value.filter((item) => !item.isBuiltIn)
+  return [
+    { key: 'preset', title: t('shipBuild.blueprint_group_preset'), items: builtInItems },
+    { key: 'user', title: t('shipBuild.blueprint_group_user'), items: userItems }
+  ].filter((group) => group.items.length > 0)
+})
+
 const closeBlueprintMenu = () => {
   blueprintMenuOpen.value = false
 }
@@ -352,7 +361,8 @@ const updateBlueprintMenuPosition = () => {
   if (!rect) return
   blueprintMenuStyle.value = {
     top: `${rect.top}px`,
-    left: `${rect.right + 8}px`
+    left: `${rect.right + 8}px`,
+    maxHeight: '400px'
   }
 }
 
@@ -1088,23 +1098,23 @@ watch(slotTargets, () => {
   >
     <div class="panel-header">
       <template v-if="selectedShip">
-        <div class="ship-switcher" role="group" :aria-label="t('ship_build.change_ship')">
+        <button
+          class="ship-switcher ship-switcher-action"
+          data-testid="ship-build-change-ship-fit-header"
+          :title="t('ship_build.change_ship')"
+          :aria-label="t('ship_build.change_ship')"
+          @click="enterShipSelector"
+        >
           <div class="ship-switcher-main">
             <span class="ship-switcher-name">{{ translateShip(selectedShip) }}</span>
           </div>
-          <button
-            class="ship-switcher-action"
-            data-testid="ship-build-change-ship-fit-header"
-            :title="t('ship_build.change_ship')"
-            @click="enterShipSelector"
-          >
-            <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 3h6v6" />
-              <path stroke-linecap="round" stroke-linejoin="round" d="M10 14L21 3" />
-              <path stroke-linecap="round" stroke-linejoin="round" d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-            </svg>
-          </button>
-        </div>
+          <span class="ship-switcher-divider" />
+          <svg class="h-3.5 w-3.5 shrink-0 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 3h6v6" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 14L21 3" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+          </svg>
+        </button>
         <div class="ship-blueprint-picker" ref="blueprintMenuRef">
           <button
             class="ship-blueprint-trigger"
@@ -1117,6 +1127,7 @@ watch(slotTargets, () => {
               {{ currentBlueprintLabel }}
               <span v-if="shouldShowBlueprintDirtyDot" class="ship-blueprint-dirty-dot" />
             </span>
+            <span class="ship-blueprint-divider" />
             <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
             </svg>
@@ -1128,31 +1139,38 @@ watch(slotTargets, () => {
             data-testid="ship-build-blueprint-menu"
           >
             <div
-              v-for="item in loadableBlueprintItems"
-              :key="item.id"
-              class="ship-blueprint-menu-row group"
-              :class="[
-                item.isBuiltIn ? 'ship-blueprint-menu-item-built-in' : '',
-                item.isCurrentSaved ? 'ship-blueprint-menu-item-current' : ''
-              ]"
+              v-for="group in groupedLoadableBlueprintItems"
+              :key="group.key"
+              class="ship-blueprint-menu-group"
             >
-              <button
-                class="ship-blueprint-menu-item"
-                @click="handleBlueprintSelect(item.id)"
+              <div class="ship-blueprint-menu-group-title">{{ group.title }}</div>
+              <div
+                v-for="item in group.items"
+                :key="item.id"
+                class="ship-blueprint-menu-row group"
+                :class="[
+                  item.isBuiltIn ? 'ship-blueprint-menu-item-built-in' : '',
+                  item.isCurrentSaved ? 'ship-blueprint-menu-item-current' : ''
+                ]"
               >
-                <span>{{ item.label }}</span>
-              </button>
-              <button
-                v-if="!item.isBuiltIn"
-                class="ship-blueprint-delete-btn"
-                :title="t('shipBuild.action_delete')"
-                @click.stop="handleBlueprintDelete(item.id)"
-              >
-                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="3 6 5 6 21 6" />
-                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                </svg>
-              </button>
+                <button
+                  class="ship-blueprint-menu-item"
+                  @click="handleBlueprintSelect(item.id)"
+                >
+                  <span>{{ item.label }}</span>
+                </button>
+                <button
+                  v-if="!item.isBuiltIn"
+                  class="ship-blueprint-delete-btn"
+                  :title="t('shipBuild.action_delete')"
+                  @click.stop="handleBlueprintDelete(item.id)"
+                >
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1441,12 +1459,11 @@ watch(slotTargets, () => {
 }
 
 .ship-switcher-action {
-  @apply relative inline-flex items-center px-2.5 py-1.5 text-emerald-200;
+  @apply relative inline-flex items-center gap-0 pr-2.5 text-emerald-200 bg-transparent appearance-none leading-none;
 }
 
-.ship-switcher-action::before {
-  content: '';
-  @apply absolute left-0 top-1/4 h-1/2 w-px bg-emerald-400/40;
+.ship-switcher-divider {
+  @apply inline-block h-3 w-px bg-emerald-400/40;
 }
 
 .ship-blueprint-picker {
@@ -1465,6 +1482,10 @@ watch(slotTargets, () => {
   @apply inline-block h-1.5 w-1.5 rounded-full bg-red-500;
 }
 
+.ship-blueprint-divider {
+  @apply inline-block h-3 w-px bg-emerald-400/40;
+}
+
 .ship-blueprint-menu {
   @apply absolute top-0 left-full ml-2 z-40 w-max min-w-44 max-h-64 overflow-y-auto rounded-md border border-emerald-400/40 bg-slate-900/95 p-1 shadow-2xl;
   scrollbar-width: thin;
@@ -1477,6 +1498,14 @@ watch(slotTargets, () => {
 
 .ship-blueprint-menu-row {
   @apply relative;
+}
+
+.ship-blueprint-menu-group + .ship-blueprint-menu-group {
+  @apply mt-2 pt-1 border-t border-emerald-400/20;
+}
+
+.ship-blueprint-menu-group-title {
+  @apply px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-300/80;
 }
 
 .ship-blueprint-menu-item {

@@ -331,6 +331,8 @@
     "built_in_mid": "Mid",
     "built_in_high": "High",
     "status_custom": "Custom",
+    "blueprint_group_preset": "Preset Loadouts",
+    "blueprint_group_user": "Blueprint Loadouts",
     "connections_count": "connections",
     "shield_secondary": "Shield (Secondary)"
   },
