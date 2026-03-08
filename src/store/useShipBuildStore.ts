@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
+import i18n from '@/i18n'
 import type {
   ConnectionValue,
   EquipmentType,
@@ -23,6 +24,7 @@ import { CURRENT_SHIP_BLUEPRINT_VERSION } from './logic/storageVersions'
 import { buildConsumableDatas, buildShipBuildDatas, getShipBuildRawData } from './logic/useGameData'
 
 const STORAGE_KEY = 'x4_ship_blueprints'
+const BUILT_IN_BLUEPRINT_ID_PREFIX = '__built_in_ship_blueprint__'
 const EMPTY_SHIP_STORAGE: ShipBlueprintStorage = {
   deployables: [],
   countermeasure: null,
@@ -79,6 +81,15 @@ export type ShipBuildMaterialAnalysis = {
   equipmentGroups: ShipBuildMaterialEquipmentGroup[]
 }
 
+type BuiltInPresetKey = 'empty' | 'low' | 'mid' | 'high'
+
+const BUILT_IN_PRESETS: Array<{ key: BuiltInPresetKey; labelKey: string }> = [
+  { key: 'empty', labelKey: 'shipBuild.built_in_empty' },
+  { key: 'low', labelKey: 'shipBuild.built_in_low' },
+  { key: 'mid', labelKey: 'shipBuild.built_in_mid' },
+  { key: 'high', labelKey: 'shipBuild.built_in_high' }
+]
+
 export const useShipBuildStore = defineStore('ship-build', () => {
   const shipBuildRaw = getShipBuildRawData()
   const ships = shipBuildRaw.ships as X4Ship[]
@@ -123,6 +134,9 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     ships: []
   })
   const lastSavedSnapshot = ref<string | null>(null)
+  const forceDirty = ref(false)
+  const loadedBuiltInPreset = ref<BuiltInPresetKey | null>(null)
+  const loadedBuiltInConnectionsSnapshot = ref<string | null>(null)
 
   const selectedByConnection = ref<Record<string, string | null>>({})
   const mockTagPatch = ref<ShipBuildMockTagPatch | null>(null)
@@ -231,6 +245,29 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     return getBucketByShipId(shipId)?.blueprints || []
   }
 
+  const getBuiltInBlueprintId = (shipId: string, preset: BuiltInPresetKey) => {
+    return `${BUILT_IN_BLUEPRINT_ID_PREFIX}:${shipId}:${preset}`
+  }
+
+  const getBuiltInPresetName = (preset: BuiltInPresetKey) => {
+    const matched = BUILT_IN_PRESETS.find((item) => item.key === preset)
+    if (!matched) return ''
+    return i18n.global.t(matched.labelKey)
+  }
+
+  const parseBuiltInBlueprintId = (id: string): { shipId: string; preset: BuiltInPresetKey } | null => {
+    if (!id.startsWith(`${BUILT_IN_BLUEPRINT_ID_PREFIX}:`)) return null
+    const parts = id.split(':')
+    if (parts.length < 3) return null
+    const presetRaw = parts[parts.length - 1] as BuiltInPresetKey
+    const shipId = parts.slice(1, parts.length - 1).join(':')
+    if (!shipId) return null
+    if (!BUILT_IN_PRESETS.some((item) => item.key === presetRaw)) return null
+    return { shipId, preset: presetRaw }
+  }
+
+  const isBuiltInBlueprintId = (id: string) => Boolean(parseBuiltInBlueprintId(id))
+
   const resolveCurrentShipId = (): string | null => {
     return blueprint.value?.shipId || null
   }
@@ -244,6 +281,355 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     lastUpdated: Date.now()
   })
 
+  const parseMk = (mk: string | null | undefined) => {
+    const parsed = Number.parseInt(mk || '', 10)
+    return Number.isFinite(parsed) ? parsed : 0
+  }
+
+  const pickByMkPreference = (candidates: X4Equipment[], preset: BuiltInPresetKey): X4Equipment | null => {
+    if (candidates.length === 0) return null
+    if (preset === 'low') {
+      const mk1 = candidates.find((item) => parseMk(item.mk) === 1)
+      return mk1 || candidates[0] || null
+    }
+    if (preset === 'mid') {
+      const mk2 = candidates.find((item) => parseMk(item.mk) === 2)
+      if (mk2) return mk2
+      const mk1 = candidates.find((item) => parseMk(item.mk) === 1)
+      return mk1 || candidates[0] || null
+    }
+    if (preset === 'high') {
+      const maxMk = candidates.reduce((max, item) => Math.max(max, parseMk(item.mk)), 0)
+      return candidates.find((item) => parseMk(item.mk) === maxMk) || candidates[0] || null
+    }
+    return candidates[0] || null
+  }
+
+  const filterCandidatesByRace = (candidates: X4Equipment[], shipRace: string) => {
+    const matched = candidates.filter((item) => item.race === shipRace)
+    return matched.length > 0 ? matched : candidates
+  }
+
+  const getEngineRole = (equipment: X4Equipment): 'combat' | 'allround' | 'travel' | 'other' => {
+    const id = equipment.id.toLowerCase()
+    if (id.includes('_combat_')) return 'combat'
+    if (id.includes('_allround_')) return 'allround'
+    if (id.includes('_travel_')) return 'travel'
+    return 'other'
+  }
+
+  const sortByEnginePriority = (candidates: X4Equipment[], shipPurposePrimary: string) => {
+    const weightsFight: Record<'combat' | 'allround' | 'travel' | 'other', number> = { combat: 0, allround: 1, travel: 2, other: 3 }
+    const weightsNonFight: Record<'combat' | 'allround' | 'travel' | 'other', number> = { travel: 0, allround: 1, combat: 2, other: 3 }
+    const weights = shipPurposePrimary === 'fight' ? weightsFight : weightsNonFight
+    return [...candidates].sort((a, b) => {
+      const aw = weights[getEngineRole(a)]
+      const bw = weights[getEngineRole(b)]
+      if (aw !== bw) return aw - bw
+      return a.id.localeCompare(b.id)
+    })
+  }
+
+  const getCandidateEquipments = (
+    slotType: EquipmentType,
+    size: ShipEquipmentSize,
+    connectionTags: string[]
+  ): X4Equipment[] => {
+    return equipments
+      .filter((equipment) => !equipment.noplayerblueprint)
+      .filter((equipment) => equipment.type === slotType && equipment.size === size)
+      .filter((equipment) => {
+        if (connectionTags.length === 0) return true
+        const equipmentTags = normalizeTagList(equipment.slotTags)
+        const connectionSet = new Set(connectionTags)
+        return equipmentTags.every((tag) => connectionSet.has(tag))
+      })
+      .sort((a, b) => a.id.localeCompare(b.id))
+  }
+
+  const pickDefaultEquipment = (payload: {
+    ship: X4Ship
+    slotType: EquipmentType
+    size: ShipEquipmentSize
+    connectionTags: string[]
+    preset: BuiltInPresetKey
+  }): X4Equipment | null => {
+    const { ship, slotType, size, connectionTags, preset } = payload
+
+    if (slotType === 'turret' && ship.purposePrimary === 'mine') {
+      const mineTurrets = equipments
+        .filter((equipment) => !equipment.noplayerblueprint)
+        .filter((equipment) => equipment.type === 'turret' && equipment.size === size)
+        .filter((equipment) => {
+          const tags = normalizeTagList(equipment.slotTags).map((tag) => tag.toLowerCase())
+          return tags.includes('mine') || tags.includes('mining')
+        })
+        .sort((a, b) => a.id.localeCompare(b.id))
+
+      const pickedMineTurret = pickByMkPreference(filterCandidatesByRace(mineTurrets, ship.race), preset)
+      if (pickedMineTurret) return pickedMineTurret
+    }
+
+    let candidates = getCandidateEquipments(slotType, size, connectionTags)
+    if (candidates.length === 0) return null
+
+    if (slotType === 'engine') {
+      candidates = sortByEnginePriority(candidates, ship.purposePrimary)
+    }
+
+    candidates = filterCandidatesByRace(candidates, ship.race)
+    return pickByMkPreference(candidates, preset)
+  }
+
+  const pickDroneByPurpose = (
+    ship: X4Ship,
+    purpose: 'trade' | 'mine' | 'build',
+    preset: BuiltInPresetKey
+  ) => {
+    let candidates = drones
+      .filter((drone) => !drone.noplayerblueprint)
+      .filter((drone) => drone.purposePrimary === purpose)
+      .sort((a, b) => a.id.localeCompare(b.id))
+
+    if (purpose === 'mine' && ship.droneTags.length > 0) {
+      const matchedByTags = candidates.filter((drone) => {
+        const tags = normalizeTagList(drone.droneTags)
+        return ship.droneTags.every((tag) => tags.includes(tag))
+      })
+      if (matchedByTags.length > 0) {
+        candidates = matchedByTags
+      }
+    }
+
+    const matchedRace = candidates.filter((drone) => drone.race === ship.race)
+    if (matchedRace.length > 0) {
+      candidates = matchedRace
+    }
+
+    const picked = pickByMkPreference(candidates as unknown as X4Equipment[], preset) as unknown as typeof drones[number] | null
+    return picked || null
+  }
+
+  const buildDefaultStorage = (ship: X4Ship, preset: BuiltInPresetKey): ShipBlueprintStorage => {
+    const storage: ShipBlueprintStorage = {
+      deployables: [],
+      countermeasure: null,
+      drones: [],
+      missiles: []
+    }
+    const unitCapacity = Math.max(0, ship.storage?.unit || 0)
+    if (unitCapacity <= 0) return storage
+
+    const isLargeOrAbove = ship.class === 'ship_l' || ship.class === 'ship_xl'
+    const isBuilderShip = ship.type === 'builder' || ship.droneTags.includes('build')
+
+    if (isLargeOrAbove && ship.purposePrimary === 'mine') {
+      const transportDrone = pickDroneByPurpose(ship, 'trade', preset)
+      const mineDrone = pickDroneByPurpose(ship, 'mine', preset)
+      const transportCount = transportDrone ? Math.min(1, unitCapacity) : 0
+      const mineCount = mineDrone ? Math.max(0, Math.min(9, unitCapacity - transportCount)) : 0
+
+      if (transportDrone && transportCount > 0) {
+        storage.drones.push({ id: transportDrone.id, name: transportDrone.name || transportDrone.id, count: transportCount })
+      }
+      if (mineDrone && mineCount > 0) {
+        storage.drones.push({ id: mineDrone.id, name: mineDrone.name || mineDrone.id, count: mineCount })
+      }
+      return storage
+    }
+
+    if (ship.purposePrimary === 'trade' && isBuilderShip) {
+      const buildDrone = pickDroneByPurpose(ship, 'build', preset)
+      if (buildDrone) {
+        storage.drones.push({ id: buildDrone.id, name: buildDrone.name || buildDrone.id, count: unitCapacity })
+      }
+      return storage
+    }
+
+    if (ship.purposePrimary === 'trade') {
+      const transportDrone = pickDroneByPurpose(ship, 'trade', preset)
+      if (transportDrone) {
+        storage.drones.push({ id: transportDrone.id, name: transportDrone.name || transportDrone.id, count: unitCapacity })
+      }
+      return storage
+    }
+
+    return storage
+  }
+
+  const buildBuiltInBlueprintForShip = (shipId: string, preset: BuiltInPresetKey): ShipBlueprint | null => {
+    const ship = findShip(shipId)
+    if (!ship) return null
+
+    const presetName = getBuiltInPresetName(preset)
+    const result: ShipBlueprint = {
+      id: getBuiltInBlueprintId(shipId, preset),
+      name: presetName,
+      shipId,
+      connections: [],
+      storage: JSON.parse(JSON.stringify(EMPTY_SHIP_STORAGE)),
+      lastUpdated: Date.now()
+    }
+
+    if (preset === 'empty') {
+      return result
+    }
+
+    const upsertGroup = (payload: {
+      slotType: EquipmentType
+      groupName: string
+      equipmentId: string
+      count: number
+    }) => {
+      let connection = result.connections.find((item) => item.slot_type === payload.slotType)
+      if (!connection) {
+        connection = { slot_type: payload.slotType, group: [] }
+        result.connections.push(connection)
+      }
+      let group = connection.group.find((item) => item.group === payload.groupName)
+      if (!group) {
+        group = { group: payload.groupName, equipment_id: payload.equipmentId, count: payload.count }
+        connection.group.push(group)
+        return group
+      }
+      if (ship.purposePrimary === 'mine' && payload.slotType === 'turret' && group.equipment_id && payload.equipmentId) {
+        const hasMiningTag = (equipmentId: string) => {
+          const equipment = findEquipment(equipmentId)
+          const tags = normalizeTagList(equipment?.slotTags || []).map((tag) => tag.toLowerCase())
+          return tags.includes('mine') || tags.includes('mining')
+        }
+        const currentIsMining = hasMiningTag(group.equipment_id)
+        const nextIsMining = hasMiningTag(payload.equipmentId)
+        if (currentIsMining && !nextIsMining) {
+          return group
+        }
+      }
+      // Preserve existing main equipment when caller only needs to ensure the group exists
+      // for attaching secondary shield info.
+      if (!payload.equipmentId && payload.count <= 0) {
+        return group
+      }
+      group.equipment_id = payload.equipmentId
+      group.count = payload.count
+      return group
+    }
+
+    ship.slots.forEach((slot) => {
+      slot.groups.forEach((group) => {
+        const mainConnection = group.connection
+        const mainCount = Math.max(0, Number(mainConnection?.count || 0))
+        const mainSize = resolveSize(undefined, mainConnection?.size)
+        if (mainConnection && mainSize) {
+          const picked = pickDefaultEquipment({
+            ship,
+            slotType: slot.type,
+            size: mainSize,
+            connectionTags: normalizeTagList(mainConnection.tags),
+            preset
+          })
+          if (picked && mainCount > 0) {
+            upsertGroup({
+              slotType: slot.type,
+              groupName: group.group,
+              equipmentId: picked.id,
+              count: mainCount
+            })
+          }
+        }
+
+        const shieldConnection = mainConnection?.shield
+        const shieldSize = resolveSize(undefined, shieldConnection?.size)
+        const shieldCount = Math.max(0, Number(shieldConnection?.count || 0))
+        if (shieldConnection && shieldSize) {
+          const pickedShield = pickDefaultEquipment({
+            ship,
+            slotType: 'shield',
+            size: shieldSize,
+            connectionTags: normalizeTagList(shieldConnection.tags),
+            preset
+          })
+          if (pickedShield && shieldCount > 0) {
+            const targetGroup = upsertGroup({
+              slotType: slot.type,
+              groupName: group.group,
+              equipmentId: '',
+              count: 0
+            })
+            targetGroup.shield = {
+              equipment_id: pickedShield.id,
+              count: shieldCount
+            }
+          }
+        }
+      })
+    })
+
+    if (ship.purposePrimary === 'mine') {
+      const turretConnection = result.connections.find((connection) => connection.slot_type === 'turret')
+      const hasMiningTurret = (turretConnection?.group || []).some((item) => {
+        const equipment = findEquipment(item.equipment_id)
+        const tags = normalizeTagList(equipment?.slotTags || []).map((tag) => tag.toLowerCase())
+        return tags.includes('mine') || tags.includes('mining')
+      })
+
+      if (!hasMiningTurret) {
+        const shipTurretSlot = ship.slots.find((slot) => slot.type === 'turret')
+        const preferredGroup = shipTurretSlot?.groups.find((group) => normalizeTagList(group.connection?.tags).includes('mining'))
+          || shipTurretSlot?.groups[0]
+        const preferredSize = resolveSize(undefined, preferredGroup?.connection?.size)
+        const preferredCount = Math.max(0, Number(preferredGroup?.connection?.count || 0))
+        if (preferredGroup && preferredSize && preferredCount > 0) {
+          const mineTurret = pickDefaultEquipment({
+            ship,
+            slotType: 'turret',
+            size: preferredSize,
+            connectionTags: normalizeTagList(preferredGroup.connection?.tags),
+            preset
+          })
+          if (mineTurret) {
+            upsertGroup({
+              slotType: 'turret',
+              groupName: preferredGroup.group,
+              equipmentId: mineTurret.id,
+              count: preferredCount
+            })
+          }
+        }
+      }
+    }
+
+    result.connections = result.connections.filter((connection) => {
+      connection.group = connection.group.filter((group) => {
+        const hasMain = Boolean(group.equipment_id)
+        const hasShield = Boolean(group.shield?.equipment_id)
+        return hasMain || hasShield
+      })
+      return connection.group.length > 0
+    })
+
+    const slotOrder = ['engine', 'thruster', 'shield', 'weapon', 'turret']
+    result.connections.sort((a, b) => {
+      const orderA = slotOrder.indexOf(a.slot_type)
+      const orderB = slotOrder.indexOf(b.slot_type)
+      return (orderA === -1 ? 999 : orderA) - (orderB === -1 ? 999 : orderB)
+    })
+
+    result.storage = buildDefaultStorage(ship, preset)
+    return result
+  }
+
+  const getBuiltInBlueprintsForShip = (shipId: string | null): ShipBlueprint[] => {
+    if (!shipId) return []
+    return BUILT_IN_PRESETS
+      .map((preset) => buildBuiltInBlueprintForShip(shipId, preset.key))
+      .filter((item): item is ShipBlueprint => Boolean(item))
+  }
+
+  const getLoadableBlueprintsForShip = (shipId: string | null) => {
+    if (!shipId) return []
+    return [...getBuiltInBlueprintsForShip(shipId), ...getBlueprintsForShip(shipId)]
+  }
+
   // Take snapshot for dirty check
   const takeSnapshot = () => {
     const shipId = resolveCurrentShipId()
@@ -251,6 +637,9 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       shipId,
       blueprint: blueprint.value
     })
+    forceDirty.value = false
+    loadedBuiltInPreset.value = null
+    loadedBuiltInConnectionsSnapshot.value = null
   }
 
   // If active blueprint exists, auto-load the corresponding blueprint after a tick
@@ -273,6 +662,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
   // isDirty computed
   const isDirty = computed(() => {
+    if (forceDirty.value) return true
     if (!lastSavedSnapshot.value) return false
     const shipId = resolveCurrentShipId()
     const current = JSON.stringify({
@@ -280,6 +670,28 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       blueprint: blueprint.value
     })
     return current !== lastSavedSnapshot.value
+  })
+
+  const activeBlueprintStatusLabel = computed(() => {
+    void i18n.global.locale.value
+    if (!loadedBuiltInPreset.value || !loadedBuiltInConnectionsSnapshot.value || !blueprint.value) {
+      if (!blueprint.value) return ''
+      if (!blueprint.value.name && forceDirty.value && !savedBlueprints.value.activeBlueprintId) {
+        return i18n.global.t('shipBuild.status_custom')
+      }
+      return blueprint.value.name || ''
+    }
+    const currentConnections = JSON.stringify(blueprint.value.connections || [])
+    if (currentConnections !== loadedBuiltInConnectionsSnapshot.value) {
+      return i18n.global.t('shipBuild.status_custom')
+    }
+    return getBuiltInPresetName(loadedBuiltInPreset.value)
+  })
+
+  const isBuiltInPresetUnchanged = computed(() => {
+    if (!loadedBuiltInPreset.value || !loadedBuiltInConnectionsSnapshot.value || !blueprint.value) return false
+    const currentConnections = JSON.stringify(blueprint.value.connections || [])
+    return currentConnections === loadedBuiltInConnectionsSnapshot.value
   })
 
   const isEditable = () => !resolveCurrentShipId()
@@ -570,6 +982,23 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   }
 
   const loadBlueprint = (id: string) => {
+    const builtIn = parseBuiltInBlueprintId(id)
+    if (builtIn) {
+      const bp = buildBuiltInBlueprintForShip(builtIn.shipId, builtIn.preset)
+      if (!bp) return
+      bp.name = ''
+      blueprint.value = JSON.parse(JSON.stringify(bp))
+      savedBlueprints.value.activeShipId = builtIn.shipId
+      savedBlueprints.value.activeBlueprintId = null
+      loadedBuiltInPreset.value = builtIn.preset
+      loadedBuiltInConnectionsSnapshot.value = JSON.stringify(blueprint.value?.connections || [])
+      takeSnapshot()
+      loadedBuiltInPreset.value = builtIn.preset
+      loadedBuiltInConnectionsSnapshot.value = JSON.stringify(blueprint.value?.connections || [])
+      forceDirty.value = true
+      return
+    }
+
     const bp = findBlueprintById(id)
     if (!bp) return
 
@@ -600,6 +1029,13 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   }
 
   const deleteBlueprint = (id: string) => {
+    if (isBuiltInBlueprintId(id)) return
+
+    const deletingCurrentLoaded = blueprint.value?.id === id
+    const preservedCurrent = deletingCurrentLoaded && blueprint.value
+      ? JSON.parse(JSON.stringify(blueprint.value)) as ShipBlueprint
+      : null
+
     let deletedFromShipId: string | null = null
     for (const bucket of savedBlueprints.value.ships) {
       const idx = bucket.blueprints.findIndex((item) => item.id === id)
@@ -612,6 +1048,19 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     if (!deletedFromShipId) return
 
     savedBlueprints.value.ships = savedBlueprints.value.ships.filter((bucket) => bucket.blueprints.length > 0)
+
+    if (preservedCurrent) {
+      preservedCurrent.id = ''
+      preservedCurrent.name = ''
+      preservedCurrent.lastUpdated = Date.now()
+      blueprint.value = preservedCurrent
+      savedBlueprints.value.activeShipId = preservedCurrent.shipId || deletedFromShipId
+      savedBlueprints.value.activeBlueprintId = null
+      saveBlueprintsToStorage()
+      takeSnapshot()
+      forceDirty.value = true
+      return
+    }
 
     // If deleted was active, fallback to first blueprint
     if (savedBlueprints.value.activeBlueprintId === id) {
@@ -1145,6 +1594,9 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     blueprint.value = null
     viewMode.value = 'selector'
     lastSavedSnapshot.value = null
+    forceDirty.value = false
+    loadedBuiltInPreset.value = null
+    loadedBuiltInConnectionsSnapshot.value = null
   }
 
   return {
@@ -1183,6 +1635,8 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     blueprint,
     savedBlueprints,
     isDirty,
+    activeBlueprintStatusLabel,
+    isBuiltInPresetUnchanged,
     isEditable,
     isEmptyForSave,
     setEquipment,
@@ -1196,6 +1650,8 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     loadBlueprint,
     deleteBlueprint,
     getBlueprintsForShip,
+    getLoadableBlueprintsForShip,
+    isBuiltInBlueprintId,
     loadBlueprintsFromStorage,
     updateBlueprintStorage,
     clearLoadoutForCurrentShip,
