@@ -3,10 +3,15 @@ import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useI18n } from 'vue-i18n'
 import type { StationType } from '@/types/x4'
-import draggable from 'vuedraggable'
 
 const empireStore = useEmpireStore()
 const { t } = useI18n()
+const props = defineProps<{
+  activeSupplySectorId?: string | null
+}>()
+const emit = defineEmits<{
+  (e: 'open-supply', sectorId: string | null): void
+}>()
 
 // 状态管理
 const showMenu = ref(false)
@@ -17,18 +22,24 @@ const stationToDelete = ref<string | null>(null)
 
 // 数据获取
 const stations = computed(() => {
-  if (!empireStore.activeEmpire) return []
-  return empireStore.activeEmpire.stations
+  return empireStore.orderedStationsBySector
 })
+const sectors = computed(() => empireStore.sectors)
 
 const activeStationId = computed(() => empireStore.activeStationId)
-const isDraggingTabs = ref(false)
-const lastTabDragEndAt = ref(0)
+const draggingType = ref<'station' | null>(null)
+const draggingStationId = ref<string | null>(null)
+const hoveredDropSectorId = ref<string | null>(null)
 
-const sortableStations = computed({
-  get: () => stations.value,
-  set: (reorderedStations) => {
-    empireStore.reorderStations(reorderedStations)
+const tabGroups = computed(() => {
+  const unassigned = stations.value.filter((station) => !station.sectorId)
+  const sectorGroups = sectors.value.map((sector) => ({
+    id: sector.id,
+    stations: stations.value.filter((station) => station.sectorId === sector.id)
+  }))
+  return {
+    unassigned,
+    sectorGroups
   }
 })
 
@@ -45,8 +56,6 @@ const getStationIcon = (type?: StationType): string => {
 
 // 核心操作
 const selectStation = (stationId: string | null) => {
-  if (isDraggingTabs.value) return
-  if (Date.now() - lastTabDragEndAt.value < 180) return
   empireStore.selectStation(stationId)
 }
 
@@ -60,6 +69,56 @@ const addNewStation = () => {
       scrollContainer.scrollLeft = scrollContainer.scrollWidth
     }
   }, 100)
+}
+
+const openSupply = (sectorId: string) => {
+  empireStore.selectStation(null)
+  emit('open-supply', sectorId)
+}
+
+const openOverview = () => {
+  empireStore.selectStation(null)
+  emit('open-supply', null)
+}
+
+const onStationDragStart = (event: DragEvent, stationId: string) => {
+  draggingType.value = 'station'
+  draggingStationId.value = stationId
+  event.dataTransfer?.setData('text/x-x4-tab-drag-type', 'station')
+  event.dataTransfer?.setData('text/x-x4-tab-station-id', stationId)
+  event.dataTransfer!.effectAllowed = 'move'
+}
+
+const onDragEnd = () => {
+  draggingType.value = null
+  draggingStationId.value = null
+  hoveredDropSectorId.value = null
+}
+
+const onDropZoneDragOver = (event: DragEvent, targetSectorId: string | null) => {
+  const payloadType = draggingType.value || event.dataTransfer?.getData('text/x-x4-tab-drag-type') || null
+  if (payloadType !== 'station') return
+  event.preventDefault()
+  event.dataTransfer!.dropEffect = 'move'
+  hoveredDropSectorId.value = targetSectorId ?? '__unassigned__'
+}
+
+const onDropZoneDragLeave = (targetSectorId: string | null) => {
+  const key = targetSectorId ?? '__unassigned__'
+  if (hoveredDropSectorId.value === key) {
+    hoveredDropSectorId.value = null
+  }
+}
+
+const onDropToZone = (event: DragEvent, targetSectorId: string | null) => {
+  event.preventDefault()
+  const payloadType = draggingType.value || event.dataTransfer?.getData('text/x-x4-tab-drag-type') || null
+  const stationId = draggingStationId.value || event.dataTransfer?.getData('text/x-x4-tab-station-id') || null
+
+  if (payloadType === 'station' && stationId) {
+    empireStore.moveStationToSector(stationId, targetSectorId)
+  }
+  onDragEnd()
 }
 
 // 右键菜单逻辑
@@ -122,14 +181,6 @@ const cancelDelete = () => {
   stationToDelete.value = null
 }
 
-const handleTabDragStart = () => {
-  isDraggingTabs.value = true
-}
-
-const handleTabDragEnd = () => {
-  isDraggingTabs.value = false
-  lastTabDragEndAt.value = Date.now()
-}
 </script>
 
 <template>
@@ -138,8 +189,8 @@ const handleTabDragEnd = () => {
       
       <div 
         class="tab-item overview-tab"
-        :class="{ 'active': activeStationId === null }"
-        @click="selectStation(null)"
+        :class="{ 'active': activeStationId === null && !props.activeSupplySectorId }"
+        @click="openOverview"
       >
         <div class="tab-highlight"></div>
         <div class="tab-content">
@@ -150,22 +201,57 @@ const handleTabDragEnd = () => {
 
       <div class="h-6 w-px bg-slate-700/50 mx-1 self-center"></div>
 
-      <draggable
-        v-model="sortableStations"
-        item-key="id"
-        class="tabs-draggable-list"
-        ghost-class="tab-drag-ghost"
-        chosen-class="tab-drag-chosen"
-        drag-class="tab-dragging"
-        :animation="160"
-        @start="handleTabDragStart"
-        @end="handleTabDragEnd"
-      >
-        <template #item="{ element: station }">
+      <div class="tabs-draggable-list">
+        <div
+          class="tab-drop-group"
+          :class="{ 'drop-active': draggingType === 'station' && hoveredDropSectorId === '__unassigned__' }"
+          @dragover="onDropZoneDragOver($event, null)"
+          @dragleave="onDropZoneDragLeave(null)"
+          @drop="onDropToZone($event, null)"
+        >
+        <div
+          v-for="station in tabGroups.unassigned"
+          :key="station.id"
+          class="tab-item station-tab"
+          :data-station-id="station.id"
+          :class="{ 'active': activeStationId === station.id }"
+          draggable="true"
+          @dragstart="onStationDragStart($event, station.id)"
+          @dragend="onDragEnd"
+          @click="selectStation(station.id)"
+          @contextmenu.stop="openMenu(station.id, $event)"
+        >
+          <div class="tab-highlight"></div>
+          <div class="tab-content">
+            <span class="tab-icon">{{ getStationIcon(station.type) }}</span>
+            <span class="tab-label max-w-[120px] truncate">{{ station.name }}</span>
+          </div>
+        </div>
+        <div v-if="draggingType === 'station' && hoveredDropSectorId === '__unassigned__'" class="tab-drop-hint">
+          {{ $t('sectorManagement.drop_move_station') }}
+        </div>
+        </div>
+
+        <div
+          v-for="group in tabGroups.sectorGroups"
+          :key="`group-${group.id}`"
+          class="sector-tab-group"
+          :class="{ 'drop-active': draggingType === 'station' && hoveredDropSectorId === group.id }"
+          @dragover="onDropZoneDragOver($event, group.id)"
+          @dragleave="onDropZoneDragLeave(group.id)"
+          @drop="onDropToZone($event, group.id)"
+        >
+          <div class="h-6 w-px bg-slate-700/50 mx-1 self-center"></div>
+
           <div
+            v-for="station in group.stations"
+            :key="station.id"
             class="tab-item station-tab"
             :data-station-id="station.id"
-            :class="{ 'active': activeStationId === station.id, 'is-dragging': isDraggingTabs }"
+            :class="{ 'active': activeStationId === station.id }"
+            draggable="true"
+            @dragstart="onStationDragStart($event, station.id)"
+            @dragend="onDragEnd"
             @click="selectStation(station.id)"
             @contextmenu.stop="openMenu(station.id, $event)"
           >
@@ -175,8 +261,24 @@ const handleTabDragEnd = () => {
               <span class="tab-label max-w-[120px] truncate">{{ station.name }}</span>
             </div>
           </div>
-        </template>
-      </draggable>
+
+          <div
+            v-if="group.stations.length > 0"
+            class="tab-item supply-tab"
+            :class="{ 'active': activeStationId === null && props.activeSupplySectorId === group.id }"
+            @click="openSupply(group.id)"
+          >
+            <div class="tab-highlight"></div>
+            <div class="tab-content">
+              <span class="tab-icon">📦</span>
+              <span class="tab-label">{{ $t('sectorManagement.virtual_supply') }}</span>
+            </div>
+          </div>
+          <div v-if="draggingType === 'station' && hoveredDropSectorId === group.id" class="tab-drop-hint">
+            {{ $t('sectorManagement.drop_move_station') }}
+          </div>
+        </div>
+      </div>
 
       <button class="add-btn" @click="addNewStation" :title="t('sector.add_station')">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -246,6 +348,19 @@ const handleTabDragEnd = () => {
 .tabs-draggable-list {
   @apply flex items-end gap-1;
 }
+.tab-drop-group {
+  @apply flex items-end gap-1 rounded-md transition-colors;
+}
+.sector-tab-group {
+  @apply flex items-end gap-1 rounded-md transition-colors;
+}
+.sector-tab-group.drop-active,
+.tab-drop-group.drop-active {
+  @apply bg-sky-900/20;
+}
+.tab-drop-hint {
+  @apply text-[10px] px-2 py-0.5 rounded bg-sky-700/30 text-sky-200 mb-1;
+}
 .tabs-scroll-area::-webkit-scrollbar {
   display: none; /* Chrome/Safari */
 }
@@ -260,24 +375,10 @@ const handleTabDragEnd = () => {
 }
 
 .station-tab {
-  @apply cursor-grab;
+  @apply cursor-pointer;
 }
-
-.station-tab:active,
-.station-tab.is-dragging {
-  @apply cursor-grabbing;
-}
-
-.tab-drag-ghost {
-  @apply opacity-40 border-sky-500 border-dashed bg-slate-700/60;
-}
-
-.tab-drag-chosen {
-  @apply shadow-lg shadow-sky-900/20;
-}
-
-.tab-dragging {
-  @apply opacity-90;
+.supply-tab {
+  @apply cursor-pointer text-emerald-300;
 }
 
 /* 选中状态 */

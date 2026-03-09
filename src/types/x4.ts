@@ -401,6 +401,7 @@ export interface StationSettings {
 export interface StationPlan {
   id: string;
   name: string;
+  sectorId?: string | null;
   type?: StationType;
   count?: number;
   modules: SavedModule[];
@@ -416,12 +417,19 @@ export interface StationPlan {
  */
 export type StationType = 'industrial' | 'supply' | 'transit' | 'shipyard';
 
+export interface SectorPlan {
+  id: string;
+  name: string;
+  order: number;
+}
+
 /**
  * 帝国方案配置
  */
 export interface EmpirePlan {
   id: string;
   name: string;
+  sectors?: SectorPlan[];
   stations: StationPlan[];
 }
 
@@ -611,6 +619,17 @@ export interface EmpireGroupedFlows {
     operations: EmpireWareFlow[];
     supply: EmpireWareFlow[];
   };
+}
+
+export interface SupplyPlanningInput {
+  sectorId: string;
+  localStationIds: string[];
+}
+
+export interface SectorInternalData {
+  sectorId: string;
+  planning: SupplyPlanningInput;
+  localGroupedFlows: EmpireGroupedFlows;
 }
 
 // [新增] 人口普查结果接口

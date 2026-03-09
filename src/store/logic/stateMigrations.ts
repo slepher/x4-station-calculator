@@ -1,5 +1,6 @@
 import type {
   EmpirePlan,
+  SectorPlan,
   LogicFlowPlan,
   SavedEmpiresState,
   SavedFlowGroup,
@@ -75,6 +76,7 @@ function toStationPlan(raw: unknown, index: number): StationPlan {
   return {
     id: typeof station.id === 'string' && station.id ? station.id : crypto.randomUUID(),
     name: typeof station.name === 'string' && station.name ? station.name : `Station ${index + 1}`,
+    sectorId: typeof station.sectorId === 'string' ? station.sectorId : null,
     type: typeof station.type === 'string' && station.type ? station.type as StationPlan['type'] : 'industrial',
     count: Number(station.count ?? 1) || 1,
     modules: Array.isArray(station.modules) ? deepClone(station.modules) : [],
@@ -85,12 +87,21 @@ function toStationPlan(raw: unknown, index: number): StationPlan {
   }
 }
 
+function defaultSector(index: number = 0): SectorPlan {
+  return {
+    id: crypto.randomUUID(),
+    name: `Sector ${index + 1}`,
+    order: index
+  }
+}
+
 function migrateLegacyV1ToV2(raw: V1StorageState): SavedEmpiresState {
   const stations = Array.isArray(raw.list) ? raw.list : []
   const list: EmpirePlan[] = stations.map((plan, index) => ({
     id: crypto.randomUUID(),
     name: typeof plan.name === 'string' && plan.name ? plan.name : `Empire ${index + 1}`,
-    stations: [toStationPlan(plan, 0)]
+    sectors: [defaultSector(0)],
+    stations: [{ ...toStationPlan(plan, 0), sectorId: null }]
   }))
 
   return {
@@ -101,12 +112,39 @@ function migrateLegacyV1ToV2(raw: V1StorageState): SavedEmpiresState {
   }
 }
 
-function normalizeEmpireStateShape(raw: SavedEmpiresState): SavedEmpiresState {
-  const list = (raw.list || []).map((empire, empireIndex) => ({
-    id: empire.id || crypto.randomUUID(),
-    name: empire.name || `Empire ${empireIndex + 1}`,
-    stations: (empire.stations || []).map((station, stationIndex) => toStationPlan(station, stationIndex))
-  }))
+function normalizeEmpireStateShape(raw: SavedEmpiresState, warnings?: string[]): SavedEmpiresState {
+  const list = (raw.list || []).map((empire, empireIndex) => {
+    const sectorsRaw = Array.isArray((empire as EmpirePlan).sectors) ? (empire as EmpirePlan).sectors || [] : []
+    if (sectorsRaw.length === 0) {
+      warnings?.push(`[empire] empire[${empireIndex}] missing sectors; default sector was created`)
+    }
+    const sectors = (sectorsRaw.length > 0 ? sectorsRaw : [defaultSector(0)]).map((sector, sectorIndex) => ({
+      id: sector?.id || crypto.randomUUID(),
+      name: sector?.name || `Sector ${sectorIndex + 1}`,
+      order: Number.isFinite(Number(sector?.order)) ? Number(sector.order) : sectorIndex
+    }))
+    sectors.sort((a, b) => a.order - b.order)
+    sectors.forEach((sector, idx) => { sector.order = idx })
+    const validSectorIdSet = new Set(sectors.map(s => s.id))
+
+    const stations = (empire.stations || []).map((station, stationIndex) => {
+      const normalized = toStationPlan(station, stationIndex)
+      if (!normalized.sectorId || !validSectorIdSet.has(normalized.sectorId)) {
+        if (normalized.sectorId) {
+          warnings?.push(`[empire] empire[${empireIndex}].station[${stationIndex}] invalid sectorId; reset to unassigned`)
+        }
+        normalized.sectorId = null
+      }
+      return normalized
+    })
+
+    return {
+      id: empire.id || crypto.randomUUID(),
+      name: empire.name || `Empire ${empireIndex + 1}`,
+      sectors,
+      stations
+    }
+  })
 
   let activeId = raw.activeId || null
   if (activeId && !list.some((empire) => empire.id === activeId)) {
@@ -161,7 +199,7 @@ export function migrateEmpireStateToCurrent(
     warnings.push(`[empire] input version ${working.version} is newer than supported ${CURRENT_EMPIRE_VERSION}; fallback to best-effort migration`)
   }
 
-  working = normalizeEmpireStateShape(working)
+  working = normalizeEmpireStateShape(working, warnings)
 
   const needModuleNormalization = working.version <= 2 || working.version > CURRENT_EMPIRE_VERSION
   if (needModuleNormalization) {

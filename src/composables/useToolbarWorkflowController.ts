@@ -177,14 +177,6 @@ export function useToolbarWorkflowController({ t, translateShip }: UseToolbarWor
         pushSaveBlocked()
         return { kind: 'blocked' }
       }
-      if (storeType === 'station' && isDirtyFor('station')) {
-        return { kind: 'open-smart-save', intent: 'NEW' }
-      }
-      if (storeType === 'station' && empireStore.activeStationId === null) {
-        // In empire overview (no active station), SAVE follows smart-save flows:
-        // dirty -> confirm SAVE/NEW flow; clean -> SAVE_AS naming flow.
-        return { kind: 'open-smart-save', intent: 'SAVE_AS' }
-      }
       if (requiresSaveAsOnSaveFor(storeType)) {
         return { kind: 'open-smart-save', intent: 'SAVE_AS' }
       }

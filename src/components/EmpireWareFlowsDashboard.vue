@@ -4,9 +4,16 @@ import { useEmpireStore } from '@/store/useEmpireStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
+import type { EmpireGroupedFlows } from '@/types/x4'
 import EmpireWareFlowGroup from './EmpireWareFlowGroup.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
+
+const props = withDefaults(defineProps<{
+  groupedFlows?: EmpireGroupedFlows | null
+}>(), {
+  groupedFlows: null
+})
 
 const empireStore = useEmpireStore()
 const gameData = useGameDataStore()
@@ -19,7 +26,7 @@ const viewMode = ref<ViewMode>('quantity')
 
 const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
 
-const empireGroupedFlows = computed(() => empireStore.empireGroupedFlows)
+const empireGroupedFlows = computed(() => props.groupedFlows || empireStore.empireGroupedFlows)
 
 const wrapFlow = (flow: any) => {
   const wareInfo = gameData.waresMap?.[flow.wareId]

@@ -160,10 +160,21 @@ function migrateFlowState(input: SavedFlowPlansState, gameDataStore: GameDataSto
 function remapEmpireIds(input: SavedEmpiresState): { state: SavedEmpiresState; activeChangedTo: string | null } {
   const empireIdMap = new Map<string, string>()
   const stationIdMap = new Map<string, string>()
+  const sectorIdMap = new Map<string, string>()
 
   const list: EmpirePlan[] = input.list.map((empire) => {
     const newEmpireId = crypto.randomUUID()
     empireIdMap.set(empire.id, newEmpireId)
+    const oldSectors = empire.sectors || []
+    oldSectors.forEach((sector) => {
+      sectorIdMap.set(sector.id, crypto.randomUUID())
+    })
+
+    const sectors = oldSectors.map((sector, index) => ({
+      ...deepClone(sector),
+      id: sectorIdMap.get(sector.id)!,
+      order: Number.isFinite(Number(sector.order)) ? Number(sector.order) : index
+    }))
 
     const stations: StationPlan[] = (empire.stations || []).map((station) => {
       const newStationId = crypto.randomUUID()
@@ -171,6 +182,7 @@ function remapEmpireIds(input: SavedEmpiresState): { state: SavedEmpiresState; a
       return {
         ...deepClone(station),
         id: newStationId,
+        sectorId: station.sectorId ? (sectorIdMap.get(station.sectorId) || null) : null,
         lastUpdated: Date.now()
       }
     })
@@ -178,6 +190,7 @@ function remapEmpireIds(input: SavedEmpiresState): { state: SavedEmpiresState; a
     return {
       ...deepClone(empire),
       id: newEmpireId,
+      sectors,
       stations
     }
   })

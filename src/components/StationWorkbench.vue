@@ -10,6 +10,8 @@ import StationTabBar from './StationTabBar.vue'
 import ContextToolbar from './ContextToolbar.vue'
 import StationWareFlowsDashboard from './StationWareFlowsDashboard.vue'
 import EmpireWareFlowsDashboard from './EmpireWareFlowsDashboard.vue'
+import SectorManagementPanel from './SectorManagementPanel.vue'
+import SupplyStationPlaceholder from './SupplyStationPlaceholder.vue'
 import LogicFlowCandidateZone from './LogicFlowCandidateZone.vue'
 import LogicFlowPlanningZone from './LogicFlowPlanningZone.vue'
 import StatusMonitor from './StatusMonitor.vue'
@@ -36,6 +38,18 @@ const importModalState = reactive<{
   initialTab: 'game-blueprint'
 })
 
+const overviewState = reactive<{
+  supplySectorId: string | null
+}>({
+  supplySectorId: null
+})
+
+watchEffect(() => {
+  if (empireStore.activeStationId !== null) {
+    overviewState.supplySectorId = null
+  }
+})
+
 const openImportModal = (payload?: {
   initialTab?: 'logic-flow' | 'game-blueprint' | 'x4-station'
 }) => {
@@ -51,26 +65,28 @@ const openImportModal = (payload?: {
     <StationToolbar @open-import="openImportModal" />
     
     <template v-if="isProductionView">
-      <StationTabBar />
+      <StationTabBar :active-supply-sector-id="overviewState.supplySectorId" @open-supply="overviewState.supplySectorId = $event" />
       <ContextToolbar @open-import="openImportModal" />
       
-      <div v-if="empireStore.activeStationId === null" class="main-layout mt-6">
-        <div class="col-span-12 lg:col-span-3">
-          <div class="coming-soon-panel">
-            <p class="text-slate-500">{{ $t('sector.coming_soon') }}</p>
-          </div>
+      <template v-if="empireStore.activeStationId === null">
+        <div v-if="overviewState.supplySectorId" class="mt-6">
+          <SupplyStationPlaceholder :sector-id="overviewState.supplySectorId" />
         </div>
 
-        <div class="col-span-12 lg:col-span-5">
-          <EmpireWareFlowsDashboard />
-        </div>
+        <div v-else class="main-layout mt-6">
+          <div class="col-span-12 lg:col-span-3">
+            <SectorManagementPanel />
+          </div>
 
-        <div class="col-span-12 lg:col-span-4">
-          <div class="coming-soon-panel">
-            <p class="text-slate-500">{{ $t('sector.coming_soon') }}</p>
+          <div class="col-span-12 lg:col-span-5">
+            <EmpireWareFlowsDashboard />
+          </div>
+
+          <div class="col-span-12 lg:col-span-4">
+            <SupplyStationPlaceholder :sector-id="overviewState.supplySectorId" />
           </div>
         </div>
-      </div>
+      </template>
       
       <div v-else class="main-layout mt-6">
         <div class="col-span-12 lg:col-span-3">
