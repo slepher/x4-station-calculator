@@ -5,6 +5,7 @@ import { useStationStore } from '@/store/useStationStore'
 import { useI18n } from 'vue-i18n'
 import type { StationType } from '@/types/x4'
 import X4NumberInput from '@/components/common/X4NumberInput.vue'
+import { useTitleDisplayNameModel } from '@/composables/useTitleDisplayNameModel'
 
 const { t } = useI18n()
 const empireStore = useEmpireStore()
@@ -20,12 +21,13 @@ const isOverview = computed(() => empireStore.activeStationId === null)
 const activeStation = computed(() => empireStore.activeStation)
 
 // --- 数据绑定 (保持您原有的逻辑) ---
-const empireName = computed({
-  get: () => empireStore.activeEmpire?.name || t('sector.new_sector_name'),
-  set: (name: string) => {
-    empireStore.updateEmpireName(name)
-  }
-})
+const sectorTitleConfig = computed(() => ({
+  getName: () => empireStore.activeEmpire?.name || '',
+  setName: (name: string) => { empireStore.updateEmpireName(name) },
+  getDefaultName: () => t('sector.new_sector_name')
+}))
+
+const { displayNameModel: empireName } = useTitleDisplayNameModel(sectorTitleConfig)
 
 const stationName = computed({
   get: () => activeStation.value?.name || '',

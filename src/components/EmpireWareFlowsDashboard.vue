@@ -33,6 +33,7 @@ const wrapFlow = (flow: any) => {
 const totalProfit = computed(() => {
   return empireGroupedFlows.value.flows.reduce((sum, flow) => sum + flow.netValue, 0)
 })
+const hasFlowData = computed(() => empireGroupedFlows.value.flows.length > 0)
 
 const getGroupSymboledValue = (group: any[]) => {
   const value = group.reduce((sum, item) => sum + Math.abs(item.netValue || 0), 0)
@@ -119,7 +120,7 @@ const empireGroups = computed(() => {
       <EmptyState v-if="empireGroupedFlows.flows.length === 0 && viewMode !== 'economy'" />
     </div>
 
-    <div class="profit-section" v-if="viewMode === 'economy'">
+    <div class="profit-section" v-if="hasFlowData && viewMode === 'economy'">
       <div class="profit-footer">
         <span class="profit-label">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
