@@ -124,7 +124,7 @@ const handleDirectEmpireImport = (planId: string) => {
 <template>
   <div class="p-6 space-y-4" data-testid="logicflow-import-body">
     <p class="text-sm text-slate-300 leading-relaxed">
-      {{ mode === 'station' ? t('logicFlowImport.mode_station_hint') : t('logicFlowImport.mode_empire_hint') }}
+      {{ mode === 'station' ? t('logicFlowImport.mode_station_hint') : t('logicFlowImport.mode_sector_hint') }}
     </p>
 
     <div v-if="plans.length === 0" class="bg-slate-900/50 border border-slate-700 rounded p-4 text-sm text-slate-400">

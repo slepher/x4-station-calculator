@@ -57,7 +57,7 @@ const openImportModal = (payload?: {
       <div v-if="empireStore.activeStationId === null" class="main-layout mt-6">
         <div class="col-span-12 lg:col-span-3">
           <div class="coming-soon-panel">
-            <p class="text-slate-500">{{ $t('empire.coming_soon') }}</p>
+            <p class="text-slate-500">{{ $t('sector.coming_soon') }}</p>
           </div>
         </div>
 
@@ -67,7 +67,7 @@ const openImportModal = (payload?: {
 
         <div class="col-span-12 lg:col-span-4">
           <div class="coming-soon-panel">
-            <p class="text-slate-500">{{ $t('empire.coming_soon') }}</p>
+            <p class="text-slate-500">{{ $t('sector.coming_soon') }}</p>
           </div>
         </div>
       </div>

@@ -33,7 +33,7 @@ const inputRef = ref<HTMLInputElement | null>(null)
 const defaultNameKey = computed(() => {
   if (props.storeType === 'ship-build') return 'shipBuild.default_blueprint_name'
   if (props.storeType === 'logicFlow') return 'menu.default_flow_name'
-  return 'empire.new_empire_name'
+  return 'sector.new_sector_name'
 })
 
 watch(() => props.isOpen, (val) => {
@@ -76,12 +76,12 @@ const currentPlanName = computed(() => {
     }
     return ''
   }
-  return empireStore.activeEmpire?.name || ''
+  return empireStore.activeEmpire?.name || t(defaultNameKey.value)
 })
 
 const dialogTitle = computed(() => {
   if (props.mode === 'import') {
-    return t('logicFlowImport.empire_confirm_title')
+    return t('logicFlowImport.sector_confirm_title')
   }
   if (props.intent === 'SAVE_AS') {
     return t('menu.dialog_title_save_as')
@@ -95,7 +95,7 @@ const dialogTitle = computed(() => {
 
 const dialogMessage = computed(() => {
   if (props.mode === 'import') {
-    return t('logicFlowImport.empire_confirm_message')
+    return t('logicFlowImport.sector_confirm_message')
   }
   if (props.intent === 'SAVE_AS') return null
 
@@ -204,13 +204,13 @@ const handleDiscard = () => {
       <div class="px-6 py-4 bg-slate-900/20 border-t border-slate-700 flex justify-end gap-3">
         <button v-if="intent === 'NEW' || mode === 'import'" @click="handleDiscard"
           class="btn-base bg-red-600 hover:bg-red-500 shadow-red-900/20">
-          <span v-if="mode === 'import'">{{ t('logicFlowImport.empire_action_discard_import') }}</span>
+          <span v-if="mode === 'import'">{{ t('logicFlowImport.sector_action_discard_import') }}</span>
           <span v-else>{{ t('menu.btn_discard_and_new') }}</span>
         </button>
 
         <button @click="handlePrimaryAction" class="btn-base bg-cyan-600 hover:bg-cyan-500 shadow-cyan-900/20">
           <span v-if="mode === 'import'">
-            {{ t('logicFlowImport.empire_action_save_import') }}
+            {{ t('logicFlowImport.sector_action_save_import') }}
           </span>
           <span v-else-if="intent === 'NEW'">
             {{ t('menu.btn_save') }}

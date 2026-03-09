@@ -60,7 +60,7 @@ watch(
 const moduleTitle = (key: ImportModuleKey) => {
   switch (key) {
     case 'x4_empire_data':
-      return t('importExport.module_empire')
+      return t('importExport.module_sector')
     case 'x4_logic_flow_plans':
       return t('importExport.module_flow')
     case 'x4_ship_blueprints':

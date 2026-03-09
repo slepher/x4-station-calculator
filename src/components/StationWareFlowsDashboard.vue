@@ -225,7 +225,7 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
           <div v-if="store.settings.showEmpireGaps && viewMode === 'quantity'" class="empire-gap-groups">
             <div v-if="empireGaps.operations.length > 0" class="empire-gap-group">
               <EmpireWareFlowGroup
-                :title="t('wareflow.empire_operations')"
+                :title="t('wareflow.sector_operations')"
                 :items="empireGaps.operations"
                 :viewMode="viewMode"
                 :showAddButton="true"
@@ -236,7 +236,7 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
             </div>
             <div v-if="empireGaps.supply.length > 0" class="empire-gap-group">
               <EmpireWareFlowGroup
-                :title="t('wareflow.empire_supply')"
+                :title="t('wareflow.sector_supply')"
                 :items="empireGaps.supply"
                 :viewMode="viewMode"
                 :showAddButton="true"

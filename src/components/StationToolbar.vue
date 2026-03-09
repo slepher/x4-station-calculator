@@ -68,9 +68,7 @@ const currentConfig = computed(() => {
   return {
     getName: () => empireStore.activeEmpire?.name || '',
     setName: (name: string) => {
-      if (empireStore.activeEmpire) {
-        empireStore.activeEmpire.name = name
-      }
+      empireStore.updateEmpireName(name)
     },
     getDefaultName: () => toolbarWorkflow.getDefaultName('station')
   }
@@ -132,7 +130,7 @@ const handleNew = () => {
   const result = toolbarWorkflow.runAction({
     storeType: activeToolbarStoreType.value,
     action: 'NEW',
-    defaultEmpireName: t('menu.default_empire_name')
+    defaultEmpireName: t('menu.default_sector_name')
   })
   if (result.kind === 'open-smart-save') {
     smartDialog.intent = result.intent
@@ -144,7 +142,7 @@ const handleSave = () => {
   const result = toolbarWorkflow.runAction({
     storeType: activeToolbarStoreType.value,
     action: 'SAVE',
-    defaultEmpireName: t('menu.default_empire_name')
+    defaultEmpireName: t('menu.default_sector_name')
   })
   if (result.kind === 'open-smart-save') {
     smartDialog.intent = result.intent
@@ -156,7 +154,7 @@ const handleSaveAs = () => {
   const result = toolbarWorkflow.runAction({
     storeType: activeToolbarStoreType.value,
     action: 'SAVE_AS',
-    defaultEmpireName: t('menu.default_empire_name')
+    defaultEmpireName: t('menu.default_sector_name')
   })
   if (result.kind === 'open-smart-save') {
     smartDialog.intent = result.intent
@@ -186,7 +184,7 @@ const handleSmartDialogSubmitDefault = ({ steps }: { steps: SmartSaveStep[] }) =
   toolbarWorkflow.runSmartSaveSteps({
     storeType: activeToolbarStoreType.value,
     steps,
-    defaultEmpireName: t('menu.default_empire_name')
+    defaultEmpireName: t('menu.default_sector_name')
   })
   smartDialog.isOpen = false
 }

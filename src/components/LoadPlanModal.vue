@@ -83,7 +83,7 @@ const getEmpireLastUpdated = (empireId: string) => {
               </div>
             </div>
             <div class="text-xs text-slate-400 bg-slate-600/50 px-2 py-1 rounded">
-              {{ empire.stations.length }} {{ t('empire.stations_count') }}
+              {{ empire.stations.length }} {{ t('sector.stations_count') }}
             </div>
           </div>
 

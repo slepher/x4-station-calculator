@@ -66,7 +66,7 @@ export function useToolbarWorkflowController({ t, translateShip }: UseToolbarWor
       const shipName = ship ? translateShip(ship) : ''
       return shipName ? `${shipName} ${t('menu.blueprint')}` : t('menu.default_blueprint_name')
     }
-    return t('empire.new_empire_name')
+    return t('sector.new_sector_name')
   }
 
   const pushSaveSuccess = () => {

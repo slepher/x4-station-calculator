@@ -200,7 +200,7 @@ const executeStationImport = (mode: 'new' | 'overwrite', payload?: StationImport
     }
     applyImportPayloadToStation(stationId, importPayload)
   } else {
-    const newStation = empireStore.createStation(importPayload.groupName || t('empire.new_station_name'))
+    const newStation = empireStore.createStation(importPayload.groupName || t('sector.new_station_name'))
     if (!newStation) {
       showStationImportConfirm.value = false
       showBlueprintStrategyDialog.value = false
@@ -229,7 +229,7 @@ const executeEmpireImport = () => {
   }
 
   result.targets.forEach((target) => {
-    const station = empireStore.createStation(target.groupName || t('empire.new_station_name'))
+    const station = empireStore.createStation(target.groupName || t('sector.new_station_name'))
     if (!station) return
     applyImportPayloadToStation(station.id, target)
   })
@@ -274,7 +274,7 @@ const handleImportSelected = (selection: { planId: string; groupId?: string }) =
   toolbarWorkflow.runImportAction({
     storeType: 'station',
     choice: 'DISCARD_AND_IMPORT',
-    defaultEmpireName: t('menu.default_empire_name'),
+    defaultEmpireName: t('menu.default_sector_name'),
     importData: () => executeEmpireImport()
   })
 }
@@ -285,7 +285,7 @@ const handleEmpireImportSubmit = (payload: { choice: 'SAVE_AND_IMPORT' | 'DISCAR
   const result = toolbarWorkflow.runImportAction({
     storeType: 'station',
     choice: payload.choice,
-    defaultEmpireName: t('menu.default_empire_name'),
+    defaultEmpireName: t('menu.default_sector_name'),
     importData: () => executeEmpireImport()
   })
   if (!result.ok) {
@@ -307,7 +307,7 @@ const getFileStationName = (xmlName: string, fileName: string) => {
   if (fromXml) return fromXml
 
   const base = fileName.replace(/\.[^.]+$/, '').trim()
-  if (!base) return t('empire.new_station_name')
+  if (!base) return t('sector.new_station_name')
   return base.slice(0, 20)
 }
 
@@ -384,11 +384,11 @@ const applyBlueprintAdd = (stationId: string, modules: BlueprintModule[]) => {
 }
 
 const createStationWithDefaultName = () => {
-  return empireStore.createStation(t('empire.new_station_name'), 'industrial')
+  return empireStore.createStation(t('sector.new_station_name'), 'industrial')
 }
 
 const createStationAndImportBlueprint = (modules: BlueprintModule[]) => {
-  const station = empireStore.createStation(blueprintStationName.value || t('empire.new_station_name'), 'industrial')
+  const station = empireStore.createStation(blueprintStationName.value || t('sector.new_station_name'), 'industrial')
   if (!station) return
   applyBlueprintOverwrite(station.id, modules)
 }
@@ -491,7 +491,7 @@ const handleBlueprintActionAdd = () => {
 const handleBlueprintActionNew = () => {
   // Handle logic-flow import
   if (pendingLogicFlowModules.value) {
-    const newStation = empireStore.createStation(pendingStationGroupName.value || t('empire.new_station_name'))
+    const newStation = empireStore.createStation(pendingStationGroupName.value || t('sector.new_station_name'))
     if (newStation) {
       applyImportPayloadToStation(newStation.id, pendingLogicFlowModules.value)
       warningSummary.value = pendingLogicFlowModules.value.warnings

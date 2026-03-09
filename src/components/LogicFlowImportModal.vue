@@ -20,7 +20,7 @@ const { t } = useI18n()
     <div class="w-full max-w-2xl bg-slate-800 border border-slate-600 rounded-lg shadow-2xl flex flex-col overflow-hidden">
       <div class="flex justify-between items-center px-6 py-4 border-b border-slate-700 bg-slate-900/30">
         <h3 class="text-lg font-bold text-white tracking-wide">
-          {{ mode === 'station' ? t('logicFlowImport.select_title_station') : t('logicFlowImport.select_title_empire') }}
+          {{ mode === 'station' ? t('logicFlowImport.select_title_station') : t('logicFlowImport.select_title_sector') }}
         </h3>
         <button @click="$emit('close')" class="text-slate-400 hover:text-white transition p-1 hover:bg-slate-700 rounded">
           <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">

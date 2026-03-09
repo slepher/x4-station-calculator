@@ -51,7 +51,7 @@ const selectStation = (stationId: string | null) => {
 }
 
 const addNewStation = () => {
-  const name = t('empire.new_station_name')
+  const name = t('sector.new_station_name')
   empireStore.createStation(name, 'industrial')
   // 自动滚动到最右侧
   setTimeout(() => {
@@ -144,7 +144,7 @@ const handleTabDragEnd = () => {
         <div class="tab-highlight"></div>
         <div class="tab-content">
           <span class="tab-icon text-base">📊</span>
-          <span class="tab-label">{{ t('empire.overview') }}</span>
+          <span class="tab-label">{{ t('sector.overview') }}</span>
         </div>
       </div>
 
@@ -178,7 +178,7 @@ const handleTabDragEnd = () => {
         </template>
       </draggable>
 
-      <button class="add-btn" @click="addNewStation" :title="t('empire.add_station')">
+      <button class="add-btn" @click="addNewStation" :title="t('sector.add_station')">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="12" y1="5" x2="12" y2="19"></line>
           <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -193,23 +193,23 @@ const handleTabDragEnd = () => {
         :style="{ top: `${menuPosition.y}px`, left: `${menuPosition.x}px` }"
         @click.stop
       >
-        <div class="menu-header">{{ t('empire.menu_operations') }}</div>
+        <div class="menu-header">{{ t('sector.menu_operations') }}</div>
         
         <div class="menu-item" @click="renameStation">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-          <span>{{ t('empire.rename_station') }}</span>
+          <span>{{ t('sector.rename_station') }}</span>
         </div>
         
         <div class="menu-item" @click="duplicateStation">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-          <span>{{ t('empire.duplicate_station') }}</span>
+          <span>{{ t('sector.duplicate_station') }}</span>
         </div>
 
         <div class="menu-divider"></div>
         
         <div class="menu-item danger" @click="confirmDelete">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-          <span>{{ t('empire.delete_station') }}</span>
+          <span>{{ t('sector.delete_station') }}</span>
         </div>
       </div>
     </Teleport>
@@ -219,9 +219,9 @@ const handleTabDragEnd = () => {
         <div class="modal-card" @click.stop>
           <div class="modal-header">
             <span class="text-amber-400 text-lg">⚠️</span>
-            <h3>{{ t('empire.confirm_delete') }}</h3>
+            <h3>{{ t('sector.confirm_delete') }}</h3>
           </div>
-          <p class="text-slate-400 text-sm mb-6 ml-1">{{ t('empire.delete_warning') }}</p>
+          <p class="text-slate-400 text-sm mb-6 ml-1">{{ t('sector.delete_warning') }}</p>
           <div class="flex justify-end gap-3">
             <button class="btn-cancel" @click="cancelDelete">{{ t('ui.cancel') }}</button>
             <button class="btn-danger" @click="deleteStation">{{ t('ui.delete') }}</button>

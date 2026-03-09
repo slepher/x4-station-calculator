@@ -21,7 +21,7 @@ const activeStation = computed(() => empireStore.activeStation)
 
 // --- 数据绑定 (保持您原有的逻辑) ---
 const empireName = computed({
-  get: () => empireStore.activeEmpire?.name || '',
+  get: () => empireStore.activeEmpire?.name || t('sector.new_sector_name'),
   set: (name: string) => {
     empireStore.updateEmpireName(name)
   }
@@ -119,11 +119,11 @@ const handleOpenImport = () => {
     <div v-if="isOverview" class="toolbar-content w-full flex items-center">
       <div class="toolbar-section">
         <div class="input-group">
-          <label class="group-label">{{ t('empire.empire_name') }}</label>
+          <label class="group-label">{{ t('sector.sector_name') }}</label>
           <input 
             v-model="empireName"
             class="ghost-input w-64 text-lg"
-            :placeholder="t('empire.unnamed_empire')"
+            :placeholder="t('sector.unnamed_sector')"
           />
         </div>
       </div>
@@ -222,14 +222,14 @@ const handleOpenImport = () => {
         </div>
 
         <div class="input-group ml-6">
-          <label class="group-label">{{ t('ui.show_empire_gaps') }}</label>
+          <label class="group-label">{{ t('ui.show_sector_gaps') }}</label>
           <button 
             class="toggle-chip"
             :class="showEmpireGaps ? 'active-green' : 'inactive'"
             @click="showEmpireGaps = !showEmpireGaps"
             data-testid="toggle-show-empire-gaps"
           >
-            <span class="sr-only">{{ t('ui.show_empire_gaps') }}</span>
+            <span class="sr-only">{{ t('ui.show_sector_gaps') }}</span>
             <span class="text-sm">📊</span>
             <span class="chip-status">{{ showEmpireGaps ? 'ON' : 'OFF' }}</span>
           </button>
