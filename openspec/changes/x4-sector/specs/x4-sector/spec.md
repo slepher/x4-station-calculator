@@ -46,6 +46,12 @@
 ### Requirement: Virtual Supply Tab per Sector
 每个有空间站的星区 MUST 在 Tab 区提供一个虚拟补给站入口。
 
+#### Scenario: 补给站 Tab 标题与样式
+- **前提** 某星区下存在空间站
+- **当** Tab 区渲染补给站入口
+- **那么** 标题 SHALL 显示该星区名称
+- **并且** 文本颜色 SHALL 与普通站点 Tab 一致
+
 #### Scenario: 打开补给站整页
 - **前提** 用户点击某星区补给站 Tab
 - **当** 系统切换视图
@@ -74,6 +80,60 @@
 - **那么** 资源视图 SHALL 仅统计该星区站点
 - **并且** 不包含其他星区站点数据
 
+### Requirement: Supply Storage View
+补给站 MUST 提供“仓储视图”，并按 `netRate` 派生仓储体积需求。
+
+#### Scenario: 单站静态值由 netRate 派生
+- **前提** 已有某站点某资源 `netRate`
+- **当** 系统计算仓储视图
+- **那么** `静产出 = max(netRate, 0)`
+- **并且** `静消耗 = max(-netRate, 0)`
+
+#### Scenario: 单站仓储体积计算
+- **前提** 已得到静产出/静消耗、`unitVolume`、站点缓冲参数
+- **当** 系统计算单站仓储体积
+- **那么** `产出仓储体积 = 静产出 × unitVolume × primaryProductBufferHours`
+- **并且** `消耗仓储体积 = 静消耗 × unitVolume × resourceBufferHours`
+
+#### Scenario: 资源总需求计算
+- **前提** 某资源在多个站点存在仓储体积分项
+- **当** 系统汇总资源总项
+- **那么** 总需求 SHALL 为 `max(Σ产出仓储体积, Σ消耗仓储体积)`
+
+#### Scenario: 仓储视图顺序与排版
+- **前提** 用户切换到补给站仓储视图
+- **当** 列表渲染
+- **那么** 资源集合 SHALL 与资源/资金视图一致
+- **并且** 列表 SHALL 不分组，顺序采用“其他视图分组顺序 + 组内顺序”拼接
+- **并且** 排版 SHALL 对齐空间站仓储视图，但无操作按钮且总项无占位
+
+### Requirement: Supply Build Zone Auto Storage Planning
+补给站左侧建筑区 MUST 根据仓储需求自动生成仓储模块规划。
+
+#### Scenario: 基于种族偏好自动选仓储模块
+- **前提** 用户在补给站态设置了 `racePreference`
+- **当** 系统计算建筑区模块清单
+- **那么** 系统 SHALL 复用空间站仓储选型逻辑（优先种族 L 仓储，回退通用/最大容量）
+- **并且** 模块数量 SHALL 按 `ceil(需求体积 / 模块容量)` 计算
+
+### Requirement: Supply Material Zone Reuses Station Dashboard
+补给站右侧建造材料区 MUST 复用空间站右侧仪表盘组件。
+
+#### Scenario: 复用组件并隐藏工人视图
+- **前提** 补给站整页已打开且左侧建筑区已生成模块清单
+- **当** 右侧面板渲染
+- **那么** 系统 SHALL 复用空间站建造仪表盘组件
+- **并且** 输入 SHALL 使用建筑区自动模块清单
+- **并且** 工人视图 SHALL 被隐藏
+
+### Requirement: Supply Context Name Edit Targets Sector
+补给站态 Context 名称编辑 MUST 作用于当前星区名。
+
+#### Scenario: 在补给站态编辑名称
+- **前提** 当前为补给站整页且有 `supplySectorId`
+- **当** 用户在 Context 名称输入框修改并确认
+- **那么** 系统 SHALL 调用星区重命名逻辑更新 `sector.name`
+
 ### Requirement: Sector Internal Data Map in Empire Store
 `useEmpireStore` MUST 提供按星区预计算的内部数据 `Map`。
 
@@ -89,6 +149,56 @@
 - **前提** 存在低版本 empire 数据
 - **当** 初始化或导入执行
 - **那么** 系统 SHALL 迁移到 v4 并补齐默认字段
+
+### Requirement: ContextBar Shows Single-Berth Throughput
+ContextBar MUST 显示单泊位吞吐量，不显示总吞吐量。
+
+#### Scenario: 单泊位吞吐量计算
+- **前提** 存在 `transportShipCapacity`
+- **当** ContextBar 渲染吞吐量指标
+- **那么** 指标 SHALL 为 `transportShipCapacity * 15`
+- **并且** 单位 SHALL 为 `m³/h`
+
+### Requirement: Pier Docking Count Data Contract
+系统 MUST 为 pier 模块提供非空 `dockingCount` 字段。
+
+#### Scenario: 数据处理阶段写入 dockingCount
+- **前提** 模块宏 `class="pier"` 且存在 `<connections>`
+- **当** 数据处理脚本解析模块
+- **那么** `dockingCount` SHALL 等于 `<connections>/<connection>` 节点数量
+
+#### Scenario: 类型契约非空
+- **前提** 前端加载 `modules.json`
+- **当** 类型系统校验 `X4Module`
+- **那么** `dockingCount` SHALL 为必填 `number`
+- **并且** 兜底构造模块时 SHALL 填充为 `0`
+
+### Requirement: Station Berth Demand by Transport Type
+空间站泊位需求 MUST 按运输类型分别取整后再求和。
+
+#### Scenario: 分类型泊位需求
+- **前提** 已得到空间站运输需求流（含 `transportType`）
+- **当** 系统计算泊位需求
+- **那么** SHALL 分别计算：
+  - `containerDemand = ceil(containerThroughput / singleBerthThroughput)`
+  - `solidDemand = ceil(solidThroughput / singleBerthThroughput)`
+  - `liquidDemand = ceil(liquidThroughput / singleBerthThroughput)`
+- **并且** `requiredTotalBerths = containerDemand + solidDemand + liquidDemand`
+
+### Requirement: Station Pier Auto-Selection Priority
+空间站自动补泊位模块 MUST 使用固定优先级选型，并按 `dockingCount` 计算补齐数量。
+
+#### Scenario: 泊位模块选型优先级
+- **前提** 系统检测到泊位缺口
+- **当** 系统选择补齐泊位模块
+- **那么** SHALL 优先选择 `plannedModules` 中同种族泊位模块
+- **并且** 若无同种族命中，SHALL 选择 `plannedModules` 中第一个泊位模块
+- **并且** 若仍未命中，SHALL 选择对应种族 E 泊位（`harbor_03`）
+
+#### Scenario: 按 dockingCount 补齐
+- **前提** 已选中目标泊位模块且存在 `dockingCount > 0`
+- **当** 系统计算补齐数量
+- **那么** `requiredModuleCount = ceil(berthDeficit / dockingCount)`
 
 ## REMOVED Requirements
 

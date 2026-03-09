@@ -12,7 +12,8 @@ import type {
   GroupedFlows,
   EmpireGroupedFlows,
   SupplyPlanningInput,
-  SectorInternalData
+  SectorInternalData,
+  SupplyStorageFlow
 } from '@/types/x4'
 import { useGameDataStore } from './useGameDataStore'
 import { analyzeEmpireWareFlow } from './logic/analyzeEmpireWareFlow'
@@ -65,6 +66,10 @@ function createEmptyEmpireGroupedFlows(): EmpireGroupedFlows {
       supply: []
     }
   }
+}
+
+function createEmptySupplyStorageFlows(): SupplyStorageFlow[] {
+  return []
 }
 
 export const useEmpireStore = defineStore('empire', () => {
@@ -151,6 +156,76 @@ export const useEmpireStore = defineStore('empire', () => {
     const stations = activeEmpire.value.stations || []
     const sectorList = sectors.value
 
+    const buildSupplyStorageFlows = (groupedFlows: EmpireGroupedFlows): SupplyStorageFlow[] => {
+      const stationMap = new Map(stations.map((station) => [station.id, station]))
+      const byWareId = new Map<string, SupplyStorageFlow>()
+
+      groupedFlows.flows.forEach((flow) => {
+        const details: SupplyStorageFlow['details'] = []
+        let totalProductionStorageVolume = 0
+        let totalConsumptionStorageVolume = 0
+
+        flow.contributions.forEach((contribution) => {
+          const station = stationMap.get(contribution.stationId)
+          if (!station) return
+
+          const staticProduction = Math.max(contribution.netRate, 0)
+          const staticConsumption = Math.max(-contribution.netRate, 0)
+          const productionStorageVolume = staticProduction * flow.unitVolume * station.settings.primaryProductBufferHours
+          const consumptionStorageVolume = staticConsumption * flow.unitVolume * station.settings.resourceBufferHours
+
+          if (productionStorageVolume > 0) {
+            details.push({
+              stationId: contribution.stationId,
+              stationName: contribution.stationName,
+              stationCount: contribution.stationCount,
+              kind: 'production',
+              staticRate: staticProduction,
+              storageVolume: productionStorageVolume
+            })
+            totalProductionStorageVolume += productionStorageVolume
+          }
+
+          if (consumptionStorageVolume > 0) {
+            details.push({
+              stationId: contribution.stationId,
+              stationName: contribution.stationName,
+              stationCount: contribution.stationCount,
+              kind: 'consumption',
+              staticRate: staticConsumption,
+              storageVolume: consumptionStorageVolume
+            })
+            totalConsumptionStorageVolume += consumptionStorageVolume
+          }
+        })
+
+        byWareId.set(flow.wareId, {
+          wareId: flow.wareId,
+          orderIndex: flow.orderIndex,
+          tier: flow.tier,
+          transportType: flow.transportType,
+          unitVolume: flow.unitVolume,
+          totalProductionStorageVolume,
+          totalConsumptionStorageVolume,
+          totalRequiredStorageVolume: Math.max(totalProductionStorageVolume, totalConsumptionStorageVolume),
+          details
+        })
+      })
+
+      const products = groupedFlows.empireGroups.operations
+        .filter((flow) => flow.netRate > 0)
+        .map((flow) => flow.wareId)
+      const operations = groupedFlows.empireGroups.operations
+        .filter((flow) => flow.netRate <= 0)
+        .map((flow) => flow.wareId)
+      const supply = groupedFlows.empireGroups.supply.map((flow) => flow.wareId)
+      const orderedWareIds = [...products, ...operations, ...supply]
+
+      return orderedWareIds
+        .map((wareId) => byWareId.get(wareId))
+        .filter((item): item is SupplyStorageFlow => !!item && item.transportType === 'container')
+    }
+
     sectorList.forEach((sector) => {
       const localStationIds = stations
         .filter((station) => station.sectorId === sector.id)
@@ -158,6 +233,7 @@ export const useEmpireStore = defineStore('empire', () => {
 
       const localStationSet = new Set(localStationIds)
       const localStations = stations.filter((station) => localStationSet.has(station.id))
+      const localGroupedFlows = analyzeEmpireWareFlow(localStations, (stationId) => stationStateMap.getFilteredGroupedFlows(stationId))
 
       map.set(sector.id, {
         sectorId: sector.id,
@@ -165,7 +241,8 @@ export const useEmpireStore = defineStore('empire', () => {
           sectorId: sector.id,
           localStationIds
         },
-        localGroupedFlows: analyzeEmpireWareFlow(localStations, (stationId) => stationStateMap.getFilteredGroupedFlows(stationId))
+        localGroupedFlows,
+        supplyStorageFlows: buildSupplyStorageFlows(localGroupedFlows)
       })
     })
 
@@ -516,7 +593,8 @@ export const useEmpireStore = defineStore('empire', () => {
     return {
       sectorId,
       planning: getSupplyPlanningInput(sectorId),
-      localGroupedFlows: createEmptyEmpireGroupedFlows()
+      localGroupedFlows: createEmptyEmpireGroupedFlows(),
+      supplyStorageFlows: createEmptySupplyStorageFlows()
     }
   }
 

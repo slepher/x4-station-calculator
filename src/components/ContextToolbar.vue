@@ -15,15 +15,31 @@ const emit = defineEmits<{
     initialTab?: 'logic-flow' | 'game-blueprint' | 'x4-station'
   }): void
 }>()
+const props = defineProps<{
+  activeSupplySectorId?: string | null
+}>()
 
 // --- 状态判断 ---
 const isOverview = computed(() => empireStore.activeStationId === null)
+const isSupplyOverview = computed(() => isOverview.value && !!props.activeSupplySectorId)
 const activeStation = computed(() => empireStore.activeStation)
+const activeSupplySector = computed(() => {
+  if (!props.activeSupplySectorId) return null
+  return empireStore.sectors.find((sector) => sector.id === props.activeSupplySectorId) || null
+})
 
 // --- 数据绑定 (保持您原有的逻辑) ---
 const sectorTitleConfig = computed(() => ({
-  getName: () => empireStore.activeEmpire?.name || '',
-  setName: (name: string) => { empireStore.updateEmpireName(name) },
+  getName: () => isSupplyOverview.value
+    ? (activeSupplySector.value?.name || '')
+    : (empireStore.activeEmpire?.name || ''),
+  setName: (name: string) => {
+    if (isSupplyOverview.value && activeSupplySector.value) {
+      empireStore.renameSector(activeSupplySector.value.id, name)
+      return
+    }
+    empireStore.updateEmpireName(name)
+  },
   getDefaultName: () => t('sector.new_sector_name')
 }))
 
@@ -61,6 +77,10 @@ const sunlight = computed({
   get: () => stationStore.settings.sunlight,
   set: (val: number) => { stationStore.updateSetting('sunlight', val) }
 })
+const transportMinutes = computed({
+  get: () => stationStore.settings.transportMinutes,
+  set: (val: number) => { stationStore.updateSetting('transportMinutes', val) }
+})
 
 const workforce = computed({
   get: () => stationStore.settings.considerWorkforceForAutoFill,
@@ -76,6 +96,16 @@ const racePreference = computed({
   get: () => stationStore.settings.racePreference,
   set: (val: string) => { stationStore.updateSetting('racePreference', val) }
 })
+
+const singleBerthThroughput = computed(() => {
+  const shipCapacity = Math.max(1, stationStore.settings.transportShipCapacity || 1)
+  return shipCapacity * 15
+})
+
+const formatThroughput = (n: number) => new Intl.NumberFormat('en-US', {
+  maximumFractionDigits: 1,
+  minimumFractionDigits: 1
+}).format(n)
 
 // --- 矿物选择逻辑 ---
 const showMineralPopover = ref(false)
@@ -129,6 +159,26 @@ const handleOpenImport = () => {
           />
         </div>
       </div>
+
+      <template v-if="isSupplyOverview">
+        <div class="separator mx-6"></div>
+        <div class="toolbar-section">
+          <div class="input-group">
+            <label class="group-label">{{ t('toolbar.race_preference') }}</label>
+            <select v-model="racePreference" class="race-select">
+              <option v-for="r in races" :key="r.value" :value="r.value">{{ r.label }}</option>
+            </select>
+          </div>
+
+          <div class="input-group ml-6">
+            <label class="group-label">{{ t('toolbar.single_berth_throughput') }}</label>
+            <div class="count-pill min-w-[120px] justify-end">
+              <span class="text-xs font-mono font-bold text-sky-400">{{ formatThroughput(singleBerthThroughput) }}</span>
+              <span class="text-[10px] text-slate-500 ml-1">m³/h</span>
+            </div>
+          </div>
+        </div>
+      </template>
 
     </div>
 
@@ -196,6 +246,22 @@ const handleOpenImport = () => {
           <div class="x4-composite-input-wrapper">
             <X4NumberInput v-model="sunlight" :min="0" :max="200" width-class="w-14" class="x4-nested-input" />
             <div class="x4-unit-suffix-box">%</div>
+          </div>
+        </div>
+
+        <div class="input-group ml-6">
+          <label class="group-label">{{ t('toolbar.transport_time') }}</label>
+          <div class="x4-composite-input-wrapper">
+            <X4NumberInput v-model="transportMinutes" :min="0" width-class="w-14" class="x4-nested-input" />
+            <div class="x4-unit-suffix-box">{{ t('ui.minute') }}</div>
+          </div>
+        </div>
+
+        <div class="input-group ml-6">
+          <label class="group-label">{{ t('toolbar.single_berth_throughput') }}</label>
+          <div class="count-pill min-w-[120px] justify-end">
+            <span class="text-xs font-mono font-bold text-sky-400">{{ formatThroughput(singleBerthThroughput) }}</span>
+            <span class="text-[10px] text-slate-500 ml-1">m³/h</span>
           </div>
         </div>
       </div>

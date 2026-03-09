@@ -38,6 +38,8 @@
     "supply_linked_gap_support": "Linked Sector Gap Support",
     "supply_material_zone": "Build Materials Zone",
     "supply_material_placeholder": "Placeholder for construction material planning.",
+    "supply_storage_production": "Production",
+    "supply_storage_consumption": "Consumption",
     "summary_local_stations": "Local stations",
     "summary_linked_sectors": "Linked sectors",
     "summary_linked_stations": "Linked sector stations",
@@ -60,6 +62,8 @@
     "no_resources": "No Resources",
     "select_resources": "Select Available Resources",
     "sunlight_efficiency": "Sunlight",
+    "transport_time": "Transport Time",
+    "single_berth_throughput": "Single Berth Throughput",
     "race_preference": "Race Preference",
     "workforce_calc": "Workforce",
     "workforce_calc_title": "Consider workforce needs in auto-fill",
@@ -264,7 +268,8 @@
     "tag_ops": "OPS",
     "cancel": "Cancel",
     "delete": "Delete",
-    "show_sector_gaps": "Show Gaps"
+    "show_sector_gaps": "Show Gaps",
+    "minute": "min"
   },
   "menu": {
     "new": "New",
@@ -376,6 +381,7 @@
     "quantity_view": "Quantity",
     "economy_view": "Economy",
     "volume_view": "Storage",
+    "transport_view": "Transport",
     "container_group": "Container",
     "solid_group": "Solid",
     "liquid_group": "Liquid",

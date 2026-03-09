@@ -4,15 +4,23 @@ import { useEmpireStore } from '@/store/useEmpireStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
-import type { EmpireGroupedFlows } from '@/types/x4'
+import type { EmpireGroupedFlows, SupplyStorageFlow } from '@/types/x4'
 import EmpireWareFlowGroup from './EmpireWareFlowGroup.vue'
+import SupplyStorageFlowItem from './SupplyStorageFlow.vue'
+import SupplyTransportFlowItem from './SupplyTransportFlow.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
 
 const props = withDefaults(defineProps<{
   groupedFlows?: EmpireGroupedFlows | null
+  enableStorageView?: boolean
+  enableTransportView?: boolean
+  supplyStorageFlows?: SupplyStorageFlow[]
 }>(), {
-  groupedFlows: null
+  groupedFlows: null,
+  enableStorageView: false,
+  enableTransportView: false,
+  supplyStorageFlows: () => []
 })
 
 const empireStore = useEmpireStore()
@@ -20,7 +28,7 @@ const gameData = useGameDataStore()
 const { t } = useI18n()
 const { translateWare } = useX4I18n()
 
-type ViewMode = 'quantity' | 'economy'
+type ViewMode = 'quantity' | 'economy' | 'storage' | 'transport'
 
 const viewMode = ref<ViewMode>('quantity')
 
@@ -51,15 +59,28 @@ const getGroupSymboledValue = (group: any[]) => {
 const title = () => {
   if (viewMode.value === 'quantity') {
     return t('wareflow.resource_view')
+  } else if (viewMode.value === 'storage') {
+    return t('wareflow.volume_view')
+  } else if (viewMode.value === 'transport') {
+    return t('wareflow.transport_view')
   } else {
     return t('wareflow.economy_view')
   }
 }
 
-const views = computed<{key: ViewMode; label: string}[]>(() => [
-  { key: 'quantity', label: t('wareflow.quantity_view') },
-  { key: 'economy', label: t('wareflow.economy_view') }
-])
+const views = computed<{key: ViewMode; label: string}[]>(() => {
+  const base: {key: ViewMode; label: string}[] = [
+    { key: 'quantity', label: t('wareflow.quantity_view') },
+    { key: 'economy', label: t('wareflow.economy_view') }
+  ]
+  if (props.enableStorageView) {
+    base.push({ key: 'storage', label: t('wareflow.volume_view') })
+  }
+  if (props.enableTransportView) {
+    base.push({ key: 'transport', label: t('wareflow.transport_view') })
+  }
+  return base
+})
 
 const empireGroups = computed(() => {
   const groups = empireGroupedFlows.value.empireGroups
@@ -94,6 +115,56 @@ const empireGroups = computed(() => {
     }
   ]
 })
+
+const storageFlows = computed(() => props.supplyStorageFlows || [])
+const hasStorageData = computed(() => storageFlows.value.length > 0)
+const storageTotalVolume = computed(() =>
+  storageFlows.value.reduce((sum, item) => sum + item.totalRequiredStorageVolume, 0)
+)
+const formatVolume = (n: number) => new Intl.NumberFormat('en-US', {
+  maximumFractionDigits: 1,
+  minimumFractionDigits: 1
+}).format(n)
+
+const getWareName = (wareId: string) => {
+  const ware = gameData.waresMap?.[wareId]
+  return ware ? translateWare(ware) : wareId
+}
+
+const transportFlows = computed(() => {
+  const flowByWareId = new Map(empireGroupedFlows.value.flows.map((flow) => [flow.wareId, flow]))
+  return storageFlows.value.map((storageFlow) => {
+    const source = flowByWareId.get(storageFlow.wareId)
+    if (!source) {
+      return {
+        wareId: storageFlow.wareId,
+        totalTransportVolume: 0,
+        details: []
+      }
+    }
+    const details = source.contributions
+      .map((detail) => ({
+        stationId: detail.stationId,
+        stationName: detail.stationName,
+        stationCount: detail.stationCount,
+        transportVolume: Math.abs(detail.netRate) * source.unitVolume
+      }))
+      .filter((detail) => detail.transportVolume > 0)
+    const totalTransportVolume = details.reduce((sum, detail) => sum + detail.transportVolume, 0)
+    return {
+      wareId: storageFlow.wareId,
+      totalTransportVolume,
+      details
+    }
+  })
+})
+
+const hasTransportData = computed(() =>
+  transportFlows.value.some((item) => item.totalTransportVolume > 0)
+)
+const transportTotalVolume = computed(() =>
+  transportFlows.value.reduce((sum, item) => sum + item.totalTransportVolume, 0)
+)
 </script>
 
 <template>
@@ -109,7 +180,7 @@ const empireGroups = computed(() => {
     </div>
 
     <div class="list-body custom-scrollbar">
-      <div class="volume-groups-container">
+      <div v-if="viewMode === 'quantity' || viewMode === 'economy'" class="volume-groups-container">
         <EmpireWareFlowGroup 
           v-for="group in empireGroups" 
           :key="group.key"
@@ -124,7 +195,55 @@ const empireGroups = computed(() => {
         <EmptyState v-if="viewMode === 'economy' && empireGroupedFlows.flows.length === 0" />
       </div>
 
-      <EmptyState v-if="empireGroupedFlows.flows.length === 0 && viewMode !== 'economy'" />
+      <div v-if="viewMode === 'storage'" class="volume-groups-container">
+        <div class="storage-group-header">
+          <h4 class="storage-group-title">{{ t('wareflow.volume_view') }}</h4>
+          <span class="storage-group-value">
+            {{ formatVolume(storageTotalVolume) }}m³
+            <svg class="w-3.5 h-3.5 text-blue-300/70" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+              <path d="m3.3 7 8.7 5 8.7-5"/>
+              <path d="M12 22V12"/>
+            </svg>
+          </span>
+        </div>
+        <SupplyStorageFlowItem
+          v-for="item in storageFlows"
+          :key="item.wareId"
+          :resource-id="item.wareId"
+          :name="getWareName(item.wareId)"
+          :unit-volume="item.unitVolume"
+          :total-required-storage-volume="item.totalRequiredStorageVolume"
+          :details="item.details"
+        />
+      </div>
+
+      <div v-if="viewMode === 'transport'" class="volume-groups-container">
+        <div class="storage-group-header">
+          <h4 class="storage-group-title">{{ t('wareflow.transport_view') }}</h4>
+          <span class="storage-group-value">
+            {{ formatVolume(transportTotalVolume) }}m³
+            <svg class="w-3.5 h-3.5 text-blue-300/70" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="3" width="15" height="13"></rect>
+              <path d="M16 8h4l3 3v5h-7z"></path>
+              <circle cx="5.5" cy="18.5" r="2.5"></circle>
+              <circle cx="18.5" cy="18.5" r="2.5"></circle>
+            </svg>
+          </span>
+        </div>
+        <SupplyTransportFlowItem
+          v-for="item in transportFlows"
+          :key="item.wareId"
+          :resource-id="item.wareId"
+          :name="getWareName(item.wareId)"
+          :total-transport-volume="item.totalTransportVolume"
+          :details="item.details"
+        />
+      </div>
+
+      <EmptyState v-if="viewMode === 'quantity' && empireGroupedFlows.flows.length === 0" />
+      <EmptyState v-if="viewMode === 'storage' && !hasStorageData" />
+      <EmptyState v-if="viewMode === 'transport' && !hasTransportData" />
     </div>
 
     <div class="profit-section" v-if="hasFlowData && viewMode === 'economy'">
@@ -211,6 +330,18 @@ const empireGroups = computed(() => {
 
 .volume-groups-container {
   @apply space-y-1;
+}
+
+.storage-group-header {
+  @apply flex justify-between items-center h-8 px-3 py-0.5 bg-slate-800/40 rounded mb-1;
+}
+
+.storage-group-title {
+  @apply text-sm font-bold text-slate-300;
+}
+
+.storage-group-value {
+  @apply text-sm font-mono text-blue-300 flex items-center gap-2;
 }
 
 .economy-group-sum {

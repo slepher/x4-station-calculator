@@ -67,6 +67,7 @@ export function analyzeWareFlow(
         productionVolume: 0,
         consumptionVolume: 0,
         netVolume: 0,
+        transportDemand: 0,
         
         // 仓储规划d
         totalOccupiedCount: 0,
@@ -118,7 +119,8 @@ export function analyzeWareFlow(
         amount: actualAmount,
         bonusPercent: Math.round(currentBonusRatio * 100),
         volumeFlow: volumeFlow,
-        valueFlow: valueFlow
+        valueFlow: valueFlow,
+        transportFlow: Math.abs(actualAmount) * entry.unitVolume
       });
     }
 
@@ -141,7 +143,8 @@ export function analyzeWareFlow(
         amount: -actualAmount, // 负数
         bonusPercent: 0,
         volumeFlow: -volumeFlow,
-        valueFlow: -valueFlow
+        valueFlow: -valueFlow,
+        transportFlow: Math.abs(actualAmount) * entry.unitVolume
       });
     }
   });
@@ -176,7 +179,8 @@ export function analyzeWareFlow(
         amount: -hourlyAmount,
         bonusPercent: 0,
         volumeFlow: -volumeFlow,
-        valueFlow: -valueFlow
+        valueFlow: -valueFlow,
+        transportFlow: Math.abs(hourlyAmount) * entry.unitVolume
       });
     }
   });
@@ -188,6 +192,26 @@ export function analyzeWareFlow(
     // A. 流量净值
     entry.netRate = entry.production - entry.consumption;
     entry.netVolume = entry.productionVolume - entry.consumptionVolume;
+    const priorityLevel = warePriorityLevels?.[entry.wareId] ?? 0
+    const isMainOrSecondary = priorityLevel > 0
+    const isSupplyGap = entry.workforceConsumption > 0
+    const isResourceFlow = entry.transportType !== 'container'
+    const shouldCountTransport = isMainOrSecondary || isSupplyGap || isResourceFlow
+
+    entry.transportDemand = shouldCountTransport
+      ? entry.contributions.reduce((sum, item) => {
+        const transportFlow = item.transportFlow !== undefined
+          ? item.transportFlow
+          : Math.abs(item.amount) * entry.unitVolume
+        return sum + transportFlow
+      }, 0)
+      : 0
+
+    entry.contributions.forEach((item) => {
+      item.transportFlow = shouldCountTransport
+        ? (item.transportFlow !== undefined ? item.transportFlow : Math.abs(item.amount) * entry.unitVolume)
+        : 0
+    })
 
     // B. 经济计算
     const isSurplus = entry.netRate >= 0;
@@ -202,18 +226,18 @@ export function analyzeWareFlow(
     
     // 2. 产出缓冲 (Output/Transport Buffer) - 基于优先级
     // 获取产物优先级级别 (0=无需求, 1=副产物, 2=主产物)
-    const priorityLevel = warePriorityLevels?.[wareId] ?? 2; // 默认为主产物
+    const storagePriorityLevel = warePriorityLevels?.[wareId] ?? 2; // 默认为主产物
     
     // 根据优先级选择缓冲时间
     let productBufferHours = 0;
-    if (priorityLevel === 2) {
+    if (storagePriorityLevel === 2) {
       productBufferHours = primaryProductBufferHours;    // 主产物使用长缓冲
-    } else if (priorityLevel === 1) {
+    } else if (storagePriorityLevel === 1) {
       productBufferHours = secondaryProductBufferHours;  // 副产物使用短缓冲
     } // priorityLevel === 0 时，productBufferHours 保持为 0（无缓冲）
     
     // 仅当 netRate > 0 且需要缓冲时才计算
-    const productionBufferCount = (entry.netRate > 0) && (priorityLevel > 0)
+    const productionBufferCount = (entry.netRate > 0) && (storagePriorityLevel > 0)
       ? entry.netRate * productBufferHours
       : 0;
 

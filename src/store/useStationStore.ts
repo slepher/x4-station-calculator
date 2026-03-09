@@ -477,6 +477,7 @@ export const useStationStore = defineStore('station', () => {
     return modulesMap.value[id] || {
       id, macroId: '', wareId: '', nameId: id, type: 'unknown', group: 'others', race: 'unknown', buildTime: 0,
       buildCost: {}, cycleTime: 0, outputs: {}, inputs: {},
+      dockingCount: 0,
       workforce: { capacity: 0, needed: 0, maxBonus: 0 }
     } as X4Module
   }

@@ -60,6 +60,44 @@ function findBestStorage(
   return candidate || null;
 }
 
+function isELargePier(module: X4Module | undefined): module is X4Module {
+  return !!module && module.type === 'pier' && !!module.macroId?.includes('harbor_03')
+}
+
+function getPierDockCount(module: X4Module | null | undefined): number {
+  if (!module) return 0
+  if (typeof module.dockingCount === 'number' && module.dockingCount > 0) {
+    return module.dockingCount
+  }
+  const byName = Number((module.name || '').match(/(\d+)-Dock/i)?.[1] || 0)
+  if (byName > 0) return byName
+  return 0
+}
+
+function findPreferredPierModule(
+  race: string,
+  modules: Record<string, X4Module>,
+  plannedModules: SavedModule[]
+): X4Module | null {
+  const plannedPiers = plannedModules
+    .map(m => modules[m.id])
+    .filter((m): m is X4Module => !!m && m.type === 'pier')
+
+  // 1. plannedModule 中优先选对应种族泊位
+  const sameRacePlanned = plannedPiers.find((m) => m.race === race)
+  if (sameRacePlanned) return sameRacePlanned
+
+  // 2. 次选 plannedModule 中第一个泊位
+  if (plannedPiers.length > 0) return plannedPiers[0]!
+
+  // 3. 没有命中则采用对应种族 E 泊位
+  const sameRace = Object.values(modules).find(m => isELargePier(m) && m.race === race)
+  if (sameRace) return sameRace
+
+  // 兜底任意 E 泊位
+  return Object.values(modules).find(m => isELargePier(m)) || null
+}
+
 /**
  * 计算模块列表的净产出
  */
@@ -361,6 +399,54 @@ export function calculateAutoFill(
       autoIndustry.push(s);
     }
   });
+
+  // 4b. 泊位自动填充
+  // 计算口径：单泊位吞吐量 = transportShipCapacity * 15
+  const modulesAfterStorage = [...plannedModules, ...autoIndustry]
+  const workforceAfterStorage = calculateTotalWorkforce(modulesAfterStorage, modules)
+  const berthAnalysis = analyzeWareFlow(
+    modulesAfterStorage,
+    modules,
+    wares,
+    medicalConsumption,
+    settings,
+    workforceAfterStorage,
+    1.0,
+    settings.resourceBufferHours,
+    settings.primaryProductBufferHours,
+    settings.secondaryProductBufferHours,
+    resolvedPriority
+  )
+
+  const singleBerthThroughput = Math.max(1, settings.transportShipCapacity || 1) * 15
+  const throughputByType = berthAnalysis.flows.reduce((acc, flow) => {
+    const value = Math.abs(flow.transportDemand || 0)
+    if (flow.transportType === 'solid') acc.solid += value
+    else if (flow.transportType === 'liquid') acc.liquid += value
+    else acc.container += value
+    return acc
+  }, { container: 0, solid: 0, liquid: 0 })
+  const requiredTotalBerths =
+    Math.ceil(throughputByType.container / singleBerthThroughput) +
+    Math.ceil(throughputByType.solid / singleBerthThroughput) +
+    Math.ceil(throughputByType.liquid / singleBerthThroughput)
+  const existingTotalBerths = modulesAfterStorage.reduce((sum, m) => {
+    const info = modules[m.id]
+    if (info?.type !== 'pier') return sum
+    return sum + getPierDockCount(info) * m.count
+  }, 0)
+  const berthDeficit = Math.max(0, requiredTotalBerths - existingTotalBerths)
+
+  if (berthDeficit > 0) {
+    const preferredPier = findPreferredPierModule(race, modules, plannedModules)
+    const berthPerModule = getPierDockCount(preferredPier)
+    if (preferredPier && berthPerModule > 0) {
+      const requiredPierCount = Math.ceil(berthDeficit / berthPerModule)
+      const existing = autoIndustry.find(m => m.id === preferredPier.id)
+      if (existing) existing.count += requiredPierCount
+      else autoIndustry.push({ id: preferredPier.id, count: requiredPierCount })
+    }
+  }
 
   // ==========================================
   // 返回结果

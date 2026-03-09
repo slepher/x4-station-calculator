@@ -35,6 +35,7 @@ const tabGroups = computed(() => {
   const unassigned = stations.value.filter((station) => !station.sectorId)
   const sectorGroups = sectors.value.map((sector) => ({
     id: sector.id,
+    name: sector.name,
     stations: stations.value.filter((station) => station.sectorId === sector.id)
   }))
   return {
@@ -271,7 +272,7 @@ const cancelDelete = () => {
             <div class="tab-highlight"></div>
             <div class="tab-content">
               <span class="tab-icon">📦</span>
-              <span class="tab-label">{{ $t('sectorManagement.virtual_supply') }}</span>
+              <span class="tab-label max-w-[120px] truncate">{{ group.name }}</span>
             </div>
           </div>
           <div v-if="draggingType === 'station' && hoveredDropSectorId === group.id" class="tab-drop-hint">
@@ -378,7 +379,7 @@ const cancelDelete = () => {
   @apply cursor-pointer;
 }
 .supply-tab {
-  @apply cursor-pointer text-emerald-300;
+  @apply cursor-pointer;
 }
 
 /* 选中状态 */

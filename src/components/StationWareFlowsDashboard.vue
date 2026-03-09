@@ -19,7 +19,7 @@ const gameData = useGameDataStore()
 const { t, locale } = useI18n();
 const { translateWare } = useX4I18n()
 
-type ViewMode = 'quantity' | 'volume' | 'economy'
+type ViewMode = 'quantity' | 'volume' | 'economy' | 'transport'
 
 // 视图模式状态管理
 const viewMode = ref<ViewMode>('quantity')
@@ -113,6 +113,12 @@ const totalProfit = computed(() => {
 const getGroupVolume = (group: any[]) => 
   formatNum(group.reduce((sum, item) => sum + Math.abs(item.totalOccupiedVolume || 0), 0))
 
+const getGroupTransport = (group: any[]) =>
+  new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: 1,
+    minimumFractionDigits: 1
+  }).format(group.reduce((sum, item) => sum + Math.abs(item.transportDemand || 0), 0))
+
 const getGroupSymboledValue = (group: any[]) => {
   const value = group.reduce((sum, item) => sum + Math.abs(item.netValue || 0), 0)
   const symbol = value >= 0 ? '+' : '-'
@@ -124,6 +130,8 @@ const title = () => {
     return t('wareflow.resource_view')
   } else if (viewMode.value === 'economy') {
     return t('wareflow.economy_view')
+  } else if (viewMode.value === 'transport') {
+    return t('wareflow.transport_view')
   } else {
     return t('station.header_volume')
   }
@@ -134,7 +142,8 @@ const views = computed<{key: ViewMode; label: string}[]>(() => {
   return [
   {key: 'quantity', label: t('wareflow.quantity_view')},
   {key: 'economy', label: t('wareflow.economy_view')},
-  {key: 'volume', label: t('wareflow.volume_view')}
+  {key: 'volume', label: t('wareflow.volume_view')},
+  {key: 'transport', label: t('wareflow.transport_view')}
 ]})
 
 const volumeGroups = computed(() => [
@@ -146,22 +155,39 @@ const volumeGroups = computed(() => [
    items: groupedFlows.value.volumeGroups.liquid.map(wrapFlow)}
 ])
 
+const transportGroups = computed(() => [
+  {key: 'container', title: t('wareflow.container_group'),
+   items: groupedFlows.value.volumeGroups.container.map(wrapFlow)},
+  {key: 'solid', title: t('wareflow.solid_group'),
+   items: groupedFlows.value.volumeGroups.solid.map(wrapFlow)},
+  {key: 'liquid', title: t('wareflow.liquid_group'),
+   items: groupedFlows.value.volumeGroups.liquid.map(wrapFlow)}
+])
+
 const rateGroups = computed(() => ([
   {key: 'positive',
    symbolClass: "positive",
-   title: viewMode.value === 'economy' ? t('wareflow.income_group') : t('wareflow.products_group'),
+   title: viewMode.value === 'economy'
+     ? t('wareflow.income_group')
+     : t('wareflow.products_group'),
    items: groupedFlows.value.rateGroups.positive.map(wrapFlow)},
   {key: 'operations',
    symbolClass: "negative",
-   title: viewMode.value === 'economy' ? t('wareflow.expenses_operations_group') : t('wareflow.operations_group'),
+   title: viewMode.value === 'economy'
+     ? t('wareflow.expenses_operations_group')
+     : t('wareflow.operations_group'),
    items: groupedFlows.value.rateGroups.operations.map(wrapFlow)},
   {key: 'supply',
    symbolClass: "negative",
-   title: viewMode.value === 'economy' ? t('wareflow.expenses_supply_group') : t('wareflow.supply_group'),
+   title: viewMode.value === 'economy'
+     ? t('wareflow.expenses_supply_group')
+     : t('wareflow.supply_group'),
    items: groupedFlows.value.rateGroups.supply.map(wrapFlow)},
   {key: 'resources', 
    symbolClass: "negative",
-   title: viewMode.value === 'economy' ? t('wareflow.expenses_resources_group') : t('wareflow.resources_group'),
+   title: viewMode.value === 'economy'
+     ? t('wareflow.expenses_resources_group')
+     : t('wareflow.resources_group'),
    items: groupedFlows.value.rateGroups.resources.map(wrapFlow)}
 ]))
 
@@ -220,6 +246,34 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
         </StationWareFlowGroup>
       </div>
       
+      <div v-if="viewMode === 'transport'" class="volume-groups-container">
+        <StationWareFlowGroup v-for="group in transportGroups" :key="group.key"
+          :title="group.title"
+          :items="group.items"
+          :viewMode="viewMode"
+        >
+          <div class="transport-group-value">
+            <span class="transport-group-sum">
+              {{ getGroupTransport(group.items) }}m³
+            </span>
+            <svg
+              class="w-3.5 h-3.5 text-blue-300/70"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#60a5fa"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="1" y="3" width="15" height="13"></rect>
+              <path d="M16 8h4l3 3v5h-7z"></path>
+              <circle cx="5.5" cy="18.5" r="2.5"></circle>
+              <circle cx="18.5" cy="18.5" r="2.5"></circle>
+            </svg>
+          </div>
+        </StationWareFlowGroup>
+      </div>
+
       <!-- 通用分组视图：根据当前视图模式显示对应的数据 -->
       <div v-if="viewMode === 'economy' || viewMode === 'quantity'" class="volume-groups-container">
           <div v-if="store.settings.showEmpireGaps && viewMode === 'quantity'" class="empire-gap-groups">
@@ -425,6 +479,14 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
 
 .volume-group-planning {
   @apply text-sm font-mono text-blue-400;
+}
+
+.transport-group-sum {
+  @apply text-sm font-mono font-bold text-blue-300;
+}
+
+.transport-group-value {
+  @apply flex items-center gap-2;
 }
 
 .volume-item {

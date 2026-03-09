@@ -38,6 +38,8 @@
     "supply_linked_gap_support": "连接星区缺口补给",
     "supply_material_zone": "建造材料区",
     "supply_material_placeholder": "建造材料区功能占位，后续接入材料规划。",
+    "supply_storage_production": "产出",
+    "supply_storage_consumption": "消耗",
     "summary_local_stations": "本地空间站数量",
     "summary_linked_sectors": "连接星区数量",
     "summary_linked_stations": "连接星区空间站数量",
@@ -60,6 +62,8 @@
     "no_resources": "无资源",
     "select_resources": "选择可用资源",
     "sunlight_efficiency": "光伏效率",
+    "transport_time": "运输时间",
+    "single_berth_throughput": "单泊位吞吐量",
     "race_preference": "偏好种族",
     "workforce_calc": "工人运算",
     "workforce_calc_title": "自动填充时考虑工人需求",
@@ -266,7 +270,8 @@
     "tag_ops": "运营",
     "cancel": "取消",
     "delete": "删除",
-    "show_sector_gaps": "显示缺口"
+    "show_sector_gaps": "显示缺口",
+    "minute": "分钟"
   },
   "menu": {
     "new": "新建",
@@ -378,6 +383,7 @@
     "quantity_view": "数量视图",
     "economy_view": "经济视图",
     "volume_view": "仓储视图",
+    "transport_view": "运输视图",
     "container_group": "集装箱",
     "solid_group": "固体",
     "liquid_group": "液体",

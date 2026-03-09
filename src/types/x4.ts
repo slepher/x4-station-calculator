@@ -322,6 +322,9 @@ export interface X4Module {
     capacity: number;
     type: 'container' | 'solid' | 'liquid';
   };
+
+  // 泊位逻辑 (仅限 pier 模块)
+  dockingCount: number;
   
   // 颜色标记
   color: string;
@@ -392,6 +395,7 @@ export interface StationSettings {
   resourceBufferHours: number; // 资源缓冲时间（小时）
   primaryProductBufferHours: number;   // 主产物缓冲时间（小时）
   secondaryProductBufferHours: number; // 副产物缓冲时间（小时）
+  transportMinutes: number; // 运输时间（分钟）
   transportShipCapacity: number; // 运输船运量
 }
 
@@ -514,6 +518,9 @@ export interface ModuleFlowAtom {
   
   // --- 3. 资金流 (参考) ---
   valueFlow: number;    // amount * unitPrice
+
+  // --- 4. 运输需求流 (按运输时间折算) ---
+  transportFlow?: number; // abs(amount) * unitVolume * (transportMinutes / 60)
 }
 
 export interface WareFlow {
@@ -535,6 +542,9 @@ export interface WareFlow {
   productionVolume: number;  // 产出体积流 (totalProduction * unitVolume)
   consumptionVolume: number; // 消耗体积流 (totalConsumption * unitVolume)
   netVolume: number;         // 净体积变化
+
+  // 运输需求流 (Transport Demand)
+  transportDemand?: number;  // Σ abs(flow) * unitVolume * (transportMinutes / 60)
 
   // 规划容器占用数量 (Total Requirement)
   totalOccupiedCount: number;
@@ -626,10 +636,32 @@ export interface SupplyPlanningInput {
   localStationIds: string[];
 }
 
+export interface SupplyStorageFlowDetail {
+  stationId: string;
+  stationName: string;
+  stationCount: number;
+  kind: 'production' | 'consumption';
+  staticRate: number;
+  storageVolume: number;
+}
+
+export interface SupplyStorageFlow {
+  wareId: string;
+  orderIndex: number;
+  tier: number;
+  transportType: TransportType;
+  unitVolume: number;
+  totalProductionStorageVolume: number;
+  totalConsumptionStorageVolume: number;
+  totalRequiredStorageVolume: number;
+  details: SupplyStorageFlowDetail[];
+}
+
 export interface SectorInternalData {
   sectorId: string;
   planning: SupplyPlanningInput;
   localGroupedFlows: EmpireGroupedFlows;
+  supplyStorageFlows: SupplyStorageFlow[];
 }
 
 // [新增] 人口普查结果接口

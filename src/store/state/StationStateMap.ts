@@ -24,6 +24,7 @@ export const DEFAULT_STATION_SETTINGS: StationSettings = {
   resourceBufferHours: 1.0,
   primaryProductBufferHours: 12.0,
   secondaryProductBufferHours: 2.0,
+  transportMinutes: 30,
   transportShipCapacity: 62000
 }
 
@@ -80,6 +81,7 @@ export function migrateStationSettings(raw: Partial<StationSettings> | null | un
   source.primaryProductBufferHours = source.primaryProductBufferHours ?? 12.0
   source.secondaryProductBufferHours = source.secondaryProductBufferHours ?? 2.0
   source.resourceBufferHours = source.resourceBufferHours !== undefined ? source.resourceBufferHours : 2
+  source.transportMinutes = source.transportMinutes ?? 30
   source.transportShipCapacity = source.transportShipCapacity ?? 62000
   source.showEmpireGaps = source.showEmpireGaps ?? false
   return { ...DEFAULT_STATION_SETTINGS, ...source }

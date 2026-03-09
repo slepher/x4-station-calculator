@@ -15,6 +15,7 @@ const props = defineProps<{
   priorityLevel?: number // 新增：产物优先级级别 (0, 1, 2)
   // 新增体积和经济数据
   netVolume: number
+  transportDemand?: number
   netValue: number
   transportType: string
   unitVolume: number
@@ -23,7 +24,8 @@ const props = defineProps<{
   totalOccupiedCount: number
   totalOccupiedConsumptionCount: number
   // 新增视图模式属性
-  viewMode: 'quantity' | 'volume' | 'economy'
+  viewMode: 'quantity' | 'volume' | 'economy' | 'transport'
+  transportMinutes?: number
 }>()
 
 const emit = defineEmits<{
@@ -55,6 +57,11 @@ const displayValue = computed(() => {
   if (props.viewMode === 'volume' && props.netVolume !== undefined) {
     return props.netVolume
   }
+  if (props.viewMode === 'transport') {
+    if (props.transportDemand !== undefined) return props.transportDemand
+    const minutes = props.transportMinutes ?? 30
+    return Math.abs(props.netRate) * (props.unitVolume || 0) * (minutes / 60)
+  }
   return props.netRate
 })
 
@@ -69,6 +76,9 @@ const formattedDisplayValue = computed(() => {
   }
   if (props.viewMode === 'volume') {
     return displaySign.value + formatNum(displayValue.value, 0) + 'm³'
+  }
+  if (props.viewMode === 'transport') {
+    return formatNum(displayValue.value, 1) + 'm³'
   }
   return displaySign.value + formatNum(displayValue.value)
 })
@@ -110,6 +120,19 @@ const formattedDetails = computed(() => {
         ...detail,
         volumeAmount: volumeValue,
         displayAmount: volumeValue
+      }
+    })
+  }
+
+  if (props.viewMode === 'transport') {
+    const minutes = props.transportMinutes ?? 30
+    return processedDetails.value.map(detail => {
+      const transportValue = detail.transportFlow !== undefined
+        ? detail.transportFlow
+        : Math.abs(detail.amount || 0) * (props.unitVolume || 0) * (minutes / 60)
+      return {
+        ...detail,
+        displayAmount: transportValue
       }
     })
   }
@@ -166,6 +189,15 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
           <div :class="classWithSymbol(displayValue, 'value')" v-if="viewMode === 'economy' || viewMode === 'quantity'">
             {{ formattedDisplayValue }}
           </div>
+          <div v-if="viewMode === 'transport'" class="value value-transport">
+            {{ formattedDisplayValue }}
+            <svg class="w-3.5 h-3.5 text-blue-300/70" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="3" width="15" height="13"></rect>
+              <path d="M16 8h4l3 3v5h-7z"></path>
+              <circle cx="5.5" cy="18.5" r="2.5"></circle>
+              <circle cx="18.5" cy="18.5" r="2.5"></circle>
+            </svg>
+          </div>
           <tippy v-if="viewMode === 'volume'" theme="x4" :allowHTML="true" interactive>
             <div class="volume-trigger-container">
               <span class="volume-count-main text-blue-400 font-mono font-bold text-sm leading-none">
@@ -198,8 +230,8 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
           </span>
           <div class="item-val-group">
             <span v-if="item.bonusPercent > 0" class="item-bonus">(+{{ item.bonusPercent }}%)</span>
-            <span class="item-val">
-              {{ item.displayAmount > 0 ? '+' : '' }}{{ formatNum(item.displayAmount) }}
+            <span class="item-val" :class="{ 'item-val-transport': viewMode === 'transport' }">
+              {{ viewMode === 'transport' ? '' : (item.displayAmount > 0 ? '+' : '') }}{{ formatNum(item.displayAmount) }}
             </span>
           </div>
         </template>
@@ -263,6 +295,10 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
   @apply text-red-400;
 }
 
+.value-transport {
+  @apply text-blue-300 flex items-center justify-end gap-2;
+}
+
 /* 三段式紧凑结构 */
 .item-name {
   @apply flex items-center gap-1;
@@ -298,6 +334,10 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
 
 .item-val {
   @apply font-mono font-medium;
+}
+
+.item-val-transport {
+  @apply text-blue-300;
 }
 
 .item-bonus {

@@ -66,7 +66,10 @@ const openImportModal = (payload?: {
     
     <template v-if="isProductionView">
       <StationTabBar :active-supply-sector-id="overviewState.supplySectorId" @open-supply="overviewState.supplySectorId = $event" />
-      <ContextToolbar @open-import="openImportModal" />
+      <ContextToolbar
+        :active-supply-sector-id="overviewState.supplySectorId"
+        @open-import="openImportModal"
+      />
       
       <template v-if="empireStore.activeStationId === null">
         <div v-if="overviewState.supplySectorId" class="mt-6">

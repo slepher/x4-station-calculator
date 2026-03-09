@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useStationStore } from '@/store/useStationStore'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
 import PriceSlider from '@/components/common/PriceSlider.vue'
@@ -9,18 +10,33 @@ import X4NumberInput from '@/components/common/X4NumberInput.vue'
 import VolumeControlSlider from '@/components/common/VolumeControlSlider.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
+import { analyzeStation } from '@/store/logic/analyzeStation'
+import type { SavedModule } from '@/types/x4'
 
 const store = useStationStore()
+const gameDataStore = useGameDataStore()
 const { translateModule, translateWare, translate } = useX4I18n()
 const { t } = useI18n()
+const props = withDefaults(defineProps<{
+  plannedModulesOverride?: SavedModule[] | null
+  hideWorkersView?: boolean
+}>(), {
+  plannedModulesOverride: null,
+  hideWorkersView: false
+})
 
 const viewMode = ref<'materials' | 'time' | 'workers' | 'volume'>('materials')
 const views = computed(() => [
   { key: 'materials', label: t('station.view_cost') },
   { key: 'volume', label: t('station.view_volume') },
   { key: 'time', label: t('station.view_time') },
-  { key: 'workers', label: t('station.view_workers') }
+  ...(props.hideWorkersView ? [] : [{ key: 'workers', label: t('station.view_workers') }])
 ])
+watch(views, (nextViews) => {
+  if (!nextViews.some((item) => item.key === viewMode.value)) {
+    viewMode.value = 'materials'
+  }
+}, { immediate: true })
 const transportShipCapacity = computed({
   get: () => store.settings.transportShipCapacity,
   set: (val) => store.updateSetting('transportShipCapacity', val)
@@ -41,25 +57,36 @@ const workforceEfficiencyColor = computed(() => {
   return 'text-red-400'
 })
 
+const analysis = computed(() => {
+  if (!props.plannedModulesOverride) return store.stationAnalysis
+  return analyzeStation(
+    props.plannedModulesOverride,
+    gameDataStore.modulesMap,
+    gameDataStore.waresMap,
+    buildPriceMultiplier.value,
+    useHQ.value
+  )
+})
+
 const maxAllowedWorkforce = computed(() => {
-  const analysis = store.stationAnalysis
-  const needed = analysis.totalNeeded || 0;
-  const capacity = analysis.totalCapacity || 0;
+  const currentAnalysis = analysis.value
+  const needed = currentAnalysis.totalNeeded || 0;
+  const capacity = currentAnalysis.totalCapacity || 0;
   return Math.min(needed, capacity);
 });
 
 const saturationPercent = computed({
   get: () => {
-    const analysis = store.stationAnalysis
-    const capacity = analysis.totalCapacity || 0;
+    const currentAnalysis = analysis.value
+    const capacity = currentAnalysis.totalCapacity || 0;
     if (capacity === 0) return 0;
     const currentVal = store.settings.workforceAuto ? store.actualWorkforce : store.settings.manualWorkforce;
     return Math.round((currentVal / capacity) * 100);
   },
   set: (val: number) => {
     if (store.settings.workforceAuto) return;
-    const analysis = store.stationAnalysis
-    const capacity = analysis.totalCapacity || 0;
+    const currentAnalysis = analysis.value
+    const capacity = currentAnalysis.totalCapacity || 0;
     store.updateSetting('manualWorkforce', Math.min(Math.round((val / 100) * capacity), capacity));
   }
 })
@@ -111,16 +138,16 @@ const formatTime = (seconds: number) => {
 }
 
 const data = computed(() => {
-  const analysis = store.stationAnalysis
+  const currentAnalysis = analysis.value
   
   if (viewMode.value === 'time') {
     return {
-      totalValue: analysis.totalTime,
+      totalValue: currentAnalysis.totalTime,
       unit: '',
       isTime: true,
       summaryItems: [], // 时间视图不需要汇总行明细
-      moduleGroups: analysis.moduleGroups.map((group: any) => {
-        const moduleData = store.modules[group.id]
+      moduleGroups: currentAnalysis.moduleGroups.map((group: any) => {
+        const moduleData = gameDataStore.modulesMap[group.id]
         return {
           ...group,
           displayName: moduleData ? translateModule(moduleData) : group.id,
@@ -140,36 +167,36 @@ const data = computed(() => {
 
   if (viewMode.value === 'workers') {
     const summaryItems = [
-      { id: 'cap', displayName: t('station.total_capacity'), count: analysis.totalCapacity, price: 0 }
+      { id: 'cap', displayName: t('station.total_capacity'), count: currentAnalysis.totalCapacity, price: 0 }
     ]
 
     // 如果有 PHQ，拆分总需求
-    if (analysis.playerHQNeeded > 0) {
+    if (currentAnalysis.playerHQNeeded > 0) {
       summaryItems.push({ 
         id: 'need', 
         displayName: t('station.total_needed'), 
-        count: analysis.totalNeeded - analysis.playerHQNeeded, 
+        count: currentAnalysis.totalNeeded - currentAnalysis.playerHQNeeded, 
         price: 0 
       })
       summaryItems.push({ 
         id: 'need', 
         displayName: translate('player_hq', '{20102,2011}', 'module'), 
-        count: analysis.playerHQNeeded, 
+        count: currentAnalysis.playerHQNeeded, 
         price: 0 
       })
     } else {
       summaryItems.push({ 
         id: 'need', 
         displayName: t('station.total_needed'), 
-        count: analysis.totalNeeded, 
+        count: currentAnalysis.totalNeeded, 
         price: 0 
       })
     }
 
-    const moduleGroups = analysis.moduleGroups
+    const moduleGroups = currentAnalysis.moduleGroups
       .filter((group: any) => group.unitCapacity || group.unitNeeded)
       .map((group: any) => {
-        const moduleData = store.modules[group.id]
+        const moduleData = gameDataStore.modulesMap[group.id]
         const items = []
         if (group.unitCapacity) {
           items.push({ 
@@ -196,7 +223,7 @@ const data = computed(() => {
       })
 
     return {
-      totalValue: analysis.totalWorkerDiff,
+      totalValue: currentAnalysis.totalWorkerDiff,
       unit: '',
       isWorkers: true,
       summaryItems,
@@ -206,24 +233,24 @@ const data = computed(() => {
 
   if (viewMode.value === 'volume') {
     return {
-      totalValue: analysis.totalVolume,
+      totalValue: currentAnalysis.totalVolume,
       unit: 'm³',
       isVolume: true,
-      summaryItems: analysis.summaryItems.map((item: any) => {
-        const ware = store.wares[item.id]
+      summaryItems: currentAnalysis.summaryItems.map((item: any) => {
+        const ware = gameDataStore.waresMap[item.id]
         return {
           ...item,
           displayName: ware ? translateWare(ware) : item.id
         }
       }),
-      moduleGroups: analysis.moduleGroups.map((group: any) => {
-        const moduleData = store.modules[group.id]
+      moduleGroups: currentAnalysis.moduleGroups.map((group: any) => {
+        const moduleData = gameDataStore.modulesMap[group.id]
         return {
           ...group,
           displayName: moduleData ? translateModule(moduleData) : group.id,
           displayValue: group.volume,
           items: group.items.map((item: any) => {
-            const ware = store.wares[item.id]
+            const ware = gameDataStore.waresMap[item.id]
             return {
               ...item,
               displayName: ware ? translateWare(ware) : item.id
@@ -236,23 +263,23 @@ const data = computed(() => {
 
   // Default: materials
   return {
-    totalValue: analysis.totalCost,
+    totalValue: currentAnalysis.totalCost,
     unit: 'Cr',
-    summaryItems: analysis.summaryItems.map((item: any) => {
-      const ware = store.wares[item.id]
+    summaryItems: currentAnalysis.summaryItems.map((item: any) => {
+      const ware = gameDataStore.waresMap[item.id]
       return {
         ...item,
         displayName: ware ? translateWare(ware) : item.id
       }
     }),
-    moduleGroups: analysis.moduleGroups.map((group: any) => {
-      const moduleData = store.modules[group.id]
+    moduleGroups: currentAnalysis.moduleGroups.map((group: any) => {
+      const moduleData = gameDataStore.modulesMap[group.id]
       return {
         ...group,
         displayName: moduleData ? translateModule(moduleData) : group.id,
         displayValue: group.value,
         items: group.items.map((item: any) => {
-          const ware = store.wares[item.id]
+          const ware = gameDataStore.waresMap[item.id]
           return {
             ...item,
             displayName: ware ? translateWare(ware) : item.id
@@ -292,30 +319,30 @@ const hasDashboardData = computed(() => {
     </div>
 
     <!-- Stats Bar -->
-    <div class="stats-bar" v-if="store.stationAnalysis.moduleGroups.length > 0">
+    <div class="stats-bar" v-if="analysis.moduleGroups.length > 0">
       <!-- Row 1: Cost, Volume, Workers Needed -->
       <div class="stat-item">
         <span class="stat-label">{{ t('station.summary_cost') }}</span>
-        <span class="stat-value text-red-400">{{ formatLargeNum(store.stationAnalysis.totalCost) }} <small>Cr</small></span>
+        <span class="stat-value text-red-400">{{ formatLargeNum(analysis.totalCost) }} <small>Cr</small></span>
       </div>
       <div class="stat-item">
         <span class="stat-label">{{ t('station.summary_volume') }}</span>
-        <span class="stat-value text-blue-400">{{ formatLargeNum(store.stationAnalysis.totalVolume) }} <small>m³</small></span>
+        <span class="stat-value text-blue-400">{{ formatLargeNum(analysis.totalVolume) }} <small>m³</small></span>
       </div>
       <div class="stat-item">
         <span class="stat-label">{{ t('station.summary_workers_needed') }}</span>
-        <span class="stat-value text-emerald-400">{{ formatNum(store.stationAnalysis.totalNeeded) }}</span>
+        <span class="stat-value text-emerald-400">{{ formatNum(analysis.totalNeeded) }}</span>
       </div>
 
       <!-- Row 2: Time, Ships, Efficiency -->
       <div class="stat-item">
         <span class="stat-label">{{ t('station.summary_time') }}</span>
-        <span class="stat-value text-red-400">{{ formatTime(store.stationAnalysis.totalTime) }}</span>
+        <span class="stat-value text-red-400">{{ formatTime(analysis.totalTime) }}</span>
       </div>
       <div class="stat-item">
         <span class="stat-label">{{ t('station.summary_transport_trips') }}</span>
         <span class="stat-value text-blue-400">
-          {{ Math.ceil(store.stationAnalysis.totalVolume / transportShipCapacity) }}
+          {{ Math.ceil(analysis.totalVolume / transportShipCapacity) }}
           <small class="text-xs text-slate-500 font-normal">({{ formatLargeNum(transportShipCapacity) }})</small>
         </span>
       </div>
@@ -363,7 +390,7 @@ const hasDashboardData = computed(() => {
     </div>
 
     <!-- Footer with Controls -->
-    <div class="dashboard-footer" v-if="hasDashboardData && (viewMode === 'materials' || viewMode === 'workers' || viewMode === 'volume')">
+    <div class="dashboard-footer" v-if="hasDashboardData && (viewMode === 'materials' || (!props.hideWorkersView && viewMode === 'workers') || viewMode === 'volume')">
       <div v-if="viewMode === 'materials'" class="simulation-controls">
         <PriceSlider 
           v-model="buildPriceMultiplier" 
@@ -384,18 +411,18 @@ const hasDashboardData = computed(() => {
         />
       </div>
 
-      <div v-if="viewMode === 'workers'" class="workforce-control-panel">
+      <div v-if="!props.hideWorkersView && viewMode === 'workers'" class="workforce-control-panel">
         <div class="control-header">
           <div class="flex items-center gap-2">
             <span class="text-[10px] text-slate-500 font-bold uppercase">{{ t('station.control_actual_workforce') }}</span>
 
             <X4NumberInput v-if="!store.settings.workforceAuto" v-model="manualWorkforce"
-              :max="store.stationAnalysis.totalCapacity" width-class="w-24" />
+              :max="analysis.totalCapacity" width-class="w-24" />
             <span v-else class="val-text-display">
               {{ store.actualWorkforce }}
             </span>
           </div>
-          <span class="percent-display">{{ Math.round((store.actualWorkforce / (store.stationAnalysis.totalCapacity || 1)) * 100)
+          <span class="percent-display">{{ Math.round((store.actualWorkforce / (analysis.totalCapacity || 1)) * 100)
             }}%</span>
         </div>
 

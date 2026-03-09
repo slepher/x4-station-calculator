@@ -447,7 +447,8 @@ class X4PrecisionLoader:
                     "cycleTime": 0,
                     "workforce": { "capacity": wf_cap, "needed": wf_val, "maxBonus": 0 },
                     "outputs": {}, 
-                    "inputs": {}
+                    "inputs": {},
+                    "dockingCount": 0
                 }
                 
                 # 初始颜色分配 
@@ -535,6 +536,13 @@ class X4PrecisionLoader:
                             "capacity": cap,
                             "type": c_type
                         }
+
+                if m_class == 'pier':
+                    # 统计 pier 宏中 <connections> 下 <connection> 节点数量
+                    # 作为泊位连接数量输出为 dockingCount
+                    connections_node = macro.find('connections')
+                    if connections_node is not None:
+                        module_data['dockingCount'] = len(connections_node.findall('connection'))
 
                 self.all_modules.append(module_data)
                 count += 1

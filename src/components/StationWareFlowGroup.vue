@@ -6,7 +6,7 @@ import { useStationStore } from '@/store/useStationStore'
 defineProps<{
   title: string
   items: any[]
-  viewMode: 'quantity' | 'volume' | 'economy'
+  viewMode: 'quantity' | 'volume' | 'economy' | 'transport'
 }>()
 
 const store = useStationStore()
@@ -31,6 +31,7 @@ const store = useStationStore()
       :name="item.name"
       :netRate="viewMode === 'quantity' ? item.netRate : 0"
       :netVolume="item.netVolume"
+      :transportDemand="item.transportDemand"
       :netValue="item.netValue"
       :transportType="item.transportType"
       :unitVolume="item.unitVolume"
@@ -41,6 +42,7 @@ const store = useStationStore()
       :locked="store.isWareLocked(item.id)"
       :priorityLevel="store.getResolvedLevel(item.id)"
       :viewMode="viewMode"
+      :transportMinutes="store.settings.transportMinutes"
       @update:locked="store.toggleWareLock(item.id)"
       @update:priorityLevel="store.toggleWarePriority(item.id)"
     />
