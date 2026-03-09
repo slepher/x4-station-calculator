@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useStationStore } from '@/store/useStationStore'
-import CollapsibleDetailList from './common/CollapsibleDetailList.vue'
-import LockButton from './common/LockButton.vue'
-import FavoriteButton from './common/FavoriteButton.vue'
-import VolumeTooltip from './common/VolumeTooltip.vue'
+import CollapsibleDetailList from '../common/CollapsibleDetailList.vue'
+import LockButton from '../common/LockButton.vue'
+import FavoriteButton from '../common/FavoriteButton.vue'
+import VolumeTooltip from '../common/VolumeTooltip.vue'
 
 const props = defineProps<{
   resourceId: string

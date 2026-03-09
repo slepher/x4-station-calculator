@@ -1,23 +1,27 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useStationStore } from '@/store/useStationStore'
 import { useI18n } from 'vue-i18n'
 import type { StationType } from '@/types/x4'
 import X4NumberInput from '@/components/common/X4NumberInput.vue'
 import { useTitleDisplayNameModel } from '@/composables/useTitleDisplayNameModel'
+import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 
 const { t } = useI18n()
 const empireStore = useEmpireStore()
 const stationStore = useStationStore()
-const emit = defineEmits<{
-  (e: 'open-import', payload?: {
-    initialTab?: 'logic-flow' | 'game-blueprint' | 'x4-station'
-  }): void
-}>()
 const props = defineProps<{
   activeSupplySectorId?: string | null
 }>()
+
+const importModalState = reactive<{
+  isOpen: boolean
+  initialTab: 'logic-flow' | 'game-blueprint' | 'x4-station'
+}>({
+  isOpen: false,
+  initialTab: 'game-blueprint'
+})
 
 // --- 状态判断 ---
 const isOverview = computed(() => empireStore.activeStationId === null)
@@ -139,9 +143,8 @@ const races = computed(() => [
 ])
 
 const handleOpenImport = () => {
-  emit('open-import', {
-    initialTab: 'logic-flow'
-  })
+  importModalState.initialTab = 'logic-flow'
+  importModalState.isOpen = true
 }
 </script>
 
@@ -316,6 +319,12 @@ const handleOpenImport = () => {
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
       </button>
     </div>
+
+    <ImportPlanModal
+      :isOpen="importModalState.isOpen"
+      :initialTab="importModalState.initialTab"
+      @close="importModalState.isOpen = false"
+    />
   </div>
 </template>
 

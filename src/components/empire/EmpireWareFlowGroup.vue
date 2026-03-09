@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CollapsibleDetailList from './common/CollapsibleDetailList.vue'
+import CollapsibleDetailList from '../common/CollapsibleDetailList.vue'
 import EmpireWareFlow from './EmpireWareFlow.vue'
 
 defineProps<{

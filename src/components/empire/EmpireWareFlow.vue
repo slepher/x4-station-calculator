@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import CollapsibleDetailList from './common/CollapsibleDetailList.vue'
+import CollapsibleDetailList from '../common/CollapsibleDetailList.vue'
 
 const props = defineProps<{
   resourceId: string

@@ -10,10 +10,10 @@ import { buildEmpireImportTargets, buildStationImportPayload, type LogicFlowImpo
 import { getLogicFlowGroupDisplayName } from '@/store/logic/logicFlowGroupName'
 import { parseGameComLink, parseXmlBlueprintMeta, resolveModuleId } from '@/store/logic/blueprintParser'
 import TopViewSwitch from '@/components/common/TopViewSwitch.vue'
-import LogicFlowImportBody from './LogicFlowImportBody.vue'
+import LogicFlowImportBody from '../logic-flow/LogicFlowImportBody.vue'
 import LogicFlowImportWarningModal from './LogicFlowImportWarningModal.vue'
 import StationImportConfirmDialog from './StationImportConfirmDialog.vue'
-import SmartSaveDialog from './SmartSaveDialog.vue'
+import SmartSaveDialog from '../common/SmartSaveDialog.vue'
 
 type ImportTabKey = 'logic-flow' | 'game-blueprint' | 'x4-station'
 type BlueprintModule = { id: string; count: number }

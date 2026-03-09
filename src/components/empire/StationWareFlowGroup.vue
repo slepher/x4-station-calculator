@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CollapsibleDetailList from './common/CollapsibleDetailList.vue'
+import CollapsibleDetailList from '../common/CollapsibleDetailList.vue'
 import StationWareFlow from './StationWareFlow.vue'
 import { useStationStore } from '@/store/useStationStore'
 

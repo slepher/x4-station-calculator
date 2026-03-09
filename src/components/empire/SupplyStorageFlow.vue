@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import CollapsibleDetailList from './common/CollapsibleDetailList.vue'
+import CollapsibleDetailList from '../common/CollapsibleDetailList.vue'
 import type { SupplyStorageFlowDetail } from '@/types/x4'
 
 const props = defineProps<{
