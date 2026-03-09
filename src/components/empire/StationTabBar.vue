@@ -27,9 +27,6 @@ const stations = computed(() => {
 const sectors = computed(() => empireStore.sectors)
 
 const activeStationId = computed(() => empireStore.activeStationId)
-const draggingType = ref<'station' | null>(null)
-const draggingStationId = ref<string | null>(null)
-const hoveredDropSectorId = ref<string | null>(null)
 
 const tabGroups = computed(() => {
   const unassigned = stations.value.filter((station) => !station.sectorId)
@@ -80,46 +77,6 @@ const openSupply = (sectorId: string) => {
 const openOverview = () => {
   empireStore.selectStation(null)
   emit('open-supply', null)
-}
-
-const onStationDragStart = (event: DragEvent, stationId: string) => {
-  draggingType.value = 'station'
-  draggingStationId.value = stationId
-  event.dataTransfer?.setData('text/x-x4-tab-drag-type', 'station')
-  event.dataTransfer?.setData('text/x-x4-tab-station-id', stationId)
-  event.dataTransfer!.effectAllowed = 'move'
-}
-
-const onDragEnd = () => {
-  draggingType.value = null
-  draggingStationId.value = null
-  hoveredDropSectorId.value = null
-}
-
-const onDropZoneDragOver = (event: DragEvent, targetSectorId: string | null) => {
-  const payloadType = draggingType.value || event.dataTransfer?.getData('text/x-x4-tab-drag-type') || null
-  if (payloadType !== 'station') return
-  event.preventDefault()
-  event.dataTransfer!.dropEffect = 'move'
-  hoveredDropSectorId.value = targetSectorId ?? '__unassigned__'
-}
-
-const onDropZoneDragLeave = (targetSectorId: string | null) => {
-  const key = targetSectorId ?? '__unassigned__'
-  if (hoveredDropSectorId.value === key) {
-    hoveredDropSectorId.value = null
-  }
-}
-
-const onDropToZone = (event: DragEvent, targetSectorId: string | null) => {
-  event.preventDefault()
-  const payloadType = draggingType.value || event.dataTransfer?.getData('text/x-x4-tab-drag-type') || null
-  const stationId = draggingStationId.value || event.dataTransfer?.getData('text/x-x4-tab-station-id') || null
-
-  if (payloadType === 'station' && stationId) {
-    empireStore.moveStationToSector(stationId, targetSectorId)
-  }
-  onDragEnd()
 }
 
 // 右键菜单逻辑
@@ -200,15 +157,15 @@ const cancelDelete = () => {
         </div>
       </div>
 
-      <div class="h-6 w-px bg-slate-700/50 mx-1 self-center"></div>
+      <div
+        v-if="tabGroups.unassigned.length > 0"
+        class="h-6 w-px bg-slate-700/50 mx-1 self-center"
+      ></div>
 
       <div class="tabs-draggable-list">
         <div
+          v-if="tabGroups.unassigned.length > 0"
           class="tab-drop-group"
-          :class="{ 'drop-active': draggingType === 'station' && hoveredDropSectorId === '__unassigned__' }"
-          @dragover="onDropZoneDragOver($event, null)"
-          @dragleave="onDropZoneDragLeave(null)"
-          @drop="onDropToZone($event, null)"
         >
         <div
           v-for="station in tabGroups.unassigned"
@@ -216,9 +173,6 @@ const cancelDelete = () => {
           class="tab-item station-tab"
           :data-station-id="station.id"
           :class="{ 'active': activeStationId === station.id }"
-          draggable="true"
-          @dragstart="onStationDragStart($event, station.id)"
-          @dragend="onDragEnd"
           @click="selectStation(station.id)"
           @contextmenu.stop="openMenu(station.id, $event)"
         >
@@ -228,19 +182,12 @@ const cancelDelete = () => {
             <span class="tab-label max-w-[120px] truncate">{{ station.name }}</span>
           </div>
         </div>
-        <div v-if="draggingType === 'station' && hoveredDropSectorId === '__unassigned__'" class="tab-drop-hint">
-          {{ $t('sectorManagement.drop_move_station') }}
-        </div>
         </div>
 
         <div
           v-for="group in tabGroups.sectorGroups"
           :key="`group-${group.id}`"
           class="sector-tab-group"
-          :class="{ 'drop-active': draggingType === 'station' && hoveredDropSectorId === group.id }"
-          @dragover="onDropZoneDragOver($event, group.id)"
-          @dragleave="onDropZoneDragLeave(group.id)"
-          @drop="onDropToZone($event, group.id)"
         >
           <div class="h-6 w-px bg-slate-700/50 mx-1 self-center"></div>
 
@@ -250,9 +197,6 @@ const cancelDelete = () => {
             class="tab-item station-tab"
             :data-station-id="station.id"
             :class="{ 'active': activeStationId === station.id }"
-            draggable="true"
-            @dragstart="onStationDragStart($event, station.id)"
-            @dragend="onDragEnd"
             @click="selectStation(station.id)"
             @contextmenu.stop="openMenu(station.id, $event)"
           >
@@ -274,9 +218,6 @@ const cancelDelete = () => {
               <span class="tab-icon">📦</span>
               <span class="tab-label max-w-[120px] truncate">{{ group.name }}</span>
             </div>
-          </div>
-          <div v-if="draggingType === 'station' && hoveredDropSectorId === group.id" class="tab-drop-hint">
-            {{ $t('sectorManagement.drop_move_station') }}
           </div>
         </div>
       </div>
@@ -354,13 +295,6 @@ const cancelDelete = () => {
 }
 .sector-tab-group {
   @apply flex items-end gap-1 rounded-md transition-colors;
-}
-.sector-tab-group.drop-active,
-.tab-drop-group.drop-active {
-  @apply bg-sky-900/20;
-}
-.tab-drop-hint {
-  @apply text-[10px] px-2 py-0.5 rounded bg-sky-700/30 text-sky-200 mb-1;
 }
 .tabs-scroll-area::-webkit-scrollbar {
   display: none; /* Chrome/Safari */
