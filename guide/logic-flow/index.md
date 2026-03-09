@@ -1,3 +1,3 @@
 # Logic Flow Index
 
-guide.logic-flow.tabbar -> tabbar
+guide.logic-flow.toolbar -> toolbar

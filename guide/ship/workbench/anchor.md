@@ -11,12 +11,30 @@
 - `guide.ship.workbench.slot-type.consumables` -> 点击 `[data-testid='slot-type-consumables']`，断言 `[data-testid='ship-storage-panel']` 可见
 - `guide.ship.workbench.slot-type.units` -> 点击 `[data-testid='slot-type-units']`，断言 `[data-testid='ship-storage-panel']` 可见
 - `guide.ship.workbench.change-ship` -> 点击 `[data-testid='ship-build-change-ship-fit-header']`，断言 `[data-testid='ship-build-view'][data-view-mode='selector']`
+- `guide.ship.workbench.slot-row` -> 点击 `.slot-row`（推荐优先用 `[data-testid^='slot-']`），断言 `[data-testid='equipment-picker']` 可见
 - `guide.ship.workbench.open-slot-picker` -> 点击 `[data-testid^='slot-']`，断言 `[data-testid='equipment-picker']` 可见
 - `guide.ship.workbench.select-candidate` -> 点击 `[data-testid^='candidate-']`，断言候选项含 `candidate-item-active`
 - `guide.ship.workbench.picker-filter-race` -> 点击 `[data-testid^='race-']`，断言 `[data-testid='equipment-picker']` 可见
 - `guide.ship.workbench.picker-filter-mk` -> 点击 `[data-testid^='mk-']`，断言 `[data-testid='equipment-picker']` 可见
 - `guide.ship.workbench.picker-filter-tag` -> 点击 `[data-testid^='tag-']`，断言 `[data-testid='equipment-picker']` 可见
 - `guide.ship.workbench.confirm-picker` -> 点击 `[data-testid='picker-confirm']`，断言 `[data-testid='ship-build-panel-fit']` 可见
+
+## 第二章：槽位类型映射
+
+- 主槽位类型（`slot-type-*`）:
+  - `engine`
+  - `thruster`
+  - `shield`
+  - `weapon`
+  - `turret`
+  - `consumables`
+  - `units`
+- `countermeasure` 说明:
+  - 无独立 `slot-type-counter` 按钮。
+  - 归属 `slot-type-consumables`（在 `ship-storage-panel` 中以 countermeasure 形式配置）。
+- `units` 说明:
+  - `slot-type-units` 与 `slot-type-consumables` 一样走 `ship-storage-panel`。
+  - 不通过 `equipment-picker` 进行装备选择。
 
 ## Pending
 

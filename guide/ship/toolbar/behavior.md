@@ -1,4 +1,4 @@
-# Ship Tabbar Behavior
+# Ship Toolbar Behavior
 
 ## 第一章：操作定义
 

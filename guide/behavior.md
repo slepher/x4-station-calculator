@@ -29,3 +29,11 @@
   - `index`: `guide.language`
   - `action`: 通过语言下拉框切换语言。
   - `expected`: 语言切换成功并刷新界面文案。
+- `guide.toolbar-dirty-guard`
+  - `index`: `guide.empire`
+  - `action`: 在任一主视图制造未保存改动后，点击工具栏 `New|新建` 或 `Save|保存`。
+  - `expected`: 进入保存确认流程并出现 SmartSaveDialog（可通过标题与按钮文本定位）。
+- `guide.toolbar-dirty-choice-result`
+  - `index`: `guide.empire`
+  - `action`: 在 SmartSaveDialog 中选择 `丢弃并新建|Discard & New` 或 `保存|Save` 路径。
+  - `expected`: 弹窗关闭；流程继续执行对应路径（丢弃后进入新建态，保存后进入已保存态）。

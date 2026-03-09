@@ -40,13 +40,17 @@
   - `action`: 点击 Consumables 槽位类型按钮。
   - `enable`: `[data-testid='ship-build-view'][data-view-mode='workbench']` 可见
   - `disable`: `slot-type-consumables` 按钮不存在
-  - `expected`: `slot-type-consumables` 激活，且 `ship-storage-panel` 可见。
+  - `expected`: `slot-type-consumables` 激活，且 `ship-storage-panel` 可见（不走 `equipment-picker`）。
 
 - `guide.ship.workbench.slot-type.units`
   - `action`: 点击 Units 槽位类型按钮。
   - `enable`: `[data-testid='ship-build-view'][data-view-mode='workbench']` 可见
   - `disable`: `slot-type-units` 按钮不存在
-  - `expected`: `slot-type-units` 激活，且 `ship-storage-panel` 可见。
+  - `expected`: `slot-type-units` 激活，且 `ship-storage-panel` 可见（不走 `equipment-picker`）。
+
+- `guide.ship.workbench.slot-type-countermeasure-mapping`
+  - `action`: 需要配置 countermeasure 时，先点击 `slot-type-consumables`。
+  - `expected`: 当前实现无 `slot-type-counter` 独立按钮；countermeasure 归属 consumables 存储面板路径。
 
 - `guide.ship.workbench.change-ship`
   - `action`: 点击工作台头部的切换船只按钮。
@@ -56,9 +60,10 @@
 
 - `guide.ship.workbench.open-slot-picker`
   - `action`: 点击装备槽位。
-  - `enable`: `ship-build-view[data-view-mode='workbench']` 且 `slot-type-consumables/slot-type-units` 未激活
-  - `disable`: `ship-storage-panel` 可见
+  - `enable`: `ship-build-view[data-view-mode='workbench']` 且当前激活槽位类型为 `engine|thruster|shield|weapon|turret`。
+  - `not_applicable`: 当前激活槽位类型为 `consumables|units` 时，不进入装备候选流程，改走 `ship-storage-panel` 存储配置流程。
   - `expected`: 候选装备区域 `equipment-picker` 可见。
+  - `locator_hint`: 优先使用 `[data-testid^='slot-']`；无 testid 场景可回退 `.slot-row`。
 
 - `guide.ship.workbench.select-candidate`
   - `select`: `equipment-candidate`

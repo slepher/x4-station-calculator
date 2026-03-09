@@ -213,7 +213,7 @@ const handleDiscard = () => {
             {{ t('logicFlowImport.empire_action_save_import') }}
           </span>
           <span v-else-if="intent === 'NEW'">
-            {{ (showInput || isNewPlan) ? t('menu.btn_save_new_and_create') : t('menu.btn_overwrite_and_create') }}
+            {{ t('menu.btn_save') }}
           </span>
           <span v-else>
             {{ t('menu.btn_save') }}

@@ -70,7 +70,7 @@ const onEsc = () => {
     <div class="flex flex-col gap-1">
       <div class="search-box group" :class="{ 'focused': isFocused }">
         <span class="search-icon">🔍</span>
-        <input ref="searchInput" :value="store.searchQuery" class="search-input" :placeholder="t('planning.search_placeholder')"
+        <input ref="searchInput" :value="store.searchQuery" class="search-input" data-testid="station-module-search-input" :placeholder="t('planning.search_placeholder')"
           @input="onInput" @focus="onFocus" @blur="onBlur" @keydown.esc="onEsc" />
         <button v-show="store.searchQuery"
           class="clear-btn opacity-0 group-hover:opacity-100 transition-opacity duration-200"
@@ -81,10 +81,10 @@ const onEsc = () => {
     </div>
 
     <Transition name="fade-slide">
-      <div v-if="isFocused" class="results-popover pop-right scrollbar-thin" @mousedown.prevent>
-        <div v-for="group in store.filteredModulesGrouped" :key="group.group" class="type-group">
+      <div v-if="isFocused" class="results-popover pop-right scrollbar-thin" data-testid="station-module-candidate-popover" @mousedown.prevent>
+        <div v-for="group in store.filteredModulesGrouped" :key="group.group" class="type-group" :data-testid="`station-module-candidate-group-${group.group}`">
           <div class="group-header">{{ group.displayLabel }}</div>
-          <div v-for="m in group.modules" :key="m.id" class="result-item" @click="handleSelect(m)">
+          <div v-for="m in group.modules" :key="m.id" class="result-item" :data-testid="`station-module-candidate-${m.id}`" @click="handleSelect(m)">
             <div class="color-indicator" :style="{ backgroundColor: m.color_rgb || (m.moduleGroup?.type === 'habitation' || m.moduleGroup?.type?.includes('habitat') ? '#f97316' : '#0ea5e9') }">
             </div>
             <span class="label">{{ m.displayLabel }}</span>

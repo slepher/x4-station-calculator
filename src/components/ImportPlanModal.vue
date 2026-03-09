@@ -37,11 +37,13 @@ const toolbarWorkflow = useToolbarWorkflowController({
 })
 
 const activeTab = ref<ImportTabKey>('game-blueprint')
+const selfClosed = ref(false)
 const x4StationContent = ref('')
 const x4StationHasError = ref(false)
 
 const showStationImportConfirm = ref(false)
 const showEmpireImportConfirm = ref(false)
+const empireImportSubmitted = ref(false)
 const showWarningModal = ref(false)
 const pendingImportSelection = ref<{ planId: string; groupId?: string } | null>(null)
 const pendingStationGroupName = ref('')
@@ -82,6 +84,7 @@ watch(
   () => props.isOpen,
   (isOpen) => {
     if (!isOpen) return
+    selfClosed.value = false
     activeTab.value = props.initialTab
     x4StationHasError.value = false
     pendingImportSelection.value = null
@@ -98,6 +101,7 @@ watch(
 )
 
 const handleClose = () => {
+  selfClosed.value = true
   x4StationHasError.value = false
   showStationImportConfirm.value = false
   showEmpireImportConfirm.value = false
@@ -211,6 +215,7 @@ const executeStationImport = (mode: 'new' | 'overwrite', payload?: StationImport
   showBlueprintStrategyDialog.value = false
   pendingImportSelection.value = null
   pendingLogicFlowModules.value = null
+  handleClose()
 }
 
 const executeEmpireImport = () => {
@@ -275,13 +280,26 @@ const handleImportSelected = (selection: { planId: string; groupId?: string }) =
 }
 
 const handleEmpireImportSubmit = (payload: { choice: 'SAVE_AND_IMPORT' | 'DISCARD_AND_IMPORT' }) => {
+  empireImportSubmitted.value = true
   showEmpireImportConfirm.value = false
-  toolbarWorkflow.runImportAction({
+  const result = toolbarWorkflow.runImportAction({
     storeType: 'station',
     choice: payload.choice,
     defaultEmpireName: t('menu.default_empire_name'),
     importData: () => executeEmpireImport()
   })
+  if (!result.ok) {
+    empireImportSubmitted.value = false
+  }
+}
+
+const handleEmpireImportDialogClose = () => {
+  if (empireImportSubmitted.value) {
+    empireImportSubmitted.value = false
+    handleClose()
+    return
+  }
+  showEmpireImportConfirm.value = false
 }
 
 const getFileStationName = (xmlName: string, fileName: string) => {
@@ -416,6 +434,7 @@ const handleBlueprintActionOverwrite = () => {
     pendingLogicFlowModules.value = null
     pendingImportSelection.value = null
     showBlueprintStrategyDialog.value = false
+    handleClose()
     return
   }
 
@@ -448,6 +467,7 @@ const handleBlueprintActionAdd = () => {
     pendingLogicFlowModules.value = null
     pendingImportSelection.value = null
     showBlueprintStrategyDialog.value = false
+    handleClose()
     return
   }
 
@@ -480,6 +500,7 @@ const handleBlueprintActionNew = () => {
     pendingLogicFlowModules.value = null
     pendingImportSelection.value = null
     showBlueprintStrategyDialog.value = false
+    handleClose()
     return
   }
 
@@ -505,7 +526,7 @@ const handleBlueprintActionNew = () => {
 </script>
 
 <template>
-  <div v-if="isOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" data-testid="import-view-modal">
+  <div v-if="isOpen && !selfClosed" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" data-testid="import-view-modal">
     <div class="w-full max-w-3xl bg-slate-800 border border-slate-600 rounded-lg shadow-2xl flex flex-col animate-fade-in overflow-hidden">
       <div class="flex justify-between items-center px-6 py-4 border-b border-slate-700 bg-slate-900/30">
         <h3 class="text-xl font-bold text-white tracking-wide flex items-center gap-2">
@@ -632,7 +653,7 @@ const handleBlueprintActionNew = () => {
       storeType="station"
       mode="import"
       @submit-import="handleEmpireImportSubmit"
-      @close="showEmpireImportConfirm = false"
+      @close="handleEmpireImportDialogClose"
     />
 
     <LogicFlowImportWarningModal

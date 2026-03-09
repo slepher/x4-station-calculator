@@ -2,8 +2,8 @@
 
 ## 第一章：行为定义
 
-- `guide.logic-flow.tabbar-ref`
+- `guide.logic-flow.toolbar-ref`
   - `type`: `zone`
-  - `index`: `guide.logic-flow.tabbar`
-  - `zone`: `tabbar`
-  - `target`: `tabbar/behavior.md`
+  - `index`: `guide.logic-flow.toolbar`
+  - `zone`: `toolbar`
+  - `target`: `toolbar/behavior.md`

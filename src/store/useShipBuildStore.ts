@@ -32,7 +32,7 @@ const EMPTY_SHIP_STORAGE: ShipBlueprintStorage = {
 
 export type StationActiveView = 'production' | 'flow' | 'ship-build'
 export type ShipBuildStatsViewMode = 'summary' | 'detail'
-export type ShipBuildViewMode = 'selector' | 'workspace'
+export type ShipBuildViewMode = 'selector' | 'workbench'
 export type ShipBuildMockTagPatch = {
   targetShipId: string
   slotType?: EquipmentType
@@ -259,7 +259,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     if (activeBlueprint) {
       // Use queueMicrotask to defer the update until after current execution context
       queueMicrotask(() => {
-        viewMode.value = 'workspace'
+        viewMode.value = 'workbench'
         blueprint.value = { ...activeBlueprint }
 
         // Set dirty to false by directly setting lastSavedSnapshot
@@ -638,7 +638,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
         blueprint.value = createEmptyBlueprintForShip(shipId)
       }
       if (shipId !== null && viewMode.value === 'selector') {
-        viewMode.value = 'workspace'
+        viewMode.value = 'workbench'
       }
       return
     }
@@ -651,7 +651,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     // If selecting the same ship as current blueprint, restore it directly.
     if (blueprint.value?.shipId === shipId) {
       fitMode.value = 'connection'
-      viewMode.value = 'workspace'
+      viewMode.value = 'workbench'
       return
     }
 
@@ -661,7 +661,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     takeSnapshot()
     selectedByConnection.value = {}
     fitMode.value = 'connection'
-    viewMode.value = 'workspace'
+    viewMode.value = 'workbench'
   }
 
   const enterShipSelector = () => {
@@ -669,7 +669,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   }
 
   const cancelShipSelector = () => {
-    viewMode.value = 'workspace'
+    viewMode.value = 'workbench'
   }
 
   const setFitMode = (mode: FitMode) => {
@@ -1133,7 +1133,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     blueprint.value = createEmptyBlueprintForShip(shipId)
     selectedByConnection.value = {}
     fitMode.value = 'connection'
-    viewMode.value = 'workspace'
+    viewMode.value = 'workbench'
     savedBlueprints.value.activeShipId = shipId
     savedBlueprints.value.activeBlueprintId = null
     saveBlueprintsToStorage()

@@ -1,9 +1,11 @@
 # Empire Anchor
 
-`zone`: `guide.empire.tabbar`
-`zone_ref`: `tabbar/`
+- `zone`: `guide.empire.toolbar`
+  - `zone_ref`: `toolbar/`
+- `zone`: `guide.empire.tabbar`
+  - `zone_ref`: `tabbar/`
 
-本层仅声明 zone 对 `tabbar/` 文件夹的引用；具体定位定义见 `tabbar/anchor.md`。
+本层声明 empire 下 `toolbar/` 与 `tabbar/` 两个子区；具体定位定义见各自子目录的 `anchor.md`。
 
 ## Pending
 

@@ -2,9 +2,10 @@
 
 ## 第一章：行为定义
 
-- `guide.ship.tabbar-ref`
-  - `index`: `guide.ship.tabbar`
-  - `zone`: `tabbar`
+- `guide.ship.toolbar-ref`
+  - `index`: `guide.ship.toolbar`
+  - `zone`: `toolbar`
+  - `target`: `toolbar/behavior.md`
 
 - `guide.ship.selector-ref`
   - `index`: `guide.ship.selector`

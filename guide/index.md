@@ -13,11 +13,12 @@ guide.language -> language
 
 .
 ├── empire
+│   ├── toolbar
 │   └── tabbar
 ├── logic-flow
-│   └── tabbar
+│   └── toolbar
 ├── ship
-│   ├── tabbar
+│   ├── toolbar
 │   ├── selector
 │   └── workbench
 ├── import

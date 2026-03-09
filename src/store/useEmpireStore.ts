@@ -180,6 +180,9 @@ export const useEmpireStore = defineStore('empire', () => {
         const sessionTabId = sessionStorage.getItem(SESSION_ACTIVE_STATION_KEY)
         if (sessionTabId && empire.stations.find(s => s.id === sessionTabId)) {
           activeStationId.value = sessionTabId
+        } else if (migrated.state.activeStationId === null) {
+          // Persisted overview state should survive reload.
+          activeStationId.value = null
         } else if (migrated.state.activeStationId && empire.stations.find(s => s.id === migrated.state.activeStationId)) {
           activeStationId.value = migrated.state.activeStationId
         } else {
@@ -248,7 +251,9 @@ export const useEmpireStore = defineStore('empire', () => {
       
       sessionStorage.removeItem(SESSION_ACTIVE_STATION_KEY)
       
-      if (savedEmpires.value.activeStationId && empire.stations.find(s => s.id === savedEmpires.value.activeStationId)) {
+      if (savedEmpires.value.activeStationId === null) {
+        activeStationId.value = null
+      } else if (savedEmpires.value.activeStationId && empire.stations.find(s => s.id === savedEmpires.value.activeStationId)) {
         activeStationId.value = savedEmpires.value.activeStationId
       } else {
         activeStationId.value = empire.stations[0]?.id || null
