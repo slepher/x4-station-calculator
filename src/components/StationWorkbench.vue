@@ -11,7 +11,7 @@ import ContextToolbar from './empire/ContextToolbar.vue'
 import StationWareFlowsDashboard from './empire/StationWareFlowsDashboard.vue'
 import EmpireWareFlowsDashboard from './empire/EmpireWareFlowsDashboard.vue'
 import SectorManagementPanel from './empire/SectorManagementPanel.vue'
-import SupplyStationPlaceholder from './empire/SupplyStationPlaceholder.vue'
+import TransitHubWorkbench from './empire/transit-hub/TransitHubWorkbench.vue'
 import LogicFlowCandidateZone from './logic-flow/LogicFlowCandidateZone.vue'
 import LogicFlowPlanningZone from './logic-flow/LogicFlowPlanningZone.vue'
 import StatusMonitor from './StatusMonitor.vue'
@@ -57,7 +57,7 @@ watchEffect(() => {
       
       <template v-if="empireStore.activeStationId === null">
         <div v-if="overviewState.supplySectorId" class="mt-6">
-          <SupplyStationPlaceholder :sector-id="overviewState.supplySectorId" />
+          <TransitHubWorkbench :sector-id="overviewState.supplySectorId" />
         </div>
 
         <div v-else class="main-layout mt-6">
@@ -70,7 +70,7 @@ watchEffect(() => {
           </div>
 
           <div class="col-span-12 lg:col-span-4">
-            <SupplyStationPlaceholder :sector-id="overviewState.supplySectorId" />
+            <TransitHubWorkbench :sector-id="overviewState.supplySectorId" />
           </div>
         </div>
       </template>

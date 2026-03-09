@@ -1,39 +1,30 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
-import CollapsibleDetailList from '../common/CollapsibleDetailList.vue'
-import type { SupplyStorageFlowDetail } from '@/types/x4'
+import CollapsibleDetailList from '@/components/common/CollapsibleDetailList.vue'
+
+interface TransportDetail {
+  stationId: string
+  stationName: string
+  stationCount: number
+  transportVolume: number
+}
 
 const props = defineProps<{
   resourceId: string
   name: string
-  unitVolume: number
-  totalRequiredStorageVolume: number
-  details: SupplyStorageFlowDetail[]
+  totalTransportVolume: number
+  details: TransportDetail[]
 }>()
 
-const { t } = useI18n()
+const formatNum = (n: number, digits: number = 1) => new Intl.NumberFormat('en-US', {
+  maximumFractionDigits: digits,
+  minimumFractionDigits: digits
+}).format(n)
 
-const totalRequiredCount = computed(() => {
-  if (!props.unitVolume || props.unitVolume <= 0) return 0
-  return Math.ceil(props.totalRequiredStorageVolume / props.unitVolume)
-})
+const formattedTotal = computed(() => `${formatNum(props.totalTransportVolume, 1)}m³`)
 
 const formattedDetails = computed(() => {
-  return [...props.details]
-    .sort((a, b) => {
-      if (a.kind !== b.kind) return a.kind === 'production' ? -1 : 1
-      return b.storageVolume - a.storageVolume
-    })
-    .map((detail) => ({
-      ...detail,
-      storageCount: (!props.unitVolume || props.unitVolume <= 0)
-        ? 0
-        : Math.ceil(detail.storageVolume / props.unitVolume),
-      kindLabel: detail.kind === 'production'
-        ? t('sectorManagement.supply_storage_production')
-        : t('sectorManagement.supply_storage_consumption')
-    }))
+  return [...props.details].sort((a, b) => b.transportVolume - a.transportVolume)
 })
 </script>
 
@@ -48,11 +39,12 @@ const formattedDetails = computed(() => {
       </template>
       <template #header>
         <div class="value value-pos">
-          {{ totalRequiredCount }}
+          {{ formattedTotal }}
           <svg class="w-3.5 h-3.5 text-blue-300/70" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
-            <path d="m3.3 7 8.7 5 8.7-5"/>
-            <path d="M12 22V12"/>
+            <rect x="1" y="3" width="15" height="13"></rect>
+            <path d="M16 8h4l3 3v5h-7z"></path>
+            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+            <circle cx="18.5" cy="18.5" r="2.5"></circle>
           </svg>
         </div>
       </template>
@@ -62,12 +54,9 @@ const formattedDetails = computed(() => {
           <span class="qty">{{ item.stationCount }}</span>
           <span class="symbol">x</span>
           <span class="name">{{ item.stationName }}</span>
-          <span :class="item.kind === 'production' ? 'kind-pos' : 'kind-neg'">
-            {{ item.kindLabel }}
-          </span>
         </span>
         <div class="item-val-group">
-          <span class="item-count">{{ item.storageCount }}</span>
+          <span class="item-val">{{ formatNum(item.transportVolume, 1) }}m³</span>
         </div>
       </template>
     </CollapsibleDetailList>
@@ -107,19 +96,11 @@ const formattedDetails = computed(() => {
   @apply text-xs font-normal text-slate-400;
 }
 
-.kind-pos {
-  @apply text-emerald-400/80 text-[10px];
-}
-
-.kind-neg {
-  @apply text-red-400/80 text-[10px];
-}
-
 .item-val-group {
   @apply flex items-center gap-3;
 }
 
-.item-count {
-  @apply font-mono font-bold text-blue-300;
+.item-val {
+  @apply font-mono font-medium text-blue-300;
 }
 </style>

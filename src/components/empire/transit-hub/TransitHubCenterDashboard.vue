@@ -1,0 +1,205 @@
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import { useGameDataStore } from '@/store/useGameDataStore'
+import { useX4I18n } from '@/utils/UseX4I18n'
+import { useI18n } from 'vue-i18n'
+import type { EmpireGroupedFlows, SupplyStorageFlow } from '@/types/x4'
+import ViewTabUi from '@/components/common/ViewTabUI.vue'
+import TransitHubQuantityView from './TransitHubQuantityView.vue'
+import TransitHubEconomyView from './TransitHubEconomyView.vue'
+import TransitHubStorageView from './TransitHubStorageView.vue'
+import TransitHubTransportView from './TransitHubTransportView.vue'
+
+const props = defineProps<{
+  groupedFlows: EmpireGroupedFlows
+  storageFlows: SupplyStorageFlow[]
+}>()
+
+const gameData = useGameDataStore()
+const { t } = useI18n()
+const { translateWare } = useX4I18n()
+
+type ViewMode = 'quantity' | 'economy' | 'storage' | 'transport'
+const viewMode = ref<ViewMode>('quantity')
+
+const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
+const formatSignedAbs = (n: number) => `${n >= 0 ? '+' : '-'}${formatNum(Math.abs(n))}`
+
+const wrapFlow = (flow: any) => {
+  const wareInfo = gameData.waresMap?.[flow.wareId]
+  return {
+    id: flow.wareId,
+    name: wareInfo ? translateWare(wareInfo) : flow.wareId,
+    ...flow
+  }
+}
+
+const views = computed(() => [
+  { key: 'quantity', label: t('wareflow.quantity_view') },
+  { key: 'economy', label: t('wareflow.economy_view') },
+  { key: 'storage', label: t('wareflow.volume_view') },
+  { key: 'transport', label: t('wareflow.transport_view') }
+])
+
+const title = computed(() => {
+  if (viewMode.value === 'quantity') return t('wareflow.resource_view')
+  if (viewMode.value === 'economy') return t('wareflow.economy_view')
+  if (viewMode.value === 'storage') return t('wareflow.volume_view')
+  return t('wareflow.transport_view')
+})
+
+const grouped = computed(() => {
+  const groups = props.groupedFlows.empireGroups
+  const products = groups.operations.filter(item => item.netRate > 0)
+  const operations = groups.operations.filter(item => item.netRate <= 0)
+  const supplyValue = groups.supply.reduce((sum, item) => sum + item.netValue, 0)
+
+  return {
+    quantity: [
+      { key: 'products', title: t('wareflow.products_group'), items: products.map(wrapFlow) },
+      { key: 'operations', title: t('wareflow.operations_group'), items: operations.map(wrapFlow) },
+      { key: 'supply', title: t('wareflow.supply_group'), items: groups.supply.map(wrapFlow) }
+    ],
+    economy: [
+      {
+        key: 'products',
+        title: t('wareflow.products_income_group'),
+        items: products.map(wrapFlow),
+        sumText: formatSignedAbs(products.reduce((sum, item) => sum + (item.netValue || 0), 0)),
+        sumClass: 'positive'
+      },
+      {
+        key: 'operations',
+        title: t('wareflow.operations_expense_group'),
+        items: operations.map(wrapFlow),
+        sumText: formatSignedAbs(operations.reduce((sum, item) => sum + (item.netValue || 0), 0)),
+        sumClass: 'negative'
+      },
+      {
+        key: 'supply',
+        title: supplyValue >= 0 ? t('wareflow.supply_income_group') : t('wareflow.supply_expense_group'),
+        items: groups.supply.map(wrapFlow),
+        sumText: formatSignedAbs(supplyValue),
+        sumClass: supplyValue >= 0 ? 'positive' : 'negative'
+      }
+    ]
+  }
+})
+
+const hasFlowData = computed(() => props.groupedFlows.flows.length > 0)
+
+const storageItems = computed(() =>
+  props.storageFlows.map((flow) => ({
+    ...flow,
+    name: wrapFlow({ wareId: flow.wareId }).name
+  }))
+)
+const storageTotalVolume = computed(() =>
+  props.storageFlows.reduce((sum, item) => sum + item.totalRequiredStorageVolume, 0)
+)
+const hasStorageData = computed(() => props.storageFlows.length > 0)
+
+const flowByWareId = computed(() => new Map(props.groupedFlows.flows.map((flow) => [flow.wareId, flow])))
+const transportItems = computed(() =>
+  props.storageFlows.map((storageFlow) => {
+    const source = flowByWareId.value.get(storageFlow.wareId)
+    if (!source) {
+      return {
+        wareId: storageFlow.wareId,
+        name: wrapFlow({ wareId: storageFlow.wareId }).name,
+        totalTransportVolume: 0,
+        details: [] as any[]
+      }
+    }
+    const details = source.contributions
+      .map((detail: any) => ({
+        stationId: detail.stationId,
+        stationName: detail.stationName,
+        stationCount: detail.stationCount,
+        transportVolume: Math.abs(detail.netRate) * source.unitVolume
+      }))
+      .filter((detail: any) => detail.transportVolume > 0)
+    const totalTransportVolume = details.reduce((sum: number, detail: any) => sum + detail.transportVolume, 0)
+
+    return {
+      wareId: storageFlow.wareId,
+      name: wrapFlow({ wareId: storageFlow.wareId }).name,
+      totalTransportVolume,
+      details
+    }
+  })
+)
+const transportTotalVolume = computed(() =>
+  transportItems.value.reduce((sum, item) => sum + item.totalTransportVolume, 0)
+)
+const hasTransportData = computed(() =>
+  transportItems.value.some((item) => item.totalTransportVolume > 0)
+)
+</script>
+
+<template>
+  <div class="list-wrapper">
+    <div class="list-header">
+      <h3 class="header-title">{{ title }}</h3>
+      <div class="header-right-group">
+        <ViewTabUi v-model="viewMode" :views="views" color-style="sky" ui-key="transit-hub-wareflow" />
+      </div>
+    </div>
+
+    <div class="list-body custom-scrollbar">
+      <TransitHubQuantityView
+        v-if="viewMode === 'quantity'"
+        :groups="grouped.quantity"
+        :has-data="hasFlowData"
+      />
+      <TransitHubEconomyView
+        v-else-if="viewMode === 'economy'"
+        :groups="grouped.economy"
+        :has-data="hasFlowData"
+      />
+      <TransitHubStorageView
+        v-else-if="viewMode === 'storage'"
+        :items="storageItems"
+        :total-volume="storageTotalVolume"
+        :has-data="hasStorageData"
+      />
+      <TransitHubTransportView
+        v-else
+        :items="transportItems"
+        :total-volume="transportTotalVolume"
+        :has-data="hasTransportData"
+      />
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.list-wrapper {
+  @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden;
+}
+.list-header {
+  @apply flex justify-between items-center p-4 bg-slate-800/30 border-b border-slate-700/50;
+}
+.header-title {
+  @apply text-base font-bold text-slate-100 tracking-wider uppercase;
+}
+.header-right-group {
+  @apply flex items-center gap-3;
+}
+.list-body {
+  @apply p-2 overflow-y-auto;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.3);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.5);
+  border-radius: 2px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.7);
+}
+</style>

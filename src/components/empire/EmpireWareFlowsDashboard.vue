@@ -6,8 +6,8 @@ import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
 import type { EmpireGroupedFlows, SupplyStorageFlow } from '@/types/x4'
 import EmpireWareFlowGroup from './EmpireWareFlowGroup.vue'
-import SupplyStorageFlowItem from './SupplyStorageFlow.vue'
-import SupplyTransportFlowItem from './SupplyTransportFlow.vue'
+import TransitHubStorageFlowItem from './transit-hub/TransitHubStorageFlow.vue'
+import TransitHubTransportFlowItem from './transit-hub/TransitHubTransportFlow.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
 
@@ -207,7 +207,7 @@ const transportTotalVolume = computed(() =>
             </svg>
           </span>
         </div>
-        <SupplyStorageFlowItem
+        <TransitHubStorageFlowItem
           v-for="item in storageFlows"
           :key="item.wareId"
           :resource-id="item.wareId"
@@ -231,7 +231,7 @@ const transportTotalVolume = computed(() =>
             </svg>
           </span>
         </div>
-        <SupplyTransportFlowItem
+        <TransitHubTransportFlowItem
           v-for="item in transportFlows"
           :key="item.wareId"
           :resource-id="item.wareId"
