@@ -34,8 +34,10 @@ const selectedShip = computed(() => {
 
 // ============ 计算辅助函数 ============
 const getPriceByMultiplier = (ware: X4Ware, multiplier: number): number => {
-  const basePrice = ware.price || 0
-  return Math.round(basePrice * multiplier)
+  const minPrice = ware.minPrice ?? ware.price ?? 0
+  const maxPrice = ware.maxPrice ?? ware.price ?? minPrice
+  const ratio = Math.max(0, Math.min(1, multiplier))
+  return Math.round(minPrice + (maxPrice - minPrice) * ratio)
 }
 
 const resolveCostByMethod = (
@@ -409,26 +411,6 @@ const getShipName = (shipId: string | undefined) => {
   <div class="col-span-12 lg:col-span-4 panel-card" data-testid="ship-build-panel-materials">
     <div class="panel-header">{{ t('ship_build.panel_materials') }}</div>
     <div class="material-panel" data-testid="ship-build-materials-panel">
-      <div class="material-method-row">
-        <label class="material-method-label" for="ship-build-material-method-select">
-          {{ t('ship_build.material_method') }}
-        </label>
-        <select
-          id="ship-build-material-method-select"
-          v-model="materialMethod"
-          class="material-method-select"
-          data-testid="ship-build-material-method-select"
-        >
-          <option
-            v-for="method in materialMethodOptions"
-            :key="method"
-            :value="method"
-          >
-            {{ method }}
-          </option>
-        </select>
-      </div>
-
       <div class="material-groups custom-scrollbar">
         <CollapsibleDetailList
           :data="materialSummaryItems"
@@ -534,11 +516,27 @@ const getShipName = (shipId: string | undefined) => {
       </div>
 
       <div class="material-footer" data-testid="ship-build-material-price-slider">
-        <PriceSlider
-          v-model="materialPriceMultiplier"
-          :label="t('ship_build.material_price')"
-          type="buy"
-        />
+        <div class="material-footer-controls">
+          <PriceSlider
+            v-model="materialPriceMultiplier"
+            :label="t('ship_build.material_price')"
+            type="sell"
+          />
+          <select
+            id="ship-build-material-method-select"
+            v-model="materialMethod"
+            class="material-method-select"
+            data-testid="ship-build-material-method-select"
+          >
+            <option
+              v-for="method in materialMethodOptions"
+              :key="method"
+              :value="method"
+            >
+              {{ method }}
+            </option>
+          </select>
+        </div>
       </div>
     </div>
   </div>
@@ -557,16 +555,8 @@ const getShipName = (shipId: string | undefined) => {
   @apply p-4 flex flex-col gap-3;
 }
 
-.material-method-row {
-  @apply flex items-center justify-between gap-3;
-}
-
-.material-method-label {
-  @apply text-[11px] uppercase tracking-wide text-slate-400 font-semibold;
-}
-
 .material-method-select {
-  @apply bg-slate-900/70 border border-slate-700 text-slate-100 text-xs rounded px-2.5 py-1.5 focus:outline-none focus:border-emerald-400;
+  @apply bg-emerald-950/30 border border-emerald-500/40 text-emerald-200 text-xs rounded px-2.5 py-1.5 focus:outline-none focus:border-emerald-300;
 }
 
 .material-groups {
@@ -614,6 +604,26 @@ const getShipName = (shipId: string | undefined) => {
 }
 
 .material-footer {
-  @apply mt-auto pt-2 border-t border-slate-800/80;
+  @apply mt-auto pt-2 border-t border-emerald-500/25;
+}
+
+.material-footer-controls {
+  @apply flex items-center gap-3;
+}
+
+.material-footer-controls :deep(.price-slider) {
+  @apply flex-1;
+}
+
+.material-footer-controls :deep(.slider-header) {
+  @apply text-emerald-300/80;
+}
+
+.material-footer-controls :deep(.custom-range) {
+  @apply bg-emerald-900/40;
+}
+
+.material-footer-controls .material-method-select {
+  @apply ml-auto;
 }
 </style>

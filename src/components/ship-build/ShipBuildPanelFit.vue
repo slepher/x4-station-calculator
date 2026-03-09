@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
-import type { FitMode, FitConnectionRow, FitGroupRow, FitEquipmentOption } from '@/components/ship-build/fitTypes'
+import type { FitMode, FitConnectionRow, FitGroupRow } from '@/components/ship-build/fitTypes'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
-import { useEquipmentStats } from '@/composables/useEquipmentStats'
-import { extractEquipmentSlotCandidatesWithFacets } from '@/store/logic/shipEquipmentPicker'
-import type { EquipmentType, ShipEquipmentSize, X4SlotTag } from '@/types/x4'
+import type { ShipEquipmentSize, X4SlotTag } from '@/types/x4'
 import X4DualPhaseRangeSlider from '@/components/common/X4DualPhaseRangeSlider.vue'
 import ShipStoragePanel from '@/components/ship-build/ShipStoragePanel.vue'
 
@@ -47,16 +45,10 @@ type GroupTabRow = {
   tabs: GroupTabItem[]
 }
 
-type PickerCandidateItem = {
-  id: string | null
-  name: string
-  mk: string | null
-  race: string | null
-  tags: string[]
-}
-
 const props = defineProps<{
   wide?: boolean
+  externalHighlightedEquipmentId?: string | null
+  pickerOpenExternal?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -68,48 +60,8 @@ const emit = defineEmits<{
 }>()
 
 const shipBuildStore = useShipBuildStore()
-const { selectedShip, blueprint, mockTagPatch } = storeToRefs(shipBuildStore)
+const { selectedShip, blueprint, mockTagPatch, isDirty, activeBlueprintStatusLabel, isBuiltInPresetUnchanged } = storeToRefs(shipBuildStore)
 const { applyConnectionAssignment, setConnectionAssignmentCount, enterShipSelector } = shipBuildStore
-
-// Get first summary (Label Value Unit, right column, top row)
-function getEquipmentSummary1(equipmentId: string): { labelKey: string; value: string; unit: string } {
-  const equipment = shipBuildStore.findEquipment(equipmentId)
-  if (!equipment || !selectedShip.value) return { labelKey: '', value: '', unit: '' }
-
-  const { summary } = useEquipmentStats(equipment, selectedShip.value)
-  if (!summary.value) return { labelKey: '', value: '', unit: '' }
-
-  const s = summary.value as any
-  const type = equipment.type
-
-  if (type === 'weapon') return { labelKey: 'ship_build.equipment_burst_dps', value: String(Math.round(s.burstDPS)), unit: 'MW' }
-  if (type === 'turret') return { labelKey: 'ship_build.equipment_sustained_dps', value: String(Math.round(s.sustainedDPS)), unit: 'MW' }
-  if (type === 'shield') return { labelKey: 'ship_build.equipment_shield_max', value: String(Math.round(s.shieldMax)), unit: 'MJ' }
-  if (type === 'engine') return { labelKey: 'ship_build.equipment_speed', value: String(s.speed), unit: 'm/s' }
-  if (type === 'thruster') return { labelKey: 'ship_build.equipment_strafe_speed', value: String(s.strafeSpeed), unit: 'm/s' }
-
-  return { labelKey: '', value: '', unit: '' }
-}
-
-// Get second summary (Label Value Unit, right column, bottom row)
-function getEquipmentSummary2(equipmentId: string): { labelKey: string; value: string; unit: string } {
-  const equipment = shipBuildStore.findEquipment(equipmentId)
-  if (!equipment || !selectedShip.value) return { labelKey: '', value: '', unit: '' }
-
-  const { summary } = useEquipmentStats(equipment, selectedShip.value)
-  if (!summary.value) return { labelKey: '', value: '', unit: '' }
-
-  const s = summary.value as any
-  const type = equipment.type
-
-  if (type === 'weapon') return { labelKey: 'ship_build.equipment_range', value: String(Math.round(s.range)), unit: 'm' }
-  if (type === 'turret') return { labelKey: 'ship_build.equipment_range', value: String(Math.round(s.range)), unit: 'm' }
-  if (type === 'shield') return { labelKey: 'ship_build.equipment_shield_delay', value: String(s.shieldDelay), unit: 's' }
-  if (type === 'engine') return { labelKey: 'ship_build.equipment_travel_speed', value: String(s.travelSpeed), unit: 'm/s' }
-  if (type === 'thruster') return { labelKey: 'ship_build.equipment_yaw_rate', value: s.yawRate.toFixed(2), unit: 'rad/s' }
-
-  return { labelKey: '', value: '', unit: '' }
-}
 
 // 本地 connectionKeyMap：从 connectionRows 构建
 const localConnectionKeyMap = computed(() => {
@@ -310,12 +262,100 @@ const activeSlotType = ref<'engine' | 'shield' | 'weapon' | 'turret' | 'thruster
 const activeTabKey = ref('')
 const expandedSlotKey = ref<string | null>(null)
 const pendingExpandedConnectionKeys = ref<string[] | null>(null)
-const selectedRaceIds = ref<string[]>([])
-const selectedMkIds = ref<string[]>([])
-const selectedTagIds = ref<string[]>([])
-const currentPage = ref(1)
 const highlightedEquipmentId = ref<string | null>(null)
 const draftCountByTarget = ref<Record<string, number>>({})
+const blueprintMenuOpen = ref(false)
+const blueprintMenuRef = ref<HTMLElement | null>(null)
+const fitPanelRef = ref<HTMLElement | null>(null)
+const blueprintTriggerRef = ref<HTMLElement | null>(null)
+const blueprintMenuStyle = ref<Record<string, string>>({})
+
+const currentBlueprintLabel = computed(() => {
+  const label = activeBlueprintStatusLabel.value || ''
+  return label || t('shipBuild.built_in_empty')
+})
+
+const shouldShowBlueprintDirtyDot = computed(() => {
+  return isDirty.value && !isBuiltInPresetUnchanged.value
+})
+
+const loadableBlueprintItems = computed(() => {
+  if (!selectedShip.value) return []
+  return shipBuildStore.getLoadableBlueprintsForShip(selectedShip.value.id).map((bp) => ({
+    id: bp.id,
+    label: bp.name,
+    isBuiltIn: shipBuildStore.isBuiltInBlueprintId(bp.id),
+    isCurrentSaved: shipBuildStore.savedBlueprints.activeBlueprintId === bp.id
+  }))
+})
+
+const groupedLoadableBlueprintItems = computed(() => {
+  const builtInItems = loadableBlueprintItems.value.filter((item) => item.isBuiltIn)
+  const userItems = loadableBlueprintItems.value.filter((item) => !item.isBuiltIn)
+  return [
+    { key: 'preset', title: t('shipBuild.blueprint_group_preset'), items: builtInItems },
+    { key: 'user', title: t('shipBuild.blueprint_group_user'), items: userItems }
+  ].filter((group) => group.items.length > 0)
+})
+
+const closeBlueprintMenu = () => {
+  blueprintMenuOpen.value = false
+}
+
+const updateBlueprintMenuPosition = () => {
+  const panel = fitPanelRef.value
+  const trigger = blueprintTriggerRef.value
+  const rect = panel?.getBoundingClientRect() || trigger?.getBoundingClientRect()
+  if (!rect) return
+  blueprintMenuStyle.value = {
+    top: `${rect.top}px`,
+    left: `${rect.right + 8}px`,
+    maxHeight: '400px'
+  }
+}
+
+const toggleBlueprintMenu = () => {
+  blueprintMenuOpen.value = !blueprintMenuOpen.value
+  if (blueprintMenuOpen.value) updateBlueprintMenuPosition()
+}
+
+const handleBlueprintSelect = (id: string) => {
+  shipBuildStore.loadBlueprint(id)
+  closeBlueprintMenu()
+}
+
+const handleBlueprintDelete = (id: string) => {
+  if (shipBuildStore.isBuiltInBlueprintId(id)) return
+  if (!confirm(t('shipBuild.confirm_delete_blueprint'))) return
+  shipBuildStore.deleteBlueprint(id)
+  closeBlueprintMenu()
+}
+
+const onGlobalPointerDown = (event: MouseEvent) => {
+  if (!blueprintMenuOpen.value) return
+  const menuRoot = blueprintMenuRef.value
+  if (!menuRoot) return
+  if (!(event.target instanceof Node)) return
+  if (menuRoot.contains(event.target)) return
+  closeBlueprintMenu()
+}
+
+const onViewportChange = () => {
+  if (!blueprintMenuOpen.value) return
+  updateBlueprintMenuPosition()
+}
+
+onMounted(() => {
+  document.addEventListener('mousedown', onGlobalPointerDown)
+  window.addEventListener('resize', onViewportChange)
+  window.addEventListener('scroll', onViewportChange, true)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('mousedown', onGlobalPointerDown)
+  window.removeEventListener('resize', onViewportChange)
+  window.removeEventListener('scroll', onViewportChange, true)
+})
 
 const slotTypeDefs = [
   { id: 'engine', label: 'E', tooltip: 'ship_build.slot_engine' },
@@ -701,117 +741,6 @@ const pickerInitialEquipmentId = computed<string | null>(() => {
   if (!selected || selected === '__mixed__') return null
   return selected
 })
-const isPickerLayout = computed(() => Boolean(pickerTarget.value))
-
-const normalizeRace = (option: FitEquipmentOption) => option.race || 'gen'
-const normalizeMk = (option: FitEquipmentOption) => option.mk || ''
-const normalizeTags = (option: FitEquipmentOption) => option.tags || []
-const tagDefs = ['standard', 'advanced', 'xenon', 'mining', 'missile', 'highpower']
-
-const pickerShipId = computed(() => {
-  const firstKey = pickerTarget.value?.connectionKeys[0]
-  return firstKey ? firstKey.split('::')[0] || '' : ''
-})
-
-const pickerSlotType = computed(() => {
-  const firstKey = pickerTarget.value?.connectionKeys[0]
-  if (!firstKey) return ''
-  return localConnectionKeyMap.value.get(firstKey)?.slotType || ''
-})
-
-const extractPickerCandidates = (filters: {
-  races: string[]
-  mks: string[]
-  tags: string[]
-}) => {
-  if (!pickerTarget.value) {
-    return {
-      items: [] as FitEquipmentOption[],
-      raceCountMap: new Map<string, number>(),
-      mkCountMap: new Map<string, number>(),
-      tagCountMap: new Map<string, number>()
-    }
-  }
-  return extractEquipmentSlotCandidatesWithFacets({
-    shipMap: shipBuildStore.shipMap,
-    equipmentMap: shipBuildStore.equipmentMap,
-    shipId: pickerShipId.value,
-    slotType: pickerSlotType.value as EquipmentType,
-    size: pickerTarget.value.size as ShipEquipmentSize,
-    tagsAll: pickerTarget.value.tags,
-    filters
-  })
-}
-
-const basePickerCandidates = computed(() => extractPickerCandidates({
-  races: [],
-  mks: [],
-  tags: []
-}).items)
-
-const availableRaceIds = computed(() => new Set(basePickerCandidates.value.map((item) => normalizeRace(item))))
-const availableMkIds = computed(() => new Set(basePickerCandidates.value.map((item) => normalizeMk(item)).filter(Boolean)))
-const availableTagIds = computed(() => new Set(basePickerCandidates.value.flatMap((item) => normalizeTags(item))))
-
-const pickerCandidateResult = computed(() => extractPickerCandidates({
-  races: selectedRaceIds.value,
-  mks: selectedMkIds.value,
-  tags: selectedTagIds.value
-}))
-
-const raceCountMap = computed(() => pickerCandidateResult.value.raceCountMap)
-const mkCountMap = computed(() => pickerCandidateResult.value.mkCountMap)
-const tagCountMap = computed(() => pickerCandidateResult.value.tagCountMap)
-
-const raceTags = computed(() => Array.from(availableRaceIds.value)
-  .sort((a, b) => a.localeCompare(b))
-  .map((id) => ({ id, label: id.toUpperCase(), count: raceCountMap.value.get(id) || 0 })))
-const mkTags = computed(() => Array.from(availableMkIds.value)
-  .sort((a, b) => Number(a) - Number(b))
-  .map((id) => ({ id, label: `MK${id}`, count: mkCountMap.value.get(id) || 0 })))
-const featureTags = computed(() => tagDefs
-  .filter((id) => availableTagIds.value.has(id))
-  .map((id) => {
-    const def = slotTagMap.get(id)
-    return {
-      id,
-      label: def ? translateSlotTag(def) : id.toUpperCase(),
-      count: tagCountMap.value.get(id) || 0
-    }
-  }))
-
-const filteredCandidates = computed(() => pickerCandidateResult.value.items)
-const pageSize = 10
-const listWithEmptyOption = computed<PickerCandidateItem[]>(() => [
-  { id: null, name: t('ship_build.fit_empty_slot'), mk: null, race: null, tags: [] },
-  ...filteredCandidates.value
-])
-const totalPages = computed(() => {
-  const total = Math.ceil(listWithEmptyOption.value.length / pageSize)
-  return total > 0 ? total : 1
-})
-const pagedCandidates = computed(() => {
-  const start = (currentPage.value - 1) * pageSize
-  return listWithEmptyOption.value.slice(start, start + pageSize)
-})
-
-const toggleTag = (items: string[], setItems: (next: string[]) => void, id: string) => {
-  if (items.includes(id)) return setItems(items.filter((item) => item !== id))
-  return setItems([...items, id])
-}
-const toggleRace = (id: string) => {
-  toggleTag(selectedRaceIds.value, (next) => { selectedRaceIds.value = next }, id)
-  currentPage.value = 1
-}
-const toggleMk = (id: string) => {
-  toggleTag(selectedMkIds.value, (next) => { selectedMkIds.value = next }, id)
-  currentPage.value = 1
-}
-const toggleFeatureTag = (id: string) => {
-  toggleTag(selectedTagIds.value, (next) => { selectedTagIds.value = next }, id)
-  currentPage.value = 1
-}
-
 const selectedNameForTarget = (target: SlotTarget) => {
   const selectedId = selectedForConnectionKeys(target.connectionKeys)
   if (!selectedId) return t('ship_build.fit_empty_slot')
@@ -846,14 +775,6 @@ const jumpToTab = (tabKey: string) => {
     pendingExpandedConnectionKeys.value = current ? [...current.connectionKeys] : null
   }
   activeTabKey.value = tabKey
-}
-
-const handlePickerConfirm = (equipmentId: string | null) => {
-  if (!pickerTarget.value) return
-  pickerTarget.value.connectionKeys.forEach((connectionKey) => {
-    applyConnectionAssignment({ connectionKey, equipmentId })
-  })
-  closePicker()
 }
 
 const clampToTargetCount = (target: SlotTarget, raw: number) => {
@@ -945,10 +866,6 @@ const handleCountSliderCommit = (target: SlotTarget, value: number) => {
 }
 
 watch(pickerTarget, (newTarget) => {
-  selectedRaceIds.value = []
-  selectedMkIds.value = []
-  selectedTagIds.value = []
-  currentPage.value = 1
   highlightedEquipmentId.value = pickerInitialEquipmentId.value
   emit('update:pickerTarget', newTarget)
 })
@@ -957,13 +874,27 @@ watch(highlightedEquipmentId, (newId) => {
   emit('update:highlightedEquipmentId', newId)
 })
 
+watch(
+  () => props.externalHighlightedEquipmentId,
+  (newId) => {
+    if (newId === undefined) return
+    if (highlightedEquipmentId.value === newId) return
+    highlightedEquipmentId.value = newId
+  }
+)
+
+watch(
+  () => props.pickerOpenExternal,
+  (open) => {
+    if (open === false && expandedSlotKey.value) {
+      closePicker()
+    }
+  }
+)
+
 watch(fitMode, (mode) => {
   emit('update:pickerMode', mode)
 }, { immediate: true })
-
-watch(filteredCandidates, () => {
-  if (currentPage.value > totalPages.value) currentPage.value = 1
-})
 
 watch(slotTargets, () => {
   const validTargetKeys = new Set(slotTargets.value.map((target) => target.key))
@@ -992,17 +923,92 @@ watch(slotTargets, () => {
 </script>
 
 <template>
-  <div class="col-span-12 panel-card" :class="wide ? 'lg:col-span-8' : 'lg:col-span-4'" data-testid="ship-build-panel-fit">
+  <div
+    class="col-span-12 panel-card"
+    :class="wide ? 'lg:col-span-8' : 'lg:col-span-4'"
+    data-testid="ship-build-panel-fit"
+    ref="fitPanelRef"
+  >
     <div class="panel-header">
-      <span>{{ selectedShip ? translateShip(selectedShip) : $t('ship_build.panel_fit') }}</span>
-      <button
-        v-if="selectedShip"
-        class="selection-change-btn"
-        data-testid="ship-build-change-ship-fit-header"
-        @click="enterShipSelector"
-      >
-        {{ t('ship_build.change_ship') }}
-      </button>
+      <template v-if="selectedShip">
+        <button
+          class="ship-switcher ship-switcher-action"
+          data-testid="ship-build-change-ship-fit-header"
+          :title="t('ship_build.change_ship')"
+          :aria-label="t('ship_build.change_ship')"
+          @click="enterShipSelector"
+        >
+          <div class="ship-switcher-main">
+            <span class="ship-switcher-name">{{ translateShip(selectedShip) }}</span>
+          </div>
+          <span class="ship-switcher-divider" />
+          <svg class="h-3.5 w-3.5 shrink-0 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 3h6v6" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 14L21 3" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+          </svg>
+        </button>
+        <div class="ship-blueprint-picker" ref="blueprintMenuRef">
+          <button
+            class="ship-blueprint-trigger"
+            data-testid="ship-build-blueprint-menu-trigger"
+            :title="t('shipBuild.load_blueprint')"
+            @click="toggleBlueprintMenu"
+            ref="blueprintTriggerRef"
+          >
+            <span class="ship-blueprint-status">
+              {{ currentBlueprintLabel }}
+              <span v-if="shouldShowBlueprintDirtyDot" class="ship-blueprint-dirty-dot" />
+            </span>
+            <span class="ship-blueprint-divider" />
+            <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
+            </svg>
+          </button>
+          <div
+            v-if="blueprintMenuOpen"
+            class="ship-blueprint-menu ship-blueprint-menu-floating"
+            :style="blueprintMenuStyle"
+            data-testid="ship-build-blueprint-menu"
+          >
+            <div
+              v-for="group in groupedLoadableBlueprintItems"
+              :key="group.key"
+              class="ship-blueprint-menu-group"
+            >
+              <div class="ship-blueprint-menu-group-title">{{ group.title }}</div>
+              <div
+                v-for="item in group.items"
+                :key="item.id"
+                class="ship-blueprint-menu-row group"
+                :class="[
+                  item.isBuiltIn ? 'ship-blueprint-menu-item-built-in' : '',
+                  item.isCurrentSaved ? 'ship-blueprint-menu-item-current' : ''
+                ]"
+              >
+                <button
+                  class="ship-blueprint-menu-item"
+                  @click="handleBlueprintSelect(item.id)"
+                >
+                  <span>{{ item.label }}</span>
+                </button>
+                <button
+                  v-if="!item.isBuiltIn"
+                  class="ship-blueprint-delete-btn"
+                  :title="t('shipBuild.action_delete')"
+                  @click.stop="handleBlueprintDelete(item.id)"
+                >
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      <span v-else>{{ $t('ship_build.panel_fit') }}</span>
     </div>
     <div class="arsenal-shell" data-testid="ship-build-fit-panel">
         <aside class="left-rail">
@@ -1027,232 +1033,80 @@ watch(slotTargets, () => {
 
         <div class="arsenal-content">
           <main class="arsenal-main">
-            <template v-if="isPickerLayout">
-              <section class="picker-grid-row picker-grid-row-compact">
-                <div class="picker-cell">
-                  <div class="mode-tabs">
-                    <button class="mode-tab mode-tab-tall" :class="fitMode === 'connection' ? 'active' : ''" @click="setMode('connection')">{{ t('ship_build.fit_mode_connection') }}</button>
-                    <button class="mode-tab mode-tab-tall" :class="fitMode === 'group' ? 'active' : ''" @click="setMode('group')">{{ t('ship_build.fit_mode_group') }}</button>
-                  </div>
-                </div>
-                <div class="picker-cell picker-right">
-                  <div class="picker-actions-inline">
-                    <button class="mode-tab mode-tab-tall picker-action-btn mr-1" data-testid="picker-cancel" @click="closePicker">{{ t('ui.cancel') }}</button>
-                    <button class="mode-tab mode-tab-tall picker-action-btn" data-testid="picker-confirm" @click="handlePickerConfirm(highlightedEquipmentId)">{{ t('ship_build.fit_picker_confirm') }}</button>
-                  </div>
-                </div>
-              </section>
+            <!-- C 槽 and U 槽: Storage Panel -->
+            <ShipStoragePanel
+              v-if="activeSlotType === 'consumables' || activeSlotType === 'units'"
+              :selected-ship="selectedShip"
+              :slot-type="activeSlotType as 'consumables' | 'units'"
+            />
 
-              <section class="picker-grid-row picker-grid-row-tabs">
-                <div class="picker-cell">
-                  <div class="group-tabs picker-row-slot-tabs">
-                    <div
-                      v-for="row in renderGroupTabRows"
-                      :key="row.key"
-                      class="group-tab-row"
-                      :data-testid="row.testId"
-                    >
-                      <button
-                        v-for="tab in row.tabs"
-                        :key="tab.key"
-                        class="group-tab"
-                        :class="activeTabKey === tab.key ? 'group-tab-active' : ''"
-                        @click="jumpToTab(tab.key)"
-                      >
-                        {{ tab.label }}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <div class="picker-cell picker-right picker-right-tabs">
-                  <div v-if="totalPages > 1" class="pager">
-                    <button class="pager-btn" :disabled="currentPage === 1" @click="currentPage = currentPage - 1">&lt;</button>
-                    <button
-                      v-for="page in totalPages"
-                      :key="page"
-                      class="pager-btn"
-                      :class="currentPage === page ? 'pager-btn-active' : ''"
-                      :data-testid="`page-${page}`"
-                      @click="currentPage = page"
-                    >
-                      {{ page }}
-                    </button>
-                    <button class="pager-btn" :disabled="currentPage === totalPages" @click="currentPage = currentPage + 1">&gt;</button>
-                  </div>
-                </div>
-              </section>
-
-              <section class="picker-grid-row">
-                <div class="picker-cell">
-                  <div class="picker-row3-left">
-                    <section class="compatibility-box picker-compat-box">
-                      <div class="filter-block">
-                        <div class="filter-line">
-                          <span class="filter-group">RACE</span>
-                          <div class="filter-items-race" :class="raceTags.length > 3 ? 'filter-items-race-two-rows' : ''">
-                            <button v-for="tag in raceTags" :key="`race-${tag.id}`" class="filter-chip" :class="selectedRaceIds.includes(tag.id) ? 'filter-chip-active' : ''" :data-testid="`race-${tag.id}`" @click="toggleRace(tag.id)">
-                              {{ tag.label }} <span class="chip-count">{{ tag.count }}</span>
-                            </button>
-                          </div>
-                        </div>
-                        <div class="filter-line">
-                          <span class="filter-group">MK</span>
-                          <button v-for="tag in mkTags" :key="`mk-${tag.id}`" class="filter-chip" :class="selectedMkIds.includes(tag.id) ? 'filter-chip-active' : ''" :data-testid="`mk-${tag.id}`" @click="toggleMk(tag.id)">
-                            {{ tag.label }} <span class="chip-count">{{ tag.count }}</span>
-                          </button>
-                        </div>
-                        <div class="filter-line">
-                          <span class="filter-group">TAG</span>
-                          <button v-for="tag in featureTags" :key="`tag-${tag.id}`" class="filter-chip" :class="selectedTagIds.includes(tag.id) ? 'filter-chip-active' : ''" :data-testid="`tag-${tag.id}`" @click="toggleFeatureTag(tag.id)">
-                            {{ tag.label }} <span class="chip-count">{{ tag.count }}</span>
-                          </button>
-                        </div>
-                      </div>
-                    </section>
-                    <section class="slot-wall picker-row3-slot-wall">
-                      <div v-for="target in slotTargets" :key="target.key" class="slot-stack">
-                        <X4DualPhaseRangeSlider
-                          class="slot-count-slider"
-                          :model-value="getDisplayedCount(target)"
-                          :min="0"
-                          :max="target.totalCount"
-                          :step="sliderStepForTarget(target)"
-                          track-bg-color="rgb(30 41 59 / 1)"
-                          track-border-color="rgb(51 65 85 / 0.7)"
-                          fill-color="rgb(16 185 129 / 0.8)"
-                          :disabled="isCountSliderDisabled(target)"
-                          @update:model-value="handleCountSliderRealtime(target, $event)"
-                          @commit="handleCountSliderCommit(target, $event)"
-                        />
-                        <button
-                          class="slot-row"
-                          :class="[
-                            expandedSlotKey === target.key ? 'slot-row-expanded' : ''
-                          ]"
-                          :data-testid="`slot-${target.key}`"
-                          @click="handleSlotClick(target)"
-                        >
-                          <div class="slot-row-main">
-                            <div class="slot-row-title">{{ target.label }}</div>
-                            <div class="slot-row-value" :class="isMixedSelectionInGroup(target) ? 'slot-row-value-mixed' : ''">{{ selectedNameForTarget(target) }}</div>
-                          </div>
-                          <div class="slot-row-side">
-                            <span class="slot-row-count">{{ getDisplayedCount(target) }}/{{ target.totalCount }}</span>
-                          </div>
-                        </button>
-                      </div>
-                      <div v-if="slotTargets.length === 0" class="empty-card">{{ t('ship_build.fit_no_equipment') }}</div>
-                    </section>
-                  </div>
-                </div>
-                <div class="picker-cell picker-right">
-                  <div class="candidate-list picker-candidate-list" data-testid="equipment-picker">
-                    <button
-                      v-for="item in pagedCandidates"
-                      :key="item.id || '__empty__'"
-                      class="candidate-item"
-                      :class="highlightedEquipmentId === item.id ? 'candidate-item-active' : ''"
-                      :data-testid="`candidate-${item.id || 'empty'}`"
-                      @click="highlightedEquipmentId = item.id"
-                    >
-                      <div class="candidate-left">
-                        <div class="candidate-name">{{ item.name }}</div>
-                        <div class="candidate-meta">{{ item.race || 'GEN' }} · {{ item.mk ? `MK${item.mk}` : '-' }}</div>
-                      </div>
-                      <div v-if="item.id" class="candidate-right">
-                        <div class="candidate-summary-1">
-                          <span class="summary-label">{{ t(getEquipmentSummary1(item.id).labelKey) }}</span>
-                          <span class="summary-value">{{ getEquipmentSummary1(item.id).value }}</span>
-                          <span class="summary-unit">{{ getEquipmentSummary1(item.id).unit }}</span>
-                        </div>
-                        <div class="candidate-summary-2">
-                          <span class="summary-label">{{ t(getEquipmentSummary2(item.id).labelKey) }}</span>
-                          <span class="summary-value">{{ getEquipmentSummary2(item.id).value }}</span>
-                          <span class="summary-unit">{{ getEquipmentSummary2(item.id).unit }}</span>
-                        </div>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-              </section>
-            </template>
-
-            <template v-else>
-              <!-- C 槽 and U 槽: Storage Panel -->
-              <ShipStoragePanel
-                v-if="activeSlotType === 'consumables' || activeSlotType === 'units'"
-                :selected-ship="selectedShip"
-                :slot-type="activeSlotType as 'consumables' | 'units'"
-              />
-
-              <div v-else class="toolbar-row">
-                <div class="mode-tabs">
-                  <button class="mode-tab" :class="fitMode === 'connection' ? 'active' : ''" @click="setMode('connection')">{{ t('ship_build.fit_mode_connection') }}</button>
-                  <button class="mode-tab" :class="fitMode === 'group' ? 'active' : ''" @click="setMode('group')">{{ t('ship_build.fit_mode_group') }}</button>
-                </div>
+            <div v-else class="toolbar-row">
+              <div class="mode-tabs">
+                <button class="mode-tab" :class="fitMode === 'connection' ? 'active' : ''" @click="setMode('connection')">{{ t('ship_build.fit_mode_connection') }}</button>
+                <button class="mode-tab" :class="fitMode === 'group' ? 'active' : ''" @click="setMode('group')">{{ t('ship_build.fit_mode_group') }}</button>
               </div>
+            </div>
 
-              <div class="group-tabs" v-if="activeSlotType !== 'consumables' && activeSlotType !== 'units'">
-                <div
-                  v-for="row in renderGroupTabRows"
-                  :key="row.key"
-                  class="group-tab-row"
-                  :data-testid="row.testId"
+            <div class="group-tabs" v-if="activeSlotType !== 'consumables' && activeSlotType !== 'units'">
+              <div
+                v-for="row in renderGroupTabRows"
+                :key="row.key"
+                class="group-tab-row"
+                :data-testid="row.testId"
+              >
+                <button
+                  v-for="tab in row.tabs"
+                  :key="tab.key"
+                  class="group-tab"
+                  :class="activeTabKey === tab.key ? 'group-tab-active' : ''"
+                  @click="jumpToTab(tab.key)"
                 >
-                  <button
-                    v-for="tab in row.tabs"
-                    :key="tab.key"
-                    class="group-tab"
-                    :class="activeTabKey === tab.key ? 'group-tab-active' : ''"
-                    @click="jumpToTab(tab.key)"
-                  >
-                    {{ tab.label }}
-                  </button>
-                </div>
+                  {{ tab.label }}
+                </button>
+              </div>
+            </div>
+
+            <section v-if="activeSlotType !== 'consumables' && activeSlotType !== 'units' && visibleCompatibilityTags.length > 0" class="compatibility-box">
+              <div class="compatibility-title">{{ t('ship_build.fit_compatibility') }}:</div>
+              <div class="compatibility-line tags">{{ visibleCompatibilityTagLabels.join(' / ') }}</div>
+              <div v-for="line in compatibilitySlotLines" :key="line" class="compatibility-line">{{ line }}</div>
+            </section>
+
+            <section v-if="activeSlotType !== 'consumables' && activeSlotType !== 'units'" class="slot-wall">
+              <div v-for="target in slotTargets" :key="target.key" class="slot-stack">
+                <X4DualPhaseRangeSlider
+                  class="slot-count-slider"
+                  :model-value="getDisplayedCount(target)"
+                  :min="0"
+                  :max="target.totalCount"
+                  :step="sliderStepForTarget(target)"
+                  track-bg-color="rgb(30 41 59 / 1)"
+                  track-border-color="rgb(51 65 85 / 0.7)"
+                  fill-color="rgb(16 185 129 / 0.8)"
+                  :disabled="isCountSliderDisabled(target)"
+                  @update:model-value="handleCountSliderRealtime(target, $event)"
+                  @commit="handleCountSliderCommit(target, $event)"
+                />
+                <button
+                  class="slot-row"
+                  :class="[
+                    expandedSlotKey === target.key ? 'slot-row-expanded' : ''
+                  ]"
+                  :data-testid="`slot-${target.key}`"
+                  @click="handleSlotClick(target)"
+                >
+                  <div class="slot-row-main">
+                    <div class="slot-row-title">{{ target.label }}</div>
+                    <div class="slot-row-value" :class="isMixedSelectionInGroup(target) ? 'slot-row-value-mixed' : ''">{{ selectedNameForTarget(target) }}</div>
+                  </div>
+                  <div class="slot-row-side">
+                    <span class="slot-row-count">{{ getDisplayedCount(target) }}/{{ target.totalCount }}</span>
+                  </div>
+                </button>
               </div>
 
-              <section v-if="activeSlotType !== 'consumables' && activeSlotType !== 'units' && visibleCompatibilityTags.length > 0" class="compatibility-box">
-                <div class="compatibility-title">{{ t('ship_build.fit_compatibility') }}:</div>
-                <div class="compatibility-line tags">{{ visibleCompatibilityTagLabels.join(' / ') }}</div>
-                <div v-for="line in compatibilitySlotLines" :key="line" class="compatibility-line">{{ line }}</div>
-              </section>
-
-              <section v-if="activeSlotType !== 'consumables' && activeSlotType !== 'units'" class="slot-wall">
-                <div v-for="target in slotTargets" :key="target.key" class="slot-stack">
-                  <X4DualPhaseRangeSlider
-                    class="slot-count-slider"
-                    :model-value="getDisplayedCount(target)"
-                    :min="0"
-                    :max="target.totalCount"
-                    :step="sliderStepForTarget(target)"
-                    track-bg-color="rgb(30 41 59 / 1)"
-                    track-border-color="rgb(51 65 85 / 0.7)"
-                    fill-color="rgb(16 185 129 / 0.8)"
-                    :disabled="isCountSliderDisabled(target)"
-                    @update:model-value="handleCountSliderRealtime(target, $event)"
-                    @commit="handleCountSliderCommit(target, $event)"
-                  />
-                  <button
-                    class="slot-row"
-                    :class="[
-                      expandedSlotKey === target.key ? 'slot-row-expanded' : ''
-                    ]"
-                    :data-testid="`slot-${target.key}`"
-                    @click="handleSlotClick(target)"
-                  >
-                    <div class="slot-row-main">
-                      <div class="slot-row-title">{{ target.label }}</div>
-                      <div class="slot-row-value" :class="isMixedSelectionInGroup(target) ? 'slot-row-value-mixed' : ''">{{ selectedNameForTarget(target) }}</div>
-                    </div>
-                    <div class="slot-row-side">
-                      <span class="slot-row-count">{{ getDisplayedCount(target) }}/{{ target.totalCount }}</span>
-                    </div>
-                  </button>
-                </div>
-
-                <div v-if="slotTargets.length === 0" class="empty-card">{{ t('ship_build.fit_no_equipment') }}</div>
-              </section>
-            </template>
+              <div v-if="slotTargets.length === 0" class="empty-card">{{ t('ship_build.fit_no_equipment') }}</div>
+            </section>
           </main>
         </div>
     </div>
@@ -1268,8 +1122,110 @@ watch(slotTargets, () => {
   @apply h-12 flex items-center justify-between px-4 py-0 text-slate-200 text-sm font-semibold border-b border-slate-800/70;
 }
 
-.selection-change-btn {
-  @apply px-3 py-1.5 rounded-full text-xs font-semibold border border-emerald-400/60 text-emerald-200 hover:bg-emerald-500/10 transition-colors;
+.ship-switcher {
+  @apply inline-flex items-center rounded-md border border-emerald-400/50 overflow-hidden transition-colors;
+}
+
+.ship-switcher:hover,
+.ship-switcher:focus-within {
+  @apply border-emerald-300 bg-emerald-500/10;
+}
+
+.ship-switcher-main {
+  @apply px-3 py-1.5 text-left text-slate-100;
+}
+
+.ship-switcher-name {
+  @apply block whitespace-nowrap text-sm font-semibold;
+}
+
+.ship-switcher-action {
+  @apply relative inline-flex items-center gap-0 pr-2.5 text-emerald-200 bg-transparent appearance-none leading-none;
+}
+
+.ship-switcher-divider {
+  @apply inline-block h-3 w-px bg-emerald-400/40;
+}
+
+.ship-blueprint-picker {
+  @apply relative;
+}
+
+.ship-blueprint-trigger {
+  @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-emerald-400/50 text-emerald-200 hover:bg-emerald-500/10 transition-colors;
+}
+
+.ship-blueprint-status {
+  @apply inline-flex items-center gap-1 text-sm font-semibold text-slate-100 whitespace-nowrap;
+}
+
+.ship-blueprint-dirty-dot {
+  @apply inline-block h-1.5 w-1.5 rounded-full bg-red-500;
+}
+
+.ship-blueprint-divider {
+  @apply inline-block h-3 w-px bg-emerald-400/40;
+}
+
+.ship-blueprint-menu {
+  @apply absolute top-0 left-full ml-2 z-40 w-max min-w-44 max-h-64 overflow-y-auto rounded-md border border-emerald-400/40 bg-slate-900/95 p-1 shadow-2xl;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(52, 211, 153, 0.65) rgba(15, 23, 42, 0.85);
+}
+
+.ship-blueprint-menu-floating {
+  @apply fixed top-0 left-0 ml-0 z-[120];
+}
+
+.ship-blueprint-menu-row {
+  @apply relative;
+}
+
+.ship-blueprint-menu-group + .ship-blueprint-menu-group {
+  @apply mt-2 pt-1 border-t border-emerald-400/20;
+}
+
+.ship-blueprint-menu-group-title {
+  @apply px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-300/80;
+}
+
+.ship-blueprint-menu-item {
+  @apply block h-8 w-full text-left px-2.5 pr-9 py-1.5 rounded text-xs text-slate-200 hover:bg-emerald-500/15 transition-colors whitespace-nowrap;
+}
+
+.ship-blueprint-menu-item-built-in {
+  @apply text-emerald-200;
+}
+
+.ship-blueprint-menu-item-current .ship-blueprint-menu-item {
+  @apply text-emerald-100 bg-emerald-500/15 border border-emerald-400/50;
+}
+
+.ship-blueprint-delete-btn {
+  @apply absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 flex items-center justify-center rounded text-red-300 hover:text-red-200 hover:bg-red-500/20 opacity-0 pointer-events-none transition-opacity;
+}
+
+.ship-blueprint-menu-row:hover .ship-blueprint-delete-btn {
+  @apply opacity-100 pointer-events-auto;
+}
+
+.ship-blueprint-menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ship-blueprint-menu::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.85);
+  border-radius: 9999px;
+}
+
+.ship-blueprint-menu::-webkit-scrollbar-thumb {
+  background: rgba(52, 211, 153, 0.65);
+  border-radius: 9999px;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.ship-blueprint-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(52, 211, 153, 0.9);
 }
 
 .arsenal-shell { @apply p-2 flex gap-2; }
@@ -1285,7 +1241,6 @@ watch(slotTargets, () => {
 .mode-tab.active { @apply border-emerald-300 text-emerald-100; }
 .mode-tab:disabled { @apply opacity-40 cursor-not-allowed; }
 .mode-tab-tall { @apply h-[25.6px] px-2 flex items-center; }
-.picker-action-btn { @apply border-emerald-300 text-emerald-100; }
 .group-tabs { @apply flex flex-col gap-1 mt-2; }
 .group-tab-row { @apply flex flex-wrap items-center gap-1; }
 .group-tab { @apply px-2.5 py-0.5 text-[11px] border border-slate-700/60 rounded text-slate-200; }
@@ -1307,24 +1262,10 @@ watch(slotTargets, () => {
 .slot-row-count { @apply text-[10px] text-emerald-300; }
 .empty-card { @apply rounded border border-dashed border-slate-700 p-3 text-xs text-slate-300 text-center; }
 
-.picker-grid-row { @apply grid gap-2 mt-2; grid-template-columns: minmax(0, calc(50% - 4rem)) minmax(0, 1fr); }
-.picker-cell { @apply min-h-20 min-w-0; }
-.picker-right { @apply flex items-start justify-end; }
-.picker-row3-left { @apply flex flex-col gap-2; }
-.picker-grid-row-compact { @apply h-[25.6px] items-center; }
-.picker-grid-row-compact .picker-cell { @apply min-h-0 h-[25.6px] flex items-center; }
-.picker-grid-row-tabs { @apply items-start; }
-.picker-grid-row-tabs .picker-cell { @apply min-h-0; }
-.picker-actions-inline { @apply inline-flex items-center gap-1.5 justify-end; }
-.picker-row-slot-tabs { @apply mt-0 h-auto items-start; }
-.picker-right-tabs { @apply h-full items-end; }
-.picker-right-tabs .pager { @apply self-end; }
 .pager { @apply inline-flex items-center gap-1; }
 .pager-btn { @apply h-[25.6px] rounded border border-slate-600 px-1.5 py-0 text-[10px] text-slate-200 inline-flex items-center; }
 .pager-btn-active { @apply border-emerald-300 text-emerald-100; }
 .pager-btn:disabled { @apply opacity-40 cursor-not-allowed; }
-.picker-compat-box { @apply mt-0; }
-.picker-row3-slot-wall { @apply mt-0; }
 .filter-block { @apply mt-2 flex flex-col gap-2; }
 .filter-line { @apply flex flex-wrap items-center gap-1.5; }
 .filter-group { @apply text-[10px] uppercase text-slate-300 font-semibold min-w-8; }
@@ -1349,9 +1290,4 @@ watch(slotTargets, () => {
 .summary-value { @apply text-xs text-emerald-300 tabular-nums; }
 .summary-unit { @apply text-[10px] text-slate-400; }
 
-@media (max-width: 1023px) {
-  .picker-grid-row { @apply grid-cols-1; }
-  .picker-right { @apply justify-start; }
-  .picker-row3-left { @apply h-auto; }
-}
 </style>

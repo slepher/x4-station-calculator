@@ -326,6 +326,13 @@
     "confirm_delete_blueprint": "Are you sure you want to delete this blueprint?",
     "confirm_load_with_unsaved": "Current configuration has unsaved changes. Load anyway?",
     "confirm_new_with_unsaved": "Current configuration has unsaved changes. Create new anyway?",
+    "built_in_empty": "Empty",
+    "built_in_low": "Low",
+    "built_in_mid": "Mid",
+    "built_in_high": "High",
+    "status_custom": "Custom",
+    "blueprint_group_preset": "Preset Loadouts",
+    "blueprint_group_user": "Blueprint Loadouts",
     "connections_count": "connections",
     "shield_secondary": "Shield (Secondary)"
   },

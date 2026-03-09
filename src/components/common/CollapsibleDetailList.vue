@@ -6,7 +6,11 @@
       :data-testid="mainRowTestid"
     >
       <div class="label-group">
-        <span class="arrow" :class="{ 'arrow-open': isOpen }" v-if="!isEmpty && isExpandable">▶</span>
+        <span class="arrow" :class="{ 'arrow-open': isOpen }" v-if="!isEmpty && isExpandable" aria-hidden="true">
+          <svg viewBox="0 0 12 12" class="arrow-icon">
+            <path d="M3 2.5L9 6L3 9.5V2.5Z" fill="currentColor" />
+          </svg>
+        </span>
         <slot name="title"></slot>
       </div>
       <div class="right-group">
@@ -58,7 +62,8 @@ const isOpen = ref(false)
 .main-row-hover { @apply hover:bg-slate-700/50 }
 .is-active { @apply border-slate-600/50 bg-slate-700/40; }
 
-.arrow { @apply text-[10px] text-slate-500 transition-transform duration-200 }
+.arrow { @apply inline-flex items-center justify-center text-slate-500 transition-transform duration-200 }
+.arrow-icon { @apply w-2.5 h-2.5; }
 .arrow-open { @apply rotate-90 text-slate-300; }
 
 .list-box { @apply bg-slate-900/60 mx-1 px-4 py-2 text-[11px] rounded-b border-x border-b border-slate-700/30 overflow-hidden; }
