@@ -21,7 +21,7 @@ export interface StationImportPayload {
 }
 
 function isImportableManualNode(node: SavedFlowNode): boolean {
-  return node.source === 'manual' && Boolean(node.moduleId)
+  return Boolean(node.module)
 }
 
 export function buildStationImportPayload(
@@ -36,14 +36,15 @@ export function buildStationImportPayload(
 
   group.nodes.forEach((node) => {
     if (isImportableManualNode(node)) {
-      const moduleId = node.moduleId!
+      const moduleId = node.module!
       moduleCounts.set(moduleId, (moduleCounts.get(moduleId) || 0) + 1)
     }
 
-    if (!node.isIsolated) return
-    const ware = waresMap[node.wareId]
+    if (!node.isolated) return
+    const wareId = node.isolated
+    const ware = waresMap[wareId]
     if (ware?.transport === 'container') {
-      lockedWareSet.add(node.wareId)
+      lockedWareSet.add(wareId)
       return
     }
 
@@ -51,8 +52,8 @@ export function buildStationImportPayload(
       type: 'isolated_non_container_ignored',
       groupId: group.id,
       groupName,
-      wareId: node.wareId,
-      wareName: getWareDisplayName(node.wareId)
+      wareId,
+      wareName: getWareDisplayName(wareId)
     })
   })
 

@@ -63,8 +63,8 @@ const selectedPlanGroupCards = computed(() => {
 
       const moduleCountMap = new Map<string, number>()
       group.nodes.forEach((node) => {
-        if (node.source !== 'manual' || !node.moduleId) return
-        moduleCountMap.set(node.moduleId, (moduleCountMap.get(node.moduleId) || 0) + 1)
+        if (!node.module) return
+        moduleCountMap.set(node.module, (moduleCountMap.get(node.module) || 0) + 1)
       })
 
       const modulePreview = Array.from(moduleCountMap.entries())

@@ -726,16 +726,8 @@ export interface ProductionLineGroup {
 // --- 逻辑组网方案持久化类型 ---
 
 export interface SavedFlowNode {
-  id: string
-  wareId: string
-  moduleId?: string
-  race: string
-  lineage: string
-  column: number
-  isIsolated: boolean
-  source: 'manual'
-  isRoot: boolean
-  order: number
+  isolated?: string
+  module?: string
 }
 
 export interface SavedFlowGroup {

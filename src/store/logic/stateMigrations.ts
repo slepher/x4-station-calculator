@@ -224,7 +224,42 @@ export function migrateEmpireStateToCurrent(
   return { state: working, warnings }
 }
 
-function normalizeFlowShape(input: SavedFlowPlansState): SavedFlowPlansState {
+function normalizeSavedFlowNode(
+  rawNode: unknown,
+  warnings: string[],
+  context: string
+): SavedFlowNode | null {
+  const node = isObject(rawNode) ? rawNode : {}
+
+  const isolated = typeof node.isolated === 'string' && node.isolated ? node.isolated : null
+  const module = typeof node.module === 'string' && node.module ? node.module : null
+  if (isolated && module) {
+    warnings.push(`[${context}] node has both isolated and module; kept isolated and dropped module`)
+    return { isolated }
+  }
+  if (isolated) return { isolated }
+  if (module) return { module }
+
+  const legacyWareId = typeof node.wareId === 'string' ? node.wareId : ''
+  const legacyModuleId = typeof node.moduleId === 'string' ? node.moduleId : ''
+  const legacyIsolated = Boolean(node.isIsolated)
+
+  if (legacyIsolated && legacyWareId) {
+    return { isolated: legacyWareId }
+  }
+  if (legacyModuleId) {
+    return { module: legacyModuleId }
+  }
+  if (legacyWareId) {
+    warnings.push(`[${context}] fallback migrated wareId-only node as isolated`)
+    return { isolated: legacyWareId }
+  }
+
+  warnings.push(`[${context}] dropped invalid flow node`)
+  return null
+}
+
+function normalizeFlowShape(input: SavedFlowPlansState, warnings: string[]): SavedFlowPlansState {
   const list: LogicFlowPlan[] = (input.list || []).map((plan, planIndex) => ({
     id: plan.id || crypto.randomUUID(),
     name: plan.name || `Logic Flow ${planIndex + 1}`,
@@ -235,18 +270,13 @@ function normalizeFlowShape(input: SavedFlowPlansState): SavedFlowPlansState {
       subCategory: group.subCategory || 'default',
       isLocked: Boolean(group.isLocked),
       lockedLineage: group.lockedLineage || 'default',
-      nodes: (group.nodes || []).map((node, nodeIndex) => ({
-        id: node.id || crypto.randomUUID(),
-        wareId: node.wareId || '',
-        moduleId: node.moduleId,
-        race: node.race || 'default',
-        lineage: node.lineage || 'default',
-        column: Number(node.column ?? 0),
-        isIsolated: Boolean(node.isIsolated),
-        source: 'manual',
-        isRoot: Boolean(node.isRoot),
-        order: Number(node.order ?? nodeIndex)
-      }))
+      nodes: (group.nodes || [])
+        .map((node, nodeIndex) => normalizeSavedFlowNode(
+          node,
+          warnings,
+          `flow[${planIndex}].group[${groupIndex}].node[${nodeIndex}]`
+        ))
+        .filter((node): node is SavedFlowNode => node !== null)
     })),
     settings: {
       isDefaultLocked: Boolean(plan.settings?.isDefaultLocked ?? true)
@@ -270,31 +300,32 @@ export function migrateFlowStateToCurrent(
   lookup: ModuleLookup
 ): MigrationResult<SavedFlowPlansState> {
   const warnings: string[] = []
-  const working = normalizeFlowShape(deepClone(input))
+  const working = normalizeFlowShape(deepClone(input), warnings)
 
   if (working.version > CURRENT_FLOW_VERSION) {
     warnings.push(`[flow] input version ${working.version} is newer than supported ${CURRENT_FLOW_VERSION}; fallback to best-effort migration`)
   }
 
-  const needModuleNormalization = working.version <= 1 || working.version > CURRENT_FLOW_VERSION
+  const needModuleNormalization = working.version <= 2 || working.version > CURRENT_FLOW_VERSION
   if (needModuleNormalization) {
     working.list = working.list.map((plan, planIndex) => ({
       ...plan,
       groups: (plan.groups || []).map((group: SavedFlowGroup, groupIndex) => ({
         ...group,
         nodes: (group.nodes || []).map((node: SavedFlowNode, nodeIndex) => {
-          if (!node.moduleId) return node
+          if (!node.module) return node
           const resolved = resolveModuleOrWarn(
-            node.moduleId,
+            node.module,
             lookup,
             warnings,
             `flow[${planIndex}].group[${groupIndex}].node[${nodeIndex}]`
           )
+          if (!resolved) return null
           return {
             ...node,
-            moduleId: resolved || undefined
+            module: resolved
           }
-        })
+        }).filter((node): node is SavedFlowNode => node !== null)
       }))
     }))
   }

@@ -932,23 +932,28 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     return false
   }
 
+  function resolveModuleOutputWareId(moduleId: string): string | null {
+    const module = gameData.modulesMap[moduleId]
+    if (!module?.outputs) return null
+    const outputWareIds = Object.keys(module.outputs)
+    if (outputWareIds.length === 0) return null
+    return outputWareIds[0] || null
+  }
+
   /**
    * 将 FlowNode 转换为 SavedFlowNode（仅保存 manual 和 isolated 节点）
    */
   function toSavedFlowNode(node: FlowNode): SavedFlowNode | null {
-    if (node.source === 'auto' && !node.isIsolated) return null
-    return {
-      id: node.id,
-      wareId: node.wareId,
-      moduleId: node.moduleId,
-      race: node.race,
-      lineage: node.lineage,
-      column: node.column,
-      isIsolated: node.isIsolated,
-      source: 'manual',
-      isRoot: node.isRoot,
-      order: node.order
+    if (node.isIsolated) {
+      return { isolated: node.wareId }
     }
+    if (node.source === 'manual' && node.moduleId) {
+      return { module: node.moduleId }
+    }
+    if (node.source !== 'auto') {
+      console.warn('[LogicFlowStore] Skip invalid node for persistence:', node)
+    }
+    return null
   }
 
   /**
@@ -1053,35 +1058,81 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       }
       groups.value.push(newGroup)
 
+      const orderByColumn = new Map<number, number>()
+      const nextOrder = (column: number) => {
+        const current = orderByColumn.get(column) || 0
+        orderByColumn.set(column, current + 1)
+        return current
+      }
+
       // 第一轮：先添加所有 isolated 节点，确保 expandUpstream 能检测到它们
       for (const savedNode of savedGroup.nodes) {
-        if (savedNode.isIsolated) {
-          const isolatedNode: FlowNode = {
-            ...savedNode,
-            isAuto: false,
-            isPreview: false
-          }
-          newGroup.nodes.push(isolatedNode)
+        if (!savedNode.isolated) continue
+        const ware = gameData.waresMap[savedNode.isolated]
+        if (!ware) {
+          console.warn('[LogicFlowStore] Skip isolated saved node with unknown ware:', savedNode)
+          continue
         }
+        const lineage = newGroup.isLocked ? (newGroup.lockedLineage || 'default') : (newGroup.subCategory || 'default')
+        const isolatedNode: FlowNode = {
+          id: crypto.randomUUID(),
+          wareId: savedNode.isolated,
+          race: lineage,
+          lineage,
+          column: ware.tier,
+          isIsolated: true,
+          isAuto: false,
+          isRoot: true,
+          source: 'manual',
+          order: nextOrder(ware.tier),
+          isPreview: false
+        }
+        insertNodeSorted(newGroup, isolatedNode)
       }
 
       // 第二轮：添加 manual 节点并扩展上游
       for (const savedNode of savedGroup.nodes) {
-        if (!savedNode.isIsolated) {
-          const manualNode: FlowNode = {
-            ...savedNode,
-            isAuto: false,
-            isPreview: false
-          }
-          newGroup.nodes.push(manualNode)
-          if (manualNode.moduleId) {
-            const module = gameData.modulesMap[manualNode.moduleId]
-            if (module?.inputs) {
-              Object.keys(module.inputs).forEach(inputWareId => {
-                expandUpstream(newGroup.id, inputWareId, 'auto', manualNode.lineage)
-              })
-            }
-          }
+        if (!savedNode.module) continue
+        const module = gameData.modulesMap[savedNode.module]
+        if (!module) {
+          console.warn('[LogicFlowStore] Skip saved module node with unknown module:', savedNode)
+          continue
+        }
+        const wareId = resolveModuleOutputWareId(savedNode.module)
+        if (!wareId) {
+          console.warn('[LogicFlowStore] Skip saved module node with no outputs:', savedNode)
+          continue
+        }
+        const ware = gameData.waresMap[wareId]
+        if (!ware) {
+          console.warn('[LogicFlowStore] Skip saved module node with unknown output ware:', savedNode)
+          continue
+        }
+
+        const lineage = newGroup.isLocked
+          ? (newGroup.lockedLineage || 'default')
+          : (module.race || module.method || newGroup.subCategory || 'default')
+
+        const manualNode: FlowNode = {
+          id: crypto.randomUUID(),
+          wareId,
+          moduleId: savedNode.module,
+          race: module.race || lineage,
+          lineage,
+          column: ware.tier,
+          isIsolated: false,
+          isAuto: false,
+          isRoot: true,
+          source: 'manual',
+          order: nextOrder(ware.tier),
+          isPreview: false
+        }
+        insertNodeSorted(newGroup, manualNode)
+
+        if (module.inputs) {
+          Object.keys(module.inputs).forEach(inputWareId => {
+            expandUpstream(newGroup.id, inputWareId, 'auto', manualNode.lineage)
+          })
         }
       }
 
