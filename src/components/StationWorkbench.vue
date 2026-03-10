@@ -60,17 +60,13 @@ watchEffect(() => {
           <TransitHubWorkbench :sector-id="overviewState.supplySectorId" />
         </div>
 
-        <div v-else class="main-layout mt-6">
-          <div class="col-span-12 lg:col-span-3">
+        <div v-else class="overview-layout mt-6">
+          <div class="col-span-1 lg:col-span-2">
             <SectorManagementPanel />
           </div>
 
-          <div class="col-span-12 lg:col-span-5">
+          <div class="col-span-1 lg:col-span-3">
             <EmpireWareFlowsDashboard />
-          </div>
-
-          <div class="col-span-12 lg:col-span-4">
-            <TransitHubWorkbench :sector-id="overviewState.supplySectorId" />
           </div>
         </div>
       </template>
@@ -107,6 +103,10 @@ watchEffect(() => {
 <style scoped>
 .main-layout {
   @apply grid grid-cols-12 gap-8 items-start;
+}
+
+.overview-layout {
+  @apply grid grid-cols-1 lg:grid-cols-5 gap-8 items-start;
 }
 
 .coming-soon-panel {

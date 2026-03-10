@@ -41,6 +41,10 @@ const tabGroups = computed(() => {
   }
 })
 
+const visibleSectorGroups = computed(() => {
+  return tabGroups.value.sectorGroups.filter((group) => group.stations.length > 0)
+})
+
 // 图标映射
 const getStationIcon = (type?: StationType): string => {
   switch (type) {
@@ -159,7 +163,7 @@ const cancelDelete = () => {
 
       <div
         v-if="tabGroups.unassigned.length > 0"
-        class="h-6 w-px bg-slate-700/50 mx-1 self-center"
+        class="tab-separator tab-separator-unassigned h-6 w-px bg-slate-700/50 mx-1 self-center"
       ></div>
 
       <div class="tabs-draggable-list">
@@ -185,11 +189,11 @@ const cancelDelete = () => {
         </div>
 
         <div
-          v-for="group in tabGroups.sectorGroups"
+          v-for="group in visibleSectorGroups"
           :key="`group-${group.id}`"
           class="sector-tab-group"
         >
-          <div class="h-6 w-px bg-slate-700/50 mx-1 self-center"></div>
+          <div class="tab-separator tab-separator-sector h-6 w-px bg-slate-700/50 mx-1 self-center"></div>
 
           <div
             v-for="station in group.stations"

@@ -353,3 +353,30 @@ describe('EmpireStore - 分站标签排序与持久化边界', () => {
     expect(orderedIds[3]).toBe(duplicated!.id)
   })
 })
+
+describe('EmpireStore - isEmptyForSave 判定', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    localStorage.clear()
+    sessionStorage.clear()
+  })
+
+  it('仅当空间站和星区都为空时才判定为空', async () => {
+    const store = useEmpireStore()
+    await vi.waitFor(() => expect(store.isReady).toBe(true), { timeout: 3000 })
+
+    // 默认新帝国包含一个默认星区，所以不为空
+    expect(store.isEmptyForSave()).toBe(false)
+
+    // 仅有空间站时不为空
+    store.createStation('S1', 'industrial')
+    expect(store.isEmptyForSave()).toBe(false)
+
+    // 手动清空星区与空间站后，才为空
+    if (store.activeEmpire) {
+      store.activeEmpire.stations = []
+      store.activeEmpire.sectors = []
+    }
+    expect(store.isEmptyForSave()).toBe(true)
+  })
+})

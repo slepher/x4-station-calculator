@@ -1,66 +1,72 @@
 # sector-link 设计说明
 
 ## 设计目标
-在不破坏既有星区排序拖拽行为的前提下，引入星区间双向连接能力，提供可理解、可删除、可持久化的多对多连接管理。
+将星区管理 UI 与星区物流纯函数统一到同一 change 下，确保：
+- UI 交互清晰、拖拽冲突可控、命名与删除行为可预测。
+- 物流计算稳定、可测试、可复现（纯函数 + 确定性输出）。
 
-## 交互设计
+## 1. UI 设计（SectorManagementPanel / StationTabBar）
 
-### 1. 星区项结构
-- 拖拽把手：继续用于星区排序。
-- 连接图标：仅用于“发起连接拖拽”。
-- 链接区：仅用于“接收连接投放”。
+### 1.1 头部与创建交互
+- 星区管理头部使用单行布局：标题 + 输入 + `+`。
+- 未分配区头部同样为单行布局：标题 + 输入 + `+`。
+- 两处创建均采用“重名后缀编号”策略，编号从 `2` 起。
+- 两处创建后均保留输入值，不自动清空。
 
-通过明确手柄分工，避免“排序拖拽”与“连接拖拽”事件冲突。
+### 1.2 空间站操作
+- 星区内空间站 chip 提供 `x` 按钮，动作是 `moveStationToSector(stationId, null)`。
+- 未分配空间站 chip 提供删除按钮：
+  - `modules.some(count>0)` 为真 -> 打开确认弹窗。
+  - 否则直接 `deleteStation(stationId)`。
 
-### 2. 建链流程
-- `dragstart`（连接图标）记录 `sourceSectorId`。
-- `dragenter/dragover`（目标链接区）提供可投放反馈。
-- `drop` 调用 store action：`createSectorLink(sourceSectorId, targetSectorId)`。
+### 1.3 拖拽态可视化
+- `draggingType === 'station'`：隐藏 `.sector-links`。
+- `draggingType === 'link'`：隐藏 `.sector-stations`。
+- `isDraggingSector === true`：同时隐藏 `.sector-stations` 和 `.sector-links`。
+- 采用状态类驱动 CSS 隐藏，不卸载组件，避免拖拽中断。
 
-### 3. 删除流程
-- 每个连接项显示删除按钮。
-- 点击后调用 `removeSectorLink(a, b)`。
-- UI 使用同一数据源重渲染，两端自动同步。
+### 1.4 样式统一
+- 拖拽把手与连接把手使用同一线性图标风格与按钮样式。
+- 空间站区与连接区使用一致最小高度，避免空态高度不一致。
 
-## 数据模型设计
+### 1.5 StationTabBar
+- `sectorGroups` 渲染前过滤无站点分组。
+- 空星区不渲染星区 tab，也不渲染对应分割线。
 
-### 1. 连接存储
-使用无向边集合表达双向关系，避免两份数据难以同步。
+## 2. Store 设计
 
-建议结构：
-- `sectorLinks: string[]`（边 key 列表）
-- 边 key 规范化规则：`minId|maxId`
+### 2.1 createStation 选择行为
+- `createStation(name, type, selectAfterCreate = true)` 增加可选参数。
+- 仅 SectorManagementPanel 的未分配创建使用 `false`，其它入口保持默认行为。
 
-说明：
-- A-B 与 B-A 会归一为同一 key，实现天然去重。
-- 删除时按同一 key 删除，天然支持“任一端删除”。
+### 2.2 isEmptyForSave
+- 判空改为：`!hasStations && !hasSectors`。
 
-### 2. 派生读取
-提供读取函数将边集合转换为“某星区的邻接列表”：
-- `getLinkedSectors(sectorId): string[]`
+## 3. 物流纯函数设计（src/store/logic/sectorLinkFlow.ts）
 
-UI 不持有副本，仅消费派生数据，减少状态漂移。
+### 3.1 输入输出模型（sector 口径）
+- 单货物：`solveSingleWareDistancePull`。
+- 多货物：`solveMultiWareByLink`。
+- 增强输出：
+  - `allocatedDemandBySector`（满足量）
+  - `deficitSummary`（总缺口、按sector缺口、同子网可产出sector映射）
 
-## 状态与持久化
-- 连接集合纳入 empire 持久化结构。
-- 初始化和迁移时为旧数据补默认空数组。
-- 刷新后通过持久化数据恢复连接显示。
+### 3.2 算法流程
+1. 构图（无向加权图）。
+2. 切分连通分量（`splitSectorNetwork`）。
+3. 需求侧最短路分层（最小距离优先）。
+4. 同距离层按缺口比例分配。
+5. 分配沿路径累加到边流量。
+6. 计算缺口摘要与满足量摘要。
 
-## 一致性与防护策略
-- 自连接：`sourceSectorId === targetSectorId` 直接拒绝。
-- 重复连接：规范化 key 已存在则忽略写入。
-- 非法目标（不存在 sector）拒绝写入。
-- 所有建链/删链校验收敛在 store action，组件层只负责交互触发与反馈。
+### 3.3 确定性与稳定性
+- 并列最短路使用稳定 tie-break。
+- 统一 `epsilon` 处理浮点误差。
 
-## 影响面
-- 星区管理面板（星区项 UI 与事件绑定）。
-- Empire store（数据结构、action、getter、迁移）。
-- i18n（连接图标提示、链接区文案、错误提示）。
-
-## 风险与对策
-- 风险：拖拽事件互相干扰，导致排序和建链误触。
-  - 对策：连接图标与排序把手使用不同 data payload 与事件入口。
-- 风险：连接删除后单端残留。
-  - 对策：采用无向边单一事实来源，不做双端冗余存储。
-- 风险：旧存档缺字段导致异常。
-  - 对策：迁移逻辑补 `sectorLinks=[]` 并容错读取。
+## 4. 风险与对策
+- 风险：拖拽状态切换导致交互闪断。
+  - 对策：用 class 控制 display，不通过 `v-if` 卸载拖拽容器。
+- 风险：重名规则与用户手输后缀冲突。
+  - 对策：仅追加 ` base + " " + index `，按已有名称集合递增。
+- 风险：删除误操作。
+  - 对策：有模块才弹确认，降低无模块流程摩擦。

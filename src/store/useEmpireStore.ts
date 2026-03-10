@@ -443,13 +443,15 @@ export const useEmpireStore = defineStore('empire', () => {
     }
   }
 
-  function createStation(name: string, type: StationType = 'industrial') {
+  function createStation(name: string, type: StationType = 'industrial', selectAfterCreate: boolean = true) {
     if (!activeEmpire.value) return null
     
     const station = createDefaultStation(name, type)
     station.sectorId = null
     activeEmpire.value.stations.push(station)
-    activeStationId.value = station.id
+    if (selectAfterCreate) {
+      activeStationId.value = station.id
+    }
     refreshStationFlowCache(station.id)
     return station
   }
@@ -708,7 +710,10 @@ export const useEmpireStore = defineStore('empire', () => {
   })
 
   function isEmptyForSave() {
-    return !activeEmpire.value || activeEmpire.value.stations.length === 0
+    if (!activeEmpire.value) return true
+    const hasStations = (activeEmpire.value.stations || []).length > 0
+    const hasSectors = (activeEmpire.value.sectors || []).length > 0
+    return !hasStations && !hasSectors
   }
 
   function isEditable() {
