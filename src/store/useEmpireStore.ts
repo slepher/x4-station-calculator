@@ -13,11 +13,14 @@ import type {
   EmpireGroupedFlows,
   SupplyPlanningInput,
   SectorInternalData,
-  SupplyStorageFlow
+  SupplyStorageFlow,
+  TransitHubViewModel
 } from '@/types/x4'
 import { useGameDataStore } from './useGameDataStore'
 import { analyzeEmpireWareFlow } from './logic/analyzeEmpireWareFlow'
 import { solveMultiWareByLink, type SectorLinkInput, type SolveMultiWareByLinkOutput } from './logic/sectorLinkFlow'
+import { buildTransitHubViewModel } from './logic/transitHubViewModel'
+import { buildStationComponentGapFlows, type StationComponentGapFlows } from './logic/stationGapViewModel'
 import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
 import { stationStateMap, DEFAULT_STATION_SETTINGS, migrateStationSettings } from './state/StationStateMap'
 import { CURRENT_EMPIRE_VERSION } from './logic/storageVersions'
@@ -776,6 +779,64 @@ export const useEmpireStore = defineStore('empire', () => {
     return sectorLinkCalcMap.value.get(sectorId) || null
   }
 
+  function getStationComponentGapFlows(stationId: string | null = activeStation.value?.id || null): StationComponentGapFlows {
+    if (!activeEmpire.value || !stationId) {
+      return { operations: [], supply: [] }
+    }
+
+    const station = activeEmpire.value.stations.find((item) => item.id === stationId)
+    const currentSectorId = station?.sectorId || ''
+    if (!currentSectorId) {
+      return { operations: [], supply: [] }
+    }
+
+    return buildStationComponentGapFlows({
+      currentSectorId,
+      sectors: sectors.value,
+      sectorLinks: sectorLinks.value,
+      orderedStations: orderedStationsBySector.value,
+      sectorInternalDataMap: sectorInternalDataMap.value
+    })
+  }
+
+  function getTransitHubViewModel(input: {
+    sectorId: string | null
+    racePreference: string
+    transportShipCapacity: number
+    storageBufferHours?: number
+  }): TransitHubViewModel {
+    if (!input.sectorId) {
+      return buildTransitHubViewModel({
+        sectorId: null,
+        sectors: sectors.value,
+        stations: orderedStationsBySector.value,
+        localGroupedFlows: createEmptyEmpireGroupedFlows(),
+        solverOutput: null,
+        waresMap: gameData.waresMap || undefined,
+        modulesMap: gameData.modulesMap || undefined,
+        racePreference: input.racePreference,
+        transportShipCapacity: input.transportShipCapacity,
+        storageBufferHours: input.storageBufferHours
+      })
+    }
+
+    const sectorData = getSectorInternalData(input.sectorId)
+    const sectorLinkCalc = getSectorLinkCalc(input.sectorId)
+
+    return buildTransitHubViewModel({
+      sectorId: input.sectorId,
+      sectors: sectors.value,
+      stations: orderedStationsBySector.value,
+      localGroupedFlows: sectorData.localGroupedFlows,
+      solverOutput: sectorLinkCalc?.solverOutput || null,
+      waresMap: gameData.waresMap || undefined,
+      modulesMap: gameData.modulesMap || undefined,
+      racePreference: input.racePreference,
+      transportShipCapacity: input.transportShipCapacity,
+      storageBufferHours: input.storageBufferHours
+    })
+  }
+
   function renameStation(stationId: string, newName: string) {
     if (!activeEmpire.value) return false
     
@@ -975,6 +1036,8 @@ export const useEmpireStore = defineStore('empire', () => {
     getSupplyPlanningInput,
     getSectorInternalData,
     getSectorLinkCalc,
+    getStationComponentGapFlows,
+    getTransitHubViewModel,
     renameStation,
     selectStation,
     selectTransitSector,

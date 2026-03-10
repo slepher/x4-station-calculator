@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
@@ -10,17 +10,28 @@ import TransitHubEconomyView from './TransitHubEconomyView.vue'
 import TransitHubStorageView from './TransitHubStorageView.vue'
 import TransitHubTransportView from './TransitHubTransportView.vue'
 
-const props = defineProps<{
-  groupedFlows: EmpireGroupedFlows
-  storageFlows: SupplyStorageFlow[]
-}>()
-
 const gameData = useGameDataStore()
 const { t } = useI18n()
 const { translateWare } = useX4I18n()
 
-type ViewMode = 'quantity' | 'economy' | 'storage' | 'transport'
-const viewMode = ref<ViewMode>('quantity')
+type SharedViewMode = 'quantity' | 'volume' | 'economy' | 'transport'
+
+const props = withDefaults(defineProps<{
+  groupedFlows: EmpireGroupedFlows
+  storageFlows: SupplyStorageFlow[]
+  viewMode?: SharedViewMode
+}>(), {
+  viewMode: 'quantity'
+})
+
+const emit = defineEmits<{
+  (e: 'update:viewMode', value: SharedViewMode): void
+}>()
+
+const viewMode = computed<SharedViewMode>({
+  get: () => props.viewMode,
+  set: (value) => emit('update:viewMode', value)
+})
 
 const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
 const formatSignedAbs = (n: number) => `${n >= 0 ? '+' : '-'}${formatNum(Math.abs(n))}`
@@ -37,14 +48,14 @@ const wrapFlow = (flow: any) => {
 const views = computed(() => [
   { key: 'quantity', label: t('wareflow.quantity_view') },
   { key: 'economy', label: t('wareflow.economy_view') },
-  { key: 'storage', label: t('wareflow.volume_view') },
+  { key: 'volume', label: t('wareflow.volume_view') },
   { key: 'transport', label: t('wareflow.transport_view') }
 ])
 
 const title = computed(() => {
   if (viewMode.value === 'quantity') return t('wareflow.resource_view')
   if (viewMode.value === 'economy') return t('wareflow.economy_view')
-  if (viewMode.value === 'storage') return t('wareflow.volume_view')
+  if (viewMode.value === 'volume') return t('wareflow.volume_view')
   return t('wareflow.transport_view')
 })
 
@@ -150,7 +161,7 @@ const hasTransportData = computed(() =>
         :has-data="hasFlowData"
       />
       <TransitHubStorageView
-        v-else-if="viewMode === 'storage'"
+        v-else-if="viewMode === 'volume'"
         :items="storageItems"
         :total-volume="storageTotalVolume"
         :has-data="hasStorageData"

@@ -666,6 +666,23 @@ export interface SectorInternalData {
   supplyStorageFlows: SupplyStorageFlow[];
 }
 
+export interface TransitHubStorageModulePlan {
+  id: string;
+  item: SavedModule;
+  info: X4Module;
+  count: number;
+  capacity: number;
+  required: number;
+  type: 'container' | 'solid' | 'liquid';
+}
+
+export interface TransitHubViewModel {
+  groupedFlows: EmpireGroupedFlows;
+  storageFlows: SupplyStorageFlow[];
+  storageModulePlans: TransitHubStorageModulePlan[];
+  supplyBuildModules: SavedModule[];
+}
+
 // [新增] 人口普查结果接口
 export interface WorkforceCensusItem {
   moduleId: string

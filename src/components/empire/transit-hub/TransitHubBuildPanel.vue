@@ -1,14 +1,9 @@
 <script setup lang="ts">
+import type { TransitHubStorageModulePlan } from '@/types/x4'
 import StationPlanningItem from '../StationPlanningItem.vue'
 
-type StoragePlanItem = {
-  id: string
-  item: { id: string; count: number }
-  info: any
-}
-
 defineProps<{
-  storageModulePlans: StoragePlanItem[]
+  storageModulePlans: TransitHubStorageModulePlan[]
 }>()
 </script>
 
