@@ -92,31 +92,23 @@ const storageItems = computed(() =>
   props.storageFlows.map((flow) => ({
     ...flow,
     name: wrapFlow({ wareId: flow.wareId }).name
-  }))
+  })).filter((item) => item.totalRequiredStorageVolume > 0)
 )
 const storageTotalVolume = computed(() =>
-  props.storageFlows.reduce((sum, item) => sum + item.totalRequiredStorageVolume, 0)
+  storageItems.value.reduce((sum, item) => sum + item.totalRequiredStorageVolume, 0)
 )
-const hasStorageData = computed(() => props.storageFlows.length > 0)
+const hasStorageData = computed(() => storageItems.value.length > 0)
 
-const flowByWareId = computed(() => new Map(props.groupedFlows.flows.map((flow) => [flow.wareId, flow])))
 const transportItems = computed(() =>
   props.storageFlows.map((storageFlow) => {
-    const source = flowByWareId.value.get(storageFlow.wareId)
-    if (!source) {
-      return {
-        wareId: storageFlow.wareId,
-        name: wrapFlow({ wareId: storageFlow.wareId }).name,
-        totalTransportVolume: 0,
-        details: [] as any[]
-      }
-    }
-    const details = source.contributions
+    const details = (storageFlow.details || [])
       .map((detail: any) => ({
         stationId: detail.stationId,
         stationName: detail.stationName,
         stationCount: detail.stationCount,
-        transportVolume: Math.abs(detail.netRate) * source.unitVolume
+        kind: detail.kind,
+        transportVolume: Math.abs(detail.staticRate || 0) * (storageFlow.unitVolume || 0),
+        sortOrder: detail.sortOrder
       }))
       .filter((detail: any) => detail.transportVolume > 0)
     const totalTransportVolume = details.reduce((sum: number, detail: any) => sum + detail.transportVolume, 0)
@@ -127,7 +119,7 @@ const transportItems = computed(() =>
       totalTransportVolume,
       details
     }
-  })
+  }).filter((item) => item.totalTransportVolume > 0)
 )
 const transportTotalVolume = computed(() =>
   transportItems.value.reduce((sum, item) => sum + item.totalTransportVolume, 0)

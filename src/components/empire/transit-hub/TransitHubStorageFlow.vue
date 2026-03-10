@@ -22,17 +22,34 @@ const totalRequiredCount = computed(() => {
 const formattedDetails = computed(() => {
   return [...props.details]
     .sort((a, b) => {
+      const orderA = Number((a as any).sortOrder)
+      const orderB = Number((b as any).sortOrder)
+      const hasOrderA = Number.isFinite(orderA)
+      const hasOrderB = Number.isFinite(orderB)
+      if (hasOrderA || hasOrderB) {
+        if (hasOrderA && hasOrderB && orderA !== orderB) return orderA - orderB
+        if (hasOrderA && !hasOrderB) return -1
+        if (!hasOrderA && hasOrderB) return 1
+      }
       if (a.kind !== b.kind) return a.kind === 'production' ? -1 : 1
       return b.storageVolume - a.storageVolume
     })
     .map((detail) => ({
       ...detail,
+      isExternal: String(detail.stationId || '').startsWith('external:'),
       storageCount: (!props.unitVolume || props.unitVolume <= 0)
         ? 0
         : Math.ceil(detail.storageVolume / props.unitVolume),
-      kindLabel: detail.kind === 'production'
-        ? t('sectorManagement.supply_storage_production')
-        : t('sectorManagement.supply_storage_consumption')
+      kindLabel: String(detail.stationId || '').startsWith('external:')
+        ? (detail.kind === 'consumption'
+            ? t('sectorManagement.supply_storage_input')
+            : t('sectorManagement.supply_storage_output'))
+        : (detail.kind === 'production'
+            ? t('sectorManagement.supply_storage_production')
+            : t('sectorManagement.supply_storage_consumption')),
+      kindClass: String(detail.stationId || '').startsWith('external:')
+        ? (detail.kind === 'consumption' ? 'kind-pos' : 'kind-neg')
+        : (detail.kind === 'production' ? 'kind-pos' : 'kind-neg')
     }))
 })
 </script>
@@ -62,7 +79,7 @@ const formattedDetails = computed(() => {
           <span class="qty">{{ item.stationCount }}</span>
           <span class="symbol">x</span>
           <span class="name">{{ item.stationName }}</span>
-          <span :class="item.kind === 'production' ? 'kind-pos' : 'kind-neg'">
+          <span :class="item.kindClass">
             {{ item.kindLabel }}
           </span>
         </span>

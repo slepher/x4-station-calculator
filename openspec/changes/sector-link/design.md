@@ -1,9 +1,10 @@
 # sector-link 设计说明
 
 ## 设计目标
-将星区管理 UI 与星区物流纯函数统一到同一 change 下，确保：
+在 `sector-link` change 内聚焦星区管理 UI 与连接交互，确保：
 - UI 交互清晰、拖拽冲突可控、命名与删除行为可预测。
-- 物流计算稳定、可测试、可复现（纯函数 + 确定性输出）。
+
+> 归属更新：纯函数物流计算已迁移至 `sector-link-calc`，本变更仅保留 UI/交互设计。
 
 ## 1. UI 设计（SectorManagementPanel / StationTabBar）
 
@@ -42,26 +43,10 @@
 ### 2.2 isEmptyForSave
 - 判空改为：`!hasStations && !hasSectors`。
 
-## 3. 物流纯函数设计（src/store/logic/sectorLinkFlow.ts）
-
-### 3.1 输入输出模型（sector 口径）
-- 单货物：`solveSingleWareDistancePull`。
-- 多货物：`solveMultiWareByLink`。
-- 增强输出：
-  - `allocatedDemandBySector`（满足量）
-  - `deficitSummary`（总缺口、按sector缺口、同子网可产出sector映射）
-
-### 3.2 算法流程
-1. 构图（无向加权图）。
-2. 切分连通分量（`splitSectorNetwork`）。
-3. 需求侧最短路分层（最小距离优先）。
-4. 同距离层按缺口比例分配。
-5. 分配沿路径累加到边流量。
-6. 计算缺口摘要与满足量摘要。
-
-### 3.3 确定性与稳定性
-- 并列最短路使用稳定 tie-break。
-- 统一 `epsilon` 处理浮点误差。
+## 3. 纯函数能力迁移说明
+- `src/store/logic/sectorLinkFlow.ts` 的纯函数计算职责迁移到 `sector-link-calc` change。
+- 本 change 不再定义纯函数输入输出、算法流程与确定性约束。
+- 若需调整分网/分层分配/流向输出语义，以 `sector-link-calc` 文档为准。
 
 ## 4. 风险与对策
 - 风险：拖拽状态切换导致交互闪断。

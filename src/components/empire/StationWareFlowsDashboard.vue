@@ -4,6 +4,8 @@ import { useStationStore } from '@/store/useStationStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
+import { getSectorNetworkComponent, type SectorLinkInput } from '@/store/logic/sectorLinkFlow'
+import { parseSectorLinkKey } from '@/store/logic/sectorLinks'
 import { useI18n } from 'vue-i18n';
 
 import PriceSlider from '@/components/common/PriceSlider.vue'
@@ -74,12 +76,163 @@ const empireFlowByWareId = computed(() => {
   return map
 })
 
+const componentGapFlows = computed(() => {
+  const activeStation = empireStore.activeStation
+  const currentSectorId = activeStation?.sectorId || ''
+  if (!currentSectorId) {
+    return {
+      operations: [] as any[],
+      supply: [] as any[]
+    }
+  }
+
+  const sectorIds = empireStore.sectors.map((sector) => sector.id)
+  const links: SectorLinkInput[] = (empireStore.sectorLinks || [])
+    .map((key) => parseSectorLinkKey(key))
+    .filter((item): item is { a: string; b: string } => !!item)
+    .map((item) => ({
+      linkId: `${item.a}|${item.b}`,
+      a: item.a,
+      b: item.b,
+      distance: 1
+    }))
+  const component = getSectorNetworkComponent(currentSectorId, sectorIds, links)
+  if (!component) {
+    return {
+      operations: [] as any[],
+      supply: [] as any[]
+    }
+  }
+
+  const sectorNameMap = new Map(empireStore.sectors.map((sector) => [sector.id, sector.name]))
+  const sectorOrderMap = new Map(empireStore.sectors.map((sector, index) => [sector.id, index]))
+  const currentSectorStationOrderMap = new Map(
+    empireStore.orderedStationsBySector
+      .filter((station) => station.sectorId === currentSectorId)
+      .map((station, index) => [station.id, index])
+  )
+  const operationsByWare = new Map<string, any>()
+  const supplyByWare = new Map<string, any>()
+
+  const appendFlow = (bucket: Map<string, any>, flow: any, contributions: any[]) => {
+    const current = bucket.get(flow.wareId)
+    if (!current) {
+      bucket.set(flow.wareId, {
+        ...flow,
+        contributions: [...contributions]
+      })
+      return
+    }
+    current.production += flow.production || 0
+    current.consumption += flow.consumption || 0
+    current.workforceConsumption += flow.workforceConsumption || 0
+    current.netRate += flow.netRate || 0
+    current.netValue += flow.netValue || 0
+    current.contributions.push(...contributions)
+  }
+
+  component.sectorIds.forEach((sectorId) => {
+    const internal = empireStore.getSectorInternalData(sectorId)
+    const localFlows = internal.localGroupedFlows
+    const sectorName = sectorNameMap.get(sectorId) || sectorId
+    const isCurrentSector = sectorId === currentSectorId
+
+    localFlows.empireGroups.operations
+      .filter((flow: any) => flow.transportType === 'container')
+      .forEach((flow: any) => {
+        const contributions = isCurrentSector
+          ? (flow.contributions || []).map((detail: any) => ({
+              ...detail,
+              sortOrder: currentSectorStationOrderMap.get(detail.stationId) ?? Number.MAX_SAFE_INTEGER / 2
+            }))
+          : [{
+              stationId: `sector:${sectorId}`,
+              stationName: sectorName,
+              stationCount: 1,
+              production: Math.max(flow.netRate || 0, 0),
+              consumption: Math.max(-(flow.netRate || 0), 0),
+              workforceConsumption: flow.workforceConsumption || 0,
+              netRate: flow.netRate || 0,
+              netValue: flow.netValue || 0,
+              sortOrder: 100000 + (sectorOrderMap.get(sectorId) ?? Number.MAX_SAFE_INTEGER / 2)
+            }]
+        appendFlow(operationsByWare, flow, contributions)
+      })
+
+    localFlows.empireGroups.supply
+      .filter((flow: any) => flow.transportType === 'container')
+      .forEach((flow: any) => {
+        const contributions = isCurrentSector
+          ? (flow.contributions || []).map((detail: any) => ({
+              ...detail,
+              sortOrder: currentSectorStationOrderMap.get(detail.stationId) ?? Number.MAX_SAFE_INTEGER / 2
+            }))
+          : [{
+              stationId: `sector:${sectorId}`,
+              stationName: sectorName,
+              stationCount: 1,
+              production: Math.max(flow.netRate || 0, 0),
+              consumption: Math.max(-(flow.netRate || 0), 0),
+              workforceConsumption: flow.workforceConsumption || 0,
+              netRate: flow.netRate || 0,
+              netValue: flow.netValue || 0,
+              sortOrder: 100000 + (sectorOrderMap.get(sectorId) ?? Number.MAX_SAFE_INTEGER / 2)
+            }]
+        appendFlow(supplyByWare, flow, contributions)
+      })
+  })
+
+  const sortFlows = (list: any[]) =>
+    list.sort((a, b) => {
+      if ((a.orderIndex ?? 0) !== (b.orderIndex ?? 0)) return (a.orderIndex ?? 0) - (b.orderIndex ?? 0)
+      if ((a.tier ?? 0) !== (b.tier ?? 0)) return (b.tier ?? 0) - (a.tier ?? 0)
+      return Math.abs(b.netRate || 0) - Math.abs(a.netRate || 0)
+    })
+
+  // Keep previous behavior: if a ware exists in supply, merge same ware from operations into supply.
+  const mergedSupplyByWare = new Map<string, any>(Array.from(supplyByWare.entries()))
+  const mergedOperationsByWare = new Map<string, any>()
+  Array.from(operationsByWare.entries()).forEach(([wareId, opFlow]) => {
+    const supplyFlow = mergedSupplyByWare.get(wareId)
+    if (!supplyFlow) {
+      mergedOperationsByWare.set(wareId, opFlow)
+      return
+    }
+    supplyFlow.production += opFlow.production || 0
+    supplyFlow.consumption += opFlow.consumption || 0
+    supplyFlow.workforceConsumption += opFlow.workforceConsumption || 0
+    supplyFlow.netRate += opFlow.netRate || 0
+    supplyFlow.netValue += opFlow.netValue || 0
+    supplyFlow.contributions.push(...(opFlow.contributions || []))
+  })
+
+  return {
+    operations: sortFlows(Array.from(mergedOperationsByWare.values())),
+    supply: sortFlows(Array.from(mergedSupplyByWare.values()))
+  }
+})
+
 const empireGaps = computed(() => {
-  const flows = empireStore.empireGroupedFlows
+  const flows = componentGapFlows.value
+  const stationNetByWare = new Map<string, number>()
+  ;(groupedFlows.value.flows || []).forEach((flow: any) => {
+    if (flow.transportType !== 'container') return
+    stationNetByWare.set(flow.wareId, Number(flow.netRate || 0))
+  })
   store.plannedModules
   locale.value
-  const operations = flows.empireGroups.operations
-    .filter((flow: any) => flow.netRate < 0 || store.getResolvedLevel(flow.wareId) > 0)
+  const byTierThenName = (a: any, b: any) => {
+    const tierA = Number(a.tier ?? 0)
+    const tierB = Number(b.tier ?? 0)
+    if (tierA !== tierB) return tierB - tierA
+    const nameA = String(a.name || '')
+    const nameB = String(b.name || '')
+    const nameCmp = nameA.localeCompare(nameB, 'en')
+    if (nameCmp !== 0) return nameCmp
+    return String(a.id || '').localeCompare(String(b.id || ''), 'en')
+  }
+  const operations = flows.operations
+    .filter((flow: any) => (stationNetByWare.get(flow.wareId) ?? 0) < 0 || store.getResolvedLevel(flow.wareId) > 0)
     .map((flow: any) => {
       const module = getModuleForWare(flow.wareId)
       const plannedIndex = module ? getPlannedModuleIndex(module.id) : -1
@@ -89,9 +242,10 @@ const empireGaps = computed(() => {
         disableRemove: !module || plannedIndex === -1
       }
     })
+    .sort(byTierThenName)
   return {
     operations,
-    supply: flows.empireGroups.supply
+    supply: flows.supply
       .map((flow: any) => {
         const module = getModuleForWare(flow.wareId)
         const plannedIndex = module ? getPlannedModuleIndex(module.id) : -1
@@ -101,9 +255,13 @@ const empireGaps = computed(() => {
           disableRemove: !module || plannedIndex === -1
         }
       })
-      .filter((flow: any) => flow.netRate <= 0 || !flow.disableRemove)
+      .filter((flow: any) => (stationNetByWare.get(flow.wareId) ?? 0) <= 0 || !flow.disableRemove)
+      .sort(byTierThenName)
   }
 })
+const hasEmpireGapItems = computed(() =>
+  empireGaps.value.operations.length > 0 || empireGaps.value.supply.length > 0
+)
 
 // 总利润计算
 const totalProfit = computed(() => {
@@ -276,7 +434,7 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
 
       <!-- 通用分组视图：根据当前视图模式显示对应的数据 -->
       <div v-if="viewMode === 'economy' || viewMode === 'quantity'" class="volume-groups-container">
-          <div v-if="store.settings.showEmpireGaps && viewMode === 'quantity'" class="empire-gap-groups">
+          <div v-if="store.settings.showEmpireGaps && viewMode === 'quantity' && hasEmpireGapItems" class="empire-gap-groups">
             <div v-if="empireGaps.operations.length > 0" class="empire-gap-group">
               <EmpireWareFlowGroup
                 :title="t('wareflow.sector_operations')"

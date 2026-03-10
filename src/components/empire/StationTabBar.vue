@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useI18n } from 'vue-i18n'
 import type { StationType } from '@/types/x4'
@@ -19,6 +19,9 @@ const menuPosition = ref({ x: 0, y: 0 })
 const menuStationId = ref<string | null>(null)
 const showDeleteConfirm = ref(false)
 const stationToDelete = ref<string | null>(null)
+const tabsScrollAreaRef = ref<HTMLElement | null>(null)
+const canScrollLeft = ref(false)
+const canScrollRight = ref(false)
 
 // 数据获取
 const stations = computed(() => {
@@ -42,7 +45,23 @@ const tabGroups = computed(() => {
 })
 
 const visibleSectorGroups = computed(() => {
-  return tabGroups.value.sectorGroups.filter((group) => group.stations.length > 0)
+  const stationCountBySector = new Map<string, number>()
+  tabGroups.value.sectorGroups.forEach((group) => {
+    stationCountBySector.set(group.id, group.stations.length)
+  })
+
+  return tabGroups.value.sectorGroups
+    .map((group) => {
+      const hasOwnStations = group.stations.length > 0
+      const hasLinkedStations = empireStore
+        .getLinkedSectors(group.id)
+        .some((linkedSectorId) => (stationCountBySector.get(linkedSectorId) ?? 0) > 0)
+      return {
+        ...group,
+        showTransitTab: hasOwnStations || hasLinkedStations
+      }
+    })
+    .filter((group) => group.showTransitTab || group.stations.length > 0)
 })
 
 // 图标映射
@@ -66,9 +85,10 @@ const addNewStation = () => {
   empireStore.createStation(name, 'industrial')
   // 自动滚动到最右侧
   setTimeout(() => {
-    const scrollContainer = document.querySelector('.tabs-scroll-area')
+    const scrollContainer = tabsScrollAreaRef.value
     if (scrollContainer) {
       scrollContainer.scrollLeft = scrollContainer.scrollWidth
+      updateTabsScrollState()
     }
   }, 100)
 }
@@ -106,8 +126,51 @@ const handleClickOutside = () => {
   if (showMenu.value) closeMenu()
 }
 
-onMounted(() => document.addEventListener('click', handleClickOutside))
-onUnmounted(() => document.removeEventListener('click', handleClickOutside))
+const updateTabsScrollState = () => {
+  const el = tabsScrollAreaRef.value
+  if (!el) {
+    canScrollLeft.value = false
+    canScrollRight.value = false
+    return
+  }
+  const maxScrollLeft = Math.max(0, el.scrollWidth - el.clientWidth)
+  canScrollLeft.value = el.scrollLeft > 1
+  canScrollRight.value = el.scrollLeft < maxScrollLeft - 1
+}
+
+const scrollTabs = (direction: 'left' | 'right') => {
+  const el = tabsScrollAreaRef.value
+  if (!el) return
+  const offset = direction === 'left' ? -320 : 320
+  el.scrollBy({ left: offset, behavior: 'smooth' })
+}
+
+const handleTabsScroll = () => {
+  updateTabsScrollState()
+}
+
+const handleWindowResize = () => {
+  updateTabsScrollState()
+}
+
+watch(
+  [stations, sectors, activeStationId, () => props.activeSupplySectorId],
+  async () => {
+    await nextTick()
+    updateTabsScrollState()
+  },
+  { deep: true }
+)
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+  window.addEventListener('resize', handleWindowResize)
+  nextTick(() => updateTabsScrollState())
+})
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+  window.removeEventListener('resize', handleWindowResize)
+})
 
 // 菜单操作
 const renameStation = () => {
@@ -147,7 +210,18 @@ const cancelDelete = () => {
 
 <template>
   <div class="station-tab-bar-container">
-    <div class="tabs-scroll-area custom-scrollbar">
+    <button
+      v-if="canScrollLeft"
+      class="tabs-nav-btn left"
+      type="button"
+      @click="scrollTabs('left')"
+      aria-label="Scroll tabs left"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m15 18-6-6 6-6"></path>
+      </svg>
+    </button>
+    <div ref="tabsScrollAreaRef" class="tabs-scroll-area custom-scrollbar" @scroll="handleTabsScroll">
       
       <div 
         class="tab-item overview-tab"
@@ -212,7 +286,7 @@ const cancelDelete = () => {
           </div>
 
           <div
-            v-if="group.stations.length > 0"
+            v-if="group.showTransitTab"
             class="tab-item supply-tab"
             :class="{ 'active': activeStationId === null && props.activeSupplySectorId === group.id }"
             @click="openSupply(group.id)"
@@ -233,6 +307,17 @@ const cancelDelete = () => {
         </svg>
       </button>
     </div>
+    <button
+      v-if="canScrollRight"
+      class="tabs-nav-btn right"
+      type="button"
+      @click="scrollTabs('right')"
+      aria-label="Scroll tabs right"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m9 18 6-6-6-6"></path>
+      </svg>
+    </button>
 
     <Teleport to="body">
       <div 
@@ -287,8 +372,22 @@ const cancelDelete = () => {
 }
 
 .tabs-scroll-area {
-  @apply flex items-end h-full px-4 gap-1 overflow-x-auto;
+  @apply flex items-end h-full px-10 gap-1 overflow-x-auto;
   scrollbar-width: none; /* Firefox */
+}
+
+.tabs-nav-btn {
+  @apply absolute top-1/2 -translate-y-1/2 z-20 h-7 w-7 rounded-md flex items-center justify-center;
+  @apply bg-slate-900/90 border border-slate-700 text-slate-400;
+  @apply hover:text-sky-300 hover:border-slate-500 transition-colors;
+}
+
+.tabs-nav-btn.left {
+  @apply left-2;
+}
+
+.tabs-nav-btn.right {
+  @apply right-2;
 }
 
 .tabs-draggable-list {

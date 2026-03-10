@@ -40,16 +40,12 @@
 - [x] 7. Empire 判空逻辑
 - [x] 7.1 `isEmptyForSave` 改为“无空间站且无星区才为空”
 
-- [x] 8. 物流纯函数实现
-- [x] 8.1 新增 `solveSingleWareDistancePull`
-- [x] 8.2 新增 `solveMultiWareByLink`
-- [x] 8.3 支持 `splitSectorNetwork` 分网
-- [x] 8.4 输出 `allocatedDemandBySector`
-- [x] 8.5 输出 `deficitSummary`
-- [x] 8.6 多货物按 sector 汇总缺口与满足量
+- [x] 8. 纯函数任务迁移
+- [x] 8.1 纯函数计算流量相关任务迁移到 `sector-link-calc`
+- [x] 8.2 本 change 保留 UI/交互任务，不再承载纯函数实现任务
 
 - [x] 9. 测试与验证
-- [x] 9.1 新增 `sector-link` 纯函数单测
+- [x] 9.1 纯函数单测任务迁移到 `sector-link-calc/test_tasks.md`
 - [x] 9.2 新增 `SectorManagementPanel` 交互单测
 - [x] 9.3 新增 `StationTabBar` 空星区单测
 - [x] 9.4 运行变更相关测试并通过

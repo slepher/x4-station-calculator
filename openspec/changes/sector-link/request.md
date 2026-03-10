@@ -3,7 +3,7 @@
 ## 目标
 在帝国视图中提供两类能力：
 - 星区管理与连接管理 UI：支持星区排序、空间站分配/回收、星区连接创建与删除。
-- 星区物流纯函数：基于星区连接网络做单货物/多货物的距离优先分配，并输出连接级流向与缺口信息。
+- （已迁移）星区物流纯函数能力迁移至 `sector-link-calc` change 统一维护。
 
 ## 已确认需求
 
@@ -40,20 +40,9 @@
 ### 5. Empire 空判定
 - `isEmptyForSave` 仅在“同时没有空间站且没有星区”时返回空。
 
-### 6. 星区物流纯函数（sector 口径）
-- 输入：
-  - 单货物：`sectors[{sectorId, net}]`、`links[{linkId,a,b,distance}]`。
-  - 多货物：`sectors[{sectorId, netByWare}]`、`links[...]`。
-- 规则：
-  - 需求驱动，按最小距离优先分配。
-  - 同距离层供给不足时按缺口比例分配。
-  - 支持任意连线和环路。
-- 输出：
-  - 单货物：`linkFlows`、`unmetDemand`、`unusedSupply`、`allocatedDemandBySector`、`deficitSummary`。
-  - 多货物：`linkWareFlows`、`allocatedDemandBySector(按sector汇总+byWare)`、`deficitSummary(按sector汇总)`。
-- 分网：
-  - 对非连通网络先切分连通分量。
-  - 缺口与可产出来源按同子网统计。
+### 6. 变更边界说明
+- `sector-link` 仅承载星区管理/连接管理 UI 与交互规则。
+- 纯函数计算流量（含分网、分层分配、连接级流向输出）已迁移至 `sector-link-calc`。
 
 ## 边界
 
@@ -61,12 +50,12 @@
 - 星区管理面板内的星区/空间站/连接交互与文案。
 - Station Tab 空星区隐藏逻辑。
 - Empire 空判定逻辑。
-- 纯函数物流分配与结果结构。
 
 ### Out of Scope
 - 价格驱动或时间切片仿真。
 - 多货物共享运力/仓储联合优化。
 - 跨实体（站点-站点、站点-星区）统一网络优化。
+- 纯函数物流分配与结果结构（迁移到 `sector-link-calc`）。
 
 ## 验收标准（DoD）
 - 星区与未分配两处创建输入均支持重名自动编号且不清空输入。
@@ -75,7 +64,6 @@
 - 三类拖拽态显示规则符合预期。
 - 空星区不在 tab 中显示（含分割线）。
 - Empire 空判定按“空间站与星区同时为空”生效。
-- 纯函数在单货物/多货物均返回连接级流向与缺口摘要。
 
 ## 未决项
 无。

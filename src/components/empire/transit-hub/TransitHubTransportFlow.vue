@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import CollapsibleDetailList from '@/components/common/CollapsibleDetailList.vue'
 
 interface TransportDetail {
   stationId: string
   stationName: string
   stationCount: number
+  kind: 'production' | 'consumption'
   transportVolume: number
+  sortOrder?: number
 }
 
 const props = defineProps<{
@@ -15,6 +18,7 @@ const props = defineProps<{
   totalTransportVolume: number
   details: TransportDetail[]
 }>()
+const { t } = useI18n()
 
 const formatNum = (n: number, digits: number = 1) => new Intl.NumberFormat('en-US', {
   maximumFractionDigits: digits,
@@ -24,7 +28,37 @@ const formatNum = (n: number, digits: number = 1) => new Intl.NumberFormat('en-U
 const formattedTotal = computed(() => `${formatNum(props.totalTransportVolume, 1)}m³`)
 
 const formattedDetails = computed(() => {
-  return [...props.details].sort((a, b) => b.transportVolume - a.transportVolume)
+  return [...props.details]
+    .sort((a, b) => {
+      const orderA = Number(a.sortOrder)
+      const orderB = Number(b.sortOrder)
+      const hasOrderA = Number.isFinite(orderA)
+      const hasOrderB = Number.isFinite(orderB)
+      if (hasOrderA || hasOrderB) {
+        if (hasOrderA && hasOrderB && orderA !== orderB) return orderA - orderB
+        if (hasOrderA && !hasOrderB) return -1
+        if (!hasOrderA && hasOrderB) return 1
+      }
+      return b.transportVolume - a.transportVolume
+    })
+    .map((detail) => {
+      const isExternal = String(detail.stationId || '').startsWith('external:')
+      const kindLabel = isExternal
+        ? (detail.kind === 'consumption'
+            ? t('sectorManagement.supply_storage_input')
+            : t('sectorManagement.supply_storage_output'))
+        : (detail.kind === 'production'
+            ? t('sectorManagement.supply_storage_production')
+            : t('sectorManagement.supply_storage_consumption'))
+      const kindClass = isExternal
+        ? (detail.kind === 'consumption' ? 'kind-pos' : 'kind-neg')
+        : (detail.kind === 'production' ? 'kind-pos' : 'kind-neg')
+      return {
+        ...detail,
+        kindLabel,
+        kindClass
+      }
+    })
 })
 </script>
 
@@ -54,6 +88,7 @@ const formattedDetails = computed(() => {
           <span class="qty">{{ item.stationCount }}</span>
           <span class="symbol">x</span>
           <span class="name">{{ item.stationName }}</span>
+          <span :class="item.kindClass">{{ item.kindLabel }}</span>
         </span>
         <div class="item-val-group">
           <span class="item-val">{{ formatNum(item.transportVolume, 1) }}m³</span>
@@ -102,5 +137,13 @@ const formattedDetails = computed(() => {
 
 .item-val {
   @apply font-mono font-medium text-blue-300;
+}
+
+.kind-pos {
+  @apply text-emerald-400/80 text-[10px];
+}
+
+.kind-neg {
+  @apply text-red-400/80 text-[10px];
 }
 </style>

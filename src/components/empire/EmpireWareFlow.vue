@@ -46,6 +46,15 @@ const formattedDisplayValue = computed(() => {
 const processedDetails = computed(() => {
   if (!props.details) return []
   return [...props.details].sort((a, b) => {
+    const orderA = Number(a.sortOrder)
+    const orderB = Number(b.sortOrder)
+    const hasOrderA = Number.isFinite(orderA)
+    const hasOrderB = Number.isFinite(orderB)
+    if (hasOrderA || hasOrderB) {
+      if (hasOrderA && hasOrderB && orderA !== orderB) return orderA - orderB
+      if (hasOrderA && !hasOrderB) return -1
+      if (!hasOrderA && hasOrderB) return 1
+    }
     return Math.abs(b.netRate) - Math.abs(a.netRate)
   })
 })

@@ -644,6 +644,7 @@ export interface SupplyStorageFlowDetail {
   kind: 'production' | 'consumption';
   staticRate: number;
   storageVolume: number;
+  sortOrder?: number;
 }
 
 export interface SupplyStorageFlow {

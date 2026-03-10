@@ -147,6 +147,7 @@ const transportFlows = computed(() => {
         stationId: detail.stationId,
         stationName: detail.stationName,
         stationCount: detail.stationCount,
+        kind: detail.netRate >= 0 ? 'production' as const : 'consumption' as const,
         transportVolume: Math.abs(detail.netRate) * source.unitVolume
       }))
       .filter((detail) => detail.transportVolume > 0)

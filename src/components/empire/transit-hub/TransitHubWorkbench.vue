@@ -31,7 +31,180 @@ const sectorGroupedFlows = computed<EmpireGroupedFlows>(() => {
 
 const sectorStorageFlows = computed<SupplyStorageFlow[]>(() => {
   if (!props.sectorId) return []
-  return empireStore.getSectorInternalData(props.sectorId).supplyStorageFlows
+
+  const sectorNameMap = new Map(empireStore.sectors.map((sector) => [sector.id, sector.name]))
+  const sectorOrderMap = new Map(empireStore.sectors.map((sector, index) => [sector.id, index]))
+  const localStationOrderMap = new Map(
+    empireStore.orderedStationsBySector
+      .filter((station) => station.sectorId === props.sectorId)
+      .map((station, index) => [station.id, index])
+  )
+  const localByWare = new Map<string, any>()
+  const upsertWare = (flow: any) => {
+    if (flow.transportType !== 'container') return
+    if (!localByWare.has(flow.wareId)) {
+      localByWare.set(flow.wareId, {
+        wareId: flow.wareId,
+        orderIndex: flow.orderIndex,
+        tier: flow.tier,
+        transportType: 'container',
+        unitVolume: flow.unitVolume || 1,
+        details: [] as Array<{
+          stationId: string
+          stationName: string
+          stationCount: number
+          kind: 'production' | 'consumption'
+          staticRate: number
+          storageVolume: number
+          sortOrder?: number
+        }>
+      })
+    }
+    return localByWare.get(flow.wareId)
+  }
+
+  const pushDetail = (wareId: string, detail: {
+    stationId: string
+    stationName: string
+    stationCount: number
+    kind: 'production' | 'consumption'
+    staticRate: number
+    storageVolume: number
+    sortOrder?: number
+  }) => {
+    const row = localByWare.get(wareId)
+    if (!row) return
+    row.details.push(detail)
+  }
+
+  // Local sector station contributions with fixed 12h buffer.
+  sectorGroupedFlows.value.flows
+    .filter((flow) => flow.transportType === 'container')
+    .forEach((flow) => {
+      const row = upsertWare(flow)
+      if (!row) return
+      ;(flow.contributions || []).forEach((detail: any) => {
+        const netRate = Number(detail.netRate || 0)
+        if (netRate > 0) {
+          pushDetail(flow.wareId, {
+            stationId: detail.stationId,
+            stationName: detail.stationName,
+            stationCount: detail.stationCount || 1,
+            kind: 'production',
+            staticRate: netRate,
+            storageVolume: netRate * row.unitVolume * 12,
+            sortOrder: localStationOrderMap.get(detail.stationId) ?? Number.MAX_SAFE_INTEGER / 2
+          })
+        } else if (netRate < 0) {
+          const amount = Math.abs(netRate)
+          pushDetail(flow.wareId, {
+            stationId: detail.stationId,
+            stationName: detail.stationName,
+            stationCount: detail.stationCount || 1,
+            kind: 'consumption',
+            staticRate: amount,
+            storageVolume: amount * row.unitVolume * 12,
+            sortOrder: localStationOrderMap.get(detail.stationId) ?? Number.MAX_SAFE_INTEGER / 2
+          })
+        }
+      })
+    })
+
+  // Build one-hop external contributions from pure solver.
+  const solverOutput = empireStore.getSectorLinkCalc(props.sectorId)?.solverOutput || {
+    linkWareFlows: [],
+    allocatedDemandBySector: [],
+    deficitSummary: {
+      totalDeficit: 0,
+      deficitByNode: [],
+      producerNodes: []
+    }
+  }
+
+  solverOutput.linkWareFlows.forEach((flow) => {
+    if (!props.sectorId) return
+    const isOutbound = flow.from === props.sectorId
+    const isInbound = flow.to === props.sectorId
+    if (!isOutbound && !isInbound) return
+
+    const peerSectorId = isOutbound ? flow.to : flow.from
+    const peerSectorName = sectorNameMap.get(peerSectorId) || peerSectorId
+
+    if (!localByWare.has(flow.wareId)) {
+      localByWare.set(flow.wareId, {
+        wareId: flow.wareId,
+        orderIndex: Number.MAX_SAFE_INTEGER,
+        tier: 0,
+        transportType: 'container',
+        unitVolume: 1,
+        details: []
+      })
+    }
+    const row = localByWare.get(flow.wareId)
+    const unitVolume = row?.unitVolume || 1
+    const amount = Math.abs(flow.amount || 0)
+    if (amount <= 0) return
+
+    row.details.push({
+      stationId: `external:${peerSectorId}:${isOutbound ? 'out' : 'in'}`,
+      stationName: peerSectorName,
+      stationCount: 1,
+      kind: isOutbound ? 'production' : 'consumption',
+      staticRate: amount,
+      storageVolume: amount * unitVolume * 12,
+      sortOrder: 100000 + (sectorOrderMap.get(peerSectorId) ?? Number.MAX_SAFE_INTEGER / 2)
+    })
+  })
+
+  const orderByWare = new Map(
+    sectorGroupedFlows.value.flows
+      .filter((flow) => flow.transportType === 'container')
+      .map((flow) => [flow.wareId, { orderIndex: flow.orderIndex, tier: flow.tier, unitVolume: flow.unitVolume || 1 }])
+  )
+
+  return Array.from(localByWare.values())
+    .map((row) => {
+      const orderRef = orderByWare.get(row.wareId)
+      if (orderRef) {
+        row.orderIndex = orderRef.orderIndex
+        row.tier = orderRef.tier
+        row.unitVolume = orderRef.unitVolume
+      }
+      const totalProductionStorageVolume = row.details
+        .filter((detail: any) => detail.kind === 'production')
+        .reduce((sum: number, detail: any) => sum + detail.storageVolume, 0)
+      const totalConsumptionStorageVolume = row.details
+        .filter((detail: any) => detail.kind === 'consumption')
+        .reduce((sum: number, detail: any) => sum + detail.storageVolume, 0)
+      return {
+        wareId: row.wareId,
+        orderIndex: row.orderIndex,
+        tier: row.tier,
+        transportType: 'container',
+        unitVolume: row.unitVolume,
+        totalProductionStorageVolume,
+        totalConsumptionStorageVolume,
+        totalRequiredStorageVolume: Math.max(totalProductionStorageVolume, totalConsumptionStorageVolume),
+        details: row.details.sort((a: any, b: any) => {
+          const orderA = Number(a.sortOrder)
+          const orderB = Number(b.sortOrder)
+          const hasOrderA = Number.isFinite(orderA)
+          const hasOrderB = Number.isFinite(orderB)
+          if (hasOrderA || hasOrderB) {
+            if (hasOrderA && hasOrderB && orderA !== orderB) return orderA - orderB
+            if (hasOrderA && !hasOrderB) return -1
+            if (!hasOrderA && hasOrderB) return 1
+          }
+          return b.storageVolume - a.storageVolume
+        })
+      } satisfies SupplyStorageFlow
+    })
+    .filter((item) => item.totalRequiredStorageVolume > 0)
+    .sort((a, b) => {
+      if (a.orderIndex !== b.orderIndex) return a.orderIndex - b.orderIndex
+      if (a.tier !== b.tier) return b.tier - a.tier
+      return a.wareId.localeCompare(b.wareId)
+    })
 })
 
 const storageModulePlans = computed(() => {
@@ -99,9 +272,9 @@ const storageModulePlans = computed(() => {
     })
   })
 
-  const totalBerthDemand = sectorGroupedFlows.value.flows.reduce((sum, flow) => {
-    const wareStationDemand = flow.contributions.reduce((stationSum, detail) => {
-      return stationSum + (Math.abs(detail.netRate) / (shipCapacity * 15))
+  const totalBerthDemand = sectorStorageFlows.value.reduce((sum, flow) => {
+    const wareStationDemand = flow.details.reduce((detailSum, detail) => {
+      return detailSum + ((Math.abs(detail.staticRate) || 0) / (shipCapacity * 15))
     }, 0)
     return sum + wareStationDemand
   }, 0)

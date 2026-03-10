@@ -139,6 +139,24 @@ function pushMapAmount(map: Map<string, number>, key: string, amount: number): v
   map.set(key, (map.get(key) ?? 0) + amount)
 }
 
+function encodeEdgeFlowKey(linkId: string, from: string, to: string): string {
+  // linkId may contain '|', so use JSON tuple encoding to keep parse stable.
+  return JSON.stringify([linkId, from, to])
+}
+
+function decodeEdgeFlowKey(key: string): { linkId: string; from: string; to: string } | null {
+  try {
+    const parsed = JSON.parse(key)
+    if (!Array.isArray(parsed) || parsed.length !== 3) return null
+    const [linkId, from, to] = parsed
+    if (typeof linkId !== 'string' || typeof from !== 'string' || typeof to !== 'string') return null
+    if (!linkId || !from || !to) return null
+    return { linkId, from, to }
+  } catch {
+    return null
+  }
+}
+
 function getValidLinks(links: SectorLinkInput[]): SectorLinkInput[] {
   const out: SectorLinkInput[] = []
   links.forEach((link) => {
@@ -384,6 +402,7 @@ function allocateOneDistanceLayer(
     let moved = 0
     proposals.forEach((proposal, key) => {
       const [supplierId, demanderId] = key.split('|')
+      if (!supplierId || !demanderId) return
       const incoming = incomingByDemander.get(demanderId) ?? 0
       const demanderRemain = localDemand.get(demanderId) ?? 0
       const factor = incoming > demanderRemain + epsilon ? demanderRemain / incoming : 1
@@ -400,6 +419,7 @@ function allocateOneDistanceLayer(
 
   allocated.forEach((amount, key) => {
     const [supplierId, demanderId] = key.split('|')
+    if (!supplierId || !demanderId) return
     demandRemains.set(demanderId, Math.max(0, (demandRemains.get(demanderId) ?? 0) - amount))
     supplyRemains.set(supplierId, Math.max(0, (supplyRemains.get(supplierId) ?? 0) - amount))
   })
@@ -457,7 +477,7 @@ export function solveSingleWareDistancePull(
       const pair = pairByKey.get(key)
       if (!pair) return
       pair.pathEdges.forEach((edge) => {
-        const edgeKey = `${edge.linkId}|${edge.from}|${edge.to}`
+        const edgeKey = encodeEdgeFlowKey(edge.linkId, edge.from, edge.to)
         pushMapAmount(edgeFlowMap, edgeKey, amount)
       })
     })
@@ -465,10 +485,12 @@ export function solveSingleWareDistancePull(
 
   const linkFlows: LinkFlow[] = Array.from(edgeFlowMap.entries())
     .map(([key, amount]) => {
-      const [linkId, from, to] = key.split('|')
+      const decoded = decodeEdgeFlowKey(key)
+      if (!decoded) return null
+      const { linkId, from, to } = decoded
       return { linkId, from, to, amount: normalizeAmount(amount, epsilon) }
     })
-    .filter((item) => item.amount > epsilon)
+    .filter((item): item is LinkFlow => !!item && item.amount > epsilon)
     .sort((a, b) => {
       if (a.linkId !== b.linkId) return a.linkId.localeCompare(b.linkId)
       if (a.from !== b.from) return a.from.localeCompare(b.from)

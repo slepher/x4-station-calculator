@@ -17,10 +17,11 @@ import type {
 } from '@/types/x4'
 import { useGameDataStore } from './useGameDataStore'
 import { analyzeEmpireWareFlow } from './logic/analyzeEmpireWareFlow'
+import { solveMultiWareByLink, type SectorLinkInput, type SolveMultiWareByLinkOutput } from './logic/sectorLinkFlow'
 import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
 import { stationStateMap, DEFAULT_STATION_SETTINGS, migrateStationSettings } from './state/StationStateMap'
 import { CURRENT_EMPIRE_VERSION } from './logic/storageVersions'
-import { getLinkedSectorIdsFor, normalizeSectorLinkKey, normalizeSectorLinks } from './logic/sectorLinks'
+import { getLinkedSectorIdsFor, normalizeSectorLinkKey, normalizeSectorLinks, parseSectorLinkKey } from './logic/sectorLinks'
 
 const STORAGE_KEY = 'x4_empire_data'
 const V1_STORAGE_KEY = 'x4_station_data'
@@ -72,6 +73,13 @@ function createEmptyEmpireGroupedFlows(): EmpireGroupedFlows {
 
 function createEmptySupplyStorageFlows(): SupplyStorageFlow[] {
   return []
+}
+
+interface SectorLinkCalcEntry {
+  sectorId: string
+  allowedWareIds: string[]
+  sectorsInput: Array<{ sectorId: string; netByWare: Record<string, number> }>
+  solverOutput: SolveMultiWareByLinkOutput
 }
 
 export const useEmpireStore = defineStore('empire', () => {
@@ -251,6 +259,114 @@ export const useEmpireStore = defineStore('empire', () => {
 
     return map
   })
+
+  const sectorLinkCalcMap = computed<Map<string, SectorLinkCalcEntry>>(() => {
+    const result = new Map<string, SectorLinkCalcEntry>()
+    if (!activeEmpire.value || !gameData.modulesMap) return result
+
+    const links: SectorLinkInput[] = (activeEmpire.value.sectorLinks || [])
+      .map((key) => parseSectorLinkKey(key))
+      .filter((item): item is { a: string; b: string } => !!item)
+      .map((item) => ({
+        linkId: `${item.a}|${item.b}`,
+        a: item.a,
+        b: item.b,
+        distance: 1
+      }))
+
+    const rawNetByWareBySector = new Map<string, Record<string, number>>()
+    sectors.value.forEach((sector) => {
+      const localStations = orderedStationsBySector.value.filter((station) => station.sectorId === sector.id)
+      const rawGroupedFlows = analyzeEmpireWareFlow(localStations, (stationId) => stationStateMap.getGroupedFlows(stationId))
+      const netByWare: Record<string, number> = {}
+      rawGroupedFlows.flows
+        .filter((flow) => flow.transportType === 'container')
+        .forEach((flow) => {
+          netByWare[flow.wareId] = Number(flow.netRate || 0)
+        })
+      rawNetByWareBySector.set(sector.id, netByWare)
+    })
+
+    sectors.value.forEach((viewSector) => {
+      const filteredFlows = sectorInternalDataMap.value.get(viewSector.id)?.localGroupedFlows
+      const allowedWareIds = new Set<string>()
+      ;(filteredFlows?.empireGroups.operations || [])
+        .filter((flow) => flow.transportType === 'container')
+        .forEach((flow) => allowedWareIds.add(flow.wareId))
+      ;(filteredFlows?.empireGroups.supply || [])
+        .filter((flow) => flow.transportType === 'container')
+        .forEach((flow) => allowedWareIds.add(flow.wareId))
+
+      // Fallback for sectors without local stations:
+      // use linked sectors (that have stations) to build a meaningful transit ware scope.
+      if (allowedWareIds.size === 0) {
+        const allStations = activeEmpire.value?.stations || []
+        const linkedSectorIds = getLinkedSectorIdsFor(viewSector.id, activeEmpire.value?.sectorLinks || [])
+        linkedSectorIds.forEach((linkedSectorId) => {
+          const linkedGroup = tabGroupsForSectorScope(allStations, linkedSectorId)
+          if (linkedGroup.length === 0) return
+          const linkedFlows = sectorInternalDataMap.value.get(linkedSectorId)?.localGroupedFlows
+          ;(linkedFlows?.empireGroups.operations || [])
+            .filter((flow) => flow.transportType === 'container')
+            .forEach((flow) => allowedWareIds.add(flow.wareId))
+          ;(linkedFlows?.empireGroups.supply || [])
+            .filter((flow) => flow.transportType === 'container')
+            .forEach((flow) => allowedWareIds.add(flow.wareId))
+        })
+      }
+
+      const sectorsInput = sectors.value.map((sector) => {
+        const raw = rawNetByWareBySector.get(sector.id) || {}
+        const netByWare: Record<string, number> = {}
+        allowedWareIds.forEach((wareId) => {
+          netByWare[wareId] = Number(raw[wareId] ?? 0)
+        })
+        return { sectorId: sector.id, netByWare }
+      })
+
+      const solverOutput = solveMultiWareByLink({
+        sectors: sectorsInput,
+        links,
+        epsilon: 1e-9
+      })
+
+      if (import.meta.env.DEV) {
+        const allowedWareList = Array.from(allowedWareIds).sort()
+        console.groupCollapsed(`[SectorLinkCalc][TransitHub] sector=${viewSector.id} allowed=${allowedWareList.join(',')}`)
+        console.log('[SectorLinkCalc][TransitHub] links', links)
+        sectorsInput.forEach((sectorInput) => {
+          const relatedFlows = solverOutput.linkWareFlows.filter(
+            (flow) => flow.from === sectorInput.sectorId || flow.to === sectorInput.sectorId
+          )
+          const allocated = solverOutput.allocatedDemandBySector.find((item) => item.sectorId === sectorInput.sectorId)
+          const deficit = solverOutput.deficitSummary.deficitByNode.find((item) => item.sectorId === sectorInput.sectorId)
+          const producers = solverOutput.deficitSummary.producerNodes.find((item) => item.sectorId === sectorInput.sectorId)
+          console.groupCollapsed(`[SectorLinkCalc][TransitHub][Sector] ${sectorInput.sectorId}`)
+          console.log('input.netByWare', sectorInput.netByWare)
+          console.log('output.linkWareFlows', relatedFlows)
+          console.log('output.allocatedDemand', allocated || null)
+          console.log('output.deficit', deficit || null)
+          console.log('output.producers', producers || null)
+          console.groupEnd()
+        })
+        console.log('[SectorLinkCalc][TransitHub] totalDeficit', solverOutput.deficitSummary.totalDeficit)
+        console.groupEnd()
+      }
+
+      result.set(viewSector.id, {
+        sectorId: viewSector.id,
+        allowedWareIds: Array.from(allowedWareIds).sort(),
+        sectorsInput,
+        solverOutput
+      })
+    })
+
+    return result
+  })
+
+  function tabGroupsForSectorScope(stations: StationPlan[], sectorId: string): StationPlan[] {
+    return stations.filter((station) => station.sectorId === sectorId)
+  }
 
   function getComputeDeps() {
     const { modulesMap, waresMap, medicalConsumptionMap } = gameData
@@ -651,6 +767,10 @@ export const useEmpireStore = defineStore('empire', () => {
     }
   }
 
+  function getSectorLinkCalc(sectorId: string): SectorLinkCalcEntry | null {
+    return sectorLinkCalcMap.value.get(sectorId) || null
+  }
+
   function renameStation(stationId: string, newName: string) {
     if (!activeEmpire.value) return false
     
@@ -806,6 +926,7 @@ export const useEmpireStore = defineStore('empire', () => {
     clearStationCaches,
     empireGroupedFlows,
     sectorInternalDataMap,
+    sectorLinkCalcMap,
     loadData,
     saveToStorage,
     saveEmpire,
@@ -829,6 +950,7 @@ export const useEmpireStore = defineStore('empire', () => {
     setSectorStationOrder,
     getSupplyPlanningInput,
     getSectorInternalData,
+    getSectorLinkCalc,
     renameStation,
     selectStation,
     getStationById,

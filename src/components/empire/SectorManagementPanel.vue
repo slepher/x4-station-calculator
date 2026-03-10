@@ -17,6 +17,7 @@ const linkFeedback = ref('')
 const linkZoneEnterCount = ref<Record<string, number>>({})
 const showDeleteConfirm = ref(false)
 const stationToDelete = ref<string | null>(null)
+const isPointerLinkDragging = ref(false)
 
 const sectors = computed(() => empireStore.sectors)
 const stations = computed(() => empireStore.activeEmpire?.stations || [])
@@ -196,6 +197,12 @@ function onStationZoneDragLeave(zoneId: string) {
 }
 
 function onSectorListStart(event: { originalEvent?: DragEvent }) {
+  const target = event.originalEvent?.target as HTMLElement | null
+  const fromHandle = !!target?.closest('.sector-drag-handle')
+  if (!fromHandle) {
+    isDraggingSector.value = false
+    return
+  }
   isDraggingSector.value = true
   const dt = event.originalEvent?.dataTransfer
   if (dt) dt.effectAllowed = 'move'
@@ -205,22 +212,62 @@ function onSectorListEnd() {
   isDraggingSector.value = false
 }
 
-function onLinkDragStart(event: DragEvent, sourceSectorId: string) {
-  draggingType.value = 'link'
-  linkDragSourceSectorId.value = sourceSectorId
-  const dt = event.dataTransfer
-  if (dt) {
-    dt.effectAllowed = 'link'
-    dt.setData('text/plain', sourceSectorId)
-  }
-  linkFeedback.value = ''
-}
-
 function onLinkDragEnd() {
+  window.removeEventListener('pointermove', onLinkPointerMove)
+  window.removeEventListener('pointerup', onLinkPointerUp)
+  isPointerLinkDragging.value = false
   draggingType.value = null
   hoveredLinkDropZone.value = null
   linkDragSourceSectorId.value = null
   linkZoneEnterCount.value = {}
+}
+
+function resolvePointerTargetSector(event: PointerEvent): string | null {
+  const el = document.elementFromPoint(event.clientX, event.clientY) as HTMLElement | null
+  const zone = el?.closest('[data-link-drop-zone]') as HTMLElement | null
+  return zone?.dataset.linkDropZone || null
+}
+
+function onLinkPointerMove(event: PointerEvent) {
+  if (!isPointerLinkDragging.value || draggingType.value !== 'link' || !linkDragSourceSectorId.value) return
+  const targetSectorId = resolvePointerTargetSector(event)
+  if (!targetSectorId || !canDropLink(targetSectorId)) {
+    hoveredLinkDropZone.value = null
+    return
+  }
+  hoveredLinkDropZone.value = targetSectorId
+}
+
+function onLinkPointerUp(event: PointerEvent) {
+  if (!isPointerLinkDragging.value || draggingType.value !== 'link') {
+    onLinkDragEnd()
+    return
+  }
+  const targetSectorId = resolvePointerTargetSector(event)
+  if (targetSectorId && canDropLink(targetSectorId) && linkDragSourceSectorId.value) {
+    const result = empireStore.createSectorLink(linkDragSourceSectorId.value, targetSectorId)
+    if (result.ok) {
+      linkFeedback.value = ''
+    } else if (result.reason === 'self-link') {
+      linkFeedback.value = t('sectorManagement.link_self_blocked')
+    } else if (result.reason === 'duplicate-link') {
+      linkFeedback.value = t('sectorManagement.link_duplicate_blocked')
+    } else {
+      linkFeedback.value = t('sectorManagement.link_invalid_target')
+    }
+  }
+  onLinkDragEnd()
+}
+
+function onLinkPointerDown(event: PointerEvent, sourceSectorId: string) {
+  event.preventDefault()
+  draggingType.value = 'link'
+  linkDragSourceSectorId.value = sourceSectorId
+  hoveredLinkDropZone.value = null
+  linkFeedback.value = ''
+  isPointerLinkDragging.value = true
+  window.addEventListener('pointermove', onLinkPointerMove)
+  window.addEventListener('pointerup', onLinkPointerUp, { once: true })
 }
 
 function onLinkZoneDragEnter(event: DragEvent, targetSectorId: string) {
@@ -389,10 +436,10 @@ function canDropLink(targetSectorId: string) {
               </button>
               <button
                 class="sector-tool-btn"
-                draggable="true"
                 :title="$t('sectorManagement.drag_link')"
-                @dragstart="onLinkDragStart($event, sector.id)"
-                @dragend="onLinkDragEnd"
+                @mousedown.stop
+                @pointerdown.stop
+                @pointerdown="onLinkPointerDown($event, sector.id)"
               >
                 <svg viewBox="0 0 24 24" class="header-icon" aria-hidden="true">
                   <path d="M10.5 13.5l3-3" />
@@ -450,6 +497,7 @@ function canDropLink(targetSectorId: string) {
 
           <div
             class="sector-links"
+            :data-link-drop-zone="sector.id"
             :class="{ 'drop-highlight': hoveredLinkDropZone === sector.id }"
             @dragenter="onLinkZoneDragEnter($event, sector.id)"
             @dragover="onLinkZoneDragOver($event, sector.id)"
@@ -506,14 +554,32 @@ function canDropLink(targetSectorId: string) {
   @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl p-3 min-h-[400px] flex flex-col gap-3;
 }
 .sector-panel.dragging-station-mode .sector-links {
-  display: none;
+  height: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border-width: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
 .sector-panel.dragging-link-mode .sector-stations {
-  display: none;
+  height: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border-width: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
 .sector-panel.dragging-sector-mode .sector-stations,
 .sector-panel.dragging-sector-mode .sector-links {
-  display: none;
+  height: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border-width: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
 .sector-panel-header {
   @apply flex items-center gap-2 border border-slate-700 rounded p-2;

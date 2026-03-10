@@ -21,29 +21,31 @@ const formatVolume = (n: number) => new Intl.NumberFormat('en-US', {
 
 <template>
   <div class="volume-groups-container">
-    <div class="storage-group-header">
-      <h4 class="storage-group-title">{{ $t('wareflow.transport_view') }}</h4>
-      <span class="storage-group-value">
-        {{ formatVolume(totalVolume) }}m³
-        <svg class="w-3.5 h-3.5 text-blue-300/70" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="1" y="3" width="15" height="13"></rect>
-          <path d="M16 8h4l3 3v5h-7z"></path>
-          <circle cx="5.5" cy="18.5" r="2.5"></circle>
-          <circle cx="18.5" cy="18.5" r="2.5"></circle>
-        </svg>
-      </span>
-    </div>
+    <template v-if="hasData">
+      <div class="storage-group-header">
+        <h4 class="storage-group-title">{{ $t('wareflow.transport_view') }}</h4>
+        <span class="storage-group-value">
+          {{ formatVolume(totalVolume) }}m³
+          <svg class="w-3.5 h-3.5 text-blue-300/70" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="3" width="15" height="13"></rect>
+            <path d="M16 8h4l3 3v5h-7z"></path>
+            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+          </svg>
+        </span>
+      </div>
 
-    <TransitHubTransportFlowItem
-      v-for="item in items"
-      :key="item.wareId"
-      :resource-id="item.wareId"
-      :name="item.name"
-      :total-transport-volume="item.totalTransportVolume"
-      :details="item.details"
-    />
+      <TransitHubTransportFlowItem
+        v-for="item in items"
+        :key="item.wareId"
+        :resource-id="item.wareId"
+        :name="item.name"
+        :total-transport-volume="item.totalTransportVolume"
+        :details="item.details"
+      />
+    </template>
 
-    <EmptyState v-if="!hasData" />
+    <EmptyState v-else />
   </div>
 </template>
 
