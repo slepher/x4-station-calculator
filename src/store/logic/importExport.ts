@@ -198,20 +198,13 @@ function remapEmpireIds(input: SavedEmpiresState): { state: SavedEmpiresState; a
 
 function remapFlowIds(input: SavedFlowPlansState): { state: SavedFlowPlansState; activeChangedTo: string | null } {
   const planIdMap = new Map<string, string>()
-  const groupIdMap = new Map<string, string>()
-
   const list: LogicFlowPlan[] = input.list.map((plan) => {
     const newPlanId = crypto.randomUUID()
     planIdMap.set(plan.id, newPlanId)
 
     const groups: SavedFlowGroup[] = (plan.groups || []).map((group) => {
       const newGroupId = crypto.randomUUID()
-      groupIdMap.set(group.id, newGroupId)
-
-      const nodes: SavedFlowNode[] = (group.nodes || []).map((node) => ({
-        ...deepClone(node),
-        id: crypto.randomUUID()
-      }))
+      const nodes: SavedFlowNode[] = (group.nodes || []).map((node) => deepClone(node))
 
       return {
         ...deepClone(group),
