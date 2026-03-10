@@ -199,12 +199,7 @@ export function analyzeWareFlow(
     const shouldCountTransport = isMainOrSecondary || isSupplyGap || isResourceFlow
 
     entry.transportDemand = shouldCountTransport
-      ? entry.contributions.reduce((sum, item) => {
-        const transportFlow = item.transportFlow !== undefined
-          ? item.transportFlow
-          : Math.abs(item.amount) * entry.unitVolume
-        return sum + transportFlow
-      }, 0)
+      ? Math.abs(entry.netRate) * entry.unitVolume
       : 0
 
     entry.contributions.forEach((item) => {

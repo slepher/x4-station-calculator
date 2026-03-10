@@ -215,7 +215,7 @@ const cancelDelete = () => {
           >
             <div class="tab-highlight"></div>
             <div class="tab-content">
-              <span class="tab-icon">📦</span>
+              <span class="tab-icon">🚚</span>
               <span class="tab-label max-w-[120px] truncate">{{ group.name }}</span>
             </div>
           </div>
