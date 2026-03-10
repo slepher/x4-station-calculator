@@ -76,16 +76,7 @@ const empireFlowByWareId = computed(() => {
   return map
 })
 
-const componentGapFlows = computed(() => {
-  const activeStation = empireStore.activeStation
-  const currentSectorId = activeStation?.sectorId || ''
-  if (!currentSectorId) {
-    return {
-      operations: [] as any[],
-      supply: [] as any[]
-    }
-  }
-
+function resolveCurrentSectorComponentSectorIds(currentSectorId: string): string[] {
   const sectorIds = empireStore.sectors.map((sector) => sector.id)
   const links: SectorLinkInput[] = (empireStore.sectorLinks || [])
     .map((key) => parseSectorLinkKey(key))
@@ -97,7 +88,21 @@ const componentGapFlows = computed(() => {
       distance: 1
     }))
   const component = getSectorNetworkComponent(currentSectorId, sectorIds, links)
-  if (!component) {
+  return component?.sectorIds || []
+}
+
+const componentGapFlows = computed(() => {
+  const activeStation = empireStore.activeStation
+  const currentSectorId = activeStation?.sectorId || ''
+  if (!currentSectorId) {
+    return {
+      operations: [] as any[],
+      supply: [] as any[]
+    }
+  }
+
+  const componentSectorIds = resolveCurrentSectorComponentSectorIds(currentSectorId)
+  if (componentSectorIds.length === 0) {
     return {
       operations: [] as any[],
       supply: [] as any[]
@@ -131,7 +136,9 @@ const componentGapFlows = computed(() => {
     current.contributions.push(...contributions)
   }
 
-  component.sectorIds.forEach((sectorId) => {
+  // Station gap view intentionally aggregates production/consumption by sector component only.
+  // No path or edge-flow distribution is used in this branch.
+  componentSectorIds.forEach((sectorId) => {
     const internal = empireStore.getSectorInternalData(sectorId)
     const localFlows = internal.localGroupedFlows
     const sectorName = sectorNameMap.get(sectorId) || sectorId

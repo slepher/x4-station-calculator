@@ -6,12 +6,6 @@ import type { StationType } from '@/types/x4'
 
 const empireStore = useEmpireStore()
 const { t } = useI18n()
-const props = defineProps<{
-  activeSupplySectorId?: string | null
-}>()
-const emit = defineEmits<{
-  (e: 'open-supply', sectorId: string | null): void
-}>()
 
 // 状态管理
 const showMenu = ref(false)
@@ -30,6 +24,7 @@ const stations = computed(() => {
 const sectors = computed(() => empireStore.sectors)
 
 const activeStationId = computed(() => empireStore.activeStationId)
+const activeTransitSectorId = computed(() => empireStore.activeTransitSectorId)
 
 const tabGroups = computed(() => {
   const unassigned = stations.value.filter((station) => !station.sectorId)
@@ -94,13 +89,11 @@ const addNewStation = () => {
 }
 
 const openSupply = (sectorId: string) => {
-  empireStore.selectStation(null)
-  emit('open-supply', sectorId)
+  empireStore.selectTransitSector(sectorId)
 }
 
 const openOverview = () => {
   empireStore.selectStation(null)
-  emit('open-supply', null)
 }
 
 // 右键菜单逻辑
@@ -154,7 +147,7 @@ const handleWindowResize = () => {
 }
 
 watch(
-  [stations, sectors, activeStationId, () => props.activeSupplySectorId],
+  [stations, sectors, activeStationId, activeTransitSectorId],
   async () => {
     await nextTick()
     updateTabsScrollState()
@@ -225,7 +218,7 @@ const cancelDelete = () => {
       
       <div 
         class="tab-item overview-tab"
-        :class="{ 'active': activeStationId === null && !props.activeSupplySectorId }"
+        :class="{ 'active': activeStationId === null && !activeTransitSectorId }"
         @click="openOverview"
       >
         <div class="tab-highlight"></div>
@@ -288,7 +281,7 @@ const cancelDelete = () => {
           <div
             v-if="group.showTransitTab"
             class="tab-item supply-tab"
-            :class="{ 'active': activeStationId === null && props.activeSupplySectorId === group.id }"
+            :class="{ 'active': activeStationId === empireStore.getTransitTabId(group.id) }"
             @click="openSupply(group.id)"
           >
             <div class="tab-highlight"></div>

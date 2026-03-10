@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import StationWorkbench from './components/StationWorkbench.vue'
+import MainWorkbench from './components/MainWorkbench.vue'
 import DragTestPage from './components/test/DragTestPage.vue'
 import TestTemplateFlow from './components/test/GLM-Parent.vue'
 import MetricPanelPlayground from './components/test/MetricPanelPlayground.vue'
@@ -69,7 +69,7 @@ setTimeout(checkExportStores, 500);
     <DragTestPage v-if="currentView === 'drag-test'" />
     <TestTemplateFlow v-else-if="currentView === 'template-flow'" />
     <MetricPanelPlayground v-else-if="currentView === 'metric-panel-test'" />
-    <StationWorkbench v-else-if="stationStore.isReady"/>
+    <MainWorkbench v-else-if="stationStore.isReady"/>
     <div v-else class="loading-gate">Initializing Station Store...</div>
   </div>
 </template>

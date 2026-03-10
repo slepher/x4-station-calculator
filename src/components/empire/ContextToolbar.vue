@@ -11,9 +11,6 @@ import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 const { t } = useI18n()
 const empireStore = useEmpireStore()
 const stationStore = useStationStore()
-const props = defineProps<{
-  activeSupplySectorId?: string | null
-}>()
 
 const importModalState = reactive<{
   isOpen: boolean
@@ -24,12 +21,13 @@ const importModalState = reactive<{
 })
 
 // --- 状态判断 ---
-const isOverview = computed(() => empireStore.activeStationId === null)
-const isSupplyOverview = computed(() => isOverview.value && !!props.activeSupplySectorId)
 const activeStation = computed(() => empireStore.activeStation)
+const activeTransitSectorId = computed(() => empireStore.activeTransitSectorId)
+const isOverview = computed(() => !activeStation.value)
+const isSupplyOverview = computed(() => !!activeTransitSectorId.value)
 const activeSupplySector = computed(() => {
-  if (!props.activeSupplySectorId) return null
-  return empireStore.sectors.find((sector) => sector.id === props.activeSupplySectorId) || null
+  if (!activeTransitSectorId.value) return null
+  return empireStore.sectors.find((sector) => sector.id === activeTransitSectorId.value) || null
 })
 
 // --- 数据绑定 (保持您原有的逻辑) ---

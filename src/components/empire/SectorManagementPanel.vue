@@ -197,12 +197,6 @@ function onStationZoneDragLeave(zoneId: string) {
 }
 
 function onSectorListStart(event: { originalEvent?: DragEvent }) {
-  const target = event.originalEvent?.target as HTMLElement | null
-  const fromHandle = !!target?.closest('.sector-drag-handle')
-  if (!fromHandle) {
-    isDraggingSector.value = false
-    return
-  }
   isDraggingSector.value = true
   const dt = event.originalEvent?.dataTransfer
   if (dt) dt.effectAllowed = 'move'

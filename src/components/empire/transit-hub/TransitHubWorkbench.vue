@@ -131,12 +131,13 @@ const sectorStorageFlows = computed<SupplyStorageFlow[]>(() => {
     const peerSectorName = sectorNameMap.get(peerSectorId) || peerSectorId
 
     if (!localByWare.has(flow.wareId)) {
+      const wareInfo = gameDataStore.waresMap?.[flow.wareId]
       localByWare.set(flow.wareId, {
         wareId: flow.wareId,
         orderIndex: Number.MAX_SAFE_INTEGER,
-        tier: 0,
+        tier: Number(wareInfo?.tier || 0),
         transportType: 'container',
-        unitVolume: 1,
+        unitVolume: Number(wareInfo?.volume || 1),
         details: []
       })
     }
