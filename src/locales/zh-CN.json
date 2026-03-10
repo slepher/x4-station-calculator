@@ -50,7 +50,15 @@
     "drag_link": "拖拽以连接星区",
     "drop_reorder_sector": "拖放以调整星区顺序",
     "select_link_target": "选择目标星区",
-    "add_link": "添加"
+    "add_link": "添加",
+    "no_links": "暂无连接星区",
+    "remove_link": "删除连接",
+    "link_created": "连接已创建",
+    "link_removed": "连接已删除",
+    "link_self_blocked": "不能连接到自身星区",
+    "link_duplicate_blocked": "该连接已存在",
+    "link_invalid_target": "连接目标无效",
+    "link_drop_here": "在此松开以创建连接"
   },
   "toolbar": {
     "import_config": "导入配置",

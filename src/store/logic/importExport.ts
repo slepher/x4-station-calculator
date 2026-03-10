@@ -14,6 +14,7 @@ import type {
 } from '@/types/x4'
 import { migrateEmpireStateToCurrent, migrateFlowStateToCurrent, migrateShipBlueprintStateToCurrent } from './stateMigrations'
 import { CURRENT_EMPIRE_VERSION, CURRENT_FLOW_VERSION, CURRENT_SHIP_BLUEPRINT_VERSION } from './storageVersions'
+import { normalizeSectorLinkKey, parseSectorLinkKey } from './sectorLinks'
 
 export type ImportMode = 'overwrite' | 'incremental'
 export type ImportModuleKey = 'x4_empire_data' | 'x4_logic_flow_plans' | 'x4_ship_blueprints'
@@ -175,6 +176,14 @@ function remapEmpireIds(input: SavedEmpiresState): { state: SavedEmpiresState; a
       id: sectorIdMap.get(sector.id)!,
       order: Number.isFinite(Number(sector.order)) ? Number(sector.order) : index
     }))
+    const sectorLinks = Array.from(new Set((empire.sectorLinks || []).map((key) => {
+      const parsed = parseSectorLinkKey(key)
+      if (!parsed) return null
+      const mappedA = sectorIdMap.get(parsed.a)
+      const mappedB = sectorIdMap.get(parsed.b)
+      if (!mappedA || !mappedB) return null
+      return normalizeSectorLinkKey(mappedA, mappedB)
+    }).filter((key): key is string => !!key)))
 
     const stations: StationPlan[] = (empire.stations || []).map((station) => {
       const newStationId = crypto.randomUUID()
@@ -191,6 +200,7 @@ function remapEmpireIds(input: SavedEmpiresState): { state: SavedEmpiresState; a
       ...deepClone(empire),
       id: newEmpireId,
       sectors,
+      sectorLinks,
       stations
     }
   })

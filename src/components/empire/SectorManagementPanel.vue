@@ -1,13 +1,19 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import draggable from 'vuedraggable'
 
 const empireStore = useEmpireStore()
+const { t } = useI18n()
 const newSectorName = ref('')
 const hoveredStationDropZone = ref<string | null>(null)
-const draggingType = ref<'station' | null>(null)
+const hoveredLinkDropZone = ref<string | null>(null)
+const draggingType = ref<'station' | 'link' | null>(null)
 const isDraggingSector = ref(false)
+const linkDragSourceSectorId = ref<string | null>(null)
+const linkFeedback = ref('')
+const linkZoneEnterCount = ref<Record<string, number>>({})
 
 const sectors = computed(() => empireStore.sectors)
 const stations = computed(() => empireStore.activeEmpire?.stations || [])
@@ -18,6 +24,54 @@ const stationsBySector = computed(() => {
   stations.value.forEach((station) => {
     if (!station.sectorId || !map.has(station.sectorId)) return
     map.get(station.sectorId)!.push(station)
+  })
+  return map
+})
+
+const linkedSectorIdsBySector = computed(() => {
+  const map = new Map<string, string[]>()
+  sectors.value.forEach((sector) => map.set(sector.id, empireStore.getLinkedSectors(sector.id)))
+  return map
+})
+
+const sectorNameMap = computed(() => {
+  const map = new Map<string, string>()
+  sectors.value.forEach((sector) => map.set(sector.id, sector.name))
+  return map
+})
+const sectorOrderMap = computed(() => {
+  const map = new Map<string, number>()
+  sectors.value.forEach((sector, index) => map.set(sector.id, index))
+  return map
+})
+
+const linkDisplayBySector = computed(() => {
+  const map = new Map<string, Array<{ id: string; preview: boolean }>>()
+  sectors.value.forEach((sector) => {
+    const linked = [...(linkedSectorIdsBySector.value.get(sector.id) || [])]
+    const shouldShowPreview =
+      draggingType.value === 'link' &&
+      hoveredLinkDropZone.value === sector.id &&
+      !!linkDragSourceSectorId.value &&
+      canDropLink(sector.id)
+
+    if (shouldShowPreview && linkDragSourceSectorId.value && !linked.includes(linkDragSourceSectorId.value)) {
+      linked.push(linkDragSourceSectorId.value)
+    }
+
+    linked.sort((a, b) => {
+      const aOrder = sectorOrderMap.value.get(a) ?? Number.MAX_SAFE_INTEGER
+      const bOrder = sectorOrderMap.value.get(b) ?? Number.MAX_SAFE_INTEGER
+      if (aOrder !== bOrder) return aOrder - bOrder
+      return a.localeCompare(b)
+    })
+
+    const list = linked.map((id) => ({
+      id,
+      preview: !!shouldShowPreview && id === linkDragSourceSectorId.value
+    }))
+
+    map.set(sector.id, list)
   })
   return map
 })
@@ -72,6 +126,82 @@ function onSectorListStart(event: { originalEvent?: DragEvent }) {
 
 function onSectorListEnd() {
   isDraggingSector.value = false
+}
+
+function onLinkDragStart(event: DragEvent, sourceSectorId: string) {
+  draggingType.value = 'link'
+  linkDragSourceSectorId.value = sourceSectorId
+  const dt = event.dataTransfer
+  if (dt) {
+    dt.effectAllowed = 'link'
+    dt.setData('text/plain', sourceSectorId)
+  }
+  linkFeedback.value = ''
+}
+
+function onLinkDragEnd() {
+  draggingType.value = null
+  hoveredLinkDropZone.value = null
+  linkDragSourceSectorId.value = null
+  linkZoneEnterCount.value = {}
+}
+
+function onLinkZoneDragEnter(event: DragEvent, targetSectorId: string) {
+  if (draggingType.value !== 'link' || !linkDragSourceSectorId.value) return
+  if (!canDropLink(targetSectorId)) return
+  event.preventDefault()
+  linkZoneEnterCount.value[targetSectorId] = (linkZoneEnterCount.value[targetSectorId] || 0) + 1
+  hoveredLinkDropZone.value = targetSectorId
+}
+
+function onLinkZoneDragOver(event: DragEvent, targetSectorId: string) {
+  if (draggingType.value !== 'link' || !linkDragSourceSectorId.value) return
+  if (!canDropLink(targetSectorId)) {
+    if (hoveredLinkDropZone.value === targetSectorId) hoveredLinkDropZone.value = null
+    return
+  }
+  event.preventDefault()
+  if (event.dataTransfer) event.dataTransfer.dropEffect = 'link'
+  hoveredLinkDropZone.value = targetSectorId
+}
+
+function onLinkZoneDragLeave(zoneId: string) {
+  const next = (linkZoneEnterCount.value[zoneId] || 1) - 1
+  linkZoneEnterCount.value[zoneId] = Math.max(0, next)
+  if (next <= 0 && hoveredLinkDropZone.value === zoneId) {
+    hoveredLinkDropZone.value = null
+  }
+}
+
+function onLinkZoneDrop(event: DragEvent, targetSectorId: string) {
+  if (draggingType.value !== 'link') return
+  event.preventDefault()
+  const source = linkDragSourceSectorId.value || event.dataTransfer?.getData('text/plain') || ''
+  const result = empireStore.createSectorLink(source, targetSectorId)
+  if (result.ok) {
+    linkFeedback.value = t('sectorManagement.link_created')
+  } else if (result.reason === 'self-link') {
+    linkFeedback.value = t('sectorManagement.link_self_blocked')
+  } else if (result.reason === 'duplicate-link') {
+    linkFeedback.value = t('sectorManagement.link_duplicate_blocked')
+  } else {
+    linkFeedback.value = t('sectorManagement.link_invalid_target')
+  }
+  linkZoneEnterCount.value[targetSectorId] = 0
+  onLinkDragEnd()
+}
+
+function removeLink(a: string, b: string) {
+  const removed = empireStore.removeSectorLink(a, b)
+  if (removed) linkFeedback.value = t('sectorManagement.link_removed')
+}
+
+function canDropLink(targetSectorId: string) {
+  const sourceSectorId = linkDragSourceSectorId.value
+  if (!sourceSectorId) return false
+  if (sourceSectorId === targetSectorId) return false
+  const linked = linkedSectorIdsBySector.value.get(targetSectorId) || []
+  return !linked.includes(sourceSectorId)
 }
 </script>
 
@@ -137,7 +267,10 @@ function onSectorListEnd() {
       @update:model-value="applySectorOrder($event)"
     >
       <template #item="{ element: sector }">
-        <div class="sector-card">
+        <div
+          class="sector-card"
+          :class="{ 'link-drop-active': draggingType === 'link' && hoveredLinkDropZone === sector.id }"
+        >
           <div class="sector-card-header">
             <div class="sector-handle-group">
               <button
@@ -146,6 +279,15 @@ function onSectorListEnd() {
               >
                 ⋮⋮
               </button>
+              <button
+                class="sector-link-handle"
+                draggable="true"
+                :title="$t('sectorManagement.drag_link')"
+                @dragstart="onLinkDragStart($event, sector.id)"
+                @dragend="onLinkDragEnd"
+              >
+                🔗
+              </button>
             </div>
             <input
               :value="sector.name"
@@ -153,7 +295,7 @@ function onSectorListEnd() {
               @change="empireStore.renameSector(sector.id, (($event.target as HTMLInputElement).value || '').trim())"
             />
             <div class="sector-actions">
-              <button class="icon-btn danger" @click="empireStore.deleteSector(sector.id)">×</button>
+              <button class="icon-btn subtle-delete" @click="empireStore.deleteSector(sector.id)">×</button>
             </div>
           </div>
 
@@ -185,9 +327,38 @@ function onSectorListEnd() {
             </draggable>
           </div>
 
+          <div
+            class="sector-links"
+            :class="{ 'drop-highlight': hoveredLinkDropZone === sector.id }"
+            @dragenter="onLinkZoneDragEnter($event, sector.id)"
+            @dragover="onLinkZoneDragOver($event, sector.id)"
+            @dragleave="onLinkZoneDragLeave(sector.id)"
+            @drop="onLinkZoneDrop($event, sector.id)"
+          >
+            <div class="zone-title">{{ $t('sectorManagement.links') }}</div>
+            <div class="link-list">
+              <div
+                v-for="item in (linkDisplayBySector.get(sector.id) || [])"
+                :key="`${sector.id}-${item.id}-${item.preview ? 'preview' : 'real'}`"
+                class="link-chip"
+                :class="{ 'link-chip-preview': item.preview }"
+              >
+                <span v-if="item.preview" class="link-drop-dot" />
+                <span>{{ sectorNameMap.get(item.id) || item.id }}</span>
+                <button
+                  v-if="!item.preview"
+                  class="icon-btn subtle-delete"
+                  :title="$t('sectorManagement.remove_link')"
+                  @click="removeLink(sector.id, item.id)"
+                >×</button>
+              </div>
+            </div>
+          </div>
         </div>
       </template>
     </draggable>
+
+    <div v-if="linkFeedback" class="link-feedback">{{ linkFeedback }}</div>
   </div>
 </template>
 
@@ -231,6 +402,9 @@ function onSectorListEnd() {
 .sector-drag-handle {
   @apply text-slate-400 hover:text-sky-300 cursor-grab px-1 inline-flex items-center justify-center w-6 h-6;
 }
+.sector-link-handle {
+  @apply text-slate-400 hover:text-emerald-300 cursor-pointer px-1 inline-flex items-center justify-center w-6 h-6 bg-transparent;
+}
 .sector-drag-handle:active {
   @apply cursor-grabbing;
 }
@@ -241,13 +415,21 @@ function onSectorListEnd() {
   @apply flex items-center gap-1;
 }
 .icon-btn {
-  @apply px-1.5 py-0.5 text-xs rounded bg-slate-700 text-slate-200 disabled:opacity-40;
+  @apply inline-flex items-center justify-center rounded text-[10px] leading-none disabled:opacity-40;
+  width: 0.75rem;
+  height: 0.75rem;
 }
-.icon-btn.danger {
-  @apply bg-red-800 text-red-100;
+.icon-btn.subtle-delete {
+  @apply bg-slate-700/90 text-blue-200 border border-blue-400/25 hover:bg-slate-600/90;
 }
 .sector-stations {
   @apply border border-slate-700/70 rounded p-2 mt-2;
+}
+.sector-links {
+  @apply border border-slate-700/70 rounded p-2 mt-2;
+}
+.sector-card.link-drop-active {
+  @apply border-emerald-500/70 shadow-lg shadow-emerald-900/30;
 }
 .drop-highlight {
   @apply border-sky-500 bg-sky-900/20;
@@ -263,6 +445,34 @@ function onSectorListEnd() {
 }
 .station-chip {
   @apply cursor-grab;
+}
+.link-drop-hint {
+  @apply text-[10px] text-slate-500 mb-1;
+}
+.link-empty {
+  @apply text-xs text-slate-500;
+}
+.link-drop-point {
+  @apply inline-flex items-center gap-2 text-xs text-emerald-200 bg-emerald-900/25 border border-emerald-500/50 rounded px-2 py-1 mb-2;
+}
+.link-drop-dot {
+  @apply inline-block w-2 h-2 rounded-full bg-emerald-300;
+  box-shadow: 0 0 0 0 rgba(110, 231, 183, 0.6);
+  animation: link-drop-pulse 1.2s ease-out infinite;
+}
+.link-list {
+  @apply flex flex-wrap gap-1;
+  min-height: 1.5rem;
+  align-content: flex-start;
+}
+.link-chip {
+  @apply inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-700 text-slate-100 text-xs;
+}
+.link-chip-preview {
+  @apply border border-emerald-400/70 bg-emerald-900/35 text-emerald-100;
+}
+.link-feedback {
+  @apply text-xs text-emerald-300;
 }
 .station-ghost {
   @apply border border-dashed border-sky-400 bg-sky-900/20 text-sky-100;
@@ -281,5 +491,14 @@ function onSectorListEnd() {
 }
 .sector-dragging {
   @apply opacity-95;
+}
+
+@keyframes link-drop-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(110, 231, 183, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 0 8px rgba(110, 231, 183, 0);
+  }
 }
 </style>

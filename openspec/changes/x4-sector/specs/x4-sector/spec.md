@@ -202,20 +202,5 @@ ContextBar MUST 显示单泊位吞吐量，不显示总吞吐量。
 
 ## REMOVED Requirements
 
-### Requirement: Sector Link Feature
-系统 SHALL NOT 提供星区连接（link）交互与 store 操作。
-
-#### Scenario: 无连接入口
-- **前提** 用户在星区管理面板
-- **当** 用户尝试查找连接操作
-- **那么** UI SHALL 不显示连接入口、连接区、连接拖拽
-
-#### Scenario: 无连接 store API
-- **前提** 业务代码引用 empire store
-- **当** 检查公开 API
-- **那么** SHALL 不包含 `linkSectors` / `unlinkSectors`
-
-#### Scenario: 中途取消约束
-- **前提** 连接功能曾进入开发过程
-- **当** 以最终版本范围评估
-- **那么** 该功能 SHALL 视为中途取消项，不纳入交付能力
+### Requirement: Sector Link Feature (Moved)
+本变更不再定义星区连接（link）能力，连接需求 SHALL 由独立变更 `sector-link` 覆盖。

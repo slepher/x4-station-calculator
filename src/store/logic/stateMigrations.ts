@@ -16,6 +16,7 @@ import type {
 } from '@/types/x4'
 import { resolveModuleId } from './blueprintParser'
 import { CURRENT_EMPIRE_VERSION, CURRENT_FLOW_VERSION, CURRENT_SHIP_BLUEPRINT_VERSION } from './storageVersions'
+import { normalizeSectorLinks } from './sectorLinks'
 
 type ModuleLookup = {
   modulesMap: Record<string, X4Module>
@@ -126,6 +127,7 @@ function normalizeEmpireStateShape(raw: SavedEmpiresState, warnings?: string[]):
     sectors.sort((a, b) => a.order - b.order)
     sectors.forEach((sector, idx) => { sector.order = idx })
     const validSectorIdSet = new Set(sectors.map(s => s.id))
+    const sectorLinks = normalizeSectorLinks((empire as EmpirePlan).sectorLinks, validSectorIdSet)
 
     const stations = (empire.stations || []).map((station, stationIndex) => {
       const normalized = toStationPlan(station, stationIndex)
@@ -142,6 +144,7 @@ function normalizeEmpireStateShape(raw: SavedEmpiresState, warnings?: string[]):
       id: empire.id || crypto.randomUUID(),
       name: empire.name || `Empire ${empireIndex + 1}`,
       sectors,
+      sectorLinks,
       stations
     }
   })

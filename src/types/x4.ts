@@ -434,6 +434,7 @@ export interface EmpirePlan {
   id: string;
   name: string;
   sectors?: SectorPlan[];
+  sectorLinks?: string[];
   stations: StationPlan[];
 }
 

@@ -20,6 +20,7 @@ import { analyzeEmpireWareFlow } from './logic/analyzeEmpireWareFlow'
 import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
 import { stationStateMap, DEFAULT_STATION_SETTINGS, migrateStationSettings } from './state/StationStateMap'
 import { CURRENT_EMPIRE_VERSION } from './logic/storageVersions'
+import { getLinkedSectorIdsFor, normalizeSectorLinkKey, normalizeSectorLinks } from './logic/sectorLinks'
 
 const STORAGE_KEY = 'x4_empire_data'
 const V1_STORAGE_KEY = 'x4_station_data'
@@ -44,6 +45,7 @@ function createDefaultEmpire(name: string = ''): EmpirePlan {
     id: crypto.randomUUID(),
     name,
     sectors: [createDefaultSector(0)],
+    sectorLinks: [],
     stations: []
   }
 }
@@ -104,6 +106,7 @@ export const useEmpireStore = defineStore('empire', () => {
     const list = activeEmpire.value.sectors || []
     return [...list].sort((a, b) => a.order - b.order)
   })
+  const sectorLinks = computed<string[]>(() => activeEmpire.value?.sectorLinks || [])
 
   const orderedStationsBySector = computed<StationPlan[]>(() => {
     if (!activeEmpire.value) return []
@@ -312,6 +315,11 @@ export const useEmpireStore = defineStore('empire', () => {
         if (!Array.isArray(empire.sectors) || empire.sectors.length === 0) {
           empire.sectors = [createDefaultSector(0)]
         }
+        if (!Array.isArray(empire.sectorLinks)) {
+          empire.sectorLinks = []
+        }
+        const validSectorIds = new Set(empire.sectors.map((sector) => sector.id))
+        empire.sectorLinks = normalizeSectorLinks(empire.sectorLinks, validSectorIds)
         empire.stations.forEach(station => {
           if (station.count === null || station.count === undefined) {
             station.count = 1
@@ -393,6 +401,13 @@ export const useEmpireStore = defineStore('empire', () => {
       const active = activeEmpire.value
       if (active && (!Array.isArray(active.sectors) || active.sectors.length === 0)) {
         active.sectors = [createDefaultSector(0)]
+      }
+      if (active && !Array.isArray(active.sectorLinks)) {
+        active.sectorLinks = []
+      }
+      if (active) {
+        const validSectorIds = new Set((active.sectors || []).map((sector) => sector.id))
+        active.sectorLinks = normalizeSectorLinks(active.sectorLinks, validSectorIds)
       }
       savedEmpires.value.activeId = empireId
       
@@ -500,6 +515,7 @@ export const useEmpireStore = defineStore('empire', () => {
     }
     if (!activeEmpire.value.sectors) activeEmpire.value.sectors = []
     activeEmpire.value.sectors.push(sector)
+    if (!Array.isArray(activeEmpire.value.sectorLinks)) activeEmpire.value.sectorLinks = []
     return sector
   }
 
@@ -575,7 +591,42 @@ export const useEmpireStore = defineStore('empire', () => {
     activeEmpire.value.stations.forEach((station) => {
       if (station.sectorId === sectorId) station.sectorId = null
     })
+    activeEmpire.value.sectorLinks = (activeEmpire.value.sectorLinks || []).filter((key) => {
+      const linkedIds = getLinkedSectorIdsFor(sectorId, [key])
+      return linkedIds.length === 0
+    })
     return true
+  }
+
+  function createSectorLink(sourceSectorId: string, targetSectorId: string) {
+    if (!activeEmpire.value) return { ok: false as const, reason: 'no-active-empire' as const }
+    const sourceExists = (activeEmpire.value.sectors || []).some((sector) => sector.id === sourceSectorId)
+    const targetExists = (activeEmpire.value.sectors || []).some((sector) => sector.id === targetSectorId)
+    if (!sourceExists || !targetExists) return { ok: false as const, reason: 'invalid-target' as const }
+
+    const key = normalizeSectorLinkKey(sourceSectorId, targetSectorId)
+    if (!key) return { ok: false as const, reason: 'self-link' as const }
+
+    if (!Array.isArray(activeEmpire.value.sectorLinks)) activeEmpire.value.sectorLinks = []
+    if (activeEmpire.value.sectorLinks.includes(key)) {
+      return { ok: false as const, reason: 'duplicate-link' as const }
+    }
+
+    activeEmpire.value.sectorLinks.push(key)
+    return { ok: true as const }
+  }
+
+  function removeSectorLink(a: string, b: string) {
+    if (!activeEmpire.value || !Array.isArray(activeEmpire.value.sectorLinks)) return false
+    const key = normalizeSectorLinkKey(a, b)
+    if (!key) return false
+    const prev = activeEmpire.value.sectorLinks.length
+    activeEmpire.value.sectorLinks = activeEmpire.value.sectorLinks.filter((item) => item !== key)
+    return activeEmpire.value.sectorLinks.length !== prev
+  }
+
+  function getLinkedSectors(sectorId: string): string[] {
+    return getLinkedSectorIdsFor(sectorId, sectorLinks.value)
   }
 
   function getSupplyPlanningInput(sectorId: string): SupplyPlanningInput {
@@ -738,6 +789,7 @@ export const useEmpireStore = defineStore('empire', () => {
     activeStation,
     activeStationId,
     sectors,
+    sectorLinks,
     orderedStationsBySector,
     savedEmpires,
     allStations,
@@ -765,6 +817,9 @@ export const useEmpireStore = defineStore('empire', () => {
     renameSector,
     reorderSectors,
     deleteSector,
+    createSectorLink,
+    removeSectorLink,
+    getLinkedSectors,
     moveStationToSector,
     setSectorStationOrder,
     getSupplyPlanningInput,
