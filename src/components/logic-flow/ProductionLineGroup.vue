@@ -308,30 +308,30 @@ const handleAdd = (_colIndex: number, event: any) => {
           </label>
         </div>
 
-        <button 
+        <button
           @click="handleMoveUp"
           :disabled="isFirstGroup"
           class="p-1 hover:bg-blue-500/10 text-white/20 hover:text-blue-400 rounded transition-all disabled:opacity-0 disabled:pointer-events-none"
-          title="Move Up"
+          :title="t('logicFlow.moveUp')"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
           </svg>
         </button>
-        <button 
+        <button
           @click="handleMoveDown"
           :disabled="isLastGroup"
           class="p-1 hover:bg-blue-500/10 text-white/20 hover:text-blue-400 rounded transition-all disabled:opacity-0 disabled:pointer-events-none"
-          title="Move Down"
+          :title="t('logicFlow.moveDown')"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
         </button>
-        <button 
+        <button
           @click="removeGroup"
           class="p-2 hover:bg-red-500/10 text-white/20 hover:text-red-400 rounded-lg transition-all"
-          title="Remove Group"
+          :title="t('logicFlow.removeGroup')"
         >
           <span class="text-sm">🗑️</span>
         </button>

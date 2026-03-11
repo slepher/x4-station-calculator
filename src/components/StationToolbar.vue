@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
@@ -14,7 +14,6 @@ import StorageExportWizard from './StorageExportWizard.vue'
 import TopViewSwitch from './common/TopViewSwitch.vue'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
-import { useTitleEditor } from '@/composables/useTitleEditor'
 import { useToolbarWorkflowController } from '@/composables/useToolbarWorkflowController'
 import type { SmartSaveStep } from '@/utils/smartSavePolicy'
 
@@ -45,86 +44,24 @@ const isToolbarActionDisabled = computed(() => (
   isShipActionDisabled.value || toolbarWorkflow.isEditableFor(activeToolbarStoreType.value)
 ))
 
-// 根据视图类型获取当前配置
-const currentConfig = computed(() => {
-  if (isFlowView.value) {
-    return {
-      getName: () => logicFlowStore.currentPlanName,
-      setName: (name: string) => { logicFlowStore.currentPlanName = name },
-      getDefaultName: () => toolbarWorkflow.getDefaultName('logicFlow')
-    }
-  }
-  if (isShipBuildView.value) {
-    return {
-      getName: () => shipBuildStore.blueprint?.name || '',
-      setName: (name: string) => {
-        if (shipBuildStore.blueprint) {
-          shipBuildStore.blueprint.name = name
-        }
-      },
-      getDefaultName: () => toolbarWorkflow.getDefaultName('ship-build', { selectedShip: shipBuildStore.selectedShip })
-    }
-  }
-  return {
-    getName: () => empireStore.activeEmpire?.name || '',
-    setName: (name: string) => {
-      empireStore.updateEmpireName(name)
-    },
-    getDefaultName: () => toolbarWorkflow.getDefaultName('station')
-  }
-})
-
-// 创建 titleEditor
-const titleEditor = useTitleEditor(currentConfig)
-const isEditingTitle = titleEditor.isEditing
-// @ts-ignore - used in template via ref="titleInputRef"
-const titleInputRef = titleEditor.inputRef
-const displayTitle = titleEditor.displayTitle
-const editingValue = titleEditor.editingValue
-const startEditing = titleEditor.startEditing
-const cancelEditing = titleEditor.cancelEditing
-const confirmEditing = titleEditor.confirmEditing
-
 const themeColors = computed(() => {
   if (isFlowView.value) {
     return {
-      title: 'text-purple-400',
-      titleBorder: 'border-purple-500/50',
       primary: 'btn-purple',
       secondary: 'btn-fuchsia'
     }
   }
   if (isShipBuildView.value) {
     return {
-      title: 'text-emerald-400',
-      titleBorder: 'border-emerald-500/50',
       primary: 'btn-green',
       secondary: 'btn-emerald'
     }
   }
   return {
-    title: 'text-sky-400',
-    titleBorder: 'border-sky-500/50',
     primary: 'btn-blue',
     secondary: 'btn-cyan'
   }
 })
-
-const startEdit = async () => {
-  await startEditing()
-}
-
-const finishEdit = () => {
-  cancelEditing()
-}
-
-const confirmEdit = () => {
-  confirmEditing()
-}
-
-watch(displayTitle, (newVal) => {
-  document.title = newVal
-}, { immediate: true })
 
 const handleNew = () => {
   const result = toolbarWorkflow.runAction({
@@ -244,15 +181,20 @@ const handleExport = () => {
         </svg>
         <span>{{ t('menu.load') }}</span>
       </button>
-      <button class="btn-tool btn-gray" data-testid="toolbar-export-btn" @click="handleExport">
+      <div v-else class="btn-tool-placeholder" aria-hidden="true">
         <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-          <polyline points="16 6 12 2 8 6" />
-          <line x1="12" x2="12" y1="2" y2="15" />
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
         </svg>
-        <span>{{ t('menu.export') }}</span>
-      </button>
+        <span>{{ t('menu.load') }}</span>
+      </div>
+    </div>
+
+    <div class="flex-1 flex justify-center">
+      <TopViewSwitch v-model="shipBuildStore.activeView" />
+    </div>
+
+    <div class="flex items-center gap-2 ml-2 mr-4">
       <button class="btn-tool btn-amber" data-testid="toolbar-import-btn" @click="showImportWizard = true">
         <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -263,41 +205,15 @@ const handleExport = () => {
         </svg>
         <span>{{ t('menu.import') }}</span>
       </button>
-    </div>
-
-    <div class="flex-1 flex justify-center min-w-0 mx-4">
-      <div v-if="isEditingTitle" class="w-full flex justify-center items-center gap-2">
-        <input
-          ref="titleInputRef"
-          v-model="editingValue"
-          :class="['bg-slate-700 font-bold text-2xl px-2 py-0.5 rounded border outline-none w-3/4 min-w-[300px] text-center transition-all h-[40px]', themeColors.title, themeColors.titleBorder]"
-          @blur="finishEdit"
-          @keydown.enter="confirmEdit"
-        />
-        <button
-          @mousedown.prevent="confirmEdit" 
-          class="text-green-400 hover:text-green-300 transition-colors p-1 rounded hover:bg-slate-700 h-[40px] w-[40px] flex items-center justify-center"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-          </svg>
-        </button>
-      </div>
-      <div 
-        v-else 
-        class="group flex items-center gap-2 cursor-pointer hover:bg-slate-700/50 px-4 py-1 rounded transition-colors max-w-full truncate"
-        @click="startEdit"
-      >
-        <h2 :class="['toolbar-title', themeColors.title]">{{ displayTitle }}</h2>
-        <svg class="w-4 h-4 text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+      <button class="btn-tool btn-gray" data-testid="toolbar-export-btn" @click="handleExport">
+        <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+          <polyline points="16 6 12 2 8 6" />
+          <line x1="12" x2="12" y1="2" y2="15" />
         </svg>
-      </div>
-    </div>
-
-    <TopViewSwitch v-model="shipBuildStore.activeView" />
-
-    <div class="flex items-center gap-2 ml-2 mr-4">
+        <span>{{ t('menu.export') }}</span>
+      </button>
       <MissingTranslate />
       <LanguageSelector />
     </div>
@@ -311,7 +227,7 @@ const handleExport = () => {
     <SmartSaveDialog
       :isOpen="smartDialog.isOpen"
       :intent="smartDialog.intent"
-      :initialName="displayTitle"
+      :initialName="toolbarWorkflow.getDefaultName(activeToolbarStoreType, { selectedShip: shipBuildStore.selectedShip })"
       :storeType="isShipBuildView ? 'ship-build' : (isFlowView ? 'logicFlow' : 'station')"
       @close="handleSmartDialogClose"
       @submit-default="handleSmartDialogSubmitDefault"
@@ -362,7 +278,9 @@ const handleExport = () => {
   @apply flex flex-wrap gap-4 justify-between items-center mb-6 bg-slate-800 py-3 border-y border-slate-700 shadow-2xl px-0 -mx-4 rounded-none;
 }
 
-.toolbar-title {
-  @apply text-2xl font-bold mx-auto select-none;
+.btn-tool-placeholder {
+  @apply flex items-center gap-2 px-3 py-1.5;
+  height: 32px;
+  visibility: hidden;
 }
 </style>

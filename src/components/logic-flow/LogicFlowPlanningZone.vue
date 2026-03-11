@@ -539,7 +539,7 @@ const handleAddFromDrop = (event: any) => {
             <div class="flex items-center gap-2 border-b border-white/5 pb-2">
               <div class="w-1 h-3 rounded-full bg-blue-500"></div>
               <span class="text-[13px] font-black text-white/80 truncate italic">
-                Preview: {{ getNewLineModuleName() || 'New Line' }}
+                {{ t('logicFlow.preview') }}: {{ getNewLineModuleName() || t('logicFlow.newLine') }}
               </span>
               
               <!-- T0 Resources Preview for New Line -->

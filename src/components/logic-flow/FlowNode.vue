@@ -138,21 +138,21 @@ const handleRemove = () => {
         </button>
 
         <!-- Promote Button (+) for Auto Nodes -->
-        <button 
+        <button
           v-if="node.source === 'auto' && !node.isIsolated && !isRawResource"
           @click="handlePromote"
           class="hover:bg-blue-500/20 rounded transition-colors"
-          title="Promote to Manual"
+          :title="t('logicFlow.promoteToManual')"
         >
           <span class="text-[9px]">➕</span>
         </button>
 
         <!-- Remove Button for Manual Nodes (not isolated) -->
-        <button 
+        <button
           v-if="node.source === 'manual' && !node.isIsolated"
           @click="handleRemove"
           class="hover:bg-red-500/20 rounded transition-colors"
-          title="Remove"
+          :title="t('logicFlow.remove')"
         >
           <span class="text-[9px]">🗑️</span>
         </button>
@@ -162,11 +162,11 @@ const handleRemove = () => {
     <!-- Subtitle: Race / Status -->
     <div class="flex items-center justify-between mt-0.5 h-3">
       <div class="flex items-center gap-1 overflow-hidden">
-        <span 
+        <span
           v-if="node.source === 'auto' && !node.isIsolated"
           class="text-[7px] font-bold uppercase tracking-tighter px-0.5 rounded bg-blue-500/20 text-blue-400 shrink-0 border border-blue-500/30"
         >
-          Auto
+          {{ t('logicFlow.auto') }}
         </span>
         <span 
           class="text-[7px] font-bold uppercase tracking-tighter px-0.5 rounded bg-black/40 shrink-0"

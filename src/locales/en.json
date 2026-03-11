@@ -469,7 +469,16 @@
     "replace": "Replace",
     "rejected": "Lineage Conflict",
     "clearAll": "Clear All",
-    "clickToAddManually": "Click to add manually"
+    "clickToAddManually": "Click to add manually",
+    "addTo": "Add to...",
+    "newProductionLine": "New Production Line",
+    "moveUp": "Move Up",
+    "moveDown": "Move Down",
+    "removeGroup": "Remove Group",
+    "promoteToManual": "Promote to Manual",
+    "remove": "Remove",
+    "preview": "Preview",
+    "newLine": "New Line"
   },
   "logicFlowImport": {
     "entry_title": "Import Logic Flow",

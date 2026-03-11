@@ -5,10 +5,32 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { getLogicFlowGroupDisplayName } from '@/store/logic/logicFlowGroupName'
 import { useI18n } from 'vue-i18n'
+import { useX4I18n } from '@/utils/UseX4I18n'
+import { useTitleEditor } from '@/composables/useTitleEditor'
+import { useToolbarWorkflowController } from '@/composables/useToolbarWorkflowController'
 
 const { t } = useI18n()
+const { translateShip } = useX4I18n()
 const gameData = useGameDataStore()
 const logicFlow = useLogicFlowStore()
+const toolbarWorkflow = useToolbarWorkflowController({ t, translateShip })
+
+// --- 方案标题编辑器 ---
+const titleConfig = computed(() => ({
+  getName: () => logicFlow.currentPlanName,
+  setName: (name: string) => { logicFlow.currentPlanName = name },
+  getDefaultName: () => toolbarWorkflow.getDefaultName('logicFlow')
+}))
+
+const titleEditor = useTitleEditor(titleConfig)
+const isEditingTitle = titleEditor.isEditing
+// @ts-ignore - used in template via ref="titleInputRef"
+const titleInputRef = titleEditor.inputRef
+const displayTitle = titleEditor.displayTitle
+const editingValue = titleEditor.editingValue
+const startEditingTitle = titleEditor.startEditing
+const finishEditingTitle = titleEditor.cancelEditing
+const confirmEditingTitle = titleEditor.confirmEditing
 
 // --- 一级分类 ---
 const activeCategory = ref<'industrial' | 'agricultural'>('industrial')
@@ -219,12 +241,60 @@ defineExpose({
 
 <template>
   <div class="candidate-zone">
+    <!-- Plan Title Row -->
+    <div class="plan-title-row">
+      <div class="plan-title-left">
+        <div class="plan-title-indicator"></div>
+
+        <!-- 编辑模式 -->
+        <div v-if="isEditingTitle" class="plan-title-edit-group">
+          <input
+            ref="titleInputRef"
+            v-model="editingValue"
+            class="plan-title-input"
+            @blur="finishEditingTitle"
+            @keydown.enter="confirmEditingTitle"
+          />
+          <button
+            @mousedown.prevent="confirmEditingTitle"
+            class="plan-title-confirm-btn"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- 显示模式 -->
+        <div
+          v-else
+          class="plan-title-display-group group/title"
+          @click="startEditingTitle"
+        >
+          <h3 class="plan-title-text">{{ displayTitle }}</h3>
+          <svg class="plan-title-edit-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Clear All Button -->
+      <button
+        @click="handleClearAll"
+        class="clear-all-btn"
+        v-if="logicFlow.groups.length > 0"
+      >
+        <span>🗑️</span>
+        <span>{{ t('logicFlow.clearAll') }}</span>
+      </button>
+    </div>
+
     <!-- Top Header: Primary Tabs & Race Selection & Search -->
     <div class="header-area">
       <div class="header-left">
         <!-- Primary Tabs -->
         <div class="tab-group">
-          <button 
+          <button
             @click="handleSwitchCategory('industrial')"
             class="tab-btn"
             :class="activeCategory === 'industrial' ? 'tab-btn-industrial-active' : 'tab-btn-inactive'"
@@ -232,7 +302,7 @@ defineExpose({
             <span class="tab-dot" :class="activeCategory === 'industrial' ? 'tab-dot-active' : 'tab-dot-inactive'"></span>
             {{ t('ui.industrial') }}
           </button>
-          <button 
+          <button
             @click="handleSwitchCategory('agricultural')"
             class="tab-btn"
             :class="activeCategory === 'agricultural' ? 'tab-btn-agricultural-active' : 'tab-btn-inactive'"
@@ -243,15 +313,15 @@ defineExpose({
         </div>
 
         <!-- Lock Control (iOS Style) -->
-        <div class="lock-control flex items-center gap-2 ml-4">
-          <label class="relative inline-flex items-center cursor-pointer group">
-            <input 
-              type="checkbox" 
-              v-model="logicFlow.isDefaultLocked" 
+        <div class="lock-control">
+          <label class="lock-label group">
+            <input
+              type="checkbox"
+              v-model="logicFlow.isDefaultLocked"
               class="sr-only peer"
             >
-            <div class="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 transition-colors"></div>
-            <span class="ml-2 text-[10px] font-bold uppercase tracking-widest text-white/40 group-hover:text-white/70 transition-colors">
+            <div class="lock-toggle"></div>
+            <span class="lock-label-text">
               {{ logicFlow.isDefaultLocked ? t('race.' + activeSubCategory) : t('logicFlow.unlock') }}
             </span>
           </label>
@@ -260,7 +330,7 @@ defineExpose({
         <!-- Race Selection (Secondary Nav moved to Header) -->
         <div class="race-filter">
           <div class="race-separator"></div>
-          <button 
+          <button
             v-for="sub in (activeCategory === 'industrial' ? industrialRaces : agriculturalRaces)"
             :key="sub"
             @click="activeSubCategory = sub"
@@ -275,14 +345,14 @@ defineExpose({
       <!-- Global Search Integration -->
       <div class="global-search">
         <div class="search-wrapper group">
-          <input 
+          <input
             v-model="gameData.searchQuery"
-            type="text" 
+            type="text"
             :placeholder="t('planning.search_placeholder')"
             class="search-input"
           />
           <div class="search-actions">
-            <button 
+            <button
               v-if="gameData.searchQuery"
               @click="gameData.searchQuery = ''"
               class="search-clear-btn"
@@ -294,15 +364,6 @@ defineExpose({
             </div>
           </div>
         </div>
-
-        <button 
-          @click="handleClearAll"
-          class="clear-all-btn"
-          v-if="logicFlow.groups.length > 0"
-        >
-          <span>🗑️</span>
-          <span>{{ t('logicFlow.clearAll') }}</span>
-        </button>
       </div>
     </div>
 
@@ -432,7 +493,7 @@ defineExpose({
                     }"
                   >
                     <div class="context-menu-header">
-                      Add to...
+                      {{ t('logicFlow.addTo') }}
                     </div>
                     <div class="context-menu-list custom-scrollbar">
                       <button 
@@ -458,7 +519,7 @@ defineExpose({
                       class="context-menu-new-line"
                     >
                       <span>✨</span>
-                      <span>New Production Line</span>
+                      <span>{{ t('logicFlow.newProductionLine') }}</span>
                     </button>
                   </div>
                 </Teleport>
@@ -493,6 +554,47 @@ defineExpose({
 /* --- Main Layout --- */
 .candidate-zone {
   @apply flex flex-col h-full bg-[#0f172a] border-b border-white/10 shadow-2xl relative z-10;
+}
+
+/* --- Plan Title Row --- */
+.plan-title-row {
+  @apply flex items-center justify-between px-6 py-3 border-b border-white/10;
+}
+
+.plan-title-left {
+  @apply flex items-center gap-2 min-w-0;
+}
+
+.plan-title-indicator {
+  @apply w-1.5 h-4 rounded-full bg-fuchsia-500 flex-shrink-0;
+  box-shadow: 0 0 8px rgba(167, 139, 250, 0.5);
+}
+
+.plan-title-edit-group {
+  @apply flex items-center gap-2 flex-1 min-w-0;
+}
+
+.plan-title-input {
+  @apply bg-slate-700 text-white font-black text-xl px-2 py-0.5 rounded border border-fuchsia-500/50 outline-none flex-1 min-w-0 text-left transition-all;
+  height: 32px;
+}
+
+.plan-title-confirm-btn {
+  @apply text-green-400 hover:text-green-300 transition-colors p-1 rounded hover:bg-slate-700 flex items-center justify-center flex-shrink-0;
+  width: 32px;
+  height: 32px;
+}
+
+.plan-title-display-group {
+  @apply flex items-center gap-2 cursor-pointer hover:bg-slate-700/50 px-2 py-0.5 rounded transition-colors min-w-0;
+}
+
+.plan-title-text {
+  @apply text-xl font-black text-white tracking-tight truncate;
+}
+
+.plan-title-edit-icon {
+  @apply w-4 h-4 text-slate-500 opacity-0 group-hover/title:opacity-100 transition-opacity flex-shrink-0;
 }
 
 .header-area {
@@ -534,6 +636,45 @@ defineExpose({
 
 .tab-dot-inactive {
   @apply bg-white/20;
+}
+
+/* --- Lock Control --- */
+.lock-control {
+  @apply flex items-center gap-2 ml-4;
+}
+
+.lock-label {
+  @apply relative inline-flex items-center cursor-pointer;
+}
+
+.lock-toggle {
+  @apply w-9 h-5 bg-white/10 rounded-full transition-colors;
+  position: relative;
+}
+
+.lock-toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border: 1px solid rgb(209 213 219);
+  border-radius: 9999px;
+  transition: transform 0.2s;
+}
+
+.peer:checked ~ .lock-toggle {
+  background: rgb(37 99 235);
+}
+
+.peer:checked ~ .lock-toggle::after {
+  transform: translateX(16px);
+}
+
+.lock-label-text {
+  @apply ml-2 text-[10px] font-bold uppercase tracking-widest text-white/40 group-hover:text-white/70 transition-colors;
 }
 
 /* --- Race Filter --- */
