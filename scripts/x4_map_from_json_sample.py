@@ -10,6 +10,8 @@ from typing import Dict, List, Optional, Tuple
 
 GATE_LINK_RE = re.compile(r"connection_ClusterGate(\d+)To(\d+)", re.IGNORECASE)
 CLUSTER_ID_RE = re.compile(r"Cluster_(\d+)_", re.IGNORECASE)
+SECTOR_GRID_SIZE = 88.0
+CLUSTER_SPACING = 2
 
 
 @dataclass
@@ -167,37 +169,109 @@ def is_display_zone(zone: Zone) -> bool:
     return not (name.startswith("tzone") or raw_name.startswith("tzone"))
 
 
-def build_sector_grid(sectors: Dict[str, Sector], sector_names: List[str]) -> Dict[str, Tuple[float, float]]:
-    sample_cluster_names = sorted({sectors[name].cluster_macro for name in sector_names if name in sectors})
-    cluster_positions = [sectors[next(name for name in sector_names if sectors[name].cluster_macro == cluster)].world_pos for cluster in sample_cluster_names]
-    min_x = min((p.x for p in cluster_positions), default=0.0)
-    max_x = max((p.x for p in cluster_positions), default=1.0)
-    min_z = min((p.z for p in cluster_positions), default=0.0)
-    max_z = max((p.z for p in cluster_positions), default=1.0)
+def nearest_hex_direction(dx: float, dz: float) -> Tuple[int, int]:
+    # Use quadrants first so neighboring clusters land in the same broad positions as the game map.
+    if abs(dx) < 1e-6 and abs(dz) < 1e-6:
+        return (1, 0)
+    if dx >= 0 and dz >= 0:
+        return (1, -1)
+    if dx >= 0 and dz < 0:
+        return (0, 1)
+    if dx < 0 and dz >= 0:
+        return (0, -1)
+    return (-1, 1)
 
-    coarse_step = 4
+
+def gate_vector_between_clusters(
+    source_cluster: str,
+    target_cluster: str,
+    sectors: Dict[str, Sector],
+    zones: Dict[str, Zone],
+    gates_by_sector: Dict[str, List[Gate]],
+) -> Optional[Vec2]:
+    source_cluster_id = cluster_id_from_macro(source_cluster)
+    target_cluster_id = cluster_id_from_macro(target_cluster)
+    if source_cluster_id is None or target_cluster_id is None:
+        return None
+
+    samples: List[Vec2] = []
+    for sector_name, sector in sectors.items():
+        if sector.cluster_macro != source_cluster:
+            continue
+        for gate in gates_by_sector.get(sector_name, []):
+            if gate.target_cluster_id != target_cluster_id:
+                continue
+            zone = zones.get(gate.zone_macro)
+            if zone is None:
+                continue
+            samples.append(Vec2(sector.local_pos.x + zone.local_pos.x, sector.local_pos.z + zone.local_pos.z))
+
+    if samples:
+        return Vec2(sum(v.x for v in samples) / len(samples), sum(v.z for v in samples) / len(samples))
+
+    reverse_samples: List[Vec2] = []
+    for sector_name, sector in sectors.items():
+        if sector.cluster_macro != target_cluster:
+            continue
+        for gate in gates_by_sector.get(sector_name, []):
+            if gate.target_cluster_id != source_cluster_id:
+                continue
+            zone = zones.get(gate.zone_macro)
+            if zone is None:
+                continue
+            reverse_samples.append(Vec2(sector.local_pos.x + zone.local_pos.x, sector.local_pos.z + zone.local_pos.z))
+    if reverse_samples:
+        avg = Vec2(sum(v.x for v in reverse_samples) / len(reverse_samples), sum(v.z for v in reverse_samples) / len(reverse_samples))
+        return Vec2(-avg.x, -avg.z)
+    return None
+
+
+def build_sector_grid(
+    sectors: Dict[str, Sector],
+    sector_names: List[str],
+    zones: Dict[str, Zone],
+    gates_by_sector: Dict[str, List[Gate]],
+    focus_cluster: int,
+) -> Dict[str, Tuple[float, float]]:
+    sample_cluster_names = sorted({sectors[name].cluster_macro for name in sector_names if name in sectors})
+    focus_cluster_macro = next((cluster for cluster in sample_cluster_names if cluster_id_from_macro(cluster) == focus_cluster), None)
+
     cluster_cells: Dict[str, Tuple[int, int]] = {}
     occupied: set[Tuple[int, int]] = set()
+    if focus_cluster_macro is not None:
+        cluster_cells[focus_cluster_macro] = (0, 0)
+        occupied.add((0, 0))
+
     for cluster_name in sample_cluster_names:
-        cluster_sample_sector = next(name for name in sector_names if sectors[name].cluster_macro == cluster_name)
-        cluster_pos = sectors[cluster_sample_sector].world_pos
-        qf = ((cluster_pos.x - min_x) / max(1.0, max_x - min_x)) * 10.0 - 5.0
-        rf = ((cluster_pos.z - min_z) / max(1.0, max_z - min_z)) * 8.0 - 4.0
-        base_q, base_r = cube_round(qf, rf)
-        candidates = [
-            (base_q * coarse_step, base_r * coarse_step),
-            ((base_q + 1) * coarse_step, base_r * coarse_step),
-            ((base_q - 1) * coarse_step, base_r * coarse_step),
-            (base_q * coarse_step, (base_r + 1) * coarse_step),
-            (base_q * coarse_step, (base_r - 1) * coarse_step),
-        ]
-        chosen = next((cell for cell in candidates if cell not in occupied), candidates[0])
-        occupied.add(chosen)
-        cluster_cells[cluster_name] = chosen
+        if cluster_name in cluster_cells:
+            continue
+        desired = None
+        if focus_cluster_macro is not None:
+            vector = gate_vector_between_clusters(focus_cluster_macro, cluster_name, sectors, zones, gates_by_sector)
+            if vector is not None:
+                dq, dr = nearest_hex_direction(vector.x, vector.z)
+                desired = (dq * CLUSTER_SPACING, dr * CLUSTER_SPACING)
+
+        if desired is None:
+            idx = len(cluster_cells)
+            fallback_slots = [(3, 0), (3, -3), (0, -3), (-3, 0), (-3, 3), (0, 3), (6, 0), (6, -6)]
+            desired = fallback_slots[idx] if idx < len(fallback_slots) else (idx * CLUSTER_SPACING, 0)
+
+        if desired in occupied:
+            dq, dr = desired
+            direction = (0 if dq == 0 else int(dq / abs(dq)), 0 if dr == 0 else int(dr / abs(dr)))
+            for step in range(2, 6):
+                candidate = (direction[0] * CLUSTER_SPACING * step, direction[1] * CLUSTER_SPACING * step)
+                if candidate not in occupied:
+                    desired = candidate
+                    break
+
+        occupied.add(desired)
+        cluster_cells[cluster_name] = desired
 
     local_slots = [(0, 0), (1, 0), (0, 1), (-1, 1), (-1, 0), (0, -1), (1, -1)]
     sector_grid: Dict[str, Tuple[float, float]] = {}
-    grid_size = 88.0
+    grid_size = SECTOR_GRID_SIZE
     for cluster_name in sample_cluster_names:
         cluster_sector_names = [name for name in sector_names if sectors[name].cluster_macro == cluster_name]
         cluster_anchor = cluster_cells[cluster_name]
@@ -217,7 +291,7 @@ def build_sector_grid(sectors: Dict[str, Sector], sector_names: List[str]) -> Di
 def render_sample(clusters: Dict[str, Cluster], sectors: Dict[str, Sector], zones: Dict[str, Zone], gates_by_sector: Dict[str, List[Gate]], focus_cluster: int, output: str) -> None:
     sector_names = [name for name, sector in sectors.items() if sector.cluster_id == focus_cluster or any(g.target_cluster_id == focus_cluster for g in gates_by_sector.get(name, []))]
     sector_names = sorted(set(sector_names))
-    sector_grid = build_sector_grid(sectors, sector_names)
+    sector_grid = build_sector_grid(sectors, sector_names, zones, gates_by_sector, focus_cluster)
 
     width = 1700.0
     height = 1200.0
@@ -227,11 +301,17 @@ def render_sample(clusters: Dict[str, Cluster], sectors: Dict[str, Sector], zone
     min_py = min((y for _, y in sector_grid.values()), default=0.0)
     max_py = max((y for _, y in sector_grid.values()), default=1.0)
 
+    available_width = width - pad * 2
+    available_height = height - pad * 2 - 120
+    grid_width = max(max_px - min_px, 1.0)
+    grid_height = max(max_py - min_py, 1.0)
+    layout_scale = min(available_width / grid_width, available_height / grid_height)
+    offset_x = pad + (available_width - grid_width * layout_scale) / 2.0
+    offset_y = pad + 90 + (available_height - grid_height * layout_scale) / 2.0
+
     def place_sector(name: str) -> Tuple[float, float]:
         x, y = sector_grid[name]
-        nx = 0.5 if max_px == min_px else (x - min_px) / (max_px - min_px)
-        ny = 0.5 if max_py == min_py else (y - min_py) / (max_py - min_py)
-        return pad + nx * (width - pad * 2), pad + 90 + ny * (height - pad * 2 - 120)
+        return offset_x + (x - min_px) * layout_scale, offset_y + (y - min_py) * layout_scale
 
     colors = ["#0f766e", "#1d4ed8", "#b45309", "#be123c", "#7c3aed", "#15803d", "#0f172a", "#4338ca"]
 
@@ -240,7 +320,7 @@ def render_sample(clusters: Dict[str, Cluster], sectors: Dict[str, Sector], zone
             return "#475569"
         return colors[cluster_id % len(colors)]
 
-    sector_radius = 70.0
+    sector_radius = SECTOR_GRID_SIZE * layout_scale * 0.84
     zone_centers: Dict[str, Tuple[float, float]] = {}
     sector_center_px: Dict[str, Tuple[float, float]] = {name: place_sector(name) for name in sector_names}
 
@@ -295,16 +375,7 @@ def render_sample(clusters: Dict[str, Cluster], sectors: Dict[str, Sector], zone
         for zone_macro, (cx, cy) in zone_centers.items():
             sector = sectors[zones[zone_macro].sector_macro]
             fill = cluster_color(sector.cluster_id)
-            r = zone_radius[zone_macro]
-            f.write(f'  <polygon points="{hex_points(cx, cy, r)}" fill="{fill}" fill-opacity="0.18" stroke="{fill}" stroke-width="1.5" stroke-opacity="0.55"/>\n')
-
-        for gate in gates_flat:
-            if gate.id not in gate_draw_pos:
-                continue
-            x, y = gate_draw_pos[gate.id]
-            fill = cluster_color(gate.cluster_id)
-            f.write(f'  <circle cx="{x:.1f}" cy="{y:.1f}" r="5.2" fill="{fill}" stroke="#ffffff" stroke-width="1.5"/>\n')
-            f.write(f'  <text x="{x + 7:.1f}" y="{y + 3:.1f}" font-size="8.8" font-family="Consolas, \'Courier New\', monospace" fill="#1e293b">C{gate.cluster_id:03d}→C{gate.target_cluster_id:03d}</text>\n')
+            f.write(f'  <circle cx="{cx:.1f}" cy="{cy:.1f}" r="5.2" fill="{fill}" stroke="#ffffff" stroke-width="1.5"/>\n')
         f.write("</svg>\n")
 
 

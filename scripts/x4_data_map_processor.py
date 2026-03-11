@@ -586,18 +586,6 @@ def main() -> None:
     for zone_id, zone in zones.items():
         if zone["kind"] == "shcon":
             sector_point_sets[zone["sector_id"]][zone_id] = zone["raw_local_pos"]
-    for highway_id, highway in local_highways.items():
-        sector_point_sets[highway["sector_id"]][f"{highway_id}:entry"] = highway["entry_pos"]
-        sector_point_sets[highway["sector_id"]][f"{highway_id}:exit"] = highway["exit_pos"]
-        for idx, point in enumerate(highway["spline"]):
-            sector_point_sets[highway["sector_id"]][f"{highway_id}:spline:{idx}"] = {"x": point["x"], "z": point["z"]}
-
-    for highway_id, highway in sector_highways.items():
-        sector_point_sets[highway["sector_id"]][f"{highway_id}:entry"] = highway["entry_pos"]
-        sector_point_sets[highway["sector_id"]][f"{highway_id}:exit"] = highway["exit_pos"]
-        for idx, point in enumerate(highway["spline"]):
-            sector_point_sets[highway["sector_id"]][f"{highway_id}:spline:{idx}"] = {"x": point["x"], "z": point["z"]}
-
     for cluster_id, sector_ids in cluster_to_sectors.items():
         local_positions = {sector_id: sectors[sector_id]["raw_local_pos"] for sector_id in sector_ids}
         template_kind, slot_map, slot_positions = choose_sector_template(local_positions)
@@ -842,4 +830,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
 

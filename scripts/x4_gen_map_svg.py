@@ -68,6 +68,57 @@ def hex_points(cx: float, cy: float, radius: float) -> str:
         points.append(f"{px:.1f},{py:.1f}")
     return " ".join(points)
 
+def hex_vertices(cx: float, cy: float, radius: float) -> List[Tuple[float, float]]:
+    vertices: List[Tuple[float, float]] = []
+    for index in range(6):
+        angle = math.radians(60 * index)
+        px = cx + radius * math.cos(angle)
+        py = cy + radius * math.sin(angle)
+        vertices.append((px, py))
+    return vertices
+
+
+def clip_segment_to_convex_polygon(
+    p0: Tuple[float, float],
+    p1: Tuple[float, float],
+    polygon: List[Tuple[float, float]],
+) -> Tuple[Tuple[float, float], Tuple[float, float]] | None:
+    # Cyrus-Beck clipping for convex polygon (vertices in CCW order).
+    dx = p1[0] - p0[0]
+    dy = p1[1] - p0[1]
+    t_enter = 0.0
+    t_leave = 1.0
+    eps = 1e-9
+
+    for index in range(len(polygon)):
+        ax, ay = polygon[index]
+        bx, by = polygon[(index + 1) % len(polygon)]
+        ex = bx - ax
+        ey = by - ay
+
+        c = ex * (p0[1] - ay) - ey * (p0[0] - ax)
+        d = ex * dy - ey * dx
+        n = -c
+
+        if abs(d) <= eps:
+            if c < -eps:
+                return None
+            continue
+
+        t = n / d
+        if d > 0:
+            t_enter = max(t_enter, t)
+        else:
+            t_leave = min(t_leave, t)
+
+        if t_enter - t_leave > eps:
+            return None
+
+    q0 = (p0[0] + dx * t_enter, p0[1] + dy * t_enter)
+    q1 = (p0[0] + dx * t_leave, p0[1] + dy * t_leave)
+    return q0, q1
+
+
 
 def fit_world_to_screen(points: Iterable[Tuple[float, float]], cfg: LayoutConfig) -> Tuple[float, float, float, float, float]:
     point_list = list(points)
@@ -211,17 +262,30 @@ def render_from_maps_json(input_path: str, output_path: str, include_all: bool =
                 f.write(f'  <circle cx="{end[0]:.1f}" cy="{end[1]:.1f}" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />\n')
 
             for sector in sectors.values():
+                sx = cx + sector['normalized']['center_offset_ratio']['x'] * cluster_radius
+                sy = cy + sector['normalized']['center_offset_ratio']['y'] * cluster_radius
+                sector_radius = sector['normalized']['sector_radius_ratio'] * cluster_radius
+                sector_hex = hex_vertices(sx, sy, sector_radius)
                 for highway in sector.get("highways", {}).values():
                     render = highway.get("render", {})
                     a_ratio = render.get("a_cluster_ratio")
                     b_ratio = render.get("b_cluster_ratio")
                     if not a_ratio or not b_ratio:
                         continue
-                    x1 = cx + a_ratio["x"] * cluster_radius
-                    y1 = cy + a_ratio["y"] * cluster_radius
-                    x2 = cx + b_ratio["x"] * cluster_radius
-                    y2 = cy + b_ratio["y"] * cluster_radius
+                    p0 = (
+                        cx + a_ratio["x"] * cluster_radius,
+                        cy + a_ratio["y"] * cluster_radius,
+                    )
+                    p1 = (
+                        cx + b_ratio["x"] * cluster_radius,
+                        cy + b_ratio["y"] * cluster_radius,
+                    )
+                    clipped = clip_segment_to_convex_polygon(p0, p1, sector_hex)
+                    if clipped is None:
+                        continue
+                    (x1, y1), (x2, y2) = clipped
                     f.write(f'  <line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />\n')
+
 
             if len(sectors) == 1:
                 only_sector = next(iter(sectors.values()))
@@ -296,5 +360,4 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
-
 

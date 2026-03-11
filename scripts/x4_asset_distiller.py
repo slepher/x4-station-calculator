@@ -297,8 +297,8 @@ def main():
 
     distill_targeted_map_xml(
         os.path.join("maps", "xu_ep2_universe"),
-        ["galaxy.xml", "clusters.xml", "sectors.xml", "zones.xml"],
-        ["galaxy.xml", "*clusters.xml", "*sectors.xml", "*zones.xml"]
+        ["galaxy.xml", "clusters.xml", "sectors.xml", "zones.xml", "zonehighways.xml", "sechighways.xml"],
+        ["galaxy.xml", "*clusters.xml", "*sectors.xml", "*zones.xml", "*zonehighways.xml", "*sechighways.xml"]
     )
 
     # --- 步骤 5: 处理核心库文件 (wares/waregroups/colors/ships/shipgroups/loadouts) ---

@@ -10,6 +10,7 @@ from typing import Dict, Iterable, List, Optional, Tuple
 
 
 GATE_LINK_RE = re.compile(r"connection_ClusterGate(\d+)To(\d+)", re.IGNORECASE)
+LOCAL_HIGHWAY_GATE_RE = re.compile(r"Highway(\d+)Connection(\d+)_gate", re.IGNORECASE)
 CLUSTER_ID_RE = re.compile(r"Cluster_(\d+)_", re.IGNORECASE)
 
 REGION_CLUSTER_IDS = [29, 501, 502, 503, 500, 704, 2, 3, 39, 1, 5, 6, 740, 725, 4, 47]
@@ -17,13 +18,22 @@ OWNER_COLORS = {
     "teladi": "#c6c000",
     "argon": "#0077cc",
     "antigone": "#00e5ff",
+    "boron": "#63b3ff",
+    "terran": "#2f7fd3",
+    "pioneers": "#7ec8ff",
+    "split": "#c00000",
+    "freesplit": "#b26b00",
+    "holyorder": "#b000b8",
+    "paranid": "#d100d1",
+    "hatikvah": "#7a4ea3",
+    "kaori": "#8a6ad9",
     "loanshark": "#c58f00",
     "riptide": "#c58f00",
+    "xenon": "#9a0000",
     "neutral": "#4b5563",
     "ownerless": "#4b5563",
     "scaleplate": "#4b5563",
     "scavenger": "#4b5563",
-    "paranid": "#d100d1",
 }
 
 
@@ -90,6 +100,18 @@ class Highway:
 
 
 @dataclass
+class LocalSectorHighway:
+    id: str
+    sector_macro: str
+    endpoint_a_id: str
+    endpoint_b_id: str
+    zone_a_macro: str
+    zone_b_macro: str
+    local_a_pos: Vec2
+    local_b_pos: Vec2
+
+
+@dataclass
 class LayoutConfig:
     width: float = 1800.0
     height: float = 1300.0
@@ -146,7 +168,7 @@ def owner_color(owner: str) -> str:
     return OWNER_COLORS.get(owner, "#94a3b8")
 
 
-def load_map_json(path: str) -> Tuple[Dict[str, Cluster], Dict[str, Sector], Dict[str, Zone], Dict[str, List[Gate]], List[Highway]]:
+def load_map_json(path: str) -> Tuple[Dict[str, Cluster], Dict[str, Sector], Dict[str, Zone], Dict[str, List[Gate]], List[Highway], List[LocalSectorHighway]]:
     raw = json.loads(Path(path).read_text(encoding="utf-8"))
     clusters_raw = raw["data"] if isinstance(raw, dict) and "data" in raw else raw
 
@@ -155,6 +177,7 @@ def load_map_json(path: str) -> Tuple[Dict[str, Cluster], Dict[str, Sector], Dic
     zones: Dict[str, Zone] = {}
     gates_by_sector: Dict[str, List[Gate]] = {}
     highways: List[Highway] = []
+    local_highways: List[LocalSectorHighway] = []
 
     for cluster_node in clusters_raw:
         cluster_macro = (cluster_node.get("macro") or {}).get("ref") or cluster_node.get("name")
@@ -172,6 +195,7 @@ def load_map_json(path: str) -> Tuple[Dict[str, Cluster], Dict[str, Sector], Dic
             cluster_id = cluster_id_from_macro(cluster_macro)
             sector_world = cluster_pos + sector_local
             sector_owner = sector_attrs.get("owner") or cluster_owner
+            local_highway_gate_ids: Dict[str, List[str]] = {}
             sectors[sector_macro] = Sector(
                 macro=sector_macro,
                 name=sector_name,
@@ -194,19 +218,49 @@ def load_map_json(path: str) -> Tuple[Dict[str, Cluster], Dict[str, Sector], Dic
                 for item in zone_node.get("items", []):
                     item_name = item.get("name") or item.get("ref") or ""
                     match = GATE_LINK_RE.fullmatch(item_name)
-                    if not match:
-                        continue
-                    gates_by_sector.setdefault(sector_macro, []).append(
-                        Gate(
-                            id=f"{zone_macro}:{item_name}",
-                            name=item_name,
-                            zone_macro=zone_macro,
-                            sector_macro=sector_macro,
-                            cluster_id=cluster_id,
-                            local_pos=pos_from(item),
-                            target_cluster_id=int(match.group(2)),
+                    if match:
+                        gates_by_sector.setdefault(sector_macro, []).append(
+                            Gate(
+                                id=f"{zone_macro}:{item_name}",
+                                name=item_name,
+                                zone_macro=zone_macro,
+                                sector_macro=sector_macro,
+                                cluster_id=cluster_id,
+                                local_pos=pos_from(item),
+                                target_cluster_id=int(match.group(2)),
+                            )
                         )
+                        continue
+                    local_highway_match = LOCAL_HIGHWAY_GATE_RE.fullmatch(item_name)
+                    if local_highway_match:
+                        highway_key = local_highway_match.group(1)
+                        local_highway_gate_ids.setdefault(highway_key, []).append((f"{zone_macro}:{item_name}", zone_macro, pos_from(item)))
+
+            for highway_key, endpoint_entries in local_highway_gate_ids.items():
+                deduped_entries = []
+                seen_endpoint_ids: set[str] = set()
+                for endpoint_entry in endpoint_entries:
+                    endpoint_id = endpoint_entry[0]
+                    if endpoint_id in seen_endpoint_ids:
+                        continue
+                    seen_endpoint_ids.add(endpoint_id)
+                    deduped_entries.append(endpoint_entry)
+                if len(deduped_entries) < 2:
+                    continue
+                endpoint_a_id, zone_a_macro, local_a_pos = deduped_entries[0]
+                endpoint_b_id, zone_b_macro, local_b_pos = deduped_entries[1]
+                local_highways.append(
+                    LocalSectorHighway(
+                        id=f"{sector_macro}:Highway{highway_key}",
+                        sector_macro=sector_macro,
+                        endpoint_a_id=endpoint_a_id,
+                        endpoint_b_id=endpoint_b_id,
+                        zone_a_macro=zone_a_macro,
+                        zone_b_macro=zone_b_macro,
+                        local_a_pos=local_a_pos,
+                        local_b_pos=local_b_pos,
                     )
+                )
 
         for highway_node in cluster_node.get("sechighways", []):
             connections = (((highway_node.get("macro") or {}).get("connections")) or [])
@@ -246,7 +300,7 @@ def load_map_json(path: str) -> Tuple[Dict[str, Cluster], Dict[str, Sector], Dic
                 )
             )
 
-    return clusters, sectors, zones, gates_by_sector, highways
+    return clusters, sectors, zones, gates_by_sector, highways, local_highways
 
 
 def is_display_zone(zone: Zone) -> bool:
@@ -589,9 +643,10 @@ def sector_anchor_positions(
     zones: Dict[str, Zone],
     gates_by_sector: Dict[str, List[Gate]],
     highways: List[Highway],
+    local_highways: List[LocalSectorHighway],
     sector_centers: Dict[str, Tuple[float, float]],
     sector_radii: Dict[str, float],
-) -> Tuple[Dict[str, Tuple[float, float]], Dict[str, Tuple[float, float]]]:
+) -> Tuple[Dict[str, Tuple[float, float]], Dict[str, Tuple[float, float]], Dict[str, Tuple[float, float]]]:
     sector_points: Dict[str, List[Tuple[str, Vec2]]] = {}
 
     for sector_macro, sector_gates in gates_by_sector.items():
@@ -612,11 +667,19 @@ def sector_anchor_positions(
             sector_points.setdefault(zone.sector_macro, []).append((zone_macro, zone.local_pos))
             seen_zones.add(zone_macro)
 
-    anchors = project_sector_local_points(sector_points, sector_centers, sector_radii)
-    gate_anchors = {anchor_id: pos for anchor_id, pos in anchors.items() if ':' in anchor_id}
-    zone_anchors = {anchor_id: pos for anchor_id, pos in anchors.items() if anchor_id in zones}
-    return gate_anchors, zone_anchors
+    for local_highway in local_highways:
+        zone_a = zones.get(local_highway.zone_a_macro)
+        zone_b = zones.get(local_highway.zone_b_macro)
+        if zone_a is None or zone_b is None:
+            continue
+        sector_points.setdefault(local_highway.sector_macro, []).append((local_highway.endpoint_a_id, zone_a.local_pos + local_highway.local_a_pos))
+        sector_points.setdefault(local_highway.sector_macro, []).append((local_highway.endpoint_b_id, zone_b.local_pos + local_highway.local_b_pos))
 
+    anchors = project_sector_local_points(sector_points, sector_centers, sector_radii)
+    gate_anchors = {anchor_id: pos for anchor_id, pos in anchors.items() if ':' in anchor_id and 'Highway' not in anchor_id}
+    zone_anchors = {anchor_id: pos for anchor_id, pos in anchors.items() if anchor_id in zones}
+    local_highway_anchors = {anchor_id: pos for anchor_id, pos in anchors.items() if 'Highway' in anchor_id}
+    return gate_anchors, zone_anchors, local_highway_anchors
 
 def highway_pairs_for_region(highways: List[Highway], region_sector_macros: set[str]) -> List[Highway]:
     return [
@@ -657,7 +720,7 @@ def paired_cluster_edges(region_sector_macros: set[str], gates_by_sector: Dict[s
 
 
 def render_region(input_path: str, output: str, include_all: bool = False) -> Dict[str, Tuple[float, float]]:
-    clusters, sectors, zones, gates_by_sector, highways = load_map_json(input_path)
+    clusters, sectors, zones, gates_by_sector, highways, local_highways = load_map_json(input_path)
     region_macros = select_region_clusters(clusters, include_all=include_all)
     region_clusters = {macro: clusters[macro] for macro in region_macros}
     region_sector_macros = {sector.macro for sector in sectors.values() if sector.cluster_macro in region_clusters}
@@ -682,7 +745,7 @@ def render_region(input_path: str, output: str, include_all: bool = False) -> Di
 
     edge_pairs = paired_cluster_edges(region_sector_macros, gates_by_sector)
     highway_pairs = highway_pairs_for_region(highways, region_sector_macros)
-    gate_anchors, zone_anchors = sector_anchor_positions(zones, gates_by_sector, highway_pairs, sector_centers, sector_radii)
+    gate_anchors, zone_anchors, local_highway_anchors = sector_anchor_positions(zones, gates_by_sector, highway_pairs, local_highways, sector_centers, sector_radii)
     highway_segments = highway_stub_segments(highway_pairs, zone_anchors, sector_centers)
 
     os.makedirs(os.path.dirname(output), exist_ok=True)
@@ -713,6 +776,17 @@ def render_region(input_path: str, output: str, include_all: bool = False) -> Di
                 f.write(
                     f'  <circle cx="{start[0]:.1f}" cy="{start[1]:.1f}" r="0.7" fill="#1d4ed8" fill-opacity="0.95" stroke="#dbeafe" stroke-width="0.4" />\n'
                 )
+
+        for local_highway in local_highways:
+            if local_highway.sector_macro not in region_sector_macros:
+                continue
+            left = local_highway_anchors.get(local_highway.endpoint_a_id)
+            right = local_highway_anchors.get(local_highway.endpoint_b_id)
+            if left is None or right is None:
+                continue
+            f.write(
+                f'  <line x1="{left[0]:.1f}" y1="{left[1]:.1f}" x2="{right[0]:.1f}" y2="{right[1]:.1f}" stroke="#38bdf8" stroke-width="0.35" stroke-opacity="0.8" />\n'
+            )
 
         for cluster_macro in region_macros:
             cluster = clusters[cluster_macro]
