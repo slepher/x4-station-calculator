@@ -210,15 +210,29 @@ def load_map_json(path: str) -> Tuple[Dict[str, Cluster], Dict[str, Sector], Dic
 
         for highway_node in cluster_node.get("sechighways", []):
             connections = (((highway_node.get("macro") or {}).get("connections")) or [])
-            endpoint_macros = [((conn.get("macro") or {}).get("ref")) for conn in connections]
-            endpoint_macros = [macro for macro in endpoint_macros if macro in zones]
+            endpoint_macros: List[str] = []
+            for conn in connections:
+                macro_ref = ((conn.get("macro") or {}).get("ref"))
+                if macro_ref in zones and macro_ref not in endpoint_macros:
+                    endpoint_macros.append(macro_ref)
             if len(endpoint_macros) < 2:
                 continue
-            zone_a_macro, zone_b_macro = endpoint_macros[:2]
+            zone_a_macro: Optional[str] = None
+            zone_b_macro: Optional[str] = None
+            for idx, left_macro in enumerate(endpoint_macros):
+                left_sector = zones[left_macro].sector_macro
+                for right_macro in endpoint_macros[idx + 1 :]:
+                    right_sector = zones[right_macro].sector_macro
+                    if left_sector != right_sector:
+                        zone_a_macro = left_macro
+                        zone_b_macro = right_macro
+                        break
+                if zone_a_macro is not None:
+                    break
+            if zone_a_macro is None or zone_b_macro is None:
+                continue
             sector_a_macro = zones[zone_a_macro].sector_macro
             sector_b_macro = zones[zone_b_macro].sector_macro
-            if sector_a_macro == sector_b_macro:
-                continue
             highways.append(
                 Highway(
                     id=((highway_node.get("macro") or {}).get("ref") or highway_node.get("name") or f"{zone_a_macro}->{zone_b_macro}"),
@@ -336,11 +350,19 @@ def template_positions(sector_count: int, cluster_radius: float, variant: int = 
         ]
         return templates[variant % len(templates)]
     if sector_count == 3:
-        return {
-            'left': (-cluster_radius * 0.5, 0.0),
-            'center': (cluster_radius * 0.25, s),
-            'upper_right': (cluster_radius * 0.25, -s),
-        }
+        templates = [
+            {
+                'left': (-cluster_radius * 0.5, 0.0),
+                'center': (cluster_radius * 0.25, s),
+                'upper_right': (cluster_radius * 0.25, -s),
+            },
+            {
+                'upper_left': (-cluster_radius * 0.25, -s),
+                'lower_left': (-cluster_radius * 0.25, s),
+                'right': (cluster_radius * 0.5, 0.0),
+            },
+        ]
+        return templates[variant % len(templates)]
     return {'single': (0.0, 0.0)}
 
 
@@ -398,10 +420,7 @@ def assign_template_slots(local_positions: Dict[str, Vec2], cluster_radius: floa
         return {names[0]: (0.0, 0.0)}
 
     if len(names) == 3:
-        return best_slot_assignment(local_positions, template_positions(3, cluster_radius))
-
-    if len(names) == 2:
-        variants = [template_positions(2, cluster_radius, 0), template_positions(2, cluster_radius, 1)]
+        variants = [template_positions(3, cluster_radius, 0), template_positions(3, cluster_radius, 1)]
         best_mapping: Optional[Dict[str, Tuple[float, float]]] = None
         best_score: Optional[float] = None
         centered = centered_local_positions(list(local_positions.items()))
@@ -415,6 +434,30 @@ def assign_template_slots(local_positions: Dict[str, Vec2], cluster_radius: floa
                 ax, ay = actual_vectors[sector_name]
                 sx, sy = slot_vectors[slot_name]
                 score += (ax - sx) ** 2 + (ay - sy) ** 2
+            if best_score is None or score < best_score:
+                best_score = score
+                best_mapping = mapping
+        return best_mapping or {}
+
+    if len(names) == 2:
+        variants = [template_positions(2, cluster_radius, 0), template_positions(2, cluster_radius, 1)]
+        best_mapping: Optional[Dict[str, Tuple[float, float]]] = None
+        best_score: Optional[float] = None
+        centered = centered_local_positions(list(local_positions.items()))
+        actual_vectors = {name: unit_vec(pos.x, -pos.z) for name, pos in centered.items()}
+        x_values = [pos.x for pos in centered.values()]
+        x_span = max(x_values) - min(x_values) if x_values else 0.0
+        for variant_index, slots in enumerate(variants):
+            mapping = best_slot_assignment(local_positions, slots)
+            slot_vectors = {slot_name: unit_vec(slot_pos[0], slot_pos[1]) for slot_name, slot_pos in slots.items()}
+            score = 0.0
+            for sector_name, slot_pos in mapping.items():
+                slot_name = next(name for name, pos in slots.items() if pos == slot_pos)
+                ax, ay = actual_vectors[sector_name]
+                sx, sy = slot_vectors[slot_name]
+                score += (ax - sx) ** 2 + (ay - sy) ** 2
+            if x_span <= 1e-6:
+                score += 0.0 if variant_index == 1 else 1e-3
             if best_score is None or score < best_score:
                 best_score = score
                 best_mapping = mapping
@@ -532,16 +575,9 @@ def project_sector_local_points(
         if sector_macro not in sector_centers or not points:
             continue
         radius = sector_radii.get(sector_macro, 24.0)
-        scale_limit: Optional[float] = None
-        for _, point in points:
-            dx = point.x
-            dy = -point.z
-            if math.hypot(dx, dy) <= 1e-6:
-                continue
-            candidate = hex_boundary_distance(radius, dx, dy) * extent_ratio
-            if scale_limit is None or candidate < scale_limit:
-                scale_limit = candidate
-        scale = scale_limit if scale_limit is not None else 1.0
+        max_extent = max((math.hypot(point.x, point.z) for _, point in points), default=1.0)
+        extent = radius * (math.sqrt(3.0) / 2.0) * extent_ratio
+        scale = extent / max(1.0, max_extent)
         cx, cy = sector_centers[sector_macro]
         for point_id, point in points:
             anchors[point_id] = (cx + point.x * scale, cy - point.z * scale)
