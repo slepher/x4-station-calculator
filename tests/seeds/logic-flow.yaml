@@ -79,3 +79,25 @@ plans:
             isIsolated: false
           - moduleId: module_gen_prod_hullparts_01
             isIsolated: false
+  - name: Logic Flow 3 - 双星区中转测试
+    groups:
+      - name: 生产站
+        category: industrial
+        subCategory: default
+        isLocked: true
+        lockedLineage: default
+        nodes:
+          - moduleId: module_gen_prod_hullparts_01
+            isIsolated: false
+          - moduleId: module_gen_prod_claytronics_01
+            isIsolated: false
+      - name: 补给站
+        category: agricultural
+        subCategory: argon
+        isLocked: true
+        lockedLineage: default
+        nodes:
+          - moduleId: module_arg_prod_medicalsupplies_01
+            isIsolated: false
+          - moduleId: module_arg_prod_foodrations_01
+            isIsolated: false

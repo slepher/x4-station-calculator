@@ -16,8 +16,11 @@ const FIXTURE_TIMESTAMP = Number(process.env.DB_FIXTURE_TIMESTAMP ?? 17724534519
 type SeedEmpire = {
   empires: Array<{
     name: string
+    sectors?: Array<{ id: string; name: string; order: number }>
+    sectorLinks?: string[]
     stations: Array<{
       name: string
+      sectorId?: string
       settings?: Record<string, boolean>
       modules: Array<{ id: string; count: number }>
       lockedWares?: string[]
@@ -54,16 +57,8 @@ type X4Module = {
 }
 
 type SavedFlowNode = {
-  id: string
-  wareId: string
-  moduleId?: string
-  race: string
-  lineage: string
-  column: number
-  isIsolated: boolean
-  source: 'manual'
-  isRoot: boolean
-  order: number
+  isolated?: string
+  module?: string
 }
 
 type SavedFlowGroup = {
@@ -95,6 +90,7 @@ type SavedModule = { id: string; count: number }
 type StationPlan = {
   id: string
   name: string
+  sectorId?: string | null
   type: 'industrial' | 'supply' | 'transit' | 'shipyard'
   count: number
   modules: SavedModule[]
@@ -104,9 +100,17 @@ type StationPlan = {
   warePriority: Record<string, number>
 }
 
+type SectorPlan = {
+  id: string
+  name: string
+  order: number
+}
+
 type EmpirePlan = {
   id: string
   name: string
+  sectors?: SectorPlan[]
+  sectorLinks?: string[]
   stations: StationPlan[]
 }
 
@@ -297,52 +301,15 @@ const stableId = (...parts: string[]): string => {
 
 const buildLogicFlowState = (
   seed: SeedLogicFlow,
-  wares: Map<string, X4Ware>,
-  modules: Map<string, X4Module>,
   now: number
 ): SavedFlowPlansState => {
   const plans: LogicFlowPlan[] = seed.plans.map((plan, planIndex) => {
     const groups: SavedFlowGroup[] = plan.groups.map((group, groupIndex) => {
-      const nodes: SavedFlowNode[] = []
-      let order = 0
-      group.nodes.forEach((node) => {
+      const nodes: SavedFlowNode[] = group.nodes.map((node) => {
         if ('wareId' in node) {
-          const ware = wares.get(node.wareId)
-          if (!ware) throw new Error(`Missing ware ${node.wareId}`)
-          nodes.push({
-            id: `lf-${planIndex + 1}-g${groupIndex + 1}-i${order + 1}`,
-            wareId: node.wareId,
-            race: 'default',
-            lineage: 'default',
-            column: ware.tier,
-            isIsolated: true,
-            source: 'manual',
-            isRoot: false,
-            order
-          })
-          order += 1
-          return
+          return { isolated: node.wareId }
         }
-
-        const module = modules.get(node.moduleId)
-        if (!module) throw new Error(`Missing module ${node.moduleId}`)
-        const wareId = pickPrimaryOutput(module)
-        const ware = wares.get(wareId)
-        if (!ware) throw new Error(`Missing ware ${wareId}`)
-
-        nodes.push({
-          id: `lf-${planIndex + 1}-g${groupIndex + 1}-m${order + 1}`,
-          wareId,
-          moduleId: module.id,
-          race: module.race,
-          lineage: group.subCategory,
-          column: ware.tier,
-          isIsolated: false,
-          source: 'manual',
-          isRoot: true,
-          order
-        })
-        order += 1
+        return { module: node.moduleId }
       })
 
       return {
@@ -379,6 +346,7 @@ const buildEmpireState = (seed: SeedEmpire, now: number): SavedEmpiresState => {
       return {
         id: `empire-${empireIndex + 1}-station-${stationIndex + 1}`,
         name: station.name,
+        sectorId: station.sectorId || null,
         type: 'industrial',
         count: 1,
         modules: station.modules.map((mod) => ({ id: mod.id, count: mod.count })),
@@ -389,11 +357,20 @@ const buildEmpireState = (seed: SeedEmpire, now: number): SavedEmpiresState => {
       }
     })
 
-    return {
+    const result: EmpirePlan = {
       id: `empire-${empireIndex + 1}`,
       name: empire.name,
       stations
     }
+
+    if (empire.sectors && empire.sectors.length > 0) {
+      result.sectors = empire.sectors
+    }
+    if (empire.sectorLinks && empire.sectorLinks.length > 0) {
+      result.sectorLinks = empire.sectorLinks
+    }
+
+    return result
   })
 
   return {
@@ -606,7 +583,7 @@ const main = async () => {
     const seedPath = path.join(SEED_DIR, seedFile)
     const seed = await loadYaml<any>(seedPath)
     if (isLogicFlowSeed(seed)) {
-      dbPayload.x4_logic_flow_plans = buildLogicFlowState(seed, wareMap, moduleMap, now)
+      dbPayload.x4_logic_flow_plans = buildLogicFlowState(seed, now)
       continue
     }
     if (isEmpireSeed(seed)) {

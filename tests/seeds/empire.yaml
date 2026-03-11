@@ -1,9 +1,15 @@
 empires:
   - name: Empire 1
+    sectors:
+      - id: sector-1
+        name: 星区 1
+        order: 0
     stations:
       - name: E1-S1
+        sectorId: sector-1
         settings:
           workforceAuto: true
+          showEmpireGaps: true
         lockedWares:
           - quantumtubes
         modules:
@@ -12,6 +18,7 @@ empires:
           - id: module_gen_prod_hullparts_01
             count: 12
       - name: E1-S2
+        sectorId: sector-1
         settings:
           workforceAuto: true
           showEmpireGaps: true
@@ -19,18 +26,26 @@ empires:
           - id: module_gen_prod_quantumtubes_01
             count: 4
       - name: E1-S3
+        sectorId: sector-1
         settings:
           workforceAuto: true
+          showEmpireGaps: true
         modules:
           - id: module_arg_prod_foodrations_01
             count: 5
           - id: module_arg_prod_medicalsupplies_01
             count: 9
   - name: Empire 2
+    sectors:
+      - id: sector-1
+        name: 星区 1
+        order: 0
     stations:
       - name: E2-S1
+        sectorId: sector-1
         settings:
           workforceAuto: true
+          showEmpireGaps: true
         lockedWares:
           - advancedcomposites
           - engineparts
@@ -57,10 +72,43 @@ empires:
           - id: module_gen_prod_weaponcomponents_01
             count: 1
       - name: E2-S2
+        sectorId: sector-1
         settings:
           workforceAuto: true
+          showEmpireGaps: true
         modules:
           - id: module_gen_prod_claytronics_01
             count: 1
           - id: module_gen_prod_hullparts_01
             count: 1
+  - name: Empire 3 - 双星区中转测试
+    sectors:
+      - id: production-sector
+        name: 生产星区
+        order: 0
+      - id: supply-sector
+        name: 补给星区
+        order: 1
+    sectorLinks:
+      - production-sector|supply-sector
+    stations:
+      - name: 生产站
+        sectorId: production-sector
+        settings:
+          workforceAuto: true
+          showEmpireGaps: true
+        modules:
+          - id: module_gen_prod_hullparts_01
+            count: 12
+          - id: module_gen_prod_claytronics_01
+            count: 6
+      - name: 补给站
+        sectorId: supply-sector
+        settings:
+          workforceAuto: true
+          showEmpireGaps: true
+        modules:
+          - id: module_arg_prod_medicalsupplies_01
+            count: 9
+          - id: module_arg_prod_foodrations_01
+            count: 6

@@ -1,7 +1,7 @@
 {
-  "vsn": 4,
+  "vsn": 3,
   "x4_empire_data": {
-    "version": 4,
+    "version": 3,
     "activeId": "empire-1",
     "activeStationId": "empire-1-station-1",
     "list": [
@@ -12,7 +12,6 @@
           {
             "id": "empire-1-station-1",
             "name": "E1-S1",
-            "sectorId": "sector-1",
             "type": "industrial",
             "count": 1,
             "modules": [
@@ -37,7 +36,7 @@
               "sellMultiplier": 0.5,
               "minersEnabled": false,
               "internalSupply": false,
-              "showEmpireGaps": true,
+              "showEmpireGaps": false,
               "racePreference": "argon",
               "resourceBufferHours": 1,
               "primaryProductBufferHours": 12,
@@ -53,7 +52,6 @@
           {
             "id": "empire-1-station-2",
             "name": "E1-S2",
-            "sectorId": "sector-1",
             "type": "industrial",
             "count": 1,
             "modules": [
@@ -88,7 +86,6 @@
           {
             "id": "empire-1-station-3",
             "name": "E1-S3",
-            "sectorId": "sector-1",
             "type": "industrial",
             "count": 1,
             "modules": [
@@ -113,7 +110,7 @@
               "sellMultiplier": 0.5,
               "minersEnabled": false,
               "internalSupply": false,
-              "showEmpireGaps": true,
+              "showEmpireGaps": false,
               "racePreference": "argon",
               "resourceBufferHours": 1,
               "primaryProductBufferHours": 12,
@@ -124,13 +121,6 @@
             "lockedWares": [],
             "warePriority": {}
           }
-        ],
-        "sectors": [
-          {
-            "id": "sector-1",
-            "name": "星区 1",
-            "order": 0
-          }
         ]
       },
       {
@@ -140,7 +130,6 @@
           {
             "id": "empire-2-station-1",
             "name": "E2-S1",
-            "sectorId": "sector-1",
             "type": "industrial",
             "count": 1,
             "modules": [
@@ -189,7 +178,7 @@
               "sellMultiplier": 0.5,
               "minersEnabled": false,
               "internalSupply": false,
-              "showEmpireGaps": true,
+              "showEmpireGaps": false,
               "racePreference": "argon",
               "resourceBufferHours": 1,
               "primaryProductBufferHours": 12,
@@ -211,7 +200,6 @@
           {
             "id": "empire-2-station-2",
             "name": "E2-S2",
-            "sectorId": "sector-1",
             "type": "industrial",
             "count": 1,
             "modules": [
@@ -236,7 +224,7 @@
               "sellMultiplier": 0.5,
               "minersEnabled": false,
               "internalSupply": false,
-              "showEmpireGaps": true,
+              "showEmpireGaps": false,
               "racePreference": "argon",
               "resourceBufferHours": 1,
               "primaryProductBufferHours": 12,
@@ -247,118 +235,12 @@
             "lockedWares": [],
             "warePriority": {}
           }
-        ],
-        "sectors": [
-          {
-            "id": "sector-1",
-            "name": "星区 1",
-            "order": 0
-          }
-        ]
-      },
-      {
-        "id": "empire-3",
-        "name": "Empire 3 - 双星区中转测试",
-        "stations": [
-          {
-            "id": "empire-3-station-1",
-            "name": "生产站",
-            "sectorId": "production-sector",
-            "type": "industrial",
-            "count": 1,
-            "modules": [
-              {
-                "id": "module_gen_prod_hullparts_01",
-                "count": 12
-              },
-              {
-                "id": "module_gen_prod_claytronics_01",
-                "count": 6
-              }
-            ],
-            "settings": {
-              "sunlight": 100,
-              "useHQ": false,
-              "manualWorkforce": 0,
-              "workforcePercent": 100,
-              "workforceAuto": true,
-              "considerWorkforceForAutoFill": false,
-              "supplyWorkforceBonus": false,
-              "buyMultiplier": 0.5,
-              "sellMultiplier": 0.5,
-              "minersEnabled": false,
-              "internalSupply": false,
-              "showEmpireGaps": true,
-              "racePreference": "argon",
-              "resourceBufferHours": 1,
-              "primaryProductBufferHours": 12,
-              "secondaryProductBufferHours": 2,
-              "transportShipCapacity": 62000
-            },
-            "lastUpdated": 1772453451902,
-            "lockedWares": [],
-            "warePriority": {}
-          },
-          {
-            "id": "empire-3-station-2",
-            "name": "补给站",
-            "sectorId": "supply-sector",
-            "type": "industrial",
-            "count": 1,
-            "modules": [
-              {
-                "id": "module_arg_prod_medicalsupplies_01",
-                "count": 9
-              },
-              {
-                "id": "module_arg_prod_foodrations_01",
-                "count": 6
-              }
-            ],
-            "settings": {
-              "sunlight": 100,
-              "useHQ": false,
-              "manualWorkforce": 0,
-              "workforcePercent": 100,
-              "workforceAuto": true,
-              "considerWorkforceForAutoFill": false,
-              "supplyWorkforceBonus": false,
-              "buyMultiplier": 0.5,
-              "sellMultiplier": 0.5,
-              "minersEnabled": false,
-              "internalSupply": false,
-              "showEmpireGaps": true,
-              "racePreference": "argon",
-              "resourceBufferHours": 1,
-              "primaryProductBufferHours": 12,
-              "secondaryProductBufferHours": 2,
-              "transportShipCapacity": 62000
-            },
-            "lastUpdated": 1772453451902,
-            "lockedWares": [],
-            "warePriority": {}
-          }
-        ],
-        "sectors": [
-          {
-            "id": "production-sector",
-            "name": "生产星区",
-            "order": 0
-          },
-          {
-            "id": "supply-sector",
-            "name": "补给星区",
-            "order": 1
-          }
-        ],
-        "sectorLinks": [
-          "production-sector|supply-sector"
         ]
       }
     ]
   },
   "x4_logic_flow_plans": {
-    "version": 3,
+    "version": 2,
     "activeId": "logic-flow-1",
     "list": [
       {
@@ -374,13 +256,39 @@
             "lockedLineage": "default",
             "nodes": [
               {
-                "module": "module_gen_prod_claytronics_01"
+                "id": "lf-1-g1-m1",
+                "wareId": "claytronics",
+                "moduleId": "module_gen_prod_claytronics_01",
+                "race": "default",
+                "lineage": "default",
+                "column": 3,
+                "isIsolated": false,
+                "source": "manual",
+                "isRoot": true,
+                "order": 0
               },
               {
-                "module": "module_gen_prod_hullparts_01"
+                "id": "lf-1-g1-m2",
+                "wareId": "hullparts",
+                "moduleId": "module_gen_prod_hullparts_01",
+                "race": "default",
+                "lineage": "default",
+                "column": 2,
+                "isIsolated": false,
+                "source": "manual",
+                "isRoot": true,
+                "order": 1
               },
               {
-                "isolated": "quantumtubes"
+                "id": "lf-1-g1-i3",
+                "wareId": "quantumtubes",
+                "race": "default",
+                "lineage": "default",
+                "column": 2,
+                "isIsolated": true,
+                "source": "manual",
+                "isRoot": false,
+                "order": 2
               }
             ]
           },
@@ -393,7 +301,16 @@
             "lockedLineage": "default",
             "nodes": [
               {
-                "module": "module_gen_prod_quantumtubes_01"
+                "id": "lf-1-g2-m1",
+                "wareId": "quantumtubes",
+                "moduleId": "module_gen_prod_quantumtubes_01",
+                "race": "default",
+                "lineage": "default",
+                "column": 2,
+                "isIsolated": false,
+                "source": "manual",
+                "isRoot": true,
+                "order": 0
               }
             ]
           },
@@ -406,10 +323,28 @@
             "lockedLineage": "default",
             "nodes": [
               {
-                "module": "module_arg_prod_foodrations_01"
+                "id": "lf-1-g3-m1",
+                "wareId": "foodrations",
+                "moduleId": "module_arg_prod_foodrations_01",
+                "race": "argon",
+                "lineage": "argon",
+                "column": 3,
+                "isIsolated": false,
+                "source": "manual",
+                "isRoot": true,
+                "order": 0
               },
               {
-                "module": "module_arg_prod_medicalsupplies_01"
+                "id": "lf-1-g3-m2",
+                "wareId": "medicalsupplies",
+                "moduleId": "module_arg_prod_medicalsupplies_01",
+                "race": "argon",
+                "lineage": "argon",
+                "column": 3,
+                "isIsolated": false,
+                "source": "manual",
+                "isRoot": true,
+                "order": 1
               }
             ]
           }
@@ -432,49 +367,177 @@
             "lockedLineage": "default",
             "nodes": [
               {
-                "module": "module_gen_prod_advancedelectronics_01"
+                "id": "lf-2-g1-m1",
+                "wareId": "advancedelectronics",
+                "moduleId": "module_gen_prod_advancedelectronics_01",
+                "race": "default",
+                "lineage": "default",
+                "column": 3,
+                "isIsolated": false,
+                "source": "manual",
+                "isRoot": true,
+                "order": 0
               },
               {
-                "module": "module_gen_prod_antimatterconverters_01"
+                "id": "lf-2-g1-m2",
+                "wareId": "antimatterconverters",
+                "moduleId": "module_gen_prod_antimatterconverters_01",
+                "race": "default",
+                "lineage": "default",
+                "column": 3,
+                "isIsolated": false,
+                "source": "manual",
+                "isRoot": true,
+                "order": 1
               },
               {
-                "module": "module_gen_prod_dronecomponents_01"
+                "id": "lf-2-g1-m3",
+                "wareId": "dronecomponents",
+                "moduleId": "module_gen_prod_dronecomponents_01",
+                "race": "default",
+                "lineage": "default",
+                "column": 3,
+                "isIsolated": false,
+                "source": "manual",
+                "isRoot": true,
+                "order": 2
               },
               {
-                "module": "module_gen_prod_fieldcoils_01"
+                "id": "lf-2-g1-m4",
+                "wareId": "fieldcoils",
+                "moduleId": "module_gen_prod_fieldcoils_01",
+                "race": "default",
+                "lineage": "default",
+                "column": 3,
+                "isIsolated": false,
+                "source": "manual",
+                "isRoot": true,
+                "order": 3
               },
               {
-                "module": "module_gen_prod_missilecomponents_01"
+                "id": "lf-2-g1-m5",
+                "wareId": "missilecomponents",
+                "moduleId": "module_gen_prod_missilecomponents_01",
+                "race": "default",
+                "lineage": "default",
+                "column": 3,
+                "isIsolated": false,
+                "source": "manual",
+                "isRoot": true,
+                "order": 4
               },
               {
-                "module": "module_gen_prod_shieldcomponents_01"
+                "id": "lf-2-g1-m6",
+                "wareId": "shieldcomponents",
+                "moduleId": "module_gen_prod_shieldcomponents_01",
+                "race": "default",
+                "lineage": "default",
+                "column": 3,
+                "isIsolated": false,
+                "source": "manual",
+                "isRoot": true,
+                "order": 5
               },
               {
-                "module": "module_gen_prod_turretcomponents_01"
+                "id": "lf-2-g1-m7",
+                "wareId": "turretcomponents",
+                "moduleId": "module_gen_prod_turretcomponents_01",
+                "race": "default",
+                "lineage": "default",
+                "column": 3,
+                "isIsolated": false,
+                "source": "manual",
+                "isRoot": true,
+                "order": 6
               },
               {
-                "module": "module_gen_prod_weaponcomponents_01"
+                "id": "lf-2-g1-m8",
+                "wareId": "weaponcomponents",
+                "moduleId": "module_gen_prod_weaponcomponents_01",
+                "race": "default",
+                "lineage": "default",
+                "column": 3,
+                "isIsolated": false,
+                "source": "manual",
+                "isRoot": true,
+                "order": 7
               },
               {
-                "isolated": "advancedcomposites"
+                "id": "lf-2-g1-i9",
+                "wareId": "advancedcomposites",
+                "race": "default",
+                "lineage": "default",
+                "column": 2,
+                "isIsolated": true,
+                "source": "manual",
+                "isRoot": false,
+                "order": 8
               },
               {
-                "isolated": "engineparts"
+                "id": "lf-2-g1-i10",
+                "wareId": "engineparts",
+                "race": "default",
+                "lineage": "default",
+                "column": 2,
+                "isIsolated": true,
+                "source": "manual",
+                "isRoot": false,
+                "order": 9
               },
               {
-                "isolated": "hullparts"
+                "id": "lf-2-g1-i11",
+                "wareId": "hullparts",
+                "race": "default",
+                "lineage": "default",
+                "column": 2,
+                "isIsolated": true,
+                "source": "manual",
+                "isRoot": false,
+                "order": 10
               },
               {
-                "isolated": "microchips"
+                "id": "lf-2-g1-i12",
+                "wareId": "microchips",
+                "race": "default",
+                "lineage": "default",
+                "column": 2,
+                "isIsolated": true,
+                "source": "manual",
+                "isRoot": false,
+                "order": 11
               },
               {
-                "isolated": "plasmaconductors"
+                "id": "lf-2-g1-i13",
+                "wareId": "plasmaconductors",
+                "race": "default",
+                "lineage": "default",
+                "column": 2,
+                "isIsolated": true,
+                "source": "manual",
+                "isRoot": false,
+                "order": 12
               },
               {
-                "isolated": "quantumtubes"
+                "id": "lf-2-g1-i14",
+                "wareId": "quantumtubes",
+                "race": "default",
+                "lineage": "default",
+                "column": 2,
+                "isIsolated": true,
+                "source": "manual",
+                "isRoot": false,
+                "order": 13
               },
               {
-                "isolated": "scanningarrays"
+                "id": "lf-2-g1-i15",
+                "wareId": "scanningarrays",
+                "race": "default",
+                "lineage": "default",
+                "column": 2,
+                "isIsolated": true,
+                "source": "manual",
+                "isRoot": false,
+                "order": 14
               }
             ]
           },
@@ -487,52 +550,28 @@
             "lockedLineage": "default",
             "nodes": [
               {
-                "module": "module_gen_prod_claytronics_01"
+                "id": "lf-2-g2-m1",
+                "wareId": "claytronics",
+                "moduleId": "module_gen_prod_claytronics_01",
+                "race": "default",
+                "lineage": "default",
+                "column": 3,
+                "isIsolated": false,
+                "source": "manual",
+                "isRoot": true,
+                "order": 0
               },
               {
-                "module": "module_gen_prod_hullparts_01"
-              }
-            ]
-          }
-        ],
-        "settings": {
-          "isDefaultLocked": true
-        },
-        "lastUpdated": 1772453451902
-      },
-      {
-        "id": "logic-flow-3",
-        "name": "Logic Flow 3 - 双星区中转测试",
-        "groups": [
-          {
-            "id": "lf-3-g1",
-            "name": "生产站",
-            "category": "industrial",
-            "subCategory": "default",
-            "isLocked": true,
-            "lockedLineage": "default",
-            "nodes": [
-              {
-                "module": "module_gen_prod_hullparts_01"
-              },
-              {
-                "module": "module_gen_prod_claytronics_01"
-              }
-            ]
-          },
-          {
-            "id": "lf-3-g2",
-            "name": "补给站",
-            "category": "agricultural",
-            "subCategory": "argon",
-            "isLocked": true,
-            "lockedLineage": "default",
-            "nodes": [
-              {
-                "module": "module_arg_prod_medicalsupplies_01"
-              },
-              {
-                "module": "module_arg_prod_foodrations_01"
+                "id": "lf-2-g2-m2",
+                "wareId": "hullparts",
+                "moduleId": "module_gen_prod_hullparts_01",
+                "race": "default",
+                "lineage": "default",
+                "column": 2,
+                "isIsolated": false,
+                "source": "manual",
+                "isRoot": true,
+                "order": 1
               }
             ]
           }

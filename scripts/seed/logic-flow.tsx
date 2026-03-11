@@ -168,6 +168,13 @@ const main = async () => {
         ),
         buildGroup('E2-S2', [claytronicsModule, hullpartsModule], [])
       ]
+    },
+    {
+      name: 'Logic Flow 3 - 双星区中转测试',
+      groups: [
+        buildGroup('生产站', [hullpartsModule, claytronicsModule], []),
+        buildGroup('补给站', [medicalsuppliesModule, foodrationsModule], [])
+      ]
     }
   ]
 

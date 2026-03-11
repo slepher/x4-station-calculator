@@ -28,13 +28,22 @@ type SeedModule = {
 
 type SeedStation = {
   name: string
+  sectorId?: string
   settings: Record<string, boolean>
   modules: SeedModule[]
   lockedWares?: string[]
 }
 
+type SeedSector = {
+  id: string
+  name: string
+  order: number
+}
+
 type SeedEmpire = {
   name: string
+  sectors?: SeedSector[]
+  sectorLinks?: string[]
   stations: SeedStation[]
 }
 
@@ -106,11 +115,14 @@ const main = async () => {
     empires: [
       {
         name: 'Empire 1',
+        sectors: [{ id: 'sector-1', name: '星区 1', order: 0 }],
         stations: [
           {
             name: 'E1-S1',
+            sectorId: 'sector-1',
             settings: {
-              workforceAuto: true
+              workforceAuto: true,
+              showEmpireGaps: true
             },
             lockedWares: [quantumtubesId],
             modules: [
@@ -126,6 +138,7 @@ const main = async () => {
           },
           {
             name: 'E1-S2',
+            sectorId: 'sector-1',
             settings: {
               workforceAuto: true,
               showEmpireGaps: true
@@ -139,8 +152,10 @@ const main = async () => {
           },
           {
             name: 'E1-S3',
+            sectorId: 'sector-1',
             settings: {
-              workforceAuto: true
+              workforceAuto: true,
+              showEmpireGaps: true
             },
             modules: [
               {
@@ -157,11 +172,14 @@ const main = async () => {
       },
       {
         name: 'Empire 2',
+        sectors: [{ id: 'sector-1', name: '星区 1', order: 0 }],
         stations: [
           {
             name: 'E2-S1',
+            sectorId: 'sector-1',
             settings: {
-              workforceAuto: true
+              workforceAuto: true,
+              showEmpireGaps: true
             },
             lockedWares: Array.from(upstreamT2Wares).sort(),
             modules: shiptechModules.map((entry) => {
@@ -174,8 +192,10 @@ const main = async () => {
           },
           {
             name: 'E2-S2',
+            sectorId: 'sector-1',
             settings: {
-              workforceAuto: true
+              workforceAuto: true,
+              showEmpireGaps: true
             },
             modules: [
               {
@@ -185,6 +205,52 @@ const main = async () => {
               {
                 id: hullpartsModule.id,
                 count: 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        name: 'Empire 3 - 双星区中转测试',
+        sectors: [
+          { id: 'production-sector', name: '生产星区', order: 0 },
+          { id: 'supply-sector', name: '补给星区', order: 1 }
+        ],
+        sectorLinks: ['production-sector|supply-sector'],
+        stations: [
+          {
+            name: '生产站',
+            sectorId: 'production-sector',
+            settings: {
+              workforceAuto: true,
+              showEmpireGaps: true
+            },
+            modules: [
+              {
+                id: hullpartsModule.id,
+                count: 12
+              },
+              {
+                id: claytronicsModule.id,
+                count: 6
+              }
+            ]
+          },
+          {
+            name: '补给站',
+            sectorId: 'supply-sector',
+            settings: {
+              workforceAuto: true,
+              showEmpireGaps: true
+            },
+            modules: [
+              {
+                id: medicalsuppliesModule.id,
+                count: 9
+              },
+              {
+                id: foodrationsModule.id,
+                count: 6
               }
             ]
           }
