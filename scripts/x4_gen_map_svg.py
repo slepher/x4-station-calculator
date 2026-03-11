@@ -49,7 +49,7 @@ class LayoutConfig:
         self.top_pad = top_pad
 
 
-def layout_config(include_all: bool = False) -> LayoutConfig:
+def layout_config(include_all: bool = True) -> LayoutConfig:
     if include_all:
         return LayoutConfig(width=3600.0, height=2600.0, pad_x=180.0, pad_y=180.0, top_pad=140.0)
     return LayoutConfig()
@@ -119,14 +119,14 @@ def scaled_layout_config(cfg: LayoutConfig, factor: float) -> LayoutConfig:
     )
 
 
-def select_region_clusters(clusters: Dict[str, dict], include_all: bool = False) -> List[str]:
+def select_region_clusters(clusters: Dict[str, dict], include_all: bool = True) -> List[str]:
     if include_all:
         return list(clusters.keys())
     allowed = {f"Cluster_{cluster_id:02d}_macro" for cluster_id in REGION_CLUSTER_IDS}
     return [cluster_id for cluster_id in clusters if cluster_id in allowed]
 
 
-def render_from_maps_json(input_path: str, output_path: str, include_all: bool = False) -> None:
+def render_from_maps_json(input_path: str, output_path: str, include_all: bool = True) -> None:
     data = json.loads(Path(input_path).read_text(encoding='utf-8'))
     clusters: Dict[str, dict] = data["clusters"]
     region_ids = select_region_clusters(clusters, include_all=include_all)
@@ -211,17 +211,17 @@ def render_from_maps_json(input_path: str, output_path: str, include_all: bool =
                 f.write(f'  <circle cx="{end[0]:.1f}" cy="{end[1]:.1f}" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />\n')
 
             for sector in sectors.values():
-                for highway in sector.get('local_highways', {}).values():
-                    render = highway.get('render', {})
-                    a_ratio = render.get('a_cluster_ratio')
-                    b_ratio = render.get('b_cluster_ratio')
+                for highway in sector.get("highways", {}).values():
+                    render = highway.get("render", {})
+                    a_ratio = render.get("a_cluster_ratio")
+                    b_ratio = render.get("b_cluster_ratio")
                     if not a_ratio or not b_ratio:
                         continue
-                    x1 = cx + a_ratio['x'] * cluster_radius
-                    y1 = cy + a_ratio['y'] * cluster_radius
-                    x2 = cx + b_ratio['x'] * cluster_radius
-                    y2 = cy + b_ratio['y'] * cluster_radius
-                    f.write(f'  <line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="#38bdf8" stroke-width="0.35" stroke-opacity="0.8" />\n')
+                    x1 = cx + a_ratio["x"] * cluster_radius
+                    y1 = cy + a_ratio["y"] * cluster_radius
+                    x2 = cx + b_ratio["x"] * cluster_radius
+                    y2 = cy + b_ratio["y"] * cluster_radius
+                    f.write(f'  <line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />\n')
 
             if len(sectors) == 1:
                 only_sector = next(iter(sectors.values()))
@@ -288,11 +288,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(description='Render universe SVG from processed maps.json.')
     parser.add_argument('--input', default=DEFAULT_INPUT)
     parser.add_argument('--output', default=DEFAULT_OUTPUT)
-    parser.add_argument('--all', action='store_true', help='Render all clusters instead of the trial region.')
+    parser.add_argument('--trial', action='store_true', help='Render trial region only (default renders all clusters).')
     args = parser.parse_args()
-    render_from_maps_json(args.input, args.output, include_all=args.all)
+    render_from_maps_json(args.input, args.output, include_all=not args.trial)
     print(f'Output: {args.output}')
 
 
 if __name__ == '__main__':
     main()
+
+

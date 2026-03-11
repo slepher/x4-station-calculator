@@ -249,6 +249,13 @@ def enrich_name_owner(macro: str, metadata: Dict[str, dict]) -> Tuple[str, Optio
     attrs = node.get("qsnaAttributes") or {}
     return attrs.get("name") or macro, attrs.get("owner")
 
+def zone_connection_path_to_zone_macro(path: Optional[str]) -> Optional[str]:
+    if not path:
+        return None
+    match = re.search(r"Zone(\d+)_Cluster_(\d+)_Sector(\d+)_connection", path, re.IGNORECASE)
+    if not match:
+        return None
+    return f"Zone{int(match.group(1)):03d}_Cluster_{int(match.group(2)):02d}_Sector{int(match.group(3)):03d}_macro"
 
 def main() -> None:
     args = parse_args()
@@ -269,6 +276,7 @@ def main() -> None:
     cluster_links: Dict[str, dict] = {}
     sector_links: Dict[str, dict] = {}
     local_highways: Dict[str, dict] = {}
+    sector_highways: Dict[str, dict] = {}
 
     for macro in galaxy_root.findall("./macro"):
         if macro.get("class") != "galaxy":
@@ -315,6 +323,30 @@ def main() -> None:
                 "entry_pos": entry,
                 "exit_pos": exitp,
                 "spline": spline,
+            }
+    zonehighway_geometry: Dict[str, dict] = {}
+    for zonehighways_root in zonehighway_roots:
+        for macro in zonehighways_root.findall("./macro[@class='highway']"):
+            highway_id = macro.get("name")
+            if not highway_id:
+                continue
+            entry = pos_from(macro.find("./connections/connection[@ref='entrypoint']"))
+            exitp = pos_from(macro.find("./connections/connection[@ref='exitpoint']"))
+            spline = []
+            for spline_node in macro.findall("./properties/boundaries/boundary[@class='splinetube']/splineposition"):
+                spline.append({
+                    "x": as_float(spline_node.get("x")),
+                    "z": as_float(spline_node.get("z")),
+                    "tx": as_float(spline_node.get("tx")),
+                    "tz": as_float(spline_node.get("tz")),
+                })
+            size_node = macro.find("./properties/boundaries/boundary[@class='splinetube']/size")
+            radius = as_float(size_node.get("r")) if size_node is not None else 0.0
+            zonehighway_geometry[highway_id] = {
+                "entry_pos": entry,
+                "exit_pos": exitp,
+                "spline": spline,
+                "radius": radius,
             }
 
     cluster_sector_offsets: Dict[str, Dict[str, Dict[str, float]]] = defaultdict(dict)
@@ -419,6 +451,7 @@ def main() -> None:
                 "zone_ids": [],
                 "cluster_gate_ids": [],
                 "local_highway_ids": [],
+                "highway_ids": [],
             }
             for conn in sector_macro_node.findall("./connections/connection[@ref='zones']"):
                 macro_node = conn.find("./macro")
@@ -427,6 +460,44 @@ def main() -> None:
                     continue
                 zone_offsets_by_sector[sector_macro][zone_macro] = pos_from(conn)
                 sectors[sector_macro]["zone_ids"].append(zone_macro)
+            for conn in sector_macro_node.findall("./connections/connection[@ref='zonehighways']"):
+                macro_node = conn.find("./macro")
+                highway_macro = macro_node.get("ref") if macro_node is not None else None
+                if not highway_macro:
+                    continue
+                geometry = zonehighway_geometry.get(
+                    highway_macro,
+                    {"entry_pos": {"x": 0.0, "z": 0.0}, "exit_pos": {"x": 0.0, "z": 0.0}, "spline": [], "radius": 0.0},
+                )
+                connection_name = conn.get("name") or highway_macro
+                highway_id = f"{sector_macro}:{connection_name}"
+                instance_offset = pos_from(conn)
+                entry_pos = vec_add(instance_offset, geometry["entry_pos"])
+                exit_pos = vec_add(instance_offset, geometry["exit_pos"])
+                entry_macro = conn.find("./macro/connections/connection[@ref='entrypoint']/macro")
+                exit_macro = conn.find("./macro/connections/connection[@ref='exitpoint']/macro")
+                entry_zone_id = zone_connection_path_to_zone_macro(entry_macro.get("path") if entry_macro is not None else None)
+                exit_zone_id = zone_connection_path_to_zone_macro(exit_macro.get("path") if exit_macro is not None else None)
+                entry_conn = entry_macro.get("connection") if entry_macro is not None else None
+                exit_conn = exit_macro.get("connection") if exit_macro is not None else None
+                sector_highways[highway_id] = {
+                    "id": highway_id,
+                    "kind": "sector_highway",
+                    "sector_id": sector_macro,
+                    "macro": highway_macro,
+                    "name": connection_name,
+                    "from_zone_id": entry_zone_id,
+                    "to_zone_id": exit_zone_id,
+                    "from_zone_connection": entry_conn,
+                    "to_zone_connection": exit_conn,
+                    "instance_offset": instance_offset,
+                    "entry_pos": entry_pos,
+                    "exit_pos": exit_pos,
+                    "spline": [vec_add(instance_offset, {"x": point["x"], "z": point["z"]}) for point in geometry["spline"]],
+                    "radius": geometry["radius"],
+                    "source": "sectors_xml_zonehighways",
+                }
+                sectors[sector_macro]["highway_ids"].append(highway_id)
 
     for zones_root in zone_roots:
         for zone_macro_node in zones_root.findall("./macro[@class='zone']"):
@@ -521,6 +592,12 @@ def main() -> None:
         for idx, point in enumerate(highway["spline"]):
             sector_point_sets[highway["sector_id"]][f"{highway_id}:spline:{idx}"] = {"x": point["x"], "z": point["z"]}
 
+    for highway_id, highway in sector_highways.items():
+        sector_point_sets[highway["sector_id"]][f"{highway_id}:entry"] = highway["entry_pos"]
+        sector_point_sets[highway["sector_id"]][f"{highway_id}:exit"] = highway["exit_pos"]
+        for idx, point in enumerate(highway["spline"]):
+            sector_point_sets[highway["sector_id"]][f"{highway_id}:spline:{idx}"] = {"x": point["x"], "z": point["z"]}
+
     for cluster_id, sector_ids in cluster_to_sectors.items():
         local_positions = {sector_id: sectors[sector_id]["raw_local_pos"] for sector_id in sector_ids}
         template_kind, slot_map, slot_positions = choose_sector_template(local_positions)
@@ -607,6 +684,32 @@ def main() -> None:
             },
         }
 
+    for highway_id, highway in sector_highways.items():
+        sector_id = highway["sector_id"]
+        sector_norm = sectors[sector_id]["normalized"]
+        scale_per_radius = sector_norm["scale_per_radius"]
+        entry_ratio = {"x": highway["entry_pos"]["x"] * scale_per_radius, "y": -highway["entry_pos"]["z"] * scale_per_radius}
+        exit_ratio = {"x": highway["exit_pos"]["x"] * scale_per_radius, "y": -highway["exit_pos"]["z"] * scale_per_radius}
+        highway["normalized"] = {
+            "entry_ratio": entry_ratio,
+            "exit_ratio": exit_ratio,
+            "spline_ratio": [
+                {"x": point["x"] * scale_per_radius, "y": -point["z"] * scale_per_radius}
+                for point in highway["spline"]
+            ],
+            "radius_ratio": highway["radius"] * scale_per_radius if highway.get("radius") else 0.0,
+        }
+        highway["render"] = {
+            "a_cluster_ratio": {
+                "x": sector_norm["center_offset_ratio"]["x"] + entry_ratio["x"] * sector_norm["sector_radius_ratio"],
+                "y": sector_norm["center_offset_ratio"]["y"] + entry_ratio["y"] * sector_norm["sector_radius_ratio"],
+            },
+            "b_cluster_ratio": {
+                "x": sector_norm["center_offset_ratio"]["x"] + exit_ratio["x"] * sector_norm["sector_radius_ratio"],
+                "y": sector_norm["center_offset_ratio"]["y"] + exit_ratio["y"] * sector_norm["sector_radius_ratio"],
+            },
+        }
+
     for link_id, link in sector_links.items():
         zone_a = zones.get(link["zone_a_id"])
         zone_b = zones.get(link["zone_b_id"])
@@ -666,11 +769,12 @@ def main() -> None:
         nested_sector = {
             key: value
             for key, value in sector.items()
-            if key not in {"zone_ids", "cluster_gate_ids", "local_highway_ids"}
+            if key not in {"zone_ids", "cluster_gate_ids", "local_highway_ids", "highway_ids"}
         }
         nested_sector["shcon_anchors"] = {}
         nested_sector["cluster_gates"] = {}
         nested_sector["local_highways"] = {}
+        nested_sector["highways"] = {}
         nested_clusters[cluster_id]["sectors"][sector_id] = nested_sector
 
     for zone_id, zone in zones.items():
@@ -703,6 +807,11 @@ def main() -> None:
         cluster_id = sectors[sector_id]["cluster_id"]
         nested_clusters[cluster_id]["sectors"][sector_id]["local_highways"][highway_id] = highway
 
+    for highway_id, highway in sector_highways.items():
+        sector_id = highway["sector_id"]
+        cluster_id = sectors[sector_id]["cluster_id"]
+        nested_clusters[cluster_id]["sectors"][sector_id]["highways"][highway_id] = highway
+
     for link_id, link in sector_links.items():
         cluster_id = link["cluster_id"]
         nested_link = {
@@ -728,8 +837,9 @@ def main() -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"Output: {output_path}")
-    print(f"clusters={len(clusters)} sectors={len(sectors)} zones={len(zones)} cluster_links={len(cluster_links)} sector_links={len(sector_links)} local_highways={len(local_highways)}")
+    print(f"clusters={len(clusters)} sectors={len(sectors)} zones={len(zones)} cluster_links={len(cluster_links)} sector_links={len(sector_links)} local_highways={len(local_highways)} highways={len(sector_highways)}")
 
 
 if __name__ == "__main__":
     main()
+
