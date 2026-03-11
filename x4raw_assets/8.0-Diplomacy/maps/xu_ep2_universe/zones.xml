@@ -1,0 +1,3747 @@
+<?xml version="1.0" encoding="utf-8"?>
+<macros>
+  <macro name="tzoneCluster_01_Sector001SHCon5_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon5_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_01_Sector001SHCon7_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon7_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_01_Sector001SHCon8_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon8_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_01_Sector001SHCon9_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon9_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_01_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate001To004" ref="gates">
+        <offset>
+          <position x="10370.056640625" y="0" z="12331.626953125" />
+          <quaternion qx="0" qy="-0.5000000596" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_01_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_01_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="-14387.787109375" y="0" z="-1117.02734375" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="-14367.095703125" y="0" z="-7551.6508789063" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate001To005" ref="gates">
+        <offset>
+          <position x="-24662.873046875" y="0" z="-12802.154296875" />
+          <quaternion qx="0" qy="0.6427876353" qz="0" qw="0.7660444379" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_01_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone005_Cluster_01_Sector01_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="asteroid_special_lm_01_macro2" ref="asteroids">
+        <offset>
+          <position x="9462.158203125" y="-301.4678955078" z="8560.0888671875" />
+          <quaternion qx="0" qy="0.8433912992" qz="0" qw="0.5372997522" />
+        </offset>
+        <macro ref="asteroid_special_lm_01_macro" connection="space" />
+      </connection>
+      <connection name="asteroid_special_lm_01_macro3" ref="asteroids">
+        <offset>
+          <position x="-14157.1044921875" y="-301.4678955078" z="2793.4875488281" />
+          <quaternion qx="-0.7859630585" qy="-0.3906999528" qz="-0.4094664454" qw="-0.2489033341" />
+        </offset>
+        <macro ref="asteroid_special_lm_01_macro" connection="space" />
+      </connection>
+      <connection name="asteroid_special_lm_01_macro" ref="asteroids">
+        <offset>
+          <position x="4238.6474609375" y="-301.4678955078" z="-12349.5791015625" />
+          <quaternion qx="0" qy="0" qz="0" qw="1" />
+        </offset>
+        <macro ref="asteroid_special_lm_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_01_Sector002SHCon5_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon5_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_01_Sector002SHCon9_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon9_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_01_Sector002SHCon11_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon11_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_01_Sector002SHCon12_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon12_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_01_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection01_gate">
+        <offset>
+          <position x="2757.8125" y="0" z="10489.2578125" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="10765.625" y="0" z="10539.0625" />
+        </offset>
+      </connection>
+      <connection ref="Highway03Connection02_gate">
+        <offset>
+          <position x="-11517.578125" y="0" z="600.5859375" />
+        </offset>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_01_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection02_gate">
+        <offset>
+          <position x="16863.28125" y="0" z="-6314.94140625" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="16574.21875" y="0" z="2729.00390625" />
+        </offset>
+      </connection>
+      <connection ref="Highway03Connection01_gate">
+        <offset>
+          <position x="3498.046875" y="0" z="-15685.05859375" />
+        </offset>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_01_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone004_Cluster_01_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate001To006" ref="gates">
+        <offset>
+          <position x="-11427.734375" y="0" z="5250.9765625" />
+          <quaternion qx="0" qy="0.4999998212" qz="0" qw="0.8660255075" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_01_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="tZoneCluster_01_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="tzoneCluster_01_Sector003SHCon4_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon4_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_01_Sector003SHCon6_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon6_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_01_Sector003SHCon10_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon10_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_01_Sector003SHCon12_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon12_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_01_Sector003_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="-9914.0625" y="0" z="-41765.625" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="-14882.8125" y="0" z="-41691.40625" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate001To002" ref="gates">
+        <offset>
+          <position x="-13804.6875" y="0" z="-27195.3125" />
+          <quaternion qx="0" qy="-1" qz="0" qw="-1.19e-08" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_01_Sector003_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_01_Sector003_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_02_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate002To001" ref="gates">
+        <offset>
+          <position x="39586.10546875" y="0" z="11740.6923828125" />
+          <quaternion qx="0" qy="5.96e-08" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+      <!--connection name="connection_ClusterGate002To308" ref="gates">
+        <offset>
+          <position x="-37337.46484375" y="0" z="44244.28515625" />
+          <quaternion qx="0" qy="-0.8660253882" qz="0" qw="-0.5" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection-->
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_02_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate002To003" ref="gates">
+        <offset>
+          <position x="5853.0122070312" y="0" z="-27338.103515625" />
+          <quaternion qx="0" qy="-0.5" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_02_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate002To008" ref="gates">
+        <offset>
+          <position x="32480.30078125" y="0" z="-15959.1904296875" />
+          <quaternion qx="0" qy="-1" qz="0" qw="7.55e-08" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_02_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate002To501" ref="gates">
+        <offset>
+          <position x="-38673.46484375" y="0" z="20791.28515625" />
+          <quaternion qx="0" qy="-0.8660253882" qz="0" qw="-0.5" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_03_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate003To009" ref="gates">
+        <offset>
+          <position x="16142.0595703125" y="0" z="11348.640625" />
+          <quaternion qx="0" qy="-0.8660253882" qz="0" qw="0.5" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_03_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate003To002" ref="gates">
+        <offset>
+          <position x="4125.3051757812" y="0" z="-3857.8566894531" />
+          <quaternion qx="0" qy="0.866025269" qz="0" qw="0.5000002384" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_03_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="-4172.1494140625" y="0" z="37364.3671875" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="-11310.287109375" y="0" z="37609.609375" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate003To039" ref="gates">
+        <offset>
+          <position x="33041.83984375" y="0" z="37390.9921875" />
+          <quaternion qx="0" qy="-3.258e-07" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_04_Sector001SHCon6_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon6_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_04_Sector001SHCon10_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon10_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_04_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection02_gate">
+        <offset>
+          <position x="29741.875" y="0" z="27909.33984375" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="24832.404296875" y="0" z="31346.9921875" />
+        </offset>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_04_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_explorationtest_macro" ref="objects">
+        <offset>
+          <position x="23041.83984375" y="0" z="27390.9921875" />
+          <quaternion qx="0" qy="0" qz="0" qw="1" />
+        </offset>
+        <macro ref="landmarks_gen_exploration_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_04_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone020_Cluster_04_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="-16512.1375" y="0" z="3181.64" />
+        </offset>
+      </connection>
+      <connection ref="Highway02Connection01_gate">
+        <offset>
+          <position x="-11598.175" y="0" z="-257.813" />
+        </offset>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone017_Cluster_04_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone014_Cluster_04_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone012_Cluster_04_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone011_Cluster_04_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone010_Cluster_04_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone009_Cluster_04_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone007_Cluster_04_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone008_Cluster_04_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone006_Cluster_04_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone005_Cluster_04_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone004_Cluster_04_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone015_Cluster_04_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone016_Cluster_04_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone013_Cluster_04_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone019_Cluster_04_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone018_Cluster_04_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="tzoneCluster_04_Sector002SHCon5_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon5_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_04_Sector002SHCon9_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon9_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_04_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="7188.6596679688" y="0" z="28394.53125" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="7182.7392578125" y="0" z="24220.703125" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate004To022" ref="gates">
+        <offset>
+          <position x="-714.111" y="0" z="10382.81875" />
+          <quaternion qx="0" qy="0" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+      <connection name="connection_ClusterGate004To001" ref="gates">
+        <offset>
+          <position x="-20276.0625" y="0" z="12205.078125" />
+          <quaternion qx="0" qy="-0.8660253882" qz="0" qw="-0.5" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_04_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_05_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate005To001" ref="gates">
+        <offset>
+          <position x="1541.5687255859" y="0" z="10947.1357421875" />
+          <quaternion qx="0" qy="-1" qz="0" qw="-4.37e-08" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_05_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate005To725" ref="gates">
+        <offset>
+          <position x="-15410.5687255859" y="0" z="-40947.1357421875" />
+          <quaternion qx="0" qy="0.707107" qz="0" qw="0.707107" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_05_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_05_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="tzoneCluster_06_Sector001SHCon11_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon11_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_06_Sector001SHCon12_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon12_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_06_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone003_Cluster_06_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="13169.1435546875" y="0" z="-34351.07421875" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="7000.0610351562" y="0" z="-39749.140625" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate006To013" ref="gates">
+        <offset>
+          <position x="-2662.0712890625" y="0" z="-26457.17578125" />
+          <quaternion qx="0" qy="0.8660253286" qz="0" qw="0.5000000596" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_06_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate006To503" ref="gates">
+        <offset>
+          <position x="0" y="0" z="0" />
+          <quaternion qx="0" qy="1.0" qz="0" qw="0.0" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_06_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="tzoneCluster_06_Sector002SHCon7_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon7_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_06_Sector002SHCon8_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon8_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_06_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="-29390.625" y="0" z="2152.34375" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="-29750" y="0" z="-3051.26953125" />
+        </offset>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_06_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone003_Cluster_06_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate006To725" ref="gates">
+        <offset>
+          <position x="-47435.5" y="500" z="-60094.9" />
+          <quaternion qx="0" qy="0" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_06_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate006To001" ref="gates">
+        <offset>
+          <position x="-7437.5" y="0" z="-4935.546875" />
+          <quaternion qx="0" qy="-0.8660253882" qz="0" qw="0.5" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_07_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_07_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone003_Cluster_07_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate007To014" ref="gates">
+        <offset>
+          <position x="37640.83984375" y="0" z="-22841.751953125" />
+          <quaternion qx="0" qy="-0.5" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_08_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate008To044" ref="gates">
+        <offset>
+          <position x="27842.228515625" y="0" z="25147.4921875" />
+          <quaternion qx="0" qy="-0.8660255671" qz="0" qw="0.4999997616" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_08_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection02_gate">
+        <offset>
+          <position x="-17472.892578125" y="0" z="-12745.86328125" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="-16972.892578125" y="0" z="-11879.8369140625" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate008To034" ref="gates">
+        <offset>
+          <position x="-17222.888671875" y="500" z="-12312.8515625" />
+          <quaternion qx="0" qy="-0.5000000596" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_08_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection01_gate">
+        <offset>
+          <position x="-13966.5986328125" y="0" z="-3947.8759765625" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="-14466.5986328125" y="0" z="-3081.8481445312" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate008To029" ref="gates">
+        <offset>
+          <position x="-14216.5986328125" y="500" z="-3514.8620605469" />
+          <quaternion qx="0" qy="0.5000000596" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_08_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate008To002" ref="gates">
+        <offset>
+          <position x="-38364.75" y="0" z="-10007.1103515625" />
+          <quaternion qx="0" qy="-1.788e-07" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+      <connection name="connection_ClusterGate008To704" ref="gates">
+        <offset>
+          <position x="31242.138671875" y="0" z="-30647.4609375" />
+          <quaternion qx="0" qy="-0.2164397687" qz="0" qw="0.9762960076" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_08_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_09_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection01_gate">
+        <offset>
+          <position x="-20023.41015625" y="0" z="-32222.79296875" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="-19023.41015625" y="0" z="-32222.79296875" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate009To034" ref="gates">
+        <offset>
+          <position x="-19523.41015625" y="500" z="-32222.79296875" />
+          <quaternion qx="0" qy="-1" qz="0" qw="7.55e-08" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone006_Cluster_08_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate008To501" ref="gates">
+        <offset>
+          <position x="-41242.138671875" y="0" z="-40647.4609375" />
+          <quaternion qx="0" qy="-0.2164397687" qz="0" qw="0.9762960076" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_09_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection02_gate">
+        <offset>
+          <position x="-29393.9140625" y="0" z="36674.546875" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="-28393.9140625" y="0" z="36674.546875" />
+        </offset>
+      </connection>
+      <connection ref="Highway03Connection01_gate">
+        <offset>
+          <position x="-44486.43359375" y="0" z="12270.6142578125" />
+        </offset>
+      </connection>
+      <connection ref="Highway03Connection02_gate">
+        <offset>
+          <position x="-5750.1298828125" y="0" z="26643.5859375" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate009To018" ref="gates">
+        <offset>
+          <position x="-28893.9140625" y="500" z="36674.546875" />
+          <quaternion qx="0" qy="0" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_09_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone004_Cluster_09_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate009to015" ref="gates">
+        <offset>
+          <position x="-3184.0515136719" y="0" z="1693.9086914062" />
+          <quaternion qx="0" qy="-0.9659258127" qz="0" qw="0.2588190734" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_09_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate009To003" ref="gates">
+        <offset>
+          <position x="11458.1298828125" y="0" z="-6089.7978515625" />
+          <quaternion qx="0" qy="0.5" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone006_Cluster_09_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_10_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection02_gate">
+        <offset>
+          <position x="5720.8862304688" y="0" z="3531.1945800781" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="6220.8862304688" y="0" z="2665.1677246094" />
+        </offset>
+      </connection>
+      <connection ref="Highway03Connection01_gate">
+        <offset>
+          <position x="10303.771484375" y="0" z="-7993.9267578125" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate010To022" ref="gates">
+        <offset>
+          <position x="5970.8862304688" y="500" z="3098.181640625" />
+          <quaternion qx="0" qy="0.5000000596" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_10_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway03Connection02_gate">
+        <offset>
+          <position x="-3894.5007324219" y="0" z="-14087.0205078125" />
+        </offset>
+      </connection>
+      <connection ref="Highway02Connection01_gate">
+        <offset>
+          <position x="-16608.4296875" y="0" z="-8595.146484375" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="-15608.4365234375" y="0" z="-8595.146484375" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate010To018" ref="gates">
+        <offset>
+          <position x="-16108.4365234375" y="500" z="-8595.146484375" />
+          <quaternion qx="0" qy="-1" qz="0" qw="-4.37e-08" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_10_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone004_Cluster_10_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_11_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="-6932.5102539062" y="0" z="-21567.962890625" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="-15582.19921875" y="0" z="-21542.572265625" />
+        </offset>
+      </connection>
+      <connection ref="Highway02Connection01_gate">
+        <offset>
+          <position x="-46362.16796875" y="0" z="5003.1967773438" />
+        </offset>
+      </connection>
+      <connection ref="Highway03Connection02_gate">
+        <offset>
+          <position x="-45862.1640625" y="0" z="5869.224609375" />
+        </offset>
+      </connection>
+      <connection ref="Highway02Connection02_gate">
+        <offset>
+          <position x="45228.94921875" y="0" z="5232.666015625" />
+        </offset>
+      </connection>
+      <connection ref="Highway03Connection01_gate">
+        <offset>
+          <position x="44728.953125" y="0" z="6098.6938476562" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate011To024" ref="gates">
+        <offset>
+          <position x="-46112.1640625" y="500" z="5436.2104492188" />
+          <quaternion qx="0" qy="0.8660253286" qz="0" qw="0.5000000596" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+      <connection name="connection_ClusterGate011To022" ref="gates">
+        <offset>
+          <position x="44978.953125" y="500" z="5665.6796875" />
+          <quaternion qx="0" qy="-0.8660253882" qz="0" qw="0.5" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_11_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_11_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_12_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_12_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection01_gate">
+        <offset>
+          <position x="20631.36328125" y="0" z="15944.15234375" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="19631.36328125" y="0" z="15944.15234375" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate012To024" ref="gates">
+        <offset>
+          <position x="20131.36328125" y="500" z="15944.15234375" />
+          <quaternion qx="0" qy="2.98e-08" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_12_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone003_Cluster_12_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="-26472.740234375" y="0" z="31849.74609375" />
+        </offset>
+      </connection>
+      <connection ref="Highway02Connection02_gate">
+        <offset>
+          <position x="-25472.740234375" y="0" z="31849.74609375" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate012To013" ref="gates">
+        <offset>
+          <position x="-25972.73828125" y="500" z="31849.74609375" />
+          <quaternion qx="0" qy="-1" qz="0" qw="7.55e-08" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_12_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_13_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection01_gate">
+        <offset>
+          <position x="17751.080078125" y="0" z="-7188.96875" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="16751.080078125" y="0" z="-7188.96875" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate013To012" ref="gates">
+        <offset>
+          <position x="17251.08203125" y="500" z="-7188.96875" />
+          <quaternion qx="0" qy="-1.788e-07" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+      <connection name="connection_ClusterGate013To027" ref="gates">
+        <offset>
+          <position x="-35152.63671875" y="0" z="34598.12890625" />
+          <quaternion qx="0" qy="0.8660253286" qz="0" qw="0.5000000596" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+      <connection name="connection_ClusterGate013To040" ref="gates">
+        <offset>
+          <position x="-27656.87109375" y="500" z="-30292.751953125" />
+          <quaternion qx="0" qy="0.819151938" qz="0" qw="0.5735765696" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_13_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate013To006" ref="gates">
+        <offset>
+          <position x="34656.40234375" y="0" z="-20601.859375" />
+          <quaternion qx="0" qy="-0.5" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_13_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection02_gate">
+        <offset>
+          <position x="-2231.4528808594" y="0" z="35494.01953125" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="-3231.4528808594" y="0" z="35494.01953125" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate013To014" ref="gates">
+        <offset>
+          <position x="-2731.4528808594" y="500" z="35494.01953125" />
+          <quaternion qx="0" qy="-1" qz="0" qw="7.55e-08" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_14_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection01_gate">
+        <offset>
+          <position x="-39482.4921875" y="0" z="-9901.8330078125" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="-40482.4921875" y="0" z="-9901.8330078125" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate014To013" ref="gates">
+        <offset>
+          <position x="-39982.49609375" y="500" z="-9901.8251953125" />
+          <quaternion qx="0" qy="0" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_14_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate014To007" ref="gates">
+        <offset>
+          <position x="-33563.359375" y="0" z="34544.76953125" />
+          <quaternion qx="0" qy="0.8433914185" qz="0" qw="0.537299633" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+      <connection name="connection_ClusterGate014To706" ref="gates">
+        <offset>
+          <position x="-37914.6171875" y="0" z="-40058.72265625" />
+          <quaternion qx="0" qy="0.3007056713" qz="0" qw="0.9537169933" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_14_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="3928.0090332031" y="0" z="11863.6171875" />
+        </offset>
+      </connection>
+      <connection ref="Highway02Connection02_gate">
+        <offset>
+          <position x="4928.0087890625" y="0" z="11855.560546875" />
+        </offset>
+      </connection>
+      <connection ref="Highway03Connection02_gate">
+        <offset>
+          <position x="902.4124145508" y="0" z="20513.3828125" />
+        </offset>
+      </connection>
+      <connection ref="Highway03Connection01_gate">
+        <offset>
+          <position x="-1010.1547241211" y="0" z="20513.3828125" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate014To029" ref="gates">
+        <offset>
+          <position x="4428.0126953125" y="500" z="11862.2890625" />
+          <quaternion qx="0" qy="-1" qz="0" qw="0" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_14_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="tzoneCluster_15_Sector001SHCon11_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon11_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_15_Sector001SHCon12_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon12_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_15_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate015To701" ref="gates">
+        <offset>
+          <position x="18219.666015625" y="0" z="-28427.5546875" />
+          <quaternion qx="0" qy="-0.7071066499" qz="0" qw="0.7071068883" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_15_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate015To016" ref="gates">
+        <offset>
+          <position x="-17487.412109375" y="0" z="46810.875" />
+          <quaternion qx="0" qy="-1" qz="0" qw="7.55e-08" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_15_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection02_gate">
+        <offset>
+          <position x="38034.60546875" y="0" z="343.2312011719" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="38030.08203125" y="0" z="7347.9306640625" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate015To009" ref="gates">
+        <offset>
+          <position x="2715.5302734375" y="0" z="14352.9052734375" />
+          <quaternion qx="0" qy="0.8660253286" qz="0" qw="0.5000000596" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_15_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection01_gate">
+        <offset>
+          <position x="-10253.7197265625" y="0" z="43551.01953125" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="-4662.0561523438" y="0" z="43540.7265625" />
+        </offset>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_15_Sector002SHCon7_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon7_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_15_Sector002SHCon8_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon8_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_15_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate015To408" ref="gates">
+        <offset>
+          <position x="31532.564453125" y="0" z="37157.8129882812" />
+          <quaternion qx="0" qy="0.707107" qz="0" qw="-0.707107" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_15_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_15_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone004_Cluster_16_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate016To017" ref="gates">
+        <offset>
+          <position x="-14847.564453125" y="0" z="7437.8129882812" />
+          <quaternion qx="0" qy="0.8660253286" qz="0" qw="0.5000000596" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_16_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate016To407" ref="gates">
+        <offset>
+          <position x="-14847.564453125" y="0" z="7437.8129882812" />
+          <quaternion qx="0" qy="-0.8660253286" qz="0" qw="0.5000000596" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_16_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_16_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate016To015" ref="gates">
+        <offset>
+          <position x="7842.7275390625" y="0" z="-8792.16015625" />
+          <quaternion qx="0" qy="-8.74e-08" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_17_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_17_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone004_Cluster_17_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate017To016" ref="gates">
+        <offset>
+          <position x="-5630.783203125" y="0" z="-31665.146484375" />
+          <quaternion qx="0" qy="-0.5000000596" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+      <connection name="connection_ClusterGate017To421" ref="gates">
+        <offset>
+          <position x="665.1306152344" y="0" z="43162.53515625" />
+          <quaternion qx="0" qy="-0.9238795638" qz="0" qw="0.3826834559" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_17_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_18_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_18_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate018To019" ref="gates">
+        <offset>
+          <position x="28224.74609375" y="0" z="-15643.791015625" />
+          <quaternion qx="0" qy="-0.5" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_18_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection01_gate">
+        <offset>
+          <position x="-423.5193786621" y="0" z="30347.1328125" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="576.4806518555" y="0" z="30347.1328125" />
+        </offset>
+      </connection>
+      <connection ref="Highway03Connection02_gate">
+        <offset>
+          <position x="25563.400390625" y="0" z="26574.337890625" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate018To009" ref="gates">
+        <offset>
+          <position x="76.4806289673" y="500" z="30347.1328125" />
+          <quaternion qx="0" qy="-1" qz="0" qw="-1.19e-08" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+      <connection name="connection_ClusterGate018To047" ref="gates">
+        <offset>
+          <position x="-16907.455078125" y="500" z="40875.546875" />
+          <quaternion qx="0" qy="-0.9396926165" qz="0" qw="-0.3420200944" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_18_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone005_Cluster_18_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection02_gate">
+        <offset>
+          <position x="335.075378418" y="0" z="-7917.4194335938" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="1335.0754394531" y="0" z="-7917.4194335938" />
+        </offset>
+      </connection>
+      <connection ref="Highway03Connection01_gate">
+        <offset>
+          <position x="17611.958984375" y="0" z="2124.7253417969" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate018To010" ref="gates">
+        <offset>
+          <position x="835.075378418" y="500" z="-7917.4194335938" />
+          <quaternion qx="0" qy="-8.74e-08" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone006_Cluster_18_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="tzoneCluster_19_Sector001SHCon11_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon11_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_19_Sector001SHCon12_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon12_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_19_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate019To018" ref="gates">
+        <offset>
+          <position x="-3751.3427734375" y="0" z="-21730.912109375" />
+          <quaternion qx="0" qy="0.8660253286" qz="0" qw="0.5000000596" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="22593.34765625" y="0" z="-31917.9921875" />
+        </offset>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_19_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate019To042" ref="gates">
+        <offset>
+          <position x="33107.58984375" y="0" z="-38968.26953125" />
+          <quaternion qx="0" qy="-0.8660253882" qz="0" qw="0.5" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_19_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="-29524.1640625" y="0" z="11172.823046875" />
+        </offset>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_19_Sector002SHCon7_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon7_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_19_Sector002SHCon8_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon8_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_19_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_19_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone003_Cluster_19_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate019To020" ref="gates">
+        <offset>
+          <position x="16460.9375" y="0" z="31140.685546875" />
+          <quaternion qx="0" qy="-0.4617488086" qz="0" qw="0.8870107532" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_20_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone004_Cluster_20_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate020To021" ref="gates">
+        <offset>
+          <position x="-7722.4731445312" y="0" z="-21839.5078125" />
+          <quaternion qx="0" qy="5.96e-08" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_20_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection02_gate">
+        <offset>
+          <position x="3058.7043457031" y="0" z="-21742.783203125" />
+        </offset>
+      </connection>
+      <connection ref="Highway03Connection01_gate">
+        <offset>
+          <position x="-5399.2939453125" y="0" z="-9883.392578125" />
+        </offset>
+      </connection>
+      <connection ref="Highway04Connection01_gate">
+        <offset>
+          <position x="7079.2138671875" y="0" z="-21733.177734375" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="-5427.0478515625" y="0" z="-13881.1953125" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate020To019" ref="gates">
+        <offset>
+          <position x="10179.4658203125" y="0" z="19711.212890625" />
+          <quaternion qx="0" qy="0.8660253286" qz="0" qw="0.5000000596" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_20_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate020To050" ref="gates">
+        <offset>
+          <position x="17102.34765625" y="0" z="11343.353515625" />
+          <quaternion qx="0" qy="-0.7071068287" qz="0" qw="0.7071067095" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_20_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection01_gate">
+        <offset>
+          <position x="5941.8984375" y="0" z="39729.00390625" />
+        </offset>
+      </connection>
+      <connection ref="Highway04Connection02_gate">
+        <offset>
+          <position x="9962.5390625" y="0" z="39723.44921875" />
+        </offset>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_21_Sector001SHCon5_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon5_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_21_Sector001SHCon9_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon9_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_21_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection02_gate">
+        <offset>
+          <position x="-99.9984741211" y="0" z="42466.64453125" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="-4108.87890625" y="0" z="42474.51953125" />
+        </offset>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_21_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_21_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection01_gate">
+        <offset>
+          <position x="6022.9189453125" y="0" z="26770.99609375" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="1995.4223632812" y="0" z="26745.392578125" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate021To020" ref="gates">
+        <offset>
+          <position x="22808.806640625" y="0" z="32459.48828125" />
+          <quaternion qx="0" qy="-1" qz="0" qw="-4.37e-08" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_21_Sector002SHCon6_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon6_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_21_Sector002SHCon10_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon10_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_21_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_21_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone003_Cluster_21_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate021To050" ref="gates">
+        <offset>
+          <position x="35306.3125" y="0" z="28914.0625" />
+          <quaternion qx="0" qy="-0.8870108128" qz="0" qw="0.4617486" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_22_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection02_gate">
+        <offset>
+          <position x="23091.765625" y="0" z="35673.91015625" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="22591.765625" y="0" z="36539.93359375" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate022To010" ref="gates">
+        <offset>
+          <position x="22841.765625" y="500" z="36106.91796875" />
+          <quaternion qx="0" qy="-0.8660253882" qz="0" qw="0.5" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+      <connection name="connection_ClusterGate022To037" ref="gates">
+        <offset>
+          <position x="32564.560546875" y="500" z="-18029.353515625" />
+          <quaternion qx="0" qy="-0.57357651" qz="0" qw="0.8191519976" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_22_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate022To023" ref="gates">
+        <offset>
+          <position x="19595.87890625" y="0" z="-44534.7578125" />
+          <quaternion qx="0" qy="-1.788e-07" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+      <connection name="connection_ClusterGate022To038" ref="gates">
+        <offset>
+          <position x="-17209.46484375" y="0" z="-44534.7578125" />
+          <quaternion qx="0" qy="-1.788e-07" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_22_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate022To004" ref="gates">
+        <offset>
+          <position x="-19143.62890625" y="0" z="36198.39453125" />
+          <quaternion qx="0" qy="-1" qz="0" qw="-1.629e-07" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_22_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection01_gate">
+        <offset>
+          <position x="-30328.125" y="0" z="-23515.392578125" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="-30670.134765625" y="0" z="-22575.69921875" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate022To011" ref="gates">
+        <offset>
+          <position x="-30499.130859375" y="500" z="-23045.54296875" />
+          <quaternion qx="0" qy="0.5735763907" qz="0" qw="0.8191520572" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_22_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_23_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate023To022" ref="gates">
+        <offset>
+          <position x="20564.4375" y="0" z="37146.35546875" />
+          <quaternion qx="0" qy="-1" qz="0" qw="7.55e-08" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_23_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_23_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone005_Cluster_23_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone004_Cluster_23_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate023To709" ref="gates">
+        <offset>
+          <position x="-1917.2668457031" y="0" z="-24121.29296875" />
+          <quaternion qx="0" qy="0" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_24_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection01_gate">
+        <offset>
+          <position x="-7868.6865234375" y="0" z="4176.994140625" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="-7049.5336914062" y="0" z="4750.572265625" />
+        </offset>
+      </connection>
+      <connection ref="Highway03Connection01_gate">
+        <offset>
+          <position x="-17867.125" y="0" z="-7037.5366210938" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate024To012" ref="gates">
+        <offset>
+          <position x="-7459.1103515625" y="500" z="4463.783203125" />
+          <quaternion qx="0" qy="-0.9537169933" qz="0" qw="-0.3007057905" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_24_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway03Connection02_gate">
+        <offset>
+          <position x="17714.248046875" y="0" z="24628.38671875" />
+        </offset>
+      </connection>
+      <connection ref="Highway04Connection01_gate">
+        <offset>
+          <position x="23716.751953125" y="0" z="10964.35546875" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate024To025" ref="gates">
+        <offset>
+          <position x="9181.572265625" y="0" z="9319.65625" />
+          <quaternion qx="0" qy="0.5" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_24_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="-25470.474609375" y="0" z="-6200.5004882812" />
+        </offset>
+      </connection>
+      <connection ref="Highway02Connection02_gate">
+        <offset>
+          <position x="-26044.052734375" y="0" z="-7019.6533203125" />
+        </offset>
+      </connection>
+      <connection ref="Highway04Connection02_gate">
+        <offset>
+          <position x="-33263.9296875" y="0" z="-11764.2822265625" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate024To011" ref="gates">
+        <offset>
+          <position x="-25757.255859375" y="500" z="-6610.0771484375" />
+          <quaternion qx="0" qy="-0.5000000596" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+      <connection name="connection_ClusterGate024To036" ref="gates">
+        <offset>
+          <position x="-29041.86328125" y="0" z="-41541.625" />
+          <quaternion qx="0" qy="0" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_24_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate024To725" ref="gates">
+        <offset>
+          <position x="-5459.1103515625" y="500" z="40630.783203125" />
+          <quaternion qx="0" qy="-1" qz="0" qw="0" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_24_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="tzoneCluster_25_Sector001SHCon6_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon6_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_25_Sector001SHCon10_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon10_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_25_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate025To024" ref="gates">
+        <offset>
+          <position x="18291.87109375" y="0" z="25138" />
+          <quaternion qx="0" qy="-0.8660253882" qz="0" qw="0.5" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_25_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="9622.7236328125" y="0" z="-20466.9609375" />
+        </offset>
+      </connection>
+      <connection ref="Highway02Connection01_gate">
+        <offset>
+          <position x="13528.8323242188" y="0" z="-20446.513671875" />
+        </offset>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_25_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection02_gate">
+        <offset>
+          <position x="1291.5114746094" y="0" z="-26721.435546875" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="-2613.7619628906" y="0" z="-26732.513671875" />
+        </offset>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_25_Sector002SHCon5_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon5_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_25_Sector002SHCon9_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon9_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_25_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate025To026" ref="gates">
+        <offset>
+          <position x="-27498.87109375" y="0" z="20218.75" />
+          <quaternion qx="0" qy="-0.8660253882" qz="0" qw="-0.5" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_25_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_25_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="13493.408203125" y="0" z="-17800.78125" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="2917.8466796875" y="0" z="-16628.90625" />
+        </offset>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_25_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="tzoneCluster_26_Sector001SHCon6_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon6_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_26_Sector001SHCon10_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon10_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_26_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="env_debris_xenon_xxl_02_macro" ref="anything">
+        <offset>
+          <position x="-5705.001953125" y="-9272.9990234375" z="47234" />
+          <quaternion qx="-7.5e-09" qy="0" qz="0" qw="1" />
+        </offset>
+        <macro ref="env_debris_xenon_xxl_02_macro" connection="space" />
+      </connection>
+      <connection name="connection_ClusterGate026To049" ref="gates">
+        <offset>
+          <position x="-24958.96875" y="0" z="16964.751953125" />
+          <quaternion qx="0" qy="-1" qz="0" qw="-1.629e-07" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_26_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_26_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone003_Cluster_26_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="tzoneCluster_26_Sector002SHCon5_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon5_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_26_Sector002SHCon9_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon9_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_26_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="env_debris_xenon_xxl_01_macro" ref="anything">
+        <offset>
+          <position x="-5904.296875" y="25099" z="-39980.46875" />
+          <quaternion qx="-0.0792836919" qy="-0.4820460677" qz="-0.0438561663" qw="0.8714483976" />
+        </offset>
+        <macro ref="env_debris_xenon_xxl_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_26_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_26_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone003_Cluster_26_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate026To025" ref="gates">
+        <offset>
+          <position x="12398.4375" y="0" z="7507.8125" />
+          <quaternion qx="0" qy="-0.5000000596" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+      <connection name="connection_ClusterGate026To715" ref="gates">
+        <offset>
+          <position x="-19087.890625" y="0" z="-14750" />
+          <quaternion qx="0" qy="0" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_27_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate027To028" ref="gates">
+        <offset>
+          <position x="10298.7978515625" y="0" z="-27247.486328125" />
+          <quaternion qx="0" qy="0.5000000596" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_27_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_27_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate027To013" ref="gates">
+        <offset>
+          <position x="-8396.712890625" y="0" z="3238.0522460938" />
+          <quaternion qx="0" qy="-0.5" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_27_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate027To049" ref="gates">
+        <offset>
+          <position x="7708.2822265625" y="0" z="-13631.7138671875" />
+          <quaternion qx="0" qy="1.51e-07" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_27_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate027To048" ref="gates">
+        <offset>
+          <position x="8080.8676757812" y="0" z="13358.09375" />
+          <quaternion qx="0" qy="-1" qz="0" qw="-1.19e-08" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_28_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate028To113" ref="gates">
+        <offset>
+          <position x="-13114.908203125" y="0" z="-40702.740234375" />
+          <quaternion qx="0" qy="0" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_28_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_28_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_28_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="-12686.111328125" y="0" z="22667.953125" />
+        </offset>
+      </connection>
+      <connection ref="Highway02Connection02_gate">
+        <offset>
+          <position x="-8725.021484375" y="0" z="22641.28125" />
+        </offset>
+      </connection>
+      <connection ref="Highway03Connection02_gate">
+        <offset>
+          <position x="-34130.38671875" y="0" z="-45357.87109375" />
+        </offset>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_28_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway03Connection01_gate">
+        <offset>
+          <position x="-44324.12890625" y="0" z="-7232.9404296875" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="-14724.989453125" y="0" z="-21063.537109375" />
+        </offset>
+      </connection>
+      <connection ref="Highway02Connection01_gate">
+        <offset>
+          <position x="-10763.99609375" y="0" z="-21067.755859375" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate028To027" ref="gates">
+        <offset>
+          <position x="-2037.2314453125" y="0" z="9229.7822265625" />
+          <quaternion qx="0" qy="-0.8660253882" qz="0" qw="0.5000000596" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_29_Sector001SHCon11_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon11_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_29_Sector001SHCon12_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon12_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_29_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate029To030" ref="gates">
+        <offset>
+          <position x="-21414.802734375" y="0" z="33491.9140625" />
+          <quaternion qx="0" qy="0.8660253286" qz="0" qw="0.5000000596" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_29_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection01_gate">
+        <offset>
+          <position x="14669.11328125" y="0" z="17405.974609375" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="14669.12890625" y="0" z="16405.990234375" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate029To032" ref="gates">
+        <offset>
+          <position x="8471.603515625" y="0" z="66695.48046875" />
+          <quaternion qx="0" qy="-1" qz="0" qw="7.55e-08" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+      <connection name="connection_ClusterGate029To008" ref="gates">
+        <offset>
+          <position x="14669.11328125" y="500" z="16905.974609375" />
+          <quaternion qx="0" qy="-0.7071068287" qz="0" qw="0.7071067691" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_29_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="-9223.3662109375" y="0" z="-13045.0361328125" />
+        </offset>
+      </connection>
+      <connection ref="Highway02Connection02_gate">
+        <offset>
+          <position x="-10089.4013671875" y="0" z="-12545.06640625" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate029To014" ref="gates">
+        <offset>
+          <position x="-9656.3720703125" y="500" z="-12795.0517578125" />
+          <quaternion qx="0" qy="0.2588191032" qz="0" qw="0.9659258127" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_29_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone005_Cluster_29_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone006_Cluster_29_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="tzoneCluster_29_Sector002SHCon7_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon7_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_29_Sector002SHCon8_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon8_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_29_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_29_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone003_Cluster_29_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_30_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate030To046" ref="gates">
+        <offset>
+          <position x="-18306.923828125" y="0" z="-1822.75390625" />
+          <quaternion qx="0" qy="-1" qz="0" qw="-1.629e-07" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_30_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate030To031" ref="gates">
+        <offset>
+          <position x="-8108.078125" y="0" z="26857.626953125" />
+          <quaternion qx="0" qy="0.8660253286" qz="0" qw="0.5000000596" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_30_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate030To029" ref="gates">
+        <offset>
+          <position x="-6473.7700195312" y="0" z="9275.88671875" />
+          <quaternion qx="0" qy="-0.5" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_31_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate031To403" ref="gates">
+        <offset>
+          <position x="-6473.7700195312" y="0" z="9275.88671875" />
+          <quaternion qx="0" qy="-0.991445" qz="0" qw="0.130526" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_31_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone005_Cluster_31_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate031To601b" ref="gates">
+        <offset>
+          <position x="-37575.5625" y="0" z="7086.3188476562" />
+          <quaternion qx="0" qy="-0.9659258127" qz="0" qw="-0.2588191628" />
+        </offset>
+        <macro ref="props_gates_anc_gate_anim_macro" connection="space">
+          <properties>
+            <state active="false" />
+          </properties>
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_31_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_31_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate031To030" ref="gates">
+        <offset>
+          <position x="-10735.3056640625" y="0" z="-6436.275390625" />
+          <quaternion qx="0" qy="-0.5" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_32_Sector001SHCon5_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon5_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_32_Sector001SHCon9_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon9_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_32_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_32_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection02_gate">
+        <offset>
+          <position x="31257.541015625" y="0" z="13839.7216796875" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="-7000.3203125" y="0" z="30997.666015625" />
+        </offset>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_32_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate032To708" ref="gates">
+        <offset>
+          <position x="26263.48046875" y="0" z="39323.18359375" />
+          <quaternion qx="0" qy="-0.707107" qz="0" qw="0.707107" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+      <connection name="landmarks_xenon_crash_site_01_macro" ref="anything">
+        <offset>
+          <position x="21646.84375" y="0" z="19680.1640625" />
+          <quaternion qx="0" qy="0" qz="0" qw="1" />
+        </offset>
+        <macro ref="landmarks_xenon_crash_site_01_macro" connection="space">
+          <properties>
+            <identification owner="xenon" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="connection_ClusterGate032To401" ref="gates">
+        <offset>
+          <position x="-13059.916015625" y="0" z="39315.3115234375" />
+          <quaternion qx="0" qy="-1" qz="0" qw="0" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_32_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection01_gate">
+        <offset>
+          <position x="-41352.62890625" y="0" z="17923.294921875" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="-19990.43359375" y="0" z="36654.3125" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate032To029" ref="gates">
+        <offset>
+          <position x="-18666.916015625" y="0" z="-11558.3115234375" />
+          <quaternion qx="0" qy="0" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_32_Sector002SHCon6_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon6_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_32_Sector002SHCon10_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon10_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_32_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection02_gate">
+        <offset>
+          <position x="-13258.048828125" y="0" z="-11156.25" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="-17710.501953125" y="0" z="-11152.34375" />
+        </offset>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_32_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection01_gate">
+        <offset>
+          <position x="-2403.2133789062" y="0" z="-46035.15625" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="-7326.7099609375" y="0" z="-46109.375" />
+        </offset>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_32_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone003_Cluster_32_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate032To033" ref="gates">
+        <offset>
+          <position x="-38534.26953125" y="0" z="-11082.03125" />
+          <quaternion qx="0" qy="0.8660253286" qz="0" qw="0.5000000596" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_33_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone003_Cluster_33_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate033To112" ref="gates">
+        <offset>
+          <position x="-32158.814453125" y="0" z="-40863.951171875" />
+          <quaternion qx="0" qy="-0.258819" qz="0" qw="-0.965926" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_33_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_33_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate033To032" ref="gates">
+        <offset>
+          <position x="26891.814453125" y="0" z="17170.951171875" />
+          <quaternion qx="0" qy="-0.5" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_34_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_34_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone005_Cluster_34_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway02Connection01_gate">
+        <offset>
+          <position x="-11883.2705078125" y="0" z="17224.43359375" />
+        </offset>
+      </connection>
+      <connection ref="Highway01Connection02_gate">
+        <offset>
+          <position x="-12225.28125" y="0" z="16284.736328125" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate034to009" ref="gates">
+        <offset>
+          <position x="-12054.275390625" y="500" z="16754.5859375" />
+          <quaternion qx="0" qy="-0.57357651" qz="0" qw="0.8191519976" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_34_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate034to420" ref="gates">
+        <offset>
+          <position x="11498.787109375" y="500" z="38158.05078125" />
+          <quaternion qx="0" qy="-0.9063078165" qz="0" qw="0.4226181507" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_34_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="Highway01Connection01_gate">
+        <offset>
+          <position x="10157.53125" y="0" z="29902.3828125" />
+        </offset>
+      </connection>
+      <connection ref="Highway02Connection02_gate">
+        <offset>
+          <position x="10499.5419921875" y="0" z="30842.076171875" />
+        </offset>
+      </connection>
+      <connection name="connection_ClusterGate034To008" ref="gates">
+        <offset>
+          <position x="10328.537109375" y="500" z="30372.228515625" />
+          <quaternion qx="0" qy="0.8191520572" qz="0" qw="0.5735764503" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_35_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone003_Cluster_35_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_35_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate035To036" ref="gates">
+        <offset>
+          <position x="-40500.87109375" y="0" z="-29390.9453125" />
+          <quaternion qx="0" qy="0.8660253286" qz="0" qw="0.5000000596" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_35_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone004_Cluster_35_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_36_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate036To024" ref="gates">
+        <offset>
+          <position x="10392.5361328125" y="0" z="27418.662109375" />
+          <quaternion qx="0" qy="-1" qz="0" qw="7.55e-08" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_36_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_36_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone005_Cluster_36_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate036To714" ref="gates">
+        <offset>
+          <position x="-33993.94921875" y="0" z="-4520.3706054688" />
+          <quaternion qx="0" qy="-5.96e-08" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_36_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate036To035" ref="gates">
+        <offset>
+          <position x="22153.9453125" y="0" z="-25904.9375" />
+          <quaternion qx="0" qy="-0.5000000596" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_37_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_37_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate037To038" ref="gates">
+        <offset>
+          <position x="-27971.76171875" y="0" z="-27283.478515625" />
+          <quaternion qx="0" qy="0.342019856" qz="0" qw="0.9396927357" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_37_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate037To022" ref="gates">
+        <offset>
+          <position x="-36352.140625" y="0" z="5562.255859375" />
+          <quaternion qx="0" qy="0.92388" qz="0" qw="0.382683" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_37_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone005_Cluster_37_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_38_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate038To037" ref="gates">
+        <offset>
+          <position x="23756.943359375" y="500" z="44295.03125" />
+          <quaternion qx="0" qy="-0.8660253882" qz="0" qw="0.5" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_38_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_38_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone004_Cluster_38_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone005_Cluster_38_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate038To022" ref="gates">
+        <offset>
+          <position x="-26115.310546875" y="500" z="19175.048828125" />
+          <quaternion qx="0" qy="0.8660253286" qz="0" qw="0.5000000596" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_39_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone003_Cluster_39_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate039To713" ref="gates">
+        <offset>
+          <position x="32837.1" y="500" z="-34633.7" />
+          <quaternion qx="0" qy="0.707107" qz="0" qw="-0.707107" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_39_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate039To003" ref="gates">
+        <offset>
+          <position x="1153.6560058594" y="500" z="26406.021484375" />
+          <quaternion qx="0" qy="1" qz="0" qw="2.821e-07" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_39_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone005_Cluster_39_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_40_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone003_Cluster_40_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_40_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate040To013" ref="gates">
+        <offset>
+          <position x="33026.6875" y="500" z="-27539.626953125" />
+          <quaternion qx="0" qy="-0.9238795638" qz="0" qw="0.3826834559" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_40_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone005_Cluster_40_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate040To041" ref="gates">
+        <offset>
+          <position x="27820.3125" y="500" z="32960.90625" />
+          <quaternion qx="0" qy="-1" qz="0" qw="7.55e-08" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_41_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone003_Cluster_41_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_41_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone004_Cluster_41_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate041To040" ref="gates">
+        <offset>
+          <position x="33218.87890625" y="500" z="-39162.97265625" />
+          <quaternion qx="0" qy="-5.96e-08" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_41_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="tzoneCluster_42_Sector001SHCon11_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon11_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_42_Sector001SHCon12_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon12_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_42_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone003_Cluster_42_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate042To019" ref="gates">
+        <offset>
+          <position x="-38413.57421875" y="500" z="-31864.212890625" />
+          <quaternion qx="0" qy="0.5000001192" qz="0" qw="0.8660253286" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_42_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate042To043" ref="gates">
+        <offset>
+          <position x="-1957.2468261719" y="500" z="26625.763671875" />
+          <quaternion qx="0" qy="-1" qz="0" qw="-7.55e-08" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_42_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="tzoneCluster_42_Sector002SHCon7_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon7_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_42_Sector002SHCon8_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon8_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_42_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone003_Cluster_42_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_42_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone004_Cluster_42_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone005_Cluster_42_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_43_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone003_Cluster_43_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate043To042" ref="gates">
+        <offset>
+          <position x="-4845.052734375" y="500" z="-17207.908203125" />
+          <quaternion qx="0" qy="-5.96e-08" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_43_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone004_Cluster_43_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_44_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone003_Cluster_44_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_44_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate044To045" ref="gates">
+        <offset>
+          <position x="-38912.23046875" y="500" z="27307.189453125" />
+          <quaternion qx="0" qy="-0.9396926165" qz="0" qw="-0.342020154" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_44_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate044To008" ref="gates">
+        <offset>
+          <position x="25351.318359375" y="500" z="-41409.1015625" />
+          <quaternion qx="0" qy="0.4226181805" qz="0" qw="0.9063078165" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_44_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_45_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone003_Cluster_45_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate045To044" ref="gates">
+        <offset>
+          <position x="21657.37890625" y="500" z="-6685.38671875" />
+          <quaternion qx="0" qy="-0.5735765696" qz="0" qw="0.8191519976" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_45_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone004_Cluster_45_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone005_Cluster_45_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_46_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone003_Cluster_46_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate046To030" ref="gates">
+        <offset>
+          <position x="-2711.998046875" y="500" z="-33803.40625" />
+          <quaternion qx="0" qy="-5.96e-08" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_46_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone004_Cluster_46_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone005_Cluster_46_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone002_Cluster_47_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate047To018" ref="gates">
+        <offset>
+          <position x="-7085.9072265625" y="500" z="-34417.88671875" />
+          <quaternion qx="0" qy="-0.5735765696" qz="0" qw="0.8191519976" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_47_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_47_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone004_Cluster_47_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone005_Cluster_47_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+  </macro>
+  <macro name="Zone001_Cluster_49_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate049To026" ref="gates">
+        <offset>
+          <position x="-39982.49609375" y="500" z="-9901.8251953125" />
+          <quaternion qx="0" qy="0" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_49_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate049To720" ref="gates">
+        <offset>
+          <position x="4428.0126953125" y="500" z="11862.2890625" />
+          <quaternion qx="0" qy="0.707107" qz="0" qw="0.707107" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_49_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate049To027" ref="gates">
+        <offset>
+          <position x="4428.0126953125" y="500" z="11862.2890625" />
+          <quaternion qx="0" qy="-1" qz="0" qw="0" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_49_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone003_Cluster_48_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate048To027" ref="gates">
+        <offset>
+          <position x="10370.056640625" y="0" z="12331.626953125" />
+          <quaternion qx="0" qy="-0.5000000596" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_48_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone001_Cluster_48_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate048To100" ref="gates">
+        <offset>
+          <position x="-32271.056640625" y="0" z="13088.626953125" />
+          <quaternion qx="0" qy="0.7071066499" qz="0" qw="0.7071068883" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_48_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate048To112" ref="gates">
+        <offset>
+          <position x="-17343.056640625" y="0" z="3110.626953125" />
+          <quaternion qx="0" qy="-0.887011" qz="0" qw="0.461749" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_48_Sector01_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone006_Cluster_48_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate048To604" ref="gates">
+        <offset>
+          <position x="-41224.856640625" y="0" z="41969.126953125" />
+          <quaternion qx="0" qy="0.7071066499" qz="0" qw="0.7071068883" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" >
+          <properties>
+            <state active="false" />
+          </properties>
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_50_Sector001SHCon6_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon6_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_50_Sector001SHCon10_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon10_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_50_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone001_Cluster_50_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone002_Cluster_50_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone003_Cluster_50_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="tzoneCluster_50_Sector002SHCon5_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon5_gate" />
+    </connections>
+  </macro>
+  <macro name="tzoneCluster_50_Sector002SHCon9_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon9_gate" />
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_50_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate050To021" ref="gates">
+        <offset>
+          <position x="-29861.328125" y="0" z="-36511.71875" />
+          <quaternion qx="0" qy="0.5755171776" qz="0" qw="0.8177897334" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_50_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate050To020" ref="gates">
+        <offset>
+          <position x="-35400.390625" y="0" z="-35945.3125" />
+          <quaternion qx="0" qy="-0.8822386265" qz="0" qw="-0.4708025455" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_50_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone003_Cluster_50_Sector002_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+
+
+  <macro name="Zone001_Cluster_709_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate709To023" ref="gates">
+        <offset>
+          <position x="4613.14" y="500" z="35623.3125" />
+          <quaternion qx="0" qy="-1.0" qz="0" qw="0" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_709_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate709To710" ref="gates">
+        <offset>
+          <position x="32564.6" y="500" z="-18029.4" />
+          <quaternion qx="0" qy="-0.866025" qz="0" qw="0.5" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_709_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate709To" ref="gates">
+        <offset>
+          <position x="-45214.4" y="500" z="-40163.7" />
+          <quaternion qx="0" qy="0" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_709_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate709To723" ref="gates">
+        <offset>
+          <position x="4613.14" y="500" z="35623.3125" />
+          <quaternion qx="0" qy="0.707107" qz="0" qw="0.707106" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_709_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+
+  <macro name="Zone001_Cluster_710_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate710To711" ref="gates">
+        <offset>
+          <position x="25857.2" y="500" z="38223.3" />
+          <quaternion qx="0" qy="-1" qz="0" qw="0" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_710_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate710To" ref="gates">
+        <offset>
+          <position x="40070.4" y="500" z="-38414.9" />
+          <quaternion qx="0" qy="0.707107" qz="0" qw="0.707107" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_710_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone004_Cluster_710_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone005_Cluster_710_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate710To709" ref="gates">
+        <offset>
+          <position x="-26425.1" y="500" z="-28918.5" />
+          <quaternion qx="0" qy="-0.5" qz="0" qw="-0.866025" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+
+  <macro name="Zone001_Cluster_711_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone002_Cluster_711_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_711_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone004_Cluster_711_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate711To712" ref="gates">
+        <offset>
+          <position x="-35480.4" y="500" z="39923.4" />
+          <quaternion qx="0" qy="-0.906308" qz="0" qw="-0.422618" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_711_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate711To710" ref="gates">
+        <offset>
+          <position x="40919.3" y="500" z="-44623.1" />
+          <quaternion qx="0" qy="0.0" qz="0" qw="1.0" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+
+  <macro name="Zone001_Cluster_712_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone002_Cluster_712_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_712_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate712To711" ref="gates">
+        <offset>
+          <position x="22386.5" y="500" z="-27984.2" />
+          <quaternion qx="0" qy="0.5373" qz="0" qw="-0.843391" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_712_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate712To713" ref="gates">
+        <offset>
+          <position x="-29261.7" y="500" z="34270.1" />
+          <quaternion qx="0" qy="-0.887011" qz="0" qw="-0.461748" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_712_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_713_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate713To" ref="gates">
+        <offset>
+          <position x="40329.8" y="500" z="42063.3" />
+          <quaternion qx="0" qy="-0.923879" qz="0" qw="-0.382684" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_713_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_713_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate713To712" ref="gates">
+        <offset>
+          <position x="-29016.8" y="500" z="-39035.3" />
+          <quaternion qx="0" qy="0" qz="0" qw="1.0" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_713_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate713To039" ref="gates">
+        <offset>
+          <position x="-42192.5" y="500" z="37052.1" />
+          <quaternion qx="0" qy="-0.707107" qz="0" qw="-0.707107" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_713_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_714_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate714To036" ref="gates">
+        <offset>
+          <position x="11603.6" y="500" z="40585.5" />
+          <quaternion qx="0" qy="-1" qz="0" qw="0" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_714_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_714_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone004_Cluster_714_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone005_Cluster_714_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_715_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate715To026" ref="gates">
+        <offset>
+          <position x="40435.5" y="500" z="37094.9" />
+          <quaternion qx="0" qy="-1" qz="0" qw="0" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_715_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_715_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone004_Cluster_715_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone005_Cluster_715_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_720_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate720To730" ref="gates">
+        <offset>
+          <position x="779.5" y="500" z="41437.9" />
+          <quaternion qx="0" qy="-1" qz="0" qw="0" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_720_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate720To049" ref="gates">
+        <offset>
+          <position x="40435.5" y="500" z="37094.9" />
+          <quaternion qx="0" qy="-1" qz="0" qw="0" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_720_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections >
+      <connection name="connection_ClusterGate720To722" ref="gates">
+        <offset>
+          <position x="40435.5" y="500" z="37094.9" />
+          <quaternion qx="0" qy="0" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_720_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections >
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_720_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate720To721" ref="gates">
+        <offset>
+          <position x="-33513.5" y="500" z="39466.9" />
+          <quaternion qx="0" qy="0.707107" qz="0" qw="0.707107" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone001_Cluster_721_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate721To608" ref="gates">
+        <offset>
+          <position x="40435.5" y="500" z="37094.9" />
+          <quaternion qx="0" qy="-1" qz="0" qw="0" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" >
+          <properties>
+            <state active="false" />
+          </properties>
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_721_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections/>
+  </macro>
+  <macro name="Zone003_Cluster_721_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections >
+      <connection name="connection_ClusterGate721To720" ref="gates">
+        <offset>
+          <position x="40435.5" y="500" z="37094.9" />
+          <quaternion qx="0" qy="-0.707107" qz="0" qw="0.707107" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_721_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone005_Cluster_721_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate721To" ref="gates">
+        <offset>
+          <position x="-29026.8" y="500" z="-23048.1" />
+          <quaternion qx="0" qy="-0.5373" qz="0" qw="0.843391" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" >
+          <properties>
+            <state active="false" />
+          </properties>
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+
+  <macro name="Zone001_Cluster_722_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate722To720" ref="gates">
+        <offset>
+          <position x="40435.5" y="500" z="37094.9" />
+          <quaternion qx="0" qy="-1.0" qz="0" qw="0.0" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_722_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_722_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections >
+      <connection name="connection_ClusterGate722To723" ref="gates">
+        <offset>
+          <position x="40435.5" y="500" z="37094.9" />
+          <quaternion qx="0" qy="-0.5" qz="0" qw="0.866025" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_722_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections >
+      <connection name="connection_ClusterGate722To724" ref="gates">
+        <offset>
+          <position x="40435.5" y="500" z="37094.9" />
+          <quaternion qx="0" qy="0.707107" qz="0" qw="0.707107" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_722_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate722To806" ref="gates">
+        <offset>
+          <position x="39310.5" y="0" z="-38914.5" />
+          <quaternion qx="0" qy="0" qz="0" qw="1.0" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+
+  <macro name="Zone001_Cluster_723_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_723_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate723To709" ref="gates">
+        <offset>
+          <position x="40435.5" y="500" z="37094.9" />
+          <quaternion qx="0" qy="-0.707107" qz="0" qw="0.707107" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_723_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate723To" ref="gates">
+        <offset>
+          <position x="33880.5" y="500" z="-31698.9" />
+          <quaternion qx="0" qy="0.573577" qz="0" qw="0.819152" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_723_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections >
+      <connection name="connection_ClusterGate723To722" ref="gates">
+        <offset>
+          <position x="40435.5" y="500" z="37094.9" />
+          <quaternion qx="0" qy="0.707107" qz="0" qw="0.707107" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_723_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+
+  <macro name="Zone001_Cluster_724_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate724To115" ref="gates">
+        <offset>
+          <position x="40435.5" y="500" z="37094.9" />
+          <quaternion qx="0" qy="-1" qz="0" qw="0.0" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_724_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_724_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate724To722" ref="gates">
+        <offset>
+          <position x="40435.5" y="500" z="1933.9" />
+          <quaternion qx="0" qy="-0.707107" qz="0" qw="0.707107" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_724_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections >
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_724_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate724To" ref="gates">
+        <offset>
+          <position x="-26081.8" y="500" z="-31284.1" />
+          <quaternion qx="0" qy="-0.422618" qz="0" qw="0.906308" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" >
+          <properties>
+            <state active="false" />
+          </properties>
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+
+  <macro name="Zone001_Cluster_725_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate725To006" ref="gates">
+        <offset>
+          <position x="40435.5" y="500" z="37094.9" />
+          <quaternion qx="0" qy="-0.707107" qz="0" qw="0.707107" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_725_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate725To005" ref="gates">
+        <offset>
+          <position x="40435.5" y="500" z="37094.9" />
+          <quaternion qx="0" qy="-0.707107" qz="0" qw="0.707107" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_725_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate725To808" ref="gates">
+        <offset>
+          <position x="-5600" y="500" z="24010" />
+          <quaternion qx="0" qy="-0.707107" qz="0" qw="0.707107" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_725_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections >
+      <connection name="connection_ClusterGate725To740" ref="gates">
+        <offset>
+          <position x="0" y="500" z="0" />
+          <quaternion qx="0" qy="0.707107" qz="0" qw="0.707107" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_725_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate725To024" ref="gates">
+        <offset>
+          <position x="-135.5" y="500" z="-31094.9" />
+          <quaternion qx="0" qy="0" qz="0" qw="1" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+</macros>

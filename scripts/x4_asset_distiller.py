@@ -192,25 +192,117 @@ def main():
 
         return output_path
 
+    def merge_xml_file(target_path, source_path):
+        target_existed = os.path.exists(target_path)
+        try:
+            source_tree = etree.parse(source_path, parser)
+        except Exception as e:
+            print(f"      ⚠️ 读取失败 {source_path}: {e}")
+            return 'failed'
+
+        source_root = source_tree.getroot()
+        if source_root.tag == 'diff':
+            if not os.path.exists(target_path):
+                print(f"      ⚠️ 缺少基础文件，无法应用补丁: {target_path}")
+                return 'failed'
+            try:
+                target_tree = etree.parse(target_path, parser)
+                xml_diff.Apply_Patch(target_tree.getroot(), source_root)
+                target_tree.write(target_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
+                return 'patched'
+            except Exception as e:
+                print(f"      ⚠️ 补丁失败 {source_path}: {e}")
+                return 'failed'
+
+        shutil.copy2(source_path, target_path)
+        return 'overwritten' if target_existed else 'copied'
+
+    def distill_targeted_map_xml(relative_dir, base_names, dlc_patterns):
+        print(f"🗺️ [4/10] 正在蒸馏地图 XML: {relative_dir} ...")
+        base_dir = os.path.join(src, relative_dir)
+        dest_dir = os.path.join(dest_root, relative_dir)
+        os.makedirs(dest_dir, exist_ok=True)
+
+        stats = {
+            'base_copied': 0,
+            'dlc_added': 0,
+            'dlc_patched': 0,
+            'dlc_overwritten': 0,
+        }
+
+        for file_name in base_names:
+            base_path = os.path.join(base_dir, file_name)
+            if not os.path.exists(base_path):
+                print(f"   ⚠️ Base 文件不存在: {base_path}")
+                continue
+            shutil.copy2(base_path, os.path.join(dest_dir, file_name))
+            stats['base_copied'] += 1
+
+        for dlc_id in dlc_order:
+            overlay_dir = os.path.join(src, "extensions", dlc_id, relative_dir)
+            if not os.path.isdir(overlay_dir):
+                continue
+
+            dlc_changed = 0
+            matched_names = set()
+            for pattern in dlc_patterns:
+                matched_names.update(
+                    os.path.basename(path)
+                    for path in glob.glob(os.path.join(overlay_dir, pattern))
+                    if path.lower().endswith(".xml")
+                )
+
+            for file_name in sorted(matched_names):
+                source_path = os.path.join(overlay_dir, file_name)
+
+                target_path = os.path.join(dest_dir, file_name)
+                result = merge_xml_file(target_path, source_path)
+                if result == 'patched':
+                    stats['dlc_patched'] += 1
+                    dlc_changed += 1
+                elif result == 'copied':
+                    stats['dlc_added'] += 1
+                    dlc_changed += 1
+                elif result == 'overwritten':
+                    stats['dlc_overwritten'] += 1
+                    dlc_changed += 1
+
+            if dlc_changed:
+                print(f"   [+] 已合并 DLC 地图 ({dlc_id})，变更 {dlc_changed} 个 XML。")
+
+        print(
+            "   ✅ 地图 XML 蒸馏完成: "
+            f"base={stats['base_copied']}, "
+            f"dlc_added={stats['dlc_added']}, "
+            f"dlc_patched={stats['dlc_patched']}, "
+            f"dlc_overwritten={stats['dlc_overwritten']}"
+        )
+
     # --- 步骤 1: 拷贝语言包 (t/) ---
     if os.path.exists(os.path.join(src, "t")):
         shutil.copytree(os.path.join(src, "t"), os.path.join(dest_root, "t"))
-        print("✅ [1/9] 语言包已拷贝。")
+        print("✅ [1/10] 语言包已拷贝。")
 
     # 创建 index 输出目录
     index_dest_dir = os.path.join(dest_root, "index")
     os.makedirs(index_dest_dir, exist_ok=True)
 
     # --- 步骤 2: 处理 index/macros.xml ---
-    print("📂 [2/9] 正在处理 index/macros.xml...")
+    print("📂 [2/10] 正在处理 index/macros.xml...")
     macros_output_path = process_index_file(src, "macros.xml", "macros", dlc_order, index_dest_dir, parser)
 
     # --- 步骤 3: 处理 index/components.xml ---
-    print("📂 [3/9] 正在处理 index/components.xml...")
+    print("📂 [3/10] 正在处理 index/components.xml...")
     components_output_path = process_index_file(src, "components.xml", "components", dlc_order, index_dest_dir, parser)
 
-    # --- 步骤 4: 处理核心库文件 (wares/waregroups/colors/ships/shipgroups/loadouts) ---
-    print("📂 [4/9] 正在处理核心库文件 (Wares/Waregroups/Colors/Ships/Shipgroups/Loadouts)...")
+    distill_targeted_map_xml(
+        os.path.join("maps", "xu_ep2_universe"),
+        ["galaxy.xml", "clusters.xml", "sectors.xml", "zones.xml"],
+        ["galaxy.xml", "*clusters.xml", "*sectors.xml", "*zones.xml"]
+    )
+
+    # --- 步骤 5: 处理核心库文件 (wares/waregroups/colors/ships/shipgroups/loadouts) ---
+    print("📂 [5/10] 正在处理核心库文件 (Wares/Waregroups/Colors/Ships/Shipgroups/Loadouts)...")
     lib_dest_dir = os.path.join(dest_root, "libraries")
     os.makedirs(lib_dest_dir, exist_ok=True)
 
@@ -257,8 +349,8 @@ def main():
         base_tree.write(final_output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
         print(f"      ✨ 生成: {os.path.basename(final_output_path)}")
 
-    # --- 步骤 5: 聚合空间站宏定义 (module_macros.xml) ---
-    print("∑ [5/9] 正在聚合空间站宏定义 (module_macros.xml)...")
+    # --- 步骤 6: 聚合空间站宏定义 (module_macros.xml) ---
+    print("∑ [6/10] 正在聚合空间站宏定义 (module_macros.xml)...")
 
     # 5.1 解析引用 (Needed Macros)
     needed_macros = set()
@@ -362,7 +454,7 @@ def main():
         return processed
 
     # 5.4 导出 module_macros
-    print("∑ [5/10] 正在聚合空间站宏定义 (module_macros.xml)...")
+    print("∑ [6/10] 正在聚合空间站宏定义 (module_macros.xml)...")
     module_macros_path = os.path.join(lib_dest_dir, "module_macros.xml")
     processed_count = export_ids_to_file(needed_macros, macro_path_map, module_macros_path, 'macros', 'macro')
     print(f"✅ 聚合完成: 写入 {processed_count} 个宏定义到 module_macros.xml")
