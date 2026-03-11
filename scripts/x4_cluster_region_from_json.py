@@ -98,6 +98,12 @@ class LayoutConfig:
     top_pad: float = 70.0
 
 
+def layout_config(include_all: bool = False) -> LayoutConfig:
+    if include_all:
+        return LayoutConfig(width=3600.0, height=2600.0, pad_x=180.0, pad_y=180.0, top_pad=140.0)
+    return LayoutConfig()
+
+
 def pos_from(node: dict) -> Vec2:
     position = ((node or {}).get("offset") or {}).get("position") or {}
     return Vec2(float(position.get("x", 0.0)), float(position.get("z", 0.0)))
@@ -235,7 +241,13 @@ def is_display_zone(zone: Zone) -> bool:
     return not (name.startswith("tzone") or raw_name.startswith("tzone"))
 
 
-def select_region_clusters(clusters: Dict[str, Cluster]) -> List[str]:
+def select_region_clusters(clusters: Dict[str, Cluster], include_all: bool = False) -> List[str]:
+    if include_all:
+        return sorted(
+            clusters.keys(),
+            key=lambda macro: (cluster_id_from_macro(macro) is None, cluster_id_from_macro(macro) or 0, clusters[macro].name),
+        )
+
     region_macros: List[str] = []
     selected_ids = set(REGION_CLUSTER_IDS)
     for macro, cluster in clusters.items():
@@ -259,6 +271,25 @@ def fit_world_to_screen(points: Iterable[Vec2], cfg: LayoutConfig) -> Tuple[floa
     offset_x = cfg.pad_x + (available_w - world_w * scale) / 2.0
     offset_y = cfg.pad_y + cfg.top_pad + (available_h - world_h * scale) / 2.0
     return min_x, min_y, scale, offset_x, offset_y
+
+
+def scaled_layout_config(cfg: LayoutConfig, factor: float) -> LayoutConfig:
+    return LayoutConfig(
+        width=cfg.width * factor,
+        height=cfg.height * factor,
+        pad_x=cfg.pad_x * factor,
+        pad_y=cfg.pad_y * factor,
+        top_pad=cfg.top_pad * factor,
+    )
+
+
+def min_center_distance(centers: Dict[str, Tuple[float, float]]) -> float:
+    values = list(centers.values())
+    distances: List[float] = []
+    for idx, (x1, y1) in enumerate(values):
+        for x2, y2 in values[idx + 1 :]:
+            distances.append(math.hypot(x2 - x1, y2 - y1))
+    return min(distances, default=float('inf'))
 
 
 def cluster_center_screen(cluster: Cluster, fit: Tuple[float, float, float, float, float]) -> Tuple[float, float]:
@@ -500,9 +531,17 @@ def project_sector_local_points(
     for sector_macro, points in sector_points.items():
         if sector_macro not in sector_centers or not points:
             continue
-        max_extent = max((math.hypot(point.x, point.z) for _, point in points), default=1.0)
-        extent = sector_radii.get(sector_macro, 24.0) * extent_ratio
-        scale = extent / max(1.0, max_extent)
+        radius = sector_radii.get(sector_macro, 24.0)
+        scale_limit: Optional[float] = None
+        for _, point in points:
+            dx = point.x
+            dy = -point.z
+            if math.hypot(dx, dy) <= 1e-6:
+                continue
+            candidate = hex_boundary_distance(radius, dx, dy) * extent_ratio
+            if scale_limit is None or candidate < scale_limit:
+                scale_limit = candidate
+        scale = scale_limit if scale_limit is not None else 1.0
         cx, cy = sector_centers[sector_macro]
         for point_id, point in points:
             anchors[point_id] = (cx + point.x * scale, cy - point.z * scale)
@@ -581,14 +620,22 @@ def paired_cluster_edges(region_sector_macros: set[str], gates_by_sector: Dict[s
     return pairs
 
 
-def render_region(input_path: str, output: str) -> Dict[str, Tuple[float, float]]:
+def render_region(input_path: str, output: str, include_all: bool = False) -> Dict[str, Tuple[float, float]]:
     clusters, sectors, zones, gates_by_sector, highways = load_map_json(input_path)
-    region_macros = select_region_clusters(clusters)
+    region_macros = select_region_clusters(clusters, include_all=include_all)
     region_clusters = {macro: clusters[macro] for macro in region_macros}
     region_sector_macros = {sector.macro for sector in sectors.values() if sector.cluster_macro in region_clusters}
-    cfg = LayoutConfig()
+    cfg = layout_config(include_all=include_all)
     fit = fit_world_to_screen([cluster.pos for cluster in region_clusters.values()], cfg)
     cluster_centers = {macro: cluster_center_screen(cluster, fit) for macro, cluster in region_clusters.items()}
+    if include_all:
+        min_distance = min_center_distance(cluster_centers)
+        cluster_radius = compute_cluster_radius(cluster_centers)
+        required_distance = math.sqrt(3.0) * cluster_radius
+        if min_distance < required_distance:
+            cfg = scaled_layout_config(cfg, required_distance / min_distance)
+            fit = fit_world_to_screen([cluster.pos for cluster in region_clusters.values()], cfg)
+            cluster_centers = {macro: cluster_center_screen(cluster, fit) for macro, cluster in region_clusters.items()}
     cluster_radius = compute_cluster_radius(cluster_centers)
     sector_centers: Dict[str, Tuple[float, float]] = {}
     sector_radii: Dict[str, float] = {}
@@ -616,25 +663,20 @@ def render_region(input_path: str, output: str) -> Dict[str, Tuple[float, float]
             if left is None or right is None:
                 continue
             f.write(
-                f'  <line x1="{left[0]:.1f}" y1="{left[1]:.1f}" x2="{right[0]:.1f}" y2="{right[1]:.1f}" stroke="#e5e7eb" stroke-width="1.8" stroke-opacity="0.85" />\n'
+                f'  <line x1="{left[0]:.1f}" y1="{left[1]:.1f}" x2="{right[0]:.1f}" y2="{right[1]:.1f}" stroke="#e5e7eb" stroke-width="0.6" stroke-opacity="0.85" />\n'
             )
 
         for highway in highway_pairs:
-            left = zone_anchors.get(highway.zone_a_macro)
-            right = zone_anchors.get(highway.zone_b_macro)
             segments = highway_segments.get(highway.id)
-            if left is None or right is None or not segments:
+            if not segments:
                 continue
             for start, end in segments:
                 f.write(
-                    f'  <line x1="{start[0]:.1f}" y1="{start[1]:.1f}" x2="{end[0]:.1f}" y2="{end[1]:.1f}" stroke="#1d4ed8" stroke-width="2.0" stroke-opacity="0.95" />\n'
+                    f'  <line x1="{start[0]:.1f}" y1="{start[1]:.1f}" x2="{end[0]:.1f}" y2="{end[1]:.1f}" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />\n'
                 )
-            f.write(
-                f'  <circle cx="{left[0]:.1f}" cy="{left[1]:.1f}" r="3.6" fill="#1d4ed8" fill-opacity="0.95" stroke="#dbeafe" stroke-width="1.0" />\n'
-            )
-            f.write(
-                f'  <circle cx="{right[0]:.1f}" cy="{right[1]:.1f}" r="3.6" fill="#1d4ed8" fill-opacity="0.95" stroke="#dbeafe" stroke-width="1.0" />\n'
-            )
+                f.write(
+                    f'  <circle cx="{start[0]:.1f}" cy="{start[1]:.1f}" r="0.7" fill="#1d4ed8" fill-opacity="0.95" stroke="#dbeafe" stroke-width="0.4" />\n'
+                )
 
         for cluster_macro in region_macros:
             cluster = clusters[cluster_macro]
@@ -672,9 +714,9 @@ def render_region(input_path: str, output: str) -> Dict[str, Tuple[float, float]
                 anchor = gate_anchors.get(gate.id)
                 if anchor is None:
                     continue
-                radius = 4.8 if len([s for s in sectors.values() if s.cluster_macro == sector.cluster_macro]) == 1 else 4.2
+                radius = 1.1 if len([s for s in sectors.values() if s.cluster_macro == sector.cluster_macro]) == 1 else 0.8
                 f.write(
-                    f'  <circle cx="{anchor[0]:.1f}" cy="{anchor[1]:.1f}" r="{radius:.1f}" fill="{owner_color(cluster.owner)}" stroke="#ffffff" stroke-width="1.0" />\n'
+                    f'  <circle cx="{anchor[0]:.1f}" cy="{anchor[1]:.1f}" r="{radius:.1f}" fill="{owner_color(cluster.owner)}" stroke="#ffffff" stroke-width="0.3" />\n'
                 )
 
         f.write("</svg>\n")
@@ -686,9 +728,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Render a cluster-first region sample from src/assets/map.json.")
     parser.add_argument("--input", default=os.path.join("src", "assets", "map.json"))
     parser.add_argument("--output", default=os.path.join("docs", "x4_cluster_region_trial.svg"))
+    parser.add_argument("--all", action="store_true", help="Render all clusters in map.json instead of the trial region.")
     args = parser.parse_args()
 
-    centers = render_region(args.input, args.output)
+    centers = render_region(args.input, args.output, include_all=args.all)
     print(f"Output: {args.output}")
     for macro, (x, y) in centers.items():
         print(f"{macro} {x:.1f} {y:.1f}")
