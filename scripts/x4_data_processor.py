@@ -5,6 +5,17 @@ import glob
 import sys
 import re
 from collections import defaultdict
+from pathlib import Path
+
+try:
+    import x4_data_map_processor
+except ModuleNotFoundError:
+    from scripts import x4_data_map_processor  # type: ignore
+
+try:
+    from processor.i18n import get_i18n_registry
+except ModuleNotFoundError:
+    from scripts.processor.i18n import get_i18n_registry  # type: ignore
 
 # =============================================================================
 # ⚙️ 项目配置
@@ -22,6 +33,13 @@ with open(config_file, 'r', encoding='utf-8') as f:
 # 考虑 distiller 生成的版本号子目录
 X4_UNPACKED_DATA_PATH = os.path.join(_config['raw_assets_dir'], _config['folder_name'])
 OUTPUT_VERSION_DIR = os.path.join(_config['processed_assets_dir'], _config['folder_name'])
+MAP_OUTPUT_JSON = str(Path(OUTPUT_VERSION_DIR) / "data" / "maps.json")
+MAP_DEFAULTS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "mapdefaults_final.xml")
+MAP_GOD_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "god_final.xml")
+MAP_FACTIONS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "factions_final.xml")
+MAP_COLORS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "colors_final.xml")
+MAP_FACTIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "factions.json")
+MAP_DIR = str(Path(X4_UNPACKED_DATA_PATH) / "maps" / "xu_ep2_universe")
 
 X4_LANG_CONFIG = {
     '044': {'iso': 'en',    'name': 'English'},
@@ -106,6 +124,8 @@ class X4PrecisionLoader:
 
         # 收集需要翻译的原始名称 (Raw Key)
         self.needed_raw_names = set()
+        self.i18n_registry = get_i18n_registry()
+        self.i18n_registry.configure(self.raw_path, X4_LANG_CONFIG)
 
         if not os.path.exists(self.raw_path):
             print(f"❌ 错误: 找不到解包目录: {self.raw_path}")
@@ -2125,135 +2145,68 @@ class X4PrecisionLoader:
     # =======================================================
     # 3. 语言提取 (Backend Translation)
     # =======================================================
+    def process_map_data(self):
+        print(f"\n🗺️ [2.5/5] 生成地图数据并合并 nameId...")
+        factions_rows, factions_by_id = x4_data_map_processor.migrate_factions(
+            factions_xml_path=Path(MAP_FACTIONS_XML),
+            colors_xml_path=Path(MAP_COLORS_XML),
+            i18n_registry=self.i18n_registry,
+        )
+        Path(MAP_FACTIONS_OUTPUT).parent.mkdir(parents=True, exist_ok=True)
+        Path(MAP_FACTIONS_OUTPUT).write_text(json.dumps(factions_rows, ensure_ascii=False, indent=2), encoding="utf-8")
+        result = x4_data_map_processor.generate_map_data(
+            map_dir=Path(MAP_DIR),
+            mapdefaults_path=Path(MAP_DEFAULTS_XML),
+            god_xml_path=Path(MAP_GOD_XML),
+            factions_by_id=factions_by_id,
+            i18n_registry=self.i18n_registry,
+        )
+        x4_data_map_processor.write_map_output(result["payload"], Path(MAP_OUTPUT_JSON))
+        map_name_ids = set(result.get("name_ids", []))
+        self.needed_raw_names.update(map_name_ids)
+        self.i18n_registry.collect_many(map_name_ids)
+        missing = result.get("missing_name_ids", {})
+        ties = result.get("owner_resolution_ties", [])
+        print(f"   ✅ factions json: {MAP_FACTIONS_OUTPUT} ({len(factions_rows)})")
+        print(f"   ✅ map nameId merged: {len(map_name_ids)}")
+        print(f"   ✅ map json: {MAP_OUTPUT_JSON}")
+        print(f"   ℹ️ owner resolution ties: {len(ties)}")
+        print(f"   ℹ️ map missing cluster nameId: {len(missing.get('clusters', []))}")
+        print(f"   ℹ️ map missing sector nameId: {len(missing.get('sectors', []))}")
+
     def extract_and_resolve_languages(self):
         print(f"\n🌍 [3/5] 构建翻译数据库...")
-        t_path = os.path.join(self.raw_path, "t")
-        
+        self.i18n_registry.collect_many(self.needed_raw_names)
+
         for x4_id, conf in X4_LANG_CONFIG.items():
             iso = conf['iso']
-            self.i18n_data[iso] = {}
-            target_name = f"0001-L{x4_id}.xml"
-            t_file = os.path.join(t_path, target_name)
+            exported = self.i18n_registry.export_collected(iso)
+            self.i18n_data[iso] = exported
+            if not exported:
+                continue
+
+            t_file = os.path.join(self.raw_path, "t", f"0001-L{x4_id}.xml")
             if not os.path.exists(t_file):
-                t_file = os.path.join(t_path, f"0001-l{x4_id}.xml")
-            
-            # A. 加载查找表
-            current_lang_db = {}
-            def load_xml(path):
-                if os.path.exists(path):
-                    try:
-                        tree = ET.parse(path)
-                        root = tree.getroot()
-                        for page in root.findall('page'):
-                            p_id = page.get('id')
-                            if not p_id: continue
-                            if p_id not in current_lang_db: current_lang_db[p_id] = {}
-                            for t in page.findall('t'):
-                                current_lang_db[p_id][t.get('id')] = "".join(t.itertext())
-                        return True
-                    except: return False
-                return False
+                t_file = os.path.join(self.raw_path, "t", f"0001-l{x4_id}.xml")
 
-            has_file = load_xml(t_file)
-            if not has_file and x4_id == '044':
-                load_xml(os.path.join(t_path, "0001.xml"))
-
-            if not current_lang_db: continue
-
-            if iso == 'en' and not self.ship_type_name_map:
+            if iso == 'en' and not self.ship_type_name_map and os.path.exists(t_file):
                 self.ship_type_name_map = self._load_ship_types_from_locale(t_file)
                 self._build_ship_type_key_map()
-            if iso == 'en' and not self.equipment_type_name_map:
+            if iso == 'en' and not self.equipment_type_name_map and os.path.exists(t_file):
                 self.equipment_type_name_map = self._load_equipment_types_from_locale(t_file)
                 self._build_equipment_type_key_map()
-            if iso == 'en' and not self.slot_tag_name_map:
+            if iso == 'en' and not self.slot_tag_name_map and os.path.exists(t_file):
                 self.slot_tag_name_map = self._load_slot_tags_from_locale(t_file)
                 self._build_slot_tag_key_map()
 
-            # B. 递归清洗
-            resolved_count = 0
-            for raw_name in self.needed_raw_names:
-                final_text = self._resolve_name(raw_name, current_lang_db)
-                if final_text:
-                    self.i18n_data[iso][raw_name] = final_text
-                    resolved_count += 1
-            
-            print(f"  ✅ [Done]  {iso:6} ({x4_id}) -> {resolved_count} 条")
-            if iso == 'en':
+            print(f"  ✅ [Done]  {iso:6} ({x4_id}) -> {len(exported)} 条")
+            if iso == 'en' and os.path.exists(t_file):
                 self.ship_type_name_map = self._load_ship_types_from_locale(t_file)
                 self.equipment_type_name_map = self._load_equipment_types_from_locale(t_file)
                 self.slot_tag_name_map = self._load_slot_tags_from_locale(t_file)
 
     def _resolve_name(self, raw_name, lang_db, depth=0):
-        if not raw_name or depth > 5: return raw_name
-        strip_parenthetical = re.search(r"\{\s*\d+\s*,\s*\d+\s*\}", raw_name) is not None
-        text = raw_name.replace("\\(", "(").replace("\\)", ")")
-        def replace_callback(match):
-            page, tid = match.group(1), match.group(2)
-            if page in lang_db and tid in lang_db[page]:
-                return self._resolve_name(lang_db[page][tid], lang_db, depth + 1)
-            return match.group(0)
-        text = re.sub(r"\{\s*(\d+)\s*,\s*(\d+)\s*\}", replace_callback, text)
-        if strip_parenthetical:
-            text = self._strip_parenthetical(text)
-        text = text.replace("\\", " ")
-        if strip_parenthetical:
-            text = self._strip_leading_duplicate_parenthetical(text)
-        return re.sub(r"\s+", " ", text).strip()
-
-    def _strip_parenthetical(self, text):
-        if not text:
-            return text
-        depth = 0
-        out = []
-        for ch in text:
-            if ch == "(":
-                depth += 1
-                continue
-            if ch == ")":
-                if depth > 0:
-                    depth -= 1
-                continue
-            if depth == 0:
-                out.append(ch)
-        return "".join(out)
-
-    def _strip_leading_duplicate_parenthetical(self, text):
-        if not text:
-            return text
-        text = text.strip()
-        if not (text.startswith("(") or text.startswith("（")):
-            return text
-        open_ch = "(" if text.startswith("(") else "（"
-        close_ch = ")" if open_ch == "(" else "）"
-        depth = 0
-        end_idx = None
-        for idx, ch in enumerate(text):
-            if ch == open_ch:
-                depth += 1
-            elif ch == close_ch:
-                depth -= 1
-                if depth == 0:
-                    end_idx = idx
-                    break
-        if end_idx is None:
-            return text
-        inner = text[1:end_idx].strip()
-        rest = text[end_idx + 1:].strip()
-        if not rest:
-            return text
-        def normalize(s):
-            return re.sub(r"\s+", " ", s).strip()
-        if normalize(inner) == normalize(rest):
-            return rest
-        # If prefix is Latin and suffix is CJK, drop the prefix.
-        if re.search(r"[A-Za-z]", inner) and re.search(r"[\u4e00-\u9fff]", rest):
-            return rest
-        # If there's a leading parenthetical label and then more text, drop the label.
-        # Common in name templates like "(Name){...}{...}" where the real name is after.
-        if re.search(r"[A-Za-z0-9\u4e00-\u9fff]", rest):
-            return rest
-        return text
+        return self.i18n_registry.get_name(raw_name, "en")
 
     def _load_ship_types_from_locale(self, t_file):
         if not t_file or not os.path.exists(t_file):
@@ -2709,6 +2662,7 @@ if __name__ == "__main__":
     loader._build_missiles()
     loader._build_drones_and_consumables()
     loader._build_bullets()
+    loader.process_map_data()
     loader.extract_and_resolve_languages()
     loader.analyze_ship_types()
     loader.analyze_equipment_types()

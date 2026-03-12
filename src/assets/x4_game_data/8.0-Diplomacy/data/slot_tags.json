@@ -2,37 +2,37 @@
   {
     "id": "standard",
     "nameId": "{20228,101}",
-    "name": "Standard",
+    "name": "{20228,101}",
     "count": 3285
   },
   {
     "id": "advanced",
     "nameId": "{20228,801}",
-    "name": "Advanced",
+    "name": "{20228,801}",
     "count": 432
   },
   {
     "id": "xenon",
     "nameId": "{20228,701}",
-    "name": "Xenon",
+    "name": "{20228,701}",
     "count": 89
   },
   {
     "id": "mining",
     "nameId": "{20228,301}",
-    "name": "Mining",
+    "name": "{20228,301}",
     "count": 120
   },
   {
     "id": "missile",
     "nameId": "{20228,201}",
-    "name": "Missile",
+    "name": "{20228,201}",
     "count": 1327
   },
   {
     "id": "highpower",
     "nameId": "{20228,401}",
-    "name": "High-Energy",
+    "name": "{20228,401}",
     "count": 30
   }
 ]

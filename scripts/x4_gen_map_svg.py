@@ -2,6 +2,7 @@ import argparse
 import json
 import math
 import os
+import re
 from pathlib import Path
 from typing import Dict, Iterable, List, Tuple
 
@@ -15,27 +16,7 @@ OUTPUT_VERSION_DIR = os.path.join(_config['processed_assets_dir'], _config['fold
 DEFAULT_INPUT = str(Path(OUTPUT_VERSION_DIR) / 'data' / 'maps.json')
 DEFAULT_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / 'data' / 'maps.svg')
 
-OWNER_COLORS = {
-    "teladi": "#c6c000",
-    "argon": "#0077cc",
-    "antigone": "#00e5ff",
-    "boron": "#63b3ff",
-    "terran": "#2f7fd3",
-    "pioneers": "#7ec8ff",
-    "split": "#c00000",
-    "freesplit": "#b26b00",
-    "holyorder": "#b000b8",
-    "paranid": "#d100d1",
-    "hatikvah": "#7a4ea3",
-    "kaori": "#8a6ad9",
-    "loanshark": "#c58f00",
-    "riptide": "#c58f00",
-    "xenon": "#9a0000",
-    "neutral": "#4b5563",
-    "ownerless": "#4b5563",
-    "scaleplate": "#4b5563",
-    "scavenger": "#4b5563",
-}
+FALLBACK_OWNER_COLOR = "#94a3b8"
 
 REGION_CLUSTER_IDS = [29, 501, 502, 503, 500, 704, 2, 3, 39, 1, 5, 6, 740, 725, 4, 47]
 
@@ -55,8 +36,8 @@ def layout_config(include_all: bool = True) -> LayoutConfig:
     return LayoutConfig()
 
 
-def owner_color(owner: str) -> str:
-    return OWNER_COLORS.get(owner, "#94a3b8")
+def resolve_owner_color(node: dict) -> str:
+    return node.get("owner_color") or FALLBACK_OWNER_COLOR
 
 
 def hex_points(cx: float, cy: float, radius: float) -> str:
@@ -76,6 +57,100 @@ def hex_vertices(cx: float, cy: float, radius: float) -> List[Tuple[float, float
         py = cy + radius * math.sin(angle)
         vertices.append((px, py))
     return vertices
+
+
+def svg_id_safe(value: str) -> str:
+    return re.sub(r"[^a-zA-Z0-9_-]", "_", value)
+
+
+def sector_clip_id(cluster_id: str, sector_id: str) -> str:
+    return f"sector-clip-{svg_id_safe(cluster_id)}-{svg_id_safe(sector_id)}"
+
+
+def catmull_rom_to_bezier_path(points: List[Tuple[float, float]]) -> str:
+    if len(points) < 2:
+        return ""
+    if len(points) == 2:
+        return f"M {points[0][0]:.1f},{points[0][1]:.1f} L {points[1][0]:.1f},{points[1][1]:.1f}"
+
+    path_parts: List[str] = [f"M {points[0][0]:.1f},{points[0][1]:.1f}"]
+    count = len(points)
+    for index in range(count - 1):
+        p0 = points[index - 1] if index - 1 >= 0 else points[index]
+        p1 = points[index]
+        p2 = points[index + 1]
+        p3 = points[index + 2] if index + 2 < count else points[index + 1]
+        c1x = p1[0] + (p2[0] - p0[0]) / 6.0
+        c1y = p1[1] + (p2[1] - p0[1]) / 6.0
+        c2x = p2[0] - (p3[0] - p1[0]) / 6.0
+        c2y = p2[1] - (p3[1] - p1[1]) / 6.0
+        path_parts.append(
+            f"C {c1x:.1f},{c1y:.1f} {c2x:.1f},{c2y:.1f} {p2[0]:.1f},{p2[1]:.1f}"
+        )
+    return " ".join(path_parts)
+
+
+def build_highway_path_points(
+    start: Tuple[float, float],
+    end: Tuple[float, float],
+    middle_points: List[Tuple[float, float]],
+    eps: float = 0.1,
+) -> List[Tuple[float, float]]:
+    points: List[Tuple[float, float]] = [start]
+    for point in middle_points:
+        if math.hypot(point[0] - start[0], point[1] - start[1]) <= eps:
+            continue
+        if math.hypot(point[0] - end[0], point[1] - end[1]) <= eps:
+            continue
+        points.append(point)
+    points.append(end)
+
+    deduped: List[Tuple[float, float]] = []
+    for point in points:
+        if not deduped:
+            deduped.append(point)
+            continue
+        prev = deduped[-1]
+        if math.hypot(point[0] - prev[0], point[1] - prev[1]) > eps:
+            deduped.append(point)
+    return deduped
+
+
+def sector_ratio_to_cluster_ratio(
+    sector_norm: dict,
+    local_ratio: dict,
+) -> Tuple[float, float] | None:
+    if not local_ratio:
+        return None
+    center_ratio = sector_norm.get("center_offset_ratio")
+    sector_radius_ratio = sector_norm.get("sector_radius_ratio")
+    if not center_ratio or sector_radius_ratio is None:
+        return None
+    return (
+        center_ratio["x"] + local_ratio["x"] * sector_radius_ratio,
+        center_ratio["y"] + local_ratio["y"] * sector_radius_ratio,
+    )
+
+
+def cluster_ratio_to_screen(
+    cx: float,
+    cy: float,
+    cluster_radius: float,
+    cluster_ratio: Tuple[float, float],
+) -> Tuple[float, float]:
+    return (
+        cx + cluster_ratio[0] * cluster_radius,
+        cy + cluster_ratio[1] * cluster_radius,
+    )
+
+
+def gate_cluster_ratio_from_raw(gate: dict, sector_norm: dict) -> Tuple[float, float] | None:
+    raw = gate.get("raw_local_pos", {})
+    sx = raw.get("sx")
+    sy = raw.get("sy")
+    if sx is None or sy is None:
+        return None
+    return sector_ratio_to_cluster_ratio(sector_norm, {"x": sx, "y": sy})
 
 
 def clip_segment_to_convex_polygon(
@@ -201,12 +276,24 @@ def render_from_maps_json(input_path: str, output_path: str, include_all: bool =
         f.write(
             f'<svg xmlns="http://www.w3.org/2000/svg" width="{int(cfg.width)}" height="{int(cfg.height)}" viewBox="0 0 {cfg.width:.1f} {cfg.height:.1f}">\n'
             f'  <rect width="100%" height="100%" fill="#050505" />\n'
-            f'  <text x="28" y="40" font-size="24" font-family="Consolas, \'Courier New\', monospace" fill="#e5e7eb">Universe Map from maps.json</text>\n'
         )
+        f.write('  <defs>\n')
+        for cluster_id in region_ids:
+            cluster = clusters[cluster_id]
+            cx, cy = cluster_centers[cluster_id]
+            for sector in cluster.get("sectors", {}).values():
+                sx = cx + sector['normalized']['center_offset_ratio']['x'] * cluster_radius
+                sy = cy + sector['normalized']['center_offset_ratio']['y'] * cluster_radius
+                sector_radius = sector['normalized']['sector_radius_ratio'] * cluster_radius
+                clip_id = sector_clip_id(cluster_id, sector["id"])
+                f.write(
+                    f'    <clipPath id="{clip_id}"><polygon points="{hex_points(sx, sy, sector_radius)}" /></clipPath>\n'
+                )
+        f.write('  </defs>\n')
 
         for cluster_id in region_ids:
             cluster = clusters[cluster_id]
-            color = owner_color(cluster.get('owner', 'neutral'))
+            color = resolve_owner_color(cluster)
             cx, cy = cluster_centers[cluster_id]
             sectors = cluster['sectors']
 
@@ -225,39 +312,17 @@ def render_from_maps_json(input_path: str, output_path: str, include_all: bool =
                 sector_b = sectors[sector_b_id]
                 from_anchor = sector_a.get('shcon_anchors', {}).get(from_zone_id)
                 to_anchor = sector_b.get('shcon_anchors', {}).get(to_zone_id)
-                start_point = from_anchor.get('render', {}).get('cluster_ratio_point') if from_anchor else None
-                end_point = to_anchor.get('render', {}).get('cluster_ratio_point') if to_anchor else None
-                if not start_point or not end_point:
+                from_raw = from_anchor.get('raw_sector_pos') if from_anchor else None
+                to_raw = to_anchor.get('raw_sector_pos') if to_anchor else None
+                from_local_ratio = {"x": from_raw["sx"], "y": from_raw["sy"]} if from_raw and "sx" in from_raw and "sy" in from_raw else None
+                to_local_ratio = {"x": to_raw["sx"], "y": to_raw["sy"]} if to_raw and "sx" in to_raw and "sy" in to_raw else None
+                start_cluster_ratio = sector_ratio_to_cluster_ratio(sector_a.get("normalized", {}), from_local_ratio)
+                end_cluster_ratio = sector_ratio_to_cluster_ratio(sector_b.get("normalized", {}), to_local_ratio)
+                if not start_cluster_ratio or not end_cluster_ratio:
                     continue
-                sa_center = (
-                    cx + sector_a['normalized']['center_offset_ratio']['x'] * cluster_radius,
-                    cy + sector_a['normalized']['center_offset_ratio']['y'] * cluster_radius,
-                )
-                sb_center = (
-                    cx + sector_b['normalized']['center_offset_ratio']['x'] * cluster_radius,
-                    cy + sector_b['normalized']['center_offset_ratio']['y'] * cluster_radius,
-                )
-                start = (
-                    cx + start_point['x'] * cluster_radius,
-                    cy + start_point['y'] * cluster_radius,
-                )
-                end = (
-                    cx + end_point['x'] * cluster_radius,
-                    cy + end_point['y'] * cluster_radius,
-                )
-                mid = ((sa_center[0] + sb_center[0]) / 2.0, (sa_center[1] + sb_center[1]) / 2.0)
-                dx = sb_center[0] - sa_center[0]
-                dy = sb_center[1] - sa_center[1]
-                length = math.hypot(dx, dy) or 1.0
-                nx = -dy / length
-                ny = dx / length
-                render = link.get('render', {})
-                lane_count = max(1, int(render.get('lane_count', 1)))
-                lane_index = int(render.get('lane_index', 0))
-                lane_offset = (lane_index - (lane_count - 1) / 2.0) * 2.2
-                seam = (mid[0] + nx * lane_offset, mid[1] + ny * lane_offset)
-                f.write(f'  <line x1="{start[0]:.1f}" y1="{start[1]:.1f}" x2="{seam[0]:.1f}" y2="{seam[1]:.1f}" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />\n')
-                f.write(f'  <line x1="{end[0]:.1f}" y1="{end[1]:.1f}" x2="{seam[0]:.1f}" y2="{seam[1]:.1f}" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />\n')
+                start = cluster_ratio_to_screen(cx, cy, cluster_radius, start_cluster_ratio)
+                end = cluster_ratio_to_screen(cx, cy, cluster_radius, end_cluster_ratio)
+                f.write(f'  <line x1="{start[0]:.1f}" y1="{start[1]:.1f}" x2="{end[0]:.1f}" y2="{end[1]:.1f}" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />\n')
                 f.write(f'  <circle cx="{start[0]:.1f}" cy="{start[1]:.1f}" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />\n')
                 f.write(f'  <circle cx="{end[0]:.1f}" cy="{end[1]:.1f}" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />\n')
 
@@ -267,24 +332,57 @@ def render_from_maps_json(input_path: str, output_path: str, include_all: bool =
                 sector_radius = sector['normalized']['sector_radius_ratio'] * cluster_radius
                 sector_hex = hex_vertices(sx, sy, sector_radius)
                 for highway in sector.get("highways", {}).values():
-                    render = highway.get("render", {})
-                    a_ratio = render.get("a_cluster_ratio")
-                    b_ratio = render.get("b_cluster_ratio")
-                    if not a_ratio or not b_ratio:
+                    sector_norm = sector.get("normalized", {})
+                    center_ratio = sector_norm.get("center_offset_ratio", {"x": 0.0, "y": 0.0})
+                    sector_radius_ratio = float(sector_norm.get("sector_radius_ratio", 1.0))
+                    entry_point = highway.get("entry")
+                    exit_point = highway.get("exit")
+                    if not entry_point or not exit_point:
                         continue
-                    p0 = (
-                        cx + a_ratio["x"] * cluster_radius,
-                        cy + a_ratio["y"] * cluster_radius,
-                    )
-                    p1 = (
-                        cx + b_ratio["x"] * cluster_radius,
-                        cy + b_ratio["y"] * cluster_radius,
-                    )
-                    clipped = clip_segment_to_convex_polygon(p0, p1, sector_hex)
-                    if clipped is None:
+                    if "sx" not in entry_point or "sy" not in entry_point or "sx" not in exit_point or "sy" not in exit_point:
                         continue
-                    (x1, y1), (x2, y2) = clipped
-                    f.write(f'  <line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />\n')
+                    start_cluster_ratio = (
+                        center_ratio["x"] + entry_point["sx"] * sector_radius_ratio,
+                        center_ratio["y"] + entry_point["sy"] * sector_radius_ratio,
+                    )
+                    end_cluster_ratio = (
+                        center_ratio["x"] + exit_point["sx"] * sector_radius_ratio,
+                        center_ratio["y"] + exit_point["sy"] * sector_radius_ratio,
+                    )
+                    start = (
+                        cx + start_cluster_ratio[0] * cluster_radius,
+                        cy + start_cluster_ratio[1] * cluster_radius,
+                    )
+                    end = (
+                        cx + end_cluster_ratio[0] * cluster_radius,
+                        cy + end_cluster_ratio[1] * cluster_radius,
+                    )
+                    spline_points = highway.get("spline", [])
+                    middle_points: List[Tuple[float, float]] = []
+                    for point in spline_points:
+                        if "sx" not in point or "sy" not in point:
+                            continue
+                        cluster_ratio_x = center_ratio["x"] + point["sx"] * sector_radius_ratio
+                        cluster_ratio_y = center_ratio["y"] + point["sy"] * sector_radius_ratio
+                        middle_points.append(
+                            (
+                                cx + cluster_ratio_x * cluster_radius,
+                                cy + cluster_ratio_y * cluster_radius,
+                            )
+                        )
+                    path_points = build_highway_path_points(start, end, middle_points)
+                    clip_id = sector_clip_id(cluster_id, sector["id"])
+                    if len(path_points) >= 3:
+                        path_d = catmull_rom_to_bezier_path(path_points)
+                        f.write(
+                            f'  <path d="{path_d}" clip-path="url(#{clip_id})" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />\n'
+                        )
+                    else:
+                        clipped = clip_segment_to_convex_polygon(start, end, sector_hex)
+                        if clipped is None:
+                            continue
+                        (x1, y1), (x2, y2) = clipped
+                        f.write(f'  <line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />\n')
 
 
             if len(sectors) == 1:
@@ -295,24 +393,25 @@ def render_from_maps_json(input_path: str, output_path: str, include_all: bool =
             else:
                 f.write(f'  <polygon points="{hex_points(cx, cy, cluster_radius)}" fill="none" stroke="{color}" stroke-width="2.8" stroke-opacity="0.95" />\n')
                 for sector in sectors.values():
+                    sector_color = resolve_owner_color(sector)
                     sx = cx + sector['normalized']['center_offset_ratio']['x'] * cluster_radius
                     sy = cy + sector['normalized']['center_offset_ratio']['y'] * cluster_radius
                     radius = sector['normalized']['sector_radius_ratio'] * cluster_radius
-                    f.write(f'  <polygon points="{hex_points(sx, sy, radius)}" fill="{color}" fill-opacity="0.08" stroke="{color}" stroke-width="2.2" stroke-opacity="0.9" />\n')
+                    f.write(f'  <polygon points="{hex_points(sx, sy, radius)}" fill="{sector_color}" fill-opacity="0.08" stroke="{sector_color}" stroke-width="2.2" stroke-opacity="0.9" />\n')
                     f.write(f'  <text x="{sx:.1f}" y="{sy - radius * 0.72:.1f}" text-anchor="middle" font-size="14" font-family="Consolas, \'Courier New\', monospace" fill="#f8fafc">{sector["name"]}</text>\n')
 
             for sector in sectors.values():
+                sector_color = resolve_owner_color(sector)
                 sx = cx + sector['normalized']['center_offset_ratio']['x'] * cluster_radius
                 sy = cy + sector['normalized']['center_offset_ratio']['y'] * cluster_radius
                 radius = sector['normalized']['sector_radius_ratio'] * cluster_radius
                 for gate in sector.get('cluster_gates', {}).values():
-                    point = gate.get('render', {}).get('cluster_ratio_point')
-                    if not point:
+                    cluster_ratio = gate_cluster_ratio_from_raw(gate, sector.get("normalized", {}))
+                    if not cluster_ratio:
                         continue
-                    gx = cx + point['x'] * cluster_radius
-                    gy = cy + point['y'] * cluster_radius
+                    gx, gy = cluster_ratio_to_screen(cx, cy, cluster_radius, cluster_ratio)
                     r = 1.1 if len(sectors) == 1 else 0.8
-                    f.write(f'  <circle cx="{gx:.1f}" cy="{gy:.1f}" r="{r:.1f}" fill="{color}" stroke="#ffffff" stroke-width="0.3" />\n')
+                    f.write(f'  <circle cx="{gx:.1f}" cy="{gy:.1f}" r="{r:.1f}" fill="{sector_color}" stroke="#ffffff" stroke-width="0.3" />\n')
 
         # cross-cluster gate lines
         gate_index = {}
@@ -323,13 +422,14 @@ def render_from_maps_json(input_path: str, output_path: str, include_all: bool =
                 sx = cx + sector['normalized']['center_offset_ratio']['x'] * cluster_radius
                 sy = cy + sector['normalized']['center_offset_ratio']['y'] * cluster_radius
                 for gate_id, gate in sector.get('cluster_gates', {}).items():
-                    point = gate.get('render', {}).get('cluster_ratio_point')
-                    if not point:
+                    cluster_ratio = gate_cluster_ratio_from_raw(gate, sector.get("normalized", {}))
+                    if not cluster_ratio:
                         continue
-                    gate_index[gate_id] = {
+                    gate_key = gate.get('id') or gate_id
+                    gate_index[gate_key] = {
                         'cluster_id': cluster_id,
                         'target_cluster_id': gate.get('target_cluster_id'),
-                        'point': (cx + point['x'] * cluster_radius, cy + point['y'] * cluster_radius),
+                        'point': cluster_ratio_to_screen(cx, cy, cluster_radius, cluster_ratio),
                     }
 
         used = set()
