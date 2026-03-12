@@ -6,8 +6,8 @@ import mapsData from '@/assets/x4_game_data/8.0-Diplomacy/data/maps.json'
 import regionYieldsData from '@/assets/x4_game_data/8.0-Diplomacy/data/regionyields.json'
 import {
   buildDefaultResourceFilters,
-  buildResourceCandidates,
   buildYieldRanksByWare,
+  getContextReachableMaxYieldName,
   getSelectedResourceIds,
   getSharedMinYieldName,
   isSectorMatchedByResources,
@@ -26,6 +26,19 @@ type SearchSectorLayout = {
 }
 
 type ResourceEntry = RegionYieldEntry & { color?: string }
+type FilterSectorCandidate = {
+  sectorId: string
+  name: string
+  displayName: string
+  resources: SectorResourceEntry[]
+  sunlight: number
+}
+type ResourceCatalogItem = {
+  ware: string
+  color: string
+  yields: string[]
+  kind: 'ware' | 'sunlight'
+}
 
 const props = defineProps<{
   sectorLayouts: SearchSectorLayout[]
@@ -46,6 +59,10 @@ const regionYields = regionYieldsData as ResourceEntry[]
 const yieldRanksByWare = buildYieldRanksByWare(regionYields)
 const resourceFilters = ref(buildDefaultResourceFilters(regionYields))
 const RESOURCE_ORDER = ['ore', 'silicon', 'methane', 'hydrogen', 'helium', 'ice', 'rawscrap', 'nividium'] as const
+const SUNLIGHT_FILTER_ID = 'sunlight'
+const SUNLIGHT_COLOR = '#F7D24B'
+const sunlightFilterEnabled = ref(false)
+const sunlightMinimum = ref(100)
 
 const toRgba = (hex: string | undefined, alpha: number) => {
   if (!hex || !hex.startsWith('#') || hex.length !== 7) return `rgba(251, 191, 36, ${alpha})`
@@ -72,64 +89,109 @@ const formatYieldLabel = (yieldName: string) => {
     .replace(/^./, (char) => char.toUpperCase())
 }
 
-const resourceCatalog = computed(() =>
-  RESOURCE_ORDER
+const resourceCatalog = computed<ResourceCatalogItem[]>(() => [
+  ...RESOURCE_ORDER
     .map((wareId) => regionYields.find((entry) => entry.ware === wareId))
     .filter((entry): entry is ResourceEntry => Boolean(entry))
     .map((entry) => ({
       ware: entry.ware,
       color: entry.color || '#fbbf24',
-      yields: entry.yields.map((item) => item.name)
-    }))
-)
+      yields: entry.yields.map((item) => item.name),
+      kind: 'ware' as const
+    })),
+  {
+    ware: SUNLIGHT_FILTER_ID,
+    color: SUNLIGHT_COLOR,
+    yields: [],
+    kind: 'sunlight' as const
+  }
+])
 
-const resourceMapById = computed<Record<string, SectorResourceEntry[]>>(() => {
-  const out: Record<string, SectorResourceEntry[]> = {}
+const sectorDataById = computed<Record<string, { resources: SectorResourceEntry[]; sunlight: number }>>(() => {
+  const out: Record<string, { resources: SectorResourceEntry[]; sunlight: number }> = {}
   const clusters = (mapsData as { clusters?: Record<string, any> }).clusters || {}
   Object.values(clusters).forEach((cluster) => {
     Object.values(cluster.sectors || {}).forEach((sector: any) => {
-      out[sector.id] = Array.isArray(sector.resources) ? sector.resources : []
+      out[sector.id] = {
+        resources: Array.isArray(sector.resources) ? sector.resources : [],
+        sunlight: Math.round(Number(sector.area?.sunlight || 0) * 100)
+      }
     })
   })
   return out
 })
 
-const sectorCandidates = computed(() =>
+const sectorCandidates = computed<FilterSectorCandidate[]>(() =>
   props.sectorLayouts.map((layout) => ({
     sectorId: layout.sectorId,
     name: layout.name,
     displayName: layout.displayName,
-    resources: resourceMapById.value[layout.sectorId] || []
+    resources: sectorDataById.value[layout.sectorId]?.resources || [],
+    sunlight: sectorDataById.value[layout.sectorId]?.sunlight || 0
   }))
 )
 
-const selectedResourceIds = computed(() => getSelectedResourceIds(resourceFilters.value))
-const showBatchYieldControl = computed(() => selectedResourceIds.value.length >= 2)
-const sharedMinYieldName = computed(() => getSharedMinYieldName(selectedResourceIds.value, resourceFilters.value))
+const selectedWareIds = computed(() => getSelectedResourceIds(resourceFilters.value))
+const selectedFilterIds = computed(() =>
+  sunlightFilterEnabled.value ? [...selectedWareIds.value, SUNLIGHT_FILTER_ID] : [...selectedWareIds.value]
+)
+const showBatchYieldControl = computed(() => selectedWareIds.value.length >= 2)
+const sharedMinYieldName = computed(() => getSharedMinYieldName(selectedWareIds.value, resourceFilters.value))
+const reachableMaxByWare = computed<Record<string, string | null>>(() =>
+  selectedWareIds.value.reduce<Record<string, string | null>>((acc, wareId) => {
+    const sectorsWithinSunlight = sunlightFilterEnabled.value
+      ? sectorCandidates.value.filter((sector) => sector.sunlight >= sunlightMinimum.value)
+      : sectorCandidates.value
+    acc[wareId] = getContextReachableMaxYieldName(wareId, sectorsWithinSunlight, resourceFilters.value, yieldRanksByWare)
+    return acc
+  }, {})
+)
 
-const matchedSectorIds = computed(() => {
-  if (!selectedResourceIds.value.length) return [] as string[]
+const filteredSectorCandidates = computed(() => {
+  if (!selectedFilterIds.value.length) return [] as FilterSectorCandidate[]
   return sectorCandidates.value
-    .filter((sector) => isSectorMatchedByResources(sector, resourceFilters.value, yieldRanksByWare))
-    .map((sector) => sector.sectorId)
+    .filter((sector) => {
+      if (sunlightFilterEnabled.value && sector.sunlight < sunlightMinimum.value) return false
+      if (!selectedWareIds.value.length) return true
+      return isSectorMatchedByResources(sector, resourceFilters.value, yieldRanksByWare)
+    })
 })
 
+const matchedSectorIds = computed(() => filteredSectorCandidates.value.map((sector) => sector.sectorId))
+
 const resourceCandidates = computed(() =>
-  buildResourceCandidates(sectorCandidates.value, resourceFilters.value, yieldRanksByWare, 10)
+  filteredSectorCandidates.value
+    .map((sector) => ({
+      sectorId: sector.sectorId,
+      name: sector.name,
+      displayName: sector.displayName,
+      score: selectedWareIds.value.length
+        ? selectedWareIds.value.reduce((sum, ware) => {
+            const resource = sector.resources.find((item) => item.ware === ware)
+            return sum + (resource?.level || 0)
+          }, 0)
+        : sector.sunlight
+    }))
+    .sort((left, right) =>
+      right.score - left.score ||
+      left.displayName.localeCompare(right.displayName) ||
+      left.sectorId.localeCompare(right.sectorId)
+    )
+    .slice(0, 10)
 )
 
 const batchYieldOptions = computed(() => {
-  const firstSelected = selectedResourceIds.value[0]
+  const firstSelected = selectedWareIds.value[0]
   if (!firstSelected) return [] as string[]
   return resourceCatalog.value.find((entry) => entry.ware === firstSelected)?.yields || []
 })
 
 watchEffect(() => {
   emit('highlight-change', matchedSectorIds.value)
-  emit('active-change', selectedResourceIds.value.length > 0)
+  emit('active-change', selectedFilterIds.value.length > 0)
   emit(
     'primary-color-change',
-    resourceCatalog.value.find((entry) => entry.ware === selectedResourceIds.value[0])?.color || null
+    resourceCatalog.value.find((entry) => entry.ware === selectedFilterIds.value[0])?.color || null
   )
 })
 
@@ -142,7 +204,7 @@ const getResourceLabel = (wareId: string) => {
 
 const getTagStyle = (wareId: string) => {
   const entry = resourceCatalog.value.find((item) => item.ware === wareId)
-  const selected = resourceFilters.value[wareId]?.selected
+  const selected = wareId === SUNLIGHT_FILTER_ID ? sunlightFilterEnabled.value : resourceFilters.value[wareId]?.selected
   const color = entry?.color || '#fbbf24'
   return {
     borderColor: selected ? color : toRgba(color, 0.72),
@@ -153,6 +215,11 @@ const getTagStyle = (wareId: string) => {
 }
 
 const toggleResource = (wareId: string) => {
+  if (wareId === SUNLIGHT_FILTER_ID) {
+    sunlightFilterEnabled.value = !sunlightFilterEnabled.value
+    if (sunlightFilterEnabled.value && !sunlightMinimum.value) sunlightMinimum.value = 100
+    return
+  }
   const current = resourceFilters.value[wareId]
   if (!current) return
   resourceFilters.value = {
@@ -178,7 +245,7 @@ const updateResourceYield = (wareId: string, nextValue: string) => {
 
 const updateAllSelectedYields = (nextValue: string) => {
   const nextFilters = { ...resourceFilters.value }
-  selectedResourceIds.value.forEach((wareId) => {
+  selectedWareIds.value.forEach((wareId) => {
     const current = nextFilters[wareId]
     if (!current) return
     nextFilters[wareId] = {
@@ -191,7 +258,7 @@ const updateAllSelectedYields = (nextValue: string) => {
 
 const clearSelectedResources = () => {
   const nextFilters = { ...resourceFilters.value }
-  selectedResourceIds.value.forEach((wareId) => {
+  selectedWareIds.value.forEach((wareId) => {
     const current = nextFilters[wareId]
     if (!current) return
     nextFilters[wareId] = {
@@ -200,17 +267,49 @@ const clearSelectedResources = () => {
     }
   })
   resourceFilters.value = nextFilters
+  sunlightFilterEnabled.value = false
+}
+
+const updateSunlightMinimum = (nextValue: number) => {
+  sunlightMinimum.value = Math.max(0, Math.round(nextValue))
+}
+
+const stepSunlightMinimum = (delta: number) => {
+  updateSunlightMinimum(sunlightMinimum.value + delta)
 }
 
 const getSectorPrimaryLabel = (item: { name: string; displayName: string }) =>
   locale.value === 'en' ? item.name : item.displayName
+
+const isYieldOptionDisabled = (wareId: string, yieldName: string) => {
+  const reachableName = reachableMaxByWare.value[wareId]
+  if (!reachableName) return yieldName !== resourceFilters.value[wareId]?.minYieldName
+  const rankMap = yieldRanksByWare[wareId]
+  const targetRank = rankMap?.[yieldName]
+  const reachableRank = rankMap?.[reachableName]
+  const currentValue = resourceFilters.value[wareId]?.minYieldName
+  if (yieldName === currentValue) return false
+  if (targetRank === undefined || reachableRank === undefined) return false
+  return targetRank > reachableRank
+}
+
+const isYieldBeyondReachable = (wareId: string) => {
+  const reachableName = reachableMaxByWare.value[wareId]
+  const currentValue = resourceFilters.value[wareId]?.minYieldName
+  if (!reachableName || !currentValue) return false
+  const rankMap = yieldRanksByWare[wareId]
+  const currentRank = rankMap?.[currentValue]
+  const reachableRank = rankMap?.[reachableName]
+  if (currentRank === undefined || reachableRank === undefined) return false
+  return currentRank > reachableRank
+}
 </script>
 
 <template>
   <div class="map-resource-panel" :class="props.mode || 'overlay'" @mousedown.stop>
     <div class="resource-panel-shell" :class="{ sidebar: props.mode === 'sidebar' }">
       <button
-        v-if="selectedResourceIds.length > 0"
+        v-if="selectedFilterIds.length > 0"
         type="button"
         class="resource-close-btn"
         data-testid="map-resource-clear-selection"
@@ -219,22 +318,22 @@ const getSectorPrimaryLabel = (item: { name: string; displayName: string }) =>
         ×
       </button>
 
-      <div class="resource-tag-grid" :class="{ compact: selectedResourceIds.length > 0 }">
+      <div class="resource-tag-grid" :class="{ compact: selectedFilterIds.length > 0 }">
         <button
           v-for="resource in resourceCatalog"
           :key="resource.ware"
           type="button"
           class="resource-tag"
-          :class="{ selected: resourceFilters[resource.ware]?.selected }"
+          :class="{ selected: resource.ware === SUNLIGHT_FILTER_ID ? sunlightFilterEnabled : resourceFilters[resource.ware]?.selected }"
           :style="getTagStyle(resource.ware)"
           :data-testid="`map-resource-tag-${resource.ware}`"
           @click="toggleResource(resource.ware)"
         >
-          {{ getResourceLabel(resource.ware) }}
+          {{ resource.ware === SUNLIGHT_FILTER_ID ? t('map.resource_filter_sunlight') : getResourceLabel(resource.ware) }}
         </button>
       </div>
 
-      <div v-if="selectedResourceIds.length > 0" class="resource-config-list">
+      <div v-if="selectedFilterIds.length > 0" class="resource-config-list">
         <div v-if="showBatchYieldControl" class="resource-config-row all-row">
           <span class="config-label">{{ t('map.resource_filter_all') }}</span>
           <select
@@ -253,7 +352,7 @@ const getSectorPrimaryLabel = (item: { name: string; displayName: string }) =>
         </div>
 
         <div
-          v-for="wareId in selectedResourceIds"
+          v-for="wareId in selectedWareIds"
           :key="wareId"
           class="resource-config-row"
         >
@@ -268,14 +367,53 @@ const getSectorPrimaryLabel = (item: { name: string; displayName: string }) =>
               v-for="yieldName in resourceCatalog.find((entry) => entry.ware === wareId)?.yields || []"
               :key="yieldName"
               :value="yieldName"
+              :disabled="isYieldOptionDisabled(wareId, yieldName)"
             >
               {{ formatYieldLabel(yieldName) }}
             </option>
           </select>
+          <span v-if="isYieldBeyondReachable(wareId)" class="config-warning">
+            {{ t('map.resource_filter_exceeds_reachable') }}
+          </span>
+        </div>
+
+        <div v-if="sunlightFilterEnabled" class="resource-config-row">
+          <span class="config-label">{{ t('map.resource_filter_sunlight') }}</span>
+          <div class="sunlight-input-wrap">
+            <input
+              class="sunlight-input"
+              type="number"
+              min="0"
+              step="1"
+              :value="sunlightMinimum"
+              data-testid="map-resource-sunlight-input"
+              @input="updateSunlightMinimum(Number(($event.target as HTMLInputElement).value || 0))"
+            />
+            <span class="sunlight-suffix">{{ t('map.resource_filter_sunlight_suffix') }}</span>
+            <div class="sunlight-stepper">
+              <button
+                type="button"
+                class="sunlight-step-btn"
+                data-testid="map-resource-sunlight-increase"
+                @click="stepSunlightMinimum(1)"
+              >
+                ▲
+              </button>
+              <button
+                type="button"
+                class="sunlight-step-btn"
+                data-testid="map-resource-sunlight-decrease"
+                @click="stepSunlightMinimum(-1)"
+              >
+                ▼
+              </button>
+            </div>
+          </div>
+          <span />
         </div>
       </div>
 
-      <div v-if="selectedResourceIds.length > 0" class="resource-candidate-box">
+      <div v-if="selectedFilterIds.length > 0" class="resource-candidate-box">
         <div class="candidate-header">
           <span>{{ t('map.resource_filter_candidates') }}</span>
           <span class="candidate-count">{{ matchedSectorIds.length }}</span>
@@ -346,16 +484,57 @@ const getSectorPrimaryLabel = (item: { name: string; displayName: string }) =>
 }
 
 .resource-config-row {
-  @apply flex items-center justify-between gap-3;
+  @apply grid items-center gap-3;
+  grid-template-columns: minmax(0, 72px) minmax(0, 142px) minmax(0, 1fr);
+  min-width: 0;
 }
 
 .config-label {
-  @apply text-sm text-amber-50;
+  @apply truncate text-sm text-amber-50;
+}
+
+.config-warning {
+  @apply min-w-0 truncate text-[11px] text-rose-300;
 }
 
 .yield-select {
-  @apply rounded-md border border-amber-300/30 bg-black/70 px-2 py-1 text-sm text-amber-50 outline-none;
+  @apply rounded-md border border-amber-300/30 bg-black/70 px-3 py-1 text-sm text-amber-50 outline-none;
   min-width: 142px;
+}
+
+.sunlight-input {
+  @apply w-full rounded-md border border-amber-300/30 bg-black/70 px-3 py-1 text-sm text-amber-50 outline-none;
+  min-width: 142px;
+  text-indent: 0.18rem;
+  padding-right: 3.25rem;
+  appearance: textfield;
+}
+
+.sunlight-input-wrap {
+  @apply relative;
+  width: 142px;
+}
+
+.sunlight-suffix {
+  @apply pointer-events-none absolute right-[1.35rem] top-1/2 -translate-y-1/2 text-sm font-semibold text-amber-100/90;
+}
+
+.sunlight-input::-webkit-outer-spin-button,
+.sunlight-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.sunlight-stepper {
+  @apply absolute right-0 top-1/2 flex -translate-y-1/2 flex-col overflow-hidden rounded-r-md rounded-l-sm border border-amber-300/25 bg-black/80;
+}
+
+.sunlight-step-btn {
+  @apply flex h-3.5 w-4 items-center justify-center bg-amber-200/10 text-[9px] leading-none text-amber-100/85 transition-colors duration-150 hover:bg-amber-200/20 hover:text-amber-50;
+}
+
+.sunlight-step-btn + .sunlight-step-btn {
+  @apply border-t border-amber-300/20;
 }
 
 .resource-candidate-box {

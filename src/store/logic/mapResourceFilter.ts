@@ -72,6 +72,16 @@ export const isSectorMatchedByResources = (
 ) => {
   const selectedIds = getSelectedResourceIds(filters)
   if (!selectedIds.length) return false
+  return isSectorMatchedBySelectedIds(candidate, filters, ranksByWare, selectedIds)
+}
+
+export const isSectorMatchedBySelectedIds = (
+  candidate: ResourceCandidateInput,
+  filters: ResourceFilterMap,
+  ranksByWare: Record<string, Record<string, number>>,
+  selectedIds: string[]
+) => {
+  if (!selectedIds.length) return false
 
   return selectedIds.every((ware) => {
     const state = filters[ware]
@@ -83,6 +93,32 @@ export const isSectorMatchedByResources = (
     if (actualRank === undefined || minimumRank === undefined) return false
     return actualRank >= minimumRank
   })
+}
+
+export const getContextReachableMaxYieldName = (
+  targetWare: string,
+  sectors: ResourceCandidateInput[],
+  filters: ResourceFilterMap,
+  ranksByWare: Record<string, Record<string, number>>
+) => {
+  const rankMap = ranksByWare[targetWare]
+  if (!rankMap) return null
+
+  const otherSelectedIds = getSelectedResourceIds(filters).filter((ware) => ware !== targetWare)
+  let bestName: string | null = null
+  let bestRank = Number.NEGATIVE_INFINITY
+
+  sectors.forEach((sector) => {
+    if (otherSelectedIds.length && !isSectorMatchedBySelectedIds(sector, filters, ranksByWare, otherSelectedIds)) return
+    const resource = sector.resources.find((item) => item.ware === targetWare)
+    if (!resource) return
+    const rank = rankMap[resource.yield]
+    if (rank === undefined || rank <= bestRank) return
+    bestRank = rank
+    bestName = resource.yield
+  })
+
+  return bestName
 }
 
 export const buildResourceCandidates = (

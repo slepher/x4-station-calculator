@@ -3,6 +3,7 @@ import {
   buildDefaultResourceFilters,
   buildResourceCandidates,
   buildYieldRanksByWare,
+  getContextReachableMaxYieldName,
   getSelectedResourceIds,
   getSharedMinYieldName,
   isSectorMatchedByResources,
@@ -99,5 +100,29 @@ describe('mapResourceFilter', () => {
 
     expect(getSelectedResourceIds(filters)).toEqual(['ore', 'silicon'])
     expect(getSharedMinYieldName(['ore', 'silicon'], filters)).toBe(MIXED_YIELD_VALUE)
+  })
+
+  it('computes reachable max for a resource within the current filter context', () => {
+    const ranks = buildYieldRanksByWare(regionYields)
+    const filters = makeFilters({
+      ore: { selected: true, minYieldName: 'medium' },
+      silicon: { selected: true, minYieldName: 'high' },
+      ice: { selected: true, minYieldName: 'lowest' }
+    })
+
+    expect(getContextReachableMaxYieldName('ice', sectors, filters, ranks)).toBe('medium')
+    expect(getContextReachableMaxYieldName('silicon', sectors, filters, ranks)).toBe('high')
+  })
+
+  it('returns null when a resource is unreachable under the other selected filters', () => {
+    const ranks = buildYieldRanksByWare(regionYields)
+    const filters = makeFilters({
+      ore: { selected: true, minYieldName: 'medium' },
+      silicon: { selected: true, minYieldName: 'high' },
+      ice: { selected: true, minYieldName: 'high' }
+    })
+
+    expect(getContextReachableMaxYieldName('silicon', sectors, filters, ranks)).toBe('high')
+    expect(getContextReachableMaxYieldName('ice', sectors.filter((item) => item.sectorId === 'sector-c'), filters, ranks)).toBe(null)
   })
 })

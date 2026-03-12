@@ -104,6 +104,11 @@
     "resource_filter_mixed": "混合",
     "resource_filter_candidates": "命中候选",
     "resource_filter_no_match": "没有满足条件的星区",
+    "resource_filter_reachable_max": "可达上限",
+    "resource_filter_unreachable": "无",
+    "resource_filter_exceeds_reachable": "高于可达上限",
+    "resource_filter_sunlight": "日光",
+    "resource_filter_sunlight_suffix": "%",
     "yield_names": {
       "lowest": "最低",
       "verylow": "很低",

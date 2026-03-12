@@ -104,6 +104,11 @@
     "resource_filter_mixed": "Mixed",
     "resource_filter_candidates": "Matched",
     "resource_filter_no_match": "No matching sectors",
+    "resource_filter_reachable_max": "Reachable Max",
+    "resource_filter_unreachable": "None",
+    "resource_filter_exceeds_reachable": "Above reachable",
+    "resource_filter_sunlight": "Sunlight",
+    "resource_filter_sunlight_suffix": "%",
     "yield_names": {
       "lowest": "Lowest",
       "verylow": "Very Low",
