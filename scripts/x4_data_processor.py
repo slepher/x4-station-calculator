@@ -38,7 +38,11 @@ MAP_DEFAULTS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "mapdefaults_
 MAP_GOD_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "god_final.xml")
 MAP_FACTIONS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "factions_final.xml")
 MAP_COLORS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "colors_final.xml")
+MAP_REGION_DEFINITIONS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "region_definitions_final.xml")
+MAP_REGIONYIELDS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "regionyields_final.xml")
 MAP_FACTIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "factions.json")
+MAP_REGIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regions.json")
+MAP_REGIONYIELDS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regionyields.json")
 MAP_DIR = str(Path(X4_UNPACKED_DATA_PATH) / "maps" / "xu_ep2_universe")
 
 X4_LANG_CONFIG = {
@@ -2147,6 +2151,9 @@ class X4PrecisionLoader:
     # =======================================================
     def process_map_data(self):
         print(f"\n🗺️ [2.5/5] 生成地图数据并合并 nameId...")
+        regionyields_rows = x4_data_map_processor.migrate_regionyields(Path(MAP_REGIONYIELDS_XML))
+        Path(MAP_REGIONYIELDS_OUTPUT).parent.mkdir(parents=True, exist_ok=True)
+        Path(MAP_REGIONYIELDS_OUTPUT).write_text(json.dumps(regionyields_rows, ensure_ascii=False, indent=2), encoding="utf-8")
         factions_rows, factions_by_id = x4_data_map_processor.migrate_factions(
             factions_xml_path=Path(MAP_FACTIONS_XML),
             colors_xml_path=Path(MAP_COLORS_XML),
@@ -2159,7 +2166,14 @@ class X4PrecisionLoader:
             mapdefaults_path=Path(MAP_DEFAULTS_XML),
             god_xml_path=Path(MAP_GOD_XML),
             factions_by_id=factions_by_id,
+            region_definitions_xml_path=Path(MAP_REGION_DEFINITIONS_XML),
+            regionyields_xml_path=Path(MAP_REGIONYIELDS_XML),
             i18n_registry=self.i18n_registry,
+        )
+        Path(MAP_REGIONS_OUTPUT).parent.mkdir(parents=True, exist_ok=True)
+        Path(MAP_REGIONS_OUTPUT).write_text(
+            json.dumps(result.get("regions", []), ensure_ascii=False, indent=2),
+            encoding="utf-8",
         )
         x4_data_map_processor.write_map_output(result["payload"], Path(MAP_OUTPUT_JSON))
         map_name_ids = set(result.get("name_ids", []))
@@ -2167,6 +2181,8 @@ class X4PrecisionLoader:
         self.i18n_registry.collect_many(map_name_ids)
         missing = result.get("missing_name_ids", {})
         ties = result.get("owner_resolution_ties", [])
+        print(f"   ✅ regionyields json: {MAP_REGIONYIELDS_OUTPUT} ({len(regionyields_rows)})")
+        print(f"   ✅ regions json: {MAP_REGIONS_OUTPUT} ({len(result.get('regions', []))})")
         print(f"   ✅ factions json: {MAP_FACTIONS_OUTPUT} ({len(factions_rows)})")
         print(f"   ✅ map nameId merged: {len(map_name_ids)}")
         print(f"   ✅ map json: {MAP_OUTPUT_JSON}")

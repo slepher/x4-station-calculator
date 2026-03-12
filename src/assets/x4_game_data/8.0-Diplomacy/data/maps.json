@@ -50,6 +50,33 @@
             "x": 0.0,
             "z": 0.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "ice",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "veryhigh",
+              "level": 14
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "triple_a",
             "slot": "center",
@@ -190,6 +217,43 @@
             "x": -21113958.0,
             "z": 7381814.5
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "ice",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "methane",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "verylow",
+              "level": 2
+            },
+            {
+              "ware": "rawscrap",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "silicon",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "triple_a",
             "slot": "left",
@@ -322,6 +386,28 @@
             "x": 38620000.0,
             "z": 53635320.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "triple_a",
             "slot": "upper_right",
@@ -519,6 +605,7 @@
             "x": 15000000.0,
             "z": 25980000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -696,6 +783,28 @@
             "x": 30000000.0,
             "z": 17320000.0
           },
+          "resources": [
+            {
+              "ware": "ice",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -809,6 +918,33 @@
             "x": 45000000.0,
             "z": -25980000.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "medplus",
+              "level": 9
+            },
+            {
+              "ware": "ice",
+              "yield": "verylow",
+              "level": 2
+            },
+            {
+              "ware": "nividium",
+              "yield": "veryhigh",
+              "level": 14
+            },
+            {
+              "ware": "ore",
+              "yield": "medplus",
+              "level": 9
+            },
+            {
+              "ware": "silicon",
+              "yield": "medlow",
+              "level": 7
+            }
+          ],
           "normalized": {
             "template_kind": "dual_a",
             "slot": "upper",
@@ -966,6 +1102,7 @@
             "x": 46046580.8125,
             "z": -46333148.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "dual_a",
             "slot": "lower",
@@ -1096,6 +1233,13 @@
             "x": 0.0,
             "z": -17320000.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "medhigh",
+              "level": 10
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -1199,6 +1343,38 @@
             "x": -30000000.0,
             "z": 0.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "methane",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "dual_a",
             "slot": "upper",
@@ -1311,6 +1487,23 @@
             "x": 17759560.0,
             "z": -5868100.5
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "methane",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "dual_a",
             "slot": "lower",
@@ -1470,6 +1663,13 @@
             "x": -105000000.0,
             "z": 43300000.0
           },
+          "resources": [
+            {
+              "ware": "ore",
+              "yield": "medlow",
+              "level": 7
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -1563,6 +1763,23 @@
             "x": -15000000.0,
             "z": 95260000.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "silicon",
+              "yield": "lowest",
+              "level": 1
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -1815,6 +2032,7 @@
             "x": 60000000.0,
             "z": 69280000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -2059,6 +2277,7 @@
             "x": 75000000.0,
             "z": -8660000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -2257,6 +2476,28 @@
             "x": -30000000.0,
             "z": -69280000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "ice",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "methane",
+              "yield": "highplus",
+              "level": 13
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -2469,6 +2710,7 @@
             "x": -60000000.0,
             "z": -51960000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -2681,6 +2923,33 @@
             "x": -75000000.0,
             "z": -8660000.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ice",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "veryhigh",
+              "level": 14
+            },
+            {
+              "ware": "silicon",
+              "yield": "verylow",
+              "level": 2
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -2923,6 +3192,7 @@
             "x": -90000000.0,
             "z": 34640000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -3155,6 +3425,28 @@
             "x": 90000000.0,
             "z": 69280000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "ice",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "methane",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "dual_a",
             "slot": "upper",
@@ -3358,6 +3650,28 @@
             "x": 199979864.0,
             "z": 69280000.0
           },
+          "resources": [
+            {
+              "ware": "ice",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "dual_a",
             "slot": "lower",
@@ -3493,6 +3807,23 @@
             "x": 90000000.0,
             "z": 86600000.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "silicon",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -3692,6 +4023,28 @@
             "x": 75000000.0,
             "z": 95260000.0
           },
+          "resources": [
+            {
+              "ware": "methane",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "silicon",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -3837,6 +4190,43 @@
             "x": 75000000.0,
             "z": 25980000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "ice",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "methane",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -4168,6 +4558,38 @@
             "x": 105000000.0,
             "z": -8660000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "methane",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "dual_a",
             "slot": "upper",
@@ -4346,6 +4768,38 @@
             "x": 217672928.0,
             "z": -8660000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "methane",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "dual_a",
             "slot": "lower",
@@ -4481,6 +4935,7 @@
             "x": 135000000.0,
             "z": -25980000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -4691,6 +5146,33 @@
             "x": 135000000.0,
             "z": -43300000.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "rawscrap",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "dual_a",
             "slot": "lower",
@@ -4821,6 +5303,18 @@
             "x": 134813100.59375,
             "z": 3410032.0
           },
+          "resources": [
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "dual_a",
             "slot": "upper",
@@ -4970,6 +5464,7 @@
             "x": 30000000.0,
             "z": -51960000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -5250,6 +5745,7 @@
             "x": 60000000.0,
             "z": -86600000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -5367,6 +5863,43 @@
             "x": -45000000.0,
             "z": -60620000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "ice",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "methane",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -5745,6 +6278,28 @@
             "x": -90000000.0,
             "z": -69280000.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "rawscrap",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "dual_b",
             "slot": "upper",
@@ -5942,6 +6497,23 @@
             "x": -90000000.0,
             "z": -107135016.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "dual_b",
             "slot": "lower",
@@ -6077,6 +6649,23 @@
             "x": -120000000.0,
             "z": -51960000.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "dual_a",
             "slot": "upper",
@@ -6193,6 +6782,28 @@
             "x": -93326018.0,
             "z": -107369964.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "dual_a",
             "slot": "lower",
@@ -6338,6 +6949,43 @@
             "x": -150000000.0,
             "z": 34640000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "ice",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "methane",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -6475,6 +7123,38 @@
             "x": -165000000.0,
             "z": 25980000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ice",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "nividium",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -6715,6 +7395,7 @@
             "x": -60000000.0,
             "z": 69280000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "dual_b",
             "slot": "lower",
@@ -6992,6 +7673,43 @@
             "x": 20377000.0,
             "z": 96438380.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "ice",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "methane",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "dual_b",
             "slot": "upper",
@@ -7130,6 +7848,7 @@
             "x": -90000000.0,
             "z": 69280000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -7243,6 +7962,18 @@
             "x": -120000000.0,
             "z": 103920000.0
           },
+          "resources": [
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "rawscrap",
+              "yield": "high",
+              "level": 12
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -7368,6 +8099,33 @@
             "x": -60000000.0,
             "z": 103920000.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "medlow",
+              "level": 7
+            },
+            {
+              "ware": "rawscrap",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "dual_b",
             "slot": "lower",
@@ -7658,6 +8416,23 @@
             "x": -60000000.0,
             "z": 137069454.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medlow",
+              "level": 7
+            }
+          ],
           "normalized": {
             "template_kind": "dual_b",
             "slot": "upper",
@@ -7829,6 +8604,18 @@
             "x": -75000000.0,
             "z": 112580000.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "rawscrap",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -8032,6 +8819,7 @@
             "x": 45000000.0,
             "z": 77940000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -8268,6 +9056,28 @@
             "x": -45000000.0,
             "z": -95260000.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ice",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "silicon",
+              "yield": "lowplus",
+              "level": 5
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -8375,6 +9185,23 @@
             "x": -60000000.0,
             "z": -86600000.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "lowplus",
+              "level": 5
+            },
+            {
+              "ware": "silicon",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -8488,6 +9315,23 @@
             "x": 45000000.0,
             "z": -60620000.0
           },
+          "resources": [
+            {
+              "ware": "methane",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "ore",
+              "yield": "veryhigh",
+              "level": 14
+            },
+            {
+              "ware": "silicon",
+              "yield": "veryhigh",
+              "level": 14
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -8675,6 +9519,38 @@
             "x": 30000000.0,
             "z": -69280000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "ice",
+              "yield": "lowest",
+              "level": 1
+            },
+            {
+              "ware": "nividium",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "ore",
+              "yield": "veryhigh",
+              "level": 14
+            },
+            {
+              "ware": "silicon",
+              "yield": "veryhigh",
+              "level": 14
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -8778,6 +9654,7 @@
             "x": 30000000.0,
             "z": 0.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -8881,6 +9758,23 @@
             "x": -90000000.0,
             "z": -17320000.0
           },
+          "resources": [
+            {
+              "ware": "nividium",
+              "yield": "medlow",
+              "level": 7
+            },
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -8998,6 +9892,18 @@
             "x": -90000000.0,
             "z": 0.0
           },
+          "resources": [
+            {
+              "ware": "ore",
+              "yield": "lowplus",
+              "level": 5
+            },
+            {
+              "ware": "silicon",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -9105,6 +10011,7 @@
             "x": 120000000.0,
             "z": 0.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "dual_a",
             "slot": "upper",
@@ -9201,6 +10108,7 @@
             "x": 232672928.0,
             "z": 0.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "dual_a",
             "slot": "lower",
@@ -9325,6 +10233,23 @@
             "x": 120000000.0,
             "z": 17320000.0
           },
+          "resources": [
+            {
+              "ware": "ore",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "rawscrap",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "silicon",
+              "yield": "lowplus",
+              "level": 5
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -9418,6 +10343,28 @@
             "x": 0.0,
             "z": 103920000.0
           },
+          "resources": [
+            {
+              "ware": "ice",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "medlow",
+              "level": 7
+            },
+            {
+              "ware": "silicon",
+              "yield": "lowplus",
+              "level": 5
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -9521,6 +10468,23 @@
             "x": -15000000.0,
             "z": 112580000.0
           },
+          "resources": [
+            {
+              "ware": "ore",
+              "yield": "verylow",
+              "level": 2
+            },
+            {
+              "ware": "rawscrap",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "verylow",
+              "level": 2
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -9686,6 +10650,38 @@
             "x": -90000000.0,
             "z": 86600000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ice",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "silicon",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -9779,6 +10775,43 @@
             "x": 60000000.0,
             "z": 34640000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ice",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "methane",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "ore",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "silicon",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -9886,6 +10919,28 @@
             "x": -150000000.0,
             "z": 51960000.0
           },
+          "resources": [
+            {
+              "ware": "ice",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "rawscrap",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "lowplus",
+              "level": 5
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -9994,6 +11049,33 @@
             "x": -120000000.0,
             "z": -17320000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "methane",
+              "yield": "highplus",
+              "level": 13
+            },
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medlow",
+              "level": 7
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -10092,6 +11174,28 @@
             "x": 150000000.0,
             "z": -34640000.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "ore",
+              "yield": "lowplus",
+              "level": 5
+            },
+            {
+              "ware": "silicon",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "dual_a",
             "slot": "upper",
@@ -10154,6 +11258,28 @@
             "x": 176673982.0,
             "z": -90049964.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "silicon",
+              "yield": "lowplus",
+              "level": 5
+            }
+          ],
           "normalized": {
             "template_kind": "dual_a",
             "slot": "lower",
@@ -10285,6 +11411,38 @@
             "x": 60000000.0,
             "z": -103920000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medplus",
+              "level": 9
+            },
+            {
+              "ware": "ice",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "methane",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "ore",
+              "yield": "lowplus",
+              "level": 5
+            },
+            {
+              "ware": "silicon",
+              "yield": "verylow",
+              "level": 2
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -10427,6 +11585,28 @@
             "x": 105000000.0,
             "z": -95260000.0
           },
+          "resources": [
+            {
+              "ware": "ice",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "verylow",
+              "level": 2
+            },
+            {
+              "ware": "ore",
+              "yield": "highlow",
+              "level": 11
+            },
+            {
+              "ware": "silicon",
+              "yield": "medhigh",
+              "level": 10
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -10516,6 +11696,28 @@
             "x": 120000000.0,
             "z": -69280000.0
           },
+          "resources": [
+            {
+              "ware": "ice",
+              "yield": "lowplus",
+              "level": 5
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "silicon",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -10605,6 +11807,28 @@
             "x": 105000000.0,
             "z": -60620000.0
           },
+          "resources": [
+            {
+              "ware": "ice",
+              "yield": "highlow",
+              "level": 11
+            },
+            {
+              "ware": "nividium",
+              "yield": "medplus",
+              "level": 9
+            },
+            {
+              "ware": "ore",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "silicon",
+              "yield": "highplus",
+              "level": 13
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -10709,6 +11933,38 @@
             "x": 90000000.0,
             "z": -34640000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medlow",
+              "level": 7
+            },
+            {
+              "ware": "ice",
+              "yield": "highlow",
+              "level": 11
+            },
+            {
+              "ware": "methane",
+              "yield": "medplus",
+              "level": 9
+            },
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medhigh",
+              "level": 10
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -10826,6 +12082,7 @@
             "x": -60000000.0,
             "z": -103920000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -10917,6 +12174,38 @@
             "x": -120000000.0,
             "z": -69280000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medlow",
+              "level": 7
+            },
+            {
+              "ware": "methane",
+              "yield": "medplus",
+              "level": 9
+            },
+            {
+              "ware": "nividium",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "ore",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "silicon",
+              "yield": "highplus",
+              "level": 13
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -11092,6 +12381,33 @@
             "x": -150000000.0,
             "z": -17320000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "methane",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "ore",
+              "yield": "lowplus",
+              "level": 5
+            },
+            {
+              "ware": "rawscrap",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -11213,6 +12529,38 @@
             "x": -210000000.0,
             "z": 69280000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "methane",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "silicon",
+              "yield": "medlow",
+              "level": 7
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -11314,6 +12662,28 @@
             "x": -135000000.0,
             "z": -95260000.0
           },
+          "resources": [
+            {
+              "ware": "methane",
+              "yield": "lowest",
+              "level": 1
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medplus",
+              "level": 9
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -11627,6 +12997,13 @@
             "x": -30000000.0,
             "z": -121240000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "high",
+              "level": 12
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -11728,6 +13105,23 @@
             "x": -210000000.0,
             "z": -103920000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "methane",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "rawscrap",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -11814,6 +13208,38 @@
             "x": -30000000.0,
             "z": -17320000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "methane",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "verylow",
+              "level": 2
+            },
+            {
+              "ware": "ore",
+              "yield": "highlow",
+              "level": 11
+            },
+            {
+              "ware": "silicon",
+              "yield": "medhigh",
+              "level": 10
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -11957,6 +13383,7 @@
             "x": -105000000.0,
             "z": 147220000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -12060,6 +13487,38 @@
             "x": -45000000.0,
             "z": 129900000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "methane",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "ore",
+              "yield": "medplus",
+              "level": 9
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -12211,6 +13670,23 @@
             "x": -45000000.0,
             "z": 147220000.0
           },
+          "resources": [
+            {
+              "ware": "ice",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "medlow",
+              "level": 7
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -12328,6 +13804,7 @@
             "x": -120000000.0,
             "z": 138560000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -12455,6 +13932,7 @@
             "x": 30000000.0,
             "z": 155880000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -12596,6 +14074,7 @@
             "x": 45000000.0,
             "z": 147220000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -12755,6 +14234,7 @@
             "x": 45000000.0,
             "z": 164540000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -12896,6 +14376,7 @@
             "x": 120000000.0,
             "z": 103920000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -13033,6 +14514,7 @@
             "x": 120000000.0,
             "z": 86600000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "dual_a",
             "slot": "lower",
@@ -13131,6 +14613,7 @@
             "x": 101796238.0,
             "z": 100611029.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "dual_a",
             "slot": "upper",
@@ -13255,6 +14738,7 @@
             "x": 150000000.0,
             "z": 103920000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -13368,6 +14852,23 @@
             "x": 165000000.0,
             "z": 112580000.0
           },
+          "resources": [
+            {
+              "ware": "ice",
+              "yield": "verylow",
+              "level": 2
+            },
+            {
+              "ware": "ore",
+              "yield": "verylow",
+              "level": 2
+            },
+            {
+              "ware": "silicon",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -13495,6 +14996,28 @@
             "x": 180000000.0,
             "z": 138560000.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ice",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "ore",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "silicon",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -13626,6 +15149,28 @@
             "x": 180000000.0,
             "z": 103920000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ice",
+              "yield": "lowminus",
+              "level": 3
+            },
+            {
+              "ware": "methane",
+              "yield": "medplus",
+              "level": 9
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -13743,6 +15288,28 @@
             "x": 195000000.0,
             "z": 112580000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "highest",
+              "level": 15
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "ice",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "methane",
+              "yield": "highest",
+              "level": 15
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -13836,6 +15403,13 @@
             "x": -45000000.0,
             "z": 164540000.0
           },
+          "resources": [
+            {
+              "ware": "rawscrap",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -13939,6 +15513,33 @@
             "x": -30000000.0,
             "z": 173200000.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ice",
+              "yield": "verylow",
+              "level": 2
+            },
+            {
+              "ware": "nividium",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "ore",
+              "yield": "verylow",
+              "level": 2
+            },
+            {
+              "ware": "silicon",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -14070,6 +15671,7 @@
             "x": 90000000.0,
             "z": 138560000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "dual_a",
             "slot": "lower",
@@ -14158,6 +15760,13 @@
             "x": 80473124.0,
             "z": 163129310.0
           },
+          "resources": [
+            {
+              "ware": "ice",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "dual_a",
             "slot": "upper",
@@ -14307,6 +15916,7 @@
             "x": 75000000.0,
             "z": 164540000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -14410,6 +16020,48 @@
             "x": 0.0,
             "z": 138560000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ice",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "methane",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "ore",
+              "yield": "highplus",
+              "level": 13
+            },
+            {
+              "ware": "rawscrap",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -14537,6 +16189,7 @@
             "x": 30000000.0,
             "z": 121240000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -14662,6 +16315,18 @@
             "x": 45000000.0,
             "z": 112580000.0
           },
+          "resources": [
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -14785,6 +16450,13 @@
             "x": 120000000.0,
             "z": 121240000.0
           },
+          "resources": [
+            {
+              "ware": "rawscrap",
+              "yield": "high",
+              "level": 12
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -14908,6 +16580,23 @@
             "x": -135000000.0,
             "z": 147220000.0
           },
+          "resources": [
+            {
+              "ware": "ice",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "silicon",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -15025,6 +16714,7 @@
             "x": -165000000.0,
             "z": 147220000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "dual_b",
             "slot": "lower",
@@ -15123,6 +16813,7 @@
             "x": -34773744.0,
             "z": 259364392.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "dual_b",
             "slot": "upper",
@@ -15247,6 +16938,7 @@
             "x": -180000000.0,
             "z": 155880000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "dual_b",
             "slot": "lower",
@@ -15349,6 +17041,18 @@
             "x": -43280992.0,
             "z": 159557055.75
           },
+          "resources": [
+            {
+              "ware": "ore",
+              "yield": "verylow",
+              "level": 2
+            },
+            {
+              "ware": "silicon",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "dual_b",
             "slot": "upper",
@@ -15499,6 +17203,18 @@
             "x": 165000000.0,
             "z": 147220000.0
           },
+          "resources": [
+            {
+              "ware": "ore",
+              "yield": "verylow",
+              "level": 2
+            },
+            {
+              "ware": "silicon",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -15577,6 +17293,7 @@
             "x": -195000000.0,
             "z": 8660000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -15688,6 +17405,7 @@
             "x": -210000000.0,
             "z": 17320000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -15813,6 +17531,7 @@
             "x": -225000000.0,
             "z": 25980000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -15924,6 +17643,7 @@
             "x": -210000000.0,
             "z": 34640000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "dual_b",
             "slot": "upper",
@@ -16021,6 +17741,7 @@
             "x": -210000000.0,
             "z": -141250496.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "dual_b",
             "slot": "lower",
@@ -16178,6 +17899,7 @@
             "x": -225000000.0,
             "z": 43300000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -16269,6 +17991,7 @@
             "x": -210000000.0,
             "z": -17320000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -16384,6 +18107,7 @@
             "x": -225000000.0,
             "z": -25980000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "triple_b",
             "slot": "right",
@@ -16510,6 +18234,7 @@
             "x": -280073532.0,
             "z": -185381120.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "triple_b",
             "slot": "lower_left",
@@ -16585,6 +18310,7 @@
             "x": -257631400.0,
             "z": 108293000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "triple_b",
             "slot": "upper_left",
@@ -16729,6 +18455,7 @@
             "x": -240000000.0,
             "z": -34640000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -16832,6 +18559,7 @@
             "x": -225000000.0,
             "z": -43300000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -16955,6 +18683,7 @@
             "x": -240000000.0,
             "z": -51960000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -17058,6 +18787,7 @@
             "x": -120000000.0,
             "z": 69280000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "dual_b",
             "slot": "upper",
@@ -17179,6 +18909,7 @@
             "x": -120000000.0,
             "z": 18225196.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "dual_b",
             "slot": "lower",
@@ -17294,6 +19025,7 @@
             "x": -165000000.0,
             "z": -77940000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -17421,6 +19153,7 @@
             "x": -180000000.0,
             "z": -86600000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -17558,6 +19291,7 @@
             "x": -195000000.0,
             "z": -77940000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -17707,6 +19441,7 @@
             "x": -255000000.0,
             "z": -60620000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -17796,6 +19531,7 @@
             "x": 20038240.0,
             "z": 81086290.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "triple_a",
             "slot": "upper_right",
@@ -17917,6 +19653,7 @@
             "x": -14013832.4,
             "z": -184824500.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "triple_a",
             "slot": "center",
@@ -17992,6 +19729,7 @@
             "x": -125379200.0,
             "z": -19965560.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "triple_a",
             "slot": "left",
@@ -18161,6 +19899,7 @@
             "x": -30000000.0,
             "z": 51960000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -18312,6 +20051,7 @@
             "x": -45000000.0,
             "z": 43300000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -18437,6 +20177,7 @@
             "x": -45000000.0,
             "z": 25980000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -18564,6 +20305,7 @@
             "x": 180000000.0,
             "z": 69280000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -18642,6 +20384,33 @@
             "x": -150000000.0,
             "z": 103920000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "methane",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -18728,6 +20497,18 @@
             "x": -165000000.0,
             "z": 95260000.0
           },
+          "resources": [
+            {
+              "ware": "ore",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -18843,6 +20624,23 @@
             "x": -180000000.0,
             "z": 86600000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "methane",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -18968,6 +20766,13 @@
             "x": -180000000.0,
             "z": 69280000.0
           },
+          "resources": [
+            {
+              "ware": "rawscrap",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -19069,6 +20874,38 @@
             "x": -195000000.0,
             "z": 112580000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "methane",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "nividium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ore",
+              "yield": "lowest",
+              "level": 1
+            },
+            {
+              "ware": "silicon",
+              "yield": "lowest",
+              "level": 1
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -19296,6 +21133,7 @@
             "x": -225000000.0,
             "z": 129900000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "triple_b",
             "slot": "upper_left",
@@ -19493,6 +21331,13 @@
             "x": -225622191.4,
             "z": 88156930.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "high",
+              "level": 12
+            }
+          ],
           "normalized": {
             "template_kind": "triple_b",
             "slot": "lower_left",
@@ -19800,6 +21645,7 @@
             "x": -165888240.0,
             "z": 127858730.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "triple_b",
             "slot": "right",
@@ -20064,6 +21910,28 @@
             "x": -240000000.0,
             "z": 121240000.0
           },
+          "resources": [
+            {
+              "ware": "ice",
+              "yield": "medplus",
+              "level": 9
+            },
+            {
+              "ware": "methane",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "ore",
+              "yield": "highlow",
+              "level": 11
+            },
+            {
+              "ware": "silicon",
+              "yield": "highlow",
+              "level": 11
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -20189,6 +22057,23 @@
             "x": -225000000.0,
             "z": 112580000.0
           },
+          "resources": [
+            {
+              "ware": "hydrogen",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "ore",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "silicon",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -20409,6 +22294,23 @@
             "x": -240000000.0,
             "z": 103920000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medhigh",
+              "level": 10
+            },
+            {
+              "ware": "ore",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "silicon",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -20635,6 +22537,7 @@
             "x": 150000000.0,
             "z": 17320000.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -20748,6 +22651,43 @@
             "x": 165000000.0,
             "z": 8660000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "ice",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "methane",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "nividium",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "ore",
+              "yield": "medlow",
+              "level": 7
+            },
+            {
+              "ware": "silicon",
+              "yield": "medium",
+              "level": 8
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -20873,6 +22813,43 @@
             "x": 165000000.0,
             "z": -8660000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "hydrogen",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "ice",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "methane",
+              "yield": "high",
+              "level": 12
+            },
+            {
+              "ware": "nividium",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "ore",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "silicon",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -21000,6 +22977,23 @@
             "x": 15000000.0,
             "z": 60620000.0
           },
+          "resources": [
+            {
+              "ware": "ice",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "medlow",
+              "level": 7
+            },
+            {
+              "ware": "ore",
+              "yield": "medhigh",
+              "level": 10
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -21137,6 +23131,28 @@
             "x": -120000000.0,
             "z": 34640000.0
           },
+          "resources": [
+            {
+              "ware": "ice",
+              "yield": "medium",
+              "level": 8
+            },
+            {
+              "ware": "nividium",
+              "yield": "medlow",
+              "level": 7
+            },
+            {
+              "ware": "ore",
+              "yield": "highlow",
+              "level": 11
+            },
+            {
+              "ware": "silicon",
+              "yield": "medplus",
+              "level": 9
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -21248,6 +23264,23 @@
             "x": -105000000.0,
             "z": 25980000.0
           },
+          "resources": [
+            {
+              "ware": "ice",
+              "yield": "medlow",
+              "level": 7
+            },
+            {
+              "ware": "ore",
+              "yield": "highlow",
+              "level": 11
+            },
+            {
+              "ware": "silicon",
+              "yield": "medhigh",
+              "level": 10
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -21346,6 +23379,23 @@
             "x": -45000000.0,
             "z": 95260000.0
           },
+          "resources": [
+            {
+              "ware": "ore",
+              "yield": "medlow",
+              "level": 7
+            },
+            {
+              "ware": "rawscrap",
+              "yield": "medplus",
+              "level": 9
+            },
+            {
+              "ware": "silicon",
+              "yield": "lowplus",
+              "level": 5
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -21439,6 +23489,7 @@
             "x": -150000000.0,
             "z": 0.0
           },
+          "resources": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -21530,6 +23581,23 @@
             "x": -45000000.0,
             "z": -8660000.0
           },
+          "resources": [
+            {
+              "ware": "helium",
+              "yield": "low",
+              "level": 4
+            },
+            {
+              "ware": "ore",
+              "yield": "lowminus",
+              "level": 3
+            },
+            {
+              "ware": "rawscrap",
+              "yield": "low",
+              "level": 4
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",

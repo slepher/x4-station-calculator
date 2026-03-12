@@ -28,7 +28,11 @@ DEFAULT_MAPDEFAULTS = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "mapdefaul
 DEFAULT_GOD_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "god_final.xml")
 DEFAULT_FACTIONS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "factions_final.xml")
 DEFAULT_COLORS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "colors_final.xml")
+DEFAULT_REGION_DEFINITIONS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "region_definitions_final.xml")
+DEFAULT_REGIONYIELDS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "regionyields_final.xml")
 DEFAULT_FACTIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "factions.json")
+DEFAULT_REGIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regions.json")
+DEFAULT_REGIONYIELDS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regionyields.json")
 
 
 CLUSTER_MACRO_RE = re.compile(r"Cluster_(\d+)_macro", re.IGNORECASE)
@@ -36,6 +40,7 @@ SECTOR_MACRO_RE = re.compile(r"Cluster_(\d+)_Sector(\d+)_macro", re.IGNORECASE)
 ZONE_MACRO_RE = re.compile(r"Zone\d+_Cluster_(\d+)_Sector(\d+)_macro", re.IGNORECASE)
 SHCON_ZONE_RE = re.compile(r"tzoneCluster_(\d+)_Sector(\d+)SHCon(\d+)_GateZone_macro", re.IGNORECASE)
 CLUSTER_GATE_RE = re.compile(r"connection_ClusterGate(\d+)To(\d+)[a-z]?", re.IGNORECASE)
+REGION_CONNECTION_RE = re.compile(r"C(\d+)S(\d+)_", re.IGNORECASE)
 ZONE_HIGHWAY_MACRO_RE = re.compile(r"Highway(\d+)_Cluster_?(\d+)_(?:Sector|S)(\d+)_macro", re.IGNORECASE)
 SEC_HIGHWAY_MACRO_RE = re.compile(r"SuperHighway(\d+)_Cluster_?(\d+)_macro", re.IGNORECASE)
 
@@ -70,7 +75,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--god-xml", default=DEFAULT_GOD_XML)
     parser.add_argument("--factions-xml", default=DEFAULT_FACTIONS_XML)
     parser.add_argument("--colors-xml", default=DEFAULT_COLORS_XML)
+    parser.add_argument("--region-definitions-xml", default=DEFAULT_REGION_DEFINITIONS_XML)
+    parser.add_argument("--regionyields-xml", default=DEFAULT_REGIONYIELDS_XML)
     parser.add_argument("--factions-output", default=DEFAULT_FACTIONS_OUTPUT)
+    parser.add_argument("--regions-output", default=DEFAULT_REGIONS_OUTPUT)
+    parser.add_argument("--regionyields-output", default=DEFAULT_REGIONYIELDS_OUTPUT)
     parser.add_argument("--output", default=DEFAULT_OUTPUT)
     return parser.parse_args()
 
@@ -255,6 +264,20 @@ def rgb_to_hex(r: int, g: int, b: int) -> str:
     return f"#{r:02X}{g:02X}{b:02X}"
 
 
+def coerce_attr_value(value: Optional[str]):
+    if value is None:
+        return ""
+    raw = value.strip()
+    if raw == "":
+        return ""
+    try:
+        if any(char in raw for char in (".", "e", "E")):
+            return float(raw)
+        return int(raw)
+    except ValueError:
+        return raw
+
+
 def load_color_map_from_xml(colors_xml_path: Path) -> Dict[str, str]:
     if not colors_xml_path.exists():
         return {}
@@ -310,6 +333,77 @@ def migrate_factions(
         by_id[faction_id] = item
     rows.sort(key=lambda item: item["id"])
     return rows, by_id
+
+
+def migrate_regionyields(regionyields_xml_path: Path) -> List[dict]:
+    if not regionyields_xml_path.exists():
+        return []
+    root = parse_xml(regionyields_xml_path)
+    resources: List[dict] = []
+    for resource_node in root.findall("./resource[@ware]"):
+        ware = (resource_node.get("ware") or "").strip()
+        if not ware:
+            continue
+        effect_r = int(as_float(resource_node.get("effect_r"), 0.0))
+        effect_g = int(as_float(resource_node.get("effect_g"), 0.0))
+        effect_b = int(as_float(resource_node.get("effect_b"), 0.0))
+        resource_item = {
+            "ware": ware,
+            "color": rgb_to_hex(effect_r, effect_g, effect_b),
+            "yields": [],
+        }
+        for yield_node in resource_node.findall("./yield[@name]"):
+            yield_item: Dict[str, object] = {}
+            for key, value in yield_node.attrib.items():
+                yield_item[key] = coerce_attr_value(value)
+            resource_item["yields"].append(yield_item)
+        resources.append(resource_item)
+    resources.sort(key=lambda item: item["ware"])
+    return resources
+
+
+def build_yield_level_map(regionyields_xml_path: Path) -> Dict[str, Dict[str, int]]:
+    levels: Dict[str, Dict[str, int]] = {}
+    for resource in migrate_regionyields(regionyields_xml_path):
+        ware = (resource.get("ware") or "").strip()
+        if not ware:
+            continue
+        yield_map: Dict[str, int] = {}
+        for index, yield_item in enumerate(resource.get("yields", []), start=1):
+            name = str(yield_item.get("name") or "").strip()
+            if not name:
+                continue
+            yield_map[name] = index
+        levels[ware] = yield_map
+    return levels
+
+
+def load_region_definition_resources(
+    region_definitions_xml_path: Path,
+    yield_level_map: Dict[str, Dict[str, int]],
+) -> Dict[str, List[dict]]:
+    if not region_definitions_xml_path.exists():
+        return {}
+    root = parse_xml(region_definitions_xml_path)
+    by_name: Dict[str, List[dict]] = {}
+    for region_node in root.findall("./region[@name]"):
+        region_name = (region_node.get("name") or "").strip()
+        if not region_name:
+            continue
+        resources: List[dict] = []
+        for resource_node in region_node.findall("./resources/resource[@ware]"):
+            ware = (resource_node.get("ware") or "").strip()
+            yield_name = (resource_node.get("yield") or "").strip()
+            if not ware or not yield_name:
+                continue
+            level = yield_level_map.get(ware, {}).get(yield_name, 1)
+            resources.append({
+                "ware": ware,
+                "yield": yield_name,
+                "level": level,
+            })
+        by_name[region_name] = resources
+    return by_name
 
 
 def load_mapdefaults(mapdefaults_xml: Path) -> Tuple[Dict[str, str], Dict[str, dict]]:
@@ -368,6 +462,8 @@ def generate_map_data(
     mapdefaults_path: Path,
     god_xml_path: Optional[Path] = None,
     factions_by_id: Optional[Dict[str, dict]] = None,
+    region_definitions_xml_path: Optional[Path] = None,
+    regionyields_xml_path: Optional[Path] = None,
     i18n_registry=None,
 ) -> Dict[str, object]:
     name_id_by_macro, area_by_sector_macro = load_mapdefaults(mapdefaults_path)
@@ -391,6 +487,7 @@ def generate_map_data(
     cluster_links: Dict[str, dict] = {}
     sector_links: Dict[str, dict] = {}
     sector_highways: Dict[str, dict] = {}
+    sector_region_links: Dict[str, List[dict]] = defaultdict(list)
 
     for macro in galaxy_root.findall("./macro"):
         if macro.get("class") != "galaxy":
@@ -496,6 +593,26 @@ def generate_map_data(
                 cluster_sector_offsets[cluster_macro][sector_macro] = raw_local
                 if sector_macro not in clusters[cluster_macro]["sector_ids"]:
                     clusters[cluster_macro]["sector_ids"].append(sector_macro)
+            for conn in cluster_macro_node.findall("./connections/connection[@ref='regions']"):
+                connection_name = (conn.get("name") or "").strip()
+                region_match = REGION_CONNECTION_RE.search(connection_name)
+                if region_match is None:
+                    continue
+                sector_macro = f"Cluster_{int(region_match.group(1)):02d}_Sector{int(region_match.group(2)):03d}_macro"
+                macro_node = conn.find("./macro")
+                if macro_node is None:
+                    continue
+                region_macro_name = (macro_node.get("name") or "").strip()
+                if not region_macro_name:
+                    continue
+                region_ref_node = macro_node.find("./properties/region")
+                region_ref = (region_ref_node.get("ref") if region_ref_node is not None else "") or ""
+                sector_region_links[sector_macro].append({
+                    "name": region_macro_name,
+                    "region_ref": region_ref,
+                    "cluster_id": cluster_macro,
+                    "sector_id": sector_macro,
+                })
             for conn in cluster_macro_node.findall("./connections/connection[@ref='sechighways']"):
                 macro_node = conn.find("./macro")
                 highway_macro = (macro_node.get("ref") if macro_node is not None else None)
@@ -614,6 +731,33 @@ def generate_map_data(
                     "source": "sectors_xml_zonehighways",
                 }
                 sectors[sector_macro]["highway_ids"].append(highway_id)
+
+    resolved_region_definitions_path = region_definitions_xml_path or Path(DEFAULT_REGION_DEFINITIONS_XML)
+    resolved_regionyields_path = regionyields_xml_path or Path(DEFAULT_REGIONYIELDS_XML)
+    yield_level_map = build_yield_level_map(resolved_regionyields_path)
+    resources_by_region_ref = load_region_definition_resources(resolved_region_definitions_path, yield_level_map)
+    regions_rows: List[dict] = []
+    for sector_id, links in sector_region_links.items():
+        merged_by_ware: Dict[str, dict] = {}
+        for link in links:
+            link_resources = [dict(item) for item in resources_by_region_ref.get(link["region_ref"], [])]
+            regions_rows.append({
+                "name": link["name"],
+                "region_ref": link["region_ref"],
+                "cluster_id": link["cluster_id"],
+                "sector_id": link["sector_id"],
+                "resources": link_resources,
+            })
+            for resource in link_resources:
+                ware = resource["ware"]
+                prev = merged_by_ware.get(ware)
+                if prev is None or resource["level"] > prev["level"]:
+                    merged_by_ware[ware] = dict(resource)
+        if sector_id in sectors:
+            sectors[sector_id]["resources"] = sorted(merged_by_ware.values(), key=lambda item: item["ware"])
+    for sector_id in sectors.keys():
+        sectors[sector_id].setdefault("resources", [])
+    regions_rows.sort(key=lambda item: (item["cluster_id"], item["sector_id"], item["name"]))
 
     for zones_root in zone_roots:
         for zone_macro_node in zones_root.findall("./macro[@class='zone']"):
@@ -1002,6 +1146,7 @@ def generate_map_data(
     missing_sector_nameid = sorted([sector_id for sector_id, sector in sectors.items() if not sector.get("nameId")])
     return {
         "payload": payload,
+        "regions": regions_rows,
         "name_ids": name_ids,
         "missing_name_ids": {
             "clusters": missing_cluster_nameid,
@@ -1014,6 +1159,7 @@ def generate_map_data(
             "cluster_links": len(cluster_links),
             "sector_links": len(sector_links),
             "highways": len(sector_highways),
+            "regions": len(regions_rows),
             "stations": sum(len(items) for items in sector_stations.values()),
             "owner_resolution_ties": len(owner_resolution_ties),
         },
@@ -1034,7 +1180,11 @@ def main() -> None:
     god_xml_path = Path(args.god_xml)
     factions_xml_path = Path(args.factions_xml)
     colors_xml_path = Path(args.colors_xml)
+    region_definitions_xml_path = Path(args.region_definitions_xml)
+    regionyields_xml_path = Path(args.regionyields_xml)
     factions_output_path = Path(args.factions_output)
+    regions_output_path = Path(args.regions_output)
+    regionyields_output_path = Path(args.regionyields_output)
 
     registry = get_i18n_registry()
     registry.configure(X4_UNPACKED_DATA_PATH, {
@@ -1045,20 +1195,29 @@ def main() -> None:
         colors_xml_path=colors_xml_path,
         i18n_registry=registry,
     )
+    regionyields_rows = migrate_regionyields(regionyields_xml_path)
     factions_output_path.parent.mkdir(parents=True, exist_ok=True)
     factions_output_path.write_text(json.dumps(factions_rows, ensure_ascii=False, indent=2), encoding="utf-8")
+    regionyields_output_path.parent.mkdir(parents=True, exist_ok=True)
+    regionyields_output_path.write_text(json.dumps(regionyields_rows, ensure_ascii=False, indent=2), encoding="utf-8")
 
     result = generate_map_data(
         map_dir=map_dir,
         mapdefaults_path=mapdefaults_path,
         god_xml_path=god_xml_path,
         factions_by_id=factions_by_id,
+        region_definitions_xml_path=region_definitions_xml_path,
+        regionyields_xml_path=regionyields_xml_path,
         i18n_registry=registry,
     )
+    regions_output_path.parent.mkdir(parents=True, exist_ok=True)
+    regions_output_path.write_text(json.dumps(result.get("regions", []), ensure_ascii=False, indent=2), encoding="utf-8")
     write_map_output(result["payload"], output_path)
     stats = result["stats"]
     missing = result["missing_name_ids"]
     print(f"Factions Output: {factions_output_path} count={len(factions_rows)}")
+    print(f"Regionyields Output: {regionyields_output_path} count={len(regionyields_rows)}")
+    print(f"Regions Output: {regions_output_path} count={len(result.get('regions', []))}")
     print(f"Output: {output_path}")
     print(
         f"clusters={stats['clusters']} sectors={stats['sectors']} zones={stats['zones']} "
