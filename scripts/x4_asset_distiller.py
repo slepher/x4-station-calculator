@@ -312,6 +312,7 @@ def main():
         { 'name': 'colors.xml', 'final': 'colors_final.xml' },
         { 'name': 'mapdefaults.xml', 'final': 'mapdefaults_final.xml' },
         { 'name': 'god.xml', 'final': 'god_final.xml' },
+        { 'name': 'factions.xml', 'final': 'factions_final.xml' },
         { 'name': 'ships.xml', 'final': 'ships_final.xml' },
         { 'name': 'shipgroups.xml', 'final': 'shipgroups_final.xml' },
         # loadouts 需要叠加 DLC
@@ -830,3 +831,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n程序终止: {e}")
         sys.exit(1)
+
+
