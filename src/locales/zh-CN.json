@@ -94,7 +94,8 @@
   "view": {
     "production": "量化生产",
     "logical_flow": "逻辑组网",
-    "ship_build": "船只建造"
+    "ship_build": "船只建造",
+    "maps": "星区地图"
   },
   "ship_build": {
     "title": "船只建造",

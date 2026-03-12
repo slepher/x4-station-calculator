@@ -94,7 +94,8 @@
   "view": {
     "production": "Quantified",
     "logical_flow": "Logical Flow",
-    "ship_build": "Ship Build"
+    "ship_build": "Ship Build",
+    "maps": "Sector Map"
   },
   "ship_build": {
     "title": "Ship Build",

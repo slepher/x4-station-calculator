@@ -817,6 +817,7 @@ def generate_map_data(
         for station in stations:
             owner = (station.get("owner") or "").strip()
             station_type = (station.get("type") or "").strip()
+            tags = station.get("tags") or []
             if not owner or owner in excluded_owners:
                 continue
             faction = faction_map.get(owner)
@@ -824,7 +825,6 @@ def generate_map_data(
                 continue
             if station_type == "piratebase":
                 continue
-            tags = station.get("tags") or []
             score = (station_type_priority(station_type), station_tag_priority(tags))
             candidates.append((score, station))
 

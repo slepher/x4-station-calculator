@@ -21,12 +21,15 @@ const currentView = ref<'main' | 'drag-test' | 'template-flow' | 'metric-panel-t
 onMounted(() => {
   const params = new URLSearchParams(window.location.search)
   const view = params.get('view')
+  const router = params.get('router')
   if (view === 'drag-test') {
     currentView.value = 'drag-test'
   } else if (view === 'template-flow') {
     currentView.value = 'template-flow'
   } else if (view === 'metric-panel-test') {
     currentView.value = 'metric-panel-test'
+  } else if (router === 'maps') {
+    shipBuildStore.activeView = 'maps'
   }
 })
 

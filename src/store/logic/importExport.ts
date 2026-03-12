@@ -41,7 +41,7 @@ export interface ModuleImportStats {
 export interface ImportApplyOptions {
   mode: ImportMode
   selectedModules: Partial<Record<ImportModuleKey, boolean>>
-  currentView: 'production' | 'flow' | 'ship-build'
+  currentView: 'production' | 'flow' | 'ship-build' | 'maps'
   payload: NormalizedImportPayload
   gameDataStore: GameDataStoreLike
   empireStore: EmpireStoreLike
@@ -73,7 +73,7 @@ interface LogicFlowStoreLike {
 interface ShipBuildStoreLike {
   savedBlueprints: SavedShipBlueprintsState
   isDirty: boolean
-  activeView: 'production' | 'flow' | 'ship-build'
+  activeView: 'production' | 'flow' | 'ship-build' | 'maps'
   loadBlueprintsFromStorage: () => void
   loadBlueprint: (id: string) => void
 }

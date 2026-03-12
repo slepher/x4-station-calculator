@@ -17,8 +17,8 @@ import { useX4I18n } from '@/utils/UseX4I18n'
 import { useToolbarWorkflowController } from '@/composables/useToolbarWorkflowController'
 import type { SmartSaveStep } from '@/utils/smartSavePolicy'
 
-const logicFlowStore = useLogicFlowStore()
-const empireStore = useEmpireStore()
+void useLogicFlowStore()
+void useEmpireStore()
 const shipBuildStore = useShipBuildStore()
 const { t } = useI18n()
 const { translateShip } = useX4I18n()

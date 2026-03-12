@@ -6,6 +6,7 @@ import StatusMonitor from './StatusMonitor.vue'
 import ProductionWorkbenchView from './empire/ProductionWorkbenchView.vue'
 import LogicFlowWorkbenchView from './logic-flow/LogicFlowWorkbenchView.vue'
 import ShipBuildView from './ship-build/ShipBuildView.vue'
+import MapWorkbenchView from './empire/MapWorkbenchView.vue'
 
 const store = useStationStore()
 const shipBuildStore = useShipBuildStore()
@@ -17,6 +18,7 @@ watchEffect(() => {
 
 const isProductionView = computed(() => shipBuildStore.activeView === 'production')
 const isShipBuildView = computed(() => shipBuildStore.activeView === 'ship-build')
+const isMapsView = computed(() => shipBuildStore.activeView === 'maps')
 
 </script>
 
@@ -32,6 +34,10 @@ const isShipBuildView = computed(() => shipBuildStore.activeView === 'ship-build
 
     <template v-else-if="isShipBuildView">
       <ShipBuildView />
+    </template>
+
+    <template v-else-if="isMapsView">
+      <MapWorkbenchView />
     </template>
 
     <div v-else class="flow-layout flex flex-col gap-6">

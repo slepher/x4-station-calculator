@@ -2205,6 +2205,13 @@ class X4PrecisionLoader:
                 self.equipment_type_name_map = self._load_equipment_types_from_locale(t_file)
                 self.slot_tag_name_map = self._load_slot_tags_from_locale(t_file)
 
+    def refresh_exported_i18n(self):
+        """在后续步骤新增 nameId 后，刷新内存中的多语言导出结果。"""
+        self.i18n_registry.collect_many(self.needed_raw_names)
+        for _x4_id, conf in X4_LANG_CONFIG.items():
+            iso = conf['iso']
+            self.i18n_data[iso] = self.i18n_registry.export_collected(iso)
+
     def _resolve_name(self, raw_name, lang_db, depth=0):
         return self.i18n_registry.get_name(raw_name, "en")
 
@@ -2667,6 +2674,7 @@ if __name__ == "__main__":
     loader.analyze_ship_types()
     loader.analyze_equipment_types()
     loader.analyze_slot_tags()
+    loader.refresh_exported_i18n()
     loader.inject_english_names() # 新增步骤
     loader.analyze_module_types()
     loader.generate_res_data() # 新增步骤: 生成资源元数据及缩写
