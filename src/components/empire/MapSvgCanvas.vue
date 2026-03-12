@@ -419,11 +419,13 @@ const clusterPolygons = computed(() => {
     Object.values(cluster.sectors || {}).forEach((sector) => {
       const ratio = sector.normalized?.center_offset_ratio || { x: 0, y: 0 }
       const radius = Number(sector.normalized?.sector_radius_ratio || 0) * clusterRadius
-      const baseLabelY = center.y - radius * SECTOR_LABEL_OFFSET_RATIO
+      const sx = center.x + ratio.x * clusterRadius
+      const sy = center.y + ratio.y * clusterRadius
+      const baseLabelY = sy - radius * SECTOR_LABEL_OFFSET_RATIO
       sectors.push({
         id: sector.id,
-        sx: center.x + ratio.x * clusterRadius,
-        sy: center.y + ratio.y * clusterRadius,
+        sx,
+        sy,
         radius,
         color: resolveOwnerColor(sector),
         label: resolveName(sector.nameId, sector.name || sector.id),
