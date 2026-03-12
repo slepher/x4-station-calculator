@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, watchEffect } from 'vue'
+import { useI18n } from 'vue-i18n'
 import mapsData from '@/assets/x4_game_data/8.0-Diplomacy/data/maps.json'
 
 type Vec2 = { x: number; y: number }
@@ -46,17 +47,53 @@ const FALLBACK_OWNER_COLOR = '#94a3b8'
 const SQRT3 = Math.sqrt(3)
 const SECTOR_LABEL_OFFSET_RATIO = 0.72
 const SECTOR_LABEL_FONT_SIZE = 14
+const MULTI_SECTOR_LABEL_FONT_SIZE = 12
+const HEX_TOP_EDGE_RATIO = SQRT3 / 2
+const MULTI_SECTOR_LABEL_PAD_RATIO = 0.03
+const MULTI_SECTOR_LABEL_PAD_MIN_PX = 2
+const MAP_FONT_FAMILY = "Consolas, 'Courier New', monospace"
+
+const fontAscentCache = new Map<string, number>()
+const getFontAscentPx = (fontSize: number, fontFamily: string) => {
+  const key = `${fontSize}:${fontFamily}`
+  const cached = fontAscentCache.get(key)
+  if (cached !== undefined) return cached
+  if (typeof document === 'undefined') {
+    const fallback = fontSize * 0.8
+    fontAscentCache.set(key, fallback)
+    return fallback
+  }
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')
+  if (!ctx) {
+    const fallback = fontSize * 0.8
+    fontAscentCache.set(key, fallback)
+    return fallback
+  }
+  ctx.font = `${fontSize}px ${fontFamily}`
+  const metrics = ctx.measureText('Hg')
+  const ascent = metrics.actualBoundingBoxAscent || fontSize * 0.8
+  fontAscentCache.set(key, ascent)
+  return ascent
+}
 
 const emit = defineEmits<{
   (e: 'content-size', payload: { width: number; height: number; clusterRefHeight: number }): void
 }>()
+const { t, te } = useI18n()
 
 const svgIdSafe = (value: string) => value.replace(/[^a-zA-Z0-9_-]/g, '_')
 const sectorClipId = (clusterId: string, sectorId: string) =>
   `sector-clip-${svgIdSafe(clusterId)}-${svgIdSafe(sectorId)}`
 const resolveOwnerColor = (node: { owner_color?: string }) => node.owner_color || FALLBACK_OWNER_COLOR
 
-const resolveName = (_nameId?: string, fallback?: string) => fallback || ''
+const resolveName = (nameId?: string, fallback?: string) => {
+  if (nameId && te(nameId)) {
+    const translated = t(nameId)
+    if (translated && translated !== nameId) return translated
+  }
+  return fallback || nameId || ''
+}
 
 const hexPoints = (cx: number, cy: number, radius: number) => {
   const points: string[] = []
@@ -421,7 +458,10 @@ const clusterPolygons = computed(() => {
       const radius = Number(sector.normalized?.sector_radius_ratio || 0) * clusterRadius
       const sx = center.x + ratio.x * clusterRadius
       const sy = center.y + ratio.y * clusterRadius
-      const baseLabelY = sy - radius * SECTOR_LABEL_OFFSET_RATIO
+      const topEdgeY = sy - radius * HEX_TOP_EDGE_RATIO
+      const pad = Math.max(MULTI_SECTOR_LABEL_PAD_MIN_PX, radius * MULTI_SECTOR_LABEL_PAD_RATIO)
+      const ascent = getFontAscentPx(MULTI_SECTOR_LABEL_FONT_SIZE, MAP_FONT_FAMILY)
+      const baseLabelY = topEdgeY + pad + ascent
       sectors.push({
         id: sector.id,
         sx,
@@ -610,8 +650,8 @@ watchEffect(() => {
               :x="sector.sx.toFixed(1)"
               :y="sector.labelY.toFixed(1)"
               text-anchor="middle"
-              :font-size="SECTOR_LABEL_FONT_SIZE"
-              font-family="Consolas, 'Courier New', monospace"
+              :font-size="MULTI_SECTOR_LABEL_FONT_SIZE"
+              :font-family="MAP_FONT_FAMILY"
               fill="#f8fafc"
             >
               {{ sector.label }}
@@ -625,7 +665,7 @@ watchEffect(() => {
           :y="(cluster.cy - (cluster.singleRadius || 0) * SECTOR_LABEL_OFFSET_RATIO).toFixed(1)"
           text-anchor="middle"
           :font-size="SECTOR_LABEL_FONT_SIZE"
-          font-family="Consolas, 'Courier New', monospace"
+          :font-family="MAP_FONT_FAMILY"
           fill="#f8fafc"
         >
           {{ cluster.singleLabel }}
