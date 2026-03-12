@@ -97,6 +97,10 @@
     "ship_build": "船只建造",
     "maps": "星区地图"
   },
+  "map": {
+    "search_sector_placeholder": "搜索星区",
+    "no_search_results": "未找到匹配星区"
+  },
   "ship_build": {
     "title": "船只建造",
     "select_ship": "选择船只",
