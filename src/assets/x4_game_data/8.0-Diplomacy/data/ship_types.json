@@ -2,7 +2,7 @@
   {
     "id": "destroyer",
     "nameId": "{20221,4001}",
-    "name": "Destroyer",
+    "name": "{20221,4001}",
     "class": [
       "ship_l"
     ]
@@ -10,7 +10,7 @@
   {
     "id": "largeminer",
     "nameId": "{20221,3041}",
-    "name": "Miner",
+    "name": "{20221,3041}",
     "class": [
       "ship_l"
     ]
@@ -18,7 +18,7 @@
   {
     "id": "freighter",
     "nameId": "{20221,4011}",
-    "name": "Freighter",
+    "name": "{20221,4011}",
     "class": [
       "ship_l"
     ]
@@ -26,7 +26,7 @@
   {
     "id": "gunboat",
     "nameId": "{20221,5041}",
-    "name": "Gunboat",
+    "name": "{20221,5041}",
     "class": [
       "ship_m"
     ]
@@ -34,7 +34,7 @@
   {
     "id": "scavenger",
     "nameId": "{20221,3061}",
-    "name": "Scavenger",
+    "name": "{20221,3061}",
     "class": [
       "ship_l",
       "ship_m"
@@ -43,7 +43,7 @@
   {
     "id": "frigate",
     "nameId": "{20221,3011}",
-    "name": "Frigate",
+    "name": "{20221,3011}",
     "class": [
       "ship_m"
     ]
@@ -51,7 +51,7 @@
   {
     "id": "miner",
     "nameId": "{20221,3041}",
-    "name": "Miner",
+    "name": "{20221,3041}",
     "class": [
       "ship_m",
       "ship_s"
@@ -60,7 +60,7 @@
   {
     "id": "transporter",
     "nameId": "{20221,3031}",
-    "name": "Transporter",
+    "name": "{20221,3031}",
     "class": [
       "ship_m"
     ]
@@ -68,7 +68,7 @@
   {
     "id": "fighter",
     "nameId": "{20221,2011}",
-    "name": "Fighter",
+    "name": "{20221,2011}",
     "class": [
       "ship_s"
     ]
@@ -76,7 +76,7 @@
   {
     "id": "heavyfighter",
     "nameId": "{20221,2021}",
-    "name": "Heavy Fighter",
+    "name": "{20221,2021}",
     "class": [
       "ship_s"
     ]
@@ -84,7 +84,7 @@
   {
     "id": "scout",
     "nameId": "{20221,2001}",
-    "name": "Scout",
+    "name": "{20221,2001}",
     "class": [
       "ship_s"
     ]
@@ -92,7 +92,7 @@
   {
     "id": "courier",
     "nameId": "{20221,2041}",
-    "name": "Courier",
+    "name": "{20221,2041}",
     "class": [
       "ship_s"
     ]
@@ -100,7 +100,7 @@
   {
     "id": "builder",
     "nameId": "{20221,5021}",
-    "name": "Builder",
+    "name": "{20221,5021}",
     "class": [
       "ship_xl"
     ]
@@ -108,7 +108,7 @@
   {
     "id": "carrier",
     "nameId": "{20221,5001}",
-    "name": "Carrier",
+    "name": "{20221,5001}",
     "class": [
       "ship_l",
       "ship_xl"
@@ -117,7 +117,7 @@
   {
     "id": "resupplier",
     "nameId": "{20221,5011}",
-    "name": "Auxiliary",
+    "name": "{20221,5011}",
     "class": [
       "ship_xl"
     ]
@@ -125,7 +125,7 @@
   {
     "id": "battleship",
     "nameId": "{20221,5031}",
-    "name": "Battleship",
+    "name": "{20221,5031}",
     "class": [
       "ship_xl"
     ]
@@ -133,7 +133,7 @@
   {
     "id": "corvette",
     "nameId": "{20221,3021}",
-    "name": "Corvette",
+    "name": "{20221,3021}",
     "class": [
       "ship_m"
     ]
@@ -141,7 +141,7 @@
   {
     "id": "envoy",
     "nameId": "{20221,5101}",
-    "name": "Envoy",
+    "name": "{20221,5101}",
     "class": [
       "ship_m"
     ]
@@ -149,7 +149,7 @@
   {
     "id": "tug",
     "nameId": "{20221,5051}",
-    "name": "Tug",
+    "name": "{20221,5051}",
     "class": [
       "ship_m"
     ]
@@ -157,7 +157,7 @@
   {
     "id": "expeditionary",
     "nameId": "{20221,5091}",
-    "name": "Expeditionary Ship",
+    "name": "{20221,5091}",
     "class": [
       "ship_l"
     ]
@@ -165,7 +165,7 @@
   {
     "id": "compactor",
     "nameId": "{20221,5061}",
-    "name": "Compactor",
+    "name": "{20221,5061}",
     "class": [
       "ship_l"
     ]

@@ -35,6 +35,7 @@ X4_UNPACKED_DATA_PATH = os.path.join(_config['raw_assets_dir'], _config['folder_
 OUTPUT_VERSION_DIR = os.path.join(_config['processed_assets_dir'], _config['folder_name'])
 MAP_OUTPUT_JSON = str(Path(OUTPUT_VERSION_DIR) / "data" / "maps.json")
 MAP_DEFAULTS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "mapdefaults_final.xml")
+MAP_GOD_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "god_final.xml")
 MAP_DIR = str(Path(X4_UNPACKED_DATA_PATH) / "maps" / "xu_ep2_universe")
 
 X4_LANG_CONFIG = {
@@ -2146,6 +2147,7 @@ class X4PrecisionLoader:
         result = x4_data_map_processor.generate_map_data(
             map_dir=Path(MAP_DIR),
             mapdefaults_path=Path(MAP_DEFAULTS_XML),
+            god_xml_path=Path(MAP_GOD_XML),
             i18n_registry=self.i18n_registry,
         )
         x4_data_map_processor.write_map_output(result["payload"], Path(MAP_OUTPUT_JSON))

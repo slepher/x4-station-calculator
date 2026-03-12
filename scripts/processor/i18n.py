@@ -138,6 +138,8 @@ class I18nRegistry:
         if strip_parenthetical:
             current = _strip_leading_duplicate_parenthetical(current)
         current = re.sub(r"\s+", " ", current).strip()
+        if lang in {"zh-CN", "zh-TW"}:
+            current = _keep_right_of_pipe(current)
 
         cache[text] = current
         return current
@@ -205,4 +207,14 @@ def _strip_leading_duplicate_parenthetical(text: str) -> str:
         return rest
     if re.search(r"[A-Za-z0-9\u4e00-\u9fff]", rest):
         return rest
+    return text
+
+
+def _keep_right_of_pipe(text: str) -> str:
+    if not text:
+        return text
+    if "｜" in text:
+        return text.split("｜", 1)[1].strip()
+    if "|" in text:
+        return text.split("|", 1)[1].strip()
     return text

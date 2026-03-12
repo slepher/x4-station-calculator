@@ -25,6 +25,7 @@ OUTPUT_VERSION_DIR = os.path.join(_config['processed_assets_dir'], _config['fold
 DEFAULT_MAP_DIR = str(Path(X4_UNPACKED_DATA_PATH) / "maps" / "xu_ep2_universe")
 DEFAULT_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "maps.json")
 DEFAULT_MAPDEFAULTS = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "mapdefaults_final.xml")
+DEFAULT_GOD_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "god_final.xml")
 
 
 CLUSTER_MACRO_RE = re.compile(r"Cluster_(\d+)_macro", re.IGNORECASE)
@@ -63,6 +64,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Extract and normalize X4 universe map data from distilled XML.")
     parser.add_argument("--map-dir", default=DEFAULT_MAP_DIR)
     parser.add_argument("--mapdefaults-xml", default=DEFAULT_MAPDEFAULTS)
+    parser.add_argument("--god-xml", default=DEFAULT_GOD_XML)
     parser.add_argument("--output", default=DEFAULT_OUTPUT)
     return parser.parse_args()
 
@@ -224,6 +226,25 @@ def split_tags(tags: Optional[str]) -> List[str]:
     return [item for item in tags.split() if item]
 
 
+def parse_select_tags(tags: Optional[str]) -> List[str]:
+    if not tags:
+        return []
+    raw = tags.strip()
+    if raw.startswith("[") and raw.endswith("]"):
+        raw = raw[1:-1]
+    parts = [item.strip() for item in re.split(r"[\s,]+", raw) if item.strip()]
+    return parts
+
+
+def station_type_priority(station_type: str) -> int:
+    return 1 if station_type in {"tradingstation", "shipyard"} else 0
+
+
+def station_tag_priority(tags: List[str]) -> int:
+    preferred = {"tradingstation", "wharf", "shipyard", "equipmentdock"}
+    return 1 if any(tag in preferred for tag in tags) else 0
+
+
 def load_mapdefaults(mapdefaults_xml: Path) -> Tuple[Dict[str, str], Dict[str, dict]]:
     if not mapdefaults_xml.exists():
         return {}, {}
@@ -274,7 +295,7 @@ def zone_connection_path_to_zone_macro(path: Optional[str]) -> Optional[str]:
         return None
     return f"Zone{int(match.group(1)):03d}_Cluster_{int(match.group(2)):02d}_Sector{int(match.group(3)):03d}_macro"
 
-def generate_map_data(map_dir: Path, mapdefaults_path: Path, i18n_registry=None) -> Dict[str, object]:
+def generate_map_data(map_dir: Path, mapdefaults_path: Path, god_xml_path: Optional[Path] = None, i18n_registry=None) -> Dict[str, object]:
     name_id_by_macro, area_by_sector_macro = load_mapdefaults(mapdefaults_path)
     registry = i18n_registry or get_i18n_registry()
     if i18n_registry is None:
@@ -651,6 +672,124 @@ def generate_map_data(map_dir: Path, mapdefaults_path: Path, i18n_registry=None)
             link["to_zone_normalized_ratio"] = zone_b.get("normalized", {}).get("projected_local_ratio")
             link["to_zone_raw_local_pos"] = zone_b["raw_local_pos"]
 
+    sector_stations: Dict[str, List[dict]] = defaultdict(list)
+    if god_xml_path and god_xml_path.exists():
+        god_root = parse_xml(god_xml_path)
+        sector_macro_by_lower = {key.lower(): key for key in sectors.keys()}
+        zone_macro_by_lower = {key.lower(): key for key in zones.keys()}
+        for station_node in god_root.findall(".//station[@id]"):
+            location = station_node.find("./location")
+            if location is None:
+                continue
+            location_class = (location.get("class") or "").strip().lower()
+            location_macro = (location.get("macro") or "").strip()
+            if not location_class or not location_macro:
+                continue
+
+            sector_id = None
+            if location_class == "sector":
+                sector_id = sector_macro_by_lower.get(location_macro.lower())
+            elif location_class == "zone":
+                zone_id = zone_macro_by_lower.get(location_macro.lower())
+                if zone_id and zone_id in zones:
+                    sector_id = zones[zone_id]["sector_id"]
+            if not sector_id or sector_id not in sectors:
+                continue
+
+            base_pos = {"x": as_float(station_node.get("x"), 0.0), "z": as_float(station_node.get("z"), 0.0)}
+            position = station_node.find("./position")
+            if position is not None:
+                base_pos = {"x": as_float(position.get("x"), 0.0), "z": as_float(position.get("z"), 0.0)}
+
+            if location_class == "zone":
+                zone_id = zone_macro_by_lower.get(location_macro.lower())
+                if not zone_id or zone_id not in zones:
+                    continue
+                raw_sector_pos = vec_add({"x": zones[zone_id]["raw_local_pos"]["x"], "z": zones[zone_id]["raw_local_pos"]["z"]}, base_pos)
+            else:
+                raw_sector_pos = base_pos
+
+            sector_norm = sectors[sector_id]["normalized"]
+            scale_per_radius = sector_norm["scale_per_radius"]
+            station_sector_pos = {
+                "x": raw_sector_pos["x"],
+                "z": raw_sector_pos["z"],
+                "sx": raw_sector_pos["x"] * scale_per_radius,
+                "sy": -raw_sector_pos["z"] * scale_per_radius,
+            }
+
+            select = station_node.find("./station/select")
+            station_item = {
+                "owner": (station_node.get("owner") or "").strip(),
+                "race": (station_node.get("race") or "").strip(),
+                "type": (station_node.get("type") or "").strip(),
+                "tags": parse_select_tags(select.get("tags") if select is not None else None),
+                "raw_sector_pos": station_sector_pos,
+            }
+            sector_stations[sector_id].append(station_item)
+
+    owner_resolution_ties: List[dict] = []
+    excluded_owners = {"player", "civilian", "khaak", "ownerless"}
+    for sector_id, sector in sectors.items():
+        stations = sector_stations.get(sector_id, [])
+        candidates = []
+        for station in stations:
+            owner = (station.get("owner") or "").strip()
+            station_type = (station.get("type") or "").strip()
+            if not owner or owner in excluded_owners:
+                continue
+            if station_type == "piratebase":
+                continue
+            tags = station.get("tags") or []
+            score = (station_type_priority(station_type), station_tag_priority(tags))
+            candidates.append((score, station))
+
+        if not candidates:
+            sector["owner"] = "ownerless"
+            sector["owner_color"] = OWNER_COLORS.get("ownerless", "#4b5563")
+            continue
+
+        candidates.sort(key=lambda item: item[0], reverse=True)
+        best_score = candidates[0][0]
+        top = [item[1] for item in candidates if item[0] == best_score]
+        chosen = top[0]
+        sector["owner"] = (chosen.get("owner") or "").strip() or "ownerless"
+        sector["owner_color"] = OWNER_COLORS.get(sector["owner"], "#4b5563")
+        if len(top) > 1:
+            owner_resolution_ties.append(
+                {
+                    "sector_id": sector_id,
+                    "score": {"type_priority": best_score[0], "tag_priority": best_score[1]},
+                    "candidates": [
+                        {
+                            "owner": item.get("owner"),
+                            "type": item.get("type"),
+                            "tags": item.get("tags", []),
+                        }
+                        for item in top
+                    ],
+                    "chosen": {
+                        "owner": chosen.get("owner"),
+                        "type": chosen.get("type"),
+                        "tags": chosen.get("tags", []),
+                    },
+                }
+            )
+
+    for cluster_id, cluster in clusters.items():
+        sector_ids = cluster.get("sector_ids", [])
+        if not sector_ids:
+            cluster["owner"] = "ownerless"
+            cluster["owner_color"] = OWNER_COLORS.get("ownerless", "#4b5563")
+            continue
+        owners = {sectors[sector_id]["owner"] for sector_id in sector_ids if sector_id in sectors}
+        if len(owners) == 1 and "ownerless" not in owners:
+            cluster_owner = next(iter(owners))
+        else:
+            cluster_owner = "ownerless"
+        cluster["owner"] = cluster_owner
+        cluster["owner_color"] = OWNER_COLORS.get(cluster_owner, "#4b5563")
+
     grouped_sector_links: Dict[Tuple[str, str, str], List[str]] = defaultdict(list)
     for link_id, link in sector_links.items():
         sector_a_id = link.get("sector_a_id")
@@ -687,6 +826,7 @@ def generate_map_data(map_dir: Path, mapdefaults_path: Path, i18n_registry=None)
         nested_sector["shcon_anchors"] = {}
         nested_sector["cluster_gates"] = {}
         nested_sector["highways"] = {}
+        nested_sector["stations"] = []
         nested_clusters[cluster_id]["sectors"][sector_id] = nested_sector
 
     for zone_id, zone in zones.items():
@@ -753,6 +893,11 @@ def generate_map_data(map_dir: Path, mapdefaults_path: Path, i18n_registry=None)
         }
         nested_clusters[cluster_id]["sector_links"][link_id] = nested_link
 
+    for sector_id, station_items in sector_stations.items():
+        cluster_id = sectors[sector_id]["cluster_id"]
+        if cluster_id and cluster_id in nested_clusters and sector_id in nested_clusters[cluster_id]["sectors"]:
+            nested_clusters[cluster_id]["sectors"][sector_id]["stations"] = station_items
+
     payload = {
         "meta": {
             "version": "x4-map-xml-v2",
@@ -785,7 +930,10 @@ def generate_map_data(map_dir: Path, mapdefaults_path: Path, i18n_registry=None)
             "cluster_links": len(cluster_links),
             "sector_links": len(sector_links),
             "highways": len(sector_highways),
+            "stations": sum(len(items) for items in sector_stations.values()),
+            "owner_resolution_ties": len(owner_resolution_ties),
         },
+        "owner_resolution_ties": owner_resolution_ties,
     }
 
 
@@ -799,15 +947,30 @@ def main() -> None:
     map_dir = Path(args.map_dir)
     output_path = Path(args.output)
     mapdefaults_path = Path(args.mapdefaults_xml)
-    result = generate_map_data(map_dir=map_dir, mapdefaults_path=mapdefaults_path)
+    god_xml_path = Path(args.god_xml)
+    result = generate_map_data(map_dir=map_dir, mapdefaults_path=mapdefaults_path, god_xml_path=god_xml_path)
     write_map_output(result["payload"], output_path)
     stats = result["stats"]
     missing = result["missing_name_ids"]
     print(f"Output: {output_path}")
     print(
         f"clusters={stats['clusters']} sectors={stats['sectors']} zones={stats['zones']} "
-        f"cluster_links={stats['cluster_links']} sector_links={stats['sector_links']} highways={stats['highways']}"
+        f"cluster_links={stats['cluster_links']} sector_links={stats['sector_links']} highways={stats['highways']} "
+        f"stations={stats['stations']} owner_resolution_ties={stats['owner_resolution_ties']}"
     )
+    ties = result.get("owner_resolution_ties", [])
+    if ties:
+        print("owner_resolution_tie_list:")
+        for item in ties:
+            candidates_text = "; ".join(
+                [
+                    f"{cand.get('owner')}|{cand.get('type')}|{','.join(cand.get('tags', []))}"
+                    for cand in item.get("candidates", [])
+                ]
+            )
+            chosen = item.get("chosen", {})
+            chosen_text = f"{chosen.get('owner')}|{chosen.get('type')}|{','.join(chosen.get('tags', []))}"
+            print(f"  {item.get('sector_id')} score={item.get('score')} chosen={chosen_text} candidates={candidates_text}")
     print(f"missing_cluster_nameId={len(missing['clusters'])}")
     if missing["clusters"]:
         print("  " + ", ".join(missing["clusters"]))
