@@ -44,6 +44,7 @@
 - **前提** 地图视口高度已知
 - **当** 缩放值为最大
 - **那么** 系统 SHALL 使单个 cluster 视觉高度约等于半屏高度
+- **并且** SHALL 支持在该结果基础上应用最大缩放倍率系数（当前为 2x）
 
 #### Scenario: 左下角缩放条
 - **前提** 地图组件已加载
@@ -62,6 +63,30 @@
 - **前提** 用户在地图区域滚动鼠标滚轮
 - **当** 缩放发生
 - **那么** 系统 SHALL 以鼠标当前位置为缩放锚点
+
+### Requirement: Label And Stargate Visual Calibration
+系统 MUST 提供一致的标签与星门视觉标定策略。
+
+#### Scenario: 单 sector 标签字号
+- **前提** cluster 仅包含一个 sector
+- **当** 渲染标签
+- **那么** 系统 SHALL 使用 `18px` 标签字号
+
+#### Scenario: 多 sector 标签字号
+- **前提** cluster 包含多个 sector
+- **当** 渲染标签
+- **那么** 系统 SHALL 按 `14 * sector_radius_ratio` 计算字号
+- **并且** SHALL 施加最小字号下限 `8px`
+
+#### Scenario: 标签顶部基线定位
+- **前提** 渲染 sector 标签
+- **当** 计算文字对齐
+- **那么** 系统 SHALL 使用顶部基线对齐（`text-before-edge`）以降低跨语言高度差带来的偏移
+
+#### Scenario: 星门图元放大
+- **前提** 渲染 cluster gate 点位与跨 cluster 连线
+- **当** 应用视觉样式
+- **那么** 系统 SHALL 将相关半径与线宽统一按 `1.5x` 放大
 
 ### Requirement: Entry Compatibility
 系统 MUST 保持现有地图入口兼容。

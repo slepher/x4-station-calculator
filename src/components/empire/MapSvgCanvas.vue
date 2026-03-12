@@ -46,11 +46,14 @@ type Cluster = {
 const FALLBACK_OWNER_COLOR = '#94a3b8'
 const SQRT3 = Math.sqrt(3)
 const SECTOR_LABEL_FONT_SIZE = 14
+const SINGLE_SECTOR_LABEL_FONT_SIZE = 18
 const MIN_SECTOR_LABEL_FONT_SIZE = 8
 const HEX_TOP_EDGE_RATIO = SQRT3 / 2
 const MULTI_SECTOR_LABEL_PAD_RATIO = 0.03
 const MULTI_SECTOR_LABEL_PAD_MIN_PX = 2
 const MAP_FONT_FAMILY = "Consolas, 'Courier New', monospace"
+const CANVAS_SCALE_FACTOR = 1.8
+const STARGATE_VISUAL_SCALE = 1.5
 
 const emit = defineEmits<{
   (e: 'content-size', payload: { width: number; height: number; clusterRefHeight: number }): void
@@ -258,7 +261,13 @@ const regionClusters = computed<Record<string, Cluster>>(() => {
 })
 
 const layoutState = computed(() => {
-  let cfg: LayoutConfig = { width: 3600, height: 2600, padX: 180, padY: 180, topPad: 140 }
+  let cfg: LayoutConfig = {
+    width: 3600 * CANVAS_SCALE_FACTOR,
+    height: 2600 * CANVAS_SCALE_FACTOR,
+    padX: 180 * CANVAS_SCALE_FACTOR,
+    padY: 180 * CANVAS_SCALE_FACTOR,
+    topPad: 140 * CANVAS_SCALE_FACTOR
+  }
   const points = Object.values(regionClusters.value).map((cluster) => cluster.normalized?.pixel_basis || { x: 0, y: 0 })
   let fit = fitWorldToScreen(points, cfg)
   let centers: Record<string, Vec2> = {}
@@ -465,7 +474,7 @@ const clusterPolygons = computed(() => {
         singleLabel: sectors[0]!.label,
         singleRadius,
         singleLabelY: topEdgeY + pad,
-        singleLabelFontSize: sectors[0]!.labelFontSize
+        singleLabelFontSize: SINGLE_SECTOR_LABEL_FONT_SIZE
       })
       return
     }
@@ -492,7 +501,7 @@ const gateCircles = computed(() => {
         rows.push({
           id: `${clusterId}:${sector.id}:${gateId}`,
           point: clusterRatioToScreen(center, clusterRadius, ratio),
-          r: sectors.length === 1 ? 1.1 : 0.8,
+          r: (sectors.length === 1 ? 1.1 : 0.8) * STARGATE_VISUAL_SCALE,
           color: sectorColor,
           clusterId,
           targetClusterId: gate.target_cluster_id
@@ -669,7 +678,7 @@ watchEffect(() => {
         :r="gate.r.toFixed(1)"
         :fill="gate.color"
         stroke="#ffffff"
-        stroke-width="0.3"
+        :stroke-width="(0.3 * STARGATE_VISUAL_SCALE).toFixed(2)"
       />
     </g>
 
@@ -682,7 +691,7 @@ watchEffect(() => {
         :x2="line.right.x.toFixed(1)"
         :y2="line.right.y.toFixed(1)"
         stroke="#e5e7eb"
-        stroke-width="0.6"
+        :stroke-width="(0.6 * STARGATE_VISUAL_SCALE).toFixed(2)"
         stroke-opacity="0.85"
       />
     </g>

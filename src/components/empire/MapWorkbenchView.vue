@@ -3,6 +3,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import MapSvgCanvas from './MapSvgCanvas.vue'
 
 const clusterRefHeightPx = ref(142)
+const MAX_SCALE_MULTIPLIER = 2
 
 const viewportRef = ref<HTMLDivElement | null>(null)
 
@@ -95,7 +96,7 @@ const recomputeScaleBounds = () => {
   const nextMin = fitByWidth
   const targetHalfScreen = window.innerHeight * 0.5
   const refHeight = Math.max(1, clusterRefHeightPx.value)
-  const nextMax = Math.max(nextMin, targetHalfScreen / refHeight)
+  const nextMax = Math.max(nextMin, targetHalfScreen / refHeight) * MAX_SCALE_MULTIPLIER
 
   minScale.value = nextMin
   maxScale.value = nextMax
