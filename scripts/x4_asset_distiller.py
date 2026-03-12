@@ -313,6 +313,8 @@ def main():
         { 'name': 'mapdefaults.xml', 'final': 'mapdefaults_final.xml' },
         { 'name': 'god.xml', 'final': 'god_final.xml' },
         { 'name': 'factions.xml', 'final': 'factions_final.xml' },
+        { 'name': 'region_definitions.xml', 'final': 'region_definitions_final.xml' },
+        { 'name': 'regionyields.xml', 'final': 'regionyields_final.xml' },
         { 'name': 'ships.xml', 'final': 'ships_final.xml' },
         { 'name': 'shipgroups.xml', 'final': 'shipgroups_final.xml' },
         # loadouts 需要叠加 DLC
