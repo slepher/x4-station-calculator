@@ -45,37 +45,12 @@ type Cluster = {
 
 const FALLBACK_OWNER_COLOR = '#94a3b8'
 const SQRT3 = Math.sqrt(3)
-const SECTOR_LABEL_OFFSET_RATIO = 0.72
 const SECTOR_LABEL_FONT_SIZE = 14
-const MULTI_SECTOR_LABEL_FONT_SIZE = 12
+const MIN_SECTOR_LABEL_FONT_SIZE = 8
 const HEX_TOP_EDGE_RATIO = SQRT3 / 2
 const MULTI_SECTOR_LABEL_PAD_RATIO = 0.03
 const MULTI_SECTOR_LABEL_PAD_MIN_PX = 2
 const MAP_FONT_FAMILY = "Consolas, 'Courier New', monospace"
-
-const fontAscentCache = new Map<string, number>()
-const getFontAscentPx = (fontSize: number, fontFamily: string) => {
-  const key = `${fontSize}:${fontFamily}`
-  const cached = fontAscentCache.get(key)
-  if (cached !== undefined) return cached
-  if (typeof document === 'undefined') {
-    const fallback = fontSize * 0.8
-    fontAscentCache.set(key, fallback)
-    return fallback
-  }
-  const canvas = document.createElement('canvas')
-  const ctx = canvas.getContext('2d')
-  if (!ctx) {
-    const fallback = fontSize * 0.8
-    fontAscentCache.set(key, fallback)
-    return fallback
-  }
-  ctx.font = `${fontSize}px ${fontFamily}`
-  const metrics = ctx.measureText('Hg')
-  const ascent = metrics.actualBoundingBoxAscent || fontSize * 0.8
-  fontAscentCache.set(key, ascent)
-  return ascent
-}
 
 const emit = defineEmits<{
   (e: 'content-size', payload: { width: number; height: number; clusterRefHeight: number }): void
@@ -440,9 +415,11 @@ const clusterPolygons = computed(() => {
     cy: number
     color: string
     clusterRadius: number
-    sectors: Array<{ id: string; sx: number; sy: number; radius: number; color: string; label: string; labelY: number }>
+    sectors: Array<{ id: string; sx: number; sy: number; radius: number; color: string; label: string; labelY: number; labelFontSize: number }>
     singleLabel?: string
     singleRadius?: number
+    singleLabelY?: number
+    singleLabelFontSize?: number
   }> = []
   const { centers, clusterRadius } = layoutState.value
 
@@ -452,16 +429,16 @@ const clusterPolygons = computed(() => {
     const center = centers[clusterId]
     if (!center) return
     const color = resolveOwnerColor(cluster)
-    const sectors: Array<{ id: string; sx: number; sy: number; radius: number; color: string; label: string; labelY: number }> = []
+    const sectors: Array<{ id: string; sx: number; sy: number; radius: number; color: string; label: string; labelY: number; labelFontSize: number }> = []
     Object.values(cluster.sectors || {}).forEach((sector) => {
       const ratio = sector.normalized?.center_offset_ratio || { x: 0, y: 0 }
+      const sectorRadiusRatio = Number(sector.normalized?.sector_radius_ratio || 0)
       const radius = Number(sector.normalized?.sector_radius_ratio || 0) * clusterRadius
       const sx = center.x + ratio.x * clusterRadius
       const sy = center.y + ratio.y * clusterRadius
       const topEdgeY = sy - radius * HEX_TOP_EDGE_RATIO
       const pad = Math.max(MULTI_SECTOR_LABEL_PAD_MIN_PX, radius * MULTI_SECTOR_LABEL_PAD_RATIO)
-      const ascent = getFontAscentPx(MULTI_SECTOR_LABEL_FONT_SIZE, MAP_FONT_FAMILY)
-      const baseLabelY = topEdgeY + pad + ascent
+      const baseLabelY = topEdgeY + pad
       sectors.push({
         id: sector.id,
         sx,
@@ -469,11 +446,15 @@ const clusterPolygons = computed(() => {
         radius,
         color: resolveOwnerColor(sector),
         label: resolveName(sector.nameId, sector.name || sector.id),
-        labelY: baseLabelY
+        labelY: baseLabelY,
+        labelFontSize: Math.max(MIN_SECTOR_LABEL_FONT_SIZE, SECTOR_LABEL_FONT_SIZE * sectorRadiusRatio)
       })
     })
 
     if (sectors.length === 1) {
+      const singleRadius = sectors[0]!.radius
+      const topEdgeY = center.y - singleRadius * HEX_TOP_EDGE_RATIO
+      const pad = Math.max(MULTI_SECTOR_LABEL_PAD_MIN_PX, singleRadius * MULTI_SECTOR_LABEL_PAD_RATIO)
       rows.push({
         id: clusterId,
         cx: center.x,
@@ -482,7 +463,9 @@ const clusterPolygons = computed(() => {
         clusterRadius,
         sectors,
         singleLabel: sectors[0]!.label,
-        singleRadius: sectors[0]!.radius
+        singleRadius,
+        singleLabelY: topEdgeY + pad,
+        singleLabelFontSize: sectors[0]!.labelFontSize
       })
       return
     }
@@ -650,7 +633,9 @@ watchEffect(() => {
               :x="sector.sx.toFixed(1)"
               :y="sector.labelY.toFixed(1)"
               text-anchor="middle"
-              :font-size="MULTI_SECTOR_LABEL_FONT_SIZE"
+              dominant-baseline="text-before-edge"
+              alignment-baseline="text-before-edge"
+              :font-size="sector.labelFontSize.toFixed(1)"
               :font-family="MAP_FONT_FAMILY"
               fill="#f8fafc"
             >
@@ -662,9 +647,11 @@ watchEffect(() => {
         <text
           v-if="cluster.sectors.length === 1"
           :x="cluster.cx.toFixed(1)"
-          :y="(cluster.cy - (cluster.singleRadius || 0) * SECTOR_LABEL_OFFSET_RATIO).toFixed(1)"
+          :y="(cluster.singleLabelY || 0).toFixed(1)"
           text-anchor="middle"
-          :font-size="SECTOR_LABEL_FONT_SIZE"
+          dominant-baseline="text-before-edge"
+          alignment-baseline="text-before-edge"
+          :font-size="(cluster.singleLabelFontSize || SECTOR_LABEL_FONT_SIZE).toFixed(1)"
           :font-family="MAP_FONT_FAMILY"
           fill="#f8fafc"
         >

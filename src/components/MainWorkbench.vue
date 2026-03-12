@@ -23,7 +23,7 @@ const isMapsView = computed(() => shipBuildStore.activeView === 'maps')
 </script>
 
 <template>
-  <div class="main-workbench w-full max-w-[1600px] mx-auto p-4 text-sm relative min-h-screen">
+  <div class="main-workbench w-full max-w-[1600px] mx-auto p-4 text-sm relative h-screen overflow-hidden flex flex-col">
     <div id="debug-ready-marker" v-if="store.isReady" class="hidden">READY</div>
 
     <StationToolbar />
@@ -36,9 +36,9 @@ const isMapsView = computed(() => shipBuildStore.activeView === 'maps')
       <ShipBuildView />
     </template>
 
-    <template v-else-if="isMapsView">
+    <div v-else-if="isMapsView" class="maps-slot">
       <MapWorkbenchView />
-    </template>
+    </div>
 
     <div v-else class="flow-layout flex flex-col gap-6">
       <LogicFlowWorkbenchView />
@@ -50,6 +50,10 @@ const isMapsView = computed(() => shipBuildStore.activeView === 'maps')
 </template>
 
 <style scoped>
+.maps-slot {
+  @apply flex-1 min-h-0;
+}
+
 .coming-soon-panel {
   @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl p-8 text-center min-h-[400px] flex items-center justify-center;
 }

@@ -11,7 +11,7 @@ const imageNaturalHeight = ref(0)
 
 const minScale = ref(1)
 const maxScale = ref(4)
-const scale = ref(1)
+const scale = ref(0)
 const zoomPercent = ref(0)
 
 const panX = ref(0)
@@ -91,7 +91,8 @@ const recomputeScaleBounds = () => {
   const { width: vw } = getViewportSize()
   if (!vw) return
 
-  const nextMin = vw / imageNaturalWidth.value
+  const fitByWidth = vw / imageNaturalWidth.value
+  const nextMin = fitByWidth
   const targetHalfScreen = window.innerHeight * 0.5
   const refHeight = Math.max(1, clusterRefHeightPx.value)
   const nextMax = Math.max(nextMin, targetHalfScreen / refHeight)
@@ -184,7 +185,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section class="map-workbench mt-4">
+  <section class="map-workbench">
     <div class="map-shell">
       <div
         ref="viewportRef"
@@ -229,17 +230,20 @@ onBeforeUnmount(() => {
 <style scoped>
 .map-workbench {
   @apply w-full;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .map-shell {
   @apply relative bg-black/70 rounded-lg border border-amber-300/35 p-3 overflow-hidden;
-  min-height: 70vh;
+  height: 100%;
 }
 
 .map-viewport {
   @apply relative w-full overflow-hidden cursor-grab;
-  height: calc(70vh - 1.5rem);
-  min-height: 560px;
+  height: 100%;
+  min-height: 0;
 }
 
 .map-viewport.dragging {
