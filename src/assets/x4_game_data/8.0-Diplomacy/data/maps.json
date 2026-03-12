@@ -11,7 +11,7 @@
       "nameId": "{20003,10001}",
       "name": "Grand Exchange",
       "owner": "teladi",
-      "owner_color": "#c6c000",
+      "owner_color": "#B3B300",
       "raw_pos": {
         "x": 0.0,
         "z": 0.0
@@ -33,7 +33,7 @@
           "nameId": "{20004,10011}",
           "name": "Grand Exchange I",
           "owner": "teladi",
-          "owner_color": "#c6c000",
+          "owner_color": "#B3B300",
           "area": {
             "sunlight": 1.23,
             "economy": 0.5,
@@ -173,7 +173,7 @@
           "nameId": "{20004,10021}",
           "name": "Grand Exchange III",
           "owner": "teladi",
-          "owner_color": "#c6c000",
+          "owner_color": "#B3B300",
           "area": {
             "sunlight": 1.35,
             "economy": 0.5,
@@ -305,7 +305,7 @@
           "nameId": "{20004,10031}",
           "name": "Grand Exchange IV",
           "owner": "teladi",
-          "owner_color": "#c6c000",
+          "owner_color": "#B3B300",
           "area": {
             "sunlight": 1.29,
             "economy": 0.5,
@@ -479,8 +479,8 @@
       "id": "Cluster_02_macro",
       "nameId": "{20003,20001}",
       "name": "Eighteen Billion",
-      "owner": "ministry",
-      "owner_color": "#4b5563",
+      "owner": "teladi",
+      "owner_color": "#B3B300",
       "raw_pos": {
         "x": 15000000.0,
         "z": 25980000.0
@@ -501,8 +501,8 @@
           "cluster_id": "Cluster_02_macro",
           "nameId": "{20004,20011}",
           "name": "Eighteen Billion",
-          "owner": "ministry",
-          "owner_color": "#4b5563",
+          "owner": "teladi",
+          "owner_color": "#B3B300",
           "area": {
             "sunlight": 0.9,
             "economy": 0.5,
@@ -657,7 +657,7 @@
       "nameId": "{20003,30001}",
       "name": "Memory of Profit",
       "owner": "teladi",
-      "owner_color": "#c6c000",
+      "owner_color": "#B3B300",
       "raw_pos": {
         "x": 30000000.0,
         "z": 17320000.0
@@ -679,7 +679,7 @@
           "nameId": "{20004,30011}",
           "name": "Memory of Profit IX",
           "owner": "teladi",
-          "owner_color": "#c6c000",
+          "owner_color": "#B3B300",
           "area": {
             "sunlight": 1.15,
             "economy": 0.5,
@@ -770,7 +770,7 @@
       "nameId": "{20003,40001}",
       "name": "Nopileos' Fortune",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": 45000000.0,
         "z": -25980000.0
@@ -792,7 +792,7 @@
           "nameId": "{20004,40011}",
           "name": "Nopileos' Fortune II",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
             "sunlight": 0.82,
             "economy": 0.5,
@@ -949,7 +949,7 @@
           "nameId": "{20004,40021}",
           "name": "Nopileos' Fortune VI",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
             "sunlight": 0.78,
             "economy": 0.5,
@@ -1057,7 +1057,7 @@
       "nameId": "{20003,50001}",
       "name": "Path to Profit",
       "owner": "teladi",
-      "owner_color": "#c6c000",
+      "owner_color": "#B3B300",
       "raw_pos": {
         "x": 0.0,
         "z": -17320000.0
@@ -1079,7 +1079,7 @@
           "nameId": "{20004,50011}",
           "name": "Path to Profit",
           "owner": "teladi",
-          "owner_color": "#c6c000",
+          "owner_color": "#B3B300",
           "area": {
             "sunlight": 1.43,
             "economy": 0.5,
@@ -1160,7 +1160,7 @@
       "nameId": "{20003,60001}",
       "name": "Black Hole Sun",
       "owner": "argon",
-      "owner_color": "#0077cc",
+      "owner_color": "#0069B3",
       "raw_pos": {
         "x": -30000000.0,
         "z": 0.0
@@ -1182,7 +1182,7 @@
           "nameId": "{20004,60011}",
           "name": "Black Hole Sun IV",
           "owner": "argon",
-          "owner_color": "#0077cc",
+          "owner_color": "#0069B3",
           "area": {
             "sunlight": 1.16,
             "economy": 0.5,
@@ -1294,7 +1294,7 @@
           "nameId": "{20004,60021}",
           "name": "Black Hole Sun V",
           "owner": "argon",
-          "owner_color": "#0077cc",
+          "owner_color": "#0069B3",
           "area": {
             "sunlight": 1.19,
             "economy": 0.5,
@@ -1431,7 +1431,7 @@
       "nameId": "{20003,70001}",
       "name": "The Reach",
       "owner": "argon",
-      "owner_color": "#0077cc",
+      "owner_color": "#0069B3",
       "raw_pos": {
         "x": -105000000.0,
         "z": 43300000.0
@@ -1453,7 +1453,7 @@
           "nameId": "{20004,70011}",
           "name": "The Reach",
           "owner": "argon",
-          "owner_color": "#0077cc",
+          "owner_color": "#0069B3",
           "area": {
             "sunlight": 3.67,
             "economy": 0.5,
@@ -1524,7 +1524,7 @@
       "nameId": "{20003,80001}",
       "name": "Silent Witness",
       "owner": "argon",
-      "owner_color": "#0077cc",
+      "owner_color": "#0069B3",
       "raw_pos": {
         "x": -15000000.0,
         "z": 95260000.0
@@ -1546,7 +1546,7 @@
           "nameId": "{20004,80011}",
           "name": "Silent Witness I",
           "owner": "argon",
-          "owner_color": "#0077cc",
+          "owner_color": "#0069B3",
           "area": {
             "sunlight": 0.98,
             "economy": 0.75,
@@ -1775,8 +1775,8 @@
       "id": "Cluster_09_macro",
       "nameId": "{20003,90001}",
       "name": "Bright Promise",
-      "owner": "ministry",
-      "owner_color": "#4b5563",
+      "owner": "teladi",
+      "owner_color": "#B3B300",
       "raw_pos": {
         "x": 60000000.0,
         "z": 69280000.0
@@ -1797,8 +1797,8 @@
           "cluster_id": "Cluster_09_macro",
           "nameId": "{20004,90011}",
           "name": "Bright Promise",
-          "owner": "ministry",
-          "owner_color": "#4b5563",
+          "owner": "teladi",
+          "owner_color": "#B3B300",
           "area": {
             "sunlight": 2.04,
             "economy": 0.75,
@@ -2020,7 +2020,7 @@
       "nameId": "{20003,100001}",
       "name": "Unholy Retribution",
       "owner": "paranid",
-      "owner_color": "#d100d1",
+      "owner_color": "#B300B3",
       "raw_pos": {
         "x": 75000000.0,
         "z": -8660000.0
@@ -2042,7 +2042,7 @@
           "nameId": "{20004,100011}",
           "name": "Unholy Retribution",
           "owner": "paranid",
-          "owner_color": "#d100d1",
+          "owner_color": "#B300B3",
           "area": {
             "sunlight": 1.63,
             "economy": 0.75,
@@ -2218,7 +2218,7 @@
       "nameId": "{20003,110001}",
       "name": "Pontifex's Claim",
       "owner": "holyorder",
-      "owner_color": "#b000b8",
+      "owner_color": "#FF99FF",
       "raw_pos": {
         "x": -30000000.0,
         "z": -69280000.0
@@ -2240,7 +2240,7 @@
           "nameId": "{20004,110011}",
           "name": "Pontifex's Claim",
           "owner": "holyorder",
-          "owner_color": "#b000b8",
+          "owner_color": "#FF99FF",
           "area": {
             "sunlight": 1.94,
             "economy": 0.75,
@@ -2430,7 +2430,7 @@
       "nameId": "{20003,120001}",
       "name": "True Sight",
       "owner": "holyorder",
-      "owner_color": "#b000b8",
+      "owner_color": "#FF99FF",
       "raw_pos": {
         "x": -60000000.0,
         "z": -51960000.0
@@ -2452,7 +2452,7 @@
           "nameId": "{20004,120011}",
           "name": "True Sight",
           "owner": "holyorder",
-          "owner_color": "#b000b8",
+          "owner_color": "#FF99FF",
           "area": {
             "sunlight": 0.71,
             "economy": 0.75,
@@ -2642,7 +2642,7 @@
       "nameId": "{20003,130001}",
       "name": "Second Contact",
       "owner": "antigone",
-      "owner_color": "#00e5ff",
+      "owner_color": "#0095FF",
       "raw_pos": {
         "x": -75000000.0,
         "z": -8660000.0
@@ -2664,7 +2664,7 @@
           "nameId": "{20004,130011}",
           "name": "Second Contact II Flashpoint",
           "owner": "antigone",
-          "owner_color": "#00e5ff",
+          "owner_color": "#0095FF",
           "area": {
             "sunlight": 0.59,
             "economy": 0.75,
@@ -2884,7 +2884,7 @@
       "nameId": "{20003,140001}",
       "name": "Argon Prime",
       "owner": "argon",
-      "owner_color": "#0077cc",
+      "owner_color": "#0069B3",
       "raw_pos": {
         "x": -90000000.0,
         "z": 34640000.0
@@ -2906,7 +2906,7 @@
           "nameId": "{20004,140011}",
           "name": "Argon Prime",
           "owner": "argon",
-          "owner_color": "#0077cc",
+          "owner_color": "#0069B3",
           "area": {
             "sunlight": 1.0,
             "economy": 0.75,
@@ -3116,7 +3116,7 @@
       "nameId": "{20003,150001}",
       "name": "Ianamus Zura",
       "owner": "teladi",
-      "owner_color": "#c6c000",
+      "owner_color": "#B3B300",
       "raw_pos": {
         "x": 90000000.0,
         "z": 69280000.0
@@ -3138,7 +3138,7 @@
           "nameId": "{20004,150011}",
           "name": "Ianamus Zura IV",
           "owner": "teladi",
-          "owner_color": "#c6c000",
+          "owner_color": "#B3B300",
           "area": {
             "sunlight": 1.33,
             "economy": 0.25,
@@ -3341,7 +3341,7 @@
           "nameId": "{20004,150021}",
           "name": "Ianamus Zura VII",
           "owner": "teladi",
-          "owner_color": "#c6c000",
+          "owner_color": "#B3B300",
           "area": {
             "sunlight": 1.15,
             "economy": 0.25,
@@ -3454,7 +3454,7 @@
       "nameId": "{20003,160001}",
       "name": "Matrix #451",
       "owner": "xenon",
-      "owner_color": "#9a0000",
+      "owner_color": "#B30000",
       "raw_pos": {
         "x": 90000000.0,
         "z": 86600000.0
@@ -3476,7 +3476,7 @@
           "nameId": "{20004,160011}",
           "name": "Matrix #451",
           "owner": "xenon",
-          "owner_color": "#9a0000",
+          "owner_color": "#B30000",
           "area": {
             "sunlight": 2.01,
             "economy": 0.25,
@@ -3653,7 +3653,7 @@
       "nameId": "{20003,170001}",
       "name": "Matrix #9",
       "owner": "xenon",
-      "owner_color": "#9a0000",
+      "owner_color": "#B30000",
       "raw_pos": {
         "x": 75000000.0,
         "z": 95260000.0
@@ -3675,7 +3675,7 @@
           "nameId": "{20004,170011}",
           "name": "Matrix #9",
           "owner": "xenon",
-          "owner_color": "#9a0000",
+          "owner_color": "#B30000",
           "area": {
             "sunlight": 1.0,
             "economy": 0.25,
@@ -3798,7 +3798,7 @@
       "nameId": "{20003,180001}",
       "name": "Trinity Sanctum",
       "owner": "paranid",
-      "owner_color": "#d100d1",
+      "owner_color": "#B300B3",
       "raw_pos": {
         "x": 75000000.0,
         "z": 25980000.0
@@ -3820,7 +3820,7 @@
           "nameId": "{20004,180011}",
           "name": "Trinity Sanctum III",
           "owner": "paranid",
-          "owner_color": "#d100d1",
+          "owner_color": "#B300B3",
           "area": {
             "sunlight": 1.33,
             "economy": 0.75,
@@ -4129,7 +4129,7 @@
       "nameId": "{20003,190001}",
       "name": "Hewa's Twin",
       "owner": "teladi",
-      "owner_color": "#c6c000",
+      "owner_color": "#B3B300",
       "raw_pos": {
         "x": 105000000.0,
         "z": -8660000.0
@@ -4151,7 +4151,7 @@
           "nameId": "{20004,190011}",
           "name": "Hewa's Twin I",
           "owner": "teladi",
-          "owner_color": "#c6c000",
+          "owner_color": "#B3B300",
           "area": {
             "sunlight": 1.16,
             "economy": 0.25,
@@ -4329,7 +4329,7 @@
           "nameId": "{20004,190021}",
           "name": "Hewa's Twin II",
           "owner": "teladi",
-          "owner_color": "#c6c000",
+          "owner_color": "#B3B300",
           "area": {
             "sunlight": 1.02,
             "economy": 0.25,
@@ -4442,7 +4442,7 @@
       "nameId": "{20003,200001}",
       "name": "Company Regard",
       "owner": "teladi",
-      "owner_color": "#c6c000",
+      "owner_color": "#B3B300",
       "raw_pos": {
         "x": 135000000.0,
         "z": -25980000.0
@@ -4464,7 +4464,7 @@
           "nameId": "{20004,200011}",
           "name": "Company Regard",
           "owner": "teladi",
-          "owner_color": "#c6c000",
+          "owner_color": "#B3B300",
           "area": {
             "sunlight": 0.83,
             "economy": 0.25,
@@ -4652,7 +4652,7 @@
       "nameId": "{20003,210001}",
       "name": "Scale Plate Green",
       "owner": "xenon",
-      "owner_color": "#9a0000",
+      "owner_color": "#B30000",
       "raw_pos": {
         "x": 135000000.0,
         "z": -43300000.0
@@ -4674,7 +4674,7 @@
           "nameId": "{20004,210011}",
           "name": "Scale Plate Green I",
           "owner": "xenon",
-          "owner_color": "#9a0000",
+          "owner_color": "#B30000",
           "area": {
             "sunlight": 1.26,
             "economy": 0.25,
@@ -4804,7 +4804,7 @@
           "nameId": "{20004,210021}",
           "name": "Scale Plate Green VII",
           "owner": "xenon",
-          "owner_color": "#9a0000",
+          "owner_color": "#B30000",
           "area": {
             "sunlight": 1.15,
             "economy": 0.25,
@@ -4931,7 +4931,7 @@
       "nameId": "{20003,220001}",
       "name": "Pious Mists",
       "owner": "paranid",
-      "owner_color": "#d100d1",
+      "owner_color": "#B300B3",
       "raw_pos": {
         "x": 30000000.0,
         "z": -51960000.0
@@ -4953,7 +4953,7 @@
           "nameId": "{20004,220011}",
           "name": "Pious Mists II",
           "owner": "paranid",
-          "owner_color": "#d100d1",
+          "owner_color": "#B300B3",
           "area": {
             "sunlight": 1.36,
             "economy": 0.75,
@@ -5210,8 +5210,8 @@
       "id": "Cluster_23_macro",
       "nameId": "{20003,230001}",
       "name": "Sacred Relic",
-      "owner": "alliance",
-      "owner_color": "#4b5563",
+      "owner": "paranid",
+      "owner_color": "#B300B3",
       "raw_pos": {
         "x": 60000000.0,
         "z": -86600000.0
@@ -5232,8 +5232,8 @@
           "cluster_id": "Cluster_23_macro",
           "nameId": "{20004,230011}",
           "name": "Sacred Relic",
-          "owner": "alliance",
-          "owner_color": "#4b5563",
+          "owner": "paranid",
+          "owner_color": "#B300B3",
           "area": {
             "sunlight": 0.71,
             "economy": 0.25,
@@ -5328,7 +5328,7 @@
       "nameId": "{20003,240001}",
       "name": "Holy Vision",
       "owner": "holyorder",
-      "owner_color": "#b000b8",
+      "owner_color": "#FF99FF",
       "raw_pos": {
         "x": -45000000.0,
         "z": -60620000.0
@@ -5350,7 +5350,7 @@
           "nameId": "{20004,240011}",
           "name": "Holy Vision",
           "owner": "holyorder",
-          "owner_color": "#b000b8",
+          "owner_color": "#FF99FF",
           "area": {
             "sunlight": 2.08,
             "economy": 0.75,
@@ -5706,7 +5706,7 @@
       "nameId": "{20003,250001}",
       "name": "Faulty Logic",
       "owner": "xenon",
-      "owner_color": "#9a0000",
+      "owner_color": "#B30000",
       "raw_pos": {
         "x": -90000000.0,
         "z": -69280000.0
@@ -5728,7 +5728,7 @@
           "nameId": "{20004,250011}",
           "name": "Faulty Logic I",
           "owner": "xenon",
-          "owner_color": "#9a0000",
+          "owner_color": "#B30000",
           "area": {
             "sunlight": 1.77,
             "economy": 0.25,
@@ -5925,7 +5925,7 @@
           "nameId": "{20004,250021}",
           "name": "Faulty Logic VII",
           "owner": "xenon",
-          "owner_color": "#9a0000",
+          "owner_color": "#B30000",
           "area": {
             "sunlight": 1.47,
             "economy": 0.25,
@@ -6038,7 +6038,7 @@
       "nameId": "{20003,260001}",
       "name": "Atiya's Misfortune",
       "owner": "xenon",
-      "owner_color": "#9a0000",
+      "owner_color": "#B30000",
       "raw_pos": {
         "x": -120000000.0,
         "z": -51960000.0
@@ -6060,7 +6060,7 @@
           "nameId": "{20004,260011}",
           "name": "Atiya's Misfortune I",
           "owner": "xenon",
-          "owner_color": "#9a0000",
+          "owner_color": "#B30000",
           "area": {
             "sunlight": 1.09,
             "economy": 0.25,
@@ -6176,7 +6176,7 @@
           "nameId": "{20004,260021}",
           "name": "Atiya's Misfortune III",
           "owner": "xenon",
-          "owner_color": "#9a0000",
+          "owner_color": "#B30000",
           "area": {
             "sunlight": 0.93,
             "economy": 0.25,
@@ -6299,7 +6299,7 @@
       "nameId": "{20003,270001}",
       "name": "The Void",
       "owner": "antigone",
-      "owner_color": "#00e5ff",
+      "owner_color": "#0095FF",
       "raw_pos": {
         "x": -150000000.0,
         "z": 34640000.0
@@ -6321,7 +6321,7 @@
           "nameId": "{20004,270011}",
           "name": "The Void",
           "owner": "antigone",
-          "owner_color": "#00e5ff",
+          "owner_color": "#0095FF",
           "area": {
             "sunlight": 1.64,
             "economy": 0.25,
@@ -6436,7 +6436,7 @@
       "nameId": "{20003,280001}",
       "name": "Antigone Memorial",
       "owner": "antigone",
-      "owner_color": "#00e5ff",
+      "owner_color": "#0095FF",
       "raw_pos": {
         "x": -165000000.0,
         "z": 25980000.0
@@ -6458,7 +6458,7 @@
           "nameId": "{20004,280011}",
           "name": "Antigone Memorial",
           "owner": "antigone",
-          "owner_color": "#00e5ff",
+          "owner_color": "#0095FF",
           "area": {
             "sunlight": 1.26,
             "economy": 0.25,
@@ -6676,7 +6676,7 @@
       "nameId": "{20003,290001}",
       "name": "Hatikvah's Choice",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": -60000000.0,
         "z": 69280000.0
@@ -6698,7 +6698,7 @@
           "nameId": "{20004,290011}",
           "name": "Hatikvah's Choice I",
           "owner": "hatikvah",
-          "owner_color": "#7a4ea3",
+          "owner_color": "#00F9FF",
           "area": {
             "sunlight": 1.12,
             "economy": 0.75,
@@ -6975,7 +6975,7 @@
           "nameId": "{20004,290021}",
           "name": "Hatikvah's Choice III",
           "owner": "argon",
-          "owner_color": "#0077cc",
+          "owner_color": "#0069B3",
           "area": {
             "sunlight": 0.91,
             "economy": 0.75,
@@ -7091,7 +7091,7 @@
       "nameId": "{20003,300001}",
       "name": "Morning Star",
       "owner": "argon",
-      "owner_color": "#0077cc",
+      "owner_color": "#0069B3",
       "raw_pos": {
         "x": -90000000.0,
         "z": 69280000.0
@@ -7113,7 +7113,7 @@
           "nameId": "{20004,300011}",
           "name": "Morning Star III",
           "owner": "argon",
-          "owner_color": "#0077cc",
+          "owner_color": "#0069B3",
           "area": {
             "sunlight": 0.76,
             "economy": 0.25,
@@ -7204,7 +7204,7 @@
       "nameId": "{20003,310001}",
       "name": "Heretic's End",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": -120000000.0,
         "z": 103920000.0
@@ -7226,7 +7226,7 @@
           "nameId": "{20004,310011}",
           "name": "Heretic's End",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
             "sunlight": 1.81,
             "economy": 0.25,
@@ -7319,7 +7319,7 @@
       "nameId": "{20003,320001}",
       "name": "Tharka's Cascade",
       "owner": "xenon",
-      "owner_color": "#9a0000",
+      "owner_color": "#B30000",
       "raw_pos": {
         "x": -60000000.0,
         "z": 103920000.0
@@ -7341,7 +7341,7 @@
           "nameId": "{20004,320011}",
           "name": "Tharka's Cascade XV",
           "owner": "xenon",
-          "owner_color": "#9a0000",
+          "owner_color": "#B30000",
           "area": {
             "sunlight": 1.42,
             "economy": 0.25,
@@ -7631,7 +7631,7 @@
           "nameId": "{20004,320021}",
           "name": "Tharka's Cascade XVII",
           "owner": "xenon",
-          "owner_color": "#9a0000",
+          "owner_color": "#B30000",
           "area": {
             "sunlight": 1.29,
             "economy": 0.25,
@@ -7780,7 +7780,7 @@
       "nameId": "{20003,330001}",
       "name": "Matrix #79B",
       "owner": "xenon",
-      "owner_color": "#9a0000",
+      "owner_color": "#B30000",
       "raw_pos": {
         "x": -75000000.0,
         "z": 112580000.0
@@ -7802,7 +7802,7 @@
           "nameId": "{20004,330011}",
           "name": "Matrix #79B",
           "owner": "xenon",
-          "owner_color": "#9a0000",
+          "owner_color": "#B30000",
           "area": {
             "sunlight": 2.39,
             "economy": 0.25,
@@ -7983,7 +7983,7 @@
       "nameId": "{20003,340001}",
       "name": "Profit Center Alpha",
       "owner": "teladi",
-      "owner_color": "#c6c000",
+      "owner_color": "#B3B300",
       "raw_pos": {
         "x": 45000000.0,
         "z": 77940000.0
@@ -8005,7 +8005,7 @@
           "nameId": "{20004,340011}",
           "name": "Profit Center Alpha",
           "owner": "teladi",
-          "owner_color": "#c6c000",
+          "owner_color": "#B3B300",
           "area": {
             "sunlight": 0.79,
             "economy": 0.75,
@@ -8219,7 +8219,7 @@
       "nameId": "{20003,350001}",
       "name": "Lasting Vengeance",
       "owner": "holyorder",
-      "owner_color": "#b000b8",
+      "owner_color": "#FF99FF",
       "raw_pos": {
         "x": -45000000.0,
         "z": -95260000.0
@@ -8241,7 +8241,7 @@
           "nameId": "{20004,350011}",
           "name": "Lasting Vengeance",
           "owner": "holyorder",
-          "owner_color": "#b000b8",
+          "owner_color": "#FF99FF",
           "area": {
             "sunlight": 1.0,
             "economy": 0.25,
@@ -8326,7 +8326,7 @@
       "nameId": "{20003,360001}",
       "name": "Cardinal's Redress",
       "owner": "holyorder",
-      "owner_color": "#b000b8",
+      "owner_color": "#FF99FF",
       "raw_pos": {
         "x": -60000000.0,
         "z": -86600000.0
@@ -8348,7 +8348,7 @@
           "nameId": "{20004,360011}",
           "name": "Cardinal's Redress",
           "owner": "holyorder",
-          "owner_color": "#b000b8",
+          "owner_color": "#FF99FF",
           "area": {
             "sunlight": 0.88,
             "economy": 0.25,
@@ -8439,7 +8439,7 @@
       "nameId": "{20003,370001}",
       "name": "Pious Mists",
       "owner": "paranid",
-      "owner_color": "#d100d1",
+      "owner_color": "#B300B3",
       "raw_pos": {
         "x": 45000000.0,
         "z": -60620000.0
@@ -8461,7 +8461,7 @@
           "nameId": "{20004,370011}",
           "name": "Pious Mists IV",
           "owner": "paranid",
-          "owner_color": "#d100d1",
+          "owner_color": "#B300B3",
           "area": {
             "sunlight": 0.89,
             "economy": 0.75,
@@ -8626,7 +8626,7 @@
       "nameId": "{20003,380001}",
       "name": "Pious Mists",
       "owner": "paranid",
-      "owner_color": "#d100d1",
+      "owner_color": "#B300B3",
       "raw_pos": {
         "x": 30000000.0,
         "z": -69280000.0
@@ -8648,7 +8648,7 @@
           "nameId": "{20004,380011}",
           "name": "Pious Mists XI",
           "owner": "paranid",
-          "owner_color": "#d100d1",
+          "owner_color": "#B300B3",
           "area": {
             "sunlight": 1.18,
             "economy": 0.75,
@@ -8729,7 +8729,7 @@
       "nameId": "{20003,390001}",
       "name": "Memory of Profit",
       "owner": "teladi",
-      "owner_color": "#c6c000",
+      "owner_color": "#B3B300",
       "raw_pos": {
         "x": 30000000.0,
         "z": 0.0
@@ -8751,7 +8751,7 @@
           "nameId": "{20004,390011}",
           "name": "Memory of Profit X",
           "owner": "teladi",
-          "owner_color": "#c6c000",
+          "owner_color": "#B3B300",
           "area": {
             "sunlight": 1.06,
             "economy": 0.5,
@@ -8832,7 +8832,7 @@
       "nameId": "{20003,400001}",
       "name": "Second Contact",
       "owner": "antigone",
-      "owner_color": "#00e5ff",
+      "owner_color": "#0095FF",
       "raw_pos": {
         "x": -90000000.0,
         "z": -17320000.0
@@ -8854,7 +8854,7 @@
           "nameId": "{20004,400011}",
           "name": "Second Contact VII",
           "owner": "antigone",
-          "owner_color": "#00e5ff",
+          "owner_color": "#0095FF",
           "area": {
             "sunlight": 0.55,
             "economy": 0.75,
@@ -8949,7 +8949,7 @@
       "nameId": "{20003,410001}",
       "name": "Second Contact",
       "owner": "antigone",
-      "owner_color": "#00e5ff",
+      "owner_color": "#0095FF",
       "raw_pos": {
         "x": -90000000.0,
         "z": 0.0
@@ -8971,7 +8971,7 @@
           "nameId": "{20004,410011}",
           "name": "Second Contact XI",
           "owner": "antigone",
-          "owner_color": "#00e5ff",
+          "owner_color": "#0095FF",
           "area": {
             "sunlight": 0.47,
             "economy": 0.75,
@@ -9056,7 +9056,7 @@
       "nameId": "{20003,420001}",
       "name": "Hewa's Twin",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": 120000000.0,
         "z": 0.0
@@ -9078,7 +9078,7 @@
           "nameId": "{20004,420011}",
           "name": "Hewa's Twin III",
           "owner": "teladi",
-          "owner_color": "#c6c000",
+          "owner_color": "#B3B300",
           "area": {
             "sunlight": 0.86,
             "economy": 0.25,
@@ -9176,7 +9176,7 @@
           "nameId": "{20004,420021}",
           "name": "Hewa's Twin IV The Cove",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
             "sunlight": 0.91,
             "economy": 0.25,
@@ -9276,7 +9276,7 @@
       "nameId": "{20003,430001}",
       "name": "Hewa's Twin",
       "owner": "teladi",
-      "owner_color": "#c6c000",
+      "owner_color": "#B3B300",
       "raw_pos": {
         "x": 120000000.0,
         "z": 17320000.0
@@ -9298,7 +9298,7 @@
           "nameId": "{20004,430011}",
           "name": "Hewa's Twin V",
           "owner": "teladi",
-          "owner_color": "#c6c000",
+          "owner_color": "#B3B300",
           "area": {
             "sunlight": 0.82,
             "economy": 0.25,
@@ -9369,7 +9369,7 @@
       "nameId": "{20003,440001}",
       "name": "Silent Witness",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": 0.0,
         "z": 103920000.0
@@ -9391,7 +9391,7 @@
           "nameId": "{20004,440011}",
           "name": "Silent Witness XI",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
             "sunlight": 1.18,
             "economy": 0.75,
@@ -9472,7 +9472,7 @@
       "nameId": "{20003,450001}",
       "name": "Silent Witness",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": -15000000.0,
         "z": 112580000.0
@@ -9494,7 +9494,7 @@
           "nameId": "{20004,450011}",
           "name": "Silent Witness XII",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
             "sunlight": 1.47,
             "economy": 0.75,
@@ -9637,7 +9637,7 @@
       "nameId": "{20003,460001}",
       "name": "Morning Star",
       "owner": "argon",
-      "owner_color": "#0077cc",
+      "owner_color": "#0069B3",
       "raw_pos": {
         "x": -90000000.0,
         "z": 86600000.0
@@ -9659,7 +9659,7 @@
           "nameId": "{20004,460011}",
           "name": "Morning Star IV",
           "owner": "argon",
-          "owner_color": "#0077cc",
+          "owner_color": "#0069B3",
           "area": {
             "sunlight": 0.65,
             "economy": 0.25,
@@ -9729,8 +9729,8 @@
       "id": "Cluster_47_macro",
       "nameId": "{20003,470001}",
       "name": "Trinity Sanctum",
-      "owner": "alliance",
-      "owner_color": "#4b5563",
+      "owner": "paranid",
+      "owner_color": "#B300B3",
       "raw_pos": {
         "x": 60000000.0,
         "z": 34640000.0
@@ -9751,8 +9751,8 @@
           "cluster_id": "Cluster_47_macro",
           "nameId": "{20004,470011}",
           "name": "Trinity Sanctum VII",
-          "owner": "alliance",
-          "owner_color": "#4b5563",
+          "owner": "paranid",
+          "owner_color": "#B300B3",
           "area": {
             "sunlight": 1.06,
             "economy": 0.75,
@@ -9837,7 +9837,7 @@
       "nameId": "{20003,480001}",
       "name": "Getsu Fune",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": -150000000.0,
         "z": 51960000.0
@@ -9859,7 +9859,7 @@
           "nameId": "{20004,480011}",
           "name": "Getsu Fune",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
             "sunlight": 0.93,
             "economy": 0.25,
@@ -9945,7 +9945,7 @@
       "nameId": "{20003,490001}",
       "name": "Frontier Edge",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": -120000000.0,
         "z": -17320000.0
@@ -9967,7 +9967,7 @@
           "nameId": "{20004,490011}",
           "name": "Frontier Edge",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
             "sunlight": 1.72,
             "economy": 0.25,
@@ -10043,7 +10043,7 @@
       "nameId": "{20003,500001}",
       "name": "Turquoise Sea",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": 150000000.0,
         "z": -34640000.0
@@ -10065,7 +10065,7 @@
           "nameId": "{20004,500011}",
           "name": "Turquoise Sea IX",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
             "sunlight": 1.41,
             "economy": 0.25,
@@ -10127,7 +10127,7 @@
           "nameId": "{20004,500021}",
           "name": "Turquoise Sea X",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
             "sunlight": 1.28,
             "economy": 0.25,
@@ -10232,10 +10232,10 @@
     },
     "Cluster_709_macro": {
       "id": "Cluster_709_macro",
-      "nameId": "",
-      "name": "",
+      "nameId": "{20003,7090001}",
+      "name": "Cardinal's Domain",
       "owner": "paranid",
-      "owner_color": "#d100d1",
+      "owner_color": "#B300B3",
       "raw_pos": {
         "x": 60000000.0,
         "z": -103920000.0
@@ -10254,15 +10254,18 @@
         "Cluster_709_Sector001_macro": {
           "id": "Cluster_709_Sector001_macro",
           "cluster_id": "Cluster_709_macro",
-          "nameId": "",
-          "name": "",
+          "nameId": "{20004,7090011}",
+          "name": "Cardinal's Domain",
           "owner": "paranid",
-          "owner_color": "#d100d1",
+          "owner_color": "#B300B3",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 1.24,
+            "economy": 0.75,
+            "security": 0.5,
+            "tags": [
+              "cardinalsdomain",
+              "allowrandomanomaly"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -10371,10 +10374,10 @@
     },
     "Cluster_710_macro": {
       "id": "Cluster_710_macro",
-      "nameId": "",
-      "name": "",
+      "nameId": "{20003,7100001}",
+      "name": "Moo-Kye's Revenge",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": 105000000.0,
         "z": -95260000.0
@@ -10393,15 +10396,18 @@
         "Cluster_710_Sector001_macro": {
           "id": "Cluster_710_Sector001_macro",
           "cluster_id": "Cluster_710_macro",
-          "nameId": "",
-          "name": "",
+          "nameId": "{20004,7100011}",
+          "name": "Moo-Kye's Revenge",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 0.93,
+            "economy": 0.1,
+            "security": 0.1,
+            "tags": [
+              "anarchy",
+              "allowrandomanomaly"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -10457,10 +10463,10 @@
     },
     "Cluster_711_macro": {
       "id": "Cluster_711_macro",
-      "nameId": "",
-      "name": "",
+      "nameId": "{20003,7110001}",
+      "name": "Mi Ton's Refuge",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": 120000000.0,
         "z": -69280000.0
@@ -10479,15 +10485,18 @@
         "Cluster_711_Sector001_macro": {
           "id": "Cluster_711_Sector001_macro",
           "cluster_id": "Cluster_711_macro",
-          "nameId": "",
-          "name": "",
+          "nameId": "{20004,7110011}",
+          "name": "Mi Ton's Refuge",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 0.53,
+            "economy": 0.1,
+            "security": 0.1,
+            "tags": [
+              "anarchy",
+              "allowrandomanomaly"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -10543,10 +10552,10 @@
     },
     "Cluster_712_macro": {
       "id": "Cluster_712_macro",
-      "nameId": "",
-      "name": "",
+      "nameId": "{20003,7120001}",
+      "name": "Loomanckstrat's Legacy",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": 105000000.0,
         "z": -60620000.0
@@ -10565,15 +10574,18 @@
         "Cluster_712_Sector001_macro": {
           "id": "Cluster_712_Sector001_macro",
           "cluster_id": "Cluster_712_macro",
-          "nameId": "",
-          "name": "",
+          "nameId": "{20004,7120011}",
+          "name": "Loomanckstrat's Legacy",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 0.02,
+            "economy": 0.1,
+            "security": 0.1,
+            "tags": [
+              "anarchy",
+              "allowrandomanomaly"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -10644,10 +10656,10 @@
     },
     "Cluster_713_macro": {
       "id": "Cluster_713_macro",
-      "nameId": "",
-      "name": "",
+      "nameId": "{20003,7130001}",
+      "name": "CEO's Doubt",
       "owner": "teladi",
-      "owner_color": "#c6c000",
+      "owner_color": "#B3B300",
       "raw_pos": {
         "x": 90000000.0,
         "z": -34640000.0
@@ -10666,15 +10678,18 @@
         "Cluster_713_Sector001_macro": {
           "id": "Cluster_713_Sector001_macro",
           "cluster_id": "Cluster_713_macro",
-          "nameId": "",
-          "name": "",
+          "nameId": "{20004,7130011}",
+          "name": "CEO's Doubt",
           "owner": "teladi",
-          "owner_color": "#c6c000",
+          "owner_color": "#B3B300",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 0.82,
+            "economy": 0.75,
+            "security": 0.5,
+            "tags": [
+              "ceosdoubt",
+              "allowrandomanomaly"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -10759,10 +10774,10 @@
     },
     "Cluster_714_macro": {
       "id": "Cluster_714_macro",
-      "nameId": "",
-      "name": "",
+      "nameId": "{20003,7140001}",
+      "name": "Freedom's Reach",
       "owner": "teladi",
-      "owner_color": "#c6c000",
+      "owner_color": "#B3B300",
       "raw_pos": {
         "x": -60000000.0,
         "z": -103920000.0
@@ -10781,15 +10796,17 @@
         "Cluster_714_Sector001_macro": {
           "id": "Cluster_714_Sector001_macro",
           "cluster_id": "Cluster_714_macro",
-          "nameId": "",
-          "name": "",
+          "nameId": "{20004,7140011}",
+          "name": "Freedom's Reach",
           "owner": "teladi",
-          "owner_color": "#c6c000",
+          "owner_color": "#B3B300",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 2.21,
+            "economy": 0.1,
+            "security": 0.2,
+            "tags": [
+              "allowrandomanomaly"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -10848,10 +10865,10 @@
     },
     "Cluster_715_macro": {
       "id": "Cluster_715_macro",
-      "nameId": "",
-      "name": "",
+      "nameId": "{20003,7150001}",
+      "name": "Mists of Artemis",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": -120000000.0,
         "z": -69280000.0
@@ -10870,15 +10887,17 @@
         "Cluster_715_Sector001_macro": {
           "id": "Cluster_715_Sector001_macro",
           "cluster_id": "Cluster_715_macro",
-          "nameId": "",
-          "name": "",
+          "nameId": "{20004,7150011}",
+          "name": "Mists of Artemis",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 1.41,
+            "economy": 0.1,
+            "security": 0.1,
+            "tags": [
+              "allowrandomanomaly"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -11021,10 +11040,10 @@
     },
     "Cluster_720_macro": {
       "id": "Cluster_720_macro",
-      "nameId": "",
-      "name": "",
+      "nameId": "{20003,7200001}",
+      "name": "Ore Belt",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": -150000000.0,
         "z": -17320000.0
@@ -11043,15 +11062,17 @@
         "Cluster_720_Sector001_macro": {
           "id": "Cluster_720_Sector001_macro",
           "cluster_id": "Cluster_720_macro",
-          "nameId": "",
-          "name": "",
+          "nameId": "{20004,7200011}",
+          "name": "Ore Belt",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 1.34,
+            "economy": 0.25,
+            "security": 0.1,
+            "tags": [
+              "allowrandomanomaly"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -11140,10 +11161,10 @@
     },
     "Cluster_721_macro": {
       "id": "Cluster_721_macro",
-      "nameId": "",
-      "name": "",
+      "nameId": "{20003,7210001}",
+      "name": "Adventure's Promise",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": -210000000.0,
         "z": 69280000.0
@@ -11162,15 +11183,17 @@
         "Cluster_721_Sector001_macro": {
           "id": "Cluster_721_Sector001_macro",
           "cluster_id": "Cluster_721_macro",
-          "nameId": "",
-          "name": "",
+          "nameId": "{20004,7210011}",
+          "name": "Adventure's Promise",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 0.71,
+            "economy": 0.25,
+            "security": 0.1,
+            "tags": [
+              "allowrandomanomaly"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -11239,10 +11262,10 @@
     },
     "Cluster_722_macro": {
       "id": "Cluster_722_macro",
-      "nameId": "",
-      "name": "",
+      "nameId": "{20003,7220001}",
+      "name": "Sanctum Verge",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": -135000000.0,
         "z": -95260000.0
@@ -11261,15 +11284,17 @@
         "Cluster_722_Sector001_macro": {
           "id": "Cluster_722_Sector001_macro",
           "cluster_id": "Cluster_722_macro",
-          "nameId": "",
-          "name": "",
+          "nameId": "{20004,7220011}",
+          "name": "Sanctum Verge",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 0.89,
+            "economy": 0.25,
+            "security": 0.1,
+            "tags": [
+              "allowrandomanomaly"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -11550,10 +11575,10 @@
     },
     "Cluster_723_macro": {
       "id": "Cluster_723_macro",
-      "nameId": "",
-      "name": "",
+      "nameId": "{20003,7230001}",
+      "name": "Tempting Fumes",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": -30000000.0,
         "z": -121240000.0
@@ -11572,15 +11597,17 @@
         "Cluster_723_Sector001_macro": {
           "id": "Cluster_723_Sector001_macro",
           "cluster_id": "Cluster_723_macro",
-          "nameId": "",
-          "name": "",
+          "nameId": "{20004,7230011}",
+          "name": "Tempting Fumes",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 1.66,
+            "economy": 0.25,
+            "security": 0.1,
+            "tags": [
+              "allowrandomanomaly"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -11649,10 +11676,10 @@
     },
     "Cluster_724_macro": {
       "id": "Cluster_724_macro",
-      "nameId": "",
-      "name": "",
+      "nameId": "{20003,7240001}",
+      "name": "Circle of Deceit",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": -210000000.0,
         "z": -103920000.0
@@ -11671,15 +11698,17 @@
         "Cluster_724_Sector001_macro": {
           "id": "Cluster_724_Sector001_macro",
           "cluster_id": "Cluster_724_macro",
-          "nameId": "",
-          "name": "",
+          "nameId": "{20004,7240011}",
+          "name": "Circle of Deceit",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 1.42,
+            "economy": 0.25,
+            "security": 0.1,
+            "tags": [
+              "allowrandomanomaly"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -11735,10 +11764,10 @@
     },
     "Cluster_725_macro": {
       "id": "Cluster_725_macro",
-      "nameId": "",
-      "name": "",
+      "nameId": "{20003,7250001}",
+      "name": "Void of Opportunity",
       "owner": "xenon",
-      "owner_color": "#9a0000",
+      "owner_color": "#B30000",
       "raw_pos": {
         "x": -30000000.0,
         "z": -17320000.0
@@ -11757,14 +11786,14 @@
         "Cluster_725_Sector001_macro": {
           "id": "Cluster_725_Sector001_macro",
           "cluster_id": "Cluster_725_macro",
-          "nameId": "",
-          "name": "",
+          "nameId": "{20004,7250011}",
+          "name": "Void of Opportunity",
           "owner": "xenon",
-          "owner_color": "#9a0000",
+          "owner_color": "#B30000",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
+            "sunlight": 0.83,
+            "economy": 0.5,
+            "security": 0.25,
             "tags": []
           },
           "raw_local_pos": {
@@ -11879,7 +11908,7 @@
       "nameId": "{20003,4000001}",
       "name": "Wretched Skies",
       "owner": "split",
-      "owner_color": "#c00000",
+      "owner_color": "#B36100",
       "raw_pos": {
         "x": -105000000.0,
         "z": 147220000.0
@@ -11901,7 +11930,7 @@
           "nameId": "{20004,4000011}",
           "name": "Wretched Skies IV Family Valka",
           "owner": "split",
-          "owner_color": "#c00000",
+          "owner_color": "#B36100",
           "area": {
             "sunlight": 1.3,
             "economy": 0.25,
@@ -11982,7 +12011,7 @@
       "nameId": "{20003,4010001}",
       "name": "Family Zhin",
       "owner": "split",
-      "owner_color": "#c00000",
+      "owner_color": "#B36100",
       "raw_pos": {
         "x": -45000000.0,
         "z": 129900000.0
@@ -12004,7 +12033,7 @@
           "nameId": "{20004,4010011}",
           "name": "Family Zhin",
           "owner": "split",
-          "owner_color": "#c00000",
+          "owner_color": "#B36100",
           "area": {
             "sunlight": 0.71,
             "economy": 0.75,
@@ -12133,7 +12162,7 @@
       "nameId": "{20003,4020001}",
       "name": "Family Kritt",
       "owner": "split",
-      "owner_color": "#c00000",
+      "owner_color": "#B36100",
       "raw_pos": {
         "x": -45000000.0,
         "z": 147220000.0
@@ -12155,7 +12184,7 @@
           "nameId": "{20004,4020011}",
           "name": "Family Kritt",
           "owner": "split",
-          "owner_color": "#c00000",
+          "owner_color": "#B36100",
           "area": {
             "sunlight": 2.39,
             "economy": 0.5,
@@ -12250,7 +12279,7 @@
       "nameId": "{20003,4030001}",
       "name": "Wretched Skies",
       "owner": "split",
-      "owner_color": "#c00000",
+      "owner_color": "#B36100",
       "raw_pos": {
         "x": -120000000.0,
         "z": 138560000.0
@@ -12272,7 +12301,7 @@
           "nameId": "{20004,4030011}",
           "name": "Wretched Skies V Family Phi",
           "owner": "split",
-          "owner_color": "#c00000",
+          "owner_color": "#B36100",
           "area": {
             "sunlight": 1.23,
             "economy": 0.5,
@@ -12377,7 +12406,7 @@
       "nameId": "{20003,4040001}",
       "name": "Zyarth's Dominion",
       "owner": "split",
-      "owner_color": "#c00000",
+      "owner_color": "#B36100",
       "raw_pos": {
         "x": 30000000.0,
         "z": 155880000.0
@@ -12399,7 +12428,7 @@
           "nameId": "{20004,4040011}",
           "name": "Zyarth's Dominion I",
           "owner": "split",
-          "owner_color": "#c00000",
+          "owner_color": "#B36100",
           "area": {
             "sunlight": 1.42,
             "economy": 0.5,
@@ -12518,7 +12547,7 @@
       "nameId": "{20003,4050001}",
       "name": "Zyarth's Dominion",
       "owner": "split",
-      "owner_color": "#c00000",
+      "owner_color": "#B36100",
       "raw_pos": {
         "x": 45000000.0,
         "z": 147220000.0
@@ -12540,7 +12569,7 @@
           "nameId": "{20004,4050011}",
           "name": "Zyarth's Dominion IV",
           "owner": "split",
-          "owner_color": "#c00000",
+          "owner_color": "#B36100",
           "area": {
             "sunlight": 2.1,
             "economy": 0.75,
@@ -12677,7 +12706,7 @@
       "nameId": "{20003,4060001}",
       "name": "Zyarth's Dominion",
       "owner": "split",
-      "owner_color": "#c00000",
+      "owner_color": "#B36100",
       "raw_pos": {
         "x": 45000000.0,
         "z": 164540000.0
@@ -12699,7 +12728,7 @@
           "nameId": "{20004,4060011}",
           "name": "Zyarth's Dominion X",
           "owner": "split",
-          "owner_color": "#c00000",
+          "owner_color": "#B36100",
           "area": {
             "sunlight": 1.51,
             "economy": 0.25,
@@ -12818,7 +12847,7 @@
       "nameId": "{20003,4070001}",
       "name": "Family Tkr",
       "owner": "freesplit",
-      "owner_color": "#b26b00",
+      "owner_color": "#FF8B00",
       "raw_pos": {
         "x": 120000000.0,
         "z": 103920000.0
@@ -12840,7 +12869,7 @@
           "nameId": "{20004,4070011}",
           "name": "Family Tkr",
           "owner": "freesplit",
-          "owner_color": "#b26b00",
+          "owner_color": "#FF8B00",
           "area": {
             "sunlight": 0.89,
             "economy": 0.5,
@@ -12955,7 +12984,7 @@
       "nameId": "{20003,4080001}",
       "name": "Thuruk's Demise",
       "owner": "freesplit",
-      "owner_color": "#b26b00",
+      "owner_color": "#FF8B00",
       "raw_pos": {
         "x": 120000000.0,
         "z": 86600000.0
@@ -12977,7 +13006,7 @@
           "nameId": "{20004,4080011}",
           "name": "Thuruk's Demise III",
           "owner": "freesplit",
-          "owner_color": "#b26b00",
+          "owner_color": "#FF8B00",
           "area": {
             "sunlight": 0.59,
             "economy": 0.4,
@@ -13075,7 +13104,7 @@
           "nameId": "{20004,4080021}",
           "name": "Thuruk's Demise II First Impact",
           "owner": "freesplit",
-          "owner_color": "#b26b00",
+          "owner_color": "#FF8B00",
           "area": {
             "sunlight": 0.71,
             "economy": 0.6,
@@ -13177,7 +13206,7 @@
       "nameId": "{20003,4090001}",
       "name": "Tharka's Ravine",
       "owner": "freesplit",
-      "owner_color": "#b26b00",
+      "owner_color": "#FF8B00",
       "raw_pos": {
         "x": 150000000.0,
         "z": 103920000.0
@@ -13199,7 +13228,7 @@
           "nameId": "{20004,4130011}",
           "name": "Tharka's Ravine XXIV",
           "owner": "freesplit",
-          "owner_color": "#b26b00",
+          "owner_color": "#FF8B00",
           "area": {
             "sunlight": 1.09,
             "economy": 0.7,
@@ -13290,7 +13319,7 @@
       "nameId": "{20003,4100001}",
       "name": "Tharka's Ravine",
       "owner": "freesplit",
-      "owner_color": "#b26b00",
+      "owner_color": "#FF8B00",
       "raw_pos": {
         "x": 165000000.0,
         "z": 112580000.0
@@ -13312,7 +13341,7 @@
           "nameId": "{20004,4120011}",
           "name": "Tharka's Ravine XVI",
           "owner": "freesplit",
-          "owner_color": "#b26b00",
+          "owner_color": "#FF8B00",
           "area": {
             "sunlight": 1.17,
             "economy": 0.25,
@@ -13417,7 +13446,7 @@
       "nameId": "{20003,4110001}",
       "name": "Heart of Acrimony",
       "owner": "freesplit",
-      "owner_color": "#b26b00",
+      "owner_color": "#FF8B00",
       "raw_pos": {
         "x": 180000000.0,
         "z": 138560000.0
@@ -13439,7 +13468,7 @@
           "nameId": "{20004,4110011}",
           "name": "Heart of Acrimony II",
           "owner": "freesplit",
-          "owner_color": "#b26b00",
+          "owner_color": "#FF8B00",
           "area": {
             "sunlight": 2.45,
             "economy": 0.5,
@@ -13548,7 +13577,7 @@
       "nameId": "{20003,4120001}",
       "name": "Tharka's Ravine",
       "owner": "freesplit",
-      "owner_color": "#b26b00",
+      "owner_color": "#FF8B00",
       "raw_pos": {
         "x": 180000000.0,
         "z": 103920000.0
@@ -13570,7 +13599,7 @@
           "nameId": "{20004,4100011}",
           "name": "Tharka's Ravine VIII",
           "owner": "freesplit",
-          "owner_color": "#b26b00",
+          "owner_color": "#FF8B00",
           "area": {
             "sunlight": 1.26,
             "economy": 0.5,
@@ -13665,7 +13694,7 @@
       "nameId": "{20003,4130001}",
       "name": "Tharka's Ravine",
       "owner": "xenon",
-      "owner_color": "#9a0000",
+      "owner_color": "#B30000",
       "raw_pos": {
         "x": 195000000.0,
         "z": 112580000.0
@@ -13687,7 +13716,7 @@
           "nameId": "{20004,4090011}",
           "name": "Tharka's Ravine IV Tharka's Fall",
           "owner": "xenon",
-          "owner_color": "#9a0000",
+          "owner_color": "#B30000",
           "area": {
             "sunlight": 1.31,
             "economy": 0.5,
@@ -13758,7 +13787,7 @@
       "nameId": "{20003,4140001}",
       "name": "Rhy's Defiance",
       "owner": "xenon",
-      "owner_color": "#9a0000",
+      "owner_color": "#B30000",
       "raw_pos": {
         "x": -45000000.0,
         "z": 164540000.0
@@ -13780,7 +13809,7 @@
           "nameId": "{20004,4140011}",
           "name": "Rhy's Defiance",
           "owner": "xenon",
-          "owner_color": "#9a0000",
+          "owner_color": "#B30000",
           "area": {
             "sunlight": 1.63,
             "economy": 0.5,
@@ -13861,7 +13890,7 @@
       "nameId": "{20003,4150001}",
       "name": "Matrix #598",
       "owner": "xenon",
-      "owner_color": "#9a0000",
+      "owner_color": "#B30000",
       "raw_pos": {
         "x": -30000000.0,
         "z": 173200000.0
@@ -13883,7 +13912,7 @@
           "nameId": "{20004,4150011}",
           "name": "Matrix #598",
           "owner": "xenon",
-          "owner_color": "#9a0000",
+          "owner_color": "#B30000",
           "area": {
             "sunlight": 0.77,
             "economy": 0.75,
@@ -13992,7 +14021,7 @@
       "nameId": "{20003,4160001}",
       "name": "Guiding Star",
       "owner": "argon",
-      "owner_color": "#0077cc",
+      "owner_color": "#0069B3",
       "raw_pos": {
         "x": 90000000.0,
         "z": 138560000.0
@@ -14014,7 +14043,7 @@
           "nameId": "{20004,4160011}",
           "name": "Guiding Star V",
           "owner": "argon",
-          "owner_color": "#0077cc",
+          "owner_color": "#0069B3",
           "area": {
             "sunlight": 0.83,
             "economy": 0.25,
@@ -14102,7 +14131,7 @@
           "nameId": "{20004,4160021}",
           "name": "Guiding Star VII",
           "owner": "argon",
-          "owner_color": "#0077cc",
+          "owner_color": "#0069B3",
           "area": {
             "sunlight": 0.71,
             "economy": 0.5,
@@ -14229,7 +14258,7 @@
       "nameId": "{20003,4170001}",
       "name": "Eleventh Hour",
       "owner": "argon",
-      "owner_color": "#0077cc",
+      "owner_color": "#0069B3",
       "raw_pos": {
         "x": 75000000.0,
         "z": 164540000.0
@@ -14251,7 +14280,7 @@
           "nameId": "{20004,4170011}",
           "name": "Eleventh Hour",
           "owner": "argon",
-          "owner_color": "#0077cc",
+          "owner_color": "#0069B3",
           "area": {
             "sunlight": 1.18,
             "economy": 0.25,
@@ -14332,7 +14361,7 @@
       "nameId": "{20003,4180001}",
       "name": "Family Nhuut",
       "owner": "split",
-      "owner_color": "#c00000",
+      "owner_color": "#B36100",
       "raw_pos": {
         "x": 0.0,
         "z": 138560000.0
@@ -14354,7 +14383,7 @@
           "nameId": "{20004,4180011}",
           "name": "Family Nhuut",
           "owner": "split",
-          "owner_color": "#c00000",
+          "owner_color": "#B36100",
           "area": {
             "sunlight": 0.85,
             "economy": 0.7,
@@ -14459,7 +14488,7 @@
       "nameId": "{20003,4190001}",
       "name": "Open Market",
       "owner": "teladi",
-      "owner_color": "#c6c000",
+      "owner_color": "#B3B300",
       "raw_pos": {
         "x": 30000000.0,
         "z": 121240000.0
@@ -14481,7 +14510,7 @@
           "nameId": "{20004,4190011}",
           "name": "Open Market",
           "owner": "teladi",
-          "owner_color": "#c6c000",
+          "owner_color": "#B3B300",
           "area": {
             "sunlight": 0.88,
             "economy": 0.5,
@@ -14584,7 +14613,7 @@
       "nameId": "{20003,4200001}",
       "name": "Two Grand",
       "owner": "teladi",
-      "owner_color": "#c6c000",
+      "owner_color": "#B3B300",
       "raw_pos": {
         "x": 45000000.0,
         "z": 112580000.0
@@ -14606,7 +14635,7 @@
           "nameId": "{20004,4200011}",
           "name": "Two Grand",
           "owner": "teladi",
-          "owner_color": "#c6c000",
+          "owner_color": "#B3B300",
           "area": {
             "sunlight": 1.33,
             "economy": 0.25,
@@ -14707,7 +14736,7 @@
       "nameId": "{20003,4210001}",
       "name": "Fires of Defeat",
       "owner": "freesplit",
-      "owner_color": "#b26b00",
+      "owner_color": "#FF8B00",
       "raw_pos": {
         "x": 120000000.0,
         "z": 121240000.0
@@ -14729,7 +14758,7 @@
           "nameId": "{20004,4210011}",
           "name": "Fires of Defeat",
           "owner": "freesplit",
-          "owner_color": "#b26b00",
+          "owner_color": "#FF8B00",
           "area": {
             "sunlight": 0.81,
             "economy": 0.5,
@@ -14830,7 +14859,7 @@
       "nameId": "{20003,4220001}",
       "name": "Wretched Skies",
       "owner": "paranid",
-      "owner_color": "#d100d1",
+      "owner_color": "#B300B3",
       "raw_pos": {
         "x": -135000000.0,
         "z": 147220000.0
@@ -14852,7 +14881,7 @@
           "nameId": "{20004,4220011}",
           "name": "Wretched Skies X",
           "owner": "paranid",
-          "owner_color": "#d100d1",
+          "owner_color": "#B300B3",
           "area": {
             "sunlight": 1.08,
             "economy": 0.25,
@@ -14947,7 +14976,7 @@
       "nameId": "{20003,4230001}",
       "name": "Litany of Fury",
       "owner": "paranid",
-      "owner_color": "#d100d1",
+      "owner_color": "#B300B3",
       "raw_pos": {
         "x": -165000000.0,
         "z": 147220000.0
@@ -14969,7 +14998,7 @@
           "nameId": "{20004,4230011}",
           "name": "Litany of Fury IX",
           "owner": "paranid",
-          "owner_color": "#d100d1",
+          "owner_color": "#B300B3",
           "area": {
             "sunlight": 0.42,
             "economy": 0.25,
@@ -15067,7 +15096,7 @@
           "nameId": "{20004,4230021}",
           "name": "Litany of Fury XII",
           "owner": "paranid",
-          "owner_color": "#d100d1",
+          "owner_color": "#B300B3",
           "area": {
             "sunlight": 0.32,
             "economy": 0.25,
@@ -15169,7 +15198,7 @@
       "nameId": "{20003,4240001}",
       "name": "Emperor's Pride",
       "owner": "xenon",
-      "owner_color": "#9a0000",
+      "owner_color": "#B30000",
       "raw_pos": {
         "x": -180000000.0,
         "z": 155880000.0
@@ -15191,7 +15220,7 @@
           "nameId": "{20004,4240011}",
           "name": "Emperor's Pride IV",
           "owner": "xenon",
-          "owner_color": "#9a0000",
+          "owner_color": "#B30000",
           "area": {
             "sunlight": 0.71,
             "economy": 0.5,
@@ -15293,7 +15322,7 @@
           "nameId": "{20004,4240021}",
           "name": "Emperor's Pride VI",
           "owner": "xenon",
-          "owner_color": "#9a0000",
+          "owner_color": "#B30000",
           "area": {
             "sunlight": 0.65,
             "economy": 0.75,
@@ -15423,7 +15452,7 @@
       "nameId": "{20003,4250001}",
       "name": "Heart of Acrimony",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": 165000000.0,
         "z": 147220000.0
@@ -15445,7 +15474,7 @@
           "nameId": "{20004,4250011}",
           "name": "Heart of Acrimony I The Boneyard",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
             "sunlight": 0.64,
             "economy": 0.0,
@@ -15499,7 +15528,7 @@
       "nameId": "{20003,1000001}",
       "name": "Sol",
       "owner": "terran",
-      "owner_color": "#2f7fd3",
+      "owner_color": "#99D5FF",
       "raw_pos": {
         "x": -195000000.0,
         "z": 8660000.0
@@ -15521,7 +15550,7 @@
           "nameId": "{20004,1000011}",
           "name": "Asteroid Belt",
           "owner": "terran",
-          "owner_color": "#2f7fd3",
+          "owner_color": "#99D5FF",
           "area": {
             "sunlight": 0.13,
             "economy": 0.25,
@@ -15610,7 +15639,7 @@
       "nameId": "{20003,1010001}",
       "name": "Sol",
       "owner": "terran",
-      "owner_color": "#2f7fd3",
+      "owner_color": "#99D5FF",
       "raw_pos": {
         "x": -210000000.0,
         "z": 17320000.0
@@ -15632,7 +15661,7 @@
           "nameId": "{20004,1010011}",
           "name": "Mars",
           "owner": "terran",
-          "owner_color": "#2f7fd3",
+          "owner_color": "#99D5FF",
           "area": {
             "sunlight": 0.44,
             "economy": 0.75,
@@ -15737,7 +15766,7 @@
       "nameId": "{20003,1020001}",
       "name": "Sol",
       "owner": "terran",
-      "owner_color": "#2f7fd3",
+      "owner_color": "#99D5FF",
       "raw_pos": {
         "x": -225000000.0,
         "z": 25980000.0
@@ -15759,7 +15788,7 @@
           "nameId": "{20004,1020011}",
           "name": "Venus",
           "owner": "terran",
-          "owner_color": "#2f7fd3",
+          "owner_color": "#99D5FF",
           "area": {
             "sunlight": 1.89,
             "economy": 0.5,
@@ -15848,7 +15877,7 @@
       "nameId": "{20003,1040001}",
       "name": "Sol",
       "owner": "terran",
-      "owner_color": "#2f7fd3",
+      "owner_color": "#99D5FF",
       "raw_pos": {
         "x": -210000000.0,
         "z": 34640000.0
@@ -15870,7 +15899,7 @@
           "nameId": "{20004,1040011}",
           "name": "Earth",
           "owner": "terran",
-          "owner_color": "#2f7fd3",
+          "owner_color": "#99D5FF",
           "area": {
             "sunlight": 1.0,
             "economy": 0.75,
@@ -15967,7 +15996,7 @@
           "nameId": "{20004,1040021}",
           "name": "The Moon",
           "owner": "terran",
-          "owner_color": "#2f7fd3",
+          "owner_color": "#99D5FF",
           "area": {
             "sunlight": 1.05,
             "economy": 0.75,
@@ -16102,7 +16131,7 @@
       "nameId": "{20003,1060001}",
       "name": "Sol",
       "owner": "terran",
-      "owner_color": "#2f7fd3",
+      "owner_color": "#99D5FF",
       "raw_pos": {
         "x": -225000000.0,
         "z": 43300000.0
@@ -16124,7 +16153,7 @@
           "nameId": "{20004,1060011}",
           "name": "Mercury",
           "owner": "terran",
-          "owner_color": "#2f7fd3",
+          "owner_color": "#99D5FF",
           "area": {
             "sunlight": 7.14,
             "economy": 0.5,
@@ -16191,7 +16220,7 @@
       "nameId": "{20003,1070001}",
       "name": "Sol",
       "owner": "terran",
-      "owner_color": "#2f7fd3",
+      "owner_color": "#99D5FF",
       "raw_pos": {
         "x": -210000000.0,
         "z": -17320000.0
@@ -16213,7 +16242,7 @@
           "nameId": "{20004,1070011}",
           "name": "Jupiter",
           "owner": "terran",
-          "owner_color": "#2f7fd3",
+          "owner_color": "#99D5FF",
           "area": {
             "sunlight": 0.1,
             "economy": 0.25,
@@ -16306,7 +16335,7 @@
       "nameId": "{20003,1080001}",
       "name": "Sol",
       "owner": "terran",
-      "owner_color": "#2f7fd3",
+      "owner_color": "#99D5FF",
       "raw_pos": {
         "x": -225000000.0,
         "z": -25980000.0
@@ -16328,7 +16357,7 @@
           "nameId": "{20004,1080011}",
           "name": "Saturn 1",
           "owner": "terran",
-          "owner_color": "#2f7fd3",
+          "owner_color": "#99D5FF",
           "area": {
             "sunlight": 0.08,
             "economy": 0.25,
@@ -16454,7 +16483,7 @@
           "nameId": "{20004,1080021}",
           "name": "Titan",
           "owner": "terran",
-          "owner_color": "#2f7fd3",
+          "owner_color": "#99D5FF",
           "area": {
             "sunlight": 0.08,
             "economy": 0.25,
@@ -16529,7 +16558,7 @@
           "nameId": "{20004,1080031}",
           "name": "Saturn 2",
           "owner": "terran",
-          "owner_color": "#2f7fd3",
+          "owner_color": "#99D5FF",
           "area": {
             "sunlight": 0.08,
             "economy": 0.25,
@@ -16651,7 +16680,7 @@
       "nameId": "{20003,1090001}",
       "name": "Sol",
       "owner": "terran",
-      "owner_color": "#2f7fd3",
+      "owner_color": "#99D5FF",
       "raw_pos": {
         "x": -240000000.0,
         "z": -34640000.0
@@ -16673,7 +16702,7 @@
           "nameId": "{20004,1090011}",
           "name": "Uranus",
           "owner": "terran",
-          "owner_color": "#2f7fd3",
+          "owner_color": "#99D5FF",
           "area": {
             "sunlight": 0.07,
             "economy": 0.25,
@@ -16754,7 +16783,7 @@
       "nameId": "{20003,1100001}",
       "name": "Sol",
       "owner": "terran",
-      "owner_color": "#2f7fd3",
+      "owner_color": "#99D5FF",
       "raw_pos": {
         "x": -225000000.0,
         "z": -43300000.0
@@ -16776,7 +16805,7 @@
           "nameId": "{20004,1100011}",
           "name": "Neptune",
           "owner": "terran",
-          "owner_color": "#2f7fd3",
+          "owner_color": "#99D5FF",
           "area": {
             "sunlight": 0.06,
             "economy": 0.25,
@@ -16877,7 +16906,7 @@
       "nameId": "{20003,1110001}",
       "name": "Sol",
       "owner": "terran",
-      "owner_color": "#2f7fd3",
+      "owner_color": "#99D5FF",
       "raw_pos": {
         "x": -240000000.0,
         "z": -51960000.0
@@ -16899,7 +16928,7 @@
           "nameId": "{20004,1110011}",
           "name": "Pluto",
           "owner": "terran",
-          "owner_color": "#2f7fd3",
+          "owner_color": "#99D5FF",
           "area": {
             "sunlight": 0.05,
             "economy": 0.25,
@@ -16980,7 +17009,7 @@
       "nameId": "{20003,1120001}",
       "name": "Savage Spur",
       "owner": "xenon",
-      "owner_color": "#9a0000",
+      "owner_color": "#B30000",
       "raw_pos": {
         "x": -120000000.0,
         "z": 69280000.0
@@ -17002,7 +17031,7 @@
           "nameId": "{20004,1120011}",
           "name": "Savage Spur I",
           "owner": "xenon",
-          "owner_color": "#9a0000",
+          "owner_color": "#B30000",
           "area": {
             "sunlight": 1.17,
             "economy": 0.25,
@@ -17123,7 +17152,7 @@
           "nameId": "{20004,1120021}",
           "name": "Savage Spur II",
           "owner": "xenon",
-          "owner_color": "#9a0000",
+          "owner_color": "#B30000",
           "area": {
             "sunlight": 1.25,
             "economy": 0.25,
@@ -17216,7 +17245,7 @@
       "nameId": "{20003,1130001}",
       "name": "Segaris",
       "owner": "pioneers",
-      "owner_color": "#7ec8ff",
+      "owner_color": "#00AFB3",
       "raw_pos": {
         "x": -165000000.0,
         "z": -77940000.0
@@ -17238,7 +17267,7 @@
           "nameId": "{20004,1130011}",
           "name": "Segaris",
           "owner": "pioneers",
-          "owner_color": "#7ec8ff",
+          "owner_color": "#00AFB3",
           "area": {
             "sunlight": 1.87,
             "economy": 0.25,
@@ -17343,7 +17372,7 @@
       "nameId": "{20003,1140001}",
       "name": "Gaian Prophecy",
       "owner": "pioneers",
-      "owner_color": "#7ec8ff",
+      "owner_color": "#00AFB3",
       "raw_pos": {
         "x": -180000000.0,
         "z": -86600000.0
@@ -17365,7 +17394,7 @@
           "nameId": "{20004,1140011}",
           "name": "Gaian Prophecy",
           "owner": "pioneers",
-          "owner_color": "#7ec8ff",
+          "owner_color": "#00AFB3",
           "area": {
             "sunlight": 2.08,
             "economy": 0.25,
@@ -17480,7 +17509,7 @@
       "nameId": "{20003,1150001}",
       "name": "Brennan's Triumph",
       "owner": "pioneers",
-      "owner_color": "#7ec8ff",
+      "owner_color": "#00AFB3",
       "raw_pos": {
         "x": -195000000.0,
         "z": -77940000.0
@@ -17502,7 +17531,7 @@
           "nameId": "{20004,1150011}",
           "name": "Brennan's Triumph",
           "owner": "pioneers",
-          "owner_color": "#7ec8ff",
+          "owner_color": "#00AFB3",
           "area": {
             "sunlight": 1.22,
             "economy": 0.25,
@@ -17629,7 +17658,7 @@
       "nameId": "{20003,1160001}",
       "name": "Sol",
       "owner": "terran",
-      "owner_color": "#2f7fd3",
+      "owner_color": "#99D5FF",
       "raw_pos": {
         "x": -255000000.0,
         "z": -60620000.0
@@ -17651,7 +17680,7 @@
           "nameId": "{20004,1160011}",
           "name": "Oort Cloud",
           "owner": "terran",
-          "owner_color": "#2f7fd3",
+          "owner_color": "#99D5FF",
           "area": {
             "sunlight": 0.02,
             "economy": 0.25,
@@ -17720,7 +17749,7 @@
       "nameId": "{20003,5000001}",
       "name": "Avarice",
       "owner": "scavenger",
-      "owner_color": "#4b5563",
+      "owner_color": "#003C66",
       "raw_pos": {
         "x": -15000000.0,
         "z": 25980000.0
@@ -17742,7 +17771,7 @@
           "nameId": "{20004,5000011}",
           "name": "Avarice I",
           "owner": "scavenger",
-          "owner_color": "#4b5563",
+          "owner_color": "#003C66",
           "area": {
             "sunlight": 13.9,
             "economy": 0.25,
@@ -17863,7 +17892,7 @@
           "nameId": "{20004,5000021}",
           "name": "Avarice V Dead End",
           "owner": "scavenger",
-          "owner_color": "#4b5563",
+          "owner_color": "#003C66",
           "area": {
             "sunlight": 13.9,
             "economy": 0.25,
@@ -17938,7 +17967,7 @@
           "nameId": "{20004,5000031}",
           "name": "Avarice IV",
           "owner": "scavenger",
-          "owner_color": "#4b5563",
+          "owner_color": "#003C66",
           "area": {
             "sunlight": 13.9,
             "economy": 0.25,
@@ -18083,7 +18112,7 @@
       "nameId": "{20003,5010001}",
       "name": "Windfall",
       "owner": "loanshark",
-      "owner_color": "#c58f00",
+      "owner_color": "#B38600",
       "raw_pos": {
         "x": -30000000.0,
         "z": 51960000.0
@@ -18105,7 +18134,7 @@
           "nameId": "{20004,5010011}",
           "name": "Windfall I Union Summit",
           "owner": "loanshark",
-          "owner_color": "#c58f00",
+          "owner_color": "#B38600",
           "area": {
             "sunlight": 0.2,
             "economy": 0.25,
@@ -18236,7 +18265,7 @@
       "nameId": "{20003,5020001}",
       "name": "Windfall",
       "owner": "loanshark",
-      "owner_color": "#c58f00",
+      "owner_color": "#B38600",
       "raw_pos": {
         "x": -45000000.0,
         "z": 43300000.0
@@ -18258,7 +18287,7 @@
           "nameId": "{20004,5020011}",
           "name": "Windfall III The Hoard",
           "owner": "loanshark",
-          "owner_color": "#c58f00",
+          "owner_color": "#B38600",
           "area": {
             "sunlight": 0.16,
             "economy": 0.25,
@@ -18359,7 +18388,7 @@
       "nameId": "{20003,5030001}",
       "name": "Windfall",
       "owner": "loanshark",
-      "owner_color": "#c58f00",
+      "owner_color": "#B38600",
       "raw_pos": {
         "x": -45000000.0,
         "z": 25980000.0
@@ -18381,7 +18410,7 @@
           "nameId": "{20004,5030011}",
           "name": "Windfall IV Aurora's Dream",
           "owner": "loanshark",
-          "owner_color": "#c58f00",
+          "owner_color": "#B38600",
           "area": {
             "sunlight": 0.11,
             "economy": 0.25,
@@ -18486,7 +18515,7 @@
       "nameId": "{20003,5040001}",
       "name": "Unknown System",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": 180000000.0,
         "z": 69280000.0
@@ -18508,7 +18537,7 @@
           "nameId": "{20004,5040011}",
           "name": "Unknown System",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
             "sunlight": 0.05,
             "economy": 0.25,
@@ -18566,7 +18595,7 @@
       "nameId": "{20003,6010001}",
       "name": "Watchful Gaze",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": -150000000.0,
         "z": 103920000.0
@@ -18588,7 +18617,7 @@
           "nameId": "{20004,6010011}",
           "name": "Watchful Gaze",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
             "sunlight": 0.0,
             "economy": 0.0,
@@ -18652,7 +18681,7 @@
       "nameId": "{20003,6020001}",
       "name": "Barren Shores",
       "owner": "boron",
-      "owner_color": "#63b3ff",
+      "owner_color": "#4DB5FF",
       "raw_pos": {
         "x": -165000000.0,
         "z": 95260000.0
@@ -18674,7 +18703,7 @@
           "nameId": "{20004,6020011}",
           "name": "Barren Shores",
           "owner": "boron",
-          "owner_color": "#63b3ff",
+          "owner_color": "#4DB5FF",
           "area": {
             "sunlight": 0.0,
             "economy": 0.0,
@@ -18767,7 +18796,7 @@
       "nameId": "{20003,6030001}",
       "name": "Great Reef",
       "owner": "boron",
-      "owner_color": "#63b3ff",
+      "owner_color": "#4DB5FF",
       "raw_pos": {
         "x": -180000000.0,
         "z": 86600000.0
@@ -18789,7 +18818,7 @@
           "nameId": "{20004,6030011}",
           "name": "Great Reef",
           "owner": "boron",
-          "owner_color": "#63b3ff",
+          "owner_color": "#4DB5FF",
           "area": {
             "sunlight": 0.0,
             "economy": 0.0,
@@ -18892,7 +18921,7 @@
       "nameId": "{20003,6040001}",
       "name": "Ocean of Fantasy",
       "owner": "boron",
-      "owner_color": "#63b3ff",
+      "owner_color": "#4DB5FF",
       "raw_pos": {
         "x": -180000000.0,
         "z": 69280000.0
@@ -18914,7 +18943,7 @@
           "nameId": "{20004,6040011}",
           "name": "Ocean of Fantasy",
           "owner": "boron",
-          "owner_color": "#63b3ff",
+          "owner_color": "#4DB5FF",
           "area": {
             "sunlight": 0.0,
             "economy": 0.0,
@@ -18993,7 +19022,7 @@
       "nameId": "{20003,6050001}",
       "name": "Sanctuary of Darkness",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": -195000000.0,
         "z": 112580000.0
@@ -19015,7 +19044,7 @@
           "nameId": "{20004,6050011}",
           "name": "Sanctuary of Darkness",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
             "sunlight": 0.0,
             "economy": 0.0,
@@ -19220,7 +19249,7 @@
       "nameId": "{20003,6060001}",
       "name": "Kingdom End",
       "owner": "boron",
-      "owner_color": "#63b3ff",
+      "owner_color": "#4DB5FF",
       "raw_pos": {
         "x": -225000000.0,
         "z": 129900000.0
@@ -19242,7 +19271,7 @@
           "nameId": "{20004,6060011}",
           "name": "Kingdom End I",
           "owner": "boron",
-          "owner_color": "#63b3ff",
+          "owner_color": "#4DB5FF",
           "area": {
             "sunlight": 0.0,
             "economy": 0.0,
@@ -19439,7 +19468,7 @@
           "nameId": "{20004,6060021}",
           "name": "Reflected Stars",
           "owner": "boron",
-          "owner_color": "#63b3ff",
+          "owner_color": "#4DB5FF",
           "area": {
             "sunlight": 0.0,
             "economy": 0.0,
@@ -19746,7 +19775,7 @@
           "nameId": "{20004,6060031}",
           "name": "Towering Wave",
           "owner": "boron",
-          "owner_color": "#63b3ff",
+          "owner_color": "#4DB5FF",
           "area": {
             "sunlight": 0.0,
             "economy": 0.0,
@@ -19988,7 +20017,7 @@
       "nameId": "{20003,6070001}",
       "name": "Rolk's Demise",
       "owner": "boron",
-      "owner_color": "#63b3ff",
+      "owner_color": "#4DB5FF",
       "raw_pos": {
         "x": -240000000.0,
         "z": 121240000.0
@@ -20010,7 +20039,7 @@
           "nameId": "{20004,6070011}",
           "name": "Rolk's Demise",
           "owner": "boron",
-          "owner_color": "#63b3ff",
+          "owner_color": "#4DB5FF",
           "area": {
             "sunlight": 0.0,
             "economy": 0.0,
@@ -20113,7 +20142,7 @@
       "nameId": "{20003,6080001}",
       "name": "Atreus' Clouds",
       "owner": "boron",
-      "owner_color": "#63b3ff",
+      "owner_color": "#4DB5FF",
       "raw_pos": {
         "x": -225000000.0,
         "z": 112580000.0
@@ -20135,7 +20164,7 @@
           "nameId": "{20004,6080011}",
           "name": "Atreus' Clouds",
           "owner": "boron",
-          "owner_color": "#63b3ff",
+          "owner_color": "#4DB5FF",
           "area": {
             "sunlight": 0.0,
             "economy": 0.0,
@@ -20333,7 +20362,7 @@
       "nameId": "{20003,6090001}",
       "name": "Menelaus' Oasis",
       "owner": "boron",
-      "owner_color": "#63b3ff",
+      "owner_color": "#4DB5FF",
       "raw_pos": {
         "x": -240000000.0,
         "z": 103920000.0
@@ -20355,7 +20384,7 @@
           "nameId": "{20004,6090011}",
           "name": "Menelaus' Oasis",
           "owner": "boron",
-          "owner_color": "#63b3ff",
+          "owner_color": "#4DB5FF",
           "area": {
             "sunlight": 0.0,
             "economy": 0.0,
@@ -20554,10 +20583,10 @@
     },
     "Cluster_701_macro": {
       "id": "Cluster_701_macro",
-      "nameId": "",
-      "name": "",
+      "nameId": "{20003,7010001}",
+      "name": "Mitsuno's Remembrance",
       "owner": "kaori",
-      "owner_color": "#8a6ad9",
+      "owner_color": "#FFB966",
       "raw_pos": {
         "x": 150000000.0,
         "z": 17320000.0
@@ -20576,15 +20605,17 @@
         "Cluster_701_Sector001_macro": {
           "id": "Cluster_701_Sector001_macro",
           "cluster_id": "Cluster_701_macro",
-          "nameId": "",
-          "name": "",
+          "nameId": "{20004,7010011}",
+          "name": "Mitsuno's Revelation",
           "owner": "kaori",
-          "owner_color": "#8a6ad9",
+          "owner_color": "#FFB966",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 1.18,
+            "economy": 0.5,
+            "security": 0.5,
+            "tags": [
+              "noaggressivespawn"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -20665,10 +20696,10 @@
     },
     "Cluster_702_macro": {
       "id": "Cluster_702_macro",
-      "nameId": "",
-      "name": "",
+      "nameId": "{20003,7020001}",
+      "name": "Mitsuno's Remembrance",
       "owner": "kaori",
-      "owner_color": "#8a6ad9",
+      "owner_color": "#FFB966",
       "raw_pos": {
         "x": 165000000.0,
         "z": 8660000.0
@@ -20687,15 +20718,17 @@
         "Cluster_702_Sector001_macro": {
           "id": "Cluster_702_Sector001_macro",
           "cluster_id": "Cluster_702_macro",
-          "nameId": "",
-          "name": "",
+          "nameId": "{20004,7020011}",
+          "name": "Mitsuno's Defiance",
           "owner": "kaori",
-          "owner_color": "#8a6ad9",
+          "owner_color": "#FFB966",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 1.11,
+            "economy": 0.5,
+            "security": 0.5,
+            "tags": [
+              "noaggressivespawn"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -20788,10 +20821,10 @@
     },
     "Cluster_703_macro": {
       "id": "Cluster_703_macro",
-      "nameId": "",
-      "name": "",
+      "nameId": "{20003,7030001}",
+      "name": "Mitsuno's Remembrance",
       "owner": "kaori",
-      "owner_color": "#8a6ad9",
+      "owner_color": "#FFB966",
       "raw_pos": {
         "x": 165000000.0,
         "z": -8660000.0
@@ -20810,15 +20843,17 @@
         "Cluster_703_Sector001_macro": {
           "id": "Cluster_703_Sector001_macro",
           "cluster_id": "Cluster_703_macro",
-          "nameId": "",
-          "name": "",
+          "nameId": "{20004,7030011}",
+          "name": "Mitsuno's Sacrifice",
           "owner": "kaori",
-          "owner_color": "#8a6ad9",
+          "owner_color": "#FFB966",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 1.06,
+            "economy": 0.75,
+            "security": 0.75,
+            "tags": [
+              "noaggressivespawn"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -20913,10 +20948,10 @@
     },
     "Cluster_704_macro": {
       "id": "Cluster_704_macro",
-      "nameId": "",
-      "name": "",
+      "nameId": "{20003,7040001}",
+      "name": "President's End",
       "owner": "argon",
-      "owner_color": "#0077cc",
+      "owner_color": "#0069B3",
       "raw_pos": {
         "x": 15000000.0,
         "z": 60620000.0
@@ -20935,15 +20970,17 @@
         "Cluster_704_Sector001_macro": {
           "id": "Cluster_704_Sector001_macro",
           "cluster_id": "Cluster_704_macro",
-          "nameId": "",
-          "name": "",
+          "nameId": "{20004,7040011}",
+          "name": "President's End",
           "owner": "argon",
-          "owner_color": "#0077cc",
+          "owner_color": "#0069B3",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 0.71,
+            "economy": 0.5,
+            "security": 0.5,
+            "tags": [
+              "noaggressivespawn"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -21028,10 +21065,10 @@
     },
     "Cluster_705_macro": {
       "id": "Cluster_705_macro",
-      "nameId": "",
-      "name": "",
+      "nameId": "{20003,7050001}",
+      "name": "Nopileos' Memorial",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": -120000000.0,
         "z": 34640000.0
@@ -21050,15 +21087,17 @@
         "Cluster_705_Sector001_macro": {
           "id": "Cluster_705_Sector001_macro",
           "cluster_id": "Cluster_705_macro",
-          "nameId": "",
-          "name": "",
+          "nameId": "{20004,7050011}",
+          "name": "Nopileos' Memorial",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 1.63,
+            "economy": 0.25,
+            "security": 0.25,
+            "tags": [
+              "noaggressivespawn"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -21117,10 +21156,10 @@
     },
     "Cluster_706_macro": {
       "id": "Cluster_706_macro",
-      "nameId": "",
-      "name": "",
+      "nameId": "{20003,7060001}",
+      "name": "Hatikvah's Faith",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": -105000000.0,
         "z": 25980000.0
@@ -21139,15 +21178,17 @@
         "Cluster_706_Sector001_macro": {
           "id": "Cluster_706_Sector001_macro",
           "cluster_id": "Cluster_706_macro",
-          "nameId": "",
-          "name": "",
+          "nameId": "{20004,7060011}",
+          "name": "Hatikvah's Faith",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 0.88,
+            "economy": 0.25,
+            "security": 0.25,
+            "tags": [
+              "noaggressivespawn"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -21203,10 +21244,10 @@
     },
     "Cluster_708_macro": {
       "id": "Cluster_708_macro",
-      "nameId": "",
-      "name": "",
+      "nameId": "{20003,7080001}",
+      "name": "Matrix #101",
       "owner": "xenon",
-      "owner_color": "#9a0000",
+      "owner_color": "#B30000",
       "raw_pos": {
         "x": -45000000.0,
         "z": 95260000.0
@@ -21225,15 +21266,17 @@
         "Cluster_708_Sector001_macro": {
           "id": "Cluster_708_Sector001_macro",
           "cluster_id": "Cluster_708_macro",
-          "nameId": "",
-          "name": "",
+          "nameId": "{20004,7080011}",
+          "name": "Matrix #101",
           "owner": "xenon",
-          "owner_color": "#9a0000",
+          "owner_color": "#B30000",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 4.08,
+            "economy": 0.25,
+            "security": 0.5,
+            "tags": [
+              "noaggressivespawn"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -21297,7 +21340,7 @@
       "nameId": "{20003,7300001}",
       "name": "Third Redemption",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": -150000000.0,
         "z": 0.0
@@ -21319,7 +21362,7 @@
           "nameId": "{20004,7300011}",
           "name": "Third Redemption",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
             "sunlight": 1.0,
             "economy": 0.25,
@@ -21388,7 +21431,7 @@
       "nameId": "{20003,7400001}",
       "name": "Scarlet Star",
       "owner": "ownerless",
-      "owner_color": "#4b5563",
+      "owner_color": "#C0C0C0",
       "raw_pos": {
         "x": -45000000.0,
         "z": -8660000.0
@@ -21410,7 +21453,7 @@
           "nameId": "{20004,7400011}",
           "name": "Scarlet Star",
           "owner": "ownerless",
-          "owner_color": "#4b5563",
+          "owner_color": "#C0C0C0",
           "area": {
             "sunlight": 2.66,
             "economy": 0.25,

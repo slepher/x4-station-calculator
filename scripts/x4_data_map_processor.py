@@ -26,6 +26,9 @@ DEFAULT_MAP_DIR = str(Path(X4_UNPACKED_DATA_PATH) / "maps" / "xu_ep2_universe")
 DEFAULT_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "maps.json")
 DEFAULT_MAPDEFAULTS = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "mapdefaults_final.xml")
 DEFAULT_GOD_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "god_final.xml")
+DEFAULT_FACTIONS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "factions_final.xml")
+DEFAULT_COLORS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "colors_final.xml")
+DEFAULT_FACTIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "factions.json")
 
 
 CLUSTER_MACRO_RE = re.compile(r"Cluster_(\d+)_macro", re.IGNORECASE)
@@ -65,6 +68,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--map-dir", default=DEFAULT_MAP_DIR)
     parser.add_argument("--mapdefaults-xml", default=DEFAULT_MAPDEFAULTS)
     parser.add_argument("--god-xml", default=DEFAULT_GOD_XML)
+    parser.add_argument("--factions-xml", default=DEFAULT_FACTIONS_XML)
+    parser.add_argument("--colors-xml", default=DEFAULT_COLORS_XML)
+    parser.add_argument("--factions-output", default=DEFAULT_FACTIONS_OUTPUT)
     parser.add_argument("--output", default=DEFAULT_OUTPUT)
     return parser.parse_args()
 
@@ -245,6 +251,67 @@ def station_tag_priority(tags: List[str]) -> int:
     return 1 if any(tag in preferred for tag in tags) else 0
 
 
+def rgb_to_hex(r: int, g: int, b: int) -> str:
+    return f"#{r:02X}{g:02X}{b:02X}"
+
+
+def load_color_map_from_xml(colors_xml_path: Path) -> Dict[str, str]:
+    if not colors_xml_path.exists():
+        return {}
+    root = parse_xml(colors_xml_path)
+    color_map: Dict[str, str] = {}
+    for color_node in root.findall(".//colors/color[@id]"):
+        color_id = (color_node.get("id") or "").strip()
+        if not color_id:
+            continue
+        r = int(as_float(color_node.get("r"), 0.0))
+        g = int(as_float(color_node.get("g"), 0.0))
+        b = int(as_float(color_node.get("b"), 0.0))
+        color_map[color_id] = rgb_to_hex(r, g, b)
+    for mapping_node in root.findall(".//mappings/mapping[@id]"):
+        mapping_id = (mapping_node.get("id") or "").strip()
+        ref_id = (mapping_node.get("ref") or "").strip()
+        if mapping_id and ref_id and ref_id in color_map:
+            color_map[mapping_id] = color_map[ref_id]
+    return color_map
+
+
+def migrate_factions(
+    factions_xml_path: Path,
+    colors_xml_path: Path,
+    i18n_registry,
+) -> Tuple[List[dict], Dict[str, dict]]:
+    if not factions_xml_path.exists():
+        return [], {}
+    colors_by_name = load_color_map_from_xml(colors_xml_path)
+    factions_root = parse_xml(factions_xml_path)
+    rows: List[dict] = []
+    by_id: Dict[str, dict] = {}
+    for node in factions_root.findall("./faction[@id]"):
+        faction_id = (node.get("id") or "").strip()
+        if not faction_id:
+            continue
+        name_id = (node.get("name") or "").strip()
+        name = i18n_registry.get_name(name_id, "en") if name_id else ""
+        tags = split_tags(node.get("tags"))
+        color_node = node.find("./color")
+        color_name = (color_node.get("ref") if color_node is not None else "") or ""
+        color = colors_by_name.get(color_name, "#4b5563")
+        item = {
+            "id": faction_id,
+            "name": name,
+            "nameId": name_id,
+            "tags": tags,
+            "color_name": color_name,
+            "color": color,
+            "claimspace": "claimspace" in tags,
+        }
+        rows.append(item)
+        by_id[faction_id] = item
+    rows.sort(key=lambda item: item["id"])
+    return rows, by_id
+
+
 def load_mapdefaults(mapdefaults_xml: Path) -> Tuple[Dict[str, str], Dict[str, dict]]:
     if not mapdefaults_xml.exists():
         return {}, {}
@@ -257,6 +324,7 @@ def load_mapdefaults(mapdefaults_xml: Path) -> Tuple[Dict[str, str], Dict[str, d
         macro = dataset.get("macro")
         if not macro:
             continue
+        macro_key = macro.lower()
         properties = dataset.find("./properties")
         if properties is None:
             continue
@@ -265,11 +333,11 @@ def load_mapdefaults(mapdefaults_xml: Path) -> Tuple[Dict[str, str], Dict[str, d
         if identification is not None:
             name_id = identification.get("name") or ""
             if name_id:
-                name_id_by_macro[macro] = name_id
+                name_id_by_macro[macro_key] = name_id
 
         area_node = properties.find("./area")
         if area_node is not None and SECTOR_MACRO_RE.fullmatch(macro):
-            area_by_sector_macro[macro] = {
+            area_by_sector_macro[macro_key] = {
                 "sunlight": as_float(area_node.get("sunlight"), 0.0),
                 "economy": as_float(area_node.get("economy"), 0.0),
                 "security": as_float(area_node.get("security"), 0.0),
@@ -295,7 +363,13 @@ def zone_connection_path_to_zone_macro(path: Optional[str]) -> Optional[str]:
         return None
     return f"Zone{int(match.group(1)):03d}_Cluster_{int(match.group(2)):02d}_Sector{int(match.group(3)):03d}_macro"
 
-def generate_map_data(map_dir: Path, mapdefaults_path: Path, god_xml_path: Optional[Path] = None, i18n_registry=None) -> Dict[str, object]:
+def generate_map_data(
+    map_dir: Path,
+    mapdefaults_path: Path,
+    god_xml_path: Optional[Path] = None,
+    factions_by_id: Optional[Dict[str, dict]] = None,
+    i18n_registry=None,
+) -> Dict[str, object]:
     name_id_by_macro, area_by_sector_macro = load_mapdefaults(mapdefaults_path)
     registry = i18n_registry or get_i18n_registry()
     if i18n_registry is None:
@@ -330,8 +404,8 @@ def generate_map_data(map_dir: Path, mapdefaults_path: Path, god_xml_path: Optio
             axial = cluster_world_to_axial(raw_pos)
             clusters[cluster_macro] = {
                 "id": cluster_macro,
-                "nameId": name_id_by_macro.get(cluster_macro, ""),
-                "name": registry.get_name(name_id_by_macro.get(cluster_macro, ""), "en"),
+                "nameId": name_id_by_macro.get(cluster_macro.lower(), ""),
+                "name": registry.get_name(name_id_by_macro.get(cluster_macro.lower(), ""), "en"),
                 "owner": "neutral",
                 "owner_color": OWNER_COLORS.get("neutral", "#94a3b8"),
                 "raw_pos": raw_pos,
@@ -401,8 +475,8 @@ def generate_map_data(map_dir: Path, mapdefaults_path: Path, god_xml_path: Optio
                 axial = cluster_world_to_axial(raw_pos)
                 clusters[cluster_macro] = {
                     "id": cluster_macro,
-                    "nameId": name_id_by_macro.get(cluster_macro, ""),
-                    "name": registry.get_name(name_id_by_macro.get(cluster_macro, ""), "en"),
+                    "nameId": name_id_by_macro.get(cluster_macro.lower(), ""),
+                    "name": registry.get_name(name_id_by_macro.get(cluster_macro.lower(), ""), "en"),
                     "owner": "neutral",
                     "owner_color": OWNER_COLORS.get("neutral", "#94a3b8"),
                     "raw_pos": raw_pos,
@@ -478,14 +552,14 @@ def generate_map_data(map_dir: Path, mapdefaults_path: Path, god_xml_path: Optio
             raw_local = cluster_sector_offsets.get(cluster_id or "", {}).get(sector_macro, {"x": 0.0, "z": 0.0})
             cluster_raw = clusters.get(cluster_id or "", {}).get("raw_pos", {"x": 0.0, "z": 0.0})
             area = area_by_sector_macro.get(
-                sector_macro,
+                sector_macro.lower(),
                 {"sunlight": 0.0, "economy": 0.0, "security": 0.0, "tags": []},
             )
             sectors[sector_macro] = {
                 "id": sector_macro,
                 "cluster_id": cluster_id,
-                "nameId": name_id_by_macro.get(sector_macro, ""),
-                "name": registry.get_name(name_id_by_macro.get(sector_macro, ""), "en"),
+                "nameId": name_id_by_macro.get(sector_macro.lower(), ""),
+                "name": registry.get_name(name_id_by_macro.get(sector_macro.lower(), ""), "en"),
                 "owner": clusters.get(cluster_id or "", {}).get("owner", "neutral"),
                 "owner_color": OWNER_COLORS.get(clusters.get(cluster_id or "", {}).get("owner", "neutral"), "#94a3b8"),
                 "area": area,
@@ -728,8 +802,15 @@ def generate_map_data(map_dir: Path, mapdefaults_path: Path, god_xml_path: Optio
             }
             sector_stations[sector_id].append(station_item)
 
+    faction_map = factions_by_id or {}
     owner_resolution_ties: List[dict] = []
-    excluded_owners = {"player", "civilian", "khaak", "ownerless"}
+    excluded_owners = {"player"}
+
+    def owner_color(owner: str) -> str:
+        if owner in faction_map:
+            return faction_map[owner].get("color") or OWNER_COLORS.get(owner, "#4b5563")
+        return OWNER_COLORS.get(owner, "#4b5563")
+
     for sector_id, sector in sectors.items():
         stations = sector_stations.get(sector_id, [])
         candidates = []
@@ -737,6 +818,9 @@ def generate_map_data(map_dir: Path, mapdefaults_path: Path, god_xml_path: Optio
             owner = (station.get("owner") or "").strip()
             station_type = (station.get("type") or "").strip()
             if not owner or owner in excluded_owners:
+                continue
+            faction = faction_map.get(owner)
+            if faction is not None and not faction.get("claimspace", False):
                 continue
             if station_type == "piratebase":
                 continue
@@ -746,7 +830,7 @@ def generate_map_data(map_dir: Path, mapdefaults_path: Path, god_xml_path: Optio
 
         if not candidates:
             sector["owner"] = "ownerless"
-            sector["owner_color"] = OWNER_COLORS.get("ownerless", "#4b5563")
+            sector["owner_color"] = owner_color("ownerless")
             continue
 
         candidates.sort(key=lambda item: item[0], reverse=True)
@@ -754,7 +838,7 @@ def generate_map_data(map_dir: Path, mapdefaults_path: Path, god_xml_path: Optio
         top = [item[1] for item in candidates if item[0] == best_score]
         chosen = top[0]
         sector["owner"] = (chosen.get("owner") or "").strip() or "ownerless"
-        sector["owner_color"] = OWNER_COLORS.get(sector["owner"], "#4b5563")
+        sector["owner_color"] = owner_color(sector["owner"])
         if len(top) > 1:
             owner_resolution_ties.append(
                 {
@@ -780,7 +864,7 @@ def generate_map_data(map_dir: Path, mapdefaults_path: Path, god_xml_path: Optio
         sector_ids = cluster.get("sector_ids", [])
         if not sector_ids:
             cluster["owner"] = "ownerless"
-            cluster["owner_color"] = OWNER_COLORS.get("ownerless", "#4b5563")
+            cluster["owner_color"] = owner_color("ownerless")
             continue
         owners = {sectors[sector_id]["owner"] for sector_id in sector_ids if sector_id in sectors}
         if len(owners) == 1 and "ownerless" not in owners:
@@ -788,7 +872,7 @@ def generate_map_data(map_dir: Path, mapdefaults_path: Path, god_xml_path: Optio
         else:
             cluster_owner = "ownerless"
         cluster["owner"] = cluster_owner
-        cluster["owner_color"] = OWNER_COLORS.get(cluster_owner, "#4b5563")
+        cluster["owner_color"] = owner_color(cluster_owner)
 
     grouped_sector_links: Dict[Tuple[str, str, str], List[str]] = defaultdict(list)
     for link_id, link in sector_links.items():
@@ -948,10 +1032,33 @@ def main() -> None:
     output_path = Path(args.output)
     mapdefaults_path = Path(args.mapdefaults_xml)
     god_xml_path = Path(args.god_xml)
-    result = generate_map_data(map_dir=map_dir, mapdefaults_path=mapdefaults_path, god_xml_path=god_xml_path)
+    factions_xml_path = Path(args.factions_xml)
+    colors_xml_path = Path(args.colors_xml)
+    factions_output_path = Path(args.factions_output)
+
+    registry = get_i18n_registry()
+    registry.configure(X4_UNPACKED_DATA_PATH, {
+        "044": {"iso": "en", "name": "English"},
+    })
+    factions_rows, factions_by_id = migrate_factions(
+        factions_xml_path=factions_xml_path,
+        colors_xml_path=colors_xml_path,
+        i18n_registry=registry,
+    )
+    factions_output_path.parent.mkdir(parents=True, exist_ok=True)
+    factions_output_path.write_text(json.dumps(factions_rows, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    result = generate_map_data(
+        map_dir=map_dir,
+        mapdefaults_path=mapdefaults_path,
+        god_xml_path=god_xml_path,
+        factions_by_id=factions_by_id,
+        i18n_registry=registry,
+    )
     write_map_output(result["payload"], output_path)
     stats = result["stats"]
     missing = result["missing_name_ids"]
+    print(f"Factions Output: {factions_output_path} count={len(factions_rows)}")
     print(f"Output: {output_path}")
     print(
         f"clusters={stats['clusters']} sectors={stats['sectors']} zones={stats['zones']} "

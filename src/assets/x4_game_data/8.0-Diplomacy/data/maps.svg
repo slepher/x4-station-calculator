@@ -172,28 +172,28 @@
   <line x1="2308.5" y1="1818.2" x2="2302.1" y2="1795.1" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="2308.5" cy="1818.2" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="2302.1" cy="1795.1" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
-  <polygon points="2397.6,1788.2 2356.6,1859.2 2274.6,1859.2 2233.6,1788.2 2274.6,1717.2 2356.6,1717.2" fill="none" stroke="#c6c000" stroke-width="2.8" stroke-opacity="0.95" />
-  <polygon points="2377.1,1823.7 2356.6,1859.2 2315.6,1859.2 2295.1,1823.7 2315.6,1788.2 2356.6,1788.2" fill="#c6c000" fill-opacity="0.08" stroke="#c6c000" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="2397.6,1788.2 2356.6,1859.2 2274.6,1859.2 2233.6,1788.2 2274.6,1717.2 2356.6,1717.2" fill="none" stroke="#B3B300" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="2377.1,1823.7 2356.6,1859.2 2315.6,1859.2 2295.1,1823.7 2315.6,1788.2 2356.6,1788.2" fill="#B3B300" fill-opacity="0.08" stroke="#B3B300" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="2336.1" y="1794.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Grand Exchange I</text>
-  <polygon points="2315.6,1788.2 2295.1,1823.7 2254.1,1823.7 2233.6,1788.2 2254.1,1752.7 2295.1,1752.7" fill="#c6c000" fill-opacity="0.08" stroke="#c6c000" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="2315.6,1788.2 2295.1,1823.7 2254.1,1823.7 2233.6,1788.2 2254.1,1752.7 2295.1,1752.7" fill="#B3B300" fill-opacity="0.08" stroke="#B3B300" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="2274.6" y="1758.7" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Grand Exchange III</text>
-  <polygon points="2377.1,1752.7 2356.6,1788.2 2315.6,1788.2 2295.1,1752.7 2315.6,1717.2 2356.6,1717.2" fill="#c6c000" fill-opacity="0.08" stroke="#c6c000" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="2377.1,1752.7 2356.6,1788.2 2315.6,1788.2 2295.1,1752.7 2315.6,1717.2 2356.6,1717.2" fill="#B3B300" fill-opacity="0.08" stroke="#B3B300" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="2336.1" y="1723.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Grand Exchange IV</text>
-  <circle cx="2346.9" cy="1827.2" r="0.8" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2309.7" cy="1819.0" r="0.8" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2258.3" cy="1799.2" r="0.8" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2338.1" cy="1744.0" r="0.8" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2520.6,1575.2 2479.6,1646.2 2397.6,1646.2 2356.6,1575.2 2397.6,1504.1 2479.6,1504.1" fill="#94a3b8" fill-opacity="0.08" stroke="#94a3b8" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="2346.9" cy="1827.2" r="0.8" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2309.7" cy="1819.0" r="0.8" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2258.3" cy="1799.2" r="0.8" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2338.1" cy="1744.0" r="0.8" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2520.6,1575.2 2479.6,1646.2 2397.6,1646.2 2356.6,1575.2 2397.6,1504.1 2479.6,1504.1" fill="#B3B300" fill-opacity="0.08" stroke="#B3B300" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2438.6" y="1516.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Eighteen Billion</text>
-  <circle cx="2421.0" cy="1604.0" r="1.1" fill="#94a3b8" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2481.6" cy="1554.5" r="1.1" fill="#94a3b8" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2421.2" cy="1545.2" r="1.1" fill="#94a3b8" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2381.9" cy="1570.5" r="1.1" fill="#94a3b8" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2643.6,1646.2 2602.6,1717.2 2520.6,1717.2 2479.6,1646.2 2520.6,1575.2 2602.6,1575.2" fill="#c6c000" fill-opacity="0.08" stroke="#c6c000" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="2421.0" cy="1604.0" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2481.6" cy="1554.5" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2421.2" cy="1545.2" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2381.9" cy="1570.5" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2643.6,1646.2 2602.6,1717.2 2520.6,1717.2 2479.6,1646.2 2520.6,1575.2 2602.6,1575.2" fill="#B3B300" fill-opacity="0.08" stroke="#B3B300" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2561.6" y="1587.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Memory of Profit IX</text>
-  <circle cx="2608.0" cy="1613.5" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2540.2" cy="1615.9" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2551.7" cy="1659.3" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2608.0" cy="1613.5" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2540.2" cy="1615.9" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2551.7" cy="1659.3" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
   <line x1="2669.6" y1="1993.3" x2="2698.2" y2="2009.2" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="2669.6" cy="1993.3" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="2698.2" cy="2009.2" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
@@ -202,88 +202,88 @@
   <circle cx="2699.6" cy="2009.2" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <path d="M 2673.5,1982.6 C 2675.5,1979.7 2676.7,1978.1 2685.6,1965.4 C 2694.4,1952.6 2715.9,1921.8 2726.8,1906.2 C 2737.8,1890.5 2743.8,1881.9 2751.3,1871.4 C 2758.7,1860.8 2520.6,2200.9 2771.4,1842.7 C 3022.3,1484.5 4008.9,75.4 4256.4,-278.1" clip-path="url(#sector-clip-Cluster_04_macro-Cluster_04_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 4257.1,-277.6 C 4009.6,75.9 3023.4,1484.3 2772.1,1843.2 C 2520.8,2202.0 2757.3,1864.3 2749.4,1875.6 C 2741.6,1886.8 2735.6,1895.3 2725.0,1910.4 C 2714.4,1925.5 2694.5,1954.1 2686.0,1966.2 C 2677.5,1978.3 2676.2,1980.2 2674.2,1983.0" clip-path="url(#sector-clip-Cluster_04_macro-Cluster_04_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="2766.6,2001.2 2725.6,2072.3 2643.6,2072.3 2602.6,2001.2 2643.6,1930.2 2725.6,1930.2" fill="none" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
-  <polygon points="2705.1,1965.7 2684.6,2001.2 2643.6,2001.2 2623.1,1965.7 2643.6,1930.2 2684.6,1930.2" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="2766.6,2001.2 2725.6,2072.3 2643.6,2072.3 2602.6,2001.2 2643.6,1930.2 2725.6,1930.2" fill="none" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="2705.1,1965.7 2684.6,2001.2 2643.6,2001.2 2623.1,1965.7 2643.6,1930.2 2684.6,1930.2" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="2664.1" y="1936.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Nopileos' Fortune II</text>
-  <polygon points="2746.1,2036.8 2725.6,2072.3 2684.6,2072.3 2664.1,2036.8 2684.6,2001.2 2725.6,2001.2" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="2746.1,2036.8 2725.6,2072.3 2684.6,2072.3 2664.1,2036.8 2684.6,2001.2 2725.6,2001.2" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="2705.1" y="2007.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Nopileos' Fortune VI</text>
-  <circle cx="2699.2" cy="2012.4" r="0.8" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2696.5" cy="2012.2" r="0.8" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2397.6,1930.2 2356.6,2001.2 2274.6,2001.2 2233.6,1930.2 2274.6,1859.2 2356.6,1859.2" fill="#c6c000" fill-opacity="0.08" stroke="#c6c000" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="2699.2" cy="2012.4" r="0.8" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2696.5" cy="2012.2" r="0.8" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2397.6,1930.2 2356.6,2001.2 2274.6,2001.2 2233.6,1930.2 2274.6,1859.2 2356.6,1859.2" fill="#B3B300" fill-opacity="0.08" stroke="#B3B300" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2315.6" y="1871.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Path to Profit</text>
-  <circle cx="2311.0" cy="1902.8" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2276.9" cy="1971.9" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2311.0" cy="1902.8" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2276.9" cy="1971.9" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
   <line x1="2077.4" y1="1752.7" x2="2065.3" y2="1809.7" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="2077.4" cy="1752.7" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="2065.3" cy="1809.7" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <line x1="2077.4" y1="1754.1" x2="2065.3" y2="1810.9" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="2077.4" cy="1754.1" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="2065.3" cy="1810.9" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
-  <polygon points="2151.6,1788.2 2110.6,1859.2 2028.6,1859.2 1987.6,1788.2 2028.6,1717.2 2110.6,1717.2" fill="none" stroke="#0077cc" stroke-width="2.8" stroke-opacity="0.95" />
-  <polygon points="2090.1,1752.7 2069.6,1788.2 2028.6,1788.2 2008.1,1752.7 2028.6,1717.2 2069.6,1717.2" fill="#0077cc" fill-opacity="0.08" stroke="#0077cc" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="2151.6,1788.2 2110.6,1859.2 2028.6,1859.2 1987.6,1788.2 2028.6,1717.2 2110.6,1717.2" fill="none" stroke="#0069B3" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="2090.1,1752.7 2069.6,1788.2 2028.6,1788.2 2008.1,1752.7 2028.6,1717.2 2069.6,1717.2" fill="#0069B3" fill-opacity="0.08" stroke="#0069B3" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="2049.1" y="1723.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Black Hole Sun IV</text>
-  <polygon points="2131.1,1823.7 2110.6,1859.2 2069.6,1859.2 2049.1,1823.7 2069.6,1788.2 2110.6,1788.2" fill="#0077cc" fill-opacity="0.08" stroke="#0077cc" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="2131.1,1823.7 2110.6,1859.2 2069.6,1859.2 2049.1,1823.7 2069.6,1788.2 2110.6,1788.2" fill="#0069B3" fill-opacity="0.08" stroke="#0069B3" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="2090.1" y="1794.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Black Hole Sun V</text>
-  <circle cx="2036.5" cy="1743.2" r="0.8" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2051.8" cy="1729.3" r="0.8" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2098.2" cy="1841.7" r="0.8" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2100.2" cy="1812.2" r="0.8" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1536.6,1433.1 1495.6,1504.1 1413.6,1504.1 1372.6,1433.1 1413.6,1362.1 1495.6,1362.1" fill="#0077cc" fill-opacity="0.08" stroke="#0077cc" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="2036.5" cy="1743.2" r="0.8" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2051.8" cy="1729.3" r="0.8" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2098.2" cy="1841.7" r="0.8" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2100.2" cy="1812.2" r="0.8" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1536.6,1433.1 1495.6,1504.1 1413.6,1504.1 1372.6,1433.1 1413.6,1362.1 1495.6,1362.1" fill="#0069B3" fill-opacity="0.08" stroke="#0069B3" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1454.6" y="1374.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">The Reach</text>
-  <circle cx="1511.2" cy="1437.7" r="1.1" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1511.2" cy="1437.7" r="1.1" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
   <path d="M 2153.5,1024.3 C 2154.8,1023.7 2157.4,1022.2 2161.5,1020.4 C 2165.5,1018.6 2171.9,1015.4 2177.5,1013.5 C 2183.2,1011.6 2190.5,1009.5 2195.3,1009.0 C 2200.2,1008.6 2205.0,1010.6 2206.9,1010.9" clip-path="url(#sector-clip-Cluster_08_macro-Cluster_08_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 2207.0,1010.7 C 2205.1,1010.3 2200.4,1008.0 2195.4,1008.4 C 2190.5,1008.8 2183.0,1011.0 2177.3,1012.9 C 2171.6,1014.9 2165.2,1018.0 2161.2,1019.9 C 2157.2,1021.8 2154.7,1023.4 2153.4,1024.1" clip-path="url(#sector-clip-Cluster_08_macro-Cluster_08_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="2274.6,1007.0 2233.6,1078.1 2151.6,1078.1 2110.6,1007.0 2151.6,936.0 2233.6,936.0" fill="#0077cc" fill-opacity="0.08" stroke="#0077cc" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="2274.6,1007.0 2233.6,1078.1 2151.6,1078.1 2110.6,1007.0 2151.6,936.0 2233.6,936.0" fill="#0069B3" fill-opacity="0.08" stroke="#0069B3" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2192.6" y="948.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Silent Witness I</text>
-  <circle cx="2199.2" cy="982.1" r="1.1" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2206.9" cy="1010.8" r="1.1" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2153.4" cy="1024.2" r="1.1" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2189.6" cy="1043.8" r="1.1" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2206.4" cy="1048.8" r="1.1" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2164.9" cy="1056.7" r="1.1" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2199.2" cy="982.1" r="1.1" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2206.9" cy="1010.8" r="1.1" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2153.4" cy="1024.2" r="1.1" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2189.6" cy="1043.8" r="1.1" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2206.4" cy="1048.8" r="1.1" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2164.9" cy="1056.7" r="1.1" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
   <path d="M 2802.0,1241.4 C 2802.0,1240.3 2802.0,1237.4 2802.0,1234.4 C 2802.0,1231.3 2802.0,1227.0 2802.0,1223.4 C 2802.0,1219.7 2802.0,1215.6 2802.0,1212.7 C 2802.0,1209.7 2802.0,1207.0 2802.0,1205.9" clip-path="url(#sector-clip-Cluster_09_macro-Cluster_09_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 2801.7,1205.9 C 2801.7,1207.3 2801.7,1211.6 2801.7,1214.5 C 2801.7,1217.4 2801.7,1220.1 2801.7,1223.1 C 2801.7,1226.0 2801.7,1229.1 2801.7,1232.2 C 2801.7,1235.2 2801.7,1239.9 2801.7,1241.4" clip-path="url(#sector-clip-Cluster_09_macro-Cluster_09_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="2889.6,1220.1 2848.6,1291.1 2766.6,1291.1 2725.6,1220.1 2766.6,1149.1 2848.6,1149.1" fill="#94a3b8" fill-opacity="0.08" stroke="#94a3b8" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="2889.6,1220.1 2848.6,1291.1 2766.6,1291.1 2725.6,1220.1 2766.6,1149.1 2848.6,1149.1" fill="#B3B300" fill-opacity="0.08" stroke="#B3B300" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2807.6" y="1161.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Bright Promise</text>
-  <circle cx="2801.9" cy="1205.9" r="1.1" fill="#94a3b8" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2801.9" cy="1241.4" r="1.1" fill="#94a3b8" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2849.9" cy="1182.2" r="1.1" fill="#94a3b8" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2768.3" cy="1223.1" r="1.1" fill="#94a3b8" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2801.9" cy="1205.9" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2801.9" cy="1241.4" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2849.9" cy="1182.2" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2768.3" cy="1223.1" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
   <path d="M 2896.5,1855.6 C 2898.8,1854.7 2903.1,1852.7 2910.6,1849.9 C 2918.1,1847.1 2933.0,1842.9 2941.6,1838.7 C 2950.1,1834.6 2957.9,1829.0 2961.9,1824.9 C 2965.8,1820.7 2964.7,1815.9 2965.3,1814.1" clip-path="url(#sector-clip-Cluster_10_macro-Cluster_10_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 2964.8,1814.1 C 2964.3,1815.7 2965.9,1819.8 2962.0,1823.8 C 2958.0,1827.8 2949.5,1833.9 2940.9,1838.1 C 2932.2,1842.4 2917.6,1846.6 2910.1,1849.5 C 2902.7,1852.3 2898.6,1854.3 2896.3,1855.2" clip-path="url(#sector-clip-Cluster_10_macro-Cluster_10_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="3012.6,1859.2 2971.6,1930.2 2889.6,1930.2 2848.6,1859.2 2889.6,1788.2 2971.6,1788.2" fill="#d100d1" fill-opacity="0.08" stroke="#d100d1" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="3012.6,1859.2 2971.6,1930.2 2889.6,1930.2 2848.6,1859.2 2889.6,1788.2 2971.6,1788.2" fill="#B300B3" fill-opacity="0.08" stroke="#B300B3" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2930.6" y="1800.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Unholy Retribution</text>
-  <circle cx="2896.4" cy="1855.4" r="1.1" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2965.0" cy="1814.1" r="1.1" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2896.4" cy="1855.4" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2965.0" cy="1814.1" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
   <path d="M 2096.0,2305.9 C 2094.5,2306.7 2091.4,2309.0 2087.1,2310.7 C 2082.8,2312.4 2075.6,2315.8 2070.1,2316.0 C 2064.5,2316.1 2058.3,2313.1 2054.0,2311.5 C 2049.7,2309.8 2045.8,2306.9 2044.2,2306.0" clip-path="url(#sector-clip-Cluster_11_macro-Cluster_11_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 2043.9,2306.5 C 2045.7,2307.5 2050.3,2310.8 2054.6,2312.5 C 2059.0,2314.3 2064.7,2317.2 2069.9,2317.1 C 2075.2,2316.9 2081.8,2313.4 2086.2,2311.7 C 2090.6,2309.9 2094.6,2307.2 2096.3,2306.4" clip-path="url(#sector-clip-Cluster_11_macro-Cluster_11_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="2151.6,2356.3 2110.6,2427.3 2028.6,2427.3 1987.6,2356.3 2028.6,2285.3 2110.6,2285.3" fill="#b000b8" fill-opacity="0.08" stroke="#b000b8" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="2151.6,2356.3 2110.6,2427.3 2028.6,2427.3 1987.6,2356.3 2028.6,2285.3 2110.6,2285.3" fill="#FF99FF" fill-opacity="0.08" stroke="#FF99FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2069.6" y="2297.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Pontifex's Claim</text>
-  <circle cx="2044.0" cy="2306.2" r="1.1" fill="#b000b8" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2096.2" cy="2306.1" r="1.1" fill="#b000b8" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2044.0" cy="2306.2" r="1.1" fill="#FF99FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2096.2" cy="2306.1" r="1.1" fill="#FF99FF" stroke="#ffffff" stroke-width="0.3" />
   <path d="M 1828.0,2157.7 C 1828.0,2159.6 1828.0,2160.8 1828.0,2169.3 C 1828.0,2177.8 1828.0,2196.9 1828.0,2208.8 C 1828.0,2220.7 1828.0,2232.9 1828.0,2240.8 C 1828.0,2248.8 1828.0,2254.1 1828.0,2256.7" clip-path="url(#sector-clip-Cluster_12_macro-Cluster_12_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 1828.5,2256.7 C 1828.5,2254.1 1828.5,2248.9 1828.5,2240.9 C 1828.5,2232.9 1828.5,2220.7 1828.5,2208.8 C 1828.5,2196.9 1828.5,2177.9 1828.5,2169.4 C 1828.5,2160.8 1828.5,2159.6 1828.5,2157.7" clip-path="url(#sector-clip-Cluster_12_macro-Cluster_12_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="1905.6,2214.3 1864.6,2285.3 1782.6,2285.3 1741.6,2214.3 1782.6,2143.3 1864.6,2143.3" fill="#b000b8" fill-opacity="0.08" stroke="#b000b8" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="1905.6,2214.3 1864.6,2285.3 1782.6,2285.3 1741.6,2214.3 1782.6,2143.3 1864.6,2143.3" fill="#FF99FF" fill-opacity="0.08" stroke="#FF99FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1823.6" y="2155.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">True Sight</text>
-  <circle cx="1828.3" cy="2256.7" r="1.1" fill="#b000b8" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1828.3" cy="2157.7" r="1.1" fill="#b000b8" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1828.3" cy="2256.7" r="1.1" fill="#FF99FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1828.3" cy="2157.7" r="1.1" fill="#FF99FF" stroke="#ffffff" stroke-width="0.3" />
   <path d="M 1692.3,1886.6 C 1693.0,1884.5 1694.1,1879.5 1696.6,1874.1 C 1699.0,1868.7 1704.0,1860.3 1707.0,1854.4 C 1710.1,1848.6 1713.0,1844.2 1714.8,1839.0 C 1716.5,1833.8 1717.2,1826.0 1717.6,1823.4" clip-path="url(#sector-clip-Cluster_13_macro-Cluster_13_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 1717.2,1823.4 C 1716.7,1826.0 1715.7,1833.8 1713.8,1839.0 C 1711.9,1844.3 1708.9,1848.9 1705.9,1854.7 C 1702.8,1860.6 1697.7,1868.8 1695.3,1874.1 C 1693.0,1879.5 1692.5,1884.6 1691.9,1886.6" clip-path="url(#sector-clip-Cluster_13_macro-Cluster_13_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="1782.6,1859.2 1741.6,1930.2 1659.6,1930.2 1618.6,1859.2 1659.6,1788.2 1741.6,1788.2" fill="#00e5ff" fill-opacity="0.08" stroke="#00e5ff" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="1782.6,1859.2 1741.6,1930.2 1659.6,1930.2 1618.6,1859.2 1659.6,1788.2 1741.6,1788.2" fill="#0095FF" fill-opacity="0.08" stroke="#0095FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1700.6" y="1800.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Second Contact II Flashpoint</text>
-  <circle cx="1692.1" cy="1886.6" r="1.1" fill="#00e5ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1670.0" cy="1869.0" r="1.1" fill="#00e5ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1673.2" cy="1896.4" r="1.1" fill="#00e5ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1744.2" cy="1895.6" r="1.1" fill="#00e5ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1717.4" cy="1823.4" r="1.1" fill="#00e5ff" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1692.1" cy="1886.6" r="1.1" fill="#0095FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1670.0" cy="1869.0" r="1.1" fill="#0095FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1673.2" cy="1896.4" r="1.1" fill="#0095FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1744.2" cy="1895.6" r="1.1" fill="#0095FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1717.4" cy="1823.4" r="1.1" fill="#0095FF" stroke="#ffffff" stroke-width="0.3" />
   <path d="M 1599.3,1551.5 C 1599.3,1549.8 1599.3,1550.4 1599.3,1541.1 C 1599.3,1531.8 1599.3,1509.2 1599.3,1495.7 C 1599.3,1482.3 1599.3,1467.5 1599.3,1460.3 C 1599.3,1453.1 1599.3,1453.8 1599.3,1452.5" clip-path="url(#sector-clip-Cluster_14_macro-Cluster_14_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 1598.9,1452.5 C 1598.9,1453.9 1598.9,1453.4 1598.9,1460.7 C 1598.9,1468.0 1598.9,1482.7 1598.9,1496.1 C 1598.9,1509.6 1598.9,1532.3 1598.9,1541.5 C 1598.9,1550.7 1598.9,1549.8 1598.9,1551.5" clip-path="url(#sector-clip-Cluster_14_macro-Cluster_14_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="1659.6,1504.1 1618.6,1575.2 1536.6,1575.2 1495.6,1504.1 1536.6,1433.1 1618.6,1433.1" fill="#0077cc" fill-opacity="0.08" stroke="#0077cc" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="1659.6,1504.1 1618.6,1575.2 1536.6,1575.2 1495.6,1504.1 1536.6,1433.1 1618.6,1433.1" fill="#0069B3" fill-opacity="0.08" stroke="#0069B3" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1577.6" y="1445.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Argon Prime</text>
-  <circle cx="1599.1" cy="1551.5" r="1.1" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1538.5" cy="1462.9" r="1.1" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1536.7" cy="1495.0" r="1.1" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1599.1" cy="1452.5" r="1.1" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1599.1" cy="1551.5" r="1.1" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1538.5" cy="1462.9" r="1.1" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1536.7" cy="1495.0" r="1.1" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1599.1" cy="1452.5" r="1.1" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
   <line x1="3060.6" y1="1177.7" x2="3046.5" y2="1248.7" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="3060.6" cy="1177.7" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="3046.5" cy="1248.7" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
@@ -292,33 +292,33 @@
   <circle cx="3046.5" cy="1250.1" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <path d="M 3040.1,1198.5 C 3039.9,1198.3 3042.6,1202.6 3039.3,1197.3 C 3035.9,1192.0 3023.4,1172.1 3020.0,1166.8 C 3016.7,1161.5 3019.4,1165.7 3019.2,1165.5" clip-path="url(#sector-clip-Cluster_15_macro-Cluster_15_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 3019.2,1164.6 C 3019.3,1164.7 3016.4,1160.2 3019.9,1165.6 C 3023.4,1171.1 3036.7,1192.0 3040.2,1197.5 C 3043.7,1202.9 3040.7,1198.4 3040.8,1198.5" clip-path="url(#sector-clip-Cluster_15_macro-Cluster_15_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="3135.6,1220.1 3094.6,1291.1 3012.6,1291.1 2971.6,1220.1 3012.6,1149.1 3094.6,1149.1" fill="none" stroke="#c6c000" stroke-width="2.8" stroke-opacity="0.95" />
-  <polygon points="3074.1,1184.6 3053.6,1220.1 3012.6,1220.1 2992.1,1184.6 3012.6,1149.1 3053.6,1149.1" fill="#c6c000" fill-opacity="0.08" stroke="#c6c000" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="3135.6,1220.1 3094.6,1291.1 3012.6,1291.1 2971.6,1220.1 3012.6,1149.1 3094.6,1149.1" fill="none" stroke="#B3B300" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="3074.1,1184.6 3053.6,1220.1 3012.6,1220.1 2992.1,1184.6 3012.6,1149.1 3053.6,1149.1" fill="#B3B300" fill-opacity="0.08" stroke="#B3B300" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="3033.1" y="1155.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Ianamus Zura IV</text>
-  <polygon points="3115.1,1255.6 3094.6,1291.1 3053.6,1291.1 3033.1,1255.6 3053.6,1220.1 3094.6,1220.1" fill="#c6c000" fill-opacity="0.08" stroke="#c6c000" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="3115.1,1255.6 3094.6,1291.1 3053.6,1291.1 3033.1,1255.6 3053.6,1220.1 3094.6,1220.1" fill="#B3B300" fill-opacity="0.08" stroke="#B3B300" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="3074.1" y="1226.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Ianamus Zura VII</text>
-  <circle cx="3058.0" cy="1183.0" r="0.8" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3039.6" cy="1170.4" r="0.8" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3014.4" cy="1163.6" r="0.8" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3056.2" cy="1244.1" r="0.8" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="3135.6,1078.1 3094.6,1149.1 3012.6,1149.1 2971.6,1078.1 3012.6,1007.0 3094.6,1007.0" fill="#9a0000" fill-opacity="0.08" stroke="#9a0000" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="3058.0" cy="1183.0" r="0.8" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3039.6" cy="1170.4" r="0.8" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3014.4" cy="1163.6" r="0.8" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3056.2" cy="1244.1" r="0.8" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="3135.6,1078.1 3094.6,1149.1 3012.6,1149.1 2971.6,1078.1 3012.6,1007.0 3094.6,1007.0" fill="#B30000" fill-opacity="0.08" stroke="#B30000" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="3053.6" y="1019.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Matrix #451</text>
-  <circle cx="3013.4" cy="1042.6" r="1.1" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3084.6" cy="1039.0" r="1.1" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3016.3" cy="1121.0" r="1.1" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="3012.6,1007.0 2971.6,1078.1 2889.6,1078.1 2848.6,1007.0 2889.6,936.0 2971.6,936.0" fill="#9a0000" fill-opacity="0.08" stroke="#9a0000" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="3013.4" cy="1042.6" r="1.1" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3084.6" cy="1039.0" r="1.1" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3016.3" cy="1121.0" r="1.1" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="3012.6,1007.0 2971.6,1078.1 2889.6,1078.1 2848.6,1007.0 2889.6,936.0 2971.6,936.0" fill="#B30000" fill-opacity="0.08" stroke="#B30000" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2930.6" y="948.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Matrix #9</text>
-  <circle cx="2963.9" cy="981.2" r="1.1" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2965.5" cy="962.3" r="1.1" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2963.9" cy="981.2" r="1.1" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2965.5" cy="962.3" r="1.1" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
   <path d="M 2931.9,1626.4 C 2931.9,1625.4 2931.9,1624.9 2931.9,1620.5 C 2931.9,1616.1 2931.9,1608.2 2931.9,1599.9 C 2931.9,1591.7 2931.9,1577.3 2931.9,1571.1 C 2931.9,1564.8 2931.9,1564.0 2931.9,1562.6" clip-path="url(#sector-clip-Cluster_18_macro-Cluster_18_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 2931.5,1562.6 C 2931.5,1563.6 2931.5,1562.4 2931.5,1568.6 C 2931.5,1574.9 2931.5,1591.6 2931.5,1600.1 C 2931.5,1608.6 2931.5,1615.3 2931.5,1619.7 C 2931.5,1624.1 2931.5,1625.2 2931.5,1626.4" clip-path="url(#sector-clip-Cluster_18_macro-Cluster_18_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 2937.7,1622.8 C 2939.6,1622.3 2945.7,1621.8 2949.5,1619.7 C 2953.2,1617.6 2955.2,1617.2 2960.3,1610.1 C 2965.3,1603.1 2975.9,1584.1 2979.7,1577.3 C 2983.5,1570.5 2983.0,1571.4 2983.1,1569.3 C 2983.2,1567.3 2981.7,1565.7 2980.2,1564.8 C 2978.6,1563.9 2979.2,1564.2 2973.9,1564.0 C 2968.7,1563.9 2954.0,1564.0 2948.5,1564.0 C 2943.0,1564.0 2942.1,1564.0 2940.8,1564.0" clip-path="url(#sector-clip-Cluster_18_macro-Cluster_18_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="3012.6,1575.2 2971.6,1646.2 2889.6,1646.2 2848.6,1575.2 2889.6,1504.1 2971.6,1504.1" fill="#d100d1" fill-opacity="0.08" stroke="#d100d1" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="3012.6,1575.2 2971.6,1646.2 2889.6,1646.2 2848.6,1575.2 2889.6,1504.1 2971.6,1504.1" fill="#B300B3" fill-opacity="0.08" stroke="#B300B3" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2930.6" y="1516.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Trinity Sanctum III</text>
-  <circle cx="2987.0" cy="1568.3" r="1.1" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2931.7" cy="1562.6" r="1.1" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2925.6" cy="1558.9" r="1.1" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2931.7" cy="1626.4" r="1.1" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2987.0" cy="1568.3" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2931.7" cy="1562.6" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2925.6" cy="1558.9" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2931.7" cy="1626.4" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
   <line x1="3183.6" y1="1829.2" x2="3169.5" y2="1887.8" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="3183.6" cy="1829.2" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="3169.5" cy="1887.8" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
@@ -326,59 +326,59 @@
   <circle cx="3183.6" cy="1830.6" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="3169.5" cy="1889.2" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <path d="M 3173.4,1825.1 C 3168.3,1822.8 3147.4,1813.0 3142.8,1810.9 C 3138.2,1808.8 3140.8,1809.7 3145.7,1812.5 C 3150.6,1815.4 3167.5,1825.2 3172.2,1827.9 C 3176.8,1830.6 3173.2,1828.9 3173.4,1828.6 C 3173.5,1828.2 3172.9,1826.2 3172.8,1825.8" clip-path="url(#sector-clip-Cluster_19_macro-Cluster_19_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="3258.6,1859.2 3217.6,1930.2 3135.6,1930.2 3094.6,1859.2 3135.6,1788.2 3217.6,1788.2" fill="none" stroke="#c6c000" stroke-width="2.8" stroke-opacity="0.95" />
-  <polygon points="3197.1,1823.7 3176.6,1859.2 3135.6,1859.2 3115.1,1823.7 3135.6,1788.2 3176.6,1788.2" fill="#c6c000" fill-opacity="0.08" stroke="#c6c000" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="3258.6,1859.2 3217.6,1930.2 3135.6,1930.2 3094.6,1859.2 3135.6,1788.2 3217.6,1788.2" fill="none" stroke="#B3B300" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="3197.1,1823.7 3176.6,1859.2 3135.6,1859.2 3115.1,1823.7 3135.6,1788.2 3176.6,1788.2" fill="#B3B300" fill-opacity="0.08" stroke="#B3B300" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="3156.1" y="1794.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Hewa's Twin I</text>
-  <polygon points="3238.1,1894.7 3217.6,1930.2 3176.6,1930.2 3156.1,1894.7 3176.6,1859.2 3217.6,1859.2" fill="#c6c000" fill-opacity="0.08" stroke="#c6c000" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="3238.1,1894.7 3217.6,1930.2 3176.6,1930.2 3156.1,1894.7 3176.6,1859.2 3217.6,1859.2" fill="#B3B300" fill-opacity="0.08" stroke="#B3B300" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="3197.1" y="1865.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Hewa's Twin II</text>
-  <circle cx="3139.2" cy="1809.5" r="0.8" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3172.1" cy="1812.7" r="0.8" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3216.4" cy="1900.4" r="0.8" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3139.2" cy="1809.5" r="0.8" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3172.1" cy="1812.7" r="0.8" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3216.4" cy="1900.4" r="0.8" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
   <path d="M 3425.9,2040.9 C 3425.9,2040.0 3425.9,2047.2 3425.9,2035.3 C 3425.9,2023.3 3425.9,1981.4 3425.9,1969.1 C 3425.9,1956.9 3425.9,1962.9 3425.9,1961.7" clip-path="url(#sector-clip-Cluster_20_macro-Cluster_20_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 3427.3,1961.7 C 3427.3,1963.0 3427.3,1957.0 3427.3,1969.3 C 3427.3,1981.5 3427.3,2023.3 3427.3,2035.3 C 3427.3,2047.2 3427.3,2040.0 3427.3,2040.9" clip-path="url(#sector-clip-Cluster_20_macro-Cluster_20_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="3504.6,2001.2 3463.6,2072.3 3381.6,2072.3 3340.6,2001.2 3381.6,1930.2 3463.6,1930.2" fill="#c6c000" fill-opacity="0.08" stroke="#c6c000" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="3504.6,2001.2 3463.6,2072.3 3381.6,2072.3 3340.6,2001.2 3381.6,1930.2 3463.6,1930.2" fill="#B3B300" fill-opacity="0.08" stroke="#B3B300" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="3422.6" y="1942.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Company Regard</text>
-  <circle cx="3380.8" cy="2039.8" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3428.3" cy="1947.5" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3461.5" cy="1998.7" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3380.8" cy="2039.8" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3428.3" cy="1947.5" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3461.5" cy="1998.7" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
   <line x1="3459.0" y1="2157.0" x2="3407.3" y2="2134.0" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="3459.0" cy="2157.0" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="3407.3" cy="2134.0" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <line x1="3460.1" y1="2157.0" x2="3408.6" y2="2134.0" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="3460.1" cy="2157.0" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="3408.6" cy="2134.0" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
-  <polygon points="3504.6,2143.3 3463.6,2214.3 3381.6,2214.3 3340.6,2143.3 3381.6,2072.3 3463.6,2072.3" fill="none" stroke="#9a0000" stroke-width="2.8" stroke-opacity="0.95" />
-  <polygon points="3484.1,2178.8 3463.6,2214.3 3422.6,2214.3 3402.1,2178.8 3422.6,2143.3 3463.6,2143.3" fill="#9a0000" fill-opacity="0.08" stroke="#9a0000" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="3504.6,2143.3 3463.6,2214.3 3381.6,2214.3 3340.6,2143.3 3381.6,2072.3 3463.6,2072.3" fill="none" stroke="#B30000" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="3484.1,2178.8 3463.6,2214.3 3422.6,2214.3 3402.1,2178.8 3422.6,2143.3 3463.6,2143.3" fill="#B30000" fill-opacity="0.08" stroke="#B30000" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="3443.1" y="2149.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Scale Plate Green I</text>
-  <polygon points="3443.1,2107.8 3422.6,2143.3 3381.6,2143.3 3361.1,2107.8 3381.6,2072.3 3422.6,2072.3" fill="#9a0000" fill-opacity="0.08" stroke="#9a0000" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="3443.1,2107.8 3422.6,2143.3 3381.6,2143.3 3361.1,2107.8 3381.6,2072.3 3422.6,2072.3" fill="#B30000" fill-opacity="0.08" stroke="#B30000" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="3402.1" y="2078.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Scale Plate Green VII</text>
-  <circle cx="3461.6" cy="2157.2" r="0.8" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3423.8" cy="2089.5" r="0.8" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3461.6" cy="2157.2" r="0.8" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3423.8" cy="2089.5" r="0.8" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
   <path d="M 2604.3,2195.1 C 2601.4,2196.4 2594.4,2199.8 2587.0,2202.9 C 2579.6,2206.0 2569.1,2210.1 2559.8,2213.6 C 2550.5,2217.2 2539.7,2221.0 2531.1,2224.2 C 2522.5,2227.5 2511.9,2231.8 2508.0,2233.3" clip-path="url(#sector-clip-Cluster_22_macro-Cluster_22_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 2508.1,2233.7 C 2512.1,2232.2 2522.9,2228.2 2531.6,2225.1 C 2540.3,2222.0 2551.0,2218.7 2560.3,2215.1 C 2569.7,2211.6 2580.3,2207.2 2587.7,2203.9 C 2595.1,2200.6 2601.7,2196.8 2604.4,2195.3" clip-path="url(#sector-clip-Cluster_22_macro-Cluster_22_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="2643.6,2214.3 2602.6,2285.3 2520.6,2285.3 2479.6,2214.3 2520.6,2143.3 2602.6,2143.3" fill="#d100d1" fill-opacity="0.08" stroke="#d100d1" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="2643.6,2214.3 2602.6,2285.3 2520.6,2285.3 2479.6,2214.3 2520.6,2143.3 2602.6,2143.3" fill="#B300B3" fill-opacity="0.08" stroke="#B300B3" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2561.6" y="2155.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Pious Mists II</text>
-  <circle cx="2604.4" cy="2195.2" r="1.1" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2607.6" cy="2213.5" r="1.1" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2568.0" cy="2254.8" r="1.1" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2555.6" cy="2254.8" r="1.1" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2555.1" cy="2163.0" r="1.1" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2508.1" cy="2233.5" r="1.1" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2889.6,2498.3 2848.6,2569.4 2766.6,2569.4 2725.6,2498.3 2766.6,2427.3 2848.6,2427.3" fill="#94a3b8" fill-opacity="0.08" stroke="#94a3b8" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="2604.4" cy="2195.2" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2607.6" cy="2213.5" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2568.0" cy="2254.8" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2555.6" cy="2254.8" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2555.1" cy="2163.0" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2508.1" cy="2233.5" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2889.6,2498.3 2848.6,2569.4 2766.6,2569.4 2725.6,2498.3 2766.6,2427.3 2848.6,2427.3" fill="#B300B3" fill-opacity="0.08" stroke="#B300B3" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2807.6" y="2439.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Sacred Relic</text>
-  <circle cx="2807.0" cy="2441.5" r="1.1" fill="#94a3b8" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2842.7" cy="2521.6" r="1.1" fill="#94a3b8" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2807.0" cy="2441.5" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2842.7" cy="2521.6" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
   <path d="M 1938.7,2270.1 C 1939.6,2271.4 1941.2,2274.3 1943.7,2278.2 C 1946.1,2282.2 1949.4,2287.7 1953.5,2293.7 C 1957.6,2299.8 1964.4,2309.5 1968.3,2314.6 C 1972.2,2319.8 1975.4,2322.9 1976.8,2324.6" clip-path="url(#sector-clip-Cluster_24_macro-Cluster_24_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 1976.9,2324.4 C 1975.6,2322.7 1972.6,2319.5 1968.9,2314.4 C 1965.1,2309.2 1958.6,2299.6 1954.6,2293.5 C 1950.5,2287.4 1947.0,2281.8 1944.4,2277.9 C 1941.8,2273.9 1939.9,2271.3 1939.0,2269.9" clip-path="url(#sector-clip-Cluster_24_macro-Cluster_24_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 1936.1,2273.0 C 1935.9,2274.4 1935.7,2277.2 1934.8,2281.3 C 1933.9,2285.3 1932.0,2292.6 1930.5,2297.3 C 1929.1,2302.0 1927.4,2306.1 1926.0,2309.4 C 1924.6,2312.7 1923.0,2315.7 1922.3,2317.0" clip-path="url(#sector-clip-Cluster_24_macro-Cluster_24_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 1923.9,2320.6 C 1925.0,2320.7 1926.7,2320.6 1930.7,2320.9 C 1934.6,2321.2 1941.6,2321.8 1947.6,2322.5 C 1953.7,2323.2 1962.2,2324.4 1966.8,2324.9 C 1971.3,2325.5 1973.5,2325.7 1974.9,2325.8" clip-path="url(#sector-clip-Cluster_24_macro-Cluster_24_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="2028.6,2285.3 1987.6,2356.3 1905.6,2356.3 1864.6,2285.3 1905.6,2214.3 1987.6,2214.3" fill="#b000b8" fill-opacity="0.08" stroke="#b000b8" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="2028.6,2285.3 1987.6,2356.3 1905.6,2356.3 1864.6,2285.3 1905.6,2214.3 1987.6,2214.3" fill="#FF99FF" fill-opacity="0.08" stroke="#FF99FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1946.6" y="2226.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Holy Vision</text>
-  <circle cx="1938.8" cy="2270.0" r="1.1" fill="#b000b8" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1920.1" cy="2321.0" r="1.1" fill="#b000b8" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1976.9" cy="2324.5" r="1.1" fill="#b000b8" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1976.0" cy="2333.7" r="1.1" fill="#b000b8" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1978.2" cy="2238.1" r="1.1" fill="#b000b8" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1938.8" cy="2270.0" r="1.1" fill="#FF99FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1920.1" cy="2321.0" r="1.1" fill="#FF99FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1976.9" cy="2324.5" r="1.1" fill="#FF99FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1976.0" cy="2333.7" r="1.1" fill="#FF99FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1978.2" cy="2238.1" r="1.1" fill="#FF99FF" stroke="#ffffff" stroke-width="0.3" />
   <line x1="1590.5" y1="2348.2" x2="1572.5" y2="2368.8" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="1590.5" cy="2348.2" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="1572.5" cy="2368.8" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
@@ -387,39 +387,39 @@
   <circle cx="1573.7" cy="2368.8" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <path d="M 1590.4,2313.4 C 1590.6,2313.4 1591.3,2313.0 1591.5,2313.4 C 1591.7,2313.7 1591.5,2313.3 1591.5,2315.3 C 1591.5,2317.3 1591.5,2321.1 1591.5,2325.5 C 1591.5,2329.8 1591.5,2338.1 1591.5,2341.5 C 1591.5,2345.0 1591.5,2345.6 1591.5,2346.4" clip-path="url(#sector-clip-Cluster_25_macro-Cluster_25_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 1590.9,2346.4 C 1590.9,2345.5 1590.9,2344.4 1590.9,2341.2 C 1590.9,2338.0 1590.9,2331.5 1590.9,2327.2 C 1590.9,2323.0 1590.9,2317.8 1590.9,2315.5 C 1590.9,2313.2 1591.1,2313.7 1590.9,2313.4 C 1590.8,2313.0 1590.0,2313.4 1589.8,2313.4" clip-path="url(#sector-clip-Cluster_25_macro-Cluster_25_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="1659.6,2356.3 1618.6,2427.3 1536.6,2427.3 1495.6,2356.3 1536.6,2285.3 1618.6,2285.3" fill="none" stroke="#9a0000" stroke-width="2.8" stroke-opacity="0.95" />
-  <polygon points="1639.1,2320.8 1618.6,2356.3 1577.6,2356.3 1557.1,2320.8 1577.6,2285.3 1618.6,2285.3" fill="#9a0000" fill-opacity="0.08" stroke="#9a0000" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="1659.6,2356.3 1618.6,2427.3 1536.6,2427.3 1495.6,2356.3 1536.6,2285.3 1618.6,2285.3" fill="none" stroke="#B30000" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="1639.1,2320.8 1618.6,2356.3 1577.6,2356.3 1557.1,2320.8 1577.6,2285.3 1618.6,2285.3" fill="#B30000" fill-opacity="0.08" stroke="#B30000" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="1598.1" y="2291.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Faulty Logic I</text>
-  <polygon points="1598.1,2391.8 1577.6,2427.3 1536.6,2427.3 1516.1,2391.8 1536.6,2356.3 1577.6,2356.3" fill="#9a0000" fill-opacity="0.08" stroke="#9a0000" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="1598.1,2391.8 1577.6,2427.3 1536.6,2427.3 1516.1,2391.8 1536.6,2356.3 1577.6,2356.3" fill="#B30000" fill-opacity="0.08" stroke="#B30000" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="1557.1" y="2362.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Faulty Logic VII</text>
-  <circle cx="1616.5" cy="2320.0" r="0.8" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1542.1" cy="2405.3" r="0.8" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1616.5" cy="2320.0" r="0.8" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1542.1" cy="2405.3" r="0.8" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
   <line x1="1327.8" y1="2200.9" x2="1345.2" y2="2222.2" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="1327.8" cy="2200.9" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="1345.2" cy="2222.2" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <line x1="1328.9" y1="2200.9" x2="1346.5" y2="2222.2" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="1328.9" cy="2200.9" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="1346.5" cy="2222.2" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
-  <polygon points="1413.6,2214.3 1372.6,2285.3 1290.6,2285.3 1249.6,2214.3 1290.6,2143.3 1372.6,2143.3" fill="none" stroke="#9a0000" stroke-width="2.8" stroke-opacity="0.95" />
-  <polygon points="1352.1,2178.8 1331.6,2214.3 1290.6,2214.3 1270.1,2178.8 1290.6,2143.3 1331.6,2143.3" fill="#9a0000" fill-opacity="0.08" stroke="#9a0000" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="1413.6,2214.3 1372.6,2285.3 1290.6,2285.3 1249.6,2214.3 1290.6,2143.3 1372.6,2143.3" fill="none" stroke="#B30000" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="1352.1,2178.8 1331.6,2214.3 1290.6,2214.3 1270.1,2178.8 1290.6,2143.3 1331.6,2143.3" fill="#B30000" fill-opacity="0.08" stroke="#B30000" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="1311.1" y="2149.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Atiya's Misfortune I</text>
-  <polygon points="1393.1,2249.8 1372.6,2285.3 1331.6,2285.3 1311.1,2249.8 1331.6,2214.3 1372.6,2214.3" fill="#9a0000" fill-opacity="0.08" stroke="#9a0000" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="1393.1,2249.8 1372.6,2285.3 1331.6,2285.3 1311.1,2249.8 1331.6,2214.3 1372.6,2214.3" fill="#B30000" fill-opacity="0.08" stroke="#B30000" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="1352.1" y="2220.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Atiya's Misfortune III</text>
-  <circle cx="1317.9" cy="2167.5" r="0.8" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1368.1" cy="2265.0" r="0.8" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1363.7" cy="2268.0" r="0.8" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1167.6,1504.1 1126.6,1575.2 1044.6,1575.2 1003.6,1504.1 1044.6,1433.1 1126.6,1433.1" fill="#00e5ff" fill-opacity="0.08" stroke="#00e5ff" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="1317.9" cy="2167.5" r="0.8" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1368.1" cy="2265.0" r="0.8" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1363.7" cy="2268.0" r="0.8" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1167.6,1504.1 1126.6,1575.2 1044.6,1575.2 1003.6,1504.1 1044.6,1433.1 1126.6,1433.1" fill="#0095FF" fill-opacity="0.08" stroke="#0095FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1085.6" y="1445.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">The Void</text>
-  <circle cx="1066.3" cy="1518.7" r="1.1" fill="#00e5ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1104.2" cy="1517.0" r="1.1" fill="#00e5ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1088.4" cy="1541.2" r="1.1" fill="#00e5ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1082.9" cy="1447.4" r="1.1" fill="#00e5ff" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1066.3" cy="1518.7" r="1.1" fill="#0095FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1104.2" cy="1517.0" r="1.1" fill="#0095FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1088.4" cy="1541.2" r="1.1" fill="#0095FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1082.9" cy="1447.4" r="1.1" fill="#0095FF" stroke="#ffffff" stroke-width="0.3" />
   <path d="M 991.5,1562.0 C 991.5,1561.2 991.5,1559.4 991.5,1557.6 C 991.5,1555.7 991.5,1553.3 991.5,1550.8 C 991.5,1548.4 991.5,1545.0 991.5,1543.0 C 991.5,1541.0 991.5,1539.4 991.5,1538.7" clip-path="url(#sector-clip-Cluster_28_macro-Cluster_28_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 992.8,1538.7 C 992.8,1539.4 992.8,1541.0 992.8,1543.0 C 992.8,1545.0 992.8,1548.3 992.8,1550.7 C 992.8,1553.1 992.8,1555.4 992.8,1557.3 C 992.8,1559.2 992.8,1561.2 992.8,1562.0" clip-path="url(#sector-clip-Cluster_28_macro-Cluster_28_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="1044.6,1575.2 1003.6,1646.2 921.6,1646.2 880.6,1575.2 921.6,1504.1 1003.6,1504.1" fill="#00e5ff" fill-opacity="0.08" stroke="#00e5ff" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="1044.6,1575.2 1003.6,1646.2 921.6,1646.2 880.6,1575.2 921.6,1504.1 1003.6,1504.1" fill="#0095FF" fill-opacity="0.08" stroke="#0095FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="962.6" y="1516.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Antigone Memorial</text>
-  <circle cx="969.1" cy="1624.3" r="1.1" fill="#00e5ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="995.6" cy="1529.0" r="1.1" fill="#00e5ff" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="969.1" cy="1624.3" r="1.1" fill="#0095FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="995.6" cy="1529.0" r="1.1" fill="#0095FF" stroke="#ffffff" stroke-width="0.3" />
   <line x1="1822.5" y1="1240.2" x2="1816.5" y2="1191.5" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="1822.5" cy="1240.2" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="1816.5" cy="1191.5" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
@@ -428,24 +428,24 @@
   <circle cx="1816.5" cy="1190.1" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <path d="M 1792.9,1268.1 C 1793.1,1267.8 1792.6,1268.4 1794.1,1265.9 C 1795.6,1263.4 1800.3,1255.4 1801.7,1253.2 C 1803.0,1250.9 1801.9,1252.8 1802.2,1252.4 C 1802.6,1252.0 1803.2,1251.2 1803.6,1250.8 C 1803.9,1250.4 1801.7,1252.1 1804.2,1250.1 C 1806.7,1248.0 1815.7,1240.3 1818.6,1238.3 C 1821.5,1236.4 1821.0,1238.3 1821.4,1238.3" clip-path="url(#sector-clip-Cluster_29_macro-Cluster_29_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 1821.4,1238.2 C 1820.9,1238.2 1821.3,1236.4 1818.4,1238.2 C 1815.6,1240.1 1806.7,1247.4 1804.3,1249.4 C 1801.8,1251.4 1804.0,1249.7 1803.7,1250.1 C 1803.3,1250.5 1802.7,1251.3 1802.4,1251.7 C 1802.0,1252.1 1803.1,1250.3 1801.8,1252.5 C 1800.4,1254.7 1795.8,1262.5 1794.3,1265.1 C 1792.8,1267.7 1793.0,1267.6 1792.8,1268.1" clip-path="url(#sector-clip-Cluster_29_macro-Cluster_29_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="1905.6,1220.1 1864.6,1291.1 1782.6,1291.1 1741.6,1220.1 1782.6,1149.1 1864.6,1149.1" fill="none" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
-  <polygon points="1844.1,1255.6 1823.6,1291.1 1782.6,1291.1 1762.1,1255.6 1782.6,1220.1 1823.6,1220.1" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="1905.6,1220.1 1864.6,1291.1 1782.6,1291.1 1741.6,1220.1 1782.6,1149.1 1864.6,1149.1" fill="none" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="1844.1,1255.6 1823.6,1291.1 1782.6,1291.1 1762.1,1255.6 1782.6,1220.1 1823.6,1220.1" fill="#00F9FF" fill-opacity="0.08" stroke="#00F9FF" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="1803.1" y="1226.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Hatikvah's Choice I</text>
-  <polygon points="1885.1,1184.6 1864.6,1220.1 1823.6,1220.1 1803.1,1184.6 1823.6,1149.1 1864.6,1149.1" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="1885.1,1184.6 1864.6,1220.1 1823.6,1220.1 1803.1,1184.6 1823.6,1149.1 1864.6,1149.1" fill="#0069B3" fill-opacity="0.08" stroke="#0069B3" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="1844.1" y="1155.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Hatikvah's Choice III</text>
-  <circle cx="1801.2" cy="1249.9" r="0.8" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1820.8" cy="1233.4" r="0.8" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1821.4" cy="1238.3" r="0.8" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1792.8" cy="1268.1" r="0.8" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1659.6,1220.1 1618.6,1291.1 1536.6,1291.1 1495.6,1220.1 1536.6,1149.1 1618.6,1149.1" fill="#0077cc" fill-opacity="0.08" stroke="#0077cc" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="1801.2" cy="1249.9" r="0.8" fill="#00F9FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1820.8" cy="1233.4" r="0.8" fill="#00F9FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1821.4" cy="1238.3" r="0.8" fill="#00F9FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1792.8" cy="1268.1" r="0.8" fill="#00F9FF" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1659.6,1220.1 1618.6,1291.1 1536.6,1291.1 1495.6,1220.1 1536.6,1149.1 1618.6,1149.1" fill="#0069B3" fill-opacity="0.08" stroke="#0069B3" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1577.6" y="1161.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Morning Star III</text>
-  <circle cx="1584.6" cy="1176.7" r="1.1" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1531.0" cy="1213.7" r="1.1" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1620.7" cy="1257.1" r="1.1" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1413.6,936.0 1372.6,1007.0 1290.6,1007.0 1249.6,936.0 1290.6,865.0 1372.6,865.0" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="1584.6" cy="1176.7" r="1.1" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1531.0" cy="1213.7" r="1.1" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1620.7" cy="1257.1" r="1.1" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1413.6,936.0 1372.6,1007.0 1290.6,1007.0 1249.6,936.0 1290.6,865.0 1372.6,865.0" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1331.6" y="877.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Heretic's End</text>
-  <circle cx="1330.2" cy="933.5" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1388.1" cy="941.7" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1330.2" cy="933.5" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1388.1" cy="941.7" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
   <line x1="1786.7" y1="948.3" x2="1849.6" y2="928.1" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="1786.7" cy="948.3" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="1849.6" cy="928.1" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
@@ -453,349 +453,349 @@
   <circle cx="1787.9" cy="948.3" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="1850.9" cy="928.1" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <path d="M 1808.8,980.8 C 1808.4,980.8 1807.5,980.8 1806.5,980.8 C 1805.6,980.8 1804.4,980.8 1803.3,980.8 C 1802.1,980.8 1800.6,980.8 1799.6,980.8 C 1798.6,980.8 1797.6,980.8 1797.2,980.8" clip-path="url(#sector-clip-Cluster_32_macro-Cluster_32_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="1905.6,936.0 1864.6,1007.0 1782.6,1007.0 1741.6,936.0 1782.6,865.0 1864.6,865.0" fill="none" stroke="#9a0000" stroke-width="2.8" stroke-opacity="0.95" />
-  <polygon points="1844.1,971.5 1823.6,1007.0 1782.6,1007.0 1762.1,971.5 1782.6,936.0 1823.6,936.0" fill="#9a0000" fill-opacity="0.08" stroke="#9a0000" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="1905.6,936.0 1864.6,1007.0 1782.6,1007.0 1741.6,936.0 1782.6,865.0 1864.6,865.0" fill="none" stroke="#B30000" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="1844.1,971.5 1823.6,1007.0 1782.6,1007.0 1762.1,971.5 1782.6,936.0 1823.6,936.0" fill="#B30000" fill-opacity="0.08" stroke="#B30000" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="1803.1" y="942.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Tharka's Cascade XV</text>
-  <polygon points="1885.1,900.5 1864.6,936.0 1823.6,936.0 1803.1,900.5 1823.6,865.0 1864.6,865.0" fill="#9a0000" fill-opacity="0.08" stroke="#9a0000" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="1885.1,900.5 1864.6,936.0 1823.6,936.0 1803.1,900.5 1823.6,865.0 1864.6,865.0" fill="#B30000" fill-opacity="0.08" stroke="#B30000" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="1844.1" y="871.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Tharka's Cascade XVII</text>
-  <circle cx="1818.5" cy="961.5" r="0.8" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1813.9" cy="961.5" r="0.8" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1811.4" cy="984.3" r="0.8" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1823.7" cy="885.3" r="0.8" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1782.6,865.0 1741.6,936.0 1659.6,936.0 1618.6,865.0 1659.6,794.0 1741.6,794.0" fill="#9a0000" fill-opacity="0.08" stroke="#9a0000" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="1818.5" cy="961.5" r="0.8" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1813.9" cy="961.5" r="0.8" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1811.4" cy="984.3" r="0.8" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1823.7" cy="885.3" r="0.8" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1782.6,865.0 1741.6,936.0 1659.6,936.0 1618.6,865.0 1659.6,794.0 1741.6,794.0" fill="#B30000" fill-opacity="0.08" stroke="#B30000" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1700.6" y="806.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Matrix #79B</text>
-  <circle cx="1661.6" cy="882.2" r="1.1" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1744.1" cy="901.5" r="1.1" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1661.6" cy="882.2" r="1.1" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1744.1" cy="901.5" r="1.1" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
   <path d="M 2635.0,1140.0 C 2636.5,1140.5 2637.0,1140.8 2643.9,1143.4 C 2650.9,1146.1 2663.4,1150.8 2676.9,1155.7 C 2690.4,1160.5 2715.5,1169.2 2725.2,1172.6 C 2734.8,1176.0 2733.0,1175.5 2734.6,1176.1" clip-path="url(#sector-clip-Cluster_34_macro-Cluster_34_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 2734.7,1175.7 C 2733.2,1175.2 2733.0,1175.0 2725.6,1172.3 C 2718.1,1169.6 2703.6,1164.4 2690.0,1159.5 C 2676.3,1154.6 2653.0,1146.2 2643.8,1142.9 C 2634.7,1139.6 2636.6,1140.2 2635.1,1139.6" clip-path="url(#sector-clip-Cluster_34_macro-Cluster_34_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="2766.6,1149.1 2725.6,1220.1 2643.6,1220.1 2602.6,1149.1 2643.6,1078.1 2725.6,1078.1" fill="#c6c000" fill-opacity="0.08" stroke="#c6c000" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="2766.6,1149.1 2725.6,1220.1 2643.6,1220.1 2602.6,1149.1 2643.6,1078.1 2725.6,1078.1" fill="#B3B300" fill-opacity="0.08" stroke="#B3B300" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2684.6" y="1090.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Profit Center Alpha</text>
-  <circle cx="2734.6" cy="1175.9" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2707.0" cy="1116.4" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2635.1" cy="1139.8" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2028.6,2569.4 1987.6,2640.4 1905.6,2640.4 1864.6,2569.4 1905.6,2498.3 1987.6,2498.3" fill="#b000b8" fill-opacity="0.08" stroke="#b000b8" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="2734.6" cy="1175.9" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2707.0" cy="1116.4" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2635.1" cy="1139.8" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2028.6,2569.4 1987.6,2640.4 1905.6,2640.4 1864.6,2569.4 1905.6,2498.3 1987.6,2498.3" fill="#FF99FF" fill-opacity="0.08" stroke="#FF99FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1946.6" y="2510.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Lasting Vengeance</text>
-  <circle cx="1890.3" cy="2561.1" r="1.1" fill="#b000b8" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1905.6,2498.3 1864.6,2569.4 1782.6,2569.4 1741.6,2498.3 1782.6,2427.3 1864.6,2427.3" fill="#b000b8" fill-opacity="0.08" stroke="#b000b8" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="1890.3" cy="2561.1" r="1.1" fill="#FF99FF" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1905.6,2498.3 1864.6,2569.4 1782.6,2569.4 1741.6,2498.3 1782.6,2427.3 1864.6,2427.3" fill="#FF99FF" fill-opacity="0.08" stroke="#FF99FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1823.6" y="2439.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Cardinal's Redress</text>
-  <circle cx="1818.8" cy="2441.8" r="1.1" fill="#b000b8" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1840.7" cy="2552.5" r="1.1" fill="#b000b8" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1871.0" cy="2523.9" r="1.1" fill="#b000b8" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2766.6,2285.3 2725.6,2356.3 2643.6,2356.3 2602.6,2285.3 2643.6,2214.3 2725.6,2214.3" fill="#d100d1" fill-opacity="0.08" stroke="#d100d1" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="1818.8" cy="2441.8" r="1.1" fill="#FF99FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1840.7" cy="2552.5" r="1.1" fill="#FF99FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1871.0" cy="2523.9" r="1.1" fill="#FF99FF" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2766.6,2285.3 2725.6,2356.3 2643.6,2356.3 2602.6,2285.3 2643.6,2214.3 2725.6,2214.3" fill="#B300B3" fill-opacity="0.08" stroke="#B300B3" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2684.6" y="2226.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Pious Mists IV</text>
-  <circle cx="2671.8" cy="2331.4" r="1.1" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2668.3" cy="2230.9" r="1.1" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2643.6,2356.3 2602.6,2427.3 2520.6,2427.3 2479.6,2356.3 2520.6,2285.3 2602.6,2285.3" fill="#d100d1" fill-opacity="0.08" stroke="#d100d1" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="2671.8" cy="2331.4" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2668.3" cy="2230.9" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2643.6,2356.3 2602.6,2427.3 2520.6,2427.3 2479.6,2356.3 2520.6,2285.3 2602.6,2285.3" fill="#B300B3" fill-opacity="0.08" stroke="#B300B3" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2561.6" y="2297.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Pious Mists XI</text>
-  <circle cx="2612.2" cy="2330.6" r="1.1" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2522.8" cy="2327.5" r="1.1" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2643.6,1788.2 2602.6,1859.2 2520.6,1859.2 2479.6,1788.2 2520.6,1717.2 2602.6,1717.2" fill="#c6c000" fill-opacity="0.08" stroke="#c6c000" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="2612.2" cy="2330.6" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2522.8" cy="2327.5" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2643.6,1788.2 2602.6,1859.2 2520.6,1859.2 2479.6,1788.2 2520.6,1717.2 2602.6,1717.2" fill="#B3B300" fill-opacity="0.08" stroke="#B3B300" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2561.6" y="1729.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Memory of Profit X</text>
-  <circle cx="2598.3" cy="1831.5" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2541.5" cy="1744.5" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1659.6,1930.2 1618.6,2001.2 1536.6,2001.2 1495.6,1930.2 1536.6,1859.2 1618.6,1859.2" fill="#00e5ff" fill-opacity="0.08" stroke="#00e5ff" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="2598.3" cy="1831.5" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2541.5" cy="1744.5" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1659.6,1930.2 1618.6,2001.2 1536.6,2001.2 1495.6,1930.2 1536.6,1859.2 1618.6,1859.2" fill="#0095FF" fill-opacity="0.08" stroke="#0095FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1577.6" y="1871.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Second Contact VII</text>
-  <circle cx="1619.7" cy="1901.6" r="1.1" fill="#00e5ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1547.1" cy="1882.3" r="1.1" fill="#00e5ff" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1659.6,1788.2 1618.6,1859.2 1536.6,1859.2 1495.6,1788.2 1536.6,1717.2 1618.6,1717.2" fill="#00e5ff" fill-opacity="0.08" stroke="#00e5ff" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="1619.7" cy="1901.6" r="1.1" fill="#0095FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1547.1" cy="1882.3" r="1.1" fill="#0095FF" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1659.6,1788.2 1618.6,1859.2 1536.6,1859.2 1495.6,1788.2 1536.6,1717.2 1618.6,1717.2" fill="#0095FF" fill-opacity="0.08" stroke="#0095FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1577.6" y="1729.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Second Contact XI</text>
-  <circle cx="1564.5" cy="1843.5" r="1.1" fill="#00e5ff" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1564.5" cy="1843.5" r="1.1" fill="#0095FF" stroke="#ffffff" stroke-width="0.3" />
   <line x1="3306.6" y1="1758.2" x2="3292.5" y2="1816.8" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="3306.6" cy="1758.2" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="3292.5" cy="1816.8" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <line x1="3306.6" y1="1759.6" x2="3292.5" y2="1818.2" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="3306.6" cy="1759.6" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="3292.5" cy="1818.2" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
-  <polygon points="3381.6,1788.2 3340.6,1859.2 3258.6,1859.2 3217.6,1788.2 3258.6,1717.2 3340.6,1717.2" fill="none" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
-  <polygon points="3320.1,1752.7 3299.6,1788.2 3258.6,1788.2 3238.1,1752.7 3258.6,1717.2 3299.6,1717.2" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="3381.6,1788.2 3340.6,1859.2 3258.6,1859.2 3217.6,1788.2 3258.6,1717.2 3340.6,1717.2" fill="none" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="3320.1,1752.7 3299.6,1788.2 3258.6,1788.2 3238.1,1752.7 3258.6,1717.2 3299.6,1717.2" fill="#B3B300" fill-opacity="0.08" stroke="#B3B300" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="3279.1" y="1723.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Hewa's Twin III</text>
-  <polygon points="3361.1,1823.7 3340.6,1859.2 3299.6,1859.2 3279.1,1823.7 3299.6,1788.2 3340.6,1788.2" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="3361.1,1823.7 3340.6,1859.2 3299.6,1859.2 3279.1,1823.7 3299.6,1788.2 3340.6,1788.2" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="3320.1" y="1794.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Hewa's Twin IV The Cove</text>
-  <circle cx="3273.7" cy="1767.5" r="0.8" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3278.8" cy="1733.1" r="0.8" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="3381.6,1646.2 3340.6,1717.2 3258.6,1717.2 3217.6,1646.2 3258.6,1575.2 3340.6,1575.2" fill="#c6c000" fill-opacity="0.08" stroke="#c6c000" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="3273.7" cy="1767.5" r="0.8" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3278.8" cy="1733.1" r="0.8" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="3381.6,1646.2 3340.6,1717.2 3258.6,1717.2 3217.6,1646.2 3258.6,1575.2 3340.6,1575.2" fill="#B3B300" fill-opacity="0.08" stroke="#B3B300" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="3299.6" y="1587.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Hewa's Twin V</text>
-  <circle cx="3310.9" cy="1701.8" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2397.6,936.0 2356.6,1007.0 2274.6,1007.0 2233.6,936.0 2274.6,865.0 2356.6,865.0" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="3310.9" cy="1701.8" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2397.6,936.0 2356.6,1007.0 2274.6,1007.0 2233.6,936.0 2274.6,865.0 2356.6,865.0" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2315.6" y="877.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Silent Witness XI</text>
-  <circle cx="2300.7" cy="881.2" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2276.3" cy="964.9" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2274.6,865.0 2233.6,936.0 2151.6,936.0 2110.6,865.0 2151.6,794.0 2233.6,794.0" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="2300.7" cy="881.2" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2276.3" cy="964.9" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2274.6,865.0 2233.6,936.0 2151.6,936.0 2110.6,865.0 2151.6,794.0 2233.6,794.0" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2192.6" y="806.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Silent Witness XII</text>
-  <circle cx="2232.5" cy="905.4" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1659.6,1078.1 1618.6,1149.1 1536.6,1149.1 1495.6,1078.1 1536.6,1007.0 1618.6,1007.0" fill="#0077cc" fill-opacity="0.08" stroke="#0077cc" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="2232.5" cy="905.4" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1659.6,1078.1 1618.6,1149.1 1536.6,1149.1 1495.6,1078.1 1536.6,1007.0 1618.6,1007.0" fill="#0069B3" fill-opacity="0.08" stroke="#0069B3" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1577.6" y="1019.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Morning Star IV</text>
-  <circle cx="1576.5" cy="1134.9" r="1.1" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2889.6,1504.1 2848.6,1575.2 2766.6,1575.2 2725.6,1504.1 2766.6,1433.1 2848.6,1433.1" fill="#94a3b8" fill-opacity="0.08" stroke="#94a3b8" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="1576.5" cy="1134.9" r="1.1" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2889.6,1504.1 2848.6,1575.2 2766.6,1575.2 2725.6,1504.1 2766.6,1433.1 2848.6,1433.1" fill="#B300B3" fill-opacity="0.08" stroke="#B300B3" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2807.6" y="1445.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Trinity Sanctum VII</text>
-  <circle cx="2855.9" cy="1533.9" r="1.1" fill="#94a3b8" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1167.6,1362.1 1126.6,1433.1 1044.6,1433.1 1003.6,1362.1 1044.6,1291.1 1126.6,1291.1" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="2855.9" cy="1533.9" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1167.6,1362.1 1126.6,1433.1 1044.6,1433.1 1003.6,1362.1 1044.6,1291.1 1126.6,1291.1" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1085.6" y="1303.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Getsu Fune</text>
-  <circle cx="1077.4" cy="1381.4" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1056.5" cy="1343.2" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1130.4" cy="1339.6" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1054.6" cy="1314.5" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1413.6,1930.2 1372.6,2001.2 1290.6,2001.2 1249.6,1930.2 1290.6,1859.2 1372.6,1859.2" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="1077.4" cy="1381.4" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1056.5" cy="1343.2" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1130.4" cy="1339.6" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1054.6" cy="1314.5" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1413.6,1930.2 1372.6,2001.2 1290.6,2001.2 1249.6,1930.2 1290.6,1859.2 1372.6,1859.2" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1331.6" y="1871.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Frontier Edge</text>
-  <circle cx="1353.4" cy="1978.3" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1308.6" cy="1898.2" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1353.4" cy="1877.8" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1353.4" cy="1978.3" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1308.6" cy="1898.2" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1353.4" cy="1877.8" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
   <line x1="3541.8" y1="2058.9" x2="3559.2" y2="2080.2" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="3541.8" cy="2058.9" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="3559.2" cy="2080.2" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <line x1="3542.9" y1="2058.9" x2="3560.5" y2="2080.2" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="3542.9" cy="2058.9" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="3560.5" cy="2080.2" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
-  <polygon points="3627.6,2072.3 3586.6,2143.3 3504.6,2143.3 3463.6,2072.3 3504.6,2001.2 3586.6,2001.2" fill="none" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
-  <polygon points="3566.1,2036.8 3545.6,2072.3 3504.6,2072.3 3484.1,2036.8 3504.6,2001.2 3545.6,2001.2" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="3627.6,2072.3 3586.6,2143.3 3504.6,2143.3 3463.6,2072.3 3504.6,2001.2 3586.6,2001.2" fill="none" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="3566.1,2036.8 3545.6,2072.3 3504.6,2072.3 3484.1,2036.8 3504.6,2001.2 3545.6,2001.2" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="3525.1" y="2007.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Turquoise Sea IX</text>
-  <polygon points="3607.1,2107.8 3586.6,2143.3 3545.6,2143.3 3525.1,2107.8 3545.6,2072.3 3586.6,2072.3" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="3607.1,2107.8 3586.6,2143.3 3545.6,2143.3 3525.1,2107.8 3545.6,2072.3 3586.6,2072.3" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="3566.1" y="2078.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Turquoise Sea X</text>
-  <circle cx="3548.6" cy="2127.2" r="0.8" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3555.2" cy="2091.0" r="0.8" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2889.6,2640.4 2848.6,2711.4 2766.6,2711.4 2725.6,2640.4 2766.6,2569.4 2848.6,2569.4" fill="#d100d1" fill-opacity="0.08" stroke="#d100d1" stroke-width="2.8" stroke-opacity="0.95" />
-  <text x="2807.6" y="2581.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc"></text>
-  <circle cx="2808.8" cy="2599.1" r="1.1" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2853.9" cy="2607.5" r="1.1" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2774.0" cy="2621.3" r="1.1" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="3258.6,2569.4 3217.6,2640.4 3135.6,2640.4 3094.6,2569.4 3135.6,2498.3 3217.6,2498.3" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
-  <text x="3176.6" y="2510.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc"></text>
-  <circle cx="3183.2" cy="2529.7" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3136.4" cy="2609.5" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="3381.6,2356.3 3340.6,2427.3 3258.6,2427.3 3217.6,2356.3 3258.6,2285.3 3340.6,2285.3" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
-  <text x="3299.6" y="2297.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc"></text>
-  <circle cx="3251.6" cy="2334.5" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3273.5" cy="2406.8" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="3258.6,2285.3 3217.6,2356.3 3135.6,2356.3 3094.6,2285.3 3135.6,2214.3 3217.6,2214.3" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
-  <text x="3176.6" y="2226.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc"></text>
-  <circle cx="3212.6" cy="2329.2" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3132.4" cy="2266.0" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="3135.6,2072.3 3094.6,2143.3 3012.6,2143.3 2971.6,2072.3 3012.6,2001.2 3094.6,2001.2" fill="#c6c000" fill-opacity="0.08" stroke="#c6c000" stroke-width="2.8" stroke-opacity="0.95" />
-  <text x="3053.6" y="2013.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc"></text>
-  <circle cx="3077.2" cy="2123.8" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3001.2" cy="2050.3" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1905.6,2640.4 1864.6,2711.4 1782.6,2711.4 1741.6,2640.4 1782.6,2569.4 1864.6,2569.4" fill="#c6c000" fill-opacity="0.08" stroke="#c6c000" stroke-width="2.8" stroke-opacity="0.95" />
-  <text x="1823.6" y="2581.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc"></text>
-  <circle cx="1827.8" cy="2583.7" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1413.6,2356.3 1372.6,2427.3 1290.6,2427.3 1249.6,2356.3 1290.6,2285.3 1372.6,2285.3" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
-  <text x="1331.6" y="2297.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc"></text>
-  <circle cx="1346.1" cy="2301.4" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1167.6,1930.2 1126.6,2001.2 1044.6,2001.2 1003.6,1930.2 1044.6,1859.2 1126.6,1859.2" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
-  <text x="1085.6" y="1871.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc"></text>
-  <circle cx="1085.7" cy="1894.5" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1126.0" cy="1890.3" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1118.7" cy="1950.9" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1048.5" cy="1950.1" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="675.6,1220.1 634.6,1291.1 552.6,1291.1 511.6,1220.1 552.6,1149.1 634.6,1149.1" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
-  <text x="593.6" y="1161.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc"></text>
-  <circle cx="603.1" cy="1164.1" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="628.0" cy="1241.5" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1290.6,2569.4 1249.6,2640.4 1167.6,2640.4 1126.6,2569.4 1167.6,2498.3 1249.6,2498.3" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
-  <text x="1208.6" y="2510.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc"></text>
-  <circle cx="1220.7" cy="2523.4" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1252.5" cy="2596.7" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1182.4" cy="2547.9" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1181.4" cy="2619.3" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2151.6,2782.4 2110.6,2853.4 2028.6,2853.4 1987.6,2782.4 2028.6,2711.4 2110.6,2711.4" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
-  <text x="2069.6" y="2723.4" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc"></text>
-  <circle cx="2110.0" cy="2742.5" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2049.8" cy="2766.2" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="675.6,2640.4 634.6,2711.4 552.6,2711.4 511.6,2640.4 552.6,2569.4 634.6,2569.4" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
-  <text x="593.6" y="2581.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc"></text>
-  <circle cx="605.5" cy="2595.4" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="636.6" cy="2677.5" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2151.6,1930.2 2110.6,2001.2 2028.6,2001.2 1987.6,1930.2 2028.6,1859.2 2110.6,1859.2" fill="#9a0000" fill-opacity="0.08" stroke="#9a0000" stroke-width="2.8" stroke-opacity="0.95" />
-  <text x="2069.6" y="1871.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc"></text>
-  <circle cx="2082.2" cy="1882.5" r="1.1" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2125.2" cy="1918.6" r="1.1" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2116.9" cy="1961.6" r="1.1" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2038.3" cy="1913.0" r="1.1" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2069.0" cy="1979.7" r="1.1" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1536.6,581.0 1495.6,652.0 1413.6,652.0 1372.6,581.0 1413.6,509.9 1495.6,509.9" fill="#c00000" fill-opacity="0.08" stroke="#c00000" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="3548.6" cy="2127.2" r="0.8" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3555.2" cy="2091.0" r="0.8" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2889.6,2640.4 2848.6,2711.4 2766.6,2711.4 2725.6,2640.4 2766.6,2569.4 2848.6,2569.4" fill="#B300B3" fill-opacity="0.08" stroke="#B300B3" stroke-width="2.8" stroke-opacity="0.95" />
+  <text x="2807.6" y="2581.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Cardinal's Domain</text>
+  <circle cx="2808.8" cy="2599.1" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2853.9" cy="2607.5" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2774.0" cy="2621.3" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="3258.6,2569.4 3217.6,2640.4 3135.6,2640.4 3094.6,2569.4 3135.6,2498.3 3217.6,2498.3" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
+  <text x="3176.6" y="2510.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Moo-Kye's Revenge</text>
+  <circle cx="3183.2" cy="2529.7" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3136.4" cy="2609.5" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="3381.6,2356.3 3340.6,2427.3 3258.6,2427.3 3217.6,2356.3 3258.6,2285.3 3340.6,2285.3" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
+  <text x="3299.6" y="2297.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Mi Ton's Refuge</text>
+  <circle cx="3251.6" cy="2334.5" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3273.5" cy="2406.8" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="3258.6,2285.3 3217.6,2356.3 3135.6,2356.3 3094.6,2285.3 3135.6,2214.3 3217.6,2214.3" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
+  <text x="3176.6" y="2226.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Loomanckstrat's Legacy</text>
+  <circle cx="3212.6" cy="2329.2" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3132.4" cy="2266.0" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="3135.6,2072.3 3094.6,2143.3 3012.6,2143.3 2971.6,2072.3 3012.6,2001.2 3094.6,2001.2" fill="#B3B300" fill-opacity="0.08" stroke="#B3B300" stroke-width="2.8" stroke-opacity="0.95" />
+  <text x="3053.6" y="2013.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">CEO's Doubt</text>
+  <circle cx="3077.2" cy="2123.8" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3001.2" cy="2050.3" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1905.6,2640.4 1864.6,2711.4 1782.6,2711.4 1741.6,2640.4 1782.6,2569.4 1864.6,2569.4" fill="#B3B300" fill-opacity="0.08" stroke="#B3B300" stroke-width="2.8" stroke-opacity="0.95" />
+  <text x="1823.6" y="2581.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Freedom's Reach</text>
+  <circle cx="1827.8" cy="2583.7" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1413.6,2356.3 1372.6,2427.3 1290.6,2427.3 1249.6,2356.3 1290.6,2285.3 1372.6,2285.3" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
+  <text x="1331.6" y="2297.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Mists of Artemis</text>
+  <circle cx="1346.1" cy="2301.4" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1167.6,1930.2 1126.6,2001.2 1044.6,2001.2 1003.6,1930.2 1044.6,1859.2 1126.6,1859.2" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
+  <text x="1085.6" y="1871.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Ore Belt</text>
+  <circle cx="1085.7" cy="1894.5" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1126.0" cy="1890.3" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1118.7" cy="1950.9" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1048.5" cy="1950.1" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="675.6,1220.1 634.6,1291.1 552.6,1291.1 511.6,1220.1 552.6,1149.1 634.6,1149.1" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
+  <text x="593.6" y="1161.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Adventure's Promise</text>
+  <circle cx="603.1" cy="1164.1" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="628.0" cy="1241.5" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1290.6,2569.4 1249.6,2640.4 1167.6,2640.4 1126.6,2569.4 1167.6,2498.3 1249.6,2498.3" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
+  <text x="1208.6" y="2510.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Sanctum Verge</text>
+  <circle cx="1220.7" cy="2523.4" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1252.5" cy="2596.7" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1182.4" cy="2547.9" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1181.4" cy="2619.3" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2151.6,2782.4 2110.6,2853.4 2028.6,2853.4 1987.6,2782.4 2028.6,2711.4 2110.6,2711.4" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
+  <text x="2069.6" y="2723.4" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Tempting Fumes</text>
+  <circle cx="2110.0" cy="2742.5" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2049.8" cy="2766.2" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="675.6,2640.4 634.6,2711.4 552.6,2711.4 511.6,2640.4 552.6,2569.4 634.6,2569.4" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
+  <text x="593.6" y="2581.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Circle of Deceit</text>
+  <circle cx="605.5" cy="2595.4" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="636.6" cy="2677.5" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2151.6,1930.2 2110.6,2001.2 2028.6,2001.2 1987.6,1930.2 2028.6,1859.2 2110.6,1859.2" fill="#B30000" fill-opacity="0.08" stroke="#B30000" stroke-width="2.8" stroke-opacity="0.95" />
+  <text x="2069.6" y="1871.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Void of Opportunity</text>
+  <circle cx="2082.2" cy="1882.5" r="1.1" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2125.2" cy="1918.6" r="1.1" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2116.9" cy="1961.6" r="1.1" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2038.3" cy="1913.0" r="1.1" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2069.0" cy="1979.7" r="1.1" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1536.6,581.0 1495.6,652.0 1413.6,652.0 1372.6,581.0 1413.6,509.9 1495.6,509.9" fill="#B36100" fill-opacity="0.08" stroke="#B36100" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1454.6" y="521.9" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Wretched Skies IV Family Valka</text>
-  <circle cx="1403.5" cy="605.9" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1502.7" cy="594.2" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2028.6,723.0 1987.6,794.0 1905.6,794.0 1864.6,723.0 1905.6,652.0 1987.6,652.0" fill="#c00000" fill-opacity="0.08" stroke="#c00000" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="1403.5" cy="605.9" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1502.7" cy="594.2" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2028.6,723.0 1987.6,794.0 1905.6,794.0 1864.6,723.0 1905.6,652.0 1987.6,652.0" fill="#B36100" fill-opacity="0.08" stroke="#B36100" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1946.6" y="664.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Family Zhin</text>
-  <circle cx="1992.4" cy="712.6" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1895.2" cy="712.6" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1940.6" cy="675.5" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1972.8" cy="773.4" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2028.6,581.0 1987.6,652.0 1905.6,652.0 1864.6,581.0 1905.6,509.9 1987.6,509.9" fill="#c00000" fill-opacity="0.08" stroke="#c00000" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="1992.4" cy="712.6" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1895.2" cy="712.6" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1940.6" cy="675.5" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1972.8" cy="773.4" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2028.6,581.0 1987.6,652.0 1905.6,652.0 1864.6,581.0 1905.6,509.9 1987.6,509.9" fill="#B36100" fill-opacity="0.08" stroke="#B36100" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1946.6" y="521.9" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Family Kritt</text>
-  <circle cx="1936.0" cy="535.1" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1973.8" cy="630.8" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1413.6,652.0 1372.6,723.0 1290.6,723.0 1249.6,652.0 1290.6,581.0 1372.6,581.0" fill="#c00000" fill-opacity="0.08" stroke="#c00000" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="1936.0" cy="535.1" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1973.8" cy="630.8" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1413.6,652.0 1372.6,723.0 1290.6,723.0 1249.6,652.0 1290.6,581.0 1372.6,581.0" fill="#B36100" fill-opacity="0.08" stroke="#B36100" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1331.6" y="592.9" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Wretched Skies V Family Phi</text>
-  <circle cx="1295.4" cy="638.6" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1382.9" cy="627.6" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1357.8" cy="699.2" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2643.6,509.9 2602.6,581.0 2520.6,581.0 2479.6,509.9 2520.6,438.9 2602.6,438.9" fill="#c00000" fill-opacity="0.08" stroke="#c00000" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="1295.4" cy="638.6" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1382.9" cy="627.6" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1357.8" cy="699.2" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2643.6,509.9 2602.6,581.0 2520.6,581.0 2479.6,509.9 2520.6,438.9 2602.6,438.9" fill="#B36100" fill-opacity="0.08" stroke="#B36100" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2561.6" y="450.9" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Zyarth's Dominion I</text>
-  <circle cx="2599.5" cy="475.3" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2518.7" cy="472.7" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2567.5" cy="555.7" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2766.6,581.0 2725.6,652.0 2643.6,652.0 2602.6,581.0 2643.6,509.9 2725.6,509.9" fill="#c00000" fill-opacity="0.08" stroke="#c00000" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="2599.5" cy="475.3" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2518.7" cy="472.7" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2567.5" cy="555.7" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2766.6,581.0 2725.6,652.0 2643.6,652.0 2602.6,581.0 2643.6,509.9 2725.6,509.9" fill="#B36100" fill-opacity="0.08" stroke="#B36100" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2684.6" y="521.9" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Zyarth's Dominion IV</text>
-  <circle cx="2703.7" cy="552.6" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2703.7" cy="634.4" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2766.6,438.9 2725.6,509.9 2643.6,509.9 2602.6,438.9 2643.6,367.9 2725.6,367.9" fill="#c00000" fill-opacity="0.08" stroke="#c00000" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="2703.7" cy="552.6" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2703.7" cy="634.4" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2766.6,438.9 2725.6,509.9 2643.6,509.9 2602.6,438.9 2643.6,367.9 2725.6,367.9" fill="#B36100" fill-opacity="0.08" stroke="#B36100" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2684.6" y="379.9" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Zyarth's Dominion X</text>
-  <circle cx="2715.1" cy="402.7" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2641.2" cy="475.7" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2706.5" cy="487.5" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="3381.6,936.0 3340.6,1007.0 3258.6,1007.0 3217.6,936.0 3258.6,865.0 3340.6,865.0" fill="#b26b00" fill-opacity="0.08" stroke="#b26b00" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="2715.1" cy="402.7" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2641.2" cy="475.7" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2706.5" cy="487.5" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="3381.6,936.0 3340.6,1007.0 3258.6,1007.0 3217.6,936.0 3258.6,865.0 3340.6,865.0" fill="#FF8B00" fill-opacity="0.08" stroke="#FF8B00" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="3299.6" y="877.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Family Tkr</text>
-  <circle cx="3344.1" cy="904.5" r="1.1" fill="#b26b00" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3299.2" cy="890.5" r="1.1" fill="#b26b00" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3252.1" cy="966.4" r="1.1" fill="#b26b00" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3320.9" cy="988.7" r="1.1" fill="#b26b00" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3344.1" cy="904.5" r="1.1" fill="#FF8B00" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3299.2" cy="890.5" r="1.1" fill="#FF8B00" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3252.1" cy="966.4" r="1.1" fill="#FF8B00" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3320.9" cy="988.7" r="1.1" fill="#FF8B00" stroke="#ffffff" stroke-width="0.3" />
   <line x1="3292.5" y1="1108.1" x2="3306.6" y2="1049.4" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="3292.5" cy="1108.1" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="3306.6" cy="1049.4" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <line x1="3292.5" y1="1106.7" x2="3306.6" y2="1048.1" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="3292.5" cy="1106.7" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="3306.6" cy="1048.1" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
-  <polygon points="3381.6,1078.1 3340.6,1149.1 3258.6,1149.1 3217.6,1078.1 3258.6,1007.0 3340.6,1007.0" fill="none" stroke="#b26b00" stroke-width="2.8" stroke-opacity="0.95" />
-  <polygon points="3361.1,1113.6 3340.6,1149.1 3299.6,1149.1 3279.1,1113.6 3299.6,1078.1 3340.6,1078.1" fill="#b26b00" fill-opacity="0.08" stroke="#b26b00" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="3381.6,1078.1 3340.6,1149.1 3258.6,1149.1 3217.6,1078.1 3258.6,1007.0 3340.6,1007.0" fill="none" stroke="#FF8B00" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="3361.1,1113.6 3340.6,1149.1 3299.6,1149.1 3279.1,1113.6 3299.6,1078.1 3340.6,1078.1" fill="#FF8B00" fill-opacity="0.08" stroke="#FF8B00" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="3320.1" y="1084.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Thuruk's Demise III</text>
-  <polygon points="3320.1,1042.6 3299.6,1078.1 3258.6,1078.1 3238.1,1042.6 3258.6,1007.0 3299.6,1007.0" fill="#b26b00" fill-opacity="0.08" stroke="#b26b00" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="3320.1,1042.6 3299.6,1078.1 3258.6,1078.1 3238.1,1042.6 3258.6,1007.0 3299.6,1007.0" fill="#FF8B00" fill-opacity="0.08" stroke="#FF8B00" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="3279.1" y="1013.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Thuruk's Demise II First Impact</text>
-  <circle cx="3325.8" cy="1090.5" r="0.8" fill="#b26b00" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3305.9" cy="1127.0" r="0.8" fill="#b26b00" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="3627.6,936.0 3586.6,1007.0 3504.6,1007.0 3463.6,936.0 3504.6,865.0 3586.6,865.0" fill="#b26b00" fill-opacity="0.08" stroke="#b26b00" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="3325.8" cy="1090.5" r="0.8" fill="#FF8B00" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3305.9" cy="1127.0" r="0.8" fill="#FF8B00" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="3627.6,936.0 3586.6,1007.0 3504.6,1007.0 3463.6,936.0 3504.6,865.0 3586.6,865.0" fill="#FF8B00" fill-opacity="0.08" stroke="#FF8B00" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="3545.6" y="877.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Tharka's Ravine XXIV</text>
-  <circle cx="3504.9" cy="896.4" r="1.1" fill="#b26b00" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3587.5" cy="929.4" r="1.1" fill="#b26b00" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3510.0" cy="968.6" r="1.1" fill="#b26b00" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="3750.6,865.0 3709.6,936.0 3627.6,936.0 3586.6,865.0 3627.6,794.0 3709.6,794.0" fill="#b26b00" fill-opacity="0.08" stroke="#b26b00" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="3504.9" cy="896.4" r="1.1" fill="#FF8B00" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3587.5" cy="929.4" r="1.1" fill="#FF8B00" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3510.0" cy="968.6" r="1.1" fill="#FF8B00" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="3750.6,865.0 3709.6,936.0 3627.6,936.0 3586.6,865.0 3627.6,794.0 3709.6,794.0" fill="#FF8B00" fill-opacity="0.08" stroke="#FF8B00" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="3668.6" y="806.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Tharka's Ravine XVI</text>
-  <circle cx="3624.8" cy="901.2" r="1.1" fill="#b26b00" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3665.1" cy="822.9" r="1.1" fill="#b26b00" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3699.7" cy="898.9" r="1.1" fill="#b26b00" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="3873.6,652.0 3832.6,723.0 3750.6,723.0 3709.6,652.0 3750.6,581.0 3832.6,581.0" fill="#b26b00" fill-opacity="0.08" stroke="#b26b00" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="3624.8" cy="901.2" r="1.1" fill="#FF8B00" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3665.1" cy="822.9" r="1.1" fill="#FF8B00" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3699.7" cy="898.9" r="1.1" fill="#FF8B00" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="3873.6,652.0 3832.6,723.0 3750.6,723.0 3709.6,652.0 3750.6,581.0 3832.6,581.0" fill="#FF8B00" fill-opacity="0.08" stroke="#FF8B00" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="3791.6" y="592.9" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Heart of Acrimony II</text>
-  <circle cx="3791.7" cy="595.2" r="1.1" fill="#b26b00" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3791.7" cy="706.4" r="1.1" fill="#b26b00" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="3873.6,936.0 3832.6,1007.0 3750.6,1007.0 3709.6,936.0 3750.6,865.0 3832.6,865.0" fill="#b26b00" fill-opacity="0.08" stroke="#b26b00" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="3791.7" cy="595.2" r="1.1" fill="#FF8B00" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3791.7" cy="706.4" r="1.1" fill="#FF8B00" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="3873.6,936.0 3832.6,1007.0 3750.6,1007.0 3709.6,936.0 3750.6,865.0 3832.6,865.0" fill="#FF8B00" fill-opacity="0.08" stroke="#FF8B00" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="3791.6" y="877.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Tharka's Ravine VIII</text>
-  <circle cx="3747.0" cy="900.8" r="1.1" fill="#b26b00" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3829.3" cy="939.0" r="1.1" fill="#b26b00" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="3996.6,865.0 3955.6,936.0 3873.6,936.0 3832.6,865.0 3873.6,794.0 3955.6,794.0" fill="#9a0000" fill-opacity="0.08" stroke="#9a0000" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="3747.0" cy="900.8" r="1.1" fill="#FF8B00" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3829.3" cy="939.0" r="1.1" fill="#FF8B00" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="3996.6,865.0 3955.6,936.0 3873.6,936.0 3832.6,865.0 3873.6,794.0 3955.6,794.0" fill="#B30000" fill-opacity="0.08" stroke="#B30000" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="3914.6" y="806.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Tharka's Ravine IV Tharka's Fall</text>
-  <circle cx="3863.1" cy="889.2" r="1.1" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2028.6,438.9 1987.6,509.9 1905.6,509.9 1864.6,438.9 1905.6,367.9 1987.6,367.9" fill="#9a0000" fill-opacity="0.08" stroke="#9a0000" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="3863.1" cy="889.2" r="1.1" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2028.6,438.9 1987.6,509.9 1905.6,509.9 1864.6,438.9 1905.6,367.9 1987.6,367.9" fill="#B30000" fill-opacity="0.08" stroke="#B30000" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1946.6" y="379.9" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Rhy's Defiance</text>
-  <circle cx="1990.5" cy="403.0" r="1.1" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1941.5" cy="470.8" r="1.1" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2151.6,367.9 2110.6,438.9 2028.6,438.9 1987.6,367.9 2028.6,296.9 2110.6,296.9" fill="#9a0000" fill-opacity="0.08" stroke="#9a0000" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="1990.5" cy="403.0" r="1.1" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1941.5" cy="470.8" r="1.1" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2151.6,367.9 2110.6,438.9 2028.6,438.9 1987.6,367.9 2028.6,296.9 2110.6,296.9" fill="#B30000" fill-opacity="0.08" stroke="#B30000" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2069.6" y="308.9" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Matrix #598</text>
-  <circle cx="2026.8" cy="405.3" r="1.1" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2124.2" cy="374.2" r="1.1" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2026.8" cy="405.3" r="1.1" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2124.2" cy="374.2" r="1.1" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
   <line x1="3068.2" y1="659.9" x2="3039.9" y2="644.0" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="3068.2" cy="659.9" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="3039.9" cy="644.0" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <line x1="3067.2" y1="659.9" x2="3037.9" y2="644.0" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="3067.2" cy="659.9" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="3037.9" cy="644.0" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
-  <polygon points="3135.6,652.0 3094.6,723.0 3012.6,723.0 2971.6,652.0 3012.6,581.0 3094.6,581.0" fill="none" stroke="#0077cc" stroke-width="2.8" stroke-opacity="0.95" />
-  <polygon points="3115.1,687.5 3094.6,723.0 3053.6,723.0 3033.1,687.5 3053.6,652.0 3094.6,652.0" fill="#0077cc" fill-opacity="0.08" stroke="#0077cc" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="3135.6,652.0 3094.6,723.0 3012.6,723.0 2971.6,652.0 3012.6,581.0 3094.6,581.0" fill="none" stroke="#0069B3" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="3115.1,687.5 3094.6,723.0 3053.6,723.0 3033.1,687.5 3053.6,652.0 3094.6,652.0" fill="#0069B3" fill-opacity="0.08" stroke="#0069B3" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="3074.1" y="658.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Guiding Star V</text>
-  <polygon points="3074.1,616.5 3053.6,652.0 3012.6,652.0 2992.1,616.5 3012.6,581.0 3053.6,581.0" fill="#0077cc" fill-opacity="0.08" stroke="#0077cc" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="3074.1,616.5 3053.6,652.0 3012.6,652.0 2992.1,616.5 3012.6,581.0 3053.6,581.0" fill="#0069B3" fill-opacity="0.08" stroke="#0069B3" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="3033.1" y="586.9" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Guiding Star VII</text>
-  <circle cx="3055.3" cy="697.4" r="0.8" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3033.3" cy="597.5" r="0.8" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="3012.6,438.9 2971.6,509.9 2889.6,509.9 2848.6,438.9 2889.6,367.9 2971.6,367.9" fill="#0077cc" fill-opacity="0.08" stroke="#0077cc" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="3055.3" cy="697.4" r="0.8" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3033.3" cy="597.5" r="0.8" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="3012.6,438.9 2971.6,509.9 2889.6,509.9 2848.6,438.9 2889.6,367.9 2971.6,367.9" fill="#0069B3" fill-opacity="0.08" stroke="#0069B3" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2930.6" y="379.9" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Eleventh Hour</text>
-  <circle cx="2883.8" cy="406.7" r="1.1" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2954.2" cy="490.6" r="1.1" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2397.6,652.0 2356.6,723.0 2274.6,723.0 2233.6,652.0 2274.6,581.0 2356.6,581.0" fill="#c00000" fill-opacity="0.08" stroke="#c00000" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="2883.8" cy="406.7" r="1.1" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2954.2" cy="490.6" r="1.1" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2397.6,652.0 2356.6,723.0 2274.6,723.0 2233.6,652.0 2274.6,581.0 2356.6,581.0" fill="#B36100" fill-opacity="0.08" stroke="#B36100" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2315.6" y="592.9" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Family Nhuut</text>
-  <circle cx="2259.9" cy="648.2" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2323.3" cy="601.5" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2365.3" cy="679.4" r="1.1" fill="#c00000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2643.6,794.0 2602.6,865.0 2520.6,865.0 2479.6,794.0 2520.6,723.0 2602.6,723.0" fill="#c6c000" fill-opacity="0.08" stroke="#c6c000" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="2259.9" cy="648.2" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2323.3" cy="601.5" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2365.3" cy="679.4" r="1.1" fill="#B36100" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2643.6,794.0 2602.6,865.0 2520.6,865.0 2479.6,794.0 2520.6,723.0 2602.6,723.0" fill="#B3B300" fill-opacity="0.08" stroke="#B3B300" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2561.6" y="735.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Open Market</text>
-  <circle cx="2514.4" cy="762.3" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2561.4" cy="752.7" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2595.4" cy="818.4" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2766.6,865.0 2725.6,936.0 2643.6,936.0 2602.6,865.0 2643.6,794.0 2725.6,794.0" fill="#c6c000" fill-opacity="0.08" stroke="#c6c000" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="2514.4" cy="762.3" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2561.4" cy="752.7" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2595.4" cy="818.4" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2766.6,865.0 2725.6,936.0 2643.6,936.0 2602.6,865.0 2643.6,794.0 2725.6,794.0" fill="#B3B300" fill-opacity="0.08" stroke="#B3B300" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2684.6" y="806.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Two Grand</text>
-  <circle cx="2641.4" cy="835.3" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2708.5" cy="820.1" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2721.5" cy="886.0" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2649.1" cy="909.4" r="1.1" fill="#c6c000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="3381.6,794.0 3340.6,865.0 3258.6,865.0 3217.6,794.0 3258.6,723.0 3340.6,723.0" fill="#b26b00" fill-opacity="0.08" stroke="#b26b00" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="2641.4" cy="835.3" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2708.5" cy="820.1" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2721.5" cy="886.0" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2649.1" cy="909.4" r="1.1" fill="#B3B300" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="3381.6,794.0 3340.6,865.0 3258.6,865.0 3217.6,794.0 3258.6,723.0 3340.6,723.0" fill="#FF8B00" fill-opacity="0.08" stroke="#FF8B00" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="3299.6" y="735.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Fires of Defeat</text>
-  <circle cx="3259.5" cy="753.7" r="1.1" fill="#b26b00" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3259.1" cy="808.1" r="1.1" fill="#b26b00" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3338.0" cy="806.1" r="1.1" fill="#b26b00" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3300.9" cy="837.0" r="1.1" fill="#b26b00" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1290.6,581.0 1249.6,652.0 1167.6,652.0 1126.6,581.0 1167.6,509.9 1249.6,509.9" fill="#d100d1" fill-opacity="0.08" stroke="#d100d1" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="3259.5" cy="753.7" r="1.1" fill="#FF8B00" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3259.1" cy="808.1" r="1.1" fill="#FF8B00" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3338.0" cy="806.1" r="1.1" fill="#FF8B00" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3300.9" cy="837.0" r="1.1" fill="#FF8B00" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1290.6,581.0 1249.6,652.0 1167.6,652.0 1126.6,581.0 1167.6,509.9 1249.6,509.9" fill="#B300B3" fill-opacity="0.08" stroke="#B300B3" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1208.6" y="521.9" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Wretched Skies X</text>
-  <circle cx="1158.0" cy="571.3" r="1.1" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1252.6" cy="616.8" r="1.1" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1158.0" cy="571.3" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1252.6" cy="616.8" r="1.1" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
   <line x1="969.6" y1="611.0" x2="977.6" y2="573.0" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="969.6" cy="611.0" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="977.6" cy="573.0" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <line x1="969.6" y1="609.6" x2="976.2" y2="573.0" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="969.6" cy="609.6" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="976.2" cy="573.0" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
-  <polygon points="1044.6,581.0 1003.6,652.0 921.6,652.0 880.6,581.0 921.6,509.9 1003.6,509.9" fill="none" stroke="#d100d1" stroke-width="2.8" stroke-opacity="0.95" />
-  <polygon points="983.1,616.5 962.6,652.0 921.6,652.0 901.1,616.5 921.6,581.0 962.6,581.0" fill="#d100d1" fill-opacity="0.08" stroke="#d100d1" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="1044.6,581.0 1003.6,652.0 921.6,652.0 880.6,581.0 921.6,509.9 1003.6,509.9" fill="none" stroke="#B300B3" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="983.1,616.5 962.6,652.0 921.6,652.0 901.1,616.5 921.6,581.0 962.6,581.0" fill="#B300B3" fill-opacity="0.08" stroke="#B300B3" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="942.1" y="586.9" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Litany of Fury IX</text>
-  <polygon points="1024.1,545.5 1003.6,581.0 962.6,581.0 942.1,545.5 962.6,509.9 1003.6,509.9" fill="#d100d1" fill-opacity="0.08" stroke="#d100d1" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="1024.1,545.5 1003.6,581.0 962.6,581.0 942.1,545.5 962.6,509.9 1003.6,509.9" fill="#B300B3" fill-opacity="0.08" stroke="#B300B3" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="983.1" y="515.9" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Litany of Fury XII</text>
-  <circle cx="920.7" cy="600.1" r="0.8" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="966.1" cy="617.9" r="0.8" fill="#d100d1" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="920.7" cy="600.1" r="0.8" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="966.1" cy="617.9" r="0.8" fill="#B300B3" stroke="#ffffff" stroke-width="0.3" />
   <line x1="846.6" y1="538.6" x2="832.5" y2="479.9" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="846.6" cy="538.6" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="832.5" cy="479.9" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <line x1="846.6" y1="540.0" x2="832.5" y2="481.3" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="846.6" cy="540.0" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="832.5" cy="481.3" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
-  <polygon points="921.6,509.9 880.6,581.0 798.6,581.0 757.6,509.9 798.6,438.9 880.6,438.9" fill="none" stroke="#9a0000" stroke-width="2.8" stroke-opacity="0.95" />
-  <polygon points="860.1,545.5 839.6,581.0 798.6,581.0 778.1,545.5 798.6,509.9 839.6,509.9" fill="#9a0000" fill-opacity="0.08" stroke="#9a0000" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="921.6,509.9 880.6,581.0 798.6,581.0 757.6,509.9 798.6,438.9 880.6,438.9" fill="none" stroke="#B30000" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="860.1,545.5 839.6,581.0 798.6,581.0 778.1,545.5 798.6,509.9 839.6,509.9" fill="#B30000" fill-opacity="0.08" stroke="#B30000" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="819.1" y="515.9" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Emperor's Pride IV</text>
-  <polygon points="901.1,474.4 880.6,509.9 839.6,509.9 819.1,474.4 839.6,438.9 880.6,438.9" fill="#9a0000" fill-opacity="0.08" stroke="#9a0000" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="901.1,474.4 880.6,509.9 839.6,509.9 819.1,474.4 839.6,438.9 880.6,438.9" fill="#B30000" fill-opacity="0.08" stroke="#B30000" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="860.1" y="444.9" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Emperor's Pride VI</text>
-  <circle cx="831.3" cy="561.7" r="0.8" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="3750.6,581.0 3709.6,652.0 3627.6,652.0 3586.6,581.0 3627.6,509.9 3709.6,509.9" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="831.3" cy="561.7" r="0.8" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="3750.6,581.0 3709.6,652.0 3627.6,652.0 3586.6,581.0 3627.6,509.9 3709.6,509.9" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="3668.6" y="521.9" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Heart of Acrimony I The Boneyard</text>
-  <circle cx="3689.8" cy="633.6" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="798.6,1717.2 757.6,1788.2 675.6,1788.2 634.6,1717.2 675.6,1646.2 757.6,1646.2" fill="#2f7fd3" fill-opacity="0.08" stroke="#2f7fd3" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="3689.8" cy="633.6" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="798.6,1717.2 757.6,1788.2 675.6,1788.2 634.6,1717.2 675.6,1646.2 757.6,1646.2" fill="#99D5FF" fill-opacity="0.08" stroke="#99D5FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="716.6" y="1658.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Asteroid Belt</text>
-  <circle cx="711.8" cy="1660.6" r="1.1" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="764.0" cy="1742.7" r="1.1" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="733.7" cy="1771.3" r="1.1" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="675.6,1646.2 634.6,1717.2 552.6,1717.2 511.6,1646.2 552.6,1575.2 634.6,1575.2" fill="#2f7fd3" fill-opacity="0.08" stroke="#2f7fd3" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="711.8" cy="1660.6" r="1.1" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="764.0" cy="1742.7" r="1.1" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="733.7" cy="1771.3" r="1.1" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="675.6,1646.2 634.6,1717.2 552.6,1717.2 511.6,1646.2 552.6,1575.2 634.6,1575.2" fill="#99D5FF" fill-opacity="0.08" stroke="#99D5FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="593.6" y="1587.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Mars</text>
-  <circle cx="553.3" cy="1606.1" r="1.1" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="623.3" cy="1692.0" r="1.1" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="552.6,1575.2 511.6,1646.2 429.6,1646.2 388.6,1575.2 429.6,1504.1 511.6,1504.1" fill="#2f7fd3" fill-opacity="0.08" stroke="#2f7fd3" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="553.3" cy="1606.1" r="1.1" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="623.3" cy="1692.0" r="1.1" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="552.6,1575.2 511.6,1646.2 429.6,1646.2 388.6,1575.2 429.6,1504.1 511.6,1504.1" fill="#99D5FF" fill-opacity="0.08" stroke="#99D5FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="470.6" y="1516.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Venus</text>
-  <circle cx="506.4" cy="1604.3" r="1.1" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="447.7" cy="1523.2" r="1.1" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="513.3" cy="1544.5" r="1.1" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="506.4" cy="1604.3" r="1.1" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="447.7" cy="1523.2" r="1.1" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="513.3" cy="1544.5" r="1.1" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
   <line x1="607.2" y1="1496.2" x2="566.2" y2="1512.1" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="607.2" cy="1496.2" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="566.2" cy="1512.1" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <line x1="620.9" y1="1496.2" x2="579.9" y2="1512.1" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="620.9" cy="1496.2" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="579.9" cy="1512.1" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
-  <polygon points="675.6,1504.1 634.6,1575.2 552.6,1575.2 511.6,1504.1 552.6,1433.1 634.6,1433.1" fill="none" stroke="#2f7fd3" stroke-width="2.8" stroke-opacity="0.95" />
-  <polygon points="655.1,1468.6 634.6,1504.1 593.6,1504.1 573.1,1468.6 593.6,1433.1 634.6,1433.1" fill="#2f7fd3" fill-opacity="0.08" stroke="#2f7fd3" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="675.6,1504.1 634.6,1575.2 552.6,1575.2 511.6,1504.1 552.6,1433.1 634.6,1433.1" fill="none" stroke="#99D5FF" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="655.1,1468.6 634.6,1504.1 593.6,1504.1 573.1,1468.6 593.6,1433.1 634.6,1433.1" fill="#99D5FF" fill-opacity="0.08" stroke="#99D5FF" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="614.1" y="1439.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Earth</text>
-  <polygon points="614.1,1539.7 593.6,1575.2 552.6,1575.2 532.1,1539.7 552.6,1504.1 593.6,1504.1" fill="#2f7fd3" fill-opacity="0.08" stroke="#2f7fd3" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="614.1,1539.7 593.6,1575.2 552.6,1575.2 532.1,1539.7 552.6,1504.1 593.6,1504.1" fill="#99D5FF" fill-opacity="0.08" stroke="#99D5FF" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="573.1" y="1510.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">The Moon</text>
-  <circle cx="555.6" cy="1557.0" r="0.8" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="552.6,1433.1 511.6,1504.1 429.6,1504.1 388.6,1433.1 429.6,1362.1 511.6,1362.1" fill="#2f7fd3" fill-opacity="0.08" stroke="#2f7fd3" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="555.6" cy="1557.0" r="0.8" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="552.6,1433.1 511.6,1504.1 429.6,1504.1 388.6,1433.1 429.6,1362.1 511.6,1362.1" fill="#99D5FF" fill-opacity="0.08" stroke="#99D5FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="470.6" y="1374.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Mercury</text>
-  <circle cx="462.8" cy="1489.4" r="1.1" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="675.6,1930.2 634.6,2001.2 552.6,2001.2 511.6,1930.2 552.6,1859.2 634.6,1859.2" fill="#2f7fd3" fill-opacity="0.08" stroke="#2f7fd3" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="462.8" cy="1489.4" r="1.1" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="675.6,1930.2 634.6,2001.2 552.6,2001.2 511.6,1930.2 552.6,1859.2 634.6,1859.2" fill="#99D5FF" fill-opacity="0.08" stroke="#99D5FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="593.6" y="1871.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Jupiter</text>
-  <circle cx="634.5" cy="1890.8" r="1.1" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="572.6" cy="1974.0" r="1.1" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="634.5" cy="1890.8" r="1.1" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="572.6" cy="1974.0" r="1.1" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
   <line x1="504.7" y1="2028.8" x2="455.0" y2="2009.2" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="504.7" cy="2028.8" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="455.0" cy="2009.2" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
@@ -808,55 +808,55 @@
   <line x1="504.7" y1="1973.7" x2="429.3" y2="1971.6" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="504.7" cy="1973.7" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="429.3" cy="1971.6" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
-  <polygon points="552.6,2001.2 511.6,2072.3 429.6,2072.3 388.6,2001.2 429.6,1930.2 511.6,1930.2" fill="none" stroke="#2f7fd3" stroke-width="2.8" stroke-opacity="0.95" />
-  <polygon points="552.6,2001.2 532.1,2036.8 491.1,2036.8 470.6,2001.2 491.1,1965.7 532.1,1965.7" fill="#2f7fd3" fill-opacity="0.08" stroke="#2f7fd3" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="552.6,2001.2 511.6,2072.3 429.6,2072.3 388.6,2001.2 429.6,1930.2 511.6,1930.2" fill="none" stroke="#99D5FF" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="552.6,2001.2 532.1,2036.8 491.1,2036.8 470.6,2001.2 491.1,1965.7 532.1,1965.7" fill="#99D5FF" fill-opacity="0.08" stroke="#99D5FF" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="511.6" y="1971.7" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Saturn 1</text>
-  <polygon points="491.1,2036.8 470.6,2072.3 429.6,2072.3 409.1,2036.8 429.6,2001.2 470.6,2001.2" fill="#2f7fd3" fill-opacity="0.08" stroke="#2f7fd3" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="491.1,2036.8 470.6,2072.3 429.6,2072.3 409.1,2036.8 429.6,2001.2 470.6,2001.2" fill="#99D5FF" fill-opacity="0.08" stroke="#99D5FF" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="450.1" y="2007.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Titan</text>
-  <polygon points="491.1,1965.7 470.6,2001.2 429.6,2001.2 409.1,1965.7 429.6,1930.2 470.6,1930.2" fill="#2f7fd3" fill-opacity="0.08" stroke="#2f7fd3" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="491.1,1965.7 470.6,2001.2 429.6,2001.2 409.1,1965.7 429.6,1930.2 470.6,1930.2" fill="#99D5FF" fill-opacity="0.08" stroke="#99D5FF" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="450.1" y="1936.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Saturn 2</text>
-  <circle cx="520.4" cy="1983.5" r="0.8" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="500.7" cy="2020.7" r="0.8" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="429.6,2072.3 388.6,2143.3 306.6,2143.3 265.6,2072.3 306.6,2001.2 388.6,2001.2" fill="#2f7fd3" fill-opacity="0.08" stroke="#2f7fd3" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="520.4" cy="1983.5" r="0.8" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="500.7" cy="2020.7" r="0.8" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="429.6,2072.3 388.6,2143.3 306.6,2143.3 265.6,2072.3 306.6,2001.2 388.6,2001.2" fill="#99D5FF" fill-opacity="0.08" stroke="#99D5FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="347.6" y="2013.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Uranus</text>
-  <circle cx="382.3" cy="2099.7" r="1.1" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="385.9" cy="2030.4" r="1.1" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="552.6,2143.3 511.6,2214.3 429.6,2214.3 388.6,2143.3 429.6,2072.3 511.6,2072.3" fill="#2f7fd3" fill-opacity="0.08" stroke="#2f7fd3" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="382.3" cy="2099.7" r="1.1" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="385.9" cy="2030.4" r="1.1" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="552.6,2143.3 511.6,2214.3 429.6,2214.3 388.6,2143.3 429.6,2072.3 511.6,2072.3" fill="#99D5FF" fill-opacity="0.08" stroke="#99D5FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="470.6" y="2084.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Neptune</text>
-  <circle cx="433.6" cy="2170.1" r="1.1" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="430.3" cy="2103.2" r="1.1" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="516.2" cy="2140.0" r="1.1" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="429.6,2214.3 388.6,2285.3 306.6,2285.3 265.6,2214.3 306.6,2143.3 388.6,2143.3" fill="#2f7fd3" fill-opacity="0.08" stroke="#2f7fd3" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="433.6" cy="2170.1" r="1.1" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="430.3" cy="2103.2" r="1.1" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="516.2" cy="2140.0" r="1.1" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="429.6,2214.3 388.6,2285.3 306.6,2285.3 265.6,2214.3 306.6,2143.3 388.6,2143.3" fill="#99D5FF" fill-opacity="0.08" stroke="#99D5FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="347.6" y="2155.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Pluto</text>
-  <circle cx="376.6" cy="2185.2" r="1.1" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="305.2" cy="2252.1" r="1.1" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="376.6" cy="2185.2" r="1.1" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="305.2" cy="2252.1" r="1.1" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
   <line x1="1345.5" y1="1210.9" x2="1304.2" y2="1228.0" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="1345.5" cy="1210.9" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="1304.2" cy="1228.0" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
-  <polygon points="1413.6,1220.1 1372.6,1291.1 1290.6,1291.1 1249.6,1220.1 1290.6,1149.1 1372.6,1149.1" fill="none" stroke="#9a0000" stroke-width="2.8" stroke-opacity="0.95" />
-  <polygon points="1393.1,1184.6 1372.6,1220.1 1331.6,1220.1 1311.1,1184.6 1331.6,1149.1 1372.6,1149.1" fill="#9a0000" fill-opacity="0.08" stroke="#9a0000" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="1413.6,1220.1 1372.6,1291.1 1290.6,1291.1 1249.6,1220.1 1290.6,1149.1 1372.6,1149.1" fill="none" stroke="#B30000" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="1393.1,1184.6 1372.6,1220.1 1331.6,1220.1 1311.1,1184.6 1331.6,1149.1 1372.6,1149.1" fill="#B30000" fill-opacity="0.08" stroke="#B30000" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="1352.1" y="1155.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Savage Spur I</text>
-  <polygon points="1352.1,1255.6 1331.6,1291.1 1290.6,1291.1 1270.1,1255.6 1290.6,1220.1 1331.6,1220.1" fill="#9a0000" fill-opacity="0.08" stroke="#9a0000" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="1352.1,1255.6 1331.6,1291.1 1290.6,1291.1 1270.1,1255.6 1290.6,1220.1 1331.6,1220.1" fill="#B30000" fill-opacity="0.08" stroke="#B30000" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="1311.1" y="1226.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Savage Spur II</text>
-  <circle cx="1372.3" cy="1164.6" r="0.8" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1292.1" cy="1264.2" r="0.8" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1044.6,2427.3 1003.6,2498.3 921.6,2498.3 880.6,2427.3 921.6,2356.3 1003.6,2356.3" fill="#7ec8ff" fill-opacity="0.08" stroke="#7ec8ff" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="1372.3" cy="1164.6" r="0.8" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1292.1" cy="1264.2" r="0.8" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1044.6,2427.3 1003.6,2498.3 921.6,2498.3 880.6,2427.3 921.6,2356.3 1003.6,2356.3" fill="#00AFB3" fill-opacity="0.08" stroke="#00AFB3" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="962.6" y="2368.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Segaris</text>
-  <circle cx="966.5" cy="2370.7" r="1.1" fill="#7ec8ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="914.0" cy="2449.5" r="1.1" fill="#7ec8ff" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="921.6,2498.3 880.6,2569.4 798.6,2569.4 757.6,2498.3 798.6,2427.3 880.6,2427.3" fill="#7ec8ff" fill-opacity="0.08" stroke="#7ec8ff" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="966.5" cy="2370.7" r="1.1" fill="#00AFB3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="914.0" cy="2449.5" r="1.1" fill="#00AFB3" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="921.6,2498.3 880.6,2569.4 798.6,2569.4 757.6,2498.3 798.6,2427.3 880.6,2427.3" fill="#00AFB3" fill-opacity="0.08" stroke="#00AFB3" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="839.6" y="2439.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Gaian Prophecy</text>
-  <circle cx="795.2" cy="2489.1" r="1.1" fill="#7ec8ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="889.5" cy="2525.4" r="1.1" fill="#7ec8ff" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="798.6,2427.3 757.6,2498.3 675.6,2498.3 634.6,2427.3 675.6,2356.3 757.6,2356.3" fill="#7ec8ff" fill-opacity="0.08" stroke="#7ec8ff" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="795.2" cy="2489.1" r="1.1" fill="#00AFB3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="889.5" cy="2525.4" r="1.1" fill="#00AFB3" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="798.6,2427.3 757.6,2498.3 675.6,2498.3 634.6,2427.3 675.6,2356.3 757.6,2356.3" fill="#00AFB3" fill-opacity="0.08" stroke="#00AFB3" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="716.6" y="2368.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Brennan's Triumph</text>
-  <circle cx="689.5" cy="2439.7" r="1.1" fill="#7ec8ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="724.9" cy="2401.3" r="1.1" fill="#7ec8ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="744.4" cy="2447.1" r="1.1" fill="#7ec8ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="717.3" cy="2484.1" r="1.1" fill="#7ec8ff" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="306.6,2285.3 265.6,2356.3 183.6,2356.3 142.6,2285.3 183.6,2214.3 265.6,2214.3" fill="#2f7fd3" fill-opacity="0.08" stroke="#2f7fd3" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="689.5" cy="2439.7" r="1.1" fill="#00AFB3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="724.9" cy="2401.3" r="1.1" fill="#00AFB3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="744.4" cy="2447.1" r="1.1" fill="#00AFB3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="717.3" cy="2484.1" r="1.1" fill="#00AFB3" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="306.6,2285.3 265.6,2356.3 183.6,2356.3 142.6,2285.3 183.6,2214.3 265.6,2214.3" fill="#99D5FF" fill-opacity="0.08" stroke="#99D5FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="224.6" y="2226.3" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Oort Cloud</text>
-  <circle cx="236.0" cy="2229.7" r="1.1" fill="#2f7fd3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="236.0" cy="2229.7" r="1.1" fill="#99D5FF" stroke="#ffffff" stroke-width="0.3" />
   <line x1="2205.9" y1="1565.3" x2="2157.1" y2="1547.6" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="2205.9" cy="1565.3" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="2157.1" cy="1547.6" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
@@ -869,55 +869,55 @@
   <line x1="2207.6" y1="1583.1" x2="2222.9" y2="1566.3" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="2207.6" cy="1583.1" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="2222.9" cy="1566.3" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
-  <polygon points="2274.6,1575.2 2233.6,1646.2 2151.6,1646.2 2110.6,1575.2 2151.6,1504.1 2233.6,1504.1" fill="none" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
-  <polygon points="2254.1,1539.7 2233.6,1575.2 2192.6,1575.2 2172.1,1539.7 2192.6,1504.1 2233.6,1504.1" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="2274.6,1575.2 2233.6,1646.2 2151.6,1646.2 2110.6,1575.2 2151.6,1504.1 2233.6,1504.1" fill="none" stroke="#003C66" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="2254.1,1539.7 2233.6,1575.2 2192.6,1575.2 2172.1,1539.7 2192.6,1504.1 2233.6,1504.1" fill="#003C66" fill-opacity="0.08" stroke="#003C66" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="2213.1" y="1510.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Avarice I</text>
-  <polygon points="2254.1,1610.7 2233.6,1646.2 2192.6,1646.2 2172.1,1610.7 2192.6,1575.2 2233.6,1575.2" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="2254.1,1610.7 2233.6,1646.2 2192.6,1646.2 2172.1,1610.7 2192.6,1575.2 2233.6,1575.2" fill="#003C66" fill-opacity="0.08" stroke="#003C66" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="2213.1" y="1581.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Avarice V Dead End</text>
-  <polygon points="2192.6,1575.2 2172.1,1610.7 2131.1,1610.7 2110.6,1575.2 2131.1,1539.7 2172.1,1539.7" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="2192.6,1575.2 2172.1,1610.7 2131.1,1610.7 2110.6,1575.2 2131.1,1539.7 2172.1,1539.7" fill="#003C66" fill-opacity="0.08" stroke="#003C66" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="2151.6" y="1545.6" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Avarice IV</text>
-  <circle cx="2130.5" cy="1566.2" r="0.8" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2151.6,1362.1 2110.6,1433.1 2028.6,1433.1 1987.6,1362.1 2028.6,1291.1 2110.6,1291.1" fill="#c58f00" fill-opacity="0.08" stroke="#c58f00" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="2130.5" cy="1566.2" r="0.8" fill="#003C66" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2151.6,1362.1 2110.6,1433.1 2028.6,1433.1 1987.6,1362.1 2028.6,1291.1 2110.6,1291.1" fill="#B38600" fill-opacity="0.08" stroke="#B38600" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="2069.6" y="1303.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Windfall I Union Summit</text>
-  <circle cx="2069.3" cy="1309.8" r="1.1" fill="#c58f00" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2017.7" cy="1385.3" r="1.1" fill="#c58f00" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2118.2" cy="1382.1" r="1.1" fill="#c58f00" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2028.6,1433.1 1987.6,1504.1 1905.6,1504.1 1864.6,1433.1 1905.6,1362.1 1987.6,1362.1" fill="#c58f00" fill-opacity="0.08" stroke="#c58f00" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="2069.3" cy="1309.8" r="1.1" fill="#B38600" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2017.7" cy="1385.3" r="1.1" fill="#B38600" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2118.2" cy="1382.1" r="1.1" fill="#B38600" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2028.6,1433.1 1987.6,1504.1 1905.6,1504.1 1864.6,1433.1 1905.6,1362.1 1987.6,1362.1" fill="#B38600" fill-opacity="0.08" stroke="#B38600" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1946.6" y="1374.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Windfall III The Hoard</text>
-  <circle cx="1987.8" cy="1445.0" r="1.1" fill="#c58f00" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1982.7" cy="1389.3" r="1.1" fill="#c58f00" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1938.5" cy="1489.0" r="1.1" fill="#c58f00" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2028.6,1575.2 1987.6,1646.2 1905.6,1646.2 1864.6,1575.2 1905.6,1504.1 1987.6,1504.1" fill="#c58f00" fill-opacity="0.08" stroke="#c58f00" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="1987.8" cy="1445.0" r="1.1" fill="#B38600" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1982.7" cy="1389.3" r="1.1" fill="#B38600" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1938.5" cy="1489.0" r="1.1" fill="#B38600" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2028.6,1575.2 1987.6,1646.2 1905.6,1646.2 1864.6,1575.2 1905.6,1504.1 1987.6,1504.1" fill="#B38600" fill-opacity="0.08" stroke="#B38600" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1946.6" y="1516.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Windfall IV Aurora's Dream</text>
-  <circle cx="1948.9" cy="1518.9" r="1.1" fill="#c58f00" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1927.7" cy="1628.7" r="1.1" fill="#c58f00" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="3873.6,1220.1 3832.6,1291.1 3750.6,1291.1 3709.6,1220.1 3750.6,1149.1 3832.6,1149.1" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="1948.9" cy="1518.9" r="1.1" fill="#B38600" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1927.7" cy="1628.7" r="1.1" fill="#B38600" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="3873.6,1220.1 3832.6,1291.1 3750.6,1291.1 3709.6,1220.1 3750.6,1149.1 3832.6,1149.1" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="3791.6" y="1161.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Unknown System</text>
-  <polygon points="1167.6,936.0 1126.6,1007.0 1044.6,1007.0 1003.6,936.0 1044.6,865.0 1126.6,865.0" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="1167.6,936.0 1126.6,1007.0 1044.6,1007.0 1003.6,936.0 1044.6,865.0 1126.6,865.0" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1085.6" y="877.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Watchful Gaze</text>
-  <circle cx="1129.3" cy="905.0" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1045.4" cy="976.2" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1044.6,1007.0 1003.6,1078.1 921.6,1078.1 880.6,1007.0 921.6,936.0 1003.6,936.0" fill="#63b3ff" fill-opacity="0.08" stroke="#63b3ff" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="1129.3" cy="905.0" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1045.4" cy="976.2" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1044.6,1007.0 1003.6,1078.1 921.6,1078.1 880.6,1007.0 921.6,936.0 1003.6,936.0" fill="#4DB5FF" fill-opacity="0.08" stroke="#4DB5FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="962.6" y="948.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Barren Shores</text>
-  <circle cx="915.4" cy="1038.7" r="1.1" fill="#63b3ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1004.7" cy="998.5" r="1.1" fill="#63b3ff" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="921.6,1078.1 880.6,1149.1 798.6,1149.1 757.6,1078.1 798.6,1007.0 880.6,1007.0" fill="#63b3ff" fill-opacity="0.08" stroke="#63b3ff" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="915.4" cy="1038.7" r="1.1" fill="#4DB5FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1004.7" cy="998.5" r="1.1" fill="#4DB5FF" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="921.6,1078.1 880.6,1149.1 798.6,1149.1 757.6,1078.1 798.6,1007.0 880.6,1007.0" fill="#4DB5FF" fill-opacity="0.08" stroke="#4DB5FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="839.6" y="1019.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Great Reef</text>
-  <circle cx="846.9" cy="1037.0" r="1.1" fill="#63b3ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="888.2" cy="1048.7" r="1.1" fill="#63b3ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="826.0" cy="1121.8" r="1.1" fill="#63b3ff" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="921.6,1220.1 880.6,1291.1 798.6,1291.1 757.6,1220.1 798.6,1149.1 880.6,1149.1" fill="#63b3ff" fill-opacity="0.08" stroke="#63b3ff" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="846.9" cy="1037.0" r="1.1" fill="#4DB5FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="888.2" cy="1048.7" r="1.1" fill="#4DB5FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="826.0" cy="1121.8" r="1.1" fill="#4DB5FF" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="921.6,1220.1 880.6,1291.1 798.6,1291.1 757.6,1220.1 798.6,1149.1 880.6,1149.1" fill="#4DB5FF" fill-opacity="0.08" stroke="#4DB5FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="839.6" y="1161.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Ocean of Fantasy</text>
-  <circle cx="836.1" cy="1175.8" r="1.1" fill="#63b3ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="878.3" cy="1261.6" r="1.1" fill="#63b3ff" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="836.1" cy="1175.8" r="1.1" fill="#4DB5FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="878.3" cy="1261.6" r="1.1" fill="#4DB5FF" stroke="#ffffff" stroke-width="0.3" />
   <path d="M 743.3,897.7 C 742.4,892.3 737.1,875.0 737.5,865.6 C 738.0,856.1 744.8,845.0 746.3,840.8" clip-path="url(#sector-clip-Cluster_605_macro-Cluster_605_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 745.9,836.2 C 740.6,834.3 724.2,825.8 714.5,824.9 C 704.9,824.0 692.5,829.9 688.1,830.9" clip-path="url(#sector-clip-Cluster_605_macro-Cluster_605_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 683.3,833.6 C 681.1,836.6 670.5,843.5 670.1,851.6 C 669.8,859.7 679.4,877.2 681.2,882.3" clip-path="url(#sector-clip-Cluster_605_macro-Cluster_605_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 690.0,885.7 C 694.6,887.0 709.5,890.9 717.8,893.6 C 726.1,896.4 736.0,900.7 739.6,902.2" clip-path="url(#sector-clip-Cluster_605_macro-Cluster_605_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="798.6,865.0 757.6,936.0 675.6,936.0 634.6,865.0 675.6,794.0 757.6,794.0" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="798.6,865.0 757.6,936.0 675.6,936.0 634.6,865.0 675.6,794.0 757.6,794.0" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="716.6" y="806.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Sanctuary of Darkness</text>
-  <circle cx="682.6" cy="826.7" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="750.7" cy="910.4" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="682.6" cy="826.7" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="750.7" cy="910.4" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
   <line x1="443.2" y1="715.0" x2="455.6" y2="730.9" stroke="#1d4ed8" stroke-width="0.4" stroke-opacity="0.95" />
   <circle cx="443.2" cy="715.0" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
   <circle cx="455.6" cy="730.9" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
@@ -938,64 +938,64 @@
   <path d="M 470.2,763.5 C 469.5,763.6 467.4,763.9 466.1,764.1 C 464.7,764.3 463.3,764.5 461.9,764.7 C 460.5,764.9 459.2,765.1 457.8,765.3 C 456.4,765.5 454.3,765.8 453.6,765.9" clip-path="url(#sector-clip-Cluster_606_macro-Cluster_606_Sector002_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 500.8,706.9 C 500.2,707.6 498.6,710.0 497.5,711.6 C 496.4,713.2 495.2,714.8 494.1,716.4 C 493.0,718.0 491.9,719.6 490.8,721.2 C 489.7,722.8 488.0,725.2 487.5,726.0" clip-path="url(#sector-clip-Cluster_606_macro-Cluster_606_Sector003_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 488.4,726.2 C 488.9,725.4 490.6,723.0 491.7,721.5 C 492.8,719.9 493.9,718.3 495.0,716.8 C 496.1,715.2 497.2,713.6 498.3,712.1 C 499.4,710.5 501.0,708.2 501.6,707.4" clip-path="url(#sector-clip-Cluster_606_macro-Cluster_606_Sector003_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="552.6,723.0 511.6,794.0 429.6,794.0 388.6,723.0 429.6,652.0 511.6,652.0" fill="none" stroke="#63b3ff" stroke-width="2.8" stroke-opacity="0.95" />
-  <polygon points="491.1,687.5 470.6,723.0 429.6,723.0 409.1,687.5 429.6,652.0 470.6,652.0" fill="#63b3ff" fill-opacity="0.08" stroke="#63b3ff" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="552.6,723.0 511.6,794.0 429.6,794.0 388.6,723.0 429.6,652.0 511.6,652.0" fill="none" stroke="#4DB5FF" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="491.1,687.5 470.6,723.0 429.6,723.0 409.1,687.5 429.6,652.0 470.6,652.0" fill="#4DB5FF" fill-opacity="0.08" stroke="#4DB5FF" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="450.1" y="658.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Kingdom End I</text>
-  <polygon points="491.1,758.5 470.6,794.0 429.6,794.0 409.1,758.5 429.6,723.0 470.6,723.0" fill="#63b3ff" fill-opacity="0.08" stroke="#63b3ff" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="491.1,758.5 470.6,794.0 429.6,794.0 409.1,758.5 429.6,723.0 470.6,723.0" fill="#4DB5FF" fill-opacity="0.08" stroke="#4DB5FF" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="450.1" y="729.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Reflected Stars</text>
-  <polygon points="552.6,723.0 532.1,758.5 491.1,758.5 470.6,723.0 491.1,687.5 532.1,687.5" fill="#63b3ff" fill-opacity="0.08" stroke="#63b3ff" stroke-width="2.2" stroke-opacity="0.9" />
+  <polygon points="552.6,723.0 532.1,758.5 491.1,758.5 470.6,723.0 491.1,687.5 532.1,687.5" fill="#4DB5FF" fill-opacity="0.08" stroke="#4DB5FF" stroke-width="2.2" stroke-opacity="0.9" />
   <text x="511.6" y="693.5" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Towering Wave</text>
-  <circle cx="429.7" cy="775.0" r="0.8" fill="#63b3ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="532.0" cy="723.4" r="0.8" fill="#63b3ff" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="429.6,794.0 388.6,865.0 306.6,865.0 265.6,794.0 306.6,723.0 388.6,723.0" fill="#63b3ff" fill-opacity="0.08" stroke="#63b3ff" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="429.7" cy="775.0" r="0.8" fill="#4DB5FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="532.0" cy="723.4" r="0.8" fill="#4DB5FF" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="429.6,794.0 388.6,865.0 306.6,865.0 265.6,794.0 306.6,723.0 388.6,723.0" fill="#4DB5FF" fill-opacity="0.08" stroke="#4DB5FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="347.6" y="735.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Rolk's Demise</text>
-  <circle cx="366.9" cy="743.1" r="1.1" fill="#63b3ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="400.5" cy="797.2" r="1.1" fill="#63b3ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="319.5" cy="843.4" r="1.1" fill="#63b3ff" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="366.9" cy="743.1" r="1.1" fill="#4DB5FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="400.5" cy="797.2" r="1.1" fill="#4DB5FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="319.5" cy="843.4" r="1.1" fill="#4DB5FF" stroke="#ffffff" stroke-width="0.3" />
   <path d="M 443.9,823.3 C 445.7,826.9 452.8,838.5 454.8,845.4 C 456.8,852.2 457.3,858.5 456.1,864.3 C 454.9,870.1 452.1,875.4 447.8,880.1 C 443.4,884.8 432.8,890.6 429.8,892.7" clip-path="url(#sector-clip-Cluster_608_macro-Cluster_608_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 428.7,891.5 C 431.6,889.5 442.0,883.9 446.3,879.3 C 450.6,874.8 453.4,869.7 454.6,864.1 C 455.7,858.5 455.3,852.4 453.4,845.8 C 451.4,839.2 444.5,828.0 442.7,824.4" clip-path="url(#sector-clip-Cluster_608_macro-Cluster_608_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="552.6,865.0 511.6,936.0 429.6,936.0 388.6,865.0 429.6,794.0 511.6,794.0" fill="#63b3ff" fill-opacity="0.08" stroke="#63b3ff" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="552.6,865.0 511.6,936.0 429.6,936.0 388.6,865.0 429.6,794.0 511.6,794.0" fill="#4DB5FF" fill-opacity="0.08" stroke="#4DB5FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="470.6" y="806.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Atreus' Clouds</text>
-  <circle cx="438.7" cy="819.9" r="1.1" fill="#63b3ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="423.5" cy="895.5" r="1.1" fill="#63b3ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="507.1" cy="908.5" r="1.1" fill="#63b3ff" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="438.7" cy="819.9" r="1.1" fill="#4DB5FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="423.5" cy="895.5" r="1.1" fill="#4DB5FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="507.1" cy="908.5" r="1.1" fill="#4DB5FF" stroke="#ffffff" stroke-width="0.3" />
   <path d="M 393.1,947.9 C 386.9,949.2 365.8,955.4 355.6,955.7 C 345.4,955.9 337.5,953.8 332.0,949.4 C 326.4,945.0 323.2,938.2 322.2,929.1 C 321.3,920.0 325.7,900.5 326.3,894.8" clip-path="url(#sector-clip-Cluster_609_macro-Cluster_609_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
   <path d="M 327.8,894.6 C 327.1,900.2 322.7,919.3 323.6,928.2 C 324.4,937.2 327.5,943.8 332.9,948.1 C 338.3,952.5 346.0,954.5 355.9,954.3 C 365.9,954.1 386.4,948.0 392.5,946.8" clip-path="url(#sector-clip-Cluster_609_macro-Cluster_609_Sector001_macro)" fill="none" stroke="#0ea5e9" stroke-width="0.45" stroke-opacity="0.92" />
-  <polygon points="429.6,936.0 388.6,1007.0 306.6,1007.0 265.6,936.0 306.6,865.0 388.6,865.0" fill="#63b3ff" fill-opacity="0.08" stroke="#63b3ff" stroke-width="2.8" stroke-opacity="0.95" />
+  <polygon points="429.6,936.0 388.6,1007.0 306.6,1007.0 265.6,936.0 306.6,865.0 388.6,865.0" fill="#4DB5FF" fill-opacity="0.08" stroke="#4DB5FF" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="347.6" y="877.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Menelaus' Oasis</text>
-  <circle cx="328.7" cy="882.4" r="1.1" fill="#63b3ff" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="401.0" cy="944.7" r="1.1" fill="#63b3ff" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="3627.6,1646.2 3586.6,1717.2 3504.6,1717.2 3463.6,1646.2 3504.6,1575.2 3586.6,1575.2" fill="#8a6ad9" fill-opacity="0.08" stroke="#8a6ad9" stroke-width="2.8" stroke-opacity="0.95" />
-  <text x="3545.6" y="1587.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc"></text>
-  <circle cx="3500.3" cy="1632.2" r="1.1" fill="#8a6ad9" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3585.0" cy="1687.1" r="1.1" fill="#8a6ad9" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="3750.6,1717.2 3709.6,1788.2 3627.6,1788.2 3586.6,1717.2 3627.6,1646.2 3709.6,1646.2" fill="#8a6ad9" fill-opacity="0.08" stroke="#8a6ad9" stroke-width="2.8" stroke-opacity="0.95" />
-  <text x="3668.6" y="1658.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc"></text>
-  <circle cx="3615.0" cy="1702.4" r="1.1" fill="#8a6ad9" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="3667.9" cy="1774.0" r="1.1" fill="#8a6ad9" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="3750.6,1859.2 3709.6,1930.2 3627.6,1930.2 3586.6,1859.2 3627.6,1788.2 3709.6,1788.2" fill="#8a6ad9" fill-opacity="0.08" stroke="#8a6ad9" stroke-width="2.8" stroke-opacity="0.95" />
-  <text x="3668.6" y="1800.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc"></text>
-  <circle cx="3668.1" cy="1802.4" r="1.1" fill="#8a6ad9" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2520.6,1291.1 2479.6,1362.1 2397.6,1362.1 2356.6,1291.1 2397.6,1220.1 2479.6,1220.1" fill="#0077cc" fill-opacity="0.08" stroke="#0077cc" stroke-width="2.8" stroke-opacity="0.95" />
-  <text x="2438.6" y="1232.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc"></text>
-  <circle cx="2384.9" cy="1272.3" r="1.1" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="2437.0" cy="1248.3" r="1.1" fill="#0077cc" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1413.6,1504.1 1372.6,1575.2 1290.6,1575.2 1249.6,1504.1 1290.6,1433.1 1372.6,1433.1" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
-  <text x="1331.6" y="1445.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc"></text>
-  <circle cx="1387.1" cy="1515.9" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1536.6,1575.2 1495.6,1646.2 1413.6,1646.2 1372.6,1575.2 1413.6,1504.1 1495.6,1504.1" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
-  <text x="1454.6" y="1516.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc"></text>
-  <circle cx="1401.0" cy="1562.6" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <circle cx="1510.4" cy="1564.8" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2028.6,1007.0 1987.6,1078.1 1905.6,1078.1 1864.6,1007.0 1905.6,936.0 1987.6,936.0" fill="#9a0000" fill-opacity="0.08" stroke="#9a0000" stroke-width="2.8" stroke-opacity="0.95" />
-  <text x="1946.6" y="948.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc"></text>
-  <circle cx="1889.9" cy="1003.0" r="1.1" fill="#9a0000" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="1167.6,1788.2 1126.6,1859.2 1044.6,1859.2 1003.6,1788.2 1044.6,1717.2 1126.6,1717.2" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="328.7" cy="882.4" r="1.1" fill="#4DB5FF" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="401.0" cy="944.7" r="1.1" fill="#4DB5FF" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="3627.6,1646.2 3586.6,1717.2 3504.6,1717.2 3463.6,1646.2 3504.6,1575.2 3586.6,1575.2" fill="#FFB966" fill-opacity="0.08" stroke="#FFB966" stroke-width="2.8" stroke-opacity="0.95" />
+  <text x="3545.6" y="1587.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Mitsuno's Revelation</text>
+  <circle cx="3500.3" cy="1632.2" r="1.1" fill="#FFB966" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3585.0" cy="1687.1" r="1.1" fill="#FFB966" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="3750.6,1717.2 3709.6,1788.2 3627.6,1788.2 3586.6,1717.2 3627.6,1646.2 3709.6,1646.2" fill="#FFB966" fill-opacity="0.08" stroke="#FFB966" stroke-width="2.8" stroke-opacity="0.95" />
+  <text x="3668.6" y="1658.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Mitsuno's Defiance</text>
+  <circle cx="3615.0" cy="1702.4" r="1.1" fill="#FFB966" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="3667.9" cy="1774.0" r="1.1" fill="#FFB966" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="3750.6,1859.2 3709.6,1930.2 3627.6,1930.2 3586.6,1859.2 3627.6,1788.2 3709.6,1788.2" fill="#FFB966" fill-opacity="0.08" stroke="#FFB966" stroke-width="2.8" stroke-opacity="0.95" />
+  <text x="3668.6" y="1800.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Mitsuno's Sacrifice</text>
+  <circle cx="3668.1" cy="1802.4" r="1.1" fill="#FFB966" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2520.6,1291.1 2479.6,1362.1 2397.6,1362.1 2356.6,1291.1 2397.6,1220.1 2479.6,1220.1" fill="#0069B3" fill-opacity="0.08" stroke="#0069B3" stroke-width="2.8" stroke-opacity="0.95" />
+  <text x="2438.6" y="1232.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">President's End</text>
+  <circle cx="2384.9" cy="1272.3" r="1.1" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2437.0" cy="1248.3" r="1.1" fill="#0069B3" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1413.6,1504.1 1372.6,1575.2 1290.6,1575.2 1249.6,1504.1 1290.6,1433.1 1372.6,1433.1" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
+  <text x="1331.6" y="1445.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Nopileos' Memorial</text>
+  <circle cx="1387.1" cy="1515.9" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1536.6,1575.2 1495.6,1646.2 1413.6,1646.2 1372.6,1575.2 1413.6,1504.1 1495.6,1504.1" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
+  <text x="1454.6" y="1516.1" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Hatikvah's Faith</text>
+  <circle cx="1401.0" cy="1562.6" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="1510.4" cy="1564.8" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2028.6,1007.0 1987.6,1078.1 1905.6,1078.1 1864.6,1007.0 1905.6,936.0 1987.6,936.0" fill="#B30000" fill-opacity="0.08" stroke="#B30000" stroke-width="2.8" stroke-opacity="0.95" />
+  <text x="1946.6" y="948.0" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Matrix #101</text>
+  <circle cx="1889.9" cy="1003.0" r="1.1" fill="#B30000" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="1167.6,1788.2 1126.6,1859.2 1044.6,1859.2 1003.6,1788.2 1044.6,1717.2 1126.6,1717.2" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1085.6" y="1729.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Third Redemption</text>
-  <circle cx="1111.3" cy="1838.8" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
-  <polygon points="2028.6,1859.2 1987.6,1930.2 1905.6,1930.2 1864.6,1859.2 1905.6,1788.2 1987.6,1788.2" fill="#4b5563" fill-opacity="0.08" stroke="#4b5563" stroke-width="2.8" stroke-opacity="0.95" />
+  <circle cx="1111.3" cy="1838.8" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
+  <polygon points="2028.6,1859.2 1987.6,1930.2 1905.6,1930.2 1864.6,1859.2 1905.6,1788.2 1987.6,1788.2" fill="#C0C0C0" fill-opacity="0.08" stroke="#C0C0C0" stroke-width="2.8" stroke-opacity="0.95" />
   <text x="1946.6" y="1800.2" text-anchor="middle" font-size="14" font-family="Consolas, 'Courier New', monospace" fill="#f8fafc">Scarlet Star</text>
-  <circle cx="2003.0" cy="1865.5" r="1.1" fill="#4b5563" stroke="#ffffff" stroke-width="0.3" />
+  <circle cx="2003.0" cy="1865.5" r="1.1" fill="#C0C0C0" stroke="#ffffff" stroke-width="0.3" />
   <line x1="2346.9" y1="1827.2" x2="2696.5" y2="2012.2" stroke="#e5e7eb" stroke-width="0.6" stroke-opacity="0.85" />
   <line x1="2309.7" y1="1819.0" x2="2311.0" y2="1902.8" stroke="#e5e7eb" stroke-width="0.6" stroke-opacity="0.85" />
   <line x1="2258.3" y1="1799.2" x2="2100.2" y2="1812.2" stroke="#e5e7eb" stroke-width="0.6" stroke-opacity="0.85" />

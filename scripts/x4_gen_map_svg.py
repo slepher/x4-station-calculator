@@ -16,27 +16,7 @@ OUTPUT_VERSION_DIR = os.path.join(_config['processed_assets_dir'], _config['fold
 DEFAULT_INPUT = str(Path(OUTPUT_VERSION_DIR) / 'data' / 'maps.json')
 DEFAULT_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / 'data' / 'maps.svg')
 
-OWNER_COLORS = {
-    "teladi": "#c6c000",
-    "argon": "#0077cc",
-    "antigone": "#00e5ff",
-    "boron": "#63b3ff",
-    "terran": "#2f7fd3",
-    "pioneers": "#7ec8ff",
-    "split": "#c00000",
-    "freesplit": "#b26b00",
-    "holyorder": "#b000b8",
-    "paranid": "#d100d1",
-    "hatikvah": "#7a4ea3",
-    "kaori": "#8a6ad9",
-    "loanshark": "#c58f00",
-    "riptide": "#c58f00",
-    "xenon": "#9a0000",
-    "neutral": "#4b5563",
-    "ownerless": "#4b5563",
-    "scaleplate": "#4b5563",
-    "scavenger": "#4b5563",
-}
+FALLBACK_OWNER_COLOR = "#94a3b8"
 
 REGION_CLUSTER_IDS = [29, 501, 502, 503, 500, 704, 2, 3, 39, 1, 5, 6, 740, 725, 4, 47]
 
@@ -56,8 +36,8 @@ def layout_config(include_all: bool = True) -> LayoutConfig:
     return LayoutConfig()
 
 
-def owner_color(owner: str) -> str:
-    return OWNER_COLORS.get(owner, "#94a3b8")
+def resolve_owner_color(node: dict) -> str:
+    return node.get("owner_color") or FALLBACK_OWNER_COLOR
 
 
 def hex_points(cx: float, cy: float, radius: float) -> str:
@@ -313,7 +293,7 @@ def render_from_maps_json(input_path: str, output_path: str, include_all: bool =
 
         for cluster_id in region_ids:
             cluster = clusters[cluster_id]
-            color = owner_color(cluster.get('owner', 'neutral'))
+            color = resolve_owner_color(cluster)
             cx, cy = cluster_centers[cluster_id]
             sectors = cluster['sectors']
 
@@ -413,13 +393,15 @@ def render_from_maps_json(input_path: str, output_path: str, include_all: bool =
             else:
                 f.write(f'  <polygon points="{hex_points(cx, cy, cluster_radius)}" fill="none" stroke="{color}" stroke-width="2.8" stroke-opacity="0.95" />\n')
                 for sector in sectors.values():
+                    sector_color = resolve_owner_color(sector)
                     sx = cx + sector['normalized']['center_offset_ratio']['x'] * cluster_radius
                     sy = cy + sector['normalized']['center_offset_ratio']['y'] * cluster_radius
                     radius = sector['normalized']['sector_radius_ratio'] * cluster_radius
-                    f.write(f'  <polygon points="{hex_points(sx, sy, radius)}" fill="{color}" fill-opacity="0.08" stroke="{color}" stroke-width="2.2" stroke-opacity="0.9" />\n')
+                    f.write(f'  <polygon points="{hex_points(sx, sy, radius)}" fill="{sector_color}" fill-opacity="0.08" stroke="{sector_color}" stroke-width="2.2" stroke-opacity="0.9" />\n')
                     f.write(f'  <text x="{sx:.1f}" y="{sy - radius * 0.72:.1f}" text-anchor="middle" font-size="14" font-family="Consolas, \'Courier New\', monospace" fill="#f8fafc">{sector["name"]}</text>\n')
 
             for sector in sectors.values():
+                sector_color = resolve_owner_color(sector)
                 sx = cx + sector['normalized']['center_offset_ratio']['x'] * cluster_radius
                 sy = cy + sector['normalized']['center_offset_ratio']['y'] * cluster_radius
                 radius = sector['normalized']['sector_radius_ratio'] * cluster_radius
@@ -429,7 +411,7 @@ def render_from_maps_json(input_path: str, output_path: str, include_all: bool =
                         continue
                     gx, gy = cluster_ratio_to_screen(cx, cy, cluster_radius, cluster_ratio)
                     r = 1.1 if len(sectors) == 1 else 0.8
-                    f.write(f'  <circle cx="{gx:.1f}" cy="{gy:.1f}" r="{r:.1f}" fill="{color}" stroke="#ffffff" stroke-width="0.3" />\n')
+                    f.write(f'  <circle cx="{gx:.1f}" cy="{gy:.1f}" r="{r:.1f}" fill="{sector_color}" stroke="#ffffff" stroke-width="0.3" />\n')
 
         # cross-cluster gate lines
         gate_index = {}

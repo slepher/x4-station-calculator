@@ -36,6 +36,9 @@ OUTPUT_VERSION_DIR = os.path.join(_config['processed_assets_dir'], _config['fold
 MAP_OUTPUT_JSON = str(Path(OUTPUT_VERSION_DIR) / "data" / "maps.json")
 MAP_DEFAULTS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "mapdefaults_final.xml")
 MAP_GOD_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "god_final.xml")
+MAP_FACTIONS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "factions_final.xml")
+MAP_COLORS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "colors_final.xml")
+MAP_FACTIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "factions.json")
 MAP_DIR = str(Path(X4_UNPACKED_DATA_PATH) / "maps" / "xu_ep2_universe")
 
 X4_LANG_CONFIG = {
@@ -2144,10 +2147,18 @@ class X4PrecisionLoader:
     # =======================================================
     def process_map_data(self):
         print(f"\n🗺️ [2.5/5] 生成地图数据并合并 nameId...")
+        factions_rows, factions_by_id = x4_data_map_processor.migrate_factions(
+            factions_xml_path=Path(MAP_FACTIONS_XML),
+            colors_xml_path=Path(MAP_COLORS_XML),
+            i18n_registry=self.i18n_registry,
+        )
+        Path(MAP_FACTIONS_OUTPUT).parent.mkdir(parents=True, exist_ok=True)
+        Path(MAP_FACTIONS_OUTPUT).write_text(json.dumps(factions_rows, ensure_ascii=False, indent=2), encoding="utf-8")
         result = x4_data_map_processor.generate_map_data(
             map_dir=Path(MAP_DIR),
             mapdefaults_path=Path(MAP_DEFAULTS_XML),
             god_xml_path=Path(MAP_GOD_XML),
+            factions_by_id=factions_by_id,
             i18n_registry=self.i18n_registry,
         )
         x4_data_map_processor.write_map_output(result["payload"], Path(MAP_OUTPUT_JSON))
@@ -2155,8 +2166,11 @@ class X4PrecisionLoader:
         self.needed_raw_names.update(map_name_ids)
         self.i18n_registry.collect_many(map_name_ids)
         missing = result.get("missing_name_ids", {})
+        ties = result.get("owner_resolution_ties", [])
+        print(f"   ✅ factions json: {MAP_FACTIONS_OUTPUT} ({len(factions_rows)})")
         print(f"   ✅ map nameId merged: {len(map_name_ids)}")
         print(f"   ✅ map json: {MAP_OUTPUT_JSON}")
+        print(f"   ℹ️ owner resolution ties: {len(ties)}")
         print(f"   ℹ️ map missing cluster nameId: {len(missing.get('clusters', []))}")
         print(f"   ℹ️ map missing sector nameId: {len(missing.get('sectors', []))}")
 
