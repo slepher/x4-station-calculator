@@ -99,7 +99,28 @@
   },
   "map": {
     "search_sector_placeholder": "搜索星区",
-    "no_search_results": "未找到匹配星区"
+    "no_search_results": "未找到匹配星区",
+    "resource_filter_all": "所有项",
+    "resource_filter_mixed": "混合",
+    "resource_filter_candidates": "命中候选",
+    "resource_filter_no_match": "没有满足条件的星区",
+    "yield_names": {
+      "lowest": "最低",
+      "verylow": "很低",
+      "lowminus": "偏低-",
+      "low": "偏低",
+      "lowplus": "偏低+",
+      "lowextra": "低扩展",
+      "medlow": "中低",
+      "medium": "中等",
+      "medplus": "中等+",
+      "medhigh": "中高",
+      "highlow": "高-",
+      "high": "高",
+      "highplus": "高+",
+      "veryhigh": "很高",
+      "highest": "最高"
+    }
   },
   "ship_build": {
     "title": "船只建造",
