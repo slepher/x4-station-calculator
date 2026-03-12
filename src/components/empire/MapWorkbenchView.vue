@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
-import mapsSvgUrl from '@/assets/x4_game_data/8.0-Diplomacy/data/maps.svg?url'
+import MapSvgCanvas from './MapSvgCanvas.vue'
 
-const CLUSTER_REF_HEIGHT_PX = 142
+const clusterRefHeightPx = ref(142)
 
 const viewportRef = ref<HTMLDivElement | null>(null)
-const mapImageRef = ref<HTMLImageElement | null>(null)
 
 const imageNaturalWidth = ref(0)
 const imageNaturalHeight = ref(0)
@@ -71,7 +70,6 @@ const applyScaleFromSlider = (value: number) => {
   const nextScale = minScale.value + (maxScale.value - minScale.value) * ratio
   const safeScale = clampScale(nextScale)
 
-  // Keep viewport center stable during zoom.
   const centerContentX = (vw * 0.5 - panX.value) / scale.value
   const centerContentY = (vh * 0.5 - panY.value) / scale.value
   scale.value = safeScale
@@ -95,7 +93,8 @@ const recomputeScaleBounds = () => {
 
   const nextMin = vw / imageNaturalWidth.value
   const targetHalfScreen = window.innerHeight * 0.5
-  const nextMax = Math.max(nextMin, targetHalfScreen / CLUSTER_REF_HEIGHT_PX)
+  const refHeight = Math.max(1, clusterRefHeightPx.value)
+  const nextMax = Math.max(nextMin, targetHalfScreen / refHeight)
 
   minScale.value = nextMin
   maxScale.value = nextMax
@@ -104,16 +103,17 @@ const recomputeScaleBounds = () => {
   clampPan(panX.value, panY.value)
 }
 
-const onImageLoad = async () => {
-  const img = mapImageRef.value
-  if (!img) return
-  imageNaturalWidth.value = img.naturalWidth
-  imageNaturalHeight.value = img.naturalHeight
+const onCanvasSize = async (payload: { width: number; height: number; clusterRefHeight: number }) => {
+  imageNaturalWidth.value = payload.width
+  imageNaturalHeight.value = payload.height
+  clusterRefHeightPx.value = payload.clusterRefHeight
   await nextTick()
   recomputeScaleBounds()
-  scale.value = minScale.value
+  if (scale.value < minScale.value + 1e-6) {
+    scale.value = minScale.value
+  }
   syncSliderFromScale()
-  clampPan(0, 0)
+  clampPan(panX.value, panY.value)
 }
 
 const onSliderInput = (event: Event) => {
@@ -196,18 +196,15 @@ onBeforeUnmount(() => {
         @mouseleave="stopDrag"
         @wheel="onWheel"
       >
-        <img
-          ref="mapImageRef"
-          :src="mapsSvgUrl"
-          alt="X4 sector map"
-          class="map-image"
+        <div
+          class="map-content"
           :style="{
             transform: `translate(${panX}px, ${panY}px) scale(${scale})`,
             transformOrigin: 'top left'
           }"
-          draggable="false"
-          @load="onImageLoad"
-        />
+        >
+          <MapSvgCanvas @content-size="onCanvasSize" />
+        </div>
       </div>
 
       <div class="zoom-panel">
@@ -249,8 +246,8 @@ onBeforeUnmount(() => {
   @apply cursor-grabbing;
 }
 
-.map-image {
-  @apply max-w-none select-none;
+.map-content {
+  @apply select-none;
   will-change: transform;
 }
 
