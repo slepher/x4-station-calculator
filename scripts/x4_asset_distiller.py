@@ -311,6 +311,7 @@ def main():
         { 'name': 'waregroups.xml', 'final': 'waregroups_final.xml' },
         { 'name': 'colors.xml', 'final': 'colors_final.xml' },
         { 'name': 'mapdefaults.xml', 'final': 'mapdefaults_final.xml' },
+        { 'name': 'god.xml', 'final': 'god_final.xml' },
         { 'name': 'ships.xml', 'final': 'ships_final.xml' },
         { 'name': 'shipgroups.xml', 'final': 'shipgroups_final.xml' },
         # loadouts 需要叠加 DLC
