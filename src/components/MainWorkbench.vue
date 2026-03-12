@@ -23,7 +23,10 @@ const isMapsView = computed(() => shipBuildStore.activeView === 'maps')
 </script>
 
 <template>
-  <div class="main-workbench w-full max-w-[1600px] mx-auto p-4 text-sm relative h-screen overflow-hidden flex flex-col">
+  <div
+    class="main-workbench w-full max-w-[1600px] mx-auto p-4 text-sm relative flex flex-col"
+    :class="{ 'maps-mode': isMapsView }"
+  >
     <div id="debug-ready-marker" v-if="store.isReady" class="hidden">READY</div>
 
     <StationToolbar />
@@ -50,6 +53,11 @@ const isMapsView = computed(() => shipBuildStore.activeView === 'maps')
 </template>
 
 <style scoped>
+.main-workbench.maps-mode {
+  height: 100vh;
+  overflow: hidden;
+}
+
 .maps-slot {
   @apply flex-1 min-h-0;
 }
