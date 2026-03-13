@@ -726,6 +726,20 @@ onBeforeUnmount(() => {
 <template>
   <section class="map-workbench">
     <div class="map-layout" :class="{ 'sidebar-active': isResourcePanelOpen }">
+      <MapResourceFilterPanel
+        v-show="isResourcePanelOpen"
+        :sector-layouts="searchSectors"
+        :mode="isResourcePanelOpen ? 'sidebar' : 'overlay'"
+        :show-entry-button="false"
+        @highlight-change="onResourceHighlightChange"
+        @resource-visual-change="onResourceVisualChange"
+        @select-sector="onResourceSectorSelect"
+        @active-change="onResourceActiveChange"
+        @primary-color-change="onResourcePrimaryColorChange"
+        @panel-open="onResourcePanelOpen"
+        @panel-close="onResourcePanelClose"
+      />
+
       <div class="map-shell">
         <div
           ref="viewportRef"
@@ -781,7 +795,7 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <div class="map-search-panel" @mousedown.stop>
+        <div class="map-search-panel right-6 top-5" @mousedown.stop>
           <div class="search-box group" :class="{ focused: isSearchFocused }">
             <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
               <circle
@@ -852,7 +866,7 @@ onBeforeUnmount(() => {
         <button
           v-if="!isResourcePanelOpen"
           type="button"
-          class="map-resource-entry-btn"
+          class="map-resource-entry-btn left-6 top-5"
           data-testid="map-resource-entry-button"
           @click="onResourcePanelOpen"
         >
@@ -869,7 +883,7 @@ onBeforeUnmount(() => {
           </svg>
         </button>
 
-        <div class="zoom-panel">
+        <div class="zoom-panel right-6 bottom-5">
           <div class="zoom-label-row">
             <span class="zoom-label">{{ t('map.scale') }}</span>
             <span class="zoom-value">{{ displayScaleText }}</span>
@@ -885,20 +899,6 @@ onBeforeUnmount(() => {
           />
         </div>
       </div>
-
-      <MapResourceFilterPanel
-        v-show="isResourcePanelOpen"
-        :sector-layouts="searchSectors"
-        :mode="isResourcePanelOpen ? 'sidebar' : 'overlay'"
-        :show-entry-button="false"
-        @highlight-change="onResourceHighlightChange"
-        @resource-visual-change="onResourceVisualChange"
-        @select-sector="onResourceSectorSelect"
-        @active-change="onResourceActiveChange"
-        @primary-color-change="onResourcePrimaryColorChange"
-        @panel-open="onResourcePanelOpen"
-        @panel-close="onResourcePanelClose"
-      />
     </div>
   </section>
 </template>
@@ -950,12 +950,12 @@ onBeforeUnmount(() => {
 }
 
 .map-search-panel {
-  @apply absolute left-6 top-5 z-10;
+  @apply absolute z-10;
   width: 220px;
 }
 
 .map-resource-entry-btn {
-  @apply absolute right-6 top-5 z-10 inline-flex h-10 items-center justify-center gap-2 rounded border border-amber-300/40 bg-black/75 px-4 text-sm font-semibold text-amber-50 shadow-xl transition-colors duration-150 hover:border-amber-200/70 hover:bg-black/85;
+  @apply absolute z-10 inline-flex h-10 items-center justify-center gap-2 rounded border border-amber-300/40 bg-black/75 px-4 text-sm font-semibold text-amber-50 shadow-xl transition-colors duration-150 hover:border-amber-200/70 hover:bg-black/85;
   backdrop-filter: blur(4px);
 }
 
@@ -1019,7 +1019,7 @@ onBeforeUnmount(() => {
 }
 
 .zoom-panel {
-  @apply absolute left-6 bottom-5 z-10 rounded-md border border-amber-300/40 bg-black/70 px-3 py-2;
+  @apply absolute z-10 rounded-md border border-amber-300/40 bg-black/70 px-3 py-2;
   width: 220px;
   backdrop-filter: blur(4px);
 }

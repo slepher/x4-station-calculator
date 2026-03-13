@@ -249,4 +249,23 @@ describe('MapWorkbenchView tooltip interactions', () => {
       }
     })
   })
+
+  it('anchors search, resource filter, zoom, and sidebar in the updated map positions', async () => {
+    const wrapper = buildWrapper()
+
+    expect(wrapper.get('.map-search-panel').classes()).toContain('right-6')
+    expect(wrapper.get('.map-search-panel').classes()).not.toContain('left-6')
+    expect(wrapper.get('.map-resource-entry-btn').classes()).toContain('left-6')
+    expect(wrapper.get('.map-resource-entry-btn').classes()).not.toContain('right-6')
+    expect(wrapper.get('.zoom-panel').classes()).toContain('right-6')
+    expect(wrapper.get('.zoom-panel').classes()).not.toContain('left-6')
+
+    const panel = wrapper.getComponent({ name: 'MapResourceFilterPanel' })
+    panel.vm.$emit('panel-open')
+    await nextTick()
+
+    const layoutChildren = Array.from(wrapper.get('.map-layout').element.children)
+    expect(layoutChildren[0]?.getAttribute('data-testid')).toBe('map-resource-filter-panel')
+    expect(layoutChildren[1]?.classList.contains('map-shell')).toBe(true)
+  })
 })
