@@ -38,6 +38,7 @@ type MapSectorDataset = {
   resources: MapSectorResourceEntry[]
   scalePerRadius: number
 }
+const UNASSIGNED_STATION_GROUP_ID = '__unassigned__'
 type SectorHoverPayload = {
   sectorId: string
   clusterId: string
@@ -79,17 +80,20 @@ type PlacementOverlayItem = {
   id: string
   kind: 'station' | 'sector'
   name: string
+  icon: 'factory' | 'shipyard' | 'tradestation'
   location: EntityLocation
 }
 type PlacementPreview = {
   kind: 'station' | 'sector'
   name: string
+  icon: 'factory' | 'shipyard' | 'tradestation'
   location: EntityLocation
 }
 type DraggingPlacementItem = {
   id: string
   kind: 'station' | 'sector'
   name: string
+  icon: 'factory' | 'shipyard' | 'tradestation'
 }
 
 const clusterRefHeightPx = ref(142)
@@ -132,6 +136,7 @@ const resourcePrimaryColor = ref<string | null>(null)
 const resourceSectorFills = ref<Record<string, SectorResourceFill>>({})
 const draggingPlacementItem = ref<DraggingPlacementItem | null>(null)
 const draggingOverlayKey = ref<string | null>(null)
+const focusedPlacementKey = ref<string | null>(null)
 const placementPreview = ref<PlacementPreview | null>(null)
 const hoveredSectorSource = ref<SectorHoverPayload | null>(null)
 const lastHoveredSectorSource = ref<SectorHoverPayload | null>(null)
@@ -185,21 +190,53 @@ const normalizedSearchQuery = computed(() => searchQuery.value.trim().toLowerCas
 const stationPanelItems = computed<MapStationPanelItem[]>(() => {
   const empire = empireStore.activeEmpire
   if (!empire) return []
-  const sectorItems = (empire.sectors || []).map((sector) => ({
-    id: sector.id,
-    kind: 'sector' as const,
-    name: sector.name,
-    targetSectorName: sector.location ? (sectorsById.value[sector.location.sector_id]?.displayName || sector.location.sector_id) : undefined,
-    location: sector.location
-  }))
-  const stationItems = (empire.stations || []).map((station) => ({
-    id: station.id,
-    kind: 'station' as const,
-    name: station.name,
-    targetSectorName: station.location ? (sectorsById.value[station.location.sector_id]?.displayName || station.location.sector_id) : undefined,
-    location: station.location
-  }))
-  return [...stationItems, ...sectorItems]
+  const sortedSectors = [...(empire.sectors || [])].sort((left, right) => (left.order || 0) - (right.order || 0))
+  const items: MapStationPanelItem[] = []
+
+  sortedSectors.forEach((sector) => {
+    items.push({
+      id: sector.id,
+      kind: 'sector',
+      name: sector.name,
+      icon: 'tradestation',
+      groupId: sector.id,
+      groupName: sector.name,
+      targetSectorName: sector.location ? (sectorsById.value[sector.location.sector_id]?.displayName || sector.location.sector_id) : undefined,
+      location: sector.location
+    })
+
+    ;(empire.stations || [])
+      .filter((station) => station.sectorId === sector.id)
+      .forEach((station) => {
+        items.push({
+          id: station.id,
+          kind: 'station',
+          name: station.name,
+          icon: station.type === 'shipyard' ? 'shipyard' : 'factory',
+          groupId: sector.id,
+          groupName: sector.name,
+          targetSectorName: station.location ? (sectorsById.value[station.location.sector_id]?.displayName || station.location.sector_id) : undefined,
+          location: station.location
+        })
+      })
+  })
+
+  ;(empire.stations || [])
+    .filter((station) => !station.sectorId)
+    .forEach((station) => {
+      items.push({
+        id: station.id,
+        kind: 'station',
+        name: station.name,
+        icon: station.type === 'shipyard' ? 'shipyard' : 'factory',
+        groupId: UNASSIGNED_STATION_GROUP_ID,
+        groupName: t('sectorManagement.unassigned'),
+        targetSectorName: station.location ? (sectorsById.value[station.location.sector_id]?.displayName || station.location.sector_id) : undefined,
+        location: station.location
+      })
+    })
+
+  return items
 })
 const placementOverlays = computed<PlacementOverlayItem[]>(() => {
   if (!isStationPanelOpen.value) return []
@@ -210,6 +247,7 @@ const placementOverlays = computed<PlacementOverlayItem[]>(() => {
       id: item.id,
       kind: item.kind,
       name: item.name,
+      icon: item.icon,
       location: item.location
     }))
 })
@@ -686,6 +724,31 @@ const focusSector = (sectorId: string) => {
   clampPan(vw * 0.5 - target.centerX * targetScale, vh * 0.5 - target.centerY * targetScale)
 }
 
+const focusPlacementOverlay = async (placementKey: string) => {
+  const viewport = viewportRef.value
+  if (!viewport) return
+
+  const targetScale = scale.value < 1 ? clampScale(1) : scale.value
+  if (targetScale !== scale.value) {
+    scale.value = targetScale
+    syncSliderFromScale()
+    await nextTick()
+  }
+
+  const overlay = viewport.querySelector<SVGGElement>(`[data-placement-key="${placementKey}"]`)
+  if (!overlay) return
+
+  const viewportRect = viewport.getBoundingClientRect()
+  const overlayRect = overlay.getBoundingClientRect()
+  const overlayCenterX = overlayRect.left - viewportRect.left + overlayRect.width / 2
+  const overlayCenterY = overlayRect.top - viewportRect.top + overlayRect.height / 2
+
+  clampPan(
+    panX.value + viewportRect.width / 2 - overlayCenterX,
+    panY.value + viewportRect.height / 2 - overlayCenterY
+  )
+}
+
 const onSliderInput = (event: Event) => {
   const input = event.target as HTMLInputElement
   const value = Number(input.value)
@@ -717,6 +780,7 @@ const onClearSearch = () => {
 }
 
 const selectSector = (sectorId: string, source: 'search' | 'resource') => {
+  focusedPlacementKey.value = null
   selectedSectorId.value = sectorId
   selectedSectorSource.value = source
   if (source === 'search') {
@@ -777,6 +841,7 @@ const onStationPanelOpen = () => {
 
 const onStationPanelClose = () => {
   isStationPanelOpen.value = false
+  focusedPlacementKey.value = null
   clearPlacementState()
 }
 
@@ -784,7 +849,8 @@ const onStationItemDragStart = (item: MapStationPanelItem) => {
   draggingPlacementItem.value = {
     id: item.id,
     kind: item.kind,
-    name: item.name
+    name: item.name,
+    icon: item.icon
   }
   draggingOverlayKey.value = item.location ? `${item.kind}:${item.id}` : null
 }
@@ -802,9 +868,11 @@ const onStationItemClearLocation = (item: MapStationPanelItem) => {
 }
 
 const onStationItemFocus = (item: MapStationPanelItem) => {
-  const targetSectorId = item.location?.sector_id
-  if (!targetSectorId) return
-  selectSector(targetSectorId, 'search')
+  if (!item.location) return
+  selectedSectorId.value = null
+  selectedSectorSource.value = null
+  focusedPlacementKey.value = `${item.kind}:${item.id}`
+  void focusPlacementOverlay(focusedPlacementKey.value)
 }
 
 const onMouseDown = (event: MouseEvent) => {
@@ -827,6 +895,7 @@ const onMouseMove = (event: MouseEvent) => {
     placementPreview.value = location ? {
       kind: draggingPlacementItem.value.kind,
       name: draggingPlacementItem.value.name,
+      icon: draggingPlacementItem.value.icon,
       location
     } : null
   }
@@ -887,6 +956,7 @@ const onViewportDragOver = (event: DragEvent) => {
   placementPreview.value = location ? {
     kind: draggingPlacementItem.value.kind,
     name: draggingPlacementItem.value.name,
+    icon: draggingPlacementItem.value.icon,
     location
   } : null
 }
@@ -901,11 +971,18 @@ const onViewportDrop = (event: DragEvent) => {
   clearPlacementState()
 }
 
-const onOverlayPointerDown = (payload: { key: string; id: string; kind: 'station' | 'sector'; name: string }) => {
+const onOverlayPointerDown = (payload: {
+  key: string
+  id: string
+  kind: 'station' | 'sector'
+  name: string
+  icon: 'factory' | 'shipyard' | 'tradestation'
+}) => {
   draggingPlacementItem.value = {
     id: payload.id,
     kind: payload.kind,
-    name: payload.name
+    name: payload.name,
+    icon: payload.icon
   }
   draggingOverlayKey.value = payload.key
 }
@@ -1011,6 +1088,7 @@ onBeforeUnmount(() => {
               :placement-overlays="placementOverlays"
               :placement-preview="isStationPanelOpen ? placementPreview : null"
               :dragging-overlay-key="draggingOverlayKey"
+              :focused-overlay-key="focusedPlacementKey"
               @content-size="onCanvasSize"
               @sector-layout="onSectorLayout"
               @sector-hover="onSectorHover"

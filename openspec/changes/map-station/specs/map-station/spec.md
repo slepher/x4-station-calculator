@@ -22,11 +22,12 @@
 - **那么** 系统 SHALL 切换为左侧工作面板 + 地图布局
 - **并且** 左侧工作面板 SHALL 显示当前 empire 的可放置对象列表
 
-#### Scenario: 左侧工作面板采用方案 A 双区块结构
+#### Scenario: 左侧工作面板按 empire sector 分组
 - **前提** 空间站面板已打开
 - **当** 用户查看面板内容
-- **那么** 系统 SHALL 显示“未放置”区块与“已放置”区块
-- **并且** 每个区块 SHALL 列出对应状态的 `station` 与 `sector transit` 对象
+- **那么** 系统 SHALL 按 `activeEmpire.sectors` 的当前排序显示分组
+- **并且** 每个分组 SHALL 列出对应 `sector transit` 与其下属 `station`
+- **并且** `station.sectorId` 为空的对象 SHALL 显示在“未分配”分组
 
 #### Scenario: 空间站面板内搜索与清空
 - **前提** 空间站面板已打开
@@ -40,9 +41,10 @@
 - **前提** 空间站面板已打开
 - **当** 用户查看列表内容
 - **那么** 系统 SHALL 使用整个面板主体共享的统一滚动容器
-- **并且** SHALL NOT 为“未放置 / 已放置”分别创建独立滚动区域
+- **并且** SHALL NOT 为分组分别创建独立滚动区域
 - **并且** 列表项 SHALL NOT 显示 `station`、`sector transit`、`未放置` 这类状态字样
 - **并且** 列表拖拽入口 SHALL 以拖动手柄呈现，而不是“拖动到地图”文案
+- **并且** 列表项左侧对象图标 SHALL 与星图 overlay 使用同源 SVG 与接近尺寸
 
 #### Scenario: 关闭面板时隐藏空间站相关内容
 - **前提** 用户当前处于空间站工作态
@@ -67,6 +69,13 @@
 
 ### Requirement: Drag To Map Sector And Save Raw Position
 系统 MUST 支持将 `station` 或 `sector transit` 拖入目标地图 sector，并以原始坐标保存落点。
+
+#### Scenario: 拖拽预览与 overlay 使用类型图标
+- **前提** 用户正在拖拽或查看已放置对象
+- **当** 系统渲染拖拽 ghost、拖拽预览或地图 overlay
+- **那么** 普通 `station` SHALL 使用 `factory.svg`
+- **并且** `station.type === shipyard` SHALL 使用 `shipyard.svg`
+- **并且** `sector transit` SHALL 使用 `tradestation.svg`
 
 #### Scenario: 拖入 station 到地图星区
 - **前提** 当前 empire 中存在某个 `station`
@@ -113,11 +122,13 @@
 - **那么** 系统 SHALL 移除该对象的 `location`
 - **并且** 该对象 SHALL 恢复为未放置状态
 
-#### Scenario: 点击已放置对象时 focus 到目标地图星区
+#### Scenario: 点击已放置对象时 focus 到对象自身 overlay
 - **前提** 某个 `station` 或 `sector transit` 当前已有 `location`
 - **并且** 空间站面板已打开
-- **当** 用户点击该对象在“已放置”区块中的列表项
-- **那么** 系统 SHALL focus 到该对象目标地图星区
-- **并且** focus 效果 SHALL 与点击地图搜索结果保持一致
-- **并且** 已放置项 SHALL 显示目标地图星区的本地化名称
+- **当** 用户点击该对象在面板分组中的列表项
+- **那么** 系统 SHALL focus 到该对象自身的地图 overlay 落点
+- **并且** 系统 SHALL 高亮该对象自身 overlay
+- **并且** SHALL NOT 额外高亮目标地图星区
+- **并且** 已放置项 SHALL 以 tag 形式显示目标地图星区的本地化名称
+- **并且** 清除位置操作 SHALL 以内嵌小图标形式出现在该 tag 内
 - **并且** SHALL NOT 显示 `sector_id` 与坐标

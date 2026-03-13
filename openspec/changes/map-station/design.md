@@ -18,20 +18,23 @@
 - 面板中的对象数据来自 `activeEmpire`：
   - `sectors` 列表作为“中转点对象”
   - `stations` 列表作为“空间站对象”
-- 面板采用方案 A：
-  - 上半区为“未放置”
-  - 下半区为“已放置”
+- 面板按 empire 结构分组，而不是按放置状态分组：
+  - 分组顺序遵循 `activeEmpire.sectors` 的排序
+  - 每个分组标题使用对应 `SectorPlan.name`
+  - 组内先显示该 `sector` 自身的 transit 对象，再显示 `station.sectorId === sector.id` 的 stations
+  - `station.sectorId` 为空的对象进入单独“未分配”分组
 - 每个对象显示最小必要信息：
   - 名称
-  - 图标
+  - 图标（与星图 overlay 使用同源 SVG）
   - 拖动手柄
-  - 已放置时提供清除位置入口
+  - 已放置时提供内嵌在目标星区 tag 中的清除位置入口
 - 已放置对象再次从面板拖出时，语义为“重新放置 / 移动”，不是复制。
 - 面板内部拥有独立搜索框，仅过滤当前面板中的 `station / sector transit` 对象。
 - 搜索框需要提供清空入口，不影响地图右上角星区搜索框。
 - “未放置 / 已放置”两个区块共享同一个滚动容器；滚动条样式需与面板整体视觉一致。
 - 已放置区块中的对象卡片不显示 `sector_id` 与坐标，而是显示目标地图星区的本地化名称。
-- 点击已放置对象卡片时，地图复用 `focusSector()` 逻辑聚焦到该对象的目标地图星区。
+- 目标地图星区名称采用 tag/pill 样式，清除按钮以小图标形式嵌入该 tag 内。
+- 点击已放置对象卡片时，地图应聚焦到该对象自身 overlay，而不是额外选中目标星区。
 
 ### 1.3 地图放置与微调
 - 当用户从面板拖出对象进入地图时，地图进入放置态：
@@ -42,6 +45,11 @@
 - overlay 节点支持再次拖动，以便在同一 sector 内微调，或拖到另一 sector。
 - 面板关闭后，overlay 节点和拖放辅助态一起隐藏。
 - 列表项右侧不再显示“拖到地图”文案，而是以 drag handle 形式作为拖拽入口提示。
+- 拖拽 ghost、拖拽预览与已放置 overlay 共用一套图标映射：
+  - 普通 `station` 使用 `factory.svg`
+  - `station.type === shipyard` 使用 `shipyard.svg`
+  - `sector transit` 使用 `tradestation.svg`
+- 图标视觉尺寸保持接近原占位 marker，不扩大交互热点。
 
 ## 2. 数据模型设计
 
@@ -90,7 +98,8 @@
 ### 3.3 再次拖动与清除
 - 再次拖动 overlay marker 时，流程与首次放置相同，只是最终更新原对象 `location`。
 - 清除位置操作直接移除对象的 `location` 字段。
-- 点击已放置对象列表项时，不修改 `location`，仅触发镜头 focus 到其目标地图星区。
+- 点击已放置对象列表项时，不修改 `location`，仅触发镜头 focus 到其自身 overlay 落点。
+- focus 高亮只作用于 overlay 自身，不向目标地图星区写入额外选中态。
 
 ## 4. Store 与 dirty 设计
 

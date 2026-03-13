@@ -2,6 +2,9 @@
 import { computed, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import mapsData from '@/assets/x4_game_data/8.0-Diplomacy/data/maps.json'
+import factoryIconUrl from '@/components/icon/factory.svg'
+import shipyardIconUrl from '@/components/icon/shipyard.svg'
+import tradestationIconUrl from '@/components/icon/tradestation.svg'
 
 type Vec2 = { x: number; y: number }
 type LayoutConfig = { width: number; height: number; padX: number; padY: number; topPad: number }
@@ -107,11 +110,13 @@ type PlacementOverlay = {
   id: string
   kind: 'station' | 'sector'
   name: string
+  icon: 'factory' | 'shipyard' | 'tradestation'
   location: PlacementLocation
 }
 type PlacementPreview = {
   kind: 'station' | 'sector'
   name: string
+  icon: 'factory' | 'shipyard' | 'tradestation'
   location: PlacementLocation
 }
 
@@ -129,6 +134,8 @@ const STARGATE_VISUAL_SCALE = 1.5
 const SEARCH_HIGHLIGHT_FILTER_ID = 'map-search-sector-glow'
 const RESOURCE_HIGHLIGHT_FILTER_ID = 'map-resource-sector-glow'
 const SEARCH_SELECTED_FILTER_ID = 'map-search-sector-selected-glow'
+const OVERLAY_ICON_SIZE = 18
+const PREVIEW_ICON_SIZE = 20
 
 const props = withDefaults(defineProps<{
   searchHighlightedSectorIds?: string[]
@@ -139,6 +146,7 @@ const props = withDefaults(defineProps<{
   placementOverlays?: PlacementOverlay[]
   placementPreview?: PlacementPreview | null
   draggingOverlayKey?: string | null
+  focusedOverlayKey?: string | null
 }>(), {
   searchHighlightedSectorIds: () => [],
   resourceHighlightedSectorIds: () => [],
@@ -147,7 +155,8 @@ const props = withDefaults(defineProps<{
   selectedSectorId: null,
   placementOverlays: () => [],
   placementPreview: null,
-  draggingOverlayKey: null
+  draggingOverlayKey: null,
+  focusedOverlayKey: null
 })
 
 const emit = defineEmits<{
@@ -163,6 +172,11 @@ const svgIdSafe = (value: string) => value.replace(/[^a-zA-Z0-9_-]/g, '_')
 const sectorClipId = (clusterId: string, sectorId: string) =>
   `sector-clip-${svgIdSafe(clusterId)}-${svgIdSafe(sectorId)}`
 const resolveOwnerColor = (node: { owner_color?: string }) => node.owner_color || FALLBACK_OWNER_COLOR
+const placementIconHref = (icon: 'factory' | 'shipyard' | 'tradestation') => {
+  if (icon === 'shipyard') return shipyardIconUrl
+  if (icon === 'tradestation') return tradestationIconUrl
+  return factoryIconUrl
+}
 
 const resolveName = (nameId?: string, fallback?: string) => {
   if (nameId && te(nameId)) {
@@ -1084,14 +1098,22 @@ watchEffect(() => {
         v-for="overlay in overlayScreenItems"
         :key="overlay.key"
         class="placement-overlay"
-        :class="[
-          overlay.kind === 'station' ? 'placement-overlay-station' : 'placement-overlay-sector',
-          { dragging: draggingOverlayKey === overlay.key }
-        ]"
+        :class="{
+          dragging: draggingOverlayKey === overlay.key,
+          focused: focusedOverlayKey === overlay.key
+        }"
         :transform="`translate(${overlay.x.toFixed(1)} ${overlay.y.toFixed(1)})`"
+        :data-placement-key="overlay.key"
         @mousedown.stop="emit('overlay-pointerdown', overlay)"
       >
-        <circle r="8" />
+        <image
+          :href="placementIconHref(overlay.icon)"
+          :x="(-OVERLAY_ICON_SIZE / 2).toFixed(1)"
+          :y="(-OVERLAY_ICON_SIZE / 2).toFixed(1)"
+          :width="OVERLAY_ICON_SIZE"
+          :height="OVERLAY_ICON_SIZE"
+          preserveAspectRatio="xMidYMid meet"
+        />
         <text x="0" y="-12" text-anchor="middle">{{ overlay.name }}</text>
       </g>
       <g
@@ -1099,7 +1121,14 @@ watchEffect(() => {
         class="placement-preview"
         :transform="`translate(${previewScreenItem.x.toFixed(1)} ${previewScreenItem.y.toFixed(1)})`"
       >
-        <circle r="9" />
+        <image
+          :href="placementIconHref(previewScreenItem.icon)"
+          :x="(-PREVIEW_ICON_SIZE / 2).toFixed(1)"
+          :y="(-PREVIEW_ICON_SIZE / 2).toFixed(1)"
+          :width="PREVIEW_ICON_SIZE"
+          :height="PREVIEW_ICON_SIZE"
+          preserveAspectRatio="xMidYMid meet"
+        />
         <text x="0" y="-13" text-anchor="middle">{{ previewScreenItem.name }}</text>
       </g>
     </g>
@@ -1149,20 +1178,24 @@ watchEffect(() => {
   cursor: grab;
 }
 
-.placement-overlay circle,
-.placement-preview circle {
-  fill: rgba(251, 191, 36, 0.88);
-  stroke: #111827;
-  stroke-width: 1.4;
-}
-
-.placement-overlay-sector circle {
-  fill: rgba(125, 211, 252, 0.9);
+.placement-overlay image,
+.placement-preview image {
+  overflow: visible;
 }
 
 .placement-overlay.dragging {
   opacity: 0.18;
   pointer-events: none;
+}
+
+.placement-overlay.focused image {
+  filter:
+    drop-shadow(0 0 4px rgba(253, 230, 138, 0.95))
+    drop-shadow(0 0 10px rgba(245, 158, 11, 0.7));
+}
+
+.placement-overlay.focused text {
+  fill: #fff7d6;
 }
 
 .placement-overlay text,
@@ -1174,11 +1207,5 @@ watchEffect(() => {
 
 .placement-preview {
   pointer-events: none;
-}
-
-.placement-preview circle {
-  fill: rgba(245, 158, 11, 0.4);
-  stroke: #fde68a;
-  stroke-dasharray: 3 2;
 }
 </style>

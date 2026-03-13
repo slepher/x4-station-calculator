@@ -1,13 +1,20 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import factoryIconUrl from '@/components/icon/factory.svg'
+import shipyardIconUrl from '@/components/icon/shipyard.svg'
+import tradestationIconUrl from '@/components/icon/tradestation.svg'
 
 type StationPanelFilter = 'all' | 'station' | 'sector' | 'unplaced' | 'placed'
+type PlacementIcon = 'factory' | 'shipyard' | 'tradestation'
 
 export type MapStationPanelItem = {
   id: string
   kind: 'station' | 'sector'
   name: string
+  icon: PlacementIcon
+  groupId: string
+  groupName: string
   targetSectorName?: string
   location?: {
     cluster_id: string
@@ -50,9 +57,22 @@ const filteredItems = computed(() => {
     return true
   })
 })
-
-const unplacedItems = computed(() => filteredItems.value.filter((item) => !item.location))
-const placedItems = computed(() => filteredItems.value.filter((item) => !!item.location))
+const groupedItems = computed(() => {
+  const groups = new Map<string, { id: string; name: string; items: MapStationPanelItem[] }>()
+  filteredItems.value.forEach((item) => {
+    const existing = groups.get(item.groupId)
+    if (existing) {
+      existing.items.push(item)
+      return
+    }
+    groups.set(item.groupId, {
+      id: item.groupId,
+      name: item.groupName,
+      items: [item]
+    })
+  })
+  return Array.from(groups.values())
+})
 
 const filterTabs = computed<Array<{ id: StationPanelFilter; label: string }>>(() => [
   { id: 'all', label: t('map.station_panel_filter_all') },
@@ -62,10 +82,33 @@ const filterTabs = computed<Array<{ id: StationPanelFilter; label: string }>>(()
   { id: 'placed', label: t('map.station_panel_filter_placed') }
 ])
 
+const iconUrlByType: Record<PlacementIcon, string> = {
+  factory: factoryIconUrl,
+  shipyard: shipyardIconUrl,
+  tradestation: tradestationIconUrl
+}
+
 const onDragStart = (event: DragEvent, item: MapStationPanelItem) => {
   if (event.dataTransfer) {
     event.dataTransfer.setData('application/x-map-station-item', JSON.stringify({ id: item.id, kind: item.kind }))
     event.dataTransfer.effectAllowed = 'move'
+    const iconUrl = iconUrlByType[item.icon]
+    if (iconUrl && typeof document !== 'undefined') {
+      const dragGhost = document.createElement('div')
+      dragGhost.style.position = 'fixed'
+      dragGhost.style.left = '-9999px'
+      dragGhost.style.top = '-9999px'
+      dragGhost.style.width = '18px'
+      dragGhost.style.height = '18px'
+      dragGhost.style.backgroundImage = `url("${iconUrl}")`
+      dragGhost.style.backgroundPosition = 'center'
+      dragGhost.style.backgroundRepeat = 'no-repeat'
+      dragGhost.style.backgroundSize = 'contain'
+      dragGhost.style.pointerEvents = 'none'
+      document.body.appendChild(dragGhost)
+      event.dataTransfer.setDragImage(dragGhost, 9, 9)
+      window.setTimeout(() => dragGhost.remove(), 0)
+    }
   }
   emit('drag-start', item)
 }
@@ -129,62 +172,65 @@ watch(() => props.open, (open) => {
         </button>
       </div>
 
-      <div class="map-station-panel__section">
-        <div class="map-station-panel__section-title">{{ t('map.station_panel_unplaced') }}</div>
-        <div v-if="unplacedItems.length > 0" class="map-station-panel__list">
-        <div
-          v-for="item in unplacedItems"
-          :key="`${item.kind}:${item.id}`"
-          class="map-station-panel__item"
-          draggable="true"
-          @dragstart="onDragStart($event, item)"
-          @dragend="onDragEnd"
-        >
-          <div class="map-station-panel__item-main">
-            <span class="map-station-panel__icon">{{ item.kind === 'station' ? '⌂' : '⇄' }}</span>
-            <div class="map-station-panel__name">{{ item.name }}</div>
-          </div>
-          <div class="map-station-panel__handle" aria-hidden="true">
-            <span></span><span></span><span></span>
-          </div>
-        </div>
-        </div>
-        <div v-else class="map-station-panel__empty">{{ t('map.station_panel_empty') }}</div>
-      </div>
-
-      <div class="map-station-panel__section">
-        <div class="map-station-panel__section-title">{{ t('map.station_panel_placed') }}</div>
-        <div v-if="placedItems.length > 0" class="map-station-panel__list">
-        <div
-          v-for="item in placedItems"
-          :key="`${item.kind}:${item.id}`"
-          class="map-station-panel__item map-station-panel__item--placed"
-          draggable="true"
-          @dragstart="onDragStart($event, item)"
-          @dragend="onDragEnd"
-          @click="emit('focus-item', item)"
-        >
-          <div class="map-station-panel__item-main">
-            <span class="map-station-panel__icon">{{ item.kind === 'station' ? '⌂' : '⇄' }}</span>
-            <div class="map-station-panel__meta">
-              <div class="map-station-panel__name">{{ item.name }}</div>
-              <div class="map-station-panel__sub">{{ item.targetSectorName }}</div>
+      <div
+        v-for="group in groupedItems"
+        :key="group.id"
+        class="map-station-panel__section"
+      >
+        <div class="map-station-panel__section-title">{{ group.name }}</div>
+        <div class="map-station-panel__list">
+          <div
+            v-for="item in group.items"
+            :key="`${item.kind}:${item.id}`"
+            class="map-station-panel__item"
+            :class="{ 'map-station-panel__item--placed': !!item.location }"
+            draggable="true"
+            @dragstart="onDragStart($event, item)"
+            @dragend="onDragEnd"
+            @click="item.location ? emit('focus-item', item) : undefined"
+          >
+            <div class="map-station-panel__item-main">
+              <img
+                class="map-station-panel__icon"
+                :src="iconUrlByType[item.icon]"
+                alt=""
+                aria-hidden="true"
+              />
+              <div v-if="item.location" class="map-station-panel__meta">
+                <div class="map-station-panel__name">{{ item.name }}</div>
+                <div class="map-station-panel__sub-row">
+                  <div class="map-station-panel__sub-tag">
+                    <span>{{ item.targetSectorName }}</span>
+                    <button
+                      class="map-station-panel__clear-inline"
+                      type="button"
+                      :title="t('map.station_panel_clear_action')"
+                      :aria-label="t('map.station_panel_clear_action')"
+                      @click.stop="emit('clear-location', item)"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="M6.5 6.5l11 11M17.5 6.5l-11 11"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-linecap="round"
+                          stroke-width="2"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="map-station-panel__name">{{ item.name }}</div>
+            </div>
+            <div class="map-station-panel__handle" aria-hidden="true">
+              <span></span><span></span><span></span>
             </div>
           </div>
-          <div class="map-station-panel__handle" aria-hidden="true">
-            <span></span><span></span><span></span>
-          </div>
-          <button
-            class="map-station-panel__clear"
-            type="button"
-            @click.stop="emit('clear-location', item)"
-          >
-            {{ t('map.station_panel_clear_action') }}
-          </button>
         </div>
-        </div>
-        <div v-else class="map-station-panel__empty">{{ t('map.station_panel_empty') }}</div>
       </div>
+
+      <div v-if="groupedItems.length === 0" class="map-station-panel__empty">{{ t('map.station_panel_empty') }}</div>
 
       <div class="map-station-panel__hint">{{ t('map.station_panel_hint') }}</div>
     </div>
@@ -277,7 +323,7 @@ watch(() => props.open, (open) => {
 }
 
 .map-station-panel__icon {
-  @apply mt-0.5 text-sm text-amber-200;
+  @apply h-[18px] w-[18px] shrink-0 object-contain;
 }
 
 .map-station-panel__meta {
@@ -294,12 +340,28 @@ watch(() => props.open, (open) => {
   @apply text-xs text-amber-100/60;
 }
 
+.map-station-panel__sub-row {
+  @apply flex items-center gap-1.5;
+}
+
+.map-station-panel__sub-tag {
+  @apply inline-flex items-center rounded-full border border-amber-300/20 bg-amber-200/10 px-2 py-0.5 text-[11px] leading-4 text-amber-100/75;
+}
+
 .map-station-panel__handle {
   @apply flex shrink-0 cursor-grab flex-col gap-1 rounded px-2 py-1 text-amber-200/55;
 }
 
 .map-station-panel__handle span {
   @apply block h-[2px] w-4 rounded-full bg-current;
+}
+
+.map-station-panel__clear-inline {
+  @apply inline-flex h-4 w-4 shrink-0 items-center justify-center self-center rounded text-amber-100/55 transition-colors duration-150 hover:text-amber-50;
+}
+
+.map-station-panel__clear-inline svg {
+  @apply h-3 w-3;
 }
 
 .map-station-panel__hint {

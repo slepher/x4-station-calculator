@@ -13,7 +13,7 @@
 
 - [x] 3. 空间站面板对象列表与操作
 - [x] 3.1 基于当前 `activeEmpire` 构造 `station` 与 `sector transit` 列表
-- [x] 3.2 在方案 A 结构中展示“未放置 / 已放置”区块、对象名称、类型与放置状态
+- [x] 3.2 按 empire 的 `sector` 排序构造分组列表，并为 `station.sectorId` 为空的对象提供“未分配”分组
 - [x] 3.3 为已放置对象提供清除位置/取消放置操作
 
 - [x] 4. 地图拖放与原始坐标换算
@@ -36,8 +36,14 @@
 - [x] 7.2 去除列表中的 `station` / `sector transit` / `未放置` 文案，并将“拖到地图”改为拖动手柄
 - [x] 7.3 将面板滚动改为整体单滚动容器，并统一滚动条风格
 - [x] 7.4 已放置对象显示目标地图星区名称，隐藏 `sector_id` 与坐标
-- [x] 7.5 点击已放置对象时复用 `focusSector()` 聚焦到对应目标地图星区
+- [x] 7.5 点击已放置对象时聚焦到对象自身 overlay，并只高亮 overlay 本身
+- [x] 7.6 将面板左侧对象图标对齐为与星图 overlay 同源的 SVG，并将清除位置操作收纳为 tag 内小图标
 
-- [x] 8. 重新构建验证
-- [x] 8.1 完成上述调整后再次执行 `npm run build`
-- [x] 8.2 若构建失败，修复后重新构建直至通过或记录 blocker
+- [x] 8. 地图图标映射收口
+- [x] 8.1 拖拽 ghost、拖拽预览与地图 overlay 统一使用对象类型图标
+- [x] 8.2 普通 `station` 使用 `factory.svg`，`shipyard` 使用 `shipyard.svg`，`sector transit` 使用 `tradestation.svg`
+- [x] 8.3 图标视觉尺寸保持与原 marker 体感一致
+
+- [x] 9. 重新构建验证
+- [x] 9.1 完成上述调整后再次执行 `npm run build`
+- [x] 9.2 若构建失败，修复后重新构建直至通过或记录 blocker
