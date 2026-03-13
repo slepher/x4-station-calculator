@@ -101,6 +101,8 @@
     "search_sector_placeholder": "搜索星区",
     "no_search_results": "未找到匹配星区",
     "resource_filter_all": "所有项",
+    "resource_filter_button": "资源",
+    "scale": "缩放",
     "resource_filter_mixed": "混合",
     "resource_filter_candidates": "命中候选",
     "resource_filter_no_match": "没有满足条件的星区",
