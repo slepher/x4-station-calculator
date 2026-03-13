@@ -196,6 +196,12 @@ The `.trae/skills/` directory contains markdown skill definitions for the Trae I
 
 These define the development workflow patterns used in this codebase.
 
+### Skill Resolution Priority
+
+- When both project-local and global skills exist with the same name, check the project-local skill first.
+- In this repository, project-local skills live under `.trae/skills/` and are also exposed via `.agents/skills/`.
+- Only fall back to global skills after confirming there is no applicable project-local skill.
+
 ## Working Guidelines
 
 ### When User Asks for Understanding/Analysis

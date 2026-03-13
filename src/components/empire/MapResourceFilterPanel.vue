@@ -369,7 +369,7 @@ const onPanelClose = () => emit('panel-close')
 }
 
 :deep(.advanced-refresh-btn) {
-  @apply shrink-0 whitespace-nowrap;
+  @apply ml-auto shrink-0 whitespace-nowrap;
 }
 
 :deep(.group-action.danger) {
