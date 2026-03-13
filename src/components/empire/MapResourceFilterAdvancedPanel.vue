@@ -26,11 +26,14 @@ type SearchSectorLayout = {
   displayName: string
   centerX: number
   centerY: number
+  radius: number
+  verticalExtent: number
 }
 
 type ResourceVisualChangePayload = {
   highlightedSectorIds: string[]
   sectorFills: Record<string, SectorResourceFill>
+  sectorGroupBadges?: Record<string, string[]>
 }
 
 type AdvancedCandidateViewModel = {
@@ -39,6 +42,7 @@ type AdvancedCandidateViewModel = {
   hubCandidateSectorIds: string[]
   coveredGroupIds: string[]
   score: number
+  resourceGroupBadges: Record<string, string[]>
 }
 
 type ResourceEntry = RegionYieldEntry & { color?: string }
@@ -57,6 +61,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'highlight-change', sectorIds: string[]): void
   (e: 'select-sector', sectorId: string): void
+  (e: 'fit-sectors', sectorIds: string[]): void
   (e: 'active-change', active: boolean): void
   (e: 'primary-color-change', color: string | null): void
   (e: 'resource-visual-change', payload: ResourceVisualChangePayload): void
@@ -156,10 +161,25 @@ const appliedResult = computed(() => buildAdvancedCandidates({
 const candidateKeyOf = (resourceSectorIds: string[]) => resourceSectorIds.slice().sort().join('|')
 
 const candidateViewModels = computed<AdvancedCandidateViewModel[]>(() =>
-  appliedResult.value.candidates.map((candidate) => ({
-    ...candidate,
-    key: candidateKeyOf(candidate.resourceSectorIds)
-  }))
+  appliedResult.value.candidates.map((candidate) => {
+    const groupOrder = Object.fromEntries(
+      normalizedAppliedGroups.value.map((group, index) => [group.id, String(index + 1)])
+    ) as Record<string, string>
+
+    const resourceGroupBadges = candidate.resourceSectorIds.reduce<Record<string, string[]>>((acc, sectorId) => {
+      const badges = (appliedResult.value.matchedGroupsBySector[sectorId] || [])
+        .map((groupId) => groupOrder[groupId])
+        .filter((value): value is string => Boolean(value))
+      if (badges.length) acc[sectorId] = badges
+      return acc
+    }, {})
+
+    return {
+      ...candidate,
+      key: candidateKeyOf(candidate.resourceSectorIds),
+      resourceGroupBadges
+    }
+  })
 )
 
 const selectedCandidate = computed(() => {
@@ -179,7 +199,7 @@ watchEffect(() => {
   if (!normalizedAppliedGroups.value.length) {
     emit('highlight-change', [])
     emit('active-change', false)
-    emit('resource-visual-change', { highlightedSectorIds: [], sectorFills: {} })
+    emit('resource-visual-change', { highlightedSectorIds: [], sectorFills: {}, sectorGroupBadges: {} })
     emit('primary-color-change', null)
     return
   }
@@ -194,7 +214,7 @@ watchEffect(() => {
 
   emit('highlight-change', highlightedSectorIds)
   emit('active-change', true)
-  emit('resource-visual-change', { highlightedSectorIds, sectorFills })
+  emit('resource-visual-change', { highlightedSectorIds, sectorFills, sectorGroupBadges: candidate?.resourceGroupBadges || {} })
   emit('primary-color-change', null)
 })
 
@@ -307,11 +327,20 @@ const refreshCandidates = () => {
   hasPendingRefresh.value = false
 }
 
-const groupTagLabels = (group: AdvancedResourceTagGroup) =>
+const groupTagItems = (group: AdvancedResourceTagGroup) =>
   group.tagIds.map((tagId) => {
-    if (tagId === ADVANCED_SUNLIGHT_TAG_ID) return t('map.resource_filter_sunlight')
-    const translated = t(`res.${tagId}`)
-    return translated !== `res.${tagId}` ? translated : tagId
+    const label = tagId === ADVANCED_SUNLIGHT_TAG_ID
+      ? t('map.resource_filter_sunlight')
+      : (() => {
+          const translated = t(`res.${tagId}`)
+          return translated !== `res.${tagId}` ? translated : tagId
+        })()
+
+    return {
+      tagId,
+      label,
+      color: resourceColors.value[tagId] || '#fbbf24'
+    }
   })
 
 const ordinaryTagsOfGroup = (group: AdvancedResourceTagGroup) => group.tagIds.filter((tagId) => tagId !== ADVANCED_SUNLIGHT_TAG_ID)
@@ -328,6 +357,7 @@ const openGroupEditor = (groupId: string) => {
 
 const onCandidateSelect = (candidate: AdvancedCandidateViewModel) => {
   selectedCandidateKey.value = candidate.key
+  emit('fit-sectors', Array.from(new Set([...candidate.resourceSectorIds, ...candidate.hubCandidateSectorIds])))
 }
 
 const onCandidateSectorTagClick = (candidate: AdvancedCandidateViewModel, sectorId: string) => {
@@ -487,7 +517,15 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
         <template v-else>
           <div class="advanced-group-line">
             <div class="advanced-group-summary">
-              <span v-for="label in groupTagLabels(group)" :key="label" class="summary-tag">{{ label }}</span>
+              <span
+                v-for="item in groupTagItems(group)"
+                :key="item.tagId"
+                class="summary-tag"
+                :data-testid="`map-resource-advanced-summary-tag-${group.id}-${item.tagId}`"
+                :style="{ backgroundColor: item.color, borderColor: item.color, color: '#111827' }"
+              >
+                {{ item.label }}
+              </span>
               <span v-if="!group.tagIds.length" class="summary-empty">{{ t('map.resource_filter_empty_group') }}</span>
             </div>
             <div class="advanced-group-actions">
@@ -519,24 +557,51 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
         >
           <div class="advanced-candidate-main">
             <div class="advanced-candidate-row">
+              <span class="candidate-type-pill" data-testid="map-resource-advanced-resource-pill">
+                <svg data-testid="map-resource-advanced-resource-pill-icon" class="candidate-type-pill-icon" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M8 1.5 13.5 4.75v6.5L8 14.5 2.5 11.25v-6.5L8 1.5Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" />
+                  <path d="M5.2 6.1h5.6M6 8h4M6.8 9.9h2.4" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+                </svg>
+                {{ t('map.resource_filter_resource_pill') }}
+              </span>
+              <div class="advanced-candidate-chip-list">
               <button
                 v-for="sectorId in candidate.resourceSectorIds"
                 :key="sectorId"
                 type="button"
                 class="candidate-chip candidate-chip-button"
+                :data-testid="`map-resource-advanced-resource-chip-${sectorId}`"
                 @click.stop="onCandidateSectorTagClick(candidate, sectorId)"
               >
                 {{ getSectorLabel(sectorId) }}
+                <span
+                  v-for="badge in candidate.resourceGroupBadges[sectorId] || []"
+                  :key="`${sectorId}-${badge}`"
+                  class="candidate-chip-badge"
+                  :data-testid="`map-resource-advanced-group-badge-${sectorId}-${badge}`"
+                >
+                  {{ badge }}
+                </span>
               </button>
+              </div>
             </div>
             <div class="advanced-candidate-meta">
-              <span>{{ t('map.resource_filter_hubs') }}:</span>
-              <span class="advanced-candidate-hubs">
+              <span class="candidate-type-pill" data-testid="map-resource-advanced-hub-pill">
+                <svg data-testid="map-resource-advanced-hub-pill-icon" class="candidate-type-pill-icon" viewBox="0 0 16 16" aria-hidden="true">
+                  <circle cx="3.5" cy="8" r="1.6" fill="currentColor" />
+                  <circle cx="12.5" cy="4" r="1.6" fill="currentColor" />
+                  <circle cx="12.5" cy="12" r="1.6" fill="currentColor" />
+                  <path d="M5 8h2.6M9.3 6l1.7-1M9.3 10l1.7 1" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+                </svg>
+                {{ t('map.resource_filter_hub_pill') }}
+              </span>
+              <span class="advanced-candidate-hubs advanced-candidate-chip-list">
                 <button
                   v-for="hubSectorId in candidate.hubCandidateSectorIds"
                   :key="hubSectorId"
                   type="button"
                   class="candidate-chip candidate-chip-button"
+                  :data-testid="`map-resource-advanced-hub-chip-${hubSectorId}`"
                   @click.stop="onCandidateSectorTagClick(candidate, hubSectorId)"
                 >
                   {{ getSectorLabel(hubSectorId) }}

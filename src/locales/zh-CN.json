@@ -122,6 +122,8 @@
     "resource_filter_add_group": "新增组",
     "resource_filter_remove_group": "删除",
     "resource_filter_empty_group": "请选择标签",
+    "resource_filter_resource_pill": "资源",
+    "resource_filter_hub_pill": "中转",
     "resource_filter_hubs": "中转候选",
     "resource_filter_sunlight": "日光",
     "resource_filter_sunlight_suffix": "%",

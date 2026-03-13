@@ -20,6 +20,8 @@ type SearchSectorLayout = {
   displayName: string
   centerX: number
   centerY: number
+  radius: number
+  verticalExtent: number
 }
 type SearchResultItem = SearchSectorLayout & {
   matchType: 'name' | 'localeName' | 'id'
@@ -134,6 +136,7 @@ const isResourcePanelOpen = ref(false)
 const isStationPanelOpen = ref(false)
 const resourcePrimaryColor = ref<string | null>(null)
 const resourceSectorFills = ref<Record<string, SectorResourceFill>>({})
+const resourceSectorGroupBadges = ref<Record<string, string[]>>({})
 const draggingPlacementItem = ref<DraggingPlacementItem | null>(null)
 const draggingOverlayKey = ref<string | null>(null)
 const focusedPlacementKey = ref<string | null>(null)
@@ -725,6 +728,40 @@ const focusSector = (sectorId: string) => {
   clampPan(vw * 0.5 - target.centerX * targetScale, vh * 0.5 - target.centerY * targetScale)
 }
 
+const fitSectors = (sectorIds: string[]) => {
+  const targets = Array.from(new Set(sectorIds))
+    .map((sectorId) => searchSectors.value.find((item) => item.sectorId === sectorId))
+    .filter((item): item is SearchSectorLayout => Boolean(item))
+  if (!targets.length) return
+
+  const { width: vw, height: vh } = getViewportSize()
+  if (!vw || !vh) return
+
+  const minX = Math.min(...targets.map((item) => item.centerX - item.radius))
+  const maxX = Math.max(...targets.map((item) => item.centerX + item.radius))
+  const minY = Math.min(...targets.map((item) => item.centerY - item.verticalExtent))
+  const maxY = Math.max(...targets.map((item) => item.centerY + item.verticalExtent))
+  const boundsW = Math.max(1, maxX - minX)
+  const boundsH = Math.max(1, maxY - minY)
+  const safeWidth = boundsW * 1.25
+  const safeHeight = boundsH * 1.25
+  const fittedScale = Math.min(vw / safeWidth, vh / safeHeight)
+  const maxRadius = Math.max(...targets.map((item) => item.radius), 1)
+  const maxVerticalExtent = Math.max(...targets.map((item) => item.verticalExtent), 1)
+  const targetScale = boundsW <= maxRadius * 2.2 && boundsH <= maxVerticalExtent * 2.2
+    ? (scale.value < 1 ? clampScale(1) : scale.value)
+    : clampScale(fittedScale)
+  const centerX = (minX + maxX) / 2
+  const centerY = (minY + maxY) / 2
+
+  focusedPlacementKey.value = null
+  selectedSectorId.value = null
+  selectedSectorSource.value = null
+  scale.value = targetScale
+  syncSliderFromScale()
+  clampPan(vw * 0.5 - centerX * targetScale, vh * 0.5 - centerY * targetScale)
+}
+
 const focusPlacementOverlay = async (placementKey: string) => {
   const viewport = viewportRef.value
   if (!viewport) return
@@ -807,12 +844,18 @@ const onResourceSectorSelect = (sectorId: string) => {
   selectSector(sectorId, 'resource')
 }
 
+const onResourceFitSectors = (sectorIds: string[]) => {
+  fitSectors(sectorIds)
+}
+
 const onResourceVisualChange = (payload: {
   highlightedSectorIds: string[]
   sectorFills: Record<string, SectorResourceFill>
+  sectorGroupBadges?: Record<string, string[]>
 }) => {
   resourceHighlightedSectorIds.value = payload.highlightedSectorIds
   resourceSectorFills.value = payload.sectorFills
+  resourceSectorGroupBadges.value = payload.sectorGroupBadges || {}
   const firstSectorId = payload.highlightedSectorIds[0]
   const firstFill = firstSectorId ? payload.sectorFills[firstSectorId] : null
   resourcePrimaryColor.value = firstFill?.mode === 'solid' ? firstFill.color : null
@@ -836,6 +879,7 @@ const onResourcePanelClose = () => {
   isResourcePanelOpen.value = false
   resourceHighlightedSectorIds.value = []
   resourceSectorFills.value = {}
+  resourceSectorGroupBadges.value = {}
   resourcePrimaryColor.value = null
 }
 
@@ -1048,6 +1092,7 @@ onBeforeUnmount(() => {
         @highlight-change="onResourceHighlightChange"
         @resource-visual-change="onResourceVisualChange"
         @select-sector="onResourceSectorSelect"
+        @fit-sectors="onResourceFitSectors"
         @active-change="onResourceActiveChange"
         @primary-color-change="onResourcePrimaryColorChange"
         @panel-open="onResourcePanelOpen"
@@ -1088,6 +1133,7 @@ onBeforeUnmount(() => {
               :search-highlighted-sector-ids="searchHighlightedSectorIds"
               :resource-highlighted-sector-ids="resourceHighlightedSectorIds"
               :resource-sector-fills="resourceSectorFills"
+              :resource-sector-group-badges="resourceSectorGroupBadges"
               :resource-fill-color-override="resourcePrimaryColor"
               :selected-sector-id="selectedSectorId"
               :placement-overlays="placementOverlays"

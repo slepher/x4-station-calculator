@@ -122,6 +122,8 @@
     "resource_filter_add_group": "Add Group",
     "resource_filter_remove_group": "Remove",
     "resource_filter_empty_group": "Select tags",
+    "resource_filter_resource_pill": "Resource",
+    "resource_filter_hub_pill": "Hub",
     "resource_filter_hubs": "Hubs",
     "resource_filter_sunlight": "Sunlight",
     "resource_filter_sunlight_suffix": "%",

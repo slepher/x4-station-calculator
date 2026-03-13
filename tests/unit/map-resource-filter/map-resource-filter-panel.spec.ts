@@ -76,6 +76,8 @@ vi.mock('vue-i18n', () => ({
         'map.resource_filter_sunlight': 'Sunlight',
         'map.resource_filter_candidates': 'Candidates',
         'map.resource_filter_no_match': 'No match',
+        'map.resource_filter_resource_pill': 'Resource',
+        'map.resource_filter_hub_pill': 'Hub',
       }
       return dict[key] || key
     }
@@ -131,12 +133,12 @@ describe('MapResourceFilterPanel', () => {
     })
 
     expect(wrapper.get('[data-testid="map-resource-entry-button"]').text()).toContain('Resource')
-    expect(wrapper.find('[data-testid="map-resource-tag-ore"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="map-resource-tag-ore"]').isVisible()).toBe(false)
 
     await wrapper.get('[data-testid="map-resource-entry-button"]').trigger('click')
 
     expect(wrapper.emitted('panel-open')).toEqual([[]])
-    expect(wrapper.find('[data-testid="map-resource-tag-ore"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="map-resource-tag-ore"]').isVisible()).toBe(false)
   })
 
   it('closes without resetting filters and re-emits highlights when reopened', async () => {
@@ -168,7 +170,7 @@ describe('MapResourceFilterPanel', () => {
     await wrapper.setProps({ mode: 'overlay' })
 
     expect(wrapper.emitted('highlight-change')?.at(-1)).toEqual([[]])
-    expect(wrapper.find('[data-testid="map-resource-tag-ore"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="map-resource-tag-ore"]').isVisible()).toBe(false)
 
     await wrapper.setProps({ mode: 'sidebar' })
 
@@ -256,5 +258,54 @@ describe('MapResourceFilterPanel', () => {
     expect(payload.sectorFills.sector_alpha.mode).toBe('pie')
     expect(payload.sectorFills.sector_alpha.slices.map((slice: any) => slice.ware)).toEqual(['ore', 'silicon'])
     expect(payload.sectorFills.sector_alpha.slices.reduce((sum: number, slice: any) => sum + slice.share, 0)).toBeCloseTo(1, 6)
+  })
+
+  it('renders advanced candidate rows with equal type pills and group badges', async () => {
+    const wrapper = mount(MapResourceFilterPanel, {
+      props: {
+        sectorLayouts: [
+          {
+            sectorId: 'sector_alpha',
+            clusterId: 'cluster_01',
+            name: 'Alpha',
+            displayName: 'Alpha',
+            centerX: 0,
+            centerY: 0
+          },
+          {
+            sectorId: 'sector_beta',
+            clusterId: 'cluster_01',
+            name: 'Beta',
+            displayName: 'Beta',
+            centerX: 120,
+            centerY: 40
+          }
+        ],
+        mode: 'sidebar'
+      }
+    })
+
+    await wrapper.get('[data-testid="map-resource-tab-advanced"]').trigger('click')
+    await wrapper.get('[data-testid="map-resource-advanced-tag-group_1-ore"]').trigger('click')
+    await wrapper.get('[data-testid="map-resource-advanced-add-group"]').trigger('click')
+    await wrapper.findAll('[data-testid$="-methane"]').at(-1)!.trigger('click')
+    await wrapper.get('[data-testid="map-resource-advanced-refresh"]').trigger('click')
+
+    const summaryTag = wrapper.get('[data-testid^="map-resource-advanced-summary-tag-"][data-testid$="-ore"]')
+    expect(summaryTag.attributes('style')).toContain('background-color')
+
+    const candidate = wrapper.get('[data-testid^="map-resource-advanced-candidate-"]')
+    const resourcePill = candidate.get('[data-testid="map-resource-advanced-resource-pill"]')
+    const hubPill = candidate.get('[data-testid="map-resource-advanced-hub-pill"]')
+    expect(resourcePill.text()).toBe('Resource')
+    expect(hubPill.text()).toBe('Hub')
+    expect(resourcePill.classes()).toContain('candidate-type-pill')
+    expect(hubPill.classes()).toContain('candidate-type-pill')
+    expect(resourcePill.get('[data-testid="map-resource-advanced-resource-pill-icon"]').exists()).toBe(true)
+    expect(hubPill.get('[data-testid="map-resource-advanced-hub-pill-icon"]').exists()).toBe(true)
+
+    const resourceChip = candidate.get('[data-testid="map-resource-advanced-resource-chip-sector_alpha"]')
+    const badge = resourceChip.get('[data-testid="map-resource-advanced-group-badge-sector_alpha-1"]')
+    expect(badge.text()).toBe('1')
   })
 })

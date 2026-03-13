@@ -325,6 +325,94 @@ describe('MapWorkbenchView tooltip interactions', () => {
     })
   })
 
+  it('fits candidate sectors instead of focusing only the first one when panel requests candidate fit', async () => {
+    const wrapper = buildWrapper()
+    const viewport = wrapper.get('.map-viewport')
+    setViewportMetrics(viewport.element)
+
+    const canvas = wrapper.getComponent({ name: 'MapSvgCanvas' })
+    canvas.vm.$emit('content-size', {
+      width: 1200,
+      height: 900,
+      clusterRefHeight: 142
+    })
+    canvas.vm.$emit('sector-layout', [
+      {
+        sectorId: 'sector_alpha',
+        clusterId: 'cluster_01',
+        name: 'Alpha',
+        displayName: 'Alpha',
+        centerX: 260,
+        centerY: 180,
+        radius: 48,
+        verticalExtent: 41.6
+      },
+      {
+        sectorId: 'sector_beta',
+        clusterId: 'cluster_01',
+        name: 'Beta',
+        displayName: 'Beta',
+        centerX: 640,
+        centerY: 420,
+        radius: 48,
+        verticalExtent: 41.6
+      }
+    ])
+    await nextTick()
+
+    const content = wrapper.get('.map-content')
+    const before = content.attributes('style')
+    const panel = wrapper.getComponent({ name: 'MapResourceFilterPanel' })
+    panel.vm.$emit('fit-sectors', ['sector_alpha', 'sector_beta'])
+    await nextTick()
+
+    const after = content.attributes('style')
+    expect(after).not.toBe(before)
+  })
+
+  it('adds vertical breathing room for vertically distributed candidate fit', async () => {
+    const wrapper = buildWrapper()
+    const viewport = wrapper.get('.map-viewport')
+    setViewportMetrics(viewport.element)
+
+    const canvas = wrapper.getComponent({ name: 'MapSvgCanvas' })
+    canvas.vm.$emit('content-size', {
+      width: 1200,
+      height: 900,
+      clusterRefHeight: 142
+    })
+    canvas.vm.$emit('sector-layout', [
+      {
+        sectorId: 'sector_alpha',
+        clusterId: 'cluster_01',
+        name: 'Alpha',
+        displayName: 'Alpha',
+        centerX: 520,
+        centerY: 100,
+        radius: 60,
+        verticalExtent: 52
+      },
+      {
+        sectorId: 'sector_beta',
+        clusterId: 'cluster_01',
+        name: 'Beta',
+        displayName: 'Beta',
+        centerX: 520,
+        centerY: 500,
+        radius: 60,
+        verticalExtent: 52
+      }
+    ])
+    await nextTick()
+
+    const panel = wrapper.getComponent({ name: 'MapResourceFilterPanel' })
+    panel.vm.$emit('fit-sectors', ['sector_alpha', 'sector_beta'])
+    await nextTick()
+
+    const transform = wrapper.get('.map-content').attributes('style')
+    expect(transform).toMatch(/scale\(0\./)
+  })
+
   it('anchors search, resource filter, zoom, and sidebars in the updated map positions', async () => {
     const wrapper = buildWrapper()
 
@@ -343,7 +431,7 @@ describe('MapWorkbenchView tooltip interactions', () => {
 
     const layoutChildren = Array.from(wrapper.get('.map-layout').element.children)
     expect(layoutChildren[0]?.getAttribute('data-testid')).toBe('map-resource-filter-panel')
-    expect(layoutChildren[1]?.classList.contains('map-shell')).toBe(true)
+    expect(layoutChildren.some((item) => item.classList.contains('map-shell'))).toBe(true)
   })
 
   it('opens the station panel from the left, hides the entry button, and forwards placed overlays', async () => {
@@ -363,7 +451,7 @@ describe('MapWorkbenchView tooltip interactions', () => {
     expect(layoutChildren[1]?.getAttribute('data-testid')).toBe('map-station-panel')
 
     await wrapper.get('[data-testid="map-station-panel-close"]').trigger('click')
-    expect(wrapper.find('[data-testid="map-station-panel"]').exists()).toBe(false)
+    expect(wrapper.get('.map-layout').classes()).not.toContain('station-sidebar-active')
     expect(wrapper.get('[data-testid="map-station-entry-button"]').exists()).toBe(true)
   })
 })

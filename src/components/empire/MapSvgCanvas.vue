@@ -59,6 +59,8 @@ type SearchSectorLayout = {
   displayName: string
   centerX: number
   centerY: number
+  radius: number
+  verticalExtent: number
 }
 type SectorResourceEntry = {
   ware: string
@@ -141,6 +143,7 @@ const props = withDefaults(defineProps<{
   searchHighlightedSectorIds?: string[]
   resourceHighlightedSectorIds?: string[]
   resourceSectorFills?: Record<string, SectorResourceFill>
+  resourceSectorGroupBadges?: Record<string, string[]>
   resourceFillColorOverride?: string | null
   selectedSectorId?: string | null
   placementOverlays?: PlacementOverlay[]
@@ -151,6 +154,7 @@ const props = withDefaults(defineProps<{
   searchHighlightedSectorIds: () => [],
   resourceHighlightedSectorIds: () => [],
   resourceSectorFills: () => ({}),
+  resourceSectorGroupBadges: () => ({}),
   resourceFillColorOverride: null,
   selectedSectorId: null,
   placementOverlays: () => [],
@@ -404,6 +408,7 @@ const shouldRenderResourceOverlay = (sectorId: string) => {
   return state === 'resource' || state === 'selected'
 }
 const getResourceFill = (sectorId: string) => props.resourceSectorFills?.[sectorId] || null
+const getResourceGroupBadges = (sectorId: string) => props.resourceSectorGroupBadges?.[sectorId] || []
 const hasPieFill = (sectorId: string) => getResourceFill(sectorId)?.mode === 'pie'
 const sectorFillOpacity = (sectorId: string) => {
   const state = getSectorVisualState(sectorId)
@@ -488,6 +493,28 @@ const buildPieSliceGeometries = (sectorId: string, cx: number, cy: number, radiu
       path
     }
   })
+}
+
+const buildResourceGroupBadgeGeometries = (sectorId: string, cx: number, cy: number, radius: number) => {
+  if (!shouldRenderResourceOverlay(sectorId)) return []
+  const badges = getResourceGroupBadges(sectorId)
+  if (!badges.length) return []
+
+  const badgeWidth = Math.max(12, radius * 0.32)
+  const badgeHeight = Math.max(12, radius * 0.24)
+  const gap = Math.max(4, radius * 0.1)
+  const totalWidth = badges.length * badgeWidth + Math.max(0, badges.length - 1) * gap
+  const startX = cx - totalWidth / 2
+  const y = cy + radius * 0.52
+
+  return badges.map((label, index) => ({
+    key: `${sectorId}-${label}-${index}`,
+    label,
+    x: startX + index * (badgeWidth + gap),
+    y,
+    width: badgeWidth,
+    height: badgeHeight
+  }))
 }
 
 const regionClusters = computed<Record<string, Cluster>>(() => {
@@ -831,7 +858,9 @@ const sectorLayouts = computed<SearchSectorLayout[]>(() =>
       name: sector.name,
       displayName: sector.displayName,
       centerX: sector.sx,
-      centerY: sector.sy
+      centerY: sector.sy,
+      radius: sector.radius,
+      verticalExtent: sector.radius * HEX_TOP_EDGE_RATIO
     }))
   )
 )
@@ -1030,6 +1059,36 @@ watchEffect(() => {
           >
             {{ cluster.singleLabel }}
           </text>
+          <g
+            v-for="badge in buildResourceGroupBadgeGeometries(cluster.sectors[0]?.id || '', cluster.cx, cluster.cy, cluster.singleRadius || 0)"
+            :key="badge.key"
+            data-testid="resource-group-badge"
+          >
+            <rect
+              :x="badge.x.toFixed(1)"
+              :y="badge.y.toFixed(1)"
+              :width="badge.width.toFixed(1)"
+              :height="badge.height.toFixed(1)"
+              rx="4"
+              ry="4"
+              fill="rgba(5, 5, 5, 0.78)"
+              stroke="rgba(251, 191, 36, 0.38)"
+            />
+            <text
+              :x="(badge.x + badge.width / 2).toFixed(1)"
+              :y="(badge.y + badge.height / 2).toFixed(1)"
+              :data-testid="`resource-group-badge-${cluster.sectors[0]?.id || ''}-${badge.label}`"
+              text-anchor="middle"
+              dominant-baseline="middle"
+              alignment-baseline="middle"
+              :font-size="Math.max(8, (badge.height * 0.7)).toFixed(1)"
+              :font-family="MAP_FONT_FAMILY"
+              font-weight="700"
+              fill="#fef3c7"
+            >
+              {{ badge.label }}
+            </text>
+          </g>
         </g>
         <template v-else>
           <polygon
@@ -1090,6 +1149,36 @@ watchEffect(() => {
               >
                 {{ sector.label }}
               </text>
+              <g
+                v-for="badge in buildResourceGroupBadgeGeometries(sector.id, sector.sx, sector.sy, sector.radius)"
+                :key="badge.key"
+                data-testid="resource-group-badge"
+              >
+                <rect
+                  :x="badge.x.toFixed(1)"
+                  :y="badge.y.toFixed(1)"
+                  :width="badge.width.toFixed(1)"
+                  :height="badge.height.toFixed(1)"
+                  rx="4"
+                  ry="4"
+                  fill="rgba(5, 5, 5, 0.78)"
+                  stroke="rgba(251, 191, 36, 0.38)"
+                />
+                <text
+                  :x="(badge.x + badge.width / 2).toFixed(1)"
+                  :y="(badge.y + badge.height / 2).toFixed(1)"
+                  :data-testid="`resource-group-badge-${sector.id}-${badge.label}`"
+                  text-anchor="middle"
+                  dominant-baseline="middle"
+                  alignment-baseline="middle"
+                  :font-size="Math.max(8, (badge.height * 0.7)).toFixed(1)"
+                  :font-family="MAP_FONT_FAMILY"
+                  font-weight="700"
+                  fill="#fef3c7"
+                >
+                  {{ badge.label }}
+                </text>
+              </g>
             </g>
           </template>
         </template>

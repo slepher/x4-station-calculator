@@ -12,11 +12,14 @@ type SearchSectorLayout = {
   displayName: string
   centerX: number
   centerY: number
+  radius: number
+  verticalExtent: number
 }
 
 type ResourceVisualChangePayload = {
   highlightedSectorIds: string[]
   sectorFills: Record<string, SectorResourceFill>
+  sectorGroupBadges?: Record<string, string[]>
 }
 
 const props = withDefaults(defineProps<{
@@ -30,6 +33,7 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   (e: 'highlight-change', sectorIds: string[]): void
   (e: 'select-sector', sectorId: string): void
+  (e: 'fit-sectors', sectorIds: string[]): void
   (e: 'active-change', active: boolean): void
   (e: 'primary-color-change', color: string | null): void
   (e: 'resource-visual-change', payload: ResourceVisualChangePayload): void
@@ -44,6 +48,12 @@ const currentMode = ref<'simple' | 'advanced'>('simple')
 
 watchEffect(() => {
   isSidebarMode.value = props.mode === 'sidebar'
+  if (!isSidebarMode.value) {
+    emit('highlight-change', [])
+    emit('active-change', false)
+    emit('resource-visual-change', { highlightedSectorIds: [], sectorFills: {}, sectorGroupBadges: {} })
+    emit('primary-color-change', null)
+  }
 })
 
 const onPanelOpen = () => emit('panel-open')
@@ -53,7 +63,7 @@ const onPanelClose = () => emit('panel-close')
 <template>
   <div class="map-resource-panel" :class="props.mode || 'overlay'" @mousedown.stop>
     <button
-      v-if="!isSidebarMode && props.showEntryButton !== false"
+      v-show="!isSidebarMode && props.showEntryButton !== false"
       type="button"
       class="resource-entry-btn"
       data-testid="map-resource-entry-button"
@@ -72,7 +82,7 @@ const onPanelClose = () => emit('panel-close')
       </svg>
     </button>
 
-    <div v-else class="resource-panel-shell" :class="{ sidebar: props.mode === 'sidebar' }">
+    <div v-show="isSidebarMode" class="resource-panel-shell" :class="{ sidebar: props.mode === 'sidebar' }">
       <div class="resource-panel-top" data-testid="map-resource-panel-header">
         <div class="resource-mode-tabs" role="tablist" :aria-label="t('map.resource_filter_mode')">
           <button
@@ -109,7 +119,7 @@ const onPanelClose = () => emit('panel-close')
         <MapResourceFilterSimplePanel
           v-show="currentMode === 'simple'"
           :sector-layouts="props.sectorLayouts"
-          :active="currentMode === 'simple'"
+          :active="currentMode === 'simple' && isSidebarMode"
           @highlight-change="emit('highlight-change', $event)"
           @resource-visual-change="emit('resource-visual-change', $event)"
           @select-sector="emit('select-sector', $event)"
@@ -120,10 +130,11 @@ const onPanelClose = () => emit('panel-close')
         <MapResourceFilterAdvancedPanel
           v-show="currentMode === 'advanced'"
           :sector-layouts="props.sectorLayouts"
-          :active="currentMode === 'advanced'"
+          :active="currentMode === 'advanced' && isSidebarMode"
           @highlight-change="emit('highlight-change', $event)"
           @resource-visual-change="emit('resource-visual-change', $event)"
           @select-sector="emit('select-sector', $event)"
+          @fit-sectors="emit('fit-sectors', $event)"
           @active-change="emit('active-change', $event)"
           @primary-color-change="emit('primary-color-change', $event)"
         />
@@ -443,11 +454,11 @@ const onPanelClose = () => emit('panel-close')
 }
 
 :deep(.advanced-candidate-row) {
-  @apply flex flex-wrap gap-2;
+  @apply flex items-start gap-2;
 }
 
 :deep(.advanced-candidate-meta) {
-  @apply mt-1 flex flex-wrap items-center gap-1.5 text-[11px] text-amber-100/65;
+  @apply mt-1 flex items-start gap-2 text-[11px] text-amber-100/65;
 }
 
 :deep(.advanced-candidate-hubs) {
@@ -455,6 +466,23 @@ const onPanelClose = () => emit('panel-close')
 }
 
 :deep(.candidate-chip-button) {
-  @apply cursor-pointer transition-colors duration-150 hover:bg-amber-200/20;
+  @apply inline-flex items-center gap-1.5 cursor-pointer transition-colors duration-150 hover:bg-amber-200/20;
+}
+
+:deep(.advanced-candidate-chip-list) {
+  @apply flex min-w-0 flex-1 flex-wrap gap-2;
+}
+
+:deep(.candidate-type-pill) {
+  @apply inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md border border-amber-300/20 bg-amber-200/10 px-2 py-1 text-xs text-amber-50;
+  min-width: 3.75rem;
+}
+
+:deep(.candidate-type-pill-icon) {
+  @apply h-3.5 w-3.5 shrink-0 opacity-80;
+}
+
+:deep(.candidate-chip-badge) {
+  @apply inline-flex h-4 min-w-4 items-center justify-center rounded-full border border-amber-200/30 bg-black/35 px-1 text-[10px] font-bold leading-none text-amber-50;
 }
 </style>

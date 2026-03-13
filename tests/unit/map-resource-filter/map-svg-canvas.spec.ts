@@ -63,4 +63,29 @@ describe('MapSvgCanvas resource pie fill', () => {
     expect(slices[0]?.attributes('fill')).toBe('#ff9900')
     expect(slices[1]?.attributes('fill')).toBe('#00bbff')
   })
+
+  it('renders bottom-center group badges only for resource-filled sectors', () => {
+    const wrapper = mount(MapSvgCanvas, {
+      props: {
+        resourceHighlightedSectorIds: ['sector_alpha'],
+        resourceSectorFills: {
+          sector_alpha: {
+            mode: 'solid',
+            ware: 'ore',
+            color: '#ff9900'
+          }
+        },
+        resourceSectorGroupBadges: {
+          sector_alpha: ['1', '2'],
+          sector_hub: ['3']
+        }
+      }
+    })
+
+    const badges = wrapper.findAll('[data-testid="resource-group-badge"]')
+    expect(badges).toHaveLength(2)
+    expect(wrapper.get('[data-testid="resource-group-badge-sector_alpha-1"]').text()).toBe('1')
+    expect(wrapper.get('[data-testid="resource-group-badge-sector_alpha-2"]').text()).toBe('2')
+    expect(wrapper.find('[data-testid="resource-group-badge-sector_hub-3"]').exists()).toBe(false)
+  })
 })
