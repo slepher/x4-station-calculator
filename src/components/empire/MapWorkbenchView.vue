@@ -492,6 +492,7 @@ const scheduleTooltipClose = () => {
 }
 
 const formatOwnerName = (owner: string) => {
+  if (owner === 'ownerless') return t('map.ownerless_name')
   const faction = factionsById[owner]!
   if (te(faction.nameId)) return t(faction.nameId)
   return t(faction.nameId)

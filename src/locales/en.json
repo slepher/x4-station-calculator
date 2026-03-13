@@ -125,6 +125,7 @@
     "resource_filter_hubs": "Hubs",
     "resource_filter_sunlight": "Sunlight",
     "resource_filter_sunlight_suffix": "%",
+    "ownerless_name": "Ownerless",
     "station_panel_button": "Station",
     "station_panel_title": "Station",
     "station_panel_close": "Close",

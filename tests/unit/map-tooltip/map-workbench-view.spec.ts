@@ -11,7 +11,10 @@ vi.mock('@/assets/x4_game_data/8.0-Diplomacy/data/regionyields.json', () => ({
 }))
 
 vi.mock('@/assets/x4_game_data/8.0-Diplomacy/data/factions.json', () => ({
-  default: [{ id: 'argon', nameId: 'faction.argon' }]
+  default: [
+    { id: 'argon', nameId: 'faction.argon' },
+    { id: 'ownerless', name: '', nameId: '' }
+  ]
 }))
 
 vi.mock('vue-i18n', async (importOriginal) => {
@@ -23,6 +26,7 @@ vi.mock('vue-i18n', async (importOriginal) => {
       t: (key: string) => {
         const dict: Record<string, string> = {
           'faction.argon': 'Argon Federation',
+          'map.ownerless_name': 'Ownerless',
           'map.resource_filter_sunlight': 'Sunlight',
           'map.resource_filter_sunlight_suffix': '%',
           'map.search_sector_placeholder': 'Search sector',
@@ -156,8 +160,13 @@ describe('MapWorkbenchView tooltip interactions', () => {
         },
         MapSectorTooltip: {
           name: 'MapSectorTooltip',
-          props: ['title'],
-          template: '<section class="sector-tooltip-card" data-testid="map-sector-tooltip">{{ title }}</section>'
+          props: ['title', 'ownerName'],
+          template: `
+            <section class="sector-tooltip-card" data-testid="map-sector-tooltip">
+              <div data-testid="map-sector-tooltip-title">{{ title }}</div>
+              <div data-testid="map-sector-tooltip-owner">{{ ownerName }}</div>
+            </section>
+          `
         },
         MapResourceFilterPanel: {
           name: 'MapResourceFilterPanel',
@@ -252,6 +261,19 @@ describe('MapWorkbenchView tooltip interactions', () => {
     await nextTick()
 
     expect(wrapper.find('[data-testid="map-sector-tooltip"]').exists()).toBe(true)
+  })
+
+  it('uses UI i18n owner label for ownerless sectors', async () => {
+    const wrapper = buildWrapper()
+    const canvas = wrapper.getComponent({ name: 'MapSvgCanvas' })
+
+    canvas.vm.$emit('sector-hover', {
+      ...hoverPayload,
+      owner: 'ownerless'
+    })
+    await nextTick()
+
+    expect(wrapper.get('[data-testid="map-sector-tooltip-owner"]').text()).toBe('Ownerless')
   })
 
   it('clears browser text selection when map drag starts', async () => {
