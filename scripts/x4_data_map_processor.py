@@ -40,7 +40,10 @@ SECTOR_MACRO_RE = re.compile(r"Cluster_(\d+)_Sector(\d+)_macro", re.IGNORECASE)
 ZONE_MACRO_RE = re.compile(r"Zone\d+_Cluster_(\d+)_Sector(\d+)_macro", re.IGNORECASE)
 SHCON_ZONE_RE = re.compile(r"tzoneCluster_(\d+)_Sector(\d+)SHCon(\d+)_GateZone_macro", re.IGNORECASE)
 CLUSTER_GATE_RE = re.compile(r"connection_ClusterGate(\d+)To(\d+)[a-z]?", re.IGNORECASE)
-REGION_CONNECTION_RE = re.compile(r"C(\d+)S(\d+)_", re.IGNORECASE)
+REGION_CONNECTION_RES = (
+    re.compile(r"C(\d+)S(\d+)_", re.IGNORECASE),
+    re.compile(r"Cluster(\d+)_Sector(\d+)_", re.IGNORECASE),
+)
 ZONE_HIGHWAY_MACRO_RE = re.compile(r"Highway(\d+)_Cluster_?(\d+)_(?:Sector|S)(\d+)_macro", re.IGNORECASE)
 SEC_HIGHWAY_MACRO_RE = re.compile(r"SuperHighway(\d+)_Cluster_?(\d+)_macro", re.IGNORECASE)
 
@@ -66,6 +69,17 @@ OWNER_COLORS = {
     "scaleplate": "#4b5563",
     "scavenger": "#4b5563",
 }
+
+
+def resolve_sector_macro_from_region_connection(connection_name: str) -> Optional[str]:
+    for pattern in REGION_CONNECTION_RES:
+        match = pattern.search(connection_name)
+        if match is None:
+            continue
+        cluster_num = int(match.group(1))
+        sector_num = int(match.group(2))
+        return f"Cluster_{cluster_num:02d}_Sector{sector_num:03d}_macro"
+    return None
 
 
 def parse_args() -> argparse.Namespace:
@@ -595,10 +609,9 @@ def generate_map_data(
                     clusters[cluster_macro]["sector_ids"].append(sector_macro)
             for conn in cluster_macro_node.findall("./connections/connection[@ref='regions']"):
                 connection_name = (conn.get("name") or "").strip()
-                region_match = REGION_CONNECTION_RE.search(connection_name)
-                if region_match is None:
+                sector_macro = resolve_sector_macro_from_region_connection(connection_name)
+                if sector_macro is None:
                     continue
-                sector_macro = f"Cluster_{int(region_match.group(1)):02d}_Sector{int(region_match.group(2)):03d}_macro"
                 macro_node = conn.find("./macro")
                 if macro_node is None:
                     continue

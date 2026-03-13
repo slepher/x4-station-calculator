@@ -1001,11 +1001,518 @@
     "resources": []
   },
   {
+    "name": "Cluster100_Sector001_AudioRegion01_macro",
+    "region_ref": "audioregion_cluster_100_sector_001",
+    "cluster_id": "Cluster_100_macro",
+    "sector_id": "Cluster_100_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster100_Sector001_Region001_macro",
+    "region_ref": "asteroidbelt_main",
+    "cluster_id": "Cluster_100_macro",
+    "sector_id": "Cluster_100_Sector001_macro",
+    "resources": [
+      {
+        "ware": "ore",
+        "yield": "lowplus",
+        "level": 5
+      },
+      {
+        "ware": "silicon",
+        "yield": "medlow",
+        "level": 7
+      },
+      {
+        "ware": "ice",
+        "yield": "low",
+        "level": 4
+      },
+      {
+        "ware": "nividium",
+        "yield": "lowplus",
+        "level": 5
+      },
+      {
+        "ware": "hydrogen",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "helium",
+        "yield": "medplus",
+        "level": 9
+      },
+      {
+        "ware": "methane",
+        "yield": "medium",
+        "level": 8
+      }
+    ]
+  },
+  {
+    "name": "Cluster101_Sector001_AudioRegion01_macro",
+    "region_ref": "audioregion_cluster_101_sector_001",
+    "cluster_id": "Cluster_101_macro",
+    "sector_id": "Cluster_101_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster102_Sector001_AudioRegion01_macro",
+    "region_ref": "audioregion_cluster_102_sector_001",
+    "cluster_id": "Cluster_102_macro",
+    "sector_id": "Cluster_102_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster104_Sector001_AudioRegion01_macro",
+    "region_ref": "audioregion_cluster_104_sector_001",
+    "cluster_id": "Cluster_104_macro",
+    "sector_id": "Cluster_104_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster104_Sector001_Region001_macro",
+    "region_ref": "torus_radiation_1",
+    "cluster_id": "Cluster_104_macro",
+    "sector_id": "Cluster_104_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster104_Sector001_Region001b_macro",
+    "region_ref": "torus_radiation1b",
+    "cluster_id": "Cluster_104_macro",
+    "sector_id": "Cluster_104_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster104_Sector001_Region002_macro",
+    "region_ref": "torus_radiation_1",
+    "cluster_id": "Cluster_104_macro",
+    "sector_id": "Cluster_104_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster104_Sector001_Region002b_macro",
+    "region_ref": "torus_radiation1b",
+    "cluster_id": "Cluster_104_macro",
+    "sector_id": "Cluster_104_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster104_Sector001_Region003_macro",
+    "region_ref": "torus_radiation_2",
+    "cluster_id": "Cluster_104_macro",
+    "sector_id": "Cluster_104_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster104_Sector001_Region003b_macro",
+    "region_ref": "torus_radiation2b",
+    "cluster_id": "Cluster_104_macro",
+    "sector_id": "Cluster_104_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster104_Sector002_AudioRegion01_macro",
+    "region_ref": "audioregion_cluster_104_sector_002",
+    "cluster_id": "Cluster_104_macro",
+    "sector_id": "Cluster_104_Sector002_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster106_Sector001_AudioRegion01_macro",
+    "region_ref": "audioregion_cluster_106_sector_001",
+    "cluster_id": "Cluster_106_macro",
+    "sector_id": "Cluster_106_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster106_Sector001_Region001_macro",
+    "region_ref": "mercury_field",
+    "cluster_id": "Cluster_106_macro",
+    "sector_id": "Cluster_106_Sector001_macro",
+    "resources": [
+      {
+        "ware": "helium",
+        "yield": "highest",
+        "level": 15
+      }
+    ]
+  },
+  {
+    "name": "Cluster107_Sector001_AudioRegion01_macro",
+    "region_ref": "audioregion_cluster_107_sector_001",
+    "cluster_id": "Cluster_107_macro",
+    "sector_id": "Cluster_107_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster108_Sector001_AudioRegion01_macro",
+    "region_ref": "audioregion_cluster_108_sector_001",
+    "cluster_id": "Cluster_108_macro",
+    "sector_id": "Cluster_108_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster108_Sector002_AudioRegion01_macro",
+    "region_ref": "audioregion_cluster_108_sector_002",
+    "cluster_id": "Cluster_108_macro",
+    "sector_id": "Cluster_108_Sector002_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster108_Sector002_Region001_macro",
+    "region_ref": "titan_field",
+    "cluster_id": "Cluster_108_macro",
+    "sector_id": "Cluster_108_Sector002_macro",
+    "resources": [
+      {
+        "ware": "hydrogen",
+        "yield": "medhigh",
+        "level": 10
+      },
+      {
+        "ware": "methane",
+        "yield": "high",
+        "level": 12
+      }
+    ]
+  },
+  {
+    "name": "Cluster108_Sector003_Region001_macro",
+    "region_ref": "saturn_field",
+    "cluster_id": "Cluster_108_macro",
+    "sector_id": "Cluster_108_Sector003_macro",
+    "resources": [
+      {
+        "ware": "ore",
+        "yield": "lowextra",
+        "level": 6
+      },
+      {
+        "ware": "silicon",
+        "yield": "lowplus",
+        "level": 5
+      },
+      {
+        "ware": "ice",
+        "yield": "lowminus",
+        "level": 3
+      },
+      {
+        "ware": "hydrogen",
+        "yield": "low",
+        "level": 4
+      },
+      {
+        "ware": "helium",
+        "yield": "low",
+        "level": 4
+      }
+    ]
+  },
+  {
+    "name": "Cluster109_Sector001_AudioRegion01_macro",
+    "region_ref": "audioregion_cluster_109_sector_001",
+    "cluster_id": "Cluster_109_macro",
+    "sector_id": "Cluster_109_Sector001_macro",
+    "resources": []
+  },
+  {
     "name": "C10S01_Region001_macro",
     "region_ref": "audioregion_cluster_10_sector_001",
     "cluster_id": "Cluster_10_macro",
     "sector_id": "Cluster_10_Sector001_macro",
     "resources": []
+  },
+  {
+    "name": "Cluster108_Sector002_Region001_macro",
+    "region_ref": "neptune_field",
+    "cluster_id": "Cluster_110_macro",
+    "sector_id": "Cluster_110_Sector001_macro",
+    "resources": [
+      {
+        "ware": "hydrogen",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "helium",
+        "yield": "medium",
+        "level": 8
+      }
+    ]
+  },
+  {
+    "name": "Cluster110_Sector001_AudioRegion01_macro",
+    "region_ref": "audioregion_cluster_110_sector_001",
+    "cluster_id": "Cluster_110_macro",
+    "sector_id": "Cluster_110_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster111_Sector001_AudioRegion01_macro",
+    "region_ref": "audioregion_cluster_111_sector_001",
+    "cluster_id": "Cluster_111_macro",
+    "sector_id": "Cluster_111_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster112_Sector001_AudioRegion01_macro",
+    "region_ref": "audioregion_cluster_112_sector_001",
+    "cluster_id": "Cluster_112_macro",
+    "sector_id": "Cluster_112_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster112_Sector001_Region001_macro",
+    "region_ref": "cluster112_s1_region01",
+    "cluster_id": "Cluster_112_macro",
+    "sector_id": "Cluster_112_Sector001_macro",
+    "resources": [
+      {
+        "ware": "ore",
+        "yield": "low",
+        "level": 4
+      },
+      {
+        "ware": "silicon",
+        "yield": "medlow",
+        "level": 7
+      },
+      {
+        "ware": "nividium",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "hydrogen",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "helium",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "methane",
+        "yield": "medium",
+        "level": 8
+      }
+    ]
+  },
+  {
+    "name": "Cluster104_Sector001_Region002_macro",
+    "region_ref": "cluster112_s2_region01",
+    "cluster_id": "Cluster_112_macro",
+    "sector_id": "Cluster_112_Sector002_macro",
+    "resources": [
+      {
+        "ware": "ore",
+        "yield": "low",
+        "level": 4
+      },
+      {
+        "ware": "silicon",
+        "yield": "low",
+        "level": 4
+      },
+      {
+        "ware": "nividium",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "hydrogen",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "helium",
+        "yield": "medhigh",
+        "level": 10
+      },
+      {
+        "ware": "methane",
+        "yield": "medium",
+        "level": 8
+      }
+    ]
+  },
+  {
+    "name": "Cluster112_Sector002_AudioRegion01_macro",
+    "region_ref": "audioregion_cluster_112_sector_002",
+    "cluster_id": "Cluster_112_macro",
+    "sector_id": "Cluster_112_Sector002_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster113_Sector001_AudioRegion01_macro",
+    "region_ref": "audioregion_cluster_113_sector_001",
+    "cluster_id": "Cluster_113_macro",
+    "sector_id": "Cluster_113_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster113_Sector001_Region001_macro",
+    "region_ref": "cluster113_region01",
+    "cluster_id": "Cluster_113_macro",
+    "sector_id": "Cluster_113_Sector001_macro",
+    "resources": [
+      {
+        "ware": "ore",
+        "yield": "low",
+        "level": 4
+      },
+      {
+        "ware": "silicon",
+        "yield": "medlow",
+        "level": 7
+      },
+      {
+        "ware": "nividium",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "hydrogen",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "helium",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "methane",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "ice",
+        "yield": "lowplus",
+        "level": 5
+      }
+    ]
+  },
+  {
+    "name": "Cluster113_Sector001_Region002_macro",
+    "region_ref": "cluster113_region02",
+    "cluster_id": "Cluster_113_macro",
+    "sector_id": "Cluster_113_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster113_Sector001_Region003_macro",
+    "region_ref": "cluster113_region02",
+    "cluster_id": "Cluster_113_macro",
+    "sector_id": "Cluster_113_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster114_Sector001_AudioRegion01_macro",
+    "region_ref": "audioregion_cluster_114_sector_001",
+    "cluster_id": "Cluster_114_macro",
+    "sector_id": "Cluster_114_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster114_Sector001_Region001_macro",
+    "region_ref": "cluster114_region01",
+    "cluster_id": "Cluster_114_macro",
+    "sector_id": "Cluster_114_Sector001_macro",
+    "resources": [
+      {
+        "ware": "ore",
+        "yield": "low",
+        "level": 4
+      },
+      {
+        "ware": "silicon",
+        "yield": "medlow",
+        "level": 7
+      },
+      {
+        "ware": "nividium",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "hydrogen",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "helium",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "methane",
+        "yield": "medium",
+        "level": 8
+      }
+    ]
+  },
+  {
+    "name": "Cluster115_Sector001_AudioRegion01_macro",
+    "region_ref": "audioregion_cluster_115_sector_001",
+    "cluster_id": "Cluster_115_macro",
+    "sector_id": "Cluster_115_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster116_Sector001_AudioRegion01_macro",
+    "region_ref": "audioregion_cluster_116_sector_001",
+    "cluster_id": "Cluster_116_macro",
+    "sector_id": "Cluster_116_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster116_Sector001_Region001_macro",
+    "region_ref": "oort_field",
+    "cluster_id": "Cluster_116_macro",
+    "sector_id": "Cluster_116_Sector001_macro",
+    "resources": [
+      {
+        "ware": "ore",
+        "yield": "low",
+        "level": 4
+      },
+      {
+        "ware": "silicon",
+        "yield": "medlow",
+        "level": 7
+      },
+      {
+        "ware": "nividium",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "ice",
+        "yield": "low",
+        "level": 4
+      },
+      {
+        "ware": "hydrogen",
+        "yield": "medhigh",
+        "level": 10
+      },
+      {
+        "ware": "helium",
+        "yield": "medhigh",
+        "level": 10
+      },
+      {
+        "ware": "methane",
+        "yield": "medhigh",
+        "level": 10
+      }
+    ]
   },
   {
     "name": "C11S01_Region001_macro",
@@ -4057,6 +4564,394 @@
         "ware": "methane",
         "yield": "highplus",
         "level": 13
+      }
+    ]
+  },
+  {
+    "name": "Cluster500_Sector001_Region002_macro",
+    "region_ref": "s2_grav",
+    "cluster_id": "Cluster_500_macro",
+    "sector_id": "Cluster_500_Sector001_macro",
+    "resources": [
+      {
+        "ware": "ore",
+        "yield": "lowest",
+        "level": 1
+      },
+      {
+        "ware": "silicon",
+        "yield": "lowest",
+        "level": 1
+      },
+      {
+        "ware": "nividium",
+        "yield": "low",
+        "level": 4
+      }
+    ]
+  },
+  {
+    "name": "Cluster500_Sector001_Region003_macro",
+    "region_ref": "wave_asteroids",
+    "cluster_id": "Cluster_500_macro",
+    "sector_id": "Cluster_500_Sector001_macro",
+    "resources": [
+      {
+        "ware": "ore",
+        "yield": "lowest",
+        "level": 1
+      },
+      {
+        "ware": "silicon",
+        "yield": "lowest",
+        "level": 1
+      },
+      {
+        "ware": "ice",
+        "yield": "low",
+        "level": 4
+      },
+      {
+        "ware": "nividium",
+        "yield": "lowest",
+        "level": 1
+      },
+      {
+        "ware": "hydrogen",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "helium",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "methane",
+        "yield": "medium",
+        "level": 8
+      }
+    ]
+  },
+  {
+    "name": "Cluster500_Sector001_Region004_macro",
+    "region_ref": "wave_active",
+    "cluster_id": "Cluster_500_macro",
+    "sector_id": "Cluster_500_Sector001_macro",
+    "resources": [
+      {
+        "ware": "hydrogen",
+        "yield": "high",
+        "level": 12
+      }
+    ]
+  },
+  {
+    "name": "Cluster500_Sector001_Region005_macro",
+    "region_ref": "audioregion_cluster_500_sector_001",
+    "cluster_id": "Cluster_500_macro",
+    "sector_id": "Cluster_500_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster500_Sector002_Region001_macro",
+    "region_ref": "s2_grav_small",
+    "cluster_id": "Cluster_500_macro",
+    "sector_id": "Cluster_500_Sector002_macro",
+    "resources": [
+      {
+        "ware": "ore",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "silicon",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "nividium",
+        "yield": "low",
+        "level": 4
+      }
+    ]
+  },
+  {
+    "name": "Cluster500_Sector002_Region002_macro",
+    "region_ref": "s2_grav_small_v2",
+    "cluster_id": "Cluster_500_macro",
+    "sector_id": "Cluster_500_Sector002_macro",
+    "resources": [
+      {
+        "ware": "ore",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "silicon",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "nividium",
+        "yield": "low",
+        "level": 4
+      }
+    ]
+  },
+  {
+    "name": "Cluster500_Sector002_Region003_macro",
+    "region_ref": "s2_grav_small_v2",
+    "cluster_id": "Cluster_500_macro",
+    "sector_id": "Cluster_500_Sector002_macro",
+    "resources": [
+      {
+        "ware": "ore",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "silicon",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "nividium",
+        "yield": "low",
+        "level": 4
+      }
+    ]
+  },
+  {
+    "name": "Cluster500_Sector002_Region004_macro",
+    "region_ref": "audioregion_cluster_500_sector_002",
+    "cluster_id": "Cluster_500_macro",
+    "sector_id": "Cluster_500_Sector002_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster500_Sector00~3_Region001_macro",
+    "region_ref": "audioregion_cluster_500_sector_003",
+    "cluster_id": "Cluster_500_macro",
+    "sector_id": "Cluster_500_Sector003_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster501_Sector001_Region001_macro",
+    "region_ref": "region_c501s01_base",
+    "cluster_id": "Cluster_501_macro",
+    "sector_id": "Cluster_501_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster501_Sector001_Region002_macro",
+    "region_ref": "region_c501s01_res",
+    "cluster_id": "Cluster_501_macro",
+    "sector_id": "Cluster_501_Sector001_macro",
+    "resources": [
+      {
+        "ware": "hydrogen",
+        "yield": "medhigh",
+        "level": 10
+      },
+      {
+        "ware": "ore",
+        "yield": "low",
+        "level": 4
+      },
+      {
+        "ware": "silicon",
+        "yield": "low",
+        "level": 4
+      },
+      {
+        "ware": "ice",
+        "yield": "lowplus",
+        "level": 5
+      },
+      {
+        "ware": "nividium",
+        "yield": "medplus",
+        "level": 9
+      }
+    ]
+  },
+  {
+    "name": "Cluster501_Sector001_Region003_macro",
+    "region_ref": "audioregion_cluster_501_sector_001",
+    "cluster_id": "Cluster_501_macro",
+    "sector_id": "Cluster_501_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster502_Sector001_Region001_macro",
+    "region_ref": "region_c502s01_base",
+    "cluster_id": "Cluster_502_macro",
+    "sector_id": "Cluster_502_Sector001_macro",
+    "resources": [
+      {
+        "ware": "hydrogen",
+        "yield": "medium",
+        "level": 8
+      }
+    ]
+  },
+  {
+    "name": "Cluster502_Sector001_Region002_macro",
+    "region_ref": "region_c502s01_scrap",
+    "cluster_id": "Cluster_502_macro",
+    "sector_id": "Cluster_502_Sector001_macro",
+    "resources": [
+      {
+        "ware": "hydrogen",
+        "yield": "high",
+        "level": 12
+      }
+    ]
+  },
+  {
+    "name": "Cluster502_Sector001_Region003_macro",
+    "region_ref": "audioregion_cluster_502_sector_001",
+    "cluster_id": "Cluster_502_macro",
+    "sector_id": "Cluster_502_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster503_Sector001_Region001_macro",
+    "region_ref": "region_c503s01_base",
+    "cluster_id": "Cluster_503_macro",
+    "sector_id": "Cluster_503_Sector001_macro",
+    "resources": [
+      {
+        "ware": "hydrogen",
+        "yield": "medium",
+        "level": 8
+      }
+    ]
+  },
+  {
+    "name": "Cluster503_Sector001_Region002_macro",
+    "region_ref": "region_c503s01_casino",
+    "cluster_id": "Cluster_503_macro",
+    "sector_id": "Cluster_503_Sector001_macro",
+    "resources": [
+      {
+        "ware": "ore",
+        "yield": "lowest",
+        "level": 1
+      }
+    ]
+  },
+  {
+    "name": "Cluster503_Sector001_Region003_macro",
+    "region_ref": "region_c503s01_casino2",
+    "cluster_id": "Cluster_503_macro",
+    "sector_id": "Cluster_503_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster503_Sector001_Region004_macro",
+    "region_ref": "region_c503s01_casino3",
+    "cluster_id": "Cluster_503_macro",
+    "sector_id": "Cluster_503_Sector001_macro",
+    "resources": [
+      {
+        "ware": "ore",
+        "yield": "lowest",
+        "level": 1
+      },
+      {
+        "ware": "silicon",
+        "yield": "lowest",
+        "level": 1
+      },
+      {
+        "ware": "ice",
+        "yield": "medium",
+        "level": 8
+      },
+      {
+        "ware": "nividium",
+        "yield": "low",
+        "level": 4
+      },
+      {
+        "ware": "rawscrap",
+        "yield": "medium",
+        "level": 8
+      }
+    ]
+  },
+  {
+    "name": "Cluster503_Sector001_Region005_macro",
+    "region_ref": "audioregion_cluster_503_sector_001",
+    "cluster_id": "Cluster_503_macro",
+    "sector_id": "Cluster_503_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster504_Sector001_Region001_macro",
+    "region_ref": "audioregion_cluster_504_sector_001",
+    "cluster_id": "Cluster_504_macro",
+    "sector_id": "Cluster_504_Sector001_macro",
+    "resources": []
+  },
+  {
+    "name": "Cluster504_Sector001_Region002_macro",
+    "region_ref": "region504_grav",
+    "cluster_id": "Cluster_504_macro",
+    "sector_id": "Cluster_504_Sector001_macro",
+    "resources": [
+      {
+        "ware": "ore",
+        "yield": "lowest",
+        "level": 1
+      },
+      {
+        "ware": "silicon",
+        "yield": "lowest",
+        "level": 1
+      },
+      {
+        "ware": "nividium",
+        "yield": "low",
+        "level": 4
+      }
+    ]
+  },
+  {
+    "name": "Cluster504_Sector001_Region003_macro",
+    "region_ref": "region504_asteroids",
+    "cluster_id": "Cluster_504_macro",
+    "sector_id": "Cluster_504_Sector001_macro",
+    "resources": [
+      {
+        "ware": "ore",
+        "yield": "lowest",
+        "level": 1
+      },
+      {
+        "ware": "silicon",
+        "yield": "lowest",
+        "level": 1
+      },
+      {
+        "ware": "nividium",
+        "yield": "low",
+        "level": 4
+      }
+    ]
+  },
+  {
+    "name": "Cluster504_Sector001_Region004_macro",
+    "region_ref": "region504wave_active",
+    "cluster_id": "Cluster_504_macro",
+    "sector_id": "Cluster_504_Sector001_macro",
+    "resources": [
+      {
+        "ware": "hydrogen",
+        "yield": "high",
+        "level": 12
       }
     ]
   },
