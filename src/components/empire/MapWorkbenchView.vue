@@ -4,10 +4,14 @@ import { useI18n } from 'vue-i18n'
 import MapSvgCanvas from './MapSvgCanvas.vue'
 import MapSectorTooltip from './MapSectorTooltip.vue'
 import MapResourceFilterPanel from './MapResourceFilterPanel.vue'
+import MapStationPanel, { type MapStationPanelItem } from './MapStationPanel.vue'
+import mapsData from '@/assets/x4_game_data/8.0-Diplomacy/data/maps.json'
 import regionYieldsData from '@/assets/x4_game_data/8.0-Diplomacy/data/regionyields.json'
 import factionsData from '@/assets/x4_game_data/8.0-Diplomacy/data/factions.json'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import { useEmpireStore } from '@/store/useEmpireStore'
 import type { SectorResourceFill } from '@/store/logic/mapResourceFilter'
+import type { EntityLocation } from '@/types/x4'
 
 type SearchSectorLayout = {
   sectorId: string
@@ -19,6 +23,20 @@ type SearchSectorLayout = {
 }
 type SearchResultItem = SearchSectorLayout & {
   matchType: 'name' | 'localeName' | 'id'
+}
+type MapSectorResourceEntry = {
+  ware: string
+  yield?: string
+  level?: number
+}
+type MapSectorDataset = {
+  id: string
+  clusterId: string
+  name: string
+  displayName: string
+  sunlight: number
+  resources: MapSectorResourceEntry[]
+  scalePerRadius: number
 }
 type SectorHoverPayload = {
   sectorId: string
@@ -56,6 +74,23 @@ type TooltipViewModel = {
   resources: TooltipResourceItem[]
   anchorRect: SectorHoverPayload['anchorRect']
 }
+type PlacementOverlayItem = {
+  key: string
+  id: string
+  kind: 'station' | 'sector'
+  name: string
+  location: EntityLocation
+}
+type PlacementPreview = {
+  kind: 'station' | 'sector'
+  name: string
+  location: EntityLocation
+}
+type DraggingPlacementItem = {
+  id: string
+  kind: 'station' | 'sector'
+  name: string
+}
 
 const clusterRefHeightPx = ref(142)
 const MAX_SCALE_MULTIPLIER = 2
@@ -92,8 +127,12 @@ const selectedSectorSource = ref<'search' | 'resource' | null>(null)
 const searchSectors = ref<SearchSectorLayout[]>([])
 const resourceHighlightedSectorIds = ref<string[]>([])
 const isResourcePanelOpen = ref(false)
+const isStationPanelOpen = ref(false)
 const resourcePrimaryColor = ref<string | null>(null)
 const resourceSectorFills = ref<Record<string, SectorResourceFill>>({})
+const draggingPlacementItem = ref<DraggingPlacementItem | null>(null)
+const draggingOverlayKey = ref<string | null>(null)
+const placementPreview = ref<PlacementPreview | null>(null)
 const hoveredSectorSource = ref<SectorHoverPayload | null>(null)
 const lastHoveredSectorSource = ref<SectorHoverPayload | null>(null)
 const hoveredSector = ref<TooltipViewModel | null>(null)
@@ -107,15 +146,73 @@ const lastMousePos = ref({ x: 0, y: 0 })
 
 const { t, te, locale } = useI18n()
 const gameDataStore = useGameDataStore()
+const empireStore = useEmpireStore()
 const factionsById = Object.fromEntries(
   (factionsData as Array<{ id: string; nameId: string }>).map((entry) => [entry.id, entry])
 ) as Record<string, { id: string; nameId: string }>
 const resourceColorByWare = Object.fromEntries(
   (regionYieldsData as Array<{ ware: string; color?: string }>).map((entry) => [entry.ware, entry.color || '#fbbf24'])
 ) as Record<string, string>
+const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
+  const out: Record<string, MapSectorDataset> = {}
+  const clusters = (mapsData as { clusters?: Record<string, { sectors?: Record<string, {
+    id: string
+    name?: string
+    nameId?: string
+    area?: { sunlight?: number }
+    resources?: MapSectorResourceEntry[]
+    normalized?: { scale_per_radius?: number }
+  }> }> }).clusters || {}
+  Object.entries(clusters).forEach(([clusterId, cluster]) => {
+    Object.values(cluster.sectors || {}).forEach((sector) => {
+      const displayName = sector.nameId && te(sector.nameId) ? t(sector.nameId) : (sector.name || sector.id)
+      out[sector.id] = {
+        id: sector.id,
+        clusterId,
+        name: sector.name || sector.id,
+        displayName,
+        sunlight: Math.round(Number(sector.area?.sunlight || 0) * 100),
+        resources: Array.isArray(sector.resources) ? sector.resources : [],
+        scalePerRadius: Number(sector.normalized?.scale_per_radius || 0)
+      }
+    })
+  })
+  return out
+})
 
 const displayScaleText = computed(() => `${Math.round(scale.value * 100)}%`)
 const normalizedSearchQuery = computed(() => searchQuery.value.trim().toLowerCase())
+const stationPanelItems = computed<MapStationPanelItem[]>(() => {
+  const empire = empireStore.activeEmpire
+  if (!empire) return []
+  const sectorItems = (empire.sectors || []).map((sector) => ({
+    id: sector.id,
+    kind: 'sector' as const,
+    name: sector.name,
+    targetSectorName: sector.location ? (sectorsById.value[sector.location.sector_id]?.displayName || sector.location.sector_id) : undefined,
+    location: sector.location
+  }))
+  const stationItems = (empire.stations || []).map((station) => ({
+    id: station.id,
+    kind: 'station' as const,
+    name: station.name,
+    targetSectorName: station.location ? (sectorsById.value[station.location.sector_id]?.displayName || station.location.sector_id) : undefined,
+    location: station.location
+  }))
+  return [...stationItems, ...sectorItems]
+})
+const placementOverlays = computed<PlacementOverlayItem[]>(() => {
+  if (!isStationPanelOpen.value) return []
+  return stationPanelItems.value
+    .filter((item): item is MapStationPanelItem & { location: EntityLocation } => Boolean(item.location))
+    .map((item) => ({
+      key: `${item.kind}:${item.id}`,
+      id: item.id,
+      kind: item.kind,
+      name: item.name,
+      location: item.location
+    }))
+})
 
 const getViewportSize = () => {
   const viewport = viewportRef.value
@@ -290,7 +387,53 @@ const clearBrowserSelection = () => {
 const getSectorElementAtPointer = (clientX: number, clientY: number) => {
   const element = document.elementFromPoint(clientX, clientY)
   if (!element) return null
-  return element.closest('[data-sector-hover-id]') as SVGGraphicsElement | null
+  return element.closest('[data-map-sector-id], [data-sector-hover-id]') as SVGGraphicsElement | null
+}
+
+const resolveLocationFromSectorElement = (sectorElement: SVGGraphicsElement, clientX: number, clientY: number): EntityLocation | null => {
+  const sectorId = sectorElement.getAttribute('data-map-sector-id') || sectorElement.getAttribute('data-sector-hover-id')
+  if (!sectorId) return null
+  const mapSector = sectorsById.value[sectorId]
+  if (!mapSector || !mapSector.scalePerRadius) return null
+  const rect = sectorElement.getBoundingClientRect()
+  if (!rect.width || !rect.height) return null
+  const centerX = rect.left + rect.width / 2
+  const centerY = rect.top + rect.height / 2
+  const radius = rect.width / 2
+  if (!radius) return null
+  const ratioX = (clientX - centerX) / radius
+  const ratioY = (clientY - centerY) / radius
+  const rawScale = 1 / mapSector.scalePerRadius
+  return {
+    cluster_id: mapSector.clusterId,
+    sector_id: sectorId,
+    pos: {
+      x: Math.round(ratioX * rawScale),
+      z: Math.round(-ratioY * rawScale)
+    },
+    sunlight: mapSector.sunlight,
+    resources: Array.from(new Set(mapSector.resources.map((entry) => entry.ware)))
+  }
+}
+
+const resolveLocationAtPointer = (clientX: number, clientY: number): EntityLocation | null => {
+  const sectorElement = getSectorElementAtPointer(clientX, clientY)
+  if (!sectorElement) return null
+  return resolveLocationFromSectorElement(sectorElement, clientX, clientY)
+}
+
+const clearPlacementState = () => {
+  draggingPlacementItem.value = null
+  draggingOverlayKey.value = null
+  placementPreview.value = null
+}
+
+const applyLocationToItem = (item: DraggingPlacementItem, location: EntityLocation) => {
+  if (item.kind === 'station') {
+    empireStore.setStationLocation(item.id, location)
+    return
+  }
+  empireStore.setSectorLocation(item.id, location)
 }
 
 const closeTooltip = () => {
@@ -615,6 +758,8 @@ const onResourcePrimaryColorChange = (color: string | null) => {
 }
 
 const onResourcePanelOpen = () => {
+  isStationPanelOpen.value = false
+  clearPlacementState()
   isResourcePanelOpen.value = true
 }
 
@@ -625,7 +770,45 @@ const onResourcePanelClose = () => {
   resourcePrimaryColor.value = null
 }
 
+const onStationPanelOpen = () => {
+  isResourcePanelOpen.value = false
+  isStationPanelOpen.value = true
+}
+
+const onStationPanelClose = () => {
+  isStationPanelOpen.value = false
+  clearPlacementState()
+}
+
+const onStationItemDragStart = (item: MapStationPanelItem) => {
+  draggingPlacementItem.value = {
+    id: item.id,
+    kind: item.kind,
+    name: item.name
+  }
+  draggingOverlayKey.value = item.location ? `${item.kind}:${item.id}` : null
+}
+
+const onStationItemDragEnd = () => {
+  clearPlacementState()
+}
+
+const onStationItemClearLocation = (item: MapStationPanelItem) => {
+  if (item.kind === 'station') {
+    empireStore.clearStationLocation(item.id)
+    return
+  }
+  empireStore.clearSectorLocation(item.id)
+}
+
+const onStationItemFocus = (item: MapStationPanelItem) => {
+  const targetSectorId = item.location?.sector_id
+  if (!targetSectorId) return
+  selectSector(targetSectorId, 'search')
+}
+
 const onMouseDown = (event: MouseEvent) => {
+  if (draggingPlacementItem.value) return
   if (event.button !== 0) return
   event.preventDefault()
   clearBrowserSelection()
@@ -639,6 +822,14 @@ const onMouseDown = (event: MouseEvent) => {
 
 const onMouseMove = (event: MouseEvent) => {
   lastMousePos.value = { x: event.clientX, y: event.clientY }
+  if (draggingPlacementItem.value && isStationPanelOpen.value) {
+    const location = resolveLocationAtPointer(event.clientX, event.clientY)
+    placementPreview.value = location ? {
+      kind: draggingPlacementItem.value.kind,
+      name: draggingPlacementItem.value.name,
+      location
+    } : null
+  }
   if (!isDragging.value) return
   const dx = event.clientX - dragStartX.value
   const dy = event.clientY - dragStartY.value
@@ -677,6 +868,11 @@ const onWheel = (event: WheelEvent) => {
 
 const stopDrag = () => {
   isDragging.value = false
+  if (!draggingPlacementItem.value) return
+  if (placementPreview.value) {
+    applyLocationToItem(draggingPlacementItem.value, placementPreview.value.location)
+  }
+  clearPlacementState()
 }
 
 const onResize = () => {
@@ -684,10 +880,46 @@ const onResize = () => {
   closeTooltip()
 }
 
+const onViewportDragOver = (event: DragEvent) => {
+  if (!draggingPlacementItem.value || !isStationPanelOpen.value) return
+  event.preventDefault()
+  const location = resolveLocationAtPointer(event.clientX, event.clientY)
+  placementPreview.value = location ? {
+    kind: draggingPlacementItem.value.kind,
+    name: draggingPlacementItem.value.name,
+    location
+  } : null
+}
+
+const onViewportDrop = (event: DragEvent) => {
+  if (!draggingPlacementItem.value || !isStationPanelOpen.value) return
+  event.preventDefault()
+  const location = resolveLocationAtPointer(event.clientX, event.clientY)
+  if (location) {
+    applyLocationToItem(draggingPlacementItem.value, location)
+  }
+  clearPlacementState()
+}
+
+const onOverlayPointerDown = (payload: { key: string; id: string; kind: 'station' | 'sector'; name: string }) => {
+  draggingPlacementItem.value = {
+    id: payload.id,
+    kind: payload.kind,
+    name: payload.name
+  }
+  draggingOverlayKey.value = payload.key
+}
+
 watch(isResourcePanelOpen, async () => {
   await nextTick()
   recomputeScaleBounds()
   closeTooltip()
+})
+
+watch(isStationPanelOpen, async (open) => {
+  if (!open) clearPlacementState()
+  await nextTick()
+  recomputeScaleBounds()
 })
 
 watch(locale, () => {
@@ -725,7 +957,7 @@ onBeforeUnmount(() => {
 
 <template>
   <section class="map-workbench">
-    <div class="map-layout" :class="{ 'sidebar-active': isResourcePanelOpen }">
+    <div class="map-layout" :class="{ 'sidebar-active': isResourcePanelOpen, 'station-sidebar-active': isStationPanelOpen }">
       <MapResourceFilterPanel
         v-show="isResourcePanelOpen"
         :sector-layouts="searchSectors"
@@ -740,6 +972,16 @@ onBeforeUnmount(() => {
         @panel-close="onResourcePanelClose"
       />
 
+      <MapStationPanel
+        :open="isStationPanelOpen"
+        :items="stationPanelItems"
+        @close="onStationPanelClose"
+        @drag-start="onStationItemDragStart"
+        @drag-end="onStationItemDragEnd"
+        @clear-location="onStationItemClearLocation"
+        @focus-item="onStationItemFocus"
+      />
+
       <div class="map-shell">
         <div
           ref="viewportRef"
@@ -750,6 +992,8 @@ onBeforeUnmount(() => {
           @mouseup="stopDrag"
           @mouseleave="stopDrag"
           @wheel="onWheel"
+          @dragover="onViewportDragOver"
+          @drop="onViewportDrop"
         >
           <div
             class="map-content"
@@ -764,10 +1008,14 @@ onBeforeUnmount(() => {
               :resource-sector-fills="resourceSectorFills"
               :resource-fill-color-override="resourcePrimaryColor"
               :selected-sector-id="selectedSectorId"
+              :placement-overlays="placementOverlays"
+              :placement-preview="isStationPanelOpen ? placementPreview : null"
+              :dragging-overlay-key="draggingOverlayKey"
               @content-size="onCanvasSize"
               @sector-layout="onSectorLayout"
               @sector-hover="onSectorHover"
               @sector-leave="onSectorLeave"
+              @overlay-pointerdown="onOverlayPointerDown"
             />
           </div>
 
@@ -883,6 +1131,26 @@ onBeforeUnmount(() => {
           </svg>
         </button>
 
+        <button
+          v-if="!isStationPanelOpen"
+          type="button"
+          class="map-station-entry-btn left-6 bottom-5"
+          data-testid="map-station-entry-button"
+          @click="onStationPanelOpen"
+        >
+          <span class="map-station-entry-label">{{ t('map.station_panel_button') }}</span>
+          <svg class="map-station-entry-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M12 3l7 4v10l-7 4-7-4V7l7-4zm0 4.2L8 9.4v5.2l4 2.2 4-2.2V9.4l-4-2.2z"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.6"
+            />
+          </svg>
+        </button>
+
         <div class="zoom-panel right-6 bottom-5">
           <div class="zoom-label-row">
             <span class="zoom-label">{{ t('map.scale') }}</span>
@@ -924,6 +1192,10 @@ onBeforeUnmount(() => {
   @apply gap-3;
 }
 
+.map-layout.station-sidebar-active {
+  @apply gap-3;
+}
+
 .map-viewport {
   @apply relative w-full overflow-hidden cursor-grab;
   height: 100%;
@@ -959,11 +1231,20 @@ onBeforeUnmount(() => {
   backdrop-filter: blur(4px);
 }
 
+.map-station-entry-btn {
+  @apply absolute z-10 inline-flex h-10 items-center justify-center gap-2 rounded border border-amber-300/40 bg-black/75 px-4 text-sm font-semibold text-amber-50 shadow-xl transition-colors duration-150 hover:border-amber-200/70 hover:bg-black/85;
+  backdrop-filter: blur(4px);
+}
+
 .map-resource-entry-label {
   @apply leading-none;
 }
 
 .map-resource-entry-icon {
+  @apply h-[18px] w-[18px] text-amber-200/70;
+}
+
+.map-station-entry-icon {
   @apply h-[18px] w-[18px] text-amber-200/70;
 }
 

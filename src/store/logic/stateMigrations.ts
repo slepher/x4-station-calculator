@@ -1,4 +1,5 @@
 import type {
+  EntityLocation,
   EmpirePlan,
   SectorPlan,
   LogicFlowPlan,
@@ -34,6 +35,25 @@ function deepClone<T>(value: T): T {
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
+}
+
+function normalizeLocation(raw: unknown): EntityLocation | undefined {
+  if (!isObject(raw)) return undefined
+  const pos = isObject(raw.pos) ? raw.pos : null
+  const clusterId = typeof raw.cluster_id === 'string' ? raw.cluster_id : ''
+  const sectorId = typeof raw.sector_id === 'string' ? raw.sector_id : ''
+  const x = Number(pos?.x)
+  const z = Number(pos?.z)
+  if (!clusterId || !sectorId || !Number.isFinite(x) || !Number.isFinite(z)) return undefined
+  return {
+    cluster_id: clusterId,
+    sector_id: sectorId,
+    pos: { x, z },
+    sunlight: Number.isFinite(Number(raw.sunlight)) ? Number(raw.sunlight) : 0,
+    resources: Array.isArray(raw.resources)
+      ? raw.resources.filter((entry): entry is string => typeof entry === 'string')
+      : []
+  }
 }
 
 function resolveModuleOrWarn(
@@ -84,7 +104,8 @@ function toStationPlan(raw: unknown, index: number): StationPlan {
     settings: settings as unknown as StationPlan['settings'],
     lastUpdated: Number(station.lastUpdated) || Date.now(),
     lockedWares: Array.isArray(station.lockedWares) ? deepClone(station.lockedWares) : [],
-    warePriority: isObject(station.warePriority) ? deepClone(station.warePriority) as Record<string, number> : {}
+    warePriority: isObject(station.warePriority) ? deepClone(station.warePriority) as Record<string, number> : {},
+    location: normalizeLocation(station.location)
   }
 }
 
@@ -92,7 +113,8 @@ function defaultSector(index: number = 0): SectorPlan {
   return {
     id: crypto.randomUUID(),
     name: `Sector ${index + 1}`,
-    order: index
+    order: index,
+    location: undefined
   }
 }
 
@@ -122,7 +144,8 @@ function normalizeEmpireStateShape(raw: SavedEmpiresState, warnings?: string[]):
     const sectors = (sectorsRaw.length > 0 ? sectorsRaw : [defaultSector(0)]).map((sector, sectorIndex) => ({
       id: sector?.id || crypto.randomUUID(),
       name: sector?.name || `Sector ${sectorIndex + 1}`,
-      order: Number.isFinite(Number(sector?.order)) ? Number(sector.order) : sectorIndex
+      order: Number.isFinite(Number(sector?.order)) ? Number(sector.order) : sectorIndex,
+      location: normalizeLocation(sector?.location)
     }))
     sectors.sort((a, b) => a.order - b.order)
     sectors.forEach((sector, idx) => { sector.order = idx })

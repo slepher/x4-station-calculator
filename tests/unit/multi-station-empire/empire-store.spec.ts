@@ -380,3 +380,88 @@ describe('EmpireStore - isEmptyForSave 判定', () => {
     expect(store.isEmptyForSave()).toBe(true)
   })
 })
+
+describe('EmpireStore - location 持久化与 dirty', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    localStorage.clear()
+    sessionStorage.clear()
+  })
+
+  it('更新 station 与 sector location 应触发 dirty，并在保存后写入 localStorage', async () => {
+    const store = useEmpireStore()
+    await vi.waitFor(() => expect(store.isReady).toBe(true), { timeout: 3000 })
+
+    const station = store.createStation('Placed Station', 'industrial')!
+    const sector = store.activeEmpire!.sectors![0]!
+
+    store.saveEmpire()
+    expect(store.isDirty).toBe(false)
+
+    store.setStationLocation(station.id, {
+      cluster_id: 'Cluster_01_macro',
+      sector_id: 'Cluster_01_Sector001_macro',
+      pos: { x: 1200, z: -3400 },
+      sunlight: 100,
+      resources: ['ore', 'ice']
+    })
+    store.setSectorLocation(sector.id, {
+      cluster_id: 'Cluster_02_macro',
+      sector_id: 'Cluster_02_Sector001_macro',
+      pos: { x: -2500, z: 900 },
+      sunlight: 132,
+      resources: ['silicon']
+    })
+
+    expect(store.isDirty).toBe(true)
+    expect(store.getStationById(station.id)?.location?.pos).toEqual({ x: 1200, z: -3400 })
+    expect(store.activeEmpire!.sectors![0]!.location?.resources).toEqual(['silicon'])
+
+    store.saveEmpire()
+    expect(store.isDirty).toBe(false)
+
+    const saved = JSON.parse(localStorage.getItem('x4_empire_data')!)
+    expect(saved.list[0].stations[0].location).toEqual({
+      cluster_id: 'Cluster_01_macro',
+      sector_id: 'Cluster_01_Sector001_macro',
+      pos: { x: 1200, z: -3400 },
+      sunlight: 100,
+      resources: ['ore', 'ice']
+    })
+    expect(saved.list[0].sectors[0].location).toEqual({
+      cluster_id: 'Cluster_02_macro',
+      sector_id: 'Cluster_02_Sector001_macro',
+      pos: { x: -2500, z: 900 },
+      sunlight: 132,
+      resources: ['silicon']
+    })
+  })
+
+  it('清除 location 应移除 station 与 sector 的位置字段', async () => {
+    const store = useEmpireStore()
+    await vi.waitFor(() => expect(store.isReady).toBe(true), { timeout: 3000 })
+
+    const station = store.createStation('Placed Station', 'industrial')!
+    const sector = store.activeEmpire!.sectors![0]!
+
+    store.setStationLocation(station.id, {
+      cluster_id: 'Cluster_01_macro',
+      sector_id: 'Cluster_01_Sector001_macro',
+      pos: { x: 10, z: 20 },
+      sunlight: 100,
+      resources: []
+    })
+    store.setSectorLocation(sector.id, {
+      cluster_id: 'Cluster_03_macro',
+      sector_id: 'Cluster_03_Sector002_macro',
+      pos: { x: 30, z: 40 },
+      sunlight: 88,
+      resources: ['methane']
+    })
+
+    expect(store.clearStationLocation(station.id)).toBe(true)
+    expect(store.clearSectorLocation(sector.id)).toBe(true)
+    expect(store.getStationById(station.id)?.location).toBeUndefined()
+    expect(store.activeEmpire!.sectors![0]!.location).toBeUndefined()
+  })
+})

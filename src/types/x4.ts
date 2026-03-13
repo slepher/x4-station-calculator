@@ -399,6 +399,17 @@ export interface StationSettings {
   transportShipCapacity: number; // 运输船运量
 }
 
+export interface EntityLocation {
+  cluster_id: string;
+  sector_id: string;
+  pos: {
+    x: number;
+    z: number;
+  };
+  sunlight: number;
+  resources: string[];
+}
+
 /**
  * 空间站布局配置
  */
@@ -406,6 +417,7 @@ export interface StationPlan {
   id: string;
   name: string;
   sectorId?: string | null;
+  location?: EntityLocation;
   type?: StationType;
   count?: number;
   modules: SavedModule[];
@@ -425,6 +437,7 @@ export interface SectorPlan {
   id: string;
   name: string;
   order: number;
+  location?: EntityLocation;
 }
 
 /**

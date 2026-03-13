@@ -33,6 +33,7 @@ type Sector = {
   normalized?: {
     center_offset_ratio?: Ratio
     sector_radius_ratio?: number
+    scale_per_radius?: number
   }
   shcon_anchors?: Record<string, Anchor>
   highways?: Record<string, Highway>
@@ -93,6 +94,26 @@ type SectorResourceFill =
       mode: 'pie'
       slices: SectorResourceColorSlice[]
     }
+type PlacementLocation = {
+  cluster_id: string
+  sector_id: string
+  pos: {
+    x: number
+    z: number
+  }
+}
+type PlacementOverlay = {
+  key: string
+  id: string
+  kind: 'station' | 'sector'
+  name: string
+  location: PlacementLocation
+}
+type PlacementPreview = {
+  kind: 'station' | 'sector'
+  name: string
+  location: PlacementLocation
+}
 
 const FALLBACK_OWNER_COLOR = '#94a3b8'
 const SQRT3 = Math.sqrt(3)
@@ -115,12 +136,18 @@ const props = withDefaults(defineProps<{
   resourceSectorFills?: Record<string, SectorResourceFill>
   resourceFillColorOverride?: string | null
   selectedSectorId?: string | null
+  placementOverlays?: PlacementOverlay[]
+  placementPreview?: PlacementPreview | null
+  draggingOverlayKey?: string | null
 }>(), {
   searchHighlightedSectorIds: () => [],
   resourceHighlightedSectorIds: () => [],
   resourceSectorFills: () => ({}),
   resourceFillColorOverride: null,
-  selectedSectorId: null
+  selectedSectorId: null,
+  placementOverlays: () => [],
+  placementPreview: null,
+  draggingOverlayKey: null
 })
 
 const emit = defineEmits<{
@@ -128,6 +155,7 @@ const emit = defineEmits<{
   (e: 'sector-layout', payload: SearchSectorLayout[]): void
   (e: 'sector-hover', payload: SectorHoverPayload): void
   (e: 'sector-leave', sectorId: string): void
+  (e: 'overlay-pointerdown', payload: PlacementOverlay): void
 }>()
 const { t, te } = useI18n()
 
@@ -790,6 +818,52 @@ const sectorLayouts = computed<SearchSectorLayout[]>(() =>
     }))
   )
 )
+const overlayScreenItems = computed(() => {
+  const { centers, clusterRadius } = layoutState.value
+  return props.placementOverlays
+    .map((overlay) => {
+      const cluster = clusters.value[overlay.location.cluster_id]
+      const sector = cluster?.sectors?.[overlay.location.sector_id]
+      const center = centers[overlay.location.cluster_id]
+      const scalePerRadius = Number(sector?.normalized?.scale_per_radius || 0)
+      const sectorRadiusRatio = Number(sector?.normalized?.sector_radius_ratio || 0)
+      const sectorCenter = sector?.normalized?.center_offset_ratio
+      if (!cluster || !sector || !center || !scalePerRadius || !sectorCenter || !sectorRadiusRatio) return null
+      const localRatio = {
+        x: overlay.location.pos.x * scalePerRadius,
+        y: -overlay.location.pos.z * scalePerRadius
+      }
+      const ratio = sectorRatioToClusterRatio(sector.normalized, localRatio)
+      if (!ratio) return null
+      const point = clusterRatioToScreen(center, clusterRadius, ratio)
+      return {
+        ...overlay,
+        x: point.x,
+        y: point.y
+      }
+    })
+    .filter((item): item is PlacementOverlay & { x: number; y: number } => !!item)
+})
+const previewScreenItem = computed(() => {
+  const preview = props.placementPreview
+  if (!preview) return null
+  const cluster = clusters.value[preview.location.cluster_id]
+  const sector = cluster?.sectors?.[preview.location.sector_id]
+  const center = layoutState.value.centers[preview.location.cluster_id]
+  const scalePerRadius = Number(sector?.normalized?.scale_per_radius || 0)
+  if (!cluster || !sector || !center || !scalePerRadius) return null
+  const ratio = sectorRatioToClusterRatio(sector.normalized, {
+    x: preview.location.pos.x * scalePerRadius,
+    y: -preview.location.pos.z * scalePerRadius
+  })
+  if (!ratio) return null
+  const point = clusterRatioToScreen(center, layoutState.value.clusterRadius, ratio)
+  return {
+    ...preview,
+    x: point.x,
+    y: point.y
+  }
+})
 
 watchEffect(() => {
   emit('content-size', {
@@ -892,6 +966,7 @@ watchEffect(() => {
           v-if="cluster.sectors.length === 1"
           class="sector-hover-target"
           :data-sector-hover-id="cluster.sectors[0]?.id || ''"
+          :data-map-sector-id="cluster.sectors[0]?.id || ''"
           @mouseenter="emitSectorHover($event, {
             sectorId: cluster.sectors[0]?.id || '',
             clusterId: cluster.sectors[0]?.clusterId || cluster.id,
@@ -951,6 +1026,7 @@ watchEffect(() => {
             <g
               class="sector-hover-target"
               :data-sector-hover-id="sector.id"
+              :data-map-sector-id="sector.id"
               @mouseenter="emitSectorHover($event, {
                 sectorId: sector.id,
                 clusterId: sector.clusterId,
@@ -1003,6 +1079,31 @@ watchEffect(() => {
       </template>
     </g>
 
+    <g class="station-overlays">
+      <g
+        v-for="overlay in overlayScreenItems"
+        :key="overlay.key"
+        class="placement-overlay"
+        :class="[
+          overlay.kind === 'station' ? 'placement-overlay-station' : 'placement-overlay-sector',
+          { dragging: draggingOverlayKey === overlay.key }
+        ]"
+        :transform="`translate(${overlay.x.toFixed(1)} ${overlay.y.toFixed(1)})`"
+        @mousedown.stop="emit('overlay-pointerdown', overlay)"
+      >
+        <circle r="8" />
+        <text x="0" y="-12" text-anchor="middle">{{ overlay.name }}</text>
+      </g>
+      <g
+        v-if="previewScreenItem"
+        class="placement-preview"
+        :transform="`translate(${previewScreenItem.x.toFixed(1)} ${previewScreenItem.y.toFixed(1)})`"
+      >
+        <circle r="9" />
+        <text x="0" y="-13" text-anchor="middle">{{ previewScreenItem.name }}</text>
+      </g>
+    </g>
+
     <g class="gates">
       <circle
         v-for="gate in gateCircles"
@@ -1041,5 +1142,43 @@ watchEffect(() => {
 
 .sector-hover-target {
   pointer-events: auto;
+}
+
+.placement-overlay {
+  pointer-events: auto;
+  cursor: grab;
+}
+
+.placement-overlay circle,
+.placement-preview circle {
+  fill: rgba(251, 191, 36, 0.88);
+  stroke: #111827;
+  stroke-width: 1.4;
+}
+
+.placement-overlay-sector circle {
+  fill: rgba(125, 211, 252, 0.9);
+}
+
+.placement-overlay.dragging {
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+.placement-overlay text,
+.placement-preview text {
+  fill: #fef3c7;
+  font-size: 10px;
+  font-family: Consolas, 'Courier New', monospace;
+}
+
+.placement-preview {
+  pointer-events: none;
+}
+
+.placement-preview circle {
+  fill: rgba(245, 158, 11, 0.4);
+  stroke: #fde68a;
+  stroke-dasharray: 3 2;
 }
 </style>
