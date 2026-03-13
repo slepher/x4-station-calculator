@@ -2,7 +2,11 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import MapSvgCanvas from './MapSvgCanvas.vue'
+import MapSectorTooltip from './MapSectorTooltip.vue'
 import MapResourceFilterPanel from './MapResourceFilterPanel.vue'
+import regionYieldsData from '@/assets/x4_game_data/8.0-Diplomacy/data/regionyields.json'
+import factionsData from '@/assets/x4_game_data/8.0-Diplomacy/data/factions.json'
+import { useGameDataStore } from '@/store/useGameDataStore'
 
 type SearchSectorLayout = {
   sectorId: string
@@ -15,12 +19,52 @@ type SearchSectorLayout = {
 type SearchResultItem = SearchSectorLayout & {
   matchType: 'name' | 'localeName' | 'id'
 }
+type SectorHoverPayload = {
+  sectorId: string
+  clusterId: string
+  name: string
+  displayName: string
+  owner: string
+  sunlight: number
+  resources: Array<{
+    ware: string
+    yield?: string
+    level?: number
+  }>
+  anchorRect: {
+    left: number
+    top: number
+    right: number
+    bottom: number
+    width: number
+    height: number
+  }
+}
+type TooltipResourceItem = {
+  wareId: string
+  label: string
+  yieldLabel: string
+  color: string
+}
+type TooltipPlacement = 'bottom' | 'top' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+type TooltipViewModel = {
+  sectorId: string
+  title: string
+  ownerName: string
+  sunlightPercent: number
+  resources: TooltipResourceItem[]
+  anchorRect: SectorHoverPayload['anchorRect']
+}
 
 const clusterRefHeightPx = ref(142)
 const MAX_SCALE_MULTIPLIER = 2
+const TOOLTIP_OFFSET = 14
+const TOOLTIP_VIEWPORT_PADDING = 12
+const RESOURCE_ORDER = ['ore', 'silicon', 'ice', 'hydrogen', 'helium', 'methane', 'nividium', 'rawscrap'] as const
 
 const viewportRef = ref<HTMLDivElement | null>(null)
 const searchInputRef = ref<HTMLInputElement | null>(null)
+const tooltipRef = ref<InstanceType<typeof MapSectorTooltip> | null>(null)
 const viewportResizeObserver = ref<ResizeObserver | null>(null)
 
 const imageNaturalWidth = ref(0)
@@ -48,8 +92,22 @@ const searchSectors = ref<SearchSectorLayout[]>([])
 const resourceHighlightedSectorIds = ref<string[]>([])
 const isResourceFilterActive = ref(false)
 const resourcePrimaryColor = ref<string | null>(null)
+const hoveredSectorSource = ref<SectorHoverPayload | null>(null)
+const hoveredSector = ref<TooltipViewModel | null>(null)
+const isTooltipHovered = ref(false)
+const tooltipPlacement = ref<TooltipPlacement>('bottom')
+const tooltipPosition = ref({ left: 0, top: 0 })
+const tooltipMeasuredSize = ref({ width: 0, height: 0 })
+const tooltipHideTimer = ref<number | null>(null)
 
-const { t, locale } = useI18n()
+const { t, te, locale } = useI18n()
+const gameDataStore = useGameDataStore()
+const factionsById = Object.fromEntries(
+  (factionsData as Array<{ id: string; nameId: string }>).map((entry) => [entry.id, entry])
+) as Record<string, { id: string; nameId: string }>
+const resourceColorByWare = Object.fromEntries(
+  (regionYieldsData as Array<{ ware: string; color?: string }>).map((entry) => [entry.ware, entry.color || '#fbbf24'])
+) as Record<string, string>
 
 const displayScaleText = computed(() => `${Math.round(scale.value * 100)}%`)
 const normalizedSearchQuery = computed(() => searchQuery.value.trim().toLowerCase())
@@ -204,6 +262,211 @@ const getResultMeta = (item: SearchResultItem) => {
   return ''
 }
 
+const clearTooltipHideTimer = () => {
+  if (tooltipHideTimer.value !== null) {
+    window.clearTimeout(tooltipHideTimer.value)
+    tooltipHideTimer.value = null
+  }
+}
+
+const closeTooltip = () => {
+  clearTooltipHideTimer()
+  hoveredSectorSource.value = null
+  hoveredSector.value = null
+  isTooltipHovered.value = false
+}
+
+const scheduleTooltipClose = () => {
+  clearTooltipHideTimer()
+  tooltipHideTimer.value = window.setTimeout(() => {
+    if (!isTooltipHovered.value) {
+      hoveredSectorSource.value = null
+      hoveredSector.value = null
+    }
+    tooltipHideTimer.value = null
+  }, 90)
+}
+
+const formatOwnerName = (owner: string) => {
+  const faction = factionsById[owner]!
+  if (te(faction.nameId)) return t(faction.nameId)
+  return t(faction.nameId)
+}
+
+const formatYieldLabel = (yieldName: string) => {
+  const localized = t(`map.yield_names.${yieldName}`)
+  if (localized !== `map.yield_names.${yieldName}`) return localized
+  return yieldName
+}
+
+const chooseTooltipPlacement = (
+  anchor: SectorHoverPayload['anchorRect'],
+  viewportWidth: number,
+  viewportHeight: number,
+  tooltipWidth: number,
+  tooltipHeight: number
+): TooltipPlacement => {
+  const centerX = anchor.left + anchor.width / 2
+  const centerY = anchor.top + anchor.height / 2
+  const candidates: Array<{ placement: TooltipPlacement; left: number; top: number }> = [
+    { placement: 'bottom', left: centerX - tooltipWidth / 2, top: anchor.bottom + TOOLTIP_OFFSET },
+    { placement: 'top', left: centerX - tooltipWidth / 2, top: anchor.top - tooltipHeight - TOOLTIP_OFFSET },
+    { placement: 'left', left: anchor.left - tooltipWidth - TOOLTIP_OFFSET, top: centerY - tooltipHeight / 2 },
+    { placement: 'right', left: anchor.right + TOOLTIP_OFFSET, top: centerY - tooltipHeight / 2 },
+    { placement: 'top-left', left: anchor.left - tooltipWidth - TOOLTIP_OFFSET, top: anchor.top - tooltipHeight - TOOLTIP_OFFSET },
+    { placement: 'top-right', left: anchor.right + TOOLTIP_OFFSET, top: anchor.top - tooltipHeight - TOOLTIP_OFFSET },
+    { placement: 'bottom-left', left: anchor.left - tooltipWidth - TOOLTIP_OFFSET, top: anchor.bottom + TOOLTIP_OFFSET },
+    { placement: 'bottom-right', left: anchor.right + TOOLTIP_OFFSET, top: anchor.bottom + TOOLTIP_OFFSET }
+  ]
+
+  const fits = (candidate: { left: number; top: number }) =>
+    candidate.left >= TOOLTIP_VIEWPORT_PADDING &&
+    candidate.top >= TOOLTIP_VIEWPORT_PADDING &&
+    candidate.left + tooltipWidth <= viewportWidth - TOOLTIP_VIEWPORT_PADDING &&
+    candidate.top + tooltipHeight <= viewportHeight - TOOLTIP_VIEWPORT_PADDING
+
+  const orthogonal = candidates.slice(0, 4)
+  const diagonal = candidates.slice(4)
+  return (
+    orthogonal.find(fits)?.placement ||
+    diagonal.find(fits)?.placement ||
+    candidates
+      .map((candidate) => {
+        const overflowLeft = Math.max(0, TOOLTIP_VIEWPORT_PADDING - candidate.left)
+        const overflowTop = Math.max(0, TOOLTIP_VIEWPORT_PADDING - candidate.top)
+        const overflowRight = Math.max(0, candidate.left + tooltipWidth - (viewportWidth - TOOLTIP_VIEWPORT_PADDING))
+        const overflowBottom = Math.max(0, candidate.top + tooltipHeight - (viewportHeight - TOOLTIP_VIEWPORT_PADDING))
+        return {
+          placement: candidate.placement,
+          overflow: overflowLeft + overflowTop + overflowRight + overflowBottom
+        }
+      })
+      .sort((left, right) => left.overflow - right.overflow)[0]?.placement ||
+    'bottom'
+  )
+}
+
+const positionTooltip = () => {
+  if (!hoveredSector.value || !viewportRef.value) return
+
+  const viewportRect = viewportRef.value.getBoundingClientRect()
+  const viewportWidth = viewportRef.value.clientWidth
+  const viewportHeight = viewportRef.value.clientHeight
+  const tooltipWidth = tooltipMeasuredSize.value.width
+  const tooltipHeight = tooltipMeasuredSize.value.height
+  if (!tooltipWidth || !tooltipHeight) return
+
+  const anchor = {
+    left: hoveredSector.value.anchorRect.left - viewportRect.left,
+    top: hoveredSector.value.anchorRect.top - viewportRect.top,
+    right: hoveredSector.value.anchorRect.right - viewportRect.left,
+    bottom: hoveredSector.value.anchorRect.bottom - viewportRect.top,
+    width: hoveredSector.value.anchorRect.width,
+    height: hoveredSector.value.anchorRect.height
+  }
+  const placement = chooseTooltipPlacement(anchor, viewportWidth, viewportHeight, tooltipWidth, tooltipHeight)
+  tooltipPlacement.value = placement
+
+  const centerX = anchor.left + anchor.width / 2
+  const centerY = anchor.top + anchor.height / 2
+  let left = centerX - tooltipWidth / 2
+  let top = anchor.bottom + TOOLTIP_OFFSET
+
+  switch (placement) {
+    case 'top':
+      top = anchor.top - tooltipHeight - TOOLTIP_OFFSET
+      break
+    case 'left':
+      left = anchor.left - tooltipWidth - TOOLTIP_OFFSET
+      top = centerY - tooltipHeight / 2
+      break
+    case 'right':
+      left = anchor.right + TOOLTIP_OFFSET
+      top = centerY - tooltipHeight / 2
+      break
+    case 'top-left':
+      left = anchor.left - tooltipWidth - TOOLTIP_OFFSET
+      top = anchor.top - tooltipHeight - TOOLTIP_OFFSET
+      break
+    case 'top-right':
+      left = anchor.right + TOOLTIP_OFFSET
+      top = anchor.top - tooltipHeight - TOOLTIP_OFFSET
+      break
+    case 'bottom-left':
+      left = anchor.left - tooltipWidth - TOOLTIP_OFFSET
+      top = anchor.bottom + TOOLTIP_OFFSET
+      break
+    case 'bottom-right':
+      left = anchor.right + TOOLTIP_OFFSET
+      top = anchor.bottom + TOOLTIP_OFFSET
+      break
+    default:
+      top = anchor.bottom + TOOLTIP_OFFSET
+      break
+  }
+
+  tooltipPosition.value = {
+    left: Math.min(
+      viewportWidth - tooltipWidth - TOOLTIP_VIEWPORT_PADDING,
+      Math.max(TOOLTIP_VIEWPORT_PADDING, left)
+    ),
+    top: Math.min(
+      viewportHeight - tooltipHeight - TOOLTIP_VIEWPORT_PADDING,
+      Math.max(TOOLTIP_VIEWPORT_PADDING, top)
+    )
+  }
+}
+
+const syncTooltipMeasurement = async () => {
+  if (!hoveredSector.value) return
+  await nextTick()
+  const el = tooltipRef.value?.$el as HTMLElement | undefined
+  if (!el) return
+  const rect = el.getBoundingClientRect()
+  if (!rect.width || !rect.height) return
+  tooltipMeasuredSize.value = { width: rect.width, height: rect.height }
+  positionTooltip()
+}
+
+const createTooltipViewModel = (payload: SectorHoverPayload): TooltipViewModel => ({
+    sectorId: payload.sectorId,
+    title: locale.value === 'en' ? payload.name : payload.displayName,
+    ownerName: formatOwnerName(payload.owner),
+    sunlightPercent: payload.sunlight,
+    resources: RESOURCE_ORDER
+      .map((wareId) => payload.resources.find((item) => item.ware === wareId))
+      .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))
+      .map((entry) => ({
+        wareId: entry.ware,
+        label: gameDataStore.getWareDisplayName(entry.ware) || (t(`res.${entry.ware}`) !== `res.${entry.ware}` ? t(`res.${entry.ware}`) : entry.ware),
+        yieldLabel: formatYieldLabel(entry.yield || 'medium'),
+        color: resourceColorByWare[entry.ware] || '#fbbf24'
+      })),
+    anchorRect: payload.anchorRect
+  })
+
+const onSectorHover = (payload: SectorHoverPayload) => {
+  clearTooltipHideTimer()
+  hoveredSectorSource.value = payload
+  hoveredSector.value = createTooltipViewModel(payload)
+  void syncTooltipMeasurement()
+}
+
+const onSectorLeave = (sectorId: string) => {
+  if (hoveredSector.value?.sectorId !== sectorId) return
+  scheduleTooltipClose()
+}
+
+const onTooltipMouseEnter = () => {
+  clearTooltipHideTimer()
+  isTooltipHovered.value = true
+}
+
+const onTooltipMouseLeave = () => {
+  isTooltipHovered.value = false
+  scheduleTooltipClose()
+}
+
 const focusSector = (sectorId: string) => {
   const target = searchSectors.value.find((item) => item.sectorId === sectorId)
   if (!target) return
@@ -278,6 +541,7 @@ const onResourcePrimaryColorChange = (color: string | null) => {
 
 const onMouseDown = (event: MouseEvent) => {
   if (event.button !== 0) return
+  closeTooltip()
   isDragging.value = true
   dragStartX.value = event.clientX
   dragStartY.value = event.clientY
@@ -295,6 +559,7 @@ const onMouseMove = (event: MouseEvent) => {
 const onWheel = (event: WheelEvent) => {
   if (!imageNaturalWidth.value || !imageNaturalHeight.value) return
   event.preventDefault()
+  closeTooltip()
 
   const { width: vw, height: vh } = getViewportSize()
   if (!vw || !vh) return
@@ -325,11 +590,27 @@ const stopDrag = () => {
 
 const onResize = () => {
   recomputeScaleBounds()
+  closeTooltip()
 }
 
 watch(isResourceFilterActive, async () => {
   await nextTick()
   recomputeScaleBounds()
+  closeTooltip()
+})
+
+watch(locale, () => {
+  if (!hoveredSectorSource.value) return
+  hoveredSector.value = createTooltipViewModel(hoveredSectorSource.value)
+  void syncTooltipMeasurement()
+})
+
+watch(hoveredSector, () => {
+  if (!hoveredSector.value) {
+    tooltipMeasuredSize.value = { width: 0, height: 0 }
+    return
+  }
+  void syncTooltipMeasurement()
 })
 
 onMounted(() => {
@@ -377,6 +658,31 @@ onBeforeUnmount(() => {
               :selected-sector-id="selectedSectorId"
               @content-size="onCanvasSize"
               @sector-layout="onSectorLayout"
+              @sector-hover="onSectorHover"
+              @sector-leave="onSectorLeave"
+            />
+          </div>
+
+          <div
+            v-if="hoveredSector"
+            class="map-sector-tooltip-layer"
+            :class="`placement-${tooltipPlacement}`"
+            :style="{
+              left: `${tooltipPosition.left}px`,
+              top: `${tooltipPosition.top}px`
+            }"
+            @mouseenter="onTooltipMouseEnter"
+            @mouseleave="onTooltipMouseLeave"
+            @mousedown.stop
+          >
+            <MapSectorTooltip
+              ref="tooltipRef"
+              :title="hoveredSector.title"
+              :owner-name="hoveredSector.ownerName"
+              :sunlight-percent="hoveredSector.sunlightPercent"
+              :resources="hoveredSector.resources"
+              :sunlight-label="t('map.resource_filter_sunlight')"
+              :sunlight-suffix="t('map.resource_filter_sunlight_suffix')"
             />
           </div>
         </div>
@@ -493,6 +799,11 @@ onBeforeUnmount(() => {
 .map-content {
   @apply select-none;
   will-change: transform;
+}
+
+.map-sector-tooltip-layer {
+  @apply absolute z-20;
+  pointer-events: auto;
 }
 
 .map-search-panel {

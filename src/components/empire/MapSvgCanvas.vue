@@ -24,7 +24,12 @@ type Sector = {
   id: string
   nameId?: string
   name?: string
+  owner?: string
   owner_color?: string
+  area?: {
+    sunlight?: number
+  }
+  resources?: SectorResourceEntry[]
   normalized?: {
     center_offset_ratio?: Ratio
     sector_radius_ratio?: number
@@ -37,6 +42,7 @@ type Cluster = {
   id: string
   nameId?: string
   name?: string
+  owner?: string
   owner_color?: string
   normalized?: { pixel_basis?: Vec2 }
   sectors?: Record<string, Sector>
@@ -49,6 +55,28 @@ type SearchSectorLayout = {
   displayName: string
   centerX: number
   centerY: number
+}
+type SectorResourceEntry = {
+  ware: string
+  yield?: string
+  level?: number
+}
+type SectorHoverPayload = {
+  sectorId: string
+  clusterId: string
+  name: string
+  displayName: string
+  owner: string
+  sunlight: number
+  resources: SectorResourceEntry[]
+  anchorRect: {
+    left: number
+    top: number
+    right: number
+    bottom: number
+    width: number
+    height: number
+  }
 }
 
 const FALLBACK_OWNER_COLOR = '#94a3b8'
@@ -81,6 +109,8 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   (e: 'content-size', payload: { width: number; height: number; clusterRefHeight: number }): void
   (e: 'sector-layout', payload: SearchSectorLayout[]): void
+  (e: 'sector-hover', payload: SectorHoverPayload): void
+  (e: 'sector-leave', sectorId: string): void
 }>()
 const { t, te } = useI18n()
 
@@ -95,6 +125,29 @@ const resolveName = (nameId?: string, fallback?: string) => {
     if (translated && translated !== nameId) return translated
   }
   return fallback || nameId || ''
+}
+
+const emitSectorHover = (
+  event: MouseEvent,
+  payload: Omit<SectorHoverPayload, 'anchorRect'>
+) => {
+  const rect = (event.currentTarget as SVGGraphicsElement | null)?.getBoundingClientRect()
+  if (!rect) return
+  emit('sector-hover', {
+    ...payload,
+    anchorRect: {
+      left: rect.left,
+      top: rect.top,
+      right: rect.right,
+      bottom: rect.bottom,
+      width: rect.width,
+      height: rect.height
+    }
+  })
+}
+
+const emitSectorLeave = (sectorId: string) => {
+  emit('sector-leave', sectorId)
 }
 
 const hexPoints = (cx: number, cy: number, radius: number) => {
@@ -509,6 +562,9 @@ const clusterPolygons = computed(() => {
       clusterId: string
       name: string
       displayName: string
+      owner: string
+      sunlight: number
+      resources: SectorResourceEntry[]
       sx: number
       sy: number
       radius: number
@@ -535,6 +591,9 @@ const clusterPolygons = computed(() => {
       clusterId: string
       name: string
       displayName: string
+      owner: string
+      sunlight: number
+      resources: SectorResourceEntry[]
       sx: number
       sy: number
       radius: number
@@ -558,6 +617,11 @@ const clusterPolygons = computed(() => {
         clusterId,
         name: sector.name || sector.id,
         displayName,
+        owner: sector.owner || cluster.owner || 'ownerless',
+        sunlight: Math.round(Number(sector.area?.sunlight || 0) * 100),
+        resources: Array.isArray((sector as { resources?: SectorResourceEntry[] }).resources)
+          ? (sector as { resources?: SectorResourceEntry[] }).resources || []
+          : [],
         sx,
         sy,
         radius,
@@ -763,16 +827,43 @@ watchEffect(() => {
 
     <g class="clusters">
       <template v-for="cluster in clusterPolygons" :key="cluster.id">
-        <polygon
+        <g
           v-if="cluster.sectors.length === 1"
-          :points="hexPoints(cluster.cx, cluster.cy, cluster.singleRadius || 0)"
-          :fill="sectorFillColor(cluster.sectors[0]?.id || '', cluster.color)"
-          :fill-opacity="sectorFillOpacity(cluster.sectors[0]?.id || '')"
-          :stroke="sectorStrokeColor(cluster.sectors[0]?.id || '', cluster.color)"
-          :stroke-width="sectorStrokeWidth(cluster.sectors[0]?.id || '', 2.8)"
-          :stroke-opacity="sectorStrokeOpacity(cluster.sectors[0]?.id || '', 0.95)"
-          :filter="sectorFilter(cluster.sectors[0]?.id || '')"
-        />
+          class="sector-hover-target"
+          @mouseenter="emitSectorHover($event, {
+            sectorId: cluster.sectors[0]?.id || '',
+            clusterId: cluster.sectors[0]?.clusterId || cluster.id,
+            name: cluster.sectors[0]?.name || '',
+            displayName: cluster.sectors[0]?.displayName || '',
+            owner: cluster.sectors[0]?.owner || 'ownerless',
+            sunlight: cluster.sectors[0]?.sunlight || 0,
+            resources: cluster.sectors[0]?.resources || []
+          })"
+          @mouseleave="emitSectorLeave(cluster.sectors[0]?.id || '')"
+        >
+          <polygon
+            :points="hexPoints(cluster.cx, cluster.cy, cluster.singleRadius || 0)"
+            :fill="sectorFillColor(cluster.sectors[0]?.id || '', cluster.color)"
+            :fill-opacity="sectorFillOpacity(cluster.sectors[0]?.id || '')"
+            :stroke="sectorStrokeColor(cluster.sectors[0]?.id || '', cluster.color)"
+            :stroke-width="sectorStrokeWidth(cluster.sectors[0]?.id || '', 2.8)"
+            :stroke-opacity="sectorStrokeOpacity(cluster.sectors[0]?.id || '', 0.95)"
+            :filter="sectorFilter(cluster.sectors[0]?.id || '')"
+          />
+          <text
+            :x="cluster.cx.toFixed(1)"
+            :y="(cluster.singleLabelY || 0).toFixed(1)"
+            text-anchor="middle"
+            dominant-baseline="text-before-edge"
+            alignment-baseline="text-before-edge"
+            :font-size="(cluster.singleLabelFontSize || SECTOR_LABEL_FONT_SIZE).toFixed(1)"
+            :font-family="MAP_FONT_FAMILY"
+            :font-weight="sectorLabelWeight(cluster.sectors[0]?.id || '')"
+            :fill="sectorLabelFill(cluster.sectors[0]?.id || '')"
+          >
+            {{ cluster.singleLabel }}
+          </text>
+        </g>
         <template v-else>
           <polygon
             :points="hexPoints(cluster.cx, cluster.cy, cluster.clusterRadius)"
@@ -782,45 +873,44 @@ watchEffect(() => {
             stroke-opacity="0.95"
           />
           <template v-for="sector in cluster.sectors" :key="sector.id">
-            <polygon
-              :points="hexPoints(sector.sx, sector.sy, sector.radius)"
-              :fill="sectorFillColor(sector.id, sector.color)"
-              :fill-opacity="sectorFillOpacity(sector.id)"
-              :stroke="sectorStrokeColor(sector.id, sector.color)"
-              :stroke-width="sectorStrokeWidth(sector.id, 2.2)"
-              :stroke-opacity="sectorStrokeOpacity(sector.id, 0.9)"
-              :filter="sectorFilter(sector.id)"
-            />
-            <text
-              :x="sector.sx.toFixed(1)"
-              :y="sector.labelY.toFixed(1)"
-              text-anchor="middle"
-              dominant-baseline="text-before-edge"
-              alignment-baseline="text-before-edge"
-              :font-size="sector.labelFontSize.toFixed(1)"
-              :font-family="MAP_FONT_FAMILY"
-              :font-weight="sectorLabelWeight(sector.id)"
-              :fill="sectorLabelFill(sector.id)"
+            <g
+              class="sector-hover-target"
+              @mouseenter="emitSectorHover($event, {
+                sectorId: sector.id,
+                clusterId: sector.clusterId,
+                name: sector.name,
+                displayName: sector.displayName,
+                owner: sector.owner,
+                sunlight: sector.sunlight,
+                resources: sector.resources
+              })"
+              @mouseleave="emitSectorLeave(sector.id)"
             >
-              {{ sector.label }}
-            </text>
+              <polygon
+                :points="hexPoints(sector.sx, sector.sy, sector.radius)"
+                :fill="sectorFillColor(sector.id, sector.color)"
+                :fill-opacity="sectorFillOpacity(sector.id)"
+                :stroke="sectorStrokeColor(sector.id, sector.color)"
+                :stroke-width="sectorStrokeWidth(sector.id, 2.2)"
+                :stroke-opacity="sectorStrokeOpacity(sector.id, 0.9)"
+                :filter="sectorFilter(sector.id)"
+              />
+              <text
+                :x="sector.sx.toFixed(1)"
+                :y="sector.labelY.toFixed(1)"
+                text-anchor="middle"
+                dominant-baseline="text-before-edge"
+                alignment-baseline="text-before-edge"
+                :font-size="sector.labelFontSize.toFixed(1)"
+                :font-family="MAP_FONT_FAMILY"
+                :font-weight="sectorLabelWeight(sector.id)"
+                :fill="sectorLabelFill(sector.id)"
+              >
+                {{ sector.label }}
+              </text>
+            </g>
           </template>
         </template>
-
-        <text
-          v-if="cluster.sectors.length === 1"
-          :x="cluster.cx.toFixed(1)"
-          :y="(cluster.singleLabelY || 0).toFixed(1)"
-          text-anchor="middle"
-          dominant-baseline="text-before-edge"
-          alignment-baseline="text-before-edge"
-          :font-size="(cluster.singleLabelFontSize || SECTOR_LABEL_FONT_SIZE).toFixed(1)"
-          :font-family="MAP_FONT_FAMILY"
-          :font-weight="sectorLabelWeight(cluster.sectors[0]?.id || '')"
-          :fill="sectorLabelFill(cluster.sectors[0]?.id || '')"
-        >
-          {{ cluster.singleLabel }}
-        </text>
       </template>
     </g>
 
@@ -858,5 +948,9 @@ watchEffect(() => {
   display: block;
   user-select: none;
   pointer-events: none;
+}
+
+.sector-hover-target {
+  pointer-events: auto;
 }
 </style>
