@@ -30,6 +30,35 @@ export type ResourceCandidate = {
   score: number
 }
 
+export type SectorResourceColorSlice = {
+  ware: string
+  color: string
+  share: number
+}
+
+export type SectorResourceFill =
+  | {
+      mode: 'solid'
+      ware: string
+      color: string
+    }
+  | {
+      mode: 'pie'
+      slices: SectorResourceColorSlice[]
+    }
+
+export type SectorResourceVisualInput = ResourceCandidateInput & {
+  sunlight: number
+}
+
+export type BuildSectorResourceFillInput = {
+  sector: SectorResourceVisualInput
+  selectedWareIds: string[]
+  sunlightFilterEnabled: boolean
+  resourceColors: Record<string, string>
+  minShare?: number
+}
+
 export const MIXED_YIELD_VALUE = '__mixed__'
 
 export const buildYieldRanksByWare = (entries: RegionYieldEntry[]) => {
@@ -147,4 +176,79 @@ export const buildResourceCandidates = (
       left.sectorId.localeCompare(right.sectorId)
     )
     .slice(0, limit)
+}
+
+const normalizeSliceShares = (slices: SectorResourceColorSlice[]) => {
+  const total = slices.reduce((sum, slice) => sum + slice.share, 0)
+  if (total <= 0) return slices
+  return slices.map((slice, index) => {
+    if (index < slices.length - 1) {
+      return {
+        ...slice,
+        share: slice.share / total
+      }
+    }
+    const allocated = slices
+      .slice(0, -1)
+      .reduce((sum, current) => sum + (current.share / total), 0)
+    return {
+      ...slice,
+      share: Math.max(0, 1 - allocated)
+    }
+  })
+}
+
+export const buildSectorResourceFill = ({
+  sector,
+  selectedWareIds,
+  sunlightFilterEnabled,
+  resourceColors,
+  minShare = 0.05
+}: BuildSectorResourceFillInput): SectorResourceFill | null => {
+  const normalResourceSlices = selectedWareIds
+    .map((ware) => ({
+      ware,
+      level: sector.resources.find((item) => item.ware === ware)?.level || 0,
+      color: resourceColors[ware] || '#fbbf24'
+    }))
+    .filter((entry) => sector.resources.some((item) => item.ware === entry.ware))
+
+  if (normalResourceSlices.length === 1) {
+    const slice = normalResourceSlices[0]!
+    return {
+      mode: 'solid',
+      ware: slice.ware,
+      color: slice.color
+    }
+  }
+
+  if (normalResourceSlices.length >= 2) {
+    const baseShare = minShare * normalResourceSlices.length
+    const remainingShare = Math.max(0, 1 - baseShare)
+    const totalLevel = normalResourceSlices.reduce((sum, slice) => sum + Math.max(0, slice.level), 0)
+    const weightedSlices = normalResourceSlices.map((slice) => ({
+      ware: slice.ware,
+      color: slice.color,
+      share: minShare + (
+        totalLevel > 0
+          ? remainingShare * (Math.max(0, slice.level) / totalLevel)
+          : remainingShare / normalResourceSlices.length
+      )
+    }))
+
+    return {
+      mode: 'pie',
+      slices: normalizeSliceShares(weightedSlices)
+    }
+  }
+
+  if (sunlightFilterEnabled) {
+    return {
+      mode: 'solid',
+      ware: 'sunlight',
+      color: resourceColors.sunlight || '#fbbf24'
+    }
+  }
+
+  return null
 }

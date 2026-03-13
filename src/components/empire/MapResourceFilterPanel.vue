@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import mapsData from '@/assets/x4_game_data/8.0-Diplomacy/data/maps.json'
 import regionYieldsData from '@/assets/x4_game_data/8.0-Diplomacy/data/regionyields.json'
 import {
+  buildSectorResourceFill,
   buildDefaultResourceFilters,
   buildYieldRanksByWare,
   getContextReachableMaxYieldName,
@@ -12,6 +13,7 @@ import {
   isSectorMatchedByResources,
   MIXED_YIELD_VALUE,
   type RegionYieldEntry,
+  type SectorResourceFill,
   type SectorResourceEntry
 } from '@/store/logic/mapResourceFilter'
 
@@ -38,6 +40,10 @@ type ResourceCatalogItem = {
   yields: string[]
   kind: 'ware' | 'sunlight'
 }
+type ResourceVisualChangePayload = {
+  highlightedSectorIds: string[]
+  sectorFills: Record<string, SectorResourceFill>
+}
 
 const props = withDefaults(defineProps<{
   sectorLayouts: SearchSectorLayout[]
@@ -52,6 +58,7 @@ const emit = defineEmits<{
   (e: 'select-sector', sectorId: string): void
   (e: 'active-change', active: boolean): void
   (e: 'primary-color-change', color: string | null): void
+  (e: 'resource-visual-change', payload: ResourceVisualChangePayload): void
   (e: 'panel-open'): void
   (e: 'panel-close'): void
 }>()
@@ -194,6 +201,27 @@ const resourceCandidates = computed(() =>
     .slice(0, 10)
 )
 
+const resourceColors = computed<Record<string, string>>(() =>
+  resourceCatalog.value.reduce<Record<string, string>>((acc, item) => {
+    acc[item.ware] = item.color
+    return acc
+  }, {})
+)
+
+const resourceSectorFills = computed<Record<string, SectorResourceFill>>(() => {
+  if (!selectedFilterIds.value.length) return {}
+  return filteredSectorCandidates.value.reduce<Record<string, SectorResourceFill>>((acc, sector) => {
+    const fill = buildSectorResourceFill({
+      sector,
+      selectedWareIds: selectedWareIds.value,
+      sunlightFilterEnabled: sunlightFilterEnabled.value,
+      resourceColors: resourceColors.value
+    })
+    if (fill) acc[sector.sectorId] = fill
+    return acc
+  }, {})
+})
+
 const batchYieldOptions = computed(() => {
   const firstSelected = selectedWareIds.value[0]
   if (!firstSelected) return [] as string[]
@@ -203,6 +231,10 @@ const batchYieldOptions = computed(() => {
 watchEffect(() => {
   emit('highlight-change', isSidebarMode.value ? matchedSectorIds.value : [])
   emit('active-change', selectedFilterIds.value.length > 0)
+  emit('resource-visual-change', {
+    highlightedSectorIds: isSidebarMode.value ? matchedSectorIds.value : [],
+    sectorFills: isSidebarMode.value ? resourceSectorFills.value : {}
+  })
   emit(
     'primary-color-change',
     isSidebarMode.value

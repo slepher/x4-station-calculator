@@ -229,4 +229,32 @@ describe('MapResourceFilterPanel', () => {
     expect(wrapper.find('[data-testid="map-resource-panel-header"]').exists()).toBe(true)
     expect(wrapper.find('.resource-tag-grid').classes()).not.toContain('compact')
   })
+
+  it('emits sector visual fills with pie slices for multi-resource selection', async () => {
+    const wrapper = mount(MapResourceFilterPanel, {
+      props: {
+        sectorLayouts: [
+          {
+            sectorId: 'sector_alpha',
+            clusterId: 'cluster_01',
+            name: 'Alpha',
+            displayName: 'Alpha',
+            centerX: 0,
+            centerY: 0
+          }
+        ],
+        mode: 'sidebar'
+      }
+    })
+
+    await wrapper.get('[data-testid="map-resource-tag-ore"]').trigger('click')
+    await wrapper.get('[data-testid="map-resource-tag-silicon"]').trigger('click')
+
+    const payload = wrapper.emitted('resource-visual-change')?.at(-1)?.[0] as any
+
+    expect(payload.highlightedSectorIds).toEqual(['sector_alpha'])
+    expect(payload.sectorFills.sector_alpha.mode).toBe('pie')
+    expect(payload.sectorFills.sector_alpha.slices.map((slice: any) => slice.ware)).toEqual(['ore', 'silicon'])
+    expect(payload.sectorFills.sector_alpha.slices.reduce((sum: number, slice: any) => sum + slice.share, 0)).toBeCloseTo(1, 6)
+  })
 })

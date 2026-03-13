@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  buildSectorResourceFill,
   buildDefaultResourceFilters,
   buildResourceCandidates,
   buildYieldRanksByWare,
@@ -122,7 +123,93 @@ describe('mapResourceFilter', () => {
       ice: { selected: true, minYieldName: 'high' }
     })
 
-    expect(getContextReachableMaxYieldName('silicon', sectors, filters, ranks)).toBe('high')
+    expect(getContextReachableMaxYieldName('silicon', sectors, filters, ranks)).toBe('medium')
     expect(getContextReachableMaxYieldName('ice', sectors.filter((item) => item.sectorId === 'sector-c'), filters, ranks)).toBe(null)
+  })
+
+  it('builds pie slices in selected resource order and excludes sunlight when resources exist', () => {
+    const fill = buildSectorResourceFill({
+      sector: {
+        sectorId: 'sector-a',
+        name: 'Alpha',
+        displayName: 'Alpha',
+        resources: [
+          { ware: 'ore', yield: 'high', level: 14 },
+          { ware: 'silicon', yield: 'high', level: 2 }
+        ],
+        sunlight: 180
+      },
+      selectedWareIds: ['ore', 'silicon'],
+      sunlightFilterEnabled: true,
+      resourceColors: {
+        ore: '#ff9900',
+        silicon: '#00bbff',
+        sunlight: '#f7d24b'
+      }
+    })
+
+    expect(fill).toMatchObject({
+      mode: 'pie',
+      slices: [
+        { ware: 'ore', color: '#ff9900' },
+        { ware: 'silicon', color: '#00bbff' }
+      ]
+    })
+    expect(fill?.mode).toBe('pie')
+    expect(fill?.slices).toHaveLength(2)
+    expect(fill?.slices.every((slice) => slice.share >= 0.05)).toBe(true)
+    expect(fill?.slices.reduce((sum, slice) => sum + slice.share, 0)).toBeCloseTo(1, 6)
+  })
+
+  it('keeps a visible minimum share and normalizes zero-level pie sectors', () => {
+    const fill = buildSectorResourceFill({
+      sector: {
+        sectorId: 'sector-z',
+        name: 'Zero',
+        displayName: 'Zero',
+        resources: [
+          { ware: 'ore', yield: 'lowest', level: 0 },
+          { ware: 'silicon', yield: 'lowest', level: 0 },
+          { ware: 'ice', yield: 'lowest', level: 0 }
+        ],
+        sunlight: 0
+      },
+      selectedWareIds: ['ore', 'silicon', 'ice'],
+      sunlightFilterEnabled: false,
+      resourceColors: {
+        ore: '#ff9900',
+        silicon: '#00bbff',
+        ice: '#ddeeff',
+        sunlight: '#f7d24b'
+      }
+    })
+
+    expect(fill?.mode).toBe('pie')
+    expect(fill?.slices).toHaveLength(3)
+    expect(fill?.slices.every((slice) => slice.share >= 0.05)).toBe(true)
+    expect(fill?.slices.reduce((sum, slice) => sum + slice.share, 0)).toBeCloseTo(1, 6)
+  })
+
+  it('falls back to sunlight solid fill only when no normal resource slice participates', () => {
+    const fill = buildSectorResourceFill({
+      sector: {
+        sectorId: 'sector-s',
+        name: 'Sun',
+        displayName: 'Sun',
+        resources: [],
+        sunlight: 150
+      },
+      selectedWareIds: [],
+      sunlightFilterEnabled: true,
+      resourceColors: {
+        sunlight: '#f7d24b'
+      }
+    })
+
+    expect(fill).toEqual({
+      mode: 'solid',
+      ware: 'sunlight',
+      color: '#f7d24b'
+    })
   })
 })

@@ -7,6 +7,7 @@ import MapResourceFilterPanel from './MapResourceFilterPanel.vue'
 import regionYieldsData from '@/assets/x4_game_data/8.0-Diplomacy/data/regionyields.json'
 import factionsData from '@/assets/x4_game_data/8.0-Diplomacy/data/factions.json'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import type { SectorResourceFill } from '@/store/logic/mapResourceFilter'
 
 type SearchSectorLayout = {
   sectorId: string
@@ -92,6 +93,7 @@ const searchSectors = ref<SearchSectorLayout[]>([])
 const resourceHighlightedSectorIds = ref<string[]>([])
 const isResourcePanelOpen = ref(false)
 const resourcePrimaryColor = ref<string | null>(null)
+const resourceSectorFills = ref<Record<string, SectorResourceFill>>({})
 const hoveredSectorSource = ref<SectorHoverPayload | null>(null)
 const lastHoveredSectorSource = ref<SectorHoverPayload | null>(null)
 const hoveredSector = ref<TooltipViewModel | null>(null)
@@ -593,6 +595,17 @@ const onResourceSectorSelect = (sectorId: string) => {
   selectSector(sectorId, 'resource')
 }
 
+const onResourceVisualChange = (payload: {
+  highlightedSectorIds: string[]
+  sectorFills: Record<string, SectorResourceFill>
+}) => {
+  resourceHighlightedSectorIds.value = payload.highlightedSectorIds
+  resourceSectorFills.value = payload.sectorFills
+  const firstSectorId = payload.highlightedSectorIds[0]
+  const firstFill = firstSectorId ? payload.sectorFills[firstSectorId] : null
+  resourcePrimaryColor.value = firstFill?.mode === 'solid' ? firstFill.color : null
+}
+
 const onResourceActiveChange = (active: boolean) => {
   void active
 }
@@ -607,6 +620,9 @@ const onResourcePanelOpen = () => {
 
 const onResourcePanelClose = () => {
   isResourcePanelOpen.value = false
+  resourceHighlightedSectorIds.value = []
+  resourceSectorFills.value = {}
+  resourcePrimaryColor.value = null
 }
 
 const onMouseDown = (event: MouseEvent) => {
@@ -731,6 +747,7 @@ onBeforeUnmount(() => {
             <MapSvgCanvas
               :search-highlighted-sector-ids="searchHighlightedSectorIds"
               :resource-highlighted-sector-ids="resourceHighlightedSectorIds"
+              :resource-sector-fills="resourceSectorFills"
               :resource-fill-color-override="resourcePrimaryColor"
               :selected-sector-id="selectedSectorId"
               @content-size="onCanvasSize"
@@ -875,6 +892,7 @@ onBeforeUnmount(() => {
         :mode="isResourcePanelOpen ? 'sidebar' : 'overlay'"
         :show-entry-button="false"
         @highlight-change="onResourceHighlightChange"
+        @resource-visual-change="onResourceVisualChange"
         @select-sector="onResourceSectorSelect"
         @active-change="onResourceActiveChange"
         @primary-color-change="onResourcePrimaryColorChange"

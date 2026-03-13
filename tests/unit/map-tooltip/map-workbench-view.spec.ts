@@ -108,6 +108,7 @@ describe('MapWorkbenchView tooltip interactions', () => {
       stubs: {
         MapSvgCanvas: {
           name: 'MapSvgCanvas',
+          props: ['resourceHighlightedSectorIds', 'resourceSectorFills'],
           template: '<div data-testid="map-svg-canvas" data-sector-hover-id="sector_alpha"></div>'
         },
         MapSectorTooltip: {
@@ -216,5 +217,36 @@ describe('MapWorkbenchView tooltip interactions', () => {
     })
 
     expect(removeAllRanges).toHaveBeenCalledTimes(1)
+  })
+
+  it('forwards resource sector fill descriptions from panel to canvas', async () => {
+    const wrapper = buildWrapper()
+    const canvas = wrapper.getComponent({ name: 'MapSvgCanvas' })
+    const panel = wrapper.getComponent({ name: 'MapResourceFilterPanel' })
+
+    panel.vm.$emit('resource-visual-change', {
+      highlightedSectorIds: ['sector_alpha'],
+      sectorFills: {
+        sector_alpha: {
+          mode: 'pie',
+          slices: [
+            { ware: 'ore', color: '#ff9900', share: 0.7 },
+            { ware: 'silicon', color: '#00bbff', share: 0.3 }
+          ]
+        }
+      }
+    })
+    await nextTick()
+
+    expect(canvas.props('resourceHighlightedSectorIds')).toEqual(['sector_alpha'])
+    expect(canvas.props('resourceSectorFills')).toEqual({
+      sector_alpha: {
+        mode: 'pie',
+        slices: [
+          { ware: 'ore', color: '#ff9900', share: 0.7 },
+          { ware: 'silicon', color: '#00bbff', share: 0.3 }
+        ]
+      }
+    })
   })
 })

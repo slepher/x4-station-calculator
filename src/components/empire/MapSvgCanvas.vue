@@ -78,6 +78,21 @@ type SectorHoverPayload = {
     height: number
   }
 }
+type SectorResourceColorSlice = {
+  ware: string
+  color: string
+  share: number
+}
+type SectorResourceFill =
+  | {
+      mode: 'solid'
+      ware: string
+      color: string
+    }
+  | {
+      mode: 'pie'
+      slices: SectorResourceColorSlice[]
+    }
 
 const FALLBACK_OWNER_COLOR = '#94a3b8'
 const SQRT3 = Math.sqrt(3)
@@ -97,11 +112,13 @@ const SEARCH_SELECTED_FILTER_ID = 'map-search-sector-selected-glow'
 const props = withDefaults(defineProps<{
   searchHighlightedSectorIds?: string[]
   resourceHighlightedSectorIds?: string[]
+  resourceSectorFills?: Record<string, SectorResourceFill>
   resourceFillColorOverride?: string | null
   selectedSectorId?: string | null
 }>(), {
   searchHighlightedSectorIds: () => [],
   resourceHighlightedSectorIds: () => [],
+  resourceSectorFills: () => ({}),
   resourceFillColorOverride: null,
   selectedSectorId: null
 })
@@ -331,16 +348,22 @@ const regionIds = computed(() => Object.keys(clusters.value))
 const searchHighlightedSectorIdSet = computed(() => new Set(props.searchHighlightedSectorIds))
 const resourceHighlightedSectorIdSet = computed(() => new Set(props.resourceHighlightedSectorIds))
 const isSelectedSector = (sectorId: string) => props.selectedSectorId === sectorId
-const isResourceFilterActive = computed(() => Boolean(props.resourceFillColorOverride))
+const isResourceFilterActive = computed(() =>
+  Object.keys(props.resourceSectorFills || {}).length > 0 || resourceHighlightedSectorIdSet.value.size > 0 || Boolean(props.resourceFillColorOverride)
+)
 const getSectorVisualState = (sectorId: string) => {
   if (isSelectedSector(sectorId)) return 'selected'
   if (searchHighlightedSectorIdSet.value.has(sectorId)) return 'search'
   if (resourceHighlightedSectorIdSet.value.has(sectorId)) return 'resource'
   return 'default'
 }
+const shouldRenderResourceOverlay = (sectorId: string) => getSectorVisualState(sectorId) === 'resource'
+const getResourceFill = (sectorId: string) => props.resourceSectorFills?.[sectorId] || null
+const hasPieFill = (sectorId: string) => getResourceFill(sectorId)?.mode === 'pie'
 const sectorFillOpacity = (sectorId: string) => {
   const state = getSectorVisualState(sectorId)
   if (isResourceFilterActive.value && state === 'default') return 0
+  if (hasPieFill(sectorId) && state === 'resource') return 0
   if (state === 'selected') return 0.28
   if (state === 'search') return 0.18
   if (state === 'resource') return 0.15
@@ -375,6 +398,9 @@ const sectorFilter = (sectorId: string) => {
 }
 const sectorFillColor = (sectorId: string, defaultColor: string) => {
   if (!isResourceFilterActive.value) return defaultColor
+  const fill = getResourceFill(sectorId)
+  if (fill?.mode === 'solid' && resourceHighlightedSectorIdSet.value.has(sectorId)) return fill.color
+  if (fill?.mode === 'pie' && resourceHighlightedSectorIdSet.value.has(sectorId)) return 'transparent'
   if (resourceHighlightedSectorIdSet.value.has(sectorId)) return props.resourceFillColorOverride || defaultColor
   return 'transparent'
 }
@@ -382,6 +408,41 @@ const sectorStrokeColor = (sectorId: string, defaultColor: string) => {
   if (!isResourceFilterActive.value) return defaultColor
   if (resourceHighlightedSectorIdSet.value.has(sectorId)) return props.resourceFillColorOverride || defaultColor
   return defaultColor
+}
+const polarToCartesian = (cx: number, cy: number, radius: number, angleDeg: number) => {
+  const angleRad = (Math.PI / 180) * angleDeg
+  return {
+    x: cx + radius * Math.cos(angleRad),
+    y: cy + radius * Math.sin(angleRad)
+  }
+}
+const describePieSlicePath = (cx: number, cy: number, radius: number, startAngle: number, sweepAngle: number) => {
+  const start = polarToCartesian(cx, cy, radius, startAngle)
+  const end = polarToCartesian(cx, cy, radius, startAngle + sweepAngle)
+  const largeArcFlag = sweepAngle > 180 ? 1 : 0
+  return [
+    `M ${cx.toFixed(1)} ${cy.toFixed(1)}`,
+    `L ${start.x.toFixed(1)} ${start.y.toFixed(1)}`,
+    `A ${radius.toFixed(1)} ${radius.toFixed(1)} 0 ${largeArcFlag} 1 ${end.x.toFixed(1)} ${end.y.toFixed(1)}`,
+    'Z'
+  ].join(' ')
+}
+const buildPieSliceGeometries = (sectorId: string, cx: number, cy: number, radius: number) => {
+  const fill = getResourceFill(sectorId)
+  if (!fill || fill.mode !== 'pie' || !shouldRenderResourceOverlay(sectorId)) return []
+  let startAngle = -90
+  return fill.slices.map((slice, index) => {
+    const sweepAngle = index === fill.slices.length - 1
+      ? 360 - (startAngle + 90)
+      : Math.max(0, Math.min(360, slice.share * 360))
+    const path = describePieSlicePath(cx, cy, radius, startAngle, sweepAngle)
+    startAngle += sweepAngle
+    return {
+      ware: slice.ware,
+      color: slice.color,
+      path
+    }
+  })
 }
 
 const regionClusters = computed<Record<string, Cluster>>(() => {
@@ -842,6 +903,19 @@ watchEffect(() => {
           })"
           @mouseleave="emitSectorLeave(cluster.sectors[0]?.id || '')"
         >
+          <g
+            v-if="cluster.sectors[0] && shouldRenderResourceOverlay(cluster.sectors[0].id)"
+            :clip-path="`url(#${sectorClipId(cluster.id, cluster.sectors[0].id)})`"
+          >
+            <path
+              v-for="slice in buildPieSliceGeometries(cluster.sectors[0].id, cluster.cx, cluster.cy, cluster.singleRadius || 0)"
+              :key="`${cluster.sectors[0]?.id}-${slice.ware}`"
+              data-testid="resource-pie-slice"
+              :d="slice.path"
+              :fill="slice.color"
+              fill-opacity="0.95"
+            />
+          </g>
           <polygon
             :points="hexPoints(cluster.cx, cluster.cy, cluster.singleRadius || 0)"
             :fill="sectorFillColor(cluster.sectors[0]?.id || '', cluster.color)"
@@ -888,6 +962,19 @@ watchEffect(() => {
               })"
               @mouseleave="emitSectorLeave(sector.id)"
             >
+              <g
+                v-if="shouldRenderResourceOverlay(sector.id)"
+                :clip-path="`url(#${sectorClipId(cluster.id, sector.id)})`"
+              >
+                <path
+                  v-for="slice in buildPieSliceGeometries(sector.id, sector.sx, sector.sy, sector.radius)"
+                  :key="`${sector.id}-${slice.ware}`"
+                  data-testid="resource-pie-slice"
+                  :d="slice.path"
+                  :fill="slice.color"
+                  fill-opacity="0.95"
+                />
+              </g>
               <polygon
                 :points="hexPoints(sector.sx, sector.sy, sector.radius)"
                 :fill="sectorFillColor(sector.id, sector.color)"
