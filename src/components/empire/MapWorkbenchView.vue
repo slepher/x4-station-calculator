@@ -1262,7 +1262,7 @@ onBeforeUnmount(() => {
 }
 
 .map-shell {
-  @apply relative min-w-0 flex-1 bg-black/70 rounded-lg border border-amber-300/35 p-3 overflow-hidden;
+  @apply relative min-w-0 flex-1 bg-black/70 rounded-lg border border-amber-300/35 overflow-hidden;
   height: 100%;
 }
 
