@@ -830,6 +830,7 @@ watchEffect(() => {
         <g
           v-if="cluster.sectors.length === 1"
           class="sector-hover-target"
+          :data-sector-hover-id="cluster.sectors[0]?.id || ''"
           @mouseenter="emitSectorHover($event, {
             sectorId: cluster.sectors[0]?.id || '',
             clusterId: cluster.sectors[0]?.clusterId || cluster.id,
@@ -875,6 +876,7 @@ watchEffect(() => {
           <template v-for="sector in cluster.sectors" :key="sector.id">
             <g
               class="sector-hover-target"
+              :data-sector-hover-id="sector.id"
               @mouseenter="emitSectorHover($event, {
                 sectorId: sector.id,
                 clusterId: sector.clusterId,

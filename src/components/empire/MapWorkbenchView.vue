@@ -93,12 +93,15 @@ const resourceHighlightedSectorIds = ref<string[]>([])
 const isResourcePanelOpen = ref(false)
 const resourcePrimaryColor = ref<string | null>(null)
 const hoveredSectorSource = ref<SectorHoverPayload | null>(null)
+const lastHoveredSectorSource = ref<SectorHoverPayload | null>(null)
 const hoveredSector = ref<TooltipViewModel | null>(null)
 const isTooltipHovered = ref(false)
 const tooltipPlacement = ref<TooltipPlacement>('bottom')
 const tooltipPosition = ref({ left: 0, top: 0 })
 const tooltipMeasuredSize = ref({ width: 0, height: 0 })
 const tooltipHideTimer = ref<number | null>(null)
+const zoomRestoreTimer = ref<number | null>(null)
+const lastMousePos = ref({ x: 0, y: 0 })
 
 const { t, te, locale } = useI18n()
 const gameDataStore = useGameDataStore()
@@ -269,15 +272,27 @@ const clearTooltipHideTimer = () => {
   }
 }
 
+const clearZoomRestoreTimer = () => {
+  if (zoomRestoreTimer.value !== null) {
+    window.clearTimeout(zoomRestoreTimer.value)
+    zoomRestoreTimer.value = null
+  }
+}
+
 const clearBrowserSelection = () => {
   const selection = window.getSelection?.()
   if (!selection) return
   selection.removeAllRanges()
 }
 
+const getSectorElementAtPointer = (clientX: number, clientY: number) => {
+  const element = document.elementFromPoint(clientX, clientY)
+  if (!element) return null
+  return element.closest('[data-sector-hover-id]') as SVGGraphicsElement | null
+}
+
 const closeTooltip = () => {
   clearTooltipHideTimer()
-  hoveredSectorSource.value = null
   hoveredSector.value = null
   isTooltipHovered.value = false
 }
@@ -434,6 +449,42 @@ const syncTooltipMeasurement = async () => {
   positionTooltip()
 }
 
+const showTooltipFromSectorElement = async (sectorElement: SVGGraphicsElement) => {
+  const sectorId = sectorElement.getAttribute('data-sector-hover-id')
+  if (!sectorId) return
+
+  const source = lastHoveredSectorSource.value
+  if (!source || source.sectorId !== sectorId) return
+
+  const rect = sectorElement.getBoundingClientRect()
+  if (!rect.width || !rect.height) return
+
+  clearTooltipHideTimer()
+  hoveredSectorSource.value = {
+    ...source,
+    anchorRect: {
+      left: rect.left,
+      top: rect.top,
+      right: rect.right,
+      bottom: rect.bottom,
+      width: rect.width,
+      height: rect.height
+    }
+  }
+  hoveredSector.value = createTooltipViewModel(hoveredSectorSource.value)
+  await syncTooltipMeasurement()
+}
+
+const scheduleZoomTooltipRestore = () => {
+  clearZoomRestoreTimer()
+  zoomRestoreTimer.value = window.setTimeout(() => {
+    zoomRestoreTimer.value = null
+    const sectorElement = getSectorElementAtPointer(lastMousePos.value.x, lastMousePos.value.y)
+    if (!sectorElement) return
+    void showTooltipFromSectorElement(sectorElement)
+  }, 200)
+}
+
 const createTooltipViewModel = (payload: SectorHoverPayload): TooltipViewModel => ({
     sectorId: payload.sectorId,
     title: locale.value === 'en' ? payload.name : payload.displayName,
@@ -452,7 +503,12 @@ const createTooltipViewModel = (payload: SectorHoverPayload): TooltipViewModel =
   })
 
 const onSectorHover = (payload: SectorHoverPayload) => {
+  lastMousePos.value = {
+    x: payload.anchorRect.left + payload.anchorRect.width / 2,
+    y: payload.anchorRect.top + payload.anchorRect.height / 2
+  }
   clearTooltipHideTimer()
+  lastHoveredSectorSource.value = payload
   hoveredSectorSource.value = payload
   hoveredSector.value = createTooltipViewModel(payload)
   void syncTooltipMeasurement()
@@ -566,6 +622,7 @@ const onMouseDown = (event: MouseEvent) => {
 }
 
 const onMouseMove = (event: MouseEvent) => {
+  lastMousePos.value = { x: event.clientX, y: event.clientY }
   if (!isDragging.value) return
   const dx = event.clientX - dragStartX.value
   const dy = event.clientY - dragStartY.value
@@ -575,6 +632,7 @@ const onMouseMove = (event: MouseEvent) => {
 const onWheel = (event: WheelEvent) => {
   if (!imageNaturalWidth.value || !imageNaturalHeight.value) return
   event.preventDefault()
+  lastMousePos.value = { x: event.clientX, y: event.clientY }
   closeTooltip()
 
   const { width: vw, height: vh } = getViewportSize()
@@ -598,6 +656,7 @@ const onWheel = (event: WheelEvent) => {
   const nextPanY = mouseY - contentY * nextScale
   clampPan(nextPanX, nextPanY)
   syncSliderFromScale()
+  scheduleZoomTooltipRestore()
 }
 
 const stopDrag = () => {
@@ -643,6 +702,8 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', onResize)
   viewportResizeObserver.value?.disconnect()
   viewportResizeObserver.value = null
+  clearTooltipHideTimer()
+  clearZoomRestoreTimer()
 })
 </script>
 

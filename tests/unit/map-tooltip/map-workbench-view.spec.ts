@@ -1,10 +1,10 @@
 /**
  * @vitest-environment jsdom
  */
-import { ref } from 'vue'
+import { nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/assets/x4_game_data/8.0-Diplomacy/data/regionyields.json', () => ({
   default: [{ ware: 'ore', color: '#ff9900' }]
@@ -37,9 +37,69 @@ vi.mock('vue-i18n', async (importOriginal) => {
 
 import MapWorkbenchView from '@/components/empire/MapWorkbenchView.vue'
 
+const hoverPayload = {
+  sectorId: 'sector_alpha',
+  clusterId: 'cluster_01',
+  name: 'Argon Prime',
+  displayName: 'Argon Prime',
+  owner: 'argon',
+  sunlight: 100,
+  resources: [],
+  anchorRect: {
+    left: 100,
+    top: 80,
+    right: 140,
+    bottom: 120,
+    width: 40,
+    height: 40
+  }
+}
+
+const setViewportMetrics = (element: Element) => {
+  Object.defineProperty(element, 'clientWidth', { configurable: true, value: 800 })
+  Object.defineProperty(element, 'clientHeight', { configurable: true, value: 600 })
+  ;(element as HTMLElement).getBoundingClientRect = vi.fn(() => ({
+    left: 0,
+    top: 0,
+    right: 800,
+    bottom: 600,
+    width: 800,
+    height: 600,
+    x: 0,
+    y: 0,
+    toJSON: () => ({})
+  }))
+}
+
+const setSectorAnchorMetrics = (element: Element) => {
+  ;(element as HTMLElement).getBoundingClientRect = vi.fn(() => ({
+    left: 100,
+    top: 80,
+    right: 140,
+    bottom: 120,
+    width: 40,
+    height: 40,
+    x: 100,
+    y: 80,
+    toJSON: () => ({})
+  }))
+}
+
+const setPointerSectorTarget = (element: Element | null) => {
+  Object.defineProperty(document, 'elementFromPoint', {
+    configurable: true,
+    value: vi.fn(() => element)
+  })
+}
+
 describe('MapWorkbenchView tooltip interactions', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.unstubAllGlobals()
   })
 
   const buildWrapper = () => mount(MapWorkbenchView, {
@@ -48,7 +108,7 @@ describe('MapWorkbenchView tooltip interactions', () => {
       stubs: {
         MapSvgCanvas: {
           name: 'MapSvgCanvas',
-          template: '<div data-testid="map-svg-canvas"></div>'
+          template: '<div data-testid="map-svg-canvas" data-sector-hover-id="sector_alpha"></div>'
         },
         MapSectorTooltip: {
           name: 'MapSectorTooltip',
@@ -61,6 +121,83 @@ describe('MapWorkbenchView tooltip interactions', () => {
         }
       }
     }
+  })
+
+  it('hides tooltip while wheel zoom is still in progress', async () => {
+    vi.useFakeTimers()
+
+    const wrapper = buildWrapper()
+    const viewport = wrapper.get('.map-viewport')
+    setViewportMetrics(viewport.element)
+    const sectorTarget = wrapper.get('[data-testid="map-svg-canvas"]').element
+    setSectorAnchorMetrics(sectorTarget)
+    setPointerSectorTarget(sectorTarget)
+
+    const canvas = wrapper.getComponent({ name: 'MapSvgCanvas' })
+    canvas.vm.$emit('content-size', {
+      width: 1200,
+      height: 900,
+      clusterRefHeight: 142
+    })
+    await nextTick()
+
+    canvas.vm.$emit('sector-hover', hoverPayload)
+    await nextTick()
+    expect(wrapper.find('[data-testid="map-sector-tooltip"]').exists()).toBe(true)
+
+    viewport.element.dispatchEvent(new WheelEvent('wheel', {
+      bubbles: true,
+      cancelable: true,
+      deltaY: -120,
+      clientX: 120,
+      clientY: 100
+    }))
+    await nextTick()
+
+    expect(wrapper.find('[data-testid="map-sector-tooltip"]').exists()).toBe(false)
+
+    vi.advanceTimersByTime(100)
+    await nextTick()
+
+    expect(wrapper.find('[data-testid="map-sector-tooltip"]').exists()).toBe(false)
+  })
+
+  it('restores tooltip after wheel zoom settles when pointer is still over a sector', async () => {
+    vi.useFakeTimers()
+
+    const wrapper = buildWrapper()
+    const viewport = wrapper.get('.map-viewport')
+    setViewportMetrics(viewport.element)
+    const sectorTarget = wrapper.get('[data-testid="map-svg-canvas"]').element
+    setSectorAnchorMetrics(sectorTarget)
+    setPointerSectorTarget(sectorTarget)
+
+    const canvas = wrapper.getComponent({ name: 'MapSvgCanvas' })
+    canvas.vm.$emit('content-size', {
+      width: 1200,
+      height: 900,
+      clusterRefHeight: 142
+    })
+    await nextTick()
+
+    canvas.vm.$emit('sector-hover', hoverPayload)
+    await nextTick()
+
+    viewport.element.dispatchEvent(new WheelEvent('wheel', {
+      bubbles: true,
+      cancelable: true,
+      deltaY: -120,
+      clientX: 120,
+      clientY: 100
+    }))
+    await nextTick()
+
+    expect(wrapper.find('[data-testid="map-sector-tooltip"]').exists()).toBe(false)
+
+    vi.advanceTimersByTime(260)
+    await nextTick()
+
+    expect(wrapper.find('[data-testid="map-sector-tooltip"]').exists()).toBe(true)
   })
 
   it('clears browser text selection when map drag starts', async () => {
