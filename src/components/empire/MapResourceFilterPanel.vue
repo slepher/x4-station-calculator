@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useGameDataStore } from '@/store/useGameDataStore'
 import mapsData from '@/assets/x4_game_data/8.0-Diplomacy/data/maps.json'
 import regionYieldsData from '@/assets/x4_game_data/8.0-Diplomacy/data/regionyields.json'
 import {
@@ -53,7 +52,6 @@ const emit = defineEmits<{
 }>()
 
 const { t, locale } = useI18n()
-const gameDataStore = useGameDataStore()
 
 const regionYields = regionYieldsData as ResourceEntry[]
 const yieldRanksByWare = buildYieldRanksByWare(regionYields)
@@ -196,8 +194,6 @@ watchEffect(() => {
 })
 
 const getResourceLabel = (wareId: string) => {
-  const displayName = gameDataStore.getWareDisplayName(wareId)
-  if (displayName) return displayName
   const fallback = t(`res.${wareId}`)
   return fallback !== `res.${wareId}` ? fallback : wareId
 }
@@ -329,7 +325,7 @@ const isYieldBeyondReachable = (wareId: string) => {
           :data-testid="`map-resource-tag-${resource.ware}`"
           @click="toggleResource(resource.ware)"
         >
-          {{ resource.ware === SUNLIGHT_FILTER_ID ? t('map.resource_filter_sunlight') : getResourceLabel(resource.ware) }}
+          {{ resource.ware === SUNLIGHT_FILTER_ID ? t('res.energycells') : getResourceLabel(resource.ware) }}
         </button>
       </div>
 
