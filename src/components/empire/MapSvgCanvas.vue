@@ -63,13 +63,18 @@ const MAP_FONT_FAMILY = "Consolas, 'Courier New', monospace"
 const CANVAS_SCALE_FACTOR = 1.8
 const STARGATE_VISUAL_SCALE = 1.5
 const SEARCH_HIGHLIGHT_FILTER_ID = 'map-search-sector-glow'
+const RESOURCE_HIGHLIGHT_FILTER_ID = 'map-resource-sector-glow'
 const SEARCH_SELECTED_FILTER_ID = 'map-search-sector-selected-glow'
 
 const props = withDefaults(defineProps<{
-  highlightedSectorIds?: string[]
+  searchHighlightedSectorIds?: string[]
+  resourceHighlightedSectorIds?: string[]
+  resourceFillColorOverride?: string | null
   selectedSectorId?: string | null
 }>(), {
-  highlightedSectorIds: () => [],
+  searchHighlightedSectorIds: () => [],
+  resourceHighlightedSectorIds: () => [],
+  resourceFillColorOverride: null,
   selectedSectorId: null
 })
 
@@ -270,19 +275,60 @@ const gateClusterRatioFromRaw = (gate: Gate, sectorNorm: Sector['normalized']): 
 
 const clusters = computed<Record<string, Cluster>>(() => (mapsData as { clusters: Record<string, Cluster> }).clusters || {})
 const regionIds = computed(() => Object.keys(clusters.value))
-const highlightedSectorIdSet = computed(() => new Set(props.highlightedSectorIds))
+const searchHighlightedSectorIdSet = computed(() => new Set(props.searchHighlightedSectorIds))
+const resourceHighlightedSectorIdSet = computed(() => new Set(props.resourceHighlightedSectorIds))
 const isSelectedSector = (sectorId: string) => props.selectedSectorId === sectorId
-const isHighlightedSector = (sectorId: string) =>
-  highlightedSectorIdSet.value.has(sectorId) || isSelectedSector(sectorId)
-const sectorFillOpacity = (sectorId: string) => isSelectedSector(sectorId) ? 0.28 : (isHighlightedSector(sectorId) ? 0.18 : 0.08)
-const sectorStrokeWidth = (sectorId: string, defaultValue: number) => isSelectedSector(sectorId) ? defaultValue + 0.9 : (isHighlightedSector(sectorId) ? defaultValue + 0.45 : defaultValue)
-const sectorStrokeOpacity = (sectorId: string, defaultValue: number) => isSelectedSector(sectorId) ? 1 : (isHighlightedSector(sectorId) ? Math.min(1, defaultValue + 0.08) : defaultValue)
-const sectorLabelFill = (sectorId: string) => isHighlightedSector(sectorId) ? '#fef3c7' : '#f8fafc'
-const sectorLabelWeight = (sectorId: string) => isHighlightedSector(sectorId) ? 700 : 500
+const isResourceFilterActive = computed(() => Boolean(props.resourceFillColorOverride))
+const getSectorVisualState = (sectorId: string) => {
+  if (isSelectedSector(sectorId)) return 'selected'
+  if (searchHighlightedSectorIdSet.value.has(sectorId)) return 'search'
+  if (resourceHighlightedSectorIdSet.value.has(sectorId)) return 'resource'
+  return 'default'
+}
+const sectorFillOpacity = (sectorId: string) => {
+  const state = getSectorVisualState(sectorId)
+  if (isResourceFilterActive.value && state === 'default') return 0
+  if (state === 'selected') return 0.28
+  if (state === 'search') return 0.18
+  if (state === 'resource') return 0.15
+  return 0.08
+}
+const sectorStrokeWidth = (sectorId: string, defaultValue: number) => {
+  const state = getSectorVisualState(sectorId)
+  if (state === 'selected') return defaultValue + 0.9
+  if (state === 'search') return defaultValue + 0.45
+  if (state === 'resource') return defaultValue + 0.25
+  return defaultValue
+}
+const sectorStrokeOpacity = (sectorId: string, defaultValue: number) => {
+  const state = getSectorVisualState(sectorId)
+  if (state === 'selected') return 1
+  if (state === 'search') return Math.min(1, defaultValue + 0.08)
+  if (state === 'resource') return Math.min(1, defaultValue + 0.03)
+  return defaultValue
+}
+const sectorLabelFill = (sectorId: string) => {
+  const state = getSectorVisualState(sectorId)
+  if (state === 'selected' || state === 'search') return '#fef3c7'
+  if (state === 'resource') return '#fce7f3'
+  return '#f8fafc'
+}
+const sectorLabelWeight = (sectorId: string) => getSectorVisualState(sectorId) === 'default' ? 500 : 700
 const sectorFilter = (sectorId: string) => {
   if (isSelectedSector(sectorId)) return `url(#${SEARCH_SELECTED_FILTER_ID})`
-  if (isHighlightedSector(sectorId)) return `url(#${SEARCH_HIGHLIGHT_FILTER_ID})`
+  if (searchHighlightedSectorIdSet.value.has(sectorId)) return `url(#${SEARCH_HIGHLIGHT_FILTER_ID})`
+  if (resourceHighlightedSectorIdSet.value.has(sectorId)) return `url(#${RESOURCE_HIGHLIGHT_FILTER_ID})`
   return undefined
+}
+const sectorFillColor = (sectorId: string, defaultColor: string) => {
+  if (!isResourceFilterActive.value) return defaultColor
+  if (resourceHighlightedSectorIdSet.value.has(sectorId)) return props.resourceFillColorOverride || defaultColor
+  return 'transparent'
+}
+const sectorStrokeColor = (sectorId: string, defaultColor: string) => {
+  if (!isResourceFilterActive.value) return defaultColor
+  if (resourceHighlightedSectorIdSet.value.has(sectorId)) return props.resourceFillColorOverride || defaultColor
+  return defaultColor
 }
 
 const regionClusters = computed<Record<string, Cluster>>(() => {
@@ -650,6 +696,16 @@ watchEffect(() => {
           <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
+      <filter :id="RESOURCE_HIGHLIGHT_FILTER_ID" x="-40%" y="-40%" width="180%" height="180%">
+        <feMorphology in="SourceAlpha" operator="dilate" radius="0.6" result="spread" />
+        <feGaussianBlur in="spread" stdDeviation="2.1" result="blur" />
+        <feFlood flood-color="#f472b6" flood-opacity="0.75" result="color" />
+        <feComposite in="color" in2="blur" operator="in" result="glow" />
+        <feMerge>
+          <feMergeNode in="glow" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
       <filter :id="SEARCH_SELECTED_FILTER_ID" x="-50%" y="-50%" width="200%" height="200%">
         <feMorphology in="SourceAlpha" operator="dilate" radius="1.1" result="spread" />
         <feGaussianBlur in="spread" stdDeviation="3.2" result="blur" />
@@ -710,9 +766,9 @@ watchEffect(() => {
         <polygon
           v-if="cluster.sectors.length === 1"
           :points="hexPoints(cluster.cx, cluster.cy, cluster.singleRadius || 0)"
-          :fill="cluster.color"
+          :fill="sectorFillColor(cluster.sectors[0]?.id || '', cluster.color)"
           :fill-opacity="sectorFillOpacity(cluster.sectors[0]?.id || '')"
-          :stroke="cluster.color"
+          :stroke="sectorStrokeColor(cluster.sectors[0]?.id || '', cluster.color)"
           :stroke-width="sectorStrokeWidth(cluster.sectors[0]?.id || '', 2.8)"
           :stroke-opacity="sectorStrokeOpacity(cluster.sectors[0]?.id || '', 0.95)"
           :filter="sectorFilter(cluster.sectors[0]?.id || '')"
@@ -728,9 +784,9 @@ watchEffect(() => {
           <template v-for="sector in cluster.sectors" :key="sector.id">
             <polygon
               :points="hexPoints(sector.sx, sector.sy, sector.radius)"
-              :fill="sector.color"
+              :fill="sectorFillColor(sector.id, sector.color)"
               :fill-opacity="sectorFillOpacity(sector.id)"
-              :stroke="sector.color"
+              :stroke="sectorStrokeColor(sector.id, sector.color)"
               :stroke-width="sectorStrokeWidth(sector.id, 2.2)"
               :stroke-opacity="sectorStrokeOpacity(sector.id, 0.9)"
               :filter="sectorFilter(sector.id)"

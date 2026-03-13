@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import MapSvgCanvas from './MapSvgCanvas.vue'
+import MapResourceFilterPanel from './MapResourceFilterPanel.vue'
 
 type SearchSectorLayout = {
   sectorId: string
@@ -20,6 +21,7 @@ const MAX_SCALE_MULTIPLIER = 2
 
 const viewportRef = ref<HTMLDivElement | null>(null)
 const searchInputRef = ref<HTMLInputElement | null>(null)
+const viewportResizeObserver = ref<ResizeObserver | null>(null)
 
 const imageNaturalWidth = ref(0)
 const imageNaturalHeight = ref(0)
@@ -40,8 +42,12 @@ const dragOriginY = ref(0)
 
 const searchQuery = ref('')
 const isSearchFocused = ref(false)
-const selectedSearchSectorId = ref<string | null>(null)
+const selectedSectorId = ref<string | null>(null)
+const selectedSectorSource = ref<'search' | 'resource' | null>(null)
 const searchSectors = ref<SearchSectorLayout[]>([])
+const resourceHighlightedSectorIds = ref<string[]>([])
+const isResourceFilterActive = ref(false)
+const resourcePrimaryColor = ref<string | null>(null)
 
 const { t, locale } = useI18n()
 
@@ -182,7 +188,7 @@ const searchResults = computed<SearchResultItem[]>(() => {
   })
 })
 
-const highlightedSectorIds = computed(() => {
+const searchHighlightedSectorIds = computed(() => {
   if (!normalizedSearchQuery.value) return [] as string[]
   if (searchResults.value.length >= 10) return [] as string[]
   return searchResults.value.map((item) => item.sectorId)
@@ -219,7 +225,6 @@ const onSliderInput = (event: Event) => {
 
 const onSearchInput = (event: Event) => {
   searchQuery.value = (event.target as HTMLInputElement).value
-  selectedSearchSectorId.value = null
 }
 
 const onSearchFocus = () => {
@@ -234,15 +239,41 @@ const onSearchBlur = () => {
 
 const onClearSearch = () => {
   searchQuery.value = ''
-  selectedSearchSectorId.value = null
+  if (selectedSectorSource.value === 'search') {
+    selectedSectorId.value = null
+    selectedSectorSource.value = null
+  }
   searchInputRef.value?.focus()
 }
 
+const selectSector = (sectorId: string, source: 'search' | 'resource') => {
+  selectedSectorId.value = sectorId
+  selectedSectorSource.value = source
+  if (source === 'search') {
+    isSearchFocused.value = false
+    searchInputRef.value?.blur()
+  }
+  focusSector(sectorId)
+}
+
 const selectSearchResult = (item: SearchSectorLayout) => {
-  selectedSearchSectorId.value = item.sectorId
-  isSearchFocused.value = false
-  searchInputRef.value?.blur()
-  focusSector(item.sectorId)
+  selectSector(item.sectorId, 'search')
+}
+
+const onResourceHighlightChange = (sectorIds: string[]) => {
+  resourceHighlightedSectorIds.value = sectorIds
+}
+
+const onResourceSectorSelect = (sectorId: string) => {
+  selectSector(sectorId, 'resource')
+}
+
+const onResourceActiveChange = (active: boolean) => {
+  isResourceFilterActive.value = active
+}
+
+const onResourcePrimaryColorChange = (color: string | null) => {
+  resourcePrimaryColor.value = color
 }
 
 const onMouseDown = (event: MouseEvent) => {
@@ -296,108 +327,134 @@ const onResize = () => {
   recomputeScaleBounds()
 }
 
+watch(isResourceFilterActive, async () => {
+  await nextTick()
+  recomputeScaleBounds()
+})
+
 onMounted(() => {
   window.addEventListener('resize', onResize)
+  if (typeof ResizeObserver !== 'undefined' && viewportRef.value) {
+    viewportResizeObserver.value = new ResizeObserver(() => {
+      recomputeScaleBounds()
+    })
+    viewportResizeObserver.value.observe(viewportRef.value)
+  }
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', onResize)
+  viewportResizeObserver.value?.disconnect()
+  viewportResizeObserver.value = null
 })
 </script>
 
 <template>
   <section class="map-workbench">
-    <div class="map-shell">
-      <div
-        ref="viewportRef"
-        class="map-viewport"
-        :class="{ dragging: isDragging }"
-        @mousedown="onMouseDown"
-        @mousemove="onMouseMove"
-        @mouseup="stopDrag"
-        @mouseleave="stopDrag"
-        @wheel="onWheel"
-      >
+    <div class="map-layout" :class="{ 'sidebar-active': isResourceFilterActive }">
+      <div class="map-shell">
         <div
-          class="map-content"
-          :style="{
-            transform: `translate(${panX}px, ${panY}px) scale(${scale})`,
-            transformOrigin: 'top left'
-          }"
+          ref="viewportRef"
+          class="map-viewport"
+          :class="{ dragging: isDragging }"
+          @mousedown="onMouseDown"
+          @mousemove="onMouseMove"
+          @mouseup="stopDrag"
+          @mouseleave="stopDrag"
+          @wheel="onWheel"
         >
-          <MapSvgCanvas
-            :highlighted-sector-ids="highlightedSectorIds"
-            :selected-sector-id="selectedSearchSectorId"
-            @content-size="onCanvasSize"
-            @sector-layout="onSectorLayout"
-          />
-        </div>
-      </div>
-
-      <div class="map-search-panel" @mousedown.stop>
-        <div class="search-box group" :class="{ focused: isSearchFocused }">
-          <span class="search-icon">🔍</span>
-          <input
-            ref="searchInputRef"
-            :value="searchQuery"
-            class="search-input"
-            data-testid="map-sector-search-input"
-            :placeholder="t('map.search_sector_placeholder')"
-            @input="onSearchInput"
-            @focus="onSearchFocus"
-            @blur="onSearchBlur"
-          />
-          <button
-            v-show="searchQuery"
-            class="clear-btn opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-            type="button"
-            @mousedown.prevent="onClearSearch"
-          >
-            ×
-          </button>
-        </div>
-
-        <Transition name="fade-slide-down">
           <div
-            v-if="shouldShowSearchPopover"
-            class="map-search-popover scrollbar-thin"
-            :class="{ 'map-search-popover-wide': hasIdMatchedResult }"
-            data-testid="map-sector-search-popover"
-            @mousedown.prevent
+            class="map-content"
+            :style="{
+              transform: `translate(${panX}px, ${panY}px) scale(${scale})`,
+              transformOrigin: 'top left'
+            }"
           >
-            <template v-if="searchResults.length > 0">
-              <button
-                v-for="item in searchResults"
-                :key="item.sectorId"
-                type="button"
-                class="result-item"
-                :data-testid="`map-sector-search-result-${item.sectorId}`"
-                @click="selectSearchResult(item)"
-              >
-                <span class="result-label">{{ getResultPrimaryLabel(item) }}</span>
-                <span v-if="getResultMeta(item)" class="result-meta">{{ getResultMeta(item) }}</span>
-              </button>
-            </template>
-            <div v-else class="no-results">{{ t('map.no_search_results') }}</div>
+            <MapSvgCanvas
+              :search-highlighted-sector-ids="searchHighlightedSectorIds"
+              :resource-highlighted-sector-ids="resourceHighlightedSectorIds"
+              :resource-fill-color-override="resourcePrimaryColor"
+              :selected-sector-id="selectedSectorId"
+              @content-size="onCanvasSize"
+              @sector-layout="onSectorLayout"
+            />
           </div>
-        </Transition>
+        </div>
+
+        <div class="map-search-panel" @mousedown.stop>
+          <div class="search-box group" :class="{ focused: isSearchFocused }">
+            <span class="search-icon">🔍</span>
+            <input
+              ref="searchInputRef"
+              :value="searchQuery"
+              class="search-input"
+              data-testid="map-sector-search-input"
+              :placeholder="t('map.search_sector_placeholder')"
+              @input="onSearchInput"
+              @focus="onSearchFocus"
+              @blur="onSearchBlur"
+            />
+            <button
+              v-show="searchQuery"
+              class="clear-btn opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+              type="button"
+              @mousedown.prevent="onClearSearch"
+            >
+              ×
+            </button>
+          </div>
+
+          <Transition name="fade-slide-down">
+            <div
+              v-if="shouldShowSearchPopover"
+              class="map-search-popover scrollbar-thin"
+              :class="{ 'map-search-popover-wide': hasIdMatchedResult }"
+              data-testid="map-sector-search-popover"
+              @mousedown.prevent
+            >
+              <template v-if="searchResults.length > 0">
+                <button
+                  v-for="item in searchResults"
+                  :key="item.sectorId"
+                  type="button"
+                  class="result-item"
+                  :data-testid="`map-sector-search-result-${item.sectorId}`"
+                  @click="selectSearchResult(item)"
+                >
+                  <span class="result-label">{{ getResultPrimaryLabel(item) }}</span>
+                  <span v-if="getResultMeta(item)" class="result-meta">{{ getResultMeta(item) }}</span>
+                </button>
+              </template>
+              <div v-else class="no-results">{{ t('map.no_search_results') }}</div>
+            </div>
+          </Transition>
+        </div>
+
+        <div class="zoom-panel">
+          <div class="zoom-label-row">
+            <span class="zoom-label">Scale</span>
+            <span class="zoom-value">{{ displayScaleText }}</span>
+          </div>
+          <input
+            class="zoom-slider"
+            type="range"
+            min="0"
+            max="100"
+            step="0.5"
+            :value="zoomPercent"
+            @input="onSliderInput"
+          />
+        </div>
       </div>
 
-      <div class="zoom-panel">
-        <div class="zoom-label-row">
-          <span class="zoom-label">Scale</span>
-          <span class="zoom-value">{{ displayScaleText }}</span>
-        </div>
-        <input
-          class="zoom-slider"
-          type="range"
-          min="0"
-          max="100"
-          step="0.5"
-          :value="zoomPercent"
-          @input="onSliderInput"
-        />
-      </div>
+      <MapResourceFilterPanel
+        :sector-layouts="searchSectors"
+        :mode="isResourceFilterActive ? 'sidebar' : 'overlay'"
+        @highlight-change="onResourceHighlightChange"
+        @select-sector="onResourceSectorSelect"
+        @active-change="onResourceActiveChange"
+        @primary-color-change="onResourcePrimaryColorChange"
+      />
     </div>
   </section>
 </template>
@@ -411,8 +468,16 @@ onBeforeUnmount(() => {
 }
 
 .map-shell {
-  @apply relative bg-black/70 rounded-lg border border-amber-300/35 p-3 overflow-hidden;
+  @apply relative min-w-0 flex-1 bg-black/70 rounded-lg border border-amber-300/35 p-3 overflow-hidden;
   height: 100%;
+}
+
+.map-layout {
+  @apply relative flex h-full min-h-0;
+}
+
+.map-layout.sidebar-active {
+  @apply gap-3;
 }
 
 .map-viewport {

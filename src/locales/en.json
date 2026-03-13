@@ -99,7 +99,33 @@
   },
   "map": {
     "search_sector_placeholder": "Search sector",
-    "no_search_results": "No matching sectors"
+    "no_search_results": "No matching sectors",
+    "resource_filter_all": "All",
+    "resource_filter_mixed": "Mixed",
+    "resource_filter_candidates": "Matched",
+    "resource_filter_no_match": "No matching sectors",
+    "resource_filter_reachable_max": "Reachable Max",
+    "resource_filter_unreachable": "None",
+    "resource_filter_exceeds_reachable": "Above reachable",
+    "resource_filter_sunlight": "Sunlight",
+    "resource_filter_sunlight_suffix": "%",
+    "yield_names": {
+      "lowest": "Lowest",
+      "verylow": "Very Low",
+      "lowminus": "Low Minus",
+      "low": "Low",
+      "lowplus": "Low Plus",
+      "lowextra": "Low Extra",
+      "medlow": "Med Low",
+      "medium": "Medium",
+      "medplus": "Med Plus",
+      "medhigh": "Med High",
+      "highlow": "High Low",
+      "high": "High",
+      "highplus": "High Plus",
+      "veryhigh": "Very High",
+      "highest": "Highest"
+    }
   },
   "ship_build": {
     "title": "Ship Build",
