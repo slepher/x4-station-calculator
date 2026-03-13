@@ -239,7 +239,7 @@ watch(() => props.open, (open) => {
 
 <style scoped>
 .map-station-panel {
-  @apply flex h-full w-[340px] shrink-0 flex-col overflow-hidden rounded-lg border border-amber-300/35 bg-black/80 p-4 text-amber-50;
+  @apply flex h-full w-[360px] shrink-0 flex-col overflow-hidden rounded-lg border border-amber-300/35 bg-black/80 p-4 text-amber-50;
   backdrop-filter: blur(10px);
 }
 
