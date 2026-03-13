@@ -35,6 +35,49 @@ vi.mock('vue-i18n', async (importOriginal) => {
   }
 })
 
+vi.mock('@/store/useEmpireStore', () => ({
+  useEmpireStore: () => ({
+    activeEmpire: {
+      id: 'empire-1',
+      name: 'Empire',
+      sectors: [
+        { id: 'sector-plan-1', name: 'Transit One', order: 0 },
+        {
+          id: 'sector-plan-2',
+          name: 'Transit Two',
+          order: 1,
+          location: {
+            cluster_id: 'cluster_01',
+            sector_id: 'sector_alpha',
+            pos: { x: 1200, z: -800 },
+            sunlight: 100,
+            resources: ['ore']
+          }
+        }
+      ],
+      stations: [
+        { id: 'station-1', name: 'Alpha Station', type: 'industrial' },
+        {
+          id: 'station-2',
+          name: 'Beta Station',
+          type: 'industrial',
+          location: {
+            cluster_id: 'cluster_01',
+            sector_id: 'sector_alpha',
+            pos: { x: 400, z: 900 },
+            sunlight: 100,
+            resources: ['ore', 'silicon']
+          }
+        }
+      ]
+    },
+    clearStationLocation: vi.fn(),
+    clearSectorLocation: vi.fn(),
+    setStationLocation: vi.fn(),
+    setSectorLocation: vi.fn()
+  })
+}))
+
 import MapWorkbenchView from '@/components/empire/MapWorkbenchView.vue'
 
 const hoverPayload = {
@@ -108,7 +151,7 @@ describe('MapWorkbenchView tooltip interactions', () => {
       stubs: {
         MapSvgCanvas: {
           name: 'MapSvgCanvas',
-          props: ['resourceHighlightedSectorIds', 'resourceSectorFills'],
+          props: ['resourceHighlightedSectorIds', 'resourceSectorFills', 'placementOverlays'],
           template: '<div data-testid="map-svg-canvas" data-sector-hover-id="sector_alpha"></div>'
         },
         MapSectorTooltip: {
@@ -119,6 +162,16 @@ describe('MapWorkbenchView tooltip interactions', () => {
         MapResourceFilterPanel: {
           name: 'MapResourceFilterPanel',
           template: '<div data-testid="map-resource-filter-panel"></div>'
+        },
+        MapStationPanel: {
+          name: 'MapStationPanel',
+          props: ['items'],
+          template: `
+            <div data-testid="map-station-panel">
+              <button data-testid="map-station-panel-close" @click="$emit('close')">close</button>
+              <div data-testid="map-station-panel-count">{{ items.length }}</div>
+            </div>
+          `
         }
       }
     }
@@ -250,7 +303,7 @@ describe('MapWorkbenchView tooltip interactions', () => {
     })
   })
 
-  it('anchors search, resource filter, zoom, and sidebar in the updated map positions', async () => {
+  it('anchors search, resource filter, zoom, and sidebars in the updated map positions', async () => {
     const wrapper = buildWrapper()
 
     expect(wrapper.get('.map-search-panel').classes()).toContain('right-6')
@@ -259,6 +312,8 @@ describe('MapWorkbenchView tooltip interactions', () => {
     expect(wrapper.get('.map-resource-entry-btn').classes()).not.toContain('right-6')
     expect(wrapper.get('.zoom-panel').classes()).toContain('right-6')
     expect(wrapper.get('.zoom-panel').classes()).not.toContain('left-6')
+    expect(wrapper.get('[data-testid="map-station-entry-button"]').classes()).toContain('left-6')
+    expect(wrapper.get('[data-testid="map-station-entry-button"]').classes()).toContain('bottom-5')
 
     const panel = wrapper.getComponent({ name: 'MapResourceFilterPanel' })
     panel.vm.$emit('panel-open')
@@ -267,5 +322,26 @@ describe('MapWorkbenchView tooltip interactions', () => {
     const layoutChildren = Array.from(wrapper.get('.map-layout').element.children)
     expect(layoutChildren[0]?.getAttribute('data-testid')).toBe('map-resource-filter-panel')
     expect(layoutChildren[1]?.classList.contains('map-shell')).toBe(true)
+  })
+
+  it('opens the station panel from the left, hides the entry button, and forwards placed overlays', async () => {
+    const wrapper = buildWrapper()
+
+    await wrapper.get('[data-testid="map-station-entry-button"]').trigger('click')
+
+    expect(wrapper.find('[data-testid="map-station-entry-button"]').exists()).toBe(false)
+    expect(wrapper.get('.map-layout').classes()).toContain('station-sidebar-active')
+    expect(wrapper.get('[data-testid="map-station-panel-count"]').text()).toBe('4')
+
+    const canvas = wrapper.getComponent({ name: 'MapSvgCanvas' })
+    expect(canvas.props('placementOverlays')).toHaveLength(2)
+
+    const layoutChildren = Array.from(wrapper.get('.map-layout').element.children)
+    expect(layoutChildren[0]?.getAttribute('data-testid')).toBe('map-resource-filter-panel')
+    expect(layoutChildren[1]?.getAttribute('data-testid')).toBe('map-station-panel')
+
+    await wrapper.get('[data-testid="map-station-panel-close"]').trigger('click')
+    expect(wrapper.find('[data-testid="map-station-panel"]').exists()).toBe(false)
+    expect(wrapper.get('[data-testid="map-station-entry-button"]').exists()).toBe(true)
   })
 })

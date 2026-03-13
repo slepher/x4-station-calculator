@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type {
+  EntityLocation,
   EmpirePlan,
   SectorPlan,
   SavedEmpiresState,
@@ -51,7 +52,8 @@ function createDefaultStation(name: string, type: StationType = 'industrial'): S
     settings: { ...DEFAULT_STATION_SETTINGS },
     lastUpdated: Date.now(),
     lockedWares: [],
-    warePriority: {}
+    warePriority: {},
+    location: undefined
   }
 }
 
@@ -69,7 +71,8 @@ function createDefaultSector(index: number): SectorPlan {
   return {
     id: crypto.randomUUID(),
     name: `Sector ${index + 1}`,
-    order: index
+    order: index,
+    location: undefined
   }
 }
 
@@ -675,6 +678,31 @@ export const useEmpireStore = defineStore('empire', () => {
     return true
   }
 
+  function setStationLocation(stationId: string, location: EntityLocation | null) {
+    if (!activeEmpire.value) return false
+    const station = activeEmpire.value.stations.find((item) => item.id === stationId)
+    if (!station) return false
+    station.location = location ? JSON.parse(JSON.stringify(location)) : undefined
+    station.lastUpdated = Date.now()
+    return true
+  }
+
+  function clearStationLocation(stationId: string) {
+    return setStationLocation(stationId, null)
+  }
+
+  function setSectorLocation(sectorId: string, location: EntityLocation | null) {
+    if (!activeEmpire.value) return false
+    const sector = (activeEmpire.value.sectors || []).find((item) => item.id === sectorId)
+    if (!sector) return false
+    sector.location = location ? JSON.parse(JSON.stringify(location)) : undefined
+    return true
+  }
+
+  function clearSectorLocation(sectorId: string) {
+    return setSectorLocation(sectorId, null)
+  }
+
   function setSectorStationOrder(sectorId: string | null, orderedStationIds: string[]) {
     if (!activeEmpire.value) return false
     const matchSector = (station: StationPlan) => (station.sectorId || null) === sectorId
@@ -1032,6 +1060,10 @@ export const useEmpireStore = defineStore('empire', () => {
     removeSectorLink,
     getLinkedSectors,
     moveStationToSector,
+    setStationLocation,
+    clearStationLocation,
+    setSectorLocation,
+    clearSectorLocation,
     setSectorStationOrder,
     getSupplyPlanningInput,
     getSectorInternalData,

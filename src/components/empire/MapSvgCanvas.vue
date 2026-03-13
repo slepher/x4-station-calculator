@@ -2,6 +2,9 @@
 import { computed, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import mapsData from '@/assets/x4_game_data/8.0-Diplomacy/data/maps.json'
+import factoryIconUrl from '@/components/icon/factory.svg'
+import shipyardIconUrl from '@/components/icon/shipyard.svg'
+import tradestationIconUrl from '@/components/icon/tradestation.svg'
 
 type Vec2 = { x: number; y: number }
 type LayoutConfig = { width: number; height: number; padX: number; padY: number; topPad: number }
@@ -33,6 +36,7 @@ type Sector = {
   normalized?: {
     center_offset_ratio?: Ratio
     sector_radius_ratio?: number
+    scale_per_radius?: number
   }
   shcon_anchors?: Record<string, Anchor>
   highways?: Record<string, Highway>
@@ -93,6 +97,28 @@ type SectorResourceFill =
       mode: 'pie'
       slices: SectorResourceColorSlice[]
     }
+type PlacementLocation = {
+  cluster_id: string
+  sector_id: string
+  pos: {
+    x: number
+    z: number
+  }
+}
+type PlacementOverlay = {
+  key: string
+  id: string
+  kind: 'station' | 'sector'
+  name: string
+  icon: 'factory' | 'shipyard' | 'tradestation'
+  location: PlacementLocation
+}
+type PlacementPreview = {
+  kind: 'station' | 'sector'
+  name: string
+  icon: 'factory' | 'shipyard' | 'tradestation'
+  location: PlacementLocation
+}
 
 const FALLBACK_OWNER_COLOR = '#94a3b8'
 const SQRT3 = Math.sqrt(3)
@@ -108,6 +134,8 @@ const STARGATE_VISUAL_SCALE = 1.5
 const SEARCH_HIGHLIGHT_FILTER_ID = 'map-search-sector-glow'
 const RESOURCE_HIGHLIGHT_FILTER_ID = 'map-resource-sector-glow'
 const SEARCH_SELECTED_FILTER_ID = 'map-search-sector-selected-glow'
+const OVERLAY_ICON_SIZE = 18
+const PREVIEW_ICON_SIZE = 20
 
 const props = withDefaults(defineProps<{
   searchHighlightedSectorIds?: string[]
@@ -115,12 +143,20 @@ const props = withDefaults(defineProps<{
   resourceSectorFills?: Record<string, SectorResourceFill>
   resourceFillColorOverride?: string | null
   selectedSectorId?: string | null
+  placementOverlays?: PlacementOverlay[]
+  placementPreview?: PlacementPreview | null
+  draggingOverlayKey?: string | null
+  focusedOverlayKey?: string | null
 }>(), {
   searchHighlightedSectorIds: () => [],
   resourceHighlightedSectorIds: () => [],
   resourceSectorFills: () => ({}),
   resourceFillColorOverride: null,
-  selectedSectorId: null
+  selectedSectorId: null,
+  placementOverlays: () => [],
+  placementPreview: null,
+  draggingOverlayKey: null,
+  focusedOverlayKey: null
 })
 
 const emit = defineEmits<{
@@ -128,6 +164,7 @@ const emit = defineEmits<{
   (e: 'sector-layout', payload: SearchSectorLayout[]): void
   (e: 'sector-hover', payload: SectorHoverPayload): void
   (e: 'sector-leave', sectorId: string): void
+  (e: 'overlay-pointerdown', payload: PlacementOverlay): void
 }>()
 const { t, te } = useI18n()
 
@@ -135,6 +172,11 @@ const svgIdSafe = (value: string) => value.replace(/[^a-zA-Z0-9_-]/g, '_')
 const sectorClipId = (clusterId: string, sectorId: string) =>
   `sector-clip-${svgIdSafe(clusterId)}-${svgIdSafe(sectorId)}`
 const resolveOwnerColor = (node: { owner_color?: string }) => node.owner_color || FALLBACK_OWNER_COLOR
+const placementIconHref = (icon: 'factory' | 'shipyard' | 'tradestation') => {
+  if (icon === 'shipyard') return shipyardIconUrl
+  if (icon === 'tradestation') return tradestationIconUrl
+  return factoryIconUrl
+}
 
 const resolveName = (nameId?: string, fallback?: string) => {
   if (nameId && te(nameId)) {
@@ -793,6 +835,52 @@ const sectorLayouts = computed<SearchSectorLayout[]>(() =>
     }))
   )
 )
+const overlayScreenItems = computed(() => {
+  const { centers, clusterRadius } = layoutState.value
+  return props.placementOverlays
+    .map((overlay) => {
+      const cluster = clusters.value[overlay.location.cluster_id]
+      const sector = cluster?.sectors?.[overlay.location.sector_id]
+      const center = centers[overlay.location.cluster_id]
+      const scalePerRadius = Number(sector?.normalized?.scale_per_radius || 0)
+      const sectorRadiusRatio = Number(sector?.normalized?.sector_radius_ratio || 0)
+      const sectorCenter = sector?.normalized?.center_offset_ratio
+      if (!cluster || !sector || !center || !scalePerRadius || !sectorCenter || !sectorRadiusRatio) return null
+      const localRatio = {
+        x: overlay.location.pos.x * scalePerRadius,
+        y: -overlay.location.pos.z * scalePerRadius
+      }
+      const ratio = sectorRatioToClusterRatio(sector.normalized, localRatio)
+      if (!ratio) return null
+      const point = clusterRatioToScreen(center, clusterRadius, ratio)
+      return {
+        ...overlay,
+        x: point.x,
+        y: point.y
+      }
+    })
+    .filter((item): item is PlacementOverlay & { x: number; y: number } => !!item)
+})
+const previewScreenItem = computed(() => {
+  const preview = props.placementPreview
+  if (!preview) return null
+  const cluster = clusters.value[preview.location.cluster_id]
+  const sector = cluster?.sectors?.[preview.location.sector_id]
+  const center = layoutState.value.centers[preview.location.cluster_id]
+  const scalePerRadius = Number(sector?.normalized?.scale_per_radius || 0)
+  if (!cluster || !sector || !center || !scalePerRadius) return null
+  const ratio = sectorRatioToClusterRatio(sector.normalized, {
+    x: preview.location.pos.x * scalePerRadius,
+    y: -preview.location.pos.z * scalePerRadius
+  })
+  if (!ratio) return null
+  const point = clusterRatioToScreen(center, layoutState.value.clusterRadius, ratio)
+  return {
+    ...preview,
+    x: point.x,
+    y: point.y
+  }
+})
 
 watchEffect(() => {
   emit('content-size', {
@@ -895,6 +983,7 @@ watchEffect(() => {
           v-if="cluster.sectors.length === 1"
           class="sector-hover-target"
           :data-sector-hover-id="cluster.sectors[0]?.id || ''"
+          :data-map-sector-id="cluster.sectors[0]?.id || ''"
           @mouseenter="emitSectorHover($event, {
             sectorId: cluster.sectors[0]?.id || '',
             clusterId: cluster.sectors[0]?.clusterId || cluster.id,
@@ -954,6 +1043,7 @@ watchEffect(() => {
             <g
               class="sector-hover-target"
               :data-sector-hover-id="sector.id"
+              :data-map-sector-id="sector.id"
               @mouseenter="emitSectorHover($event, {
                 sectorId: sector.id,
                 clusterId: sector.clusterId,
@@ -1006,6 +1096,46 @@ watchEffect(() => {
       </template>
     </g>
 
+    <g class="station-overlays">
+      <g
+        v-for="overlay in overlayScreenItems"
+        :key="overlay.key"
+        class="placement-overlay"
+        :class="{
+          dragging: draggingOverlayKey === overlay.key,
+          focused: focusedOverlayKey === overlay.key
+        }"
+        :transform="`translate(${overlay.x.toFixed(1)} ${overlay.y.toFixed(1)})`"
+        :data-placement-key="overlay.key"
+        @mousedown.stop="emit('overlay-pointerdown', overlay)"
+      >
+        <image
+          :href="placementIconHref(overlay.icon)"
+          :x="(-OVERLAY_ICON_SIZE / 2).toFixed(1)"
+          :y="(-OVERLAY_ICON_SIZE / 2).toFixed(1)"
+          :width="OVERLAY_ICON_SIZE"
+          :height="OVERLAY_ICON_SIZE"
+          preserveAspectRatio="xMidYMid meet"
+        />
+        <text x="0" y="-12" text-anchor="middle">{{ overlay.name }}</text>
+      </g>
+      <g
+        v-if="previewScreenItem"
+        class="placement-preview"
+        :transform="`translate(${previewScreenItem.x.toFixed(1)} ${previewScreenItem.y.toFixed(1)})`"
+      >
+        <image
+          :href="placementIconHref(previewScreenItem.icon)"
+          :x="(-PREVIEW_ICON_SIZE / 2).toFixed(1)"
+          :y="(-PREVIEW_ICON_SIZE / 2).toFixed(1)"
+          :width="PREVIEW_ICON_SIZE"
+          :height="PREVIEW_ICON_SIZE"
+          preserveAspectRatio="xMidYMid meet"
+        />
+        <text x="0" y="-13" text-anchor="middle">{{ previewScreenItem.name }}</text>
+      </g>
+    </g>
+
     <g class="gates">
       <circle
         v-for="gate in gateCircles"
@@ -1044,5 +1174,41 @@ watchEffect(() => {
 
 .sector-hover-target {
   pointer-events: auto;
+}
+
+.placement-overlay {
+  pointer-events: auto;
+  cursor: grab;
+}
+
+.placement-overlay image,
+.placement-preview image {
+  overflow: visible;
+}
+
+.placement-overlay.dragging {
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+.placement-overlay.focused image {
+  filter:
+    drop-shadow(0 0 4px rgba(253, 230, 138, 0.95))
+    drop-shadow(0 0 10px rgba(245, 158, 11, 0.7));
+}
+
+.placement-overlay.focused text {
+  fill: #fff7d6;
+}
+
+.placement-overlay text,
+.placement-preview text {
+  fill: #fef3c7;
+  font-size: 10px;
+  font-family: Consolas, 'Courier New', monospace;
+}
+
+.placement-preview {
+  pointer-events: none;
 }
 </style>
