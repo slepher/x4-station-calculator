@@ -39,16 +39,21 @@ type ResourceCatalogItem = {
   kind: 'ware' | 'sunlight'
 }
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   sectorLayouts: SearchSectorLayout[]
   mode?: 'overlay' | 'sidebar'
-}>()
+  showEntryButton?: boolean
+}>(), {
+  showEntryButton: true
+})
 
 const emit = defineEmits<{
   (e: 'highlight-change', sectorIds: string[]): void
   (e: 'select-sector', sectorId: string): void
   (e: 'active-change', active: boolean): void
   (e: 'primary-color-change', color: string | null): void
+  (e: 'panel-open'): void
+  (e: 'panel-close'): void
 }>()
 
 const { t, locale } = useI18n()
@@ -59,8 +64,10 @@ const resourceFilters = ref(buildDefaultResourceFilters(regionYields))
 const RESOURCE_ORDER = ['ore', 'silicon', 'methane', 'hydrogen', 'helium', 'ice', 'rawscrap', 'nividium'] as const
 const SUNLIGHT_FILTER_ID = 'sunlight'
 const SUNLIGHT_COLOR = '#F7D24B'
+const DEFAULT_CANDIDATE_WARE_IDS = ['ore', 'silicon', 'methane', 'hydrogen', 'helium'] as const
 const sunlightFilterEnabled = ref(false)
 const sunlightMinimum = ref(100)
+const isSidebarMode = computed(() => props.mode === 'sidebar')
 
 const toRgba = (hex: string | undefined, alpha: number) => {
   if (!hex || !hex.startsWith('#') || hex.length !== 7) return `rgba(251, 191, 36, ${alpha})`
@@ -156,9 +163,13 @@ const filteredSectorCandidates = computed(() => {
 })
 
 const matchedSectorIds = computed(() => filteredSectorCandidates.value.map((sector) => sector.sectorId))
+const candidateBaseSectors = computed(() =>
+  selectedFilterIds.value.length > 0 ? filteredSectorCandidates.value : sectorCandidates.value
+)
+const candidateCount = computed(() => candidateBaseSectors.value.length)
 
 const resourceCandidates = computed(() =>
-  filteredSectorCandidates.value
+  candidateBaseSectors.value
     .map((sector) => ({
       sectorId: sector.sectorId,
       name: sector.name,
@@ -168,7 +179,12 @@ const resourceCandidates = computed(() =>
             const resource = sector.resources.find((item) => item.ware === ware)
             return sum + (resource?.level || 0)
           }, 0)
-        : sector.sunlight
+        : sunlightFilterEnabled.value
+          ? sector.sunlight
+          : DEFAULT_CANDIDATE_WARE_IDS.reduce((sum, ware) => {
+              const resource = sector.resources.find((item) => item.ware === ware)
+              return sum + (resource?.level || 0)
+            }, 0)
     }))
     .sort((left, right) =>
       right.score - left.score ||
@@ -185,13 +201,23 @@ const batchYieldOptions = computed(() => {
 })
 
 watchEffect(() => {
-  emit('highlight-change', matchedSectorIds.value)
+  emit('highlight-change', isSidebarMode.value ? matchedSectorIds.value : [])
   emit('active-change', selectedFilterIds.value.length > 0)
   emit(
     'primary-color-change',
-    resourceCatalog.value.find((entry) => entry.ware === selectedFilterIds.value[0])?.color || null
+    isSidebarMode.value
+      ? resourceCatalog.value.find((entry) => entry.ware === selectedFilterIds.value[0])?.color || null
+      : null
   )
 })
+
+const openPanel = () => {
+  emit('panel-open')
+}
+
+const closePanel = () => {
+  emit('panel-close')
+}
 
 const getResourceLabel = (wareId: string) => {
   const fallback = t(`res.${wareId}`)
@@ -252,20 +278,6 @@ const updateAllSelectedYields = (nextValue: string) => {
   resourceFilters.value = nextFilters
 }
 
-const clearSelectedResources = () => {
-  const nextFilters = { ...resourceFilters.value }
-  selectedWareIds.value.forEach((wareId) => {
-    const current = nextFilters[wareId]
-    if (!current) return
-    nextFilters[wareId] = {
-      ...current,
-      selected: false
-    }
-  })
-  resourceFilters.value = nextFilters
-  sunlightFilterEnabled.value = false
-}
-
 const updateSunlightMinimum = (nextValue: number) => {
   sunlightMinimum.value = Math.max(0, Math.round(nextValue))
 }
@@ -303,29 +315,50 @@ const isYieldBeyondReachable = (wareId: string) => {
 
 <template>
   <div class="map-resource-panel" :class="props.mode || 'overlay'" @mousedown.stop>
-    <div class="resource-panel-shell" :class="{ sidebar: props.mode === 'sidebar' }">
-      <button
-        v-if="selectedFilterIds.length > 0"
-        type="button"
-        class="resource-close-btn"
-        data-testid="map-resource-clear-selection"
-        @click="clearSelectedResources"
-      >
-        ×
-      </button>
+    <button
+      v-if="!isSidebarMode && props.showEntryButton !== false"
+      type="button"
+      class="resource-entry-btn"
+      data-testid="map-resource-entry-button"
+      @click="openPanel"
+    >
+      <span class="resource-entry-label">{{ t('map.resource_filter_button') }}</span>
+      <svg class="resource-entry-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M3 5h18l-7 8v5l-4 2v-7L3 5z"
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.8"
+        />
+      </svg>
+    </button>
 
-      <div class="resource-tag-grid" :class="{ compact: selectedFilterIds.length > 0 }">
+    <div v-else class="resource-panel-shell" :class="{ sidebar: props.mode === 'sidebar' }">
+      <div class="resource-panel-header" data-testid="map-resource-panel-header">
+        <div class="resource-tag-grid">
+          <button
+            v-for="resource in resourceCatalog"
+            :key="resource.ware"
+            type="button"
+            class="resource-tag"
+            :class="{ selected: resource.ware === SUNLIGHT_FILTER_ID ? sunlightFilterEnabled : resourceFilters[resource.ware]?.selected }"
+            :style="getTagStyle(resource.ware)"
+            :data-testid="`map-resource-tag-${resource.ware}`"
+            @click="toggleResource(resource.ware)"
+          >
+            {{ resource.ware === SUNLIGHT_FILTER_ID ? t('res.energycells') : getResourceLabel(resource.ware) }}
+          </button>
+        </div>
+
         <button
-          v-for="resource in resourceCatalog"
-          :key="resource.ware"
           type="button"
-          class="resource-tag"
-          :class="{ selected: resource.ware === SUNLIGHT_FILTER_ID ? sunlightFilterEnabled : resourceFilters[resource.ware]?.selected }"
-          :style="getTagStyle(resource.ware)"
-          :data-testid="`map-resource-tag-${resource.ware}`"
-          @click="toggleResource(resource.ware)"
+          class="resource-close-btn"
+          data-testid="map-resource-close-panel"
+          @click="closePanel"
         >
-          {{ resource.ware === SUNLIGHT_FILTER_ID ? t('res.energycells') : getResourceLabel(resource.ware) }}
+          ×
         </button>
       </div>
 
@@ -409,10 +442,10 @@ const isYieldBeyondReachable = (wareId: string) => {
         </div>
       </div>
 
-      <div v-if="selectedFilterIds.length > 0" class="resource-candidate-box">
+      <div class="resource-candidate-box">
         <div class="candidate-header">
           <span>{{ t('map.resource_filter_candidates') }}</span>
-          <span class="candidate-count">{{ matchedSectorIds.length }}</span>
+          <span class="candidate-count">{{ candidateCount }}</span>
         </div>
         <div v-if="resourceCandidates.length > 0" class="candidate-list">
           <button
@@ -439,6 +472,19 @@ const isYieldBeyondReachable = (wareId: string) => {
   max-width: calc(100% - 3rem);
 }
 
+.resource-entry-btn {
+  @apply inline-flex items-center gap-2 rounded-lg border border-amber-300/35 bg-black/75 px-4 py-2 text-sm font-semibold text-amber-50 shadow-2xl transition-colors duration-150 hover:border-amber-200/70 hover:bg-black/85;
+  backdrop-filter: blur(8px);
+}
+
+.resource-entry-label {
+  @apply leading-none;
+}
+
+.resource-entry-icon {
+  @apply h-4 w-4 text-amber-200/90;
+}
+
 .map-resource-panel.overlay {
   @apply absolute right-6 top-5 z-10;
 }
@@ -459,16 +505,16 @@ const isYieldBeyondReachable = (wareId: string) => {
   backdrop-filter: blur(0px);
 }
 
-.resource-tag-grid {
-  @apply flex flex-wrap gap-2;
+.resource-panel-header {
+  @apply flex items-start gap-3;
 }
 
-.resource-tag-grid.compact {
-  padding-right: 2.75rem;
+.resource-tag-grid {
+  @apply flex flex-1 flex-wrap gap-2;
 }
 
 .resource-close-btn {
-  @apply absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full border border-amber-300/35 bg-black/55 text-lg leading-none text-amber-100/75 transition-colors duration-150 hover:text-amber-50 hover:border-amber-200/70;
+  @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-amber-300/35 bg-black/55 text-lg leading-none text-amber-100/75 transition-colors duration-150 hover:text-amber-50 hover:border-amber-200/70;
 }
 
 .resource-tag {

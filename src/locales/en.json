@@ -101,6 +101,8 @@
     "search_sector_placeholder": "Search sector",
     "no_search_results": "No matching sectors",
     "resource_filter_all": "All",
+    "resource_filter_button": "Resource",
+    "scale": "Scale",
     "resource_filter_mixed": "Mixed",
     "resource_filter_candidates": "Matched",
     "resource_filter_no_match": "No matching sectors",

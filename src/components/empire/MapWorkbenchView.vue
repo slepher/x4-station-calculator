@@ -90,7 +90,7 @@ const selectedSectorId = ref<string | null>(null)
 const selectedSectorSource = ref<'search' | 'resource' | null>(null)
 const searchSectors = ref<SearchSectorLayout[]>([])
 const resourceHighlightedSectorIds = ref<string[]>([])
-const isResourceFilterActive = ref(false)
+const isResourcePanelOpen = ref(false)
 const resourcePrimaryColor = ref<string | null>(null)
 const hoveredSectorSource = ref<SectorHoverPayload | null>(null)
 const hoveredSector = ref<TooltipViewModel | null>(null)
@@ -532,11 +532,19 @@ const onResourceSectorSelect = (sectorId: string) => {
 }
 
 const onResourceActiveChange = (active: boolean) => {
-  isResourceFilterActive.value = active
+  void active
 }
 
 const onResourcePrimaryColorChange = (color: string | null) => {
   resourcePrimaryColor.value = color
+}
+
+const onResourcePanelOpen = () => {
+  isResourcePanelOpen.value = true
+}
+
+const onResourcePanelClose = () => {
+  isResourcePanelOpen.value = false
 }
 
 const onMouseDown = (event: MouseEvent) => {
@@ -593,7 +601,7 @@ const onResize = () => {
   closeTooltip()
 }
 
-watch(isResourceFilterActive, async () => {
+watch(isResourcePanelOpen, async () => {
   await nextTick()
   recomputeScaleBounds()
   closeTooltip()
@@ -632,7 +640,7 @@ onBeforeUnmount(() => {
 
 <template>
   <section class="map-workbench">
-    <div class="map-layout" :class="{ 'sidebar-active': isResourceFilterActive }">
+    <div class="map-layout" :class="{ 'sidebar-active': isResourcePanelOpen }">
       <div class="map-shell">
         <div
           ref="viewportRef"
@@ -689,7 +697,26 @@ onBeforeUnmount(() => {
 
         <div class="map-search-panel" @mousedown.stop>
           <div class="search-box group" :class="{ focused: isSearchFocused }">
-            <span class="search-icon">🔍</span>
+            <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle
+                cx="11"
+                cy="11"
+                r="6.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.8"
+              />
+              <path
+                d="M16 16l4 4"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.8"
+              />
+            </svg>
             <input
               ref="searchInputRef"
               :value="searchQuery"
@@ -736,9 +763,29 @@ onBeforeUnmount(() => {
           </Transition>
         </div>
 
+        <button
+          v-if="!isResourcePanelOpen"
+          type="button"
+          class="map-resource-entry-btn"
+          data-testid="map-resource-entry-button"
+          @click="onResourcePanelOpen"
+        >
+          <span class="map-resource-entry-label">{{ t('map.resource_filter_button') }}</span>
+          <svg class="map-resource-entry-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M3 5h18l-7 8v5l-4 2v-7L3 5z"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.8"
+            />
+          </svg>
+        </button>
+
         <div class="zoom-panel">
           <div class="zoom-label-row">
-            <span class="zoom-label">Scale</span>
+            <span class="zoom-label">{{ t('map.scale') }}</span>
             <span class="zoom-value">{{ displayScaleText }}</span>
           </div>
           <input
@@ -754,12 +801,16 @@ onBeforeUnmount(() => {
       </div>
 
       <MapResourceFilterPanel
+        v-show="isResourcePanelOpen"
         :sector-layouts="searchSectors"
-        :mode="isResourceFilterActive ? 'sidebar' : 'overlay'"
+        :mode="isResourcePanelOpen ? 'sidebar' : 'overlay'"
+        :show-entry-button="false"
         @highlight-change="onResourceHighlightChange"
         @select-sector="onResourceSectorSelect"
         @active-change="onResourceActiveChange"
         @primary-color-change="onResourcePrimaryColorChange"
+        @panel-open="onResourcePanelOpen"
+        @panel-close="onResourcePanelClose"
       />
     </div>
   </section>
@@ -811,6 +862,19 @@ onBeforeUnmount(() => {
   width: 220px;
 }
 
+.map-resource-entry-btn {
+  @apply absolute right-6 top-5 z-10 inline-flex h-10 items-center justify-center gap-2 rounded border border-amber-300/40 bg-black/75 px-4 text-sm font-semibold text-amber-50 shadow-xl transition-colors duration-150 hover:border-amber-200/70 hover:bg-black/85;
+  backdrop-filter: blur(4px);
+}
+
+.map-resource-entry-label {
+  @apply leading-none;
+}
+
+.map-resource-entry-icon {
+  @apply h-[18px] w-[18px] text-amber-200/70;
+}
+
 .search-box {
   @apply flex items-center h-10 w-full bg-black/75 border border-amber-300/40 rounded px-2 shadow-xl;
   backdrop-filter: blur(4px);
@@ -829,7 +893,7 @@ onBeforeUnmount(() => {
 }
 
 .search-icon {
-  @apply mr-2 text-amber-200/70;
+  @apply mr-2 h-[18px] w-[18px] shrink-0 text-amber-200/70;
 }
 
 .clear-btn {

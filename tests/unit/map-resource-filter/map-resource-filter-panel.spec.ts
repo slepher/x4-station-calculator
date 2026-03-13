@@ -4,8 +4,57 @@
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import MapResourceFilterPanel from '@/components/empire/MapResourceFilterPanel.vue'
 import { useGameDataStore } from '@/store/useGameDataStore'
+
+vi.mock('@/assets/x4_game_data/8.0-Diplomacy/data/regionyields.json', () => ({
+  default: [
+    { ware: 'ore', color: '#ff9900', yields: [{ name: 'lowest' }, { name: 'medium' }, { name: 'high' }] },
+    { ware: 'silicon', color: '#00bbff', yields: [{ name: 'lowest' }, { name: 'medium' }, { name: 'high' }] },
+    { ware: 'methane', color: '#34d399', yields: [{ name: 'lowest' }, { name: 'medium' }, { name: 'high' }] },
+    { ware: 'hydrogen', color: '#60a5fa', yields: [{ name: 'lowest' }, { name: 'medium' }, { name: 'high' }] },
+    { ware: 'helium', color: '#f472b6', yields: [{ name: 'lowest' }, { name: 'medium' }, { name: 'high' }] }
+  ]
+}))
+
+vi.mock('@/assets/x4_game_data/8.0-Diplomacy/data/maps.json', () => ({
+  default: {
+    clusters: {
+      cluster_01: {
+        sectors: {
+          sector_alpha: {
+            id: 'sector_alpha',
+            resources: [
+              { ware: 'ore', yield: 'high', level: 12 },
+              { ware: 'silicon', yield: 'high', level: 11 },
+              { ware: 'methane', yield: 'medium', level: 8 },
+              { ware: 'hydrogen', yield: 'high', level: 9 },
+              { ware: 'helium', yield: 'medium', level: 7 }
+            ],
+            area: { sunlight: 1.5 }
+          },
+          sector_beta: {
+            id: 'sector_beta',
+            resources: [
+              { ware: 'ore', yield: 'high', level: 10 },
+              { ware: 'silicon', yield: 'medium', level: 6 },
+              { ware: 'methane', yield: 'high', level: 10 },
+              { ware: 'hydrogen', yield: 'medium', level: 7 },
+              { ware: 'helium', yield: 'low', level: 3 }
+            ],
+            area: { sunlight: 1.2 }
+          },
+          sector_gamma: {
+            id: 'sector_gamma',
+            resources: [
+              { ware: 'ore', yield: 'medium', level: 4 }
+            ],
+            area: { sunlight: 0.7 }
+          }
+        }
+      }
+    }
+  }
+}))
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
@@ -21,6 +70,9 @@ vi.mock('vue-i18n', () => ({
         'res.ice': 'Ice',
         'res.rawscrap': 'Scr',
         'res.nividium': 'Niv',
+        'map.resource_filter_button': 'Resource',
+        'map.resource_filter_all': 'All',
+        'map.resource_filter_mixed': 'Mixed',
         'map.resource_filter_sunlight': 'Sunlight',
         'map.resource_filter_candidates': 'Candidates',
         'map.resource_filter_no_match': 'No match',
@@ -29,6 +81,8 @@ vi.mock('vue-i18n', () => ({
     }
   })
 }))
+
+import MapResourceFilterPanel from '@/components/empire/MapResourceFilterPanel.vue'
 
 vi.mock('@/i18n', () => ({
   loadLanguageAsync: vi.fn(async () => {})
@@ -52,11 +106,11 @@ describe('MapResourceFilterPanel', () => {
     }
   })
 
-  it('renders top-right tags with short resource i18n and sunlight as energy cell short i18n', () => {
+  it('renders sidebar tags with short resource i18n and sunlight as energy cell short i18n', () => {
     const wrapper = mount(MapResourceFilterPanel, {
       props: {
         sectorLayouts: [],
-        mode: 'overlay'
+        mode: 'sidebar'
       }
     })
 
@@ -66,5 +120,113 @@ describe('MapResourceFilterPanel', () => {
     expect(wrapper.get('[data-testid="map-resource-tag-silicon"]').text()).not.toContain('Silicon Full')
     expect(wrapper.get('[data-testid="map-resource-tag-sunlight"]').text()).toContain('EC')
     expect(wrapper.get('[data-testid="map-resource-tag-sunlight"]').text()).not.toContain('Sunlight')
+  })
+
+  it('shows only the entry button in overlay mode and emits open request on click', async () => {
+    const wrapper = mount(MapResourceFilterPanel, {
+      props: {
+        sectorLayouts: [],
+        mode: 'overlay'
+      }
+    })
+
+    expect(wrapper.get('[data-testid="map-resource-entry-button"]').text()).toContain('Resource')
+    expect(wrapper.find('[data-testid="map-resource-tag-ore"]').exists()).toBe(false)
+
+    await wrapper.get('[data-testid="map-resource-entry-button"]').trigger('click')
+
+    expect(wrapper.emitted('panel-open')).toEqual([[]])
+    expect(wrapper.find('[data-testid="map-resource-tag-ore"]').exists()).toBe(false)
+  })
+
+  it('closes without resetting filters and re-emits highlights when reopened', async () => {
+    const wrapper = mount(MapResourceFilterPanel, {
+      props: {
+        sectorLayouts: [
+          {
+            sectorId: 'sector_alpha',
+            clusterId: 'cluster_01',
+            name: 'Alpha',
+            displayName: 'Alpha',
+            centerX: 0,
+            centerY: 0
+          }
+        ],
+        mode: 'sidebar'
+      }
+    })
+
+    await wrapper.get('[data-testid="map-resource-tag-ore"]').trigger('click')
+
+    expect(wrapper.emitted('highlight-change')?.at(-1)).toEqual([['sector_alpha']])
+    expect(wrapper.find('[data-testid="map-resource-yield-ore"]').exists()).toBe(true)
+
+    await wrapper.get('[data-testid="map-resource-close-panel"]').trigger('click')
+
+    expect(wrapper.emitted('panel-close')).toEqual([[]])
+
+    await wrapper.setProps({ mode: 'overlay' })
+
+    expect(wrapper.emitted('highlight-change')?.at(-1)).toEqual([[]])
+    expect(wrapper.find('[data-testid="map-resource-tag-ore"]').exists()).toBe(false)
+
+    await wrapper.setProps({ mode: 'sidebar' })
+
+    expect(wrapper.find('[data-testid="map-resource-yield-ore"]').exists()).toBe(true)
+    expect(wrapper.get('[data-testid="map-resource-tag-ore"]').classes()).toContain('selected')
+    expect(wrapper.emitted('highlight-change')?.at(-1)).toEqual([['sector_alpha']])
+  })
+
+  it('shows default top ten candidates in sidebar when no tag is selected', () => {
+    const wrapper = mount(MapResourceFilterPanel, {
+      props: {
+        sectorLayouts: [
+          {
+            sectorId: 'sector_alpha',
+            clusterId: 'cluster_01',
+            name: 'Alpha',
+            displayName: 'Alpha',
+            centerX: 0,
+            centerY: 0
+          },
+          {
+            sectorId: 'sector_beta',
+            clusterId: 'cluster_01',
+            name: 'Beta',
+            displayName: 'Beta',
+            centerX: 0,
+            centerY: 0
+          },
+          {
+            sectorId: 'sector_gamma',
+            clusterId: 'cluster_01',
+            name: 'Gamma',
+            displayName: 'Gamma',
+            centerX: 0,
+            centerY: 0
+          }
+        ],
+        mode: 'sidebar'
+      }
+    })
+
+    const candidates = wrapper.findAll('[data-testid^="map-resource-candidate-"]')
+    expect(candidates).toHaveLength(3)
+    expect(candidates[0]?.attributes('data-testid')).toBe('map-resource-candidate-sector_alpha')
+    expect(candidates[1]?.attributes('data-testid')).toBe('map-resource-candidate-sector_beta')
+    expect(candidates[2]?.attributes('data-testid')).toBe('map-resource-candidate-sector_gamma')
+  })
+
+  it('keeps close button and tags in the same header flow when nothing is selected', () => {
+    const wrapper = mount(MapResourceFilterPanel, {
+      props: {
+        sectorLayouts: [],
+        mode: 'sidebar'
+      }
+    })
+
+    expect(wrapper.find('[data-testid="map-resource-close-panel"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="map-resource-panel-header"]').exists()).toBe(true)
+    expect(wrapper.find('.resource-tag-grid').classes()).not.toContain('compact')
   })
 })
