@@ -588,6 +588,10 @@ const selectSearchResult = (item: SearchSectorLayout) => {
 }
 
 const onResourceHighlightChange = (sectorIds: string[]) => {
+  if (selectedSectorSource.value === 'resource') {
+    selectedSectorId.value = null
+    selectedSectorSource.value = null
+  }
   resourceHighlightedSectorIds.value = sectorIds
 }
 

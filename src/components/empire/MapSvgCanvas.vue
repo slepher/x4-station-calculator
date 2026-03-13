@@ -357,13 +357,16 @@ const getSectorVisualState = (sectorId: string) => {
   if (resourceHighlightedSectorIdSet.value.has(sectorId)) return 'resource'
   return 'default'
 }
-const shouldRenderResourceOverlay = (sectorId: string) => getSectorVisualState(sectorId) === 'resource'
+const shouldRenderResourceOverlay = (sectorId: string) => {
+  const state = getSectorVisualState(sectorId)
+  return state === 'resource' || state === 'selected'
+}
 const getResourceFill = (sectorId: string) => props.resourceSectorFills?.[sectorId] || null
 const hasPieFill = (sectorId: string) => getResourceFill(sectorId)?.mode === 'pie'
 const sectorFillOpacity = (sectorId: string) => {
   const state = getSectorVisualState(sectorId)
   if (isResourceFilterActive.value && state === 'default') return 0
-  if (hasPieFill(sectorId) && state === 'resource') return 0
+  if (hasPieFill(sectorId) && (state === 'resource' || state === 'selected')) return 0
   if (state === 'selected') return 0.28
   if (state === 'search') return 0.18
   if (state === 'resource') return 0.15
