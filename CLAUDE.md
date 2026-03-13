@@ -6,28 +6,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Development server (hot reload)
-pnpm run dev
+npm run dev
 
 # Production build
-pnpm run build
+npm run build
 
 # Preview production build
-pnpm run preview
+npm run preview
 
 # Unit tests (Vitest)
 npm run test:unit
 # Run single test file
-pnpm exec vitest run tests/unit/<path>/<file>.spec.ts
+npm run test:unit -- tests/unit/<path>/<file>.spec.ts
 
 # E2E tests (Playwright)
-pnpm run test:e2e
+npm run test:e2e
 # Run single test file
-pnpm exec playwright test tests/e2e/<path>/<file>.spec.ts
+npm run test:e2e -- tests/e2e/<path>/<file>.spec.ts
 # Interactive UI mode
-pnpm run test:e2e:ui
+npm run test:e2e:ui
 
 # Install Playwright browsers
-pnpm run playwright:install
+npm run playwright:install
 ```
 
 ## Project Architecture

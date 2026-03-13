@@ -78,7 +78,9 @@ If baseline fails, report and ask before implementation.
 
 Node baseline recommendation for this repo:
 ```bash
-pnpm exec vitest run tests/unit/ship-build-storage/ship-build-storage.spec.ts --reporter=dot
+npm install
+npm run build
+# then run a minimal baseline test command
 ```
 
 ## Required Worktree-Ready Report
