@@ -269,6 +269,12 @@ const clearTooltipHideTimer = () => {
   }
 }
 
+const clearBrowserSelection = () => {
+  const selection = window.getSelection?.()
+  if (!selection) return
+  selection.removeAllRanges()
+}
+
 const closeTooltip = () => {
   clearTooltipHideTimer()
   hoveredSectorSource.value = null
@@ -549,6 +555,8 @@ const onResourcePanelClose = () => {
 
 const onMouseDown = (event: MouseEvent) => {
   if (event.button !== 0) return
+  event.preventDefault()
+  clearBrowserSelection()
   closeTooltip()
   isDragging.value = true
   dragStartX.value = event.clientX
@@ -845,6 +853,11 @@ onBeforeUnmount(() => {
 
 .map-viewport.dragging {
   @apply cursor-grabbing;
+  user-select: none;
+}
+
+.map-viewport.dragging * {
+  user-select: none;
 }
 
 .map-content {

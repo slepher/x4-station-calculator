@@ -39,6 +39,7 @@ defineProps<{
 .sector-tooltip-card {
   min-width: 220px;
   max-width: 280px;
+  user-select: none;
   border-radius: 16px;
   border: 1px solid rgba(252, 211, 77, 0.28);
   background:
