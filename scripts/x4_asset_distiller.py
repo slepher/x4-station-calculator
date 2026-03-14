@@ -16,6 +16,24 @@ def load_all_configs():
         m_config = json.load(f)
     with open(version_file, 'r', encoding='utf-8') as f:
         v_config = json.load(f)
+
+    # 从 versions 数组中查找当前版本配置
+    current_version = v_config.get('current_version')
+    is_beta = v_config.get('beta', False)
+    versions = v_config.get('versions', [])
+    version_config = None
+    for v in versions:
+        if v.get('version') == current_version and v.get('beta', False) == is_beta:
+            version_config = v
+            break
+
+    if version_config is None:
+        beta_str = "beta" if is_beta else "stable"
+        raise ValueError(f"❌ 错误: 未找到版本 {current_version} ({beta_str}) 的配置。")
+
+    # 将版本配置合并到 v_config 顶层（保持兼容）
+    v_config.update(version_config)
+
     return m_config, v_config, config_dir
 
 def setup_customizer(m_config):

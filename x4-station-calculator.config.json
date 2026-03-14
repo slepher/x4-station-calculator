@@ -1,7 +1,10 @@
 {
-  "version": "8.0",
-  "codename": "Diplomacy",
-  "folder_name": "8.0-Diplomacy",
+  "versions": [
+    { "version": "8.0", "codename": "Diplomacy", "folder_name": "8.0-Diplomacy", "beta": false },
+    { "version": "9.0", "codename": "Empire", "folder_name": "9.0-Empire-beta", "beta": true }
+  ],
+  "current_version": "9.0",
+  "beta": true,
   "raw_assets_dir": "./x4raw_assets",
   "processed_assets_dir": "./src/assets/x4_game_data",
   "dlc_order": [
