@@ -60,18 +60,9 @@ function createDefaultEmpire(name: string = ''): EmpirePlan {
   return {
     id: crypto.randomUUID(),
     name,
-    sectors: [createDefaultSector(0)],
+    sectors: [],
     sectorLinks: [],
     stations: []
-  }
-}
-
-function createDefaultSector(index: number): SectorPlan {
-  return {
-    id: crypto.randomUUID(),
-    name: `Sector ${index + 1}`,
-    order: index,
-    location: undefined
   }
 }
 
@@ -420,13 +411,10 @@ export const useEmpireStore = defineStore('empire', () => {
     if (migrated.state.activeId) {
       const empire = migrated.state.list.find(e => e.id === migrated.state.activeId)
       if (empire) {
-        if (!Array.isArray(empire.sectors) || empire.sectors.length === 0) {
-          empire.sectors = [createDefaultSector(0)]
-        }
         if (!Array.isArray(empire.sectorLinks)) {
           empire.sectorLinks = []
         }
-        const validSectorIds = new Set(empire.sectors.map((sector) => sector.id))
+        const validSectorIds = new Set((empire.sectors || []).map((sector) => sector.id))
         empire.sectorLinks = normalizeSectorLinks(empire.sectorLinks, validSectorIds)
         empire.stations.forEach(station => {
           if (station.count === null || station.count === undefined) {
@@ -516,9 +504,6 @@ export const useEmpireStore = defineStore('empire', () => {
       clearStationCaches()
       activeEmpire.value = JSON.parse(JSON.stringify(empire))
       const active = activeEmpire.value
-      if (active && (!Array.isArray(active.sectors) || active.sectors.length === 0)) {
-        active.sectors = [createDefaultSector(0)]
-      }
       if (active && !Array.isArray(active.sectorLinks)) {
         active.sectorLinks = []
       }
