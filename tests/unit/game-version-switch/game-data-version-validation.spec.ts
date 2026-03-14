@@ -80,4 +80,17 @@ describe('useGameDataStore version validation', () => {
     expect(store.folderName).toBe('8.0-Diplomacy')
     expect(store.hasStoredVersion).toBe(false)
   })
+
+  it('统一输出完整版本和短版本显示文本', async () => {
+    const store = useGameDataStore()
+    await store.initialize()
+
+    expect(store.displayVersion('9.0', true, 'Empire')).toBe('9.0-Empire-beta')
+    expect(store.displayFullVersion('9.0', true)).toBe('9.0-beta')
+    expect(store.displayFullVersion('8.0', false)).toBe('8.0')
+    expect(store.versionOptions.map(option => option.label)).toEqual([
+      '8.0-Diplomacy',
+      '9.0-Empire-beta'
+    ])
+  })
 })

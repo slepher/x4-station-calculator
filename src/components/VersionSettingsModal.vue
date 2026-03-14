@@ -70,21 +70,21 @@ const dirtyModules = computed<DirtyModuleOption[]>(() => {
   const modules: DirtyModuleOption[] = [
     {
       key: 'empire',
-      label: t('settings.gameVersion.moduleEmpire'),
+      label: t('moduleNames.sector'),
       isDirty: empireStore.isDirty,
       isNew: empireStore.requiresSaveAsOnSave(),
       defaultName: getDefaultName('empire')
     },
     {
       key: 'logic_flow',
-      label: t('settings.gameVersion.moduleLogicFlow'),
+      label: t('moduleNames.flow'),
       isDirty: logicFlowStore.isDirty,
       isNew: logicFlowStore.requiresSaveAsOnSave(),
       defaultName: getDefaultName('logic_flow')
     },
     {
       key: 'ship_blueprints',
-      label: t('settings.gameVersion.moduleShipBlueprints'),
+      label: t('moduleNames.ship'),
       isDirty: shipBuildStore.isDirty,
       isNew: shipBuildStore.requiresSaveAsOnSave(),
       defaultName: getDefaultName('ship_blueprints')
@@ -109,6 +109,9 @@ const isSameVersionSelection = computed(() => {
 const shouldPersistCurrentVersion = computed(() => isSameVersionSelection.value && !gameData.hasStoredVersion)
 const isSwitchDisabled = computed(() => isSameVersionSelection.value && gameData.hasStoredVersion)
 const shouldShowDirtyModules = computed(() => !isSameVersionSelection.value && dirtyModules.value.length > 0)
+const switchButtonLabel = computed(() =>
+  shouldPersistCurrentVersion.value ? t('settings.gameVersion.save') : t('settings.gameVersion.switch')
+)
 
 const isAllSelected = computed({
   get: () => dirtyModules.value.length > 0 && selectedModuleKeys.value.length === dirtyModules.value.length,
@@ -315,7 +318,7 @@ const handleBackdropClick = (event: MouseEvent) => {
             :disabled="isSwitchDisabled"
             @click="handleSwitch"
           >
-            {{ t('settings.gameVersion.switch') }}
+            {{ switchButtonLabel }}
           </button>
           <button
             v-else

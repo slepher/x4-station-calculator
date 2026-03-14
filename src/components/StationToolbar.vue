@@ -200,7 +200,7 @@ const handleExport = () => {
     </div>
 
     <div class="flex items-center gap-2 ml-2 mr-4">
-      <button class="btn-tool btn-amber" data-testid="toolbar-import-btn" @click="showImportWizard = true">
+      <button class="btn-tool btn-toolbar-import" data-testid="toolbar-import-btn" @click="showImportWizard = true">
         <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
@@ -210,7 +210,7 @@ const handleExport = () => {
         </svg>
         <span>{{ t('menu.import') }}</span>
       </button>
-      <button class="btn-tool btn-gray" data-testid="toolbar-export-btn" @click="handleExport">
+      <button class="btn-tool btn-toolbar-export" data-testid="toolbar-export-btn" @click="handleExport">
         <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
@@ -219,7 +219,7 @@ const handleExport = () => {
         </svg>
         <span>{{ t('menu.export') }}</span>
       </button>
-      <button class="btn-tool btn-black btn-version" data-testid="toolbar-version-btn" @click="showVersionSettingsModal = true">
+      <button class="btn-tool btn-toolbar-version btn-version" data-testid="toolbar-version-btn" @click="showVersionSettingsModal = true">
         <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M16 3h5v5" />
@@ -231,7 +231,7 @@ const handleExport = () => {
           <path d="M21 14l-7-7" />
           <path d="M10 10L3 3" />
         </svg>
-        <span>{{ t('menu.version_switch') }}</span>
+        <span>{{ gameData.displayFullVersion() }}</span>
         <span
           v-if="showVersionIndicator"
           class="version-indicator"
@@ -291,16 +291,16 @@ const handleExport = () => {
   @apply bg-purple-600 hover:bg-purple-500;
 }
 
-.btn-gray {
-  @apply bg-slate-500 hover:bg-slate-400;
+.btn-toolbar-import {
+  @apply bg-slate-700 hover:bg-slate-600 border-slate-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)];
 }
 
-.btn-black {
-  @apply bg-black hover:bg-slate-900;
+.btn-toolbar-export {
+  @apply bg-slate-600 hover:bg-slate-500 border-slate-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)];
 }
 
-.btn-amber {
-  @apply bg-amber-600 hover:bg-amber-500;
+.btn-toolbar-version {
+  @apply bg-slate-800 hover:bg-slate-700 border-slate-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)];
 }
 
 .btn-version {

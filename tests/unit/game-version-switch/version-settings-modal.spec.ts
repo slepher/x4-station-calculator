@@ -17,7 +17,9 @@ const saveAsBlueprintMock = vi.fn()
 const gameDataState = {
   currentVersion: '8.0',
   isBeta: false,
-  hasStoredVersion: true
+  hasStoredVersion: true,
+  displayVersion: (version: string, beta: boolean, codename?: string) => `${version}${codename ? `-${codename}` : ''}${beta ? '-beta' : ''}`,
+  displayFullVersion: (version: string, beta: boolean) => `${version}${beta ? '-beta' : ''}`
 }
 
 const empireState = {
@@ -43,13 +45,14 @@ vi.mock('vue-i18n', () => ({
         'settings.gameVersion.title': 'Game Version',
         'settings.gameVersion.select': 'Select game version',
         'settings.gameVersion.switch': 'Switch',
+        'settings.gameVersion.save': 'Save',
         'settings.gameVersion.saveAndSwitch': 'Save and switch',
         'settings.gameVersion.unsavedModules': 'Unsaved modules',
         'settings.gameVersion.selectAll': 'Select all',
         'settings.gameVersion.saveScopeWarning': 'Checked modules will be saved before switching version.',
-        'settings.gameVersion.moduleEmpire': 'Empire',
-        'settings.gameVersion.moduleLogicFlow': 'Logic Flow',
-        'settings.gameVersion.moduleShipBlueprints': 'Ship blueprints',
+        'moduleNames.sector': 'Sector',
+        'moduleNames.flow': 'Flow',
+        'moduleNames.ship': 'Ship',
         'settings.gameVersion.moduleNameLabel': 'Name',
         'common.cancel': 'Cancel',
         'menu.default_flow_name': 'Flow Draft',
@@ -80,9 +83,11 @@ vi.mock('@/store/useGameDataStore', () => ({
     get hasStoredVersion() {
       return gameDataState.hasStoredVersion
     },
+    displayVersion: gameDataState.displayVersion,
+    displayFullVersion: gameDataState.displayFullVersion,
     versionOptions: [
       { version: '8.0', codename: 'Diplomacy', beta: false, label: '8.0-Diplomacy' },
-      { version: '9.0', codename: 'Empire', beta: true, label: '9.0-Empire (beta)' }
+      { version: '9.0', codename: 'Empire', beta: true, label: '9.0-Empire-beta' }
     ],
     setVersion: setVersionMock,
     persistVersionSelection: persistVersionSelectionMock
@@ -182,6 +187,8 @@ describe('VersionSettingsModal', () => {
     await wrapper.get('[data-testid="version-select"]').setValue('9.0::beta')
 
     expect(wrapper.text()).toContain('Unsaved modules')
+    expect(wrapper.text()).toContain('Flow')
+    expect(wrapper.text()).toContain('Ship')
     expect(wrapper.find('[data-testid="version-save-switch"]').exists()).toBe(false)
     expect(wrapper.get('[data-testid="version-switch"]').text()).toBe('Switch')
 
@@ -210,6 +217,7 @@ describe('VersionSettingsModal', () => {
 
     expect(wrapper.find('[data-testid="version-switch"]').exists()).toBe(false)
     expect(wrapper.get('[data-testid="version-save-switch"]').text()).toBe('Save and switch')
+    expect(wrapper.text()).toContain('Sector')
     expect((wrapper.get('[data-testid="module-name-logic_flow"]').element as HTMLInputElement).value).toBe('Flow Draft')
     expect((wrapper.get('[data-testid="module-name-ship_blueprints"]').element as HTMLInputElement).value).toBe('Falx Blueprint')
 
@@ -231,6 +239,7 @@ describe('VersionSettingsModal', () => {
     })
 
     expect(wrapper.find('[data-testid="unsaved-modules-panel"]').exists()).toBe(false)
+    expect(wrapper.get('[data-testid="version-switch"]').text()).toBe('Save')
 
     await wrapper.get('[data-testid="version-switch"]').trigger('click')
 

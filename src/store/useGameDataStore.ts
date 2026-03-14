@@ -85,12 +85,31 @@ export const useGameDataStore = defineStore('gameData', () => {
     )
   })
 
+  function displayVersion(
+    version: string = currentVersion.value,
+    beta: boolean = isBeta.value,
+    codename?: string
+  ): string {
+    const resolvedCodename = codename
+      || versionsConfig.value.find(v => v.version === version && v.beta === beta)?.codename
+      || currentVersionConfig.value?.codename
+      || ''
+    return `${version}${resolvedCodename ? `-${resolvedCodename}` : ''}${beta ? '-beta' : ''}`
+  }
+
+  function displayFullVersion(
+    version: string = currentVersion.value,
+    beta: boolean = isBeta.value
+  ): string {
+    return `${version}${beta ? '-beta' : ''}`
+  }
+
   const versionOptions = computed(() => {
     return versionsConfig.value.map(v => ({
       version: v.version,
       codename: v.codename,
       beta: v.beta,
-      label: `${v.version}-${v.codename}${v.beta ? ' (beta)' : ''}`
+      label: displayVersion(v.version, v.beta, v.codename)
     }))
   })
 
@@ -372,6 +391,8 @@ export const useGameDataStore = defineStore('gameData', () => {
     hasStoredVersion,
     // Version computed
     currentVersionConfig,
+    displayVersion,
+    displayFullVersion,
     versionOptions,
     needsVersionSetup,
     persistVersionSelection,

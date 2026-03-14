@@ -8,11 +8,13 @@ import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { useStatusStore } from '@/store/useStatusStore'
 import {
   applyImportPayload,
-  getModuleImportStats,
   normalizeImportPayload,
+  prepareImportPayload,
   type ImportModuleKey,
+  type ImportSanitizeSummary,
   type ModuleImportStats,
-  type NormalizedImportPayload
+  type NormalizedImportPayload,
+  type PreparedImportPayload
 } from '@/store/logic/importExport'
 
 const props = defineProps<{
@@ -33,6 +35,7 @@ const statusStore = useStatusStore()
 const fileName = ref('')
 const parseError = ref('')
 const parsedPayload = ref<NormalizedImportPayload | null>(null)
+const preparedPayload = ref<PreparedImportPayload | null>(null)
 const moduleStats = ref<ModuleImportStats[]>([])
 const mode = ref<'overwrite' | 'incremental'>('overwrite')
 const selectedModules = ref<Record<ImportModuleKey, boolean>>({
@@ -43,6 +46,8 @@ const selectedModules = ref<Record<ImportModuleKey, boolean>>({
 
 const hasParsedPayload = computed(() => parsedPayload.value !== null)
 const availableKeys = computed(() => moduleStats.value.map((item) => item.key))
+const versionState = computed(() => preparedPayload.value?.versionState || null)
+const sanitizeSummaries = computed(() => preparedPayload.value?.sanitizeSummaries || [])
 
 const setDefaultSelections = (selectAll: boolean) => {
   const keys = new Set(availableKeys.value)
@@ -58,6 +63,7 @@ watch(
     fileName.value = ''
     parseError.value = ''
     parsedPayload.value = null
+    preparedPayload.value = null
     moduleStats.value = []
     mode.value = 'overwrite'
     selectedModules.value = {
@@ -78,14 +84,25 @@ watch(mode, (nextMode) => {
 const moduleTitle = (key: ImportModuleKey) => {
   switch (key) {
     case 'x4_empire_data':
-      return t('importExport.module_sector')
+      return t('moduleNames.sector')
     case 'x4_logic_flow_plans':
-      return t('importExport.module_flow')
+      return t('moduleNames.flow')
     case 'x4_ship_blueprints':
-      return t('importExport.module_ship')
+      return t('moduleNames.ship')
     default:
       return key
   }
+}
+
+const summaryText = (summary: ImportSanitizeSummary) => {
+  const detailText = summary.details
+    .map((detail) => t(`importExport.sanitize_kind_${detail.kind}`, { count: detail.count }))
+    .join(t('importExport.sanitize_joiner'))
+
+  return t('importExport.sanitize_summary_line', {
+    module: moduleTitle(summary.key),
+    details: detailText
+  })
 }
 
 const onPickFile = async (event: Event) => {
@@ -100,33 +117,38 @@ const onPickFile = async (event: Event) => {
     const rawText = await file.text()
     const raw = JSON.parse(rawText)
     const normalized = normalizeImportPayload(raw)
-    const stats = getModuleImportStats(normalized)
+    const prepared = prepareImportPayload(normalized, gameDataStore, shipBuildStore)
+    const stats = prepared.moduleStats
 
     if (stats.length === 0) {
       parseError.value = t('importExport.error_no_module')
       parsedPayload.value = null
+      preparedPayload.value = null
       moduleStats.value = []
       return
     }
 
     parsedPayload.value = normalized
+    preparedPayload.value = prepared
     moduleStats.value = stats
     setDefaultSelections(true)
   } catch (error) {
     parseError.value = t('importExport.error_parse_failed')
     parsedPayload.value = null
+    preparedPayload.value = null
     moduleStats.value = []
   }
 }
 
 const handleApplyImport = () => {
-  if (!parsedPayload.value) return
+  if (!parsedPayload.value || !preparedPayload.value) return
 
   const result = applyImportPayload({
     mode: mode.value,
     selectedModules: selectedModules.value,
     currentView: shipBuildStore.activeView,
     payload: parsedPayload.value,
+    preparedPayload: preparedPayload.value,
     gameDataStore,
     empireStore,
     logicFlowStore,
@@ -138,8 +160,13 @@ const handleApplyImport = () => {
     return
   }
 
-  if (result.warnings.length > 0) {
-    statusStore.pushMessage('warning', 'system', result.warnings.join(' '))
+  const warningLines = [...result.warnings]
+  if (result.sanitizeSummaries.length > 0) {
+    warningLines.push(...result.sanitizeSummaries.map(summaryText))
+  }
+
+  if (warningLines.length > 0) {
+    statusStore.pushMessage('warning', 'system', warningLines.join(' '))
   }
 
   statusStore.pushMessage('success', 'system', t('importExport.import_success', { count: result.applied.length }))
@@ -178,6 +205,28 @@ const handleApplyImport = () => {
         </div>
 
         <div v-if="hasParsedPayload" class="space-y-4" data-testid="storage-import-config">
+          <div class="space-y-2 rounded border border-slate-700 bg-slate-900/40 px-3 py-3">
+            <div class="flex items-center justify-between gap-4 text-sm">
+              <span class="text-slate-400">{{ t('importExport.file_game_version') }}</span>
+              <span class="text-slate-100" data-testid="storage-import-file-version">
+                {{ versionState ? gameDataStore.displayFullVersion(versionState.file.game_vsn, versionState.file.beta) : '' }}
+              </span>
+            </div>
+            <div class="flex items-center justify-between gap-4 text-sm">
+              <span class="text-slate-400">{{ t('importExport.current_game_version') }}</span>
+              <span class="text-slate-100" data-testid="storage-import-current-version">
+                {{ versionState ? gameDataStore.displayFullVersion(versionState.current.game_vsn, versionState.current.beta) : '' }}
+              </span>
+            </div>
+            <p
+              v-if="versionState?.mismatch"
+              class="rounded border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-200"
+              data-testid="storage-import-version-warning"
+            >
+              {{ t('importExport.version_mismatch') }}
+            </p>
+          </div>
+
           <div>
             <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">{{ t('importExport.mode') }}</div>
             <div class="flex gap-2">
@@ -221,6 +270,20 @@ const handleApplyImport = () => {
                 </div>
                 <span class="text-xs text-slate-400">{{ t('importExport.module_count', { count: entry.count }) }}</span>
               </label>
+            </div>
+          </div>
+
+          <div v-if="sanitizeSummaries.length > 0" class="space-y-2">
+            <div class="text-xs uppercase tracking-wider text-slate-400">{{ t('importExport.sanitize_summary_title') }}</div>
+            <div class="space-y-2">
+              <div
+                v-for="summary in sanitizeSummaries"
+                :key="summary.key"
+                class="rounded border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-100"
+                :data-testid="`storage-import-sanitize-${summary.key}`"
+              >
+                {{ summaryText(summary) }}
+              </div>
             </div>
           </div>
         </div>
