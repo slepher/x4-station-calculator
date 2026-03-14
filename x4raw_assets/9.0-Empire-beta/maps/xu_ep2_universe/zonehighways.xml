@@ -1,0 +1,2331 @@
+<?xml version="1.0" encoding="utf-8"?>
+<macros>
+  <!--macro name="Highway01_Cluster_01_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-220752.234375" y="0" z="-22202.01171875" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-220772.921875" y="0" z="-15767.3876953125" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-220752.234375" y="0" z="-22202.01171875" tx="0.987343728542328" ty="0" tz="0.158594816923141" weight="0" inlength="0" outlength="7156.740234375" />
+          <splineposition x="-156036.484375" y="0" z="-36844.55078125" tx="0.957172274589539" ty="0" tz="-0.289519071578979" weight="1" inlength="37687.3984375" outlength="37687.3984375" />
+          <splineposition x="-4286.15576171875" y="0" z="-87582.2890625" tx="0.95856374502182" ty="0" tz="-0.284878104925156" weight="1" inlength="20403.19921875" outlength="644.661010742188" />
+          <splineposition x="4241.83642578125" y="0" z="-88576.3359375" tx="0.99730384349823" ty="0" tz="0.0733825787901878" weight="1" inlength="2568.919921875" outlength="3324.7900390625" />
+          <splineposition x="21666.876953125" y="0" z="-80669.6015625" tx="0.660841941833496" ty="0" tz="0.750525116920471" weight="0" inlength="3018.86010742188" outlength="2466.39990234375" />
+          <splineposition x="28016.533203125" y="0" z="-72075.75" tx="0.469993889331818" ty="0" tz="0.882669687271118" weight="1" inlength="2356.43994140625" outlength="70691.5" />
+          <splineposition x="29882.712890625" y="0" z="67586.2109375" tx="-0.416411429643631" ty="0" tz="0.909176290035248" weight="1" inlength="49446.19921875" outlength="8019.259765625" />
+          <splineposition x="15551.330078125" y="0" z="73947.90625" tx="-0.999733448028564" ty="0" tz="0.0230865813791752" weight="1" inlength="8019.259765625" outlength="5593.9501953125" />
+          <splineposition x="-11224.8994140625" y="0" z="70673.78125" tx="-0.974272608757019" ty="0" tz="-0.225372731685638" weight="1" inlength="5544" outlength="6642.64990234375" />
+          <splineposition x="-30430.80078125" y="0" z="64720.25390625" tx="-0.954571664333344" ty="0" tz="-0.297981530427933" weight="1" inlength="6702.490234375" outlength="56866" />
+          <splineposition x="-154099.9375" y="0" z="3277.1455078125" tx="-0.920410990715027" ty="0" tz="-0.390952110290527" weight="1" inlength="34443.30078125" outlength="34443.3984375" />
+          <splineposition x="-220772.921875" y="0" z="-15767.3876953125" tx="-0.998410820960999" ty="0" tz="0.0563546530902386" weight="1" inlength="12745.2001953125" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro>
+  <macro name="Highway01_Cluster_01_Sector002_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="71335.9375" y="0" z="-118960.453125" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-59480.46875" y="0" z="108444.3359375" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="71335.9375" y="0" z="-118960.453125" tx="-0.999989092350006" ty="0" tz="0.0046672890894115" weight="0" inlength="0" outlength="9763.7802734375" />
+          <splineposition x="42044.921875" y="0" z="-118823.734375" tx="-0.999948978424072" ty="0" tz="0.0101014776155353" weight="1" inlength="9763.7802734375" outlength="35844.1015625" />
+          <splineposition x="-46175.78125" y="0" z="-57337.40234375" tx="-0.49278599023819" ty="0" tz="0.870150566101074" weight="1" inlength="25295.30078125" outlength="31819.5" />
+          <splineposition x="-59537.109375" y="0" z="77269.53125" tx="-0.0356026776134968" ty="0" tz="0.999366044998169" weight="1" inlength="44747.3984375" outlength="10312.599609375" />
+          <splineposition x="-59480.46875" y="0" z="108444.3359375" tx="0.00181711360346526" ty="0" tz="0.999998331069946" weight="0" inlength="10391.599609375" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro>
+  <macro name="Highway02_Cluster_01_Sector002_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-40937.5" y="0" z="123328.125" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="98175.78125" y="0" z="-113070.796875" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-40937.5" y="0" z="123328.125" tx="0.00229656859301031" ty="0" tz="-0.99999737739563" weight="0" inlength="0" outlength="10487.7998046875" />
+          <splineposition x="-40865.234375" y="0" z="91864.75" tx="0.00222968496382236" ty="0" tz="-0.999997496604919" weight="1" inlength="10487.7998046875" outlength="47461.1015625" />
+          <splineposition x="-33179.6875" y="0" z="-50311.5234375" tx="0.174110561609268" ty="0" tz="-0.984726130962372" weight="1" inlength="47439.8984375" outlength="40002.80078125" />
+          <splineposition x="69300.78125" y="0" z="-112863.765625" tx="0.99886155128479" ty="0" tz="-0.047702893614769" weight="1" inlength="58547.3984375" outlength="14081.5" />
+          <splineposition x="98175.78125" y="0" z="-113070.796875" tx="0.999974310398102" ty="0" tz="-0.00716946506872773" weight="0" inlength="9625.25" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro>
+  <macro name="Highway03_Cluster_01_Sector002_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="183802.734375" y="0" z="-150069.828125" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="43779.296875" y="0" z="85810.546875" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="183802.734375" y="0" z="-150069.828125" tx="-0.999297678470612" ty="0" tz="0.0374714210629463" weight="0" inlength="0" outlength="8083.7998046875" />
+          <splineposition x="159570.3125" y="0" z="-149161.125" tx="-0.999489605426788" ty="0" tz="0.0319447889924049" weight="1" inlength="8083.7998046875" outlength="36150.3984375" />
+          <splineposition x="69697.265625" y="0" z="-207343.75" tx="-0.827132821083069" ty="0" tz="-0.56200647354126" weight="1" inlength="36149.1015625" outlength="4053.61010742188" />
+          <splineposition x="58294.921875" y="0" z="-214089.84375" tx="-0.937429070472717" ty="0" tz="-0.348176330327988" weight="1" inlength="4054.2900390625" outlength="10190.099609375" />
+          <splineposition x="27931.640625" y="0" z="-217661.125" tx="-0.999998450279236" ty="0" tz="0.00176239071879536" weight="0" inlength="11209" outlength="4458.990234375" />
+          <splineposition x="15859.375" y="0" z="-217818.359375" tx="-0.999889075756073" ty="0" tz="0.0148926163092256" weight="1" inlength="4086.28002929688" outlength="28232.900390625" />
+          <splineposition x="-62789.0625" y="0" z="-186602.046875" tx="-0.782918930053711" ty="0" tz="0.622123718261719" weight="1" inlength="29520.599609375" outlength="4157.52978515625" />
+          <splineposition x="-71906.25" y="0" z="-179056.640625" tx="-0.768905937671661" ty="0" tz="0.639361917972565" weight="1" inlength="3944.85009765625" outlength="8569.080078125" />
+          <splineposition x="-85296.875" y="0" z="-157113.28125" tx="-0.299213618040085" ty="0" tz="0.954186141490936" weight="1" inlength="8436.41015625" outlength="3883.8701171875" />
+          <splineposition x="-87835.9375" y="0" z="-145554.6875" tx="-0.166111022233963" ty="0" tz="0.986107051372528" weight="1" inlength="4026.84008789063" outlength="28160.30078125" />
+          <splineposition x="-78322.265625" y="0" z="-63343.75" tx="0.259017646312714" ty="0" tz="0.965872585773468" weight="1" inlength="28827.5" outlength="4297.5498046875" />
+          <splineposition x="-74869.140625" y="0" z="-51498.53515625" tx="0.281654715538025" ty="0" tz="0.959515810012817" weight="1" inlength="4112.419921875" outlength="11084.900390625" />
+          <splineposition x="-60335.9375" y="0" z="-21587.40234375" tx="0.439253002405167" ty="0" tz="0.898363411426544" weight="1" inlength="11084.5" outlength="4112.97998046875" />
+          <splineposition x="-53158.203125" y="0" z="-11550.78125" tx="0.583713710308075" ty="0" tz="0.811959564685822" weight="1" inlength="4113.169921875" outlength="37948.80078125" />
+          <splineposition x="27658.203125" y="0" z="68634.28125" tx="0.710213184356689" ty="0" tz="0.703986644744873" weight="1" inlength="37949.30078125" outlength="7852.47021484375" />
+          <splineposition x="43779.296875" y="0" z="85810.546875" tx="0.684355556964874" ty="0" tz="0.72914844751358" weight="1" inlength="7851.8798828125" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro>
+  <macro name="Highway01_Cluster_01_Sector003_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-35617.1875" y="0" z="110058.59375" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-30648.4375" y="0" z="109984.375" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-35617.1875" y="0" z="110058.59375" tx="0.0300892684608698" ty="0" tz="-0.999547243118286" weight="0" inlength="0" outlength="10254.599609375" />
+          <splineposition x="-42894.53125" y="0" z="79304.6875" tx="-0.232038676738739" ty="0" tz="-0.97270655632019" weight="1" inlength="10533.099609375" outlength="70869.6015625" />
+          <splineposition x="-97550.78125" y="0" z="-108175.78125" tx="-0.253978192806244" ty="0" tz="-0.967209935188293" weight="1" inlength="65497.6015625" outlength="3306.84008789063" />
+          <splineposition x="-97996.09375" y="0" z="-129640.625" tx="0.28189617395401" ty="0" tz="-0.959444940090179" weight="1" inlength="3674.15991210938" outlength="7744.919921875" />
+          <splineposition x="-86769.53125" y="0" z="-146980.46875" tx="0.785970211029053" ty="0" tz="-0.618264377117157" weight="0" inlength="8557.580078125" outlength="4056.42993164063" />
+          <splineposition x="-77089.84375" y="0" z="-153312.5" tx="0.902095854282379" ty="0" tz="-0.431535661220551" weight="1" inlength="4000.92993164063" outlength="61137.5" />
+          <splineposition x="91933.59375" y="0" z="-152527.34375" tx="0.869216620922089" ty="0" tz="0.494431436061859" weight="1" inlength="47246.6015625" outlength="2975.8701171875" />
+          <splineposition x="99824.21875" y="0" z="-145609.375" tx="0.653128683567047" ty="0" tz="0.757246911525726" weight="1" inlength="2124.39990234375" outlength="3290" />
+          <splineposition x="107085.9375" y="0" z="-132726.5625" tx="0.37197333574295" ty="0" tz="0.928243398666382" weight="1" inlength="4795.43994140625" outlength="3095.169921875" />
+          <splineposition x="108660.15625" y="0" z="-122160.15625" tx="-0.0196499098092318" ty="0" tz="0.999806940555573" weight="1" inlength="3187.89990234375" outlength="75985.1015625" />
+          <splineposition x="-20761.71875" y="0" z="81335.9375" tx="-0.536904692649841" ty="0" tz="0.843642890453339" weight="1" inlength="82564.796875" outlength="10102.099609375" />
+          <splineposition x="-30648.4375" y="0" z="109984.375" tx="0.0548668578267097" ty="0" tz="0.998493671417236" weight="1" inlength="9565.1103515625" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro-->
+  <!--macro name="Highway01_Cluster_03_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-34509.2265625" y="0" z="-50823.88671875" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-27371.08984375" y="0" z="-51069.125" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-34509.234375" y="0" z="-50823.87890625" tx="0.0577566400170326" ty="0" tz="0.99833071231842" weight="0" inlength="0" outlength="5567.35986328125" />
+          <splineposition x="-33544.58203125" y="0" z="-34149.66796875" tx="0.0572547875344753" ty="0" tz="0.998359620571136" weight="1" inlength="5567.35986328125" outlength="32317.900390625" />
+          <splineposition x="-29633.998046875" y="0" z="54899.484375" tx="0.124024875462055" ty="0" tz="0.99227911233902" weight="1" inlength="32303.80078125" outlength="3717.07006835938" />
+          <splineposition x="-23798.14453125" y="0" z="74774.9453125" tx="0.552996695041656" ty="0" tz="0.833183467388153" weight="1" inlength="4547.7099609375" outlength="8886.419921875" />
+          <splineposition x="-7844.25341796875" y="0" z="88450.2578125" tx="0.907423794269562" ty="0" tz="0.420216649770737" weight="0" inlength="8968.080078125" outlength="4589.5" />
+          <splineposition x="5620.14404296875" y="0" z="93398.0546875" tx="0.929388523101807" ty="0" tz="0.369102865457535" weight="1" inlength="3955.98999023438" outlength="58059.69921875" />
+          <splineposition x="162656.21875" y="0" z="109671.515625" tx="0.985810875892639" ty="0" tz="-0.167859688401222" weight="1" inlength="54189.6015625" outlength="3011.7900390625" />
+          <splineposition x="173785.96875" y="0" z="104674.3203125" tx="0.807598650455475" ty="0" tz="-0.589732468128204" weight="1" inlength="3416.65991210938" outlength="8432.2998046875" />
+          <splineposition x="183936.578125" y="0" z="84640.265625" tx="-0.090958796441555" ty="0" tz="-0.995854675769806" weight="1" inlength="6981.240234375" outlength="2747.419921875" />
+          <splineposition x="180164.703125" y="0" z="72948.1640625" tx="-0.622848153114319" ty="0" tz="-0.782342731952667" weight="1" inlength="3249.68994140625" outlength="84989.796875" />
+          <splineposition x="-22468.2734375" y="0" z="-34394.984375" tx="-0.433094441890717" ty="0" tz="-0.901348531246185" weight="1" inlength="78976.3984375" outlength="5202.18017578125" />
+          <splineposition x="-27371.08984375" y="0" z="-51069.1171875" tx="-0.282095551490784" ty="0" tz="-0.95938628911972" weight="1" inlength="5793.330078125" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro-->
+  <macro name="Highway01_Cluster_04_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-5735.763671875" y="0" z="-8191.5205078125" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="11482426" y="0" z="16398607" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-5735.76" y="0.0" z="-8191.52" tx="0.573576" ty="0.0" tz="0.819152" weight="0" inlength="0.0" outlength="50814.5" />
+          <splineposition x="81702.3" y="0.0" z="116683.0" tx="0.573557" ty="0.0" tz="0.819166" weight="1" inlength="50814.5" outlength="174583.0" />
+          <splineposition x="381096.0" y="0.0" z="546425.0" tx="0.571662" ty="0.0" tz="0.820489" weight="1" inlength="174583.0" outlength="102914.0" />
+          <splineposition x="558724.0" y="0.0" z="798950.0" tx="0.575348" ty="0.0" tz="0.817909" weight="1" inlength="102913.0" outlength="84756.5" />
+          <splineposition x="704964.0" y="0.0" z="1006960" tx="0.575138" ty="0.0" tz="0.818056" weight="0" inlength="84756.3" outlength="0.0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro>
+  <macro name="Highway02_Cluster_04_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="11482430" y="0" z="16398605" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-5735.763671875" y="0" z="-8191.5205078125" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="704968.0" y="0.0" z="1006950" tx="-0.574137" ty="0.0" tz="-0.81876" weight="0" inlength="0.0" outlength="95669.7" />
+          <splineposition x="540186.0" y="0.0" z="771963.0" tx="-0.574128" ty="0.0" tz="-0.818766" weight="1" inlength="95669.8" outlength="103002.0" />
+          <splineposition x="363051.0" y="0.0" z="518766.0" tx="-0.573236" ty="0.0" tz="-0.81939" weight="1" inlength="103002.0" outlength="164520.0" />
+          <splineposition x="80085.5" y="0.0" z="114374.0" tx="-0.573317" ty="0.0" tz="-0.819334" weight="1" inlength="164520.0" outlength="49874.9" />
+          <splineposition x="-5735.76" y="0.0" z="-8191.52" tx="-0.573576" ty="0.0" tz="-0.819152" weight="0" inlength="49874.9" outlength="0.0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro>
+  <macro name="Highway01_Cluster_04_Sector002_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-81247.6171875" y="0" z="150123.046875" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-81241.703125" y="0" z="154296.875" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-81247.6171875" y="0" z="150123.046875" tx="0.999994218349457" ty="0" tz="0.00340652652084827" weight="0" inlength="0" outlength="12040.2998046875" />
+          <splineposition x="-48149.4140625" y="0" z="144310.546875" tx="0.913605690002441" ty="0" tz="-0.406601399183273" weight="1" inlength="10241.7998046875" outlength="82102.296875" />
+          <splineposition x="41457.3984375" y="0" z="-105400.390625" tx="0.631456971168518" ty="0" tz="-0.775410950183868" weight="1" inlength="158440" outlength="10046.2998046875" />
+          <splineposition x="62575.5625" y="0" z="-114099.609375" tx="0.999997138977051" ty="0" tz="-0.00240327068604529" weight="1" inlength="4259.919921875" outlength="6897.8798828125" />
+          <splineposition x="88535.15625" y="0" z="-104558.59375" tx="0.741347134113312" ty="0" tz="0.671121776103973" weight="0" inlength="9272.1103515625" outlength="3566.82006835938" />
+          <splineposition x="95403.6875" y="0" z="-96433.59375" tx="0.638092398643494" ty="0" tz="0.769959807395935" weight="1" inlength="3546.84008789063" outlength="96308.796875" />
+          <splineposition x="-48149.4140625" y="0" z="154310.546875" tx="-0.999969959259033" ty="0" tz="0.00775166088715196" weight="1" inlength="124316" outlength="14238.400390625" />
+          <splineposition x="-81241.703125" y="0" z="154296.875" tx="-0.999999940395355" ty="0" tz="-0.000413605011999607" weight="1" inlength="11030.7998046875" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro>
+  <!--macro name="Highway01_Cluster_06_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-88059.8125" y="0" z="-5539.0893554688" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-81890.734375" y="0" z="-141.0217285156" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-88059.8125" y="0" z="-5539.08154296875" tx="-0.0249411650002003" ty="0" tz="-0.999688923358917" weight="0" inlength="0" outlength="8021.5" />
+          <splineposition x="-88233.7734375" y="0" z="-29596.099609375" tx="-0.0194895267486572" ty="0" tz="-0.999810039997101" weight="1" inlength="8021.5" outlength="57865.30078125" />
+          <splineposition x="13419.685546875" y="0" z="-150213.3125" tx="0.865085959434509" ty="0" tz="-0.501623630523682" weight="1" inlength="50782.30078125" outlength="2910.48999023438" />
+          <splineposition x="25063.560546875" y="0" z="-156603.09375" tx="0.888100802898407" ty="0" tz="-0.459648728370667" weight="1" inlength="2732.85009765625" outlength="6467.89990234375" />
+          <splineposition x="43784.8046875" y="0" z="-161703.875" tx="0.991463184356689" ty="0" tz="-0.130387157201767" weight="0" inlength="8007.8701171875" outlength="2745.26000976563" />
+          <splineposition x="55953.61328125" y="0" z="-160853.1875" tx="0.995220065116882" ty="0" tz="0.0976577326655388" weight="1" inlength="2217.32006835938" outlength="32600.80078125" />
+          <splineposition x="179488.359375" y="0" z="-86797.5390625" tx="0.404942393302917" ty="0" tz="0.914342224597931" weight="1" inlength="23438" outlength="1481.15002441406" />
+          <splineposition x="183181.234375" y="0" z="-74122.1796875" tx="0.117303378880024" ty="0" tz="0.993096113204956" weight="1" inlength="2521.419921875" outlength="4324.77978515625" />
+          <splineposition x="183188.328125" y="0" z="-55688.05078125" tx="-0.109543859958649" ty="0" tz="0.993981957435608" weight="1" inlength="4043.59008789063" outlength="2507.3701171875" />
+          <splineposition x="179701.671875" y="0" z="-45451.48828125" tx="-0.495247155427933" ty="0" tz="0.868752121925354" weight="1" inlength="2316.93994140625" outlength="49497.69921875" />
+          <splineposition x="-45443.203125" y="0" z="-108.566284179688" tx="-0.999999582767487" ty="0" tz="-0.000917750876396894" weight="1" inlength="95694.796875" outlength="12598.7001953125" />
+          <splineposition x="-81890.7265625" y="0" z="-141.029357910156" tx="-0.999999582767487" ty="0" tz="-0.000890678376890719" weight="1" inlength="12149.2001953125" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro-->
+  <!--macro name="Highway01_Cluster_06_Sector002_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-132710.9375" y="0" z="57092.28515625" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-132351.5625" y="0" z="62295.8984375" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-132707.03125" y="0" z="57092.28515625" tx="0.999997079372406" ty="0" tz="-0.00240572122856975" weight="0" inlength="0" outlength="6968.77001953125" />
+          <splineposition x="-111804.6875" y="0" z="57041.9921875" tx="0.999935925006866" ty="0" tz="-0.0113186473026872" weight="1" inlength="6968.77001953125" outlength="71340.1015625" />
+          <splineposition x="-30816.40625" y="0" z="-101867.671875" tx="0.621786236763" ty="0" tz="-0.783187031745911" weight="1" inlength="41883.69921875" outlength="3942.919921875" />
+          <splineposition x="-19125" y="0" z="-111352.5390625" tx="0.918144464492798" ty="0" tz="-0.396245807409287" weight="1" inlength="3922.330078125" outlength="11414.2001953125" />
+          <splineposition x="12054.6875" y="0" z="-121919.921875" tx="0.979968190193176" ty="0" tz="-0.199154019355774" weight="0" inlength="11530.5" outlength="4611.330078125" />
+          <splineposition x="25093.75" y="0" z="-123748.53125" tx="0.997485876083374" ty="0" tz="-0.0708656832575798" weight="1" inlength="4323.490234375" outlength="23661.599609375" />
+          <splineposition x="106542.96875" y="0" z="-117540.0390625" tx="0.96062958240509" ty="0" tz="0.277832329273224" weight="1" inlength="25017" outlength="4291.35009765625" />
+          <splineposition x="118351.5625" y="0" z="-112004.390625" tx="0.824839055538177" ty="0" tz="0.565367639064789" weight="1" inlength="5166.33984375" outlength="11063.2001953125" />
+          <splineposition x="138386.71875" y="0" z="-92542.96875" tx="0.57528018951416" ty="0" tz="0.817956387996674" weight="1" inlength="9445.2802734375" outlength="4025.68994140625" />
+          <splineposition x="142808.59375" y="0" z="-81487.3046875" tx="0.0946204289793968" ty="0" tz="0.995513439178467" weight="1" inlength="4007.10009765625" outlength="27252.5" />
+          <splineposition x="129621.09375" y="0" z="10756.34765625" tx="-0.226898208260536" ty="0" tz="0.973918497562408" weight="1" inlength="28020.69921875" outlength="4369.509765625" />
+          <splineposition x="126507.8125" y="0" z="24155.76171875" tx="-0.275005787611008" ty="0" tz="0.961442589759827" weight="1" inlength="4352.75" outlength="10097.7001953125" />
+          <splineposition x="109425.78125" y="0" z="50036.1328125" tx="-0.747299134731293" ty="0" tz="0.664487779140472" weight="1" inlength="11437.599609375" outlength="3907.03002929688" />
+          <splineposition x="101128.90625" y="0" z="56618.1640625" tx="-0.788771748542786" ty="0" tz="0.614686191082001" weight="1" inlength="3530.11010742188" outlength="39940.19921875" />
+          <splineposition x="-92703.125" y="0" z="62331.0546875" tx="-0.99999064207077" ty="0" tz="0.00432969024404883" weight="1" inlength="77095" outlength="13215.099609375" />
+          <splineposition x="-132347.65625" y="0" z="62295.8984375" tx="-0.999999582767487" ty="0" tz="-0.000886786612682045" weight="1" inlength="13214.7998046875" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro-->
+  <macro name="Highway02_Cluster_08_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-134945.546875" y="0" z="-25167.849609375" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="86319.609375" y="0" z="30678.2734375" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-134945.546875" y="0" z="-25167.849609375" tx="0.844524204730988" ty="0" tz="0.535517394542694" weight="0" inlength="0" outlength="3721.6298828125" />
+          <splineposition x="-101907.5234375" y="0" z="-8956.2451171875" tx="0.912015795707703" ty="0" tz="0.410155057907104" weight="1" inlength="17333.099609375" outlength="17333.099609375" />
+          <splineposition x="-35219.0546875" y="0" z="19658.341796875" tx="0.947686851024628" ty="0" tz="0.319201529026031" weight="1" inlength="24690.900390625" outlength="24690.900390625" />
+          <splineposition x="38511.81640625" y="0" z="38261.62890625" tx="0.994070649147034" ty="0" tz="0.108736455440521" weight="1" inlength="19658" outlength="19658" />
+          <splineposition x="86319.609375" y="0" z="30678.275390625" tx="0.859736621379852" ty="0" tz="-0.510737597942352" weight="0" inlength="11615" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <macro name="Highway01_Cluster_08_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="125516.5625" y="0" z="32295.6953125" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-96748.578125" y="0" z="-23550.42578125" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="125516.5625" y="0" z="32295.6953125" tx="-0.838531315326691" ty="0" tz="0.544853389263153" weight="0" inlength="0" outlength="11568.099609375" />
+          <splineposition x="77571.6875" y="0" z="41727.5546875" tx="-0.994554460048676" ty="0" tz="-0.104218125343323" weight="1" inlength="20020.19921875" outlength="20020.19921875" />
+          <splineposition x="2525.5888671875" y="0" z="22847.0546875" tx="-0.947714447975159" ty="0" tz="-0.319119602441788" weight="1" inlength="24962.69921875" outlength="24962.69921875" />
+          <splineposition x="-64393.33984375" y="0" z="-6009.357421875" tx="-0.899115562438965" ty="0" tz="-0.437711268663406" weight="1" inlength="17521.80078125" outlength="17521.69921875" />
+          <splineposition x="-96748.578125" y="0" z="-23550.42578125" tx="-0.859174728393555" ty="0" tz="-0.511682331562042" weight="0" inlength="3719.38989257813" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <macro name="Highway01_Cluster_09_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="6289.5756835938" y="0" z="-63517.7578125" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="6289.5756835938" y="0" z="61482.2421875" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="6289.57568359375" y="0" z="-63517.7578125" tx="0" ty="0" tz="1" weight="0" inlength="0" outlength="6628.66015625" />
+          <splineposition x="6289.57568359375" y="0" z="-38631.765625" tx="-1.19209994409175e-06" ty="0" tz="1" weight="1" inlength="6628.669921875" outlength="12877.2998046875" />
+          <splineposition x="6289.57568359375" y="0" z="0" tx="-7.1530001832798e-07" ty="0" tz="1" weight="1" inlength="12877.2998046875" outlength="12534.7001953125" />
+          <splineposition x="6289.57568359375" y="0" z="37604.0546875" tx="-7.1530001832798e-07" ty="0" tz="1" weight="1" inlength="12534.7001953125" outlength="6292.72998046875" />
+          <splineposition x="6289.57568359375" y="0" z="61482.2421875" tx="0" ty="0" tz="1" weight="0" inlength="6292.72998046875" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <macro name="Highway02_Cluster_09_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="4461.6547851562" y="0" z="60463.46875" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="4461.6547851562" y="0" z="-64536.53125" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="4461.65478515625" y="0" z="60463.46875" tx="0" ty="0" tz="-1" weight="0" inlength="0" outlength="8471.8896484375" />
+          <splineposition x="4461.65478515625" y="0" z="30047.806640625" tx="-7.1530001832798e-07" ty="0" tz="-1" weight="1" inlength="8471.8896484375" outlength="10015.900390625" />
+          <splineposition x="4461.65478515625" y="0" z="0" tx="-7.1530001832798e-07" ty="0" tz="-1" weight="1" inlength="10015.900390625" outlength="10652" />
+          <splineposition x="4461.65478515625" y="0" z="-31955.88671875" tx="-9.53700009631575e-07" ty="0" tz="-1" weight="1" inlength="10652" outlength="9193.5498046875" />
+          <splineposition x="4461.65478515625" y="0" z="-64536.53125" tx="0" ty="0" tz="-1" weight="0" inlength="9193.5400390625" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <!--macro name="Highway03_Cluster_09_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-110162.53125" y="0" z="-50222.5546875" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-71426.2265625" y="0" z="-35849.58203125" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-110162.53125" y="0" z="-50222.5546875" tx="-0.999991655349731" ty="0" tz="-0.00408459873870015" weight="0" inlength="0" outlength="8324.98046875" />
+          <splineposition x="-135137.25" y="0" z="-50324.55859375" tx="-0.99999338388443" ty="0" tz="0.00363361369818449" weight="1" inlength="8324.9697265625" outlength="32972.80078125" />
+          <splineposition x="-193636.203125" y="0" z="30319.775390625" tx="-0.330627590417862" ty="0" tz="0.94376128911972" weight="1" inlength="31804.80078125" outlength="3865.81005859375" />
+          <splineposition x="-197120.078125" y="0" z="41465.8359375" tx="-0.27564200758934" ty="0" tz="0.961260378360748" weight="1" inlength="4046.06005859375" outlength="14749.7998046875" />
+          <splineposition x="-207685.984375" y="0" z="84003.75" tx="-0.135239005088806" ty="0" tz="0.990813016891479" weight="0" inlength="14566.5" outlength="3995.80004882813" />
+          <splineposition x="-209898.234375" y="0" z="96006.671875" tx="-0.178322121500969" ty="0" tz="0.983972191810608" weight="1" inlength="4066.63989257813" outlength="29256.900390625" />
+          <splineposition x="-197429.421875" y="0" z="181810.0625" tx="0.593547463417053" ty="0" tz="0.804799020290375" weight="1" inlength="30559.69921875" outlength="15573.7998046875" />
+          <splineposition x="-163590.3125" y="0" z="210061.25" tx="0.910044848918915" ty="0" tz="0.414509862661362" weight="1" inlength="17635.400390625" outlength="80230.1015625" />
+          <splineposition x="36678.640625" y="0" z="199536.140625" tx="0.94538402557373" ty="0" tz="-0.325958579778671" weight="1" inlength="65414" outlength="3699.26000976563" />
+          <splineposition x="46955.796875" y="0" z="194740.15625" tx="0.829101324081421" ty="0" tz="-0.559098422527313" weight="1" inlength="4049.93994140625" outlength="11076.7998046875" />
+          <splineposition x="68100.25" y="0" z="172045.296875" tx="0.470895111560822" ty="0" tz="-0.882189214229584" weight="1" inlength="10553.7001953125" outlength="3858.69995117188" />
+          <splineposition x="72158.28125" y="0" z="161455.03125" tx="0.313782244920731" ty="0" tz="-0.949494957923889" weight="1" inlength="3720.92993164063" outlength="51690" />
+          <splineposition x="69291.8125" y="0" z="3933.40673828125" tx="-0.293358445167542" ty="0" tz="-0.956002533435822" weight="1" inlength="49546.80078125" outlength="3569.71997070313" />
+          <splineposition x="64869.67578125" y="0" z="-6520.66015625" tx="-0.392789393663406" ty="0" tz="-0.919628441333771" weight="1" inlength="3783.6298828125" outlength="10398.900390625" />
+          <splineposition x="42881.7890625" y="0" z="-28651.158203125" tx="-0.895530700683594" ty="0" tz="-0.444999694824219" weight="1" inlength="8172.990234375" outlength="2973.76000976563" />
+          <splineposition x="32456.51171875" y="0" z="-33140.78125" tx="-0.987745702266693" ty="0" tz="-0.156071975827217" weight="1" inlength="3517.32006835938" outlength="26354.599609375" />
+          <splineposition x="-52567.7578125" y="0" z="-35908.4140625" tx="-0.999999582767487" ty="0" tz="0.00088119471911341" weight="1" inlength="28341.400390625" outlength="6282.009765625" />
+          <splineposition x="-71426.2265625" y="0" z="-35849.58203125" tx="-0.999995112419128" ty="0" tz="0.00311975460499525" weight="1" inlength="6286.18994140625" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro-->
+  <macro name="Highway01_Cluster_10_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-80496.578125" y="0" z="-41930.0234375" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="66956.2421875" y="0" z="47147.2265625" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-80496.578125" y="0" z="-41930.0234375" tx="0.854392528533936" ty="0" tz="0.519628167152405" weight="0" inlength="0" outlength="9315.1796875" />
+          <splineposition x="-50232.80859375" y="0" z="-29658.42578125" tx="0.95311975479126" ty="0" tz="0.302593380212784" weight="1" inlength="7007.02978515625" outlength="18294.400390625" />
+          <splineposition x="16169.7958984375" y="0" z="-5724.59033203125" tx="0.906846582889557" ty="0" tz="0.421460896730423" weight="1" inlength="25190.400390625" outlength="18627.099609375" />
+          <splineposition x="59644.421875" y="0" z="24044.765625" tx="0.464058727025986" ty="0" tz="0.885804414749146" weight="1" inlength="18504.30078125" outlength="5582.9599609375" />
+          <splineposition x="66956.2421875" y="0" z="47147.2265625" tx="0.000289273506496102" ty="0" tz="0.999999940395355" weight="0" inlength="7384.81005859375" outlength="3244.03002929688" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <macro name="Highway02_Cluster_10_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="29145.87109375" y="0" z="56346.4453125" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-117806.9609375" y="0" z="-31864.779296875" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="29145.87109375" y="0" z="56346.4453125" tx="0.000114192996989004" ty="0" tz="-1" weight="0" inlength="1343.31005859375" outlength="5779.18994140625" />
+          <splineposition x="23016.1484375" y="0" z="35466.12109375" tx="-0.422897636890411" ty="0" tz="-0.906177461147308" weight="1" inlength="6094.2099609375" outlength="18106.5" />
+          <splineposition x="-22158.6015625" y="0" z="4787.57470703125" tx="-0.897723495960236" ty="0" tz="-0.440559297800064" weight="1" inlength="11224.900390625" outlength="14660.2001953125" />
+          <splineposition x="-88034.3359375" y="0" z="-19531.533203125" tx="-0.957647144794464" ty="0" tz="-0.287944346666336" weight="1" inlength="16170" outlength="6258.080078125" />
+          <splineposition x="-117806.9609375" y="0" z="-31864.779296875" tx="-0.860841870307922" ty="0" tz="-0.50887256860733" weight="0" inlength="9627.4404296875" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <!--macro name="Highway03_Cluster_10_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-129938.703125" y="0" z="13709.3125" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="25145.171875" y="0" z="107953.78125" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-129938.703125" y="0" z="13709.3125" tx="0.788560092449188" ty="0" tz="-0.614957690238953" weight="0" inlength="0" outlength="18720.80078125" />
+          <splineposition x="-102526.65625" y="0" z="-7114.740234375" tx="0.800788402557373" ty="0" tz="-0.598947405815125" weight="1" inlength="24945.69921875" outlength="24945.69921875" />
+          <splineposition x="-8998.3408203125" y="0" z="-70626.4921875" tx="0.855949819087982" ty="0" tz="-0.517058849334717" weight="1" inlength="1385.83996582031" outlength="1385.84997558594" />
+          <splineposition x="-2291.60302734375" y="0" z="-72376.15625" tx="0.944923877716064" ty="0" tz="0.327290117740631" weight="0" inlength="2720.71997070313" outlength="2720.71997070313" />
+          <splineposition x="11355.61328125" y="0" z="-65872.8671875" tx="0.852137982845306" ty="0" tz="0.523317158222198" weight="0" inlength="2720.34008789063" outlength="2720.34008789063" />
+          <splineposition x="15347.8701171875" y="0" z="-58563.41796875" tx="0.011320685967803" ty="0" tz="0.999935925006866" weight="1" inlength="4757.580078125" outlength="4757.60009765625" />
+          <splineposition x="23876.921875" y="0" z="71163.28125" tx="0.0532016232609749" ty="0" tz="0.998583793640137" weight="1" inlength="22176.80078125" outlength="22176.80078125" />
+          <splineposition x="25145.171875" y="0" z="107953.78125" tx="-0.00313688162714243" ty="0" tz="0.999995052814484" weight="0" inlength="14921.900390625" outlength="8111.83984375" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro-->
+  <!--macro name="Highway01_Cluster_11_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="10014.328125" y="0" z="88843.109375" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="18664.017578125" y="0" z="88817.71875" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="10014.328125" y="0" z="88843.1171875" tx="-0.99996417760849" ty="0" tz="-0.00846517365425825" weight="0" inlength="0" outlength="6221.4599609375" />
+          <splineposition x="-8649.3720703125" y="0" z="88685.1171875" tx="-0.999842405319214" ty="0" tz="-0.0177543703466654" weight="1" inlength="6221.4599609375" outlength="48928.6015625" />
+          <splineposition x="-57498.54296875" y="0" z="-49733.81640625" tx="0.182707816362381" ty="0" tz="-0.983167231082916" weight="1" inlength="48107.8984375" outlength="3242.21997070313" />
+          <splineposition x="-54647.54296875" y="0" z="-59206.65625" tx="0.444495469331741" ty="0" tz="-0.895781099796295" weight="1" inlength="3341.169921875" outlength="7846.43994140625" />
+          <splineposition x="-39932.71484375" y="0" z="-77184.140625" tx="0.798867881298065" ty="0" tz="-0.601506531238556" weight="0" inlength="7602.0400390625" outlength="3408.26000976563" />
+          <splineposition x="-30643.455078125" y="0" z="-81895.2890625" tx="0.964438855648041" ty="0" tz="-0.264306008815765" weight="1" inlength="3500.28002929688" outlength="45581.1015625" />
+          <splineposition x="104715.8359375" y="0" z="-73276.4921875" tx="0.922544121742249" ty="0" tz="0.385891616344452" weight="1" inlength="46256.30078125" outlength="3860.89990234375" />
+          <splineposition x="114949.8359375" y="0" z="-68436.015625" tx="0.842930912971497" ty="0" tz="0.538021802902222" weight="1" inlength="3547.40991210938" outlength="8593.080078125" />
+          <splineposition x="134694.96875" y="0" z="-49405.09765625" tx="0.496669620275497" ty="0" tz="0.867939651012421" weight="1" inlength="9437.4697265625" outlength="3032.39990234375" />
+          <splineposition x="137501.4375" y="0" z="-41052.421875" tx="0.228987872600555" ty="0" tz="0.973429262638092" weight="1" inlength="2928.34008789063" outlength="53385.69921875" />
+          <splineposition x="43969.60546875" y="0" z="88962.21875" tx="-0.999990463256836" ty="0" tz="0.0043642302043736" weight="1" inlength="39283.6015625" outlength="6188.5" />
+          <splineposition x="18664.017578125" y="0" z="88817.7265625" tx="-0.999971926212311" ty="0" tz="-0.00749695394188166" weight="1" inlength="8435.4296875" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro-->
+  <macro name="Highway03_Cluster_11_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="23645.759765625" y="0" z="-6823.7685546875" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-66945.359375" y="0" z="-7053.2377929688" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="23645.759765625" y="0" z="-6823.7685546875" tx="-0.884836316108704" ty="0" tz="-0.465901970863342" weight="0" inlength="2904.51000976563" outlength="2980.15991210938" />
+          <splineposition x="8061.6513671875" y="0" z="-15228.3857421875" tx="-0.889411509037018" ty="0" tz="-0.457107365131378" weight="1" inlength="6846.830078125" outlength="6846.830078125" />
+          <splineposition x="-21730.244140625" y="0" z="-24447.25" tx="-0.99954628944397" ty="0" tz="-0.0301194097846746" weight="1" inlength="9315.1396484375" outlength="9315.1396484375" />
+          <splineposition x="-49784.4609375" y="0" z="-16581.359375" tx="-0.895048499107361" ty="0" tz="0.445968806743622" weight="1" inlength="7122.7998046875" outlength="7122.7998046875" />
+          <splineposition x="-66945.359375" y="0" z="-7053.23779296875" tx="-0.833667457103729" ty="0" tz="0.552266716957092" weight="0" inlength="5834.580078125" outlength="2532.61010742188" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <macro name="Highway02_Cluster_11_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-44067.3671875" y="0" z="-5595.53515625" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="47523.75" y="0" z="-5366.0659179688" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-44067.3671875" y="0" z="-5595.53515625" tx="0.871428966522217" ty="0" tz="-0.490521669387817" weight="0" inlength="3814.330078125" outlength="5993.5" />
+          <splineposition x="-25298.427734375" y="0" z="-16165.435546875" tx="0.89557021856308" ty="0" tz="-0.444920241832733" weight="1" inlength="6663.77001953125" outlength="6663.77978515625" />
+          <splineposition x="1462.13122558594" y="0" z="-24121.865234375" tx="0.999715805053711" ty="0" tz="0.0238404367119074" weight="1" inlength="9165.8603515625" outlength="9165.8603515625" />
+          <splineposition x="29887.65234375" y="0" z="-14611" tx="0.886818289756775" ty="0" tz="0.462118327617645" weight="1" inlength="5677.2001953125" outlength="5677.2001953125" />
+          <splineposition x="47523.75" y="0" z="-5366.06591796875" tx="0.871274650096893" ty="0" tz="0.490795761346817" weight="0" inlength="8345.849609375" outlength="6019.35986328125" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <macro name="Highway01_Cluster_12_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-51734.296875" y="0" z="161723.859375" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-51734.296875" y="0" z="-48276.1328125" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-51734.296875" y="0" z="161723.859375" tx="-4.64850018033758e-06" ty="0" tz="-1" weight="0" inlength="0" outlength="8206.3798828125" />
+          <splineposition x="-51734.41015625" y="0" z="137104.734375" tx="0" ty="0" tz="-1" weight="1" inlength="8206.3896484375" outlength="27921.80078125" />
+          <splineposition x="-51734.10546875" y="0" z="53339.41796875" tx="-3.81469999410911e-06" ty="0" tz="-1" weight="1" inlength="27921.80078125" outlength="22635.5" />
+          <splineposition x="-51734.28515625" y="0" z="-14567.119140625" tx="-5.72199996895506e-06" ty="0" tz="-1" weight="1" inlength="22635.5" outlength="11236.2998046875" />
+          <splineposition x="-51734.296875" y="0" z="-48276.1328125" tx="-3.39499990786862e-07" ty="0" tz="-1" weight="0" inlength="11236.2998046875" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <macro name="Highway02_Cluster_12_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-66616.703125" y="0" z="-46158.89453125" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-66616.703125" y="0" z="163841.109375" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-66616.703125" y="0" z="-46158.89453125" tx="-1.3602999615614e-06" ty="0" tz="1" weight="0" inlength="0" outlength="11216.900390625" />
+          <splineposition x="-66616.7421875" y="0" z="-12508.3310546875" tx="1.14440999823273e-05" ty="0" tz="1" weight="1" inlength="11216.900390625" outlength="22654.099609375" />
+          <splineposition x="-66616.765625" y="0" z="55454.109375" tx="3.81469999410911e-06" ty="0" tz="1" weight="1" inlength="22654.099609375" outlength="27863.900390625" />
+          <splineposition x="-66616.65625" y="0" z="139045.875" tx="1.90735008800402e-05" ty="0" tz="1" weight="1" inlength="27863.900390625" outlength="8265.08984375" />
+          <splineposition x="-66616.703125" y="0" z="163841.109375" tx="-1.84620000709401e-06" ty="0" tz="1" weight="0" inlength="8265.080078125" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <macro name="Highway02_Cluster_13_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-13912.73046875" y="0" z="-62219.03125" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="46087.26953125" y="0" z="87780.96875" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-13912.73046875" y="0" z="-62219.03125" tx="0.00279753049835563" ty="0" tz="0.999996066093445" weight="0" inlength="0" outlength="4553.0400390625" />
+          <splineposition x="-3880.26245117188" y="0" z="-32529.052734375" tx="0.438709765672684" ty="0" tz="0.898628830909729" weight="1" inlength="13233.900390625" outlength="13233.900390625" />
+          <splineposition x="20938.51171875" y="0" z="14127.0546875" tx="0.461018711328506" ty="0" tz="0.887390434741974" weight="1" inlength="15616.900390625" outlength="15616.900390625" />
+          <splineposition x="39268.65234375" y="0" z="50646.1015625" tx="0.343837082386017" ty="0" tz="0.939029335975647" weight="1" inlength="12185.900390625" outlength="12185.900390625" />
+          <splineposition x="46087.26953125" y="0" z="87780.96875" tx="0.00204586051404476" ty="0" tz="0.999997913837433" weight="0" inlength="9869.2900390625" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <macro name="Highway01_Cluster_13_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="20291.1640625" y="0" z="98676.2265625" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-39708.8359375" y="0" z="-51323.77734375" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="20291.1640625" y="0" z="98676.2265625" tx="-0.000972758512943983" ty="0" tz="-0.999999523162842" weight="0" inlength="0" outlength="9870.48046875" />
+          <splineposition x="12276.2109375" y="0" z="61525.66015625" tx="-0.361709743738174" ty="0" tz="-0.932290732860565" weight="1" inlength="12402.900390625" outlength="12402.900390625" />
+          <splineposition x="-6627.8994140625" y="0" z="24298.22265625" tx="-0.466912478208542" ty="0" tz="-0.884303510189056" weight="1" inlength="15677.5" outlength="15677.5" />
+          <splineposition x="-31590.677734375" y="0" z="-21684.375" tx="-0.42390650510788" ty="0" tz="-0.90570592880249" weight="1" inlength="12997.7001953125" outlength="12997.7001953125" />
+          <splineposition x="-39708.8359375" y="0" z="-51323.77734375" tx="0.0217698961496353" ty="0" tz="-0.999763011932373" weight="0" inlength="4657.0400390625" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <macro name="Highway02_Cluster_14_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-12353.7021484375" y="0" z="-102809.1015625" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-12353.7021484375" y="0" z="127184.1640625" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-12353.6416015625" y="0" z="-102809.109375" tx="-7.48399997974047e-07" ty="0" tz="1" weight="0" inlength="0" outlength="6385.490234375" />
+          <splineposition x="-12353.6533203125" y="0" z="-78650.375" tx="3.25799987876962e-07" ty="0" tz="1" weight="1" inlength="6385.47998046875" outlength="35119.1015625" />
+          <splineposition x="-12353.671875" y="0" z="26706.91015625" tx="8.02700014901347e-07" ty="0" tz="1" weight="1" inlength="35119.1015625" outlength="27418.400390625" />
+          <splineposition x="-12353.68359375" y="0" z="108962.09375" tx="2.7099999897473e-06" ty="0" tz="1" weight="1" inlength="27418.400390625" outlength="4407.35986328125" />
+          <splineposition x="-12353.85546875" y="0" z="127190.8984375" tx="-1.27011999211391e-05" ty="0" tz="1" weight="0" inlength="4407.35986328125" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <macro name="Highway01_Cluster_14_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-5765.8310546875" y="0" z="126268.90625" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-5765.8310546875" y="0" z="-103732.421875" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-5765.8310546875" y="0" z="126268.90625" tx="3.19049991048814e-06" ty="0" tz="-1" weight="0" inlength="0" outlength="7216.5400390625" />
+          <splineposition x="-5765.72412109375" y="0" z="107119.28125" tx="1.18335001388914e-05" ty="0" tz="-1" weight="1" inlength="4716.5400390625" outlength="27418.400390625" />
+          <splineposition x="-5765.712890625" y="0" z="24864.08984375" tx="1.50999994730228e-07" ty="0" tz="-1" weight="1" inlength="27418.400390625" outlength="35119.1015625" />
+          <splineposition x="-5765.697265625" y="0" z="-80493.1953125" tx="1.1047000043618e-06" ty="0" tz="-1" weight="1" inlength="35119.1015625" outlength="6080.39990234375" />
+          <splineposition x="-5765.8310546875" y="0" z="-103732.421875" tx="-7.85239990364062e-06" ty="0" tz="-1" weight="0" inlength="8579.41015625" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <macro name="Highway03_Cluster_14_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="0.0038146973" y="0" z="-10000" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="1912.5709228516" y="0" z="-10000" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="0" y="0" z="-10000" tx="-0.99978095293045" ty="0" tz="-0.0209281574934721" weight="0" inlength="0" outlength="1474.10998535156" />
+          <splineposition x="-1977.46276855469" y="0" z="-9348.4345703125" tx="0.321676850318909" ty="0" tz="0.946849524974823" weight="1" inlength="490.518005371094" outlength="490.518005371094" />
+          <splineposition x="932.872802734375" y="0" z="-7208.63330078125" tx="0.999643623828888" ty="0" tz="0.0266957450658083" weight="1" inlength="901.971008300781" outlength="901.971008300781" />
+          <splineposition x="3432.44555664063" y="0" z="-9203.93359375" tx="0.333482533693314" ty="0" tz="-0.942756295204163" weight="1" inlength="493.048004150391" outlength="493.048004150391" />
+          <splineposition x="1912.56713867188" y="0" z="-10000" tx="-0.998454689979553" ty="0" tz="-0.0555715896189213" weight="0" inlength="1178.34997558594" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro>
+  <macro name="Highway02_Cluster_15_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="94232.28125" y="0" z="-186828.03125" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-57155.47265625" y="0" z="52744.33984375" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="94232.3" y="0.0" z="-186828.0" tx="-0.534193" ty="0.0" tz="0.845363" weight="0" inlength="0.0" outlength="3612.89" />
+          <splineposition x="88442.3" y="0.0" z="-177665.0" tx="-0.534187" ty="0.0" tz="0.845367" weight="1" inlength="3612.89" outlength="87239.5" />
+          <splineposition x="-51365.5" y="0.0" z="43581.7" tx="-0.534185" ty="0.0" tz="0.845367" weight="1" inlength="87239.5" outlength="3612.92" />
+          <splineposition x="-57155.5" y="0.0" z="52744.3" tx="-0.534192" ty="0.0" tz="0.845363" weight="0" inlength="3612.9" outlength="0.0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro>
+  <macro name="Highway01_Cluster_15_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-65824.703125" y="0" z="31206.498046875" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="91159.2421875" y="0" z="-215380.859375" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-65824.7" y="0.0" z="31206.5" tx="0.537033" ty="0.0" tz="-0.843561" weight="0" inlength="0.0" outlength="3098.15" />
+          <splineposition x="-60833.3" y="0.0" z="23366.1" tx="0.537049" ty="0.0" tz="-0.843551" weight="1" inlength="3098.15" outlength="91242.7" />
+          <splineposition x="86167.8" y="0.0" z="-207540.0" tx="0.537031" ty="0.0" tz="-0.843563" weight="1" inlength="91242.7" outlength="3098.15" />
+          <splineposition x="91159.2" y="0.0" z="-215381.0" tx="0.537032" ty="0.0" tz="-0.843562" weight="0" inlength="3098.15" outlength="0.0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro>
+  <macro name="Highway01_Cluster_18_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="2352.0363769531" y="0" z="-74158.5703125" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="2408.7492675781" y="0" z="104684.8125" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="2352.03637695313" y="0" z="-74158.5703125" tx="0" ty="0" tz="1" weight="0" inlength="0" outlength="3776.31005859375" />
+          <splineposition x="2352.14916992188" y="0" z="-57741.2109375" tx="-8.34499985558068e-07" ty="0" tz="1" weight="1" inlength="3776.32006835938" outlength="19247.099609375" />
+          <splineposition x="2352.14916992188" y="0" z="0" tx="-1.19200002757225e-07" ty="0" tz="1" weight="1" inlength="19247.099609375" outlength="27003.80078125" />
+          <splineposition x="2352.14916992188" y="0" z="81011.265625" tx="4.72069004899822e-05" ty="0" tz="1" weight="1" inlength="27003.80078125" outlength="5991.89013671875" />
+          <splineposition x="2408.74926757813" y="0" z="104684.8125" tx="-2.76542996289209e-05" ty="0" tz="1" weight="0" inlength="5991.8701171875" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <macro name="Highway02_Cluster_18_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="1875.8399658203" y="0" z="105060.5078125" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="1819.1270751953" y="0" z="-73782.875" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="1875.83996582031" y="0" z="105060.5078125" tx="-0.00505391787737608" ty="0" tz="-0.999987244606018" weight="0" inlength="0" outlength="3714.419921875" />
+          <splineposition x="1807.95812988281" y="0" z="88241.046875" tx="-0.0049814130179584" ty="0" tz="-0.999987602233887" weight="1" inlength="3714.42993164063" outlength="29413.69921875" />
+          <splineposition x="1807.95788574219" y="0" z="0" tx="2.49743006861536e-05" ty="0" tz="-1" weight="1" inlength="29413.69921875" outlength="18333.5" />
+          <splineposition x="1807.95812988281" y="0" z="-55000.390625" tx="1.24573998618871e-05" ty="0" tz="-1" weight="1" inlength="18333.5" outlength="4564.47021484375" />
+          <splineposition x="1819.12707519531" y="0" z="-73782.875" tx="-2.97469996439759e-05" ty="0" tz="-1" weight="0" inlength="4564.47021484375" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <macro name="Highway03_Cluster_18_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-19943.140625" y="0" z="-68692.3046875" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-11176.3916015625" y="0" z="96336.1328125" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-19943.140625" y="0" z="-68692.3046875" tx="0.999819219112396" ty="0" tz="-0.0190140400081873" weight="0" inlength="0" outlength="11508.7001953125" />
+          <splineposition x="13180.83203125" y="0" z="-60144.8828125" tx="0.873622417449951" ty="0" tz="0.486604422330856" weight="1" inlength="12118.7998046875" outlength="12118.7998046875" />
+          <splineposition x="43513.21484375" y="0" z="-33189.66796875" tx="0.579280316829681" ty="0" tz="0.81512838602066" weight="1" inlength="24368.599609375" outlength="24368.599609375" />
+          <splineposition x="97943.9609375" y="0" z="58989.59765625" tx="0.488624751567841" ty="0" tz="0.872494041919708" weight="1" inlength="21864.30078125" outlength="21864.30078125" />
+          <splineposition x="107613.2109375" y="0" z="81269.8203125" tx="0.0361519753932953" ty="0" tz="0.999346315860748" weight="0" inlength="5842.0498046875" outlength="5842.0498046875" />
+          <splineposition x="99376.3046875" y="0" z="94012.6484375" tx="-0.863993287086487" ty="0" tz="0.503503322601318" weight="0" inlength="4961.5400390625" outlength="4961.5400390625" />
+          <splineposition x="81863.671875" y="0" z="96208.7421875" tx="-0.999675750732422" ty="0" tz="0.0254631042480469" weight="1" inlength="14826.099609375" outlength="14826.099609375" />
+          <splineposition x="10449.9130859375" y="0" z="96335.9609375" tx="-0.999999225139618" ty="0" tz="0.00125503563322127" weight="1" inlength="15506.7001953125" outlength="15506.7001953125" />
+          <splineposition x="-11176.3916015625" y="0" z="96336.1328125" tx="-0.999812066555023" ty="0" tz="-0.019386101514101" weight="0" inlength="1089.34997558594" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro>
+  <macro name="Highway01_Cluster_19_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-4013.2294921875" y="0" z="-29061.044921875" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-8388.0458984375" y="0" z="-33550.9140625" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-226266.0" y="0.0" z="74400.9" tx="0.866031" ty="0.0" tz="-0.49999" weight="0" inlength="0.0" outlength="8020.37" />
+          <splineposition x="-205428.0" y="0.0" z="62370.5" tx="0.865993" ty="0.0" tz="-0.500057" weight="1" inlength="8020.35" outlength="21106.2" />
+          <splineposition x="-13224.8" y="0.0" z="-49049.4" tx="0.865983" ty="0.0" tz="-0.500074" weight="1" inlength="21106.2" outlength="3341.21" />
+          <splineposition x="-4544.13" y="0.0" z="-54061.2" tx="0.866026" ty="0.0" tz="-0.499998" weight="0" inlength="3341.17" outlength="0.0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro>
+  <!--macro name="Highway03_Cluster_20_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="36787.4609375" y="0" z="69246.2265625" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="53249.08984375" y="0" z="-184380.734375" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="36787.4609375" y="0" z="69246.2109375" tx="-0.999975383281708" ty="0" tz="-0.00701327761635184" weight="0" inlength="0" outlength="4773.490234375" />
+          <splineposition x="22467.353515625" y="0" z="69233.1015625" tx="-0.999919533729553" ty="0" tz="-0.0126878963783383" weight="1" inlength="4773.490234375" outlength="31269.5" />
+          <splineposition x="-53603.03125" y="0" z="14251.8154296875" tx="-0.675050377845764" ty="0" tz="-0.73777163028717" weight="1" inlength="24849.69921875" outlength="1670.65002441406" />
+          <splineposition x="-57710.390625" y="0" z="9465.9267578125" tx="-0.650112450122833" ty="0" tz="-0.759837985038757" weight="1" inlength="2102.25" outlength="7249.10986328125" />
+          <splineposition x="-67613.5546875" y="0" z="-9895.7138671875" tx="-0.273586452007294" ty="0" tz="-0.961847424507141" weight="0" inlength="7298.8701171875" outlength="2116.67993164063" />
+          <splineposition x="-69090.2265625" y="0" z="-16027.16015625" tx="-0.156250432133675" ty="0" tz="-0.98771744966507" weight="1" inlength="2079.22998046875" outlength="19763.69921875" />
+          <splineposition x="-69082.84375" y="0" z="-75975.0859375" tx="0.000923156272619963" ty="0" tz="-0.999999582767487" weight="1" inlength="19982.599609375" outlength="16669.69921875" />
+          <splineposition x="-68978.1484375" y="0" z="-124825.2265625" tx="0.00100326491519809" ty="0" tz="-0.999999523162842" weight="1" inlength="16669.69921875" outlength="2063.580078125" />
+          <splineposition x="-67669.5546875" y="0" z="-132168.609375" tx="0.365558654069901" ty="0" tz="-0.930788278579712" weight="1" inlength="2418.419921875" outlength="7641.97021484375" />
+          <splineposition x="-56075.3203125" y="0" z="-147959.28125" tx="0.716812491416931" ty="0" tz="-0.697265982627869" weight="1" inlength="5895.18994140625" outlength="1865.64001464844" />
+          <splineposition x="-51185.671875" y="0" z="-151756.21875" tx="0.828603506088257" ty="0" tz="-0.559835910797119" weight="1" inlength="1990.68994140625" outlength="30032.69921875" />
+          <splineposition x="36331.77734375" y="0" z="-184373.078125" tx="0.99993908405304" ty="0" tz="-0.0110397767275572" weight="1" inlength="32262.099609375" outlength="5843.68994140625" />
+          <splineposition x="53249.08984375" y="0" z="-184380.765625" tx="0.99999988079071" ty="0" tz="-0.000454589404398575" weight="1" inlength="5639.10009765625" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro>
+  <macro name="Highway01_Cluster_20_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="47609.109375" y="0" z="-115472.8828125" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="31153.13671875" y="0" z="129978.8203125" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="47609.109375" y="0" z="-115472.8984375" tx="-0.999999642372131" ty="0" tz="-0.000833208381664008" weight="0" inlength="0" outlength="5585.5498046875" />
+          <splineposition x="30852.447265625" y="0" z="-115467.6171875" tx="-0.999996542930603" ty="0" tz="0.00262452778406441" weight="1" inlength="5585.56005859375" outlength="28909.80078125" />
+          <splineposition x="-49823.29296875" y="0" z="-83618.140625" tx="-0.802143394947052" ty="0" tz="0.597131431102753" weight="1" inlength="19950.099609375" outlength="1585.14001464844" />
+          <splineposition x="-55278.5546875" y="0" z="-78938.3828125" tx="-0.733130872249603" ty="0" tz="0.680087566375732" weight="1" inlength="1996.19995117188" outlength="6037.47998046875" />
+          <splineposition x="-66934.828125" y="0" z="-63394.2265625" tx="-0.479061663150787" ty="0" tz="0.877781271934509" weight="0" inlength="6568.97021484375" outlength="2171.92993164063" />
+          <splineposition x="-68672.65625" y="0" z="-54991.01953125" tx="0.0249099880456924" ty="0" tz="0.999689698219299" weight="1" inlength="2197.82006835938" outlength="11110.900390625" />
+          <splineposition x="-68622.1015625" y="0" z="-20153.560546875" tx="0.000961303187068552" ty="0" tz="0.999999523162842" weight="1" inlength="11612.5" outlength="22448.80078125" />
+          <splineposition x="-68051.328125" y="0" z="47192.57421875" tx="0.0977593809366226" ty="0" tz="0.99521005153656" weight="1" inlength="22557.599609375" outlength="2346.61010742188" />
+          <splineposition x="-66826.9375" y="0" z="53998.55859375" tx="0.22359111905098" ty="0" tz="0.974683046340942" weight="1" inlength="2522.169921875" outlength="8251.740234375" />
+          <splineposition x="-56305.93359375" y="0" z="74362.140625" tx="0.626680850982666" ty="0" tz="0.779276013374329" weight="1" inlength="8144.3798828125" outlength="2489.35009765625" />
+          <splineposition x="-51716.296875" y="0" z="79655.265625" tx="0.65513950586319" ty="0" tz="0.755507946014404" weight="1" inlength="2335.28002929688" outlength="28937.19921875" />
+          <splineposition x="17976.986328125" y="0" z="129951.9921875" tx="0.999984741210938" ty="0" tz="0.00552375009283423" weight="1" inlength="27577" outlength="3864.63989257813" />
+          <splineposition x="31153.13671875" y="0" z="129978.8203125" tx="0.999992489814758" ty="0" tz="-0.0038718490395695" weight="1" inlength="4055.23999023438" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro-->
+  <macro name="Highway02_Cluster_20_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-28150.6796875" y="0" z="-108760.421875" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-28149.642578125" y="0" z="123136.609375" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-28150.0" y="0.0" z="-108760.0" tx="0.0" ty="0.0" tz="1.0" weight="0" inlength="0.0" outlength="5545.36" />
+          <splineposition x="-28150.0" y="0.0" z="-92124.3" tx="0.0" ty="0.0" tz="1.0" weight="1" inlength="5545.38" outlength="64492.5" />
+          <splineposition x="-28150.0" y="0.0" z="101353.0" tx="4.76837e-006" ty="0.0" weight="1" tz="1.0" inlength="64492.5" outlength="7261.15" />
+          <splineposition x="-28149.6" y="0.0" z="123137.0" tx="1.73368e-005" ty="0.0" weight="0" tz="1.0" inlength="7261.14" outlength="0.0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro>
+  <macro name="Highway04_Cluster_20_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-37032.76953125" y="0" z="126973.0859375" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-37032.1875" y="0" z="-104939.109375" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-37032.8" y="0.0" z="126973.0" tx="5.17026e-006" ty="0.0" tz="-1.0" weight="0"  inlength="0.0" outlength="7378.15" /> 
+          <splineposition x="-37032.6" y="0.0" z="104839.0" tx="1.14441e-005" ty="0.0" tz="-1.0" weight="1" inlength="7378.15" outlength="64384.5" /> 
+          <splineposition x="-37032.6" y="0.0" z="-88314.8" tx="-9.53674e-006" ty="0.0" tz="-1.0" weight="1" inlength="64384.5" outlength="5541.43" /> 
+          <splineposition x="-37032.6" y="0.0" z="-104939.0" tx="0.0" ty="0.0" tz="-1.0" weight="0" inlength="5541.44" outlength="0.0" /> 
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro>
+  <!--macro name="Highway01_Cluster_21_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-88717.125" y="0" z="-111961.015625" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="109487.4140625" y="0" z="189249.53125" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-88717.125" y="0" z="-111961.015625" tx="0.00392272928729653" ty="0" tz="0.999992311000824" weight="0" inlength="0" outlength="4195.18994140625" />
+          <splineposition x="-88728.515625" y="0" z="-99375.53125" tx="0.00445557339116931" ty="0" tz="0.999990046024323" weight="1" inlength="4195.2099609375" outlength="35554.6015625" />
+          <splineposition x="-76812.7578125" y="0" z="6627.3994140625" tx="0.199443966150284" ty="0" tz="0.979909241199493" weight="1" inlength="36518.5" outlength="3145.27001953125" />
+          <splineposition x="-74012.5078125" y="0" z="15376.95703125" tx="0.37728887796402" ty="0" tz="0.926095604896545" weight="1" inlength="3133.39990234375" outlength="8141.68994140625" />
+          <splineposition x="-62398.7890625" y="0" z="36231.68359375" tx="0.640269756317139" ty="0" tz="0.768150150775909" weight="0" inlength="8403.25" outlength="3234.06005859375" />
+          <splineposition x="-56435.078125" y="0" z="43219.5546875" tx="0.65332955121994" ty="0" tz="0.757073640823364" weight="1" inlength="3062.25" outlength="70211.296875" />
+          <splineposition x="109467.0703125" y="0" z="173348.71875" tx="0.0689624771475792" ty="0" tz="0.997619271278381" weight="1" inlength="58631.69921875" outlength="4426.8798828125" />
+          <splineposition x="109487.4140625" y="0" z="189249.53125" tx="0.0184475127607584" ty="0" tz="0.999829828739166" weight="1" inlength="5301.18017578125" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro>
+  <macro name="Highway02_Cluster_21_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="78346.421875" y="0" z="189784.828125" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-119876.734375" y="0" z="-111459.1953125" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="78346.421875" y="0" z="189784.828125" tx="-0.0528242327272892" ty="0" tz="-0.998603820800781" weight="0" inlength="0.0152588002383709" outlength="5300.43017578125" />
+          <splineposition x="78316.6328125" y="0" z="173811.1875" tx="-0.0183989610522985" ty="0" tz="-0.999830722808838" weight="1" inlength="5324.83984375" outlength="70491.8984375" />
+          <splineposition x="-87123.078125" y="0" z="41915.34375" tx="-0.666890263557434" ty="0" tz="-0.745155930519104" weight="1" inlength="70813.1015625" outlength="3079.84008789063" />
+          <splineposition x="-93083.015625" y="0" z="34909.97265625" tx="-0.647048532962799" ty="0" tz="-0.762448787689209" weight="1" inlength="3065.8701171875" outlength="6897.97021484375" />
+          <splineposition x="-103871.140625" y="0" z="16875.19921875" tx="-0.412552297115326" ty="0" tz="-0.910933911800385" weight="0" inlength="6870.72998046875" outlength="3053.76000976563" />
+          <splineposition x="-106891.53125" y="0" z="8144.92236328125" tx="-0.229438945651054" ty="0" tz="-0.973323047161102" weight="1" inlength="2989.84008789063" outlength="35507.8984375" />
+          <splineposition x="-119881.015625" y="0" z="-100197.359375" tx="0.000701904122252017" ty="0" tz="-0.999999761581421" weight="1" inlength="35961.1015625" outlength="3708" />
+          <splineposition x="-119876.734375" y="0" z="-111459.1953125" tx="0.033784206956625" ty="0" tz="-0.999429166316986" weight="1" inlength="3732.68994140625" outlength="0.0152588002383709" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro-->
+  <macro name="Highway01_Cluster_22_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="160071.84375" y="0" z="59792.88671875" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-124562.2734375" y="0" z="-53445.59765625" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="160071.84375" y="0" z="59792.88671875" tx="-0.879516005516052" ty="0" tz="-0.475869327783585" weight="0" inlength="0" outlength="10080.2001953125" />
+          <splineposition x="108897.5390625" y="0" z="36473.24609375" tx="-0.922670781612396" ty="0" tz="-0.385588675737381" weight="1" inlength="22468.19921875" outlength="22468.19921875" />
+          <splineposition x="28555.048828125" y="0" z="4899.26416015625" tx="-0.934400975704193" ty="0" tz="-0.356222927570343" weight="1" inlength="29476.400390625" outlength="29476.400390625" />
+          <splineposition x="-56352.828125" y="0" z="-26543.498046875" tx="-0.936225652694702" ty="0" tz="-0.351399332284927" weight="1" inlength="26303" outlength="26303" />
+          <splineposition x="-124562.2734375" y="0" z="-53445.59765625" tx="-0.931212663650513" ty="0" tz="-0.364476323127747" weight="0" inlength="18549.5" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <macro name="Highway02_Cluster_22_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-188464.71875" y="0" z="-50252.60546875" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="96327.375" y="0" z="63059.546875" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-188464.71875" y="0" z="-50252.60546875" tx="0.931837797164917" ty="0" tz="0.362875044345856" weight="0" inlength="0" outlength="18919.5" />
+          <splineposition x="-119119.25" y="0" z="-24977.41015625" tx="0.941729843616486" ty="0" tz="0.336370229721069" weight="1" inlength="26278.400390625" outlength="26278.400390625" />
+          <splineposition x="-34212.15234375" y="0" z="4530.26513671875" tx="0.93566358089447" ty="0" tz="0.352893263101578" weight="1" inlength="29557.19921875" outlength="29557.19921875" />
+          <splineposition x="46806.66796875" y="0" z="37626.26171875" tx="0.915383636951447" ty="0" tz="0.402582705020905" weight="1" inlength="22581.900390625" outlength="22581.900390625" />
+          <splineposition x="96327.375" y="0" z="63059.546875" tx="0.871094226837158" ty="0" tz="0.49111595749855" weight="0" inlength="9448.599609375" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <macro name="Highway02_Cluster_24_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-50789.23046875" y="0" z="88477.34375" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="93937.9921875" y="0" z="-118779.0703125" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-50789.23046875" y="0" z="88477.34375" tx="0.567959666252136" ty="0" tz="-0.823056399822235" weight="0" inlength="555.606994628906" outlength="3635.98999023438" />
+          <splineposition x="-32102.41015625" y="0" z="57539.2421875" tx="0.531195461750031" ty="0" tz="-0.847249329090118" weight="1" inlength="16837.80078125" outlength="16837.80078125" />
+          <splineposition x="5258.27978515625" y="0" z="-1505.19555664063" tx="0.561084568500519" ty="0" tz="-0.827758491039276" weight="1" inlength="27874.599609375" outlength="27874.599609375" />
+          <splineposition x="61744.24609375" y="0" z="-80897.171875" tx="0.590921759605408" ty="0" tz="-0.806728839874268" weight="1" inlength="23366.30078125" outlength="23366.30078125" />
+          <splineposition x="93937.9921875" y="0" z="-118779.0703125" tx="0.811945259571075" ty="0" tz="-0.58373361825943" weight="0" inlength="7560.33984375" outlength="2231.71997070313" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <macro name="Highway01_Cluster_24_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="77642.265625" y="0" z="-119421.046875" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-66839.3828125" y="0" z="87589.7890625" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="77642.265625" y="0" z="-119421.046875" tx="-0.817204594612122" ty="0" tz="0.576347708702087" weight="0" inlength="2615.169921875" outlength="7367.6298828125" />
+          <splineposition x="46874.91796875" y="0" z="-81421.7109375" tx="-0.581073999404907" ty="0" tz="0.8138507604599" weight="1" inlength="22947" outlength="22947" />
+          <splineposition x="-7446.62841796875" y="0" z="-2102.55053710938" tx="-0.556472539901733" ty="0" tz="0.830865979194641" weight="1" inlength="27852.599609375" outlength="27852.599609375" />
+          <splineposition x="-46131.65625" y="0" z="57421.66015625" tx="-0.545127332210541" ty="0" tz="0.838353276252747" weight="1" inlength="17106.099609375" outlength="17106.099609375" />
+          <splineposition x="-66839.3828125" y="0" z="87589.7890625" tx="-0.568038582801819" ty="0" tz="0.82300192117691" weight="0" inlength="4682.1298828125" outlength="868.377014160156" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <macro name="Highway03_Cluster_24_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="4694.5190429688" y="0" z="98021.375" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-47662.67578125" y="0" z="-69255.6875" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="4694.51513671875" y="0" z="98021.375" tx="0.0389888435602188" ty="0" tz="-0.9992396235466" weight="0" inlength="0" outlength="5443.02978515625" />
+          <splineposition x="-278.617858886719" y="0" z="66758.0234375" tx="-0.223228245973587" ty="0" tz="-0.974766194820404" weight="1" inlength="15802.099609375" outlength="15802.099609375" />
+          <splineposition x="-16471.3203125" y="0" z="5601.29931640625" tx="-0.29803192615509" ty="0" tz="-0.954555928707123" weight="1" inlength="18711.80078125" outlength="18711.80078125" />
+          <splineposition x="-33739.16015625" y="0" z="-40410.5625" tx="-0.384811609983444" ty="0" tz="-0.922995150089264" weight="1" inlength="13515.900390625" outlength="13515.900390625" />
+          <splineposition x="-47662.6796875" y="0" z="-69255.671875" tx="-0.517422139644623" ty="0" tz="-0.855730295181274" weight="0" inlength="7892.56982421875" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro>
+  <macro name="Highway04_Cluster_24_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-86447.375" y="0" z="-2063.15625" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="107413.1015625" y="0" z="-21908.5703125" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-86447.3671875" y="0" z="-2063.15625" tx="0.978180348873138" ty="0" tz="0.207757517695427" weight="0" inlength="0" outlength="2105.10009765625" />
+          <splineposition x="-60803.203125" y="0" z="-3193.29833984375" tx="0.996883153915405" ty="0" tz="-0.0788923278450966" weight="1" inlength="15084" outlength="15084" />
+          <splineposition x="3774.2900390625" y="0" z="-9207.82421875" tx="0.993767976760864" ty="0" tz="-0.111468330025673" weight="1" inlength="23041.400390625" outlength="23041.400390625" />
+          <splineposition x="76585.15625" y="0" z="-18590.453125" tx="0.993450999259949" ty="0" tz="-0.114258863031864" weight="1" inlength="17386.30078125" outlength="17386.30078125" />
+          <splineposition x="107413.1015625" y="0" z="-21908.5703125" tx="0.99957799911499" ty="0" tz="-0.0290485881268978" weight="0" inlength="3280.2099609375" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro>
+  <macro name="Highway02_Cluster_25_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-23480.01171875" y="0" z="112835.7578125" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-15377.8037109375" y="0" z="-128658.171875" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-15377.4" y="0.0" z="112836.0" tx="0.0" ty="0.0" tz="-1.0" weight="0"  inlength="0.0" outlength="4731.06" />
+          <splineposition x="-15377.4" y="0.0" z="98642.6" tx="3.33786e-006" ty="0.0" tz="-1.0" weight="1"  inlength="4731.06" outlength="24774.0" />
+          <splineposition x="-15377.4" y="0.0" z="24320.7" tx="4.76837e-007" ty="0.0" tz="-1.0" weight="1"  inlength="24774.0" outlength="39152.2" />
+          <splineposition x="-15377.4" y="0.0" z="-93136.0" tx="4.76837e-007" ty="0.0" tz="-1.0" weight=""  inlength="39152.2" outlength="11840.7" />
+          <splineposition x="-15377.8" y="0.0" z="-128658.0" tx="-1.20007e-005" ty="0.0" tz="-1.0" weight="0"  inlength="11840.7" outlength="0.0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="xenonlocalhighwayconfiguration" ring="0" />
+    </properties>
+  </macro>
+  <macro name="Highway01_Cluster_25_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="25537.533203125" y="0" z="-140032.3125" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="17306.19140625" y="0" z="101452.2421875" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="25537.5" y="0.0" z="-140032.0" tx="-7.80079e-006" ty="0.0" tz="1.0" weight="0"  inlength="0.0" outlength="12714.4" />
+          <splineposition x="25537.2" y="0.0" z="-101889.0" tx="-8.58307e-006" ty="0.0" tz="1.0" weight="1"  inlength="12714.4" outlength="33963.1" />
+          <splineposition x="25537.2" y="0.0" z="0.0" tx="0.0" ty="0.0" tz="1.0" weight="1"  inlength="33963.1" outlength="28511.1" />
+          <splineposition x="25537.2" y="0.0" z="85533.3" tx="0.0" ty="0.0" tz="1.0" weight="1"  inlength="28511.1" outlength="5306.32" />
+          <splineposition x="25537.2" y="0.0" z="101452.0" tx="0.0" ty="0.0" tz="1.0" weight="0"  inlength="5306.3" outlength="0.0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="xenonlocalhighwayconfiguration" ring="0" />
+    </properties>
+  </macro>
+  <!--macro name="Highway01_Cluster_25_Sector002_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="64337.78515625" y="0" z="95808.59375" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="74913.34375" y="0" z="94636.71875" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="64337.76953125" y="0" z="95808.59375" tx="-0.838184058666229" ty="0" tz="-0.545387506484985" weight="0" inlength="0" outlength="8544.669921875" />
+          <splineposition x="42851.74609375" y="0" z="81828.125" tx="-0.837996065616608" ty="0" tz="-0.545676290988922" weight="1" inlength="8544.669921875" outlength="43169.30078125" />
+          <splineposition x="-62830.14453125" y="0" z="8101.5625" tx="-0.821957886219025" ty="0" tz="-0.56954824924469" weight="1" inlength="43170.69921875" outlength="3478.82006835938" />
+          <splineposition x="-71154.265625" y="0" z="894.53125" tx="-0.683620929718018" ty="0" tz="-0.729837238788605" weight="1" inlength="3494.4599609375" outlength="10471.2998046875" />
+          <splineposition x="-89068.203125" y="0" z="-24445.3125" tx="-0.48396623134613" ty="0" tz="-0.875086665153503" weight="1" inlength="10710.900390625" outlength="3487.61010742188" />
+          <splineposition x="-94477.4375" y="0" z="-33261.71875" tx="-0.467605322599411" ty="0" tz="-0.883937358856201" weight="1" inlength="3389.60009765625" outlength="44026" />
+          <splineposition x="-155826.359375" y="0" z="-145398.4375" tx="-0.161541521549225" ty="0" tz="-0.986865937709808" weight="1" inlength="45015" outlength="2707.8701171875" />
+          <splineposition x="-154928.671875" y="0" z="-165546.875" tx="0.384710729122162" ty="0" tz="-0.923037171363831" weight="1" inlength="3460.0400390625" outlength="10545.5" />
+          <splineposition x="-136616.625" y="0" z="-188152.34375" tx="0.850816071033478" ty="0" tz="-0.52546364068985" weight="1" inlength="12543.2998046875" outlength="4089.17993164063" />
+          <splineposition x="-110843.5078125" y="0" z="-195628.90625" tx="0.98579603433609" ty="0" tz="-0.167946845293045" weight="1" inlength="2602.10009765625" outlength="47094.1015625" />
+          <splineposition x="19510.947265625" y="0" z="-179738.28125" tx="0.921343743801117" ty="0" tz="0.388748943805695" weight="1" inlength="48891.6015625" outlength="3236.39990234375" />
+          <splineposition x="28104.99609375" y="0" z="-175585.9375" tx="0.893564760684967" ty="0" tz="0.448934346437454" weight="1" inlength="7499.47021484375" outlength="8867.8798828125" />
+          <splineposition x="50912.26953125" y="0" z="-149238.28125" tx="0.480550140142441" ty="0" tz="0.876967251300812" weight="1" inlength="8693" outlength="3704.23999023438" />
+          <splineposition x="55148.7421875" y="0" z="-140250" tx="0.347866356372833" ty="0" tz="0.937544107437134" weight="1" inlength="3331.30004882813" outlength="73406.6015625" />
+          <splineposition x="75112.515625" y="0" z="77757.8125" tx="0.00211333762854338" ty="0" tz="0.999997794628143" weight="1" inlength="73191.703125" outlength="5644.5498046875" />
+          <splineposition x="74913.328125" y="0" z="94636.71875" tx="-0.0118006560951471" ty="0" tz="0.999930381774902" weight="1" inlength="5625.39013671875" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro-->
+  <macro name="Highway01_Cluster_28_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="7014.7783203125" y="0" z="-34709.78515625" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="7014.0729980469" y="0" z="37767.6328125" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="7014.78" y="0.0" z="-34709.8" tx="0.0" ty="0.0" tz="1.0" weight="0" inlength="0.0" outlength="4563.61" /> 
+          <splineposition x="7014.69" y="0.0" z="-21019.0" tx="0.0" ty="0.0" tz="1.0" weight="1" inlength="4563.61" outlength="7006.32" /> 
+          <splineposition x="7014.69" y="0.0" z="0.0" tx="0.0" ty="0.0" tz="1.0" weight="1" inlength="7006.32" outlength="8099.69" /> 
+          <splineposition x="7014.69" y="0.0" z="24299.0" tx="0.0" ty="0.0" tz="1.0" weight="1" inlength="8099.69" outlength="4489.53" /> 
+          <splineposition x="7014.69" y="0.0" z="37767.6" tx="0.0" ty="0.0" tz="1.0" weight="0" inlength="4489.52" outlength="0.0" /> 
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro>
+  <macro name="Highway02_Cluster_28_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="162.146484375" y="0" z="38782.79296875" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="162.1011962891" y="0" z="-33717.078125" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+         <splineposition x="162.918" y="0.0" z="38782.8" tx="0.0" ty="0.0" tz="-1.0" weight="0" inlength="0.0" outlength="4472.41" /> 
+          <splineposition x="162.918" y="0.0" z="25365.5" tx="0.0" ty="0.0" tz="-1.0" weight="1" inlength="4472.41" outlength="7963.27" /> 
+          <splineposition x="162.918" y="0.0" z="1475.73" tx="0.0" ty="0.0" tz="-1.0" weight="1" inlength="7963.27" outlength="6839.51" /> 
+          <splineposition x="162.918" y="0.0" z="-19042.8" tx="0.0" ty="0.0" tz="-1.0" weight="1" inlength="6839.51" outlength="4891.43" /> 
+          <splineposition x="163.094" y="0.0" z="-33717.1" tx="0.0" ty="0.0" tz="-1.0" weight="0" inlength="4891.43" outlength="0.0" /> 
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro>
+  <!--macro name="Highway03_Cluster_28_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="38686.95703125" y="0" z="30191.322265625" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="46841.97265625" y="0" z="-124142.515625" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="38686.95703125" y="0" z="30191.306640625" tx="-0.999875485897064" ty="0" tz="0.0157791655510664" weight="0" inlength="0" outlength="3899.03002929688" />
+          <splineposition x="26991.318359375" y="0" z="30375.876953125" tx="-0.999935150146484" ty="0" tz="0.0113907940685749" weight="1" inlength="3899.03002929688" outlength="43803.30078125" />
+          <splineposition x="-86017.609375" y="0" z="-36687.91796875" tx="-0.716148197650909" ty="0" tz="-0.697948276996613" weight="1" inlength="42749.1015625" outlength="3214.60009765625" />
+          <splineposition x="-93016.9765625" y="0" z="-43663.26953125" tx="-0.607254803180695" ty="0" tz="-0.794507145881653" weight="1" inlength="2922.05004882813" outlength="8384.16015625" />
+          <splineposition x="-107570.4140625" y="0" z="-67996.2734375" tx="-0.292774498462677" ty="0" tz="-0.956181526184082" weight="0" inlength="11681.7998046875" outlength="4071.330078125" />
+          <splineposition x="-110404.7734375" y="0" z="-77462.6953125" tx="-0.2852743268013" ty="0" tz="-0.958445906639099" weight="1" inlength="3293.8798828125" outlength="32522.80078125" />
+          <splineposition x="-116358.0625" y="0" z="-174941.765625" tx="0.0837557837367058" ty="0" tz="-0.996486306190491" weight="1" inlength="32675.69921875" outlength="3133.97998046875" />
+          <splineposition x="-112892.484375" y="0" z="-186357.359375" tx="0.543641448020935" ty="0" tz="-0.839317560195923" weight="1" inlength="3346.3701171875" outlength="7099.27978515625" />
+          <splineposition x="-97382.4140625" y="0" z="-197898.40625" tx="0.9078249335289" ty="0" tz="-0.419349402189255" weight="1" inlength="6776.06005859375" outlength="3193.98999023438" />
+          <splineposition x="-88728.2578125" y="0" z="-201458.859375" tx="0.925948321819305" ty="0" tz="-0.377650201320648" weight="1" inlength="3119.32006835938" outlength="17220.599609375" />
+          <splineposition x="-37074.44140625" y="0" z="-200556.96875" tx="0.959656774997711" ty="0" tz="0.281174004077911" weight="1" inlength="17297" outlength="3340.90991210938" />
+          <splineposition x="-27347.04296875" y="0" z="-197224.796875" tx="0.934635937213898" ty="0" tz="0.355606019496918" weight="1" inlength="4547.22021484375" outlength="13659.7998046875" />
+          <splineposition x="-148.086547851563" y="0" z="-185469.390625" tx="0.895265281200409" ty="0" tz="0.445533454418182" weight="1" inlength="11859.2998046875" outlength="3947.84008789063" />
+          <splineposition x="8622.5927734375" y="0" z="-180478.125" tx="0.855340480804443" ty="0" tz="0.51806628704071" weight="1" inlength="3571.85009765625" outlength="21036.5" />
+          <splineposition x="47124" y="0" z="-136148.46875" tx="-0.00190545234363526" ty="0" tz="0.999998211860657" weight="1" inlength="23490.69921875" outlength="4800.31005859375" />
+          <splineposition x="46841.97265625" y="0" z="-124142.515625" tx="-0.0234842225909233" ty="0" tz="0.999724209308624" weight="0" inlength="4003.09008789063" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ring="0" />
+    </properties>
+  </macro-->
+  <macro name="Highway01_Cluster_29_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-178583.15625" y="0" z="-235480.28125" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="114891.5078125" y="0" z="70760.984375" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-178583.15625" y="0" z="-235480.28125" tx="0.455021321773529" ty="0" tz="0.890480577945709" weight="0" inlength="3550.42993164063" outlength="4598.2099609375" />
+          <splineposition x="-165929.53125" y="0" z="-212584.140625" tx="0.445625960826874" ty="0" tz="0.895219266414642" weight="1" inlength="8116.93017578125" outlength="50794" />
+          <splineposition x="-88046.59375" y="0" z="-81569.7734375" tx="0.588665366172791" ty="0" tz="0.808376789093018" weight="1" inlength="51233.80078125" outlength="3341.4599609375" />
+          <splineposition x="-82108.0703125" y="0" z="-73600.765625" tx="0.593387842178345" ty="0" tz="0.804916679859161" weight="0" inlength="3419.5400390625" outlength="7299.06005859375" />
+          <splineposition x="-68680.5234375" y="0" z="-57283.3984375" tx="0.638481795787811" ty="0" tz="0.769636929035187" weight="0" inlength="7562.2998046875" outlength="3542.8701171875" />
+          <splineposition x="-62390.92578125" y="0" z="-49806.44140625" tx="0.641701102256775" ty="0" tz="0.766954839229584" weight="1" inlength="2818.44995117188" outlength="53095.19921875" />
+          <splineposition x="85828.5234375" y="0" z="70771.9453125" tx="0.999855756759644" ty="0" tz="0.0169834326952696" weight="1" inlength="56875.19921875" outlength="5849.509765625" />
+          <splineposition x="114891.5078125" y="0" z="70760.984375" tx="0.999980807304382" ty="0" tz="-0.00619234796613455" weight="0" inlength="6495.4599609375" outlength="77.0070037841797" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <macro name="Highway02_Cluster_29_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="90883.6640625" y="0" z="68680.1484375" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-203457.015625" y="0" z="-238061.140625" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="90883.6640625" y="0" z="68680.1484375" tx="-0.999961316585541" ty="0" tz="-0.00879779271781445" weight="0" inlength="0" outlength="6301.0400390625" />
+          <splineposition x="60249.20703125" y="0" z="68683.046875" tx="-0.999981760978699" ty="0" tz="-0.00603877473622561" weight="1" inlength="6141.60009765625" outlength="60938.19921875" />
+          <splineposition x="-85258.6796875" y="0" z="-45937.8203125" tx="-0.694816708564758" ty="0" tz="-0.719186902046204" weight="1" inlength="55873.6015625" outlength="3019.13989257813" />
+          <splineposition x="-91539.09375" y="0" z="-53429.20703125" tx="-0.638251543045044" ty="0" tz="-0.769827902317047" weight="0" inlength="3317.01000976563" outlength="7088.68994140625" />
+          <splineposition x="-104995.0703125" y="0" z="-69761.859375" tx="-0.634558260440826" ty="0" tz="-0.772875070571899" weight="0" inlength="6694.2099609375" outlength="3132.419921875" />
+          <splineposition x="-110956.3671875" y="0" z="-77716.8671875" tx="-0.598889172077179" ty="0" tz="-0.800831913948059" weight="1" inlength="3313.60009765625" outlength="50235.3984375" />
+          <splineposition x="-187691" y="0" z="-207424.828125" tx="-0.451919287443161" ty="0" tz="-0.892058849334717" weight="1" inlength="50441.1015625" outlength="8525.25" />
+          <splineposition x="-203457.015625" y="0" z="-238061.140625" tx="-0.510480761528015" ty="0" tz="-0.859889149665833" weight="0" inlength="8838.919921875" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <macro name="Highway02_Cluster_32_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="45912.29296875" y="0" z="-169929.96875" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-53676.5234375" y="0" z="-170017.390625" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="45912.29296875" y="0" z="-169929.96875" tx="-0.999999642372131" ty="0" tz="-0.00083363801240921" weight="0" inlength="0" outlength="6442.9599609375" />
+          <splineposition x="26583.423828125" y="0" z="-169946.078125" tx="-0.999999701976776" ty="0" tz="-0.000808715471066535" weight="1" inlength="6442.9599609375" outlength="9324.23046875" />
+          <splineposition x="-1389.2822265625" y="0" z="-169946.078125" tx="-1" ty="0" tz="0" weight="1" inlength="9324.240234375" outlength="10522.2001953125" />
+          <splineposition x="-32955.96484375" y="0" z="-169946.078125" tx="-1" ty="0" tz="-3.81470017600805e-05" weight="1" inlength="10522.2001953125" outlength="6906.89990234375" />
+          <splineposition x="-53676.5234375" y="0" z="-170017.390625" tx="-0.999994099140167" ty="0" tz="-0.00344195147044957" weight="0" inlength="6906.89013671875" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="xenonlocalhighwayconfiguration" ring="0" />
+    </properties>
+  </macro>
+  <!--macro name="Highway01_Cluster_32_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-4669.28125" y="0" z="-57600.578125" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="154539.59375" y="0" z="-55940.0703125" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-4669.2734375" y="0" z="-57600.578125" tx="-0.00685146450996399" ty="0" tz="0.999976515769959" weight="0" inlength="0" outlength="6759.9599609375" />
+          <splineposition x="-4808.2197265625" y="0" z="-37321.15234375" tx="-0.00905254110693932" ty="0" tz="0.999959051609039" weight="1" inlength="6759.97021484375" outlength="78282.5" />
+          <splineposition x="-53807.80078125" y="0" z="174408.125" tx="-0.200943440198898" ty="0" tz="0.979602873325348" weight="1" inlength="65890.203125" outlength="3174.2099609375" />
+          <splineposition x="-52240.76953125" y="0" z="188588.4375" tx="0.432878822088242" ty="0" tz="0.901452124118805" weight="1" inlength="3611.3701171875" outlength="8391.169921875" />
+          <splineposition x="-31729.63671875" y="0" z="204385.0625" tx="0.986954987049103" ty="0" tz="0.160996466875076" weight="0" inlength="11052" outlength="4868.52978515625" />
+          <splineposition x="-21881.69921875" y="0" z="204608.484375" tx="0.998341798782349" ty="0" tz="-0.0575644560158253" weight="1" inlength="3383.52001953125" outlength="63732.1015625" />
+          <splineposition x="145171.234375" y="0" z="91275.2734375" tx="0.697776317596436" ty="0" tz="-0.716315746307373" weight="1" inlength="53334.5" outlength="3496.60009765625" />
+          <splineposition x="153833.90625" y="0" z="82735.5859375" tx="0.711686670780182" ty="0" tz="-0.702497065067291" weight="1" inlength="4054.73999023438" outlength="9618.1904296875" />
+          <splineposition x="168853.390625" y="0" z="58009.32421875" tx="0.146592348814011" ty="0" tz="-0.989197015762329" weight="1" inlength="9364.5302734375" outlength="3895.68994140625" />
+          <splineposition x="168612.8125" y="0" z="45115.99609375" tx="-0.1087876111269" ty="0" tz="-0.99406498670578" weight="1" inlength="4226.259765625" outlength="28471.80078125" />
+          <splineposition x="154400.65625" y="0" z="-34492.4609375" tx="-0.174294203519821" ty="0" tz="-0.984693646430969" weight="1" inlength="26955.69921875" outlength="7149.35009765625" />
+          <splineposition x="154539.59375" y="0" z="-55940.0703125" tx="0.00647757109254599" ty="0" tz="-0.999979019165039" weight="1" inlength="7149.35009765625" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="xenonlocalhighwayconfiguration" ring="0" />
+    </properties>
+  </macro-->
+  <!--macro name="Highway01_Cluster_32_Sector002_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-10382.7744140625" y="0" z="-100417.96875" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="11991.451171875" y="0" z="61812.5" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-10382.7705078125" y="0" z="-100421.875" tx="0" ty="0" tz="1" weight="0" inlength="0" outlength="6640.6201171875" />
+          <splineposition x="-10382.7705078125" y="0" z="-80500" tx="0.000435829104389995" ty="0" tz="0.99999988079071" weight="1" inlength="6640.6201171875" outlength="27054.69921875" />
+          <splineposition x="0" y="0" z="0" tx="0.287131369113922" ty="0" tz="0.957891225814819" weight="1" inlength="28008.900390625" outlength="14438.7001953125" />
+          <splineposition x="11965.087890625" y="0" z="40093.75" tx="0.00491812359541655" ty="0" tz="0.999987900257111" weight="1" inlength="13363.2998046875" outlength="6937.509765625" />
+          <splineposition x="11991.451171875" y="0" z="61808.59375" tx="0.0012139828177169" ty="0" tz="0.999999284744263" weight="0" inlength="7238.2900390625" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="xenonlocalhighwayconfiguration" ring="0" />
+    </properties>
+  </macro>
+  <macro name="Highway02_Cluster_32_Sector002_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-10397.033203125" y="0" z="62558.59375" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-33242.30078125" y="0" z="-99750" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-10397.041015625" y="0" z="62554.6875" tx="-0.0104851610958576" ty="0" tz="-0.999945044517517" weight="0" inlength="0" outlength="7488.68994140625" />
+          <splineposition x="-10632.560546875" y="0" z="40093.75" tx="-0.0129823889583349" ty="0" tz="-0.999915719032288" weight="1" inlength="7488.68994140625" outlength="13844.5" />
+          <splineposition x="-21466.396484375" y="0" z="0" tx="-0.261660009622574" ty="0" tz="-0.965160131454468" weight="1" inlength="13842.599609375" outlength="27070" />
+          <splineposition x="-33242.30078125" y="0" z="-80351.5625" tx="0.0151329031214118" ty="0" tz="-0.999885499477386" weight="1" inlength="26788.69921875" outlength="6399.2900390625" />
+          <splineposition x="-33242.30078125" y="0" z="-99753.90625" tx="0" ty="0" tz="-1" weight="0" inlength="6468.75" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="xenonlocalhighwayconfiguration" ring="0" />
+    </properties>
+  </macro-->
+  <macro name="Highway01_Cluster_34_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-120166.09375" y="0" z="41443.2890625" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="159186.53125" y="0" z="-59840.73046875" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-120166.09375" y="0" z="41443.2890625" tx="0.929382622241974" ty="0" tz="-0.369117856025696" weight="0" inlength="0" outlength="6734.25" />
+          <splineposition x="-95092.2421875" y="0" z="31654.2890625" tx="0.929503858089447" ty="0" tz="-0.3688123524189" weight="1" inlength="6734.259765625" outlength="32866.5" />
+          <splineposition x="-2626.60986328125" y="0" z="-2615.81225585938" tx="0.939313113689423" ty="0" tz="-0.343061059713364" weight="1" inlength="32866.5" outlength="47858.69921875" />
+          <splineposition x="132767.546875" y="0" z="-50184.828125" tx="0.93947035074234" ty="0" tz="-0.342630237340927" weight="1" inlength="47858.69921875" outlength="7823.89990234375" />
+          <splineposition x="159186.53125" y="0" z="-59840.73046875" tx="0.939220190048218" ty="0" tz="-0.343315422534943" weight="0" inlength="7814.39013671875" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+  <macro name="Highway02_Cluster_34_Sector001_macro" class="highway">
+    <component ref="standardzonehighway" />
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="126586.8125" y="0" z="-41101.875" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-152765.8125" y="0" z="60182.13671875" />
+        </offset>
+      </connection>
+    </connections>
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="126586.8125" y="0" z="-41101.875" tx="-0.952658474445343" ty="0" tz="0.304042518138886" weight="0" inlength="0" outlength="7689.66015625" />
+          <splineposition x="101025.046875" y="0" z="-31509.30078125" tx="-0.952282547950745" ty="0" tz="0.305217921733856" weight="1" inlength="7689.64990234375" outlength="35386.69921875" />
+          <splineposition x="1107.35327148438" y="0" z="4357.28076171875" tx="-0.94115149974823" ty="0" tz="0.337985068559647" weight="1" inlength="35386.69921875" outlength="45833" />
+          <splineposition x="-128370.0390625" y="0" z="51033.609375" tx="-0.93724912405014" ty="0" tz="0.348660349845886" weight="1" inlength="45833" outlength="6073.83984375" />
+          <splineposition x="-152765.78125" y="0" z="60182.13671875" tx="-0.93445360660553" ty="0" tz="0.356084853410721" weight="0" inlength="6073.81005859375" outlength="0" />
+          <size r="200" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+      <configuration ref="ringlocalhighwayconfiguration" ring="1" />
+    </properties>
+  </macro>
+</macros>

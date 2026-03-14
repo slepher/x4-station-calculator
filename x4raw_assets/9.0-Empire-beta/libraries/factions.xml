@@ -1,0 +1,723 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Last exported: 24.07.2025 14:51:53
+
+Default Relation Ranges:
+  self:          1.0  to  1.0
+  ally:          0.5  to  1.0
+  member:        0.1  to  1.0
+  friend:        0.01 to  1.0
+  neutral:      -0.01 to  0.01
+  enemy:        -1.0  to -0.01
+  killmilitary: -1.0  to -0.1
+  kill:         -1.0  to -0.32
+  nemesis:      -1.0  to -1.0
+
+UI value mapping (analogously for negative values):
+  1.0       = 30
+  0.5       = 27
+  0.32      = 25
+  0.1       = 20
+  0.032     = 15
+  0.01      = 10
+  0.0032    = 5
+These values are fixed. Between them, logarithmic interpolation is used. Approximate formulas:
+  uivalue = 10 * log10(relation * 1000)
+  relation = 10^(uivalue / 10) / 1000
+Between -0.0032 and +0.0032 (UI -5...+5) linear interpolation is used, and 0.00064 equates to one UI value step.
+
+Note: Relations defined here apply only to gamestart. Relations may change through gameplay and/or plot.
+-->
+<factions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="factions.xsd">
+  <signals>
+    <signal id="attacked" name="{1036, 161}" description="{1036, 162}" default="auto">
+      <response id="attack" name="{1036, 311}" description="{1036, 312}" />
+      <response id="auto" name="{1036, 371}" description="{1036, 372}" />
+      <response id="distract" name="{1036,381}" description="{1036,382}" />
+      <response id="flee" name="{1036, 321}" description="{1036, 322}" />
+      <response id="ignore" name="{1036, 331}" description="{1036, 332}" />
+    </signal>
+    <signal id="foundabandonedship" name="{1036, 121}" description="{1036, 122}" default="ignore">
+      <response id="claim" name="{1036, 241}" description="{1036, 242}" />
+      <response id="ignore" name="{1036, 271}" description="{1036, 272}" />
+      <response id="mark" name="{1036, 251}" description="{1036, 252}" />
+      <response id="protect" name="{1036, 261}" description="{1036, 262}" />
+    </signal>
+    <signal id="foundlockbox" name="{1036, 131}" description="{1036, 132}" default="ignore">
+      <response id="collect" name="{1036, 281}" description="{1036, 282}" />
+      <response id="ignore" name="{1036, 291}" description="{1036, 292}" />
+      <response id="wait" name="{1036, 231}" description="{1036, 232}" />
+    </signal>
+    <signal id="piratehalt" name="{1036,101}" description="{1036,102}" default="attack">
+      <response id="attack" name="{1036,201}" description="{1036,202}" />
+      <response id="comply" name="{1036,211}" description="{1036,212}" />
+      <response id="distract" name="{1036,381}" description="{1036,382}" />
+      <response id="flee" name="{1036,221}" description="{1036,222}" />
+      <response id="wait" name="{1036,231}" description="{1036,232}" />
+    </signal>
+    <signal id="policefoundcontraband" name="{1036, 151}" description="{1036, 152}" default="destroy" ask="0">
+      <response id="collect" name="{1036, 351}" description="{1036, 352}" />
+      <response id="destroy" name="{1036, 341}" description="{1036, 342}" />
+      <response id="ignore" name="{1036, 361}" description="{1036, 362}" />
+    </signal>
+    <signal id="policehalt" name="{1036,111}" description="{1036,112}" default="comply">
+      <response id="attack" name="{1036,201}" description="{1036,202}" />
+      <response id="comply" name="{1036,211}" description="{1036,212}" />
+      <response id="distract" name="{1036,381}" description="{1036,382}" />
+      <response id="flee" name="{1036,221}" description="{1036,222}" />
+      <response id="wait" name="{1036,231}" description="{1036,232}" />
+    </signal>
+  </signals>
+  <faction id="player" name="{20203,101}" description="{20203,102}" shortname="{20203,103}" prefixname="{20203,104}" behaviourset="default" tags="claimspace police" policefaction="player">
+    <color ref="faction_player" />
+    <account amount="0" />
+    <icon active="faction_player" inactive="faction_player" />
+    <licences>
+      <licence type="generaluseship" name="{1001,61}" tags="basic hidden" />
+      <licence type="generaluseequipment" factions="alliance antigone argon buccaneers hatikvah holyorder ministry paranid scaleplate teladi trinity" />
+      <licence type="generaluseship" factions="alliance antigone argon buccaneers hatikvah holyorder ministry paranid scaleplate teladi trinity" />
+      <licence type="station_gen_basic" factions="alliance antigone argon buccaneers hatikvah holyorder ministry paranid scaleplate teladi trinity" />
+      <licence type="station_illegal" factions="hatikvah scaleplate" />
+    </licences>
+    <relations>
+      <relation faction="buccaneers" relation="-0.032" />
+      <relation faction="criminal" relation="-0.5" />
+      <relation faction="holyorderfanatic" relation="-1" />
+      <relation faction="khaak" relation="-1" />
+      <relation faction="outlaw" relation="-0.32" />
+      <relation faction="scaleplate" relation="-0.0032" />
+      <relation faction="xenon" relation="-1" />
+    </relations>
+  </faction>
+  <faction id="alliance" name="{20203,801}" description="{20203,802}" shortname="{20203,803}" prefixname="{20203,804}" spacename="{20203,805}" homespacename="{20203,806}" primaryrace="paranid" behaviourset="default" tags="economic privateloadout privateship protective standard watchdoguser" policefaction="paranid">
+    <color ref="faction_alliance" />
+    <icon active="faction_alliance" inactive="faction_alliance" banner="diplomacy_banner_alliance" />
+    <licences>
+      <licence type="capitalequipment" name="{20207,2141}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="capitalship" name="{20207,3111}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="ceremonyally" name="{20207,5111}" minrelation="0.1" />
+      <licence type="ceremonyfriend" name="{20207,5101}" minrelation="0.01" />
+      <licence type="generaluseequipment" name="{20207,2331}" minrelation="-0.01" tags="basic" />
+      <licence type="generaluseship" name="{20207,2321}" minrelation="-0.01" tags="basic" />
+      <licence type="militaryequipment" name="{20207,2131}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="militaryship" name="{20207,3101}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="shipsalecontract" name="{20207,9061}" description="{20207,9062}" minrelation="0.1" precursor="ceremonyally" price="1" tags="hidden" />
+      <licence type="station_equip_lxl" name="{20207,10041}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_equip_sm" name="{20207,10031}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_gen_advanced" name="{20207,10021}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_gen_basic" name="{20207,10001}" minrelation="-0.01" tags="basic" />
+      <licence type="station_gen_intermediate" name="{20207,10011}" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="subgroupfriend" name="{20207,6051}" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="tradesubscription" name="{20207,4051}" description="{20207,4052}" minrelation="0.1" precursor="ceremonyally" price="10000" />
+      <licence type="capitalequipment" factions="buccaneers paranid trinity" />
+      <licence type="generaluseequipment" factions="antigone argon buccaneers holyorder ministry paranid teladi trinity" />
+      <licence type="generaluseship" factions="hatikvah" />
+      <licence type="police" factions="buccaneers paranid trinity" />
+      <licence type="subgroupfriend" factions="argon" />
+    </licences>
+    <relations>
+      <relation faction="antigone" relation="0.1" />
+      <relation faction="argon" relation="0.1" />
+      <relation faction="criminal" relation="-0.5" />
+      <relation faction="hatikvah" relation="0.1" />
+      <relation faction="khaak" relation="-1" />
+      <relation faction="ministry" relation="0.1" />
+      <relation faction="outlaw" relation="-0.032" />
+      <relation faction="paranid" relation="0.67" />
+      <relation faction="smuggler" relation="-0.06" />
+      <relation faction="teladi" relation="0.1" />
+      <relation faction="trinity" relation="0.67" />
+      <relation faction="xenon" relation="-1" />
+    </relations>
+  </faction>
+  <faction id="antigone" name="{20203,301}" description="{20203,302}" shortname="{20203,303}" prefixname="{20203,304}" spacename="{20203,305}" homespacename="{20203,306}" primaryrace="argon" behaviourset="default" tags="claimspace economic police privateloadout privateship protective publicship standard watchdoguser" policefaction="argon">
+    <color ref="faction_antigone" />
+    <icon active="faction_antigone" inactive="faction_antigone" banner="diplomacy_banner_antigone" />
+    <licences>
+      <licence type="capitalequipment" name="{20207,2061}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="capitalship" name="{20207,3031}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="ceremonyally" name="{20207,5031}" minrelation="0.1" />
+      <licence type="ceremonyfriend" name="{20207,5021}" minrelation="0.01" />
+      <licence type="generaluseequipment" name="{20207,2241}" minrelation="-0.01" tags="basic" />
+      <licence type="generaluseship" name="{20207,2251}" minrelation="-0.01" tags="basic" />
+      <licence type="militaryequipment" name="{20207,2051}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="militaryship" name="{20207,3021}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="shipsalecontract" name="{20207,9031}" description="{20207,9032}" minrelation="0.1" precursor="ceremonyally" price="1" tags="hidden" />
+      <licence type="station_equip_lxl" name="{20207,7191}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_equip_sm" name="{20207,7181}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_gen_advanced" name="{20207,7331}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_gen_basic" name="{20207,7311}" minrelation="-0.01" tags="basic" />
+      <licence type="station_gen_intermediate" name="{20207,7321}" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="tradesubscription" name="{20207,4011}" description="{20207,4012}" minrelation="0.1" precursor="ceremonyally" price="10000000" />
+      <licence type="capitalequipment" factions="argon" />
+      <licence type="capitalship" factions="argon" />
+      <licence type="envoy_access" factions="argon ministry" />
+      <licence type="generaluseequipment" factions="argon" />
+      <licence type="generaluseship" factions="argon hatikvah" />
+      <licence type="militaryequipment" factions="argon" />
+      <licence type="militaryship" factions="argon" />
+      <licence type="police" factions="argon" />
+    </licences>
+    <relations>
+      <relation faction="alliance" relation="0.1" />
+      <relation faction="argon" relation="0.67" />
+      <relation faction="buccaneers" relation="-0.032" />
+      <relation faction="criminal" relation="-0.5" />
+      <relation faction="holyorder" relation="-0.1" />
+      <relation faction="holyorderfanatic" relation="-1" />
+      <relation faction="khaak" relation="-1" />
+      <relation faction="outlaw" relation="-0.032" />
+      <relation faction="scaleplate" relation="-0.1" />
+      <relation faction="smuggler" relation="-0.06" />
+      <relation faction="xenon" relation="-1" />
+    </relations>
+  </faction>
+  <faction id="argon" name="{20203,201}" description="{20203,202}" shortname="{20203,203}" prefixname="{20203,204}" spacename="{20203,205}" homespacename="{20203,206}" primaryrace="argon" behaviourset="default" tags="claimspace economic police privateloadout privateship protective publicloadout publicship standard watchdoguser" policefaction="argon">
+    <color ref="faction_argon" />
+    <icon active="faction_argon" inactive="faction_argon" banner="diplomacy_banner_argon" />
+    <licences>
+      <licence type="capitalequipment" name="{20207,2041}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="capitalship" name="{20207,3011}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="ceremonyally" name="{20207,5011}" minrelation="0.1" />
+      <licence type="ceremonyfriend" name="{20207,5001}" minrelation="0.01" />
+      <licence type="envoy_access" name="{20207,9401}" icon="menu_unlocked" price="1" tags="hidden" />
+      <licence type="generaluseequipment" name="{20207,2001}" minrelation="-0.01" tags="basic" />
+      <licence type="generaluseship" name="{20207,2211}" minrelation="-0.01" tags="basic" />
+      <licence type="militaryequipment" name="{20207,2031}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="militaryship" name="{20207,3001}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="police" name="{20207,1001}" description="{20207,1002}" minrelation="0.01" precursor="ceremonyfriend" price="156000" maxlegalscan="2" />
+      <licence type="shipsalecontract" name="{20207,9001}" description="{20207,9002}" minrelation="0.1" precursor="ceremonyally" price="1" tags="hidden" />
+      <licence type="station_equip_lxl" name="{20207,7171}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_equip_sm" name="{20207,7161}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_gen_advanced" name="{20207,7301}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_gen_basic" name="{20207,7281}" minrelation="-0.01" tags="basic" />
+      <licence type="station_gen_intermediate" name="{20207,7291}" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="subgroupfriend" name="{20207,6001}" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="tradesubscription" name="{20207,4001}" description="{20207,4002}" minrelation="0.1" precursor="ceremonyally" price="10000000" />
+      <licence type="capitalship" factions="antigone" />
+      <licence type="generaluseship" factions="antigone hatikvah" />
+      <licence type="militaryship" factions="antigone" />
+    </licences>
+    <relations>
+      <relation faction="alliance" relation="0.1" />
+      <relation faction="antigone" relation="0.67" />
+      <relation faction="buccaneers" relation="-0.032" />
+      <relation faction="criminal" relation="-0.5" />
+      <relation faction="holyorder" relation="-0.1" />
+      <relation faction="holyorderfanatic" relation="-1" />
+      <relation faction="khaak" relation="-1" />
+      <relation faction="outlaw" relation="-0.032" />
+      <relation faction="scaleplate" relation="-0.32" />
+      <relation faction="smuggler" relation="-0.06" />
+      <relation faction="teladi" relation="0.1" />
+      <relation faction="xenon" relation="-1" />
+    </relations>
+  </faction>
+  <faction id="buccaneers" name="{20203,2401}" description="{20203,2402}" shortname="{20203,2403}" prefixname="{20203,2404}" spacename="{20203,2405}" homespacename="{20203,2406}" primaryrace="paranid" behaviourset="default" tags="claimspace economic pirate plunder privateloadout privateship protective watchdoguser">
+    <color ref="faction_buccaneers" />
+    <icon active="faction_buccaneers" inactive="faction_buccaneers" banner="diplomacy_banner_buccaneers" />
+    <licences>
+      <licence type="capitalequipment" name="{20207,2511}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="capitalship" name="{20207,3251}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="ceremonyally" name="{20207,5251}" minrelation="0.1" />
+      <licence type="ceremonyfriend" name="{20207,5241}" minrelation="0.01" />
+      <licence type="generaluseequipment" name="{20207,2481}" minrelation="-0.01" tags="basic" />
+      <licence type="generaluseship" name="{20207,2491}" minrelation="-0.01" tags="basic" />
+      <licence type="militaryequipment" name="{20207,2501}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="militaryship" name="{20207,3241}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="police" name="{20207,1061}" description="{20207,1062}" minrelation="0.01" precursor="ceremonyfriend" price="156000" maxlegalscan="2" />
+      <licence type="shipsalecontract" name="{20207,9121}" description="{20207,9122}" minrelation="0.1" precursor="ceremonyally" price="1" tags="hidden" />
+      <licence type="station_equip_lxl" name="{20207,7651}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_equip_sm" name="{20207,7661}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_gen_advanced" name="{20207,7671}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_gen_basic" name="{20207,7681}" minrelation="-0.01" tags="basic" />
+      <licence type="station_gen_intermediate" name="{20207,7691}" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="tradesubscription" name="{20207,4111}" description="{20207,4112}" minrelation="0.1" precursor="ceremonyally" price="12000000" />
+      <licence type="capitalequipment" factions="antigone argon holyorder paranid" />
+      <licence type="capitalship" factions="antigone argon holyorder paranid" />
+      <licence type="envoy_access" factions="argon ministry" />
+      <licence type="generaluseequipment" factions="antigone argon holyorder paranid" />
+      <licence type="generaluseship" factions="antigone argon holyorder paranid" />
+      <licence type="militaryequipment" factions="antigone argon holyorder paranid" />
+      <licence type="militaryship" factions="antigone argon holyorder paranid" />
+      <licence type="station_equip_lxl" factions="holyorder paranid" />
+      <licence type="station_equip_sm" factions="holyorder paranid" />
+      <licence type="station_gen_advanced" factions="holyorder paranid" />
+      <licence type="station_gen_basic" factions="holyorder paranid" />
+      <licence type="station_gen_intermediate" factions="holyorder paranid" />
+    </licences>
+    <relations locked="1">
+      <relation faction="antigone" relation="-0.032" />
+      <relation faction="argon" relation="-0.032" />
+      <relation faction="criminal" relation="-0.5" />
+      <relation faction="hatikvah" relation="-0.032" />
+      <relation faction="holyorder" relation="-0.032" />
+      <relation faction="holyorderfanatic" relation="-0.32" />
+      <relation faction="khaak" relation="-1" />
+      <relation faction="ministry" relation="-0.032" />
+      <relation faction="outlaw" relation="-0.032" />
+      <relation faction="paranid" relation="-0.032" />
+      <relation faction="player" relation="-0.032" />
+      <relation faction="scaleplate" relation="-0.32" />
+      <relation faction="smuggler" relation="-0.06" />
+      <relation faction="trinity" relation="-0.032" />
+      <relation faction="xenon" relation="-1" />
+    </relations>
+  </faction>
+  <faction id="civilian" name="{20203,10301}" description="{20203,10302}" prefixname="{20203,10304}" behaviourset="default" tags="hidden">
+    <color ref="faction_civilian" />
+    <icon active="faction_civilian" inactive="faction_civilian" />
+    <relations locked="1">
+      <relation faction="criminal" relation="-0.5" />
+      <relation faction="khaak" relation="-1" />
+      <relation faction="smuggler" relation="-0.06" />
+      <relation faction="xenon" relation="-1" />
+    </relations>
+  </faction>
+  <faction id="criminal" name="{20203,10101}" description="{20203,10102}" prefixname="{20203,10104}" behaviourset="default" tags="hidden">
+    <color ref="faction_criminal" />
+    <icon active="faction_criminal" inactive="faction_criminal" />
+    <relations locked="1">
+      <relation faction="alliance" relation="-0.5" />
+      <relation faction="antigone" relation="-0.5" />
+      <relation faction="argon" relation="-0.5" />
+      <relation faction="buccaneers" relation="-0.5" />
+      <relation faction="civilian" relation="-0.5" />
+      <relation faction="hatikvah" relation="-0.5" />
+      <relation faction="holyorder" relation="-0.5" />
+      <relation faction="khaak" relation="-1" />
+      <relation faction="ministry" relation="-0.5" />
+      <relation faction="outlaw" relation="-0.032" />
+      <relation faction="paranid" relation="-0.5" />
+      <relation faction="player" relation="-0.5" />
+      <relation faction="scaleplate" relation="-0.5" />
+      <relation faction="teladi" relation="-0.5" />
+      <relation faction="trinity" relation="-0.5" />
+      <relation faction="xenon" relation="-1" />
+    </relations>
+  </faction>
+  <faction id="hatikvah" name="{20203,901}" description="{20203,902}" shortname="{20203,903}" prefixname="{20203,904}" spacename="{20203,905}" homespacename="{20203,906}" primaryrace="argon" behaviourset="default" tags="claimspace economic pirate plunder privateloadout privateship protective watchdoguser">
+    <color ref="faction_hatikvah" />
+    <icon active="faction_hatikvah" inactive="faction_hatikvah" banner="diplomacy_banner_hatikvah" />
+    <licences>
+      <licence type="capitalequipment" name="{20207,2081}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="capitalship" name="{20207,3051}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="ceremonyally" name="{20207,5051}" minrelation="0.1" />
+      <licence type="ceremonyfriend" name="{20207,5041}" minrelation="0.01" />
+      <licence type="generaluseequipment" name="{20207,2301}" minrelation="-0.01" tags="basic" />
+      <licence type="generaluseship" name="{20207,2341}" minrelation="-0.01" tags="basic" />
+      <licence type="militaryequipment" name="{20207,2071}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="militaryship" name="{20207,3041}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="shipsalecontract" name="{20207,9071}" description="{20207,9072}" minrelation="0.1" precursor="ceremonyally" price="1" tags="hidden" />
+      <licence type="station_gen_advanced" name="{20207,10191}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_gen_basic" name="{20207,10171}" minrelation="-0.01" tags="basic" />
+      <licence type="station_gen_intermediate" name="{20207,10181}" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="station_illegal" name="{20207,7461}" minrelation="-0.01" tags="hidden" />
+      <licence type="subgroupfriend" name="{20207,6021}" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="tradesubscription" name="{20207,4021}" description="{20207,4022}" minrelation="0.1" precursor="ceremonyally" price="1000000" />
+      <licence type="generaluseequipment" factions="argon buccaneers paranid teladi trinity" />
+      <licence type="generaluseship" factions="antigone argon buccaneers holyorder ministry paranid scaleplate teladi trinity" />
+      <licence type="station_gen_basic" factions="scaleplate" />
+      <licence type="station_illegal" factions="scaleplate teladi" />
+    </licences>
+    <relations>
+      <relation faction="alliance" relation="0.1" />
+      <relation faction="buccaneers" relation="-0.032" />
+      <relation faction="criminal" relation="-0.5" />
+      <relation faction="khaak" relation="-1" />
+      <relation faction="outlaw" relation="-0.032" />
+      <relation faction="smuggler" relation="-0.06" />
+      <relation faction="xenon" relation="-1" />
+    </relations>
+    <signals>
+      <response signal="foundlockbox" response="collect" />
+    </signals>
+  </faction>
+  <faction id="holyorder" name="{20203,501}" description="{20203,502}" shortname="{20203,503}" prefixname="{20203,504}" spacename="{20203,505}" homespacename="{20203,506}" primaryrace="paranid" behaviourset="default" tags="claimspace economic police privateloadout privateship protective publicship standard watchdoguser" policefaction="holyorder">
+    <color ref="faction_holyorder" />
+    <icon active="faction_holyorder" inactive="faction_holyorder" banner="diplomacy_banner_holyorder" />
+    <licences>
+      <licence type="capitalequipment" name="{20207,2121}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="capitalship" name="{20207,3091}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="ceremonyally" name="{20207,5091}" minrelation="0.1" />
+      <licence type="ceremonyfriend" name="{20207,5081}" minrelation="0.01" />
+      <licence type="generaluseequipment" name="{20207,2261}" minrelation="-0.01" tags="basic" />
+      <licence type="generaluseship" name="{20207,2271}" minrelation="-0.01" tags="basic" />
+      <licence type="hyperion_access" name="{20207,9301}" icon="menu_unlocked" price="1" tags="hidden" />
+      <licence type="militaryequipment" name="{20207,2111}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="militaryship" name="{20207,3081}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="police" name="{20207,1021}" description="{20207,1022}" minrelation="0.01" precursor="ceremonyfriend" price="156000" maxlegalscan="2" />
+      <licence type="shipsalecontract" name="{20207,9041}" description="{20207,9042}" minrelation="0.1" precursor="ceremonyally" price="1" tags="hidden" />
+      <licence type="station_equip_lxl" name="{20207,7231}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_equip_sm" name="{20207,7221}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_gen_advanced" name="{20207,7391}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_gen_basic" name="{20207,7371}" minrelation="-0.01" tags="basic" />
+      <licence type="station_gen_intermediate" name="{20207,7381}" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="story_paranid_palace_module" name="{20207,10201}" icon="menu_unlocked" price="1" tags="hidden" />
+      <licence type="tradesubscription" name="{20207,4041}" description="{20207,4042}" minrelation="0.1" precursor="ceremonyally" price="10000000" />
+      <licence type="capitalequipment" factions="paranid" />
+      <licence type="envoy_access" factions="argon ministry" />
+      <licence type="generaluseequipment" factions="paranid" />
+      <licence type="generaluseship" factions="hatikvah" />
+      <licence type="militaryequipment" factions="paranid" />
+    </licences>
+    <relations>
+      <relation faction="antigone" relation="-0.1" />
+      <relation faction="argon" relation="-0.1" />
+      <relation faction="buccaneers" relation="-0.032" />
+      <relation faction="criminal" relation="-0.5" />
+      <relation faction="khaak" relation="-1" />
+      <relation faction="ministry" relation="-0.1" />
+      <relation faction="outlaw" relation="-0.032" />
+      <relation faction="paranid" relation="-0.1" />
+      <relation faction="scaleplate" relation="-0.32" />
+      <relation faction="smuggler" relation="-0.06" />
+      <relation faction="teladi" relation="-0.1" />
+      <relation faction="trinity" relation="1" />
+      <relation faction="xenon" relation="-1" />
+    </relations>
+  </faction>
+  <faction id="holyorderfanatic" name="{20203,2601}" description="{20203,2602}" shortname="{20203,2603}" prefixname="{20203,2604}" spacename="{20203,2605}" homespacename="{20203,2606}" primaryrace="paranid" behaviourset="default" tags="privateloadout hidden">
+    <color ref="faction_holyorderfanatic" />
+    <icon active="faction_holyorder" inactive="faction_holyorder" banner="diplomacy_banner_holyorder" />
+    <licences>
+      <licence type="capitalequipment" factions="holyorder paranid" />
+      <licence type="capitalship" factions="holyorder" />
+      <licence type="generaluseequipment" factions="holyorder paranid" />
+      <licence type="generaluseship" factions="holyorder" />
+      <licence type="militaryequipment" factions="holyorder paranid" />
+      <licence type="militaryship" factions="holyorder" />
+    </licences>
+    <relations locked="1">
+      <relation faction="antigone" relation="-1" />
+      <relation faction="argon" relation="-1" />
+      <relation faction="buccaneers" relation="-0.32" />
+      <relation faction="khaak" relation="-1" />
+      <relation faction="outlaw" relation="-0.032" />
+      <relation faction="paranid" relation="-1" />
+      <relation faction="player" relation="-1" />
+      <relation faction="trinity" relation="-1" />
+      <relation faction="xenon" relation="-1" />
+    </relations>
+  </faction>
+  <faction id="khaak" name="{20203,1501}" description="{20203,1502}" shortname="{20203,1503}" prefixname="{20203,1504}" spacename="{20203,1505}" homespacename="{20203,1506}" primaryrace="khaak" behaviourset="khaak" tags="aggressive nodiplomacyselection noresupply notradeoffer privateloadout privateship">
+    <color ref="faction_khaak" />
+    <icon active="faction_khaak" inactive="faction_khaak" banner="diplomacy_banner_khaak" />
+    <relations locked="1">
+      <relation faction="alliance" relation="-1" />
+      <relation faction="antigone" relation="-1" />
+      <relation faction="argon" relation="-1" />
+      <relation faction="buccaneers" relation="-1" />
+      <relation faction="civilian" relation="-1" />
+      <relation faction="criminal" relation="-1" />
+      <relation faction="hatikvah" relation="-1" />
+      <relation faction="holyorder" relation="-1" />
+      <relation faction="holyorderfanatic" relation="-1" />
+      <relation faction="ministry" relation="-1" />
+      <relation faction="outlaw" relation="-0.032" />
+      <relation faction="paranid" relation="-1" />
+      <relation faction="player" relation="-1" />
+      <relation faction="scaleplate" relation="-1" />
+      <relation faction="smuggler" relation="-1" />
+      <relation faction="teladi" relation="-1" />
+      <relation faction="trinity" relation="-1" />
+      <relation faction="visitor" relation="-1" />
+      <relation faction="xenon" relation="-1" />
+    </relations>
+    <signals>
+      <response signal="policehalt" response="attack" />
+    </signals>
+  </faction>
+  <faction id="ministry" name="{20203,701}" description="{20203,702}" shortname="{20203,703}" prefixname="{20203,704}" spacename="{20203,705}" homespacename="{20203,706}" primaryrace="teladi" behaviourset="default" tags="economic police privateloadout privateship protective publicship standard watchdoguser" policefaction="ministry">
+    <color ref="faction_ministry" />
+    <icon active="faction_ministry" inactive="faction_ministry" banner="diplomacy_banner_ministry" />
+    <licences>
+      <licence type="capitalequipment" name="{20207,2181}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="capitalship" name="{20207,3151}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="ceremonyally" name="{20207,5151}" minrelation="0.1" />
+      <licence type="ceremonyfriend" name="{20207,5141}" minrelation="0.01" />
+      <licence type="envoy_access" name="{20207,9401}" icon="menu_unlocked" price="1" tags="hidden" />
+      <licence type="generaluseequipment" name="{20207,2281}" minrelation="-0.01" tags="basic" />
+      <licence type="generaluseship" name="{20207,2291}" minrelation="-0.01" tags="basic" />
+      <licence type="militaryequipment" name="{20207,2171}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="militaryship" name="{20207,3141}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="police" name="{20207,1031}" description="{20207,1032}" minrelation="0.01" precursor="ceremonyfriend" price="156000" maxlegalscan="2" />
+      <licence type="shipsalecontract" name="{20207,9051}" description="{20207,9052}" minrelation="0.1" precursor="ceremonyally" price="1" tags="hidden" />
+      <licence type="station_equip_lxl" name="{20207,7271}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_equip_sm" name="{20207,7261}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_gen_advanced" name="{20207,7451}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_gen_basic" name="{20207,7431}" minrelation="-0.01" tags="basic" />
+      <licence type="station_gen_intermediate" name="{20207,7441}" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="station_illegal" name="{20207,7471}" minrelation="0.01" precursor="ceremonyfriend" tags="hidden" />
+      <licence type="tradesubscription" name="{20207,4071}" description="{20207,4072}" minrelation="0.1" precursor="ceremonyally" price="100000" />
+      <licence type="capitalequipment" factions="teladi" />
+      <licence type="capitalship" factions="teladi" />
+      <licence type="generaluseequipment" factions="teladi" />
+      <licence type="generaluseship" factions="hatikvah scaleplate teladi" />
+      <licence type="militaryequipment" factions="teladi" />
+      <licence type="militaryship" factions="teladi" />
+      <licence type="station_illegal" factions="teladi" />
+    </licences>
+    <relations>
+      <relation faction="alliance" relation="0.1" />
+      <relation faction="buccaneers" relation="-0.032" />
+      <relation faction="criminal" relation="-0.5" />
+      <relation faction="holyorder" relation="-0.1" />
+      <relation faction="khaak" relation="-1" />
+      <relation faction="outlaw" relation="-0.032" />
+      <relation faction="scaleplate" relation="-0.32" />
+      <relation faction="smuggler" relation="-0.06" />
+      <relation faction="teladi" relation="0.67" />
+      <relation faction="xenon" relation="-1" />
+    </relations>
+  </faction>
+  <faction id="outlaw" name="{20203,10101}" description="{20203,10102}" prefixname="{20203,10104}" behaviourset="default" tags="hidden">
+    <color ref="faction_criminal" />
+    <icon active="faction_criminal" inactive="faction_criminal" />
+    <relations locked="1">
+      <relation faction="alliance" relation="-0.032" />
+      <relation faction="antigone" relation="-0.032" />
+      <relation faction="argon" relation="-0.032" />
+      <relation faction="buccaneers" relation="-0.032" />
+      <relation faction="criminal" relation="-0.032" />
+      <relation faction="hatikvah" relation="-0.032" />
+      <relation faction="holyorder" relation="-0.032" />
+      <relation faction="holyorderfanatic" relation="-0.032" />
+      <relation faction="khaak" relation="-0.032" />
+      <relation faction="ministry" relation="-0.032" />
+      <relation faction="paranid" relation="-0.032" />
+      <relation faction="player" relation="-0.32" />
+      <relation faction="scaleplate" relation="-0.032" />
+      <relation faction="smuggler" relation="-0.032" />
+      <relation faction="teladi" relation="-0.032" />
+      <relation faction="trinity" relation="-0.032" />
+      <relation faction="xenon" relation="-0.032" />
+    </relations>
+  </faction>
+  <faction id="ownerless" behaviourset="default" tags="hidden">
+    <color ref="faction_ownerless" />
+    <icon active="faction_ownerless" inactive="faction_ownerless" />
+    <relations locked="1" />
+  </faction>
+  <faction id="paranid" name="{20203,401}" description="{20203,402}" shortname="{20203,403}" prefixname="{20203,404}" spacename="{20203,405}" homespacename="{20203,406}" primaryrace="paranid" behaviourset="default" tags="claimspace economic police privateloadout privateship protective publicloadout publicship standard watchdoguser" policefaction="paranid">
+    <color ref="faction_paranid" />
+    <icon active="faction_paranid" inactive="faction_paranid" banner="diplomacy_banner_paranid" />
+    <licences>
+      <licence type="capitalequipment" name="{20207,2101}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="capitalship" name="{20207,3071}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="ceremonyally" name="{20207,5071}" minrelation="0.1" />
+      <licence type="ceremonyfriend" name="{20207,5061}" minrelation="0.01" />
+      <licence type="generaluseequipment" name="{20207,2011}" minrelation="-0.01" tags="basic" />
+      <licence type="generaluseship" name="{20207,2221}" minrelation="-0.01" tags="basic" />
+      <licence type="hyperion_access" name="{20207,9301}" icon="menu_unlocked" price="1" tags="hidden" />
+      <licence type="militaryequipment" name="{20207,2091}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="militaryship" name="{20207,3061}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="police" name="{20207,1011}" description="{20207,1012}" minrelation="0.01" precursor="ceremonyfriend" price="156000" maxlegalscan="2" />
+      <licence type="shipsalecontract" name="{20207,9011}" description="{20207,9012}" minrelation="0.1" precursor="ceremonyally" price="1" tags="hidden" />
+      <licence type="station_equip_lxl" name="{20207,7211}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_equip_sm" name="{20207,7201}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_gen_advanced" name="{20207,7361}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_gen_basic" name="{20207,7341}" minrelation="-0.01" tags="basic" />
+      <licence type="station_gen_intermediate" name="{20207,7351}" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="story_paranid_palace_module" name="{20207,10201}" icon="menu_unlocked" price="1" tags="hidden" />
+      <licence type="tradesubscription" name="{20207,4031}" description="{20207,4032}" minrelation="0.1" precursor="ceremonyally" price="12000000" />
+      <licence type="envoy_access" factions="argon ministry" />
+      <licence type="generaluseship" factions="hatikvah" />
+    </licences>
+    <relations>
+      <relation faction="alliance" relation="0.67" />
+      <relation faction="buccaneers" relation="-0.032" />
+      <relation faction="criminal" relation="-0.5" />
+      <relation faction="holyorder" relation="-0.1" />
+      <relation faction="holyorderfanatic" relation="-1" />
+      <relation faction="khaak" relation="-1" />
+      <relation faction="outlaw" relation="-0.032" />
+      <relation faction="scaleplate" relation="-0.32" />
+      <relation faction="smuggler" relation="-0.06" />
+      <relation faction="trinity" relation="1" />
+      <relation faction="xenon" relation="-1" />
+    </relations>
+  </faction>
+  <faction id="scaleplate" name="{20203,1001}" description="{20203,1002}" shortname="{20203,1003}" prefixname="{20203,1004}" spacename="{20203,1005}" homespacename="{20203,1006}" primaryrace="teladi" behaviourset="default" tags="economic pirate plunder privateloadout privateship protective watchdoguser">
+    <color ref="faction_scaleplate" />
+    <icon active="faction_scaleplate" inactive="faction_scaleplate" banner="diplomacy_banner_scaleplate" />
+    <licences>
+      <licence type="capitalequipment" name="{20207,2201}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="capitalship" name="{20207,3171}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="ceremonyally" name="{20207,5171}" minrelation="0.1" />
+      <licence type="ceremonyfriend" name="{20207,5161}" minrelation="0.01" />
+      <licence type="generaluseequipment" name="{20207,2311}" minrelation="-0.01" tags="basic" />
+      <licence type="generaluseship" name="{20207,2351}" minrelation="-0.01" tags="basic" />
+      <licence type="militaryequipment" name="{20207,2191}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="militaryship" name="{20207,3161}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="shipsalecontract" name="{20207,9081}" description="{20207,9082}" minrelation="0.1" precursor="ceremonyally" price="1" tags="hidden" />
+      <licence type="station_gen_advanced" name="{20207,7021}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_gen_basic" name="{20207,7001}" minrelation="-0.01" tags="basic" />
+      <licence type="station_gen_intermediate" name="{20207,7011}" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="station_illegal" name="{20207,7491}" minrelation="-0.01" tags="hidden" />
+      <licence type="subgroupfriend" name="{20207,6081}" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="tradesubscription" name="{20207,4081}" description="{20207,4082}" minrelation="0.1" precursor="ceremonyally" price="1000000" />
+      <licence type="capitalequipment" factions="argon buccaneers paranid teladi trinity" />
+      <licence type="capitalship" factions="antigone argon ministry teladi" />
+      <licence type="generaluseequipment" factions="argon buccaneers paranid teladi trinity" />
+      <licence type="generaluseship" factions="antigone argon hatikvah ministry teladi" />
+      <licence type="militaryequipment" factions="argon buccaneers paranid teladi trinity" />
+      <licence type="militaryship" factions="antigone argon ministry teladi" />
+      <licence type="station_illegal" factions="teladi" />
+    </licences>
+    <relations locked="1">
+      <relation faction="antigone" relation="-0.1" />
+      <relation faction="argon" relation="-0.32" />
+      <relation faction="buccaneers" relation="-0.32" />
+      <relation faction="criminal" relation="-0.5" />
+      <relation faction="holyorder" relation="-0.32" />
+      <relation faction="khaak" relation="-1" />
+      <relation faction="ministry" relation="-0.32" />
+      <relation faction="outlaw" relation="-0.032" />
+      <relation faction="paranid" relation="-0.32" />
+      <relation faction="player" relation="-0.0032" />
+      <relation faction="smuggler" relation="-0.06" />
+      <relation faction="trinity" relation="-0.32" />
+      <relation faction="xenon" relation="-1" />
+    </relations>
+    <signals>
+      <response signal="foundlockbox" response="collect" />
+      <response signal="policehalt" response="attack" />
+    </signals>
+  </faction>
+  <faction id="smuggler" name="{20203,10101}" description="{20203,10102}" prefixname="{20203,10104}" behaviourset="default" tags="hidden">
+    <color ref="faction_smuggler" />
+    <icon active="faction_smuggler" inactive="faction_smuggler" />
+    <relations locked="1">
+      <relation faction="alliance" relation="-0.06" />
+      <relation faction="antigone" relation="-0.06" />
+      <relation faction="argon" relation="-0.06" />
+      <relation faction="buccaneers" relation="-0.06" />
+      <relation faction="civilian" relation="-0.06" />
+      <relation faction="hatikvah" relation="-0.06" />
+      <relation faction="holyorder" relation="-0.06" />
+      <relation faction="khaak" relation="-1" />
+      <relation faction="ministry" relation="-0.06" />
+      <relation faction="outlaw" relation="-0.032" />
+      <relation faction="paranid" relation="-0.06" />
+      <relation faction="scaleplate" relation="-0.06" />
+      <relation faction="teladi" relation="-0.06" />
+      <relation faction="trinity" relation="-0.06" />
+      <relation faction="xenon" relation="-1" />
+    </relations>
+  </faction>
+  <faction id="teladi" name="{20203,601}" description="{20203,602}" shortname="{20203,603}" prefixname="{20203,604}" spacename="{20203,605}" homespacename="{20203,606}" primaryrace="teladi" behaviourset="default" tags="claimspace economic privateloadout privateship protective publicloadout publicship standard watchdoguser" policefaction="ministry">
+    <color ref="faction_teladi" />
+    <icon active="faction_teladi" inactive="faction_teladi" banner="diplomacy_banner_teladi" />
+    <licences>
+      <licence type="capitalequipment" name="{20207,2161}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="capitalship" name="{20207,3131}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="ceremonyally" name="{20207,5131}" minrelation="0.1" />
+      <licence type="ceremonyfriend" name="{20207,5121}" minrelation="0.01" />
+      <licence type="generaluseequipment" name="{20207,2021}" minrelation="-0.01" tags="basic" />
+      <licence type="generaluseship" name="{20207,2231}" minrelation="-0.01" tags="basic" />
+      <licence type="militaryequipment" name="{20207,2151}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="militaryship" name="{20207,3121}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="shipsalecontract" name="{20207,9021}" description="{20207,9022}" minrelation="0.1" precursor="ceremonyally" price="1" tags="hidden" />
+      <licence type="station_equip_lxl" name="{20207,7251}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_equip_sm" name="{20207,7241}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_gen_advanced" name="{20207,7421}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_gen_basic" name="{20207,7401}" minrelation="-0.01" tags="basic" />
+      <licence type="station_gen_intermediate" name="{20207,7411}" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="station_illegal" name="{20207,7481}" minrelation="0.01" precursor="ceremonyfriend" tags="hidden" />
+      <licence type="subgroupfriend" name="{20207,6061}" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="tradesubscription" name="{20207,4061}" description="{20207,4062}" minrelation="0.1" precursor="ceremonyally" price="16000000" />
+      <licence type="capitalship" factions="ministry" />
+      <licence type="envoy_access" factions="ministry" />
+      <licence type="generaluseship" factions="hatikvah ministry scaleplate" />
+      <licence type="militaryship" factions="ministry" />
+      <licence type="police" factions="ministry" />
+    </licences>
+    <relations>
+      <relation faction="alliance" relation="0.1" />
+      <relation faction="argon" relation="0.1" />
+      <relation faction="criminal" relation="-0.5" />
+      <relation faction="holyorder" relation="-0.1" />
+      <relation faction="khaak" relation="-1" />
+      <relation faction="ministry" relation="0.67" />
+      <relation faction="outlaw" relation="-0.032" />
+      <relation faction="smuggler" relation="-0.06" />
+      <relation faction="xenon" relation="-1" />
+    </relations>
+  </faction>
+  <faction id="trinity" name="{20203,2301}" description="{20203,2302}" shortname="{20203,2303}" prefixname="{20203,2304}" spacename="{20203,2305}" homespacename="{20203,2306}" primaryrace="paranid" behaviourset="default" active="0" tags="claimspace economic police privateloadout privateship protective publicloadout publicship standard watchdoguser" policefaction="trinity">
+    <color ref="faction_trinity" />
+    <icon active="faction_trinity" inactive="faction_trinity" banner="diplomacy_banner_trinity" />
+    <licences>
+      <licence type="capitalequipment" name="{20207,2551}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="capitalship" name="{20207,3271}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="ceremonyally" name="{20207,5271}" minrelation="0.1" />
+      <licence type="ceremonyfriend" name="{20207,5261}" minrelation="0.01" />
+      <licence type="generaluseequipment" name="{20207,2521}" minrelation="-0.01" tags="basic" />
+      <licence type="generaluseship" name="{20207,2531}" minrelation="-0.01" tags="basic" />
+      <licence type="hyperion_access" name="{20207,9301}" icon="menu_unlocked" price="1" tags="hidden" />
+      <licence type="militaryequipment" name="{20207,2541}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="militaryship" name="{20207,3261}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="police" name="{20207,1071}" description="{20207,1072}" minrelation="0.01" precursor="ceremonyfriend" price="156000" maxlegalscan="2" />
+      <licence type="shipsalecontract" name="{20207,9131}" description="{20207,9132}" minrelation="0.1" precursor="ceremonyally" price="1" tags="hidden" />
+      <licence type="station_equip_lxl" name="{20207,7701}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_equip_sm" name="{20207,7711}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_gen_advanced" name="{20207,7101}" minrelation="0.1" precursor="ceremonyally" />
+      <licence type="station_gen_basic" name="{20207,7081}" minrelation="-0.01" tags="basic" />
+      <licence type="station_gen_intermediate" name="{20207,7091}" minrelation="0.01" precursor="ceremonyfriend" />
+      <licence type="tradesubscription" name="{20207,4121}" description="{20207,4122}" minrelation="0.1" precursor="ceremonyally" price="12000000" />
+      <licence type="envoy_access" factions="argon ministry" />
+    </licences>
+    <relations>
+      <relation faction="alliance" relation="0.67" />
+      <relation faction="buccaneers" relation="-0.032" />
+      <relation faction="criminal" relation="-0.5" />
+      <relation faction="holyorder" relation="1" />
+      <relation faction="holyorderfanatic" relation="-1" />
+      <relation faction="khaak" relation="-1" />
+      <relation faction="outlaw" relation="-0.032" />
+      <relation faction="paranid" relation="1" />
+      <relation faction="scaleplate" relation="-0.32" />
+      <relation faction="smuggler" relation="-0.06" />
+      <relation faction="xenon" relation="-1" />
+    </relations>
+  </faction>
+  <faction id="visitor" name="{20203,20101}" description="{20203,20102}" prefixname="{20203,20104}" behaviourset="default" tags="visitor hidden">
+    <color ref="faction_visitor" />
+    <icon active="faction_visitor" inactive="faction_visitor" />
+    <licences>
+      <licence type="station_venture" name="{20207,7151}" tags="hidden" />
+    </licences>
+    <relations>
+      <relation faction="khaak" relation="-1" />
+      <relation faction="xenon" relation="-1" />
+    </relations>
+  </faction>
+  <faction id="xenon" name="{20203,1101}" description="{20203,1102}" shortname="{20203,1103}" prefixname="{20203,1104}" spacename="{20203,1105}" homespacename="{20203,1106}" primaryrace="xenon" behaviourset="xenon" tags="claimspace nodiplomacyselection notradeoffer privateloadout privateship">
+    <color ref="faction_xenon" />
+    <icon active="faction_xenon" inactive="faction_xenon" banner="diplomacy_banner_xenon" />
+    <relations locked="1">
+      <relation faction="alliance" relation="-1" />
+      <relation faction="antigone" relation="-1" />
+      <relation faction="argon" relation="-1" />
+      <relation faction="buccaneers" relation="-1" />
+      <relation faction="civilian" relation="-1" />
+      <relation faction="criminal" relation="-1" />
+      <relation faction="hatikvah" relation="-1" />
+      <relation faction="holyorder" relation="-1" />
+      <relation faction="holyorderfanatic" relation="-1" />
+      <relation faction="khaak" relation="-1" />
+      <relation faction="ministry" relation="-1" />
+      <relation faction="outlaw" relation="-0.032" />
+      <relation faction="paranid" relation="-1" />
+      <relation faction="player" relation="-1" />
+      <relation faction="scaleplate" relation="-1" />
+      <relation faction="smuggler" relation="-1" />
+      <relation faction="teladi" relation="-1" />
+      <relation faction="trinity" relation="-1" />
+      <relation faction="visitor" relation="-1" />
+    </relations>
+    <signals>
+      <response signal="policehalt" response="attack" />
+    </signals>
+  </faction>
+</factions>

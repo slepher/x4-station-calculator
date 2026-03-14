@@ -1,0 +1,1110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<groups>
+  <!-- ############################# -->
+  <!--    ARGON FEDERATION -->
+  <!--    (traders and miners and small ships have a small chance to use the variant of a different faction) -->
+  <!-- ############################# -->
+
+  <!-- Construction / Supply -->
+  <group name="arg_builder_xl">
+    <select macro="ship_arg_xl_builder_01_a_macro" weight="100"/>
+  </group>
+  <group name="arg_resupplier_xl">
+    <select macro="ship_arg_xl_resupplier_01_a_macro" weight="100"/>
+  </group>
+
+  <!-- Transporters -->
+  <group name="arg_trader_container_l">
+    <select macro="ship_arg_l_trans_container_01_a_macro" weight="40"/>
+    <select macro="ship_arg_l_trans_container_01_b_macro" weight="10"/>
+    <select macro="ship_arg_l_trans_container_02_a_macro" weight="40"/>
+    <select macro="ship_arg_l_trans_container_02_b_macro" weight="10"/>
+    <select macro="ship_arg_l_trans_container_03_a_macro" weight="250"/>
+    <select macro="ship_arg_l_trans_container_03_b_macro" weight="50"/>
+    <select macro="ship_arg_l_trans_container_04_a_macro" weight="250"/>
+    <select macro="ship_arg_l_trans_container_04_b_macro" weight="50"/>
+    <select macro="ship_arg_l_trans_container_05_a_macro" weight="250"/>
+    <select macro="ship_arg_l_trans_container_05_b_macro" weight="50"/>
+  </group>
+  <group name="arg_trader_container_m">
+    <select macro="ship_arg_m_trans_container_01_a_macro" weight="400"/>
+    <select macro="ship_arg_m_trans_container_01_b_macro" weight="100"/>
+    <select macro="ship_arg_m_trans_container_02_a_macro" weight="400"/>
+    <select macro="ship_arg_m_trans_container_02_b_macro" weight="100"/>
+  </group>
+  <group name="arg_trader_container_s">
+    <select macro="ship_arg_s_trans_container_01_a_macro" weight="400"/>
+    <select macro="ship_arg_s_trans_container_01_b_macro" weight="100"/>
+    <select macro="ship_arg_s_trans_container_02_a_macro" weight="400"/>
+    <select macro="ship_arg_s_trans_container_02_b_macro" weight="100"/>
+  </group>
+
+  <!-- Miners -->
+  <group name="arg_miner_solid_l">
+    <select macro="ship_arg_l_miner_solid_01_a_macro" weight="950"/>
+    <select macro="ship_arg_l_miner_solid_01_b_macro" weight="50"/>
+  </group>
+  <group name="arg_miner_liquid_l">
+    <select macro="ship_arg_l_miner_liquid_01_a_macro" weight="950"/>
+    <select macro="ship_arg_l_miner_liquid_01_b_macro" weight="50"/>
+  </group>
+  <group name="arg_miner_solid_m">
+    <select macro="ship_arg_m_miner_solid_01_a_macro" weight="950"/>
+    <select macro="ship_arg_m_miner_solid_01_b_macro" weight="50"/>
+  </group>
+  <group name="arg_miner_liquid_m">
+    <select macro="ship_arg_m_miner_liquid_01_a_macro" weight="950"/>
+    <select macro="ship_arg_m_miner_liquid_01_b_macro" weight="50"/>
+  </group>
+  <group name="arg_miner_solid_s">
+    <select macro="ship_arg_s_miner_solid_01_a_macro" weight="100"/>
+  </group>
+  <group name="arg_miner_solid_mixed">
+    <select macro="ship_arg_l_miner_solid_01_a_macro" weight="280"/>
+    <select macro="ship_arg_l_miner_solid_01_b_macro" weight="15"/>
+    <select macro="ship_arg_m_miner_solid_01_a_macro" weight="650"/>
+    <select macro="ship_arg_m_miner_solid_01_b_macro" weight="35"/>
+    <select macro="ship_arg_s_miner_solid_01_a_macro" weight="20"/>
+  </group>
+  <group name="arg_miner_liquid_mixed">
+    <select macro="ship_arg_l_miner_liquid_01_a_macro" weight="285"/>
+    <select macro="ship_arg_l_miner_liquid_01_b_macro" weight="15"/>
+    <select macro="ship_arg_m_miner_liquid_01_a_macro" weight="665"/>
+    <select macro="ship_arg_m_miner_liquid_01_b_macro" weight="35"/>
+  </group>
+
+  <!-- Military / Combat -->
+  <group name="arg_carrier_xl">
+    <select macro="ship_arg_xl_carrier_02_a_macro" weight="100"/>
+  </group>
+  <group name="arg_destroyer_l">
+    <select macro="ship_arg_l_destroyer_02_a_macro" weight="100"/>
+  </group>
+  <group name="arg_frigate_m">
+    <select macro="ship_arg_m_frigate_01_a_macro" weight="100"/>
+  </group>
+  <group name="arg_gunboat_m">
+    <select macro="ship_arg_m_bomber_01_a_macro" weight="100"/>
+  </group>
+  <group name="arg_fighter_s">
+    <select macro="ship_arg_s_heavyfighter_02_a_macro" weight="100"/>
+    <select macro="ship_arg_s_fighter_01_a_macro" weight="400"/>
+    <select macro="ship_arg_s_fighter_01_b_macro" weight="50"/>
+    <select macro="ship_arg_s_fighter_02_a_macro" weight="250"/>
+    <select macro="ship_arg_s_fighter_02_b_macro" weight="50"/>
+    <select macro="ship_arg_s_fighter_04_a_macro" weight="150"/>
+  </group>
+  <group name="arg_fighter_heavy_s">
+    <select macro="ship_arg_s_heavyfighter_02_a_macro" weight="80"/>
+    <select macro="ship_arg_s_fighter_04_a_macro" weight="20"/>
+  </group>
+  <group name="arg_fighter_light_s">
+    <select macro="ship_arg_s_fighter_01_a_macro" weight="250"/>
+    <select macro="ship_arg_s_fighter_01_b_macro" weight="50"/>
+    <select macro="ship_arg_s_fighter_02_a_macro" weight="500"/>
+    <select macro="ship_arg_s_fighter_02_b_macro" weight="50"/>
+    <select macro="ship_arg_s_fighter_04_a_macro" weight="150"/>
+  </group>
+  <group name="arg_scout_s">
+    <select macro="ship_arg_s_scout_01_a_macro" weight="950"/>
+    <select macro="ship_arg_s_scout_01_b_macro" weight="50"/>
+  </group>
+
+
+  <!-- ############################# -->
+  <!--    ANTIGONE REPUBLIC -->
+  <!--    (traders and miners and small ships have a small chance to use the variant of a different faction) -->
+  <!-- ############################# -->
+
+  <!-- Construction / Supply -->
+  <group name="ant_builder_xl">
+    <select macro="ship_arg_xl_builder_01_b_macro" weight="100"/>
+  </group>
+  <group name="ant_resupplier_xl">
+    <select macro="ship_arg_xl_resupplier_01_b_macro" weight="100"/>
+  </group>
+
+  <!-- Transporters -->
+  <group name="ant_trader_container_l">
+    <select macro="ship_arg_l_trans_container_01_b_macro" weight="40"/>
+    <select macro="ship_arg_l_trans_container_01_a_macro" weight="10"/>
+    <select macro="ship_arg_l_trans_container_02_b_macro" weight="40"/>
+    <select macro="ship_arg_l_trans_container_02_a_macro" weight="10"/>
+    <select macro="ship_arg_l_trans_container_03_b_macro" weight="250"/>
+    <select macro="ship_arg_l_trans_container_03_a_macro" weight="50"/>
+    <select macro="ship_arg_l_trans_container_04_b_macro" weight="250"/>
+    <select macro="ship_arg_l_trans_container_04_a_macro" weight="50"/>
+    <select macro="ship_arg_l_trans_container_05_b_macro" weight="250"/>
+    <select macro="ship_arg_l_trans_container_05_a_macro" weight="50"/>
+  </group>
+  <group name="ant_trader_container_m">
+    <select macro="ship_arg_m_trans_container_01_b_macro" weight="400"/>
+    <select macro="ship_arg_m_trans_container_01_a_macro" weight="100"/>
+    <select macro="ship_arg_m_trans_container_02_b_macro" weight="400"/>
+    <select macro="ship_arg_m_trans_container_02_a_macro" weight="100"/>
+  </group>
+  <group name="ant_trader_container_s">
+    <select macro="ship_arg_s_trans_container_01_a_macro" weight="100"/>
+    <select macro="ship_arg_s_trans_container_01_b_macro" weight="400"/>
+    <select macro="ship_arg_s_trans_container_02_a_macro" weight="100"/>
+    <select macro="ship_arg_s_trans_container_02_b_macro" weight="400"/>
+  </group>
+
+  <!-- Miners -->
+  <group name="ant_miner_solid_l">
+    <select macro="ship_arg_l_miner_solid_01_b_macro" weight="950"/>
+    <select macro="ship_arg_l_miner_solid_01_a_macro" weight="50"/>
+  </group>
+  <group name="ant_miner_liquid_l">
+    <select macro="ship_arg_l_miner_liquid_01_b_macro" weight="950"/>
+    <select macro="ship_arg_l_miner_liquid_01_a_macro" weight="50"/>
+  </group>
+  <group name="ant_miner_solid_m">
+    <select macro="ship_arg_m_miner_solid_01_b_macro" weight="950"/>
+    <select macro="ship_arg_m_miner_solid_01_a_macro" weight="50"/>
+  </group>
+  <group name="ant_miner_liquid_m">
+    <select macro="ship_arg_m_miner_liquid_01_b_macro" weight="950"/>
+    <select macro="ship_arg_m_miner_liquid_01_a_macro" weight="50"/>
+  </group>
+  <group name="ant_miner_solid_s">
+    <select macro="ship_arg_s_miner_solid_01_a_macro" weight="100"/>
+  </group>
+  <group name="ant_miner_solid_mixed">
+    <select macro="ship_arg_l_miner_solid_01_b_macro" weight="280"/>
+    <select macro="ship_arg_l_miner_solid_01_a_macro" weight="15"/>
+    <select macro="ship_arg_m_miner_solid_01_b_macro" weight="650"/>
+    <select macro="ship_arg_m_miner_solid_01_a_macro" weight="35"/>
+    <select macro="ship_arg_s_miner_solid_01_a_macro" weight="20"/>
+  </group>
+  <group name="ant_miner_liquid_mixed">
+    <select macro="ship_arg_l_miner_liquid_01_b_macro" weight="285"/>
+    <select macro="ship_arg_l_miner_liquid_01_a_macro" weight="15"/>
+    <select macro="ship_arg_m_miner_liquid_01_b_macro" weight="665"/>
+    <select macro="ship_arg_m_miner_liquid_01_a_macro" weight="35"/>
+  </group>
+
+  <!-- Military / Combat -->
+  <group name="ant_carrier_xl">
+    <select macro="ship_arg_xl_carrier_02_a_macro" weight="100"/>
+  </group>
+  <group name="ant_destroyer_l">
+    <select macro="ship_arg_l_destroyer_02_a_macro" weight="100"/>
+  </group>
+  <group name="ant_frigate_m">
+    <select macro="ship_arg_m_frigate_01_b_macro" weight="100"/>
+  </group>
+  <group name="ant_gunboat_m">
+    <select macro="ship_arg_m_bomber_01_b_macro" weight="100"/>
+  </group>
+  <group name="ant_fighter_s">
+    <select macro="ship_arg_s_heavyfighter_02_a_macro" weight="200"/>
+    <select macro="ship_arg_s_fighter_01_b_macro" weight="300"/>
+    <select macro="ship_arg_s_fighter_01_a_macro" weight="50"/>
+    <select macro="ship_arg_s_fighter_02_b_macro" weight="350"/>
+    <select macro="ship_arg_s_fighter_02_a_macro" weight="50"/>
+    <select macro="ship_arg_s_fighter_03_a_macro" weight="50"/>
+  </group>
+  <group name="ant_fighter_heavy_s">
+    <select macro="ship_arg_s_heavyfighter_02_a_macro" weight="80"/>
+    <select macro="ship_arg_s_fighter_03_a_macro" weight="20"/>
+  </group>
+  <group name="ant_fighter_light_s">
+    <select macro="ship_arg_s_fighter_01_b_macro" weight="30"/>
+    <select macro="ship_arg_s_fighter_01_a_macro" weight="10"/>
+    <select macro="ship_arg_s_fighter_02_b_macro" weight="40"/>
+    <select macro="ship_arg_s_fighter_02_a_macro" weight="10"/>
+    <select macro="ship_arg_s_fighter_03_a_macro" weight="10"/>
+  </group>
+  <group name="ant_scout_s">
+    <select macro="ship_arg_s_scout_01_b_macro" weight="950"/>
+    <select macro="ship_arg_s_scout_01_a_macro" weight="50"/>
+  </group>
+
+
+  <!-- ############################# -->
+  <!--    GODREALM OF THE PARANID -->
+  <!--    (Paranid factions are very strict and stick to their own variants. changed as of 5.0 to both use the E variants) -->
+  <!-- ############################# -->
+
+  <!-- Construction / Supply -->
+  <group name="par_builder_xl">
+    <select macro="ship_par_xl_builder_01_a_macro" weight="100"/>
+  </group>
+  <group name="par_resupplier_xl">
+    <select macro="ship_par_xl_resupplier_02_a_macro" weight="100"/>
+    <!--<select macro="ship_par_xl_resupplier_01_a_macro" weight="100"/>-->
+  </group>
+
+  <!-- Transporters -->
+  <group name="par_trader_container_l">
+    <select macro="ship_par_l_trans_container_03_a_macro" weight="100"/>
+    <!--<select macro="ship_par_l_trans_container_01_a_macro" weight="100"/>
+    <select macro="ship_par_l_trans_container_02_a_macro" weight="100"/>-->
+  </group>
+  <group name="par_trader_container_m">
+    <select macro="ship_par_m_trans_container_01_a_macro" weight="100"/>
+    <select macro="ship_par_m_trans_container_02_a_macro" weight="100"/>
+  </group>
+  <group name="par_trader_container_s">
+    <select macro="ship_par_s_trans_container_01_a_macro" weight="100"/>
+  </group>
+
+  <!-- Miners -->
+  <group name="par_miner_solid_l">
+    <select macro="ship_par_l_miner_solid_02_a_macro" weight="100"/>
+    <!--<select macro="ship_par_l_miner_solid_01_a_macro" weight="100"/>-->
+  </group>
+  <group name="par_miner_liquid_l">
+    <select macro="ship_par_l_miner_liquid_02_a_macro" weight="100"/>
+    <!--<select macro="ship_par_l_miner_liquid_01_a_macro" weight="100"/>-->
+  </group>
+  <group name="par_miner_solid_m">
+    <select macro="ship_par_m_miner_solid_01_a_macro" weight="100"/>
+  </group>
+  <group name="par_miner_liquid_m">
+    <select macro="ship_par_m_miner_liquid_01_a_macro" weight="100"/>
+  </group>
+  <group name="par_miner_solid_s">
+    <select macro="ship_par_s_miner_solid_01_a_macro" weight="100"/>
+  </group>
+  <group name="par_miner_solid_mixed">
+    <select macro="ship_par_l_miner_solid_02_a_macro" weight="25"/>
+    <!--<select macro="ship_par_l_miner_solid_01_a_macro" weight="25"/>-->
+    <select macro="ship_par_m_miner_solid_01_a_macro" weight="65"/>
+    <select macro="ship_par_s_miner_solid_01_a_macro" weight="10"/>
+  </group>
+  <group name="par_miner_liquid_mixed">
+    <select macro="ship_par_l_miner_liquid_02_a_macro" weight="30"/>
+    <!--<select macro="ship_par_l_miner_liquid_01_a_macro" weight="30"/>-->
+    <select macro="ship_par_m_miner_liquid_01_a_macro" weight="70"/>
+  </group>
+
+  <!-- Military / Combat -->
+  <group name="par_carrier_xl">
+    <select macro="ship_par_xl_carrier_02_a_macro" weight="100"/>
+    <!--<select macro="ship_par_xl_carrier_01_a_macro weight="100""/>-->
+  </group>
+  <group name="par_destroyer_l">
+    <select macro="ship_par_l_destroyer_02_a_macro" weight="100"/>
+    <!--<select macro="ship_par_l_destroyer_01_a_macro" weight="100"/>-->
+  </group>
+  <group name="par_frigate_m">
+    <select macro="ship_par_m_frigate_01_a_macro" weight="100"/>
+  </group>
+  <group name="par_corvette_m">
+    <select macro="ship_par_m_corvette_01_a_macro" weight="100"/>
+  </group>
+  <group name="par_fighter_s">
+    <select macro="ship_par_s_fighter_01_a_macro" weight="100"/>
+    <select macro="ship_par_s_fighter_02_a_macro" weight="100"/>
+  </group>
+  <group name="par_scout_s">
+    <select macro="ship_par_s_scout_01_a_macro" weight="100"/>
+  </group>
+
+  
+  <!-- ############################# -->
+  <!--    HOLY ORDER OF THE PONTIFEX -->
+  <!--    (Paranid factions are very strict and stick to their own variants. changed as of 5.0 to both use the E variants) -->
+  <!-- ############################# -->
+
+  <!-- Construction / Supply -->
+  <group name="hol_builder_xl">
+    <select macro="ship_par_xl_builder_01_b_macro" weight="100"/>
+  </group>
+  <group name="hol_resupplier_xl">
+    <select macro="ship_par_xl_resupplier_02_a_macro" weight="100"/>
+    <!--<select macro="ship_par_xl_resupplier_01_b_macro" weight="100"/>-->
+  </group>
+
+  <!-- Transporters -->
+  <group name="hol_trader_container_l">
+    <select macro="ship_par_l_trans_container_03_a_macro" weight="100"/>
+    <!--<select macro="ship_par_l_trans_container_01_b_macro" weight="100"/>
+    <select macro="ship_par_l_trans_container_02_b_macro" weight="100"/>-->
+  </group>
+  <group name="hol_trader_container_m">
+    <select macro="ship_par_m_trans_container_01_b_macro" weight="100"/>
+    <select macro="ship_par_m_trans_container_02_b_macro" weight="100"/>
+  </group>
+  <group name="hol_trader_container_s">
+    <select macro="ship_par_s_trans_container_01_b_macro" weight="100"/>
+  </group>
+
+  <!-- Miners -->
+  <group name="hol_miner_solid_l">
+    <select macro="ship_par_l_miner_solid_02_a_macro" weight="100"/>
+    <!--<select macro="ship_par_l_miner_solid_01_b_macro" weight="100"/>-->
+  </group>
+  <group name="hol_miner_liquid_l">
+    <select macro="ship_par_l_miner_liquid_02_a_macro" weight="100"/>
+    <!--<select macro="ship_par_l_miner_liquid_01_b_macro" weight="100"/>-->
+  </group>
+  <group name="hol_miner_solid_m">
+    <select macro="ship_par_m_miner_solid_01_b_macro" weight="100"/>
+  </group>
+  <group name="hol_miner_liquid_m">
+    <select macro="ship_par_m_miner_liquid_01_b_macro" weight="100"/>
+  </group>
+  <group name="hol_miner_solid_s">
+    <select macro="ship_par_s_miner_solid_01_a_macro" weight="100"/>
+  </group>
+  <group name="hol_miner_solid_mixed">
+    <select macro="ship_par_l_miner_solid_02_a_macro" weight="25"/>
+    <!--<select macro="ship_par_l_miner_solid_01_b_macro" weight="25"/>-->
+    <select macro="ship_par_m_miner_solid_01_b_macro" weight="65"/>
+    <select macro="ship_par_s_miner_solid_01_a_macro" weight="10"/>
+  </group>
+  <group name="hol_miner_liquid_mixed">
+    <select macro="ship_par_l_miner_liquid_02_a_macro" weight="30"/>
+    <!--<select macro="ship_par_l_miner_liquid_01_b_macro" weight="30"/>-->
+    <select macro="ship_par_m_miner_liquid_01_b_macro" weight="70"/>
+  </group>
+
+  <!-- Military / Combat -->
+  <group name="hol_carrier_xl">
+    <select macro="ship_par_xl_carrier_02_a_macro" weight="100"/>
+    <!--<select macro="ship_par_xl_carrier_01_b_macro" weight="100"/>-->
+  </group>
+  <group name="hol_destroyer_l">
+    <select macro="ship_par_l_destroyer_02_a_macro" weight="100"/>
+    <!--<select macro="ship_par_l_destroyer_01_b_macro" weight="100"/>-->
+  </group>
+  <group name="hol_frigate_m">
+    <select macro="ship_par_m_frigate_01_b_macro" weight="100"/>
+  </group>
+  <group name="hol_corvette_m">
+    <select macro="ship_par_m_corvette_01_b_macro" weight="100"/>
+  </group>
+  <group name="hol_fighter_s">
+    <select macro="ship_par_s_fighter_01_b_macro" weight="450"/>
+    <select macro="ship_par_s_fighter_02_b_macro" weight="450"/>
+    <select macro="ship_par_s_heavyfighter_01_a_macro" weight="100"/>
+  </group>
+  <group name="hol_fighter_heavy_s">
+    <select macro="ship_par_s_heavyfighter_01_a_macro" weight="100"/>
+  </group>
+  <group name="hol_fighter_light_s">
+    <select macro="ship_par_s_fighter_01_b_macro" weight="100"/>
+    <select macro="ship_par_s_fighter_02_b_macro" weight="100"/>
+  </group>
+  <group name="hol_scout_s">
+    <select macro="ship_par_s_scout_01_b_macro" weight="100"/>
+  </group>
+
+
+  <!-- ############################# -->
+  <!--    TRINITY OF THE REALM -->
+  <!--    (Union of PAR and HOP. Has access to ships from both factions) -->
+  <!-- ############################# -->
+
+  <!-- Construction / Supply -->
+  <group name="tri_builder_xl">
+    <select macro="ship_par_xl_builder_01_a_macro" weight="100"/>
+    <select macro="ship_par_xl_builder_01_b_macro" weight="100"/>
+  </group>
+  <group name="tri_resupplier_xl">
+    <select macro="ship_par_xl_resupplier_02_a_macro" weight="100"/>
+    <!--<select macro="ship_par_xl_resupplier_01_a_macro" weight="100"/>
+    <select macro="ship_par_xl_resupplier_01_b_macro" weight="100"/>-->
+  </group>
+
+  <!-- Transporters -->
+  <group name="tri_trader_container_l">
+    <select macro="ship_par_l_trans_container_03_a_macro" weight="100"/>
+    <!--<select macro="ship_par_l_trans_container_01_a_macro" weight="100"/>
+    <select macro="ship_par_l_trans_container_02_a_macro" weight="100"/>
+    <select macro="ship_par_l_trans_container_01_b_macro" weight="100"/>
+    <select macro="ship_par_l_trans_container_02_b_macro" weight="100"/>-->
+  </group>
+  <group name="tri_trader_container_m">
+    <select macro="ship_par_m_trans_container_01_a_macro" weight="100"/>
+    <select macro="ship_par_m_trans_container_02_a_macro" weight="100"/>
+    <select macro="ship_par_m_trans_container_01_b_macro" weight="100"/>
+    <select macro="ship_par_m_trans_container_02_b_macro" weight="100"/>
+  </group>
+  <group name="tri_trader_container_s">
+    <select macro="ship_par_s_trans_container_01_a_macro" weight="100"/>
+    <select macro="ship_par_s_trans_container_01_b_macro" weight="100"/>
+  </group>
+
+  <!-- Miners -->
+  <group name="tri_miner_solid_l">
+    <select macro="ship_par_l_miner_solid_02_a_macro" weight="100"/>
+    <!--<select macro="ship_par_l_miner_solid_01_a_macro" weight="100"/>
+    <select macro="ship_par_l_miner_solid_01_b_macro" weight="100"/>-->
+  </group>
+  <group name="tri_miner_liquid_l">
+    <select macro="ship_par_l_miner_liquid_02_a_macro" weight="100"/>
+    <!--<select macro="ship_par_l_miner_liquid_01_a_macro" weight="100"/>
+    <select macro="ship_par_l_miner_liquid_01_b_macro" weight="100"/>-->
+  </group>
+  <group name="tri_miner_solid_m">
+    <select macro="ship_par_m_miner_solid_01_a_macro" weight="100"/>
+    <select macro="ship_par_m_miner_solid_01_b_macro" weight="100"/>
+  </group>
+  <group name="tri_miner_liquid_m">
+    <select macro="ship_par_m_miner_liquid_01_a_macro" weight="100"/>
+    <select macro="ship_par_m_miner_liquid_01_b_macro" weight="100"/>
+  </group>
+  <group name="tri_miner_solid_s">
+    <select macro="ship_par_s_miner_solid_01_a_macro" weight="100"/>
+  </group>
+  <group name="tri_miner_solid_mixed">
+    <select macro="ship_par_l_miner_solid_02_a_macro" weight="60"/>
+    <!--<select macro="ship_par_l_miner_solid_01_a_macro" weight="30"/>-->
+    <select macro="ship_par_m_miner_solid_01_a_macro" weight="65"/>
+    <select macro="ship_par_s_miner_solid_01_a_macro" weight="10"/>
+    <!--<select macro="ship_par_l_miner_solid_01_b_macro" weight="30"/>-->
+    <select macro="ship_par_m_miner_solid_01_b_macro" weight="65"/>
+  </group>
+  <group name="tri_miner_liquid_mixed">
+    <select macro="ship_par_l_miner_liquid_02_a_macro" weight="60"/>
+    <!--<select macro="ship_par_l_miner_liquid_01_a_macro" weight="30"/>-->
+    <select macro="ship_par_m_miner_liquid_01_a_macro" weight="70"/>
+    <!--<select macro="ship_par_l_miner_liquid_01_b_macro" weight="30"/>-->
+    <select macro="ship_par_m_miner_liquid_01_b_macro" weight="70"/>
+  </group>
+
+  <!-- Military / Combat -->
+  <group name="tri_carrier_xl">
+    <select macro="ship_par_xl_carrier_02_a_macro" weight="100"/>
+    <!--<select macro="ship_par_xl_carrier_01_a_macro" weight="100"/>
+    <select macro="ship_par_xl_carrier_01_b_macro" weight="100"/>-->
+  </group>
+  <group name="tri_destroyer_l">
+    <select macro="ship_par_l_destroyer_02_a_macro" weight="100"/>
+    <!--<select macro="ship_par_l_destroyer_01_a_macro" weight="100"/>
+    <select macro="ship_par_l_destroyer_01_b_macro" weight="100"/>-->
+  </group>
+  <group name="tri_frigate_m">
+    <select macro="ship_par_m_frigate_01_a_macro" weight="100"/>
+    <select macro="ship_par_m_frigate_01_b_macro" weight="100"/>
+  </group>
+  <group name="tri_corvette_m">
+    <select macro="ship_par_m_corvette_01_a_macro" weight="100"/>
+    <select macro="ship_par_m_corvette_01_b_macro" weight="100"/>
+  </group>
+  <group name="tri_fighter_s">
+    <select macro="ship_par_s_heavyfighter_01_a_macro" weight="200"/>
+    <select macro="ship_par_s_fighter_01_a_macro" weight="450"/>
+    <select macro="ship_par_s_fighter_02_a_macro" weight="450"/>
+    <select macro="ship_par_s_fighter_01_b_macro" weight="450"/>
+    <select macro="ship_par_s_fighter_02_b_macro" weight="450"/>
+  </group>
+  <group name="tri_fighter_heavy_s">
+    <select macro="ship_par_s_heavyfighter_01_a_macro" weight="100"/>
+  </group>
+  <group name="tri_fighter_light_s">
+    <select macro="ship_par_s_fighter_01_a_macro" weight="100"/>
+    <select macro="ship_par_s_fighter_02_a_macro" weight="100"/>
+    <select macro="ship_par_s_fighter_01_b_macro" weight="100"/>
+    <select macro="ship_par_s_fighter_02_b_macro" weight="100"/>
+  </group>
+  <group name="tri_scout_s">
+    <select macro="ship_par_s_scout_01_a_macro" weight="100"/>
+    <select macro="ship_par_s_scout_01_b_macro" weight="100"/>
+  </group>
+
+
+  <!-- ############################# -->
+  <!--    TELADI COMPANY & MINISTRY OF FINANCE-->
+  <!--    (ships are shared between the two factions) -->
+  <!-- ############################# -->
+
+  <!-- Construction / Supply -->
+  <group name="tel_builder_xl">
+    <select macro="ship_tel_xl_builder_01_a_macro" weight="100"/>
+    <select macro="ship_tel_xl_builder_01_b_macro" weight="100"/>
+  </group>
+  <group name="tel_resupplier_xl">
+    <select macro="ship_tel_xl_resupplier_01_a_macro" weight="100"/>
+    <select macro="ship_tel_xl_resupplier_01_b_macro" weight="100"/>
+  </group>
+
+  <!-- Transporters -->
+  <group name="tel_trader_container_l">
+    <select macro="ship_tel_l_trans_container_03_a_macro" weight="100"/>
+  </group>
+  <group name="tel_trader_container_m">
+    <select macro="ship_tel_m_trans_container_01_a_macro" weight="100"/>
+    <select macro="ship_tel_m_trans_container_01_b_macro" weight="100"/>
+    <select macro="ship_tel_m_trans_container_02_a_macro" weight="100"/>
+    <select macro="ship_tel_m_trans_container_02_b_macro" weight="100"/>
+  </group>
+  <group name="tel_trader_container_m_ministry">
+    <select macro="ship_tel_m_trans_container_03_a_macro" weight="100"/>
+  </group>
+  <group name="tel_trader_container_s">
+    <select macro="ship_tel_s_trans_container_01_a_macro" weight="100"/>
+    <select macro="ship_tel_s_trans_container_01_b_macro" weight="100"/>
+  </group>
+
+  <!-- Miners -->
+  <group name="tel_miner_solid_l">
+    <select macro="ship_tel_l_miner_solid_02_a_macro" weight="100"/>
+  </group>
+  <group name="tel_miner_liquid_l">
+    <select macro="ship_tel_l_miner_liquid_02_a_macro" weight="100"/>
+  </group>
+  <group name="tel_miner_solid_m">
+    <select macro="ship_tel_m_miner_solid_01_a_macro" weight="100"/>
+    <select macro="ship_tel_m_miner_solid_01_b_macro" weight="100"/>
+  </group>
+  <group name="tel_miner_liquid_m">
+    <select macro="ship_tel_m_miner_liquid_01_a_macro" weight="100"/>
+    <select macro="ship_tel_m_miner_liquid_01_b_macro" weight="100"/>
+  </group>
+  <group name="tel_miner_solid_s">
+    <select macro="ship_tel_s_miner_solid_01_a_macro" weight="100"/>
+  </group>
+  <group name="tel_miner_solid_mixed">
+    <select macro="ship_tel_l_miner_solid_02_a_macro" weight="200"/>
+    <select macro="ship_tel_m_miner_solid_01_a_macro" weight="300"/>
+    <select macro="ship_tel_m_miner_solid_01_b_macro" weight="300"/>
+    <select macro="ship_tel_s_miner_solid_01_a_macro" weight="200"/>
+  </group>
+  <group name="tel_miner_liquid_mixed">
+    <select macro="ship_tel_l_miner_liquid_02_a_macro" weight="300"/>
+    <select macro="ship_tel_m_miner_liquid_01_a_macro" weight="350"/>
+    <select macro="ship_tel_m_miner_liquid_01_b_macro" weight="350"/>
+  </group>
+
+  <!-- Military / Combat -->
+  <group name="tel_carrier_xl">
+    <select macro="ship_tel_xl_carrier_01_a_macro" weight="100"/>
+    <select macro="ship_tel_xl_carrier_01_b_macro" weight="100"/>
+  </group>
+  <group name="tel_destroyer_l">
+    <select macro="ship_tel_l_destroyer_02_a_macro" weight="100"/>
+  </group>
+  <group name="tel_frigate_m">
+    <select macro="ship_tel_m_frigate_01_a_macro" weight="100"/>
+    <select macro="ship_tel_m_frigate_01_b_macro" weight="100"/>
+  </group>
+  <group name="tel_gunboat_m">
+    <select macro="ship_tel_m_bomber_01_a_macro" weight="100"/>
+    <select macro="ship_tel_m_bomber_01_b_macro" weight="100"/>
+  </group>
+  <group name="tel_fighter_s">
+    <select macro="ship_tel_s_fighter_01_a_macro" weight="250"/>
+    <select macro="ship_tel_s_fighter_01_b_macro" weight="250"/>
+    <select macro="ship_tel_s_fighter_02_a_macro" weight="250"/>
+    <select macro="ship_tel_s_fighter_02_b_macro" weight="250"/>
+  </group>
+  <group name="tel_scout_s">
+    <select macro="ship_tel_s_scout_01_a_macro" weight="100"/>
+    <select macro="ship_tel_s_scout_01_b_macro" weight="100"/>
+    <select macro="ship_tel_s_scout_02_a_macro" weight="100"/>
+    <select macro="ship_tel_s_scout_02_b_macro" weight="100"/>
+  </group>
+
+
+  <!-- ############################# -->
+  <!--    XENON -->
+  <!-- ############################# -->
+  <group name="xen_miner_m">
+    <select macro="ship_xen_m_miner_solid_01_a_macro" weight="100"/>
+  </group>
+
+  <group name="xen_carrier_xl">
+    <select macro="ship_xen_xl_carrier_01_a_macro" weight="100"/>
+  </group>
+  <group name="xen_destroyer_xl">
+    <select macro="ship_xen_xl_destroyer_01_a_macro" weight="100"/>
+  </group>
+  <group name="xen_terraformer_l">
+    <select macro="ship_xen_l_terraformer_01_a_macro" weight="100"/>
+  </group>
+  <group name="xen_corvette_m">
+    <select macro="ship_xen_m_corvette_01_a_macro" weight="100"/>
+  </group>
+  <group name="xen_fighter_m">
+    <select macro="ship_xen_m_corvette_02_a_macro" weight="100"/>
+    <select macro="ship_xen_m_corvette_01_a_macro" weight="3"/>
+  </group>
+  <group name="xen_fighter_s">
+    <select macro="ship_xen_s_fighter_01_a_macro" weight="100"/>
+    <select macro="ship_xen_s_fighter_02_a_macro" weight="100"/>
+    <select macro="ship_xen_s_heavyfighter_01_a_macro" weight="3"/>
+  </group>
+  <group name="xen_fighter_heavy_s">
+    <select macro="ship_xen_s_fighter_01_a_macro" weight="20"/>
+    <select macro="ship_xen_s_fighter_02_a_macro" weight="80"/>
+    <select macro="ship_xen_s_heavyfighter_01_a_macro" weight="1"/>
+  </group>
+  <group name="xen_fighter_light_s">
+    <select macro="ship_xen_s_fighter_01_a_macro" weight="80"/>
+    <select macro="ship_xen_s_fighter_02_a_macro" weight="20"/>
+  </group>
+  <group name="xen_scout_s">
+    <select macro="ship_xen_s_scout_01_a_macro" weight="100"/>
+  </group>
+
+  <!-- ############################# -->
+  <!--    KHA'AK                     -->
+  <!-- ############################# -->
+  <group name="kha_destroyer_l">
+    <select macro="ship_kha_l_destroyer_01_a_macro" weight="100"/>
+  </group>
+  <group name="kha_fighter_m">
+    <select macro="ship_kha_m_fighter_01_a_macro" weight="100"/>
+    <select macro="ship_kha_m_fighter_02_a_macro" weight="100"/>
+  </group>
+  <group name="kha_fighter_leader">
+    <select macro="ship_kha_s_fighter_01_a_macro" weight="100"/>
+  </group>
+  <group name="kha_fighter_escort">
+    <select macro="ship_kha_s_fighter_02_a_macro" weight="100"/>
+  </group>
+
+  <!-- ############################# -->
+  <!--    MASS TRAFFIC -->
+  <!--      Argon -->
+  <!-- ############################# -->
+  <group name="argon_dockarea_mass_traffic">
+    <select macro="ship_arg_xs_cv_01_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_cv_02_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_02_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_01_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_01_b_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_01_c_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_01_d_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_b_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_04_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_04_b_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_b_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_c_macro" weight="100"/>
+  </group>
+  <group name="argon_pier_mass_traffic">
+    <select macro="ship_arg_xs_cv_01_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_cv_02_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_02_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_01_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_01_b_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_01_c_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_01_d_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_b_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_04_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_04_b_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_b_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_c_macro" weight="100"/>
+  </group>
+  <group name="argon_storage_mass_traffic">
+    <select macro="ship_arg_xs_pv_04_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_04_b_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_b_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_c_macro" weight="100"/>
+  </group>
+  <group name="argon_production_mass_traffic">
+    <select macro="ship_arg_xs_cv_01_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_cv_02_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_04_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_04_b_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_b_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_c_macro" weight="100"/>
+  </group>
+  <group name="argon_buildmodule_mass_traffic">
+    <select macro="ship_arg_xs_cv_01_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_cv_02_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_04_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_04_b_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_b_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_c_macro" weight="100"/>
+  </group>
+  <group name="argon_defencemodule_mass_traffic">
+    <select macro="ship_arg_xs_cv_01_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_cv_02_a_macro" weight="100"/>
+  </group>
+  <group name="argon_civilian_mass_traffic">
+    <select macro="ship_arg_xs_pv_02_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_01_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_01_b_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_01_c_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_01_d_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_b_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_04_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_04_b_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_a_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_b_macro" weight="100"/>
+    <select macro="ship_arg_xs_pv_05_c_macro" weight="100"/>
+  </group>
+  <group name="argon_police_mass_traffic">
+    <select macro="ship_arg_xs_police_01_a_macro" weight="100"/>
+  </group>
+
+  <!-- ############################# -->
+  <!--    MASS TRAFFIC -->
+  <!--      Teladi -->
+  <!-- ############################# -->
+  <group name="teladi_dockarea_mass_traffic">
+    <select macro="ship_tel_xs_pv_01_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_01_b_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_02_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_02_b_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_03_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_03_b_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_04_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_04_b_macro" weight="100"/>
+  </group>
+  <group name="teladi_pier_mass_traffic">
+    <select macro="ship_tel_xs_pv_01_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_01_b_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_02_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_02_b_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_03_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_03_b_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_04_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_04_b_macro" weight="100"/>
+  </group>
+  <group name="teladi_storage_mass_traffic">
+    <select macro="ship_tel_xs_pv_01_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_01_b_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_02_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_02_b_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_03_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_03_b_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_04_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_04_b_macro" weight="100"/>
+  </group>
+  <group name="teladi_production_mass_traffic">
+    <select macro="ship_tel_xs_pv_01_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_01_b_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_02_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_02_b_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_03_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_03_b_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_04_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_04_b_macro" weight="100"/>
+  </group>
+  <group name="teladi_buildmodule_mass_traffic">
+    <select macro="ship_tel_xs_pv_01_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_01_b_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_02_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_02_b_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_03_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_03_b_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_04_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_04_b_macro" weight="100"/>
+  </group>
+  <group name="teladi_defencemodule_mass_traffic">
+    <select macro="ship_tel_xs_pv_01_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_01_b_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_02_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_02_b_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_03_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_03_b_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_04_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_04_b_macro" weight="100"/>
+  </group>
+  <group name="teladi_civilian_mass_traffic">
+    <select macro="ship_tel_xs_pv_01_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_01_b_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_02_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_02_b_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_03_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_03_b_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_04_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_pv_04_b_macro" weight="100"/>
+  </group>
+  <group name="teladi_police_mass_traffic">
+    <select macro="ship_tel_xs_police_01_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_police_02_a_macro" weight="100"/>
+    <select macro="ship_tel_xs_police_03_a_macro" weight="100"/>
+  </group>
+
+  <!-- ############################# -->
+  <!--    MASS TRAFFIC -->
+  <!--      Paranid -->
+  <!-- ############################# -->
+  <group name="paranid_dockarea_mass_traffic">
+    <select macro="ship_par_xs_pv_01_a_macro" weight="100"/>
+    <select macro="ship_par_xs_pv_02_a_macro" weight="100"/>
+    <select macro="ship_par_xs_pv_03_a_macro" weight="100"/>
+    <select macro="ship_par_xs_pv_04_a_macro" weight="100"/>
+  </group>
+  <group name="paranid_pier_mass_traffic">
+    <select macro="ship_par_xs_pv_01_a_macro" weight="100"/>
+    <select macro="ship_par_xs_pv_02_a_macro" weight="100"/>
+    <select macro="ship_par_xs_pv_03_a_macro" weight="100"/>
+    <select macro="ship_par_xs_pv_04_a_macro" weight="100"/>
+  </group>
+  <group name="paranid_storage_mass_traffic">
+    <select macro="ship_par_xs_pv_01_a_macro" weight="100"/>
+    <select macro="ship_par_xs_pv_02_a_macro" weight="100"/>
+    <select macro="ship_par_xs_pv_03_a_macro" weight="100"/>
+    <select macro="ship_par_xs_pv_04_a_macro" weight="100"/>
+  </group>
+  <group name="paranid_production_mass_traffic">
+    <select macro="ship_par_xs_pv_01_a_macro" weight="100"/>
+    <select macro="ship_par_xs_pv_02_a_macro" weight="100"/>
+    <select macro="ship_par_xs_pv_03_a_macro" weight="100"/>
+    <select macro="ship_par_xs_pv_04_a_macro" weight="100"/>
+  </group>
+  <group name="paranid_buildmodule_mass_traffic">
+    <select macro="ship_par_xs_pv_01_a_macro" weight="100"/>
+    <select macro="ship_par_xs_pv_02_a_macro" weight="100"/>
+    <select macro="ship_par_xs_pv_03_a_macro" weight="100"/>
+    <select macro="ship_par_xs_pv_04_a_macro" weight="100"/>
+  </group>
+  <group name="paranid_defencemodule_mass_traffic">
+    <select macro="ship_par_xs_pv_01_a_macro" weight="100"/>
+    <select macro="ship_par_xs_pv_02_a_macro" weight="100"/>
+    <select macro="ship_par_xs_pv_03_a_macro" weight="100"/>
+    <select macro="ship_par_xs_pv_04_a_macro" weight="100"/>
+  </group>
+  <group name="paranid_civilian_mass_traffic">
+    <select macro="ship_par_xs_pv_01_a_macro" weight="100"/>
+    <select macro="ship_par_xs_pv_02_a_macro" weight="100"/>
+    <select macro="ship_par_xs_pv_03_a_macro" weight="100"/>
+    <select macro="ship_par_xs_pv_04_a_macro" weight="100"/>
+  </group>
+  <group name="paranid_police_mass_traffic">
+    <select macro="ship_par_xs_police_01_a_macro" weight="100"/>
+  </group>
+
+  <!-- ############################# -->
+  <!--    MASS TRAFFIC -->
+  <!--      Xenon -->
+  <!-- ############################# -->
+  <group name="xenon_civilian_mass_traffic">
+    <select macro="ship_xen_xs_pv_01_a_macro" weight="100"/>
+    <select macro="ship_xen_xs_pv_02_a_macro" weight="100"/>
+    <select macro="ship_xen_xs_pv_03_a_macro" weight="100"/>
+    <select macro="ship_xen_xs_pv_04_a_macro" weight="100"/>
+  </group>
+
+
+  <!-- ############################# -->
+  <!--    HATIKVAH  -->
+  <!--      (mixed-race civilian ships, used by deep-space mining jobs) -->
+  <!-- ############################# -->
+  <group name="mixed_miner_solid_l">
+    <select macro="ship_arg_l_miner_solid_01_a_macro" weight="330"/>
+    <select macro="ship_arg_l_miner_solid_01_b_macro" weight="330"/>
+    <select macro="ship_tel_l_miner_solid_02_a_macro" weight="1260"/>
+    <select macro="ship_par_l_miner_solid_02_a_macro" weight="80"/>
+    <!--<select macro="ship_par_l_miner_solid_01_a_macro" weight="40"/>
+    <select macro="ship_par_l_miner_solid_01_b_macro" weight="40"/>-->
+  </group>
+  <group name="mixed_miner_liquid_l">
+    <select macro="ship_arg_l_miner_liquid_01_a_macro" weight="330"/>
+    <select macro="ship_arg_l_miner_liquid_01_b_macro" weight="330"/>
+    <select macro="ship_tel_l_miner_liquid_02_a_macro" weight="1260"/>
+    <select macro="ship_par_l_miner_liquid_02_a_macro" weight="80"/>
+    <!--<select macro="ship_par_l_miner_liquid_01_a_macro" weight="40"/>
+    <select macro="ship_par_l_miner_liquid_01_b_macro" weight="40"/>-->
+  </group>
+  <group name="mixed_miner_solid_m">
+    <select macro="ship_arg_m_miner_solid_01_a_macro" weight="330"/>
+    <select macro="ship_tel_m_miner_solid_01_a_macro" weight="630"/>
+    <select macro="ship_par_m_miner_solid_01_a_macro" weight="40"/>
+  </group>
+  <group name="mixed_miner_liquid_m">
+    <select macro="ship_arg_m_miner_liquid_01_a_macro" weight="330"/>
+    <select macro="ship_arg_m_miner_liquid_01_b_macro" weight="330"/>
+    <select macro="ship_tel_m_miner_liquid_01_a_macro" weight="630"/>
+    <select macro="ship_tel_m_miner_liquid_01_b_macro" weight="630"/>
+    <select macro="ship_par_m_miner_liquid_01_a_macro" weight="40"/>
+    <select macro="ship_par_m_miner_liquid_01_b_macro" weight="40"/>
+  </group>
+  <group name="mixed_miner_solid_s">
+    <select macro="ship_arg_s_miner_solid_01_a_macro" weight="330"/>
+    <select macro="ship_tel_s_miner_solid_01_a_macro" weight="630"/>
+    <select macro="ship_par_s_miner_solid_01_a_macro" weight="40"/>
+  </group>
+  <group name="mixed_miner_solid_mixed">
+    <select macro="ship_arg_l_miner_solid_01_a_macro" weight="100"/>
+    <select macro="ship_arg_l_miner_solid_01_b_macro" weight="100"/>
+    <select macro="ship_arg_m_miner_solid_01_a_macro" weight="190"/>
+    <select macro="ship_arg_m_miner_solid_01_b_macro" weight="190"/>
+    <select macro="ship_tel_l_miner_solid_02_a_macro" weight="380"/>
+    <select macro="ship_tel_m_miner_solid_01_a_macro" weight="390"/>
+    <select macro="ship_tel_m_miner_solid_01_b_macro" weight="390"/>
+    <select macro="ship_par_l_miner_solid_02_a_macro" weight="20"/>
+    <!--<select macro="ship_par_l_miner_solid_01_a_macro" weight="10"/>
+    <select macro="ship_par_l_miner_solid_01_b_macro" weight="10"/>-->
+    <select macro="ship_par_m_miner_solid_01_a_macro" weight="20"/>
+    <select macro="ship_par_m_miner_solid_01_b_macro" weight="20"/>
+    <select macro="ship_arg_s_miner_solid_01_a_macro" weight="80"/>
+    <select macro="ship_tel_s_miner_solid_01_a_macro" weight="100"/>
+    <select macro="ship_par_s_miner_solid_01_a_macro" weight="20"/>
+  </group>
+  <group name="mixed_miner_liquid_mixed">
+    <select macro="ship_arg_l_miner_liquid_01_a_macro" weight="100"/>
+    <select macro="ship_arg_l_miner_liquid_01_b_macro" weight="100"/>
+    <select macro="ship_arg_m_miner_liquid_01_a_macro" weight="230"/>
+    <select macro="ship_arg_m_miner_liquid_01_b_macro" weight="230"/>
+    <select macro="ship_tel_l_miner_liquid_02_a_macro" weight="380"/>
+    <select macro="ship_tel_m_miner_liquid_01_a_macro" weight="440"/>
+    <select macro="ship_tel_m_miner_liquid_01_b_macro" weight="440"/>
+    <select macro="ship_par_l_miner_liquid_02_a_macro" weight="20"/>
+    <!--<select macro="ship_par_l_miner_liquid_01_a_macro" weight="10"/>
+    <select macro="ship_par_l_miner_liquid_01_b_macro" weight="10"/>-->
+    <select macro="ship_par_m_miner_liquid_01_a_macro" weight="30"/>
+    <select macro="ship_par_m_miner_liquid_01_b_macro" weight="30"/>
+  </group>
+
+  <!-- ############################# -->
+  <!--    SCALEPLATE PACT  -->
+  <!--      (sometimes also used by Hatikvah jobs) -->
+  <!-- ############################# -->
+  <group name="sca_pirate">
+    <select macro="ship_arg_m_bomber_02_a_macro" weight="100"/>
+  </group>
+
+  <group name="sca_pirate_l">
+    <select macro="ship_arg_l_destroyer_02_a_macro" weight="30"/>
+    <select macro="ship_tel_l_destroyer_02_a_macro" weight="70"/>
+  </group>
+
+  <group name="sca_pirate_sm">
+    <select macro="ship_arg_m_bomber_02_a_macro" weight="10"/>
+    <select macro="ship_arg_s_scout_01_a_macro" weight="360"/>
+    <select macro="ship_arg_s_scout_01_b_macro" weight="360"/>
+    <select macro="ship_tel_s_scout_01_a_macro" weight="540"/>
+    <select macro="ship_tel_s_scout_01_b_macro" weight="540"/>
+    <select macro="ship_tel_s_fighter_01_a_macro" weight="90"/>
+    <select macro="ship_tel_s_fighter_01_b_macro" weight="90"/>
+  </group>
+
+  <group name="sca_pirate_s">
+    <select macro="ship_arg_s_scout_01_a_macro" weight="300"/>
+    <select macro="ship_arg_s_scout_01_b_macro" weight="300"/>
+    <select macro="ship_tel_s_scout_01_a_macro" weight="700"/>
+    <select macro="ship_tel_s_scout_01_b_macro" weight="700"/>
+    <select macro="ship_tel_s_fighter_01_a_macro" weight="10"/>
+    <select macro="ship_tel_s_fighter_01_b_macro" weight="10"/>
+  </group>
+
+  <!-- Duke's Buccaneers -->
+
+  <group name="buc_transport_m">
+    <select macro="ship_par_m_trans_container_03_a_macro"  weight="100"/>
+  </group>
+
+  <!-- Phase 1: Guerilla Warfare
+        Small and Medium ships only. No frigates. Mostly Argon with a few (5%) Paranid ships. -->
+  <group name="buc_guerilla_m">
+    <select macro="ship_arg_m_bomber_01_a_macro" weight="90"/>
+    <select macro="ship_arg_m_bomber_01_b_macro" weight="90"/>
+    <select macro="ship_arg_m_bomber_02_a_macro" weight="200"/>
+
+    <select macro="ship_par_m_corvette_01_a_macro" weight="100"/>
+    <select macro="ship_par_m_corvette_01_b_macro" weight="100"/>
+  </group>
+  <group name="buc_guerilla_s">
+    <select macro="ship_arg_s_fighter_02_a_macro" weight="950"/>
+    <select macro="ship_arg_s_fighter_02_b_macro" weight="570"/>
+    <select macro="ship_arg_s_fighter_03_a_macro" weight="760"/>
+    <select macro="ship_arg_s_fighter_04_a_macro" weight="190"/>
+    <select macro="ship_arg_s_heavyfighter_02_a_macro" weight="1330"/>
+
+    <select macro="ship_par_s_fighter_01_a_macro" weight="70"/>
+    <select macro="ship_par_s_fighter_01_b_macro" weight="40"/>
+    <select macro="ship_par_s_fighter_02_a_macro" weight="50"/>
+    <select macro="ship_par_s_fighter_02_b_macro" weight="30"/>
+    <select macro="ship_par_s_heavyfighter_01_a_macro" weight="10"/>
+  </group>
+
+  <!-- Phase 2: Conventional Military Buildup and Deployment
+        Full military deployment. Mostly Paranid ships, handful of Argon ships. -->
+  <group name="buc_military_carrier_xl">
+    <select macro="ship_par_xl_carrier_02_a_macro" weight="100"/>
+    <!--<select macro="ship_par_xl_carrier_01_a_macro" weight="100"/>
+    <select macro="ship_par_xl_carrier_01_b_macro" weight="100"/>-->
+  </group>
+  <group name="buc_military_resupplier_xl">
+    <select macro="ship_par_xl_resupplier_02_a_macro" weight="100"/>
+    <!--<select macro="ship_par_xl_resupplier_01_a_macro" weight="100"/>
+    <select macro="ship_par_xl_resupplier_01_b_macro" weight="100"/>-->
+  </group>
+  <group name="buc_military_destroyer_l">
+    <select macro="ship_arg_l_destroyer_02_a_macro" weight="20"/>
+    <select macro="ship_par_l_destroyer_02_a_macro" weight="80"/>
+    <!--<select macro="ship_par_l_destroyer_01_a_macro" weight="40"/>
+    <select macro="ship_par_l_destroyer_01_b_macro" weight="40"/>-->
+  </group>
+  <group name="buc_military_m">
+    <select macro="ship_arg_m_bomber_01_a_macro" weight="100"/>
+    <select macro="ship_arg_m_bomber_01_b_macro" weight="100"/>
+    <select macro="ship_arg_m_frigate_01_a_macro" weight="100"/>
+    <select macro="ship_arg_m_frigate_01_b_macro" weight="100"/>
+
+    <select macro="ship_arg_m_bomber_02_a_macro" weight="160"/>
+    <select macro="ship_par_m_frigate_01_a_macro" weight="70"/>
+    <select macro="ship_par_m_frigate_01_b_macro" weight="70"/>
+    <select macro="ship_par_m_corvette_01_a_macro" weight="230"/>
+    <select macro="ship_par_m_corvette_01_b_macro" weight="230"/>
+  </group>
+  <group name="buc_military_gunboat_m">
+    <select macro="ship_arg_m_bomber_01_a_macro" weight="100"/>
+    <select macro="ship_arg_m_bomber_01_b_macro" weight="100"/>
+    <select macro="ship_arg_m_bomber_02_a_macro" weight="300"/>
+  </group>
+  <group name="buc_military_frigate_m">
+    <select macro="ship_arg_m_frigate_01_a_macro" weight="10"/>
+    <select macro="ship_arg_m_frigate_01_b_macro" weight="10"/>
+    <select macro="ship_par_m_frigate_01_a_macro" weight="40"/>
+    <select macro="ship_par_m_frigate_01_b_macro" weight="40"/>
+  </group>
+  <group name="buc_military_corvette_m">
+    <select macro="ship_par_m_corvette_01_a_macro" weight="100"/>
+    <select macro="ship_par_m_corvette_01_b_macro" weight="100"/>
+  </group>
+  <group name="buc_military_fighter_s">
+    <select macro="ship_arg_s_fighter_02_a_macro" weight="40"/>
+    <select macro="ship_arg_s_fighter_02_b_macro" weight="50"/>
+    <select macro="ship_arg_s_fighter_03_a_macro" weight="30"/>
+    <select macro="ship_arg_s_fighter_04_a_macro" weight="10"/>
+    <select macro="ship_arg_s_heavyfighter_02_a_macro" weight="70"/>
+
+    <select macro="ship_par_s_fighter_01_a_macro" weight="570"/>
+    <select macro="ship_par_s_fighter_01_b_macro" weight="190"/>
+    <select macro="ship_par_s_fighter_02_a_macro" weight="950"/>
+    <select macro="ship_par_s_fighter_02_b_macro" weight="760"/>
+    <select macro="ship_par_s_heavyfighter_01_a_macro" weight="1330"/>
+  </group>
+  <group name="buc_military_fighter_heavy_s">
+    <select macro="ship_arg_s_heavyfighter_02_a_macro" weight="100"/>
+    <select macro="ship_par_s_heavyfighter_01_a_macro" weight="400"/>
+  </group>
+  <group name="buc_military_fighter_light_s">
+    <select macro="ship_arg_s_fighter_02_a_macro" weight="30"/>
+    <select macro="ship_arg_s_fighter_02_b_macro" weight="40"/>
+    <select macro="ship_arg_s_fighter_03_a_macro" weight="20"/>
+    <select macro="ship_arg_s_fighter_04_a_macro" weight="10"/>
+    <select macro="ship_par_s_fighter_01_a_macro" weight="380"/>
+    <select macro="ship_par_s_fighter_01_b_macro" weight="190"/>
+    <select macro="ship_par_s_fighter_02_a_macro" weight="760"/>
+    <select macro="ship_par_s_fighter_02_b_macro" weight="570"/>
+  </group>
+  <group name="buc_military_scout_s">
+    <select macro="ship_arg_s_scout_01_a_macro" weight="10"/>
+    <select macro="ship_arg_s_scout_01_b_macro" weight="10"/>
+    <select macro="ship_par_s_scout_01_a_macro" weight="40"/>
+    <select macro="ship_par_s_scout_01_b_macro" weight="40"/>
+  </group>
+
+  <!-- ############################# -->
+  <!--    OTHER  -->
+  <!-- ############################# -->
+  <!-- used for boarding -->
+  <group name="boardingpods" description="Boarding pods transporting marines to target objects">
+    <select macro="ship_gen_xs_boardingpod_01_a_macro"  weight="100"/>
+  </group>
+  
+  <!-- Recycling Ships -->
+  <group name="common_tug_m">
+    <select macro="ship_gen_m_tugboat_01_a_macro" weight="100"/>
+  </group>
+</groups>

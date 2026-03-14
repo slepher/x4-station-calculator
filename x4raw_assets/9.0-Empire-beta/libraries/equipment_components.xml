@@ -1,0 +1,1988 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<components>
+  <component name="engine_arg_l_allround_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="engine large component  standard "/>
+    </connections>
+  </component>
+  <component name="engine_arg_l_travel_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="engine large component  standard "/>
+    </connections>
+  </component>
+  <component name="engine_arg_xl_allround_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="engine extralarge component  standard "/>
+    </connections>
+  </component>
+  <component name="engine_arg_xl_travel_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="engine extralarge component  standard "/>
+    </connections>
+  </component>
+  <component name="engine_bor_l_travel_01_mk1" class="engine">
+    <connections>
+      <connection name="con_engine_01" tags="advanced component engine large "/>
+    </connections>
+  </component>
+  <component name="engine_bor_m_01" class="engine">
+    <connections>
+      <connection name="ship" tags="advanced component engine medium"/>
+    </connections>
+  </component>
+  <component name="engine_bor_s_01" class="engine">
+    <connections>
+      <connection name="ship" tags="advanced component engine small"/>
+    </connections>
+  </component>
+  <component name="engine_bor_xl_travel_01_mk1" class="engine">
+    <connections>
+      <connection name="con_engine_01" tags="advanced component engine extralarge "/>
+    </connections>
+  </component>
+  <component name="engine_gen_m_corvette_01" class="engine">
+    <connections>
+      <connection name="ship" tags="component engine medium ship_gen_m_corvette_01"/>
+    </connections>
+  </component>
+  <component name="engine_gen_m_virtual_01" class="engine">
+    <connections>
+      <connection name="con_engine_01" tags="advanced component engine medium"/>
+    </connections>
+  </component>
+  <component name="engine_gen_m_yacht_01_mk1" class="engine">
+    <connections>
+      <connection name="con_engine_01" tags="engine medium ship_gen_m_yacht_01 mandatory component "/>
+    </connections>
+  </component>
+  <component name="engine_gen_s_racer_01" class="engine">
+    <connections>
+      <connection name="ship" tags="component engine small small_racer"/>
+    </connections>
+  </component>
+  <component name="engine_gen_s_virtual_01" class="engine">
+    <connections>
+      <connection name="con_engine_01" tags="advanced component engine small"/>
+    </connections>
+  </component>
+  <component name="engine_kha_l_destroyer_01_allround_01_mk1" class="engine">
+    <connections>
+      <connection name="con_engine_01" tags="component engine khaak large ship_kha_l_destroyer_01 "/>
+    </connections>
+  </component>
+  <component name="engine_kha_m_combat_01_mk1" class="engine">
+    <connections>
+      <connection name="connection_engine01" tags="engine medium component standard "/>
+    </connections>
+  </component>
+  <component name="engine_kha_m_combat_02_mk1" class="engine">
+    <connections>
+      <connection name="connection_engine01" tags="engine medium component standard "/>
+    </connections>
+  </component>
+  <component name="engine_kha_s_combat_01_mk1" class="engine">
+    <connections>
+      <connection name="connection_engine01" tags="engine small component standard "/>
+    </connections>
+  </component>
+  <component name="engine_kha_xl_battleship_01_allround_01_mk1" class="engine">
+    <connections>
+      <connection name="con_engine_01" tags="component engine extralarge khaak ship_kha_xl_battleship_01 "/>
+    </connections>
+  </component>
+  <component name="engine_par_l_allround_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="engine large component  standard "/>
+    </connections>
+  </component>
+  <component name="engine_par_l_travel_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="engine large component  standard "/>
+    </connections>
+  </component>
+  <component name="engine_par_xl_allround_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="engine extralarge component  standard "/>
+    </connections>
+  </component>
+  <component name="engine_par_xl_travel_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="engine extralarge component  standard "/>
+    </connections>
+  </component>
+  <component name="engine_pir_xl_battleship_01_allround_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="engine extralarge pir_battleship_01 component "/>
+    </connections>
+  </component>
+  <component name="engine_spl_l_allround_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="engine large component  standard "/>
+    </connections>
+  </component>
+  <component name="engine_spl_l_travel_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="engine large component  standard "/>
+    </connections>
+  </component>
+  <component name="engine_spl_xl_allround_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="engine extralarge component  standard "/>
+    </connections>
+  </component>
+  <component name="engine_spl_xl_travel_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="engine extralarge component  standard "/>
+    </connections>
+  </component>
+  <component name="engine_tel_l_allround_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="engine large component  standard "/>
+    </connections>
+  </component>
+  <component name="engine_tel_l_travel_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="engine large component  standard "/>
+    </connections>
+  </component>
+  <component name="engine_tel_xl_allround_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="engine extralarge component  standard "/>
+    </connections>
+  </component>
+  <component name="engine_tel_xl_travel_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="engine extralarge component  standard "/>
+    </connections>
+  </component>
+  <component name="engine_ter_l_allround_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="engine large component  standard "/>
+    </connections>
+  </component>
+  <component name="engine_ter_l_allround_02_mk1" class="engine">
+    <connections>
+      <connection name="con_engine_01" tags="advanced component engine large "/>
+    </connections>
+  </component>
+  <component name="engine_ter_l_travel_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="engine large component  standard "/>
+    </connections>
+  </component>
+  <component name="engine_ter_m_virtual_01" class="engine">
+    <connections>
+      <connection name="ship" tags="advanced component engine medium"/>
+    </connections>
+  </component>
+  <component name="engine_ter_s_virtual_01" class="engine">
+    <connections>
+      <connection name="ship" tags="advanced component engine small"/>
+    </connections>
+  </component>
+  <component name="engine_ter_xl_allround_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="engine extralarge component  standard "/>
+    </connections>
+  </component>
+  <component name="engine_ter_xl_travel_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="engine extralarge component  standard "/>
+    </connections>
+  </component>
+  <component name="engine_xen_l_allround_01_mk1" class="engine">
+    <connections>
+      <connection name="Connection01" tags="engine large component standard " parent="part_main"/>
+    </connections>
+  </component>
+  <component name="engine_xen_l_allround_02_mk1" class="engine">
+    <connections>
+      <connection name="con_engine_01" tags="component engine large xenon "/>
+    </connections>
+  </component>
+  <component name="engine_xen_m_combat_01_mk1" class="engine">
+    <connections>
+      <connection name="connection_engine01" tags="engine medium component standard"/>
+    </connections>
+  </component>
+  <component name="engine_xen_m_travel_01_mk1" class="engine">
+    <connections>
+      <connection name="connection_engine01" tags="engine medium component standard "/>
+    </connections>
+  </component>
+  <component name="engine_xen_m_virtual_01" class="engine">
+    <connections>
+      <connection name="ship" tags="component engine medium xenon"/>
+    </connections>
+  </component>
+  <component name="engine_xen_s_combat_01_mk1" class="engine">
+    <connections>
+      <connection name="conn_engine01" tags="engine small component standard "/>
+    </connections>
+  </component>
+  <component name="engine_xen_s_virtual_01" class="engine">
+    <connections>
+      <connection name="ship" tags="component engine small xenon"/>
+    </connections>
+  </component>
+  <component name="engine_xen_xl_allround_01_mk1" class="engine">
+    <connections>
+      <connection name="connection_component01" tags="engine extralarge component standard "/>
+    </connections>
+  </component>
+  <component name="engine_xen_xl_mothership_01_allround_mk1" class="engine">
+    <connections>
+      <connection name="con_engine_01" tags="component engine extralarge ship_xen_xl_mothership_01 "/>
+    </connections>
+  </component>
+  <component name="generic_shieldgenerator" class="shieldgenerator">
+    <connections>
+      <connection name="ParentConnection" tags="component shield small standard"/>
+    </connections>
+  </component>
+  <component name="scanner_gen_s_basic_01_mk1" class="destructible">
+    <connections>
+      <connection name="Connection01" tags="scanner mining longrange component"/>
+    </connections>
+  </component>
+  <component name="shield_arg_l_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="small_Con_shieldgen_01" tags="large shield component standard "/>
+    </connections>
+  </component>
+  <component name="shield_arg_l_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="small_Con_shieldgen_01" tags="large shield component standard "/>
+    </connections>
+  </component>
+  <component name="shield_arg_m_standard_02_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component hittable standard "/>
+    </connections>
+  </component>
+  <component name="shield_arg_m_standard_02_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component hittable standard "/>
+    </connections>
+  </component>
+  <component name="shield_arg_xl_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="small_Con_shieldgen_01" tags="extralarge shield component  standard "/>
+    </connections>
+  </component>
+  <component name="shield_bor_l_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component large shield "/>
+    </connections>
+  </component>
+  <component name="shield_bor_l_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component large shield "/>
+    </connections>
+  </component>
+  <component name="shield_bor_l_standard_01_mk3" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component large shield "/>
+    </connections>
+  </component>
+  <component name="shield_bor_m_standard_01" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component medium shield unhittable"/>
+    </connections>
+  </component>
+  <component name="shield_bor_m_standard_02_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component hittable medium shield "/>
+    </connections>
+  </component>
+  <component name="shield_bor_m_standard_02_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component hittable medium shield "/>
+    </connections>
+  </component>
+  <component name="shield_bor_m_standard_02_mk3" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component hittable medium shield "/>
+    </connections>
+  </component>
+  <component name="shield_bor_s_standard_01" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component shield small"/>
+    </connections>
+  </component>
+  <component name="shield_bor_xl_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component extralarge shield "/>
+    </connections>
+  </component>
+  <component name="shield_bor_xl_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component extralarge shield "/>
+    </connections>
+  </component>
+  <component name="shield_gen_m_corvette_01" class="shieldgenerator">
+    <connections>
+      <connection name="ParentConnection" tags="component medium shield ship_gen_m_corvette_01 unhittable"/>
+    </connections>
+  </component>
+  <component name="shield_gen_m_virtual_01" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component medium shield unhittable"/>
+    </connections>
+  </component>
+  <component name="shield_gen_m_yacht_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shieldgen_01" tags="component mandatory medium shield ship_gen_m_yacht_01 unhittable"/>
+    </connections>
+  </component>
+  <component name="shield_gen_s_racer_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="connection01" tags="component shield small small_racer"/>
+    </connections>
+  </component>
+  <component name="shield_gen_s_virtual_01" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component shield small"/>
+    </connections>
+  </component>
+  <component name="shield_kha_l_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="component khaak large shield "/>
+    </connections>
+  </component>
+  <component name="shield_kha_m_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="medium shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_kha_m_standard_02_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="medium shield component hittable standard "/>
+    </connections>
+  </component>
+  <component name="shield_kha_m_standard_03_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="component khaak medium shield "/>
+    </connections>
+  </component>
+  <component name="shield_kha_xl_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="component extralarge khaak shield "/>
+    </connections>
+  </component>
+  <component name="shield_par_l_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="small_Con_shieldgen_01" tags="component large shield standard "/>
+    </connections>
+  </component>
+  <component name="shield_par_l_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="small_Con_shieldgen_01" tags="component large shield standard "/>
+    </connections>
+  </component>
+  <component name="shield_pir_xl_battleship_01_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="extralarge shield pir_battleship_01 component "/>
+    </connections>
+  </component>
+  <component name="shield_spl_l_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="small_Con_shieldgen_01" tags="large shield component standard "/>
+    </connections>
+  </component>
+  <component name="shield_spl_l_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="small_Con_shieldgen_01" tags="large shield component standard "/>
+    </connections>
+  </component>
+  <component name="shield_spl_m_standard_02_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component hittable standard "/>
+    </connections>
+  </component>
+  <component name="shield_spl_m_standard_02_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component hittable standard "/>
+    </connections>
+  </component>
+  <component name="shield_spl_xl_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shieldgen_01" tags="extralarge shield component  standard "/>
+    </connections>
+  </component>
+  <component name="shield_ter_l_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shieldgen_01" tags="large shield component standard "/>
+    </connections>
+  </component>
+  <component name="shield_ter_l_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="con_shieldgen_01" tags="large shield component standard "/>
+    </connections>
+  </component>
+  <component name="shield_ter_l_standard_01_mk3" class="shieldgenerator">
+    <connections>
+      <connection name="con_shieldgen_01" tags="large shield component standard "/>
+    </connections>
+  </component>
+  <component name="shield_ter_l_standard_02_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield" tags="advanced component large shield "/>
+    </connections>
+  </component>
+  <component name="shield_ter_l_standard_02_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield" tags="advanced component large shield "/>
+    </connections>
+  </component>
+  <component name="shield_ter_l_standard_02_mk3" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield" tags="advanced component large shield "/>
+    </connections>
+  </component>
+  <component name="shield_ter_m_standard_02_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component hittable standard "/>
+    </connections>
+  </component>
+  <component name="shield_ter_m_standard_02_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component hittable standard "/>
+    </connections>
+  </component>
+  <component name="shield_ter_m_standard_02_mk3" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component hittable standard "/>
+    </connections>
+  </component>
+  <component name="shield_ter_m_standard_04_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component hittable medium shield "/>
+    </connections>
+  </component>
+  <component name="shield_ter_m_standard_04_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component hittable medium shield "/>
+    </connections>
+  </component>
+  <component name="shield_ter_m_standard_04_mk3" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="advanced component hittable medium shield "/>
+    </connections>
+  </component>
+  <component name="shield_ter_m_virtual_01" class="shieldgenerator">
+    <connections>
+      <connection name="ParentConnection" tags="advanced component medium shield unhittable"/>
+    </connections>
+  </component>
+  <component name="shield_ter_s_virtual_01" class="shieldgenerator">
+    <connections>
+      <connection name="ParentConnection" tags="advanced component shield small"/>
+    </connections>
+  </component>
+  <component name="shield_ter_s_xperimental_01" class="shieldgenerator">
+    <connections>
+      <connection name="ParentConnection" tags="component shield ship_ter_s_xperimental_01 small"/>
+    </connections>
+  </component>
+  <component name="shield_ter_xl_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shieldgen_01" tags="extralarge shield component  standard "/>
+    </connections>
+  </component>
+  <component name="shield_ter_xl_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="con_shieldgen_01" tags="extralarge shield component  standard "/>
+    </connections>
+  </component>
+  <component name="shield_xen_l_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="small_Con_shieldgen_01" tags="large shield component standard "/>
+    </connections>
+  </component>
+  <component name="shield_xen_l_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="small_Con_shieldgen_01" tags="large shield component standard "/>
+    </connections>
+  </component>
+  <component name="shield_xen_l_standard_02_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield" tags="component large shield xenon "/>
+    </connections>
+  </component>
+  <component name="shield_xen_l_standard_02_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield" tags="component large shield xenon "/>
+    </connections>
+  </component>
+  <component name="shield_xen_m_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_xen_m_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="shield_xen_m_standard_02_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component hittable standard "/>
+    </connections>
+  </component>
+  <component name="shield_xen_m_standard_02_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="Con_shieldgen_01" tags="medium shield component hittable standard "/>
+    </connections>
+  </component>
+  <component name="shield_xen_m_standard_04_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield_01" tags="component hittable medium shield xenon "/>
+    </connections>
+  </component>
+  <component name="shield_xen_m_virtual_01" class="shieldgenerator">
+    <connections>
+      <connection name="ParentConnection" tags="component medium shield unhittable xenon"/>
+    </connections>
+  </component>
+  <component name="shield_xen_s_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="Connection01" tags="small shield component standard "/>
+    </connections>
+  </component>
+  <component name="shield_xen_s_standard_01_mk2" class="shieldgenerator">
+    <connections>
+      <connection name="Connection01" tags="small shield component standard "/>
+    </connections>
+  </component>
+  <component name="shield_xen_s_virtual_01" class="shieldgenerator">
+    <connections>
+      <connection name="ParentConnection" tags="component shield small xenon"/>
+    </connections>
+  </component>
+  <component name="shield_xen_xl_mothership_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="con_shield" tags="component extralarge shield ship_xen_xl_mothership_01 "/>
+    </connections>
+  </component>
+  <component name="shield_xen_xl_standard_01_mk1" class="shieldgenerator">
+    <connections>
+      <connection name="small_Con_shieldgen_01" tags="extralarge shield component  standard "/>
+    </connections>
+  </component>
+  <component name="thruster_gen_l_allround_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="thruster large component"/>
+    </connections>
+  </component>
+  <component name="thruster_gen_l_allround_01_mk2" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="thruster large component"/>
+    </connections>
+  </component>
+  <component name="thruster_gen_l_allround_01_mk3" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="thruster large component"/>
+    </connections>
+  </component>
+  <component name="thruster_gen_m_allround_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="thruster medium component"/>
+    </connections>
+  </component>
+  <component name="thruster_gen_m_allround_01_mk2" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="thruster medium component"/>
+    </connections>
+  </component>
+  <component name="thruster_gen_m_allround_01_mk3" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="thruster medium component"/>
+    </connections>
+  </component>
+  <component name="thruster_gen_m_combat_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="thruster medium component"/>
+    </connections>
+  </component>
+  <component name="thruster_gen_m_combat_01_mk2" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="thruster medium component"/>
+    </connections>
+  </component>
+  <component name="thruster_gen_m_combat_01_mk3" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="thruster medium component"/>
+    </connections>
+  </component>
+  <component name="thruster_gen_s_allround_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="thruster small component"/>
+    </connections>
+  </component>
+  <component name="thruster_gen_s_allround_01_mk2" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="thruster small component"/>
+    </connections>
+  </component>
+  <component name="thruster_gen_s_allround_01_mk3" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="thruster small component"/>
+    </connections>
+  </component>
+  <component name="thruster_gen_s_combat_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="thruster small component"/>
+    </connections>
+  </component>
+  <component name="thruster_gen_s_combat_01_mk2" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="thruster small component"/>
+    </connections>
+  </component>
+  <component name="thruster_gen_s_combat_01_mk3" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="thruster small component"/>
+    </connections>
+  </component>
+  <component name="thruster_gen_xl_allround_01_mk1" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="thruster extralarge component"/>
+    </connections>
+  </component>
+  <component name="thruster_gen_xl_allround_01_mk2" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="thruster extralarge component"/>
+    </connections>
+  </component>
+  <component name="thruster_gen_xl_allround_01_mk3" class="engine">
+    <connections>
+      <connection name="EngineConnection01" tags="thruster extralarge component"/>
+    </connections>
+  </component>
+  <component name="turret_arg_l_beam_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_beam_l" tags="turret large standard component combat "/>
+    </connections>
+  </component>
+  <component name="turret_arg_l_dumbfire_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_turret_dumbfire_l" tags="turret large missile component standard "/>
+    </connections>
+  </component>
+  <component name="turret_arg_l_guided_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_turret_guided_l" tags="turret large missile component standard "/>
+    </connections>
+  </component>
+  <component name="turret_arg_l_laser_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_laser_l" tags="turret large standard component  combat "/>
+    </connections>
+  </component>
+  <component name="turret_arg_l_mining_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_mining_l" tags="turret large mining component standard "/>
+    </connections>
+  </component>
+  <component name="turret_arg_l_plasma_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_plasma_l" tags="turret large standard component combat "/>
+    </connections>
+  </component>
+  <component name="turret_arg_m_beam_01_mk1" class="turret">
+    <connections>
+      <connection name="con_beam_turret_01" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_arg_m_beam_02_mk1" class="turret">
+    <connections>
+      <connection name="con_beam_turret_01" tags="turret medium standard component hittable combat "/>
+    </connections>
+  </component>
+  <component name="turret_arg_m_dumbfire_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_dumbfire_turret" tags="turret medium missile component unhittable  standard "/>
+    </connections>
+  </component>
+  <component name="turret_arg_m_dumbfire_02_mk1" class="missileturret">
+    <connections>
+      <connection name="con_dumbfire_turret" tags="turret medium missile component hittable  standard "/>
+    </connections>
+  </component>
+  <component name="turret_arg_m_flak_01_mk1" class="turret">
+    <connections>
+      <connection name="con_flak_turret" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_arg_m_flak_02_mk1" class="turret">
+    <connections>
+      <connection name="con_flak_turret" tags="turret medium standard component hittable combat "/>
+    </connections>
+  </component>
+  <component name="turret_arg_m_gatling_01_mk1" class="turret">
+    <connections>
+      <connection name="con_gatling_turret" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_arg_m_gatling_02_mk1" class="turret">
+    <connections>
+      <connection name="con_gatling_turret" tags="turret medium standard component hittable combat "/>
+    </connections>
+  </component>
+  <component name="turret_arg_m_guided_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_guided_turret" tags="turret medium missile component unhittable standard "/>
+    </connections>
+  </component>
+  <component name="turret_arg_m_guided_02_mk1" class="missileturret">
+    <connections>
+      <connection name="con_guided_turret" tags="turret medium missile component hittable standard "/>
+    </connections>
+  </component>
+  <component name="turret_arg_m_laser_01_mk1" class="turret">
+    <connections>
+      <connection name="con_laser_turret_01" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_arg_m_laser_02_mk1" class="turret">
+    <connections>
+      <connection name="con_laser_turret_01" tags="turret medium standard hittable component combat "/>
+    </connections>
+  </component>
+  <component name="turret_arg_m_mining_01_mk1" class="turret">
+    <connections>
+      <connection name="con_mining_turret" tags="advanced component medium mining turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_arg_m_mining_02_mk1" class="turret">
+    <connections>
+      <connection name="con_mining_turret" tags="turret medium mining hittable component standard "/>
+    </connections>
+  </component>
+  <component name="turret_arg_m_plasma_01_mk1" class="turret">
+    <connections>
+      <connection name="con_plasma_turret" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_arg_m_plasma_02_mk1" class="turret">
+    <connections>
+      <connection name="con_plasma_turret" tags="turret medium standard hittable component combat "/>
+    </connections>
+  </component>
+  <component name="turret_arg_m_shotgun_01_mk1" class="turret">
+    <connections>
+      <connection name="con_shotgun_turret" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_arg_m_shotgun_02_mk1" class="turret">
+    <connections>
+      <connection name="con_shotgun_turret" tags="turret medium standard component hittable combat "/>
+    </connections>
+  </component>
+  <component name="turret_bor_l_disruptor_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_01" tags="advanced combat component large turret "/>
+    </connections>
+  </component>
+  <component name="turret_bor_l_flak_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret" tags="advanced combat component large turret "/>
+    </connections>
+  </component>
+  <component name="turret_bor_l_laser_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_01" tags="advanced combat component large turret "/>
+    </connections>
+  </component>
+  <component name="turret_bor_l_mining_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret" tags="advanced component large mining turret "/>
+    </connections>
+  </component>
+  <component name="turret_bor_m_arc_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_01" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_bor_m_arc_02_mk1" class="turret">
+    <connections>
+      <connection name="con_turret" tags="advanced combat component hittable medium turret "/>
+    </connections>
+  </component>
+  <component name="turret_bor_m_dumbfire_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_turret" tags="advanced component hittable medium missile turret "/>
+    </connections>
+  </component>
+  <component name="turret_bor_m_guided_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_turret" tags="advanced component hittable medium missile turret "/>
+    </connections>
+  </component>
+  <component name="turret_bor_m_laser_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_bor_m_laser_02_mk1" class="turret">
+    <connections>
+      <connection name="con_turret" tags="advanced combat component hittable medium turret "/>
+    </connections>
+  </component>
+  <component name="turret_bor_m_mining_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_01" tags="advanced component medium mining turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_bor_m_mining_02_mk1" class="turret">
+    <connections>
+      <connection name="con_turret" tags="advanced component hittable medium mining turret "/>
+    </connections>
+  </component>
+  <component name="turret_bor_m_railgun_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_01" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_bor_m_railgun_02_mk1" class="turret">
+    <connections>
+      <connection name="con_turret" tags="advanced combat component hittable medium turret "/>
+    </connections>
+  </component>
+  <component name="turret_gen_m_disabler_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_gen_m_gatling_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_gen_m_scrapbeam_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_01" tags="turret medium mandatory ship_gen_m_tugboat_01 unhittable component"/>
+    </connections>
+  </component>
+  <component name="turret_gen_m_shieldpierce_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_gen_m_yacht_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_01" tags="turret medium mandatory ship_gen_m_yacht_01 unhittable component"/>
+    </connections>
+  </component>
+  <component name="turret_kha_l_beam_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret" tags="combat component khaak large turret "/>
+    </connections>
+  </component>
+  <component name="turret_kha_m_beam_01_mk1" class="turret">
+    <connections>
+      <connection name="connection_component01" tags="component turret medium standard hittable   combat "/>
+    </connections>
+  </component>
+  <component name="turret_par_l_beam_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_beam_l" tags="turret large standard component combat "/>
+    </connections>
+  </component>
+  <component name="turret_par_l_dumbfire_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_turret_dumbfire_l" tags="turret large missile component standard "/>
+    </connections>
+  </component>
+  <component name="turret_par_l_guided_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_turret_guided_l" tags="turret large missile component standard "/>
+    </connections>
+  </component>
+  <component name="turret_par_l_laser_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_laser_l" tags="turret large standard component  combat "/>
+    </connections>
+  </component>
+  <component name="turret_par_l_mining_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_mining_l" tags="turret large mining component standard "/>
+    </connections>
+  </component>
+  <component name="turret_par_l_plasma_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_plasma_l" tags="turret large standard component combat "/>
+    </connections>
+  </component>
+  <component name="turret_par_m_beam_01_mk1" class="turret">
+    <connections>
+      <connection name="con_beam_turret_01" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_par_m_beam_02_mk1" class="turret">
+    <connections>
+      <connection name="con_beam_turret_01" tags="turret medium standard component hittable combat "/>
+    </connections>
+  </component>
+  <component name="turret_par_m_dumbfire_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_dumbfire_turret" tags="turret medium missile component unhittable  standard "/>
+    </connections>
+  </component>
+  <component name="turret_par_m_dumbfire_02_mk1" class="missileturret">
+    <connections>
+      <connection name="con_dumbfire_turret" tags="turret medium missile component hittable  standard "/>
+    </connections>
+  </component>
+  <component name="turret_par_m_gatling_01_mk1" class="turret">
+    <connections>
+      <connection name="con_gatling_turret" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_par_m_gatling_02_mk1" class="turret">
+    <connections>
+      <connection name="con_gatling_turret" tags="turret medium standard component hittable combat "/>
+    </connections>
+  </component>
+  <component name="turret_par_m_guided_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_guided_turret" tags="turret medium missile component unhittable standard "/>
+    </connections>
+  </component>
+  <component name="turret_par_m_guided_02_mk1" class="missileturret">
+    <connections>
+      <connection name="con_guided_turret" tags="turret medium missile component hittable standard "/>
+    </connections>
+  </component>
+  <component name="turret_par_m_laser_01_mk1" class="turret">
+    <connections>
+      <connection name="con_laser_turret_01" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_par_m_laser_02_mk1" class="turret">
+    <connections>
+      <connection name="con_laser_turret_01" tags="turret medium standard hittable component combat "/>
+    </connections>
+  </component>
+  <component name="turret_par_m_mining_01_mk1" class="turret">
+    <connections>
+      <connection name="con_mining_turret" tags="advanced component mining turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_par_m_mining_02_mk1" class="turret">
+    <connections>
+      <connection name="con_mining_turret" tags="turret medium mining hittable component standard "/>
+    </connections>
+  </component>
+  <component name="turret_par_m_plasma_01_mk1" class="turret">
+    <connections>
+      <connection name="con_plasma_turret" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_par_m_plasma_02_mk1" class="turret">
+    <connections>
+      <connection name="con_plasma_turret" tags="turret medium standard hittable component combat "/>
+    </connections>
+  </component>
+  <component name="turret_par_m_shotgun_01_mk1" class="turret">
+    <connections>
+      <connection name="con_shotgun_turret" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_par_m_shotgun_02_mk1" class="turret">
+    <connections>
+      <connection name="con_shotgun_turret" tags="turret medium standard component hittable combat "/>
+    </connections>
+  </component>
+  <component name="turret_pir_l_battleship_01_laser_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_laser_l" tags="turret large pir_battleship_01 component "/>
+    </connections>
+  </component>
+  <component name="turret_pir_m_battleship_01_gatling_02_mk1" class="turret">
+    <connections>
+      <connection name="con_gatling_turret" tags="turret medium pir_battleship_01 component hittable"/>
+    </connections>
+  </component>
+  <component name="turret_spl_l_beam_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_laser_l" tags="turret large standard component  combat "/>
+    </connections>
+  </component>
+  <component name="turret_spl_l_dumbfire_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_turret_dumbfire_l" tags="turret large missile component standard "/>
+    </connections>
+  </component>
+  <component name="turret_spl_l_guided_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_turret_dumbfire_l" tags="turret large missile component standard "/>
+    </connections>
+  </component>
+  <component name="turret_spl_l_laser_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_laser_l" tags="turret large standard component  combat "/>
+    </connections>
+  </component>
+  <component name="turret_spl_l_mining_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_mining_l" tags="turret large mining component  standard "/>
+    </connections>
+  </component>
+  <component name="turret_spl_l_plasma_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_laser_l" tags="turret large standard component  combat "/>
+    </connections>
+  </component>
+  <component name="turret_spl_m_beam_01_mk1" class="turret">
+    <connections>
+      <connection name="con_beam_turret_01" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_spl_m_beam_02_mk1" class="turret">
+    <connections>
+      <connection name="con_beam_turret_01" tags="turret medium standard component hittable combat "/>
+    </connections>
+  </component>
+  <component name="turret_spl_m_dumbfire_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_dumbfire_turret" tags="turret medium missile component unhittable  standard"/>
+    </connections>
+  </component>
+  <component name="turret_spl_m_dumbfire_02_mk1" class="missileturret">
+    <connections>
+      <connection name="con_dumbfire_turret" tags="turret medium missile component hittable  standard "/>
+    </connections>
+  </component>
+  <component name="turret_spl_m_flak_01_mk1" class="turret">
+    <connections>
+      <connection name="con_flak_turret" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_spl_m_flak_02_mk1" class="turret">
+    <connections>
+      <connection name="con_flak_turret" tags="turret medium standard component hittable combat "/>
+    </connections>
+  </component>
+  <component name="turret_spl_m_gatling_01_mk1" class="turret">
+    <connections>
+      <connection name="con_gatling_turret" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_spl_m_gatling_02_mk1" class="turret">
+    <connections>
+      <connection name="con_gatling_turret" tags="turret medium standard component hittable combat "/>
+    </connections>
+  </component>
+  <component name="turret_spl_m_guided_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_guided_turret" tags="turret medium missile component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="turret_spl_m_guided_02_mk1" class="missileturret">
+    <connections>
+      <connection name="con_guided_turret" tags="turret medium missile component hittable standard "/>
+    </connections>
+  </component>
+  <component name="turret_spl_m_laser_01_mk1" class="turret">
+    <connections>
+      <connection name="con_laser_turret_01" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_spl_m_laser_02_mk1" class="turret">
+    <connections>
+      <connection name="con_laser_turret_01" tags="turret medium standard hittable component combat "/>
+    </connections>
+  </component>
+  <component name="turret_spl_m_mining_01_mk1" class="turret">
+    <connections>
+      <connection name="con_mining_turret" tags="advanced component medium mining turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_spl_m_mining_02_mk1" class="turret">
+    <connections>
+      <connection name="con_mining_turret" tags="turret medium mining hittable component standard "/>
+    </connections>
+  </component>
+  <component name="turret_spl_m_plasma_01_mk1" class="turret">
+    <connections>
+      <connection name="con_plasma_turret" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_spl_m_plasma_02_mk1" class="turret">
+    <connections>
+      <connection name="con_plasma_turret" tags="turret medium standard hittable component combat "/>
+    </connections>
+  </component>
+  <component name="turret_spl_m_shotgun_01_mk1" class="turret">
+    <connections>
+      <connection name="con_shotgun_turret" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_spl_m_shotgun_02_mk1" class="turret">
+    <connections>
+      <connection name="con_shotgun_turret" tags="turret medium standard component hittable combat "/>
+    </connections>
+  </component>
+  <component name="turret_tel_l_beam_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_beam_l" tags="turret large standard component combat "/>
+    </connections>
+  </component>
+  <component name="turret_tel_l_dumbfire_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_turret_dumbfire_l" tags="turret large missile component standard "/>
+    </connections>
+  </component>
+  <component name="turret_tel_l_guided_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_turret_guided_l" tags="turret large missile component standard "/>
+    </connections>
+  </component>
+  <component name="turret_tel_l_laser_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_laser_l" tags="turret large standard component  combat "/>
+    </connections>
+  </component>
+  <component name="turret_tel_l_mining_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_mining_l" tags="turret large mining component standard "/>
+    </connections>
+  </component>
+  <component name="turret_tel_l_plasma_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_plasma_l" tags="turret large standard component combat "/>
+    </connections>
+  </component>
+  <component name="turret_tel_m_beam_01_mk1" class="turret">
+    <connections>
+      <connection name="con_beam_turret_01" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_tel_m_beam_02_mk1" class="turret">
+    <connections>
+      <connection name="con_beam_turret_01" tags="turret medium standard component hittable combat "/>
+    </connections>
+  </component>
+  <component name="turret_tel_m_dumbfire_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_dumbfire_turret" tags="turret medium missile component unhittable  standard "/>
+    </connections>
+  </component>
+  <component name="turret_tel_m_dumbfire_02_mk1" class="missileturret">
+    <connections>
+      <connection name="con_dumbfire_turret" tags="turret medium missile component hittable  standard "/>
+    </connections>
+  </component>
+  <component name="turret_tel_m_gatling_01_mk1" class="turret">
+    <connections>
+      <connection name="con_gatling_turret" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_tel_m_gatling_02_mk1" class="turret">
+    <connections>
+      <connection name="con_gatling_turret" tags="turret medium standard component hittable combat "/>
+    </connections>
+  </component>
+  <component name="turret_tel_m_guided_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_guided_turret" tags="turret medium missile component unhittable standard "/>
+    </connections>
+  </component>
+  <component name="turret_tel_m_guided_02_mk1" class="missileturret">
+    <connections>
+      <connection name="con_guided_turret" tags="turret medium missile component hittable standard "/>
+    </connections>
+  </component>
+  <component name="turret_tel_m_laser_01_mk1" class="turret">
+    <connections>
+      <connection name="con_laser_turret_01" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_tel_m_laser_02_mk1" class="turret">
+    <connections>
+      <connection name="con_laser_turret_01" tags="turret medium standard hittable component combat "/>
+    </connections>
+  </component>
+  <component name="turret_tel_m_mining_01_mk1" class="turret">
+    <connections>
+      <connection name="con_mining_turret" tags="advanced component medium mining turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_tel_m_mining_02_mk1" class="turret">
+    <connections>
+      <connection name="con_mining_turret" tags="turret medium mining hittable component standard "/>
+    </connections>
+  </component>
+  <component name="turret_tel_m_plasma_01_mk1" class="turret">
+    <connections>
+      <connection name="con_plasma_turret" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_tel_m_plasma_02_mk1" class="turret">
+    <connections>
+      <connection name="con_plasma_turret" tags="turret medium standard hittable component combat "/>
+    </connections>
+  </component>
+  <component name="turret_tel_m_shotgun_01_mk1" class="turret">
+    <connections>
+      <connection name="con_shotgun_turret" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_tel_m_shotgun_02_mk1" class="turret">
+    <connections>
+      <connection name="con_shotgun_turret" tags="turret medium standard component hittable combat "/>
+    </connections>
+  </component>
+  <component name="turret_ter_l_beam_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_laser_l" tags="turret large standard component  combat "/>
+    </connections>
+  </component>
+  <component name="turret_ter_l_dumbfire_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_missileturret" tags="turret large missile component standard "/>
+    </connections>
+  </component>
+  <component name="turret_ter_l_gatling_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_laser_l" tags="turret large standard component  combat "/>
+    </connections>
+  </component>
+  <component name="turret_ter_l_guided_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_missileturret" tags="turret large missile component standard "/>
+    </connections>
+  </component>
+  <component name="turret_ter_l_laser_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_laser_l" tags="turret large standard component  combat "/>
+    </connections>
+  </component>
+  <component name="turret_ter_l_mining_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_laser_l" tags="turret large mining component  standard "/>
+    </connections>
+  </component>
+  <component name="turret_ter_m_beam_01_mk1" class="turret">
+    <connections>
+      <connection name="con_beam_turret_01" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_ter_m_beam_02_mk1" class="turret">
+    <connections>
+      <connection name="con_beam_turret_01" tags="turret medium standard component hittable combat "/>
+    </connections>
+  </component>
+  <component name="turret_ter_m_dumbfire_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_dumbfire_turret" tags="turret medium missile component unhittable  standard "/>
+    </connections>
+  </component>
+  <component name="turret_ter_m_dumbfire_02_mk1" class="missileturret">
+    <connections>
+      <connection name="con_dumbfire_turret" tags="turret medium missile component hittable  standard "/>
+    </connections>
+  </component>
+  <component name="turret_ter_m_gatling_01_mk1" class="turret">
+    <connections>
+      <connection name="con_gatling_turret" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_ter_m_gatling_02_mk1" class="turret">
+    <connections>
+      <connection name="con_gatling_turret" tags="turret medium standard component hittable combat "/>
+    </connections>
+  </component>
+  <component name="turret_ter_m_guided_01_mk1" class="missileturret">
+    <connections>
+      <connection name="con_guided_turret" tags="turret medium missile component unhittable standard"/>
+    </connections>
+  </component>
+  <component name="turret_ter_m_guided_02_mk1" class="missileturret">
+    <connections>
+      <connection name="con_guided_turret" tags="turret medium missile component hittable standard "/>
+    </connections>
+  </component>
+  <component name="turret_ter_m_laser_01_mk1" class="turret">
+    <connections>
+      <connection name="con_laser_turret_01" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_ter_m_laser_02_mk1" class="turret">
+    <connections>
+      <connection name="con_laser_turret_01" tags="turret medium standard hittable component combat "/>
+    </connections>
+  </component>
+  <component name="turret_ter_m_laser_03_mk1" class="turret">
+    <connections>
+      <connection name="con_turret" tags="advanced combat component medium turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_ter_m_laser_04_mk1" class="turret">
+    <connections>
+      <connection name="con_turret" tags="advanced combat component hittable medium turret "/>
+    </connections>
+  </component>
+  <component name="turret_ter_m_mining_01_mk1" class="turret">
+    <connections>
+      <connection name="con_mining_turret" tags="advanced component medium mining turret unhittable "/>
+    </connections>
+  </component>
+  <component name="turret_ter_m_mining_02_mk1" class="turret">
+    <connections>
+      <connection name="con_mining_turret" tags="turret medium mining hittable component standard "/>
+    </connections>
+  </component>
+  <component name="turret_xen_l_laser_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret_laser_l" tags="turret large standard component  combat "/>
+    </connections>
+  </component>
+  <component name="turret_xen_l_plasma_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret" tags="combat component large turret xenon "/>
+    </connections>
+  </component>
+  <component name="turret_xen_m_gatling_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret" tags="combat component medium turret unhittable xenon "/>
+    </connections>
+  </component>
+  <component name="turret_xen_m_gatling_02_mk1" class="turret">
+    <connections>
+      <connection name="con_turret" tags="combat component hittable medium turret xenon "/>
+    </connections>
+  </component>
+  <component name="turret_xen_m_laser_01_mk1" class="turret">
+    <connections>
+      <connection name="con_laser_turret_01" tags="combat component medium turret unhittable xenon "/>
+    </connections>
+  </component>
+  <component name="turret_xen_m_laser_02_mk1" class="turret">
+    <connections>
+      <connection name="con_laser_turret_01" tags="turret medium standard hittable component combat "/>
+    </connections>
+  </component>
+  <component name="turret_xen_xl_battleship_01_mk1" class="turret">
+    <connections>
+      <connection name="con_turret" tags="component extralarge ship_xen_xl_mothership_01 turret "/>
+    </connections>
+  </component>
+  <component name="weapon_arg_l_destroyer_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="arg_destroyer_01 component large weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_arg_m_ion_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_arg_m_ion_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_arg_s_ion_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_arg_s_ion_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_atf_xl_battleship_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="component extralarge mandatory weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_bor_l_beam_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="advanced component large weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_bor_m_dumbfire_01_mk1" class="missilelauncher">
+    <connections>
+      <connection name="con_weapon_01" tags="advanced combat component medium missile weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_bor_m_flak_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_bor_m_guided_01_mk1" class="missilelauncher">
+    <connections>
+      <connection name="con_weapon_01" tags="advanced combat component medium missile weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_bor_m_laser_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_bor_m_mining_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="advanced component medium mining weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_bor_m_railgun_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_bor_m_torpedo_01_mk1" class="missilelauncher">
+    <connections>
+      <connection name="con_weapon_01" tags="advanced combat component medium missile weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_bor_s_arc_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_bor_s_dumbfire_01_mk1" class="missilelauncher">
+    <connections>
+      <connection name="con_weapon_01" tags="advanced combat component missile small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_bor_s_gatling_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_bor_s_guided_01_mk1" class="missilelauncher">
+    <connections>
+      <connection name="con_weapon_01" tags="advanced combat component missile small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_bor_s_laser_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_bor_s_mining_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="advanced component mining small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_bor_s_torpedo_01_mk1" class="missilelauncher">
+    <connections>
+      <connection name="con_weapon_01" tags="advanced combat component missile small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_beam_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_beam_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_disabler_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="component mandatory medium ship_gen_m_corvette_01 weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_dumbfire_01_mk1" class="missilelauncher">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced component medium missile weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_dumbfire_01_mk2" class="missilelauncher">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced component medium missile weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_gatling_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_gatling_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_guided_01_mk1" class="missilelauncher">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced component medium missile weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_guided_01_mk2" class="missilelauncher">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced component medium missile weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_laser_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_laser_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_mining_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced component medium mining weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_mining_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced component medium mining weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_missile_01" class="missilelauncher">
+    <connections>
+      <connection name="con_missilelauncher_01" tags="advanced component medium missile weapon"/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_plasma_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_plasma_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_shieldpierce_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="component mandatory medium ship_gen_m_corvette_01 weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_shotgun_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_shotgun_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_torpedo_01_mk1" class="missilelauncher">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced component medium missile weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_torpedo_01_mk2" class="missilelauncher">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced component medium missile weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_m_yacht_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon01" tags="component mandatory medium ship_gen_m_yacht_01 weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_beam_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_beam_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_burst_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_burst_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_cannon_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_cannon_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_dumbfire_01_mk1" class="missilelauncher">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced component missile small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_dumbfire_01_mk2" class="missilelauncher">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced component missile small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_gatling_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_gatling_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_guided_01_mk1" class="missilelauncher">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced component missile small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_guided_01_mk2" class="missilelauncher">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced component missile small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_laser_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_laser_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_mining_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced component mining small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_mining_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced component mining small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_missile_01" class="missilelauncher">
+    <connections>
+      <connection name="con_missilelauncher_01" tags="advanced component missile small weapon"/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_plasma_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_plasma_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_shotgun_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_shotgun_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_torpedo_01_mk1" class="missilelauncher">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced component missile small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_gen_s_torpedo_01_mk2" class="missilelauncher">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced component missile small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_kha_l_beam_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="combat component large mandatory ship_kha_l_destroyer_01 weapon"/>
+    </connections>
+  </component>
+  <component name="weapon_kha_m_laser_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="component weapon medium standard combat"/>
+    </connections>
+  </component>
+  <component name="weapon_kha_s_laser_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="component weapon small standard combat"/>
+    </connections>
+  </component>
+  <component name="weapon_kha_xl_battleship_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="combat component extralarge mandatory ship_kha_xl_battleship_01 weapon"/>
+    </connections>
+  </component>
+  <component name="weapon_par_l_destroyer_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="component weapon large par_destroyer_01 "/>
+    </connections>
+  </component>
+  <component name="weapon_par_l_expeditionary_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="component large ship_par_l_expeditionary_01 weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_par_m_railgun_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_par_m_railgun_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_par_s_railgun_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_par_s_railgun_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_pir_xl_battleship_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="component extralarge pir_battleship_01 weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_spl_l_destroyer_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="component large spl_destroyer_01 weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_spl_m_gatling_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_spl_m_gatling_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_spl_m_railgun_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_spl_m_railgun_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_spl_m_shotgun_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_spl_m_shotgun_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_spl_m_sticky_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_spl_m_sticky_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_spl_s_gatling_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_spl_s_gatling_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_spl_s_railgun_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_spl_s_railgun_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_spl_s_shotgun_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_spl_s_shotgun_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_spl_s_sticky_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_spl_s_sticky_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_tel_l_destroyer_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="component weapon large tel_destroyer_01"/>
+    </connections>
+  </component>
+  <component name="weapon_tel_m_charge_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_tel_m_charge_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_tel_s_charge_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_tel_s_charge_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_ter_l_destroyer_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="component large ter_destroyer_01 weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_ter_l_flagship_01_mk1" class="missilelauncher">
+    <connections>
+      <connection name="con_weapon_01" tags="component large mandatory ship_ter_l_flagship_01 weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_ter_m_beam_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="component highpower medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_ter_m_beam_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="component highpower medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_ter_m_gatling_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="component highpower medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_ter_m_gatling_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="component highpower medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_ter_m_laser_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_ter_m_laser_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_ter_m_laser_02_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="advanced combat component medium weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_ter_s_beam_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="component highpower small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_ter_s_beam_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="component highpower small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_ter_s_gatling_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="component highpower small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_ter_s_gatling_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="component highpower small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_ter_s_laser_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_ter_s_laser_01_mk2" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_ter_s_laser_02_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="advanced combat component small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_ter_s_plasma_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="combat component ship_ter_s_xperimental_01 small weapon "/>
+    </connections>
+  </component>
+  <component name="weapon_xen_m_beam_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="combat component medium weapon xenon "/>
+    </connections>
+  </component>
+  <component name="weapon_xen_m_laser_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="component weapon medium standard combat"/>
+    </connections>
+  </component>
+  <component name="weapon_xen_m_laser_02_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="combat component medium weapon xenon "/>
+    </connections>
+  </component>
+  <component name="weapon_xen_m_mining_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="component weapon medium mining  standard "/>
+    </connections>
+  </component>
+  <component name="weapon_xen_m_mining_02_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="component medium mining weapon xenon "/>
+    </connections>
+  </component>
+  <component name="weapon_xen_s_gatling_01_mk1" class="weapon">
+    <connections>
+      <connection name="con_weapon_01" tags="combat component small weapon xenon "/>
+    </connections>
+  </component>
+  <component name="weapon_xen_s_laser_01_mk1" class="weapon">
+    <connections>
+      <connection name="WeaponCon_01" tags="component weapon small standard combat"/>
+    </connections>
+  </component>
+</components>

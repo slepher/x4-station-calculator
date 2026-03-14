@@ -1,0 +1,685 @@
+<?xml version="1.0" encoding="utf-8"?>
+<macros>
+  <macro name="Cluster_602_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="Zone002_Cluster_602_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-4656.418" y="0" z="-121536.6" />
+        </offset>
+        <macro ref="Zone002_Cluster_602_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_602_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-133889.7" y="0" z="-88467.94" />
+        </offset>
+        <macro ref="Zone004_Cluster_602_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_602_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-113247.6" y="0" z="72268.07" />
+        </offset>
+        <macro ref="Zone005_Cluster_602_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_602_Sector001_connection" ref="zones">
+        <offset>
+          <position x="85.55412" y="0" z="115545.4" />
+        </offset>
+        <macro ref="Zone001_Cluster_602_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_602_Sector001_connection" ref="zones">
+        <offset>
+          <position x="121474.9" y="0" z="-4501.229" />
+        </offset>
+        <macro ref="Zone003_Cluster_602_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_603_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="Zone003_Cluster_603_Sector001_connection" ref="zones">
+        <offset>
+          <position x="123600.2" y="0" z="-99607.15" />
+        </offset>
+        <macro ref="Zone003_Cluster_603_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_603_Sector001_connection" ref="zones">
+        <offset>
+          <position x="22972.12" y="0" z="119150.4" />
+        </offset>
+        <macro ref="Zone002_Cluster_603_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_603_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-98169.94" y="0" z="101618.8" />
+        </offset>
+        <macro ref="Zone001_Cluster_603_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_603_Sector001_connection" ref="zones">
+        <offset>
+          <position x="142074" y="0" z="71801.65" />
+        </offset>
+        <macro ref="Zone004_Cluster_603_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_603_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-57990.49" y="0" z="-130164.1" />
+        </offset>
+        <macro ref="Zone005_Cluster_603_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_605_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <properties>
+      <navigation highres="true"/>
+    </properties>
+    <connections>
+      <connection name="Zone004_Cluster_605_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-84684.0" y="0" z="55644.57" />
+        </offset>
+        <macro ref="Zone004_Cluster_605_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_605_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-15863.0" y="0" z="31730.0" />
+        </offset>
+        <macro ref="Zone001_Cluster_605_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_605_Sector001_connection" ref="zones">
+        <offset>
+          <position x="90789.0" y="0" z="39800.822" />
+        </offset>
+        <macro ref="Zone005_Cluster_605_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_605_Sector001_connection" ref="zones">
+        <offset>
+          <position x="55319.0" y="0" z="-98948.0" />
+        </offset>
+        <macro ref="Zone002_Cluster_605_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_605_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-87130.6" y="0" z="-70078.0" />
+        </offset>
+        <macro ref="Zone003_Cluster_605_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Highway01_Cluster605_S1_connection" ref="zonehighways">
+        <offset>
+          <position x="54045.97" y="0" z="-1369.687" />
+        </offset>
+        <macro ref="Highway01_Cluster605_S1_macro" connection="sector">
+          <connections>
+            <connection ref="exitpoint">
+              <macro path="../../Zone005_Cluster_605_Sector001_connection" connection="Highway01Connection02_gate" />
+            </connection>
+            <connection ref="entrypoint">
+              <macro path="../../Zone002_Cluster_605_Sector001_connection" connection="Highway01Connection01_gate" />
+            </connection>
+          </connections>
+        </macro>
+      </connection>
+      <connection name="Highway02_Cluster605_S1_connection" ref="zonehighways">
+        <offset>
+          <position x="-5172.099" y="-4515.625" z="103353.3" />
+        </offset>
+        <macro ref="Highway02_Cluster605_S1_macro" connection="sector">
+          <connections>
+            <connection ref="exitpoint">
+              <macro path="../../Zone004_Cluster_605_Sector001_connection" connection="Highway02Connection02_gate" />
+            </connection>
+            <connection ref="entrypoint">
+              <macro path="../../Zone005_Cluster_605_Sector001_connection" connection="Highway02Connection01_gate" />
+            </connection>
+          </connections>
+        </macro>
+      </connection>
+      <connection name="Highway03_Cluster605_S1_connection" ref="zonehighways">
+        <offset>
+          <position x="-119591.6" y="-5000" z="34557.91" />
+        </offset>
+        <macro ref="Highway03_Cluster605_S1_macro" connection="sector">
+          <connections>
+            <connection ref="entrypoint">
+              <macro path="../../Zone004_Cluster_605_Sector001_connection" connection="Highway03Connection01_gate" />
+            </connection>
+            <connection ref="exitpoint">
+              <macro path="../../Zone003_Cluster_605_Sector001_connection" connection="Highway03Connection02_gate" />
+            </connection>
+          </connections>
+        </macro>
+      </connection>
+      <connection name="Highway04_Cluster605_S1_connection" ref="zonehighways">
+        <offset>
+          <position x="3199.005" y="0" z="-73723.76" />
+        </offset>
+        <macro ref="Highway04_Cluster605_S1_macro" connection="sector">
+          <connections>
+            <connection ref="exitpoint">
+              <macro path="../../Zone002_Cluster_605_Sector001_connection" connection="Highway04Connection02_gate" />
+            </connection>
+            <connection ref="entrypoint">
+              <macro path="../../Zone003_Cluster_605_Sector001_connection" connection="Highway04Connection01_gate" />
+            </connection>
+          </connections>
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_606_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="tzoneCluster_606_Sector001SHCon6_GateZone_connection" ref="zones">
+        <offset>
+          <position x="-50000" y="0" z="-200000" />
+        </offset>
+        <macro ref="tzoneCluster_606_Sector001SHCon6_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="tzoneCluster_606_Sector001SHCon10_GateZone_connection" ref="zones">
+        <offset>
+          <position x="-43159.09" y="0" z="-200000" />
+        </offset>
+        <macro ref="tzoneCluster_606_Sector001SHCon10_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="tzoneCluster_606_Sector001SHCon11_GateZone_connection" ref="zones">
+        <offset>
+          <position x="200000" y="0" z="50000" />
+        </offset>
+        <macro ref="tzoneCluster_606_Sector001SHCon11_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_606_Sector001_connection" ref="zones">
+        <offset>
+          <position x="51992.35" y="0" z="-1060.822" />
+        </offset>
+        <macro ref="Zone005_Cluster_606_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_606_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-127513.9" y="0" z="82085.13" />
+        </offset>
+        <macro ref="Zone004_Cluster_606_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_606_Sector001_connection" ref="zones">
+        <offset>
+          <position x="133484.8" y="0" z="131372.6" />
+        </offset>
+        <macro ref="Zone001_Cluster_606_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_606_Sector001_connection" ref="zones">
+        <offset>
+          <position x="105554.4" y="0" z="-127903.8" />
+        </offset>
+        <macro ref="Zone003_Cluster_606_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_606_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-22721.23" y="0" z="-122067.9" />
+        </offset>
+        <macro ref="Zone002_Cluster_606_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Highway01_Cluster606_S1_connection" ref="zonehighways">
+        <offset>
+          <position x="-17970.55" y="0" z="28692.03" />
+        </offset>
+        <macro ref="Highway01_Cluster606_S1_macro" connection="sector">
+          <connections>
+            <connection ref="entrypoint">
+              <macro path="../../Zone001_Cluster_606_Sector001_connection" connection="Highway01Connection01_gate" />
+            </connection>
+            <connection ref="exitpoint">
+              <macro path="../../Zone002_Cluster_606_Sector001_connection" connection="Highway01Connection02_gate" />
+            </connection>
+          </connections>
+        </macro>
+      </connection>
+      <connection name="Highway02_Cluster606_S1_connection" ref="zonehighways">
+        <offset>
+          <position x="10844.69" y="0" z="27861.63" />
+        </offset>
+        <macro ref="Highway02_Cluster606_S1_macro" connection="sector">
+          <connections>
+            <connection ref="exitpoint">
+              <macro path="../../Zone001_Cluster_606_Sector001_connection" connection="Highway02Connection02_gate" />
+            </connection>
+            <connection ref="entrypoint">
+              <macro path="../../Zone002_Cluster_606_Sector001_connection" connection="Highway02Connection01_gate" />
+            </connection>
+          </connections>
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_606_Sector002_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="tzoneCluster_606_Sector002SHCon5_GateZone_connection" ref="zones">
+        <offset>
+          <position x="40468.75" y="0" z="200000" />
+        </offset>
+        <macro ref="tzoneCluster_606_Sector002SHCon5_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="tzoneCluster_606_Sector002SHCon9_GateZone_connection" ref="zones">
+        <offset>
+          <position x="50000" y="0" z="200000" />
+        </offset>
+        <macro ref="tzoneCluster_606_Sector002SHCon9_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="tzoneCluster_606_Sector002SHCon11_GateZone_connection" ref="zones">
+        <offset>
+          <position x="200000" y="0" z="-40046.88" />
+        </offset>
+        <macro ref="tzoneCluster_606_Sector002SHCon11_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="tzoneCluster_606_Sector002SHCon12_GateZone_connection" ref="zones">
+        <offset>
+          <position x="200000" y="0" z="-25000" />
+        </offset>
+        <macro ref="tzoneCluster_606_Sector002SHCon12_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_606_Sector002_connection" ref="zones">
+        <offset>
+          <position x="-119849.7" y="0" z="-93007.81" />
+        </offset>
+        <macro ref="Zone004_Cluster_606_Sector002_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_606_Sector002_connection" ref="zones">
+        <offset>
+          <position x="-107447.6" y="0" z="124554.7" />
+        </offset>
+        <macro ref="Zone001_Cluster_606_Sector002_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_606_Sector002_connection" ref="zones">
+        <offset>
+          <position x="-6696.777" y="0" z="-60289.06" />
+        </offset>
+        <macro ref="Zone005_Cluster_606_Sector002_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_606_Sector002_connection" ref="zones">
+        <offset>
+          <position x="50325.93" y="0" z="153750" />
+        </offset>
+        <macro ref="Zone002_Cluster_606_Sector002_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_606_Sector002_connection" ref="zones">
+        <offset>
+          <position x="156852" y="0" z="-61492.19" />
+        </offset>
+        <macro ref="Zone003_Cluster_606_Sector002_macro" connection="sector" />
+      </connection>
+      <connection name="Highway01_Cluster606_S2_connection" ref="zonehighways">
+        <offset>
+          <position x="6150.4678" y="0" z="78687.5" />
+        </offset>
+        <macro ref="Highway01_Cluster606_S2_macro" connection="sector">
+          <connections>
+            <connection ref="entrypoint">
+              <macro path="../../Zone005_Cluster_606_Sector002_connection" connection="Highway01Connection01_gate" />
+            </connection>
+            <connection ref="exitpoint">
+              <macro path="../../Zone002_Cluster_606_Sector002_connection" connection="Highway01Connection02_gate" />
+            </connection>
+          </connections>
+        </macro>
+      </connection>
+      <connection name="Highway02_Cluster606_S2_connection" ref="zonehighways">
+        <offset>
+          <position x="34209.69" y="0" z="62898.44" />
+        </offset>
+        <macro ref="Highway02_Cluster606_S2_macro" connection="sector">
+          <connections>
+            <connection ref="exitpoint">
+              <macro path="../../Zone005_Cluster_606_Sector002_connection" connection="Highway02Connection02_gate" />
+            </connection>
+            <connection ref="entrypoint">
+              <macro path="../../Zone002_Cluster_606_Sector002_connection" connection="Highway02Connection01_gate" />
+            </connection>
+          </connections>
+        </macro>
+      </connection>
+      <connection name="Highway03_Cluster606_S2_connection" ref="zonehighways">
+        <offset>
+          <position x="78014.28" y="0" z="-49441.5" />
+        </offset>
+        <macro ref="Highway03_Cluster606_S2_macro" connection="sector">
+          <connections>
+            <connection ref="entrypoint">
+              <macro path="../../Zone005_Cluster_606_Sector002_connection" connection="Highway03Connection01_gate" />
+            </connection>
+            <connection ref="exitpoint">
+              <macro path="../../Zone003_Cluster_606_Sector002_connection" connection="Highway03Connection02_gate" />
+            </connection>
+          </connections>
+        </macro>
+      </connection>
+      <connection name="Highway04_Cluster606_S2_connection" ref="zonehighways">
+        <offset>
+          <position x="64403.44" y="0" z="-58960.13" />
+        </offset>
+        <macro ref="Highway04_Cluster606_S2_macro" connection="sector">
+          <connections>
+            <connection ref="exitpoint">
+              <macro path="../../Zone005_Cluster_606_Sector002_connection" connection="Highway04Connection02_gate" />
+            </connection>
+            <connection ref="entrypoint">
+              <macro path="../../Zone003_Cluster_606_Sector002_connection" connection="Highway04Connection01_gate" />
+            </connection>
+          </connections>
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_606_Sector003_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="tzoneCluster_606_Sector003SHCon7_GateZone_connection" ref="zones">
+        <offset>
+          <position x="-200000" y="0" z="-44060.06" />
+        </offset>
+        <macro ref="tzoneCluster_606_Sector003SHCon7_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="tzoneCluster_606_Sector003SHCon8_GateZone_connection" ref="zones">
+        <offset>
+          <position x="-200000" y="0" z="-25000" />
+        </offset>
+        <macro ref="tzoneCluster_606_Sector003SHCon8_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_606_Sector003_connection" ref="zones">
+        <offset>
+          <position x="115195.3" y="0" z="14787.11" />
+        </offset>
+        <macro ref="Zone002_Cluster_606_Sector003_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_606_Sector003_connection" ref="zones">
+        <offset>
+          <position x="-3023.438" y="0" z="-6614.258" />
+        </offset>
+        <macro ref="Zone005_Cluster_606_Sector003_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_606_Sector003_connection" ref="zones">
+        <offset>
+          <position x="-144757.8" y="0" z="-39335.94" />
+        </offset>
+        <macro ref="Zone004_Cluster_606_Sector003_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_606_Sector003_connection" ref="zones">
+        <offset>
+          <position x="117000" y="0" z="-133457" />
+        </offset>
+        <macro ref="Zone003_Cluster_606_Sector003_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_606_Sector003_connection" ref="zones">
+        <offset>
+          <position x="-46281.25" y="0" z="138438.5" />
+        </offset>
+        <macro ref="Zone001_Cluster_606_Sector003_macro" connection="sector" />
+      </connection>
+      <connection name="Highway01_Cluster606_S3_connection" ref="zonehighways">
+        <offset>
+          <position x="-134710.9" y="0" z="56698.24" />
+        </offset>
+        <macro ref="Highway01_Cluster606_S3_macro" connection="sector">
+          <connections>
+            <connection ref="exitpoint">
+              <macro path="../../Zone004_Cluster_606_Sector003_connection" connection="Highway01Connection02_gate" />
+            </connection>
+            <connection ref="entrypoint">
+              <macro path="../../Zone001_Cluster_606_Sector003_connection" connection="Highway01Connection01_gate" />
+            </connection>
+          </connections>
+        </macro>
+      </connection>
+      <connection name="Highway02_Cluster606_S3_connection" ref="zonehighways">
+        <offset>
+          <position x="-92679.69" y="0" z="52495.12" />
+        </offset>
+        <macro ref="Highway02_Cluster606_S3_macro" connection="sector">
+          <connections>
+            <connection ref="entrypoint">
+              <macro path="../../Zone004_Cluster_606_Sector003_connection" connection="Highway02Connection01_gate" />
+            </connection>
+            <connection ref="exitpoint">
+              <macro path="../../Zone001_Cluster_606_Sector003_connection" connection="Highway02Connection02_gate" />
+            </connection>
+          </connections>
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_604_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="Zone004_Cluster_604_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-22312.77" y="0" z="118045.5" />
+        </offset>
+        <macro ref="Zone004_Cluster_604_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_604_Sector001_connection" ref="zones">
+        <offset>
+          <position x="121771.5" y="0" z="106741.4" />
+        </offset>
+        <macro ref="Zone002_Cluster_604_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_604_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-73025.88" y="0" z="-1060.822" />
+        </offset>
+        <macro ref="Zone005_Cluster_604_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_604_Sector001_connection" ref="zones">
+        <offset>
+          <position x="105554.4" y="0" z="-127903.8" />
+        </offset>
+        <macro ref="Zone003_Cluster_604_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_604_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-30677.88" y="0" z="-122754.3" />
+        </offset>
+        <macro ref="Zone001_Cluster_604_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_607_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="Zone001_Cluster_607_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-96044.66" y="0" z="106400.7" />
+        </offset>
+        <macro ref="Zone001_Cluster_607_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_607_Sector001_connection" ref="zones">
+        <offset>
+          <position x="23503.43" y="0" z="118619.1" />
+        </offset>
+        <macro ref="Zone002_Cluster_607_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_607_Sector001_connection" ref="zones">
+        <offset>
+          <position x="131077.1" y="0" z="2934.617" />
+        </offset>
+        <macro ref="Zone005_Cluster_607_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_607_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-76997.9" y="0" z="-117440.4" />
+        </offset>
+        <macro ref="Zone004_Cluster_607_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_607_Sector001_connection" ref="zones">
+        <offset>
+          <position x="105554.4" y="0" z="-127903.8" />
+        </offset>
+        <macro ref="Zone003_Cluster_607_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_601_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="Zone004_Cluster_601_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-127517.8" y="0" z="34255.37" />
+        </offset>
+        <macro ref="Zone004_Cluster_601_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_601_Sector001_connection" ref="zones">
+        <offset>
+          <position x="85.55412" y="0" z="115545.4" />
+        </offset>
+        <macro ref="Zone001_Cluster_601_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_601_Sector001_connection" ref="zones">
+        <offset>
+          <position x="137328.5" y="0" z="138576.5" />
+        </offset>
+        <macro ref="Zone002_Cluster_601_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_601_Sector001_connection" ref="zones">
+        <offset>
+          <position x="105554.4" y="0" z="-127903.8" />
+        </offset>
+        <macro ref="Zone003_Cluster_601_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_601_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-129500.2" y="0" z="-126969.5" />
+        </offset>
+        <macro ref="Zone005_Cluster_601_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_608_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="Zone001_Cluster_608_Sector001_connection" ref="zones">
+        <offset>
+          <position x="138576.6" y="0" z="85026.23" />
+        </offset>
+        <macro ref="Zone001_Cluster_608_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_608_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-115973.5" y="0" z="117824.6" />
+        </offset>
+        <macro ref="Zone002_Cluster_608_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_608_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-14468.67" y="0" z="-1060.822" />
+        </offset>
+        <macro ref="Zone005_Cluster_608_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_608_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-128151.2" y="0" z="-109468.4" />
+        </offset>
+        <macro ref="Zone004_Cluster_608_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_608_Sector001_connection" ref="zones">
+        <offset>
+          <position x="105554.4" y="0" z="-127903.8" />
+        </offset>
+        <macro ref="Zone003_Cluster_608_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Highway02_Cluster608_S1_connection" ref="zonehighways">
+        <offset>
+          <position x="-77095.79" y="0" z="22713.1" />
+        </offset>
+        <macro ref="Highway02_Cluster608_S1_macro" connection="sector">
+          <connections>
+            <connection ref="entrypoint">
+              <macro path="../../Zone002_Cluster_608_Sector001_connection" connection="Highway02Connection01_gate" />
+            </connection>
+            <connection ref="exitpoint">
+              <macro path="../../Zone004_Cluster_608_Sector001_connection" connection="Highway02Connection02_gate" />
+            </connection>
+          </connections>
+        </macro>
+      </connection>
+      <connection name="Highway01_Cluster608_S1_connection" ref="zonehighways">
+        <offset>
+          <position x="-88389.38" y="0" z="23377.43" />
+        </offset>
+        <macro ref="Highway01_Cluster608_S1_macro" connection="sector">
+          <connections>
+            <connection ref="exitpoint">
+              <macro path="../../Zone002_Cluster_608_Sector001_connection" connection="Highway01Connection02_gate" />
+            </connection>
+            <connection ref="entrypoint">
+              <macro path="../../Zone004_Cluster_608_Sector001_connection" connection="Highway01Connection01_gate" />
+            </connection>
+          </connections>
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_609_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="Zone001_Cluster_609_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-93144.93" y="0" z="68418.03" />
+        </offset>
+        <macro ref="Zone001_Cluster_609_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_609_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-67369.28" y="0" z="148723.7" />
+        </offset>
+        <macro ref="Zone002_Cluster_609_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_609_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-60807.18" y="0" z="-32170.72" />
+        </offset>
+        <macro ref="Zone005_Cluster_609_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_609_Sector001_connection" ref="zones">
+        <offset>
+          <position x="158696.5" y="0" z="-62249.09" />
+        </offset>
+        <macro ref="Zone004_Cluster_609_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_609_Sector001_connection" ref="zones">
+        <offset>
+          <position x="41106.73" y="0" z="-87067.31" />
+        </offset>
+        <macro ref="Zone003_Cluster_609_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Highway02_Cluster609_S1_connection" ref="zonehighways">
+        <offset>
+          <position x="17238.83" y="0" z="43307.28" />
+        </offset>
+        <macro ref="Highway02_Cluster609_S1_macro" connection="sector">
+          <connections>
+            <connection ref="exitpoint">
+              <macro path="../../Zone002_Cluster_609_Sector001_connection" connection="Highway02Connection02_gate" />
+            </connection>
+            <connection ref="entrypoint">
+              <macro path="../../Zone004_Cluster_609_Sector001_connection" connection="Highway02Connection01_gate" />
+            </connection>
+          </connections>
+        </macro>
+      </connection>
+      <connection name="Highway01_Cluster609_S1_connection" ref="zonehighways">
+        <offset>
+          <position x="35175.7" y="0" z="43307.28" />
+        </offset>
+        <macro ref="Highway01_Cluster609_S1_macro" connection="sector">
+          <connections>
+            <connection ref="entrypoint">
+              <macro path="../../Zone002_Cluster_609_Sector001_connection" connection="Highway01Connection01_gate" />
+            </connection>
+            <connection ref="exitpoint">
+              <macro path="../../Zone004_Cluster_609_Sector001_connection" connection="Highway01Connection02_gate" />
+            </connection>
+          </connections>
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+</macros>

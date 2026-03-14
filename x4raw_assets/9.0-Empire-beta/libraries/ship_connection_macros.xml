@@ -1,0 +1,3379 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<macros>
+  <macro name="bridge_arg_l_01_macro" class="cockpit">
+    <component ref="bridge_arg_l_01"/>
+    <properties>
+      <identification name="{20109,5501}"/>
+      <sound_occlusion inside="0.2"/>
+    </properties>
+  </macro>
+  <macro name="bridge_arg_xl_01_macro" class="cockpit">
+    <component ref="bridge_arg_xl_01"/>
+    <properties>
+      <identification name="{20109,5501}"/>
+      <sound_occlusion inside="0.2"/>
+    </properties>
+  </macro>
+  <macro name="bridge_bor_l_01_macro" class="cockpit">
+    <component ref="bridge_bor_l_01"/>
+    <properties>
+      <identification name="{20109,5501}"/>
+      <sound_occlusion inside="0.2"/>
+    </properties>
+  </macro>
+  <macro name="bridge_bor_xl_01_macro" class="cockpit">
+    <component ref="bridge_bor_xl_01"/>
+    <properties>
+      <identification name="{20109,5501}"/>
+      <sound_occlusion inside="0.2"/>
+    </properties>
+  </macro>
+  <macro name="bridge_par_l_01_macro" class="cockpit">
+    <component ref="bridge_par_l_01"/>
+    <properties>
+      <identification name="{20109,5501}"/>
+      <sound_occlusion inside="0.2"/>
+    </properties>
+  </macro>
+  <macro name="bridge_par_l_expeditionary_01_macro" class="cockpit">
+    <component ref="bridge_par_l_expeditionary_01"/>
+    <properties>
+      <identification name="{20109,5501}"/>
+      <sound_occlusion inside="0.2"/>
+    </properties>
+  </macro>
+  <macro name="bridge_par_xl_01_macro" class="cockpit">
+    <component ref="bridge_par_xl_01"/>
+    <properties>
+      <identification name="{20109,5501}"/>
+      <sound_occlusion inside="0.2"/>
+    </properties>
+  </macro>
+  <macro name="bridge_pir_l_01_macro" class="cockpit">
+    <component ref="bridge_pir_l_01"/>
+    <properties>
+      <identification name="{20109,5501}"/>
+      <sound_occlusion inside="0.2"/>
+    </properties>
+  </macro>
+  <macro name="bridge_pir_xl_01_macro" class="cockpit">
+    <component ref="bridge_pir_xl_01"/>
+    <properties>
+      <identification name="{20109,5501}"/>
+      <sound_occlusion inside="0.2"/>
+    </properties>
+  </macro>
+  <macro name="bridge_spl_l_01_macro" class="cockpit">
+    <component ref="bridge_spl_l_01"/>
+    <properties>
+      <identification name="{20109,5501}"/>
+      <sound_occlusion inside="0.2"/>
+    </properties>
+  </macro>
+  <macro name="bridge_spl_xl_01_macro" class="cockpit">
+    <component ref="bridge_spl_xl_01"/>
+    <properties>
+      <identification name="{20109,5501}"/>
+      <sound_occlusion inside="0.2"/>
+    </properties>
+  </macro>
+  <macro name="bridge_tel_l_01_macro" class="cockpit">
+    <component ref="bridge_tel_l_01"/>
+    <properties>
+      <identification name="{20109,5501}"/>
+      <sound_occlusion inside="0.2"/>
+    </properties>
+  </macro>
+  <macro name="bridge_tel_xl_01_macro" class="cockpit">
+    <component ref="bridge_tel_xl_01"/>
+    <properties>
+      <identification name="{20109,5501}"/>
+      <sound_occlusion inside="0.2"/>
+    </properties>
+  </macro>
+  <macro name="bridge_ter_l_01_macro" class="cockpit">
+    <component ref="bridge_ter_l_01"/>
+    <properties>
+      <identification name="{20109,5501}"/>
+      <sound_occlusion inside="0.2"/>
+    </properties>
+  </macro>
+  <macro name="bridge_ter_l_02_macro" class="cockpit">
+    <component ref="bridge_ter_l_02"/>
+    <properties>
+      <identification name="{20109,5501}"/>
+      <sound_occlusion inside="0.2"/>
+    </properties>
+  </macro>
+  <macro name="bridge_ter_xl_01_macro" class="cockpit">
+    <component ref="bridge_ter_xl_01"/>
+    <properties>
+      <identification name="{20109,5501}"/>
+      <sound_occlusion inside="0.2"/>
+    </properties>
+  </macro>
+  <macro name="bridge_tfm_l_01_macro" class="cockpit">
+    <component ref="bridge_tfm_l_01"/>
+    <properties>
+      <identification name="{20109,5501}"/>
+      <sound_occlusion inside="0.2"/>
+    </properties>
+  </macro>
+  <macro name="buildmodule_gen_carrier_macro" class="buildmodule">
+    <component ref="generic_buildmodule"/>
+    <properties>
+      <build/>
+      <hull integrated="1"/>
+      <secrecy level="3"/>
+      <builder usemasstraffic="0"/>
+      <supply classes="ship_m ship_s"/>
+    </properties>
+    <connections>
+      <connection name="buildprocessorconnection_01" ref="buildprocessorconnection">
+        <macro ref="buildprocessor_gen_01_macro" connection="object"/>
+      </connection>
+      <connection name="buildprocessorconnection_02" ref="buildprocessorconnection">
+        <macro ref="buildprocessor_gen_01_macro" connection="object"/>
+      </connection>
+      <connection name="buildprocessorconnection_03" ref="buildprocessorconnection">
+        <macro ref="buildprocessor_gen_01_macro" connection="object"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="buildmodule_gen_carrier_s_macro" class="buildmodule">
+    <component ref="generic_buildmodule"/>
+    <properties>
+      <build/>
+      <hull integrated="1"/>
+      <secrecy level="3"/>
+      <builder usemasstraffic="0"/>
+      <supply classes="ship_s"/>
+    </properties>
+    <connections>
+      <connection name="buildprocessorconnection_01" ref="buildprocessorconnection">
+        <macro ref="buildprocessor_gen_01_macro" connection="object"/>
+      </connection>
+      <connection name="buildprocessorconnection_02" ref="buildprocessorconnection">
+        <macro ref="buildprocessor_gen_01_macro" connection="object"/>
+      </connection>
+      <connection name="buildprocessorconnection_03" ref="buildprocessorconnection">
+        <macro ref="buildprocessor_gen_01_macro" connection="object"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="buildmodule_gen_resupplier_macro" class="buildmodule">
+    <component ref="generic_buildmodule"/>
+    <properties>
+      <build/>
+      <hull integrated="1"/>
+      <secrecy level="3"/>
+      <builder usemasstraffic="0"/>
+      <supply classes="ship_m ship_s ship_l ship_xl"/>
+    </properties>
+    <connections>
+      <connection name="buildprocessorconnection_01" ref="buildprocessorconnection">
+        <macro ref="buildprocessor_gen_01_macro" connection="object"/>
+      </connection>
+      <connection name="buildprocessorconnection_02" ref="buildprocessorconnection">
+        <macro ref="buildprocessor_gen_01_macro" connection="object"/>
+      </connection>
+      <connection name="buildprocessorconnection_03" ref="buildprocessorconnection">
+        <macro ref="buildprocessor_gen_01_macro" connection="object"/>
+      </connection>
+      <connection name="buildprocessorconnection_04" ref="buildprocessorconnection">
+        <macro ref="buildprocessor_gen_01_macro" connection="object"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="cockpit_gen_invisible_01_macro" class="cockpit">
+    <component ref="cockpit_invisible"/>
+    <properties>
+      <room walkable="0"/>
+      <wall opaque="1"/>
+    </properties>
+  </macro>
+  <macro name="cockpit_gen_virtual_01_macro" class="cockpit">
+    <component ref="generic_cockpit"/>
+    <properties>
+      <identification name="{20109,5401}" unique="0"/>
+    </properties>
+  </macro>
+  <macro name="cockpit_gen_xs_spacesuit_macro" class="cockpit">
+    <component ref="generic_cockpit"/>
+    <properties>
+      <identification name="{20109,5401}" unique="0"/>
+      <room walkable="0"/>
+      <sound_environment ref="small room"/>
+    </properties>
+  </macro>
+  <macro name="dismantleprocessor_gen_01_macro" class="dismantleprocessor">
+    <component ref="generic_dismantleprocessor"/>
+  </macro>
+  <macro name="dock_gen_xs_ship_01_macro" class="dockingbay">
+    <component ref="dock_gen_xs_ship_01"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock external="0" storage="0" allow="1" uselandinggear="0"/>
+      <undock rotate="0" speed="30" distance="50" allow="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_xs spacesuit"/>
+    </properties>
+  </macro>
+  <macro name="dock_gen_xs_ship_02_macro" class="dockingbay">
+    <component ref="dock_gen_xs_ship_02"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock external="0" storage="0" allow="1" uselandinggear="0"/>
+      <undock rotate="0" speed="30" distance="50" allow="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_xs spacesuit"/>
+    </properties>
+  </macro>
+  <macro name="dockarea_arg_m_ship_01_hightech_macro" class="dockarea">
+    <component ref="dockarea_arg_m_ship_01_hightech"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_hightech_macro">
+        <macro ref="dockingbay_arg_m_01_hightech_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_arg_m_ship_01_macro" class="dockarea">
+    <component ref="dockarea_arg_m_ship_01"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_macro">
+        <macro ref="dockingbay_arg_m_01_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_arg_m_ship_02_macro" class="dockarea">
+    <component ref="dockarea_arg_m_ship_02"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFordockingbay_arg_m_01_macro">
+        <macro ref="dockingbay_arg_m_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_m_01_macro#001">
+        <macro ref="dockingbay_arg_m_01_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_arg_s_ship_01_hightech_macro" class="dockarea">
+    <component ref="dockarea_arg_s_ship_01_hightech"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_arg_s_ship_01_macro" class="dockarea">
+    <component ref="dockarea_arg_s_ship_01"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_arg_s_ship_02_macro" class="dockarea">
+    <component ref="dockarea_arg_s_ship_02"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro1">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_arg_s_ship_03_macro" class="dockarea">
+    <component ref="dockarea_arg_s_ship_03"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro1">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro2">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro3">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_arg_s_ship_04_macro" class="dockarea">
+    <component ref="dockarea_arg_s_ship_04"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro1">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro2">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro3">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro4">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro5">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro6">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro7">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_arg_s_ship_06_macro" class="dockarea">
+    <component ref="dockarea_arg_s_ship_06"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#001">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#002">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#003">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#004">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#005">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#006">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#007">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_arg_s_ship_07_macro" class="dockarea">
+    <component ref="dockarea_arg_s_ship_07"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#001">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#002">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#003">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#004">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#005">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#006">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#007">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_arg_s_ship_08_macro" class="dockarea">
+    <component ref="dockarea_arg_s_ship_08"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#002">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#003">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#004">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#005">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_arg_s_ship_09_macro" class="dockarea">
+    <component ref="dockarea_arg_s_ship_09"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#002">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#003">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#004">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#005">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_arg_s_ship_10_macro" class="dockarea">
+    <component ref="dockarea_arg_s_ship_10"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#003">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro#004">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_arg_xl_builder_01_macro" class="dockarea">
+    <component ref="dockarea_arg_xl_builder_01"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_macro">
+        <macro ref="dockingbay_arg_m_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_arg_xl_carrier_01_macro" class="dockarea">
+    <component ref="dockarea_arg_xl_carrier_01"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_macro">
+        <macro ref="dockingbay_arg_m_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_macro1">
+        <macro ref="dockingbay_arg_m_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_macro2">
+        <macro ref="dockingbay_arg_m_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_macro3">
+        <macro ref="dockingbay_arg_m_01_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_arg_xl_resupplier_01_macro" class="dockarea">
+    <component ref="dockarea_arg_xl_resupplier_01"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_macro">
+        <macro ref="dockingbay_arg_m_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_macro1">
+        <macro ref="dockingbay_arg_m_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro1">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_atf_xl_battleship_01_macro" class="dockarea">
+    <component ref="dockarea_atf_xl_battleship_01"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_macro">
+        <macro ref="dockingbay_arg_m_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro1">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro2">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_par_l_destroyer_01_macro" class="dockarea">
+    <component ref="dockarea_par_l_destroyer_01"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_macro">
+        <macro ref="dockingbay_arg_m_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro1">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_par_l_expeditionary_01_macro" class="dockarea">
+    <component ref="dockarea_par_l_expeditionary_01"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <dock usetodockpos="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFordockingbay_arg_s_01_macro">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_par_l_miner_solid_01_macro" class="dockarea">
+    <component ref="dockarea_par_l_miner_solid_01"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro1">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_par_xl_carrier_01_macro" class="dockarea">
+    <component ref="dockarea_par_xl_carrier_01"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_macro">
+        <macro ref="dockingbay_arg_m_01_macro" connection="space"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_macro1">
+        <macro ref="dockingbay_arg_m_01_macro" connection="space"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_macro2">
+        <macro ref="dockingbay_arg_m_01_macro" connection="space"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_macro3">
+        <macro ref="dockingbay_arg_m_01_macro" connection="space"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro">
+        <macro ref="dockingbay_arg_s_01_macro" connection="space"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro1">
+        <macro ref="dockingbay_arg_s_01_macro" connection="space"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro2">
+        <macro ref="dockingbay_arg_s_01_macro" connection="space"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro3">
+        <macro ref="dockingbay_arg_s_01_macro" connection="space"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro4">
+        <macro ref="dockingbay_arg_s_01_macro" connection="space"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro5">
+        <macro ref="dockingbay_arg_s_01_macro" connection="space"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro6">
+        <macro ref="dockingbay_arg_s_01_macro" connection="space"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro7">
+        <macro ref="dockingbay_arg_s_01_macro" connection="space"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_par_xl_resupplier_01_macro" class="dockarea">
+    <component ref="dockarea_par_xl_resupplier_01"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_macro">
+        <macro ref="dockingbay_arg_m_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_macro1">
+        <macro ref="dockingbay_arg_m_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro1">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro2">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro3">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro4">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro5">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro6">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro7">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_pir_xl_battleship_01_macro" class="dockarea">
+    <component ref="dockarea_pir_xl_battleship_01"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_lowtech_macro">
+        <macro ref="dockingbay_arg_m_01_lowtech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_lowtech_macro">
+        <macro ref="dockingbay_arg_s_01_lowtech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_lowtech_macro1">
+        <macro ref="dockingbay_arg_s_01_lowtech_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_spl_xl_carrier_01_macro" class="dockarea">
+    <component ref="dockarea_spl_xl_carrier_01"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro1">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro10">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro11">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro12">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro13">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro14">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro15">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro16">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro17">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro18">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro19">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro2">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro20">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro3">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro4">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro5">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro6">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro7">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro8">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro9">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_spl_xl_resupplier_01_macro" class="dockarea">
+    <component ref="dockarea_spl_xl_resupplier_01"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_macro">
+        <macro ref="dockingbay_arg_m_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_macro1">
+        <macro ref="dockingbay_arg_m_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro1">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro2">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro3">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro4">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro5">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro6">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro7">
+        <macro ref="dockingbay_arg_s_01_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_tel_l_transporter_01_macro" class="dockarea">
+    <component ref="dockarea_tel_l_transporter_01"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro">
+        <macro ref="dockingbay_arg_s_01_macro" connection="space"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro1">
+        <macro ref="dockingbay_arg_s_01_macro" connection="space"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_tel_xl_carrier_01_macro" class="dockarea">
+    <component ref="dockarea_tel_xl_carrier_01"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_macro">
+        <macro ref="dockingbay_arg_m_01_macro" connection="space"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro">
+        <macro ref="dockingbay_arg_s_01_macro" connection="space"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_macro1">
+        <macro ref="dockingbay_arg_s_01_macro" connection="space"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_ter_xl_carrier_01_macro" class="dockarea">
+    <component ref="dockarea_ter_xl_carrier_01"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro1">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro10">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro11">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro12">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro13">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro14">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro15">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro16">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro17">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro2">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro3">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro4">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro5">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro6">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro7">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro8">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro9">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockarea_ter_xl_resupplier_01_macro" class="dockarea">
+    <component ref="dockarea_ter_xl_resupplier_01"/>
+    <properties>
+      <identification name="{20104, 70001}" description="{20104, 70002}"/>
+      <hull integrated="1"/>
+      <sound_occlusion inside="0.2" outside="0.5"/>
+    </properties>
+    <connections>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_hightech_macro">
+        <macro ref="dockingbay_arg_m_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_m_01_hightech_macro1">
+        <macro ref="dockingbay_arg_m_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro1">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro2">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro3">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro4">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro5">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro6">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+      <connection ref="ConnectionFor_dockingbay_arg_s_01_hightech_macro7">
+        <macro ref="dockingbay_arg_s_01_hightech_macro" connection="position"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="dockingbay_arg_m_01_hightech_macro" class="dockingbay">
+    <component ref="dockingbay_arg_m_01_hightech"/>
+    <properties>
+      <identification name="{20104,73001}" shortname="{20104,73003}" description="{20104,73002}"/>
+      <translationspeed max="10"/>
+      <translationacceleration max="3"/>
+      <effects>
+        <cargotube attach="dock_m_cargotube_attach" detach="dock_m_cargotube_detach"/>
+        <landing ref="ship_blowout_size_m">
+          <curve>
+            <point position="0" value="0"/>
+            <point position="1" value="1"/>
+            <point position="40" value="0"/>
+          </curve>
+        </landing>
+      </effects>
+      <dock external="1"/>
+      <docksize tags="dock_m"/>
+    </properties>
+  </macro>
+  <macro name="dockingbay_arg_m_01_lowtech_macro" class="dockingbay">
+    <component ref="dockingbay_arg_m_01_lowtech"/>
+    <properties>
+      <identification name="{20104,72801}" shortname="{20104,72803}" description="{20104,72802}"/>
+      <translationspeed max="10"/>
+      <translationacceleration max="3"/>
+      <effects>
+        <cargotube attach="dock_m_cargotube_attach" detach="dock_m_cargotube_detach"/>
+        <landing ref="ship_blowout_size_m">
+          <curve>
+            <point position="0" value="0"/>
+            <point position="1" value="1"/>
+            <point position="40" value="0"/>
+          </curve>
+        </landing>
+      </effects>
+      <dock external="1"/>
+      <docksize tags="dock_m"/>
+    </properties>
+  </macro>
+  <macro name="dockingbay_arg_m_01_macro" class="dockingbay">
+    <component ref="dockingbay_arg_m_01"/>
+    <properties>
+      <identification name="{20104,72901}" shortname="{20104,72903}" description="{20104,72902}"/>
+      <translationspeed max="10"/>
+      <translationacceleration max="3"/>
+      <effects>
+        <cargotube attach="dock_m_cargotube_attach" detach="dock_m_cargotube_detach"/>
+        <landing ref="ship_blowout_size_m">
+          <curve>
+            <point position="0" value="0"/>
+            <point position="1" value="1"/>
+            <point position="40" value="0"/>
+          </curve>
+        </landing>
+      </effects>
+      <dock external="1"/>
+      <docksize tags="dock_m"/>
+    </properties>
+  </macro>
+  <macro name="dockingbay_arg_s_01_hightech_macro" class="dockingbay">
+    <component ref="dockingbay_arg_s_01_hightech"/>
+    <properties>
+      <identification name="{20104,72701}" shortname="{20104,72703}" description="{20104,72702}"/>
+      <translationspeed max="5"/>
+      <translationacceleration max="2"/>
+      <effects>
+        <cargotube attach="dock_s_cargotube_attach" detach="dock_s_cargotube_detach"/>
+        <landing ref="ship_blowout_size_s">
+          <curve>
+            <point position="0" value="0"/>
+            <point position="1" value="1"/>
+            <point position="40" value="0"/>
+          </curve>
+        </landing>
+      </effects>
+      <dock external="1"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="dockingbay_arg_s_01_lowtech_macro" class="dockingbay">
+    <component ref="dockingbay_arg_s_01_lowtech"/>
+    <properties>
+      <identification name="{20104,72501}" shortname="{20104,72503}" description="{20104,72502}"/>
+      <translationspeed max="5"/>
+      <translationacceleration max="2"/>
+      <effects>
+        <cargotube attach="dock_s_cargotube_attach" detach="dock_s_cargotube_detach"/>
+        <landing ref="ship_blowout_size_s">
+          <curve>
+            <point position="0" value="0"/>
+            <point position="1" value="1"/>
+            <point position="40" value="0"/>
+          </curve>
+        </landing>
+      </effects>
+      <dock external="1"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="dockingbay_arg_s_01_macro" class="dockingbay">
+    <component ref="dockingbay_arg_s_01"/>
+    <properties>
+      <identification name="{20104,72601}" shortname="{20104,72603}" description="{20104,72602}"/>
+      <translationspeed max="5"/>
+      <translationacceleration max="2"/>
+      <effects>
+        <cargotube attach="dock_s_cargotube_attach" detach="dock_s_cargotube_detach"/>
+        <landing ref="ship_blowout_size_s">
+          <curve>
+            <point position="0" value="0"/>
+            <point position="1" value="1"/>
+            <point position="40" value="0"/>
+          </curve>
+        </landing>
+      </effects>
+      <dock external="1"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="engine_gen_spacesuit_01_mk1_macro" class="engine">
+    <component ref="generic_engine_spacesuit"/>
+    <properties>
+      <identification name="{20113,4001}" description="{20113,4002}" mk="1"/>
+      <boost duration="3600" thrust="2" acceleration="2" release="0" coast="0"/>
+      <thrust forward="0.3" reverse="0.3" strafe="0.3" pitch="0.3" yaw="0.3" roll="0.3"/>
+      <hull integrated="1"/>
+      <effects>
+        <boosting ref="arg_boost_fx_xs"/>
+      </effects>
+      <glow dynamic="0"/>
+      <sounds>
+        <enginedetail ref="enginedetail_spacesuit_01"/>
+      </sounds>
+      <decelerationcurve>
+        <point position="1" value="1"/>
+        <point position="1.25" value="2"/>
+        <point position="1.75" value="4"/>
+        <point position="2.1" value="4"/>
+        <point position="2.5" value="4"/>
+      </decelerationcurve>
+      <strafecurve>
+        <point position="1" value="1"/>
+        <point position="1.25" value="2"/>
+        <point position="1.75" value="4"/>
+        <point position="2.1" value="4"/>
+        <point position="2.5" value="4"/>
+      </strafecurve>
+    </properties>
+  </macro>
+  <macro name="engine_xen_xl_mothership_01_allround_mk1_macro" class="engine">
+    <component ref="engine_xen_xl_mothership_01_allround_mk1"/>
+    <properties>
+      <identification name="{20107,9024}" basename="{20107,9021}" shortname="{20107,9025}" makerrace="xenon" description="{20107,9022}" mk="1"/>
+      <thrust forward="35312" reverse="38844"/>
+      <hull max="151600" threshold="0.3"/>
+      <effects>
+        <traveling ref="gen_traveldrive_fx_xl"/>
+      </effects>
+      <decelerationcurve>
+        <point position="1.01" value="1"/>
+        <point position="1.2" value="2"/>
+        <point position="1.5" value="4"/>
+        <point position="1.7" value="6"/>
+        <point position="2.1" value="10"/>
+        <point position="2.5" value="20"/>
+      </decelerationcurve>
+      <strafecurve>
+        <point position="1.01" value="1"/>
+        <point position="1.2" value="2"/>
+        <point position="1.5" value="4"/>
+        <point position="1.7" value="6"/>
+        <point position="2.1" value="10"/>
+        <point position="2.5" value="20"/>
+      </strafecurve>
+    </properties>
+  </macro>
+  <macro name="launchtube_arg_s_01_macro" class="dockingbay">
+    <component ref="launchtube_arg_s_01"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock external="1" allow="0" allowunits="1" priority="1" uselandinggear="0"/>
+      <undock speed="300" distance="600"/>
+      <room walkable="0"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="launchtube_xen_s_01_macro" class="dockingbay">
+    <component ref="launchtube_xen_s_01"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock external="1" allow="1" priority="1" uselandinggear="0"/>
+      <undock speed="300" distance="600"/>
+      <room walkable="0"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="props_01_spl_coffin_01_macro" class="destructible">
+    <component ref="props_01_spl_coffin_01"/>
+    <properties>
+      <hull max="100" integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="props_xen_generator_01_macro" class="destructible">
+    <component ref="props_xen_generator_01"/>
+    <properties>
+      <identification name="{20109,7601}" surfaceelement="1"/>
+      <hull invulnerable="0" max="5000" integrated="0"/>
+    </properties>
+  </macro>
+  <macro name="room_gen_captainsquarter_01_macro" class="room">
+    <component ref="room_gen_captainsquarter_01"/>
+    <properties>
+      <identification name="{20007,1641}"/>
+    </properties>
+  </macro>
+  <macro name="room_gen_crewquarter_01_macro" class="room">
+    <component ref="room_gen_crewquarter_01"/>
+    <properties>
+      <identification name="{20007,1251}"/>
+    </properties>
+  </macro>
+  <macro name="shield_xen_xl_mothership_01_mk1_macro" class="shieldgenerator">
+    <component ref="shield_xen_xl_mothership_01_mk1"/>
+    <properties>
+      <identification name="{20106,9024}" basename="{20106,9021}" shortname="{20106,9025}" makerrace="xenon" description="{20106,9022}" mk="1"/>
+      <recharge max="86060" rate="240" delay="20.7" disruptionstability="10"/>
+      <hull max="25500"/>
+    </properties>
+  </macro>
+  <macro name="ship_spl_xl_ark_01_hab_l_01_macro" class="destructible">
+    <component ref="ship_spl_xl_ark_01_hab_l_01"/>
+    <properties>
+      <identification name="{20104,31201}" shortname="{20104,31203}" makerrace="split"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="ship_spl_xl_ark_01_hab_s_01_macro" class="destructible">
+    <component ref="ship_spl_xl_ark_01_hab_s_01"/>
+    <properties>
+      <identification name="{20104,31001}" shortname="{20104,31203}" makerrace="split"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="ship_spl_xl_ark_01_part_01_macro" class="destructible">
+    <component ref="ship_spl_xl_ark_01_part_01"/>
+    <properties>
+      <hull integrated="1" paint="1"/>
+      <autoaim allow="0"/>
+    </properties>
+    <connections>
+      <connection ref="con_dockarea_arg_s_ship_01">
+        <macro ref="dockarea_arg_s_ship_01_macro" connection="Connection01"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="ship_spl_xl_ark_01_part_02_macro" class="destructible">
+    <component ref="ship_spl_xl_ark_01_part_02"/>
+    <properties>
+      <hull integrated="1" paint="1"/>
+      <autoaim allow="0"/>
+    </properties>
+    <connections>
+      <connection ref="con_dockarea_arg_xl_builder_01">
+        <macro ref="dockarea_arg_xl_builder_01_macro" connection="Connection01"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="ship_spl_xl_ark_01_prod_cheltmeat_01_macro" class="destructible">
+    <component ref="ship_spl_xl_ark_01_prod_cheltmeat_01"/>
+    <properties>
+      <identification name="{20104,14901}" shortname="{20104,14903}" makerrace="split"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="ship_spl_xl_ark_01_prod_scruffinfruit_01_macro" class="destructible">
+    <component ref="ship_spl_xl_ark_01_prod_scruffinfruit_01"/>
+    <properties>
+      <identification name="{20104,14801}" shortname="{20104,14803}" makerrace="split"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="ship_spl_xl_ark_01_storage_l_container_01_macro" class="destructible">
+    <component ref="ship_spl_xl_ark_01_storage_l_container_01"/>
+    <properties>
+      <identification name="{20104,25301}" shortname="{20104,25303}" makerrace="split"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="ship_spl_xl_ark_01_storage_l_liquid_01_macro" class="destructible">
+    <component ref="ship_spl_xl_ark_01_storage_l_liquid_01"/>
+    <properties>
+      <identification name="{20104,26301}" shortname="{20104,26303}" makerrace="split"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="ship_spl_xl_ark_01_storage_m_liquid_01_macro" class="destructible">
+    <component ref="ship_spl_xl_ark_01_storage_m_liquid_01"/>
+    <properties>
+      <identification name="{20104,26201}" shortname="{20104,26203}" makerrace="split"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="ship_spl_xl_ark_01_storage_m_solid_01_macro" class="destructible">
+    <component ref="ship_spl_xl_ark_01_storage_m_solid_01"/>
+    <properties>
+      <identification name="{20104,27201}" shortname="{20104,27203}" makerrace="split"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="ship_spl_xl_ark_01_struct_base_02_macro" class="destructible">
+    <component ref="ship_spl_xl_ark_01_struct_base_02"/>
+    <properties>
+      <identification name="{20104,51101}" shortname="{20104,51103}" makerrace="split"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="ship_spl_xl_ark_01_struct_base_03_macro" class="destructible">
+    <component ref="ship_spl_xl_ark_01_struct_base_03"/>
+    <properties>
+      <identification name="{20104,51201}" shortname="{20104,51203}" makerrace="split"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="ship_spl_xl_ark_01_struct_cross_01_macro" class="destructible">
+    <component ref="ship_spl_xl_ark_01_struct_cross_01"/>
+    <properties>
+      <identification name="{20104,51901}" shortname="{20104,51903}" makerrace="split"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="ship_xen_xl_mothership_01_damagebody_01_macro" class="destructible">
+    <component ref="ship_xen_xl_mothership_01_damagebody_01"/>
+  </macro>
+  <macro name="ship_xen_xl_mothership_01_part_01_macro" class="destructible">
+    <component ref="ship_xen_xl_mothership_01_part_01"/>
+    <properties>
+      <identification name="{20109,13901}"/>
+      <hull integrated="1" paint="1"/>
+      <autoaim allow="0"/>
+    </properties>
+  </macro>
+  <macro name="ship_xen_xl_mothership_01_part_02_macro" class="destructible">
+    <component ref="ship_xen_xl_mothership_01_part_02"/>
+    <properties>
+      <identification name="{20109,14001}"/>
+      <hull integrated="1" paint="1"/>
+      <autoaim allow="0"/>
+    </properties>
+  </macro>
+  <macro name="ship_xen_xl_mothership_01_part_03_macro" class="destructible">
+    <component ref="ship_xen_xl_mothership_01_part_03"/>
+    <properties>
+      <identification name="{20109,14101}"/>
+      <hull integrated="1" paint="1"/>
+      <autoaim allow="0"/>
+    </properties>
+  </macro>
+  <macro name="ship_xen_xl_mothership_01_part_04_macro" class="destructible">
+    <component ref="ship_xen_xl_mothership_01_part_04"/>
+    <properties>
+      <identification name="{20109,14201}"/>
+      <hull integrated="1" paint="1"/>
+      <autoaim allow="0"/>
+    </properties>
+  </macro>
+  <macro name="ship_xen_xl_mothership_01_part_05_macro" class="destructible">
+    <component ref="ship_xen_xl_mothership_01_part_05"/>
+    <properties>
+      <identification name="{20109,14301}"/>
+      <hull integrated="1" paint="1"/>
+      <autoaim allow="0"/>
+    </properties>
+  </macro>
+  <macro name="ship_xen_xl_mothership_01_part_06_macro" class="defencemodule">
+    <component ref="ship_xen_xl_mothership_01_part_06"/>
+    <properties>
+      <identification name="{20109,14401}"/>
+      <hull max="27500" wreckintegrated="0" paint="1"/>
+      <autoaim allow="0"/>
+    </properties>
+    <connections>
+      <connection ref="con_turret_extralarge_01">
+        <macro ref="turret_xen_xl_battleship_01_mk1_macro" connection="con_turret"/>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="shipstorage_gen_m_01_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="10" external="0" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_m"/>
+    </properties>
+  </macro>
+  <macro name="shipstorage_gen_m_eight_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="8" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_m"/>
+    </properties>
+  </macro>
+  <macro name="shipstorage_gen_m_four_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="4" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_m"/>
+    </properties>
+  </macro>
+  <macro name="shipstorage_gen_m_six_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="6" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_m"/>
+    </properties>
+  </macro>
+  <macro name="shipstorage_gen_m_two_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="2" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_m"/>
+    </properties>
+  </macro>
+  <macro name="shipstorage_gen_s_01_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="40" external="0" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="shipstorage_gen_s_02_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="100" external="0" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="shipstorage_gen_s_eight_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="8" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="shipstorage_gen_s_few_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="5" external="0" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="shipstorage_gen_s_four_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="4" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="shipstorage_gen_s_frigate_01_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="1" external="0" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="shipstorage_gen_s_nine_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="9" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="shipstorage_gen_s_seventytwo_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="72" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="shipstorage_gen_s_six_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="6" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="shipstorage_gen_s_sixteen_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="16" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="shipstorage_gen_s_sixtyfour_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="64" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="shipstorage_gen_s_three_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="3" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="shipstorage_gen_s_twelve_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="12" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="shipstorage_gen_s_twentyeight_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="28" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="shipstorage_gen_s_twentyfour_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="24" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="shipstorage_gen_s_two_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="2" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_s"/>
+    </properties>
+  </macro>
+  <macro name="shipstorage_gen_xs_01_macro" class="dockingbay">
+    <component ref="generic_dockingbay"/>
+    <properties>
+      <identification name="{20104,79701}" description="{20104,79702}"/>
+      <dock capacity="10" external="0" storage="1"/>
+      <room walkable="0"/>
+      <docksize tags="dock_xs"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_l_destroyer_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="2300" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_l_destroyer_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="2760" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_l_destroyer_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="3100" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_l_miner_liquid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="42000" tags="liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_l_miner_liquid_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="50400" tags="liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_l_miner_solid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="40000" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_l_miner_solid_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="50400" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_l_trans_container_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="36000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_l_trans_container_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="43200" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_l_trans_container_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="33000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_l_trans_container_02_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="39600" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_l_trans_container_03_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="45000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_l_trans_container_03_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="54000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_l_trans_container_04_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="37000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_l_trans_container_04_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="44400" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_l_trans_container_05_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="29000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_l_trans_container_05_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="34800" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_m_bomber_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="880" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_m_bomber_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="1056" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_m_bomber_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="2370" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_m_frigate_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="1760" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_m_frigate_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="2112" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_m_miner_liquid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="10400" tags="liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_m_miner_liquid_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="12480" tags="liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_m_miner_solid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="9800" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_m_miner_solid_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="11760" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_m_trans_container_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="8200" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_m_trans_container_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="9840" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_m_trans_container_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="7400" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_m_trans_container_02_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="8880" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_s_fighter_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="240" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_s_fighter_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="288" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_s_fighter_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="150" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_s_fighter_02_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="180" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_s_fighter_03_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="150" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_s_fighter_04_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="190" tags="container"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_s_heavyfighter_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="350" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_s_heavyfighter_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="420" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_s_heavyfighter_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="320" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_s_miner_solid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="2600" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_s_scout_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="540" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_s_scout_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="648" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_s_trans_container_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="1960" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_s_trans_container_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="2352" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_s_trans_container_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="1030" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_s_trans_container_02_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="1236" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_xl_builder_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="50" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_xl_builder_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="50" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_xl_carrier_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="19000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_xl_carrier_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="22800" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_xl_carrier_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="25000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_xl_resupplier_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="29000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_arg_xl_resupplier_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="argon"/>
+      <cargo max="34800" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_atf_l_destroyer_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="3000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_atf_xl_battleship_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="9000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_bor_l_carrier_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="8000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_bor_l_destroyer_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="2000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_bor_l_miner_liquid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="42000" tags="liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_bor_l_miner_solid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="40000" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_bor_l_trans_container_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="30000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_bor_m_corvette_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="400" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_bor_m_gunboat_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="850" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_bor_m_miner_liquid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="8600" tags="liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_bor_m_miner_solid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="7800" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_bor_m_trans_container_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="9200" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_bor_s_fighter_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="270" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_bor_s_heavyfighter_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="boron"/>
+      <cargo max="330" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_bor_s_miner_solid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="boron"/>
+      <cargo max="2560" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_bor_s_scout_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="boron"/>
+      <cargo max="790" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_bor_s_scout_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="530" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_bor_s_trans_container_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="boron"/>
+      <cargo max="2230" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_bor_xl_builder_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="50" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_bor_xl_carrier_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="35000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_bor_xl_resupplier_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="40000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_gen_m_corvette_01_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="580" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_gen_m_corvette_02_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="380" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_gen_m_tugboat_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="1360" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_gen_m_yacht_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="4300" tags="container condensate"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_gen_s_fighter_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="700" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_gen_s_fighter_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="840" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_gen_s_racer_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="340" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_l_destroyer_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="1700" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_l_destroyer_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="2040" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_l_destroyer_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="2600" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_l_expeditionary_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="7000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_l_miner_liquid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="32000" tags="liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_l_miner_liquid_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="38400" tags="liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_l_miner_liquid_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="35200" tags="liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_l_miner_solid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="32000" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_l_miner_solid_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="38400" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_l_miner_solid_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="34960" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_l_trans_container_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="21000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_l_trans_container_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="25200" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_l_trans_container_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="19000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_l_trans_container_02_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="22800" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_l_trans_container_03_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="25500" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_m_corvette_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="560" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_m_corvette_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="672" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_m_frigate_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="1630" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_m_frigate_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="1956" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_m_miner_liquid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="9600" tags="liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_m_miner_liquid_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="11520" tags="liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_m_miner_solid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="9000" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_m_miner_solid_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="11520" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_m_trans_container_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="7900" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_m_trans_container_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="9480" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_m_trans_container_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="7100" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_m_trans_container_02_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="8520" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_m_trans_container_03_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="4000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_s_fighter_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="240" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_s_fighter_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="288" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_s_fighter_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="270" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_s_fighter_02_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="324" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_s_heavyfighter_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="270" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_s_miner_solid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="2100" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_s_scout_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="440" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_s_scout_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="528" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_s_trans_container_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="1580" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_s_trans_container_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="1896" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_xl_carrier_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="20000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_xl_carrier_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="24000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_xl_carrier_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="22000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_xl_resupplier_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="29000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_xl_resupplier_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="34800" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_par_xl_resupplier_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="paranid"/>
+      <cargo max="34040" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_pir_l_miner_solid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="34000" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_pir_l_scavenger_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="21000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_pir_l_scrapper_01_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="7700" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_pir_s_fighter_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="650" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_pir_s_fighter_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="500" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_pir_s_heavyfighter_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="590" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_pir_s_trans_condensate_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="250" tags="condensate"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_pir_s_trans_container_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="2080" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_pir_xl_battleship_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="56000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_l_destroyer_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="split"/>
+      <cargo max="800" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_l_miner_liquid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="split"/>
+      <cargo max="22000" tags="liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_l_miner_solid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="split"/>
+      <cargo max="20000" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_l_trans_container_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="split"/>
+      <cargo max="16000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_m_bomber_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="split"/>
+      <cargo max="740" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_m_corvette_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="split"/>
+      <cargo max="450" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_m_corvette_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="340" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_m_frigate_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="split"/>
+      <cargo max="1290" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_m_miner_liquid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="split"/>
+      <cargo max="7600" tags="liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_m_miner_solid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="split"/>
+      <cargo max="7000" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_m_trans_container_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="split"/>
+      <cargo max="7500" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_s_fighter_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="split"/>
+      <cargo max="540" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_s_fighter_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="split"/>
+      <cargo max="170" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_s_fighter_02_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="100" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_s_heavyfighter_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="split"/>
+      <cargo max="200" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_s_heavyfighter_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="split"/>
+      <cargo max="180" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_s_miner_solid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="split"/>
+      <cargo max="1720" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_s_scenariofighter_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="split"/>
+      <cargo max="200" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_s_scout_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="split"/>
+      <cargo max="380" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_s_trans_container_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="split"/>
+      <cargo max="1350" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_xl_ark_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="34000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_xl_battleship_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="split"/>
+      <cargo max="1000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_spl_xl_resupplier_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="split"/>
+      <cargo max="29000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_l_destroyer_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="3700" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_l_destroyer_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="4440" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_l_destroyer_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="4000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_l_miner_liquid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="44000" tags="liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_l_miner_liquid_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="52800" tags="liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_l_miner_liquid_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="54000" tags="liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_l_miner_solid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="48000" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_l_miner_solid_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="57600" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_l_miner_solid_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="50000" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_l_trans_container_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="40800" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_l_trans_container_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="51000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_l_trans_container_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="36800" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_l_trans_container_02_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="46000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_l_trans_container_03_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="62000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_m_bomber_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="850" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_m_bomber_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="1020" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_m_frigate_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="2430" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_m_frigate_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="2916" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_m_miner_liquid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="10800" tags="liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_m_miner_liquid_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="12960" tags="liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_m_miner_solid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="10000" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_m_miner_solid_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="12000" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_m_trans_container_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="12080" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_m_trans_container_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="15100" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_m_trans_container_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="10880" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_m_trans_container_02_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="13600" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_m_trans_container_03_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="7900" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_s_fighter_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="612" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_s_fighter_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="730" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_s_fighter_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="300" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_s_fighter_02_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="360" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_s_miner_solid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="3500" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_s_scout_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="760" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_s_scout_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="912" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_s_scout_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="960" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_s_scout_02_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="1152" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_s_trans_container_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="3096" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_s_trans_container_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="3870" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_s_trans_container_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="2580" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_xl_carrier_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="28000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_xl_carrier_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="33600" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_xl_resupplier_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="25000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_tel_xl_resupplier_01_b_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="teladi"/>
+      <cargo max="30000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_l_destroyer_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="terran"/>
+      <cargo max="2800" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_l_flagship_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="8600" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_l_miner_liquid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="terran"/>
+      <cargo max="38000" tags="liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_l_miner_solid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="terran"/>
+      <cargo max="38000" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_l_trans_container_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="terran"/>
+      <cargo max="42000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_m_corvette_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="terran"/>
+      <cargo max="560" tags="container"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_m_corvette_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="400" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_m_frigate_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="terran"/>
+      <cargo max="1500" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_m_gunboat_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="950" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_m_miner_liquid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="terran"/>
+      <cargo max="10000" tags="liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_m_miner_solid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="terran"/>
+      <cargo max="8800" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_m_trans_container_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="terran"/>
+      <cargo max="10700" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_s_fighter_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="terran"/>
+      <cargo max="140" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_s_fighter_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="180" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_s_fighter_03_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="110" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_s_fighter_04_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="100" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_s_heavyfighter_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="terran"/>
+      <cargo max="360" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_s_miner_solid_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="terran"/>
+      <cargo max="5480" tags="solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_s_scout_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="terran"/>
+      <cargo max="440" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_s_scout_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="670" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_s_trans_container_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="terran"/>
+      <cargo max="4120" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_s_xperimental_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="1100" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_xl_carrier_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="terran"/>
+      <cargo max="22000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_ter_xl_resupplier_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="terran"/>
+      <cargo max="43000" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_xen_l_terraformer_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="12000" tags="container solid liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_xen_m_corvette_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="750" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_xen_m_corvette_02_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="570" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_xen_m_miner_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <identification makerrace="xenon"/>
+      <cargo max="9500" tags="container solid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_xen_s_heavyfighter_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="280" tags="container"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_yak_m_corvette_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="1100" tags="container solid liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="storage_yak_s_fighter_01_a_macro" class="storage">
+    <component ref="generic_storage"/>
+    <properties>
+      <cargo max="510" tags="container solid liquid"/>
+      <hull integrated="1"/>
+    </properties>
+  </macro>
+  <macro name="turret_xen_l_plasma_01_mk1_story_macro" class="turret" alias="turret_xen_l_plasma_01_mk1_macro" ref="turret_xen_l_plasma_01_mk1_macro">
+    <component ref="turret_xen_l_plasma_01_mk1"/>
+    <properties>
+      <bullet class="bullet_xen_turret_l_plasma_01_mk1_story_macro"/>
+      <effects>
+        <sefx_damage_low ref="surfacemodule_damage_l_low"/>
+        <sefx_damage_medium ref="surfacemodule_damage_l_medium"/>
+        <sefx_damage_high ref="surfacemodule_damage_l_high"/>
+      </effects>
+    </properties>
+  </macro>
+  <macro name="turret_xen_xl_battleship_01_mk1_macro" class="turret">
+    <component ref="turret_xen_xl_battleship_01_mk1"/>
+    <properties>
+      <identification name="{20105,9074}" basename="{20105,9071}" shortname="{20105,9075}" makerrace="xenon" description="{20105,9072}" mk="1"/>
+      <bullet class="bullet_xen_turret_xl_beam_01_mk1_macro"/>
+      <rotationspeed max="10"/>
+      <rotationacceleration max="3"/>
+      <reload rate="0.5" time="3"/>
+      <hull max="15600" threshold="0.2" integrated="1"/>
+      <effects>
+        <firing stop="stopshooting_xen_xl_beam_01_mk1"/>
+      </effects>
+      <sounds>
+        <firing ref="turret_xen_xl_beam_01_mk1_charge"/>
+      </sounds>
+      <weapon angle="25"/>
+    </properties>
+  </macro>
+</macros>

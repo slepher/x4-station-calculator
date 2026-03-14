@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<macros>
+  <macro name="Zone001_Cluster_730_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_730_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+  <macro name="Zone003_Cluster_730_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections >
+      <connection name="connection_ClusterGate730To720" ref="gates">
+        <offset>
+          <position x="-28232.2" y="500" z="-24042.9" />
+        </offset>
+        <macro ref="props_gates_anc_gate_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_730_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+  <macro name="Zone005_Cluster_730_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+    </connections>
+  </macro>
+</macros>
