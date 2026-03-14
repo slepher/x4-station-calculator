@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
-import mapsData from '@/assets/x4_game_data/8.0-Diplomacy/data/maps.json'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import factoryIconUrl from '@/components/icon/factory.svg'
 import shipyardIconUrl from '@/components/icon/shipyard.svg'
 import tradestationIconUrl from '@/components/icon/tradestation.svg'
@@ -171,6 +171,7 @@ const emit = defineEmits<{
   (e: 'overlay-pointerdown', payload: PlacementOverlay): void
 }>()
 const { t, te } = useI18n()
+const gameData = useGameDataStore()
 
 const svgIdSafe = (value: string) => value.replace(/[^a-zA-Z0-9_-]/g, '_')
 const sectorClipId = (clusterId: string, sectorId: string) =>
@@ -389,7 +390,7 @@ const gateClusterRatioFromRaw = (gate: Gate, sectorNorm: Sector['normalized']): 
   return sectorRatioToClusterRatio(sectorNorm, { x: raw.sx, y: raw.sy })
 }
 
-const clusters = computed<Record<string, Cluster>>(() => (mapsData as { clusters: Record<string, Cluster> }).clusters || {})
+const clusters = computed<Record<string, Cluster>>(() => (gameData.maps as unknown as { clusters: Record<string, Cluster> })?.clusters || {})
 const regionIds = computed(() => Object.keys(clusters.value))
 const searchHighlightedSectorIdSet = computed(() => new Set(props.searchHighlightedSectorIds))
 const resourceHighlightedSectorIdSet = computed(() => new Set(props.resourceHighlightedSectorIds))

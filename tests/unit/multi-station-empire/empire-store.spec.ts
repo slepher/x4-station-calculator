@@ -40,6 +40,7 @@ describe('EmpireStore - V2 数据结构', () => {
     expect(store.activeEmpireId).toBeDefined()
     // New empire is now in-memory until explicit save.
     expect(store.empires.length).toBe(0)
+    expect(store.activeEmpire?.sectors || []).toEqual([])
   })
 
   it('V1 → V2 数据迁移测试', async () => {
@@ -365,8 +366,7 @@ describe('EmpireStore - isEmptyForSave 判定', () => {
     const store = useEmpireStore()
     await vi.waitFor(() => expect(store.isReady).toBe(true), { timeout: 3000 })
 
-    // 默认新帝国包含一个默认星区，所以不为空
-    expect(store.isEmptyForSave()).toBe(false)
+    expect(store.isEmptyForSave()).toBe(true)
 
     // 仅有空间站时不为空
     store.createStation('S1', 'industrial')
@@ -377,6 +377,28 @@ describe('EmpireStore - isEmptyForSave 判定', () => {
       store.activeEmpire.stations = []
       store.activeEmpire.sectors = []
     }
+    expect(store.isEmptyForSave()).toBe(true)
+  })
+
+  it('加载空 sectors 的存档时不应自动补默认星区', async () => {
+    localStorage.setItem('x4_empire_data', JSON.stringify({
+      version: 2,
+      activeId: 'empire-1',
+      activeStationId: null,
+      list: [{
+        id: 'empire-1',
+        name: 'Empty Empire',
+        sectors: [],
+        sectorLinks: [],
+        stations: []
+      }]
+    }))
+
+    const store = useEmpireStore()
+    await vi.waitFor(() => expect(store.isReady).toBe(true), { timeout: 3000 })
+
+    expect(store.activeEmpire?.sectors || []).toEqual([])
+    expect(store.sectors).toEqual([])
     expect(store.isEmptyForSave()).toBe(true)
   })
 })
@@ -393,7 +415,7 @@ describe('EmpireStore - location 持久化与 dirty', () => {
     await vi.waitFor(() => expect(store.isReady).toBe(true), { timeout: 3000 })
 
     const station = store.createStation('Placed Station', 'industrial')!
-    const sector = store.activeEmpire!.sectors![0]!
+    const sector = store.createSector('Placed Sector')!
 
     store.saveEmpire()
     expect(store.isDirty).toBe(false)
@@ -442,7 +464,7 @@ describe('EmpireStore - location 持久化与 dirty', () => {
     await vi.waitFor(() => expect(store.isReady).toBe(true), { timeout: 3000 })
 
     const station = store.createStation('Placed Station', 'industrial')!
-    const sector = store.activeEmpire!.sectors![0]!
+    const sector = store.createSector('Placed Sector')!
 
     store.setStationLocation(station.id, {
       cluster_id: 'Cluster_01_macro',

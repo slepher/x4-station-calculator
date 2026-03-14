@@ -353,6 +353,7 @@
     "save_as": "Save As",
     "load": "Load",
     "export": "Export",
+    "version_switch": "Version",
     "share": "Share",
     "import": "Import",
     "station_planner": "Station Planner",
@@ -516,7 +517,26 @@
   "common": {
     "average": "AVERAGE",
     "no_active_production": "No Active Production",
-    "add_modules_hint": "Please add production modules to see data"
+    "add_modules_hint": "Please add production modules to see data",
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "settings": {
+    "gameVersion": {
+      "title": "Game Version",
+      "select": "Select game data version",
+      "dataIsolationHint": "Data is not shared between versions. Use import/export to transfer data.",
+      "save": "Save",
+      "switch": "Switch",
+      "saveAndSwitch": "Save and Switch",
+      "unsavedModules": "Unsaved Modules",
+      "selectAll": "Select All",
+      "saveScopeWarning": "Checked modules will be saved before switching version.",
+      "moduleEmpire": "Sector",
+      "moduleLogicFlow": "Flow",
+      "moduleShipBlueprints": "Ship",
+      "moduleNameLabel": "Name"
+    }
   },
   "logicFlow": {
     "status": {
@@ -596,10 +616,18 @@
     "rawscrap": "Scr",
     "silicon": "Si"
   },
+  "moduleNames": {
+    "sector": "Sector",
+    "flow": "Flow",
+    "ship": "Ship"
+  },
   "importExport": {
     "title": "Import Data",
     "export_title": "Export Data",
     "export_filename": "File Name",
+    "file_game_version": "File Game Version",
+    "current_game_version": "Current Game Version",
+    "version_mismatch": "This file was exported from a different game version. Import is allowed, but invalid references will be removed for the current version.",
     "upload": "Upload File",
     "select_file": "Choose JSON File",
     "no_file": "No file selected",
@@ -607,10 +635,16 @@
     "mode_overwrite": "Overwrite",
     "mode_incremental": "Incremental",
     "modules": "Modules",
-    "module_sector": "Sector",
-    "module_flow": "Flow",
-    "module_ship": "Ship",
     "module_count": "{count} items",
+    "sanitize_summary_title": "Removed Invalid References",
+    "sanitize_summary_line": "{module}: removed {details}.",
+    "sanitize_joiner": ", ",
+    "sanitize_kind_invalidModulesRemoved": "{count} station modules",
+    "sanitize_kind_invalidFlowModulesRemoved": "{count} flow module nodes",
+    "sanitize_kind_invalidShipsRemoved": "{count} ship blueprints",
+    "sanitize_kind_invalidEquipmentsCleared": "{count} equipment slots",
+    "sanitize_kind_invalidShieldsCleared": "{count} shield slots",
+    "sanitize_kind_invalidStorageItemsRemoved": "{count} storage items",
     "action_apply": "Apply Import",
     "action_download": "Download",
     "import_success": "Import complete: {count} module(s) applied.",

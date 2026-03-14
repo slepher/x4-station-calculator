@@ -10,7 +10,9 @@ import type {
   SavedFlowGroup,
   SavedFlowNode,
   ShipBlueprint,
-  ShipBlueprintBucket
+  ShipBlueprintBucket,
+  X4Ship,
+  X4Equipment
 } from '@/types/x4'
 import { migrateEmpireStateToCurrent, migrateFlowStateToCurrent, migrateShipBlueprintStateToCurrent } from './stateMigrations'
 import { CURRENT_EMPIRE_VERSION, CURRENT_FLOW_VERSION, CURRENT_SHIP_BLUEPRINT_VERSION } from './storageVersions'
@@ -29,8 +31,14 @@ const STORAGE_KEY_MAP: Record<ImportModuleKey, string> = {
   [SHIP_KEY]: 'x4_ship_blueprints'
 }
 
+const DEFAULT_IMPORT_GAME_VSN = '8.0'
+const DEFAULT_IMPORT_BETA = false
+
+type MaybeWrapped<T> = T | { value: T }
+
 export interface NormalizedImportPayload {
   modules: Partial<Record<ImportModuleKey, unknown>>
+  fileMeta: ImportFileMeta
 }
 
 export interface ModuleImportStats {
@@ -38,11 +46,45 @@ export interface ModuleImportStats {
   count: number
 }
 
+export interface ImportFileMeta {
+  game_vsn: string
+  beta: boolean
+  inferred: boolean
+}
+
+export interface ImportVersionState {
+  file: ImportFileMeta
+  current: {
+    game_vsn: string
+    beta: boolean
+  }
+  mismatch: boolean
+}
+
+export interface ImportSanitizeSummary {
+  key: ImportModuleKey
+  removed: number
+  details: Array<{
+    kind: string
+    count: number
+  }>
+}
+
+export interface PreparedImportPayload {
+  payload: NormalizedImportPayload
+  moduleStats: ModuleImportStats[]
+  versionState: ImportVersionState
+  preparedModules: Partial<Record<ImportModuleKey, unknown>>
+  sanitizeSummaries: ImportSanitizeSummary[]
+  warnings: string[]
+}
+
 export interface ImportApplyOptions {
   mode: ImportMode
   selectedModules: Partial<Record<ImportModuleKey, boolean>>
   currentView: 'production' | 'flow' | 'ship-build' | 'maps'
   payload: NormalizedImportPayload
+  preparedPayload?: PreparedImportPayload
   gameDataStore: GameDataStoreLike
   empireStore: EmpireStoreLike
   logicFlowStore: LogicFlowStoreLike
@@ -53,12 +95,14 @@ export interface ImportApplyResult {
   applied: ImportModuleKey[]
   skipped: ImportModuleKey[]
   warnings: string[]
+  sanitizeSummaries: ImportSanitizeSummary[]
 }
 
 interface EmpireStoreLike {
   savedEmpires: SavedEmpiresState
   activeEmpireId: string | null
   isDirty: boolean
+  loadEmpire?: (empireId: string) => void
   loadData: (data: SavedEmpiresState) => void
   initializeAllStationCaches: () => void
   saveToStorage: () => void
@@ -67,6 +111,7 @@ interface EmpireStoreLike {
 interface LogicFlowStoreLike {
   savedPlans: SavedFlowPlansState
   isDirty: boolean
+  loadPlan?: (index: number) => void
   init: () => void
 }
 
@@ -74,6 +119,13 @@ interface ShipBuildStoreLike {
   savedBlueprints: SavedShipBlueprintsState
   isDirty: boolean
   activeView: 'production' | 'flow' | 'ship-build' | 'maps'
+  shipMap?: MaybeWrapped<Map<string, unknown>>
+  equipmentMap?: MaybeWrapped<Map<string, unknown>>
+  consumablesMap?: MaybeWrapped<Map<string, unknown>>
+  dronesMap?: MaybeWrapped<Map<string, unknown>>
+  missilesMap?: MaybeWrapped<Map<string, unknown>>
+  findShip?: (id: string | null | undefined) => X4Ship | null
+  findEquipment?: (id: string | null | undefined) => X4Equipment | null
   loadBlueprintsFromStorage: () => void
   loadBlueprint: (id: string) => void
 }
@@ -81,6 +133,15 @@ interface ShipBuildStoreLike {
 interface GameDataStoreLike {
   modulesMap: Record<string, X4Module>
   modulesByMacroId?: Record<string, X4Module>
+  currentVersion?: string
+  isBeta?: boolean
+  getStorageKey?: (module: 'empire' | 'logic_flow' | 'ship_blueprints') => string
+}
+
+interface ShipSlotRequirement {
+  slotType: string
+  size: string
+  tags: string[]
 }
 
 function deepClone<T>(value: T): T {
@@ -89,6 +150,94 @@ function deepClone<T>(value: T): T {
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
+}
+
+function unwrapWrappedValue<T>(value: MaybeWrapped<T> | undefined, fallback: T): T {
+  if (value && typeof value === 'object' && 'value' in value) {
+    return value.value as T
+  }
+  return (value as T | undefined) ?? fallback
+}
+
+function toLookupSet(value: MaybeWrapped<Map<string, unknown>> | undefined): Set<string> {
+  return new Set(Array.from(unwrapWrappedValue(value, new Map<string, unknown>()).keys()))
+}
+
+function normalizeStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+  return value
+    .filter((item): item is string => typeof item === 'string' && item.length > 0)
+    .map((item) => item.trim())
+}
+
+function buildShipSlotRequirementMap(ship: X4Ship | null): Map<string, ShipSlotRequirement> {
+  const requirementMap = new Map<string, ShipSlotRequirement>()
+  if (!ship) return requirementMap
+
+  ship.slots.forEach((slot) => {
+    slot.groups.forEach((group) => {
+      requirementMap.set(group.group, {
+        slotType: slot.type,
+        size: group.connection.size,
+        tags: normalizeStringArray(group.connection.tags)
+      })
+    })
+  })
+
+  return requirementMap
+}
+
+function isEquipmentCompatibleWithRequirement(
+  equipment: X4Equipment | null,
+  requirement: ShipSlotRequirement | undefined,
+  slotType: string
+): boolean {
+  if (!equipment) return false
+  if (!requirement) return true
+  if (equipment.type !== slotType) return false
+  if (equipment.size !== requirement.size) return false
+  const connectionTags = new Set(requirement.tags)
+  return normalizeStringArray(equipment.slotTags).every((tag) => connectionTags.has(tag))
+}
+
+function buildImportFileMeta(raw: unknown): ImportFileMeta {
+  const record = isObject(raw) ? raw : {}
+  const game_vsn = typeof record.game_vsn === 'string' && record.game_vsn.trim()
+    ? record.game_vsn.trim()
+    : DEFAULT_IMPORT_GAME_VSN
+  const beta = typeof record.beta === 'boolean' ? record.beta : DEFAULT_IMPORT_BETA
+  const inferred = typeof record.game_vsn !== 'string' || typeof record.beta !== 'boolean'
+  return { game_vsn, beta, inferred }
+}
+
+function buildImportVersionState(payload: NormalizedImportPayload, gameDataStore: GameDataStoreLike): ImportVersionState {
+  const currentVersion = typeof gameDataStore.currentVersion === 'string' && gameDataStore.currentVersion
+    ? gameDataStore.currentVersion
+    : DEFAULT_IMPORT_GAME_VSN
+  const currentBeta = typeof gameDataStore.isBeta === 'boolean' ? gameDataStore.isBeta : DEFAULT_IMPORT_BETA
+  return {
+    file: payload.fileMeta,
+    current: {
+      game_vsn: currentVersion,
+      beta: currentBeta
+    },
+    mismatch: payload.fileMeta.game_vsn !== currentVersion || payload.fileMeta.beta !== currentBeta
+  }
+}
+
+function getStorageKey(moduleKey: ImportModuleKey, gameDataStore?: GameDataStoreLike): string {
+  if (!gameDataStore?.getStorageKey) return STORAGE_KEY_MAP[moduleKey]
+  if (moduleKey === EMPIRE_KEY) return gameDataStore.getStorageKey('empire')
+  if (moduleKey === FLOW_KEY) return gameDataStore.getStorageKey('logic_flow')
+  return gameDataStore.getStorageKey('ship_blueprints')
+}
+
+function buildSanitizeSummary(key: ImportModuleKey, detailMap: Record<string, number>): ImportSanitizeSummary | null {
+  const details = Object.entries(detailMap)
+    .filter(([, count]) => count > 0)
+    .map(([kind, count]) => ({ kind, count }))
+  const removed = details.reduce((sum, item) => sum + item.count, 0)
+  return removed > 0 ? { key, removed, details } : null
 }
 
 function isEmpireState(value: unknown): value is SavedEmpiresState {
@@ -350,8 +499,8 @@ function mergeShipState(current: SavedShipBlueprintsState, incoming: SavedShipBl
   }
 }
 
-function persistModule(moduleKey: ImportModuleKey, value: unknown) {
-  localStorage.setItem(STORAGE_KEY_MAP[moduleKey], JSON.stringify(value))
+function persistModule(moduleKey: ImportModuleKey, value: unknown, gameDataStore?: GameDataStoreLike) {
+  localStorage.setItem(getStorageKey(moduleKey, gameDataStore), JSON.stringify(value))
 }
 
 function getImportModulesFromRaw(raw: unknown): Partial<Record<ImportModuleKey, unknown>> {
@@ -374,7 +523,8 @@ function getImportModulesFromRaw(raw: unknown): Partial<Record<ImportModuleKey, 
 
 export function normalizeImportPayload(raw: unknown): NormalizedImportPayload {
   return {
-    modules: getImportModulesFromRaw(raw)
+    modules: getImportModulesFromRaw(raw),
+    fileMeta: buildImportFileMeta(raw)
   }
 }
 
@@ -394,6 +544,261 @@ export function getModuleImportStats(payload: NormalizedImportPayload): ModuleIm
   }
 
   return stats
+}
+
+function sanitizeEmpireState(input: SavedEmpiresState, gameDataStore: GameDataStoreLike) {
+  let invalidModulesRemoved = 0
+  const state: SavedEmpiresState = {
+    ...deepClone(input),
+    list: input.list.map((empire) => ({
+      ...deepClone(empire),
+      stations: (empire.stations || []).map((station) => ({
+        ...deepClone(station),
+        modules: (station.modules || []).filter((module) => {
+          const isValid = Boolean(gameDataStore.modulesMap[module.id])
+          if (!isValid) invalidModulesRemoved += 1
+          return isValid
+        })
+      }))
+    }))
+  }
+
+  return {
+    state,
+    summary: buildSanitizeSummary(EMPIRE_KEY, { invalidModulesRemoved })
+  }
+}
+
+function sanitizeFlowState(input: SavedFlowPlansState, gameDataStore: GameDataStoreLike) {
+  let invalidFlowModulesRemoved = 0
+  const state: SavedFlowPlansState = {
+    ...deepClone(input),
+    list: input.list.map((plan) => ({
+      ...deepClone(plan),
+      groups: (plan.groups || []).map((group) => ({
+        ...deepClone(group),
+        nodes: (group.nodes || []).filter((node) => {
+          if (!node.module) return true
+          const isValid = Boolean(gameDataStore.modulesMap[node.module])
+          if (!isValid) invalidFlowModulesRemoved += 1
+          return isValid
+        })
+      }))
+    }))
+  }
+
+  return {
+    state,
+    summary: buildSanitizeSummary(FLOW_KEY, { invalidFlowModulesRemoved })
+  }
+}
+
+function sanitizeShipState(input: SavedShipBlueprintsState, shipBuildStore: ShipBuildStoreLike) {
+  const shipIds = toLookupSet(shipBuildStore.shipMap)
+  const equipmentIds = toLookupSet(shipBuildStore.equipmentMap)
+  const consumableIds = toLookupSet(shipBuildStore.consumablesMap)
+  const droneIds = toLookupSet(shipBuildStore.dronesMap)
+  const missileIds = toLookupSet(shipBuildStore.missilesMap)
+
+  let invalidShipsRemoved = 0
+  let invalidEquipmentsCleared = 0
+  let invalidShieldsCleared = 0
+  let invalidStorageItemsRemoved = 0
+
+  const ships: ShipBlueprintBucket[] = []
+  input.ships.forEach((bucket) => {
+    if (!shipIds.has(bucket.shipId)) {
+      invalidShipsRemoved += bucket.blueprints.length
+      return
+    }
+
+    const blueprints: ShipBlueprint[] = []
+    bucket.blueprints.forEach((blueprint) => {
+      if (!shipIds.has(blueprint.shipId)) {
+        invalidShipsRemoved += 1
+        return
+      }
+
+      const ship = shipBuildStore.findShip?.(blueprint.shipId) || null
+      const slotRequirementMap = buildShipSlotRequirementMap(ship)
+
+      const connections = (blueprint.connections || []).map((connection) => {
+        const groups = (connection.group || []).reduce<ShipBlueprint['connections'][number]['group']>((acc, group) => {
+          const nextGroup = deepClone(group) as unknown as Record<string, unknown>
+          const groupRequirement = slotRequirementMap.get(group.group)
+          const currentEquipment = typeof group.equipment_id === 'string' && group.equipment_id
+            ? shipBuildStore.findEquipment?.(group.equipment_id) || null
+            : null
+          const passesEquipmentCompatibility = !groupRequirement || !shipBuildStore.findEquipment
+            || isEquipmentCompatibleWithRequirement(currentEquipment, groupRequirement, connection.slot_type)
+
+          const isEquipmentValid = !group.equipment_id
+            || (
+              equipmentIds.has(group.equipment_id)
+              && passesEquipmentCompatibility
+            )
+
+          if (!isEquipmentValid && group.equipment_id) {
+            nextGroup.equipment_id = ''
+            nextGroup.count = 0
+            invalidEquipmentsCleared += 1
+          }
+
+          const nextShield = isObject(nextGroup.shield) ? nextGroup.shield as Record<string, unknown> : null
+          const shieldEquipmentId = nextShield && typeof nextShield.equipment_id === 'string' ? nextShield.equipment_id : ''
+          const currentShield = shieldEquipmentId
+            ? shipBuildStore.findEquipment?.(shieldEquipmentId) || null
+            : null
+          const passesShieldCompatibility = !shipBuildStore.findEquipment
+            || isEquipmentCompatibleWithRequirement(currentShield, undefined, 'shield')
+          const isShieldValid = !shieldEquipmentId
+            || (
+              equipmentIds.has(shieldEquipmentId)
+              && passesShieldCompatibility
+            )
+
+          if (!isShieldValid && nextShield) {
+            nextGroup.shield = {
+              ...nextShield,
+              equipment_id: '',
+              count: 0
+            }
+            invalidShieldsCleared += 1
+          }
+
+          const mainEquipmentId = typeof nextGroup.equipment_id === 'string' ? nextGroup.equipment_id : ''
+          const nextShieldId = isObject(nextGroup.shield) && typeof nextGroup.shield.equipment_id === 'string'
+            ? nextGroup.shield.equipment_id
+            : ''
+          if (mainEquipmentId || nextShieldId) {
+            acc.push(nextGroup as unknown as ShipBlueprint['connections'][number]['group'][number])
+          }
+          return acc
+        }, [])
+
+        return {
+          ...deepClone(connection),
+          group: groups
+        }
+      })
+
+      const storage = blueprint.storage
+        ? {
+            ...deepClone(blueprint.storage),
+            deployables: (blueprint.storage.deployables || []).filter((item) => {
+              const isValid = consumableIds.has(item.id)
+              if (!isValid) invalidStorageItemsRemoved += 1
+              return isValid
+            }),
+            countermeasure: (() => {
+              if (!blueprint.storage?.countermeasure) return null
+              const isValid = consumableIds.has(blueprint.storage.countermeasure.id)
+              if (!isValid) {
+                invalidStorageItemsRemoved += 1
+                return null
+              }
+              return deepClone(blueprint.storage.countermeasure)
+            })(),
+            drones: (blueprint.storage.drones || []).filter((item) => {
+              const isValid = droneIds.has(item.id)
+              if (!isValid) invalidStorageItemsRemoved += 1
+              return isValid
+            }),
+            missiles: (blueprint.storage.missiles || []).filter((item) => {
+              const isValid = missileIds.has(item.id)
+              if (!isValid) invalidStorageItemsRemoved += 1
+              return isValid
+            })
+          }
+        : undefined
+
+      blueprints.push({
+        ...deepClone(blueprint),
+        connections,
+        storage
+      })
+    })
+
+    if (blueprints.length > 0) {
+      ships.push({
+        shipId: bucket.shipId,
+        blueprints
+      })
+    }
+  })
+
+  const flattened = ships.flatMap((bucket) => bucket.blueprints)
+  const activeBlueprint = input.activeBlueprintId
+    ? flattened.find((item) => item.id === input.activeBlueprintId) || null
+    : null
+
+  return {
+    state: {
+      version: input.version,
+      activeShipId: activeBlueprint?.shipId || (ships.some((bucket) => bucket.shipId === input.activeShipId) ? input.activeShipId : ships[0]?.shipId || null),
+      activeBlueprintId: activeBlueprint?.id || flattened[0]?.id || null,
+      ships
+    },
+    summary: buildSanitizeSummary(SHIP_KEY, {
+      invalidShipsRemoved,
+      invalidEquipmentsCleared,
+      invalidShieldsCleared,
+      invalidStorageItemsRemoved
+    })
+  }
+}
+
+export function prepareImportPayload(
+  payload: NormalizedImportPayload,
+  gameDataStore: GameDataStoreLike,
+  shipBuildStore: ShipBuildStoreLike
+): PreparedImportPayload {
+  const warnings: string[] = []
+  const moduleStats: ModuleImportStats[] = []
+  const sanitizeSummaries: ImportSanitizeSummary[] = []
+  const preparedModules: Partial<Record<ImportModuleKey, unknown>> = {}
+
+  const empire = coerceEmpireState(payload.modules[EMPIRE_KEY])
+  if (empire) {
+    const migrated = migrateEmpireState(empire, gameDataStore)
+    warnings.push(...migrated.warnings)
+    const sanitized = sanitizeEmpireState(migrated.state, gameDataStore)
+    preparedModules[EMPIRE_KEY] = sanitized.state
+    moduleStats.push({ key: EMPIRE_KEY, count: sanitized.state.list.length })
+    if (sanitized.summary) sanitizeSummaries.push(sanitized.summary)
+  }
+
+  const flow = coerceFlowState(payload.modules[FLOW_KEY])
+  if (flow) {
+    const migrated = migrateFlowState(flow, gameDataStore)
+    warnings.push(...migrated.warnings)
+    const sanitized = sanitizeFlowState(migrated.state, gameDataStore)
+    preparedModules[FLOW_KEY] = sanitized.state
+    moduleStats.push({ key: FLOW_KEY, count: sanitized.state.list.length })
+    if (sanitized.summary) sanitizeSummaries.push(sanitized.summary)
+  }
+
+  const ship = coerceShipState(payload.modules[SHIP_KEY])
+  if (ship) {
+    const migrated = migrateShipBlueprintStateToCurrent(ship)
+    warnings.push(...migrated.warnings)
+    const sanitized = sanitizeShipState(migrated.state, shipBuildStore)
+    preparedModules[SHIP_KEY] = sanitized.state
+    moduleStats.push({
+      key: SHIP_KEY,
+      count: sanitized.state.ships.reduce((sum, bucket) => sum + bucket.blueprints.length, 0)
+    })
+    if (sanitized.summary) sanitizeSummaries.push(sanitized.summary)
+  }
+
+  return {
+    payload,
+    moduleStats,
+    versionState: buildImportVersionState(payload, gameDataStore),
+    preparedModules,
+    sanitizeSummaries,
+    warnings
+  }
 }
 
 export function buildExportPayload(
@@ -419,6 +824,10 @@ export function buildExportPayload(
     format: 'x4-import-export',
     version: 1,
     exportedAt: new Date().toISOString(),
+    game_vsn: typeof gameDataStore?.currentVersion === 'string' && gameDataStore.currentVersion
+      ? gameDataStore.currentVersion
+      : DEFAULT_IMPORT_GAME_VSN,
+    beta: typeof gameDataStore?.isBeta === 'boolean' ? gameDataStore.isBeta : DEFAULT_IMPORT_BETA,
     data: {
       [EMPIRE_KEY]: deepClone(migratedEmpire),
       [FLOW_KEY]: deepClone(migratedFlow),
@@ -440,13 +849,9 @@ export function triggerJsonDownload(filename: string, data: unknown) {
 }
 
 function applyEmpireImport(options: ImportApplyOptions, warnings: string[]): boolean {
-  const raw = options.payload.modules[EMPIRE_KEY]
-  const incomingRaw = coerceEmpireState(raw)
-  if (!incomingRaw) return false
-
-  const migratedResult = migrateEmpireState(incomingRaw, options.gameDataStore)
-  warnings.push(...migratedResult.warnings)
-  const migrated = migratedResult.state
+  const preparedPayload = options.preparedPayload || prepareImportPayload(options.payload, options.gameDataStore, options.shipBuildStore)
+  const migrated = preparedPayload.preparedModules[EMPIRE_KEY] as SavedEmpiresState | undefined
+  if (!migrated) return false
   const current = deepClone(options.empireStore.savedEmpires)
 
   let next: SavedEmpiresState
@@ -477,21 +882,20 @@ function applyEmpireImport(options: ImportApplyOptions, warnings: string[]): boo
     warnings.push('Empire activeId was missing; fallback to first empire.')
   }
 
-  persistModule(EMPIRE_KEY, next)
+  persistModule(EMPIRE_KEY, next, options.gameDataStore)
   options.empireStore.loadData(next)
   options.empireStore.initializeAllStationCaches()
   options.empireStore.saveToStorage()
+  if (next.activeId) {
+    options.empireStore.loadEmpire?.(next.activeId)
+  }
   return true
 }
 
 function applyFlowImport(options: ImportApplyOptions, warnings: string[]): boolean {
-  const raw = options.payload.modules[FLOW_KEY]
-  const incomingRaw = coerceFlowState(raw)
-  if (!incomingRaw) return false
-
-  const migratedResult = migrateFlowState(incomingRaw, options.gameDataStore)
-  warnings.push(...migratedResult.warnings)
-  const migrated = migratedResult.state
+  const preparedPayload = options.preparedPayload || prepareImportPayload(options.payload, options.gameDataStore, options.shipBuildStore)
+  const migrated = preparedPayload.preparedModules[FLOW_KEY] as SavedFlowPlansState | undefined
+  if (!migrated) return false
   const current = deepClone(options.logicFlowStore.savedPlans)
 
   let next: SavedFlowPlansState
@@ -517,19 +921,21 @@ function applyFlowImport(options: ImportApplyOptions, warnings: string[]): boole
     warnings.push('Logic-flow activeId was missing; fallback to first plan.')
   }
 
-  persistModule(FLOW_KEY, next)
+  persistModule(FLOW_KEY, next, options.gameDataStore)
   options.logicFlowStore.init()
+  if (next.activeId) {
+    const activeIndex = next.list.findIndex((plan) => plan.id === next.activeId)
+    if (activeIndex >= 0) {
+      options.logicFlowStore.loadPlan?.(activeIndex)
+    }
+  }
   return true
 }
 
 function applyShipImport(options: ImportApplyOptions, warnings: string[]): boolean {
-  const raw = options.payload.modules[SHIP_KEY]
-  const incomingRaw = coerceShipState(raw)
-  if (!incomingRaw) return false
-
-  const migratedResult = migrateShipBlueprintStateToCurrent(incomingRaw)
-  warnings.push(...migratedResult.warnings)
-  const migrated = migratedResult.state
+  const preparedPayload = options.preparedPayload || prepareImportPayload(options.payload, options.gameDataStore, options.shipBuildStore)
+  const migrated = preparedPayload.preparedModules[SHIP_KEY] as SavedShipBlueprintsState | undefined
+  if (!migrated) return false
   const current = deepClone(options.shipBuildStore.savedBlueprints)
 
   let next: SavedShipBlueprintsState
@@ -559,16 +965,17 @@ function applyShipImport(options: ImportApplyOptions, warnings: string[]): boole
     warnings.push('Ship-build activeId was missing; fallback to first blueprint.')
   }
 
-  persistModule(SHIP_KEY, next)
+  persistModule(SHIP_KEY, next, options.gameDataStore)
   options.shipBuildStore.loadBlueprintsFromStorage()
-  if (next.activeBlueprintId && options.currentView === 'ship-build') {
+  if (next.activeBlueprintId) {
     options.shipBuildStore.loadBlueprint(next.activeBlueprintId)
   }
   return true
 }
 
 export function applyImportPayload(options: ImportApplyOptions): ImportApplyResult {
-  const warnings: string[] = []
+  const preparedPayload = options.preparedPayload || prepareImportPayload(options.payload, options.gameDataStore, options.shipBuildStore)
+  const warnings: string[] = [...preparedPayload.warnings]
   const applied: ImportModuleKey[] = []
   const skipped: ImportModuleKey[] = []
 
@@ -593,5 +1000,10 @@ export function applyImportPayload(options: ImportApplyOptions): ImportApplyResu
     warnings.push(`${key} payload is missing or invalid.`)
   })
 
-  return { applied, skipped, warnings }
+  return {
+    applied,
+    skipped,
+    warnings,
+    sanitizeSummaries: preparedPayload.sanitizeSummaries
+  }
 }

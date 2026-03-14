@@ -98,6 +98,7 @@ describe('Logic Flow Plans - Unit Tests', () => {
       store.settings.isDefaultLocked = false
       expect(store.isDirty).toBe(true)
     })
+
   })
 
   describe('UT-2: saveCurrentPlan 方法', () => {

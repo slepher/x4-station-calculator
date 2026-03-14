@@ -1,0 +1,527 @@
+[
+  {
+    "id": "ship_arg_xs_police_01_a",
+    "nameId": "{20101,110101}",
+    "name": "{20101,110101}",
+    "macro": "ship_arg_xs_police_01_a_macro",
+    "class": "ship_xs",
+    "mk": null,
+    "race": "argon",
+    "deployable": false,
+    "tags": [
+      "drone",
+      "equipment",
+      "noplayerblueprint"
+    ],
+    "cost": {
+      "default": {
+        "dronecomponents": 1.0,
+        "energycells": 50.0,
+        "smartchips": 10.0
+      },
+      "closedloop": {
+        "energycells": 104.0,
+        "hullparts": 3.0
+      }
+    },
+    "purposePrimary": "fight",
+    "droneTags": [],
+    "noplayerblueprint": true,
+    "cargo": []
+  },
+  {
+    "id": "ship_gen_s_fightingdrone_01_a",
+    "nameId": "{20101,100401}",
+    "name": "{20101,100401}",
+    "macro": "ship_gen_s_fightingdrone_01_a_macro",
+    "class": "ship_s",
+    "mk": null,
+    "race": null,
+    "deployable": false,
+    "tags": [
+      "drone",
+      "equipment"
+    ],
+    "cost": {
+      "default": {
+        "dronecomponents": 1.0,
+        "energycells": 50.0,
+        "smartchips": 30.0
+      },
+      "xenon": {
+        "energycells": 15.0,
+        "ore": 10.0,
+        "silicon": 10.0
+      },
+      "terran": {
+        "energycells": 500.0,
+        "metallicmicrolattice": 29.0,
+        "siliconcarbide": 3.0
+      },
+      "closedloop": {
+        "claytronics": 1.0,
+        "energycells": 21.0,
+        "hullparts": 5.0
+      }
+    },
+    "purposePrimary": "fight",
+    "droneTags": [],
+    "noplayerblueprint": false,
+    "cargo": []
+  },
+  {
+    "id": "ship_gen_s_lasertower_01_a",
+    "nameId": "{20201,20601}",
+    "name": "{20201,20601}",
+    "macro": "ship_gen_s_lasertower_01_a_macro",
+    "class": "ship_s",
+    "mk": null,
+    "race": null,
+    "deployable": true,
+    "tags": [
+      "equipment",
+      "lasertower"
+    ],
+    "cost": {
+      "default": {
+        "dronecomponents": 2.0,
+        "energycells": 50.0,
+        "smartchips": 20.0
+      },
+      "xenon": {
+        "energycells": 70.0,
+        "ore": 10.0,
+        "silicon": 4.0
+      },
+      "terran": {
+        "energycells": 500.0,
+        "metallicmicrolattice": 51.0,
+        "siliconcarbide": 3.0
+      },
+      "closedloop": {
+        "claytronics": 1.0,
+        "energycells": 30.0,
+        "hullparts": 6.0
+      }
+    },
+    "purposePrimary": "fight",
+    "droneTags": [],
+    "noplayerblueprint": false,
+    "cargo": []
+  },
+  {
+    "id": "ship_gen_s_miningdrone_liquid_01_a",
+    "nameId": "{20101,100601}",
+    "name": "{20101,100601}",
+    "macro": "ship_gen_s_miningdrone_liquid_01_a_macro",
+    "class": "ship_s",
+    "mk": null,
+    "race": null,
+    "deployable": false,
+    "tags": [
+      "drone",
+      "equipment"
+    ],
+    "cost": {
+      "default": {
+        "dronecomponents": 1.0,
+        "energycells": 125.0
+      },
+      "xenon": {
+        "energycells": 40.0,
+        "ore": 15.0,
+        "silicon": 10.0
+      },
+      "terran": {
+        "energycells": 500.0,
+        "metallicmicrolattice": 33.0,
+        "siliconcarbide": 3.0
+      },
+      "closedloop": {
+        "energycells": 126.0,
+        "hullparts": 4.0
+      }
+    },
+    "purposePrimary": "mine",
+    "droneTags": [
+      "mine",
+      "liquid"
+    ],
+    "noplayerblueprint": false,
+    "cargo": [
+      {
+        "type": "liquid",
+        "capacity": 0
+      }
+    ]
+  },
+  {
+    "id": "ship_gen_s_miningdrone_solid_01_a",
+    "nameId": "{20101,100501}",
+    "name": "{20101,100501}",
+    "macro": "ship_gen_s_miningdrone_solid_01_a_macro",
+    "class": "ship_s",
+    "mk": null,
+    "race": null,
+    "deployable": false,
+    "tags": [
+      "drone",
+      "equipment"
+    ],
+    "cost": {
+      "default": {
+        "dronecomponents": 1.0,
+        "energycells": 125.0
+      },
+      "xenon": {
+        "energycells": 40.0,
+        "ore": 15.0,
+        "silicon": 10.0
+      },
+      "terran": {
+        "energycells": 500.0,
+        "metallicmicrolattice": 33.0,
+        "siliconcarbide": 3.0
+      },
+      "closedloop": {
+        "energycells": 126.0,
+        "hullparts": 4.0
+      }
+    },
+    "purposePrimary": "mine",
+    "droneTags": [
+      "mine",
+      "solid"
+    ],
+    "noplayerblueprint": false,
+    "cargo": [
+      {
+        "type": "solid",
+        "capacity": 0
+      }
+    ]
+  },
+  {
+    "id": "ship_gen_xs_buildingdrone_01_a",
+    "nameId": "{20101,100301}",
+    "name": "{20101,100301}",
+    "macro": "ship_gen_xs_buildingdrone_01_a_macro",
+    "class": "ship_xs",
+    "mk": null,
+    "race": null,
+    "deployable": false,
+    "tags": [
+      "drone",
+      "equipment"
+    ],
+    "cost": {
+      "default": {
+        "dronecomponents": 1.0,
+        "energycells": 50.0,
+        "smartchips": 10.0
+      },
+      "xenon": {
+        "energycells": 14.0,
+        "ore": 20.0,
+        "silicon": 20.0
+      },
+      "terran": {
+        "energycells": 500.0,
+        "metallicmicrolattice": 33.0,
+        "siliconcarbide": 4.0
+      },
+      "closedloop": {
+        "energycells": 104.0,
+        "hullparts": 3.0
+      }
+    },
+    "purposePrimary": "build",
+    "droneTags": [
+      "build"
+    ],
+    "noplayerblueprint": false,
+    "cargo": []
+  },
+  {
+    "id": "ship_gen_xs_cargodrone_empty_01_a",
+    "nameId": "{20101,100101}",
+    "name": "{20101,100101}",
+    "macro": "ship_gen_xs_cargodrone_empty_01_a_macro",
+    "class": "ship_xs",
+    "mk": null,
+    "race": null,
+    "deployable": false,
+    "tags": [
+      "drone",
+      "equipment"
+    ],
+    "cost": {
+      "default": {
+        "dronecomponents": 1.0,
+        "energycells": 50.0,
+        "smartchips": 10.0
+      },
+      "xenon": {
+        "energycells": 36.0,
+        "ore": 20.0,
+        "silicon": 20.0
+      },
+      "terran": {
+        "energycells": 500.0,
+        "metallicmicrolattice": 51.0,
+        "siliconcarbide": 4.0
+      },
+      "closedloop": {
+        "energycells": 104.0,
+        "hullparts": 3.0
+      }
+    },
+    "purposePrimary": "trade",
+    "droneTags": [],
+    "noplayerblueprint": false,
+    "cargo": [
+      {
+        "type": "container",
+        "capacity": 2
+      }
+    ]
+  },
+  {
+    "id": "ship_gen_xs_lasertower_01_a",
+    "nameId": "{20201,20501}",
+    "name": "{20201,20501}",
+    "macro": "ship_gen_xs_lasertower_01_a_macro",
+    "class": "ship_xs",
+    "mk": null,
+    "race": null,
+    "deployable": true,
+    "tags": [
+      "equipment",
+      "lasertower"
+    ],
+    "cost": {
+      "default": {
+        "dronecomponents": 1.0,
+        "energycells": 50.0,
+        "smartchips": 20.0
+      },
+      "xenon": {
+        "energycells": 26.0,
+        "ore": 5.0,
+        "silicon": 2.0
+      },
+      "terran": {
+        "energycells": 500.0,
+        "metallicmicrolattice": 30.0
+      },
+      "closedloop": {
+        "energycells": 126.0,
+        "hullparts": 4.0
+      }
+    },
+    "purposePrimary": "fight",
+    "droneTags": [],
+    "noplayerblueprint": false,
+    "cargo": []
+  },
+  {
+    "id": "ship_gen_xs_repairdrone_01_a",
+    "nameId": "{20101,100201}",
+    "name": "{20101,100201}",
+    "macro": "ship_gen_xs_repairdrone_01_a_macro",
+    "class": "ship_xs",
+    "mk": null,
+    "race": null,
+    "deployable": false,
+    "tags": [
+      "drone",
+      "equipment"
+    ],
+    "cost": {
+      "default": {
+        "dronecomponents": 1.0,
+        "energycells": 50.0,
+        "smartchips": 10.0
+      },
+      "xenon": {
+        "energycells": 14.0,
+        "ore": 20.0,
+        "silicon": 20.0
+      },
+      "terran": {
+        "energycells": 500.0,
+        "metallicmicrolattice": 33.0,
+        "siliconcarbide": 4.0
+      },
+      "closedloop": {
+        "energycells": 104.0,
+        "hullparts": 3.0
+      }
+    },
+    "purposePrimary": "build",
+    "droneTags": [],
+    "noplayerblueprint": false,
+    "cargo": []
+  },
+  {
+    "id": "ship_par_xs_police_01_a",
+    "nameId": "{20101,110601}",
+    "name": "{20101,110601}",
+    "macro": "ship_par_xs_police_01_a_macro",
+    "class": "ship_xs",
+    "mk": null,
+    "race": "paranid",
+    "deployable": false,
+    "tags": [
+      "drone",
+      "equipment",
+      "noplayerblueprint"
+    ],
+    "cost": {
+      "default": {
+        "dronecomponents": 1.0,
+        "energycells": 50.0,
+        "smartchips": 10.0
+      }
+    },
+    "purposePrimary": "fight",
+    "droneTags": [],
+    "noplayerblueprint": true,
+    "cargo": []
+  },
+  {
+    "id": "ship_spl_xs_police_01_a",
+    "nameId": "{20101,110901}",
+    "name": "{20101,110901}",
+    "macro": "ship_spl_xs_police_01_a_macro",
+    "class": "ship_xs",
+    "mk": null,
+    "race": "split",
+    "deployable": false,
+    "tags": [
+      "drone",
+      "equipment",
+      "noplayerblueprint"
+    ],
+    "cost": {
+      "default": {
+        "dronecomponents": 1.0,
+        "energycells": 50.0,
+        "smartchips": 10.0
+      }
+    },
+    "purposePrimary": "trade",
+    "droneTags": [],
+    "noplayerblueprint": true,
+    "cargo": [
+      {
+        "type": "container",
+        "capacity": 0
+      }
+    ]
+  },
+  {
+    "id": "ship_tel_xs_police_01_a",
+    "nameId": "{20101,110702}",
+    "name": "{20101,110702}",
+    "macro": "ship_tel_xs_police_01_a_macro",
+    "class": "ship_xs",
+    "mk": null,
+    "race": "teladi",
+    "deployable": false,
+    "tags": [
+      "drone",
+      "equipment",
+      "noplayerblueprint"
+    ],
+    "cost": {
+      "default": {
+        "dronecomponents": 1.0,
+        "energycells": 50.0,
+        "smartchips": 10.0
+      }
+    },
+    "purposePrimary": "fight",
+    "droneTags": [],
+    "noplayerblueprint": true,
+    "cargo": []
+  },
+  {
+    "id": "ship_tel_xs_police_02_a",
+    "nameId": "{20101,110703}",
+    "name": "{20101,110703}",
+    "macro": "ship_tel_xs_police_02_a_macro",
+    "class": "ship_xs",
+    "mk": null,
+    "race": "teladi",
+    "deployable": false,
+    "tags": [
+      "drone",
+      "equipment",
+      "noplayerblueprint"
+    ],
+    "cost": {
+      "default": {
+        "dronecomponents": 1.0,
+        "energycells": 50.0,
+        "smartchips": 10.0
+      }
+    },
+    "purposePrimary": "fight",
+    "droneTags": [],
+    "noplayerblueprint": true,
+    "cargo": []
+  },
+  {
+    "id": "ship_tel_xs_police_03_a",
+    "nameId": "{20101,110704}",
+    "name": "{20101,110704}",
+    "macro": "ship_tel_xs_police_03_a_macro",
+    "class": "ship_xs",
+    "mk": null,
+    "race": "teladi",
+    "deployable": false,
+    "tags": [
+      "drone",
+      "equipment",
+      "noplayerblueprint"
+    ],
+    "cost": {
+      "default": {
+        "dronecomponents": 1.0,
+        "energycells": 50.0,
+        "smartchips": 10.0
+      }
+    },
+    "purposePrimary": "fight",
+    "droneTags": [],
+    "noplayerblueprint": true,
+    "cargo": []
+  },
+  {
+    "id": "ship_ter_xs_police_01_a",
+    "nameId": "{20101,111001}",
+    "name": "{20101,111001}",
+    "macro": "ship_ter_xs_police_01_a_macro",
+    "class": "ship_xs",
+    "mk": null,
+    "race": "terran",
+    "deployable": false,
+    "tags": [
+      "drone",
+      "equipment",
+      "noplayerblueprint"
+    ],
+    "cost": {
+      "default": {
+        "energycells": 50.0,
+        "metallicmicrolattice": 2.0,
+        "siliconcarbide": 2.0
+      }
+    },
+    "purposePrimary": "fight",
+    "droneTags": [],
+    "noplayerblueprint": true,
+    "cargo": []
+  }
+]

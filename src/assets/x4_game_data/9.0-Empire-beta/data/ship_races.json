@@ -1,0 +1,52 @@
+[
+  {
+    "id": "argon",
+    "noplayerblueprint": false,
+    "noplayerbuild": false
+  },
+  {
+    "id": "boron",
+    "noplayerblueprint": false,
+    "noplayerbuild": false
+  },
+  {
+    "id": "generic",
+    "noplayerblueprint": false,
+    "noplayerbuild": false
+  },
+  {
+    "id": "paranid",
+    "noplayerblueprint": false,
+    "noplayerbuild": false
+  },
+  {
+    "id": "pirates",
+    "noplayerblueprint": false,
+    "noplayerbuild": false
+  },
+  {
+    "id": "split",
+    "noplayerblueprint": false,
+    "noplayerbuild": false
+  },
+  {
+    "id": "teladi",
+    "noplayerblueprint": false,
+    "noplayerbuild": false
+  },
+  {
+    "id": "terran",
+    "noplayerblueprint": false,
+    "noplayerbuild": false
+  },
+  {
+    "id": "xenon",
+    "noplayerblueprint": false,
+    "noplayerbuild": true
+  },
+  {
+    "id": "yaki",
+    "noplayerblueprint": false,
+    "noplayerbuild": false
+  }
+]

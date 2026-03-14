@@ -1,0 +1,539 @@
+[
+  {
+    "id": "alliance",
+    "name": "Alliance of the Word",
+    "nameId": "{20203,801}",
+    "tags": [
+      "economic",
+      "privateloadout",
+      "privateship",
+      "protective",
+      "standard",
+      "watchdoguser"
+    ],
+    "color_name": "faction_alliance",
+    "color": "#660066",
+    "claimspace": false
+  },
+  {
+    "id": "antigone",
+    "name": "Antigone Republic",
+    "nameId": "{20203,301}",
+    "tags": [
+      "claimspace",
+      "economic",
+      "police",
+      "privateloadout",
+      "privateship",
+      "protective",
+      "publicship",
+      "standard",
+      "watchdoguser"
+    ],
+    "color_name": "faction_antigone",
+    "color": "#0095FF",
+    "claimspace": true
+  },
+  {
+    "id": "argon",
+    "name": "Argon Federation",
+    "nameId": "{20203,201}",
+    "tags": [
+      "claimspace",
+      "economic",
+      "police",
+      "privateloadout",
+      "privateship",
+      "protective",
+      "publicloadout",
+      "publicship",
+      "standard",
+      "watchdoguser"
+    ],
+    "color_name": "faction_argon",
+    "color": "#0069B3",
+    "claimspace": true
+  },
+  {
+    "id": "boron",
+    "name": "Queendom of Boron",
+    "nameId": "{20203,1301}",
+    "tags": [
+      "claimspace",
+      "economic",
+      "police",
+      "privateloadout",
+      "privateship",
+      "protective",
+      "standard",
+      "watchdoguser"
+    ],
+    "color_name": "faction_boron",
+    "color": "#4DB5FF",
+    "claimspace": true
+  },
+  {
+    "id": "buccaneers",
+    "name": "Duke's Buccaneers",
+    "nameId": "{20203,2401}",
+    "tags": [
+      "claimspace",
+      "economic",
+      "pirate",
+      "plunder",
+      "privateloadout",
+      "privateship",
+      "protective",
+      "watchdoguser"
+    ],
+    "color_name": "faction_buccaneers",
+    "color": "#006466",
+    "claimspace": true
+  },
+  {
+    "id": "civilian",
+    "name": "Civilian",
+    "nameId": "{20203,10301}",
+    "tags": [
+      "hidden"
+    ],
+    "color_name": "faction_civilian",
+    "color": "#C0C0C0",
+    "claimspace": false
+  },
+  {
+    "id": "court",
+    "name": "Court of Curbs",
+    "nameId": "{20203,1801}",
+    "tags": [
+      "claimspace",
+      "economic",
+      "police",
+      "protective",
+      "watchdoguser",
+      "privateloadout",
+      "privateship"
+    ],
+    "color_name": "faction_court",
+    "color": "#FFBF00",
+    "claimspace": true
+  },
+  {
+    "id": "criminal",
+    "name": "Criminal",
+    "nameId": "{20203,10101}",
+    "tags": [
+      "hidden"
+    ],
+    "color_name": "faction_criminal",
+    "color": "#B30000",
+    "claimspace": false
+  },
+  {
+    "id": "fallensplit",
+    "name": "Fallen Families",
+    "nameId": "{20203,1701}",
+    "tags": [
+      "noresupply",
+      "pirate",
+      "plunder",
+      "privateloadout",
+      "privateship"
+    ],
+    "color_name": "faction_fallensplit",
+    "color": "#FF9999",
+    "claimspace": false
+  },
+  {
+    "id": "freesplit",
+    "name": "Free Families",
+    "nameId": "{20203,1601}",
+    "tags": [
+      "claimspace",
+      "economic",
+      "plunder",
+      "privateloadout",
+      "privateship",
+      "protective",
+      "publicloadout",
+      "publicship",
+      "standard"
+    ],
+    "color_name": "faction_freesplit",
+    "color": "#FF8B00",
+    "claimspace": true
+  },
+  {
+    "id": "hatikvah",
+    "name": "Hatikvah Free League",
+    "nameId": "{20203,901}",
+    "tags": [
+      "claimspace",
+      "economic",
+      "pirate",
+      "plunder",
+      "privateloadout",
+      "privateship",
+      "protective",
+      "watchdoguser"
+    ],
+    "color_name": "faction_hatikvah",
+    "color": "#00F9FF",
+    "claimspace": true
+  },
+  {
+    "id": "holyorder",
+    "name": "Holy Order of the Pontifex",
+    "nameId": "{20203,501}",
+    "tags": [
+      "claimspace",
+      "economic",
+      "police",
+      "privateloadout",
+      "privateship",
+      "protective",
+      "publicship",
+      "standard",
+      "watchdoguser"
+    ],
+    "color_name": "faction_holyorder",
+    "color": "#FF99FF",
+    "claimspace": true
+  },
+  {
+    "id": "holyorderfanatic",
+    "name": "Holy Order Faithful",
+    "nameId": "{20203,2601}",
+    "tags": [
+      "privateloadout",
+      "hidden"
+    ],
+    "color_name": "faction_holyorderfanatic",
+    "color": "#660000",
+    "claimspace": false
+  },
+  {
+    "id": "kaori",
+    "name": "Quettanauts",
+    "nameId": "{20203,3601}",
+    "tags": [
+      "barterships",
+      "barterwares",
+      "claimspace",
+      "economic",
+      "noblueprintsale",
+      "nolicencesale",
+      "noplayerbuyships",
+      "noplayersellships",
+      "notradeoffer",
+      "privateloadout",
+      "privateship",
+      "protective",
+      "standard"
+    ],
+    "color_name": "faction_kaori",
+    "color": "#FFB966",
+    "claimspace": true
+  },
+  {
+    "id": "khaak",
+    "name": "Kha'ak",
+    "nameId": "{20203,1501}",
+    "tags": [
+      "aggressive",
+      "nodiplomacyselection",
+      "noresupply",
+      "notradeoffer",
+      "privateloadout",
+      "privateship"
+    ],
+    "color_name": "faction_khaak",
+    "color": "#FF00FF",
+    "claimspace": false
+  },
+  {
+    "id": "loanshark",
+    "name": "Vigor Syndicate",
+    "nameId": "{20203,3301}",
+    "tags": [
+      "claimspace",
+      "economic",
+      "pirate",
+      "plunder",
+      "police",
+      "privateloadout",
+      "privateship",
+      "standard"
+    ],
+    "color_name": "faction_loanshark",
+    "color": "#B38600",
+    "claimspace": true
+  },
+  {
+    "id": "ministry",
+    "name": "Ministry of Finance",
+    "nameId": "{20203,701}",
+    "tags": [
+      "economic",
+      "police",
+      "privateloadout",
+      "privateship",
+      "protective",
+      "publicship",
+      "standard",
+      "watchdoguser"
+    ],
+    "color_name": "faction_ministry",
+    "color": "#006600",
+    "claimspace": false
+  },
+  {
+    "id": "outlaw",
+    "name": "Criminal",
+    "nameId": "{20203,10101}",
+    "tags": [
+      "hidden"
+    ],
+    "color_name": "faction_criminal",
+    "color": "#B30000",
+    "claimspace": false
+  },
+  {
+    "id": "ownerless",
+    "name": "",
+    "nameId": "",
+    "tags": [
+      "hidden"
+    ],
+    "color_name": "faction_ownerless",
+    "color": "#C0C0C0",
+    "claimspace": false
+  },
+  {
+    "id": "paranid",
+    "name": "Godrealm of the Paranid",
+    "nameId": "{20203,401}",
+    "tags": [
+      "claimspace",
+      "economic",
+      "police",
+      "privateloadout",
+      "privateship",
+      "protective",
+      "publicloadout",
+      "publicship",
+      "standard",
+      "watchdoguser"
+    ],
+    "color_name": "faction_paranid",
+    "color": "#B300B3",
+    "claimspace": true
+  },
+  {
+    "id": "pioneers",
+    "name": "Segaris Pioneers",
+    "nameId": "{20203,2901}",
+    "tags": [
+      "claimspace",
+      "economic",
+      "privateloadout",
+      "privateship",
+      "protective",
+      "standard"
+    ],
+    "color_name": "faction_pioneers",
+    "color": "#00AFB3",
+    "claimspace": true
+  },
+  {
+    "id": "player",
+    "name": "Player",
+    "nameId": "{20203,101}",
+    "tags": [
+      "claimspace",
+      "police"
+    ],
+    "color_name": "faction_player",
+    "color": "#4DFF4D",
+    "claimspace": true
+  },
+  {
+    "id": "scaleplate",
+    "name": "Scale Plate Pact",
+    "nameId": "{20203,1001}",
+    "tags": [
+      "economic",
+      "pirate",
+      "plunder",
+      "privateloadout",
+      "privateship",
+      "protective",
+      "watchdoguser"
+    ],
+    "color_name": "faction_scaleplate",
+    "color": "#666600",
+    "claimspace": false
+  },
+  {
+    "id": "scavenger",
+    "name": "Riptide Rakers",
+    "nameId": "{20203,3201}",
+    "tags": [
+      "claimspace",
+      "economic",
+      "extrarepair",
+      "privateloadout",
+      "privateship",
+      "standard"
+    ],
+    "color_name": "faction_scavenger",
+    "color": "#003C66",
+    "claimspace": true
+  },
+  {
+    "id": "smuggler",
+    "name": "Criminal",
+    "nameId": "{20203,10101}",
+    "tags": [
+      "hidden"
+    ],
+    "color_name": "faction_smuggler",
+    "color": "#B30000",
+    "claimspace": false
+  },
+  {
+    "id": "split",
+    "name": "Zyarth Patriarchy",
+    "nameId": "{20203,2001}",
+    "tags": [
+      "claimspace",
+      "economic",
+      "police",
+      "privateloadout",
+      "privateship",
+      "protective",
+      "publicloadout",
+      "publicship",
+      "standard",
+      "watchdoguser"
+    ],
+    "color_name": "faction_split",
+    "color": "#B36100",
+    "claimspace": true
+  },
+  {
+    "id": "teladi",
+    "name": "Teladi Company",
+    "nameId": "{20203,601}",
+    "tags": [
+      "claimspace",
+      "economic",
+      "privateloadout",
+      "privateship",
+      "protective",
+      "publicloadout",
+      "publicship",
+      "standard",
+      "watchdoguser"
+    ],
+    "color_name": "faction_teladi",
+    "color": "#B3B300",
+    "claimspace": true
+  },
+  {
+    "id": "terran",
+    "name": "Terran Protectorate",
+    "nameId": "{20203,3001}",
+    "tags": [
+      "claimspace",
+      "economic",
+      "police",
+      "privateloadout",
+      "privateship",
+      "protective",
+      "standard",
+      "watchdoguser"
+    ],
+    "color_name": "faction_terran",
+    "color": "#99D5FF",
+    "claimspace": true
+  },
+  {
+    "id": "terran",
+    "name": "Terran Protectorate",
+    "nameId": "{20203,3001}",
+    "tags": [
+      "claimspace",
+      "economic",
+      "police",
+      "protective",
+      "watchdoguser",
+      "privateloadout",
+      "privateship"
+    ],
+    "color_name": "faction_terran",
+    "color": "#99D5FF",
+    "claimspace": true
+  },
+  {
+    "id": "trinity",
+    "name": "Realm of the Trinity",
+    "nameId": "{20203,2301}",
+    "tags": [
+      "claimspace",
+      "economic",
+      "police",
+      "privateloadout",
+      "privateship",
+      "protective",
+      "publicloadout",
+      "publicship",
+      "standard",
+      "watchdoguser"
+    ],
+    "color_name": "faction_trinity",
+    "color": "#FFCCFF",
+    "claimspace": true
+  },
+  {
+    "id": "visitor",
+    "name": "Visitor",
+    "nameId": "{20203,20101}",
+    "tags": [
+      "visitor",
+      "hidden"
+    ],
+    "color_name": "faction_visitor",
+    "color": "#FFFF00",
+    "claimspace": false
+  },
+  {
+    "id": "xenon",
+    "name": "Xenon",
+    "nameId": "{20203,1101}",
+    "tags": [
+      "claimspace",
+      "nodiplomacyselection",
+      "notradeoffer",
+      "privateloadout",
+      "privateship"
+    ],
+    "color_name": "faction_xenon",
+    "color": "#B30000",
+    "claimspace": true
+  },
+  {
+    "id": "yaki",
+    "name": "Yaki",
+    "nameId": "{20203,2801}",
+    "tags": [
+      "pirate",
+      "plunder",
+      "privateloadout",
+      "privateship"
+    ],
+    "color_name": "faction_yaki",
+    "color": "#FF4D4D",
+    "claimspace": false
+  }
+]

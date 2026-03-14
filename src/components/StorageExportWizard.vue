@@ -9,6 +9,7 @@ import {
   buildExportPayload,
   getModuleImportStats,
   normalizeImportPayload,
+  triggerJsonDownload,
   type ImportModuleKey
 } from '@/store/logic/importExport'
 
@@ -37,6 +38,10 @@ const moduleStats = computed(() =>
   getModuleImportStats(normalizeImportPayload(payload.value))
 )
 
+const currentVersionLabel = computed(() =>
+  gameDataStore.displayFullVersion()
+)
+
 const buildDefaultFileName = () => {
   const now = new Date()
   const yyyy = now.getFullYear()
@@ -44,7 +49,8 @@ const buildDefaultFileName = () => {
   const dd = String(now.getDate()).padStart(2, '0')
   const hh = String(now.getHours()).padStart(2, '0')
   const min = String(now.getMinutes()).padStart(2, '0')
-  return `x4-export-${yyyy}${mm}${dd}-${hh}${min}.json`
+  const betaSuffix = gameDataStore.isBeta ? '-beta' : ''
+  return `x4-export-${gameDataStore.currentVersion}${betaSuffix}-${yyyy}${mm}${dd}-${hh}${min}.json`
 }
 
 const exportFileName = ref(buildDefaultFileName())
@@ -60,11 +66,11 @@ watch(
 const moduleTitle = (key: ImportModuleKey) => {
   switch (key) {
     case 'x4_empire_data':
-      return t('importExport.module_sector')
+      return t('moduleNames.sector')
     case 'x4_logic_flow_plans':
-      return t('importExport.module_flow')
+      return t('moduleNames.flow')
     case 'x4_ship_blueprints':
-      return t('importExport.module_ship')
+      return t('moduleNames.ship')
     default:
       return key
   }
@@ -73,16 +79,7 @@ const moduleTitle = (key: ImportModuleKey) => {
 const handleDownload = () => {
   const raw = exportFileName.value.trim()
   const withExt = raw ? (raw.endsWith('.json') ? raw : `${raw}.json`) : buildDefaultFileName()
-
-  const blob = new Blob([JSON.stringify(payload.value, null, 2)], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = withExt
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
+  triggerJsonDownload(withExt, payload.value)
   emit('close')
 }
 </script>
@@ -108,6 +105,10 @@ const handleDownload = () => {
             class="w-full px-3 py-2 rounded border border-slate-700 bg-slate-900/40 text-slate-100 text-sm outline-none focus:border-slate-500"
             data-testid="storage-export-filename-input"
           />
+        </div>
+        <div class="rounded border border-slate-700 bg-slate-900/40 px-3 py-2">
+          <div class="text-xs uppercase tracking-wider text-slate-400 mb-1">{{ t('importExport.current_game_version') }}</div>
+          <div class="text-sm text-slate-100" data-testid="storage-export-current-version">{{ currentVersionLabel }}</div>
         </div>
         <div class="text-xs uppercase tracking-wider text-slate-400">{{ t('importExport.modules') }}</div>
         <div class="space-y-2" data-testid="storage-export-config">

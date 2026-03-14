@@ -5,9 +5,6 @@ import MapSvgCanvas from './MapSvgCanvas.vue'
 import MapSectorTooltip from './MapSectorTooltip.vue'
 import MapResourceFilterPanel from './MapResourceFilterPanel.vue'
 import MapStationPanel, { type MapStationPanelItem } from './MapStationPanel.vue'
-import mapsData from '@/assets/x4_game_data/8.0-Diplomacy/data/maps.json'
-import regionYieldsData from '@/assets/x4_game_data/8.0-Diplomacy/data/regionyields.json'
-import factionsData from '@/assets/x4_game_data/8.0-Diplomacy/data/factions.json'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import type { SectorResourceFill } from '@/store/logic/mapResourceFilter'
@@ -155,24 +152,17 @@ const lastMousePos = ref({ x: 0, y: 0 })
 const { t, te, locale } = useI18n()
 const gameDataStore = useGameDataStore()
 const empireStore = useEmpireStore()
-const factionsById = Object.fromEntries(
-  (factionsData as Array<{ id: string; nameId: string }>).map((entry) => [entry.id, entry])
-) as Record<string, { id: string; nameId: string }>
-const resourceColorByWare = Object.fromEntries(
-  (regionYieldsData as Array<{ ware: string; color?: string }>).map((entry) => [entry.ware, entry.color || '#fbbf24'])
-) as Record<string, string>
+const factionsById = computed(() => Object.fromEntries(
+  (gameDataStore.factions || []).map((entry: any) => [entry.id, entry])
+) as Record<string, { id: string; nameId: string }>)
+const resourceColorByWare = computed(() => Object.fromEntries(
+  (gameDataStore.regionyields || []).map((entry: any) => [entry.ware, entry.color || '#fbbf24'])
+) as Record<string, string>)
 const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
   const out: Record<string, MapSectorDataset> = {}
-  const clusters = (mapsData as { clusters?: Record<string, { sectors?: Record<string, {
-    id: string
-    name?: string
-    nameId?: string
-    area?: { sunlight?: number }
-    resources?: MapSectorResourceEntry[]
-    normalized?: { scale_per_radius?: number }
-  }> }> }).clusters || {}
+  const clusters = gameDataStore.maps?.clusters || {}
   Object.entries(clusters).forEach(([clusterId, cluster]) => {
-    Object.values(cluster.sectors || {}).forEach((sector) => {
+    Object.values(cluster.sectors || {}).forEach((sector: any) => {
       const displayName = sector.nameId && te(sector.nameId) ? t(sector.nameId) : (sector.name || sector.id)
       out[sector.id] = {
         id: sector.id,
@@ -496,7 +486,7 @@ const scheduleTooltipClose = () => {
 
 const formatOwnerName = (owner: string) => {
   if (owner === 'ownerless') return t('map.ownerless_name')
-  const faction = factionsById[owner]!
+  const faction = factionsById.value[owner]!
   if (te(faction.nameId)) return t(faction.nameId)
   return t(faction.nameId)
 }
@@ -684,7 +674,7 @@ const createTooltipViewModel = (payload: SectorHoverPayload): TooltipViewModel =
         wareId: entry.ware,
         label: gameDataStore.getWareDisplayName(entry.ware) || (t(`res.${entry.ware}`) !== `res.${entry.ware}` ? t(`res.${entry.ware}`) : entry.ware),
         yieldLabel: formatYieldLabel(entry.yield || 'medium'),
-        color: resourceColorByWare[entry.ware] || '#fbbf24'
+        color: resourceColorByWare.value[entry.ware] || '#fbbf24'
       })),
     anchorRect: payload.anchorRect
   })

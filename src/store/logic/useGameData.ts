@@ -11,22 +11,15 @@ import type {
   X4SlotTag,
   X4ShipType,
   X4Ware,
-  RaceMedicalConsumption
+  RaceMedicalConsumption,
+  X4Bullet,
+  X4Map,
+  X4RegionYield,
+  X4Faction,
+  X4Language,
+  X4DefaultMax,
+  X4ShipSlot
 } from '../../types/x4'
-
-import waresRaw from '../../assets/x4_game_data/8.0-Diplomacy/data/wares.json'
-import ModulesRaw from '../../assets/x4_game_data/8.0-Diplomacy/data/modules.json'
-import moduleGroupsRaw from '../../assets/x4_game_data/8.0-Diplomacy/data/module_groups.json'
-import consumptionRaw from '../../assets/x4_game_data/8.0-Diplomacy/data/consumption.json'
-import shipsRaw from '../../assets/x4_game_data/8.0-Diplomacy/data/ships.json'
-import shipRacesRaw from '../../assets/x4_game_data/8.0-Diplomacy/data/ship_races.json'
-import shipTypesRaw from '../../assets/x4_game_data/8.0-Diplomacy/data/ship_types.json'
-import equipmentsRaw from '../../assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
-import equipmentTypesRaw from '../../assets/x4_game_data/8.0-Diplomacy/data/equipment_types.json'
-import slotTagsRaw from '../../assets/x4_game_data/8.0-Diplomacy/data/slot_tags.json'
-import consumablesRaw from '../../assets/x4_game_data/8.0-Diplomacy/data/consumables.json'
-import dronesRaw from '../../assets/x4_game_data/8.0-Diplomacy/data/drones.json'
-import missilesRaw from '../../assets/x4_game_data/8.0-Diplomacy/data/missiles.json'
 
 export type LocalizedX4Module = X4Module & { localeName: string }
 export type LocalizedX4ModuleGroup = X4ModuleGroup & { localeName: string }
@@ -56,24 +49,111 @@ export type ConsumableDatas = {
   missilesMap: Map<string, X4Missile>
 }
 
-export function getShipBuildRawData(): ShipBuildRawData {
+export type GameDataFiles = {
+  wares: X4Ware[]
+  modules: X4Module[]
+  moduleGroups: X4ModuleGroup[]
+  consumption: RaceMedicalConsumption
+  ships: X4Ship[]
+  shipRaces: X4ShipRace[]
+  shipTypes: X4ShipType[]
+  equipments: X4Equipment[]
+  equipmentTypes: X4EquipmentType[]
+  slotTags: X4SlotTag[]
+  consumables: X4Consumable[]
+  drones: X4Drone[]
+  missiles: X4Missile[]
+  bullets: X4Bullet[]
+  maps: X4Map
+  regionyields: X4RegionYield[]
+  factions: X4Faction[]
+  defaultMaxes: Record<string, X4DefaultMax>
+  shipSlots: Record<string, X4ShipSlot[]>
+  languages: X4Language[]
+}
+
+type JsonModule<T = unknown> = { default: T }
+type JsonLoader = () => Promise<unknown>
+type GameDataLoaderMap = Record<string, JsonLoader>
+
+const gameDataLoaders = import.meta.glob('/src/assets/x4_game_data/*/data/*.json')
+
+export function buildGameDataLoaderKey(folderName: string, file: string): string {
+  return `/src/assets/x4_game_data/${folderName}/data/${file}`
+}
+
+async function loadJsonFromBundle<T>(
+  folderName: string,
+  file: string,
+  loaders: GameDataLoaderMap = gameDataLoaders
+): Promise<T> {
+  const key = buildGameDataLoaderKey(folderName, file)
+  const loader = loaders[key]
+  if (!loader) {
+    throw new Error(`[GameData] Missing bundled data file '${file}' for folder '${folderName}'`)
+  }
+  const mod = await loader() as JsonModule<T>
+  return mod.default
+}
+
+export async function loadGameDataFiles(
+  folderName: string,
+  loaders: GameDataLoaderMap = gameDataLoaders
+): Promise<GameDataFiles> {
+
+  const [
+    wares, modules, moduleGroups, consumption,
+    ships, shipRaces, shipTypes,
+    equipments, equipmentTypes, slotTags,
+    consumables, drones, missiles, bullets,
+    maps, regionyields, factions,
+    defaultMaxes, shipSlots, languages
+  ] = await Promise.all([
+    loadJsonFromBundle<X4Ware[]>(folderName, 'wares.json', loaders),
+    loadJsonFromBundle<X4Module[]>(folderName, 'modules.json', loaders),
+    loadJsonFromBundle<X4ModuleGroup[]>(folderName, 'module_groups.json', loaders),
+    loadJsonFromBundle<RaceMedicalConsumption>(folderName, 'consumption.json', loaders),
+    loadJsonFromBundle<X4Ship[]>(folderName, 'ships.json', loaders),
+    loadJsonFromBundle<X4ShipRace[]>(folderName, 'ship_races.json', loaders),
+    loadJsonFromBundle<X4ShipType[]>(folderName, 'ship_types.json', loaders),
+    loadJsonFromBundle<X4Equipment[]>(folderName, 'equipments.json', loaders),
+    loadJsonFromBundle<X4EquipmentType[]>(folderName, 'equipment_types.json', loaders),
+    loadJsonFromBundle<X4SlotTag[]>(folderName, 'slot_tags.json', loaders),
+    loadJsonFromBundle<X4Consumable[]>(folderName, 'consumables.json', loaders),
+    loadJsonFromBundle<X4Drone[]>(folderName, 'drones.json', loaders),
+    loadJsonFromBundle<X4Missile[]>(folderName, 'missiles.json', loaders),
+    loadJsonFromBundle<X4Bullet[]>(folderName, 'bullets.json', loaders),
+    loadJsonFromBundle<X4Map>(folderName, 'maps.json', loaders),
+    loadJsonFromBundle<X4RegionYield[]>(folderName, 'regionyields.json', loaders),
+    loadJsonFromBundle<X4Faction[]>(folderName, 'factions.json', loaders),
+    loadJsonFromBundle<Record<string, X4DefaultMax>>(folderName, 'default_maxes.json', loaders),
+    loadJsonFromBundle<Record<string, X4ShipSlot[]>>(folderName, 'ship_slots.json', loaders),
+    loadJsonFromBundle<X4Language[]>(folderName, 'languages.json', loaders)
+  ])
+
   return {
-    ships: shipsRaw as unknown as X4Ship[],
-    races: shipRacesRaw as X4ShipRace[],
-    types: shipTypesRaw as X4ShipType[],
-    equipments: equipmentsRaw as X4Equipment[],
-    equipmentTypes: equipmentTypesRaw as X4EquipmentType[],
-    slotTags: slotTagsRaw as X4SlotTag[],
-    wares: waresRaw as X4Ware[]
+    wares, modules, moduleGroups, consumption,
+    ships, shipRaces, shipTypes,
+    equipments, equipmentTypes, slotTags,
+    consumables, drones, missiles, bullets,
+    maps, regionyields, factions,
+    defaultMaxes, shipSlots, languages
   }
 }
 
-export function buildShipBuildDatas(payload: {
-  ships: X4Ship[]
-  races: X4ShipRace[]
-  types: X4ShipType[]
-  equipments: X4Equipment[]
-} = getShipBuildRawData()): ShipBuildDatas {
+export function getShipBuildRawData(data: GameDataFiles): ShipBuildRawData {
+  return {
+    ships: data.ships,
+    races: data.shipRaces,
+    types: data.shipTypes,
+    equipments: data.equipments,
+    equipmentTypes: data.equipmentTypes,
+    slotTags: data.slotTags,
+    wares: data.wares
+  }
+}
+
+export function buildShipBuildDatas(payload: ShipBuildRawData): ShipBuildDatas {
   const shipMap = new Map<string, X4Ship>()
   payload.ships.forEach((ship) => shipMap.set(ship.id, ship))
 
@@ -96,14 +176,8 @@ export function buildShipBuildDatas(payload: {
   }
 }
 
-export function buildConsumableDatas(payload?: {
-  consumables?: X4Consumable[]
-  drones?: X4Drone[]
-  missiles?: X4Missile[]
-}): ConsumableDatas {
-  const consumables = payload?.consumables || (consumablesRaw as X4Consumable[])
-  const drones = payload?.drones || (dronesRaw as X4Drone[])
-  const missiles = payload?.missiles || (missilesRaw as X4Missile[])
+export function buildConsumableDatas(data: GameDataFiles): ConsumableDatas {
+  const { consumables, drones, missiles } = data
 
   const consumablesMap = new Map<string, X4Consumable>()
   consumables.forEach((item) => consumablesMap.set(item.id, item))
@@ -124,9 +198,9 @@ export function buildConsumableDatas(payload?: {
   }
 }
 
-export function buildWaresMap(): Record<string, X4Ware> {
+export function buildWaresMap(wares: X4Ware[]): Record<string, X4Ware> {
   const map: Record<string, X4Ware> = {}
-  ;(waresRaw as any[]).forEach(w => {
+  wares.forEach(w => {
     map[w.id] = {
       ...w,
       price: w.price || 0,
@@ -137,9 +211,9 @@ export function buildWaresMap(): Record<string, X4Ware> {
   return map
 }
 
-export function buildModulesMap(): Record<string, X4Module> {
+export function buildModulesMap(modules: X4Module[]): Record<string, X4Module> {
   const map: Record<string, X4Module> = {}
-  ;(ModulesRaw as any[]).forEach(m => {
+  modules.forEach(m => {
     if(!m.isPlayerBlueprint) return
     map[m.id] = {
       ...m,
@@ -180,16 +254,17 @@ export function buildModulesByOutputMap(modulesMap: Record<string, X4Module>): R
   return outputMap
 }
 
-export function buildMedicalConsumptionMap(): RaceMedicalConsumption {
-  return consumptionRaw as RaceMedicalConsumption
+export function buildMedicalConsumptionMap(consumption: RaceMedicalConsumption): RaceMedicalConsumption {
+  return consumption
 }
 
 export function buildLocalizedModulesMap(
+  modules: X4Module[],
   isEn: boolean,
   translateModule: (m: X4Module) => string
 ): Record<string, LocalizedX4Module> {
   const map: Record<string, LocalizedX4Module> = {}
-  ;(ModulesRaw as any[]).forEach(m => {
+  modules.forEach(m => {
     if(!m.isPlayerBlueprint) return
     map[m.id] = {
       ...m,
@@ -201,11 +276,12 @@ export function buildLocalizedModulesMap(
 }
 
 export function buildLocalizedModuleGroupsMap(
+  moduleGroups: X4ModuleGroup[],
   isEn: boolean,
   translateModuleGroup: (mg: X4ModuleGroup) => string
 ): Record<string, LocalizedX4ModuleGroup> {
   const map: Record<string, LocalizedX4ModuleGroup> = {}
-  ;(moduleGroupsRaw as any[]).forEach((mg: any) => {
+  moduleGroups.forEach((mg) => {
     map[mg.id] = {
       ...mg,
       localeName: isEn ? (mg.name || '') : translateModuleGroup(mg)
@@ -265,7 +341,7 @@ export function precomputeCandidateWares(
   industrialRaces.forEach(raceKey => {
     const resultSet = new Set<string>()
     const seeds = new Set<string>()
-    
+
     Object.values(modulesMap).forEach(m => {
       if (m.race === raceKey && INDUSTRIAL_GROUPS.includes(m.group)) {
         Object.keys(m.outputs).forEach(id => {
@@ -290,9 +366,9 @@ export function precomputeCandidateWares(
     const trace = (wareId: string) => {
       if (visited.has(wareId)) return
       visited.add(wareId)
-      
+
       resultSet.add(wareId)
-      
+
       const ware = waresMap[wareId]
       if (ware && ware.tier === 0) return
 
@@ -321,7 +397,7 @@ export function precomputeCandidateWares(
     const trace = (wareId: string) => {
       if (visited.has(wareId)) return
       visited.add(wareId)
-      
+
       resultSet.add(wareId)
 
       const ware = waresMap[wareId]

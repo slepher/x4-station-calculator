@@ -8,7 +8,6 @@ import type {
   ModuleGroupResult,
 } from '../types/x4'
 import { useGameDataStore } from './useGameDataStore'
-import { useLogicFlowStore } from './useLogicFlowStore'
 import { useEmpireStore } from './useEmpireStore'
 import { useShipBuildStore, type StationActiveView } from './useShipBuildStore'
 import { generateFilteredModulesGrouped } from './logic/searchModule'
@@ -34,7 +33,6 @@ function deepClone<T>(value: T): T {
 
 export const useStationStore = defineStore('station', () => {
   const gameData = useGameDataStore()
-  const logicFlow = useLogicFlowStore()
   const empireStore = useEmpireStore()
   const shipBuildStore = useShipBuildStore()
 
@@ -482,19 +480,8 @@ export const useStationStore = defineStore('station', () => {
     } as X4Module
   }
 
-  const initializeStore = async () => {
-    console.log('[StationStore] Initializing...')
-    try {
-      await gameData.initialize()
-      logicFlow.init()
-      syncStateFromActiveStation()
-      console.log('[StationStore] Initialized. Ready:', isReady.value)
-    } catch (e) {
-      console.error('[Store] Initialization failed:', e)
-    }
-  }
-
-  initializeStore()
+  // StationStore is now a pure presentation layer
+  // Initialization is coordinated by App.vue
 
   return {
     isReady, isDirty, activeView,

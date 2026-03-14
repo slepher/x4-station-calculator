@@ -20,6 +20,23 @@ if not os.path.exists(config_file):
 with open(config_file, "r", encoding="utf-8") as f:
     _config = json.load(f)
 
+# 从 versions 数组中查找当前版本配置
+_current_version = _config.get('current_version')
+_is_beta = _config.get('beta', False)
+_versions = _config.get('versions', [])
+_version_config = None
+for v in _versions:
+    if v.get('version') == _current_version and v.get('beta', False) == _is_beta:
+        _version_config = v
+        break
+
+if _version_config is None:
+    _beta_str = "beta" if _is_beta else "stable"
+    raise SystemExit(f"未找到版本 {_current_version} ({_beta_str}) 的配置。")
+
+# 将版本配置合并到 _config 顶层
+_config.update(_version_config)
+
 X4_UNPACKED_DATA_PATH = os.path.join(_config['raw_assets_dir'], _config['folder_name'])
 OUTPUT_VERSION_DIR = os.path.join(_config['processed_assets_dir'], _config['folder_name'])
 DEFAULT_MAP_DIR = str(Path(X4_UNPACKED_DATA_PATH) / "maps" / "xu_ep2_universe")

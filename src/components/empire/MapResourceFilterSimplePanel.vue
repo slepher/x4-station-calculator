@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
-import mapsData from '@/assets/x4_game_data/8.0-Diplomacy/data/maps.json'
-import regionYieldsData from '@/assets/x4_game_data/8.0-Diplomacy/data/regionyields.json'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import {
   buildDefaultResourceFilters,
   buildSectorResourceFill,
@@ -59,16 +58,24 @@ const emit = defineEmits<{
 }>()
 
 const { t, locale } = useI18n()
+const gameData = useGameDataStore()
 
-const regionYields = regionYieldsData as ResourceEntry[]
-const yieldRanksByWare = buildYieldRanksByWare(regionYields)
-const resourceFilters = ref(buildDefaultResourceFilters(regionYields))
+const regionYields = computed<ResourceEntry[]>(() => (gameData.regionyields || []) as ResourceEntry[])
+const yieldRanksByWare = computed(() => buildYieldRanksByWare(regionYields.value))
+const resourceFilters = ref(buildDefaultResourceFilters([]))
 const RESOURCE_ORDER = ['ore', 'silicon', 'methane', 'hydrogen', 'helium', 'ice', 'rawscrap', 'nividium'] as const
 const SUNLIGHT_FILTER_ID = 'sunlight'
 const SUNLIGHT_COLOR = '#F7D24B'
 const DEFAULT_CANDIDATE_WARE_IDS = ['ore', 'silicon', 'methane', 'hydrogen', 'helium'] as const
 const sunlightFilterEnabled = ref(false)
 const sunlightMinimum = ref(100)
+
+// Initialize resourceFilters when regionYields becomes available
+watchEffect(() => {
+  if (regionYields.value.length > 0 && Object.keys(resourceFilters.value).length === 0) {
+    resourceFilters.value = buildDefaultResourceFilters(regionYields.value)
+  }
+})
 
 const toRgba = (hex: string | undefined, alpha: number) => {
   if (!hex || !hex.startsWith('#') || hex.length !== 7) return `rgba(251, 191, 36, ${alpha})`
@@ -97,7 +104,7 @@ const formatYieldLabel = (yieldName: string) => {
 
 const resourceCatalog = computed<ResourceCatalogItem[]>(() => [
   ...RESOURCE_ORDER
-    .map((wareId) => regionYields.find((entry) => entry.ware === wareId))
+    .map((wareId) => regionYields.value.find((entry) => entry.ware === wareId))
     .filter((entry): entry is ResourceEntry => Boolean(entry))
     .map((entry) => ({
       ware: entry.ware,
@@ -115,7 +122,7 @@ const resourceCatalog = computed<ResourceCatalogItem[]>(() => [
 
 const sectorDataById = computed<Record<string, { resources: SectorResourceEntry[]; sunlight: number }>>(() => {
   const out: Record<string, { resources: SectorResourceEntry[]; sunlight: number }> = {}
-  const clusters = (mapsData as { clusters?: Record<string, any> }).clusters || {}
+  const clusters = gameData.maps?.clusters || {}
   Object.values(clusters).forEach((cluster) => {
     Object.values(cluster.sectors || {}).forEach((sector: any) => {
       out[sector.id] = {
@@ -148,7 +155,7 @@ const reachableMaxByWare = computed<Record<string, string | null>>(() =>
     const sectorsWithinSunlight = sunlightFilterEnabled.value
       ? sectorCandidates.value.filter((sector) => sector.sunlight >= sunlightMinimum.value)
       : sectorCandidates.value
-    acc[wareId] = getContextReachableMaxYieldName(wareId, sectorsWithinSunlight, resourceFilters.value, yieldRanksByWare)
+    acc[wareId] = getContextReachableMaxYieldName(wareId, sectorsWithinSunlight, resourceFilters.value, yieldRanksByWare.value)
     return acc
   }, {})
 )
@@ -158,7 +165,7 @@ const filteredSectorCandidates = computed(() => {
   return sectorCandidates.value.filter((sector) => {
     if (sunlightFilterEnabled.value && sector.sunlight < sunlightMinimum.value) return false
     if (!selectedWareIds.value.length) return true
-    return isSectorMatchedByResources(sector, resourceFilters.value, yieldRanksByWare)
+    return isSectorMatchedByResources(sector, resourceFilters.value, yieldRanksByWare.value)
   })
 })
 
@@ -308,7 +315,7 @@ const getSectorPrimaryLabel = (item: { name: string; displayName: string }) =>
 const isYieldOptionDisabled = (wareId: string, yieldName: string) => {
   const reachableName = reachableMaxByWare.value[wareId]
   if (!reachableName) return yieldName !== resourceFilters.value[wareId]?.minYieldName
-  const rankMap = yieldRanksByWare[wareId]
+  const rankMap = yieldRanksByWare.value[wareId]
   const targetRank = rankMap?.[yieldName]
   const reachableRank = rankMap?.[reachableName]
   const currentValue = resourceFilters.value[wareId]?.minYieldName
@@ -321,7 +328,7 @@ const isYieldBeyondReachable = (wareId: string) => {
   const reachableName = reachableMaxByWare.value[wareId]
   const currentValue = resourceFilters.value[wareId]?.minYieldName
   if (!reachableName || !currentValue) return false
-  const rankMap = yieldRanksByWare[wareId]
+  const rankMap = yieldRanksByWare.value[wareId]
   const currentRank = rankMap?.[currentValue]
   const reachableRank = rankMap?.[reachableName]
   if (currentRank === undefined || reachableRank === undefined) return false

@@ -27,6 +27,14 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   const lastSavedSnapshot = ref<string>('')
   const settings = ref<LogicFlowSettings>({ isDefaultLocked: true })
 
+  function buildSnapshot() {
+    return JSON.stringify({ groups: groups.value, settings: settings.value })
+  }
+
+  function buildEmptySnapshot() {
+    return JSON.stringify({ groups: [], settings: { isDefaultLocked: true } })
+  }
+
   // 同步到 state 以便持久化（可选，但目前主要用于测试注入）
   const startDragging = (wareId: string, lineage?: string) => {
     // T0 资源不可被拖拽 - 每次调用时重新获取 gameData 实例
@@ -405,19 +413,22 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   /**
    * 初始化
    */
-  function init() {
+  async function init() {
+    // Must initialize gameData first to get correct storage key
+    if (!gameData.isReady) {
+      await gameData.initialize()
+    }
+
     loadPlansFromStorage()
-    
+
     // 根据 activeId 自动加载当前方案
     if (savedPlans.value.activeId) {
       const activePlan = savedPlans.value.list.find(p => p.id === savedPlans.value.activeId)
       if (activePlan) {
         applyPlan(activePlan)
       }
-    }
-    
-    if (!gameData.isReady) {
-      gameData.initialize()
+    } else {
+      lastSavedSnapshot.value = buildEmptySnapshot()
     }
   }
 
@@ -920,7 +931,8 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
    * 脏检查：当前状态与上次保存的快照是否一致
    */
   const isDirty = computed(() => {
-    const current = JSON.stringify({ groups: groups.value, settings: settings.value })
+    if (groups.value.length === 0) return false
+    const current = buildSnapshot()
     return current !== lastSavedSnapshot.value
   })
 
@@ -1004,7 +1016,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     }
 
     currentPlanName.value = planName
-    lastSavedSnapshot.value = JSON.stringify({ groups: groups.value, settings: settings.value })
+    lastSavedSnapshot.value = buildSnapshot()
     savePlansToStorage()
     return true
   }
@@ -1141,7 +1153,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       }
     }
 
-    lastSavedSnapshot.value = JSON.stringify({ groups: groups.value, settings: settings.value })
+    lastSavedSnapshot.value = buildSnapshot()
   }
 
   /**
@@ -1171,13 +1183,13 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     savedPlans.value.activeId = null
     settings.value = { isDefaultLocked: true }
     isDefaultLocked.value = true
-    lastSavedSnapshot.value = ''
+    lastSavedSnapshot.value = buildEmptySnapshot()
   }
 
   // --- Plan Persistence ---
 
   function loadPlansFromStorage() {
-    const stored = localStorage.getItem('x4_logic_flow_plans')
+    const stored = localStorage.getItem(gameData.getStorageKey('logic_flow'))
     if (stored) {
       try {
         const data = JSON.parse(stored) as SavedFlowPlansState
@@ -1195,7 +1207,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   }
 
   function savePlansToStorage() {
-    localStorage.setItem('x4_logic_flow_plans', JSON.stringify(savedPlans.value))
+    localStorage.setItem(gameData.getStorageKey('logic_flow'), JSON.stringify(savedPlans.value))
   }
 
   return {

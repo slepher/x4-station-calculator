@@ -222,6 +222,7 @@ export interface X4Drone {
   purposePrimary: string;
   droneTags: string[];
   noplayerblueprint: boolean;
+  deployable?: boolean;
   cargo: Array<{ type: 'container' | 'solid' | 'liquid' | 'condensate'; capacity: number }>;
   tags: string[];
   cost: Record<string, Partial<Record<string, number>>>;
@@ -303,6 +304,7 @@ export interface X4Module {
   name: string;
   type: 'production' | 'habitation' | 'storage' | 'dock' | 'connection' | string;
   method: 'terran' | 'closed_loop' | 'recycling' | 'default' | 'teladi' | 'none'; // 生产方式偏好
+  isPlayerBlueprint: boolean; // 是否为玩家可建造的蓝图
 
   group: string;      // 模块分组 ID
   race: string;       // 种族归属
@@ -836,5 +838,171 @@ export interface SavedShipBlueprintsState {
 // View layer type for selectedByConnection
 export interface ConnectionValue {
   equipmentId: string | null
+  count: number
+}
+
+// --- Game Version Types ---
+
+export interface VersionConfig {
+  version: string
+  beta: boolean
+  codename: string
+  folder_name: string
+  storage_keys: {
+    empire: string
+    logic_flow: string
+    ship_blueprints: string
+  }
+}
+
+export interface VersionsFile {
+  current_version: string
+  beta: boolean
+  versions: VersionConfig[]
+}
+
+export interface GameVersionStorage {
+  version: string
+  beta: boolean
+}
+
+// --- Map Data Types ---
+
+export interface X4MapSector {
+  id: string
+  cluster_id: string
+  nameId: string
+  name: string
+  owner: string
+  owner_color: string
+  area?: {
+    sunlight: number
+    economy: number
+    security: number
+    tags?: string[]
+  }
+  raw_local_pos?: { x: number; z: number }
+  raw_world_pos?: { x: number; z: number }
+  normalized?: {
+    axial?: { q: number; r: number }
+    pixel_basis?: { x: number; y: number }
+  }
+}
+
+export interface X4MapCluster {
+  id: string
+  nameId: string
+  name: string
+  owner: string
+  owner_color: string
+  raw_pos?: { x: number; z: number }
+  normalized?: {
+    axial?: { q: number; r: number }
+    pixel_basis?: { x: number; y: number }
+  }
+  sectors: Record<string, X4MapSector>
+}
+
+export interface X4Map {
+  meta?: {
+    version?: string
+    source_map_dir?: string
+    mapdefaults_xml?: string
+    structure?: string
+  }
+  clusters: Record<string, X4MapCluster>
+}
+
+// --- Region Yield Types ---
+
+export interface X4YieldLevel {
+  name: string
+  resourcedensity: number
+  replenishtime: number
+  gatherspeedfactor: number
+  scaneffect: string
+  scaneffectdensity: number
+  scaneffectintensity: number
+}
+
+export interface X4RegionYield {
+  ware: string
+  color: string
+  yields: X4YieldLevel[]
+}
+
+// --- Faction Types ---
+
+export interface X4Faction {
+  id: string
+  name: string
+  nameId: string
+  tags?: string[]
+  color_name?: string
+  color?: string
+  claimspace?: boolean
+}
+
+// --- Language Types ---
+
+export interface X4Language {
+  code: string
+  name: string
+  x4_id: string
+}
+
+// --- Default Max Types ---
+
+export interface X4DefaultMax {
+  hull?: number
+  weapon_burst?: number
+  weapon_sustained?: number
+  shield_value?: number
+  shield_delay?: number
+  shield_rate?: number
+  turret_value?: number
+  turret_sustained_value?: number
+  group_shield_value?: number
+  group_shield_delay?: number
+  group_shield_rate?: number
+  turret_burst?: number
+  turret_sustained?: number
+  dock_ship_m?: number
+  dock_ship_s?: number
+  engine_forward?: number
+  engine_acceleration?: number
+  engine_yaw?: number
+  engine_pitch?: number
+  engine_roll?: number
+  boost_speed?: number
+  boost_acceleration?: number
+  boost_duration?: number
+  boost_recharge?: number
+  travel_speed?: number
+  travel_acceleration?: number
+  travel_charge_time?: number
+  thruster_horizontal_speed?: number
+  thruster_horizontal_acceleration?: number
+  thruster_vertical_speed?: number
+  thruster_vertical_acceleration?: number
+  capacity_crew?: number
+  capacity_container?: number
+  capacity_solid?: number
+  capacity_liquid?: number
+  capacity_condensate?: number
+  capacity_ship_m?: number
+  capacity_ship_s?: number
+  capacity_unit?: number
+  capacity_missile?: number
+  capacity_countermeasure?: number
+  capacity_deployable?: number
+  radar_range?: number
+}
+
+// --- Ship Slot Types ---
+
+export interface X4ShipSlot {
+  slot: string
+  size: string
   count: number
 }

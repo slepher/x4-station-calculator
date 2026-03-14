@@ -1,19 +1,40 @@
 import {
   extractEquipmentCandidatesBySelector,
   extractShipCandidates,
-  filterEquipmentCandidates,
   type EquipmentPickerFilters,
   type EquipmentSlotSelector,
   type ShipCandidateFilters
 } from '../store/logic/shipEquipmentPicker'
 import type { EquipmentType, ShipEquipmentSize } from '../types/x4'
 import { buildShipBuildDatas } from '../store/logic/useGameData'
+import { useGameDataStore } from '../store/useGameDataStore'
 
-const { shipMap, equipmentMap } = buildShipBuildDatas()
+/**
+ * This module provides ship build query functions.
+ * Note: These functions require the gameDataStore to be initialized first.
+ */
+
+function getShipBuildData() {
+  const gameData = useGameDataStore()
+  const data = gameData.gameData
+  if (!data) {
+    throw new Error('Game data not initialized. Call gameDataStore.initialize() first.')
+  }
+  return buildShipBuildDatas({
+    ships: data.ships,
+    races: data.shipRaces,
+    types: data.shipTypes,
+    equipments: data.equipments,
+    equipmentTypes: data.equipmentTypes,
+    slotTags: data.slotTags,
+    wares: data.wares
+  })
+}
 
 export const getShipCandidates = (
   filters: ShipCandidateFilters
 ) => {
+  const { shipMap } = getShipBuildData()
   return extractShipCandidates({
     shipMap,
     filters
@@ -23,61 +44,35 @@ export const getShipCandidates = (
 export const getEquipmentCandidatesBySlot = (
   slotType: EquipmentType,
   size: ShipEquipmentSize,
-  tagsAll: string[],
+  _tagsAll: string[],
   filters: EquipmentPickerFilters
 ) => {
-  const base = Array.from(equipmentMap.values())
-    .filter((equipment) => !equipment.noplayerblueprint)
-    .filter((equipment) => equipment.type === slotType && equipment.size === size)
-    .filter((equipment) => (equipment.slotTags || []).every((tag) => tagsAll.includes(tag)))
-    .map((equipment) => ({
-      id: equipment.id,
-      name: equipment.name || equipment.id,
-      mk: equipment.mk || null,
-      race: equipment.race || null,
-      tags: Array.isArray(equipment.slotTags) ? equipment.slotTags.filter((tag): tag is string => typeof tag === 'string') : []
-    }))
-    .sort((a, b) => (a.id > b.id ? 1 : a.id < b.id ? -1 : 0))
+  const { equipmentMap } = getShipBuildData()
 
-  const items = filterEquipmentCandidates(base, filters)
-  const racePool = filterEquipmentCandidates(base, { races: [], mks: filters.mks, tags: filters.tags })
-  const mkPool = filterEquipmentCandidates(base, { races: filters.races, mks: [], tags: filters.tags })
-  const tagPool = filterEquipmentCandidates(base, { races: filters.races, mks: filters.mks, tags: [] })
-
-  const raceCountMap = new Map<string, number>()
-  racePool.forEach((item) => {
-    const race = item.race || 'gen'
-    raceCountMap.set(race, (raceCountMap.get(race) || 0) + 1)
-  })
-
-  const mkCountMap = new Map<string, number>()
-  mkPool.forEach((item) => {
-    if (!item.mk) return
-    mkCountMap.set(item.mk, (mkCountMap.get(item.mk) || 0) + 1)
-  })
-
-  const tagCountMap = new Map<string, number>()
-  tagPool.forEach((item) => {
-    item.tags.forEach((tag) => tagCountMap.set(tag, (tagCountMap.get(tag) || 0) + 1))
-  })
-
-  return {
-    items,
-    raceCountMap,
-    mkCountMap,
-    tagCountMap
+  const selector: EquipmentSlotSelector = {
+    mode: 'slotTypeSizeN',
+    slotType,
+    sizeN: size
   }
+
+  return extractEquipmentCandidatesBySelector({
+    shipMap: new Map(),
+    equipmentMap,
+    shipId: '',
+    selector,
+    filters
+  })
 }
 
 export const getEquipmentCandidatesBySelector = (
-  shipId: string,
   selector: EquipmentSlotSelector,
   filters: EquipmentPickerFilters
 ) => {
+  const { equipmentMap } = getShipBuildData()
   return extractEquipmentCandidatesBySelector({
-    shipMap,
+    shipMap: new Map(),
     equipmentMap,
-    shipId,
+    shipId: '',
     selector,
     filters
   })

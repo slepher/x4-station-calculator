@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import i18n from '@/i18n'
+import { useGameDataStore } from './useGameDataStore'
 import type {
   ConnectionValue,
   EquipmentType,
@@ -21,9 +22,8 @@ import type {
 import type { FitConnectionRow, FitMode } from '@/components/ship-build/fitTypes'
 import { migrateShipBlueprintStateToCurrent } from './logic/stateMigrations'
 import { CURRENT_SHIP_BLUEPRINT_VERSION } from './logic/storageVersions'
-import { buildConsumableDatas, buildShipBuildDatas, getShipBuildRawData } from './logic/useGameData'
+import { buildConsumableDatas, buildShipBuildDatas } from './logic/useGameData'
 
-const STORAGE_KEY = 'x4_ship_blueprints'
 const BUILT_IN_BLUEPRINT_ID_PREFIX = '__built_in_ship_blueprint__'
 const EMPTY_SHIP_STORAGE: ShipBlueprintStorage = {
   deployables: [],
@@ -91,33 +91,44 @@ const BUILT_IN_PRESETS: Array<{ key: BuiltInPresetKey; labelKey: string }> = [
 ]
 
 export const useShipBuildStore = defineStore('ship-build', () => {
-  const shipBuildRaw = getShipBuildRawData()
-  const ships = shipBuildRaw.ships as X4Ship[]
-  const equipments = shipBuildRaw.equipments as X4Equipment[]
-  const equipmentTypes = shipBuildRaw.equipmentTypes as X4EquipmentType[]
-  const slotTags = shipBuildRaw.slotTags as X4SlotTag[]
-  const wares = shipBuildRaw.wares as X4Ware[]
-  const {
-    shipMap,
-    raceMap,
-    typeMap,
-    equipmentMap,
-    shipTypes,
-    shipRaces
-  } = buildShipBuildDatas({
-    ships,
-    races: shipBuildRaw.races as X4ShipRace[],
-    types: shipBuildRaw.types as X4ShipType[],
-    equipments
-  })
-  const {
-    consumables,
-    drones,
-    missiles,
-    consumablesMap,
-    dronesMap,
-    missilesMap
-  } = buildConsumableDatas()
+  const gameData = useGameDataStore()
+
+  function getStorageKey(): string {
+    return gameData.getStorageKey('ship_blueprints')
+  }
+
+  // Get data from gameData store
+  const ships = computed<X4Ship[]>(() => gameData.gameData?.ships || [])
+  const shipRaces = computed<X4ShipRace[]>(() => gameData.gameData?.shipRaces || [])
+  const shipTypes = computed<X4ShipType[]>(() => gameData.gameData?.shipTypes || [])
+  const equipments = computed<X4Equipment[]>(() => gameData.gameData?.equipments || [])
+  const equipmentTypes = computed<X4EquipmentType[]>(() => gameData.gameData?.equipmentTypes || [])
+  const slotTags = computed<X4SlotTag[]>(() => gameData.gameData?.slotTags || [])
+  const wares = computed<X4Ware[]>(() => gameData.gameData?.wares || [])
+
+  const shipBuildDatas = computed(() => buildShipBuildDatas({
+    ships: ships.value,
+    races: shipRaces.value,
+    types: shipTypes.value,
+    equipments: equipments.value,
+    equipmentTypes: equipmentTypes.value,
+    slotTags: slotTags.value,
+    wares: wares.value
+  }))
+
+  const shipMap = computed(() => shipBuildDatas.value.shipMap)
+  const raceMap = computed(() => shipBuildDatas.value.raceMap)
+  const typeMap = computed(() => shipBuildDatas.value.typeMap)
+  const equipmentMap = computed(() => shipBuildDatas.value.equipmentMap)
+
+  const consumableDatas = computed(() => buildConsumableDatas(gameData.gameData!))
+  const consumables = computed(() => consumableDatas.value.consumables)
+  const drones = computed(() => consumableDatas.value.drones)
+  const missiles = computed(() => consumableDatas.value.missiles)
+  const consumablesMap = computed(() => consumableDatas.value.consumablesMap)
+  const dronesMap = computed(() => consumableDatas.value.dronesMap)
+  const missilesMap = computed(() => consumableDatas.value.missilesMap)
+
   const activeView = ref<StationActiveView>(
     (localStorage.getItem('x4_station_active_view') as StationActiveView) || 'production'
   )
@@ -142,13 +153,19 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   const mockTagPatch = ref<ShipBuildMockTagPatch | null>(null)
   const translateEquipmentFn = ref<(equipment: X4Equipment) => string>((equipment) => equipment.name || equipment.id)
   const translateEquipmentTypeFn = ref<(type: X4EquipmentType) => string>((type) => type.name || type.id)
-  const equipmentTypeMap = new Map<EquipmentType, X4EquipmentType>()
-  const waresMap = new Map<string, X4Ware>()
-  equipmentTypes.forEach((type) => {
-    equipmentTypeMap.set(type.id, type)
+  const equipmentTypeMap = computed(() => {
+    const map = new Map<EquipmentType, X4EquipmentType>()
+    equipmentTypes.value.forEach((type) => {
+      map.set(type.id, type)
+    })
+    return map
   })
-  wares.forEach((ware) => {
-    waresMap.set(ware.id, ware)
+  const waresMap = computed(() => {
+    const map = new Map<string, X4Ware>()
+    wares.value.forEach((ware) => {
+      map.set(ware.id, ware)
+    })
+    return map
   })
 
   watch(activeView, (val) => {
@@ -158,7 +175,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   // Load blueprints from localStorage
   const loadBlueprintsFromStorage = () => {
     try {
-      const data = localStorage.getItem(STORAGE_KEY)
+      const data = localStorage.getItem(getStorageKey())
       if (data) {
         const parsed = JSON.parse(data)
         const migrated = migrateShipBlueprintStateToCurrent(parsed)
@@ -187,14 +204,33 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   // Save blueprints to localStorage
   const saveBlueprintsToStorage = () => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(savedBlueprints.value))
+      localStorage.setItem(getStorageKey(), JSON.stringify(savedBlueprints.value))
     } catch (e) {
       console.error('Failed to save blueprints to storage:', e)
     }
   }
 
-  // Initialize: load from storage
-  loadBlueprintsFromStorage()
+  // Initialize: must be called after gameData is ready
+  async function initialize() {
+    if (!gameData.isReady) {
+      await gameData.initialize()
+    }
+    loadBlueprintsFromStorage()
+
+    // Restore blueprint from saved active state
+    if (savedBlueprints.value.activeBlueprintId) {
+      const bp = findBlueprintById(savedBlueprints.value.activeBlueprintId)
+      if (bp) {
+        const restored = JSON.parse(JSON.stringify(bp)) as ShipBlueprint
+        restored.storage = restored.storage
+          ? JSON.parse(JSON.stringify(restored.storage))
+          : JSON.parse(JSON.stringify(EMPTY_SHIP_STORAGE))
+        blueprint.value = restored
+        viewMode.value = 'workbench'
+        takeSnapshot()
+      }
+    }
+  }
 
   const getBucketByShipId = (shipId: string): ShipBlueprintBucket | null => {
     return savedBlueprints.value.ships.find((bucket) => bucket.shipId === shipId) || null
@@ -222,22 +258,22 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
   const findShip = (shipId: string | null | undefined): X4Ship | null => {
     if (!shipId) return null
-    return shipMap.get(shipId) || null
+    return shipMap.value.get(shipId) || null
   }
 
   const findEquipmentType = (typeId: EquipmentType | string | null | undefined): X4EquipmentType | null => {
     if (!typeId) return null
-    return equipmentTypeMap.get(typeId as EquipmentType) || null
+    return equipmentTypeMap.value.get(typeId as EquipmentType) || null
   }
 
   const findEquipment = (equipmentId: string | null | undefined): X4Equipment | null => {
     if (!equipmentId) return null
-    return equipmentMap.get(equipmentId) || null
+    return equipmentMap.value.get(equipmentId) || null
   }
 
   const findWare = (wareId: string | null | undefined): X4Ware | null => {
     if (!wareId) return null
-    return waresMap.get(wareId) || null
+    return waresMap.value.get(wareId) || null
   }
 
   const getBlueprintsForShip = (shipId: string | null): ShipBlueprint[] => {
@@ -335,7 +371,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     size: ShipEquipmentSize,
     connectionTags: string[]
   ): X4Equipment[] => {
-    return equipments
+    return equipments.value
       .filter((equipment) => !equipment.noplayerblueprint)
       .filter((equipment) => equipment.type === slotType && equipment.size === size)
       .filter((equipment) => {
@@ -357,7 +393,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     const { ship, slotType, size, connectionTags, preset } = payload
 
     if (slotType === 'turret' && ship.purposePrimary === 'mine') {
-      const mineTurrets = equipments
+      const mineTurrets = equipments.value
         .filter((equipment) => !equipment.noplayerblueprint)
         .filter((equipment) => equipment.type === 'turret' && equipment.size === size)
         .filter((equipment) => {
@@ -386,7 +422,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     purpose: 'trade' | 'mine' | 'build',
     preset: BuiltInPresetKey
   ) => {
-    let candidates = drones
+    let candidates = drones.value
       .filter((drone) => !drone.noplayerblueprint)
       .filter((drone) => drone.purposePrimary === purpose)
       .sort((a, b) => a.id.localeCompare(b.id))
@@ -406,7 +442,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       candidates = matchedRace
     }
 
-    const picked = pickByMkPreference(candidates as unknown as X4Equipment[], preset) as unknown as typeof drones[number] | null
+    const picked = pickByMkPreference(candidates as unknown as X4Equipment[], preset) as unknown as typeof drones.value[number] | null
     return picked || null
   }
 
@@ -662,6 +698,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
   // isDirty computed
   const isDirty = computed(() => {
+    if (isEmptyForSave()) return false
     if (forceDirty.value) return true
     if (!lastSavedSnapshot.value) return false
     const shipId = resolveCurrentShipId()
@@ -1487,7 +1524,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     size: ShipEquipmentSize,
     connectionTags: string[]
   ) => {
-    return equipments
+    return equipments.value
       .filter((equipment) => !equipment.noplayerblueprint)
       .filter((equipment) => equipment.type === slotType && equipment.size === size)
       .filter((equipment) => {
@@ -1527,7 +1564,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
         if (!connectionSize) return
         const sourceTags = patchItem?.tags || connection?.tags || []
         const tags = normalizeTagList(sourceTags)
-        const typeDef = equipmentTypeMap.get(slot.type)
+        const typeDef = equipmentTypeMap.value.get(slot.type)
 
         rows.push({
           connectionKey: baseKey,
@@ -1561,7 +1598,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
           ? resolveSize(shieldPatchItem.size, shieldDef?.size)
           : resolveSize(undefined, shieldDef?.size)
         if (!shieldSize) return
-        const shieldTypeDef = equipmentTypeMap.get('shield')
+        const shieldTypeDef = equipmentTypeMap.value.get('shield')
         const shieldTypeLabel = shieldTypeDef ? translateEquipmentTypeFn.value(shieldTypeDef) : 'shield'
         rows.push({
           connectionKey: shieldKey,
@@ -1665,6 +1702,8 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     isBuiltInPresetUnchanged,
     isEditable,
     isEmptyForSave,
+    // Initialization
+    initialize,
     setEquipment,
     setShield,
     setGroupEquipment,

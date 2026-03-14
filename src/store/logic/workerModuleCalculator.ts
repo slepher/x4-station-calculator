@@ -2,7 +2,6 @@ import type { SavedModule, StationSettings, X4Module, X4Ware, RaceMedicalConsump
 import { findBestHabitat, findBestProducer } from './bestModuleSelector'
 import { calculateWorkforceCensus } from './calculatorUtils'
 import { analyzeWareFlow } from './analyzeWareFlow'
-import consumptionRaw from '../../assets/x4_game_data/8.0-Diplomacy/data/consumption.json'
 
 // --- 私有辅助函数：递归计算单单位物资的工人成本 ---
 
@@ -81,15 +80,16 @@ export function calculateSustainMultiplier(
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
   useEfficiency: boolean,
-  sunlight: number = 100
+  sunlight: number,
+  medicalConsumption: RaceMedicalConsumption
 ): { R: number, M: number } {
   const cache = new Map<string, number>();
   const visited = new Set<string>();
 
   // 获取种族消耗数据
-  const raceData = (consumptionRaw as any)[raceKey] || (consumptionRaw as any)['default'];
-  const consumptionRates = raceData?.wares || raceData || {};
-  
+  const raceData = medicalConsumption[raceKey] || medicalConsumption['default'] || {};
+  const consumptionRates = raceData.wares || raceData;
+
   let R = 0;
 
   // 遍历该种族工人每小时吃的所有东西
@@ -101,11 +101,11 @@ export function calculateSustainMultiplier(
   }
 
   // 安全阀：防止 R >= 1 导致除零或负数
-  const safeR = Math.min(R, 0.99); 
-  
-  return { 
-    R: safeR, 
-    M: 1 / (1 - safeR) 
+  const safeR = Math.min(R, 0.99);
+
+  return {
+    R: safeR,
+    M: 1 / (1 - safeR)
   };
 }
 
@@ -126,29 +126,30 @@ export function calculateWorkerSupplyNeeds(
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
   considerWorkforceForAutoFill: boolean,
-  sunlight: number = 100
+  sunlight: number,
+  medicalConsumption: RaceMedicalConsumption
 ): Record<string, number> {
-  
+
   // 1. 快速预估：计算乘数 M
   // 如果没有启用工人计算，则不需要递归乘数 (M=1)
   let M = 1.0;
   if (considerWorkforceForAutoFill) {
-    const result = calculateSustainMultiplier(raceKey, modulesMap, waresMap, true, sunlight);
+    const result = calculateSustainMultiplier(raceKey, modulesMap, waresMap, true, sunlight, medicalConsumption);
     M = result.M;
   }
 
   let currentTotalWorkers = Math.ceil(targetWorkerCount * M);
   let finalModules: Record<string, number> = {};
-  
+
   // 2. 收敛循环
   for (let iter = 0; iter < 5; iter++) {
     const tempModules: Record<string, number> = {};
     const productionState: Record<string, number> = {};
-    
+
     // A. 初始化需求
-    const raceData = (consumptionRaw as any)[raceKey] || (consumptionRaw as any)['default'];
-    const consumptionRates = raceData?.wares || raceData || {};
-    
+    const raceData = medicalConsumption[raceKey] || medicalConsumption['default'] || {};
+    const consumptionRates = raceData.wares || raceData;
+
     for (const [ware, amount] of Object.entries(consumptionRates)) {
       productionState[ware] = (productionState[ware] || 0) - (currentTotalWorkers * (amount as number) * 3600);
     }
@@ -272,7 +273,8 @@ export function calculateAutoSupplyModules(
       modules,
       wares,
       globalWorkforceBonus,
-      settings.sunlight
+      settings.sunlight,
+      medicalConsumption
     );
     const raceSupplyModules: SavedModule[] = [];
 

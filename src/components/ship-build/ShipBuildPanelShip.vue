@@ -4,8 +4,7 @@ import { useI18n } from 'vue-i18n'
 import MetricsPanel from '@/components/common/MetricsPanel.vue'
 import type { MetricSchema, MetricValueMap } from '@/components/common/metricsPanelTypes'
 import type { X4Ship } from '@/types/x4'
-import defaultMaxesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/default_maxes.json'
-import shipSlotsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ship_slots.json'
+import { useGameDataStore } from '@/store/useGameDataStore'
 
 const props = defineProps<{
   targetShip: X4Ship | null
@@ -13,6 +12,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
+const gameData = useGameDataStore()
 
 type ShipClass = X4Ship['class']
 type PropertyKey =
@@ -45,8 +45,8 @@ type SlotItem = {
   count: number
 }
 
-const defaultMaxes = defaultMaxesRaw as Record<ShipClass, Record<string, number>>
-const shipSlotsByClass = shipSlotsRaw as Record<ShipClass, SlotItem[]>
+const defaultMaxes = computed(() => gameData.defaultMaxes as Record<ShipClass, Record<string, number>>)
+const shipSlotsByClass = computed(() => gameData.shipSlots as Record<ShipClass, SlotItem[]>)
 
 const propertyMetaList: PropertyMeta[] = [
   { key: 'hull', labelKey: 'ship_build.stats_hull', unit: 'MJ', maxField: 'hull' },
@@ -139,7 +139,7 @@ const activeClass = computed<ShipClass | null>(() => {
 
 const activePropertyMetaList = computed<PropertyMeta[]>(() => {
   if (!activeClass.value) return []
-  const classMaxes = defaultMaxes[activeClass.value] || {}
+  const classMaxes = defaultMaxes.value[activeClass.value] || {}
   return propertyMetaList.filter((item) => Number(classMaxes[item.maxField] || 0) > 0)
 })
 
@@ -155,7 +155,7 @@ const rightPropertyKeys = computed<PropertyKey[]>(() => {
 
 const activeSlots = computed<SlotItem[]>(() => {
   if (!activeClass.value) return []
-  return (shipSlotsByClass[activeClass.value] || []).filter((item) => Number(item.count || 0) > 0)
+  return (shipSlotsByClass.value[activeClass.value] || []).filter((item) => Number(item.count || 0) > 0)
 })
 
 const leftKeys = computed<string[]>(() => {
@@ -170,7 +170,7 @@ const metadataMap = computed(() => {
   const map = new Map<string, { label: string; unit: string; max: number }>()
   if (!activeClass.value) return map
 
-  const classMaxes = defaultMaxes[activeClass.value] || {}
+  const classMaxes = defaultMaxes.value[activeClass.value] || {}
   activePropertyMetaList.value.forEach((item) => {
     const rawMax = Number(classMaxes[item.maxField] || 0)
     const max = item.key === 'radar_range' ? Math.round(rawMax / 1000) : rawMax

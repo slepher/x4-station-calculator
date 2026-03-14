@@ -1,7 +1,6 @@
 import type {
   EntityLocation,
   EmpirePlan,
-  SectorPlan,
   LogicFlowPlan,
   SavedEmpiresState,
   SavedFlowGroup,
@@ -109,21 +108,12 @@ function toStationPlan(raw: unknown, index: number): StationPlan {
   }
 }
 
-function defaultSector(index: number = 0): SectorPlan {
-  return {
-    id: crypto.randomUUID(),
-    name: `Sector ${index + 1}`,
-    order: index,
-    location: undefined
-  }
-}
-
 function migrateLegacyV1ToV2(raw: V1StorageState): SavedEmpiresState {
   const stations = Array.isArray(raw.list) ? raw.list : []
   const list: EmpirePlan[] = stations.map((plan, index) => ({
     id: crypto.randomUUID(),
     name: typeof plan.name === 'string' && plan.name ? plan.name : `Empire ${index + 1}`,
-    sectors: [defaultSector(0)],
+    sectors: [],
     stations: [{ ...toStationPlan(plan, 0), sectorId: null }]
   }))
 
@@ -138,10 +128,7 @@ function migrateLegacyV1ToV2(raw: V1StorageState): SavedEmpiresState {
 function normalizeEmpireStateShape(raw: SavedEmpiresState, warnings?: string[]): SavedEmpiresState {
   const list = (raw.list || []).map((empire, empireIndex) => {
     const sectorsRaw = Array.isArray((empire as EmpirePlan).sectors) ? (empire as EmpirePlan).sectors || [] : []
-    if (sectorsRaw.length === 0) {
-      warnings?.push(`[empire] empire[${empireIndex}] missing sectors; default sector was created`)
-    }
-    const sectors = (sectorsRaw.length > 0 ? sectorsRaw : [defaultSector(0)]).map((sector, sectorIndex) => ({
+    const sectors = sectorsRaw.map((sector, sectorIndex) => ({
       id: sector?.id || crypto.randomUUID(),
       name: sector?.name || `Sector ${sectorIndex + 1}`,
       order: Number.isFinite(Number(sector?.order)) ? Number(sector.order) : sectorIndex,

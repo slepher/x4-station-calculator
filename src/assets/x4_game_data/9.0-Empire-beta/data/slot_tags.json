@@ -1,0 +1,38 @@
+[
+  {
+    "id": "standard",
+    "nameId": "{20228,101}",
+    "name": "Standard",
+    "count": 2337
+  },
+  {
+    "id": "advanced",
+    "nameId": "{20228,801}",
+    "name": "Advanced",
+    "count": 1441
+  },
+  {
+    "id": "xenon",
+    "nameId": "{20228,701}",
+    "name": "Xenon",
+    "count": 90
+  },
+  {
+    "id": "mining",
+    "nameId": "{20228,301}",
+    "name": "Mining",
+    "count": 118
+  },
+  {
+    "id": "missile",
+    "nameId": "{20228,201}",
+    "name": "Missile",
+    "count": 1137
+  },
+  {
+    "id": "highpower",
+    "nameId": "{20228,401}",
+    "name": "High-Energy",
+    "count": 31
+  }
+]

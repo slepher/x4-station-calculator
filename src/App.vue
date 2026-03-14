@@ -1,22 +1,51 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import MainWorkbench from './components/MainWorkbench.vue'
 import DragTestPage from './components/test/DragTestPage.vue'
 import TestTemplateFlow from './components/test/GLM-Parent.vue'
 import MetricPanelPlayground from './components/test/MetricPanelPlayground.vue'
-import { useStationStore } from '@/store/useStationStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { useStationStore } from '@/store/useStationStore'
 
-const stationStore = useStationStore()
 const gameDataStore = useGameDataStore()
 const logicFlowStore = useLogicFlowStore()
 const empireStore = useEmpireStore()
 const shipBuildStore = useShipBuildStore()
+const stationStore = useStationStore()
 
 const currentView = ref<'main' | 'drag-test' | 'template-flow' | 'metric-panel-test'>('main')
+const isInitializing = ref(true)
+
+// Unified initialization coordinator
+async function initializeApp() {
+  console.log('[App] Starting unified initialization...')
+  isInitializing.value = true
+
+  try {
+    // Step 1: Initialize gameData first (sets version and storage keys)
+    await gameDataStore.initialize()
+    console.log('[App] GameData initialized. Version:', gameDataStore.currentVersion, 'Beta:', gameDataStore.isBeta)
+
+    // Step 2: Initialize business stores in parallel (they all depend on gameData)
+    await Promise.all([
+      empireStore.initialize(),
+      logicFlowStore.init(),
+      shipBuildStore.initialize()
+    ])
+
+    console.log('[App] All stores initialized. Empire ready:', empireStore.isReady)
+  } catch (e) {
+    console.error('[App] Initialization failed:', e)
+  } finally {
+    isInitializing.value = false
+  }
+}
+
+// Start initialization immediately
+initializeApp()
 
 onMounted(() => {
   const params = new URLSearchParams(window.location.search)
@@ -33,10 +62,12 @@ onMounted(() => {
   }
 })
 
-// 暴露 store 供测试使用
+// Expose stores for testing
+const isReady = computed(() => empireStore.isReady && gameDataStore.isReady)
+
 const checkExportStores = () => {
-  const isTest = (window as any).isTestEnv || 
-                 window.location.search.includes('test=true') || 
+  const isTest = (window as any).isTestEnv ||
+                 window.location.search.includes('test=true') ||
                  window.localStorage.getItem('isTestEnv') === 'true';
 
   if (import.meta.env.DEV || isTest) {
@@ -49,20 +80,15 @@ const checkExportStores = () => {
       (window as any).shipBuildStore = shipBuildStore;
       (window as any).store = stationStore;
     }
-    
-    if (!gameDataStore.isReady) {
-      console.log('[App] GameData not ready, initializing...');
-      gameDataStore.initialize();
-    }
     return true;
   }
   return false;
 };
 
-// 立即尝试暴露
+// Expose stores immediately for test access
 checkExportStores();
 
-// 延迟重试，处理某些极端情况下的加载顺序问题
+// Retry for edge cases
 setTimeout(checkExportStores, 100);
 setTimeout(checkExportStores, 500);
 </script>
@@ -72,8 +98,8 @@ setTimeout(checkExportStores, 500);
     <DragTestPage v-if="currentView === 'drag-test'" />
     <TestTemplateFlow v-else-if="currentView === 'template-flow'" />
     <MetricPanelPlayground v-else-if="currentView === 'metric-panel-test'" />
-    <MainWorkbench v-else-if="stationStore.isReady"/>
-    <div v-else class="loading-gate">Initializing Station Store...</div>
+    <MainWorkbench v-else-if="isReady"/>
+    <div v-else class="loading-gate">Initializing... (GameData: {{ gameDataStore.isReady }}, Empire: {{ empireStore.isReady }})</div>
   </div>
 </template>
 
@@ -102,7 +128,7 @@ setTimeout(checkExportStores, 500);
 }
 .tippy-box[data-theme~='x4'][data-placement^='left']
   > .tippy-arrow::before {
-  border-left-color: #151C2C; 
+  border-left-color: #151C2C;
 }
 .tippy-box[data-theme~='x4'][data-placement^='right']
   > .tippy-arrow::before {
