@@ -6,13 +6,16 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                         UI Layer                                 │
 ├─────────────────────────────────────────────────────────────────┤
-│  SettingsButton (toolbar)                                        │
+│  Version Entry Button (toolbar, right of Export)                 │
+│    ├─ black btn-tool variant                                     │
 │    ├─ shows red dot if needsVersionSetup                         │
 │    └─ opens VersionSettingsModal                                 │
 │                                                                  │
 │  VersionSettingsModal                                            │
 │    ├─ VersionDropdown (version select)                           │
-│    └─ SaveButton → setVersion()                                  │
+│    ├─ DirtyModuleChecklist (multi-select + select all)           │
+│    ├─ SaveAsNameInputs (per checked isNew module)                │
+│    └─ Switch / SaveAndSwitch → setVersion()                      │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -74,30 +77,58 @@ useGameDataStore.initialize()
 ### Version Switch Flow
 
 ```
-User clicks SettingsButton
+User clicks version entry button
     │
     ▼
 VersionSettingsModal opens
+    │
+    ├─► inspect dirty state of empire / logic_flow / ship_blueprints
+    │
+    ├─► render red bordered checklist for dirty modules
+    │
+    ├─► checked dirty module with isNew?
+    │       └─ render dedicated name input with module default name
     │
     ▼
 User selects version from dropdown
     │
     ▼
-User clicks Save
+User clicks Switch / SaveAndSwitch
     │
-    ▼
-gameDataStore.setVersion(version, beta)
+    ├─► same version + hasStoredVersion = false
+    │      └─ persist x4_game_version only
+    │         no dirty-save flow
+    │         no reload
     │
-    ├─► localStorage.setItem('x4_game_version', JSON.stringify({version, beta}))
+    ├─► same version + hasStoredVersion = true
+    │      └─ button disabled
+    │         no action
     │
-    ├─► hasStoredVersion = true
+    └─► different version
+           │
+           ├─ optional save selected dirty modules
+           │
+           └─► gameDataStore.setVersion(version, beta)
+                  └─ localStorage.setItem('x4_game_version', JSON.stringify({version, beta}))
+                     window.location.reload()
+```
+
+### Dirty Save Strategy
+
+```
+dirty modules = [empire, logic_flow, ship_blueprints]
     │
-    ├─► currentVersion = version
+    ├─ same version branch
+    │   └─ ignored entirely
     │
-    ├─► isBeta = beta
-    │
-    └─► loadGameDataFiles(newFolderName)
-            └─ rebuild all maps
+    └─ different version branch
+        │
+        ├─ unchecked
+        │    └─ ignored during switch
+        │
+        └─ checked
+             ├─ isNew = false → call regular save method
+             └─ isNew = true  → require per-module name input, then call save-as method
 ```
 
 ### Storage Key Resolution
@@ -134,45 +165,29 @@ return config.storage_keys.empire
 | `src/store/useEmpireStore.ts` | 使用动态 storage key |
 | `src/store/useLogicFlowStore.ts` | 使用动态 storage key |
 | `src/store/useShipBuildStore.ts` | 使用动态 storage key |
-| `src/components/Toolbar.vue` | 添加 SettingsButton |
+| `src/components/StationToolbar.vue` | 添加导出右侧版本切换按钮并承载红点 |
+| `src/locales/en.json` | 新增版本切换保存流文案 |
+| `src/locales/zh-CN.json` | 新增版本切换保存流文案 |
+| `src/components/SettingsButton.vue` | 保留组件文件，但不再作为当前版本入口 |
 
 ## Component Design
 
-### SettingsButton.vue
+### Toolbar Version Entry
 
 ```vue
 <template>
-  <div class="settings-button-wrapper">
-    <button @click="openModal" class="settings-btn">
-      <GearIcon />
-    </button>
-    <span v-if="needsSetup" class="red-dot" />
-  </div>
-  <VersionSettingsModal
-    v-model:visible="modalVisible"
-    @saved="onSaved"
-  />
+  <button class="btn-tool btn-black btn-version" @click="showVersionSettingsModal = true">
+    <SwitchIcon />
+    <span>{{ t('menu.version_switch') }}</span>
+    <span v-if="needsSetup" class="version-indicator" />
+  </button>
 </template>
-
-<script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useGameDataStore } from '@/store/useGameDataStore'
-
-const gameDataStore = useGameDataStore()
-const modalVisible = ref(false)
-
-const needsSetup = computed(() => gameDataStore.needsVersionSetup)
-
-function openModal() {
-  modalVisible.value = true
-}
-
-function onSaved() {
-  modalVisible.value = false
-  // 可选：提示用户数据已切换
-}
-</script>
 ```
+
+补充要求：
+- 入口位置固定在导出按钮右侧
+- 红点提示从旧 `SettingsButton` 迁移到新版本按钮
+- `SettingsButton.vue` 暂时不在工具栏渲染，但保留源码
 
 ### VersionSettingsModal.vue
 
@@ -231,6 +246,12 @@ async function save() {
 </script>
 ```
 
+新增要求：
+- 弹窗内部同时访问 `useEmpireStore`、`useLogicFlowStore`、`useShipBuildStore`
+- 勾选区默认不选中任何 dirty 模块
+- 仅在存在选中项时显示 `保存并切换`
+- 红框区域必须明确提示“勾选即会在切换前保存”
+
 ## i18n Keys
 
 ```json
@@ -258,6 +279,8 @@ async function save() {
 ## Edge Cases
 
 1. **版本数据不存在**: 显示错误提示，降级到默认版本
+2. **勾选的 isNew 模块名称为空**: 阻止 `保存并切换`
+3. **dirty 模块存在但未勾选**: 允许直接切换，不额外弹确认
 2. **localStorage 损坏**: 解析失败时使用默认配置
 3. **切换版本后数据丢失**: 提示用户数据将重置（各版本独立存储）
 4. **首次访问**: 显示红点，引导用户设置版本

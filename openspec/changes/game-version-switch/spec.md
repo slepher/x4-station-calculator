@@ -86,6 +86,9 @@ function getStorageKey(module: 'empire' | 'logic_flow' | 'ship_blueprints'): str
 
 // 切换版本（写入 x4_game_version）
 async function setVersion(version: string, beta: boolean): Promise<void>
+
+// 将当前有效版本写入 x4_game_version，但不 reload
+function persistVersionSelection(version: string, beta: boolean): void
 ```
 
 ### 修改 initialize()
@@ -208,11 +211,45 @@ interface Emits {
 ### Behavior
 
 1. 显示版本下拉框
-2. 用户选择版本后点击保存
-3. 调用 `gameDataStore.setVersion(version, beta)`
-4. 触发 `saved` 事件，父组件处理后续逻辑
+2. 如果存在 dirty 模块，显示未保存模块区域，仅列出 dirty 项
+3. 未保存模块区域提供多选框与“全选”，默认不勾选任何模块
+4. 当至少勾选一个 dirty 模块时，显示 `保存并切换`；否则显示 `切换`
+5. 对每个被勾选且 `requiresSaveAsOnSave()` 为 `true` 的模块，显示独立名称输入框，并填充该模块默认名称
+6. 若目标版本与当前生效版本相同且 `hasStoredVersion = false`，点击 `切换` 时仅调用 `gameDataStore.persistVersionSelection(version, beta)`，不保存 dirty 模块，也不 reload
+7. 若目标版本与当前生效版本相同且 `hasStoredVersion = true`，`切换` 按钮置灰，且不显示保存分支
+8. 点击 `保存并切换` 时，仅保存已勾选模块，再调用 `gameDataStore.setVersion(version, beta)`
+9. 点击 `切换` 时，不保存任何 dirty 模块，直接调用 `gameDataStore.setVersion(version, beta)`；该分支仅适用于目标版本与当前版本不同的真实切换场景
 
-## Component: SettingsButton
+### Dirty Module Sources
+
+```typescript
+const dirtyModules = [
+  { key: 'empire', isDirty: empireStore.isDirty, isNew: empireStore.requiresSaveAsOnSave() },
+  { key: 'logic_flow', isDirty: logicFlowStore.isDirty, isNew: logicFlowStore.requiresSaveAsOnSave() },
+  { key: 'ship_blueprints', isDirty: shipBuildStore.isDirty, isNew: shipBuildStore.requiresSaveAsOnSave() }
+]
+```
+
+### Save Semantics
+
+```typescript
+if (checked.empire) {
+  if (empireStore.requiresSaveAsOnSave()) empireStore.saveEmpireAs(inputName.empire)
+  else empireStore.saveEmpire()
+}
+
+if (checked.logic_flow) {
+  if (logicFlowStore.requiresSaveAsOnSave()) logicFlowStore.saveCurrentPlanAs(inputName.logic_flow)
+  else logicFlowStore.saveCurrentPlan()
+}
+
+if (checked.ship_blueprints) {
+  if (shipBuildStore.requiresSaveAsOnSave()) shipBuildStore.saveAsBlueprint(inputName.ship_blueprints)
+  else shipBuildStore.saveBlueprint()
+}
+```
+
+## Component: Version Entry Button
 
 ### Props
 
@@ -220,9 +257,11 @@ interface Emits {
 
 ### Behavior
 
-1. 显示齿轮图标
-2. 当 `gameDataStore.needsVersionSetup` 为 true 时显示红点
-3. 点击打开 VersionSettingsModal
+1. 在工具栏导出按钮右边显示独立的版本切换按钮
+2. 按钮样式与导出按钮保持一致，颜色为黑色
+3. 当 `gameDataStore.needsVersionSetup` 为 true 时在该按钮上显示红点
+4. 点击打开 `VersionSettingsModal`
+5. 原 `SettingsButton.vue` 不再作为当前入口，但保留组件文件，不删除
 
 ## Store Changes
 
@@ -260,8 +299,47 @@ function getStorageKey(): string {
 }
 ```
 
+## i18n Keys
+
+```json
+{
+  "settings": {
+    "gameVersion": {
+      "switch": "Switch",
+      "saveAndSwitch": "Save and switch",
+      "unsavedModules": "Unsaved modules",
+      "selectAll": "Select all",
+      "saveScopeWarning": "Checked modules will be saved before switching version.",
+      "moduleEmpire": "Empire",
+      "moduleLogicFlow": "Logic Flow",
+      "moduleShipBlueprints": "Ship blueprints",
+      "moduleNameLabel": "Name"
+    }
+  }
+}
+```
+
+```json
+{
+  "settings": {
+    "gameVersion": {
+      "switch": "切换",
+      "saveAndSwitch": "保存并切换",
+      "unsavedModules": "未保存的模块",
+      "selectAll": "全选",
+      "saveScopeWarning": "勾选的模块会在切换版本前先保存。",
+      "moduleEmpire": "星区规划",
+      "moduleLogicFlow": "逻辑组网",
+      "moduleShipBlueprints": "舰船配装",
+      "moduleNameLabel": "名称"
+    }
+  }
+}
+```
+
 ## Error Handling
 
 1. `versions.json` 不存在 → 使用默认配置 (8.0 stable)
 2. 匹配版本失败 → 降级到第一个版本
 3. 游戏数据文件不存在 → 显示错误提示
+4. 勾选的 `isNew` 模块名称为空 → 阻止 `保存并切换`

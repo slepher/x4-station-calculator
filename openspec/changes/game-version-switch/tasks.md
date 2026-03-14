@@ -2,125 +2,140 @@
 
 ## Overview
 
-实现游戏版本切换功能的任务列表，包括动态数据加载重构。
+实现游戏版本切换功能的任务列表。
+
+**核心原则**：切换版本 = 存储 + 页面刷新，数据在 initialize 时一次性加载。
 
 ## Task List
 
 ### Phase 1: Data Layer
 
-- [ ] **T1.1** 更新 `src/assets/versions.json` 配置文件
+- [x] **T1.1** 更新 `src/assets/versions.json` 配置文件
   - 已存在，确认包含 8.0 stable 和 9.0 beta 两个版本配置
   - 定义 storage_keys 映射
 
 ### Phase 2: Store Layer - Version Management
 
-- [ ] **T2.1** 修改 `src/store/logic/useGameData.ts`
+- [x] **T2.1** 修改 `src/store/logic/useGameData.ts`
   - 移除所有静态 import（13个数据文件）
-  - 扩展 `GameDataFiles` 类型（新增 bullets, maps, factions 等）
-  - 新增 `loadGameDataFiles(folderName)` 动态加载函数（加载所有数据文件）
+  - 扩展 `GameDataFiles` 类型
+  - 新增 `loadGameDataFiles(folderName)` 动态加载函数
   - 修改所有 `build*` 函数接受数据参数
 
-- [ ] **T2.2** 修改 `src/store/useGameDataStore.ts`
-  - 新增版本管理 state（versionsConfig, currentVersion, isBeta, hasStoredVersion, gameData, folderName）
-  - 新增版本 computed（currentVersionConfig, versionOptions, needsVersionSetup）
-  - 新增数据 computed（bullets, missiles, drones, consumables, maps, regionyields, factions, defaultMaxes, shipSlots, languages）
-  - 新增方法 `getStorageKey(module)`
-  - 新增方法 `setVersion(version, beta)`
-  - 新增方法 `getRawData(file)` （可选，用于特殊场景）
-  - 修改 `initialize()` 逻辑
+- [x] **T2.2** 修改 `src/store/useGameDataStore.ts`
+  - 版本管理 state（versionsConfig, currentVersion, isBeta, folderName）
+  - 方法 `getStorageKey(module)`
+  - 方法 `setVersion(version, beta)` - 存储 + 刷新页面
 
-- [ ] **T2.3** 修改 `src/store/useEmpireStore.ts`
+- [x] **T2.3** 修改 `src/store/useEmpireStore.ts`
   - 使用 `gameDataStore.getStorageKey('empire')` 替代硬编码 key
 
-- [ ] **T2.4** 修改 `src/store/useLogicFlowStore.ts`
+- [x] **T2.4** 修改 `src/store/useLogicFlowStore.ts`
   - 使用 `gameDataStore.getStorageKey('logic_flow')` 替代硬编码 key
 
-- [ ] **T2.5** 修改 `src/store/useShipBuildStore.ts`
+- [x] **T2.5** 修改 `src/store/useShipBuildStore.ts`
   - 使用 `gameDataStore.getStorageKey('ship_blueprints')` 替代硬编码 key
 
-### Phase 2.5: Data Loading Refactor - Store Logic
-
-- [ ] **T2.6** 修改 `src/store/logic/workerModuleCalculator.ts`
+- [x] **T2.6** 修改 `src/store/logic/workerModuleCalculator.ts`
   - 从 useGameDataStore 获取 consumption 数据
-  - 移除静态 import
 
-- [ ] **T2.7** 修改 `src/store/logic/productionCalculator.ts`
+- [x] **T2.7** 修改 `src/store/logic/productionCalculator.ts`
   - 从 useGameDataStore 获取 consumption 数据
-  - 移除静态 import
 
-### Phase 2.6: Data Loading Refactor - Composables
+### Phase 2.5: 简化数据访问（移除 computed 包装）
 
-- [ ] **T2.8** 修改 `src/composables/useEquipmentStats.ts`
-  - 从 useGameDataStore 获取 bullets, missiles 数据
-  - 移除静态 import
+- [x] **T2.8** 简化 `src/store/useGameDataStore.ts`
+  - 将 bullets, missiles, drones 等从 computed 改为普通 ref
+  - 数据在 initialize 时一次性加载
+  - `setVersion()` 改为存储 + `location.reload()`
 
-### Phase 2.7: Data Loading Refactor - Ship Build Components
+- [x] **T2.9** 简化组件数据访问
+  - `useEquipmentStats.ts` - 保持 computed 用于构建内部 map（正确用法）
+  - `ShipStoragePanel.vue` - 使用 gameData.xxx 直接访问
+  - `ShipBuildPanelStats.vue` - 使用 gameData.xxx 直接访问
+  - `ShipBuildPanelShip.vue` - 使用 gameData.xxx 直接访问
+  - `MapSvgCanvas.vue` - 使用 gameData.xxx 直接访问
+  - `MapResourceFilterSimplePanel.vue` - 使用 gameData.xxx 直接访问
+  - `MapResourceFilterAdvancedPanel.vue` - 使用 gameData.xxx 直接访问
+  - `MapWorkbenchView.vue` - 使用 gameData.xxx 直接访问
+  - `LanguageSelector.vue` - 使用 gameData.xxx 直接访问
 
-- [ ] **T2.9** 修改 `src/components/ship-build/ShipStoragePanel.vue`
-  - 从 useGameDataStore 获取 consumables, drones, missiles, equipments
-  - 移除静态 import（4个）
+### Phase 2.6: i18n 动态加载
 
-- [ ] **T2.10** 修改 `src/components/ship-build/ShipBuildPanelStats.vue`
-  - 从 useGameDataStore 获取 bullets, missiles, defaultMaxes
-  - 移除静态 import（3个）
-
-- [ ] **T2.11** 修改 `src/components/ship-build/ShipBuildPanelShip.vue`
-  - 从 useGameDataStore 获取 defaultMaxes, shipSlots
-  - 移除静态 import（2个）
-
-### Phase 2.8: Data Loading Refactor - Map Components
-
-- [ ] **T2.12** 修改 `src/components/empire/MapSvgCanvas.vue`
-  - 从 useGameDataStore 获取 maps 数据
-  - 移除静态 import
-
-- [ ] **T2.13** 修改 `src/components/empire/MapResourceFilterSimplePanel.vue`
-  - 从 useGameDataStore 获取 maps, regionyields 数据
-  - 移除静态 import（2个）
-
-- [ ] **T2.14** 修改 `src/components/empire/MapResourceFilterAdvancedPanel.vue`
-  - 从 useGameDataStore 获取 maps, regionyields 数据
-  - 移除静态 import（2个）
-
-- [ ] **T2.15** 修改 `src/components/empire/MapWorkbenchView.vue`
-  - 从 useGameDataStore 获取 maps, regionyields, factions 数据
-  - 移除静态 import（3个）
-
-### Phase 2.9: Data Loading Refactor - Other Components
-
-- [ ] **T2.16** 修改 `src/components/LanguageSelector.vue`
-  - 从 useGameDataStore 获取 languages 数据
-  - 移除静态 import
-
-- [ ] **T2.17** 修改 `src/i18n.ts`
+- [x] **T2.10** 修改 `src/i18n.ts`
   - 改为动态加载游戏 locales
   - 新增 `setGameFolderName(name)` 函数
-  - 修改 `getGameLocaleLoader` 使用动态路径
+
+### Phase 2.7: 修复初始化时序问题
+
+- [x] **T2.11** 修复 `src/store/useShipBuildStore.ts` 初始化时序
+  - 问题：`loadBlueprintsFromStorage()` 在 store 定义体中直接调用
+  - 解决：添加 `initialize()` 异步函数，移除立即调用
+  - 确保 `gameData.initialize()` 在读取 storage 前执行
+
+- [x] **T2.12** 修复 `src/store/useLogicFlowStore.ts` 初始化时序
+  - 问题：`loadPlansFromStorage()` 在 `gameData.initialize()` 之前调用
+  - 解决：调整 `init()` 为 async，先 await gameData.initialize()
+
+- [x] **T2.13** 更新 `src/store/useStationStore.ts` 初始化调用
+  - 添加 `await logicFlow.init()`
+  - 添加 `shipBuildStore.initialize()` 调用
+
+- [x] **T2.14** 重构初始化协调机制
+  - 移除 `useEmpireStore` 末尾的自动 `initialize()` 调用
+  - 移除 `useStationStore` 的初始化逻辑，变为纯展示层
+  - 在 `App.vue` 添加 `initializeApp()` 统一协调初始化
+  - 初始化顺序：gameData → empire/logicFlow/shipBuild (并行)
 
 ### Phase 3: UI Layer
 
-- [ ] **T3.1** 创建 `src/components/SettingsButton.vue`
+- [x] **T3.1** 创建 `src/components/SettingsButton.vue`
   - 齿轮图标按钮
   - 红点指示器（needsVersionSetup）
   - 打开 VersionSettingsModal
 
-- [ ] **T3.2** 创建 `src/components/VersionSettingsModal.vue`
+- [x] **T3.2** 创建 `src/components/VersionSettingsModal.vue`
   - 版本下拉框（显示 version-codename，beta 后缀）
   - 保存按钮
   - 调用 `setVersion()`
 
-- [ ] **T3.3** 修改 Toolbar 组件
-  - 在语言栏右边添加 SettingsButton
+- [x] **T3.3** 修改 Toolbar 组件
+  - 初版在语言栏右边添加 SettingsButton
+
+- [x] **T3.4** 扩展 `src/components/VersionSettingsModal.vue`
+  - 显示 dirty 模块多选列表与全选
+  - 红框强调保存范围
+  - 选中项为 isNew 时显示独立名称输入框
+  - 按钮规则切换为 `取消|切换` / `取消|保存并切换`
+
+- [x] **T3.5** 扩展同版本确认分支
+  - 目标版本与当前版本相同且未写入 `x4_game_version` 时，仅写库不 reload
+  - 目标版本与当前版本相同且已写库时，`切换` 按钮置灰
+  - dirty 模块保存流仅对真实版本切换生效
+
+- [x] **T3.6** 调整版本入口位置与样式
+  - 隐藏工具栏中的 `SettingsButton` 入口，但不删除组件文件
+  - 新增导出按钮右侧的独立版本切换按钮
+  - 新按钮沿用 `btn-tool` 风格并使用黑色底色
+  - 首次未写入 `x4_game_version` 的红点提示迁移到该版本切换按钮
 
 ### Phase 4: i18n
 
-- [ ] **T4.1** 添加英文翻译 `src/locales/en.json`
+- [x] **T4.1** 添加英文翻译 `src/locales/en.json`
   - settings.gameVersion.title
   - settings.gameVersion.select
 
-- [ ] **T4.2** 添加中文翻译 `src/locales/zh-CN.json`
+- [x] **T4.2** 添加中文翻译 `src/locales/zh-CN.json`
   - settings.gameVersion.title
   - settings.gameVersion.select
+
+- [x] **T4.3** 为版本切换保存流补充 i18n
+  - 未保存模块标题
+  - 全选
+  - 保存范围提示
+  - 模块名称
+  - 切换 / 保存并切换
+  - 名称输入标签
 
 ### Phase 5: Testing
 
@@ -133,6 +148,17 @@
   - 首次访问显示红点
   - 切换版本
   - 数据隔离验证
+
+- [x] **T5.3** 单元测试：版本弹窗未保存模块流程
+  - dirty 模块默认不勾选
+  - 全选行为
+  - 按钮状态切换
+  - isNew 模块单独名称输入框
+  - 保存选中模块后切版本
+
+- [x] **T5.4** 单元测试：同版本确认与禁用逻辑
+  - 未写库但目标版本与当前版本相同时，仅写入 `x4_game_version`
+  - 已写库且目标版本与当前版本相同时，切换按钮置灰
 
 ## Dependencies
 
