@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
-import mapsData from '@/assets/x4_game_data/8.0-Diplomacy/data/maps.json'
-import regionYieldsData from '@/assets/x4_game_data/8.0-Diplomacy/data/regionyields.json'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import {
   ADVANCED_SUNLIGHT_TAG_ID,
   buildAdvancedCandidates,
@@ -68,8 +67,9 @@ const emit = defineEmits<{
 }>()
 
 const { t, locale } = useI18n()
-const regionYields = regionYieldsData as ResourceEntry[]
-const yieldRanksByWare = buildYieldRanksByWare(regionYields)
+const gameData = useGameDataStore()
+const regionYields = computed<ResourceEntry[]>(() => (gameData.regionyields || []) as ResourceEntry[])
+const yieldRanksByWare = computed(() => buildYieldRanksByWare(regionYields.value))
 const RESOURCE_ORDER = ['ore', 'silicon', 'methane', 'hydrogen', 'helium', 'ice', 'rawscrap', 'nividium'] as const
 const SUNLIGHT_COLOR = '#F7D24B'
 
@@ -97,7 +97,7 @@ const selectedCandidateKey = ref<string | null>(null)
 
 const resourceCatalog = computed<ResourceCatalogItem[]>(() => [
   ...RESOURCE_ORDER
-    .map((wareId) => regionYields.find((entry) => entry.ware === wareId))
+    .map((wareId) => regionYields.value.find((entry) => entry.ware === wareId))
     .filter((entry): entry is ResourceEntry => Boolean(entry))
     .map((entry) => ({
       ware: entry.ware,
@@ -122,7 +122,7 @@ const resourceColors = computed<Record<string, string>>(() =>
 
 const sectorDataById = computed<Record<string, { resources: SectorResourceEntry[]; sunlight: number }>>(() => {
   const out: Record<string, { resources: SectorResourceEntry[]; sunlight: number }> = {}
-  const clusters = (mapsData as { clusters?: Record<string, any> }).clusters || {}
+  const clusters = gameData.maps?.clusters || {}
   Object.values(clusters).forEach((cluster) => {
     Object.values(cluster.sectors || {}).forEach((sector: any) => {
       out[sector.id] = {
@@ -134,7 +134,7 @@ const sectorDataById = computed<Record<string, { resources: SectorResourceEntry[
   return out
 })
 
-const sectorGraph = computed(() => buildSectorGraph((mapsData as { clusters?: Record<string, any> }).clusters || {}))
+const sectorGraph = computed(() => buildSectorGraph(gameData.maps?.clusters || {}))
 
 const sectors = computed<AdvancedResourceSector[]>(() =>
   props.sectorLayouts.map((layout) => ({
@@ -153,7 +153,7 @@ const appliedResult = computed(() => buildAdvancedCandidates({
   tagGroups: normalizedAppliedGroups.value,
   jumpLimit: jumpLimitApplied.value,
   allowTransit: allowTransitApplied.value,
-  yieldRanksByWare,
+  yieldRanksByWare: yieldRanksByWare.value,
   resourceColors: resourceColors.value,
   sectorGraph: sectorGraph.value
 }))

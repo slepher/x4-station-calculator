@@ -2,10 +2,32 @@ import { createI18n } from 'vue-i18n'
 import Cookies from 'js-cookie'
 
 import uiEn from '@/locales/en.json'
-import gameEn from '@/assets/x4_game_data/8.0-Diplomacy/locales/en.json'
 
 const uiLocaleLoaders = import.meta.glob('/src/locales/!(en).json')
-const gameLocaleLoaders = import.meta.glob('/src/assets/x4_game_data/8.0-Diplomacy/locales/!(en).json')
+
+// Pre-load all game locale loaders at build time
+const gameLocaleLoaders8 = import.meta.glob('/src/assets/x4_game_data/8.0-Diplomacy/locales/*.json')
+const gameLocaleLoaders9 = import.meta.glob('/src/assets/x4_game_data/9.0-Empire-beta/locales/*.json')
+
+const gameLocaleLoadersMap: Record<string, Record<string, () => Promise<any>>> = {
+  '8.0-Diplomacy': gameLocaleLoaders8,
+  '9.0-Empire-beta': gameLocaleLoaders9
+}
+
+let currentGameFolderName = '8.0-Diplomacy'
+const loadedLanguages = new Set<string>()
+
+function getGameLocaleLoaders(): Record<string, () => Promise<any>> {
+  return gameLocaleLoadersMap[currentGameFolderName] || gameLocaleLoaders8
+}
+
+export function setGameFolderName(folderName: string) {
+  const changed = currentGameFolderName !== folderName
+  currentGameFolderName = folderName
+  if (changed) {
+    loadedLanguages.delete(i18n.global.locale.value)
+  }
+}
 
 // ★ 物理优先级：Cookie > 浏览器语言 > 默认 'en'
 const getInitialLocale = () => {
@@ -22,22 +44,18 @@ const i18n = createI18n({
   globalInjection: true,
   messages: {
     en: {
-      ...uiEn,
-      ...gameEn
+      ...uiEn
     }
   }
 })
 
-// 记录已加载的语言，避免重复请求
-const loadedLanguages = new Set<string>(['en'])
-
 const getUiLocaleLoader = (lang: string) => uiLocaleLoaders[`/src/locales/${lang}.json`]
-const getGameLocaleLoader = (lang: string) => gameLocaleLoaders[`/src/assets/x4_game_data/8.0-Diplomacy/locales/${lang}.json`]
+const getGameLocaleLoader = (lang: string) => {
+  const loaders = getGameLocaleLoaders()
+  return loaders[`/src/assets/x4_game_data/${currentGameFolderName}/locales/${lang}.json`]
+}
 
 const loadLocaleMessages = async (lang: string) => {
-  if (lang === 'en') {
-    return
-  }
   const gameLoader = getGameLocaleLoader(lang)
   if (!gameLoader) {
     throw new Error(`[i18n] Game locale '${lang}' not found`)
@@ -45,13 +63,17 @@ const loadLocaleMessages = async (lang: string) => {
   const gameMsg = await gameLoader() as { default: Record<string, any> }
 
   let uiMsg: Record<string, any> = {}
-  const uiLoader = getUiLocaleLoader(lang)
-  if (uiLoader) {
-    const uiModule = await uiLoader() as { default: Record<string, any> }
-    uiMsg = uiModule.default
-  } else {
+  if (lang === 'en') {
     uiMsg = uiEn
-    console.warn(`[i18n] UI translation for '${lang}' not found, falling back to English UI.`)
+  } else {
+    const uiLoader = getUiLocaleLoader(lang)
+    if (uiLoader) {
+      const uiModule = await uiLoader() as { default: Record<string, any> }
+      uiMsg = uiModule.default
+    } else {
+      uiMsg = uiEn
+      console.warn(`[i18n] UI translation for '${lang}' not found, falling back to English UI.`)
+    }
   }
 
   ;(i18n.global as any).setLocaleMessage(lang, {
@@ -114,10 +136,6 @@ export async function loadLanguageAsync(lang: string) {
 
 export async function initI18n() {
   const targetLocale = getInitialLocale()
-  if (targetLocale === 'en') {
-    setI18nLanguage('en')
-    return
-  }
   await loadLanguageAsync(targetLocale)
 }
 

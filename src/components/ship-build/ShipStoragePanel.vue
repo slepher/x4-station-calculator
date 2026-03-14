@@ -2,17 +2,15 @@
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import type { X4Ship, ShipBlueprintStorage } from '@/types/x4'
 import X4DualPhaseRangeSlider from '@/components/common/X4DualPhaseRangeSlider.vue'
-import consumablesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/consumables.json'
-import dronesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/drones.json'
-import missilesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/missiles.json'
-import equipmentsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
 
 const { t } = useI18n()
 const { translate } = useX4I18n()
 const store = useShipBuildStore()
+const gameData = useGameDataStore()
 
 const props = defineProps<{
   selectedShip: X4Ship | null
@@ -21,18 +19,25 @@ const props = defineProps<{
 
 // Get candidate items based on slot type
 const deployableItems = computed(() => {
-  return consumablesRaw.filter((item: any) => item.deployable === true)
+  const consumables = gameData.consumables
+  if (!consumables) return []
+  return consumables.filter((item: any) => item.deployable === true)
 })
 
 const countermeasureItems = computed(() => {
-  return consumablesRaw.filter((item: any) => item.class === 'countermeasure')
+  const consumables = gameData.consumables
+  if (!consumables) return []
+  return consumables.filter((item: any) => item.class === 'countermeasure')
 })
 
 const droneItems = computed(() => {
+  const drones = gameData.drones
+  if (!drones) return []
+
   const shipDroneTags = props.selectedShip?.droneTags || []
 
   // Filter drones based on matching rules
-  const matched = (dronesRaw as any[]).filter((drone) => {
+  const matched = drones.filter((drone) => {
     const droneNoBlueprint = drone.noplayerblueprint === true
     const droneDeployable = drone.deployable === true
     const droneTags = drone.droneTags || []
@@ -64,7 +69,8 @@ const missileLimit = computed(() => props.selectedShip?.storage?.missile || 0)
 // Get all ammunitionTags from ship blueprint's weapons and turrets
 const shipAmmunitionTags = computed(() => {
   const bp = props.selectedShip ? store.blueprint : null
-  if (!bp) return []
+  const equipments = store.equipments
+  if (!bp || !equipments) return []
 
   const tagSet = new Set<string>()
 
@@ -75,7 +81,7 @@ const shipAmmunitionTags = computed(() => {
     conn.group.forEach((g) => {
       if (!g.equipment_id) return
 
-      const equipment = (equipmentsRaw as any[]).find(e => e.id === g.equipment_id)
+      const equipment = equipments.find((e: any) => e.id === g.equipment_id)
       if (!equipment) return
 
       const ammoTags: string[] = equipment.ammunitionTags || []
@@ -88,6 +94,9 @@ const shipAmmunitionTags = computed(() => {
 
 // Missile matching based on ship's ammunitionTags
 const missileItems = computed(() => {
+  const missiles = gameData.missiles
+  if (!missiles) return []
+
   const ammoTags: string[] = shipAmmunitionTags.value
 
   // If no ammunitionTags, return empty
@@ -96,7 +105,7 @@ const missileItems = computed(() => {
   }
 
   // Match missiles that have all ammunitionTags
-  const matched = (missilesRaw as any[]).filter((missile) => {
+  const matched = missiles.filter((missile) => {
     const missileTags = missile.missileTags || []
     // Match if missile has all the ship's ammunitionTags
     return ammoTags.some((tag: string) => missileTags.includes(tag))
@@ -161,13 +170,14 @@ watch([() => store.blueprint, () => props.selectedShip], () => {
 // Ensure missile candidates refresh immediately when weapon/turret ammo tags change.
 watch(shipAmmunitionTags, () => {
   const bp = store.blueprint
-  if (props.slotType === 'units' && bp?.storage?.missiles?.length) {
+  const missiles = gameData.missiles
+  if (props.slotType === 'units' && bp?.storage?.missiles?.length && missiles) {
     const ammoTags = shipAmmunitionTags.value
     const currentMissiles = bp.storage.missiles
     const filteredMissiles = ammoTags.length === 0
       ? []
       : currentMissiles.filter((item) => {
-        const missile = (missilesRaw as any[]).find((m) => m.id === item.id)
+        const missile = missiles.find((m) => m.id === item.id)
         if (!missile) return false
         const missileTags: string[] = missile.missileTags || []
         return ammoTags.some((tag: string) => missileTags.includes(tag))

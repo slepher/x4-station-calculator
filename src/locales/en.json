@@ -353,6 +353,7 @@
     "save_as": "Save As",
     "load": "Load",
     "export": "Export",
+    "version_switch": "Version",
     "share": "Share",
     "import": "Import",
     "station_planner": "Station Planner",
@@ -516,7 +517,24 @@
   "common": {
     "average": "AVERAGE",
     "no_active_production": "No Active Production",
-    "add_modules_hint": "Please add production modules to see data"
+    "add_modules_hint": "Please add production modules to see data",
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "settings": {
+    "gameVersion": {
+      "title": "Game Version",
+      "select": "Select game data version",
+      "switch": "Switch",
+      "saveAndSwitch": "Save and Switch",
+      "unsavedModules": "Unsaved Modules",
+      "selectAll": "Select All",
+      "saveScopeWarning": "Checked modules will be saved before switching version.",
+      "moduleEmpire": "Empire",
+      "moduleLogicFlow": "Logic Flow",
+      "moduleShipBlueprints": "Ship Blueprints",
+      "moduleNameLabel": "Name"
+    }
   },
   "logicFlow": {
     "status": {

@@ -27,7 +27,6 @@ import { stationStateMap, DEFAULT_STATION_SETTINGS, migrateStationSettings } fro
 import { CURRENT_EMPIRE_VERSION } from './logic/storageVersions'
 import { getLinkedSectorIdsFor, normalizeSectorLinkKey, normalizeSectorLinks, parseSectorLinkKey } from './logic/sectorLinks'
 
-const STORAGE_KEY = 'x4_empire_data'
 const V1_STORAGE_KEY = 'x4_station_data'
 const SESSION_ACTIVE_STATION_KEY = 'x4_active_station_id'
 const TRANSIT_TAB_PREFIX = 'transit:'
@@ -100,6 +99,10 @@ interface SectorLinkCalcEntry {
 
 export const useEmpireStore = defineStore('empire', () => {
   const gameData = useGameDataStore()
+
+  function getStorageKey(): string {
+    return gameData.getStorageKey('empire')
+  }
 
   const isReady = ref(false)
   const lastSavedSnapshot = ref<string>('')
@@ -459,7 +462,7 @@ export const useEmpireStore = defineStore('empire', () => {
   }
 
   function saveToStorage() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedEmpires.value))
+    localStorage.setItem(getStorageKey(), JSON.stringify(savedEmpires.value))
   }
 
   function saveEmpire() {
@@ -937,6 +940,7 @@ export const useEmpireStore = defineStore('empire', () => {
   }
 
   const isDirty = computed(() => {
+    if (isEmptyForSave()) return false
     const current = serializeEmpireForDirtyCheck()
     return current !== lastSavedSnapshot.value
   })
@@ -967,7 +971,7 @@ export const useEmpireStore = defineStore('empire', () => {
     try {
       await gameData.initialize()
       
-      const stored = localStorage.getItem(STORAGE_KEY)
+      const stored = localStorage.getItem(getStorageKey())
       if (stored) {
         try {
           const data = JSON.parse(stored) as SavedEmpiresState | V1StorageState
@@ -1011,8 +1015,6 @@ export const useEmpireStore = defineStore('empire', () => {
       console.error('[EmpireStore] Initialization failed:', e)
     }
   }
-
-  initialize()
 
   return {
     isReady,

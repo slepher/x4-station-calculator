@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { loadLanguageAsync } from '@/i18n' // 导入我们刚写的异步函数
-import languageList from '@/assets/x4_game_data/8.0-Diplomacy/data/languages.json'
+import { useGameDataStore } from '@/store/useGameDataStore'
 
 const { locale } = useI18n()
+const gameData = useGameDataStore()
+
+const languageList = computed(() => gameData.languages || [])
 
 // 使用一个本地 ref 来绑定 select，防止直接修改 locale 导致未加载就切换
 const currentLang = ref(locale.value)

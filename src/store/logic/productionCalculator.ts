@@ -1,18 +1,17 @@
-import type { 
-  SavedModule, 
-  StationSettings, 
-  X4Module, 
-  X4Ware, 
-  WareDetail, 
-  ProductionLogItem
+import type {
+  SavedModule,
+  StationSettings,
+  X4Module,
+  X4Ware,
+  WareDetail,
+  ProductionLogItem,
+  RaceMedicalConsumption
 } from '@/types/x4'
 
-import { 
-  getDynamicPrice, 
+import {
+  getDynamicPrice,
   calculateWorkforceCensus
 } from './calculatorUtils'
-
-import consumptionRaw from '../../assets/x4_game_data/8.0-Diplomacy/data/consumption.json'
 
 /**
  * 核心利润与产出分析
@@ -23,7 +22,8 @@ export function calculateProfitBreakdown(
   waresMap: Record<string, X4Ware>,
   settings: StationSettings,
   actualWorkforce: number,
-  saturation: number
+  saturation: number,
+  medicalConsumption: RaceMedicalConsumption
 ) {
   const wareDetails: Record<string, WareDetail> = {};
   
@@ -68,8 +68,8 @@ export function calculateProfitBreakdown(
 
   censusItems.forEach(item => {
     // 查表计算消耗
-    const raceKey = item.race in consumptionRaw ? item.race : 'default';
-    const raceConsumption = (consumptionRaw as any)[raceKey];
+    const raceKey = item.race in medicalConsumption ? item.race : 'default';
+    const raceConsumption = medicalConsumption[raceKey] || {};
     const wares = raceConsumption.wares || raceConsumption;
 
     for (const [wareId, perPersonPerSecond] of Object.entries(wares)) {

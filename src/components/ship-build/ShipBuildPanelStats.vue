@@ -2,13 +2,11 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import { useEquipmentStats } from '@/composables/useEquipmentStats'
 import MetricsPanel from '@/components/common/MetricsPanel.vue'
 import type { MetricSchema, MetricValueMap, MetricsPanelViewTab } from '@/components/common/metricsPanelTypes'
 import type { X4Ship, ShipBlueprint } from '@/types/x4'
-import bulletsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/bullets.json'
-import missilesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/missiles.json'
-import defaultMaxesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/default_maxes.json'
 
 const props = defineProps<{
   shipBlueprint: ShipBlueprint | null
@@ -19,21 +17,10 @@ const { t } = useI18n()
 
 // 全局字典数据 - 直接从 store 读取
 const store = useShipBuildStore()
-
-// Bullet map - use id as key
-const bulletMap = new Map<string, any>()
-bulletsRaw.forEach((b: any) => {
-  bulletMap.set(b.id, b)
-})
-
-// Missile map - use macro as key (equipment.bullet stores macro value)
-const missileMap = new Map<string, any>()
-missilesRaw.forEach((m: any) => {
-  missileMap.set(m.macro, m)
-})
+const gameData = useGameDataStore()
 
 // Default maxes map - 用于数值条的 max 值
-const defaultMaxesMap = defaultMaxesRaw as Record<string, any>
+const defaultMaxesMap = computed(() => gameData.defaultMaxes)
 
 // PanelStats key -> default_maxes 字段映射
 const STAT_KEY_TO_MAX_FIELD: Record<string, string> = {
@@ -353,7 +340,7 @@ const getCargoSummaryKeys = (ship: X4Ship) => {
 const getDefaultMax = (shipClass: string, statKey: string): number => {
   const maxField = STAT_KEY_TO_MAX_FIELD[statKey]
   if (!maxField) return 1
-  const classData = defaultMaxesMap[shipClass]
+  const classData = defaultMaxesMap.value[shipClass] as Record<string, any> | undefined
   if (!classData) return 1
   let value = classData[maxField] || 1
   // radar_range 需要从米转换为千米

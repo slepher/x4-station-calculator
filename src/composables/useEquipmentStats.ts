@@ -1,19 +1,6 @@
 import { computed } from 'vue'
 import type { X4Equipment, X4Ship } from '@/types/x4'
-import bulletsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/bullets.json'
-import missilesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/missiles.json'
-
-// Bullet map - use id as key
-const bulletMap = new Map<string, any>()
-bulletsRaw.forEach((b: any) => {
-  bulletMap.set(b.id, b)
-})
-
-// Missile map - use macro as key
-const missileMap = new Map<string, any>()
-missilesRaw.forEach((m: any) => {
-  missileMap.set(m.macro, m)
-})
+import { useGameDataStore } from '@/store/useGameDataStore'
 
 // ============ 类型定义 ============
 
@@ -361,37 +348,65 @@ function calculateThrusterDetail(equipment: X4Equipment, ship: X4Ship): Thruster
 // ============ Composable ============
 
 export function useEquipmentStats(equipment: X4Equipment, ship: X4Ship) {
+  const gameData = useGameDataStore()
+
+  // Build maps from gameDataStore
+  const bulletMap = computed(() => {
+    const bullets = gameData.bullets
+    if (!bullets) return new Map()
+    const map = new Map<string, any>()
+    bullets.forEach((b: any) => map.set(b.id, b))
+    return map
+  })
+
+  const missileMap = computed(() => {
+    const missiles = gameData.missiles
+    if (!missiles) return new Map()
+    const map = new Map<string, any>()
+    missiles.forEach((m: any) => map.set(m.macro, m))
+    return map
+  })
+
   // 获取 bullet/missile 数据
-  const bullet = equipment.bullet ? bulletMap.get(equipment.bullet) : null
-  const missile = equipment.bullet && !bullet ? missileMap.get(equipment.bullet) : null
+  const bullet = computed(() => {
+    if (!equipment.bullet) return null
+    return bulletMap.value.get(equipment.bullet) || null
+  })
+
+  const missile = computed(() => {
+    if (!equipment.bullet || bullet.value) return null
+    return missileMap.value.get(equipment.bullet) || null
+  })
 
   // 计算详情
   const details = computed(() => {
     const equipmentType = equipment.type
     const equipmentClass = equipment.class
+    const bulletVal = bullet.value
+    const missileVal = missile.value
 
     // 导弹发射器：type=weapon 且 class=missilelauncher (必须在普通weapon之前)
     if (equipmentType === 'weapon' && equipmentClass === 'missilelauncher') {
-      if (!missile) return undefined
-      return calculateWeaponDPS(equipment, null, missile, 1)
+      if (!missileVal) return undefined
+      return calculateWeaponDPS(equipment, null, missileVal, 1)
     }
 
     // 导弹炮塔：type=turret 且 class=missileturret (必须在普通turret之前)
     if (equipmentType === 'turret' && equipmentClass === 'missileturret') {
-      if (!missile) return undefined
-      return calculateWeaponDPS(equipment, null, missile, 1)
+      if (!missileVal) return undefined
+      return calculateWeaponDPS(equipment, null, missileVal, 1)
     }
 
     // 武器：type=weapon
     if (equipmentType === 'weapon') {
-      if (!bullet) return undefined
-      return calculateWeaponDPS(equipment, bullet, null, 1)
+      if (!bulletVal) return undefined
+      return calculateWeaponDPS(equipment, bulletVal, null, 1)
     }
 
     // 炮塔：type=turret
     if (equipmentType === 'turret') {
-      if (!bullet) return undefined
-      return calculateWeaponDPS(equipment, bullet, null, 1)
+      if (!bulletVal) return undefined
+      return calculateWeaponDPS(equipment, bulletVal, null, 1)
     }
 
     // 护盾

@@ -3,6 +3,7 @@ import { ref, reactive, computed } from 'vue'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import LanguageSelector from './LanguageSelector.vue'
 import MissingTranslate from './MissingTranslate.vue'
 import LoadPlanModal from './empire/LoadPlanModal.vue'
@@ -12,6 +13,7 @@ import LoadShipBlueprintModal from './ship-build/LoadShipBlueprintModal.vue'
 import StorageImportWizard from './StorageImportWizard.vue'
 import StorageExportWizard from './StorageExportWizard.vue'
 import TopViewSwitch from './common/TopViewSwitch.vue'
+import VersionSettingsModal from './VersionSettingsModal.vue'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useToolbarWorkflowController } from '@/composables/useToolbarWorkflowController'
@@ -20,6 +22,7 @@ import type { SmartSaveStep } from '@/utils/smartSavePolicy'
 void useLogicFlowStore()
 void useEmpireStore()
 const shipBuildStore = useShipBuildStore()
+const gameData = useGameDataStore()
 const { t } = useI18n()
 const { translateShip } = useX4I18n()
 const toolbarWorkflow = useToolbarWorkflowController({ t, translateShip })
@@ -28,6 +31,7 @@ const showLoadModal = ref(false)
 const showLoadFlowModal = ref(false)
 const showLoadBlueprintModal = ref(false)
 const showImportWizard = ref(false)
+const showVersionSettingsModal = ref(false)
 const showExportWizard = ref(false)
 const smartDialog = reactive({
   isOpen: false,
@@ -43,6 +47,7 @@ const activeToolbarStoreType = computed(() => (
 const isToolbarActionDisabled = computed(() => (
   isShipActionDisabled.value || toolbarWorkflow.isEditableFor(activeToolbarStoreType.value)
 ))
+const showVersionIndicator = computed(() => gameData.needsVersionSetup)
 
 const themeColors = computed(() => {
   if (isFlowView.value) {
@@ -214,6 +219,25 @@ const handleExport = () => {
         </svg>
         <span>{{ t('menu.export') }}</span>
       </button>
+      <button class="btn-tool btn-black btn-version" data-testid="toolbar-version-btn" @click="showVersionSettingsModal = true">
+        <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 3h5v5" />
+          <path d="M8 21H3v-5" />
+          <path d="M21 3l-7 7" />
+          <path d="M3 21l7-7" />
+          <path d="M14 21h7v-7" />
+          <path d="M3 10V3h7" />
+          <path d="M21 14l-7-7" />
+          <path d="M10 10L3 3" />
+        </svg>
+        <span>{{ t('menu.version_switch') }}</span>
+        <span
+          v-if="showVersionIndicator"
+          class="version-indicator"
+          data-testid="toolbar-version-indicator"
+        />
+      </button>
       <MissingTranslate />
       <LanguageSelector />
     </div>
@@ -223,6 +247,7 @@ const handleExport = () => {
     <LoadShipBlueprintModal :isOpen="showLoadBlueprintModal" @close="showLoadBlueprintModal = false" />
     <StorageImportWizard :isOpen="showImportWizard" @close="showImportWizard = false" />
     <StorageExportWizard :isOpen="showExportWizard" @close="showExportWizard = false" />
+    <VersionSettingsModal :visible="showVersionSettingsModal" @close="showVersionSettingsModal = false" />
 
     <SmartSaveDialog
       :isOpen="smartDialog.isOpen"
@@ -270,8 +295,20 @@ const handleExport = () => {
   @apply bg-slate-500 hover:bg-slate-400;
 }
 
+.btn-black {
+  @apply bg-black hover:bg-slate-900;
+}
+
 .btn-amber {
   @apply bg-amber-600 hover:bg-amber-500;
+}
+
+.btn-version {
+  @apply relative;
+}
+
+.version-indicator {
+  @apply absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full;
 }
 
 .toolbar-panel {
