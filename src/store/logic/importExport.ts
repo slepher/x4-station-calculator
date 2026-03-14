@@ -10,7 +10,9 @@ import type {
   SavedFlowGroup,
   SavedFlowNode,
   ShipBlueprint,
-  ShipBlueprintBucket
+  ShipBlueprintBucket,
+  X4Ship,
+  X4Equipment
 } from '@/types/x4'
 import { migrateEmpireStateToCurrent, migrateFlowStateToCurrent, migrateShipBlueprintStateToCurrent } from './stateMigrations'
 import { CURRENT_EMPIRE_VERSION, CURRENT_FLOW_VERSION, CURRENT_SHIP_BLUEPRINT_VERSION } from './storageVersions'
@@ -122,6 +124,8 @@ interface ShipBuildStoreLike {
   consumablesMap?: MaybeWrapped<Map<string, unknown>>
   dronesMap?: MaybeWrapped<Map<string, unknown>>
   missilesMap?: MaybeWrapped<Map<string, unknown>>
+  findShip?: (id: string | null | undefined) => X4Ship | null
+  findEquipment?: (id: string | null | undefined) => X4Equipment | null
   loadBlueprintsFromStorage: () => void
   loadBlueprint: (id: string) => void
 }
@@ -132,6 +136,12 @@ interface GameDataStoreLike {
   currentVersion?: string
   isBeta?: boolean
   getStorageKey?: (module: 'empire' | 'logic_flow' | 'ship_blueprints') => string
+}
+
+interface ShipSlotRequirement {
+  slotType: string
+  size: string
+  tags: string[]
 }
 
 function deepClone<T>(value: T): T {
@@ -151,6 +161,43 @@ function unwrapWrappedValue<T>(value: MaybeWrapped<T> | undefined, fallback: T):
 
 function toLookupSet(value: MaybeWrapped<Map<string, unknown>> | undefined): Set<string> {
   return new Set(Array.from(unwrapWrappedValue(value, new Map<string, unknown>()).keys()))
+}
+
+function normalizeStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+  return value
+    .filter((item): item is string => typeof item === 'string' && item.length > 0)
+    .map((item) => item.trim())
+}
+
+function buildShipSlotRequirementMap(ship: X4Ship | null): Map<string, ShipSlotRequirement> {
+  const requirementMap = new Map<string, ShipSlotRequirement>()
+  if (!ship) return requirementMap
+
+  ship.slots.forEach((slot) => {
+    slot.groups.forEach((group) => {
+      requirementMap.set(group.group, {
+        slotType: slot.type,
+        size: group.connection.size,
+        tags: normalizeStringArray(group.connection.tags)
+      })
+    })
+  })
+
+  return requirementMap
+}
+
+function isEquipmentCompatibleWithRequirement(
+  equipment: X4Equipment | null,
+  requirement: ShipSlotRequirement | undefined,
+  slotType: string
+): boolean {
+  if (!equipment) return false
+  if (!requirement) return true
+  if (equipment.type !== slotType) return false
+  if (equipment.size !== requirement.size) return false
+  const connectionTags = new Set(requirement.tags)
+  return normalizeStringArray(equipment.slotTags).every((tag) => connectionTags.has(tag))
 }
 
 function buildImportFileMeta(raw: unknown): ImportFileMeta {
@@ -572,24 +619,59 @@ function sanitizeShipState(input: SavedShipBlueprintsState, shipBuildStore: Ship
         return
       }
 
+      const ship = shipBuildStore.findShip?.(blueprint.shipId) || null
+      const slotRequirementMap = buildShipSlotRequirementMap(ship)
+
       const connections = (blueprint.connections || []).map((connection) => {
         const groups = (connection.group || []).reduce<ShipBlueprint['connections'][number]['group']>((acc, group) => {
-          const nextGroup = deepClone(group)
-          if (nextGroup.equipment_id && !equipmentIds.has(nextGroup.equipment_id)) {
+          const nextGroup = deepClone(group) as unknown as Record<string, unknown>
+          const groupRequirement = slotRequirementMap.get(group.group)
+          const currentEquipment = typeof group.equipment_id === 'string' && group.equipment_id
+            ? shipBuildStore.findEquipment?.(group.equipment_id) || null
+            : null
+          const passesEquipmentCompatibility = !groupRequirement || !shipBuildStore.findEquipment
+            || isEquipmentCompatibleWithRequirement(currentEquipment, groupRequirement, connection.slot_type)
+
+          const isEquipmentValid = !group.equipment_id
+            || (
+              equipmentIds.has(group.equipment_id)
+              && passesEquipmentCompatibility
+            )
+
+          if (!isEquipmentValid && group.equipment_id) {
             nextGroup.equipment_id = ''
             nextGroup.count = 0
             invalidEquipmentsCleared += 1
           }
-          if (nextGroup.shield?.equipment_id && !equipmentIds.has(nextGroup.shield.equipment_id)) {
+
+          const nextShield = isObject(nextGroup.shield) ? nextGroup.shield as Record<string, unknown> : null
+          const shieldEquipmentId = nextShield && typeof nextShield.equipment_id === 'string' ? nextShield.equipment_id : ''
+          const currentShield = shieldEquipmentId
+            ? shipBuildStore.findEquipment?.(shieldEquipmentId) || null
+            : null
+          const passesShieldCompatibility = !shipBuildStore.findEquipment
+            || isEquipmentCompatibleWithRequirement(currentShield, undefined, 'shield')
+          const isShieldValid = !shieldEquipmentId
+            || (
+              equipmentIds.has(shieldEquipmentId)
+              && passesShieldCompatibility
+            )
+
+          if (!isShieldValid && nextShield) {
             nextGroup.shield = {
-              ...nextGroup.shield,
+              ...nextShield,
               equipment_id: '',
               count: 0
             }
             invalidShieldsCleared += 1
           }
-          if (nextGroup.equipment_id || nextGroup.shield?.equipment_id) {
-            acc.push(nextGroup)
+
+          const mainEquipmentId = typeof nextGroup.equipment_id === 'string' ? nextGroup.equipment_id : ''
+          const nextShieldId = isObject(nextGroup.shield) && typeof nextGroup.shield.equipment_id === 'string'
+            ? nextGroup.shield.equipment_id
+            : ''
+          if (mainEquipmentId || nextShieldId) {
+            acc.push(nextGroup as unknown as ShipBlueprint['connections'][number]['group'][number])
           }
           return acc
         }, [])

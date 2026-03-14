@@ -134,6 +134,14 @@
 - **并且**：当 `shipId` 不存在时，系统 MUST 移除整条 blueprint。
 - **并且**：当装备或仓储物品不存在时，系统 MUST 置空或移除对应引用，而不是保留脏数据。
 
+#### Scenario: Ship 模块识别跨版本槽位不兼容的装备
+- **前提**：导入包含 `x4_ship_blueprints`。
+- **并且**：导出文件来自不同游戏版本。
+- **并且**：某个 `equipment_id` 在当前版本中仍然存在，但它不再匹配当前舰船对应槽位的 `slot_type / size / tags`。
+- **当**：系统执行 Ship Blueprint 模块导入预处理。
+- **那么**：系统 MUST 将该装备视为失效引用并在导入前清空。
+- **并且**：系统 MUST 在清洗摘要中体现该装备已被移除。
+
 ### Requirement: Import-Export Module Naming
 导入/导出相关界面与提示中的模块名称 MUST 与版本切换场景使用同一套 i18n 语义，并统一采用 `Sector / 星区` 面向用户表达。
 

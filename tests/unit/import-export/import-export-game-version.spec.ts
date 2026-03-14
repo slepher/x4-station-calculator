@@ -139,6 +139,45 @@ function createShipState(shipId = 'ship-valid', equipmentId = 'equipment-valid')
   }
 }
 
+function createTurretShipState(shipId = 'ship_ter_m_corvette_01_a', equipmentId = 'turret_ter_m_beam_01_mk1'): SavedShipBlueprintsState {
+  return {
+    version: CURRENT_SHIP_BLUEPRINT_VERSION,
+    activeShipId: shipId,
+    activeBlueprintId: 'bp-turret',
+    ships: [
+      {
+        shipId,
+        blueprints: [
+          {
+            id: 'bp-turret',
+            name: 'Turret Blueprint',
+            shipId,
+            connections: [
+              {
+                slot_type: 'turret',
+                group: [
+                  {
+                    group: 'con_turret_front',
+                    equipment_id: equipmentId,
+                    count: 1
+                  }
+                ]
+              }
+            ],
+            storage: {
+              deployables: [],
+              countermeasure: null,
+              drones: [],
+              missiles: []
+            },
+            lastUpdated: 1
+          }
+        ]
+      }
+    ]
+  }
+}
+
 function buildStores() {
   const empireStore = {
     savedEmpires: createEmpireState(),
@@ -268,6 +307,64 @@ describe('import-export game version pipeline', () => {
         details: [{ kind: 'invalidShipsRemoved', count: 1 }]
       }
     ])
+  })
+
+  it('sanitizes cross-version ship equipment when it no longer matches the current slot', () => {
+    const { shipBuildStore, gameDataStore } = buildStores()
+    shipBuildStore.shipMap = new Map([['ship_ter_m_corvette_01_a', {}]])
+    shipBuildStore.equipmentMap = new Map([['turret_ter_m_beam_01_mk1', {}]])
+    shipBuildStore.findShip = vi.fn(() => ({
+      id: 'ship_ter_m_corvette_01_a',
+      slots: [
+        {
+          type: 'turret',
+          groups: [
+            {
+              group: 'con_turret_front',
+              connection: {
+                size: 'medium',
+                tags: ['combat', 'standard', 'unhittable'],
+                count: 1
+              }
+            }
+          ]
+        }
+      ]
+    }))
+    shipBuildStore.findEquipment = vi.fn(() => ({
+      id: 'turret_ter_m_beam_01_mk1',
+      slotTags: ['advanced', 'combat', 'unhittable'],
+      type: 'turret',
+      size: 'medium',
+    }))
+
+    const payload = normalizeImportPayload({
+      game_vsn: '9.0',
+      beta: true,
+      data: {
+        x4_empire_data: createEmpireState(),
+        x4_logic_flow_plans: createFlowState(),
+        x4_ship_blueprints: createTurretShipState()
+      }
+    })
+
+    const prepared = prepareImportPayload(payload, {
+      ...gameDataStore,
+      currentVersion: '8.0',
+      isBeta: false
+    }, shipBuildStore)
+
+    expect(prepared.versionState.mismatch).toBe(true)
+    expect(prepared.moduleStats).toEqual([
+      { key: 'x4_empire_data', count: 1 },
+      { key: 'x4_logic_flow_plans', count: 1 },
+      { key: 'x4_ship_blueprints', count: 1 }
+    ])
+    expect(prepared.sanitizeSummaries).toContainEqual({
+      key: 'x4_ship_blueprints',
+      removed: 1,
+      details: [{ kind: 'invalidEquipmentsCleared', count: 1 }]
+    })
   })
 
   it('applies imports into the active version storage keys', () => {
