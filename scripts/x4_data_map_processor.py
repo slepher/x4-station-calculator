@@ -1,4 +1,5 @@
 import argparse
+import bisect
 import json
 import math
 import os
@@ -10,46 +11,71 @@ from typing import Dict, Iterable, List, Optional, Tuple
 
 try:
     from processor.i18n import get_i18n_registry
+    from processor.versioning import get_target_versions, load_version_config, merge_version_config
 except ModuleNotFoundError:
     from scripts.processor.i18n import get_i18n_registry  # type: ignore
+    from scripts.processor.versioning import get_target_versions, load_version_config, merge_version_config  # type: ignore
+
+_config = load_version_config()
+
+X4_UNPACKED_DATA_PATH = ""
+OUTPUT_VERSION_DIR = ""
+DEFAULT_MAP_DIR = ""
+DEFAULT_OUTPUT = ""
+DEFAULT_MAPDEFAULTS = ""
+DEFAULT_GOD_XML = ""
+DEFAULT_FACTIONS_XML = ""
+DEFAULT_COLORS_XML = ""
+DEFAULT_REGION_DEFINITIONS_XML = ""
+DEFAULT_REGIONOBJECTGROUPS_XML = ""
+DEFAULT_REGIONYIELDS_XML = ""
+DEFAULT_FACTIONS_OUTPUT = ""
+DEFAULT_REGIONS_OUTPUT = ""
+DEFAULT_REGIONYIELDS_OUTPUT = ""
 
 
-config_file = "x4-station-calculator.config.json"
-if not os.path.exists(config_file):
-    raise SystemExit(f"Missing config file: {config_file}")
-with open(config_file, "r", encoding="utf-8") as f:
-    _config = json.load(f)
+def apply_runtime_config(effective_config: Dict[str, object]) -> None:
+    global X4_UNPACKED_DATA_PATH
+    global OUTPUT_VERSION_DIR
+    global DEFAULT_MAP_DIR
+    global DEFAULT_OUTPUT
+    global DEFAULT_MAPDEFAULTS
+    global DEFAULT_GOD_XML
+    global DEFAULT_FACTIONS_XML
+    global DEFAULT_COLORS_XML
+    global DEFAULT_REGION_DEFINITIONS_XML
+    global DEFAULT_REGIONOBJECTGROUPS_XML
+    global DEFAULT_REGIONYIELDS_XML
+    global DEFAULT_FACTIONS_OUTPUT
+    global DEFAULT_REGIONS_OUTPUT
+    global DEFAULT_REGIONYIELDS_OUTPUT
 
-# 从 versions 数组中查找当前版本配置
-_current_version = _config.get('current_version')
-_is_beta = _config.get('beta', False)
-_versions = _config.get('versions', [])
-_version_config = None
-for v in _versions:
-    if v.get('version') == _current_version and v.get('beta', False) == _is_beta:
-        _version_config = v
-        break
+    X4_UNPACKED_DATA_PATH = os.path.join(str(effective_config["raw_assets_dir"]), str(effective_config["folder_name"]))
+    OUTPUT_VERSION_DIR = os.path.join(str(effective_config["processed_assets_dir"]), str(effective_config["folder_name"]))
+    DEFAULT_MAP_DIR = str(Path(X4_UNPACKED_DATA_PATH) / "maps" / "xu_ep2_universe")
+    DEFAULT_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "maps.json")
+    DEFAULT_MAPDEFAULTS = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "mapdefaults_final.xml")
+    DEFAULT_GOD_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "god_final.xml")
+    DEFAULT_FACTIONS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "factions_final.xml")
+    DEFAULT_COLORS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "colors_final.xml")
+    DEFAULT_REGION_DEFINITIONS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "region_definitions_final.xml")
+    DEFAULT_REGIONOBJECTGROUPS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "regionobjectgroups_final.xml")
+    DEFAULT_REGIONYIELDS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "regionyields_final.xml")
+    DEFAULT_FACTIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "factions.json")
+    DEFAULT_REGIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regions.json")
+    DEFAULT_REGIONYIELDS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regionyields.json")
 
-if _version_config is None:
-    _beta_str = "beta" if _is_beta else "stable"
-    raise SystemExit(f"未找到版本 {_current_version} ({_beta_str}) 的配置。")
 
-# 将版本配置合并到 _config 顶层
-_config.update(_version_config)
+def default_version_item(config: Dict[str, object]) -> Dict[str, object]:
+    current_version = config.get("current_version")
+    current_beta = bool(config.get("beta", False))
+    for version_item in config.get("versions", []):
+        if str(version_item.get("version")) == str(current_version) and bool(version_item.get("beta", False)) == current_beta:
+            return merge_version_config(config, version_item)
+    raise SystemExit("未找到默认版本配置。")
 
-X4_UNPACKED_DATA_PATH = os.path.join(_config['raw_assets_dir'], _config['folder_name'])
-OUTPUT_VERSION_DIR = os.path.join(_config['processed_assets_dir'], _config['folder_name'])
-DEFAULT_MAP_DIR = str(Path(X4_UNPACKED_DATA_PATH) / "maps" / "xu_ep2_universe")
-DEFAULT_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "maps.json")
-DEFAULT_MAPDEFAULTS = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "mapdefaults_final.xml")
-DEFAULT_GOD_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "god_final.xml")
-DEFAULT_FACTIONS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "factions_final.xml")
-DEFAULT_COLORS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "colors_final.xml")
-DEFAULT_REGION_DEFINITIONS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "region_definitions_final.xml")
-DEFAULT_REGIONYIELDS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "regionyields_final.xml")
-DEFAULT_FACTIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "factions.json")
-DEFAULT_REGIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regions.json")
-DEFAULT_REGIONYIELDS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regionyields.json")
+
+apply_runtime_config(default_version_item(_config))
 
 
 CLUSTER_MACRO_RE = re.compile(r"Cluster_(\d+)_macro", re.IGNORECASE)
@@ -101,17 +127,24 @@ def resolve_sector_macro_from_region_connection(connection_name: str) -> Optiona
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Extract and normalize X4 universe map data from distilled XML.")
-    parser.add_argument("--map-dir", default=DEFAULT_MAP_DIR)
-    parser.add_argument("--mapdefaults-xml", default=DEFAULT_MAPDEFAULTS)
-    parser.add_argument("--god-xml", default=DEFAULT_GOD_XML)
-    parser.add_argument("--factions-xml", default=DEFAULT_FACTIONS_XML)
-    parser.add_argument("--colors-xml", default=DEFAULT_COLORS_XML)
-    parser.add_argument("--region-definitions-xml", default=DEFAULT_REGION_DEFINITIONS_XML)
-    parser.add_argument("--regionyields-xml", default=DEFAULT_REGIONYIELDS_XML)
-    parser.add_argument("--factions-output", default=DEFAULT_FACTIONS_OUTPUT)
-    parser.add_argument("--regions-output", default=DEFAULT_REGIONS_OUTPUT)
-    parser.add_argument("--regionyields-output", default=DEFAULT_REGIONYIELDS_OUTPUT)
-    parser.add_argument("--output", default=DEFAULT_OUTPUT)
+    mode_group = parser.add_mutually_exclusive_group()
+    mode_group.add_argument("--all-versions", action="store_true", help="处理配置中的所有版本")
+    mode_group.add_argument("--version", type=str, help="处理指定版本号，例如 8.0 或 9.0")
+    flavor_group = parser.add_mutually_exclusive_group()
+    flavor_group.add_argument("--beta", action="store_true", help="选择 beta 版本")
+    flavor_group.add_argument("--stable", action="store_true", help="选择 stable 版本")
+    parser.add_argument("--map-dir")
+    parser.add_argument("--mapdefaults-xml")
+    parser.add_argument("--god-xml")
+    parser.add_argument("--factions-xml")
+    parser.add_argument("--colors-xml")
+    parser.add_argument("--region-definitions-xml")
+    parser.add_argument("--regionobjectgroups-xml")
+    parser.add_argument("--regionyields-xml")
+    parser.add_argument("--factions-output")
+    parser.add_argument("--regions-output")
+    parser.add_argument("--regionyields-output")
+    parser.add_argument("--output")
     return parser.parse_args()
 
 
@@ -309,6 +342,247 @@ def coerce_attr_value(value: Optional[str]):
         return raw
 
 
+def as_number(value, default: float = 0.0) -> float:
+    if isinstance(value, (int, float)):
+        return float(value)
+    if isinstance(value, str):
+        raw = value.strip()
+        if raw:
+            try:
+                return float(raw)
+            except ValueError:
+                return default
+    return default
+
+
+def round_sig(value: float, digits: int = 4) -> float:
+    if value == 0 or not math.isfinite(value):
+        return value
+    return round(value, digits - 1 - int(math.floor(math.log10(abs(value)))))
+
+
+def normalize_noise_bound(value: Optional[float], default: float) -> float:
+    return min(1.0, max(0.0, default if value is None else float(value)))
+
+
+def parse_xml_attrs(node: ET.Element) -> Dict[str, object]:
+    return {key: coerce_attr_value(value) for key, value in node.attrib.items()}
+
+
+def parse_step_curve(node: Optional[ET.Element]) -> List[dict]:
+    if node is None:
+        return []
+    steps: List[dict] = []
+    for step_node in node.findall("./step"):
+        steps.append({
+            "position": as_number(coerce_attr_value(step_node.get("position")), 0.0),
+            "value": as_number(coerce_attr_value(step_node.get("value")), 0.0),
+        })
+    steps.sort(key=lambda item: item["position"])
+    return steps
+
+
+def piecewise_average(steps: List[dict], weighted_power: Optional[int] = None) -> float:
+    if not steps:
+        return 1.0
+    points = sorted(
+        [
+            {
+                "position": min(1.0, max(0.0, float(item.get("position", 0.0)))),
+                "value": float(item.get("value", 0.0)),
+            }
+            for item in steps
+        ],
+        key=lambda item: item["position"],
+    )
+    if points[0]["position"] > 0.0:
+        points.insert(0, {"position": 0.0, "value": points[0]["value"]})
+    if points[-1]["position"] < 1.0:
+        points.append({"position": 1.0, "value": points[-1]["value"]})
+
+    total = 0.0
+    weight_total = 0.0
+    for left, right in zip(points, points[1:]):
+        x0 = left["position"]
+        x1 = right["position"]
+        if x1 <= x0:
+            continue
+        y0 = left["value"]
+        y1 = right["value"]
+        mid = (x0 + x1) * 0.5
+        ymid = y0 + (y1 - y0) * ((mid - x0) / (x1 - x0))
+        if weighted_power is None:
+            total += (y0 + y1) * (x1 - x0) * 0.5
+            weight_total += (x1 - x0)
+        else:
+            w0 = x0 ** weighted_power
+            wm = mid ** weighted_power
+            w1 = x1 ** weighted_power
+            total += ((y0 * w0) + (4.0 * ymid * wm) + (y1 * w1)) * (x1 - x0) / 6.0
+            weight_total += (w0 + (4.0 * wm) + w1) * (x1 - x0) / 6.0
+    if weight_total <= 0:
+        return 1.0
+    return total / weight_total
+
+
+def distance_3d(left: dict, right: dict) -> float:
+    return math.sqrt(
+        (as_number(left.get("x")) - as_number(right.get("x"))) ** 2
+        + (as_number(left.get("y")) - as_number(right.get("y"))) ** 2
+        + (as_number(left.get("z")) - as_number(right.get("z"))) ** 2
+    )
+
+
+def boundary_volume(boundary: Optional[dict]) -> float:
+    if not boundary:
+        return 1.0
+    boundary_class = str(boundary.get("class") or "")
+    size = boundary.get("size") or {}
+    radius = as_number(size.get("r"), 0.0)
+    if boundary_class == "sphere":
+        return (4.0 / 3.0) * math.pi * (radius ** 3)
+    if boundary_class == "cylinder":
+        linear = as_number(size.get("linear"), 0.0)
+        return math.pi * (radius ** 2) * linear
+    if boundary_class == "splinetube":
+        spline = boundary.get("spline") or []
+        length = 0.0
+        for left, right in zip(spline, spline[1:]):
+            length += distance_3d(left, right)
+        return math.pi * (radius ** 2) * length
+    return 1.0
+
+
+def build_boundary(node: Optional[ET.Element]) -> Optional[dict]:
+    if node is None:
+        return None
+    boundary = {
+        "class": (node.get("class") or "").strip(),
+    }
+    size_node = node.find("./size")
+    if size_node is not None:
+        boundary["size"] = parse_xml_attrs(size_node)
+    spline_points = []
+    for spline_node in node.findall("./splineposition"):
+        spline_points.append(parse_xml_attrs(spline_node))
+    if spline_points:
+        boundary["spline"] = spline_points
+    return boundary
+
+
+def build_falloff(node: Optional[ET.Element]) -> Optional[dict]:
+    if node is None:
+        return None
+    lateral = parse_step_curve(node.find("./lateral"))
+    radial = parse_step_curve(node.find("./radial"))
+    falloff = {
+        "lateral": lateral,
+        "radial": radial,
+    }
+    falloff["lateral_factor"] = piecewise_average(lateral)
+    falloff["radial_factor"] = piecewise_average(radial, weighted_power=1)
+    falloff["effective_factor"] = falloff["lateral_factor"] * falloff["radial_factor"]
+    return falloff
+
+
+class PerlinNoise3D:
+    def __init__(self, seed: int = 1337):
+        import random
+
+        permutation = list(range(256))
+        random.Random(seed).shuffle(permutation)
+        self.p = permutation * 2
+
+    @staticmethod
+    def fade(t: float) -> float:
+        return t * t * t * (t * (t * 6 - 15) + 10)
+
+    @staticmethod
+    def lerp(a: float, b: float, t: float) -> float:
+        return a + t * (b - a)
+
+    @staticmethod
+    def grad(hash_value: int, x: float, y: float, z: float) -> float:
+        h = hash_value & 15
+        u = x if h < 8 else y
+        v = y if h < 4 else (x if h in (12, 14) else z)
+        return ((u if (h & 1) == 0 else -u) + (v if (h & 2) == 0 else -v))
+
+    def sample(self, x: float, y: float, z: float) -> float:
+        xi = math.floor(x) & 255
+        yi = math.floor(y) & 255
+        zi = math.floor(z) & 255
+        xf = x - math.floor(x)
+        yf = y - math.floor(y)
+        zf = z - math.floor(z)
+        u = self.fade(xf)
+        v = self.fade(yf)
+        w = self.fade(zf)
+
+        p = self.p
+        aaa = p[p[p[xi] + yi] + zi]
+        aba = p[p[p[xi] + yi + 1] + zi]
+        aab = p[p[p[xi] + yi] + zi + 1]
+        abb = p[p[p[xi] + yi + 1] + zi + 1]
+        baa = p[p[p[xi + 1] + yi] + zi]
+        bba = p[p[p[xi + 1] + yi + 1] + zi]
+        bab = p[p[p[xi + 1] + yi] + zi + 1]
+        bbb = p[p[p[xi + 1] + yi + 1] + zi + 1]
+
+        x1 = self.lerp(
+            self.grad(aaa, xf, yf, zf),
+            self.grad(baa, xf - 1, yf, zf),
+            u,
+        )
+        x2 = self.lerp(
+            self.grad(aba, xf, yf - 1, zf),
+            self.grad(bba, xf - 1, yf - 1, zf),
+            u,
+        )
+        y1 = self.lerp(x1, x2, v)
+
+        x3 = self.lerp(
+            self.grad(aab, xf, yf, zf - 1),
+            self.grad(bab, xf - 1, yf, zf - 1),
+            u,
+        )
+        x4 = self.lerp(
+            self.grad(abb, xf, yf - 1, zf - 1),
+            self.grad(bbb, xf - 1, yf - 1, zf - 1),
+            u,
+        )
+        y2 = self.lerp(x3, x4, v)
+        return self.lerp(y1, y2, w)
+
+
+def build_noise_cdf(sample_count: int = 32768) -> List[float]:
+    noise = PerlinNoise3D(1337)
+    values: List[float] = []
+    grid = round(sample_count ** (1.0 / 3.0))
+    inv = 1.0 / max(1, grid)
+    for xi in range(grid):
+        for yi in range(grid):
+            for zi in range(grid):
+                raw = noise.sample((xi + 0.5) * inv * 7.13, (yi + 0.5) * inv * 5.71, (zi + 0.5) * inv * 6.37)
+                values.append((raw + 1.0) * 0.5)
+    values.sort()
+    return values
+
+
+NOISE_CDF_SAMPLES = build_noise_cdf()
+
+
+def noise_probability(min_value: Optional[float], max_value: Optional[float]) -> float:
+    lo = normalize_noise_bound(min_value, 0.0)
+    hi = normalize_noise_bound(max_value, 1.0)
+    if hi <= lo:
+        return 0.0
+    samples = NOISE_CDF_SAMPLES
+    left = bisect.bisect_left(samples, lo)
+    right = bisect.bisect_right(samples, hi)
+    return max(0.0, min(1.0, (right - left) / len(samples)))
+
+
 def load_color_map_from_xml(colors_xml_path: Path) -> Dict[str, str]:
     if not colors_xml_path.exists():
         return {}
@@ -409,32 +683,283 @@ def build_yield_level_map(regionyields_xml_path: Path) -> Dict[str, Dict[str, in
     return levels
 
 
-def load_region_definition_resources(
+def build_yield_density_map(regionyields_xml_path: Path) -> Dict[str, Dict[str, float]]:
+    density_map: Dict[str, Dict[str, float]] = {}
+    for resource in migrate_regionyields(regionyields_xml_path):
+        ware = str(resource.get("ware") or "").strip()
+        if not ware:
+            continue
+        density_map[ware] = {}
+        for yield_item in resource.get("yields", []):
+            yield_name = str(yield_item.get("name") or "").strip()
+            if not yield_name:
+                continue
+            density_map[ware][yield_name] = as_number(yield_item.get("resourcedensity"), 0.0)
+    return density_map
+
+
+def load_region_object_groups(
+    regionobjectgroups_xml_path: Path,
+) -> Dict[str, dict]:
+    if not regionobjectgroups_xml_path.exists():
+        return {}
+    root = parse_xml(regionobjectgroups_xml_path)
+    groups: Dict[str, dict] = {}
+    for group_node in root.findall("./group[@name]"):
+        group_name = (group_node.get("name") or "").strip()
+        if not group_name:
+            continue
+        groups[group_name] = {
+            "resource": (group_node.get("resource") or "").strip(),
+            "yield": as_number(group_node.get("yield"), 0.0),
+            "yieldvariation": as_number(group_node.get("yieldvariation"), 0.0),
+        }
+    return groups
+
+
+def build_region_legacy_resource_map(
     region_definitions_xml_path: Path,
     yield_level_map: Dict[str, Dict[str, int]],
-) -> Dict[str, List[dict]]:
+    yield_density_map: Dict[str, Dict[str, float]],
+) -> Dict[str, Dict[str, dict]]:
     if not region_definitions_xml_path.exists():
         return {}
     root = parse_xml(region_definitions_xml_path)
-    by_name: Dict[str, List[dict]] = {}
+    by_name: Dict[str, Dict[str, dict]] = {}
     for region_node in root.findall("./region[@name]"):
         region_name = (region_node.get("name") or "").strip()
         if not region_name:
             continue
-        resources: List[dict] = []
+        resources: Dict[str, dict] = {}
         for resource_node in region_node.findall("./resources/resource[@ware]"):
             ware = (resource_node.get("ware") or "").strip()
             yield_name = (resource_node.get("yield") or "").strip()
             if not ware or not yield_name:
                 continue
             level = yield_level_map.get(ware, {}).get(yield_name, 1)
-            resources.append({
+            resources[ware] = {
                 "ware": ware,
                 "yield": yield_name,
                 "level": level,
-            })
+                "resourcedensity": yield_density_map.get(ware, {}).get(yield_name, 0.0),
+            }
         by_name[region_name] = resources
     return by_name
+
+
+def parse_field_resource_ids(field_item: dict) -> List[str]:
+    resource = str(field_item.get("resource") or "").strip()
+    if resource:
+        return [resource]
+    raw_resources = field_item.get("resources")
+    if isinstance(raw_resources, str):
+        return split_tags(raw_resources)
+    if isinstance(raw_resources, list):
+        return [str(item).strip() for item in raw_resources if str(item).strip()]
+    return []
+
+
+GAS_ENGINE_MULTIPLIER = 1000.0
+
+
+def summarize_region_resources(
+    region_item: dict,
+    legacy_resource_map: Dict[str, dict],
+) -> List[dict]:
+    region_density = as_number(region_item.get("density"), 1.0)
+    boundary = region_item.get("boundary")
+    falloff = region_item.get("falloff") or {}
+    effective_volume_m3 = boundary_volume(boundary) * as_number(falloff.get("effective_factor"), 1.0)
+    effective_volume_km3 = effective_volume_m3 / 1_000_000_000.0
+    region_noise_probability = noise_probability(region_item.get("minnoisevalue"), region_item.get("maxnoisevalue"))
+    by_ware: Dict[str, dict] = {}
+
+    for field in region_item.get("fields", []):
+        resource_ids = parse_field_resource_ids(field)
+        if not resource_ids:
+            continue
+        densityfactor = as_number(field.get("densityfactor"), 0.0)
+        if densityfactor <= 0:
+            densityfactor = as_number(field.get("uniformdensity"), 0.0)
+        if densityfactor <= 0:
+            densityfactor = 1.0
+        field_noise_probability = noise_probability(field.get("minnoisevalue"), field.get("maxnoisevalue"))
+        noise_coverage = region_noise_probability * field_noise_probability
+        field["noise_coverage"] = noise_coverage
+        if noise_coverage <= 0:
+            continue
+        share = 1.0 / len(resource_ids)
+        for ware in resource_ids:
+            legacy = legacy_resource_map.get(ware, {})
+            is_gas_field = str(field.get("kind") or "") == "nebula"
+            if is_gas_field:
+                uniformdensity = as_number(field.get("uniformdensity"), 0.0)
+                localdensity = as_number(field.get("localdensity"), 0.0)
+                local_component = localdensity * 0.5 * noise_coverage
+                probe_density = region_density * (uniformdensity + (localdensity * 0.5)) * GAS_ENGINE_MULTIPLIER
+                simulated_density = region_density * (uniformdensity + local_component) * GAS_ENGINE_MULTIPLIER * share
+                simulated_amount = simulated_density * effective_volume_km3
+            else:
+                yield_base = as_number(field.get("yield"), 0.0)
+                if yield_base <= 0:
+                    yield_base = as_number(legacy.get("resourcedensity"), 0.0)
+                if yield_base <= 0:
+                    continue
+                probe_density = 0.0
+                uniformdensity = 0.0
+                localdensity = 0.0
+                simulated_density = region_density * densityfactor * yield_base * noise_coverage * share
+                simulated_amount = simulated_density * effective_volume_km3
+            item = by_ware.setdefault(ware, {
+                "ware": ware,
+                "resource_kind": "gas" if is_gas_field else "solid",
+                "field_count": 0,
+                "densityfactor_sum": 0.0,
+                "noise_coverage_sum": 0.0,
+                "simulated_density": 0.0,
+                "simulated_amount": 0.0,
+                "volume_km3": effective_volume_km3,
+                "probe_density_sum": 0.0,
+                "uniformdensity_sum": 0.0,
+                "localdensity_sum": 0.0,
+                "gas_multiplier": GAS_ENGINE_MULTIPLIER if is_gas_field else None,
+                "legacy_yield": legacy.get("yield"),
+                "legacy_level": legacy.get("level"),
+            })
+            item["field_count"] += 1
+            item["densityfactor_sum"] += densityfactor * share
+            item["noise_coverage_sum"] += noise_coverage * share
+            item["simulated_density"] += simulated_density
+            item["simulated_amount"] += simulated_amount
+            item["probe_density_sum"] += probe_density
+            item["uniformdensity_sum"] += uniformdensity * share
+            item["localdensity_sum"] += localdensity * share
+
+    resources = sorted(by_ware.values(), key=lambda item: item["ware"])
+    for item in resources:
+        field_count = max(1, int(item.get("field_count", 0)))
+        item["noise_coverage_avg"] = item["noise_coverage_sum"] / field_count
+        item["noise_coverage"] = item["noise_coverage_avg"]
+        item["probe_density"] = round_sig(as_number(item["probe_density_sum"], 0.0) / field_count, 4)
+        item["uniformdensity"] = as_number(item["uniformdensity_sum"], 0.0)
+        item["localdensity"] = as_number(item["localdensity_sum"], 0.0)
+        item["simulated_density"] = round_sig(as_number(item["simulated_density"]), 4)
+        item["simulated_amount"] = int(round(as_number(item["simulated_amount"])))
+        item["density"] = item["simulated_density"]
+        item["amount"] = item["simulated_amount"]
+        item["amount_per_field"] = int(round(as_number(item["simulated_amount"]) / field_count))
+    return resources
+
+
+def migrate_region_definitions(
+    region_definitions_xml_path: Path,
+    regionobjectgroups_xml_path: Path,
+    yield_level_map: Dict[str, Dict[str, int]],
+    yield_density_map: Dict[str, Dict[str, float]],
+) -> Dict[str, dict]:
+    if not region_definitions_xml_path.exists():
+        return {}
+    root = parse_xml(region_definitions_xml_path)
+    group_index = load_region_object_groups(regionobjectgroups_xml_path)
+    legacy_resources_by_region = build_region_legacy_resource_map(region_definitions_xml_path, yield_level_map, yield_density_map)
+    definitions: Dict[str, dict] = {}
+
+    for region_node in root.findall("./region[@name]"):
+        region_name = (region_node.get("name") or "").strip()
+        if not region_name:
+            continue
+        region_item = {
+            "density": as_number(region_node.get("density"), 1.0),
+            "rotation": as_number(region_node.get("rotation"), 0.0),
+            "noisescale": as_number(region_node.get("noisescale"), 0.0),
+            "seed": int(as_number(region_node.get("seed"), 0.0)),
+            "minnoisevalue": normalize_noise_bound(
+                as_number(region_node.get("minnoisevalue"), 0.0),
+                0.0,
+            ),
+            "maxnoisevalue": normalize_noise_bound(
+                as_number(region_node.get("maxnoisevalue"), 1.0),
+                1.0,
+            ),
+            "boundary": build_boundary(region_node.find("./boundary")),
+            "falloff": build_falloff(region_node.find("./falloff")),
+            "fields": [],
+        }
+
+        for field_node in region_node.findall("./fields/*"):
+            field_item = {"kind": field_node.tag}
+            field_item.update(parse_xml_attrs(field_node))
+            if "groupref" in field_item:
+                group = group_index.get(str(field_item["groupref"]), {})
+                if group:
+                    field_item["resource"] = group.get("resource") or field_item.get("resource") or ""
+                    field_item["yield"] = group.get("yield", 0.0)
+                    field_item["yieldvariation"] = group.get("yieldvariation", 0.0)
+            region_item["fields"].append(field_item)
+
+        region_item["resources"] = summarize_region_resources(
+            region_item,
+            legacy_resources_by_region.get(region_name, {}),
+        )
+        definitions[region_name] = region_item
+    return definitions
+
+
+def summarize_sector_resources(region_rows: List[dict]) -> List[dict]:
+    by_ware: Dict[str, dict] = {}
+    for region in region_rows:
+        for resource in region.get("resources", []):
+            ware = str(resource.get("ware") or "").strip()
+            if not ware:
+                continue
+            entry = by_ware.setdefault(ware, {
+                "ware": ware,
+                "total_amount": 0.0,
+                "max_density": 0.0,
+                "regions": [],
+            })
+            density = as_number(resource.get("density"), 0.0)
+            amount = as_number(resource.get("amount"), 0.0)
+            noise_coverage = as_number(resource.get("noise_coverage"), 0.0)
+            entry["total_amount"] += amount
+            entry["max_density"] = max(entry["max_density"], density)
+            entry["regions"].append({
+                "name": region.get("name"),
+                "region_ref": region.get("region_ref"),
+                "density": density,
+                "amount": amount,
+                "volume_km3": as_number(resource.get("volume_km3"), 0.0),
+                "noise_coverage": noise_coverage,
+                "densityfactor_sum": as_number(resource.get("densityfactor_sum"), 0.0),
+            })
+
+    summarized: List[dict] = []
+    for ware, item in sorted(by_ware.items()):
+        regions = item["regions"]
+        if not regions:
+            continue
+        max_density = as_number(item.get("max_density"), 0.0)
+        density_threshold = max_density / 3.0 if max_density > 0 else 0.0
+        qualified = [region for region in regions if as_number(region.get("density"), 0.0) >= density_threshold]
+        representative = max(
+            qualified or regions,
+            key=lambda region: (as_number(region.get("amount"), 0.0), as_number(region.get("density"), 0.0)),
+        )
+        max_amount_region = max(
+            regions,
+            key=lambda region: (as_number(region.get("amount"), 0.0), as_number(region.get("density"), 0.0)),
+        )
+        summarized.append({
+            "ware": ware,
+            "total_amount": int(round(as_number(item["total_amount"]))),
+            "max_density": round_sig(max_density, 4),
+            "representative_amount": int(round(as_number(representative.get("amount"), 0.0))),
+            "representative_density": round_sig(as_number(representative.get("density"), 0.0), 4),
+            "max_amount_region_amount": int(round(as_number(max_amount_region.get("amount"), 0.0))),
+            "max_amount_region_density": round_sig(as_number(max_amount_region.get("density"), 0.0), 4),
+            "qualified_region_count": len(qualified),
+        })
+    return summarized
 
 
 def load_mapdefaults(mapdefaults_xml: Path) -> Tuple[Dict[str, str], Dict[str, dict]]:
@@ -494,6 +1019,7 @@ def generate_map_data(
     god_xml_path: Optional[Path] = None,
     factions_by_id: Optional[Dict[str, dict]] = None,
     region_definitions_xml_path: Optional[Path] = None,
+    regionobjectgroups_xml_path: Optional[Path] = None,
     regionyields_xml_path: Optional[Path] = None,
     i18n_registry=None,
 ) -> Dict[str, object]:
@@ -763,30 +1289,45 @@ def generate_map_data(
                 sectors[sector_macro]["highway_ids"].append(highway_id)
 
     resolved_region_definitions_path = region_definitions_xml_path or Path(DEFAULT_REGION_DEFINITIONS_XML)
+    resolved_regionobjectgroups_path = regionobjectgroups_xml_path or Path(DEFAULT_REGIONOBJECTGROUPS_XML)
     resolved_regionyields_path = regionyields_xml_path or Path(DEFAULT_REGIONYIELDS_XML)
     yield_level_map = build_yield_level_map(resolved_regionyields_path)
-    resources_by_region_ref = load_region_definition_resources(resolved_region_definitions_path, yield_level_map)
+    yield_density_map = build_yield_density_map(resolved_regionyields_path)
+    definitions_by_region_ref = migrate_region_definitions(
+        resolved_region_definitions_path,
+        resolved_regionobjectgroups_path,
+        yield_level_map,
+        yield_density_map,
+    )
     regions_rows: List[dict] = []
     for sector_id, links in sector_region_links.items():
-        merged_by_ware: Dict[str, dict] = {}
+        sector_region_rows: List[dict] = []
         for link in links:
-            link_resources = [dict(item) for item in resources_by_region_ref.get(link["region_ref"], [])]
-            regions_rows.append({
+            definition = definitions_by_region_ref.get(link["region_ref"], {})
+            region_row = {
                 "name": link["name"],
                 "region_ref": link["region_ref"],
                 "cluster_id": link["cluster_id"],
                 "sector_id": link["sector_id"],
-                "resources": link_resources,
-            })
-            for resource in link_resources:
-                ware = resource["ware"]
-                prev = merged_by_ware.get(ware)
-                if prev is None or resource["level"] > prev["level"]:
-                    merged_by_ware[ware] = dict(resource)
+                "density": definition.get("density"),
+                "rotation": definition.get("rotation"),
+                "noisescale": definition.get("noisescale"),
+                "seed": definition.get("seed"),
+                "minnoisevalue": definition.get("minnoisevalue"),
+                "maxnoisevalue": definition.get("maxnoisevalue"),
+                "boundary": definition.get("boundary"),
+                "falloff": definition.get("falloff"),
+                "fields": [dict(item) for item in definition.get("fields", [])],
+                "resources": [dict(item) for item in definition.get("resources", [])],
+            }
+            regions_rows.append(region_row)
+            sector_region_rows.append(region_row)
         if sector_id in sectors:
-            sectors[sector_id]["resources"] = sorted(merged_by_ware.values(), key=lambda item: item["ware"])
+            sectors[sector_id]["resource_stats"] = summarize_sector_resources(sector_region_rows)
+            sectors[sector_id]["resources"] = []
     for sector_id in sectors.keys():
         sectors[sector_id].setdefault("resources", [])
+        sectors[sector_id].setdefault("resource_stats", [])
     regions_rows.sort(key=lambda item: (item["cluster_id"], item["sector_id"], item["name"]))
 
     for zones_root in zone_roots:
@@ -1202,19 +1743,38 @@ def write_map_output(payload: dict, output_path: Path) -> None:
     output_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def main() -> None:
-    args = parse_args()
-    map_dir = Path(args.map_dir)
-    output_path = Path(args.output)
-    mapdefaults_path = Path(args.mapdefaults_xml)
-    god_xml_path = Path(args.god_xml)
-    factions_xml_path = Path(args.factions_xml)
-    colors_xml_path = Path(args.colors_xml)
-    region_definitions_xml_path = Path(args.region_definitions_xml)
-    regionyields_xml_path = Path(args.regionyields_xml)
-    factions_output_path = Path(args.factions_output)
-    regions_output_path = Path(args.regions_output)
-    regionyields_output_path = Path(args.regionyields_output)
+def resolve_runtime_paths(args: argparse.Namespace) -> dict:
+    return {
+        "map_dir": Path(args.map_dir or DEFAULT_MAP_DIR),
+        "output_path": Path(args.output or DEFAULT_OUTPUT),
+        "mapdefaults_path": Path(args.mapdefaults_xml or DEFAULT_MAPDEFAULTS),
+        "god_xml_path": Path(args.god_xml or DEFAULT_GOD_XML),
+        "factions_xml_path": Path(args.factions_xml or DEFAULT_FACTIONS_XML),
+        "colors_xml_path": Path(args.colors_xml or DEFAULT_COLORS_XML),
+        "region_definitions_xml_path": Path(args.region_definitions_xml or DEFAULT_REGION_DEFINITIONS_XML),
+        "regionobjectgroups_xml_path": Path(args.regionobjectgroups_xml or DEFAULT_REGIONOBJECTGROUPS_XML),
+        "regionyields_xml_path": Path(args.regionyields_xml or DEFAULT_REGIONYIELDS_XML),
+        "factions_output_path": Path(args.factions_output or DEFAULT_FACTIONS_OUTPUT),
+        "regions_output_path": Path(args.regions_output or DEFAULT_REGIONS_OUTPUT),
+        "regionyields_output_path": Path(args.regionyields_output or DEFAULT_REGIONYIELDS_OUTPUT),
+    }
+
+
+def run_for_config(args: argparse.Namespace, effective_config: Dict[str, object]) -> None:
+    apply_runtime_config(effective_config)
+    runtime_paths = resolve_runtime_paths(args)
+    map_dir = runtime_paths["map_dir"]
+    output_path = runtime_paths["output_path"]
+    mapdefaults_path = runtime_paths["mapdefaults_path"]
+    god_xml_path = runtime_paths["god_xml_path"]
+    factions_xml_path = runtime_paths["factions_xml_path"]
+    colors_xml_path = runtime_paths["colors_xml_path"]
+    region_definitions_xml_path = runtime_paths["region_definitions_xml_path"]
+    regionobjectgroups_xml_path = runtime_paths["regionobjectgroups_xml_path"]
+    regionyields_xml_path = runtime_paths["regionyields_xml_path"]
+    factions_output_path = runtime_paths["factions_output_path"]
+    regions_output_path = runtime_paths["regions_output_path"]
+    regionyields_output_path = runtime_paths["regionyields_output_path"]
 
     registry = get_i18n_registry()
     registry.configure(X4_UNPACKED_DATA_PATH, {
@@ -1237,6 +1797,7 @@ def main() -> None:
         god_xml_path=god_xml_path,
         factions_by_id=factions_by_id,
         region_definitions_xml_path=region_definitions_xml_path,
+        regionobjectgroups_xml_path=regionobjectgroups_xml_path,
         regionyields_xml_path=regionyields_xml_path,
         i18n_registry=registry,
     )
@@ -1275,7 +1836,18 @@ def main() -> None:
         print("  " + ", ".join(missing["sectors"]))
 
 
+def main() -> None:
+    args = parse_args()
+    target_versions = get_target_versions(_config, args)
+    print(f"🧭 计划处理 {len(target_versions)} 个版本。")
+    for version_item in target_versions:
+        effective_config = merge_version_config(_config, version_item)
+        version_label = effective_config.get("version")
+        flavor = "beta" if effective_config.get("beta", False) else "stable"
+        folder_name = effective_config.get("folder_name", "")
+        print(f"\n🚀 版本开始: {version_label} ({flavor}) -> {folder_name}")
+        run_for_config(args, effective_config)
+
+
 if __name__ == "__main__":
     main()
-
-

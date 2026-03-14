@@ -50,6 +50,48 @@
             "x": 0.0,
             "z": 0.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 2816328393,
+              "max_density": 159.2,
+              "representative_amount": 1343360914,
+              "representative_density": 159.2,
+              "max_amount_region_amount": 1343360914,
+              "max_amount_region_density": 159.2,
+              "qualified_region_count": 3
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 90416,
+              "max_density": 4.065,
+              "representative_amount": 22604,
+              "representative_density": 4.065,
+              "max_amount_region_amount": 22604,
+              "max_amount_region_density": 4.065,
+              "qualified_region_count": 4
+            },
+            {
+              "ware": "ore",
+              "total_amount": 226497710,
+              "max_density": 358900.0,
+              "representative_amount": 10316825,
+              "representative_density": 358900.0,
+              "max_amount_region_amount": 83431201,
+              "max_amount_region_density": 9.89,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 138997418,
+              "max_density": 1756.0,
+              "representative_amount": 9761956,
+              "representative_density": 1756.0,
+              "max_amount_region_amount": 47674972,
+              "max_amount_region_density": 5.652,
+              "qualified_region_count": 4
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "triple_a",
@@ -191,6 +233,48 @@
             "x": -21113958.0,
             "z": 7381814.5
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 1870906,
+              "max_density": 336.5,
+              "representative_amount": 935453,
+              "representative_density": 336.5,
+              "max_amount_region_amount": 935453,
+              "max_amount_region_density": 336.5,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "ore",
+              "total_amount": 5888484222,
+              "max_density": 444.3,
+              "representative_amount": 1364649481,
+              "representative_density": 444.3,
+              "max_amount_region_amount": 1364649481,
+              "max_amount_region_density": 444.3,
+              "qualified_region_count": 8
+            },
+            {
+              "ware": "rawscrap",
+              "total_amount": 29051947,
+              "max_density": 31500.0,
+              "representative_amount": 29051947,
+              "representative_density": 31500.0,
+              "max_amount_region_amount": 29051947,
+              "max_amount_region_density": 31500.0,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 2592481386,
+              "max_density": 195.6,
+              "representative_amount": 600804595,
+              "representative_density": 195.6,
+              "max_amount_region_amount": 600804595,
+              "max_amount_region_density": 195.6,
+              "qualified_region_count": 8
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "triple_a",
@@ -324,6 +408,38 @@
             "x": 38620000.0,
             "z": 53635320.0
           },
+          "resource_stats": [
+            {
+              "ware": "nividium",
+              "total_amount": 22604,
+              "max_density": 4.065,
+              "representative_amount": 22604,
+              "representative_density": 4.065,
+              "max_amount_region_amount": 22604,
+              "max_amount_region_density": 4.065,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 3984272935,
+              "max_density": 1855.0,
+              "representative_amount": 10317274,
+              "representative_density": 1855.0,
+              "max_amount_region_amount": 737826940,
+              "max_amount_region_density": 533.2,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 2130075740,
+              "max_density": 1756.0,
+              "representative_amount": 9761956,
+              "representative_density": 1756.0,
+              "max_amount_region_amount": 393669372,
+              "max_amount_region_density": 284.5,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "triple_a",
@@ -523,6 +639,7 @@
             "z": 25980000.0
           },
           "resources": [],
+          "resource_stats": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -700,6 +817,48 @@
             "x": 30000000.0,
             "z": 17320000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 935453,
+              "max_density": 336.5,
+              "representative_amount": 935453,
+              "representative_density": 336.5,
+              "max_amount_region_amount": 935453,
+              "max_amount_region_density": 336.5,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 22604,
+              "max_density": 4.065,
+              "representative_amount": 22604,
+              "representative_density": 4.065,
+              "max_amount_region_amount": 22604,
+              "max_amount_region_density": 4.065,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 10317274,
+              "max_density": 1855.0,
+              "representative_amount": 10317274,
+              "representative_density": 1855.0,
+              "max_amount_region_amount": 10317274,
+              "max_amount_region_density": 1855.0,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 9761956,
+              "max_density": 1756.0,
+              "representative_amount": 9761956,
+              "representative_density": 1756.0,
+              "max_amount_region_amount": 9761956,
+              "max_amount_region_density": 1756.0,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -814,6 +973,48 @@
             "x": 45000000.0,
             "z": -25980000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 4806282887,
+              "max_density": 14.14,
+              "representative_amount": 4802145113,
+              "representative_density": 14.14,
+              "max_amount_region_amount": 4802145113,
+              "max_amount_region_density": 14.14,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 260848770,
+              "max_density": 358900.0,
+              "representative_amount": 61900952,
+              "representative_density": 358900.0,
+              "max_amount_region_amount": 198822626,
+              "max_amount_region_density": 0.5854,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 39272995243,
+              "max_density": 115.5,
+              "representative_amount": 39241030610,
+              "representative_density": 115.5,
+              "max_amount_region_amount": 39241030610,
+              "max_amount_region_density": 115.5,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 38627960836,
+              "max_density": 113.6,
+              "representative_amount": 38598184564,
+              "representative_density": 113.6,
+              "max_amount_region_amount": 38598184564,
+              "max_amount_region_density": 113.6,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -972,6 +1173,7 @@
             "x": 46046580.8125,
             "z": -46333148.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -1103,6 +1305,7 @@
             "x": 0.0,
             "z": -17320000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -1207,6 +1410,38 @@
             "x": -30000000.0,
             "z": 0.0
           },
+          "resource_stats": [
+            {
+              "ware": "nividium",
+              "total_amount": 22604,
+              "max_density": 4.065,
+              "representative_amount": 22604,
+              "representative_density": 4.065,
+              "max_amount_region_amount": 22604,
+              "max_amount_region_density": 4.065,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 10317274,
+              "max_density": 1855.0,
+              "representative_amount": 10317274,
+              "representative_density": 1855.0,
+              "max_amount_region_amount": 10317274,
+              "max_amount_region_density": 1855.0,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 9761956,
+              "max_density": 1756.0,
+              "representative_amount": 9761956,
+              "representative_density": 1756.0,
+              "max_amount_region_amount": 9761956,
+              "max_amount_region_density": 1756.0,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -1320,6 +1555,7 @@
             "x": 17759560.0,
             "z": -5868100.5
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -1480,6 +1716,18 @@
             "x": -105000000.0,
             "z": 43300000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 1478040738,
+              "max_density": 265.8,
+              "representative_amount": 1478040738,
+              "representative_density": 265.8,
+              "max_amount_region_amount": 1478040738,
+              "max_amount_region_density": 265.8,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -1574,6 +1822,28 @@
             "x": -15000000.0,
             "z": 95260000.0
           },
+          "resource_stats": [
+            {
+              "ware": "nividium",
+              "total_amount": 78057993,
+              "max_density": 1.193,
+              "representative_amount": 78057993,
+              "representative_density": 1.193,
+              "max_amount_region_amount": 78057993,
+              "max_amount_region_density": 1.193,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 1497040790,
+              "max_density": 22.87,
+              "representative_amount": 1497040790,
+              "representative_density": 22.87,
+              "max_amount_region_amount": 1497040790,
+              "max_amount_region_density": 22.87,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -1827,6 +2097,7 @@
             "x": 60000000.0,
             "z": 69280000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -2072,6 +2343,7 @@
             "x": 75000000.0,
             "z": -8660000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -2271,6 +2543,18 @@
             "x": -30000000.0,
             "z": -69280000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 4677265,
+              "max_density": 336.5,
+              "representative_amount": 935453,
+              "representative_density": 336.5,
+              "max_amount_region_amount": 935453,
+              "max_amount_region_density": 336.5,
+              "qualified_region_count": 5
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -2484,6 +2768,7 @@
             "x": -60000000.0,
             "z": -51960000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -2697,6 +2982,48 @@
             "x": -75000000.0,
             "z": -8660000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 226616011,
+              "max_density": 790.0,
+              "representative_amount": 226616011,
+              "representative_density": 790.0,
+              "max_amount_region_amount": 226616011,
+              "max_amount_region_density": 790.0,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 968696,
+              "max_density": 3.377,
+              "representative_amount": 968696,
+              "representative_density": 3.377,
+              "max_amount_region_amount": 968696,
+              "max_amount_region_density": 3.377,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 411194744,
+              "max_density": 358900.0,
+              "representative_amount": 10316825,
+              "representative_density": 358900.0,
+              "max_amount_region_amount": 400877919,
+              "max_amount_region_density": 1398.0,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 358545893,
+              "max_density": 1250.0,
+              "representative_amount": 358545893,
+              "representative_density": 1250.0,
+              "max_amount_region_amount": 358545893,
+              "max_amount_region_density": 1250.0,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -2940,6 +3267,7 @@
             "x": -90000000.0,
             "z": 34640000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -3173,6 +3501,18 @@
             "x": 90000000.0,
             "z": 69280000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 1870906,
+              "max_density": 336.5,
+              "representative_amount": 935453,
+              "representative_density": 336.5,
+              "max_amount_region_amount": 935453,
+              "max_amount_region_density": 336.5,
+              "qualified_region_count": 2
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -3377,6 +3717,48 @@
             "x": 199979864.0,
             "z": 69280000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 2806359,
+              "max_density": 336.5,
+              "representative_amount": 935453,
+              "representative_density": 336.5,
+              "max_amount_region_amount": 935453,
+              "max_amount_region_density": 336.5,
+              "qualified_region_count": 3
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 67812,
+              "max_density": 4.065,
+              "representative_amount": 22604,
+              "representative_density": 4.065,
+              "max_amount_region_amount": 22604,
+              "max_amount_region_density": 4.065,
+              "qualified_region_count": 3
+            },
+            {
+              "ware": "ore",
+              "total_amount": 30951822,
+              "max_density": 1855.0,
+              "representative_amount": 10317274,
+              "representative_density": 1855.0,
+              "max_amount_region_amount": 10317274,
+              "max_amount_region_density": 1855.0,
+              "qualified_region_count": 3
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 29285868,
+              "max_density": 1756.0,
+              "representative_amount": 9761956,
+              "representative_density": 1756.0,
+              "max_amount_region_amount": 9761956,
+              "max_amount_region_density": 1756.0,
+              "qualified_region_count": 3
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -3513,6 +3895,28 @@
             "x": 90000000.0,
             "z": 86600000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 230635002,
+              "max_density": 6.365,
+              "representative_amount": 230635002,
+              "representative_density": 6.365,
+              "max_amount_region_amount": 230635002,
+              "max_amount_region_density": 6.365,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 198820997,
+              "max_density": 5.487,
+              "representative_amount": 198820997,
+              "representative_density": 5.487,
+              "max_amount_region_amount": 198820997,
+              "max_amount_region_density": 5.487,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -3713,6 +4117,38 @@
             "x": 75000000.0,
             "z": 95260000.0
           },
+          "resource_stats": [
+            {
+              "ware": "nividium",
+              "total_amount": 1194765,
+              "max_density": 0.002282,
+              "representative_amount": 1194765,
+              "representative_density": 0.002282,
+              "max_amount_region_amount": 1194765,
+              "max_amount_region_density": 0.002282,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 3716675570,
+              "max_density": 7.098,
+              "representative_amount": 3716675570,
+              "representative_density": 7.098,
+              "max_amount_region_amount": 3716675570,
+              "max_amount_region_density": 7.098,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 1858337785,
+              "max_density": 3.549,
+              "representative_amount": 1858337785,
+              "representative_density": 3.549,
+              "max_amount_region_amount": 1858337785,
+              "max_amount_region_density": 3.549,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -3859,6 +4295,48 @@
             "x": 75000000.0,
             "z": 25980000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 1870906,
+              "max_density": 336.5,
+              "representative_amount": 935453,
+              "representative_density": 336.5,
+              "max_amount_region_amount": 935453,
+              "max_amount_region_density": 336.5,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 22604,
+              "max_density": 4.065,
+              "representative_amount": 22604,
+              "representative_density": 4.065,
+              "max_amount_region_amount": 22604,
+              "max_amount_region_density": 4.065,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 10317274,
+              "max_density": 1855.0,
+              "representative_amount": 10317274,
+              "representative_density": 1855.0,
+              "max_amount_region_amount": 10317274,
+              "max_amount_region_density": 1855.0,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 9761956,
+              "max_density": 1756.0,
+              "representative_amount": 9761956,
+              "representative_density": 1756.0,
+              "max_amount_region_amount": 9761956,
+              "max_amount_region_density": 1756.0,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -4191,6 +4669,38 @@
             "x": 105000000.0,
             "z": -8660000.0
           },
+          "resource_stats": [
+            {
+              "ware": "nividium",
+              "total_amount": 45208,
+              "max_density": 4.065,
+              "representative_amount": 22604,
+              "representative_density": 4.065,
+              "max_amount_region_amount": 22604,
+              "max_amount_region_density": 4.065,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "ore",
+              "total_amount": 20634548,
+              "max_density": 1855.0,
+              "representative_amount": 10317274,
+              "representative_density": 1855.0,
+              "max_amount_region_amount": 10317274,
+              "max_amount_region_density": 1855.0,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 19523912,
+              "max_density": 1756.0,
+              "representative_amount": 9761956,
+              "representative_density": 1756.0,
+              "max_amount_region_amount": 9761956,
+              "max_amount_region_density": 1756.0,
+              "qualified_region_count": 2
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -4370,6 +4880,38 @@
             "x": 217672928.0,
             "z": -8660000.0
           },
+          "resource_stats": [
+            {
+              "ware": "nividium",
+              "total_amount": 113020,
+              "max_density": 4.065,
+              "representative_amount": 22604,
+              "representative_density": 4.065,
+              "max_amount_region_amount": 22604,
+              "max_amount_region_density": 4.065,
+              "qualified_region_count": 5
+            },
+            {
+              "ware": "ore",
+              "total_amount": 51586370,
+              "max_density": 1855.0,
+              "representative_amount": 10317274,
+              "representative_density": 1855.0,
+              "max_amount_region_amount": 10317274,
+              "max_amount_region_density": 1855.0,
+              "qualified_region_count": 5
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 48809780,
+              "max_density": 1756.0,
+              "representative_amount": 9761956,
+              "representative_density": 1756.0,
+              "max_amount_region_amount": 9761956,
+              "max_amount_region_density": 1756.0,
+              "qualified_region_count": 5
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -4506,6 +5048,7 @@
             "x": 135000000.0,
             "z": -25980000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -4717,6 +5260,48 @@
             "x": 135000000.0,
             "z": -43300000.0
           },
+          "resource_stats": [
+            {
+              "ware": "nividium",
+              "total_amount": 45208,
+              "max_density": 4.065,
+              "representative_amount": 22604,
+              "representative_density": 4.065,
+              "max_amount_region_amount": 22604,
+              "max_amount_region_density": 4.065,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "ore",
+              "total_amount": 20634548,
+              "max_density": 1855.0,
+              "representative_amount": 10317274,
+              "representative_density": 1855.0,
+              "max_amount_region_amount": 10317274,
+              "max_amount_region_density": 1855.0,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "rawscrap",
+              "total_amount": 1835820891,
+              "max_density": 8610.0,
+              "representative_amount": 1835820891,
+              "representative_density": 8610.0,
+              "max_amount_region_amount": 1835820891,
+              "max_amount_region_density": 8610.0,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 19523912,
+              "max_density": 1756.0,
+              "representative_amount": 9761956,
+              "representative_density": 1756.0,
+              "max_amount_region_amount": 9761956,
+              "max_amount_region_density": 1756.0,
+              "qualified_region_count": 2
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -4848,6 +5433,28 @@
             "x": 134813100.59375,
             "z": 3410032.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 1757019,
+              "max_density": 6.239,
+              "representative_amount": 1757019,
+              "representative_density": 6.239,
+              "max_amount_region_amount": 1757019,
+              "max_amount_region_density": 6.239,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 34569953,
+              "max_density": 122.7,
+              "representative_amount": 34569953,
+              "representative_density": 122.7,
+              "max_amount_region_amount": 34569953,
+              "max_amount_region_density": 122.7,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -4998,6 +5605,7 @@
             "x": 30000000.0,
             "z": -51960000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -5279,6 +5887,7 @@
             "x": 60000000.0,
             "z": -86600000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -5397,6 +6006,48 @@
             "x": -45000000.0,
             "z": -60620000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 1870906,
+              "max_density": 336.5,
+              "representative_amount": 935453,
+              "representative_density": 336.5,
+              "max_amount_region_amount": 935453,
+              "max_amount_region_density": 336.5,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 67812,
+              "max_density": 4.065,
+              "representative_amount": 22604,
+              "representative_density": 4.065,
+              "max_amount_region_amount": 22604,
+              "max_amount_region_density": 4.065,
+              "qualified_region_count": 3
+            },
+            {
+              "ware": "ore",
+              "total_amount": 30951822,
+              "max_density": 1855.0,
+              "representative_amount": 10317274,
+              "representative_density": 1855.0,
+              "max_amount_region_amount": 10317274,
+              "max_amount_region_density": 1855.0,
+              "qualified_region_count": 3
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 29285868,
+              "max_density": 1756.0,
+              "representative_amount": 9761956,
+              "representative_density": 1756.0,
+              "max_amount_region_amount": 9761956,
+              "max_amount_region_density": 1756.0,
+              "qualified_region_count": 3
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -5776,6 +6427,38 @@
             "x": -90000000.0,
             "z": -69280000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 3929599454,
+              "max_density": 28.27,
+              "representative_amount": 3929599454,
+              "representative_density": 28.27,
+              "max_amount_region_amount": 3929599454,
+              "max_amount_region_density": 28.27,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "rawscrap",
+              "total_amount": 121840806,
+              "max_density": 7884.0,
+              "representative_amount": 121840806,
+              "representative_density": 7884.0,
+              "max_amount_region_amount": 121840806,
+              "max_amount_region_density": 7884.0,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 3864888582,
+              "max_density": 27.8,
+              "representative_amount": 3864888582,
+              "representative_density": 27.8,
+              "max_amount_region_amount": 3864888582,
+              "max_amount_region_density": 27.8,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "dual_b",
@@ -5974,6 +6657,28 @@
             "x": -90000000.0,
             "z": -107135016.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 3929599454,
+              "max_density": 28.27,
+              "representative_amount": 3929599454,
+              "representative_density": 28.27,
+              "max_amount_region_amount": 3929599454,
+              "max_amount_region_density": 28.27,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 3864888582,
+              "max_density": 27.8,
+              "representative_amount": 3864888582,
+              "representative_density": 27.8,
+              "max_amount_region_amount": 3864888582,
+              "max_amount_region_density": 27.8,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "dual_b",
@@ -6110,6 +6815,18 @@
             "x": -120000000.0,
             "z": -51960000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 5328597764,
+              "max_density": 106.5,
+              "representative_amount": 5328597764,
+              "representative_density": 106.5,
+              "max_amount_region_amount": 5328597764,
+              "max_amount_region_density": 106.5,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -6227,6 +6944,28 @@
             "x": -93326018.0,
             "z": -107369964.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 1416482934,
+              "max_density": 28.3,
+              "representative_amount": 1416482934,
+              "representative_density": 28.3,
+              "max_amount_region_amount": 1416482934,
+              "max_amount_region_density": 28.3,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 1389532759,
+              "max_density": 27.77,
+              "representative_amount": 1389532759,
+              "representative_density": 27.77,
+              "max_amount_region_amount": 1389532759,
+              "max_amount_region_density": 27.77,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -6373,6 +7112,48 @@
             "x": -150000000.0,
             "z": 34640000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 75856040,
+              "max_density": 621.9,
+              "representative_amount": 75856040,
+              "representative_density": 621.9,
+              "max_amount_region_amount": 75856040,
+              "max_amount_region_density": 621.9,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 411940,
+              "max_density": 3.377,
+              "representative_amount": 411940,
+              "representative_density": 3.377,
+              "max_amount_region_amount": 411940,
+              "max_amount_region_density": 3.377,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 177310964,
+              "max_density": 1102.0,
+              "representative_amount": 134470704,
+              "representative_density": 1102.0,
+              "max_amount_region_amount": 134470704,
+              "max_amount_region_density": 1102.0,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 177310964,
+              "max_density": 1102.0,
+              "representative_amount": 134470704,
+              "representative_density": 1102.0,
+              "max_amount_region_amount": 134470704,
+              "max_amount_region_density": 1102.0,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -6511,6 +7292,48 @@
             "x": -165000000.0,
             "z": 25980000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 80541310,
+              "max_density": 304.9,
+              "representative_amount": 58725515,
+              "representative_density": 304.9,
+              "max_amount_region_amount": 58725515,
+              "max_amount_region_density": 304.9,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 1289145,
+              "max_density": 3.377,
+              "representative_amount": 650474,
+              "representative_density": 3.377,
+              "max_amount_region_amount": 650474,
+              "max_amount_region_density": 3.377,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "ore",
+              "total_amount": 131402358,
+              "max_density": 451.7,
+              "representative_amount": 87000047,
+              "representative_density": 451.7,
+              "max_amount_region_amount": 87000047,
+              "max_amount_region_density": 451.7,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 130556550,
+              "max_density": 451.7,
+              "representative_amount": 87000047,
+              "representative_density": 451.7,
+              "max_amount_region_amount": 87000047,
+              "max_amount_region_density": 451.7,
+              "qualified_region_count": 2
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -6752,6 +7575,7 @@
             "x": -60000000.0,
             "z": 69280000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_b",
@@ -7030,6 +7854,48 @@
             "x": 20377000.0,
             "z": 96438380.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 1870906,
+              "max_density": 336.5,
+              "representative_amount": 935453,
+              "representative_density": 336.5,
+              "max_amount_region_amount": 935453,
+              "max_amount_region_density": 336.5,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 366468,
+              "max_density": 4.065,
+              "representative_amount": 22604,
+              "representative_density": 4.065,
+              "max_amount_region_amount": 343864,
+              "max_amount_region_density": 0.07606,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 60108807,
+              "max_density": 1855.0,
+              "representative_amount": 10317274,
+              "representative_density": 1855.0,
+              "max_amount_region_amount": 49791533,
+              "max_amount_region_density": 11.01,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 57352758,
+              "max_density": 1756.0,
+              "representative_amount": 9761956,
+              "representative_density": 1756.0,
+              "max_amount_region_amount": 47590802,
+              "max_amount_region_density": 10.53,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "dual_b",
@@ -7169,6 +8035,7 @@
             "x": -90000000.0,
             "z": 69280000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -7283,6 +8150,28 @@
             "x": -120000000.0,
             "z": 103920000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 775083992,
+              "max_density": 139.4,
+              "representative_amount": 775083992,
+              "representative_density": 139.4,
+              "max_amount_region_amount": 775083992,
+              "max_amount_region_density": 139.4,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "rawscrap",
+              "total_amount": 40579484,
+              "max_density": 23310.0,
+              "representative_amount": 40579484,
+              "representative_density": 23310.0,
+              "max_amount_region_amount": 40579484,
+              "max_amount_region_density": 23310.0,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -7409,6 +8298,48 @@
             "x": -60000000.0,
             "z": 103920000.0
           },
+          "resource_stats": [
+            {
+              "ware": "nividium",
+              "total_amount": 126884,
+              "max_density": 0.01141,
+              "representative_amount": 126884,
+              "representative_density": 0.01141,
+              "max_amount_region_amount": 126884,
+              "max_amount_region_density": 0.01141,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 16951711,
+              "max_density": 1.524,
+              "representative_amount": 16951711,
+              "representative_density": 1.524,
+              "max_amount_region_amount": 16951711,
+              "max_amount_region_density": 1.524,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "rawscrap",
+              "total_amount": 40579484,
+              "max_density": 23310.0,
+              "representative_amount": 40579484,
+              "representative_density": 23310.0,
+              "max_amount_region_amount": 40579484,
+              "max_amount_region_density": 23310.0,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 16748696,
+              "max_density": 1.506,
+              "representative_amount": 16748696,
+              "representative_density": 1.506,
+              "max_amount_region_amount": 16748696,
+              "max_amount_region_density": 1.506,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "dual_b",
@@ -7700,6 +8631,28 @@
             "x": -60000000.0,
             "z": 137069454.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 71035021,
+              "max_density": 267.2,
+              "representative_amount": 71035021,
+              "representative_density": 267.2,
+              "max_amount_region_amount": 71035021,
+              "max_amount_region_density": 267.2,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 59932386,
+              "max_density": 225.4,
+              "representative_amount": 59932386,
+              "representative_density": 225.4,
+              "max_amount_region_amount": 59932386,
+              "max_amount_region_density": 225.4,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "dual_b",
@@ -7872,6 +8825,18 @@
             "x": -75000000.0,
             "z": 112580000.0
           },
+          "resource_stats": [
+            {
+              "ware": "rawscrap",
+              "total_amount": 307422157,
+              "max_density": 13980.0,
+              "representative_amount": 301361621,
+              "representative_density": 13980.0,
+              "max_amount_region_amount": 301361621,
+              "max_amount_region_density": 13980.0,
+              "qualified_region_count": 2
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -8076,6 +9041,7 @@
             "x": 45000000.0,
             "z": 77940000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -8313,6 +9279,38 @@
             "x": -45000000.0,
             "z": -95260000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 57433978,
+              "max_density": 106.2,
+              "representative_amount": 57433978,
+              "representative_density": 106.2,
+              "max_amount_region_amount": 57433978,
+              "max_amount_region_density": 106.2,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 3567013,
+              "max_density": 6.594,
+              "representative_amount": 3567013,
+              "representative_density": 6.594,
+              "max_amount_region_amount": 3567013,
+              "max_amount_region_density": 6.594,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 1019147,
+              "max_density": 1.884,
+              "representative_amount": 1019147,
+              "representative_density": 1.884,
+              "max_amount_region_amount": 1019147,
+              "max_amount_region_density": 1.884,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -8421,6 +9419,28 @@
             "x": -60000000.0,
             "z": -86600000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 913227957,
+              "max_density": 33.89,
+              "representative_amount": 913227957,
+              "representative_density": 33.89,
+              "max_amount_region_amount": 913227957,
+              "max_amount_region_density": 33.89,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 621462465,
+              "max_density": 23.06,
+              "representative_amount": 621462465,
+              "representative_density": 23.06,
+              "max_amount_region_amount": 621462465,
+              "max_amount_region_density": 23.06,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -8535,6 +9555,28 @@
             "x": 45000000.0,
             "z": -60620000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 328233321,
+              "max_density": 358900.0,
+              "representative_amount": 10316825,
+              "representative_density": 358900.0,
+              "max_amount_region_amount": 317916496,
+              "max_amount_region_density": 267.2,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 278543595,
+              "max_density": 358900.0,
+              "representative_amount": 10316825,
+              "representative_density": 358900.0,
+              "max_amount_region_amount": 268226770,
+              "max_amount_region_density": 225.4,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -8723,6 +9765,48 @@
             "x": 30000000.0,
             "z": -69280000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 8840106,
+              "max_density": 1.829,
+              "representative_amount": 4796449,
+              "representative_density": 1.188,
+              "max_amount_region_amount": 4796449,
+              "max_amount_region_density": 1.188,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 21561235,
+              "max_density": 4.46,
+              "representative_amount": 11698657,
+              "representative_density": 2.898,
+              "max_amount_region_amount": 11698657,
+              "max_amount_region_density": 2.898,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "ore",
+              "total_amount": 799267901,
+              "max_density": 358900.0,
+              "representative_amount": 10316825,
+              "representative_density": 358900.0,
+              "max_amount_region_amount": 495889813,
+              "max_amount_region_density": 224.3,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 26875329,
+              "max_density": 358900.0,
+              "representative_amount": 10316825,
+              "representative_density": 358900.0,
+              "max_amount_region_amount": 10316825,
+              "max_amount_region_density": 358900.0,
+              "qualified_region_count": 2
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -8827,6 +9911,7 @@
             "x": 30000000.0,
             "z": 0.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -8931,6 +10016,38 @@
             "x": -90000000.0,
             "z": -17320000.0
           },
+          "resource_stats": [
+            {
+              "ware": "nividium",
+              "total_amount": 419797287,
+              "max_density": 37.62,
+              "representative_amount": 419797287,
+              "representative_density": 37.62,
+              "max_amount_region_amount": 419797287,
+              "max_amount_region_density": 37.62,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 3616673302,
+              "max_density": 324.1,
+              "representative_amount": 3616673302,
+              "representative_density": 324.1,
+              "max_amount_region_amount": 3616673302,
+              "max_amount_region_density": 324.1,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 2557500812,
+              "max_density": 229.2,
+              "representative_amount": 2557500812,
+              "representative_density": 229.2,
+              "max_amount_region_amount": 2557500812,
+              "max_amount_region_density": 229.2,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -9049,6 +10166,28 @@
             "x": -90000000.0,
             "z": 0.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 125939186,
+              "max_density": 22.57,
+              "representative_amount": 125939186,
+              "representative_density": 22.57,
+              "max_amount_region_amount": 125939186,
+              "max_amount_region_density": 22.57,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 83959457,
+              "max_density": 15.05,
+              "representative_amount": 83959457,
+              "representative_density": 15.05,
+              "max_amount_region_amount": 83959457,
+              "max_amount_region_density": 15.05,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -9157,6 +10296,7 @@
             "x": 120000000.0,
             "z": 0.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -9254,6 +10394,7 @@
             "x": 232672928.0,
             "z": 0.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -9379,6 +10520,38 @@
             "x": 120000000.0,
             "z": 17320000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 408042963,
+              "max_density": 22.57,
+              "representative_amount": 408042963,
+              "representative_density": 22.57,
+              "max_amount_region_amount": 408042963,
+              "max_amount_region_density": 22.57,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "rawscrap",
+              "total_amount": 2887486,
+              "max_density": 0.1597,
+              "representative_amount": 2887486,
+              "representative_density": 0.1597,
+              "max_amount_region_amount": 2887486,
+              "max_amount_region_density": 0.1597,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 272028642,
+              "max_density": 15.05,
+              "representative_amount": 272028642,
+              "representative_density": 15.05,
+              "max_amount_region_amount": 272028642,
+              "max_amount_region_density": 15.05,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -9473,6 +10646,48 @@
             "x": 0.0,
             "z": 103920000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 3992662,
+              "max_density": 0.04488,
+              "representative_amount": 3992662,
+              "representative_density": 0.04488,
+              "max_amount_region_amount": 3992662,
+              "max_amount_region_density": 0.04488,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 9738200,
+              "max_density": 0.1095,
+              "representative_amount": 9738200,
+              "representative_density": 0.1095,
+              "max_amount_region_amount": 9738200,
+              "max_amount_region_density": 0.1095,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 1027805580,
+              "max_density": 11.55,
+              "representative_amount": 1027805580,
+              "representative_density": 11.55,
+              "max_amount_region_amount": 1027805580,
+              "max_amount_region_density": 11.55,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 527850698,
+              "max_density": 5.933,
+              "representative_amount": 527850698,
+              "representative_density": 5.933,
+              "max_amount_region_amount": 527850698,
+              "max_amount_region_density": 5.933,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -9577,6 +10792,48 @@
             "x": -15000000.0,
             "z": 112580000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 310028521,
+              "max_density": 2.23,
+              "representative_amount": 310028521,
+              "representative_density": 2.23,
+              "max_amount_region_amount": 310028521,
+              "max_amount_region_density": 2.23,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "rawkhaakscrap",
+              "total_amount": 2954287334,
+              "max_density": 21.25,
+              "representative_amount": 2954287334,
+              "representative_density": 21.25,
+              "max_amount_region_amount": 2954287334,
+              "max_amount_region_density": 21.25,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "rawscrap",
+              "total_amount": 36487500169,
+              "max_density": 262.5,
+              "representative_amount": 36487500169,
+              "representative_density": 262.5,
+              "max_amount_region_amount": 36487500169,
+              "max_amount_region_density": 262.5,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 310028521,
+              "max_density": 2.23,
+              "representative_amount": 310028521,
+              "representative_density": 2.23,
+              "max_amount_region_amount": 310028521,
+              "max_amount_region_density": 2.23,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -9743,6 +11000,48 @@
             "x": -90000000.0,
             "z": 86600000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 172399939,
+              "max_density": 1.829,
+              "representative_amount": 172333428,
+              "representative_density": 0.6198,
+              "max_amount_region_amount": 172333428,
+              "max_amount_region_density": 0.6198,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 141639201,
+              "max_density": 133.8,
+              "representative_amount": 4866639,
+              "representative_density": 133.8,
+              "max_amount_region_amount": 136772562,
+              "max_amount_region_density": 0.4919,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 4632048128,
+              "max_density": 670.8,
+              "representative_amount": 24397155,
+              "representative_density": 670.8,
+              "max_amount_region_amount": 4607650973,
+              "max_amount_region_density": 16.57,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 4527259723,
+              "max_density": 16.28,
+              "representative_amount": 4527223394,
+              "representative_density": 16.28,
+              "max_amount_region_amount": 4527223394,
+              "max_amount_region_density": 16.28,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -9837,6 +11136,48 @@
             "x": 60000000.0,
             "z": 34640000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 172356012,
+              "max_density": 1.829,
+              "representative_amount": 172333428,
+              "representative_density": 0.6198,
+              "max_amount_region_amount": 172333428,
+              "max_amount_region_density": 0.6198,
+              "qualified_region_count": 3
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 139325071,
+              "max_density": 312.2,
+              "representative_amount": 1575020,
+              "representative_density": 312.2,
+              "max_amount_region_amount": 136772562,
+              "max_amount_region_density": 0.4919,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "ore",
+              "total_amount": 4615935180,
+              "max_density": 670.8,
+              "representative_amount": 4900293,
+              "representative_density": 670.8,
+              "max_amount_region_amount": 4607650973,
+              "max_amount_region_density": 16.57,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 4527235730,
+              "max_density": 16.28,
+              "representative_amount": 4527223394,
+              "representative_density": 16.28,
+              "max_amount_region_amount": 4527223394,
+              "max_amount_region_density": 16.28,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -9945,6 +11286,58 @@
             "x": -150000000.0,
             "z": 51960000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 215025067,
+              "max_density": 159.2,
+              "representative_amount": 215025067,
+              "representative_density": 159.2,
+              "max_amount_region_amount": 215025067,
+              "max_amount_region_density": 159.2,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 13354415,
+              "max_density": 9.89,
+              "representative_amount": 13354415,
+              "representative_density": 9.89,
+              "max_amount_region_amount": 13354415,
+              "max_amount_region_density": 9.89,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "rawkhaakscrap",
+              "total_amount": 1434734504,
+              "max_density": 1063.0,
+              "representative_amount": 1434734504,
+              "representative_density": 1063.0,
+              "max_amount_region_amount": 1434734504,
+              "max_amount_region_density": 1063.0,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "rawscrap",
+              "total_amount": 655638205,
+              "max_density": 485.6,
+              "representative_amount": 655638205,
+              "representative_density": 485.6,
+              "max_amount_region_amount": 655638205,
+              "max_amount_region_density": 485.6,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 7631095,
+              "max_density": 5.652,
+              "representative_amount": 7631095,
+              "representative_density": 5.652,
+              "max_amount_region_amount": 7631095,
+              "max_amount_region_density": 5.652,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -10054,6 +11447,28 @@
             "x": -120000000.0,
             "z": -17320000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 1251241298,
+              "max_density": 331.1,
+              "representative_amount": 1251241298,
+              "representative_density": 331.1,
+              "max_amount_region_amount": 1251241298,
+              "max_amount_region_density": 331.1,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 135546731,
+              "max_density": 35.87,
+              "representative_amount": 135546731,
+              "representative_density": 35.87,
+              "max_amount_region_amount": 135546731,
+              "max_amount_region_density": 35.87,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -10153,6 +11568,28 @@
             "x": 150000000.0,
             "z": -34640000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 3060379756,
+              "max_density": 28.39,
+              "representative_amount": 3060379756,
+              "representative_density": 28.39,
+              "max_amount_region_amount": 3060379756,
+              "max_amount_region_density": 28.39,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 3002152602,
+              "max_density": 27.85,
+              "representative_amount": 3002152602,
+              "representative_density": 27.85,
+              "max_amount_region_amount": 3002152602,
+              "max_amount_region_density": 27.85,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -10216,6 +11653,28 @@
             "x": 176673982.0,
             "z": -90049964.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 3060379756,
+              "max_density": 28.39,
+              "representative_amount": 3060379756,
+              "representative_density": 28.39,
+              "max_amount_region_amount": 3060379756,
+              "max_amount_region_density": 28.39,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 3002152602,
+              "max_density": 27.85,
+              "representative_amount": 3002152602,
+              "representative_density": 27.85,
+              "max_amount_region_amount": 3002152602,
+              "max_amount_region_density": 27.85,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -10348,6 +11807,38 @@
             "x": 60000000.0,
             "z": -103920000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 7186346,
+              "max_density": 1.843,
+              "representative_amount": 7186346,
+              "representative_density": 1.843,
+              "max_amount_region_amount": 7186346,
+              "max_amount_region_density": 1.843,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 24408364,
+              "max_density": 6.259,
+              "representative_amount": 24408364,
+              "representative_density": 6.259,
+              "max_amount_region_amount": 24408364,
+              "max_amount_region_density": 6.259,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 40661852,
+              "max_density": 10.43,
+              "representative_amount": 40661852,
+              "representative_density": 10.43,
+              "max_amount_region_amount": 40661852,
+              "max_amount_region_density": 10.43,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -10491,6 +11982,48 @@
             "x": 105000000.0,
             "z": -95260000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 8649010,
+              "max_density": 14.09,
+              "representative_amount": 4564142,
+              "representative_density": 14.09,
+              "max_amount_region_amount": 4564142,
+              "max_amount_region_density": 14.09,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 76092856,
+              "max_density": 234.9,
+              "representative_amount": 76092856,
+              "representative_density": 234.9,
+              "max_amount_region_amount": 76092856,
+              "max_amount_region_density": 234.9,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 26363444,
+              "max_density": 37.8,
+              "representative_amount": 14115925,
+              "representative_density": 22.01,
+              "max_amount_region_amount": 14115925,
+              "max_amount_region_density": 22.01,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 59157920,
+              "max_density": 62.56,
+              "representative_amount": 38890433,
+              "representative_density": 60.65,
+              "max_amount_region_amount": 38890433,
+              "max_amount_region_density": 60.65,
+              "qualified_region_count": 2
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -10581,6 +12114,48 @@
             "x": 120000000.0,
             "z": -69280000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 19734433,
+              "max_density": 47.26,
+              "representative_amount": 14429915,
+              "representative_density": 47.26,
+              "max_amount_region_amount": 14429915,
+              "max_amount_region_density": 47.26,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 87894151,
+              "max_density": 783.1,
+              "representative_amount": 87894151,
+              "representative_density": 783.1,
+              "max_amount_region_amount": 87894151,
+              "max_amount_region_density": 783.1,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 52620696,
+              "max_density": 126.0,
+              "representative_amount": 38476512,
+              "representative_density": 126.0,
+              "max_amount_region_amount": 38476512,
+              "max_amount_region_density": 126.0,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 90649196,
+              "max_density": 217.1,
+              "representative_amount": 66283139,
+              "representative_density": 217.1,
+              "max_amount_region_amount": 66283139,
+              "max_amount_region_density": 217.1,
+              "qualified_region_count": 2
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -10671,6 +12246,48 @@
             "x": 105000000.0,
             "z": -60620000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 9203851,
+              "max_density": 4.726,
+              "representative_amount": 9203851,
+              "representative_density": 4.726,
+              "max_amount_region_amount": 9203851,
+              "max_amount_region_density": 4.726,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 152504830,
+              "max_density": 78.31,
+              "representative_amount": 152504830,
+              "representative_density": 78.31,
+              "max_amount_region_amount": 152504830,
+              "max_amount_region_density": 78.31,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 70443101,
+              "max_density": 36.17,
+              "representative_amount": 70443101,
+              "representative_density": 36.17,
+              "max_amount_region_amount": 70443101,
+              "max_amount_region_density": 36.17,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 47465008,
+              "max_density": 24.37,
+              "representative_amount": 47465008,
+              "representative_density": 24.37,
+              "max_amount_region_amount": 47465008,
+              "max_amount_region_density": 24.37,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -10776,6 +12393,38 @@
             "x": 90000000.0,
             "z": -34640000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 20005112,
+              "max_density": 14.18,
+              "representative_amount": 20005112,
+              "representative_density": 14.18,
+              "max_amount_region_amount": 20005112,
+              "max_amount_region_density": 14.18,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 53342445,
+              "max_density": 37.8,
+              "representative_amount": 53342445,
+              "representative_density": 37.8,
+              "max_amount_region_amount": 53342445,
+              "max_amount_region_density": 37.8,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 91892547,
+              "max_density": 65.13,
+              "representative_amount": 91892547,
+              "representative_density": 65.13,
+              "max_amount_region_amount": 91892547,
+              "max_amount_region_density": 65.13,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -10894,6 +12543,7 @@
             "x": -60000000.0,
             "z": -103920000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -10986,6 +12636,38 @@
             "x": -120000000.0,
             "z": -69280000.0
           },
+          "resource_stats": [
+            {
+              "ware": "nividium",
+              "total_amount": 1067533810,
+              "max_density": 156.6,
+              "representative_amount": 1067533810,
+              "representative_density": 156.6,
+              "max_amount_region_amount": 1067533810,
+              "max_amount_region_density": 156.6,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 171790660,
+              "max_density": 25.2,
+              "representative_amount": 171790660,
+              "representative_density": 25.2,
+              "max_amount_region_amount": 171790660,
+              "max_amount_region_density": 25.2,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 295942215,
+              "max_density": 43.42,
+              "representative_amount": 295942215,
+              "representative_density": 43.42,
+              "max_amount_region_amount": 295942215,
+              "max_amount_region_density": 43.42,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -11162,6 +12844,28 @@
             "x": -150000000.0,
             "z": -17320000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 32836937,
+              "max_density": 14.68,
+              "representative_amount": 22716180,
+              "representative_density": 14.68,
+              "max_amount_region_amount": 22716180,
+              "max_amount_region_density": 14.68,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "rawscrap",
+              "total_amount": 82947341,
+              "max_density": 33.18,
+              "representative_amount": 82947341,
+              "representative_density": 33.18,
+              "max_amount_region_amount": 82947341,
+              "max_amount_region_density": 33.18,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -11284,6 +12988,38 @@
             "x": -210000000.0,
             "z": 69280000.0
           },
+          "resource_stats": [
+            {
+              "ware": "nividium",
+              "total_amount": 143158,
+              "max_density": 0.01801,
+              "representative_amount": 143158,
+              "representative_density": 0.01801,
+              "max_amount_region_amount": 143158,
+              "max_amount_region_density": 0.01801,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 121067808,
+              "max_density": 15.23,
+              "representative_amount": 121067808,
+              "representative_density": 15.23,
+              "max_amount_region_amount": 121067808,
+              "max_amount_region_density": 15.23,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 470816728,
+              "max_density": 59.24,
+              "representative_amount": 470816728,
+              "representative_density": 59.24,
+              "max_amount_region_amount": 470816728,
+              "max_amount_region_density": 59.24,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -11386,6 +13122,38 @@
             "x": -135000000.0,
             "z": -95260000.0
           },
+          "resource_stats": [
+            {
+              "ware": "nividium",
+              "total_amount": 810562187,
+              "max_density": 501.2,
+              "representative_amount": 561158437,
+              "representative_density": 501.2,
+              "max_amount_region_amount": 561158437,
+              "max_amount_region_density": 501.2,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "ore",
+              "total_amount": 130438035,
+              "max_density": 80.65,
+              "representative_amount": 90303255,
+              "representative_density": 80.65,
+              "max_amount_region_amount": 90303255,
+              "max_amount_region_density": 80.65,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 224704424,
+              "max_density": 138.9,
+              "representative_amount": 155564601,
+              "representative_density": 138.9,
+              "max_amount_region_amount": 155564601,
+              "max_amount_region_density": 138.9,
+              "qualified_region_count": 2
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -11700,6 +13468,7 @@
             "x": -30000000.0,
             "z": -121240000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -11802,6 +13571,28 @@
             "x": -210000000.0,
             "z": -103920000.0
           },
+          "resource_stats": [
+            {
+              "ware": "rawkhaakscrap",
+              "total_amount": 282520918,
+              "max_density": 1063.0,
+              "representative_amount": 282520918,
+              "representative_density": 1063.0,
+              "max_amount_region_amount": 282520918,
+              "max_amount_region_density": 1063.0,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "rawscrap",
+              "total_amount": 131934003,
+              "max_density": 496.2,
+              "representative_amount": 131934003,
+              "representative_density": 496.2,
+              "max_amount_region_amount": 131934003,
+              "max_amount_region_density": 496.2,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -11889,6 +13680,38 @@
             "x": -30000000.0,
             "z": -17320000.0
           },
+          "resource_stats": [
+            {
+              "ware": "nividium",
+              "total_amount": 226705191,
+              "max_density": 234.9,
+              "representative_amount": 150612335,
+              "representative_density": 234.9,
+              "max_amount_region_amount": 150612335,
+              "max_amount_region_density": 234.9,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "ore",
+              "total_amount": 26463825,
+              "max_density": 33.2,
+              "representative_amount": 15707779,
+              "representative_density": 24.5,
+              "max_amount_region_amount": 15707779,
+              "max_amount_region_density": 24.5,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 31806978,
+              "max_density": 32.95,
+              "representative_amount": 21131070,
+              "representative_density": 32.95,
+              "max_amount_region_amount": 21131070,
+              "max_amount_region_density": 32.95,
+              "qualified_region_count": 2
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -12033,6 +13856,7 @@
             "x": -105000000.0,
             "z": 147220000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -12137,6 +13961,38 @@
             "x": -45000000.0,
             "z": 129900000.0
           },
+          "resource_stats": [
+            {
+              "ware": "nividium",
+              "total_amount": 1262651,
+              "max_density": 0.5403,
+              "representative_amount": 1262651,
+              "representative_density": 0.5403,
+              "max_amount_region_amount": 1262651,
+              "max_amount_region_density": 0.5403,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 144715600,
+              "max_density": 61.93,
+              "representative_amount": 144715600,
+              "representative_density": 61.93,
+              "max_amount_region_amount": 144715600,
+              "max_amount_region_density": 61.93,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 415260354,
+              "max_density": 177.7,
+              "representative_amount": 415260354,
+              "representative_density": 177.7,
+              "max_amount_region_amount": 415260354,
+              "max_amount_region_density": 177.7,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -12289,6 +14145,38 @@
             "x": -45000000.0,
             "z": 147220000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 830089882,
+              "max_density": 82.31,
+              "representative_amount": 830089882,
+              "representative_density": 82.31,
+              "max_amount_region_amount": 830089882,
+              "max_amount_region_density": 82.31,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 227976339,
+              "max_density": 22.61,
+              "representative_amount": 227976339,
+              "representative_density": 22.61,
+              "max_amount_region_amount": 227976339,
+              "max_amount_region_density": 22.61,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 208978311,
+              "max_density": 20.72,
+              "representative_amount": 208978311,
+              "representative_density": 20.72,
+              "max_amount_region_amount": 208978311,
+              "max_amount_region_density": 20.72,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -12407,6 +14295,7 @@
             "x": -120000000.0,
             "z": 138560000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -12535,6 +14424,7 @@
             "x": 30000000.0,
             "z": 155880000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -12677,6 +14567,7 @@
             "x": 45000000.0,
             "z": 147220000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -12837,6 +14728,7 @@
             "x": 45000000.0,
             "z": 164540000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -12979,6 +14871,7 @@
             "x": 120000000.0,
             "z": 103920000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -13117,6 +15010,7 @@
             "x": 120000000.0,
             "z": 86600000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -13216,6 +15110,7 @@
             "x": 101796238.0,
             "z": 100611029.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -13341,6 +15236,7 @@
             "x": 150000000.0,
             "z": 103920000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -13455,6 +15351,38 @@
             "x": 165000000.0,
             "z": 112580000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 40025205,
+              "max_density": 6.268,
+              "representative_amount": 40025205,
+              "representative_density": 6.268,
+              "max_amount_region_amount": 40025205,
+              "max_amount_region_density": 6.268,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 8174327,
+              "max_density": 1.28,
+              "representative_amount": 8174327,
+              "representative_density": 1.28,
+              "max_amount_region_amount": 8174327,
+              "max_amount_region_density": 1.28,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 186814532,
+              "max_density": 29.26,
+              "representative_amount": 186814532,
+              "representative_density": 29.26,
+              "max_amount_region_amount": 186814532,
+              "max_amount_region_density": 29.26,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -13583,6 +15511,38 @@
             "x": 180000000.0,
             "z": 138560000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 1099858930,
+              "max_density": 115.4,
+              "representative_amount": 42492592,
+              "representative_density": 115.4,
+              "max_amount_region_amount": 1057366338,
+              "max_amount_region_density": 13.55,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 5202454,
+              "max_density": 14.13,
+              "representative_amount": 5202454,
+              "representative_density": 14.13,
+              "max_amount_region_amount": 5202454,
+              "max_amount_region_density": 14.13,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 3121473,
+              "max_density": 8.477,
+              "representative_amount": 3121473,
+              "representative_density": 8.477,
+              "max_amount_region_amount": 3121473,
+              "max_amount_region_density": 8.477,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -13715,6 +15675,18 @@
             "x": 180000000.0,
             "z": 103920000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 400252051,
+              "max_density": 6.268,
+              "representative_amount": 400252051,
+              "representative_density": 6.268,
+              "max_amount_region_amount": 400252051,
+              "max_amount_region_density": 6.268,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -13833,6 +15805,18 @@
             "x": 195000000.0,
             "z": 112580000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 865117913,
+              "max_density": 13.55,
+              "representative_amount": 865117913,
+              "representative_density": 13.55,
+              "max_amount_region_amount": 865117913,
+              "max_amount_region_density": 13.55,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -13927,6 +15911,18 @@
             "x": -45000000.0,
             "z": 164540000.0
           },
+          "resource_stats": [
+            {
+              "ware": "rawscrap",
+              "total_amount": 15752441,
+              "max_density": 0.8223,
+              "representative_amount": 15752441,
+              "representative_density": 0.8223,
+              "max_amount_region_amount": 15752441,
+              "max_amount_region_density": 0.8223,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -14031,6 +16027,48 @@
             "x": -30000000.0,
             "z": 173200000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 442492674,
+              "max_density": 6.268,
+              "representative_amount": 442492674,
+              "representative_density": 6.268,
+              "max_amount_region_amount": 442492674,
+              "max_amount_region_density": 6.268,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 6357221,
+              "max_density": 0.09006,
+              "representative_amount": 6357221,
+              "representative_density": 0.09006,
+              "max_amount_region_amount": 6357221,
+              "max_amount_region_density": 0.09006,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 75429720,
+              "max_density": 1.069,
+              "representative_amount": 75429720,
+              "representative_density": 1.069,
+              "max_amount_region_amount": 75429720,
+              "max_amount_region_density": 1.069,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 2090761239,
+              "max_density": 29.62,
+              "representative_amount": 2090761239,
+              "representative_density": 29.62,
+              "max_amount_region_amount": 2090761239,
+              "max_amount_region_density": 29.62,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -14163,6 +16201,7 @@
             "x": 90000000.0,
             "z": 138560000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -14252,6 +16291,18 @@
             "x": 80473124.0,
             "z": 163129310.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 400252051,
+              "max_density": 6.268,
+              "representative_amount": 400252051,
+              "representative_density": 6.268,
+              "max_amount_region_amount": 400252051,
+              "max_amount_region_density": 6.268,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -14402,6 +16453,7 @@
             "x": 75000000.0,
             "z": 164540000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -14506,6 +16558,68 @@
             "x": 0.0,
             "z": 138560000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 1769971,
+              "max_density": 25.07,
+              "representative_amount": 1769971,
+              "representative_density": 25.07,
+              "max_amount_region_amount": 1769971,
+              "max_amount_region_density": 25.07,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 25429,
+              "max_density": 0.3602,
+              "representative_amount": 25429,
+              "representative_density": 0.3602,
+              "max_amount_region_amount": 25429,
+              "max_amount_region_density": 0.3602,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 43298567,
+              "max_density": 613.4,
+              "representative_amount": 43298567,
+              "representative_density": 613.4,
+              "max_amount_region_amount": 43298567,
+              "max_amount_region_density": 613.4,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "rawkhaakscrap",
+              "total_amount": 16944736,
+              "max_density": 1063.0,
+              "representative_amount": 16944736,
+              "representative_density": 1063.0,
+              "max_amount_region_amount": 16944736,
+              "max_amount_region_density": 1063.0,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "rawscrap",
+              "total_amount": 277887037,
+              "max_density": 9459.0,
+              "representative_amount": 146064930,
+              "representative_density": 9459.0,
+              "max_amount_region_amount": 146064930,
+              "max_amount_region_density": 9459.0,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 8363045,
+              "max_density": 118.5,
+              "representative_amount": 8363045,
+              "representative_density": 118.5,
+              "max_amount_region_amount": 8363045,
+              "max_amount_region_density": 118.5,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -14634,6 +16748,7 @@
             "x": 30000000.0,
             "z": 121240000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -14760,6 +16875,28 @@
             "x": 45000000.0,
             "z": 112580000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 4392547,
+              "max_density": 15.6,
+              "representative_amount": 4392547,
+              "representative_density": 15.6,
+              "max_amount_region_amount": 4392547,
+              "max_amount_region_density": 15.6,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 86424881,
+              "max_density": 306.9,
+              "representative_amount": 86424881,
+              "representative_density": 306.9,
+              "max_amount_region_amount": 86424881,
+              "max_amount_region_density": 306.9,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -14884,6 +17021,18 @@
             "x": 120000000.0,
             "z": 121240000.0
           },
+          "resource_stats": [
+            {
+              "ware": "rawscrap",
+              "total_amount": 117076399,
+              "max_density": 14510.0,
+              "representative_amount": 117076399,
+              "representative_density": 14510.0,
+              "max_amount_region_amount": 117076399,
+              "max_amount_region_density": 14510.0,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -15008,6 +17157,38 @@
             "x": -135000000.0,
             "z": 147220000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 179715340,
+              "max_density": 159.2,
+              "representative_amount": 179715340,
+              "representative_density": 159.2,
+              "max_amount_region_amount": 179715340,
+              "max_amount_region_density": 159.2,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 11161458,
+              "max_density": 9.89,
+              "representative_amount": 11161458,
+              "representative_density": 9.89,
+              "max_amount_region_amount": 11161458,
+              "max_amount_region_density": 9.89,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 6377976,
+              "max_density": 5.652,
+              "representative_amount": 6377976,
+              "representative_density": 5.652,
+              "max_amount_region_amount": 6377976,
+              "max_amount_region_density": 5.652,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -15126,6 +17307,7 @@
             "x": -165000000.0,
             "z": 147220000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_b",
@@ -15225,6 +17407,7 @@
             "x": -34773744.0,
             "z": 259364392.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_b",
@@ -15350,6 +17533,7 @@
             "x": -180000000.0,
             "z": 155880000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_b",
@@ -15453,6 +17637,28 @@
             "x": -43280992.0,
             "z": 159557055.75
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 74553454,
+              "max_density": 1.056,
+              "representative_amount": 74553454,
+              "representative_density": 1.056,
+              "max_amount_region_amount": 74553454,
+              "max_amount_region_density": 1.056,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 1542388614,
+              "max_density": 21.85,
+              "representative_amount": 1542388614,
+              "representative_density": 21.85,
+              "max_amount_region_amount": 1542388614,
+              "max_amount_region_density": 21.85,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "dual_b",
@@ -15604,6 +17810,28 @@
             "x": 165000000.0,
             "z": 147220000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 74553454,
+              "max_density": 1.056,
+              "representative_amount": 74553454,
+              "representative_density": 1.056,
+              "max_amount_region_amount": 74553454,
+              "max_amount_region_density": 1.056,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 1542388614,
+              "max_density": 21.85,
+              "representative_amount": 1542388614,
+              "representative_density": 21.85,
+              "max_amount_region_amount": 1542388614,
+              "max_amount_region_density": 21.85,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -15683,6 +17911,48 @@
             "x": -195000000.0,
             "z": 8660000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 945868040,
+              "max_density": 1.67,
+              "representative_amount": 945868040,
+              "representative_density": 1.67,
+              "max_amount_region_amount": 945868040,
+              "max_amount_region_density": 1.67,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 5101621,
+              "max_density": 0.009006,
+              "representative_amount": 5101621,
+              "representative_density": 0.009006,
+              "max_amount_region_amount": 5101621,
+              "max_amount_region_density": 0.009006,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 4314416430,
+              "max_density": 7.616,
+              "representative_amount": 4314416430,
+              "representative_density": 7.616,
+              "max_amount_region_amount": 4314416430,
+              "max_amount_region_density": 7.616,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 16778196111,
+              "max_density": 29.62,
+              "representative_amount": 16778196111,
+              "representative_density": 29.62,
+              "max_amount_region_amount": 16778196111,
+              "max_amount_region_density": 29.62,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -15795,6 +18065,7 @@
             "x": -210000000.0,
             "z": 17320000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -15921,6 +18192,7 @@
             "x": -225000000.0,
             "z": 25980000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -16033,6 +18305,7 @@
             "x": -210000000.0,
             "z": 34640000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_b",
@@ -16131,6 +18404,7 @@
             "x": -210000000.0,
             "z": -141250496.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_b",
@@ -16289,6 +18563,7 @@
             "x": -225000000.0,
             "z": 43300000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -16381,6 +18656,7 @@
             "x": -210000000.0,
             "z": -17320000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -16497,6 +18773,7 @@
             "x": -225000000.0,
             "z": -25980000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "triple_b",
@@ -16624,6 +18901,7 @@
             "x": -280073532.0,
             "z": -185381120.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "triple_b",
@@ -16700,6 +18978,38 @@
             "x": -257631400.0,
             "z": 108293000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 27387571466770,
+              "max_density": 178.9,
+              "representative_amount": 27387571466770,
+              "representative_density": 178.9,
+              "max_amount_region_amount": 27387571466770,
+              "max_amount_region_density": 178.9,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 5774697390270049,
+              "max_density": 37720.0,
+              "representative_amount": 5774697390270049,
+              "representative_density": 37720.0,
+              "max_amount_region_amount": 5774697390270049,
+              "max_amount_region_density": 37720.0,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 464919861999277,
+              "max_density": 3037.0,
+              "representative_amount": 464919861999277,
+              "representative_density": 3037.0,
+              "max_amount_region_amount": 464919861999277,
+              "max_amount_region_density": 3037.0,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "triple_b",
@@ -16845,6 +19155,7 @@
             "x": -240000000.0,
             "z": -34640000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -16949,6 +19260,7 @@
             "x": -225000000.0,
             "z": -43300000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -17073,6 +19385,7 @@
             "x": -240000000.0,
             "z": -51960000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -17177,6 +19490,38 @@
             "x": -120000000.0,
             "z": 69280000.0
           },
+          "resource_stats": [
+            {
+              "ware": "nividium",
+              "total_amount": 122099,
+              "max_density": 0.009006,
+              "representative_amount": 122099,
+              "representative_density": 0.009006,
+              "max_amount_region_amount": 122099,
+              "max_amount_region_density": 0.009006,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 103258757,
+              "max_density": 7.616,
+              "representative_amount": 103258757,
+              "representative_density": 7.616,
+              "max_amount_region_amount": 103258757,
+              "max_amount_region_density": 7.616,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 401559680,
+              "max_density": 29.62,
+              "representative_amount": 401559680,
+              "representative_density": 29.62,
+              "max_amount_region_amount": 401559680,
+              "max_amount_region_density": 29.62,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "dual_b",
@@ -17299,6 +19644,38 @@
             "x": -120000000.0,
             "z": 18225196.0
           },
+          "resource_stats": [
+            {
+              "ware": "nividium",
+              "total_amount": 0,
+              "max_density": 0.009006,
+              "representative_amount": 0,
+              "representative_density": 0.009006,
+              "max_amount_region_amount": 0,
+              "max_amount_region_density": 0.009006,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 0,
+              "max_density": 7.616,
+              "representative_amount": 0,
+              "representative_density": 7.616,
+              "max_amount_region_amount": 0,
+              "max_amount_region_density": 7.616,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 0,
+              "max_density": 29.62,
+              "representative_amount": 0,
+              "representative_density": 29.62,
+              "max_amount_region_amount": 0,
+              "max_amount_region_density": 29.62,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "dual_b",
@@ -17415,6 +19792,48 @@
             "x": -165000000.0,
             "z": -77940000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 16899334,
+              "max_density": 4.339,
+              "representative_amount": 16899334,
+              "representative_density": 4.339,
+              "max_amount_region_amount": 16899334,
+              "max_amount_region_density": 4.339,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 35074,
+              "max_density": 0.009006,
+              "representative_amount": 35074,
+              "representative_density": 0.009006,
+              "max_amount_region_amount": 35074,
+              "max_amount_region_density": 0.009006,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 29661613,
+              "max_density": 7.616,
+              "representative_amount": 29661613,
+              "representative_density": 7.616,
+              "max_amount_region_amount": 29661613,
+              "max_amount_region_density": 7.616,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 115350098,
+              "max_density": 29.62,
+              "representative_amount": 115350098,
+              "representative_density": 29.62,
+              "max_amount_region_amount": 115350098,
+              "max_amount_region_density": 29.62,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -17543,6 +19962,38 @@
             "x": -180000000.0,
             "z": -86600000.0
           },
+          "resource_stats": [
+            {
+              "ware": "nividium",
+              "total_amount": 71579,
+              "max_density": 0.009006,
+              "representative_amount": 71579,
+              "representative_density": 0.009006,
+              "max_amount_region_amount": 71579,
+              "max_amount_region_density": 0.009006,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 60533904,
+              "max_density": 7.616,
+              "representative_amount": 60533904,
+              "representative_density": 7.616,
+              "max_amount_region_amount": 60533904,
+              "max_amount_region_density": 7.616,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 235408364,
+              "max_density": 29.62,
+              "representative_amount": 235408364,
+              "representative_density": 29.62,
+              "max_amount_region_amount": 235408364,
+              "max_amount_region_density": 29.62,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -17681,6 +20132,7 @@
             "x": -195000000.0,
             "z": -77940000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -17831,6 +20283,48 @@
             "x": -255000000.0,
             "z": -60620000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 557386523,
+              "max_density": 1.431,
+              "representative_amount": 557386523,
+              "representative_density": 1.431,
+              "max_amount_region_amount": 557386523,
+              "max_amount_region_density": 1.431,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 3507364,
+              "max_density": 0.009006,
+              "representative_amount": 3507364,
+              "representative_density": 0.009006,
+              "max_amount_region_amount": 3507364,
+              "max_amount_region_density": 0.009006,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 2966161296,
+              "max_density": 7.616,
+              "representative_amount": 2966161296,
+              "representative_density": 7.616,
+              "max_amount_region_amount": 2966161296,
+              "max_amount_region_density": 7.616,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 11535009827,
+              "max_density": 29.62,
+              "representative_amount": 11535009827,
+              "representative_density": 29.62,
+              "max_amount_region_amount": 11535009827,
+              "max_amount_region_density": 29.62,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -17921,6 +20415,48 @@
             "x": 20038240.0,
             "z": 81086290.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 14956464938047,
+              "max_density": 1.67,
+              "representative_amount": 14956464938047,
+              "representative_density": 1.67,
+              "max_amount_region_amount": 14956464938047,
+              "max_amount_region_density": 1.67,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 80669968364,
+              "max_density": 0.06207,
+              "representative_amount": 988377,
+              "representative_density": 0.06207,
+              "max_amount_region_amount": 80668979987,
+              "max_amount_region_density": 0.009006,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 68221380268225,
+              "max_density": 7.616,
+              "representative_amount": 68221374832153,
+              "representative_density": 7.616,
+              "max_amount_region_amount": 68221374832153,
+              "max_amount_region_density": 7.616,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 265303924343874,
+              "max_density": 29.62,
+              "representative_amount": 265303923355497,
+              "representative_density": 29.62,
+              "max_amount_region_amount": 265303923355497,
+              "max_amount_region_density": 29.62,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "triple_a",
@@ -18043,6 +20579,38 @@
             "x": -14013832.4,
             "z": -184824500.0
           },
+          "resource_stats": [
+            {
+              "ware": "nividium",
+              "total_amount": 17913,
+              "max_density": 0.06207,
+              "representative_amount": 15443,
+              "representative_density": 0.06207,
+              "max_amount_region_amount": 15443,
+              "max_amount_region_density": 0.06207,
+              "qualified_region_count": 3
+            },
+            {
+              "ware": "ore",
+              "total_amount": 98529,
+              "max_density": 0.3414,
+              "representative_amount": 84939,
+              "representative_density": 0.3414,
+              "max_amount_region_amount": 84939,
+              "max_amount_region_density": 0.3414,
+              "qualified_region_count": 3
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 17913,
+              "max_density": 0.06207,
+              "representative_amount": 15443,
+              "representative_density": 0.06207,
+              "max_amount_region_amount": 15443,
+              "max_amount_region_density": 0.06207,
+              "qualified_region_count": 3
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "triple_a",
@@ -18119,6 +20687,7 @@
             "x": -125379200.0,
             "z": -19965560.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "triple_a",
@@ -18289,6 +20858,48 @@
             "x": -30000000.0,
             "z": 51960000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 365385702,
+              "max_density": 1.196,
+              "representative_amount": 365385702,
+              "representative_density": 1.196,
+              "max_amount_region_amount": 365385702,
+              "max_amount_region_density": 1.196,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 4753743,
+              "max_density": 0.01556,
+              "representative_amount": 4753743,
+              "representative_density": 0.01556,
+              "max_amount_region_amount": 4753743,
+              "max_amount_region_density": 0.01556,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 2493943834,
+              "max_density": 8.165,
+              "representative_amount": 2493943834,
+              "representative_density": 8.165,
+              "max_amount_region_amount": 2493943834,
+              "max_amount_region_density": 8.165,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 365385702,
+              "max_density": 1.196,
+              "representative_amount": 365385702,
+              "representative_density": 1.196,
+              "max_amount_region_amount": 365385702,
+              "max_amount_region_density": 1.196,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -18441,6 +21052,7 @@
             "x": -45000000.0,
             "z": 43300000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -18567,6 +21179,58 @@
             "x": -45000000.0,
             "z": 25980000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 455336,
+              "max_density": 1.675,
+              "representative_amount": 455336,
+              "representative_density": 1.675,
+              "max_amount_region_amount": 455336,
+              "max_amount_region_density": 1.675,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 2456,
+              "max_density": 0.009033,
+              "representative_amount": 2456,
+              "representative_density": 0.009033,
+              "max_amount_region_amount": 2456,
+              "max_amount_region_density": 0.009033,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 8861341,
+              "max_density": 22.34,
+              "representative_amount": 6784404,
+              "representative_density": 22.34,
+              "max_amount_region_amount": 6784404,
+              "max_amount_region_density": 22.34,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "rawscrap",
+              "total_amount": 655807550,
+              "max_density": 2412.0,
+              "representative_amount": 655807550,
+              "representative_density": 2412.0,
+              "max_amount_region_amount": 655807550,
+              "max_amount_region_density": 2412.0,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 8076932,
+              "max_density": 29.71,
+              "representative_amount": 8076932,
+              "representative_density": 29.71,
+              "max_amount_region_amount": 8076932,
+              "max_amount_region_density": 29.71,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -18695,6 +21359,38 @@
             "x": 180000000.0,
             "z": 69280000.0
           },
+          "resource_stats": [
+            {
+              "ware": "nividium",
+              "total_amount": 4573665,
+              "max_density": 0.06207,
+              "representative_amount": 988377,
+              "representative_density": 0.06207,
+              "max_amount_region_amount": 3585288,
+              "max_amount_region_density": 0.009006,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 1276769507,
+              "max_density": 3.193,
+              "representative_amount": 1271333435,
+              "representative_density": 3.193,
+              "max_amount_region_amount": 1271333435,
+              "max_amount_region_density": 3.193,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 3768447767,
+              "max_density": 9.463,
+              "representative_amount": 3767459390,
+              "representative_density": 9.463,
+              "max_amount_region_amount": 3767459390,
+              "max_amount_region_density": 9.463,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -18774,6 +21470,28 @@
             "x": -150000000.0,
             "z": 103920000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 0,
+              "max_density": 33.5,
+              "representative_amount": 0,
+              "representative_density": 33.5,
+              "max_amount_region_amount": 0,
+              "max_amount_region_density": 33.5,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 0,
+              "max_density": 29.62,
+              "representative_amount": 0,
+              "representative_density": 29.62,
+              "max_amount_region_amount": 0,
+              "max_amount_region_density": 29.62,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -18861,6 +21579,28 @@
             "x": -165000000.0,
             "z": 95260000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 0,
+              "max_density": 96.93,
+              "representative_amount": 0,
+              "representative_density": 96.93,
+              "max_amount_region_amount": 0,
+              "max_amount_region_density": 96.93,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 0,
+              "max_density": 29.62,
+              "representative_amount": 0,
+              "representative_density": 29.62,
+              "max_amount_region_amount": 0,
+              "max_amount_region_density": 29.62,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -18977,6 +21717,7 @@
             "x": -180000000.0,
             "z": 86600000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -19103,6 +21844,18 @@
             "x": -180000000.0,
             "z": 69280000.0
           },
+          "resource_stats": [
+            {
+              "ware": "rawscrap",
+              "total_amount": 0,
+              "max_density": 57.71,
+              "representative_amount": 0,
+              "representative_density": 57.71,
+              "max_amount_region_amount": 0,
+              "max_amount_region_density": 57.71,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -19205,6 +21958,38 @@
             "x": -195000000.0,
             "z": 112580000.0
           },
+          "resource_stats": [
+            {
+              "ware": "nividium",
+              "total_amount": 0,
+              "max_density": 0.009033,
+              "representative_amount": 0,
+              "representative_density": 0.009033,
+              "max_amount_region_amount": 0,
+              "max_amount_region_density": 0.009033,
+              "qualified_region_count": 9
+            },
+            {
+              "ware": "ore",
+              "total_amount": 0,
+              "max_density": 97.48,
+              "representative_amount": 0,
+              "representative_density": 97.48,
+              "max_amount_region_amount": 0,
+              "max_amount_region_density": 97.48,
+              "qualified_region_count": 9
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 0,
+              "max_density": 29.71,
+              "representative_amount": 0,
+              "representative_density": 29.71,
+              "max_amount_region_amount": 0,
+              "max_amount_region_density": 29.71,
+              "qualified_region_count": 9
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -19433,6 +22218,7 @@
             "x": -225000000.0,
             "z": 129900000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "triple_b",
@@ -19631,6 +22417,7 @@
             "x": -225622191.4,
             "z": 88156930.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "triple_b",
@@ -19939,6 +22726,7 @@
             "x": -165888240.0,
             "z": 127858730.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "triple_b",
@@ -20204,6 +22992,38 @@
             "x": -240000000.0,
             "z": 121240000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 0,
+              "max_density": 7.156,
+              "representative_amount": 0,
+              "representative_density": 7.156,
+              "max_amount_region_amount": 0,
+              "max_amount_region_density": 7.156,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 0,
+              "max_density": 81.65,
+              "representative_amount": 0,
+              "representative_density": 81.65,
+              "max_amount_region_amount": 0,
+              "max_amount_region_density": 81.65,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 0,
+              "max_density": 29.62,
+              "representative_amount": 0,
+              "representative_density": 29.62,
+              "max_amount_region_amount": 0,
+              "max_amount_region_density": 29.62,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -20330,6 +23150,28 @@
             "x": -225000000.0,
             "z": 112580000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 30294200,
+              "max_density": 3.006,
+              "representative_amount": 30294200,
+              "representative_density": 3.006,
+              "max_amount_region_amount": 30294200,
+              "max_amount_region_density": 3.006,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 47681908,
+              "max_density": 4.732,
+              "representative_amount": 47681908,
+              "representative_density": 4.732,
+              "max_amount_region_amount": 47681908,
+              "max_amount_region_density": 4.732,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -20551,6 +23393,28 @@
             "x": -240000000.0,
             "z": 103920000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 8243934,
+              "max_density": 0.9203,
+              "representative_amount": 8243934,
+              "representative_density": 0.9203,
+              "max_amount_region_amount": 8243934,
+              "max_amount_region_density": 0.9203,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 65047541,
+              "max_density": 7.262,
+              "representative_amount": 65047541,
+              "representative_density": 7.262,
+              "max_amount_region_amount": 65047541,
+              "max_amount_region_density": 7.262,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -20778,6 +23642,7 @@
             "x": 150000000.0,
             "z": 17320000.0
           },
+          "resource_stats": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -20892,6 +23757,48 @@
             "x": 165000000.0,
             "z": 8660000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 3090898,
+              "max_density": 4.726,
+              "representative_amount": 2351847,
+              "representative_density": 4.726,
+              "max_amount_region_amount": 2351847,
+              "max_amount_region_density": 4.726,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 51207435,
+              "max_density": 78.31,
+              "representative_amount": 38961591,
+              "representative_density": 78.29,
+              "max_amount_region_amount": 38961591,
+              "max_amount_region_density": 78.29,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "ore",
+              "total_amount": 8241696,
+              "max_density": 12.6,
+              "representative_amount": 6271059,
+              "representative_density": 12.6,
+              "max_amount_region_amount": 6271059,
+              "max_amount_region_density": 12.6,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 14197895,
+              "max_density": 21.71,
+              "representative_amount": 10803097,
+              "representative_density": 21.71,
+              "max_amount_region_amount": 10803097,
+              "max_amount_region_density": 21.71,
+              "qualified_region_count": 2
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -21018,6 +23925,48 @@
             "x": 165000000.0,
             "z": -8660000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 2351847,
+              "max_density": 4.726,
+              "representative_amount": 2351847,
+              "representative_density": 4.726,
+              "max_amount_region_amount": 2351847,
+              "max_amount_region_density": 4.726,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 38961591,
+              "max_density": 78.29,
+              "representative_amount": 38961591,
+              "representative_density": 78.29,
+              "max_amount_region_amount": 38961591,
+              "max_amount_region_density": 78.29,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 6271059,
+              "max_density": 12.6,
+              "representative_amount": 6271059,
+              "representative_density": 12.6,
+              "max_amount_region_amount": 6271059,
+              "max_amount_region_density": 12.6,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 10803097,
+              "max_density": 21.71,
+              "representative_amount": 10803097,
+              "representative_density": 21.71,
+              "max_amount_region_amount": 10803097,
+              "max_amount_region_density": 21.71,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -21146,6 +24095,38 @@
             "x": 15000000.0,
             "z": 60620000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 19020708,
+              "max_density": 6.37,
+              "representative_amount": 9510354,
+              "representative_density": 6.37,
+              "max_amount_region_amount": 9510354,
+              "max_amount_region_density": 6.37,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 350654315,
+              "max_density": 234.9,
+              "representative_amount": 350654315,
+              "representative_density": 234.9,
+              "max_amount_region_amount": 350654315,
+              "max_amount_region_density": 234.9,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 65729146,
+              "max_density": 22.01,
+              "representative_amount": 32864573,
+              "representative_density": 22.01,
+              "max_amount_region_amount": 32864573,
+              "max_amount_region_density": 22.01,
+              "qualified_region_count": 2
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -21284,6 +24265,48 @@
             "x": -120000000.0,
             "z": 34640000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 18206709,
+              "max_density": 28.36,
+              "representative_amount": 13546636,
+              "representative_density": 28.36,
+              "max_amount_region_amount": 13546636,
+              "max_amount_region_density": 28.36,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "nividium",
+              "total_amount": 421174793,
+              "max_density": 501.1,
+              "representative_amount": 249354179,
+              "representative_density": 501.1,
+              "max_amount_region_amount": 249354179,
+              "max_amount_region_density": 501.1,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "ore",
+              "total_amount": 44680956,
+              "max_density": 59.82,
+              "representative_amount": 28577315,
+              "representative_density": 59.82,
+              "max_amount_region_amount": 28577315,
+              "max_amount_region_density": 59.82,
+              "qualified_region_count": 2
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 115189328,
+              "max_density": 137.0,
+              "representative_amount": 68197197,
+              "representative_density": 137.0,
+              "max_amount_region_amount": 68197197,
+              "max_amount_region_density": 137.0,
+              "qualified_region_count": 2
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -21396,6 +24419,38 @@
             "x": -105000000.0,
             "z": 25980000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ice",
+              "total_amount": 1728607,
+              "max_density": 4.726,
+              "representative_amount": 1728607,
+              "representative_density": 4.726,
+              "max_amount_region_amount": 1728607,
+              "max_amount_region_density": 4.726,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "ore",
+              "total_amount": 2683940,
+              "max_density": 7.338,
+              "representative_amount": 2683940,
+              "representative_density": 7.338,
+              "max_amount_region_amount": 2683940,
+              "max_amount_region_density": 7.338,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 7394456,
+              "max_density": 20.22,
+              "representative_amount": 7394456,
+              "representative_density": 20.22,
+              "max_amount_region_amount": 7394456,
+              "max_amount_region_density": 20.22,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -21495,6 +24550,48 @@
             "x": -45000000.0,
             "z": 95260000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 298032,
+              "max_density": 4.436,
+              "representative_amount": 298032,
+              "representative_density": 4.436,
+              "max_amount_region_amount": 298032,
+              "max_amount_region_density": 4.436,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "rawkhaakscrap",
+              "total_amount": 0,
+              "max_density": 1066.0,
+              "representative_amount": 0,
+              "representative_density": 1066.0,
+              "max_amount_region_amount": 0,
+              "max_amount_region_density": 1066.0,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "rawscrap",
+              "total_amount": 0,
+              "max_density": 865.7,
+              "representative_amount": 0,
+              "representative_density": 865.7,
+              "max_amount_region_amount": 0,
+              "max_amount_region_density": 865.7,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "silicon",
+              "total_amount": 1358165,
+              "max_density": 20.22,
+              "representative_amount": 1358165,
+              "representative_density": 20.22,
+              "max_amount_region_amount": 1358165,
+              "max_amount_region_density": 20.22,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -21590,6 +24687,7 @@
             "z": 0.0
           },
           "resources": [],
+          "resource_stats": [],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -21681,6 +24779,28 @@
             "x": -45000000.0,
             "z": -8660000.0
           },
+          "resource_stats": [
+            {
+              "ware": "ore",
+              "total_amount": 262027734,
+              "max_density": 21.49,
+              "representative_amount": 262027734,
+              "representative_density": 21.49,
+              "max_amount_region_amount": 262027734,
+              "max_amount_region_density": 21.49,
+              "qualified_region_count": 1
+            },
+            {
+              "ware": "rawscrap",
+              "total_amount": 7921089,
+              "max_density": 1.659,
+              "representative_amount": 7921089,
+              "representative_density": 1.659,
+              "max_amount_region_amount": 7921089,
+              "max_amount_region_density": 1.659,
+              "qualified_region_count": 1
+            }
+          ],
           "resources": [],
           "normalized": {
             "template_kind": "single",
