@@ -365,6 +365,7 @@ def run_distillation_for_version(m_config, v_config, config_dir, xml_diff):
         { 'path': os.path.join('libraries', 'factions.xml'), 'final': os.path.join('libraries', 'factions_final.xml') },
         { 'path': os.path.join('libraries', 'region_definitions.xml'), 'final': os.path.join('libraries', 'region_definitions_final.xml') },
         { 'path': os.path.join('libraries', 'regionyields.xml'), 'final': os.path.join('libraries', 'regionyields_final.xml') },
+        { 'path': os.path.join('libraries', 'regionobjectgroups.xml'), 'final': os.path.join('libraries', 'regionobjectgroups_final.xml') },
         { 'path': os.path.join('libraries', 'ships.xml'), 'final': os.path.join('libraries', 'ships_final.xml') },
         { 'path': os.path.join('libraries', 'shipgroups.xml'), 'final': os.path.join('libraries', 'shipgroups_final.xml') },
         { 'path': os.path.join('libraries', 'loadouts.xml'), 'final': os.path.join('libraries', 'loadouts_final.xml') },
