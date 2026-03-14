@@ -3,6 +3,8 @@ export type RegionYieldEntry = {
   yields: Array<{ name: string }>
 }
 
+export const FIXED_RESOURCE_YIELD_NAMES = ['low', 'midlow', 'medium', 'midhigh', 'high'] as const
+
 export type SectorResourceEntry = {
   ware: string
   yield: string
@@ -61,6 +63,12 @@ export type BuildSectorResourceFillInput = {
 
 export const MIXED_YIELD_VALUE = '__mixed__'
 
+export const buildFixedYieldEntries = (wareIds: string[]): RegionYieldEntry[] =>
+  wareIds.map((ware) => ({
+    ware,
+    yields: FIXED_RESOURCE_YIELD_NAMES.map((name) => ({ name }))
+  }))
+
 export const buildYieldRanksByWare = (entries: RegionYieldEntry[]) => {
   const out: Record<string, Record<string, number>> = {}
   entries.forEach((entry) => {
@@ -77,7 +85,7 @@ export const buildDefaultResourceFilters = (entries: RegionYieldEntry[]): Resour
   entries.forEach((entry) => {
     out[entry.ware] = {
       selected: false,
-      minYieldName: entry.yields[0]?.name || 'lowest'
+      minYieldName: entry.yields[0]?.name || 'low'
     }
   })
   return out

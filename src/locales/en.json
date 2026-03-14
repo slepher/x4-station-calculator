@@ -147,6 +147,8 @@
     "station_panel_empty": "No matching entries",
     "station_panel_hint": "Drag to a sector, then continue dragging on the map to fine-tune.",
     "yield_names": {
+      "midlow": "Mid Low",
+      "midhigh": "Mid High",
       "lowest": "Lowest",
       "verylow": "Very Low",
       "lowminus": "Low Minus",

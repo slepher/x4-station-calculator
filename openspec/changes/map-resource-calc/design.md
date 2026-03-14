@@ -38,13 +38,14 @@
   - `ware`
   - `total_amount`
   - `max_density`
-  - `density_threshold`
-  - `representative_region`
   - `representative_amount`
   - `representative_density`
   - `max_amount_region_density`
-- 本次实现先将新的 sector 聚合结果写入 `resource_stats`，与旧的地图前端读取路径隔离。
-- 现有 `resources` 字段暂时保留为空数组，等待后续前端 change 切换到新字段。
+- sector 聚合结果直接写入 `resources`。
+- 每条 sector 资源记录额外输出：
+  - `yield`
+  - `level`
+- 其中 `yield/level` 基于 `representative_density` 分档。
 - 其中：
   - `representative_*` 来自“最高密度下探到 `1/3` 后仍达标的矿区中，总量最大的那片”
   - `max_amount_region_density` 只是“总量最高矿区”的密度补充字段，不参与代表矿区选择

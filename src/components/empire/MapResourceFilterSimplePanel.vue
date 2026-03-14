@@ -3,6 +3,7 @@ import { computed, ref, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import {
+  buildFixedYieldEntries,
   buildDefaultResourceFilters,
   buildSectorResourceFill,
   buildYieldRanksByWare,
@@ -11,7 +12,6 @@ import {
   getSharedMinYieldName,
   isSectorMatchedByResources,
   MIXED_YIELD_VALUE,
-  type RegionYieldEntry,
   type SectorResourceEntry,
   type SectorResourceFill
 } from '@/store/logic/mapResourceFilter'
@@ -25,7 +25,6 @@ type SearchSectorLayout = {
   centerY: number
 }
 
-type ResourceEntry = RegionYieldEntry & { color?: string }
 type FilterSectorCandidate = {
   sectorId: string
   name: string
@@ -60,10 +59,13 @@ const emit = defineEmits<{
 const { t, locale } = useI18n()
 const gameData = useGameDataStore()
 
-const regionYields = computed<ResourceEntry[]>(() => (gameData.regionyields || []) as ResourceEntry[])
+const RESOURCE_ORDER = ['ore', 'silicon', 'methane', 'hydrogen', 'helium', 'ice', 'rawscrap', 'nividium'] as const
+const regionYields = computed(() => buildFixedYieldEntries([...RESOURCE_ORDER]))
+const regionYieldColors = computed<Record<string, string>>(() =>
+  Object.fromEntries(((gameData.regionyields || []) as Array<{ ware: string; color?: string }>).map((entry) => [entry.ware, entry.color || '#fbbf24']))
+)
 const yieldRanksByWare = computed(() => buildYieldRanksByWare(regionYields.value))
 const resourceFilters = ref(buildDefaultResourceFilters([]))
-const RESOURCE_ORDER = ['ore', 'silicon', 'methane', 'hydrogen', 'helium', 'ice', 'rawscrap', 'nividium'] as const
 const SUNLIGHT_FILTER_ID = 'sunlight'
 const SUNLIGHT_COLOR = '#F7D24B'
 const DEFAULT_CANDIDATE_WARE_IDS = ['ore', 'silicon', 'methane', 'hydrogen', 'helium'] as const
@@ -103,12 +105,10 @@ const formatYieldLabel = (yieldName: string) => {
 }
 
 const resourceCatalog = computed<ResourceCatalogItem[]>(() => [
-  ...RESOURCE_ORDER
-    .map((wareId) => regionYields.value.find((entry) => entry.ware === wareId))
-    .filter((entry): entry is ResourceEntry => Boolean(entry))
+  ...regionYields.value
     .map((entry) => ({
       ware: entry.ware,
-      color: entry.color || '#fbbf24',
+      color: regionYieldColors.value[entry.ware] || '#fbbf24',
       yields: entry.yields.map((item) => item.name),
       kind: 'ware' as const
     })),

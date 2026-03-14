@@ -147,6 +147,8 @@
     "station_panel_empty": "没有匹配对象",
     "station_panel_hint": "拖到星区后可继续在地图上微调位置。",
     "yield_names": {
+      "midlow": "中低",
+      "midhigh": "中高",
       "lowest": "最低",
       "verylow": "很低",
       "lowminus": "偏低-",

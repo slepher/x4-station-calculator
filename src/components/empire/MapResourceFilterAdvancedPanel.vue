@@ -10,10 +10,10 @@ import {
   type AdvancedResourceTagGroup
 } from '@/store/logic/mapAdvancedResourceFilter'
 import {
+  buildFixedYieldEntries,
   buildYieldRanksByWare,
   getSharedMinYieldName,
   MIXED_YIELD_VALUE,
-  type RegionYieldEntry,
   type SectorResourceFill,
   type SectorResourceEntry
 } from '@/store/logic/mapResourceFilter'
@@ -44,7 +44,6 @@ type AdvancedCandidateViewModel = {
   resourceGroupBadges: Record<string, string[]>
 }
 
-type ResourceEntry = RegionYieldEntry & { color?: string }
 type ResourceCatalogItem = {
   ware: string
   color: string
@@ -68,9 +67,12 @@ const emit = defineEmits<{
 
 const { t, locale } = useI18n()
 const gameData = useGameDataStore()
-const regionYields = computed<ResourceEntry[]>(() => (gameData.regionyields || []) as ResourceEntry[])
-const yieldRanksByWare = computed(() => buildYieldRanksByWare(regionYields.value))
 const RESOURCE_ORDER = ['ore', 'silicon', 'methane', 'hydrogen', 'helium', 'ice', 'rawscrap', 'nividium'] as const
+const regionYields = computed(() => buildFixedYieldEntries([...RESOURCE_ORDER]))
+const regionYieldColors = computed<Record<string, string>>(() =>
+  Object.fromEntries(((gameData.regionyields || []) as Array<{ ware: string; color?: string }>).map((entry) => [entry.ware, entry.color || '#fbbf24']))
+)
+const yieldRanksByWare = computed(() => buildYieldRanksByWare(regionYields.value))
 const SUNLIGHT_COLOR = '#F7D24B'
 
 const nextGroupId = (() => {
@@ -96,12 +98,10 @@ const hasPendingRefresh = ref(true)
 const selectedCandidateKey = ref<string | null>(null)
 
 const resourceCatalog = computed<ResourceCatalogItem[]>(() => [
-  ...RESOURCE_ORDER
-    .map((wareId) => regionYields.value.find((entry) => entry.ware === wareId))
-    .filter((entry): entry is ResourceEntry => Boolean(entry))
+  ...regionYields.value
     .map((entry) => ({
       ware: entry.ware,
-      color: entry.color || '#fbbf24',
+      color: regionYieldColors.value[entry.ware] || '#fbbf24',
       yields: entry.yields.map((item) => item.name),
       kind: 'ware' as const
     })),
@@ -245,7 +245,7 @@ const toggleGroupTag = (groupId: string, tagId: string) => {
     const nextMinYieldByWare = { ...group.minYieldByWare }
     if (!nextTagIds.includes(tagId)) delete nextMinYieldByWare[tagId]
     if (tagId !== ADVANCED_SUNLIGHT_TAG_ID && nextTagIds.includes(tagId) && !nextMinYieldByWare[tagId]) {
-      nextMinYieldByWare[tagId] = resourceCatalog.value.find((entry) => entry.ware === tagId)?.yields[0] || 'lowest'
+      nextMinYieldByWare[tagId] = resourceCatalog.value.find((entry) => entry.ware === tagId)?.yields[0] || 'low'
     }
     return {
       ...group,
@@ -371,7 +371,7 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
   getSharedMinYieldName(
     ordinaryTagsOfGroup(group),
     Object.fromEntries(
-      ordinaryTagsOfGroup(group).map((wareId) => [wareId, { selected: true, minYieldName: group.minYieldByWare[wareId] || 'lowest' }])
+      ordinaryTagsOfGroup(group).map((wareId) => [wareId, { selected: true, minYieldName: group.minYieldByWare[wareId] || 'low' }])
     )
   )
 </script>

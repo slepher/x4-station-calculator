@@ -361,6 +361,19 @@ def round_sig(value: float, digits: int = 4) -> float:
     return round(value, digits - 1 - int(math.floor(math.log10(abs(value)))))
 
 
+def classify_density_tier(ware: str, density: float) -> Tuple[str, int]:
+    value = max(0.0, density)
+    if ware == "nividium":
+        thresholds = [0.1, 1.0, 10.0, 100.0, 1000.0]
+    else:
+        thresholds = [1.0, 10.0, 100.0, 1000.0, 10000.0]
+    names = ["low", "midlow", "medium", "midhigh", "high"]
+    for index in range(len(thresholds) - 1):
+        if value < thresholds[index + 1]:
+            return names[index], index + 1
+    return names[-1], len(names)
+
+
 def normalize_noise_bound(value: Optional[float], default: float) -> float:
     return min(1.0, max(0.0, default if value is None else float(value)))
 
@@ -848,6 +861,7 @@ def summarize_region_resources(
         item["density"] = item["simulated_density"]
         item["amount"] = item["simulated_amount"]
         item["amount_per_field"] = int(round(as_number(item["simulated_amount"]) / field_count))
+        item["yield"], item["level"] = classify_density_tier(str(item.get("ware") or ""), as_number(item["density"]))
     return resources
 
 
@@ -958,6 +972,8 @@ def summarize_sector_resources(region_rows: List[dict]) -> List[dict]:
             "max_amount_region_amount": int(round(as_number(max_amount_region.get("amount"), 0.0))),
             "max_amount_region_density": round_sig(as_number(max_amount_region.get("density"), 0.0), 4),
             "qualified_region_count": len(qualified),
+            "yield": classify_density_tier(ware, as_number(representative.get("density"), 0.0))[0],
+            "level": classify_density_tier(ware, as_number(representative.get("density"), 0.0))[1],
         })
     return summarized
 
@@ -1323,11 +1339,9 @@ def generate_map_data(
             regions_rows.append(region_row)
             sector_region_rows.append(region_row)
         if sector_id in sectors:
-            sectors[sector_id]["resource_stats"] = summarize_sector_resources(sector_region_rows)
-            sectors[sector_id]["resources"] = []
+            sectors[sector_id]["resources"] = summarize_sector_resources(sector_region_rows)
     for sector_id in sectors.keys():
         sectors[sector_id].setdefault("resources", [])
-        sectors[sector_id].setdefault("resource_stats", [])
     regions_rows.sort(key=lambda item: (item["cluster_id"], item["sector_id"], item["name"]))
 
     for zones_root in zone_roots:

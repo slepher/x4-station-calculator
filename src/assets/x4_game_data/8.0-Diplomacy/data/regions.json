@@ -222,7 +222,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -246,7 +248,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -270,7 +274,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -497,7 +503,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -521,7 +529,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -545,7 +555,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -772,7 +784,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -796,7 +810,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -820,7 +836,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -944,7 +962,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -1187,7 +1207,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -1211,7 +1233,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -1235,7 +1259,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -1648,7 +1674,9 @@
         "localdensity": 0.0,
         "density": 159.2,
         "amount": 215025067,
-        "amount_per_field": 53756267
+        "amount_per_field": 53756267,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -1672,7 +1700,9 @@
         "localdensity": 0.0,
         "density": 9.89,
         "amount": 13354415,
-        "amount_per_field": 6677208
+        "amount_per_field": 6677208,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -1696,7 +1726,9 @@
         "localdensity": 0.0,
         "density": 5.652,
         "amount": 7631095,
-        "amount_per_field": 3815548
+        "amount_per_field": 3815548,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -2289,7 +2321,9 @@
         "localdensity": 0.0,
         "density": 159.2,
         "amount": 1343360914,
-        "amount_per_field": 335840228
+        "amount_per_field": 335840228,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -2313,7 +2347,9 @@
         "localdensity": 0.0,
         "density": 9.89,
         "amount": 83431201,
-        "amount_per_field": 41715600
+        "amount_per_field": 41715600,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -2337,7 +2373,9 @@
         "localdensity": 0.0,
         "density": 5.652,
         "amount": 47674972,
-        "amount_per_field": 23837486
+        "amount_per_field": 23837486,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -2870,7 +2908,9 @@
         "localdensity": 0.0,
         "density": 159.2,
         "amount": 1257942412,
-        "amount_per_field": 314485603
+        "amount_per_field": 314485603,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -2894,7 +2934,9 @@
         "localdensity": 0.0,
         "density": 9.89,
         "amount": 78126173,
-        "amount_per_field": 39063086
+        "amount_per_field": 39063086,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -2918,7 +2960,9 @@
         "localdensity": 0.0,
         "density": 5.652,
         "amount": 44643527,
-        "amount_per_field": 22321764
+        "amount_per_field": 22321764,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -3031,7 +3075,9 @@
         "localdensity": 0.0,
         "density": 358900.0,
         "amount": 10316825,
-        "amount_per_field": 10316825
+        "amount_per_field": 10316825,
+        "yield": "high",
+        "level": 5
       }
     ]
   },
@@ -3155,7 +3201,9 @@
         "localdensity": 0.8,
         "density": 1050.0,
         "amount": 559877050,
-        "amount_per_field": 559877050
+        "amount_per_field": 559877050,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -3323,7 +3371,9 @@
         "localdensity": 0.0,
         "density": 336.5,
         "amount": 935453,
-        "amount_per_field": 233863
+        "amount_per_field": 233863,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -3475,7 +3525,9 @@
         "localdensity": 0.0,
         "density": 336.5,
         "amount": 935453,
-        "amount_per_field": 233863
+        "amount_per_field": 233863,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -3599,7 +3651,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -3723,7 +3777,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -3847,7 +3903,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -4174,7 +4232,9 @@
         "localdensity": 0.0,
         "density": 444.3,
         "amount": 729564741,
-        "amount_per_field": 364782370
+        "amount_per_field": 364782370,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -4198,7 +4258,9 @@
         "localdensity": 0.0,
         "density": 195.6,
         "amount": 321200319,
-        "amount_per_field": 160600160
+        "amount_per_field": 160600160,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -4495,7 +4557,9 @@
         "localdensity": 0.0,
         "density": 444.3,
         "amount": 486222687,
-        "amount_per_field": 243111344
+        "amount_per_field": 243111344,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -4519,7 +4583,9 @@
         "localdensity": 0.0,
         "density": 195.6,
         "amount": 214065831,
-        "amount_per_field": 107032916
+        "amount_per_field": 107032916,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -4796,7 +4862,9 @@
         "localdensity": 0.0,
         "density": 444.3,
         "amount": 592005667,
-        "amount_per_field": 296002834
+        "amount_per_field": 296002834,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -4820,7 +4888,9 @@
         "localdensity": 0.0,
         "density": 195.6,
         "amount": 260638156,
-        "amount_per_field": 130319078
+        "amount_per_field": 130319078,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -5097,7 +5167,9 @@
         "localdensity": 0.0,
         "density": 444.3,
         "amount": 498351332,
-        "amount_per_field": 249175666
+        "amount_per_field": 249175666,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -5121,7 +5193,9 @@
         "localdensity": 0.0,
         "density": 195.6,
         "amount": 219405624,
-        "amount_per_field": 109702812
+        "amount_per_field": 109702812,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -5388,7 +5462,9 @@
         "localdensity": 0.0,
         "density": 444.3,
         "amount": 474954264,
-        "amount_per_field": 237477132
+        "amount_per_field": 237477132,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -5412,7 +5488,9 @@
         "localdensity": 0.0,
         "density": 195.6,
         "amount": 209104761,
-        "amount_per_field": 104552380
+        "amount_per_field": 104552380,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -5679,7 +5757,9 @@
         "localdensity": 0.0,
         "density": 444.3,
         "amount": 378086569,
-        "amount_per_field": 189043284
+        "amount_per_field": 189043284,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -5703,7 +5783,9 @@
         "localdensity": 0.0,
         "density": 195.6,
         "amount": 166457505,
-        "amount_per_field": 83228752
+        "amount_per_field": 83228752,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -6050,7 +6132,9 @@
         "localdensity": 0.0,
         "density": 444.3,
         "amount": 1364649481,
-        "amount_per_field": 682324740
+        "amount_per_field": 682324740,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -6074,7 +6158,9 @@
         "localdensity": 0.0,
         "density": 195.6,
         "amount": 600804595,
-        "amount_per_field": 300402298
+        "amount_per_field": 300402298,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -6421,7 +6507,9 @@
         "localdensity": 0.0,
         "density": 444.3,
         "amount": 1364649481,
-        "amount_per_field": 682324740
+        "amount_per_field": 682324740,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -6445,7 +6533,9 @@
         "localdensity": 0.0,
         "density": 195.6,
         "amount": 600804595,
-        "amount_per_field": 300402298
+        "amount_per_field": 300402298,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -6567,7 +6657,9 @@
         "localdensity": 0.085,
         "density": 513.7,
         "amount": 473823,
-        "amount_per_field": 473823
+        "amount_per_field": 473823,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "rawscrap",
@@ -6591,7 +6683,9 @@
         "localdensity": 0.0,
         "density": 31500.0,
         "amount": 29051947,
-        "amount_per_field": 29051947
+        "amount_per_field": 29051947,
+        "yield": "high",
+        "level": 5
       }
     ]
   },
@@ -6834,7 +6928,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -6858,7 +6954,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -6882,7 +6980,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -7006,7 +7106,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -7130,7 +7232,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -7409,7 +7513,9 @@
         "localdensity": 0.0,
         "density": 533.2,
         "amount": 633426298,
-        "amount_per_field": 316713149
+        "amount_per_field": 316713149,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -7433,7 +7539,9 @@
         "localdensity": 0.0,
         "density": 284.5,
         "amount": 337966154,
-        "amount_per_field": 168983077
+        "amount_per_field": 168983077,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -7712,7 +7820,9 @@
         "localdensity": 0.0,
         "density": 533.2,
         "amount": 645010672,
-        "amount_per_field": 322505336
+        "amount_per_field": 322505336,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -7736,7 +7846,9 @@
         "localdensity": 0.0,
         "density": 284.5,
         "amount": 344147025,
-        "amount_per_field": 172073512
+        "amount_per_field": 172073512,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -8015,7 +8127,9 @@
         "localdensity": 0.0,
         "density": 533.2,
         "amount": 651441214,
-        "amount_per_field": 325720607
+        "amount_per_field": 325720607,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -8039,7 +8153,9 @@
         "localdensity": 0.0,
         "density": 284.5,
         "amount": 347578057,
-        "amount_per_field": 173789028
+        "amount_per_field": 173789028,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -8318,7 +8434,9 @@
         "localdensity": 0.0,
         "density": 533.2,
         "amount": 737826940,
-        "amount_per_field": 368913470
+        "amount_per_field": 368913470,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -8342,7 +8460,9 @@
         "localdensity": 0.0,
         "density": 284.5,
         "amount": 393669372,
-        "amount_per_field": 196834686
+        "amount_per_field": 196834686,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -8621,7 +8741,9 @@
         "localdensity": 0.0,
         "density": 533.2,
         "amount": 633626798,
-        "amount_per_field": 316813399
+        "amount_per_field": 316813399,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -8645,7 +8767,9 @@
         "localdensity": 0.0,
         "density": 284.5,
         "amount": 338073131,
-        "amount_per_field": 169036566
+        "amount_per_field": 169036566,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -8924,7 +9048,9 @@
         "localdensity": 0.0,
         "density": 533.2,
         "amount": 672623739,
-        "amount_per_field": 336311870
+        "amount_per_field": 336311870,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -8948,7 +9074,9 @@
         "localdensity": 0.0,
         "density": 284.5,
         "amount": 358880045,
-        "amount_per_field": 179440022
+        "amount_per_field": 179440022,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -9380,7 +9508,9 @@
         "localdensity": 0.00875,
         "density": 29.04,
         "amount": 42585398,
-        "amount_per_field": 42585398
+        "amount_per_field": 42585398,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "methane",
@@ -9404,7 +9534,9 @@
         "localdensity": 0.00875,
         "density": 29.04,
         "amount": 42585398,
-        "amount_per_field": 42585398
+        "amount_per_field": 42585398,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -9428,7 +9560,9 @@
         "localdensity": 0.0,
         "density": 9.89,
         "amount": 14502406,
-        "amount_per_field": 7251203
+        "amount_per_field": 7251203,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -9452,7 +9586,9 @@
         "localdensity": 0.0,
         "density": 5.652,
         "amount": 8287089,
-        "amount_per_field": 4143544
+        "amount_per_field": 4143544,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -9695,7 +9831,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -9719,7 +9857,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -9743,7 +9883,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -9895,7 +10037,9 @@
         "localdensity": 0.0,
         "density": 336.5,
         "amount": 935453,
-        "amount_per_field": 233863
+        "amount_per_field": 233863,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -10373,7 +10517,9 @@
         "localdensity": 0.2075,
         "density": 403.4,
         "amount": 137028180134,
-        "amount_per_field": 137028180134
+        "amount_per_field": 137028180134,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ice",
@@ -10397,7 +10543,9 @@
         "localdensity": 0.0,
         "density": 14.14,
         "amount": 4802145113,
-        "amount_per_field": 1600715038
+        "amount_per_field": 1600715038,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "nividium",
@@ -10421,7 +10569,9 @@
         "localdensity": 0.0,
         "density": 0.5854,
         "amount": 198822626,
-        "amount_per_field": 198822626
+        "amount_per_field": 198822626,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -10445,7 +10595,9 @@
         "localdensity": 0.0,
         "density": 115.5,
         "amount": 39241030610,
-        "amount_per_field": 13080343537
+        "amount_per_field": 13080343537,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -10469,7 +10621,9 @@
         "localdensity": 0.0,
         "density": 113.6,
         "amount": 38598184564,
-        "amount_per_field": 12866061521
+        "amount_per_field": 12866061521,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -10728,7 +10882,9 @@
         "localdensity": 0.075,
         "density": 337.4,
         "amount": 1876072549,
-        "amount_per_field": 1876072549
+        "amount_per_field": 1876072549,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ice",
@@ -10752,7 +10908,9 @@
         "localdensity": 0.0,
         "density": 0.7441,
         "amount": 4137774,
-        "amount_per_field": 1379258
+        "amount_per_field": 1379258,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "nividium",
@@ -10776,7 +10934,9 @@
         "localdensity": 0.0,
         "density": 0.02251,
         "amount": 125192,
-        "amount_per_field": 125192
+        "amount_per_field": 125192,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -10800,7 +10960,9 @@
         "localdensity": 0.0,
         "density": 5.748,
         "amount": 31964633,
-        "amount_per_field": 10654878
+        "amount_per_field": 10654878,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -10824,7 +10986,9 @@
         "localdensity": 0.0,
         "density": 5.355,
         "amount": 29776272,
-        "amount_per_field": 9925424
+        "amount_per_field": 9925424,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -10937,7 +11101,9 @@
         "localdensity": 0.0,
         "density": 358900.0,
         "amount": 61900952,
-        "amount_per_field": 61900952
+        "amount_per_field": 61900952,
+        "yield": "high",
+        "level": 5
       }
     ]
   },
@@ -11021,7 +11187,9 @@
         "localdensity": 0.075,
         "density": 806.1,
         "amount": 52757703892,
-        "amount_per_field": 52757703892
+        "amount_per_field": 52757703892,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -11264,7 +11432,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -11288,7 +11458,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -11312,7 +11484,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -11436,7 +11610,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -11560,7 +11736,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -11684,7 +11862,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -11824,7 +12004,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -11948,7 +12130,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -12072,7 +12256,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -12196,7 +12382,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -12320,7 +12508,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -12517,7 +12707,9 @@
         "localdensity": 0.0,
         "density": 265.8,
         "amount": 1478040738,
-        "amount_per_field": 369510184
+        "amount_per_field": 369510184,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -12674,7 +12866,9 @@
         "localdensity": 0.075,
         "density": 33.74,
         "amount": 2208183320,
-        "amount_per_field": 2208183320
+        "amount_per_field": 2208183320,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "nividium",
@@ -12698,7 +12892,9 @@
         "localdensity": 0.0,
         "density": 1.193,
         "amount": 78057993,
-        "amount_per_field": 78057993
+        "amount_per_field": 78057993,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -12722,7 +12918,9 @@
         "localdensity": 0.0,
         "density": 22.87,
         "amount": 1497040790,
-        "amount_per_field": 499013597
+        "amount_per_field": 499013597,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -13116,7 +13314,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 16994759619,
-        "amount_per_field": 16994759619
+        "amount_per_field": 16994759619,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "hydrogen",
@@ -13140,7 +13340,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 16994759619,
-        "amount_per_field": 16994759619
+        "amount_per_field": 16994759619,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ice",
@@ -13164,7 +13366,9 @@
         "localdensity": 0.0,
         "density": 1.67,
         "amount": 945868040,
-        "amount_per_field": 472934020
+        "amount_per_field": 472934020,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "methane",
@@ -13188,7 +13392,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 16994759619,
-        "amount_per_field": 16994759619
+        "amount_per_field": 16994759619,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "nividium",
@@ -13212,7 +13418,9 @@
         "localdensity": 0.0,
         "density": 0.009006,
         "amount": 5101621,
-        "amount_per_field": 5101621
+        "amount_per_field": 5101621,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -13236,7 +13444,9 @@
         "localdensity": 0.0,
         "density": 7.616,
         "amount": 4314416430,
-        "amount_per_field": 719069405
+        "amount_per_field": 719069405,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -13260,7 +13470,9 @@
         "localdensity": 0.0,
         "density": 29.62,
         "amount": 16778196111,
-        "amount_per_field": 4194549028
+        "amount_per_field": 4194549028,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -13647,7 +13859,9 @@
         "localdensity": 0.075,
         "density": 16.74,
         "amount": 6519052238,
-        "amount_per_field": 6519052238
+        "amount_per_field": 6519052238,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -13813,7 +14027,9 @@
         "localdensity": 0.075,
         "density": 16.74,
         "amount": 6519052238,
-        "amount_per_field": 6519052238
+        "amount_per_field": 6519052238,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "methane",
@@ -13837,7 +14053,9 @@
         "localdensity": 0.075,
         "density": 16.74,
         "amount": 6519052238,
-        "amount_per_field": 6519052238
+        "amount_per_field": 6519052238,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -14096,7 +14314,9 @@
         "localdensity": 0.01,
         "density": 305.0,
         "amount": 46690834095670,
-        "amount_per_field": 46690834095670
+        "amount_per_field": 46690834095670,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "hydrogen",
@@ -14120,7 +14340,9 @@
         "localdensity": 0.01,
         "density": 305.0,
         "amount": 46690834095670,
-        "amount_per_field": 46690834095670
+        "amount_per_field": 46690834095670,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ice",
@@ -14144,7 +14366,9 @@
         "localdensity": 0.0,
         "density": 178.9,
         "amount": 27387571466770,
-        "amount_per_field": 27387571466770
+        "amount_per_field": 27387571466770,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -14168,7 +14392,9 @@
         "localdensity": 0.0,
         "density": 37720.0,
         "amount": 5774697390270049,
-        "amount_per_field": 1924899130090016
+        "amount_per_field": 1924899130090016,
+        "yield": "high",
+        "level": 5
       },
       {
         "ware": "silicon",
@@ -14192,7 +14418,9 @@
         "localdensity": 0.0,
         "density": 3037.0,
         "amount": 464919861999277,
-        "amount_per_field": 154973287333092
+        "amount_per_field": 154973287333092,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -14342,7 +14570,9 @@
         "localdensity": 0.075,
         "density": 16.74,
         "amount": 6519052238,
-        "amount_per_field": 6519052238
+        "amount_per_field": 6519052238,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "hydrogen",
@@ -14366,7 +14596,9 @@
         "localdensity": 0.075,
         "density": 16.74,
         "amount": 6519052238,
-        "amount_per_field": 6519052238
+        "amount_per_field": 6519052238,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -14746,7 +14978,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 406742786,
-        "amount_per_field": 406742786
+        "amount_per_field": 406742786,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "hydrogen",
@@ -14770,7 +15004,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 406742786,
-        "amount_per_field": 406742786
+        "amount_per_field": 406742786,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "methane",
@@ -14794,7 +15030,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 406742786,
-        "amount_per_field": 406742786
+        "amount_per_field": 406742786,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "nividium",
@@ -14818,7 +15056,9 @@
         "localdensity": 0.0,
         "density": 0.009006,
         "amount": 122099,
-        "amount_per_field": 122099
+        "amount_per_field": 122099,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -14842,7 +15082,9 @@
         "localdensity": 0.0,
         "density": 7.616,
         "amount": 103258757,
-        "amount_per_field": 17209793
+        "amount_per_field": 17209793,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -14866,7 +15108,9 @@
         "localdensity": 0.0,
         "density": 29.62,
         "amount": 401559680,
-        "amount_per_field": 100389920
+        "amount_per_field": 100389920,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -15165,7 +15409,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "hydrogen",
@@ -15189,7 +15435,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "methane",
@@ -15213,7 +15461,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "nividium",
@@ -15237,7 +15487,9 @@
         "localdensity": 0.0,
         "density": 0.009006,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -15261,7 +15513,9 @@
         "localdensity": 0.0,
         "density": 7.616,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -15285,7 +15539,9 @@
         "localdensity": 0.0,
         "density": 29.62,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -15663,7 +15919,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 116838972,
-        "amount_per_field": 116838972
+        "amount_per_field": 116838972,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "hydrogen",
@@ -15687,7 +15945,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 116838972,
-        "amount_per_field": 116838972
+        "amount_per_field": 116838972,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ice",
@@ -15711,7 +15971,9 @@
         "localdensity": 0.0,
         "density": 4.339,
         "amount": 16899334,
-        "amount_per_field": 8449667
+        "amount_per_field": 8449667,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "methane",
@@ -15735,7 +15997,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 116838972,
-        "amount_per_field": 116838972
+        "amount_per_field": 116838972,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "nividium",
@@ -15759,7 +16023,9 @@
         "localdensity": 0.0,
         "density": 0.009006,
         "amount": 35074,
-        "amount_per_field": 35074
+        "amount_per_field": 35074,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -15783,7 +16049,9 @@
         "localdensity": 0.0,
         "density": 7.616,
         "amount": 29661613,
-        "amount_per_field": 4943602
+        "amount_per_field": 4943602,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -15807,7 +16075,9 @@
         "localdensity": 0.0,
         "density": 29.62,
         "amount": 115350098,
-        "amount_per_field": 28837524
+        "amount_per_field": 28837524,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -16587,7 +16857,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 238446882,
-        "amount_per_field": 238446882
+        "amount_per_field": 238446882,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "hydrogen",
@@ -16611,7 +16883,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 238446882,
-        "amount_per_field": 238446882
+        "amount_per_field": 238446882,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "methane",
@@ -16635,7 +16909,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 238446882,
-        "amount_per_field": 238446882
+        "amount_per_field": 238446882,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "nividium",
@@ -16659,7 +16935,9 @@
         "localdensity": 0.0,
         "density": 0.009006,
         "amount": 71579,
-        "amount_per_field": 71579
+        "amount_per_field": 71579,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -16683,7 +16961,9 @@
         "localdensity": 0.0,
         "density": 7.616,
         "amount": 60533904,
-        "amount_per_field": 10088984
+        "amount_per_field": 10088984,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -16707,7 +16987,9 @@
         "localdensity": 0.0,
         "density": 29.62,
         "amount": 235408364,
-        "amount_per_field": 58852091
+        "amount_per_field": 58852091,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -17069,7 +17351,9 @@
         "localdensity": 0.075,
         "density": 33.74,
         "amount": 13139927340,
-        "amount_per_field": 13139927340
+        "amount_per_field": 13139927340,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "hydrogen",
@@ -17093,7 +17377,9 @@
         "localdensity": 0.075,
         "density": 33.74,
         "amount": 13139927340,
-        "amount_per_field": 13139927340
+        "amount_per_field": 13139927340,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ice",
@@ -17117,7 +17403,9 @@
         "localdensity": 0.0,
         "density": 1.431,
         "amount": 557386523,
-        "amount_per_field": 278693262
+        "amount_per_field": 278693262,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "methane",
@@ -17141,7 +17429,9 @@
         "localdensity": 0.075,
         "density": 33.74,
         "amount": 13139927340,
-        "amount_per_field": 13139927340
+        "amount_per_field": 13139927340,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "nividium",
@@ -17165,7 +17455,9 @@
         "localdensity": 0.0,
         "density": 0.009006,
         "amount": 3507364,
-        "amount_per_field": 3507364
+        "amount_per_field": 3507364,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -17189,7 +17481,9 @@
         "localdensity": 0.0,
         "density": 7.616,
         "amount": 2966161296,
-        "amount_per_field": 494360216
+        "amount_per_field": 494360216,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -17213,7 +17507,9 @@
         "localdensity": 0.0,
         "density": 29.62,
         "amount": 11535009827,
-        "amount_per_field": 2883752457
+        "amount_per_field": 2883752457,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -17365,7 +17661,9 @@
         "localdensity": 0.0,
         "density": 336.5,
         "amount": 935453,
-        "amount_per_field": 233863
+        "amount_per_field": 233863,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -17517,7 +17815,9 @@
         "localdensity": 0.0,
         "density": 336.5,
         "amount": 935453,
-        "amount_per_field": 233863
+        "amount_per_field": 233863,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -17669,7 +17969,9 @@
         "localdensity": 0.0,
         "density": 336.5,
         "amount": 935453,
-        "amount_per_field": 233863
+        "amount_per_field": 233863,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -17821,7 +18123,9 @@
         "localdensity": 0.0,
         "density": 336.5,
         "amount": 935453,
-        "amount_per_field": 233863
+        "amount_per_field": 233863,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -17973,7 +18277,9 @@
         "localdensity": 0.0,
         "density": 336.5,
         "amount": 935453,
-        "amount_per_field": 233863
+        "amount_per_field": 233863,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -18097,7 +18403,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -18221,7 +18529,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -18345,7 +18655,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -18834,7 +19146,9 @@
         "localdensity": 0.2075,
         "density": 605.2,
         "amount": 173582142,
-        "amount_per_field": 173582142
+        "amount_per_field": 173582142,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ice",
@@ -18858,7 +19172,9 @@
         "localdensity": 0.0,
         "density": 790.0,
         "amount": 226616011,
-        "amount_per_field": 56654003
+        "amount_per_field": 56654003,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "nividium",
@@ -18882,7 +19198,9 @@
         "localdensity": 0.0,
         "density": 3.377,
         "amount": 968696,
-        "amount_per_field": 968696
+        "amount_per_field": 968696,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -18906,7 +19224,9 @@
         "localdensity": 0.0,
         "density": 1398.0,
         "amount": 400877919,
-        "amount_per_field": 133625973
+        "amount_per_field": 133625973,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -18930,7 +19250,9 @@
         "localdensity": 0.0,
         "density": 1250.0,
         "amount": 358545893,
-        "amount_per_field": 119515298
+        "amount_per_field": 119515298,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -19059,7 +19381,9 @@
         "localdensity": 0.0,
         "density": 358900.0,
         "amount": 10316825,
-        "amount_per_field": 10316825
+        "amount_per_field": 10316825,
+        "yield": "high",
+        "level": 5
       }
     ]
   },
@@ -19612,7 +19936,9 @@
         "localdensity": 0.0,
         "density": 336.5,
         "amount": 935453,
-        "amount_per_field": 233863
+        "amount_per_field": 233863,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -19764,7 +20090,9 @@
         "localdensity": 0.0,
         "density": 336.5,
         "amount": 935453,
-        "amount_per_field": 233863
+        "amount_per_field": 233863,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -19888,7 +20216,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -20012,7 +20342,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -20136,7 +20468,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -20260,7 +20594,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -20503,7 +20839,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -20527,7 +20865,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -20551,7 +20891,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -20778,7 +21120,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -20802,7 +21146,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -20826,7 +21172,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -21053,7 +21401,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -21077,7 +21427,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -21101,7 +21453,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -21253,7 +21607,9 @@
         "localdensity": 0.0,
         "density": 336.5,
         "amount": 935453,
-        "amount_per_field": 233863
+        "amount_per_field": 233863,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -21405,7 +21761,9 @@
         "localdensity": 0.0,
         "density": 336.5,
         "amount": 935453,
-        "amount_per_field": 233863
+        "amount_per_field": 233863,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -21557,7 +21915,9 @@
         "localdensity": 0.0,
         "density": 336.5,
         "amount": 935453,
-        "amount_per_field": 233863
+        "amount_per_field": 233863,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -21774,7 +22134,9 @@
         "localdensity": 0.085,
         "density": 513.6,
         "amount": 18607442507,
-        "amount_per_field": 18607442507
+        "amount_per_field": 18607442507,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -21798,7 +22160,9 @@
         "localdensity": 0.0,
         "density": 6.365,
         "amount": 230635002,
-        "amount_per_field": 76878334
+        "amount_per_field": 76878334,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -21822,7 +22186,9 @@
         "localdensity": 0.0,
         "density": 5.487,
         "amount": 198820997,
-        "amount_per_field": 99410498
+        "amount_per_field": 99410498,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -22058,7 +22424,9 @@
         "localdensity": 0.085,
         "density": 513.6,
         "amount": 268897005052,
-        "amount_per_field": 268897005052
+        "amount_per_field": 268897005052,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "nividium",
@@ -22082,7 +22450,9 @@
         "localdensity": 0.0,
         "density": 0.002282,
         "amount": 1194765,
-        "amount_per_field": 1194765
+        "amount_per_field": 1194765,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -22106,7 +22476,9 @@
         "localdensity": 0.0,
         "density": 7.098,
         "amount": 3716675570,
-        "amount_per_field": 929168892
+        "amount_per_field": 929168892,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -22130,7 +22502,9 @@
         "localdensity": 0.0,
         "density": 3.549,
         "amount": 1858337785,
-        "amount_per_field": 464584446
+        "amount_per_field": 464584446,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -22357,7 +22731,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -22381,7 +22757,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -22405,7 +22783,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -22529,7 +22909,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -22653,7 +23035,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -22777,7 +23161,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -22929,7 +23315,9 @@
         "localdensity": 0.0,
         "density": 336.5,
         "amount": 935453,
-        "amount_per_field": 233863
+        "amount_per_field": 233863,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -23081,7 +23469,9 @@
         "localdensity": 0.0,
         "density": 336.5,
         "amount": 935453,
-        "amount_per_field": 233863
+        "amount_per_field": 233863,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -23324,7 +23714,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -23348,7 +23740,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -23372,7 +23766,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -23599,7 +23995,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -23623,7 +24021,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -23647,7 +24047,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -23771,7 +24173,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -23895,7 +24299,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -24019,7 +24425,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -24262,7 +24670,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -24286,7 +24696,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -24310,7 +24722,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -24537,7 +24951,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -24561,7 +24977,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -24585,7 +25003,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -24812,7 +25232,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -24836,7 +25258,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -24860,7 +25284,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -25087,7 +25513,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -25111,7 +25539,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -25135,7 +25565,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -25362,7 +25794,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -25386,7 +25820,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -25410,7 +25846,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -25534,7 +25972,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -25658,7 +26098,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -25782,7 +26224,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -26041,7 +26485,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -26065,7 +26511,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -26089,7 +26537,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -26316,7 +26766,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -26340,7 +26792,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -26364,7 +26818,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -26593,7 +27049,9 @@
         "localdensity": 0.085,
         "density": 102.7,
         "amount": 21899241,
-        "amount_per_field": 21899241
+        "amount_per_field": 21899241,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "rawscrap",
@@ -26617,7 +27075,9 @@
         "localdensity": 0.0,
         "density": 8610.0,
         "amount": 1835820891,
-        "amount_per_field": 305970148
+        "amount_per_field": 305970148,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -26949,7 +27409,9 @@
         "localdensity": 0.0,
         "density": 6.239,
         "amount": 1757019,
-        "amount_per_field": 439255
+        "amount_per_field": 439255,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -26973,7 +27435,9 @@
         "localdensity": 0.0,
         "density": 122.7,
         "amount": 34569953,
-        "amount_per_field": 8642488
+        "amount_per_field": 8642488,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -27232,7 +27696,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -27256,7 +27722,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -27280,7 +27748,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -27507,7 +27977,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -27531,7 +28003,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -27555,7 +28029,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -27782,7 +28258,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -27806,7 +28284,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -27830,7 +28310,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -27982,7 +28464,9 @@
         "localdensity": 0.0,
         "density": 336.5,
         "amount": 935453,
-        "amount_per_field": 233863
+        "amount_per_field": 233863,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -28134,7 +28618,9 @@
         "localdensity": 0.0,
         "density": 336.5,
         "amount": 935453,
-        "amount_per_field": 233863
+        "amount_per_field": 233863,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -28258,7 +28744,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -28382,7 +28870,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -28506,7 +28996,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -28771,7 +29263,9 @@
         "localdensity": 0.075,
         "density": 356.1,
         "amount": 49500399353,
-        "amount_per_field": 49500399353
+        "amount_per_field": 49500399353,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -28795,7 +29289,9 @@
         "localdensity": 0.0,
         "density": 28.27,
         "amount": 3929599454,
-        "amount_per_field": 1309866485
+        "amount_per_field": 1309866485,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -28819,7 +29315,9 @@
         "localdensity": 0.0,
         "density": 27.8,
         "amount": 3864888582,
-        "amount_per_field": 1288296194
+        "amount_per_field": 1288296194,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -29038,7 +29536,9 @@
         "localdensity": 0.0,
         "density": 7884.0,
         "amount": 121840806,
-        "amount_per_field": 40613602
+        "amount_per_field": 40613602,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -29298,7 +29798,9 @@
         "localdensity": 0.075,
         "density": 356.1,
         "amount": 49500399353,
-        "amount_per_field": 49500399353
+        "amount_per_field": 49500399353,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -29322,7 +29824,9 @@
         "localdensity": 0.0,
         "density": 28.27,
         "amount": 3929599454,
-        "amount_per_field": 1309866485
+        "amount_per_field": 1309866485,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -29346,7 +29850,9 @@
         "localdensity": 0.0,
         "density": 27.8,
         "amount": 3864888582,
-        "amount_per_field": 1288296194
+        "amount_per_field": 1288296194,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -29578,7 +30084,9 @@
         "localdensity": 0.075,
         "density": 356.1,
         "amount": 17820143767,
-        "amount_per_field": 17820143767
+        "amount_per_field": 17820143767,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -29602,7 +30110,9 @@
         "localdensity": 0.0,
         "density": 106.5,
         "amount": 5328597764,
-        "amount_per_field": 1332149441
+        "amount_per_field": 1332149441,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -29956,7 +30466,9 @@
         "localdensity": 0.075,
         "density": 356.1,
         "amount": 17820143767,
-        "amount_per_field": 17820143767
+        "amount_per_field": 17820143767,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -29980,7 +30492,9 @@
         "localdensity": 0.0,
         "density": 28.3,
         "amount": 1416482934,
-        "amount_per_field": 472160978
+        "amount_per_field": 472160978,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -30004,7 +30518,9 @@
         "localdensity": 0.0,
         "density": 27.77,
         "amount": 1389532759,
-        "amount_per_field": 694766380
+        "amount_per_field": 694766380,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -30506,7 +31022,9 @@
         "localdensity": 0.075,
         "density": 506.1,
         "amount": 61731449,
-        "amount_per_field": 61731449
+        "amount_per_field": 61731449,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ice",
@@ -30530,7 +31048,9 @@
         "localdensity": 0.0,
         "density": 621.9,
         "amount": 75856040,
-        "amount_per_field": 25285347
+        "amount_per_field": 25285347,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "nividium",
@@ -30554,7 +31074,9 @@
         "localdensity": 0.0,
         "density": 3.377,
         "amount": 411940,
-        "amount_per_field": 411940
+        "amount_per_field": 411940,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -30578,7 +31100,9 @@
         "localdensity": 0.0,
         "density": 1102.0,
         "amount": 134470704,
-        "amount_per_field": 44823568
+        "amount_per_field": 44823568,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -30602,7 +31126,9 @@
         "localdensity": 0.0,
         "density": 1102.0,
         "amount": 134470704,
-        "amount_per_field": 44823568
+        "amount_per_field": 44823568,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -30726,7 +31252,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -30850,7 +31378,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -30974,7 +31504,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -31253,7 +31785,9 @@
         "localdensity": 0.075,
         "density": 506.1,
         "amount": 73453546,
-        "amount_per_field": 73453546
+        "amount_per_field": 73453546,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -31277,7 +31811,9 @@
         "localdensity": 0.0,
         "density": 147.6,
         "amount": 21420130,
-        "amount_per_field": 21420130
+        "amount_per_field": 21420130,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -31301,7 +31837,9 @@
         "localdensity": 0.0,
         "density": 147.6,
         "amount": 21420130,
-        "amount_per_field": 21420130
+        "amount_per_field": 21420130,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -31564,7 +32102,9 @@
         "localdensity": 0.075,
         "density": 506.1,
         "amount": 73453546,
-        "amount_per_field": 73453546
+        "amount_per_field": 73453546,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -31588,7 +32128,9 @@
         "localdensity": 0.0,
         "density": 147.6,
         "amount": 21420130,
-        "amount_per_field": 21420130
+        "amount_per_field": 21420130,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -31612,7 +32154,9 @@
         "localdensity": 0.0,
         "density": 147.6,
         "amount": 21420130,
-        "amount_per_field": 21420130
+        "amount_per_field": 21420130,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -32012,7 +32556,9 @@
         "localdensity": 0.125,
         "density": 543.5,
         "amount": 104677930,
-        "amount_per_field": 104677930
+        "amount_per_field": 104677930,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ice",
@@ -32036,7 +32582,9 @@
         "localdensity": 0.0,
         "density": 304.9,
         "amount": 58725515,
-        "amount_per_field": 19575172
+        "amount_per_field": 19575172,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "nividium",
@@ -32060,7 +32608,9 @@
         "localdensity": 0.0,
         "density": 3.377,
         "amount": 650474,
-        "amount_per_field": 650474
+        "amount_per_field": 650474,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -32084,7 +32634,9 @@
         "localdensity": 0.0,
         "density": 451.7,
         "amount": 87000047,
-        "amount_per_field": 43500024
+        "amount_per_field": 43500024,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -32108,7 +32660,9 @@
         "localdensity": 0.0,
         "density": 451.7,
         "amount": 87000047,
-        "amount_per_field": 43500024
+        "amount_per_field": 43500024,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -32448,7 +33002,9 @@
         "localdensity": 0.125,
         "density": 543.5,
         "amount": 102778502,
-        "amount_per_field": 102778502
+        "amount_per_field": 102778502,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ice",
@@ -32472,7 +33028,9 @@
         "localdensity": 0.0,
         "density": 115.4,
         "amount": 21815795,
-        "amount_per_field": 7271932
+        "amount_per_field": 7271932,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "nividium",
@@ -32496,7 +33054,9 @@
         "localdensity": 0.0,
         "density": 3.377,
         "amount": 638671,
-        "amount_per_field": 638671
+        "amount_per_field": 638671,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -32520,7 +33080,9 @@
         "localdensity": 0.0,
         "density": 234.8,
         "amount": 44402311,
-        "amount_per_field": 22201156
+        "amount_per_field": 22201156,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -32544,7 +33106,9 @@
         "localdensity": 0.0,
         "density": 230.3,
         "amount": 43556503,
-        "amount_per_field": 21778252
+        "amount_per_field": 21778252,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -32684,7 +33248,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -32927,7 +33493,9 @@
         "localdensity": 0.0,
         "density": 4.065,
         "amount": 22604,
-        "amount_per_field": 22604
+        "amount_per_field": 22604,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -32951,7 +33519,9 @@
         "localdensity": 0.0,
         "density": 1855.0,
         "amount": 10317274,
-        "amount_per_field": 2579318
+        "amount_per_field": 2579318,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -32975,7 +33545,9 @@
         "localdensity": 0.0,
         "density": 1756.0,
         "amount": 9761956,
-        "amount_per_field": 2440489
+        "amount_per_field": 2440489,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -33202,7 +33774,9 @@
         "localdensity": 0.0,
         "density": 0.07606,
         "amount": 343864,
-        "amount_per_field": 343864
+        "amount_per_field": 343864,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -33226,7 +33800,9 @@
         "localdensity": 0.0,
         "density": 11.01,
         "amount": 49791533,
-        "amount_per_field": 16597178
+        "amount_per_field": 16597178,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -33250,7 +33826,9 @@
         "localdensity": 0.0,
         "density": 10.53,
         "amount": 47590802,
-        "amount_per_field": 15863601
+        "amount_per_field": 15863601,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -33402,7 +33980,9 @@
         "localdensity": 0.0,
         "density": 336.5,
         "amount": 935453,
-        "amount_per_field": 233863
+        "amount_per_field": 233863,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -33554,7 +34134,9 @@
         "localdensity": 0.0,
         "density": 336.5,
         "amount": 935453,
-        "amount_per_field": 233863
+        "amount_per_field": 233863,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -33678,7 +34260,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -33802,7 +34386,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -33926,7 +34512,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -34050,7 +34638,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -34251,7 +34841,9 @@
         "localdensity": 0.0,
         "density": 139.4,
         "amount": 775083992,
-        "amount_per_field": 193770998
+        "amount_per_field": 193770998,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -34513,7 +35105,9 @@
         "localdensity": 0.0,
         "density": 23310.0,
         "amount": 40579484,
-        "amount_per_field": 13526495
+        "amount_per_field": 13526495,
+        "yield": "high",
+        "level": 5
       }
     ]
   },
@@ -34761,7 +35355,9 @@
         "localdensity": 0.1,
         "density": 374.8,
         "amount": 4167918798,
-        "amount_per_field": 4167918798
+        "amount_per_field": 4167918798,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "nividium",
@@ -34785,7 +35381,9 @@
         "localdensity": 0.0,
         "density": 0.01141,
         "amount": 126884,
-        "amount_per_field": 126884
+        "amount_per_field": 126884,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -34809,7 +35407,9 @@
         "localdensity": 0.0,
         "density": 1.524,
         "amount": 16951711,
-        "amount_per_field": 5650570
+        "amount_per_field": 5650570,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -34833,7 +35433,9 @@
         "localdensity": 0.0,
         "density": 1.506,
         "amount": 16748696,
-        "amount_per_field": 5582899
+        "amount_per_field": 5582899,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -35095,7 +35697,9 @@
         "localdensity": 0.0,
         "density": 23310.0,
         "amount": 40579484,
-        "amount_per_field": 13526495
+        "amount_per_field": 13526495,
+        "yield": "high",
+        "level": 5
       }
     ]
   },
@@ -35451,7 +36055,9 @@
         "localdensity": 0.075,
         "density": 506.1,
         "amount": 134557766,
-        "amount_per_field": 134557766
+        "amount_per_field": 134557766,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -35475,7 +36081,9 @@
         "localdensity": 0.0,
         "density": 267.2,
         "amount": 71035021,
-        "amount_per_field": 23678340
+        "amount_per_field": 23678340,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -35499,7 +36107,9 @@
         "localdensity": 0.0,
         "density": 225.4,
         "amount": 59932386,
-        "amount_per_field": 19977462
+        "amount_per_field": 19977462,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -35795,7 +36405,9 @@
         "localdensity": 0.085,
         "density": 102.7,
         "amount": 54748,
-        "amount_per_field": 54748
+        "amount_per_field": 54748,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "rawscrap",
@@ -35819,7 +36431,9 @@
         "localdensity": 0.0,
         "density": 11370.0,
         "amount": 6060536,
-        "amount_per_field": 1010089
+        "amount_per_field": 1010089,
+        "yield": "high",
+        "level": 5
       }
     ]
   },
@@ -36064,7 +36678,9 @@
         "localdensity": 0.085,
         "density": 513.7,
         "amount": 11076392,
-        "amount_per_field": 11076392
+        "amount_per_field": 11076392,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "rawscrap",
@@ -36088,7 +36704,9 @@
         "localdensity": 0.0,
         "density": 13980.0,
         "amount": 301361621,
-        "amount_per_field": 43051660
+        "amount_per_field": 43051660,
+        "yield": "high",
+        "level": 5
       }
     ]
   },
@@ -36333,7 +36951,9 @@
         "localdensity": 0.075,
         "density": 37.39,
         "amount": 20224924,
-        "amount_per_field": 20224924
+        "amount_per_field": 20224924,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ice",
@@ -36357,7 +36977,9 @@
         "localdensity": 0.0,
         "density": 106.2,
         "amount": 57433978,
-        "amount_per_field": 14358494
+        "amount_per_field": 14358494,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -36381,7 +37003,9 @@
         "localdensity": 0.0,
         "density": 6.594,
         "amount": 3567013,
-        "amount_per_field": 1783506
+        "amount_per_field": 1783506,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -36405,7 +37029,9 @@
         "localdensity": 0.0,
         "density": 1.884,
         "amount": 1019147,
-        "amount_per_field": 1019147
+        "amount_per_field": 1019147,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -36640,7 +37266,9 @@
         "localdensity": 0.005,
         "density": 432.5,
         "amount": 11655607997,
-        "amount_per_field": 11655607997
+        "amount_per_field": 11655607997,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -36664,7 +37292,9 @@
         "localdensity": 0.0,
         "density": 33.89,
         "amount": 913227957,
-        "amount_per_field": 304409319
+        "amount_per_field": 304409319,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -36688,7 +37318,9 @@
         "localdensity": 0.0,
         "density": 23.06,
         "amount": 621462465,
-        "amount_per_field": 310731232
+        "amount_per_field": 310731232,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -37047,7 +37679,9 @@
         "localdensity": 0.0,
         "density": 450.0,
         "amount": 535481024,
-        "amount_per_field": 535481024
+        "amount_per_field": 535481024,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -37071,7 +37705,9 @@
         "localdensity": 0.0,
         "density": 267.2,
         "amount": 317916496,
-        "amount_per_field": 105972165
+        "amount_per_field": 105972165,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -37095,7 +37731,9 @@
         "localdensity": 0.0,
         "density": 225.4,
         "amount": 268226770,
-        "amount_per_field": 89408923
+        "amount_per_field": 89408923,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -37208,7 +37846,9 @@
         "localdensity": 0.0,
         "density": 358900.0,
         "amount": 10316825,
-        "amount_per_field": 10316825
+        "amount_per_field": 10316825,
+        "yield": "high",
+        "level": 5
       }
     ]
   },
@@ -37321,7 +37961,9 @@
         "localdensity": 0.0,
         "density": 358900.0,
         "amount": 10316825,
-        "amount_per_field": 10316825
+        "amount_per_field": 10316825,
+        "yield": "high",
+        "level": 5
       }
     ]
   },
@@ -37689,7 +38331,9 @@
         "localdensity": 0.0175,
         "density": 463.1,
         "amount": 1023959126,
-        "amount_per_field": 1023959126
+        "amount_per_field": 1023959126,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "hydrogen",
@@ -37713,7 +38357,9 @@
         "localdensity": 0.0175,
         "density": 463.1,
         "amount": 1023959126,
-        "amount_per_field": 1023959126
+        "amount_per_field": 1023959126,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ice",
@@ -37737,7 +38383,9 @@
         "localdensity": 0.0,
         "density": 1.829,
         "amount": 4043657,
-        "amount_per_field": 4043657
+        "amount_per_field": 4043657,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "nividium",
@@ -37761,7 +38409,9 @@
         "localdensity": 0.0,
         "density": 4.46,
         "amount": 9862578,
-        "amount_per_field": 9862578
+        "amount_per_field": 9862578,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -37785,7 +38435,9 @@
         "localdensity": 0.0,
         "density": 224.3,
         "amount": 495889813,
-        "amount_per_field": 165296604
+        "amount_per_field": 165296604,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -37809,7 +38461,9 @@
         "localdensity": 0.0,
         "density": 0.9989,
         "amount": 2208727,
-        "amount_per_field": 2208727
+        "amount_per_field": 2208727,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -38191,7 +38845,9 @@
         "localdensity": 0.0175,
         "density": 463.1,
         "amount": 1869664643,
-        "amount_per_field": 1869664643
+        "amount_per_field": 1869664643,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "hydrogen",
@@ -38215,7 +38871,9 @@
         "localdensity": 0.0175,
         "density": 463.1,
         "amount": 1869664643,
-        "amount_per_field": 1869664643
+        "amount_per_field": 1869664643,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ice",
@@ -38239,7 +38897,9 @@
         "localdensity": 0.0,
         "density": 1.188,
         "amount": 4796449,
-        "amount_per_field": 4796449
+        "amount_per_field": 4796449,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "nividium",
@@ -38263,7 +38923,9 @@
         "localdensity": 0.0,
         "density": 2.898,
         "amount": 11698657,
-        "amount_per_field": 11698657
+        "amount_per_field": 11698657,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -38287,7 +38949,9 @@
         "localdensity": 0.0,
         "density": 70.03,
         "amount": 282744438,
-        "amount_per_field": 94248146
+        "amount_per_field": 94248146,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -38311,7 +38975,9 @@
         "localdensity": 0.0,
         "density": 0.9989,
         "amount": 4032952,
-        "amount_per_field": 4032952
+        "amount_per_field": 4032952,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -38424,7 +39090,9 @@
         "localdensity": 0.0,
         "density": 358900.0,
         "amount": 10316825,
-        "amount_per_field": 10316825
+        "amount_per_field": 10316825,
+        "yield": "high",
+        "level": 5
       }
     ]
   },
@@ -38537,7 +39205,9 @@
         "localdensity": 0.0,
         "density": 358900.0,
         "amount": 10316825,
-        "amount_per_field": 10316825
+        "amount_per_field": 10316825,
+        "yield": "high",
+        "level": 5
       }
     ]
   },
@@ -38650,7 +39320,9 @@
         "localdensity": 0.0,
         "density": 358900.0,
         "amount": 10316825,
-        "amount_per_field": 10316825
+        "amount_per_field": 10316825,
+        "yield": "high",
+        "level": 5
       }
     ]
   },
@@ -38763,7 +39435,9 @@
         "localdensity": 0.0,
         "density": 358900.0,
         "amount": 10316825,
-        "amount_per_field": 10316825
+        "amount_per_field": 10316825,
+        "yield": "high",
+        "level": 5
       }
     ]
   },
@@ -39145,7 +39819,9 @@
         "localdensity": 0.075,
         "density": 202.4,
         "amount": 473037384,
-        "amount_per_field": 473037384
+        "amount_per_field": 473037384,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "hydrogen",
@@ -39169,7 +39845,9 @@
         "localdensity": 0.075,
         "density": 202.4,
         "amount": 473037384,
-        "amount_per_field": 473037384
+        "amount_per_field": 473037384,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "methane",
@@ -39193,7 +39871,9 @@
         "localdensity": 0.075,
         "density": 202.4,
         "amount": 473037384,
-        "amount_per_field": 473037384
+        "amount_per_field": 473037384,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "nividium",
@@ -39217,7 +39897,9 @@
         "localdensity": 0.0,
         "density": 0.5403,
         "amount": 1262651,
-        "amount_per_field": 1262651
+        "amount_per_field": 1262651,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -39241,7 +39923,9 @@
         "localdensity": 0.0,
         "density": 61.93,
         "amount": 144715600,
-        "amount_per_field": 24119267
+        "amount_per_field": 24119267,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -39265,7 +39949,9 @@
         "localdensity": 0.0,
         "density": 177.7,
         "amount": 415260354,
-        "amount_per_field": 103815088
+        "amount_per_field": 103815088,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -39493,7 +40179,9 @@
         "localdensity": 0.0,
         "density": 82.31,
         "amount": 830089882,
-        "amount_per_field": 207522470
+        "amount_per_field": 207522470,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -39517,7 +40205,9 @@
         "localdensity": 0.0,
         "density": 22.61,
         "amount": 227976339,
-        "amount_per_field": 113988170
+        "amount_per_field": 113988170,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -39541,7 +40231,9 @@
         "localdensity": 0.0,
         "density": 20.72,
         "amount": 208978311,
-        "amount_per_field": 104489156
+        "amount_per_field": 104489156,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -39883,7 +40575,9 @@
         "localdensity": 0.0,
         "density": 37.62,
         "amount": 419797287,
-        "amount_per_field": 419797287
+        "amount_per_field": 419797287,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -39907,7 +40601,9 @@
         "localdensity": 0.0,
         "density": 324.1,
         "amount": 3616673302,
-        "amount_per_field": 1205557767
+        "amount_per_field": 1205557767,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -39931,7 +40627,9 @@
         "localdensity": 0.0,
         "density": 229.2,
         "amount": 2557500812,
-        "amount_per_field": 1278750406
+        "amount_per_field": 1278750406,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -40259,7 +40957,9 @@
         "localdensity": 0.0,
         "density": 6.268,
         "amount": 40025205,
-        "amount_per_field": 10006301
+        "amount_per_field": 10006301,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -40283,7 +40983,9 @@
         "localdensity": 0.0,
         "density": 1.28,
         "amount": 8174327,
-        "amount_per_field": 1362388
+        "amount_per_field": 1362388,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -40307,7 +41009,9 @@
         "localdensity": 0.0,
         "density": 29.26,
         "amount": 186814532,
-        "amount_per_field": 46703633
+        "amount_per_field": 46703633,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -40480,7 +41184,9 @@
         "localdensity": 0.5075,
         "density": 68.3,
         "amount": 5330105454,
-        "amount_per_field": 5330105454
+        "amount_per_field": 5330105454,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ice",
@@ -40504,7 +41210,9 @@
         "localdensity": 0.0,
         "density": 13.55,
         "amount": 1057366338,
-        "amount_per_field": 352455446
+        "amount_per_field": 352455446,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -40828,7 +41536,9 @@
         "localdensity": 0.0,
         "density": 115.4,
         "amount": 42492592,
-        "amount_per_field": 10623148
+        "amount_per_field": 10623148,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -40852,7 +41562,9 @@
         "localdensity": 0.0,
         "density": 14.13,
         "amount": 5202454,
-        "amount_per_field": 2601227
+        "amount_per_field": 2601227,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -40876,7 +41588,9 @@
         "localdensity": 0.0,
         "density": 8.477,
         "amount": 3121473,
-        "amount_per_field": 1560736
+        "amount_per_field": 1560736,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -41098,7 +41812,9 @@
         "localdensity": 0.2075,
         "density": 53.34,
         "amount": 3406125264,
-        "amount_per_field": 3406125264
+        "amount_per_field": 3406125264,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "hydrogen",
@@ -41122,7 +41838,9 @@
         "localdensity": 0.2075,
         "density": 53.34,
         "amount": 3406125264,
-        "amount_per_field": 3406125264
+        "amount_per_field": 3406125264,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ice",
@@ -41146,7 +41864,9 @@
         "localdensity": 0.0,
         "density": 6.268,
         "amount": 400252051,
-        "amount_per_field": 100063013
+        "amount_per_field": 100063013,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "methane",
@@ -41170,7 +41890,9 @@
         "localdensity": 0.2075,
         "density": 53.34,
         "amount": 3406125264,
-        "amount_per_field": 3406125264
+        "amount_per_field": 3406125264,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -41397,7 +42119,9 @@
         "localdensity": 0.2075,
         "density": 153.3,
         "amount": 9791412332,
-        "amount_per_field": 9791412332
+        "amount_per_field": 9791412332,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "hydrogen",
@@ -41421,7 +42145,9 @@
         "localdensity": 0.2075,
         "density": 153.3,
         "amount": 9791412332,
-        "amount_per_field": 9791412332
+        "amount_per_field": 9791412332,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ice",
@@ -41445,7 +42171,9 @@
         "localdensity": 0.0,
         "density": 13.55,
         "amount": 865117913,
-        "amount_per_field": 288372638
+        "amount_per_field": 288372638,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "methane",
@@ -41469,7 +42197,9 @@
         "localdensity": 0.2075,
         "density": 153.3,
         "amount": 9791412332,
-        "amount_per_field": 9791412332
+        "amount_per_field": 9791412332,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -41646,7 +42376,9 @@
         "localdensity": 0.0,
         "density": 0.8223,
         "amount": 15752441,
-        "amount_per_field": 3150488
+        "amount_per_field": 3150488,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -41993,7 +42725,9 @@
         "localdensity": 0.52075,
         "density": 169.0,
         "amount": 11927016157,
-        "amount_per_field": 11927016157
+        "amount_per_field": 11927016157,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ice",
@@ -42017,7 +42751,9 @@
         "localdensity": 0.0,
         "density": 6.268,
         "amount": 442492674,
-        "amount_per_field": 110623168
+        "amount_per_field": 110623168,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "nividium",
@@ -42041,7 +42777,9 @@
         "localdensity": 0.0,
         "density": 0.09006,
         "amount": 6357221,
-        "amount_per_field": 6357221
+        "amount_per_field": 6357221,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -42065,7 +42803,9 @@
         "localdensity": 0.0,
         "density": 1.069,
         "amount": 75429720,
-        "amount_per_field": 12571620
+        "amount_per_field": 12571620,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -42089,7 +42829,9 @@
         "localdensity": 0.0,
         "density": 29.62,
         "amount": 2090761239,
-        "amount_per_field": 522690310
+        "amount_per_field": 522690310,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -42265,7 +43007,9 @@
         "localdensity": 0.0,
         "density": 6.268,
         "amount": 400252051,
-        "amount_per_field": 100063013
+        "amount_per_field": 100063013,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -42456,7 +43200,9 @@
         "localdensity": 0.0,
         "density": 8266.0,
         "amount": 131822107,
-        "amount_per_field": 43940702
+        "amount_per_field": 43940702,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -42615,7 +43361,9 @@
         "localdensity": 0.0,
         "density": 9459.0,
         "amount": 146064930,
-        "amount_per_field": 48688310
+        "amount_per_field": 48688310,
+        "yield": "midhigh",
+        "level": 4
       }
     ]
   },
@@ -42970,7 +43718,9 @@
         "localdensity": 0.052075,
         "density": 10.38,
         "amount": 732968,
-        "amount_per_field": 732968
+        "amount_per_field": 732968,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "hydrogen",
@@ -42994,7 +43744,9 @@
         "localdensity": 0.252075,
         "density": 107.5,
         "amount": 7585853,
-        "amount_per_field": 7585853
+        "amount_per_field": 7585853,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ice",
@@ -43018,7 +43770,9 @@
         "localdensity": 0.0,
         "density": 25.07,
         "amount": 1769971,
-        "amount_per_field": 442493
+        "amount_per_field": 442493,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "methane",
@@ -43042,7 +43796,9 @@
         "localdensity": 0.052075,
         "density": 10.38,
         "amount": 732968,
-        "amount_per_field": 732968
+        "amount_per_field": 732968,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "nividium",
@@ -43066,7 +43822,9 @@
         "localdensity": 0.0,
         "density": 0.3602,
         "amount": 25429,
-        "amount_per_field": 25429
+        "amount_per_field": 25429,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -43090,7 +43848,9 @@
         "localdensity": 0.0,
         "density": 613.4,
         "amount": 43298567,
-        "amount_per_field": 8659713
+        "amount_per_field": 8659713,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -43114,7 +43874,9 @@
         "localdensity": 0.0,
         "density": 118.5,
         "amount": 8363045,
-        "amount_per_field": 2090761
+        "amount_per_field": 2090761,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -43277,7 +44039,9 @@
         "localdensity": 0.0,
         "density": 22.57,
         "amount": 125939186,
-        "amount_per_field": 125939186
+        "amount_per_field": 125939186,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -43301,7 +44065,9 @@
         "localdensity": 0.0,
         "density": 15.05,
         "amount": 83959457,
-        "amount_per_field": 83959457
+        "amount_per_field": 83959457,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -43615,7 +44381,9 @@
         "localdensity": 0.0,
         "density": 15.6,
         "amount": 4392547,
-        "amount_per_field": 1098137
+        "amount_per_field": 1098137,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -43639,7 +44407,9 @@
         "localdensity": 0.0,
         "density": 306.9,
         "amount": 86424881,
-        "amount_per_field": 21606220
+        "amount_per_field": 21606220,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -43813,7 +44583,9 @@
         "localdensity": 0.0,
         "density": 14510.0,
         "amount": 117076399,
-        "amount_per_field": 29269100
+        "amount_per_field": 29269100,
+        "yield": "high",
+        "level": 5
       }
     ]
   },
@@ -44203,7 +44975,9 @@
         "localdensity": 0.0,
         "density": 159.2,
         "amount": 179715340,
-        "amount_per_field": 44928835
+        "amount_per_field": 44928835,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -44227,7 +45001,9 @@
         "localdensity": 0.0,
         "density": 9.89,
         "amount": 11161458,
-        "amount_per_field": 5580729
+        "amount_per_field": 5580729,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -44251,7 +45027,9 @@
         "localdensity": 0.0,
         "density": 5.652,
         "amount": 6377976,
-        "amount_per_field": 3188988
+        "amount_per_field": 3188988,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -44535,7 +45313,9 @@
         "localdensity": 0.0,
         "density": 1.056,
         "amount": 74553454,
-        "amount_per_field": 14910691
+        "amount_per_field": 14910691,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -44559,7 +45339,9 @@
         "localdensity": 0.0,
         "density": 21.85,
         "amount": 1542388614,
-        "amount_per_field": 385597154
+        "amount_per_field": 385597154,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -44795,7 +45577,9 @@
         "localdensity": 0.0,
         "density": 1.056,
         "amount": 74553454,
-        "amount_per_field": 14910691
+        "amount_per_field": 14910691,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -44819,7 +45603,9 @@
         "localdensity": 0.0,
         "density": 21.85,
         "amount": 1542388614,
-        "amount_per_field": 385597154
+        "amount_per_field": 385597154,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -45025,7 +45811,9 @@
         "localdensity": 0.0,
         "density": 22.57,
         "amount": 408042963,
-        "amount_per_field": 408042963
+        "amount_per_field": 408042963,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "rawscrap",
@@ -45049,7 +45837,9 @@
         "localdensity": 0.0,
         "density": 0.1597,
         "amount": 2887486,
-        "amount_per_field": 2887486
+        "amount_per_field": 2887486,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -45073,7 +45863,9 @@
         "localdensity": 0.0,
         "density": 15.05,
         "amount": 272028642,
-        "amount_per_field": 272028642
+        "amount_per_field": 272028642,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -45320,7 +46112,9 @@
         "localdensity": 0.0,
         "density": 0.04488,
         "amount": 3992662,
-        "amount_per_field": 3992662
+        "amount_per_field": 3992662,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "nividium",
@@ -45344,7 +46138,9 @@
         "localdensity": 0.0,
         "density": 0.1095,
         "amount": 9738200,
-        "amount_per_field": 9738200
+        "amount_per_field": 9738200,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -45368,7 +46164,9 @@
         "localdensity": 0.0,
         "density": 11.55,
         "amount": 1027805580,
-        "amount_per_field": 342601860
+        "amount_per_field": 342601860,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -45392,7 +46190,9 @@
         "localdensity": 0.0,
         "density": 5.933,
         "amount": 527850698,
-        "amount_per_field": 527850698
+        "amount_per_field": 527850698,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -45696,7 +46496,9 @@
         "localdensity": 0.0,
         "density": 2.23,
         "amount": 310028521,
-        "amount_per_field": 310028521
+        "amount_per_field": 310028521,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "rawscrap",
@@ -45720,7 +46522,9 @@
         "localdensity": 0.0,
         "density": 262.5,
         "amount": 36487500169,
-        "amount_per_field": 5212500024
+        "amount_per_field": 5212500024,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -45744,7 +46548,9 @@
         "localdensity": 0.0,
         "density": 2.23,
         "amount": 310028521,
-        "amount_per_field": 310028521
+        "amount_per_field": 310028521,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -46002,7 +46808,9 @@
         "localdensity": 0.0,
         "density": 0.6198,
         "amount": 172333428,
-        "amount_per_field": 172333428
+        "amount_per_field": 172333428,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "nividium",
@@ -46026,7 +46834,9 @@
         "localdensity": 0.0,
         "density": 0.4919,
         "amount": 136772562,
-        "amount_per_field": 136772562
+        "amount_per_field": 136772562,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -46050,7 +46860,9 @@
         "localdensity": 0.0,
         "density": 16.57,
         "amount": 4607650973,
-        "amount_per_field": 1535883658
+        "amount_per_field": 1535883658,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -46074,7 +46886,9 @@
         "localdensity": 0.0,
         "density": 16.28,
         "amount": 4527223394,
-        "amount_per_field": 2263611697
+        "amount_per_field": 2263611697,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -46431,7 +47245,9 @@
         "localdensity": 0.00875,
         "density": 231.5,
         "amount": 8421123,
-        "amount_per_field": 8421123
+        "amount_per_field": 8421123,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "hydrogen",
@@ -46455,7 +47271,9 @@
         "localdensity": 0.00875,
         "density": 231.5,
         "amount": 8421123,
-        "amount_per_field": 8421123
+        "amount_per_field": 8421123,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ice",
@@ -46479,7 +47297,9 @@
         "localdensity": 0.0,
         "density": 1.829,
         "amount": 66511,
-        "amount_per_field": 66511
+        "amount_per_field": 66511,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "nividium",
@@ -46503,7 +47323,9 @@
         "localdensity": 0.0,
         "density": 133.8,
         "amount": 4866639,
-        "amount_per_field": 4866639
+        "amount_per_field": 4866639,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "ore",
@@ -46527,7 +47349,9 @@
         "localdensity": 0.0,
         "density": 670.8,
         "amount": 24397155,
-        "amount_per_field": 8132385
+        "amount_per_field": 8132385,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -46551,7 +47375,9 @@
         "localdensity": 0.0,
         "density": 0.9989,
         "amount": 36329,
-        "amount_per_field": 36329
+        "amount_per_field": 36329,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -46809,7 +47635,9 @@
         "localdensity": 0.0,
         "density": 0.6198,
         "amount": 172333428,
-        "amount_per_field": 172333428
+        "amount_per_field": 172333428,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "nividium",
@@ -46833,7 +47661,9 @@
         "localdensity": 0.0,
         "density": 0.4919,
         "amount": 136772562,
-        "amount_per_field": 136772562
+        "amount_per_field": 136772562,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -46857,7 +47687,9 @@
         "localdensity": 0.0,
         "density": 16.57,
         "amount": 4607650973,
-        "amount_per_field": 1535883658
+        "amount_per_field": 1535883658,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -46881,7 +47713,9 @@
         "localdensity": 0.0,
         "density": 16.28,
         "amount": 4527223394,
-        "amount_per_field": 2263611697
+        "amount_per_field": 2263611697,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -47208,7 +48042,9 @@
         "localdensity": 0.005833333333333334,
         "density": 154.4,
         "amount": 778680,
-        "amount_per_field": 778680
+        "amount_per_field": 778680,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "hydrogen",
@@ -47232,7 +48068,9 @@
         "localdensity": 0.005833333333333334,
         "density": 154.4,
         "amount": 778680,
-        "amount_per_field": 778680
+        "amount_per_field": 778680,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ice",
@@ -47256,7 +48094,9 @@
         "localdensity": 0.0,
         "density": 1.829,
         "amount": 9225,
-        "amount_per_field": 9225
+        "amount_per_field": 9225,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "methane",
@@ -47280,7 +48120,9 @@
         "localdensity": 0.005833333333333334,
         "density": 154.4,
         "amount": 778680,
-        "amount_per_field": 778680
+        "amount_per_field": 778680,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "nividium",
@@ -47304,7 +48146,9 @@
         "localdensity": 0.0,
         "density": 312.2,
         "amount": 1575020,
-        "amount_per_field": 1575020
+        "amount_per_field": 1575020,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "ore",
@@ -47328,7 +48172,9 @@
         "localdensity": 0.0,
         "density": 670.8,
         "amount": 3383914,
-        "amount_per_field": 1127971
+        "amount_per_field": 1127971,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -47352,7 +48198,9 @@
         "localdensity": 0.0,
         "density": 0.9989,
         "amount": 5039,
-        "amount_per_field": 5039
+        "amount_per_field": 5039,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -47679,7 +48527,9 @@
         "localdensity": 0.005833333333333334,
         "density": 154.4,
         "amount": 1127617,
-        "amount_per_field": 1127617
+        "amount_per_field": 1127617,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "hydrogen",
@@ -47703,7 +48553,9 @@
         "localdensity": 0.005833333333333334,
         "density": 154.4,
         "amount": 1127617,
-        "amount_per_field": 1127617
+        "amount_per_field": 1127617,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ice",
@@ -47727,7 +48579,9 @@
         "localdensity": 0.0,
         "density": 1.829,
         "amount": 13359,
-        "amount_per_field": 13359
+        "amount_per_field": 13359,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "methane",
@@ -47751,7 +48605,9 @@
         "localdensity": 0.005833333333333334,
         "density": 154.4,
         "amount": 1127617,
-        "amount_per_field": 1127617
+        "amount_per_field": 1127617,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "nividium",
@@ -47775,7 +48631,9 @@
         "localdensity": 0.0,
         "density": 133.8,
         "amount": 977489,
-        "amount_per_field": 977489
+        "amount_per_field": 977489,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "ore",
@@ -47799,7 +48657,9 @@
         "localdensity": 0.0,
         "density": 670.8,
         "amount": 4900293,
-        "amount_per_field": 1633431
+        "amount_per_field": 1633431,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -47823,7 +48683,9 @@
         "localdensity": 0.0,
         "density": 0.9989,
         "amount": 7297,
-        "amount_per_field": 7297
+        "amount_per_field": 7297,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -48302,7 +49164,9 @@
         "localdensity": 0.0,
         "density": 159.2,
         "amount": 215025067,
-        "amount_per_field": 53756267
+        "amount_per_field": 53756267,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -48326,7 +49190,9 @@
         "localdensity": 0.0,
         "density": 9.89,
         "amount": 13354415,
-        "amount_per_field": 6677208
+        "amount_per_field": 6677208,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "rawscrap",
@@ -48350,7 +49216,9 @@
         "localdensity": 0.0,
         "density": 469.6,
         "amount": 634075926,
-        "amount_per_field": 634075926
+        "amount_per_field": 634075926,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -48374,7 +49242,9 @@
         "localdensity": 0.0,
         "density": 5.652,
         "amount": 7631095,
-        "amount_per_field": 3815548
+        "amount_per_field": 3815548,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -48710,7 +49580,9 @@
         "localdensity": 0.75,
         "density": 28.75,
         "amount": 108643535,
-        "amount_per_field": 108643535
+        "amount_per_field": 108643535,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -48734,7 +49606,9 @@
         "localdensity": 0.0,
         "density": 331.1,
         "amount": 1251241298,
-        "amount_per_field": 250248260
+        "amount_per_field": 250248260,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -48758,7 +49632,9 @@
         "localdensity": 0.0,
         "density": 35.87,
         "amount": 135546731,
-        "amount_per_field": 33886683
+        "amount_per_field": 33886683,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -48898,7 +49774,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -49022,7 +49900,9 @@
         "localdensity": 0.8,
         "density": 900.0,
         "amount": 15514127,
-        "amount_per_field": 15514127
+        "amount_per_field": 15514127,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -49227,7 +50107,9 @@
         "localdensity": 0.0,
         "density": 0.06207,
         "amount": 988377,
-        "amount_per_field": 988377
+        "amount_per_field": 988377,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -49251,7 +50133,9 @@
         "localdensity": 0.0,
         "density": 0.3414,
         "amount": 5436072,
-        "amount_per_field": 1359018
+        "amount_per_field": 1359018,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -49275,7 +50159,9 @@
         "localdensity": 0.0,
         "density": 0.06207,
         "amount": 988377,
-        "amount_per_field": 988377
+        "amount_per_field": 988377,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -49608,7 +50494,9 @@
         "localdensity": 0.0,
         "density": 50.0,
         "amount": 447880528340498,
-        "amount_per_field": 447880528340498
+        "amount_per_field": 447880528340498,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "hydrogen",
@@ -49632,7 +50520,9 @@
         "localdensity": 0.0,
         "density": 50.0,
         "amount": 447880528340498,
-        "amount_per_field": 447880528340498
+        "amount_per_field": 447880528340498,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ice",
@@ -49656,7 +50546,9 @@
         "localdensity": 0.0,
         "density": 1.67,
         "amount": 14956464938047,
-        "amount_per_field": 7478232469024
+        "amount_per_field": 7478232469024,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "methane",
@@ -49680,7 +50572,9 @@
         "localdensity": 0.0,
         "density": 50.0,
         "amount": 447880528340498,
-        "amount_per_field": 447880528340498
+        "amount_per_field": 447880528340498,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "nividium",
@@ -49704,7 +50598,9 @@
         "localdensity": 0.0,
         "density": 0.009006,
         "amount": 80668979987,
-        "amount_per_field": 80668979987
+        "amount_per_field": 80668979987,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -49728,7 +50624,9 @@
         "localdensity": 0.0,
         "density": 7.616,
         "amount": 68221374832153,
-        "amount_per_field": 11370229138692
+        "amount_per_field": 11370229138692,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -49752,7 +50650,9 @@
         "localdensity": 0.0,
         "density": 29.62,
         "amount": 265303923355497,
-        "amount_per_field": 66325980838874
+        "amount_per_field": 66325980838874,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -49883,7 +50783,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -50104,7 +51006,9 @@
         "localdensity": 0.0,
         "density": 0.06207,
         "amount": 15443,
-        "amount_per_field": 15443
+        "amount_per_field": 15443,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -50128,7 +51032,9 @@
         "localdensity": 0.0,
         "density": 0.3414,
         "amount": 84939,
-        "amount_per_field": 21235
+        "amount_per_field": 21235,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -50152,7 +51058,9 @@
         "localdensity": 0.0,
         "density": 0.06207,
         "amount": 15443,
-        "amount_per_field": 15443
+        "amount_per_field": 15443,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -50357,7 +51265,9 @@
         "localdensity": 0.0,
         "density": 0.06207,
         "amount": 1235,
-        "amount_per_field": 1235
+        "amount_per_field": 1235,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -50381,7 +51291,9 @@
         "localdensity": 0.0,
         "density": 0.3414,
         "amount": 6795,
-        "amount_per_field": 1699
+        "amount_per_field": 1699,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -50405,7 +51317,9 @@
         "localdensity": 0.0,
         "density": 0.06207,
         "amount": 1235,
-        "amount_per_field": 1235
+        "amount_per_field": 1235,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -50610,7 +51524,9 @@
         "localdensity": 0.0,
         "density": 0.06207,
         "amount": 1235,
-        "amount_per_field": 1235
+        "amount_per_field": 1235,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -50634,7 +51550,9 @@
         "localdensity": 0.0,
         "density": 0.3414,
         "amount": 6795,
-        "amount_per_field": 1699
+        "amount_per_field": 1699,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -50658,7 +51576,9 @@
         "localdensity": 0.0,
         "density": 0.06207,
         "amount": 1235,
-        "amount_per_field": 1235
+        "amount_per_field": 1235,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -50936,7 +51856,9 @@
         "localdensity": 0.0,
         "density": 50.0,
         "amount": 15271630955,
-        "amount_per_field": 15271630955
+        "amount_per_field": 15271630955,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ice",
@@ -50960,7 +51882,9 @@
         "localdensity": 0.0,
         "density": 1.196,
         "amount": 365385702,
-        "amount_per_field": 365385702
+        "amount_per_field": 365385702,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "nividium",
@@ -50984,7 +51908,9 @@
         "localdensity": 0.0,
         "density": 0.01556,
         "amount": 4753743,
-        "amount_per_field": 4753743
+        "amount_per_field": 4753743,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -51008,7 +51934,9 @@
         "localdensity": 0.0,
         "density": 8.165,
         "amount": 2493943834,
-        "amount_per_field": 831314611
+        "amount_per_field": 831314611,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -51032,7 +51960,9 @@
         "localdensity": 0.0,
         "density": 1.196,
         "amount": 365385702,
-        "amount_per_field": 365385702
+        "amount_per_field": 365385702,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -51147,7 +52077,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 4691445029361,
-        "amount_per_field": 4691445029361
+        "amount_per_field": 4691445029361,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -51268,7 +52200,9 @@
         "localdensity": 0.0,
         "density": 100.0,
         "amount": 162366,
-        "amount_per_field": 162366
+        "amount_per_field": 162366,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -51383,7 +52317,9 @@
         "localdensity": 0.1,
         "density": 855.0,
         "amount": 4080388895776,
-        "amount_per_field": 4080388895776
+        "amount_per_field": 4080388895776,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -51508,7 +52444,9 @@
         "localdensity": 0.0,
         "density": 22.34,
         "amount": 6784404,
-        "amount_per_field": 6784404
+        "amount_per_field": 6784404,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -52013,7 +52951,9 @@
         "localdensity": 0.0,
         "density": 1.675,
         "amount": 455336,
-        "amount_per_field": 227668
+        "amount_per_field": 227668,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "nividium",
@@ -52037,7 +52977,9 @@
         "localdensity": 0.0,
         "density": 0.009033,
         "amount": 2456,
-        "amount_per_field": 2456
+        "amount_per_field": 2456,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -52061,7 +53003,9 @@
         "localdensity": 0.0,
         "density": 7.639,
         "amount": 2076937,
-        "amount_per_field": 346156
+        "amount_per_field": 346156,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "rawscrap",
@@ -52085,7 +53029,9 @@
         "localdensity": 0.0,
         "density": 2412.0,
         "amount": 655807550,
-        "amount_per_field": 81975944
+        "amount_per_field": 81975944,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -52109,7 +53055,9 @@
         "localdensity": 0.0,
         "density": 29.71,
         "amount": 8076932,
-        "amount_per_field": 2019233
+        "amount_per_field": 2019233,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -52346,7 +53294,9 @@
         "localdensity": 0.0,
         "density": 0.06207,
         "amount": 988377,
-        "amount_per_field": 988377
+        "amount_per_field": 988377,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -52370,7 +53320,9 @@
         "localdensity": 0.0,
         "density": 0.3414,
         "amount": 5436072,
-        "amount_per_field": 1359018
+        "amount_per_field": 1359018,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -52394,7 +53346,9 @@
         "localdensity": 0.0,
         "density": 0.06207,
         "amount": 988377,
-        "amount_per_field": 988377
+        "amount_per_field": 988377,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -52559,7 +53513,9 @@
         "localdensity": 0.0,
         "density": 0.009006,
         "amount": 3585288,
-        "amount_per_field": 3585288
+        "amount_per_field": 3585288,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -52583,7 +53539,9 @@
         "localdensity": 0.0,
         "density": 3.193,
         "amount": 1271333435,
-        "amount_per_field": 423777812
+        "amount_per_field": 423777812,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -52607,7 +53565,9 @@
         "localdensity": 0.0,
         "density": 9.463,
         "amount": 3767459390,
-        "amount_per_field": 3767459390
+        "amount_per_field": 3767459390,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -52723,7 +53683,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -53073,7 +54035,9 @@
         "localdensity": 0.75,
         "density": 562.5,
         "amount": 60635192584,
-        "amount_per_field": 60635192584
+        "amount_per_field": 60635192584,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -53097,7 +54061,9 @@
         "localdensity": 0.0,
         "density": 28.39,
         "amount": 3060379756,
-        "amount_per_field": 1020126585
+        "amount_per_field": 1020126585,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -53121,7 +54087,9 @@
         "localdensity": 0.0,
         "density": 27.85,
         "amount": 3002152602,
-        "amount_per_field": 1501076301
+        "amount_per_field": 1501076301,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -53361,7 +54329,9 @@
         "localdensity": 0.75,
         "density": 592.5,
         "amount": 63869069521,
-        "amount_per_field": 63869069521
+        "amount_per_field": 63869069521,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -53385,7 +54355,9 @@
         "localdensity": 0.0,
         "density": 28.39,
         "amount": 3060379756,
-        "amount_per_field": 1020126585
+        "amount_per_field": 1020126585,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -53409,7 +54381,9 @@
         "localdensity": 0.0,
         "density": 27.85,
         "amount": 3002152602,
-        "amount_per_field": 1501076301
+        "amount_per_field": 1501076301,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -53708,7 +54682,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "hydrogen",
@@ -53732,7 +54708,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "methane",
@@ -53756,7 +54734,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -53780,7 +54760,9 @@
         "localdensity": 0.0,
         "density": 33.5,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -53804,7 +54786,9 @@
         "localdensity": 0.0,
         "density": 29.62,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -53951,7 +54935,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "hydrogen",
@@ -53975,7 +54961,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "methane",
@@ -53999,7 +54987,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -54414,7 +55404,9 @@
         "localdensity": 0.0,
         "density": 96.93,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -54438,7 +55430,9 @@
         "localdensity": 0.0,
         "density": 29.62,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -54607,7 +55601,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "hydrogen",
@@ -54631,7 +55627,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "methane",
@@ -54655,7 +55653,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -54846,7 +55846,9 @@
         "localdensity": 0.0,
         "density": 57.71,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -55012,7 +56014,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "hydrogen",
@@ -55036,7 +56040,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "methane",
@@ -55060,7 +56066,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -56152,7 +57160,9 @@
         "localdensity": 0.0,
         "density": 0.009033,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -56176,7 +57186,9 @@
         "localdensity": 0.0,
         "density": 97.48,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -56200,7 +57212,9 @@
         "localdensity": 0.0,
         "density": 29.71,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -56449,7 +57463,9 @@
         "localdensity": 0.0,
         "density": 0.009033,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -56473,7 +57489,9 @@
         "localdensity": 0.0,
         "density": 97.46,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -56497,7 +57515,9 @@
         "localdensity": 0.0,
         "density": 29.71,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -56746,7 +57766,9 @@
         "localdensity": 0.0,
         "density": 0.009033,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -56770,7 +57792,9 @@
         "localdensity": 0.0,
         "density": 97.46,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -56794,7 +57818,9 @@
         "localdensity": 0.0,
         "density": 29.71,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -57043,7 +58069,9 @@
         "localdensity": 0.0,
         "density": 0.009033,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -57067,7 +58095,9 @@
         "localdensity": 0.0,
         "density": 97.46,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -57091,7 +58121,9 @@
         "localdensity": 0.0,
         "density": 29.71,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -57340,7 +58372,9 @@
         "localdensity": 0.0,
         "density": 0.009033,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -57364,7 +58398,9 @@
         "localdensity": 0.0,
         "density": 97.46,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -57388,7 +58424,9 @@
         "localdensity": 0.0,
         "density": 29.71,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -57637,7 +58675,9 @@
         "localdensity": 0.0,
         "density": 0.009033,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -57661,7 +58701,9 @@
         "localdensity": 0.0,
         "density": 97.46,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -57685,7 +58727,9 @@
         "localdensity": 0.0,
         "density": 29.71,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -57934,7 +58978,9 @@
         "localdensity": 0.0,
         "density": 0.009033,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -57958,7 +59004,9 @@
         "localdensity": 0.0,
         "density": 97.46,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -57982,7 +59030,9 @@
         "localdensity": 0.0,
         "density": 29.71,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -58231,7 +59281,9 @@
         "localdensity": 0.0,
         "density": 0.009033,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -58255,7 +59307,9 @@
         "localdensity": 0.0,
         "density": 97.46,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -58279,7 +59333,9 @@
         "localdensity": 0.0,
         "density": 29.71,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -58528,7 +59584,9 @@
         "localdensity": 0.0,
         "density": 0.009033,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -58552,7 +59610,9 @@
         "localdensity": 0.0,
         "density": 97.46,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -58576,7 +59636,9 @@
         "localdensity": 0.0,
         "density": 29.71,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -59016,7 +60078,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -59355,7 +60419,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -59602,7 +60668,9 @@
         "localdensity": 0.0,
         "density": 7.156,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -59626,7 +60694,9 @@
         "localdensity": 0.0,
         "density": 81.65,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -59650,7 +60720,9 @@
         "localdensity": 0.0,
         "density": 29.62,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -59849,7 +60921,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -59873,7 +60947,9 @@
         "localdensity": 0.0,
         "density": 3.006,
         "amount": 30294200,
-        "amount_per_field": 15147100
+        "amount_per_field": 15147100,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -59897,7 +60973,9 @@
         "localdensity": 0.0,
         "density": 4.732,
         "amount": 47681908,
-        "amount_per_field": 23840954
+        "amount_per_field": 23840954,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -60186,7 +61264,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -60210,7 +61290,9 @@
         "localdensity": 0.0,
         "density": 0.9203,
         "amount": 8243934,
-        "amount_per_field": 1373989
+        "amount_per_field": 1373989,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -60234,7 +61316,9 @@
         "localdensity": 0.0,
         "density": 7.262,
         "amount": 65047541,
-        "amount_per_field": 16261885
+        "amount_per_field": 16261885,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -60480,7 +61564,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 22394026,
-        "amount_per_field": 22394026
+        "amount_per_field": 22394026,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "hydrogen",
@@ -60504,7 +61590,9 @@
         "localdensity": 0.0,
         "density": 850.0,
         "amount": 634497415,
-        "amount_per_field": 634497415
+        "amount_per_field": 634497415,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "methane",
@@ -60528,7 +61616,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 22394026,
-        "amount_per_field": 22394026
+        "amount_per_field": 22394026,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -60678,7 +61768,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 14929351,
-        "amount_per_field": 14929351
+        "amount_per_field": 14929351,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "hydrogen",
@@ -60702,7 +61794,9 @@
         "localdensity": 0.0,
         "density": 850.0,
         "amount": 422998277,
-        "amount_per_field": 422998277
+        "amount_per_field": 422998277,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "methane",
@@ -60726,7 +61820,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 14929351,
-        "amount_per_field": 14929351
+        "amount_per_field": 14929351,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -61088,7 +62184,9 @@
         "localdensity": 0.0,
         "density": 4.726,
         "amount": 2351847,
-        "amount_per_field": 470369
+        "amount_per_field": 470369,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "nividium",
@@ -61112,7 +62210,9 @@
         "localdensity": 0.0,
         "density": 78.29,
         "amount": 38961591,
-        "amount_per_field": 19480796
+        "amount_per_field": 19480796,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -61136,7 +62236,9 @@
         "localdensity": 0.0,
         "density": 12.6,
         "amount": 6271059,
-        "amount_per_field": 1045176
+        "amount_per_field": 1045176,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -61160,7 +62262,9 @@
         "localdensity": 0.0,
         "density": 21.71,
         "amount": 10803097,
-        "amount_per_field": 2160619
+        "amount_per_field": 2160619,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -61515,7 +62619,9 @@
         "localdensity": 0.0,
         "density": 4.726,
         "amount": 739051,
-        "amount_per_field": 147810
+        "amount_per_field": 147810,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "nividium",
@@ -61539,7 +62645,9 @@
         "localdensity": 0.0,
         "density": 78.31,
         "amount": 12245844,
-        "amount_per_field": 4081948
+        "amount_per_field": 4081948,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -61563,7 +62671,9 @@
         "localdensity": 0.0,
         "density": 12.6,
         "amount": 1970637,
-        "amount_per_field": 328440
+        "amount_per_field": 328440,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -61587,7 +62697,9 @@
         "localdensity": 0.0,
         "density": 21.71,
         "amount": 3394798,
-        "amount_per_field": 678960
+        "amount_per_field": 678960,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -61737,7 +62849,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 201546238,
-        "amount_per_field": 201546238
+        "amount_per_field": 201546238,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "hydrogen",
@@ -61761,7 +62875,9 @@
         "localdensity": 0.0,
         "density": 850.0,
         "amount": 5710476736,
-        "amount_per_field": 5710476736
+        "amount_per_field": 5710476736,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "methane",
@@ -61785,7 +62901,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 201546238,
-        "amount_per_field": 201546238
+        "amount_per_field": 201546238,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -61935,7 +63053,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 201546238,
-        "amount_per_field": 201546238
+        "amount_per_field": 201546238,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "hydrogen",
@@ -61959,7 +63079,9 @@
         "localdensity": 0.0,
         "density": 850.0,
         "amount": 5710476736,
-        "amount_per_field": 5710476736
+        "amount_per_field": 5710476736,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "methane",
@@ -61983,7 +63105,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 201546238,
-        "amount_per_field": 201546238
+        "amount_per_field": 201546238,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -62345,7 +63469,9 @@
         "localdensity": 0.0,
         "density": 4.726,
         "amount": 2351847,
-        "amount_per_field": 470369
+        "amount_per_field": 470369,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "nividium",
@@ -62369,7 +63495,9 @@
         "localdensity": 0.0,
         "density": 78.29,
         "amount": 38961591,
-        "amount_per_field": 19480796
+        "amount_per_field": 19480796,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -62393,7 +63521,9 @@
         "localdensity": 0.0,
         "density": 12.6,
         "amount": 6271059,
-        "amount_per_field": 1045176
+        "amount_per_field": 1045176,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -62417,7 +63547,9 @@
         "localdensity": 0.0,
         "density": 21.71,
         "amount": 10803097,
-        "amount_per_field": 2160619
+        "amount_per_field": 2160619,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -62655,7 +63787,9 @@
         "localdensity": 0.0,
         "density": 6.37,
         "amount": 9510354,
-        "amount_per_field": 2377588
+        "amount_per_field": 2377588,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "nividium",
@@ -62679,7 +63813,9 @@
         "localdensity": 0.0,
         "density": 234.9,
         "amount": 350654315,
-        "amount_per_field": 175327158
+        "amount_per_field": 175327158,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "ore",
@@ -62703,7 +63839,9 @@
         "localdensity": 0.0,
         "density": 22.01,
         "amount": 32864573,
-        "amount_per_field": 8216143
+        "amount_per_field": 8216143,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -62911,7 +64049,9 @@
         "localdensity": 0.0,
         "density": 6.37,
         "amount": 9510354,
-        "amount_per_field": 2377588
+        "amount_per_field": 2377588,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -62935,7 +64075,9 @@
         "localdensity": 0.0,
         "density": 22.01,
         "amount": 32864573,
-        "amount_per_field": 8216143
+        "amount_per_field": 8216143,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -63273,7 +64415,9 @@
         "localdensity": 0.0,
         "density": 501.1,
         "amount": 249354179,
-        "amount_per_field": 124677090
+        "amount_per_field": 124677090,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "silicon",
@@ -63297,7 +64441,9 @@
         "localdensity": 0.0,
         "density": 137.0,
         "amount": 68197197,
-        "amount_per_field": 17049299
+        "amount_per_field": 17049299,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -63537,7 +64683,9 @@
         "localdensity": 0.0,
         "density": 28.36,
         "amount": 13546636,
-        "amount_per_field": 2709327
+        "amount_per_field": 2709327,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -63561,7 +64709,9 @@
         "localdensity": 0.0,
         "density": 59.82,
         "amount": 28577315,
-        "amount_per_field": 5715463
+        "amount_per_field": 5715463,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -63859,7 +65009,9 @@
         "localdensity": 0.0,
         "density": 12.74,
         "amount": 4660073,
-        "amount_per_field": 1165018
+        "amount_per_field": 1165018,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "nividium",
@@ -63883,7 +65035,9 @@
         "localdensity": 0.0,
         "density": 469.8,
         "amount": 171820614,
-        "amount_per_field": 85910307
+        "amount_per_field": 85910307,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "ore",
@@ -63907,7 +65061,9 @@
         "localdensity": 0.0,
         "density": 44.03,
         "amount": 16103641,
-        "amount_per_field": 4025910
+        "amount_per_field": 4025910,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -63931,7 +65087,9 @@
         "localdensity": 0.0,
         "density": 128.5,
         "amount": 46992131,
-        "amount_per_field": 11748033
+        "amount_per_field": 11748033,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -64279,7 +65437,9 @@
         "localdensity": 0.0,
         "density": 4.726,
         "amount": 1728607,
-        "amount_per_field": 345721
+        "amount_per_field": 345721,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -64303,7 +65463,9 @@
         "localdensity": 0.0,
         "density": 7.338,
         "amount": 2683940,
-        "amount_per_field": 670985
+        "amount_per_field": 670985,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -64327,7 +65489,9 @@
         "localdensity": 0.0,
         "density": 20.22,
         "amount": 7394456,
-        "amount_per_field": 2464819
+        "amount_per_field": 2464819,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -64505,7 +65669,9 @@
         "localdensity": 0.0,
         "density": 4.436,
         "amount": 298032,
-        "amount_per_field": 99344
+        "amount_per_field": 99344,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -64529,7 +65695,9 @@
         "localdensity": 0.0,
         "density": 20.22,
         "amount": 1358165,
-        "amount_per_field": 452722
+        "amount_per_field": 452722,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -64783,7 +65951,9 @@
         "localdensity": 0.0,
         "density": 865.7,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -64928,7 +66098,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "hydrogen",
@@ -64952,7 +66124,9 @@
         "localdensity": 0.0,
         "density": 25.0,
         "amount": 162292713,
-        "amount_per_field": 162292713
+        "amount_per_field": 162292713,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "methane",
@@ -64976,7 +66150,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -65278,7 +66454,9 @@
         "localdensity": 0.0,
         "density": 1.843,
         "amount": 7186346,
-        "amount_per_field": 1437269
+        "amount_per_field": 1437269,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -65302,7 +66480,9 @@
         "localdensity": 0.0,
         "density": 6.259,
         "amount": 24408364,
-        "amount_per_field": 4881673
+        "amount_per_field": 4881673,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "silicon",
@@ -65326,7 +66506,9 @@
         "localdensity": 0.0,
         "density": 10.43,
         "amount": 40661852,
-        "amount_per_field": 10165463
+        "amount_per_field": 10165463,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -65715,7 +66897,9 @@
         "localdensity": 0.0,
         "density": 14.09,
         "amount": 4564142,
-        "amount_per_field": 1141036
+        "amount_per_field": 1141036,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "nividium",
@@ -65739,7 +66923,9 @@
         "localdensity": 0.0,
         "density": 234.9,
         "amount": 76092856,
-        "amount_per_field": 38046428
+        "amount_per_field": 38046428,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "ore",
@@ -65763,7 +66949,9 @@
         "localdensity": 0.0,
         "density": 37.8,
         "amount": 12247519,
-        "amount_per_field": 2041253
+        "amount_per_field": 2041253,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -65787,7 +66975,9 @@
         "localdensity": 0.0,
         "density": 62.56,
         "amount": 20267487,
-        "amount_per_field": 5066872
+        "amount_per_field": 5066872,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -66137,7 +67327,9 @@
         "localdensity": 0.0,
         "density": 6.37,
         "amount": 4084868,
-        "amount_per_field": 1021217
+        "amount_per_field": 1021217,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -66161,7 +67353,9 @@
         "localdensity": 0.0,
         "density": 22.01,
         "amount": 14115925,
-        "amount_per_field": 3528981
+        "amount_per_field": 3528981,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -66185,7 +67379,9 @@
         "localdensity": 0.0,
         "density": 60.65,
         "amount": 38890433,
-        "amount_per_field": 12963478
+        "amount_per_field": 12963478,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -66838,7 +68034,9 @@
         "localdensity": 0.0,
         "density": 47.26,
         "amount": 14429915,
-        "amount_per_field": 2885983
+        "amount_per_field": 2885983,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -66862,7 +68060,9 @@
         "localdensity": 0.0,
         "density": 126.0,
         "amount": 38476512,
-        "amount_per_field": 6412752
+        "amount_per_field": 6412752,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -66886,7 +68086,9 @@
         "localdensity": 0.0,
         "density": 217.1,
         "amount": 66283139,
-        "amount_per_field": 13256628
+        "amount_per_field": 13256628,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -67310,7 +68512,9 @@
         "localdensity": 0.0,
         "density": 47.26,
         "amount": 5304518,
-        "amount_per_field": 1060904
+        "amount_per_field": 1060904,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "nividium",
@@ -67334,7 +68538,9 @@
         "localdensity": 0.0,
         "density": 783.1,
         "amount": 87894151,
-        "amount_per_field": 29298050
+        "amount_per_field": 29298050,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "ore",
@@ -67358,7 +68564,9 @@
         "localdensity": 0.0,
         "density": 126.0,
         "amount": 14144184,
-        "amount_per_field": 2357364
+        "amount_per_field": 2357364,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "silicon",
@@ -67382,7 +68590,9 @@
         "localdensity": 0.0,
         "density": 217.1,
         "amount": 24366057,
-        "amount_per_field": 4873211
+        "amount_per_field": 4873211,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -67846,7 +69056,9 @@
         "localdensity": 0.0,
         "density": 4.726,
         "amount": 9203851,
-        "amount_per_field": 1840770
+        "amount_per_field": 1840770,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "nividium",
@@ -67870,7 +69082,9 @@
         "localdensity": 0.0,
         "density": 78.31,
         "amount": 152504830,
-        "amount_per_field": 50834943
+        "amount_per_field": 50834943,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "ore",
@@ -67894,7 +69108,9 @@
         "localdensity": 0.0,
         "density": 36.17,
         "amount": 70443101,
-        "amount_per_field": 11740517
+        "amount_per_field": 11740517,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -67918,7 +69134,9 @@
         "localdensity": 0.0,
         "density": 24.37,
         "amount": 47465008,
-        "amount_per_field": 9493002
+        "amount_per_field": 9493002,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -68114,7 +69332,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 23477469,
-        "amount_per_field": 23477469
+        "amount_per_field": 23477469,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "hydrogen",
@@ -68138,7 +69358,9 @@
         "localdensity": 0.0,
         "density": 850.0,
         "amount": 665194959,
-        "amount_per_field": 665194959
+        "amount_per_field": 665194959,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "methane",
@@ -68162,7 +69384,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 23477469,
-        "amount_per_field": 23477469
+        "amount_per_field": 23477469,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -68376,7 +69600,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 21634354,
-        "amount_per_field": 21634354
+        "amount_per_field": 21634354,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "hydrogen",
@@ -68400,7 +69626,9 @@
         "localdensity": 0.0,
         "density": 850.0,
         "amount": 612973358,
-        "amount_per_field": 612973358
+        "amount_per_field": 612973358,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "methane",
@@ -68424,7 +69652,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 21634354,
-        "amount_per_field": 21634354
+        "amount_per_field": 21634354,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -68833,7 +70063,9 @@
         "localdensity": 0.0,
         "density": 14.18,
         "amount": 20005112,
-        "amount_per_field": 4001022
+        "amount_per_field": 4001022,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "ore",
@@ -68857,7 +70089,9 @@
         "localdensity": 0.0,
         "density": 37.8,
         "amount": 53342445,
-        "amount_per_field": 8890408
+        "amount_per_field": 8890408,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -68881,7 +70115,9 @@
         "localdensity": 0.0,
         "density": 65.13,
         "amount": 91892547,
-        "amount_per_field": 18378509
+        "amount_per_field": 18378509,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -69677,7 +70913,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "hydrogen",
@@ -69701,7 +70939,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "methane",
@@ -69725,7 +70965,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -70022,7 +71264,9 @@
         "localdensity": 0.0,
         "density": 156.6,
         "amount": 1067533810,
-        "amount_per_field": 355844603
+        "amount_per_field": 355844603,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "ore",
@@ -70046,7 +71290,9 @@
         "localdensity": 0.0,
         "density": 25.2,
         "amount": 171790660,
-        "amount_per_field": 28631777
+        "amount_per_field": 28631777,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -70070,7 +71316,9 @@
         "localdensity": 0.0,
         "density": 43.42,
         "amount": 295942215,
-        "amount_per_field": 59188443
+        "amount_per_field": 59188443,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -70215,7 +71463,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "hydrogen",
@@ -70239,7 +71489,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "methane",
@@ -70263,7 +71515,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -70560,7 +71814,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 74993198,
-        "amount_per_field": 74993198
+        "amount_per_field": 74993198,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "hydrogen",
@@ -70584,7 +71840,9 @@
         "localdensity": 0.0,
         "density": 50.0,
         "amount": 124988664,
-        "amount_per_field": 124988664
+        "amount_per_field": 124988664,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "methane",
@@ -70608,7 +71866,9 @@
         "localdensity": 0.0,
         "density": 30.0,
         "amount": 74993198,
-        "amount_per_field": 74993198
+        "amount_per_field": 74993198,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "rawscrap",
@@ -70632,7 +71892,9 @@
         "localdensity": 0.0,
         "density": 33.18,
         "amount": 82947341,
-        "amount_per_field": 20736835
+        "amount_per_field": 20736835,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -70784,7 +72046,9 @@
         "localdensity": 0.0,
         "density": 14.68,
         "amount": 22716180,
-        "amount_per_field": 5679045
+        "amount_per_field": 5679045,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -70936,7 +72200,9 @@
         "localdensity": 0.0,
         "density": 14.68,
         "amount": 10120757,
-        "amount_per_field": 2530189
+        "amount_per_field": 2530189,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -71284,7 +72550,9 @@
         "localdensity": 0.0,
         "density": 60.0,
         "amount": 476893765,
-        "amount_per_field": 476893765
+        "amount_per_field": 476893765,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "hydrogen",
@@ -71308,7 +72576,9 @@
         "localdensity": 0.0,
         "density": 60.0,
         "amount": 476893765,
-        "amount_per_field": 476893765
+        "amount_per_field": 476893765,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "methane",
@@ -71332,7 +72602,9 @@
         "localdensity": 0.0,
         "density": 60.0,
         "amount": 476893765,
-        "amount_per_field": 476893765
+        "amount_per_field": 476893765,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "nividium",
@@ -71356,7 +72628,9 @@
         "localdensity": 0.0,
         "density": 0.01801,
         "amount": 143158,
-        "amount_per_field": 143158
+        "amount_per_field": 143158,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "ore",
@@ -71380,7 +72654,9 @@
         "localdensity": 0.0,
         "density": 15.23,
         "amount": 121067808,
-        "amount_per_field": 20177968
+        "amount_per_field": 20177968,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -71404,7 +72680,9 @@
         "localdensity": 0.0,
         "density": 59.24,
         "amount": 470816728,
-        "amount_per_field": 117704182
+        "amount_per_field": 117704182,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -71769,7 +73047,9 @@
         "localdensity": 0.0,
         "density": 90.0,
         "amount": 29157355,
-        "amount_per_field": 29157355
+        "amount_per_field": 29157355,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -72070,7 +73350,9 @@
         "localdensity": 0.0,
         "density": 501.2,
         "amount": 249403750,
-        "amount_per_field": 83134583
+        "amount_per_field": 83134583,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "ore",
@@ -72094,7 +73376,9 @@
         "localdensity": 0.0,
         "density": 80.65,
         "amount": 40134780,
-        "amount_per_field": 6689130
+        "amount_per_field": 6689130,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -72118,7 +73402,9 @@
         "localdensity": 0.0,
         "density": 138.9,
         "amount": 69139823,
-        "amount_per_field": 13827965
+        "amount_per_field": 13827965,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -72419,7 +73705,9 @@
         "localdensity": 0.0,
         "density": 501.2,
         "amount": 561158437,
-        "amount_per_field": 187052812
+        "amount_per_field": 187052812,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "ore",
@@ -72443,7 +73731,9 @@
         "localdensity": 0.0,
         "density": 80.65,
         "amount": 90303255,
-        "amount_per_field": 15050542
+        "amount_per_field": 15050542,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -72467,7 +73757,9 @@
         "localdensity": 0.0,
         "density": 138.9,
         "amount": 155564601,
-        "amount_per_field": 31112920
+        "amount_per_field": 31112920,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -72633,7 +73925,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -73190,7 +74484,9 @@
         "localdensity": 0.0,
         "density": 496.2,
         "amount": 131934003,
-        "amount_per_field": 32983501
+        "amount_per_field": 32983501,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -73321,7 +74617,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "methane",
@@ -73345,7 +74643,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -73678,7 +74978,9 @@
         "localdensity": 0.0,
         "density": 234.9,
         "amount": 76092856,
-        "amount_per_field": 38046428
+        "amount_per_field": 38046428,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "ore",
@@ -73702,7 +75004,9 @@
         "localdensity": 0.0,
         "density": 33.2,
         "amount": 10756046,
-        "amount_per_field": 2689012
+        "amount_per_field": 2689012,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -73726,7 +75030,9 @@
         "localdensity": 0.0,
         "density": 32.95,
         "amount": 10675908,
-        "amount_per_field": 3558636
+        "amount_per_field": 3558636,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -73893,7 +75199,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "hydrogen",
@@ -73917,7 +75225,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       },
       {
         "ware": "methane",
@@ -73941,7 +75251,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -74249,7 +75561,9 @@
         "localdensity": 0.0,
         "density": 234.9,
         "amount": 150612335,
-        "amount_per_field": 75306168
+        "amount_per_field": 75306168,
+        "yield": "midhigh",
+        "level": 4
       },
       {
         "ware": "ore",
@@ -74273,7 +75587,9 @@
         "localdensity": 0.0,
         "density": 24.5,
         "amount": 15707779,
-        "amount_per_field": 5235926
+        "amount_per_field": 5235926,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "silicon",
@@ -74297,7 +75613,9 @@
         "localdensity": 0.0,
         "density": 32.95,
         "amount": 21131070,
-        "amount_per_field": 7043690
+        "amount_per_field": 7043690,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -74549,7 +75867,9 @@
         "localdensity": 0.0,
         "density": 210.0,
         "amount": 83926007,
-        "amount_per_field": 83926007
+        "amount_per_field": 83926007,
+        "yield": "medium",
+        "level": 3
       }
     ]
   },
@@ -74865,7 +76185,9 @@
         "localdensity": 0.0,
         "density": 343.4,
         "amount": 25633345,
-        "amount_per_field": 5126669
+        "amount_per_field": 5126669,
+        "yield": "medium",
+        "level": 3
       },
       {
         "ware": "methane",
@@ -74889,7 +76211,9 @@
         "localdensity": 0.0,
         "density": 49.2,
         "amount": 3672620,
-        "amount_per_field": 3672620
+        "amount_per_field": 3672620,
+        "yield": "midlow",
+        "level": 2
       },
       {
         "ware": "nividium",
@@ -74913,7 +76237,9 @@
         "localdensity": 0.0,
         "density": 1284.0,
         "amount": 95864566,
-        "amount_per_field": 31954855
+        "amount_per_field": 31954855,
+        "yield": "high",
+        "level": 5
       },
       {
         "ware": "ore",
@@ -74937,7 +76263,9 @@
         "localdensity": 0.0,
         "density": 30.64,
         "amount": 2286832,
-        "amount_per_field": 381139
+        "amount_per_field": 381139,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -75500,7 +76828,9 @@
         "localdensity": 0.0,
         "density": 21.49,
         "amount": 262027734,
-        "amount_per_field": 87342578
+        "amount_per_field": 87342578,
+        "yield": "midlow",
+        "level": 2
       }
     ]
   },
@@ -75747,7 +77077,9 @@
         "localdensity": 0.0,
         "density": 1.659,
         "amount": 7921089,
-        "amount_per_field": 1980272
+        "amount_per_field": 1980272,
+        "yield": "low",
+        "level": 1
       }
     ]
   },
@@ -75920,7 +77252,9 @@
         "localdensity": 0.0,
         "density": 0.0,
         "amount": 0,
-        "amount_per_field": 0
+        "amount_per_field": 0,
+        "yield": "low",
+        "level": 1
       }
     ]
   }

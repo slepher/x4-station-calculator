@@ -111,12 +111,18 @@
 - **那么** 系统 SHALL 输出代表矿区的总量
 - **并且** SHALL 输出代表矿区的密度
 
-#### Scenario: 将新聚合写入独立字段并保持旧资源列表为空
+#### Scenario: 将新聚合直接写入 sector.resources
 - **前提** 系统已经生成 sector 级数值资源聚合结果
 - **当** 系统写入地图数据产物
-- **那么** 系统 SHALL 将新聚合结果写入独立的 sector 字段
-- **并且** SHALL 允许旧 `sector.resources` 在当前 change 中保持为空数组
-- **并且** SHALL 将前端切换读取路径留给后续独立 change
+- **那么** 系统 SHALL 将聚合结果直接写入 `sector.resources`
+
+#### Scenario: 代表密度驱动 yield 与 level 分档
+- **前提** 系统已得到某个 sector 资源的 `representative_density`
+- **当** 系统写入 sector 聚合结果
+- **那么** 系统 SHALL 输出 `yield` 与 `level`
+- **并且** `nividium` SHALL 使用 `0.1 ~ 1000` 的 10 倍对数五档
+- **并且** 其他资源 SHALL 使用 `1 ~ 10000` 的 10 倍对数五档
+- **并且** 档位名 SHALL 依次为 `low`、`midlow`、`medium`、`midhigh`、`high`
 
 #### Scenario: 额外记录总量最高矿区的密度
 - **前提** 某个 sector 的某资源存在总量最高矿区
