@@ -3,6 +3,7 @@ import shutil
 import glob
 import json
 import sys
+import argparse
 from copy import deepcopy
 from lxml import etree
 
@@ -16,25 +17,59 @@ def load_all_configs():
         m_config = json.load(f)
     with open(version_file, 'r', encoding='utf-8') as f:
         v_config = json.load(f)
-
-    # 从 versions 数组中查找当前版本配置
-    current_version = v_config.get('current_version')
-    is_beta = v_config.get('beta', False)
-    versions = v_config.get('versions', [])
-    version_config = None
-    for v in versions:
-        if v.get('version') == current_version and v.get('beta', False) == is_beta:
-            version_config = v
-            break
-
-    if version_config is None:
-        beta_str = "beta" if is_beta else "stable"
-        raise ValueError(f"❌ 错误: 未找到版本 {current_version} ({beta_str}) 的配置。")
-
-    # 将版本配置合并到 v_config 顶层（保持兼容）
-    v_config.update(version_config)
-
     return m_config, v_config, config_dir
+
+def parse_args():
+    arg_parser = argparse.ArgumentParser(description="X4 资产蒸馏脚本")
+    mode_group = arg_parser.add_mutually_exclusive_group()
+    mode_group.add_argument("--all-versions", action="store_true", help="蒸馏配置中的所有版本")
+    mode_group.add_argument("--version", type=str, help="蒸馏指定版本号，例如 8.0 或 9.0")
+    flavor_group = arg_parser.add_mutually_exclusive_group()
+    flavor_group.add_argument("--beta", action="store_true", help="选择 beta 版本")
+    flavor_group.add_argument("--stable", action="store_true", help="选择 stable 版本")
+    return arg_parser.parse_args()
+
+def get_target_versions(v_config, args):
+    versions = v_config.get('versions', [])
+    if not versions:
+        raise ValueError("❌ 错误: 配置中缺少 versions 数组。")
+
+    if args.all_versions:
+        return versions
+
+    def matches_flavor(version_item):
+        if args.beta:
+            return bool(version_item.get('beta', False)) is True
+        if args.stable:
+            return bool(version_item.get('beta', False)) is False
+        return True
+
+    if args.version:
+        candidates = [v for v in versions if str(v.get('version')) == str(args.version) and matches_flavor(v)]
+        if not candidates:
+            raise ValueError(f"❌ 错误: 未找到版本 {args.version}（请检查 beta/stable 选项）。")
+        if len(candidates) > 1:
+            raise ValueError(f"❌ 错误: 版本 {args.version} 同时存在多个候选，请显式指定 --beta 或 --stable。")
+        return candidates
+
+    current_version = v_config.get('current_version')
+    current_beta = bool(v_config.get('beta', False))
+    if args.beta:
+        current_beta = True
+    elif args.stable:
+        current_beta = False
+
+    for version_item in versions:
+        if str(version_item.get('version')) == str(current_version) and bool(version_item.get('beta', False)) == current_beta:
+            return [version_item]
+
+    beta_str = "beta" if current_beta else "stable"
+    raise ValueError(f"❌ 错误: 未找到版本 {current_version} ({beta_str}) 的配置。")
+
+def merge_version_config(v_config, version_item):
+    merged = deepcopy(v_config)
+    merged.update(version_item)
+    return merged
 
 def setup_customizer(m_config):
     paths = m_config.get('X4_PATHS', {})
@@ -49,10 +84,7 @@ def setup_customizer(m_config):
     except ImportError:
         raise ImportError("❌ 错误: 无法加载 Customizer 框架逻辑。")
 
-def main():
-    # 1. 加载配置与初始化
-    m_config, v_config, config_dir = load_all_configs()
-    xml_diff = setup_customizer(m_config)
+def run_distillation_for_version(m_config, v_config, config_dir, xml_diff):
 
     paths = m_config['X4_PATHS']
     src = os.path.normpath(os.path.join(config_dir, paths['SOURCE'], v_config['folder_name']))
@@ -319,46 +351,48 @@ def main():
         ["galaxy.xml", "*clusters.xml", "*sectors.xml", "*zones.xml", "*zonehighways.xml", "*sechighways.xml"]
     )
 
-    # --- 步骤 5: 处理核心库文件 (wares/waregroups/colors/ships/shipgroups/loadouts) ---
-    print("📂 [5/10] 正在处理核心库文件 (Wares/Waregroups/Colors/Ships/Shipgroups/Loadouts)...")
+    # --- 步骤 5: 处理库与任务脚本文件 ---
+    print("📂 [5/10] 正在处理核心 XML 文件 (libraries + md)...")
     lib_dest_dir = os.path.join(dest_root, "libraries")
     os.makedirs(lib_dest_dir, exist_ok=True)
 
-    lib_files = [
-        { 'name': 'wares.xml', 'final': 'wares_final.xml' },
-        { 'name': 'waregroups.xml', 'final': 'waregroups_final.xml' },
-        { 'name': 'colors.xml', 'final': 'colors_final.xml' },
-        { 'name': 'mapdefaults.xml', 'final': 'mapdefaults_final.xml' },
-        { 'name': 'god.xml', 'final': 'god_final.xml' },
-        { 'name': 'factions.xml', 'final': 'factions_final.xml' },
-        { 'name': 'region_definitions.xml', 'final': 'region_definitions_final.xml' },
-        { 'name': 'regionyields.xml', 'final': 'regionyields_final.xml' },
-        { 'name': 'ships.xml', 'final': 'ships_final.xml' },
-        { 'name': 'shipgroups.xml', 'final': 'shipgroups_final.xml' },
-        # loadouts 需要叠加 DLC
-        { 'name': 'loadouts.xml', 'final': 'loadouts_final.xml' },
-        { 'name': 'defaults.xml', 'final': 'defaults_final.xml' }
+    xml_files = [
+        { 'path': os.path.join('libraries', 'wares.xml'), 'final': os.path.join('libraries', 'wares_final.xml') },
+        { 'path': os.path.join('libraries', 'waregroups.xml'), 'final': os.path.join('libraries', 'waregroups_final.xml') },
+        { 'path': os.path.join('libraries', 'colors.xml'), 'final': os.path.join('libraries', 'colors_final.xml') },
+        { 'path': os.path.join('libraries', 'mapdefaults.xml'), 'final': os.path.join('libraries', 'mapdefaults_final.xml') },
+        { 'path': os.path.join('libraries', 'god.xml'), 'final': os.path.join('libraries', 'god_final.xml') },
+        { 'path': os.path.join('libraries', 'factions.xml'), 'final': os.path.join('libraries', 'factions_final.xml') },
+        { 'path': os.path.join('libraries', 'region_definitions.xml'), 'final': os.path.join('libraries', 'region_definitions_final.xml') },
+        { 'path': os.path.join('libraries', 'regionyields.xml'), 'final': os.path.join('libraries', 'regionyields_final.xml') },
+        { 'path': os.path.join('libraries', 'ships.xml'), 'final': os.path.join('libraries', 'ships_final.xml') },
+        { 'path': os.path.join('libraries', 'shipgroups.xml'), 'final': os.path.join('libraries', 'shipgroups_final.xml') },
+        { 'path': os.path.join('libraries', 'loadouts.xml'), 'final': os.path.join('libraries', 'loadouts_final.xml') },
+        { 'path': os.path.join('libraries', 'defaults.xml'), 'final': os.path.join('libraries', 'defaults_final.xml') },
+        { 'path': os.path.join('md', 'factionlogic.xml'), 'final': os.path.join('md', 'factionlogic_final.xml') },
     ]
 
-    for lib_file in lib_files:
-        lib_name = lib_file['name']
-        final_name = lib_file['final']
-        print(f"   🔨 处理 {lib_name} ...")
-        # 1. 拷贝 Base
-        base_src = os.path.join(src, "libraries", lib_name)
-        target_path = os.path.join(lib_dest_dir, lib_name)
-        
+    for xml_file in xml_files:
+        relative_path = os.path.normpath(xml_file['path'])
+        final_relative_path = os.path.normpath(xml_file['final'])
+        print(f"   🔨 处理 {relative_path} ...")
+
+        base_src = os.path.join(src, relative_path)
+        target_path = os.path.join(dest_root, relative_path)
+        final_output_path = os.path.join(dest_root, final_relative_path)
+        os.makedirs(os.path.dirname(target_path), exist_ok=True)
+        os.makedirs(os.path.dirname(final_output_path), exist_ok=True)
+
         if os.path.exists(base_src):
             shutil.copy2(base_src, target_path)
         else:
             print(f"      ⚠️ Base 文件不存在: {base_src}")
             continue
 
-        # 2. 合并 DLC Patch
+        # 合并 DLC Patch
         base_tree = etree.parse(target_path, parser)
         for dlc_id in dlc_order:
-            # Patch 位于 SOURCE 目录的 extensions 中
-            patch_path = os.path.join(src, "extensions", dlc_id, "libraries", lib_name)
+            patch_path = os.path.join(src, "extensions", dlc_id, relative_path)
             if os.path.exists(patch_path):
                 print(f"      [+] 注入补丁 ({dlc_id})")
                 try:
@@ -366,9 +400,8 @@ def main():
                     xml_diff.Apply_Patch(base_tree.getroot(), patch_tree.getroot())
                 except Exception as e:
                     print(f"      ⚠️ 警告: 补丁失败 {dlc_id}: {e}")
-        
-        # 3. 写入 Final
-        final_output_path = os.path.join(lib_dest_dir, final_name)
+
+        # 写入 Final
         base_tree.write(final_output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
         print(f"      ✨ 生成: {os.path.basename(final_output_path)}")
 
@@ -844,6 +877,21 @@ def main():
         print(f"   ✅ 所有 equipment wares 都已导出！")
 
     print(f"✨ 全流程结束！资产已蒸馏至 {dest_root}")
+
+def main():
+    args = parse_args()
+    m_config, v_config, config_dir = load_all_configs()
+    target_versions = get_target_versions(v_config, args)
+    xml_diff = setup_customizer(m_config)
+
+    print(f"🧭 计划蒸馏 {len(target_versions)} 个版本。")
+    for version_item in target_versions:
+        effective_v_config = merge_version_config(v_config, version_item)
+        version_label = str(effective_v_config.get('version'))
+        flavor = "beta" if effective_v_config.get('beta', False) else "stable"
+        folder_name = effective_v_config.get('folder_name', '')
+        print(f"\n🚀 版本开始: {version_label} ({flavor}) -> {folder_name}")
+        run_distillation_for_version(m_config, effective_v_config, config_dir, xml_diff)
 
 if __name__ == "__main__":
     try:
