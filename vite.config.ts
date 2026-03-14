@@ -1,22 +1,13 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
-import { viteStaticCopy } from 'vite-plugin-static-copy'
 
 const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 5174;
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    vue(),
-    viteStaticCopy({
-      targets: [
-        {
-          src: 'src/assets/x4_game_data',
-          dest: 'assets'
-        }
-      ]
-    })
+    vue()
   ],
   base: '/x4-station-calculator/', // 你的 GitHub 仓库名
   preview: {

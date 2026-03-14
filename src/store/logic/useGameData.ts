@@ -72,13 +72,34 @@ export type GameDataFiles = {
   languages: X4Language[]
 }
 
-export async function loadGameDataFiles(folderName: string): Promise<GameDataFiles> {
-  const base = `${import.meta.env.BASE_URL}assets/x4_game_data/${folderName}/data`
+type JsonModule<T = unknown> = { default: T }
+type JsonLoader = () => Promise<unknown>
+type GameDataLoaderMap = Record<string, JsonLoader>
 
-  const fetchJson = async (file: string) => {
-    const response = await fetch(`${base}/${file}`)
-    return response.json()
+const gameDataLoaders = import.meta.glob('/src/assets/x4_game_data/*/data/*.json')
+
+export function buildGameDataLoaderKey(folderName: string, file: string): string {
+  return `/src/assets/x4_game_data/${folderName}/data/${file}`
+}
+
+async function loadJsonFromBundle<T>(
+  folderName: string,
+  file: string,
+  loaders: GameDataLoaderMap = gameDataLoaders
+): Promise<T> {
+  const key = buildGameDataLoaderKey(folderName, file)
+  const loader = loaders[key]
+  if (!loader) {
+    throw new Error(`[GameData] Missing bundled data file '${file}' for folder '${folderName}'`)
   }
+  const mod = await loader() as JsonModule<T>
+  return mod.default
+}
+
+export async function loadGameDataFiles(
+  folderName: string,
+  loaders: GameDataLoaderMap = gameDataLoaders
+): Promise<GameDataFiles> {
 
   const [
     wares, modules, moduleGroups, consumption,
@@ -88,26 +109,26 @@ export async function loadGameDataFiles(folderName: string): Promise<GameDataFil
     maps, regionyields, factions,
     defaultMaxes, shipSlots, languages
   ] = await Promise.all([
-    fetchJson('wares.json'),
-    fetchJson('modules.json'),
-    fetchJson('module_groups.json'),
-    fetchJson('consumption.json'),
-    fetchJson('ships.json'),
-    fetchJson('ship_races.json'),
-    fetchJson('ship_types.json'),
-    fetchJson('equipments.json'),
-    fetchJson('equipment_types.json'),
-    fetchJson('slot_tags.json'),
-    fetchJson('consumables.json'),
-    fetchJson('drones.json'),
-    fetchJson('missiles.json'),
-    fetchJson('bullets.json'),
-    fetchJson('maps.json'),
-    fetchJson('regionyields.json'),
-    fetchJson('factions.json'),
-    fetchJson('default_maxes.json'),
-    fetchJson('ship_slots.json'),
-    fetchJson('languages.json')
+    loadJsonFromBundle<X4Ware[]>(folderName, 'wares.json', loaders),
+    loadJsonFromBundle<X4Module[]>(folderName, 'modules.json', loaders),
+    loadJsonFromBundle<X4ModuleGroup[]>(folderName, 'module_groups.json', loaders),
+    loadJsonFromBundle<RaceMedicalConsumption>(folderName, 'consumption.json', loaders),
+    loadJsonFromBundle<X4Ship[]>(folderName, 'ships.json', loaders),
+    loadJsonFromBundle<X4ShipRace[]>(folderName, 'ship_races.json', loaders),
+    loadJsonFromBundle<X4ShipType[]>(folderName, 'ship_types.json', loaders),
+    loadJsonFromBundle<X4Equipment[]>(folderName, 'equipments.json', loaders),
+    loadJsonFromBundle<X4EquipmentType[]>(folderName, 'equipment_types.json', loaders),
+    loadJsonFromBundle<X4SlotTag[]>(folderName, 'slot_tags.json', loaders),
+    loadJsonFromBundle<X4Consumable[]>(folderName, 'consumables.json', loaders),
+    loadJsonFromBundle<X4Drone[]>(folderName, 'drones.json', loaders),
+    loadJsonFromBundle<X4Missile[]>(folderName, 'missiles.json', loaders),
+    loadJsonFromBundle<X4Bullet[]>(folderName, 'bullets.json', loaders),
+    loadJsonFromBundle<X4Map>(folderName, 'maps.json', loaders),
+    loadJsonFromBundle<X4RegionYield[]>(folderName, 'regionyields.json', loaders),
+    loadJsonFromBundle<X4Faction[]>(folderName, 'factions.json', loaders),
+    loadJsonFromBundle<Record<string, X4DefaultMax>>(folderName, 'default_maxes.json', loaders),
+    loadJsonFromBundle<Record<string, X4ShipSlot[]>>(folderName, 'ship_slots.json', loaders),
+    loadJsonFromBundle<X4Language[]>(folderName, 'languages.json', loaders)
   ])
 
   return {
