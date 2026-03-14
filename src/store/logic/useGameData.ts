@@ -73,7 +73,12 @@ export type GameDataFiles = {
 }
 
 export async function loadGameDataFiles(folderName: string): Promise<GameDataFiles> {
-  const base = `../../assets/x4_game_data/${folderName}/data`
+  const base = `${import.meta.env.BASE_URL}assets/x4_game_data/${folderName}/data`
+
+  const fetchJson = async (file: string) => {
+    const response = await fetch(`${base}/${file}`)
+    return response.json()
+  }
 
   const [
     wares, modules, moduleGroups, consumption,
@@ -83,26 +88,26 @@ export async function loadGameDataFiles(folderName: string): Promise<GameDataFil
     maps, regionyields, factions,
     defaultMaxes, shipSlots, languages
   ] = await Promise.all([
-    import(/* @vite-ignore */ `${base}/wares.json`).then(m => m.default),
-    import(/* @vite-ignore */ `${base}/modules.json`).then(m => m.default),
-    import(/* @vite-ignore */ `${base}/module_groups.json`).then(m => m.default),
-    import(/* @vite-ignore */ `${base}/consumption.json`).then(m => m.default),
-    import(/* @vite-ignore */ `${base}/ships.json`).then(m => m.default),
-    import(/* @vite-ignore */ `${base}/ship_races.json`).then(m => m.default),
-    import(/* @vite-ignore */ `${base}/ship_types.json`).then(m => m.default),
-    import(/* @vite-ignore */ `${base}/equipments.json`).then(m => m.default),
-    import(/* @vite-ignore */ `${base}/equipment_types.json`).then(m => m.default),
-    import(/* @vite-ignore */ `${base}/slot_tags.json`).then(m => m.default),
-    import(/* @vite-ignore */ `${base}/consumables.json`).then(m => m.default),
-    import(/* @vite-ignore */ `${base}/drones.json`).then(m => m.default),
-    import(/* @vite-ignore */ `${base}/missiles.json`).then(m => m.default),
-    import(/* @vite-ignore */ `${base}/bullets.json`).then(m => m.default),
-    import(/* @vite-ignore */ `${base}/maps.json`).then(m => m.default),
-    import(/* @vite-ignore */ `${base}/regionyields.json`).then(m => m.default),
-    import(/* @vite-ignore */ `${base}/factions.json`).then(m => m.default),
-    import(/* @vite-ignore */ `${base}/default_maxes.json`).then(m => m.default),
-    import(/* @vite-ignore */ `${base}/ship_slots.json`).then(m => m.default),
-    import(/* @vite-ignore */ `${base}/languages.json`).then(m => m.default)
+    fetchJson('wares.json'),
+    fetchJson('modules.json'),
+    fetchJson('module_groups.json'),
+    fetchJson('consumption.json'),
+    fetchJson('ships.json'),
+    fetchJson('ship_races.json'),
+    fetchJson('ship_types.json'),
+    fetchJson('equipments.json'),
+    fetchJson('equipment_types.json'),
+    fetchJson('slot_tags.json'),
+    fetchJson('consumables.json'),
+    fetchJson('drones.json'),
+    fetchJson('missiles.json'),
+    fetchJson('bullets.json'),
+    fetchJson('maps.json'),
+    fetchJson('regionyields.json'),
+    fetchJson('factions.json'),
+    fetchJson('default_maxes.json'),
+    fetchJson('ship_slots.json'),
+    fetchJson('languages.json')
   ])
 
   return {
