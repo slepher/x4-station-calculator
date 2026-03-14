@@ -1,0 +1,173 @@
+[
+  {
+    "id": "destroyer",
+    "nameId": "{20221,4001}",
+    "name": "Destroyer",
+    "class": [
+      "ship_l"
+    ]
+  },
+  {
+    "id": "largeminer",
+    "nameId": "{20221,3041}",
+    "name": "Miner",
+    "class": [
+      "ship_l"
+    ]
+  },
+  {
+    "id": "freighter",
+    "nameId": "{20221,4011}",
+    "name": "Freighter",
+    "class": [
+      "ship_l"
+    ]
+  },
+  {
+    "id": "gunboat",
+    "nameId": "{20221,5041}",
+    "name": "Gunboat",
+    "class": [
+      "ship_m"
+    ]
+  },
+  {
+    "id": "scavenger",
+    "nameId": "{20221,3061}",
+    "name": "Scavenger",
+    "class": [
+      "ship_l",
+      "ship_m"
+    ]
+  },
+  {
+    "id": "frigate",
+    "nameId": "{20221,3011}",
+    "name": "Frigate",
+    "class": [
+      "ship_m"
+    ]
+  },
+  {
+    "id": "miner",
+    "nameId": "{20221,3041}",
+    "name": "Miner",
+    "class": [
+      "ship_m",
+      "ship_s"
+    ]
+  },
+  {
+    "id": "transporter",
+    "nameId": "{20221,3031}",
+    "name": "Transporter",
+    "class": [
+      "ship_m"
+    ]
+  },
+  {
+    "id": "fighter",
+    "nameId": "{20221,2011}",
+    "name": "Fighter",
+    "class": [
+      "ship_s"
+    ]
+  },
+  {
+    "id": "heavyfighter",
+    "nameId": "{20221,2021}",
+    "name": "Heavy Fighter",
+    "class": [
+      "ship_s"
+    ]
+  },
+  {
+    "id": "scout",
+    "nameId": "{20221,2001}",
+    "name": "Scout",
+    "class": [
+      "ship_s"
+    ]
+  },
+  {
+    "id": "courier",
+    "nameId": "{20221,2041}",
+    "name": "Courier",
+    "class": [
+      "ship_s"
+    ]
+  },
+  {
+    "id": "builder",
+    "nameId": "{20221,5021}",
+    "name": "Builder",
+    "class": [
+      "ship_xl"
+    ]
+  },
+  {
+    "id": "carrier",
+    "nameId": "{20221,5001}",
+    "name": "Carrier",
+    "class": [
+      "ship_l",
+      "ship_xl"
+    ]
+  },
+  {
+    "id": "resupplier",
+    "nameId": "{20221,5011}",
+    "name": "Auxiliary",
+    "class": [
+      "ship_xl"
+    ]
+  },
+  {
+    "id": "battleship",
+    "nameId": "{20221,5031}",
+    "name": "Battleship",
+    "class": [
+      "ship_xl"
+    ]
+  },
+  {
+    "id": "corvette",
+    "nameId": "{20221,3021}",
+    "name": "Corvette",
+    "class": [
+      "ship_m"
+    ]
+  },
+  {
+    "id": "envoy",
+    "nameId": "{20221,5101}",
+    "name": "Envoy",
+    "class": [
+      "ship_m"
+    ]
+  },
+  {
+    "id": "tug",
+    "nameId": "{20221,5051}",
+    "name": "Tug",
+    "class": [
+      "ship_m"
+    ]
+  },
+  {
+    "id": "expeditionary",
+    "nameId": "{20221,5091}",
+    "name": "Expeditionary Ship",
+    "class": [
+      "ship_l"
+    ]
+  },
+  {
+    "id": "compactor",
+    "nameId": "{20221,5061}",
+    "name": "Compactor",
+    "class": [
+      "ship_l"
+    ]
+  }
+]

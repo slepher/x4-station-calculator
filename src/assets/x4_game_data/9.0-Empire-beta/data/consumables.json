@@ -1,0 +1,404 @@
+[
+  {
+    "id": "countermeasure_flares_01",
+    "nameId": "{20201,1001}",
+    "name": "{20201,1001}",
+    "macro": "countermeasure_flares_01_macro",
+    "class": "countermeasure",
+    "mk": null,
+    "race": null,
+    "deployable": false,
+    "tags": [
+      "countermeasure",
+      "equipment"
+    ],
+    "cost": {
+      "default": {
+        "advancedcomposites": 1.0,
+        "energycells": 9.0
+      },
+      "xenon": {
+        "energycells": 15.0,
+        "ore": 4.0,
+        "silicon": 3.0
+      },
+      "terran": {
+        "energycells": 90.0,
+        "metallicmicrolattice": 20.0
+      },
+      "closedloop": {
+        "energycells": 30.0,
+        "hullparts": 1.0
+      }
+    }
+  },
+  {
+    "id": "waypointmarker_01",
+    "nameId": "{20201,20801}",
+    "name": "{20201,20801}",
+    "macro": "env_deco_nav_beacon_t1_macro",
+    "class": "navbeacon",
+    "mk": null,
+    "race": null,
+    "deployable": true,
+    "tags": [
+      "equipment",
+      "navbeacon"
+    ],
+    "cost": {
+      "default": {
+        "energycells": 1.0,
+        "hullparts": 1.0
+      },
+      "xenon": {
+        "energycells": 1.0,
+        "ore": 1.0
+      },
+      "terran": {
+        "energycells": 50.0,
+        "metallicmicrolattice": 11.0
+      },
+      "closedloop": {
+        "energycells": 14.0
+      }
+    }
+  },
+  {
+    "id": "resourceprobe_01",
+    "nameId": "{20201, 20701}",
+    "name": "{20201, 20701}",
+    "macro": "eq_arg_resourceprobe_01_macro",
+    "class": "resourceprobe",
+    "mk": null,
+    "race": null,
+    "deployable": true,
+    "tags": [
+      "equipment",
+      "resourceprobe"
+    ],
+    "cost": {
+      "default": {
+        "energycells": 1.0,
+        "hullparts": 1.0,
+        "scanningarrays": 1.0
+      },
+      "xenon": {
+        "energycells": 2.0,
+        "silicon": 1.0
+      },
+      "terran": {
+        "energycells": 20.0,
+        "metallicmicrolattice": 17.0,
+        "siliconcarbide": 1.0
+      },
+      "closedloop": {
+        "energycells": 54.0,
+        "hullparts": 2.0
+      }
+    }
+  },
+  {
+    "id": "satellite_mk1",
+    "nameId": "{20201,20301}",
+    "name": "{20201,20301}",
+    "macro": "eq_arg_satellite_01_macro",
+    "class": "satellite",
+    "mk": null,
+    "race": null,
+    "deployable": true,
+    "tags": [
+      "equipment",
+      "satellite"
+    ],
+    "cost": {
+      "default": {
+        "energycells": 1.0,
+        "scanningarrays": 1.0
+      },
+      "xenon": {
+        "energycells": 5.0,
+        "silicon": 1.0
+      },
+      "terran": {
+        "energycells": 50.0,
+        "metallicmicrolattice": 26.0,
+        "siliconcarbide": 2.0
+      },
+      "closedloop": {
+        "energycells": 54.0,
+        "hullparts": 1.0
+      }
+    }
+  },
+  {
+    "id": "satellite_mk2",
+    "nameId": "{20201,20401}",
+    "name": "{20201,20401}",
+    "macro": "eq_arg_satellite_02_macro",
+    "class": "satellite",
+    "mk": null,
+    "race": null,
+    "deployable": true,
+    "tags": [
+      "equipment",
+      "satellite"
+    ],
+    "cost": {
+      "default": {
+        "advancedelectronics": 5.0,
+        "energycells": 10.0,
+        "scanningarrays": 5.0
+      },
+      "xenon": {
+        "energycells": 10.0,
+        "silicon": 1.0
+      },
+      "terran": {
+        "computronicsubstrate": 5.0,
+        "energycells": 25.0,
+        "metallicmicrolattice": 39.0,
+        "siliconcarbide": 6.0
+      },
+      "closedloop": {
+        "claytronics": 3.0,
+        "energycells": 51.0,
+        "hullparts": 17.0
+      }
+    }
+  },
+  {
+    "id": "software_scannerlongrangemk1",
+    "nameId": "{20108,1001}",
+    "name": "{20108,1001}",
+    "macro": "scanner_gen_s_longrange_01_mk1_macro",
+    "class": "scanner",
+    "mk": null,
+    "race": null,
+    "deployable": false,
+    "tags": [
+      "equipment",
+      "noblueprint",
+      "scanner",
+      "software"
+    ],
+    "cost": {
+      "default": {},
+      "closedloop": {}
+    }
+  },
+  {
+    "id": "software_scannerlongrangemk2",
+    "nameId": "{20108,1011}",
+    "name": "{20108,1011}",
+    "macro": "scanner_gen_s_longrange_01_mk2_macro",
+    "class": "scanner",
+    "mk": null,
+    "race": null,
+    "deployable": false,
+    "tags": [
+      "equipment",
+      "noblueprint",
+      "scanner",
+      "software"
+    ],
+    "cost": {
+      "default": {},
+      "closedloop": {}
+    }
+  },
+  {
+    "id": "software_scannerminingmk1",
+    "nameId": "{20108,1021}",
+    "name": "{20108,1021}",
+    "macro": "scanner_gen_s_mining_01_mk1_macro",
+    "class": "scanner",
+    "mk": null,
+    "race": null,
+    "deployable": false,
+    "tags": [
+      "noblueprint",
+      "noplayerblueprint",
+      "scanner"
+    ],
+    "cost": {}
+  },
+  {
+    "id": "software_scannerminingmk2",
+    "nameId": "{20108,1031}",
+    "name": "{20108,1031}",
+    "macro": "scanner_gen_s_mining_01_mk2_macro",
+    "class": "scanner",
+    "mk": null,
+    "race": null,
+    "deployable": false,
+    "tags": [
+      "noblueprint",
+      "noplayerblueprint",
+      "scanner"
+    ],
+    "cost": {}
+  },
+  {
+    "id": "software_scannerobjectmk1",
+    "nameId": "{20108,1041}",
+    "name": "{20108,1041}",
+    "macro": "scanner_gen_s_object_01_mk1_macro",
+    "class": "scanner",
+    "mk": null,
+    "race": null,
+    "deployable": false,
+    "tags": [
+      "equipment",
+      "noblueprint",
+      "scanner",
+      "software"
+    ],
+    "cost": {
+      "default": {},
+      "closedloop": {}
+    }
+  },
+  {
+    "id": "software_scannerobjectmk2",
+    "nameId": "{20108,1061}",
+    "name": "{20108,1061}",
+    "macro": "scanner_gen_s_object_01_mk2_macro",
+    "class": "scanner",
+    "mk": null,
+    "race": null,
+    "deployable": false,
+    "tags": [
+      "equipment",
+      "noblueprint",
+      "scanner",
+      "software"
+    ],
+    "cost": {
+      "default": {},
+      "closedloop": {}
+    }
+  },
+  {
+    "id": "weapon_clustermine_01",
+    "nameId": "{20201,21001}",
+    "name": "{20201,21001}",
+    "macro": "weapon_clustermine_01_macro",
+    "class": "mine",
+    "mk": null,
+    "race": null,
+    "deployable": true,
+    "tags": [
+      "equipment",
+      "mine"
+    ],
+    "cost": {
+      "default": {
+        "energycells": 6.0,
+        "weaponcomponents": 4.0
+      }
+    }
+  },
+  {
+    "id": "weapon_gen_mine_01",
+    "nameId": "{20201,20201}",
+    "name": "{20201,20201}",
+    "macro": "weapon_gen_mine_01_macro",
+    "class": "mine",
+    "mk": null,
+    "race": null,
+    "deployable": true,
+    "tags": [
+      "equipment",
+      "mine"
+    ],
+    "cost": {
+      "default": {
+        "energycells": 5.0,
+        "weaponcomponents": 3.0
+      },
+      "xenon": {
+        "energycells": 10.0,
+        "ore": 1.0
+      },
+      "terran": {
+        "energycells": 50.0,
+        "metallicmicrolattice": 42.0,
+        "siliconcarbide": 2.0
+      },
+      "closedloop": {
+        "energycells": 45.0,
+        "hullparts": 1.0
+      }
+    }
+  },
+  {
+    "id": "weapon_gen_mine_02",
+    "nameId": "{20201,20101}",
+    "name": "{20201,20101}",
+    "macro": "weapon_gen_mine_02_macro",
+    "class": "mine",
+    "mk": null,
+    "race": null,
+    "deployable": true,
+    "tags": [
+      "equipment",
+      "mine"
+    ],
+    "cost": {
+      "default": {
+        "energycells": 7.0,
+        "smartchips": 10.0,
+        "weaponcomponents": 3.0
+      },
+      "xenon": {
+        "energycells": 15.0,
+        "ore": 2.0
+      },
+      "terran": {
+        "computronicsubstrate": 1.0,
+        "energycells": 50.0,
+        "metallicmicrolattice": 32.0
+      },
+      "closedloop": {
+        "energycells": 70.0,
+        "hullparts": 2.0
+      }
+    }
+  },
+  {
+    "id": "weapon_gen_mine_03",
+    "nameId": "{20201,20901}",
+    "name": "{20201,20901}",
+    "macro": "weapon_gen_mine_03_macro",
+    "class": "mine",
+    "mk": null,
+    "race": null,
+    "deployable": true,
+    "tags": [
+      "equipment",
+      "mine"
+    ],
+    "cost": {
+      "default": {
+        "energycells": 11.0,
+        "smartchips": 30.0,
+        "weaponcomponents": 3.0
+      },
+      "xenon": {
+        "energycells": 20.0,
+        "ore": 1.0,
+        "silicon": 1.0
+      },
+      "terran": {
+        "computronicsubstrate": 2.0,
+        "energycells": 60.0,
+        "metallicmicrolattice": 33.0,
+        "siliconcarbide": 1.0
+      },
+      "closedloop": {
+        "energycells": 119.0,
+        "hullparts": 4.0
+      }
+    }
+  }
+]
