@@ -55,7 +55,7 @@ def main():
     xml_diff = setup_customizer(m_config)
 
     paths = m_config['X4_PATHS']
-    src = os.path.normpath(os.path.join(config_dir, paths['SOURCE']))
+    src = os.path.normpath(os.path.join(config_dir, paths['SOURCE'], v_config['folder_name']))
     dest_root = os.path.normpath(os.path.join(config_dir, v_config['raw_assets_dir'], v_config['folder_name']))
 
     print(f"🧪 开始资产蒸馏流: {v_config['folder_name']}")
