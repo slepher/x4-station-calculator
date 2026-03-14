@@ -1,0 +1,1389 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mdscript name="Khaak_Activity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="md.xsd">
+  <cues>
+    <!--TODO @Owen Cue to be signalled externally to request ignoring a sector. Would result in $Sector and $WatchedSector entries being cleaned (as long as they don't contain a station already)-->
+
+    <cue name="Manager" mapeditor="false" version="8">
+      <conditions>
+        <event_cue_signalled cue="md.Setup.Start" />
+        <check_value value="player.galaxy.macro == macro.xu_ep2_universe_macro" comment="only in main-galaxy"/>
+      </conditions>
+      <actions>
+        <set_value name="$DebugChance" exact="0"/>
+        <set_value name="$DebugChance2" exact="0"/>
+
+        <!--$SectorFocusTable {$Sector} = activityvalue-->
+        <set_value name="$SectorMiningActivityTable" exact="table[]"/>
+        <set_value name="$SectorKhaakActivityTable" exact="table[]"/>
+        <find_sector groupname="$Sectors" multiple="true"/>
+        <create_group groupname="$WatchedSectors"/>
+
+        <!--Table caching resource data. Key: $Sector, Value: Table.[$NextCheckTime, $YieldsTable.{$Ware} = yield]-->
+        <set_value name="$SectorResourceYieldTable" exact="table[]"/>
+
+        <set_value name="$MaxKhaakActivity"  exact="500000"/>
+
+        <set_value name="$SpawnOutpostThreshold" exact="50000" comment="The mining activity value for any sector to reach to trigger the logic to select a suitably active sector (not necessarily that sector)"/>
+        <set_value name="$MinSpawnOutpostThreshold" exact="40000" comment="The mining activity value required for a sector to be considered in the logic to be selected as an outpost sector"/>
+        <set_value name="$MaxMiningActivity" exact="500000"/>
+
+        <!--If there are no resources in a sector of interest, occasionally increment activity by $NoMinableResourcePointBonus to $NoMinableResourcePointBonus * 2-->
+        <set_value name="$NoMinableResourcePointBonus" exact="10"/>
+
+        <set_value name="$ResourceWares" exact="[ware.ore, ware.silicon, ware.nividium]"/>
+
+        <!--This table contains the yield factor value for each ware the Kha'ak are concerned with.
+        By using get_highest_resource_yield, we will get the current highest yield per resource.
+        The yield * the yield factor = how many activity points the sector gains per hour, even if there is no active mining-->
+        <set_value name="$YieldFactorTable" exact="table[
+                   {ware.ore} = 0.0003,
+                   {ware.silicon} = 0.0005,
+                   {ware.nividium} = 0.005]"/>
+
+        <!--This table contains the mining factor value for each ware the Kha'ak are concerned with.-->
+        <set_value name="$MiningFactorTable" exact="table[
+                   {ware.ore} = 0.7,
+                   {ware.silicon} = 1.0,
+                   {ware.nividium} = 2.0]"/>
+        <set_value name="$PlayerMiningFactor" exact="2.0f"/>
+
+        <!--This table contains the spawning modifier factor to be applied to the chance calculated from the sector activity level.-->
+        <set_value name="$SpawnChanceFactorTable" exact="table[
+                   {ware.ore} = 1.2,
+                   {ware.silicon} = 1.2,
+                   {ware.nividium} = 2.7]"/>
+
+        <!--Group to be populated by other sources to exclude certain sectors-->
+        <create_group groupname="$IgnoredSectors"/>
+
+        <!--#############
+        HIVE STATION DATA
+        ##############-->
+
+        <create_group groupname="$HiveStations"/>
+        <set_value name="$HiveStationGateRange" exact="3" comment="the gate distance where the hive can place an outpost to impact NPC mining"/>
+        <set_value name="$HiveStationMacros" exact="[macro.landmarks_kha_hive_01_macro]"/>
+        <set_value name="$NextHiveStationMinSpawnTime" exact="player.age"/>
+        <set_value name="$FreeHiveSpawnQuota" exact="0" comment="Amount of hives which are allowed to be spawned on the next evaluation, with 100% chance, within the allowed quota."/>
+        <set_value name="$HiveSectorCooldown" exact="96h"/>
+        <!--List of times when the next hive creation cooldown ends. When passing an entry, a new hive can be created and that entry removed.-->
+        <set_value name="$HiveGlobalCooldownTimes" exact="[]"/>
+
+        <!--Define which sectors the hive stations can be spawned-->
+        <find_sector groupname="$PotentialHiveStationSectors" macro="macro.cluster_06_sector002_macro" comment="Black Hole Sun V"/>
+        <find_sector groupname="$PotentialHiveStationSectors" macro="macro.cluster_16_sector001_macro" comment="Matrix #451"/>
+        <find_sector groupname="$PotentialHiveStationSectors" macro="macro.cluster_20_sector001_macro" comment="Company Regard"/>
+        <find_sector groupname="$PotentialHiveStationSectors" macro="macro.cluster_28_sector001_macro" comment="Antigone Memorial"/>
+        <find_sector groupname="$PotentialHiveStationSectors" macro="macro.cluster_31_sector001_macro" comment="Heretic's End"/>
+        <find_sector groupname="$PotentialHiveStationSectors" macro="macro.cluster_35_sector001_macro" comment="Lasting Vengeance"/>
+        <find_sector groupname="$PotentialHiveStationSectors" macro="macro.cluster_37_sector001_macro" comment="Pious Mists IV"/>
+        <find_sector groupname="$PotentialHiveStationSectors" macro="macro.cluster_45_sector001_macro" comment="Silent Witness XII"/>
+        <set_value name="$HiveStationMaxCount" exact="$PotentialHiveStationSectors.count * 0.75"/>
+
+        <set_value name="$HivePresenceTable" exact="table[]" comment="key: sector, value: table[$LastKnownTime = the last gametime a Kha'ak hive was present, $Station = the station, $PlayerKill = was player the killer (optional)]"/>
+
+        <!--################
+        OUTPOST STATION DATA
+        #################-->
+
+        <create_group groupname="$Outposts"/>
+        <set_value name="$OutpostPresenceTable" exact="table[]" comment="key: sector, value: table[$LastKnownTime = the last gametime a Kha'ak hive was present, $Station = the station, $PlayerKill = was player the killer (optional)]"/>
+        <set_value name="$OutpostSectorCooldown" exact="48h"/>
+        <!--List of times when the next outpost creation cooldown ends. When passing an entry, a new outpost can be created and that entry removed.-->
+        <set_value name="$OutpostGlobalCooldownTimes" exact="[]"/>
+        <!--Table containing times that the last miner hassassing ships were spawned. Key: sector, value: time-->
+        <set_value name="$KhaakMiningHarassmentSpawnTimes" exact="table[]"/>
+        <set_value name="$OutpostShipGroupTable" exact="table[]"/>
+        <set_value name="$OutpostShipQuotaTable" exact="table[]" comment="Table containing the current quota the station has for harassing miners"/>
+        <set_value name="$PlayerOutpostCreated" exact="false" comment="Used to have special behaviour the first time one is spawned"/>
+
+        <!--Next spawn time values for outposts-->
+        <set_value name="$NextOutpostMinSpawnTime" exact="player.age"/>
+
+        <!--Table to store which hive sector caused an outpost to be created in reaction to NPC miners. Key: HiveSector, value: [PlacementTime, Outpost (may become invalid after destruction)]-->
+        <set_value name="$OutpostPlacementRecords" exact="table[]"/>
+
+        <!--Mining interference-->
+        <set_value name="$MaxOutpostShipQuota" exact="50"/>
+
+        <!--##################
+        DEFENDING KHA'AK SHIPS
+        ###################-->
+        <!--Tables with hive or outpost stations as the key-->
+        <set_value name="$DefenceShipGroupTable" exact="table[]" comment="Table containing groups of ships defending the station"/>
+        <set_value name="$DefenceShipQuotaTable" exact="table[]" comment="Table containing the current quota the station has for defending ships"/>
+        <set_value name="$MaxHiveDefenceShipQuota" exact="60"/>
+        <set_value name="$MaxOutpostDefenceShipQuota" exact="25"/>
+
+      </actions>
+      <patch sinceversion="2">
+        <create_group groupname="$IgnoredSectors"/>
+      </patch>
+      <patch sinceversion="3">
+        <set_value name="$SpawnChanceFactorTable" exact="table[
+                   {ware.ore} = 1.3,
+                   {ware.silicon} = 1.3,
+                   {ware.nividium} = 1.5]"/>
+      </patch>
+      <patch sinceversion="4">
+
+        <set_value name="$MaxShipSpawnThreshold"  exact="250000"/>
+
+        <set_value name="$YieldFactorTable" exact="table[
+                   {ware.ore} = 0.0005,
+                   {ware.silicon} = 0.0005,
+                   {ware.nividium} = 0.005]"/>
+        <set_value name="$MiningFactorTable" exact="table[
+                   {ware.ore} = 7.0,
+                   {ware.silicon} = 10.0,
+                   {ware.nividium} = 20.0]"/>
+        <set_value name="$PlayerMiningFactor" exact="2.0f"/>
+
+        <set_value name="$SpawnChanceFactorTable" exact="table[
+                   {ware.ore} = 1.2,
+                   {ware.silicon} = 1.2,
+                   {ware.nividium} = 2.7]"/>
+
+        <set_value name="$AntiNPCOutpostThreshold" exact="40000"/>
+        <set_value name="$AntiPlayerOutpostThreshold" exact="30000"/>
+        <clear_table table="$SectorActivityTable"/>
+        <set_value name="$SectorPlayerActivityTable" exact="table[]"/>
+
+        <find_sector groupname="$PotentialHiveStationSectors" macro="macro.cluster_06_sector002_macro" comment="Black Hole Sun V"/>
+        <find_sector groupname="$PotentialHiveStationSectors" macro="macro.cluster_16_sector001_macro" comment="Matrix #451"/>
+        <find_sector groupname="$PotentialHiveStationSectors" macro="macro.cluster_20_sector001_macro" comment="Company Regard"/>
+        <find_sector groupname="$PotentialHiveStationSectors" macro="macro.cluster_28_sector001_macro" comment="Antigone Memorial"/>
+        <find_sector groupname="$PotentialHiveStationSectors" macro="macro.cluster_31_sector001_macro" comment="Heretic's End"/>
+        <find_sector groupname="$PotentialHiveStationSectors" macro="macro.cluster_35_sector001_macro" comment="Lasting Vengeance"/>
+        <find_sector groupname="$PotentialHiveStationSectors" macro="macro.cluster_37_sector001_macro" comment="Pious Mists IV"/>
+        <find_sector groupname="$PotentialHiveStationSectors" macro="macro.cluster_45_sector001_macro" comment="Silent Witness XII"/>
+        <set_value name="$HiveStationMaxCount" exact="$PotentialHiveStationSectors.count * 0.75"/>
+
+        <do_if value="not $HiveStations?">
+          <create_group groupname="$HiveStations"/>
+        </do_if>
+        <remove_value name="$BaseStationMacros"/>
+        <remove_value name="$BaseStationGateRange"/>
+        <remove_value name="$NextBaseStationMinSpawnTime"/>
+        <remove_value name="$BaseStationMaxCount"/>
+
+        <set_value name="$HiveStationGateRange" exact="3" comment="the gate distance where the hive can place an outpost to impact NPC mining"/>
+        <set_value name="$HiveStationMacros" exact="[macro.landmarks_kha_hive_01_macro]"/>
+        <set_value name="$NextHiveStationMinSpawnTime" exact="player.age"/>
+        <set_value name="$FreeHiveSpawnQuota" exact="2" comment="Create some new hives when patching"/>
+        <set_value name="$HiveSectorCooldown" exact="48h"/>
+        <set_value name="$HiveSpawnChance" exact="0.017f" comment="The chance of a hive spawning each run of the Evaluate cue, which happens every minute. Should average to around every 4 days"/>
+
+        <set_value name="$DefenceShipGroupTable" exact="table[]"/>
+        <set_value name="$DefenceShipQuotaTable" exact="table[]"/>
+
+        <find_sector groupname="$Sectors" multiple="true"/>
+        <create_group groupname="$WatchedSectors"/>
+        <do_for_each in="$BaseStations">
+          <find_sector_in_range groupname="$WatchedSectors" object="loop.element" excluded="$IgnoredSectors" maxdistance="$HiveStationGateRange" multiple="true"/>
+        </do_for_each>
+
+        <do_if value="not $HivePresenceTable?">
+          <set_value name="$HivePresenceTable" exact="table[]"/>
+        </do_if>
+
+        <create_group groupname="$Outposts"/>
+        <set_value name="$OutpostPresenceTable" exact="table[]"/>
+        <set_value name="$OutpostSectorCooldown" exact="2h"/>
+        <set_value name="$OutpostSpawnChance" exact="0.017f"/>
+
+
+        <set_value name="$OutpostShipGroupTable" exact="table[]"/>
+        <set_value name="$OutpostShipQuotaTable" exact="table[]" comment="Table containing the current quota the station has for defending ships"/>
+        <set_value name="$NextPlayerOutpostMinSpawnTime" exact="player.age"/>
+        <set_value name="$NextNPCOutpostMinSpawnTime" exact="player.age"/>
+        <set_value name="$OutpostPlacementRecords" exact="table[]"/>
+        <set_value name="$PlayerOutpostCreated" exact="false" comment="Used to have special behaviour the first time one is spawned"/>
+
+        <set_value name="$DefenceShipQuotaTable" exact="table[]"/>
+        <set_value name="$MaxOutpostShipQuota" exact="50"/>
+        <set_value name="$MaxHiveDefenceShipQuota" exact="60"/>
+        <set_value name="$MaxOutpostDefenceShipQuota" exact="25"/>
+
+        <clear_table table="$ShipQuotaTable"/>
+      </patch>
+      <patch sinceversion="5">
+        <set_value name="$OutpostSpawnChance" exact="0.136f" comment="The chance of a outpost spawning each run of the Evaluate cue, which happens every minute. Should average to around every 12 hours"/>
+      </patch>
+      <patch sinceversion="6">
+        <set_value name="$NoMinableResourcePointBonus" exact="100"/>
+      </patch>
+      <patch sinceversion="7">
+        <set_value name="$NewOutpostPresenceTable" exact="table[]"/>
+        <do_for_each name="$OutpostSector" valuename="$OutpostPlacementValue" in="$OutpostPresenceTable">
+          <do_if value="typeof $OutpostPlacementValue == datatype.table">
+            <!--if the value is a table, then the station manager instance patchcode has already run, adding the table. take it and use in the new PresenceTable-->
+            <set_value name="$NewOutpostPresenceTable.{$OutpostSector}" exact="$OutpostPlacementValue"/>
+          </do_if>
+          <do_else>
+            <!--value must be a gametime, build a new table-->
+            <set_value name="$OutpostTable" exact="table[]"/>
+            <set_value name="$FoundOutpost" exact="null"/>
+            <do_for_each name="$Outpost" in="$Outposts">
+              <do_if value="$Outpost.sector == $OutpostSector">
+                <set_value name="$FoundOutpost" exact="$Outpost"/>
+                <break/>
+              </do_if>
+            </do_for_each>
+            <set_value name="$OutpostTable.$LastKnownTime" exact="$OutpostPlacementValue"/>
+            <set_value name="$OutpostTable.$Station" exact="$FoundOutpost"/>
+            <do_if value="not $FoundOutpost.isoperational">
+              <!--Treat lost stations as being killed by the player-->
+              <set_value name="$OutpostTable.$PlayerKill" exact="true"/>
+            </do_if>
+            <set_value name="$NewOutpostPresenceTable.{$OutpostSector}" exact="$OutpostTable"/>
+          </do_else>
+        </do_for_each>
+        <set_value name="$OutpostPresenceTable" exact="$NewOutpostPresenceTable"/>
+        <remove_value name="$FoundOutpost"/>
+        <remove_value name="$NewOutpostPresenceTable"/>
+
+        <set_value name="$NewHivePresenceTable" exact="table[]"/>
+        <do_for_each name="$HiveSector" valuename="$HivePlacementValue" in="$HivePresenceTable">
+          <do_if value="typeof $HivePlacementValue == datatype.table">
+            <!--if the value is a table, then the station manager instance patchcode has already run, adding the table. take it and use in the new PresenceTable-->
+            <set_value name="$NewHivePresenceTable.{$OutpostSector}" exact="$HivePlacementValue"/>
+          </do_if>
+          <do_else>
+            <!--value must be a gametime, build a new table-->
+            <set_value name="$HiveTable" exact="table[]"/>
+            <set_value name="$FoundHive" exact="null"/>
+            <do_for_each name="$Hive" in="$HiveStations">
+              <do_if value="$Hive.sector == $HiveSector">
+                <set_value name="$FoundHive" exact="$Hive"/>
+                <break/>
+              </do_if>
+            </do_for_each>
+            <set_value name="$HiveTable.$LastKnownTime" exact="$HivePlacementValue"/>
+            <set_value name="$HiveTable.$Station" exact="$FoundHive"/>
+            <do_if value="not $FoundHive.isoperational">
+              <!--Treat lost stations as being killed by the player-->
+              <set_value name="$HiveTable.$PlayerKill" exact="true"/>
+            </do_if>
+            <set_value name="$NewHivePresenceTable.{$HiveSector}" exact="$HiveTable"/>
+          </do_else>
+        </do_for_each>
+        <set_value name="$HivePresenceTable" exact="$NewHivePresenceTable"/>
+        <remove_value name="$FoundHive"/>
+        <remove_value name="$NewHivePresenceTable"/>
+
+        <remove_value name="$HiveSpawnChance"/>
+        <remove_value name="$OutpostSpawnChance"/>
+
+        <set_value name="$NextOutpostMinSpawnTime" min="player.age + 30min" max="player.age + 120min"/>
+        <remove_value name="$NextPlayerOutpostMinSpawnTime"/>
+        <remove_value name="$NextNPCOutpostMinSpawnTime"/>
+        <remove_value name="$AntiNPCOutpostThreshold"/>
+        <remove_value name="$AntiPlayerOutpostThreshold"/>
+
+        <remove_value name="$MaxShipSpawnThreshold"/>
+        <set_value name="$MaxKhaakActivity"  exact="500000"/>
+
+        <set_value name="$SpawnOutpostThreshold" exact="50000" comment="The mining activity value for any sector to reach to trigger the logic to select a suitably active sector (not necessarily that sector)"/>
+        <set_value name="$MinSpawnOutpostThreshold" exact="40000" comment="The mining activity value required for a sector to be considered in the logic to be selected as an outpost sector"/>
+        <set_value name="$MaxMiningActivity" exact="500000"/>
+        <set_value name="$OutpostSectorCooldown" exact="48h"/>
+        <set_value name="$NoMinableResourcePointBonus" exact="10"/>
+        <set_value name="$MiningFactorTable" exact="table[
+                   {ware.ore} = 0.7,
+                   {ware.silicon} = 1.0,
+                   {ware.nividium} = 2.0]"/>
+
+        <!--Start the activity tables from scratch-->
+        <remove_value name="$SectorActivityTable"/>
+        <remove_value name="$SectorPlayerActivityTable"/>
+        <set_value name="$SectorMiningActivityTable" exact="table[]"/>
+        <set_value name="$SectorKhaakActivityTable" exact="table[]"/>
+
+        <clear_table table="$OutpostShipQuotaTable"/>
+        <do_for_each name="$Outpost" in="$Outposts">
+          <set_value name="$OutpostShipQuotaTable.{$Outpost}" min="$MaxOutpostShipQuota / 16" max="$MaxOutpostShipQuota / 8"/>
+          <set_value name="$SectorKhaakActivityTable.{$Outpost.sector}" min="$MaxKhaakActivity / 100" max="$MaxKhaakActivity / 80"/>
+        </do_for_each>
+
+        <!--List of times when the next hive creation cooldown ends. When passing an entry, a new hive can be created and that entry removed.-->
+        <set_value name="$HiveGlobalCooldownTimes" exact="[]"/>
+
+        <!--List of times when the next outpost creation cooldown ends. When passing an entry, a new outpost can be created and that entry removed.-->
+        <set_value name="$OutpostGlobalCooldownTimes" exact="[]"/>
+
+        <!--Table containing times that the last miner hassassing ships were spawned. Key: sector, value: time-->
+        <set_value name="$KhaakMiningHarassmentSpawnTimes" exact="table[]"/>
+      </patch>
+      <patch sinceversion="8">
+        <set_value name="$SectorResourceYieldTable" exact="table[]"/>
+      </patch>
+      <cues>
+        <cue name="TriggerReport" instantiate="true">
+          <conditions>
+            <event_cue_signalled/>
+          </conditions>
+          <actions>
+            <debug_text text="'There are ' + $HiveStations.count + ' Khaak hive stations and ' + $Outposts.count + ' outposts'"/>
+
+            <do_for_each name="$Station" in="$HiveStations">
+              <debug_text text="'Hive station: ' + $Station + ' ' + $Station.knownname + ' in ' + $Station.sector.knownname + ' Mining activity: ' + @$SectorMiningActivityTable.{$Station.sector} + ', Khaak ship activity: ' + @$SectorKhaakActivityTable.{$Station.sector}"/>
+              <debug_text text="'- Defence ships: ' + @$DefenceShipGroupTable.{$Station}.count + ' out of ' + @$DefenceShipQuotaTable.{$Station}"/>
+            </do_for_each>
+            <do_for_each name="$Station" in="$Outposts">
+              <debug_text text="'Outpost station: ' + $Station + ' ' + $Station.knownname + ' in ' + $Station.sector.knownname + ' Mining activity: ' + @$SectorMiningActivityTable.{$Station.sector} + ', Khaak ship activity: ' + @$SectorKhaakActivityTable.{$Station.sector}"/>
+              <debug_text text="'- Defence ships: ' + @$DefenceShipGroupTable.{$Station}.count + ' out of ' + $DefenceShipQuotaTable.{$Station}"/>
+              <debug_text text="'- Mining interferance ships: ' + @$OutpostShipGroupTable.{$Station}.count + ' out of ' + $OutpostShipQuotaTable.{$Station}"/>
+            </do_for_each>
+            <do_for_each name="$Sector" in="$Sectors">
+              <find_ship_by_true_owner name="this.$KhaakShips" faction="faction.khaak" space="$Sector" multiple="true"/>
+              <debug_text text="$Sector + ' ' + $Sector.knownname + ' - Resources: ' + $Sector.resources.list + ' - Number of Khaak Ships ' + this.$KhaakShips.count + '\nhas an activity value of ' + @$SectorMiningActivityTable.{$Sector} + '\nhas a Khaak ship activity value of ' + @$SectorKhaakActivityTable.{$Sector}"/>
+            </do_for_each>
+          </actions>
+        </cue>
+
+        <cue name="Init">
+          <actions>
+            <!--Find all exiting Kha'ak base stations in the galaxy. It doesn't matter if they're not in the $PotentialHiveStationSectors-->
+            <find_station_by_true_owner groupname="$HiveStations" faction="faction.khaak" macro="$HiveStationMacros" space="player.galaxy" multiple="true"/>
+            <do_for_each in="$HiveStations">
+              <signal_cue_instantly cue="StationManager" param="loop.element"/>
+              <set_value name="$DefenceShipQuotaTable.{loop.element}" min="0" max="$MaxHiveDefenceShipQuota / 4"/>
+            </do_for_each>
+
+            <do_for_each name="$Sector" in="$Sectors">
+              <do_if value="$Sector.resources.count">
+                <set_value name="$SectorMiningActivityTable.{$Sector}" min="0" max="5000"/>
+              </do_if>
+            </do_for_each>
+            <!--TODO @Owen spawn some early Kha'ak-->
+          </actions>
+        </cue>
+
+        <!--event.param = station-->
+        <cue name="StationManager" instantiate="true" namespace="this" version="5">
+          <conditions>
+            <event_cue_signalled/>
+          </conditions>
+          <actions>
+            <set_value name="$Station" exact="event.param"/>
+
+            <create_group groupname="$DefenceShipGroup"/>
+            <set_value name="Manager.$DefenceShipGroupTable.{$Station}" exact="$DefenceShipGroup"/>
+            <set_value name="$NextDefenceTime" exact="player.age"/>
+            <set_value name="$IsHive" exact="$Station.macro.ismacro.{Manager.$HiveStationMacros}"/>
+
+            <!--Damage slice tables. Slices of time are 10 minutes. Max number of slices per table, 12, so 2 hours of history-->
+            <set_value name="$NPCDamageTable" exact="table[]" comment="Table of damage dealt by non-player owned objects to this station. Key: time slice start time, value: total slice damage"/>
+            <set_value name="$PlayerDamageTable" exact="table[]" comment="Table of damage dealt by player owned objects to this station. Key: time slice start time, value: total slice damage"/>
+
+            <do_if value="$IsHive">
+              <set_value name="Manager.$HivePresenceTable.{$Station.sector}" exact="table[$LastKnownTime = player.age, $Station = $Station]"/>
+              <set_value name="Manager.$DefenceShipQuotaTable.{$Station}" exact="Manager.$MaxHiveDefenceShipQuota / 4"/>
+              <find_sector_in_range groupname="Manager.$WatchedSectors" object="$Station" excluded="Manager.$IgnoredSectors" maxdistance="Manager.$HiveStationGateRange" multiple="true"/>
+              <debug_text text="'Setting up Khaak hive ' + $Station + ' ' + $Station.knownname + ' in ' + $Station.sector.knownname" chance="Manager.$DebugChance"/>
+            </do_if>
+            <do_else>
+              <add_to_group groupname="Manager.$WatchedSectors" object="$Station.sector"/>
+              <set_value name="Manager.$OutpostPresenceTable.{$Station.sector}" exact="table[$LastKnownTime = player.age, $Station = $Station]"/>
+              <set_value name="Manager.$DefenceShipQuotaTable.{$Station}" exact="Manager.$MaxOutpostDefenceShipQuota / 4"/>
+              <create_group groupname="$MiningShipGroup"/>
+              <set_value name="Manager.$OutpostShipGroupTable.{$Station}" exact="$MiningShipGroup"/>
+              <debug_text text="'Setting up Khaak outpost ' + $Station + ' ' + $Station.knownname + ' in ' + $Station.sector.knownname" chance="Manager.$DebugChance"/>
+
+              <set_value name="$OutpostSelfKillDelta" min="2.5h" max="4.5h"/>
+              <set_value name="$LastPlayerMiningEvent" exact="player.age"/>
+            </do_else>
+          </actions>
+          <patch sinceversion="2">
+            <do_if value="not $Station.exists">
+              <debug_text text="'Cleaning up left over instance of Khaak station manager for destroyed station'" filter="savegame"/>
+              <cancel_cue cue="this"/>
+            </do_if>
+            <do_elseif value="Manager.$ShipGroupTable.{$Station} != $ShipGroup">
+              <debug_text text="'Cleaning up excess instance of Khaak station manager for ' + $Station + ' ' + $Station.knownname" filter="savegame"/>
+              <cancel_cue cue="this"/>
+            </do_elseif>
+          </patch>
+          <patch sinceversion="3">
+            <set_value name="$NextDefenceTime" exact="player.age"/>
+            <!--The only existing stations are hives-->
+            <set_value name="$IsHive" exact="true"/>
+
+            <!--Move the ship group into the new $DefenceShipGroupTable-->
+            <set_value name="$DefenceShipGroup" exact="$ShipGroup"/>
+            <do_if value="not Manager.$DefenceShipGroupTable?">
+              <set_value name="Manager.$DefenceShipGroupTable" exact="table[]"/>
+            </do_if>
+            <do_if value="not Manager.$DefenceShipQuotaTable?">
+              <set_value name="Manager.$DefenceShipQuotaTable" exact="table[]"/>
+            </do_if>
+            <set_value name="Manager.$DefenceShipGroupTable.{$Station}" exact="$DefenceShipGroup"/>
+            <set_value name="Manager.$DefenceShipQuotaTable.{$Station}" exact="Manager.$MaxHiveDefenceShipQuota / 4"/>
+
+            <do_if value="not Manager.$HivePresenceTable?">
+              <set_value name="Manager.$HivePresenceTable" exact="table[]"/>
+            </do_if>
+            <set_value name="Manager.$HivePresenceTable.{$Station.sector}" exact="table[$LastKnownTime = player.age, $Station = $Station]"/>
+
+            <do_if value="not Manager.$HiveStations?">
+              <create_group groupname="Manager.$HiveStations"/>
+            </do_if>
+            <add_to_group groupname="Manager.$HiveStations" object="$Station"/>
+          </patch>
+          <patch sinceversion="4">
+            <set_value name="$NPCDamageTable" exact="table[]" comment="Table of damage dealt by non-player owned objects to this station. Key: time slice start time, value: total slice damage"/>
+            <set_value name="$PlayerDamageTable" exact="table[]" comment="Table of damage dealt by player owned objects to this station. Key: time slice start time, value: total slice damage"/>
+
+            <do_if value="not $IsHive">
+              <set_value name="$OutpostSelfKillDelta" min="2.5h" max="4.5h"/>
+              <set_value name="$LastPlayerMiningEvent" exact="player.age"/>
+            </do_if>
+          </patch>
+          <patch sinceversion="5">
+            <do_if value="not $Station.exists">
+              <debug_text text="'Cleaning up left over instance of Khaak station manager for destroyed station'" filter="savegame"/>
+              <cancel_cue cue="this"/>
+            </do_if>
+          </patch>
+          <cues>
+            <cue name="StationManager_StationLost" checkinterval="1min">
+              <conditions>
+                <check_value value="not @$Station.isoperational"/>
+              </conditions>
+              <actions>
+                <assert value="false" text="'Khaak station was lost but was not caught by an event. Cleaning up the instance. [Owen]'"/>
+                <cancel_cue cue="namespace"/>
+              </actions>
+            </cue>
+
+            <cue name="StationManager_StationDestroyed">
+              <conditions>
+                <event_object_destroyed object="$Station"/>
+              </conditions>
+              <actions>
+                <!--If the player helped deal 10% of the historical damage, count it as player involved-->
+                <set_value name="$TotalNPCDamage" exact="0"/>
+                <set_value name="$TotalPlayerDamage" exact="0"/>
+
+                <do_for_each valuename="$NPCDamage" in="$NPCDamageTable">
+                  <set_value name="$TotalNPCDamage" operation="add" exact="$NPCDamage"/>
+                </do_for_each>
+                <do_for_each valuename="$PlayerDamage" in="$PlayerDamageTable">
+                  <set_value name="$TotalPlayerDamage" operation="add" exact="$PlayerDamage"/>
+                </do_for_each>
+                <debug_text text="$Station + ' ' + $Station.knownname + ' in ' + $Station.sector.knownname + ' destroyed - NPC Damage: ' + $TotalNPCDamage + ' Player damage: ' + $TotalPlayerDamage" chance="Manager.$DebugChance"/>
+
+                <set_value name="$PlayerInvolved" exact="$TotalPlayerDamage and $TotalPlayerDamage ge $TotalNPCDamage / 10"/>
+                <do_if value="$IsHive">
+                  <do_if value="$PlayerInvolved">
+                    <append_to_list name="Manager.$HiveGlobalCooldownTimes" min="player.age + 47h" max="player.age + 49h"/>
+                  </do_if>
+                </do_if>
+                <do_else>
+                  <do_if value="$PlayerInvolved">
+                    <!--TODO @Owen not used-->
+                    <append_to_list name="Manager.$OutpostGlobalCooldownTimes" min="player.age + 6h" max="player.age + 7h"/>
+                  </do_if>
+                </do_else>
+                <cancel_cue cue="namespace"/>
+              </actions>
+            </cue>
+            <cue name="StationManager_ShipDestroyed_v2" instantiate="true">
+              <conditions>
+                <event_object_destroyed group="$DefenceShipGroup"/>
+              </conditions>
+              <actions>
+                <do_if value="Manager.$DefenceShipQuotaTable.{$Station} gt 0">
+                  <do_all chance="100">
+                    <set_value name="Manager.$DefenceShipQuotaTable.{$Station}" operation="subtract"/>
+                    <debug_text text="'Reducing ship quota for ' + $Station + ' ' + $Station.knownname + ' in ' + $Station.sector.knownname + ' from ' + (Manager.$DefenceShipQuotaTable.{$Station} + 1) + ' to ' + Manager.$DefenceShipQuotaTable.{$Station}" chance="Manager.$DebugChance"/>
+                  </do_all>
+                </do_if>
+              </actions>
+            </cue>
+
+            <!--Defence handling-->
+            <cue name="StationManager_Attacked" instantiate="true">
+              <conditions>
+                <check_any>
+                  <event_object_attacked object="$Station"/>
+                  <event_object_attacked group="$DefenceShipGroup"/>
+                </check_any>
+                <check_value value="player.age ge $NextDefenceTime and Manager.$DefenceShipQuotaTable.{$Station} gt Manager.$DefenceShipGroupTable.{$Station}.count"/>
+                <!--Only spawn if there is enough quota for a group-->
+                <check_value value="Manager.$DefenceShipQuotaTable.{$Station} - Manager.$DefenceShipGroupTable.{$Station}.count ge 3"/>
+                <check_value value="event.object == $Station or event.object.bboxdistanceto.{$Station} lt 10km"/>
+              </conditions>
+              <actions>
+                <do_if value="event.object == $Station">
+                  <set_value name="$LastStationAttacker" exact="event.param"/>
+                </do_if>
+                <set_value name="$NextDefenceTime" min="player.age + 10s" max="player.age + 20s"/>
+
+                <do_if value="@event.param.isclass.controllable and event.param.sector == $Station.sector and $Station.bboxdistanceto.{event.param} lt 5km">
+                  <get_safe_pos result="this.$ResultPos" object="event.param" sector="event.param.sector" radius="1km"/>
+                </do_if>
+                <do_else>
+                  <get_safe_pos result="this.$ResultPos" object="$Station" sector="$Station.sector" radius="1km"/>
+                </do_else>
+                <set_value name="this.$SubordinateCount" min="1" max="[Manager.$DefenceShipQuotaTable.{$Station} - (Manager.$DefenceShipGroupTable.{$Station}.count + 1), 3].min"/>
+                <debug_text text="'Khaak station ' + $Station + ' ' + $Station.knownname + ' in ' + $Station.sector.knownname + ' has been attacked and will spawn ' + (this.$SubordinateCount + 1) + ' defence ships. Remaining quota: ' + (Manager.$DefenceShipQuotaTable.{$Station} - this.$SubordinateCount - 1 - Manager.$DefenceShipGroupTable.{$Station}.count)" chance="Manager.$DebugChance"/>
+                <signal_cue_instantly cue="SpawnActiveKhaak" param="[$Station.sector, this.$ResultPos, $Station, this.$SubordinateCount, true]"/>
+              </actions>
+            </cue>
+
+            <cue name="StationManager_Damaged" instantiate="true">
+              <conditions>
+                <check_any>
+                  <event_object_hull_damaged object="$Station"/>
+                  <event_object_shield_damaged object="$Station"/>
+                </check_any>
+              </conditions>
+              <delay exact="1ms"/>
+              <actions>
+                <do_if value="@$LastStationAttacker.isoperational">
+                  <set_value name="this.$TimeSliceDuration" exact="10min"/>
+                  <set_value name="this.$MaxNumSlices" exact="12"/>
+
+                  <set_value name="this.$DamageTableRef" exact="if $LastStationAttacker.isplayerowned then $PlayerDamageTable else $NPCDamageTable"/>
+                  <do_if value="this.$DamageTableRef.keys.count == 0">
+                    <set_value name="this.$DamageTableRef.{player.age}" exact="event.param3"/>
+                  </do_if>
+                  <do_else>
+                    <set_value name="this.$LastTimeSliceStart" exact="this.$DamageTableRef.keys.last"/>
+                    <do_if value="player.age ge this.$LastTimeSliceStart">
+                      <do_if value="player.age lt this.$LastTimeSliceStart + this.$TimeSliceDuration">
+                        <set_value name="this.$DamageTableRef.{this.$LastTimeSliceStart}" operation="add" exact="event.param3"/>
+                      </do_if>
+                      <do_elseif value="player.age lt this.$LastTimeSliceStart + (this.$TimeSliceDuration * 2)">
+                        <set_value name="this.$DamageTableRef.{this.$LastTimeSliceStart + this.$TimeSliceDuration}" exact="event.param3"/>
+                      </do_elseif>
+                      <do_else>
+                        <set_value name="this.$DamageTableRef.{player.age}" exact="event.param3"/>
+                      </do_else>
+                    </do_if>
+                  </do_else>
+
+                  <!--Remove outdated entries-->
+                  <set_value name="this.$StartSliceTimeCutoff" exact="this.$DamageTableRef.keys.last - (this.$MaxNumSlices * this.$TimeSliceDuration)"/>
+                  <do_for_each name="$TimeSliceStart" in="this.$DamageTableRef" reverse="true">
+                    <do_if value="$TimeSliceStart lt this.$StartSliceTimeCutoff">
+                      <debug_text text="$Station + ' ' + $Station.knownname + ' - Removing damage history data for time ' + $TimeSliceStart + ' til ' + ($TimeSliceStart + this.$TimeSliceDuration) + ' Damage: ' + this.$DamageTableRef.{$TimeSliceStart}" chance="Manager.$DebugChance"/>
+                      <remove_value name="this.$DamageTableRef.{$TimeSliceStart}"/>
+                    </do_if>
+                  </do_for_each>
+                </do_if>
+              </actions>
+            </cue>
+
+            <cue name="StationManager_MinerAttacked_Check" onfail="cancel">
+              <conditions>
+                <check_value value="$MiningShipGroup?"/>
+              </conditions>
+              <cues>
+                <cue name="StationManager_MinerAttacked" instantiate="true">
+                  <conditions>
+                    <event_object_attacked_object group="$MiningShipGroup"/>
+                  </conditions>
+                  <actions>
+                    <do_if value="event.param.primarypurpose == purpose.mine">
+                      <do_if value="event.param.isplayerowned">
+                        <set_value name="$LastPlayerMinerAttacked" exact="player.age"/>
+                        <set_value name="$LastPlayerMiningEvent" exact="player.age"/>
+                      </do_if>
+                    </do_if>
+                  </actions>
+                </cue>
+
+                <cue name="StationManager_MinerKilled" instantiate="true">
+                  <conditions>
+                    <event_object_killed_object group="$MiningShipGroup"/>
+                  </conditions>
+                  <actions>
+                    <do_if value="event.param.primarypurpose == purpose.mine">
+                      <do_if value="event.param.isplayerowned">
+                        <set_value name="$LastPlayerMiningEvent" exact="player.age"/>
+                        <set_value name="$LastPlayerMinerKilled" exact="player.age"/>
+                        <set_value name="$NumPlayerMinersKilled" operation="add"/>
+                      </do_if>
+                    </do_if>
+                  </actions>
+                </cue>
+              </cues>
+            </cue>
+
+            <cue name="StationManager_Player_Mined_Sector" instantiate="true">
+              <conditions>
+                <event_sector_resource_depleted sector="$Station.sector" check="false"/>
+                <check_value value="not $IsHive and event.param3.{3}"/>
+              </conditions>
+              <actions>
+                <!--Don't update the mining time everytime as it could lead to stations lingering in quiet sectors for longer-->
+                <set_value name="$LastPlayerMiningEvent" exact="player.age" chance="10"/>
+              </actions>
+            </cue>
+
+            <cue name="StationManager_OutpostMover" checkinterval="1min">
+              <conditions>
+                <check_value value="not $IsHive and player.age gt ($LastPlayerMiningEvent + $OutpostSelfKillDelta) and $Station.attention lt attention.visible"/>
+              </conditions>
+              <actions>
+                <debug_text text="$Station + ' ' + $Station.knownname + ' in ' + $Station.sector.knownname + ' - is killing itself so a new one can be placed elsewhere'" chance="Manager.$DebugChance"/>
+                <destroy_object object="$Station"/>
+              </actions>
+            </cue>
+          </cues>
+        </cue>
+
+        <cue name="SectorResourceDepleted" instantiate="true">
+          <conditions>
+            <event_sector_resource_depleted group="$Sectors"/>
+            <check_value value="$MiningFactorTable.{event.param}?"/>
+            <check_value value="event.param3.{3} or $WatchedSectors.indexof.{event.object}"/>
+          </conditions>
+          <actions>
+            <debug_text text="event.object + ' ' + event.object.knownname + ' - Resource ' + event.param + ' was depleted by amount: ' + event.param2 + ' Was player: ' + event.param3.{3}" chance="$DebugChance2"/>
+
+            <do_if value="@$OutpostPresenceTable.{event.object}.$Station.isoperational">
+              <!--Add points to the Kha'ak ship activity table-->
+              <do_if value="@$SectorKhaakActivityTable.{event.object} lt $MaxKhaakActivity">
+                <do_if value="event.param3.{3}">
+                  <debug_text text="'Previous Khaak activity value: ' + @$SectorKhaakActivityTable.{event.object}" chance="$DebugChance2"/>
+                  <set_value name="$SectorKhaakActivityTable.{event.object}" operation="add" exact="event.param2 * $MiningFactorTable.{event.param} * $PlayerMiningFactor"/>
+                  <do_if value="$SectorKhaakActivityTable.{event.object} gt $MaxKhaakActivity">
+                    <set_value name="$SectorKhaakActivityTable.{event.object}" exact="$MaxKhaakActivity"/>
+                  </do_if>
+                  <debug_text text="'New activity value: ' + $SectorKhaakActivityTable.{event.object}" chance="$DebugChance2"/>
+                </do_if>
+              </do_if>
+            </do_if>
+            <do_else>
+              <!--Add points to the mining activity table-->
+              <debug_text text="'Previous activity value: ' + @$SectorMiningActivityTable.{event.object}" chance="$DebugChance2"/>
+              <do_if value="event.param3.{3}">
+                <set_value name="$SectorMiningActivityTable.{event.object}" operation="add" exact="event.param2 * $MiningFactorTable.{event.param} * $PlayerMiningFactor"/>
+              </do_if>
+              <do_else>
+                <set_value name="$SectorMiningActivityTable.{event.object}" operation="add" exact="event.param2 * $MiningFactorTable.{event.param}"/>
+              </do_else>
+              <debug_text text="'New activity value: ' + $SectorMiningActivityTable.{event.object}" chance="$DebugChance2"/>
+            </do_else>
+
+            <do_if value="not event.param3.{2} and $OutpostPresenceTable.{event.object}?">
+              <!--Depletion is not linked to a killed object, so we treat this as a low-attention gathering of resources. It may result in Kha'ak spawning at this position.-->
+              <signal_cue_instantly cue="RequestAsteroidKhaakSpawn" param="[event.object, event.param3.{1}, event.param3.{3}, event.param, event.param2]"/>
+            </do_if>
+          </actions>
+        </cue>
+
+        <cue name="SectorRegionAsteroidDestroyed" instantiate="true">
+          <conditions>
+            <event_region_asteroid_mined group="$Sectors"/>
+            <!--TODO @Owen better checks if it was a suitable asteroid-->
+            <check_value value="event.param and event.param.size gt 400m and event.param2"/>
+          </conditions>
+          <actions>
+            <create_position name="this.$Pos" object="event.param" max="event.param.size / 4" space="event.object"/>
+            <set_value name="this.$MinedResource" exact="if event.param.wares.count then event.param.wares.random else null"/>
+            <do_if value="this.$MinedResource">
+              <signal_cue_instantly cue="RequestAsteroidKhaakSpawn" param="[event.object, this.$Pos, @event.param2.isplayerowned, this.$MinedResource, event.param.wares.{this.$MinedResource}.count]"/>
+            </do_if>
+            <do_else>
+              <signal_cue_instantly cue="RequestAsteroidKhaakSpawn" param="[event.object, this.$Pos, @event.param2.isplayerowned]"/>
+            </do_else>
+          </actions>
+        </cue>
+
+        <!--Get a suitable station when spawning a Kha'ak in a certain sector
+        Result: Station-->
+        <library name="GetSuitableBaseStationForShipSpawn" purpose="run_actions">
+          <params>
+            <param name="Sector" comment="Sector for the new ship to spawn in"/>
+            <param name="CheckSectorChance" default="true"/>
+            <param name="ShipCount" default="1"/>
+            <param name="Resource" default="null" comment="Mined resource which could affect spawn chance"/>
+            <param name="MinedAmount" default="1" comment="The amount of mined resources. The amount is used to normalise the spawn chance when large amounts of resources are mined in one go"/>
+            <param name="IsDefensive" default="false"/>
+          </params>
+          <actions>
+            <do_if value="$CheckSectorChance">
+              <!--Chance of Kha'ak spawning request success when sector activity is at $MaxKhaakActivity, per mined unit of the resource-->
+              <set_value name="$BaseSpawnChance" exact="0.03f" comment="Spawn chance per each mined unit, where the activity level is at maximum"/>
+
+              <set_value name="$Chance" exact="0"/>
+              <set_value name="$Activity" exact="@Manager.$SectorKhaakActivityTable.{$Sector}"/>
+              <do_if value="$Activity gt 0">
+                <do_if value="$Activity ge Manager.$MaxKhaakActivity">
+                  <set_value name="$Chance" exact="$BaseSpawnChance * $MinedAmount"/>
+                </do_if>
+                <do_else>
+                  <set_value name="$Chance" exact="((1f / Manager.$MaxKhaakActivity) * $Activity) * ($BaseSpawnChance * $MinedAmount)"/>
+                </do_else>
+                <do_if value="$Resource and Manager.$SpawnChanceFactorTable.{$Resource}?">
+                  <set_value name="$Chance" exact="$Chance * Manager.$SpawnChanceFactorTable.{$Resource}"/>
+                </do_if>
+                <debug_text text="'Sector ' + $Sector +  ' ' + $Sector.knownname + ' has a Khaak activity value of ' + $Activity + ' ' + $MinedAmount + ' of ' + $Resource + ' was mined and the chance to spawn a Khaak ship is: ' + $Chance" chance="Manager.$DebugChance2"/>
+              </do_if>
+            </do_if>
+            <do_else>
+              <set_value name="$Chance" exact="100"/>
+            </do_else>
+
+            <do_all chance="$Chance">
+              <do_if value="$IsDefensive">
+                <!--Check if any nearby Kha'ak stations have a free ship quota-->
+                <shuffle_group group="Manager.$Outposts"/>
+                <do_for_each name="$Station" in="Manager.$Outposts">
+                  <do_if value="@Manager.$DefenceShipQuotaTable.{$Station} and Manager.$DefenceShipQuotaTable.{$Station} ge (@Manager.$DefenceShipGroupTable.{$Station}.count + $ShipCount) and $Station.sector == $Sector">
+                    <return value="$Station"/>
+                  </do_if>
+                </do_for_each>
+                <shuffle_group group="Manager.$HiveStations"/>
+                <do_for_each name="$Station" in="Manager.$HiveStations">
+                  <do_if value="@Manager.$DefenceShipQuotaTable.{$Station} and Manager.$DefenceShipQuotaTable.{$Station} ge (@Manager.$DefenceShipGroupTable.{$Station}.count + $ShipCount) and $Station.sector == $Sector">
+                    <return value="$Station"/>
+                  </do_if>
+                </do_for_each>
+              </do_if>
+              <do_else>
+                <!--Check if any nearby Kha'ak stations have a free ship quota-->
+                <shuffle_group group="Manager.$Outposts"/>
+                <do_for_each name="$Station" in="Manager.$Outposts">
+                  <do_if value="@Manager.$OutpostShipQuotaTable.{$Station} and Manager.$OutpostShipQuotaTable.{$Station} ge (@Manager.$OutpostShipGroupTable.{$Station}.count + $ShipCount) and $Station.sector == $Sector">
+                    <return value="$Station"/>
+                  </do_if>
+                </do_for_each>
+              </do_else>
+            </do_all>
+            <return value="null"/>
+          </actions>
+        </library>
+
+        <!--event.param [$sector, $position, $attackplayerowned, $resource(optional), $minedamount(optional)]-->
+        <cue name="RequestAsteroidKhaakSpawn" instantiate="true">
+          <conditions>
+            <event_cue_signalled/>
+            <check_value value="player.age gt @$KhaakMiningHarassmentSpawnTimes.{event.param.{1}} + 3min" comment="cooldown between Kha'ak asteroid spawns"/>
+          </conditions>
+          <actions>
+            <do_if value="@event.param.{4} and @event.param.{5}">
+              <run_actions ref="GetSuitableBaseStationForShipSpawn" result="$BaseStation">
+                <param name="Sector" value="event.param.{1}"/>
+                <param name="Resource" value="event.param.{4}"/>
+                <param name="MinedAmount" value="event.param.{5}"/>
+              </run_actions>
+            </do_if>
+            <do_else>
+              <run_actions ref="GetSuitableBaseStationForShipSpawn" result="$BaseStation">
+                <param name="Sector" value="event.param.{1}"/>
+              </run_actions>
+            </do_else>
+            <do_if value="$BaseStation">
+              <set_value name="this.$SubordinateCount" exact="0"/>
+              <do_if value="$Outposts.indexof.{$BaseStation} and @$OutpostShipQuotaTable.{$BaseStation} gt @$OutpostShipGroupTable.{$BaseStation}.count + 1" chance="75">
+                <set_value name="this.$SubordinateCount" min="1" max="[@$OutpostShipQuotaTable.{$BaseStation} - (@$OutpostShipGroupTable.{$BaseStation}.count + 1), 8].min" profile="decreasing" scale="2"/>
+              </do_if>
+              <signal_cue_instantly cue="SpawnAsteroidKhaak" param="[event.param.{1}, event.param.{2}, $BaseStation, event.param.{3}, this.$SubordinateCount]"/>
+              <set_value name="$KhaakMiningHarassmentSpawnTimes.{event.param.{1}}" exact="player.age"/>
+            </do_if>
+          </actions>
+        </cue>
+
+        <!--Occasionally attempt to spawn an active Kha'ak attack group in a random sector-->
+        <!--<cue name="OccasionalSpawn">
+          <delay min="1min" max="2min"/>
+          <actions>
+            <do_if value="$Sectors.count">
+              <set_value name="this.$SubordinateCount" min="0" max="3"/>
+              <signal_cue_instantly cue="RequestActiveKhaakSpawn" param="[$Sectors.random, this.$SubordinateCount]"/>
+            </do_if>
+            <reset_cue cue="this"/>
+          </actions>
+        </cue>-->
+
+        <!--event.param [$sector, $position, $basestation (optional), $attackplayerowned (optional), $numsubordinates (optional)]-->
+        <cue name="SpawnAsteroidKhaak" instantiate="true" namespace="this" version="2">
+          <conditions>
+            <event_cue_signalled/>
+          </conditions>
+          <actions>
+            <set_value name="$ActivateTime" min="4s" max="6s"/>
+            <set_value name="$AttackPlayerOwned" exact="@event.param.{4}"/>
+            <set_value name="$NumSubordinates" exact="@event.param.{5}"/>
+            <create_group groupname="$Subordinates"/>
+            <create_ship name="$Ship" sector="event.param.{1}">
+              <select faction="faction.khaak" size="class.ship_m"/>
+              <owner exact="faction.khaak"/>
+              <pilot actor="null"/>
+              <position value="event.param.{2}"/>
+            </create_ship>
+            <do_if value="$Ship.exists">
+              <debug_text text="'Created Khaak ship ' + $Ship + ' ' + $Ship.knownname + ' in sector ' + event.param.{1}.knownname" chance="Manager.$DebugChance"/>
+              <set_value name="Manager.$NewShip" exact="$Ship"/>
+
+              <do_if value="@event.param.{3}.exists and Manager.$Outposts.indexof.{event.param.{3}}">
+                <add_to_group groupname="Manager.$OutpostShipGroupTable.{event.param.{3}}" object="$Ship"/>
+              </do_if>
+
+              <!--Hack the engines to have the ship drift-->
+              <find_object_component name="$Engines" multiple="true" object="$Ship" class="class.engine"/>
+              <do_for_each name="$Engine" in="$Engines">
+                <set_object_hacked object="$Engine" duration="$ActivateTime"/>
+              </do_for_each>
+              <set_value name="$linear_x" min="-15m" max="15m"/>
+              <set_value name="$linear_y" min="-15m" max="15m"/>
+              <set_value name="$linear_z" min="-15m" max="15m"/>
+              <set_value name="$angular_x" min="-0.2m" max="0.2m"/>
+              <set_value name="$angular_y" min="-0.2m" max="0.2m"/>
+              <set_value name="$angular_z" min="-0.2m" max="0.2m"/>
+              <add_object_velocity object="$Ship">
+                <linear x="$linear_x" y="$linear_y" z="$linear_z"/>
+                <angular x="$angular_x" y="$angular_y" z="$angular_z"/>
+              </add_object_velocity>
+
+              <add_effect object="$Ship.zone" effect="'jump_jumpin_khaak'">
+                <position object="$Ship"/>
+              </add_effect>
+              <flicker_object_lights object="$Ship" range="0.2" base="0.0" interval="0.05s" duration="$ActivateTime" fadein="$ActivateTime * 0.25" fadeduring="true"/>
+            </do_if>
+            <do_else>
+              <cancel_cue cue="this"/>
+            </do_else>
+          </actions>
+          <delay exact="$ActivateTime - 1s"/>
+          <actions>
+            <do_all exact="$NumSubordinates">
+              <create_ship name="$Subordinate" groupname="$Subordinates" sector="event.param.{1}">
+                <select faction="faction.khaak" size="[class.ship_s, class.ship_m].random"/>
+                <owner exact="faction.khaak"/>
+                <pilot actor="null"/>
+                <safepos object="$Ship" min="1km" max="2km"/>
+              </create_ship>
+              <debug_text text="'Created subordinate Khaak ship ' + $Subordinate + ' ' + $Subordinate.knownname + ' in sector ' + event.param.{1}.knownname" chance="Manager.$DebugChance"/>
+              <add_effect object="$Subordinate.zone" effect="'jump_jumpin_khaak'">
+                <position object="$Subordinate"/>
+              </add_effect>
+              <do_if value="@event.param.{3}.exists and Manager.$Outposts.indexof.{event.param.{3}}">
+                <add_to_group groupname="Manager.$OutpostShipGroupTable.{event.param.{3}}" object="$Subordinate"/>
+              </do_if>
+            </do_all>
+            <remove_value name="$Subordinate"/>
+          </actions>
+          <delay exact="1s"/>
+          <actions>
+            <do_if value="$Ship.isoperational">
+              <!--Add the pilot and give the order slightly earlier than the engines recovering-->
+              <create_cue_actor cue="this" name="$Pilot">
+                <select faction="faction.khaak" tags="tag.aipilot"/>
+              </create_cue_actor>
+              <assign_control_entity object="$Ship" actor="$Pilot" post="controlpost.aipilot" transfer="true"/>
+              <create_order object="$Ship" id="'Patrol'" default="true">
+                <param name="space" value="$Ship.sector"/>
+              </create_order>
+
+              <find_ship name="$MiningShip" primarypurpose="purpose.mine" owner="if $AttackPlayerOwned then faction.player else null" space="$Ship.sector" sortbydistanceto="$Ship" sortdescending="false">
+                <match_distance object="$Ship" max="5km"/>
+              </find_ship>
+              <do_if value="$MiningShip">
+                <create_order object="$Ship" id="'Attack'">
+                  <param name="primarytarget" value="$MiningShip"/>
+                </create_order>
+              </do_if>
+
+              <do_for_each name="$Subordinate" in="$Subordinates">
+                <create_cue_actor cue="this" name="$Pilot">
+                  <select faction="faction.khaak" tags="tag.aipilot"/>
+                </create_cue_actor>
+                <assign_control_entity object="$Subordinate" actor="$Pilot" post="controlpost.aipilot" transfer="true"/>
+                <!--Temporarily disable subordinate formations and escorting-->
+                <do_if value="false and $Subordinate.isclass.ship_s">
+                  <set_object_commander object="$Subordinate" commander="$Ship"/>
+                  <create_order object="$Subordinate" id="'Escort'" default="true">
+                    <param name="formation" value="formationshape.halfcircle"/>
+                    <!-- ship width -->
+                    <param name="formationparam" value="32.6274m"/>
+                    <param name="rollformation" value="true"/>
+                    <param name="overrideformationskill" value="true"/>
+                  </create_order>
+                </do_if>
+                <do_else>
+                  <create_order object="$Subordinate" id="'Patrol'" default="true">
+                    <param name="space" value="$Subordinate.sector"/>
+                  </create_order>
+                  <do_if value="$MiningShip">
+                    <create_order object="$Subordinate" id="'Attack'">
+                      <param name="primarytarget" value="$MiningShip"/>
+                    </create_order>
+                  </do_if>
+                </do_else>
+              </do_for_each>
+            </do_if>
+          </actions>
+          <patch sinceversion="2" state="active">
+            <do_if value="not $AttackPlayerOwned?">
+              <set_value name="$AttackPlayerOwned" exact="false"/>
+              <set_value name="$NumSubordinates" exact="1"/>
+              <create_group groupname="$Subordinates"/>
+            </do_if>
+          </patch>
+        </cue>
+
+        <!--event.param [$sector, $subordinatecount, $checkchance (defaults to true), $isdefensive]-->
+        <cue name="RequestActiveKhaakSpawn" instantiate="true">
+          <conditions>
+            <event_cue_signalled/>
+          </conditions>
+          <actions>
+            <set_value name="this.$Sector" exact="event.param.{1}"/>
+            <set_value name="this.$SubordinateCount" exact="event.param.{2}"/>
+            <run_actions ref="GetSuitableBaseStationForShipSpawn" result="this.$BaseStation">
+              <param name="Sector" value="this.$Sector"/>
+              <param name="ShipCount" value="1 + this.$SubordinateCount"/>
+              <param name="CheckSectorChance" value="if event.param.{3}? then event.param.{3} else true"/>
+              <param name="IsDefensive" value="@event.param.{4}"/>
+            </run_actions>
+            <do_if value="this.$BaseStation">
+              <set_value name="this.$ResultPos" exact="null"/>
+              <do_if value="this.$Sector.resources.count">
+                <find_resource sector="this.$ResSector" refobject="this.$Sector" position="this.$RegionPos" ware="this.$Sector.resources.list" snap="false"/>
+                <do_if value="this.$ResSector">
+                  <get_safe_pos result="this.$ResultPos" sector="this.$ResSector" value="this.$RegionPos" radius="300m"/>
+                </do_if>
+              </do_if>
+              <do_else>
+                <set_value name="$SectorCentre" exact="this.$Sector.coreposition"/>
+                <set_value name="$Yaw" min="0deg" max="360deg"/>
+                <set_value name="$Y" min="$SectorCentre.y - 10km" max="$SectorCentre.y + 10km"/>
+                <set_value name="$PlacementDist" min="0km" max="this.$Sector.coresize / 2" profile="increasing"/>
+
+                <get_safe_pos result="this.$ResultPos" sector="this.$Sector" x="$SectorCentre.x + sin($Yaw) * $PlacementDist" y="$Y" z="$SectorCentre.z + cos($Yaw) * $PlacementDist" radius="300m"/>
+                <remove_value name="$SectorCentre"/>
+                <remove_value name="$Yaw"/>
+                <remove_value name="$Y"/>
+              </do_else>
+
+              <do_if value="this.$ResultPos">
+                <signal_cue_instantly cue="SpawnActiveKhaak" param="[this.$Sector, this.$ResultPos, this.$BaseStation, this.$SubordinateCount, @event.param.{4}]"/>
+              </do_if>
+            </do_if>
+          </actions>
+        </cue>
+
+        <cue name="Test_SpawnActiveKhaak" instantiate="true">
+          <conditions>
+            <event_cue_signalled/>
+          </conditions>
+          <actions>
+            <create_position name="this.$Pos" object="player.ship" space="player.sector" z="400m"/>
+            <signal_cue_instantly cue="SpawnActiveKhaak" param="[player.sector, this.$Pos, null, 3]"/>
+          </actions>
+        </cue>
+
+        <!--Spawn a Kha'ak (or group) that warps in to attack
+        event.param [$sector, $position, $basestation (optional), $numsubordinates (optional), $isdefensive]-->
+        <cue name="SpawnActiveKhaak" instantiate="true" namespace="this">
+          <conditions>
+            <event_cue_signalled/>
+          </conditions>
+          <actions>
+            <set_value name="$ActivateTime" exact="4s"/>
+            <do_if value="@event.param.{4}">
+              <set_value name="$Class" exact="class.ship_m"/>
+            </do_if>
+            <do_else>
+              <do_any>
+                <set_value name="$Class" exact="class.ship_m" weight="10"/>
+                <set_value name="$Class" exact="class.ship_s" weight="5"/>
+              </do_any>
+            </do_else>
+            <create_ship name="$Ship" sector="event.param.{1}">
+              <select faction="faction.khaak" size="$Class"/>
+              <owner exact="faction.khaak"/>
+              <pilot actor="null"/>
+              <position value="event.param.{2}"/>
+            </create_ship>
+            <do_if value="$Ship.exists">
+              <debug_text text="'Created Khaak ship ' + $Ship + ' ' + $Ship.knownname + ' in sector ' + event.param.{1}.knownname" chance="Manager.$DebugChance"/>
+
+              <find_object_component name="$Engines" multiple="true" object="$Ship" class="class.engine"/>
+              <do_for_each name="$Engine" in="$Engines">
+                <set_object_hacked object="$Engine" duration="$ActivateTime"/>
+              </do_for_each>
+
+              <set_value name="$ShipGroup" exact="null"/>
+              <do_if value="@event.param.{3}.exists">
+                <do_if value="@event.param.{5}">
+                  <!--Is a defensive spawn-->
+                  <set_value name="$ShipGroup" exact="@Manager.$DefenceShipGroupTable.{event.param.{3}}"/>
+                </do_if>
+                <do_elseif value="Manager.$Outposts.indexof.{event.param.{3}}">
+                  <set_value name="$ShipGroup" exact="@Manager.$OutpostShipGroupTable.{event.param.{3}}"/>
+                </do_elseif>
+              </do_if>
+              <do_if value="$ShipGroup">
+                <add_to_group groupname="$ShipGroup" object="$Ship"/>
+              </do_if>
+
+              <set_value name="$AddAsSubordinates" exact="false"/>
+              <do_if value="@event.param.{4}">
+                <do_all exact="event.param.{4}">
+                  <create_ship name="$Follower" sector="event.param.{1}">
+                    <select faction="faction.khaak" size="class.ship_s"/>
+                    <owner exact="faction.khaak"/>
+                    <pilot>
+                      <select faction="faction.khaak" tags="tag.aipilot"/>
+                    </pilot>
+                    <!--TODO @Owen better spawning position for subordinates-->
+                    <safepos object="$Ship"/>
+                  </create_ship>
+                  <do_if value="$AddAsSubordinates">
+                    <set_object_commander object="$Follower" commander="$Ship"/>
+                    <create_order object="$Follower" id="'Escort'" default="true">
+                      <param name="formation" value="formationshape.halfcircle"/>
+                      <!-- ship width -->
+                      <param name="formationparam" value="32.6274m"/>
+                      <param name="rollformation" value="true"/>
+                      <param name="overrideformationskill" value="true"/>
+                    </create_order>
+                  </do_if>
+                  <do_else>
+                    <create_order object="$Follower" id="'Patrol'" default="true">
+                      <param name="space" value="$Follower.sector"/>
+                    </create_order>
+                  </do_else>
+
+                  <do_if value="$ShipGroup">
+                    <add_to_group groupname="$ShipGroup" object="$Follower"/>
+                  </do_if>
+                </do_all>
+              </do_if>
+
+              <add_effect object="$Ship.zone" effect="'jump_jumpin_khaak'">
+                <position object="$Ship"/>
+              </add_effect>
+            </do_if>
+            <do_else>
+              <cancel_cue cue="this"/>
+            </do_else>
+          </actions>
+          <delay exact="$ActivateTime"/>
+          <actions>
+            <do_if value="$Ship.isoperational">
+              <create_cue_actor cue="this" name="$Pilot">
+                <select faction="faction.khaak" tags="tag.aipilot"/>
+              </create_cue_actor>
+              <assign_control_entity object="$Ship" actor="$Pilot" post="controlpost.aipilot" transfer="true"/>
+              <create_order object="$Ship" id="'Patrol'" default="true">
+                <param name="space" value="$Ship.sector"/>
+              </create_order>
+            </do_if>
+          </actions>
+        </cue>
+
+        <cue name="StationDestroyed_v2" instantiate="true">
+          <conditions>
+            <check_any>
+              <event_object_destroyed group="$HiveStations"/>
+              <event_object_destroyed group="$Outposts"/>
+            </check_any>
+          </conditions>
+          <actions>
+            <!--TODO @Owen hand off Kha'ak ships to other stations? Have them despawn over time?-->
+            <do_if value="$Outposts.indexof.{event.object}">
+              <remove_value name="$OutpostShipGroupTable.{event.object}"/>
+              <remove_value name="$OutpostShipQuotaTable.{event.object}"/>
+            </do_if>
+            <remove_value name="$DefenceShipGroupTable.{event.object}"/>
+            <remove_value name="$DefenceShipQuotaTable.{event.object}"/>
+
+            <set_value name="this.$ValidSectors" exact="[]"/>
+            <do_for_each name="$HiveStation" in="$HiveStations">
+              <do_if value="event.object != $HiveStation">
+                <find_sector_in_range name="this.$ValidSectors" object="$HiveStation" excluded="$IgnoredSectors" maxdistance="$HiveStationGateRange" multiple="true" append="true"/>
+              </do_if>
+            </do_for_each>
+
+            <do_for_each name="$Outpost" in="$Outposts">
+              <do_if value="event.object != $Outpost">
+                <append_to_list name="this.$ValidSectors" exact="$Outpost.sector"/>
+              </do_if>
+            </do_for_each>
+
+            <set_value name="this.$OldSectors" exact="$WatchedSectors.list"/>
+            <do_for_each name="$OldSector" in="this.$OldSectors">
+              <do_if value="this.$ValidSectors.indexof.{$OldSector} == 0">
+                <debug_text text="'Sector ' + $OldSector + ' ' + $OldSector.knownname + ' no longer is to be listened to.'" chance="$DebugChance"/>
+                <remove_value name="$SectorMiningActivityTable.{$OldSector}"/>
+                <remove_value name="$SectorKhaakActivityTable.{$OldSector}"/>
+                <remove_from_group group="$WatchedSectors" object="$OldSector"/>
+              </do_if>
+            </do_for_each>
+          </actions>
+        </cue>
+
+        <!--This cue:
+        - checks the resource yield of the $Sectors and increments values in the $SectorMiningActivityTable (if sector has not resources, increment a small amount)
+        - has a chance to increment the $ShipQuotaTable values to allow more Kha'ak ships for a station
+        - has a chance to spawn a new station, if conditions are met
+        - if a sector activity level is high enough, trigger a major event at the cost of activity level-->
+        <cue name="Evaluate" instantiate="true" checkinterval="1min">
+          <conditions>
+            <cue_is_complete cue="Init"/>
+          </conditions>
+          <actions>
+            <do_for_each name="$Sector" in="$WatchedSectors">
+              <set_value name="$SectorResources" exact="$Sector.resources.list"/>
+
+              <do_if value="not $SectorResourceYieldTable.{$Sector}? or player.age gt $SectorResourceYieldTable.{$Sector}.$NextCheckTime">
+                <do_if value="not $SectorResourceYieldTable.{$Sector}?">
+                  <set_value name="$SectorResourceYieldTable.{$Sector}" exact="table[]"/>
+                </do_if>
+                <set_value name="$SectorResourceYieldTable.{$Sector}.$NextCheckTime" min="player.age + 5min" max="player.age + 60min"/>
+
+                <do_for_each name="$Resource" in="$SectorResources">
+                  <do_if value="$YieldFactorTable.{$Resource}?">
+                    <get_highest_resource_yield result="$YieldResult" sector="$Sector" ware="$Resource" yieldname="'veryhigh'" comment="see library/regionyield.xml" />
+                    <do_if value="not $YieldResult">
+                      <get_highest_resource_yield result="$YieldResult" sector="$Sector" ware="$Resource" yieldname="'high'" comment="see library/regionyield.xml" />
+                    </do_if>
+                    <do_if value="not $YieldResult">
+                      <get_highest_resource_yield result="$YieldResult" sector="$Sector" ware="$Resource" yieldname="'medium'" comment="see library/regionyield.xml" />
+                    </do_if>
+                    <do_if value="not $YieldResult">
+                      <get_highest_resource_yield result="$YieldResult" sector="$Sector" ware="$Resource" yieldname="'low'" comment="see library/regionyield.xml" />
+                    </do_if>
+                    <do_if value="$YieldResult">
+                      <do_if value="not $SectorResourceYieldTable.{$Sector}.$YieldsTable?">
+                        <set_value name="$SectorResourceYieldTable.{$Sector}.$YieldsTable" exact="table[]"/>
+                      </do_if>
+                      <set_value name="$SectorResourceYieldTable.{$Sector}.$YieldsTable.{$Resource}" exact="$YieldResult"/>
+                    </do_if>
+                  </do_if>
+                </do_for_each>
+              </do_if>
+
+              <set_value name="this.$HadMatchingResources" exact="false"/>
+              <do_for_each name="$Resource" in="$SectorResources">
+                <do_if value="$YieldFactorTable.{$Resource}?">
+                  <set_value name="$YieldResult" exact="@$SectorResourceYieldTable.{$Sector}.$YieldsTable.{$Resource}"/>
+                  <do_if value="$YieldResult">
+                    <set_value name="this.$HadMatchingResources" exact="true"/>
+                    <debug_text text="$Sector + ' ' + $Sector.knownname + ' has ' + $Resource + ' with yield ' + $YieldResult" chance="$DebugChance2"/>
+                    <debug_text text="'Previous activity value: ' + @$SectorMiningActivityTable.{$Sector}" chance="$DebugChance2"/>
+                    <set_value name="$SectorMiningActivityTable.{$Sector}" operation="add" exact="$YieldResult * $YieldFactorTable.{$Resource}"/>
+                    <debug_text text="'Current activity value: ' + $SectorMiningActivityTable.{$Sector}" chance="$DebugChance2"/>
+                  </do_if>
+                  <do_else>
+                    <debug_text text="$Sector + ' ' + $Sector.knownname + ' has ' + $Resource + ' with low yield'" chance="$DebugChance2"/>
+                  </do_else>
+                </do_if>
+              </do_for_each>
+              <do_if value="not this.$HadMatchingResources">
+                <!--Sector has no resources. Increment a small amount.-->
+                <debug_text text="$Sector + ' ' + $Sector.knownname + ' has no resources. Incrementing activitly by a small amount'" chance="$DebugChance2"/>
+                <debug_text text="'Previous activity value: ' + @$SectorMiningActivityTable.{$Sector}" chance="$DebugChance2"/>
+                <set_value name="$SectorMiningActivityTable.{$Sector}" operation="add" min="$NoMinableResourcePointBonus" max="$NoMinableResourcePointBonus * 2"/>
+                <debug_text text="'Current activity value: ' + $SectorMiningActivityTable.{$Sector}" chance="$DebugChance2"/>
+              </do_if>
+            </do_for_each>
+
+            <do_for_each name="$Station" in="$HiveStations">
+              <set_value name="$HivePresenceTable.{$Station.sector}.$LastKnownTime" exact="player.age"/>
+
+              <!--See if any of the hives should increment their ship quotas-->
+              <do_if value="@$DefenceShipQuotaTable.{$Station} lt $MaxHiveDefenceShipQuota">
+                <do_all chance="(100f - ((100f / $MaxHiveDefenceShipQuota) * @$DefenceShipQuotaTable.{$Station})) * 0.5f">
+                  <set_value name="$DefenceShipQuotaTable.{$Station}" operation="add"/>
+                  <debug_text text="'Increasing defence ship quota for ' + $Station + ' ' + $Station.knownname + ' in ' + $Station.sector.knownname + ' to ' + $DefenceShipQuotaTable.{$Station}" chance="$DebugChance"/>
+                </do_all>
+              </do_if>
+            </do_for_each>
+            <do_for_each name="$Station" in="$Outposts">
+              <!--Update the outpost presence table-->
+              <set_value name="$OutpostPresenceTable.{$Station.sector}.$LastKnownTime" exact="player.age"/>
+
+              <!--See if any of the outposts should increment their ship quotas-->
+              <do_if value="@$DefenceShipQuotaTable.{$Station} lt $MaxOutpostDefenceShipQuota">
+                <do_all chance="(100f - ((100f / $MaxOutpostDefenceShipQuota) * @$DefenceShipQuotaTable.{$Station})) * 0.5f">
+                  <set_value name="$DefenceShipQuotaTable.{$Station}" operation="add"/>
+                  <debug_text text="'Increasing defence ship quota for ' + $Station + ' ' + $Station.knownname + ' in ' + $Station.sector.knownname + ' to ' + $DefenceShipQuotaTable.{$Station}" chance="$DebugChance"/>
+                </do_all>
+              </do_if>
+
+              <set_value name="this.$PotentialMaxKhaak" exact="[((1f / $MaxKhaakActivity) * @$SectorKhaakActivityTable.{$Station.sector}), 1f].min * $MaxOutpostShipQuota"/>
+              <do_if value="@$OutpostShipQuotaTable.{$Station} lt this.$PotentialMaxKhaak">
+                <do_all chance="20">
+                  <set_value name="$OutpostShipQuotaTable.{$Station}" operation="add"/>
+                  <debug_text text="'Increasing outpost harassing ship quota for ' + $Station + ' ' + $Station.knownname + ' in ' + $Station.sector.knownname + ' to ' + $OutpostShipQuotaTable.{$Station}" chance="$DebugChance"/>
+                </do_all>
+              </do_if>
+            </do_for_each>
+
+            <!--Refresh the max number of stations (e.g. in case of new extensions)-->
+            <set_value name="$HiveStationMaxCount" exact="$PotentialHiveStationSectors.count * 0.75"/>
+
+            <!--Check if any new stations should be built-->
+            <set_value name="this.$LowestCooldownTime" exact="if $HiveGlobalCooldownTimes.count then $HiveGlobalCooldownTimes.min else 0"/>
+
+            <do_if value="$HiveStations.count lt $HiveStationMaxCount and ((player.age gt $NextHiveStationMinSpawnTime and player.age gt this.$LowestCooldownTime) or @$FreeHiveSpawnQuota)">
+              <!--Populate a list with the potential sectors, but exclude those which have had a hive present recently (or not so recently if the player killed it)-->
+              <set_value name="$HiveStationSectors" exact="$PotentialHiveStationSectors.list"/>
+              <do_for_each name="$PotentialSector" valuename="$HiveTable" in="$HivePresenceTable">
+                <do_if value="$HiveTable.$Station.exists or (player.age lt $HiveTable.$LastKnownTime + (if @$HiveTable.$PlayerKill then $HiveSectorCooldown else 20min))">
+                  <remove_from_list name="$HiveStationSectors" exact="$PotentialSector"/>
+                </do_if>
+              </do_for_each>
+              <do_if value="$HiveStationSectors.count">
+                <set_value name="this.$NewSector" exact="$HiveStationSectors.random"/>
+                <do_if value="@$FreeHiveSpawnQuota gt 0">
+                  <!--Reduce $FreeHiveSpawnQuota each time until zero-->
+                  <set_value name="$FreeHiveSpawnQuota" operation="subtract"/>
+                </do_if>
+                <do_elseif value="this.$LowestCooldownTime">
+                  <remove_from_list name="$HiveGlobalCooldownTimes" exact="this.$LowestCooldownTime"/>
+                </do_elseif>
+                <!--Stagger the building of multiple stations-->
+                <set_value name="$NextHiveStationMinSpawnTime" min="player.age + 20min" max="player.age + 40min"/>
+                <set_value name="$SectorCentre" exact="this.$NewSector.coreposition"/>
+                <set_value name="$Yaw" min="0deg" max="360deg"/>
+                <set_value name="$Y" min="$SectorCentre.y - 20km" max="$SectorCentre.y + 20km"/>
+                <set_value name="$PlacementDist" min="(this.$NewSector.coresize / 2) + 170km" max="(this.$NewSector.coresize / 2) + 190km" profile="increasing" scale="2"/>
+
+                <create_station name="this.$NewStation" groupname="$HiveStations" sector="this.$NewSector" owner="faction.khaak" macro="macro.landmarks_kha_hive_01_macro" state="componentstate.operational">
+                  <safepos x="$SectorCentre.x + sin($Yaw) * $PlacementDist" y="$Y" z="$SectorCentre.z + cos($Yaw) * $PlacementDist" allowyaxis="false" includeplotbox="true"/>
+                </create_station>
+                <create_position name="this.$StationSectorPos" object="this.$NewStation" space="this.$NewSector"/>
+                <signal_objects object="player.galaxy" param="'init station'" param2="this.$NewStation" param3="false"/>
+                <signal_cue_instantly cue="StationManager" param="this.$NewStation"/>
+                <remove_value name="$SectorCentre"/>
+                <remove_value name="$Yaw"/>
+                <remove_value name="$Y"/>
+                <remove_value name="$PlacementDist"/>
+
+                <set_value name="this.$DefencePlatformCount" min="6" max="8"/>
+                <do_all exact="this.$DefencePlatformCount">
+                  <create_station name="this.$DefencePlatform" sector="this.$NewSector" owner="faction.khaak" macro="macro.landmarks_kha_weaponplatform_01_macro" state="componentstate.operational">
+                    <!--#HACK TODO @Owen the size of the Kha'ak hive is reported as 28km, which seems a bit too large and causes the defence platforms to be moved far away-->
+                    <safepos value="this.$StationSectorPos" space="this.$NewSector" min="9050m" max="9200m" ignored="this.$NewStation" includefiringrange="false" includeplotbox="false"/>
+                  </create_station>
+                  <signal_objects object="player.galaxy" param="'init station'" param2="this.$DefencePlatform" param3="false"/>
+                </do_all>
+
+                <debug_text text="'Create a new station in ' + this.$NewSector.knownname + ' at ' + this.$StationSectorPos + ' with ' + this.$DefencePlatformCount + ' defence platforms'" chance="$DebugChance"/>
+              </do_if>
+              <remove_value name="$HiveStationSectors"/>
+              <remove_value name="$FreeHiveSpawnQuota"/>
+            </do_if>
+
+            <do_if value="player.age ge $NextOutpostMinSpawnTime">
+              <debug_text text="'Checking to place new outpost'" chance="$DebugChance"/>
+              <set_value name="this.$TotalActivity" exact="0"/>
+              <set_value name="this.$SortedSectors" exact="$SectorMiningActivityTable.keys.sorted"/>
+              <!--If one sector has exceeded $SpawnOutpostThreshold, attempt to find a sector to place a new outpost, considering sectors which have also exceeded $MinSpawnOutpostThreshold-->
+              <do_if value="this.$SortedSectors.count and $SectorMiningActivityTable.{this.$SortedSectors.last} ge $SpawnOutpostThreshold">
+                <set_value name="this.$PotentialSectorsTable" exact="table[]"/>
+                <do_for_each name="$Sector" in="this.$SortedSectors" reverse="true">
+                  <!--Check that the sector has resources and is not on an outpost cooldown-->
+                  <do_if value="$Sector.resources.count and (not $OutpostPresenceTable.{$Sector}? or (player.age ge $OutpostPresenceTable.{$Sector}.$LastKnownTime + (if @$OutpostPresenceTable.{$Sector}.$PlayerKill then $OutpostSectorCooldown else 20min)))">
+                    <do_if value="@$SectorMiningActivityTable.{$Sector} ge $MinSpawnOutpostThreshold">
+                      <set_value name="this.$TotalActivity" operation="add" exact="$SectorMiningActivityTable.{$Sector}"/>
+                      <set_value name="this.$PotentialSectorsTable.{$Sector}" exact="$SectorMiningActivityTable.{$Sector}"/>
+                      <debug_text text="'Potential new outpost sector: ' + $Sector + ' ' + $Sector.knownname + ' with score ' + $SectorMiningActivityTable.{$Sector}" chance="$DebugChance"/>
+                    </do_if>
+                  </do_if>
+                  <!--Only consider the sectors with the top 10 activity level-->
+                  <do_if value="this.$PotentialSectorsTable.keys.count gt 10">
+                    <break/>
+                  </do_if>
+                </do_for_each>
+              </do_if>
+              <do_if value="this.$TotalActivity">
+                <set_value name="this.$SelectedTableValue" min="0" max="this.$TotalActivity"/>
+                <set_value name="this.$CurrentTableValue" exact="0"/>
+                <set_value name="this.$SelectedSector" exact="null"/>
+                <do_for_each name="$PotentialSector" valuename="$ThisElementValue" in="this.$PotentialSectorsTable">
+                  <do_if value="this.$CurrentTableValue + $ThisElementValue ge this.$SelectedTableValue">
+                    <set_value name="this.$SelectedSector" exact="$PotentialSector"/>
+                    <break/>
+                  </do_if>
+                  <do_else>
+                    <set_value name="this.$CurrentTableValue" operation="add" exact="$ThisElementValue"/>
+                  </do_else>
+                </do_for_each>
+                <do_if value="this.$SelectedSector">
+                  <!--Find a hive to spawn the outpost.-->
+                  <shuffle_group group="$HiveStations"/>
+                  <set_value name="this.$SelectedHive" exact="null"/>
+                  <do_for_each name="$Hive" in="$HiveStations">
+                    <set_value name="this.$GateDistance" exact="$Hive.gatedistance.{this.$SelectedSector}"/>
+                    <do_if value="this.$GateDistance ge 0 and this.$GateDistance le $HiveStationGateRange">
+                      <set_value name="this.$SelectedHive" exact="$Hive"/>
+                      <break/>
+                    </do_if>
+                  </do_for_each>
+                  <do_if value="this.$SelectedHive">
+                    <set_value name="$NextOutpostMinSpawnTime" min="player.age + 30min" max="player.age + 120min"/>
+                    <include_actions ref="Create_Outpost_Helper"/>
+                    <do_if value="this.$NewStation.exists">
+                      <!--Note: $OutpostPlacementRecords was previously used to prevent more than one outpost being around a hive. No longer the case.-->
+                      <set_value name="$OutpostPlacementRecords.{this.$SelectedHive.sector}" exact="[player.age, this.$NewStation]"/>
+                      <set_value name="$SectorMiningActivityTable.{this.$SelectedSector}" exact="0"/>
+                      <set_value name="$SectorKhaakActivityTable.{this.$SelectedSector}" min="$MaxKhaakActivity / 100" max="$MaxKhaakActivity / 80"/>
+                    </do_if>
+                    <break/>
+                  </do_if>
+                </do_if>
+              </do_if>
+            </do_if>
+
+
+            <!--See if a major spawning event should happen in a sector, at the cost of activity level-->
+            <!--TODO @Owen should this happen but only for Hive sectors?-->
+            <!--<do_for_each name="$Sector" in="$WatchedSectors">
+              <do_if value="@$SectorActivityTable.{$Sector} ge $MaxMiningActivity">
+                <debug_text text="'Attempting to spawn a large number of Khaak in sector ' + $Sector + ' ' + $Sector.knownname" chance="$DebugChance"/>
+                <do_all min="4" max="6">
+                  <set_value name="this.$SubordinateCount" min="0" max="3"/>
+                  <signal_cue_instantly cue="RequestActiveKhaakSpawn" param="[$Sector, this.$SubordinateCount, false, true]"/>
+                </do_all>
+                <set_value name="$SectorActivityTable.{$Sector}" min="0" max="$MaxMiningActivity / 5"/>
+                <break/>
+              </do_if>
+            </do_for_each>-->
+
+            <!--Check if any sector has exceeded the max mining activity. If so, remove its value as something should have happened by now.-->
+            <do_for_each name="$Sector" in="$WatchedSectors">
+              <do_if value="@$SectorMiningActivityTable.{$Sector} gt $MaxMiningActivity">
+                <set_value name="$SectorMiningActivityTable.{$Sector}" exact="0"/>
+              </do_if>
+            </do_for_each>
+          </actions>
+        </cue>
+
+        <library name="Create_Outpost_Helper">
+          <actions>
+            <set_value name="$SectorCentre" exact="this.$SelectedSector.coreposition"/>
+            <set_value name="$Yaw" min="0deg" max="360deg"/>
+            <set_value name="$Y" min="$SectorCentre.y - 20km" max="$SectorCentre.y + 20km"/>
+            <set_value name="$PlacementDist" min="(this.$SelectedSector.coresize / 2) + 140km" max="(this.$SelectedSector.coresize / 2) + 180km" profile="increasing" scale="2"/>
+
+            <create_station name="this.$NewStation" groupname="$Outposts" sector="this.$SelectedSector" owner="faction.khaak" macro="macro.landmarks_kha_nest_01_macro" state="componentstate.operational">
+              <safepos x="$SectorCentre.x + sin($Yaw) * $PlacementDist" y="$Y" z="$SectorCentre.z + cos($Yaw) * $PlacementDist" allowyaxis="false" includeplotbox="true"/>
+            </create_station>
+            <do_if value="this.$NewStation">
+              <create_position name="this.$StationSectorPos" object="this.$NewStation" space="this.$SelectedSector"/>
+              <signal_objects object="player.galaxy" param="'init station'" param2="this.$NewStation" param3="false"/>
+              <signal_cue_instantly cue="StationManager" param="this.$NewStation"/>
+              <set_value name="$OutpostShipQuotaTable.{this.$NewStation}" min="$MaxOutpostShipQuota / 16" max="$MaxOutpostShipQuota / 8"/>
+            </do_if>
+            <remove_value name="$SectorCentre"/>
+            <remove_value name="$Yaw"/>
+            <remove_value name="$Y"/>
+            <remove_value name="$PlacementDist"/>
+          </actions>
+        </library>
+      </cues>
+    </cue>
+  </cues>
+</mdscript>

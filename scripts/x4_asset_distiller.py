@@ -370,6 +370,7 @@ def run_distillation_for_version(m_config, v_config, config_dir, xml_diff):
         { 'path': os.path.join('libraries', 'loadouts.xml'), 'final': os.path.join('libraries', 'loadouts_final.xml') },
         { 'path': os.path.join('libraries', 'defaults.xml'), 'final': os.path.join('libraries', 'defaults_final.xml') },
         { 'path': os.path.join('md', 'factionlogic.xml'), 'final': os.path.join('md', 'factionlogic_final.xml') },
+        { 'path': os.path.join('md', 'khaak_activity.xml'), 'final': os.path.join('md', 'khaak_activity_final.xml') },
     ]
 
     for xml_file in xml_files:
