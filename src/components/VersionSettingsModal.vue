@@ -244,6 +244,7 @@ const handleBackdropClick = (event: MouseEvent) => {
               {{ option.label }}
             </option>
           </select>
+          <p class="data-isolation-hint">{{ t('settings.gameVersion.dataIsolationHint') }}</p>
 
           <div
             v-if="shouldShowDirtyModules"
@@ -367,6 +368,10 @@ const handleBackdropClick = (event: MouseEvent) => {
 
 .version-select {
   @apply w-full bg-slate-900 border border-slate-600 text-slate-200 rounded px-3 py-2 focus:border-sky-500 outline-none;
+}
+
+.data-isolation-hint {
+  @apply mt-2 text-xs text-slate-400;
 }
 
 .modal-footer {

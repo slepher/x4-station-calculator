@@ -527,6 +527,7 @@
     "gameVersion": {
       "title": "游戏版本",
       "select": "选择游戏数据版本",
+      "dataIsolationHint": "版本之间数据不互通，如需迁移数据请使用导入导出功能。",
       "save": "保存",
       "switch": "切换",
       "saveAndSwitch": "保存并切换",

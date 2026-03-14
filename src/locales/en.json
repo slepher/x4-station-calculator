@@ -525,6 +525,7 @@
     "gameVersion": {
       "title": "Game Version",
       "select": "Select game data version",
+      "dataIsolationHint": "Data is not shared between versions. Use import/export to transfer data.",
       "save": "Save",
       "switch": "Switch",
       "saveAndSwitch": "Save and Switch",
