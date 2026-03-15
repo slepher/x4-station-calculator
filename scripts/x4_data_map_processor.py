@@ -32,6 +32,8 @@ DEFAULT_REGIONYIELDS_XML = ""
 DEFAULT_FACTIONS_OUTPUT = ""
 DEFAULT_REGIONS_OUTPUT = ""
 DEFAULT_REGIONYIELDS_OUTPUT = ""
+DEFAULT_REGIONYIELD_DEFINITIONS_OUTPUT = ""
+DEFAULT_RESOURCEAREAS_OUTPUT = ""
 
 
 def apply_runtime_config(effective_config: Dict[str, object]) -> None:
@@ -49,6 +51,8 @@ def apply_runtime_config(effective_config: Dict[str, object]) -> None:
     global DEFAULT_FACTIONS_OUTPUT
     global DEFAULT_REGIONS_OUTPUT
     global DEFAULT_REGIONYIELDS_OUTPUT
+    global DEFAULT_REGIONYIELD_DEFINITIONS_OUTPUT
+    global DEFAULT_RESOURCEAREAS_OUTPUT
 
     X4_UNPACKED_DATA_PATH = os.path.join(str(effective_config["raw_assets_dir"]), str(effective_config["folder_name"]))
     OUTPUT_VERSION_DIR = os.path.join(str(effective_config["processed_assets_dir"]), str(effective_config["folder_name"]))
@@ -64,6 +68,8 @@ def apply_runtime_config(effective_config: Dict[str, object]) -> None:
     DEFAULT_FACTIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "factions.json")
     DEFAULT_REGIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regions.json")
     DEFAULT_REGIONYIELDS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regionyields.json")
+    DEFAULT_REGIONYIELD_DEFINITIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regionyield_definitions.json")
+    DEFAULT_RESOURCEAREAS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "resourceareas.json")
 
 
 def default_version_item(config: Dict[str, object]) -> Dict[str, object]:
@@ -112,6 +118,271 @@ OWNER_COLORS = {
     "scaleplate": "#4b5563",
     "scavenger": "#4b5563",
 }
+
+
+# =============================================================================
+# 版本分流：资源模型检测
+# =============================================================================
+
+def detect_map_resource_model(version_str: str) -> str:
+    """
+    根据游戏版本号判定资源模型类型。
+
+    规则：主版本号 < 9 使用 'regions' 模型，>= 9 使用 'resourceareas' 模型。
+
+    Args:
+        version_str: 版本字符串，如 "8.0", "9.0", "9.0-Empire-beta"
+
+    Returns:
+        "regions" 或 "resourceareas"
+    """
+    if not version_str:
+        return "regions"
+    # 提取主版本号
+    match = re.match(r"(\d+)", str(version_str))
+    if not match:
+        return "regions"
+    major_version = int(match.group(1))
+    return "resourceareas" if major_version >= 9 else "regions"
+
+
+# =============================================================================
+# 9.0+ 资源区定义解析 (resourceareas model)
+# =============================================================================
+
+def migrate_resourcearea_definitions(regionyields_xml_path: Path) -> Dict[str, dict]:
+    """
+    解析 9.0+ 版本的 regionyields_final.xml，提取 definition 节点。
+
+    该版本使用 <definition> 元素定义资源区模板，而非旧版的 <resource><yield> 结构。
+
+    Args:
+        regionyields_xml_path: regionyields_final.xml 文件路径
+
+    Returns:
+        按 definition id 索引的定义字典
+    """
+    if not regionyields_xml_path.exists():
+        return {}
+    root = parse_xml(regionyields_xml_path)
+    definitions: Dict[str, dict] = {}
+
+    for def_node in root.findall("./definition[@id]"):
+        def_id = (def_node.get("id") or "").strip()
+        if not def_id:
+            continue
+
+        # 基础标识
+        ware = (def_node.get("ware") or "").strip()
+        tag = (def_node.get("tag") or "").strip()  # verylow/low/medium/high/veryhigh
+
+        # 产能参数
+        yield_val = as_float(def_node.get("yield"), 0.0)
+        respawn_delay = as_float(def_node.get("respawndelay"), 0.0)  # 分钟
+
+        # 展示参数
+        rating = as_float(def_node.get("rating"), 0.0)
+        scaneffect = (def_node.get("scaneffect") or "").strip()
+        scaneffectintensity = as_float(def_node.get("scaneffectintensity"), 0.0)
+        scaneffectcolor = (def_node.get("scaneffectcolor") or "").strip()
+
+        # 类型系数：矿物用 objectyieldfactor，气体用 gatherspeedfactor
+        objectyieldfactor = as_float(def_node.get("objectyieldfactor"), None)
+        gatherspeedfactor = as_float(def_node.get("gatherspeedfactor"), None)
+
+        # 尺寸参数：从 boundary/size/@r 读取半径
+        radius = 0.0
+        boundary_node = def_node.find("./boundary[@class='sphere']/size")
+        if boundary_node is not None:
+            radius = as_float(boundary_node.get("r"), 0.0)
+
+        # 派生字段：从 id 命名中提取尺寸
+        size = ""
+        if "_tiny_" in def_id:
+            size = "tiny"
+        elif "_small_" in def_id:
+            size = "small"
+        elif "_medium_" in def_id:
+            size = "medium"
+        elif "_large_" in def_id:
+            size = "large"
+
+        # 派生字段：可持续产量/小时 = yield / respawnDelay * 60
+        sustainable_yield_per_hour = 0.0
+        if respawn_delay > 0:
+            sustainable_yield_per_hour = yield_val / respawn_delay * 60.0
+
+        definition: Dict[str, object] = {
+            "id": def_id,
+            "ware": ware,
+            "tag": tag,
+            "size": size,
+            "radius": radius,
+            "yield": yield_val,
+            "respawnDelay": respawn_delay,
+            "rating": rating,
+            "sustainableYieldPerHour": sustainable_yield_per_hour,
+        }
+
+        # 可选字段
+        if scaneffect:
+            definition["scaneffect"] = scaneffect
+        if scaneffectintensity > 0:
+            definition["scaneffectintensity"] = scaneffectintensity
+        if scaneffectcolor:
+            definition["scaneffectcolor"] = scaneffectcolor
+        if objectyieldfactor is not None:
+            definition["objectyieldfactor"] = objectyieldfactor
+        if gatherspeedfactor is not None:
+            definition["gatherspeedfactor"] = gatherspeedfactor
+
+        definitions[def_id] = definition
+
+    return definitions
+
+
+def migrate_sector_resourceareas(mapdefaults_xml_path: Path) -> Dict[str, List[dict]]:
+    """
+    解析 mapdefaults_final.xml 中各 sector 的 resourceareas 引用。
+
+    Args:
+        mapdefaults_xml_path: mapdefaults_final.xml 文件路径
+
+    Returns:
+        按 sector macro 索引的资源区引用列表
+    """
+    if not mapdefaults_xml_path.exists():
+        return {}
+    root = parse_xml(mapdefaults_xml_path)
+    sector_resource_areas: Dict[str, List[dict]] = {}
+
+    for dataset in root.findall("./dataset[@macro]"):
+        macro = (dataset.get("macro") or "").strip().lower()
+        if not macro:
+            continue
+        # 只处理 sector macro
+        if not SECTOR_MACRO_RE.fullmatch(macro):
+            continue
+
+        resourceareas_node = dataset.find("./properties/resourceareas")
+        if resourceareas_node is None:
+            continue
+
+        areas: List[dict] = []
+        for area_node in resourceareas_node.findall("./resourcearea[@ref]"):
+            ref = (area_node.get("ref") or "").strip()
+            amount = as_float(area_node.get("amount"), 0.0)
+            if ref:
+                areas.append({
+                    "ref": ref,
+                    "amount": int(amount) if amount > 0 else 1,
+                })
+
+        if areas:
+            sector_resource_areas[macro] = areas
+
+    return sector_resource_areas
+
+
+def build_sector_resource_summaries_from_resourceareas(
+    sector_resource_areas: Dict[str, List[dict]],
+    definitions: Dict[str, dict],
+) -> Dict[str, List[dict]]:
+    """
+    从 resourceareas 数据聚合出 sector 级资源摘要，兼容现有 maps.json 的 sector.resources 结构。
+
+    Args:
+        sector_resource_areas: sector 的资源区引用
+        definitions: 资源区定义模板
+
+    Returns:
+        按 sector macro 索引的资源摘要列表
+    """
+    TAG_LEVEL_MAP: Dict[str, int] = {
+        "verylow": 1,
+        "low": 2,
+        "medium": 3,
+        "high": 4,
+        "veryhigh": 5,
+    }
+
+    summaries: Dict[str, List[dict]] = {}
+
+    for sector_macro, areas in sector_resource_areas.items():
+        by_ware: Dict[str, dict] = {}
+
+        for area in areas:
+            ref = area.get("ref", "")
+            amount = area.get("amount", 1)
+            definition = definitions.get(ref, {})
+
+            ware = definition.get("ware", "")
+            if not ware:
+                continue
+
+            tag = definition.get("tag", "medium")
+            yield_val = as_float(definition.get("yield"), 0.0)
+            respawn_delay = as_float(definition.get("respawnDelay"), 0.0)
+            sustainable_yield = as_float(definition.get("sustainableYieldPerHour"), 0.0)
+            level = TAG_LEVEL_MAP.get(tag, 3)
+
+            entry = by_ware.setdefault(ware, {
+                "ware": ware,
+                "amount": 0,
+                "max_yield": 0.0,
+                "max_level": 0,
+                "max_tag": "",
+                "total_sustainable_yield": 0.0,
+            })
+
+            entry["amount"] += amount
+            if yield_val > entry["max_yield"]:
+                entry["max_yield"] = yield_val
+                entry["max_level"] = level
+                entry["max_tag"] = tag
+            if respawn_delay > 0:
+                entry["total_sustainable_yield"] += sustainable_yield * amount
+
+        # 转换为兼容格式
+        resources: List[dict] = []
+        for ware, entry in sorted(by_ware.items()):
+            resources.append({
+                "ware": ware,
+                "yield": entry["max_tag"],
+                "level": entry["max_level"],
+                "totalYield": int(entry["max_yield"] * entry["amount"]),
+                "sustainableYieldPerHour": int(entry["total_sustainable_yield"]),
+            })
+
+        summaries[sector_macro] = resources
+
+    return summaries
+
+
+def build_resourceareas_json_payload(
+    version_str: str,
+    sector_resource_areas: Dict[str, List[dict]],
+    definitions: Dict[str, dict],
+) -> dict:
+    """
+    构建 resourceareas.json 的完整输出结构。
+
+    Args:
+        version_str: 版本字符串
+        sector_resource_areas: sector 的资源区引用
+        definitions: 资源区定义模板
+
+    Returns:
+        完整的 resourceareas.json payload
+    """
+    return {
+        "meta": {
+            "version": version_str,
+            "schema": "x4-resourceareas-v1",
+        },
+        "sectorResourceAreas": sector_resource_areas,
+        "definitions": definitions,
+    }
 
 
 def resolve_sector_macro_from_region_connection(connection_name: str) -> Optional[str]:
@@ -446,23 +717,48 @@ def distance_3d(left: dict, right: dict) -> float:
     )
 
 
+# 体积计算上限限制（单位：米）
+CYLINDER_RADIUS_LIMIT = 200_000      # 200 km
+CYLINDER_HEIGHT_LIMIT = 80_000       # 80 km
+SPLINETUBE_LENGTH_LIMIT = 1_000_000  # 1000 km
+
+
 def boundary_volume(boundary: Optional[dict]) -> float:
+    """
+    计算边界体积（单位：m³），带体积上限限制。
+
+    限制规则：
+    - sphere: 半径 > 200km 时按圆柱体计算（r=200km, h=80km）
+    - cylinder: 半径最大 200km，高度最大 80km
+    - splinetube: 长度最大 1000km，半径最大 200km
+    """
     if not boundary:
         return 1.0
     boundary_class = str(boundary.get("class") or "")
     size = boundary.get("size") or {}
     radius = as_number(size.get("r"), 0.0)
+
     if boundary_class == "sphere":
+        if radius > CYLINDER_RADIUS_LIMIT:
+            # 超过限制，按圆柱体计算
+            return math.pi * (CYLINDER_RADIUS_LIMIT ** 2) * CYLINDER_HEIGHT_LIMIT
         return (4.0 / 3.0) * math.pi * (radius ** 3)
+
     if boundary_class == "cylinder":
         linear = as_number(size.get("linear"), 0.0)
-        return math.pi * (radius ** 2) * linear
+        r_capped = min(radius, CYLINDER_RADIUS_LIMIT)
+        linear_capped = min(linear, CYLINDER_HEIGHT_LIMIT)
+        return math.pi * (r_capped ** 2) * linear_capped
+
     if boundary_class == "splinetube":
         spline = boundary.get("spline") or []
         length = 0.0
         for left, right in zip(spline, spline[1:]):
             length += distance_3d(left, right)
-        return math.pi * (radius ** 2) * length
+        r_capped = min(radius, CYLINDER_RADIUS_LIMIT)
+        length_capped = min(length, SPLINETUBE_LENGTH_LIMIT)
+        return math.pi * (r_capped ** 2) * length_capped
+
     return 1.0
 
 
@@ -697,18 +993,43 @@ def build_yield_level_map(regionyields_xml_path: Path) -> Dict[str, Dict[str, in
 
 
 def build_yield_density_map(regionyields_xml_path: Path) -> Dict[str, Dict[str, float]]:
-    density_map: Dict[str, Dict[str, float]] = {}
+    """
+    构建资源密度映射表（仅 resourcedensity）。
+    兼容旧函数，新代码请使用 build_yield_info_map。
+    """
+    info_map = build_yield_info_map(regionyields_xml_path)
+    return {
+        ware: {
+            yield_name: info["resourcedensity"]
+            for yield_name, info in yields.items()
+        }
+        for ware, yields in info_map.items()
+    }
+
+
+def build_yield_info_map(regionyields_xml_path: Path) -> Dict[str, Dict[str, dict]]:
+    """
+    构建资源完整信息映射表，包含 resourcedensity、replenishtime、gatherspeedfactor。
+
+    Returns:
+        {ware: {yield_name: {resourcedensity, replenishtime, gatherspeedfactor}}}
+    """
+    info_map: Dict[str, Dict[str, dict]] = {}
     for resource in migrate_regionyields(regionyields_xml_path):
         ware = str(resource.get("ware") or "").strip()
         if not ware:
             continue
-        density_map[ware] = {}
+        info_map[ware] = {}
         for yield_item in resource.get("yields", []):
             yield_name = str(yield_item.get("name") or "").strip()
             if not yield_name:
                 continue
-            density_map[ware][yield_name] = as_number(yield_item.get("resourcedensity"), 0.0)
-    return density_map
+            info_map[ware][yield_name] = {
+                "resourcedensity": as_number(yield_item.get("resourcedensity"), 0.0),
+                "replenishtime": as_number(yield_item.get("replenishtime"), 0.0),
+                "gatherspeedfactor": as_number(yield_item.get("gatherspeedfactor"), 1.0),
+            }
+    return info_map
 
 
 def load_region_object_groups(
@@ -778,7 +1099,19 @@ GAS_ENGINE_MULTIPLIER = 1000.0
 def summarize_region_resources(
     region_item: dict,
     legacy_resource_map: Dict[str, dict],
+    yield_info_map: Optional[Dict[str, Dict[str, dict]]] = None,
 ) -> List[dict]:
+    """
+    总结 region 的资源产出。
+
+    Args:
+        region_item: region 定义
+        legacy_resource_map: 旧版资源映射
+        yield_info_map: 资源 yield 信息映射（包含 replenishtime, gatherspeedfactor）
+
+    Returns:
+        资源产出列表，包含 delay 和 respawn 字段
+    """
     region_density = as_number(region_item.get("density"), 1.0)
     boundary = region_item.get("boundary")
     falloff = region_item.get("falloff") or {}
@@ -816,6 +1149,11 @@ def summarize_region_resources(
                 yield_base = as_number(field.get("yield"), 0.0)
                 if yield_base <= 0:
                     yield_base = as_number(legacy.get("resourcedensity"), 0.0)
+                if yield_base <= 0:
+                    # 尝试从 yield_info_map 获取
+                    yield_name = legacy.get("yield", "")
+                    if yield_info_map and ware in yield_info_map and yield_name in yield_info_map[ware]:
+                        yield_base = yield_info_map[ware][yield_name]["resourcedensity"]
                 if yield_base <= 0:
                     continue
                 probe_density = 0.0
@@ -862,6 +1200,23 @@ def summarize_region_resources(
         item["amount"] = item["simulated_amount"]
         item["amount_per_field"] = int(round(as_number(item["simulated_amount"]) / field_count))
         item["yield"], item["level"] = classify_density_tier(str(item.get("ware") or ""), as_number(item["density"]))
+
+        # 计算 delay 和 respawn
+        # delay = replenishtime / 60 (小时)
+        # respawn = yield * 60 / delay = sustainableYieldPerHour
+        yield_name = item.get("legacy_yield", "")
+        if yield_info_map and item["ware"] in yield_info_map and yield_name in yield_info_map[item["ware"]]:
+            replenishtime = yield_info_map[item["ware"]][yield_name]["replenishtime"]
+            gatherspeedfactor = yield_info_map[item["ware"]][yield_name]["gatherspeedfactor"]
+        else:
+            # 默认值
+            replenishtime = 60.0  # 默认 1 小时
+            gatherspeedfactor = 1.0
+
+        item["delay"] = replenishtime / 60.0 if replenishtime > 0 else 60.0
+        item["respawn"] = item["simulated_amount"] * 60.0 / item["delay"] if item["delay"] > 0 else 0.0
+        item["factor"] = gatherspeedfactor if is_gas_field else 1.0
+
     return resources
 
 
@@ -870,6 +1225,7 @@ def migrate_region_definitions(
     regionobjectgroups_xml_path: Path,
     yield_level_map: Dict[str, Dict[str, int]],
     yield_density_map: Dict[str, Dict[str, float]],
+    yield_info_map: Optional[Dict[str, Dict[str, dict]]] = None,
 ) -> Dict[str, dict]:
     if not region_definitions_xml_path.exists():
         return {}
@@ -914,66 +1270,47 @@ def migrate_region_definitions(
         region_item["resources"] = summarize_region_resources(
             region_item,
             legacy_resources_by_region.get(region_name, {}),
+            yield_info_map,
         )
         definitions[region_name] = region_item
     return definitions
 
 
 def summarize_sector_resources(region_rows: List[dict]) -> List[dict]:
+    """
+    总结 sector 的资源产出，输出统一的 resources 格式。
+
+    计算方式（与 9.0 统一）：
+    - amount = sum(yield * amount) 实际是 sum(simulated_amount)
+    - respawn = sum(respawn * amount) = sum(simulated_amount * 60 / delay)
+    """
     by_ware: Dict[str, dict] = {}
     for region in region_rows:
         for resource in region.get("resources", []):
             ware = str(resource.get("ware") or "").strip()
             if not ware:
                 continue
+
+            # amount = simulated_amount
+            amount = as_number(resource.get("amount"), 0.0)
+            # respawn = amount * 60 / delay
+            delay = as_number(resource.get("delay"), 60.0)
+            respawn = amount * 60.0 / delay if delay > 0 else 0.0
+
             entry = by_ware.setdefault(ware, {
                 "ware": ware,
-                "total_amount": 0.0,
-                "max_density": 0.0,
-                "regions": [],
+                "amount": 0.0,
+                "respawn": 0.0,
             })
-            density = as_number(resource.get("density"), 0.0)
-            amount = as_number(resource.get("amount"), 0.0)
-            noise_coverage = as_number(resource.get("noise_coverage"), 0.0)
-            entry["total_amount"] += amount
-            entry["max_density"] = max(entry["max_density"], density)
-            entry["regions"].append({
-                "name": region.get("name"),
-                "region_ref": region.get("region_ref"),
-                "density": density,
-                "amount": amount,
-                "volume_km3": as_number(resource.get("volume_km3"), 0.0),
-                "noise_coverage": noise_coverage,
-                "densityfactor_sum": as_number(resource.get("densityfactor_sum"), 0.0),
-            })
+            entry["amount"] += amount
+            entry["respawn"] += respawn
 
     summarized: List[dict] = []
-    for ware, item in sorted(by_ware.items()):
-        regions = item["regions"]
-        if not regions:
-            continue
-        max_density = as_number(item.get("max_density"), 0.0)
-        density_threshold = max_density / 3.0 if max_density > 0 else 0.0
-        qualified = [region for region in regions if as_number(region.get("density"), 0.0) >= density_threshold]
-        representative = max(
-            qualified or regions,
-            key=lambda region: (as_number(region.get("amount"), 0.0), as_number(region.get("density"), 0.0)),
-        )
-        max_amount_region = max(
-            regions,
-            key=lambda region: (as_number(region.get("amount"), 0.0), as_number(region.get("density"), 0.0)),
-        )
+    for ware, entry in sorted(by_ware.items()):
         summarized.append({
             "ware": ware,
-            "total_amount": int(round(as_number(item["total_amount"]))),
-            "max_density": round_sig(max_density, 4),
-            "representative_amount": int(round(as_number(representative.get("amount"), 0.0))),
-            "representative_density": round_sig(as_number(representative.get("density"), 0.0), 4),
-            "max_amount_region_amount": int(round(as_number(max_amount_region.get("amount"), 0.0))),
-            "max_amount_region_density": round_sig(as_number(max_amount_region.get("density"), 0.0), 4),
-            "qualified_region_count": len(qualified),
-            "yield": classify_density_tier(ware, as_number(representative.get("density"), 0.0))[0],
-            "level": classify_density_tier(ware, as_number(representative.get("density"), 0.0))[1],
+            "amount": int(round(entry["amount"])),
+            "respawn": int(round(entry["respawn"])),
         })
     return summarized
 
@@ -1038,6 +1375,9 @@ def generate_map_data(
     regionobjectgroups_xml_path: Optional[Path] = None,
     regionyields_xml_path: Optional[Path] = None,
     i18n_registry=None,
+    resource_model: str = "regions",
+    sector_resource_areas: Optional[Dict[str, List[dict]]] = None,
+    definitions: Optional[Dict[str, dict]] = None,
 ) -> Dict[str, object]:
     name_id_by_macro, area_by_sector_macro = load_mapdefaults(mapdefaults_path)
     registry = i18n_registry or get_i18n_registry()
@@ -1304,45 +1644,134 @@ def generate_map_data(
                 }
                 sectors[sector_macro]["highway_ids"].append(highway_id)
 
-    resolved_region_definitions_path = region_definitions_xml_path or Path(DEFAULT_REGION_DEFINITIONS_XML)
-    resolved_regionobjectgroups_path = regionobjectgroups_xml_path or Path(DEFAULT_REGIONOBJECTGROUPS_XML)
-    resolved_regionyields_path = regionyields_xml_path or Path(DEFAULT_REGIONYIELDS_XML)
-    yield_level_map = build_yield_level_map(resolved_regionyields_path)
-    yield_density_map = build_yield_density_map(resolved_regionyields_path)
-    definitions_by_region_ref = migrate_region_definitions(
-        resolved_region_definitions_path,
-        resolved_regionobjectgroups_path,
-        yield_level_map,
-        yield_density_map,
-    )
     regions_rows: List[dict] = []
-    for sector_id, links in sector_region_links.items():
-        sector_region_rows: List[dict] = []
-        for link in links:
-            definition = definitions_by_region_ref.get(link["region_ref"], {})
-            region_row = {
-                "name": link["name"],
-                "region_ref": link["region_ref"],
-                "cluster_id": link["cluster_id"],
-                "sector_id": link["sector_id"],
-                "density": definition.get("density"),
-                "rotation": definition.get("rotation"),
-                "noisescale": definition.get("noisescale"),
-                "seed": definition.get("seed"),
-                "minnoisevalue": definition.get("minnoisevalue"),
-                "maxnoisevalue": definition.get("maxnoisevalue"),
-                "boundary": definition.get("boundary"),
-                "falloff": definition.get("falloff"),
-                "fields": [dict(item) for item in definition.get("fields", [])],
-                "resources": [dict(item) for item in definition.get("resources", [])],
-            }
-            regions_rows.append(region_row)
-            sector_region_rows.append(region_row)
-        if sector_id in sectors:
-            sectors[sector_id]["resources"] = summarize_sector_resources(sector_region_rows)
-    for sector_id in sectors.keys():
-        sectors[sector_id].setdefault("resources", [])
-    regions_rows.sort(key=lambda item: (item["cluster_id"], item["sector_id"], item["name"]))
+    resourceareas_rows: List[dict] = []
+
+    # 根据资源模型选择不同的处理逻辑
+    if resource_model == "resourceareas" and sector_resource_areas and definitions:
+        # 9.0+ 使用新版资源嵌入逻辑
+        # 注意：sector_resource_areas 的 key 是小写，sectors 的 key 是原始大小写
+        # 需要用 sectors 字典的 key 的小写版本去匹配
+        for sector_key in sectors.keys():
+            sector_key_lower = sector_key.lower()
+            areas = sector_resource_areas.get(sector_key_lower, [])
+
+            # 获取 cluster_id
+            cluster_id = sectors[sector_key].get("cluster_id", "")
+
+            # 聚合 resources (原 resource_wares)
+            resources_map: Dict[str, dict] = {}
+
+            for area in areas:
+                ref = area.get("ref", "")
+                amount = area.get("amount", 1)
+                definition = definitions.get(ref, {})
+
+                if not definition:
+                    continue
+
+                ware = definition.get("ware", "")
+                rating = definition.get("rating", 0.0)
+                yield_val = definition.get("yield", 0.0)
+                delay = definition.get("respawnDelay", 0.0)
+                sustainable = definition.get("sustainableYieldPerHour", 0.0)
+
+                # factor: 自动选择 objectyieldfactor 或 gatherspeedfactor
+                factor = definition.get("objectyieldfactor")
+                if factor is None:
+                    factor = definition.get("gatherspeedfactor")
+                if factor is None:
+                    factor = 1.0
+
+                # 计算 respawn = yield × 60 / delay
+                respawn = 0.0
+                if delay > 0:
+                    respawn = yield_val * 60.0 / delay
+
+                # 添加到 resourceareas_rows（单独输出）
+                resourceareas_rows.append({
+                    "ref": ref,
+                    "amount": amount,
+                    "ware": ware,
+                    "rating": rating,
+                    "yield": yield_val,
+                    "delay": delay,
+                    "factor": factor,
+                    "respawn": respawn,
+                    "cluster_id": cluster_id,
+                    "sector_id": sector_key,
+                })
+
+                # 统一到 maps.json 的 sector.resources 计算方式
+                # amount = sum(yield * amount)
+                # respawn = sum(respawn * amount) = sum(yield * 60 / delay * amount)
+                if ware:
+                    entry = resources_map.setdefault(ware, {
+                        "ware": ware,
+                        "amount": 0.0,
+                        "respawn": 0.0,
+                    })
+                    entry["amount"] += yield_val * amount
+                    if delay > 0:
+                        respawn = yield_val * 60.0 / delay
+                        entry["respawn"] += respawn * amount
+
+            # 转换 resources
+            resources_list = [
+                {
+                    "ware": entry["ware"],
+                    "amount": int(entry["amount"]),
+                    "respawn": int(entry["respawn"]),
+                }
+                for entry in sorted(resources_map.values(), key=lambda x: x["ware"])
+            ]
+
+            sectors[sector_key]["resources"] = resources_list
+
+        for sector_key in sectors.keys():
+            sectors[sector_key].setdefault("resources", [])
+    else:
+        # 8.0- 使用旧版 region 处理逻辑
+        resolved_region_definitions_path = region_definitions_xml_path or Path(DEFAULT_REGION_DEFINITIONS_XML)
+        resolved_regionobjectgroups_path = regionobjectgroups_xml_path or Path(DEFAULT_REGIONOBJECTGROUPS_XML)
+        resolved_regionyields_path = regionyields_xml_path or Path(DEFAULT_REGIONYIELDS_XML)
+        yield_level_map = build_yield_level_map(resolved_regionyields_path)
+        yield_info_map = build_yield_info_map(resolved_regionyields_path)
+        yield_density_map = build_yield_density_map(resolved_regionyields_path)
+        definitions_by_region_ref = migrate_region_definitions(
+            resolved_region_definitions_path,
+            resolved_regionobjectgroups_path,
+            yield_level_map,
+            yield_density_map,
+            yield_info_map,
+        )
+        for sector_id, links in sector_region_links.items():
+            sector_region_rows: List[dict] = []
+            for link in links:
+                definition = definitions_by_region_ref.get(link["region_ref"], {})
+                region_row = {
+                    "name": link["name"],
+                    "region_ref": link["region_ref"],
+                    "cluster_id": link["cluster_id"],
+                    "sector_id": link["sector_id"],
+                    "density": definition.get("density"),
+                    "rotation": definition.get("rotation"),
+                    "noisescale": definition.get("noisescale"),
+                    "seed": definition.get("seed"),
+                    "minnoisevalue": definition.get("minnoisevalue"),
+                    "maxnoisevalue": definition.get("maxnoisevalue"),
+                    "boundary": definition.get("boundary"),
+                    "falloff": definition.get("falloff"),
+                    "fields": [dict(item) for item in definition.get("fields", [])],
+                    "resources": [dict(item) for item in definition.get("resources", [])],
+                }
+                regions_rows.append(region_row)
+                sector_region_rows.append(region_row)
+            if sector_id in sectors:
+                sectors[sector_id]["resources"] = summarize_sector_resources(sector_region_rows)
+        for sector_id in sectors.keys():
+            sectors[sector_id].setdefault("resources", [])
+        regions_rows.sort(key=lambda item: (item["cluster_id"], item["sector_id"], item["name"]))
 
     for zones_root in zone_roots:
         for zone_macro_node in zones_root.findall("./macro[@class='zone']"):
@@ -1732,6 +2161,7 @@ def generate_map_data(
     return {
         "payload": payload,
         "regions": regions_rows,
+        "resourceareas": resourceareas_rows,
         "name_ids": name_ids,
         "missing_name_ids": {
             "clusters": missing_cluster_nameid,
@@ -1745,6 +2175,7 @@ def generate_map_data(
             "sector_links": len(sector_links),
             "highways": len(sector_highways),
             "regions": len(regions_rows),
+            "resourceareas": len(resourceareas_rows),
             "stations": sum(len(items) for items in sector_stations.values()),
             "owner_resolution_ties": len(owner_resolution_ties),
         },
@@ -1771,6 +2202,8 @@ def resolve_runtime_paths(args: argparse.Namespace) -> dict:
         "factions_output_path": Path(args.factions_output or DEFAULT_FACTIONS_OUTPUT),
         "regions_output_path": Path(args.regions_output or DEFAULT_REGIONS_OUTPUT),
         "regionyields_output_path": Path(args.regionyields_output or DEFAULT_REGIONYIELDS_OUTPUT),
+        "regionyield_definitions_output_path": Path(DEFAULT_REGIONYIELD_DEFINITIONS_OUTPUT),
+        "resourceareas_output_path": Path(DEFAULT_RESOURCEAREAS_OUTPUT),
     }
 
 
@@ -1789,6 +2222,13 @@ def run_for_config(args: argparse.Namespace, effective_config: Dict[str, object]
     factions_output_path = runtime_paths["factions_output_path"]
     regions_output_path = runtime_paths["regions_output_path"]
     regionyields_output_path = runtime_paths["regionyields_output_path"]
+    regionyield_definitions_output_path = runtime_paths["regionyield_definitions_output_path"]
+    resourceareas_output_path = runtime_paths["resourceareas_output_path"]
+
+    # 版本分流：根据版本号判定资源模型
+    version_str = str(effective_config.get("version", ""))
+    resource_model = detect_map_resource_model(version_str)
+    print(f"📊 资源模型: {resource_model} (version={version_str})")
 
     registry = get_i18n_registry()
     registry.configure(X4_UNPACKED_DATA_PATH, {
@@ -1799,30 +2239,86 @@ def run_for_config(args: argparse.Namespace, effective_config: Dict[str, object]
         colors_xml_path=colors_xml_path,
         i18n_registry=registry,
     )
-    regionyields_rows = migrate_regionyields(regionyields_xml_path)
     factions_output_path.parent.mkdir(parents=True, exist_ok=True)
     factions_output_path.write_text(json.dumps(factions_rows, ensure_ascii=False, indent=2), encoding="utf-8")
-    regionyields_output_path.parent.mkdir(parents=True, exist_ok=True)
-    regionyields_output_path.write_text(json.dumps(regionyields_rows, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    result = generate_map_data(
-        map_dir=map_dir,
-        mapdefaults_path=mapdefaults_path,
-        god_xml_path=god_xml_path,
-        factions_by_id=factions_by_id,
-        region_definitions_xml_path=region_definitions_xml_path,
-        regionobjectgroups_xml_path=regionobjectgroups_xml_path,
-        regionyields_xml_path=regionyields_xml_path,
-        i18n_registry=registry,
-    )
-    regions_output_path.parent.mkdir(parents=True, exist_ok=True)
-    regions_output_path.write_text(json.dumps(result.get("regions", []), ensure_ascii=False, indent=2), encoding="utf-8")
+    # 版本分流：根据资源模型选择不同的处理逻辑
+    if resource_model == "resourceareas":
+        # 9.0+ 新版资源模型
+        # 1. 解析 definition 模板
+        definitions = migrate_resourcearea_definitions(regionyields_xml_path)
+        print(f"📦 解析 resourcearea definitions: {len(definitions)} 个")
+
+        # 2. 解析 sector 资源区引用
+        sector_resource_areas = migrate_sector_resourceareas(mapdefaults_path)
+        print(f"📦 解析 sector resourceareas: {len(sector_resource_areas)} 个 sector")
+
+        # 3. 输出 regionyield_definitions.json（只含 definitions 数组）
+        definitions_list = list(definitions.values())
+        regionyield_definitions_output_path.parent.mkdir(parents=True, exist_ok=True)
+        regionyield_definitions_output_path.write_text(
+            json.dumps(definitions_list, ensure_ascii=False, indent=2),
+            encoding="utf-8"
+        )
+        print(f"📦 Regionyield Definitions Output: {regionyield_definitions_output_path}")
+
+        # 4. regionyields.json 固定输出空数组
+        regionyields_output_path.parent.mkdir(parents=True, exist_ok=True)
+        regionyields_output_path.write_text("[]", encoding="utf-8")
+        print(f"📦 Regionyields Output: {regionyields_output_path} (空数组占位)")
+
+        # 5. 生成 maps.json
+        result = generate_map_data(
+            map_dir=map_dir,
+            mapdefaults_path=mapdefaults_path,
+            god_xml_path=god_xml_path,
+            factions_by_id=factions_by_id,
+            region_definitions_xml_path=region_definitions_xml_path,
+            regionobjectgroups_xml_path=regionobjectgroups_xml_path,
+            regionyields_xml_path=regionyields_xml_path,
+            i18n_registry=registry,
+            resource_model="resourceareas",
+            sector_resource_areas=sector_resource_areas,
+            definitions=definitions,
+        )
+
+        # 6. 输出 resourceareas.json
+        resourceareas_rows = result.get("resourceareas", [])
+        resourceareas_output_path.parent.mkdir(parents=True, exist_ok=True)
+        resourceareas_output_path.write_text(
+            json.dumps(resourceareas_rows, ensure_ascii=False, indent=2),
+            encoding="utf-8"
+        )
+        print(f"📦 Resourceareas Output: {resourceareas_output_path} count={len(resourceareas_rows)}")
+
+        # 7. 9.0+ 不输出 regions.json
+        print(f"📦 Regions Output: 跳过 (9.0+ 不生成)")
+
+    else:
+        # 8.0- 旧版资源模型
+        regionyields_rows = migrate_regionyields(regionyields_xml_path)
+        regionyields_output_path.parent.mkdir(parents=True, exist_ok=True)
+        regionyields_output_path.write_text(json.dumps(regionyields_rows, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"📦 Regionyields Output: {regionyields_output_path} count={len(regionyields_rows)}")
+
+        result = generate_map_data(
+            map_dir=map_dir,
+            mapdefaults_path=mapdefaults_path,
+            god_xml_path=god_xml_path,
+            factions_by_id=factions_by_id,
+            region_definitions_xml_path=region_definitions_xml_path,
+            regionobjectgroups_xml_path=regionobjectgroups_xml_path,
+            regionyields_xml_path=regionyields_xml_path,
+            i18n_registry=registry,
+        )
+        regions_output_path.parent.mkdir(parents=True, exist_ok=True)
+        regions_output_path.write_text(json.dumps(result.get("regions", []), ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"📦 Regions Output: {regions_output_path} count={len(result.get('regions', []))}")
+
     write_map_output(result["payload"], output_path)
     stats = result["stats"]
     missing = result["missing_name_ids"]
     print(f"Factions Output: {factions_output_path} count={len(factions_rows)}")
-    print(f"Regionyields Output: {regionyields_output_path} count={len(regionyields_rows)}")
-    print(f"Regions Output: {regions_output_path} count={len(result.get('regions', []))}")
     print(f"Output: {output_path}")
     print(
         f"clusters={stats['clusters']} sectors={stats['sectors']} zones={stats['zones']} "
