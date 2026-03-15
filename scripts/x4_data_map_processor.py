@@ -727,6 +727,8 @@ def boundary_volume(boundary: Optional[dict]) -> float:
     """
     计算边界体积（单位：m³），带体积上限限制。
 
+    返回：体积值（m³）
+
     限制规则：
     - sphere: 半径 > 200km 时按圆柱体计算（r=200km, h=80km）
     - cylinder: 半径最大 200km，高度最大 80km
@@ -762,7 +764,29 @@ def boundary_volume(boundary: Optional[dict]) -> float:
     return 1.0
 
 
+def compute_spline_length(boundary: Optional[dict]) -> float:
+    """
+    计算 splinetube 的等效 linear 长度（控制点距离之和）。
+    对于非 splinetube 类型，返回 0.0。
+    """
+    if not boundary:
+        return 0.0
+    boundary_class = str(boundary.get("class") or "")
+    if boundary_class != "splinetube":
+        return 0.0
+    spline = boundary.get("spline") or []
+    length = 0.0
+    for left, right in zip(spline, spline[1:]):
+        length += distance_3d(left, right)
+    return length
+
+
 def build_boundary(node: Optional[ET.Element]) -> Optional[dict]:
+    """
+    构建边界对象。
+
+    对于 splinetube 类型，在 size 中添加等效 linear 字段（控制点距离之和）。
+    """
     if node is None:
         return None
     boundary = {
@@ -776,6 +800,14 @@ def build_boundary(node: Optional[ET.Element]) -> Optional[dict]:
         spline_points.append(parse_xml_attrs(spline_node))
     if spline_points:
         boundary["spline"] = spline_points
+        # 对于 splinetube 类型，计算并存储等效 linear 长度
+        if boundary["class"] == "splinetube":
+            length = 0.0
+            for left, right in zip(spline_points, spline_points[1:]):
+                length += distance_3d(left, right)
+            if "size" not in boundary:
+                boundary["size"] = {}
+            boundary["size"]["linear"] = length
     return boundary
 
 
@@ -1090,12 +1122,12 @@ def summarize_region_resources(
     总结 region 的资源产出。
 
     Args:
-        region_item: region 定义（不含 fields）
+        region_item: region 定义（含 density, boundary, falloff, volume_km3, falloff_factor, noise_probability）
         legacy_resource_map: 旧版资源映射（从 XML resources 节点读取）
-        yield_info_map: 资源 yield 信息映射（包含 replenishtime, gatherspeedfactor）
+        yield_info_map: 资源 yield 信息映射（用于获取 replenishtime 计算 delay）
 
     Returns:
-        资源产出列表，包含 ware, amount, rating, yield, delay, factor, respawn, volume_km3, falloff_factor, noise_probability
+        资源产出列表，包含 ware, rating, yield, delay, respawn
     """
     region_density = as_number(region_item.get("density"), 1.0)
     boundary = region_item.get("boundary")
@@ -1103,7 +1135,6 @@ def summarize_region_resources(
     effective_volume_m3 = boundary_volume(boundary) * as_number(falloff.get("effective_factor"), 1.0)
     effective_volume_km3 = effective_volume_m3 / 1_000_000_000.0
     region_noise_probability = noise_probability(region_item.get("minnoisevalue"), region_item.get("maxnoisevalue"))
-    falloff_factor = as_number(falloff.get("effective_factor"), 1.0)
     by_ware: Dict[str, dict] = {}
 
     # 不再使用 fields 数据，直接从 legacy_resource_map 读取资源类型
@@ -1118,12 +1149,9 @@ def summarize_region_resources(
             continue
 
         # 简化计算：假设所有资源都是固体（非气体），factor = 1
-        # 气体资源在 8.0 中通过 regiontype="nebula" 标识，这里简化处理
-        is_gas_field = False  # 8.0 气体资源较少，简化处理
+        is_gas_field = False
 
         # 计算 simulated_amount
-        # 假设 densityfactor = 1.0（平均密度系数）
-        # noise_coverage 简化为 region_noise_probability（不考虑 field 级别的噪声）
         densityfactor = 1.0
         noise_coverage = region_noise_probability
         simulated_density = region_density * densityfactor * resourcedensity * noise_coverage
@@ -1131,23 +1159,19 @@ def summarize_region_resources(
 
         item = by_ware.setdefault(ware, {
             "ware": ware,
-            "simulated_amount": 0.0,
             "is_gas_field": is_gas_field,
             "yield_name": yield_name,
+            "simulated_amount": 0.0,
         })
         item["simulated_amount"] += simulated_amount
 
     resources = sorted(by_ware.values(), key=lambda item: item["ware"])
     for item in resources:
         is_gas_field = item.get("is_gas_field", False)
-        item["volume_km3"] = round(effective_volume_km3, 4)
-        item["falloff_factor"] = round(falloff_factor, 4)
-        item["noise_probability"] = round(region_noise_probability, 4)
-        item["simulated_amount"] = int(round(as_number(item["simulated_amount"])))
-        item["amount"] = item["simulated_amount"]
+        simulated_amount = as_number(item["simulated_amount"])
         # yield 是产量值（数值），rating 是星级评分
-        _, item["rating"] = classify_density_tier(str(item.get("ware") or ""), as_number(item["simulated_amount"]))
-        item["yield"] = item["simulated_amount"]  # yield 字段存储实际产量值
+        _, item["rating"] = classify_density_tier(str(item.get("ware") or ""), simulated_amount)
+        item["yield"] = simulated_amount  # yield 字段存储实际产量值
 
         # 计算 delay 和 respawn
         # delay = replenishtime / 60 (小时)
@@ -1162,12 +1186,13 @@ def summarize_region_resources(
             gatherspeedfactor = 1.0
 
         item["delay"] = replenishtime / 60.0 if replenishtime > 0 else 60.0
-        item["respawn"] = item["simulated_amount"] * 60.0 / item["delay"] if item["delay"] > 0 else 0.0
+        item["respawn"] = simulated_amount * 60.0 / item["delay"] if item["delay"] > 0 else 0.0
         item["factor"] = gatherspeedfactor if is_gas_field else 1.0
 
         # 清理中间字段
         del item["is_gas_field"]
         del item["yield_name"]
+        del item["simulated_amount"]  # 移除 simulated_amount 字段
 
     return resources
 
@@ -1208,6 +1233,25 @@ def migrate_region_definitions(
             "falloff": build_falloff(region_node.find("./falloff")),
         }
 
+        # 计算 region 级别的体积和噪声参数（移动到 region 根级别，不再放在 resources 数组内）
+        boundary = region_item["boundary"]
+        falloff = region_item["falloff"] or {}
+        effective_volume_m3 = boundary_volume(boundary) * as_number(falloff.get("effective_factor"), 1.0)
+        effective_volume_km3 = effective_volume_m3 / 1_000_000_000.0
+        region_noise_probability = noise_probability(
+            region_item.get("minnoisevalue"),
+            region_item.get("maxnoisevalue"),
+        )
+
+        # 对于 splinetube 类型，存储等效 linear 长度
+        spline_linear = compute_spline_length(boundary)
+        if spline_linear > 0:
+            region_item["linear"] = spline_linear
+
+        region_item["volume_km3"] = round(effective_volume_km3, 4)
+        region_item["falloff_factor"] = round(as_number(falloff.get("effective_factor"), 1.0), 4)
+        region_item["noise_probability"] = round(region_noise_probability, 4)
+
         # 不再解析 fields 节点，相关数据已从输出中移除
 
         region_item["resources"] = summarize_region_resources(
@@ -1224,8 +1268,8 @@ def summarize_sector_resources(region_rows: List[dict]) -> List[dict]:
     总结 sector 的资源产出，输出统一的 resources 格式。
 
     计算方式（与 9.0 统一）：
-    - amount = sum(yield * amount) 实际是 sum(simulated_amount)
-    - respawn = sum(respawn * amount) = sum(simulated_amount * 60 / delay)
+    - amount = sum(yield) 因为 yield 现在是 simulated_amount 的值
+    - respawn = sum(yield * 60 / delay) = sum(respawn)
     """
     by_ware: Dict[str, dict] = {}
     for region in region_rows:
@@ -1234,18 +1278,18 @@ def summarize_sector_resources(region_rows: List[dict]) -> List[dict]:
             if not ware:
                 continue
 
-            # amount = simulated_amount
-            amount = as_number(resource.get("amount"), 0.0)
-            # respawn = amount * 60 / delay
+            # yield 现在是 simulated_amount 的值
+            yield_val = as_number(resource.get("yield"), 0.0)
+            # respawn = yield * 60 / delay
             delay = as_number(resource.get("delay"), 60.0)
-            respawn = amount * 60.0 / delay if delay > 0 else 0.0
+            respawn = yield_val * 60.0 / delay if delay > 0 else 0.0
 
             entry = by_ware.setdefault(ware, {
                 "ware": ware,
                 "amount": 0.0,
                 "respawn": 0.0,
             })
-            entry["amount"] += amount
+            entry["amount"] += yield_val
             entry["respawn"] += respawn
 
     summarized: List[dict] = []
