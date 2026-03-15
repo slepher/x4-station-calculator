@@ -360,29 +360,34 @@ def build_sector_resource_summaries_from_resourceareas(
 
 
 def build_resourceareas_json_payload(
-    version_str: str,
-    sector_resource_areas: Dict[str, List[dict]],
-    definitions: Dict[str, dict],
-) -> dict:
+    flat_rows: List[dict],
+) -> List[dict]:
     """
-    构建 resourceareas.json 的完整输出结构。
+    将扁平的 resourceareas 数组转换为按 cluster_id + sector_id 分组的结构。
 
     Args:
-        version_str: 版本字符串
-        sector_resource_areas: sector 的资源区引用
-        definitions: 资源区定义模板
+        flat_rows: 扁平的 resourcearea 记录列表，每条包含 cluster_id, sector_id 等字段
 
     Returns:
-        完整的 resourceareas.json payload
+        分组后的数组，每组包含 cluster_id, sector_id, areas 三个字段
     """
-    return {
-        "meta": {
-            "version": version_str,
-            "schema": "x4-resourceareas-v1",
-        },
-        "sectorResourceAreas": sector_resource_areas,
-        "definitions": definitions,
-    }
+    from collections import defaultdict
+    grouped: Dict[Tuple[str, str], List[dict]] = defaultdict(list)
+
+    for row in flat_rows:
+        key = (row.get("cluster_id", ""), row.get("sector_id", ""))
+        # 移除 cluster_id 和 sector_id 后放入 areas
+        area = {k: v for k, v in row.items() if k not in ("cluster_id", "sector_id")}
+        grouped[key].append(area)
+
+    result: List[dict] = []
+    for (cluster_id, sector_id), areas in sorted(grouped.items()):
+        result.append({
+            "cluster_id": cluster_id,
+            "sector_id": sector_id,
+            "areas": areas,
+        })
+    return result
 
 
 def resolve_sector_macro_from_region_connection(connection_name: str) -> Optional[str]:
@@ -2155,7 +2160,7 @@ def generate_map_data(
     return {
         "payload": payload,
         "regions": regions_rows,
-        "resourceareas": resourceareas_rows,
+        "resourceareas": build_resourceareas_json_payload(resourceareas_rows),
         "name_ids": name_ids,
         "missing_name_ids": {
             "clusters": missing_cluster_nameid,
@@ -2169,7 +2174,7 @@ def generate_map_data(
             "sector_links": len(sector_links),
             "highways": len(sector_highways),
             "regions": len(regions_rows),
-            "resourceareas": len(resourceareas_rows),
+            "resourceareas": sum(len(g.get("areas", [])) for g in build_resourceareas_json_payload(resourceareas_rows)),
             "stations": sum(len(items) for items in sector_stations.values()),
             "owner_resolution_ties": len(owner_resolution_ties),
         },

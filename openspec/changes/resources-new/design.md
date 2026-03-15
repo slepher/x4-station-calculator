@@ -69,34 +69,44 @@
 ]
 ```
 
-### 2.3 `resourceareas.json` 来源
+### 2.3 `resourceareas.json` 来源（9.0 版本）
 - 解析 `mapdefaults_final.xml` 中各个 `dataset macro="<sector>"` 下的 `<resourceareas>`。
 - 通过 `ref` 关联 `regionyield_definitions` 中的定义。
-- 输出为数组，每条记录包含：
-  - `ref`：资源区定义引用
-  - `amount`：该类型资源球数量
-  - `ware`：资源类型（来自 definition）
-  - `rating`：星级评分（来自 definition）
-  - `yield`：单个资源球产量（来自 definition）
-  - `delay`：重生时间（来自 definition）
-  - `factor`：采集系数（来自 definition，自动选择 objectyieldfactor 或 gatherspeedfactor）
-  - `cluster_id`：所属 cluster（派生）
-  - `sector_id`：所属 sector（派生）
+- 输出按 `cluster_id + sector_id` 分组，每组包含：
+  - `cluster_id`：所属 cluster
+  - `sector_id`：所属 sector
+  - `areas`：资源区数组，每个元素包含：
+    - `ref`：资源区定义引用
+    - `amount`：该类型资源球数量
+    - `ware`：资源类型（来自 definition）
+    - `rating`：星级评分（来自 definition）
+    - `yield`：单个资源球产量（来自 definition）
+    - `delay`：重生时间（来自 definition）
+    - `factor`：采集系数（来自 definition，自动选择 objectyieldfactor 或 gatherspeedfactor）
+    - `respawn`：每小时持续产量（计算派生）
 
-### 2.4 `resourceareas.json` 结构
+### 2.4 `resourceareas.json` 结构（9.0 版本）
+
+按 `cluster_id + sector_id` 分组：
+
 ```json
 [
   {
-    "ref": "sphere_medium_hydrogen_medium",
-    "amount": 7,
-    "ware": "hydrogen",
-    "rating": 10.0,
-    "yield": 150000.0,
-    "delay": 60.0,
-    "factor": 1.0,
-    "respawn": 150000.0,
     "cluster_id": "Cluster_01_macro",
-    "sector_id": "Cluster_01_Sector001_macro"
+    "sector_id": "Cluster_01_Sector001_macro",
+    "areas": [
+      {
+        "ref": "sphere_medium_hydrogen_medium",
+        "amount": 7,
+        "ware": "hydrogen",
+        "rating": 10.0,
+        "yield": 150000.0,
+        "delay": 60.0,
+        "factor": 1.0,
+        "respawn": 150000.0
+      },
+      ...
+    ]
   },
   ...
 ]
@@ -171,32 +181,41 @@ respawn = yield × 60 / delay  (= sustainableYieldPerHour)
 ### 2.7 `resourceareas.json` 来源（8.0 版本）
 - 解析 `mapdefaults_final.xml` 中各 sector 对 region 的引用。
 - 通过 `region_ref` 关联 `regions.json` 中的定义。
-- 输出为数组，每条记录包含：
-  - `ref`：region 定义引用
-  - `amount`：该 region 在 sector 中被引用的次数
-  - `ware`：资源类型（来自 region.resources）
-  - `rating`：星级评分（来自 region.resources）
-  - `yield`：产量（来自 region.resources）
-  - `delay`：重生时间（来自 region.resources）
-  - `factor`：采集系数（来自 region.resources）
-  - `respawn`：每小时持续产量（来自 region.resources）
-  - `cluster_id`：所属 cluster（派生）
-  - `sector_id`：所属 sector（派生）
+- 输出按 `cluster_id + sector_id` 分组，每组包含：
+  - `cluster_id`：所属 cluster
+  - `sector_id`：所属 sector
+  - `areas`：资源区引用数组，每个元素包含：
+    - `ref`：region 定义引用
+    - `amount`：该 region 在 sector 中被引用的次数
+    - `ware`：资源类型（来自 region.resources）
+    - `rating`：星级评分（来自 region.resources）
+    - `yield`：产量（来自 region.resources）
+    - `delay`：重生时间（来自 region.resources）
+    - `factor`：采集系数（来自 region.resources）
+    - `respawn`：每小时持续产量（来自 region.resources）
 
 ### 2.8 `resourceareas.json` 结构（8.0 版本）
+
+按 `cluster_id + sector_id` 分组：
+
 ```json
 [
   {
-    "ref": "region_ore_medium_01",
-    "amount": 3,
-    "ware": "ore",
-    "rating": 10,
-    "yield": 150000,
-    "delay": 30.0,
-    "factor": 1,
-    "respawn": 300000,
     "cluster_id": "Cluster_01_macro",
-    "sector_id": "Cluster_01_Sector001_macro"
+    "sector_id": "Cluster_01_Sector001_macro",
+    "areas": [
+      {
+        "ref": "region_ore_medium_01",
+        "amount": 3,
+        "ware": "ore",
+        "rating": 10,
+        "yield": 150000,
+        "delay": 30.0,
+        "factor": 1,
+        "respawn": 300000
+      },
+      ...
+    ]
   },
   ...
 ]

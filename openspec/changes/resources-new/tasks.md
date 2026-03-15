@@ -47,14 +47,22 @@
 - [x] 9.3 气体资源从 XML 读取 `gatherspeedfactor`，固体资源设为 `1`。
 
 ## 10. 验证
-- [x] 10.1 为 `9.0+` 验证 `resourceareas.json` 结构正确（数组，含 cluster_id/sector_id）。
+- [x] 10.1 为 `9.0+` 验证 `resourceareas.json` 结构正确（分组结构，含 cluster_id/sector_id/areas）。
 - [x] 10.2 为 `9.0+` 验证 `maps.json` 中 sector 的 `resources` 字段（原 resource_wares）。
 - [x] 10.3 完成实现后执行 `npm run build`，确认前端不报错。
 - [x] 10.4 为 `8.0` 验证 `regions.json` 结构正确（纯定义，不含 fields，含 resources 数组）。
-- [x] 10.5 为 `8.0` 验证 `resourceareas.json` 结构正确（引用关系，含 cluster_id/sector_id）。
+- [x] 10.5 为 `8.0` 验证 `resourceareas.json` 结构正确（分组结构，含 cluster_id/sector_id/areas）。
 - [x] 10.6 为 `8.0` 验证 `regionyields.json` 包含 `replenishtime` 和 `gatherspeedfactor`。
 
 ## 11. 统一 8.0/9.0 sector.resources 计算方式
 - [x] 11.1 统一 `respawn` 计算公式：`sum(respawn × amount)`。
 - [x] 11.2 9.0 `build_sector_resources_from_resourceareas()` 使用统一公式。
 - [x] 11.3 8.0 `summarize_sector_resources()` 使用统一公式。
+
+## 12. `resourceareas.json` 分组结构重构
+- [x] 12.1 将 `resourceareas.json` 从扁平数组改为按 `cluster_id + sector_id` 分组。
+- [x] 12.2 每组包含 `cluster_id`, `sector_id`, `areas` 三个字段。
+- [x] 12.3 `areas` 数组包含原扁平结构中的所有字段（除 `cluster_id` 和 `sector_id`）。
+- [x] 12.4 对 8.0 和 9.0 版本同时生效。
+- [x] 12.5 更新 `build_80_resourceareas_array()` 返回分组结构。
+- [x] 12.6 更新 `build_resourceareas_array()` 返回分组结构。
