@@ -30,16 +30,16 @@
 - [x] 6.3 当版本小于 `9.0` 时继续沿用扩展结构输出。
 
 ## 7. `8.0` regions.json 输出格式重构
-- [ ] 7.1 移除 `regions.json` 中的 `fields` 字段，不再使用该数据。
-- [ ] 7.2 移除 `regions.json` 中的 `cluster_id` / `sector_id` / `ref` / `amount` 引用字段。
-- [ ] 7.3 将 `regions.json` 改为纯 region 定义，使用 `id` 表示 region 名称。
-- [ ] 7.4 保留 `boundary`、`falloff`、`resources` 等定义字段。
-- [ ] 7.5 `resources` 数组包含 `{ware, amount, rating, yield, delay, factor, respawn, volume_km3, falloff_factor, noise_probability}`。
+- [x] 7.1 移除 `regions.json` 中的 `fields` 字段，不再使用该数据。
+- [x] 7.2 移除 `regions.json` 中的 `cluster_id` / `sector_id` / `ref` / `amount` 引用字段。
+- [x] 7.3 将 `regions.json` 改为纯 region 定义，使用 `id` 表示 region 名称。
+- [x] 7.4 保留 `boundary`、`falloff`、`resources` 等定义字段。
+- [x] 7.5 `resources` 数组包含 `{ware, amount, rating, yield, delay, factor, respawn, volume_km3, falloff_factor, noise_probability}`。
 
 ## 8. `8.0` resourceareas.json 新增
-- [ ] 8.1 新增 `resourceareas.json` 输出，存放 region 到 sector 的引用关系。
-- [ ] 8.2 每条记录包含 `{ref, amount, ware, rating, yield, delay, factor, respawn, cluster_id, sector_id}`。
-- [ ] 8.3 数据从 region 定义和 sector 引用派生。
+- [x] 8.1 新增 `resourceareas.json` 输出，存放 region 到 sector 的引用关系。
+- [x] 8.2 每条记录包含 `{ref, amount, ware, rating, yield, delay, factor, respawn, cluster_id, sector_id}`。
+- [x] 8.3 数据从 region 定义和 sector 引用派生。
 
 ## 9. `8.0` regionyields.json 扩展
 - [x] 9.1 在 `migrate_regionyields()` 输出中增加 `replenishtime` 字段。
@@ -47,12 +47,12 @@
 - [x] 9.3 气体资源从 XML 读取 `gatherspeedfactor`，固体资源设为 `1`。
 
 ## 10. 验证
-- [ ] 10.1 为 `9.0+` 验证 `resourceareas.json` 结构正确（数组，含 cluster_id/sector_id）。
-- [ ] 10.2 为 `9.0+` 验证 `maps.json` 中 sector 的 `resources` 字段（原 resource_wares）。
-- [ ] 10.3 完成实现后执行 `npm run build`，确认前端不报错。
-- [ ] 10.4 为 `8.0` 验证 `regions.json` 结构正确（纯定义，不含 fields，含 resources 数组）。
-- [ ] 10.5 为 `8.0` 验证 `resourceareas.json` 结构正确（引用关系，含 cluster_id/sector_id）。
-- [ ] 10.6 为 `8.0` 验证 `regionyields.json` 包含 `replenishtime` 和 `gatherspeedfactor`。
+- [x] 10.1 为 `9.0+` 验证 `resourceareas.json` 结构正确（数组，含 cluster_id/sector_id）。
+- [x] 10.2 为 `9.0+` 验证 `maps.json` 中 sector 的 `resources` 字段（原 resource_wares）。
+- [x] 10.3 完成实现后执行 `npm run build`，确认前端不报错。
+- [x] 10.4 为 `8.0` 验证 `regions.json` 结构正确（纯定义，不含 fields，含 resources 数组）。
+- [x] 10.5 为 `8.0` 验证 `resourceareas.json` 结构正确（引用关系，含 cluster_id/sector_id）。
+- [x] 10.6 为 `8.0` 验证 `regionyields.json` 包含 `replenishtime` 和 `gatherspeedfactor`。
 
 ## 11. 统一 8.0/9.0 sector.resources 计算方式
 - [x] 11.1 统一 `respawn` 计算公式：`sum(respawn × amount)`。
