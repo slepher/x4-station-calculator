@@ -1738,7 +1738,10 @@ def generate_map_data(
             yield_info_map,
         )
         for sector_id, links in sector_region_links.items():
+            # 按 (ref, ware) 聚合 resourceareas
+            resourceareas_map: Dict[tuple, dict] = {}
             sector_region_rows: List[dict] = []
+
             for link in links:
                 definition = definitions_by_region_ref.get(link["region_ref"], {})
                 if not definition:
@@ -1746,19 +1749,26 @@ def generate_map_data(
                 # 构建 resourceareas 行（region 到 sector 的引用关系）
                 resources = definition.get("resources", [])
                 for res in resources:
-                    resourceareas_rows.append({
-                        "ref": link["region_ref"],
-                        "amount": 1,  # 每次引用计为 1
-                        "ware": res.get("ware"),
-                        "rating": res.get("rating"),
-                        "yield": res.get("yield"),
-                        "delay": res.get("delay"),
-                        "factor": res.get("factor"),
-                        "respawn": res.get("respawn"),
-                        "cluster_id": link["cluster_id"],
-                        "sector_id": link["sector_id"],
-                    })
+                    key = (link["region_ref"], res.get("ware"))
+                    if key not in resourceareas_map:
+                        resourceareas_map[key] = {
+                            "ref": link["region_ref"],
+                            "amount": 0,  # 累加 amount
+                            "ware": res.get("ware"),
+                            "rating": res.get("rating"),
+                            "yield": res.get("yield"),
+                            "delay": res.get("delay"),
+                            "factor": res.get("factor"),
+                            "respawn": res.get("respawn"),
+                            "cluster_id": link["cluster_id"],
+                            "sector_id": link["sector_id"],
+                        }
+                    resourceareas_map[key]["amount"] += 1  # 每次引用计为 1
                 sector_region_rows.append(definition)
+
+            # 转换为列表
+            resourceareas_rows.extend(resourceareas_map.values())
+
             if sector_id in sectors:
                 sectors[sector_id]["resources"] = summarize_sector_resources(sector_region_rows)
         for sector_id in sectors.keys():
