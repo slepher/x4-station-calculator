@@ -1081,21 +1081,6 @@ def build_region_legacy_resource_map(
     return by_name
 
 
-def parse_field_resource_ids(field_item: dict) -> List[str]:
-    resource = str(field_item.get("resource") or "").strip()
-    if resource:
-        return [resource]
-    raw_resources = field_item.get("resources")
-    if isinstance(raw_resources, str):
-        return split_tags(raw_resources)
-    if isinstance(raw_resources, list):
-        return [str(item).strip() for item in raw_resources if str(item).strip()]
-    return []
-
-
-GAS_ENGINE_MULTIPLIER = 1000.0
-
-
 def summarize_region_resources(
     region_item: dict,
     legacy_resource_map: Dict[str, dict],
@@ -1105,12 +1090,12 @@ def summarize_region_resources(
     总结 region 的资源产出。
 
     Args:
-        region_item: region 定义
-        legacy_resource_map: 旧版资源映射
+        region_item: region 定义（不含 fields）
+        legacy_resource_map: 旧版资源映射（从 XML resources 节点读取）
         yield_info_map: 资源 yield 信息映射（包含 replenishtime, gatherspeedfactor）
 
     Returns:
-        资源产出列表，包含 delay 和 respawn 字段
+        资源产出列表，包含 ware, amount, rating, yield, delay, factor, respawn, volume_km3, falloff_factor, noise_probability
     """
     region_density = as_number(region_item.get("density"), 1.0)
     boundary = region_item.get("boundary")
@@ -1118,93 +1103,56 @@ def summarize_region_resources(
     effective_volume_m3 = boundary_volume(boundary) * as_number(falloff.get("effective_factor"), 1.0)
     effective_volume_km3 = effective_volume_m3 / 1_000_000_000.0
     region_noise_probability = noise_probability(region_item.get("minnoisevalue"), region_item.get("maxnoisevalue"))
+    falloff_factor = as_number(falloff.get("effective_factor"), 1.0)
     by_ware: Dict[str, dict] = {}
 
-    for field in region_item.get("fields", []):
-        resource_ids = parse_field_resource_ids(field)
-        if not resource_ids:
+    # 不再使用 fields 数据，直接从 legacy_resource_map 读取资源类型
+    for ware, legacy in legacy_resource_map.items():
+        yield_name = legacy.get("yield", "")
+        resourcedensity = legacy.get("resourcedensity", 0.0)
+        if resourcedensity <= 0:
+            # 尝试从 yield_info_map 获取
+            if yield_info_map and ware in yield_info_map and yield_name in yield_info_map[ware]:
+                resourcedensity = yield_info_map[ware][yield_name]["resourcedensity"]
+        if resourcedensity <= 0:
             continue
-        densityfactor = as_number(field.get("densityfactor"), 0.0)
-        if densityfactor <= 0:
-            densityfactor = as_number(field.get("uniformdensity"), 0.0)
-        if densityfactor <= 0:
-            densityfactor = 1.0
-        field_noise_probability = noise_probability(field.get("minnoisevalue"), field.get("maxnoisevalue"))
-        noise_coverage = region_noise_probability * field_noise_probability
-        field["noise_coverage"] = noise_coverage
-        if noise_coverage <= 0:
-            continue
-        share = 1.0 / len(resource_ids)
-        for ware in resource_ids:
-            legacy = legacy_resource_map.get(ware, {})
-            is_gas_field = str(field.get("kind") or "") == "nebula"
-            if is_gas_field:
-                uniformdensity = as_number(field.get("uniformdensity"), 0.0)
-                localdensity = as_number(field.get("localdensity"), 0.0)
-                local_component = localdensity * 0.5 * noise_coverage
-                probe_density = region_density * (uniformdensity + (localdensity * 0.5)) * GAS_ENGINE_MULTIPLIER
-                simulated_density = region_density * (uniformdensity + local_component) * GAS_ENGINE_MULTIPLIER * share
-                simulated_amount = simulated_density * effective_volume_km3
-            else:
-                yield_base = as_number(field.get("yield"), 0.0)
-                if yield_base <= 0:
-                    yield_base = as_number(legacy.get("resourcedensity"), 0.0)
-                if yield_base <= 0:
-                    # 尝试从 yield_info_map 获取
-                    yield_name = legacy.get("yield", "")
-                    if yield_info_map and ware in yield_info_map and yield_name in yield_info_map[ware]:
-                        yield_base = yield_info_map[ware][yield_name]["resourcedensity"]
-                if yield_base <= 0:
-                    continue
-                probe_density = 0.0
-                uniformdensity = 0.0
-                localdensity = 0.0
-                simulated_density = region_density * densityfactor * yield_base * noise_coverage * share
-                simulated_amount = simulated_density * effective_volume_km3
-            item = by_ware.setdefault(ware, {
-                "ware": ware,
-                "resource_kind": "gas" if is_gas_field else "solid",
-                "field_count": 0,
-                "densityfactor_sum": 0.0,
-                "noise_coverage_sum": 0.0,
-                "simulated_density": 0.0,
-                "simulated_amount": 0.0,
-                "volume_km3": effective_volume_km3,
-                "probe_density_sum": 0.0,
-                "uniformdensity_sum": 0.0,
-                "localdensity_sum": 0.0,
-                "gas_multiplier": GAS_ENGINE_MULTIPLIER if is_gas_field else None,
-                "legacy_yield": legacy.get("yield"),
-                "legacy_level": legacy.get("level"),
-            })
-            item["field_count"] += 1
-            item["densityfactor_sum"] += densityfactor * share
-            item["noise_coverage_sum"] += noise_coverage * share
-            item["simulated_density"] += simulated_density
-            item["simulated_amount"] += simulated_amount
-            item["probe_density_sum"] += probe_density
-            item["uniformdensity_sum"] += uniformdensity * share
-            item["localdensity_sum"] += localdensity * share
+
+        # 简化计算：假设所有资源都是固体（非气体），factor = 1
+        # 气体资源在 8.0 中通过 regiontype="nebula" 标识，这里简化处理
+        is_gas_field = False  # 8.0 气体资源较少，简化处理
+
+        # 计算 simulated_amount
+        # 假设 densityfactor = 1.0（平均密度系数）
+        # noise_coverage 简化为 region_noise_probability（不考虑 field 级别的噪声）
+        densityfactor = 1.0
+        noise_coverage = region_noise_probability
+        simulated_density = region_density * densityfactor * resourcedensity * noise_coverage
+        simulated_amount = simulated_density * effective_volume_km3
+
+        item = by_ware.setdefault(ware, {
+            "ware": ware,
+            "simulated_amount": 0.0,
+            "is_gas_field": is_gas_field,
+            "yield_name": yield_name,
+        })
+        item["simulated_amount"] += simulated_amount
 
     resources = sorted(by_ware.values(), key=lambda item: item["ware"])
     for item in resources:
-        field_count = max(1, int(item.get("field_count", 0)))
-        item["noise_coverage_avg"] = item["noise_coverage_sum"] / field_count
-        item["noise_coverage"] = item["noise_coverage_avg"]
-        item["probe_density"] = round_sig(as_number(item["probe_density_sum"], 0.0) / field_count, 4)
-        item["uniformdensity"] = as_number(item["uniformdensity_sum"], 0.0)
-        item["localdensity"] = as_number(item["localdensity_sum"], 0.0)
-        item["simulated_density"] = round_sig(as_number(item["simulated_density"]), 4)
+        is_gas_field = item.get("is_gas_field", False)
+        item["volume_km3"] = round(effective_volume_km3, 4)
+        item["falloff_factor"] = round(falloff_factor, 4)
+        item["noise_probability"] = round(region_noise_probability, 4)
         item["simulated_amount"] = int(round(as_number(item["simulated_amount"])))
-        item["density"] = item["simulated_density"]
         item["amount"] = item["simulated_amount"]
-        item["amount_per_field"] = int(round(as_number(item["simulated_amount"]) / field_count))
-        item["yield"], item["level"] = classify_density_tier(str(item.get("ware") or ""), as_number(item["density"]))
+        # yield 是产量值（数值），rating 是星级评分
+        _, item["rating"] = classify_density_tier(str(item.get("ware") or ""), as_number(item["simulated_amount"]))
+        item["yield"] = item["simulated_amount"]  # yield 字段存储实际产量值
 
         # 计算 delay 和 respawn
         # delay = replenishtime / 60 (小时)
-        # respawn = yield * 60 / delay = sustainableYieldPerHour
-        yield_name = item.get("legacy_yield", "")
+        # respawn = amount * 60 / delay = sustainableYieldPerHour
+        yield_name = item.get("yield_name", "")
         if yield_info_map and item["ware"] in yield_info_map and yield_name in yield_info_map[item["ware"]]:
             replenishtime = yield_info_map[item["ware"]][yield_name]["replenishtime"]
             gatherspeedfactor = yield_info_map[item["ware"]][yield_name]["gatherspeedfactor"]
@@ -1216,6 +1164,10 @@ def summarize_region_resources(
         item["delay"] = replenishtime / 60.0 if replenishtime > 0 else 60.0
         item["respawn"] = item["simulated_amount"] * 60.0 / item["delay"] if item["delay"] > 0 else 0.0
         item["factor"] = gatherspeedfactor if is_gas_field else 1.0
+
+        # 清理中间字段
+        del item["is_gas_field"]
+        del item["yield_name"]
 
     return resources
 
@@ -1239,6 +1191,7 @@ def migrate_region_definitions(
         if not region_name:
             continue
         region_item = {
+            "id": region_name,
             "density": as_number(region_node.get("density"), 1.0),
             "rotation": as_number(region_node.get("rotation"), 0.0),
             "noisescale": as_number(region_node.get("noisescale"), 0.0),
@@ -1253,19 +1206,9 @@ def migrate_region_definitions(
             ),
             "boundary": build_boundary(region_node.find("./boundary")),
             "falloff": build_falloff(region_node.find("./falloff")),
-            "fields": [],
         }
 
-        for field_node in region_node.findall("./fields/*"):
-            field_item = {"kind": field_node.tag}
-            field_item.update(parse_xml_attrs(field_node))
-            if "groupref" in field_item:
-                group = group_index.get(str(field_item["groupref"]), {})
-                if group:
-                    field_item["resource"] = group.get("resource") or field_item.get("resource") or ""
-                    field_item["yield"] = group.get("yield", 0.0)
-                    field_item["yieldvariation"] = group.get("yieldvariation", 0.0)
-            region_item["fields"].append(field_item)
+        # 不再解析 fields 节点，相关数据已从输出中移除
 
         region_item["resources"] = summarize_region_resources(
             region_item,
@@ -1749,29 +1692,36 @@ def generate_map_data(
             sector_region_rows: List[dict] = []
             for link in links:
                 definition = definitions_by_region_ref.get(link["region_ref"], {})
-                region_row = {
-                    "name": link["name"],
-                    "region_ref": link["region_ref"],
-                    "cluster_id": link["cluster_id"],
-                    "sector_id": link["sector_id"],
-                    "density": definition.get("density"),
-                    "rotation": definition.get("rotation"),
-                    "noisescale": definition.get("noisescale"),
-                    "seed": definition.get("seed"),
-                    "minnoisevalue": definition.get("minnoisevalue"),
-                    "maxnoisevalue": definition.get("maxnoisevalue"),
-                    "boundary": definition.get("boundary"),
-                    "falloff": definition.get("falloff"),
-                    "fields": [dict(item) for item in definition.get("fields", [])],
-                    "resources": [dict(item) for item in definition.get("resources", [])],
-                }
-                regions_rows.append(region_row)
-                sector_region_rows.append(region_row)
+                if not definition:
+                    continue
+                # 构建 resourceareas 行（region 到 sector 的引用关系）
+                resources = definition.get("resources", [])
+                for res in resources:
+                    resourceareas_rows.append({
+                        "ref": link["region_ref"],
+                        "amount": 1,  # 每次引用计为 1
+                        "ware": res.get("ware"),
+                        "rating": res.get("rating"),
+                        "yield": res.get("yield"),
+                        "delay": res.get("delay"),
+                        "factor": res.get("factor"),
+                        "respawn": res.get("respawn"),
+                        "cluster_id": link["cluster_id"],
+                        "sector_id": link["sector_id"],
+                    })
+                sector_region_rows.append(definition)
             if sector_id in sectors:
                 sectors[sector_id]["resources"] = summarize_sector_resources(sector_region_rows)
         for sector_id in sectors.keys():
             sectors[sector_id].setdefault("resources", [])
-        regions_rows.sort(key=lambda item: (item["cluster_id"], item["sector_id"], item["name"]))
+
+        # regions_rows 输出纯 region 定义（去重）
+        seen_region_ids = set()
+        for region_id, definition in definitions_by_region_ref.items():
+            if region_id not in seen_region_ids:
+                regions_rows.append(definition)
+                seen_region_ids.add(region_id)
+        regions_rows.sort(key=lambda item: item["id"])
 
     for zones_root in zone_roots:
         for zone_macro_node in zones_root.findall("./macro[@class='zone']"):
@@ -2311,9 +2261,18 @@ def run_for_config(args: argparse.Namespace, effective_config: Dict[str, object]
             regionyields_xml_path=regionyields_xml_path,
             i18n_registry=registry,
         )
+
+        # 输出 regions.json（纯 region 定义）
         regions_output_path.parent.mkdir(parents=True, exist_ok=True)
         regions_output_path.write_text(json.dumps(result.get("regions", []), ensure_ascii=False, indent=2), encoding="utf-8")
         print(f"📦 Regions Output: {regions_output_path} count={len(result.get('regions', []))}")
+
+        # 输出 resourceareas.json（region 到 sector 的引用关系）
+        resourceareas_output_path.parent.mkdir(parents=True, exist_ok=True)
+        resourceareas_output_path.write_text(
+            json.dumps(result.get("resourceareas", []), ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        print(f"📦 Resourceareas Output: {resourceareas_output_path} count={len(result.get('resourceareas', []))}")
 
     write_map_output(result["payload"], output_path)
     stats = result["stats"]

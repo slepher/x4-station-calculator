@@ -19,7 +19,8 @@
 ### 1.2 产物策略
 - `< 9`
   - `maps.json`（含 `sector.resources` 聚合摘要）
-  - `regions.json`（资源区数组，带 cluster_id/sector_id，对齐 9.0 resourceareas.json 格式）
+  - `regions.json`（纯 region 定义，不含 fields，含 resources 计算结果）
+  - `resourceareas.json`（region 到 sector 的引用关系，对齐 9.0 格式）
   - `regionyields.json`（扩展结构，含 replenishtime/gatherspeedfactor）
 - `>= 9`
   - `maps.json`（含 `sector.resources` 按 ware 聚合）
@@ -108,22 +109,81 @@ respawn = yield × 60 / delay  (= sustainableYieldPerHour)
 
 ### 2.5 `regions.json` 来源（8.0 版本）
 - 解析 `regions_final.xml` 中各 region 定义。
-- 解析 `mapdefaults_final.xml` 中各 sector 对 region 的引用。
+- **不再解析 `fields` 节点**，废弃相关字段。
 - 输出为数组，每条记录包含：
-  - `ref`：region 名称
-  - `amount`：该 region 在 sector 中被引用的次数
-  - `ware`：资源类型（来自 region resources）
-  - `rating`：星级评分（按 yield 值查表）
-  - `yield`：最终产量（计算得出）
-  - `delay`：重生时间（replenishtime / 60）
-  - `factor`：采集系数（气体用 gatherspeedfactor，固体为 1）
-  - `cluster_id`：所属 cluster（派生）
-  - `sector_id`：所属 sector（派生）
-  - `volume_km3`：有效体积（计算得出）
-  - `falloff_factor`：Falloff 平均值（lateral × radial）
-  - `noise_probability`：噪点概率
+  - `id`：region 名称
+  - `density`：区域密度
+  - `rotation`：旋转角度
+  - `noisescale`：噪声缩放
+  - `seed`：随机种子
+  - `minnoisevalue`：最小噪声值
+  - `maxnoisevalue`：最大噪声值
+  - `boundary`：边界形状（sphere/cylinder/splinetube）
+  - `falloff`：衰减曲线
+  - `resources`：计算后的资源产出数组（见下方结构）
 
 ### 2.6 `regions.json` 结构（8.0 版本）
+```json
+[
+  {
+    "id": "region_ore_medium_01",
+    "density": 1.5,
+    "rotation": 0,
+    "noisescale": 0,
+    "seed": 0,
+    "minnoisevalue": 0,
+    "maxnoisevalue": 1,
+    "boundary": {
+      "class": "cylinder",
+      "size": { "r": 25000, "linear": 5000 }
+    },
+    "falloff": {
+      "lateral": [...],
+      "radial": [...],
+      "lateral_factor": 0.9,
+      "radial_factor": 0.63,
+      "effective_factor": 0.567
+    },
+    "resources": [
+      {
+        "ware": "ore",
+        "amount": 150000,
+        "rating": 10,
+        "yield": 150000,
+        "delay": 30.0,
+        "factor": 1,
+        "respawn": 300000,
+        "volume_km3": 125.6,
+        "falloff_factor": 0.9,
+        "noise_probability": 0.35
+      }
+    ]
+  },
+  ...
+]
+```
+
+**废弃字段说明：**
+- `fields`：不再使用，相关数据已从输出中移除
+- `cluster_id` / `sector_id`：移至 `resourceareas.json`
+- `ref` / `amount`：移至 `resourceareas.json`
+
+### 2.7 `resourceareas.json` 来源（8.0 版本）
+- 解析 `mapdefaults_final.xml` 中各 sector 对 region 的引用。
+- 通过 `region_ref` 关联 `regions.json` 中的定义。
+- 输出为数组，每条记录包含：
+  - `ref`：region 定义引用
+  - `amount`：该 region 在 sector 中被引用的次数
+  - `ware`：资源类型（来自 region.resources）
+  - `rating`：星级评分（来自 region.resources）
+  - `yield`：产量（来自 region.resources）
+  - `delay`：重生时间（来自 region.resources）
+  - `factor`：采集系数（来自 region.resources）
+  - `respawn`：每小时持续产量（来自 region.resources）
+  - `cluster_id`：所属 cluster（派生）
+  - `sector_id`：所属 sector（派生）
+
+### 2.8 `resourceareas.json` 结构（8.0 版本）
 ```json
 [
   {
@@ -131,20 +191,18 @@ respawn = yield × 60 / delay  (= sustainableYieldPerHour)
     "amount": 3,
     "ware": "ore",
     "rating": 10,
-    "yield": 150000.0,
+    "yield": 150000,
     "delay": 30.0,
     "factor": 1,
+    "respawn": 300000,
     "cluster_id": "Cluster_01_macro",
-    "sector_id": "Cluster_01_Sector001_macro",
-    "volume_km3": 125.6,
-    "falloff_factor": 0.9,
-    "noise_probability": 0.35
+    "sector_id": "Cluster_01_Sector001_macro"
   },
   ...
 ]
 ```
 
-### 2.7 8.0 版本 yield 计算链路
+### 2.9 8.0 版本 yield 计算链路
 ```
 yield = volume_km3 × falloff_factor × noise_probability
         × region_density × densityfactor × resourcedensity
@@ -161,7 +219,7 @@ delay = replenishtime / 60  (小时)
 sustainableYieldPerHour = yield × 60 / delay
 ```
 
-### 2.8 8.0 版本 boundary_volume 计算
+### 2.10 8.0 版本 boundary_volume 计算
 
 单位：XML 中坐标和半径的单位为米（m），计算结果转换为 km³（除以 10^9）。
 
@@ -185,7 +243,7 @@ sustainableYieldPerHour = yield × 60 / delay
 | cylinder | 200,000 m (200 km) | 80,000 m (80 km) |
 | splinetube | 200,000 m (200 km) | 1,000,000 m (1000 km) |
 
-### 2.9 8.0 版本 rating 映射表
+### 2.11 8.0 版本 rating 映射表
 
 #### 普通矿物（非 Nividium）
 
@@ -227,7 +285,7 @@ N 矿 yield 值约为普通矿物的 1/10，使用独立的 rating 映射表：
 
 识别方式：`ware == "nividium"`
 
-### 2.10 `regionyields.json` 扩展结构（8.0 版本）
+### 2.12 `regionyields.json` 扩展结构（8.0 版本）
 在原有基础上扩展，增加 `replenishtime` 和 `gatherspeedfactor` 字段：
 
 ```json
@@ -298,6 +356,8 @@ N 矿 yield 值约为普通矿物的 1/10，使用独立的 rating 映射表：
   - `migrate_sector_resourceareas(mapdefaults_xml_path)`
   - `build_resourceareas_array(...)` → 返回带 cluster_id/sector_id 的数组
   - `build_sector_resources_from_resourceareas(...)`
+- 8.0 版本新增：
+  - `build_80_resourceareas_array(...)` → 从 region 引用生成 resourceareas.json
 
 ### 4.2 入口层职责
 - `x4_data_map_processor.py` 负责：
@@ -305,11 +365,13 @@ N 矿 yield 值约为普通矿物的 1/10，使用独立的 rating 映射表：
   - 具体解析 XML
   - 生成 `maps.json` 所需 payload
   - 生成 `resourceareas.json` 和 `regionyield_definitions.json`
+  - 8.0 版本生成 `regions.json`（纯定义）和 `resourceareas.json`（引用关系）
 
 ### 4.3 明确避免的设计
 - 不在同一个函数中同时兼容旧版 `<resource><yield>` 和新版 `<definition>`。
 - 不把新版 `definition` 强行适配回旧版 `regionyields.json` 语义。
 - 不让前端通过读取空 `regionyields.json` 反推出新版资源能力。
+- **不再使用 `fields` 节点数据进行计算**，该字段已从输出中移除。
 
 ## 5. 风险与对策
 
