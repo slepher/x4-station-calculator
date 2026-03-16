@@ -1007,6 +1007,9 @@ def migrate_regionyields(regionyields_xml_path: Path) -> List[dict]:
             yield_item: Dict[str, object] = {}
             for key, value in yield_node.attrib.items():
                 yield_item[key] = coerce_attr_value(value)
+            # 添加 density 作为 resourcedensity 的别名（level 标识）
+            if "resourcedensity" in yield_item:
+                yield_item["density"] = yield_item["resourcedensity"]
             resource_item["yields"].append(yield_item)
         resources.append(resource_item)
     resources.sort(key=lambda item: item["ware"])
@@ -1088,6 +1091,62 @@ def load_region_object_groups(
     return groups
 
 
+def parse_region_fields(
+    region_node: ET.Element,
+    group_index: Dict[str, dict],
+) -> dict:
+    """
+    解析 region 的 <fields> 节点，提取 asteroid 和 nebula 字段数据。
+
+    Args:
+        region_node: region XML 节点
+        group_index: regionobjectgroups 的 group 索引
+
+    Returns:
+        包含 asteroids 和 gas_nebulae 列表的字典
+    """
+    fields_data = {
+        "asteroids": [],
+        "gas_nebulae": [],
+    }
+
+    fields_node = region_node.find("./fields")
+    if fields_node is None:
+        return fields_data
+
+    # 解析 asteroid 字段（固体资源）
+    for asteroid_node in fields_node.findall("./asteroid[@groupref]"):
+        groupref = (asteroid_node.get("groupref") or "").strip()
+        if not groupref or groupref not in group_index:
+            continue
+
+        group = group_index[groupref]
+        densityfactor = as_float(asteroid_node.get("densityfactor"), 1.0)
+        minnoisevalue = as_float(asteroid_node.get("minnoisevalue"), 0.0)
+        maxnoisevalue = as_float(asteroid_node.get("maxnoisevalue"), 1.0)
+        resourcepercentage = as_float(asteroid_node.get("resourcepercentage"), 100.0) / 100.0
+
+        fields_data["asteroids"].append({
+            "groupref": groupref,
+            "resource": group["resource"],
+            "yield": group["yield"],
+            "densityfactor": densityfactor,
+            "noise_width": max(0.0, maxnoisevalue - minnoisevalue),
+            "resourcepercentage": resourcepercentage,
+        })
+
+    # 解析 nebula 字段（气体资源）
+    # 只有带 resources="..." 属性的 nebula 才生成资源
+    for nebula_node in fields_node.findall("./nebula[@resources]"):
+        resources = (nebula_node.get("resources") or "").strip()
+        if resources:
+            fields_data["gas_nebulae"].append({
+                "resource": resources,
+            })
+
+    return fields_data
+
+
 def build_region_legacy_resource_map(
     region_definitions_xml_path: Path,
     yield_level_map: Dict[str, Dict[str, int]],
@@ -1120,84 +1179,159 @@ def build_region_legacy_resource_map(
 
 def summarize_region_resources(
     region_item: dict,
-    legacy_resource_map: Dict[str, dict],
+    fields_data: dict,
     yield_info_map: Optional[Dict[str, Dict[str, dict]]] = None,
 ) -> List[dict]:
     """
-    总结 region 的资源产出。
+    总结 region 的资源产出（8.0 版本，使用 fields 解析）。
 
     Args:
         region_item: region 定义（含 density, boundary, falloff, volume_km3, falloff_factor, noise_probability）
-        legacy_resource_map: 旧版资源映射（从 XML resources 节点读取）
+        fields_data: 解析后的 fields 数据（含 asteroids 和 gas_nebulae 列表）
         yield_info_map: 资源 yield 信息映射（用于获取 replenishtime 计算 delay）
 
     Returns:
-        资源产出列表，包含 ware, rating, yield, delay, respawn
+        资源产出列表，包含 ware, yield, delay, respawn, density, respawn_density
     """
     region_density = as_number(region_item.get("density"), 1.0)
-    boundary = region_item.get("boundary")
-    falloff = region_item.get("falloff") or {}
-    effective_volume_m3 = boundary_volume(boundary) * as_number(falloff.get("effective_factor"), 1.0)
-    effective_volume_km3 = effective_volume_m3 / 1_000_000_000.0
-    region_noise_probability = noise_probability(region_item.get("minnoisevalue"), region_item.get("maxnoisevalue"))
+    falloff_factor = as_number(region_item.get("falloff_factor"), 1.0)
+    noise_probability = as_number(region_item.get("noise_probability"), 1.0)
+    volume_km3 = as_number(region_item.get("volume_km3"), 0.0)
+
+    # Region 修正因子：F_region = density × falloff_factor × noise_probability
+    F_region = region_density * falloff_factor * noise_probability
+
     by_ware: Dict[str, dict] = {}
 
-    # 不再使用 fields 数据，直接从 legacy_resource_map 读取资源类型
-    for ware, legacy in legacy_resource_map.items():
-        yield_name = legacy.get("yield", "")
-        resourcedensity = legacy.get("resourcedensity", 0.0)
-        if resourcedensity <= 0:
-            # 尝试从 yield_info_map 获取
-            if yield_info_map and ware in yield_info_map and yield_name in yield_info_map[ware]:
-                resourcedensity = yield_info_map[ware][yield_name]["resourcedensity"]
+    # 处理固体资源（asteroid fields）
+    for asteroid in fields_data.get("asteroids", []):
+        ware = asteroid["resource"]
+        densityfactor = asteroid["densityfactor"]
+        noise_width = asteroid["noise_width"]
+        group_yield = asteroid["yield"]
+        resourcepercentage = asteroid["resourcepercentage"]
+
+        # Field 贡献 = densityfactor × noise_width × yield × resourcepercentage
+        field_contribution = densityfactor * noise_width * group_yield * resourcepercentage
+
+        # 获取 resourcedensity 和 replenishtime
+        if yield_info_map and ware in yield_info_map:
+            # 对于 asteroid，需要根据 yield_name 查找，但 fields 中没有 yield_name
+            # 这里使用 legacy_resource_map 传递的 yield_name 来获取
+            # 由于 fields 解析不携带 yield_name，我们需要从 ware 的第一个 yield 获取
+            yield_entries = list(yield_info_map[ware].values())
+            if yield_entries:
+                resourcedensity = yield_entries[0].get("resourcedensity", 0.0)
+                replenishtime = yield_entries[0].get("replenishtime", 60.0)
+            else:
+                resourcedensity = 0.0
+                replenishtime = 60.0
+        else:
+            resourcedensity = 0.0
+            replenishtime = 60.0
+
         if resourcedensity <= 0:
             continue
 
-        # 简化计算：假设所有资源都是固体（非气体），factor = 1
-        is_gas_field = False
+        # 单位密度 = ρ_base × F_region × field_contribution
+        density = resourcedensity * F_region * field_contribution
 
-        # 计算 simulated_amount
-        densityfactor = 1.0
-        noise_coverage = region_noise_probability
-        simulated_density = region_density * densityfactor * resourcedensity * noise_coverage
-        simulated_amount = simulated_density * effective_volume_km3
+        # 单位回复密度 = density × 60 / replenishtime
+        respawn_density = density * 60.0 / replenishtime if replenishtime > 0 else 0.0
+
+        # 总量 = density × volume_km3
+        yield_total = density * volume_km3
+
+        # 总重生量 = respawn_density × volume_km3
+        respawn_total = respawn_density * volume_km3
 
         item = by_ware.setdefault(ware, {
             "ware": ware,
-            "is_gas_field": is_gas_field,
-            "yield_name": yield_name,
-            "simulated_amount": 0.0,
+            "density": 0.0,
+            "respawn_density": 0.0,
+            "yield": 0.0,
+            "respawn": 0.0,
+            "replenishtime": replenishtime,
+            "is_gas": False,
         })
-        item["simulated_amount"] += simulated_amount
 
-    resources = sorted(by_ware.values(), key=lambda item: item["ware"])
-    for item in resources:
-        is_gas_field = item.get("is_gas_field", False)
-        simulated_amount = as_number(item["simulated_amount"])
-        # yield 是产量值（数值），rating 是星级评分
-        _, item["rating"] = classify_density_tier(str(item.get("ware") or ""), simulated_amount)
-        item["yield"] = simulated_amount  # yield 字段存储实际产量值
+        # 累加（多个 asteroid field 可能产出同一种资源）
+        item["density"] += density
+        item["respawn_density"] += respawn_density
+        item["yield"] += yield_total
+        item["respawn"] += respawn_total
+        item["replenishtime"] = replenishtime  # 使用最后一个
 
-        # 计算 delay 和 respawn
-        # delay = replenishtime / 60 (小时)
-        # respawn = amount * 60 / delay = sustainableYieldPerHour
-        yield_name = item.get("yield_name", "")
-        if yield_info_map and item["ware"] in yield_info_map and yield_name in yield_info_map[item["ware"]]:
-            replenishtime = yield_info_map[item["ware"]][yield_name]["replenishtime"]
-            gatherspeedfactor = yield_info_map[item["ware"]][yield_name]["gatherspeedfactor"]
+    # 处理气体资源（nebula fields）
+    for nebula in fields_data.get("gas_nebulae", []):
+        ware = nebula["resource"]
+
+        # 获取 resourcedensity 和 replenishtime
+        if yield_info_map and ware in yield_info_map:
+            yield_entries = list(yield_info_map[ware].values())
+            if yield_entries:
+                resourcedensity = yield_entries[0].get("resourcedensity", 0.0)
+                replenishtime = yield_entries[0].get("replenishtime", 60.0)
+                gatherspeedfactor = yield_entries[0].get("gatherspeedfactor", 1.0)
+            else:
+                resourcedensity = 0.0
+                replenishtime = 60.0
+                gatherspeedfactor = 1.0
         else:
-            # 默认值
-            replenishtime = 60.0  # 默认 1 小时
+            resourcedensity = 0.0
+            replenishtime = 60.0
             gatherspeedfactor = 1.0
 
-        item["delay"] = replenishtime / 60.0 if replenishtime > 0 else 60.0
-        item["respawn"] = simulated_amount * 60.0 / item["delay"] if item["delay"] > 0 else 0.0
-        item["factor"] = gatherspeedfactor if is_gas_field else 1.0
+        if resourcedensity <= 0:
+            continue
 
-        # 清理中间字段
-        del item["is_gas_field"]
-        del item["yield_name"]
-        del item["simulated_amount"]  # 移除 simulated_amount 字段
+        # 气体资源：单位密度 = ρ_base × F_region（不使用 field_contribution）
+        density = resourcedensity * F_region
+
+        # 单位回复密度 = density × 60 / replenishtime
+        respawn_density = density * 60.0 / replenishtime if replenishtime > 0 else 0.0
+
+        # 总量 = density × volume_km3
+        yield_total = density * volume_km3
+
+        # 总重生量 = respawn_density × volume_km3
+        respawn_total = respawn_density * volume_km3
+
+        item = by_ware.setdefault(ware, {
+            "ware": ware,
+            "density": 0.0,
+            "respawn_density": 0.0,
+            "yield": 0.0,
+            "respawn": 0.0,
+            "replenishtime": replenishtime,
+            "is_gas": True,
+        })
+
+        item["density"] += density
+        item["respawn_density"] += respawn_density
+        item["yield"] += yield_total
+        item["respawn"] += respawn_total
+        item["replenishtime"] = replenishtime
+        item["gatherspeedfactor"] = gatherspeedfactor
+
+    # 构建最终输出
+    resources: List[dict] = []
+    for ware, item in sorted(by_ware.items(), key=lambda x: x[0]):
+        # 计算 delay（分钟）和 factor
+        replenishtime = item["replenishtime"]
+        delay = replenishtime if replenishtime > 0 else 60.0  # 单位：分钟
+        factor = item.get("gatherspeedfactor", 1.0) if item.get("is_gas") else 1.0
+
+        resource_item = {
+            "ware": ware,
+            "yield": item["yield"],
+            "delay": delay,
+            "respawn": item["respawn"],
+            "density": item["density"],
+            "respawn_density": item["respawn_density"],
+            "factor": factor,
+        }
+        resources.append(resource_item)
 
     return resources
 
@@ -1213,7 +1347,6 @@ def migrate_region_definitions(
         return {}
     root = parse_xml(region_definitions_xml_path)
     group_index = load_region_object_groups(regionobjectgroups_xml_path)
-    legacy_resources_by_region = build_region_legacy_resource_map(region_definitions_xml_path, yield_level_map, yield_density_map)
     definitions: Dict[str, dict] = {}
 
     for region_node in root.findall("./region[@name]"):
@@ -1238,11 +1371,14 @@ def migrate_region_definitions(
             "falloff": build_falloff(region_node.find("./falloff")),
         }
 
-        # 计算 region 级别的体积和噪声参数（移动到 region 根级别，不再放在 resources 数组内）
+        # 计算 region 级别的体积和噪声参数（移动到 region 根级别）
         boundary = region_item["boundary"]
         falloff = region_item["falloff"] or {}
-        effective_volume_m3 = boundary_volume(boundary) * as_number(falloff.get("effective_factor"), 1.0)
-        effective_volume_km3 = effective_volume_m3 / 1_000_000_000.0
+
+        # 体积计算：纯几何体积，不含 falloff 修正
+        volume_m3 = boundary_volume(boundary)
+        volume_km3 = volume_m3 / 1_000_000_000.0
+
         region_noise_probability = noise_probability(
             region_item.get("minnoisevalue"),
             region_item.get("maxnoisevalue"),
@@ -1253,15 +1389,16 @@ def migrate_region_definitions(
         if spline_linear > 0:
             region_item["linear"] = spline_linear
 
-        region_item["volume_km3"] = round(effective_volume_km3, 4)
+        region_item["volume_km3"] = round(volume_km3, 4)
         region_item["falloff_factor"] = round(as_number(falloff.get("effective_factor"), 1.0), 4)
         region_item["noise_probability"] = round(region_noise_probability, 4)
 
-        # 不再解析 fields 节点，相关数据已从输出中移除
+        # 解析 fields 节点（asteroid 和 nebula）
+        fields_data = parse_region_fields(region_node, group_index)
 
         region_item["resources"] = summarize_region_resources(
             region_item,
-            legacy_resources_by_region.get(region_name, {}),
+            fields_data,
             yield_info_map,
         )
         definitions[region_name] = region_item
@@ -1273,8 +1410,8 @@ def summarize_sector_resources(region_rows: List[dict]) -> List[dict]:
     总结 sector 的资源产出，输出统一的 resources 格式。
 
     计算方式（与 9.0 统一）：
-    - amount = sum(yield) 因为 yield 现在是 simulated_amount 的值
-    - respawn = sum(yield * 60 / delay) = sum(respawn)
+    - amount = sum(yield) - yield 已经是总量（density × volume_km3）
+    - respawn = sum(respawn) - respawn 已经是每小时总回复量（respawn_density × volume_km3）
     """
     by_ware: Dict[str, dict] = {}
     for region in region_rows:
@@ -1283,11 +1420,9 @@ def summarize_sector_resources(region_rows: List[dict]) -> List[dict]:
             if not ware:
                 continue
 
-            # yield 现在是 simulated_amount 的值
+            # yield 和 respawn 已经是总量
             yield_val = as_number(resource.get("yield"), 0.0)
-            # respawn = yield * 60 / delay
-            delay = as_number(resource.get("delay"), 60.0)
-            respawn = yield_val * 60.0 / delay if delay > 0 else 0.0
+            respawn_val = as_number(resource.get("respawn"), 0.0)
 
             entry = by_ware.setdefault(ware, {
                 "ware": ware,
@@ -1295,7 +1430,7 @@ def summarize_sector_resources(region_rows: List[dict]) -> List[dict]:
                 "respawn": 0.0,
             })
             entry["amount"] += yield_val
-            entry["respawn"] += respawn
+            entry["respawn"] += respawn_val
 
     summarized: List[dict] = []
     for ware, entry in sorted(by_ware.items()):

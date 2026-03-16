@@ -154,18 +154,18 @@ respawn = yield × 60 / delay  (= sustainableYieldPerHour)
       "radial_factor": 0.63,
       "effective_factor": 0.567
     },
+    "volume_km3": 125.6,
+    "falloff_factor": 0.567,
+    "noise_probability": 0.35,
     "resources": [
       {
         "ware": "ore",
-        "amount": 150000,
-        "rating": 10,
         "yield": 150000,
         "delay": 30.0,
         "factor": 1,
         "respawn": 300000,
-        "volume_km3": 125.6,
-        "falloff_factor": 0.9,
-        "noise_probability": 0.35
+        "density": 950.0,
+        "respawn_density": 1900.0
       }
     ]
   },
@@ -222,21 +222,52 @@ respawn = yield × 60 / delay  (= sustainableYieldPerHour)
 ```
 
 ### 2.9 8.0 版本 yield 计算链路
+
+**体积计算（纯几何，不含 falloff）：**
 ```
-yield = volume_km3 × falloff_factor × noise_probability
-        × region_density × densityfactor × resourcedensity
+volume_km3 = boundary_volume(boundary) / 10^9
+```
+
+**Region 修正因子：**
+```
+F_region = density × falloff_factor × noise_probability
+```
+
+**Field 贡献（固体资源）：**
+```
+field_contribution = Σ(densityfactor × noise_width × yield × resourcepercentage/100)
 
 其中:
-- volume_km3 = boundary_volume(boundary) / 10^9
-- falloff_factor = lateral_factor × radial_factor
-- noise_probability = noise_probability(minnoisevalue, maxnoisevalue)
-- region_density = region.@density
-- densityfactor = field.@densityfactor 或 field.@uniformdensity
-- resourcedensity = 查表(ware, yield_name)
-
-delay = replenishtime / 60  (小时)
-sustainableYieldPerHour = yield × 60 / delay
+- noise_width = maxnoisevalue - minnoisevalue (field 级别噪声范围)
+- yield = group.yield (从 regionobjectgroups 读取)
+- resourcepercentage = field 级别的产量概率 (默认 100%，需要 /100 转换为小数)
 ```
+
+**单位密度（新增）：**
+```
+density = ρ_base × F_region × field_contribution
+
+单位：resources/km³
+```
+
+**单位回复密度（新增）：**
+```
+respawn_density = density × 60 / replenishtime
+
+单位：resources/km³/hour
+```
+
+**总量计算：**
+```
+yield = density × volume_km3
+respawn = respawn_density × volume_km3
+```
+
+**参数说明：**
+- `ρ_base` = `resourcedensity` (从 regionyields 的 yield 定义)
+- `replenishtime` 单位是**分钟**
+- `× 60` 转换为每小时
+
 
 ### 2.10 8.0 版本 boundary_volume 计算
 
@@ -328,6 +359,7 @@ N 矿 yield 值约为普通矿物的 1/10，使用独立的 rating 映射表：
 注意：
 - 气体资源有 `gatherspeedfactor` 字段
 - 固体资源 `gatherspeedfactor` 设为 `1`
+- `replenishtime` 单位是**分钟**（不是秒）
 
 ## 3. `maps.json` 资源数据设计
 
@@ -355,13 +387,14 @@ N 矿 yield 值约为普通矿物的 1/10，使用独立的 rating 映射表：
 | 字段 | 计算规则 |
 |------|----------|
 | `ware` | 资源类型 |
-| `amount` | `sum(yield * amount)` |
-| `respawn` | `sum(yield * 60 / delay * amount)` = `sum(sustainableYieldPerHour * amount)` |
+| `amount` | `sum(yield * amount)` = `sum(density × volume_km3 × amount)` |
+| `respawn` | `sum(respawn_density × volume_km3 × amount)` = 每小时总回复量 |
 
 其中：
-- `yield`：单次采集产量（来自 definition 或 region 计算）
-- `delay`：重生时间（小时）= `replenishtime / 60`
-- `sustainableYieldPerHour` = `yield × 60 / delay`
+- `density`：单位密度（resources/km³），已包含 falloff 等修正因子
+- `respawn_density`：单位回复密度（resources/km³/hour）= `density × 60 / replenishtime`
+- `volume_km3`：区域几何体积（不含 falloff 修正）
+- `replenishtime` 单位是**分钟**
 
 ## 4. 代码组织设计
 

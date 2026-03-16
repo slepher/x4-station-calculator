@@ -34,7 +34,7 @@
 - [x] 7.2 移除 `regions.json` 中的 `cluster_id` / `sector_id` / `ref` / `amount` 引用字段。
 - [x] 7.3 将 `regions.json` 改为纯 region 定义，使用 `id` 表示 region 名称。
 - [x] 7.4 保留 `boundary`、`falloff`、`resources` 等定义字段。
-- [x] 7.5 `resources` 数组包含 `{ware, amount, rating, yield, delay, factor, respawn, volume_km3, falloff_factor, noise_probability}`。
+- [x] 7.5 `resources` 数组包含 `{ware, yield, delay, factor, respawn, density, respawn_density}`。
 
 ## 8. `8.0` resourceareas.json 新增
 - [x] 8.1 新增 `resourceareas.json` 输出，存放 region 到 sector 的引用关系。
@@ -50,9 +50,12 @@
 - [x] 10.1 为 `9.0+` 验证 `resourceareas.json` 结构正确（分组结构，含 cluster_id/sector_id/areas）。
 - [x] 10.2 为 `9.0+` 验证 `maps.json` 中 sector 的 `resources` 字段（原 resource_wares）。
 - [x] 10.3 完成实现后执行 `npm run build`，确认前端不报错。
-- [x] 10.4 为 `8.0` 验证 `regions.json` 结构正确（纯定义，不含 fields，含 resources 数组）。
+- [x] 10.4 为 `8.0` 验证 `regions.json` 结构正确（纯定义，不含 fields，含 resources 数组，包含 density 和 respawn_density 字段）。
 - [x] 10.5 为 `8.0` 验证 `resourceareas.json` 结构正确（分组结构，含 cluster_id/sector_id/areas）。
 - [x] 10.6 为 `8.0` 验证 `regionyields.json` 包含 `replenishtime` 和 `gatherspeedfactor`。
+- [x] 10.7 验证 `replenishtime` 单位处理正确（保持分钟，未错误除以 60）。
+- [x] 10.8 验证 `volume_km3` 是纯几何体积（不含 falloff 修正）。
+- [x] 10.9 验证 field 贡献公式正确（含 resourcepercentage/100 转换）。
 
 ## 11. 统一 8.0/9.0 sector.resources 计算方式
 - [x] 11.1 统一 `respawn` 计算公式：`sum(respawn × amount)`。
@@ -66,3 +69,14 @@
 - [x] 12.4 对 8.0 和 9.0 版本同时生效。
 - [x] 12.5 更新 `build_80_resourceareas_array()` 返回分组结构。
 - [x] 12.6 更新 `build_resourceareas_array()` 返回分组结构。
+
+## 13. 8.0 资源计算模型修正
+- [x] 13.1 重新支持 `<fields>` 节点解析（asteroid 和 nebula）。
+- [x] 13.2 为 asteroid field 解析 `groupref`、`densityfactor`、`minnoisevalue`、`maxnoisevalue`、`resourcepercentage`。
+- [x] 13.3 为 nebula field 解析 `resources` 属性（识别气体资源）。
+- [x] 13.4 实现 field 贡献公式：`Σ(densityfactor × noise_width × yield × resourcepercentage/100)`。
+- [x] 13.5 修正 `replenishtime` 单位处理：保持分钟（移除错误的 `/60`）。
+- [x] 13.6 体积计算移除 falloff：`volume_km3 = boundary_volume(boundary) / 10^9`。
+- [x] 13.7 为 `resources` 添加 `density` 字段（单位密度，resources/km³）。
+- [x] 13.8 为 `resources` 添加 `respawn_density` 字段（单位回复密度，resources/km³/hour）。
+- [x] 13.9 区分固体/气体资源计算逻辑（气体不使用 yield 乘数）。

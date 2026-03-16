@@ -10,7 +10,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 300
       },
       {
         "name": "verylow",
@@ -19,7 +20,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 600
       },
       {
         "name": "lowminus",
@@ -28,7 +30,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 1300
       },
       {
         "name": "low",
@@ -37,7 +40,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 3000
       },
       {
         "name": "lowplus",
@@ -46,7 +50,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 4800
       },
       {
         "name": "lowextra",
@@ -55,7 +60,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 8000
       },
       {
         "name": "medlow",
@@ -64,7 +70,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 9600
       },
       {
         "name": "medium",
@@ -73,7 +80,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 15000
       },
       {
         "name": "medplus",
@@ -82,7 +90,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 32500
       },
       {
         "name": "medhigh",
@@ -91,7 +100,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 50000
       },
       {
         "name": "highlow",
@@ -100,7 +110,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 71500
       },
       {
         "name": "high",
@@ -109,7 +120,8 @@
         "gatherspeedfactor": 4.0,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 130000
       },
       {
         "name": "highplus",
@@ -118,7 +130,8 @@
         "gatherspeedfactor": 4.0,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 175000
       },
       {
         "name": "veryhigh",
@@ -127,7 +140,8 @@
         "gatherspeedfactor": 4.0,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 245000
       },
       {
         "name": "highest",
@@ -136,7 +150,8 @@
         "gatherspeedfactor": 4.0,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 350000
       }
     ]
   },
@@ -151,7 +166,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 660
       },
       {
         "name": "verylow",
@@ -160,7 +176,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 1500
       },
       {
         "name": "lowminus",
@@ -169,7 +186,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 3000
       },
       {
         "name": "low",
@@ -178,7 +196,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 6600
       },
       {
         "name": "lowplus",
@@ -187,7 +206,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 11500
       },
       {
         "name": "lowextra",
@@ -196,7 +216,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 20000
       },
       {
         "name": "medlow",
@@ -205,7 +226,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 24000
       },
       {
         "name": "medium",
@@ -214,7 +236,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 49500
       },
       {
         "name": "medplus",
@@ -223,7 +246,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 105500
       },
       {
         "name": "medhigh",
@@ -232,7 +256,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 250000
       },
       {
         "name": "highlow",
@@ -241,7 +266,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 375000
       },
       {
         "name": "high",
@@ -250,7 +276,8 @@
         "gatherspeedfactor": 4.0,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 450000
       },
       {
         "name": "highplus",
@@ -259,7 +286,8 @@
         "gatherspeedfactor": 4.0,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 3000000
       },
       {
         "name": "veryhigh",
@@ -268,7 +296,8 @@
         "gatherspeedfactor": 4.0,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 9000000
       },
       {
         "name": "highest",
@@ -277,7 +306,8 @@
         "gatherspeedfactor": 4.0,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 20000000
       }
     ]
   },
@@ -291,7 +321,8 @@
         "replenishtime": 180,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 0.3
+        "scaneffectintensity": 0.3,
+        "density": 0.015
       },
       {
         "name": "verylow",
@@ -299,7 +330,8 @@
         "replenishtime": 180,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 0.3
+        "scaneffectintensity": 0.3,
+        "density": 0.15
       },
       {
         "name": "lowminus",
@@ -307,7 +339,8 @@
         "replenishtime": 300,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 0.3
+        "scaneffectintensity": 0.3,
+        "density": 0.6
       },
       {
         "name": "low",
@@ -315,7 +348,8 @@
         "replenishtime": 300,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 1.5
       },
       {
         "name": "lowplus",
@@ -323,7 +357,8 @@
         "replenishtime": 600,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 4
       },
       {
         "name": "lowextra",
@@ -331,7 +366,8 @@
         "replenishtime": 600,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 8
       },
       {
         "name": "medlow",
@@ -339,7 +375,8 @@
         "replenishtime": 600,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 9
       },
       {
         "name": "medium",
@@ -347,7 +384,8 @@
         "replenishtime": 600,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 15
       },
       {
         "name": "medplus",
@@ -355,7 +393,8 @@
         "replenishtime": 2400,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 30
       },
       {
         "name": "medhigh",
@@ -363,7 +402,8 @@
         "replenishtime": 600,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 60
       },
       {
         "name": "highlow",
@@ -371,7 +411,8 @@
         "replenishtime": 3600,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 90
       },
       {
         "name": "high",
@@ -379,7 +420,8 @@
         "replenishtime": 1200,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 150
       },
       {
         "name": "highplus",
@@ -387,7 +429,8 @@
         "replenishtime": 3600,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 600
       },
       {
         "name": "veryhigh",
@@ -395,7 +438,8 @@
         "replenishtime": 2400,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 1500
       },
       {
         "name": "highest",
@@ -403,7 +447,8 @@
         "replenishtime": 18000,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 30000
       }
     ]
   },
@@ -418,7 +463,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 300
       },
       {
         "name": "verylow",
@@ -427,7 +473,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 600
       },
       {
         "name": "lowminus",
@@ -436,7 +483,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 1300
       },
       {
         "name": "low",
@@ -445,7 +493,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 2500
       },
       {
         "name": "lowplus",
@@ -454,7 +503,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 4800
       },
       {
         "name": "lowextra",
@@ -463,7 +513,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 8000
       },
       {
         "name": "medlow",
@@ -472,7 +523,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 9600
       },
       {
         "name": "medium",
@@ -481,7 +533,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 25000
       },
       {
         "name": "medplus",
@@ -490,7 +543,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 52500
       },
       {
         "name": "medhigh",
@@ -499,7 +553,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 125000
       },
       {
         "name": "highlow",
@@ -508,7 +563,8 @@
         "gatherspeedfactor": 1.0,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 165000
       },
       {
         "name": "high",
@@ -517,7 +573,8 @@
         "gatherspeedfactor": 4.0,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 250000
       },
       {
         "name": "highplus",
@@ -526,7 +583,8 @@
         "gatherspeedfactor": 4.0,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 375000
       },
       {
         "name": "veryhigh",
@@ -535,7 +593,8 @@
         "gatherspeedfactor": 4.0,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 735000
       },
       {
         "name": "highest",
@@ -544,7 +603,8 @@
         "gatherspeedfactor": 4.0,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 1250000
       }
     ]
   },
@@ -558,7 +618,8 @@
         "replenishtime": 2400,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 1e-05
       },
       {
         "name": "verylow",
@@ -566,7 +627,8 @@
         "replenishtime": 3600,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 3e-05
       },
       {
         "name": "lowminus",
@@ -574,7 +636,8 @@
         "replenishtime": 4800,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 5e-05
       },
       {
         "name": "low",
@@ -582,7 +645,8 @@
         "replenishtime": 5040,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 0.0001
       },
       {
         "name": "lowplus",
@@ -590,7 +654,8 @@
         "replenishtime": 6400,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 0.0002
       },
       {
         "name": "lowextra",
@@ -598,7 +663,8 @@
         "replenishtime": 7000,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 0.0004
       },
       {
         "name": "medlow",
@@ -606,7 +672,8 @@
         "replenishtime": 7200,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 0.0006
       },
       {
         "name": "medium",
@@ -614,7 +681,8 @@
         "replenishtime": 10080,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 0.001
       },
       {
         "name": "medplus",
@@ -622,7 +690,8 @@
         "replenishtime": 12440,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 0.002
       },
       {
         "name": "medhigh",
@@ -630,7 +699,8 @@
         "replenishtime": 14400,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 0.004
       },
       {
         "name": "highlow",
@@ -638,7 +708,8 @@
         "replenishtime": 16800,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 0.008
       },
       {
         "name": "high",
@@ -646,7 +717,8 @@
         "replenishtime": 20160,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 0.01
       },
       {
         "name": "highplus",
@@ -654,7 +726,8 @@
         "replenishtime": 32000,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 0.04
       },
       {
         "name": "veryhigh",
@@ -662,7 +735,8 @@
         "replenishtime": 40320,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 0.1
       },
       {
         "name": "highest",
@@ -670,7 +744,8 @@
         "replenishtime": 80640,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 1.0
       }
     ]
   },
@@ -684,7 +759,8 @@
         "replenishtime": 600,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 0.1
+        "scaneffectintensity": 0.1,
+        "density": 0.026
       },
       {
         "name": "verylow",
@@ -692,7 +768,8 @@
         "replenishtime": 1200,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 0.3
+        "scaneffectintensity": 0.3,
+        "density": 0.06
       },
       {
         "name": "lowminus",
@@ -700,7 +777,8 @@
         "replenishtime": 1200,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 0.3
+        "scaneffectintensity": 0.3,
+        "density": 0.2
       },
       {
         "name": "low",
@@ -708,7 +786,8 @@
         "replenishtime": 1800,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 0.6
+        "scaneffectintensity": 0.6,
+        "density": 0.6
       },
       {
         "name": "lowplus",
@@ -716,7 +795,8 @@
         "replenishtime": 1800,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 0.6
+        "scaneffectintensity": 0.6,
+        "density": 1.8
       },
       {
         "name": "lowextra",
@@ -724,7 +804,8 @@
         "replenishtime": 1900,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 0.6
+        "scaneffectintensity": 0.6,
+        "density": 3.2
       },
       {
         "name": "medlow",
@@ -732,7 +813,8 @@
         "replenishtime": 2000,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 4
       },
       {
         "name": "medium",
@@ -740,7 +822,8 @@
         "replenishtime": 2400,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 6
       },
       {
         "name": "medplus",
@@ -748,7 +831,8 @@
         "replenishtime": 2400,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 16
       },
       {
         "name": "medhigh",
@@ -756,7 +840,8 @@
         "replenishtime": 2400,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 32
       },
       {
         "name": "highlow",
@@ -764,7 +849,8 @@
         "replenishtime": 3600,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 48
       },
       {
         "name": "high",
@@ -772,7 +858,8 @@
         "replenishtime": 3600,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 60
       },
       {
         "name": "highplus",
@@ -780,7 +867,8 @@
         "replenishtime": 3600,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 120
       },
       {
         "name": "veryhigh",
@@ -788,7 +876,8 @@
         "replenishtime": 18000,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 3600
       },
       {
         "name": "highest",
@@ -796,7 +885,8 @@
         "replenishtime": 24000,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 60000
       }
     ]
   },
@@ -810,7 +900,8 @@
         "replenishtime": 600,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 0.006
       },
       {
         "name": "verylow",
@@ -818,7 +909,8 @@
         "replenishtime": 600,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 0.01
       },
       {
         "name": "lowminus",
@@ -826,7 +918,8 @@
         "replenishtime": 1200,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 0.35
       },
       {
         "name": "low",
@@ -834,7 +927,8 @@
         "replenishtime": 1200,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 0.75
       },
       {
         "name": "lowplus",
@@ -842,7 +936,8 @@
         "replenishtime": 1800,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 1.0
       },
       {
         "name": "lowextra",
@@ -850,7 +945,8 @@
         "replenishtime": 1900,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 1.2
       },
       {
         "name": "medlow",
@@ -858,7 +954,8 @@
         "replenishtime": 2000,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 1.3
       },
       {
         "name": "medium",
@@ -866,7 +963,8 @@
         "replenishtime": 2400,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 1.5
       },
       {
         "name": "medplus",
@@ -874,7 +972,8 @@
         "replenishtime": 2400,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 2.5
       },
       {
         "name": "medhigh",
@@ -882,7 +981,8 @@
         "replenishtime": 2400,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 4
       },
       {
         "name": "highlow",
@@ -890,7 +990,8 @@
         "replenishtime": 3600,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 6
       },
       {
         "name": "high",
@@ -898,7 +999,8 @@
         "replenishtime": 4200,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 7.5
       },
       {
         "name": "highplus",
@@ -906,7 +1008,8 @@
         "replenishtime": 4800,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 12
       },
       {
         "name": "veryhigh",
@@ -914,7 +1017,8 @@
         "replenishtime": 5400,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 15
       },
       {
         "name": "highest",
@@ -922,7 +1026,8 @@
         "replenishtime": 6400,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 35
       }
     ]
   },
@@ -936,7 +1041,8 @@
         "replenishtime": 600,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 0.1
+        "scaneffectintensity": 0.1,
+        "density": 0.026
       },
       {
         "name": "verylow",
@@ -944,7 +1050,8 @@
         "replenishtime": 1200,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 0.3
+        "scaneffectintensity": 0.3,
+        "density": 0.06
       },
       {
         "name": "lowminus",
@@ -952,7 +1059,8 @@
         "replenishtime": 1200,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 0.3
+        "scaneffectintensity": 0.3,
+        "density": 0.2
       },
       {
         "name": "low",
@@ -960,7 +1068,8 @@
         "replenishtime": 1800,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 0.6
+        "scaneffectintensity": 0.6,
+        "density": 0.6
       },
       {
         "name": "lowplus",
@@ -968,7 +1077,8 @@
         "replenishtime": 1800,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 0.6
+        "scaneffectintensity": 0.6,
+        "density": 1.8
       },
       {
         "name": "lowextra",
@@ -976,7 +1086,8 @@
         "replenishtime": 1900,
         "scaneffect": "scfx_dynamic_lowyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 0.6
+        "scaneffectintensity": 0.6,
+        "density": 3.2
       },
       {
         "name": "medlow",
@@ -984,7 +1095,8 @@
         "replenishtime": 2000,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 4
       },
       {
         "name": "medium",
@@ -992,7 +1104,8 @@
         "replenishtime": 2400,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 6
       },
       {
         "name": "medplus",
@@ -1000,7 +1113,8 @@
         "replenishtime": 2400,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 16
       },
       {
         "name": "medhigh",
@@ -1008,7 +1122,8 @@
         "replenishtime": 2400,
         "scaneffect": "scfx_dynamic_normalyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 32
       },
       {
         "name": "highlow",
@@ -1016,7 +1131,8 @@
         "replenishtime": 3600,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 48
       },
       {
         "name": "high",
@@ -1024,7 +1140,8 @@
         "replenishtime": 3600,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 60
       },
       {
         "name": "highplus",
@@ -1032,7 +1149,8 @@
         "replenishtime": 3600,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 120
       },
       {
         "name": "veryhigh",
@@ -1040,7 +1158,8 @@
         "replenishtime": 18000,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 3600
       },
       {
         "name": "highest",
@@ -1048,7 +1167,8 @@
         "replenishtime": 24000,
         "scaneffect": "scfx_dynamic_highyield_01",
         "scaneffectdensity": 0.01,
-        "scaneffectintensity": 1.0
+        "scaneffectintensity": 1.0,
+        "density": 60000
       }
     ]
   }
