@@ -1,0 +1,20 @@
+{
+  "version": "9.0",
+  "beta": true,
+  "folder_name": "9.0-Empire-beta",
+  "type": "charactergroups",
+  "base_file": "D:\\Documents\\project\\x4tools\\x4data\\9.0-Empire-beta\\libraries\\charactergroups.xml",
+  "dlc_summaries": [
+    {
+      "dlc": "ego_dlc_timelines",
+      "modified_records": 1,
+      "modified_fields_total": 12,
+      "major_changes": [
+        {
+          "type": "select",
+          "count": 12
+        }
+      ]
+    }
+  ]
+}

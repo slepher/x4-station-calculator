@@ -1,0 +1,84 @@
+{
+  "version": "9.0",
+  "beta": true,
+  "folder_name": "9.0-Empire-beta",
+  "type": "classcatalog",
+  "base_file": "D:\\Documents\\project\\x4tools\\x4data\\9.0-Empire-beta\\libraries\\classcatalog.xml",
+  "dlc_summaries": [
+    {
+      "dlc": "ego_dlc_split",
+      "modified_records": 2,
+      "modified_fields_total": 187,
+      "major_changes": [
+        {
+          "type": "template",
+          "count": 96
+        },
+        {
+          "type": "macro",
+          "count": 91
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_terran",
+      "modified_records": 2,
+      "modified_fields_total": 167,
+      "major_changes": [
+        {
+          "type": "template",
+          "count": 87
+        },
+        {
+          "type": "macro",
+          "count": 80
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_pirate",
+      "modified_records": 2,
+      "modified_fields_total": 161,
+      "major_changes": [
+        {
+          "type": "template",
+          "count": 91
+        },
+        {
+          "type": "macro",
+          "count": 70
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_boron",
+      "modified_records": 2,
+      "modified_fields_total": 163,
+      "major_changes": [
+        {
+          "type": "template",
+          "count": 89
+        },
+        {
+          "type": "macro",
+          "count": 74
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_timelines",
+      "modified_records": 2,
+      "modified_fields_total": 154,
+      "major_changes": [
+        {
+          "type": "template",
+          "count": 80
+        },
+        {
+          "type": "macro",
+          "count": 74
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "version": "8.0",
+  "beta": false,
+  "folder_name": "8.0-Diplomacy",
+  "type": "sound_library",
+  "base_file": "D:\\Documents\\project\\x4tools\\x4data\\8.0-Diplomacy\\libraries\\sound_library.xml",
+  "dlc_summaries": [
+    {
+      "dlc": "ego_dlc_split",
+      "modified_records": 8,
+      "modified_fields_total": 25,
+      "major_changes": [
+        {
+          "type": "unknown",
+          "count": 25
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_terran",
+      "modified_records": 3,
+      "modified_fields_total": 28,
+      "major_changes": [
+        {
+          "type": "unknown",
+          "count": 28
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_pirate",
+      "modified_records": 4,
+      "modified_fields_total": 17,
+      "major_changes": [
+        {
+          "type": "unknown",
+          "count": 17
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_boron",
+      "modified_records": 3,
+      "modified_fields_total": 33,
+      "major_changes": [
+        {
+          "type": "unknown",
+          "count": 33
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_timelines",
+      "modified_records": 3,
+      "modified_fields_total": 12,
+      "major_changes": [
+        {
+          "type": "unknown",
+          "count": 12
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_mini_01",
+      "modified_records": 2,
+      "modified_fields_total": 18,
+      "major_changes": [
+        {
+          "type": "unknown",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_mini_02",
+      "modified_records": 4,
+      "modified_fields_total": 26,
+      "major_changes": [
+        {
+          "type": "unknown",
+          "count": 26
+        }
+      ]
+    }
+  ]
+}

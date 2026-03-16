@@ -1,0 +1,92 @@
+{
+  "version": "9.0",
+  "beta": true,
+  "folder_name": "9.0-Empire-beta",
+  "type": "wares",
+  "base_file": "D:\\Documents\\project\\x4tools\\x4data\\9.0-Empire-beta\\libraries\\wares.xml",
+  "dlc_summaries": [
+    {
+      "dlc": "ego_dlc_split",
+      "modified_records": 66,
+      "modified_fields_total": 144,
+      "major_changes": [
+        {
+          "type": "owner",
+          "count": 141
+        },
+        {
+          "type": "production.split",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_terran",
+      "modified_records": 171,
+      "modified_fields_total": 213,
+      "major_changes": [
+        {
+          "type": "production.terran",
+          "count": 132
+        },
+        {
+          "type": "owner",
+          "count": 69
+        },
+        {
+          "type": "illegal",
+          "count": 12
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_pirate",
+      "modified_records": 205,
+      "modified_fields_total": 376,
+      "major_changes": [
+        {
+          "type": "production.closedloop",
+          "count": 192
+        },
+        {
+          "type": "owner",
+          "count": 181
+        },
+        {
+          "type": "illegal",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_boron",
+      "modified_records": 66,
+      "modified_fields_total": 70,
+      "major_changes": [
+        {
+          "type": "owner",
+          "count": 49
+        },
+        {
+          "type": "illegal",
+          "count": 14
+        },
+        {
+          "type": "production.boron",
+          "count": 7
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_timelines",
+      "modified_records": 102,
+      "modified_fields_total": 102,
+      "major_changes": [
+        {
+          "type": "owner",
+          "count": 102
+        }
+      ]
+    }
+  ]
+}

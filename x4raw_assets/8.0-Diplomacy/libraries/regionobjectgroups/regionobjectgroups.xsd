@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="groups">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="group" minOccurs="0" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation>
+              A region object group, to be referenced in region_definitions.xml
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="select" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="macro" use="required">
+                    <xs:annotation>
+                      <xs:documentation>
+                        The macro name of the region object
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="weight">
+                    <xs:annotation>
+                      <xs:documentation>
+                        The weight of this macro selection (defaults to 1)
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="name" use="required" type="xs:ID">
+              <xs:annotation>
+                <xs:documentation>
+                  The name of this region object group
+                </xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="resource">
+              <xs:annotation>
+                <xs:documentation>
+                  The resource ware ID to be assigned when this group is used
+                </xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:NMTOKEN">
+                  <xs:enumeration value="ore" />
+                  <xs:enumeration value="nividium" />
+                  <xs:enumeration value="silicon" />
+                  <xs:enumeration value="ice" />
+                  <xs:enumeration value="hydrogen" />
+                  <xs:enumeration value="helium" />
+                  <xs:enumeration value="methane" />
+                  <xs:enumeration value="rawscrap" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="yield">
+              <xs:annotation>
+                <xs:documentation>
+                  The base yield for region objects in this group
+                </xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="yieldvariation">
+              <xs:annotation>
+                <xs:documentation>
+                  The yield variation fraction for region objects in this group, as a fraction of the base yield. Must be between 0 and 1. Defaults to 0.
+                </xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:float">
+                  <xs:minInclusive value="0" />
+                  <xs:maxInclusive value="1" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

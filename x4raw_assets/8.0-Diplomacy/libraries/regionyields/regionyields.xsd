@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="regionyields">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="resource" minOccurs="0" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation>
+              Yield definitions for a specific resource ware
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="yield" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="name" use="required">
+                    <xs:annotation>
+                      <xs:documentation>
+                        The ID of this yield definition, to be referenced in region_definitions.xml
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="resourcedensity" use="required" type="xs:float">
+                    <xs:annotation>
+                      <xs:documentation>
+                        The resource density, in ware amount per km³
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="replenishtime" use="required" type="xs:float">
+                    <xs:annotation>
+                      <xs:documentation>
+                        The time it takes to replenish the resources from empty to full (minutes)
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="gatherspeedfactor" type="xs:float">
+                    <xs:annotation>
+                      <xs:documentation>
+                        The gather speed factor (only relevant for liquid resources)
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="scaneffect" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>
+                        The scan result effect definition, see libraries/effects.xml
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="scaneffectdensity" type="xs:float" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>
+                        The scan result effect density, defaults to 1.0
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="scaneffectintensity" type="xs:float">
+                    <xs:annotation>
+                      <xs:documentation>
+                        The scan result effect intensity (opacity, volume, etc.), defaults to 1.0
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="ware" use="required">
+              <xs:annotation>
+                <xs:documentation>
+                  The resource ware ID
+                </xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:NMTOKEN">
+                  <xs:enumeration value="ore" />
+                  <xs:enumeration value="nividium" />
+                  <xs:enumeration value="silicon" />
+                  <xs:enumeration value="ice" />
+                  <xs:enumeration value="hydrogen" />
+                  <xs:enumeration value="helium" />
+                  <xs:enumeration value="methane" />
+                  <xs:enumeration value="rawscrap" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="effect_r" type="xs:nonNegativeInteger" use="optional">
+              <xs:annotation>
+                <xs:documentation>
+                  The red component of the color to use for scan result effects, defaults to 255
+                </xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="effect_g" type="xs:nonNegativeInteger" use="optional">
+              <xs:annotation>
+                <xs:documentation>
+                  The green component of the color to use for scan result effects, defaults to 255
+                </xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="effect_b" type="xs:nonNegativeInteger" use="optional">
+              <xs:annotation>
+                <xs:documentation>
+                  The blue component of the color to use for scan result effects, defaults to 255
+                </xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

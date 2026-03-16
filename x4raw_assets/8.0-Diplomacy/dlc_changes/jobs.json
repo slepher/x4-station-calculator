@@ -1,0 +1,20 @@
+{
+  "version": "8.0",
+  "beta": false,
+  "folder_name": "8.0-Diplomacy",
+  "type": "jobs",
+  "base_file": "D:\\Documents\\project\\x4tools\\x4data\\8.0-Diplomacy\\libraries\\jobs.xml",
+  "dlc_summaries": [
+    {
+      "dlc": "ego_dlc_terran",
+      "modified_records": 28,
+      "modified_fields_total": 28,
+      "major_changes": [
+        {
+          "type": "location",
+          "count": 28
+        }
+      ]
+    }
+  ]
+}

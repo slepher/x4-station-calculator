@@ -1,0 +1,649 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <xs:include schemaLocation="common.xsd" />
+
+  <xs:simpleType name="colorvalue">
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="0" />
+      <xs:maxInclusive value="255" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="iconid">
+    <xs:restriction base="idname" />
+  </xs:simpleType>
+
+  <xs:complexType name="icon">
+    <xs:attribute name="active" type="iconid" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Active icon id for faction
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="inactive" type="iconid" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Inactive icon id for faction
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="image" type="iconid">
+      <xs:annotation>
+        <xs:documentation>
+          Image for the faction
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="banner" type="iconid">
+      <xs:annotation>
+        <xs:documentation>
+          Banner for the faction
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:simpleType name="responseid">
+    <xs:restriction base="idname" />
+  </xs:simpleType>
+
+  <xs:complexType name="response">
+    <xs:attribute name="id" type="responseid" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Response id
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Response name
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="description" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Response description
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:simpleType name="signalid">
+    <xs:restriction base="idname" />
+  </xs:simpleType>
+
+  <xs:complexType name="signal">
+    <xs:sequence>
+      <xs:element name="response" type="response" minOccurs="1" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+            Signal response
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="id" type="signalid" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Signal id
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Signal name
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="description" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Signal description
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="default" type="responseid" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Default response
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ask" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          Default ask setting
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="responsesetting">
+    <xs:attribute name="signal" type="signalid" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Signal id
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="response" type="responseid" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Response id
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ask" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          Ask setting (not normally required, as default in signal definition should be set to player default)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="responsesettings">
+    <xs:sequence>
+      <xs:element name="response" type="responsesetting" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+            Response setting (only required in this file if behaviour for this faction is not the same as the default)
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="relationrangelookup">
+    <xs:annotation>
+      <xs:documentation>
+        Named relation range
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ally" />
+      <xs:enumeration value="dock" />
+      <xs:enumeration value="enemy" />
+      <xs:enumeration value="friend" />
+      <xs:enumeration value="kill" />
+      <xs:enumeration value="member" />
+      <xs:enumeration value="nemesis" />
+      <xs:enumeration value="neutral" />
+      <xs:enumeration value="self" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="factiontaglookup">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="aggressive" />
+      <xs:enumeration value="barterships" />
+      <xs:enumeration value="barterwares" />
+      <xs:enumeration value="claimspace" />
+      <xs:enumeration value="economic" />
+      <xs:enumeration value="extrarepair" />
+      <xs:enumeration value="hidden" />
+      <xs:enumeration value="noblueprintsale" />
+      <xs:enumeration value="nodiplomacyselection" />
+      <xs:enumeration value="nolicencesale" />
+      <xs:enumeration value="noplayerbuyships" />
+      <xs:enumeration value="noplayersellships" />
+      <xs:enumeration value="noresupply" />
+      <xs:enumeration value="notradeoffer" />
+      <xs:enumeration value="pirate" />
+      <xs:enumeration value="plunder" />
+      <xs:enumeration value="police" />
+      <xs:enumeration value="privateloadout" />
+      <xs:enumeration value="privateship" />
+      <xs:enumeration value="protective" />
+      <xs:enumeration value="publicloadout" />
+      <xs:enumeration value="publicship" />
+      <xs:enumeration value="standard" />
+      <xs:enumeration value="visitor" />
+      <xs:enumeration value="watchdoguser" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="factionlicencetaglookup">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="accessrestricted" />
+      <xs:enumeration value="basic" />
+      <xs:enumeration value="hidden" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="relationvalue">
+    <xs:annotation>
+      <xs:documentation>
+        Relation value
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:float">
+      <xs:minInclusive value="-1.0" />
+      <xs:maxInclusive value="1.0" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="factionid">
+    <xs:restriction base="idname" />
+  </xs:simpleType>
+
+  <xs:complexType name="relation">
+    <xs:attribute name="faction" type="factionid">
+      <xs:annotation>
+        <xs:documentation>
+          Faction id for relation
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="relation" type="relationvalue">
+      <xs:annotation>
+        <xs:documentation>
+          Relation value for relation
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="min" type="relationvalue">
+      <xs:annotation>
+        <xs:documentation>
+          Minimum allowed relation value for relation
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="max" type="relationvalue">
+      <xs:annotation>
+        <xs:documentation>
+          Maximum allowed relation value for relation
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="relations">
+    <xs:sequence>
+      <xs:element name="relation" type="relation" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+            Relation for one faction to another
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="locked" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          Are relations locked? (don't change permanently)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="lockreason" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Reason why relations are locked (shown to player, defaults to empty string and player is just told it's not currently possible)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="buildrules">
+    <xs:attribute name="method" type="buildmethodlookup">
+      <xs:annotation>
+        <xs:documentation>
+          Override build method if it should be different from the default for the primaryrace (see wares.xml production/method definitions)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="account">
+    <xs:attribute name="amount" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Money
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="color">
+    <xs:attribute name="r" type="colorvalue">
+      <xs:annotation>
+        <xs:documentation>
+          Red
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="g" type="colorvalue">
+      <xs:annotation>
+        <xs:documentation>
+          Green
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="b" type="colorvalue">
+      <xs:annotation>
+        <xs:documentation>
+          Blue
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="glow" type="xs:float">
+      <xs:annotation>
+        <xs:documentation>
+          Glow factor
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ref" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Reference to color library
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="licence">
+    <xs:attribute name="type" type="licencelookup">
+      <xs:annotation>
+        <xs:documentation>
+          Type of licence
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="name" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Licence name (Do not use with 'faction' attribute)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="description" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Licence description
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="grantedtext" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Text shown if licence granted
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="notgrantedtext" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Text shown if licence not granted
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="icon" type="iconid">
+      <xs:annotation>
+        <xs:documentation>
+          Icon for licence
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="factions" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Factions that have granted a license of the specified type (only use with type attribute)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="minrelation" type="xs:float" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Minimum relation the player must have with this faction to obtain this licence (Only use with 'type' attribute)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="precursor" type="licencelookup" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Type of licence required as a precursor to this one
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="price" type="xs:float" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Price of the licence
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="maxlegalscan" type="xs:integer" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Defines up to which scan level becomes legal if licence is held
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="tags">
+      <xs:annotation>
+        <xs:documentation>
+          Tags
+        </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:list itemType="factionlicencetaglookup" />
+      </xs:simpleType>
+    </xs:attribute>
+
+  </xs:complexType>
+
+  <xs:complexType name="licences">
+    <xs:sequence>
+      <xs:element name="licence" type="licence" minOccurs="1" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+            Licence definition
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="factiondef">
+    <xs:sequence>
+      <xs:element name="color" type="color" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Color for a faction
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="account" type="account" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Account for a faction
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="icon" type="icon" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Icons for a faction
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="licences" type="licences" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Licences for a faction
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="relations" type="relations" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Relations for a faction
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="signals" type="responsesettings" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Signal response settings for a faction
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="buildrules" type="buildrules" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Buildrules for a faction
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="id" type="factionid" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Faction id
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="name" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Faction name
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="description" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Faction description
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="shortname" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Short faction name (i.e. abbreviation)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="prefixname" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Faction prefix name (used before item names)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="spacename" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Faction space name
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="homespacename" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Faction home space name
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="behaviourset" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Name of a flight behaviour set which is used by members of this race. Must correspond to an entry in behaviours.xml
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="constructionbias" type="xs:float">
+      <xs:annotation>
+        <xs:documentation>
+          Construction direction bias (omit or set to 0.0 to default from primary race, or use range 0.1 to 10.0 where less than 1.0 prefers vertical connections, 1.0 is balanced, and greater than 1.0 prefers horizontal connections)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="primaryrace" type="racelookup">
+      <xs:annotation>
+        <xs:documentation>
+          Race id
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="policefaction" type="factionid">
+      <xs:annotation>
+        <xs:documentation>
+          Folice faction for this faction (optional). Police faction must have the police tag. Default is the faction itself if it has the police tag, otherwise no police faction at all.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="tags">
+      <xs:annotation>
+        <xs:documentation>
+          Tags
+        </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:list itemType="factiontaglookup" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="active" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          Is the faction active at game start (default is true)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="known" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          Is the faction known to the player at game start (default is true)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="relationrange">
+    <xs:attribute name="range" type="relationrangelookup" use="required" />
+    <xs:attribute name="min" type="relationvalue" />
+    <xs:attribute name="max" type="relationvalue" />
+  </xs:complexType>
+
+  <xs:complexType name="factions">
+    <xs:sequence>
+      <xs:element name="signals" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="signal" type="signal" minOccurs="0" maxOccurs="unbounded" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ranges" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="range" type="relationrange" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="faction" type="factiondef" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+            Definition of a single faction
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="factions" type="factions">
+    <xs:annotation>
+      <xs:documentation>
+        Faction DB
+      </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+</xs:schema>

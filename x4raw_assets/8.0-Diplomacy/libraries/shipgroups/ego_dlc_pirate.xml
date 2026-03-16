@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<groups>
+  <!-- Loanshark (Vigor) -->
+  <!-- Transporters -->
+  <group name="loanshark_trader_container_l">
+    <select macro="ship_pir_l_scavenger_01_a_macro" weight="100"/>
+  </group>
+  <group name="loanshark_trader_container_s">
+    <select macro="ship_pir_s_trans_container_01_a_macro" weight="100"/>
+  </group>
+  <!-- Miners -->
+  <group name="loanshark_miner_solid_l">
+    <select macro="ship_pir_l_miner_solid_01_a_macro" weight="100"/>
+  </group>
+  <!-- Plunder -->
+  <group name="loanshark_pirate_l">
+    <select macro="ship_pir_l_scavenger_01_a_macro" weight="100"/>
+  </group>
+  <!-- Military / Combat -->
+  <group name="loanshark_fighter_s">
+    <select macro="ship_pir_s_heavyfighter_01_a_macro" weight="20"/>
+    <select macro="ship_pir_s_fighter_02_a_macro" weight="80"/>
+    <select macro="ship_pir_s_fighter_01_a_macro" weight="900"/>
+  </group>
+  <group name="loanshark_fighter_heavy_s">
+    <select macro="ship_pir_s_heavyfighter_01_a_macro" weight="100"/>
+  </group>
+  <group name="loanshark_fighter_light_s">
+    <select macro="ship_pir_s_fighter_01_a_macro" weight="70"/>
+    <select macro="ship_pir_s_fighter_02_a_macro" weight="30"/>
+  </group>
+  <group name="loanshark_fighter_common_s">
+    <select macro="ship_pir_s_fighter_01_a_macro" weight="100"/>
+  </group>
+  <group name="loanshark_fighter_aurora_s">
+    <select macro="ship_pir_s_fighter_02_a_macro" weight="70"/>
+    <select macro="ship_pir_s_fighter_01_a_macro" weight="30"/>
+  </group>
+  <group name="loanshark_fighter_scrapyard_s">
+    <select macro="ship_pir_s_heavyfighter_01_a_macro" weight="70"/>
+    <select macro="ship_pir_s_fighter_01_a_macro" weight="30"/>
+  </group>
+  <!-- Scavenger (Riptide) -->
+  <!-- Construction -->
+  <group name="scavenger_builder_xl">
+    <select macro="ship_pir_xl_builder_01_macro" weight="100"/>
+  </group>
+  <!-- Recycling Ships -->
+  <group name="scavenger_compactor_l">
+    <select macro="ship_pir_l_scrapper_01_macro" weight="100"/>
+  </group>
+  <!-- Transporters -->
+  <group name="scavenger_trader_container_m">
+    <select macro="ship_tel_m_trans_container_01_a_macro" weight="100"/>
+    <select macro="ship_tel_m_trans_container_01_b_macro" weight="100"/>
+    <select macro="ship_tel_m_trans_container_02_a_macro" weight="100"/>
+    <select macro="ship_tel_m_trans_container_02_b_macro" weight="100"/>
+  </group>
+  <group name="scavenger_trader_container_s">
+    <select macro="ship_pir_s_trans_container_01_a_macro" weight="100"/>
+  </group>
+  <group name="scavenger_trader_condensate_s">
+    <select macro="ship_pir_s_trans_condensate_01_a_macro" weight="100"/>
+  </group>
+  <!-- Ministry of Finance -->
+  <group name="tel_trader_container_s_ministry">
+    <select macro="ship_tel_s_trans_container_02_a_macro" weight="100"/>
+  </group>
+</groups>
