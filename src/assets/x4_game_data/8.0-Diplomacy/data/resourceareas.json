@@ -8,150 +8,150 @@
         "amount": 4,
         "ware": "nividium",
         "rating": null,
-        "yield": 5.00455707552,
+        "yield": 5,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.125113926888
+        "respawn": 0
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 4,
         "ware": "ore",
         "rating": null,
-        "yield": 405904.6107242007,
+        "yield": 405885,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40590.46107242007
+        "respawn": 40588
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 4,
         "ware": "silicon",
         "rating": null,
-        "yield": 401090.2268175504,
+        "yield": 401071,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40109.02268175505
+        "respawn": 40107
       },
       {
         "ref": "p1_40km_hydrogen_field",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 17065539.6835968,
+        "yield": 17065439,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 5688513.2278656
+        "respawn": 5688480
       },
       {
         "ref": "region_cluster_01_sector_001_a",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 10364350.416028392,
+        "yield": 10364350,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 3454783.4720094632
+        "respawn": 3454783
       },
       {
         "ref": "region_cluster_01_sector_001_a",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 2207019.2622650582,
+        "yield": 2207019,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 220701.9262265058
+        "respawn": 220702
       },
       {
         "ref": "region_cluster_01_sector_001_a",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 1261153.8641514617,
+        "yield": 1261154,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 126115.38641514619
+        "respawn": 126115
       },
       {
         "ref": "region_cluster_01_sector_001_c",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 10364350.416028392,
+        "yield": 10364350,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 3454783.4720094632
+        "respawn": 3454783
       },
       {
         "ref": "region_cluster_01_sector_001_c",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 2207019.2622650582,
+        "yield": 2207019,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 220701.9262265058
+        "respawn": 220702
       },
       {
         "ref": "region_cluster_01_sector_001_c",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 1261153.8641514617,
+        "yield": 1261154,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 126115.38641514619
+        "respawn": 126115
       },
       {
         "ref": "region_cluster_01_sector_001_b",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 10364350.416028392,
+        "yield": 10364350,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 3454783.4720094632
+        "respawn": 3454783
       },
       {
         "ref": "region_cluster_01_sector_001_b",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 2207019.2622650582,
+        "yield": 2207019,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 220701.9262265058
+        "respawn": 220702
       },
       {
         "ref": "region_cluster_01_sector_001_b",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 1261153.8641514617,
+        "yield": 1261154,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 126115.38641514619
+        "respawn": 126115
       },
       {
         "ref": "region_highyield_ore",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 268224.4238817311,
+        "yield": 266381,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 26822.442388173113
+        "respawn": 26638
       },
       {
         "ref": "p1_80km_hydrogen_field",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 527884075.5038136,
+        "yield": 527884260,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 175961358.50127122
+        "respawn": 175961420
       }
     ]
   },
@@ -164,190 +164,190 @@
         "amount": 2,
         "ware": "ice",
         "rating": null,
-        "yield": 117294.30645750002,
+        "yield": 117301,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 39098.102152499996
+        "respawn": 39100
       },
       {
         "ref": "p1_40km_hydrogen_field",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 17065539.6835968,
+        "yield": 17065439,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 5688513.2278656
+        "respawn": 5688480
       },
       {
         "ref": "p1_40km_helium_field",
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       },
       {
         "ref": "p1_40km_methane_field",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       },
       {
         "ref": "region_cluster_01_sector_002_a",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 12457927.80021273,
+        "yield": 12457918,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 1245792.780021273
+        "respawn": 1245792
       },
       {
         "ref": "region_cluster_01_sector_002_a",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 6367385.320108729,
+        "yield": 6367381,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 636738.5320108728
+        "respawn": 636738
       },
       {
         "ref": "region_cluster_01_sector_002_b",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 13137019.417276422,
+        "yield": 13137009,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 1313701.9417276422
+        "respawn": 1313701
       },
       {
         "ref": "region_cluster_01_sector_002_b",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 6714476.591052393,
+        "yield": 6714472,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 671447.6591052393
+        "respawn": 671447
       },
       {
         "ref": "region_cluster_01_sector_002_c",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 13137019.417276422,
+        "yield": 13137009,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 1313701.9417276422
+        "respawn": 1313701
       },
       {
         "ref": "region_cluster_01_sector_002_c",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 6714476.591052393,
+        "yield": 6714472,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 671447.6591052393
+        "respawn": 671447
       },
       {
         "ref": "region_cluster_01_sector_002_d",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 13137019.417276422,
+        "yield": 13137009,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 1313701.9417276422
+        "respawn": 1313701
       },
       {
         "ref": "region_cluster_01_sector_002_d",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 6714476.591052393,
+        "yield": 6714472,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 671447.6591052393
+        "respawn": 671447
       },
       {
         "ref": "region_cluster_01_sector_002_e",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 13137019.417276422,
+        "yield": 13137009,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 1313701.9417276422
+        "respawn": 1313701
       },
       {
         "ref": "region_cluster_01_sector_002_e",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 6714476.591052393,
+        "yield": 6714472,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 671447.6591052393
+        "respawn": 671447
       },
       {
         "ref": "region_cluster_01_sector_002_f",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 13137019.417276422,
+        "yield": 13137009,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 1313701.9417276422
+        "respawn": 1313701
       },
       {
         "ref": "region_cluster_01_sector_002_f",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 6714476.591052393,
+        "yield": 6714472,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 671447.6591052393
+        "respawn": 671447
       },
       {
         "ref": "region_cluster_01_sector_002_g",
         "amount": 2,
         "ware": "ore",
         "rating": null,
-        "yield": 13137019.417276422,
+        "yield": 13137009,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 1313701.9417276422
+        "respawn": 1313701
       },
       {
         "ref": "region_cluster_01_sector_002_g",
         "amount": 2,
         "ware": "silicon",
         "rating": null,
-        "yield": 6714476.591052393,
+        "yield": 6714472,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 671447.6591052393
+        "respawn": 671447
       },
       {
         "ref": "p1_wreckfield_station_10km",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 913085.6596487999,
+        "yield": 913453,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 304361.8865496
+        "respawn": 304484
       }
     ]
   },
@@ -360,160 +360,160 @@
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 5.00455707552,
+        "yield": 5,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.125113926888
+        "respawn": 0
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 405904.6107242007,
+        "yield": 405885,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40590.46107242007
+        "respawn": 40588
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 401090.2268175504,
+        "yield": 401071,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40109.02268175505
+        "respawn": 40107
       },
       {
         "ref": "p1_40km_hydrogen_field",
         "amount": 2,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 17065539.6835968,
+        "yield": 17065439,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 5688513.2278656
+        "respawn": 5688480
       },
       {
         "ref": "region_cluster_01_sector_003_a",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 21019231.06764228,
+        "yield": 21019215,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 2101923.1067642276
+        "respawn": 2101922
       },
       {
         "ref": "region_cluster_01_sector_003_a",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 9341880.474507678,
+        "yield": 9341873,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 934188.0474507678
+        "respawn": 934187
       },
       {
         "ref": "region_cluster_01_sector_003_b",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 21019231.06764228,
+        "yield": 21019215,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 2101923.1067642276
+        "respawn": 2101922
       },
       {
         "ref": "region_cluster_01_sector_003_b",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 9341880.474507678,
+        "yield": 9341873,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 934188.0474507678
+        "respawn": 934187
       },
       {
         "ref": "region_cluster_01_sector_003_c",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 21019231.06764228,
+        "yield": 21019215,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 2101923.1067642276
+        "respawn": 2101922
       },
       {
         "ref": "region_cluster_01_sector_003_c",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 9341880.474507678,
+        "yield": 9341873,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 934188.0474507678
+        "respawn": 934187
       },
       {
         "ref": "region_cluster_01_sector_003_d",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 21019231.06764228,
+        "yield": 21019215,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 2101923.1067642276
+        "respawn": 2101922
       },
       {
         "ref": "region_cluster_01_sector_003_d",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 9341880.474507678,
+        "yield": 9341873,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 934188.0474507678
+        "respawn": 934187
       },
       {
         "ref": "region_cluster_01_sector_003_e",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 21019231.06764228,
+        "yield": 21019215,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 2101923.1067642276
+        "respawn": 2101922
       },
       {
         "ref": "region_cluster_01_sector_003_e",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 9341880.474507678,
+        "yield": 9341873,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 934188.0474507678
+        "respawn": 934187
       },
       {
         "ref": "region_cluster_01_sector_003_f",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 21019231.06764228,
+        "yield": 21019215,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 2101923.1067642276
+        "respawn": 2101922
       },
       {
         "ref": "region_cluster_01_sector_003_f",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 9341880.474507678,
+        "yield": 9341873,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 934188.0474507678
+        "respawn": 934187
       }
     ]
   },
@@ -526,20 +526,20 @@
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 2207019.2622650582,
+        "yield": 2207019,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 220701.9262265058
+        "respawn": 220702
       },
       {
         "ref": "region_cluster_02_sector_001b",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 1261153.8641514617,
+        "yield": 1261154,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 126115.38641514619
+        "respawn": 126115
       }
     ]
   },
@@ -552,40 +552,40 @@
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 117294.30645750002,
+        "yield": 117301,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 39098.102152499996
+        "respawn": 39100
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 5.00455707552,
+        "yield": 5,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.125113926888
+        "respawn": 0
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 405904.6107242007,
+        "yield": 405885,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40590.46107242007
+        "respawn": 40588
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 401090.2268175504,
+        "yield": 401071,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40109.02268175505
+        "respawn": 40107
       }
     ]
   },
@@ -598,110 +598,110 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 7200186814.530668,
+        "yield": 7200187099,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2400062271.510223
+        "respawn": 2400062366
       },
       {
         "ref": "region2_cluster_04_sector_001",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 5985155.2895786185,
+        "yield": 5985156,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 1995051.7631928725
+        "respawn": 1995052
       },
       {
         "ref": "region2_cluster_04_sector_001",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 1418.2186149833135,
+        "yield": 1418,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 35.455465374582836
+        "respawn": 35
       },
       {
         "ref": "region2_cluster_04_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 38643620.82106532,
+        "yield": 38643622,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 3864362.082106532
+        "respawn": 3864362
       },
       {
         "ref": "region2_cluster_04_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 37735960.907476,
+        "yield": 37735962,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 3773596.0907476
+        "respawn": 3773596
       },
       {
         "ref": "region3_cluster_04_sector_001",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 2341524167.3394685,
+        "yield": 2341524053,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 780508055.779823
+        "respawn": 780508018
       },
       {
         "ref": "region3_cluster_04_sector_001",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 102441.68232110176,
+        "yield": 102442,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 34147.227440367256
+        "respawn": 34147
       },
       {
         "ref": "region3_cluster_04_sector_001",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 17.738819449541428,
+        "yield": 18,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.44347048623853574
+        "respawn": 0
       },
       {
         "ref": "region3_cluster_04_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 747159.075214685,
+        "yield": 747159,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 74715.90752146851
+        "respawn": 74716
       },
       {
         "ref": "region3_cluster_04_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 710262.3307596389,
+        "yield": 710262,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 71026.2330759639
+        "respawn": 71026
       },
       {
         "ref": "region_highyield_nividium",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 618.9794397270721,
+        "yield": 620,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 15.474485993176799
+        "respawn": 15
       }
     ]
   },
@@ -714,10 +714,10 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 9921712573.452585,
+        "yield": 9921712088,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 3307237524.484195
+        "respawn": 3307237363
       }
     ]
   },
@@ -730,60 +730,60 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 17065539.6835968,
+        "yield": 17065439,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 5688513.2278656
+        "respawn": 5688480
       },
       {
         "ref": "p1_40km_helium_field",
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       },
       {
         "ref": "p1_40km_methane_field",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 5.00455707552,
+        "yield": 5,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.125113926888
+        "respawn": 0
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 405904.6107242007,
+        "yield": 405885,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40590.46107242007
+        "respawn": 40588
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 401090.2268175504,
+        "yield": 401071,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40109.02268175505
+        "respawn": 40107
       }
     ]
   },
@@ -796,30 +796,30 @@
         "amount": 2,
         "ware": "helium",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       },
       {
         "ref": "p1_40km_hydrogen_field",
         "amount": 2,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 17065539.6835968,
+        "yield": 17065439,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 5688513.2278656
+        "respawn": 5688480
       },
       {
         "ref": "p1_40km_methane_field",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       }
     ]
   },
@@ -832,10 +832,10 @@
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 37600088.64622049,
+        "yield": 37600087,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 3760008.864622049
+        "respawn": 3760009
       }
     ]
   },
@@ -848,30 +848,30 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 661447504.896839,
+        "yield": 661447473,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 220482501.63227972
+        "respawn": 220482491
       },
       {
         "ref": "region_cluster_08_sector_001",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 1002.1931892376351,
+        "yield": 1002,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 25.05482973094088
+        "respawn": 25
       },
       {
         "ref": "region_cluster_08_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 15634213.752107108,
+        "yield": 15634213,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 1563421.3752107108
+        "respawn": 1563421
       }
     ]
   },
@@ -884,70 +884,70 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 55321064.04536716,
+        "yield": 55321061,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 18440354.68178905
+        "respawn": 18440354
       },
       {
         "ref": "asteroidbelt_main",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 121706340.89980774,
+        "yield": 121706335,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 40568780.29993591
+        "respawn": 40568778
       },
       {
         "ref": "asteroidbelt_main",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 387247.4483175701,
+        "yield": 387247,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 129082.48277252336
+        "respawn": 129082
       },
       {
         "ref": "asteroidbelt_main",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 55321064.04536716,
+        "yield": 55321061,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 18440354.68178905
+        "respawn": 18440354
       },
       {
         "ref": "asteroidbelt_main",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 3.68807093635781,
+        "yield": 4,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.09220177340894525
+        "respawn": 0
       },
       {
         "ref": "asteroidbelt_main",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 1477183.052139394,
+        "yield": 1477183,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 147718.30521393937
+        "respawn": 147718
       },
       {
         "ref": "asteroidbelt_main",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 2044850.930663588,
+        "yield": 2044851,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 204485.09306635882
+        "respawn": 204485
       }
     ]
   },
@@ -960,10 +960,10 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 38033231.531189926,
+        "yield": 38033230,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 12677743.843729975
+        "respawn": 12677743
       }
     ]
   },
@@ -976,20 +976,20 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 83673109.36861783,
+        "yield": 83673105,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 27891036.456205945
+        "respawn": 27891035
       },
       {
         "ref": "titan_field",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 38033231.531189926,
+        "yield": 38033230,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 12677743.843729975
+        "respawn": 12677743
       }
     ]
   },
@@ -1002,50 +1002,50 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 48165404.67715629,
+        "yield": 48165326,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 16055134.892385429
+        "respawn": 16055109
       },
       {
         "ref": "saturn_field",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 105963890.28974384,
+        "yield": 105963716,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 35321296.763247944
+        "respawn": 35321239
       },
       {
         "ref": "saturn_field",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 3612405.3507867213,
+        "yield": 3612399,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 1204135.116928907
+        "respawn": 1204133
       },
       {
         "ref": "saturn_field",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 136918190.36226296,
+        "yield": 136917966,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 13691819.036226295
+        "respawn": 13691797
       },
       {
         "ref": "saturn_field",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 12794336.995741948,
+        "yield": 12794316,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 1279433.6995741948
+        "respawn": 1279432
       }
     ]
   },
@@ -1058,20 +1058,20 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 38033231.531189926,
+        "yield": 38033230,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 12677743.843729975
+        "respawn": 12677743
       },
       {
         "ref": "neptune_field",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 83673109.36861783,
+        "yield": 83673105,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 27891036.456205945
+        "respawn": 27891035
       }
     ]
   },
@@ -1084,60 +1084,60 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 132409764.16075923,
+        "yield": 132409758,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 44136588.05358641
+        "respawn": 44136586
       },
       {
         "ref": "cluster112_s1_region01",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 291301481.1536703,
+        "yield": 291301467,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 97100493.71789011
+        "respawn": 97100489
       },
       {
         "ref": "cluster112_s1_region01",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 132409764.16075923,
+        "yield": 132409758,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 44136588.05358641
+        "respawn": 44136586
       },
       {
         "ref": "cluster112_s1_region01",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 8.827317610717282,
+        "yield": 9,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.2206829402679321
+        "respawn": 0
       },
       {
         "ref": "cluster112_s1_region01",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 3535605.5226205937,
+        "yield": 3535605,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 353560.5522620594
+        "respawn": 353561
       },
       {
         "ref": "cluster112_s1_region01",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 4894306.249262198,
+        "yield": 4894306,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 489430.62492621964
+        "respawn": 489431
       }
     ]
   },
@@ -1150,60 +1150,60 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "cluster112_s2_region01",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "cluster112_s2_region01",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "cluster112_s2_region01",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "cluster112_s2_region01",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "cluster112_s2_region01",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       }
     ]
   },
@@ -1216,70 +1216,70 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 38033231.531189926,
+        "yield": 38033230,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 12677743.843729975
+        "respawn": 12677743
       },
       {
         "ref": "cluster113_region01",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 83673109.36861783,
+        "yield": 83673105,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 27891036.456205945
+        "respawn": 27891035
       },
       {
         "ref": "cluster113_region01",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 342299.0837807094,
+        "yield": 342299,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 114099.69459356979
+        "respawn": 114100
       },
       {
         "ref": "cluster113_region01",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 38033231.531189926,
+        "yield": 38033230,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 12677743.843729975
+        "respawn": 12677743
       },
       {
         "ref": "cluster113_region01",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 2.5355487687459948,
+        "yield": 3,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.06338871921864987
+        "respawn": 0
       },
       {
         "ref": "cluster113_region01",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 1015563.3483458335,
+        "yield": 1015563,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 101556.33483458334
+        "respawn": 101556
       },
       {
         "ref": "cluster113_region01",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 1405835.014831217,
+        "yield": 1405835,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 140583.50148312168
+        "respawn": 140583
       }
     ]
   },
@@ -1292,60 +1292,60 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 38033231.531189926,
+        "yield": 38033230,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 12677743.843729975
+        "respawn": 12677743
       },
       {
         "ref": "cluster114_region01",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 83673109.36861783,
+        "yield": 83673105,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 27891036.456205945
+        "respawn": 27891035
       },
       {
         "ref": "cluster114_region01",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 38033231.531189926,
+        "yield": 38033230,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 12677743.843729975
+        "respawn": 12677743
       },
       {
         "ref": "cluster114_region01",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 2.5355487687459948,
+        "yield": 3,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.06338871921864987
+        "respawn": 0
       },
       {
         "ref": "cluster114_region01",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 1015563.3483458335,
+        "yield": 1015563,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 101556.33483458334
+        "respawn": 101556
       },
       {
         "ref": "cluster114_region01",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 1405835.014831217,
+        "yield": 1405835,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 140583.50148312168
+        "respawn": 140583
       }
     ]
   },
@@ -1358,70 +1358,70 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 38033231.531189926,
+        "yield": 38033230,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 12677743.843729975
+        "respawn": 12677743
       },
       {
         "ref": "oort_field",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 83673109.36861783,
+        "yield": 83673105,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 27891036.456205945
+        "respawn": 27891035
       },
       {
         "ref": "oort_field",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 228199.38918713958,
+        "yield": 228199,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 76066.46306237986
+        "respawn": 76066
       },
       {
         "ref": "oort_field",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 38033231.531189926,
+        "yield": 38033230,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 12677743.843729975
+        "respawn": 12677743
       },
       {
         "ref": "oort_field",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 2.5355487687459948,
+        "yield": 3,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.06338871921864987
+        "respawn": 0
       },
       {
         "ref": "oort_field",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 1015563.3483458335,
+        "yield": 1015563,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 101556.33483458334
+        "respawn": 101556
       },
       {
         "ref": "oort_field",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 1405835.014831217,
+        "yield": 1405835,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 140583.50148312168
+        "respawn": 140583
       }
     ]
   },
@@ -1434,40 +1434,40 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       },
       {
         "ref": "p1_40km_hydrogen_field",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 17065539.6835968,
+        "yield": 17065439,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 5688513.2278656
+        "respawn": 5688480
       },
       {
         "ref": "p1_40km_ice_field",
         "amount": 5,
         "ware": "ice",
         "rating": null,
-        "yield": 117294.30645750002,
+        "yield": 117301,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 39098.102152499996
+        "respawn": 39100
       },
       {
         "ref": "p1_40km_methane_highyield_field",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       }
     ]
   },
@@ -1480,60 +1480,60 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 146841346.0651884,
+        "yield": 146841397,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 48947115.355062805
+        "respawn": 48947132
       },
       {
         "ref": "region_cluster_13_sector_001",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 4296778.024066592,
+        "yield": 4296780,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 1432259.3413555308
+        "respawn": 1432260
       },
       {
         "ref": "region_cluster_13_sector_001",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 111.24344398877906,
+        "yield": 111,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 2.7810860997194764
+        "respawn": 3
       },
       {
         "ref": "region_cluster_13_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 5726812.496542348,
+        "yield": 5726814,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 572681.2496542347
+        "respawn": 572681
       },
       {
         "ref": "region_cluster_13_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 5148346.5878006965,
+        "yield": 5148348,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 514834.65878006956
+        "respawn": 514835
       },
       {
         "ref": "region_highyield_ore",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 268224.4238817311,
+        "yield": 266381,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 26822.442388173113
+        "respawn": 26638
       }
     ]
   },
@@ -1546,40 +1546,40 @@
         "amount": 2,
         "ware": "ice",
         "rating": null,
-        "yield": 117294.30645750002,
+        "yield": 117301,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 39098.102152499996
+        "respawn": 39100
       },
       {
         "ref": "p1_40km_helium_field",
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       },
       {
         "ref": "p1_40km_methane_field",
         "amount": 2,
         "ware": "methane",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       },
       {
         "ref": "p1_40km_hydrogen_field",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 17065539.6835968,
+        "yield": 17065439,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 5688513.2278656
+        "respawn": 5688480
       }
     ]
   },
@@ -1592,40 +1592,40 @@
         "amount": 3,
         "ware": "ice",
         "rating": null,
-        "yield": 117294.30645750002,
+        "yield": 117301,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 39098.102152499996
+        "respawn": 39100
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 3,
         "ware": "nividium",
         "rating": null,
-        "yield": 5.00455707552,
+        "yield": 5,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.125113926888
+        "respawn": 0
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 3,
         "ware": "ore",
         "rating": null,
-        "yield": 405904.6107242007,
+        "yield": 405885,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40590.46107242007
+        "respawn": 40588
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 3,
         "ware": "silicon",
         "rating": null,
-        "yield": 401090.2268175504,
+        "yield": 401071,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40109.02268175505
+        "respawn": 40107
       }
     ]
   },
@@ -1638,30 +1638,30 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 4728316148.295404,
+        "yield": 4728315917,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 1576105382.7651348
+        "respawn": 1576105306
       },
       {
         "ref": "region_cluster_16_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 7823213.990816031,
+        "yield": 7823214,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 782321.3990816032
+        "respawn": 782321
       },
       {
         "ref": "region_cluster_16_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 5401742.993658688,
+        "yield": 5401743,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 540174.2993658688
+        "respawn": 540174
       }
     ]
   },
@@ -1674,40 +1674,40 @@
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 4509869351.569357,
+        "yield": 4509869131,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 1503289783.8564525
+        "respawn": 1503289710
       },
       {
         "ref": "region_cluster_17_sector_001",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 751.6448919282261,
+        "yield": 752,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 18.79112229820565
+        "respawn": 19
       },
       {
         "ref": "region_cluster_17_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 9927725.732588012,
+        "yield": 9927725,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 992772.5732588011
+        "respawn": 992773
       },
       {
         "ref": "region_cluster_17_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 4963862.866294006,
+        "yield": 4963863,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 496386.28662940057
+        "respawn": 496386
       }
     ]
   },
@@ -1720,70 +1720,70 @@
         "amount": 2,
         "ware": "ice",
         "rating": null,
-        "yield": 117294.30645750002,
+        "yield": 117301,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 39098.102152499996
+        "respawn": 39100
       },
       {
         "ref": "p1_40km_hydrogen_field",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 17065539.6835968,
+        "yield": 17065439,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 5688513.2278656
+        "respawn": 5688480
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 5.00455707552,
+        "yield": 5,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.125113926888
+        "respawn": 0
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 405904.6107242007,
+        "yield": 405885,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40590.46107242007
+        "respawn": 40588
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 401090.2268175504,
+        "yield": 401071,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40109.02268175505
+        "respawn": 40107
       },
       {
         "ref": "p1_40km_methane_field",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       },
       {
         "ref": "p1_40km_helium_field",
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       }
     ]
   },
@@ -1796,60 +1796,60 @@
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       },
       {
         "ref": "p1_40km_hydrogen_field",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 17065539.6835968,
+        "yield": 17065439,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 5688513.2278656
+        "respawn": 5688480
       },
       {
         "ref": "p1_40km_helium_field",
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 2,
         "ware": "nividium",
         "rating": null,
-        "yield": 5.00455707552,
+        "yield": 5,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.125113926888
+        "respawn": 0
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 2,
         "ware": "ore",
         "rating": null,
-        "yield": 405904.6107242007,
+        "yield": 405885,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40590.46107242007
+        "respawn": 40588
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 2,
         "ware": "silicon",
         "rating": null,
-        "yield": 401090.2268175504,
+        "yield": 401071,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40109.02268175505
+        "respawn": 40107
       }
     ]
   },
@@ -1862,60 +1862,60 @@
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 5,
         "ware": "nividium",
         "rating": null,
-        "yield": 5.00455707552,
+        "yield": 5,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.125113926888
+        "respawn": 0
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 5,
         "ware": "ore",
         "rating": null,
-        "yield": 405904.6107242007,
+        "yield": 405885,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40590.46107242007
+        "respawn": 40588
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 5,
         "ware": "silicon",
         "rating": null,
-        "yield": 401090.2268175504,
+        "yield": 401071,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40109.02268175505
+        "respawn": 40107
       },
       {
         "ref": "p1_40km_helium_field",
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       },
       {
         "ref": "p1_40km_hydrogen_field",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 17065539.6835968,
+        "yield": 17065439,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 5688513.2278656
+        "respawn": 5688480
       }
     ]
   },
@@ -1928,40 +1928,40 @@
         "amount": 2,
         "ware": "nividium",
         "rating": null,
-        "yield": 5.00455707552,
+        "yield": 5,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.125113926888
+        "respawn": 0
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 2,
         "ware": "ore",
         "rating": null,
-        "yield": 405904.6107242007,
+        "yield": 405885,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40590.46107242007
+        "respawn": 40588
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 2,
         "ware": "silicon",
         "rating": null,
-        "yield": 401090.2268175504,
+        "yield": 401071,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40109.02268175505
+        "respawn": 40107
       },
       {
         "ref": "p1_wreckfield_xenon_teladi_battle_200km",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 42086664.52795655,
+        "yield": 42086629,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 14028888.175985517
+        "respawn": 14028876
       }
     ]
   },
@@ -1974,20 +1974,20 @@
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 891281.5638807779,
+        "yield": 891283,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 89128.1563880778
+        "respawn": 89128
       },
       {
         "ref": "region_cluster_21_sector_002_b",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 1570144.6715049576,
+        "yield": 1570147,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 157014.46715049577
+        "respawn": 157015
       }
     ]
   },
@@ -2000,70 +2000,70 @@
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       },
       {
         "ref": "p1_40km_hydrogen_field",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 17065539.6835968,
+        "yield": 17065439,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 5688513.2278656
+        "respawn": 5688480
       },
       {
         "ref": "p1_40km_helium_field",
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 3,
         "ware": "nividium",
         "rating": null,
-        "yield": 5.00455707552,
+        "yield": 5,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.125113926888
+        "respawn": 0
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 3,
         "ware": "ore",
         "rating": null,
-        "yield": 405904.6107242007,
+        "yield": 405885,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40590.46107242007
+        "respawn": 40588
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 3,
         "ware": "silicon",
         "rating": null,
-        "yield": 401090.2268175504,
+        "yield": 401071,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40109.02268175505
+        "respawn": 40107
       },
       {
         "ref": "p1_40km_ice_field",
         "amount": 2,
         "ware": "ice",
         "rating": null,
-        "yield": 117294.30645750002,
+        "yield": 117301,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 39098.102152499996
+        "respawn": 39100
       }
     ]
   },
@@ -2076,30 +2076,30 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 3512286251.0092025,
+        "yield": 3512286079,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 1170762083.6697342
+        "respawn": 1170762026
       },
       {
         "ref": "region_cluster_25_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 44276093.34605541,
+        "yield": 44276091,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 4427609.334605541
+        "respawn": 4427609
       },
       {
         "ref": "region_cluster_25_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 40125209.594862714,
+        "yield": 40125208,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 4012520.9594862713
+        "respawn": 4012521
       }
     ]
   },
@@ -2112,30 +2112,30 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 3512286251.0092025,
+        "yield": 3512286079,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 1170762083.6697342
+        "respawn": 1170762026
       },
       {
         "ref": "region_cluster_25_sector_002",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 44276093.34605541,
+        "yield": 44276091,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 4427609.334605541
+        "respawn": 4427609
       },
       {
         "ref": "region_cluster_25_sector_002",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 40125209.594862714,
+        "yield": 40125208,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 4012520.9594862713
+        "respawn": 4012521
       }
     ]
   },
@@ -2148,30 +2148,30 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 3512286251.0092025,
+        "yield": 3512286079,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 1170762083.6697342
+        "respawn": 1170762026
       },
       {
         "ref": "region_cluster_26_sector_001",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 1995.6171880734096,
+        "yield": 1996,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 49.890429701835245
+        "respawn": 50
       },
       {
         "ref": "region_cluster_26_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 52716223.640147224,
+        "yield": 52716221,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 5271622.364014722
+        "respawn": 5271622
       }
     ]
   },
@@ -2184,40 +2184,40 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 3512286251.0092025,
+        "yield": 3512286079,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 1170762083.6697342
+        "respawn": 1170762026
       },
       {
         "ref": "region_cluster_26_sector_002",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 1995.6171880734096,
+        "yield": 1996,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 49.890429701835245
+        "respawn": 50
       },
       {
         "ref": "region_cluster_26_sector_002",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 55345116.68256926,
+        "yield": 55345114,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 5534511.668256925
+        "respawn": 5534511
       },
       {
         "ref": "region_cluster_26_sector_002",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 29056186.258348864,
+        "yield": 29056185,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 2905618.625834886
+        "respawn": 2905618
       }
     ]
   },
@@ -2230,110 +2230,110 @@
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       },
       {
         "ref": "p1_40km_helium_field",
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       },
       {
         "ref": "p1_40km_hydrogen_field",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 17065539.6835968,
+        "yield": 17065439,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 5688513.2278656
+        "respawn": 5688480
       },
       {
         "ref": "region2_cluster_27_sector_001",
         "amount": 2,
         "ware": "methane",
         "rating": null,
-        "yield": 65114646.78434281,
+        "yield": 65114799,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 21704882.261447605
+        "respawn": 21704933
       },
       {
         "ref": "region2_cluster_27_sector_001",
         "amount": 2,
         "ware": "ore",
         "rating": null,
-        "yield": 564326.9387976377,
+        "yield": 564328,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 56432.69387976378
+        "respawn": 56433
       },
       {
         "ref": "region2_cluster_27_sector_001",
         "amount": 2,
         "ware": "silicon",
         "rating": null,
-        "yield": 564326.9387976377,
+        "yield": 564328,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 56432.69387976378
+        "respawn": 56433
       },
       {
         "ref": "region_cluster_27_sector_001",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 120389209.80361484,
+        "yield": 120388883,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 40129736.60120495
+        "respawn": 40129628
       },
       {
         "ref": "region_cluster_27_sector_001",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 2934486.988963112,
+        "yield": 2934479,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 978162.3296543706
+        "respawn": 978160
       },
       {
         "ref": "region_cluster_27_sector_001",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 91.20394682092032,
+        "yield": 91,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 2.280098670523008
+        "respawn": 2
       },
       {
         "ref": "region_cluster_27_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 3746658.1354034073,
+        "yield": 3746648,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 374665.8135403407
+        "respawn": 374665
       },
       {
         "ref": "region_cluster_27_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 3746658.1354034073,
+        "yield": 3746648,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 374665.8135403407
+        "respawn": 374665
       }
     ]
   },
@@ -2346,110 +2346,110 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 190114633.02011403,
+        "yield": 190114745,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 63371544.34003802
+        "respawn": 63371582
       },
       {
         "ref": "region_cluster_28_sector_001",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 1287594.5599998634,
+        "yield": 1287595,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 429198.1866666211
+        "respawn": 429198
       },
       {
         "ref": "region_cluster_28_sector_001",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 144.02623713645,
+        "yield": 144,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 3.60065592841125
+        "respawn": 4
       },
       {
         "ref": "region_cluster_28_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 2621277.5158833903,
+        "yield": 2621279,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 262127.75158833904
+        "respawn": 262128
       },
       {
         "ref": "region_cluster_28_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 2621277.5158833903,
+        "yield": 2621279,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 262127.75158833904
+        "respawn": 262128
       },
       {
         "ref": "regionpart2_cluster_28_sector_001",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 186664916.35817963,
+        "yield": 186665022,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 62221638.78605988
+        "respawn": 62221674
       },
       {
         "ref": "regionpart2_cluster_28_sector_001",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 517570.9044476799,
+        "yield": 517571,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 172523.63481589328
+        "respawn": 172524
       },
       {
         "ref": "regionpart2_cluster_28_sector_001",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 141.41281542286333,
+        "yield": 141,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 3.5353203855715836
+        "respawn": 4
       },
       {
         "ref": "regionpart2_cluster_28_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 1654529.940447501,
+        "yield": 1654531,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 165452.9940447501
+        "respawn": 165453
       },
       {
         "ref": "regionpart2_cluster_28_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 1470693.2803977788,
+        "yield": 1470694,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 147069.3280397779
+        "respawn": 147069
       },
       {
         "ref": "p1_40km_helium_highyield_field",
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       }
     ]
   },
@@ -2462,100 +2462,100 @@
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 5.00455707552,
+        "yield": 5,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.125113926888
+        "respawn": 0
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 405904.6107242007,
+        "yield": 405885,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40590.46107242007
+        "respawn": 40588
       },
       {
         "ref": "p1_40km_asteroid_field",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 401090.2268175504,
+        "yield": 401071,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 40109.02268175505
+        "respawn": 40107
       },
       {
         "ref": "p1_40km_helium_field",
         "amount": 2,
         "ware": "helium",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       },
       {
         "ref": "p1_40km_ice_field",
         "amount": 2,
         "ware": "ice",
         "rating": null,
-        "yield": 117294.30645750002,
+        "yield": 117301,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 39098.102152499996
+        "respawn": 39100
       },
       {
         "ref": "p1_40km_hydrogen_field",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 17065539.6835968,
+        "yield": 17065439,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 5688513.2278656
+        "respawn": 5688480
       },
       {
         "ref": "region_cluster_29_sector_002",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 7210.7799964930555,
+        "yield": 7211,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 180.26949991232638
+        "respawn": 180
       },
       {
         "ref": "region_cluster_29_sector_002",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 502447150.15563613,
+        "yield": 502447126,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 50244715.01556361
+        "respawn": 50244713
       },
       {
         "ref": "region_cluster_29_sector_002",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 367461348.6212861,
+        "yield": 367461331,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 36746134.86212861
+        "respawn": 36746133
       }
     ]
   },
@@ -2568,10 +2568,10 @@
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 85923293.64968878,
+        "yield": 85923289,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 8592329.364968877
+        "respawn": 8592329
       }
     ]
   },
@@ -2584,40 +2584,40 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 5619658001.603544,
+        "yield": 5619657727,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 1873219333.8678482
+        "respawn": 1873219242
       },
       {
         "ref": "region_cluster_32_sector_001",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 2128.658333940736,
+        "yield": 2129,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 53.2164583485184
+        "respawn": 53
       },
       {
         "ref": "region_cluster_32_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 90765991.359233,
+        "yield": 90765987,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 9076599.1359233
+        "respawn": 9076599
       },
       {
         "ref": "region_cluster_32_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 73055554.02084608,
+        "yield": 73055550,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 7305555.402084608
+        "respawn": 7305555
       }
     ]
   },
@@ -2630,30 +2630,30 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 262418232.95916304,
+        "yield": 262418357,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 87472744.31972101
+        "respawn": 87472786
       },
       {
         "ref": "region_cluster_32_sector_002",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 5427286.181655416,
+        "yield": 5427289,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 542728.6181655416
+        "respawn": 542729
       },
       {
         "ref": "region_cluster_32_sector_002",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 4703648.024101362,
+        "yield": 4703650,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 470364.80241013615
+        "respawn": 470365
       }
     ]
   },
@@ -2666,20 +2666,20 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 105216.6662096509,
+        "yield": 105163,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 35072.22206988363
+        "respawn": 35054
       },
       {
         "ref": "p1_wreckfield_xenon_battle_60km",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 21343587.802762497,
+        "yield": 21343336,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 7114529.2675875
+        "respawn": 7114445
       }
     ]
   },
@@ -2692,40 +2692,40 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 355941438.5733196,
+        "yield": 355941365,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 118647146.19110656
+        "respawn": 118647122
       },
       {
         "ref": "region_cluster_35_sector_001_a",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 4424999.247718315,
+        "yield": 4424998,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 1474999.7492394382
+        "respawn": 1474999
       },
       {
         "ref": "region_cluster_35_sector_001_a",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 942274.0628413698,
+        "yield": 942274,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 94227.40628413697
+        "respawn": 94227
       },
       {
         "ref": "region_cluster_35_sector_001_a",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 269221.16081181995,
+        "yield": 269221,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 26922.116081181994
+        "respawn": 26922
       }
     ]
   },
@@ -2738,30 +2738,30 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 1260884306.2221415,
+        "yield": 1260884245,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 420294768.7407139
+        "respawn": 420294748
       },
       {
         "ref": "region_cluster_36_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 3389562.6840478373,
+        "yield": 3389563,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 338956.26840478374
+        "respawn": 338956
       },
       {
         "ref": "region_cluster_36_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 2296796.285321981,
+        "yield": 2296796,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 229679.6285321981
+        "respawn": 229680
       }
     ]
   },
@@ -2774,50 +2774,50 @@
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 213218166.94965488,
+        "yield": 213218062,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 71072722.31655164
+        "respawn": 71072687
       },
       {
         "ref": "region_cluster_37_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 9701426.596209297,
+        "yield": 9701422,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 970142.6596209297
+        "respawn": 970142
       },
       {
         "ref": "region_cluster_37_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 8407903.050048057,
+        "yield": 8407899,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 840790.3050048058
+        "respawn": 840790
       },
       {
         "ref": "region_highyield_silicon",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 268224.4238817311,
+        "yield": 266381,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 26822.442388173113
+        "respawn": 26638
       },
       {
         "ref": "region_highyield_ore",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 268224.4238817311,
+        "yield": 266381,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 26822.442388173113
+        "respawn": 26638
       }
     ]
   },
@@ -2830,140 +2830,140 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 592272685.9377477,
+        "yield": 592272563,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 197424228.64591596
+        "respawn": 197424188
       },
       {
         "ref": "region_cluster_38_sector_001_b",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 1302999909.063045,
+        "yield": 1302999638,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 434333303.021015
+        "respawn": 434333213
       },
       {
         "ref": "region_cluster_38_sector_001_b",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 14569.908074068597,
+        "yield": 14570,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 4856.636024689533
+        "respawn": 4857
       },
       {
         "ref": "region_cluster_38_sector_001_b",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 23.690907437509917,
+        "yield": 24,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.5922726859377478
+        "respawn": 1
       },
       {
         "ref": "region_cluster_38_sector_001_b",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 2176404.6965925777,
+        "yield": 2176404,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 217640.4696592578
+        "respawn": 217640
       },
       {
         "ref": "region_cluster_38_sector_001_b",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 82128.47911670108,
+        "yield": 82128,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 8212.847911670107
+        "respawn": 8213
       },
       {
         "ref": "region_cluster_38_sector_001",
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 592272685.9377477,
+        "yield": 592272563,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 197424228.64591596
+        "respawn": 197424188
       },
       {
         "ref": "region_cluster_38_sector_001",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 1302999909.063045,
+        "yield": 1302999638,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 434333303.021015
+        "respawn": 434333213
       },
       {
         "ref": "region_cluster_38_sector_001",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 19426.544098758128,
+        "yield": 19427,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 6475.514699586042
+        "respawn": 6476
       },
       {
         "ref": "region_cluster_38_sector_001",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 31.58787658334655,
+        "yield": 32,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.7896969145836638
+        "respawn": 1
       },
       {
         "ref": "region_cluster_38_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 4209084.554730928,
+        "yield": 4209084,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 420908.4554730927
+        "respawn": 420908
       },
       {
         "ref": "region_cluster_38_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 82128.47911670108,
+        "yield": 82128,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 8212.847911670107
+        "respawn": 8213
       },
       {
         "ref": "region_highyield_silicon",
         "amount": 2,
         "ware": "silicon",
         "rating": null,
-        "yield": 268224.4238817311,
+        "yield": 266381,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 26822.442388173113
+        "respawn": 26638
       },
       {
         "ref": "region_highyield_ore",
         "amount": 2,
         "ware": "ore",
         "rating": null,
-        "yield": 268224.4238817311,
+        "yield": 266381,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 26822.442388173113
+        "respawn": 26638
       }
     ]
   },
@@ -2976,60 +2976,60 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 136919633.51137576,
+        "yield": 136919636,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 45639877.83712525
+        "respawn": 45639879
       },
       {
         "ref": "region_cluster_401_sector_001",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 301223193.72502667,
+        "yield": 301223199,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 100407731.24167553
+        "respawn": 100407733
       },
       {
         "ref": "region_cluster_401_sector_001",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 136919633.51137576,
+        "yield": 136919636,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 45639877.83712525
+        "respawn": 45639879
       },
       {
         "ref": "region_cluster_401_sector_001",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 91.2797556742505,
+        "yield": 91,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 2.2819938918562626
+        "respawn": 2
       },
       {
         "ref": "region_cluster_401_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 4296811.938853995,
+        "yield": 4296812,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 429681.1938853994
+        "respawn": 429681
       },
       {
         "ref": "region_cluster_401_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 5061006.053358818,
+        "yield": 5061006,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 506100.60533588193
+        "respawn": 506101
       }
     ]
   },
@@ -3042,30 +3042,30 @@
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 8372346.957637654,
+        "yield": 8372347,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2790782.319212551
+        "respawn": 2790782
       },
       {
         "ref": "region_cluster_402_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 9635678.619602803,
+        "yield": 9635678,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 963567.8619602803
+        "respawn": 963568
       },
       {
         "ref": "region_cluster_402_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 8832705.401302569,
+        "yield": 8832705,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 883270.5401302569
+        "respawn": 883270
       }
     ]
   },
@@ -3078,30 +3078,30 @@
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 237.3093252677768,
+        "yield": 237,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 5.9327331316944205
+        "respawn": 6
       },
       {
         "ref": "region_cluster_40_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 5758706.293164716,
+        "yield": 5758708,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 575870.6293164716
+        "respawn": 575871
       },
       {
         "ref": "region_cluster_40_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 4113361.6379747977,
+        "yield": 4113363,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 411336.1637974798
+        "respawn": 411336
       }
     ]
   },
@@ -3114,30 +3114,30 @@
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 438455.1356831782,
+        "yield": 438455,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 146151.71189439273
+        "respawn": 146152
       },
       {
         "ref": "region_cluster_410_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 611698.3844165315,
+        "yield": 611698,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 61169.838441653155
+        "respawn": 61170
       },
       {
         "ref": "region_cluster_410_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 1125419.1055282506,
+        "yield": 1125419,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 112541.91055282508
+        "respawn": 112542
       }
     ]
   },
@@ -3150,50 +3150,50 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 328607120.4327497,
+        "yield": 328607104,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 109535706.81091656
+        "respawn": 109535701
       },
       {
         "ref": "region_cluster_411_sector_001",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 2837970.5855555655,
+        "yield": 2837970,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 945990.1951851884
+        "respawn": 945990
       },
       {
         "ref": "region_cluster_411_sector_001_b",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 3910460.2714997116,
+        "yield": 3910463,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 1303486.7571665708
+        "respawn": 1303488
       },
       {
         "ref": "region_cluster_411_sector_001_b",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 1374235.668801588,
+        "yield": 1374237,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 137423.5668801588
+        "respawn": 137424
       },
       {
         "ref": "region_cluster_411_sector_001_b",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 824541.4012809529,
+        "yield": 824542,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 82454.14012809529
+        "respawn": 82454
       }
     ]
   },
@@ -3206,40 +3206,40 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 244434918.85505918,
+        "yield": 244434907,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 81478306.28501971
+        "respawn": 81478302
       },
       {
         "ref": "region_cluster_412_sector_001",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 537756821.4811301,
+        "yield": 537756795,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 179252273.82704338
+        "respawn": 179252265
       },
       {
         "ref": "region_cluster_412_sector_001",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 3507641.085570099,
+        "yield": 3507641,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 1169213.6951900327
+        "respawn": 1169214
       },
       {
         "ref": "region_cluster_412_sector_001",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 244434918.85505918,
+        "yield": 244434907,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 81478306.28501971
+        "respawn": 81478302
       }
     ]
   },
@@ -3252,40 +3252,40 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 244434918.85505918,
+        "yield": 244434907,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 81478306.28501971
+        "respawn": 81478302
       },
       {
         "ref": "region_cluster_413_sector_001",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 537756821.4811301,
+        "yield": 537756795,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 179252273.82704338
+        "respawn": 179252265
       },
       {
         "ref": "region_cluster_413_sector_001",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 4644263.458246123,
+        "yield": 4644263,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 1548087.8194153744
+        "respawn": 1548088
       },
       {
         "ref": "region_cluster_413_sector_001",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 244434918.85505918,
+        "yield": 244434907,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 81478306.28501971
+        "respawn": 81478302
       }
     ]
   },
@@ -3298,50 +3298,50 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 424649298.14377075,
+        "yield": 424649277,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 141549766.0479236
+        "respawn": 141549759
       },
       {
         "ref": "region_cluster_415_sector_001",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 2769871.558346868,
+        "yield": 2769871,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 923290.519448956
+        "respawn": 923290
       },
       {
         "ref": "region_cluster_415_sector_001",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 128.68160549811236,
+        "yield": 129,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 3.2170401374528086
+        "respawn": 3
       },
       {
         "ref": "region_cluster_415_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 3849252.8652650337,
+        "yield": 3849253,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 384925.2865265034
+        "respawn": 384925
       },
       {
         "ref": "region_cluster_415_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 7134751.616842839,
+        "yield": 7134751,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 713475.1616842839
+        "respawn": 713475
       }
     ]
   },
@@ -3354,10 +3354,10 @@
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 3507641.085570099,
+        "yield": 3507641,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 1169213.6951900327
+        "respawn": 1169214
       }
     ]
   },
@@ -3370,70 +3370,70 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 8444730.362673651,
+        "yield": 8444750,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2814910.1208912176
+        "respawn": 2814917
       },
       {
         "ref": "region_cluster_418_sector_001_d",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 18578406.797882035,
+        "yield": 18578450,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 6192802.2659606775
+        "respawn": 6192817
       },
       {
         "ref": "region_cluster_418_sector_001_d",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 121181.88070436691,
+        "yield": 121182,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 40393.96023478896
+        "respawn": 40394
       },
       {
         "ref": "region_cluster_418_sector_001_d",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 8444730.362673651,
+        "yield": 8444750,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2814910.1208912176
+        "respawn": 2814917
       },
       {
         "ref": "region_cluster_418_sector_001_d",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 5.629820241782435,
+        "yield": 6,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.14074550604456085
+        "respawn": 0
       },
       {
         "ref": "region_cluster_418_sector_001_d",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 1115526.3616282223,
+        "yield": 1115529,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 111552.63616282221
+        "respawn": 111553
       },
       {
         "ref": "region_cluster_418_sector_001_d",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 312145.3833056271,
+        "yield": 312146,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 31214.538330562707
+        "respawn": 31215
       }
     ]
   },
@@ -3446,20 +3446,20 @@
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 1665911.4634718548,
+        "yield": 1665911,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 166591.14634718548
+        "respawn": 166591
       },
       {
         "ref": "region_cluster_41_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 1110607.6423145698,
+        "yield": 1110608,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 111060.76423145698
+        "respawn": 111061
       }
     ]
   },
@@ -3472,20 +3472,20 @@
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 2228203.9097019443,
+        "yield": 2228207,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 222820.39097019445
+        "respawn": 222821
       },
       {
         "ref": "region_cluster_420_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 3925361.6787623945,
+        "yield": 3925367,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 392536.1678762394
+        "respawn": 392537
       }
     ]
   },
@@ -3498,30 +3498,30 @@
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 10364350.416028392,
+        "yield": 10364350,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 3454783.4720094632
+        "respawn": 3454783
       },
       {
         "ref": "region_cluster_422_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 2207019.2622650582,
+        "yield": 2207019,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 220701.9262265058
+        "respawn": 220702
       },
       {
         "ref": "region_cluster_422_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 1261153.8641514617,
+        "yield": 1261154,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 126115.38641514619
+        "respawn": 126115
       }
     ]
   },
@@ -3534,20 +3534,20 @@
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 3648509.5606879783,
+        "yield": 3648509,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 364850.95606879785
+        "respawn": 364851
       },
       {
         "ref": "region_cluster_424_sector_002",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 6582707.529255937,
+        "yield": 6582707,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 658270.7529255938
+        "respawn": 658271
       }
     ]
   },
@@ -3560,20 +3560,20 @@
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 3648509.5606879783,
+        "yield": 3648509,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 364850.95606879785
+        "respawn": 364851
       },
       {
         "ref": "region_cluster_425_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 6582707.529255937,
+        "yield": 6582707,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 658270.7529255938
+        "respawn": 658271
       }
     ]
   },
@@ -3586,20 +3586,20 @@
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 1665911.4634718548,
+        "yield": 1665911,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 166591.14634718548
+        "respawn": 166591
       },
       {
         "ref": "region_cluster_43_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 1110607.6423145698,
+        "yield": 1110608,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 111060.76423145698
+        "respawn": 111061
       }
     ]
   },
@@ -3612,40 +3612,40 @@
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 1309.1248753761574,
+        "yield": 1309,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 436.3749584587191
+        "respawn": 436
       },
       {
         "ref": "region_cluster_44_sector_001",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 2.128658333944972,
+        "yield": 2,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.05321645834862429
+        "respawn": 0
       },
       {
         "ref": "region_cluster_44_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 597727.260171748,
+        "yield": 597727,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 59772.72601717479
+        "respawn": 59773
       },
       {
         "ref": "region_cluster_44_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 309932.65342238784,
+        "yield": 309933,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 30993.26534223878
+        "respawn": 30993
       }
     ]
   },
@@ -3658,20 +3658,20 @@
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 110690.2333651385,
+        "yield": 110690,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 11069.02333651385
+        "respawn": 11069
       },
       {
         "ref": "region_cluster_45_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 110690.2333651385,
+        "yield": 110690,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 11069.02333651385
+        "respawn": 11069
       }
     ]
   },
@@ -3684,80 +3684,80 @@
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 53642.19001530656,
+        "yield": 53642,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 17880.73000510219
+        "respawn": 17881
       },
       {
         "ref": "region_bigasteroids",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 28.382111119209824,
+        "yield": 28,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.7095527779802457
+        "respawn": 1
       },
       {
         "ref": "region_bigasteroids",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 4781818.081364471,
+        "yield": 4781818,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 478181.8081364471
+        "respawn": 478182
       },
       {
         "ref": "region_bigasteroids",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 4604713.707980601,
+        "yield": 4604713,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 460471.37079806015
+        "respawn": 460471
       },
       {
         "ref": "region_cluster_46_sector_001",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 535.1349198034304,
+        "yield": 535,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 178.37830660114346
+        "respawn": 178
       },
       {
         "ref": "region_cluster_46_sector_001",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 26.104142429435633,
+        "yield": 26,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.6526035607358908
+        "respawn": 1
       },
       {
         "ref": "region_cluster_46_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 342747.3900984898,
+        "yield": 342745,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 34274.739009848985
+        "respawn": 34275
       },
       {
         "ref": "region_cluster_46_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 2262.35901055109,
+        "yield": 2262,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 226.23590105510897
+        "respawn": 226
       }
     ]
   },
@@ -3770,120 +3770,120 @@
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 53642.19001530656,
+        "yield": 53642,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 17880.73000510219
+        "respawn": 17881
       },
       {
         "ref": "region_bigasteroids",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 28.382111119209824,
+        "yield": 28,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.7095527779802457
+        "respawn": 1
       },
       {
         "ref": "region_bigasteroids",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 4781818.081364471,
+        "yield": 4781818,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 478181.8081364471
+        "respawn": 478182
       },
       {
         "ref": "region_bigasteroids",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 4604713.707980601,
+        "yield": 4604713,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 460471.37079806015
+        "respawn": 460471
       },
       {
         "ref": "region_cluster_47_sector_001",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 74.23036492213942,
+        "yield": 74,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 24.74345497404647
+        "respawn": 25
       },
       {
         "ref": "region_cluster_47_sector_001",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 8.44898462528416,
+        "yield": 8,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.21122461563210398
+        "respawn": 0
       },
       {
         "ref": "region_cluster_47_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 47543.643484277585,
+        "yield": 47546,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 4754.364348427758
+        "respawn": 4755
       },
       {
         "ref": "region_cluster_47_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 313.8194289391262,
+        "yield": 314,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 31.38194289391262
+        "respawn": 31
       },
       {
         "ref": "region_cluster_47_sector_001b",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 107.484567401501,
+        "yield": 107,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 35.82818913383366
+        "respawn": 36
       },
       {
         "ref": "region_cluster_47_sector_001b",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 5.243149629341512,
+        "yield": 5,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.1310787407335378
+        "respawn": 0
       },
       {
         "ref": "region_cluster_47_sector_001b",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 68842.55463325405,
+        "yield": 68841,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 6884.255463325406
+        "respawn": 6884
       },
       {
         "ref": "region_cluster_47_sector_001b",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 454.40630120959804,
+        "yield": 454,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 45.44063012095981
+        "respawn": 45
       }
     ]
   },
@@ -3896,30 +3896,30 @@
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 10364350.416028392,
+        "yield": 10364350,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 3454783.4720094632
+        "respawn": 3454783
       },
       {
         "ref": "region_cluster_48_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 2207019.2622650582,
+        "yield": 2207019,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 220701.9262265058
+        "respawn": 220702
       },
       {
         "ref": "region_cluster_48_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 1261153.8641514617,
+        "yield": 1261154,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 126115.38641514619
+        "respawn": 126115
       }
     ]
   },
@@ -3932,50 +3932,50 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 107417500.62952425,
+        "yield": 107417497,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 35805833.54317474
+        "respawn": 35805832
       },
       {
         "ref": "region_cluster_49_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 26545663.770723358,
+        "yield": 26545663,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 2654566.377072336
+        "respawn": 2654566
       },
       {
         "ref": "region_cluster_49_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 2609203.6410489106,
+        "yield": 2609204,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 260920.36410489102
+        "respawn": 260920
       },
       {
         "ref": "p1_40km_helium_highyield_field",
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       },
       {
         "ref": "p1_40km_methane_highyield_field",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 7757063.492544,
+        "yield": 7757018,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 2585687.830848
+        "respawn": 2585673
       }
     ]
   },
@@ -3988,110 +3988,110 @@
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 238.1211017604935,
+        "yield": 238,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 5.953027544012338
+        "respawn": 6
       },
       {
         "ref": "s2_grav",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 3405131.755175057,
+        "yield": 3405132,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 340513.1755175057
+        "respawn": 340513
       },
       {
         "ref": "s2_grav",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 619114.864577283,
+        "yield": 619115,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 61911.4864577283
+        "respawn": 61911
       },
       {
         "ref": "wave_asteroids",
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 119060550.88024673,
+        "yield": 119060545,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 39686850.293415576
+        "respawn": 39686848
       },
       {
         "ref": "wave_asteroids",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 261933211.9365428,
+        "yield": 261933199,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 87311070.64551428
+        "respawn": 87311066
       },
       {
         "ref": "wave_asteroids",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 833423.8561617271,
+        "yield": 833424,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 277807.952053909
+        "respawn": 277808
       },
       {
         "ref": "wave_asteroids",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 119060550.88024673,
+        "yield": 119060545,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 39686850.293415576
+        "respawn": 39686848
       },
       {
         "ref": "wave_asteroids",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 7.937370058683115,
+        "yield": 8,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.19843425146707785
+        "respawn": 0
       },
       {
         "ref": "wave_asteroids",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 3179154.8296043486,
+        "yield": 3179155,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 317915.48296043486
+        "respawn": 317915
       },
       {
         "ref": "wave_asteroids",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 4400874.829036853,
+        "yield": 4400875,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 440087.4829036853
+        "respawn": 440087
       },
       {
         "ref": "wave_active",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       }
     ]
   },
@@ -4104,60 +4104,60 @@
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 14.8825688621034,
+        "yield": 15,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.37206422155258495
+        "respawn": 0
       },
       {
         "ref": "s2_grav_small",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 212820.73472807856,
+        "yield": 212821,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 21282.073472807857
+        "respawn": 21282
       },
       {
         "ref": "s2_grav_small",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 38694.67904146883,
+        "yield": 38695,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 3869.467904146883
+        "respawn": 3869
       },
       {
         "ref": "s2_grav_small_v2",
         "amount": 2,
         "ware": "nividium",
         "rating": null,
-        "yield": 1.190605507452346,
+        "yield": 1,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.02976513768630865
+        "respawn": 0
       },
       {
         "ref": "s2_grav_small_v2",
         "amount": 2,
         "ware": "ore",
         "rating": null,
-        "yield": 17025.658756568544,
+        "yield": 17026,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 1702.5658756568546
+        "respawn": 1703
       },
       {
         "ref": "s2_grav_small_v2",
         "amount": 2,
         "ware": "silicon",
         "rating": null,
-        "yield": 3095.574319376099,
+        "yield": 3096,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 309.5574319376099
+        "respawn": 310
       }
     ]
   },
@@ -4170,50 +4170,50 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 387022098.11046875,
+        "yield": 387022079,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 129007366.03682293
+        "respawn": 129007360
       },
       {
         "ref": "region_c501s01_res",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 879595.6775237925,
+        "yield": 879596,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 293198.5591745975
+        "respawn": 293199
       },
       {
         "ref": "region_c501s01_res",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 87.95956775237927,
+        "yield": 88,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 2.1989891938094814
+        "respawn": 2
       },
       {
         "ref": "region_c501s01_res",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 8537942.04316428,
+        "yield": 8537942,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 853794.204316428
+        "respawn": 853794
       },
       {
         "ref": "region_c501s01_res",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 1524632.5077079071,
+        "yield": 1524632,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 152463.2507707907
+        "respawn": 152463
       }
     ]
   },
@@ -4226,20 +4226,20 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 387022098.11046875,
+        "yield": 387022079,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 129007366.03682293
+        "respawn": 129007360
       },
       {
         "ref": "region_c502s01_scrap",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 1071559.5538032001,
+        "yield": 1071528,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 357186.51793440006
+        "respawn": 357176
       }
     ]
   },
@@ -4252,60 +4252,60 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 387022098.11046875,
+        "yield": 387022079,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 129007366.03682293
+        "respawn": 129007360
       },
       {
         "ref": "region_c503s01_casino",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 442171.1335521189,
+        "yield": 442171,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 44217.11335521189
+        "respawn": 44217
       },
       {
         "ref": "region_c503s01_casino3",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 57096.058866440995,
+        "yield": 57096,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 19032.019622147
+        "respawn": 19032
       },
       {
         "ref": "region_c503s01_casino3",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 0.5437719892042,
+        "yield": 1,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.013594299730104998
+        "respawn": 0
       },
       {
         "ref": "region_c503s01_casino3",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 217796.99483595823,
+        "yield": 217797,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 21779.69948359583
+        "respawn": 21780
       },
       {
         "ref": "region_c503s01_casino3",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 301494.37941426865,
+        "yield": 301494,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 30149.43794142687
+        "respawn": 30149
       }
     ]
   },
@@ -4318,70 +4318,70 @@
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 238.1211017604935,
+        "yield": 238,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 5.953027544012338
+        "respawn": 6
       },
       {
         "ref": "region504_grav",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 3405131.755175057,
+        "yield": 3405132,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 340513.1755175057
+        "respawn": 340513
       },
       {
         "ref": "region504_grav",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 619114.864577283,
+        "yield": 619115,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 61911.4864577283
+        "respawn": 61911
       },
       {
         "ref": "region504_asteroids",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 7.937370058683115,
+        "yield": 8,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.19843425146707785
+        "respawn": 0
       },
       {
         "ref": "region504_asteroids",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 1300141.2156122944,
+        "yield": 1300141,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 130014.12156122943
+        "respawn": 130014
       },
       {
         "ref": "region504_asteroids",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 1650972.972206088,
+        "yield": 1650973,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 165097.2972206088
+        "respawn": 165097
       },
       {
         "ref": "region504wave_active",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       }
     ]
   },
@@ -4394,40 +4394,40 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 2731979237.0385237,
+        "yield": 2731979103,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 910659745.6795079
+        "respawn": 910659701
       },
       {
         "ref": "region_cluster_50_sector_001",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 1552.260930135524,
+        "yield": 1552,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 38.80652325338809
+        "respawn": 39
       },
       {
         "ref": "region_cluster_50_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 43049369.795758545,
+        "yield": 43049368,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 4304936.979575854
+        "respawn": 4304937
       },
       {
         "ref": "region_cluster_50_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 22600919.142773237,
+        "yield": 22600918,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 2260091.9142773235
+        "respawn": 2260092
       }
     ]
   },
@@ -4440,40 +4440,40 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 2731979237.0385237,
+        "yield": 2731979103,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 910659745.6795079
+        "respawn": 910659701
       },
       {
         "ref": "region_cluster_50_sector_002",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 1552.260930135524,
+        "yield": 1552,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 38.80652325338809
+        "respawn": 39
       },
       {
         "ref": "region_cluster_50_sector_002",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 43049369.795758545,
+        "yield": 43049368,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 4304936.979575854
+        "respawn": 4304937
       },
       {
         "ref": "region_cluster_50_sector_002",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 22600919.142773237,
+        "yield": 22600918,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 2260091.9142773235
+        "respawn": 2260092
       }
     ]
   },
@@ -4486,80 +4486,80 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c601s1_region1",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c601s1_region1",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c601s1_region1",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c601s1_region1",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c601s1_region2",
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c601s1_region2",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c601s1_region2",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       }
     ]
   },
@@ -4572,20 +4572,20 @@
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c602s1_region1",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       }
     ]
   },
@@ -4598,30 +4598,30 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 119060550.88024673,
+        "yield": 119060545,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 39686850.293415576
+        "respawn": 39686848
       },
       {
         "ref": "c603s1_region1",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 261933211.9365428,
+        "yield": 261933199,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 87311070.64551428
+        "respawn": 87311066
       },
       {
         "ref": "c603s1_region1",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 119060550.88024673,
+        "yield": 119060545,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 39686850.293415576
+        "respawn": 39686848
       }
     ]
   },
@@ -4634,300 +4634,300 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region12",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region12",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region12",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region13",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region13",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region13",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region14",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region14",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region14",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region15",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region15",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region15",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region16",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region16",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region16",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region17",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region17",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region17",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region18",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region18",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region18",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region19",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region19",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region19",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region20",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region20",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c605s1_region20",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       }
     ]
   },
@@ -4940,10 +4940,10 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 119060550.88024673,
+        "yield": 119060545,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 39686850.293415576
+        "respawn": 39686848
       }
     ]
   },
@@ -4956,40 +4956,40 @@
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c607s1_region2",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c607s1_region2",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       },
       {
         "ref": "c607s1_region1",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 0.0,
+        "yield": 0,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 0.0
+        "respawn": 0
       }
     ]
   },
@@ -5002,30 +5002,30 @@
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 294674863.4286107,
+        "yield": 294674849,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 98224954.47620356
+        "respawn": 98224950
       },
       {
         "ref": "c608s1_region1",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 696504.2226494433,
+        "yield": 696504,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 69650.42226494433
+        "respawn": 69650
       },
       {
         "ref": "c608s1_region1",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 928672.2968659246,
+        "yield": 928672,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 92867.22968659246
+        "respawn": 92867
       }
     ]
   },
@@ -5038,30 +5038,30 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 119060550.88024673,
+        "yield": 119060545,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 39686850.293415576
+        "respawn": 39686848
       },
       {
         "ref": "c609s1_region1",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 2103133.19496903,
+        "yield": 2103133,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 210313.31949690304
+        "respawn": 210313
       },
       {
         "ref": "c609s1_region1",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 3121370.7755771354,
+        "yield": 3121371,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 312137.07755771355
+        "respawn": 312137
       }
     ]
   },
@@ -5074,170 +5074,170 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 22393272.435336,
+        "yield": 22393277,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 7464424.145112001
+        "respawn": 7464426
       },
       {
         "ref": "region_cluster_702_sector_001_nebula_1",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 49265199.35773921,
+        "yield": 49265210,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 16421733.1192464
+        "respawn": 16421737
       },
       {
         "ref": "region_cluster_702_sector_001_nebula_1",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 22393272.435336,
+        "yield": 22393277,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 7464424.145112001
+        "respawn": 7464426
       },
       {
         "ref": "region_cluster_702_sector_001_nebula_2",
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 14928848.289432,
+        "yield": 14928859,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 4976282.763144
+        "respawn": 4976286
       },
       {
         "ref": "region_cluster_702_sector_001_nebula_2",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 32843466.236750405,
+        "yield": 32843491,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 10947822.0789168
+        "respawn": 10947830
       },
       {
         "ref": "region_cluster_702_sector_001_nebula_2",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 14928848.289432,
+        "yield": 14928859,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 4976282.763144
+        "respawn": 4976286
       },
       {
         "ref": "region_cluster_702_sector_001_nebula_3",
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 89573089.738968,
+        "yield": 89573085,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 29857696.579656
+        "respawn": 29857695
       },
       {
         "ref": "region_cluster_702_sector_001_nebula_3",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 197060797.4257296,
+        "yield": 197060788,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 65686932.475243196
+        "respawn": 65686929
       },
       {
         "ref": "region_cluster_702_sector_001_nebula_3",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 89573089.738968,
+        "yield": 89573085,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 29857696.579656
+        "respawn": 29857695
       },
       {
         "ref": "region_cluster_702_sector_001_asteroids_1",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 251924.314884165,
+        "yield": 251925,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 83974.77162805501
+        "respawn": 83975
       },
       {
         "ref": "region_cluster_702_sector_001_asteroids_1",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 389.3941262160181,
+        "yield": 389,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 9.734853155400451
+        "respawn": 10
       },
       {
         "ref": "region_cluster_702_sector_001_asteroids_1",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 960153.8540175824,
+        "yield": 960155,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 96015.38540175823
+        "respawn": 96015
       },
       {
         "ref": "region_cluster_702_sector_001_asteroids_1",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 490026.50676542136,
+        "yield": 490027,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 49002.65067654213
+        "respawn": 49003
       },
       {
         "ref": "region_cluster_702_sector_001_asteroids_2",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 79163.61097517269,
+        "yield": 79164,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 26387.870325057564
+        "respawn": 26388
       },
       {
         "ref": "region_cluster_702_sector_001_asteroids_2",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 124.70712049916092,
+        "yield": 125,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 3.1176780124790233
+        "respawn": 3
       },
       {
         "ref": "region_cluster_702_sector_001_asteroids_2",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 301714.6090511738,
+        "yield": 301715,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 30171.460905117376
+        "respawn": 30172
       },
       {
         "ref": "region_cluster_702_sector_001_asteroids_2",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 153983.81758798214,
+        "yield": 153984,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 15398.381758798212
+        "respawn": 15398
       }
     ]
   },
@@ -5250,70 +5250,70 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 89573089.738968,
+        "yield": 89573085,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 29857696.579656
+        "respawn": 29857695
       },
       {
         "ref": "region_cluster_703_sector_001_nebula_1",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 197060797.4257296,
+        "yield": 197060788,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 65686932.475243196
+        "respawn": 65686929
       },
       {
         "ref": "region_cluster_703_sector_001_nebula_1",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 89573089.738968,
+        "yield": 89573085,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 29857696.579656
+        "respawn": 29857695
       },
       {
         "ref": "region_cluster_703_sector_001_asteroids_1",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 251924.314884165,
+        "yield": 251925,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 83974.77162805501
+        "respawn": 83975
       },
       {
         "ref": "region_cluster_703_sector_001_asteroids_1",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 389.3941262160181,
+        "yield": 389,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 9.734853155400451
+        "respawn": 10
       },
       {
         "ref": "region_cluster_703_sector_001_asteroids_1",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 960153.8540175824,
+        "yield": 960155,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 96015.38540175823
+        "respawn": 96015
       },
       {
         "ref": "region_cluster_703_sector_001_asteroids_1",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 490026.50676542136,
+        "yield": 490027,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 49002.65067654213
+        "respawn": 49003
       }
     ]
   },
@@ -5326,50 +5326,50 @@
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 1192441.757181642,
+        "yield": 1192442,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 397480.585727214
+        "respawn": 397481
       },
       {
         "ref": "region_cluster_704_sector_001_asteroids_1",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 3504.5471361300843,
+        "yield": 3505,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 87.61367840325211
+        "respawn": 88
       },
       {
         "ref": "region_cluster_704_sector_001_asteroids_1",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 3517803.9534118036,
+        "yield": 3517805,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 351780.3953411803
+        "respawn": 351780
       },
       {
         "ref": "region_cluster_704_sector_001_asteroids_2",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 1192441.757181642,
+        "yield": 1192442,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 397480.585727214
+        "respawn": 397481
       },
       {
         "ref": "region_cluster_704_sector_001_asteroids_2",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 3517803.9534118036,
+        "yield": 3517805,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 351780.3953411803
+        "respawn": 351780
       }
     ]
   },
@@ -5382,80 +5382,80 @@
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 2492.1224077825154,
+        "yield": 2492,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 62.30306019456289
+        "respawn": 62
       },
       {
         "ref": "region_cluster_705_sector_001_asteroids_1",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 3034815.9007999473,
+        "yield": 3034818,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 303481.5900799947
+        "respawn": 303482
       },
       {
         "ref": "region_cluster_705_sector_001_asteroids_2",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 1451084.0538001496,
+        "yield": 1451085,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 483694.68460005
+        "respawn": 483695
       },
       {
         "ref": "region_cluster_705_sector_001_asteroids_2",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 3890940.364783312,
+        "yield": 3890942,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 389094.03647833114
+        "respawn": 389094
       },
       {
         "ref": "region_cluster_705_sector_001_asteroids_3",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 584296.461032922,
+        "yield": 584296,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 194765.487010974
+        "respawn": 194765
       },
       {
         "ref": "region_cluster_705_sector_001_asteroids_3",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 1717.228096744644,
+        "yield": 1717,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 42.93070241861611
+        "respawn": 43
       },
       {
         "ref": "region_cluster_705_sector_001_asteroids_3",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 1723723.9372128411,
+        "yield": 1723723,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 172372.3937212841
+        "respawn": 172372
       },
       {
         "ref": "region_cluster_705_sector_001_asteroids_3",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 2091177.831805714,
+        "yield": 2091177,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 209117.7831805714
+        "respawn": 209118
       }
     ]
   },
@@ -5468,30 +5468,30 @@
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 185164.371454095,
+        "yield": 185164,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 61721.457151365
+        "respawn": 61721
       },
       {
         "ref": "region_cluster_706_sector_001_asteroids_1",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 287287.3228688069,
+        "yield": 287287,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 28728.732286880688
+        "respawn": 28729
       },
       {
         "ref": "region_cluster_706_sector_001_asteroids_1",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 253432.87502329372,
+        "yield": 253433,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 25343.287502329375
+        "respawn": 25343
       }
     ]
   },
@@ -5504,20 +5504,20 @@
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 31806.956283328516,
+        "yield": 31807,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 3180.6956283328514
+        "respawn": 3181
       },
       {
         "ref": "region_cluster_708_sector_001_asteroids_1",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 46548.89538444288,
+        "yield": 46549,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 4654.8895384442885
+        "respawn": 4655
       }
     ]
   },
@@ -5530,60 +5530,60 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 124648343.3968686,
+        "yield": 124648337,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 41549447.7989562
+        "respawn": 41549446
       },
       {
         "ref": "region_cluster_709_sector_001_nebula_1",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 274226355.4731109,
+        "yield": 274226342,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 91408785.15770365
+        "respawn": 91408781
       },
       {
         "ref": "region_cluster_709_sector_001_nebula_1",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 124648343.3968686,
+        "yield": 124648337,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 41549447.7989562
+        "respawn": 41549446
       },
       {
         "ref": "region_cluster_709_sector_001_asteroids_1",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 468922.9002222054,
+        "yield": 468923,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 156307.63340740182
+        "respawn": 156308
       },
       {
         "ref": "region_cluster_709_sector_001_asteroids_1",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 2400845.3182384283,
+        "yield": 2400845,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 240084.5318238428
+        "respawn": 240085
       },
       {
         "ref": "region_cluster_709_sector_001_asteroids_1",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 1207690.082785233,
+        "yield": 1207690,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 120769.00827852331
+        "respawn": 120769
       }
     ]
   },
@@ -5596,70 +5596,70 @@
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 488363.6568464594,
+        "yield": 488363,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 162787.88561548645
+        "respawn": 162788
       },
       {
         "ref": "region_cluster_710_sector_001_asteroids_1",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 760.4866895171235,
+        "yield": 760,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 19.01216723792809
+        "respawn": 19
       },
       {
         "ref": "region_cluster_710_sector_001_asteroids_1",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 1875180.3807740693,
+        "yield": 1875178,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 187518.0380774069
+        "respawn": 187518
       },
       {
         "ref": "region_cluster_710_sector_001_asteroids_1",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 940597.1498980455,
+        "yield": 940596,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 94059.71498980455
+        "respawn": 94060
       },
       {
         "ref": "region_cluster_710_sector_001_asteroids_2",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 512169.30557318975,
+        "yield": 512170,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 170723.1018577299
+        "respawn": 170723
       },
       {
         "ref": "region_cluster_710_sector_001_asteroids_2",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 1510942.7333540567,
+        "yield": 1510944,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 151094.27333540568
+        "respawn": 151094
       },
       {
         "ref": "region_cluster_710_sector_001_asteroids_2",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 1332890.5608700963,
+        "yield": 1332891,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 133289.05608700967
+        "respawn": 133289
       }
     ]
   },
@@ -5672,70 +5672,70 @@
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 1545681.0515467613,
+        "yield": 1545679,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 515227.01718225377
+        "respawn": 515226
       },
       {
         "ref": "region_cluster_711_sector_001_asteroids_1",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 5891021.751540571,
+        "yield": 5891015,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 589102.1751540571
+        "respawn": 589102
       },
       {
         "ref": "region_cluster_711_sector_001_asteroids_1",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 3006556.499364608,
+        "yield": 3006553,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 300655.6499364608
+        "respawn": 300655
       },
       {
         "ref": "region_cluster_711_sector_001_asteroids_2",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 568201.1015936362,
+        "yield": 568202,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 189400.36719787878
+        "respawn": 189401
       },
       {
         "ref": "region_cluster_711_sector_001_asteroids_2",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 895.0921057203456,
+        "yield": 895,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 22.377302643008637
+        "respawn": 22
       },
       {
         "ref": "region_cluster_711_sector_001_asteroids_2",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 2165572.9332955214,
+        "yield": 2165574,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 216557.29332955214
+        "respawn": 216557
       },
       {
         "ref": "region_cluster_711_sector_001_asteroids_2",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 1105227.183339638,
+        "yield": 1105228,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 110522.71833396381
+        "respawn": 110523
       }
     ]
   },
@@ -5748,40 +5748,40 @@
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 631032.2384424628,
+        "yield": 631032,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 210344.07948082092
+        "respawn": 210344
       },
       {
         "ref": "region_cluster_712_sector_001_asteroids_1",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 994.070538583435,
+        "yield": 994,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 24.85176346458588
+        "respawn": 25
       },
       {
         "ref": "region_cluster_712_sector_001_asteroids_1",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 7201508.180368969,
+        "yield": 7201506,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 720150.8180368969
+        "respawn": 720151
       },
       {
         "ref": "region_cluster_712_sector_001_asteroids_1",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 1584454.9522444487,
+        "yield": 1584454,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 158445.49522444484
+        "respawn": 158445
       }
     ]
   },
@@ -5794,90 +5794,90 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 23476409.2921506,
+        "yield": 23476402,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 7825469.7640502015
+        "respawn": 7825467
       },
       {
         "ref": "region_cluster_713_sector_001_nebula_1",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 51648100.44273132,
+        "yield": 51648085,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 17216033.48091044
+        "respawn": 17216028
       },
       {
         "ref": "region_cluster_713_sector_001_nebula_1",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 23476409.2921506,
+        "yield": 23476402,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 7825469.7640502015
+        "respawn": 7825467
       },
       {
         "ref": "region_cluster_713_sector_001_nebula_2",
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 21633377.143393204,
+        "yield": 21633377,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 7211125.714464402
+        "respawn": 7211126
       },
       {
         "ref": "region_cluster_713_sector_001_nebula_2",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 47593429.71546505,
+        "yield": 47593429,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 15864476.57182168
+        "respawn": 15864476
       },
       {
         "ref": "region_cluster_713_sector_001_nebula_2",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 21633377.143393204,
+        "yield": 21633377,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 7211125.714464402
+        "respawn": 7211126
       },
       {
         "ref": "region_cluster_713_sector_001_asteroids_1",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 2142876.311661203,
+        "yield": 2142876,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 714292.1038870676
+        "respawn": 714292
       },
       {
         "ref": "region_cluster_713_sector_001_asteroids_1",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 8167099.512687063,
+        "yield": 8167097,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 816709.9512687061
+        "respawn": 816710
       },
       {
         "ref": "region_cluster_713_sector_001_asteroids_1",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 4168181.201233119,
+        "yield": 4168180,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 416818.12012331194
+        "respawn": 416818
       }
     ]
   },
@@ -5890,90 +5890,90 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 130880760.567084,
+        "yield": 130880769,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 43626920.189028
+        "respawn": 43626923
       },
       {
         "ref": "region_cluster_715_sector_001_nebula_1",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 287937673.2475848,
+        "yield": 287937692,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 95979224.4158616
+        "respawn": 95979231
       },
       {
         "ref": "region_cluster_715_sector_001_nebula_1",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 130880760.567084,
+        "yield": 130880769,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 43626920.189028
+        "respawn": 43626923
       },
       {
         "ref": "region_cluster_715_sector_001_asteroids_1",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 6958.493770149967,
+        "yield": 6958,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 173.96234425374917
+        "respawn": 174
       },
       {
         "ref": "region_cluster_715_sector_001_asteroids_1",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 16835279.485584397,
+        "yield": 16835281,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 1683527.9485584393
+        "respawn": 1683528
       },
       {
         "ref": "region_cluster_715_sector_001_asteroids_1",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 8592095.071244081,
+        "yield": 8592096,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 859209.5071244081
+        "respawn": 859210
       },
       {
         "ref": "region_cluster_715_sector_001_nebula_2",
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 130880760.567084,
+        "yield": 130880769,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 43626920.189028
+        "respawn": 43626923
       },
       {
         "ref": "region_cluster_715_sector_001_nebula_2",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 287937673.2475848,
+        "yield": 287937692,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 95979224.4158616
+        "respawn": 95979231
       },
       {
         "ref": "region_cluster_715_sector_001_nebula_2",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 130880760.567084,
+        "yield": 130880769,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 43626920.189028
+        "respawn": 43626923
       }
     ]
   },
@@ -5986,50 +5986,50 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 74989812.80060971,
+        "yield": 74989814,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 24996604.266869903
+        "respawn": 24996605
       },
       {
         "ref": "region_cluster_720_sector_001_nebula_1",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 164977588.16134134,
+        "yield": 164977590,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 54992529.38711377
+        "respawn": 54992530
       },
       {
         "ref": "region_cluster_720_sector_001_nebula_1",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 74989812.80060971,
+        "yield": 74989814,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 24996604.266869903
+        "respawn": 24996605
       },
       {
         "ref": "region_cluster_720_sector_001_asteroids_1",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 2431667.1771914633,
+        "yield": 2431667,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 243166.7177191464
+        "respawn": 243167
       },
       {
         "ref": "region_cluster_720_sector_001_asteroids_2",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 1083341.4840907166,
+        "yield": 1083342,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 108334.14840907165
+        "respawn": 108334
       }
     ]
   },
@@ -6042,60 +6042,60 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 76066463.06237985,
+        "yield": 76066459,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 25355487.68745995
+        "respawn": 25355486
       },
       {
         "ref": "region_cluster_721_sector_001_nebula_1",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 167346218.73723567,
+        "yield": 167346211,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 55782072.91241189
+        "respawn": 55782070
       },
       {
         "ref": "region_cluster_721_sector_001_nebula_1",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 76066463.06237985,
+        "yield": 76066459,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 25355487.68745995
+        "respawn": 25355486
       },
       {
         "ref": "region_cluster_721_sector_001_nebula_1",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 5.0710975374919895,
+        "yield": 5,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 0.12677743843729974
+        "respawn": 0
       },
       {
         "ref": "region_cluster_721_sector_001_nebula_1",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 2031126.696691667,
+        "yield": 2031127,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 203112.66966916667
+        "respawn": 203113
       },
       {
         "ref": "region_cluster_721_sector_001_nebula_1",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 2811670.029662434,
+        "yield": 2811670,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 281167.00296624337
+        "respawn": 281167
       }
     ]
   },
@@ -6108,70 +6108,70 @@
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 29156039.214714,
+        "yield": 29156005,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 9718679.738238
+        "respawn": 9718668
       },
       {
         "ref": "region_cluster_722_sector_001_asteroids_2",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 2539.894722308698,
+        "yield": 2540,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 63.49736805771745
+        "respawn": 63
       },
       {
         "ref": "region_cluster_722_sector_001_asteroids_2",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 6144984.665712527,
+        "yield": 6144989,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 614498.4665712527
+        "respawn": 614499
       },
       {
         "ref": "region_cluster_722_sector_001_asteroids_2",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 3136169.643298696,
+        "yield": 3136172,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 313616.9643298696
+        "respawn": 313617
       },
       {
         "ref": "region_cluster_722_sector_001_asteroids_3",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 5714.763125295629,
+        "yield": 5715,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 142.86907813239074
+        "respawn": 143
       },
       {
         "ref": "region_cluster_722_sector_001_asteroids_3",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 13826215.498097686,
+        "yield": 13826218,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 1382621.5498097686
+        "respawn": 1382622
       },
       {
         "ref": "region_cluster_722_sector_001_asteroids_3",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 7056381.697546849,
+        "yield": 7056383,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 705638.1697546849
+        "respawn": 705638
       }
     ]
   },
@@ -6184,10 +6184,10 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 130880760.567084,
+        "yield": 130880769,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 43626920.189028
+        "respawn": 43626923
       }
     ]
   },
@@ -6200,20 +6200,20 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 130880760.567084,
+        "yield": 130880769,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 43626920.189028
+        "respawn": 43626923
       },
       {
         "ref": "region_cluster_724_sector_001_nebula_1",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 130880760.567084,
+        "yield": 130880769,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 43626920.189028
+        "respawn": 43626923
       }
     ]
   },
@@ -6226,90 +6226,90 @@
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 77256789.90282,
+        "yield": 77256788,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 25752263.30094
+        "respawn": 25752263
       },
       {
         "ref": "region_cluster_725_sector_001_nebula_1_res",
         "amount": 1,
         "ware": "hydrogen",
         "rating": null,
-        "yield": 169964937.78620398,
+        "yield": 169964934,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 56654979.262067996
+        "respawn": 56654978
       },
       {
         "ref": "region_cluster_725_sector_001_nebula_1_res",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 77256789.90282,
+        "yield": 77256788,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 25752263.30094
+        "respawn": 25752263
       },
       {
         "ref": "region_cluster_725_sector_001",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 760.4866895171235,
+        "yield": 760,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 19.01216723792809
+        "respawn": 19
       },
       {
         "ref": "region_cluster_725_sector_001",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 1718262.5777204786,
+        "yield": 1718261,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 171826.25777204783
+        "respawn": 171826
       },
       {
         "ref": "region_cluster_725_sector_001",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 687911.4767038574,
+        "yield": 687911,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 68791.14767038575
+        "respawn": 68791
       },
       {
         "ref": "region_cluster_725_sector_002",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 1505.2487572244922,
+        "yield": 1505,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 37.6312189306123
+        "respawn": 38
       },
       {
         "ref": "region_cluster_725_sector_002",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 2800820.690758927,
+        "yield": 2800822,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 280082.0690758927
+        "respawn": 280082
       },
       {
         "ref": "region_cluster_725_sector_002",
         "amount": 1,
         "ware": "silicon",
         "rating": null,
-        "yield": 1361598.9729503754,
+        "yield": 1361600,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 136159.89729503755
+        "respawn": 136160
       }
     ]
   },
@@ -6322,50 +6322,50 @@
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 35968132.24246801,
+        "yield": 35968090,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 11989377.414156001
+        "respawn": 11989363
       },
       {
         "ref": "region_cluster_730_sector_001_asteroids_1",
         "amount": 1,
         "ware": "ice",
         "rating": null,
-        "yield": 684718.6433171692,
+        "yield": 684720,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 228239.54777238975
+        "respawn": 228240
       },
       {
         "ref": "region_cluster_730_sector_001_asteroids_1",
         "amount": 1,
         "ware": "methane",
         "rating": null,
-        "yield": 36724966.790054396,
+        "yield": 36725053,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 12241655.5966848
+        "respawn": 12241684
       },
       {
         "ref": "region_cluster_730_sector_001_asteroids_1",
         "amount": 1,
         "ware": "nividium",
         "rating": null,
-        "yield": 976.2720338356129,
+        "yield": 976,
         "delay": 2400.0,
         "factor": 1.0,
-        "respawn": 24.406800845890324
+        "respawn": 24
       },
       {
         "ref": "region_cluster_730_sector_001_asteroids_1",
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 305870.0067387664,
+        "yield": 305871,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 30587.000673876642
+        "respawn": 30587
       }
     ]
   },
@@ -6378,20 +6378,20 @@
         "amount": 1,
         "ware": "ore",
         "rating": null,
-        "yield": 3151778.4509275868,
+        "yield": 3151778,
         "delay": 600.0,
         "factor": 1.0,
-        "respawn": 315177.8450927586
+        "respawn": 315178
       },
       {
         "ref": "region_cluster_740_sector_001_asteroid_2",
         "amount": 1,
         "ware": "helium",
         "rating": null,
-        "yield": 3611362.6386431996,
+        "yield": 3611348,
         "delay": 180.0,
         "factor": 1.0,
-        "respawn": 1203787.5462143999
+        "respawn": 1203783
       }
     ]
   }

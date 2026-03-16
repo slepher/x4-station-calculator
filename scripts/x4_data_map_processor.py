@@ -428,6 +428,28 @@ def as_float(value: Optional[str], default: float = 0.0) -> float:
     return float(value) if value is not None else default
 
 
+def round_significant(value: float, sig_digits: int = 5) -> float:
+    """
+    四舍五入到指定有效数字。
+    如果整数部分超过 sig_digits 位，则直接取整。
+    """
+    if value == 0:
+        return 0
+    abs_val = abs(value)
+    # 计算整数部分位数
+    int_digits = int(math.floor(math.log10(abs_val))) + 1
+    if int_digits > sig_digits:
+        # 整数部分超过 sig_digits 位，直接取整
+        return round(value)
+    # 否则保留 sig_digits 有效数字
+    return round(value, sig_digits - int_digits)
+
+
+def round_to_int(value: float) -> int:
+    """四舍五入到整数。"""
+    return round(value)
+
+
 def pos_from(parent: Optional[ET.Element]) -> Dict[str, float]:
     position = None
     if parent is not None:
@@ -1324,11 +1346,11 @@ def summarize_region_resources(
 
         resource_item = {
             "ware": ware,
-            "yield": item["yield"],
+            "yield": round_to_int(item["yield"]),
             "delay": delay,
-            "respawn": item["respawn"],
-            "density": item["density"],
-            "respawn_density": item["respawn_density"],
+            "respawn": round_to_int(item["respawn"]),
+            "density": round_significant(item["density"]),
+            "respawn_density": round_significant(item["respawn_density"]),
             "factor": factor,
         }
         resources.append(resource_item)
@@ -1389,7 +1411,7 @@ def migrate_region_definitions(
         if spline_linear > 0:
             region_item["linear"] = spline_linear
 
-        region_item["volume_km3"] = round(volume_km3, 4)
+        region_item["volume_km3"] = round_to_int(volume_km3)
         region_item["falloff_factor"] = round(as_number(falloff.get("effective_factor"), 1.0), 4)
         region_item["noise_probability"] = round(region_noise_probability, 4)
 
@@ -1821,10 +1843,10 @@ def generate_map_data(
                     "amount": amount,
                     "ware": ware,
                     "rating": rating,
-                    "yield": yield_val,
+                    "yield": round_to_int(yield_val),
                     "delay": delay,
                     "factor": factor,
-                    "respawn": respawn,
+                    "respawn": round_to_int(respawn),
                     "cluster_id": cluster_id,
                     "sector_id": sector_key,
                 })
