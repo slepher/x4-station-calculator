@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+  <add sel="//cue[@name='FactionLogicManagers']/cues">
+    
+    <cue name="SetupBoronDLC" version="2">
+      <actions>
+        <set_value name="md.$FactionData.{faction.boron}" exact="table[]" />
+      </actions>
+      <patch sinceversion="2">
+        <set_value name="BoronFactionLogic.$PreferredHQSpaceMacro" exact="macro.Cluster_603_Sector001_macro"/>
+      </patch>
+    </cue>
+    
+    <cue name="BoronFactionLogic" comment="enabled from the start (boron)">
+      <cues>
+        <cue name="BoronFactionLogic_Manager" ref="Manager">
+          <param name="Faction" value="faction.boron"/>
+          <param name="BaseAggressionLevel" value="moodlevel.low"/>
+          <param name="BaseAvariceLevel" value="moodlevel.low"/>
+          <param name="BaseLawfulness" value="0.9"/>
+          <param name="PreferredHQSpaceMacro" value="[macro.Cluster_603_Sector001_macro]" comment="list updated in PeriodicCallback"/>
+          <param name="PreferredHQTypes" value="['shipbuilding', 'equipmentdock', 'defencestation', 'tradestation', 'any']"/>
+          <param name="SatelliteNetworkGoal" value="10"/>
+          <param name="LasertowerNetworkGoal" value="5"/>
+          <param name="MinefieldGoalPerSector" value="1" comment="[MGPS * Sectors, 12].min is the maximum amount of Minefields for this faction"/>
+          <param name="EconomicallyExcludedSectorMacros" value="[
+                 macro.cluster_601_sector001_macro,
+                 macro.cluster_602_sector001_macro,
+                 macro.cluster_603_sector001_macro,
+                 macro.cluster_604_sector001_macro,
+                 macro.cluster_605_sector001_macro,
+                 macro.cluster_606_sector001_macro,
+                 macro.cluster_606_sector002_macro,
+                 macro.cluster_606_sector003_macro,
+                 macro.cluster_607_sector001_macro,
+                 macro.cluster_608_sector001_macro,
+                 macro.cluster_609_sector001_macro,
+                 ]"/>
+          <param name="PeriodicCallback" value="md.FactionLogic.PeriodicCallback" />
+          <param name="DebugChance" value="0"/>
+          <param name="DebugChance2" value="0"/>
+        </cue>
+
+        <cue name="BoronRelocateHQ">
+          <conditions>
+            <event_cue_signalled/>
+          </conditions>
+          <actions>
+            <set_value name="$BoronRelocateHQ" exact="true"/>
+          </actions>
+        </cue>
+
+        <cue name="PeriodicCallback" instantiate="true">
+          <conditions>
+            <event_cue_signalled/>
+          </conditions>
+          <actions>
+            <set_value name="$param" exact="event.param"/>
+            <debug_text text="'Boron Re-eval caller=%s hqnecessary=%s hq=%s preferredhqspace=%s preferredhqtype=%s'.[$param.$caller, $param.$hqnecessary, $param.$hq, $param.$PreferredHQSpaceMacro, $param.$preferredhqtypes]" chance="0"/>
+
+            <do_if value="$param.$caller">
+              
+              <do_if value="$BoronRelocateHQ?">
+                <debug_text text="'Relocate BoronHQ caller=%s'.[$param.$caller]"/>
+                <!-- 
+                  macro.cluster_606_sector001_macro = Kingdom End I
+                  macro.cluster_606_sector002_macro = Reflected Stars
+                  macro.cluster_606_sector003_macro = Towering Wave
+                  macro.cluster_607_sector001_macro = Rolks Demise
+                  macro.cluster_608_sector001_macro = Atreus Clouds
+                  macro.cluster_609_sector001_macro = Menalaus Oasis
+                  macro.cluster_603_sector001_macro = Great Reef 
+                  macro.cluster_602_sector001_macro = Barren Shores
+                  macro.cluster_604_sector001_macro = Ocean of Fantasy
+                -->
+                <!-- Update prefered space, basically moving from outer boron cluster (Great Reef) to the Inner Boron Clusters -->
+
+                <clear_list list="$param.$PreferredHQSpaceMacro" comment="this updates the existing list"/>
+                <append_to_list name="$param.$PreferredHQSpaceMacro" exact="[
+                  macro.cluster_606_sector001_macro, 
+                  macro.cluster_606_sector002_macro, 
+                  macro.cluster_606_sector003_macro, 
+                  macro.cluster_607_sector001_macro, 
+                  macro.cluster_608_sector001_macro, 
+                  macro.cluster_609_sector001_macro, 
+                  macro.cluster_603_sector001_macro, 
+                  macro.cluster_602_sector001_macro, 
+                  macro.cluster_604_sector001_macro]
+                "/>
+                <debug_text text="'Relocate BoronHQ updatedPos=%s'.[$param.$PreferredHQSpaceMacro]"/>
+
+                <set_value name="$param.$caller.$hqrelocate" exact="true" comment="Inform factionlogic that the HQ should be moved"/>
+                <remove_value name="$BoronRelocateHQ" comment="One-time trigger"/>
+              </do_if>
+            </do_if>
+            <do_else>
+              <debug_text text="'No caller set?!'"/>
+            </do_else>
+          </actions>
+        </cue>
+        
+      </cues>
+    </cue>
+    
+  </add>
+</diff>

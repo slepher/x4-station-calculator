@@ -1,0 +1,1652 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+  <add sel="/god/objects">
+
+    <!-- Debris used as marker for the centre of the Split gamestart battlefield -->
+    <object id="split_gamestart_battlefield_debris">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_421_sector001_macro" solitary="true"/>
+      <!-- Original region connection position. Refer to C421S01_Region002_connection (dlc4_clusters.xml)
+      <position x="27000" y="-5000" z="330000" />-->
+      <position x="42000" y="-5000" z="120000" />
+      <object macro="collectable_asteroidchunk_s_01_macro" />
+    </object>
+
+  </add>
+
+  <add sel="/god/stations">
+
+    <!-- Family Zyarth -->
+    <!-- Wretched Skies IV Family Valka -->
+    <station id="spl_defence_cluster_400_sector001" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_400_sector001_macro" />
+      <position x="3500" y="0" z="-50000" pitch="0" roll="0" yaw="0"/>
+      <station>
+        <select faction="split" tags="[defence]"/>
+        <loadout useplanloadout="true"/>
+      </station>
+    </station>
+
+    <!-- Family Zhin -->
+    <station id="equipmentdock_split_02" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_401_sector001_macro" />
+      <station>
+        <select faction="split" tags="[equipmentdock]" />
+        <loadout>
+          <level exact="1.0" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="spl_defence_cluster_401_sector001" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_401_sector001_macro" />
+      <position x="-10000" y="0" z="12000" pitch="0" roll="0" yaw="0"/>
+      <station>
+        <select faction="split" tags="[defence]"/>
+        <loadout useplanloadout="true"/>
+      </station>
+    </station>
+
+    <station id="spl_defence_cluster_401_sector001_2" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone005_cluster_401_sector001_macro" />
+      <position x="4506" y="0" z="6992" pitch="0" roll="0" yaw="0"/>
+      <station>
+        <select faction="split" tags="[defence]"/>
+        <loadout useplanloadout="true"/>
+      </station>
+    </station>
+
+    <!-- Family Kritt -->
+    <station id="spl_defence_cluster_402_sector001" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone002_cluster_402_sector001_macro" />
+      <position x="-11400" y="0" z="-1800" pitch="0" roll="0" yaw="0"/>
+      <station>
+        <select faction="split" tags="[defence]"/>
+        <loadout useplanloadout="true"/>
+      </station>
+    </station>
+
+    <station id="spl_defence_cluster_402_sector001_2" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone005_cluster_402_sector001_macro" />
+      <position x="-5200" y="0" z="-11000" pitch="0" roll="0" yaw="0"/>
+      <station>
+        <select faction="split" tags="[defence]"/>
+        <loadout useplanloadout="true"/>
+      </station>
+    </station>
+
+    <!-- Wretched Skies V Family Phi -->
+    <station id="wharf_split_02" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_403_sector001_macro" />
+      <position x="-107418.086" z="-33812.773" pitch="0" roll="0"/>
+      <station>
+        <select faction="split" tags="[wharf]" />
+        <loadout>
+          <level exact="1.0" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="spl_defence_cluster_403_sector001" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone004_cluster_403_sector001_macro" />
+      <position x="-31200" z="15800" pitch="0" roll="0"/>
+      <station>
+        <select faction="split" tags="[defence]"/>
+        <loadout useplanloadout="true"/>
+      </station>
+    </station>
+
+    <!-- Zyarth Dominon I -->
+    <station id="equipmentdock_split_01" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_404_sector001_macro" />
+      <position x="48011.633" y="5000" z="12045.338" roll="0" pitch="0"/>
+      <station>
+        <select faction="split" tags="[equipmentdock]" />
+        <loadout>
+          <level exact="1.0" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="spl_defence_cluster_404_sector001" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_404_sector001_macro" />
+      <position  x="-4000" y="0" z="-8400" roll="0" pitch="0"/>
+      <station>
+        <select faction="split" tags="[defence]"/>
+        <loadout useplanloadout="true"/>
+      </station>
+    </station>
+
+    <station id="spl_defence_cluster_404_sector001_2" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone004_cluster_404_sector001_macro" />
+      <position  x="16740" y="0" z="9700" roll="0" pitch="0"/>
+      <station>
+        <select faction="split" tags="[defence]"/>
+        <loadout useplanloadout="true"/>
+      </station>
+    </station>
+
+    <!-- Zyarth Dominon IV -->
+    <station id="shipyard_split_01" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_405_sector001_macro" />
+      <position  x="188010.406" z="36057.273" roll="0" pitch="0"/>
+      <station>
+        <select faction="split" tags="[shipyard]" />
+        <loadout>
+          <level exact="1.0" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="shipyard_split_warforge_01" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_405_sector001_macro" solitary="1"/>
+      <position  x="183900" z="-123400" roll="0" pitch="0" yaw="60"/>
+      <station constructionplan="spl_shipyard_warforge">
+        <select faction="split" tags="[shipyard]" />
+        <loadout>
+          <level exact="1.0" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="wharf_split_01" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_405_sector001_macro" />
+      <position x="-107418.086" z="-33812.773" pitch="0" roll="0"/>
+      <station>
+        <select faction="split" tags="[wharf]" />
+        <loadout>
+          <level exact="1.0" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="spl_defence_cluster_405_sector001" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone005_cluster_405_sector001_macro" />
+      <position  x="-18900" y="0" z="-11300" roll="0" pitch="0"/>
+      <station>
+        <select faction="split" tags="[defence]"/>
+        <loadout useplanloadout="true"/>
+      </station>
+    </station>
+
+    <station id="spl_hullparts_landmark" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_405_sector001_macro"/>
+      <station>
+        <select faction="split" tags="[hullpartslandmark]" />
+        <loadout>
+          <level exact="0.8" />
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Zyarth Dominon X -->
+    <station id="tradestation_split_01" race="split" owner="split" type="tradingstation">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_406_sector001_macro" />
+      <station>
+        <select faction="split" tags="[tradestation]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="spl_defence_cluster_406_sector001" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone003_cluster_406_sector001_macro" />
+      <position  x="-23300" y="0" z="350" roll="0" pitch="0"/>
+      <station>
+        <select faction="split" tags="[defence]"/>
+        <loadout useplanloadout="true"/>
+      </station>
+    </station>
+
+    <station id="spl_defence_cluster_406_sector001_2" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_406_sector001_macro" />
+      <position  x="-50770" y="0" z="18800" roll="0" pitch="0"/>
+      <station>
+        <select faction="split" tags="[defence]"/>
+        <loadout useplanloadout="true"/>
+      </station>
+    </station>
+
+    <!-- Family Nhuut -->
+    <station id="spl_defence_cluster_418_sector001" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_418_sector001_macro" />
+      <position  x="8000" y="0" z="-35600" roll="0" pitch="0"/>
+      <station>
+        <select faction="split" tags="[defence]"/>
+        <loadout useplanloadout="true"/>
+      </station>
+    </station>
+
+    <station id="spl_defence_cluster_418_sector001_2" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone004_cluster_418_sector001_macro" />
+      <position  x="13000" y="0" z="16300" roll="0" pitch="0"/>
+      <station>
+        <select faction="split" tags="[defence]"/>
+        <loadout useplanloadout="true"/>
+      </station>
+    </station>
+
+    <!--
+    <station id="spl_defence_cluster_418_sector001_3" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone002_cluster_418_sector001_macro" />
+      <position  x="10000" y="0" z="-500" roll="0" pitch="0"/>
+      <station>
+        <select faction="split" tags="[defence]"/>
+        <loadout useplanloadout="true"/>
+      </station>
+    </station>
+    -->
+
+    <!-- Free Families -->
+    <station id="shipyard_freesplit_01" race="split" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_411_sector001_macro" />
+      <position x="-162274.281" z="-93188.641" pitch="0" roll="0" />
+      <station>
+        <select faction="freesplit" tags="[shipyard]" />
+        <loadout>
+          <level exact="1.0" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="wharf_freesplit_01" race="split" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_411_sector001_macro" />
+      <position x="-31492.625" z="23097.979" pitch="0" roll="0" yaw="180" />
+      <station>
+        <select faction="freesplit" tags="[wharf]" />
+        <loadout>
+          <level exact="1.0" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="equipmentdock_freesplit_01" race="split" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_412_sector001_macro" />
+      <station>
+        <select faction="freesplit" tags="[equipmentdock]" />
+        <loadout>
+          <level exact="1.0" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="equipmentdock_freesplit_02" race="split" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_407_sector001_macro" />
+      <station>
+        <select faction="freesplit" tags="[equipmentdock]" />
+        <loadout>
+          <level exact="1.0" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="tradestation_freesplit_01" race="split" owner="freesplit" type="tradingstation">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_410_sector001_macro" />
+      <station>
+        <select faction="freesplit" tags="[tradestation]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="frf_defence_cluster_407_sector001" race="split" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_407_sector001_macro" />
+      <station>
+        <select faction="freesplit" tags="[defence]" />
+      </station>
+    </station>
+
+    <station id="frf_defence_cluster_408_sector001" race="split" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_408_sector001_macro" />
+      <station>
+        <select faction="freesplit" tags="[defence]" />
+      </station>
+    </station>
+
+    <station id="frf_defence_cluster_408_sector002" race="split" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_408_sector002_macro" />
+      <station>
+        <select faction="freesplit" tags="[defence]" />
+      </station>
+    </station>
+
+    <station id="frf_defence_cluster_409_sector001" race="split" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_409_sector001_macro" />
+      <station>
+        <select faction="freesplit" tags="[defence]" />
+      </station>
+    </station>
+
+    <station id="frf_defence_cluster_410_sector001" race="split" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_410_sector001_macro" />
+      <station>
+        <select faction="freesplit" tags="[defence]" />
+      </station>
+    </station>
+
+    <station id="frf_defence_cluster_411_sector001" race="split" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_411_sector001_macro" />
+      <station>
+        <select faction="freesplit" tags="[defence]" />
+      </station>
+    </station>
+
+    <station id="frf_defence_cluster_412_sector001" race="split" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_412_sector001_macro" />
+      <station>
+        <select faction="freesplit" tags="[defence]" />
+      </station>
+    </station>
+
+    <station id="frf_defence_cluster_421_sector001" race="split" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_421_sector001_macro" />
+      <station>
+        <select faction="freesplit" tags="[defence]" />
+      </station>
+    </station>
+
+    <!-- Argon -->
+    <station id="arg_defence_cluster_416_sector001" race="argon" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_416_sector001_macro" />
+      <station>
+        <select faction="argon" tags="[defence]" />
+      </station>
+    </station>
+    <station id="arg_defence_cluster_416_sector002" race="argon" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_416_sector002_macro" />
+      <station>
+        <select faction="argon" tags="[defence]" />
+      </station>
+    </station>
+    <station id="arg_wharf_cluster_416_sector002" race="argon" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_416_sector002_macro" />
+      <station>
+        <select faction="argon" tags="[wharf]" />
+        <loadout>
+          <level exact="1.0" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="arg_defence_cluster_417_sector001" race="argon" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_417_sector001_macro" />
+      <station>
+        <select faction="argon" tags="[defence]" />
+      </station>
+    </station>
+
+    <!-- Paranid -->
+    <station id="par_defence_cluster_423_sector001" race="paranid" owner="paranid" type="factory">
+      <quotas>
+        <!-- TWO defence stations here to slow down Xenon invasion -->
+        <quota galaxy="2" zone="2" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_423_sector001_macro" />
+      <station>
+        <select faction="paranid" tags="[defence]" />
+      </station>
+    </station>
+    <station id="par_defence_cluster_423_sector002" race="paranid" owner="paranid" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_423_sector002_macro" />
+      <station>
+        <select faction="paranid" tags="[defence]" />
+      </station>
+    </station>
+    <station id="par_defence_cluster_422_sector001" race="paranid" owner="paranid" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_422_sector001_macro" />
+      <station>
+        <select faction="paranid" tags="[defence]" />
+      </station>
+    </station>
+    <station id="par_wharf_cluster_422_sector001" race="paranid" owner="paranid" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_422_sector001_macro" />
+      <station>
+        <select faction="paranid" tags="[wharf]" />
+        <loadout>
+          <level exact="1.0" />
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Teladi -->
+    <station id="tel_dlc_split_ringstation_01" race="teladi" owner="teladi" type="tradingstation">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_419_sector001_macro" />
+      <position x="26284" y="13920" z="17982" roll="0" pitch="0"/>
+      <station ref="tradestation_tel_ring">
+        <loadout>
+          <level exact="1.0"/>
+        </loadout>
+      </station>
+    </station>
+    <station id="tel_defence_cluster_419_sector001" race="teladi" owner="teladi" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_419_sector001_macro" />
+      <station>
+        <select faction="teladi" tags="[defence]" />
+      </station>
+    </station>
+    <station id="tel_defence_cluster_420_sector001" race="teladi" owner="teladi" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_420_sector001_macro" />
+      <station>
+        <select faction="teladi" tags="[defence]" />
+      </station>
+    </station>
+
+    <!-- Xenon -->
+    <station id="xen_defence_cluster_413_sector001" race="xenon" owner="xenon" type="defence">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_413_sector001_macro" />
+      <station>
+        <select faction="xenon" tags="[defence]" />
+      </station>
+    </station>
+
+    <station id="xen_defence_cluster_414_sector001" race="xenon" owner="xenon" type="defence">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_414_sector001_macro" />
+      <station>
+        <select faction="xenon" tags="[defence]" />
+      </station>
+    </station>
+
+    <station id="xen_defence_cluster_415_sector001" race="xenon" owner="xenon" type="defence">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_415_sector001_macro" />
+      <station>
+        <select faction="xenon" tags="[defence]" />
+      </station>
+    </station>
+    <station id="shipyard_xenon_cluster_415" race="xenon" owner="xenon" type="shipyard">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_415_sector001_macro" />
+      <station>
+        <select faction="xenon" tags="[shipyard]" />
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+    <station id="wharf_xenon_cluster_415" race="xenon" owner="xenon" type="shipyard">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_415_sector001_macro" />
+      <station>
+        <select faction="xenon" tags="[wharf]" />
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <station id="xen_defence_cluster_424_sector001" race="xenon" owner="xenon" type="defence">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone003_cluster_424_sector001_macro" />
+      <station>
+        <select faction="xenon" tags="[defence]" />
+        <loadout>
+          <level exact="1.0" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="xen_defence_cluster_424_sector001_002" race="xenon" owner="xenon" type="defence">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone004_cluster_424_sector001_macro" />
+      <station>
+        <select faction="xenon" tags="[defence]" />
+        <loadout>
+          <level exact="1.0" />
+        </loadout>
+      </station>
+    </station>
+    
+    <station id="xen_defence_cluster_424_sector002" race="xenon" owner="xenon" type="defence">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone003_cluster_424_sector002_macro" />
+      <station>
+        <select faction="xenon" tags="[defence]" />
+      </station>
+    </station>
+    <station id="shipyard_xenon_cluster_424" race="xenon" owner="xenon" type="shipyard">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_424_sector002_macro" />
+      <station>
+        <select faction="xenon" tags="[shipyard]" />
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+    <station id="wharf_xenon_cluster_424" race="xenon" owner="xenon" type="shipyard">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_424_sector002_macro" />
+      <station>
+        <select faction="xenon" tags="[wharf]" />
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+  </add>
+
+  <add sel="/god/products">
+    <!-- Split (Family Zyarth) Economy -->
+    <product id="spl_advancedcomposites" ware="advancedcomposites" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="advancedcomposites" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_advancedelectronics" ware="advancedelectronics" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="4" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="advancedelectronics" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_antimattercells" ware="antimattercells" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="3" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <region ware="hydrogen" max="100000" />
+      </location>
+      <module>
+        <select ware="antimattercells" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_antimatterconverters" ware="antimatterconverters" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="antimatterconverters" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_cheltmeat" ware="cheltmeat" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="3" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.25" />
+      </location>
+      <module>
+        <select ware="cheltmeat" race="split"/>
+      </module>
+    </product>
+
+    <product id="spl_claytronics" ware="claytronics" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="7" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="claytronics" race="argon" />
+      </module>
+    </product>
+
+    <product id="spl_dronecomponents" ware="dronecomponents" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="dronecomponents" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_energycells" ware="energycells" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="10" sector="6" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.6" maxbound="false" />
+        <sunlight min="0.5" />
+      </location>
+      <module>
+        <select ware="energycells" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_engineparts" ware="engineparts" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="engineparts" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_fieldcoils" ware="fieldcoils" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="fieldcoils" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_graphene" ware="graphene" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="6" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <region ware="methane" max="100000" />
+      </location>
+      <module>
+        <select ware="graphene" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_hullparts" ware="hullparts" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="22" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="hullparts" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_medicalsupplies" ware="medicalsupplies" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="22" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="medicalsupplies" race="split"/>
+      </module>
+    </product>
+
+    <product id="spl_microchips" ware="microchips" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="8" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="microchips" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_missilecomponents" ware="missilecomponents" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="3" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="missilecomponents" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_plasmaconductors" ware="plasmaconductors" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="4" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.5" maxbound="false" />
+      </location>
+      <module>
+        <select ware="plasmaconductors" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_quantumtubes" ware="quantumtubes" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="4" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.5" maxbound="false" />
+      </location>
+      <module>
+        <select ware="quantumtubes" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_refinedmetals" ware="refinedmetals" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="8" sector="4" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <region ware="ore" max="160000" />
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="refinedmetals" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_scanningarrays" ware="scanningarrays" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.5" maxbound="false" />
+      </location>
+      <module>
+        <select ware="scanningarrays" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_scruffinfruits" ware="scruffinfruits" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="5" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.25" />
+      </location>
+      <module>
+        <select ware="scruffinfruits" race="split"/>
+      </module>
+    </product>
+
+    <product id="spl_shieldcomponents" ware="shieldcomponents" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="shieldcomponents" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_siliconwafers" ware="siliconwafers" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="6" sector="4" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <region ware="silicon" max="100000"/>
+        <economy max="0.5" maxbound="false" />
+      </location>
+      <module>
+        <select ware="siliconwafers" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_smartchips" ware="smartchips" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="8" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="smartchips" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_spices" ware="spices" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="6" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.25" />
+      </location>
+      <module>
+        <select ware="spices" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_superfluidcoolant" ware="superfluidcoolant" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <region ware="helium" max="100000" />
+      </location>
+      <module>
+        <select ware="superfluidcoolant" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_turretcomponents" ware="turretcomponents" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="turretcomponents" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_water" ware="water" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="4" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <region ware="ice" max="100000" />
+      </location>
+      <module>
+        <select ware="water" race="argon"/>
+      </module>
+    </product>
+
+    <product id="spl_weaponcomponents" ware="weaponcomponents" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="4" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="split" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="weaponcomponents" race="argon"/>
+      </module>
+    </product>
+
+    <!-- Split (Free Families) Economy -->
+    <product id="frf_advancedcomposites" ware="advancedcomposites" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="advancedcomposites" race="argon" />
+      </module>
+    </product>
+
+    <product id="frf_advancedelectronics" ware="advancedelectronics" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="3" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="advancedelectronics" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_antimattercells" ware="antimattercells" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="3" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <region ware="hydrogen" max="100000" />
+      </location>
+      <module>
+        <select ware="antimattercells" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_antimatterconverters" ware="antimatterconverters" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="antimatterconverters" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_cheltmeat" ware="cheltmeat" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="3" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.25" />
+      </location>
+      <module>
+        <select ware="cheltmeat" race="split"/>
+      </module>
+    </product>
+
+    <product id="frf_claytronics" ware="claytronics" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="7" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="claytronics" race="argon" />
+      </module>
+    </product>
+
+    <product id="frf_dronecomponents" ware="dronecomponents" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="dronecomponents" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_energycells" ware="energycells" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="10" sector="6" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.6" maxbound="false" />
+        <sunlight min="0.5" />
+      </location>
+      <module>
+        <select ware="energycells" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_engineparts" ware="engineparts" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="engineparts" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_fieldcoils" ware="fieldcoils" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="fieldcoils" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_graphene" ware="graphene" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="6" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <region ware="methane" max="100000" />
+      </location>
+      <module>
+        <select ware="graphene" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_hullparts" ware="hullparts" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="22" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="hullparts" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_medicalsupplies" ware="medicalsupplies" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="22" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="medicalsupplies" race="split"/>
+      </module>
+    </product>
+
+    <product id="frf_microchips" ware="microchips" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="8" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="microchips" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_missilecomponents" ware="missilecomponents" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="3" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="missilecomponents" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_plasmaconductors" ware="plasmaconductors" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="4" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.5" maxbound="false" />
+      </location>
+      <module>
+        <select ware="plasmaconductors" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_quantumtubes" ware="quantumtubes" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="4" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.5" maxbound="false" />
+      </location>
+      <module>
+        <select ware="quantumtubes" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_refinedmetals" ware="refinedmetals" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="6" sector="4" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <region ware="ore" max="100000" />
+        <economy max="0.5" maxbound="false" />
+      </location>
+      <module>
+        <select ware="refinedmetals" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_scanningarrays" ware="scanningarrays" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.5" maxbound="false" />
+      </location>
+      <module>
+        <select ware="scanningarrays" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_scruffinfruits" ware="scruffinfruits" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="5" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.25" />
+      </location>
+      <module>
+        <select ware="scruffinfruits" race="split"/>
+      </module>
+    </product>
+
+    <product id="frf_shieldcomponents" ware="shieldcomponents" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="shieldcomponents" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_siliconwafers" ware="siliconwafers" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="6" sector="4" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <region ware="silicon" max="100000"/>
+        <economy max="0.5" maxbound="false" />
+      </location>
+      <module>
+        <select ware="siliconwafers" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_smartchips" ware="smartchips" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="8" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="smartchips" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_spices" ware="spices" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="6" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.25" />
+      </location>
+      <module>
+        <select ware="spices" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_superfluidcoolant" ware="superfluidcoolant" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <region ware="helium" max="100000" />
+      </location>
+      <module>
+        <select ware="superfluidcoolant" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_turretcomponents" ware="turretcomponents" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="turretcomponents" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_water" ware="water" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="4" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <region ware="ice" max="100000" />
+      </location>
+      <module>
+        <select ware="water" race="argon"/>
+      </module>
+    </product>
+
+    <product id="frf_weaponcomponents" ware="weaponcomponents" owner="freesplit" type="factory">
+      <quotas>
+        <quota galaxy="4" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="freesplit" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="weaponcomponents" race="argon"/>
+      </module>
+    </product>
+
+    <!-- Argon DLC economy -->
+    <product id="arg_dlc_split_energycells" ware="energycells" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="3" sector="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="argon" relation="self" comparison="ge">
+        <economy max="0.6" maxbound="false" />
+        <sunlight min="0.5" />
+      </location>
+      <module>
+        <select ware="energycells" race="argon"/>
+      </module>
+    </product>
+
+    <product id="arg_dlc_split_foodrations" ware="foodrations" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="3" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="argon" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="foodrations" race="argon"/>
+      </module>
+    </product>
+
+    <product id="arg_dlc_split_meat" ware="meat" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="argon" relation="self" comparison="ge">
+        <economy max="0.25" />
+      </location>
+      <module>
+        <select ware="meat" race="argon"/>
+      </module>
+    </product>
+
+    <product id="arg_dlc_split_medicalsupplies" ware="medicalsupplies" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="5" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="argon" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="medicalsupplies" race="argon"/>
+      </module>
+    </product>
+
+    <product id="arg_dlc_split_spacefuel" ware="spacefuel" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <!-- in freesplit territory! -->
+      <location class="sector" macro="cluster_421_sector001_macro" solitary="true">
+        <economy max="0.5" maxbound="false" />
+      </location>
+      <module>
+        <select ware="spacefuel" race="argon"/>
+      </module>
+    </product>
+
+    <product id="arg_dlc_split_spices" ware="spices" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="argon" relation="self" comparison="ge">
+        <economy max="0.25" />
+      </location>
+      <module>
+        <select ware="spices" race="argon"/>
+      </module>
+    </product>
+
+    <product id="arg_dlc_split_water" ware="water" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="argon" relation="self" comparison="ge">
+        <region ware="ice" max="100000" />
+      </location>
+      <module>
+        <select ware="water" race="argon"/>
+      </module>
+    </product>
+
+    <product id="arg_dlc_split_wheat" ware="wheat" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="argon" relation="self" comparison="ge">
+        <economy max="0.25" />
+      </location>
+      <module>
+        <select ware="wheat" race="argon"/>
+      </module>
+    </product>
+
+    <!-- Paranid DLC economy -->
+    <product id="par_dlc_split_antimatterconverters" ware="antimatterconverters" owner="paranid" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="paranid" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="antimatterconverters" race="paranid"/>
+      </module>
+    </product>
+
+    <product id="par_dlc_split_energycells" ware="energycells" owner="paranid" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="paranid" relation="self" comparison="ge">
+        <sunlight min="0.6" />
+      </location>
+      <module>
+        <select ware="energycells" race="paranid"/>
+      </module>
+    </product>
+
+    <product id="par_dlc_split_engineparts" ware="engineparts" owner="paranid" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="paranid" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="engineparts" race="paranid"/>
+      </module>
+    </product>
+
+    <product id="par_dlc_split_hullparts" ware="hullparts" owner="paranid" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="paranid" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="hullparts" race="paranid"/>
+      </module>
+    </product>
+
+    <product id="par_dlc_split_shieldcomponents" ware="shieldcomponents" owner="paranid" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="paranid" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="shieldcomponents" race="paranid"/>
+      </module>
+    </product>
+
+    <product id="par_dlc_split_turretcomponents" ware="turretcomponents" owner="paranid" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="paranid" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="turretcomponents" race="paranid"/>
+      </module>
+    </product>
+
+    <product id="par_dlc_split_weaponcomponents" ware="weaponcomponents" owner="paranid" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="paranid" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="weaponcomponents" race="paranid"/>
+      </module>
+    </product>
+
+    <!-- Teladi DLC economy -->
+    <product id="tel_dlc_split_advancedelectronics" ware="advancedelectronics" owner="teladi" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="teladi" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="advancedelectronics" race="teladi"/>
+      </module>
+    </product>
+
+    <product id="tel_dlc_split_weaponcomponents" ware="weaponcomponents" owner="teladi" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="teladi" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="weaponcomponents" race="teladi"/>
+      </module>
+    </product>
+
+    <product id="tel_dlc_split_teladianium" ware="teladianium" owner="teladi" type="factory">
+      <quotas>
+        <quota galaxy="2" cluster="2"/>
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="[teladi]" relation="self" comparison="ge">
+        <region ware="ore" max="100000" />
+        <economy max="0.25" maxbound="false" />
+      </location>
+      <module>
+        <select ware="teladianium" race="teladi"/>
+      </module>
+    </product>
+
+    <product id="tel_dlc_split_siliconwafers" ware="siliconwafers" owner="teladi" type="factory">
+      <quotas>
+        <quota galaxy="2" cluster="2"/>
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="[teladi]" relation="self" comparison="ge">
+        <region ware="silicon" max="100000"/>
+        <economy max="0.25" maxbound="false" />
+      </location>
+      <module>
+        <select ware="siliconwafers" race="teladi"/>
+      </module>
+    </product>
+
+    <!-- Xenon DLC economy -->
+    <product id="xen_dlc_split_energycells" ware="energycells" owner="xenon" type="factory">
+      <quotas>
+        <quota galaxy="10" sector="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="xenon" relation="self" comparison="ge"/>
+      <module>
+        <select ware="energycells" race="xenon"/>
+      </module>
+    </product>
+
+  </add>
+
+  <add sel="/god/gamestart[@galaxy='timelines_map_mining_1_galaxy_macro']/stations">
+    <station id="scenario_mining_1to4_spl_equipment" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="timelines_map_mining_1_cluster_001_sector_001_macro" matchextension="false" />
+      <position  x="45000" y="0" z="110000" roll="0" pitch="0"/>
+      <station>
+        <select faction="split" tags="[equipmentdock]" />
+        <loadout>
+          <level exact="1.0" />
+        </loadout>
+      </station>
+    </station>
+  </add>
+
+
+  <!-- replace the argon-shipyard use for scenario1 with a split-shipyard -->
+  <replace sel="/god/gamestart[@ref='x4ep1_gamestart_tutorial1']/stations/station[@id='shipyard_argon_01']">
+    <station id="shipyard_split_01" race="split" owner="split" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="demo_cluster_40_sector001_macro" matchextension="false" />
+      <position x="76000" y="0" z="62000" pitch="0" roll="0" />
+      <station constructionplan="scenario1_split_shipyard"/>
+    </station>
+  </replace>
+
+</diff>

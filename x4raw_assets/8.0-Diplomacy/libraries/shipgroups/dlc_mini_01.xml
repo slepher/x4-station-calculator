@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<groups>
+  
+  <group name="par_expeditionary_l">
+    <select macro="ship_par_l_expeditionary_01_a_macro" weight="100"/>
+  </group>
+
+  <group name="hol_expeditionary_l">
+    <select macro="ship_par_l_expeditionary_01_a_macro" weight="100"/>
+  </group>
+
+  <group name="tri_expeditionary_l">
+    <select macro="ship_par_l_expeditionary_01_a_macro" weight="100"/>
+  </group>
+
+</groups>

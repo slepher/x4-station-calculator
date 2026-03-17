@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+  <add sel="/god/objects">
+    <object id="landmark_communication_facility_asteroid_xxl_01">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_730_sector001_macro" />
+      <position x="-151419.42" y="515" z="-155335.53" pitch="0" roll="0" yaw="170" safepos="false"/>
+      <object macro="env_asteroid_xenon_xxl_07_macro" />
+    </object>
+    <object id="landmark_communication_facility_asteroid_xxl_02">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_730_sector001_macro" />
+      <position x="-114623.2" y="800" z="-151516.45" pitch="0" roll="0" yaw="170" safepos="false"/>
+      <object macro="env_asteroid_xenon_xxl_07_macro" />
+    </object>
+    <object id="landmark_communication_facility_asteroid_xxl_03">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_730_sector001_macro" />
+      <position x="-115487.34" y="800" z="-146037.81" pitch="0" roll="0" yaw="-135" safepos="false"/>
+      <object macro="env_asteroid_xenon_xxl_07_macro" />
+    </object>
+    
+    <object id="landmark_communication_facility_asteroid_l_01">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_730_sector001_macro" />
+      <position x="-113370.33" y="0" z="-148532.94" pitch="0" roll="0" yaw="0" safepos="false"/>
+      <object macro="env_asteroid_xenon_l_02_macro" />
+    </object>
+    
+    <object id="landmark_communication_facility_asteroid_l_02">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_730_sector001_macro" />
+      <position x="-117300.91" y="0" z="-149184.41" pitch="0" roll="0" yaw="0" safepos="false"/>
+      <object macro="env_asteroid_xenon_l_02_macro" />
+    </object>
+    <object id="landmark_communication_facility_asteroid_l_03">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_730_sector001_macro" />
+      <position x="-121817.37" y="0" z="-150039.25" pitch="0" roll="0" yaw="0" safepos="false"/>
+      <object macro="env_asteroid_xenon_l_02_macro" />
+    </object>
+    <object id="landmark_communication_facility_asteroid_l_04">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_730_sector001_macro" />
+      <position x="-126186.68" y="0" z="-150800.91" pitch="0" roll="0" yaw="0" safepos="false"/>
+      <object macro="env_asteroid_xenon_l_02_macro" />
+    </object>
+    <object id="landmark_communication_facility_asteroid_l_05">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_730_sector001_macro" />
+      <position x="-130279.12" y="0" z="-151576.47" pitch="0" roll="0" yaw="0" safepos="false"/>
+      <object macro="env_asteroid_xenon_l_02_macro" />
+    </object>
+    <object id="landmark_communication_facility_asteroid_l_06">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_730_sector001_macro" />
+      <position x="-133802.7" y="0" z="-152152.8" pitch="0" roll="0" yaw="0" safepos="false"/>
+      <object macro="env_asteroid_xenon_l_02_macro" />
+    </object>
+    <object id="landmark_communication_facility_asteroid_l_07">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_730_sector001_macro" />
+      <position x="-138069.75" y="0" z="-152892.5" pitch="0" roll="0" yaw="0" safepos="false"/>
+      <object macro="env_asteroid_xenon_l_02_macro" />
+    </object>
+    <object id="landmark_communication_facility_asteroid_l_08">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_730_sector001_macro" />
+      <position x="-142086.55" y="0" z="-153607.45" pitch="0" roll="0" yaw="0" safepos="false"/>
+      <object macro="env_asteroid_xenon_l_02_macro" />
+    </object>
+    <object id="landmark_communication_facility_asteroid_l_09">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_730_sector001_macro" />
+      <position x="-145377.94" y="0" z="-154241.12" pitch="0" roll="0" yaw="0" safepos="false"/>
+      <object macro="env_asteroid_xenon_l_02_macro" />
+    </object>
+    <object id="landmark_communication_facility_asteroid_l_10">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_730_sector001_macro" />
+      <position x="-147938.55" y="0" z="-156171.83" pitch="0" roll="0" yaw="0" safepos="false"/>
+      <object macro="env_asteroid_xenon_l_02_macro" />
+    </object>
+    <object id="landmark_communication_facility_asteroid_l_11">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_730_sector001_macro" />
+      <position x="-148542.09" y="0" z="-158064.84" pitch="0" roll="0" yaw="0" safepos="false"/>
+      <object macro="env_asteroid_xenon_l_02_macro" />
+    </object>
+    <object id="landmark_communication_facility_asteroid_l_12">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_730_sector001_macro" />
+      <position x="-148507.47" y="0" z="-153155.19" pitch="0" roll="0" yaw="0" safepos="false"/>
+      <object macro="env_asteroid_xenon_l_02_macro" />
+    </object>
+    <object id="landmark_communication_facility_asteroid_l_13">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_730_sector001_macro" />
+      <position x="-149596.52" y="0" z="-151750.87" pitch="0" roll="0" yaw="0" safepos="false"/>
+      <object macro="env_asteroid_xenon_l_02_macro" />
+    </object>
+  </add>
+
+  <add sel="/god/stations">
+    <!-- Third Redemption -->
+    <station id="landmark_abandoned_communications_facility_730_01" race="paranid" owner="ownerless" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_730_sector001_macro" />
+      <position x="-132000" y="0" z="-151800" pitch="0" roll="0" yaw="170" safepos="false"/>
+      <station constructionplan="landmark_abandoned_communications_facility">
+      </station>
+    </station>
+  </add>
+
+  <!--
+  <add sel="/god/products">
+ 
+  </add>
+  -->
+</diff>

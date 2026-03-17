@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+  <add sel="//cue[@name='FactionLogicManagers']/cues">
+
+    <cue name="SetupTimelinesDLC" >
+      <actions>
+        <set_value name="md.$FactionData.{faction.kaori}" exact="table[]" />
+      </actions>
+    </cue>
+
+    <cue name="KaoriFactionLogic_GamestatTrigger" onfail="cancel">
+      <conditions>
+        <cue_is_complete cue="md.Setup_DLC_Timelines.Epilogue_Unlock"/>
+      </conditions>
+      <actions>
+        <signal_cue cue="KaoriFactionLogic" check="false"/>
+      </actions>
+    </cue>
+
+    <cue name="KaoriFactionLogic" comment="triggered when the gates open">
+      <conditions>
+        <event_cue_signalled/>
+      </conditions>
+      <cues>
+        <cue name="KaoriFactionLogic_Manager" ref="Manager">
+          <param name="Faction" value="faction.kaori"/>
+          <param name="BaseAggressionLevel" value="moodlevel.low"/>
+          <param name="BaseAvariceLevel" value="moodlevel.low"/>
+          <param name="BaseLawfulness" value="1.0"/>
+          <param name="PreferredHQSpaceMacro" value="[macro.cluster_703_sector001_macro]" comment="Mitsuno's sacrifice"/>
+          <param name="PreferredHQTypes" value="['tradestation', 'shipbuilding', 'equipmentdock', 'defensestation', 'any']"/>
+          <param name="SatelliteNetworkGoal" value="10"/>
+          <param name="LasertowerNetworkGoal" value="15"/>
+          <param name="MinefieldGoalPerSector" value="0" comment="[MGPS * Sectors, 12].min is the maximum amount of Minefields for this faction"/>
+          <param name="DebugChance" value="0"/>
+          <param name="DebugChance2" value="0"/>
+        </cue>
+      </cues>
+    </cue>
+
+  </add>
+</diff>

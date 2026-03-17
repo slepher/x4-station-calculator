@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Last exported: 22.09.2025 11:10:10-->
+<diff>
+  <add sel="/wares">
+    <ware id="engine_arg_m_corvette_01_mk1" name="{20107,9034}" description="{20107,9032}" group="engines" transport="equipment" volume="1" tags="engine equipment hiddenwithoutlicence onlyownerbuild">
+      <price min="203907" average="239890" max="275874" />
+      <production time="15" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="41" />
+          <ware ware="energycells" amount="450" />
+          <ware ware="engineparts" amount="79" />
+        </primary>
+      </production>
+      <component ref="engine_arg_m_corvette_01_mk1_macro" />
+      <icon video="engine_arg_m_corvette_01_mk1_video_macro" />
+      <restriction licence="envoy_access" />
+      <use threshold="0" />
+      <owner faction="argon" />
+    </ware>
+    <ware id="engine_arg_m_corvette_01_mk2" name="{20107,9054}" description="{20107,9052}" group="engines" transport="equipment" volume="1" tags="engine equipment hiddenwithoutlicence onlyownerbuild">
+      <price min="489379" average="575740" max="662101" />
+      <production time="15" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="98" />
+          <ware ware="energycells" amount="1080" />
+          <ware ware="engineparts" amount="190" />
+        </primary>
+      </production>
+      <component ref="engine_arg_m_corvette_01_mk2_macro" />
+      <icon video="engine_arg_m_corvette_01_mk2_video_macro" />
+      <restriction licence="envoy_access" />
+      <use threshold="0.7" />
+      <owner faction="argon" />
+    </ware>
+    <ware id="engine_tel_m_corvette_01_mk1" name="{20107,9044}" description="{20107,9042}" group="engines" transport="equipment" volume="1" tags="engine equipment hiddenwithoutlicence onlyownerbuild">
+      <price min="171139" average="201340" max="231541" />
+      <production time="15" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="34" />
+          <ware ware="energycells" amount="378" />
+          <ware ware="engineparts" amount="66" />
+        </primary>
+      </production>
+      <component ref="engine_tel_m_corvette_01_mk1_macro" />
+      <icon video="engine_tel_m_corvette_01_mk1_video_macro" />
+      <restriction licence="envoy_access" />
+      <use threshold="0" />
+      <owner faction="ministry" />
+      <owner faction="scaleplate" />
+    </ware>
+    <ware id="engine_tel_m_corvette_01_mk2" name="{20107,9064}" description="{20107,9062}" group="engines" transport="equipment" volume="1" tags="engine equipment hiddenwithoutlicence onlyownerbuild">
+      <price min="410729" average="483210" max="555692" />
+      <production time="15" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="82" />
+          <ware ware="energycells" amount="906" />
+          <ware ware="engineparts" amount="159" />
+        </primary>
+      </production>
+      <component ref="engine_tel_m_corvette_01_mk2_macro" />
+      <icon video="engine_tel_m_corvette_01_mk2_video_macro" />
+      <restriction licence="envoy_access" />
+      <use threshold="0.7" />
+      <owner faction="ministry" />
+    </ware>
+    <ware id="research_ship_gen_m_corvette_02" name="{20216,4001}" description="{20216,4002}" transport="research" volume="1" tags="nocustomgamestart research" sortorder="501">
+      <price min="1" average="1" max="1" />
+      <research time="780">
+        <primary>
+          <ware ware="energycells" amount="2450" />
+          <ware ware="smartchips" amount="850" />
+          <ware ware="superfluidcoolant" amount="244" />
+          <ware ware="teladianium" amount="348" />
+        </primary>
+      </research>
+    </ware>
+    <ware id="shield_gen_m_corvette_01_mk1" name="{20106,9034}" description="{20106,9032}" group="shields" transport="equipment" volume="1" tags="equipment hiddenwithoutlicence onlyownerbuild shield">
+      <price min="62350" average="73350" max="84355" />
+      <production time="20" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="70" />
+          <ware ware="fieldcoils" amount="13" />
+          <ware ware="shieldcomponents" amount="24" />
+        </primary>
+      </production>
+      <component ref="shield_gen_m_corvette_01_mk1_macro" />
+      <icon video="shield_gen_m_corvette_01_mk1_video_macro" />
+      <restriction licence="envoy_access" />
+      <use threshold="0" />
+      <owner faction="argon" />
+      <owner faction="ministry" />
+      <owner faction="scaleplate" />
+    </ware>
+    <ware id="ship_gen_m_corvette_01" name="{20101,123601}" description="{20101,123611}" transport="ship" volume="1" tags="hiddenwithoutlicence onlyownerbuild ship">
+      <price min="1083822" average="1275085" max="1466348" />
+      <production time="26" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="146" />
+          <ware ware="hullparts" amount="1209" />
+        </primary>
+      </production>
+      <component ref="ship_gen_m_corvette_01_macro" />
+      <restriction licence="envoy_access" />
+      <owner faction="argon" />
+      <owner faction="ministry" />
+    </ware>
+    <ware id="ship_gen_m_corvette_02" name="{20101,123701}" description="{20101,123711}" transport="ship" volume="1" tags="hiddenwithoutlicence nocustomgamestart nodiplomacyblueprint ship">
+      <price min="777444" average="914640" max="1051836" />
+      <production time="19" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="105" />
+          <ware ware="hullparts" amount="872" />
+        </primary>
+      </production>
+      <component ref="ship_gen_m_corvette_02_macro" />
+      <restriction licence="envoy_access" />
+      <owner faction="scaleplate" />
+    </ware>
+    <ware id="turret_gen_m_disabler_01_mk1" name="{20105,7044}" description="{20105,7042}" group="turrets" transport="equipment" volume="1" tags="equipment hiddenwithoutlicence onlyownerbuild turret">
+      <price min="10061" average="60363" max="67070" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="4" />
+          <ware ware="energycells" amount="126" />
+          <ware ware="turretcomponents" amount="15" />
+        </primary>
+      </production>
+      <component ref="turret_gen_m_disabler_01_mk1_macro" />
+      <restriction licence="envoy_access" />
+      <use threshold="0" />
+      <owner faction="ministry" />
+    </ware>
+    <ware id="turret_gen_m_gatling_01_mk1" name="{20105,7054}" description="{20105,7052}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="36999" average="41110" max="45221" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedcomposites" amount="2" />
+          <ware ware="energycells" amount="77" />
+          <ware ware="turretcomponents" amount="9" />
+        </primary>
+      </production>
+      <component ref="turret_gen_m_gatling_01_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="scaleplate" />
+    </ware>
+    <ware id="turret_gen_m_shieldpierce_01_mk1" name="{20105,7034}" description="{20105,7032}" group="turrets" transport="equipment" volume="1" tags="equipment hiddenwithoutlicence onlyownerbuild turret">
+      <price min="75456" average="83840" max="92224" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="5" />
+          <ware ware="energycells" amount="157" />
+          <ware ware="turretcomponents" amount="18" />
+        </primary>
+      </production>
+      <component ref="turret_gen_m_shieldpierce_01_mk1_macro" />
+      <restriction licence="envoy_access" />
+      <use threshold="0" />
+      <owner faction="argon" />
+    </ware>
+    <ware id="weapon_gen_m_disabler_01_mk1" name="{20105,2594}" description="{20105,2592}" group="weapons" transport="equipment" volume="1" tags="equipment hiddenwithoutlicence onlyownerbuild weapon">
+      <price min="399870" average="444300" max="488730" />
+      <production time="20" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="26" />
+          <ware ware="energycells" amount="833" />
+          <ware ware="weaponcomponents" amount="94" />
+        </primary>
+      </production>
+      <component ref="weapon_gen_m_disabler_01_mk1_macro" />
+      <restriction licence="envoy_access" />
+      <use threshold="0" />
+      <owner faction="ministry" />
+      <owner faction="scaleplate" />
+    </ware>
+    <ware id="weapon_gen_m_shieldpierce_01_mk1" name="{20105,2584}" description="{20105,2582}" group="weapons" transport="equipment" volume="1" tags="equipment hiddenwithoutlicence onlyownerbuild weapon">
+      <price min="300659" average="334065" max="334065" />
+      <production time="20" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="20" />
+          <ware ware="energycells" amount="626" />
+          <ware ware="turretcomponents" amount="70" />
+        </primary>
+      </production>
+      <component ref="weapon_gen_m_shieldpierce_01_mk1_macro" />
+      <restriction licence="envoy_access" />
+      <use threshold="0" />
+      <owner faction="argon" />
+    </ware>
+  </add>
+  <add sel="/wares/ware[@id='engine_arg_m_corvette_01_mk1']" if="/wares/production/method[@id='closedloop']" silent="1">
+    <production time="15" amount="1" method="closedloop" name="{20206,1201}">
+      <primary>
+        <ware ware="claytronics" amount="10" />
+        <ware ware="energycells" amount="197" />
+        <ware ware="hullparts" amount="60" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='engine_arg_m_corvette_01_mk2']" if="/wares/production/method[@id='closedloop']" silent="1">
+    <production time="15" amount="1" method="closedloop" name="{20206,1201}">
+      <primary>
+        <ware ware="claytronics" amount="25" />
+        <ware ware="energycells" amount="341" />
+        <ware ware="hullparts" amount="144" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='engine_tel_m_corvette_01_mk1']" if="/wares/production/method[@id='closedloop']" silent="1">
+    <production time="15" amount="1" method="closedloop" name="{20206,1201}">
+      <primary>
+        <ware ware="claytronics" amount="8" />
+        <ware ware="energycells" amount="208" />
+        <ware ware="hullparts" amount="50" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='engine_tel_m_corvette_01_mk2']" if="/wares/production/method[@id='closedloop']" silent="1">
+    <production time="15" amount="1" method="closedloop" name="{20206,1201}">
+      <primary>
+        <ware ware="claytronics" amount="21" />
+        <ware ware="energycells" amount="271" />
+        <ware ware="hullparts" amount="121" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='shield_gen_m_corvette_01_mk1']" if="/wares/production/method[@id='closedloop']" silent="1">
+    <production time="20" amount="1" method="closedloop" name="{20206,1201}">
+      <primary>
+        <ware ware="claytronics" amount="3" />
+        <ware ware="energycells" amount="69" />
+        <ware ware="hullparts" amount="18" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='ship_gen_m_corvette_01']" if="/wares/production/method[@id='closedloop']" silent="1">
+    <production time="26" amount="1" method="closedloop" name="{20206,1201}">
+      <primary>
+        <ware ware="claytronics" amount="75" />
+        <ware ware="energycells" amount="798" />
+        <ware ware="hullparts" amount="427" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='ship_gen_m_corvette_02']" if="/wares/production/method[@id='closedloop']" silent="1">
+    <production time="19" amount="1" method="closedloop" name="{20206,1201}">
+      <primary>
+        <ware ware="claytronics" amount="54" />
+        <ware ware="energycells" amount="587" />
+        <ware ware="hullparts" amount="308" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='turret_gen_m_disabler_01_mk1']" if="/wares/production/method[@id='closedloop']" silent="1">
+    <production time="10" amount="1" method="closedloop" name="{20206,1201}">
+      <primary>
+        <ware ware="claytronics" amount="2" />
+        <ware ware="energycells" amount="158" />
+        <ware ware="hullparts" amount="17" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='turret_gen_m_gatling_01_mk1']" if="/wares/production/method[@id='closedloop']" silent="1">
+    <production time="10" amount="1" method="closedloop" name="{20206,1201}">
+      <primary>
+        <ware ware="claytronics" amount="1" />
+        <ware ware="energycells" amount="79" />
+        <ware ware="hullparts" amount="7" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='turret_gen_m_shieldpierce_01_mk1']" if="/wares/production/method[@id='closedloop']" silent="1">
+    <production time="10" amount="1" method="closedloop" name="{20206,1201}">
+      <primary>
+        <ware ware="claytronics" amount="3" />
+        <ware ware="energycells" amount="137" />
+        <ware ware="hullparts" amount="20" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_disabler_01_mk1']" if="/wares/production/method[@id='closedloop']" silent="1">
+    <production time="20" amount="1" method="closedloop" name="{20206,1201}">
+      <primary>
+        <ware ware="claytronics" amount="19" />
+        <ware ware="energycells" amount="283" />
+        <ware ware="hullparts" amount="111" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_shieldpierce_01_mk1']" if="/wares/production/method[@id='closedloop']" silent="1">
+    <production time="20" amount="1" method="closedloop" name="{20206,1201}">
+      <primary>
+        <ware ware="claytronics" amount="14" />
+        <ware ware="energycells" amount="232" />
+        <ware ware="hullparts" amount="82" />
+      </primary>
+    </production>
+  </add>
+</diff>

@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+<macros>
+  <macro name="Cluster_701_macro" class="cluster">
+    <component ref="standardcluster" />
+    <connections>
+      <connection name="Cluster_701_Sector001_connection" ref="sectors">
+        <macro ref="Cluster_701_Sector001_macro" connection="cluster" />
+      </connection>
+      <connection name="C701S01_Region01_connection" ref="regions">
+        <offset>
+          <position x="0" y="-20000" z="0" />
+        </offset>
+        <macro name="region01_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_701_sector_001" />
+          </properties>
+        </macro>
+      </connection>
+      <connection ref="content">
+        <macro>
+          <component ref="cluster_701_v1" connection="space" />
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_702_macro" class="cluster">
+    <component ref="standardcluster" />
+    <connections>
+      <connection name="Cluster_702_Sector001_connection" ref="sectors">
+        <macro ref="Cluster_702_Sector001_macro" connection="cluster" />
+      </connection>
+      
+      <connection name="C702S01_Region01_connection" ref="regions">
+        <offset>
+          <position x="80000" y="-20000" z="80000" />
+        </offset>
+        <macro name="region01_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_702_sector_001_nebula_1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C702S01_Region02_connection" ref="regions">
+        <offset>
+          <position x="-140000" y="-20000" z="-180000" />
+        </offset>
+        <macro name="region03_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_702_sector_001_nebula_2" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C702S01_Region06_connection" ref="regions">
+        <offset>
+          <position x="0" y="-20000" z="0" />
+        </offset>
+        <macro name="region06_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_702_sector_001_nebula_3" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C702S01_Region03_connection" ref="regions">
+        <offset>
+          <position x="80000" y="-10000" z="80000" />
+        </offset>
+        <macro name="region03_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_702_sector_001_asteroids_1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C702S01_Region04_connection" ref="regions">
+        <offset>
+          <position x="-140000" y="-10000" z="-180000" />
+        </offset>
+        <macro name="region04_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_702_sector_001_asteroids_2" />
+          </properties>
+        </macro>
+      </connection>
+      
+      <connection ref="content">
+        <macro>
+          <component ref="cluster_702_v1" connection="space" />
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_703_macro" class="cluster">
+    <component ref="standardcluster" />
+    <connections>
+      <connection name="Cluster_703_Sector001_connection" ref="sectors">
+        <macro ref="Cluster_703_Sector001_macro" connection="cluster" />
+      </connection>
+      <connection name="C703S01_Region01_connection" ref="regions">
+        <offset>
+          <position x="0" y="-20000" z="0" />
+        </offset>
+        <macro name="region01_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_703_sector_001_nebula_1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C703S01_Region02_connection" ref="regions">
+        <offset>
+          <position x="-120000" y="-10000" z="-50000" />
+        </offset>
+        <macro name="region02_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_703_sector_001_asteroids_1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection ref="content">
+        <macro>
+          <component ref="cluster_703_v1" connection="space" />
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_705_macro" class="cluster">
+    <component ref="standardcluster" />
+    <connections>
+      <connection name="Cluster_705_Sector001_connection" ref="sectors">
+        <macro ref="Cluster_705_Sector001_macro" connection="cluster" />
+      </connection>
+      <connection name="C705S01_Region01_connection" ref="regions">
+        <offset>
+          <position x="-50000" y="-10000" z="160000" />
+        </offset>
+        <macro name="region01_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_705_sector_001_asteroids_1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C705S01_Region02_connection" ref="regions">
+        <offset>
+          <position x="-150000" y="-15000" z="-100000" />
+        </offset>
+        <macro name="region02_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_705_sector_001_asteroids_2" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C705S01_Region03_connection" ref="regions">
+        <offset>
+          <position x="100000" y="-10000" z="-130000" />
+        </offset>
+        <macro name="region03_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_705_sector_001_asteroids_3" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C705S01_Region04_connection" ref="regions">
+        <offset>
+          <position x="0" y="-20000" z="0" />
+        </offset>
+        <macro name="region04_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_705_sector_001_nebula_1" />
+          </properties>
+        </macro>
+      </connection>
+
+      <connection ref="content">
+        <macro>
+          <component ref="cluster_705_v1" connection="space" />
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_706_macro" class="cluster">
+    <component ref="standardcluster" />
+    <connections>
+      <connection name="Cluster_706_Sector001_connection" ref="sectors">
+        <macro ref="Cluster_706_Sector001_macro" connection="cluster" />
+      </connection>
+         <connection name="C706S01_Region01_connection" ref="regions">
+        <offset>
+          <position x="15000" y="-15000" z="80000" />
+        </offset>
+        <macro name="region01_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_706_sector_001_asteroids_1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection ref="content">
+        <macro>
+          <component ref="cluster_706_v2" connection="space" />
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_704_macro" class="cluster">
+    <component ref="standardcluster" />
+    <connections>
+      <connection name="Cluster_704_Sector001_connection" ref="sectors">
+        <macro ref="Cluster_704_Sector001_macro" connection="cluster" />
+      </connection>
+      <connection ref="content">
+        <macro>
+          <component ref="cluster_704_v1" connection="space" />
+        </macro>
+      </connection>
+      <connection name="C704S01_Region01_connection" ref="regions">
+        <offset>
+          <position x="-150000" y="-30000" z="-200000" />
+        </offset>
+        <macro name="region01_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_704_sector_001_asteroids_1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C704S01_Region02_connection" ref="regions">
+        <offset>
+          <position x="150000" y="-30000" z="-150000" />
+        </offset>
+        <macro name="region02_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_704_sector_001_asteroids_2" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C704S01_Region03_connection" ref="regions">
+        <offset>
+          <position x="150000" y="-20000" z="-150000" />
+        </offset>
+        <macro name="region03_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_704_sector_001_nebula_1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C704S01_Region04_connection" ref="regions">
+        <offset>
+          <position x="-150000" y="-20000" z="-200000" />
+        </offset>
+        <macro name="region04_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_704_sector_001_nebula_1" />
+          </properties>
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_708_macro" class="cluster">
+    <component ref="standardcluster" />
+    <connections>
+      <connection name="Cluster_708_Sector001_connection" ref="sectors">
+        <macro ref="Cluster_708_Sector001_macro" connection="cluster" />
+      </connection>
+        <connection name="C708S01_Region01_connection" ref="regions">
+        <offset>
+          <position x="-50000" y="-15000" z="-20000" />
+        </offset>
+        <macro name="region01_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_708_sector_001_asteroids_1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C708S01_Region02_connection" ref="regions">
+        <offset>
+          <position x="0" y="0" z="0" />
+        </offset>
+        <macro name="region02_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_708_sector_001_nebula_1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C708S01_Region03_connection" ref="regions">
+        <offset>
+          <position x="0" y="0" z="0" />
+        </offset>
+        <macro name="region03_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_708_sector_001_scrap_1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection ref="content">
+        <macro>
+          <component ref="cluster_708_v1" connection="space" />
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+</macros>

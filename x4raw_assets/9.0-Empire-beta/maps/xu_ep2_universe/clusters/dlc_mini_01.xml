@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<macros>
+  <macro name="Cluster_730_macro" class="cluster">
+    <component ref="standardcluster" />
+    <connections>
+      <connection name="Cluster_730_Sector001_connection" ref="sectors">
+        <macro ref="Cluster_730_Sector001_macro" connection="cluster" />
+      </connection>
+      <connection name="C7300S01_Region01_connection" ref="regions">
+        <offset>
+          <position x="-2000" y="0" z="-66000" />
+        </offset>
+        <macro name="region01_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_730_sector_001_nebula_1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C7300S01_Region02_connection" ref="regions">
+        <offset>
+          <position x="0" y="0" z="-1500" />
+        </offset>
+        <macro name="region02_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_730_sector_001_asteroids_1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C7300S01_Region03_connection" ref="regions">
+        <macro name="region03_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="audioregion_cluster_730_sector_001" />
+          </properties>
+        </macro>
+      </connection>
+      <connection ref="content">
+        <macro>
+          <component ref="cluster_730_v2" connection="space" />
+        </macro>
+      </connection>
+      <connection name="C7300S01_Region04_connection" ref="regions">
+        <offset>
+          <position x="-2000" y="0" z="-66000" />
+        </offset>
+        <macro name="region04_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_730_sector_001_nebula_2" />
+          </properties>
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+</macros>

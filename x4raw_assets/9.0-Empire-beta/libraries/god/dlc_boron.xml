@@ -1,0 +1,902 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+  <add sel="/god/stations">
+
+    <!-- Boron -->
+    <!-- Watchful Gaze -->
+
+    <!-- Barren Shores -->
+    <station id="boron_defence_602_001" race="boron" owner="boron" type="factory" >
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="zone" macro="zone003_cluster_602_sector001_macro" />
+      <position  x="15730" y="0" z="10000" roll="0" pitch="0"/>
+      <station>
+        <select faction="boron" tags="[defence]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="boron_trade_602_001" race="boron" owner="boron" type="tradingstation">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_602_sector001_macro" />
+      <position  x="-45000" y="0" z="50500" roll="0" pitch="0"/>
+      <station>
+        <select faction="boron" tags="[tradestation]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+    
+    <!-- Great Reef -->
+    <station id="boron_defence_603_001" race="boron" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="zone" macro="zone004_cluster_603_sector001_macro" />
+      <position  x="3000" y="0" z="21000" roll="0" pitch="0"/>
+      <station>
+        <select faction="boron" tags="[defence]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="boron_wharf_603_001" race="boron" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_603_sector001_macro" />
+      <position x="-55700" z="12700" pitch="0" roll="0"/>
+      <station>
+        <select faction="boron" tags="[wharf]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Oscean of Fantasy -->
+    <station id="boron_trade_604_001" race="boron" owner="boron" type="tradingstation">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_604_sector001_macro" />
+      <position  x="2000" y="0" z="-43100" roll="0" pitch="0"/>
+      <station>
+        <select faction="boron" tags="[tradestation]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Sanctuary of Darkness -->
+
+    <!-- Towering Wave (Kingdom End) -->
+    <station id="boron_defence_606_003" race="boron" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="zone" macro="zone002_cluster_606_sector003_macro" />
+      <position  x="-17100" y="0" z="-22800" roll="0" pitch="0"/>
+      <station>
+        <select faction="boron" tags="[defence]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="boron_tradingport_606_003" race="boron" owner="boron" type="tradingstation" respawnable="true">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_606_sector003_macro" />
+      <position  x="-19250" y="0" z="-10350" roll="0" pitch="0" yaw="-60"/>
+      <station>
+        <select faction="boron" tags="[tradestation_port]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Reflected Stars (Kingdom End) -->
+    <station id="boron_defence_606_002" race="boron" owner="boron" type="factory" respawnable="true">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="zone" macro="zone003_cluster_606_sector002_macro" />
+      <position  x="16450" y="0" z="25800" roll="0" pitch="0" yaw="0"/>
+      <station>
+        <select faction="boron" tags="[defence]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="boron_alliancehub_606_002" race="boron" owner="boron" type="tradingstation" respawnable="true">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="zone" macro="zone005_cluster_606_sector002_macro" />
+      <position  x="2865" y="0" z="6800" roll="0" pitch="0" yaw="55"/>
+      <station>
+        <select faction="boron" tags="[tradestation_alliancehub]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Kingdom End I (Kingdom End) -->
+    <station id="boron_defence_606_001" race="boron" owner="boron" type="factory" respawnable="true">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="zone" macro="zone002_cluster_606_sector001_macro" />
+      <position  x="-35300" y="0" z="-35000" roll="0" pitch="0"/>
+      <station>
+        <select faction="boron" tags="[defence]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="boron_wharf_606_001" race="boron" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_606_sector001_macro" />
+      <position x="54300" z="-81500" pitch="0" roll="0"/>
+      <station>
+        <select faction="boron" tags="[wharf]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="boron_shipyard_606_001" race="boron" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone005_cluster_606_sector001_macro" />
+      <position x="-26450" z="16700" pitch="0" roll="0"/>
+      <station>
+        <select faction="boron" tags="[shipyard]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="boron_orbitalmooring_606_001" race="boron" owner="boron" type="tradingstation">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_606_sector001_macro" />
+      <position  x="-17200" y="1000" z="-17800" pitch="0" roll="0" yaw="-62"/>
+      <station>
+        <select faction="boron" tags="[tradestation_mooring]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Rolk's Demise -->
+    <station id="boron_defence_607_001" race="boron" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="zone" macro="zone005_cluster_607_sector001_macro" />
+      <position  x="-19250" y="0" z="4100" roll="0" pitch="0"/>
+      <station>
+        <select faction="boron" tags="[defence]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="boron_supplyquay_607_001" race="boron" owner="boron" type="tradingstation">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_607_sector001_macro" />
+      <position  x="-79000" y="0" z="32300" roll="0" pitch="0"/>
+      <station>
+        <select faction="boron" tags="[tradestation_quay]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Atreus' Clouds -->
+    <station id="boron_defence_608_001" race="boron" owner="boron" type="factory" respawnable="true">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_608_sector001_macro" />
+      <position  x="-80000" y="0" z="14200" roll="0" pitch="0" yaw="45"/>
+      <station>
+        <select faction="boron" tags="[defence]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+    
+    <station id="boron_logisticsharbour_608_001" race="boron" owner="boron" type="tradingstation" respawnable="true">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="zone" macro="zone005_cluster_608_sector001_macro" />
+      <position  x="-18300" y="0" z="18350" roll="0" pitch="0" yaw="0"/>
+      <station>
+        <select faction="boron" tags="[tradestation_harbour]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Menelaus' Oasis -->
+    <station id="boron_defence_609_001" race="boron" owner="boron" type="factory" respawnable="true">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_609_sector001_macro" />
+      <position  x="25000" y="0" z="43000" roll="0" pitch="0"/>
+      <station>
+        <select faction="boron" tags="[defence]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="boron_equipment_609_001" race="boron" owner="boron" type="factory" respawnable="true">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="zone" macro="zone005_cluster_609_sector001_macro" />
+      <position  x="16400" y="0" z="2300" roll="0" pitch="0"/>
+      <station>
+        <select faction="boron" tags="[equipmentdock]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="boron_supplyreservoir_609_001" race="boron" owner="boron" type="tradingstation" respawnable="true">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="zone" macro="zone005_cluster_609_sector001_macro" />
+      <position  x="-25000" y="0" z="-5200" roll="0" pitch="0" yaw="0"/>
+      <station>
+        <select faction="boron" tags="[tradestation_reservoir]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <!-- 9.00 -->
+    <!-- Khaak Scrap Stations -->
+    <station id="bor_khaakscrap_01" race="boron" owner="boron" type="factory" startactive="false">
+      <quotas>
+        <quota galaxy="1"/>
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy max="0.50" />
+      </location>
+      <station constructionplan="bor_khaakscrap_processor">
+        <loadout>
+          <level exact="0.7"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Boron God gamestart player HQ -->
+    <station id="gs_boron2_hq" race="boron" owner="civilian" type="headquarters">
+      <quotas>
+        <quota galaxy="1" zone="1" gamestart="x4ep1_gamestart_boron2" />
+      </quotas>
+      <location class="sector" macro="cluster_31_sector001_macro" matchextension="false"/>
+      <position x="-3335" y="0" z="67904" pitch="0" roll="0" yaw="0" />
+      <station constructionplan="'x4ep1_playerheadquarters_with_dock'">
+        <loadout>
+          <level exact="0.2" />
+        </loadout>
+      </station>
+    </station>
+  </add>
+
+  <add sel="/god/products">
+    <product id="bor_advancedcomposites" ware="advancedcomposites" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="4" sector="2"/>
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="advancedcomposites" race="boron"/>
+      </module>
+    </product>
+
+    <station id="bor_advancedcomposites_prefab_03_01" ware="advancedcomposites" owner="boron" type="factory" priority="55">
+      <quotas>
+        <quota galaxy="2" sector="1"/>
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.75" maxbound="false" />
+      </location>
+      <station constructionplan="bor_advancedcomposites_prefab_03">
+        <stage min="1" max="3"/>
+        <loadout>
+          <level exact="0.7"/>
+        </loadout>
+      </station>
+    </station>
+
+    <product id="bor_advancedelectronics" ware="advancedelectronics" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="advancedelectronics" race="boron"/>
+      </module>
+    </product>
+
+    <product id="bor_antimattercells" ware="antimattercells" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <region ware="hydrogen" max="5000" />
+      </location>
+      <module>
+        <select ware="antimattercells" race="boron"/>
+      </module>
+    </product>
+
+    <station id="bor_antimattercells_prefab_04_01" ware="antimattercells" owner="boron" type="factory" priority="55">
+      <quotas>
+        <quota galaxy="1"/>
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.75" maxbound="false" />
+      </location>
+      <station constructionplan="bor_antimattercells_prefab_04">
+        <stage min="1" max="2"/>
+        <loadout>
+          <level exact="0.7"/>
+        </loadout>
+      </station>
+    </station>
+
+    <product id="bor_antimatterconverters" ware="antimatterconverters" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="antimatterconverters" race="boron"/>
+      </module>
+    </product>
+
+    <product id="bor_claytronics" ware="claytronics" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="6" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="claytronics" race="boron" />
+      </module>
+    </product>
+
+    <station id="bor_claytronics_prefab_04_01" ware="claytronics" owner="boron" type="factory" priority="55">
+      <quotas>
+        <quota galaxy="1"/>
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.75" maxbound="false" />
+      </location>
+      <station constructionplan="bor_claytronics_prefab_04">
+        <stage min="1" max="4"/>
+        <loadout>
+          <level exact="0.7"/>
+        </loadout>
+      </station>
+    </station>
+
+    <product id="bor_dronecomponents" ware="dronecomponents" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="dronecomponents" race="boron"/>
+      </module>
+    </product>
+
+    <product id="bor_energycells" ware="energycells" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="6" cluster="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge" >
+        <economy max="0.5" maxbound="false" />
+        <sunlight min="1" />
+      </location>
+      <module>
+        <select ware="energycells" race="boron"/>
+      </module>
+    </product>
+
+    <station id="bor_energycells_prefab_04_01" ware="energycells" owner="boron" type="factory" priority="55">
+      <quotas>
+        <quota galaxy="1"/>
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.50" maxbound="false" />
+        <sunlight min="1" />
+      </location>
+      <station constructionplan="bor_energycells_prefab_04">
+        <stage min="2" max="4"/>
+        <loadout>
+          <level exact="0.7"/>
+        </loadout>
+      </station>
+    </station>
+
+    <product id="bor_engineparts" ware="engineparts" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="engineparts" race="boron"/>
+      </module>
+    </product>
+
+    <product id="bor_fieldcoils" ware="fieldcoils" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="fieldcoils" race="boron"/>
+      </module>
+    </product>
+
+    <product id="bor_bofu" ware="bofu" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="6" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.5" maxbound="false" />
+      </location>
+      <module>
+        <select ware="bofu" race="boron"/>
+      </module>
+    </product>
+
+    <station id="bor_bofu_prefab_06_01" ware="bofu" owner="boron" type="factory" priority="55">
+      <quotas>
+        <quota galaxy="1"/>
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.50" maxbound="false" />
+      </location>
+      <station constructionplan="bor_bofu_prefab_06">
+        <stage min="1" max="4"/>
+        <loadout>
+          <level exact="0.7"/>
+        </loadout>
+      </station>
+    </station>
+
+    <product id="bor_graphene" ware="graphene" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="5" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <region ware="methane" max="5000" />
+      </location>
+      <module>
+        <select ware="graphene" race="boron"/>
+      </module>
+    </product>
+
+    <station id="bor_graphene_prefab_04_01" ware="graphene" owner="boron" type="factory" priority="55">
+      <quotas>
+        <quota galaxy="1"/>
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <region ware="methane" max="5000" />
+      </location>
+      <station constructionplan="bor_graphene_prefab_04">
+        <stage min="1" max="4"/>
+        <loadout>
+          <level exact="0.7"/>
+        </loadout>
+      </station>
+    </station>
+
+    <product id="bor_hullparts" ware="hullparts" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="18" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="hullparts" race="boron"/>
+      </module>
+    </product>
+
+    <station id="bor_hullparts_prefab_08_01" ware="hullparts" owner="boron" type="factory" priority="55">
+      <quotas>
+        <quota galaxy="2" sector="1"/>
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.75" maxbound="false" />
+      </location>
+      <station constructionplan="bor_hullparts_prefab_08">
+        <stage min="4" max="8"/>
+        <loadout>
+          <level exact="0.7"/>
+        </loadout>
+      </station>
+    </station>
+
+    <product id="bor_bogas" ware="bogas" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="2" cluster="1"/>
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.5" maxbound="false" />
+      </location>
+      <module>
+        <select ware="bogas" race="boron"/>
+      </module>
+    </product>
+
+    <product id="bor_medicalsupplies" ware="medicalsupplies" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="14" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.5" maxbound="false" />
+      </location>
+      <module>
+        <select ware="medicalsupplies" race="boron"/>
+      </module>
+    </product>
+
+    <station id="bor_medicalsupplies_prefab_08_01" ware="medicalsupplies" owner="boron" type="factory" priority="55">
+      <quotas>
+        <quota galaxy="2" sector="1"/>
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.75" maxbound="false" />
+      </location>
+      <station constructionplan="bor_medicalsupplies_prefab_08">
+        <stage min="4" max="8"/>
+        <loadout>
+          <level exact="0.7"/>
+        </loadout>
+      </station>
+    </station>
+
+    <product id="bor_microchips" ware="microchips" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="4" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="microchips" race="boron"/>
+      </module>
+    </product>
+
+    <product id="bor_missilecomponents" ware="missilecomponents" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="missilecomponents" race="boron"/>
+      </module>
+    </product>
+
+    <product id="bor_plasmaconductors" ware="plasmaconductors" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="8" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy max="0.5" maxbound="false" />
+      </location>
+      <module>
+        <select ware="plasmaconductors" race="boron"/>
+      </module>
+    </product>
+
+    <station id="bor_plasmaconductors_prefab_04_01" ware="plasmaconductors" owner="boron" type="factory" priority="55">
+      <quotas>
+        <quota galaxy="2" sector="1"/>
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.5" max="0.75" maxbound="false" />
+      </location>
+      <station constructionplan="bor_plasmaconductors_prefab_04">
+        <stage min="2" max="4"/>
+        <loadout>
+          <level exact="0.7"/>
+        </loadout>
+      </station>
+    </station>
+
+    <product id="bor_quantumtubes" ware="quantumtubes" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.5" maxbound="false" />
+      </location>
+      <module>
+        <select ware="quantumtubes" race="boron"/>
+      </module>
+    </product>
+
+    <product id="bor_refinedmetals" ware="refinedmetals" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="6" sector="3" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <region ware="ore" max="5000" />
+        <economy max="0.25" maxbound="false" />
+      </location>
+      <module>
+        <select ware="refinedmetals" race="boron"/>
+      </module>
+    </product>
+
+    <station id="bor_refinedmetals_prefab_03_01" ware="refinedmetals" owner="boron" type="factory" priority="55">
+      <quotas>
+        <quota galaxy="2" sector="1"/>
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <region ware="ore" max="5000" />
+        <economy max="0.50" maxbound="false" />
+      </location>
+      <station constructionplan="bor_refinedmetals_prefab_03">
+        <stage min="1" max="3"/>
+        <loadout>
+          <level exact="0.7"/>
+        </loadout>
+      </station>
+    </station>
+
+    <product id="bor_scanningarrays" ware="scanningarrays" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy max="0.5" maxbound="false" />
+      </location>
+      <module>
+        <select ware="scanningarrays" race="boron"/>
+      </module>
+    </product>
+
+    <product id="bor_shieldcomponents" ware="shieldcomponents" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="shieldcomponents" race="boron"/>
+      </module>
+    </product>
+
+    <product id="bor_siliconwafers" ware="siliconwafers" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="3" sector="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <region ware="silicon" max="5000"/>
+        <economy max="0.25" maxbound="false" />
+      </location>
+      <module>
+        <select ware="siliconwafers" race="boron"/>
+      </module>
+    </product>
+
+    <product id="bor_smartchips" ware="smartchips" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="4" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="smartchips" race="boron"/>
+      </module>
+    </product>
+
+    <product id="bor_superfluidcoolant" ware="superfluidcoolant" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <region ware="helium" max="5000" />
+      </location>
+      <module>
+        <select ware="superfluidcoolant" race="boron"/>
+      </module>
+    </product>
+
+    <station id="bor_superfluidcoolant_prefab_03_01" ware="superfluidcoolant" owner="boron" type="factory" priority="55">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <region ware="helium" max="5000" />
+      </location>
+      <station constructionplan="bor_superfluidcoolant_prefab_03">
+        <stage min="1" max="3"/>
+        <loadout>
+          <level exact="0.7"/>
+        </loadout>
+      </station>
+    </station>
+
+    <product id="bor_turretcomponents" ware="turretcomponents" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="turretcomponents" race="boron"/>
+      </module>
+    </product>
+
+    <product id="bor_water" ware="water" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="4" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <region ware="ice" max="5000" />
+      </location>
+      <module>
+        <select ware="water" race="boron"/>
+      </module>
+    </product>
+
+    <station id="bor_water_prefab_03_01" ware="water" owner="boron" type="factory" priority="55">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <region ware="ice" max="5000" />
+      </location>
+      <station constructionplan="bor_water_prefab_05">
+        <stage min="1" max="3"/>
+        <loadout>
+          <level exact="0.7"/>
+        </loadout>
+      </station>
+    </station>
+
+    <product id="bor_weaponcomponents" ware="weaponcomponents" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="weaponcomponents" race="boron"/>
+      </module>
+    </product>
+
+    <product id="bor_plankton" ware="plankton" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="8" cluster="1"/>
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy max="0.5" maxbound="false" />
+      </location>
+      <module>
+        <select ware="plankton" race="boron"/>
+      </module>
+    </product>
+
+    <station id="bor_plankton_prefab_06_01" ware="plankton" owner="boron" type="factory" priority="55">
+      <quotas>
+        <quota galaxy="2" sector="1"/>
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.5" max="0.75" maxbound="false" />
+      </location>
+      <station constructionplan="bor_plankton_prefab_06">
+        <stage min="2" max="4"/>
+        <loadout>
+          <level exact="0.7"/>
+        </loadout>
+      </station>
+    </station>
+  </add>
+
+  <add sel="/god/gamestart[@galaxy='timelines_map_mining_1_galaxy_macro']/stations">
+    <station id="scenario_mining_1to4_bor_equipment" race="boron" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="timelines_map_mining_1_cluster_001_sector_001_macro" matchextension="false"/>
+      <position  x="88000" y="0" z="-17000" roll="0" pitch="0"/>
+      <station>
+        <select faction="boron" tags="[equipmentdock]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+  </add>
+
+  <!-- replace the argon-shipyard (or split in case of SV, or terran in case of CoH) use for scenario1 with a boron-shipyard (god.xml in the base-game adds a station when running module 'x4ep1_gamestart_tutorial1' -->
+  <replace sel="/god/gamestart[@ref='x4ep1_gamestart_tutorial1']/stations/station[@id='shipyard_argon_01' or @id='shipyard_split_01' or @id='shipyard_terran_01']">
+    <station id="shipyard_boron_01" race="boron" owner="boron" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="demo_cluster_40_sector001_macro" matchextension="false" />
+      <position x="76000" y="0" z="62000" pitch="0" roll="0" />
+      <station>
+        <select faction="boron" tags="[shipyard]" />
+        <loadout>
+          <level exact="0.2" />
+        </loadout>
+      </station>
+    </station>
+  </replace>
+
+  
+</diff>

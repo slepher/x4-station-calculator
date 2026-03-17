@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Map Defaults
+  This file contains various properties for clusters, sectors, zones etc. to separate balancing data from universe design.
+  Continued from and parsed exactly like defaults.xml -->
+
+
+<!--Example for encyclopedia information setup per cluster
+
+<system>
+  <space environment="textref">
+  <suns>
+    <sun class="textref">
+    <sun …>
+    …
+  </suns>
+  <planets>
+    <planet class="textref" geology="textref" atmosphere="textref" population="textref" maxpopulation="number" settlements="textref" part="partname" atmopart="partname">
+      <moons>  
+        <moon geology="textref" atmosphere="textref" population="textref" maxpopulation="number" settlements="textref" part="partname" atmopart="partname">
+        <moon …>
+        …
+      </moons>
+    </planet>
+    <planet …>
+    …
+  </planets>
+<system>
+-->
+
+<!-- available text ids from page 1001
+ <t id="2466">Planetary Population</t>
+ <t id="2467">Security</t>
+ <t id="2468">Economy</t>
+ <t id="2469">Atmosphere</t>
+ <t id="2470">Geology</t>
+ <t id="2471">Environment</t>
+ -->
+
+<!-- available text ids from page 1042
+10001 - 10991 Generic 10011 name, 10012 descr
+ <t id="10011">None</t>{1042,10011}(None)
+ 
+11001 - 11991 Atmosphere Types
+ <t id="11011">Methane</t>{1042,11011}(Methane)
+ <t id="11021">Hydrogen</t>{1042,11021}(Hydrogen)
+ <t id="11031">Oxygen</t>{1042,11031}(Oxygen)
+ <t id="11041">Nitrogen</t>{1042,11041}(Nitrogen)
+ <t id="11051">Helium</t>{1042,11051}(Helium)
+ <t id="11061">Methane/Hydrogen</t>{1042,11061}(Methane/Hydrogen)
+ <t id="11071">Nitrogen/Oxygen</t>{1042,11071}(Nitrogen/Oxygen)
+ <t id="11081">Carbon Dioxide</t>{1042,11081}(Carbon Dioxide)
+ <t id="11091">Sulphur Dioxide</t>{1042,11091}(Sulphur Dioxide)
+ <t id="11101">Nitrogen/Hydrogen</t>{1042,11101}(Nitrogen/Hydrogen)
+ <t id="11111">Hydrogen/Helium</t>{1042,11111}(Hydrogen/Helium)
+
+12001 - 12991 Space Types
+ <t id="12011">Clear Space</t>{1042,12011}(Clear Space)
+ <t id="12021">Thin Nebula</t>{1042,12021}(Thin Nebula)
+ <t id="12031">Nebula</t>{1042,12031}(Nebula)
+ <t id="12041">Asteroids</t>{1042,12041}(Asteroids)
+ <t id="12051">Protoplanetary Disc</t>{1042,12051}(Protoplanetary Disc)
+ <t id="12061">Heavy Radiation</t>{1042,12061}(Heavy Radiation)
+
+13001 - 13991 Sun Types
+ <t id="13011">Red Dwarf</t>{1042,13011}(Red Dwarf)
+ <t id="13021">Yellow Dwarf</t>{1042,13021}(Yellow Dwarf)
+ <t id="13031">Orange Dwarf</t>{1042,13031}(Orange Dwarf)
+ <t id="13041">White Dwarf</t>{1042,13041}(White Dwarf)
+ <t id="13051">Blue Dwarf</t>{1042,13051}(Blue Dwarf)
+ <t id="13061">Brown Dwarf</t>{1042,13061}(Brown Dwarf)
+ <t id="13071">Black Dwarf</t>{1042,13071}(Black Dwarf)
+ <t id="13081">Red Giant</t>{1042,13081}(Red Giant)
+ <t id="13091">Yellow Giant</t>{1042,13091}(Yellow Giant)
+ <t id="13101">Orange Giant</t>{1042,13101}(Orange Giant)
+ <t id="13111">White Giant</t>{1042,13111}(White Giant)
+ <t id="13121">Blue Giant</t>{1042,13121}(Blue Giant)
+ <t id="13131">Red Supergiant</t>{1042,13131}(Red Supergiant)
+ <t id="13141">Yellow Supergiant</t>{1042,13141}(Yellow Supergiant)
+ <t id="13151">Orange Supergiant</t>{1042,13151}(Orange Supergiant)
+ <t id="13161">White Supergiant</t>{1042,13161}(White Supergiant)
+ <t id="13171">Blue Supergiant</t>{1042,13171}(Blue Supergiant)
+ <t id="13181">Neutron Star</t>{1042,13181}(Neutron Star)
+ <t id="13191">Black Hole</t>{1042,13191}(Black Hole)
+
+14001 - 14991 Planet Types
+ <t id="14011">Super Earth</t>{1042,14011}(Super Earth)
+ <t id="14021">Ringed Super Earth</t>{1042,14021}(Ringed Super Earth)
+ <t id="14031">Terrestrial</t>{1042,14031}(Terrestrial)
+ <t id="14041">Ringed Terrestrial</t>{1042,14041}(Ringed Terrestrial)
+ <t id="14051">Moon</t>{1042,14051}(Moon)
+ <t id="14061">Planet</t>{1042,14061}(Planet)
+ <t id="14071">Ringed Planet</t>{1042,14071}(Ringed Planet)
+ <t id="14081">Gas Giant</t>{1042,14081}(Gas Giant)
+ <t id="14091">Ringed Gas Giant</t>{1042,14091}(Ringed Gas Giant)
+ <t id="14101">Earth Analog</t>{1042,14101}(Earth Analog)
+ <t id="14111">Ringed Earth Analog</t>{1042,14111}(Ringed Earth Analog)
+ <t id="14121">Dwarf Planet</t>{1042,14121}(Dwarf Planet)
+ <t id="14131">Ice Giant</t>{1042,14131}(Ice Giant)
+ <t id="14141">Ringed Ice Giant</t>{1042,14141}(Ringed Ice Giant)
+
+15001 - 15991 Geology Types
+ <t id="15011">Tundra</t>{1042,15011}(Tundra)
+ <t id="15021">Mountains</t>{1042,15021}(Mountains)
+ <t id="15031">Volcanic</t>{1042,15031}(Volcanic)
+ <t id="15041">Xenon Structures</t>{1042,15041}(Xenon Structures)
+ <t id="15051">Rocks&Ice</t>{1042,15051}(Rocks/Ice)
+ <t id="15061">Canyons</t>{1042,15061}(Canyons)
+ <t id="15071">Rocks</t>{1042,15071}(Rocks)
+ <t id="15081">Ice</t>{1042,15081}(Ice)
+ <t id="15091">Craters</t>{1042,15091}(Craters)
+ <t id="15101">Barren</t>{1042,15101}(Barren)
+ <t id="15111">Desert</t>{1042,15111}(Desert)
+ <t id="15121">Swamp</t>{1042,15121}(Swamp)
+ <t id="15131">Forest</t>{1042,15131}(Forest)
+ <t id="15141">Ocean</t>{1042,15141}(Ocean)
+ <t id="15151">Polar</t>{1042,15151}(Polar)
+
+16001 - 16991 Settlement Types
+ <t id="16011">Uninhabited</t>{1042,16011}(Uninhabited)
+ <t id="16021">Mining Colonies</t>{1042,16021}(Mining Colonies)
+ <t id="16031">Research Outpost</t>{1042,16031}(Research Outpost)
+ <t id="16041">Multiple Cities</t>{1042,16041}(Multiple Cities)
+ <t id="16051">Densely Populated</t>{1042,16051}(Densely Populated)
+ <t id="16061">Xenon Structures</t>{1042,16061}(Xenon Structures)
+ <t id="16071">Megalopolis</t>{1042,16071}(Megalopolis)
+ <t id="16081">Sky City</t>{1042,16081}(Sky City)
+ <t id="16091">Agora Ouranos</t>{1042,16091}(Agora Ouranos)
+ <t id="16101">Small Settlements</t>{1042,16101}(Small Settlements)
+-->
+
+<!-- available text ids from page 20400 (Other Identifiers)
+20403 - Star Names
+ <t id="1">A</t>{20403,1}(A)
+ <t id="2">B</t>{20403,2}(B)
+ <t id="3">C</t>{20403,3}(C)
+ <t id="4">D</t>{20403,4}(D)
+ <t id="5">E</t>{20403,5}(E)
+ <t id="6">F</t>{20403,6}(F)
+
+20403 - Planet Names
+ <t id="101">a</t>{20403,101}(a)
+ <t id="102">b</t>{20403,102}(b)
+ <t id="103">c</t>{20403,103}(c)
+ <t id="104">d</t>{20403,104}(d)
+ <t id="105">e</t>{20403,105}(e)
+ <t id="106">f</t>{20403,106}(f)
+ <t id="107">g</t>{20403,107}(g)
+ <t id="108">h</t>{20403,108}(h)
+ <t id="109">i</t>{20403,109}(i)
+ <t id="110">j</t>{20403,110}(j)
+ <t id="111">k</t>{20403,111}(k)
+ <t id="112">l</t>{20403,112}(l)
+ <t id="113">m</t>{20403,113}(m)
+ <t id="114">n</t>{20403,114}(n)
+  
+20402 - Moon Names
+ <t id="1">n</t>{20402,1}(I)
+ <t id="2">n</t>{20402,2}(II)
+ <t id="3">n</t>{20402,3}(III)
+ <t id="4">n</t>{20402,4}(IV)
+ <t id="5">n</t>{20402,5}(V)
+ <t id="6">n</t>{20402,6}(VI)
+ <t id="7">n</t>{20402,7}(VII)
+ <t id="8">n</t>{20402,8}(VIII)
+-->
+
+<defaults xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="libraries.xsd">
+  <!-- Avarice -->
+  <dataset macro="Cluster_500_macro">
+    <properties>
+      <identification name="{20003,5000001}" description="{20003,5000002}" image="enc_cluster500"/>
+      <sounds>
+        <music ref="music_dlc_pirate_soundtrack_avarice" />
+      </sounds>
+      <system>
+        <space environment="{1042,12061}(Heavy Radiation)"/>
+        <suns>
+          <sun class="{1042,13081}(Red Giant)"/>
+        </suns>
+        <planets>
+          <planet name="{20003,5000001} {20403,101}(a)" class="{1042,14061}(Planet)" geology="{1042,15101}(Barren)" atmosphere="{1042,10011}(None)" population="{1042,10011}(None)" settlements="{1042,10011}(None)">
+            <moons>
+              <moon name="{20003,5000001} {20403,101}(a) {20402,1}(I)" geology="{1042,15101}(Barren)" atmosphere="{1042,10011}(None)" population="{1042,10011}(None)" settlements="{1042,10011}(None)"/>
+            </moons>
+          </planet>
+        </planets>
+      </system>
+    </properties>
+  </dataset>
+  <!-- Avarice I -->
+  <dataset macro="Cluster_500_Sector001_macro">
+    <properties>
+      <identification name="{20004,5000011}" description="{20004,5000012}" />
+      <resources>
+        <ware ware="condensate" amount="100" />
+      </resources>
+      <area sunlight="13.9" economy="0.25" security="0.75" thewave="true" />
+    </properties>
+  </dataset>
+  <!-- Avarice V Dead End -->
+  <dataset macro="Cluster_500_Sector002_macro">
+    <properties>
+      <identification name="{20004,5000021}" description="{20004,5000022}" />
+      <resources>
+        <ware ware="condensate" amount="100" />
+      </resources>
+      <area sunlight="13.9" economy="0.25" security="0.75" thewave="true" />
+    </properties>
+  </dataset>
+  <!-- Avarice IV -->
+  <dataset macro="Cluster_500_Sector003_macro">
+    <properties>
+      <identification name="{20004,5000031}" description="{20004,5000032}" />
+      <resources>
+        <ware ware="condensate" amount="100" />
+      </resources>
+      <area sunlight="13.9" economy="0.25" security="0.75" thewave="true" />
+    </properties>
+  </dataset>
+
+  <!-- Windfall I Union Summit -->
+  <dataset macro="Cluster_501_macro">
+    <properties>
+      <identification name="{20003,5010001}" description="{20003,5010002}" system="501" image="enc_cluster501"/>
+      <sounds>
+        <music ref="music_dlc_pirate_soundtrack_windfall" />
+      </sounds>
+      <system>
+        <space environment="{1042,12031}(Nebula)"/>
+        <suns>
+          <sun class="{1042,13091}(Yellow Giant)"/>
+        </suns>
+        <planets>
+          <planet name="{20003,5010001} {20403,101}(a)" class="{1042,14031}(Terrestrial)" geology="{1042,15031}(Volcanic)" atmosphere="{1042,10011}(None)" population="{1042,10011}(None)" settlements="{1042,10011}(None)">
+            <moons>
+              <moon name="{20003,5010001} {20403,101}(a) {20402,1}(I)" geology="{1042,15101}(Barren)" atmosphere="{1042,10011}(None)" population="{1042,10011}(None)" settlements="{1042,10011}(None)"/>
+            </moons>
+          </planet>
+        </planets>
+      </system>
+    </properties>
+  </dataset>
+  <dataset macro="Cluster_501_Sector001_macro">
+    <properties>
+      <identification name="{20004,5010011}" description="{20004,5010012}" />
+      <area sunlight="0.20" economy="0.25" security="0.75" tags="allowrandomanomaly"/>
+    </properties>
+  </dataset>
+  <!-- Windfall III The Hoard -->
+  <dataset macro="Cluster_502_macro">
+    <properties>
+      <identification name="{20003,5020001}" description="{20003,5020002}" system="501" />
+      <sounds>
+        <music ref="music_dlc_pirate_soundtrack_windfall" />
+      </sounds>
+    </properties>
+  </dataset>
+  <dataset macro="Cluster_502_Sector001_macro">
+    <properties>
+      <identification name="{20004,5020011}" description="{20004,5020012}" />
+      <area sunlight="0.16" economy="0.25" security="0.75" />
+    </properties>
+  </dataset>
+  <!-- Windfall IV Aurora's Dream -->
+  <dataset macro="Cluster_503_macro">
+    <properties>
+      <identification name="{20003,5030001}" description="{20003,5030002}" system="501" />
+      <sounds>
+        <music ref="music_dlc_pirate_soundtrack_windfall" />
+      </sounds>
+    </properties>
+  </dataset>
+  <dataset macro="Cluster_503_Sector001_macro">
+    <properties>
+      <identification name="{20004,5030011}" description="{20004,5030012}" />
+      <area sunlight="0.11" economy="0.25" security="0.75" tags="allowrandomanomaly" />
+    </properties>
+  </dataset>
+  <!-- Leap of Faith -->
+  <dataset macro="Cluster_504_macro">
+    <properties>
+      <identification name="{20003,5040001}" description="{20003,5040002}" image="enc_cluster504"/>
+      <sounds>
+        <music ref="music_dlc_pirate_soundtrack_leap_of_faith" />
+      </sounds>
+      <area god="false" jobs="false" factionlogic="false" />
+      <system>
+        <space environment="{1042,12021}(Thin Nebula)"/>
+        <suns>
+          <sun class="{1042,13191}(Black Hole)"/>
+        </suns>
+      </system>
+    </properties>
+  </dataset>
+  <dataset macro="Cluster_504_Sector001_macro">
+    <properties>
+      <identification name="{20004,5040011}" description="{20004,5040012}" />
+      <area sunlight="0.05" economy="0.25" security="0.75" tags="allowrandomanomaly" />
+    </properties>
+  </dataset>
+
+</defaults>

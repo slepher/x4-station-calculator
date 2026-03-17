@@ -1,0 +1,2355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Last exported: 19.02.2025 14:14:34-->
+<diff>
+  <add sel="/wares/production">
+    <method id="split" name="{20206,701}">
+      <default race="split" />
+    </method>
+  </add>
+  <add sel="/wares">
+    <ware id="cheltmeat" name="{20201,5001}" description="{20201,5002}" factoryname="{20201,5004}" group="agricultural" transport="container" volume="7" tags="container economy">
+      <price min="31" average="51" max="72" />
+      <production time="450" amount="209" method="default" name="{20206,701}">
+        <primary>
+          <ware ware="energycells" amount="50" />
+          <ware ware="water" amount="120" />
+        </primary>
+        <effects>
+          <effect type="work" product="0.6" />
+        </effects>
+      </production>
+      <icon active="ware_cheltmeat" video="ware_cheltmeat_macro" />
+    </ware>
+    <ware id="engine_spl_l_allround_01_mk1" name="{20107,3084}" description="{20107,3082}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="258153" average="368448" max="480054" />
+      <production time="20" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="129" />
+          <ware ware="energycells" amount="37" />
+          <ware ware="engineparts" amount="101" />
+        </primary>
+      </production>
+      <component ref="engine_spl_l_allround_01_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0.5" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_l_travel_01_mk1" name="{20107,3094}" description="{20107,3092}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="266600" average="380897" max="496641" />
+      <production time="20" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="111" />
+          <ware ware="energycells" amount="94" />
+          <ware ware="engineparts" amount="143" />
+        </primary>
+      </production>
+      <component ref="engine_spl_l_travel_01_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_m_allround_01_mk1" name="{20107,2604}" description="{20107,2602}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="8721" average="12654" max="16644" />
+      <production time="15" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="25" />
+          <ware ware="engineparts" amount="10" />
+        </primary>
+      </production>
+      <component ref="engine_spl_m_allround_01_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_m_allround_01_mk2" name="{20107,2614}" description="{20107,2612}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="43115" average="61948" max="81054" />
+      <production time="15" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="7" />
+          <ware ware="energycells" amount="58" />
+          <ware ware="engineparts" amount="41" />
+        </primary>
+      </production>
+      <component ref="engine_spl_m_allround_01_mk2_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0.25" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_m_allround_01_mk3" name="{20107,2624}" description="{20107,2622}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="210854" average="301234" max="392833" />
+      <production time="15" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="73" />
+          <ware ware="energycells" amount="84" />
+          <ware ware="engineparts" amount="141" />
+        </primary>
+      </production>
+      <component ref="engine_spl_m_allround_01_mk3_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.55" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_m_combat_01_mk1" name="{20107,2634}" description="{20107,2632}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="10078" average="14695" max="19374" />
+      <production time="15" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="36" />
+          <ware ware="engineparts" amount="11" />
+        </primary>
+      </production>
+      <component ref="engine_spl_m_combat_01_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_m_combat_01_mk2" name="{20107,2644}" description="{20107,2642}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="51756" average="74180" max="96917" />
+      <production time="15" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="13" />
+          <ware ware="energycells" amount="48" />
+          <ware ware="engineparts" amount="42" />
+        </primary>
+      </production>
+      <component ref="engine_spl_m_combat_01_mk2_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.25" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_m_combat_01_mk3" name="{20107,2654}" description="{20107,2652}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="253468" average="362360" max="472712" />
+      <production time="15" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="87" />
+          <ware ware="energycells" amount="126" />
+          <ware ware="engineparts" amount="169" />
+        </primary>
+      </production>
+      <component ref="engine_spl_m_combat_01_mk3_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.55" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_m_combat_01_mk4" name="{20107,2714}" description="{20107,2712}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="1267862" average="1811825" max="2363619" />
+      <production time="15" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="335" />
+          <ware ware="energycells" amount="636" />
+          <ware ware="engineparts" amount="1039" />
+        </primary>
+      </production>
+      <component ref="engine_spl_m_combat_01_mk4_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.7" />
+      <owner faction="court" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_m_travel_01_mk1" name="{20107,2664}" description="{20107,2662}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="9348" average="13657" max="18023" />
+      <production time="15" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="36" />
+          <ware ware="engineparts" amount="10" />
+        </primary>
+      </production>
+      <component ref="engine_spl_m_travel_01_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_m_travel_01_mk2" name="{20107,2674}" description="{20107,2672}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="48165" average="69084" max="90288" />
+      <production time="15" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="13" />
+          <ware ware="energycells" amount="49" />
+          <ware ware="engineparts" amount="37" />
+        </primary>
+      </production>
+      <component ref="engine_spl_m_travel_01_mk2_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0.25" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_m_travel_01_mk3" name="{20107,2684}" description="{20107,2682}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="243287" average="347073" max="452449" />
+      <production time="15" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="52" />
+          <ware ware="energycells" amount="73" />
+          <ware ware="engineparts" amount="227" />
+        </primary>
+      </production>
+      <component ref="engine_spl_m_travel_01_mk3_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0.55" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_s_allround_01_mk1" name="{20107,1604}" description="{20107,1602}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="3443" average="5119" max="6812" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="22" />
+          <ware ware="engineparts" amount="3" />
+        </primary>
+      </production>
+      <component ref="engine_spl_s_allround_01_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_s_allround_01_mk2" name="{20107,1614}" description="{20107,1612}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="19551" average="28340" max="37244" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="3" />
+          <ware ware="energycells" amount="51" />
+          <ware ware="engineparts" amount="17" />
+        </primary>
+      </production>
+      <component ref="engine_spl_s_allround_01_mk2_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0.25" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_s_allround_01_mk3" name="{20107,1624}" description="{20107,1622}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="91360" average="131077" max="171342" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="23" />
+          <ware ware="energycells" amount="98" />
+          <ware ware="engineparts" amount="73" />
+        </primary>
+      </production>
+      <component ref="engine_spl_s_allround_01_mk3_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.55" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_s_combat_01_mk1" name="{20107,1634}" description="{20107,1632}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="4902" average="7193" max="9513" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="22" />
+          <ware ware="engineparts" amount="5" />
+        </primary>
+      </production>
+      <component ref="engine_spl_s_combat_01_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_s_combat_01_mk2" name="{20107,1644}" description="{20107,1642}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="29617" average="42659" max="55883" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="5" />
+          <ware ware="energycells" amount="50" />
+          <ware ware="engineparts" amount="27" />
+        </primary>
+      </production>
+      <component ref="engine_spl_s_combat_01_mk2_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.25" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_s_combat_01_mk3" name="{20107,1654}" description="{20107,1652}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="134474" average="192227" max="250800" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="37" />
+          <ware ware="energycells" amount="72" />
+          <ware ware="engineparts" amount="107" />
+        </primary>
+      </production>
+      <component ref="engine_spl_s_combat_01_mk3_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.55" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_s_combat_01_mk4" name="{20107,1704}" description="{20107,1702}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="672885" average="961168" max="1254040" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="95" />
+          <ware ware="energycells" amount="361" />
+          <ware ware="engineparts" amount="710" />
+        </primary>
+      </production>
+      <component ref="engine_spl_s_combat_01_mk4_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.7" />
+      <owner faction="court" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_s_travel_01_mk1" name="{20107,1664}" description="{20107,1662}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="4172" average="6156" max="8162" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="22" />
+          <ware ware="engineparts" amount="4" />
+        </primary>
+      </production>
+      <component ref="engine_spl_s_travel_01_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_s_travel_01_mk2" name="{20107,1674}" description="{20107,1672}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="25342" average="36583" max="47977" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="4" />
+          <ware ware="energycells" amount="51" />
+          <ware ware="engineparts" amount="23" />
+        </primary>
+      </production>
+      <component ref="engine_spl_s_travel_01_mk2_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0.25" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_s_travel_01_mk3" name="{20107,1684}" description="{20107,1682}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="123724" average="176882" max="230850" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="23" />
+          <ware ware="energycells" amount="77" />
+          <ware ware="engineparts" amount="119" />
+        </primary>
+      </production>
+      <component ref="engine_spl_s_travel_01_mk3_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0.55" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_xl_allround_01_mk1" name="{20107,4084}" description="{20107,4082}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="340974" average="486335" max="633834" />
+      <production time="30" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="92" />
+          <ware ware="energycells" amount="78" />
+          <ware ware="engineparts" amount="283" />
+        </primary>
+      </production>
+      <component ref="engine_spl_xl_allround_01_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0.5" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="engine_spl_xl_travel_01_mk1" name="{20107,4094}" description="{20107,4092}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="352716" average="503356" max="656275" />
+      <production time="30" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="79" />
+          <ware ware="energycells" amount="120" />
+          <ware ware="engineparts" amount="321" />
+        </primary>
+      </production>
+      <component ref="engine_spl_xl_travel_01_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="missile_disruptor_light_mk1" name="{20105,6184}" description="{20105,6182}" group="missiles" transport="equipment" volume="1" tags="equipment missile">
+      <price min="1387" average="1632" max="1877" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="15" />
+          <ware ware="missilecomponents" amount="3" />
+          <ware ware="smartchips" amount="2" />
+        </primary>
+      </production>
+      <component ref="missile_disruptor_light_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.56" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="missile_interceptor_light_mk1" name="{20105,6204}" description="{20105,6202}" group="missiles" transport="equipment" volume="1" tags="equipment missile">
+      <price min="1267" average="1490" max="1714" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="12" />
+          <ware ware="missilecomponents" amount="11" />
+          <ware ware="smartchips" amount="1" />
+        </primary>
+      </production>
+      <component ref="missile_interceptor_light_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.51" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="missile_scatter_heavy_mk1" name="{20105,6274}" description="{20105,6272}" group="missiles" transport="equipment" volume="1" tags="equipment missile">
+      <price min="1078" average="1268" max="1458" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="5" />
+          <ware ware="missilecomponents" amount="24" />
+        </primary>
+      </production>
+      <component ref="missile_scatter_heavy_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.7" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="missile_starburst_heavy_mk1" name="{20105,6234}" description="{20105,6232}" group="missiles" transport="equipment" volume="1" tags="equipment missile">
+      <price min="1700" average="2000" max="2300" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="17" />
+          <ware ware="missilecomponents" amount="9" />
+          <ware ware="smartchips" amount="2" />
+        </primary>
+      </production>
+      <component ref="missile_starburst_heavy_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.69" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_conn_base_01" name="{20104,51001}" description="{20104,51002}" transport="container" volume="1" tags="module">
+      <price min="92363" average="108662" max="124961" />
+      <production time="59" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="14" />
+          <ware ware="energycells" amount="27" />
+          <ware ware="hullparts" amount="50" />
+        </primary>
+      </production>
+      <component ref="struct_spl_base_01_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_conn_base_02" name="{20104,51101}" description="{20104,51102}" transport="container" volume="1" tags="module">
+      <price min="75585" average="88924" max="102263" />
+      <production time="53" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="17" />
+          <ware ware="energycells" amount="34" />
+          <ware ware="hullparts" amount="62" />
+        </primary>
+      </production>
+      <component ref="struct_spl_base_02_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_conn_base_03" name="{20104,51201}" description="{20104,51202}" transport="container" volume="1" tags="module">
+      <price min="98841" average="116284" max="133727" />
+      <production time="72" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="18" />
+          <ware ware="energycells" amount="37" />
+          <ware ware="hullparts" amount="68" />
+        </primary>
+      </production>
+      <component ref="struct_spl_base_03_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_conn_cross_01" name="{20104,51901}" description="{20104,51902}" transport="container" volume="1" tags="module">
+      <price min="65300" average="76824" max="88348" />
+      <production time="47" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="12" />
+          <ware ware="energycells" amount="24" />
+          <ware ware="hullparts" amount="44" />
+        </primary>
+      </production>
+      <component ref="struct_spl_cross_01_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_conn_vertical_01" name="{20104,52701}" description="{20104,52702}" transport="container" volume="1" tags="module">
+      <price min="54125" average="63676" max="73227" />
+      <production time="38" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="10" />
+          <ware ware="energycells" amount="20" />
+          <ware ware="hullparts" amount="36" />
+        </primary>
+      </production>
+      <component ref="struct_spl_vertical_01_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_conn_vertical_02" name="{20104,52801}" description="{20104,52802}" transport="container" volume="1" tags="module">
+      <price min="70888" average="83398" max="95908" />
+      <production time="52" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="13" />
+          <ware ware="energycells" amount="26" />
+          <ware ware="hullparts" amount="48" />
+        </primary>
+      </production>
+      <component ref="struct_spl_vertical_02_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_def_claim_01" name="{20104,40401}" description="{20104,40402}" transport="container" volume="1" tags="module">
+      <price min="750516" average="882960" max="1015404" />
+      <production time="541" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="138" />
+          <ware ware="energycells" amount="276" />
+          <ware ware="hullparts" amount="505" />
+        </primary>
+      </production>
+      <research time="10">
+        <research>
+          <ware ware="research_module_defence" />
+        </research>
+      </research>
+      <component ref="defence_spl_claim_01_macro" />
+      <restriction licence="station_gen_advanced" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_def_disc_01" name="{20104,40901}" description="{20104,40902}" transport="container" volume="1" tags="module">
+      <price min="570940" average="671694" max="772448" />
+      <production time="410" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="105" />
+          <ware ware="energycells" amount="210" />
+          <ware ware="hullparts" amount="384" />
+        </primary>
+      </production>
+      <research time="10">
+        <research>
+          <ware ware="research_module_defence" />
+        </research>
+      </research>
+      <component ref="defence_spl_disc_01_macro" />
+      <restriction licence="station_gen_intermediate" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_def_tube_01" name="{20104,41401}" description="{20104,41402}" transport="container" volume="1" tags="module">
+      <price min="570940" average="671694" max="772448" />
+      <production time="410" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="105" />
+          <ware ware="energycells" amount="210" />
+          <ware ware="hullparts" amount="384" />
+        </primary>
+      </production>
+      <research time="10">
+        <research>
+          <ware ware="research_module_defence" />
+        </research>
+      </research>
+      <component ref="defence_spl_tube_01_macro" />
+      <restriction licence="station_gen_intermediate" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_hab_l_01" name="{20104,31201}" description="{20104,31202}" transport="container" volume="1" tags="module">
+      <price min="16627714" average="19562016" max="22496318" />
+      <production time="750" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="191" />
+          <ware ware="energycells" amount="383" />
+          <ware ware="hullparts" amount="700" />
+        </primary>
+      </production>
+      <research time="10">
+        <research>
+          <ware ware="research_module_habitation" />
+        </research>
+      </research>
+      <component ref="hab_spl_l_01_macro" />
+      <restriction licence="station_gen_advanced" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_hab_m_01" name="{20104,31101}" description="{20104,31102}" transport="container" volume="1" tags="module">
+      <price min="11754290" average="13828576" max="15902862" />
+      <production time="530" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="135" />
+          <ware ware="energycells" amount="271" />
+          <ware ware="hullparts" amount="495" />
+        </primary>
+      </production>
+      <research time="10">
+        <research>
+          <ware ware="research_module_habitation" />
+        </research>
+      </research>
+      <component ref="hab_spl_m_01_macro" />
+      <restriction licence="station_gen_intermediate" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_hab_s_01" name="{20104,31001}" description="{20104,31002}" transport="container" volume="1" tags="module">
+      <price min="8172621" average="9614848" max="11057075" />
+      <production time="367" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="94" />
+          <ware ware="energycells" amount="188" />
+          <ware ware="hullparts" amount="343" />
+        </primary>
+      </production>
+      <research time="10">
+        <research>
+          <ware ware="research_module_habitation" />
+        </research>
+      </research>
+      <component ref="hab_spl_s_01_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_pier_l_01" name="{20104,72201}" description="{20104,72202}" transport="container" volume="1" tags="module">
+      <price min="2946171" average="3466084" max="3985997" />
+      <production time="750" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="542" />
+          <ware ware="energycells" amount="1083" />
+          <ware ware="hullparts" amount="1980" />
+        </primary>
+      </production>
+      <research time="10">
+        <research>
+          <ware ware="research_module_dock" />
+        </research>
+      </research>
+      <component ref="pier_spl_harbor_01_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_pier_l_02" name="{20104,72101}" description="{20104,72102}" transport="container" volume="1" tags="module">
+      <price min="1701192" average="2001402" max="2301612" />
+      <production time="433" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="313" />
+          <ware ware="energycells" amount="625" />
+          <ware ware="hullparts" amount="1143" />
+        </primary>
+      </production>
+      <research time="10">
+        <research>
+          <ware ware="research_module_dock" />
+        </research>
+      </research>
+      <component ref="pier_spl_harbor_02_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_pier_l_03" name="{20104,72301}" description="{20104,72302}" transport="container" volume="1" tags="module">
+      <price min="3399016" average="3998842" max="4598668" />
+      <production time="866" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="625" />
+          <ware ware="energycells" amount="1250" />
+          <ware ware="hullparts" amount="2287" />
+        </primary>
+      </production>
+      <research time="10">
+        <research>
+          <ware ware="research_module_dock" />
+        </research>
+      </research>
+      <component ref="pier_spl_harbor_03_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_prod_cheltmeat_01" name="{20104,14901}" description="{20104,14902}" transport="container" volume="1" tags="module">
+      <price min="698188" average="821398" max="944608" />
+      <production time="503" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="282" />
+          <ware ware="energycells" amount="256" />
+          <ware ware="hullparts" amount="1158" />
+        </primary>
+      </production>
+      <research time="10">
+        <research>
+          <ware ware="research_module_production" />
+        </research>
+      </research>
+      <component ref="prod_spl_cheltmeat_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_prod_medicalsupplies_01" name="{20104,15001}" description="{20104,15002}" transport="container" volume="1" tags="module">
+      <price min="1223505" average="1439418" max="1655331" />
+      <production time="739" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="248" />
+          <ware ware="energycells" amount="451" />
+          <ware ware="hullparts" amount="910" />
+        </primary>
+      </production>
+      <research time="10">
+        <research>
+          <ware ware="research_module_production" />
+        </research>
+      </research>
+      <component ref="prod_spl_medicalsupplies_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_prod_scruffinfruits_01" name="{20104,14801}" description="{20104,14802}" transport="container" volume="1" tags="module">
+      <price min="829662" average="976073" max="1122484" />
+      <production time="598" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="335" />
+          <ware ware="energycells" amount="305" />
+          <ware ware="hullparts" amount="1377" />
+        </primary>
+      </production>
+      <research time="10">
+        <research>
+          <ware ware="research_module_production" />
+        </research>
+      </research>
+      <component ref="prod_spl_scruffinfruit_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_stor_container_l_01" name="{20104,25301}" description="{20104,25302}" transport="container" volume="1" tags="module">
+      <price min="734191" average="863754" max="993317" />
+      <production time="683" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="135" />
+          <ware ware="energycells" amount="270" />
+          <ware ware="hullparts" amount="494" />
+        </primary>
+      </production>
+      <research time="10">
+        <research>
+          <ware ware="research_module_storage" />
+        </research>
+      </research>
+      <component ref="storage_spl_l_container_01_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_stor_container_m_01" name="{20104,25201}" description="{20104,25202}" transport="container" volume="1" tags="module">
+      <price min="489314" average="575664" max="662014" />
+      <production time="455" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="90" />
+          <ware ware="energycells" amount="180" />
+          <ware ware="hullparts" amount="329" />
+        </primary>
+      </production>
+      <research time="10">
+        <research>
+          <ware ware="research_module_storage" />
+        </research>
+      </research>
+      <component ref="storage_spl_m_container_01_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_stor_container_s_01" name="{20104,25101}" description="{20104,25102}" transport="container" volume="1" tags="module">
+      <price min="331199" average="389646" max="448093" />
+      <production time="307" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="61" />
+          <ware ware="energycells" amount="121" />
+          <ware ware="hullparts" amount="222" />
+        </primary>
+      </production>
+      <research time="10">
+        <research>
+          <ware ware="research_module_storage" />
+        </research>
+      </research>
+      <component ref="storage_spl_s_container_01_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_stor_liquid_l_01" name="{20104,26301}" description="{20104,26302}" transport="container" volume="1" tags="module">
+      <price min="734191" average="863754" max="993317" />
+      <production time="683" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="135" />
+          <ware ware="energycells" amount="270" />
+          <ware ware="hullparts" amount="494" />
+        </primary>
+      </production>
+      <research time="10">
+        <research>
+          <ware ware="research_module_storage" />
+        </research>
+      </research>
+      <component ref="storage_spl_l_liquid_01_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_stor_liquid_m_01" name="{20104,26201}" description="{20104,26202}" transport="container" volume="1" tags="module">
+      <price min="489314" average="575664" max="662014" />
+      <production time="455" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="90" />
+          <ware ware="energycells" amount="180" />
+          <ware ware="hullparts" amount="329" />
+        </primary>
+      </production>
+      <research time="10">
+        <research>
+          <ware ware="research_module_storage" />
+        </research>
+      </research>
+      <component ref="storage_spl_m_liquid_01_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_stor_liquid_s_01" name="{20104,26101}" description="{20104,26102}" transport="container" volume="1" tags="module">
+      <price min="331199" average="389646" max="448093" />
+      <production time="307" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="61" />
+          <ware ware="energycells" amount="121" />
+          <ware ware="hullparts" amount="222" />
+        </primary>
+      </production>
+      <research time="10">
+        <research>
+          <ware ware="research_module_storage" />
+        </research>
+      </research>
+      <component ref="storage_spl_s_liquid_01_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_stor_solid_l_01" name="{20104,27301}" description="{20104,27302}" transport="container" volume="1" tags="module">
+      <price min="734191" average="863754" max="993317" />
+      <production time="683" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="135" />
+          <ware ware="energycells" amount="270" />
+          <ware ware="hullparts" amount="494" />
+        </primary>
+      </production>
+      <research time="10">
+        <research>
+          <ware ware="research_module_storage" />
+        </research>
+      </research>
+      <component ref="storage_spl_l_solid_01_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_stor_solid_m_01" name="{20104,27201}" description="{20104,27202}" transport="container" volume="1" tags="module">
+      <price min="489314" average="575664" max="662014" />
+      <production time="455" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="90" />
+          <ware ware="energycells" amount="180" />
+          <ware ware="hullparts" amount="329" />
+        </primary>
+      </production>
+      <research time="10">
+        <research>
+          <ware ware="research_module_storage" />
+        </research>
+      </research>
+      <component ref="storage_spl_m_solid_01_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="module_spl_stor_solid_s_01" name="{20104,27101}" description="{20104,27102}" transport="container" volume="1" tags="module">
+      <price min="331199" average="389646" max="448093" />
+      <production time="307" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="61" />
+          <ware ware="energycells" amount="121" />
+          <ware ware="hullparts" amount="222" />
+        </primary>
+      </production>
+      <research time="10">
+        <research>
+          <ware ware="research_module_storage" />
+        </research>
+      </research>
+      <component ref="storage_spl_s_solid_01_macro" />
+      <restriction licence="station_gen_basic" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="scruffinfruits" name="{20201,5101}" description="{20201,5102}" factoryname="{20201,5104}" group="agricultural" transport="container" volume="6" tags="container economy">
+      <price min="17" average="28" max="40" />
+      <production time="300" amount="255" method="default" name="{20206,701}">
+        <primary>
+          <ware ware="energycells" amount="30" />
+          <ware ware="water" amount="80" />
+        </primary>
+        <effects>
+          <effect type="work" product="0.53" />
+        </effects>
+      </production>
+      <icon active="ware_scruffinfruit" video="ware_scruffinfruit_macro" />
+    </ware>
+    <ware id="shield_spl_l_standard_01_mk1" name="{20106,3084}" description="{20106,3082}" group="shields" transport="equipment" volume="1" tags="equipment shield">
+      <price min="27782" average="45874" max="64068" />
+      <production time="20" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="104" />
+          <ware ware="fieldcoils" amount="5" />
+          <ware ware="shieldcomponents" amount="23" />
+        </primary>
+      </production>
+      <component ref="shield_spl_l_standard_01_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="shield_spl_l_standard_01_mk2" name="{20106,3094}" description="{20106,3092}" group="shields" transport="equipment" volume="1" tags="equipment shield">
+      <price min="136139" average="226085" max="316589" />
+      <production time="20" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="165" />
+          <ware ware="fieldcoils" amount="31" />
+          <ware ware="shieldcomponents" amount="129" />
+        </primary>
+      </production>
+      <component ref="shield_spl_l_standard_01_mk2_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0.25" />
+      <owner faction="court" />
+      <owner faction="split" />
+    </ware>
+    <ware id="shield_spl_m_standard_01_mk1" name="{20106,2084}" description="{20106,2082}" group="shields" transport="equipment" volume="1" tags="equipment shield">
+      <price min="8653" average="14227" max="19836" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="48" />
+          <ware ware="fieldcoils" amount="1" />
+          <ware ware="shieldcomponents" amount="7" />
+        </primary>
+      </production>
+      <component ref="shield_spl_m_standard_01_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="shield_spl_m_standard_01_mk2" name="{20106,2094}" description="{20106,2092}" group="shields" transport="equipment" volume="1" tags="equipment shield">
+      <price min="39644" average="65687" max="91930" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="84" />
+          <ware ware="fieldcoils" amount="6" />
+          <ware ware="shieldcomponents" amount="41" />
+        </primary>
+      </production>
+      <component ref="shield_spl_m_standard_01_mk2_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.65" />
+      <owner faction="court" />
+      <owner faction="split" />
+    </ware>
+    <ware id="shield_spl_m_standard_02_mk1" name="{20106,2084}" description="{20106,2082}" group="shields" transport="equipment" volume="1" tags="equipment shield">
+      <price min="8653" average="14227" max="19836" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="48" />
+          <ware ware="fieldcoils" amount="1" />
+          <ware ware="shieldcomponents" amount="7" />
+        </primary>
+      </production>
+      <component ref="shield_spl_m_standard_02_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="shield_spl_m_standard_02_mk2" name="{20106,2094}" description="{20106,2092}" group="shields" transport="equipment" volume="1" tags="equipment shield">
+      <price min="39644" average="65687" max="91930" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="84" />
+          <ware ware="fieldcoils" amount="6" />
+          <ware ware="shieldcomponents" amount="41" />
+        </primary>
+      </production>
+      <component ref="shield_spl_m_standard_02_mk2_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.65" />
+      <owner faction="court" />
+      <owner faction="split" />
+    </ware>
+    <ware id="shield_spl_s_standard_01_mk1" name="{20106,1124}" description="{20106,1122}" group="shields" transport="equipment" volume="1" tags="equipment shield">
+      <price min="929" average="1528" max="2132" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="5" />
+          <ware ware="shieldcomponents" amount="1" />
+        </primary>
+      </production>
+      <component ref="shield_spl_s_standard_01_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="shield_spl_s_standard_01_mk2" name="{20106,1134}" description="{20106,1132}" group="shields" transport="equipment" volume="1" tags="equipment shield">
+      <price min="6658" average="11035" max="15447" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="13" />
+          <ware ware="fieldcoils" amount="1" />
+          <ware ware="shieldcomponents" amount="7" />
+        </primary>
+      </production>
+      <component ref="shield_spl_s_standard_01_mk2_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.65" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="shield_spl_s_standard_01_mk3" name="{20106,1144}" description="{20106,1142}" group="shields" transport="equipment" volume="1" tags="equipment shield">
+      <price min="31475" average="52166" max="73051" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="60" />
+          <ware ware="fieldcoils" amount="3" />
+          <ware ware="shieldcomponents" amount="37" />
+        </primary>
+      </production>
+      <component ref="shield_spl_s_standard_01_mk3_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.9" />
+      <owner faction="court" />
+      <owner faction="split" />
+    </ware>
+    <ware id="shield_spl_xl_standard_01_mk1" name="{20106,4044}" description="{20106,4042}" group="shields" transport="equipment" volume="1" tags="equipment shield">
+      <price min="143572" average="238442" max="333746" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="184" />
+          <ware ware="fieldcoils" amount="41" />
+          <ware ware="shieldcomponents" amount="117" />
+        </primary>
+      </production>
+      <component ref="shield_spl_xl_standard_01_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="ship_spl_l_destroyer_01_a" name="{20101,42801}" description="{20101,42811}" transport="ship" volume="1" tags="ship">
+      <price min="10617172" average="12490790" max="14364409" />
+      <production time="309" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="1710" />
+          <ware ware="hullparts" amount="11822" />
+        </primary>
+      </production>
+      <component ref="ship_spl_l_destroyer_01_a_macro" />
+      <restriction licence="capitalship" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="ship_spl_l_miner_liquid_01_a" name="{20101,41907}" description="{20101,41917}" transport="ship" volume="1" tags="ship">
+      <price min="1368742" average="1610285" max="1851828" />
+      <production time="66" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="365" />
+          <ware ware="hullparts" amount="1513" />
+        </primary>
+      </production>
+      <component ref="ship_spl_l_miner_liquid_01_a_macro" />
+      <restriction licence="generaluseship" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="ship_spl_l_miner_solid_01_a" name="{20101,41906}" description="{20101,41916}" transport="ship" volume="1" tags="ship">
+      <price min="1368742" average="1610285" max="1851828" />
+      <production time="66" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="365" />
+          <ware ware="hullparts" amount="1513" />
+        </primary>
+      </production>
+      <component ref="ship_spl_l_miner_solid_01_a_macro" />
+      <restriction licence="generaluseship" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="ship_spl_l_trans_container_01_a" name="{20101,42401}" description="{20101,42411}" transport="ship" volume="1" tags="ship">
+      <price min="2497746" average="2938525" max="3379304" />
+      <production time="120" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="666" />
+          <ware ware="hullparts" amount="2761" />
+        </primary>
+      </production>
+      <component ref="ship_spl_l_trans_container_01_a_macro" />
+      <restriction licence="generaluseship" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="ship_spl_m_corvette_01_a" name="{20101,40601}" description="{20101,40611}" transport="ship" volume="1" tags="ship">
+      <price min="1056903" average="1243415" max="1429927" />
+      <production time="26" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="142" />
+          <ware ware="hullparts" amount="1179" />
+        </primary>
+      </production>
+      <component ref="ship_spl_m_corvette_01_a_macro" />
+      <restriction licence="militaryship" />
+      <owner faction="court" />
+      <owner faction="split" />
+    </ware>
+    <ware id="ship_spl_m_corvette_01_b" name="{20101,40604}" description="{20101,40614}" transport="ship" volume="1" tags="ship">
+      <price min="628375" average="739265" max="850155" />
+      <production time="15" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="84" />
+          <ware ware="hullparts" amount="701" />
+        </primary>
+      </production>
+      <component ref="ship_spl_m_corvette_01_b_macro" />
+      <restriction licence="militaryship" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+    </ware>
+    <ware id="ship_spl_m_frigate_01_a" name="{20101,41401}" description="{20101,41411}" transport="ship" volume="1" tags="ship">
+      <price min="1846659" average="2172540" max="2498421" />
+      <production time="45" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="248" />
+          <ware ware="hullparts" amount="2060" />
+        </primary>
+      </production>
+      <component ref="ship_spl_m_frigate_01_a_macro" />
+      <restriction licence="militaryship" />
+      <owner faction="court" />
+      <owner faction="split" />
+    </ware>
+    <ware id="ship_spl_m_miner_liquid_01_a" name="{20101,42007}" description="{20101,42017}" transport="ship" volume="1" tags="ship">
+      <price min="180770" average="212670" max="244571" />
+      <production time="13" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="72" />
+          <ware ware="hullparts" amount="198" />
+        </primary>
+      </production>
+      <component ref="ship_spl_m_miner_liquid_01_a_macro" />
+      <restriction licence="generaluseship" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="ship_spl_m_miner_solid_01_a" name="{20101,42006}" description="{20101,42016}" transport="ship" volume="1" tags="ship">
+      <price min="200855" average="236300" max="271745" />
+      <production time="14" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="80" />
+          <ware ware="hullparts" amount="220" />
+        </primary>
+      </production>
+      <component ref="ship_spl_m_miner_solid_01_a_macro" />
+      <restriction licence="generaluseship" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="ship_spl_m_trans_container_01_a" name="{20101,41601}" description="{20101,41611}" transport="ship" volume="1" tags="ship">
+      <price min="317679" average="373740" max="429801" />
+      <production time="23" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="126" />
+          <ware ware="hullparts" amount="348" />
+        </primary>
+      </production>
+      <component ref="ship_spl_m_trans_container_01_a_macro" />
+      <restriction licence="generaluseship" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="ship_spl_s_fighter_01_a" name="{20101,40301}" description="{20101,40311}" transport="ship" volume="1" tags="ship">
+      <price min="165266" average="194430" max="223595" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="53" />
+          <ware ware="hullparts" amount="182" />
+        </primary>
+      </production>
+      <component ref="ship_spl_s_fighter_01_a_macro" />
+      <restriction licence="militaryship" />
+      <owner faction="court" />
+      <owner faction="split" />
+    </ware>
+    <ware id="ship_spl_s_fighter_02_a" name="{20101,41101}" description="{20101,41111}" transport="ship" volume="1" tags="ship">
+      <price min="216984" average="255275" max="293566" />
+      <production time="13" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="69" />
+          <ware ware="hullparts" amount="239" />
+        </primary>
+      </production>
+      <component ref="ship_spl_s_fighter_02_a_macro" />
+      <restriction licence="generaluseship" />
+      <owner faction="court" />
+      <owner faction="split" />
+    </ware>
+    <ware id="ship_spl_s_fighter_02_b" name="{20101,41104}" description="{20101,41114}" transport="ship" volume="1" tags="ship">
+      <price min="105349" average="123940" max="142531" />
+      <production time="6" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="34" />
+          <ware ware="hullparts" amount="116" />
+        </primary>
+      </production>
+      <component ref="ship_spl_s_fighter_02_b_macro" />
+      <restriction licence="militaryship" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+    </ware>
+    <ware id="ship_spl_s_heavyfighter_01_a" name="{20101,41001}" description="{20101,41011}" transport="ship" volume="1" tags="ship">
+      <price min="287831" average="338625" max="389419" />
+      <production time="17" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="92" />
+          <ware ware="hullparts" amount="317" />
+        </primary>
+      </production>
+      <component ref="ship_spl_s_heavyfighter_01_a_macro" />
+      <restriction licence="militaryship" />
+      <owner faction="court" />
+      <owner faction="split" />
+    </ware>
+    <ware id="ship_spl_s_heavyfighter_02_a" name="{20101,42701}" description="{20101,42711}" transport="ship" volume="1" tags="ship">
+      <price min="230648" average="271350" max="312053" />
+      <production time="13" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="74" />
+          <ware ware="hullparts" amount="254" />
+        </primary>
+      </production>
+      <component ref="ship_spl_s_heavyfighter_02_a_macro" />
+      <restriction licence="militaryship" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+    </ware>
+    <ware id="ship_spl_s_miner_solid_01_a" name="{20101,42104}" description="{20101,42114}" transport="ship" volume="1" tags="ship">
+      <price min="108970" average="128200" max="147430" />
+      <production time="6" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="35" />
+          <ware ware="hullparts" amount="120" />
+        </primary>
+      </production>
+      <component ref="ship_spl_s_miner_solid_01_a_macro" />
+      <restriction licence="generaluseship" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="ship_spl_s_scout_01_a" name="{20101,40701}" description="{20101,40711}" transport="ship" volume="1" tags="ship">
+      <price min="124410" average="146365" max="168320" />
+      <production time="7" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="40" />
+          <ware ware="hullparts" amount="137" />
+        </primary>
+      </production>
+      <component ref="ship_spl_s_scout_01_a_macro" />
+      <restriction licence="generaluseship" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="ship_spl_s_trans_container_01_a" name="{20101,42101}" description="{20101,42111}" transport="ship" volume="1" tags="ship">
+      <price min="210630" average="247800" max="284970" />
+      <production time="12" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="67" />
+          <ware ware="hullparts" amount="232" />
+        </primary>
+      </production>
+      <component ref="ship_spl_s_trans_container_01_a_macro" />
+      <restriction licence="generaluseship" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="ship_spl_xl_builder_01_a" name="{20101,40501}" description="{20101,40511}" transport="ship" volume="1" tags="ship">
+      <price min="10219542" average="12022990" max="13826439" />
+      <production time="500" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="2864" />
+          <ware ware="hullparts" amount="11286" />
+        </primary>
+      </production>
+      <component ref="ship_spl_xl_builder_01_a_macro" />
+      <restriction licence="generaluseship" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="ship_spl_xl_carrier_01_a" name="{20101,40101}" description="{20101,40111}" transport="ship" volume="1" tags="nocustomgamestart ship">
+      <price min="27714314" average="32605075" max="37495836" />
+      <production time="1007" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="5565" />
+          <ware ware="hullparts" amount="30775" />
+        </primary>
+      </production>
+      <component ref="ship_spl_xl_carrier_01_a_macro" />
+      <restriction licence="capitalship" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="ship_spl_xl_resupplier_01_a" name="{20101,42601}" description="{20101,42611}" transport="ship" volume="1" tags="ship">
+      <price min="14646486" average="17231160" max="19815834" />
+      <production time="532" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="2941" />
+          <ware ware="hullparts" amount="16264" />
+        </primary>
+      </production>
+      <component ref="ship_spl_xl_resupplier_01_a_macro" />
+      <restriction licence="capitalship" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="ship_spl_xs_police_01_a" name="{20101,110901}" description="{20101,110911}" group="drones" transport="equipment" volume="1" tags="drone equipment noplayerblueprint">
+      <price min="7999" average="9410" max="10822" />
+      <production time="60" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="dronecomponents" amount="1" />
+          <ware ware="energycells" amount="50" />
+          <ware ware="smartchips" amount="10" />
+        </primary>
+      </production>
+      <component ref="ship_spl_xs_police_01_a_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0.4" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_l_beam_01_mk1" name="{20105,5264}" description="{20105,5262}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="98006" average="150548" max="203353" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="13" />
+          <ware ware="energycells" amount="42" />
+          <ware ware="turretcomponents" amount="46" />
+        </primary>
+      </production>
+      <component ref="turret_spl_l_beam_01_mk1_macro" />
+      <restriction licence="capitalequipment" />
+      <use threshold="1" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_l_dumbfire_01_mk1" name="{20105,5274}" description="{20105,5272}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="49955" average="76329" max="102822" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="7" />
+          <ware ware="energycells" amount="35" />
+          <ware ware="turretcomponents" amount="21" />
+        </primary>
+      </production>
+      <component ref="turret_spl_l_dumbfire_01_mk1_macro" />
+      <restriction licence="capitalequipment" />
+      <use threshold="0.61" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_l_guided_01_mk1" name="{20105,5284}" description="{20105,5282}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="51277" average="82314" max="113573" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="3" />
+          <ware ware="energycells" amount="47" />
+          <ware ware="turretcomponents" amount="39" />
+        </primary>
+      </production>
+      <component ref="turret_spl_l_guided_01_mk1_macro" />
+      <restriction licence="capitalequipment" />
+      <use threshold="0.7" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_l_laser_01_mk1" name="{20105,5244}" description="{20105,5242}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="33835" average="55193" max="76716" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="1" />
+          <ware ware="energycells" amount="47" />
+          <ware ware="turretcomponents" amount="29" />
+        </primary>
+      </production>
+      <component ref="turret_spl_l_laser_01_mk1_macro" />
+      <restriction licence="capitalequipment" />
+      <use threshold="0" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_l_mining_01_mk1" name="{20105,5294}" description="{20105,5292}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="30723" average="50969" max="71387" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="47" />
+          <ware ware="turretcomponents" amount="30" />
+        </primary>
+      </production>
+      <component ref="turret_spl_l_mining_01_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" purposes="mine" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_l_plasma_01_mk1" name="{20105,5254}" description="{20105,5252}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="59861" average="96290" max="132964" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="3" />
+          <ware ware="energycells" amount="132" />
+          <ware ware="turretcomponents" amount="43" />
+        </primary>
+      </production>
+      <component ref="turret_spl_l_plasma_01_mk1_macro" />
+      <restriction licence="capitalequipment" />
+      <use threshold="0.6" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_m_beam_01_mk1" name="{20105,4364}" description="{20105,4362}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="32650" average="51180" max="69808" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="3" />
+          <ware ware="energycells" amount="81" />
+          <ware ware="turretcomponents" amount="17" />
+        </primary>
+      </production>
+      <component ref="turret_spl_m_beam_01_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="1" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_m_beam_02_mk1" name="{20105,4364}" description="{20105,4362}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="32650" average="51180" max="69808" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="3" />
+          <ware ware="energycells" amount="81" />
+          <ware ware="turretcomponents" amount="17" />
+        </primary>
+      </production>
+      <component ref="turret_spl_m_beam_02_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="1" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_m_dumbfire_01_mk1" name="{20105,4384}" description="{20105,4382}" group="turrets" transport="equipment" volume="1" tags="noplayerblueprint turret">
+      <price min="15800" average="26066" max="36406" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="64" />
+          <ware ware="turretcomponents" amount="13" />
+        </primary>
+      </production>
+      <component ref="turret_spl_m_dumbfire_01_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_m_dumbfire_02_mk1" name="{20105,4384}" description="{20105,4382}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="15800" average="26066" max="36406" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="64" />
+          <ware ware="turretcomponents" amount="13" />
+        </primary>
+      </production>
+      <component ref="turret_spl_m_dumbfire_02_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.55" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_m_flak_01_mk1" name="{20105,4424}" description="{20105,4426}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="41023" average="65305" max="89587" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="3" />
+          <ware ware="energycells" amount="45" />
+          <ware ware="turretcomponents" amount="27" />
+        </primary>
+      </production>
+      <component ref="turret_spl_m_flak_01_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.95" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+    </ware>
+    <ware id="turret_spl_m_flak_02_mk1" name="{20105,4424}" description="{20105,4426}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="41023" average="65305" max="89587" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="3" />
+          <ware ware="energycells" amount="45" />
+          <ware ware="turretcomponents" amount="27" />
+        </primary>
+      </production>
+      <component ref="turret_spl_m_flak_02_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.95" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+    </ware>
+    <ware id="turret_spl_m_gatling_01_mk1" name="{20105,4344}" description="{20105,4342}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="15116" average="24972" max="34901" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="52" />
+          <ware ware="turretcomponents" amount="13" />
+        </primary>
+      </production>
+      <component ref="turret_spl_m_gatling_01_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.06" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_m_gatling_02_mk1" name="{20105,4344}" description="{20105,4342}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="15116" average="24972" max="34901" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="52" />
+          <ware ware="turretcomponents" amount="13" />
+        </primary>
+      </production>
+      <component ref="turret_spl_m_gatling_02_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.06" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_m_guided_01_mk1" name="{20105,4394}" description="{20105,4392}" group="turrets" transport="equipment" volume="1" tags="noplayerblueprint turret">
+      <price min="17066" average="27275" max="37546" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="1" />
+          <ware ware="energycells" amount="48" />
+          <ware ware="turretcomponents" amount="11" />
+        </primary>
+      </production>
+      <component ref="turret_spl_m_guided_01_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_m_guided_02_mk1" name="{20105,4394}" description="{20105,4392}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="17066" average="27275" max="37546" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="1" />
+          <ware ware="energycells" amount="48" />
+          <ware ware="turretcomponents" amount="11" />
+        </primary>
+      </production>
+      <component ref="turret_spl_m_guided_02_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.63" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_m_laser_01_mk1" name="{20105,4324}" description="{20105,4322}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="13247" average="21860" max="30535" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="52" />
+          <ware ware="turretcomponents" amount="11" />
+        </primary>
+      </production>
+      <component ref="turret_spl_m_laser_01_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_m_laser_02_mk1" name="{20105,4324}" description="{20105,4322}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="13247" average="21860" max="30535" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="52" />
+          <ware ware="turretcomponents" amount="11" />
+        </primary>
+      </production>
+      <component ref="turret_spl_m_laser_02_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_m_mining_01_mk1" name="{20105,4374}" description="{20105,4372}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="10374" average="17203" max="24088" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="18" />
+          <ware ware="turretcomponents" amount="10" />
+        </primary>
+      </production>
+      <component ref="turret_spl_m_mining_01_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" purposes="mine" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_m_mining_02_mk1" name="{20105,4374}" description="{20105,4372}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="10374" average="17203" max="24088" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="18" />
+          <ware ware="turretcomponents" amount="10" />
+        </primary>
+      </production>
+      <component ref="turret_spl_m_mining_02_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" purposes="mine" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_m_plasma_01_mk1" name="{20105,4354}" description="{20105,4352}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="20258" average="32684" max="45201" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="1" />
+          <ware ware="energycells" amount="22" />
+          <ware ware="turretcomponents" amount="16" />
+        </primary>
+      </production>
+      <component ref="turret_spl_m_plasma_01_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.57" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_m_plasma_02_mk1" name="{20105,4354}" description="{20105,4352}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="20258" average="32684" max="45201" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="1" />
+          <ware ware="energycells" amount="22" />
+          <ware ware="turretcomponents" amount="16" />
+        </primary>
+      </production>
+      <component ref="turret_spl_m_plasma_02_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.57" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_m_shotgun_01_mk1" name="{20105,4334}" description="{20105,4332}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="14797" average="24521" max="34325" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="30" />
+          <ware ware="turretcomponents" amount="14" />
+        </primary>
+      </production>
+      <component ref="turret_spl_m_shotgun_01_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.06" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="turret_spl_m_shotgun_02_mk1" name="{20105,4334}" description="{20105,4332}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
+      <price min="14797" average="24521" max="34325" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="30" />
+          <ware ware="turretcomponents" amount="14" />
+        </primary>
+      </production>
+      <component ref="turret_spl_m_shotgun_02_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.06" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="weapon_spl_l_destroyer_01_mk1" name="{20105,3034}" description="{20105,3032}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
+      <price min="727725" average="1086323" max="1444922" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="131" />
+          <ware ware="energycells" amount="29" />
+          <ware ware="weaponcomponents" amount="201" />
+        </primary>
+      </production>
+      <component ref="weapon_spl_l_destroyer_01_mk1_macro" />
+      <restriction licence="capitalequipment" />
+      <use threshold="0" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="weapon_spl_m_gatling_01_mk1" name="{20105,2324}" description="{20105,2322}" transport="equipment" volume="1" tags="equipment weapon">
+      <price min="31065" average="51653" max="72242" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="32" />
+          <ware ware="weaponcomponents" amount="30" />
+        </primary>
+      </production>
+      <component ref="weapon_spl_m_gatling_01_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.06" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="weapon_spl_m_gatling_01_mk2" name="{20105,2334}" description="{20105,2332}" transport="equipment" volume="1" tags="equipment weapon">
+      <price min="170789" average="256540" max="342291" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="29" />
+          <ware ware="energycells" amount="31" />
+          <ware ware="weaponcomponents" amount="53" />
+        </primary>
+      </production>
+      <component ref="weapon_spl_m_gatling_01_mk2_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.29" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="weapon_spl_m_railgun_01_mk1" name="{20105,2284}" description="{20105,2282}" transport="equipment" volume="1" tags="equipment weapon">
+      <price min="299375" average="451554" max="603733" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="49" />
+          <ware ware="energycells" amount="29" />
+          <ware ware="weaponcomponents" amount="102" />
+        </primary>
+      </production>
+      <component ref="weapon_spl_m_railgun_01_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.99" />
+      <owner faction="court" />
+      <owner faction="split" />
+    </ware>
+    <ware id="weapon_spl_m_railgun_01_mk2" name="{20105,2294}" description="{20105,2292}" transport="equipment" volume="1" tags="equipment weapon">
+      <price min="1181388" average="1778634" max="2375880" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedcomposites" amount="115" />
+          <ware ware="advancedelectronics" amount="112" />
+          <ware ware="energycells" amount="1130" />
+          <ware ware="weaponcomponents" amount="415" />
+        </primary>
+      </production>
+      <component ref="weapon_spl_m_railgun_01_mk2_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="1" />
+      <owner faction="court" />
+      <owner faction="split" />
+    </ware>
+    <ware id="weapon_spl_m_shotgun_01_mk1" name="{20105,2304}" description="{20105,2302}" transport="equipment" volume="1" tags="equipment weapon">
+      <price min="19688" average="31715" max="43742" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="1" />
+          <ware ware="energycells" amount="35" />
+          <ware ware="weaponcomponents" amount="14" />
+        </primary>
+      </production>
+      <component ref="weapon_spl_m_shotgun_01_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.06" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="weapon_spl_m_shotgun_01_mk2" name="{20105,2314}" description="{20105,2312}" transport="equipment" volume="1" tags="equipment weapon">
+      <price min="101905" average="157126" max="212348" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="13" />
+          <ware ware="energycells" amount="44" />
+          <ware ware="weaponcomponents" amount="48" />
+        </primary>
+      </production>
+      <component ref="weapon_spl_m_shotgun_01_mk2_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.28" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="weapon_spl_m_sticky_01_mk1" name="{20105,2344}" description="{20105,2342}" transport="equipment" volume="1" tags="equipment weapon">
+      <price min="20549" average="33157" max="45765" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="1" />
+          <ware ware="energycells" amount="33" />
+          <ware ware="weaponcomponents" amount="15" />
+        </primary>
+      </production>
+      <component ref="weapon_spl_m_sticky_01_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.07" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="weapon_spl_m_sticky_01_mk2" name="{20105,2354}" description="{20105,2352}" transport="equipment" volume="1" tags="equipment weapon">
+      <price min="75907" average="124414" max="172921" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="2" />
+          <ware ware="energycells" amount="44" />
+          <ware ware="weaponcomponents" amount="67" />
+        </primary>
+      </production>
+      <component ref="weapon_spl_m_sticky_01_mk2_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.28" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="weapon_spl_s_gatling_01_mk1" name="{20105,1324}" description="{20105,1322}" transport="equipment" volume="1" tags="equipment weapon">
+      <price min="15527" average="25753" max="35978" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="33" />
+          <ware ware="weaponcomponents" amount="14" />
+        </primary>
+      </production>
+      <component ref="weapon_spl_s_gatling_01_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.21" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="weapon_spl_s_gatling_01_mk2" name="{20105,1334}" description="{20105,1332}" transport="equipment" volume="1" tags="equipment weapon">
+      <price min="78181" average="127292" max="176404" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="3" />
+          <ware ware="energycells" amount="30" />
+          <ware ware="weaponcomponents" amount="66" />
+        </primary>
+      </production>
+      <component ref="weapon_spl_s_gatling_01_mk2_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.99" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="weapon_spl_s_railgun_01_mk1" name="{20105,1284}" description="{20105,1282}" transport="equipment" volume="1" tags="equipment weapon">
+      <price min="158471" average="245670" max="332869" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="19" />
+          <ware ware="energycells" amount="29" />
+          <ware ware="weaponcomponents" amount="82" />
+        </primary>
+      </production>
+      <component ref="weapon_spl_s_railgun_01_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.96" />
+      <owner faction="court" />
+      <owner faction="split" />
+    </ware>
+    <ware id="weapon_spl_s_railgun_01_mk2" name="{20105,1294}" description="{20105,1292}" transport="equipment" volume="1" tags="equipment weapon">
+      <price min="839148" average="1266147" max="1693145" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedcomposites" amount="68" />
+          <ware ware="advancedelectronics" amount="78" />
+          <ware ware="energycells" amount="748" />
+          <ware ware="weaponcomponents" amount="296" />
+        </primary>
+      </production>
+      <component ref="weapon_spl_s_railgun_01_mk2_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="1" />
+      <owner faction="court" />
+      <owner faction="split" />
+    </ware>
+    <ware id="weapon_spl_s_shotgun_01_mk1" name="{20105,1304}" description="{20105,1302}" transport="equipment" volume="1" tags="equipment weapon">
+      <price min="15675" average="25034" max="34394" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="1" />
+          <ware ware="energycells" amount="33" />
+          <ware ware="weaponcomponents" amount="10" />
+        </primary>
+      </production>
+      <component ref="weapon_spl_s_shotgun_01_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.13" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="weapon_spl_s_shotgun_01_mk2" name="{20105,1314}" description="{20105,1312}" transport="equipment" volume="1" tags="equipment weapon">
+      <price min="78369" average="123707" max="169045" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="7" />
+          <ware ware="energycells" amount="40" />
+          <ware ware="weaponcomponents" amount="49" />
+        </primary>
+      </production>
+      <component ref="weapon_spl_s_shotgun_01_mk2_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.63" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="weapon_spl_s_sticky_01_mk1" name="{20105,1344}" description="{20105,1342}" transport="equipment" volume="1" tags="equipment weapon">
+      <price min="8590" average="14199" max="19808" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="31" />
+          <ware ware="weaponcomponents" amount="7" />
+        </primary>
+      </production>
+      <component ref="weapon_spl_s_sticky_01_mk1_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.06" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+    <ware id="weapon_spl_s_sticky_01_mk2" name="{20105,1354}" description="{20105,1352}" transport="equipment" volume="1" tags="equipment weapon">
+      <price min="29099" average="45446" max="61794" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="3" />
+          <ware ware="energycells" amount="41" />
+          <ware ware="weaponcomponents" amount="15" />
+        </primary>
+      </production>
+      <component ref="weapon_spl_s_sticky_01_mk2_macro" />
+      <restriction licence="militaryequipment" />
+      <use threshold="0.18" />
+      <owner faction="court" />
+      <owner faction="freesplit" />
+      <owner faction="split" />
+    </ware>
+  </add>
+  <add sel="/wares/ware[@id='module_arg_dock_m_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_arg_dock_m_01_hightech']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_arg_dock_m_01_lowtech']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_arg_dock_m_02']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_arg_dock_m_02_hightech']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_arg_dock_m_02_lowtech']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_arg_radar_dish_01']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_build_dockarea_m_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_build_l_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_build_xl_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_equip_dockarea_m_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_equip_l_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_equip_xl_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_advancedcomposites_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_advancedelectronics_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_antimattercells_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_antimatterconverters_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_claytronics_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_dronecomponents_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_energycells_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_engineparts_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_fieldcoils_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_graphene_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_hullparts_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_microchips_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_missilecomponents_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_plasmaconductors_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_quantumtubes_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_refinedmetals_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_scanningarrays_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_shieldcomponents_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_siliconwafers_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_smartchips_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_spices_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_superfluidcoolant_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_turretcomponents_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_water_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_prod_weaponcomponents_01']">
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_dumbfire_01_mk1']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_dumbfire_01_mk2']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_guided_01_mk1']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_guided_01_mk2']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_laser_01_mk1']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_laser_01_mk2']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_mining_01_mk1']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_mining_01_mk2']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_plasma_01_mk1']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_plasma_01_mk2']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_torpedo_01_mk1']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_torpedo_01_mk2']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_dumbfire_01_mk1']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_dumbfire_01_mk2']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_guided_01_mk1']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_guided_01_mk2']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_laser_01_mk1']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_laser_01_mk2']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_mining_01_mk1']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_mining_01_mk2']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_plasma_01_mk1']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_plasma_01_mk2']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_torpedo_01_mk1']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_torpedo_01_mk2']">
+    <owner faction="court" />
+    <owner faction="freesplit" />
+    <owner faction="split" />
+  </add>
+  <add sel="/wares/ware[@id='medicalsupplies']">
+    <production time="300" amount="208" method="split" name="{20206,701}">
+      <primary>
+        <ware ware="energycells" amount="100" />
+        <ware ware="scruffinfruits" amount="30" />
+        <ware ware="spices" amount="60" />
+        <ware ware="water" amount="60" />
+      </primary>
+      <effects>
+        <effect type="work" product="0.28" />
+      </effects>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='workunit_busy']">
+    <production time="600" amount="200" method="split" name="{20206,701}">
+      <primary>
+        <ware ware="cheltmeat" amount="17" />
+        <ware ware="medicalsupplies" amount="45" />
+        <ware ware="scruffinfruits" amount="23" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='workunit_idle']">
+    <production time="600" amount="200" method="split" name="{20206,701}">
+      <primary>
+        <ware ware="cheltmeat" amount="13" />
+        <ware ware="medicalsupplies" amount="30" />
+        <ware ware="scruffinfruits" amount="10" />
+      </primary>
+    </production>
+  </add>
+</diff>
