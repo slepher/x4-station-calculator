@@ -2145,13 +2145,17 @@ def migrate_region_definitions(
         # 解析 fields 节点（asteroid、debris 和 nebula）
         fields_data = parse_region_fields(region_node, group_index, resources_map)
 
-        # === regions.json: 包含 boundary, falloff 和模板资源数据 ===
+        # === regions.json: 包含 boundary, falloff, volume_km3 和模板资源数据 ===
         region_template = {
             "id": region_name,
             "boundary": region_item["boundary"],
             "falloff": region_item["falloff"],
+            "volume_km3": region_item["volume_km3"],
             "resources": [],
         }
+        # 对于 splinetube 类型，添加 linear 字段
+        if "linear" in region_item:
+            region_template["linear"] = region_item["linear"]
 
         # 从 resources_map 和 yield_info_map 构建模板资源
         for ware, res_info in resources_map.items():

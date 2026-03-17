@@ -118,7 +118,20 @@ yield = hit_block_count × (lateral × radial) × resourcedensity
 
 **regions.json** - 模板数据（不含坐标，无法进行截断计算）：
 
-每个 region 的 resources 数组元素包含：
+region 级包含：
+- `id`: region 唯一标识
+- `boundary`: 边界几何定义（class, size, spline）
+- `falloff`: falloff 曲线定义
+- `volume_km3`: 几何体积（km³）
+- `linear`: 仅 splinetube 类型，表示等效长度
+- `resources`: 资源模板数组
+
+每个 region 的 resources 数组元素仅包含模板字段：
+- `ware`: 资源类型
+- `resourcedensity`: 资源密度
+- `delay`: 重生时间（秒）
+- `gatherfactor`: 采集效率系数
+- `yield_name`: 产量名称标识
 
 ```json
 {
@@ -277,7 +290,7 @@ resourceareas.json (实例：ref, amount, position, falloff 因子，体积/方�
 ## 验收标准（DoD）
 
 1. [ ] `regions.json` 中不再包含 resources 为空的元素
-2. [ ] `regions.json` 仅包含模板字段（ware, resourcedensity, delay, gatherfactor, yield_name）
+2. [ ] `regions.json` region 级包含 boundary, falloff, volume_km3；resources 数组仅包含模板字段（ware, resourcedensity, delay, gatherfactor, yield_name）
 3. [ ] `regions.json` 移除了 noise 相关字段（density, rotation, noisescale, seed, minnoisevalue, maxnoisevalue, noise_probability）
 4. [ ] `resourceareas.json` 包含 ref, amount, position 字段
 5. [ ] `resourceareas.json` 包含 falloff 因子（lateral_factor, radial_factor, falloff_factor）
