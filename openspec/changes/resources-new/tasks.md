@@ -80,3 +80,20 @@
 - [x] 13.7 为 `resources` 添加 `density` 字段（单位密度，resources/km³）。
 - [x] 13.8 为 `resources` 添加 `respawn_density` 字段（单位回复密度，resources/km³/hour）。
 - [x] 13.9 区分固体/气体资源计算逻辑（气体不使用 yield 乘数）。
+
+## 14. 8.0 regions.json resources 数组增强
+- [x] 14.1 为 `resources` 数组添加 `yield_name` 字段（从 region 的 `<resources>` 节点读取）。
+- [x] 14.2 为 `resources` 数组添加 `resourcedensity` 字段（从 yield_info_map 查找）。
+- [x] 14.3 更新 `summarize_region_resources()` 函数输出 `yield_name` 和 `resourcedensity`。
+- [x] 14.4 执行 `python3 scripts/x4_data_map_processor.py --version 8.0` 验证输出。
+- [x] 14.5 执行 `npm run build` 确认前端不报错。
+
+## 15. 8.0 regions.json field 数组迁移
+- [x] 15.1 在 `parse_region_fields()` 中增加 `debris` 节点解析（与 asteroid 逻辑相同）。
+- [x] 15.2 更新 `parse_region_fields()` 返回 `asteroids`、`debris`、`nebulae` 三个数组。
+- [x] 15.3 为 asteroid 解析 `groupref`，从 group 查找 `resource` 和 `yield`。
+- [x] 15.4 为 debris 解析 `groupref`，从 group 查找 `resource` 和 `yield`。
+- [x] 15.5 为 nebula 解析 `resources` 属性为数组。
+- [x] 15.6 在 `migrate_region_definitions()` 中将 `asteroids`、`debris`、`nebulae` 添加到 region 输出。
+- [x] 15.7 执行 `python3 scripts/x4_data_map_processor.py --version 8.0` 验证输出。
+- [x] 15.8 执行 `npm run build` 确认前端不报错。

@@ -69,3 +69,73 @@
 - **当** 系统聚合 `sector.resources`
 - **那么** 系统 SHALL 使用该 `ware` 中最高的 `tag` 作为摘要 `yield`
 - **并且** 系统 SHALL 输出与该 `yield` 对应的 `level`
+
+### Requirement: 8.0 Regions.json Resources Array Enhancement
+系统 MUST 在 8.0 版本的 `regions.json` 中为 `resources` 数组的每个资源项添加更多字段信息。
+
+#### Scenario: 为 resources 添加 yield_name 字段
+- **前提** 当前处理的游戏版本主版本号小于 `9`（8.0 版本）
+- **当** 系统解析 `region_definitions_final.xml` 的 region 节点
+- **那么** 系统 SHALL 读取 `<resources>/<resource>` 节点的 `yield` 属性
+- **并且** 系统 SHALL 在输出的 `resources` 数组中为每个资源项添加 `yield_name` 字段
+
+#### Scenario: 为 resources 添加 resourcedensity 字段
+- **前提** 当前处理的游戏版本主版本号小于 `9`（8.0 版本）
+- **当** 系统解析 `regionyields_final.xml`
+- **那么** 系统 SHALL 根据 `ware` 和 `yield_name` 查找对应的 `resourcedensity`
+- **并且** 系统 SHALL 在输出的 `resources` 数组中为每个资源项添加 `resourcedensity` 字段
+
+#### Scenario: resources 数组完整字段结构
+- **前提** 当前处理的游戏版本主版本号小于 `9`（8.0 版本）
+- **当** 系统输出 `regions.json` 的 `resources` 数组
+- **那么** 每个资源项 SHALL 包含以下字段：
+  - `ware` - 资源类型
+  - `yield` - 总产量（整数）
+  - `delay` - 回复时间（分钟）
+  - `respawn` - 总回复量（整数）
+  - `density` - 单位密度（resources/km³）
+  - `respawn_density` - 单位回复密度（resources/km³/hour）
+  - `factor` - 修正因子（默认 1.0）
+  - `yield_name` - Yield 等级名称（新增）
+  - `resourcedensity` - 基础资源密度（新增）
+
+### Requirement: 8.0 Regions.json Field Arrays Enhancement
+系统 MUST 在 8.0 版本的 `regions.json` 中为每个 region 添加原始 field 数据数组。
+
+#### Scenario: 添加 asteroids 数组
+- **前提** 当前处理的游戏版本主版本号小于 `9`（8.0 版本）
+- **当** 系统解析 `region_definitions_final.xml` 的 region 节点
+- **那么** 系统 SHALL 读取 `<fields><asteroid .../>` 节点
+- **并且** 系统 SHALL 根据 `groupref` 查找对应的 asteroid group 定义
+- **并且** 系统 SHALL 在输出中添加 `asteroids` 数组
+- **并且** 每个 asteroid 项 SHALL 包含以下字段：
+  - `groupref` - 引用的 asteroid group ID
+  - `resource` - 该 asteroid 产出的 ware（从 group 解析）
+  - `yield` - 基础产量（从 group 解析）
+  - `densityfactor` - 密度修正因子
+  - `minnoisevalue` - 噪声最小值
+  - `maxnoisevalue` - 噪声最大值
+  - `resourcepercentage` - 资源百分比
+
+#### Scenario: 添加 debris 数组
+- **前提** 当前处理的游戏版本主版本号小于 `9`（8.0 版本）
+- **当** 系统解析 `region_definitions_final.xml` 的 region 节点
+- **那么** 系统 SHALL 读取 `<fields><debris .../>` 节点
+- **并且** 系统 SHALL 根据 `groupref` 查找对应的 debris group 定义
+- **并且** 系统 SHALL 在输出中添加 `debris` 数组
+- **并且** 每个 debris 项 SHALL 包含以下字段：
+  - `groupref` - 引用的 debris group ID
+  - `resource` - 该 debris 产出的 ware（从 group 解析）
+  - `yield` - 基础产量（从 group 解析）
+  - `densityfactor` - 密度修正因子
+  - `minnoisevalue` - 噪声最小值
+  - `maxnoisevalue` - 噪声最大值
+  - `resourcepercentage` - 资源百分比
+
+#### Scenario: 添加 nebulae 数组
+- **前提** 当前处理的游戏版本主版本号小于 `9`（8.0 版本）
+- **当** 系统解析 `region_definitions_final.xml` 的 region 节点
+- **那么** 系统 SHALL 读取 `<fields><nebula resources="..."/>` 节点
+- **并且** 系统 SHALL 在输出中添加 `nebulae` 数组
+- **并且** 每个 nebula 项 SHALL 包含以下字段：
+  - `resources` - 气体资源 ware 列表（数组，解析逗号分隔的 resources 属性）

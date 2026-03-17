@@ -53,28 +53,28 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 544949699,
-              "respawn": 181649900
+              "amount": 206420340600,
+              "respawn": 6880678020
             },
             {
               "ware": "ice",
-              "amount": 31093050,
-              "respawn": 10364349
+              "amount": 12437220256,
+              "respawn": 1451009029
             },
             {
               "ware": "nividium",
-              "amount": 20,
-              "respawn": 0
+              "amount": 2000,
+              "respawn": 12
             },
             {
               "ware": "ore",
-              "amount": 8510978,
-              "respawn": 851096
+              "amount": 37319293986,
+              "respawn": 134518640
             },
             {
               "ware": "silicon",
-              "amount": 5387746,
-              "respawn": 538773
+              "amount": 375651807,
+              "respawn": 9653228
             }
           ],
           "normalized": {
@@ -220,33 +220,38 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 7757018,
-              "respawn": 2585673
+              "amount": 1292836320,
+              "respawn": 43094544
             },
             {
               "ware": "hydrogen",
-              "amount": 17978892,
-              "respawn": 5992964
+              "amount": 6532690590,
+              "respawn": 222323619
             },
             {
               "ware": "ice",
-              "amount": 234602,
-              "respawn": 78200
+              "amount": 234601110,
+              "respawn": 23460112
             },
             {
               "ware": "methane",
-              "amount": 7757018,
-              "respawn": 2585673
+              "amount": 646418160,
+              "respawn": 64641816
             },
             {
               "ware": "ore",
-              "amount": 104416981,
-              "respawn": 10441699
+              "amount": 138775315,
+              "respawn": 10845915
+            },
+            {
+              "ware": "rawscrap",
+              "amount": 217983150,
+              "respawn": 3114045
             },
             {
               "ware": "silicon",
-              "amount": 53368685,
-              "respawn": 5336867
+              "amount": 402067311,
+              "respawn": 14938389
             }
           ],
           "normalized": {
@@ -384,23 +389,23 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 34130878,
-              "respawn": 11376960
+              "amount": 12928363200,
+              "respawn": 430945440
             },
             {
               "ware": "nividium",
-              "amount": 5,
-              "respawn": 0
+              "amount": 500,
+              "respawn": 3
             },
             {
               "ware": "ore",
-              "amount": 126521175,
-              "respawn": 12652120
+              "amount": 821253961,
+              "respawn": 30636741
             },
             {
               "ware": "silicon",
-              "amount": 56452309,
-              "respawn": 5645229
+              "amount": 415927325,
+              "respawn": 14889466
             }
           ],
           "normalized": {
@@ -781,23 +786,23 @@
           "resources": [
             {
               "ware": "ice",
-              "amount": 117301,
-              "respawn": 39100
+              "amount": 117300555,
+              "respawn": 11730056
             },
             {
               "ware": "nividium",
-              "amount": 5,
-              "respawn": 0
+              "amount": 500,
+              "respawn": 3
             },
             {
               "ware": "ore",
-              "amount": 405885,
-              "respawn": 40588
+              "amount": 93665744,
+              "respawn": 2341644
             },
             {
               "ware": "silicon",
-              "amount": 401071,
-              "respawn": 40107
+              "amount": 92554786,
+              "respawn": 2313870
             }
           ],
           "normalized": {
@@ -916,28 +921,28 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 9541711152,
-              "respawn": 3180570384
+              "amount": 1326553302392,
+              "respawn": 55926063677
             },
             {
               "ware": "ice",
-              "amount": 6087598,
-              "respawn": 2029199
+              "amount": 60875972,
+              "respawn": 20291990
             },
             {
               "ware": "nividium",
-              "amount": 2056,
-              "respawn": 50
+              "amount": 6285950,
+              "respawn": 9944
             },
             {
               "ware": "ore",
-              "amount": 39390781,
-              "respawn": 3939078
+              "amount": 757048811,
+              "respawn": 26357686
             },
             {
               "ware": "silicon",
-              "amount": 38446224,
-              "respawn": 3844622
+              "amount": 980101024,
+              "respawn": 32305797
             }
           ],
           "normalized": {
@@ -1231,8 +1236,8 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 9921712088,
-              "respawn": 3307237363
+              "amount": 3758224275900,
+              "respawn": 125274142530
             }
           ],
           "normalized": {
@@ -1341,33 +1346,33 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 7757018,
-              "respawn": 2585673
+              "amount": 1292836320,
+              "respawn": 43094544
             },
             {
               "ware": "hydrogen",
-              "amount": 17065439,
-              "respawn": 5688480
+              "amount": 6464181600,
+              "respawn": 215472720
             },
             {
               "ware": "methane",
-              "amount": 7757018,
-              "respawn": 2585673
+              "amount": 646418160,
+              "respawn": 64641816
             },
             {
               "ware": "nividium",
-              "amount": 5,
-              "respawn": 0
+              "amount": 500,
+              "respawn": 3
             },
             {
               "ware": "ore",
-              "amount": 405885,
-              "respawn": 40588
+              "amount": 93665744,
+              "respawn": 2341644
             },
             {
               "ware": "silicon",
-              "amount": 401071,
-              "respawn": 40107
+              "amount": 92554786,
+              "respawn": 2313870
             }
           ],
           "normalized": {
@@ -1485,18 +1490,18 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 15514036,
-              "respawn": 5171346
+              "amount": 2585672640,
+              "respawn": 86189088
             },
             {
               "ware": "hydrogen",
-              "amount": 34130878,
-              "respawn": 11376960
+              "amount": 12928363200,
+              "respawn": 430945440
             },
             {
               "ware": "methane",
-              "amount": 7757018,
-              "respawn": 2585673
+              "amount": 646418160,
+              "respawn": 64641816
             }
           ],
           "normalized": {
@@ -1661,8 +1666,8 @@
           "resources": [
             {
               "ware": "ore",
-              "amount": 37600087,
-              "respawn": 3760009
+              "amount": 5784628740,
+              "respawn": 173538862
             }
           ],
           "normalized": {
@@ -1761,13 +1766,13 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 661447473,
-              "respawn": 220482491
+              "amount": 49608560442,
+              "respawn": 4960856044
             },
             {
               "ware": "nividium",
-              "amount": 1002,
-              "respawn": 25
+              "amount": 10022,
+              "respawn": 119
             },
             {
               "ware": "silicon",
@@ -2474,23 +2479,23 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 7757018,
-              "respawn": 2585673
+              "amount": 3361374432,
+              "respawn": 56022907
             },
             {
               "ware": "hydrogen",
-              "amount": 17065439,
-              "respawn": 5688480
+              "amount": 6464181600,
+              "respawn": 215472720
             },
             {
               "ware": "ice",
-              "amount": 586505,
-              "respawn": 195500
+              "amount": 586502775,
+              "respawn": 58650280
             },
             {
               "ware": "methane",
-              "amount": 7757018,
-              "respawn": 2585673
+              "amount": 9696272400,
+              "respawn": 121203405
             }
           ],
           "normalized": {
@@ -2921,28 +2926,28 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 146841397,
-              "respawn": 48947132
+              "amount": 11013104800,
+              "respawn": 1101310480
             },
             {
               "ware": "ice",
-              "amount": 4296780,
-              "respawn": 1432260
+              "amount": 4296779524,
+              "respawn": 429677952
             },
             {
               "ware": "nividium",
-              "amount": 111,
-              "respawn": 3
+              "amount": 11124,
+              "respawn": 66
             },
             {
               "ware": "ore",
-              "amount": 5993195,
-              "respawn": 599319
+              "amount": 36927565974,
+              "respawn": 125147666
             },
             {
               "ware": "silicon",
-              "amount": 5148348,
-              "respawn": 514835
+              "amount": 11880804,
+              "respawn": 594040
             }
           ],
           "normalized": {
@@ -3423,23 +3428,23 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 7757018,
-              "respawn": 2585673
+              "amount": 1292836320,
+              "respawn": 43094544
             },
             {
               "ware": "hydrogen",
-              "amount": 17065439,
-              "respawn": 5688480
+              "amount": 6464181600,
+              "respawn": 215472720
             },
             {
               "ware": "ice",
-              "amount": 234602,
-              "respawn": 78200
+              "amount": 234601110,
+              "respawn": 23460112
             },
             {
               "ware": "methane",
-              "amount": 15514036,
-              "respawn": 5171346
+              "amount": 1292836320,
+              "respawn": 129283632
             }
           ],
           "normalized": {
@@ -3648,23 +3653,23 @@
           "resources": [
             {
               "ware": "ice",
-              "amount": 351903,
-              "respawn": 117300
+              "amount": 351901665,
+              "respawn": 35190168
             },
             {
               "ware": "nividium",
-              "amount": 15,
-              "respawn": 0
+              "amount": 1500,
+              "respawn": 9
             },
             {
               "ware": "ore",
-              "amount": 1217655,
-              "respawn": 121764
+              "amount": 280997232,
+              "respawn": 7024932
             },
             {
               "ware": "silicon",
-              "amount": 1203213,
-              "respawn": 120321
+              "amount": 277664358,
+              "respawn": 6941610
             }
           ],
           "normalized": {
@@ -3805,18 +3810,18 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 4728315917,
-              "respawn": 1576105306
+              "amount": 354623693784,
+              "respawn": 35462369378
             },
             {
               "ware": "ore",
-              "amount": 7823214,
-              "respawn": 782321
+              "amount": 180535699,
+              "respawn": 6017857
             },
             {
               "ware": "silicon",
-              "amount": 5401743,
-              "respawn": 540174
+              "amount": 124655601,
+              "respawn": 4155187
             }
           ],
           "normalized": {
@@ -4021,23 +4026,23 @@
           "resources": [
             {
               "ware": "methane",
-              "amount": 4509869131,
-              "respawn": 1503289710
+              "amount": 1879112137950,
+              "respawn": 62637071265
             },
             {
               "ware": "nividium",
-              "amount": 752,
-              "respawn": 19
+              "amount": 75164,
+              "respawn": 447
             },
             {
               "ware": "ore",
-              "amount": 9927725,
-              "respawn": 992773
+              "amount": 229101352,
+              "respawn": 7636712
             },
             {
               "ware": "silicon",
-              "amount": 4963863,
-              "respawn": 496386
+              "amount": 114550676,
+              "respawn": 3818356
             }
           ],
           "normalized": {
@@ -4188,38 +4193,38 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 7757018,
-              "respawn": 2585673
+              "amount": 1292836320,
+              "respawn": 43094544
             },
             {
               "ware": "hydrogen",
-              "amount": 17065439,
-              "respawn": 5688480
+              "amount": 6464181600,
+              "respawn": 215472720
             },
             {
               "ware": "ice",
-              "amount": 234602,
-              "respawn": 78200
+              "amount": 234601110,
+              "respawn": 23460112
             },
             {
               "ware": "methane",
-              "amount": 7757018,
-              "respawn": 2585673
+              "amount": 646418160,
+              "respawn": 64641816
             },
             {
               "ware": "nividium",
-              "amount": 5,
-              "respawn": 0
+              "amount": 500,
+              "respawn": 3
             },
             {
               "ware": "ore",
-              "amount": 405885,
-              "respawn": 40588
+              "amount": 93665744,
+              "respawn": 2341644
             },
             {
               "ware": "silicon",
-              "amount": 401071,
-              "respawn": 40107
+              "amount": 92554786,
+              "respawn": 2313870
             }
           ],
           "normalized": {
@@ -4556,33 +4561,33 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 7757018,
-              "respawn": 2585673
+              "amount": 1292836320,
+              "respawn": 43094544
             },
             {
               "ware": "hydrogen",
-              "amount": 17065439,
-              "respawn": 5688480
+              "amount": 6464181600,
+              "respawn": 215472720
             },
             {
               "ware": "methane",
-              "amount": 7757018,
-              "respawn": 2585673
+              "amount": 646418160,
+              "respawn": 64641816
             },
             {
               "ware": "nividium",
-              "amount": 10,
-              "respawn": 0
+              "amount": 1000,
+              "respawn": 6
             },
             {
               "ware": "ore",
-              "amount": 811770,
-              "respawn": 81176
+              "amount": 187331488,
+              "respawn": 4683288
             },
             {
               "ware": "silicon",
-              "amount": 802142,
-              "respawn": 80214
+              "amount": 185109572,
+              "respawn": 4627740
             }
           ],
           "normalized": {
@@ -4766,33 +4771,33 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 7757018,
-              "respawn": 2585673
+              "amount": 1292836320,
+              "respawn": 43094544
             },
             {
               "ware": "hydrogen",
-              "amount": 17065439,
-              "respawn": 5688480
+              "amount": 6464181600,
+              "respawn": 215472720
             },
             {
               "ware": "methane",
-              "amount": 7757018,
-              "respawn": 2585673
+              "amount": 646418160,
+              "respawn": 64641816
             },
             {
               "ware": "nividium",
-              "amount": 25,
-              "respawn": 0
+              "amount": 2500,
+              "respawn": 15
             },
             {
               "ware": "ore",
-              "amount": 2029425,
-              "respawn": 202940
+              "amount": 468328720,
+              "respawn": 11708220
             },
             {
               "ware": "silicon",
-              "amount": 2005355,
-              "respawn": 200535
+              "amount": 462773930,
+              "respawn": 11569350
             }
           ],
           "normalized": {
@@ -5144,23 +5149,28 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 42086629,
-              "respawn": 14028876
+              "amount": 3156497173,
+              "respawn": 315649717
             },
             {
               "ware": "nividium",
-              "amount": 10,
-              "respawn": 0
+              "amount": 1000,
+              "respawn": 6
             },
             {
               "ware": "ore",
-              "amount": 811770,
-              "respawn": 81176
+              "amount": 187331488,
+              "respawn": 4683288
+            },
+            {
+              "ware": "rawscrap",
+              "amount": 2761695898,
+              "respawn": 69042397
             },
             {
               "ware": "silicon",
-              "amount": 802142,
-              "respawn": 80214
+              "amount": 185109572,
+              "respawn": 4627740
             }
           ],
           "normalized": {
@@ -5296,13 +5306,13 @@
           "resources": [
             {
               "ware": "ore",
-              "amount": 891283,
-              "respawn": 89128
+              "amount": 205680637,
+              "respawn": 5142016
             },
             {
               "ware": "silicon",
-              "amount": 1570147,
-              "respawn": 157015
+              "amount": 362341564,
+              "respawn": 9058539
             }
           ],
           "normalized": {
@@ -5856,38 +5866,38 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 7757018,
-              "respawn": 2585673
+              "amount": 1292836320,
+              "respawn": 43094544
             },
             {
               "ware": "hydrogen",
-              "amount": 17065439,
-              "respawn": 5688480
+              "amount": 6464181600,
+              "respawn": 215472720
             },
             {
               "ware": "ice",
-              "amount": 234602,
-              "respawn": 78200
+              "amount": 234601110,
+              "respawn": 23460112
             },
             {
               "ware": "methane",
-              "amount": 7757018,
-              "respawn": 2585673
+              "amount": 646418160,
+              "respawn": 64641816
             },
             {
               "ware": "nividium",
-              "amount": 15,
-              "respawn": 0
+              "amount": 1500,
+              "respawn": 9
             },
             {
               "ware": "ore",
-              "amount": 1217655,
-              "respawn": 121764
+              "amount": 280997232,
+              "respawn": 7024932
             },
             {
               "ware": "silicon",
-              "amount": 1203213,
-              "respawn": 120321
+              "amount": 277664358,
+              "respawn": 6941610
             }
           ],
           "normalized": {
@@ -6271,18 +6281,23 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 3512286079,
-              "respawn": 1170762026
+              "amount": 263421455946,
+              "respawn": 26342145595
             },
             {
               "ware": "ore",
-              "amount": 44276091,
-              "respawn": 4427609
+              "amount": 1021755950,
+              "respawn": 34058532
+            },
+            {
+              "ware": "rawscrap",
+              "amount": 262792739,
+              "respawn": 6569818
             },
             {
               "ware": "silicon",
-              "amount": 40125208,
-              "respawn": 4012521
+              "amount": 925966330,
+              "respawn": 30865544
             }
           ],
           "normalized": {
@@ -6485,18 +6500,18 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 3512286079,
-              "respawn": 1170762026
+              "amount": 263421455946,
+              "respawn": 26342145595
             },
             {
               "ware": "ore",
-              "amount": 44276091,
-              "respawn": 4427609
+              "amount": 10217559503,
+              "respawn": 255438988
             },
             {
               "ware": "silicon",
-              "amount": 40125208,
-              "respawn": 4012521
+              "amount": 9259663300,
+              "respawn": 231491582
             }
           ],
           "normalized": {
@@ -6637,18 +6652,18 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 3512286079,
-              "respawn": 1170762026
+              "amount": 263421455946,
+              "respawn": 26342145595
             },
             {
               "ware": "nividium",
-              "amount": 1996,
-              "respawn": 50
+              "amount": 1995617,
+              "respawn": 5939
             },
             {
               "ware": "ore",
-              "amount": 52716221,
-              "respawn": 5271622
+              "amount": 12165281784,
+              "respawn": 304132045
             }
           ],
           "normalized": {
@@ -6770,23 +6785,23 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 3512286079,
-              "respawn": 1170762026
+              "amount": 263421455946,
+              "respawn": 26342145595
             },
             {
               "ware": "nividium",
-              "amount": 1996,
-              "respawn": 50
+              "amount": 1995617,
+              "respawn": 5939
             },
             {
               "ware": "ore",
-              "amount": 55345114,
-              "respawn": 5534511
+              "amount": 12771949379,
+              "respawn": 319298734
             },
             {
               "ware": "silicon",
-              "amount": 29056185,
-              "respawn": 2905618
+              "amount": 6705273424,
+              "respawn": 167631836
             }
           ],
           "normalized": {
@@ -6937,38 +6952,38 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 7757018,
-              "respawn": 2585673
+              "amount": 1292836320,
+              "respawn": 43094544
             },
             {
               "ware": "hydrogen",
-              "amount": 137454322,
-              "respawn": 45818108
+              "amount": 15493347835,
+              "respawn": 1118389343
             },
             {
               "ware": "ice",
-              "amount": 2934479,
-              "respawn": 978160
+              "amount": 293447903,
+              "respawn": 58689581
             },
             {
               "ware": "methane",
-              "amount": 137986616,
-              "respawn": 45995539
+              "amount": 109171083208,
+              "respawn": 1421200130
             },
             {
               "ware": "nividium",
-              "amount": 91,
-              "respawn": 2
+              "amount": 9120,
+              "respawn": 54
             },
             {
               "ware": "ore",
-              "amount": 4875304,
-              "respawn": 487531
+              "amount": 1125070266,
+              "respawn": 28126757
             },
             {
               "ware": "silicon",
-              "amount": 4875304,
-              "respawn": 487531
+              "amount": 346920303,
+              "respawn": 9393517
             }
           ],
           "normalized": {
@@ -7111,33 +7126,33 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 7757018,
-              "respawn": 2585673
+              "amount": 3361374432,
+              "respawn": 56022907
             },
             {
               "ware": "hydrogen",
-              "amount": 376779767,
-              "respawn": 125593256
+              "amount": 28258482564,
+              "respawn": 2825848257
             },
             {
               "ware": "ice",
-              "amount": 1805166,
-              "respawn": 601722
+              "amount": 180516652,
+              "respawn": 36103330
             },
             {
               "ware": "nividium",
-              "amount": 285,
-              "respawn": 8
+              "amount": 155816,
+              "respawn": 507
             },
             {
               "ware": "ore",
-              "amount": 4275810,
-              "respawn": 427581
+              "amount": 606565085,
+              "respawn": 15288217
             },
             {
               "ware": "silicon",
-              "amount": 4091973,
-              "respawn": 409197
+              "amount": 606381248,
+              "respawn": 15269833
             }
           ],
           "normalized": {
@@ -7661,38 +7676,38 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 15514036,
-              "respawn": 5171346
+              "amount": 2585672640,
+              "respawn": 86189088
             },
             {
               "ware": "hydrogen",
-              "amount": 17065439,
-              "respawn": 5688480
+              "amount": 6464181600,
+              "respawn": 215472720
             },
             {
               "ware": "ice",
-              "amount": 234602,
-              "respawn": 78200
+              "amount": 234601110,
+              "respawn": 23460112
             },
             {
               "ware": "methane",
-              "amount": 7757018,
-              "respawn": 2585673
+              "amount": 646418160,
+              "respawn": 64641816
             },
             {
               "ware": "nividium",
-              "amount": 7216,
-              "respawn": 180
+              "amount": 721578,
+              "respawn": 4295
             },
             {
               "ware": "ore",
-              "amount": 502853011,
-              "respawn": 50285301
+              "amount": 1253159111,
+              "respawn": 60316312
             },
             {
               "ware": "silicon",
-              "amount": 367862402,
-              "respawn": 36786240
+              "amount": 940542472,
+              "respawn": 44713254
             }
           ],
           "normalized": {
@@ -7950,8 +7965,13 @@
           "resources": [
             {
               "ware": "ore",
-              "amount": 85923289,
-              "respawn": 8592329
+              "amount": 19828451411,
+              "respawn": 495711285
+            },
+            {
+              "ware": "rawscrap",
+              "amount": 306078411,
+              "respawn": 4372549
             }
           ],
           "normalized": {
@@ -8082,23 +8102,28 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 5619657727,
-              "respawn": 1873219242
+              "amount": 421474329514,
+              "respawn": 42147432951
             },
             {
               "ware": "nividium",
-              "amount": 2129,
-              "respawn": 53
+              "amount": 212866,
+              "respawn": 1267
             },
             {
               "ware": "ore",
-              "amount": 90765987,
-              "respawn": 9076599
+              "amount": 13963997988,
+              "respawn": 418919940
+            },
+            {
+              "ware": "rawscrap",
+              "amount": 306078411,
+              "respawn": 4372549
             },
             {
               "ware": "silicon",
-              "amount": 73055550,
-              "respawn": 7305555
+              "amount": 16858973181,
+              "respawn": 421474330
             }
           ],
           "normalized": {
@@ -8394,18 +8419,18 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 262418357,
-              "respawn": 87472786
+              "amount": 19681376756,
+              "respawn": 1968137676
             },
             {
               "ware": "ore",
-              "amount": 5427289,
-              "respawn": 542729
+              "amount": 1252451248,
+              "respawn": 31311281
             },
             {
               "ware": "silicon",
-              "amount": 4703650,
-              "respawn": 470365
+              "amount": 723638499,
+              "respawn": 21709155
             }
           ],
           "normalized": {
@@ -8582,8 +8607,13 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 21448499,
-              "respawn": 7149499
+              "amount": 1608637430,
+              "respawn": 160863743
+            },
+            {
+              "ware": "rawscrap",
+              "amount": 467144401,
+              "respawn": 11678610
             }
           ],
           "normalized": {
@@ -9029,23 +9059,23 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 355941365,
-              "respawn": 118647122
+              "amount": 26695602339,
+              "respawn": 2669560234
             },
             {
               "ware": "ice",
-              "amount": 4424998,
-              "respawn": 1474999
+              "amount": 4424998327,
+              "respawn": 442499833
             },
             {
               "ware": "ore",
-              "amount": 942274,
-              "respawn": 94227
+              "amount": 21744782,
+              "respawn": 724826
             },
             {
               "ware": "silicon",
-              "amount": 269221,
-              "respawn": 26922
+              "amount": 18638384,
+              "respawn": 621279
             }
           ],
           "normalized": {
@@ -9158,18 +9188,18 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 1260884245,
-              "respawn": 420294748
+              "amount": 94566318342,
+              "respawn": 9456631834
             },
             {
               "ware": "ore",
-              "amount": 3389563,
-              "respawn": 338956
+              "amount": 234662020,
+              "respawn": 7822067
             },
             {
               "ware": "silicon",
-              "amount": 2296796,
-              "respawn": 229680
+              "amount": 53002989,
+              "respawn": 1766766
             }
           ],
           "normalized": {
@@ -9288,18 +9318,18 @@
           "resources": [
             {
               "ware": "methane",
-              "amount": 213218062,
-              "respawn": 71072687
+              "amount": 88840859271,
+              "respawn": 2961361976
             },
             {
               "ware": "ore",
-              "amount": 9967803,
-              "respawn": 996780
+              "amount": 39122303209,
+              "respawn": 178914786
             },
             {
               "ware": "silicon",
-              "amount": 8674280,
-              "respawn": 867428
+              "amount": 38177036466,
+              "respawn": 161750732
             }
           ],
           "normalized": {
@@ -9492,13 +9522,13 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 1184545126,
-              "respawn": 394848376
+              "amount": 59227256272,
+              "respawn": 5922725628
             },
             {
               "ware": "hydrogen",
-              "amount": 2605999276,
-              "respawn": 868666426
+              "amount": 591285441779,
+              "respawn": 26224512916
             },
             {
               "ware": "ice",
@@ -9507,18 +9537,18 @@
             },
             {
               "ware": "nividium",
-              "amount": 56,
-              "respawn": 2
+              "amount": 26850,
+              "respawn": 90
             },
             {
               "ware": "ore",
-              "amount": 6918250,
-              "respawn": 691824
+              "amount": 74740530517,
+              "respawn": 270390905
             },
             {
               "ware": "silicon",
-              "amount": 697018,
-              "respawn": 69702
+              "amount": 73772795055,
+              "respawn": 246087830
             }
           ],
           "normalized": {
@@ -9731,18 +9761,18 @@
           "resources": [
             {
               "ware": "nividium",
-              "amount": 237,
-              "respawn": 6
+              "amount": 14239,
+              "respawn": 119
             },
             {
               "ware": "ore",
-              "amount": 5758708,
-              "respawn": 575871
+              "amount": 1328932685,
+              "respawn": 33223317
             },
             {
               "ware": "silicon",
-              "amount": 4113363,
-              "respawn": 411336
+              "amount": 949237632,
+              "respawn": 23730941
             }
           ],
           "normalized": {
@@ -9865,13 +9895,13 @@
           "resources": [
             {
               "ware": "ore",
-              "amount": 1665911,
-              "respawn": 166591
+              "amount": 115332321,
+              "respawn": 3844411
             },
             {
               "ware": "silicon",
-              "amount": 1110608,
-              "respawn": 111061
+              "amount": 25629405,
+              "respawn": 854313
             }
           ],
           "normalized": {
@@ -10206,13 +10236,18 @@
           "resources": [
             {
               "ware": "ore",
-              "amount": 1665911,
-              "respawn": 166591
+              "amount": 38444107,
+              "respawn": 1281470
+            },
+            {
+              "ware": "rawscrap",
+              "amount": 1401608072,
+              "respawn": 70080404
             },
             {
               "ware": "silicon",
-              "amount": 1110608,
-              "respawn": 111061
+              "amount": 76888214,
+              "respawn": 2562940
             }
           ],
           "normalized": {
@@ -10311,23 +10346,23 @@
           "resources": [
             {
               "ware": "ice",
-              "amount": 1309,
-              "respawn": 436
+              "amount": 130912,
+              "respawn": 26182
             },
             {
               "ware": "nividium",
-              "amount": 2,
-              "respawn": 0
+              "amount": 213,
+              "respawn": 1
             },
             {
               "ware": "ore",
-              "amount": 597727,
-              "respawn": 59773
+              "amount": 91958036,
+              "respawn": 2758741
             },
             {
               "ware": "silicon",
-              "amount": 309933,
-              "respawn": 30993
+              "amount": 21456875,
+              "respawn": 715229
             }
           ],
           "normalized": {
@@ -10436,13 +10471,18 @@
           "resources": [
             {
               "ware": "ore",
-              "amount": 110690,
-              "respawn": 11069
+              "amount": 255439,
+              "respawn": 12772
+            },
+            {
+              "ware": "rawscrap",
+              "amount": 1419681998,
+              "respawn": 35492050
             },
             {
               "ware": "silicon",
-              "amount": 110690,
-              "respawn": 11069
+              "amount": 255439,
+              "respawn": 12772
             }
           ],
           "normalized": {
@@ -10612,24 +10652,34 @@
           },
           "resources": [
             {
+              "ware": "helium",
+              "amount": 815749870,
+              "respawn": 81574987
+            },
+            {
+              "ware": "hydrogen",
+              "amount": 2691974572,
+              "respawn": 269197457
+            },
+            {
               "ware": "ice",
-              "amount": 54177,
-              "respawn": 18059
+              "amount": 5417732,
+              "respawn": 1083547
             },
             {
               "ware": "nividium",
-              "amount": 54,
-              "respawn": 2
+              "amount": 4404,
+              "respawn": 30
             },
             {
               "ware": "ore",
-              "amount": 5124563,
-              "respawn": 512457
+              "amount": 532190216,
+              "respawn": 14224335
             },
             {
               "ware": "silicon",
-              "amount": 4606975,
-              "respawn": 460697
+              "amount": 106264881,
+              "respawn": 3542313
             }
           ],
           "normalized": {
@@ -10727,24 +10777,39 @@
           },
           "resources": [
             {
+              "ware": "helium",
+              "amount": 659311139,
+              "respawn": 29521105
+            },
+            {
+              "ware": "hydrogen",
+              "amount": 914119931,
+              "respawn": 91411993
+            },
+            {
               "ware": "ice",
-              "amount": 53823,
-              "respawn": 17942
+              "amount": 5366036,
+              "respawn": 1073449
+            },
+            {
+              "ware": "methane",
+              "amount": 461676733,
+              "respawn": 46167673
             },
             {
               "ware": "nividium",
-              "amount": 41,
-              "respawn": 1
+              "amount": 11811,
+              "respawn": 45
             },
             {
               "ware": "ore",
-              "amount": 4898205,
-              "respawn": 489821
+              "amount": 110466030,
+              "respawn": 3689960
             },
             {
               "ware": "silicon",
-              "amount": 4605481,
-              "respawn": 460547
+              "amount": 106263387,
+              "respawn": 3542163
             }
           ],
           "normalized": {
@@ -10857,18 +10922,23 @@
           "resources": [
             {
               "ware": "ice",
-              "amount": 10364350,
-              "respawn": 3454783
+              "amount": 10364350214,
+              "respawn": 1036435021
             },
             {
               "ware": "ore",
-              "amount": 2207019,
-              "respawn": 220702
+              "amount": 50931213,
+              "respawn": 1697707
+            },
+            {
+              "ware": "rawscrap",
+              "amount": 4973751245,
+              "respawn": 124343781
             },
             {
               "ware": "silicon",
-              "amount": 1261154,
-              "respawn": 126115
+              "amount": 87310650,
+              "respawn": 2910355
             }
           ],
           "normalized": {
@@ -10982,28 +11052,28 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 7757018,
-              "respawn": 2585673
+              "amount": 3361374432,
+              "respawn": 56022907
             },
             {
               "ware": "hydrogen",
-              "amount": 107417497,
-              "respawn": 35805832
+              "amount": 40688446004,
+              "respawn": 1356281533
             },
             {
               "ware": "methane",
-              "amount": 7757018,
-              "respawn": 2585673
+              "amount": 9696272400,
+              "respawn": 121203405
             },
             {
               "ware": "ore",
-              "amount": 26545663,
-              "respawn": 2654566
+              "amount": 6125922227,
+              "respawn": 153148056
             },
             {
               "ware": "silicon",
-              "amount": 2609204,
-              "respawn": 260920
+              "amount": 401415933,
+              "respawn": 12042478
             }
           ],
           "normalized": {
@@ -11107,23 +11177,23 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 2731979103,
-              "respawn": 910659701
+              "amount": 204898432761,
+              "respawn": 20489843276
             },
             {
               "ware": "nividium",
-              "amount": 1552,
-              "respawn": 39
+              "amount": 15523,
+              "respawn": 185
             },
             {
               "ware": "ore",
-              "amount": 43049368,
-              "respawn": 4304937
+              "amount": 2980340840,
+              "respawn": 99344695
             },
             {
               "ware": "silicon",
-              "amount": 22600918,
-              "respawn": 2260092
+              "amount": 521559647,
+              "respawn": 17385322
             }
           ],
           "normalized": {
@@ -11191,23 +11261,23 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 2731979103,
-              "respawn": 910659701
+              "amount": 204898432761,
+              "respawn": 20489843276
             },
             {
               "ware": "nividium",
-              "amount": 1552,
-              "respawn": 39
+              "amount": 155226,
+              "respawn": 924
             },
             {
               "ware": "ore",
-              "amount": 43049368,
-              "respawn": 4304937
+              "amount": 993446947,
+              "respawn": 33114898
             },
             {
               "ware": "silicon",
-              "amount": 22600918,
-              "respawn": 2260092
+              "amount": 1564678941,
+              "respawn": 52155965
             }
           ],
           "normalized": {
@@ -11344,33 +11414,33 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 124648337,
-              "respawn": 41549446
+              "amount": 6232416865,
+              "respawn": 623241687
             },
             {
               "ware": "hydrogen",
-              "amount": 274226342,
-              "respawn": 91408781
+              "amount": 43834665285,
+              "respawn": 1461155510
             },
             {
               "ware": "ice",
-              "amount": 468923,
-              "respawn": 156308
+              "amount": 46892288,
+              "respawn": 9378458
             },
             {
               "ware": "methane",
-              "amount": 124648337,
-              "respawn": 41549446
+              "amount": 103873614420,
+              "respawn": 1298420180
             },
             {
               "ware": "ore",
-              "amount": 2400845,
-              "respawn": 240085
+              "amount": 166212360,
+              "respawn": 5540412
             },
             {
               "ware": "silicon",
-              "amount": 1207690,
-              "respawn": 120769
+              "amount": 2786977,
+              "respawn": 139349
             }
           ],
           "normalized": {
@@ -11518,23 +11588,23 @@
           "resources": [
             {
               "ware": "ice",
-              "amount": 1000533,
-              "respawn": 333511
+              "amount": 539580052,
+              "respawn": 59079702
             },
             {
               "ware": "nividium",
-              "amount": 760,
-              "respawn": 19
+              "amount": 2281,
+              "respawn": 38
             },
             {
               "ware": "ore",
-              "amount": 3386122,
-              "respawn": 338612
+              "amount": 3496735377,
+              "respawn": 58860055
             },
             {
               "ware": "silicon",
-              "amount": 2273487,
-              "respawn": 227349
+              "amount": 1188415717,
+              "respawn": 29966718
             }
           ],
           "normalized": {
@@ -11629,23 +11699,23 @@
           "resources": [
             {
               "ware": "ice",
-              "amount": 2113881,
-              "respawn": 704627
+              "amount": 306088339,
+              "respawn": 46065627
             },
             {
               "ware": "nividium",
-              "amount": 895,
-              "respawn": 22
+              "amount": 89509,
+              "respawn": 533
             },
             {
               "ware": "ore",
-              "amount": 8056589,
-              "respawn": 805659
+              "amount": 185921303,
+              "respawn": 6197377
             },
             {
               "ware": "silicon",
-              "amount": 4111781,
-              "respawn": 411178
+              "amount": 77883751,
+              "respawn": 2737821
             }
           ],
           "normalized": {
@@ -11740,23 +11810,23 @@
           "resources": [
             {
               "ware": "ice",
-              "amount": 631032,
-              "respawn": 210344
+              "amount": 3786192241,
+              "respawn": 63103204
             },
             {
               "ware": "nividium",
-              "amount": 994,
-              "respawn": 25
+              "amount": 198814,
+              "respawn": 959
             },
             {
               "ware": "ore",
-              "amount": 7201506,
-              "respawn": 720151
+              "amount": 16618859811,
+              "respawn": 276980997
             },
             {
               "ware": "silicon",
-              "amount": 1584454,
-              "respawn": 158445
+              "amount": 7312866713,
+              "respawn": 121881112
             }
           ],
           "normalized": {
@@ -11866,33 +11936,33 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 45109779,
-              "respawn": 15036593
+              "amount": 1832913704,
+              "respawn": 183291371
             },
             {
               "ware": "hydrogen",
-              "amount": 99241514,
-              "respawn": 33080504
+              "amount": 2630598886,
+              "respawn": 263059889
             },
             {
               "ware": "ice",
-              "amount": 2142876,
-              "respawn": 714292
+              "amount": 12857254682,
+              "respawn": 214287578
             },
             {
               "ware": "methane",
-              "amount": 45109779,
-              "respawn": 15036593
+              "amount": 5742207772,
+              "respawn": 321831382
             },
             {
               "ware": "ore",
-              "amount": 8167097,
-              "respawn": 816710
+              "amount": 1884714805,
+              "respawn": 47117870
             },
             {
               "ware": "silicon",
-              "amount": 4168180,
-              "respawn": 416818
+              "amount": 5130067899,
+              "respawn": 128251697
             }
           ],
           "normalized": {
@@ -12107,33 +12177,33 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 261761538,
-              "respawn": 87253846
+              "amount": 7852846142,
+              "respawn": 916165383
             },
             {
               "ware": "hydrogen",
-              "amount": 575875384,
-              "respawn": 191958462
+              "amount": 13349838443,
+              "respawn": 1622921536
             },
             {
               "ware": "methane",
-              "amount": 261761538,
-              "respawn": 87253846
+              "amount": 23994807658,
+              "respawn": 981605768
             },
             {
               "ware": "nividium",
-              "amount": 6958,
-              "respawn": 174
+              "amount": 6958494,
+              "respawn": 20710
             },
             {
               "ware": "ore",
-              "amount": 16835281,
-              "respawn": 1683528
+              "amount": 38850647484,
+              "respawn": 647510791
             },
             {
               "ware": "silicon",
-              "amount": 8592096,
-              "respawn": 859210
+              "amount": 39655825975,
+              "respawn": 660930433
             }
           ],
           "normalized": {
@@ -12314,23 +12384,28 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 74989814,
-              "respawn": 24996605
+              "amount": 749898138,
+              "respawn": 149979628
             },
             {
               "ware": "hydrogen",
-              "amount": 164977590,
-              "respawn": 54992530
+              "amount": 1649775903,
+              "respawn": 329955181
             },
             {
               "ware": "methane",
-              "amount": 74989814,
-              "respawn": 24996605
+              "amount": 624915115,
+              "respawn": 124983023
             },
             {
               "ware": "ore",
-              "amount": 3515009,
-              "respawn": 351501
+              "amount": 131115984,
+              "respawn": 4370533
+            },
+            {
+              "ware": "rawscrap",
+              "amount": 168427122,
+              "respawn": 4210678
             }
           ],
           "normalized": {
@@ -12457,33 +12532,33 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 76066459,
-              "respawn": 25355486
+              "amount": 3803322967,
+              "respawn": 380332297
             },
             {
               "ware": "hydrogen",
-              "amount": 167346211,
-              "respawn": 55782070
+              "amount": 12550965792,
+              "respawn": 1255096579
             },
             {
               "ware": "methane",
-              "amount": 76066459,
-              "respawn": 25355486
+              "amount": 6338871612,
+              "respawn": 633887161
             },
             {
               "ware": "nividium",
-              "amount": 5,
-              "respawn": 0
+              "amount": 507,
+              "respawn": 3
             },
             {
               "ware": "ore",
-              "amount": 2031127,
-              "respawn": 203113
+              "amount": 46872152,
+              "respawn": 1562405
             },
             {
               "ware": "silicon",
-              "amount": 2811670,
-              "respawn": 281167
+              "amount": 432564599,
+              "respawn": 12976938
             }
           ],
           "normalized": {
@@ -12595,18 +12670,18 @@
             },
             {
               "ware": "nividium",
-              "amount": 8255,
-              "respawn": 206
+              "amount": 723870,
+              "respawn": 4672
             },
             {
               "ware": "ore",
-              "amount": 19971207,
-              "respawn": 1997121
+              "amount": 3332473249,
+              "respawn": 84493560
             },
             {
               "ware": "silicon",
-              "amount": 10192555,
-              "respawn": 1019255
+              "amount": 3015549410,
+              "respawn": 80816723
             }
           ],
           "normalized": {
@@ -12925,8 +13000,8 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 130880769,
-              "respawn": 43626923
+              "amount": 56714999921,
+              "respawn": 945249999
             }
           ],
           "normalized": {
@@ -13033,13 +13108,18 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 130880769,
-              "respawn": 43626923
+              "amount": 1308807690,
+              "respawn": 261761538
             },
             {
               "ware": "methane",
-              "amount": 130880769,
-              "respawn": 43626923
+              "amount": 109067307540,
+              "respawn": 1363341344
+            },
+            {
+              "ware": "rawscrap",
+              "amount": 267905286,
+              "respawn": 6697632
             }
           ],
           "normalized": {
@@ -13131,33 +13211,33 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 77256788,
-              "respawn": 25752263
+              "amount": 3862839420,
+              "respawn": 386283942
             },
             {
               "ware": "hydrogen",
-              "amount": 169964934,
-              "respawn": 56654978
+              "amount": 12747370086,
+              "respawn": 1274737009
             },
             {
               "ware": "methane",
-              "amount": 77256788,
-              "respawn": 25752263
+              "amount": 6438065700,
+              "respawn": 643806570
             },
             {
               "ware": "nividium",
-              "amount": 2265,
-              "respawn": 57
+              "amount": 6797,
+              "respawn": 113
             },
             {
               "ware": "ore",
-              "amount": 4519083,
-              "respawn": 451908
+              "amount": 8342922557,
+              "respawn": 139048709
             },
             {
               "ware": "silicon",
-              "amount": 2049511,
-              "respawn": 204951
+              "amount": 2522474481,
+              "respawn": 63061862
             }
           ],
           "normalized": {
@@ -13410,33 +13490,33 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 136919636,
-              "respawn": 45639879
+              "amount": 6845981795,
+              "respawn": 684598179
             },
             {
               "ware": "hydrogen",
-              "amount": 301223199,
-              "respawn": 100407733
+              "amount": 22591739923,
+              "respawn": 2259173992
             },
             {
               "ware": "methane",
-              "amount": 136919636,
-              "respawn": 45639879
+              "amount": 11409969658,
+              "respawn": 1140996966
             },
             {
               "ware": "nividium",
-              "amount": 91,
-              "respawn": 2
+              "amount": 91280,
+              "respawn": 272
             },
             {
               "ware": "ore",
-              "amount": 4296812,
-              "respawn": 429681
+              "amount": 2644192008,
+              "respawn": 66104800
             },
             {
               "ware": "silicon",
-              "amount": 5061006,
-              "respawn": 506101
+              "amount": 1167924494,
+              "respawn": 29198112
             }
           ],
           "normalized": {
@@ -13593,18 +13673,18 @@
           "resources": [
             {
               "ware": "ice",
-              "amount": 8372347,
-              "respawn": 2790782
+              "amount": 8372346548,
+              "respawn": 837234655
             },
             {
               "ware": "ore",
-              "amount": 9635678,
-              "respawn": 963568
+              "amount": 1482412023,
+              "respawn": 44472361
             },
             {
               "ware": "silicon",
-              "amount": 8832705,
-              "respawn": 883270
+              "amount": 2038316531,
+              "respawn": 50957913
             }
           ],
           "normalized": {
@@ -14775,18 +14855,18 @@
           "resources": [
             {
               "ware": "ice",
-              "amount": 438455,
-              "respawn": 146152
+              "amount": 4384551,
+              "respawn": 1461517
             },
             {
               "ware": "ore",
-              "amount": 611698,
-              "respawn": 61170
+              "amount": 1411612,
+              "respawn": 70581
             },
             {
               "ware": "silicon",
-              "amount": 1125419,
-              "respawn": 112542
+              "amount": 25971209,
+              "respawn": 865707
             }
           ],
           "normalized": {
@@ -14919,23 +14999,23 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 328607104,
-              "respawn": 109535701
+              "amount": 24645532828,
+              "respawn": 2464553283
             },
             {
               "ware": "ice",
-              "amount": 6748433,
-              "respawn": 2249478
+              "amount": 674843343,
+              "respawn": 134968669
             },
             {
               "ware": "ore",
-              "amount": 1374237,
-              "respawn": 137424
+              "amount": 31713153,
+              "respawn": 1057105
             },
             {
               "ware": "silicon",
-              "amount": 824542,
-              "respawn": 82454
+              "amount": 19027892,
+              "respawn": 634263
             }
           ],
           "normalized": {
@@ -15072,23 +15152,23 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 244434907,
-              "respawn": 81478302
+              "amount": 12221745345,
+              "respawn": 1222174535
             },
             {
               "ware": "hydrogen",
-              "amount": 537756795,
-              "respawn": 179252265
+              "amount": 40331759639,
+              "respawn": 4033175964
             },
             {
               "ware": "ice",
-              "amount": 3507641,
-              "respawn": 1169214
+              "amount": 140305637,
+              "respawn": 28061127
             },
             {
               "ware": "methane",
-              "amount": 244434907,
-              "respawn": 81478302
+              "amount": 42776108708,
+              "respawn": 1425870290
             }
           ],
           "normalized": {
@@ -15211,23 +15291,23 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 244434907,
-              "respawn": 81478302
+              "amount": 285174058055,
+              "respawn": 3168600645
             },
             {
               "ware": "hydrogen",
-              "amount": 537756795,
-              "respawn": 179252265
+              "amount": 366652360357,
+              "respawn": 4583154504
             },
             {
               "ware": "ice",
-              "amount": 4644263,
-              "respawn": 1548088
+              "amount": 464426323,
+              "respawn": 92885265
             },
             {
               "ware": "methane",
-              "amount": 244434907,
-              "respawn": 81478302
+              "amount": 1018478778769,
+              "respawn": 11316430875
             }
           ],
           "normalized": {
@@ -15323,7 +15403,13 @@
             "x": -45000000.0,
             "z": 164540000.0
           },
-          "resources": [],
+          "resources": [
+            {
+              "ware": "rawscrap",
+              "amount": 346327716,
+              "respawn": 8658193
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -15430,28 +15516,28 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 424649277,
-              "respawn": 141549759
+              "amount": 31848695804,
+              "respawn": 3184869580
             },
             {
               "ware": "ice",
-              "amount": 2769871,
-              "respawn": 923290
+              "amount": 27698714,
+              "respawn": 9232905
             },
             {
               "ware": "nividium",
-              "amount": 129,
-              "respawn": 3
+              "amount": 1287,
+              "respawn": 15
             },
             {
               "ware": "ore",
-              "amount": 3849253,
-              "respawn": 384925
+              "amount": 8882891,
+              "respawn": 444145
             },
             {
               "ware": "silicon",
-              "amount": 7134751,
-              "respawn": 713475
+              "amount": 164648106,
+              "respawn": 5488270
             }
           ],
           "normalized": {
@@ -15677,8 +15763,8 @@
           "resources": [
             {
               "ware": "ice",
-              "amount": 3507641,
-              "respawn": 1169214
+              "amount": 350764091,
+              "respawn": 70152818
             }
           ],
           "normalized": {
@@ -15937,38 +16023,43 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 8444750,
-              "respawn": 2814917
+              "amount": 422237505,
+              "respawn": 42223751
             },
             {
               "ware": "hydrogen",
-              "amount": 18578450,
-              "respawn": 6192817
+              "amount": 1393383768,
+              "respawn": 139338377
             },
             {
               "ware": "ice",
-              "amount": 121182,
-              "respawn": 40394
+              "amount": 12118216,
+              "respawn": 2423643
             },
             {
               "ware": "methane",
-              "amount": 8444750,
-              "respawn": 2814917
+              "amount": 703729176,
+              "respawn": 70372918
             },
             {
               "ware": "nividium",
-              "amount": 6,
-              "respawn": 0
+              "amount": 56,
+              "respawn": 1
             },
             {
               "ware": "ore",
-              "amount": 1115529,
-              "respawn": 111553
+              "amount": 5148595246,
+              "respawn": 85809921
+            },
+            {
+              "ware": "rawscrap",
+              "amount": 367561520,
+              "respawn": 9189038
             },
             {
               "ware": "silicon",
-              "amount": 312146,
-              "respawn": 31215
+              "amount": 72033718,
+              "respawn": 1800843
             }
           ],
           "normalized": {
@@ -16227,13 +16318,13 @@
           "resources": [
             {
               "ware": "ore",
-              "amount": 2228207,
-              "respawn": 222821
+              "amount": 514201592,
+              "respawn": 12855040
             },
             {
               "ware": "silicon",
-              "amount": 3925367,
-              "respawn": 392537
+              "amount": 905853910,
+              "respawn": 22646348
             }
           ],
           "normalized": {
@@ -16359,7 +16450,13 @@
             "x": 120000000.0,
             "z": 121240000.0
           },
-          "resources": [],
+          "resources": [
+            {
+              "ware": "rawscrap",
+              "amount": 871968092,
+              "respawn": 12456687
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -16486,18 +16583,18 @@
           "resources": [
             {
               "ware": "ice",
-              "amount": 10364350,
-              "respawn": 3454783
+              "amount": 10364350214,
+              "respawn": 1036435021
             },
             {
               "ware": "ore",
-              "amount": 2207019,
-              "respawn": 220702
+              "amount": 50931213,
+              "respawn": 1697707
             },
             {
               "ware": "silicon",
-              "amount": 1261154,
-              "respawn": 126115
+              "amount": 29103550,
+              "respawn": 970118
             }
           ],
           "normalized": {
@@ -16947,13 +17044,13 @@
           "resources": [
             {
               "ware": "ore",
-              "amount": 3648509,
-              "respawn": 364851
+              "amount": 8419637,
+              "respawn": 420982
             },
             {
               "ware": "silicon",
-              "amount": 6582707,
-              "respawn": 658271
+              "amount": 151908628,
+              "respawn": 5063621
             }
           ],
           "normalized": {
@@ -17109,13 +17206,13 @@
           "resources": [
             {
               "ware": "ore",
-              "amount": 3648509,
-              "respawn": 364851
+              "amount": 8419637,
+              "respawn": 420982
             },
             {
               "ware": "silicon",
-              "amount": 6582707,
-              "respawn": 658271
+              "amount": 151908628,
+              "respawn": 5063621
             }
           ],
           "normalized": {
@@ -17199,38 +17296,38 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 55321061,
-              "respawn": 18440354
+              "amount": 5993114979,
+              "respawn": 199770499
             },
             {
               "ware": "hydrogen",
-              "amount": 121706335,
-              "respawn": 40568778
+              "amount": 9127975121,
+              "respawn": 912797512
             },
             {
               "ware": "ice",
-              "amount": 387247,
-              "respawn": 129082
+              "amount": 38724743,
+              "respawn": 7744949
             },
             {
               "ware": "methane",
-              "amount": 55321061,
-              "respawn": 18440354
+              "amount": 4610088445,
+              "respawn": 461008845
             },
             {
               "ware": "nividium",
-              "amount": 4,
-              "respawn": 0
+              "amount": 74,
+              "respawn": 1
             },
             {
               "ware": "ore",
-              "amount": 1477183,
-              "respawn": 147718
+              "amount": 102266514,
+              "respawn": 3408884
             },
             {
               "ware": "silicon",
-              "amount": 2044851,
-              "respawn": 204485
+              "amount": 314592435,
+              "respawn": 9437773
             }
           ],
           "normalized": {
@@ -17841,8 +17938,8 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 38033230,
-              "respawn": 12677743
+              "amount": 44372101284,
+              "respawn": 493023348
             }
           ],
           "normalized": {
@@ -18182,13 +18279,13 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 83673105,
-              "respawn": 27891035
+              "amount": 31694358060,
+              "respawn": 1056478602
             },
             {
               "ware": "methane",
-              "amount": 38033230,
-              "respawn": 12677743
+              "amount": 31694358060,
+              "respawn": 396179476
             }
           ],
           "normalized": {
@@ -18269,28 +18366,28 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 48165326,
-              "respawn": 16055109
+              "amount": 481653257,
+              "respawn": 96330651
             },
             {
               "ware": "hydrogen",
-              "amount": 105963716,
-              "respawn": 35321239
+              "amount": 1059637165,
+              "respawn": 211927433
             },
             {
               "ware": "ice",
-              "amount": 3612399,
-              "respawn": 1204133
+              "amount": 144495977,
+              "respawn": 28899195
             },
             {
               "ware": "ore",
-              "amount": 136917966,
-              "respawn": 13691797
+              "amount": 16851441938,
+              "respawn": 532150798
             },
             {
               "ware": "silicon",
-              "amount": 12794316,
-              "respawn": 1279432
+              "amount": 885760339,
+              "respawn": 29525345
             }
           ],
           "normalized": {
@@ -18544,13 +18641,13 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 38033230,
-              "respawn": 12677743
+              "amount": 1901661484,
+              "respawn": 190166148
             },
             {
               "ware": "hydrogen",
-              "amount": 83673105,
-              "respawn": 27891035
+              "amount": 6275482896,
+              "respawn": 627548290
             }
           ],
           "normalized": {
@@ -18783,33 +18880,33 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 132409758,
-              "respawn": 44136586
+              "amount": 6620487884,
+              "respawn": 662048788
             },
             {
               "ware": "hydrogen",
-              "amount": 291301467,
-              "respawn": 97100489
+              "amount": 21847610019,
+              "respawn": 2184761002
             },
             {
               "ware": "methane",
-              "amount": 132409758,
-              "respawn": 44136586
+              "amount": 11034146474,
+              "respawn": 1103414647
             },
             {
               "ware": "nividium",
-              "amount": 9,
-              "respawn": 0
+              "amount": 883,
+              "respawn": 5
             },
             {
               "ware": "ore",
-              "amount": 3535605,
-              "respawn": 353561
+              "amount": 81590893,
+              "respawn": 2719696
             },
             {
               "ware": "silicon",
-              "amount": 4894306,
-              "respawn": 489431
+              "amount": 752970155,
+              "respawn": 22589105
             }
           ],
           "normalized": {
@@ -19083,38 +19180,38 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 38033230,
-              "respawn": 12677743
+              "amount": 1901661484,
+              "respawn": 190166148
             },
             {
               "ware": "hydrogen",
-              "amount": 83673105,
-              "respawn": 27891035
+              "amount": 6275482896,
+              "respawn": 627548290
             },
             {
               "ware": "ice",
-              "amount": 342299,
-              "respawn": 114100
+              "amount": 91279751,
+              "respawn": 9127975
             },
             {
               "ware": "methane",
-              "amount": 38033230,
-              "respawn": 12677743
+              "amount": 3169435806,
+              "respawn": 316943581
             },
             {
               "ware": "nividium",
-              "amount": 3,
-              "respawn": 0
+              "amount": 254,
+              "respawn": 2
             },
             {
               "ware": "ore",
-              "amount": 1015563,
-              "respawn": 101556
+              "amount": 23436076,
+              "respawn": 781203
             },
             {
               "ware": "silicon",
-              "amount": 1405835,
-              "respawn": 140583
+              "amount": 216282299,
+              "respawn": 6488469
             }
           ],
           "normalized": {
@@ -19247,33 +19344,33 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 38033230,
-              "respawn": 12677743
+              "amount": 1901661484,
+              "respawn": 190166148
             },
             {
               "ware": "hydrogen",
-              "amount": 83673105,
-              "respawn": 27891035
+              "amount": 6275482896,
+              "respawn": 627548290
             },
             {
               "ware": "methane",
-              "amount": 38033230,
-              "respawn": 12677743
+              "amount": 3169435806,
+              "respawn": 316943581
             },
             {
               "ware": "nividium",
-              "amount": 3,
-              "respawn": 0
+              "amount": 254,
+              "respawn": 2
             },
             {
               "ware": "ore",
-              "amount": 1015563,
-              "respawn": 101556
+              "amount": 23436076,
+              "respawn": 781203
             },
             {
               "ware": "silicon",
-              "amount": 1405835,
-              "respawn": 140583
+              "amount": 216282299,
+              "respawn": 6488469
             }
           ],
           "normalized": {
@@ -19566,38 +19663,38 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 38033230,
-              "respawn": 12677743
+              "amount": 6338871612,
+              "respawn": 211295720
             },
             {
               "ware": "hydrogen",
-              "amount": 83673105,
-              "respawn": 27891035
+              "amount": 31694358060,
+              "respawn": 1056478602
             },
             {
               "ware": "ice",
-              "amount": 228199,
-              "respawn": 76066
+              "amount": 22819938,
+              "respawn": 4563988
             },
             {
               "ware": "methane",
-              "amount": 38033230,
-              "respawn": 12677743
+              "amount": 15847179030,
+              "respawn": 528239301
             },
             {
               "ware": "nividium",
-              "amount": 3,
-              "respawn": 0
+              "amount": 254,
+              "respawn": 2
             },
             {
               "ware": "ore",
-              "amount": 1015563,
-              "respawn": 101556
+              "amount": 23436076,
+              "respawn": 781203
             },
             {
               "ware": "silicon",
-              "amount": 1405835,
-              "respawn": 140583
+              "amount": 216282299,
+              "respawn": 6488469
             }
           ],
           "normalized": {
@@ -19692,28 +19789,28 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 119060545,
-              "respawn": 39686848
+              "amount": 5953027253,
+              "respawn": 595302725
             },
             {
               "ware": "hydrogen",
-              "amount": 261933199,
-              "respawn": 87311066
+              "amount": 19644989935,
+              "respawn": 1964498993
             },
             {
               "ware": "ice",
-              "amount": 833424,
-              "respawn": 277808
+              "amount": 83342382,
+              "respawn": 16668476
             },
             {
               "ware": "methane",
-              "amount": 119060545,
-              "respawn": 39686848
+              "amount": 9921712088,
+              "respawn": 992171209
             },
             {
               "ware": "nividium",
-              "amount": 246,
-              "respawn": 6
+              "amount": 2389,
+              "respawn": 28
             },
             {
               "ware": "ore",
@@ -19850,18 +19947,18 @@
           "resources": [
             {
               "ware": "nividium",
-              "amount": 17,
-              "respawn": 0
+              "amount": 173,
+              "respawn": 2
             },
             {
               "ware": "ore",
-              "amount": 246873,
-              "respawn": 24688
+              "amount": 56970514,
+              "respawn": 1424263
             },
             {
               "ware": "silicon",
-              "amount": 44887,
-              "respawn": 4489
+              "amount": 10358276,
+              "respawn": 258956
             }
           ],
           "normalized": {
@@ -20112,28 +20209,28 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 387022079,
-              "respawn": 129007360
+              "amount": 146599272420,
+              "respawn": 4886642414
             },
             {
               "ware": "ice",
-              "amount": 879596,
-              "respawn": 293199
+              "amount": 234558836,
+              "respawn": 23455884
             },
             {
               "ware": "nividium",
-              "amount": 88,
-              "respawn": 2
+              "amount": 17592,
+              "respawn": 85
             },
             {
               "ware": "ore",
-              "amount": 8537942,
-              "respawn": 853794
+              "amount": 197029422,
+              "respawn": 6567647
             },
             {
               "ware": "silicon",
-              "amount": 1524632,
-              "respawn": 152463
+              "amount": 35183825,
+              "respawn": 1172794
             }
           ],
           "normalized": {
@@ -20290,8 +20387,8 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 388093607,
-              "respawn": 129364536
+              "amount": 29757243179,
+              "respawn": 2911797935
             }
           ],
           "normalized": {
@@ -20422,23 +20519,28 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 387022079,
-              "respawn": 129007360
+              "amount": 29026655939,
+              "respawn": 2902665594
             },
             {
               "ware": "ice",
-              "amount": 57096,
-              "respawn": 19032
+              "amount": 57096016,
+              "respawn": 5709602
             },
             {
               "ware": "nividium",
-              "amount": 1,
+              "amount": 5,
               "respawn": 0
             },
             {
               "ware": "ore",
               "amount": 659968,
               "respawn": 65997
+            },
+            {
+              "ware": "rawscrap",
+              "amount": 996835260,
+              "respawn": 24920881
             },
             {
               "ware": "silicon",
@@ -20581,8 +20683,8 @@
             },
             {
               "ware": "nividium",
-              "amount": 246,
-              "respawn": 6
+              "amount": 2460,
+              "respawn": 29
             },
             {
               "ware": "ore",
@@ -20916,18 +21018,18 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 119060545,
-              "respawn": 39686848
+              "amount": 5953027253,
+              "respawn": 595302725
             },
             {
               "ware": "hydrogen",
-              "amount": 261933199,
-              "respawn": 87311066
+              "amount": 19644989935,
+              "respawn": 1964498993
             },
             {
               "ware": "methane",
-              "amount": 119060545,
-              "respawn": 39686848
+              "amount": 9921712088,
+              "respawn": 992171209
             }
           ],
           "normalized": {
@@ -21055,7 +21157,13 @@
             "x": -180000000.0,
             "z": 69280000.0
           },
-          "resources": [],
+          "resources": [
+            {
+              "ware": "rawscrap",
+              "amount": 0,
+              "respawn": 0
+            }
+          ],
           "normalized": {
             "template_kind": "single",
             "slot": "single",
@@ -21617,8 +21725,8 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 119060545,
-              "respawn": 39686848
+              "amount": 51592902860,
+              "respawn": 859881714
             }
           ],
           "normalized": {
@@ -22343,18 +22451,18 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "amount": 294674849,
-              "respawn": 98224950
+              "amount": 200914669790,
+              "respawn": 2511433372
             },
             {
               "ware": "ore",
-              "amount": 696504,
-              "respawn": 69650
+              "amount": 16073174,
+              "respawn": 535772
             },
             {
               "ware": "silicon",
-              "amount": 928672,
-              "respawn": 92867
+              "amount": 21430898,
+              "respawn": 714363
             }
           ],
           "normalized": {
@@ -22580,18 +22688,18 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 119060545,
-              "respawn": 39686848
+              "amount": 19843424177,
+              "respawn": 661447473
             },
             {
               "ware": "ore",
-              "amount": 2103133,
-              "respawn": 210313
+              "amount": 48533841,
+              "respawn": 1617795
             },
             {
               "ware": "silicon",
-              "amount": 3121371,
-              "respawn": 312137
+              "amount": 72031630,
+              "respawn": 2401054
             }
           ],
           "normalized": {
@@ -22937,38 +23045,38 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 126895221,
-              "respawn": 42298407
+              "amount": 1268952221,
+              "respawn": 253790445
             },
             {
               "ware": "hydrogen",
-              "amount": 279169489,
-              "respawn": 93056496
+              "amount": 2791694886,
+              "respawn": 558338978
             },
             {
               "ware": "ice",
-              "amount": 331089,
-              "respawn": 110363
+              "amount": 33108824,
+              "respawn": 6621765
             },
             {
               "ware": "methane",
-              "amount": 126895221,
-              "respawn": 42298407
+              "amount": 1057460184,
+              "respawn": 211492037
             },
             {
               "ware": "nividium",
-              "amount": 514,
-              "respawn": 13
+              "amount": 5141,
+              "respawn": 61
             },
             {
               "ware": "ore",
-              "amount": 1261870,
-              "respawn": 126187
+              "amount": 194133794,
+              "respawn": 5824014
             },
             {
               "ware": "silicon",
-              "amount": 644011,
-              "respawn": 64401
+              "amount": 148617908,
+              "respawn": 3715448
             }
           ],
           "normalized": {
@@ -23099,38 +23207,38 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 89573085,
-              "respawn": 29857695
+              "amount": 4478654268,
+              "respawn": 447865427
             },
             {
               "ware": "hydrogen",
-              "amount": 197060788,
-              "respawn": 65686929
+              "amount": 14779559084,
+              "respawn": 1477955908
             },
             {
               "ware": "ice",
-              "amount": 251925,
-              "respawn": 83975
+              "amount": 25192450,
+              "respawn": 5038490
             },
             {
               "ware": "methane",
-              "amount": 89573085,
-              "respawn": 29857695
+              "amount": 74644237800,
+              "respawn": 933052972
             },
             {
               "ware": "nividium",
-              "amount": 389,
-              "respawn": 10
+              "amount": 3894,
+              "respawn": 46
             },
             {
               "ware": "ore",
-              "amount": 960155,
-              "respawn": 96015
+              "amount": 22157413,
+              "respawn": 738580
             },
             {
               "ware": "silicon",
-              "amount": 490027,
-              "respawn": 49003
+              "amount": 11308312,
+              "respawn": 376944
             }
           ],
           "normalized": {
@@ -23263,18 +23371,18 @@
           "resources": [
             {
               "ware": "ice",
-              "amount": 2384884,
-              "respawn": 794962
+              "amount": 2384884030,
+              "respawn": 238488404
             },
             {
               "ware": "nividium",
-              "amount": 3505,
-              "respawn": 88
+              "amount": 210273,
+              "respawn": 1752
             },
             {
               "ware": "ore",
-              "amount": 7035610,
-              "respawn": 703560
+              "amount": 5141406890,
+              "respawn": 128535172
             }
           ],
           "normalized": {
@@ -23417,23 +23525,23 @@
           "resources": [
             {
               "ware": "ice",
-              "amount": 2035381,
-              "respawn": 678460
+              "amount": 2035380869,
+              "respawn": 203538087
             },
             {
               "ware": "nividium",
-              "amount": 4209,
-              "respawn": 105
+              "amount": 183872,
+              "respawn": 1568
             },
             {
               "ware": "ore",
-              "amount": 5614665,
-              "respawn": 561466
+              "amount": 7223055260,
+              "respawn": 121047225
             },
             {
               "ware": "silicon",
-              "amount": 5125995,
-              "respawn": 512600
+              "amount": 1915838348,
+              "respawn": 48298108
             }
           ],
           "normalized": {
@@ -23550,18 +23658,18 @@
           "resources": [
             {
               "ware": "ice",
-              "amount": 185164,
-              "respawn": 61721
+              "amount": 111098594,
+              "respawn": 11109859
             },
             {
               "ware": "ore",
-              "amount": 287287,
-              "respawn": 28729
+              "amount": 530376458,
+              "respawn": 8839608
             },
             {
               "ware": "silicon",
-              "amount": 253433,
-              "respawn": 25343
+              "amount": 311917304,
+              "respawn": 7797933
             }
           ],
           "normalized": {
@@ -23665,13 +23773,18 @@
           "resources": [
             {
               "ware": "ore",
-              "amount": 31807,
-              "respawn": 3181
+              "amount": 4893378,
+              "respawn": 146801
+            },
+            {
+              "ware": "rawscrap",
+              "amount": 0,
+              "respawn": 0
             },
             {
               "ware": "silicon",
-              "amount": 46549,
-              "respawn": 4655
+              "amount": 3222616,
+              "respawn": 107421
             }
           ],
           "normalized": {
@@ -23862,13 +23975,18 @@
           "resources": [
             {
               "ware": "helium",
-              "amount": 3611348,
-              "respawn": 1203783
+              "amount": 36113481,
+              "respawn": 7222696
             },
             {
               "ware": "ore",
-              "amount": 3151778,
-              "respawn": 315178
+              "amount": 24244448,
+              "respawn": 1212222
+            },
+            {
+              "ware": "rawscrap",
+              "amount": 8042668,
+              "respawn": 402133
             }
           ],
           "normalized": {
