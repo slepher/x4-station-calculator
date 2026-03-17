@@ -1,0 +1,5152 @@
+{
+  "sectors": [
+    {
+      "sector_id": "cluster_01_sector001_macro",
+      "ware": {
+        "ice": {
+          "low": {
+            "max": 165387546,
+            "time": 18000,
+            "resourcedensity": 1.5,
+            "respawn": 33077509.2,
+            "falloff": 420.60228
+          },
+          "medium": {
+            "max": 123423333,
+            "time": 18000,
+            "resourcedensity": 15,
+            "respawn": 24684666.6,
+            "falloff": 31.388177
+          }
+        },
+        "ore": {
+          "verylow": {
+            "max": 3422884,
+            "time": 72000,
+            "resourcedensity": 0.06,
+            "respawn": 171144.2,
+            "falloff": 217.621104
+          },
+          "medium": {
+            "max": 321955,
+            "time": 72000,
+            "resourcedensity": 6,
+            "respawn": 16097.75,
+            "falloff": 0.204693
+          },
+          "low": {
+            "max": 45874524,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 1529150.8,
+            "falloff": 291.662369
+          },
+          "veryhigh": {
+            "max": 182164,
+            "time": 108000,
+            "resourcedensity": 3600,
+            "respawn": 6072.133333,
+            "falloff": 0.000193
+          }
+        },
+        "silicon": {
+          "lowest": {
+            "max": 1427475,
+            "time": 36000,
+            "resourcedensity": 0.026,
+            "respawn": 142747.5,
+            "falloff": 209.437884
+          },
+          "medium": {
+            "max": 275940,
+            "time": 36000,
+            "resourcedensity": 6,
+            "respawn": 27594.0,
+            "falloff": 0.175438
+          },
+          "verylow": {
+            "max": 4585557,
+            "time": 72000,
+            "resourcedensity": 0.06,
+            "respawn": 229277.85,
+            "falloff": 291.541862
+          }
+        },
+        "hydrogen": {
+          "medhigh": {
+            "max": 1605740,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "respawn": 53524.666667,
+            "falloff": 6.42296
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 55,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 0.327381,
+            "falloff": 0.209808
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_01_sector002_macro",
+      "ware": {
+        "ore": {
+          "lowest": {
+            "max": 4013156,
+            "time": 36000,
+            "resourcedensity": 0.026,
+            "respawn": 401315.6,
+            "falloff": 588.806739
+          },
+          "verylow": {
+            "max": 1178807,
+            "time": 36000,
+            "resourcedensity": 0.06,
+            "respawn": 117880.7,
+            "falloff": 74.946531
+          }
+        },
+        "silicon": {
+          "verylow": {
+            "max": 10016316,
+            "time": 72000,
+            "resourcedensity": 0.06,
+            "respawn": 500815.8,
+            "falloff": 636.820221
+          },
+          "low": {
+            "max": 11755065,
+            "time": 72000,
+            "resourcedensity": 0.6,
+            "respawn": 587753.25,
+            "falloff": 74.736691
+          }
+        },
+        "hydrogen": {
+          "medium": {
+            "max": 89434,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 8943.4,
+            "falloff": 1.806747
+          },
+          "medhigh": {
+            "max": 346498,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "respawn": 11549.933333,
+            "falloff": 1.385992
+          }
+        },
+        "rawscrap": {
+          "high": {
+            "max": 14896,
+            "time": 252000,
+            "resourcedensity": 7.5,
+            "respawn": 212.8,
+            "falloff": 0.007576
+          }
+        },
+        "ice": {
+          "medium": {
+            "max": 102042,
+            "time": 36000,
+            "resourcedensity": 15,
+            "respawn": 10204.2,
+            "falloff": 0.025951
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 34648,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 3464.8,
+            "falloff": 1.38592
+          }
+        },
+        "helium": {
+          "medhigh": {
+            "max": 34649,
+            "time": 108000,
+            "resourcedensity": 50000,
+            "respawn": 1154.966667,
+            "falloff": 0.69298
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_01_sector003_macro",
+      "ware": {
+        "ore": {
+          "verylow": {
+            "max": 7895187,
+            "time": 72000,
+            "resourcedensity": 0.06,
+            "respawn": 394759.35,
+            "falloff": 501.962471
+          },
+          "low": {
+            "max": 8247139,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 274904.633333,
+            "falloff": 52.433898
+          },
+          "medium": {
+            "max": 45758,
+            "time": 72000,
+            "resourcedensity": 6,
+            "respawn": 2287.9,
+            "falloff": 0.029092
+          }
+        },
+        "silicon": {
+          "verylow": {
+            "max": 7897413,
+            "time": 72000,
+            "resourcedensity": 0.06,
+            "respawn": 394870.65,
+            "falloff": 502.103996
+          },
+          "low": {
+            "max": 8247654,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 274921.8,
+            "falloff": 52.437172
+          },
+          "medium": {
+            "max": 45777,
+            "time": 72000,
+            "resourcedensity": 6,
+            "respawn": 2288.85,
+            "falloff": 0.029104
+          }
+        },
+        "hydrogen": {
+          "medhigh": {
+            "max": 519747,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "respawn": 17324.9,
+            "falloff": 2.078988
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 10,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 0.059524,
+            "falloff": 0.038147
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_02_sector001_macro",
+      "ware": {
+        "helium": {
+          "medium": {
+            "max": 543690,
+            "time": 36000,
+            "resourcedensity": 15000,
+            "respawn": 54369.0,
+            "falloff": 36.246
+          }
+        },
+        "methane": {
+          "high": {
+            "max": 9061935,
+            "time": 288000,
+            "resourcedensity": 250000,
+            "respawn": 113274.1875,
+            "falloff": 36.24774
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 6366256,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 212208.533333,
+            "falloff": 40.475566
+          }
+        },
+        "silicon": {
+          "lowminus": {
+            "max": 2121954,
+            "time": 72000,
+            "resourcedensity": 0.2,
+            "respawn": 106097.7,
+            "falloff": 40.473061
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_03_sector001_macro",
+      "ware": {
+        "ice": {
+          "medium": {
+            "max": 188184,
+            "time": 36000,
+            "resourcedensity": 15,
+            "respawn": 18818.4,
+            "falloff": 0.047858
+          }
+        },
+        "ore": {
+          "medium": {
+            "max": 146534,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 3663.35,
+            "falloff": 0.093164
+          }
+        },
+        "silicon": {
+          "medium": {
+            "max": 146538,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 3663.45,
+            "falloff": 0.093166
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 15,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 0.089286,
+            "falloff": 0.05722
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_04_sector001_macro",
+      "ware": {
+        "hydrogen": {
+          "medplus": {
+            "max": 9287539,
+            "time": 108000,
+            "resourcedensity": 105500,
+            "respawn": 309584.633333,
+            "falloff": 88.033545
+          },
+          "medium": {
+            "max": 2228242,
+            "time": 108000,
+            "resourcedensity": 49500,
+            "respawn": 74274.733333,
+            "falloff": 45.01499
+          }
+        },
+        "ice": {
+          "verylow": {
+            "max": 4614885,
+            "time": 10800,
+            "resourcedensity": 0.15,
+            "respawn": 1538295.0,
+            "falloff": 117.362595
+          }
+        },
+        "nividium": {
+          "medlow": {
+            "max": 18480,
+            "time": 432000,
+            "resourcedensity": 0.0006,
+            "respawn": 154.0,
+            "falloff": 117.492676
+          }
+        },
+        "ore": {
+          "lowminus": {
+            "max": 4776594,
+            "time": 72000,
+            "resourcedensity": 0.2,
+            "respawn": 238829.7,
+            "falloff": 91.1063
+          },
+          "medplus": {
+            "max": 81062819,
+            "time": 72000,
+            "resourcedensity": 16,
+            "respawn": 4053140.95,
+            "falloff": 19.326882
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 14332830,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 477761.0,
+            "falloff": 91.125679
+          },
+          "medlow": {
+            "max": 22055666,
+            "time": 108000,
+            "resourcedensity": 4,
+            "respawn": 735188.866667,
+            "falloff": 21.033922
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_05_sector001_macro",
+      "ware": {
+        "hydrogen": {
+          "medhigh": {
+            "max": 111126997,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "respawn": 3704233.233333,
+            "falloff": 444.507988
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_06_sector001_macro",
+      "ware": {
+        "helium": {
+          "medhigh": {
+            "max": 34649,
+            "time": 108000,
+            "resourcedensity": 50000,
+            "respawn": 1154.966667,
+            "falloff": 0.69298
+          }
+        },
+        "hydrogen": {
+          "medhigh": {
+            "max": 346498,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "respawn": 11549.933333,
+            "falloff": 1.385992
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 69296,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 6929.6,
+            "falloff": 2.77184
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 5,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 0.029762,
+            "falloff": 0.019073
+          }
+        },
+        "ore": {
+          "medium": {
+            "max": 40809,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 1020.225,
+            "falloff": 0.025946
+          }
+        },
+        "silicon": {
+          "medium": {
+            "max": 40815,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 1020.375,
+            "falloff": 0.025949
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_06_sector002_macro",
+      "ware": {
+        "hydrogen": {
+          "medhigh": {
+            "max": 692996,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "respawn": 23099.866667,
+            "falloff": 2.771984
+          }
+        },
+        "helium": {
+          "medhigh": {
+            "max": 103947,
+            "time": 108000,
+            "resourcedensity": 50000,
+            "respawn": 3464.9,
+            "falloff": 2.07894
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 68715,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 6871.5,
+            "falloff": 2.7486
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_07_sector001_macro",
+      "ware": {
+        "ore": {
+          "medlow": {
+            "max": 64110868,
+            "time": 120000,
+            "resourcedensity": 4,
+            "respawn": 1923326.04,
+            "falloff": 61.140888
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_08_sector001_macro",
+      "ware": {
+        "hydrogen": {
+          "medium": {
+            "max": 21808240,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 2180824.0,
+            "falloff": 440.570505
+          }
+        },
+        "nividium": {
+          "low": {
+            "max": 11350,
+            "time": 302400,
+            "resourcedensity": 0.0001,
+            "respawn": 135.119048,
+            "falloff": 432.96814
+          }
+        },
+        "silicon": {
+          "lowest": {
+            "max": 3092194,
+            "time": 36000,
+            "resourcedensity": 0.026,
+            "respawn": 309219.4,
+            "falloff": 453.684
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_100_sector001_macro",
+      "ware": {
+        "helium": {
+          "medplus": {
+            "max": 44444526,
+            "time": 108000,
+            "resourcedensity": 32500,
+            "respawn": 1481484.2,
+            "falloff": 1367.523877
+          }
+        },
+        "hydrogen": {
+          "medium": {
+            "max": 67692982,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 6769298.2,
+            "falloff": 1367.53499
+          }
+        },
+        "ice": {
+          "low": {
+            "max": 543764250,
+            "time": 18000,
+            "resourcedensity": 1.5,
+            "respawn": 108752850.0,
+            "falloff": 1382.863998
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 34187844,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 3418784.4,
+            "falloff": 1367.51376
+          }
+        },
+        "nividium": {
+          "lowplus": {
+            "max": 67310,
+            "time": 384000,
+            "resourcedensity": 0.0002,
+            "respawn": 631.03125,
+            "falloff": 1283.836365
+          }
+        },
+        "ore": {
+          "lowplus": {
+            "max": 652503773,
+            "time": 108000,
+            "resourcedensity": 1.8,
+            "respawn": 21750125.766667,
+            "falloff": 1382.835755
+          }
+        },
+        "silicon": {
+          "medlow": {
+            "max": 1450042233,
+            "time": 120000,
+            "resourcedensity": 4,
+            "respawn": 43501266.99,
+            "falloff": 1382.868035
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_106_sector001_macro",
+      "ware": {
+        "helium": {
+          "highest": {
+            "max": 160400136,
+            "time": 324000,
+            "resourcedensity": 350000,
+            "respawn": 1782223.733333,
+            "falloff": 458.286103
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_108_sector002_macro",
+      "ware": {
+        "hydrogen": {
+          "medhigh": {
+            "max": 114571360,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "respawn": 3819045.333333,
+            "falloff": 458.28544
+          }
+        },
+        "methane": {
+          "high": {
+            "max": 114571360,
+            "time": 288000,
+            "resourcedensity": 250000,
+            "respawn": 1432142.0,
+            "falloff": 458.28544
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_108_sector003_macro",
+      "ware": {
+        "helium": {
+          "low": {
+            "max": 6197317,
+            "time": 18000,
+            "resourcedensity": 3000,
+            "respawn": 1239463.4,
+            "falloff": 2065.772333
+          }
+        },
+        "hydrogen": {
+          "low": {
+            "max": 13636434,
+            "time": 18000,
+            "resourcedensity": 6600,
+            "respawn": 2727286.8,
+            "falloff": 2066.126364
+          }
+        },
+        "ice": {
+          "lowminus": {
+            "max": 330701952,
+            "time": 18000,
+            "resourcedensity": 0.6,
+            "respawn": 66140390.4,
+            "falloff": 2102.546387
+          }
+        },
+        "ore": {
+          "lowextra": {
+            "max": 1763750688,
+            "time": 114000,
+            "resourcedensity": 3.2,
+            "respawn": 55697390.147368,
+            "falloff": 2102.554665
+          }
+        },
+        "silicon": {
+          "lowplus": {
+            "max": 992105280,
+            "time": 108000,
+            "resourcedensity": 1.8,
+            "respawn": 33070176.0,
+            "falloff": 2102.545166
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_110_sector001_macro",
+      "ware": {
+        "helium": {
+          "medium": {
+            "max": 6873801,
+            "time": 36000,
+            "resourcedensity": 15000,
+            "respawn": 687380.1,
+            "falloff": 458.2534
+          }
+        },
+        "hydrogen": {
+          "medium": {
+            "max": 22684737,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 2268473.7,
+            "falloff": 458.277515
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_112_sector001_macro",
+      "ware": {
+        "helium": {
+          "medium": {
+            "max": 1361941,
+            "time": 36000,
+            "resourcedensity": 15000,
+            "respawn": 136194.1,
+            "falloff": 90.796067
+          }
+        },
+        "hydrogen": {
+          "medium": {
+            "max": 4494442,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 449444.2,
+            "falloff": 90.796808
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 2269904,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 226990.4,
+            "falloff": 90.79616
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 24255,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 144.375,
+            "falloff": 92.525482
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 14677529,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 489250.966667,
+            "falloff": 93.317216
+          }
+        },
+        "silicon": {
+          "medlow": {
+            "max": 97858260,
+            "time": 120000,
+            "resourcedensity": 4,
+            "respawn": 2935747.8,
+            "falloff": 93.324909
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_112_sector002_macro",
+      "ware": {
+        "helium": {
+          "medhigh": {
+            "max": 17422586,
+            "time": 108000,
+            "resourcedensity": 50000,
+            "respawn": 580752.866667,
+            "falloff": 348.45172
+          }
+        },
+        "hydrogen": {
+          "medium": {
+            "max": 17248360,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 1724836.0,
+            "falloff": 348.451717
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 8711290,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 871129.0,
+            "falloff": 348.4516
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 93860,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 558.690476,
+            "falloff": 358.047485
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 56774831,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 1892494.366667,
+            "falloff": 360.964654
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 56777358,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 1892578.6,
+            "falloff": 360.980721
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_113_sector001_macro",
+      "ware": {
+        "helium": {
+          "medium": {
+            "max": 381597,
+            "time": 36000,
+            "resourcedensity": 15000,
+            "respawn": 38159.7,
+            "falloff": 25.4398
+          }
+        },
+        "hydrogen": {
+          "medium": {
+            "max": 1259434,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 125943.4,
+            "falloff": 25.443111
+          }
+        },
+        "ice": {
+          "lowplus": {
+            "max": 27220806,
+            "time": 36000,
+            "resourcedensity": 4,
+            "respawn": 2722080.6,
+            "falloff": 25.959784
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 636050,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 63605.0,
+            "falloff": 25.442
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 6475,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 38.541667,
+            "falloff": 24.700165
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 4081860,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 136062.0,
+            "falloff": 25.951767
+          }
+        },
+        "silicon": {
+          "medlow": {
+            "max": 27220098,
+            "time": 120000,
+            "resourcedensity": 4,
+            "respawn": 816602.94,
+            "falloff": 25.959108
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_114_sector001_macro",
+      "ware": {
+        "helium": {
+          "medium": {
+            "max": 747102,
+            "time": 36000,
+            "resourcedensity": 15000,
+            "respawn": 74710.2,
+            "falloff": 49.8068
+          }
+        },
+        "hydrogen": {
+          "medium": {
+            "max": 2465758,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 246575.8,
+            "falloff": 49.813293
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 1245290,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 124529.0,
+            "falloff": 49.8116
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 7989064,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 266302.133333,
+            "falloff": 50.793101
+          }
+        },
+        "silicon": {
+          "medlow": {
+            "max": 53277216,
+            "time": 120000,
+            "resourcedensity": 4,
+            "respawn": 1598316.48,
+            "falloff": 50.809113
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 12725,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 75.744048,
+            "falloff": 48.542023
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_116_sector001_macro",
+      "ware": {
+        "helium": {
+          "medhigh": {
+            "max": 22913843,
+            "time": 108000,
+            "resourcedensity": 50000,
+            "respawn": 763794.766667,
+            "falloff": 458.27686
+          }
+        },
+        "hydrogen": {
+          "medhigh": {
+            "max": 114571360,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "respawn": 3819045.333333,
+            "falloff": 458.28544
+          }
+        },
+        "ice": {
+          "low": {
+            "max": 182866572,
+            "time": 18000,
+            "resourcedensity": 1.5,
+            "respawn": 36573314.4,
+            "falloff": 465.053741
+          }
+        },
+        "methane": {
+          "medhigh": {
+            "max": 57285465,
+            "time": 108000,
+            "resourcedensity": 125000,
+            "respawn": 1909515.5,
+            "falloff": 458.28372
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 119435,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 710.922619,
+            "falloff": 455.608368
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 73136267,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 2437875.566667,
+            "falloff": 464.987863
+          }
+        },
+        "silicon": {
+          "medlow": {
+            "max": 487646658,
+            "time": 120000,
+            "resourcedensity": 4,
+            "respawn": 14629399.74,
+            "falloff": 465.056093
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_11_sector001_macro",
+      "ware": {
+        "methane": {
+          "highplus": {
+            "max": 1039496,
+            "time": 288000,
+            "resourcedensity": 375000,
+            "respawn": 12993.7,
+            "falloff": 2.771989
+          }
+        },
+        "ice": {
+          "medium": {
+            "max": 503517,
+            "time": 36000,
+            "resourcedensity": 15,
+            "respawn": 50351.7,
+            "falloff": 0.128051
+          }
+        },
+        "hydrogen": {
+          "medhigh": {
+            "max": 692996,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "respawn": 23099.866667,
+            "falloff": 2.771984
+          }
+        },
+        "helium": {
+          "high": {
+            "max": 180178,
+            "time": 216000,
+            "resourcedensity": 130000,
+            "respawn": 3002.966667,
+            "falloff": 1.385985
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_13_sector001_macro",
+      "ware": {
+        "hydrogen": {
+          "medium": {
+            "max": 1367620,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 136762.0,
+            "falloff": 27.628687
+          }
+        },
+        "ice": {
+          "medium": {
+            "max": 104668681,
+            "time": 36000,
+            "resourcedensity": 15,
+            "respawn": 10466868.1,
+            "falloff": 26.618622
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 7795,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 46.39881,
+            "falloff": 29.735565
+          }
+        },
+        "ore": {
+          "lowminus": {
+            "max": 1660190,
+            "time": 72000,
+            "resourcedensity": 0.2,
+            "respawn": 83009.5,
+            "falloff": 31.665611
+          },
+          "veryhigh": {
+            "max": 114510,
+            "time": 1080000,
+            "resourcedensity": 3600,
+            "respawn": 381.7,
+            "falloff": 0.000121
+          }
+        },
+        "silicon": {
+          "verylow": {
+            "max": 474022,
+            "time": 72000,
+            "resourcedensity": 0.06,
+            "respawn": 23701.1,
+            "falloff": 30.137507
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_15_sector001_macro",
+      "ware": {
+        "helium": {
+          "medhigh": {
+            "max": 69298,
+            "time": 108000,
+            "resourcedensity": 50000,
+            "respawn": 2309.933333,
+            "falloff": 1.38596
+          }
+        },
+        "hydrogen": {
+          "medhigh": {
+            "max": 173249,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "respawn": 5774.966667,
+            "falloff": 0.692996
+          }
+        },
+        "ice": {
+          "medium": {
+            "max": 246435,
+            "time": 36000,
+            "resourcedensity": 15,
+            "respawn": 24643.5,
+            "falloff": 0.062672
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 95097,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 9509.7,
+            "falloff": 3.80388
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_15_sector002_macro",
+      "ware": {
+        "ice": {
+          "medium": {
+            "max": 399975,
+            "time": 36000,
+            "resourcedensity": 15,
+            "respawn": 39997.5,
+            "falloff": 0.101719
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 35,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 0.208333,
+            "falloff": 0.133514
+          }
+        },
+        "ore": {
+          "medium": {
+            "max": 285663,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 7141.575,
+            "falloff": 0.18162
+          }
+        },
+        "silicon": {
+          "medium": {
+            "max": 285705,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 7142.625,
+            "falloff": 0.181646
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_16_sector001_macro",
+      "ware": {
+        "hydrogen": {
+          "medium": {
+            "max": 9212108,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 921210.8,
+            "falloff": 186.103192
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 29772251,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 992408.366667,
+            "falloff": 189.286874
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 29772743,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 992424.766667,
+            "falloff": 189.290002
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_17_sector001_macro",
+      "ware": {
+        "methane": {
+          "medhigh": {
+            "max": 351529303,
+            "time": 108000,
+            "resourcedensity": 125000,
+            "respawn": 11717643.433333,
+            "falloff": 2812.234424
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 755560,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 4497.380952,
+            "falloff": 2882.232666
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 457049868,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 15234995.6,
+            "falloff": 2905.844803
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 457049868,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 15234995.6,
+            "falloff": 2905.844803
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_18_sector001_macro",
+      "ware": {
+        "ice": {
+          "medium": {
+            "max": 306126,
+            "time": 36000,
+            "resourcedensity": 15,
+            "respawn": 30612.6,
+            "falloff": 0.077852
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 69296,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 6929.6,
+            "falloff": 2.77184
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 10,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 0.059524,
+            "falloff": 0.038147
+          }
+        },
+        "ore": {
+          "medium": {
+            "max": 81618,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 2040.45,
+            "falloff": 0.051891
+          }
+        },
+        "silicon": {
+          "medium": {
+            "max": 81630,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 2040.75,
+            "falloff": 0.051899
+          }
+        },
+        "hydrogen": {
+          "medhigh": {
+            "max": 173249,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "respawn": 5774.966667,
+            "falloff": 0.692996
+          }
+        },
+        "helium": {
+          "medhigh": {
+            "max": 34649,
+            "time": 108000,
+            "resourcedensity": 50000,
+            "respawn": 1154.966667,
+            "falloff": 0.69298
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_19_sector001_macro",
+      "ware": {
+        "nividium": {
+          "medium": {
+            "max": 15,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 0.089286,
+            "falloff": 0.05722
+          }
+        },
+        "ore": {
+          "medium": {
+            "max": 122427,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 3060.675,
+            "falloff": 0.077837
+          }
+        },
+        "silicon": {
+          "medium": {
+            "max": 122445,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 3061.125,
+            "falloff": 0.077848
+          }
+        },
+        "helium": {
+          "medhigh": {
+            "max": 138596,
+            "time": 108000,
+            "resourcedensity": 50000,
+            "respawn": 4619.866667,
+            "falloff": 2.77192
+          }
+        },
+        "hydrogen": {
+          "medhigh": {
+            "max": 173249,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "respawn": 5774.966667,
+            "falloff": 0.692996
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 34648,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 3464.8,
+            "falloff": 1.38592
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_19_sector002_macro",
+      "ware": {
+        "nividium": {
+          "medium": {
+            "max": 55,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 0.327381,
+            "falloff": 0.209808
+          }
+        },
+        "ore": {
+          "medium": {
+            "max": 447364,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 11184.1,
+            "falloff": 0.284426
+          }
+        },
+        "silicon": {
+          "medium": {
+            "max": 447438,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 11185.95,
+            "falloff": 0.284473
+          }
+        },
+        "hydrogen": {
+          "medhigh": {
+            "max": 346498,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "respawn": 11549.933333,
+            "falloff": 1.385992
+          }
+        },
+        "helium": {
+          "medhigh": {
+            "max": 69298,
+            "time": 108000,
+            "resourcedensity": 50000,
+            "respawn": 2309.933333,
+            "falloff": 1.38596
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 68230,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 6823.0,
+            "falloff": 2.7292
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_21_sector001_macro",
+      "ware": {
+        "hydrogen": {
+          "medium": {
+            "max": 398992,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 39899.2,
+            "falloff": 8.060444
+          }
+        },
+        "rawscrap": {
+          "medium": {
+            "max": 3169370,
+            "time": 144000,
+            "resourcedensity": 1.5,
+            "respawn": 79234.25,
+            "falloff": 8.060125
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 30,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 0.178571,
+            "falloff": 0.114441
+          }
+        },
+        "ore": {
+          "medium": {
+            "max": 239229,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 5980.725,
+            "falloff": 0.152098
+          }
+        },
+        "silicon": {
+          "medium": {
+            "max": 239256,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 5981.4,
+            "falloff": 0.152115
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_21_sector002_macro",
+      "ware": {
+        "ore": {
+          "medium": {
+            "max": 22575936,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 564398.4,
+            "falloff": 14.353394
+          }
+        },
+        "silicon": {
+          "medium": {
+            "max": 14875977,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 371899.425,
+            "falloff": 9.457891
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_24_sector001_macro",
+      "ware": {
+        "nividium": {
+          "medium": {
+            "max": 40,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 0.238095,
+            "falloff": 0.152588
+          }
+        },
+        "ore": {
+          "medium": {
+            "max": 323657,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 8091.425,
+            "falloff": 0.205776
+          }
+        },
+        "silicon": {
+          "medium": {
+            "max": 323691,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 8092.275,
+            "falloff": 0.205797
+          }
+        },
+        "ice": {
+          "medium": {
+            "max": 204084,
+            "time": 36000,
+            "resourcedensity": 15,
+            "respawn": 20408.4,
+            "falloff": 0.051901
+          }
+        },
+        "hydrogen": {
+          "medhigh": {
+            "max": 641559,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "respawn": 21385.3,
+            "falloff": 2.566236
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 33402,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 3340.2,
+            "falloff": 1.33608
+          }
+        },
+        "helium": {
+          "medhigh": {
+            "max": 69233,
+            "time": 108000,
+            "resourcedensity": 50000,
+            "respawn": 2307.766667,
+            "falloff": 1.38466
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_25_sector001_macro",
+      "ware": {
+        "hydrogen": {
+          "medium": {
+            "max": 30742296,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 3074229.6,
+            "falloff": 621.056485
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 65961960,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 2198732.0,
+            "falloff": 419.374847
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 65356954,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 2178565.133333,
+            "falloff": 415.528323
+          }
+        },
+        "rawscrap": {
+          "medium": {
+            "max": 107624,
+            "time": 144000,
+            "resourcedensity": 1.5,
+            "respawn": 2690.6,
+            "falloff": 0.273702
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_25_sector002_macro",
+      "ware": {
+        "hydrogen": {
+          "medium": {
+            "max": 30742296,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 3074229.6,
+            "falloff": 621.056485
+          }
+        },
+        "ore": {
+          "medium": {
+            "max": 659662790,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 16491569.75,
+            "falloff": 419.402307
+          }
+        },
+        "silicon": {
+          "medium": {
+            "max": 653603206,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 16340080.15,
+            "falloff": 415.549727
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_26_sector001_macro",
+      "ware": {
+        "hydrogen": {
+          "medium": {
+            "max": 12222925,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 1222292.5,
+            "falloff": 246.927778
+          }
+        },
+        "nividium": {
+          "high": {
+            "max": 656335,
+            "time": 1209600,
+            "resourcedensity": 0.01,
+            "respawn": 1953.377976,
+            "falloff": 250.371933
+          }
+        },
+        "ore": {
+          "medium": {
+            "max": 394602035,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 9865050.875,
+            "falloff": 250.881217
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_26_sector002_macro",
+      "ware": {
+        "hydrogen": {
+          "medium": {
+            "max": 12222925,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 1222292.5,
+            "falloff": 246.927778
+          }
+        },
+        "nividium": {
+          "high": {
+            "max": 656335,
+            "time": 1209600,
+            "resourcedensity": 0.01,
+            "respawn": 1953.377976,
+            "falloff": 250.371933
+          }
+        },
+        "ore": {
+          "medium": {
+            "max": 394604030,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 9865100.75,
+            "falloff": 250.882486
+          }
+        },
+        "silicon": {
+          "medium": {
+            "max": 394605282,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 9865132.05,
+            "falloff": 250.883282
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_27_sector001_macro",
+      "ware": {
+        "methane": {
+          "high": {
+            "max": 9841134,
+            "time": 288000,
+            "resourcedensity": 250000,
+            "respawn": 123014.175,
+            "falloff": 39.364536
+          },
+          "medium": {
+            "max": 34648,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 3464.8,
+            "falloff": 1.38592
+          }
+        },
+        "ore": {
+          "medium": {
+            "max": 55162025,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 1379050.625,
+            "falloff": 35.071071
+          }
+        },
+        "silicon": {
+          "medium": {
+            "max": 28546813,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 713670.325,
+            "falloff": 18.149575
+          },
+          "low": {
+            "max": 1781983,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 59399.433333,
+            "falloff": 11.329543
+          }
+        },
+        "hydrogen": {
+          "medium": {
+            "max": 874425,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 87442.5,
+            "falloff": 17.665152
+          },
+          "medhigh": {
+            "max": 97782,
+            "time": 36000,
+            "resourcedensity": 250000,
+            "respawn": 9778.2,
+            "falloff": 0.391128
+          }
+        },
+        "ice": {
+          "low": {
+            "max": 4228620,
+            "time": 18000,
+            "resourcedensity": 1.5,
+            "respawn": 845724.0,
+            "falloff": 10.753937
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 2900,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 17.261905,
+            "falloff": 11.062622
+          }
+        },
+        "helium": {
+          "medhigh": {
+            "max": 69298,
+            "time": 108000,
+            "resourcedensity": 50000,
+            "respawn": 2309.933333,
+            "falloff": 1.38596
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_28_sector001_macro",
+      "ware": {
+        "hydrogen": {
+          "medium": {
+            "max": 798318,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 79831.8,
+            "falloff": 16.127636
+          }
+        },
+        "ice": {
+          "low": {
+            "max": 6535161,
+            "time": 18000,
+            "resourcedensity": 1.5,
+            "respawn": 1307032.2,
+            "falloff": 16.619774
+          }
+        },
+        "nividium": {
+          "high": {
+            "max": 28400,
+            "time": 1209600,
+            "resourcedensity": 0.01,
+            "respawn": 84.52381,
+            "falloff": 10.83374
+          },
+          "medium": {
+            "max": 5970,
+            "time": 1209600,
+            "resourcedensity": 0.001,
+            "respawn": 17.767857,
+            "falloff": 22.773743
+          }
+        },
+        "ore": {
+          "lowest": {
+            "max": 73883,
+            "time": 36000,
+            "resourcedensity": 0.026,
+            "respawn": 7388.3,
+            "falloff": 10.840049
+          },
+          "medium": {
+            "max": 7609548,
+            "time": 36000,
+            "resourcedensity": 6,
+            "respawn": 760954.8,
+            "falloff": 4.83802
+          }
+        },
+        "silicon": {
+          "lowest": {
+            "max": 73932,
+            "time": 36000,
+            "resourcedensity": 0.026,
+            "respawn": 7393.2,
+            "falloff": 10.847238
+          },
+          "medium": {
+            "max": 7609563,
+            "time": 36000,
+            "resourcedensity": 6,
+            "respawn": 760956.3,
+            "falloff": 4.83803
+          }
+        },
+        "helium": {
+          "high": {
+            "max": 180178,
+            "time": 216000,
+            "resourcedensity": 130000,
+            "respawn": 3002.966667,
+            "falloff": 1.385985
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_29_sector002_macro",
+      "ware": {
+        "nividium": {
+          "medium": {
+            "max": 8255,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 49.136905,
+            "falloff": 31.490326
+          }
+        },
+        "ore": {
+          "verylow": {
+            "max": 567688,
+            "time": 72000,
+            "resourcedensity": 0.06,
+            "respawn": 28384.4,
+            "falloff": 36.092631
+          },
+          "medium": {
+            "max": 81618,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 2040.45,
+            "falloff": 0.051891
+          }
+        },
+        "silicon": {
+          "verylow": {
+            "max": 567757,
+            "time": 72000,
+            "resourcedensity": 0.06,
+            "respawn": 28387.85,
+            "falloff": 36.097018
+          },
+          "medium": {
+            "max": 81630,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 2040.75,
+            "falloff": 0.051899
+          }
+        },
+        "helium": {
+          "medhigh": {
+            "max": 103947,
+            "time": 108000,
+            "resourcedensity": 50000,
+            "respawn": 3464.9,
+            "falloff": 2.07894
+          }
+        },
+        "hydrogen": {
+          "medhigh": {
+            "max": 173249,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "respawn": 5774.966667,
+            "falloff": 0.692996
+          }
+        },
+        "ice": {
+          "medium": {
+            "max": 153063,
+            "time": 36000,
+            "resourcedensity": 15,
+            "respawn": 15306.3,
+            "falloff": 0.038926
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 17324,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 1732.4,
+            "falloff": 0.69296
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_31_sector001_macro",
+      "ware": {
+        "ore": {
+          "medium": {
+            "max": 97990630,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 2449765.75,
+            "falloff": 62.300765
+          }
+        },
+        "rawscrap": {
+          "high": {
+            "max": 12831,
+            "time": 252000,
+            "resourcedensity": 7.5,
+            "respawn": 183.3,
+            "falloff": 0.006526
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_32_sector001_macro",
+      "ware": {
+        "hydrogen": {
+          "medium": {
+            "max": 4264666,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 426466.6,
+            "falloff": 86.154869
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 23245,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 138.363095,
+            "falloff": 88.672638
+          }
+        },
+        "ore": {
+          "medlow": {
+            "max": 94409809,
+            "time": 120000,
+            "resourcedensity": 4,
+            "respawn": 2832294.27,
+            "falloff": 90.03621
+          }
+        },
+        "silicon": {
+          "medium": {
+            "max": 141615705,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 3540392.625,
+            "falloff": 90.03684
+          }
+        },
+        "rawscrap": {
+          "high": {
+            "max": 14817,
+            "time": 252000,
+            "resourcedensity": 7.5,
+            "respawn": 211.671429,
+            "falloff": 0.007536
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_32_sector002_macro",
+      "ware": {
+        "hydrogen": {
+          "medium": {
+            "max": 677636,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 67763.6,
+            "falloff": 13.689616
+          }
+        },
+        "ore": {
+          "medium": {
+            "max": 24260248,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 606506.2,
+            "falloff": 15.42425
+          }
+        },
+        "silicon": {
+          "medlow": {
+            "max": 16173495,
+            "time": 120000,
+            "resourcedensity": 4,
+            "respawn": 485204.85,
+            "falloff": 15.424247
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_33_sector001_macro",
+      "ware": {
+        "hydrogen": {
+          "medium": {
+            "max": 119058,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 11905.8,
+            "falloff": 2.405212
+          }
+        },
+        "rawscrap": {
+          "medium": {
+            "max": 70503,
+            "time": 144000,
+            "resourcedensity": 1.5,
+            "respawn": 1762.575,
+            "falloff": 0.179298
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_35_sector001_macro",
+      "ware": {
+        "hydrogen": {
+          "medium": {
+            "max": 454832,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 45483.2,
+            "falloff": 9.188525
+          }
+        },
+        "ice": {
+          "medium": {
+            "max": 37084662,
+            "time": 36000,
+            "resourcedensity": 15,
+            "respawn": 3708466.2,
+            "falloff": 9.431117
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 1483303,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 49443.433333,
+            "falloff": 9.430586
+          }
+        },
+        "silicon": {
+          "lowplus": {
+            "max": 4450116,
+            "time": 108000,
+            "resourcedensity": 1.8,
+            "respawn": 148337.2,
+            "falloff": 9.431025
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_36_sector001_macro",
+      "ware": {
+        "hydrogen": {
+          "medium": {
+            "max": 16497674,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 1649767.4,
+            "falloff": 333.286343
+          }
+        },
+        "ore": {
+          "lowplus": {
+            "max": 160949415,
+            "time": 108000,
+            "resourcedensity": 1.8,
+            "respawn": 5364980.5,
+            "falloff": 341.096274
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 53649543,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 1788318.1,
+            "falloff": 341.094608
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_37_sector001_macro",
+      "ware": {
+        "methane": {
+          "medhigh": {
+            "max": 5798812,
+            "time": 108000,
+            "resourcedensity": 125000,
+            "respawn": 193293.733333,
+            "falloff": 46.390496
+          }
+        },
+        "ore": {
+          "medium": {
+            "max": 76455481,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 1911387.025,
+            "falloff": 48.609086
+          },
+          "veryhigh": {
+            "max": 1232995,
+            "time": 144000,
+            "resourcedensity": 3600,
+            "respawn": 30824.875,
+            "falloff": 0.001307
+          }
+        },
+        "silicon": {
+          "medlow": {
+            "max": 50970267,
+            "time": 120000,
+            "resourcedensity": 4,
+            "respawn": 1529108.01,
+            "falloff": 48.609035
+          },
+          "veryhigh": {
+            "max": 540253,
+            "time": 120000,
+            "resourcedensity": 3600,
+            "respawn": 16207.59,
+            "falloff": 0.000572
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_38_sector001_macro",
+      "ware": {
+        "helium": {
+          "medium": {
+            "max": 3070088,
+            "time": 36000,
+            "resourcedensity": 15000,
+            "respawn": 307008.8,
+            "falloff": 204.672533
+          }
+        },
+        "hydrogen": {
+          "medium": {
+            "max": 6835439,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 683543.9,
+            "falloff": 138.089677
+          },
+          "medhigh": {
+            "max": 15912614,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "respawn": 530420.466667,
+            "falloff": 63.650456
+          }
+        },
+        "ice": {
+          "lowest": {
+            "max": 240984,
+            "time": 10800,
+            "resourcedensity": 0.015,
+            "respawn": 80328.0,
+            "falloff": 61.2854
+          }
+        },
+        "nividium": {
+          "high": {
+            "max": 371160,
+            "time": 1209600,
+            "resourcedensity": 0.01,
+            "respawn": 1104.642857,
+            "falloff": 141.586304
+          },
+          "medium": {
+            "max": 38660,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 230.119048,
+            "falloff": 147.476196
+          }
+        },
+        "ore": {
+          "lowest": {
+            "max": 322875,
+            "time": 36000,
+            "resourcedensity": 0.026,
+            "respawn": 32287.5,
+            "falloff": 47.371938
+          },
+          "medium": {
+            "max": 30789092,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 769727.3,
+            "falloff": 19.575178
+          },
+          "veryhigh": {
+            "max": 651,
+            "time": 36000,
+            "resourcedensity": 3600,
+            "respawn": 65.1,
+            "falloff": 1e-06
+          }
+        },
+        "silicon": {
+          "lowest": {
+            "max": 456888,
+            "time": 36000,
+            "resourcedensity": 0.026,
+            "respawn": 45688.8,
+            "falloff": 67.034208
+          },
+          "lowplus": {
+            "max": 13936238,
+            "time": 108000,
+            "resourcedensity": 1.8,
+            "respawn": 464541.266667,
+            "falloff": 29.534738
+          },
+          "veryhigh": {
+            "max": 114510,
+            "time": 1080000,
+            "resourcedensity": 3600,
+            "respawn": 381.7,
+            "falloff": 0.000121
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_401_sector001_macro",
+      "ware": {
+        "helium": {
+          "medium": {
+            "max": 382779,
+            "time": 36000,
+            "resourcedensity": 15000,
+            "respawn": 38277.9,
+            "falloff": 25.5186
+          }
+        },
+        "hydrogen": {
+          "medium": {
+            "max": 1263337,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 126333.7,
+            "falloff": 25.52196
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 638020,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 63802.0,
+            "falloff": 25.5208
+          }
+        },
+        "nividium": {
+          "high": {
+            "max": 67850,
+            "time": 1209600,
+            "resourcedensity": 0.01,
+            "respawn": 201.934524,
+            "falloff": 25.882721
+          }
+        },
+        "ore": {
+          "medplus": {
+            "max": 108883493,
+            "time": 144000,
+            "resourcedensity": 16,
+            "respawn": 2722087.325,
+            "falloff": 25.959848
+          }
+        },
+        "silicon": {
+          "medium": {
+            "max": 40830612,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 1020765.3,
+            "falloff": 25.959404
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_402_sector001_macro",
+      "ware": {
+        "ice": {
+          "medium": {
+            "max": 542802948,
+            "time": 36000,
+            "resourcedensity": 15,
+            "respawn": 54280294.8,
+            "falloff": 138.041928
+          }
+        },
+        "ore": {
+          "medlow": {
+            "max": 144746310,
+            "time": 120000,
+            "resourcedensity": 4,
+            "respawn": 4342389.3,
+            "falloff": 138.040838
+          }
+        },
+        "silicon": {
+          "medium": {
+            "max": 217121016,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 5428025.4,
+            "falloff": 138.041824
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_40_sector001_macro",
+      "ware": {
+        "ore": {
+          "medium": {
+            "max": 148517802,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 3712945.05,
+            "falloff": 94.425076
+          }
+        },
+        "silicon": {
+          "medium": {
+            "max": 148798284,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 3719957.1,
+            "falloff": 94.603401
+          }
+        },
+        "nividium": {
+          "medlow": {
+            "max": 13415,
+            "time": 432000,
+            "resourcedensity": 0.0006,
+            "respawn": 111.791667,
+            "falloff": 85.290273
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_410_sector001_macro",
+      "ware": {
+        "ice": {
+          "verylow": {
+            "max": 6518208,
+            "time": 10800,
+            "resourcedensity": 0.15,
+            "respawn": 2172736.0,
+            "falloff": 165.766602
+          }
+        },
+        "ore": {
+          "verylow": {
+            "max": 2617245,
+            "time": 72000,
+            "resourcedensity": 0.06,
+            "respawn": 130862.25,
+            "falloff": 166.399956
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 26197773,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 873259.1,
+            "falloff": 166.560955
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_411_sector001_macro",
+      "ware": {
+        "hydrogen": {
+          "medium": {
+            "max": 18799058,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 1879905.8,
+            "falloff": 379.778949
+          }
+        },
+        "ice": {
+          "low": {
+            "max": 170034291,
+            "time": 18000,
+            "resourcedensity": 1.5,
+            "respawn": 34006858.2,
+            "falloff": 432.419563
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 5781946,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 192731.533333,
+            "falloff": 36.760623
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 5782014,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 192733.8,
+            "falloff": 36.761055
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_412_sector001_macro",
+      "ware": {
+        "helium": {
+          "medium": {
+            "max": 7237146,
+            "time": 36000,
+            "resourcedensity": 15000,
+            "respawn": 723714.6,
+            "falloff": 482.4764
+          }
+        },
+        "hydrogen": {
+          "medium": {
+            "max": 23883483,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 2388348.3,
+            "falloff": 482.494606
+          }
+        },
+        "ice": {
+          "lowminus": {
+            "max": 77391093,
+            "time": 18000,
+            "resourcedensity": 0.6,
+            "respawn": 15478218.6,
+            "falloff": 492.039318
+          }
+        },
+        "methane": {
+          "medplus": {
+            "max": 25330988,
+            "time": 108000,
+            "resourcedensity": 52500,
+            "respawn": 844366.266667,
+            "falloff": 482.49501
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_413_sector001_macro",
+      "ware": {
+        "helium": {
+          "highest": {
+            "max": 168875175,
+            "time": 324000,
+            "resourcedensity": 350000,
+            "respawn": 1876390.833333,
+            "falloff": 482.5005
+          }
+        },
+        "hydrogen": {
+          "high": {
+            "max": 217125332,
+            "time": 288000,
+            "resourcedensity": 450000,
+            "respawn": 2714066.65,
+            "falloff": 482.500738
+          }
+        },
+        "ice": {
+          "low": {
+            "max": 193491804,
+            "time": 18000,
+            "resourcedensity": 1.5,
+            "respawn": 38698360.8,
+            "falloff": 492.075104
+          }
+        },
+        "methane": {
+          "highest": {
+            "max": 603126508,
+            "time": 324000,
+            "resourcedensity": 1250000,
+            "respawn": 6701405.644444,
+            "falloff": 482.501206
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_414_sector001_macro",
+      "ware": {
+        "rawscrap": {
+          "medium": {
+            "max": 48519529,
+            "time": 144000,
+            "resourcedensity": 1.5,
+            "respawn": 1212988.225,
+            "falloff": 123.391543
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_415_sector001_macro",
+      "ware": {
+        "hydrogen": {
+          "medium": {
+            "max": 19945533,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 1994553.3,
+            "falloff": 402.940061
+          }
+        },
+        "ice": {
+          "verylow": {
+            "max": 15916248,
+            "time": 10800,
+            "resourcedensity": 0.15,
+            "respawn": 5305416.0,
+            "falloff": 404.771118
+          }
+        },
+        "ore": {
+          "verylow": {
+            "max": 7064881,
+            "time": 72000,
+            "resourcedensity": 0.06,
+            "respawn": 353244.05,
+            "falloff": 449.173037
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 59885010,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 1996167.0,
+            "falloff": 380.73864
+          }
+        },
+        "nividium": {
+          "low": {
+            "max": 10210,
+            "time": 302400,
+            "resourcedensity": 0.0001,
+            "respawn": 121.547619,
+            "falloff": 389.480591
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_416_sector002_macro",
+      "ware": {
+        "ice": {
+          "low": {
+            "max": 194442708,
+            "time": 18000,
+            "resourcedensity": 1.5,
+            "respawn": 38888541.6,
+            "falloff": 494.493378
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_418_sector001_macro",
+      "ware": {
+        "helium": {
+          "medium": {
+            "max": 39610,
+            "time": 36000,
+            "resourcedensity": 15000,
+            "respawn": 3961.0,
+            "falloff": 2.640667
+          }
+        },
+        "hydrogen": {
+          "medium": {
+            "max": 130714,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 13071.4,
+            "falloff": 2.640687
+          }
+        },
+        "ice": {
+          "low": {
+            "max": 547944,
+            "time": 18000,
+            "resourcedensity": 1.5,
+            "respawn": 109588.8,
+            "falloff": 1.393494
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 66016,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 6601.6,
+            "falloff": 2.64064
+          }
+        },
+        "nividium": {
+          "low": {
+            "max": 40,
+            "time": 302400,
+            "resourcedensity": 0.0001,
+            "respawn": 0.47619,
+            "falloff": 1.525879
+          }
+        },
+        "ore": {
+          "highplus": {
+            "max": 31859328,
+            "time": 216000,
+            "resourcedensity": 120,
+            "respawn": 530988.8,
+            "falloff": 1.012781
+          }
+        },
+        "silicon": {
+          "medium": {
+            "max": 1711938,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 42798.45,
+            "falloff": 1.088421
+          }
+        },
+        "rawscrap": {
+          "medium": {
+            "max": 669698,
+            "time": 144000,
+            "resourcedensity": 1.5,
+            "respawn": 16742.45,
+            "falloff": 1.70313
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_41_sector001_macro",
+      "ware": {
+        "ore": {
+          "lowplus": {
+            "max": 5059790,
+            "time": 108000,
+            "resourcedensity": 1.8,
+            "respawn": 168659.666667,
+            "falloff": 10.723093
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 1686558,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 56218.6,
+            "falloff": 10.722847
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_420_sector001_macro",
+      "ware": {
+        "ore": {
+          "medium": {
+            "max": 18949234,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 473730.85,
+            "falloff": 12.047599
+          }
+        },
+        "silicon": {
+          "medium": {
+            "max": 15190053,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 379751.325,
+            "falloff": 9.657576
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_421_sector001_macro",
+      "ware": {
+        "rawscrap": {
+          "high": {
+            "max": 135674,
+            "time": 252000,
+            "resourcedensity": 7.5,
+            "respawn": 1938.2,
+            "falloff": 0.069007
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_422_sector001_macro",
+      "ware": {
+        "ice": {
+          "medium": {
+            "max": 212026434,
+            "time": 36000,
+            "resourcedensity": 15,
+            "respawn": 21202643.4,
+            "falloff": 53.921111
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 8480616,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 282687.2,
+            "falloff": 53.918304
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 8480703,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 282690.1,
+            "falloff": 53.918858
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_424_sector002_macro",
+      "ware": {
+        "ore": {
+          "verylow": {
+            "max": 7316204,
+            "time": 72000,
+            "resourcedensity": 0.06,
+            "respawn": 365810.2,
+            "falloff": 465.151723
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 61678665,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 2055955.5,
+            "falloff": 392.142391
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_425_sector001_macro",
+      "ware": {
+        "ore": {
+          "verylow": {
+            "max": 7245591,
+            "time": 72000,
+            "resourcedensity": 0.06,
+            "respawn": 362279.55,
+            "falloff": 460.66227
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 61120632,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 2037354.4,
+            "falloff": 388.594513
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_43_sector001_macro",
+      "ware": {
+        "ore": {
+          "low": {
+            "max": 21233125,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 707770.833333,
+            "falloff": 134.996573
+          }
+        },
+        "rawscrap": {
+          "low": {
+            "max": 26541395,
+            "time": 72000,
+            "resourcedensity": 0.75,
+            "respawn": 1327069.75,
+            "falloff": 134.996516
+          }
+        },
+        "silicon": {
+          "lowplus": {
+            "max": 63700758,
+            "time": 108000,
+            "resourcedensity": 1.8,
+            "respawn": 2123358.6,
+            "falloff": 134.999504
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_44_sector001_macro",
+      "ware": {
+        "ice": {
+          "low": {
+            "max": 89844927,
+            "time": 18000,
+            "resourcedensity": 1.5,
+            "respawn": 17968985.4,
+            "falloff": 228.487465
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 113575,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 676.041667,
+            "falloff": 433.254242
+          }
+        },
+        "ore": {
+          "medlow": {
+            "max": 239902613,
+            "time": 120000,
+            "resourcedensity": 4,
+            "respawn": 7197078.39,
+            "falloff": 228.78896
+          }
+        },
+        "silicon": {
+          "lowplus": {
+            "max": 108019530,
+            "time": 108000,
+            "resourcedensity": 1.8,
+            "respawn": 3600651.0,
+            "falloff": 228.923225
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_45_sector001_macro",
+      "ware": {
+        "ore": {
+          "verylow": {
+            "max": 4904346,
+            "time": 72000,
+            "resourcedensity": 0.06,
+            "respawn": 245217.3,
+            "falloff": 311.809921
+          }
+        },
+        "rawscrap": {
+          "medium": {
+            "max": 247271950,
+            "time": 144000,
+            "resourcedensity": 1.5,
+            "respawn": 6181798.75,
+            "falloff": 628.845088
+          }
+        },
+        "silicon": {
+          "verylow": {
+            "max": 4904346,
+            "time": 72000,
+            "resourcedensity": 0.06,
+            "respawn": 245217.3,
+            "falloff": 311.809921
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_46_sector001_macro",
+      "ware": {
+        "ice": {
+          "low": {
+            "max": 187392132,
+            "time": 18000,
+            "resourcedensity": 1.5,
+            "respawn": 37478426.4,
+            "falloff": 476.562836
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 103360632,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 3445354.4,
+            "falloff": 657.1492
+          },
+          "medhigh": {
+            "max": 15991253,
+            "time": 144000,
+            "resourcedensity": 32,
+            "respawn": 399781.325,
+            "falloff": 1.906306
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 86990826,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 2899694.2,
+            "falloff": 553.072777
+          },
+          "lowest": {
+            "max": 12982,
+            "time": 36000,
+            "resourcedensity": 0.026,
+            "respawn": 1298.2,
+            "falloff": 1.904708
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 116135,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 691.279762,
+            "falloff": 443.019867
+          },
+          "medlow": {
+            "max": 235,
+            "time": 432000,
+            "resourcedensity": 0.0006,
+            "respawn": 1.958333,
+            "falloff": 1.49409
+          }
+        },
+        "helium": {
+          "medium": {
+            "max": 155643,
+            "time": 36000,
+            "resourcedensity": 15000,
+            "respawn": 15564.3,
+            "falloff": 10.3762
+          }
+        },
+        "hydrogen": {
+          "medium": {
+            "max": 513640,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 51364.0,
+            "falloff": 10.376566
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_47_sector001_macro",
+      "ware": {
+        "ice": {
+          "low": {
+            "max": 186642585,
+            "time": 18000,
+            "resourcedensity": 1.5,
+            "respawn": 37328517.0,
+            "falloff": 474.656639
+          },
+          "verylow": {
+            "max": 636741,
+            "time": 18000,
+            "resourcedensity": 0.15,
+            "respawn": 127348.2,
+            "falloff": 16.193161
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 88706745,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 2956891.5,
+            "falloff": 563.982296
+          },
+          "lowest": {
+            "max": 262264,
+            "time": 108000,
+            "resourcedensity": 0.026,
+            "respawn": 8742.133333,
+            "falloff": 38.479145
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 88307606,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 2943586.866667,
+            "falloff": 561.444639
+          },
+          "lowest": {
+            "max": 262574,
+            "time": 108000,
+            "resourcedensity": 0.026,
+            "respawn": 8752.466667,
+            "falloff": 38.524628
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 116990,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 696.369048,
+            "falloff": 446.281433
+          },
+          "high": {
+            "max": 185,
+            "time": 604800,
+            "resourcedensity": 0.01,
+            "respawn": 1.10119,
+            "falloff": 0.070572
+          }
+        },
+        "helium": {
+          "medhigh": {
+            "max": 220630,
+            "time": 108000,
+            "resourcedensity": 50000,
+            "respawn": 7354.333333,
+            "falloff": 4.4126
+          },
+          "medium": {
+            "max": 25565,
+            "time": 36000,
+            "resourcedensity": 15000,
+            "respawn": 2556.5,
+            "falloff": 1.704333
+          }
+        },
+        "hydrogen": {
+          "medium": {
+            "max": 302790,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 30279.0,
+            "falloff": 6.11697
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 152923,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 15292.3,
+            "falloff": 6.11692
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_48_sector001_macro",
+      "ware": {
+        "ice": {
+          "medium": {
+            "max": 190719465,
+            "time": 36000,
+            "resourcedensity": 15,
+            "respawn": 19071946.5,
+            "falloff": 48.502468
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 7628369,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 254278.966667,
+            "falloff": 48.499864
+          }
+        },
+        "rawscrap": {
+          "medium": {
+            "max": 19071743,
+            "time": 144000,
+            "resourcedensity": 1.5,
+            "respawn": 476793.575,
+            "falloff": 48.501951
+          }
+        },
+        "silicon": {
+          "lowplus": {
+            "max": 22886043,
+            "time": 108000,
+            "resourcedensity": 1.8,
+            "respawn": 762868.1,
+            "falloff": 48.501848
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_49_sector001_macro",
+      "ware": {
+        "hydrogen": {
+          "medhigh": {
+            "max": 11428093,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "respawn": 380936.433333,
+            "falloff": 45.712372
+          }
+        },
+        "ore": {
+          "medium": {
+            "max": 76577775,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 1914444.375,
+            "falloff": 48.686838
+          }
+        },
+        "silicon": {
+          "medlow": {
+            "max": 51051645,
+            "time": 120000,
+            "resourcedensity": 4,
+            "respawn": 1531549.35,
+            "falloff": 48.686643
+          }
+        },
+        "helium": {
+          "high": {
+            "max": 180178,
+            "time": 216000,
+            "resourcedensity": 130000,
+            "respawn": 3002.966667,
+            "falloff": 1.385985
+          }
+        },
+        "methane": {
+          "highplus": {
+            "max": 932960,
+            "time": 288000,
+            "resourcedensity": 375000,
+            "respawn": 11662.0,
+            "falloff": 2.487893
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_500_sector001_macro",
+      "ware": {
+        "helium": {
+          "medium": {
+            "max": 12105661,
+            "time": 36000,
+            "resourcedensity": 15000,
+            "respawn": 1210566.1,
+            "falloff": 807.044067
+          }
+        },
+        "hydrogen": {
+          "high": {
+            "max": 41750988,
+            "time": 36000,
+            "resourcedensity": 450000,
+            "respawn": 4175098.8,
+            "falloff": 92.779973
+          },
+          "medium": {
+            "max": 39950993,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 3995099.3,
+            "falloff": 807.090768
+          }
+        },
+        "ice": {
+          "low": {
+            "max": 322117632,
+            "time": 18000,
+            "resourcedensity": 1.5,
+            "respawn": 64423526.4,
+            "falloff": 819.1875
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 20176770,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 2017677.0,
+            "falloff": 807.0708
+          }
+        },
+        "ore": {
+          "lowest": {
+            "max": 6224229,
+            "time": 36000,
+            "resourcedensity": 0.026,
+            "respawn": 622422.9,
+            "falloff": 913.213436
+          }
+        },
+        "silicon": {
+          "lowest": {
+            "max": 6225873,
+            "time": 36000,
+            "resourcedensity": 0.026,
+            "respawn": 622587.3,
+            "falloff": 913.454643
+          }
+        },
+        "nividium": {
+          "low": {
+            "max": 2355,
+            "time": 302400,
+            "resourcedensity": 0.0001,
+            "respawn": 28.035714,
+            "falloff": 89.836121
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_500_sector002_macro",
+      "ware": {
+        "helium": {
+          "medium": {
+            "max": 12158772,
+            "time": 36000,
+            "resourcedensity": 15000,
+            "respawn": 1215877.2,
+            "falloff": 810.5848
+          }
+        },
+        "hydrogen": {
+          "high": {
+            "max": 41847061,
+            "time": 36000,
+            "resourcedensity": 450000,
+            "respawn": 4184706.1,
+            "falloff": 92.993469
+          },
+          "medium": {
+            "max": 40126264,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 4012626.4,
+            "falloff": 810.631596
+          }
+        },
+        "ice": {
+          "low": {
+            "max": 322117632,
+            "time": 18000,
+            "resourcedensity": 1.5,
+            "respawn": 64423526.4,
+            "falloff": 819.1875
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 20265290,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 2026529.0,
+            "falloff": 810.6116
+          }
+        },
+        "ore": {
+          "lowest": {
+            "max": 6263511,
+            "time": 36000,
+            "resourcedensity": 0.026,
+            "respawn": 626351.1,
+            "falloff": 918.976857
+          },
+          "medium": {
+            "max": 724573,
+            "time": 36000,
+            "resourcedensity": 6,
+            "respawn": 72457.3,
+            "falloff": 0.460671
+          }
+        },
+        "silicon": {
+          "lowest": {
+            "max": 6264546,
+            "time": 36000,
+            "resourcedensity": 0.026,
+            "respawn": 626454.6,
+            "falloff": 919.128711
+          },
+          "medium": {
+            "max": 724590,
+            "time": 36000,
+            "resourcedensity": 6,
+            "respawn": 72459.0,
+            "falloff": 0.460682
+          }
+        },
+        "nividium": {
+          "low": {
+            "max": 5,
+            "time": 302400,
+            "resourcedensity": 0.0001,
+            "respawn": 0.059524,
+            "falloff": 0.190735
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_500_sector003_macro",
+      "ware": {
+        "helium": {
+          "medium": {
+            "max": 12161483,
+            "time": 36000,
+            "resourcedensity": 15000,
+            "respawn": 1216148.3,
+            "falloff": 810.765533
+          }
+        },
+        "hydrogen": {
+          "high": {
+            "max": 41935211,
+            "time": 36000,
+            "resourcedensity": 450000,
+            "respawn": 4193521.1,
+            "falloff": 93.189358
+          },
+          "medium": {
+            "max": 40135216,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 4013521.6,
+            "falloff": 810.812444
+          }
+        },
+        "ice": {
+          "low": {
+            "max": 322117632,
+            "time": 18000,
+            "resourcedensity": 1.5,
+            "respawn": 64423526.4,
+            "falloff": 819.1875
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 20269810,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 2026981.0,
+            "falloff": 810.7924
+          }
+        },
+        "ore": {
+          "lowest": {
+            "max": 5571584,
+            "time": 36000,
+            "resourcedensity": 0.026,
+            "respawn": 557158.4,
+            "falloff": 817.457933
+          }
+        },
+        "silicon": {
+          "lowest": {
+            "max": 5572608,
+            "time": 36000,
+            "resourcedensity": 0.026,
+            "respawn": 557260.8,
+            "falloff": 817.608173
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_501_sector001_macro",
+      "ware": {
+        "hydrogen": {
+          "medhigh": {
+            "max": 251093169,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "respawn": 8369772.3,
+            "falloff": 1004.372676
+          }
+        },
+        "ice": {
+          "lowplus": {
+            "max": 1053163161,
+            "time": 36000,
+            "resourcedensity": 4,
+            "respawn": 105316316.1,
+            "falloff": 1004.374658
+          }
+        },
+        "nividium": {
+          "medplus": {
+            "max": 519205,
+            "time": 746400,
+            "resourcedensity": 0.002,
+            "respawn": 2504.20418,
+            "falloff": 990.304947
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 157964677,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 5265489.233333,
+            "falloff": 1004.312369
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 157970937,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 5265697.9,
+            "falloff": 1004.352169
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_502_sector001_macro",
+      "ware": {
+        "hydrogen": {
+          "medium": {
+            "max": 1622038049,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 162203804.9,
+            "falloff": 32768.445434
+          },
+          "high": {
+            "max": 71549,
+            "time": 288000,
+            "resourcedensity": 450000,
+            "respawn": 894.3625,
+            "falloff": 0.158998
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_503_sector001_macro",
+      "ware": {
+        "hydrogen": {
+          "medium": {
+            "max": 694739016,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 69473901.6,
+            "falloff": 14035.131636
+          }
+        },
+        "ice": {
+          "medium": {
+            "max": 46429590,
+            "time": 36000,
+            "resourcedensity": 15,
+            "respawn": 4642959.0,
+            "falloff": 11.807655
+          }
+        },
+        "nividium": {
+          "low": {
+            "max": 270,
+            "time": 302400,
+            "resourcedensity": 0.0001,
+            "respawn": 3.214286,
+            "falloff": 10.299683
+          }
+        },
+        "ore": {
+          "lowest": {
+            "max": 121078,
+            "time": 36000,
+            "resourcedensity": 0.026,
+            "respawn": 12107.8,
+            "falloff": 17.764458
+          }
+        },
+        "rawscrap": {
+          "medium": {
+            "max": 4642506,
+            "time": 144000,
+            "resourcedensity": 1.5,
+            "respawn": 116062.65,
+            "falloff": 11.806503
+          }
+        },
+        "silicon": {
+          "lowest": {
+            "max": 80232,
+            "time": 36000,
+            "resourcedensity": 0.026,
+            "respawn": 8023.2,
+            "falloff": 11.771569
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_504_sector001_macro",
+      "ware": {
+        "nividium": {
+          "low": {
+            "max": 22835,
+            "time": 302400,
+            "resourcedensity": 0.0001,
+            "respawn": 271.845238,
+            "falloff": 871.086121
+          }
+        },
+        "ore": {
+          "lowest": {
+            "max": 6231397,
+            "time": 36000,
+            "resourcedensity": 0.026,
+            "respawn": 623139.7,
+            "falloff": 914.265119
+          }
+        },
+        "silicon": {
+          "lowest": {
+            "max": 6235089,
+            "time": 36000,
+            "resourcedensity": 0.026,
+            "respawn": 623508.9,
+            "falloff": 914.806806
+          }
+        },
+        "hydrogen": {
+          "high": {
+            "max": 292333210,
+            "time": 288000,
+            "resourcedensity": 450000,
+            "respawn": 3654165.125,
+            "falloff": 649.629356
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_50_sector001_macro",
+      "ware": {
+        "hydrogen": {
+          "medium": {
+            "max": 39935360,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 3993536.0,
+            "falloff": 806.774949
+          }
+        },
+        "ore": {
+          "lowplus": {
+            "max": 380680234,
+            "time": 108000,
+            "resourcedensity": 1.8,
+            "respawn": 12689341.133333,
+            "falloff": 806.766582
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 126891981,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 4229732.7,
+            "falloff": 806.757488
+          }
+        },
+        "nividium": {
+          "low": {
+            "max": 17920,
+            "time": 302400,
+            "resourcedensity": 0.0001,
+            "respawn": 213.333333,
+            "falloff": 683.59375
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_50_sector002_macro",
+      "ware": {
+        "hydrogen": {
+          "medium": {
+            "max": 39935360,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 3993536.0,
+            "falloff": 806.774949
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 210065,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 1250.386905,
+            "falloff": 801.334381
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 126887856,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 4229595.2,
+            "falloff": 806.731262
+          }
+        },
+        "silicon": {
+          "lowplus": {
+            "max": 380682849,
+            "time": 108000,
+            "resourcedensity": 1.8,
+            "respawn": 12689428.3,
+            "falloff": 806.772124
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_601_sector001_macro",
+      "ware": {
+        "helium": {
+          "medhigh": {
+            "max": 8313997,
+            "time": 108000,
+            "resourcedensity": 50000,
+            "respawn": 277133.233333,
+            "falloff": 166.27994
+          }
+        },
+        "hydrogen": {
+          "medhigh": {
+            "max": 41570341,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "respawn": 1385678.033333,
+            "falloff": 166.281364
+          }
+        },
+        "methane": {
+          "medhigh": {
+            "max": 20785121,
+            "time": 108000,
+            "resourcedensity": 125000,
+            "respawn": 692837.366667,
+            "falloff": 166.280968
+          }
+        },
+        "ore": {
+          "medium": {
+            "max": 152120162,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 3803004.05,
+            "falloff": 96.715394
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 15210978,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 507032.6,
+            "falloff": 96.708794
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_602_sector001_macro",
+      "ware": {
+        "ore": {
+          "medium": {
+            "max": 98637107,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 2465927.675,
+            "falloff": 62.711784
+          }
+        },
+        "silicon": {
+          "medium": {
+            "max": 98637276,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 2465931.9,
+            "falloff": 62.711891
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_603_sector001_macro",
+      "ware": {
+        "helium": {
+          "medium": {
+            "max": 2295864,
+            "time": 36000,
+            "resourcedensity": 15000,
+            "respawn": 229586.4,
+            "falloff": 153.0576
+          }
+        },
+        "hydrogen": {
+          "medium": {
+            "max": 7576687,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 757668.7,
+            "falloff": 153.064384
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 3826551,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 382655.1,
+            "falloff": 153.06204
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_604_sector001_macro",
+      "ware": {
+        "rawscrap": {
+          "low": {
+            "max": 888530,
+            "time": 72000,
+            "resourcedensity": 0.75,
+            "respawn": 44426.5,
+            "falloff": 4.519297
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_605_sector001_macro",
+      "ware": {
+        "helium": {
+          "high": {
+            "max": 14780451,
+            "time": 216000,
+            "resourcedensity": 130000,
+            "respawn": 246340.85,
+            "falloff": 113.695777
+          }
+        },
+        "hydrogen": {
+          "high": {
+            "max": 51163347,
+            "time": 288000,
+            "resourcedensity": 450000,
+            "respawn": 639541.8375,
+            "falloff": 113.696327
+          }
+        },
+        "methane": {
+          "high": {
+            "max": 28424040,
+            "time": 288000,
+            "resourcedensity": 250000,
+            "respawn": 355300.5,
+            "falloff": 113.69616
+          }
+        },
+        "ore": {
+          "lowest": {
+            "max": 88939,
+            "time": 36000,
+            "resourcedensity": 0.026,
+            "respawn": 8893.9,
+            "falloff": 13.049052
+          }
+        },
+        "silicon": {
+          "lowest": {
+            "max": 89148,
+            "time": 36000,
+            "resourcedensity": 0.026,
+            "respawn": 8914.8,
+            "falloff": 13.079717
+          }
+        },
+        "nividium": {
+          "low": {
+            "max": 565,
+            "time": 302400,
+            "resourcedensity": 0.0001,
+            "respawn": 6.72619,
+            "falloff": 21.55304
+          },
+          "medium": {
+            "max": 2895,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 17.232143,
+            "falloff": 11.043549
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_606_sector002_macro",
+      "ware": {
+        "helium": {
+          "high": {
+            "max": 19618430,
+            "time": 216000,
+            "resourcedensity": 130000,
+            "respawn": 326973.833333,
+            "falloff": 150.911
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_607_sector001_macro",
+      "ware": {
+        "ice": {
+          "medplus": {
+            "max": 1067737329,
+            "time": 144000,
+            "resourcedensity": 30,
+            "respawn": 26693433.225,
+            "falloff": 135.769822
+          }
+        },
+        "ore": {
+          "highlow": {
+            "max": 1708379423,
+            "time": 216000,
+            "resourcedensity": 48,
+            "respawn": 28472990.383333,
+            "falloff": 135.769798
+          }
+        },
+        "silicon": {
+          "highlow": {
+            "max": 1708380375,
+            "time": 216000,
+            "resourcedensity": 48,
+            "respawn": 28473006.25,
+            "falloff": 135.769874
+          }
+        },
+        "methane": {
+          "high": {
+            "max": 30669004,
+            "time": 288000,
+            "resourcedensity": 250000,
+            "respawn": 383362.55,
+            "falloff": 122.676016
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_608_sector001_macro",
+      "ware": {
+        "hydrogen": {
+          "high": {
+            "max": 37764330,
+            "time": 288000,
+            "resourcedensity": 450000,
+            "respawn": 472054.125,
+            "falloff": 83.920733
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 13380614,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 446020.466667,
+            "falloff": 85.071653
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 13380589,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 446019.633333,
+            "falloff": 85.071494
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_609_sector001_macro",
+      "ware": {
+        "helium": {
+          "medhigh": {
+            "max": 3644745,
+            "time": 108000,
+            "resourcedensity": 50000,
+            "respawn": 121491.5,
+            "falloff": 72.8949
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 11892727,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 396424.233333,
+            "falloff": 75.611922
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 11893002,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 396433.4,
+            "falloff": 75.61367
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_702_sector001_macro",
+      "ware": {
+        "helium": {
+          "low": {
+            "max": 283855,
+            "time": 18000,
+            "resourcedensity": 3000,
+            "respawn": 56771.0,
+            "falloff": 94.618333
+          }
+        },
+        "hydrogen": {
+          "low": {
+            "max": 624590,
+            "time": 18000,
+            "resourcedensity": 6600,
+            "respawn": 124918.0,
+            "falloff": 94.634848
+          }
+        },
+        "methane": {
+          "low": {
+            "max": 236537,
+            "time": 18000,
+            "resourcedensity": 2500,
+            "respawn": 47307.4,
+            "falloff": 94.6148
+          }
+        },
+        "ice": {
+          "low": {
+            "max": 4960859,
+            "time": 18000,
+            "resourcedensity": 1.5,
+            "respawn": 992171.8,
+            "falloff": 12.616117
+          }
+        },
+        "nividium": {
+          "low": {
+            "max": 240,
+            "time": 302400,
+            "resourcedensity": 0.0001,
+            "respawn": 2.857143,
+            "falloff": 9.155273
+          }
+        },
+        "ore": {
+          "medlow": {
+            "max": 13229199,
+            "time": 120000,
+            "resourcedensity": 4,
+            "respawn": 396875.97,
+            "falloff": 12.616347
+          }
+        },
+        "silicon": {
+          "medium": {
+            "max": 19843965,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 496099.125,
+            "falloff": 12.616453
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_703_sector001_macro",
+      "ware": {
+        "helium": {
+          "medium": {
+            "max": 1134299,
+            "time": 36000,
+            "resourcedensity": 15000,
+            "respawn": 113429.9,
+            "falloff": 75.619933
+          }
+        },
+        "hydrogen": {
+          "medium": {
+            "max": 3743371,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 374337.1,
+            "falloff": 75.623657
+          }
+        },
+        "methane": {
+          "high": {
+            "max": 18906203,
+            "time": 288000,
+            "resourcedensity": 250000,
+            "respawn": 236327.5375,
+            "falloff": 75.624812
+          }
+        },
+        "ice": {
+          "low": {
+            "max": 4660684,
+            "time": 18000,
+            "resourcedensity": 1.5,
+            "respawn": 932136.8,
+            "falloff": 11.852732
+          }
+        },
+        "nividium": {
+          "low": {
+            "max": 225,
+            "time": 302400,
+            "resourcedensity": 0.0001,
+            "respawn": 2.678571,
+            "falloff": 8.583069
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 1864200,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 62140.0,
+            "falloff": 11.852264
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 1864178,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 62139.266667,
+            "falloff": 11.852125
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_704_sector001_macro",
+      "ware": {
+        "ice": {
+          "medium": {
+            "max": 74678478,
+            "time": 36000,
+            "resourcedensity": 15,
+            "respawn": 7467847.8,
+            "falloff": 18.991719
+          }
+        },
+        "ore": {
+          "medhigh": {
+            "max": 79786699,
+            "time": 144000,
+            "resourcedensity": 32,
+            "respawn": 1994667.475,
+            "falloff": 9.511316
+          },
+          "medium": {
+            "max": 14911327,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 372783.175,
+            "falloff": 9.480366
+          }
+        },
+        "nividium": {
+          "medlow": {
+            "max": 1435,
+            "time": 432000,
+            "resourcedensity": 0.0006,
+            "respawn": 11.958333,
+            "falloff": 9.123484
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_705_sector001_macro",
+      "ware": {
+        "ice": {
+          "medium": {
+            "max": 79743460,
+            "time": 36000,
+            "resourcedensity": 15,
+            "respawn": 7974346.0,
+            "falloff": 20.279811
+          }
+        },
+        "nividium": {
+          "lowplus": {
+            "max": 420,
+            "time": 384000,
+            "resourcedensity": 0.0002,
+            "respawn": 3.9375,
+            "falloff": 8.010864
+          },
+          "medlow": {
+            "max": 1900,
+            "time": 432000,
+            "resourcedensity": 0.0006,
+            "respawn": 15.833333,
+            "falloff": 12.079875
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 1482097,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 49403.233333,
+            "falloff": 9.422919
+          },
+          "highlow": {
+            "max": 138170904,
+            "time": 216000,
+            "resourcedensity": 48,
+            "respawn": 2302848.4,
+            "falloff": 10.980837
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 1482069,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 49402.3,
+            "falloff": 9.422741
+          },
+          "medplus": {
+            "max": 52755882,
+            "time": 144000,
+            "resourcedensity": 16,
+            "respawn": 1318897.05,
+            "falloff": 12.577982
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_706_sector001_macro",
+      "ware": {
+        "ice": {
+          "medlow": {
+            "max": 16825497,
+            "time": 36000,
+            "resourcedensity": 9,
+            "respawn": 1682549.7,
+            "falloff": 7.131575
+          }
+        },
+        "ore": {
+          "highlow": {
+            "max": 89736272,
+            "time": 216000,
+            "resourcedensity": 48,
+            "respawn": 1495604.533333,
+            "falloff": 7.131598
+          }
+        },
+        "silicon": {
+          "medhigh": {
+            "max": 59824158,
+            "time": 144000,
+            "resourcedensity": 32,
+            "respawn": 1495603.95,
+            "falloff": 7.131595
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_708_sector001_macro",
+      "ware": {
+        "rawscrap": {
+          "medplus": {
+            "max": 3892104,
+            "time": 144000,
+            "resourcedensity": 2.5,
+            "respawn": 97302.6,
+            "falloff": 5.938879
+          }
+        },
+        "ore": {
+          "medlow": {
+            "max": 540124,
+            "time": 120000,
+            "resourcedensity": 4,
+            "respawn": 16203.72,
+            "falloff": 0.515102
+          }
+        },
+        "silicon": {
+          "lowplus": {
+            "max": 243036,
+            "time": 108000,
+            "resourcedensity": 1.8,
+            "respawn": 8101.2,
+            "falloff": 0.51506
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_709_sector001_macro",
+      "ware": {
+        "helium": {
+          "medium": {
+            "max": 694270,
+            "time": 36000,
+            "resourcedensity": 15000,
+            "respawn": 69427.0,
+            "falloff": 46.284667
+          }
+        },
+        "hydrogen": {
+          "medplus": {
+            "max": 4883268,
+            "time": 108000,
+            "resourcedensity": 105500,
+            "respawn": 162775.6,
+            "falloff": 46.2869
+          }
+        },
+        "ice": {
+          "low": {
+            "max": 11570457,
+            "time": 18000,
+            "resourcedensity": 1.5,
+            "respawn": 2314091.4,
+            "falloff": 29.425194
+          }
+        },
+        "methane": {
+          "high": {
+            "max": 11571755,
+            "time": 288000,
+            "resourcedensity": 250000,
+            "respawn": 144646.9375,
+            "falloff": 46.28702
+          }
+        },
+        "ore": {
+          "lowplus": {
+            "max": 13919843,
+            "time": 108000,
+            "resourcedensity": 1.8,
+            "respawn": 463994.766667,
+            "falloff": 29.499993
+          }
+        },
+        "silicon": {
+          "verylow": {
+            "max": 463478,
+            "time": 72000,
+            "resourcedensity": 0.06,
+            "respawn": 23173.9,
+            "falloff": 29.467138
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_710_sector001_macro",
+      "ware": {
+        "ice": {
+          "low": {
+            "max": 27004740,
+            "time": 18000,
+            "resourcedensity": 1.5,
+            "respawn": 5400948.0,
+            "falloff": 68.676605
+          },
+          "medium": {
+            "max": 63976893,
+            "time": 36000,
+            "resourcedensity": 15,
+            "respawn": 6397689.3,
+            "falloff": 16.270165
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 60870121,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 2029004.033333,
+            "falloff": 387.001807
+          },
+          "highlow": {
+            "max": 185959578,
+            "time": 216000,
+            "resourcedensity": 48,
+            "respawn": 3099326.3,
+            "falloff": 14.778739
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 41857602,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 1395253.4,
+            "falloff": 266.123466
+          },
+          "medhigh": {
+            "max": 123973115,
+            "time": 144000,
+            "resourcedensity": 32,
+            "respawn": 3099327.875,
+            "falloff": 14.778747
+          }
+        },
+        "nividium": {
+          "verylow": {
+            "max": 50,
+            "time": 216000,
+            "resourcedensity": 3e-05,
+            "respawn": 0.833333,
+            "falloff": 6.357829
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_711_sector001_macro",
+      "ware": {
+        "ice": {
+          "low": {
+            "max": 5537423,
+            "time": 18000,
+            "resourcedensity": 1.5,
+            "respawn": 1107484.6,
+            "falloff": 14.082395
+          },
+          "lowplus": {
+            "max": 4575670,
+            "time": 36000,
+            "resourcedensity": 4,
+            "respawn": 457567.0,
+            "falloff": 4.363699
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 2901003,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 96700.1,
+            "falloff": 18.44408
+          }
+        },
+        "silicon": {
+          "low": {
+            "max": 2214795,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 73826.5,
+            "falloff": 14.081287
+          },
+          "lowminus": {
+            "max": 228683,
+            "time": 72000,
+            "resourcedensity": 0.2,
+            "respawn": 11434.15,
+            "falloff": 4.361782
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 1080,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 6.428571,
+            "falloff": 4.119873
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_712_sector001_macro",
+      "ware": {
+        "ice": {
+          "highlow": {
+            "max": 1087342960,
+            "time": 216000,
+            "resourcedensity": 90,
+            "respawn": 18122382.666667,
+            "falloff": 46.087602
+          }
+        },
+        "nividium": {
+          "medplus": {
+            "max": 23935,
+            "time": 746400,
+            "resourcedensity": 0.002,
+            "respawn": 115.442122,
+            "falloff": 45.65239
+          }
+        },
+        "ore": {
+          "high": {
+            "max": 728033590,
+            "time": 216000,
+            "resourcedensity": 60,
+            "respawn": 12133893.166667,
+            "falloff": 46.287129
+          }
+        },
+        "silicon": {
+          "highplus": {
+            "max": 1456068517,
+            "time": 216000,
+            "resourcedensity": 120,
+            "respawn": 24267808.616667,
+            "falloff": 46.287172
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_713_sector001_macro",
+      "ware": {
+        "helium": {
+          "medium": {
+            "max": 381363,
+            "time": 36000,
+            "resourcedensity": 15000,
+            "respawn": 38136.3,
+            "falloff": 25.4242
+          },
+          "medlow": {
+            "max": 274711,
+            "time": 36000,
+            "resourcedensity": 9600,
+            "respawn": 27471.1,
+            "falloff": 28.615729
+          }
+        },
+        "hydrogen": {
+          "medlow": {
+            "max": 610191,
+            "time": 36000,
+            "resourcedensity": 24000,
+            "respawn": 61019.1,
+            "falloff": 25.424625
+          },
+          "lowplus": {
+            "max": 329089,
+            "time": 36000,
+            "resourcedensity": 11500,
+            "respawn": 32908.9,
+            "falloff": 28.616435
+          }
+        },
+        "methane": {
+          "medplus": {
+            "max": 1334829,
+            "time": 108000,
+            "resourcedensity": 52500,
+            "respawn": 44494.3,
+            "falloff": 25.425314
+          },
+          "medium": {
+            "max": 715433,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 71543.3,
+            "falloff": 28.61732
+          }
+        },
+        "ice": {
+          "highlow": {
+            "max": 798766390,
+            "time": 216000,
+            "resourcedensity": 90,
+            "respawn": 13312773.166667,
+            "falloff": 33.856133
+          }
+        },
+        "ore": {
+          "medium": {
+            "max": 54009538,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 1350238.45,
+            "falloff": 34.338339
+          }
+        },
+        "silicon": {
+          "medhigh": {
+            "max": 288054360,
+            "time": 144000,
+            "resourcedensity": 32,
+            "respawn": 7201359.0,
+            "falloff": 34.338756
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_715_sector001_macro",
+      "ware": {
+        "helium": {
+          "medium": {
+            "max": 1313668,
+            "time": 36000,
+            "resourcedensity": 15000,
+            "respawn": 131366.8,
+            "falloff": 87.577867
+          },
+          "low": {
+            "max": 1313668,
+            "time": 36000,
+            "resourcedensity": 3000,
+            "respawn": 131366.8,
+            "falloff": 437.889333
+          }
+        },
+        "hydrogen": {
+          "medlow": {
+            "max": 2101948,
+            "time": 36000,
+            "resourcedensity": 24000,
+            "respawn": 210194.8,
+            "falloff": 87.581167
+          },
+          "low": {
+            "max": 2101948,
+            "time": 36000,
+            "resourcedensity": 6600,
+            "respawn": 210194.8,
+            "falloff": 318.47697
+          }
+        },
+        "methane": {
+          "medplus": {
+            "max": 4598041,
+            "time": 108000,
+            "resourcedensity": 52500,
+            "respawn": 153268.033333,
+            "falloff": 87.581733
+          },
+          "low": {
+            "max": 4598041,
+            "time": 108000,
+            "resourcedensity": 2500,
+            "respawn": 153268.033333,
+            "falloff": 1839.2164
+          }
+        },
+        "nividium": {
+          "high": {
+            "max": 120820,
+            "time": 1209600,
+            "resourcedensity": 0.01,
+            "respawn": 359.583333,
+            "falloff": 46.089172
+          }
+        },
+        "ore": {
+          "high": {
+            "max": 728033489,
+            "time": 216000,
+            "resourcedensity": 60,
+            "respawn": 12133891.483333,
+            "falloff": 46.287123
+          }
+        },
+        "silicon": {
+          "highplus": {
+            "max": 1456068095,
+            "time": 216000,
+            "resourcedensity": 120,
+            "respawn": 24267801.583333,
+            "falloff": 46.287158
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_720_sector001_macro",
+      "ware": {
+        "ore": {
+          "low": {
+            "max": 4550568,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 151685.6,
+            "falloff": 28.931732
+          },
+          "lowplus": {
+            "max": 7748469,
+            "time": 108000,
+            "resourcedensity": 1.8,
+            "respawn": 258282.3,
+            "falloff": 16.421146
+          }
+        },
+        "helium": {
+          "low": {
+            "max": 80975,
+            "time": 18000,
+            "resourcedensity": 3000,
+            "respawn": 16195.0,
+            "falloff": 26.991667
+          }
+        },
+        "hydrogen": {
+          "low": {
+            "max": 178189,
+            "time": 18000,
+            "resourcedensity": 6600,
+            "respawn": 35637.8,
+            "falloff": 26.998333
+          }
+        },
+        "methane": {
+          "low": {
+            "max": 67478,
+            "time": 18000,
+            "resourcedensity": 2500,
+            "respawn": 13495.6,
+            "falloff": 26.9912
+          }
+        },
+        "rawscrap": {
+          "medium": {
+            "max": 10617287,
+            "time": 144000,
+            "resourcedensity": 1.5,
+            "respawn": 265432.175,
+            "falloff": 27.001157
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_721_sector001_macro",
+      "ware": {
+        "helium": {
+          "medium": {
+            "max": 1503709,
+            "time": 36000,
+            "resourcedensity": 15000,
+            "respawn": 150370.9,
+            "falloff": 100.247267
+          }
+        },
+        "hydrogen": {
+          "medium": {
+            "max": 4962784,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 496278.4,
+            "falloff": 100.258263
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 2506373,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 250637.3,
+            "falloff": 100.25492
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 16176275,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 539209.166667,
+            "falloff": 102.845987
+          }
+        },
+        "silicon": {
+          "medlow": {
+            "max": 107876058,
+            "time": 120000,
+            "resourcedensity": 4,
+            "respawn": 3236281.74,
+            "falloff": 102.878626
+          }
+        },
+        "nividium": {
+          "medium": {
+            "max": 25695,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 152.946429,
+            "falloff": 98.018646
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_722_sector001_macro",
+      "ware": {
+        "nividium": {
+          "medium": {
+            "max": 5670,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "respawn": 33.75,
+            "falloff": 21.629333
+          },
+          "medlow": {
+            "max": 1785,
+            "time": 432000,
+            "resourcedensity": 0.0006,
+            "respawn": 14.875,
+            "falloff": 11.348724
+          }
+        },
+        "ore": {
+          "medium": {
+            "max": 34588303,
+            "time": 144000,
+            "resourcedensity": 6,
+            "respawn": 864707.575,
+            "falloff": 21.990651
+          },
+          "low": {
+            "max": 1854248,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 61808.266667,
+            "falloff": 11.788991
+          }
+        },
+        "silicon": {
+          "medlow": {
+            "max": 23058789,
+            "time": 120000,
+            "resourcedensity": 4,
+            "respawn": 691763.67,
+            "falloff": 21.990575
+          },
+          "medplus": {
+            "max": 49451038,
+            "time": 144000,
+            "resourcedensity": 16,
+            "respawn": 1236275.95,
+            "falloff": 11.790046
+          }
+        },
+        "methane": {
+          "lowest": {
+            "max": 4143,
+            "time": 10800,
+            "resourcedensity": 300,
+            "respawn": 1381.0,
+            "falloff": 13.81
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_723_sector001_macro",
+      "ware": {
+        "helium": {
+          "high": {
+            "max": 13348047,
+            "time": 216000,
+            "resourcedensity": 130000,
+            "respawn": 222467.45,
+            "falloff": 102.677285
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_724_sector001_macro",
+      "ware": {
+        "helium": {
+          "low": {
+            "max": 546961,
+            "time": 18000,
+            "resourcedensity": 3000,
+            "respawn": 109392.2,
+            "falloff": 182.320333
+          }
+        },
+        "methane": {
+          "high": {
+            "max": 45589272,
+            "time": 288000,
+            "resourcedensity": 250000,
+            "respawn": 569865.9,
+            "falloff": 182.357088
+          }
+        },
+        "rawscrap": {
+          "medium": {
+            "max": 6501107,
+            "time": 144000,
+            "resourcedensity": 1.5,
+            "respawn": 162527.675,
+            "falloff": 16.53317
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_725_sector001_macro",
+      "ware": {
+        "ore": {
+          "highlow": {
+            "max": 550591910,
+            "time": 216000,
+            "resourcedensity": 48,
+            "respawn": 9176531.833333,
+            "falloff": 43.757114
+          }
+        },
+        "silicon": {
+          "medhigh": {
+            "max": 367061154,
+            "time": 144000,
+            "resourcedensity": 32,
+            "respawn": 9176528.85,
+            "falloff": 43.757099
+          }
+        },
+        "nividium": {
+          "verylow": {
+            "max": 170,
+            "time": 216000,
+            "resourcedensity": 3e-05,
+            "respawn": 2.833333,
+            "falloff": 21.616618
+          }
+        },
+        "helium": {
+          "medium": {
+            "max": 39374,
+            "time": 36000,
+            "resourcedensity": 15000,
+            "respawn": 3937.4,
+            "falloff": 2.624933
+          }
+        },
+        "hydrogen": {
+          "medium": {
+            "max": 129944,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "respawn": 12994.4,
+            "falloff": 2.625131
+          }
+        },
+        "methane": {
+          "medium": {
+            "max": 65624,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "respawn": 6562.4,
+            "falloff": 2.62496
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_730_sector001_macro",
+      "ware": {
+        "ice": {
+          "medplus": {
+            "max": 33329634,
+            "time": 144000,
+            "resourcedensity": 30,
+            "respawn": 833240.85,
+            "falloff": 4.238082
+          }
+        },
+        "methane": {
+          "medlow": {
+            "max": 113174,
+            "time": 36000,
+            "resourcedensity": 9600,
+            "respawn": 11317.4,
+            "falloff": 11.788958
+          },
+          "lowest": {
+            "max": 6987,
+            "time": 10800,
+            "resourcedensity": 300,
+            "respawn": 2329.0,
+            "falloff": 23.29
+          }
+        },
+        "nividium": {
+          "medlow": {
+            "max": 600,
+            "time": 432000,
+            "resourcedensity": 0.0006,
+            "respawn": 5.0,
+            "falloff": 3.814697
+          }
+        },
+        "ore": {
+          "low": {
+            "max": 666423,
+            "time": 108000,
+            "resourcedensity": 0.6,
+            "respawn": 22214.1,
+            "falloff": 4.237003
+          }
+        }
+      }
+    },
+    {
+      "sector_id": "cluster_740_sector001_macro",
+      "ware": {
+        "ore": {
+          "lowminus": {
+            "max": 4518627,
+            "time": 72000,
+            "resourcedensity": 0.2,
+            "respawn": 225931.35,
+            "falloff": 86.18597
+          }
+        },
+        "helium": {
+          "low": {
+            "max": 33384,
+            "time": 18000,
+            "resourcedensity": 3000,
+            "respawn": 6676.8,
+            "falloff": 11.128
+          }
+        },
+        "rawscrap": {
+          "low": {
+            "max": 11612550,
+            "time": 72000,
+            "resourcedensity": 0.75,
+            "respawn": 580627.5,
+            "falloff": 59.064484
+          }
+        }
+      }
+    }
+  ]
+}
