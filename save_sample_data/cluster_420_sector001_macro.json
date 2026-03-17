@@ -1,0 +1,251 @@
+{
+  "sector_id": "cluster_420_sector001_macro",
+  "ware": {
+    "ore": {
+      "medium": {
+        "resources": [
+          {
+            "x": -192000,
+            "y": 0,
+            "z": 320000,
+            "max": 962600,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.612005
+          },
+          {
+            "x": -192000,
+            "y": 0,
+            "z": 256000,
+            "max": 1590082,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 1.010947
+          },
+          {
+            "x": -256000,
+            "y": 0,
+            "z": 320000,
+            "max": 1247523,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.793154
+          },
+          {
+            "x": -256000,
+            "y": 0,
+            "z": 256000,
+            "max": 2908891,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 1.849423
+          },
+          {
+            "x": -320000,
+            "y": 0,
+            "z": 256000,
+            "max": 2178784,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 1.385234
+          },
+          {
+            "x": -256000,
+            "y": 0,
+            "z": 192000,
+            "max": 415185,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.263968
+          },
+          {
+            "x": -256000,
+            "y": 0,
+            "z": 128000,
+            "max": 1743379,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 1.108411
+          },
+          {
+            "x": -320000,
+            "y": 0,
+            "z": 192000,
+            "max": 1490314,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.947516
+          },
+          {
+            "x": -320000,
+            "y": 0,
+            "z": 128000,
+            "max": 1753771,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 1.115018
+          },
+          {
+            "x": -256000,
+            "y": 0,
+            "z": 64000,
+            "max": 1475542,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.938124
+          },
+          {
+            "x": -256000,
+            "y": 0,
+            "z": 0,
+            "max": 578025,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.367498
+          },
+          {
+            "x": -320000,
+            "y": 0,
+            "z": 64000,
+            "max": 1792372,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 1.139559
+          },
+          {
+            "x": -320000,
+            "y": 0,
+            "z": 0,
+            "max": 812766,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.516743
+          }
+        ]
+      }
+    },
+    "silicon": {
+      "medium": {
+        "resources": [
+          {
+            "x": -192000,
+            "y": 0,
+            "z": 320000,
+            "max": 962604,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.612007
+          },
+          {
+            "x": -192000,
+            "y": 0,
+            "z": 256000,
+            "max": 726213,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.461714
+          },
+          {
+            "x": -256000,
+            "y": 0,
+            "z": 320000,
+            "max": 1247517,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.79315
+          },
+          {
+            "x": -256000,
+            "y": 0,
+            "z": 256000,
+            "max": 1026003,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.652315
+          },
+          {
+            "x": -320000,
+            "y": 0,
+            "z": 256000,
+            "max": 1166349,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.741545
+          },
+          {
+            "x": -256000,
+            "y": 0,
+            "z": 192000,
+            "max": 415191,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.263971
+          },
+          {
+            "x": -256000,
+            "y": 0,
+            "z": 128000,
+            "max": 1743375,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 1.108408
+          },
+          {
+            "x": -320000,
+            "y": 0,
+            "z": 192000,
+            "max": 1490316,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.947517
+          },
+          {
+            "x": -320000,
+            "y": 0,
+            "z": 128000,
+            "max": 1753764,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 1.115013
+          },
+          {
+            "x": -256000,
+            "y": 0,
+            "z": 64000,
+            "max": 1475550,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.938129
+          },
+          {
+            "x": -256000,
+            "y": 0,
+            "z": 0,
+            "max": 578025,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.367498
+          },
+          {
+            "x": -320000,
+            "y": 0,
+            "z": 64000,
+            "max": 1792368,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 1.139557
+          },
+          {
+            "x": -320000,
+            "y": 0,
+            "z": 0,
+            "max": 812778,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.51675
+          }
+        ]
+      }
+    }
+  }
+}

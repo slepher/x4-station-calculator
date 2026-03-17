@@ -1,0 +1,410 @@
+{
+  "sector_id": "cluster_19_sector002_macro",
+  "ware": {
+    "nividium": {
+      "medium": {
+        "resources": [
+          {
+            "x": 128000,
+            "y": 0,
+            "z": 128000,
+            "max": 5,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "falloff": 0.019073
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 128000,
+            "max": 5,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "falloff": 0.019073
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 64000,
+            "max": 5,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "falloff": 0.019073
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 0,
+            "max": 5,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "falloff": 0.019073
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "z": 64000,
+            "max": 5,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "falloff": 0.019073
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "max": 5,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "falloff": 0.019073
+          },
+          {
+            "x": -64000,
+            "y": 0,
+            "z": 64000,
+            "max": 5,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "falloff": 0.019073
+          },
+          {
+            "x": -64000,
+            "y": 0,
+            "z": 0,
+            "max": 5,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "falloff": 0.019073
+          },
+          {
+            "x": 128000,
+            "y": 0,
+            "z": -64000,
+            "max": 5,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "falloff": 0.019073
+          },
+          {
+            "x": -128000,
+            "y": 0,
+            "z": 64000,
+            "max": 5,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "falloff": 0.019073
+          },
+          {
+            "x": -128000,
+            "y": 0,
+            "z": 0,
+            "max": 5,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "falloff": 0.019073
+          }
+        ]
+      }
+    },
+    "ore": {
+      "medium": {
+        "resources": [
+          {
+            "x": 128000,
+            "y": 0,
+            "z": 128000,
+            "max": 40809,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025946
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 128000,
+            "max": 40809,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025946
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 64000,
+            "max": 40809,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025946
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 0,
+            "max": 40809,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025946
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "z": 64000,
+            "max": 39274,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.02497
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "max": 40809,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025946
+          },
+          {
+            "x": -64000,
+            "y": 0,
+            "z": 64000,
+            "max": 40809,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025946
+          },
+          {
+            "x": -64000,
+            "y": 0,
+            "z": 0,
+            "max": 40809,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025946
+          },
+          {
+            "x": 128000,
+            "y": 0,
+            "z": -64000,
+            "max": 40809,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025946
+          },
+          {
+            "x": -128000,
+            "y": 0,
+            "z": 64000,
+            "max": 40809,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025946
+          },
+          {
+            "x": -128000,
+            "y": 0,
+            "z": 0,
+            "max": 40809,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025946
+          }
+        ]
+      }
+    },
+    "silicon": {
+      "medium": {
+        "resources": [
+          {
+            "x": 128000,
+            "y": 0,
+            "z": 128000,
+            "max": 40815,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025949
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 128000,
+            "max": 40815,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025949
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 64000,
+            "max": 40815,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025949
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 0,
+            "max": 40815,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025949
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "z": 64000,
+            "max": 39288,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.024979
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "max": 40815,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025949
+          },
+          {
+            "x": -64000,
+            "y": 0,
+            "z": 64000,
+            "max": 40815,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025949
+          },
+          {
+            "x": -64000,
+            "y": 0,
+            "z": 0,
+            "max": 40815,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025949
+          },
+          {
+            "x": 128000,
+            "y": 0,
+            "z": -64000,
+            "max": 40815,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025949
+          },
+          {
+            "x": -128000,
+            "y": 0,
+            "z": 64000,
+            "max": 40815,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025949
+          },
+          {
+            "x": -128000,
+            "y": 0,
+            "z": 0,
+            "max": 40815,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025949
+          }
+        ]
+      }
+    },
+    "hydrogen": {
+      "medhigh": {
+        "resources": [
+          {
+            "x": 0,
+            "y": 0,
+            "z": 64000,
+            "max": 173249,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "falloff": 0.692996
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "max": 173249,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "falloff": 0.692996
+          }
+        ]
+      }
+    },
+    "helium": {
+      "medhigh": {
+        "resources": [
+          {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "max": 34649,
+            "time": 108000,
+            "resourcedensity": 50000,
+            "falloff": 0.69298
+          },
+          {
+            "x": -64000,
+            "y": 0,
+            "z": 0,
+            "max": 34649,
+            "time": 108000,
+            "resourcedensity": 50000,
+            "falloff": 0.69298
+          }
+        ]
+      }
+    },
+    "methane": {
+      "medium": {
+        "resources": [
+          {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "max": 16493,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "falloff": 0.65972
+          },
+          {
+            "x": -64000,
+            "y": 0,
+            "z": 0,
+            "max": 17324,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "falloff": 0.69296
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "z": -64000,
+            "max": 17089,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "falloff": 0.68356
+          },
+          {
+            "x": -64000,
+            "y": 0,
+            "z": -64000,
+            "max": 17324,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "falloff": 0.69296
+          }
+        ]
+      }
+    }
+  }
+}

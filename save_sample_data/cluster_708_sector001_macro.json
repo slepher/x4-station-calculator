@@ -1,0 +1,176 @@
+{
+  "sector_id": "cluster_708_sector001_macro",
+  "ware": {
+    "rawscrap": {
+      "medplus": {
+        "resources": [
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 128000,
+            "max": 159943,
+            "time": 144000,
+            "resourcedensity": 2.5,
+            "falloff": 0.244054
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 64000,
+            "max": 319900,
+            "time": 144000,
+            "resourcedensity": 2.5,
+            "falloff": 0.488129
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 0,
+            "max": 319900,
+            "time": 144000,
+            "resourcedensity": 2.5,
+            "falloff": 0.488129
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": -64000,
+            "max": 319900,
+            "time": 144000,
+            "resourcedensity": 2.5,
+            "falloff": 0.488129
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "z": 128000,
+            "max": 213261,
+            "time": 144000,
+            "resourcedensity": 2.5,
+            "falloff": 0.32541
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "z": 64000,
+            "max": 319900,
+            "time": 144000,
+            "resourcedensity": 2.5,
+            "falloff": 0.488129
+          },
+          {
+            "x": -64000,
+            "y": 0,
+            "z": 64000,
+            "max": 319900,
+            "time": 144000,
+            "resourcedensity": 2.5,
+            "falloff": 0.488129
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "max": 319900,
+            "time": 144000,
+            "resourcedensity": 2.5,
+            "falloff": 0.488129
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "z": -64000,
+            "max": 319900,
+            "time": 144000,
+            "resourcedensity": 2.5,
+            "falloff": 0.488129
+          },
+          {
+            "x": -64000,
+            "y": 0,
+            "z": 0,
+            "max": 319900,
+            "time": 144000,
+            "resourcedensity": 2.5,
+            "falloff": 0.488129
+          },
+          {
+            "x": -64000,
+            "y": 0,
+            "z": -64000,
+            "max": 319900,
+            "time": 144000,
+            "resourcedensity": 2.5,
+            "falloff": 0.488129
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "z": -128000,
+            "max": 319900,
+            "time": 144000,
+            "resourcedensity": 2.5,
+            "falloff": 0.488129
+          },
+          {
+            "x": -64000,
+            "y": 0,
+            "z": -128000,
+            "max": 319900,
+            "time": 144000,
+            "resourcedensity": 2.5,
+            "falloff": 0.488129
+          }
+        ]
+      }
+    },
+    "ore": {
+      "medlow": {
+        "resources": [
+          {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "max": 270062,
+            "time": 120000,
+            "resourcedensity": 4,
+            "falloff": 0.257551
+          },
+          {
+            "x": -64000,
+            "y": 0,
+            "z": 0,
+            "max": 270062,
+            "time": 120000,
+            "resourcedensity": 4,
+            "falloff": 0.257551
+          }
+        ]
+      }
+    },
+    "silicon": {
+      "lowplus": {
+        "resources": [
+          {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "max": 121518,
+            "time": 108000,
+            "resourcedensity": 1.8,
+            "falloff": 0.25753
+          },
+          {
+            "x": -64000,
+            "y": 0,
+            "z": 0,
+            "max": 121518,
+            "time": 108000,
+            "resourcedensity": 1.8,
+            "falloff": 0.25753
+          }
+        ]
+      }
+    }
+  }
+}

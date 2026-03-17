@@ -1,0 +1,101 @@
+{
+  "sector_id": "cluster_604_sector001_macro",
+  "ware": {
+    "rawscrap": {
+      "low": {
+        "resources": [
+          {
+            "x": 128000,
+            "y": 0,
+            "z": 128000,
+            "max": 31976,
+            "time": 72000,
+            "resourcedensity": 0.75,
+            "falloff": 0.162638
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 128000,
+            "max": 95966,
+            "time": 72000,
+            "resourcedensity": 0.75,
+            "falloff": 0.488108
+          },
+          {
+            "x": 128000,
+            "y": 0,
+            "z": 64000,
+            "max": 88826,
+            "time": 72000,
+            "resourcedensity": 0.75,
+            "falloff": 0.451792
+          },
+          {
+            "x": 128000,
+            "y": 0,
+            "z": 0,
+            "max": 95966,
+            "time": 72000,
+            "resourcedensity": 0.75,
+            "falloff": 0.488108
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 64000,
+            "max": 95966,
+            "time": 72000,
+            "resourcedensity": 0.75,
+            "falloff": 0.488108
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 0,
+            "max": 95966,
+            "time": 72000,
+            "resourcedensity": 0.75,
+            "falloff": 0.488108
+          },
+          {
+            "x": 128000,
+            "y": 0,
+            "z": -64000,
+            "max": 95966,
+            "time": 72000,
+            "resourcedensity": 0.75,
+            "falloff": 0.488108
+          },
+          {
+            "x": 128000,
+            "y": 0,
+            "z": -128000,
+            "max": 95966,
+            "time": 72000,
+            "resourcedensity": 0.75,
+            "falloff": 0.488108
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": -64000,
+            "max": 95966,
+            "time": 72000,
+            "resourcedensity": 0.75,
+            "falloff": 0.488108
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": -128000,
+            "max": 95966,
+            "time": 72000,
+            "resourcedensity": 0.75,
+            "falloff": 0.488108
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "sector_id": "cluster_03_sector001_macro",
+  "ware": {
+    "ice": {
+      "medium": {
+        "resources": [
+          {
+            "x": 192000,
+            "y": 0,
+            "z": 64000,
+            "max": 38442,
+            "time": 36000,
+            "resourcedensity": 15,
+            "falloff": 0.009776
+          },
+          {
+            "x": 192000,
+            "y": 0,
+            "z": 0,
+            "max": 51021,
+            "time": 36000,
+            "resourcedensity": 15,
+            "falloff": 0.012975
+          },
+          {
+            "x": 128000,
+            "y": 0,
+            "z": 64000,
+            "max": 47700,
+            "time": 36000,
+            "resourcedensity": 15,
+            "falloff": 0.012131
+          },
+          {
+            "x": 128000,
+            "y": 0,
+            "z": 0,
+            "max": 51021,
+            "time": 36000,
+            "resourcedensity": 15,
+            "falloff": 0.012975
+          }
+        ]
+      }
+    },
+    "ore": {
+      "medium": {
+        "resources": [
+          {
+            "x": 128000,
+            "y": 0,
+            "z": -64000,
+            "max": 26616,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.016922
+          },
+          {
+            "x": 128000,
+            "y": 0,
+            "z": -128000,
+            "max": 38300,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.02435
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": -64000,
+            "max": 40809,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025946
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": -128000,
+            "max": 40809,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025946
+          }
+        ]
+      }
+    },
+    "silicon": {
+      "medium": {
+        "resources": [
+          {
+            "x": 128000,
+            "y": 0,
+            "z": -64000,
+            "max": 26613,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.01692
+          },
+          {
+            "x": 128000,
+            "y": 0,
+            "z": -128000,
+            "max": 38295,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.024347
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": -64000,
+            "max": 40815,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025949
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": -128000,
+            "max": 40815,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025949
+          }
+        ]
+      }
+    },
+    "nividium": {
+      "medium": {
+        "resources": [
+          {
+            "x": 128000,
+            "y": 0,
+            "z": -128000,
+            "max": 5,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "falloff": 0.019073
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": -64000,
+            "max": 5,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "falloff": 0.019073
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": -128000,
+            "max": 5,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "falloff": 0.019073
+          }
+        ]
+      }
+    }
+  }
+}
