@@ -1,0 +1,804 @@
+<?xml version="1.0" encoding="utf-8"?>
+<macros>
+  <macro name="Cluster_100_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="Zone003_Cluster_100_Sector001_connection" ref="zones">
+        <offset>
+          <position x="69261.015625" y="0" z="57018.04296875" />
+        </offset>
+        <macro ref="Zone003_Cluster_100_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_100_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-114153.03125" y="0" z="116118.703125" />
+        </offset>
+        <macro ref="Zone001_Cluster_100_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_100_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-21916.24609375" y="0" z="108944.6796875" />
+        </offset>
+        <macro ref="Zone002_Cluster_100_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_100_Sector001_connection" ref="zones">
+        <offset>
+          <position x="92201.28125" y="0" z="-35614.76953125" />
+        </offset>
+        <macro ref="Zone004_Cluster_100_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_100_Sector001_connection" ref="zones">
+        <offset>
+          <position x="75408.1328125" y="0" z="-126087.234375" />
+        </offset>
+        <macro ref="Zone005_Cluster_100_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_101_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="Zone002_Cluster_101_Sector001_connection" ref="zones">
+        <offset>
+          <position x="3637.3442382812" y="0" z="120528.09375" />
+        </offset>
+        <macro ref="Zone002_Cluster_101_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_101_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-114153.03125" y="0" z="116118.703125" />
+        </offset>
+        <macro ref="Zone001_Cluster_101_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_101_Sector001_connection" ref="zones">
+        <offset>
+          <position x="106003.796875" y="0" z="11714.935546875" />
+        </offset>
+        <macro ref="Zone004_Cluster_101_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_101_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-75256.7734375" y="0" z="-33358.421875" />
+        </offset>
+        <macro ref="Zone003_Cluster_101_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_101_Sector001_connection" ref="zones">
+        <offset>
+          <position x="75408.1328125" y="0" z="-126087.234375" />
+        </offset>
+        <macro ref="Zone005_Cluster_101_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_102_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="Zone004_Cluster_102_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-16199.36328125" y="0" z="-64794.8515625" />
+        </offset>
+        <macro ref="Zone004_Cluster_102_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_102_Sector001_connection" ref="zones">
+        <offset>
+          <position x="76468.1328125" y="0" z="-96198.4296875" />
+        </offset>
+        <macro ref="Zone005_Cluster_102_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_102_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-124678.890625" y="0" z="-47108.84765625" />
+        </offset>
+        <macro ref="Zone001_Cluster_102_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_102_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-77654.3203125" y="0" z="125309.953125" />
+        </offset>
+        <macro ref="Zone002_Cluster_102_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_102_Sector001_connection" ref="zones">
+        <offset>
+          <position x="90514.46875" y="0" z="77155.703125" />
+        </offset>
+        <macro ref="Zone003_Cluster_102_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_104_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="tzoneCluster_104_Sector001SHCon6_GateZone_connection" ref="zones">
+        <offset>
+          <position x="-50000" y="0" z="-200000" />
+        </offset>
+        <macro ref="tzoneCluster_104_Sector001SHCon6_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="tzoneCluster_104_Sector001SHCon10_GateZone_connection" ref="zones">
+        <offset>
+          <position x="50000" y="0" z="-200000" />
+        </offset>
+        <macro ref="tzoneCluster_104_Sector001SHCon10_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_104_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-114153.03125" y="0" z="116118.703125" />
+        </offset>
+        <macro ref="Zone001_Cluster_104_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_104_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-613.1934814453" y="0" z="115214.9296875" />
+        </offset>
+        <macro ref="Zone002_Cluster_104_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_104_Sector001_connection" ref="zones">
+        <offset>
+          <position x="117080.328125" y="0" z="114347.96875" />
+        </offset>
+        <macro ref="Zone003_Cluster_104_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_104_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-92491.0078125" y="0" z="-124889.625" />
+        </offset>
+        <macro ref="Zone005_Cluster_104_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_104_Sector001_connection" ref="zones">
+        <offset>
+          <position x="18336.318359375" y="0" z="-79140.4609375" />
+        </offset>
+        <macro ref="Zone004_Cluster_104_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_104_Sector002_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="tzoneCluster_104_Sector002SHCon5_GateZone_connection" ref="zones">
+        <offset>
+          <position x="-50000" y="0" z="200000" />
+        </offset>
+        <macro ref="tzoneCluster_104_Sector002SHCon5_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="tzoneCluster_104_Sector002SHCon9_GateZone_connection" ref="zones">
+        <offset>
+          <position x="50000" y="0" z="200000" />
+        </offset>
+        <macro ref="tzoneCluster_104_Sector002SHCon9_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_104_Sector002_connection" ref="zones">
+        <offset>
+          <position x="-92491.0078125" y="0" z="-121375" />
+        </offset>
+        <macro ref="Zone005_Cluster_104_Sector002_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_104_Sector002_connection" ref="zones">
+        <offset>
+          <position x="-114153.03125" y="0" z="119656.25" />
+        </offset>
+        <macro ref="Zone001_Cluster_104_Sector002_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_104_Sector002_connection" ref="zones">
+        <offset>
+          <position x="-613.1934814453" y="0" z="118718.75" />
+        </offset>
+        <macro ref="Zone002_Cluster_104_Sector002_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_104_Sector002_connection" ref="zones">
+        <offset>
+          <position x="117080.328125" y="0" z="117843.75" />
+        </offset>
+        <macro ref="Zone003_Cluster_104_Sector002_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_104_Sector002_connection" ref="zones">
+        <offset>
+          <position x="18336.318359375" y="0" z="-75625" />
+        </offset>
+        <macro ref="Zone004_Cluster_104_Sector002_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_106_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="Zone002_Cluster_106_Sector001_connection" ref="zones">
+        <offset>
+          <position x="121647.03125" y="0" z="111465.1015625" />
+        </offset>
+        <macro ref="Zone002_Cluster_106_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_106_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-114153.03125" y="0" z="116118.703125" />
+        </offset>
+        <macro ref="Zone001_Cluster_106_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_106_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-15650.0546875" y="0" z="-88057.8984375" />
+        </offset>
+        <macro ref="Zone003_Cluster_106_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_107_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="Zone003_Cluster_107_Sector001_connection" ref="zones">
+        <offset>
+          <position x="114955.0546875" y="0" z="93626.5625" />
+        </offset>
+        <macro ref="Zone003_Cluster_107_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_107_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-114153.03125" y="0" z="116118.703125" />
+        </offset>
+        <macro ref="Zone001_Cluster_107_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_107_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-118565.796875" y="0" z="4700.7827148438" />
+        </offset>
+        <macro ref="Zone002_Cluster_107_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_107_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-33514.703125" y="0" z="-136578.609375" />
+        </offset>
+        <macro ref="Zone005_Cluster_107_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_107_Sector001_connection" ref="zones">
+        <offset>
+          <position x="77843.9296875" y="0" z="-134397.53125" />
+        </offset>
+        <macro ref="Zone004_Cluster_107_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_108_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="tzoneCluster_108_Sector001SHCon6_GateZone_connection" ref="zones">
+        <offset>
+          <position x="-50000" y="0" z="-200000" />
+        </offset>
+        <macro ref="tzoneCluster_108_Sector001SHCon6_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="tzoneCluster_108_Sector001SHCon10_GateZone_connection" ref="zones">
+        <offset>
+          <position x="-35487.578125" y="0" z="-200000" />
+        </offset>
+        <macro ref="tzoneCluster_108_Sector001SHCon10_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="tzoneCluster_108_Sector001SHCon9_GateZone_connection" ref="zones">
+        <offset>
+          <position x="-35156" y="0" z="200000" />
+        </offset>
+        <macro ref="tzoneCluster_108_Sector001SHCon9_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="tzoneCluster_108_Sector001SHCon5_GateZone_connection" ref="zones">
+        <offset>
+          <position x="-50000" y="0" z="200000" />
+        </offset>
+        <macro ref="tzoneCluster_108_Sector001SHCon5_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_108_Sector001_connection" ref="zones">
+        <offset>
+          <position x="128262.0234375" y="0" z="-134751.28125" />
+        </offset>
+        <macro ref="Zone004_Cluster_108_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_108_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-114153.03125" y="0" z="116118.703125" />
+        </offset>
+        <macro ref="Zone001_Cluster_108_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_108_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-15640.625" y="0" z="-12908.8056640625" />
+        </offset>
+        <macro ref="Zone003_Cluster_108_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_108_Sector001_connection" ref="zones">
+        <offset>
+          <position x="54030.68359375" y="0" z="101330.6171875" />
+        </offset>
+        <macro ref="Zone002_Cluster_108_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_108_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-44812.53125" y="0" z="-136466.296875" />
+        </offset>
+        <macro ref="Zone005_Cluster_108_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_108_Sector002_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="tzoneCluster_108_Sector002SHCon5_GateZone_connection" ref="zones">
+        <offset>
+          <position x="35730.46875" y="0" z="200000" />
+        </offset>
+        <macro ref="tzoneCluster_108_Sector002SHCon5_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="tzoneCluster_108_Sector002SHCon9_GateZone_connection" ref="zones">
+        <offset>
+          <position x="50000" y="0" z="200000" />
+        </offset>
+        <macro ref="tzoneCluster_108_Sector002SHCon9_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_108_Sector002_connection" ref="zones">
+        <offset>
+          <position x="133539.0625" y="0" z="-117875" />
+        </offset>
+        <macro ref="Zone004_Cluster_108_Sector002_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_108_Sector002_connection" ref="zones">
+        <offset>
+          <position x="-108882.8125" y="0" z="133000" />
+        </offset>
+        <macro ref="Zone001_Cluster_108_Sector002_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_108_Sector002_connection" ref="zones">
+        <offset>
+          <position x="-10367.1875" y="0" z="3968.75" />
+        </offset>
+        <macro ref="Zone003_Cluster_108_Sector002_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_108_Sector002_connection" ref="zones">
+        <offset>
+          <position x="59304.6875" y="0" z="118218.75" />
+        </offset>
+        <macro ref="Zone002_Cluster_108_Sector002_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_108_Sector002_connection" ref="zones">
+        <offset>
+          <position x="-39539.0625" y="0" z="-119593.75" />
+        </offset>
+        <macro ref="Zone005_Cluster_108_Sector002_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+   <macro name="Cluster_108_Sector003_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="tzoneCluster_108_Sector003SHCon10_GateZone_connection" ref="zones">
+        <offset>
+          <position x="8314" y="0" z="-1765" />
+        </offset>
+        <macro ref="tzoneCluster_108_Sector003SHCon10_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="tzoneCluster_108_Sector003SHCon6_GateZone_connection" ref="zones">
+        <offset>
+          <position x="-6197" y="0" z="-1765" />
+        </offset>
+        <macro ref="tzoneCluster_108_Sector003SHCon6_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_108_Sector003_connection" ref="zones">
+        <offset>
+          <position x="133566.0625" y="32401" z="-66875" />
+        </offset>
+        <macro ref="Zone004_Cluster_108_Sector003_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_108_Sector003_connection" ref="zones">
+        <offset>
+          <position x="-108855.8125" y="-67377" z="133063" />
+        </offset>
+        <macro ref="Zone001_Cluster_108_Sector003_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_108_Sector003_connection" ref="zones">
+        <offset>
+          <position x="-10339.1875" y="0" z="4031.75" />
+        </offset>
+        <macro ref="Zone003_Cluster_108_Sector003_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_108_Sector003_connection" ref="zones">
+        <offset>
+          <position x="59332.6875" y="-59747" z="118281.75" />
+        </offset>
+        <macro ref="Zone002_Cluster_108_Sector003_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_108_Sector003_connection" ref="zones">
+        <offset>
+          <position x="-81238.0625" y="59781" z="-119531.75" />
+        </offset>
+        <macro ref="Zone005_Cluster_108_Sector003_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_109_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="Zone003_Cluster_109_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-115810.3515625" y="0" z="-24860.451171875" />
+        </offset>
+        <macro ref="Zone003_Cluster_109_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_109_Sector001_connection" ref="zones">
+        <offset>
+          <position x="82573.1640625" y="0" z="-92239.5546875" />
+        </offset>
+        <macro ref="Zone001_Cluster_109_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_109_Sector001_connection" ref="zones">
+        <offset>
+          <position x="127966.0625" y="0" z="123632.28125" />
+        </offset>
+        <macro ref="Zone002_Cluster_109_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_110_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="Zone002_Cluster_110_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-109002.078125" y="0" z="-85623.265625" />
+        </offset>
+        <macro ref="Zone002_Cluster_110_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_110_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-114153.03125" y="0" z="116118.703125" />
+        </offset>
+        <macro ref="Zone001_Cluster_110_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_110_Sector001_connection" ref="zones">
+        <offset>
+          <position x="3378.3110351562" y="0" z="-6792.5375976562" />
+        </offset>
+        <macro ref="Zone003_Cluster_110_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_110_Sector001_connection" ref="zones">
+        <offset>
+          <position x="125349.3515625" y="0" z="15909.6376953125" />
+        </offset>
+        <macro ref="Zone005_Cluster_110_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_110_Sector001_connection" ref="zones">
+        <offset>
+          <position x="116630.1484375" y="0" z="-131209.625" />
+        </offset>
+        <macro ref="Zone004_Cluster_110_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_111_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="Zone001_Cluster_111_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-114153.03125" y="0" z="116118.703125" />
+        </offset>
+        <macro ref="Zone001_Cluster_111_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_111_Sector001_connection" ref="zones">
+        <offset>
+          <position x="95555.3671875" y="0" z="78553.984375" />
+        </offset>
+        <macro ref="Zone002_Cluster_111_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_111_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-10435.958984375" y="0" z="65998.03125" />
+        </offset>
+        <macro ref="Zone003_Cluster_111_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_111_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-22357.017578125" y="0" z="-139766.53125" />
+        </offset>
+        <macro ref="Zone005_Cluster_111_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_111_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-129370.0859375" y="0" z="-126427.765625" />
+        </offset>
+        <macro ref="Zone004_Cluster_111_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_112_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="tzoneCluster_112_Sector001SHCon6_GateZone_connection" ref="zones">
+        <offset>
+          <position x="-50000" y="0" z="-200000" />
+        </offset>
+        <macro ref="tzoneCluster_112_Sector001SHCon6_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_112_Sector001_connection" ref="zones">
+        <offset>
+          <position x="39907.90625" y="0" z="28085.9375" />
+        </offset>
+        <macro ref="Zone003_Cluster_112_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_112_Sector001_connection" ref="zones">
+        <offset>
+          <position x="127631.0859375" y="0" z="128764.296875" />
+        </offset>
+        <macro ref="Zone002_Cluster_112_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_112_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-114153.03125" y="0" z="119765.625" />
+        </offset>
+        <macro ref="Zone001_Cluster_112_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_112_Sector001_connection" ref="zones">
+        <offset>
+          <position x="75408.1328125" y="0" z="-122437.5" />
+        </offset>
+        <macro ref="Zone005_Cluster_112_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_112_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-71305.390625" y="0" z="-99017.8203125" />
+        </offset>
+        <macro ref="Zone004_Cluster_112_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_112_Sector002_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="tzoneCluster_112_Sector002SHCon5_GateZone_connection" ref="zones">
+        <offset>
+          <position x="-50000" y="0" z="200000" />
+        </offset>
+        <macro ref="tzoneCluster_112_Sector002SHCon5_GateZone_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_112_Sector002_connection" ref="zones">
+        <offset>
+          <position x="-114153.03125" y="0" z="119765.625" />
+        </offset>
+        <macro ref="Zone001_Cluster_112_Sector002_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_112_Sector002_connection" ref="zones">
+        <offset>
+          <position x="126016.421875" y="0" z="130125" />
+        </offset>
+        <macro ref="Zone004_Cluster_112_Sector002_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_112_Sector002_connection" ref="zones">
+        <offset>
+          <position x="39907.90625" y="0" z="28085.9375" />
+        </offset>
+        <macro ref="Zone003_Cluster_112_Sector002_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_112_Sector002_connection" ref="zones">
+        <offset>
+          <position x="-113140.0625" y="0" z="-50164.0625" />
+        </offset>
+        <macro ref="Zone002_Cluster_112_Sector002_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_112_Sector002_connection" ref="zones">
+        <offset>
+          <position x="75408.1328125" y="0" z="-122437.5" />
+        </offset>
+        <macro ref="Zone005_Cluster_112_Sector002_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_113_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="Zone001_Cluster_113_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-85828.5546875" y="0" z="52478.46875" />
+        </offset>
+        <macro ref="Zone001_Cluster_113_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_113_Sector001_connection" ref="zones">
+        <offset>
+          <position x="1565.6280517578" y="0" z="132593.875" />
+        </offset>
+        <macro ref="Zone005_Cluster_113_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_113_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-113140.0625" y="0" z="-50164.0625" />
+        </offset>
+        <macro ref="Zone002_Cluster_113_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_113_Sector001_connection" ref="zones">
+        <offset>
+          <position x="142358.359375" y="0" z="125211.609375" />
+        </offset>
+        <macro ref="Zone004_Cluster_113_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_113_Sector001_connection" ref="zones">
+        <offset>
+          <position x="125405.6875" y="0" z="-141350.703125" />
+        </offset>
+        <macro ref="Zone003_Cluster_113_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_114_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="Zone001_Cluster_114_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-25623.83984375" y="0" z="144203.359375" />
+        </offset>
+        <macro ref="Zone001_Cluster_114_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_114_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-115039.453125" y="0" z="41591.33984375" />
+        </offset>
+        <macro ref="Zone002_Cluster_114_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_114_Sector001_connection" ref="zones">
+        <offset>
+          <position x="128824.4296875" y="0" z="69666.140625" />
+        </offset>
+        <macro ref="Zone004_Cluster_114_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_114_Sector001_connection" ref="zones">
+        <offset>
+          <position x="131127.3125" y="0" z="-114179.359375" />
+        </offset>
+        <macro ref="Zone005_Cluster_114_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_114_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-130885.6484375" y="0" z="-135881.453125" />
+        </offset>
+        <macro ref="Zone003_Cluster_114_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_115_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="Zone003_Cluster_115_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-29.6058654785" y="0" z="-100147.09375" />
+        </offset>
+        <macro ref="Zone003_Cluster_115_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_115_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-113140.0625" y="0" z="-50164.0625" />
+        </offset>
+        <macro ref="Zone002_Cluster_115_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_115_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-130028.4609375" y="0" z="145028.8125" />
+        </offset>
+        <macro ref="Zone001_Cluster_115_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_115_Sector001_connection" ref="zones">
+        <offset>
+          <position x="64411.78125" y="0" z="91019.59375" />
+        </offset>
+        <macro ref="Zone004_Cluster_115_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_115_Sector001_connection" ref="zones">
+        <offset>
+          <position x="121893.0390625" y="0" z="-70436.6328125" />
+        </offset>
+        <macro ref="Zone005_Cluster_115_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone006_Cluster_115_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-29.6" y="0" z="-274972.6328125" />
+        </offset>
+        <macro ref="Zone006_Cluster_115_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_116_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections >
+      <connection name="Zone002_Cluster_116_Sector001_connection" ref="zones">
+        <offset>
+          <position x="3637.3442382812" y="0" z="120528.09375" />
+        </offset>
+        <macro ref="Zone002_Cluster_116_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_116_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-114153.03125" y="0" z="116118.703125" />
+        </offset>
+        <macro ref="Zone001_Cluster_116_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_116_Sector001_connection" ref="zones">
+        <offset>
+          <position x="106003.796875" y="0" z="11714.935546875" />
+        </offset>
+        <macro ref="Zone004_Cluster_116_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_116_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-75256.7734375" y="0" z="-33358.421875" />
+        </offset>
+        <macro ref="Zone003_Cluster_116_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_116_Sector001_connection" ref="zones">
+        <offset>
+          <position x="75408.1328125" y="0" z="-126087.234375" />
+        </offset>
+        <macro ref="Zone005_Cluster_116_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <!--macro name="Cluster_103_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="Zone001_Cluster_103_Sector001_connection" ref="zones">
+        <offset>
+          <position x="115852.3125" y="0" z="108480.2421875" />
+        </offset>
+        <macro ref="Zone001_Cluster_103_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_103_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-62464.08203125" y="0" z="46461.5625" />
+        </offset>
+        <macro ref="Zone002_Cluster_103_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_103_Sector001_connection" ref="zones">
+        <offset>
+          <position x="38807.4609375" y="0" z="-2030.6472167969" />
+        </offset>
+        <macro ref="Zone003_Cluster_103_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_103_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-85791.265625" y="0" z="-120009.1796875" />
+        </offset>
+        <macro ref="Zone005_Cluster_103_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone004_Cluster_103_Sector001_connection" ref="zones">
+        <offset>
+          <position x="32806.41796875" y="0" z="-111475.0703125" />
+        </offset>
+        <macro ref="Zone004_Cluster_103_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_105_Sector001_macro" class="sector">
+    <component ref="standardsector" />
+    <connections>
+      <connection name="Zone004_Cluster_105_Sector001_connection" ref="zones">
+        <offset>
+          <position x="92201.28125" y="0" z="-35614.76953125" />
+        </offset>
+        <macro ref="Zone004_Cluster_105_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone002_Cluster_105_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-121044.859375" y="0" z="-121834.3125" />
+        </offset>
+        <macro ref="Zone002_Cluster_105_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone005_Cluster_105_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-7242.66796875" y="0" z="-139471.875" />
+        </offset>
+        <macro ref="Zone005_Cluster_105_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone003_Cluster_105_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-39685.33984375" y="0" z="-3140.6401367188" />
+        </offset>
+        <macro ref="Zone003_Cluster_105_Sector001_macro" connection="sector" />
+      </connection>
+      <connection name="Zone001_Cluster_105_Sector001_connection" ref="zones">
+        <offset>
+          <position x="-123063.78125" y="0" z="141558.8125" />
+        </offset>
+        <macro ref="Zone001_Cluster_105_Sector001_macro" connection="sector" />
+      </connection>
+    </connections>
+  </macro-->
+</macros>

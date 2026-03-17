@@ -1,0 +1,713 @@
+<?xml version="1.0" encoding="utf-8"?>
+<macros>
+  <macro name="Cluster_602_macro" class="cluster">
+    <component ref="standardcluster" />
+    <connections>
+      <connection name="Cluster_602_Sector001_connection" ref="sectors">
+        <macro ref="Cluster_602_Sector001_macro" connection="cluster" />
+      </connection>
+      <connection name="C602S01_Region01_connection" ref="regions">
+        <offset>
+          <position x="0" y="15000" z="0" />
+        </offset>
+        <macro name="C602S01_Region01_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c602s1_region1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C602S01_Region02_connection" ref="regions">
+        <offset>
+          <position x="0" y="0" z="0" />
+        </offset>
+        <macro name="C602S01_Region02_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="audioregion_cluster_602_sector001" />
+          </properties>
+        </macro>
+      </connection>
+      <connection ref="content">
+        <macro>
+          <component ref="Cluster_602_v1" connection="space" />
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_603_macro" class="cluster">
+    <component ref="standardcluster" />
+    <connections>
+      <connection name="Cluster_603_Sector001_connection" ref="sectors">
+        <macro ref="Cluster_603_Sector001_macro" connection="cluster" />
+      </connection>
+      <connection name="C603S01_Region01_connection" ref="regions">
+        <offset>
+          <position x="-33.70285" y="-40000" z="-1202.716" />
+        </offset>
+        <macro name="C603S01_Region01_macro">
+          <component ref="standardregion" connection="cluster" />
+          <properties>
+            <region ref="c603s1_region1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C603S01_Region02_connection" ref="regions">
+        <offset>
+          <position x="0" y="0" z="0" />
+        </offset>
+        <macro name="C603S01_Region02_macro">
+          <component ref="standardregion" connection="cluster" />
+          <properties>
+            <region ref="audioregion_cluster_603_sector001" />
+          </properties>
+        </macro>
+      </connection>
+      <connection ref="content">
+        <macro>
+          <component ref="Cluster_603_v1" connection="space" />
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_605_macro" class="cluster">
+    <component ref="standardcluster" />
+    <connections>
+      <connection name="Cluster_605_Sector001_connection" ref="sectors">
+        <macro ref="Cluster_605_Sector001_macro" connection="cluster" />
+      </connection>
+      <connection ref="content">
+        <macro>
+          <component ref="Cluster_605" connection="space" />
+        </macro>
+      </connection>
+      <connection name="C605S01_Region01_connection" ref="regions">
+        <offset>
+          <position x="0.0" y="-50000" z="0.0" />
+        </offset>
+        <macro name="C605S01_Region01_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c605s1_region" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C605S01_Region01warning_connection" ref="regions">
+        <offset>
+          <position x="0.0" y="-50000" z="0.0" />
+        </offset>
+        <macro name="C605S01_Region01warning_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c605s1_regionwarning" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C605S01_Region12_connection" ref="regions">
+        <offset>
+          <position x="0.0" y="0" z="0.0" />
+        </offset>
+        <macro name="C605S01_Region12_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c605s1_region12" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C605S01_Region13_connection" ref="regions">
+        <offset>
+          <position x="0.0" y="0" z="0.0" />
+        </offset>
+        <macro name="C605S01_Region13_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c605s1_region13" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C605S01_Region14_connection" ref="regions">
+        <offset>
+          <position x="0.0" y="0" z="0.0" />
+        </offset>
+        <macro name="C605S01_Region14_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c605s1_region14" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C605S01_Region15_connection" ref="regions">
+        <offset>
+          <position x="0.0" y="0" z="0.0" />
+        </offset>
+        <macro name="C605S01_Region15_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c605s1_region15" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C605S01_Region16_connection" ref="regions">
+        <offset>
+          <position x="0.0" y="0" z="0.0" />
+        </offset>
+        <macro name="C605S01_Region16_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c605s1_region16" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C605S01_Region17_connection" ref="regions">
+        <offset>
+          <position x="0.0" y="0" z="0.0" />
+        </offset>
+        <macro name="C605S01_Region17_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c605s1_region17" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C605S01_Region18_connection" ref="regions">
+        <offset>
+          <position x="0.0" y="0" z="0.0" />
+        </offset>
+        <macro name="C605S01_Region18_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c605s1_region18" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C605S01_Region19_connection" ref="regions">
+        <offset>
+          <position x="0.0" y="0" z="0.0" />
+        </offset>
+        <macro name="C605S01_Region19_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c605s1_region19" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C605S01_Region20_connection" ref="regions">
+        <offset>
+          <position x="0.0" y="0" z="0.0" />
+        </offset>
+        <macro name="C605S01_Region20_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c605s1_region20" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C605S01_Region21_connection" ref="regions">
+        <offset>
+          <position x="0" y="0" z="0" />
+        </offset>
+        <macro name="C605S01_Region21_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="audioregion_cluster_605_sector001" />
+          </properties>
+        </macro>
+      </connection>
+
+      <connection name="C605S01_Region02_connection" ref="regions">
+        <offset>
+          <position x="0.0" y="0" z="0.0" />
+        </offset>
+        <macro name="C605S01_Region02_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c605s1_region2" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C605S01_Region03_connection" ref="regions">
+        <offset>
+          <position x="0.0" y="0" z="0.0" />
+        </offset>
+        <macro name="C605S01_Region03_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c605s1_region3" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C605S01_Region04_connection" ref="regions">
+        <offset>
+          <position x="0.0" y="0" z="0.0" />
+        </offset>
+        <macro name="C605S01_Region04_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c605s1_region4" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C605S01_Region05_connection" ref="regions">
+        <offset>
+          <position x="0.0" y="0" z="0.0" />
+        </offset>
+        <macro name="C605S01_Region05_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c605s1_region5" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C605S01_Region06_connection" ref="regions">
+        <offset>
+          <position x="0.0" y="0" z="0.0" />
+        </offset>
+        <macro name="C605S01_Region06_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c605s1_region6" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C605S01_Region07_connection" ref="regions">
+        <offset>
+          <position x="0.0" y="0" z="0.0" />
+        </offset>
+        <macro name="C605S01_Region07_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c605s1_region7" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C605S01_Region08_connection" ref="regions">
+        <offset>
+          <position x="0.0" y="0" z="0.0" />
+        </offset>
+        <macro name="C605S01_Region08_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c605s1_region8" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C605S01_Region09_connection" ref="regions">
+        <offset>
+          <position x="0.0" y="0" z="0.0" />
+        </offset>
+        <macro name="C605S01_Region09_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c605s1_region9" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C605S01_Region10_connection" ref="regions">
+        <offset>
+          <position x="0.0" y="0" z="0.0" />
+        </offset>
+        <macro name="C605S01_Region10_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c605s1_region10" />
+          </properties>
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_606_macro" class="cluster">
+    <component ref="standardcluster" />
+    <connections>
+      <connection name="Cluster_606_Sector001_connection" ref="sectors">
+        <macro ref="Cluster_606_Sector001_macro" connection="cluster" />
+      </connection>
+      <connection name="C606S01_Region01_connection" ref="regions">
+        <offset>
+          <position x="58.65234375" y="-7500" z="524.859375" />
+        </offset>
+        <macro name="C606S01_Region01_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c606s1_region" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C606S01_Region02_connection" ref="regions">
+        <offset>
+          <position x="0" y="0" z="0" />
+        </offset>
+        <macro name="C606S01_Region02_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="audioregion_cluster_606_sector001" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="Cluster_606_Sector002_connection" ref="sectors">
+        <offset>
+          <position x="-622191.4" y="0" z="-4.174307e+07" />
+        </offset>
+        <macro ref="Cluster_606_Sector002_macro" connection="cluster" />
+      </connection>
+      <connection name="C606S02_Region01_connection" ref="regions">
+        <offset>
+          <position x="-622191.4" y="0" z="-4.174307e+07" />
+        </offset>
+        <macro name="C606S02_Region01_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c606s2_region" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C606S02_Region02_connection" ref="regions">
+        <offset>
+          <position x="-622191.4" y="0" z="-4.174307e+07" />
+        </offset>
+        <macro name="C606S02_Region02_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="audioregion_cluster_606_sector002" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="Cluster_606_Sector003_connection" ref="sectors">
+        <offset>
+          <position x="5.911176e+07" y="0" z="-2041270" />
+        </offset>
+        <macro ref="Cluster_606_Sector003_macro" connection="cluster" />
+      </connection>
+      <connection name="C606S03_Region01_connection" ref="regions">
+        <offset>
+          <position x="5.911176e+07" y="-20000" z="-2041270" />
+        </offset>
+        <macro name="C606S03_Region01_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c606s3_region" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C606S03_Region02_connection" ref="regions">
+        <offset>
+          <position x="5.911176e+07" y="0" z="-2041270" />
+        </offset>
+        <macro name="C606S03_Region02_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="audioregion_cluster_606_sector003" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="SuperHighway01_Cluster606_connection" ref="sechighways">
+        <offset>
+          <position x="-315861.3" y="0" z="-2.087154e+07" />
+        </offset>
+        <macro ref="SuperHighway01_Cluster606_macro" connection="cluster">
+          <connections>
+            <connection ref="entrypoint">
+              <macro ref="tzoneCluster_606_Sector001SHCon6_GateZone_macro" path="../../Cluster_606_Sector001_connection/tzoneCluster_606_Sector001SHCon6_GateZone_connection" connection="exitpoint1" />
+            </connection>
+            <connection ref="entrypoint">
+              <macro ref="tzoneCluster_606_Sector001SHCon6_GateZone_macro" path="../../Cluster_606_Sector001_connection/tzoneCluster_606_Sector001SHCon6_GateZone_connection" connection="exitpoint1" />
+            </connection>
+            <connection ref="entrypoint">
+              <macro ref="tzoneCluster_606_Sector001SHCon6_GateZone_macro" path="../../Cluster_606_Sector001_connection/tzoneCluster_606_Sector001SHCon6_GateZone_connection" connection="exitpoint1" />
+            </connection>
+            <connection ref="entrypoint">
+              <macro ref="tzoneCluster_606_Sector001SHCon6_GateZone_macro" path="../../Cluster_606_Sector001_connection/tzoneCluster_606_Sector001SHCon6_GateZone_connection" connection="exitpoint1" />
+            </connection>
+            <connection ref="entrypoint">
+              <macro ref="tzoneCluster_606_Sector001SHCon6_GateZone_macro" path="../../Cluster_606_Sector001_connection/tzoneCluster_606_Sector001SHCon6_GateZone_connection" connection="exitpoint1" />
+            </connection>
+            <connection ref="exitpoint">
+              <macro ref="tzoneCluster_606_Sector002SHCon5_GateZone_macro" path="../../Cluster_606_Sector002_connection/tzoneCluster_606_Sector002SHCon5_GateZone_connection" connection="entrypoint1" />
+            </connection>
+          </connections>
+        </macro>
+      </connection>
+      <connection name="SuperHighway02_Cluster606_connection" ref="sechighways">
+        <offset>
+          <position x="-307675.2" y="0" z="-2.087154e+07" />
+        </offset>
+        <macro ref="SuperHighway02_Cluster606_macro" connection="cluster">
+          <connections>
+            <connection ref="exitpoint">
+              <macro ref="tzoneCluster_606_Sector001SHCon10_GateZone_macro" path="../../Cluster_606_Sector001_connection/tzoneCluster_606_Sector001SHCon10_GateZone_connection" connection="entrypoint1" />
+            </connection>
+            <connection ref="exitpoint">
+              <macro ref="tzoneCluster_606_Sector001SHCon10_GateZone_macro" path="../../Cluster_606_Sector001_connection/tzoneCluster_606_Sector001SHCon10_GateZone_connection" connection="entrypoint1" />
+            </connection>
+            <connection ref="exitpoint">
+              <macro ref="tzoneCluster_606_Sector001SHCon10_GateZone_macro" path="../../Cluster_606_Sector001_connection/tzoneCluster_606_Sector001SHCon10_GateZone_connection" connection="entrypoint1" />
+            </connection>
+            <connection ref="exitpoint">
+              <macro ref="tzoneCluster_606_Sector001SHCon10_GateZone_macro" path="../../Cluster_606_Sector001_connection/tzoneCluster_606_Sector001SHCon10_GateZone_connection" connection="entrypoint1" />
+            </connection>
+            <connection ref="exitpoint">
+              <macro ref="tzoneCluster_606_Sector001SHCon10_GateZone_macro" path="../../Cluster_606_Sector001_connection/tzoneCluster_606_Sector001SHCon10_GateZone_connection" connection="entrypoint1" />
+            </connection>
+            <connection ref="entrypoint">
+              <macro ref="tzoneCluster_606_Sector002SHCon9_GateZone_macro" path="../../Cluster_606_Sector002_connection/tzoneCluster_606_Sector002SHCon9_GateZone_connection" connection="exitpoint1" />
+            </connection>
+          </connections>
+        </macro>
+      </connection>
+      <connection name="SuperHighway04_Cluster606_connection" ref="sechighways">
+        <offset>
+          <position x="2.924479e+07" y="0" z="-1.864132e+07" />
+        </offset>
+        <macro ref="SuperHighway04_Cluster606_macro" connection="cluster">
+          <connections>
+            <connection ref="exitpoint">
+              <macro ref="tzoneCluster_606_Sector002SHCon12_GateZone_macro" path="../../Cluster_606_Sector002_connection/tzoneCluster_606_Sector002SHCon12_GateZone_connection" connection="entrypoint1" />
+            </connection>
+            <connection ref="entrypoint">
+              <macro ref="tzoneCluster_606_Sector003SHCon8_GateZone_macro" path="../../Cluster_606_Sector003_connection/tzoneCluster_606_Sector003SHCon8_GateZone_connection" connection="exitpoint1" />
+            </connection>
+          </connections>
+        </macro>
+      </connection>
+      <connection name="SuperHighway03_Cluster606_connection" ref="sechighways">
+        <offset>
+          <position x="2.924479e+07" y="0" z="-1.865837e+07" />
+        </offset>
+        <macro ref="SuperHighway03_Cluster606_macro" connection="cluster">
+          <connections>
+            <connection ref="entrypoint">
+              <macro ref="tzoneCluster_606_Sector002SHCon11_GateZone_macro" path="../../Cluster_606_Sector002_connection/tzoneCluster_606_Sector002SHCon11_GateZone_connection" connection="exitpoint1" />
+            </connection>
+            <connection ref="exitpoint">
+              <macro ref="tzoneCluster_606_Sector003SHCon7_GateZone_macro" path="../../Cluster_606_Sector003_connection/tzoneCluster_606_Sector003SHCon7_GateZone_connection" connection="entrypoint1" />
+            </connection>
+          </connections>
+        </macro>
+      </connection>
+      <connection ref="content">
+        <macro>
+          <component ref="Cluster_606_v3" connection="space" />
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_604_macro" class="cluster">
+    <component ref="standardcluster" />
+    <connections>
+      <connection name="Cluster_604_Sector001_connection" ref="sectors">
+        <macro ref="Cluster_604_Sector001_macro" connection="cluster" />
+      </connection>
+      <connection name="C604S01_Region01_connection" ref="regions">
+        <offset>
+          <position x="113703.65234375" y="0" z="-14228.859375" />
+        </offset>
+        <macro name="C604S01_Region01_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c604s1_region1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C604S01_Region02_connection" ref="regions">
+        <offset>
+          <position x="0" y="0" z="0" />
+        </offset>
+        <macro name="C604S01_Region02_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="audioregion_cluster_604_sector001" />
+          </properties>
+        </macro>
+      </connection>
+      <connection ref="content">
+        <macro>
+          <component ref="Cluster_604" connection="space" />
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_607_macro" class="cluster">
+    <component ref="standardcluster" />
+    <connections>
+      <connection name="Cluster_607_Sector001_connection" ref="sectors">
+        <macro ref="Cluster_607_Sector001_macro" connection="cluster" />
+      </connection>
+      <connection name="C607S01_Region02_connection" ref="regions">
+        <offset>
+          <position x="-15937.8" y="0" z="71059.27" />
+        </offset>
+        <macro name="C607S01_Region02_macro">
+          <component ref="standardregion" connection="cluster" />
+          <properties>
+            <region ref="c607s1_region2" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C607S01_Region01_connection" ref="regions">
+        <offset>
+          <position x="119988.65234375" y="0" z="-123218.859375" />
+        </offset>
+        <macro name="C607S01_Region01_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c607s1_region1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C607S01_Region03_connection" ref="regions">
+        <offset>
+          <position x="0" y="0" z="0" />
+        </offset>
+        <macro name="C607S01_Region03_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="audioregion_cluster_607_sector001" />
+          </properties>
+        </macro>
+      </connection>
+      <connection ref="content">
+        <macro>
+          <component ref="Cluster_607_v1" connection="space" />
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_601_macro" class="cluster">
+    <component ref="standardcluster" />
+    <connections>
+      <connection name="Cluster_601_Sector001_connection" ref="sectors">
+        <macro ref="Cluster_601_Sector001_macro" connection="cluster" />
+      </connection>
+      <connection ref="content">
+        <macro>
+          <component ref="Cluster_601" connection="space" />
+        </macro>
+      </connection>
+
+      <connection name="C601S01_Region01_connection" ref="regions">
+        <offset>
+          <position x="-92752.6" y="0" z="-78583.80" />
+        </offset>
+        <macro name="C601S01_Region01_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c601s1_region1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C601S01_Region02_connection" ref="regions">
+        <offset>
+          <position x="115338.0" y="0" z="257441.0" />
+        </offset>
+        <macro name="C601S01_Region02_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c601s1_region2" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C601S01_Region03_connection" ref="regions">
+        <offset>
+          <position x="-136885" y="0" z="240611.0" />
+        </offset>
+        <macro name="C601S01_Region03_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c601s1_region3" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C601S01_Region04_connection" ref="regions">
+        <offset>
+          <position x="211821.0" y="0" z="-141592.0" />
+        </offset>
+        <macro name="C601S01_Region04_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="c601s1_region4" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C601S01_Region05_connection" ref="regions">
+        <offset>
+          <position x="0" y="0" z="0" />
+        </offset>
+        <macro name="C601S01_Region05_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="audioregion_cluster_601_sector001" />
+          </properties>
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_608_macro" class="cluster">
+    <component ref="standardcluster" />
+    <connections>
+      <connection name="Cluster_608_Sector001_connection" ref="sectors">
+        <macro ref="Cluster_608_Sector001_macro" connection="cluster" />
+      </connection>
+      <connection name="C608S01_Region01_connection" ref="regions">
+        <offset>
+          <position x="-33.70285" y="-20000" z="-1202.716" />
+        </offset>
+        <macro name="C608S01_Region01_macro">
+          <component ref="standardregion" connection="cluster" />
+          <properties>
+            <region ref="c608s1_region1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C608S01_Region02_connection" ref="regions">
+        <offset>
+          <position x="0" y="0" z="0" />
+        </offset>
+        <macro name="C608S01_Region02_macro">
+          <component ref="standardregion" connection="cluster" />
+          <properties>
+            <region ref="audioregion_cluster_608_sector001" />
+          </properties>
+        </macro>
+      </connection>
+      <connection ref="content">
+        <macro>
+          <component ref="Cluster_608_v1" connection="space" />
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_609_macro" class="cluster">
+    <component ref="standardcluster" />
+    <connections>
+      <connection name="Cluster_609_Sector001_connection" ref="sectors">
+        <macro ref="Cluster_609_Sector001_macro" connection="cluster" />
+      </connection>
+      <connection name="C609S01_Region01_connection" ref="regions">
+        <offset>
+          <position x="-33.70285" y="-30000" z="-1202.716" />
+        </offset>
+        <macro name="C609S01_Region01_macro">
+          <component ref="standardregion" connection="cluster" />
+          <properties>
+            <region ref="c609s1_region1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C609S01_Region02_connection" ref="regions">
+        <offset>
+          <position x="0" y="0" z="0" />
+        </offset>
+        <macro name="C609S01_Region02_macro">
+          <component ref="standardregion" connection="cluster" />
+          <properties>
+            <region ref="audioregion_cluster_609_sector001" />
+          </properties>
+        </macro>
+      </connection>
+      <connection ref="content">
+        <macro>
+          <component ref="Cluster_609_v1" connection="space" />
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+</macros>

@@ -1,0 +1,1086 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+  <add sel="/god/objects">
+    <object id="destroyed_gate">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_101_sector001_macro" />
+      <position x="92024.027" y="-1532.621" z="13449.546" pitch="0" roll="0" yaw="0"/>
+      <object macro="props_ter_gate_01_destroyed_macro" />
+    </object>
+
+    <!-- Brennan's Triumph Wrecks ( 01-03 used for satelitesplacement - please dont change position!) -->
+    <object id="brennanstriumph_wreck_01">
+      <quotas>
+        <quota galaxy="1"/>
+      </quotas>
+      <location class="sector" macro="cluster_115_sector001_macro" />
+      <position x="-78833.094" z="-278096.438"/>
+      <object macro="env_debris_station_l_06_macro"/>
+    </object>
+
+    <object id="brennanstriumph_wreck_02">
+      <quotas>
+        <quota galaxy="1"/>
+      </quotas>
+      <location class="sector" macro="cluster_115_sector001_macro" />
+      <position x="-144411.625" z="-120517.711"/>
+      <object macro="env_debris_station_l_05_macro"/>
+    </object>
+
+    <object id="brennanstriumph_wreck_03">
+      <quotas>
+        <quota galaxy="1"/>
+      </quotas>
+      <location class="sector" macro="cluster_115_sector001_macro" />
+      <position x="7269.938" z="70031.75"/>
+      <object macro="env_debris_station_l_04_macro"/>
+    </object>
+
+    <object id="brennanstriumph_wreck_04">
+      <quotas>
+        <quota galaxy="1"/>
+      </quotas>
+      <location class="sector" macro="cluster_115_sector001_macro" />
+      <position x="-120000" z="55000"/>
+      <object macro="env_debris_station_l_03_macro"/>
+    </object>
+
+    <object id="brennanstriumph_wreck_05">
+      <quotas>
+        <quota galaxy="1"/>
+      </quotas>
+      <location class="sector" macro="cluster_115_sector001_macro" />
+      <position x="200000" z="-50000"/>
+      <object macro="env_debris_station_l_01_macro"/>
+    </object>
+  </add>
+  <add sel="/god/stations">
+    
+    <!-- SOL STATIONS-->
+
+    <!-- Earth -->
+    <!-- Torus Maze -->
+    <station id="torus_maze" race="terran" owner="ownerless">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_104_sector001_macro" />
+      <position x="34975.328125" y="0" z="12766.701171875" pitch="0" roll="0" yaw="0" />
+      <station macro="torus_maze_macro" />
+    </station>
+    
+    <!-- Terran Orbital Logistics Dock -->
+    <station id="ter_logisticsdock_cluster_104_sector001" race="terran" owner="terran" type="tradingstation">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_104_sector001_macro" />
+      <position x="-54140.0" y="0.0" z="-41031.0" pitch="0" roll="0" />
+      <station constructionplan="'ter_logisticsdock'">
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Terran Orbital Defence Station -->
+    <station id="ter_defence_cluster_104_sector001" race="terran" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_104_sector001_macro" />
+      <position x="-29178.0" y="0.0" z="-143571.0" pitch="0" roll="0" />
+      <station constructionplan="'ter_defence'">
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+    
+    <!-- The Moon-->
+    <!-- Terran Shipyard -->
+    <station id="ter_shipyard_cluster_104_sector002" race="terran" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_104_sector002_macro" />
+      <position x="76577.0" y="0.0" z="35236.0" pitch="0" roll="0" />
+      <station>
+        <select faction="terran" tags="[shipyard]" />
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Terran Orbital Support Station -->
+    <station id="ter_supportstation_cluster_104_sector002" race="terran" owner="terran" type="tradingstation">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_104_sector002_macro" />
+      <position x="-127870.0" y="0.0" z="-36826.0" pitch="0" roll="0" />
+      <station constructionplan="'ter_supportstation'">
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Terran Orbital Defence Station -->
+    <station id="ter_defence_cluster_104_sector002" race="terran" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone005_cluster_104_sector002_macro" />
+      <position x="-10712.195" y="0.0" z="-6692.047" yaw="-74.31804" pitch="0" roll="0"/>
+      <station constructionplan="'ter_defence'">
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Mars -->
+    <!-- Terran Wharf -->
+    <station id="ter_wharf_cluster_101_sector001" race="terran" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_101_sector001_macro" />
+      <position x="38168.0" y="0.0" z="12295.0" pitch="0" roll="0" />
+      <station>
+        <select faction="terran" tags="[wharf]" />
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+    
+    <!-- Terran Orbital Supply Base -->
+    <station id="ter_supplybase_cluster_101_sector001" race="terran" owner="terran" type="tradingstation">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_101_sector001_macro" />
+      <position x="72596.0" y="0.0" z="2558.0" pitch="0" roll="0" />
+      <station constructionplan="'ter_supplybase'">
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Terran Orbital Defence Station -->
+    <station id="ter_defence_cluster_101_sector001" race="terran" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone005_cluster_101_sector001_macro" />
+      <position x="9288.0" y="0.0" z="-24666.0" pitch="0" roll="0"/>
+      <station constructionplan="'ter_defence'">
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Venus -->
+    <!-- Terran Orbital Defence Station -->
+    <station id="ter_defence_cluster_102_sector001" race="terran" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone003_cluster_102_sector001_macro" />
+      <position x="-28200.0" z="-26900.0" pitch="0" roll="0" />
+      <station>
+        <select faction="terran" tags="[defence]" />
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+    
+    <!-- Mercury -->
+    <!-- Terran Orbital Defence Station -->
+    <station id="ter_defence_cluster_106_sector001" race="terran" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone003_cluster_106_sector001_macro" />
+      <position x="-8530.0" y="0.0" z="-6020.0" pitch="0" roll="0"/>
+      <station constructionplan="'ter_defence'">
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Asteroid Belt -->
+    <!-- Terran Orbital Defence Station -->
+    <station id="ter_defenceplatform_cluster_100_sector001" race="terran" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone004_cluster_100_sector001_macro" />
+      <position x="-3268.781" y="0.0" z="-27953.324" pitch="0" roll="0"/>
+      <station constructionplan="'ter_defenceplatform'">
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Jupiter -->
+    <!-- Terran Equipment Dock -->
+    <station id="ter_equipmentdock_cluster_107_sector001" race="terran" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_107_sector001_macro" />
+      <position x="89031.0" y="0.0" z="-37895.0" pitch="0" roll="0" />
+      <station>
+        <select faction="terran" tags="[equipmentdock]" />
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Terran Orbital Defence Station -->
+    <station id="ter_defence_cluster_107_sector001" race="terran" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_107_sector001_macro" />
+      <position x="44595.0" y="0.0" z="51693.0" pitch="0" roll="0"/>
+      <station constructionplan="'ter_defence'">
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Saturn -->
+    <!-- Terran Orbital Supply Base -->
+    <station id="ter_supplybase_cluster_108_sector001" race="terran" owner="terran" type="tradingstation">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_108_sector001_macro" />
+      <position x="-74400.0" y="0.0" z="-29515.0" pitch="0" roll="0" />
+      <station constructionplan="'ter_supplybase'">
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Terran Orbital Defence Station -->
+    <station id="ter_defence_cluster_108_sector001" race="terran" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone002_cluster_108_sector001_macro" />
+      <position x="-37880.0" y="0.0" z="-9800.0" pitch="0" roll="0"/>
+      <station constructionplan="'ter_defence'">
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Terran Orbital Defence Station -->
+    <station id="ter_defence_cluster_108_sector003" race="terran" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_108_sector003_macro" />
+      <position x="-6200" y="0" z="42000" pitch="0" roll="0" yaw="160"/>
+      <station constructionplan="'ter_defence'">
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Titan -->
+    <!-- Terran Orbital Defence Station -->
+    <station id="ter_defence_cluster_108_sector002" race="terran" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone002_cluster_108_sector002_macro" />
+      <position x="-18880.0" y="0.0" z="34430.0" pitch="0" roll="0"/>
+      <station constructionplan="'ter_defence'">
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Uranus -->
+    <!-- Terran Orbital Defence Station -->
+    <station id="ter_defence_cluster_109_sector001" race="terran" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone002_cluster_109_sector001_macro" />
+      <position x="21620.0" y="0.0" z="-41675.0" pitch="0" roll="0"/>
+      <station>
+        <select faction="terran" tags="[defence]" />
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Neptune -->
+    <!-- Terran Orbital Logistics Dock -->
+    <station id="ter_logisticsdock_cluster_110_sector001" race="terran" owner="terran" type="tradingstation">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_110_sector001_macro" />
+      <position x="-26701.0" y="0.0" z="9977.0" pitch="0" roll="0" />
+      <station constructionplan="'ter_logisticsdock'">
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+    
+    <!-- Terran Orbital Defence Station -->
+    <station id="ter_defence_cluster_110_sector001" race="terran" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone005_cluster_110_sector001_macro" />
+      <position x="-28680.0" y="0.0" z="-7760.0" pitch="0" roll="0"/>
+      <station constructionplan="'ter_defence'">
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Pluto -->
+    <!-- Terran Orbital Defence Station -->
+    <station id="ter_defence_cluster_111_sector001" race="terran" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_111_sector001_macro" />
+      <position x="44777.0" y="0.0" z="9001.0" pitch="0" roll="0"/>
+      <station>
+        <select faction="terran" tags="[defence]" />
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+    
+    <!-- Oort Cloud -->
+    <!-- Terran Orbital Defence Station -->
+    <station id="ter_defence_cluster_116_sector001" race="terran" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_116_sector001_macro" />
+      <position x="44777.0" y="0.0" z="9001.0" pitch="0" roll="0"/>
+      <station constructionplan="'ter_defence'">
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- PIONEER STATIONS -->
+
+    <!-- Segaris -->
+    <!-- Segaris Pioneers Science HQ -->
+    <station id="pio_scienceHQ_cluster_113_sector001" race="terran" owner="pioneers" type="tradingstation" encyclopedia="true">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_113_sector001_macro" />
+      <position x="36689.0" y="0.0" z="1607.0" pitch="0" roll="0" />
+      <station constructionplan="'piosciencehq3'">
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Segaris Pioneers Defence Platform -->
+    <station id="pio_defence_cluster_113_sector001" race="terran" owner="pioneers" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="zone" macro="zone005_cluster_113_sector001_macro" />
+      <position x="-11190.0" y="0.0" z="-9700.0" pitch="0" roll="0" />
+      <station constructionplan="'pio_defence'">
+        <loadout>
+          <level exact="0.7" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Segaris Pioneers Equipment Dock -->
+    <station id="pio_equipmentdock_zone001_cluster_113_sector001" race="terran" owner="pioneers" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_113_sector001_macro" />
+      <position x="-18560.0" y="0.0" z="-5043.0" pitch="0" roll="0" />
+      <station>
+        <select faction="pioneers" tags="[equipmentdock]" />
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+    
+    <!-- Gaian Prophecy -->
+    <!-- scientific gamestart player HQ -->
+    <station id="x4ep1_gamestart_scientist_hq" race="terran" owner="pioneers" type="headquarters" encyclopedia="true">
+      <quotas>
+        <quota galaxy="1" zone="1" gamestart="x4ep1_gamestart_terran1" />
+        <quota galaxy="1" zone="1" gamestart="x4ep1_gamestart_terran2" />
+      </quotas>
+      <location class="sector" macro="cluster_114_sector001_macro" />
+      <position x="-207000" y="-1100" z="-31000" pitch="0" roll="0" yaw="0" />
+      <station constructionplan="'x4ep1_playerheadquarters_pioneer_configuration'">
+        <loadout>
+          <level exact="0.2" />
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Segaris Pioneers Defence Platform -->
+    <station id="pio_defence_cluster_114_sector001" race="terran" owner="pioneers" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_114_sector001_macro" />
+      <position x="9294" y="0.0" z="-5326" pitch="0" roll="0" yaw="0" />
+      <station constructionplan="'pio_defence'">
+        <loadout>
+          <level exact="0.7" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Segaris Pioneers Trading Station -->
+    <station id="pio_tradestation_cluster_114_sector001" race="terran" owner="pioneers" type="tradingstation">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_114_sector001_macro" />
+      <position x="16400" y="0.0" z="41240" pitch="0" roll="0" yaw="0" />
+      <station constructionplan="'pio_trade'">
+        <loadout>
+          <level exact="0.7" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!--5.0 Recycling Station-->
+    <station id="pio_processing" race="terran" owner="pioneers" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1"/>
+      </quotas>
+      <location class="sector" macro="cluster_114_sector001_macro" solitary="true"/>
+      <position x="-8867" y="0" z="-108345" pitch="0" roll="0" yaw="50"/>
+      <station constructionplan="pio_scrap_processor">
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+    
+    <!-- Brennan's Triumph-->
+    <!-- Segaris Pioneers Shipyard -->
+    <station id="pio_shipyard_cluster_115_sector001" race="terran" owner="pioneers" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_115_sector001_macro" />
+      <position x="54808.0" y="0.0" z="-149169.0" pitch="0" roll="0" />
+      <station>
+        <select faction="pioneers" tags="[shipyard]" />
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Segaris Pioneers Wharf -->
+    <station id="pio_wharf_cluster_115_sector001" race="terran" owner="pioneers" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_115_sector001_macro" />
+      <position x="-47264.0" y="0.0" z="-34716.0" pitch="0" roll="0" />
+      <station>
+        <select faction="pioneers" tags="[wharf]" />
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Segaris Pioneers Defence Platform (Start Location for gamestart 2 - Project Genesis - Please dont change position!) -->
+    <station id="pio_defence_cluster_115_sector001" race="terran" owner="pioneers" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_115_sector001_macro" />
+      <position x="157000" y="0" z="-117500" pitch="0" roll="0" yaw="290" />
+      <station constructionplan="'pio_defence'">
+        <loadout>
+          <level exact="0.7" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>    
+
+    <!-- Xenon stations in Savage Spur I/II -->
+
+    <station id="xen_defence_cluster_112_sector001" race="xenon" owner="xenon" type="defence">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="zone" macro="zone002_cluster_112_sector001_macro" />
+      <station>
+        <select faction="xenon" tags="[defence]" />
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <station id="xen_defence_cluster_112_sector002" race="xenon" owner="xenon" type="defence">
+      <quotas>
+        <quota galaxy="5" sector="5" />
+      </quotas>
+      <location class="sector" macro="cluster_112_sector002_macro" />
+      <station>
+        <select faction="xenon" tags="[defence]" />
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <station id="shipyard_xenon_cluster_112" race="xenon" owner="xenon" type="shipyard">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone004_cluster_112_sector001_macro" />
+      <station>
+        <select faction="xenon" tags="[shipyard]" />
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <station id="wharf_xenon_cluster_112" race="xenon" owner="xenon" type="shipyard">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="zone" macro="zone005_cluster_112_sector001_macro" />
+      <station>
+        <select faction="xenon" tags="[wharf]" />
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Yaki wharf / pirate base -->
+    <station id="yaki_pirate_cluster_112_sector001" race="argon" owner="yaki" type="yakistation">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_112_sector001_macro" solitary="true" />
+      <station>
+        <select faction="yaki" tags="[wharf]" />
+        <loadout>
+          <level exact="1.0" />
+        </loadout>
+      </station>
+    </station>
+  </add>
+
+  <add sel="/god/products">
+    <!-- Terran Economy -->
+    <product id="ter_metallicmicrolattice" ware="metallicmicrolattice" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="7" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="terran" relation="self" comparison="ge">
+        <!--<region ware="helium" max="150000" />
+        <region ware="ore" max="150000" />-->
+      </location>
+      <module>
+        <select ware="metallicmicrolattice" race="terran"/>
+      </module>
+    </product>
+
+    <product id="ter_computronicsubstrate" ware="computronicsubstrate" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="8" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="terran" relation="self" comparison="ge">
+        <!--<region ware="hydrogen" max="150000" />
+        <region ware="ore" max="150000" />
+        <region ware="silicon" max="150000" />-->
+      </location>
+      <module>
+        <select ware="computronicsubstrate" race="terran"/>
+      </module>
+    </product>
+
+    <product id="ter_siliconcarbide" ware="siliconcarbide" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="5" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="terran" relation="self" comparison="ge">
+        <!--<region ware="methane" max="150000" />
+        <region ware="silicon" max="150000" />-->
+      </location>
+      <module>
+        <select ware="siliconcarbide" race="terran"/>
+      </module>
+    </product>
+
+    <product id="ter_energycells" ware="energycells" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="64" sector="32" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="terran" relation="self" comparison="ge">
+        <economy max="0.6" maxbound="false" />
+        <sunlight min="0.4" max="7.0" maxbound="false" />
+      </location>
+      <module>
+        <select ware="energycells" race="terran"/>
+      </module>
+    </product>
+
+    <product id="ter_medicalsupplies" ware="medicalsupplies" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="16" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="terran" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+        <!--<region ware="ice" max="150000" />-->
+      </location>
+      <module>
+        <select ware="medicalsupplies" race="terran"/>
+      </module>
+    </product>
+
+    <product id="ter_proteinpaste" ware="proteinpaste" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="4" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="terran" relation="self" comparison="ge">
+        <!--<region ware="ice" max="150000" />
+        <region ware="methane" max="150000" />-->
+      </location>
+      <module>
+        <select ware="proteinpaste" race="terran"/>
+      </module>
+    </product>
+
+    <product id="ter_terranmre" ware="terranmre" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="9" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="terran" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="terranmre" race="terran"/>
+      </module>
+    </product>
+
+    <product id="ter_stimulants" ware="stimulants" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="pioneers" relation="self" comparison="ge">
+        <economy max="0.25" maxbound="false" />
+        <!--<region ware="helium" max="150000" />
+        <region ware="silicon" max="150000" />-->
+      </location>
+      <module>
+        <select ware="stimulants" race="terran"/>
+      </module>
+    </product>
+
+
+    <!-- Segaris Pioneers Economy -->
+    <product id="pio_metallicmicrolattice" ware="metallicmicrolattice" owner="pioneers" type="factory">
+      <quotas>
+        <quota galaxy="3" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="pioneers" relation="self" comparison="ge">
+        <!--<region ware="helium" max="150000" />
+        <region ware="ore" max="150000" />-->
+      </location>
+      <module>
+        <select ware="metallicmicrolattice" race="terran"/>
+      </module>
+    </product>
+
+    <product id="pio_computronicsubstrate" ware="computronicsubstrate" owner="pioneers" type="factory">
+      <quotas>
+        <quota galaxy="3" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="pioneers" relation="self" comparison="ge">
+        <!--<region ware="hydrogen" max="150000" />
+        <region ware="ore" max="150000" />
+        <region ware="silicon" max="150000" />-->
+      </location>
+      <module>
+        <select ware="computronicsubstrate" race="terran"/>
+      </module>
+    </product>
+
+    <product id="pio_siliconcarbide" ware="siliconcarbide" owner="pioneers" type="factory">
+      <quotas>
+        <quota galaxy="5" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="pioneers" relation="self" comparison="ge">
+        <!--<region ware="methane" max="150000" />
+        <region ware="silicon" max="150000" />-->
+      </location>
+      <module>
+        <select ware="siliconcarbide" race="terran"/>
+      </module>
+    </product>
+
+    <product id="pio_energycells" ware="energycells" owner="pioneers" type="factory">
+      <quotas>
+        <quota galaxy="32" sector="24" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="pioneers" relation="self" comparison="ge">
+        <economy max="0.6" maxbound="false" />
+        <sunlight min="0.5" />
+      </location>
+      <module>
+        <select ware="energycells" race="terran"/>
+      </module>
+    </product>
+
+    <product id="pio_medicalsupplies" ware="medicalsupplies" owner="pioneers" type="factory">
+      <quotas>
+        <quota galaxy="11" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="pioneers" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+        <!--<region ware="ice" max="150000" />-->
+      </location>
+      <module>
+        <select ware="medicalsupplies" race="terran"/>
+      </module>
+    </product>
+
+    <product id="pio_proteinpaste" ware="proteinpaste" owner="pioneers" type="factory">
+      <quotas>
+        <quota galaxy="3" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="pioneers" relation="self" comparison="ge">
+        <!--<region ware="ice" max="150000" />
+        <region ware="methane" max="150000" />-->
+      </location>
+      <module>
+        <select ware="proteinpaste" race="terran"/>
+      </module>
+    </product>
+
+    <product id="pio_terranmre" ware="terranmre" owner="pioneers" type="factory">
+      <quotas>
+        <quota galaxy="4" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="pioneers" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="terranmre" race="terran"/>
+      </module>
+    </product>
+
+    <product id="pio_stimulants" ware="stimulants" owner="pioneers" type="factory">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="pioneers" relation="self" comparison="ge">
+        <economy max="0.25" maxbound="false" />
+        <!--<region ware="helium" max="150000" />
+        <region ware="silicon" max="150000" />-->
+      </location>
+      <module>
+        <select ware="stimulants" race="terran"/>
+      </module>
+    </product>
+
+    <!-- Segaris Pioneers stations in Terran space -->
+    <!-- Pluto -->
+    <product id="pio_terranmre_pluto" ware="terranmre" owner="pioneers" type="factory" friendgroup="pio_pluto">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="cluster" macro="cluster_111_macro" faction="terran" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="terranmre" race="terran"/>
+      </module>
+    </product>
+
+    <product id="pio_metallicmicrolattice_pluto" ware="metallicmicrolattice" owner="pioneers" type="factory" friendgroup="pio_pluto">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="cluster" macro="cluster_111_macro" faction="terran" relation="self" comparison="ge">
+        <!--<region ware="helium" max="150000" />
+        <region ware="ore" max="150000" />-->
+      </location>
+      <module>
+        <select ware="metallicmicrolattice" race="terran"/>
+      </module>
+    </product>
+
+    <product id="pio_computronicsubstrate_pluto" ware="computronicsubstrate" owner="pioneers" type="factory" friendgroup="pio_pluto">
+      <quotas>
+        <quota galaxy="3" />
+      </quotas>
+      <location class="cluster" macro="cluster_111_macro" faction="terran" relation="self" comparison="ge">
+        <!--<region ware="hydrogen" max="150000" />
+        <region ware="ore" max="150000" />
+        <region ware="silicon" max="150000" />-->
+      </location>
+      <module>
+        <select ware="computronicsubstrate" race="terran"/>
+      </module>
+    </product>
+
+    <product id="pio_siliconcarbide_pluto" ware="siliconcarbide" owner="pioneers" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="cluster" macro="cluster_111_macro" faction="terran" relation="self" comparison="ge">
+        <!--<region ware="methane" max="150000" />
+        <region ware="silicon" max="150000" />-->
+      </location>
+      <module>
+        <select ware="siliconcarbide" race="terran"/>
+      </module>
+    </product>
+
+    <product id="pio_medicalsupplies_pluto" ware="medicalsupplies" owner="pioneers" type="factory" friendgroup="pio_pluto">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="cluster" macro="cluster_111_macro" faction="terran" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+        <!--<region ware="ice" max="150000" />-->
+      </location>
+      <module>
+        <select ware="medicalsupplies" race="terran"/>
+      </module>
+    </product>
+
+    <!-- Neptune -->
+    <product id="pio_terranmre_neptune" ware="terranmre" owner="pioneers" type="factory" friendgroup="pio_neptune">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="cluster" macro="cluster_110_macro" faction="terran" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="terranmre" race="terran"/>
+      </module>
+    </product>
+
+    <product id="pio_metallicmicrolattice_neptune" ware="metallicmicrolattice" owner="pioneers" type="factory" friendgroup="pio_neptune">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="cluster" macro="cluster_110_macro" faction="terran" relation="self" comparison="ge">
+        <!--<region ware="helium" max="150000" />
+        <region ware="ore" max="150000" />-->
+      </location>
+      <module>
+        <select ware="metallicmicrolattice" race="terran"/>
+      </module>
+    </product>
+
+    <product id="pio_computronicsubstrate_neptune" ware="computronicsubstrate" owner="pioneers" type="factory" friendgroup="pio_neptune">
+      <quotas>
+        <quota galaxy="3" />
+      </quotas>
+      <location class="cluster" macro="cluster_110_macro" faction="terran" relation="self" comparison="ge">
+        <!--<region ware="hydrogen" max="150000" />
+        <region ware="ore" max="150000" />
+        <region ware="silicon" max="150000" />-->
+      </location>
+      <module>
+        <select ware="computronicsubstrate" race="terran"/>
+      </module>
+    </product>
+
+    <product id="pio_siliconcarbide_neptune" ware="siliconcarbide" owner="pioneers" type="factory" friendgroup="pio_neptune">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="cluster" macro="cluster_110_macro" faction="terran" relation="self" comparison="ge">
+        <!--<region ware="methane" max="150000" />
+        <region ware="silicon" max="150000" />-->
+      </location>
+      <module>
+        <select ware="siliconcarbide" race="terran"/>
+      </module>
+    </product>
+
+    <product id="pio_medicalsupplies_neptune" ware="medicalsupplies" owner="pioneers" type="factory" friendgroup="pio_neptune">
+      <quotas>
+        <quota galaxy="3" />
+      </quotas>
+      <location class="cluster" macro="cluster_110_macro" faction="terran" relation="self" comparison="ge">
+        <!--<region ware="ice" max="150000" />-->
+      </location>
+      <module>
+        <select ware="medicalsupplies" race="terran"/>
+      </module>
+    </product>
+
+    <product id="pio_proteinpaste_neptune" ware="proteinpaste" owner="pioneers" type="factory" friendgroup="pio_neptune">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="cluster" macro="cluster_110_macro" faction="terran" relation="self" comparison="ge">
+        <!--<region ware="ice" max="150000" />
+        <region ware="methane" max="150000" />-->
+      </location>
+      <module>
+        <select ware="proteinpaste" race="terran"/>
+      </module>
+    </product>
+
+    <!-- Segaris Pioneers stations in Oort Cloud -->
+    <product id="pio_computronicsubstrate_oortcloud" ware="computronicsubstrate" owner="pioneers" type="factory" friendgroup="pio_oortcloud">
+      <quotas>
+        <quota galaxy="2" />
+      </quotas>
+      <location class="sector" macro="cluster_116_sector001_macro" relation="self" comparison="ge" />
+      <module>
+        <select ware="computronicsubstrate" race="terran"/>
+      </module>
+    </product>
+
+    <product id="pio_metallicmicrolattice_oortcloud" ware="metallicmicrolattice" owner="pioneers" type="factory" friendgroup="pio_oortcloud">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_116_sector001_macro" relation="self" comparison="ge" />
+      <module>
+        <select ware="metallicmicrolattice" race="terran"/>
+      </module>
+    </product>
+
+    <product id="pio_siliconcarbide_oortcloud" ware="siliconcarbide" owner="pioneers" type="factory" friendgroup="pio_oortcloud">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_116_sector001_macro" relation="self" comparison="ge" />
+      <module>
+        <select ware="siliconcarbide" race="terran"/>
+      </module>
+    </product>
+
+    <!-- Xenon Economy -->
+    <product id="xen_dlc_terran_energycells_cluster_112_sector001" ware="energycells" owner="xenon" type="factory">
+      <quotas>
+        <quota galaxy="4" sector="4" />
+      </quotas>
+      <location class="sector" macro="cluster_112_sector001_macro" faction="xenon" relation="self" comparison="ge">
+        <security min="0.25"/>
+      </location>
+      <module>
+        <select ware="energycells" race="xenon"/>
+      </module>
+    </product>
+
+    <product id="xen_dlc_terran_energycells_cluster_112_sector002" ware="energycells" owner="xenon" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_112_sector002_macro" faction="xenon" relation="self" comparison="ge">
+        <security min="0.25"/>
+      </location>
+      <module>
+        <select ware="energycells" race="xenon"/>
+      </module>
+    </product>
+
+  </add>
+
+  <!-- replace the argon-shipyard (or split, in case of SV) use for scenario1 with a terran-shipyard (god.xml in the base-game adds a station when running module 'x4ep1_gamestart_tutorial1' -->
+  <replace sel="/god/gamestart[@ref='x4ep1_gamestart_tutorial1']/stations/station[@id='shipyard_argon_01' or @id='shipyard_split_01']">
+    <station id="shipyard_terran_01" race="split" owner="terran" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="demo_cluster_40_sector001_macro" matchextension="false" />
+      <position x="76000" y="0" z="62000" pitch="0" roll="0" />
+      <station>
+        <select faction="terran" tags="[shipyard]" />
+        <loadout>
+          <level exact="0.2" />
+        </loadout>
+      </station>
+    </station>
+  </replace>
+  
+</diff>

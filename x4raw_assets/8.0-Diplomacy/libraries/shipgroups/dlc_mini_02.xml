@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<groups>
+  <group name="envoy">
+    <select macro="ship_gen_m_corvette_01_macro"/>
+  </group>
+  <group name="cypher">
+    <select macro="ship_gen_m_corvette_02_macro"/>
+  </group>
+</groups>

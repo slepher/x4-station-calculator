@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+  <add sel="//cue[@name='FactionLogicManagers']/cues">
+    
+    <cue name="SetupPirateDLC" >
+      <actions>
+        <set_value name="md.$FactionData.{faction.loanshark}" exact="table[]" />
+        <set_value name="md.$FactionData.{faction.scavenger}" exact="table[]" />
+      </actions>
+    </cue>
+    
+    <cue name="LoansharkFactionLogic" comment="Vigor Syndicate">
+      <cues>
+        <cue name="LoansharkFactionLogic_Manager" ref="Manager">
+          <param name="Faction" value="faction.loanshark"/>
+          <param name="BaseAggressionLevel" value="moodlevel.high"/>
+          <param name="BaseAvariceLevel" value="moodlevel.low"/>
+          <param name="BaseLawfulness" value="0.1"/>
+          <param name="PreferredHQSpaceMacro" value="macro.cluster_501_sector001_macro"/>
+          <param name="PreferredHQTypes" value="['equipmentdock', 'shipbuilding', 'defensestation', 'any']"/>
+          <param name="SatelliteNetworkGoal" value="10"/>
+          <param name="LasertowerNetworkGoal" value="5"/>
+          <param name="LasertowerGateChance" value="33"/>
+          <param name="MinefieldGoalPerSector" value="3" comment="[MGPS * Sectors, 12].min is the maximum amount of Minefields for this faction"/>
+          <param name="DebugChance" value="0"/>
+          <param name="DebugChance2" value="0"/>
+        </cue>
+      </cues>
+    </cue>
+
+    <cue name="ScavengerFactionLogic" comment="Riptide Rakers">
+      <cues>
+        <cue name="ScavengerFactionLogic_Manager" ref="Manager">
+          <param name="Faction" value="faction.scavenger"/>
+          <param name="BaseAggressionLevel" value="moodlevel.low"/>
+          <param name="BaseAvariceLevel" value="moodlevel.normal"/>
+          <param name="BaseLawfulness" value="0.8"/>
+          <param name="PreferredHQSpaceMacro" value="macro.cluster_500_sector001_macro"/>
+          <param name="PreferredHQTypes" value="['tradestation', 'equipmentdock', 'shipbuilding', 'defensestation', 'any']"/>
+          <param name="SatelliteNetworkGoal" value="2"/>
+          <param name="LasertowerNetworkGoal" value="2"/>
+          <param name="DebugChance" value="0"/>
+          <param name="DebugChance2" value="0"/>
+        </cue>
+      </cues>
+    </cue>
+
+  </add>
+</diff>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+  <add sel="/ships">
+    <ship id="argon_envoy" group="envoy">
+      <category tags="[envoy]" faction="[argon, antigone]" size="ship_m"/>
+      <pilot>
+        <select faction="argon" tags="commander"/>
+      </pilot>
+      <drop ref="ship_medium_luxury"/>
+      <people ref="argon_elite_freighter_crew"/>
+    </ship>
+    <ship id="teladi_envoy" group="envoy">
+      <category tags="[envoy]" faction="[teladi, ministry]" size="ship_m"/>
+      <pilot>
+        <select faction="teladi" tags="commander"/>
+      </pilot>
+      <drop ref="ship_medium_luxury"/>
+      <people ref="teladi_elite_freighter_crew"/>
+    </ship>
+    <ship id="paranid_envoy" group="envoy">
+      <category tags="[envoy]" faction="[paranid, holyorder, trinity, buccaneers]" size="ship_m"/>
+      <pilot>
+        <select faction="paranid" tags="commander"/>
+      </pilot>
+      <drop ref="ship_medium_luxury"/>
+      <people ref="paranid_elite_freighter_crew"/>
+    </ship>
+    <ship id="scaleplate_cypher" group="cypher">
+      <category tags="[cypher]" faction="[scaleplate]" size="ship_m"/>
+      <pilot>
+        <select faction="teladi" tags="commander"/>
+      </pilot>
+      <drop ref="ship_small_pirate"/>
+      <people ref="scaleplate_pirate_crew"/>
+    </ship>
+  </add>
+  <add sel="//ship[@id='split_scout_s']" pos="after" silent="true">
+    <ship id="split_envoy" group="envoy">
+      <category tags="[envoy]" faction="[split, freesplit, court]" size="ship_m"/>
+      <pilot>
+        <select faction="split" tags="commander"/>
+      </pilot>
+      <drop ref="ship_medium_luxury"/>
+      <people ref="split_elite_freighter_crew"/>
+    </ship>
+  </add>
+  <add sel="//ship[@id='terran_scout_s']" pos="after" silent="true">
+    <ship id="terran_envoy" group="envoy">
+      <category tags="[envoy]" faction="[terran, pioneers]" size="ship_m"/>
+      <pilot>
+        <select faction="terran" tags="commander"/>
+      </pilot>
+      <drop ref="ship_medium_luxury"/>
+      <people ref="terran_elite_freighter_crew"/>
+    </ship>
+  </add>
+  <add sel="//ship[@id='boron_scout_s']" pos="after" silent="true">
+    <ship id="boron_envoy" group="envoy">
+      <category tags="[envoy]" faction="[boron]" size="ship_m"/>
+      <pilot>
+        <select faction="boron" tags="commander"/>
+      </pilot>
+      <drop ref="ship_medium_luxury"/>
+      <people ref="boron_elite_freighter_crew"/>
+    </ship>
+  </add>
+  <add sel="//ship[@id='scavenger_smuggler_container_s']" pos="after" silent="true">
+    <ship id="scavenger_envoy" group="envoy">
+      <category tags="[envoy]" faction="[scavenger]" size="ship_m"/>
+      <pilot>
+        <select faction="scavenger" tags="commander"/>
+      </pilot>
+      <drop ref="ship_medium_luxury"/>
+      <people ref="scavenger_elite_freighter_crew"/>
+    </ship>
+  </add>
+</diff>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+  <add sel="//cue[@name='FactionLogicManagers']/cues">
+    
+    <cue name="SetupTerranDLC" >
+      <actions>
+        <set_value name="md.$FactionData.{faction.terran}" exact="table[]" />
+      </actions>
+    </cue>
+    
+    <cue name="TerranFactionLogic" comment="enabled from the start (zyarth)">
+      <cues>
+        <!-- TODO: @Owen: Additional filter in case Saturn doesn't have any suitable stations, to prevent the HQ ending up in Sol (2nd find-HQ-pass selects "anything in the galaxy") -->
+        <cue name="TerranFactionLogic_Manager" ref="Manager">
+          <param name="Faction" value="faction.terran"/>
+          <param name="BaseAggressionLevel" value="moodlevel.normal"/>
+          <param name="BaseAvariceLevel" value="moodlevel.high"/>
+          <param name="BaseLawfulness" value="0.6"/>
+          <param name="ExpeditionEnemies" value="[faction.xenon]"/>
+          <param name="PreferredHQSpaceMacro" value="macro.cluster_108_sector001_macro" comment="Saturn (Sol would lock the promotion ceremony behind the inner/outer-core license)"/>
+          <param name="PreferredHQTypes" value="['equipmentdock', 'shipbuilding', 'defensestation', 'tradestation', 'any']"/>
+          <param name="SatelliteNetworkGoal" value="20"/>
+          <param name="LasertowerNetworkGoal" value="20"/>
+          <param name="MinefieldGoalPerSector" value="1" comment="[MGPS * Sectors, 12].min is the maximum amount of Minefields for this faction"/>
+          <param name="ExcludedSectorMacros" value="[macro.cluster_112_sector001_macro, macro.cluster_112_sector002_macro]"/>
+          <param name="DebugChance" value="0"/>
+          <param name="DebugChance2" value="0"/>
+        </cue>
+      </cues>
+    </cue>
+
+    <cue name="PioneerFactionLogic" comment="enabled from the start (zyarth)">
+      <cues>
+        <cue name="PioneerFactionLogic_Manager" ref="Manager">
+          <param name="Faction" value="faction.pioneers"/>
+          <param name="BaseAggressionLevel" value="moodlevel.normal"/>
+          <param name="BaseAvariceLevel" value="moodlevel.low"/>
+          <param name="BaseLawfulness" value="0.6"/>
+          <param name="PreferredHQSpaceMacro" value="macro.cluster_113_sector001_macro" comment="Segaris"/>
+          <param name="PreferredHQTypes" value="['tradestation', 'equipmentdock', 'shipbuilding', 'defensestation', 'any']"/>
+          <param name="SatelliteNetworkGoal" value="5"/>
+          <param name="LasertowerNetworkGoal" value="7"/>
+          <param name="DebugChance" value="0"/>
+          <param name="DebugChance2" value="0"/>
+        </cue>
+      </cues>
+    </cue>
+
+    <cue name="YakiFactionLogic" comment="enabled from the start (zyarth)">
+      <cues>
+        <cue name="YakiFactionLogic_Manager" ref="Manager">
+          <param name="Faction" value="faction.yaki"/>
+          <param name="BaseAggressionLevel" value="moodlevel.normal"/>
+          <param name="BaseAvariceLevel" value="moodlevel.normal"/>
+          <param name="BaseLawfulness" value="0.0"/>
+          <param name="PreferredHQSpaceMacro" value="macro.cluster_112_sector001_macro" comment="Yaki home"/>
+          <param name="PreferredHQTypes" value="['piratebase', 'any']"/>
+          <param name="MinefieldGoalPerSector" value="6" comment="[MGPS * Sectors, 12].min is the maximum amount of Minefields for this faction"/>
+          <param name="DebugChance" value="0"/>
+          <param name="DebugChance2" value="0"/>
+        </cue>
+      </cues>
+    </cue>
+
+  </add>
+</diff>

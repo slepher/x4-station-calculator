@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<macros>
+  <macro name="SuperHighway01_Cluster606_macro" class="highway">
+    <component ref="standardsechighway" />
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="265861.3" y="0" z="2.067154e+07" tx="-0.01286017" ty="0" tz="-0.9999173" weight="0" inlength="0" outlength="3445540" />
+          <splineposition x="132930.7" y="0" z="1.033577e+07" tx="-0.01286209" ty="0" tz="-0.9999173" weight="1" inlength="3445540" outlength="3445540" />
+          <splineposition x="0" y="0" z="0" tx="-0.01286017" ty="0" tz="-0.9999173" weight="1" inlength="3445540" outlength="3445540" />
+          <splineposition x="-132930.7" y="0" z="-1.033577e+07" tx="-0.01286209" ty="0" tz="-0.9999173" weight="1" inlength="3445540" outlength="3445540" />
+          <splineposition x="-265861.3" y="0" z="-2.067154e+07" tx="-0.01286017" ty="0" tz="-0.9999173" weight="0" inlength="3445540" outlength="0" />
+          <size r="1000" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+    </properties>
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="265861.3" y="0" z="2.067154e+07" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-265861.3" y="0" z="-2.067154e+07" />
+        </offset>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="SuperHighway02_Cluster606_macro" class="highway">
+    <component ref="standardsechighway" />
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-264516.2" y="0" z="-2.067154e+07" tx="0.01279511" ty="0" tz="0.9999182" weight="0" inlength="0" outlength="3445540" />
+          <splineposition x="-132258.1" y="0" z="-1.033577e+07" tx="0.01280108" ty="0" tz="0.999918" weight="1" inlength="3445540" outlength="3445540" />
+          <splineposition x="0" y="0" z="0" tx="0.01279511" ty="0" tz="0.9999182" weight="1" inlength="3445540" outlength="3445540" />
+          <splineposition x="132258.1" y="0" z="1.033577e+07" tx="0.01280108" ty="0" tz="0.999918" weight="1" inlength="3445540" outlength="3445540" />
+          <splineposition x="264516.2" y="0" z="2.067154e+07" tx="0.01279511" ty="0" tz="0.9999182" weight="0" inlength="3445540" outlength="0" />
+          <size r="1000" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+    </properties>
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-264516.2" y="0" z="-2.067154e+07" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="264516.2" y="0" z="2.067154e+07" />
+        </offset>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="SuperHighway04_Cluster606_macro" class="highway">
+    <component ref="standardsechighway" />
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="2.9667e+007" y="0.0" z="1.6575e+007" tx="-0.993223" ty="0.0" tz="-0.116227" inlength="0.0" outlength="4.97824e+006" /> 
+          <splineposition x="1.48335e+007" y="0.0" z="1.15634e+007" tx="-0.872656" ty="0.0" tz="-0.488336" inlength="5.66388e+006" outlength="5.66388e+006" /> 
+          <splineposition x="0.0" y="0.0" z="0.0" tx="-0.788258" ty="0.0" tz="-0.615344" inlength="6.26936e+006" outlength="6.26936e+006" /> 
+          <splineposition x="-1.48335e+007" y="0.0" z="-1.15634e+007" tx="-0.788616" ty="0.0" tz="-0.614886" inlength="6.26936e+006" outlength="6.26936e+006" /> 
+          <splineposition x="-2.9667e+007" y="0.0" z="-2.31268e+007" tx="-0.788676" ty="0.0" tz="-0.614809" inlength="6.26936e+006" outlength="0.0" /> 
+          <size r="1000" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+    </properties>
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="2.966698e+07" y="0" z="2.312675e+07" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="-2.966698e+07" y="0" z="-2.312675e+07" />
+        </offset>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="SuperHighway03_Cluster606_macro" class="highway">
+    <component ref="standardsechighway" />
+    <properties>
+      <boundaries>
+        <boundary class="splinetube">
+          <splineposition x="-2.9667e+007" y="0.0" z="-2.31247e+007" tx="0.788702" ty="0.0" tz="0.614776" inlength="0.0" outlength="6.26916e+006" />
+          <splineposition x="-1.48335e+007" y="0.0" z="-1.15624e+007" tx="0.788616" ty="0.0" tz="0.614886" inlength="6.26916e+006" outlength="6.26916e+006" />
+          <splineposition x="0.0" y="0.0" z="0.0" tx="0.788284" ty="0.0" tz="0.615311" inlength="6.26916e+006" outlength="6.26916e+006" />
+          <splineposition x="1.48335e+007" y="0.0" z="1.15624e+007" tx="0.872656" ty="0.0" tz="0.488336" inlength="5.66371e+006" outlength="5.66371e+006" />
+          <splineposition x="2.9667e+007" y="0.0" z="1.6573e+007" tx="0.99323" ty="0.0" tz="0.116161" inlength="4.9782e+006" outlength="0.0" />
+          <size r="1000" />
+        </boundary>
+      </boundaries>
+      <controls>
+        <linear>
+          <time />
+        </linear>
+        <angular>
+          <roll />
+        </angular>
+      </controls>
+    </properties>
+    <connections>
+      <connection ref="entrypoint">
+        <offset>
+          <position x="-2.966698e+07" y="0" z="-2.312475e+07" />
+        </offset>
+      </connection>
+      <connection ref="exitpoint">
+        <offset>
+          <position x="2.966698e+07" y="0" z="2.312474e+07" />
+        </offset>
+      </connection>
+    </connections>
+  </macro>
+</macros>

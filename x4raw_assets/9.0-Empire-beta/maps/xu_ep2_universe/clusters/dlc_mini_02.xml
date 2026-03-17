@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<macros>
+  <macro name="Cluster_740_macro" class="cluster">
+    <component ref="standardcluster" />
+    <connections>
+      <connection name="Cluster_740_Sector001_connection" ref="sectors">
+        <macro ref="Cluster_740_Sector001_macro" connection="cluster" />
+      </connection>
+      <connection name="C740S01_Region01_connection" ref="regions">
+        <offset>
+          <position x="0" y="-20000" z="0" />
+        </offset>
+        <macro name="region01_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_740_sector_001_nebula_1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C740S01_Region02_connection" ref="regions">
+        <offset>
+          <position x="0" y="0" z="0" />
+        </offset>
+        <macro name="region02_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_740_sector_001_asteroid_1" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C740S01_Region03_connection" ref="regions">
+        <offset>
+          <position x="-185000" y="-20000" z="130000" />
+          <rotation yaw="-170"/>
+        </offset>
+        <macro name="region03_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="region_cluster_740_sector_001_asteroid_2" />
+          </properties>
+        </macro>
+      </connection>
+      <connection name="C40S01_AudioRegion01_connection" ref="regions">
+        <offset>
+          <position x="0" y="0" z="0" />
+        </offset>
+        <macro name="audioregion01_macro">
+          <component connection="cluster" ref="standardregion" />
+          <properties>
+            <region ref="audioregion_cluster_740_sector_001" />
+          </properties>
+        </macro>
+      </connection>
+      <connection ref="content">
+        <macro>
+          <component ref="cluster_740" connection="space" />
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+</macros>

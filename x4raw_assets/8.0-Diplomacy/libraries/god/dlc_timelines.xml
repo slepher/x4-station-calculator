@@ -1,0 +1,1125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+  <!-- New Clusters -->
+  <add sel="/god/objects">
+    <object id="khaak_wreck_cluster_704">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_704_sector001_macro" />
+      <position x="36827" y="-804" z="-58952" pitch="-33" yaw="49" roll="4" safepos="false" />
+      <object macro="landmarks_kha_xl_battleship_01_macro" />
+    </object>
+  </add>
+
+  <add sel="/god/products">
+    <product id="arg_advancedelectronics_new" ware="advancedelectronics" owner="argon" type="factory" startactive="false">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_704_sector001_macro" faction="[argon]" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="advancedelectronics" race="argon"/>
+      </module>
+    </product>
+
+    <product id="arg_refinedmetals_new" ware="refinedmetals" owner="argon" type="factory" startactive="false">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_704_sector001_macro" faction="[argon]" relation="self" comparison="ge">
+        <region ware="ore" max="100000" />
+      </location>
+      <module>
+        <select ware="refinedmetals" race="argon"/>
+      </module>
+    </product>
+
+    <product id="arg_turretcomponents_new" ware="turretcomponents" owner="argon" type="factory" startactive="false">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_704_sector001_macro" faction="[argon]" relation="self" comparison="ge">
+        <economy max="0.75" maxbound="false" />
+      </location>
+      <module>
+        <select ware="turretcomponents" race="argon"/>
+      </module>
+    </product>
+
+    <product id="arg_water_new" ware="water" owner="argon" type="factory" startactive="false">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_704_sector001_macro" faction="[argon]" relation="self" comparison="ge">
+        <region ware="ice" max="100000" />
+      </location>
+      <module>
+        <select ware="water" race="argon"/>
+      </module>
+    </product>
+  </add>
+
+  <add sel="/god/stations">
+    <!-- Mitsuno's Revelation -->
+    <station id="kao_tradestation_cluster_701" race="argon" owner="kaori" type="tradingstation" startactive="false">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_701_sector001_macro" />
+      <position x="50000" y="0" z="-5000" pitch="0" yaw="20" roll="0" />
+      <station constructionplan="kao_tradestation_lighthouse">
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="kao_energy_array" race="teladi" owner="kaori" type="factory" startactive="false">
+      <quotas>
+        <quota galaxy="1" zone="1"/>
+      </quotas>
+      <location class="sector" macro="cluster_701_sector001_macro" />
+      <position x="-70000" y="0" z="-50000" pitch="0" yaw="305" roll="0" />
+      <station constructionplan="kao_energy_array" />
+    </station>
+
+    <!-- Mitsuno's Defiance -->
+    <station id="kao_wharf_cluster_702" race="argon" owner="kaori" type="factory" startactive="false">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_702_sector001_macro" />
+      <position x="0" y="0" z="0" pitch="0" yaw="0" roll="0" />
+      <station constructionplan="kao_wharf">
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="kao_hydro_processing_plant" race="argon" owner="kaori" type="factory" startactive="false">
+      <quotas>
+        <quota galaxy="1" zone="1"/>
+      </quotas>
+      <location class="sector" macro="cluster_702_sector001_macro" />
+      <position x="-45000" y="0" z="-100000" pitch="0" yaw="35" roll="0" />
+      <station constructionplan="kao_hydro_processing_plant" />
+    </station>
+
+    <station id="kao_compound_refinery" race="teladi" owner="kaori" type="factory" startactive="false">
+      <quotas>
+        <quota galaxy="1" zone="1"/>
+      </quotas>
+      <location class="sector" macro="cluster_702_sector001_macro" />
+      <position x="-60000" y="0" z="42000" pitch="0" yaw="165" roll="0" />
+      <station constructionplan="kao_compound_refinery" />
+    </station>
+
+
+    <!-- Mitsuno's Sacrifice -->
+    <station id="kao_tradestation_cluster_703" race="argon" owner="kaori" type="tradingstation" startactive="false">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_703_sector001_macro" />
+      <position x="60000" y="0" z="90000" pitch="0" yaw="0" roll="0" />
+      <station constructionplan="kao_tradestation_hq">
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="kao_shipyard_cluster_703" race="teladi" owner="kaori" type="factory" startactive="false">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_703_sector001_macro" />
+      <position x="-60000" y="0" z="-42000" pitch="0" yaw="40" roll="0" />
+      <station constructionplan="kao_shipyard">
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="kao_advanced_tech_complex" race="paranid" owner="kaori" type="factory" startactive="false">
+      <quotas>
+        <quota galaxy="1" zone="1"/>
+      </quotas>
+      <location class="sector" macro="cluster_703_sector001_macro" />
+      <position x="85000" y="0" z="-6000" pitch="0" yaw="0" roll="0" />
+      <station constructionplan="kao_advanced_tech_complex" />
+    </station>
+
+    <station id="kao_produce_facility" race="paranid" owner="kaori" type="factory" startactive="false">
+      <quotas>
+        <quota galaxy="1" zone="1"/>
+      </quotas>
+      <location class="sector" macro="cluster_703_sector001_macro" />
+      <position x="-60000" y="0" z="55000" pitch="0" yaw="0" roll="0" />
+      <station constructionplan="kao_produce_facility" />
+    </station>
+
+    <!-- President's End -->
+    <station id="arg_tradestation_cluster_704" race="argon" owner="argon" type="tradingstation" startactive="false">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_704_sector001_macro" />
+      <position x="37350" y="0" z="-59200" pitch="0" yaw="330" roll="0" safepos="false" />
+      <station>
+        <select faction="argon" tags="[tradestation_memorial]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="arg_defence_cluster_704_sector001_01" race="argon" owner="argon" type="factory" startactive="false">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_704_sector001_macro" />
+      <position x="-125000" y="0" z="66500" pitch="0" yaw="0" roll="0" />
+      <station>
+        <select faction="argon" tags="[defence]" />
+      </station>
+    </station>
+
+    <!-- Nopileos' Memorial -->
+    <station id="sca_piratestation_cluster_705" race="teladi" owner="scaleplate" type="piratebase" startactive="false">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_705_sector001_macro" solitary="true"/>
+      <position x="105000" y="-3000" z="25000" pitch="0" yaw="35" roll="0" />
+      <station constructionplan="sca_piratestation_cluster_705">
+        <loadout>
+          <level exact="0.7" />
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Matrix #101 -->
+    <station id="xen_defence_cluster_708_sector001_01" race="xenon" owner="xenon" type="defence" startactive="false">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_708_sector001_macro" />
+      <position x="-134000" y="0" z="14000" pitch="0" roll="0" />
+      <station>
+        <select faction="xenon" tags="[defence]" />
+        <loadout>
+          <level exact="1.0" />
+          <variation exact="0"/>
+        </loadout>
+      </station>
+    </station>
+  </add>
+
+  <!-- Scenarios -->
+  <add sel="/god">
+    <gamestart ref="scenario_tharkas_cascade">
+      <ships>
+        <ship id="tharkas_ark" owner="holyorderfanatic">
+          <quotas>
+            <quota galaxy="1" zone="1"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_tharkas_cascade_cluster_001_sector_001_macro"  matchextension="false">
+            <region allowhazardous="true"/>
+          </location>
+          <position x="72038.50" y="0" z="141965.344" pitch="0" roll="0" yaw="180" safepos="false"/>
+          <ship macro="ship_spl_xl_ark_01_a_macro">
+            <pilot>
+              <select race="split" />
+            </pilot>
+            <paint ware="ware.paintmod_0090"/>
+            <people>
+              <fillpercent exact="70"/>
+              <person role="service" weight="12">
+                <select race="split" tags="[service, rookie]"/>
+              </person>
+              <person role="service" weight="41">
+                <select race="split" tags="[service, regular]"/>
+              </person>
+              <person role="service" weight="16">
+                <select race="split" tags="[service, veteran]"/>
+              </person>
+              <person role="service" weight="11">
+                <select race="split" tags="[service, elite]"/>
+              </person>
+              <person role="marine" weight="18">
+                <select race="split" tags="[marine, rookie]"/>
+              </person>
+              <person role="marine" weight="29">
+                <select race="split" tags="[marine, regular]"/>
+              </person>
+              <person role="marine" weight="11">
+                <select race="split" tags="[marine, veteran]"/>
+              </person>
+              <person role="passenger" weight="2">
+                <select race="split" tags="passenger"/>
+              </person>
+            </people>
+            <loadout ref="scenario_ark"/>
+          </ship>
+        </ship>
+      </ships>
+    </gamestart>
+
+    <gamestart ref="scenario_seek_and_destroy">
+      <objects>
+        <object id="monument_paranid">
+          <quotas>
+            <quota galaxy="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_seek_and_destroy_c11_sector_01_macro"  matchextension="false"/>
+          <position x="92024.027" y="-1532.621" z="13449.546" pitch="0" roll="0" yaw="90"/>
+          <object macro="landmarks_par_monument_01_macro" />
+        </object>
+      </objects>
+      <stations>
+        <station id="scenario_seek_and_destroy_factory" race="paranid" owner="holyorder" type="factory">
+          <quotas>
+            <quota galaxy="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_seek_and_destroy_c11_sector_01_macro"  matchextension="false"/>
+          <position x="-26112.1640625" y="500" z="-7436.2104492188" pitch="0" roll="0" yaw="135" />
+          <station constructionplan="'scenario_seek_and_destroy_hol_weaponcomponents'">
+            <loadout>
+              <level exact="0"/>
+            </loadout>
+          </station>
+        </station>
+      </stations>
+    </gamestart>
+
+     <gamestart ref="scenario_mining_5">
+      <ships>
+        <!--<ship id="scenario_mining_5_mining_base_ship_cthonios" owner="civilian">
+          <quotas>
+            <quota galaxy="1" zone="1"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_mining_5_cluster_001_sector_001_macro" matchextension="false">
+            <region allowhazardous="true"/>
+          </location>
+          <position x="145000" y="-5000" z="45000" pitch="0" roll="0" yaw="-20" safepos="false"/>
+          <ship macro="ship_par_l_miner_solid_02_a_macro">
+            <owner overridenpc="true"/>
+            <pilot>
+              <select faction="faction.paranid" tags="tag.fighterpilot"/>
+            </pilot>
+            <people ref="paranid_elite_freighter_crew"/>
+            <loadout ref="scenario_mining_cthonios"/>
+          </ship>
+        </ship>-->
+      </ships>
+      <stations>
+      </stations>
+    </gamestart>
+
+    <gamestart ref="scenario_mining_7">
+      <ships>
+        <ship id="scenario_mining_7_mining_base_ship_magnetar" owner="player">
+          <quotas>
+            <quota galaxy="1" zone="1"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_mining_7_cluster_001_sector_001_macro" matchextension="false">
+            <region allowhazardous="true"/>
+          </location>
+          <position x="-70400" y="0" z="-25000" pitch="0" roll="0" yaw="-107" safepos="false"/>
+          <ship macro="ship_arg_l_miner_solid_01_a_macro">
+            <owner overridenpc="true"/>
+            <pilot>
+              <select faction="faction.argon" tags="tag.scenario_mining_pilot"/>
+            </pilot>
+            <people ref="scenario_mining_argon_crew"/>
+            <loadout ref="scenario_mining_magnetar"/>
+          </ship>
+        </ship>
+      </ships>
+      <stations>
+        <station id="scenario_mining_7_funanori_station" race="argon" owner="argon" type="tradingstation">
+          <quotas>
+            <quota galaxy="1" zone="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_mining_7_cluster_001_sector_001_macro" matchextension="false"/>
+          <position x="53000" y="-5000" z="-76000" pitch="0" roll="0" yaw="60" />
+          <station constructionplan="'scenario_mining_funanori_complete'"/>
+        </station>
+      </stations>
+    </gamestart>
+
+    <gamestart ref="scenario_fleet_battle_1">
+      <stations>
+        <station id="arg_defence_cluster001_001" race="argon" owner="argon" type="factory">
+          <quotas>
+            <quota galaxy="1" zone="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_1_cluster_001_sector_001_macro" matchextension="false"/>
+          <position x="-12795" y="0" z="90100" pitch="0" roll="0" yaw="0" />
+          <station constructionplan="'scenario_fleet_battle_1_defence_platform'">
+            <loadout>
+              <level exact="0"/>
+              <variation exact="0"/>
+            </loadout>
+          </station>
+        </station>
+
+        <station id="par_defence_cluster001_001" race="paranid" owner="paranid" type="factory">
+          <quotas>
+            <quota galaxy="1" zone="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_1_cluster_001_sector_001_macro" matchextension="false"/>
+          <position x="30000" y="0" z="-60000" pitch="0" roll="0" />
+          <station>
+            <select faction="paranid" tags="[defence]" />
+            <loadout>
+              <level exact="0.1"/>
+              <variation exact="0"/>
+            </loadout>
+          </station>
+        </station>
+
+        <station id="arg_defence_cluster002_001" race="argon" owner="argon" type="factory">
+          <quotas>
+            <quota galaxy="1" zone="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_1_cluster_002_sector_001_macro" matchextension="false"/>
+          <position x="30000" y="0" z="60000" pitch="0" roll="0" />
+          <station>
+            <select faction="argon" tags="[defence]" />
+            <loadout>
+              <level exact="0.1"/>
+              <variation exact="0"/>
+            </loadout>
+          </station>
+        </station>
+      </stations>
+      <ships>
+        <ship id="scenario_fleet_battle_1_playerflagship" owner="player">
+          <quotas>
+            <quota galaxy="1"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_1_cluster_001_sector_001_macro" matchextension="false">
+            <region allowhazardous="true"/>
+          </location>
+          <!-- will be warped to starting position in md.Scenario_Fleet_Battle_1 -->
+          <position x="0" y="0" z="0" pitch="0" roll="0" yaw="180" safepos="false"/>
+          <ship macro="ship_tel_xl_carrier_01_b_macro">
+            <pilot>
+              <select tags="[tag.elitepilot]" faction="[faction.argon, faction.teladi, faction.paranid]"/>
+            </pilot>
+            <people>
+              <fillpercent exact="100"/>
+              <person role="service">
+                <!-- mixed source faction, except Split -->
+                <select tags="[tag.service, tag.elite]" faction="[faction.argon, faction.teladi, faction.paranid]"/>
+              </person>
+            </people>
+            <loadout ref="timelines_scenario_fleet_battle_1_player_tel_carrier"/>
+          </ship>
+        </ship>
+        <ship id="scenario_fleet_battle_1_playerdestroyer_1" owner="player">
+          <quotas>
+            <quota galaxy="1"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_1_cluster_001_sector_001_macro" matchextension="false">
+            <region allowhazardous="true"/>
+          </location>
+          <!-- will be warped to starting position in md.Scenario_Fleet_Battle_1 -->
+          <position x="0" y="0" z="0" pitch="0" roll="0" yaw="180" safepos="false"/>
+          <ship macro="ship_tel_l_destroyer_02_a_macro">
+            <pilot>
+              <select tags="[tag.elitepilot]" faction="[faction.argon, faction.teladi, faction.paranid]"/>
+            </pilot>
+            <people>
+              <fillpercent exact="100"/>
+              <person role="service">
+                <!-- mixed source faction, except Split -->
+                <select tags="[tag.service, tag.elite]" faction="[faction.argon, faction.teladi, faction.paranid]"/>
+              </person>
+            </people>
+            <loadout ref="timelines_scenario_fleet_battle_1_player_tel_destroyer"/>
+            <equipmentmods>
+              <weapon ware="mod_weapon_damage_fleet_battle_1" macro="weapon_tel_l_destroyer_01_mk1_macro"/>
+              <weapon ware="mod_weapon_damage_fleet_battle_1" macro="weapon_tel_l_destroyer_01_mk1_macro"/>
+              <shield ware="mod_shield_capacity_02_mk3"/>
+            </equipmentmods>
+          </ship>
+        </ship>
+        <ship id="scenario_fleet_battle_1_playerdestroyer_2" owner="player">
+          <quotas>
+            <quota galaxy="1"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_1_cluster_001_sector_001_macro" matchextension="false">
+            <region allowhazardous="true"/>
+          </location>
+          <!-- will be warped to starting position in md.Scenario_Fleet_Battle_1 -->
+          <position x="0" y="0" z="0" pitch="0" roll="0" yaw="180" safepos="false"/>
+          <ship macro="ship_tel_l_destroyer_02_a_macro">
+            <pilot>
+              <select tags="[tag.elitepilot]" faction="[faction.argon, faction.teladi, faction.paranid]"/>
+            </pilot>
+            <people>
+              <fillpercent exact="100"/>
+              <person role="service">
+                <!-- mixed source faction, except Split -->
+                <select tags="[tag.service, tag.elite]" faction="[faction.argon, faction.teladi, faction.paranid]"/>
+              </person>
+            </people>
+            <loadout ref="timelines_scenario_fleet_battle_1_player_tel_destroyer"/>
+            <equipmentmods>
+              <weapon ware="mod_weapon_damage_fleet_battle_1" macro="weapon_tel_l_destroyer_01_mk1_macro"/>
+              <weapon ware="mod_weapon_damage_fleet_battle_1" macro="weapon_tel_l_destroyer_01_mk1_macro"/>
+              <shield ware="mod_shield_capacity_02_mk3"/>
+            </equipmentmods>
+          </ship>
+        </ship>
+      </ships>
+    </gamestart>
+
+    <gamestart ref="scenario_fleet_battle_2">
+      <stations>
+        <station id="par_defence_scenario_fleet_battle_2_cluster002_001" race="paranid" owner="paranid" type="factory">
+          <quotas>
+            <quota galaxy="1" zone="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_2_cluster_002_sector_001_macro" matchextension="false"/>
+          <position x="145000" y="0" z="120000" pitch="0" roll="0" />
+          <station>
+            <select faction="paranid" tags="[defence]" />
+            <loadout>
+              <level exact="1.0" />
+            </loadout>
+          </station>
+        </station>
+        <station id="par_defence_scenario_fleet_battle_2_cluster002_002" race="paranid" owner="paranid" type="factory">
+          <quotas>
+            <quota galaxy="1" zone="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_2_cluster_002_sector_001_macro" matchextension="false"/>
+          <position x="7500" y="0" z="133600" pitch="0" roll="0" />
+          <station>
+            <select faction="paranid" tags="[defence]" />
+            <loadout>
+              <level exact="1.0" />
+            </loadout>
+          </station>
+        </station>
+        <station id="par_palace_scenario_fleet_battle_2_cluster002_001" race="paranid" owner="paranid" type="tradingstation">
+          <quotas>
+            <quota galaxy="1" zone="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_2_cluster_002_sector_001_macro" matchextension="false"/>
+          <position x="38300" y="0" z="39000" pitch="0" yaw="210" roll="0" />
+          <station>
+            <select faction="paranid" tags="[paranid_palace]" />
+            <loadout>
+              <level exact="0.75" />
+            </loadout>
+          </station>
+        </station>
+        <station id="par_mining_outpost_cluster001_001" race="paranid" owner="paranid" type="factory">
+          <quotas>
+            <quota galaxy="1" zone="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_2_cluster_001_sector_001_macro" matchextension="false"/>
+          <position x="-121800" y="0" z="-80000" pitch="0" yaw="0" roll="0" />
+          <station constructionplan="'scenario_fleet_battle_2_outpost'">
+            <loadout>
+              <level exact="0.5" />
+            </loadout>
+          </station>
+        </station>
+        <station id="par_refinery_cluster001_001" race="paranid" owner="paranid" type="factory">
+          <quotas>
+            <quota galaxy="1" zone="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_2_cluster_001_sector_001_macro" matchextension="false"/>
+          <position x="-9000" y="0" z="20000" pitch="0" yaw="0" roll="0" />
+          <station constructionplan="'scenario_fleet_battle_2_refinery'">
+            <loadout>
+              <level exact="0.5"/>
+            </loadout>
+          </station>
+        </station>
+      </stations>
+      <products>
+        <product id="par_advancedcomposites" ware="advancedcomposites" owner="paranid" type="factory">
+          <quotas>
+            <quota sector="1" galaxy="1"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_2_cluster_002_sector_001_macro" faction="[paranid]" relation="self" comparison="ge" matchextension="false"/>
+          <module>
+            <select ware="advancedcomposites" race="paranid"/>
+          </module>
+        </product>
+        <product id="par_energycells" ware="energycells" owner="paranid" type="factory">
+          <quotas>
+            <quota sector="2" galaxy="2"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_2_cluster_002_sector_001_macro" faction="[paranid]" relation="self" comparison="ge" matchextension="false"/>
+          <module>
+            <select ware="energycells" race="paranid"/>
+          </module>
+        </product>
+        <product id="par_graphene" ware="graphene" owner="paranid" type="factory">
+          <quotas>
+            <quota sector="1" galaxy="1"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_2_cluster_002_sector_001_macro" faction="[paranid]" relation="self" comparison="ge" matchextension="false"/>
+          <module>
+            <select ware="graphene" race="paranid"/>
+          </module>
+        </product>
+        <product id="par_majasnails" ware="majasnails" owner="paranid" type="factory">
+          <quotas>
+            <quota sector="1" galaxy="1"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_2_cluster_002_sector_001_macro" faction="[paranid]" relation="self" comparison="ge" matchextension="false"/>
+          <module>
+            <select ware="majasnails" race="paranid"/>
+          </module>
+        </product>
+        <product id="par_medicalsupplies" ware="medicalsupplies" owner="paranid" type="factory">
+          <quotas>
+            <quota sector="1" galaxy="1"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_2_cluster_002_sector_001_macro" faction="[paranid]" relation="self" comparison="ge" matchextension="false"/>
+          <module>
+            <select ware="medicalsupplies" race="paranid"/>
+          </module>
+        </product>
+        <product id="par_refinedmetals" ware="refinedmetals" owner="paranid" type="factory">
+          <quotas>
+            <quota sector="2" galaxy="2"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_2_cluster_002_sector_001_macro" faction="[paranid]" relation="self" comparison="ge" matchextension="false"/>
+          <module>
+            <select ware="refinedmetals" race="paranid"/>
+          </module>
+        </product>
+        <product id="par_siliconwafers" ware="siliconwafers" owner="paranid" type="factory">
+          <quotas>
+            <quota sector="1" galaxy="1"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_2_cluster_002_sector_001_macro" faction="[paranid]" relation="self" comparison="ge" matchextension="false"/>
+          <module>
+            <select ware="siliconwafers" race="paranid"/>
+          </module>
+        </product>
+      </products>
+      <ships>
+        <ship id="scenario_fleet_battle_2_carrier" owner="paranid">
+          <quotas>
+            <quota galaxy="1" zone="1"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_2_cluster_001_sector_001_macro" matchextension="false">
+            <region allowhazardous="true"/>
+          </location>
+          <position x="-125000" y="0" z="-125000" pitch="0" roll="0" yaw="0" safepos="false"/>
+          <ship macro="ship_par_xl_carrier_02_a_macro">
+            <pilot>
+              <select race="paranid" />
+            </pilot>
+            <loadout ref="timelines_scenario_fleet_battle_2_par_carrier"/>
+          </ship>
+        </ship>
+      </ships>
+    </gamestart>
+
+    <gamestart ref="scenario_fleet_battle_3">
+      <stations>
+        <station id="par_mining_outpost_cluster001_001" race="paranid" owner="paranid" type="factory">
+          <quotas>
+            <quota galaxy="1" zone="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_3_cluster_001_sector_001_macro" matchextension="false"/>
+          <position x="-121800" y="0" z="-80000" pitch="0" yaw="0" roll="0" />
+          <station constructionplan="'scenario_fleet_battle_2_outpost'">
+            <loadout>
+              <level exact="0.5" />
+            </loadout>
+          </station>
+        </station>
+        <station id="par_refinery_cluster001_001" race="paranid" owner="paranid" type="factory">
+          <quotas>
+            <quota galaxy="1" zone="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_3_cluster_001_sector_001_macro" matchextension="false"/>
+          <position x="-9000" y="0" z="20000" pitch="0" yaw="0" roll="0" />
+          <station constructionplan="'scenario_fleet_battle_2_refinery'">
+            <loadout>
+              <level exact="0.5"/>
+            </loadout>
+          </station>
+        </station>
+      </stations>
+      <ships>
+        <ship id="scenario_fleet_battle_3_cpu" owner="xenon">
+          <quotas>
+            <quota galaxy="1" zone="1"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_fleet_battle_3_cluster_001_sector_001_macro" matchextension="false">
+            <region allowhazardous="true"/>
+          </location>
+          <position x="150000" y="0" z="0" pitch="0" roll="0" yaw="235" safepos="false"/>
+          <ship macro="ship_tfm_xl_carrier_02_b_macro">
+            <pilot>
+              <select race="xenon" />
+            </pilot>
+            <loadout ref="default"/>
+          </ship>
+        </ship>
+      </ships>
+    </gamestart>
+
+    <gamestart ref="scenario_weaken_fleet">
+      <stations>
+        <station id="hol_defence_scenario_weaken_fleet_001" race="paranid" owner="holyorder" type="factory">
+          <quotas>
+            <quota galaxy="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_weaken_fleet_cluster_001_sector_001_macro" matchextension="false"/>
+          <position x="75000" y="0" z="-140000" pitch="0" roll="0" yaw="0" safepos="false" />
+          <station>
+            <select faction="holyorder" tags="[defence]" />
+            <loadout>
+              <level exact="0.1"/>
+              <variation exact="0"/>
+            </loadout>
+          </station>
+        </station>
+      </stations>
+    </gamestart>
+
+    <gamestart ref="scenario_weaken_station">
+      <stations>
+        <station id="xen_defence_scenario_weaken_station_001" race="xenon" owner="xenon" type="defence">
+          <quotas>
+            <quota galaxy="1"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_weaken_station_cluster_001_sector_001_macro" matchextension="false">
+            <region allowhazardous="true"/>
+          </location>
+          <position x="174000" y="0" z="181000" pitch="0" roll="0" yaw="0" safepos="false"/>
+          <station constructionplan="scenario_weaken_station_defence_platform" >
+            <loadout useplanloadout="true"/>
+          </station>
+        </station>
+      </stations>
+    </gamestart>
+    <!-- Attack on Antigone -->
+    <gamestart ref="scenario_waveattack_antigone">
+      <stations>
+        <station id="scenario_waveattack_antigone_station" race="argon" owner="argon" type="tradingstation">
+          <quotas>
+            <quota galaxy="1" zone="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_waveattack_antigone_cluster_001_sector_001_macro" matchextension="false"/>
+          <position x="-4074" y="2078" z="-87630" pitch="0" roll="0" yaw="60" />
+          <station constructionplan="'arg_tradestation_antigone'"/>
+        </station>
+      </stations>
+    </gamestart>
+
+    <!-- Protect Object -->
+    <gamestart ref="scenario_protect_object">
+      <stations>
+        <station id="usc_defence_scenario_protect_object_station_001" race="argon" owner="argon" type="factory">
+          <quotas>
+            <quota galaxy="1"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_protect_object_cluster_001_sector_001_macro" matchextension="false"/>
+          <position x="-400000" y="0" z="-100000" pitch="0" roll="0" />
+          <station>
+            <select faction="argon" tags="[defence]" />
+          </station>
+        </station>
+      </stations>
+    </gamestart>
+
+    <!-- M0 Boss Battle -->
+    <gamestart ref="scenario_m0_boss_battle">
+      <stations>
+        <station id="xen_shipyard_scenario_m0_boss_battle_cluster_001_001" race="xenon" owner="xenon" type="shipyard">
+          <quotas>
+            <quota galaxy="1" zone="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_m0_bossbattle_cluster_001_sector_001_macro" matchextension="false" />
+          <position x="-60000" y="0" z="-140000" pitch="0" roll="0" />
+          <station>
+            <select faction="xenon" tags="[shipyard]" />
+            <loadout>
+              <level exact="1.0" />
+              <variation exact="0"/>
+            </loadout>
+          </station>
+        </station>
+
+        <station id="xen_wharf_scenario_m0_boss_battle_cluster_001_001" race="xenon" owner="xenon" type="shipyard">
+          <quotas>
+            <quota galaxy="1" zone="1"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_m0_bossbattle_cluster_001_sector_001_macro" matchextension="false"/>
+          <position x="-135000" y="0" z="-50000" pitch="0" roll="0" />
+          <station>
+            <select faction="xenon" tags="[wharf]" />
+            <loadout>
+              <level exact="1.0" />
+              <variation exact="0"/>
+            </loadout>
+          </station>
+        </station>
+
+        <station id="xen_defence_scenario_m0_boss_battle_cluster_001_001" race="xenon" owner="xenon" type="defence">
+          <quotas>
+            <quota galaxy="1"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_m0_bossbattle_cluster_001_sector_001_macro" matchextension="false"/>
+          <position x="100000" y="0" z="130000" pitch="0" roll="0" />
+          <station constructionplan="'xen_defense_xbeyond'">
+            <loadout>
+              <level exact="0.7"/>
+            </loadout>
+          </station>
+        </station>
+
+        <station id="xen_defence_scenario_m0_boss_battle_cluster_002_001" race="xenon" owner="xenon" type="defence">
+          <quotas>
+            <quota galaxy="1"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_m0_bossbattle_cluster_002_sector_001_macro" matchextension="false"/>
+          <position x="11000" y="0" z="-12500" pitch="0" roll="0" />
+          <station constructionplan="'xen_defense_xbeyond'">
+            <loadout>
+              <level exact="0.7"/>
+            </loadout>
+          </station>
+        </station>
+      </stations>
+    </gamestart>
+
+    <!-- scenario_transport_refugees_engineer -->
+    <gamestart ref="scenario_transport_refugees_engineer">
+      <ships>
+        <ship id="scenario_transport_refugees_engineer_rescue_ship" owner="civilian">
+          <quotas>
+            <quota galaxy="1" zone="1"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_transport_refugees_engineer_cluster_001_sector_001_macro" matchextension="false">
+            <region allowhazardous="true"/>
+          </location>
+          <position x="-25656.203125" y="5081.773438" z="-179603.093750" safepos="false"/>
+          <ship macro="ship_arg_m_trans_container_01_a_macro">
+            <pilot macro="character_timelines_transport_refugees_rescue_npc_macro" />
+            <loadout ref="timelines_scenario_transport_refugees_rescue_ship_mercury"/>
+          </ship>
+        </ship>
+      </ships>
+    </gamestart>
+
+    <!-- scenario_transport_refugees_escort -->
+    <gamestart ref="scenario_transport_refugees_escort">
+      <ships>
+        <ship id="scenario_transport_refugees_escort_rescue_ship" owner="player">
+          <quotas>
+            <quota galaxy="1" zone="1"/>
+          </quotas>
+          <location class="sector" macro="timelines_map_transport_refugees_engineer_cluster_001_sector_001_macro" matchextension="false">
+            <region allowhazardous="true"/>
+          </location>
+          <position x="-28421.710938" y="1431.817627" z="-100396.507813" safepos="false"/>
+          <ship macro="ship_arg_m_trans_container_01_a_macro">
+            <pilot macro="character_timelines_transport_refugees_rescue_npc_macro" />
+            <loadout ref="timelines_scenario_transport_refugees_rescue_ship_mercury"/>
+          </ship>
+        </ship>
+      </ships>
+    </gamestart>
+
+    <!-- Dragonfyre -->
+    <gamestart ref="scenario_dragonfyre">
+      <stations>
+        <station id="scenario_dragonfyre_orbital_support" race="argon" owner="argon" type="tradingstation">
+          <quotas>
+            <quota galaxy="1" zone="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_dragonfyre_cluster_001_sector_001_macro" matchextension="false" />
+          <position x="97040" y="0" z="-27267" pitch="0" roll="0" yaw="0" />
+          <station constructionplan="scenario_dragonfyre_support">
+            <loadout>
+              <level exact="0.5" />
+            </loadout>
+          </station>
+        </station>
+        <station id="scenario_dragonfyre_orbital_defence_001" race="argon" owner="argon" type="factory">
+          <quotas>
+            <quota galaxy="1" zone="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_dragonfyre_cluster_001_sector_001_macro" matchextension="false" />
+          <position x="-11732" y="0" z="-19819" pitch="0" roll="0" yaw="165"/>
+          <station constructionplan="scenario_dragonfyre_defence">
+            <loadout>
+              <level exact="0.5" />
+            </loadout>
+          </station>
+        </station>
+        <station id="scenario_dragonfyre_orbital_defence_002" race="argon" owner="argon" type="factory">
+          <quotas>
+            <quota galaxy="1" zone="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_dragonfyre_cluster_001_sector_001_macro" matchextension="false" />
+          <position x="-49224" y="0" z="94106" pitch="0" roll="0" yaw="42"/>
+          <station constructionplan="scenario_dragonfyre_defence">
+            <loadout>
+              <level exact="0.5" />
+            </loadout>
+          </station>
+        </station>
+        <station id="scenario_dragonfyre_orbital_defence_003" race="argon" owner="argon" type="factory">
+          <quotas>
+            <quota galaxy="1" zone="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_dragonfyre_cluster_001_sector_001_macro" matchextension="false" />
+          <position x="-118557" y="0" z="-58369" pitch="0" roll="0" yaw="235"/>
+          <station constructionplan="scenario_dragonfyre_defence">
+            <loadout>
+              <level exact="0.5" />
+            </loadout>
+          </station>
+        </station>
+      </stations>
+    </gamestart>
+
+    <!-- Khaak Boss Battle -->
+    <gamestart ref="scenario_khaak_boss_battle">
+      <stations>
+        <station id="scenario_khaak_battle_shipyard" race="argon" owner="argon" type="factory">
+          <quotas>
+            <quota galaxy="1" zone="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_khaak_boss_battle_cluster_001_sector_001_macro" matchextension="false" />
+          <position x="800" y="0" z="-84300" pitch="0" roll="0" yaw="235"/>
+          <station>
+            <select faction="argon" tags="[shipyard]" />
+            <loadout>
+              <level exact="0.75" />
+            </loadout>
+          </station>
+        </station>
+        <station id="scenario_khaak_battle_wharf" race="argon" owner="argon" type="factory">
+          <quotas>
+            <quota galaxy="1" zone="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_khaak_boss_battle_cluster_001_sector_001_macro" matchextension="false" />
+          <position x="52000" y="0" z="-45000" pitch="0" roll="0" yaw="35"/>
+          <station>
+            <select faction="argon" tags="[wharf]" />
+            <loadout>
+              <level exact="0.75" />
+            </loadout>
+          </station>
+        </station>
+        <station id="scenario_khaak_battle_tradestation" race="argon" owner="argon" type="tradingstation">
+          <quotas>
+            <quota galaxy="1" zone="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_khaak_boss_battle_cluster_001_sector_001_macro" matchextension="false" />
+          <position x="2500" y="0" z="77000" pitch="0" roll="0" yaw="140"/>
+          <station>
+            <select faction="argon" tags="[tradestation]" />
+            <loadout>
+              <level exact="0.75" />
+            </loadout>
+          </station>
+        </station>
+        <station id="scenario_khaak_battle_microchips" race="argon" owner="argon" type="factory">
+          <quotas>
+            <quota galaxy="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_khaak_boss_battle_cluster_001_sector_001_macro" matchextension="false" />
+          <position x="61000" y="12000" z="6000" pitch="0" roll="0"/>
+          <station constructionplan="'scenario_khaak_bossbattle_microchip_factory'">
+            <loadout>
+              <level exact="0.5"/>
+            </loadout>
+          </station>
+        </station>
+        <station id="scenario_khaak_battle_quantumtubes" race="argon" owner="argon" type="factory">
+          <quotas>
+            <quota galaxy="1" />
+          </quotas>
+          <location class="sector" macro="timelines_map_khaak_boss_battle_cluster_001_sector_001_macro" matchextension="false" />
+          <position x="-72000" y="-2500" z="92000" pitch="0" roll="0"/>
+          <station constructionplan="'scenario_khaak_bossbattle_quantumtube_factory'">
+            <loadout>
+              <level exact="0.5"/>
+            </loadout>
+          </station>
+        </station>
+      </stations>
+    </gamestart>
+  </add>
+
+  <add sel="/god/gamestart[@galaxy='timelines_map_mining_1_galaxy_macro']/ships">
+    <!-- Ships -->
+    <ship id="scenario_mining_1_mining_base_ship_cthonios" owner="civilian">
+      <quotas>
+        <quota galaxy="1" zone="1" gamestart="scenario_mining_1"/>
+      </quotas>
+      <location class="sector" macro="timelines_map_mining_1_cluster_001_sector_001_macro" matchextension="false">
+        <region allowhazardous="true"/>
+      </location>
+      <position x="137000" y="0" z="56000" pitch="0" roll="0" yaw="-17" safepos="false"/>
+      <ship macro="ship_par_l_miner_solid_02_a_macro">
+        <owner overridenpc="true"/>
+        <pilot>
+          <select faction="faction.paranid" tags="tag.fighterpilot"/>
+        </pilot>
+        <people ref="paranid_elite_freighter_crew"/>
+        <loadout ref="scenario_mining_cthonios"/>
+      </ship>
+    </ship>
+  </add>
+
+  <add sel="/god/gamestart[@galaxy='timelines_map_mining_1_galaxy_macro']/stations">
+    <!-- Production -->
+    <station id="scenario_mining_1to4_energy_001" race="argon" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="timelines_map_mining_1_cluster_001_sector_001_macro" matchextension="false"/>
+      <position x="-135000" y="0" z="51000" pitch="0" roll="0" yaw="0" />
+      <station constructionplan="'scenario_mining_solar_power_plant'"/>
+    </station>
+    <station id="scenario_mining_1to4_energy_002" race="argon" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="1"/>
+      </quotas>
+      <location class="sector" macro="timelines_map_mining_1_cluster_001_sector_001_macro" matchextension="false"/>
+      <position x="140000" y="0" z="180000" pitch="0" roll="0" yaw="0" />
+      <station constructionplan="'scenario_mining_solar_power_plant'"/>
+    </station>
+    <station id="scenario_mining_1to4_wheat_001" race="argon" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="timelines_map_mining_1_cluster_001_sector_001_macro" matchextension="false"/>
+      <position x="188000" y="0" z="82000" pitch="0" roll="0" yaw="185" />
+      <station constructionplan="'scenario_mining_wheat_farm'"/>
+    </station>
+    <station id="scenario_mining_1to4_wheat_002" race="argon" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="timelines_map_mining_1_cluster_001_sector_001_macro" matchextension="false"/>
+      <position x="190000" y="0" z="-9000" pitch="0" roll="0" yaw="230" />
+      <station constructionplan="'scenario_mining_wheat_farm'"/>
+    </station>
+    <station id="scenario_mining_1to4_flowerfarm_001" race="argon" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="timelines_map_mining_1_cluster_001_sector_001_macro" matchextension="false"/>
+      <position x="173000" y="0" z="-98000" pitch="0" roll="0" yaw="70" />
+      <station constructionplan="'scenario_mining_flower_farm'"/>
+    </station>
+    <!-- Docks -->
+    <station id="scenario_mining_1to4_arg_equipment" race="argon" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="timelines_map_mining_1_cluster_001_sector_001_macro" matchextension="false" />
+      <position  x="-50000" y="0" z="60000" roll="0" pitch="0"/>
+      <station>
+        <select faction="argon" tags="[equipmentdock]" />
+        <loadout>
+          <level exact="1.0" />
+        </loadout>
+      </station>
+    </station>
+    <station id="scenario_mining_1to4_par_equipment" race="paranid" owner="paranid" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="timelines_map_mining_1_cluster_001_sector_001_macro" matchextension="false" />
+      <position  x="2400" y="0" z="-7500" roll="0" pitch="0"/>
+      <station>
+        <select faction="paranid" tags="[equipmentdock]" />
+        <loadout>
+          <level exact="1.0" />
+        </loadout>
+      </station>
+    </station>
+    <station id="scenario_mining_1to4_tel_equipment" race="teladi" owner="teladi" type="factory">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="timelines_map_mining_1_cluster_001_sector_001_macro" matchextension="false" />
+      <position  x="76200" y="0" z="63000" roll="0" pitch="0"/>
+      <station>
+        <select faction="teladi" tags="[equipmentdock]" />
+        <loadout>
+          <level exact="1.0" />
+        </loadout>
+      </station>
+    </station>
+    <!-- Refineries -->
+    <station id="scenario_mining_1to4_ore_refinery_001" race="argon" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="timelines_map_mining_1_cluster_001_sector_001_macro" matchextension="false"/>
+      <position x="-46000" y="0" z="120000" pitch="0" roll="0" yaw="35" />
+      <station constructionplan="'scenario_mining_ore_refinery'"/>
+    </station>
+    <station id="scenario_mining_1to4_ore_refinery_002" race="argon" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="timelines_map_mining_1_cluster_001_sector_001_macro" matchextension="false"/>
+      <position x="39000" y="0" z="-113000" pitch="0" roll="0" yaw="65" />
+      <station constructionplan="'scenario_mining_ore_refinery'"/>
+    </station>
+    <station id="scenario_mining_1to4_silicon_refinery_001" race="argon" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="timelines_map_mining_1_cluster_001_sector_001_macro" matchextension="false"/>
+      <position x="76000" y="0" z="-103000" pitch="0" roll="0" yaw="110" />
+      <station constructionplan="'scenario_mining_silicon_refinery'"/>
+    </station>
+    <!-- Funanori -->
+    <station id="scenario_mining_4_funanori_station" race="argon" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" gamestart="scenario_mining_4" />
+      </quotas>
+      <location class="sector" macro="timelines_map_mining_1_cluster_001_sector_001_macro" matchextension="false"/>
+      <position x="53000" y="-5000" z="-76000" pitch="0" roll="0" yaw="42" />
+      <station constructionplan="'scenario_mining_funanori_early'"/>
+    </station>
+    <station id="scenario_mining_3_funanori_station" race="argon" owner="argon" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" gamestart="scenario_mining_3" />
+      </quotas>
+      <location class="sector" macro="timelines_map_mining_1_cluster_001_sector_001_macro" matchextension="false"/>
+      <position x="53000" y="-5000" z="-76000" pitch="0" roll="0" yaw="42" />
+      <station constructionplan="'scenario_mining_funanori_partial'"/>
+    </station>
+  </add>
+
+  <replace sel="//ship[@id='scenario_fleet_battle_1_playerflagship']/ship/@macro" if="//station[@id='torus_maze']">ship_ter_xl_carrier_01_a_macro</replace>
+  <replace sel="//ship[@id='scenario_fleet_battle_1_playerflagship']/ship/loadout/@ref" if="//station[@id='torus_maze']">timelines_scenario_fleet_battle_1_player_ter_carrier</replace>
+  <replace sel="//ship[@id='scenario_fleet_battle_1_playerdestroyer_1']/ship/@macro" if="//station[@id='torus_maze']">ship_ter_l_destroyer_01_a_macro</replace>
+  <replace sel="//ship[@id='scenario_fleet_battle_1_playerdestroyer_1']/ship/loadout/@ref" if="//station[@id='torus_maze']">timelines_scenario_fleet_battle_1_player_ter_destroyer</replace>
+  <remove sel="//ship[@id='scenario_fleet_battle_1_playerdestroyer_1']/ship/equipmentmods" if="//station[@id='torus_maze']"/>
+  <replace sel="//ship[@id='scenario_fleet_battle_1_playerdestroyer_2']/ship/@macro" if="//station[@id='torus_maze']">ship_ter_l_destroyer_01_a_macro</replace>
+  <replace sel="//ship[@id='scenario_fleet_battle_1_playerdestroyer_2']/ship/loadout/@ref" if="//station[@id='torus_maze']">timelines_scenario_fleet_battle_1_player_ter_destroyer</replace>
+  <remove sel="//ship[@id='scenario_fleet_battle_1_playerdestroyer_2']/ship/equipmentmods" if="//station[@id='torus_maze']"/>
+</diff>

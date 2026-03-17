@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+  <add sel="//cue[@name='FactionLogicManagers']/cues">
+    
+    <cue name="SetupSplitDLC" version="2">
+      <actions>
+        <set_value name="md.$FactionData.{faction.split}" exact="table[]" />
+        <set_value name="md.$FactionData.{faction.freesplit}" exact="table[]" />
+        <set_value name="md.$FactionData.{faction.court}" exact="table[]" />
+      </actions>
+      <patch sinceversion="2">
+        <set_value name="SplitFactionLogic.$PreferredHQSpaceMacro" exact="macro.cluster_405_sector001_macro"/>
+        <set_value name="FreeSplitFactionLogic.$PreferredHQSpaceMacro" exact="macro.cluster_408_sector002_macro"/>
+        <set_value name="CourtFactionLogic.$PreferredHQSpaceMacro" exact="macro.cluster_425_sector001_macro"/>
+      </patch>
+    </cue>
+    
+    <cue name="SplitFactionLogic" comment="enabled from the start (zyarth)">
+      <cues>
+        <cue name="SplitFactionLogic_Manager" ref="Manager">
+          <param name="Faction" value="faction.split"/>
+          <param name="BaseAggressionLevel" value="moodlevel.high"/>
+          <param name="BaseAvariceLevel" value="moodlevel.low"/>
+          <param name="BaseLawfulness" value="0.4"/>
+          <param name="PreferredHQSpaceMacro" value="macro.cluster_405_sector001_macro" comment="Zyarth's Dominion IV"/>
+          <param name="PreferredHQTypes" value="['equipmentdock', 'shipbuilding']"/>
+          <param name="SatelliteNetworkGoal" value="10"/>
+          <param name="LasertowerNetworkGoal" value="5"/>
+          <param name="MinefieldGoalPerSector" value="1" comment="[MGPS * Sectors, 12].min is the maximum amount of Minefields for this faction"/>
+          <param name="DebugChance" value="0"/>
+          <param name="DebugChance2" value="0"/>
+        </cue>
+      </cues>
+    </cue>
+
+    <cue name="FreeSplitFactionLogic" comment="enabled from the start (curbs)">
+      <cues>
+        <cue name="FreeSplitFactionLogic_Manager" ref="Manager">
+          <param name="Faction" value="faction.freesplit"/>
+          <param name="BaseAggressionLevel" value="moodlevel.normal"/>
+          <param name="BaseAvariceLevel" value="moodlevel.low"/>
+          <param name="BaseLawfulness" value="0.6"/>
+          <param name="PreferredHQSpaceMacro" value="macro.cluster_408_sector002_macro" comment="Thuruk's Demise"/>
+          <param name="PreferredHQTypes" value="['equipmentdock', 'shipbuilding']"/>
+          <param name="SatelliteNetworkGoal" value="7"/>
+          <param name="LasertowerNetworkGoal" value="5"/>
+          <param name="MinefieldGoalPerSector" value="1" comment="[MGPS * Sectors, 12].min is the maximum amount of Minefields for this faction"/>
+          <param name="DebugChance" value="0"/>
+          <param name="DebugChance2" value="0"/>
+        </cue>
+      </cues>
+    </cue>
+
+    <cue name="CourtFactionLogic" comment="handles .court (which is either named 'Court of Curbs' or 'Cabal of Curbs'">
+      <conditions>
+        <event_cue_signalled/>
+      </conditions>
+      <cues>
+        <cue name="CourtFactionLogic_Manager" ref="Manager">
+          <param name="Faction" value="faction.court"/>
+          <param name="BaseAggressionLevel" value="moodlevel.normal"/>
+          <param name="BaseAvariceLevel" value="moodlevel.low"/>
+          <param name="BaseLawfulness" value="0.8"/>
+          <param name="PreferredHQSpaceMacro" value="macro.cluster_425_sector001_macro" comment="Heart of Acrimony (the Boneyard)"/>
+          <param name="PreferredHQTypes" value="['defencestation', 'shipbuilding', 'equipmentdock']"/>
+          <param name="SatelliteNetworkGoal" value="7"/>
+          <param name="LasertowerNetworkGoal" value="5"/>
+          <param name="MinefieldGoalPerSector" value="1" comment="[MGPS * Sectors, 12].min is the maximum amount of Minefields for this faction"/>
+          <param name="DebugChance" value="0"/>
+          <param name="DebugChance2" value="0"/>
+        </cue>
+      </cues>
+    </cue>
+
+    <cue name="FallenFamiliesFactionLogic">
+      <cues>
+        <cue name="FallenFamiliesFactionLogic_Manager" ref="Manager">
+          <param name="Faction" value="faction.fallensplit"/>
+          <param name="BaseAggressionLevel" value="moodlevel.high"/>
+          <param name="BaseAvariceLevel" value="moodlevel.normal"/>
+          <param name="BaseLawfulness" value="0.2"/>
+          <param name="SatelliteNetworkGoal" value="2"/>
+          <param name="LasertowerNetworkGoal" value="5"/>
+          <param name="MinefieldGoalPerSector" value="4" comment="[MGPS * Sectors, 12].min is the maximum amount of Minefields for this faction"/>
+          <param name="DebugChance" value="0"/>
+          <param name="DebugChance2" value="0"/>
+        </cue>
+      </cues>
+    </cue>
+    
+  </add>
+</diff>
