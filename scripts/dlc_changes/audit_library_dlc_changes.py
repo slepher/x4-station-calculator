@@ -32,6 +32,22 @@ def normalize_dlc_name(dlc_id: str) -> str:
     return dlc_id[4:] if dlc_id.startswith("ego_") else dlc_id
 
 
+def resolve_distilled_dlc_file(type_dir: Path, dlc_id: str) -> Optional[Path]:
+    primary = type_dir / f"{normalize_dlc_name(dlc_id)}.xml"
+    if primary.exists():
+        return primary
+    # Backward compatibility for older distilled output names (without dlc_ prefix).
+    legacy_name = normalize_dlc_name(dlc_id)
+    if legacy_name.startswith("dlc_"):
+        legacy = type_dir / f"{legacy_name[4:]}.xml"
+        if legacy.exists():
+            return legacy
+    fallback = type_dir / f"{dlc_id}.xml"
+    if fallback.exists():
+        return fallback
+    return None
+
+
 def load_configs() -> Tuple[dict, dict]:
     game_cfg_path = "x4-game.config.json"
     station_cfg_path = "x4-station-calculator.config.json"
@@ -169,12 +185,19 @@ def compare_nodes(before: etree._Element, after: etree._Element, path_prefix: st
     return out
 
 
+def apply_overlay(base_tree: etree._ElementTree, overlay_tree: etree._ElementTree, xml_diff) -> etree._ElementTree:
+    overlay_root = overlay_tree.getroot()
+    if overlay_root.tag == "diff":
+        merged_tree = etree.ElementTree(deepcopy(base_tree.getroot()))
+        xml_diff.Apply_Patch(merged_tree.getroot(), overlay_root)
+        return merged_tree
+    # Non-diff file means overwrite semantics.
+    return etree.ElementTree(deepcopy(overlay_root))
+
+
 def analyze_patch(base_tree: etree._ElementTree, patch_path: Path, xml_diff, parser: etree.XMLParser) -> Dict[str, List[str]]:
     patch_tree = parse_xml(patch_path, parser)
-    patch_root = patch_tree.getroot()
-
-    merged_tree = etree.ElementTree(deepcopy(base_tree.getroot()))
-    xml_diff.Apply_Patch(merged_tree.getroot(), patch_root)
+    merged_tree = apply_overlay(base_tree, patch_tree, xml_diff)
 
     base_records = top_level_record_map(base_tree.getroot())
     merged_records = top_level_record_map(merged_tree.getroot())
@@ -188,15 +211,15 @@ def analyze_patch(base_tree: etree._ElementTree, patch_path: Path, xml_diff, par
 
 
 def run_for_version(version_item: dict, game_cfg: dict, station_cfg: dict, xml_diff):
-    src_root = Path(game_cfg["X4_PATHS"]["SOURCE"]) / version_item["folder_name"]
-    base_lib = src_root / "libraries"
+    distilled_root = Path(station_cfg.get("raw_assets_dir", "./x4raw_assets")) / version_item["folder_name"]
+    base_lib = distilled_root / "libraries"
     if not base_lib.exists():
-        raise FileNotFoundError(f"Missing libraries directory: {base_lib}")
+        raise FileNotFoundError(f"Missing distilled libraries directory: {base_lib}")
 
     dlc_ids = station_cfg.get("dlc_order", [])
     parser = etree.XMLParser(remove_blank_text=True)
 
-    out_root = Path(station_cfg.get("raw_assets_dir", "./x4raw_assets")) / version_item["folder_name"] / "dlc_changes"
+    out_root = distilled_root / "dlc_changes"
     if out_root.exists():
         shutil.rmtree(out_root)
     out_root.mkdir(parents=True, exist_ok=True)
@@ -204,7 +227,9 @@ def run_for_version(version_item: dict, game_cfg: dict, station_cfg: dict, xml_d
     written_files = 0
     written_types = 0
     for file_name in DISTILLED_LIBRARY_FILES:
-        base_xml = base_lib / file_name
+        stem = Path(file_name).stem
+        distilled_type_dir = base_lib / stem
+        base_xml = distilled_type_dir / "base.xml"
         if not base_xml.exists():
             continue
         try:
@@ -212,12 +237,12 @@ def run_for_version(version_item: dict, game_cfg: dict, station_cfg: dict, xml_d
         except Exception:
             continue
 
-        type_name = base_xml.stem
+        type_name = stem
         type_summaries = []
 
         for dlc_id in dlc_ids:
-            patch_path = src_root / "extensions" / dlc_id / "libraries" / base_xml.name
-            if not patch_path.exists():
+            patch_path = resolve_distilled_dlc_file(distilled_type_dir, dlc_id)
+            if patch_path is None:
                 continue
             try:
                 changed = analyze_patch(base_tree, patch_path, xml_diff, parser)
