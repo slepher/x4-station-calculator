@@ -12,6 +12,24 @@ from typing import Dict, List, Optional, Tuple
 from lxml import etree
 
 KEY_ATTRS = ("id", "name", "ref", "macro", "method", "ware", "faction", "group", "class", "type", "race")
+DISTILLED_LIBRARY_FILES = [
+    "wares.xml",
+    "waregroups.xml",
+    "colors.xml",
+    "mapdefaults.xml",
+    "god.xml",
+    "factions.xml",
+    "region_definitions.xml",
+    "regionyields.xml",
+    "regionobjectgroups.xml",
+    "ships.xml",
+    "shipgroups.xml",
+    "loadouts.xml",
+    "defaults.xml",
+]
+
+def normalize_dlc_name(dlc_id: str) -> str:
+    return dlc_id[4:] if dlc_id.startswith("ego_") else dlc_id
 
 
 def load_configs() -> Tuple[dict, dict]:
@@ -185,7 +203,10 @@ def run_for_version(version_item: dict, game_cfg: dict, station_cfg: dict, xml_d
 
     written_files = 0
     written_types = 0
-    for base_xml in sorted(base_lib.glob("*.xml")):
+    for file_name in DISTILLED_LIBRARY_FILES:
+        base_xml = base_lib / file_name
+        if not base_xml.exists():
+            continue
         try:
             base_tree = parse_xml(base_xml, parser)
         except Exception:
@@ -238,7 +259,7 @@ def run_for_version(version_item: dict, game_cfg: dict, station_cfg: dict, xml_d
             ]
 
             payload = {
-                "dlc": dlc_id,
+                "dlc": normalize_dlc_name(dlc_id),
                 "modified_records": len(changed) if "__error__" not in changed else 0,
                 "modified_fields_total": sum(len(v) for v in changed.values()) if "__error__" not in changed else 0,
                 "major_changes": major_changes if "__error__" not in changed else [],

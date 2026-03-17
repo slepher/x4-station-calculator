@@ -106,6 +106,9 @@ def run_distillation_for_version(m_config, v_config, config_dir, xml_diff):
     parser = etree.XMLParser(remove_blank_text=True)
     dlc_order = v_config.get('dlc_order', [])
 
+    def normalize_dlc_name(dlc_id):
+        return dlc_id[4:] if dlc_id.startswith("ego_") else dlc_id
+
     # 辅助函数：计算节点签名（用于去重）
     def node_signature(node):
         # 忽略纯空白 text/tail，避免 <entry></entry> 与 <entry/> 被视为不同。
@@ -317,11 +320,10 @@ def run_distillation_for_version(m_config, v_config, config_dir, xml_diff):
             if not source_path:
                 continue
 
-            dlc_tree, dlc_result = apply_overlay_to_tree(base_tree, source_path)
-            if dlc_tree is not None and dlc_result in ('patched', 'overwritten'):
-                dlc_output_path = os.path.join(slot_dir, f"{dlc_id}.xml")
-                dlc_tree.write(dlc_output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
-                dlc_written += 1
+            # 按需求：目录中保留 DLC 原始文件，不写“打过补丁后的单 DLC 版本”。
+            dlc_output_path = os.path.join(slot_dir, f"{normalize_dlc_name(dlc_id)}.xml")
+            shutil.copy2(source_path, dlc_output_path)
+            dlc_written += 1
 
             final_next_tree, final_result = apply_overlay_to_tree(final_tree, source_path)
             if final_next_tree is not None and final_result in ('patched', 'overwritten'):
