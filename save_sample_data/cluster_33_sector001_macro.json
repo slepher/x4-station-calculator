@@ -1,0 +1,71 @@
+{
+  "sector_id": "cluster_33_sector001_macro",
+  "ware": {
+    "hydrogen": {
+      "medium": {
+        "resources": [
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 64000,
+            "max": 37756,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "falloff": 0.762747
+          },
+          {
+            "x": -64000,
+            "y": 0,
+            "z": 128000,
+            "max": 40651,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "falloff": 0.821232
+          },
+          {
+            "x": -128000,
+            "y": 0,
+            "z": 128000,
+            "max": 40651,
+            "time": 36000,
+            "resourcedensity": 49500,
+            "falloff": 0.821232
+          }
+        ]
+      }
+    },
+    "rawscrap": {
+      "medium": {
+        "resources": [
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 64000,
+            "max": 883,
+            "time": 144000,
+            "resourcedensity": 1.5,
+            "falloff": 0.002246
+          },
+          {
+            "x": -64000,
+            "y": 0,
+            "z": 128000,
+            "max": 34810,
+            "time": 144000,
+            "resourcedensity": 1.5,
+            "falloff": 0.088526
+          },
+          {
+            "x": -128000,
+            "y": 0,
+            "z": 128000,
+            "max": 34810,
+            "time": 144000,
+            "resourcedensity": 1.5,
+            "falloff": 0.088526
+          }
+        ]
+      }
+    }
+  }
+}

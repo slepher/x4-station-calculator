@@ -1,0 +1,128 @@
+{
+  "sector_id": "cluster_15_sector001_macro",
+  "ware": {
+    "helium": {
+      "medhigh": {
+        "resources": [
+          {
+            "x": 192000,
+            "y": 0,
+            "z": 0,
+            "max": 34649,
+            "time": 108000,
+            "resourcedensity": 50000,
+            "falloff": 0.69298
+          },
+          {
+            "x": 192000,
+            "y": 0,
+            "z": -64000,
+            "max": 34649,
+            "time": 108000,
+            "resourcedensity": 50000,
+            "falloff": 0.69298
+          }
+        ]
+      }
+    },
+    "hydrogen": {
+      "medhigh": {
+        "resources": [
+          {
+            "x": 192000,
+            "y": 0,
+            "z": 0,
+            "max": 173249,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "falloff": 0.692996
+          }
+        ]
+      }
+    },
+    "ice": {
+      "medium": {
+        "resources": [
+          {
+            "x": 192000,
+            "y": 0,
+            "z": 0,
+            "max": 98250,
+            "time": 36000,
+            "resourcedensity": 15,
+            "falloff": 0.024986
+          },
+          {
+            "x": 192000,
+            "y": 0,
+            "z": -64000,
+            "max": 46143,
+            "time": 36000,
+            "resourcedensity": 15,
+            "falloff": 0.011735
+          },
+          {
+            "x": 128000,
+            "y": 0,
+            "z": 0,
+            "max": 51021,
+            "time": 36000,
+            "resourcedensity": 15,
+            "falloff": 0.012975
+          },
+          {
+            "x": 128000,
+            "y": 0,
+            "z": -64000,
+            "max": 51021,
+            "time": 36000,
+            "resourcedensity": 15,
+            "falloff": 0.012975
+          }
+        ]
+      }
+    },
+    "methane": {
+      "medium": {
+        "resources": [
+          {
+            "x": 192000,
+            "y": 0,
+            "z": 0,
+            "max": 25801,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "falloff": 1.03204
+          },
+          {
+            "x": 192000,
+            "y": 0,
+            "z": -64000,
+            "max": 17324,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "falloff": 0.69296
+          },
+          {
+            "x": 128000,
+            "y": 0,
+            "z": 0,
+            "max": 34648,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "falloff": 1.38592
+          },
+          {
+            "x": 128000,
+            "y": 0,
+            "z": -64000,
+            "max": 17324,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "falloff": 0.69296
+          }
+        ]
+      }
+    }
+  }
+}

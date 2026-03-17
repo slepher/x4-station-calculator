@@ -1,0 +1,131 @@
+{
+  "sector_id": "cluster_06_sector001_macro",
+  "ware": {
+    "helium": {
+      "medhigh": {
+        "resources": [
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 0,
+            "max": 34649,
+            "time": 108000,
+            "resourcedensity": 50000,
+            "falloff": 0.69298
+          }
+        ]
+      }
+    },
+    "hydrogen": {
+      "medhigh": {
+        "resources": [
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 0,
+            "max": 173249,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "falloff": 0.692996
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "max": 173249,
+            "time": 108000,
+            "resourcedensity": 250000,
+            "falloff": 0.692996
+          }
+        ]
+      }
+    },
+    "methane": {
+      "medium": {
+        "resources": [
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 0,
+            "max": 17324,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "falloff": 0.69296
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "max": 17324,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "falloff": 0.69296
+          },
+          {
+            "x": 64000,
+            "y": 0,
+            "z": -64000,
+            "max": 17324,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "falloff": 0.69296
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "z": -64000,
+            "max": 17324,
+            "time": 36000,
+            "resourcedensity": 25000,
+            "falloff": 0.69296
+          }
+        ]
+      }
+    },
+    "nividium": {
+      "medium": {
+        "resources": [
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 0,
+            "max": 5,
+            "time": 604800,
+            "resourcedensity": 0.001,
+            "falloff": 0.019073
+          }
+        ]
+      }
+    },
+    "ore": {
+      "medium": {
+        "resources": [
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 0,
+            "max": 40809,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025946
+          }
+        ]
+      }
+    },
+    "silicon": {
+      "medium": {
+        "resources": [
+          {
+            "x": 64000,
+            "y": 0,
+            "z": 0,
+            "max": 40815,
+            "time": 144000,
+            "resourcedensity": 6,
+            "falloff": 0.025949
+          }
+        ]
+      }
+    }
+  }
+}
