@@ -1078,6 +1078,7 @@ def generate_gas_block_coordinates(
                     dist = math.sqrt(dx*dx + dy*dy + dz*dz)
                     effective_radius = radius + block_half
                     in_radius = dist <= effective_radius
+                    in_height = True  # 球体没有高度限制
 
                 # 总方块数：所有在 region 半径内的方块
                 if in_radius and in_height:
@@ -2084,7 +2085,7 @@ def migrate_region_definitions(
     迁移 region 定义。
 
     新架构（8.0 简化版）：
-    - regions.json: 仅包含模板数据（ware, resourcedensity, delay, gatherfactor, yield_name）
+    - regions.json: 包含 boundary, falloff 和资源模板数据（ware, resourcedensity, delay, gatherfactor, yield_name）
     - resourceareas.json: 包含实例计算结果（需要 position 进行截断计算）
 
     Args:
@@ -2093,8 +2094,8 @@ def migrate_region_definitions(
 
     Returns:
         (region_templates, region_calc_data)
-        - region_templates: regions.json 使用的模板数据
-        - region_calc_data: resourceareas.json 使用的计算数据（含 boundary, falloff 等）
+        - region_templates: regions.json 使用的模板数据（含 boundary, falloff, resources）
+        - region_calc_data: resourceareas.json 使用的计算数据（含 asteroids, debris, nebulae 等）
     """
     if not region_definitions_xml_path.exists():
         return {}, {}
@@ -2144,9 +2145,11 @@ def migrate_region_definitions(
         # 解析 fields 节点（asteroid、debris 和 nebula）
         fields_data = parse_region_fields(region_node, group_index, resources_map)
 
-        # === regions.json: 仅包含模板数据（yield_info_map 字段）===
+        # === regions.json: 包含 boundary, falloff 和模板资源数据 ===
         region_template = {
             "id": region_name,
+            "boundary": region_item["boundary"],
+            "falloff": region_item["falloff"],
             "resources": [],
         }
 
