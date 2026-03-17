@@ -229,3 +229,20 @@ When merging a worktree branch into develop:
 - Run `git merge <branch-name>` directly in the develop working directory
 - Do NOT push to remote unless explicitly requested
 - Example workflow: commit on branch → switch to develop → merge branch
+
+## Analysis Scripts
+
+分析脚本目录：`analysis/`
+
+- `analysis/scripts/` - 正式分析脚本
+- `analysis/tmp_scripts/` - 临时分析脚本
+
+**强制规则：**
+- **禁止**使用 `python3 -c "..."` 执行临时分析代码
+- 必须先创建脚本文件到对应目录，然后执行
+- 临时脚本 → `analysis/tmp_scripts/xxx.py` → `python3 analysis/tmp_scripts/xxx.py`
+- 正式脚本 → `analysis/scripts/xxx.py` → `python3 analysis/scripts/xxx.py`
+
+**原因：** 使用 `python3 -c "..."` 会触发沙盒确认弹窗，每次执行都需要用户确认，严重妨碍效率。创建脚本文件执行则不会触发确认。
+
+**违反后果：** 每次违反都需要向用户说明原因并道歉。没有例外，无论代码多简单。

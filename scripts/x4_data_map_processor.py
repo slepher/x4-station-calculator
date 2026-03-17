@@ -93,6 +93,10 @@ REGION_CONNECTION_RES = (
     re.compile(r"C(\d+)S(\d+)_", re.IGNORECASE),
     re.compile(r"Cluster(\d+)_Sector(\d+)_", re.IGNORECASE),
 )
+REGION_REF_RES = (
+    re.compile(r"region_cluster_(\d+)_sector_(\d+)", re.IGNORECASE),
+    re.compile(r"region(\d+)_cluster_(\d+)_sector_(\d+)", re.IGNORECASE),
+)
 ZONE_HIGHWAY_MACRO_RE = re.compile(r"Highway(\d+)_Cluster_?(\d+)_(?:Sector|S)(\d+)_macro", re.IGNORECASE)
 SEC_HIGHWAY_MACRO_RE = re.compile(r"SuperHighway(\d+)_Cluster_?(\d+)_macro", re.IGNORECASE)
 
@@ -401,6 +405,25 @@ def resolve_sector_macro_from_region_connection(connection_name: str) -> Optiona
     return None
 
 
+def resolve_sector_macro_from_region_ref(region_ref: str) -> Optional[str]:
+    """从 region ref 解析 sector"""
+    for pattern in REGION_REF_RES:
+        match = pattern.search(region_ref)
+        if match is None:
+            continue
+        groups = match.groups()
+        if len(groups) == 3:
+            # region(\d+)_cluster_(\d+)_sector_(\d+) 格式
+            cluster_num = int(groups[1])
+            sector_num = int(groups[2])
+        else:
+            # region_cluster_(\d+)_sector_(\d+) 格式
+            cluster_num = int(groups[0])
+            sector_num = int(groups[1])
+        return f"Cluster_{cluster_num:02d}_Sector{sector_num:03d}_macro"
+    return None
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Extract and normalize X4 universe map data from distilled XML.")
     mode_group = parser.add_mutually_exclusive_group()
@@ -451,6 +474,7 @@ def round_to_int(value: float) -> int:
 
 
 def pos_from(parent: Optional[ET.Element]) -> Dict[str, float]:
+    """获取 2D 坐标 (x, z)，兼容旧代码"""
     position = None
     if parent is not None:
         position = parent.find("./offset/position")
@@ -459,8 +483,32 @@ def pos_from(parent: Optional[ET.Element]) -> Dict[str, float]:
     return {"x": as_float(position.get("x")), "z": as_float(position.get("z"))}
 
 
+def pos3d_from(parent: Optional[ET.Element]) -> Dict[str, float]:
+    """获取 3D 坐标 (x, y, z)"""
+    position = None
+    if parent is not None:
+        position = parent.find("./offset/position")
+    if position is None:
+        return {"x": 0.0, "y": 0.0, "z": 0.0}
+    return {
+        "x": as_float(position.get("x"), 0.0),
+        "y": as_float(position.get("y"), 0.0),
+        "z": as_float(position.get("z"), 0.0),
+    }
+
+
 def vec_add(left: Dict[str, float], right: Dict[str, float]) -> Dict[str, float]:
+    """2D 向量加法 (x, z)"""
     return {"x": left["x"] + right["x"], "z": left["z"] + right["z"]}
+
+
+def vec_add_3d(left: Dict[str, float], right: Dict[str, float]) -> Dict[str, float]:
+    """3D 向量加法"""
+    return {
+        "x": left.get("x", 0.0) + right.get("x", 0.0),
+        "y": left.get("y", 0.0) + right.get("y", 0.0),
+        "z": left.get("z", 0.0) + right.get("z", 0.0),
+    }
 
 
 def cluster_world_to_axial(pos: Dict[str, float]) -> Dict[str, int]:
@@ -812,10 +860,22 @@ def build_boundary(node: Optional[ET.Element]) -> Optional[dict]:
     """
     构建边界对象。
 
+    支持两种 XML 结构：
+    1. 直接 <boundary> 节点
+    2. <boundaries><boundary .../></boundaries> 容器中的第一个 boundary
+
     对于 splinetube 类型，在 size 中添加等效 linear 字段（控制点距离之和）。
     """
     if node is None:
         return None
+
+    # 检查是否是 boundaries 容器，如果是则取第一个 boundary 子节点
+    if node.tag == "boundaries":
+        boundary_node = node.find("./boundary[@class]")
+        if boundary_node is None:
+            return None
+        node = boundary_node
+
     boundary = {
         "class": (node.get("class") or "").strip(),
     }
@@ -851,6 +911,312 @@ def build_falloff(node: Optional[ET.Element]) -> Optional[dict]:
     falloff["radial_factor"] = piecewise_average(radial, weighted_power=1)
     falloff["effective_factor"] = falloff["lateral_factor"] * falloff["radial_factor"]
     return falloff
+
+
+# =============================================================================
+# 8.0 简化资源计算算法
+# =============================================================================
+# 新算法核心：
+# 1. 移除 fields/noise/factor 计算
+# 2. 固体：体积 × falloff × resourcedensity
+# 3. 气体：方块数 × falloff × resourcedensity
+# 4. 截断规则：固体 256km×256km×192km，气体 256km×256km×64km
+# =============================================================================
+
+# 截断限制（单位：米）
+SOLID_XZ_LIMIT = 256_000       # 256 km
+SOLID_Y_LIMIT = 96_000         # 96 km (总高度 192km)
+GAS_XZ_LIMIT = 256_000         # 256 km
+GAS_Y_LIMIT = 64_000           # 64 km (总高度 128km)
+GAS_BLOCK_SIZE = 64_000        # 64 km 立方体网格
+GAS_MIN_HEIGHT = 64_000        # 气体最小高度 64km
+
+# 气体资源 ware 列表
+GAS_WARES = {"helium", "hydrogen", "methane", "bogas"}
+
+
+def is_gas_ware(ware: str) -> bool:
+    """判断 ware 是否为气体资源"""
+    return ware in GAS_WARES
+
+
+def calculate_falloff_factors(falloff: Optional[dict]) -> Tuple[float, float, float]:
+    """
+    从 falloff 对象计算一元因子
+
+    Returns:
+        (lateral_factor, radial_factor, total_factor)
+    """
+    if not falloff:
+        return (1.0, 1.0, 1.0)
+
+    lateral_factor = as_number(falloff.get("lateral_factor"), 1.0)
+    radial_factor = as_number(falloff.get("radial_factor"), 1.0)
+    return (lateral_factor, radial_factor, lateral_factor * radial_factor)
+
+
+def calculate_solid_volume_truncated(boundary: dict) -> Tuple[float, float]:
+    """
+    计算固体资源的有效体积（截断后）
+
+    Args:
+        boundary: 边界定义（含 class, size, spline 等）
+
+    Returns:
+        (total_volume_m3, effective_volume_m3) - 截断前和截断后的体积（单位：m³）
+    """
+    boundary_class = str(boundary.get("class", ""))
+    size = boundary.get("size", {})
+    radius = as_number(size.get("r"), 0.0)
+
+    if boundary_class == "sphere":
+        # 球体：V = 4/3 × π × r³
+        total_volume = (4.0 / 3.0) * math.pi * (radius ** 3)
+        # 截断：半径限制在 200km，高度限制在 192km
+        capped_radius = min(radius, SOLID_XZ_LIMIT)
+        # 球体截断为圆柱体
+        effective_volume = math.pi * (capped_radius ** 2) * (SOLID_Y_LIMIT * 2)
+        return (total_volume, effective_volume)
+
+    elif boundary_class == "cylinder":
+        linear = as_number(size.get("linear"), 0.0)
+        # 圆柱：V = π × r² × h
+        total_volume = math.pi * (radius ** 2) * linear
+        # 截断
+        capped_radius = min(radius, SOLID_XZ_LIMIT)
+        capped_height = min(linear, SOLID_Y_LIMIT * 2)  # 192km
+        effective_volume = math.pi * (capped_radius ** 2) * capped_height
+        return (total_volume, effective_volume)
+
+    elif boundary_class == "splinetube":
+        spline = boundary.get("spline", [])
+        length = 0.0
+        for i in range(len(spline) - 1):
+            p0 = spline[i]
+            p1 = spline[i + 1]
+            length += distance_3d(p0, p1)
+
+        # Tube: V = π × r² × length
+        total_volume = math.pi * (radius ** 2) * length
+        # 截断：X/Z 限制 256km，长度限制 512km
+        capped_radius = min(radius, SOLID_XZ_LIMIT)
+        capped_length = min(length, SOLID_XZ_LIMIT * 2)
+        effective_volume = math.pi * (capped_radius ** 2) * capped_length
+        return (total_volume, effective_volume)
+
+    else:
+        return (0.0, 0.0)
+
+
+def generate_gas_block_coordinates(
+    region_pos: Dict[str, float],
+    boundary: dict,
+) -> Tuple[List[Tuple[int, int, int]], List[Tuple[int, int, int]]]:
+    """
+    生成气体资源命中的 64km³ 方块坐标列表
+
+    方块是 64×64×64km 的立方体，判断命中需要检查方块是否与圆柱体相交。
+    使用方块中心到圆柱中心的距离 <= (radius + 方块半宽) 来判断。
+
+    Args:
+        region_pos: region 相对 sector 的坐标 (x, y, z)
+        boundary: 边界定义（含 size.r 半径，size.linear 高度）
+
+    Returns:
+        (total_blocks_coords, effective_blocks_coords) - 总坐标列表和有效坐标列表
+    """
+    radius = as_number(boundary.get("size", {}).get("r", 0.0))
+    linear = as_number(boundary.get("size", {}).get("linear", 0.0))
+    boundary_class = str(boundary.get("class", ""))
+
+    # 方块尺寸
+    block_half = GAS_BLOCK_SIZE // 2  # 32km，方块半宽
+
+    # 有效范围（方块索引）
+    xz_max_blocks = GAS_XZ_LIMIT // GAS_BLOCK_SIZE  # 4 个方块（单侧）
+    y_max_blocks = GAS_Y_LIMIT // GAS_BLOCK_SIZE    # 1 个方块（单侧）
+
+    total_coords = []
+    effective_coords = []
+
+    # 遍历所有可能的方块（-4 到 +4 共 9 个，-1 到 +1 共 3 个）
+    for bx in range(-xz_max_blocks - 1, xz_max_blocks + 2):
+        for by in range(-y_max_blocks - 1, y_max_blocks + 2):
+            for bz in range(-xz_max_blocks - 1, xz_max_blocks + 2):
+                # 方块中心坐标（相对 sector 原点）
+                block_x = bx * GAS_BLOCK_SIZE
+                block_y = by * GAS_BLOCK_SIZE
+                block_z = bz * GAS_BLOCK_SIZE
+
+                # 计算方块中心到 region 中心的偏移
+                dx = block_x - region_pos.get("x", 0.0)
+                dy = block_y - region_pos.get("y", 0.0)
+                dz = block_z - region_pos.get("z", 0.0)
+
+                if boundary_class == "cylinder":
+                    # 圆柱体：检查 XZ 平面距离和 Y 轴高度
+                    # 方块有大小，使用 radius + block_half 作为有效半径
+                    dist_xz = math.sqrt(dx*dx + dz*dz)
+                    effective_radius = radius + block_half
+
+                    # Y 轴高度检查：方块与圆柱高度范围相交
+                    # 圆柱 Y 范围：[region_y - linear, region_y + linear]
+                    # 方块 Y 范围：[block_y - block_half, block_y + block_half]
+                    region_y = region_pos.get("y", 0.0)
+                    block_y_min = block_y - block_half
+                    block_y_max = block_y + block_half
+                    cylinder_y_min = region_y - linear
+                    cylinder_y_max = region_y + linear
+
+                    # 检查 Y 范围是否相交
+                    y_overlap = not (block_y_max < cylinder_y_min or block_y_min > cylinder_y_max)
+
+                    in_radius = dist_xz <= effective_radius
+                    in_height = y_overlap
+                else:
+                    # 球体或其他：检查 3D 距离，使用 radius + block_half
+                    dist = math.sqrt(dx*dx + dy*dy + dz*dz)
+                    effective_radius = radius + block_half
+                    in_radius = dist <= effective_radius
+
+                # 总方块数：所有在 region 半径内的方块
+                if in_radius and in_height:
+                    total_coords.append((block_x, block_y, block_z))
+
+                    # 有效方块数：还需要在截断范围内
+                    if (abs(block_x) <= GAS_XZ_LIMIT and
+                        abs(block_z) <= GAS_XZ_LIMIT and
+                        abs(block_y) <= GAS_Y_LIMIT):
+                        effective_coords.append((block_x, block_y, block_z))
+
+    return (total_coords, effective_coords)
+
+
+def calculate_gas_block_count_truncated(
+    region_pos: Dict[str, float],
+    boundary: dict,
+) -> Tuple[int, int]:
+    """
+    计算气体资源命中的 64km³ 方块数量
+
+    Args:
+        region_pos: region 相对 sector 的坐标 (x, y, z)
+        boundary: 边界定义（含 size.r 半径）
+
+    Returns:
+        (total_blocks, effective_blocks) - 总方块数和有效方块数
+    """
+    total_coords, effective_coords = generate_gas_block_coordinates(region_pos, boundary)
+    return (max(1, len(total_coords)), max(0, len(effective_coords)))
+
+
+def calculate_region_resources_simplified(
+    region: dict,
+    region_pos: Optional[Dict[str, float]] = None,
+    yield_info_map: Optional[Dict[str, Dict[str, dict]]] = None,
+) -> List[dict]:
+    """
+    简化版资源计算（8.0 新算法）
+
+    公式：yield = base × falloff × resourcedensity
+
+    Args:
+        region: region 定义（含 boundary, falloff, resources）
+        region_pos: region 相对 sector 的坐标（用于气体计算）
+        yield_info_map: 资源 yield 信息映射（用于获取 replenishtime）
+
+    Returns:
+        资源列表，包含 total_yield/total_respawn/yield/respawn 字段
+    """
+    boundary = region.get("boundary", {})
+    falloff = region.get("falloff")
+    resources_raw = region.get("resources", [])
+
+    if not resources_raw:
+        return []
+
+    # 计算 falloff
+    lateral_f, radial_f, total_falloff = calculate_falloff_factors(falloff)
+
+    results = []
+
+    for res in resources_raw:
+        ware = res.get("ware", "")
+        if not ware:
+            continue
+
+        # 获取 resourcedensity 和 replenishtime
+        resourcedensity = as_number(res.get("resourcedensity"), 0.0)
+        replenishtime = as_number(res.get("replenishtime"), 60.0)
+
+        # 如果 resourcedensity 为 0，尝试从 yield_info_map 获取
+        if resourcedensity <= 0 and yield_info_map:
+            yield_name = res.get("yield_name")
+            if ware in yield_info_map:
+                if yield_name and yield_name in yield_info_map[ware]:
+                    resourcedensity = as_number(
+                        yield_info_map[ware][yield_name].get("resourcedensity"), 0.0
+                    )
+                    replenishtime = as_number(
+                        yield_info_map[ware][yield_name].get("replenishtime"), 60.0
+                    )
+
+        if resourcedensity <= 0:
+            continue
+
+        if is_gas_ware(ware):
+            # 气体资源：使用方块网格算法
+            total_blocks, effective_blocks = calculate_gas_block_count_truncated(
+                region_pos or {"x": 0.0, "y": 0.0, "z": 0.0},
+                boundary
+            )
+
+            # yield = blocks × falloff × resourcedensity
+            total_yield = total_blocks * total_falloff * resourcedensity
+            effective_yield = effective_blocks * total_falloff * resourcedensity
+
+            # respawn = yield × 60 / replenishtime
+            total_respawn = total_yield * 60.0 / replenishtime if replenishtime > 0 else 0.0
+            effective_respawn = effective_yield * 60.0 / replenishtime if replenishtime > 0 else 0.0
+
+            results.append({
+                "ware": ware,
+                "resourcedensity": resourcedensity,
+                "total_yield": round_to_int(total_yield),
+                "total_respawn": round_to_int(total_respawn),
+                "yield": round_to_int(effective_yield),
+                "respawn": round_to_int(effective_respawn),
+                "delay": replenishtime,
+                "factor": 1.0,  # 气体不再使用 factor
+            })
+        else:
+            # 固体资源：使用体积算法
+            total_vol, effective_vol = calculate_solid_volume_truncated(boundary)
+
+            # 转换为 km³
+            total_vol_km3 = total_vol / 1_000_000_000.0
+            effective_vol_km3 = effective_vol / 1_000_000_000.0
+
+            # yield = volume × falloff × resourcedensity
+            total_yield = total_vol_km3 * total_falloff * resourcedensity
+            effective_yield = effective_vol_km3 * total_falloff * resourcedensity
+
+            # respawn = yield × 60 / replenishtime
+            total_respawn = total_yield * 60.0 / replenishtime if replenishtime > 0 else 0.0
+            effective_respawn = effective_yield * 60.0 / replenishtime if replenishtime > 0 else 0.0
+
+            results.append({
+                "ware": ware,
+                "resourcedensity": resourcedensity,
+                "total_yield": round_to_int(total_yield),
+                "total_respawn": round_to_int(total_respawn),
+                "yield": round_to_int(effective_yield),
+                "respawn": round_to_int(effective_respawn),
+                "delay": replenishtime,
+                "factor": 1.0,  # 固体不再使用 factor
+            })
+
+    return results
 
 
 class PerlinNoise3D:
@@ -1712,47 +2078,55 @@ def migrate_region_definitions(
     yield_level_map: Dict[str, Dict[str, int]],
     yield_density_map: Dict[str, Dict[str, float]],
     yield_info_map: Optional[Dict[str, Dict[str, dict]]] = None,
-) -> Dict[str, dict]:
+    region_position_map: Optional[Dict[str, Dict[str, float]]] = None,
+) -> Tuple[Dict[str, dict], Dict[str, dict]]:
+    """
+    迁移 region 定义。
+
+    新架构（8.0 简化版）：
+    - regions.json: 仅包含模板数据（ware, resourcedensity, delay, gatherfactor, yield_name）
+    - resourceareas.json: 包含实例计算结果（需要 position 进行截断计算）
+
+    Args:
+        region_position_map: region_ref → {"x": float, "y": float, "z": float} 的映射，
+                            表示 region 相对其所属 cluster 的坐标
+
+    Returns:
+        (region_templates, region_calc_data)
+        - region_templates: regions.json 使用的模板数据
+        - region_calc_data: resourceareas.json 使用的计算数据（含 boundary, falloff 等）
+    """
     if not region_definitions_xml_path.exists():
-        return {}
+        return {}, {}
     root = parse_xml(region_definitions_xml_path)
     group_index = load_region_object_groups(regionobjectgroups_xml_path)
-    definitions: Dict[str, dict] = {}
+    templates: Dict[str, dict] = {}
+    calc_data: Dict[str, dict] = {}
 
     for region_node in root.findall("./region[@name]"):
         region_name = (region_node.get("name") or "").strip()
         if not region_name:
             continue
+        # 支持两种 XML 结构：直接 <boundary> 或 <boundaries><boundary/></boundaries>
+        boundary_node = region_node.find("./boundary")
+        if boundary_node is None:
+            boundary_node = region_node.find("./boundaries")
+        falloff_node = region_node.find("./falloff")
+
+        # 8.0 简化算法：只保留 boundary 和 falloff，移除 noise 相关字段
         region_item = {
             "id": region_name,
-            "density": as_number(region_node.get("density"), 1.0),
-            "rotation": as_number(region_node.get("rotation"), 0.0),
-            "noisescale": as_number(region_node.get("noisescale"), 0.0),
-            "seed": int(as_number(region_node.get("seed"), 0.0)),
-            "minnoisevalue": normalize_noise_bound(
-                as_number(region_node.get("minnoisevalue"), 0.0),
-                0.0,
-            ),
-            "maxnoisevalue": normalize_noise_bound(
-                as_number(region_node.get("maxnoisevalue"), 1.0),
-                1.0,
-            ),
-            "boundary": build_boundary(region_node.find("./boundary")),
-            "falloff": build_falloff(region_node.find("./falloff")),
+            "boundary": build_boundary(boundary_node),
+            "falloff": build_falloff(falloff_node),
         }
 
-        # 计算 region 级别的体积和噪声参数（移动到 region 根级别）
+        # 计算 region 级别的体积（移动到 region 根级别）
         boundary = region_item["boundary"]
         falloff = region_item["falloff"] or {}
 
         # 体积计算：纯几何体积，不含 falloff 修正
         volume_m3 = boundary_volume(boundary)
         volume_km3 = volume_m3 / 1_000_000_000.0
-
-        region_noise_probability = noise_probability(
-            region_item.get("minnoisevalue"),
-            region_item.get("maxnoisevalue"),
-        )
 
         # 对于 splinetube 类型，存储等效 linear 长度
         spline_linear = compute_spline_length(boundary)
@@ -1761,7 +2135,8 @@ def migrate_region_definitions(
 
         region_item["volume_km3"] = round_to_int(volume_km3)
         region_item["falloff_factor"] = round(as_number(falloff.get("effective_factor"), 1.0), 4)
-        region_item["noise_probability"] = round(region_noise_probability, 4)
+
+        # 注意：position 不再写入 region definition，而是在 resourceareas 中写入
 
         # 解析 region 的 <resources> 节点，获取 ware → yield_name 映射
         resources_map = parse_region_resources_node(region_node)
@@ -1769,34 +2144,301 @@ def migrate_region_definitions(
         # 解析 fields 节点（asteroid、debris 和 nebula）
         fields_data = parse_region_fields(region_node, group_index, resources_map)
 
-        region_item["resources"] = summarize_region_resources(
-            region_item,
-            fields_data,
-            resources_map,
-            yield_info_map,
-        )
+        # === regions.json: 仅包含模板数据（yield_info_map 字段）===
+        region_template = {
+            "id": region_name,
+            "resources": [],
+        }
 
-        # 新增：resources_0（仅使用 <resources> 节点）
-        region_item["resources_0"] = summarize_region_resources_only(
-            region_item,
-            resources_map,
-            yield_info_map,
-        )
+        # 从 resources_map 和 yield_info_map 构建模板资源
+        for ware, res_info in resources_map.items():
+            yield_name = res_info.get("yield")
 
-        # 新增：resources_fields（仅使用 <fields> 节点数据）
-        region_item["resources_fields"] = summarize_region_fields_only(
-            region_item,
-            fields_data,
-            yield_info_map,
-        )
+            # 获取 resourcedensity 和 replenishtime
+            resourcedensity: float = 0.0
+            replenishtime: float = 60.0
+            gatherfactor: float = 1.0
 
+            if yield_info_map and ware in yield_info_map:
+                if yield_name and yield_name in yield_info_map[ware]:
+                    resourcedensity = yield_info_map[ware][yield_name].get("resourcedensity", 0.0)
+                    replenishtime = yield_info_map[ware][yield_name].get("replenishtime", 60.0)
+                    gatherfactor = yield_info_map[ware][yield_name].get("gatherspeedfactor", 1.0)
+                else:
+                    # 如果 yield_name 不存在，使用第一个
+                    yield_entries = list(yield_info_map[ware].values())
+                    if yield_entries:
+                        resourcedensity = yield_entries[0].get("resourcedensity", 0.0)
+                        replenishtime = yield_entries[0].get("replenishtime", 60.0)
+                        gatherfactor = yield_entries[0].get("gatherspeedfactor", 1.0)
+
+            if resourcedensity > 0:
+                region_template["resources"].append({
+                    "ware": ware,
+                    "resourcedensity": resourcedensity,
+                    "delay": replenishtime,
+                    "gatherfactor": gatherfactor if is_gas_ware(ware) else 1.0,
+                    "yield_name": yield_name,
+                })
+
+        # 只保留有 resources 的 region
+        if region_template["resources"]:
+            templates[region_name] = region_template
+
+        # === resourceareas.json: 保留完整计算数据 ===
         # 添加 field 数组（asteroids、debris、nebulae）
         region_item["asteroids"] = fields_data.get("asteroids", [])
         region_item["debris"] = fields_data.get("debris", [])
         region_item["nebulae"] = fields_data.get("nebulae", [])
 
-        definitions[region_name] = region_item
-    return definitions
+        calc_data[region_name] = region_item
+
+    return templates, calc_data
+
+
+def summarize_region_resources_simplified(
+    region_item: dict,
+    resources_map: Dict[str, dict],
+    yield_info_map: Optional[Dict[str, Dict[str, dict]]] = None,
+) -> List[dict]:
+    """
+    简化版资源计算（8.0 新算法）- 整合到 migrate_region_definitions 的版本
+
+    核心变更：
+    1. 移除 fields/noise/factor 计算
+    2. 固体：有效体积 × falloff × resourcedensity
+    3. 气体：有效方块数 × falloff × resourcedensity
+    4. 输出 total_yield/total_respawn/yield/respawn 字段
+    5. density/respawn_density：单位体积产量和回复密度
+
+    Args:
+        region_item: region 定义（含 boundary, falloff）
+        resources_map: region 的 <resources> 节点解析结果，ware → {yield_name, ...}
+        yield_info_map: 资源 yield 信息映射（用于获取 replenishtime）
+
+    Returns:
+        资源产出列表，包含 total_yield/total_respawn/yield/respawn/density/respawn_density 字段
+    """
+    boundary = region_item.get("boundary", {})
+    falloff = region_item.get("falloff")
+    region_pos = region_item.get("position")  # 如果有 position 则使用
+
+    if not resources_map:
+        return []
+
+    # 计算 falloff
+    lateral_f, radial_f, total_falloff = calculate_falloff_factors(falloff)
+
+    results = []
+
+    for ware, res_info in resources_map.items():
+        yield_name = res_info.get("yield")
+
+        # 获取 resourcedensity 和 replenishtime
+        resourcedensity: float = 0.0
+        replenishtime: float = 60.0
+
+        if yield_info_map and ware in yield_info_map:
+            if yield_name and yield_name in yield_info_map[ware]:
+                resourcedensity = yield_info_map[ware][yield_name].get("resourcedensity", 0.0)
+                replenishtime = yield_info_map[ware][yield_name].get("replenishtime", 60.0)
+            else:
+                # 如果 yield_name 不存在，使用第一个
+                yield_entries = list(yield_info_map[ware].values())
+                if yield_entries:
+                    resourcedensity = yield_entries[0].get("resourcedensity", 0.0)
+                    replenishtime = yield_entries[0].get("replenishtime", 60.0)
+
+        if resourcedensity <= 0:
+            continue
+
+        if is_gas_ware(ware):
+            # 气体资源：使用方块网格算法
+            total_blocks, effective_blocks = calculate_gas_block_count_truncated(
+                region_pos or {"x": 0.0, "y": 0.0, "z": 0.0},
+                boundary
+            )
+
+            # yield = blocks × falloff × resourcedensity
+            total_yield = total_blocks * total_falloff * resourcedensity
+            effective_yield = effective_blocks * total_falloff * resourcedensity
+
+            # respawn = yield × 60 / replenishtime
+            total_respawn = total_yield * 60.0 / replenishtime if replenishtime > 0 else 0.0
+            effective_respawn = effective_yield * 60.0 / replenishtime if replenishtime > 0 else 0.0
+
+            # density = yield / volume (单位体积产量)
+            # 气体的体积按有效方块数 × 64km³ 计算
+            effective_vol_km3 = effective_blocks * (GAS_BLOCK_SIZE ** 3) / 1_000_000_000.0
+            density = effective_yield / effective_vol_km3 if effective_vol_km3 > 0 else 0.0
+            respawn_density = effective_respawn / effective_vol_km3 if effective_vol_km3 > 0 else 0.0
+
+            # 获取 gatherfactor（气体的 gatherspeedfactor）
+            gatherfactor = 1.0
+            if yield_info_map and ware in yield_info_map:
+                if yield_name and yield_name in yield_info_map[ware]:
+                    gatherfactor = yield_info_map[ware][yield_name].get("gatherspeedfactor", 1.0)
+
+            results.append({
+                "ware": ware,
+                "resourcedensity": resourcedensity,
+                "total_yield": round_to_int(total_yield),
+                "total_respawn": int(round(total_respawn)),
+                "yield": round_to_int(effective_yield),
+                "respawn": int(round(effective_respawn)),
+                "delay": replenishtime,
+                "gatherfactor": gatherfactor,
+                "density": round_significant(density),
+                "respawn_density": round_significant(respawn_density),
+                "yield_name": yield_name,
+            })
+        else:
+            # 固体资源：使用体积算法
+            total_vol, effective_vol = calculate_solid_volume_truncated(boundary)
+
+            # 转换为 km³
+            total_vol_km3 = total_vol / 1_000_000_000.0
+            effective_vol_km3 = effective_vol / 1_000_000_000.0
+
+            # yield = volume × falloff × resourcedensity
+            total_yield = total_vol_km3 * total_falloff * resourcedensity
+            effective_yield = effective_vol_km3 * total_falloff * resourcedensity
+
+            # respawn = yield × 60 / replenishtime
+            total_respawn = total_yield * 60.0 / replenishtime if replenishtime > 0 else 0.0
+            effective_respawn = effective_yield * 60.0 / replenishtime if replenishtime > 0 else 0.0
+
+            # density = yield / volume (单位体积产量)
+            density = effective_yield / effective_vol_km3 if effective_vol_km3 > 0 else 0.0
+            respawn_density = effective_respawn / effective_vol_km3 if effective_vol_km3 > 0 else 0.0
+
+            results.append({
+                "ware": ware,
+                "resourcedensity": resourcedensity,
+                "total_yield": round_to_int(total_yield),
+                "total_respawn": int(round(total_respawn)),
+                "yield": round_to_int(effective_yield),
+                "respawn": int(round(effective_respawn)),
+                "delay": replenishtime,
+                "gatherfactor": 1.0,  # 固体不再使用 factor
+                "density": round_significant(density),
+                "respawn_density": round_significant(respawn_density),
+                "yield_name": yield_name,
+            })
+
+    return results
+
+
+def calculate_resourcearea_resources(
+    region_calc: dict,
+    region_pos: Optional[Dict[str, float]],
+    template_resources: List[dict],
+) -> List[dict]:
+    """
+    计算 resourcearea 级别的资源数据（实例计算）
+
+    基于 region 计算数据（boundary, falloff）和 position，计算每个资源的产量。
+
+    公式：yield = base × falloff × resourcedensity
+
+    Args:
+        region_calc: region 计算数据（含 boundary, falloff）
+        region_pos: region 相对 sector 的坐标（用于气体计算和截断）
+        template_resources: 模板资源列表（含 ware, resourcedensity, delay, gatherfactor, yield_name）
+
+    Returns:
+        资源列表，包含 total_yield/total_respawn/yield/respawn/density/respawn_density 字段
+    """
+    boundary = region_calc.get("boundary", {})
+    falloff = region_calc.get("falloff")
+
+    if not template_resources:
+        return []
+
+    # 计算 falloff
+    lateral_f, radial_f, total_falloff = calculate_falloff_factors(falloff)
+
+    results = []
+
+    for template_res in template_resources:
+        ware = template_res.get("ware", "")
+        if not ware:
+            continue
+
+        resourcedensity = as_number(template_res.get("resourcedensity"), 0.0)
+        replenishtime = as_number(template_res.get("delay"), 60.0)
+        gatherfactor = as_number(template_res.get("gatherfactor"), 1.0)
+
+        if resourcedensity <= 0:
+            continue
+
+        if is_gas_ware(ware):
+            # 气体资源：使用方块网格算法
+            total_blocks, effective_blocks = calculate_gas_block_count_truncated(
+                region_pos or {"x": 0.0, "y": 0.0, "z": 0.0},
+                boundary
+            )
+
+            # yield = blocks × falloff × resourcedensity
+            total_yield = total_blocks * total_falloff * resourcedensity
+            effective_yield = effective_blocks * total_falloff * resourcedensity
+
+            # respawn = yield × 60 / replenishtime
+            total_respawn = total_yield * 60.0 / replenishtime if replenishtime > 0 else 0.0
+            effective_respawn = effective_yield * 60.0 / replenishtime if replenishtime > 0 else 0.0
+
+            # density = yield / volume (单位体积产量)
+            # 气体的体积按有效方块数 × 64km³ 计算
+            effective_vol_km3 = effective_blocks * (GAS_BLOCK_SIZE ** 3) / 1_000_000_000.0
+            density = effective_yield / effective_vol_km3 if effective_vol_km3 > 0 else 0.0
+            respawn_density = effective_respawn / effective_vol_km3 if effective_vol_km3 > 0 else 0.0
+
+            results.append({
+                "ware": ware,
+                "resourcedensity": resourcedensity,
+                "total_yield": round_to_int(total_yield),
+                "total_respawn": int(round(total_respawn)),
+                "yield": round_to_int(effective_yield),
+                "respawn": int(round(effective_respawn)),
+                "delay": replenishtime,
+                "gatherfactor": gatherfactor,
+                "density": round_significant(density),
+                "respawn_density": round_significant(respawn_density),
+            })
+        else:
+            # 固体资源：使用体积算法
+            total_vol, effective_vol = calculate_solid_volume_truncated(boundary)
+
+            # 转换为 km³
+            total_vol_km3 = total_vol / 1_000_000_000.0
+            effective_vol_km3 = effective_vol / 1_000_000_000.0
+
+            # yield = volume × falloff × resourcedensity
+            total_yield = total_vol_km3 * total_falloff * resourcedensity
+            effective_yield = effective_vol_km3 * total_falloff * resourcedensity
+
+            # respawn = yield × 60 / replenishtime
+            total_respawn = total_yield * 60.0 / replenishtime if replenishtime > 0 else 0.0
+            effective_respawn = effective_yield * 60.0 / replenishtime if replenishtime > 0 else 0.0
+
+            # density = yield / volume (单位体积产量)
+            density = effective_yield / effective_vol_km3 if effective_vol_km3 > 0 else 0.0
+            respawn_density = effective_respawn / effective_vol_km3 if effective_vol_km3 > 0 else 0.0
+
+            results.append({
+                "ware": ware,
+                "resourcedensity": resourcedensity,
+                "total_yield": round_to_int(total_yield),
+                "total_respawn": int(round(total_respawn)),
+                "yield": round_to_int(effective_yield),
+                "respawn": int(round(effective_respawn)),
+                "delay": replenishtime,
+                "gatherfactor": 1.0,  # 固体不再使用 factor
+                "density": round_significant(density),
+                "respawn_density": round_significant(respawn_density),
+            })
+
+    return results
 
 
 def summarize_sector_resources(region_rows: List[dict]) -> List[dict]:
@@ -2029,7 +2671,21 @@ def generate_map_data(
                     clusters[cluster_macro]["sector_ids"].append(sector_macro)
             for conn in cluster_macro_node.findall("./connections/connection[@ref='regions']"):
                 connection_name = (conn.get("name") or "").strip()
+                # 两级解析逻辑：
+                # 1. 优先从 connection 名称解析 sector
                 sector_macro = resolve_sector_macro_from_region_connection(connection_name)
+                # 2. 如果 connection 名称解析出的 sector 不存在于 clusters 中，则使用 region ref 解析
+                if sector_macro is None or sector_macro not in clusters.get(sector_macro.split("_Sector")[0] + "_macro", {}).get("sector_ids", []):
+                    macro_node = conn.find("./macro")
+                    if macro_node is not None:
+                        region_ref_node = macro_node.find("./properties/region")
+                        region_ref = (region_ref_node.get("ref") if region_ref_node is not None else "") or ""
+                        if region_ref:
+                            sector_macro_from_ref = resolve_sector_macro_from_region_ref(region_ref)
+                            # 如果 region ref 解析出的 sector 存在于 clusters 中，则使用它
+                            if sector_macro_from_ref and sector_macro_from_ref in clusters.get(sector_macro_from_ref.split("_Sector")[0] + "_macro", {}).get("sector_ids", []):
+                                sector_macro = sector_macro_from_ref
+                # 3. 如果 region ref 也无法解析，则不匹配
                 if sector_macro is None:
                     continue
                 macro_node = conn.find("./macro")
@@ -2045,6 +2701,7 @@ def generate_map_data(
                     "region_ref": region_ref,
                     "cluster_id": cluster_macro,
                     "sector_id": sector_macro,
+                    "offset": pos3d_from(conn),  # region 相对 cluster 的坐标
                 })
             for conn in cluster_macro_node.findall("./connections/connection[@ref='sechighways']"):
                 macro_node = conn.find("./macro")
@@ -2259,57 +2916,145 @@ def generate_map_data(
         yield_level_map = build_yield_level_map(resolved_regionyields_path)
         yield_info_map = build_yield_info_map(resolved_regionyields_path)
         yield_density_map = build_yield_density_map(resolved_regionyields_path)
-        definitions_by_region_ref = migrate_region_definitions(
+
+        # 构建 region_position_map：region_ref → 相对 sector 的坐标
+        # 坐标转换逻辑：
+        # 1. region 的 offset 是相对 cluster 的坐标
+        # 2. sector 有 raw_local_pos（相对 cluster）和 raw_world_pos（世界坐标）
+        # 3. region 相对 sector 坐标 = region 相对 cluster 坐标 - sector 相对 cluster 坐标
+        region_position_map: Dict[str, Dict[str, float]] = {}
+        for sector_id, links in sector_region_links.items():
+            sector_data = sectors.get(sector_id, {})
+            sector_local_pos = sector_data.get("raw_local_pos", {"x": 0.0, "y": 0.0, "z": 0.0})
+            for link in links:
+                region_ref = link["region_ref"]
+                region_offset = link.get("offset", {"x": 0.0, "y": 0.0, "z": 0.0})
+                # region 相对 sector 坐标 = region 相对 cluster 坐标 - sector 相对 cluster 坐标
+                relative_pos = {
+                    "x": region_offset.get("x", 0.0) - sector_local_pos.get("x", 0.0),
+                    "y": region_offset.get("y", 0.0) - sector_local_pos.get("y", 0.0),
+                    "z": region_offset.get("z", 0.0) - sector_local_pos.get("z", 0.0),
+                }
+                # 如果同一个 region 被多个 sector 引用，取最后一个
+                region_position_map[region_ref] = relative_pos
+
+        templates, calc_data = migrate_region_definitions(
             resolved_region_definitions_path,
             resolved_regionobjectgroups_path,
             yield_level_map,
             yield_density_map,
             yield_info_map,
+            region_position_map,
         )
+        # regions_rows 输出纯 region 模板定义
+        for region_id, template in templates.items():
+            regions_rows.append(template)
+        regions_rows.sort(key=lambda item: item["id"])
+
         for sector_id, links in sector_region_links.items():
-            # 按 (ref, ware) 聚合 resourceareas
+            # 如果 sector 不在 sectors 字典中，跳过（例如 isolated sector）
+            if sector_id not in sectors:
+                continue
+
+            # 按 (ref, position) 聚合 resourceareas
+            # 新格式：{areas: [{ref, amount, position, resources: [{ware, ...}]}]}
             resourceareas_map: Dict[tuple, dict] = {}
             sector_region_rows: List[dict] = []
+            referenced_region_ids: set = set()  # 跟踪被引用的 region ID
 
             for link in links:
-                definition = definitions_by_region_ref.get(link["region_ref"], {})
-                if not definition:
+                region_ref = link["region_ref"]
+                region_calc = calc_data.get(region_ref, {})
+                if not region_calc:
                     continue
-                # 构建 resourceareas 行（region 到 sector 的引用关系）
-                resources = definition.get("resources", [])
-                for res in resources:
-                    key = (link["region_ref"], res.get("ware"))
-                    if key not in resourceareas_map:
-                        resourceareas_map[key] = {
-                            "ref": link["region_ref"],
-                            "amount": 0,  # 累加 amount
-                            "ware": res.get("ware"),
-                            "rating": res.get("rating"),
-                            "yield": res.get("yield"),
-                            "delay": res.get("delay"),
-                            "factor": res.get("factor"),
-                            "respawn": res.get("respawn"),
-                            "cluster_id": link["cluster_id"],
-                            "sector_id": link["sector_id"],
-                        }
-                    resourceareas_map[key]["amount"] += 1  # 每次引用计为 1
-                sector_region_rows.append(definition)
 
-            # 转换为列表
-            resourceareas_rows.extend(resourceareas_map.values())
+                # 获取 position（如果存在）
+                position = region_position_map.get(region_ref) if region_position_map else None
+
+                # 获取 region 的模板资源（从 templates 获取 ware 基础信息）
+                template = templates.get(region_ref, {})
+                template_resources = template.get("resources", [])
+                if not template_resources:
+                    continue  # 没有资源的 region 不写入
+
+                # 标记该 region 为已引用
+                referenced_region_ids.add(region_ref)
+
+                # position_key: 有 position 时使用 position 字符串，无 position 时使用 None
+                position_key = None
+                if position:
+                    position_key = f"{position['x']},{position['y']},{position['z']}"
+
+                # 按 (ref, position_key) 聚合
+                key = (region_ref, position_key)
+                if key not in resourceareas_map:
+                    resourceareas_map[key] = {
+                        "ref": region_ref,
+                        "amount": 0,
+                    }
+                    # 只有有 position 时才添加 position 字段
+                    if position:
+                        resourceareas_map[key]["position"] = position
+
+                    # 计算 falloff 因子
+                    falloff = region_calc.get("falloff") or {}
+                    lateral_f = as_number(falloff.get("lateral_factor"), 1.0)
+                    radial_f = as_number(falloff.get("radial_factor"), 1.0)
+                    total_falloff = lateral_f * radial_f
+
+                    resourceareas_map[key]["lateral_factor"] = round(lateral_f, 4)
+                    resourceareas_map[key]["radial_factor"] = round(radial_f, 4)
+                    resourceareas_map[key]["falloff_factor"] = round(total_falloff, 4)
+
+                    # 计算体积（固体）或方块数（气体）
+                    boundary = region_calc.get("boundary", {})
+
+                    # 判断是否为气体资源（根据 template_resources 中的 ware）
+                    has_gas = any(is_gas_ware(t.get("ware", "")) for t in template_resources)
+                    has_solid = any(not is_gas_ware(t.get("ware", "")) for t in template_resources)
+
+                    # 分别计算气体和固体的体积/方块数
+                    if has_gas:
+                        # 气体资源：使用方块网格算法
+                        total_blocks, effective_blocks = calculate_gas_block_count_truncated(
+                            position or {"x": 0.0, "y": 0.0, "z": 0.0},
+                            boundary
+                        )
+                        resourceareas_map[key]["total_blocks"] = total_blocks
+                        resourceareas_map[key]["blocks"] = effective_blocks
+
+                    if has_solid:
+                        # 固体资源：使用体积算法
+                        total_vol, effective_vol = calculate_solid_volume_truncated(boundary)
+                        total_vol_km3 = total_vol / 1_000_000_000.0
+                        effective_vol_km3 = effective_vol / 1_000_000_000.0
+                        resourceareas_map[key]["total_volume_km3"] = round_to_int(total_vol_km3)
+                        resourceareas_map[key]["volume_km3"] = round_to_int(effective_vol_km3)
+
+                    # 计算 resources
+                    resourceareas_map[key]["resources"] = calculate_resourcearea_resources(
+                        region_calc,
+                        position,
+                        template_resources,
+                    )
+
+                # 累加 amount
+                resourceareas_map[key]["amount"] += 1
+
+                sector_region_rows.append(region_calc)
+
+            # 转换为列表，添加 cluster_id 和 sector_id 字段
+            sector_data = sectors.get(sector_id, {})
+            cluster_id = sector_data.get("cluster_id", "")
+            for area_item in resourceareas_map.values():
+                area_item["cluster_id"] = cluster_id
+                area_item["sector_id"] = sector_id
+                resourceareas_rows.append(area_item)
 
             if sector_id in sectors:
                 sectors[sector_id]["resources"] = summarize_sector_resources(sector_region_rows)
         for sector_id in sectors.keys():
             sectors[sector_id].setdefault("resources", [])
-
-        # regions_rows 输出纯 region 定义（去重）
-        seen_region_ids = set()
-        for region_id, definition in definitions_by_region_ref.items():
-            if region_id not in seen_region_ids:
-                regions_rows.append(definition)
-                seen_region_ids.add(region_id)
-        regions_rows.sort(key=lambda item: item["id"])
 
     for zones_root in zone_roots:
         for zone_macro_node in zones_root.findall("./macro[@class='zone']"):
