@@ -2,5 +2,10 @@
   "enabledPlugins": {
     "frontend-design@claude-plugins-official": true,
     "playwright@claude-plugins-official": true
-  }
+  },
+  "allow": [
+    "Bash(python3:*)",
+    "Bash(cat:*)",
+    "Bash(head:*)"
+  ]
 }
