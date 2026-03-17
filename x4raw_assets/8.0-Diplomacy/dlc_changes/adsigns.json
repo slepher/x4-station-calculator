@@ -1,0 +1,31 @@
+{
+  "version": "8.0",
+  "beta": false,
+  "folder_name": "8.0-Diplomacy",
+  "type": "adsigns",
+  "base_file": "D:\\Documents\\project\\x4tools\\x4data\\8.0-Diplomacy\\libraries\\adsigns.xml",
+  "dlc_summaries": [
+    {
+      "dlc": "ego_dlc_split",
+      "modified_records": 1,
+      "modified_fields_total": 2,
+      "major_changes": [
+        {
+          "type": "adsign",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_terran",
+      "modified_records": 1,
+      "modified_fields_total": 6,
+      "major_changes": [
+        {
+          "type": "adsign",
+          "count": 6
+        }
+      ]
+    }
+  ]
+}

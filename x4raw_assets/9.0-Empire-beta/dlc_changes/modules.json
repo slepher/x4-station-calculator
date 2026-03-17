@@ -1,0 +1,42 @@
+{
+  "version": "9.0",
+  "beta": true,
+  "folder_name": "9.0-Empire-beta",
+  "type": "modules",
+  "base_file": "D:\\Documents\\project\\x4tools\\x4data\\9.0-Empire-beta\\libraries\\modules.xml",
+  "dlc_summaries": [
+    {
+      "dlc": "ego_dlc_split",
+      "modified_records": 26,
+      "modified_fields_total": 26,
+      "major_changes": [
+        {
+          "type": "category",
+          "count": 26
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_terran",
+      "modified_records": 2,
+      "modified_fields_total": 2,
+      "major_changes": [
+        {
+          "type": "category",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_boron",
+      "modified_records": 25,
+      "modified_fields_total": 25,
+      "major_changes": [
+        {
+          "type": "category",
+          "count": 25
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "version": "9.0",
+  "beta": true,
+  "folder_name": "9.0-Empire-beta",
+  "type": "adsigns",
+  "base_file": "D:\\Documents\\project\\x4tools\\x4data\\9.0-Empire-beta\\libraries\\adsigns.xml",
+  "dlc_summaries": [
+    {
+      "dlc": "ego_dlc_split",
+      "modified_records": 1,
+      "modified_fields_total": 2,
+      "major_changes": [
+        {
+          "type": "adsign",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_terran",
+      "modified_records": 1,
+      "modified_fields_total": 6,
+      "major_changes": [
+        {
+          "type": "adsign",
+          "count": 6
+        }
+      ]
+    }
+  ]
+}

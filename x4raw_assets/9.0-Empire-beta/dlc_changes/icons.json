@@ -1,0 +1,86 @@
+{
+  "version": "9.0",
+  "beta": true,
+  "folder_name": "9.0-Empire-beta",
+  "type": "icons",
+  "base_file": "D:\\Documents\\project\\x4tools\\x4data\\9.0-Empire-beta\\libraries\\icons.xml",
+  "dlc_summaries": [
+    {
+      "dlc": "ego_dlc_split",
+      "modified_records": 4,
+      "modified_fields_total": 4,
+      "major_changes": [
+        {
+          "type": "unknown",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_terran",
+      "modified_records": 3,
+      "modified_fields_total": 3,
+      "major_changes": [
+        {
+          "type": "unknown",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_pirate",
+      "modified_records": 3,
+      "modified_fields_total": 3,
+      "major_changes": [
+        {
+          "type": "unknown",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_boron",
+      "modified_records": 3,
+      "modified_fields_total": 3,
+      "major_changes": [
+        {
+          "type": "unknown",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_timelines",
+      "modified_records": 3,
+      "modified_fields_total": 3,
+      "major_changes": [
+        {
+          "type": "unknown",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_mini_01",
+      "modified_records": 3,
+      "modified_fields_total": 3,
+      "major_changes": [
+        {
+          "type": "unknown",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_mini_02",
+      "modified_records": 2,
+      "modified_fields_total": 2,
+      "major_changes": [
+        {
+          "type": "unknown",
+          "count": 2
+        }
+      ]
+    }
+  ]
+}

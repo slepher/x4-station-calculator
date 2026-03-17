@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<ships xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="libraries.xsd">
+  <!-- Hyperion for all 3 PAR factions -->
+  <ship id="paranid_expeditionary_l" group="par_expeditionary_l">
+    <category tags="[military, expeditionary]" faction="paranid" size="ship_l"/>
+    <pilot>
+      <select faction="paranid" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_large_military"/>
+    <people ref="paranid_military_crew"/>
+  </ship>
+  <ship id="holyorder_expeditionary_l" group="hol_expeditionary_l">
+    <category tags="[military, expeditionary]" faction="holyorder" size="ship_l"/>
+    <pilot>
+      <select faction="paranid" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_large_military"/>
+    <people ref="paranid_military_crew"/>
+  </ship>
+  <ship id="tri_expeditionary_l" group="tri_expeditionary_l">
+    <category tags="[military, expeditionary]" faction="trinity" size="ship_l"/>
+    <pilot>
+      <select faction="trinity" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_large_military"/>
+    <people ref="paranid_military_crew"/>
+  </ship>
+  <ship id="argon_envoy" group="envoy">
+    <category tags="[envoy]" faction="[argon, antigone]" size="ship_m"/>
+    <pilot>
+      <select faction="argon" tags="commander"/>
+    </pilot>
+    <drop ref="ship_medium_luxury"/>
+    <people ref="argon_elite_freighter_crew"/>
+  </ship>
+  <ship id="teladi_envoy" group="envoy">
+    <category tags="[envoy]" faction="[teladi, ministry]" size="ship_m"/>
+    <pilot>
+      <select faction="teladi" tags="commander"/>
+    </pilot>
+    <drop ref="ship_medium_luxury"/>
+    <people ref="teladi_elite_freighter_crew"/>
+  </ship>
+  <ship id="paranid_envoy" group="envoy">
+    <category tags="[envoy]" faction="[paranid, holyorder, trinity, buccaneers]" size="ship_m"/>
+    <pilot>
+      <select faction="paranid" tags="commander"/>
+    </pilot>
+    <drop ref="ship_medium_luxury"/>
+    <people ref="paranid_elite_freighter_crew"/>
+  </ship>
+  <ship id="scaleplate_cypher" group="cypher">
+    <category tags="[cypher]" faction="[scaleplate]" size="ship_m"/>
+    <pilot>
+      <select faction="teladi" tags="commander"/>
+    </pilot>
+    <drop ref="ship_small_pirate"/>
+    <people ref="scaleplate_pirate_crew"/>
+  </ship>
+</ships>

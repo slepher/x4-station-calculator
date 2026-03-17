@@ -1,0 +1,20 @@
+{
+  "version": "8.0",
+  "beta": false,
+  "folder_name": "8.0-Diplomacy",
+  "type": "charactergroups",
+  "base_file": "D:\\Documents\\project\\x4tools\\x4data\\8.0-Diplomacy\\libraries\\charactergroups.xml",
+  "dlc_summaries": [
+    {
+      "dlc": "ego_dlc_timelines",
+      "modified_records": 1,
+      "modified_fields_total": 12,
+      "major_changes": [
+        {
+          "type": "select",
+          "count": 12
+        }
+      ]
+    }
+  ]
+}

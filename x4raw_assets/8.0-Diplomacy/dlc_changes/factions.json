@@ -1,0 +1,84 @@
+{
+  "version": "8.0",
+  "beta": false,
+  "folder_name": "8.0-Diplomacy",
+  "type": "factions",
+  "base_file": "D:\\Documents\\project\\x4tools\\x4data\\8.0-Diplomacy\\libraries\\factions.xml",
+  "dlc_summaries": [
+    {
+      "dlc": "ego_dlc_split",
+      "modified_records": 18,
+      "modified_fields_total": 48,
+      "major_changes": [
+        {
+          "type": "relation",
+          "count": 45
+        },
+        {
+          "type": "licence",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_terran",
+      "modified_records": 18,
+      "modified_fields_total": 46,
+      "major_changes": [
+        {
+          "type": "relation",
+          "count": 43
+        },
+        {
+          "type": "licence",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_pirate",
+      "modified_records": 17,
+      "modified_fields_total": 29,
+      "major_changes": [
+        {
+          "type": "relation",
+          "count": 25
+        },
+        {
+          "type": "licence",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_boron",
+      "modified_records": 15,
+      "modified_fields_total": 21,
+      "major_changes": [
+        {
+          "type": "relation",
+          "count": 14
+        },
+        {
+          "type": "licence",
+          "count": 7
+        }
+      ]
+    },
+    {
+      "dlc": "ego_dlc_timelines",
+      "modified_records": 16,
+      "modified_fields_total": 23,
+      "major_changes": [
+        {
+          "type": "relation",
+          "count": 22
+        },
+        {
+          "type": "licence",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

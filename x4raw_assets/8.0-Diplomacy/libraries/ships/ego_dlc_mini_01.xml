@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<ships xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="libraries.xsd">
+  <!-- Hyperion for all 3 PAR factions -->
+  <ship id="paranid_expeditionary_l" group="par_expeditionary_l">
+    <category tags="[military, expeditionary]" faction="paranid" size="ship_l"/>
+    <pilot>
+      <select faction="paranid" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_large_military"/>
+    <people ref="paranid_military_crew"/>
+  </ship>
+  <ship id="holyorder_expeditionary_l" group="hol_expeditionary_l">
+    <category tags="[military, expeditionary]" faction="holyorder" size="ship_l"/>
+    <pilot>
+      <select faction="paranid" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_large_military"/>
+    <people ref="paranid_military_crew"/>
+  </ship>
+  <ship id="tri_expeditionary_l" group="tri_expeditionary_l">
+    <category tags="[military, expeditionary]" faction="trinity" size="ship_l"/>
+    <pilot>
+      <select faction="trinity" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_large_military"/>
+    <people ref="paranid_military_crew"/>
+  </ship>
+</ships>

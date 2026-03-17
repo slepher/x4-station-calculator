@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<regions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="region_definitions.xsd">
+  <region name="region_cluster_740_sector_001_nebula_1" density="1.0" rotation="0" noisescale="15000" seed="8888" minnoisevalue="0.0" maxnoisevalue="1">
+    <boundary class="cylinder">
+      <size r="350000" linear="40000"/>
+    </boundary>
+    <falloff>
+      <lateral>
+        <step position="0.0" value="0.50"/>
+        <step position="0.3" value="0.90"/>
+        <step position="0.5" value="1.0"/>
+        <step position="0.7" value="0.90"/>
+        <step position="1.0" value="0.50"/>
+      </lateral>
+      <radial>
+        <step position="0.0" value="1.0"/>
+        <step position="0.99" value="1.0"/>
+        <step position="1.0" value="0.0"/>
+      </radial>
+    </falloff>
+    <fields>
+      <volumetricfog multiplier="1.0" medium="fog_c740" texture="assets/textures/environments/fog_smoothclouds_01" lodrule="nebulafar" size="164000" densityfactor="0.000125" sizevariation="0.5" rotation="0" rotationvariation="0.5" noisescale="100000" seed="214" minnoisevalue="0.0" maxnoisevalue="1.0" distancefactor="0.50"/>
+      <!-- No res hot Asteroids -->
+      <asteroid groupref="asteroid_hot_xl" lodrule="asteroidxl" densityfactor="0.1" rotation="0" rotationvariation="4" noisescale="15000" seed="8888" minnoisevalue="0.7" maxnoisevalue="1"/>
+      <asteroid groupref="asteroid_hot_l" densityfactor="0.1" rotation="0" rotationvariation="4" noisescale="15000" seed="8888" minnoisevalue="0.7" maxnoisevalue="1"/>
+      <!-- Ore -->
+      <asteroid groupref="asteroid_ore_m" densityfactor="0.2" rotation="360" rotationvariation="8" noisescale="15000" seed="8888" minnoisevalue="0.57" maxnoisevalue="1"/>
+      <asteroid groupref="asteroid_ore_s" densityfactor="0.3" rotation="360" rotationvariation="16" noisescale="1500" seed="8888" minnoisevalue="0.57" maxnoisevalue="1"/>
+      <asteroid groupref="asteroid_ore_xs" densityfactor="0.1" rotation="360" rotationvariation="32" noisescale="1500" seed="8888" minnoisevalue="0.65" maxnoisevalue="1"/>
+    </fields>
+  </region>
+  <region name="region_cluster_740_sector_001_asteroid_1" density="0.005" rotation="0" noisescale="1000" seed="32" minnoisevalue="0.05" maxnoisevalue="1">
+    <boundary class="splinetube">
+      <size r="40000"/>
+      <splineposition x="56364.9" y="-17962.9" z="168431.0" tx="-0.631004" ty="-0.160856" tz="-0.75892" inlength="0.0" outlength="31378.1"/>
+      <splineposition x="15888.0" y="-17912.4" z="106651.0" tx="-0.370716" ty="0.263947" tz="-0.89045" inlength="19474.9" outlength="19474.9"/>
+      <splineposition x="13255.4" y="12523.0" z="64191.0" tx="0.455713" ty="0.183096" tz="-0.871092" inlength="24135.0" outlength="24135.0"/>
+      <splineposition x="81216.6" y="8581.93" z="-19841.4" tx="-0.109998" ty="0.00754536" tz="-0.993903" inlength="20662.8" outlength="20662.8"/>
+      <splineposition x="-560.993" y="13477.0" z="-59009.7" tx="-0.833751" ty="-0.131801" tz="-0.536179" inlength="25952.2" outlength="25952.2"/>
+      <splineposition x="-48681.5" y="-11931.4" z="-103222.0" tx="-0.904558" ty="-0.141098" tz="0.402327" inlength="24399.3" outlength="24399.3"/>
+      <splineposition x="-132880.0" y="-7141.48" z="136.379" tx="-0.117973" ty="-0.0122753" tz="0.992941" inlength="34132.7" outlength="34132.7"/>
+      <splineposition x="-72055.7" y="-14664.4" z="100217.0" tx="0.801768" ty="-0.0822559" tz="0.591947" inlength="55433.9" outlength="0.0"/>
+    </boundary>
+    <falloff>
+      <lateral>
+        <step position="0.0" value="0.0"/>
+        <step position="0.1" value="2.6"/>
+        <step position="0.2" value="2.8"/>
+        <step position="0.5" value="2.0"/>
+        <step position="0.6" value="2.8"/>
+        <step position="0.8" value="2.7"/>
+        <step position="0.9" value="2.6"/>
+        <step position="1.0" value="0.0"/>
+      </lateral>
+      <radial>
+        <step position="0.0" value="1.0"/>
+        <step position="0.51" value="1.0"/>
+        <step position="0.65" value="0.85"/>
+        <step position="1.0" value="0.0"/>
+      </radial>
+    </falloff>
+    <fields>
+      <debris groupref="debris_xl" densityfactor="0.05" rotation="360" rotationvariation="1" noisescale="10000" seed="32" minnoisevalue="0.540" maxnoisevalue="1"/>
+      <debris groupref="debris_l" densityfactor="0.07" rotation="360" rotationvariation="1" noisescale="10000" seed="32" minnoisevalue="0.540" maxnoisevalue="1"/>
+      <debris groupref="debris_xenon_xl" densityfactor="0.05" rotation="360" rotationvariation="4" noisescale="10000" seed="32" minnoisevalue="0.60" maxnoisevalue="1" distancefactor="1.0"/>
+      <debris groupref="debris_xenon_m" densityfactor="0.1" rotation="360" rotationvariation="4" noisescale="10000" seed="32" minnoisevalue="0.60" maxnoisevalue="1" distancefactor="1.0"/>
+    </fields>
+  </region>
+  <region name="region_cluster_740_sector_001_asteroid_2" density="0.30" rotation="0" noisescale="15000" seed="8888" minnoisevalue="0.0" maxnoisevalue="1">
+    <boundary class="splinetube">
+      <size r="7000"/>
+      <splineposition x="-130280.0" y="0.0" z="-102115.0" tx="-0.397476" ty="0.057867" tz="0.915786" inlength="0.0" outlength="29631.3"/>
+      <splineposition x="-195859.0" y="7536.44" z="-18446.2" tx="-0.742379" ty="0.0765376" tz="0.665594" inlength="43030.7" outlength="43030.7"/>
+      <splineposition x="-321927.0" y="19857.7" z="69745.4" tx="-0.878614" ty="0.153762" tz="0.4521" inlength="45465.2" outlength="45465.2"/>
+      <splineposition x="-435559.0" y="49610.5" z="104796.0" tx="-0.938856" ty="0.336239" tz="0.0741201" inlength="38136.1" outlength="0.0"/>
+    </boundary>
+    <falloff>
+      <lateral>
+        <step position="0.0" value="0.0"/>
+        <step position="0.05" value="1.0"/>
+        <step position="0.95" value="1.0"/>
+        <step position="1.0" value="0.0"/>
+      </lateral>
+      <radial>
+        <step position="0.0" value="1.0"/>
+        <step position="0.51" value="1.0"/>
+        <step position="0.75" value="0.85"/>
+        <step position="1.0" value="0.0"/>
+      </radial>
+    </falloff>
+    <fields>
+      <volumetricfog multiplier="0.50" medium="fog_greenveins" texture="assets/textures/environments/fog_patterncloud_06" lodrule="nebulafar" size="35000" sizevariation="0.5" densityfactor="0.01" rotation="0" rotationvariation="0.50" noisescale="15000" seed="3214" minnoisevalue="0.3" maxnoisevalue="1.0" distancefactor="0.80"/>
+      <nebula ref="fogpattern_v3_macro" localred="255" localgreen="255" localblue="255" localdensity="0.0" uniformred="0" uniformgreen="137" uniformblue="124" uniformdensity="0.0" backgroundfog="false" resources="helium"/>
+      <!--Lockboxes-->
+      <object groupref="lockboxes_rare" densityfactor="0.000025" rotation="0" rotationvariation="70" minnoisevalue="0.0" maxnoisevalue="1"/>
+    </fields>
+  </region>
+  <!--AUDIO & LOCKBOX REGIONS ______________________________________________________________________________________________________________________________________________________________________________________________________-->
+  <alias name="audioregion_cluster_740_sector_001" ref="audioregion_default_01_07"/>
+</regions>
