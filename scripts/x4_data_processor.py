@@ -2170,15 +2170,17 @@ class X4PrecisionLoader:
         version_str = str(self.config.get("version", ""))
 
         # 调用统一的 Map 处理服务
-        process_map_for_version(
+        result = process_map_for_version(
             raw_assets_dir=X4_UNPACKED_DATA_PATH,
             processed_assets_dir=OUTPUT_VERSION_DIR,
             folder_name="",  # base_path 已经包含 folder_name
             version=version_str,
-            i18n_languages=None,  # 使用默认的 English
+            i18n_registry=self.i18n_registry,  # 使用已配置好的 registry
         )
 
-        # 注意：names 收集在服务函数内部通过 registry 完成，此处不需要额外处理
+        # 收集 nameId 到 needed_raw_names
+        name_ids = result.get("name_ids", set())
+        self.needed_raw_names.update(name_ids)
 
     def extract_and_resolve_languages(self):
         print(f"\n🌍 [3/5] 构建翻译数据库...")

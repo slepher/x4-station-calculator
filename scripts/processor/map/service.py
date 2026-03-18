@@ -4,9 +4,9 @@
 """
 
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict, Optional, Any, Set
 
-from processor.i18n import get_i18n_registry
+from processor.i18n import get_i18n_registry, I18nRegistry
 from processor.path_utils import get_map_dir, get_library_xml
 from processor.resource.model_detector import detect_map_resource_model
 from processor.resource.modern_processor import (
@@ -31,8 +31,8 @@ def process_map_for_version(
     processed_assets_dir: str,
     folder_name: str,
     version: str,
-    i18n_languages: Optional[Dict[str, dict]] = None,
-) -> Dict[str, object]:
+    i18n_registry: Optional[I18nRegistry] = None,
+) -> Dict[str, Any]:
     """
     根据版本号处理 Map 数据。
 
@@ -43,10 +43,10 @@ def process_map_for_version(
         processed_assets_dir: 处理后输出目录
         folder_name: 版本文件夹名（如 "8.0-Diplomacy"）
         version: 版本号（如 "8.0", "9.0"）
-        i18n_languages: 国际化语言配置，默认使用 English
+        i18n_registry: 可选的共享 registry 实例，不传则创建新的（仅 English）
 
     Returns:
-        处理结果统计信息
+        处理结果统计信息，包含 name_ids 集合
     """
     # 构建基础路径
     base_path = raw_assets_dir
@@ -74,11 +74,13 @@ def process_map_for_version(
     resource_model = detect_map_resource_model(version)
     print(f"📊 资源模型：{resource_model} (version={version})")
 
-    # 配置国际化
-    if i18n_languages is None:
-        i18n_languages = {"044": {"iso": "en", "name": "English"}}
-    registry = get_i18n_registry()
-    registry.configure(raw_assets_dir, i18n_languages)
+    # 配置国际化 - 使用共享实例或创建新的
+    use_shared = i18n_registry is not None
+    registry = i18n_registry if use_shared else get_i18n_registry()
+
+    if not use_shared:
+        # 仅在创建新 registry 时配置（x4_map_processor.py 场景）
+        registry.configure(raw_assets_dir, {"044": {"iso": "en", "name": "English"}})
 
     # 处理 factions
     factions_rows, factions_by_id = migrate_factions(
@@ -124,10 +126,26 @@ def process_map_for_version(
         print(f"📦 Resourceareas Output: {resourceareas_output_path} count={len(resourceareas_rows)}")
         print(f"📦 Regions Output: 跳过 (9.0+ 不生成)")
 
+        # 输出 maps.json
+        payload = result.get("payload", {})
+        write_map(payload, maps_output_path)
+        print(f"📦 Maps Output: {maps_output_path}")
+
+        # 收集 nameId
+        map_name_ids = set(result.get("name_ids", []))
+        missing = result.get("missing_name_ids", {})
+        ties = result.get("owner_resolution_ties", [])
+
+        print(f"   ✅ map nameId merged: {len(map_name_ids)}")
+        print(f"   ℹ️ owner resolution ties: {len(ties)}")
+        print(f"   ℹ️ map missing cluster nameId: {len(missing.get('clusters', []))}")
+        print(f"   ℹ️ map missing sector nameId: {len(missing.get('sectors', []))}")
+
         return {
             "resource_model": "resourceareas",
             "resourceareas_count": len(resourceareas_rows),
             "factions_count": len(factions_rows),
+            "name_ids": map_name_ids,
         }
 
     else:
@@ -148,20 +166,38 @@ def process_map_for_version(
             resource_model="regions",
         )
 
-        # 输出 maps.json
-        payload = result.get("payload", {})
-        write_map(payload, maps_output_path)
-        print(f"📦 Maps Output: {maps_output_path}")
-
         # 输出 regions.json
         regions_rows = result.get("regions", [])
         write_regions(regions_rows, regions_output_path)
         print(f"📦 Regions Output: {regions_output_path} count={len(regions_rows)}")
 
-        return {
-            "resource_model": "regions",
-            "regions_count": len(regions_rows),
-            "regionyields_count": len(regionyields_rows),
-            "factions_count": len(factions_rows),
-            "map_name_ids": len(result.get("name_ids", [])),
-        }
+        # 输出 resourceareas.json（8.0 也需要）
+        resourceareas_rows = result.get("resourceareas", [])
+        write_resourceareas(resourceareas_rows, resourceareas_output_path)
+        print(f"📦 Resourceareas Output: {resourceareas_output_path} count={len(resourceareas_rows)}")
+
+        print(f"📦 Regionyields Output: {regionyields_output_path} ({len(regionyields_rows)})")
+
+    # 分支后处理：输出 maps.json 并收集 nameId（8.0 和 9.0 共有）
+    payload = result.get("payload", {})
+    write_map(payload, maps_output_path)
+    print(f"📦 Maps Output: {maps_output_path}")
+
+    # 收集 nameId
+    map_name_ids = set(result.get("name_ids", []))
+    missing = result.get("missing_name_ids", {})
+    ties = result.get("owner_resolution_ties", [])
+
+    print(f"   ✅ map nameId merged: {len(map_name_ids)}")
+    print(f"   ℹ️ owner resolution ties: {len(ties)}")
+    print(f"   ℹ️ map missing cluster nameId: {len(missing.get('clusters', []))}")
+    print(f"   ℹ️ map missing sector nameId: {len(missing.get('sectors', []))}")
+
+    return {
+        "resource_model": resource_model,
+        "resourceareas_count": len(result.get("resourceareas", [])),
+        "regions_count": len(result.get("regions", [])),
+        "regionyields_count": len(result.get("regionyields", [])),
+        "factions_count": len(factions_rows),
+        "name_ids": map_name_ids,
+    }

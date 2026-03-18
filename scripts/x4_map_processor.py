@@ -27,6 +27,7 @@ def run_for_config(args: argparse.Namespace, effective_config: dict) -> None:
         processed_assets_dir=OUTPUT_VERSION_DIR,
         folder_name="",  # base_path 已经包含 folder_name
         version=version_str,
+        # i18n_registry 不传，服务函数会创建新的（仅 English）
     )
 
 

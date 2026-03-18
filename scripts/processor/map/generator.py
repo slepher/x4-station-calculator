@@ -985,12 +985,6 @@ def generate_map_data(
             nested_clusters[cluster_id]["sectors"][sector_id]["stations"] = station_items
 
     payload = {
-        "meta": {
-            "version": "x4-map-xml-v2",
-            "source_map_dir": str(map_dir),
-            "mapdefaults_xml": str(mapdefaults_path) if mapdefaults_path.exists() else None,
-            "structure": "clusters->sectors with zone data expanded into sector-space",
-        },
         "clusters": nested_clusters,
     }
     name_ids = sorted(

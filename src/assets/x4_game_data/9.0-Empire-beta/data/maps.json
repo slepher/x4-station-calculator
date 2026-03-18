@@ -1,10 +1,4 @@
 {
-  "meta": {
-    "version": "x4-map-xml-v2",
-    "source_map_dir": "x4raw_assets/9.0-Empire-beta/maps/xu_ep2_universe",
-    "mapdefaults_xml": "x4raw_assets/9.0-Empire-beta/libraries/mapdefaults/final.xml",
-    "structure": "clusters->sectors with zone data expanded into sector-space"
-  },
   "clusters": {
     "Cluster_01_macro": {
       "id": "Cluster_01_macro",
