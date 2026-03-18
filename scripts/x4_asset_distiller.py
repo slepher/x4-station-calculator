@@ -253,12 +253,34 @@ def run_distillation_for_version(m_config, v_config, config_dir, xml_diff):
     def clone_tree(tree):
         return etree.ElementTree(deepcopy(tree.getroot()))
 
-    def apply_overlay_to_tree(base_tree, source_path):
+    def apply_overlay_to_tree(base_tree, source_path, merge_mode='patch_or_overwrite'):
         try:
             source_tree = etree.parse(source_path, parser)
         except Exception as e:
             print(f"      ⚠️ 读取失败 {source_path}: {e}")
             return None, 'failed'
+
+        if merge_mode == 'append_macros':
+            if base_tree is None:
+                print(f"      ⚠️ 缺少基础树，无法追加宏节点: {source_path}")
+                return None, 'failed'
+            try:
+                target_tree = clone_tree(base_tree)
+                target_root = target_tree.getroot()
+                source_root = source_tree.getroot()
+
+                target_macros = target_root if target_root.tag == 'macros' else target_root.find('./macros')
+                source_macros = source_root if source_root.tag == 'macros' else source_root.find('./macros')
+                if target_macros is None or source_macros is None:
+                    print(f"      ⚠️ 宏节点结构不匹配，无法追加: {source_path}")
+                    return None, 'failed'
+
+                for macro_node in source_macros.findall('./macro'):
+                    target_macros.append(deepcopy(macro_node))
+                return target_tree, 'patched'
+            except Exception as e:
+                print(f"      ⚠️ 追加宏节点失败 {source_path}: {e}")
+                return None, 'failed'
 
         source_root = source_tree.getroot()
         if source_root.tag == 'diff':
@@ -295,7 +317,7 @@ def run_distillation_for_version(m_config, v_config, config_dir, xml_diff):
                 return True
         return False
 
-    def build_dlc_stack_xml(relative_path, overlay_sources_by_dlc):
+    def build_dlc_stack_xml(relative_path, overlay_sources_by_dlc, merge_mode='patch_or_overwrite'):
         slot_dir, base_output_path, final_output_path = get_xml_slot_paths(relative_path)
         os.makedirs(slot_dir, exist_ok=True)
 
@@ -325,7 +347,7 @@ def run_distillation_for_version(m_config, v_config, config_dir, xml_diff):
             shutil.copy2(source_path, dlc_output_path)
             dlc_written += 1
 
-            final_next_tree, final_result = apply_overlay_to_tree(final_tree, source_path)
+            final_next_tree, final_result = apply_overlay_to_tree(final_tree, source_path, merge_mode=merge_mode)
             if final_next_tree is not None and final_result in ('patched', 'overwritten'):
                 final_tree = final_next_tree
 
@@ -388,7 +410,7 @@ def run_distillation_for_version(m_config, v_config, config_dir, xml_diff):
             relative_path = os.path.join(relative_dir, file_name)
             overlay_sources_by_dlc = overlay_sources_by_target.get(file_name, {})
 
-            result = build_dlc_stack_xml(relative_path, overlay_sources_by_dlc)
+            result = build_dlc_stack_xml(relative_path, overlay_sources_by_dlc, merge_mode='append_macros')
             if result['base']:
                 stats['base_written'] += 1
             if result['final']:
