@@ -204,7 +204,7 @@
       "class": "splinetube",
       "size": {
         "r": 50000,
-        "linear": 690326.147707009
+        "linear": 690326
       },
       "spline": [
         {
@@ -317,8 +317,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medhigh"
       }
-    ],
-    "linear": 690326.147707009
+    ]
   },
   {
     "id": "c601s1_region2",
@@ -326,7 +325,7 @@
       "class": "splinetube",
       "size": {
         "r": 67500,
-        "linear": 388890.47435587936
+        "linear": 388890
       },
       "spline": [
         {
@@ -425,8 +424,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medhigh"
       }
-    ],
-    "linear": 388890.47435587936
+    ]
   },
   {
     "id": "c602s1_region1",
@@ -434,7 +432,7 @@
       "class": "splinetube",
       "size": {
         "r": 20000,
-        "linear": 993994.4094888804
+        "linear": 993994
       },
       "spline": [
         {
@@ -586,8 +584,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 993994.4094888804
+    ]
   },
   {
     "id": "c602s1_region1sm",
@@ -595,7 +592,7 @@
       "class": "splinetube",
       "size": {
         "r": 20000,
-        "linear": 993994.4094888804
+        "linear": 993994
       },
       "spline": [
         {
@@ -747,8 +744,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 993994.4094888804
+    ]
   },
   {
     "id": "c603s1_region1",
@@ -831,7 +827,7 @@
       "class": "splinetube",
       "size": {
         "r": 12500,
-        "linear": 257900.13667334843
+        "linear": 257900
       },
       "spline": [
         {
@@ -916,8 +912,7 @@
         "gatherfactor": 1.0,
         "yield_name": "low"
       }
-    ],
-    "linear": 257900.13667334843
+    ]
   },
   {
     "id": "c605s1_region",
@@ -1000,7 +995,7 @@
       "class": "splinetube",
       "size": {
         "r": 15000,
-        "linear": 260969.721383903
+        "linear": 260970
       },
       "spline": [
         {
@@ -1099,8 +1094,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 260969.721383903
+    ]
   },
   {
     "id": "c605s1_region13",
@@ -1108,7 +1102,7 @@
       "class": "splinetube",
       "size": {
         "r": 12500,
-        "linear": 154907.813057953
+        "linear": 154908
       },
       "spline": [
         {
@@ -1207,8 +1201,7 @@
         "gatherfactor": 1.0,
         "yield_name": "low"
       }
-    ],
-    "linear": 154907.813057953
+    ]
   },
   {
     "id": "c605s1_region14",
@@ -1216,7 +1209,7 @@
       "class": "splinetube",
       "size": {
         "r": 1500,
-        "linear": 119250.23193301947
+        "linear": 119250
       },
       "spline": [
         {
@@ -1325,8 +1318,7 @@
         "gatherfactor": 1.0,
         "yield_name": "low"
       }
-    ],
-    "linear": 119250.23193301947
+    ]
   },
   {
     "id": "c605s1_region15",
@@ -1334,7 +1326,7 @@
       "class": "splinetube",
       "size": {
         "r": 2500,
-        "linear": 74959.31575136237
+        "linear": 74959
       },
       "spline": [
         {
@@ -1443,8 +1435,7 @@
         "gatherfactor": 1.0,
         "yield_name": "low"
       }
-    ],
-    "linear": 74959.31575136237
+    ]
   },
   {
     "id": "c605s1_region16",
@@ -1452,7 +1443,7 @@
       "class": "splinetube",
       "size": {
         "r": 2500,
-        "linear": 303919.7960545303
+        "linear": 303920
       },
       "spline": [
         {
@@ -1581,8 +1572,7 @@
         "gatherfactor": 1.0,
         "yield_name": "low"
       }
-    ],
-    "linear": 303919.7960545303
+    ]
   },
   {
     "id": "c605s1_region17",
@@ -1590,7 +1580,7 @@
       "class": "splinetube",
       "size": {
         "r": 2500,
-        "linear": 94876.51307815578
+        "linear": 94877
       },
       "spline": [
         {
@@ -1699,8 +1689,7 @@
         "gatherfactor": 1.0,
         "yield_name": "low"
       }
-    ],
-    "linear": 94876.51307815578
+    ]
   },
   {
     "id": "c605s1_region18",
@@ -1708,7 +1697,7 @@
       "class": "splinetube",
       "size": {
         "r": 2500,
-        "linear": 80023.04094124642
+        "linear": 80023
       },
       "spline": [
         {
@@ -1807,8 +1796,7 @@
         "gatherfactor": 1.0,
         "yield_name": "low"
       }
-    ],
-    "linear": 80023.04094124642
+    ]
   },
   {
     "id": "c605s1_region19",
@@ -1816,7 +1804,7 @@
       "class": "splinetube",
       "size": {
         "r": 2500,
-        "linear": 82531.84649824575
+        "linear": 82532
       },
       "spline": [
         {
@@ -1905,8 +1893,7 @@
         "gatherfactor": 1.0,
         "yield_name": "low"
       }
-    ],
-    "linear": 82531.84649824575
+    ]
   },
   {
     "id": "c605s1_region1sm",
@@ -1989,7 +1976,7 @@
       "class": "splinetube",
       "size": {
         "r": 2500,
-        "linear": 109707.62134168255
+        "linear": 109708
       },
       "spline": [
         {
@@ -2078,8 +2065,7 @@
         "gatherfactor": 1.0,
         "yield_name": "low"
       }
-    ],
-    "linear": 109707.62134168255
+    ]
   },
   {
     "id": "c606s2_region",
@@ -2148,7 +2134,7 @@
       "class": "splinetube",
       "size": {
         "r": 80000,
-        "linear": 508856.22583019227
+        "linear": 508856
       },
       "spline": [
         {
@@ -2233,8 +2219,7 @@
         "gatherfactor": 4.0,
         "yield_name": "high"
       }
-    ],
-    "linear": 508856.22583019227
+    ]
   },
   {
     "id": "c607s1_region2",
@@ -2242,7 +2227,7 @@
       "class": "splinetube",
       "size": {
         "r": 40000,
-        "linear": 1092896.8435711341
+        "linear": 1092897
       },
       "spline": [
         {
@@ -2381,8 +2366,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medplus"
       }
-    ],
-    "linear": 1092896.8435711341
+    ]
   },
   {
     "id": "c608s1_region1",
@@ -4344,7 +4328,7 @@
       "class": "splinetube",
       "size": {
         "r": 5000,
-        "linear": 182160.52554617068
+        "linear": 182161
       },
       "spline": [
         {
@@ -4471,8 +4455,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 182160.52554617068
+    ]
   },
   {
     "id": "p1_wreckfield_xenon_split_cluster32",
@@ -4480,7 +4463,7 @@
       "class": "splinetube",
       "size": {
         "r": 5000,
-        "linear": 47122.179048897495
+        "linear": 47122
       },
       "spline": [
         {
@@ -4617,8 +4600,7 @@
         "gatherfactor": 1.0,
         "yield_name": "high"
       }
-    ],
-    "linear": 47122.179048897495
+    ]
   },
   {
     "id": "p1_wreckfield_xenon_teladi_10km",
@@ -4770,7 +4752,7 @@
       "class": "splinetube",
       "size": {
         "r": 60000,
-        "linear": 31037310.62774433
+        "linear": 31037311
       },
       "spline": [
         {
@@ -5009,8 +4991,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medplus"
       }
-    ],
-    "linear": 31037310.62774433
+    ]
   },
   {
     "id": "region2_cluster_27_sector_001",
@@ -5018,7 +4999,7 @@
       "class": "splinetube",
       "size": {
         "r": 8000,
-        "linear": 698783.0644223287
+        "linear": 698783
       },
       "spline": [
         {
@@ -5173,8 +5154,7 @@
         "gatherfactor": 4.0,
         "yield_name": "high"
       }
-    ],
-    "linear": 698783.0644223287
+    ]
   },
   {
     "id": "region3_cluster_04_sector_001",
@@ -5940,7 +5920,7 @@
       "class": "splinetube",
       "size": {
         "r": 18000,
-        "linear": 1598349.3178789336
+        "linear": 1598349
       },
       "spline": [
         {
@@ -6185,8 +6165,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 1598349.3178789336
+    ]
   },
   {
     "id": "region_cluster_01_sector_001_b",
@@ -6194,7 +6173,7 @@
       "class": "splinetube",
       "size": {
         "r": 18000,
-        "linear": 9985626.447259743
+        "linear": 9985626
       },
       "spline": [
         {
@@ -6619,8 +6598,7 @@
         "gatherfactor": 1.0,
         "yield_name": "low"
       }
-    ],
-    "linear": 9985626.447259743
+    ]
   },
   {
     "id": "region_cluster_01_sector_001_c",
@@ -6628,7 +6606,7 @@
       "class": "splinetube",
       "size": {
         "r": 18000,
-        "linear": 9350683.717956927
+        "linear": 9350684
       },
       "spline": [
         {
@@ -6993,8 +6971,7 @@
         "gatherfactor": 1.0,
         "yield_name": "low"
       }
-    ],
-    "linear": 9350683.717956927
+    ]
   },
   {
     "id": "region_cluster_01_sector_002_a",
@@ -7002,7 +6979,7 @@
       "class": "splinetube",
       "size": {
         "r": 12000,
-        "linear": 4611868.375271695
+        "linear": 4611868
       },
       "spline": [
         {
@@ -7200,8 +7177,7 @@
         "gatherfactor": 1.0,
         "yield_name": "verylow"
       }
-    ],
-    "linear": 4611868.375271695
+    ]
   },
   {
     "id": "region_cluster_01_sector_002_b",
@@ -7209,7 +7185,7 @@
       "class": "splinetube",
       "size": {
         "r": 12000,
-        "linear": 2914626.991907852
+        "linear": 2914627
       },
       "spline": [
         {
@@ -7377,8 +7353,7 @@
         "gatherfactor": 1.0,
         "yield_name": "verylow"
       }
-    ],
-    "linear": 2914626.991907852
+    ]
   },
   {
     "id": "region_cluster_01_sector_002_c",
@@ -7386,7 +7361,7 @@
       "class": "splinetube",
       "size": {
         "r": 12000,
-        "linear": 3548735.4685820853
+        "linear": 3548735
       },
       "spline": [
         {
@@ -7534,8 +7509,7 @@
         "gatherfactor": 1.0,
         "yield_name": "verylow"
       }
-    ],
-    "linear": 3548735.4685820853
+    ]
   },
   {
     "id": "region_cluster_01_sector_002_d",
@@ -7543,7 +7517,7 @@
       "class": "splinetube",
       "size": {
         "r": 12000,
-        "linear": 2987331.283820828
+        "linear": 2987331
       },
       "spline": [
         {
@@ -7691,8 +7665,7 @@
         "gatherfactor": 1.0,
         "yield_name": "verylow"
       }
-    ],
-    "linear": 2987331.283820828
+    ]
   },
   {
     "id": "region_cluster_01_sector_002_e",
@@ -7700,7 +7673,7 @@
       "class": "splinetube",
       "size": {
         "r": 12000,
-        "linear": 2847079.237662859
+        "linear": 2847079
       },
       "spline": [
         {
@@ -7838,8 +7811,7 @@
         "gatherfactor": 1.0,
         "yield_name": "low"
       }
-    ],
-    "linear": 2847079.237662859
+    ]
   },
   {
     "id": "region_cluster_01_sector_002_f",
@@ -7847,7 +7819,7 @@
       "class": "splinetube",
       "size": {
         "r": 12000,
-        "linear": 2266412.7948151426
+        "linear": 2266413
       },
       "spline": [
         {
@@ -7985,8 +7957,7 @@
         "gatherfactor": 1.0,
         "yield_name": "low"
       }
-    ],
-    "linear": 2266412.7948151426
+    ]
   },
   {
     "id": "region_cluster_01_sector_002_g",
@@ -7994,7 +7965,7 @@
       "class": "splinetube",
       "size": {
         "r": 12000,
-        "linear": 8180293.342308618
+        "linear": 8180293
       },
       "spline": [
         {
@@ -8212,8 +8183,7 @@
         "gatherfactor": 1.0,
         "yield_name": "verylow"
       }
-    ],
-    "linear": 8180293.342308618
+    ]
   },
   {
     "id": "region_cluster_01_sector_002_h",
@@ -8221,7 +8191,7 @@
       "class": "splinetube",
       "size": {
         "r": 12000,
-        "linear": 9792433.93624768
+        "linear": 9792434
       },
       "spline": [
         {
@@ -8469,8 +8439,7 @@
         "gatherfactor": 1.0,
         "yield_name": "verylow"
       }
-    ],
-    "linear": 9792433.93624768
+    ]
   },
   {
     "id": "region_cluster_01_sector_003_a",
@@ -8478,7 +8447,7 @@
       "class": "splinetube",
       "size": {
         "r": 12000,
-        "linear": 3164190.3874836876
+        "linear": 3164190
       },
       "spline": [
         {
@@ -8626,8 +8595,7 @@
         "gatherfactor": 1.0,
         "yield_name": "verylow"
       }
-    ],
-    "linear": 3164190.3874836876
+    ]
   },
   {
     "id": "region_cluster_01_sector_003_b",
@@ -8635,7 +8603,7 @@
       "class": "splinetube",
       "size": {
         "r": 12000,
-        "linear": 3222058.470530969
+        "linear": 3222058
       },
       "spline": [
         {
@@ -8783,8 +8751,7 @@
         "gatherfactor": 1.0,
         "yield_name": "verylow"
       }
-    ],
-    "linear": 3222058.470530969
+    ]
   },
   {
     "id": "region_cluster_01_sector_003_c",
@@ -8792,7 +8759,7 @@
       "class": "splinetube",
       "size": {
         "r": 12000,
-        "linear": 3254181.323549643
+        "linear": 3254181
       },
       "spline": [
         {
@@ -8940,8 +8907,7 @@
         "gatherfactor": 1.0,
         "yield_name": "verylow"
       }
-    ],
-    "linear": 3254181.323549643
+    ]
   },
   {
     "id": "region_cluster_01_sector_003_d",
@@ -8949,7 +8915,7 @@
       "class": "splinetube",
       "size": {
         "r": 12000,
-        "linear": 3685708.848220414
+        "linear": 3685709
       },
       "spline": [
         {
@@ -9097,8 +9063,7 @@
         "gatherfactor": 1.0,
         "yield_name": "verylow"
       }
-    ],
-    "linear": 3685708.848220414
+    ]
   },
   {
     "id": "region_cluster_01_sector_003_e",
@@ -9106,7 +9071,7 @@
       "class": "splinetube",
       "size": {
         "r": 12000,
-        "linear": 3165191.959972304
+        "linear": 3165192
       },
       "spline": [
         {
@@ -9254,8 +9219,7 @@
         "gatherfactor": 1.0,
         "yield_name": "low"
       }
-    ],
-    "linear": 3165191.959972304
+    ]
   },
   {
     "id": "region_cluster_01_sector_003_f",
@@ -9263,7 +9227,7 @@
       "class": "splinetube",
       "size": {
         "r": 12000,
-        "linear": 3359995.596125735
+        "linear": 3359996
       },
       "spline": [
         {
@@ -9411,8 +9375,7 @@
         "gatherfactor": 1.0,
         "yield_name": "verylow"
       }
-    ],
-    "linear": 3359995.596125735
+    ]
   },
   {
     "id": "region_cluster_02_sector_001",
@@ -9446,7 +9409,7 @@
       "class": "splinetube",
       "size": {
         "r": 18000,
-        "linear": 1735748.7779740281
+        "linear": 1735749
       },
       "spline": [
         {
@@ -9668,8 +9631,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 1735748.7779740281
+    ]
   },
   {
     "id": "region_cluster_03_sector_001",
@@ -10042,7 +10004,7 @@
       "class": "splinetube",
       "size": {
         "r": 8000,
-        "linear": 1927935.2313718467
+        "linear": 1927935
       },
       "spline": [
         {
@@ -10311,8 +10273,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 1927935.2313718467
+    ]
   },
   {
     "id": "region_cluster_15_sector_001",
@@ -10654,7 +10615,7 @@
       "class": "splinetube",
       "size": {
         "r": 18000,
-        "linear": 333390.8434741325
+        "linear": 333391
       },
       "spline": [
         {
@@ -10772,8 +10733,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 333390.8434741325
+    ]
   },
   {
     "id": "region_cluster_22_sector_001",
@@ -11182,7 +11142,7 @@
       "class": "splinetube",
       "size": {
         "r": 8000,
-        "linear": 819859.0722642601
+        "linear": 819859
       },
       "spline": [
         {
@@ -11511,8 +11471,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 819859.0722642601
+    ]
   },
   {
     "id": "region_cluster_28_sector_001",
@@ -11520,7 +11479,7 @@
       "class": "splinetube",
       "size": {
         "r": 15000,
-        "linear": 634945.7942905627
+        "linear": 634946
       },
       "spline": [
         {
@@ -11779,8 +11738,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 634945.7942905627
+    ]
   },
   {
     "id": "region_cluster_29_sector_001",
@@ -12082,7 +12040,7 @@
       "class": "splinetube",
       "size": {
         "r": 15000,
-        "linear": 833138.2441974923
+        "linear": 833138
       },
       "spline": [
         {
@@ -12277,8 +12235,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 833138.2441974923
+    ]
   },
   {
     "id": "region_cluster_35_sector_001_a",
@@ -12451,7 +12408,7 @@
       "class": "splinetube",
       "size": {
         "r": 15000,
-        "linear": 2503777.2965198606
+        "linear": 2503777
       },
       "spline": [
         {
@@ -12596,8 +12553,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medhigh"
       }
-    ],
-    "linear": 2503777.2965198606
+    ]
   },
   {
     "id": "region_cluster_38_sector_001",
@@ -12605,7 +12561,7 @@
       "class": "splinetube",
       "size": {
         "r": 25000,
-        "linear": 1674898.8509482755
+        "linear": 1674899
       },
       "spline": [
         {
@@ -12781,8 +12737,7 @@
         "gatherfactor": 1.0,
         "yield_name": "lowest"
       }
-    ],
-    "linear": 1674898.8509482755
+    ]
   },
   {
     "id": "region_cluster_38_sector_001_b",
@@ -12790,7 +12745,7 @@
       "class": "splinetube",
       "size": {
         "r": 25000,
-        "linear": 3058226.723187186
+        "linear": 3058227
       },
       "spline": [
         {
@@ -12996,8 +12951,7 @@
         "gatherfactor": 1.0,
         "yield_name": "lowest"
       }
-    ],
-    "linear": 3058226.723187186
+    ]
   },
   {
     "id": "region_cluster_401_sector_001",
@@ -13373,7 +13327,7 @@
       "class": "splinetube",
       "size": {
         "r": 12000,
-        "linear": 980698.8165485332
+        "linear": 980699
       },
       "spline": [
         {
@@ -13528,8 +13482,7 @@
         "gatherfactor": 1.0,
         "yield_name": "low"
       }
-    ],
-    "linear": 980698.8165485332
+    ]
   },
   {
     "id": "region_cluster_412_sector_001",
@@ -13892,7 +13845,7 @@
       "class": "splinetube",
       "size": {
         "r": 4000,
-        "linear": 369352.6974207715
+        "linear": 369353
       },
       "spline": [
         {
@@ -13959,8 +13912,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 369352.6974207715
+    ]
   },
   {
     "id": "region_cluster_418_sector_001_c",
@@ -13968,7 +13920,7 @@
       "class": "splinetube",
       "size": {
         "r": 4000,
-        "linear": 357644.9445245941
+        "linear": 357645
       },
       "spline": [
         {
@@ -14035,8 +13987,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 357644.9445245941
+    ]
   },
   {
     "id": "region_cluster_418_sector_001_d",
@@ -14198,7 +14149,7 @@
       "class": "splinetube",
       "size": {
         "r": 18000,
-        "linear": 333390.8434741325
+        "linear": 333391
       },
       "spline": [
         {
@@ -14316,8 +14267,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 333390.8434741325
+    ]
   },
   {
     "id": "region_cluster_421_sector_001",
@@ -14382,7 +14332,7 @@
       "class": "splinetube",
       "size": {
         "r": 18000,
-        "linear": 1335880.9470009252
+        "linear": 1335881
       },
       "spline": [
         {
@@ -14587,8 +14537,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 1335880.9470009252
+    ]
   },
   {
     "id": "region_cluster_424_sector_002",
@@ -14951,7 +14900,7 @@
       "class": "splinetube",
       "size": {
         "r": 7000,
-        "linear": 304962.07175842393
+        "linear": 304962
       },
       "spline": [
         {
@@ -15147,8 +15096,7 @@
         "gatherfactor": 1.0,
         "yield_name": "low"
       }
-    ],
-    "linear": 304962.07175842393
+    ]
   },
   {
     "id": "region_cluster_47_sector_001",
@@ -15156,7 +15104,7 @@
       "class": "splinetube",
       "size": {
         "r": 5000,
-        "linear": 95526.98125201154
+        "linear": 95527
       },
       "spline": [
         {
@@ -15329,8 +15277,7 @@
         "gatherfactor": 1.0,
         "yield_name": "verylow"
       }
-    ],
-    "linear": 95526.98125201154
+    ]
   },
   {
     "id": "region_cluster_47_sector_001b",
@@ -15338,7 +15285,7 @@
       "class": "splinetube",
       "size": {
         "r": 5000,
-        "linear": 120056.23601404991
+        "linear": 120056
       },
       "spline": [
         {
@@ -15511,8 +15458,7 @@
         "gatherfactor": 1.0,
         "yield_name": "verylow"
       }
-    ],
-    "linear": 120056.23601404991
+    ]
   },
   {
     "id": "region_cluster_48_sector_001",
@@ -15520,7 +15466,7 @@
       "class": "splinetube",
       "size": {
         "r": 18000,
-        "linear": 1598349.3178789336
+        "linear": 1598349
       },
       "spline": [
         {
@@ -15772,8 +15718,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 1598349.3178789336
+    ]
   },
   {
     "id": "region_cluster_49_sector_001",
@@ -15781,7 +15726,7 @@
       "class": "splinetube",
       "size": {
         "r": 34000,
-        "linear": 1160991.3129823282
+        "linear": 1160991
       },
       "spline": [
         {
@@ -15946,8 +15891,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medhigh"
       }
-    ],
-    "linear": 1160991.3129823282
+    ]
   },
   {
     "id": "region_cluster_50_sector_001",
@@ -17139,7 +17083,7 @@
       "class": "splinetube",
       "size": {
         "r": 12500,
-        "linear": 257900.13667334843
+        "linear": 257900
       },
       "spline": [
         {
@@ -17224,8 +17168,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medplus"
       }
-    ],
-    "linear": 257900.13667334843
+    ]
   },
   {
     "id": "region_cluster_709_sector_001_asteroids_1",
@@ -17379,7 +17322,7 @@
       "class": "splinetube",
       "size": {
         "r": 18000,
-        "linear": 383500.0004411905
+        "linear": 383500
       },
       "spline": [
         {
@@ -17511,8 +17454,7 @@
         "gatherfactor": 1.0,
         "yield_name": "verylow"
       }
-    ],
-    "linear": 383500.0004411905
+    ]
   },
   {
     "id": "region_cluster_710_sector_001_asteroids_2",
@@ -17520,7 +17462,7 @@
       "class": "splinetube",
       "size": {
         "r": 18000,
-        "linear": 759070.3518813982
+        "linear": 759070
       },
       "spline": [
         {
@@ -17685,8 +17627,7 @@
         "gatherfactor": 1.0,
         "yield_name": "low"
       }
-    ],
-    "linear": 759070.3518813982
+    ]
   },
   {
     "id": "region_cluster_711_sector_001_asteroids_1",
@@ -17694,7 +17635,7 @@
       "class": "splinetube",
       "size": {
         "r": 18000,
-        "linear": 361438.32356111717
+        "linear": 361438
       },
       "spline": [
         {
@@ -17819,8 +17760,7 @@
         "gatherfactor": 1.0,
         "yield_name": "low"
       }
-    ],
-    "linear": 361438.32356111717
+    ]
   },
   {
     "id": "region_cluster_711_sector_001_asteroids_2",
@@ -17828,7 +17768,7 @@
       "class": "splinetube",
       "size": {
         "r": 18000,
-        "linear": 132866.77317125694
+        "linear": 132867
       },
       "spline": [
         {
@@ -17950,8 +17890,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 132866.77317125694
+    ]
   },
   {
     "id": "region_cluster_712_sector_001_asteroids_1",
@@ -18037,7 +17976,7 @@
       "class": "splinetube",
       "size": {
         "r": 28000,
-        "linear": 690270.1816195198
+        "linear": 690270
       },
       "spline": [
         {
@@ -18182,8 +18121,7 @@
         "gatherfactor": 1.0,
         "yield_name": "highlow"
       }
-    ],
-    "linear": 690270.1816195198
+    ]
   },
   {
     "id": "region_cluster_713_sector_001_nebula_1",
@@ -18191,7 +18129,7 @@
       "class": "splinetube",
       "size": {
         "r": 22000,
-        "linear": 620139.5343781861
+        "linear": 620140
       },
       "spline": [
         {
@@ -18306,8 +18244,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 620139.5343781861
+    ]
   },
   {
     "id": "region_cluster_713_sector_001_nebula_2",
@@ -18315,7 +18252,7 @@
       "class": "splinetube",
       "size": {
         "r": 22000,
-        "linear": 571455.0407354494
+        "linear": 571455
       },
       "spline": [
         {
@@ -18430,8 +18367,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medplus"
       }
-    ],
-    "linear": 571455.0407354494
+    ]
   },
   {
     "id": "region_cluster_715_sector_001_asteroids_1",
@@ -18782,7 +18718,7 @@
       "class": "splinetube",
       "size": {
         "r": 50000,
-        "linear": 383500.0004411905
+        "linear": 383500
       },
       "spline": [
         {
@@ -18914,8 +18850,7 @@
         "gatherfactor": 1.0,
         "yield_name": "low"
       }
-    ],
-    "linear": 383500.0004411905
+    ]
   },
   {
     "id": "region_cluster_721_sector_001_nebula_1",
@@ -19019,7 +18954,7 @@
       "class": "splinetube",
       "size": {
         "r": 18000,
-        "linear": 383500.0004411905
+        "linear": 383500
       },
       "spline": [
         {
@@ -19130,8 +19065,7 @@
         "gatherfactor": 1.0,
         "yield_name": "lowest"
       }
-    ],
-    "linear": 383500.0004411905
+    ]
   },
   {
     "id": "region_cluster_722_sector_001_asteroids_2",
@@ -19410,7 +19344,7 @@
       "class": "splinetube",
       "size": {
         "r": 15000,
-        "linear": 833138.2441974923
+        "linear": 833138
       },
       "spline": [
         {
@@ -19591,8 +19525,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 833138.2441974923
+    ]
   },
   {
     "id": "region_cluster_725_sector_001",
@@ -19600,7 +19533,7 @@
       "class": "splinetube",
       "size": {
         "r": 18000,
-        "linear": 383500.0004411905
+        "linear": 383500
       },
       "spline": [
         {
@@ -19725,8 +19658,7 @@
         "gatherfactor": 1.0,
         "yield_name": "verylow"
       }
-    ],
-    "linear": 383500.0004411905
+    ]
   },
   {
     "id": "region_cluster_725_sector_001_nebula_1_res",
@@ -19809,7 +19741,7 @@
       "class": "splinetube",
       "size": {
         "r": 18000,
-        "linear": 759070.3518813982
+        "linear": 759070
       },
       "spline": [
         {
@@ -19974,8 +19906,7 @@
         "gatherfactor": 1.0,
         "yield_name": "verylow"
       }
-    ],
-    "linear": 759070.3518813982
+    ]
   },
   {
     "id": "region_cluster_730_sector_001_asteroids_1",
@@ -20065,7 +19996,7 @@
       "class": "splinetube",
       "size": {
         "r": 18000,
-        "linear": 383500.0004411905
+        "linear": 383500
       },
       "spline": [
         {
@@ -20176,8 +20107,7 @@
         "gatherfactor": 1.0,
         "yield_name": "lowest"
       }
-    ],
-    "linear": 383500.0004411905
+    ]
   },
   {
     "id": "region_cluster_740_sector_001_asteroid_1",
@@ -20185,7 +20115,7 @@
       "class": "splinetube",
       "size": {
         "r": 40000,
-        "linear": 645987.1121596431
+        "linear": 645987
       },
       "spline": [
         {
@@ -20336,8 +20266,7 @@
         "gatherfactor": 1.0,
         "yield_name": "low"
       }
-    ],
-    "linear": 645987.1121596431
+    ]
   },
   {
     "id": "region_cluster_740_sector_001_asteroid_2",
@@ -20345,7 +20274,7 @@
       "class": "splinetube",
       "size": {
         "r": 7000,
-        "linear": 383500.0004411905
+        "linear": 383500
       },
       "spline": [
         {
@@ -20440,8 +20369,7 @@
         "gatherfactor": 1.0,
         "yield_name": "low"
       }
-    ],
-    "linear": 383500.0004411905
+    ]
   },
   {
     "id": "region_cluster_740_sector_001_nebula_1",
@@ -20756,7 +20684,7 @@
       "class": "splinetube",
       "size": {
         "r": 18000,
-        "linear": 1598349.3178789336
+        "linear": 1598349
       },
       "spline": [
         {
@@ -21001,8 +20929,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 1598349.3178789336
+    ]
   },
   {
     "id": "region_scenario_mining_5",
@@ -21010,7 +20937,7 @@
       "class": "splinetube",
       "size": {
         "r": 18000,
-        "linear": 1598349.3178789336
+        "linear": 1598349
       },
       "spline": [
         {
@@ -21255,8 +21182,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 1598349.3178789336
+    ]
   },
   {
     "id": "region_scenario_mining_7_getsu_fune",
@@ -21264,7 +21190,7 @@
       "class": "splinetube",
       "size": {
         "r": 18000,
-        "linear": 1598349.3178789336
+        "linear": 1598349
       },
       "spline": [
         {
@@ -21509,8 +21435,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 1598349.3178789336
+    ]
   },
   {
     "id": "region_scenario_mining_7_nividium_l",
@@ -21677,7 +21602,7 @@
       "class": "splinetube",
       "size": {
         "r": 15000,
-        "linear": 623424.41343381
+        "linear": 623424
       },
       "spline": [
         {
@@ -21876,8 +21801,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 623424.41343381
+    ]
   },
   {
     "id": "s2_grav",
@@ -22468,7 +22392,7 @@
       "class": "splinetube",
       "size": {
         "r": 5000,
-        "linear": 182160.52554617068
+        "linear": 182161
       },
       "spline": [
         {
@@ -22595,8 +22519,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 182160.52554617068
+    ]
   },
   {
     "id": "scenario_wave_attack_1_region_001",
@@ -22683,7 +22606,7 @@
       "class": "splinetube",
       "size": {
         "r": 15000,
-        "linear": 634945.7942905627
+        "linear": 634946
       },
       "spline": [
         {
@@ -22935,8 +22858,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 634945.7942905627
+    ]
   },
   {
     "id": "scenario_wave_attack_antigone_region_002",
@@ -22944,7 +22866,7 @@
       "class": "splinetube",
       "size": {
         "r": 15000,
-        "linear": 623424.41343381
+        "linear": 623424
       },
       "spline": [
         {
@@ -23136,8 +23058,7 @@
         "gatherfactor": 1.0,
         "yield_name": "medium"
       }
-    ],
-    "linear": 623424.41343381
+    ]
   },
   {
     "id": "test_scenario_mining_region_big",

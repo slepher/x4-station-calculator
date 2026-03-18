@@ -14,6 +14,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 5000
+          }
+        },
         "total_volume_km3": 9817,
         "volume_km3": 9817,
         "resources": [
@@ -66,6 +73,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -94,7 +109,14 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
-        "total_volume_km3": 1626921,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 18000,
+            "linear": 1598349
+          }
+        },
+        "total_volume_km3": 1017876,
         "volume_km3": 1017876,
         "resources": [
           {
@@ -146,7 +168,14 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
-        "total_volume_km3": 9517837,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 18000,
+            "linear": 9350684
+          }
+        },
+        "total_volume_km3": 1017876,
         "volume_km3": 1017876,
         "resources": [
           {
@@ -198,7 +227,14 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
-        "total_volume_km3": 10164130,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 18000,
+            "linear": 9985626
+          }
+        },
+        "total_volume_km3": 1017876,
         "volume_km3": 1017876,
         "resources": [
           {
@@ -250,6 +286,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.8133,
         "falloff_factor": 0.732,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 2500,
+            "linear": 2000
+          }
+        },
         "total_volume_km3": 39,
         "volume_km3": 39,
         "resources": [
@@ -278,6 +321,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.5893,
         "falloff_factor": 0.5304,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 80000,
+            "linear": 50000
+          }
+        },
+        "total_volume_km3": 1005310,
         "total_blocks": 1,
         "blocks": 0,
         "resources": [
@@ -312,6 +363,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 2500
+          }
+        },
         "total_volume_km3": 4909,
         "volume_km3": 4909,
         "resources": [
@@ -340,6 +398,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -368,6 +434,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 1,
         "blocks": 1,
         "resources": [
@@ -396,6 +470,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -424,7 +506,14 @@
         "lateral_factor": 1.1,
         "radial_factor": 0.7155,
         "falloff_factor": 0.787,
-        "total_volume_km3": 2086360,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 12000,
+            "linear": 4611868
+          }
+        },
+        "total_volume_km3": 452389,
         "volume_km3": 452389,
         "resources": [
           {
@@ -464,7 +553,14 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
-        "total_volume_km3": 1318546,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 12000,
+            "linear": 2914627
+          }
+        },
+        "total_volume_km3": 452389,
         "volume_km3": 452389,
         "resources": [
           {
@@ -504,7 +600,14 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
-        "total_volume_km3": 1605410,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 12000,
+            "linear": 3548735
+          }
+        },
+        "total_volume_km3": 452389,
         "volume_km3": 452389,
         "resources": [
           {
@@ -544,7 +647,14 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
-        "total_volume_km3": 1351437,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 12000,
+            "linear": 2987331
+          }
+        },
+        "total_volume_km3": 452389,
         "volume_km3": 452389,
         "resources": [
           {
@@ -584,7 +694,14 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
-        "total_volume_km3": 1287988,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 12000,
+            "linear": 2847079
+          }
+        },
+        "total_volume_km3": 452389,
         "volume_km3": 452389,
         "resources": [
           {
@@ -624,7 +741,14 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
-        "total_volume_km3": 1025301,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 12000,
+            "linear": 2266413
+          }
+        },
+        "total_volume_km3": 452389,
         "volume_km3": 452389,
         "resources": [
           {
@@ -664,7 +788,14 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
-        "total_volume_km3": 3700678,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 12000,
+            "linear": 8180293
+          }
+        },
+        "total_volume_km3": 452389,
         "volume_km3": 452389,
         "resources": [
           {
@@ -704,9 +835,16 @@
         "lateral_factor": 0.99,
         "radial_factor": 0.8472,
         "falloff_factor": 0.8388,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 10000,
+            "linear": 3500
+          }
+        },
+        "total_volume_km3": 1100,
         "total_blocks": 1,
         "blocks": 0,
-        "total_volume_km3": 1100,
         "volume_km3": 1100,
         "resources": [
           {
@@ -752,6 +890,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 5000
+          }
+        },
         "total_volume_km3": 9817,
         "volume_km3": 9817,
         "resources": [
@@ -804,6 +949,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -832,7 +985,14 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
-        "total_volume_km3": 1431446,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 12000,
+            "linear": 3164190
+          }
+        },
+        "total_volume_km3": 452389,
         "volume_km3": 452389,
         "resources": [
           {
@@ -872,7 +1032,14 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
-        "total_volume_km3": 1457625,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 12000,
+            "linear": 3222058
+          }
+        },
+        "total_volume_km3": 452389,
         "volume_km3": 452389,
         "resources": [
           {
@@ -912,7 +1079,14 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
-        "total_volume_km3": 1472157,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 12000,
+            "linear": 3254181
+          }
+        },
+        "total_volume_km3": 452389,
         "volume_km3": 452389,
         "resources": [
           {
@@ -952,7 +1126,14 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
-        "total_volume_km3": 1667375,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 12000,
+            "linear": 3685709
+          }
+        },
+        "total_volume_km3": 452389,
         "volume_km3": 452389,
         "resources": [
           {
@@ -992,7 +1173,14 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
-        "total_volume_km3": 1431899,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 12000,
+            "linear": 3165192
+          }
+        },
+        "total_volume_km3": 452389,
         "volume_km3": 452389,
         "resources": [
           {
@@ -1032,7 +1220,14 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
-        "total_volume_km3": 1520026,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 12000,
+            "linear": 3359996
+          }
+        },
+        "total_volume_km3": 452389,
         "volume_km3": 452389,
         "resources": [
           {
@@ -1078,9 +1273,16 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 18000,
+            "linear": 1735749
+          }
+        },
+        "total_volume_km3": 1017876,
         "total_blocks": 2,
         "blocks": 2,
-        "total_volume_km3": 1766777,
         "volume_km3": 1017876,
         "resources": [
           {
@@ -1150,6 +1352,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 2500
+          }
+        },
         "total_volume_km3": 4909,
         "volume_km3": 4909,
         "resources": [
@@ -1178,6 +1387,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 5000
+          }
+        },
         "total_volume_km3": 9817,
         "volume_km3": 9817,
         "resources": [
@@ -1236,9 +1452,16 @@
         "lateral_factor": 1.21,
         "radial_factor": 0.7997,
         "falloff_factor": 0.9676,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 60000,
+            "linear": 31037311
+          }
+        },
+        "total_volume_km3": 11309734,
         "total_blocks": 1,
         "blocks": 0,
-        "total_volume_km3": 351023713,
         "volume_km3": 11309734,
         "resources": [
           {
@@ -1314,9 +1537,16 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 250000,
+            "linear": 50000
+          }
+        },
+        "total_volume_km3": 6283185,
         "total_blocks": 122,
         "blocks": 122,
-        "total_volume_km3": 9817477,
         "volume_km3": 9817477,
         "resources": [
           {
@@ -1392,6 +1622,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.8133,
         "falloff_factor": 0.732,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 5000,
+            "linear": 3000
+          }
+        },
         "total_volume_km3": 236,
         "volume_km3": 236,
         "resources": [
@@ -1426,6 +1663,13 @@
         "lateral_factor": 1.0,
         "radial_factor": 1.0,
         "falloff_factor": 1.0,
+        "boundary": {
+          "class": "sphere",
+          "size": {
+            "r": 250000
+          }
+        },
+        "total_volume_km3": 10053096,
         "total_blocks": 273,
         "blocks": 183,
         "resources": [
@@ -1460,6 +1704,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -1488,6 +1740,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 1,
         "blocks": 1,
         "resources": [
@@ -1516,6 +1776,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -1544,6 +1812,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 5000
+          }
+        },
         "total_volume_km3": 9817,
         "volume_km3": 9817,
         "resources": [
@@ -1602,6 +1877,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 1,
         "blocks": 1,
         "resources": [
@@ -1630,6 +1913,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -1658,6 +1949,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -1692,7 +1991,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
-        "total_volume_km3": 9817477,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 250000,
+            "linear": 50000
+          }
+        },
+        "total_volume_km3": 6283185,
         "volume_km3": 9817477,
         "resources": [
           {
@@ -1726,9 +2032,15 @@
         "lateral_factor": 1.0,
         "radial_factor": 1.0,
         "falloff_factor": 1.0,
+        "boundary": {
+          "class": "sphere",
+          "size": {
+            "r": 250000
+          }
+        },
+        "total_volume_km3": 10053096,
         "total_blocks": 273,
         "blocks": 183,
-        "total_volume_km3": 65449847,
         "volume_km3": 37699112,
         "resources": [
           {
@@ -1786,9 +2098,16 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.46,
         "falloff_factor": 0.368,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 3500000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "total_blocks": 363,
         "blocks": 162,
-        "total_volume_km3": 1539380400,
         "volume_km3": 8235497,
         "resources": [
           {
@@ -1894,6 +2213,14 @@
         "lateral_factor": 0.55,
         "radial_factor": 0.46,
         "falloff_factor": 0.253,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 3500000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "total_blocks": 242,
         "blocks": 162,
         "resources": [
@@ -1928,6 +2255,14 @@
         "lateral_factor": 0.55,
         "radial_factor": 0.46,
         "falloff_factor": 0.253,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 3500000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "total_blocks": 242,
         "blocks": 162,
         "resources": [
@@ -1974,9 +2309,16 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.801,
         "falloff_factor": 0.6408,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 195000000,
+            "linear": 2000
+          }
+        },
+        "total_volume_km3": 251327,
         "total_blocks": 121,
         "blocks": 81,
-        "total_volume_km3": 238918121306,
         "volume_km3": 411775,
         "resources": [
           {
@@ -2058,6 +2400,14 @@
         "lateral_factor": 0.55,
         "radial_factor": 0.46,
         "falloff_factor": 0.253,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 3500000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "total_blocks": 242,
         "blocks": 162,
         "resources": [
@@ -2104,9 +2454,16 @@
         "lateral_factor": 0.975,
         "radial_factor": 0.9033,
         "falloff_factor": 0.8808,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 350000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "total_blocks": 218,
         "blocks": 162,
-        "total_volume_km3": 15393804,
         "volume_km3": 8235497,
         "resources": [
           {
@@ -2200,9 +2557,17 @@
         "lateral_factor": 1.0,
         "radial_factor": 1.0,
         "falloff_factor": 1.0,
+        "boundary": {
+          "class": "box",
+          "size": {
+            "x": 600000,
+            "y": 25000,
+            "z": 600000
+          }
+        },
+        "total_volume_km3": 0,
         "total_blocks": 1,
         "blocks": 1,
-        "total_volume_km3": 0,
         "volume_km3": 0,
         "resources": [
           {
@@ -2296,9 +2661,16 @@
         "lateral_factor": 0.55,
         "radial_factor": 0.46,
         "falloff_factor": 0.253,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 350000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "total_blocks": 218,
         "blocks": 162,
-        "total_volume_km3": 15393804,
         "volume_km3": 8235497,
         "resources": [
           {
@@ -2404,9 +2776,16 @@
         "lateral_factor": 0.55,
         "radial_factor": 0.46,
         "falloff_factor": 0.253,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 500000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "total_blocks": 242,
         "blocks": 162,
-        "total_volume_km3": 31415927,
         "volume_km3": 8235497,
         "resources": [
           {
@@ -2500,9 +2879,16 @@
         "lateral_factor": 0.55,
         "radial_factor": 0.46,
         "falloff_factor": 0.253,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 3500000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "total_blocks": 242,
         "blocks": 162,
-        "total_volume_km3": 1539380400,
         "volume_km3": 8235497,
         "resources": [
           {
@@ -2608,6 +2994,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -2636,6 +3030,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -2664,6 +3066,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 2500
+          }
+        },
         "total_volume_km3": 4909,
         "volume_km3": 4909,
         "resources": [
@@ -2692,6 +3101,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 3,
         "blocks": 3,
         "resources": [
@@ -2726,9 +3143,16 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.6379,
         "falloff_factor": 0.74,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 8000,
+            "linear": 1927935
+          }
+        },
+        "total_volume_km3": 201062,
         "total_blocks": 1,
         "blocks": 1,
-        "total_volume_km3": 387634,
         "volume_km3": 201062,
         "resources": [
           {
@@ -2804,6 +3228,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.8133,
         "falloff_factor": 0.732,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 2500,
+            "linear": 2000
+          }
+        },
         "total_volume_km3": 39,
         "volume_km3": 39,
         "resources": [
@@ -2838,6 +3269,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 2500
+          }
+        },
         "total_volume_km3": 4909,
         "volume_km3": 4909,
         "resources": [
@@ -2866,6 +3304,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 1,
         "blocks": 1,
         "resources": [
@@ -2894,6 +3340,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -2922,6 +3376,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -2956,6 +3418,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 2500
+          }
+        },
         "total_volume_km3": 4909,
         "volume_km3": 4909,
         "resources": [
@@ -2984,6 +3453,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 5000
+          }
+        },
         "total_volume_km3": 9817,
         "volume_km3": 9817,
         "resources": [
@@ -3042,9 +3518,16 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.8472,
         "falloff_factor": 0.7625,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 550000,
+            "linear": 50000
+          }
+        },
+        "total_volume_km3": 6283185,
         "total_blocks": 242,
         "blocks": 162,
-        "total_volume_km3": 47516589,
         "volume_km3": 10294371,
         "resources": [
           {
@@ -3102,9 +3585,15 @@
         "lateral_factor": 1.0,
         "radial_factor": 1.0,
         "falloff_factor": 1.0,
+        "boundary": {
+          "class": "sphere",
+          "size": {
+            "r": 500000
+          }
+        },
+        "total_volume_km3": 10053096,
         "total_blocks": 605,
         "blocks": 243,
-        "total_volume_km3": 523598776,
         "volume_km3": 39530384,
         "resources": [
           {
@@ -3174,6 +3663,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 2500
+          }
+        },
         "total_volume_km3": 4909,
         "volume_km3": 4909,
         "resources": [
@@ -3202,6 +3698,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -3230,6 +3734,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 5000
+          }
+        },
         "total_volume_km3": 9817,
         "volume_km3": 9817,
         "resources": [
@@ -3282,6 +3793,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -3310,6 +3829,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 1,
         "blocks": 1,
         "resources": [
@@ -3344,6 +3871,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -3372,6 +3907,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -3400,6 +3943,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 1,
         "blocks": 1,
         "resources": [
@@ -3428,6 +3979,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 5000
+          }
+        },
         "total_volume_km3": 9817,
         "volume_km3": 9817,
         "resources": [
@@ -3486,6 +4044,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -3514,6 +4080,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 5000
+          }
+        },
         "total_volume_km3": 9817,
         "volume_km3": 9817,
         "resources": [
@@ -3566,6 +4139,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 1,
         "blocks": 1,
         "resources": [
@@ -3594,6 +4175,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -3628,6 +4217,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 5000
+          }
+        },
         "total_volume_km3": 9817,
         "volume_km3": 9817,
         "resources": [
@@ -3680,9 +4276,16 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.7541,
         "falloff_factor": 0.6787,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 100000,
+            "linear": 10000
+          }
+        },
+        "total_volume_km3": 314159,
         "total_blocks": 11,
         "blocks": 11,
-        "total_volume_km3": 314159,
         "volume_km3": 314159,
         "resources": [
           {
@@ -3728,6 +4331,13 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 18000,
+            "linear": 333391
+          }
+        },
         "total_volume_km3": 339351,
         "volume_km3": 339351,
         "resources": [
@@ -3774,6 +4384,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -3802,6 +4420,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -3830,6 +4456,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 1,
         "blocks": 1,
         "resources": [
@@ -3858,6 +4492,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 5000
+          }
+        },
         "total_volume_km3": 9817,
         "volume_km3": 9817,
         "resources": [
@@ -3910,6 +4551,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 2500
+          }
+        },
         "total_volume_km3": 4909,
         "volume_km3": 4909,
         "resources": [
@@ -3944,6 +4592,13 @@
         "lateral_factor": 1.0825,
         "radial_factor": 0.9979,
         "falloff_factor": 1.0802,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 5000,
+            "linear": 182161
+          }
+        },
         "total_volume_km3": 14307,
         "volume_km3": 14307,
         "resources": [
@@ -3972,9 +4627,16 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 1250000,
+            "linear": 50000
+          }
+        },
+        "total_volume_km3": 6283185,
         "total_blocks": 242,
         "blocks": 162,
-        "total_volume_km3": 245436926,
         "volume_km3": 10294371,
         "resources": [
           {
@@ -4032,9 +4694,16 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 1250000,
+            "linear": 50000
+          }
+        },
+        "total_volume_km3": 6283185,
         "total_blocks": 242,
         "blocks": 162,
-        "total_volume_km3": 245436926,
         "volume_km3": 10294371,
         "resources": [
           {
@@ -4092,9 +4761,16 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 750000,
+            "linear": 50000
+          }
+        },
+        "total_volume_km3": 6283185,
         "total_blocks": 242,
         "blocks": 162,
-        "total_volume_km3": 88357293,
         "volume_km3": 10294371,
         "resources": [
           {
@@ -4152,9 +4828,16 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 750000,
+            "linear": 50000
+          }
+        },
+        "total_volume_km3": 6283185,
         "total_blocks": 242,
         "blocks": 162,
-        "total_volume_km3": 88357293,
         "volume_km3": 10294371,
         "resources": [
           {
@@ -4224,6 +4907,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -4252,6 +4943,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 1,
         "blocks": 1,
         "resources": [
@@ -4280,6 +4979,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -4308,9 +5015,16 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.8906,
         "falloff_factor": 1.0331,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 8000,
+            "linear": 698783
+          }
+        },
+        "total_volume_km3": 140499,
         "total_blocks": 2,
         "blocks": 2,
-        "total_volume_km3": 140499,
         "volume_km3": 140499,
         "resources": [
           {
@@ -4362,9 +5076,16 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.6379,
         "falloff_factor": 0.74,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 8000,
+            "linear": 819859
+          }
+        },
+        "total_volume_km3": 164842,
         "total_blocks": 1,
         "blocks": 1,
-        "total_volume_km3": 164842,
         "volume_km3": 164842,
         "resources": [
           {
@@ -4446,9 +5167,16 @@
         "lateral_factor": 0.6727,
         "radial_factor": 0.6379,
         "falloff_factor": 0.4292,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 15000,
+            "linear": 634946
+          }
+        },
+        "total_volume_km3": 448817,
         "total_blocks": 1,
         "blocks": 1,
-        "total_volume_km3": 448817,
         "volume_km3": 448817,
         "resources": [
           {
@@ -4524,9 +5252,16 @@
         "lateral_factor": 0.6727,
         "radial_factor": 0.6379,
         "falloff_factor": 0.4292,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 15000,
+            "linear": 623424
+          }
+        },
+        "total_volume_km3": 440673,
         "total_blocks": 1,
         "blocks": 1,
-        "total_volume_km3": 440673,
         "volume_km3": 440673,
         "resources": [
           {
@@ -4602,6 +5337,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -4636,6 +5379,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -4664,6 +5415,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 5000
+          }
+        },
         "total_volume_km3": 9817,
         "volume_km3": 9817,
         "resources": [
@@ -4716,6 +5474,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 1,
         "blocks": 1,
         "resources": [
@@ -4744,6 +5510,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 2500
+          }
+        },
         "total_volume_km3": 4909,
         "volume_km3": 4909,
         "resources": [
@@ -4772,6 +5545,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -4800,7 +5581,14 @@
         "lateral_factor": 0.641,
         "radial_factor": 0.898,
         "falloff_factor": 0.5756,
-        "total_volume_km3": 7853982,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 250000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "volume_km3": 7853982,
         "resources": [
           {
@@ -4858,7 +5646,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
-        "total_volume_km3": 9817477,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 250000,
+            "linear": 50000
+          }
+        },
+        "total_volume_km3": 6283185,
         "volume_km3": 9817477,
         "resources": [
           {
@@ -4886,6 +5681,13 @@
         "lateral_factor": 0.6575,
         "radial_factor": 0.7155,
         "falloff_factor": 0.4704,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 5000,
+            "linear": 47122
+          }
+        },
         "total_volume_km3": 3701,
         "volume_km3": 3701,
         "resources": [
@@ -4920,9 +5722,16 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 250000,
+            "linear": 100000
+          }
+        },
+        "total_volume_km3": 10053096,
         "total_blocks": 244,
         "blocks": 183,
-        "total_volume_km3": 19634954,
         "volume_km3": 19634954,
         "resources": [
           {
@@ -4986,6 +5795,13 @@
         "lateral_factor": 0.6575,
         "radial_factor": 0.7155,
         "falloff_factor": 0.4704,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 5000,
+            "linear": 47122
+          }
+        },
         "total_volume_km3": 3701,
         "volume_km3": 3701,
         "resources": [
@@ -5020,9 +5836,16 @@
         "lateral_factor": 0.7077,
         "radial_factor": 0.6379,
         "falloff_factor": 0.4515,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 15000,
+            "linear": 833138
+          }
+        },
+        "total_volume_km3": 588911,
         "total_blocks": 1,
         "blocks": 1,
-        "total_volume_km3": 588911,
         "volume_km3": 588911,
         "resources": [
           {
@@ -5080,9 +5903,16 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.7541,
         "falloff_factor": 0.6787,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 10000,
+            "linear": 2500
+          }
+        },
+        "total_volume_km3": 785,
         "total_blocks": 1,
         "blocks": 1,
-        "total_volume_km3": 785,
         "volume_km3": 785,
         "resources": [
           {
@@ -5122,9 +5952,16 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.8472,
         "falloff_factor": 0.7625,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 30000,
+            "linear": 10000
+          }
+        },
+        "total_volume_km3": 28274,
         "total_blocks": 2,
         "blocks": 2,
-        "total_volume_km3": 28274,
         "volume_km3": 28274,
         "resources": [
           {
@@ -5170,9 +6007,16 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.7653,
         "falloff_factor": 0.6888,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 100000,
+            "linear": 25000
+          }
+        },
+        "total_volume_km3": 785398,
         "total_blocks": 26,
         "blocks": 16,
-        "total_volume_km3": 785398,
         "volume_km3": 785398,
         "resources": [
           {
@@ -5242,9 +6086,16 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.8472,
         "falloff_factor": 0.7625,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 750000,
+            "linear": 20000
+          }
+        },
+        "total_volume_km3": 2513274,
         "total_blocks": 121,
         "blocks": 81,
-        "total_volume_km3": 35342917,
         "volume_km3": 4117748,
         "resources": [
           {
@@ -5302,9 +6153,16 @@
         "lateral_factor": 0.7077,
         "radial_factor": 0.95,
         "falloff_factor": 0.6724,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 15000,
+            "linear": 2503777
+          }
+        },
+        "total_volume_km3": 706858,
         "total_blocks": 1,
         "blocks": 1,
-        "total_volume_km3": 1769816,
         "volume_km3": 706858,
         "resources": [
           {
@@ -5356,6 +6214,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.8133,
         "falloff_factor": 0.732,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 2500,
+            "linear": 2000
+          }
+        },
         "total_volume_km3": 39,
         "volume_km3": 39,
         "resources": [
@@ -5384,6 +6249,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.8133,
         "falloff_factor": 0.732,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 2500,
+            "linear": 2000
+          }
+        },
         "total_volume_km3": 39,
         "volume_km3": 39,
         "resources": [
@@ -5418,9 +6290,16 @@
         "lateral_factor": 0.7077,
         "radial_factor": 0.95,
         "falloff_factor": 0.6724,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 25000,
+            "linear": 3058227
+          }
+        },
+        "total_volume_km3": 1963495,
         "total_blocks": 4,
         "blocks": 2,
-        "total_volume_km3": 6004814,
         "volume_km3": 1963495,
         "resources": [
           {
@@ -5508,9 +6387,16 @@
         "lateral_factor": 0.7077,
         "radial_factor": 0.95,
         "falloff_factor": 0.6724,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 25000,
+            "linear": 1674899
+          }
+        },
+        "total_volume_km3": 1963495,
         "total_blocks": 1,
         "blocks": 0,
-        "total_volume_km3": 3288656,
         "volume_km3": 1963495,
         "resources": [
           {
@@ -5598,6 +6484,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.8133,
         "falloff_factor": 0.732,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 2500,
+            "linear": 2000
+          }
+        },
         "total_volume_km3": 39,
         "volume_km3": 39,
         "resources": [
@@ -5626,6 +6519,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.8133,
         "falloff_factor": 0.732,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 2500,
+            "linear": 2000
+          }
+        },
         "total_volume_km3": 39,
         "volume_km3": 39,
         "resources": [
@@ -5660,9 +6560,16 @@
         "lateral_factor": 0.55,
         "radial_factor": 0.46,
         "falloff_factor": 0.253,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 350000,
+            "linear": 24000
+          }
+        },
+        "total_volume_km3": 3015929,
         "total_blocks": 218,
         "blocks": 162,
-        "total_volume_km3": 9236282,
         "volume_km3": 4941298,
         "resources": [
           {
@@ -5756,7 +6663,14 @@
         "lateral_factor": 0.45,
         "radial_factor": 0.7133,
         "falloff_factor": 0.321,
-        "total_volume_km3": 31415927,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 500000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "volume_km3": 8235497,
         "resources": [
           {
@@ -5814,7 +6728,14 @@
         "lateral_factor": 1.0,
         "radial_factor": 0.7893,
         "falloff_factor": 0.7893,
-        "total_volume_km3": 14137167,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 750000,
+            "linear": 8000
+          }
+        },
+        "total_volume_km3": 1005310,
         "volume_km3": 1647099,
         "resources": [
           {
@@ -5872,7 +6793,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.9033,
         "falloff_factor": 0.813,
-        "total_volume_km3": 7853982,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 500000,
+            "linear": 10000
+          }
+        },
+        "total_volume_km3": 1256637,
         "volume_km3": 2058874,
         "resources": [
           {
@@ -5930,9 +6858,16 @@
         "lateral_factor": 0.55,
         "radial_factor": 0.9033,
         "falloff_factor": 0.4968,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 500000,
+            "linear": 200000
+          }
+        },
+        "total_volume_km3": 10053096,
         "total_blocks": 363,
         "blocks": 162,
-        "total_volume_km3": 157079633,
         "volume_km3": 39530384,
         "resources": [
           {
@@ -5972,6 +6907,13 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 12000,
+            "linear": 980699
+          }
+        },
         "total_volume_km3": 443658,
         "volume_km3": 443658,
         "resources": [
@@ -6030,9 +6972,16 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.9033,
         "falloff_factor": 0.813,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 500000,
+            "linear": 100000
+          }
+        },
+        "total_volume_km3": 10053096,
         "total_blocks": 484,
         "blocks": 243,
-        "total_volume_km3": 78539816,
         "volume_km3": 20588742,
         "resources": [
           {
@@ -6102,9 +7051,16 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.9033,
         "falloff_factor": 0.813,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 500000,
+            "linear": 100000
+          }
+        },
+        "total_volume_km3": 10053096,
         "total_blocks": 484,
         "blocks": 243,
-        "total_volume_km3": 78539816,
         "volume_km3": 20588742,
         "resources": [
           {
@@ -6174,7 +7130,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.9033,
         "falloff_factor": 0.813,
-        "total_volume_km3": 23561945,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 500000,
+            "linear": 30000
+          }
+        },
+        "total_volume_km3": 3769911,
         "volume_km3": 6176622,
         "resources": [
           {
@@ -6208,9 +7171,16 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.7133,
         "falloff_factor": 0.642,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 500000,
+            "linear": 140000
+          }
+        },
+        "total_volume_km3": 10053096,
         "total_blocks": 484,
         "blocks": 243,
-        "total_volume_km3": 109955743,
         "volume_km3": 28824238,
         "resources": [
           {
@@ -6292,7 +7262,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.9033,
         "falloff_factor": 0.813,
-        "total_volume_km3": 78539816,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 500000,
+            "linear": 100000
+          }
+        },
+        "total_volume_km3": 10053096,
         "volume_km3": 20588742,
         "resources": [
           {
@@ -6326,6 +7303,13 @@
         "lateral_factor": 0.65,
         "radial_factor": 1.3215,
         "falloff_factor": 0.8589,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 4000,
+            "linear": 357645
+          }
+        },
         "total_volume_km3": 17977,
         "volume_km3": 17977,
         "resources": [
@@ -6354,6 +7338,13 @@
         "lateral_factor": 0.65,
         "radial_factor": 1.3215,
         "falloff_factor": 0.8589,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 4000,
+            "linear": 369353
+          }
+        },
         "total_volume_km3": 18566,
         "volume_km3": 18566,
         "resources": [
@@ -6382,9 +7373,16 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.7133,
         "falloff_factor": 0.642,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 50000,
+            "linear": 14000
+          }
+        },
+        "total_volume_km3": 109956,
         "total_blocks": 5,
         "blocks": 5,
-        "total_volume_km3": 109956,
         "volume_km3": 109956,
         "resources": [
           {
@@ -6490,7 +7488,14 @@
         "lateral_factor": 1.0,
         "radial_factor": 0.7893,
         "falloff_factor": 0.7893,
-        "total_volume_km3": 7068583,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 250000,
+            "linear": 36000
+          }
+        },
+        "total_volume_km3": 4523893,
         "volume_km3": 7068583,
         "resources": [
           {
@@ -6536,6 +7541,13 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 18000,
+            "linear": 333391
+          }
+        },
         "total_volume_km3": 339351,
         "volume_km3": 339351,
         "resources": [
@@ -6582,6 +7594,13 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.7133,
         "falloff_factor": 0.642,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 20000,
+            "linear": 10000
+          }
+        },
         "total_volume_km3": 12566,
         "volume_km3": 12566,
         "resources": [
@@ -6616,7 +7635,14 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
-        "total_volume_km3": 1359761,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 18000,
+            "linear": 1335881
+          }
+        },
+        "total_volume_km3": 1017876,
         "volume_km3": 1017876,
         "resources": [
           {
@@ -6674,7 +7700,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.7133,
         "falloff_factor": 0.642,
-        "total_volume_km3": 109955743,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 500000,
+            "linear": 140000
+          }
+        },
+        "total_volume_km3": 10053096,
         "volume_km3": 28824238,
         "resources": [
           {
@@ -6720,7 +7753,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.7133,
         "falloff_factor": 0.642,
-        "total_volume_km3": 109955743,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 500000,
+            "linear": 140000
+          }
+        },
+        "total_volume_km3": 10053096,
         "volume_km3": 28824238,
         "resources": [
           {
@@ -6766,7 +7806,14 @@
         "lateral_factor": 1.0,
         "radial_factor": 0.7893,
         "falloff_factor": 0.7893,
-        "total_volume_km3": 22902210,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 450000,
+            "linear": 36000
+          }
+        },
+        "total_volume_km3": 4523893,
         "volume_km3": 7411947,
         "resources": [
           {
@@ -6824,7 +7871,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
-        "total_volume_km3": 157079633,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 1000000,
+            "linear": 50000
+          }
+        },
+        "total_volume_km3": 6283185,
         "volume_km3": 10294371,
         "resources": [
           {
@@ -6894,7 +7948,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
-        "total_volume_km3": 245436926,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 1250000,
+            "linear": 50000
+          }
+        },
+        "total_volume_km3": 6283185,
         "volume_km3": 10294371,
         "resources": [
           {
@@ -6952,7 +8013,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
-        "total_volume_km3": 490873852,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 1250000,
+            "linear": 100000
+          }
+        },
+        "total_volume_km3": 10053096,
         "volume_km3": 20588742,
         "resources": [
           {
@@ -7016,9 +8084,16 @@
         "lateral_factor": 0.8155,
         "radial_factor": 0.95,
         "falloff_factor": 0.7747,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 7000,
+            "linear": 304962
+          }
+        },
+        "total_volume_km3": 46945,
         "total_blocks": 1,
         "blocks": 1,
-        "total_volume_km3": 46945,
         "volume_km3": 46945,
         "resources": [
           {
@@ -7112,7 +8187,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
-        "total_volume_km3": 490873852,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 1250000,
+            "linear": 100000
+          }
+        },
+        "total_volume_km3": 10053096,
         "volume_km3": 20588742,
         "resources": [
           {
@@ -7176,9 +8258,16 @@
         "lateral_factor": 0.7077,
         "radial_factor": 0.95,
         "falloff_factor": 0.6724,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 5000,
+            "linear": 95527
+          }
+        },
+        "total_volume_km3": 7503,
         "total_blocks": 1,
         "blocks": 1,
-        "total_volume_km3": 7503,
         "volume_km3": 7503,
         "resources": [
           {
@@ -7278,9 +8367,16 @@
         "lateral_factor": 0.8155,
         "radial_factor": 0.95,
         "falloff_factor": 0.7747,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 5000,
+            "linear": 120056
+          }
+        },
+        "total_volume_km3": 9429,
         "total_blocks": 1,
         "blocks": 0,
-        "total_volume_km3": 9429,
         "volume_km3": 9429,
         "resources": [
           {
@@ -7386,7 +8482,14 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
-        "total_volume_km3": 1626921,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 18000,
+            "linear": 1598349
+          }
+        },
+        "total_volume_km3": 1017876,
         "volume_km3": 1017876,
         "resources": [
           {
@@ -7456,9 +8559,16 @@
         "lateral_factor": 1.405,
         "radial_factor": 0.6379,
         "falloff_factor": 0.8963,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 34000,
+            "linear": 1160991
+          }
+        },
+        "total_volume_km3": 3631681,
         "total_blocks": 7,
         "blocks": 7,
-        "total_volume_km3": 4216350,
         "volume_km3": 3631681,
         "resources": [
           {
@@ -7510,6 +8620,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -7538,6 +8656,14 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.6293,
         "falloff_factor": 0.5664,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 25000,
+            "linear": 15500
+          }
+        },
+        "total_volume_km3": 30434,
         "total_blocks": 3,
         "blocks": 3,
         "resources": [
@@ -7572,7 +8698,14 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
-        "total_volume_km3": 20106193,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 400000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "volume_km3": 8235497,
         "resources": [
           {
@@ -7624,9 +8757,16 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 300000000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "total_blocks": 242,
         "blocks": 162,
-        "total_volume_km3": 11309733552923,
         "volume_km3": 8235497,
         "resources": [
           {
@@ -7726,6 +8866,14 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 300000000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "total_blocks": 242,
         "blocks": 162,
         "resources": [
@@ -7760,6 +8908,13 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 50000,
+            "linear": 40000
+          }
+        },
         "total_volume_km3": 314159,
         "volume_km3": 314159,
         "resources": [
@@ -7812,6 +8967,13 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 20000,
+            "linear": 20000
+          }
+        },
         "total_volume_km3": 25133,
         "volume_km3": 25133,
         "resources": [
@@ -7870,9 +9032,15 @@
         "lateral_factor": 1.0,
         "radial_factor": 0.5833,
         "falloff_factor": 0.5833,
+        "boundary": {
+          "class": "sphere",
+          "size": {
+            "r": 500000
+          }
+        },
+        "total_volume_km3": 10053096,
         "total_blocks": 605,
         "blocks": 243,
-        "total_volume_km3": 523598776,
         "volume_km3": 39530384,
         "resources": [
           {
@@ -7954,6 +9122,13 @@
         "lateral_factor": 1.0,
         "radial_factor": 0.5833,
         "falloff_factor": 0.5833,
+        "boundary": {
+          "class": "sphere",
+          "size": {
+            "r": 4000000
+          }
+        },
+        "total_volume_km3": 10053096,
         "total_blocks": 605,
         "blocks": 243,
         "resources": [
@@ -7982,6 +9157,14 @@
         "lateral_factor": 0.2,
         "radial_factor": 0.646,
         "falloff_factor": 0.1292,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 20000,
+            "linear": 10000
+          }
+        },
+        "total_volume_km3": 12566,
         "total_blocks": 3,
         "blocks": 3,
         "resources": [
@@ -8016,6 +9199,13 @@
         "lateral_factor": 1.0,
         "radial_factor": 0.5833,
         "falloff_factor": 0.5833,
+        "boundary": {
+          "class": "sphere",
+          "size": {
+            "r": 1250000
+          }
+        },
+        "total_volume_km3": 10053096,
         "total_blocks": 605,
         "blocks": 243,
         "resources": [
@@ -8044,6 +9234,13 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.8392,
         "falloff_factor": 0.6713,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 60000,
+            "linear": 40000
+          }
+        },
         "total_volume_km3": 452389,
         "volume_km3": 452389,
         "resources": [
@@ -8072,6 +9269,13 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.7512,
         "falloff_factor": 0.601,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 120000,
+            "linear": 10000
+          }
+        },
         "total_volume_km3": 452389,
         "volume_km3": 452389,
         "resources": [
@@ -8154,7 +9358,14 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
-        "total_volume_km3": 20106193,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 400000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "volume_km3": 8235497,
         "resources": [
           {
@@ -8206,7 +9417,14 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
-        "total_volume_km3": 502654825,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 2000000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "volume_km3": 8235497,
         "resources": [
           {
@@ -8258,6 +9476,14 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 1000000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "total_blocks": 242,
         "blocks": 162,
         "resources": [
@@ -8292,9 +9518,16 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.8133,
         "falloff_factor": 0.732,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 1250000,
+            "linear": 30000
+          }
+        },
+        "total_volume_km3": 3769911,
         "total_blocks": 242,
         "blocks": 162,
-        "total_volume_km3": 147262156,
         "volume_km3": 6176622,
         "resources": [
           {
@@ -8364,9 +9597,16 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.8133,
         "falloff_factor": 0.732,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 1250000,
+            "linear": 30000
+          }
+        },
+        "total_volume_km3": 3769911,
         "total_blocks": 242,
         "blocks": 162,
-        "total_volume_km3": 147262156,
         "volume_km3": 6176622,
         "resources": [
           {
@@ -8436,9 +9676,16 @@
         "lateral_factor": 1.0,
         "radial_factor": 0.99,
         "falloff_factor": 0.99,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 50000,
+            "linear": 690326
+          }
+        },
+        "total_volume_km3": 5421809,
         "total_blocks": 8,
         "blocks": 8,
-        "total_volume_km3": 5421809,
         "volume_km3": 5421809,
         "resources": [
           {
@@ -8514,6 +9761,14 @@
         "lateral_factor": 1.0,
         "radial_factor": 0.99,
         "falloff_factor": 0.99,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 67500,
+            "linear": 388890
+          }
+        },
+        "total_volume_km3": 5566532,
         "total_blocks": 16,
         "blocks": 11,
         "resources": [
@@ -8572,6 +9827,13 @@
         "lateral_factor": 1.0,
         "radial_factor": 0.99,
         "falloff_factor": 0.99,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 20000,
+            "linear": 993994
+          }
+        },
         "total_volume_km3": 1249090,
         "volume_km3": 1249090,
         "resources": [
@@ -8618,6 +9880,14 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 300000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "total_blocks": 178,
         "blocks": 154,
         "resources": [
@@ -8676,6 +9946,13 @@
         "lateral_factor": 1.0,
         "radial_factor": 1.0,
         "falloff_factor": 1.0,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 12500,
+            "linear": 257900
+          }
+        },
         "total_volume_km3": 126596,
         "volume_km3": 126596,
         "resources": [
@@ -8710,6 +9987,14 @@
         "lateral_factor": 1.0,
         "radial_factor": 0.99,
         "falloff_factor": 0.99,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 300000,
+            "linear": 100000
+          }
+        },
+        "total_volume_km3": 10053096,
         "total_blocks": 356,
         "blocks": 231,
         "resources": [
@@ -8762,6 +10047,13 @@
         "lateral_factor": 1.0,
         "radial_factor": 1.0,
         "falloff_factor": 1.0,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 15000,
+            "linear": 260970
+          }
+        },
         "total_volume_km3": 184469,
         "volume_km3": 184469,
         "resources": [
@@ -8814,6 +10106,13 @@
         "lateral_factor": 1.0,
         "radial_factor": 1.0,
         "falloff_factor": 1.0,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 12500,
+            "linear": 154908
+          }
+        },
         "total_volume_km3": 76040,
         "volume_km3": 76040,
         "resources": [
@@ -8866,6 +10165,13 @@
         "lateral_factor": 1.0,
         "radial_factor": 1.0,
         "falloff_factor": 1.0,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 1500,
+            "linear": 119250
+          }
+        },
         "total_volume_km3": 843,
         "volume_km3": 843,
         "resources": [
@@ -8918,6 +10224,13 @@
         "lateral_factor": 1.0,
         "radial_factor": 1.0,
         "falloff_factor": 1.0,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 2500,
+            "linear": 74959
+          }
+        },
         "total_volume_km3": 1472,
         "volume_km3": 1472,
         "resources": [
@@ -8970,6 +10283,13 @@
         "lateral_factor": 1.0,
         "radial_factor": 1.0,
         "falloff_factor": 1.0,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 2500,
+            "linear": 303920
+          }
+        },
         "total_volume_km3": 5967,
         "volume_km3": 5967,
         "resources": [
@@ -9022,6 +10342,13 @@
         "lateral_factor": 1.0,
         "radial_factor": 1.0,
         "falloff_factor": 1.0,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 2500,
+            "linear": 94877
+          }
+        },
         "total_volume_km3": 1863,
         "volume_km3": 1863,
         "resources": [
@@ -9074,6 +10401,13 @@
         "lateral_factor": 1.0,
         "radial_factor": 1.0,
         "falloff_factor": 1.0,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 2500,
+            "linear": 80023
+          }
+        },
         "total_volume_km3": 1571,
         "volume_km3": 1571,
         "resources": [
@@ -9126,6 +10460,13 @@
         "lateral_factor": 1.0,
         "radial_factor": 1.0,
         "falloff_factor": 1.0,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 2500,
+            "linear": 82532
+          }
+        },
         "total_volume_km3": 1621,
         "volume_km3": 1621,
         "resources": [
@@ -9178,6 +10519,13 @@
         "lateral_factor": 1.0,
         "radial_factor": 1.0,
         "falloff_factor": 1.0,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 2500,
+            "linear": 109708
+          }
+        },
         "total_volume_km3": 2154,
         "volume_km3": 2154,
         "resources": [
@@ -9236,6 +10584,14 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 300000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "total_blocks": 267,
         "blocks": 231,
         "resources": [
@@ -9270,7 +10626,14 @@
         "lateral_factor": 1.0,
         "radial_factor": 0.99,
         "falloff_factor": 0.99,
-        "total_volume_km3": 5493499,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 40000,
+            "linear": 1092897
+          }
+        },
+        "total_volume_km3": 5026548,
         "volume_km3": 5026548,
         "resources": [
           {
@@ -9322,6 +10685,14 @@
         "lateral_factor": 1.0,
         "radial_factor": 0.99,
         "falloff_factor": 0.99,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 80000,
+            "linear": 508856
+          }
+        },
+        "total_volume_km3": 10231161,
         "total_blocks": 23,
         "blocks": 23,
         "resources": [
@@ -9356,9 +10727,16 @@
         "lateral_factor": 0.9,
         "radial_factor": 0.99,
         "falloff_factor": 0.891,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 300000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "total_blocks": 178,
         "blocks": 154,
-        "total_volume_km3": 11309734,
         "volume_km3": 8235497,
         "resources": [
           {
@@ -9416,9 +10794,16 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 300000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "total_blocks": 178,
         "blocks": 154,
-        "total_volume_km3": 11309734,
         "volume_km3": 8235497,
         "resources": [
           {
@@ -9476,6 +10861,14 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 100000,
+            "linear": 30000
+          }
+        },
+        "total_volume_km3": 942478,
         "total_blocks": 26,
         "blocks": 26,
         "resources": [
@@ -9528,6 +10921,14 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 100000,
+            "linear": 20000
+          }
+        },
+        "total_volume_km3": 628319,
         "total_blocks": 26,
         "blocks": 26,
         "resources": [
@@ -9580,6 +10981,14 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 300000,
+            "linear": 30000
+          }
+        },
+        "total_volume_km3": 3769911,
         "total_blocks": 178,
         "blocks": 154,
         "resources": [
@@ -9632,6 +11041,13 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 100000,
+            "linear": 20000
+          }
+        },
         "total_volume_km3": 628319,
         "volume_km3": 628319,
         "resources": [
@@ -9696,6 +11112,12 @@
         "lateral_factor": 1.0,
         "radial_factor": 0.5833,
         "falloff_factor": 0.5833,
+        "boundary": {
+          "class": "sphere",
+          "size": {
+            "r": 40000
+          }
+        },
         "total_volume_km3": 268083,
         "volume_km3": 965097,
         "resources": [
@@ -9766,6 +11188,14 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 300000,
+            "linear": 30000
+          }
+        },
+        "total_volume_km3": 3769911,
         "total_blocks": 178,
         "blocks": 154,
         "resources": [
@@ -9818,6 +11248,13 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 100000,
+            "linear": 20000
+          }
+        },
         "total_volume_km3": 628319,
         "volume_km3": 628319,
         "resources": [
@@ -9888,6 +11325,13 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 100000,
+            "linear": 60000
+          }
+        },
         "total_volume_km3": 1884956,
         "volume_km3": 1884956,
         "resources": [
@@ -9940,6 +11384,13 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 100000,
+            "linear": 60000
+          }
+        },
         "total_volume_km3": 1884956,
         "volume_km3": 1884956,
         "resources": [
@@ -9986,6 +11437,13 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 100000,
+            "linear": 20000
+          }
+        },
         "total_volume_km3": 628319,
         "volume_km3": 628319,
         "resources": [
@@ -10026,6 +11484,13 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 80000,
+            "linear": 30000
+          }
+        },
         "total_volume_km3": 603186,
         "volume_km3": 603186,
         "resources": [
@@ -10066,6 +11531,13 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 70000,
+            "linear": 30000
+          }
+        },
         "total_volume_km3": 461814,
         "volume_km3": 461814,
         "resources": [
@@ -10136,6 +11608,13 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 70000,
+            "linear": 30000
+          }
+        },
         "total_volume_km3": 461814,
         "volume_km3": 461814,
         "resources": [
@@ -10194,6 +11673,13 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 30000,
+            "linear": 30000
+          }
+        },
         "total_volume_km3": 84823,
         "volume_km3": 84823,
         "resources": [
@@ -10234,6 +11720,13 @@
         "lateral_factor": 1.0,
         "radial_factor": 1.0,
         "falloff_factor": 1.0,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 12500,
+            "linear": 257900
+          }
+        },
         "total_volume_km3": 126596,
         "volume_km3": 126596,
         "resources": [
@@ -10268,6 +11761,14 @@
         "lateral_factor": 0.915,
         "radial_factor": 0.9033,
         "falloff_factor": 0.8266,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 250000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "total_blocks": 122,
         "blocks": 122,
         "resources": [
@@ -10320,7 +11821,14 @@
         "lateral_factor": 0.915,
         "radial_factor": 0.5427,
         "falloff_factor": 0.4965,
-        "total_volume_km3": 7853982,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 250000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "volume_km3": 7853982,
         "resources": [
           {
@@ -10378,6 +11886,13 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 18000,
+            "linear": 383500
+          }
+        },
         "total_volume_km3": 390355,
         "volume_km3": 390355,
         "resources": [
@@ -10442,6 +11957,13 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 18000,
+            "linear": 759070
+          }
+        },
         "total_volume_km3": 772640,
         "volume_km3": 772640,
         "resources": [
@@ -10500,6 +12022,13 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 18000,
+            "linear": 361438
+          }
+        },
         "total_volume_km3": 367899,
         "volume_km3": 367899,
         "resources": [
@@ -10552,6 +12081,13 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 18000,
+            "linear": 132867
+          }
+        },
         "total_volume_km3": 135242,
         "volume_km3": 135242,
         "resources": [
@@ -10622,7 +12158,14 @@
         "lateral_factor": 0.915,
         "radial_factor": 0.9033,
         "falloff_factor": 0.8266,
-        "total_volume_km3": 2356194,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 250000,
+            "linear": 12000
+          }
+        },
+        "total_volume_km3": 1507964,
         "volume_km3": 2356194,
         "resources": [
           {
@@ -10692,6 +12235,14 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 22000,
+            "linear": 620140
+          }
+        },
+        "total_volume_km3": 942941,
         "total_blocks": 1,
         "blocks": 1,
         "resources": [
@@ -10744,6 +12295,14 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 22000,
+            "linear": 571455
+          }
+        },
+        "total_volume_km3": 868915,
         "total_blocks": 1,
         "blocks": 1,
         "resources": [
@@ -10796,6 +12355,13 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 28000,
+            "linear": 690270
+          }
+        },
         "total_volume_km3": 1700141,
         "volume_km3": 1700141,
         "resources": [
@@ -10854,6 +12420,14 @@
         "lateral_factor": 0.915,
         "radial_factor": 0.9033,
         "falloff_factor": 0.8266,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 350000,
+            "linear": 42000
+          }
+        },
+        "total_volume_km3": 5277876,
         "total_blocks": 218,
         "blocks": 162,
         "resources": [
@@ -10906,7 +12480,14 @@
         "lateral_factor": 0.915,
         "radial_factor": 0.9033,
         "falloff_factor": 0.8266,
-        "total_volume_km3": 8246681,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 250000,
+            "linear": 42000
+          }
+        },
+        "total_volume_km3": 5277876,
         "volume_km3": 8246681,
         "resources": [
           {
@@ -10958,6 +12539,14 @@
         "lateral_factor": 0.915,
         "radial_factor": 0.9033,
         "falloff_factor": 0.8266,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 350000,
+            "linear": 42000
+          }
+        },
+        "total_volume_km3": 5277876,
         "total_blocks": 218,
         "blocks": 162,
         "resources": [
@@ -11016,9 +12605,16 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 50000,
+            "linear": 383500
+          }
+        },
+        "total_volume_km3": 3012002,
         "total_blocks": 8,
         "blocks": 6,
-        "total_volume_km3": 3012002,
         "volume_km3": 3012002,
         "resources": [
           {
@@ -11082,6 +12678,13 @@
         "lateral_factor": 0.95,
         "radial_factor": 0.6483,
         "falloff_factor": 0.6159,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 200000,
+            "linear": 20000
+          }
+        },
         "total_volume_km3": 2513274,
         "volume_km3": 2513274,
         "resources": [
@@ -11110,6 +12713,13 @@
         "lateral_factor": 0.95,
         "radial_factor": 0.8023,
         "falloff_factor": 0.7622,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 120000,
+            "linear": 20000
+          }
+        },
         "total_volume_km3": 904779,
         "volume_km3": 904779,
         "resources": [
@@ -11144,9 +12754,16 @@
         "lateral_factor": 0.55,
         "radial_factor": 0.46,
         "falloff_factor": 0.253,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 500000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "total_blocks": 363,
         "blocks": 243,
-        "total_volume_km3": 31415927,
         "volume_km3": 8235497,
         "resources": [
           {
@@ -11240,6 +12857,14 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 18000,
+            "linear": 383500
+          }
+        },
+        "total_volume_km3": 390355,
         "total_blocks": 2,
         "blocks": 2,
         "resources": [
@@ -11268,6 +12893,13 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 100000,
+            "linear": 20000
+          }
+        },
         "total_volume_km3": 628319,
         "volume_km3": 628319,
         "resources": [
@@ -11320,6 +12952,13 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 150000,
+            "linear": 20000
+          }
+        },
         "total_volume_km3": 1413717,
         "volume_km3": 1413717,
         "resources": [
@@ -11378,6 +13017,14 @@
         "lateral_factor": 0.915,
         "radial_factor": 0.9033,
         "falloff_factor": 0.8266,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 250000,
+            "linear": 42000
+          }
+        },
+        "total_volume_km3": 5277876,
         "total_blocks": 111,
         "blocks": 84,
         "resources": [
@@ -11412,6 +13059,13 @@
         "lateral_factor": 0.7077,
         "radial_factor": 0.6379,
         "falloff_factor": 0.4515,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 15000,
+            "linear": 833138
+          }
+        },
         "total_volume_km3": 588911,
         "volume_km3": 588911,
         "resources": [
@@ -11440,6 +13094,14 @@
         "lateral_factor": 0.915,
         "radial_factor": 0.9033,
         "falloff_factor": 0.8266,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 350000,
+            "linear": 42000
+          }
+        },
+        "total_volume_km3": 5277876,
         "total_blocks": 207,
         "blocks": 159,
         "resources": [
@@ -11486,6 +13148,14 @@
         "lateral_factor": 0.55,
         "radial_factor": 0.46,
         "falloff_factor": 0.253,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 90000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 1017876,
         "total_blocks": 18,
         "blocks": 18,
         "resources": [
@@ -11538,6 +13208,13 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 18000,
+            "linear": 383500
+          }
+        },
         "total_volume_km3": 390355,
         "volume_km3": 390355,
         "resources": [
@@ -11590,6 +13267,13 @@
         "lateral_factor": 1.16,
         "radial_factor": 0.7155,
         "falloff_factor": 0.8299,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 18000,
+            "linear": 759070
+          }
+        },
         "total_volume_km3": 772640,
         "volume_km3": 772640,
         "resources": [
@@ -11648,6 +13332,14 @@
         "lateral_factor": 1.185,
         "radial_factor": 0.864,
         "falloff_factor": 1.0238,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 18000,
+            "linear": 383500
+          }
+        },
+        "total_volume_km3": 390355,
         "total_blocks": 1,
         "blocks": 1,
         "resources": [
@@ -11676,9 +13368,16 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 100000,
+            "linear": 3000
+          }
+        },
+        "total_volume_km3": 94248,
         "total_blocks": 13,
         "blocks": 13,
-        "total_volume_km3": 94248,
         "volume_km3": 94248,
         "resources": [
           {
@@ -11748,7 +13447,14 @@
         "lateral_factor": 0.8,
         "radial_factor": 0.99,
         "falloff_factor": 0.792,
-        "total_volume_km3": 15393804,
+        "boundary": {
+          "class": "cylinder",
+          "size": {
+            "r": 350000,
+            "linear": 40000
+          }
+        },
+        "total_volume_km3": 5026548,
         "volume_km3": 8235497,
         "resources": [
           {
@@ -11776,6 +13482,13 @@
         "lateral_factor": 2.305,
         "radial_factor": 0.6379,
         "falloff_factor": 1.4704,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 40000,
+            "linear": 645987
+          }
+        },
         "total_volume_km3": 3247085,
         "volume_km3": 3247085,
         "resources": [
@@ -11804,6 +13517,14 @@
         "lateral_factor": 0.95,
         "radial_factor": 0.7155,
         "falloff_factor": 0.6797,
+        "boundary": {
+          "class": "splinetube",
+          "size": {
+            "r": 7000,
+            "linear": 383500
+          }
+        },
+        "total_volume_km3": 59035,
         "total_blocks": 1,
         "blocks": 1,
         "resources": [

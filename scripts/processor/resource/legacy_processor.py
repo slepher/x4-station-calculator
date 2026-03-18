@@ -683,9 +683,9 @@ def migrate_region_definitions(
         volume_m3 = boundary_volume(boundary)
         volume_km3 = volume_m3 / 1_000_000_000.0
 
-        spline_linear = compute_spline_length(boundary)
-        if spline_linear > 0:
-            region_item["linear"] = spline_linear
+        # 对 splinetube 的 linear 取整（只修改 boundary.size.linear，不存外层 linear）
+        if boundary and boundary.get("class") == "splinetube" and "size" in boundary and "linear" in boundary["size"]:
+            boundary["size"]["linear"] = round_to_int(boundary["size"]["linear"])
 
         region_item["volume_km3"] = round_to_int(volume_km3)
         region_item["falloff_factor"] = round(as_number(falloff.get("effective_factor"), 1.0), 4)
@@ -700,8 +700,6 @@ def migrate_region_definitions(
             "volume_km3": region_item["volume_km3"],
             "resources": [],
         }
-        if "linear" in region_item:
-            region_template["linear"] = region_item["linear"]
 
         for ware, res_info in resources_map.items():
             yield_name = res_info.get("yield")

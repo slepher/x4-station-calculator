@@ -570,16 +570,42 @@ def generate_map_data(
                     if position:
                         resourceareas_map[key]["position"] = position
 
-                    falloff = region_calc.get("falloff") or {}
-                    lateral_f = as_number(falloff.get("lateral_factor"), 1.0)
-                    radial_f = as_number(falloff.get("radial_factor"), 1.0)
+                    # 从 region 模板复制 falloff 因子
+                    template = templates.get(region_ref, {})
+                    template_falloff = template.get("falloff")
+                    if not template_falloff:
+                        print(f"  ⚠️ 警告：region '{region_ref}' 缺少 falloff 数据")
+                        template_falloff = {}
+                    lateral_f = as_number(template_falloff.get("lateral_factor"), 1.0)
+                    radial_f = as_number(template_falloff.get("radial_factor"), 1.0)
                     total_falloff = lateral_f * radial_f
 
                     resourceareas_map[key]["lateral_factor"] = round(lateral_f, 4)
                     resourceareas_map[key]["radial_factor"] = round(radial_f, 4)
                     resourceareas_map[key]["falloff_factor"] = round(total_falloff, 4)
 
-                    boundary = region_calc.get("boundary", {})
+                    # 从 region 模板复制完整的 boundary 数据用于计算（包括 spline）
+                    template_boundary = template.get("boundary")
+                    if not template_boundary:
+                        print(f"  ⚠️ 警告：region '{region_ref}' 缺少 boundary 数据，跳过")
+                        continue
+                    boundary_for_calc = dict(template_boundary)
+
+                    # 输出用的 boundary 只包含 class 和 size（供人类阅读）
+                    boundary_for_output = {
+                        "class": template_boundary.get("class", ""),
+                    }
+                    if "size" in template_boundary:
+                        boundary_for_output["size"] = template_boundary["size"]
+
+                    resourceareas_map[key]["boundary"] = boundary_for_output
+
+                    # 从 region 模板复制 total_volume_km3
+                    volume_km3 = template.get("volume_km3")
+                    if volume_km3 is None:
+                        print(f"  ⚠️ 警告：region '{region_ref}' 缺少 volume_km3 数据")
+                        volume_km3 = 0
+                    resourceareas_map[key]["total_volume_km3"] = volume_km3
 
                     has_gas = any(is_gas_ware(t.get("ware", "")) for t in template_resources)
                     has_solid = any(not is_gas_ware(t.get("ware", "")) for t in template_resources)
@@ -587,16 +613,15 @@ def generate_map_data(
                     if has_gas:
                         total_blocks, effective_blocks = calculate_gas_block_count_truncated(
                             position or {"x": 0.0, "y": 0.0, "z": 0.0},
-                            boundary
+                            boundary_for_calc
                         )
                         resourceareas_map[key]["total_blocks"] = total_blocks
                         resourceareas_map[key]["blocks"] = effective_blocks
 
                     if has_solid:
-                        total_vol, effective_vol = calculate_solid_volume_truncated(boundary)
-                        total_vol_km3 = total_vol / 1_000_000_000.0
+                        # 使用 position 重新计算有效体积
+                        _, effective_vol = calculate_solid_volume_truncated(boundary_for_calc)
                         effective_vol_km3 = effective_vol / 1_000_000_000.0
-                        resourceareas_map[key]["total_volume_km3"] = round_to_int(total_vol_km3)
                         resourceareas_map[key]["volume_km3"] = round_to_int(effective_vol_km3)
 
                     resourceareas_map[key]["resources"] = calculate_resourcearea_resources(
