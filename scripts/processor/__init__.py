@@ -10,7 +10,6 @@ from processor.config import (
     X4_UNPACKED_DATA_PATH,
     OUTPUT_VERSION_DIR,
 )
-from processor.map import run_for_config, main
 
 __all__ = [
     "get_i18n_registry",
@@ -21,8 +20,6 @@ __all__ = [
     "default_version_item",
     "parse_args",
     "resolve_runtime_paths",
-    "run_for_config",
-    "main",
     "X4_UNPACKED_DATA_PATH",
     "OUTPUT_VERSION_DIR",
 ]

@@ -1,10 +1,16 @@
-"""Map 处理器入口 - X4 Map Data Processor."""
+"""Map 处理器 - X4 Map Data Processor."""
 
 import argparse
+import sys
 from pathlib import Path
 from typing import Dict
 
-import processor.config as config
+# 添加 scripts 目录到 Python 路径
+script_dir = Path(__file__).resolve().parent
+if str(script_dir) not in sys.path:
+    sys.path.insert(0, str(script_dir))
+
+from processor.config import apply_runtime_config, merge_version_config
 from processor.versioning import load_version_config, get_target_versions
 from processor.i18n import get_i18n_registry
 from processor.resource.model_detector import detect_map_resource_model
@@ -27,23 +33,29 @@ from processor.output_manager import (
 
 def run_for_config(args: argparse.Namespace, effective_config: Dict[str, object]) -> None:
     """运行指定配置的处理流程。"""
-    config.apply_runtime_config(effective_config)
-    runtime_paths = config.resolve_runtime_paths(args)
+    apply_runtime_config(effective_config)
 
-    map_dir = runtime_paths["map_dir"]
-    output_path = runtime_paths["output_path"]
-    mapdefaults_path = runtime_paths["mapdefaults_path"]
-    god_xml_path = runtime_paths["god_xml_path"]
-    factions_xml_path = runtime_paths["factions_xml_path"]
-    colors_xml_path = runtime_paths["colors_xml_path"]
-    region_definitions_xml_path = runtime_paths["region_definitions_xml_path"]
-    regionobjectgroups_xml_path = runtime_paths["regionobjectgroups_xml_path"]
-    regionyields_xml_path = runtime_paths["regionyields_xml_path"]
-    factions_output_path = runtime_paths["factions_output_path"]
-    regions_output_path = runtime_paths["regions_output_path"]
-    regionyields_output_path = runtime_paths["regionyields_output_path"]
-    regionyield_definitions_output_path = runtime_paths["regionyield_definitions_output_path"]
-    resourceareas_output_path = runtime_paths["resourceareas_output_path"]
+    # 构建运行时路径
+    from processor.path_utils import get_map_dir, get_library_xml
+    from processor.config import X4_UNPACKED_DATA_PATH, OUTPUT_VERSION_DIR
+
+    base_path = X4_UNPACKED_DATA_PATH
+    output_base = OUTPUT_VERSION_DIR
+
+    map_dir = Path(args.map_dir) if args.map_dir else Path(get_map_dir(base_path, ""))
+    output_path = Path(args.output) if args.output else Path(output_base) / "data" / "maps.json"
+    mapdefaults_path = Path(args.mapdefaults_xml) if args.mapdefaults_xml else Path(get_library_xml(base_path, "mapdefaults"))
+    god_xml_path = Path(args.god_xml) if args.god_xml else Path(get_library_xml(base_path, "god"))
+    factions_xml_path = Path(args.factions_xml) if args.factions_xml else Path(get_library_xml(base_path, "factions"))
+    colors_xml_path = Path(args.colors_xml) if args.colors_xml else Path(get_library_xml(base_path, "colors"))
+    region_definitions_xml_path = Path(args.region_definitions_xml) if args.region_definitions_xml else Path(get_library_xml(base_path, "region_definitions"))
+    regionobjectgroups_xml_path = Path(args.regionobjectgroups_xml) if args.regionobjectgroups_xml else Path(get_library_xml(base_path, "regionobjectgroups"))
+    regionyields_xml_path = Path(args.regionyields_xml) if args.regionyields_xml else Path(get_library_xml(base_path, "regionyields"))
+    factions_output_path = Path(args.factions_output) if args.factions_output else Path(output_base) / "data" / "factions.json"
+    regions_output_path = Path(args.regions_output) if args.regions_output else Path(output_base) / "data" / "regions.json"
+    regionyields_output_path = Path(args.regionyields_output) if args.regionyields_output else Path(output_base) / "data" / "regionyields.json"
+    regionyield_definitions_output_path = Path(output_base) / "data" / "regionyield_definitions.json"
+    resourceareas_output_path = Path(output_base) / "data" / "resourceareas.json"
 
     # 版本分流：根据版本号判定资源模型
     version_str = str(effective_config.get("version", ""))
@@ -51,7 +63,7 @@ def run_for_config(args: argparse.Namespace, effective_config: Dict[str, object]
     print(f"📊 资源模型：{resource_model} (version={version_str})")
 
     registry = get_i18n_registry()
-    registry.configure(config.X4_UNPACKED_DATA_PATH, {
+    registry.configure(X4_UNPACKED_DATA_PATH, {
         "044": {"iso": "en", "name": "English"},
     })
 
@@ -175,14 +187,9 @@ def main() -> None:
     versions = get_target_versions(_config, args)
     for version_item in versions:
         print(f"处理版本：{version_item.get('version')}")
-        effective_config = config.merge_version_config(_config, version_item)
+        effective_config = merge_version_config(_config, version_item)
         run_for_config(args, effective_config)
 
 
 if __name__ == "__main__":
-    import sys
-    # 添加 scripts 目录到 Python 路径以支持直接运行
-    script_dir = Path(__file__).resolve().parent.parent.parent
-    if str(script_dir) not in sys.path:
-        sys.path.insert(0, str(script_dir))
     main()
