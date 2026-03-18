@@ -4,7 +4,6 @@ import json
 import glob
 import sys
 import re
-import argparse
 from collections import defaultdict
 from pathlib import Path
 
@@ -15,30 +14,64 @@ except ModuleNotFoundError:
 
 try:
     from processor.i18n import get_i18n_registry
-    from processor.versioning import get_target_versions, load_version_config, merge_version_config
+    from processor.path_utils import get_library_xml, build_paths, get_map_dir
 except ModuleNotFoundError:
     from scripts.processor.i18n import get_i18n_registry  # type: ignore
-    from scripts.processor.versioning import get_target_versions, load_version_config, merge_version_config  # type: ignore
+    from scripts.processor.path_utils import get_library_xml, build_paths, get_map_dir  # type: ignore
 
 # =============================================================================
 # ⚙️ 项目配置
 # =============================================================================
-_config = load_version_config()
+config_file = 'x4-station-calculator.config.json'
+if not os.path.exists(config_file):
+    print("" + "!" * 60)
+    print(f"❌ 错误: 找不到配置文件 '{config_file}'")
+    print("!" * 60 + "")
+    sys.exit(1)
 
-X4_UNPACKED_DATA_PATH = ""
-OUTPUT_VERSION_DIR = ""
-MAP_OUTPUT_JSON = ""
-MAP_DEFAULTS_XML = ""
-MAP_GOD_XML = ""
-MAP_FACTIONS_XML = ""
-MAP_COLORS_XML = ""
-MAP_REGION_DEFINITIONS_XML = ""
-MAP_REGIONOBJECTGROUPS_XML = ""
-MAP_REGIONYIELDS_XML = ""
-MAP_FACTIONS_OUTPUT = ""
-MAP_REGIONS_OUTPUT = ""
-MAP_REGIONYIELDS_OUTPUT = ""
-MAP_DIR = ""
+with open(config_file, 'r', encoding='utf-8') as f:
+    _config = json.load(f)
+
+# 从 versions 数组中查找当前版本配置
+_current_version = _config.get('current_version')
+_is_beta = _config.get('beta', False)
+_versions = _config.get('versions', [])
+_version_config = None
+for v in _versions:
+    if v.get('version') == _current_version and v.get('beta', False) == _is_beta:
+        _version_config = v
+        break
+
+if _version_config is None:
+    _beta_str = "beta" if _is_beta else "stable"
+    print("" + "!" * 60)
+    print(f"❌ 错误: 未找到版本 {_current_version} ({_beta_str}) 的配置。")
+    print("!" * 60 + "")
+    sys.exit(1)
+
+# 将版本配置合并到 _config 顶层
+_config.update(_version_config)
+
+# 使用 path_utils 构建统一路径
+PATHS = build_paths(_config['raw_assets_dir'], _config['folder_name'])
+OUTPUT_BASE = os.path.join(_config['processed_assets_dir'], _config['folder_name'])
+
+X4_UNPACKED_DATA_PATH = PATHS["base"]
+MAP_DIR = get_map_dir(_config['raw_assets_dir'], _config['folder_name'])
+
+# Libraries XML 路径
+MAP_DEFAULTS_XML = PATHS["mapdefaults"]
+MAP_GOD_XML = PATHS["god"]
+MAP_FACTIONS_XML = PATHS["factions"]
+MAP_COLORS_XML = PATHS["colors"]
+MAP_REGION_DEFINITIONS_XML = PATHS["region_definitions"]
+MAP_REGIONYIELDS_XML = PATHS["regionyields"]
+
+# 输出路径
+MAP_OUTPUT_JSON = os.path.join(OUTPUT_BASE, "data", "maps.json")
+MAP_FACTIONS_OUTPUT = os.path.join(OUTPUT_BASE, "data", "factions.json")
+MAP_REGIONS_OUTPUT = os.path.join(OUTPUT_BASE, "data", "regions.json")
+MAP_REGIONYIELDS_OUTPUT = os.path.join(OUTPUT_BASE, "data", "regionyields.json")
 
 X4_LANG_CONFIG = {
     '044': {'iso': 'en',    'name': 'English'},
@@ -54,53 +87,6 @@ X4_LANG_CONFIG = {
     '055': {'iso': 'pt-BR', 'name': 'Português (Brasil)'},
     '048': {'iso': 'pl',    'name': 'Polski'}
 }
-
-
-def apply_runtime_config(effective_config):
-    global X4_UNPACKED_DATA_PATH
-    global OUTPUT_VERSION_DIR
-    global MAP_OUTPUT_JSON
-    global MAP_DEFAULTS_XML
-    global MAP_GOD_XML
-    global MAP_FACTIONS_XML
-    global MAP_COLORS_XML
-    global MAP_REGION_DEFINITIONS_XML
-    global MAP_REGIONOBJECTGROUPS_XML
-    global MAP_REGIONYIELDS_XML
-    global MAP_FACTIONS_OUTPUT
-    global MAP_REGIONS_OUTPUT
-    global MAP_REGIONYIELDS_OUTPUT
-    global MAP_DIR
-
-    X4_UNPACKED_DATA_PATH = os.path.join(str(effective_config['raw_assets_dir']), str(effective_config['folder_name']))
-    OUTPUT_VERSION_DIR = os.path.join(str(effective_config['processed_assets_dir']), str(effective_config['folder_name']))
-    MAP_OUTPUT_JSON = str(Path(OUTPUT_VERSION_DIR) / "data" / "maps.json")
-    MAP_DEFAULTS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "mapdefaults_final.xml")
-    MAP_GOD_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "god_final.xml")
-    MAP_FACTIONS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "factions_final.xml")
-    MAP_COLORS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "colors_final.xml")
-    MAP_REGION_DEFINITIONS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "region_definitions_final.xml")
-    MAP_REGIONOBJECTGROUPS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "regionobjectgroups_final.xml")
-    MAP_REGIONYIELDS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "regionyields_final.xml")
-    MAP_FACTIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "factions.json")
-    MAP_REGIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regions.json")
-    MAP_REGIONYIELDS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regionyields.json")
-    MAP_DIR = str(Path(X4_UNPACKED_DATA_PATH) / "maps" / "xu_ep2_universe")
-
-
-def default_version_item(config):
-    current_version = config.get("current_version")
-    current_beta = bool(config.get("beta", False))
-    for version_item in config.get("versions", []):
-        if str(version_item.get("version")) == str(current_version) and bool(version_item.get("beta", False)) == current_beta:
-            return merge_version_config(config, version_item)
-    print("" + "!" * 60)
-    print("❌ 错误: 未找到默认版本配置。")
-    print("!" * 60 + "")
-    sys.exit(1)
-
-
-apply_runtime_config(default_version_item(_config))
 
 SPECIAL_TYPE_MAPPING = {
     'moduletypes_processing': 'processingmodule',
@@ -185,7 +171,7 @@ class X4PrecisionLoader:
         # 从配置中提取模块类型原始 Key
         for raw_key in self.config.get('module_types', {}).values():
             self.needed_raw_names.add(raw_key)
-        wares_path = os.path.join(self.raw_path, "libraries", "wares_final.xml")
+        wares_path = get_library_xml(self.raw_path, "wares")
         try:
             tree = ET.parse(wares_path)
             root = tree.getroot()
@@ -352,8 +338,8 @@ class X4PrecisionLoader:
     # 1.2 加载颜色库
     # =======================================================
     def load_colors(self):
-        print(f"🎨 [1.2/5] 解析 colors_final.xml...")
-        colors_path = os.path.join(self.raw_path, "libraries", "colors_final.xml")
+        print(f"🎨 [1.2/5] 解析 colors/final.xml...")
+        colors_path = get_library_xml(self.raw_path, "colors")
         if not os.path.exists(colors_path):
             print(f"   ⚠️ 警告: 找不到颜色定义文件: {colors_path}")
             return 
@@ -409,8 +395,8 @@ class X4PrecisionLoader:
     # 1.5 处理模块分组 (Module Groups - 合并 Waregroups 和 ModuleTypes)
     # =======================================================
     def process_module_groups(self):
-        print(f"📦 [1.5/5] 解析 waregroups_final.xml 并合并配置...")
-        wg_path = os.path.join(self.raw_path, "libraries", "waregroups_final.xml")
+        print(f"📦 [1.5/5] 解析 waregroups/final.xml 并合并配置...")
+        wg_path = get_library_xml(self.raw_path, "waregroups")
         
         # 1. 解析 XML 中的 Waregroups
         if os.path.exists(wg_path):
@@ -880,7 +866,7 @@ class X4PrecisionLoader:
         return int(capacity or 0) > 0
 
     def _load_shipgroups(self):
-        shipgroups_path = os.path.join(self.raw_path, "libraries", "shipgroups_final.xml")
+        shipgroups_path = get_library_xml(self.raw_path, "shipgroups")
         mapping = {}
         if not os.path.exists(shipgroups_path):
             print(f"   ⚠️ 警告: 找不到 shipgroups 文件: {shipgroups_path}")
@@ -1001,8 +987,8 @@ class X4PrecisionLoader:
         return mapping
 
     def _load_ship_defaults(self):
-        """加载 defaults_final.xml 中各 ship class 的默认属性"""
-        defaults_path = os.path.join(self.raw_path, "libraries", "defaults_final.xml")
+        """加载 defaults/final.xml 中各 ship class 的默认属性"""
+        defaults_path = get_library_xml(self.raw_path, "defaults")
         mapping = {}
         if not os.path.exists(defaults_path):
             print(f"   ⚠️ 警告: 找不到 defaults 文件: {defaults_path}")
@@ -1044,11 +1030,11 @@ class X4PrecisionLoader:
         return mapping
 
     def _load_ship_max_statistics(self):
-        """加载 defaults.xml 中各 ship class 的最大统计数据 (statistics.max)"""
-        defaults_path = os.path.join(self.raw_path, "libraries", "defaults.xml")
+        """加载 defaults/final.xml 中各 ship class 的最大统计数据 (statistics.max)"""
+        defaults_path = get_library_xml(self.raw_path, "defaults")
         mapping = {}
         if not os.path.exists(defaults_path):
-            print(f"   ⚠️ 警告: 找不到 defaults 文件: {defaults_path}")
+            print(f"   ⚠️ 警告：找不到 defaults 文件：{defaults_path}")
             return mapping
 
         try:
@@ -1205,9 +1191,10 @@ class X4PrecisionLoader:
                 if info:
                     mapping[class_name] = info
 
-            print(f"   ✅ 读取 {len(mapping)} 个 ship class 的最大统计数据。")
         except Exception as e:
             print(f"   ❌ Ship max statistics XML Error: {e}")
+        if mapping:
+            print(f"   ✅ 读取 {len(mapping)} 个 ship class 的最大统计数据。")
         return mapping
 
     def _load_ship_macros(self):
@@ -1309,7 +1296,7 @@ class X4PrecisionLoader:
         return mapping
 
     def _load_loadouts(self, ship_macros, ship_connections):
-        loadouts_path = os.path.join(self.raw_path, "libraries", "loadouts_final.xml")
+        loadouts_path = get_library_xml(self.raw_path, "loadouts")
         mapping = {}
         if not os.path.exists(loadouts_path):
             print(f"   ⚠️ 警告: 找不到 loadouts 文件: {loadouts_path}")
@@ -2209,7 +2196,6 @@ class X4PrecisionLoader:
             god_xml_path=Path(MAP_GOD_XML),
             factions_by_id=factions_by_id,
             region_definitions_xml_path=Path(MAP_REGION_DEFINITIONS_XML),
-            regionobjectgroups_xml_path=Path(MAP_REGIONOBJECTGROUPS_XML),
             regionyields_xml_path=Path(MAP_REGIONYIELDS_XML),
             i18n_registry=self.i18n_registry,
         )
@@ -2717,20 +2703,8 @@ class X4PrecisionLoader:
             json.dump(available_languages, f, indent=2, ensure_ascii=False)   
         print("🎉 全部完成！")
 
-def parse_args():
-    parser = argparse.ArgumentParser(description="X4 数据处理脚本")
-    mode_group = parser.add_mutually_exclusive_group()
-    mode_group.add_argument("--all-versions", action="store_true", help="处理配置中的所有版本")
-    mode_group.add_argument("--version", type=str, help="处理指定版本号，例如 8.0 或 9.0")
-    flavor_group = parser.add_mutually_exclusive_group()
-    flavor_group.add_argument("--beta", action="store_true", help="选择 beta 版本")
-    flavor_group.add_argument("--stable", action="store_true", help="选择 stable 版本")
-    return parser.parse_args()
-
-
-def run_for_config(effective_config):
-    apply_runtime_config(effective_config)
-    loader = X4PrecisionLoader(X4_UNPACKED_DATA_PATH, OUTPUT_VERSION_DIR, effective_config)
+if __name__ == "__main__":
+    loader = X4PrecisionLoader(X4_UNPACKED_DATA_PATH, OUTPUT_BASE, _config)
     loader.build_database()
     loader.load_colors()  # 加载颜色定义
     loader.process_module_groups()
@@ -2750,20 +2724,3 @@ def run_for_config(effective_config):
     loader.analyze_module_types()
     loader.generate_res_data() # 新增步骤: 生成资源元数据及缩写
     loader.save()
-
-
-def main():
-    args = parse_args()
-    target_versions = get_target_versions(_config, args)
-    print(f"🧭 计划处理 {len(target_versions)} 个版本。")
-    for version_item in target_versions:
-        effective_config = merge_version_config(_config, version_item)
-        version_label = effective_config.get("version")
-        flavor = "beta" if effective_config.get("beta", False) else "stable"
-        folder_name = effective_config.get("folder_name", "")
-        print(f"\n🚀 版本开始: {version_label} ({flavor}) -> {folder_name}")
-        run_for_config(effective_config)
-
-
-if __name__ == "__main__":
-    main()

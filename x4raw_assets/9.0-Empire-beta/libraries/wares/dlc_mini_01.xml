@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Last exported: 09.03.2026 17:03:37-->
+<diff>
+  <add sel="/wares">
+    <ware id="ship_par_l_expeditionary_01_a" name="{20101,33101}" description="{20101,33111}" transport="ship" volume="1" tags="hiddenwithoutlicence ship">
+      <price min="2905313" average="3418015" max="3930717" />
+      <production time="85" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="468" />
+          <ware ware="hullparts" amount="3235" />
+        </primary>
+      </production>
+      <component ref="ship_par_l_expeditionary_01_a_macro" />
+      <restriction licence="hyperion_access" />
+      <owner faction="holyorder" />
+      <owner faction="paranid" />
+      <owner faction="trinity" />
+    </ware>
+    <ware id="weapon_par_l_expeditionary_01_mk1" name="{20105,3104}" description="{20105,3102}" group="weapons" transport="equipment" volume="1" tags="equipment hiddenwithoutlicence weapon">
+      <price min="1044754" average="1160838" max="1276922" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="264" />
+          <ware ware="energycells" amount="2394" />
+          <ware ware="weaponcomponents" amount="268" />
+        </primary>
+      </production>
+      <component ref="weapon_par_l_expeditionary_01_mk1_macro" />
+      <restriction licence="hyperion_access" />
+      <use threshold="0" />
+      <owner faction="holyorder" />
+      <owner faction="paranid" />
+      <owner faction="trinity" />
+    </ware>
+  </add>
+</diff>

@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ships xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="libraries.xsd">
+  
+  <!--Terran Protectorate-->
+  <ship id="terran_builder_xl" group="ter_builder_xl">
+    <category tags="[builder, mission]" faction="terran" size="ship_xl"/>
+    <pilot>
+      <select faction="terran" tags="traderpilot"/>
+    </pilot>
+    <drop ref="ship_large_civilian"/>
+    <people ref="terran_freighter_crew"/>
+  </ship>
+  <ship id="terran_resupplier_xl" group="ter_resupplier_xl">
+    <category tags="[resupplier, mission]" faction="terran" size="ship_xl"/>
+    <pilot>
+      <select faction="terran" tags="traderpilot"/>
+    </pilot>
+    <drop ref="ship_large_civilian"/>
+    <people ref="terran_freighter_crew"/>
+  </ship>
+
+  <ship id="terran_trader_container_l" group="ter_trader_container_l">
+    <category tags="[trader, container, mission]" faction="terran" size="ship_l"/>
+    <pilot>
+      <select faction="terran" tags="traderpilot"/>
+    </pilot>
+    <basket basket="all_container"/>
+    <drop ref="ship_large_civilian"/>
+    <people ref="terran_freighter_crew"/>
+  </ship>
+  <ship id="terran_trader_container_m" group="ter_trader_container_m">
+    <category tags="[trader, container, mission]" faction="terran" size="ship_m"/>
+    <pilot>
+      <select faction="terran" tags="traderpilot"/>
+    </pilot>
+    <basket basket="all_container"/>
+    <drop ref="ship_medium_civilian"/>
+    <people ref="terran_freighter_crew"/>
+  </ship>
+  <ship id="terran_trader_container_s" group="ter_trader_container_s">
+    <category tags="[trader, container, mission]" faction="terran" size="ship_s"/>
+    <pilot>
+      <select faction="terran" tags="traderpilot"/>
+    </pilot>
+    <basket basket="all_container"/>
+    <drop ref="ship_small_civilian"/>
+    <people ref="terran_freighter_crew"/>
+  </ship>
+
+  <ship id="terran_miner_solid_l" group="ter_miner_solid_l">
+    <category tags="[miner, solid, mission]" faction="terran" size="ship_l"/>
+    <pilot>
+      <select faction="terran" tags="traderpilot"/>
+    </pilot>
+    <basket basket="minerals"/>
+    <drop ref="ship_large_civilian"/>
+    <people ref="terran_freighter_crew"/>
+  </ship>
+  <ship id="terran_miner_liquid_l" group="ter_miner_liquid_l">
+    <category tags="[miner, liquid, mission]" faction="terran" size="ship_l"/>
+    <pilot>
+      <select faction="terran" tags="traderpilot"/>
+    </pilot>
+    <basket basket="gases"/>
+    <drop ref="ship_large_civilian"/>
+    <people ref="terran_freighter_crew"/>
+  </ship>
+  <ship id="terran_miner_solid_m" group="ter_miner_solid_m">
+    <category tags="[miner, solid, mission]" faction="terran" size="ship_m"/>
+    <pilot>
+      <select faction="terran" tags="traderpilot"/>
+    </pilot>
+    <basket basket="minerals"/>
+    <drop ref="ship_medium_civilian"/>
+    <people ref="terran_freighter_crew"/>
+  </ship>
+  <ship id="terran_miner_liquid_m" group="ter_miner_liquid_m">
+    <category tags="[miner, liquid, mission]" faction="terran" size="ship_m"/>
+    <pilot>
+      <select faction="terran" tags="traderpilot"/>
+    </pilot>
+    <basket basket="gases"/>
+    <drop ref="ship_medium_civilian"/>
+    <people ref="terran_freighter_crew"/>
+  </ship>
+  <ship id="terran_miner_solid_s" group="ter_miner_solid_s">
+    <category tags="[miner, solid, mission]" faction="terran" size="ship_s"/>
+    <pilot>
+      <select faction="terran" tags="traderpilot"/>
+    </pilot>
+    <basket basket="minerals"/>
+    <drop ref="ship_small_civilian"/>
+    <people ref="terran_freighter_crew"/>
+  </ship>
+  <ship id="terran_miner_solid_mixed"  group="ter_miner_solid_mixed">
+    <category tags="[miner, solid, mixed]" faction="terran"/>
+    <owner exact="terran" overridenpc="true"/>
+    <pilot>
+      <select faction="terran" tags="traderpilot"/>
+    </pilot>
+    <basket basket="minerals"/>
+    <drop ref="ship_medium_civilian"/>
+    <people ref="terran_freighter_crew"/>
+  </ship>
+  <ship id="terran_miner_liquid_mixed"  group="ter_miner_liquid_mixed">
+    <category tags="[miner, liquid, mixed]" faction="terran"/>
+    <owner exact="terran" overridenpc="true"/>
+    <pilot>
+      <select faction="terran" tags="traderpilot"/>
+    </pilot>
+    <basket basket="gases"/>
+    <drop ref="ship_medium_civilian"/>
+    <people ref="terran_freighter_crew"/>
+  </ship>
+
+  <ship id="terran_carrier_xl" group="ter_carrier_xl">
+    <category tags="[military, carrier, mission]" faction="terran" size="ship_xl"/>
+    <pilot>
+      <select faction="terran" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_large_military"/>
+    <people ref="terran_military_crew"/>
+  </ship>
+
+  <!-- exclusive to faction.terran -->
+  <ship id="terran_battleship_atf_xl" group="atf_battleship_xl">
+    <category tags="[military, battleship, mission, atf]" faction="terran" size="ship_xl"/>
+    <pilot>
+      <select faction="terran" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_large_military"/>
+    <people ref="terran_asgard_crew"/>
+  </ship>
+  <ship id="terran_destroyer_atf_l" group="atf_destroyer_l">
+    <category tags="[military, destroyer, mission, atf]" faction="terran" size="ship_l"/>
+    <pilot>
+      <select faction="terran" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_large_military"/>
+    <people ref="terran_military_crew"/>
+  </ship>
+  <ship id="terran_destroyer_mixed_l" group="teratf_destroyer_l">
+    <category tags="[military, destroyer, mission, teratf]" faction="terran" size="ship_l"/>
+    <pilot>
+      <select faction="terran" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_large_military"/>
+    <people ref="terran_military_crew"/>
+  </ship>
+  <ship id="terran_destroyer_l" group="ter_destroyer_l">
+    <category tags="[military, destroyer, mission, noatf]" faction="terran" size="ship_l"/>
+    <pilot>
+      <select faction="terran" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_large_military"/>
+    <people ref="terran_military_crew"/>
+  </ship>
+  <ship id="terran_military_m" group="ter_military_m">
+    <category tags="[military, medium, selection, mission]" faction="terran" size="ship_m"/>
+    <pilot>
+      <select faction="terran" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_small_military"/>
+    <people ref="terran_military_crew"/>
+  </ship>
+  <ship id="terran_frigate_m" group="ter_frigate_m">
+    <category tags="[military, medium, frigate, mission]" faction="terran" size="ship_m"/>
+    <pilot>
+      <select faction="terran" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_small_military"/>
+    <people ref="terran_military_crew"/>
+  </ship>
+  <ship id="terran_corvette_m" group="ter_corvette_m">
+    <category tags="[military, medium, corvette, mission]" faction="terran" size="ship_m"/>
+    <pilot>
+      <select faction="terran" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_small_military"/>
+    <people ref="terran_veteran_military_crew"/>
+  </ship>
+  <ship id="terran_gunboat_m" group="ter_gunboat_m">
+    <category tags="[military, medium, gunboat, mission]" faction="terran" size="ship_m"/>
+    <pilot>
+      <select faction="terran" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_small_military"/>
+    <people ref="terran_veteran_military_crew"/>
+  </ship>
+  <ship id="terran_fighter_s" group="ter_fighter_s">
+    <category tags="[military, fighter, selection, mission, police]" faction="terran" size="ship_s"/>
+    <pilot>
+      <select faction="terran" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_small_military"/>
+    <people ref="terran_military_crew"/>
+  </ship>
+  <ship id="terran_fighter_heavy_s" group="ter_fighter_heavy_s">
+    <category tags="[military, fighter, heavy, mission]" faction="terran" size="ship_s"/>
+    <pilot>
+      <select faction="terran" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_small_military"/>
+    <people ref="terran_veteran_military_crew"/>
+  </ship>
+  <ship id="terran_fighter_light_s" group="ter_fighter_light_s">
+    <category tags="[military, fighter, light, mission]" faction="terran" size="ship_s"/>
+    <pilot>
+      <select faction="terran" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_small_military"/>
+    <people ref="terran_veteran_military_crew"/>
+  </ship>
+  <ship id="terran_scout_s" group="ter_scout_s">
+    <category tags="[military, scout, light, mission]" faction="terran" size="ship_s"/>
+    <pilot>
+      <select faction="terran" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_small_military"/>
+    <people ref="terran_military_crew"/>
+  </ship>
+
+  <!-- Segaris Pioneers -->
+  <ship id="pioneer_builder_xl" group="ter_builder_xl">
+    <category tags="[builder, mission]" faction="pioneers" size="ship_xl"/>
+    <pilot>
+      <select faction="pioneers" tags="traderpilot"/>
+    </pilot>
+    <drop ref="ship_large_civilian"/>
+    <people ref="pioneers_freighter_crew"/>
+  </ship>
+  <ship id="pioneer_resupplier_xl" group="ter_resupplier_xl">
+    <category tags="[resupplier, mission]" faction="pioneers" size="ship_xl"/>
+    <pilot>
+      <select faction="pioneers" tags="traderpilot"/>
+    </pilot>
+    <drop ref="ship_large_civilian"/>
+    <people ref="pioneers_freighter_crew"/>
+  </ship>
+
+  <ship id="pioneer_trader_container_l" group="ter_trader_container_l">
+    <category tags="[trader, container, mission]" faction="pioneers" size="ship_l"/>
+    <pilot>
+      <select faction="pioneers" tags="traderpilot"/>
+    </pilot>
+    <basket basket="all_container"/>
+    <drop ref="ship_large_civilian"/>
+    <people ref="pioneers_freighter_crew"/>
+  </ship>
+  <ship id="pioneer_trader_container_m" group="ter_trader_container_m">
+    <category tags="[trader, container, mission]" faction="pioneers" size="ship_m"/>
+    <pilot>
+      <select faction="pioneers" tags="traderpilot"/>
+    </pilot>
+    <basket basket="all_container"/>
+    <drop ref="ship_medium_civilian"/>
+    <people ref="pioneers_freighter_crew"/>
+  </ship>
+  <ship id="pioneer_trader_container_s" group="ter_trader_container_s">
+    <category tags="[trader, container, mission]" faction="pioneers" size="ship_s"/>
+    <pilot>
+      <select faction="pioneers" tags="traderpilot"/>
+    </pilot>
+    <basket basket="all_container"/>
+    <drop ref="ship_small_civilian"/>
+    <people ref="pioneers_freighter_crew"/>
+  </ship>
+
+  <ship id="pioneer_miner_solid_l" group="ter_miner_solid_l">
+    <category tags="[miner, solid, mission]" faction="pioneers" size="ship_l"/>
+    <pilot>
+      <select faction="pioneers" tags="traderpilot"/>
+    </pilot>
+    <basket basket="minerals"/>
+    <drop ref="ship_large_civilian"/>
+    <people ref="pioneers_freighter_crew"/>
+  </ship>
+  <ship id="pioneer_miner_liquid_l" group="ter_miner_liquid_l">
+    <category tags="[miner, liquid, mission]" faction="pioneers" size="ship_l"/>
+    <pilot>
+      <select faction="pioneers" tags="traderpilot"/>
+    </pilot>
+    <basket basket="gases"/>
+    <drop ref="ship_large_civilian"/>
+    <people ref="pioneers_freighter_crew"/>
+  </ship>
+  <ship id="pioneer_miner_solid_m" group="ter_miner_solid_m">
+    <category tags="[miner, solid, mission]" faction="pioneers" size="ship_m"/>
+    <pilot>
+      <select faction="pioneers" tags="traderpilot"/>
+    </pilot>
+    <basket basket="minerals"/>
+    <drop ref="ship_medium_civilian"/>
+    <people ref="pioneers_freighter_crew"/>
+  </ship>
+  <ship id="pioneer_miner_liquid_m" group="ter_miner_liquid_m">
+    <category tags="[miner, liquid, mission]" faction="pioneers" size="ship_m"/>
+    <pilot>
+      <select faction="pioneers" tags="traderpilot"/>
+    </pilot>
+    <basket basket="gases"/>
+    <drop ref="ship_medium_civilian"/>
+    <people ref="pioneers_freighter_crew"/>
+  </ship>
+  <ship id="pioneer_miner_solid_s" group="ter_miner_solid_s">
+    <category tags="[miner, solid, mission]" faction="pioneers" size="ship_s"/>
+    <pilot>
+      <select faction="pioneers" tags="traderpilot"/>
+    </pilot>
+    <basket basket="minerals"/>
+    <drop ref="ship_small_civilian"/>
+    <people ref="pioneers_freighter_crew"/>
+  </ship>
+  <ship id="pioneer_miner_solid_mixed"  group="ter_miner_solid_mixed">
+    <category tags="[miner, solid, mixed]" faction="pioneers"/>
+    <owner exact="terran" overridenpc="true"/>
+    <pilot>
+      <select faction="pioneers" tags="traderpilot"/>
+    </pilot>
+    <basket basket="minerals"/>
+    <drop ref="ship_medium_civilian"/>
+    <people ref="pioneers_freighter_crew"/>
+  </ship>
+  <ship id="pioneer_miner_liquid_mixed"  group="ter_miner_liquid_mixed">
+    <category tags="[miner, liquid, mixed]" faction="pioneers"/>
+    <owner exact="terran" overridenpc="true"/>
+    <pilot>
+      <select faction="pioneers" tags="traderpilot"/>
+    </pilot>
+    <basket basket="gases"/>
+    <drop ref="ship_medium_civilian"/>
+    <people ref="pioneers_freighter_crew"/>
+  </ship>
+
+  <ship id="pioneer_carrier_xl" group="ter_carrier_xl">
+    <category tags="[military, carrier, mission]" faction="pioneers" size="ship_xl"/>
+    <pilot>
+      <select faction="pioneers" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_large_military"/>
+    <people ref="pioneers_military_crew"/>
+  </ship>
+  
+  <ship id="pioneers_destroyer_l" group="ter_destroyer_l">
+    <category tags="[military, destroyer, mission]" faction="pioneers" size="ship_l"/>
+    <pilot>
+      <select faction="terran" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_large_military"/>
+    <people ref="pioneers_veteran_military_crew"/>
+  </ship>
+  <ship id="pioneers_corvette_m" group="pio_corvette_m">
+    <category tags="[military, medium, corvette, mission]" faction="pioneers" size="ship_m"/>
+    <pilot>
+      <select faction="pioneers" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_small_military"/>
+    <people ref="pioneers_elite_military_crew"/>
+  </ship>
+  <ship id="pioneers_fighter_s" group="pio_fighter_s">
+    <category tags="[military, fighter, selection, mission]" faction="pioneers" size="ship_s"/>
+    <pilot>
+      <select faction="pioneers" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_small_military"/>
+    <people ref="pioneers_military_crew"/>
+  </ship>
+  <ship id="pioneers_fighter_heavy_s" group="pio_fighter_heavy_s">
+    <category tags="[military, fighter, heavy, mission]" faction="pioneers" size="ship_s"/>
+    <pilot>
+      <select faction="pioneers" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_small_military"/>
+    <people ref="pioneers_veteran_military_crew"/>
+  </ship>
+  <ship id="pioneers_fighter_light_s" group="pio_fighter_light_s">
+    <category tags="[military, fighter, light, mission]" faction="pioneers" size="ship_s"/>
+    <pilot>
+      <select faction="pioneers" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_small_military"/>
+    <people ref="pioneers_veteran_military_crew"/>
+  </ship>
+  <ship id="pioneers_scout_s" group="pio_scout_s">
+    <category tags="[military, scout, light, mission]" faction="pioneers" size="ship_s"/>
+    <pilot>
+      <select faction="terran" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_small_military"/>
+    <people ref="pioneers_military_crew"/>
+  </ship>
+  <ship id="pioneer_tug_m" group="common_tug_m">
+    <category tags="[tug, mission]" faction="pioneers" size="ship_m"/>
+    <pilot>
+      <select faction="pioneers" tags="traderpilot"/>
+    </pilot>
+    <basket basket="all_container"/>
+    <drop ref="ship_medium_civilian"/>
+    <people ref="pioneers_freighter_crew"/>
+  </ship>
+
+  <!-- Yaki -->
+  <ship id="yaki_corvette_m" group="yak_military_m">
+    <category tags="[military, medium, corvette, mission, plunder]" faction="yaki" size="ship_m"/>
+    <pilot>
+      <select faction="yaki" tags="fighterpilot"/>
+    </pilot>
+    <basket basket="pirate_container"/>
+    <drop ref="ship_small_pirate"/>
+    <people ref="yaki_elite_military_crew"/>
+  </ship>
+  <ship id="yaki_fighter_s" group="yak_military_s">
+    <category tags="[military, fighter, mission, plunder]" faction="yaki" size="ship_s"/>
+    <pilot>
+      <select faction="yaki" tags="fighterpilot"/>
+    </pilot>
+    <basket basket="pirate_container"/>
+    <drop ref="ship_small_pirate"/>
+    <people ref="yaki_veteran_military_crew"/>
+  </ship>
+
+  <!-- Terran Mass Traffic -->
+  <ship id="masstraffic_terran_dockarea" group="terran_dockarea_mass_traffic">
+    <owner exact="civilian" overridenpc="true"/>
+    <pilot>
+      <select faction="civilian" tags="[masstraffic]" race="terran"/>
+    </pilot>
+    <drop ref="masstraffic_terran_civilian"/>
+  </ship>
+  <ship id="masstraffic_terran_pier" group="terran_pier_mass_traffic">
+    <owner exact="civilian" overridenpc="true"/>
+    <pilot>
+      <select faction="civilian" tags="[masstraffic]" race="terran"/>
+    </pilot>
+    <drop ref="masstraffic_terran_civilian"/>
+  </ship>
+  <ship id="masstraffic_terran_storage" group="terran_storage_mass_traffic">
+    <owner exact="civilian" overridenpc="true"/>
+    <pilot>
+      <select faction="civilian" tags="[masstraffic]" race="terran"/>
+    </pilot>
+    <drop ref="masstraffic_terran_civilian"/>
+  </ship>
+  <ship id="masstraffic_terran_production" group="terran_production_mass_traffic">
+    <owner exact="civilian" overridenpc="true"/>
+    <pilot>
+      <select faction="civilian" tags="[masstraffic]" race="terran"/>
+    </pilot>
+    <drop ref="masstraffic_terran_civilian"/>
+  </ship>
+  <ship id="masstraffic_terran_buildmodule" group="terran_buildmodule_mass_traffic">
+    <owner exact="civilian" overridenpc="true"/>
+    <pilot>
+      <select faction="civilian" tags="[masstraffic]" race="terran"/>
+    </pilot>
+    <drop ref="masstraffic_terran_civilian"/>
+  </ship>
+  <ship id="masstraffic_terran_defencemodule" group="terran_defencemodule_mass_traffic">
+    <owner exact="civilian" overridenpc="true"/>
+    <pilot>
+      <select faction="civilian" tags="[masstraffic]" race="terran"/>
+    </pilot>
+    <drop ref="masstraffic_terran_civilian"/>
+  </ship>
+
+  <ship id="masstraffic_terran_civilian" group="terran_civilian_mass_traffic">
+    <owner exact="civilian" overridenpc="true"/>
+    <pilot>
+      <select faction="civilian" tags="[masstraffic]" race="terran"/>
+    </pilot>
+    <drop ref="masstraffic_terran_civilian"/>
+  </ship>
+  <ship id="masstraffic_terran_civilian_station" group="terran_civilian_mass_traffic">
+    <owner exact="civilian" overridenpc="true"/>
+    <pilot>
+      <select faction="civilian" tags="[masstraffic]" race="terran"/>
+    </pilot>
+    <drop ref="masstraffic_terran_civilian"/>
+  </ship>
+  <ship id="masstraffic_terran_police" group="terran_police_mass_traffic">
+    <owner exact="terran" overridenpc="true"/>
+    <pilot>
+      <select faction="terran" tags="pilot"/>
+    </pilot>
+    <drop ref="masstraffic_terran_civilian"/>
+  </ship>
+</ships>

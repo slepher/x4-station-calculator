@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<groups>
+
+  <!-- ############################# -->
+  <!--    Kaori -->
+  <!--    using combination of different faction ships -->
+  <!--    Trade ships are TEL mostly, military is a combination of all base game factions -->
+  <!-- ############################# -->
+  <!-- Construction -->
+  <group name="kao_builder_xl">
+    <select macro="ship_tel_xl_builder_01_b_macro" weight="100"/>
+  </group>
+
+  <!-- Transporters -->
+  <group name="kao_trader_container_l">
+    <select macro="ship_tel_l_trans_container_03_a_macro" weight="100"/>
+  </group>
+  <group name="kao_trader_container_m">
+    <select macro="ship_tel_m_trans_container_01_b_macro" weight="100"/>
+  </group>
+  <group name="kao_trader_container_s">
+    <select macro="ship_tel_s_trans_container_01_b_macro" weight="100"/>
+  </group>
+
+  <!-- Miners -->
+  <group name="kao_miner_solid_m">
+    <select macro="ship_arg_m_miner_solid_01_b_macro" weight="100"/>
+  </group>
+  <group name="kao_miner_liquid_m">
+    <select macro="ship_arg_m_miner_liquid_01_b_macro" weight="100"/>
+  </group>
+  <group name="kao_miner_solid_s">
+    <select macro="ship_tel_s_miner_solid_01_a_macro" weight="100"/>
+  </group>
+
+  <!-- ############################# -->
+  <!-- Military / Combat -->
+  <!-- ############################# -->
+  <group name="kao_corvette_m">
+    <select macro="ship_par_m_corvette_01_b_macro" weight="100"/>
+  </group>
+  <group name="kao_gunboat_m">
+    <select macro="ship_tel_m_bomber_01_b_macro" weight="100"/>
+  </group>
+  <group name="kao_mixed_m">
+    <select macro="ship_par_m_corvette_01_b_macro" weight="100"/>
+    <select macro="ship_tel_m_bomber_01_b_macro" weight="100"/>
+  </group>
+  <group name="kao_fighter_s">
+    <select macro="ship_par_s_heavyfighter_01_a_macro" weight="75"/>
+    <select macro="ship_arg_s_fighter_01_b_macro" weight="100"/>
+    <select macro="ship_arg_s_scout_01_b_macro" weight="50"/>
+  </group>
+  <group name="kao_fighter_heavy_s">
+    <select macro="ship_par_s_heavyfighter_01_a_macro" weight="100"/>
+  </group>
+  <group name="kao_fighter_light_s">
+    <select macro="ship_arg_s_fighter_01_b_macro" weight="100"/>
+  </group>
+  <group name="kao_scout_s">
+    <select macro="ship_arg_s_scout_01_b_macro" weight="100"/>
+  </group>
+
+  <!-- ############################# -->
+  <!--    MASS TRAFFIC -->
+  <!--      Kaori -->
+  <!-- ############################# -->
+
+  <!-- Using regular Argon mass traffic -->
+
+</groups>

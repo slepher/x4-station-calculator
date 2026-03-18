@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ships xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="libraries.xsd">
+  <!-- Loanshark -->
+  <ship id="loanshark_plunderer" group="loanshark_pirate_l">
+    <category tags="[military, plunderer, mission]" faction="[loanshark]" size="ship_l"/>
+    <owner exact="loanshark" overridenpc="true"/>
+    <pilot>
+      <select faction="loanshark" tags="commander"/>
+    </pilot>
+    <basket basket="pirate_container"/>
+    <drop ref="ship_large_military"/>
+    <people ref="loanshark_pirate_crew"/>
+  </ship>
+  <ship id="loanshark_trader_container_l" group="loanshark_trader_container_l">
+    <category tags="[trader, container, mission]" faction="[loanshark]" size="ship_l"/>
+    <pilot>
+      <select faction="loanshark" tags="traderpilot"/>
+    </pilot>
+    <basket basket="all_container"/>
+    <drop ref="ship_large_civilian"/>
+    <people ref="loanshark_freighter_crew"/>
+  </ship>
+  <ship id="loanshark_smuggler_container_s" group="loanshark_trader_container_s">
+    <category tags="[trader, container, mission]" faction="[loanshark]" size="ship_s"/>
+    <pilot>
+      <select faction="loanshark" tags="traderpilot"/>
+    </pilot>
+    <basket basket="global_illegal"/>
+    <drop ref="ship_small_military"/>
+    <people ref="loanshark_pirate_crew"/>
+  </ship>
+  <ship id="loanshark_miner_solid_l" group="loanshark_miner_solid_l">
+    <category tags="[miner, solid, mission]" faction="[loanshark]" size="ship_l"/>
+    <pilot>
+      <select faction="loanshark" tags="traderpilot"/>
+    </pilot>
+    <basket basket="ice"/>
+    <drop ref="ship_large_civilian"/>
+    <people ref="loanshark_freighter_crew"/>
+  </ship>
+  <ship id="loanshark_fighter_s" group="loanshark_fighter_s">
+    <category tags="[military, fighter, selection, mission]" faction="[loanshark]" size="ship_s"/>
+    <pilot>
+      <select faction="loanshark" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_small_military"/>
+    <people ref="loanshark_military_crew"/>
+  </ship>
+  <ship id="loanshark_fighter_heavy_s" group="loanshark_fighter_heavy_s">
+    <category tags="[military, fighter, heavy, mission]" faction="[loanshark]" size="ship_s"/>
+    <pilot>
+      <select faction="loanshark" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_small_military"/>
+    <people ref="loanshark_military_crew"/>
+  </ship>
+  <!--<ship id="loanshark_fighter_light_s" group="loanshark_fighter_light_s">
+    <category tags="[military, fighter, light, mission]" faction="[loanshark]" size="ship_s"/>
+    <pilot>
+      <select faction="loanshark" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_small_military"/>
+    <people ref="loanshark_military_crew"/>
+  </ship>-->
+  <ship id="loanshark_fighter_common_s" group="loanshark_fighter_common_s">
+    <category tags="[military, fighter, light, mission]" faction="[loanshark]" size="ship_s"/>
+    <pilot>
+      <select faction="loanshark" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_small_military"/>
+    <people ref="loanshark_military_crew"/>
+  </ship>
+  <ship id="loanshark_fighter_aurora_s" group="loanshark_fighter_aurora_s">
+    <category tags="[military, fighter, aurora, mission]" faction="[loanshark]" size="ship_s"/>
+    <pilot>
+      <select faction="loanshark" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_small_military"/>
+    <people ref="loanshark_military_crew"/>
+  </ship>
+  <ship id="loanshark_fighter_scrapyard_s" group="loanshark_fighter_scrapyard_s">
+    <category tags="[military, fighter, scrapyard, mission]" faction="[loanshark]" size="ship_s"/>
+    <pilot>
+      <select faction="loanshark" tags="fighterpilot"/>
+    </pilot>
+    <drop ref="ship_small_military"/>
+    <people ref="loanshark_military_crew"/>
+  </ship>
+
+  <!-- Scavenger -->
+  <ship id="scavenger_builder_xl" group="scavenger_builder_xl">
+    <category tags="[builder, mission]" faction="[scavenger]" size="ship_xl"/>
+    <pilot>
+      <select faction="scavenger" tags="traderpilot"/>
+    </pilot>
+    <drop ref="ship_large_civilian"/>
+    <people ref="scavenger_freighter_crew"/>
+  </ship>
+
+  <ship id="scavenger_tug_m" group="common_tug_m">
+    <category tags="[tug, mission]" faction="[scavenger]" size="ship_m"/>
+    <pilot>
+      <select faction="scavenger" tags="traderpilot"/>
+    </pilot>
+    <basket basket="all_container"/>
+    <drop ref="ship_medium_civilian"/>
+    <people ref="scavenger_freighter_crew"/>
+  </ship>
+  <ship id="scavenger_compactor_l" group="scavenger_compactor_l">
+    <category tags="[compactor, mission]" faction="[scavenger]" size="ship_l"/>
+    <pilot>
+      <select faction="scavenger" tags="traderpilot"/>
+    </pilot>
+    <basket basket="all_container"/>
+    <drop ref="ship_large_civilian"/>
+    <people ref="scavenger_freighter_crew"/>
+  </ship>
+
+  <ship id="scavenger_trader_container_m" group="scavenger_trader_container_m">
+    <category tags="[trader, container, mission]" faction="[scavenger]" size="ship_m"/>
+    <pilot>
+      <select faction="scavenger" tags="traderpilot"/>
+    </pilot>
+    <basket basket="all_container"/>
+    <drop ref="ship_medium_civilian"/>
+    <people ref="scavenger_freighter_crew"/>
+  </ship>
+
+  <ship id="scavenger_trader_condensate_s" group="scavenger_trader_condensate_s">
+    <category tags="[trader, condensate, mission]" faction="[scavenger]" size="ship_s"/>
+    <pilot>
+      <select faction="scavenger" tags="traderpilot"/>
+    </pilot>
+    <basket basket="condensate"/>
+    <drop ref="ship_small_civilian"/>
+    <people ref="scavenger_freighter_crew"/>
+  </ship>
+
+  <ship id="scavenger_smuggler_container_s" group="scavenger_trader_container_s">
+    <category tags="[trader, container, mission]" faction="[scavenger]" size="ship_s"/>
+    <pilot>
+      <select faction="scavenger" tags="traderpilot"/>
+    </pilot>
+    <basket basket="food_argon"/>
+    <drop ref="ship_small_military"/>
+    <people ref="scavenger_pirate_crew"/>
+  </ship>
+
+  <!-- Ministry of Finance -->
+  <ship id="ministry_specialops_container_s" group="tel_trader_container_s_ministry">
+    <category tags="[raven]" faction="[ministry]" size="ship_s"/>
+    <pilot>
+      <select faction="ministry" tags="fighterpilot"/>
+    </pilot>
+    <equipmentmods>
+      <ship ware="ware.mod_ship_hidecargo_01"/>
+    </equipmentmods>
+    <basket basket="all_container"/>
+    <drop ref="ship_small_military"/>
+    <people ref="teladi_elite_military_crew"/>
+  </ship>
+</ships>

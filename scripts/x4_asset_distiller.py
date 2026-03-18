@@ -5,6 +5,7 @@ import json
 import sys
 import argparse
 from copy import deepcopy
+from pathlib import Path
 from lxml import etree
 
 def load_all_configs():
@@ -74,12 +75,16 @@ def merge_version_config(v_config, version_item):
 def setup_customizer(m_config):
     paths = m_config.get('X4_PATHS', {})
     customizer_path = paths.get('CUSTOMIZER_PATH')
+    game_dir = paths.get('GAME_DIR')
     if not customizer_path or not os.path.exists(customizer_path):
         raise NotADirectoryError(f"❌ 错误: CUSTOMIZER_PATH 无效: {customizer_path}")
     if customizer_path not in sys.path:
         sys.path.append(customizer_path)
     try:
-        from Framework import File_Manager # type: ignore
+        from Framework import File_Manager, Settings # type: ignore
+        if game_dir:
+            # 强制使用项目配置中的 GAME_DIR，避免读取 Customizer settings.json 里的旧路径。
+            Settings(path_to_x4_folder=game_dir, allow_path_error=True)
         return File_Manager.XML_Diff
     except ImportError:
         raise ImportError("❌ 错误: 无法加载 Customizer 框架逻辑。")
@@ -100,6 +105,9 @@ def run_distillation_for_version(m_config, v_config, config_dir, xml_diff):
 
     parser = etree.XMLParser(remove_blank_text=True)
     dlc_order = v_config.get('dlc_order', [])
+
+    def normalize_dlc_name(dlc_id):
+        return dlc_id[4:] if dlc_id.startswith("ego_") else dlc_id
 
     # 辅助函数：计算节点签名（用于去重）
     def node_signature(node):
@@ -242,90 +250,157 @@ def run_distillation_for_version(m_config, v_config, config_dir, xml_diff):
 
         return output_path
 
-    def merge_xml_file(target_path, source_path):
-        target_existed = os.path.exists(target_path)
+    def clone_tree(tree):
+        return etree.ElementTree(deepcopy(tree.getroot()))
+
+    def apply_overlay_to_tree(base_tree, source_path):
+        if base_tree is None:
+            print(f"      ⚠️ 缺少基础树，无法应用补丁: {source_path}")
+            return None, 'failed'
+
         try:
             source_tree = etree.parse(source_path, parser)
         except Exception as e:
             print(f"      ⚠️ 读取失败 {source_path}: {e}")
-            return 'failed'
+            return None, 'failed'
 
         source_root = source_tree.getroot()
-        if source_root.tag == 'diff':
-            if not os.path.exists(target_path):
-                print(f"      ⚠️ 缺少基础文件，无法应用补丁: {target_path}")
-                return 'failed'
+        try:
+            target_tree = clone_tree(base_tree)
+            xml_diff.Apply_Patch(target_tree.getroot(), source_root)
+            return target_tree, 'patched'
+        except Exception as e:
+            print(f"      ⚠️ 补丁失败 {source_path}: {e}")
+            return None, 'failed'
+
+    def get_xml_slot_paths(relative_path):
+        rel = Path(os.path.normpath(relative_path))
+        slot_dir = os.path.join(dest_root, str(rel.parent), rel.stem)
+        return slot_dir, os.path.join(slot_dir, "base.xml"), os.path.join(slot_dir, "final.xml")
+
+    def copy_related_xsd(relative_path, slot_dir):
+        rel_path = Path(relative_path)
+        xsd_name = f"{rel_path.stem}.xsd"
+        base_xsd = os.path.join(src, str(rel_path.parent), xsd_name)
+        if os.path.exists(base_xsd):
+            shutil.copy2(base_xsd, os.path.join(slot_dir, xsd_name))
+            return True
+
+        for dlc_id in dlc_order:
+            dlc_xsd = os.path.join(src, "extensions", dlc_id, str(rel_path.parent), xsd_name)
+            if os.path.exists(dlc_xsd):
+                shutil.copy2(dlc_xsd, os.path.join(slot_dir, xsd_name))
+                return True
+        return False
+
+    def build_dlc_stack_xml(relative_path, overlay_sources_by_dlc):
+        slot_dir, base_output_path, final_output_path = get_xml_slot_paths(relative_path)
+        os.makedirs(slot_dir, exist_ok=True)
+
+        base_src = os.path.join(src, relative_path)
+        base_tree = None
+        if os.path.exists(base_src):
             try:
-                target_tree = etree.parse(target_path, parser)
-                xml_diff.Apply_Patch(target_tree.getroot(), source_root)
-                target_tree.write(target_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
-                return 'patched'
+                base_tree = etree.parse(base_src, parser)
+                base_tree.write(base_output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
             except Exception as e:
-                print(f"      ⚠️ 补丁失败 {source_path}: {e}")
-                return 'failed'
+                print(f"      ⚠️ Base 解析失败 {base_src}: {e}")
+                return {'base': False, 'final': False, 'dlc_written': 0, 'xsd': False}
+        else:
+            print(f"      ⚠️ Base 文件不存在: {base_src}")
 
-        shutil.copy2(source_path, target_path)
-        return 'overwritten' if target_existed else 'copied'
+        copied_xsd = copy_related_xsd(relative_path, slot_dir)
+        final_tree = clone_tree(base_tree) if base_tree is not None else None
+        dlc_written = 0
 
-    def distill_targeted_map_xml(relative_dir, base_names, dlc_patterns):
-        print(f"🗺️ [4/10] 正在蒸馏地图 XML: {relative_dir} ...")
-        base_dir = os.path.join(src, relative_dir)
-        dest_dir = os.path.join(dest_root, relative_dir)
-        os.makedirs(dest_dir, exist_ok=True)
+        for dlc_id in dlc_order:
+            source_path = overlay_sources_by_dlc.get(dlc_id)
+            if not source_path:
+                continue
 
-        stats = {
-            'base_copied': 0,
-            'dlc_added': 0,
-            'dlc_patched': 0,
-            'dlc_overwritten': 0,
+            # 按需求：目录中保留 DLC 原始文件，不写“打过补丁后的单 DLC 版本”。
+            dlc_output_path = os.path.join(slot_dir, f"{normalize_dlc_name(dlc_id)}.xml")
+            shutil.copy2(source_path, dlc_output_path)
+            dlc_written += 1
+
+            final_next_tree, final_result = apply_overlay_to_tree(final_tree, source_path)
+            if final_next_tree is not None and final_result == 'patched':
+                final_tree = final_next_tree
+
+        if final_tree is None and base_tree is not None:
+            final_tree = clone_tree(base_tree)
+
+        if final_tree is not None:
+            final_tree.write(final_output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
+            final_written = True
+        else:
+            final_written = False
+
+        return {
+            'base': base_tree is not None,
+            'final': final_written,
+            'dlc_written': dlc_written,
+            'xsd': copied_xsd,
         }
 
-        for file_name in base_names:
-            base_path = os.path.join(base_dir, file_name)
-            if not os.path.exists(base_path):
-                print(f"   ⚠️ Base 文件不存在: {base_path}")
-                continue
-            shutil.copy2(base_path, os.path.join(dest_dir, file_name))
-            stats['base_copied'] += 1
+    def distill_targeted_map_xml(relative_dir, base_names):
+        print(f"🗺️ [4/10] 正在蒸馏地图 XML: {relative_dir} ...")
+        stats = {
+            'base_written': 0,
+            'final_written': 0,
+            'dlc_versions_written': 0,
+            'xsd_copied': 0,
+        }
 
+        base_name_set = set(base_names)
+
+        def map_dlc_name_to_base(file_name):
+            if file_name in base_name_set:
+                return file_name
+            for base_name in base_names:
+                if file_name.endswith(f"_{base_name}"):
+                    return base_name
+            return None
+
+        overlay_sources_by_target = {name: {} for name in base_names}
         for dlc_id in dlc_order:
             overlay_dir = os.path.join(src, "extensions", dlc_id, relative_dir)
             if not os.path.isdir(overlay_dir):
                 continue
 
-            dlc_changed = 0
-            matched_names = set()
-            for pattern in dlc_patterns:
-                matched_names.update(
-                    os.path.basename(path)
-                    for path in glob.glob(os.path.join(overlay_dir, pattern))
-                    if path.lower().endswith(".xml")
-                )
+            selected_by_target = {}
+            for path in sorted(glob.glob(os.path.join(overlay_dir, "*.xml"))):
+                file_name = os.path.basename(path)
+                target_name = map_dlc_name_to_base(file_name)
+                if target_name is None:
+                    continue
+                priority = 2 if file_name == target_name else 1
+                current = selected_by_target.get(target_name)
+                if current is None or priority > current[0]:
+                    selected_by_target[target_name] = (priority, path)
 
-            for file_name in sorted(matched_names):
-                source_path = os.path.join(overlay_dir, file_name)
+            for target_name, (_, target_path) in selected_by_target.items():
+                overlay_sources_by_target[target_name][dlc_id] = target_path
 
-                target_path = os.path.join(dest_dir, file_name)
-                result = merge_xml_file(target_path, source_path)
-                if result == 'patched':
-                    stats['dlc_patched'] += 1
-                    dlc_changed += 1
-                elif result == 'copied':
-                    stats['dlc_added'] += 1
-                    dlc_changed += 1
-                elif result == 'overwritten':
-                    stats['dlc_overwritten'] += 1
-                    dlc_changed += 1
+        for file_name in base_names:
+            relative_path = os.path.join(relative_dir, file_name)
+            overlay_sources_by_dlc = overlay_sources_by_target.get(file_name, {})
 
-            if dlc_changed:
-                print(f"   [+] 已合并 DLC 地图 ({dlc_id})，变更 {dlc_changed} 个 XML。")
+            result = build_dlc_stack_xml(relative_path, overlay_sources_by_dlc)
+            if result['base']:
+                stats['base_written'] += 1
+            if result['final']:
+                stats['final_written'] += 1
+            if result['xsd']:
+                stats['xsd_copied'] += 1
+            stats['dlc_versions_written'] += result['dlc_written']
 
         print(
             "   ✅ 地图 XML 蒸馏完成: "
-            f"base={stats['base_copied']}, "
-            f"dlc_added={stats['dlc_added']}, "
-            f"dlc_patched={stats['dlc_patched']}, "
-            f"dlc_overwritten={stats['dlc_overwritten']}"
+            f"base={stats['base_written']}, "
+            f"final={stats['final_written']}, "
+            f"dlc_versions={stats['dlc_versions_written']}, "
+            f"xsd={stats['xsd_copied']}"
         )
 
     # --- 步骤 1: 拷贝语言包 (t/) ---
@@ -347,8 +422,7 @@ def run_distillation_for_version(m_config, v_config, config_dir, xml_diff):
 
     distill_targeted_map_xml(
         os.path.join("maps", "xu_ep2_universe"),
-        ["galaxy.xml", "clusters.xml", "sectors.xml", "zones.xml", "zonehighways.xml", "sechighways.xml"],
-        ["galaxy.xml", "*clusters.xml", "*sectors.xml", "*zones.xml", "*zonehighways.xml", "*sechighways.xml"]
+        ["galaxy.xml", "clusters.xml", "sectors.xml", "zones.xml", "zonehighways.xml", "sechighways.xml"]
     )
 
     # --- 步骤 5: 处理库与任务脚本文件 ---
@@ -357,62 +431,42 @@ def run_distillation_for_version(m_config, v_config, config_dir, xml_diff):
     os.makedirs(lib_dest_dir, exist_ok=True)
 
     xml_files = [
-        { 'path': os.path.join('libraries', 'wares.xml'), 'final': os.path.join('libraries', 'wares_final.xml') },
-        { 'path': os.path.join('libraries', 'waregroups.xml'), 'final': os.path.join('libraries', 'waregroups_final.xml') },
-        { 'path': os.path.join('libraries', 'colors.xml'), 'final': os.path.join('libraries', 'colors_final.xml') },
-        { 'path': os.path.join('libraries', 'mapdefaults.xml'), 'final': os.path.join('libraries', 'mapdefaults_final.xml') },
-        { 'path': os.path.join('libraries', 'god.xml'), 'final': os.path.join('libraries', 'god_final.xml') },
-        { 'path': os.path.join('libraries', 'factions.xml'), 'final': os.path.join('libraries', 'factions_final.xml') },
-        { 'path': os.path.join('libraries', 'region_definitions.xml'), 'final': os.path.join('libraries', 'region_definitions_final.xml') },
-        { 'path': os.path.join('libraries', 'regionyields.xml'), 'final': os.path.join('libraries', 'regionyields_final.xml') },
-        { 'path': os.path.join('libraries', 'regionobjectgroups.xml'), 'final': os.path.join('libraries', 'regionobjectgroups_final.xml') },
-        { 'path': os.path.join('libraries', 'ships.xml'), 'final': os.path.join('libraries', 'ships_final.xml') },
-        { 'path': os.path.join('libraries', 'shipgroups.xml'), 'final': os.path.join('libraries', 'shipgroups_final.xml') },
-        { 'path': os.path.join('libraries', 'loadouts.xml'), 'final': os.path.join('libraries', 'loadouts_final.xml') },
-        { 'path': os.path.join('libraries', 'defaults.xml'), 'final': os.path.join('libraries', 'defaults_final.xml') },
-        { 'path': os.path.join('md', 'factionlogic.xml'), 'final': os.path.join('md', 'factionlogic_final.xml') },
-        { 'path': os.path.join('md', 'khaak_activity.xml'), 'final': os.path.join('md', 'khaak_activity_final.xml') },
+        os.path.join('libraries', 'wares.xml'),
+        os.path.join('libraries', 'waregroups.xml'),
+        os.path.join('libraries', 'colors.xml'),
+        os.path.join('libraries', 'mapdefaults.xml'),
+        os.path.join('libraries', 'god.xml'),
+        os.path.join('libraries', 'factions.xml'),
+        os.path.join('libraries', 'region_definitions.xml'),
+        os.path.join('libraries', 'regionyields.xml'),
+        os.path.join('libraries', 'regionobjectgroups.xml'),
+        os.path.join('libraries', 'ships.xml'),
+        os.path.join('libraries', 'shipgroups.xml'),
+        os.path.join('libraries', 'loadouts.xml'),
+        os.path.join('libraries', 'defaults.xml'),
+        os.path.join('md', 'factionlogic.xml'),
+        os.path.join('md', 'khaak_activity.xml'),
     ]
 
     for xml_file in xml_files:
-        relative_path = os.path.normpath(xml_file['path'])
-        final_relative_path = os.path.normpath(xml_file['final'])
+        relative_path = os.path.normpath(xml_file)
         print(f"   🔨 处理 {relative_path} ...")
-
-        base_src = os.path.join(src, relative_path)
-        target_path = os.path.join(dest_root, relative_path)
-        final_output_path = os.path.join(dest_root, final_relative_path)
-        os.makedirs(os.path.dirname(target_path), exist_ok=True)
-        os.makedirs(os.path.dirname(final_output_path), exist_ok=True)
-
-        if os.path.exists(base_src):
-            shutil.copy2(base_src, target_path)
-        else:
-            print(f"      ⚠️ Base 文件不存在: {base_src}")
-            continue
-
-        # 合并 DLC Patch
-        base_tree = etree.parse(target_path, parser)
+        overlay_sources_by_dlc = {}
         for dlc_id in dlc_order:
             patch_path = os.path.join(src, "extensions", dlc_id, relative_path)
             if os.path.exists(patch_path):
                 print(f"      [+] 注入补丁 ({dlc_id})")
-                try:
-                    patch_tree = etree.parse(patch_path, parser)
-                    xml_diff.Apply_Patch(base_tree.getroot(), patch_tree.getroot())
-                except Exception as e:
-                    print(f"      ⚠️ 警告: 补丁失败 {dlc_id}: {e}")
-
-        # 写入 Final
-        base_tree.write(final_output_path, encoding='utf-8', xml_declaration=True, pretty_print=True)
-        print(f"      ✨ 生成: {os.path.basename(final_output_path)}")
+                overlay_sources_by_dlc[dlc_id] = patch_path
+        result = build_dlc_stack_xml(relative_path, overlay_sources_by_dlc)
+        if result['final']:
+            print("      ✨ 生成: final.xml")
 
     # --- 步骤 6: 聚合空间站宏定义 (module_macros.xml) ---
     print("∑ [6/10] 正在聚合空间站宏定义 (module_macros.xml)...")
 
     # 5.1 解析引用 (Needed Macros)
     needed_macros = set()
-    wares_final_path = os.path.join(lib_dest_dir, "wares_final.xml")
+    wares_final_path = os.path.join(lib_dest_dir, "wares", "final.xml")
     if os.path.exists(wares_final_path):
         w_tree = etree.parse(wares_final_path)
         for ware in w_tree.findall(".//ware"):

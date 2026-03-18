@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Last exported: 04.07.2025 13:03:16
+
+Default Relation Ranges:
+  self:          1.0  to  1.0
+  ally:          0.5  to  1.0
+  member:        0.1  to  1.0
+  friend:        0.01 to  1.0
+  neutral:      -0.01 to  0.01
+  enemy:        -1.0  to -0.01
+  killmilitary: -1.0  to -0.1
+  kill:         -1.0  to -0.32
+  nemesis:      -1.0  to -1.0
+
+UI value mapping (analogously for negative values):
+  1.0       = 30
+  0.5       = 27
+  0.32      = 25
+  0.1       = 20
+  0.032     = 15
+  0.01      = 10
+  0.0032    = 5
+These values are fixed. Between them, logarithmic interpolation is used. Approximate formulas:
+  uivalue = 10 * log10(relation * 1000)
+  relation = 10^(uivalue / 10) / 1000
+Between -0.0032 and +0.0032 (UI -5...+5) linear interpolation is used, and 0.00064 equates to one UI value step.
+
+Note: Relations defined here apply only to gamestart. Relations may change through gameplay and/or plot.
+-->
+<diff>
+  <add sel="/factions/faction[@id='player']/licences">
+    <licence type="generaluseequipment" factions="court freesplit" />
+    <licence type="generaluseship" factions="court freesplit" />
+    <licence type="station_gen_basic" factions="court freesplit" />
+  </add>
+  <add sel="/factions/faction[@id='alliance']/relations">
+    <relation faction="fallensplit" relation="0.011" />
+  </add>
+  <add sel="/factions/faction[@id='antigone']/relations">
+    <relation faction="court" relation="-0.011" />
+    <relation faction="fallensplit" relation="-0.1" />
+    <relation faction="freesplit" relation="-0.011" />
+    <relation faction="split" relation="-0.1" />
+  </add>
+  <add sel="/factions/faction[@id='argon']/relations">
+    <relation faction="court" relation="-0.011" />
+    <relation faction="fallensplit" relation="-0.32" />
+    <relation faction="freesplit" relation="-0.011" />
+    <relation faction="split" relation="-0.1" />
+  </add>
+  <add sel="/factions/faction[@id='buccaneers']/relations">
+    <relation faction="court" relation="-0.032" />
+    <relation faction="fallensplit" relation="-0.32" />
+    <relation faction="freesplit" relation="-0.032" />
+    <relation faction="split" relation="-0.032" />
+  </add>
+  <add sel="/factions/faction[@id='criminal']/relations">
+    <relation faction="court" relation="-0.5" />
+    <relation faction="fallensplit" relation="-0.5" />
+    <relation faction="freesplit" relation="-0.5" />
+    <relation faction="split" relation="-0.5" />
+  </add>
+  <add sel="/factions/faction[@id='hatikvah']/relations">
+    <relation faction="fallensplit" relation="0.011" />
+  </add>
+  <add sel="/factions/faction[@id='holyorder']/relations">
+    <relation faction="fallensplit" relation="-0.32" />
+  </add>
+  <add sel="/factions/faction[@id='holyorderfanatic']/relations">
+    <relation faction="fallensplit" relation="-0.1" />
+  </add>
+  <add sel="/factions/faction[@id='khaak']/relations">
+    <relation faction="court" relation="-1" />
+    <relation faction="fallensplit" relation="-1" />
+    <relation faction="freesplit" relation="-1" />
+    <relation faction="split" relation="-1" />
+  </add>
+  <add sel="/factions/faction[@id='ministry']/relations">
+    <relation faction="fallensplit" relation="-0.32" />
+  </add>
+  <add sel="/factions/faction[@id='outlaw']/relations">
+    <relation faction="court" relation="-0.032" />
+    <relation faction="fallensplit" relation="-0.032" />
+    <relation faction="freesplit" relation="-0.032" />
+    <relation faction="split" relation="-0.032" />
+  </add>
+  <add sel="/factions/faction[@id='paranid']/relations">
+    <relation faction="fallensplit" relation="-0.32" />
+  </add>
+  <add sel="/factions/faction[@id='player']/relations">
+    <relation faction="fallensplit" relation="-0.0032" />
+    <relation faction="freesplit" relation="-0.0032" />
+    <relation faction="split" relation="-0.032" />
+  </add>
+  <add sel="/factions/faction[@id='scaleplate']/relations">
+    <relation faction="court" relation="-0.32" />
+    <relation faction="fallensplit" relation="0.011" />
+    <relation faction="freesplit" relation="-0.1" />
+    <relation faction="split" relation="-0.32" />
+  </add>
+  <add sel="/factions/faction[@id='smuggler']/relations">
+    <relation faction="court" relation="-0.06" />
+    <relation faction="fallensplit" relation="-0.06" />
+  </add>
+  <add sel="/factions/faction[@id='teladi']/relations">
+    <relation faction="fallensplit" relation="-0.1" />
+  </add>
+  <add sel="/factions/faction[@id='trinity']/relations">
+    <relation faction="fallensplit" relation="-0.32" />
+  </add>
+  <add sel="/factions/faction[@id='xenon']/relations">
+    <relation faction="court" relation="-1" />
+    <relation faction="fallensplit" relation="-1" />
+    <relation faction="freesplit" relation="-1" />
+    <relation faction="split" relation="-1" />
+  </add>
+  <add sel="/factions">
+    <faction id="court" name="{20203,1801}" description="{20203,1802}" shortname="{20203,1803}" prefixname="{20203,1804}" spacename="{20203,1805}" homespacename="{20203,1806}" primaryrace="split" behaviourset="default" active="0" tags="claimspace economic police protective watchdoguser privateloadout privateship" policefaction="court">
+      <color ref="faction_court" />
+      <icon active="faction_cabal" inactive="faction_cabal" banner="diplomacy_banner_court" />
+      <licences>
+        <licence type="capitalequipment" name="{20207,2471}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+        <licence type="capitalship" name="{20207,3231}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+        <licence type="ceremonyally" name="{20207,5211}" minrelation="0.1" />
+        <licence type="ceremonyfriend" name="{20207,5201}" minrelation="0.01" />
+        <licence type="generaluseequipment" name="{20207,2441}" minrelation="-0.01" tags="basic" />
+        <licence type="generaluseship" name="{20207,2451}" minrelation="-0.01" tags="basic" />
+        <licence type="militaryequipment" name="{20207,2461}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+        <licence type="militaryship" name="{20207,3221}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+        <licence type="police" name="{20207,1081}" description="{20207,1082}" minrelation="0.01" precursor="ceremonyfriend" price="175000" maxlegalscan="2" />
+        <licence type="shipsalecontract" name="{20207,9111}" description="{20207,9112}" minrelation="0.1" precursor="ceremonyally" price="1" tags="hidden" />
+        <licence type="station_equip_lxl" name="{20207,7601}" minrelation="0.1" precursor="ceremonyally" />
+        <licence type="station_equip_sm" name="{20207,7611}" minrelation="0.1" precursor="ceremonyally" />
+        <licence type="station_gen_advanced" name="{20207,7621}" minrelation="0.1" precursor="ceremonyally" />
+        <licence type="station_gen_basic" name="{20207,7631}" minrelation="-0.01" tags="basic" />
+        <licence type="station_gen_intermediate" name="{20207,7641}" minrelation="0.01" precursor="ceremonyfriend" />
+        <licence type="tradesubscription" name="{20207,4131}" description="{20207,4132}" minrelation="0.1" precursor="ceremonyally" price="10000000" />
+        <licence type="capitalequipment" factions="freesplit" />
+        <licence type="capitalship" factions="freesplit" />
+        <licence type="envoy_access" factions="argon ministry" />
+        <licence type="generaluseequipment" factions="freesplit" />
+        <licence type="generaluseship" factions="freesplit" />
+        <licence type="militaryequipment" factions="freesplit" />
+        <licence type="militaryship" factions="freesplit" />
+        <licence type="station_equip_lxl" factions="freesplit" />
+        <licence type="station_equip_sm" factions="freesplit" />
+        <licence type="station_gen_advanced" factions="freesplit" />
+        <licence type="station_gen_basic" factions="freesplit" />
+        <licence type="station_gen_intermediate" factions="freesplit" />
+      </licences>
+      <relations>
+        <relation faction="antigone" relation="-0.011" />
+        <relation faction="argon" relation="-0.011" />
+        <relation faction="buccaneers" relation="-0.032" />
+        <relation faction="criminal" relation="-0.5" />
+        <relation faction="fallensplit" relation="-0.32" />
+        <relation faction="khaak" relation="-1" />
+        <relation faction="outlaw" relation="-0.032" />
+        <relation faction="scaleplate" relation="-0.32" />
+        <relation faction="smuggler" relation="-0.06" />
+        <relation faction="split" relation="-0.1" />
+        <relation faction="xenon" relation="-1" />
+      </relations>
+    </faction>
+    <faction id="fallensplit" name="{20203,1701}" description="{20203,1702}" shortname="{20203,1703}" prefixname="{20203,1704}" spacename="{20203,1705}" homespacename="{20203,1706}" primaryrace="split" behaviourset="default" tags="noresupply pirate plunder privateloadout privateship">
+      <color ref="faction_fallensplit" />
+      <icon active="faction_fallensplit" inactive="faction_fallensplit" banner="diplomacy_banner_fallensplit" />
+      <licences>
+        <licence type="capitalequipment" factions="court freesplit" />
+        <licence type="capitalship" factions="court freesplit" />
+        <licence type="generaluseequipment" factions="court freesplit" />
+        <licence type="generaluseship" factions="court freesplit" />
+        <licence type="militaryequipment" factions="court freesplit" />
+        <licence type="militaryship" factions="court freesplit" />
+      </licences>
+      <relations>
+        <relation faction="alliance" relation="0.011" />
+        <relation faction="antigone" relation="-0.1" />
+        <relation faction="argon" relation="-0.32" />
+        <relation faction="buccaneers" relation="-0.32" />
+        <relation faction="court" relation="-0.32" />
+        <relation faction="criminal" relation="-0.5" />
+        <relation faction="freesplit" relation="0.1" />
+        <relation faction="hatikvah" relation="0.011" />
+        <relation faction="holyorder" relation="-0.32" />
+        <relation faction="holyorderfanatic" relation="-0.1" />
+        <relation faction="khaak" relation="-1" />
+        <relation faction="ministry" relation="-0.32" />
+        <relation faction="outlaw" relation="-0.032" />
+        <relation faction="paranid" relation="-0.32" />
+        <relation faction="player" relation="-0.0032" />
+        <relation faction="scaleplate" relation="0.011" />
+        <relation faction="smuggler" relation="-0.06" />
+        <relation faction="split" relation="-0.32" />
+        <relation faction="teladi" relation="-0.1" />
+        <relation faction="trinity" relation="-0.32" />
+        <relation faction="xenon" relation="-1" />
+      </relations>
+      <signals>
+        <response signal="policehalt" response="attack" />
+      </signals>
+    </faction>
+    <faction id="freesplit" name="{20203,1601}" description="{20203,1602}" shortname="{20203,1603}" prefixname="{20203,1604}" spacename="{20203,1605}" homespacename="{20203,1606}" primaryrace="split" behaviourset="default" tags="claimspace economic plunder privateloadout privateship protective publicloadout publicship standard">
+      <color ref="faction_freesplit" />
+      <icon active="faction_freesplit" inactive="faction_freesplit" banner="diplomacy_banner_freesplit" />
+      <licences>
+        <licence type="capitalequipment" name="{20207,2391}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+        <licence type="capitalship" name="{20207,3191}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+        <licence type="ceremonyally" name="{20207,5191}" minrelation="0.1" />
+        <licence type="ceremonyfriend" name="{20207,5181}" minrelation="0.01" />
+        <licence type="generaluseequipment" name="{20207,2361}" minrelation="-0.01" tags="basic" />
+        <licence type="generaluseship" name="{20207,2371}" minrelation="-0.01" tags="basic" />
+        <licence type="militaryequipment" name="{20207,2381}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+        <licence type="militaryship" name="{20207,3181}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+        <licence type="police" name="{20207,1041}" description="{20207,1042}" price="125000" maxlegalscan="2" tags="hidden" />
+        <licence type="shipsalecontract" name="{20207,9091}" description="{20207,9092}" minrelation="0.1" precursor="ceremonyally" price="1" tags="hidden" />
+        <licence type="station_equip_lxl" name="{20207,7501}" minrelation="0.1" precursor="ceremonyally" />
+        <licence type="station_equip_sm" name="{20207,7511}" minrelation="0.1" precursor="ceremonyally" />
+        <licence type="station_gen_advanced" name="{20207,7521}" minrelation="0.1" precursor="ceremonyally" />
+        <licence type="station_gen_basic" name="{20207,7531}" minrelation="-0.01" tags="basic" />
+        <licence type="station_gen_intermediate" name="{20207,7541}" minrelation="0.01" precursor="ceremonyfriend" />
+        <licence type="tradesubscription" name="{20207,4091}" description="{20207,4092}" minrelation="0.1" precursor="ceremonyally" price="10000000" />
+        <licence type="envoy_access" factions="argon ministry" />
+      </licences>
+      <relations>
+        <relation faction="antigone" relation="-0.011" />
+        <relation faction="argon" relation="-0.011" />
+        <relation faction="buccaneers" relation="-0.032" />
+        <relation faction="criminal" relation="-0.5" />
+        <relation faction="fallensplit" relation="0.1" />
+        <relation faction="khaak" relation="-1" />
+        <relation faction="outlaw" relation="-0.032" />
+        <relation faction="player" relation="-0.0032" />
+        <relation faction="scaleplate" relation="-0.1" />
+        <relation faction="xenon" relation="-1" />
+      </relations>
+      <signals>
+        <response signal="policehalt" response="attack" />
+      </signals>
+    </faction>
+    <faction id="split" name="{20203,2001}" description="{20203,2002}" shortname="{20203,2003}" prefixname="{20203,2004}" spacename="{20203,2005}" homespacename="{20203,2006}" primaryrace="split" behaviourset="default" tags="claimspace economic police privateloadout privateship protective publicloadout publicship standard watchdoguser" policefaction="split">
+      <color ref="faction_split" />
+      <icon active="faction_split" inactive="faction_split" banner="diplomacy_banner_split" />
+      <licences>
+        <licence type="capitalequipment" name="{20207,2431}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+        <licence type="capitalship" name="{20207,3211}" icon="bse_star" minrelation="0.1" precursor="ceremonyally" />
+        <licence type="ceremonyally" name="{20207,5231}" minrelation="0.1" />
+        <licence type="ceremonyfriend" name="{20207,5221}" minrelation="0.01" />
+        <licence type="generaluseequipment" name="{20207,2401}" minrelation="-0.01" tags="basic" />
+        <licence type="generaluseship" name="{20207,2411}" minrelation="-0.01" tags="basic" />
+        <licence type="militaryequipment" name="{20207,2421}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+        <licence type="militaryship" name="{20207,3201}" icon="bse_star" minrelation="0.01" precursor="ceremonyfriend" />
+        <licence type="police" name="{20207,1051}" description="{20207,1052}" minrelation="0.01" precursor="ceremonyfriend" price="125000" maxlegalscan="2" />
+        <licence type="shipsalecontract" name="{20207,9101}" description="{20207,9102}" minrelation="0.1" precursor="ceremonyally" price="1" tags="hidden" />
+        <licence type="station_equip_lxl" name="{20207,7551}" minrelation="0.1" precursor="ceremonyally" />
+        <licence type="station_equip_sm" name="{20207,7561}" minrelation="0.1" precursor="ceremonyally" />
+        <licence type="station_gen_advanced" name="{20207,7571}" minrelation="0.1" precursor="ceremonyally" />
+        <licence type="station_gen_basic" name="{20207,7581}" minrelation="-0.01" tags="basic" />
+        <licence type="station_gen_intermediate" name="{20207,7591}" minrelation="0.01" precursor="ceremonyfriend" />
+        <licence type="tradesubscription" name="{20207,4101}" description="{20207,4102}" minrelation="0.1" precursor="ceremonyally" price="10000000" />
+        <licence type="envoy_access" factions="argon ministry" />
+        <licence type="generaluseship" factions="hatikvah" />
+      </licences>
+      <relations>
+        <relation faction="antigone" relation="-0.1" />
+        <relation faction="argon" relation="-0.1" />
+        <relation faction="buccaneers" relation="-0.032" />
+        <relation faction="court" relation="-0.1" />
+        <relation faction="criminal" relation="-0.5" />
+        <relation faction="fallensplit" relation="-0.32" />
+        <relation faction="khaak" relation="-1" />
+        <relation faction="outlaw" relation="-0.032" />
+        <relation faction="player" relation="-0.032" />
+        <relation faction="scaleplate" relation="-0.32" />
+        <relation faction="xenon" relation="-1" />
+      </relations>
+    </faction>
+  </add>
+</diff>

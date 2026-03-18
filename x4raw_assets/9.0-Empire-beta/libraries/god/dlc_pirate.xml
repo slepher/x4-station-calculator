@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+  <add sel="/god/objects">
+
+    <!-- S1, S2, S3 Anomalies -->
+
+    <object id="S2A_anomaly_01">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_500_sector001_macro">
+        <region allowhazardous="true"/>
+      </location>
+      <position x="-325782.563" z="-255068.516"/>
+      <object macro="wormhole_v1_macro" />
+    </object>
+
+    <object id="S2A_anomaly_02">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_500_sector001_macro">
+        <region allowhazardous="true"/>
+      </location>
+      <position x="360204.688" z="44720.395"/>
+      <object macro="wormhole_v1_macro" />
+    </object>
+    
+    <object id="S2B_anomaly_01">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_500_sector002_macro">
+        <region allowhazardous="true"/>
+      </location>
+      <position x="-33452.758" y="0" z="41875" />
+      <object macro="wormhole_v1_macro" />
+    </object>
+
+    <object id="S2B_anomaly_02">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_500_sector002_macro">
+        <region allowhazardous="true"/>
+      </location>
+      <position x="33774" y="0" z="198847" />
+      <object macro="wormhole_v1_macro" />
+    </object>
+
+    <object id="S2B_anomaly_03">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_500_sector002_macro">
+        <region allowhazardous="true"/>
+      </location>
+      <position x="1711.742" z="-36683.922"/>
+      <object macro="wormhole_v1_macro" />
+    </object>
+
+    <object id="S2B_anomaly_04">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_500_sector002_macro">
+        <region allowhazardous="true"/>
+      </location>
+      <position x="270342.594" z="331564.844"/>
+      <object macro="wormhole_v1_macro" />
+    </object>
+
+    <object id="S2B_anomaly_05">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_500_sector002_macro">
+        <region allowhazardous="true"/>
+      </location>
+      <position x="-280191.656" z="101317.039"/>
+      <object macro="wormhole_v1_macro" />
+    </object>
+
+    <object id="S2C_anomaly_01">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_500_sector003_macro">
+        <region allowhazardous="true"/>
+      </location>
+      <position x="-19067.662" z="-75025.664"/>
+      <object macro="wormhole_v1_macro" />
+    </object>
+
+    <object id="S3_anomaly_01">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_504_sector001_macro" />
+      <position x="-75988.00" y="0" z="-118535" />
+      <!-- wormhole_v1_standalone_, so this is never a destination for an anomaly with a random destination (transition destination = false) -->
+      <object macro="wormhole_v1_standalone_macro" />
+    </object>
+
+    <object id="erlking_blueprint_1" owner="ownerless">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location solitary="true">
+        <region gravidar="true" allowhazardous="true"/>
+      </location>
+      <object macro="landmarks_erlking_vault_01_macro" />
+    </object>
+
+    <object id="erlking_blueprint_2" owner="ownerless">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location solitary="true">
+        <corerange min="0.9" max="1.3" />
+        <region allowhazardous="true"/>
+      </location>
+      <object macro="landmarks_erlking_vault_02_macro" />
+    </object>
+
+    <object id="erlking_blueprint_3" owner="ownerless">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location solitary="true">
+        <corerange min="0.9" max="1.3" />
+        <region allowhazardous="true"/>
+      </location>
+      <object macro="landmarks_erlking_vault_03_macro" />
+    </object>
+
+    <object id="erlking_blueprint_4" owner="ownerless">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location solitary="true">
+        <corerange min="0.9" max="1.3" />
+        <region allowhazardous="true"/>
+      </location>
+      <object macro="landmarks_erlking_vault_04_macro" />
+    </object>
+
+    <object id="erlking_blueprint_5" owner="ownerless">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location solitary="true">
+        <corerange min="0.9" max="1.3" />
+        <region allowhazardous="true"/>
+      </location>
+      <object macro="landmarks_erlking_vault_05_macro" />
+    </object>
+    
+    <!-- race finishline -->
+
+    <object id="story_race_finishline">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_502_sector001_macro" />
+      <position x="132234" y="0" z="-184180" />
+      <object macro="triggerobject_race_finish_01_macro" />
+    </object>
+    
+  </add>
+  
+  <add sel="/god/stations">
+
+    <!-- S3 (as actual station) -->
+
+    <!--station id="s3_station" race="argon" owner="ownerless">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_504_sector001_macro" />
+      <position x="-24002.742" z="19997.539" pitch="0" roll="0" yaw="0"/>
+      <station>
+        <select tags="[s3ware]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station-->
+
+    <!-- Gamestart Prison Station -->
+    <!-- Note that we are adding this a basegame sector -->
+
+    <station id="story_prison_station_id" race="teladi" owner="ministry" type="factory" encyclopedia="true">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_02_sector001_macro" matchextension="false" />
+      <position x="92024.027" y="-1532.621" z="13449.546" pitch="0" roll="0" yaw="90"/>
+      <station constructionplan="x4ep1_gamestart_prison_station_plan" >
+        <loadout useplanloadout="true"/>
+        <!--select faction="faction.player" tags="[factory]"  /-->
+      </station>
+    </station>
+
+    <!-- S3 Monument Station -->
+    
+    <station id="monument_s3station" race="argon" owner="ownerless">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_504_sector001_macro" />
+      <position x="0" z="0" pitch="0" roll="0" yaw="90"/>
+      <station macro="landmarks_soh_condensatedispenser_01_macro"/>
+    </station>
+
+    <!-- S2 Landmarks (tidebreak & aurora casino) -->
+    
+    <station id="pirate_landmark_01" race="argon" owner="civilian">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_500_sector003_macro">
+        <region allowhazardous="true"/>
+      </location>
+      <position x="-55828.0" y="0.0" z="135828.1" pitch="0" roll="0" yaw="0" />
+      <station macro="landmarks_gen_piratestation_01_macro" />
+    </station>
+
+    <station id="pirate_landmark_02" race="argon" owner="loanshark">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_503_sector001_macro" />
+      <position x="41900.991" y="-1999" z="48366" pitch="0" roll="0" yaw="180" />
+      <station macro="landmarks_gen_piratestation_02_macro" />
+    </station>
+
+    <!-- Fixed factory for Pirate GS 1 in Windfall IV -->
+
+    <station id="pirate_gs_1_smuggling_station" race="argon" owner="loanshark" type="factory" encyclopedia="true">
+      <quotas>
+        <quota galaxy="1" />
+      </quotas>
+      <location class="sector" macro="cluster_503_sector001_macro" />
+      <position x="-252282" y="500" z="4829" pitch="0" roll="0" yaw="0" />
+      <station constructionplan="pirate_gs_1_smuggling_station_plan" />
+    </station>
+
+    <!-- Loan Sharks -->
+
+    <station id="loanshark_grand_refinery" race="argon" owner="loanshark" type="factory" encyclopedia="true">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_501_sector001_macro" solitary="true"/>
+      <position x="110397" z="73286" pitch="0" roll="0" yaw="0"/>
+      <station constructionplan="loanshark_grand_refinery">
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="loanshark_shipyard_01" race="argon" owner="loanshark" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_501_sector001_macro" solitary="true"/>
+      <position x="-102336.641" z="57284.375" pitch="0" roll="0" yaw="0"/>
+      <station>
+        <select faction="loanshark" tags="[shipyard]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="loanshark_wharf_01" race="argon" owner="loanshark" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_501_sector001_macro" solitary="true"/>
+      <position x="-29810.096" z="30543.082" pitch="0" roll="0" yaw="0"/>
+      <station>
+        <select faction="loanshark" tags="[wharf]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+    
+    <station id="loanshark_defence_01" race="argon" owner="loanshark" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_501_sector001_macro" solitary="true"/>
+      <position x="57150.184" z="33485.859" pitch="0" roll="0" yaw="0"/>
+      <station>
+        <select faction="loanshark" tags="[defence]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="loanshark_defence_02" race="argon" owner="loanshark" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_502_sector001_macro" solitary="true"/>
+      <position x="40546.391" z="5062.227" pitch="0" roll="0" yaw="0"/>
+      <station>
+        <select faction="loanshark" tags="[defence]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="loanshark_defence_03" race="argon" owner="loanshark" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_503_sector001_macro" solitary="true"/>
+      <position x="-4536.227" z="903.813" pitch="0" roll="0" yaw="0"/>
+      <station>
+        <select faction="loanshark" tags="[defence]"/>
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Keepsafe -->
+    <station id="Story_ScrapyardStation" race="teladi" owner="loanshark" type="tradingstation" encyclopedia="true">
+      <quotas>
+        <quota galaxy="1" sector="1"/>
+      </quotas>
+      <location class="zone" macro="zone006_cluster_502_sector001_macro" solitary="true"/>
+      <position x="0" y="0" z="0" pitch="0" roll="0" yaw="45"/>
+      <station constructionplan="Story_ScrapyardStation">
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <!-- Alliance of the Word -->
+    <!--
+    <station id="wharf_alliance_toa" race="argon" owner="alliance" type="factory">
+      <quotas>
+        <quota galaxy="1" zone="1" />
+      </quotas>
+      <location class="sector" macro="cluster_502_sector001_macro" solitary="true"/>
+      <position x="-69468.57" z="32990.395" pitch="0" roll="0" yaw="0"/>
+      <station constructionplan="ali_wharf_toa">
+        <select faction="alliance" tags="[wharf]" />
+        <loadout>
+          <level exact="1.0" />
+        </loadout>
+      </station>
+    </station>
+    -->
+
+    <!-- Scavengers -->
+
+    <station id="scavenger_shipyard_01" race="argon" owner="scavenger" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="zone" macro="zone004_cluster_500_sector001_macro">
+        <region allowhazardous="true"/>
+      </location>
+      <position x="38717.664" z="-39042.773" pitch="0" roll="0" yaw="0"/>
+      <station>
+        <select faction="scavenger" tags="[shipyard]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="scavenger_wharf_01" race="argon" owner="scavenger" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="sector" macro="cluster_500_sector001_macro">
+        <region allowhazardous="true"/>
+      </location>
+      <position x="-114264.586" z="-82679.758" pitch="0" roll="0" yaw="0"/>
+      <station>
+        <select faction="scavenger" tags="[wharf]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="scavenger_defence_01" race="argon" owner="scavenger" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="zone" macro="zone005_cluster_500_sector001_macro" solitary="true">
+        <region allowhazardous="true"/>
+      </location>
+      <position x="38437.68" z="-1496.875" pitch="0" roll="0" yaw="0"/>
+      <station>
+        <select faction="scavenger" tags="[defence]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="scavenger_defence_02" race="argon" owner="scavenger" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_500_sector002_macro" solitary="true">
+        <region allowhazardous="true"/>
+      </location>
+      <position x="21098.273" z="-44652.875" pitch="0" roll="0" yaw="0"/>
+      <station>
+        <select faction="scavenger" tags="[defence]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+    <station id="scavenger_defence_03" race="argon" owner="scavenger" type="factory">
+      <quotas>
+        <quota galaxy="1" sector="1" />
+      </quotas>
+      <location class="zone" macro="zone001_cluster_500_sector003_macro" solitary="true">
+        <region allowhazardous="true"/>
+      </location>
+      <position x="-6235.023" z="-4007.164" pitch="0" roll="0" yaw="0"/>
+      <station>
+        <select faction="scavenger" tags="[defence]" />
+        <loadout>
+          <level exact="0.75" />
+        </loadout>
+      </station>
+    </station>
+
+  </add>
+  
+  <add sel="/god/products">
+    <!--Riptide Rakers-->
+    <product id="rip_scrap_tide" ware="scrapmetal" owner="scavenger" type="factory">
+      <quotas>
+        <quota galaxy="9" sector="3" />
+      </quotas>
+      <location class="cluster" macro="cluster_500_macro">
+        <region allowhazardous="true"/>
+      </location>
+      <module>
+        <select ware="scrapmetal" tags="condensate" faction="scavenger"/>
+      </module>
+    </product>
+
+    <product id="rip_energycells_tide" ware="energycells" owner="scavenger" type="factory" startactive="false">
+      <quotas>
+        <quota galaxy="30" />
+      </quotas>
+      <location class="cluster" macro="cluster_500_macro">
+        <region allowhazardous="true"/>
+      </location>
+      <module>
+        <select ware="energycells" faction="scavenger"/>
+      </module>
+    </product>
+    
+    <!--Vigor Syndicate-->
+
+    <product id="vig_foodrations" ware="foodrations" owner="loanshark" type="factory">
+      <quotas>
+        <quota galaxy="10" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="loanshark" relation="self" comparison="ge" />
+      <module>
+        <select ware="foodrations" faction="loanshark"/>
+      </module>
+    </product>
+
+    <product id="vig_meat" ware="meat" owner="loanshark" type="factory">
+      <quotas>
+        <quota galaxy="4" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="loanshark" relation="self" comparison="ge" />
+      <module>
+        <select ware="meat" faction="loanshark"/>
+      </module>
+    </product>
+
+    <product id="vig_medicalsupplies" ware="medicalsupplies" owner="loanshark" type="factory">
+      <quotas>
+        <quota galaxy="10" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="loanshark" relation="self" comparison="ge" />
+      <module>
+        <select ware="medicalsupplies" faction="loanshark"/>
+      </module>
+    </product>
+
+    <product id="vig_spices" ware="spices" owner="loanshark" type="factory">
+      <quotas>
+        <quota galaxy="4" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="loanshark" relation="self" comparison="ge" />
+      <module>
+        <select ware="spices" faction="loanshark"/>
+      </module>
+    </product>
+
+    <product id="vig_water" ware="water" owner="loanshark" type="factory">
+      <quotas>
+        <quota galaxy="6" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="loanshark" relation="self" comparison="ge" />
+      <module>
+        <select ware="water" faction="loanshark"/>
+      </module>
+    </product>
+
+    <product id="vig_wheat" ware="wheat" owner="loanshark" type="factory">
+      <quotas>
+        <quota galaxy="4" />
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="loanshark" relation="self" comparison="ge" />
+      <module>
+        <select ware="wheat" faction="loanshark"/>
+      </module>
+    </product>
+
+  </add>
+  
+</diff>

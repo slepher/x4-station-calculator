@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Map Defaults
+  This file contains various properties for clusters, sectors, zones etc. to separate balancing data from universe design.
+  Continued from and parsed exactly like defaults.xml -->
+
+<!-- Tags
+- boronborder - Used in jobs.xml to control jobs activation
+- boroncore - Used in jobs.xml to control jobs activation
+- boronpirate - Used in jobs.xml to control jobs activation
+-->
+
+<!--Example for encyclopedia information setup per cluster
+
+<system>
+  <space environment="textref">
+  <suns>
+    <sun class="textref">
+    <sun …>
+    …
+  </suns>
+  <planets>
+    <planet class="textref" geology="textref" atmosphere="textref" population="textref" maxpopulation="number" settlements="textref" part="partname" atmopart="partname">
+      <moons>  
+        <moon geology="textref" atmosphere="textref" population="textref" maxpopulation="number" settlements="textref" part="partname" atmopart="partname">
+        <moon …>
+        …
+      </moons>
+    </planet>
+    <planet …>
+    …
+  </planets>
+<system>
+-->
+
+<!-- available text ids from page 1001
+ <t id="2466">Planetary Population</t>
+ <t id="2467">Security</t>
+ <t id="2468">Economy</t>
+ <t id="2469">Atmosphere</t>
+ <t id="2470">Geology</t>
+ <t id="2471">Environment</t>
+ -->
+
+<!-- available text ids from page 1042
+10001 - 10991 Generic 10011 name, 10012 descr
+ <t id="10011">None</t>{1042,10011}(None)
+ 
+11001 - 11991 Atmosphere Types
+ <t id="11011">Methane</t>{1042,11011}(Methane)
+ <t id="11021">Hydrogen</t>{1042,11021}(Hydrogen)
+ <t id="11031">Oxygen</t>{1042,11031}(Oxygen)
+ <t id="11041">Nitrogen</t>{1042,11041}(Nitrogen)
+ <t id="11051">Helium</t>{1042,11051}(Helium)
+ <t id="11061">Methane/Hydrogen</t>{1042,11061}(Methane/Hydrogen)
+ <t id="11071">Nitrogen/Oxygen</t>{1042,11071}(Nitrogen/Oxygen)
+ <t id="11081">Carbon Dioxide</t>{1042,11081}(Carbon Dioxide)
+ <t id="11091">Sulphur Dioxide</t>{1042,11091}(Sulphur Dioxide)
+ <t id="11101">Nitrogen/Hydrogen</t>{1042,11101}(Nitrogen/Hydrogen)
+ <t id="11111">Hydrogen/Helium</t>{1042,11111}(Hydrogen/Helium)
+
+12001 - 12991 Space Types
+ <t id="12011">Clear Space</t>{1042,12011}(Clear Space)
+ <t id="12021">Thin Nebula</t>{1042,12021}(Thin Nebula)
+ <t id="12031">Nebula</t>{1042,12031}(Nebula)
+ <t id="12041">Asteroids</t>{1042,12041}(Asteroids)
+ <t id="12051">Protoplanetary Disc</t>{1042,12051}(Protoplanetary Disc)
+ <t id="12061">Heavy Radiation</t>{1042,12061}(Heavy Radiation)
+
+13001 - 13991 Sun Types
+ <t id="13011">Red Dwarf</t>{1042,13011}(Red Dwarf)
+ <t id="13021">Yellow Dwarf</t>{1042,13021}(Yellow Dwarf)
+ <t id="13031">Orange Dwarf</t>{1042,13031}(Orange Dwarf)
+ <t id="13041">White Dwarf</t>{1042,13041}(White Dwarf)
+ <t id="13051">Blue Dwarf</t>{1042,13051}(Blue Dwarf)
+ <t id="13061">Brown Dwarf</t>{1042,13061}(Brown Dwarf)
+ <t id="13071">Black Dwarf</t>{1042,13071}(Black Dwarf)
+ <t id="13081">Red Giant</t>{1042,13081}(Red Giant)
+ <t id="13091">Yellow Giant</t>{1042,13091}(Yellow Giant)
+ <t id="13101">Orange Giant</t>{1042,13101}(Orange Giant)
+ <t id="13111">White Giant</t>{1042,13111}(White Giant)
+ <t id="13121">Blue Giant</t>{1042,13121}(Blue Giant)
+ <t id="13131">Red Supergiant</t>{1042,13131}(Red Supergiant)
+ <t id="13141">Yellow Supergiant</t>{1042,13141}(Yellow Supergiant)
+ <t id="13151">Orange Supergiant</t>{1042,13151}(Orange Supergiant)
+ <t id="13161">White Supergiant</t>{1042,13161}(White Supergiant)
+ <t id="13171">Blue Supergiant</t>{1042,13171}(Blue Supergiant)
+ <t id="13181">Neutron Star</t>{1042,13181}(Neutron Star)
+ <t id="13191">Black Hole</t>{1042,13191}(Black Hole)
+
+14001 - 14991 Planet Types
+ <t id="14011">Super Earth</t>{1042,14011}(Super Earth)
+ <t id="14021">Ringed Super Earth</t>{1042,14021}(Ringed Super Earth)
+ <t id="14031">Terrestrial</t>{1042,14031}(Terrestrial)
+ <t id="14041">Ringed Terrestrial</t>{1042,14041}(Ringed Terrestrial)
+ <t id="14051">Moon</t>{1042,14051}(Moon)
+ <t id="14061">Planet</t>{1042,14061}(Planet)
+ <t id="14071">Ringed Planet</t>{1042,14071}(Ringed Planet)
+ <t id="14081">Gas Giant</t>{1042,14081}(Gas Giant)
+ <t id="14091">Ringed Gas Giant</t>{1042,14091}(Ringed Gas Giant)
+ <t id="14101">Earth Analog</t>{1042,14101}(Earth Analog)
+ <t id="14111">Ringed Earth Analog</t>{1042,14111}(Ringed Earth Analog)
+ <t id="14121">Dwarf Planet</t>{1042,14121}(Dwarf Planet)
+ <t id="14131">Ice Giant</t>{1042,14131}(Ice Giant)
+ <t id="14141">Ringed Ice Giant</t>{1042,14141}(Ringed Ice Giant)
+
+15001 - 15991 Geology Types
+ <t id="15011">Tundra</t>{1042,15011}(Tundra)
+ <t id="15021">Mountains</t>{1042,15021}(Mountains)
+ <t id="15031">Volcanic</t>{1042,15031}(Volcanic)
+ <t id="15041">Xenon Structures</t>{1042,15041}(Xenon Structures)
+ <t id="15051">Rocks&Ice</t>{1042,15051}(Rocks/Ice)
+ <t id="15061">Canyons</t>{1042,15061}(Canyons)
+ <t id="15071">Rocks</t>{1042,15071}(Rocks)
+ <t id="15081">Ice</t>{1042,15081}(Ice)
+ <t id="15091">Craters</t>{1042,15091}(Craters)
+ <t id="15101">Barren</t>{1042,15101}(Barren)
+ <t id="15111">Desert</t>{1042,15111}(Desert)
+ <t id="15121">Swamp</t>{1042,15121}(Swamp)
+ <t id="15131">Forest</t>{1042,15131}(Forest)
+ <t id="15141">Ocean</t>{1042,15141}(Ocean)
+ <t id="15151">Polar</t>{1042,15151}(Polar)
+
+16001 - 16991 Settlement Types
+ <t id="16011">Uninhabited</t>{1042,16011}(Uninhabited)
+ <t id="16021">Mining Colonies</t>{1042,16021}(Mining Colonies)
+ <t id="16031">Research Outpost</t>{1042,16031}(Research Outpost)
+ <t id="16041">Multiple Cities</t>{1042,16041}(Multiple Cities)
+ <t id="16051">Densely Populated</t>{1042,16051}(Densely Populated)
+ <t id="16061">Xenon Structures</t>{1042,16061}(Xenon Structures)
+ <t id="16071">Megalopolis</t>{1042,16071}(Megalopolis)
+ <t id="16081">Sky City</t>{1042,16081}(Sky City)
+ <t id="16091">Agora Ouranos</t>{1042,16081}(Agora Ouranos)
+ <t id="16101">Small Settlements</t>{1042,16101}(Small Settlements)
+-->
+
+<!-- available text ids from page 20400 (Other Identifiers)
+20403 - Star Names
+ <t id="1">A</t>{20403,1}(A)
+ <t id="2">B</t>{20403,2}(B)
+ <t id="3">C</t>{20403,3}(C)
+ <t id="4">D</t>{20403,4}(D)
+ <t id="5">E</t>{20403,5}(E)
+ <t id="6">F</t>{20403,6}(F)
+
+20403 - Planet Names
+ <t id="101">a</t>{20403,101}(a)
+ <t id="102">b</t>{20403,102}(b)
+ <t id="103">c</t>{20403,103}(c)
+ <t id="104">d</t>{20403,104}(d)
+ <t id="105">e</t>{20403,105}(e)
+ <t id="106">f</t>{20403,106}(f)
+ <t id="107">g</t>{20403,107}(g)
+ <t id="108">h</t>{20403,108}(h)
+ <t id="109">i</t>{20403,109}(i)
+ <t id="110">j</t>{20403,110}(j)
+ <t id="111">k</t>{20403,111}(k)
+ <t id="112">l</t>{20403,112}(l)
+ <t id="113">m</t>{20403,113}(m)
+ <t id="114">n</t>{20403,114}(n)
+  
+20402 - Moon Names
+ <t id="1">n</t>{20402,1}(I)
+ <t id="2">n</t>{20402,2}(II)
+ <t id="3">n</t>{20402,3}(III)
+ <t id="4">n</t>{20402,4}(IV)
+ <t id="5">n</t>{20402,5}(V)
+ <t id="6">n</t>{20402,6}(VI)
+ <t id="7">n</t>{20402,7}(VII)
+ <t id="8">n</t>{20402,8}(VIII)
+-->
+
+<defaults xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="libraries.xsd">
+  <!-- Watchful Gaze -->
+  <dataset macro="Cluster_601_macro">
+    <properties>
+      <identification name="{20003,6010001}" description="{20003,6010002}" image="enc_cluster601" system="601" />
+      <sounds>
+        <music ref="music_dlc_boron_soundtrack_border" />
+      </sounds>
+      <area sunlight="0.41" economy="0.25" security="0.25" extensionexclusivejobs="true" tags="boronborder allowrandomanomaly" />
+      <system>
+        <space environment="{1042,12031}(Nebula)" />
+        <suns>
+          <sun class="{1042,13051}(Blue Dwarf)" />
+        </suns>
+      </system>
+    </properties>
+  </dataset>
+  <dataset macro="Cluster_601_Sector001_macro">
+    <properties>
+      <identification name="{20004,6010011}" description="{20004,6010012}" />
+    </properties>
+  </dataset>
+
+  <!-- Barren Shores -->
+  <dataset macro="Cluster_602_macro">
+    <properties>
+      <identification name="{20003,6020001}" description="{20003,6020002}" image="enc_cluster602" system="602" />
+      <sounds>
+        <music ref="music_dlc_boron_soundtrack_outer_bubble" />
+      </sounds>
+      <area sunlight="0.83" economy="0.25" security="0.50" extensionexclusivejobs="true" tags="boronborder allowrandomanomaly" />
+      <system>
+        <space environment="{1042,12011}(Clear Space)" />
+        <suns>
+          <sun class="{1042,13111}(White Giant)" />
+        </suns>
+        <planets>
+          <planet name="{20005,9066}(Menehune)" class="{1042,14031}(Terrestrial)" geology="{1042,15141}(Ocean)" atmosphere="{1042,11071}(Nitrogen/Oxygen)" population="{1042,10021}" maxpopulation="800000000" settlements="{1042,16041}(Multiple Cities)" part="part_barrenshores">
+            <moons>
+              <moon name="{20005,9068}(Yanva)" geology="{1042,15101}(Barren)" atmosphere="{1042,10011}(None)" population="{1042,10011}(None)" settlements="{1042,16011}(Uninhabited)" />
+              <moon name="{20005,9067}(Urvasi)" geology="{1042,15111}(Desert)" atmosphere="{1042,10011}(None)" population="{1042,10011}(None)" settlements="{1042,16011}(Uninhabited)" />
+            </moons>
+          </planet>
+        </planets>
+      </system>
+    </properties>
+  </dataset>
+  <dataset macro="Cluster_602_Sector001_macro">
+    <properties>
+      <identification name="{20004,6020011}" description="{20004,6020012}" />
+      <worlds>
+        <world factor="0.83" part="part_barrenshores"/>
+      </worlds>
+    </properties>
+  </dataset>
+
+  <!-- Great Reef -->
+  <dataset macro="Cluster_603_macro">
+    <properties>
+      <identification name="{20003,6030001}" description="{20003,6030002}" image="enc_cluster603" system="603" />
+      <sounds>
+        <music ref="music_dlc_boron_soundtrack_outer_bubble" />
+      </sounds>
+      <area sunlight="1.28" economy="0.5" security="0.75" extensionexclusivejobs="true" tags="boronborder allowrandomanomaly" />
+      <system>
+        <space environment="{1042,12031}(Nebula)" />
+        <suns>
+          <sun class="{1042,13081}(Red Giant)" />
+        </suns>
+        <planets>
+          <planet name="{20005,9069}(Nakshatra)" class="{1042,14031}(Terrestrial)" geology="{1042,15141}(Ocean)" atmosphere="{1042,11071}(Nitrogen/Oxygen)" population="{1042,10021}" maxpopulation="1200000000" settlements="{1042,16041}(Multiple Cities)" part="part_greatreef">
+            <moons>
+              <moon name="{20005,9072}(Ghayyan)" geology="{1042,15101}(Barren)" atmosphere="{1042,10011}(None)" population="{1042,10011}(None)" settlements="{1042,16011}(Uninhabited)" />
+            </moons>
+          </planet>
+          <planet name="{20005,9070}(Dashamaa)" class="{1042,14121}(Dwarf Planet)" geology="{1042,15111}(Desert)" atmosphere="{1042,11011}(Methane)" population="{1042,10011}(None)" settlements="{1042,16011}(Uninhabited)">
+            <moons>
+              <moon name="{20005,9071}(Rajasanu)" geology="{1042,15081}(Ice)" atmosphere="{1042,10011}(None)" population="{1042,10011}(None)" settlements="{1042,16011}(Uninhabited)" />
+            </moons>
+          </planet>
+        </planets>
+      </system>
+    </properties>
+  </dataset>
+  <dataset macro="Cluster_603_Sector001_macro">
+    <properties>
+      <identification name="{20004,6030011}" description="{20004,6030012}" />
+      <worlds>
+        <world factor="1.28" part="part_greatreef"/>
+      </worlds>
+    </properties>
+  </dataset>
+
+  <!-- Ocean of Fantasy -->
+  <dataset macro="Cluster_604_macro">
+    <properties>
+      <identification name="{20003,6040001}" description="{20003,6040002}" image="enc_cluster604" system="604" />
+      <sounds>
+        <music ref="music_dlc_boron_soundtrack_outer_bubble" />
+      </sounds>
+      <area sunlight="0.12" economy="0.25" security="0.25" extensionexclusivejobs="true" tags="boronborder allowrandomanomaly" />
+      <system>
+        <space environment="{1042,12011}(Clear Space)" />
+        <suns>
+          <sun class="{1042,13081}(Red Giant)" />
+        </suns>
+        <planets>
+          <planet name="{20005,9073}(Samsara)" class="{1042,14031}(Terrestrial)" geology="{1042,15031}(Volcanic)" atmosphere="{1042,11091}(Sulphur Dioxide)" population="{1042,10011}(None)" settlements="{1042,16011}(Uninhabited)" part="part_oof_planet" atmopart="part_oof_atmo">
+            <moons>
+              <moon name="{20005,9074}(Moksha)" geology="{1042,15071}(Rocks)" atmosphere="{1042,10011}(None)" population="{1042,10011}(None)" settlements="{1042,16011}(Uninhabited)" />
+            </moons>
+            <shaderparams>
+              <!--Note: materials are planet_oof / atmo_planet_oof-->
+              <shaderparam name="is_lava" stat="seismicactivity">
+                <!--Initial value: 2-->
+                <param position="0" value="0" />
+                <param position="2" value="2.2" />
+              </shaderparam>
+              <shaderparam name="lavalevel" stat="seismicactivity">
+                <!--Initial value: 2-->
+                <param position="0" value="0" />
+                <param position="2" value="0.457" />
+              </shaderparam>
+              <shaderparam name="waterlevel" stat="humidity">
+                <!--Initial value: 0-->
+                <param position="3" value="0" />
+                <param position="6" value="0.557" />
+              </shaderparam>
+              <shaderparam name="water_map" stat="seismicactivity" type="texture">
+                <!--Initial value: 2-->
+                <param position="0" texture="assets\textures\fx\white_01_diff" />
+                <param position="1" texture="" />
+              </shaderparam>
+              <shaderparam name="color_atmo" stat="toxicity" type="color">
+                <!--Initial value: 1-->
+                <param position="0" r="40" g="40" b="6" a="20" />
+                <param position="1" r="80" g="0" b="6" a="20" />
+              </shaderparam>
+              <shaderparam name="color_water" stat="radioactivity" type="color">
+                <!--Initial value: 1-->
+                <param position="0" r="10" g="70" b="50" a="255" />
+                <param position="1" r="250" g="30" b="13" a="255" />
+              </shaderparam>
+              <shaderparam name="cloud_colorfactor" stat="methane">
+                <!--Initial value: 0-->
+                <param position="0" value="0" />
+                <param position="1" value="0.125" />
+              </shaderparam>
+              <shaderparam name="color_heightStr" stat="humidity">
+                <!--Initial value: 0-->
+                <param position="3" value="0" />
+                <param position="6" value="0.1" />
+              </shaderparam>
+              <shaderparam name="color_climateStr" stat="humidity">
+                <!--Initial value: 0-->
+                <param position="3" value="0.25" />
+                <param position="6" value="0.75" />
+              </shaderparam>
+              <shaderparam name="citylevel" stat="population">
+                <!--Initial value: 0-->
+                <param position="0" value="0" />
+                <param position="10000000000" value="1" />
+              </shaderparam>
+            </shaderparams>
+          </planet>
+        </planets>
+      </system>
+    </properties>
+  </dataset>
+  <dataset macro="Cluster_604_Sector001_macro">
+    <properties>
+      <identification name="{20004,6040011}" description="{20004,6040012}" />
+      <worlds>
+        <world part="part_oof_planet"/>
+      </worlds>
+    </properties>
+  </dataset>
+
+  <!-- Sanctuary of Darkness -->
+  <dataset macro="Cluster_605_macro">
+    <properties>
+      <identification name="{20003,6050001}" description="{20003,6050002}" image="enc_cluster605" system="605" />
+      <sounds>
+        <music ref="music_dlc_boron_soundtrack_border" />
+      </sounds>
+      <area sunlight="1.74" economy="0.25" security="0.25" extensionexclusivejobs="true" />
+      <system>
+        <space environment="{1042,12061}(Heavy Radiation)" />
+        <suns>
+          <sun class="{1042,13031}(Orange Dwarf)" />
+        </suns>
+        <planets>
+          <planet name="{20005,9075}(Narasimha)" class="{1042,14031}(Terrestrial)" geology="{1042,15101}(Barren)" atmosphere="{1042,10011}(None)" population="{1042,10011}(None)" settlements="{1042,16011}(Uninhabited)">
+            <moons>
+              <moon name="{20005,9075}(Narasimha) {20402,1}(I)" geology="{1042,15071}(Rocks)" atmosphere="{1042,10011}(None)" population="{1042,10011}(None)" settlements="{1042,16011}(Uninhabited)" />
+            </moons>
+          </planet>
+        </planets>
+      </system>
+    </properties>
+  </dataset>
+  <dataset macro="Cluster_605_Sector001_macro">
+    <properties>
+      <identification name="{20004,6050011}" description="{20004,6050012}" />
+    </properties>
+  </dataset>
+
+  <!-- Kingdom End -->
+  <dataset macro="Cluster_606_macro">
+    <properties>
+      <identification name="{20003,6060001}" description="{20003,6060002}" image="enc_cluster606" system="606" />
+      <sounds>
+        <music ref="music_dlc_boron_soundtrack_kingdom_end" />
+      </sounds>
+      <area sunlight="1.18" economy="0.75" security="0.75" extensionexclusivejobs="true" tags="boroncore" />
+      <system>
+        <space environment="{1042,12031}(Nebula)" />
+        <suns>
+          <sun class="{1042,13081}(Red Giant)" />
+        </suns>
+        <planets>
+          <planet name="{20005,9063}(Nishala)" class="{1042,14031}(Terrestrial)" geology="{1042,15141}(Ocean)" atmosphere="{1042,11101}(Nitrogen/Hydrogen)" population="{1042,10021}" maxpopulation="37500000000" settlements="{1042,16051}(Densely Populated)" part="part_kingdomend">
+            <moons>
+              <moon name="{20005,9064}(Nidishani)" geology="{1042,15071}(Rocks)" atmosphere="{1042,10011}(None)" population="{1042,10011}(None)" settlements="{1042,16011}(Uninhabited)" />
+              <moon name="{20005,9065}(Nimashani)" geology="{1042,15081}(Ice)" atmosphere="{1042,10011}(None)" population="{1042,10011}(None)" settlements="{1042,16011}(Uninhabited)" />
+            </moons>
+          </planet>
+        </planets>
+      </system>
+    </properties>
+  </dataset>
+  <!-- Kingdom End I -->
+  <dataset macro="Cluster_606_Sector001_macro">
+    <properties>
+      <identification name="{20004,6060011}" description="{20004,6060012}" />
+      <worlds>
+        <world factor="0.75" part="part_kingdomend"/>
+      </worlds>
+    </properties>
+  </dataset>
+  <!-- Reflected Stars -->
+  <dataset macro="Cluster_606_Sector002_macro">
+    <properties>
+      <identification name="{20004,6060021}" description="{20004,6060022}" />
+      <worlds>
+        <world factor="0.15" part="part_kingdomend"/>
+      </worlds>
+    </properties>
+  </dataset>
+  <!-- Towering Wave -->
+  <dataset macro="Cluster_606_Sector003_macro">
+    <properties>
+      <identification name="{20004,6060031}" description="{20004,6060032}" />
+      <worlds>
+        <world factor="0.05" part="part_kingdomend"/>
+      </worlds>
+    </properties>
+  </dataset>
+
+  <!-- Rolk's Demise -->
+  <dataset macro="Cluster_607_macro">
+    <properties>
+      <identification name="{20003,6070001}" description="{20003,6070002}" image="enc_cluster607" system="607" />
+      <sounds>
+        <music ref="music_dlc_boron_soundtrack_inner_bubble" />
+      </sounds>
+      <area sunlight="0.15" economy="0.25" security="0.25" extensionexclusivejobs="true" tags="boroncore boronpirate" />
+      <system>
+        <space environment="{1042,12011}(Clear Space)" />
+        <suns>
+          <sun class="{1042,13061}(Brown Dwarf)" />
+        </suns>
+      </system>
+    </properties>
+  </dataset>
+  <dataset macro="Cluster_607_Sector001_macro">
+    <properties>
+      <identification name="{20004,6070011}" description="{20004,6070012}" />
+    </properties>
+  </dataset>
+
+  <!-- Atreus' Clouds -->
+  <dataset macro="Cluster_608_macro">
+    <properties>
+      <identification name="{20003,6080001}" description="{20003,6080002}" image="enc_cluster608" system="608" />
+      <sounds>
+        <music ref="music_dlc_boron_soundtrack_inner_bubble" />
+      </sounds>
+      <area sunlight="0.41" economy="0.25" security="0.25" extensionexclusivejobs="true" tags="boroncore boronpirate" />
+      <system>
+        <space environment="{1042,12031}(Nebula)" />
+        <suns>
+          <sun class="{1042,13111}(White Giant)" />
+        </suns>
+        <planets>
+          <planet name="{20005,9077}(Jamshala)" class="{1042,14031}(Terrestrial)" geology="{1042,15141}(Ocean)" atmosphere="{1042,11071}(Nitrogen/Oxygen)" population="{1042,10021}" maxpopulation="4000000000" settlements="{1042,16041}(Multiple Cities)" part="part_atreusclouds">
+            <moons>
+              <moon name="{20005,9079}(Jita)" geology="{1042,15071}(Rocks)" atmosphere="{1042,10011}(None)" population="{1042,10011}(None)" settlements="{1042,16011}(Uninhabited)" />
+              <moon name="{20005,9078}(Pavana)" geology="{1042,15081}(Ice)" atmosphere="{1042,10011}(None)" population="{1042,10011}(None)" settlements="{1042,16011}(Uninhabited)" />
+            </moons>
+          </planet>
+        </planets>
+      </system>
+    </properties>
+  </dataset>
+  <dataset macro="Cluster_608_Sector001_macro">
+    <properties>
+      <identification name="{20004,6080011}" description="{20004,6080012}" />
+      <worlds>
+        <world factor="0.41" part="part_atreusclouds"/>
+      </worlds>
+    </properties>
+  </dataset>
+
+  <!-- Menelaus' Oasis -->
+  <dataset macro="Cluster_609_macro">
+    <properties>
+      <identification name="{20003,6090001}" description="{20003,6090002}" image="enc_cluster609" system="609" />
+      <sounds>
+        <music ref="music_dlc_boron_soundtrack_inner_bubble" />
+      </sounds>
+      <area sunlight="2.71" economy="0.5" security="0.25" extensionexclusivejobs="true" tags="boroncore boronpirate" />
+      <system>
+        <space environment="{1042,12031}(Nebula)" />
+        <suns>
+          <sun class="{1042,13121}(Blue Giant)" />
+        </suns>
+        <planets>
+          <planet name="{20005,9076}(Ayeshma)" class="{1042,14031}(Terrestrial)" geology="{1042,15141}(Ocean)" atmosphere="{1042,11061}(Methane/Hydrogen)" population="{1042,10021}" maxpopulation="300000000" settlements="{1042,16041}(Multiple Cities)" part="part_menelaus"/>
+        </planets>
+      </system>
+    </properties>
+  </dataset>
+  <dataset macro="Cluster_609_Sector001_macro">
+    <properties>
+      <identification name="{20004,6090011}" description="{20004,6090012}" />
+      <worlds>
+        <world factor="2.71" part="part_menelaus"/>
+      </worlds>
+    </properties>
+  </dataset>
+	
+  <!-- base-demo -->
+  <dataset macro="demo_Cluster_13_macro" comment="Jupiter">
+    <properties>
+      <identification name="{20003,6030001}" description="{20003,6030002}" image="enc_cluster01"/>
+    </properties>
+  </dataset>
+  <dataset macro="demo_Cluster_13_Sector001_macro">
+    <properties>
+      <identification name="{20004,6030011}" description="{20004,6030012}" />
+      <sounds>
+        <music ref="music_cluster_complete" />
+      </sounds>
+    </properties>
+  </dataset>
+  <dataset macro="demo_Cluster_40_macro" comment="Mars">
+    <properties>
+      <identification name="{20003,6040001}" description="{20003,6040002}" image="enc_cluster23"/>
+    </properties>
+  </dataset>
+  <dataset macro="demo_Cluster_40_Sector001_macro">
+    <properties>
+      <identification name="{20004,6040011}" description="{20004,6040012}" />
+    </properties>
+  </dataset>
+  <dataset macro="demo_Cluster_41_macro" comment="Asteroid Belt">
+    <properties>
+      <identification name="{20003,6020001}" description="{20003,6020002}" image="enc_cluster35"/>
+    </properties>
+  </dataset>
+  <dataset macro="demo_Cluster_41_Sector001_macro">
+    <properties>
+      <identification name="{20004,6020011}" description="{20004,6020012}" />
+    </properties>
+  </dataset>
+  <!-- end-base-demo -->	
+	
+</defaults>

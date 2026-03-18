@@ -1,0 +1,1355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Last exported: 09.03.2026 17:03:27-->
+<diff>
+  <add sel="/wares">
+    <ware id="engine_arg_s_racer_01_mk1" name="{20107,1834}" description="{20107,1842}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="199910" average="222124" max="244336" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="416" />
+          <ware ware="engineparts" amount="71" />
+          <ware ware="fieldcoils" amount="38" />
+        </primary>
+      </production>
+      <component ref="engine_arg_s_racer_01_mk1_macro" />
+      <icon video="engine_arg_s_racer_01_mk1_video_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="ownerless" />
+    </ware>
+    <ware id="engine_gen_s_racer_01_mk1" name="{20107,1914}" description="{20107,1912}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="217228" average="241364" max="265500" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="41" />
+          <ware ware="energycells" amount="453" />
+          <ware ware="engineparts" amount="77" />
+        </primary>
+      </production>
+      <component ref="engine_gen_s_racer_01_mk1_macro" />
+      <icon video="engine_gen_s_racer_01_mk1_video_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="ownerless" />
+    </ware>
+    <ware id="engine_gen_s_racer_01_mk2" name="{20107,1924}" description="{20107,1922}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="289637" average="321819" max="354000" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="55" />
+          <ware ware="energycells" amount="603" />
+          <ware ware="engineparts" amount="103" />
+        </primary>
+      </production>
+      <component ref="engine_gen_s_racer_01_mk2_macro" />
+      <icon video="engine_gen_s_racer_01_mk2_video_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="ownerless" />
+    </ware>
+    <ware id="engine_par_s_racer_01_mk1" name="{20107,1904}" description="{20107,1842}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="199910" average="222124" max="244336" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="38" />
+          <ware ware="energycells" amount="416" />
+          <ware ware="engineparts" amount="71" />
+        </primary>
+      </production>
+      <component ref="engine_par_s_racer_01_mk1_macro" />
+      <icon video="engine_par_s_racer_01_mk1_video_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="ownerless" />
+    </ware>
+    <ware id="engine_tel_s_racer_01_mk1" name="{20107,1844}" description="{20107,1842}" group="engines" transport="equipment" volume="1" tags="engine equipment">
+      <price min="239689" average="266322" max="292954" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="55" />
+          <ware ware="energycells" amount="499" />
+          <ware ware="engineparts" amount="85" />
+        </primary>
+      </production>
+      <component ref="engine_tel_s_racer_01_mk1_macro" />
+      <icon video="engine_tel_s_racer_01_mk1_video_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="ownerless" />
+    </ware>
+    <ware id="engine_ter_l_allround_02_mk1" name="{20107,3154}" description="{20107,3152}" group="engines" transport="equipment" volume="1" tags="engine equipment nocustomgamestart nodiplomacyblueprint">
+      <price min="754907" average="838785" max="922664" />
+      <production time="20" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="295" />
+          <ware ware="energycells" amount="1000" />
+          <ware ware="engineparts" amount="175" />
+        </primary>
+      </production>
+      <component ref="engine_ter_l_allround_02_mk1_macro" />
+      <restriction licence="capitalequipment" />
+      <use threshold="0" />
+      <owner faction="terran" />
+    </ware>
+    <ware id="engine_ter_m_virtual_01_mk1" name="{20107,2844}" description="{20107,2842}" group="engines" transport="equipment" volume="1" tags="engine equipment nocustomgamestart nodiplomacyblueprint">
+      <price min="76478" average="95598" max="114717" />
+      <production time="15" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="35" />
+          <ware ware="energycells" amount="60" />
+          <ware ware="engineparts" amount="22" />
+        </primary>
+      </production>
+      <component ref="engine_ter_m_virtual_01_mk1_macro" />
+      <icon video="engine_ter_m_virtual_01_mk1_video_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="terran" />
+    </ware>
+    <ware id="engine_ter_s_virtual_01_mk1" name="{20107,1854}" description="{20107,1852}" group="engines" transport="equipment" volume="1" tags="engine equipment nocustomgamestart nodiplomacyblueprint">
+      <price min="15563" average="19453" max="23344" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="50" />
+          <ware ware="engineparts" amount="15" />
+        </primary>
+      </production>
+      <component ref="engine_ter_s_virtual_01_mk1_macro" />
+      <icon video="engine_ter_s_virtual_01_mk1_video_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="terran" />
+    </ware>
+    <ware id="engine_xen_xl_mothership_01_allround_mk1" name="{20107,9024}" description="{20107,9022}" group="engines" transport="equipment" volume="1" tags="engine equipment noplayerblueprint">
+      <price min="498332" average="600400" max="702468" />
+      <production time="1" amount="1" method="default" name="{20206,601}" tags="noplayerbuild">
+        <primary>
+          <ware ware="energycells" amount="80" />
+          <ware ware="ore" amount="660" />
+          <ware ware="silicon" amount="660" />
+        </primary>
+      </production>
+      <component ref="engine_xen_xl_mothership_01_allround_mk1_macro" />
+      <restriction licence="capitalequipment" />
+      <use threshold="0" factions="xenon" />
+      <owner faction="xenon" />
+    </ware>
+    <ware id="missile_flagship_heavy_mk1" name="{20105,6304}" description="{20105,6302}" group="missiles" transport="equipment" volume="1" tags="equipment missile">
+      <price min="1564" average="1840" max="2116" />
+      <production time="3" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="23" />
+          <ware ware="missilecomponents" amount="7" />
+          <ware ware="smartchips" amount="3" />
+        </primary>
+      </production>
+      <component ref="missile_flagship_heavy_mk1_macro" />
+      <container ref="sm_gen_pickup_equipment_01_macro" />
+      <restriction licence="capitalequipment" />
+      <use threshold="0" />
+      <owner faction="ownerless" />
+    </ware>
+    <ware id="missile_flagship_light_mk1" name="{20105,6314}" description="{20105,6312}" group="missiles" transport="equipment" volume="1" tags="equipment missile">
+      <price min="1324" average="1558" max="1791" />
+      <production time="3" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="19" />
+          <ware ware="missilecomponents" amount="6" />
+          <ware ware="smartchips" amount="3" />
+        </primary>
+      </production>
+      <component ref="missile_flagship_light_mk1_macro" />
+      <container ref="sm_gen_pickup_equipment_01_macro" />
+      <restriction licence="capitalequipment" />
+      <use threshold="0" />
+      <owner faction="ownerless" />
+    </ware>
+    <ware id="module_conn_arg_antigonearc_01" name="{20104,55101}" description="{20104,55102}" transport="container" volume="1" tags="module rewarded">
+      <price min="160148" average="188410" max="216671" />
+      <production time="220" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="19" />
+          <ware ware="energycells" amount="1060" />
+          <ware ware="hullparts" amount="142" />
+        </primary>
+      </production>
+      <component ref="landmarks_arg_antigonearc_01_macro" />
+      <restriction licence="station_gen_intermediate" />
+      <owner faction="kaori" />
+    </ware>
+    <ware id="module_conn_arg_antigonescaffolding_01" name="{20104,55401}" description="{20104,55402}" transport="container" volume="1" tags="module rewarded">
+      <price min="179063" average="210663" max="242262" />
+      <production time="302" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="21" />
+          <ware ware="energycells" amount="1185" />
+          <ware ware="hullparts" amount="159" />
+        </primary>
+      </production>
+      <component ref="landmarks_arg_antigonescaffolding_01_macro" />
+      <restriction licence="station_gen_intermediate" />
+      <owner faction="kaori" />
+    </ware>
+    <ware id="module_conn_arg_antigonestraight_01" name="{20104,55301}" description="{20104,55302}" transport="container" volume="1" tags="module rewarded">
+      <price min="126101" average="148354" max="170607" />
+      <production time="275" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="15" />
+          <ware ware="energycells" amount="835" />
+          <ware ware="hullparts" amount="112" />
+        </primary>
+      </production>
+      <component ref="landmarks_arg_antigonestraight_01_macro" />
+      <restriction licence="station_gen_intermediate" />
+      <owner faction="kaori" />
+    </ware>
+    <ware id="module_hab_arg_antigonepillar_01" name="{20104,32201}" description="{20104,32202}" transport="container" volume="1" tags="module rewarded">
+      <price min="16691091" average="19636578" max="22582065" />
+      <production time="530" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="117" />
+          <ware ware="energycells" amount="6627" />
+          <ware ware="hullparts" amount="888" />
+        </primary>
+      </production>
+      <component ref="landmarks_arg_antigonepillar_01_macro" />
+      <restriction licence="station_gen_advanced" />
+      <owner faction="kaori" />
+    </ware>
+    <ware id="module_hab_arg_antigonespire_01" name="{20104,32301}" description="{20104,32302}" transport="container" volume="1" tags="module rewarded">
+      <price min="23611353" average="27778063" max="31944772" />
+      <production time="848" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="claytronics" amount="165" />
+          <ware ware="energycells" amount="9375" />
+          <ware ware="hullparts" amount="1256" />
+        </primary>
+      </production>
+      <component ref="landmarks_arg_antigonespire_01_macro" />
+      <restriction licence="station_gen_advanced" />
+      <owner faction="kaori" />
+    </ware>
+    <ware id="mod_engine_boostthrust_escort_scenario" name="{20110,110330011}" description="{20110,101032}" shortname="{20110,110330012}" transport="inventory" volume="1" tags="crafting equipmentmod noplayerblueprint">
+      <price min="212500" average="250000" max="287500" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="modpart_enginefuelinjector_t2" amount="1" />
+          <ware ware="modpart_extendedfuelcontainer" amount="3" />
+          <ware ware="modpart_nividiumoxide" amount="3" />
+        </primary>
+        <research>
+          <ware ware="research_mod_engine_mk2" />
+        </research>
+      </production>
+    </ware>
+    <ware id="mod_engine_travelthrust_transport_refugees" name="{20110,111020021}" description="{20110,101102}" shortname="{20110,111020022}" transport="inventory" volume="1" tags="crafting equipmentmod noplayerblueprint">
+      <price min="212500" average="250000" max="287500" />
+      <production time="10" amount="1" method="default" name="{20206,101}" dismantlefactor="0">
+        <primary>
+          <ware ware="modpart_enginefuelinjector_t2" amount="1" />
+          <ware ware="modpart_extendedfuelcontainer" amount="3" />
+          <ware ware="modpart_nividiumoxide" amount="3" />
+        </primary>
+        <research>
+          <ware ware="research_mod_engine_mk2" />
+        </research>
+      </production>
+    </ware>
+    <ware id="mod_weapon_damage_fleet_battle_1" name="{20110,100030011}" description="{20110,100002}" shortname="{20110,100030012}" transport="inventory" volume="1" tags="crafting equipmentmod noplayerblueprint">
+      <price min="1062500" average="1250000" max="1437500" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="modpart_highenergycatalyst" amount="3" />
+          <ware ware="modpart_tuningsoftware" amount="1" />
+          <ware ware="modpart_weaponchamber_t3" amount="1" />
+        </primary>
+        <research>
+          <ware ware="research_mod_weapon_mk3" />
+        </research>
+      </production>
+    </ware>
+    <ware id="research_ship_arg_s_racing_01" name="{20216,2801}" description="{20216,2802}" transport="research" volume="1" tags="nocustomgamestart research" sortorder="501">
+      <price min="1" average="1" max="1" />
+      <research time="600">
+        <primary>
+          <ware ware="antimattercells" amount="32" />
+          <ware ware="microchips" amount="6" />
+          <ware ware="superfluidcoolant" amount="38" />
+        </primary>
+      </research>
+    </ware>
+    <ware id="research_ship_par_s_racing_01" name="{20216,3001}" description="{20216,3002}" transport="research" volume="1" tags="nocustomgamestart research" sortorder="501">
+      <price min="1" average="1" max="1" />
+      <research time="600">
+        <primary>
+          <ware ware="antimatterconverters" amount="14" />
+          <ware ware="graphene" amount="39" />
+          <ware ware="quantumtubes" amount="21" />
+        </primary>
+      </research>
+    </ware>
+    <ware id="research_ship_tel_s_racing_01" name="{20216,2901}" description="{20216,2902}" transport="research" volume="1" tags="nocustomgamestart research" sortorder="501">
+      <price min="1" average="1" max="1" />
+      <research time="360">
+        <primary>
+          <ware ware="engineparts" amount="36" />
+          <ware ware="fieldcoils" amount="14" />
+          <ware ware="teladianium" amount="28" />
+        </primary>
+      </research>
+    </ware>
+    <ware id="research_ship_ter_l_flagship_01" name="{20216,2701}" description="{20216,2702}" transport="research" volume="1" tags="nocustomgamestart research" sortorder="501">
+      <price min="1" average="1" max="1" />
+      <research time="640">
+        <primary>
+          <ware ware="advancedelectronics" amount="20" />
+          <ware ware="energycells" amount="760" />
+          <ware ware="refinedmetals" amount="78" />
+          <ware ware="scanningarrays" amount="52" />
+        </primary>
+      </research>
+    </ware>
+    <ware id="research_ship_ter_m_corvette_01" name="{20216,2601}" description="{20216,2602}" transport="research" volume="1" tags="nocustomgamestart research" sortorder="501">
+      <price min="1" average="1" max="1" />
+      <research time="580">
+        <primary>
+          <ware ware="antimattercells" amount="54" />
+          <ware ware="energycells" amount="415" />
+          <ware ware="engineparts" amount="172" />
+          <ware ware="smartchips" amount="148" />
+        </primary>
+      </research>
+    </ware>
+    <ware id="research_ship_ter_s_fighter_01" name="{20216,2501}" description="{20216,2502}" transport="research" volume="1" tags="nocustomgamestart research" sortorder="501">
+      <price min="1" average="1" max="1" />
+      <research time="450">
+        <primary>
+          <ware ware="energycells" amount="360" />
+          <ware ware="fieldcoils" amount="15" />
+          <ware ware="plasmaconductors" amount="23" />
+          <ware ware="superfluidcoolant" amount="48" />
+        </primary>
+      </research>
+    </ware>
+    <ware id="shield_arg_s_racer_01_mk1" name="{20106,1004}" description="{20106,1002}" group="shields" transport="equipment" volume="1" tags="equipment shield">
+      <price min="12223" average="13582" max="14939" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="14" />
+          <ware ware="fieldcoils" amount="3" />
+          <ware ware="shieldcomponents" amount="5" />
+        </primary>
+      </production>
+      <component ref="shield_arg_s_racer_01_mk1_macro" />
+      <icon video="shield_arg_s_racer_01_mk1_video_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="ownerless" />
+    </ware>
+    <ware id="shield_gen_s_racer_01_mk1" name="{20106,1274}" description="{20106,1272}" group="shields" transport="equipment" volume="1" tags="equipment shield">
+      <price min="13242" average="14713" max="16184" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="14" />
+          <ware ware="fieldcoils" amount="3" />
+          <ware ware="shieldcomponents" amount="5" />
+        </primary>
+      </production>
+      <component ref="shield_gen_s_racer_01_mk1_macro" />
+      <icon video="shield_gen_s_racer_01_mk1_video_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="ownerless" />
+    </ware>
+    <ware id="shield_par_s_racer_01_mk1" name="{20106,1014}" description="{20106,1022}" group="shields" transport="equipment" volume="1" tags="equipment shield">
+      <price min="12223" average="13582" max="14939" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="13" />
+          <ware ware="fieldcoils" amount="2" />
+          <ware ware="shieldcomponents" amount="4" />
+        </primary>
+      </production>
+      <component ref="shield_par_s_racer_01_mk1_macro" />
+      <icon video="shield_par_s_racer_01_mk1_video_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="ownerless" />
+    </ware>
+    <ware id="shield_tel_s_racer_01_mk1" name="{20106,1024}" description="{20106,1022}" group="shields" transport="equipment" volume="1" tags="equipment shield">
+      <price min="12223" average="13582" max="14939" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="13" />
+          <ware ware="fieldcoils" amount="2" />
+          <ware ware="shieldcomponents" amount="4" />
+        </primary>
+      </production>
+      <component ref="shield_tel_s_racer_01_mk1_macro" />
+      <icon video="shield_tel_s_racer_01_mk1_video_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="ownerless" />
+    </ware>
+    <ware id="shield_ter_l_standard_02_mk1" name="{20106,3164}" description="{20106,3162}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart nodiplomacyblueprint shield">
+      <price min="104540" average="116156" max="127771" />
+      <production time="20" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="500" />
+          <ware ware="fieldcoils" amount="25" />
+          <ware ware="shieldcomponents" amount="15" />
+        </primary>
+      </production>
+      <component ref="shield_ter_l_standard_02_mk1_macro" />
+      <restriction licence="capitalequipment" />
+      <use threshold="0" />
+      <owner faction="terran" />
+    </ware>
+    <ware id="shield_ter_l_standard_02_mk2" name="{20106,3174}" description="{20106,3172}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
+      <price min="494028" average="548920" max="603812" />
+      <production time="20" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="1000" />
+          <ware ware="fieldcoils" amount="150" />
+          <ware ware="shieldcomponents" amount="117" />
+        </primary>
+      </production>
+      <component ref="shield_ter_l_standard_02_mk2_macro" />
+      <restriction licence="capitalequipment" />
+      <use threshold="0.25" />
+      <owner faction="terran" />
+    </ware>
+    <ware id="shield_ter_l_standard_02_mk3" name="{20106,3184}" description="{20106,3182}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
+      <price min="1294817" average="1523314" max="1751811" />
+      <production time="20" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="1500" />
+          <ware ware="fieldcoils" amount="473" />
+          <ware ware="shieldcomponents" amount="309" />
+        </primary>
+      </production>
+      <component ref="shield_ter_l_standard_02_mk3_macro" />
+      <restriction licence="capitalequipment" />
+      <use threshold="0.55" />
+      <owner faction="terran" />
+    </ware>
+    <ware id="shield_ter_m_standard_04_mk1" name="{20106,2174}" description="{20106,2172}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
+      <price min="69473" average="86842" max="104210" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="60" />
+          <ware ware="fieldcoils" amount="20" />
+          <ware ware="shieldcomponents" amount="35" />
+        </primary>
+      </production>
+      <component ref="shield_ter_m_standard_04_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="terran" />
+    </ware>
+    <ware id="shield_ter_m_standard_04_mk2" name="{20106,2184}" description="{20106,2182}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
+      <price min="129373" average="161716" max="194059" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="80" />
+          <ware ware="fieldcoils" amount="50" />
+          <ware ware="shieldcomponents" amount="40" />
+        </primary>
+      </production>
+      <component ref="shield_ter_m_standard_04_mk2_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0.25" />
+      <owner faction="terran" />
+    </ware>
+    <ware id="shield_ter_m_standard_04_mk3" name="{20106,2194}" description="{20106,2192}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
+      <price min="566175" average="707718" max="849262" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="100" />
+          <ware ware="fieldcoils" amount="240" />
+          <ware ware="shieldcomponents" amount="150" />
+        </primary>
+      </production>
+      <component ref="shield_ter_m_standard_04_mk3_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0.55" />
+      <owner faction="terran" />
+    </ware>
+    <ware id="shield_ter_m_virtual_01_mk1" name="{20106,2174}" description="{20106,2172}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
+      <price min="69473" average="86842" max="104210" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="60" />
+          <ware ware="fieldcoils" amount="20" />
+          <ware ware="shieldcomponents" amount="35" />
+        </primary>
+      </production>
+      <component ref="shield_ter_m_virtual_01_mk1_macro" />
+      <icon video="shield_ter_m_virtual_01_mk1_video_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="terran" />
+    </ware>
+    <ware id="shield_ter_m_virtual_01_mk2" name="{20106,2184}" description="{20106,2182}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
+      <price min="129373" average="161716" max="185975" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="80" />
+          <ware ware="fieldcoils" amount="50" />
+          <ware ware="shieldcomponents" amount="40" />
+        </primary>
+      </production>
+      <component ref="shield_ter_m_virtual_01_mk2_macro" />
+      <icon video="shield_ter_m_virtual_01_mk1_video_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0.25" />
+      <owner faction="terran" />
+    </ware>
+    <ware id="shield_ter_m_virtual_01_mk3" name="{20106,2194}" description="{20106,2192}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
+      <price min="566175" average="707718" max="849262" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="100" />
+          <ware ware="fieldcoils" amount="240" />
+          <ware ware="shieldcomponents" amount="150" />
+        </primary>
+      </production>
+      <component ref="shield_ter_m_virtual_01_mk3_macro" />
+      <icon video="shield_ter_m_virtual_01_mk1_video_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0.55" />
+      <owner faction="terran" />
+    </ware>
+    <ware id="shield_ter_s_virtual_01_mk1" name="{20106,1224}" description="{20106,1222}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
+      <price min="11811" average="14763" max="17716" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="50" />
+          <ware ware="shieldcomponents" amount="10" />
+        </primary>
+      </production>
+      <component ref="shield_ter_s_virtual_01_mk1_macro" />
+      <icon video="shield_ter_s_virtual_01_mk1_video_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="terran" />
+    </ware>
+    <ware id="shield_ter_s_xperimental_01_mk5" name="{20106,1264}" description="{20106,1262}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
+      <price min="389810" average="458600" max="527390" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="antimatterconverters" amount="42" />
+          <ware ware="energycells" amount="1420" />
+          <ware ware="shieldcomponents" amount="205" />
+        </primary>
+      </production>
+      <component ref="shield_ter_s_xperimental_01_mk5_macro" />
+      <icon video="shield_ter_s_xperimental_01_mk5_video_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="terran" />
+    </ware>
+    <ware id="shield_xen_xl_mothership_01_mk1" name="{20106,9024}" description="{20106,9022}" group="shields" transport="equipment" volume="1" tags="equipment noplayerblueprint shield">
+      <price min="320048" average="385600" max="451152" />
+      <production time="1" amount="1" method="default" name="{20206,601}" tags="noplayerbuild">
+        <primary>
+          <ware ware="energycells" amount="95" />
+          <ware ware="ore" amount="420" />
+          <ware ware="silicon" amount="420" />
+        </primary>
+      </production>
+      <component ref="shield_xen_xl_mothership_01_mk1_macro" />
+      <restriction licence="capitalequipment" />
+      <use threshold="0" factions="xenon" />
+      <owner faction="xenon" />
+    </ware>
+    <ware id="ship_arg_s_racer_01_a" name="{20101,11904}" description="{20101,11913}" transport="ship" volume="1" tags="limited nocustomgamestart ship">
+      <price min="146598" average="172350" max="198203" />
+      <production time="7" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="45" />
+          <ware ware="hullparts" amount="106" />
+        </primary>
+      </production>
+      <component ref="ship_arg_s_racer_01_a_macro" />
+      <restriction licence="generaluseship" />
+      <owner faction="ownerless" />
+    </ware>
+    <ware id="ship_gen_s_racer_01_a" name="{20101,123001}" description="{20101,123011}" transport="ship" volume="1" tags="limited nocustomgamestart ship">
+      <price min="294823" average="346850" max="398878" />
+      <production time="14" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="1821" />
+          <ware ware="hullparts" amount="193" />
+        </primary>
+      </production>
+      <component ref="ship_gen_s_racer_01_a_macro" />
+      <restriction licence="generaluseship" />
+      <owner faction="ownerless" />
+    </ware>
+    <ware id="ship_par_s_racer_01_a" name="{20101,31504}" description="{20101,31514}" transport="ship" volume="1" tags="limited nocustomgamestart ship">
+      <price min="163320" average="191440" max="223781" />
+      <production time="16" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="70" />
+          <ware ware="hullparts" amount="166" />
+        </primary>
+      </production>
+      <component ref="ship_par_s_racer_01_a_macro" />
+      <restriction licence="generaluseship" />
+      <owner faction="ownerless" />
+    </ware>
+    <ware id="ship_tel_s_racer_01_a" name="{20101,20104}" description="{20101,20114}" transport="ship" volume="1" tags="limited nocustomgamestart ship">
+      <price min="146332" average="163250" max="171398" />
+      <production time="12" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="60" />
+          <ware ware="hullparts" amount="122" />
+        </primary>
+      </production>
+      <component ref="ship_tel_s_racer_01_a_macro" />
+      <restriction licence="generaluseship" />
+      <owner faction="ownerless" />
+    </ware>
+    <ware id="ship_ter_l_flagship_01_a" name="{20101,62701}" description="{20101,62711}" transport="ship" volume="1" tags="nocustomgamestart ship">
+      <price min="5679310" average="7099138" max="8518965" />
+      <production time="187" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="1850" />
+          <ware ware="hullparts" amount="4950" />
+        </primary>
+      </production>
+      <component ref="ship_ter_l_flagship_01_a_macro" />
+      <restriction licence="capitalship" />
+      <owner faction="ownerless" />
+    </ware>
+    <ware id="ship_ter_m_corvette_02_a" name="{20101,64801}" description="{20101,64811}" transport="ship" volume="1" tags="nocustomgamestart ship">
+      <price min="1128622" average="1410777" max="1692933" />
+      <production time="15" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="170" />
+          <ware ware="hullparts" amount="950" />
+        </primary>
+      </production>
+      <component ref="ship_ter_m_corvette_02_a_macro" />
+      <restriction licence="militaryship" />
+      <owner faction="ownerless" />
+    </ware>
+    <ware id="ship_ter_s_fighter_04_a" name="{20101,60401}" description="{20101,60411}" transport="ship" volume="1" tags="nocustomgamestart ship">
+      <price min="275041" average="343801" max="412561" />
+      <production time="15" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="115" />
+          <ware ware="hullparts" amount="265" />
+        </primary>
+      </production>
+      <component ref="ship_ter_s_fighter_04_a_macro" />
+      <restriction licence="militaryship" />
+      <owner faction="ownerless" />
+    </ware>
+    <ware id="ship_ter_s_xperimental_01_a" name="{20101,122801}" description="{20101,122811}" transport="ship" volume="1" tags="limited nocustomgamestart ship">
+      <price min="1058607" average="1323258" max="1587910" />
+      <production time="60" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="energycells" amount="435" />
+          <ware ware="hullparts" amount="870" />
+        </primary>
+      </production>
+      <component ref="ship_ter_s_xperimental_01_a_macro" />
+      <restriction licence="militaryship" />
+      <owner faction="ownerless" />
+    </ware>
+    <ware id="ship_xen_xl_mothership_01" name="{20101,72101}" description="{20101,72111}" transport="ship" volume="1" tags="noplayerblueprint ship">
+      <price min="13039000" average="15340000" max="17641000" />
+      <production time="1000" amount="1" method="default" name="{20206,601}" tags="noplayerbuild">
+        <primary>
+          <ware ware="energycells" amount="15000" />
+          <ware ware="ore" amount="23000" />
+          <ware ware="silicon" amount="15000" />
+        </primary>
+      </production>
+      <component ref="ship_xen_xl_mothership_01_a_macro" />
+      <restriction licence="capitalship" />
+      <owner faction="xenon" />
+    </ware>
+    <ware id="turret_ter_m_laser_03_mk1" name="{20105,7014}" description="{20105,7012}" group="turrets" transport="equipment" volume="1" tags="equipment missiononly turret">
+      <price min="133187" average="147985" max="162784" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="24" />
+          <ware ware="energycells" amount="305" />
+          <ware ware="turretcomponents" amount="71" />
+        </primary>
+      </production>
+      <component ref="turret_ter_m_laser_03_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="terran" />
+    </ware>
+    <ware id="turret_ter_m_laser_04_mk1" name="{20105,7014}" description="{20105,7012}" group="turrets" transport="equipment" volume="1" tags="equipment missiononly turret">
+      <price min="133187" average="147985" max="162784" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="24" />
+          <ware ware="energycells" amount="305" />
+          <ware ware="turretcomponents" amount="71" />
+        </primary>
+      </production>
+      <component ref="turret_ter_m_laser_04_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="terran" />
+    </ware>
+    <ware id="turret_xen_xl_battleship_01_mk1" name="{20105,9074}" description="{20105,9072}" group="turrets" transport="equipment" volume="1" tags="equipment noplayerblueprint turret">
+      <price min="40670" average="49000" max="57330" />
+      <production time="10" amount="1" method="default" name="{20206,601}" tags="noplayerbuild" dismantlefactor="3.17">
+        <primary>
+          <ware ware="energycells" amount="47" />
+          <ware ware="ore" amount="25" />
+          <ware ware="silicon" amount="23" />
+        </primary>
+      </production>
+      <component ref="turret_xen_xl_battleship_01_mk1_macro" />
+      <restriction licence="capitalequipment" />
+      <use threshold="0" factions="xenon" />
+      <owner faction="xenon" />
+    </ware>
+    <ware id="weapon_gen_spacesuit_laser_03_mk1" name="{20113,1081}" description="{20113,1082}" group="weapons" transport="inventory" volume="1" tags="disallowdrop equipment inventory noblueprint noplayerblueprint personalupgrade weapon">
+      <price min="80000" average="100000" max="120000" />
+      <production time="10" amount="1" method="default" name="{20206,101}" />
+      <component ref="spacesuit_gen_laser_03_macro" />
+      <icon video="ware_inventory_personalblaster_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+    </ware>
+    <ware id="weapon_ter_l_flagship_01_mk1" name="{20105,3094}" description="{20105,3092}" group="weapons" transport="equipment" volume="1" tags="equipment missilelauncher nocustomgamestart weapon">
+      <price min="1798200" average="1998000" max="2197800" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="455" />
+          <ware ware="energycells" amount="4120" />
+          <ware ware="weaponcomponents" amount="462" />
+        </primary>
+      </production>
+      <component ref="weapon_ter_l_flagship_01_mk1_macro" />
+      <icon video="weapon_ter_l_flagship_01_mk1_video_macro" />
+      <restriction licence="capitalequipment" />
+      <use threshold="0" />
+      <owner faction="ownerless" />
+    </ware>
+    <ware id="weapon_ter_m_laser_02_mk1" name="{20105,2564}" description="{20105,2562}" group="weapons" transport="equipment" volume="1" tags="equipment missiononly weapon">
+      <price min="246414" average="273793" max="301172" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="62" />
+          <ware ware="energycells" amount="564" />
+          <ware ware="weaponcomponents" amount="63" />
+        </primary>
+      </production>
+      <component ref="weapon_ter_m_laser_02_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="terran" />
+    </ware>
+    <ware id="weapon_ter_s_laser_02_mk1" name="{20105,1564}" description="{20105,1562}" group="weapons" transport="equipment" volume="1" tags="equipment missiononly weapon">
+      <price min="164275" average="182528" max="200781" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="41" />
+          <ware ware="energycells" amount="376" />
+          <ware ware="weaponcomponents" amount="42" />
+        </primary>
+      </production>
+      <component ref="weapon_ter_s_laser_02_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="terran" />
+    </ware>
+    <ware id="weapon_ter_s_plasma_01_mk1" name="{20105,1554}" description="{20105,1552}" group="weapons" transport="equipment" volume="1" tags="equipment missiononly weapon">
+      <price min="168711" average="187457" max="206202" />
+      <production time="10" amount="1" method="default" name="{20206,101}">
+        <primary>
+          <ware ware="advancedelectronics" amount="42" />
+          <ware ware="energycells" amount="386" />
+          <ware ware="weaponcomponents" amount="43" />
+        </primary>
+      </production>
+      <component ref="weapon_ter_s_plasma_01_mk1_macro" />
+      <restriction licence="generaluseequipment" />
+      <use threshold="0" />
+      <owner faction="terran" />
+    </ware>
+  </add>
+  <add sel="/wares/ware[@id='engine_ter_l_allround_02_mk1']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="20" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="28" />
+        <ware ware="energycells" amount="1650" />
+        <ware ware="metallicmicrolattice" amount="245" />
+        <ware ware="siliconcarbide" amount="45" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='engine_ter_m_virtual_01_mk1']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="15" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="3" />
+        <ware ware="energycells" amount="265" />
+        <ware ware="metallicmicrolattice" amount="38" />
+        <ware ware="siliconcarbide" amount="5" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='engine_ter_s_virtual_01_mk1']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="10" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="energycells" amount="155" />
+        <ware ware="metallicmicrolattice" amount="15" />
+        <ware ware="siliconcarbide" amount="4" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='missile_flagship_heavy_mk1']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="3" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="energycells" amount="8" />
+        <ware ware="metallicmicrolattice" amount="10" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='missile_flagship_heavy_mk1']" if="/wares/production/method[@id='closedloop']" silent="1">
+    <production time="3" amount="1" method="closedloop" name="{20206,1201}">
+      <primary>
+        <ware ware="energycells" amount="25" />
+        <ware ware="hullparts" amount="1" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='missile_flagship_light_mk1']" if="/wares/production/method[@id='closedloop']" silent="1">
+    <production time="3" amount="1" method="closedloop" name="{20206,1201}">
+      <primary>
+        <ware ware="energycells" amount="33" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='missile_flagship_light_mk1']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="3" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="energycells" amount="6" />
+        <ware ware="metallicmicrolattice" amount="8" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='shield_ter_l_standard_02_mk1']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="20" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="5" />
+        <ware ware="energycells" amount="385" />
+        <ware ware="metallicmicrolattice" amount="15" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='shield_ter_l_standard_02_mk2']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="20" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="22" />
+        <ware ware="energycells" amount="1115" />
+        <ware ware="metallicmicrolattice" amount="165" />
+        <ware ware="siliconcarbide" amount="14" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='shield_ter_l_standard_02_mk3']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="20" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="58" />
+        <ware ware="energycells" amount="2415" />
+        <ware ware="metallicmicrolattice" amount="490" />
+        <ware ware="siliconcarbide" amount="42" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='shield_ter_m_standard_04_mk1']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="10" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="3" />
+        <ware ware="energycells" amount="212" />
+        <ware ware="metallicmicrolattice" amount="23" />
+        <ware ware="siliconcarbide" amount="4" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='shield_ter_m_standard_04_mk2']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="10" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="4" />
+        <ware ware="energycells" amount="285" />
+        <ware ware="metallicmicrolattice" amount="32" />
+        <ware ware="siliconcarbide" amount="20" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='shield_ter_m_standard_04_mk3']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="10" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="9" />
+        <ware ware="energycells" amount="1645" />
+        <ware ware="metallicmicrolattice" amount="15" />
+        <ware ware="siliconcarbide" amount="135" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='shield_ter_m_virtual_01_mk1']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="10" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="3" />
+        <ware ware="energycells" amount="368" />
+        <ware ware="metallicmicrolattice" amount="27" />
+        <ware ware="siliconcarbide" amount="2" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='shield_ter_m_virtual_01_mk2']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="10" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="4" />
+        <ware ware="energycells" amount="1475" />
+        <ware ware="metallicmicrolattice" amount="155" />
+        <ware ware="siliconcarbide" amount="2" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='shield_ter_m_virtual_01_mk3']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="10" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="26" />
+        <ware ware="energycells" amount="1855" />
+        <ware ware="metallicmicrolattice" amount="187" />
+        <ware ware="siliconcarbide" amount="18" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='shield_ter_s_virtual_01_mk1']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="10" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="1" />
+        <ware ware="energycells" amount="83" />
+        <ware ware="metallicmicrolattice" amount="20" />
+        <ware ware="siliconcarbide" amount="2" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='shield_ter_s_xperimental_01_mk5']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="10" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="15" />
+        <ware ware="energycells" amount="2225" />
+        <ware ware="metallicmicrolattice" amount="215" />
+        <ware ware="siliconcarbide" amount="13" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='ship_ter_l_flagship_01_a']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="187" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="124" />
+        <ware ware="energycells" amount="1365" />
+        <ware ware="metallicmicrolattice" amount="315" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='ship_ter_m_corvette_02_a']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="15" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="24" />
+        <ware ware="energycells" amount="285" />
+        <ware ware="metallicmicrolattice" amount="42" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='ship_ter_s_fighter_04_a']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="15" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="7" />
+        <ware ware="energycells" amount="85" />
+        <ware ware="metallicmicrolattice" amount="25" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='ship_ter_s_xperimental_01_a']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="60" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="18" />
+        <ware ware="energycells" amount="1785" />
+        <ware ware="metallicmicrolattice" amount="155" />
+        <ware ware="siliconcarbide" amount="15" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='turret_ter_m_laser_03_mk1']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="10" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="8" />
+        <ware ware="energycells" amount="231" />
+        <ware ware="metallicmicrolattice" amount="7" />
+        <ware ware="siliconcarbide" amount="73" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='turret_ter_m_laser_04_mk1']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="10" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="73" />
+        <ware ware="energycells" amount="231" />
+        <ware ware="metallicmicrolattice" amount="8" />
+        <ware ware="siliconcarbide" amount="7" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='weapon_ter_l_flagship_01_mk1']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="10" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="90" />
+        <ware ware="energycells" amount="3121" />
+        <ware ware="metallicmicrolattice" amount="1050" />
+        <ware ware="siliconcarbide" amount="107" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='weapon_ter_m_laser_02_mk1']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="10" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="12" />
+        <ware ware="energycells" amount="427" />
+        <ware ware="metallicmicrolattice" amount="136" />
+        <ware ware="siliconcarbide" amount="15" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='weapon_ter_s_laser_02_mk1']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="10" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="8" />
+        <ware ware="energycells" amount="285" />
+        <ware ware="metallicmicrolattice" amount="91" />
+        <ware ware="siliconcarbide" amount="10" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='weapon_ter_s_plasma_01_mk1']" if="/wares/production/method[@id='terran']" silent="1">
+    <production time="10" amount="1" method="terran" name="{20206,901}">
+      <primary>
+        <ware ware="computronicsubstrate" amount="8" />
+        <ware ware="energycells" amount="292" />
+        <ware ware="metallicmicrolattice" amount="93" />
+        <ware ware="siliconcarbide" amount="10" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='engine_par_l_allround_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='engine_par_l_travel_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='engine_par_m_allround_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='engine_par_m_allround_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='engine_par_m_allround_01_mk3']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='engine_par_m_combat_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='engine_par_m_combat_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='engine_par_m_combat_01_mk3']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='engine_par_m_travel_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='engine_par_m_travel_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='engine_par_m_travel_01_mk3']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='engine_par_s_allround_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='engine_par_s_allround_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='engine_par_s_allround_01_mk3']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='engine_par_s_combat_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='engine_par_s_combat_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='engine_par_s_combat_01_mk3']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='engine_par_s_travel_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='engine_par_s_travel_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='engine_par_s_travel_01_mk3']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='engine_par_xl_allround_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='engine_par_xl_travel_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='module_arg_radar_dish_01']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_conn_observationdeck_01']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_conn_observationdeck_02']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='module_gen_conn_observationdeck_03']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='shield_tel_l_standard_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='shield_tel_l_standard_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='shield_tel_m_standard_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='shield_tel_m_standard_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='shield_tel_m_standard_02_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='shield_tel_m_standard_02_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='shield_tel_s_standard_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='shield_tel_s_standard_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='shield_tel_s_standard_01_mk3']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='shield_tel_xl_standard_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='ship_arg_m_miner_liquid_01_b']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='ship_arg_m_miner_solid_01_b']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='ship_arg_s_fighter_01_b']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='ship_arg_s_scout_01_b']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='ship_par_m_corvette_01_b']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='ship_par_s_heavyfighter_01_a']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='ship_tel_l_trans_container_03_a']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='ship_tel_m_bomber_01_b']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='ship_tel_m_trans_container_01_b']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='ship_tel_s_miner_solid_01_a']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='ship_tel_s_trans_container_01_b']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='ship_tel_xl_builder_01_b']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_l_beam_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_l_dumbfire_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_l_guided_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_l_laser_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_l_mining_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_l_plasma_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_m_beam_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_m_beam_02_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_m_dumbfire_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_m_dumbfire_02_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_m_gatling_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_m_gatling_02_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_m_guided_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_m_guided_02_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_m_laser_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_m_laser_02_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_m_mining_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_m_mining_02_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_m_plasma_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_m_plasma_02_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_m_shotgun_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='turret_arg_m_shotgun_02_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_beam_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_beam_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_dumbfire_02_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_gatling_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_gatling_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_guided_02_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_laser_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_laser_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_mining_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_mining_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_plasma_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_plasma_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_shotgun_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_shotgun_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_torpedo_02_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_beam_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_beam_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_cannon_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_cannon_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_dumbfire_02_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_gatling_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_gatling_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_guided_02_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_laser_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_laser_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_mining_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_mining_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_plasma_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_plasma_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_shotgun_01_mk1']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_shotgun_01_mk2']">
+    <owner faction="kaori" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_torpedo_02_mk1']">
+    <owner faction="kaori" />
+  </add>
+</diff>
