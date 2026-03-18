@@ -1,3 +1,4 @@
+import argparse
 import os
 import xml.etree.ElementTree as ET
 import json
@@ -8,70 +9,98 @@ from collections import defaultdict
 from pathlib import Path
 
 try:
-    import x4_data_map_processor
-except ModuleNotFoundError:
-    from scripts import x4_data_map_processor  # type: ignore
-
-try:
     from processor.i18n import get_i18n_registry
     from processor.path_utils import get_library_xml, build_paths, get_map_dir
+    from processor.versioning import get_target_versions, load_version_config, merge_version_config
+    from processor.resource.legacy_processor import migrate_regionyields
+    from processor.map.writer import migrate_factions, write_map_output
+    from processor.map.generator import generate_map_data
 except ModuleNotFoundError:
     from scripts.processor.i18n import get_i18n_registry  # type: ignore
     from scripts.processor.path_utils import get_library_xml, build_paths, get_map_dir  # type: ignore
+    from scripts.processor.versioning import get_target_versions, load_version_config, merge_version_config  # type: ignore
+    from scripts.processor.resource.legacy_processor import migrate_regionyields  # type: ignore
+    from scripts.processor.map.writer import migrate_factions, write_map_output  # type: ignore
+    from scripts.processor.map.generator import generate_map_data  # type: ignore
 
 # =============================================================================
 # ⚙️ 项目配置
 # =============================================================================
-config_file = 'x4-station-calculator.config.json'
-if not os.path.exists(config_file):
+_config = load_version_config()
+
+# 全局路径变量（由 apply_runtime_config 填充）
+X4_UNPACKED_DATA_PATH = ""
+OUTPUT_VERSION_DIR = ""
+MAP_DIR = ""
+MAP_DEFAULTS_XML = ""
+MAP_GOD_XML = ""
+MAP_FACTIONS_XML = ""
+MAP_COLORS_XML = ""
+MAP_REGION_DEFINITIONS_XML = ""
+MAP_REGIONOBJECTGROUPS_XML = ""
+MAP_REGIONYIELDS_XML = ""
+MAP_OUTPUT_JSON = ""
+MAP_FACTIONS_OUTPUT = ""
+MAP_REGIONS_OUTPUT = ""
+MAP_REGIONYIELDS_OUTPUT = ""
+
+
+def apply_runtime_config(effective_config):
+    """应用运行时配置，设置全局路径变量"""
+    global X4_UNPACKED_DATA_PATH
+    global OUTPUT_VERSION_DIR
+    global MAP_DIR
+    global MAP_DEFAULTS_XML
+    global MAP_GOD_XML
+    global MAP_FACTIONS_XML
+    global MAP_COLORS_XML
+    global MAP_REGION_DEFINITIONS_XML
+    global MAP_REGIONOBJECTGROUPS_XML
+    global MAP_REGIONYIELDS_XML
+    global MAP_OUTPUT_JSON
+    global MAP_FACTIONS_OUTPUT
+    global MAP_REGIONS_OUTPUT
+    global MAP_REGIONYIELDS_OUTPUT
+
+    # 拼接基础路径
+    base_path = os.path.join(str(effective_config['raw_assets_dir']), str(effective_config['folder_name']))
+    OUTPUT_VERSION_DIR = os.path.join(str(effective_config['processed_assets_dir']), str(effective_config['folder_name']))
+
+    X4_UNPACKED_DATA_PATH = base_path
+
+    # 使用 path_utils 构建库文件路径（支持 libraries/{type}/final.xml 格式）
+    MAP_DIR = get_map_dir(base_path, "")  # base_path 已经包含 folder_name，所以传空字符串
+    MAP_DEFAULTS_XML = get_library_xml(base_path, "mapdefaults")
+    MAP_GOD_XML = get_library_xml(base_path, "god")
+    MAP_FACTIONS_XML = get_library_xml(base_path, "factions")
+    MAP_COLORS_XML = get_library_xml(base_path, "colors")
+    MAP_REGION_DEFINITIONS_XML = get_library_xml(base_path, "region_definitions")
+    MAP_REGIONOBJECTGROUPS_XML = get_library_xml(base_path, "regionobjectgroups")
+    MAP_REGIONYIELDS_XML = get_library_xml(base_path, "regionyields")
+
+    # 输出路径
+    MAP_OUTPUT_JSON = str(Path(OUTPUT_VERSION_DIR) / "data" / "maps.json")
+    MAP_FACTIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "factions.json")
+    MAP_REGIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regions.json")
+    MAP_REGIONYIELDS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regionyields.json")
+
+
+def default_version_item(config):
+    """获取默认版本配置项"""
+    current_version = config.get("current_version")
+    current_beta = bool(config.get("beta", False))
+    for version_item in config.get("versions", []):
+        if str(version_item.get("version")) == str(current_version) and bool(version_item.get("beta", False)) == current_beta:
+            return merge_version_config(config, version_item)
     print("" + "!" * 60)
-    print(f"❌ 错误: 找不到配置文件 '{config_file}'")
+    print("❌ 错误：未找到默认版本配置。")
     print("!" * 60 + "")
     sys.exit(1)
 
-with open(config_file, 'r', encoding='utf-8') as f:
-    _config = json.load(f)
 
-# 从 versions 数组中查找当前版本配置
-_current_version = _config.get('current_version')
-_is_beta = _config.get('beta', False)
-_versions = _config.get('versions', [])
-_version_config = None
-for v in _versions:
-    if v.get('version') == _current_version and v.get('beta', False) == _is_beta:
-        _version_config = v
-        break
+# 初始化默认版本配置
+apply_runtime_config(default_version_item(_config))
 
-if _version_config is None:
-    _beta_str = "beta" if _is_beta else "stable"
-    print("" + "!" * 60)
-    print(f"❌ 错误: 未找到版本 {_current_version} ({_beta_str}) 的配置。")
-    print("!" * 60 + "")
-    sys.exit(1)
-
-# 将版本配置合并到 _config 顶层
-_config.update(_version_config)
-
-# 使用 path_utils 构建统一路径
-PATHS = build_paths(_config['raw_assets_dir'], _config['folder_name'])
-OUTPUT_BASE = os.path.join(_config['processed_assets_dir'], _config['folder_name'])
-
-X4_UNPACKED_DATA_PATH = PATHS["base"]
-MAP_DIR = get_map_dir(_config['raw_assets_dir'], _config['folder_name'])
-
-# Libraries XML 路径
-MAP_DEFAULTS_XML = PATHS["mapdefaults"]
-MAP_GOD_XML = PATHS["god"]
-MAP_FACTIONS_XML = PATHS["factions"]
-MAP_COLORS_XML = PATHS["colors"]
-MAP_REGION_DEFINITIONS_XML = PATHS["region_definitions"]
-MAP_REGIONYIELDS_XML = PATHS["regionyields"]
-
-# 输出路径
-MAP_OUTPUT_JSON = os.path.join(OUTPUT_BASE, "data", "maps.json")
-MAP_FACTIONS_OUTPUT = os.path.join(OUTPUT_BASE, "data", "factions.json")
-MAP_REGIONS_OUTPUT = os.path.join(OUTPUT_BASE, "data", "regions.json")
-MAP_REGIONYIELDS_OUTPUT = os.path.join(OUTPUT_BASE, "data", "regionyields.json")
 
 X4_LANG_CONFIG = {
     '044': {'iso': 'en',    'name': 'English'},
@@ -2700,11 +2729,26 @@ class X4PrecisionLoader:
                 available_languages.append({"code": iso, "name": conf['name'], "x4_id": x4_id})
 
         with open(os.path.join(data_dir, "languages.json"), 'w', encoding='utf-8') as f:
-            json.dump(available_languages, f, indent=2, ensure_ascii=False)   
+            json.dump(available_languages, f, indent=2, ensure_ascii=False)
         print("🎉 全部完成！")
 
-if __name__ == "__main__":
-    loader = X4PrecisionLoader(X4_UNPACKED_DATA_PATH, OUTPUT_BASE, _config)
+
+def parse_args():
+    """解析命令行参数"""
+    parser = argparse.ArgumentParser(description="X4 数据处理脚本")
+    mode_group = parser.add_mutually_exclusive_group()
+    mode_group.add_argument("--all-versions", action="store_true", help="处理配置中的所有版本")
+    mode_group.add_argument("--version", type=str, help="处理指定版本号，例如 8.0 或 9.0")
+    flavor_group = parser.add_mutually_exclusive_group()
+    flavor_group.add_argument("--beta", action="store_true", help="选择 beta 版本")
+    flavor_group.add_argument("--stable", action="store_true", help="选择 stable 版本")
+    return parser.parse_args()
+
+
+def run_for_config(effective_config):
+    """处理单个版本配置"""
+    apply_runtime_config(effective_config)
+    loader = X4PrecisionLoader(X4_UNPACKED_DATA_PATH, OUTPUT_VERSION_DIR, effective_config)
     loader.build_database()
     loader.load_colors()  # 加载颜色定义
     loader.process_module_groups()
@@ -2720,7 +2764,25 @@ if __name__ == "__main__":
     loader.analyze_equipment_types()
     loader.analyze_slot_tags()
     loader.refresh_exported_i18n()
-    loader.inject_english_names() # 新增步骤
+    loader.inject_english_names()  # 新增步骤
     loader.analyze_module_types()
-    loader.generate_res_data() # 新增步骤: 生成资源元数据及缩写
+    loader.generate_res_data()  # 新增步骤：生成资源元数据及缩写
     loader.save()
+
+
+def main():
+    """主函数：支持多版本处理"""
+    args = parse_args()
+    target_versions = get_target_versions(_config, args)
+    print(f"🧭 计划处理 {len(target_versions)} 个版本。")
+    for version_item in target_versions:
+        effective_config = merge_version_config(_config, version_item)
+        version_label = effective_config.get("version")
+        flavor = "beta" if effective_config.get("beta", False) else "stable"
+        folder_name = effective_config.get("folder_name", "")
+        print(f"\n🚀 版本开始：{version_label} ({flavor}) -> {folder_name}")
+        run_for_config(effective_config)
+
+
+if __name__ == "__main__":
+    main()

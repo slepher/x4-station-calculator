@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 from typing import Dict, Optional
 
+from processor.path_utils import get_library_xml, get_map_dir, build_output_paths
 from processor.versioning import load_version_config, merge_version_config
 
 # 加载配置
@@ -48,20 +49,26 @@ def apply_runtime_config(effective_config: Dict[str, object]) -> None:
     global DEFAULT_REGIONYIELD_DEFINITIONS_OUTPUT
     global DEFAULT_RESOURCEAREAS_OUTPUT
 
-    X4_UNPACKED_DATA_PATH = os.path.join(str(effective_config["raw_assets_dir"]), str(effective_config["folder_name"]))
+    base_path = os.path.join(str(effective_config["raw_assets_dir"]), str(effective_config["folder_name"]))
+    X4_UNPACKED_DATA_PATH = base_path
     OUTPUT_VERSION_DIR = os.path.join(str(effective_config["processed_assets_dir"]), str(effective_config["folder_name"]))
-    DEFAULT_MAP_DIR = str(Path(X4_UNPACKED_DATA_PATH) / "maps" / "xu_ep2_universe")
-    DEFAULT_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "maps.json")
-    DEFAULT_MAPDEFAULTS = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "mapdefaults_final.xml")
-    DEFAULT_GOD_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "god_final.xml")
-    DEFAULT_FACTIONS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "factions_final.xml")
-    DEFAULT_COLORS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "colors_final.xml")
-    DEFAULT_REGION_DEFINITIONS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "region_definitions_final.xml")
-    DEFAULT_REGIONOBJECTGROUPS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "regionobjectgroups_final.xml")
-    DEFAULT_REGIONYIELDS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "regionyields_final.xml")
-    DEFAULT_FACTIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "factions.json")
-    DEFAULT_REGIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regions.json")
-    DEFAULT_REGIONYIELDS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regionyields.json")
+
+    # 使用 path_utils 构建库文件路径
+    DEFAULT_MAP_DIR = get_map_dir(base_path, "")  # folder_name 已包含在 base_path 中
+    DEFAULT_MAPDEFAULTS = get_library_xml(base_path, "mapdefaults")
+    DEFAULT_GOD_XML = get_library_xml(base_path, "god")
+    DEFAULT_FACTIONS_XML = get_library_xml(base_path, "factions")
+    DEFAULT_COLORS_XML = get_library_xml(base_path, "colors")
+    DEFAULT_REGION_DEFINITIONS_XML = get_library_xml(base_path, "region_definitions")
+    DEFAULT_REGIONOBJECTGROUPS_XML = get_library_xml(base_path, "regionobjectgroups")
+    DEFAULT_REGIONYIELDS_XML = get_library_xml(base_path, "regionyields")
+
+    # 使用 path_utils 构建输出路径
+    output_paths = build_output_paths(str(effective_config["processed_assets_dir"]), str(effective_config["folder_name"]))
+    DEFAULT_OUTPUT = output_paths["maps"]
+    DEFAULT_FACTIONS_OUTPUT = output_paths["factions"]
+    DEFAULT_REGIONS_OUTPUT = output_paths["regions"]
+    DEFAULT_REGIONYIELDS_OUTPUT = output_paths["regionyields"]
     DEFAULT_REGIONYIELD_DEFINITIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regionyield_definitions.json")
     DEFAULT_RESOURCEAREAS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "resourceareas.json")
 

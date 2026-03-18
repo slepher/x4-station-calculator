@@ -8,6 +8,7 @@ from typing import Dict, List, Optional, Tuple
 
 import xml.etree.ElementTree as ET
 
+from processor.path_utils import get_map_xml_path
 from processor.utils.math_utils import (
     as_float,
     pos_from,
@@ -156,12 +157,12 @@ def generate_map_data(
         })
     registry.collect_many(set(name_id_by_macro.values()))
 
-    galaxy_root = parse_xml(map_dir / "galaxy.xml")
-    cluster_roots = parse_xml_group(map_dir, "clusters.xml")
-    sector_roots = parse_xml_group(map_dir, "sectors.xml")
-    zone_roots = parse_xml_group(map_dir, "zones.xml")
-    zonehighway_roots = parse_xml_group(map_dir, "zonehighways.xml")
-    sechighway_roots = parse_xml_group(map_dir, "sechighways.xml")
+    galaxy_root = parse_xml(get_map_xml_path(str(map_dir), "galaxy"))
+    clusters_root = parse_xml(get_map_xml_path(str(map_dir), "clusters"))
+    sectors_root = parse_xml(get_map_xml_path(str(map_dir), "sectors"))
+    zones_root = parse_xml(get_map_xml_path(str(map_dir), "zones"))
+    zonehighways_root = parse_xml(get_map_xml_path(str(map_dir), "zonehighways"))
+    sechighways_root = parse_xml(get_map_xml_path(str(map_dir), "sechighways"))
 
     clusters: Dict[str, dict] = {}
     sectors: Dict[str, dict] = {}
@@ -197,29 +198,27 @@ def generate_map_data(
             }
 
     sechighway_geometry: Dict[str, dict] = {}
-    for sechighways_root in sechighway_roots:
-        for macro in sechighways_root.findall("./macro[@class='highway']"):
-            highway_id = macro.get("name")
-            if not highway_id:
-                continue
-            entry = pos_from(macro.find("./connections/connection[@ref='entrypoint']"))
-            exitp = pos_from(macro.find("./connections/connection[@ref='exitpoint']"))
-            spline = []
-            for spline_node in macro.findall("./properties/boundaries/boundary[@class='splinetube']/splineposition"):
-                spline.append({
-                    "x": as_float(spline_node.get("x")),
-                    "z": as_float(spline_node.get("z")),
-                    "tx": as_float(spline_node.get("tx")),
-                    "tz": as_float(spline_node.get("tz")),
-                })
-            sechighway_geometry[highway_id] = {
-                "entry_pos": entry,
-                "exit_pos": exitp,
-                "spline": spline,
-            }
+    for macro in sechighways_root.findall("./macro[@class='highway']"):
+        highway_id = macro.get("name")
+        if not highway_id:
+            continue
+        entry = pos_from(macro.find("./connections/connection[@ref='entrypoint']"))
+        exitp = pos_from(macro.find("./connections/connection[@ref='exitpoint']"))
+        spline = []
+        for spline_node in macro.findall("./properties/boundaries/boundary[@class='splinetube']/splineposition"):
+            spline.append({
+                "x": as_float(spline_node.get("x")),
+                "z": as_float(spline_node.get("z")),
+                "tx": as_float(spline_node.get("tx")),
+                "tz": as_float(spline_node.get("tz")),
+            })
+        sechighway_geometry[highway_id] = {
+            "entry_pos": entry,
+            "exit_pos": exitp,
+            "spline": spline,
+        }
     zonehighway_geometry: Dict[str, dict] = {}
-    for zonehighways_root in zonehighway_roots:
-        for macro in zonehighways_root.findall("./macro[@class='highway']"):
+    for macro in zonehighways_root.findall("./macro[@class='highway']"):
             highway_id = macro.get("name")
             if not highway_id:
                 continue
@@ -244,184 +243,182 @@ def generate_map_data(
 
     cluster_sector_offsets: Dict[str, Dict[str, Dict[str, float]]] = defaultdict(dict)
     zone_offsets_by_sector: Dict[str, Dict[str, Dict[str, float]]] = defaultdict(dict)
-    for clusters_root in cluster_roots:
-        for cluster_macro_node in clusters_root.findall("./macro[@class='cluster']"):
-            cluster_macro = cluster_macro_node.get("name")
-            if not cluster_macro:
-                continue
-            if cluster_macro not in clusters:
-                raw_pos = {"x": 0.0, "z": 0.0}
-                axial = cluster_world_to_axial(raw_pos)
-                clusters[cluster_macro] = {
-                    "id": cluster_macro,
-                    "nameId": name_id_by_macro.get(cluster_macro.lower(), ""),
-                    "name": registry.get_name(name_id_by_macro.get(cluster_macro.lower(), ""), "en"),
-                    "owner": "neutral",
-                    "owner_color": OWNER_COLORS.get("neutral", "#94a3b8"),
-                    "raw_pos": raw_pos,
-                    "normalized": {
-                        "axial": axial,
-                        "pixel_basis": axial_to_pixel_flat(axial["q"], axial["r"], 1.0),
-                    },
-                    "sector_ids": [],
-                    "sector_link_ids": [],
-                }
-            for conn in cluster_macro_node.findall("./connections/connection[@ref='sectors']"):
-                macro_node = conn.find("./macro")
-                sector_macro = macro_node.get("ref") if macro_node is not None else None
-                if not sector_macro:
-                    continue
-                raw_local = pos_from(conn)
-                cluster_sector_offsets[cluster_macro][sector_macro] = raw_local
-                if sector_macro not in clusters[cluster_macro]["sector_ids"]:
-                    clusters[cluster_macro]["sector_ids"].append(sector_macro)
-            for conn in cluster_macro_node.findall("./connections/connection[@ref='regions']"):
-                connection_name = (conn.get("name") or "").strip()
-                sector_macro = resolve_sector_macro_from_region_connection(connection_name)
-                if sector_macro is None:
-                    macro_node = conn.find("./macro")
-                    if macro_node is not None:
-                        region_ref_node = macro_node.find("./properties/region")
-                        region_ref = (region_ref_node.get("ref") if region_ref_node is not None else "") or ""
-                        if region_ref:
-                            sector_macro_from_ref = resolve_sector_macro_from_region_ref(region_ref)
-                            if sector_macro_from_ref:
-                                sector_macro = sector_macro_from_ref
-                if sector_macro is None:
-                    continue
-                macro_node = conn.find("./macro")
-                if macro_node is None:
-                    continue
-                region_macro_name = (macro_node.get("name") or "").strip()
-                if not region_macro_name:
-                    continue
-                region_ref_node = macro_node.find("./properties/region")
-                region_ref = (region_ref_node.get("ref") if region_ref_node is not None else "") or ""
-                sector_region_links[sector_macro].append({
-                    "name": region_macro_name,
-                    "region_ref": region_ref,
-                    "cluster_id": cluster_macro,
-                    "sector_id": sector_macro,
-                    "offset": pos3d_from(conn),
-                })
-            for conn in cluster_macro_node.findall("./connections/connection[@ref='sechighways']"):
-                macro_node = conn.find("./macro")
-                highway_macro = (macro_node.get("ref") if macro_node is not None else None)
-                if not highway_macro:
-                    continue
-                endpoint_macros = [m.get("ref") for m in conn.findall("./macro/connections/connection/macro") if m.get("ref")]
-                unique_endpoints: List[str] = []
-                seen_endpoints = set()
-                for endpoint in endpoint_macros:
-                    if endpoint not in seen_endpoints:
-                        unique_endpoints.append(endpoint)
-                        seen_endpoints.add(endpoint)
-                if len(unique_endpoints) < 2:
-                    continue
-                pair: Optional[Tuple[str, str]] = None
-                for idx, left in enumerate(unique_endpoints):
-                    left_match = SHCON_ZONE_RE.fullmatch(left)
-                    if left_match is None:
-                        continue
-                    left_sector = f"Cluster_{int(left_match.group(1)):02d}_Sector{int(left_match.group(2)):03d}_macro"
-                    for right in unique_endpoints[idx + 1:]:
-                        right_match = SHCON_ZONE_RE.fullmatch(right)
-                        if right_match is None:
-                            continue
-                        right_sector = f"Cluster_{int(right_match.group(1)):02d}_Sector{int(right_match.group(2)):03d}_macro"
-                        if left_sector != right_sector:
-                            pair = (left, right)
-                            break
-                    if pair is not None:
-                        break
-                if pair is None:
-                    continue
-                link_id = highway_macro
-                sector_links[link_id] = {
-                    "id": link_id,
-                    "kind": "sector_highway",
-                    "cluster_id": cluster_macro,
-                    "macro": highway_macro,
-                    "raw_local_pos": pos_from(conn),
-                    "zone_a_id": pair[0],
-                    "zone_b_id": pair[1],
-                    "geometry": sechighway_geometry.get(highway_macro, {"entry_pos": {"x": 0.0, "z": 0.0}, "exit_pos": {"x": 0.0, "z": 0.0}, "spline": []}),
-                }
-                if link_id not in clusters[cluster_macro]["sector_link_ids"]:
-                    clusters[cluster_macro]["sector_link_ids"].append(link_id)
-
-    for sectors_root in sector_roots:
-        for sector_macro_node in sectors_root.findall("./macro[@class='sector']"):
-            sector_macro = sector_macro_node.get("name")
+    for cluster_macro_node in clusters_root.findall("./macro[@class='cluster']"):
+        cluster_macro = cluster_macro_node.get("name")
+        if not cluster_macro:
+            continue
+        if cluster_macro not in clusters:
+            raw_pos = {"x": 0.0, "z": 0.0}
+            axial = cluster_world_to_axial(raw_pos)
+            clusters[cluster_macro] = {
+                "id": cluster_macro,
+                "nameId": name_id_by_macro.get(cluster_macro.lower(), ""),
+                "name": registry.get_name(name_id_by_macro.get(cluster_macro.lower(), ""), "en"),
+                "owner": "neutral",
+                "owner_color": OWNER_COLORS.get("neutral", "#94a3b8"),
+                "raw_pos": raw_pos,
+                "normalized": {
+                    "axial": axial,
+                    "pixel_basis": axial_to_pixel_flat(axial["q"], axial["r"], 1.0),
+                },
+                "sector_ids": [],
+                "sector_link_ids": [],
+            }
+        for conn in cluster_macro_node.findall("./connections/connection[@ref='sectors']"):
+            macro_node = conn.find("./macro")
+            sector_macro = macro_node.get("ref") if macro_node is not None else None
             if not sector_macro:
                 continue
-            match = SECTOR_MACRO_RE.fullmatch(sector_macro)
-            cluster_id = f"Cluster_{int(match.group(1)):02d}_macro" if match else None
-            raw_local = cluster_sector_offsets.get(cluster_id or "", {}).get(sector_macro, {"x": 0.0, "z": 0.0})
-            cluster_raw = clusters.get(cluster_id or "", {}).get("raw_pos", {"x": 0.0, "z": 0.0})
-            area = area_by_sector_macro.get(
-                sector_macro.lower(),
-                {"sunlight": 0.0, "economy": 0.0, "security": 0.0, "tags": []},
-            )
-            sectors[sector_macro] = {
-                "id": sector_macro,
-                "cluster_id": cluster_id,
-                "nameId": name_id_by_macro.get(sector_macro.lower(), ""),
-                "name": registry.get_name(name_id_by_macro.get(sector_macro.lower(), ""), "en"),
-                "owner": clusters.get(cluster_id or "", {}).get("owner", "neutral"),
-                "owner_color": OWNER_COLORS.get(clusters.get(cluster_id or "", {}).get("owner", "neutral"), "#94a3b8"),
-                "area": area,
-                "raw_local_pos": raw_local,
-                "raw_world_pos": vec_add(cluster_raw, raw_local),
-                "zone_ids": [],
-                "cluster_gate_ids": [],
-                "highway_ids": [],
+            raw_local = pos_from(conn)
+            cluster_sector_offsets[cluster_macro][sector_macro] = raw_local
+            if sector_macro not in clusters[cluster_macro]["sector_ids"]:
+                clusters[cluster_macro]["sector_ids"].append(sector_macro)
+        for conn in cluster_macro_node.findall("./connections/connection[@ref='regions']"):
+            connection_name = (conn.get("name") or "").strip()
+            sector_macro = resolve_sector_macro_from_region_connection(connection_name)
+            if sector_macro is None:
+                macro_node = conn.find("./macro")
+                if macro_node is not None:
+                    region_ref_node = macro_node.find("./properties/region")
+                    region_ref = (region_ref_node.get("ref") if region_ref_node is not None else "") or ""
+                    if region_ref:
+                        sector_macro_from_ref = resolve_sector_macro_from_region_ref(region_ref)
+                        if sector_macro_from_ref:
+                            sector_macro = sector_macro_from_ref
+            if sector_macro is None:
+                continue
+            macro_node = conn.find("./macro")
+            if macro_node is None:
+                continue
+            region_macro_name = (macro_node.get("name") or "").strip()
+            if not region_macro_name:
+                continue
+            region_ref_node = macro_node.find("./properties/region")
+            region_ref = (region_ref_node.get("ref") if region_ref_node is not None else "") or ""
+            sector_region_links[sector_macro].append({
+                "name": region_macro_name,
+                "region_ref": region_ref,
+                "cluster_id": cluster_macro,
+                "sector_id": sector_macro,
+                "offset": pos3d_from(conn),
+            })
+        for conn in cluster_macro_node.findall("./connections/connection[@ref='sechighways']"):
+            macro_node = conn.find("./macro")
+            highway_macro = (macro_node.get("ref") if macro_node is not None else None)
+            if not highway_macro:
+                continue
+            endpoint_macros = [m.get("ref") for m in conn.findall("./macro/connections/connection/macro") if m.get("ref")]
+            unique_endpoints: List[str] = []
+            seen_endpoints = set()
+            for endpoint in endpoint_macros:
+                if endpoint not in seen_endpoints:
+                    unique_endpoints.append(endpoint)
+                    seen_endpoints.add(endpoint)
+            if len(unique_endpoints) < 2:
+                continue
+            pair: Optional[Tuple[str, str]] = None
+            for idx, left in enumerate(unique_endpoints):
+                left_match = SHCON_ZONE_RE.fullmatch(left)
+                if left_match is None:
+                    continue
+                left_sector = f"Cluster_{int(left_match.group(1)):02d}_Sector{int(left_match.group(2)):03d}_macro"
+                for right in unique_endpoints[idx + 1:]:
+                    right_match = SHCON_ZONE_RE.fullmatch(right)
+                    if right_match is None:
+                        continue
+                    right_sector = f"Cluster_{int(right_match.group(1)):02d}_Sector{int(right_match.group(2)):03d}_macro"
+                    if left_sector != right_sector:
+                        pair = (left, right)
+                        break
+                if pair is not None:
+                    break
+            if pair is None:
+                continue
+            link_id = highway_macro
+            sector_links[link_id] = {
+                "id": link_id,
+                "kind": "sector_highway",
+                "cluster_id": cluster_macro,
+                "macro": highway_macro,
+                "raw_local_pos": pos_from(conn),
+                "zone_a_id": pair[0],
+                "zone_b_id": pair[1],
+                "geometry": sechighway_geometry.get(highway_macro, {"entry_pos": {"x": 0.0, "z": 0.0}, "exit_pos": {"x": 0.0, "z": 0.0}, "spline": []}),
             }
-            for conn in sector_macro_node.findall("./connections/connection[@ref='zones']"):
-                macro_node = conn.find("./macro")
-                zone_macro = macro_node.get("ref") if macro_node is not None else None
-                if not zone_macro:
-                    continue
-                zone_offsets_by_sector[sector_macro][zone_macro] = pos_from(conn)
-                sectors[sector_macro]["zone_ids"].append(zone_macro)
-            for conn in sector_macro_node.findall("./connections/connection[@ref='zonehighways']"):
-                macro_node = conn.find("./macro")
-                highway_macro = macro_node.get("ref") if macro_node is not None else None
-                if not highway_macro:
-                    continue
-                geometry = zonehighway_geometry.get(
-                    highway_macro,
-                    {"entry_pos": {"x": 0.0, "z": 0.0}, "exit_pos": {"x": 0.0, "z": 0.0}, "spline": [], "radius": 0.0},
-                )
-                connection_name = conn.get("name") or highway_macro
-                highway_id = f"{sector_macro}:{connection_name}"
-                instance_offset = pos_from(conn)
-                entry_pos = vec_add(instance_offset, geometry["entry_pos"])
-                exit_pos = vec_add(instance_offset, geometry["exit_pos"])
-                entry_macro = conn.find("./macro/connections/connection[@ref='entrypoint']/macro")
-                exit_macro = conn.find("./macro/connections/connection[@ref='exitpoint']/macro")
-                entry_zone_id = zone_connection_path_to_zone_macro(entry_macro.get("path") if entry_macro is not None else None)
-                exit_zone_id = zone_connection_path_to_zone_macro(exit_macro.get("path") if exit_macro is not None else None)
-                entry_conn = entry_macro.get("connection") if entry_macro is not None else None
-                exit_conn = exit_macro.get("connection") if exit_macro is not None else None
-                sector_highways[highway_id] = {
-                    "id": highway_id,
-                    "kind": "sector_highway",
-                    "sector_id": sector_macro,
-                    "macro": highway_macro,
-                    "name": connection_name,
-                    "from_zone_id": entry_zone_id,
-                    "to_zone_id": exit_zone_id,
-                    "from_zone_connection": entry_conn,
-                    "to_zone_connection": exit_conn,
-                    "instance_offset": instance_offset,
-                    "entry_pos": entry_pos,
-                    "exit_pos": exit_pos,
-                    "spline": [vec_add(instance_offset, {"x": point["x"], "z": point["z"]}) for point in geometry["spline"]],
-                    "radius": geometry["radius"],
-                    "source": "sectors_xml_zonehighways",
-                }
-                sectors[sector_macro]["highway_ids"].append(highway_id)
+            if link_id not in clusters[cluster_macro]["sector_link_ids"]:
+                clusters[cluster_macro]["sector_link_ids"].append(link_id)
+
+    for sector_macro_node in sectors_root.findall("./macro[@class='sector']"):
+        sector_macro = sector_macro_node.get("name")
+        if not sector_macro:
+            continue
+        match = SECTOR_MACRO_RE.fullmatch(sector_macro)
+        cluster_id = f"Cluster_{int(match.group(1)):02d}_macro" if match else None
+        raw_local = cluster_sector_offsets.get(cluster_id or "", {}).get(sector_macro, {"x": 0.0, "z": 0.0})
+        cluster_raw = clusters.get(cluster_id or "", {}).get("raw_pos", {"x": 0.0, "z": 0.0})
+        area = area_by_sector_macro.get(
+            sector_macro.lower(),
+            {"sunlight": 0.0, "economy": 0.0, "security": 0.0, "tags": []},
+        )
+        sectors[sector_macro] = {
+            "id": sector_macro,
+            "cluster_id": cluster_id,
+            "nameId": name_id_by_macro.get(sector_macro.lower(), ""),
+            "name": registry.get_name(name_id_by_macro.get(sector_macro.lower(), ""), "en"),
+            "owner": clusters.get(cluster_id or "", {}).get("owner", "neutral"),
+            "owner_color": OWNER_COLORS.get(clusters.get(cluster_id or "", {}).get("owner", "neutral"), "#94a3b8"),
+            "area": area,
+            "raw_local_pos": raw_local,
+            "raw_world_pos": vec_add(cluster_raw, raw_local),
+            "zone_ids": [],
+            "cluster_gate_ids": [],
+            "highway_ids": [],
+        }
+        for conn in sector_macro_node.findall("./connections/connection[@ref='zones']"):
+            macro_node = conn.find("./macro")
+            zone_macro = macro_node.get("ref") if macro_node is not None else None
+            if not zone_macro:
+                continue
+            zone_offsets_by_sector[sector_macro][zone_macro] = pos_from(conn)
+            sectors[sector_macro]["zone_ids"].append(zone_macro)
+        for conn in sector_macro_node.findall("./connections/connection[@ref='zonehighways']"):
+            macro_node = conn.find("./macro")
+            highway_macro = macro_node.get("ref") if macro_node is not None else None
+            if not highway_macro:
+                continue
+            geometry = zonehighway_geometry.get(
+                highway_macro,
+                {"entry_pos": {"x": 0.0, "z": 0.0}, "exit_pos": {"x": 0.0, "z": 0.0}, "spline": [], "radius": 0.0},
+            )
+            connection_name = conn.get("name") or highway_macro
+            highway_id = f"{sector_macro}:{connection_name}"
+            instance_offset = pos_from(conn)
+            entry_pos = vec_add(instance_offset, geometry["entry_pos"])
+            exit_pos = vec_add(instance_offset, geometry["exit_pos"])
+            entry_macro = conn.find("./macro/connections/connection[@ref='entrypoint']/macro")
+            exit_macro = conn.find("./macro/connections/connection[@ref='exitpoint']/macro")
+            entry_zone_id = zone_connection_path_to_zone_macro(entry_macro.get("path") if entry_macro is not None else None)
+            exit_zone_id = zone_connection_path_to_zone_macro(exit_macro.get("path") if exit_macro is not None else None)
+            entry_conn = entry_macro.get("connection") if entry_macro is not None else None
+            exit_conn = exit_macro.get("connection") if exit_macro is not None else None
+            sector_highways[highway_id] = {
+                "id": highway_id,
+                "kind": "sector_highway",
+                "sector_id": sector_macro,
+                "macro": highway_macro,
+                "name": connection_name,
+                "from_zone_id": entry_zone_id,
+                "to_zone_id": exit_zone_id,
+                "from_zone_connection": entry_conn,
+                "to_zone_connection": exit_conn,
+                "instance_offset": instance_offset,
+                "entry_pos": entry_pos,
+                "exit_pos": exit_pos,
+                "spline": [vec_add(instance_offset, {"x": point["x"], "z": point["z"]}) for point in geometry["spline"]],
+                "radius": geometry["radius"],
+                "source": "sectors_xml_zonehighways",
+            }
+            sectors[sector_macro]["highway_ids"].append(highway_id)
 
     regions_rows: List[dict] = []
     resourceareas_rows: List[dict] = []
@@ -620,8 +617,7 @@ def generate_map_data(
         for sector_id in sectors.keys():
             sectors[sector_id].setdefault("resources", [])
 
-    for zones_root in zone_roots:
-        for zone_macro_node in zones_root.findall("./macro[@class='zone']"):
+    for zone_macro_node in zones_root.findall("./macro[@class='zone']"):
             zone_macro = zone_macro_node.get("name")
             if not zone_macro:
                 continue
@@ -1032,6 +1028,3 @@ def generate_map_data(
     }
 
 
-def parse_xml_group(map_dir: Path, suffix: str) -> List[ET.Element]:
-    """解析 XML 文件组。"""
-    return [parse_xml(path) for path in sorted(map_dir.glob(f"*{suffix}"))]
