@@ -42,9 +42,8 @@ from processor.resource.legacy_processor import (
     calculate_resourcearea_resources,
 )
 from processor.sector.resource_summary import summarize_sector_resources
-from processor.map.writer import (
-    build_boundary,
-    build_falloff,
+from processor.map.converter import build_boundary, build_falloff
+from processor.map.calculator import (
     boundary_volume,
     compute_spline_length,
     calculate_solid_volume_truncated,

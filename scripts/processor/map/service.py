@@ -3,6 +3,7 @@
 提供统一的 Map 数据处理服务，根据版本号自动选择资源模型并执行对应的处理流程。
 """
 
+import json
 from pathlib import Path
 from typing import Dict, Optional, Any, Set
 
@@ -15,7 +16,7 @@ from processor.resource.modern_processor import (
 )
 from processor.resource.legacy_processor import migrate_regionyields
 from processor.map.generator import generate_map_data
-from processor.map.writer import migrate_factions
+from processor.map.converter import migrate_factions
 from processor.output_manager import (
     write_regionyields,
     write_factions,
@@ -24,6 +25,12 @@ from processor.output_manager import (
     write_resourceareas,
     write_regionyield_definitions,
 )
+
+
+def write_map_output(payload: dict, output_path: Path) -> None:
+    """写入地图输出文件。"""
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def process_map_for_version(

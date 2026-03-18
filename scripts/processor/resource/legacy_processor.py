@@ -1,6 +1,5 @@
 """8.0- 传统资源处理模块 - X4 Map Data Processor."""
 
-import math
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -8,25 +7,16 @@ import xml.etree.ElementTree as ET
 
 from processor.utils.xml_utils import parse_xml, parse_xml_attrs
 from processor.utils.data_utils import coerce_attr_value
-from processor.utils.math_utils import (
-    as_float, as_number, round_significant, round_to_int,
-    rgb_to_hex, distance_3d
+from processor.utils.math_utils import as_float, as_number, round_significant, round_to_int, rgb_to_hex, distance_3d
+from processor.map.constants import GAS_BLOCK_SIZE
+from processor.map.calculator import (
+    is_gas_ware,
+    calculate_falloff_factors,
+    boundary_volume,
+    compute_spline_length,
+    calculate_gas_block_count_truncated,
+    calculate_solid_volume_truncated,
 )
-
-# 截断限制（单位：米）
-SOLID_XZ_LIMIT = 256_000       # 256 km
-SOLID_Y_LIMIT = 96_000         # 96 km (总高度 192km)
-GAS_XZ_LIMIT = 256_000         # 256 km
-GAS_Y_LIMIT = 64_000           # 64 km (总高度 128km)
-GAS_BLOCK_SIZE = 64_000        # 64 km 立方体网格
-
-# 体积上限限制
-CYLINDER_RADIUS_LIMIT = 200_000   # 200 km
-CYLINDER_HEIGHT_LIMIT = 80_000    # 80 km
-SPLINETUBE_LENGTH_LIMIT = 1_000_000  # 1000 km
-
-# 气体资源 ware 列表
-GAS_WARES = {"helium", "hydrogen", "methane", "bogas"}
 
 
 def migrate_regionyields(regionyields_xml_path: Path) -> List[dict]:
@@ -269,169 +259,6 @@ def build_region_legacy_resource_map(
             }
         by_name[region_name] = resources
     return by_name
-
-
-def is_gas_ware(ware: str) -> bool:
-    """判断 ware 是否为气体资源"""
-    return ware in GAS_WARES
-
-
-def calculate_falloff_factors(falloff: Optional[dict]) -> Tuple[float, float, float]:
-    """从 falloff 对象计算一元因子"""
-    if not falloff:
-        return (1.0, 1.0, 1.0)
-    lateral_factor = as_number(falloff.get("lateral_factor"), 1.0)
-    radial_factor = as_number(falloff.get("radial_factor"), 1.0)
-    return (lateral_factor, radial_factor, lateral_factor * radial_factor)
-
-
-def boundary_volume(boundary: Optional[dict]) -> float:
-    """计算边界体积（单位：m³）"""
-    if not boundary:
-        return 1.0
-    boundary_class = str(boundary.get("class") or "")
-    size = boundary.get("size") or {}
-    radius = as_number(size.get("r"), 0.0)
-
-    if boundary_class == "sphere":
-        if radius > CYLINDER_RADIUS_LIMIT:
-            return math.pi * (CYLINDER_RADIUS_LIMIT ** 2) * CYLINDER_HEIGHT_LIMIT
-        return (4.0 / 3.0) * math.pi * (radius ** 3)
-
-    if boundary_class == "cylinder":
-        linear = as_number(size.get("linear"), 0.0)
-        r_capped = min(radius, CYLINDER_RADIUS_LIMIT)
-        linear_capped = min(linear, CYLINDER_HEIGHT_LIMIT)
-        return math.pi * (r_capped ** 2) * linear_capped
-
-    if boundary_class == "splinetube":
-        spline = boundary.get("spline") or []
-        length = 0.0
-        for left, right in zip(spline, spline[1:]):
-            length += distance_3d(left, right)
-        r_capped = min(radius, CYLINDER_RADIUS_LIMIT)
-        length_capped = min(length, SPLINETUBE_LENGTH_LIMIT)
-        return math.pi * (r_capped ** 2) * length_capped
-
-    return 1.0
-
-
-def compute_spline_length(boundary: Optional[dict]) -> float:
-    """计算 splinetube 的等效 linear 长度"""
-    if not boundary:
-        return 0.0
-    boundary_class = str(boundary.get("class") or "")
-    if boundary_class != "splinetube":
-        return 0.0
-    spline = boundary.get("spline") or []
-    length = 0.0
-    for left, right in zip(spline, spline[1:]):
-        length += distance_3d(left, right)
-    return length
-
-
-def generate_gas_block_coordinates(
-    region_pos: Dict[str, float],
-    boundary: dict,
-) -> Tuple[List[Tuple[int, int, int]], List[Tuple[int, int, int]]]:
-    """生成气体资源命中的 64km³ 方块坐标列表"""
-    radius = as_number(boundary.get("size", {}).get("r"), 0.0)
-    linear = as_number(boundary.get("size", {}).get("linear"), 0.0)
-    boundary_class = str(boundary.get("class", ""))
-
-    block_half = GAS_BLOCK_SIZE // 2
-    xz_max_blocks = GAS_XZ_LIMIT // GAS_BLOCK_SIZE
-    y_max_blocks = GAS_Y_LIMIT // GAS_BLOCK_SIZE
-
-    total_coords = []
-    effective_coords = []
-
-    for bx in range(-xz_max_blocks - 1, xz_max_blocks + 2):
-        for by in range(-y_max_blocks - 1, y_max_blocks + 2):
-            for bz in range(-xz_max_blocks - 1, xz_max_blocks + 2):
-                block_x = bx * GAS_BLOCK_SIZE
-                block_y = by * GAS_BLOCK_SIZE
-                block_z = bz * GAS_BLOCK_SIZE
-
-                dx = block_x - region_pos.get("x", 0.0)
-                dy = block_y - region_pos.get("y", 0.0)
-                dz = block_z - region_pos.get("z", 0.0)
-
-                if boundary_class == "cylinder":
-                    dist_xz = math.sqrt(dx*dx + dz*dz)
-                    effective_radius = radius + block_half
-
-                    region_y = region_pos.get("y", 0.0)
-                    block_y_min = block_y - block_half
-                    block_y_max = block_y + block_half
-                    cylinder_y_min = region_y - linear
-                    cylinder_y_max = region_y + linear
-
-                    y_overlap = not (block_y_max < cylinder_y_min or block_y_min > cylinder_y_max)
-
-                    in_radius = dist_xz <= effective_radius
-                    in_height = y_overlap
-                else:
-                    dist = math.sqrt(dx*dx + dy*dy + dz*dz)
-                    effective_radius = radius + block_half
-                    in_radius = dist <= effective_radius
-                    in_height = True
-
-                if in_radius and in_height:
-                    total_coords.append((block_x, block_y, block_z))
-                    if (abs(block_x) <= GAS_XZ_LIMIT and
-                        abs(block_z) <= GAS_XZ_LIMIT and
-                        abs(block_y) <= GAS_Y_LIMIT):
-                        effective_coords.append((block_x, block_y, block_z))
-
-    return (total_coords, effective_coords)
-
-
-def calculate_gas_block_count_truncated(
-    region_pos: Dict[str, float],
-    boundary: dict,
-) -> Tuple[int, int]:
-    """计算气体资源命中的 64km³ 方块数量"""
-    total_coords, effective_coords = generate_gas_block_coordinates(region_pos, boundary)
-    return (max(1, len(total_coords)), max(0, len(effective_coords)))
-
-
-def calculate_solid_volume_truncated(boundary: dict) -> Tuple[float, float]:
-    """计算固体资源的有效体积（截断后）"""
-    boundary_class = str(boundary.get("class", ""))
-    size = boundary.get("size", {})
-    radius = as_number(size.get("r"), 0.0)
-
-    if boundary_class == "sphere":
-        total_volume = (4.0 / 3.0) * math.pi * (radius ** 3)
-        capped_radius = min(radius, SOLID_XZ_LIMIT)
-        effective_volume = math.pi * (capped_radius ** 2) * (SOLID_Y_LIMIT * 2)
-        return (total_volume, effective_volume)
-
-    elif boundary_class == "cylinder":
-        linear = as_number(size.get("linear"), 0.0)
-        total_volume = math.pi * (radius ** 2) * linear
-        capped_radius = min(radius, SOLID_XZ_LIMIT)
-        capped_height = min(linear, SOLID_Y_LIMIT * 2)
-        effective_volume = math.pi * (capped_radius ** 2) * capped_height
-        return (total_volume, effective_volume)
-
-    elif boundary_class == "splinetube":
-        spline = boundary.get("spline", [])
-        length = 0.0
-        for i in range(len(spline) - 1):
-            p0 = spline[i]
-            p1 = spline[i + 1]
-            length += distance_3d(p0, p1)
-
-        total_volume = math.pi * (radius ** 2) * length
-        capped_radius = min(radius, SOLID_XZ_LIMIT)
-        capped_length = min(length, SPLINETUBE_LENGTH_LIMIT)
-        effective_volume = math.pi * (capped_radius ** 2) * capped_length
-        return (total_volume, effective_volume)
-
-    else:
-        return (1.0, 1.0)
 
 
 def summarize_region_resources(
