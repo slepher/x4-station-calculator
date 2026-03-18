@@ -139,6 +139,10 @@ class X4PrecisionLoader:
         self.consumables_data = [] # mine, satellite, scanner, countermeasure, etc.
         self.ship_max_stats = {}  # ship class max statistics from defaults.xml
 
+        # 颜色相关数据库（版本专用）
+        self.regionyields_db = {}  # 8.0: ware_id → {effect_r, effect_g, effect_b}
+        self.resource_map_colors = {}  # 9.0: ware_id → {color_id, color_rgb}
+
         # 收集需要翻译的原始名称 (Raw Key)
         self.needed_raw_names = set()
         self.i18n_registry = get_i18n_registry()
@@ -344,6 +348,77 @@ class X4PrecisionLoader:
             # 2. 解析 Mapping 映射 
             self.mappings_db = {m.get('id'): m.get('ref') for m in root.findall(".//mappings/mapping")}
             print(f"   ✅ 加载了 {len(color_defs)} 个颜色定义和 {len(self.mappings_db)} 个映射。")
+        except Exception as e:
+            print(f"   ❌ Colors XML Error: {e}")
+
+    # =======================================================
+    # 1.3 加载 8.0 regionyields 颜色（版本专用）
+    # =======================================================
+    def load_regionyields_colors(self):
+        """8.0 Diplomacy: 从 regionyields/final.xml 提取资源颜色 effect_r/g/b"""
+        print(f"🎨 [1.3/5] 解析 regionyields/final.xml (8.0 颜色)...")
+        regionyields_path = get_library_xml(self.raw_path, "regionyields")
+        if not os.path.exists(regionyields_path):
+            print(f"   ⚠️ 警告：找不到 regionyields 文件：{regionyields_path}")
+            return
+
+        try:
+            tree = ET.parse(regionyields_path)
+            root = tree.getroot()
+
+            for res in root.findall(".//resource"):
+                ware_id = res.get('ware')
+                if ware_id:
+                    r = int(res.get('effect_r', 0))
+                    g = int(res.get('effect_g', 0))
+                    b = int(res.get('effect_b', 0))
+                    self.regionyields_db[ware_id] = {
+                        'r': r,
+                        'g': g,
+                        'b': b,
+                        'color_rgb': f"#{r:02X}{g:02X}{b:02X}"
+                    }
+
+            print(f"   ✅ 加载了 {len(self.regionyields_db)} 个资源颜色 (8.0 regionyields)。")
+        except Exception as e:
+            print(f"   ❌ Regionyields XML Error: {e}")
+
+    # =======================================================
+    # 1.4 加载 9.0 resource_map 颜色映射（版本专用）
+    # =======================================================
+    def load_resource_map_colors(self):
+        """9.0 Empire: 从 colors/final.xml 提取 resource_map_{ware_id} → color → RGB"""
+        print(f"🎨 [1.4/5] 解析 resource_map 映射 (9.0 颜色)...")
+        colors_path = get_library_xml(self.raw_path, "colors")
+        if not os.path.exists(colors_path):
+            print(f"   ⚠️ 警告：找不到颜色定义文件：{colors_path}")
+            return
+
+        try:
+            tree = ET.parse(colors_path)
+            root = tree.getroot()
+
+            # 1. 解析颜色定义
+            color_defs = {}
+            for c in root.findall(".//colors/color"):
+                c_id = c.get('id')
+                r, g, b = int(c.get('r', 0)), int(c.get('g', 0)), int(c.get('b', 0))
+                color_defs[c_id] = f"#{r:02X}{g:02X}{b:02X}"
+
+            # 2. 解析 resource_map_* 映射
+            for m in root.findall(".//mappings/mapping"):
+                mapping_id = m.get('id')
+                if mapping_id and mapping_id.startswith('resource_map_'):
+                    # 提取 ware_id: resource_map_ore → ore
+                    ware_id = mapping_id.replace('resource_map_', '')
+                    color_ref = m.get('ref')
+                    if color_ref and color_ref in color_defs:
+                        self.resource_map_colors[ware_id] = {
+                            'color_id': color_ref,
+                            'color_rgb': color_defs[color_ref]
+                        }
+
+            print(f"   ✅ 加载了 {len(self.resource_map_colors)} 个资源颜色映射 (9.0 resource_map)。")
         except Exception as e:
             print(f"   ❌ Colors XML Error: {e}")
 
@@ -2534,28 +2609,52 @@ class X4PrecisionLoader:
         print(f"   ℹ️  Found {len(t0_wares)} Tier 0 wares.")
 
         res_list = []
-        
+
         for ware in t0_wares:
             w_id = ware['id']
             # Default English name
             en_name = ware.get('name', w_id)
-            
+
             # Construct res.json entry
             # Base entry
             entry = {
                 "id": w_id
             }
 
+            # 3. 添加颜色信息（根据版本选择不同来源）
+            color_info = None
+            if w_id == 'energycells':
+                # energycells 使用手动挑选的颜色
+                if self.regionyields_db:  # 8.0
+                    color_info = {"color_id": "magenta_bright", "color_rgb": "#FF66FF"}
+                elif self.resource_map_colors:  # 9.0
+                    color_info = {"color_id": "magenta_bright", "color_rgb": "#FF66FF"}
+            elif w_id in self.regionyields_db:  # 8.0: 从 regionyields 获取
+                color_info = self.regionyields_db[w_id]
+            elif w_id in self.resource_map_colors:  # 9.0: 从 resource_map 获取
+                color_info = self.resource_map_colors[w_id]
+
+            if color_info:
+                if 'color_id' in color_info:
+                    entry['color'] = color_info['color_id']
+                if 'color_rgb' in color_info:
+                    entry['color_rgb'] = color_info['color_rgb']
+                # 8.0 特有：单独的 r, g, b 字段
+                if 'r' in color_info:
+                    entry['color_r'] = color_info['r']
+                    entry['color_g'] = color_info['g']
+                    entry['color_b'] = color_info['b']
+
             # Process all available languages
             for iso, lang_map in self.i18n_data.items():
                 # Resolve full name first
                 raw_key = ware.get('nameId')
                 full_name = lang_map.get(raw_key, en_name)
-                
+
                 # Assign to res.json field
                 # Use name_{iso} for all languages, no abbreviations
                 entry[f"name_{iso}"] = full_name
-            
+
             res_list.append(entry)
 
         # Write res.json
@@ -2685,6 +2784,8 @@ def run_for_config(effective_config):
     loader = X4PrecisionLoader(X4_UNPACKED_DATA_PATH, OUTPUT_VERSION_DIR, effective_config)
     loader.build_database()
     loader.load_colors()  # 加载颜色定义
+    loader.load_regionyields_colors()  # 8.0: 从 regionyields 加载颜色
+    loader.load_resource_map_colors()  # 9.0: 从 resource_map 加载颜色
     loader.process_module_groups()
     loader.scan_assets()
     loader.parse_ship_and_equipment_data()

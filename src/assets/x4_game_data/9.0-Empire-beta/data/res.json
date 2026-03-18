@@ -1,6 +1,8 @@
 [
   {
     "id": "energycells",
+    "color": "magenta_bright",
+    "color_rgb": "#FF66FF",
     "name_en": "Energy Cells",
     "name_zh-CN": "能量电池",
     "name_zh-TW": "能量電池",
@@ -16,6 +18,8 @@
   },
   {
     "id": "helium",
+    "color": "yellow_dark",
+    "color_rgb": "#B3B300",
     "name_en": "Helium",
     "name_zh-CN": "氦",
     "name_zh-TW": "氦",
@@ -31,6 +35,8 @@
   },
   {
     "id": "hydrogen",
+    "color": "cyan_dark",
+    "color_rgb": "#00AFB3",
     "name_en": "Hydrogen",
     "name_zh-CN": "氢",
     "name_zh-TW": "氫",
@@ -46,6 +52,8 @@
   },
   {
     "id": "ice",
+    "color": "grey_128",
+    "color_rgb": "#808080",
     "name_en": "Ice",
     "name_zh-CN": "冰",
     "name_zh-TW": "冰",
@@ -61,6 +69,8 @@
   },
   {
     "id": "methane",
+    "color": "green_dark",
+    "color_rgb": "#00B300",
     "name_en": "Methane",
     "name_zh-CN": "甲烷",
     "name_zh-TW": "甲烷",
@@ -76,6 +86,8 @@
   },
   {
     "id": "nividium",
+    "color": "magenta_dark",
+    "color_rgb": "#B300B3",
     "name_en": "Nividium",
     "name_zh-CN": "N矿",
     "name_zh-TW": "N礦",
@@ -91,6 +103,8 @@
   },
   {
     "id": "ore",
+    "color": "orange_dark",
+    "color_rgb": "#B36100",
     "name_en": "Ore",
     "name_zh-CN": "金属矿石",
     "name_zh-TW": "金屬礦石",
@@ -136,6 +150,8 @@
   },
   {
     "id": "silicon",
+    "color": "azure_dark",
+    "color_rgb": "#0069B3",
     "name_en": "Silicon",
     "name_zh-CN": "硅",
     "name_zh-TW": "矽",
