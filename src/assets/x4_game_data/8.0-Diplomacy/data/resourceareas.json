@@ -1064,6 +1064,78 @@
     ]
   },
   {
+    "cluster_id": "Cluster_02_macro",
+    "sector_id": "Cluster_02_Sector001_macro",
+    "areas": [
+      {
+        "ref": "region_cluster_02_sector_001b",
+        "amount": 1,
+        "position": {
+          "x": 116213.6171875,
+          "y": 0.0,
+          "z": -156292.671875
+        },
+        "lateral_factor": 1.16,
+        "radial_factor": 0.7155,
+        "falloff_factor": 0.8299,
+        "total_blocks": 2,
+        "blocks": 2,
+        "total_volume_km3": 1766777,
+        "volume_km3": 1017876,
+        "resources": [
+          {
+            "ware": "ore",
+            "resourcedensity": 0.6,
+            "total_yield": 879789,
+            "total_respawn": 29326,
+            "yield": 506864,
+            "respawn": 16895,
+            "delay": 1800.0,
+            "gatherfactor": 1.0,
+            "density": 0.49796,
+            "respawn_density": 0.016599
+          },
+          {
+            "ware": "silicon",
+            "resourcedensity": 0.2,
+            "total_yield": 293263,
+            "total_respawn": 14663,
+            "yield": 168955,
+            "respawn": 8448,
+            "delay": 1200.0,
+            "gatherfactor": 1.0,
+            "density": 0.16599,
+            "respawn_density": 0.0082994
+          },
+          {
+            "ware": "methane",
+            "resourcedensity": 250000.0,
+            "total_yield": 414969,
+            "total_respawn": 5187,
+            "yield": 414969,
+            "respawn": 5187,
+            "delay": 4800.0,
+            "gatherfactor": 4.0,
+            "density": 0.79149,
+            "respawn_density": 0.0098936
+          },
+          {
+            "ware": "helium",
+            "resourcedensity": 15000.0,
+            "total_yield": 24898,
+            "total_respawn": 2490,
+            "yield": 24898,
+            "respawn": 2490,
+            "delay": 600.0,
+            "gatherfactor": 1.0,
+            "density": 0.047489,
+            "respawn_density": 0.0047489
+          }
+        ]
+      }
+    ]
+  },
+  {
     "cluster_id": "Cluster_03_macro",
     "sector_id": "Cluster_03_Sector001_macro",
     "areas": [
@@ -11556,6 +11628,106 @@
             "gatherfactor": 1.0,
             "density": 2.4898e-05,
             "respawn_density": 4.1497e-07
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cluster_id": "Cluster_730_macro",
+    "sector_id": "Cluster_730_Sector001_macro",
+    "areas": [
+      {
+        "ref": "region_cluster_730_sector_001_nebula_1",
+        "amount": 1,
+        "position": {
+          "x": -2000.0,
+          "y": 0.0,
+          "z": -66000.0
+        },
+        "lateral_factor": 1.185,
+        "radial_factor": 0.864,
+        "falloff_factor": 1.0238,
+        "total_blocks": 1,
+        "blocks": 1,
+        "resources": [
+          {
+            "ware": "methane",
+            "resourcedensity": 300.0,
+            "total_yield": 307,
+            "total_respawn": 102,
+            "yield": 307,
+            "respawn": 102,
+            "delay": 180.0,
+            "gatherfactor": 1.0,
+            "density": 0.0011717,
+            "respawn_density": 0.00039055
+          }
+        ]
+      },
+      {
+        "ref": "region_cluster_730_sector_001_asteroids_1",
+        "amount": 1,
+        "position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": -1500.0
+        },
+        "lateral_factor": 0.8,
+        "radial_factor": 0.99,
+        "falloff_factor": 0.792,
+        "total_blocks": 13,
+        "blocks": 13,
+        "total_volume_km3": 94248,
+        "volume_km3": 94248,
+        "resources": [
+          {
+            "ware": "methane",
+            "resourcedensity": 9600.0,
+            "total_yield": 98845,
+            "total_respawn": 9884,
+            "yield": 98845,
+            "respawn": 9884,
+            "delay": 600.0,
+            "gatherfactor": 1.0,
+            "density": 0.029005,
+            "respawn_density": 0.0029005
+          },
+          {
+            "ware": "ore",
+            "resourcedensity": 0.6,
+            "total_yield": 44788,
+            "total_respawn": 1493,
+            "yield": 44788,
+            "respawn": 1493,
+            "delay": 1800.0,
+            "gatherfactor": 1.0,
+            "density": 0.47522,
+            "respawn_density": 0.015841
+          },
+          {
+            "ware": "ice",
+            "resourcedensity": 30.0,
+            "total_yield": 2239403,
+            "total_respawn": 55985,
+            "yield": 2239403,
+            "respawn": 55985,
+            "delay": 2400.0,
+            "gatherfactor": 1.0,
+            "density": 23.761,
+            "respawn_density": 0.59402
+          },
+          {
+            "ware": "nividium",
+            "resourcedensity": 0.0006,
+            "total_yield": 45,
+            "total_respawn": 0,
+            "yield": 45,
+            "respawn": 0,
+            "delay": 7200.0,
+            "gatherfactor": 1.0,
+            "density": 0.00047522,
+            "respawn_density": 3.9601e-06
           }
         ]
       }

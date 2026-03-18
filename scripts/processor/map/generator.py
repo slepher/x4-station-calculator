@@ -275,16 +275,21 @@ def generate_map_data(
                 clusters[cluster_macro]["sector_ids"].append(sector_macro)
         for conn in cluster_macro_node.findall("./connections/connection[@ref='regions']"):
             connection_name = (conn.get("name") or "").strip()
+            # 1. 优先从 connection 名称解析 sector
             sector_macro = resolve_sector_macro_from_region_connection(connection_name)
-            if sector_macro is None:
+            # 2. 如果 connection 名称解析出的 sector 不存在于当前 cluster 中，则使用 region ref 解析
+            cluster_sector_ids = clusters[cluster_macro]["sector_ids"]
+            if sector_macro is None or sector_macro not in cluster_sector_ids:
                 macro_node = conn.find("./macro")
                 if macro_node is not None:
                     region_ref_node = macro_node.find("./properties/region")
                     region_ref = (region_ref_node.get("ref") if region_ref_node is not None else "") or ""
                     if region_ref:
                         sector_macro_from_ref = resolve_sector_macro_from_region_ref(region_ref)
-                        if sector_macro_from_ref:
+                        # 如果 region ref 解析出的 sector 存在于当前 cluster 中，则使用它
+                        if sector_macro_from_ref and sector_macro_from_ref in cluster_sector_ids:
                             sector_macro = sector_macro_from_ref
+            # 3. 如果仍无法解析，则跳过
             if sector_macro is None:
                 continue
             macro_node = conn.find("./macro")
