@@ -2901,22 +2901,40 @@ def generate_map_data(
                         respawn = yield_val * 60.0 / delay
                         entry["respawn"] += respawn * amount
 
-            # 转换 resources
-            resources_list = [
+                # 构建该 area 的 resources 数组（每个 area 单独输出）
+                area_resources = [{
+                    "ware": ware,
+                    "yield": round_to_int(yield_val * amount),
+                    "respawn": round_to_int(respawn * amount),
+                    "delay": delay,
+                    "gatherfactor": factor,
+                    "rating": rating,
+                }]
+
+                # 添加到 resourceareas_rows（新结构：包含 resources 数组）
+                resourceareas_rows.append({
+                    "ref": ref,
+                    "amount": amount,
+                    "resources": area_resources,
+                    "cluster_id": cluster_id,
+                    "sector_id": sector_key,
+                })
+
+            # sector.resources 使用 sector 级聚合结果
+            sector_resources_list = [
                 {
                     "ware": entry["ware"],
-                    "amount": int(entry["amount"]),
-                    "respawn": int(entry["respawn"]),
+                    "yield": round_to_int(entry["yield"]),
+                    "respawn": round_to_int(entry["respawn"]),
                 }
                 for entry in sorted(resources_map.values(), key=lambda x: x["ware"])
             ]
 
-            sectors[sector_key]["resources"] = resources_list
+            sectors[sector_key]["resources"] = sector_resources_list
 
         for sector_key in sectors.keys():
             sectors[sector_key].setdefault("resources", [])
     else:
-        # 8.0- 使用旧版 region 处理逻辑
         resolved_region_definitions_path = region_definitions_xml_path or Path(DEFAULT_REGION_DEFINITIONS_XML)
         resolved_regionobjectgroups_path = regionobjectgroups_xml_path or Path(DEFAULT_REGIONOBJECTGROUPS_XML)
         resolved_regionyields_path = regionyields_xml_path or Path(DEFAULT_REGIONYIELDS_XML)

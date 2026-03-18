@@ -427,6 +427,46 @@ def generate_map_data(
     regions_rows: List[dict] = []
     resourceareas_rows: List[dict] = []
 
+    def aggregate_sector_resources_from_resourceareas() -> Dict[str, List[dict]]:
+        """从 resourceareas_rows 聚合出 sector.resources。"""
+        result: Dict[str, List[dict]] = {}
+        by_sector: Dict[str, Dict[str, dict]] = {}
+
+        for area in resourceareas_rows:
+            sector_id = area.get("sector_id", "")
+            if not sector_id:
+                continue
+
+            amount = area.get("amount", 1)
+            resources = area.get("resources", [])
+            if not resources:
+                continue
+
+            sector_map = by_sector.setdefault(sector_id, {})
+            for res in resources:
+                ware = res.get("ware", "")
+                if not ware:
+                    continue
+                # yield 和 respawn 需要乘以 amount
+                yield_val = res.get("yield", 0) * amount
+                respawn_val = res.get("respawn", 0) * amount
+
+                entry = sector_map.setdefault(ware, {
+                    "ware": ware,
+                    "yield": 0,
+                    "respawn": 0,
+                })
+                entry["yield"] += yield_val
+                entry["respawn"] += respawn_val
+
+        for sector_id, ware_map in by_sector.items():
+            result[sector_id] = [
+                {"ware": e["ware"], "yield": e["yield"], "respawn": e["respawn"]}
+                for e in sorted(ware_map.values(), key=lambda x: x["ware"])
+            ]
+
+        return result
+
     # 根据资源模型选择不同的处理逻辑
     if resource_model == "resourceareas" and sector_resource_areas and definitions:
         # 9.0+ 使用新版资源嵌入逻辑
@@ -436,7 +476,8 @@ def generate_map_data(
 
             cluster_id = sectors[sector_key].get("cluster_id", "")
 
-            resources_map: Dict[str, dict] = {}
+            # sector 级聚合：按 ware 聚合所有 area 的 resources
+            sector_resources_map: Dict[str, dict] = {}
 
             for area in areas:
                 ref = area.get("ref", "")
@@ -450,7 +491,6 @@ def generate_map_data(
                 rating = definition.get("rating", 0.0)
                 yield_val = definition.get("yield", 0.0)
                 delay = definition.get("respawnDelay", 0.0)
-                sustainable = definition.get("sustainableYieldPerHour", 0.0)
 
                 factor = definition.get("objectyieldfactor")
                 if factor is None:
@@ -462,43 +502,46 @@ def generate_map_data(
                 if delay > 0:
                     respawn = yield_val * 60.0 / delay
 
+                # sector 级聚合
+                if ware:
+                    sector_entry = sector_resources_map.setdefault(ware, {
+                        "ware": ware,
+                        "yield": 0.0,
+                        "respawn": 0.0,
+                    })
+                    sector_entry["yield"] += yield_val * amount
+                    sector_entry["respawn"] += respawn * amount
+
+                # 构建该 area 的 resources 数组（每个 area 单独输出）
+                area_resources = [{
+                    "ware": ware,
+                    "yield": round_to_int(yield_val * amount),
+                    "respawn": round_to_int(respawn * amount),
+                    "delay": delay,
+                    "gatherfactor": factor,
+                    "rating": rating,
+                }]
+
+                # 添加到 resourceareas_rows（新结构：包含 resources 数组）
                 resourceareas_rows.append({
                     "ref": ref,
                     "amount": amount,
-                    "ware": ware,
-                    "rating": rating,
-                    "yield": round_to_int(yield_val),
-                    "delay": delay,
-                    "factor": factor,
-                    "respawn": round_to_int(respawn),
+                    "resources": area_resources,
                     "cluster_id": cluster_id,
                     "sector_id": sector_key,
                 })
 
-                if ware:
-                    entry = resources_map.setdefault(ware, {
-                        "ware": ware,
-                        "amount": 0.0,
-                        "respawn": 0.0,
-                    })
-                    entry["amount"] += yield_val * amount
-                    if delay > 0:
-                        respawn = yield_val * 60.0 / delay
-                        entry["respawn"] += respawn * amount
-
-            resources_list = [
+            # sector.resources 使用 sector 级聚合结果
+            sector_resources_list = [
                 {
                     "ware": entry["ware"],
-                    "amount": int(entry["amount"]),
-                    "respawn": int(entry["respawn"]),
+                    "yield": round_to_int(entry["yield"]),
+                    "respawn": round_to_int(entry["respawn"]),
                 }
-                for entry in sorted(resources_map.values(), key=lambda x: x["ware"])
+                for entry in sorted(sector_resources_map.values(), key=lambda x: x["ware"])
             ]
 
-            sectors[sector_key]["resources"] = resources_list
-
-        for sector_key in sectors.keys():
-            sectors[sector_key].setdefault("resources", [])
+            sectors[sector_key]["resources"] = sector_resources_list
     else:
         # 8.0- 使用旧版 region 处理逻辑
         resolved_region_definitions_path = region_definitions_xml_path or Path("")
@@ -641,10 +684,13 @@ def generate_map_data(
                 area_item["sector_id"] = sector_id
                 resourceareas_rows.append(area_item)
 
-            if sector_id in sectors:
-                sectors[sector_id]["resources"] = summarize_sector_resources(sector_region_rows)
+        # 8.0 分支结束后，统一从 resourceareas_rows 聚合 sector.resources
+        sector_resources_map = aggregate_sector_resources_from_resourceareas()
         for sector_id in sectors.keys():
-            sectors[sector_id].setdefault("resources", [])
+            if sector_id in sector_resources_map:
+                sectors[sector_id]["resources"] = sector_resources_map[sector_id]
+            else:
+                sectors[sector_id].setdefault("resources", [])
 
     for zone_macro_node in zones_root.findall("./macro[@class='zone']"):
             zone_macro = zone_macro_node.get("name")

@@ -178,14 +178,6 @@ def build_sector_resource_summaries_from_resourceareas(
     Returns:
         按 sector macro 索引的资源摘要列表
     """
-    TAG_LEVEL_MAP: Dict[str, int] = {
-        "verylow": 1,
-        "low": 2,
-        "medium": 3,
-        "high": 4,
-        "veryhigh": 5,
-    }
-
     summaries: Dict[str, List[dict]] = {}
 
     for sector_macro, areas in sector_resource_areas.items():
@@ -200,38 +192,29 @@ def build_sector_resource_summaries_from_resourceareas(
             if not ware:
                 continue
 
-            tag = definition.get("tag", "medium")
             yield_val = as_float(definition.get("yield"), 0.0)
             respawn_delay = as_float(definition.get("respawnDelay"), 0.0)
-            sustainable_yield = as_float(definition.get("sustainableYieldPerHour"), 0.0)
-            level = TAG_LEVEL_MAP.get(tag, 3)
 
+            respawn = 0.0
+            if respawn_delay > 0:
+                respawn = yield_val * 60.0 / respawn_delay
+
+            # 按 ware 聚合，yield 和 respawn 需要乘以 amount
             entry = by_ware.setdefault(ware, {
                 "ware": ware,
-                "amount": 0,
-                "max_yield": 0.0,
-                "max_level": 0,
-                "max_tag": "",
-                "total_sustainable_yield": 0.0,
+                "yield": 0.0,
+                "respawn": 0.0,
             })
-
-            entry["amount"] += amount
-            if yield_val > entry["max_yield"]:
-                entry["max_yield"] = yield_val
-                entry["max_level"] = level
-                entry["max_tag"] = tag
-            if respawn_delay > 0:
-                entry["total_sustainable_yield"] += sustainable_yield * amount
+            entry["yield"] += yield_val * amount
+            entry["respawn"] += respawn * amount
 
         # 转换为兼容格式
         resources: List[dict] = []
         for ware, entry in sorted(by_ware.items()):
             resources.append({
                 "ware": ware,
-                "yield": entry["max_tag"],
-                "level": entry["max_level"],
-                "totalYield": int(entry["max_yield"] * entry["amount"]),
-                "sustainableYieldPerHour": int(entry["total_sustainable_yield"]),
+                "yield": int(entry["yield"]),
+                "respawn": int(entry["respawn"]),
             })
 
         summaries[sector_macro] = resources
@@ -244,7 +227,7 @@ def build_resourceareas_json_payload(flat_rows: List[dict]) -> List[dict]:
     将扁平的 resourceareas 数组转换为按 cluster_id + sector_id 分组的结构。
 
     Args:
-        flat_rows: 扁平的 resourcearea 记录列表，每条包含 cluster_id, sector_id 等字段
+        flat_rows: 扁平的 resourcearea 记录列表，每条包含 cluster_id, sector_id, resources 等字段
 
     Returns:
         分组后的数组，每组包含 cluster_id, sector_id, areas 三个字段

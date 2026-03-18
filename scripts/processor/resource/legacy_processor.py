@@ -8,6 +8,19 @@ import xml.etree.ElementTree as ET
 from processor.utils.xml_utils import parse_xml, parse_xml_attrs
 from processor.utils.data_utils import coerce_attr_value
 from processor.utils.math_utils import as_float, as_number, round_significant, round_to_int, rgb_to_hex, distance_3d
+
+
+def round_yield_value(value: float) -> int | float:
+    """
+    格式化 yield/respawn 值：
+    - 如果整数部分大于 5 位（>= 100000），则取整
+    - 如果整数部分小于等于 5 位，则保留 5 位有效数字（整数 + 小数）
+    """
+    if value >= 100000:
+        return int(round(value))
+    else:
+        # 保留 5 位有效数字
+        return round(value, 5 - len(str(int(value))) if int(value) > 0 else 5)
 from processor.map.constants import GAS_BLOCK_SIZE
 from processor.map.calculator import (
     is_gas_ware,
@@ -901,10 +914,10 @@ def calculate_resourcearea_resources(
             results.append({
                 "ware": ware,
                 "resourcedensity": resourcedensity,
-                "total_yield": round_to_int(total_yield),
-                "total_respawn": int(round(total_respawn)),
-                "yield": round_to_int(effective_yield),
-                "respawn": int(round(effective_respawn)),
+                "total_yield": round_yield_value(total_yield),
+                "total_respawn": round_yield_value(total_respawn),
+                "yield": round_yield_value(effective_yield),
+                "respawn": round_yield_value(effective_respawn),
                 "delay": replenishtime,
                 "gatherfactor": gatherfactor,
                 "density": round_significant(density),
@@ -933,10 +946,10 @@ def calculate_resourcearea_resources(
             results.append({
                 "ware": ware,
                 "resourcedensity": resourcedensity,
-                "total_yield": round_to_int(total_yield),
-                "total_respawn": int(round(total_respawn)),
-                "yield": round_to_int(effective_yield),
-                "respawn": int(round(effective_respawn)),
+                "total_yield": round_yield_value(total_yield),
+                "total_respawn": round_yield_value(total_respawn),
+                "yield": round_yield_value(effective_yield),
+                "respawn": round_yield_value(effective_respawn),
                 "delay": replenishtime,
                 "gatherfactor": gatherfactor,
                 "density": round_significant(density),
