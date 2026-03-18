@@ -74,6 +74,9 @@ test-results/
 # Worktrees
 worktrees/
 
+# 临时脚本目录
+analysis/tmp_scripts/
+
 
 server-*.log
 pnpm-*.yaml
