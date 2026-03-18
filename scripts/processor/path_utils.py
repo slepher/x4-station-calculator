@@ -23,6 +23,7 @@ LIBRARY_FILES: Dict[str, str] = {
     "factions": "factions",
     "region_definitions": "region_definitions",
     "regionyields": "regionyields",
+    "regionobjectgroups": "regionobjectgroups",
 }
 
 
@@ -69,6 +70,7 @@ def build_paths(raw_assets_dir: str, folder_name: str) -> Dict[str, str]:
         "colors": get_library_xml(base_path, "colors"),
         "region_definitions": get_library_xml(base_path, "region_definitions"),
         "regionyields": get_library_xml(base_path, "regionyields"),
+        "regionobjectgroups": get_library_xml(base_path, "regionobjectgroups"),
         "wares": get_library_xml(base_path, "wares"),
         "waregroups": get_library_xml(base_path, "waregroups"),
         "shipgroups": get_library_xml(base_path, "shipgroups"),

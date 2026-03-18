@@ -10,20 +10,14 @@ from pathlib import Path
 
 try:
     from processor.i18n import get_i18n_registry
-    from processor.path_utils import get_library_xml, build_paths, get_map_dir
+    from processor.path_utils import get_library_xml
     from processor.versioning import get_target_versions, load_version_config, merge_version_config
-    from processor.resource.legacy_processor import migrate_regionyields
-    from processor.map.writer import migrate_factions
-    from processor.map.generator import generate_map_data
-    from processor.output_manager import write_regionyields, write_factions, write_regions, write_map
+    from processor.map.service import process_map_for_version
 except ModuleNotFoundError:
     from scripts.processor.i18n import get_i18n_registry  # type: ignore
-    from scripts.processor.path_utils import get_library_xml, build_paths, get_map_dir  # type: ignore
+    from scripts.processor.path_utils import get_library_xml  # type: ignore
     from scripts.processor.versioning import get_target_versions, load_version_config, merge_version_config  # type: ignore
-    from scripts.processor.resource.legacy_processor import migrate_regionyields  # type: ignore
-    from scripts.processor.map.writer import migrate_factions  # type: ignore
-    from scripts.processor.map.generator import generate_map_data  # type: ignore
-    from scripts.processor.output_manager import write_regionyields, write_factions, write_regions, write_map  # type: ignore
+    from scripts.processor.map.service import process_map_for_version  # type: ignore
 
 # =============================================================================
 # ⚙️ 项目配置
@@ -33,58 +27,18 @@ _config = load_version_config()
 # 全局路径变量（由 apply_runtime_config 填充）
 X4_UNPACKED_DATA_PATH = ""
 OUTPUT_VERSION_DIR = ""
-MAP_DIR = ""
-MAP_DEFAULTS_XML = ""
-MAP_GOD_XML = ""
-MAP_FACTIONS_XML = ""
-MAP_COLORS_XML = ""
-MAP_REGION_DEFINITIONS_XML = ""
-MAP_REGIONOBJECTGROUPS_XML = ""
-MAP_REGIONYIELDS_XML = ""
-MAP_OUTPUT_JSON = ""
-MAP_FACTIONS_OUTPUT = ""
-MAP_REGIONS_OUTPUT = ""
-MAP_REGIONYIELDS_OUTPUT = ""
 
 
 def apply_runtime_config(effective_config):
     """应用运行时配置，设置全局路径变量"""
     global X4_UNPACKED_DATA_PATH
     global OUTPUT_VERSION_DIR
-    global MAP_DIR
-    global MAP_DEFAULTS_XML
-    global MAP_GOD_XML
-    global MAP_FACTIONS_XML
-    global MAP_COLORS_XML
-    global MAP_REGION_DEFINITIONS_XML
-    global MAP_REGIONOBJECTGROUPS_XML
-    global MAP_REGIONYIELDS_XML
-    global MAP_OUTPUT_JSON
-    global MAP_FACTIONS_OUTPUT
-    global MAP_REGIONS_OUTPUT
-    global MAP_REGIONYIELDS_OUTPUT
 
     # 拼接基础路径
     base_path = os.path.join(str(effective_config['raw_assets_dir']), str(effective_config['folder_name']))
     OUTPUT_VERSION_DIR = os.path.join(str(effective_config['processed_assets_dir']), str(effective_config['folder_name']))
 
     X4_UNPACKED_DATA_PATH = base_path
-
-    # 使用 path_utils 构建库文件路径（支持 libraries/{type}/final.xml 格式）
-    MAP_DIR = get_map_dir(base_path, "")  # base_path 已经包含 folder_name，所以传空字符串
-    MAP_DEFAULTS_XML = get_library_xml(base_path, "mapdefaults")
-    MAP_GOD_XML = get_library_xml(base_path, "god")
-    MAP_FACTIONS_XML = get_library_xml(base_path, "factions")
-    MAP_COLORS_XML = get_library_xml(base_path, "colors")
-    MAP_REGION_DEFINITIONS_XML = get_library_xml(base_path, "region_definitions")
-    MAP_REGIONOBJECTGROUPS_XML = get_library_xml(base_path, "regionobjectgroups")
-    MAP_REGIONYIELDS_XML = get_library_xml(base_path, "regionyields")
-
-    # 输出路径
-    MAP_OUTPUT_JSON = str(Path(OUTPUT_VERSION_DIR) / "data" / "maps.json")
-    MAP_FACTIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "factions.json")
-    MAP_REGIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regions.json")
-    MAP_REGIONYIELDS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regionyields.json")
 
 
 def default_version_item(config):
@@ -2212,48 +2166,19 @@ class X4PrecisionLoader:
     def process_map_data(self):
         print(f"\n🗺️ [2.5/5] 生成地图数据并合并 nameId...")
 
-        # 处理 regionyields
-        regionyields_rows = migrate_regionyields(Path(MAP_REGIONYIELDS_XML))
-        write_regionyields(regionyields_rows, MAP_REGIONYIELDS_OUTPUT)
+        # 从 config 获取版本号
+        version_str = str(self.config.get("version", ""))
 
-        # 处理 factions
-        factions_rows, factions_by_id = migrate_factions(
-            factions_xml_path=Path(MAP_FACTIONS_XML),
-            colors_xml_path=Path(MAP_COLORS_XML),
-            i18n_registry=self.i18n_registry,
-        )
-        write_factions(factions_rows, MAP_FACTIONS_OUTPUT)
-
-        # 生成地图数据
-        result = generate_map_data(
-            map_dir=Path(MAP_DIR),
-            mapdefaults_path=Path(MAP_DEFAULTS_XML),
-            god_xml_path=Path(MAP_GOD_XML),
-            factions_by_id=factions_by_id,
-            region_definitions_xml_path=Path(MAP_REGION_DEFINITIONS_XML),
-            regionyields_xml_path=Path(MAP_REGIONYIELDS_XML),
-            i18n_registry=self.i18n_registry,
+        # 调用统一的 Map 处理服务
+        process_map_for_version(
+            raw_assets_dir=X4_UNPACKED_DATA_PATH,
+            processed_assets_dir=OUTPUT_VERSION_DIR,
+            folder_name="",  # base_path 已经包含 folder_name
+            version=version_str,
+            i18n_languages=None,  # 使用默认的 English
         )
 
-        # 输出 regions 和 maps
-        write_regions(result.get("regions", []), MAP_REGIONS_OUTPUT)
-        write_map(result["payload"], MAP_OUTPUT_JSON)
-
-        # 统计信息
-        map_name_ids = set(result.get("name_ids", []))
-        self.needed_raw_names.update(map_name_ids)
-        self.i18n_registry.collect_many(map_name_ids)
-        missing = result.get("missing_name_ids", {})
-        ties = result.get("owner_resolution_ties", [])
-
-        print(f"   ✅ regionyields json: {MAP_REGIONYIELDS_OUTPUT} ({len(regionyields_rows)})")
-        print(f"   ✅ regions json: {MAP_REGIONS_OUTPUT} ({len(result.get('regions', []))})")
-        print(f"   ✅ factions json: {MAP_FACTIONS_OUTPUT} ({len(factions_rows)})")
-        print(f"   ✅ map nameId merged: {len(map_name_ids)}")
-        print(f"   ✅ map json: {MAP_OUTPUT_JSON}")
-        print(f"   ℹ️ owner resolution ties: {len(ties)}")
-        print(f"   ℹ️ map missing cluster nameId: {len(missing.get('clusters', []))}")
-        print(f"   ℹ️ map missing sector nameId: {len(missing.get('sectors', []))}")
+        # 注意：names 收集在服务函数内部通过 registry 完成，此处不需要额外处理
 
     def extract_and_resolve_languages(self):
         print(f"\n🌍 [3/5] 构建翻译数据库...")
