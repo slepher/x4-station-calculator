@@ -5698,6 +5698,70 @@
     <connections>
     </connections>
   </macro>
+  <!--macro name="Zone001_Cluster_103_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate103To104" ref="gates">
+        <offset>
+          <position x="16531.037109375" y="0" z="11018.126953125" />
+          <quaternion qx="0" qy="-0.8660253882" qz="0" qw="0.5" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_103_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone003_Cluster_103_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone005_Cluster_103_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate103To102" ref="gates">
+        <offset>
+          <position x="-33993.94921875" y="0" z="-4520.3627929688" />
+          <quaternion qx="0" qy="0.5" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone004_Cluster_103_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone004_Cluster_105_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection name="connection_ClusterGate105To107" ref="gates">
+        <offset>
+          <position x="22153.9453125" y="0" z="-25904.9375" />
+          <quaternion qx="0" qy="-0.5000000596" qz="0" qw="0.8660253882" />
+        </offset>
+        <macro ref="props_gates_orb_accelerator_01_macro" connection="space" />
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Zone002_Cluster_105_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone005_Cluster_105_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone003_Cluster_105_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro>
+  <macro name="Zone001_Cluster_105_Sector001_macro" class="zone">
+    <component ref="standardzone" />
+    <connections />
+  </macro-->
   <macro name="tzoneCluster_500_Sector001SHCon6_GateZone_macro" class="zone">
     <component ref="standardzone"/>
     <connections>
@@ -5784,12 +5848,24 @@
       <connection ref="SHCon5_gate"/>
     </connections>
   </macro>
+  <!--macro name="tzoneCluster_500_Sector003SHCon6_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon6_gate" />
+    </connections>
+  </macro-->
   <macro name="tzoneCluster_500_Sector003SHCon9_GateZone_macro" class="zone">
     <component ref="standardzone"/>
     <connections>
       <connection ref="SHCon9_gate"/>
     </connections>
   </macro>
+  <!--macro name="tzoneCluster_500_Sector003SHCon10_GateZone_macro" class="zone">
+    <component ref="standardzone" />
+    <connections>
+      <connection ref="SHCon10_gate" />
+    </connections>
+  </macro-->
   <macro name="Zone002_Cluster_500_Sector003_macro" class="zone">
     <component ref="standardzone"/>
     <connections/>

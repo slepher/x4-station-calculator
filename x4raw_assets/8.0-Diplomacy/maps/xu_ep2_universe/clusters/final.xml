@@ -5915,6 +5915,32 @@
       </connection>
     </connections>
   </macro>
+  <!--macro name="Cluster_103_macro" class="cluster">
+    <component ref="standardcluster" />
+    <connections>
+      <connection name="Cluster_103_Sector001_connection" ref="sectors">
+        <macro ref="Cluster_103_Sector001_macro" connection="cluster" />
+      </connection>
+      <connection ref="content">
+        <macro>
+          <component connection="space" ref="Cluster_103" />
+        </macro>
+      </connection>
+    </connections>
+  </macro>
+  <macro name="Cluster_105_macro" class="cluster">
+    <component ref="standardcluster" />
+    <connections>
+      <connection name="Cluster_105_Sector001_connection" ref="sectors">
+        <macro ref="Cluster_105_Sector001_macro" connection="cluster" />
+      </connection>
+      <connection ref="content">
+        <macro>
+          <component connection="space" ref="Cluster_105" />
+        </macro>
+      </connection>
+    </connections>
+  </macro-->
   <macro name="Cluster_500_macro" class="cluster">
     <component ref="standardcluster"/>
     <connections>
