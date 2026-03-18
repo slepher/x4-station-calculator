@@ -1,7 +1,6 @@
 """Map 处理器入口 - X4 Map Data Processor."""
 
 import argparse
-import json
 from pathlib import Path
 from typing import Dict
 
@@ -15,7 +14,15 @@ from processor.resource.modern_processor import (
 )
 from processor.resource.legacy_processor import migrate_regionyields
 from processor.map.generator import generate_map_data
-from processor.map.writer import write_map_output, migrate_factions
+from processor.map.writer import migrate_factions
+from processor.output_manager import (
+    write_regionyields,
+    write_factions,
+    write_regions,
+    write_map,
+    write_resourceareas,
+    write_regionyield_definitions,
+)
 
 
 def run_for_config(args: argparse.Namespace, effective_config: Dict[str, object]) -> None:
@@ -53,8 +60,7 @@ def run_for_config(args: argparse.Namespace, effective_config: Dict[str, object]
         colors_xml_path=colors_xml_path,
         i18n_registry=registry,
     )
-    factions_output_path.parent.mkdir(parents=True, exist_ok=True)
-    factions_output_path.write_text(json.dumps(factions_rows, ensure_ascii=False, indent=2), encoding="utf-8")
+    write_factions(factions_rows, factions_output_path)
 
     # 版本分流：根据资源模型选择不同的处理逻辑
     if resource_model == "resourceareas":
@@ -66,15 +72,11 @@ def run_for_config(args: argparse.Namespace, effective_config: Dict[str, object]
         print(f"📦 解析 sector resourceareas: {len(sector_resource_areas)} 个 sector")
 
         definitions_list = list(definitions.values())
-        regionyield_definitions_output_path.parent.mkdir(parents=True, exist_ok=True)
-        regionyield_definitions_output_path.write_text(
-            json.dumps(definitions_list, ensure_ascii=False, indent=2),
-            encoding="utf-8"
-        )
+        write_regionyield_definitions(definitions_list, regionyield_definitions_output_path)
         print(f"📦 Regionyield Definitions Output: {regionyield_definitions_output_path}")
 
-        regionyields_output_path.parent.mkdir(parents=True, exist_ok=True)
-        regionyields_output_path.write_text("[]", encoding="utf-8")
+        # 9.0+ 不生成 regionyields，写入空数组
+        write_regionyields([], regionyields_output_path)
         print(f"📦 Regionyields Output: {regionyields_output_path} (空数组占位)")
 
         result = generate_map_data(
@@ -92,11 +94,7 @@ def run_for_config(args: argparse.Namespace, effective_config: Dict[str, object]
         )
 
         resourceareas_rows = result.get("resourceareas", [])
-        resourceareas_output_path.parent.mkdir(parents=True, exist_ok=True)
-        resourceareas_output_path.write_text(
-            json.dumps(resourceareas_rows, ensure_ascii=False, indent=2),
-            encoding="utf-8"
-        )
+        write_resourceareas(resourceareas_rows, resourceareas_output_path)
         print(f"📦 Resourceareas Output: {resourceareas_output_path} count={len(resourceareas_rows)}")
 
         print(f"📦 Regions Output: 跳过 (9.0+ 不生成)")
@@ -104,8 +102,7 @@ def run_for_config(args: argparse.Namespace, effective_config: Dict[str, object]
     else:
         # 8.0- 旧版资源模型
         regionyields_rows = migrate_regionyields(regionyields_xml_path)
-        regionyields_output_path.parent.mkdir(parents=True, exist_ok=True)
-        regionyields_output_path.write_text(json.dumps(regionyields_rows, ensure_ascii=False, indent=2), encoding="utf-8")
+        write_regionyields(regionyields_rows, regionyields_output_path)
         print(f"📦 Regionyields Output: {regionyields_output_path} count={len(regionyields_rows)}")
 
         result = generate_map_data(
@@ -122,13 +119,12 @@ def run_for_config(args: argparse.Namespace, effective_config: Dict[str, object]
 
         # 输出 maps.json
         payload = result.get("payload", {})
-        write_map_output(payload, output_path)
+        write_map(payload, output_path)
         print(f"📦 Maps Output: {output_path}")
 
         # 输出 regions.json
         regions_rows = result.get("regions", [])
-        regions_output_path.parent.mkdir(parents=True, exist_ok=True)
-        regions_output_path.write_text(json.dumps(regions_rows, ensure_ascii=False, indent=2), encoding="utf-8")
+        write_regions(regions_rows, regions_output_path)
         print(f"📦 Regions Output: {regions_output_path} count={len(regions_rows)}")
 
 

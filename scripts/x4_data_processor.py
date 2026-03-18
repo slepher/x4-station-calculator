@@ -13,15 +13,17 @@ try:
     from processor.path_utils import get_library_xml, build_paths, get_map_dir
     from processor.versioning import get_target_versions, load_version_config, merge_version_config
     from processor.resource.legacy_processor import migrate_regionyields
-    from processor.map.writer import migrate_factions, write_map_output
+    from processor.map.writer import migrate_factions
     from processor.map.generator import generate_map_data
+    from processor.output_manager import write_regionyields, write_factions, write_regions, write_map
 except ModuleNotFoundError:
     from scripts.processor.i18n import get_i18n_registry  # type: ignore
     from scripts.processor.path_utils import get_library_xml, build_paths, get_map_dir  # type: ignore
     from scripts.processor.versioning import get_target_versions, load_version_config, merge_version_config  # type: ignore
     from scripts.processor.resource.legacy_processor import migrate_regionyields  # type: ignore
-    from scripts.processor.map.writer import migrate_factions, write_map_output  # type: ignore
+    from scripts.processor.map.writer import migrate_factions  # type: ignore
     from scripts.processor.map.generator import generate_map_data  # type: ignore
+    from scripts.processor.output_manager import write_regionyields, write_factions, write_regions, write_map  # type: ignore
 
 # =============================================================================
 # ⚙️ 项目配置
@@ -2209,36 +2211,41 @@ class X4PrecisionLoader:
     # =======================================================
     def process_map_data(self):
         print(f"\n🗺️ [2.5/5] 生成地图数据并合并 nameId...")
-        regionyields_rows = x4_data_map_processor.migrate_regionyields(Path(MAP_REGIONYIELDS_XML))
-        Path(MAP_REGIONYIELDS_OUTPUT).parent.mkdir(parents=True, exist_ok=True)
-        Path(MAP_REGIONYIELDS_OUTPUT).write_text(json.dumps(regionyields_rows, ensure_ascii=False, indent=2), encoding="utf-8")
-        factions_rows, factions_by_id = x4_data_map_processor.migrate_factions(
-            factions_xml_path=Path(MAP_FACTIONS_XML),
-            colors_xml_path=Path(MAP_COLORS_XML),
+
+        # 处理 regionyields
+        regionyields_rows = migrate_regionyields(MAP_REGIONYIELDS_XML)
+        write_regionyields(regionyields_rows, MAP_REGIONYIELDS_OUTPUT)
+
+        # 处理 factions
+        factions_rows, factions_by_id = migrate_factions(
+            factions_xml_path=MAP_FACTIONS_XML,
+            colors_xml_path=MAP_COLORS_XML,
             i18n_registry=self.i18n_registry,
         )
-        Path(MAP_FACTIONS_OUTPUT).parent.mkdir(parents=True, exist_ok=True)
-        Path(MAP_FACTIONS_OUTPUT).write_text(json.dumps(factions_rows, ensure_ascii=False, indent=2), encoding="utf-8")
-        result = x4_data_map_processor.generate_map_data(
-            map_dir=Path(MAP_DIR),
-            mapdefaults_path=Path(MAP_DEFAULTS_XML),
-            god_xml_path=Path(MAP_GOD_XML),
+        write_factions(factions_rows, MAP_FACTIONS_OUTPUT)
+
+        # 生成地图数据
+        result = generate_map_data(
+            map_dir=MAP_DIR,
+            mapdefaults_path=MAP_DEFAULTS_XML,
+            god_xml_path=MAP_GOD_XML,
             factions_by_id=factions_by_id,
-            region_definitions_xml_path=Path(MAP_REGION_DEFINITIONS_XML),
-            regionyields_xml_path=Path(MAP_REGIONYIELDS_XML),
+            region_definitions_xml_path=MAP_REGION_DEFINITIONS_XML,
+            regionyields_xml_path=MAP_REGIONYIELDS_XML,
             i18n_registry=self.i18n_registry,
         )
-        Path(MAP_REGIONS_OUTPUT).parent.mkdir(parents=True, exist_ok=True)
-        Path(MAP_REGIONS_OUTPUT).write_text(
-            json.dumps(result.get("regions", []), ensure_ascii=False, indent=2),
-            encoding="utf-8",
-        )
-        x4_data_map_processor.write_map_output(result["payload"], Path(MAP_OUTPUT_JSON))
+
+        # 输出 regions 和 maps
+        write_regions(result.get("regions", []), MAP_REGIONS_OUTPUT)
+        write_map(result["payload"], MAP_OUTPUT_JSON)
+
+        # 统计信息
         map_name_ids = set(result.get("name_ids", []))
         self.needed_raw_names.update(map_name_ids)
         self.i18n_registry.collect_many(map_name_ids)
         missing = result.get("missing_name_ids", {})
         ties = result.get("owner_resolution_ties", [])
+
         print(f"   ✅ regionyields json: {MAP_REGIONYIELDS_OUTPUT} ({len(regionyields_rows)})")
         print(f"   ✅ regions json: {MAP_REGIONS_OUTPUT} ({len(result.get('regions', []))})")
         print(f"   ✅ factions json: {MAP_FACTIONS_OUTPUT} ({len(factions_rows)})")
