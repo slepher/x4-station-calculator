@@ -28,6 +28,7 @@ class I18nRegistry:
         self._lookup_cache.clear()
         self._resolved_cache.clear()
         self._missing_by_lang.clear()
+        self._collected_name_ids.clear()
 
     def collect(self, name_id: str) -> None:
         if name_id:
