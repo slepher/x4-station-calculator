@@ -14,8 +14,10 @@ except ModuleNotFoundError:
 
 try:
     from processor.i18n import get_i18n_registry
+    from processor.path_utils import get_library_xml, build_paths, get_map_dir
 except ModuleNotFoundError:
     from scripts.processor.i18n import get_i18n_registry  # type: ignore
+    from scripts.processor.path_utils import get_library_xml, build_paths, get_map_dir  # type: ignore
 
 # =============================================================================
 # ⚙️ 项目配置
@@ -50,20 +52,26 @@ if _version_config is None:
 # 将版本配置合并到 _config 顶层
 _config.update(_version_config)
 
-# 考虑 distiller 生成的版本号子目录
-X4_UNPACKED_DATA_PATH = os.path.join(_config['raw_assets_dir'], _config['folder_name'])
-OUTPUT_VERSION_DIR = os.path.join(_config['processed_assets_dir'], _config['folder_name'])
-MAP_OUTPUT_JSON = str(Path(OUTPUT_VERSION_DIR) / "data" / "maps.json")
-MAP_DEFAULTS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "mapdefaults_final.xml")
-MAP_GOD_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "god_final.xml")
-MAP_FACTIONS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "factions_final.xml")
-MAP_COLORS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "colors_final.xml")
-MAP_REGION_DEFINITIONS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "region_definitions_final.xml")
-MAP_REGIONYIELDS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "regionyields_final.xml")
-MAP_FACTIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "factions.json")
-MAP_REGIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regions.json")
-MAP_REGIONYIELDS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regionyields.json")
-MAP_DIR = str(Path(X4_UNPACKED_DATA_PATH) / "maps" / "xu_ep2_universe")
+# 使用 path_utils 构建统一路径
+PATHS = build_paths(_config['raw_assets_dir'], _config['folder_name'])
+OUTPUT_BASE = os.path.join(_config['processed_assets_dir'], _config['folder_name'])
+
+X4_UNPACKED_DATA_PATH = PATHS["base"]
+MAP_DIR = get_map_dir(_config['raw_assets_dir'], _config['folder_name'])
+
+# Libraries XML 路径
+MAP_DEFAULTS_XML = PATHS["mapdefaults"]
+MAP_GOD_XML = PATHS["god"]
+MAP_FACTIONS_XML = PATHS["factions"]
+MAP_COLORS_XML = PATHS["colors"]
+MAP_REGION_DEFINITIONS_XML = PATHS["region_definitions"]
+MAP_REGIONYIELDS_XML = PATHS["regionyields"]
+
+# 输出路径
+MAP_OUTPUT_JSON = os.path.join(OUTPUT_BASE, "data", "maps.json")
+MAP_FACTIONS_OUTPUT = os.path.join(OUTPUT_BASE, "data", "factions.json")
+MAP_REGIONS_OUTPUT = os.path.join(OUTPUT_BASE, "data", "regions.json")
+MAP_REGIONYIELDS_OUTPUT = os.path.join(OUTPUT_BASE, "data", "regionyields.json")
 
 X4_LANG_CONFIG = {
     '044': {'iso': 'en',    'name': 'English'},
@@ -163,7 +171,7 @@ class X4PrecisionLoader:
         # 从配置中提取模块类型原始 Key
         for raw_key in self.config.get('module_types', {}).values():
             self.needed_raw_names.add(raw_key)
-        wares_path = os.path.join(self.raw_path, "libraries", "wares_final.xml")
+        wares_path = get_library_xml(self.raw_path, "wares")
         try:
             tree = ET.parse(wares_path)
             root = tree.getroot()
@@ -330,8 +338,8 @@ class X4PrecisionLoader:
     # 1.2 加载颜色库
     # =======================================================
     def load_colors(self):
-        print(f"🎨 [1.2/5] 解析 colors_final.xml...")
-        colors_path = os.path.join(self.raw_path, "libraries", "colors_final.xml")
+        print(f"🎨 [1.2/5] 解析 colors/final.xml...")
+        colors_path = get_library_xml(self.raw_path, "colors")
         if not os.path.exists(colors_path):
             print(f"   ⚠️ 警告: 找不到颜色定义文件: {colors_path}")
             return 
@@ -387,8 +395,8 @@ class X4PrecisionLoader:
     # 1.5 处理模块分组 (Module Groups - 合并 Waregroups 和 ModuleTypes)
     # =======================================================
     def process_module_groups(self):
-        print(f"📦 [1.5/5] 解析 waregroups_final.xml 并合并配置...")
-        wg_path = os.path.join(self.raw_path, "libraries", "waregroups_final.xml")
+        print(f"📦 [1.5/5] 解析 waregroups/final.xml 并合并配置...")
+        wg_path = get_library_xml(self.raw_path, "waregroups")
         
         # 1. 解析 XML 中的 Waregroups
         if os.path.exists(wg_path):
@@ -858,7 +866,7 @@ class X4PrecisionLoader:
         return int(capacity or 0) > 0
 
     def _load_shipgroups(self):
-        shipgroups_path = os.path.join(self.raw_path, "libraries", "shipgroups_final.xml")
+        shipgroups_path = get_library_xml(self.raw_path, "shipgroups")
         mapping = {}
         if not os.path.exists(shipgroups_path):
             print(f"   ⚠️ 警告: 找不到 shipgroups 文件: {shipgroups_path}")
@@ -979,8 +987,8 @@ class X4PrecisionLoader:
         return mapping
 
     def _load_ship_defaults(self):
-        """加载 defaults_final.xml 中各 ship class 的默认属性"""
-        defaults_path = os.path.join(self.raw_path, "libraries", "defaults_final.xml")
+        """加载 defaults/final.xml 中各 ship class 的默认属性"""
+        defaults_path = get_library_xml(self.raw_path, "defaults")
         mapping = {}
         if not os.path.exists(defaults_path):
             print(f"   ⚠️ 警告: 找不到 defaults 文件: {defaults_path}")
@@ -1022,11 +1030,11 @@ class X4PrecisionLoader:
         return mapping
 
     def _load_ship_max_statistics(self):
-        """加载 defaults.xml 中各 ship class 的最大统计数据 (statistics.max)"""
-        defaults_path = os.path.join(self.raw_path, "libraries", "defaults.xml")
+        """加载 defaults/final.xml 中各 ship class 的最大统计数据 (statistics.max)"""
+        defaults_path = get_library_xml(self.raw_path, "defaults")
         mapping = {}
         if not os.path.exists(defaults_path):
-            print(f"   ⚠️ 警告: 找不到 defaults 文件: {defaults_path}")
+            print(f"   ⚠️ 警告：找不到 defaults 文件：{defaults_path}")
             return mapping
 
         try:
@@ -1183,9 +1191,10 @@ class X4PrecisionLoader:
                 if info:
                     mapping[class_name] = info
 
-            print(f"   ✅ 读取 {len(mapping)} 个 ship class 的最大统计数据。")
         except Exception as e:
             print(f"   ❌ Ship max statistics XML Error: {e}")
+        if mapping:
+            print(f"   ✅ 读取 {len(mapping)} 个 ship class 的最大统计数据。")
         return mapping
 
     def _load_ship_macros(self):
@@ -1287,7 +1296,7 @@ class X4PrecisionLoader:
         return mapping
 
     def _load_loadouts(self, ship_macros, ship_connections):
-        loadouts_path = os.path.join(self.raw_path, "libraries", "loadouts_final.xml")
+        loadouts_path = get_library_xml(self.raw_path, "loadouts")
         mapping = {}
         if not os.path.exists(loadouts_path):
             print(f"   ⚠️ 警告: 找不到 loadouts 文件: {loadouts_path}")
@@ -2695,7 +2704,7 @@ class X4PrecisionLoader:
         print("🎉 全部完成！")
 
 if __name__ == "__main__":
-    loader = X4PrecisionLoader(X4_UNPACKED_DATA_PATH, OUTPUT_VERSION_DIR, _config)
+    loader = X4PrecisionLoader(X4_UNPACKED_DATA_PATH, OUTPUT_BASE, _config)
     loader.build_database()
     loader.load_colors()  # 加载颜色定义
     loader.process_module_groups()

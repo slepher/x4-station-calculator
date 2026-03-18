@@ -10,8 +10,10 @@ from typing import Dict, Iterable, List, Optional, Tuple
 
 try:
     from processor.i18n import get_i18n_registry
+    from processor.path_utils import build_paths, get_map_dir, get_map_xml_path
 except ModuleNotFoundError:
     from scripts.processor.i18n import get_i18n_registry  # type: ignore
+    from scripts.processor.path_utils import build_paths, get_map_dir, get_map_xml_path  # type: ignore
 
 
 config_file = "x4-station-calculator.config.json"
@@ -37,19 +39,26 @@ if _version_config is None:
 # 将版本配置合并到 _config 顶层
 _config.update(_version_config)
 
-X4_UNPACKED_DATA_PATH = os.path.join(_config['raw_assets_dir'], _config['folder_name'])
-OUTPUT_VERSION_DIR = os.path.join(_config['processed_assets_dir'], _config['folder_name'])
-DEFAULT_MAP_DIR = str(Path(X4_UNPACKED_DATA_PATH) / "maps" / "xu_ep2_universe")
-DEFAULT_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "maps.json")
-DEFAULT_MAPDEFAULTS = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "mapdefaults_final.xml")
-DEFAULT_GOD_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "god_final.xml")
-DEFAULT_FACTIONS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "factions_final.xml")
-DEFAULT_COLORS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "colors_final.xml")
-DEFAULT_REGION_DEFINITIONS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "region_definitions_final.xml")
-DEFAULT_REGIONYIELDS_XML = str(Path(X4_UNPACKED_DATA_PATH) / "libraries" / "regionyields_final.xml")
-DEFAULT_FACTIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "factions.json")
-DEFAULT_REGIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regions.json")
-DEFAULT_REGIONYIELDS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regionyields.json")
+# 使用 path_utils 构建统一路径
+PATHS = build_paths(_config['raw_assets_dir'], _config['folder_name'])
+OUTPUT_BASE = os.path.join(_config['processed_assets_dir'], _config['folder_name'])
+
+X4_UNPACKED_DATA_PATH = PATHS["base"]
+DEFAULT_MAP_DIR = get_map_dir(_config['raw_assets_dir'], _config['folder_name'])
+
+# 输入路径（libraries XML）
+DEFAULT_MAPDEFAULTS = PATHS["mapdefaults"]
+DEFAULT_GOD_XML = PATHS["god"]
+DEFAULT_FACTIONS_XML = PATHS["factions"]
+DEFAULT_COLORS_XML = PATHS["colors"]
+DEFAULT_REGION_DEFINITIONS_XML = PATHS["region_definitions"]
+DEFAULT_REGIONYIELDS_XML = PATHS["regionyields"]
+
+# 输出路径
+DEFAULT_OUTPUT = os.path.join(OUTPUT_BASE, "data", "maps.json")
+DEFAULT_FACTIONS_OUTPUT = os.path.join(OUTPUT_BASE, "data", "factions.json")
+DEFAULT_REGIONS_OUTPUT = os.path.join(OUTPUT_BASE, "data", "regions.json")
+DEFAULT_REGIONYIELDS_OUTPUT = os.path.join(OUTPUT_BASE, "data", "regionyields.json")
 
 
 CLUSTER_MACRO_RE = re.compile(r"Cluster_(\d+)_macro", re.IGNORECASE)
@@ -476,10 +485,6 @@ def parse_xml(path: Path) -> ET.Element:
     return ET.parse(path).getroot()
 
 
-def parse_xml_group(map_dir: Path, suffix: str) -> List[ET.Element]:
-    return [parse_xml(path) for path in sorted(map_dir.glob(f"*{suffix}"))]
-
-
 def zone_connection_path_to_zone_macro(path: Optional[str]) -> Optional[str]:
     if not path:
         return None
@@ -505,12 +510,13 @@ def generate_map_data(
         })
     registry.collect_many(set(name_id_by_macro.values()))
 
-    galaxy_root = parse_xml(map_dir / "galaxy.xml")
-    cluster_roots = parse_xml_group(map_dir, "clusters.xml")
-    sector_roots = parse_xml_group(map_dir, "sectors.xml")
-    zone_roots = parse_xml_group(map_dir, "zones.xml")
-    zonehighway_roots = parse_xml_group(map_dir, "zonehighways.xml")
-    sechighway_roots = parse_xml_group(map_dir, "sechighways.xml")
+    # 从 final.xml 读取所有地图数据（distiller 已合并所有数据）
+    galaxy_root = parse_xml(Path(get_map_xml_path(str(map_dir), "galaxy")))
+    cluster_roots = [parse_xml(Path(get_map_xml_path(str(map_dir), "clusters")))]
+    sector_roots = [parse_xml(Path(get_map_xml_path(str(map_dir), "sectors")))]
+    zone_roots = [parse_xml(Path(get_map_xml_path(str(map_dir), "zones")))]
+    zonehighway_roots = [parse_xml(Path(get_map_xml_path(str(map_dir), "zonehighways")))]
+    sechighway_roots = [parse_xml(Path(get_map_xml_path(str(map_dir), "sechighways")))]
 
     clusters: Dict[str, dict] = {}
     sectors: Dict[str, dict] = {}
@@ -599,7 +605,8 @@ def generate_map_data(
             if not cluster_macro:
                 continue
             if cluster_macro not in clusters:
-                raw_pos = galaxy_cluster_positions.get(cluster_macro, {"x": 0.0, "z": 0.0})
+                # Cluster not defined in galaxy.xml, use default position
+                raw_pos = {"x": 0.0, "z": 0.0}
                 axial = cluster_world_to_axial(raw_pos)
                 clusters[cluster_macro] = {
                     "id": cluster_macro,
