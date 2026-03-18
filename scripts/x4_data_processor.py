@@ -2213,25 +2213,25 @@ class X4PrecisionLoader:
         print(f"\n🗺️ [2.5/5] 生成地图数据并合并 nameId...")
 
         # 处理 regionyields
-        regionyields_rows = migrate_regionyields(MAP_REGIONYIELDS_XML)
+        regionyields_rows = migrate_regionyields(Path(MAP_REGIONYIELDS_XML))
         write_regionyields(regionyields_rows, MAP_REGIONYIELDS_OUTPUT)
 
         # 处理 factions
         factions_rows, factions_by_id = migrate_factions(
-            factions_xml_path=MAP_FACTIONS_XML,
-            colors_xml_path=MAP_COLORS_XML,
+            factions_xml_path=Path(MAP_FACTIONS_XML),
+            colors_xml_path=Path(MAP_COLORS_XML),
             i18n_registry=self.i18n_registry,
         )
         write_factions(factions_rows, MAP_FACTIONS_OUTPUT)
 
         # 生成地图数据
         result = generate_map_data(
-            map_dir=MAP_DIR,
-            mapdefaults_path=MAP_DEFAULTS_XML,
-            god_xml_path=MAP_GOD_XML,
+            map_dir=Path(MAP_DIR),
+            mapdefaults_path=Path(MAP_DEFAULTS_XML),
+            god_xml_path=Path(MAP_GOD_XML),
             factions_by_id=factions_by_id,
-            region_definitions_xml_path=MAP_REGION_DEFINITIONS_XML,
-            regionyields_xml_path=MAP_REGIONYIELDS_XML,
+            region_definitions_xml_path=Path(MAP_REGION_DEFINITIONS_XML),
+            regionyields_xml_path=Path(MAP_REGIONYIELDS_XML),
             i18n_registry=self.i18n_registry,
         )
 
