@@ -27,6 +27,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -39,6 +40,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -51,6 +53,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 5.5606,
             "total_respawn": 0.0331,
             "yield": 5.5606,
@@ -87,6 +90,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 283200,
             "total_respawn": 9440.0,
             "yield": 283200,
@@ -122,6 +126,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 81015.0,
             "total_respawn": 4050.7,
             "yield": 50686.0,
@@ -134,6 +139,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 35106.0,
             "total_respawn": 3510.6,
             "yield": 21964.0,
@@ -146,6 +152,7 @@
           {
             "ware": "ice",
             "resourcedensity": 15.0,
+            "yield_name": "medium",
             "total_yield": 20253646,
             "total_respawn": 2025365,
             "yield": 12671602,
@@ -181,6 +188,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 473953,
             "total_respawn": 23698.0,
             "yield": 50686.0,
@@ -193,6 +201,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 205379,
             "total_respawn": 20538.0,
             "yield": 21964.0,
@@ -205,6 +214,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 11848814,
             "total_respawn": 2369763,
             "yield": 1267160,
@@ -240,6 +250,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 5061355,
             "total_respawn": 168712,
             "yield": 506864,
@@ -252,6 +263,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 506136,
             "total_respawn": 25307.0,
             "yield": 50686.0,
@@ -264,6 +276,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 12653388,
             "total_respawn": 2530678,
             "yield": 1267160,
@@ -299,6 +312,7 @@
           {
             "ware": "ore",
             "resourcedensity": 3600.0,
+            "yield_name": "veryhigh",
             "total_yield": 103484,
             "total_respawn": 344.95,
             "yield": 103484,
@@ -335,6 +349,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 132600,
             "total_respawn": 4420.0,
             "yield": 0.0,
@@ -376,6 +391,7 @@
           {
             "ware": "ice",
             "resourcedensity": 15.0,
+            "yield_name": "medium",
             "total_yield": 41705.0,
             "total_respawn": 4170.5,
             "yield": 41705.0,
@@ -412,6 +428,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 283200,
             "total_respawn": 9440.0,
             "yield": 283200,
@@ -448,6 +465,7 @@
           {
             "ware": "helium",
             "resourcedensity": 50000.0,
+            "yield_name": "medhigh",
             "total_yield": 28320.0,
             "total_respawn": 944.0,
             "yield": 28320.0,
@@ -484,6 +502,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 28320.0,
             "total_respawn": 2832.0,
             "yield": 28320.0,
@@ -519,6 +538,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 42692.0,
             "total_respawn": 4269.2,
             "yield": 9256.9,
@@ -531,6 +551,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 98519.0,
             "total_respawn": 4926.0,
             "yield": 21362.0,
@@ -566,6 +587,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 28452.0,
             "total_respawn": 2845.2,
             "yield": 9761.8,
@@ -578,6 +600,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 65659.0,
             "total_respawn": 3282.9,
             "yield": 22527.0,
@@ -613,6 +636,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 34642.0,
             "total_respawn": 3464.2,
             "yield": 9761.8,
@@ -625,6 +649,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 79943.0,
             "total_respawn": 3997.2,
             "yield": 22527.0,
@@ -660,6 +685,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 29162.0,
             "total_respawn": 2916.2,
             "yield": 9761.8,
@@ -672,6 +698,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 67296.0,
             "total_respawn": 3364.8,
             "yield": 22527.0,
@@ -707,6 +734,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 64137.0,
             "total_respawn": 3206.8,
             "yield": 22527.0,
@@ -719,6 +747,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 641370,
             "total_respawn": 21379.0,
             "yield": 225273,
@@ -754,6 +783,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 51056.0,
             "total_respawn": 2552.8,
             "yield": 22527.0,
@@ -766,6 +796,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 510561,
             "total_respawn": 17019.0,
             "yield": 225273,
@@ -801,6 +832,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 79855.0,
             "total_respawn": 7985.5,
             "yield": 9761.8,
@@ -813,6 +845,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 184280,
             "total_respawn": 9214.0,
             "yield": 22527.0,
@@ -850,6 +883,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 41519.0,
             "total_respawn": 4151.9,
             "yield": 0.0,
@@ -862,6 +896,7 @@
           {
             "ware": "rawscrap",
             "resourcedensity": 7.5,
+            "yield_name": "high",
             "total_yield": 6917.1,
             "total_respawn": 98.816,
             "yield": 6917.1,
@@ -903,6 +938,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -915,6 +951,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -927,6 +964,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 5.5606,
             "total_respawn": 0.0331,
             "yield": 5.5606,
@@ -963,6 +1001,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 283200,
             "total_respawn": 9440.0,
             "yield": 283200,
@@ -998,6 +1037,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 71281.0,
             "total_respawn": 3564.0,
             "yield": 22527.0,
@@ -1010,6 +1050,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 71281.0,
             "total_respawn": 3564.0,
             "yield": 22527.0,
@@ -1045,6 +1086,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 72584.0,
             "total_respawn": 3629.2,
             "yield": 22527.0,
@@ -1057,6 +1099,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 72584.0,
             "total_respawn": 3629.2,
             "yield": 22527.0,
@@ -1092,6 +1135,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 73308.0,
             "total_respawn": 3665.4,
             "yield": 22527.0,
@@ -1104,6 +1148,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 73308.0,
             "total_respawn": 3665.4,
             "yield": 22527.0,
@@ -1139,6 +1184,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 83029.0,
             "total_respawn": 4151.5,
             "yield": 22527.0,
@@ -1151,6 +1197,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 83029.0,
             "total_respawn": 4151.5,
             "yield": 22527.0,
@@ -1186,6 +1233,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 713032,
             "total_respawn": 23768.0,
             "yield": 225273,
@@ -1198,6 +1246,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 713032,
             "total_respawn": 23768.0,
             "yield": 225273,
@@ -1233,6 +1282,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 75692.0,
             "total_respawn": 3784.6,
             "yield": 22527.0,
@@ -1245,6 +1295,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 75692.0,
             "total_respawn": 3784.6,
             "yield": 22527.0,
@@ -1288,6 +1339,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 879789,
             "total_respawn": 29326.0,
             "yield": 506864,
@@ -1300,6 +1352,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.2,
+            "yield_name": "lowminus",
             "total_yield": 293263,
             "total_respawn": 14663.0,
             "yield": 168955,
@@ -1312,6 +1365,7 @@
           {
             "ware": "methane",
             "resourcedensity": 250000.0,
+            "yield_name": "high",
             "total_yield": 414969,
             "total_respawn": 5187.1,
             "yield": 414969,
@@ -1324,6 +1378,7 @@
           {
             "ware": "helium",
             "resourcedensity": 15000.0,
+            "yield_name": "medium",
             "total_yield": 24898.0,
             "total_respawn": 2489.8,
             "yield": 24898.0,
@@ -1365,6 +1420,7 @@
           {
             "ware": "ice",
             "resourcedensity": 15.0,
+            "yield_name": "medium",
             "total_yield": 41705.0,
             "total_respawn": 4170.5,
             "yield": 41705.0,
@@ -1400,6 +1456,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -1412,6 +1469,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -1424,6 +1482,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 5.5606,
             "total_respawn": 0.0331,
             "yield": 5.5606,
@@ -1467,6 +1526,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.2,
+            "yield_name": "lowminus",
             "total_yield": 67931008,
             "total_respawn": 3396550,
             "yield": 2188689,
@@ -1479,6 +1539,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 203793023,
             "total_respawn": 6793101,
             "yield": 6566066,
@@ -1491,6 +1552,7 @@
           {
             "ware": "ice",
             "resourcedensity": 0.15,
+            "yield_name": "verylow",
             "total_yield": 50948256,
             "total_respawn": 16982752,
             "yield": 1641516,
@@ -1503,6 +1565,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0006,
+            "yield_name": "medlow",
             "total_yield": 203793,
             "total_respawn": 1698.3,
             "yield": 6566.1,
@@ -1515,6 +1578,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 105500.0,
+            "yield_name": "medplus",
             "total_yield": 102083,
             "total_respawn": 3402.8,
             "yield": 0.0,
@@ -1552,6 +1616,7 @@
           {
             "ware": "ore",
             "resourcedensity": 16.0,
+            "yield_name": "medplus",
             "total_yield": 88969904,
             "total_respawn": 2224248,
             "yield": 88969904,
@@ -1564,6 +1629,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 4.0,
+            "yield_name": "medlow",
             "total_yield": 22242476,
             "total_respawn": 667274,
             "yield": 22242476,
@@ -1576,6 +1642,7 @@
           {
             "ware": "ice",
             "resourcedensity": 0.15,
+            "yield_name": "verylow",
             "total_yield": 834093,
             "total_respawn": 278031,
             "yield": 834093,
@@ -1588,6 +1655,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0006,
+            "yield_name": "medlow",
             "total_yield": 3336.4,
             "total_respawn": 27.803,
             "yield": 3336.4,
@@ -1600,6 +1668,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 3420490,
             "total_respawn": 342049,
             "yield": 3420490,
@@ -1635,6 +1704,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.1,
+            "yield_name": "veryhigh",
             "total_yield": 17.247,
             "total_respawn": 0.02567,
             "yield": 17.247,
@@ -1676,6 +1746,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 68250000,
             "total_respawn": 2275000,
             "yield": 45750000,
@@ -1718,6 +1789,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 283200,
             "total_respawn": 9440.0,
             "yield": 283200,
@@ -1754,6 +1826,7 @@
           {
             "ware": "helium",
             "resourcedensity": 50000.0,
+            "yield_name": "medhigh",
             "total_yield": 28320.0,
             "total_respawn": 944.0,
             "yield": 28320.0,
@@ -1790,6 +1863,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 28320.0,
             "total_respawn": 2832.0,
             "yield": 28320.0,
@@ -1825,6 +1899,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -1837,6 +1912,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -1849,6 +1925,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 5.5606,
             "total_respawn": 0.0331,
             "yield": 5.5606,
@@ -1891,6 +1968,7 @@
           {
             "ware": "helium",
             "resourcedensity": 50000.0,
+            "yield_name": "medhigh",
             "total_yield": 28320.0,
             "total_respawn": 944.0,
             "yield": 28320.0,
@@ -1927,6 +2005,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 283200,
             "total_respawn": 9440.0,
             "yield": 283200,
@@ -1963,6 +2042,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 28320.0,
             "total_respawn": 2832.0,
             "yield": 28320.0,
@@ -2004,6 +2084,7 @@
           {
             "ware": "ore",
             "resourcedensity": 4.0,
+            "yield_name": "medlow",
             "total_yield": 22242476,
             "total_respawn": 667274,
             "yield": 22242476,
@@ -2046,6 +2127,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 13513500,
             "total_respawn": 1351350,
             "yield": 9058500,
@@ -2058,6 +2140,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 1701696,
             "total_respawn": 170170,
             "yield": 980177,
@@ -2070,6 +2153,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0001,
+            "yield_name": "low",
             "total_yield": 6545.0,
             "total_respawn": 77.916,
             "yield": 3769.9,
@@ -2113,6 +2197,7 @@
           {
             "ware": "ore",
             "resourcedensity": 1.8,
+            "yield_name": "lowplus",
             "total_yield": 1019685577,
             "total_respawn": 33989519,
             "yield": 5455193,
@@ -2125,6 +2210,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 4.0,
+            "yield_name": "medlow",
             "total_yield": 2265967949,
             "total_respawn": 67979038,
             "yield": 12122651,
@@ -2137,6 +2223,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 849737981,
             "total_respawn": 169947596,
             "yield": 4545994,
@@ -2149,6 +2236,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0002,
+            "yield_name": "lowplus",
             "total_yield": 113298,
             "total_respawn": 1062.2,
             "yield": 606.13,
@@ -2161,6 +2249,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 6612408,
             "total_respawn": 661241,
             "yield": 2950992,
@@ -2173,6 +2262,7 @@
           {
             "ware": "helium",
             "resourcedensity": 32500.0,
+            "yield_name": "medplus",
             "total_yield": 4341480,
             "total_respawn": 144716,
             "yield": 1937520,
@@ -2185,6 +2275,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 3339600,
             "total_respawn": 333960,
             "yield": 1490400,
@@ -2227,6 +2318,7 @@
           {
             "ware": "helium",
             "resourcedensity": 350000.0,
+            "yield_name": "highest",
             "total_yield": 21429100,
             "total_respawn": 238101,
             "yield": 14345100,
@@ -2269,6 +2361,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 15306500,
             "total_respawn": 510217,
             "yield": 10246500,
@@ -2281,6 +2374,7 @@
           {
             "ware": "methane",
             "resourcedensity": 250000.0,
+            "yield_name": "high",
             "total_yield": 15306500,
             "total_respawn": 191331,
             "yield": 10246500,
@@ -2324,6 +2418,7 @@
           {
             "ware": "ore",
             "resourcedensity": 3.2,
+            "yield_name": "lowextra",
             "total_yield": 489895555145,
             "total_respawn": 15470385952,
             "yield": 844334,
@@ -2336,6 +2431,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 1.8,
+            "yield_name": "lowplus",
             "total_yield": 275566249769,
             "total_respawn": 9185541659,
             "yield": 474938,
@@ -2348,6 +2444,7 @@
           {
             "ware": "ice",
             "resourcedensity": 0.6,
+            "yield_name": "lowminus",
             "total_yield": 91855416590,
             "total_respawn": 18371083318,
             "yield": 158313,
@@ -2360,6 +2457,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 6600.0,
+            "yield_name": "low",
             "total_yield": 511722,
             "total_respawn": 102344,
             "yield": 342557,
@@ -2372,6 +2470,7 @@
           {
             "ware": "helium",
             "resourcedensity": 3000.0,
+            "yield_name": "low",
             "total_yield": 232601,
             "total_respawn": 46520.0,
             "yield": 155708,
@@ -2414,6 +2513,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 3030687,
             "total_respawn": 303069,
             "yield": 2028807,
@@ -2426,6 +2526,7 @@
           {
             "ware": "helium",
             "resourcedensity": 15000.0,
+            "yield_name": "medium",
             "total_yield": 918390,
             "total_respawn": 91839.0,
             "yield": 614790,
@@ -2469,6 +2570,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 8134856,
             "total_respawn": 271162,
             "yield": 4352048,
@@ -2481,6 +2583,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 4.0,
+            "yield_name": "medlow",
             "total_yield": 54232372,
             "total_respawn": 1626971,
             "yield": 29013655,
@@ -2493,6 +2596,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 13558.0,
             "total_respawn": 80.703,
             "yield": 7253.4,
@@ -2505,6 +2609,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 9504173,
             "total_respawn": 950417,
             "yield": 7062734,
@@ -2517,6 +2622,7 @@
           {
             "ware": "helium",
             "resourcedensity": 15000.0,
+            "yield_name": "medium",
             "total_yield": 2880052,
             "total_respawn": 288005,
             "yield": 2140222,
@@ -2529,6 +2635,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 4800088,
             "total_respawn": 480009,
             "yield": 3567038,
@@ -2573,6 +2680,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 0.0,
             "total_respawn": 0.0,
             "yield": 0.0,
@@ -2585,6 +2693,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 0.0,
             "total_respawn": 0.0,
             "yield": 0.0,
@@ -2597,6 +2706,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 0.0,
             "total_respawn": 0.0,
             "yield": 0.0,
@@ -2609,6 +2719,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 49500.0,
             "total_respawn": 4950.0,
             "yield": 49500.0,
@@ -2621,6 +2732,7 @@
           {
             "ware": "helium",
             "resourcedensity": 50000.0,
+            "yield_name": "medhigh",
             "total_yield": 50000.0,
             "total_respawn": 1666.7,
             "yield": 50000.0,
@@ -2633,6 +2745,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 25000.0,
             "total_respawn": 2500.0,
             "yield": 25000.0,
@@ -2676,6 +2789,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 2336779,
             "total_respawn": 77893.0,
             "yield": 1250148,
@@ -2688,6 +2802,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 4.0,
+            "yield_name": "medlow",
             "total_yield": 15578530,
             "total_respawn": 467356,
             "yield": 8334323,
@@ -2700,6 +2815,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 3894.6,
             "total_respawn": 23.182,
             "yield": 2083.6,
@@ -2712,6 +2828,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 2730123,
             "total_respawn": 273012,
             "yield": 2028807,
@@ -2724,6 +2841,7 @@
           {
             "ware": "helium",
             "resourcedensity": 15000.0,
+            "yield_name": "medium",
             "total_yield": 827310,
             "total_respawn": 82731.0,
             "yield": 614790,
@@ -2736,6 +2854,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 1378850,
             "total_respawn": 137885,
             "yield": 1024650,
@@ -2748,6 +2867,7 @@
           {
             "ware": "ice",
             "resourcedensity": 4.0,
+            "yield_name": "lowplus",
             "total_yield": 15578530,
             "total_respawn": 1557853,
             "yield": 8334323,
@@ -2791,6 +2911,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 4768938,
             "total_respawn": 158965,
             "yield": 1250148,
@@ -2803,6 +2924,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 4.0,
+            "yield_name": "medlow",
             "total_yield": 31792918,
             "total_respawn": 953788,
             "yield": 8334323,
@@ -2815,6 +2937,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 7948.2,
             "total_respawn": 47.311,
             "yield": 2083.6,
@@ -2827,6 +2950,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 3030687,
             "total_respawn": 303069,
             "yield": 2028807,
@@ -2839,6 +2963,7 @@
           {
             "ware": "helium",
             "resourcedensity": 15000.0,
+            "yield_name": "medium",
             "total_yield": 918390,
             "total_respawn": 91839.0,
             "yield": 614790,
@@ -2851,6 +2976,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 1530650,
             "total_respawn": 153065,
             "yield": 1024650,
@@ -2894,6 +3020,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 233677945,
             "total_respawn": 7789265,
             "yield": 1250148,
@@ -2906,6 +3033,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 4.0,
+            "yield_name": "medlow",
             "total_yield": 1557852965,
             "total_respawn": 46735589,
             "yield": 8334323,
@@ -2918,6 +3046,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 389463,
             "total_respawn": 2318.2,
             "yield": 2083.6,
@@ -2930,6 +3059,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 584194862,
             "total_respawn": 116838972,
             "yield": 3125371,
@@ -2942,6 +3072,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 15306500,
             "total_respawn": 510217,
             "yield": 10246500,
@@ -2954,6 +3085,7 @@
           {
             "ware": "helium",
             "resourcedensity": 50000.0,
+            "yield_name": "medhigh",
             "total_yield": 3061300,
             "total_respawn": 102043,
             "yield": 2049300,
@@ -2966,6 +3098,7 @@
           {
             "ware": "methane",
             "resourcedensity": 125000.0,
+            "yield_name": "medhigh",
             "total_yield": 7653250,
             "total_respawn": 255108,
             "yield": 5123250,
@@ -3008,6 +3141,7 @@
           {
             "ware": "helium",
             "resourcedensity": 130000.0,
+            "yield_name": "high",
             "total_yield": 147264,
             "total_respawn": 2454.4,
             "yield": 147264,
@@ -3044,6 +3178,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 283200,
             "total_respawn": 9440.0,
             "yield": 283200,
@@ -3079,6 +3214,7 @@
           {
             "ware": "ice",
             "resourcedensity": 15.0,
+            "yield_name": "medium",
             "total_yield": 41705.0,
             "total_respawn": 4170.5,
             "yield": 41705.0,
@@ -3115,6 +3251,7 @@
           {
             "ware": "methane",
             "resourcedensity": 375000.0,
+            "yield_name": "highplus",
             "total_yield": 637200,
             "total_respawn": 7965.0,
             "yield": 637200,
@@ -3158,6 +3295,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.2,
+            "yield_name": "lowminus",
             "total_yield": 57368.0,
             "total_respawn": 2868.4,
             "yield": 29756.0,
@@ -3170,6 +3308,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 17210.0,
             "total_respawn": 860.52,
             "yield": 8926.9,
@@ -3182,6 +3321,7 @@
           {
             "ware": "ice",
             "resourcedensity": 15.0,
+            "yield_name": "medium",
             "total_yield": 4302622,
             "total_respawn": 430262,
             "yield": 2231725,
@@ -3194,6 +3334,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 286.84,
             "total_respawn": 1.7074,
             "yield": 148.78,
@@ -3206,6 +3347,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 36629.0,
             "total_respawn": 3662.9,
             "yield": 36629.0,
@@ -3241,6 +3383,7 @@
           {
             "ware": "ore",
             "resourcedensity": 3600.0,
+            "yield_name": "veryhigh",
             "total_yield": 103484,
             "total_respawn": 344.95,
             "yield": 103484,
@@ -3282,6 +3425,7 @@
           {
             "ware": "ice",
             "resourcedensity": 15.0,
+            "yield_name": "medium",
             "total_yield": 41705.0,
             "total_respawn": 4170.5,
             "yield": 41705.0,
@@ -3318,6 +3462,7 @@
           {
             "ware": "helium",
             "resourcedensity": 50000.0,
+            "yield_name": "medhigh",
             "total_yield": 28320.0,
             "total_respawn": 944.0,
             "yield": 28320.0,
@@ -3354,6 +3499,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 28320.0,
             "total_respawn": 2832.0,
             "yield": 28320.0,
@@ -3390,6 +3536,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 283200,
             "total_respawn": 9440.0,
             "yield": 283200,
@@ -3431,6 +3578,7 @@
           {
             "ware": "ice",
             "resourcedensity": 15.0,
+            "yield_name": "medium",
             "total_yield": 41705.0,
             "total_respawn": 4170.5,
             "yield": 41705.0,
@@ -3466,6 +3614,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -3478,6 +3627,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -3490,6 +3640,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 5.5606,
             "total_respawn": 0.0331,
             "yield": 5.5606,
@@ -3533,6 +3684,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 21739552,
             "total_respawn": 724652,
             "yield": 4709829,
@@ -3545,6 +3697,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 21739552,
             "total_respawn": 724652,
             "yield": 4709829,
@@ -3557,6 +3710,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 9134287,
             "total_respawn": 913429,
             "yield": 6114688,
@@ -3599,6 +3753,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 314159265,
             "total_respawn": 10471976,
             "yield": 23718230,
@@ -3611,6 +3766,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 314159265,
             "total_respawn": 10471976,
             "yield": 23718230,
@@ -3623,6 +3779,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 523599,
             "total_respawn": 3116.7,
             "yield": 39530.0,
@@ -3635,6 +3792,7 @@
           {
             "ware": "methane",
             "resourcedensity": 125000.0,
+            "yield_name": "medhigh",
             "total_yield": 75625000,
             "total_respawn": 2520833,
             "yield": 30375000,
@@ -3676,6 +3834,7 @@
           {
             "ware": "ice",
             "resourcedensity": 15.0,
+            "yield_name": "medium",
             "total_yield": 41705.0,
             "total_respawn": 4170.5,
             "yield": 41705.0,
@@ -3712,6 +3871,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 283200,
             "total_respawn": 9440.0,
             "yield": 283200,
@@ -3747,6 +3907,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -3759,6 +3920,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -3771,6 +3933,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 5.5606,
             "total_respawn": 0.0331,
             "yield": 5.5606,
@@ -3807,6 +3970,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 28320.0,
             "total_respawn": 2832.0,
             "yield": 28320.0,
@@ -3843,6 +4007,7 @@
           {
             "ware": "helium",
             "resourcedensity": 50000.0,
+            "yield_name": "medhigh",
             "total_yield": 28320.0,
             "total_respawn": 944.0,
             "yield": 28320.0,
@@ -3885,6 +4050,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 28320.0,
             "total_respawn": 2832.0,
             "yield": 28320.0,
@@ -3921,6 +4087,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 283200,
             "total_respawn": 9440.0,
             "yield": 283200,
@@ -3957,6 +4124,7 @@
           {
             "ware": "helium",
             "resourcedensity": 50000.0,
+            "yield_name": "medhigh",
             "total_yield": 28320.0,
             "total_respawn": 944.0,
             "yield": 28320.0,
@@ -3992,6 +4160,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -4004,6 +4173,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -4016,6 +4186,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 5.5606,
             "total_respawn": 0.0331,
             "yield": 5.5606,
@@ -4058,6 +4229,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 28320.0,
             "total_respawn": 2832.0,
             "yield": 28320.0,
@@ -4093,6 +4265,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -4105,6 +4278,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -4117,6 +4291,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 5.5606,
             "total_respawn": 0.0331,
             "yield": 5.5606,
@@ -4153,6 +4328,7 @@
           {
             "ware": "helium",
             "resourcedensity": 50000.0,
+            "yield_name": "medhigh",
             "total_yield": 28320.0,
             "total_respawn": 944.0,
             "yield": 28320.0,
@@ -4189,6 +4365,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 283200,
             "total_respawn": 9440.0,
             "yield": 283200,
@@ -4230,6 +4407,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -4242,6 +4420,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -4254,6 +4433,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 5.5606,
             "total_respawn": 0.0331,
             "yield": 5.5606,
@@ -4291,6 +4471,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 369539,
             "total_respawn": 36954.0,
             "yield": 369539,
@@ -4303,6 +4484,7 @@
           {
             "ware": "rawscrap",
             "resourcedensity": 1.5,
+            "yield_name": "medium",
             "total_yield": 319818,
             "total_respawn": 7995.5,
             "yield": 319818,
@@ -4344,6 +4526,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 1689838,
             "total_respawn": 42246.0,
             "yield": 1689838,
@@ -4356,6 +4539,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 1689838,
             "total_respawn": 42246.0,
             "yield": 1689838,
@@ -4398,6 +4582,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 28320.0,
             "total_respawn": 2832.0,
             "yield": 28320.0,
@@ -4434,6 +4619,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 283200,
             "total_respawn": 9440.0,
             "yield": 283200,
@@ -4470,6 +4656,7 @@
           {
             "ware": "helium",
             "resourcedensity": 50000.0,
+            "yield_name": "medhigh",
             "total_yield": 28320.0,
             "total_respawn": 944.0,
             "yield": 28320.0,
@@ -4505,6 +4692,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -4517,6 +4705,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -4529,6 +4718,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 5.5606,
             "total_respawn": 0.0331,
             "yield": 5.5606,
@@ -4564,6 +4754,7 @@
           {
             "ware": "ice",
             "resourcedensity": 15.0,
+            "yield_name": "medium",
             "total_yield": 41705.0,
             "total_respawn": 4170.5,
             "yield": 41705.0,
@@ -4605,6 +4796,7 @@
           {
             "ware": "rawscrap",
             "resourcedensity": 1.5,
+            "yield_name": "medium",
             "total_yield": 23182.0,
             "total_respawn": 579.55,
             "yield": 23182.0,
@@ -4642,6 +4834,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 83409285,
             "total_respawn": 2780309,
             "yield": 3498439,
@@ -4654,6 +4847,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 83409285,
             "total_respawn": 2780309,
             "yield": 3498439,
@@ -4666,6 +4860,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 6784906,
             "total_respawn": 678491,
             "yield": 4541962,
@@ -4709,6 +4904,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 834092850,
             "total_respawn": 20852321,
             "yield": 34984390,
@@ -4721,6 +4917,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 834092850,
             "total_respawn": 20852321,
             "yield": 34984390,
@@ -4733,6 +4930,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 6784906,
             "total_respawn": 678491,
             "yield": 4541962,
@@ -4776,6 +4974,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 300273426,
             "total_respawn": 7506836,
             "yield": 34984390,
@@ -4788,6 +4987,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.01,
+            "yield_name": "high",
             "total_yield": 500456,
             "total_respawn": 1489.5,
             "yield": 58307.0,
@@ -4800,6 +5000,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 6784906,
             "total_respawn": 678491,
             "yield": 4541962,
@@ -4843,6 +5044,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 300273426,
             "total_respawn": 7506836,
             "yield": 34984390,
@@ -4855,6 +5057,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 300273426,
             "total_respawn": 7506836,
             "yield": 34984390,
@@ -4867,6 +5070,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.01,
+            "yield_name": "high",
             "total_yield": 500456,
             "total_respawn": 1489.5,
             "yield": 58307.0,
@@ -4879,6 +5083,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 6784906,
             "total_respawn": 678491,
             "yield": 4541962,
@@ -4921,6 +5126,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 28320.0,
             "total_respawn": 2832.0,
             "yield": 28320.0,
@@ -4957,6 +5163,7 @@
           {
             "ware": "helium",
             "resourcedensity": 50000.0,
+            "yield_name": "medhigh",
             "total_yield": 28320.0,
             "total_respawn": 944.0,
             "yield": 28320.0,
@@ -4993,6 +5200,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 283200,
             "total_respawn": 9440.0,
             "yield": 283200,
@@ -5030,6 +5238,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 870856,
             "total_respawn": 21771.0,
             "yield": 870856,
@@ -5042,6 +5251,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 870856,
             "total_respawn": 21771.0,
             "yield": 870856,
@@ -5054,6 +5264,7 @@
           {
             "ware": "methane",
             "resourcedensity": 250000.0,
+            "yield_name": "high",
             "total_yield": 516527,
             "total_respawn": 6456.6,
             "yield": 516527,
@@ -5091,6 +5302,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 731880,
             "total_respawn": 18297.0,
             "yield": 731880,
@@ -5103,6 +5315,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 73188.0,
             "total_respawn": 2439.6,
             "yield": 73188.0,
@@ -5115,6 +5328,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 182970,
             "total_respawn": 36594.0,
             "yield": 182970,
@@ -5127,6 +5341,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 121.98,
             "total_respawn": 0.72607,
             "yield": 121.98,
@@ -5139,6 +5354,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 36629.0,
             "total_respawn": 3662.9,
             "yield": 36629.0,
@@ -5182,6 +5398,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 1155675,
             "total_respawn": 28892.0,
             "yield": 1155675,
@@ -5194,6 +5411,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 1155675,
             "total_respawn": 28892.0,
             "yield": 1155675,
@@ -5206,6 +5424,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 288919,
             "total_respawn": 57784.0,
             "yield": 288919,
@@ -5218,6 +5437,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 192.61,
             "total_respawn": 1.1465,
             "yield": 192.61,
@@ -5230,6 +5450,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 21243.0,
             "total_respawn": 2124.3,
             "yield": 21243.0,
@@ -5267,6 +5488,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 4917.1,
             "total_respawn": 491.71,
             "yield": 4917.1,
@@ -5279,6 +5501,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 4917.1,
             "total_respawn": 491.71,
             "yield": 4917.1,
@@ -5291,6 +5514,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 283676,
             "total_respawn": 56735.0,
             "yield": 283676,
@@ -5303,6 +5527,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.01,
+            "yield_name": "high",
             "total_yield": 1891.2,
             "total_respawn": 5.6285,
             "yield": 1891.2,
@@ -5315,6 +5540,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 21243.0,
             "total_respawn": 2124.3,
             "yield": 21243.0,
@@ -5351,6 +5577,7 @@
           {
             "ware": "helium",
             "resourcedensity": 130000.0,
+            "yield_name": "high",
             "total_yield": 147264,
             "total_respawn": 2454.4,
             "yield": 147264,
@@ -5393,6 +5620,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 28320.0,
             "total_respawn": 2832.0,
             "yield": 28320.0,
@@ -5428,6 +5656,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -5440,6 +5669,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33364.0,
             "total_respawn": 834.09,
             "yield": 33364.0,
@@ -5452,6 +5682,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 5.5606,
             "total_respawn": 0.0331,
             "yield": 5.5606,
@@ -5488,6 +5719,7 @@
           {
             "ware": "helium",
             "resourcedensity": 50000.0,
+            "yield_name": "medhigh",
             "total_yield": 28320.0,
             "total_respawn": 944.0,
             "yield": 28320.0,
@@ -5523,6 +5755,7 @@
           {
             "ware": "ice",
             "resourcedensity": 15.0,
+            "yield_name": "medium",
             "total_yield": 41705.0,
             "total_respawn": 4170.5,
             "yield": 41705.0,
@@ -5559,6 +5792,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 283200,
             "total_respawn": 9440.0,
             "yield": 283200,
@@ -5594,6 +5828,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 271254,
             "total_respawn": 13563.0,
             "yield": 271254,
@@ -5606,6 +5841,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 271254,
             "total_respawn": 13563.0,
             "yield": 271254,
@@ -5618,6 +5854,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 4520.9,
             "total_respawn": 26.91,
             "yield": 4520.9,
@@ -5659,6 +5896,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 33363714,
             "total_respawn": 834093,
             "yield": 33363714,
@@ -5694,6 +5932,7 @@
           {
             "ware": "rawscrap",
             "resourcedensity": 7.5,
+            "yield_name": "high",
             "total_yield": 13057.0,
             "total_respawn": 186.54,
             "yield": 13057.0,
@@ -5737,6 +5976,7 @@
           {
             "ware": "ore",
             "resourcedensity": 4.0,
+            "yield_name": "medlow",
             "total_yield": 44484952,
             "total_respawn": 1334549,
             "yield": 44484952,
@@ -5749,6 +5989,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 66727428,
             "total_respawn": 1668186,
             "yield": 66727428,
@@ -5761,6 +6002,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 11121.0,
             "total_respawn": 66.198,
             "yield": 11121.0,
@@ -5773,6 +6015,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 6840979,
             "total_respawn": 684098,
             "yield": 5130734,
@@ -5808,6 +6051,7 @@
           {
             "ware": "rawscrap",
             "resourcedensity": 7.5,
+            "yield_name": "high",
             "total_yield": 13057.0,
             "total_respawn": 186.54,
             "yield": 13057.0,
@@ -5851,6 +6095,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 1595300,
             "total_respawn": 39882.0,
             "yield": 1595300,
@@ -5863,6 +6108,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 4.0,
+            "yield_name": "medlow",
             "total_yield": 1063533,
             "total_respawn": 31906.0,
             "yield": 1063533,
@@ -5875,6 +6121,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 22348.0,
             "total_respawn": 2234.8,
             "yield": 22348.0,
@@ -5918,6 +6165,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 33594.0,
             "total_respawn": 3359.4,
             "yield": 33594.0,
@@ -5930,6 +6178,7 @@
           {
             "ware": "rawscrap",
             "resourcedensity": 1.5,
+            "yield_name": "medium",
             "total_yield": 799.55,
             "total_respawn": 19.989,
             "yield": 799.55,
@@ -5967,6 +6216,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 75490.0,
             "total_respawn": 7549.0,
             "yield": 75490.0,
@@ -5979,6 +6229,7 @@
           {
             "ware": "rawscrap",
             "resourcedensity": 1.5,
+            "yield_name": "medium",
             "total_yield": 32340.0,
             "total_respawn": 808.5,
             "yield": 32340.0,
@@ -6022,6 +6273,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 886486,
             "total_respawn": 88649.0,
             "yield": 545530,
@@ -6034,6 +6286,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 324589,
             "total_respawn": 10820.0,
             "yield": 324589,
@@ -6046,6 +6299,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 1.8,
+            "yield_name": "lowplus",
             "total_yield": 973768,
             "total_respawn": 32459.0,
             "yield": 973768,
@@ -6058,6 +6312,7 @@
           {
             "ware": "ice",
             "resourcedensity": 15.0,
+            "yield_name": "medium",
             "total_yield": 8114734,
             "total_respawn": 811473,
             "yield": 8114734,
@@ -6101,6 +6356,7 @@
           {
             "ware": "ore",
             "resourcedensity": 1.8,
+            "yield_name": "lowplus",
             "total_yield": 48509744,
             "total_respawn": 1616991,
             "yield": 5651795,
@@ -6113,6 +6369,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 16169915,
             "total_respawn": 538997,
             "yield": 1883932,
@@ -6125,6 +6382,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 4567143,
             "total_respawn": 456714,
             "yield": 3057344,
@@ -6168,6 +6426,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 7139747,
             "total_respawn": 178494,
             "yield": 2851590,
@@ -6180,6 +6439,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 4.0,
+            "yield_name": "medlow",
             "total_yield": 4759831,
             "total_respawn": 142795,
             "yield": 1901060,
@@ -6192,6 +6452,7 @@
           {
             "ware": "methane",
             "resourcedensity": 125000.0,
+            "yield_name": "medhigh",
             "total_yield": 84045.0,
             "total_respawn": 2801.5,
             "yield": 84045.0,
@@ -6227,6 +6488,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 3600.0,
+            "yield_name": "veryhigh",
             "total_yield": 103484,
             "total_respawn": 344.95,
             "yield": 103484,
@@ -6262,6 +6524,7 @@
           {
             "ware": "ore",
             "resourcedensity": 3600.0,
+            "yield_name": "veryhigh",
             "total_yield": 103484,
             "total_respawn": 344.95,
             "yield": 103484,
@@ -6305,6 +6568,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 104973,
             "total_respawn": 10497.0,
             "yield": 34325.0,
@@ -6317,6 +6581,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 104973,
             "total_respawn": 10497.0,
             "yield": 34325.0,
@@ -6329,6 +6594,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.01,
+            "yield_name": "high",
             "total_yield": 40374.0,
             "total_respawn": 120.16,
             "yield": 13202.0,
@@ -6341,6 +6607,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 133128,
             "total_respawn": 13313.0,
             "yield": 66564.0,
@@ -6353,6 +6620,7 @@
           {
             "ware": "helium",
             "resourcedensity": 15000.0,
+            "yield_name": "medium",
             "total_yield": 40342.0,
             "total_respawn": 4034.2,
             "yield": 20171.0,
@@ -6365,6 +6633,7 @@
           {
             "ware": "ice",
             "resourcedensity": 0.015,
+            "yield_name": "lowest",
             "total_yield": 60561.0,
             "total_respawn": 20187.0,
             "yield": 19803.0,
@@ -6402,6 +6671,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 13267015,
             "total_respawn": 331675,
             "yield": 7921084,
@@ -6414,6 +6684,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 1.8,
+            "yield_name": "lowplus",
             "total_yield": 3980104,
             "total_respawn": 132670,
             "yield": 2376325,
@@ -6426,6 +6697,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 2211.2,
             "total_respawn": 13.162,
             "yield": 1320.2,
@@ -6438,6 +6710,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 168091,
             "total_respawn": 5603.0,
             "yield": 0.0,
@@ -6450,6 +6723,7 @@
           {
             "ware": "helium",
             "resourcedensity": 15000.0,
+            "yield_name": "medium",
             "total_yield": 10085.0,
             "total_respawn": 1008.5,
             "yield": 0.0,
@@ -6462,6 +6736,7 @@
           {
             "ware": "ice",
             "resourcedensity": 0.015,
+            "yield_name": "lowest",
             "total_yield": 33168.0,
             "total_respawn": 11056.0,
             "yield": 19803.0,
@@ -6497,6 +6772,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 3600.0,
+            "yield_name": "veryhigh",
             "total_yield": 103484,
             "total_respawn": 344.95,
             "yield": 103484,
@@ -6532,6 +6808,7 @@
           {
             "ware": "ore",
             "resourcedensity": 3600.0,
+            "yield_name": "veryhigh",
             "total_yield": 103484,
             "total_respawn": 344.95,
             "yield": 103484,
@@ -6575,6 +6852,7 @@
           {
             "ware": "ore",
             "resourcedensity": 16.0,
+            "yield_name": "medplus",
             "total_yield": 37388471,
             "total_respawn": 934712,
             "yield": 20002374,
@@ -6587,6 +6865,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 14020677,
             "total_respawn": 350517,
             "yield": 7500890,
@@ -6599,6 +6878,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.01,
+            "yield_name": "high",
             "total_yield": 23368.0,
             "total_respawn": 69.547,
             "yield": 12501.0,
@@ -6611,6 +6891,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 2730123,
             "total_respawn": 273012,
             "yield": 2028807,
@@ -6623,6 +6904,7 @@
           {
             "ware": "helium",
             "resourcedensity": 15000.0,
+            "yield_name": "medium",
             "total_yield": 827310,
             "total_respawn": 82731.0,
             "yield": 614790,
@@ -6635,6 +6917,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 1378850,
             "total_respawn": 137885,
             "yield": 1024650,
@@ -6676,6 +6959,7 @@
           {
             "ware": "ore",
             "resourcedensity": 4.0,
+            "yield_name": "medlow",
             "total_yield": 40338050,
             "total_respawn": 1210141,
             "yield": 10574378,
@@ -6688,6 +6972,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 60507075,
             "total_respawn": 1512677,
             "yield": 15861567,
@@ -6700,6 +6985,7 @@
           {
             "ware": "ice",
             "resourcedensity": 15.0,
+            "yield_name": "medium",
             "total_yield": 151267686,
             "total_respawn": 15126769,
             "yield": 39653916,
@@ -6741,6 +7027,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 66953623,
             "total_respawn": 1673841,
             "yield": 7800662,
@@ -6753,6 +7040,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 66953623,
             "total_respawn": 1673841,
             "yield": 7800662,
@@ -6765,6 +7053,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0006,
+            "yield_name": "medlow",
             "total_yield": 6695.4,
             "total_respawn": 55.795,
             "yield": 780.07,
@@ -6806,6 +7095,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 383117,
             "total_respawn": 19156.0,
             "yield": 100432,
@@ -6818,6 +7108,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 3831172,
             "total_respawn": 127706,
             "yield": 1004319,
@@ -6830,6 +7121,7 @@
           {
             "ware": "ice",
             "resourcedensity": 0.15,
+            "yield_name": "verylow",
             "total_yield": 957793,
             "total_respawn": 319264,
             "yield": 251080,
@@ -6873,6 +7165,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 117063596,
             "total_respawn": 23412719,
             "yield": 29460019,
@@ -6885,6 +7178,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 8927350,
             "total_respawn": 892735,
             "yield": 3984107,
@@ -6920,6 +7214,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 220925,
             "total_respawn": 7364.2,
             "yield": 220925,
@@ -6932,6 +7227,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 220925,
             "total_respawn": 7364.2,
             "yield": 220925,
@@ -6944,6 +7240,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 552312,
             "total_respawn": 110462,
             "yield": 552312,
@@ -6987,6 +7284,7 @@
           {
             "ware": "ice",
             "resourcedensity": 0.6,
+            "yield_name": "lowminus",
             "total_yield": 38311722,
             "total_respawn": 7662344,
             "yield": 10043188,
@@ -6999,6 +7297,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 19477854,
             "total_respawn": 1947785,
             "yield": 9779171,
@@ -7011,6 +7310,7 @@
           {
             "ware": "helium",
             "resourcedensity": 15000.0,
+            "yield_name": "medium",
             "total_yield": 5902380,
             "total_respawn": 590238,
             "yield": 2963385,
@@ -7023,6 +7323,7 @@
           {
             "ware": "methane",
             "resourcedensity": 52500.0,
+            "yield_name": "medplus",
             "total_yield": 20658330,
             "total_respawn": 688611,
             "yield": 10371848,
@@ -7066,6 +7367,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 95779306,
             "total_respawn": 19155861,
             "yield": 25107970,
@@ -7078,6 +7380,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 450000.0,
+            "yield_name": "high",
             "total_yield": 177071400,
             "total_respawn": 2213393,
             "yield": 88901550,
@@ -7090,6 +7393,7 @@
           {
             "ware": "helium",
             "resourcedensity": 350000.0,
+            "yield_name": "highest",
             "total_yield": 137722200,
             "total_respawn": 1530247,
             "yield": 69145650,
@@ -7102,6 +7406,7 @@
           {
             "ware": "methane",
             "resourcedensity": 1250000.0,
+            "yield_name": "highest",
             "total_yield": 491865000,
             "total_respawn": 5465167,
             "yield": 246948750,
@@ -7143,6 +7448,7 @@
           {
             "ware": "rawscrap",
             "resourcedensity": 1.5,
+            "yield_name": "medium",
             "total_yield": 28733792,
             "total_respawn": 718345,
             "yield": 7532391,
@@ -7186,6 +7492,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 4235495,
             "total_respawn": 211775,
             "yield": 1110310,
@@ -7198,6 +7505,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 42354952,
             "total_respawn": 1411832,
             "yield": 11103097,
@@ -7210,6 +7518,7 @@
           {
             "ware": "ice",
             "resourcedensity": 0.15,
+            "yield_name": "verylow",
             "total_yield": 10588738,
             "total_respawn": 3529579,
             "yield": 2775774,
@@ -7222,6 +7531,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 15381036,
             "total_respawn": 1538104,
             "yield": 7722297,
@@ -7234,6 +7544,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0001,
+            "yield_name": "low",
             "total_yield": 7059.2,
             "total_respawn": 84.038,
             "yield": 1850.5,
@@ -7275,6 +7586,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 95779306,
             "total_respawn": 19155861,
             "yield": 25107970,
@@ -7316,6 +7628,7 @@
           {
             "ware": "rawscrap",
             "resourcedensity": 1.5,
+            "yield_name": "medium",
             "total_yield": 23162.0,
             "total_respawn": 579.05,
             "yield": 23162.0,
@@ -7351,6 +7664,7 @@
           {
             "ware": "rawscrap",
             "resourcedensity": 1.5,
+            "yield_name": "medium",
             "total_yield": 23920.0,
             "total_respawn": 598.01,
             "yield": 23920.0,
@@ -7388,6 +7702,7 @@
           {
             "ware": "ore",
             "resourcedensity": 120.0,
+            "yield_name": "highplus",
             "total_yield": 8470990,
             "total_respawn": 141183,
             "yield": 8470990,
@@ -7400,6 +7715,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 423550,
             "total_respawn": 10589.0,
             "yield": 423550,
@@ -7412,6 +7728,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 105887,
             "total_respawn": 21177.0,
             "yield": 105887,
@@ -7424,6 +7741,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 158895,
             "total_respawn": 15890.0,
             "yield": 158895,
@@ -7436,6 +7754,7 @@
           {
             "ware": "helium",
             "resourcedensity": 15000.0,
+            "yield_name": "medium",
             "total_yield": 48150.0,
             "total_respawn": 4815.0,
             "yield": 48150.0,
@@ -7448,6 +7767,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 80250.0,
             "total_respawn": 8025.0,
             "yield": 80250.0,
@@ -7460,6 +7780,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0001,
+            "yield_name": "low",
             "total_yield": 7.0592,
             "total_respawn": 0.08404,
             "yield": 7.0592,
@@ -7501,6 +7822,7 @@
           {
             "ware": "ore",
             "resourcedensity": 1.8,
+            "yield_name": "lowplus",
             "total_yield": 10043043,
             "total_respawn": 334768,
             "yield": 10043043,
@@ -7513,6 +7835,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 3347681,
             "total_respawn": 111589,
             "yield": 3347681,
@@ -7554,6 +7877,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 1689838,
             "total_respawn": 42246.0,
             "yield": 1689838,
@@ -7566,6 +7890,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 1689838,
             "total_respawn": 42246.0,
             "yield": 1689838,
@@ -7607,6 +7932,7 @@
           {
             "ware": "rawscrap",
             "resourcedensity": 7.5,
+            "yield_name": "high",
             "total_yield": 60507.0,
             "total_respawn": 864.39,
             "yield": 60507.0,
@@ -7648,6 +7974,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 677110,
             "total_respawn": 22570.0,
             "yield": 506864,
@@ -7660,6 +7987,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 677110,
             "total_respawn": 22570.0,
             "yield": 506864,
@@ -7672,6 +8000,7 @@
           {
             "ware": "ice",
             "resourcedensity": 15.0,
+            "yield_name": "medium",
             "total_yield": 16927751,
             "total_respawn": 1692775,
             "yield": 12671602,
@@ -7713,6 +8042,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 4235495,
             "total_respawn": 211775,
             "yield": 1110310,
@@ -7725,6 +8055,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 42354952,
             "total_respawn": 1411832,
             "yield": 11103097,
@@ -7766,6 +8097,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 4235495,
             "total_respawn": 211775,
             "yield": 1110310,
@@ -7778,6 +8110,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 42354952,
             "total_respawn": 1411832,
             "yield": 11103097,
@@ -7819,6 +8152,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 10846487,
             "total_respawn": 361550,
             "yield": 3510298,
@@ -7831,6 +8165,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 1.8,
+            "yield_name": "lowplus",
             "total_yield": 32539461,
             "total_respawn": 1084649,
             "yield": 10530894,
@@ -7843,6 +8178,7 @@
           {
             "ware": "rawscrap",
             "resourcedensity": 0.75,
+            "yield_name": "low",
             "total_yield": 13558109,
             "total_respawn": 677905,
             "yield": 4387873,
@@ -7884,6 +8220,7 @@
           {
             "ware": "ore",
             "resourcedensity": 4.0,
+            "yield_name": "medlow",
             "total_yield": 355879616,
             "total_respawn": 10676388,
             "yield": 23322927,
@@ -7896,6 +8233,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 133454856,
             "total_respawn": 26690971,
             "yield": 8746097,
@@ -7908,6 +8246,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 88970.0,
             "total_respawn": 529.58,
             "yield": 5830.7,
@@ -7920,6 +8259,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 1.8,
+            "yield_name": "lowplus",
             "total_yield": 160145827,
             "total_respawn": 5338194,
             "yield": 10495317,
@@ -7961,6 +8301,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 8340928,
             "total_respawn": 417046,
             "yield": 349844,
@@ -7973,6 +8314,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 8340928,
             "total_respawn": 417046,
             "yield": 349844,
@@ -7985,6 +8327,7 @@
           {
             "ware": "rawscrap",
             "resourcedensity": 1.5,
+            "yield_name": "medium",
             "total_yield": 208523212,
             "total_respawn": 5213080,
             "yield": 8746097,
@@ -8026,6 +8369,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 166818570,
             "total_respawn": 5560619,
             "yield": 6996878,
@@ -8038,6 +8382,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 166818570,
             "total_respawn": 5560619,
             "yield": 6996878,
@@ -8050,6 +8395,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 417046425,
             "total_respawn": 83409285,
             "yield": 17492195,
@@ -8062,6 +8408,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 278031,
             "total_respawn": 1654.9,
             "yield": 11661.0,
@@ -8099,6 +8446,7 @@
           {
             "ware": "ore",
             "resourcedensity": 32.0,
+            "yield_name": "medhigh",
             "total_yield": 1163829,
             "total_respawn": 29096.0,
             "yield": 1163829,
@@ -8111,6 +8459,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0006,
+            "yield_name": "medlow",
             "total_yield": 21.822,
             "total_respawn": 0.18185,
             "yield": 21.822,
@@ -8123,6 +8472,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 38349.0,
             "total_respawn": 3834.9,
             "yield": 38349.0,
@@ -8135,6 +8485,7 @@
           {
             "ware": "helium",
             "resourcedensity": 15000.0,
+            "yield_name": "medium",
             "total_yield": 11621.0,
             "total_respawn": 1162.1,
             "yield": 11621.0,
@@ -8147,6 +8498,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 945.61,
             "total_respawn": 94.561,
             "yield": 945.61,
@@ -8159,6 +8511,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 54555.0,
             "total_respawn": 10911.0,
             "yield": 54555.0,
@@ -8200,6 +8553,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 166818570,
             "total_respawn": 5560619,
             "yield": 6996878,
@@ -8212,6 +8566,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 166818570,
             "total_respawn": 5560619,
             "yield": 6996878,
@@ -8224,6 +8579,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 417046425,
             "total_respawn": 83409285,
             "yield": 17492195,
@@ -8236,6 +8592,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 278031,
             "total_respawn": 1654.9,
             "yield": 11661.0,
@@ -8273,6 +8630,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 131.16,
             "total_respawn": 13.116,
             "yield": 131.16,
@@ -8285,6 +8643,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.01,
+            "yield_name": "high",
             "total_yield": 50.445,
             "total_respawn": 0.15013,
             "yield": 50.445,
@@ -8297,6 +8656,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 33282.0,
             "total_respawn": 3328.2,
             "yield": 33282.0,
@@ -8309,6 +8669,7 @@
           {
             "ware": "helium",
             "resourcedensity": 15000.0,
+            "yield_name": "medium",
             "total_yield": 10085.0,
             "total_respawn": 1008.5,
             "yield": 10085.0,
@@ -8321,6 +8682,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 16809.0,
             "total_respawn": 1680.9,
             "yield": 16809.0,
@@ -8333,6 +8695,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 131.16,
             "total_respawn": 13.116,
             "yield": 131.16,
@@ -8345,6 +8708,7 @@
           {
             "ware": "ice",
             "resourcedensity": 0.15,
+            "yield_name": "verylow",
             "total_yield": 756.68,
             "total_respawn": 252.23,
             "yield": 756.68,
@@ -8382,6 +8746,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 189.93,
             "total_respawn": 18.993,
             "yield": 189.93,
@@ -8394,6 +8759,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 7.305,
             "total_respawn": 0.04348,
             "yield": 7.305,
@@ -8406,6 +8772,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 38349.0,
             "total_respawn": 3834.9,
             "yield": 0.0,
@@ -8418,6 +8785,7 @@
           {
             "ware": "helium",
             "resourcedensity": 50000.0,
+            "yield_name": "medhigh",
             "total_yield": 38736.0,
             "total_respawn": 1291.2,
             "yield": 0.0,
@@ -8430,6 +8798,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 19368.0,
             "total_respawn": 1936.8,
             "yield": 0.0,
@@ -8442,6 +8811,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 189.93,
             "total_respawn": 18.993,
             "yield": 189.93,
@@ -8454,6 +8824,7 @@
           {
             "ware": "ice",
             "resourcedensity": 0.15,
+            "yield_name": "verylow",
             "total_yield": 1095.8,
             "total_respawn": 365.25,
             "yield": 1095.8,
@@ -8495,6 +8866,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 810146,
             "total_respawn": 27005.0,
             "yield": 506864,
@@ -8507,6 +8879,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 1.8,
+            "yield_name": "lowplus",
             "total_yield": 2430438,
             "total_respawn": 81015.0,
             "yield": 1520592,
@@ -8519,6 +8892,7 @@
           {
             "ware": "ice",
             "resourcedensity": 15.0,
+            "yield_name": "medium",
             "total_yield": 20253646,
             "total_respawn": 2025365,
             "yield": 12671602,
@@ -8531,6 +8905,7 @@
           {
             "ware": "rawscrap",
             "resourcedensity": 1.5,
+            "yield_name": "medium",
             "total_yield": 2025365,
             "total_respawn": 50634.0,
             "yield": 1267160,
@@ -8574,6 +8949,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 22673885,
             "total_respawn": 566847,
             "yield": 19529762,
@@ -8586,6 +8962,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 4.0,
+            "yield_name": "medlow",
             "total_yield": 15115923,
             "total_respawn": 453478,
             "yield": 13019842,
@@ -8598,6 +8975,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 1568469,
             "total_respawn": 52282.0,
             "yield": 1568469,
@@ -8634,6 +9012,7 @@
           {
             "ware": "helium",
             "resourcedensity": 130000.0,
+            "yield_name": "high",
             "total_yield": 147264,
             "total_respawn": 2454.4,
             "yield": 147264,
@@ -8670,6 +9049,7 @@
           {
             "ware": "methane",
             "resourcedensity": 375000.0,
+            "yield_name": "highplus",
             "total_yield": 637200,
             "total_respawn": 7965.0,
             "yield": 637200,
@@ -8711,6 +9091,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 414041,
             "total_respawn": 41404.0,
             "yield": 169591,
@@ -8723,6 +9104,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 414041,
             "total_respawn": 41404.0,
             "yield": 169591,
@@ -8735,6 +9117,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0001,
+            "yield_name": "low",
             "total_yield": 1592.5,
             "total_respawn": 18.958,
             "yield": 652.27,
@@ -8772,6 +9155,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 232897874737,
             "total_respawn": 23289787474,
             "yield": 169591,
@@ -8784,6 +9168,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 232897874737,
             "total_respawn": 23289787474,
             "yield": 169591,
@@ -8796,6 +9181,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 13436415850215,
             "total_respawn": 2687283170043,
             "yield": 9784099,
@@ -8808,6 +9194,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 1e-05,
+            "yield_name": "lowest",
             "total_yield": 89576106,
             "total_respawn": 2239403,
             "yield": 65.227,
@@ -8820,6 +9207,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 9487687,
             "total_respawn": 948769,
             "yield": 6351262,
@@ -8832,6 +9220,7 @@
           {
             "ware": "helium",
             "resourcedensity": 15000.0,
+            "yield_name": "medium",
             "total_yield": 2875057,
             "total_respawn": 287506,
             "yield": 1924625,
@@ -8844,6 +9233,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 4791761,
             "total_respawn": 479176,
             "yield": 3207708,
@@ -8880,6 +9270,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 450000.0,
+            "yield_name": "high",
             "total_yield": 86251704,
             "total_respawn": 1078146,
             "yield": 57738744,
@@ -8921,6 +9312,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 1492935,
             "total_respawn": 37323.0,
             "yield": 1492935,
@@ -8933,6 +9325,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 1492935,
             "total_respawn": 37323.0,
             "yield": 1492935,
@@ -8945,6 +9338,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0001,
+            "yield_name": "low",
             "total_yield": 24.882,
             "total_respawn": 0.29622,
             "yield": 24.882,
@@ -8980,6 +9374,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 119435,
             "total_respawn": 2985.9,
             "yield": 119435,
@@ -8992,6 +9387,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 119435,
             "total_respawn": 2985.9,
             "yield": 119435,
@@ -9004,6 +9400,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0001,
+            "yield_name": "low",
             "total_yield": 1.9906,
             "total_respawn": 0.0237,
             "yield": 1.9906,
@@ -9046,6 +9443,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 88229167,
             "total_respawn": 2940972,
             "yield": 35437500,
@@ -9058,6 +9456,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 183259571,
             "total_respawn": 6108652,
             "yield": 13835634,
@@ -9070,6 +9469,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 183259571,
             "total_respawn": 6108652,
             "yield": 13835634,
@@ -9082,6 +9482,7 @@
           {
             "ware": "ice",
             "resourcedensity": 4.0,
+            "yield_name": "lowplus",
             "total_yield": 1221730476,
             "total_respawn": 122173048,
             "yield": 92237562,
@@ -9094,6 +9495,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.002,
+            "yield_name": "medplus",
             "total_yield": 610865,
             "total_respawn": 2946.3,
             "yield": 46119.0,
@@ -9135,6 +9537,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 17469375,
             "total_respawn": 1746937,
             "yield": 7016625,
@@ -9171,6 +9574,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 450000.0,
+            "yield_name": "high",
             "total_yield": 174429,
             "total_respawn": 2180.4,
             "yield": 174429,
@@ -9212,6 +9616,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 17469375,
             "total_respawn": 1746937,
             "yield": 7016625,
@@ -9247,6 +9652,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 7896.3,
             "total_respawn": 789.63,
             "yield": 7896.3,
@@ -9282,6 +9688,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 7068.7,
             "total_respawn": 706.87,
             "yield": 7068.7,
@@ -9294,6 +9701,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 7068.7,
             "total_respawn": 706.87,
             "yield": 7068.7,
@@ -9306,6 +9714,7 @@
           {
             "ware": "ice",
             "resourcedensity": 15.0,
+            "yield_name": "medium",
             "total_yield": 4078109,
             "total_respawn": 407811,
             "yield": 4078109,
@@ -9318,6 +9727,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0001,
+            "yield_name": "low",
             "total_yield": 27.187,
             "total_respawn": 0.32366,
             "yield": 27.187,
@@ -9330,6 +9740,7 @@
           {
             "ware": "rawscrap",
             "resourcedensity": 1.5,
+            "yield_name": "medium",
             "total_yield": 407811,
             "total_respawn": 10195.0,
             "yield": 407811,
@@ -9371,6 +9782,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 414041,
             "total_respawn": 41404.0,
             "yield": 169591,
@@ -9383,6 +9795,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 414041,
             "total_respawn": 41404.0,
             "yield": 169591,
@@ -9395,6 +9808,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0001,
+            "yield_name": "low",
             "total_yield": 1592.5,
             "total_respawn": 18.958,
             "yield": 652.27,
@@ -9430,6 +9844,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 10351017,
             "total_respawn": 1035102,
             "yield": 169591,
@@ -9442,6 +9857,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 10351017,
             "total_respawn": 1035102,
             "yield": 169591,
@@ -9454,6 +9870,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0001,
+            "yield_name": "low",
             "total_yield": 39812.0,
             "total_respawn": 473.95,
             "yield": 652.27,
@@ -9490,6 +9907,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 450000.0,
+            "yield_name": "high",
             "total_yield": 86251704,
             "total_respawn": 1078146,
             "yield": 57738744,
@@ -9533,6 +9951,7 @@
           {
             "ware": "ore",
             "resourcedensity": 1.8,
+            "yield_name": "lowplus",
             "total_yield": 194032616,
             "total_respawn": 6467754,
             "yield": 8138318,
@@ -9545,6 +9964,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 64677539,
             "total_respawn": 2155918,
             "yield": 2712773,
@@ -9557,6 +9977,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0001,
+            "yield_name": "low",
             "total_yield": 10780.0,
             "total_respawn": 128.33,
             "yield": 452.13,
@@ -9569,6 +9990,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 8768628,
             "total_respawn": 876863,
             "yield": 5869908,
@@ -9612,6 +10034,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 64677539,
             "total_respawn": 2155918,
             "yield": 2712773,
@@ -9624,6 +10047,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 1.8,
+            "yield_name": "lowplus",
             "total_yield": 194032616,
             "total_respawn": 6467754,
             "yield": 8138318,
@@ -9636,6 +10060,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 107796,
             "total_respawn": 641.64,
             "yield": 4521.3,
@@ -9648,6 +10073,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 8768628,
             "total_respawn": 876863,
             "yield": 5869908,
@@ -9691,6 +10117,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 32206629,
             "total_respawn": 805166,
             "yield": 32206629,
@@ -9703,6 +10130,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 3220663,
             "total_respawn": 107355,
             "yield": 3220663,
@@ -9715,6 +10143,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 1980067,
             "total_respawn": 66002.0,
             "yield": 1980067,
@@ -9727,6 +10156,7 @@
           {
             "ware": "helium",
             "resourcedensity": 50000.0,
+            "yield_name": "medhigh",
             "total_yield": 396013,
             "total_respawn": 13200.0,
             "yield": 396013,
@@ -9739,6 +10169,7 @@
           {
             "ware": "methane",
             "resourcedensity": 125000.0,
+            "yield_name": "medhigh",
             "total_yield": 990033,
             "total_respawn": 33001.0,
             "yield": 990033,
@@ -9775,6 +10206,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 250000.0,
+            "yield_name": "medhigh",
             "total_yield": 3960133,
             "total_respawn": 132004,
             "yield": 2722592,
@@ -9787,6 +10219,7 @@
           {
             "ware": "helium",
             "resourcedensity": 50000.0,
+            "yield_name": "medhigh",
             "total_yield": 792027,
             "total_respawn": 26401.0,
             "yield": 544518,
@@ -9799,6 +10232,7 @@
           {
             "ware": "methane",
             "resourcedensity": 125000.0,
+            "yield_name": "medhigh",
             "total_yield": 1980067,
             "total_respawn": 66002.0,
             "yield": 1361296,
@@ -9840,6 +10274,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 7419846,
             "total_respawn": 185496,
             "yield": 7419846,
@@ -9852,6 +10287,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 7419846,
             "total_respawn": 185496,
             "yield": 7419846,
@@ -9894,6 +10330,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 6978547,
             "total_respawn": 697855,
             "yield": 6037619,
@@ -9906,6 +10343,7 @@
           {
             "ware": "helium",
             "resourcedensity": 15000.0,
+            "yield_name": "medium",
             "total_yield": 2114711,
             "total_respawn": 211471,
             "yield": 1829582,
@@ -9918,6 +10356,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 3524519,
             "total_respawn": 352452,
             "yield": 3049303,
@@ -9959,6 +10398,7 @@
           {
             "ware": "rawscrap",
             "resourcedensity": 0.75,
+            "yield_name": "low",
             "total_yield": 94947.0,
             "total_respawn": 4747.4,
             "yield": 94947.0,
@@ -10001,6 +10441,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 450000.0,
+            "yield_name": "high",
             "total_yield": 158603340,
             "total_respawn": 1982542,
             "yield": 102913965,
@@ -10013,6 +10454,7 @@
           {
             "ware": "helium",
             "resourcedensity": 130000.0,
+            "yield_name": "high",
             "total_yield": 45818743,
             "total_respawn": 763646,
             "yield": 29730701,
@@ -10025,6 +10467,7 @@
           {
             "ware": "methane",
             "resourcedensity": 250000.0,
+            "yield_name": "high",
             "total_yield": 88112967,
             "total_respawn": 1101412,
             "yield": 57174425,
@@ -10060,6 +10503,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 4796.2,
             "total_respawn": 479.62,
             "yield": 4796.2,
@@ -10072,6 +10516,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 4796.2,
             "total_respawn": 479.62,
             "yield": 4796.2,
@@ -10084,6 +10529,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 184.47,
             "total_respawn": 1.098,
             "yield": 184.47,
@@ -10119,6 +10565,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 1977.0,
             "total_respawn": 197.7,
             "yield": 1977.0,
@@ -10131,6 +10578,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 1977.0,
             "total_respawn": 197.7,
             "yield": 1977.0,
@@ -10143,6 +10591,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0001,
+            "yield_name": "low",
             "total_yield": 7.604,
             "total_respawn": 0.09052,
             "yield": 7.604,
@@ -10178,6 +10627,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 21.916,
             "total_respawn": 2.1916,
             "yield": 21.916,
@@ -10190,6 +10640,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 21.916,
             "total_respawn": 2.1916,
             "yield": 21.916,
@@ -10202,6 +10653,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0001,
+            "yield_name": "low",
             "total_yield": 0.08429,
             "total_respawn": 0.001,
             "yield": 0.08429,
@@ -10237,6 +10689,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 38.267,
             "total_respawn": 3.8267,
             "yield": 38.267,
@@ -10249,6 +10702,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 38.267,
             "total_respawn": 3.8267,
             "yield": 38.267,
@@ -10261,6 +10715,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0001,
+            "yield_name": "low",
             "total_yield": 0.14718,
             "total_respawn": 0.00175,
             "yield": 0.14718,
@@ -10296,6 +10751,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 155.15,
             "total_respawn": 15.515,
             "yield": 155.15,
@@ -10308,6 +10764,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 155.15,
             "total_respawn": 15.515,
             "yield": 155.15,
@@ -10320,6 +10777,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0001,
+            "yield_name": "low",
             "total_yield": 0.59675,
             "total_respawn": 0.0071,
             "yield": 0.59675,
@@ -10355,6 +10813,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 48.435,
             "total_respawn": 4.8435,
             "yield": 48.435,
@@ -10367,6 +10826,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 48.435,
             "total_respawn": 4.8435,
             "yield": 48.435,
@@ -10379,6 +10839,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0001,
+            "yield_name": "low",
             "total_yield": 0.18629,
             "total_respawn": 0.00222,
             "yield": 0.18629,
@@ -10414,6 +10875,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 40.852,
             "total_respawn": 4.0852,
             "yield": 40.852,
@@ -10426,6 +10888,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 40.852,
             "total_respawn": 4.0852,
             "yield": 40.852,
@@ -10438,6 +10901,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0001,
+            "yield_name": "low",
             "total_yield": 0.15712,
             "total_respawn": 0.00187,
             "yield": 0.15712,
@@ -10473,6 +10937,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 42.133,
             "total_respawn": 4.2133,
             "yield": 42.133,
@@ -10485,6 +10950,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 42.133,
             "total_respawn": 4.2133,
             "yield": 42.133,
@@ -10497,6 +10963,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0001,
+            "yield_name": "low",
             "total_yield": 0.16205,
             "total_respawn": 0.00193,
             "yield": 0.16205,
@@ -10532,6 +10999,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 56.007,
             "total_respawn": 5.6007,
             "yield": 56.007,
@@ -10544,6 +11012,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.026,
+            "yield_name": "lowest",
             "total_yield": 56.007,
             "total_respawn": 5.6007,
             "yield": 56.007,
@@ -10556,6 +11025,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0001,
+            "yield_name": "low",
             "total_yield": 0.21541,
             "total_respawn": 0.00256,
             "yield": 0.21541,
@@ -10598,6 +11068,7 @@
           {
             "ware": "helium",
             "resourcedensity": 130000.0,
+            "yield_name": "high",
             "total_yield": 27491246,
             "total_respawn": 458187,
             "yield": 23784561,
@@ -10639,6 +11110,7 @@
           {
             "ware": "ore",
             "resourcedensity": 48.0,
+            "yield_name": "highlow",
             "total_yield": 261059848,
             "total_respawn": 4350997,
             "yield": 238869615,
@@ -10651,6 +11123,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 48.0,
+            "yield_name": "highlow",
             "total_yield": 261059848,
             "total_respawn": 4350997,
             "yield": 238869615,
@@ -10663,6 +11136,7 @@
           {
             "ware": "ice",
             "resourcedensity": 30.0,
+            "yield_name": "medplus",
             "total_yield": 163162405,
             "total_respawn": 4079060,
             "yield": 149293509,
@@ -10699,6 +11173,7 @@
           {
             "ware": "methane",
             "resourcedensity": 250000.0,
+            "yield_name": "high",
             "total_yield": 5692692,
             "total_respawn": 71159.0,
             "yield": 5692692,
@@ -10742,6 +11217,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 6046387,
             "total_respawn": 201546,
             "yield": 4402845,
@@ -10754,6 +11230,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 6046387,
             "total_respawn": 201546,
             "yield": 4402845,
@@ -10766,6 +11243,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 450000.0,
+            "yield_name": "high",
             "total_yield": 71371503,
             "total_respawn": 892144,
             "yield": 61748379,
@@ -10809,6 +11287,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 5374566,
             "total_respawn": 179152,
             "yield": 3913640,
@@ -10821,6 +11300,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 5374566,
             "total_respawn": 179152,
             "yield": 3913640,
@@ -10833,6 +11313,7 @@
           {
             "ware": "helium",
             "resourcedensity": 50000.0,
+            "yield_name": "medhigh",
             "total_yield": 7049037,
             "total_respawn": 234968,
             "yield": 6098605,
@@ -10875,6 +11356,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 6600.0,
+            "yield_name": "low",
             "total_yield": 135912,
             "total_respawn": 27182.0,
             "yield": 135912,
@@ -10887,6 +11369,7 @@
           {
             "ware": "helium",
             "resourcedensity": 3000.0,
+            "yield_name": "low",
             "total_yield": 61778.0,
             "total_respawn": 12356.0,
             "yield": 61778.0,
@@ -10899,6 +11382,7 @@
           {
             "ware": "methane",
             "resourcedensity": 2500.0,
+            "yield_name": "low",
             "total_yield": 51482.0,
             "total_respawn": 10296.0,
             "yield": 51482.0,
@@ -10935,6 +11419,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 6600.0,
+            "yield_name": "low",
             "total_yield": 135912,
             "total_respawn": 27182.0,
             "yield": 135912,
@@ -10947,6 +11432,7 @@
           {
             "ware": "helium",
             "resourcedensity": 3000.0,
+            "yield_name": "low",
             "total_yield": 61778.0,
             "total_respawn": 12356.0,
             "yield": 61778.0,
@@ -10959,6 +11445,7 @@
           {
             "ware": "methane",
             "resourcedensity": 2500.0,
+            "yield_name": "low",
             "total_yield": 51482.0,
             "total_respawn": 10296.0,
             "yield": 51482.0,
@@ -10995,6 +11482,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 6600.0,
+            "yield_name": "low",
             "total_yield": 930473,
             "total_respawn": 186095,
             "yield": 805016,
@@ -11007,6 +11495,7 @@
           {
             "ware": "helium",
             "resourcedensity": 3000.0,
+            "yield_name": "low",
             "total_yield": 422942,
             "total_respawn": 84588.0,
             "yield": 365916,
@@ -11019,6 +11508,7 @@
           {
             "ware": "methane",
             "resourcedensity": 2500.0,
+            "yield_name": "low",
             "total_yield": 352452,
             "total_respawn": 70490.0,
             "yield": 304930,
@@ -11054,6 +11544,7 @@
           {
             "ware": "ore",
             "resourcedensity": 4.0,
+            "yield_name": "medlow",
             "total_yield": 1990580,
             "total_respawn": 59717.0,
             "yield": 1990580,
@@ -11066,6 +11557,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 2985870,
             "total_respawn": 74647.0,
             "yield": 2985870,
@@ -11078,6 +11570,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 746468,
             "total_respawn": 149294,
             "yield": 746468,
@@ -11090,6 +11583,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0001,
+            "yield_name": "low",
             "total_yield": 49.765,
             "total_respawn": 0.59243,
             "yield": 49.765,
@@ -11124,6 +11618,7 @@
           {
             "ware": "ore",
             "resourcedensity": 4.0,
+            "yield_name": "medlow",
             "total_yield": 625526,
             "total_respawn": 18766.0,
             "yield": 2251894,
@@ -11136,6 +11631,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 938289,
             "total_respawn": 23457.0,
             "yield": 3377840,
@@ -11148,6 +11644,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 234572,
             "total_respawn": 46914.0,
             "yield": 844460,
@@ -11160,6 +11657,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0001,
+            "yield_name": "low",
             "total_yield": 15.638,
             "total_respawn": 0.18617,
             "yield": 56.297,
@@ -11202,6 +11700,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 6978547,
             "total_respawn": 697855,
             "yield": 6037619,
@@ -11214,6 +11713,7 @@
           {
             "ware": "helium",
             "resourcedensity": 15000.0,
+            "yield_name": "medium",
             "total_yield": 2114711,
             "total_respawn": 211471,
             "yield": 1829582,
@@ -11226,6 +11726,7 @@
           {
             "ware": "methane",
             "resourcedensity": 250000.0,
+            "yield_name": "high",
             "total_yield": 35245187,
             "total_respawn": 440565,
             "yield": 30493027,
@@ -11261,6 +11762,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 298587,
             "total_respawn": 9952.9,
             "yield": 298587,
@@ -11273,6 +11775,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 298587,
             "total_respawn": 9952.9,
             "yield": 298587,
@@ -11285,6 +11788,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 746468,
             "total_respawn": 149294,
             "yield": 746468,
@@ -11297,6 +11801,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0001,
+            "yield_name": "low",
             "total_yield": 49.765,
             "total_respawn": 0.59243,
             "yield": 49.765,
@@ -11338,6 +11843,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 8957611,
             "total_respawn": 223940,
             "yield": 8957611,
@@ -11350,6 +11856,7 @@
           {
             "ware": "ice",
             "resourcedensity": 15.0,
+            "yield_name": "medium",
             "total_yield": 22394026,
             "total_respawn": 2239403,
             "yield": 22394026,
@@ -11362,6 +11869,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0006,
+            "yield_name": "medlow",
             "total_yield": 895.76,
             "total_respawn": 7.4647,
             "yield": 895.76,
@@ -11397,6 +11905,7 @@
           {
             "ware": "ore",
             "resourcedensity": 32.0,
+            "yield_name": "medhigh",
             "total_yield": 47773923,
             "total_respawn": 1194348,
             "yield": 47773923,
@@ -11409,6 +11918,7 @@
           {
             "ware": "ice",
             "resourcedensity": 15.0,
+            "yield_name": "medium",
             "total_yield": 22394026,
             "total_respawn": 2239403,
             "yield": 22394026,
@@ -11450,6 +11960,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 16.0,
+            "yield_name": "medplus",
             "total_yield": 7962321,
             "total_respawn": 199058,
             "yield": 7962321,
@@ -11462,6 +11973,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0006,
+            "yield_name": "medlow",
             "total_yield": 298.59,
             "total_respawn": 2.4882,
             "yield": 298.59,
@@ -11497,6 +12009,7 @@
           {
             "ware": "ore",
             "resourcedensity": 48.0,
+            "yield_name": "highlow",
             "total_yield": 22931483,
             "total_respawn": 382191,
             "yield": 22931483,
@@ -11509,6 +12022,7 @@
           {
             "ware": "ice",
             "resourcedensity": 15.0,
+            "yield_name": "medium",
             "total_yield": 7166088,
             "total_respawn": 716609,
             "yield": 7166088,
@@ -11544,6 +12058,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 219461,
             "total_respawn": 7315.4,
             "yield": 219461,
@@ -11556,6 +12071,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 219461,
             "total_respawn": 7315.4,
             "yield": 219461,
@@ -11568,6 +12084,7 @@
           {
             "ware": "ice",
             "resourcedensity": 15.0,
+            "yield_name": "medium",
             "total_yield": 5486536,
             "total_respawn": 548654,
             "yield": 5486536,
@@ -11580,6 +12097,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0002,
+            "yield_name": "lowplus",
             "total_yield": 73.154,
             "total_respawn": 0.68582,
             "yield": 73.154,
@@ -11621,6 +12139,7 @@
           {
             "ware": "ore",
             "resourcedensity": 48.0,
+            "yield_name": "highlow",
             "total_yield": 17556917,
             "total_respawn": 292615,
             "yield": 17556917,
@@ -11633,6 +12152,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 32.0,
+            "yield_name": "medhigh",
             "total_yield": 11704611,
             "total_respawn": 292615,
             "yield": 11704611,
@@ -11645,6 +12165,7 @@
           {
             "ware": "ice",
             "resourcedensity": 9.0,
+            "yield_name": "medlow",
             "total_yield": 3291922,
             "total_respawn": 329192,
             "yield": 3291922,
@@ -11686,6 +12207,7 @@
           {
             "ware": "ore",
             "resourcedensity": 4.0,
+            "yield_name": "medlow",
             "total_yield": 268728,
             "total_respawn": 8061.8,
             "yield": 268728,
@@ -11698,6 +12220,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 1.8,
+            "yield_name": "lowplus",
             "total_yield": 120928,
             "total_respawn": 4030.9,
             "yield": 120928,
@@ -11733,6 +12256,7 @@
           {
             "ware": "rawscrap",
             "resourcedensity": 2.5,
+            "yield_name": "medplus",
             "total_yield": 316491,
             "total_respawn": 7912.3,
             "yield": 316491,
@@ -11775,6 +12299,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 105500.0,
+            "yield_name": "medplus",
             "total_yield": 10638525,
             "total_respawn": 354618,
             "yield": 10638525,
@@ -11787,6 +12312,7 @@
           {
             "ware": "helium",
             "resourcedensity": 15000.0,
+            "yield_name": "medium",
             "total_yield": 1512587,
             "total_respawn": 151259,
             "yield": 1512587,
@@ -11799,6 +12325,7 @@
           {
             "ware": "methane",
             "resourcedensity": 250000.0,
+            "yield_name": "high",
             "total_yield": 25209775,
             "total_respawn": 315122,
             "yield": 25209775,
@@ -11834,6 +12361,7 @@
           {
             "ware": "ore",
             "resourcedensity": 1.8,
+            "yield_name": "lowplus",
             "total_yield": 7019669,
             "total_respawn": 233989,
             "yield": 7019669,
@@ -11846,6 +12374,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.06,
+            "yield_name": "verylow",
             "total_yield": 233989,
             "total_respawn": 11699.0,
             "yield": 233989,
@@ -11858,6 +12387,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 5849724,
             "total_respawn": 1169945,
             "yield": 5849724,
@@ -11899,6 +12429,7 @@
           {
             "ware": "ore",
             "resourcedensity": 48.0,
+            "yield_name": "highlow",
             "total_yield": 15550590,
             "total_respawn": 259176,
             "yield": 15550590,
@@ -11911,6 +12442,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 32.0,
+            "yield_name": "medhigh",
             "total_yield": 10367060,
             "total_respawn": 259176,
             "yield": 10367060,
@@ -11923,6 +12455,7 @@
           {
             "ware": "ice",
             "resourcedensity": 15.0,
+            "yield_name": "medium",
             "total_yield": 4859559,
             "total_respawn": 485956,
             "yield": 4859559,
@@ -11935,6 +12468,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 3e-05,
+            "yield_name": "verylow",
             "total_yield": 9.7191,
             "total_respawn": 0.16199,
             "yield": 9.7191,
@@ -11970,6 +12504,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 384745,
             "total_respawn": 12825.0,
             "yield": 384745,
@@ -11982,6 +12517,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 384745,
             "total_respawn": 12825.0,
             "yield": 384745,
@@ -11994,6 +12530,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 961864,
             "total_respawn": 192373,
             "yield": 961864,
@@ -12035,6 +12572,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 183200,
             "total_respawn": 6106.7,
             "yield": 183200,
@@ -12047,6 +12585,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 183200,
             "total_respawn": 6106.7,
             "yield": 183200,
@@ -12059,6 +12598,7 @@
           {
             "ware": "ice",
             "resourcedensity": 1.5,
+            "yield_name": "low",
             "total_yield": 458000,
             "total_respawn": 91600.0,
             "yield": 458000,
@@ -12094,6 +12634,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 67345.0,
             "total_respawn": 2244.8,
             "yield": 67345.0,
@@ -12106,6 +12647,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 0.2,
+            "yield_name": "lowminus",
             "total_yield": 22448.0,
             "total_respawn": 1122.4,
             "yield": 22448.0,
@@ -12118,6 +12660,7 @@
           {
             "ware": "ice",
             "resourcedensity": 4.0,
+            "yield_name": "lowplus",
             "total_yield": 448969,
             "total_respawn": 44897.0,
             "yield": 448969,
@@ -12130,6 +12673,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 112.24,
             "total_respawn": 0.66811,
             "yield": 112.24,
@@ -12171,6 +12715,7 @@
           {
             "ware": "ore",
             "resourcedensity": 60.0,
+            "yield_name": "high",
             "total_yield": 116850753,
             "total_respawn": 1947513,
             "yield": 116850753,
@@ -12183,6 +12728,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 120.0,
+            "yield_name": "highplus",
             "total_yield": 233701507,
             "total_respawn": 3895025,
             "yield": 233701507,
@@ -12195,6 +12741,7 @@
           {
             "ware": "ice",
             "resourcedensity": 90.0,
+            "yield_name": "highlow",
             "total_yield": 175276130,
             "total_respawn": 2921269,
             "yield": 175276130,
@@ -12207,6 +12754,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.002,
+            "yield_name": "medplus",
             "total_yield": 3895.0,
             "total_respawn": 18.786,
             "yield": 3895.0,
@@ -12249,6 +12797,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 11500.0,
+            "yield_name": "lowplus",
             "total_yield": 9544.3,
             "total_respawn": 954.43,
             "yield": 9544.3,
@@ -12261,6 +12810,7 @@
           {
             "ware": "helium",
             "resourcedensity": 9600.0,
+            "yield_name": "medlow",
             "total_yield": 7967.4,
             "total_respawn": 796.74,
             "yield": 7967.4,
@@ -12273,6 +12823,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 20748.0,
             "total_respawn": 2074.8,
             "yield": 20748.0,
@@ -12309,6 +12860,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 24000.0,
+            "yield_name": "medlow",
             "total_yield": 19918.0,
             "total_respawn": 1991.8,
             "yield": 19918.0,
@@ -12321,6 +12873,7 @@
           {
             "ware": "helium",
             "resourcedensity": 15000.0,
+            "yield_name": "medium",
             "total_yield": 12449.0,
             "total_respawn": 1244.9,
             "yield": 12449.0,
@@ -12333,6 +12886,7 @@
           {
             "ware": "methane",
             "resourcedensity": 52500.0,
+            "yield_name": "medplus",
             "total_yield": 43572.0,
             "total_respawn": 1452.4,
             "yield": 43572.0,
@@ -12368,6 +12922,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 8466066,
             "total_respawn": 211652,
             "yield": 8466066,
@@ -12380,6 +12935,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 32.0,
+            "yield_name": "medhigh",
             "total_yield": 45152354,
             "total_respawn": 1128809,
             "yield": 45152354,
@@ -12392,6 +12948,7 @@
           {
             "ware": "ice",
             "resourcedensity": 90.0,
+            "yield_name": "highlow",
             "total_yield": 126990996,
             "total_respawn": 2116517,
             "yield": 126990996,
@@ -12434,6 +12991,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 6600.0,
+            "yield_name": "low",
             "total_yield": 1189240,
             "total_respawn": 237848,
             "yield": 883747,
@@ -12446,6 +13004,7 @@
           {
             "ware": "helium",
             "resourcedensity": 3000.0,
+            "yield_name": "low",
             "total_yield": 540564,
             "total_respawn": 108113,
             "yield": 401703,
@@ -12458,6 +13017,7 @@
           {
             "ware": "methane",
             "resourcedensity": 2500.0,
+            "yield_name": "low",
             "total_yield": 450470,
             "total_respawn": 90094.0,
             "yield": 334753,
@@ -12493,6 +13053,7 @@
           {
             "ware": "ore",
             "resourcedensity": 60.0,
+            "yield_name": "high",
             "total_yield": 408977637,
             "total_respawn": 6816294,
             "yield": 408977637,
@@ -12505,6 +13066,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 120.0,
+            "yield_name": "highplus",
             "total_yield": 817955273,
             "total_respawn": 13632588,
             "yield": 817955273,
@@ -12517,6 +13079,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.01,
+            "yield_name": "high",
             "total_yield": 68163.0,
             "total_respawn": 202.87,
             "yield": 68163.0,
@@ -12553,6 +13116,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 24000.0,
+            "yield_name": "medlow",
             "total_yield": 4324510,
             "total_respawn": 432451,
             "yield": 3213626,
@@ -12565,6 +13129,7 @@
           {
             "ware": "helium",
             "resourcedensity": 15000.0,
+            "yield_name": "medium",
             "total_yield": 2702818,
             "total_respawn": 270282,
             "yield": 2008517,
@@ -12577,6 +13142,7 @@
           {
             "ware": "methane",
             "resourcedensity": 52500.0,
+            "yield_name": "medplus",
             "total_yield": 9459865,
             "total_respawn": 315329,
             "yield": 7029808,
@@ -12620,6 +13186,7 @@
           {
             "ware": "rawscrap",
             "resourcedensity": 1.5,
+            "yield_name": "medium",
             "total_yield": 3749660,
             "total_respawn": 93741.0,
             "yield": 3749660,
@@ -12632,6 +13199,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 6600.0,
+            "yield_name": "low",
             "total_yield": 43821.0,
             "total_respawn": 8764.1,
             "yield": 32866.0,
@@ -12644,6 +13212,7 @@
           {
             "ware": "helium",
             "resourcedensity": 3000.0,
+            "yield_name": "low",
             "total_yield": 19918.0,
             "total_respawn": 3983.7,
             "yield": 14939.0,
@@ -12656,6 +13225,7 @@
           {
             "ware": "methane",
             "resourcedensity": 2500.0,
+            "yield_name": "low",
             "total_yield": 16599.0,
             "total_respawn": 3319.7,
             "yield": 12449.0,
@@ -12691,6 +13261,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 928733,
             "total_respawn": 30958.0,
             "yield": 928733,
@@ -12726,6 +13297,7 @@
           {
             "ware": "ore",
             "resourcedensity": 1.8,
+            "yield_name": "lowplus",
             "total_yield": 1241337,
             "total_respawn": 41378.0,
             "yield": 1241337,
@@ -12769,6 +13341,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 4768938,
             "total_respawn": 158965,
             "yield": 1250148,
@@ -12781,6 +13354,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 4.0,
+            "yield_name": "medlow",
             "total_yield": 31792918,
             "total_respawn": 953788,
             "yield": 8334323,
@@ -12793,6 +13367,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 7948.2,
             "total_respawn": 47.311,
             "yield": 2083.6,
@@ -12805,6 +13380,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 4546031,
             "total_respawn": 454603,
             "yield": 3043211,
@@ -12817,6 +13393,7 @@
           {
             "ware": "helium",
             "resourcedensity": 15000.0,
+            "yield_name": "medium",
             "total_yield": 1377585,
             "total_respawn": 137759,
             "yield": 922185,
@@ -12829,6 +13406,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 2295975,
             "total_respawn": 229598,
             "yield": 1536975,
@@ -12871,6 +13449,7 @@
           {
             "ware": "methane",
             "resourcedensity": 300.0,
+            "yield_name": "lowest",
             "total_yield": 497.96,
             "total_respawn": 165.99,
             "yield": 497.96,
@@ -12906,6 +13485,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 298587,
             "total_respawn": 9952.9,
             "yield": 298587,
@@ -12918,6 +13498,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 16.0,
+            "yield_name": "medplus",
             "total_yield": 7962321,
             "total_respawn": 199058,
             "yield": 7962321,
@@ -12930,6 +13511,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0006,
+            "yield_name": "medlow",
             "total_yield": 298.59,
             "total_respawn": 2.4882,
             "yield": 298.59,
@@ -12965,6 +13547,7 @@
           {
             "ware": "ore",
             "resourcedensity": 6.0,
+            "yield_name": "medium",
             "total_yield": 6718208,
             "total_respawn": 167955,
             "yield": 6718208,
@@ -12977,6 +13560,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 4.0,
+            "yield_name": "medlow",
             "total_yield": 4478805,
             "total_respawn": 134364,
             "yield": 4478805,
@@ -12989,6 +13573,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.001,
+            "yield_name": "medium",
             "total_yield": 1119.7,
             "total_respawn": 6.6649,
             "yield": 1119.7,
@@ -13031,6 +13616,7 @@
           {
             "ware": "helium",
             "resourcedensity": 130000.0,
+            "yield_name": "high",
             "total_yield": 11927117,
             "total_respawn": 198785,
             "yield": 9025926,
@@ -13072,6 +13658,7 @@
           {
             "ware": "rawscrap",
             "resourcedensity": 1.5,
+            "yield_name": "medium",
             "total_yield": 398825,
             "total_respawn": 9970.6,
             "yield": 398825,
@@ -13108,6 +13695,7 @@
           {
             "ware": "helium",
             "resourcedensity": 3000.0,
+            "yield_name": "low",
             "total_yield": 513288,
             "total_respawn": 102658,
             "yield": 394264,
@@ -13120,6 +13708,7 @@
           {
             "ware": "methane",
             "resourcedensity": 250000.0,
+            "yield_name": "high",
             "total_yield": 42773962,
             "total_respawn": 534675,
             "yield": 32855363,
@@ -13162,6 +13751,7 @@
           {
             "ware": "hydrogen",
             "resourcedensity": 49500.0,
+            "yield_name": "medium",
             "total_yield": 225423,
             "total_respawn": 22542.0,
             "yield": 225423,
@@ -13174,6 +13764,7 @@
           {
             "ware": "helium",
             "resourcedensity": 15000.0,
+            "yield_name": "medium",
             "total_yield": 68310.0,
             "total_respawn": 6831.0,
             "yield": 68310.0,
@@ -13186,6 +13777,7 @@
           {
             "ware": "methane",
             "resourcedensity": 25000.0,
+            "yield_name": "medium",
             "total_yield": 113850,
             "total_respawn": 11385.0,
             "yield": 113850,
@@ -13221,6 +13813,7 @@
           {
             "ware": "ore",
             "resourcedensity": 48.0,
+            "yield_name": "highlow",
             "total_yield": 15550590,
             "total_respawn": 259176,
             "yield": 15550590,
@@ -13233,6 +13826,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 32.0,
+            "yield_name": "medhigh",
             "total_yield": 10367060,
             "total_respawn": 259176,
             "yield": 10367060,
@@ -13245,6 +13839,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 3e-05,
+            "yield_name": "verylow",
             "total_yield": 9.7191,
             "total_respawn": 0.16199,
             "yield": 9.7191,
@@ -13280,6 +13875,7 @@
           {
             "ware": "ore",
             "resourcedensity": 48.0,
+            "yield_name": "highlow",
             "total_yield": 30779639,
             "total_respawn": 512994,
             "yield": 30779639,
@@ -13292,6 +13888,7 @@
           {
             "ware": "silicon",
             "resourcedensity": 32.0,
+            "yield_name": "medhigh",
             "total_yield": 20519759,
             "total_respawn": 512994,
             "yield": 20519759,
@@ -13304,6 +13901,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 3e-05,
+            "yield_name": "verylow",
             "total_yield": 19.237,
             "total_respawn": 0.32062,
             "yield": 19.237,
@@ -13346,6 +13944,7 @@
           {
             "ware": "methane",
             "resourcedensity": 300.0,
+            "yield_name": "lowest",
             "total_yield": 307.14,
             "total_respawn": 102.38,
             "yield": 307.14,
@@ -13383,6 +13982,7 @@
           {
             "ware": "methane",
             "resourcedensity": 9600.0,
+            "yield_name": "medlow",
             "total_yield": 98845.0,
             "total_respawn": 9884.5,
             "yield": 98845.0,
@@ -13395,6 +13995,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.6,
+            "yield_name": "low",
             "total_yield": 44788.0,
             "total_respawn": 1492.9,
             "yield": 44788.0,
@@ -13407,6 +14008,7 @@
           {
             "ware": "ice",
             "resourcedensity": 30.0,
+            "yield_name": "medplus",
             "total_yield": 2239403,
             "total_respawn": 55985.0,
             "yield": 2239403,
@@ -13419,6 +14021,7 @@
           {
             "ware": "nividium",
             "resourcedensity": 0.0006,
+            "yield_name": "medlow",
             "total_yield": 44.788,
             "total_respawn": 0.37323,
             "yield": 44.788,
@@ -13460,6 +14063,7 @@
           {
             "ware": "ore",
             "resourcedensity": 0.2,
+            "yield_name": "lowminus",
             "total_yield": 2438461,
             "total_respawn": 121923,
             "yield": 1304547,
@@ -13495,6 +14099,7 @@
           {
             "ware": "rawscrap",
             "resourcedensity": 0.75,
+            "yield_name": "low",
             "total_yield": 3580862,
             "total_respawn": 179043,
             "yield": 3580862,
@@ -13531,6 +14136,7 @@
           {
             "ware": "helium",
             "resourcedensity": 3000.0,
+            "yield_name": "low",
             "total_yield": 2039.1,
             "total_respawn": 407.81,
             "yield": 2039.1,
