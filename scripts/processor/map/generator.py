@@ -427,8 +427,37 @@ def generate_map_data(
     regions_rows: List[dict] = []
     resourceareas_rows: List[dict] = []
 
+    def calculate_rating(respawn: float) -> int:
+        """
+        根据 respawn 值计算资源评级 (1-5 分)。
+
+        评级标准：
+        - 1 分 (低):   respawn < 30
+        - 2 分 (中低): 30 <= respawn < 100
+        - 3 分 (中):   100 <= respawn < 300
+        - 4 分 (中高): 300 <= respawn < 1000
+        - 5 分 (高):   respawn >= 1000
+        """
+        if respawn < 30:
+            return 1
+        elif respawn < 100:
+            return 2
+        elif respawn < 300:
+            return 3
+        elif respawn < 1000:
+            return 4
+        else:
+            return 5
+
     def aggregate_sector_resources_from_resourceareas() -> Dict[str, List[dict]]:
-        """从 resourceareas_rows 聚合出 sector.resources。"""
+        """从 resourceareas_rows 聚合出 sector.resources。
+
+        四个字段独立聚合：
+        - yield: 聚合 res.get("yield", 0) * amount
+        - respawn: 聚合 res.get("respawn", 0) * amount
+        - total_yield: 聚合 res.get("total_yield", 0)（如果存在）
+        - total_respawn: 聚合 res.get("total_respawn", 0)（如果存在）
+        """
         result: Dict[str, List[dict]] = {}
         by_sector: Dict[str, Dict[str, dict]] = {}
 
@@ -447,23 +476,42 @@ def generate_map_data(
                 ware = res.get("ware", "")
                 if not ware:
                     continue
-                # yield 和 respawn 需要乘以 amount
-                yield_val = res.get("yield", 0) * amount
-                respawn_val = res.get("respawn", 0) * amount
 
                 entry = sector_map.setdefault(ware, {
                     "ware": ware,
                     "yield": 0,
                     "respawn": 0,
+                    "total_yield": 0,
+                    "total_respawn": 0,
                 })
-                entry["yield"] += yield_val
-                entry["respawn"] += respawn_val
+
+                # yield 和 respawn 始终聚合（乘以 amount）
+                entry["yield"] += res.get("yield", 0) * amount
+                entry["respawn"] += res.get("respawn", 0) * amount
+
+                # total_yield 和 total_respawn 只在字段存在时聚合
+                if "total_yield" in res:
+                    entry["total_yield"] += res.get("total_yield", 0)
+                if "total_respawn" in res:
+                    entry["total_respawn"] += res.get("total_respawn", 0)
 
         for sector_id, ware_map in by_sector.items():
-            result[sector_id] = [
-                {"ware": e["ware"], "yield": e["yield"], "respawn": e["respawn"]}
-                for e in sorted(ware_map.values(), key=lambda x: x["ware"])
-            ]
+            result[sector_id] = []
+            for e in sorted(ware_map.values(), key=lambda x: x["ware"]):
+                # 评级基于 respawn 字段
+                rating = calculate_rating(e["respawn"])
+                entry = {
+                    "ware": e["ware"],
+                    "yield": e["yield"],
+                    "respawn": e["respawn"],
+                    "rating": rating,
+                }
+                # 只在聚合值非 0 时添加 total_yield 和 total_respawn
+                if e["total_yield"] != 0:
+                    entry["total_yield"] = e["total_yield"]
+                if e["total_respawn"] != 0:
+                    entry["total_respawn"] = e["total_respawn"]
+                result[sector_id].append(entry)
 
         return result
 
@@ -475,9 +523,6 @@ def generate_map_data(
             areas = sector_resource_areas.get(sector_key_lower, [])
 
             cluster_id = sectors[sector_key].get("cluster_id", "")
-
-            # sector 级聚合：按 ware 聚合所有 area 的 resources
-            sector_resources_map: Dict[str, dict] = {}
 
             for area in areas:
                 ref = area.get("ref", "")
@@ -502,16 +547,6 @@ def generate_map_data(
                 if delay > 0:
                     respawn = yield_val * 60.0 / delay
 
-                # sector 级聚合
-                if ware:
-                    sector_entry = sector_resources_map.setdefault(ware, {
-                        "ware": ware,
-                        "yield": 0.0,
-                        "respawn": 0.0,
-                    })
-                    sector_entry["yield"] += yield_val * amount
-                    sector_entry["respawn"] += respawn * amount
-
                 # 构建该 area 的 resources 数组（每个 area 单独输出）
                 area_resources = [{
                     "ware": ware,
@@ -531,17 +566,7 @@ def generate_map_data(
                     "sector_id": sector_key,
                 })
 
-            # sector.resources 使用 sector 级聚合结果
-            sector_resources_list = [
-                {
-                    "ware": entry["ware"],
-                    "yield": round_to_int(entry["yield"]),
-                    "respawn": round_to_int(entry["respawn"]),
-                }
-                for entry in sorted(sector_resources_map.values(), key=lambda x: x["ware"])
-            ]
-
-            sectors[sector_key]["resources"] = sector_resources_list
+        # 9.0+ 不在分支内聚合，等分支结束后统一处理
     else:
         # 8.0- 使用旧版 region 处理逻辑
         resolved_region_definitions_path = region_definitions_xml_path or Path("")
@@ -684,13 +709,13 @@ def generate_map_data(
                 area_item["sector_id"] = sector_id
                 resourceareas_rows.append(area_item)
 
-        # 8.0 分支结束后，统一从 resourceareas_rows 聚合 sector.resources
-        sector_resources_map = aggregate_sector_resources_from_resourceareas()
-        for sector_id in sectors.keys():
-            if sector_id in sector_resources_map:
-                sectors[sector_id]["resources"] = sector_resources_map[sector_id]
-            else:
-                sectors[sector_id].setdefault("resources", [])
+    # 两个分支结束后，统一从 resourceareas_rows 聚合 sector.resources
+    sector_resources_map = aggregate_sector_resources_from_resourceareas()
+    for sector_id in sectors.keys():
+        if sector_id in sector_resources_map:
+            sectors[sector_id]["resources"] = sector_resources_map[sector_id]
+        else:
+            sectors[sector_id].setdefault("resources", [])
 
     for zone_macro_node in zones_root.findall("./macro[@class='zone']"):
             zone_macro = zone_macro_node.get("name")
