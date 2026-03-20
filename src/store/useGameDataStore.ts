@@ -42,8 +42,8 @@ import {
 import type { GameDataFiles } from './logic/useGameData'
 
 export const useGameDataStore = defineStore('gameData', () => {
-  const { locale: currentLocale } = useI18n()
-  const { translateModule, translateModuleGroup, translateWare } = useX4I18n()
+  const { locale: currentLocale, t } = useI18n()
+  const { translateModule, translateModuleGroup, translateWare, translateDlc } = useX4I18n()
 
   // Version management state
   const versionsConfig = ref<VersionConfig[]>([])
@@ -231,6 +231,15 @@ export const useGameDataStore = defineStore('gameData', () => {
   function getWareDisplayName(wareId: string | undefined): string {
     if (!wareId) return ''
     return localizedWaresMap.value[wareId]?.localeName || wareId
+  }
+
+  function getDlcDisplayName(dlcTag: string | null | undefined): string {
+    if (!dlcTag || dlcTag === 'base') return t('settings.dlc.baseLabel')
+    const normalized = normalizeDlcId(dlcTag)
+    const dlc = availableDlcs.value.find(item => normalizeDlcId(item.id) === normalized)
+      || dlcs.value.find(item => normalizeDlcId(item.id) === normalized)
+    if (!dlc) return dlcTag
+    return translateDlc(dlc)
   }
 
   function prepareLocalizedWares() {
@@ -516,6 +525,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     findModuleForWare,
     getModuleDisplayName,
     getWareDisplayName,
+    getDlcDisplayName,
     getModuleVolumeCompression,
     saveDlcSetting,
     isDlcActive,

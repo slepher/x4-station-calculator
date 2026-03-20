@@ -543,6 +543,7 @@
       "title": "DLC Settings",
       "selectAll": "Select All",
       "clearAll": "Clear All",
+      "baseLabel": "Base",
       "requiredVersion": "Requires {version}",
       "enforceTitle": "Restrict inactive DLC items",
       "enforceHint": "Inactive DLC items will be hidden from search lists, and already configured inactive items will not take effect"
