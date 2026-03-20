@@ -663,7 +663,8 @@ def migrate_region_definitions(
     """
     迁移 region 定义。
     """
-    from processor.map.writer import build_boundary, build_falloff, boundary_volume, compute_spline_length
+    from processor.map.converter import build_boundary, build_falloff
+    from processor.map.calculator import boundary_volume, compute_spline_length
 
     if not region_definitions_xml_path.exists():
         return {}, {}

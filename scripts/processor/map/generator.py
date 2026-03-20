@@ -13,6 +13,7 @@ from processor.utils.math_utils import (
     as_float,
     pos_from,
     pos3d_from,
+    quaternion_from,
     vec_add,
     cluster_world_to_axial,
     axial_to_pixel_flat,
@@ -305,6 +306,7 @@ def generate_map_data(
                 "cluster_id": cluster_macro,
                 "sector_id": sector_macro,
                 "offset": pos3d_from(conn),
+                "rotation": quaternion_from(conn),
             })
         for conn in cluster_macro_node.findall("./connections/connection[@ref='sechighways']"):
             macro_node = conn.find("./macro")
@@ -576,19 +578,31 @@ def generate_map_data(
         yield_info_map = build_yield_info_map(resolved_regionyields_path)
         yield_density_map = build_yield_density_map(resolved_regionyields_path)
 
-        region_position_map: Dict[str, Dict[str, float]] = {}
+        # 同一个 region ref 会在多个 sector 复用，必须按 sector + instance 区分坐标。
+        region_position_map: Dict[Tuple[str, str, str], Dict[str, object]] = {}
         for sector_id, links in sector_region_links.items():
             sector_data = sectors.get(sector_id, {})
             sector_local_pos = sector_data.get("raw_local_pos", {"x": 0.0, "y": 0.0, "z": 0.0})
             for link in links:
                 region_ref = link["region_ref"]
+                region_name = link.get("name", "")
                 region_offset = link.get("offset", {"x": 0.0, "y": 0.0, "z": 0.0})
+                cluster_rotation = link.get("rotation")
+                cluster_pos = {
+                    "x": region_offset.get("x", 0.0),
+                    "y": region_offset.get("y", 0.0),
+                    "z": region_offset.get("z", 0.0),
+                }
                 relative_pos = {
                     "x": region_offset.get("x", 0.0) - sector_local_pos.get("x", 0.0),
                     "y": region_offset.get("y", 0.0) - sector_local_pos.get("y", 0.0),
                     "z": region_offset.get("z", 0.0) - sector_local_pos.get("z", 0.0),
                 }
-                region_position_map[region_ref] = relative_pos
+                region_position_map[(sector_id, region_ref, region_name)] = {
+                    "position": relative_pos,
+                    "cluster_position": cluster_pos,
+                    "rotation": cluster_rotation,
+                }
 
         templates, calc_data = migrate_region_definitions(
             resolved_region_definitions_path,
@@ -612,11 +626,15 @@ def generate_map_data(
 
             for link in links:
                 region_ref = link["region_ref"]
+                region_name = link.get("name", "")
                 region_calc = calc_data.get(region_ref, {})
                 if not region_calc:
                     continue
 
-                position = region_position_map.get(region_ref) if region_position_map else None
+                position_entry = region_position_map.get((sector_id, region_ref, region_name)) if region_position_map else None
+                position = position_entry.get("position") if position_entry else None
+                cluster_position = position_entry.get("cluster_position") if position_entry else None
+                rotation = position_entry.get("rotation") if position_entry else None
 
                 template = templates.get(region_ref, {})
                 template_resources = template.get("resources", [])
@@ -637,6 +655,9 @@ def generate_map_data(
                     }
                     if position:
                         resourceareas_map[key]["position"] = position
+                    resourceareas_map[key]["cluster_position"] = cluster_position
+                    if rotation is not None:
+                        resourceareas_map[key]["rotation"] = rotation
 
                     # 从 region 模板复制 falloff 因子
                     template = templates.get(region_ref, {})
@@ -646,11 +667,15 @@ def generate_map_data(
                         template_falloff = {}
                     lateral_f = as_number(template_falloff.get("lateral_factor"), 1.0)
                     radial_f = as_number(template_falloff.get("radial_factor"), 1.0)
+                    radial_f_2 = as_number(template_falloff.get("radial_factor_2"), radial_f)
                     total_falloff = lateral_f * radial_f
+                    total_falloff_2 = as_number(template_falloff.get("effective_factor_2"), lateral_f * radial_f_2)
 
                     resourceareas_map[key]["lateral_factor"] = round(lateral_f, 4)
                     resourceareas_map[key]["radial_factor"] = round(radial_f, 4)
                     resourceareas_map[key]["falloff_factor"] = round(total_falloff, 4)
+                    resourceareas_map[key]["radial_factor_2"] = round(radial_f_2, 4)
+                    resourceareas_map[key]["effective_factor_2"] = round(total_falloff_2, 4)
 
                     # 从 region 模板复制完整的 boundary 数据用于计算（包括 spline）
                     template_boundary = template.get("boundary")
@@ -675,16 +700,15 @@ def generate_map_data(
                         volume_km3 = 0
                     resourceareas_map[key]["total_volume_km3"] = volume_km3
 
-                    has_gas = any(is_gas_ware(t.get("ware", "")) for t in template_resources)
                     has_solid = any(not is_gas_ware(t.get("ware", "")) for t in template_resources)
 
-                    if has_gas:
-                        total_blocks, effective_blocks = calculate_gas_block_count_truncated(
-                            position or {"x": 0.0, "y": 0.0, "z": 0.0},
-                            boundary_for_calc
-                        )
-                        resourceareas_map[key]["total_blocks"] = total_blocks
-                        resourceareas_map[key]["blocks"] = effective_blocks
+                    # block 统计统一对所有资源区计算，截断规则沿用气体的 64km 网格口径。
+                    total_blocks, effective_blocks = calculate_gas_block_count_truncated(
+                        position or {"x": 0.0, "y": 0.0, "z": 0.0},
+                        boundary_for_calc
+                    )
+                    resourceareas_map[key]["total_blocks"] = total_blocks
+                    resourceareas_map[key]["blocks"] = effective_blocks
 
                     if has_solid:
                         # 使用 position 重新计算有效体积
@@ -1120,5 +1144,3 @@ def generate_map_data(
         },
         "owner_resolution_ties": owner_resolution_ties,
     }
-
-

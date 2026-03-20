@@ -9,7 +9,7 @@ from typing import Dict, List, Optional, Tuple
 
 from processor.utils.xml_utils import parse_xml, parse_xml_attrs, parse_step_curve, piecewise_average
 from processor.utils.data_utils import split_tags, coerce_attr_value
-from processor.utils.math_utils import as_float, as_number, rgb_to_hex, distance_3d
+from processor.utils.math_utils import as_float, as_number, rgb_to_hex
 from processor.map.calculator import compute_spline_length
 
 
@@ -80,7 +80,7 @@ def build_boundary(node: Optional[ET.Element]) -> Optional[dict]:
     1. 直接 <boundary> 节点
     2. <boundaries><boundary .../></boundaries> 容器中的第一个 boundary
 
-    对于 splinetube 类型，在 size 中添加等效 linear 字段（控制点距离之和）。
+    对于 splinetube 类型，在 size 中添加等效 linear 字段（曲线弧长）。
     """
     if node is None:
         return None
@@ -105,9 +105,7 @@ def build_boundary(node: Optional[ET.Element]) -> Optional[dict]:
         boundary["spline"] = spline_points
         # 对于 splinetube 类型，计算并存储等效 linear 长度
         if boundary["class"] == "splinetube":
-            length = 0.0
-            for left, right in zip(spline_points, spline_points[1:]):
-                length += distance_3d(left, right)
+            length = compute_spline_length(boundary)
             if "size" not in boundary:
                 boundary["size"] = {}
             boundary["size"]["linear"] = length
@@ -125,6 +123,8 @@ def build_falloff(node: Optional[ET.Element]) -> Optional[dict]:
         "radial": radial,
     }
     falloff["lateral_factor"] = piecewise_average(lateral)
-    falloff["radial_factor"] = piecewise_average(radial, weighted_power=1)
+    falloff["radial_factor"] = piecewise_average(radial)
+    falloff["radial_factor_2"] = piecewise_average(radial, weighted_power=1)
     falloff["effective_factor"] = falloff["lateral_factor"] * falloff["radial_factor"]
+    falloff["effective_factor_2"] = falloff["lateral_factor"] * falloff["radial_factor_2"]
     return falloff

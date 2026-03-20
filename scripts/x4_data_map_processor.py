@@ -2942,26 +2942,34 @@ def generate_map_data(
         yield_info_map = build_yield_info_map(resolved_regionyields_path)
         yield_density_map = build_yield_density_map(resolved_regionyields_path)
 
-        # 构建 region_position_map：region_ref → 相对 sector 的坐标
+        # 构建 region_position_map：按 sector + region_ref + instance name 记录相对 sector 的坐标
         # 坐标转换逻辑：
         # 1. region 的 offset 是相对 cluster 的坐标
         # 2. sector 有 raw_local_pos（相对 cluster）和 raw_world_pos（世界坐标）
         # 3. region 相对 sector 坐标 = region 相对 cluster 坐标 - sector 相对 cluster 坐标
-        region_position_map: Dict[str, Dict[str, float]] = {}
+        region_position_map: Dict[Tuple[str, str, str], Dict[str, Dict[str, float]]] = {}
         for sector_id, links in sector_region_links.items():
             sector_data = sectors.get(sector_id, {})
             sector_local_pos = sector_data.get("raw_local_pos", {"x": 0.0, "y": 0.0, "z": 0.0})
             for link in links:
                 region_ref = link["region_ref"]
+                region_name = link.get("name", "")
                 region_offset = link.get("offset", {"x": 0.0, "y": 0.0, "z": 0.0})
+                cluster_pos = {
+                    "x": region_offset.get("x", 0.0),
+                    "y": region_offset.get("y", 0.0),
+                    "z": region_offset.get("z", 0.0),
+                }
                 # region 相对 sector 坐标 = region 相对 cluster 坐标 - sector 相对 cluster 坐标
                 relative_pos = {
                     "x": region_offset.get("x", 0.0) - sector_local_pos.get("x", 0.0),
                     "y": region_offset.get("y", 0.0) - sector_local_pos.get("y", 0.0),
                     "z": region_offset.get("z", 0.0) - sector_local_pos.get("z", 0.0),
                 }
-                # 如果同一个 region 被多个 sector 引用，取最后一个
-                region_position_map[region_ref] = relative_pos
+                region_position_map[(sector_id, region_ref, region_name)] = {
+                    "position": relative_pos,
+                    "cluster_position": cluster_pos,
+                }
 
         templates, calc_data = migrate_region_definitions(
             resolved_region_definitions_path,
@@ -2989,12 +2997,15 @@ def generate_map_data(
 
             for link in links:
                 region_ref = link["region_ref"]
+                region_name = link.get("name", "")
                 region_calc = calc_data.get(region_ref, {})
                 if not region_calc:
                     continue
 
                 # 获取 position（如果存在）
-                position = region_position_map.get(region_ref) if region_position_map else None
+                position_entry = region_position_map.get((sector_id, region_ref, region_name)) if region_position_map else None
+                position = position_entry.get("position") if position_entry else None
+                cluster_position = position_entry.get("cluster_position") if position_entry else None
 
                 # 获取 region 的模板资源（从 templates 获取 ware 基础信息）
                 template = templates.get(region_ref, {})
@@ -3020,6 +3031,8 @@ def generate_map_data(
                     # 只有有 position 时才添加 position 字段
                     if position:
                         resourceareas_map[key]["position"] = position
+                    if cluster_position:
+                        resourceareas_map[key]["cluster_position"] = cluster_position
 
                     # 计算 falloff 因子
                     falloff = region_calc.get("falloff") or {}
