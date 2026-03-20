@@ -114,6 +114,30 @@ Yield 下拉框改为 5 个等级，显示等级名称和数值范围。
 
 ---
 
+### Requirement: AdvancedFilterJumpLogic
+
+高级资源过滤器的跳数计算逻辑基于 cluster 层级。
+
+#### Scenario: 用户在高级过滤器中设置跳数限制
+
+**前提**：用户在高级资源过滤器中设置了跳数限制（如 jumpLimit=2）
+**当**：应用过滤条件时
+**那么**：跳数计算规则如下：
+- 同一 cluster 内的 sector 之间移动：跳数增加 0
+- 跨 cluster 的 sector 之间移动：跳数增加 1
+- 只有当目标 sector 的累计跳数 ≤ jumpLimit 时才可达
+
+#### Scenario: 用户查看候选评分
+
+**前提**：高级过滤器生成了多个候选方案
+**当**：显示候选列表时
+**那么**：每个候选的评分计算规则如下：
+- 对每个 tag group，取候选中所有 sector 在该组上的最高平均 rating
+- 最终评分为所有组分数中的最低分（瓶颈）
+- Rating 等级：1=low, 2=midlow, 3=medium, 4=midhigh, 5=high
+
+---
+
 ## MODIFIED Requirements
 
 ### Requirement: PanelEntryButtonBehavior
@@ -152,3 +176,5 @@ Yield 下拉框改为 5 个等级，显示等级名称和数值范围。
 | 8 | 8.0 和 9.0 版本行为一致 | 跨版本测试 |
 | 9 | Tooltip 显示 respawn 值（而非 yield） | 代码审查 + 交互测试 |
 | 10 | Tooltip 数字根据数量级正确格式化 | 交互测试 |
+| 11 | 高级过滤器跳数计算基于 cluster（同 cluster 跳数=0，跨 cluster 跳数=1） | 单元测试 + 代码审查 |
+| 12 | 高级过滤器评分使用 rating 计算（而非 level） | 单元测试 + 代码审查 |
