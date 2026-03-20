@@ -37,6 +37,7 @@ export type BuildAdvancedCandidatesInput = {
   yieldRanksByWare: Record<string, Record<string, number>>
   resourceColors: Record<string, string>
   sectorGraph: Record<string, string[]>
+  sectorClusterMap: Record<string, string>
 }
 
 export type BuildAdvancedCandidatesResult = {
@@ -58,19 +59,31 @@ const isStrictSubset = (left: string[], right: string[]) => {
   return left.every((item) => rightSet.has(item))
 }
 
-const breadthFirstReachable = (graph: Record<string, string[]>, start: string, maxDepth: number) => {
+const breadthFirstReachable = (
+  graph: Record<string, string[]>,
+  start: string,
+  maxDepth: number,
+  sectorClusterMap: Record<string, string>
+) => {
   const distances: Record<string, number> = { [start]: 0 }
   const queue = [start]
   let index = 0
+  const startClusterId = sectorClusterMap[start]
 
   while (index < queue.length) {
     const current = queue[index++]!
     const currentDepth = distances[current] || 0
-    if (currentDepth >= maxDepth) continue
+    const currentClusterId = sectorClusterMap[current]
 
     ;(graph[current] || []).forEach((next) => {
       if (distances[next] !== undefined) return
-      distances[next] = currentDepth + 1
+      const nextClusterId = sectorClusterMap[next]
+      // 同一 cluster 内移动不增加跳数，跨 cluster 移动跳数 +1
+      const depthIncrease = (currentClusterId && nextClusterId && currentClusterId !== nextClusterId) ? 1 : 0
+      const newDepth = currentDepth + depthIncrease
+      // 只有当新深度超过限制时才跳过
+      if (newDepth > maxDepth) return
+      distances[next] = newDepth
       queue.push(next)
     })
   }
@@ -125,9 +138,12 @@ export const buildSectorGraph = (clusters: Record<string, {
     })
   })
 
-  return Object.fromEntries(
-    Object.entries(graph).map(([sectorId, neighbors]) => [sectorId, Array.from(neighbors)])
-  ) as Record<string, string[]>
+  return {
+    graph: Object.fromEntries(
+      Object.entries(graph).map(([sectorId, neighbors]) => [sectorId, Array.from(neighbors)])
+    ) as Record<string, string[]>,
+    sectorClusterMap: sectorClusterIdMap
+  }
 }
 
 export const matchSectorToTagGroup = (
@@ -147,7 +163,7 @@ export const matchSectorToTagGroup = (
 
   let matched = true
   let includesSunlight = false
-  const ordinaryRatings: number[] = []
+  const ordinaryLevels: number[] = []
   const ordinaryWareIds: string[] = []
 
   group.tagIds.forEach((tagId) => {
@@ -163,17 +179,18 @@ export const matchSectorToTagGroup = (
     const minimumRating = minYieldName ? (YIELD_NAME_TO_RATING[minYieldName] ?? 1) : 1
     const actualRating = resource?.rating ?? 0
 
-    // 只要资源存在且 rating >= 最低要求，就加入匹配列表
+    // 如果资源不存在或 rating < 最低要求，设置 matched = false
     if (!resource || actualRating < minimumRating) {
-      return // 跳过这个资源，但不影响整个组的匹配
+      matched = false
+      return
     }
 
     ordinaryWareIds.push(tagId)
-    ordinaryRatings.push(actualRating)
+    ordinaryLevels.push(resource.level)
   })
 
   // 如果没有任何资源匹配，则该组不匹配
-  if (ordinaryRatings.length === 0) {
+  if (ordinaryLevels.length === 0) {
     matched = false
   }
 
@@ -181,8 +198,8 @@ export const matchSectorToTagGroup = (
     groupId: group.id,
     matched,
     matchedOrdinaryWareIds: normalizeOrdinaryTagIds(ordinaryWareIds),
-    ordinaryAverageLevel: ordinaryRatings.length
-      ? ordinaryRatings.reduce((sum, rating) => sum + rating, 0) / ordinaryRatings.length
+    ordinaryAverageLevel: ordinaryLevels.length
+      ? ordinaryLevels.reduce((sum, level) => sum + level, 0) / ordinaryLevels.length
       : null,
     includesSunlight
   }
@@ -195,7 +212,8 @@ export const buildAdvancedCandidates = ({
   allowTransit,
   yieldRanksByWare,
   resourceColors,
-  sectorGraph
+  sectorGraph,
+  sectorClusterMap
 }: BuildAdvancedCandidatesInput): BuildAdvancedCandidatesResult => {
   const groupIds = tagGroups.map((group) => group.id)
   const requiredGroupIdSet = new Set(groupIds)
@@ -236,7 +254,7 @@ export const buildAdvancedCandidates = ({
   const mergedCandidates = new Map<string, { resourceSectorIds: string[]; hubCandidateSectorIds: Set<string>; coveredGroupIds: string[] }>()
 
   hubSectorIds.forEach((hubSectorId) => {
-    const reachable = breadthFirstReachable(sectorGraph, hubSectorId, Math.max(0, jumpLimit))
+    const reachable = breadthFirstReachable(sectorGraph, hubSectorId, Math.max(0, jumpLimit), sectorClusterMap)
     const resourceSectorIds = matchedResourceSectorIds
       .filter((sectorId) => reachable[sectorId] !== undefined)
       .sort()
