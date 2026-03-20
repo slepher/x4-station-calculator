@@ -540,6 +540,14 @@
       "moduleLogicFlow": "流程",
       "moduleShipBlueprints": "舰船",
       "moduleNameLabel": "名称"
+    },
+    "dlc": {
+      "title": "DLC 设定",
+      "selectAll": "全选",
+      "clearAll": "全不选",
+      "requiredVersion": "需要版本 {version}",
+      "enforceTitle": "限制未激活 DLC 物品",
+      "enforceHint": "未激活的 DLC 物品不会从搜索列表里面出现，已经设置的未激活物品不会生效"
     }
   },
   "logicFlow": {

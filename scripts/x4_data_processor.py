@@ -91,13 +91,13 @@ SLOT_TAG_I18N_TARGETS = {
 
 DLC_I18N_PAGE_ID = "1021"
 DLC_I18N_TARGETS = [
-    {"id": "ego_dlc_boron", "lookup": "Kingdom End", "dependencyVersion": "600"},
-    {"id": "ego_dlc_mini_01", "lookup": "Hyperion Pack", "dependencyVersion": "750"},
-    {"id": "ego_dlc_mini_02", "lookup": "Envoy Pack", "dependencyVersion": "800"},
-    {"id": "ego_dlc_pirate", "lookup": "Tides of Avarice", "dependencyVersion": "600"},
     {"id": "ego_dlc_split", "lookup": "Split Vendetta", "dependencyVersion": "600"},
     {"id": "ego_dlc_terran", "lookup": "Cradle of Humanity", "dependencyVersion": "600"},
+    {"id": "ego_dlc_pirate", "lookup": "Tides of Avarice", "dependencyVersion": "600"},
+    {"id": "ego_dlc_boron", "lookup": "Kingdom End", "dependencyVersion": "600"},
     {"id": "ego_dlc_timelines", "lookup": "Timelines", "dependencyVersion": "700"},
+    {"id": "ego_dlc_mini_01", "lookup": "Hyperion Pack", "dependencyVersion": "750"},
+    {"id": "ego_dlc_mini_02", "lookup": "Envoy Pack", "dependencyVersion": "800"},
 ]
 
 
