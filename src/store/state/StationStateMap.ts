@@ -33,6 +33,8 @@ export interface StationComputeDeps {
   waresMap: Record<string, X4Ware>
   medicalConsumptionMap: RaceMedicalConsumption
   buildPriceMultiplier?: number
+  enforceDlcActivation?: boolean
+  isModuleDlcActive?: (moduleId: string) => boolean
 }
 
 export interface StationState {
@@ -202,11 +204,20 @@ export class StationStateMap {
 
   recompute(stationId: string, deps: StationComputeDeps): StationState {
     const state = this.ensure(stationId)
+    const shouldFilterInactiveDlc = deps.enforceDlcActivation === true && typeof deps.isModuleDlcActive === 'function'
+    const computeModulesMap = shouldFilterInactiveDlc
+      ? Object.fromEntries(
+          Object.entries(deps.modulesMap).filter(([id]) => deps.isModuleDlcActive?.(id) !== false)
+        )
+      : deps.modulesMap
+    const plannedModulesForCompute = shouldFilterInactiveDlc
+      ? state.plannedModules.filter(module => deps.isModuleDlcActive?.(module.id) !== false)
+      : state.plannedModules
 
     const autoFillResult = calculateAutoFill(
-      state.plannedModules,
+      plannedModulesForCompute,
       state.settings,
-      deps.modulesMap,
+      computeModulesMap,
       deps.waresMap,
       state.lockedWares,
       deps.medicalConsumptionMap,
@@ -214,11 +225,11 @@ export class StationStateMap {
     )
 
     state.autoIndustryModules = autoFillResult.autoIndustry
-    const allIndustryModules = [...state.plannedModules, ...state.autoIndustryModules]
+    const allIndustryModules = [...plannedModulesForCompute, ...state.autoIndustryModules]
 
     const workforceBreakdown = calculateWorkforceBreakdown(
       allIndustryModules,
-      deps.modulesMap,
+      computeModulesMap,
       state.settings
     )
     const actualWorkforce = calculateActualWorkforce(workforceBreakdown, state.settings)
@@ -226,9 +237,9 @@ export class StationStateMap {
 
     const warePriorityLevels = buildResolvedWarePriority(
       {
-        plannedModules: state.plannedModules,
+        plannedModules: plannedModulesForCompute,
         autoIndustryModules: state.autoIndustryModules,
-        modulesMap: deps.modulesMap,
+        modulesMap: computeModulesMap,
         userPriorityOverride: state.warePriority
       },
       Object.keys(deps.waresMap)
@@ -236,7 +247,7 @@ export class StationStateMap {
 
     const groupedFlows = analyzeWareFlow(
       allIndustryModules,
-      deps.modulesMap,
+      computeModulesMap,
       deps.waresMap,
       deps.medicalConsumptionMap,
       state.settings,
@@ -255,7 +266,7 @@ export class StationStateMap {
 
     state.stationAnalysis = analyzeStation(
       allIndustryModules,
-      deps.modulesMap,
+      computeModulesMap,
       deps.waresMap,
       deps.buildPriceMultiplier ?? 0.5,
       state.settings.useHQ

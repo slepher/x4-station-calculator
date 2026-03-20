@@ -5,9 +5,11 @@ import { useX4I18n } from '@/utils/UseX4I18n';
 import X4NumberInput from '@/components/common/X4NumberInput.vue';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
+import { useGameDataStore } from '@/store/useGameDataStore';
 
 const { translateModule } = useX4I18n();
 const { t } = useI18n();
+const gameData = useGameDataStore()
 
 const props = defineProps<{
   item: SavedModule
@@ -15,6 +17,8 @@ const props = defineProps<{
   readonly?: boolean
   noClick?: boolean
   isNumberFlashing?: boolean
+  inactiveByDlc?: boolean
+  countDisabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -49,23 +53,39 @@ const colorBarStyle = computed(() => {
 const moduleInfoClass = computed(() => {
   return !props.readonly ? 'module-info--editable ignore-drag' : 'module-info--readonly'
 })
+
+const shouldShowDlcTag = computed(() => props.info.dlc_tag !== 'base')
+const dlcLabel = computed(() => gameData.getDlcDisplayName(props.info.dlc_tag))
+const isDlcActive = computed(() => gameData.isDlcActive(props.info.dlc_tag))
 </script>
 
 <template>
-  <div class="module-row group/row" :class="{ 'module-row--draggable': !readonly, 'module-row--readonly': readonly }">
+  <div
+    class="module-row group/row"
+    :class="{
+      'module-row--draggable': !readonly,
+      'module-row--readonly': readonly,
+      'module-row--inactive': inactiveByDlc
+    }"
+  >
     <div class="color-bar" :style="colorBarStyle">
     </div>
 
     <div class="module-info" :class="moduleInfoClass">
-      <div class="module-name" :title="info.name">
-        {{ translateModule(info) }}
+      <div class="module-title-row">
+        <div class="module-name" :title="info.name">
+          {{ translateModule(info) }}
+        </div>
+        <span v-if="shouldShowDlcTag" class="dlc-tag" :class="isDlcActive ? 'dlc-tag--active' : 'dlc-tag--inactive'">
+          {{ dlcLabel }}
+        </span>
       </div>
     </div>
 
     <div class="controls" v-if="!readonly">
       <div class="ignore-drag input-wrapper" :class="{ 'input-wrapper--flashing': isNumberFlashing }">
         <X4NumberInput :modelValue="item.count" @update:modelValue="emit('update:count', $event)" width-class="w-14"
-          :min="1" />
+          :min="1" :disabled="countDisabled" />
       </div>
       <button @click="emit('remove')" class="remove-btn ignore-drag" :title="t('planning.remove')">×</button>
     </div>
@@ -117,6 +137,10 @@ const moduleInfoClass = computed(() => {
   @apply cursor-default;
 }
 
+.module-row--inactive {
+  @apply opacity-50;
+}
+
 .color-bar {
   @apply w-1.5 h-6 rounded-sm mr-2 flex-shrink-0;
 }
@@ -143,6 +167,22 @@ const moduleInfoClass = computed(() => {
 
 .module-name {
   @apply truncate font-medium text-slate-300 group-hover/row:text-white transition-colors text-xs sm:text-sm;
+}
+
+.module-title-row {
+  @apply flex items-center gap-2 min-w-0;
+}
+
+.dlc-tag {
+  @apply inline-flex max-w-[110px] flex-shrink-0 items-center rounded-md border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide;
+}
+
+.dlc-tag--active {
+  @apply border-emerald-500/70 text-emerald-300;
+}
+
+.dlc-tag--inactive {
+  @apply border-rose-500/70 text-rose-300;
 }
 
 .controls {
