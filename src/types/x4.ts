@@ -859,6 +859,7 @@ export interface VersionConfig {
     empire: string
     logic_flow: string
     ship_blueprints: string
+    setting: string
   }
 }
 
@@ -871,6 +872,11 @@ export interface VersionsFile {
 export interface GameVersionStorage {
   version: string
   beta: boolean
+}
+
+export interface X4SettingStorage {
+  activeDlcs?: string[]
+  enforceDlcActivation?: boolean
 }
 
 // --- Map Data Types ---

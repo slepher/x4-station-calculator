@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useGameDataStore } from '@/store/useGameDataStore'
+withDefaults(defineProps<{
+  showIndicator?: boolean
+}>(), {
+  showIndicator: false
+})
 
 const emit = defineEmits<{
   (e: 'click'): void
 }>()
-
-const gameData = useGameDataStore()
-const showIndicator = computed(() => gameData.needsVersionSetup)
 
 const handleClick = () => {
   emit('click')
