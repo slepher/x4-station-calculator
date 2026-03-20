@@ -83,8 +83,9 @@ const formatYieldLabel = (yieldName: string) => {
   return displayLevel
 }
 const regionYields = computed(() => buildFixedYieldEntries([...RESOURCE_ORDER]))
-const regionYieldColors = computed<Record<string, string>>(() =>
-  Object.fromEntries(((gameData.regionyields || []) as Array<{ ware: string; color?: string }>).map((entry) => [entry.ware, entry.color || '#fbbf24']))
+// 使用 res.json 的 color_rgb 作为资源颜色（与 MapWorkbenchView.vue 保持一致）
+const resourceColorsFromRes = computed<Record<string, string>>(() =>
+  Object.fromEntries(((gameData.res || []) as Array<{ id: string; color_rgb?: string }>).map((entry) => [entry.id, entry.color_rgb || '#fbbf24']))
 )
 const yieldRanksByWare = computed(() => buildYieldRanksByWare(regionYields.value))
 const SUNLIGHT_COLOR = '#F7D24B'
@@ -115,7 +116,7 @@ const resourceCatalog = computed<ResourceCatalogItem[]>(() => [
   ...regionYields.value
     .map((entry) => ({
       ware: entry.ware,
-      color: regionYieldColors.value[entry.ware] || '#fbbf24',
+      color: resourceColorsFromRes.value[entry.ware] || '#fbbf24',
       yields: entry.yields.map((item) => item.name),
       kind: 'ware' as const
     })),
@@ -126,13 +127,6 @@ const resourceCatalog = computed<ResourceCatalogItem[]>(() => [
     kind: 'sunlight' as const
   }
 ])
-
-const resourceColors = computed<Record<string, string>>(() =>
-  resourceCatalog.value.reduce<Record<string, string>>((acc, item) => {
-    acc[item.ware] = item.color
-    return acc
-  }, {})
-)
 
 const sectorDataById = computed<Record<string, { resources: SectorResourceEntry[]; sunlight: number }>>(() => {
   const out: Record<string, { resources: SectorResourceEntry[]; sunlight: number }> = {}
@@ -170,7 +164,7 @@ const appliedResult = computed(() => buildAdvancedCandidates({
   jumpLimit: jumpLimitApplied.value,
   allowTransit: allowTransitApplied.value,
   yieldRanksByWare: yieldRanksByWare.value,
-  resourceColors: resourceColors.value,
+  resourceColors: resourceColorsFromRes.value,
   sectorGraph: sectorGraph.value,
   sectorClusterMap: sectorClusterMap.value
 }))
@@ -356,7 +350,7 @@ const groupTagItems = (group: AdvancedResourceTagGroup) =>
     return {
       tagId,
       label,
-      color: resourceColors.value[tagId] || '#fbbf24'
+      color: resourceColorsFromRes.value[tagId] || '#fbbf24'
     }
   })
 

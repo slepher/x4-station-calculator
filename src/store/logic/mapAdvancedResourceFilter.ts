@@ -68,7 +68,6 @@ const breadthFirstReachable = (
   const distances: Record<string, number> = { [start]: 0 }
   const queue = [start]
   let index = 0
-  const startClusterId = sectorClusterMap[start]
 
   while (index < queue.length) {
     const current = queue[index++]!

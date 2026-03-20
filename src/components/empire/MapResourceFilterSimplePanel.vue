@@ -61,8 +61,9 @@ const gameData = useGameDataStore()
 
 const RESOURCE_ORDER = ['ore', 'silicon', 'methane', 'hydrogen', 'helium', 'ice', 'rawscrap', 'nividium'] as const
 const regionYields = computed(() => buildFixedYieldEntries([...RESOURCE_ORDER]))
-const regionYieldColors = computed<Record<string, string>>(() =>
-  Object.fromEntries(((gameData.regionyields || []) as Array<{ ware: string; color?: string }>).map((entry) => [entry.ware, entry.color || '#fbbf24']))
+// 使用 res.json 的 color_rgb 作为资源颜色（与 MapWorkbenchView.vue 保持一致）
+const resourceColorMap = computed<Record<string, string>>(() =>
+  Object.fromEntries(((gameData.res || []) as Array<{ id: string; color_rgb?: string }>).map((entry) => [entry.id, entry.color_rgb || '#fbbf24']))
 )
 const yieldRanksByWare = computed(() => buildYieldRanksByWare(regionYields.value))
 const resourceFilters = ref(buildDefaultResourceFilters([]))
@@ -114,7 +115,7 @@ const resourceCatalog = computed<ResourceCatalogItem[]>(() => [
   ...regionYields.value
     .map((entry) => ({
       ware: entry.ware,
-      color: regionYieldColors.value[entry.ware] || '#fbbf24',
+      color: resourceColorMap.value[entry.ware] || '#fbbf24',
       yields: entry.yields.map((item) => item.name),
       kind: 'ware' as const
     })),
@@ -207,13 +208,6 @@ const resourceCandidates = computed(() =>
     .slice(0, 10)
 )
 
-const resourceColors = computed<Record<string, string>>(() =>
-  resourceCatalog.value.reduce<Record<string, string>>((acc, item) => {
-    acc[item.ware] = item.color
-    return acc
-  }, {})
-)
-
 const resourceSectorFills = computed<Record<string, SectorResourceFill>>(() => {
   if (!selectedFilterIds.value.length) return {}
   return filteredSectorCandidates.value.reduce<Record<string, SectorResourceFill>>((acc, sector) => {
@@ -221,7 +215,7 @@ const resourceSectorFills = computed<Record<string, SectorResourceFill>>(() => {
       sector,
       selectedWareIds: selectedWareIds.value,
       sunlightFilterEnabled: sunlightFilterEnabled.value,
-      resourceColors: resourceColors.value
+      resourceColors: resourceColorMap.value
     })
     if (fill) acc[sector.sectorId] = fill
     return acc
