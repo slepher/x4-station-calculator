@@ -148,7 +148,9 @@ const sectorDataById = computed<Record<string, { resources: SectorResourceEntry[
   return out
 })
 
-const sectorGraph = computed(() => buildSectorGraph(gameData.maps?.clusters || {}))
+const sectorGraphResult = computed(() => buildSectorGraph(gameData.maps?.clusters || {}))
+const sectorGraph = computed(() => sectorGraphResult.value.graph)
+const sectorClusterMap = computed(() => sectorGraphResult.value.sectorClusterMap)
 
 const sectors = computed<AdvancedResourceSector[]>(() =>
   props.sectorLayouts.map((layout) => ({
@@ -169,7 +171,8 @@ const appliedResult = computed(() => buildAdvancedCandidates({
   allowTransit: allowTransitApplied.value,
   yieldRanksByWare: yieldRanksByWare.value,
   resourceColors: resourceColors.value,
-  sectorGraph: sectorGraph.value
+  sectorGraph: sectorGraph.value,
+  sectorClusterMap: sectorClusterMap.value
 }))
 
 const candidateKeyOf = (resourceSectorIds: string[]) => resourceSectorIds.slice().sort().join('|')
