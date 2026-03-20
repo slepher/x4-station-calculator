@@ -118,6 +118,8 @@ watch(() => store.plannedModules.length, (newLength, oldLength) => {
           :prevent-on-filter="false" class="draggable-container">
           <template #item="{ element, index }">
             <StationPlanningItem :item="element" :info="store.getModuleInfo(element.id)!"
+              :inactive-by-dlc="store.enforceDlcActivation && !store.isModuleDlcActive(element.id)"
+              :count-disabled="!store.isModuleCountEditable(element.id)"
               :class="{ 'module-row--highlight': highlightedModuleIds.has(element.id) }"
               :is-number-flashing="flashingNumberModuleIds.has(element.id)"
               @update:count="(val: number) => store.updateModuleCount(index, val)" @remove="store.removeModule(index)" />

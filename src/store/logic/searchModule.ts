@@ -31,7 +31,8 @@ export function generateFilteredModulesGrouped(
   query: string,
   currentLocale: string,
   localizedModulesMap: Record<string, LocalizedX4Module>,
-  localizedModuleGroupsMap: Record<string, LocalizedX4ModuleGroup>
+  localizedModuleGroupsMap: Record<string, LocalizedX4ModuleGroup>,
+  includeModule?: (module: LocalizedX4Module) => boolean
 ): ModuleGroupResult[] {
   const searchQuery = query.trim().toLowerCase()
   const isSearching = searchQuery.length > 0
@@ -76,6 +77,8 @@ export function generateFilteredModulesGrouped(
 
   // 2. 遍历模块，结合类型命中状态进行级联过滤
   Object.values(localizedModulesMap).forEach(m => {
+    if (includeModule && !includeModule(m)) return
+
     const localeName = (m.localeName || '').toLowerCase()
     const originalName = (m.name || '').toLowerCase()
     const id = (m.id || '').toLowerCase()
