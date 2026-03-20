@@ -97,11 +97,17 @@ const getReadableTextColor = (hex: string | undefined) => {
 }
 
 const formatYieldLabel = (yieldName: string) => {
-  const localized = t(`map.yield_names.${yieldName}`)
-  if (localized !== `map.yield_names.${yieldName}`) return localized
-  return yieldName
-    .replace(/([a-z])([A-Z])/g, '$1 $2')
-    .replace(/^./, (char) => char.toUpperCase())
+  const levelKey = `map.yield_levels.${yieldName}`
+  const levelText = t(levelKey)
+  const fallbackLevel = yieldName === 'low' ? 'Low' :
+                      yieldName === 'midlow' ? 'Mid Low' :
+                      yieldName === 'medium' ? 'Medium' :
+                      yieldName === 'midhigh' ? 'Mid High' :
+                      yieldName === 'high' ? 'High' : yieldName
+
+  const displayLevel = levelKey !== levelText ? levelText : fallbackLevel
+
+  return displayLevel
 }
 
 const resourceCatalog = computed<ResourceCatalogItem[]>(() => [
@@ -155,7 +161,7 @@ const reachableMaxByWare = computed<Record<string, string | null>>(() =>
     const sectorsWithinSunlight = sunlightFilterEnabled.value
       ? sectorCandidates.value.filter((sector) => sector.sunlight >= sunlightMinimum.value)
       : sectorCandidates.value
-    acc[wareId] = getContextReachableMaxYieldName(wareId, sectorsWithinSunlight, resourceFilters.value, yieldRanksByWare.value)
+    acc[wareId] = getContextReachableMaxYieldName(wareId, sectorsWithinSunlight, resourceFilters.value)
     return acc
   }, {})
 )
@@ -190,7 +196,7 @@ const resourceCandidates = computed(() =>
           ? sector.sunlight
           : DEFAULT_CANDIDATE_WARE_IDS.reduce((sum, ware) => {
               const resource = sector.resources.find((item) => item.ware === ware)
-              return sum + (resource?.level || 0)
+              return sum + (resource?.rating || 0)
             }, 0)
     }))
     .sort((left, right) =>

@@ -164,6 +164,13 @@
       "highplus": "高+",
       "veryhigh": "很高",
       "highest": "最高"
+    },
+    "yield_levels": {
+      "low": "低",
+      "midlow": "中低",
+      "medium": "中",
+      "midhigh": "中高",
+      "high": "高"
     }
   },
   "ship_build": {

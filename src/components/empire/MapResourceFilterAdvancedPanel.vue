@@ -68,6 +68,20 @@ const emit = defineEmits<{
 const { t, locale } = useI18n()
 const gameData = useGameDataStore()
 const RESOURCE_ORDER = ['ore', 'silicon', 'methane', 'hydrogen', 'helium', 'ice', 'rawscrap', 'nividium'] as const
+
+const formatYieldLabel = (yieldName: string) => {
+  const levelKey = `map.yield_levels.${yieldName}`
+  const levelText = t(levelKey)
+  const fallbackLevel = yieldName === 'low' ? 'Low' :
+                      yieldName === 'midlow' ? 'Mid Low' :
+                      yieldName === 'medium' ? 'Medium' :
+                      yieldName === 'midhigh' ? 'Mid High' :
+                      yieldName === 'high' ? 'High' : yieldName
+
+  const displayLevel = levelKey !== levelText ? levelText : fallbackLevel
+
+  return displayLevel
+}
 const regionYields = computed(() => buildFixedYieldEntries([...RESOURCE_ORDER]))
 const regionYieldColors = computed<Record<string, string>>(() =>
   Object.fromEntries(((gameData.regionyields || []) as Array<{ ware: string; color?: string }>).map((entry) => [entry.ware, entry.color || '#fbbf24']))
@@ -470,7 +484,7 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
                   :key="yieldName"
                   :value="yieldName"
                 >
-                  {{ t(`map.yield_names.${yieldName}`) }}
+                  {{ formatYieldLabel(yieldName) }}
                 </option>
               </select>
             </label>
@@ -487,7 +501,7 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
                   :key="yieldName"
                   :value="yieldName"
                 >
-                  {{ t(`map.yield_names.${yieldName}`) }}
+                  {{ formatYieldLabel(yieldName) }}
                 </option>
               </select>
             </label>

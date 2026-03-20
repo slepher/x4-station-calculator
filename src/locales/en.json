@@ -164,6 +164,13 @@
       "highplus": "High Plus",
       "veryhigh": "Very High",
       "highest": "Highest"
+    },
+    "yield_levels": {
+      "low": "Low",
+      "midlow": "Mid Low",
+      "medium": "Medium",
+      "midhigh": "Mid High",
+      "high": "High"
     }
   },
   "ship_build": {

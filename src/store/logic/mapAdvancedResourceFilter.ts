@@ -1,5 +1,5 @@
 import type { SectorResourceFill, SectorResourceVisualInput } from './mapResourceFilter'
-import { buildSectorResourceFill } from './mapResourceFilter'
+import { buildSectorResourceFill, YIELD_NAME_TO_RATING } from '@/store/logic/mapResourceFilter'
 
 export const ADVANCED_SUNLIGHT_TAG_ID = 'sunlight'
 
@@ -133,7 +133,7 @@ export const buildSectorGraph = (clusters: Record<string, {
 export const matchSectorToTagGroup = (
   sector: AdvancedResourceSector,
   group: AdvancedResourceTagGroup,
-  yieldRanksByWare: Record<string, Record<string, number>>
+  _yieldRanksByWare: Record<string, Record<string, number>>
 ): AdvancedGroupMatch => {
   if (!group.tagIds.length) {
     return {
@@ -147,7 +147,7 @@ export const matchSectorToTagGroup = (
 
   let matched = true
   let includesSunlight = false
-  const ordinaryLevels: number[] = []
+  const ordinaryRatings: number[] = []
   const ordinaryWareIds: string[] = []
 
   group.tagIds.forEach((tagId) => {
@@ -158,26 +158,31 @@ export const matchSectorToTagGroup = (
     }
 
     const resource = sector.resources.find((entry) => entry.ware === tagId)
-    const rankMap = yieldRanksByWare[tagId]
     const minYieldName = group.minYieldByWare[tagId]
-    const actualRank = resource && rankMap ? rankMap[resource.yield] : undefined
-    const minimumRank = minYieldName && rankMap ? rankMap[minYieldName] : undefined
+    // 将 minYieldName（如 'low', 'high'）转换为 rating 数值
+    const minimumRating = minYieldName ? (YIELD_NAME_TO_RATING[minYieldName] ?? 1) : 1
+    const actualRating = resource?.rating ?? 0
 
-    if (!resource || actualRank === undefined || minimumRank === undefined || actualRank < minimumRank) {
-      matched = false
-      return
+    // 只要资源存在且 rating >= 最低要求，就加入匹配列表
+    if (!resource || actualRating < minimumRating) {
+      return // 跳过这个资源，但不影响整个组的匹配
     }
 
     ordinaryWareIds.push(tagId)
-    ordinaryLevels.push(resource.level || 0)
+    ordinaryRatings.push(actualRating)
   })
+
+  // 如果没有任何资源匹配，则该组不匹配
+  if (ordinaryRatings.length === 0) {
+    matched = false
+  }
 
   return {
     groupId: group.id,
     matched,
     matchedOrdinaryWareIds: normalizeOrdinaryTagIds(ordinaryWareIds),
-    ordinaryAverageLevel: ordinaryLevels.length
-      ? ordinaryLevels.reduce((sum, level) => sum + level, 0) / ordinaryLevels.length
+    ordinaryAverageLevel: ordinaryRatings.length
+      ? ordinaryRatings.reduce((sum, rating) => sum + rating, 0) / ordinaryRatings.length
       : null,
     includesSunlight
   }
@@ -205,11 +210,12 @@ export const buildAdvancedCandidates = ({
     const matchedGroupIds: string[] = []
     const ordinaryWareSet = new Set<string>()
     let hasSunlightMatch = false
-    const scoreMap: Record<string, number | null> = {}
+    const groupAverageScoresBySector: Record<string, number | null> = {}
 
     tagGroups.forEach((group) => {
       const match = matchSectorToTagGroup(sector, group, yieldRanksByWare)
-      scoreMap[group.id] = match.ordinaryAverageLevel
+      // 使用该组匹配资源的平均 rating 作为分数（可以是小数）
+      groupAverageScoresBySector[group.id] = match.ordinaryAverageLevel
       if (!match.matched) return
       matchedGroupIds.push(group.id)
       match.matchedOrdinaryWareIds.forEach((wareId) => ordinaryWareSet.add(wareId))
@@ -219,7 +225,7 @@ export const buildAdvancedCandidates = ({
     matchedGroupsBySector[sector.sectorId] = matchedGroupIds
     matchedResourceTagsBySector[sector.sectorId] = Array.from(ordinaryWareSet).sort()
     matchedSunlightBySector[sector.sectorId] = hasSunlightMatch
-    groupScoresBySector[sector.sectorId] = scoreMap
+    groupScoresBySector[sector.sectorId] = groupAverageScoresBySector
   })
 
   const matchedResourceSectorIds = sectors
@@ -265,6 +271,7 @@ export const buildAdvancedCandidates = ({
   ))
 
   const buildCandidateScore = (resourceSectorIds: string[]) => {
+    // 1. 对每个 tag group，取候选中所有 sector 在该 group 上的最高平均分
     const groupScores = tagGroups
       .map((group) => resourceSectorIds
         .map((sectorId) => groupScoresBySector[sectorId]?.[group.id] ?? null)
@@ -274,6 +281,7 @@ export const buildAdvancedCandidates = ({
       .map((scores) => Math.max(...scores))
 
     if (!groupScores.length) return 0
+    // 2. 取所有组分数中的最低分（瓶颈）
     return Math.min(...groupScores)
   }
 

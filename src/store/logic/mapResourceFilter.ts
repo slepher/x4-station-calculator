@@ -5,10 +5,34 @@ export type RegionYieldEntry = {
 
 export const FIXED_RESOURCE_YIELD_NAMES = ['low', 'midlow', 'medium', 'midhigh', 'high'] as const
 
+/**
+ * 将 rating (1-5) 映射到等级名称
+ * rating 1 = low, 2 = midlow, 3 = medium, 4 = midhigh, 5 = high
+ */
+export const RATING_TO_YIELD_NAME: Record<number, string> = {
+  1: 'low',
+  2: 'midlow',
+  3: 'medium',
+  4: 'midhigh',
+  5: 'high'
+}
+
+/**
+ * 将等级名称映射到 rating (1-5)
+ */
+export const YIELD_NAME_TO_RATING: Record<string, number> = {
+  low: 1,
+  midlow: 2,
+  medium: 3,
+  midhigh: 4,
+  high: 5
+}
+
 export type SectorResourceEntry = {
   ware: string
   yield: string
   level: number
+  rating: number
 }
 
 export type ResourceFilterState = {
@@ -105,54 +129,49 @@ export const getSharedMinYieldName = (selectedIds: string[], filters: ResourceFi
 export const isSectorMatchedByResources = (
   candidate: ResourceCandidateInput,
   filters: ResourceFilterMap,
-  ranksByWare: Record<string, Record<string, number>>
+  _ranksByWare: Record<string, Record<string, number>>
 ) => {
   const selectedIds = getSelectedResourceIds(filters)
   if (!selectedIds.length) return false
-  return isSectorMatchedBySelectedIds(candidate, filters, ranksByWare, selectedIds)
+  return isSectorMatchedBySelectedIds(candidate, filters, selectedIds)
 }
 
 export const isSectorMatchedBySelectedIds = (
   candidate: ResourceCandidateInput,
   filters: ResourceFilterMap,
-  ranksByWare: Record<string, Record<string, number>>,
   selectedIds: string[]
 ) => {
   if (!selectedIds.length) return false
 
   return selectedIds.every((ware) => {
     const state = filters[ware]
-    const rankMap = ranksByWare[ware]
     const resource = candidate.resources.find((item) => item.ware === ware)
-    if (!state || !rankMap || !resource) return false
-    const actualRank = rankMap[resource.yield]
-    const minimumRank = rankMap[state.minYieldName]
-    if (actualRank === undefined || minimumRank === undefined) return false
-    return actualRank >= minimumRank
+    if (!state || !resource) return false
+    // 使用 rating 进行比较（rating 1-5 直接对应等级）
+    const actualRating = resource.rating
+    const minimumRating = YIELD_NAME_TO_RATING[state.minYieldName] || 1
+    if (actualRating === undefined || minimumRating === undefined) return false
+    return actualRating >= minimumRating
   })
 }
 
 export const getContextReachableMaxYieldName = (
   targetWare: string,
   sectors: ResourceCandidateInput[],
-  filters: ResourceFilterMap,
-  ranksByWare: Record<string, Record<string, number>>
+  filters: ResourceFilterMap
 ) => {
-  const rankMap = ranksByWare[targetWare]
-  if (!rankMap) return null
-
   const otherSelectedIds = getSelectedResourceIds(filters).filter((ware) => ware !== targetWare)
+  let bestRating = 0
   let bestName: string | null = null
-  let bestRank = Number.NEGATIVE_INFINITY
 
   sectors.forEach((sector) => {
-    if (otherSelectedIds.length && !isSectorMatchedBySelectedIds(sector, filters, ranksByWare, otherSelectedIds)) return
+    if (otherSelectedIds.length && !isSectorMatchedBySelectedIds(sector, filters, otherSelectedIds)) return
     const resource = sector.resources.find((item) => item.ware === targetWare)
     if (!resource) return
-    const rank = rankMap[resource.yield]
-    if (rank === undefined || rank <= bestRank) return
-    bestRank = rank
-    bestName = resource.yield
+    const rating = resource.rating
+    if (rating <= bestRating) return
+    bestRating = rating
+    bestName = RATING_TO_YIELD_NAME[rating] || 'low'
   })
 
   return bestName
@@ -175,7 +194,7 @@ export const buildResourceCandidates = (
       displayName: sector.displayName,
       score: selectedIds.reduce((sum, ware) => {
         const resource = sector.resources.find((item) => item.ware === ware)
-        return sum + (resource?.level || 0)
+        return sum + (resource?.rating || 0)
       }, 0)
     }))
     .sort((left, right) =>
@@ -216,7 +235,7 @@ export const buildSectorResourceFill = ({
   const normalResourceSlices = selectedWareIds
     .map((ware) => ({
       ware,
-      level: sector.resources.find((item) => item.ware === ware)?.level || 0,
+      rating: sector.resources.find((item) => item.ware === ware)?.rating || 0,
       color: resourceColors[ware] || '#fbbf24'
     }))
     .filter((entry) => sector.resources.some((item) => item.ware === entry.ware))
@@ -233,13 +252,13 @@ export const buildSectorResourceFill = ({
   if (normalResourceSlices.length >= 2) {
     const baseShare = minShare * normalResourceSlices.length
     const remainingShare = Math.max(0, 1 - baseShare)
-    const totalLevel = normalResourceSlices.reduce((sum, slice) => sum + Math.max(0, slice.level), 0)
+    const totalRating = normalResourceSlices.reduce((sum, slice) => sum + Math.max(0, slice.rating), 0)
     const weightedSlices = normalResourceSlices.map((slice) => ({
       ware: slice.ware,
       color: slice.color,
       share: minShare + (
-        totalLevel > 0
-          ? remainingShare * (Math.max(0, slice.level) / totalLevel)
+        totalRating > 0
+          ? remainingShare * (Math.max(0, slice.rating) / totalRating)
           : remainingShare / normalResourceSlices.length
       )
     }))

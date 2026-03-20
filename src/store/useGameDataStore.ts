@@ -22,7 +22,8 @@ import type {
   X4ShipSlot,
   X4Consumable,
   X4Drone,
-  X4Missile
+  X4Missile,
+  X4Res
 } from '@/types/x4'
 import { generateFilteredModulesGrouped } from './logic/searchModule'
 import {
@@ -73,6 +74,7 @@ export const useGameDataStore = defineStore('gameData', () => {
   const consumables = ref<X4Consumable[]>([])
   const maps = ref<X4Map>({ clusters: {} })
   const regionyields = ref<X4RegionYield[]>([])
+  const res = ref<X4Res[]>([])
   const factions = ref<X4Faction[]>([])
   const defaultMaxes = ref<Record<string, X4DefaultMax>>({})
   const shipSlots = ref<Record<string, X4ShipSlot[]>>({})
@@ -296,6 +298,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     consumables.value = data.consumables
     maps.value = data.maps
     regionyields.value = data.regionyields
+    res.value = data.res
     factions.value = data.factions
     defaultMaxes.value = data.defaultMaxes
     shipSlots.value = data.shipSlots
@@ -420,6 +423,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     consumables,
     maps,
     regionyields,
+    res,
     factions,
     defaultMaxes,
     shipSlots,

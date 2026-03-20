@@ -7,6 +7,7 @@ import MapResourceFilterPanel from './MapResourceFilterPanel.vue'
 import MapStationPanel, { type MapStationPanelItem } from './MapStationPanel.vue'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
+import { formatNumber } from '@/utils/numberFormatter'
 import type { SectorResourceFill } from '@/store/logic/mapResourceFilter'
 import type { EntityLocation } from '@/types/x4'
 
@@ -27,6 +28,8 @@ type MapSectorResourceEntry = {
   ware: string
   yield?: string
   level?: number
+  respawn?: number
+  rating?: number
 }
 type MapSectorDataset = {
   id: string
@@ -49,6 +52,8 @@ type SectorHoverPayload = {
     ware: string
     yield?: string
     level?: number
+    respawn?: number
+    rating?: number
   }>
   anchorRect: {
     left: number
@@ -62,7 +67,7 @@ type SectorHoverPayload = {
 type TooltipResourceItem = {
   wareId: string
   label: string
-  yieldLabel: string
+  respawnLabel: string
   color: string
 }
 type TooltipPlacement = 'bottom' | 'top' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
@@ -156,7 +161,7 @@ const factionsById = computed(() => Object.fromEntries(
   (gameDataStore.factions || []).map((entry: any) => [entry.id, entry])
 ) as Record<string, { id: string; nameId: string }>)
 const resourceColorByWare = computed(() => Object.fromEntries(
-  (gameDataStore.regionyields || []).map((entry: any) => [entry.ware, entry.color || '#fbbf24'])
+  (gameDataStore.res || []).map((entry: any) => [entry.id, entry.color_rgb || '#fbbf24'])
 ) as Record<string, string>)
 const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
   const out: Record<string, MapSectorDataset> = {}
@@ -491,12 +496,6 @@ const formatOwnerName = (owner: string) => {
   return t(faction.nameId)
 }
 
-const formatYieldLabel = (yieldName: string) => {
-  const localized = t(`map.yield_names.${yieldName}`)
-  if (localized !== `map.yield_names.${yieldName}`) return localized
-  return yieldName
-}
-
 const chooseTooltipPlacement = (
   anchor: SectorHoverPayload['anchorRect'],
   viewportWidth: number,
@@ -673,7 +672,7 @@ const createTooltipViewModel = (payload: SectorHoverPayload): TooltipViewModel =
       .map((entry) => ({
         wareId: entry.ware,
         label: gameDataStore.getWareDisplayName(entry.ware) || (t(`res.${entry.ware}`) !== `res.${entry.ware}` ? t(`res.${entry.ware}`) : entry.ware),
-        yieldLabel: formatYieldLabel(entry.yield || 'medium'),
+        respawnLabel: formatNumber(entry.respawn ?? 0),
         color: resourceColorByWare.value[entry.ware] || '#fbbf24'
       })),
     anchorRect: payload.anchorRect
@@ -1162,7 +1161,7 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <div class="map-search-panel right-6 top-5" @mousedown.stop>
+        <div class="map-search-panel left-6 top-5" @mousedown.stop>
           <div class="search-box group" :class="{ focused: isSearchFocused }">
             <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
               <circle
@@ -1230,45 +1229,47 @@ onBeforeUnmount(() => {
           </Transition>
         </div>
 
-        <button
-          v-if="!isResourcePanelOpen"
-          type="button"
-          class="map-resource-entry-btn left-6 top-5"
-          data-testid="map-resource-entry-button"
-          @click="onResourcePanelOpen"
-        >
-          <span class="map-resource-entry-label">{{ t('map.resource_filter_button') }}</span>
-          <svg class="map-resource-entry-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              d="M3 5h18l-7 8v5l-4 2v-7L3 5z"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="1.8"
-            />
-          </svg>
-        </button>
+        <div class="map-panel-tabs left-6 bottom-5" @mousedown.stop>
+          <button
+            type="button"
+            class="map-panel-tab"
+            :class="{ active: isResourcePanelOpen }"
+            data-testid="map-resource-entry-button"
+            @click="onResourcePanelOpen"
+          >
+            <span class="map-panel-tab-label">{{ t('map.resource_filter_button') }}</span>
+            <svg class="map-panel-tab-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M3 5h18l-7 8v5l-4 2v-7L3 5z"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.8"
+              />
+            </svg>
+          </button>
 
-        <button
-          v-if="!isStationPanelOpen"
-          type="button"
-          class="map-station-entry-btn left-6 bottom-5"
-          data-testid="map-station-entry-button"
-          @click="onStationPanelOpen"
-        >
-          <span class="map-station-entry-label">{{ t('map.station_panel_button') }}</span>
-          <svg class="map-station-entry-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              d="M12 3l7 4v10l-7 4-7-4V7l7-4zm0 4.2L8 9.4v5.2l4 2.2 4-2.2V9.4l-4-2.2z"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="1.6"
-            />
-          </svg>
-        </button>
+          <button
+            type="button"
+            class="map-panel-tab"
+            :class="{ active: isStationPanelOpen }"
+            data-testid="map-station-entry-button"
+            @click="onStationPanelOpen"
+          >
+            <span class="map-panel-tab-label">{{ t('map.station_panel_button') }}</span>
+            <svg class="map-panel-tab-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 3l7 4v10l-7 4-7-4V7l7-4zm0 4.2L8 9.4v5.2l4 2.2 4-2.2V9.4l-4-2.2z"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.6"
+              />
+            </svg>
+          </button>
+        </div>
 
         <div class="zoom-panel right-6 bottom-5">
           <div class="zoom-label-row">
@@ -1364,6 +1365,27 @@ onBeforeUnmount(() => {
 }
 
 .map-station-entry-icon {
+  @apply h-[18px] w-[18px] text-amber-200/70;
+}
+
+.map-panel-tabs {
+  @apply absolute z-10 flex items-center gap-1;
+}
+
+.map-panel-tab {
+  @apply inline-flex items-center gap-2 rounded border border-amber-300/40 bg-black/75 px-4 h-10 text-sm font-semibold text-amber-50 shadow-xl transition-colors duration-150 hover:border-amber-200/70 hover:bg-black/85;
+  backdrop-filter: blur(4px);
+}
+
+.map-panel-tab.active {
+  @apply border-amber-200/70 bg-amber-200/15 text-amber-50;
+}
+
+.map-panel-tab-label {
+  @apply leading-none;
+}
+
+.map-panel-tab-icon {
   @apply h-[18px] w-[18px] text-amber-200/70;
 }
 

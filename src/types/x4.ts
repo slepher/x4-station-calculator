@@ -931,6 +931,28 @@ export interface X4RegionYield {
   yields: X4YieldLevel[]
 }
 
+/**
+ * 资源定义 - 对应 res.json
+ * 用于地图资源颜色显示
+ */
+export interface X4Res {
+  id: string
+  color: string
+  color_rgb: string
+  name_en?: string
+  'name_zh-CN'?: string
+  'name_zh-TW'?: string
+  name_de?: string
+  name_fr?: string
+  name_it?: string
+  name_es?: string
+  name_ru?: string
+  name_ja?: string
+  name_ko?: string
+  'name_pt-BR'?: string
+  name_pl?: string
+}
+
 // --- Faction Types ---
 
 export interface X4Faction {
