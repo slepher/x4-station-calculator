@@ -22,6 +22,11 @@ const gameData = useGameDataStore()
 // Default maxes map - 用于数值条的 max 值
 const defaultMaxesMap = computed(() => gameData.defaultMaxes)
 
+const isEquipmentActiveForStats = (equipmentId: string | null | undefined) => {
+  if (!equipmentId) return false
+  return store.isEquipmentDlcUsable(equipmentId)
+}
+
 // PanelStats key -> default_maxes 字段映射
 const STAT_KEY_TO_MAX_FIELD: Record<string, string> = {
   hull: 'hull',
@@ -74,6 +79,7 @@ const getWeaponStatsByUseEquipmentStats = (blueprintData: ShipBlueprint | null) 
   blueprintData.connections.forEach((conn) => {
     conn.group.forEach((g) => {
       if (!g.equipment_id || g.count <= 0) return
+      if (!isEquipmentActiveForStats(g.equipment_id)) return
       const equipment = store.findEquipment(g.equipment_id)
       if (!equipment?.bullet) return
 
@@ -104,6 +110,7 @@ const getTurretStatsByUseEquipmentStats = (blueprintData: ShipBlueprint | null) 
   blueprintData.connections.forEach((conn) => {
     conn.group.forEach((g) => {
       if (!g.equipment_id || g.count <= 0) return
+      if (!isEquipmentActiveForStats(g.equipment_id)) return
       const equipment = store.findEquipment(g.equipment_id)
       if (!equipment?.bullet) return
 
@@ -138,6 +145,7 @@ const getShieldStatsByUseEquipmentStats = (blueprintData: ShipBlueprint | null) 
     if (conn.slot_type !== 'shield') return
     conn.group.forEach((g) => {
       if (!g.equipment_id || g.count <= 0) return
+      if (!isEquipmentActiveForStats(g.equipment_id)) return
       const equipment = store.findEquipment(g.equipment_id)
       if (!equipment?.recharge) return
 
@@ -159,6 +167,7 @@ const getShieldStatsByUseEquipmentStats = (blueprintData: ShipBlueprint | null) 
     if (conn.slot_type === 'shield') return
     conn.group.forEach((g) => {
       if (!g.shield?.equipment_id || g.shield.count <= 0) return
+      if (!isEquipmentActiveForStats(g.shield.equipment_id)) return
       const shieldEquipment = store.findEquipment(g.shield.equipment_id)
       if (!shieldEquipment?.recharge) return
 
@@ -195,6 +204,7 @@ const getEngineStatsByUseEquipmentStats = (blueprintData: ShipBlueprint | null) 
     if (conn.slot_type !== 'engine') return
     conn.group.forEach((g) => {
       if (!g.equipment_id || g.count <= 0) return
+      if (!isEquipmentActiveForStats(g.equipment_id)) return
       const equipment = store.findEquipment(g.equipment_id)
       if (!equipment) return
 
@@ -241,6 +251,7 @@ const getThrusterStatsByUseEquipmentStats = (blueprintData: ShipBlueprint | null
     if (conn.slot_type !== 'thruster') return
     conn.group.forEach((g) => {
       if (!g.equipment_id || g.count <= 0) return
+      if (!isEquipmentActiveForStats(g.equipment_id)) return
       const equipment = store.findEquipment(g.equipment_id)
       if (!equipment) return
 
