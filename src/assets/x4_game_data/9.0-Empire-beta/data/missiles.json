@@ -3,6 +3,7 @@
     "id": "missile_cluster_heavy_mk1",
     "nameId": "{20105,6114}",
     "name": "{20105,6114}",
+    "dlc_tag": "base",
     "macro": "missile_cluster_heavy_mk1_macro",
     "class": "missile",
     "tags": [
@@ -42,6 +43,7 @@
     "id": "missile_cluster_light_mk1",
     "nameId": "{20105,6104}",
     "name": "{20105,6104}",
+    "dlc_tag": "base",
     "macro": "missile_cluster_light_mk1_macro",
     "class": "missile",
     "tags": [
@@ -81,6 +83,7 @@
     "id": "missile_disruptor_light_mk1",
     "nameId": "{20105,6184}",
     "name": "{20105,6184}",
+    "dlc_tag": "dlc_split",
     "macro": "missile_disruptor_light_mk1_macro",
     "class": "missile",
     "tags": [
@@ -112,6 +115,7 @@
     "id": "missile_dumbfire_heavy_mk1",
     "nameId": "{20105,6024}",
     "name": "{20105,6024}",
+    "dlc_tag": "base",
     "macro": "missile_dumbfire_heavy_mk1_macro",
     "class": "missile",
     "tags": [
@@ -151,6 +155,7 @@
     "id": "missile_dumbfire_heavy_mk2",
     "nameId": "{20105,6034}",
     "name": "{20105,6034}",
+    "dlc_tag": "base",
     "macro": "missile_dumbfire_heavy_mk2_macro",
     "class": "missile",
     "tags": [
@@ -190,6 +195,7 @@
     "id": "missile_dumbfire_light_mk1",
     "nameId": "{20105,6004}",
     "name": "{20105,6004}",
+    "dlc_tag": "base",
     "macro": "missile_dumbfire_light_mk1_macro",
     "class": "missile",
     "tags": [
@@ -229,6 +235,7 @@
     "id": "missile_dumbfire_light_mk2",
     "nameId": "{20105,6014}",
     "name": "{20105,6014}",
+    "dlc_tag": "base",
     "macro": "missile_dumbfire_light_mk2_macro",
     "class": "missile",
     "tags": [
@@ -268,6 +275,7 @@
     "id": "missile_emp_mk1",
     "nameId": "{20105,6164}",
     "name": "{20105,6164}",
+    "dlc_tag": "base",
     "macro": "missile_emp_mk1_macro",
     "class": "missile",
     "tags": [
@@ -307,6 +315,7 @@
     "id": "missile_flagship_heavy_mk1",
     "nameId": "{20105,6304}",
     "name": "{20105,6304}",
+    "dlc_tag": "dlc_timelines",
     "macro": "missile_flagship_heavy_mk1_macro",
     "class": "missile",
     "tags": [
@@ -344,6 +353,7 @@
     "id": "missile_flagship_light_mk1",
     "nameId": "{20105,6314}",
     "name": "{20105,6314}",
+    "dlc_tag": "dlc_timelines",
     "macro": "missile_flagship_light_mk1_macro",
     "class": "missile",
     "tags": [
@@ -380,6 +390,7 @@
     "id": "missile_gen_l_dumbfire_01_mk1",
     "nameId": "{20105,6374}",
     "name": "{20105,6374}",
+    "dlc_tag": "base",
     "macro": "missile_gen_l_dumbfire_01_mk1_macro",
     "class": "missile",
     "tags": [
@@ -421,6 +432,7 @@
     "id": "missile_gen_l_guided_01_mk1",
     "nameId": "{20105,6404}",
     "name": "{20105,6404}",
+    "dlc_tag": "base",
     "macro": "missile_gen_l_guided_01_mk1_macro",
     "class": "missile",
     "tags": [
@@ -463,6 +475,7 @@
     "id": "missile_gen_m_dumbfire_01_mk1",
     "nameId": "{20105,6344}",
     "name": "{20105,6344}",
+    "dlc_tag": "base",
     "macro": "missile_gen_m_dumbfire_01_mk1_macro",
     "class": "missile",
     "tags": [
@@ -503,6 +516,7 @@
     "id": "missile_gen_m_dumbfire_01_mk2",
     "nameId": "{20105,6364}",
     "name": "{20105,6364}",
+    "dlc_tag": "base",
     "macro": "missile_gen_m_dumbfire_01_mk2_macro",
     "class": "missile",
     "tags": [
@@ -543,6 +557,7 @@
     "id": "missile_gen_m_guided_01_mk1",
     "nameId": "{20105,6394}",
     "name": "{20105,6394}",
+    "dlc_tag": "base",
     "macro": "missile_gen_m_guided_01_mk1_macro",
     "class": "missile",
     "tags": [
@@ -585,6 +600,7 @@
     "id": "missile_gen_m_smart_01_mk1",
     "nameId": "{20105,6454}",
     "name": "{20105,6454}",
+    "dlc_tag": "base",
     "macro": "missile_gen_m_smart_01_mk1_macro",
     "class": "missile",
     "tags": [
@@ -627,6 +643,7 @@
     "id": "missile_gen_s_disruptor_01_mk1",
     "nameId": "{20105,6324}",
     "name": "{20105,6324}",
+    "dlc_tag": "dlc_split",
     "macro": "missile_gen_s_disruptor_01_mk1_macro",
     "class": "missile",
     "tags": [
@@ -659,6 +676,7 @@
     "id": "missile_gen_s_dumbfire_01_mk1",
     "nameId": "{20105,6334}",
     "name": "{20105,6334}",
+    "dlc_tag": "base",
     "macro": "missile_gen_s_dumbfire_01_mk1_macro",
     "class": "missile",
     "tags": [
@@ -699,6 +717,7 @@
     "id": "missile_gen_s_dumbfire_01_mk2",
     "nameId": "{20105,6354}",
     "name": "{20105,6354}",
+    "dlc_tag": "base",
     "macro": "missile_gen_s_dumbfire_01_mk2_macro",
     "class": "missile",
     "tags": [
@@ -739,6 +758,7 @@
     "id": "missile_gen_s_emp_01_mk1",
     "nameId": "{20105,6414}",
     "name": "{20105,6414}",
+    "dlc_tag": "base",
     "macro": "missile_gen_s_emp_01_mk1_macro",
     "class": "missile",
     "tags": [
@@ -780,6 +800,7 @@
     "id": "missile_gen_s_guided_01_mk1",
     "nameId": "{20105,6384}",
     "name": "{20105,6384}",
+    "dlc_tag": "base",
     "macro": "missile_gen_s_guided_01_mk1_macro",
     "class": "missile",
     "tags": [
@@ -821,6 +842,7 @@
     "id": "missile_gen_s_heatseeker_01_mk1",
     "nameId": "{20105,6424}",
     "name": "{20105,6424}",
+    "dlc_tag": "base",
     "macro": "missile_gen_s_heatseeker_01_mk1_macro",
     "class": "missile",
     "tags": [
@@ -862,6 +884,7 @@
     "id": "missile_gen_s_interceptor_01_mk1",
     "nameId": "{20105,6434}",
     "name": "{20105,6434}",
+    "dlc_tag": "dlc_split",
     "macro": "missile_gen_s_interceptor_01_mk1_macro",
     "class": "missile",
     "tags": [
@@ -895,6 +918,7 @@
     "id": "missile_gen_s_smart_01_mk1",
     "nameId": "{20105,6444}",
     "name": "{20105,6444}",
+    "dlc_tag": "base",
     "macro": "missile_gen_s_smart_01_mk1_macro",
     "class": "missile",
     "tags": [
@@ -936,6 +960,7 @@
     "id": "missile_gen_s_swarm_01_mk1",
     "nameId": "{20105,6524}",
     "name": "{20105,6524}",
+    "dlc_tag": "base",
     "macro": "missile_gen_s_swarm_01_mk1_macro",
     "class": "missile",
     "tags": [
@@ -977,6 +1002,7 @@
     "id": "missile_gen_s_torpedo_01_mk1",
     "nameId": "{20105,6464}",
     "name": "{20105,6464}",
+    "dlc_tag": "base",
     "macro": "missile_gen_s_torpedo_01_mk1_macro",
     "class": "missile",
     "tags": [
@@ -1019,6 +1045,7 @@
     "id": "missile_guided_heavy_mk1",
     "nameId": "{20105,6054}",
     "name": "{20105,6054}",
+    "dlc_tag": "base",
     "macro": "missile_guided_heavy_mk1_macro",
     "class": "missile",
     "tags": [
@@ -1060,6 +1087,7 @@
     "id": "missile_guided_light_mk1",
     "nameId": "{20105,6044}",
     "name": "{20105,6044}",
+    "dlc_tag": "base",
     "macro": "missile_guided_light_mk1_macro",
     "class": "missile",
     "tags": [
@@ -1100,6 +1128,7 @@
     "id": "missile_heatseeker_heavy_mk1",
     "nameId": "{20105,6094}",
     "name": "{20105,6094}",
+    "dlc_tag": "base",
     "macro": "missile_heatseeker_heavy_mk1_macro",
     "class": "missile",
     "tags": [
@@ -1141,6 +1170,7 @@
     "id": "missile_heatseeker_light_mk1",
     "nameId": "{20105,6084}",
     "name": "{20105,6084}",
+    "dlc_tag": "base",
     "macro": "missile_heatseeker_light_mk1_macro",
     "class": "missile",
     "tags": [
@@ -1181,6 +1211,7 @@
     "id": "missile_interceptor_light_mk1",
     "nameId": "{20105,6204}",
     "name": "{20105,6204}",
+    "dlc_tag": "dlc_split",
     "macro": "missile_interceptor_light_mk1_macro",
     "class": "missile",
     "tags": [
@@ -1212,6 +1243,7 @@
     "id": "missile_scatter_heavy_mk1",
     "nameId": "{20105,6274}",
     "name": "{20105,6274}",
+    "dlc_tag": "dlc_split",
     "macro": "missile_scatter_heavy_mk1_macro",
     "class": "missile",
     "tags": [
@@ -1242,6 +1274,7 @@
     "id": "missile_smart_heavy_mk1",
     "nameId": "{20105,6134}",
     "name": "{20105,6134}",
+    "dlc_tag": "base",
     "macro": "missile_smart_heavy_mk1_macro",
     "class": "missile",
     "tags": [
@@ -1283,6 +1316,7 @@
     "id": "missile_smart_light_mk1",
     "nameId": "{20105,6124}",
     "name": "{20105,6124}",
+    "dlc_tag": "base",
     "macro": "missile_smart_light_mk1_macro",
     "class": "missile",
     "tags": [
@@ -1323,6 +1357,7 @@
     "id": "missile_starburst_heavy_mk1",
     "nameId": "{20105,6234}",
     "name": "{20105,6234}",
+    "dlc_tag": "dlc_split",
     "macro": "missile_starburst_heavy_mk1_macro",
     "class": "missile",
     "tags": [
@@ -1354,6 +1389,7 @@
     "id": "missile_swarm_heavy_mk1",
     "nameId": "{20105,6074}",
     "name": "{20105,6074}",
+    "dlc_tag": "base",
     "macro": "missile_swarm_heavy_mk1_macro",
     "class": "missile",
     "tags": [
@@ -1395,6 +1431,7 @@
     "id": "missile_swarm_light_mk1",
     "nameId": "{20105,6064}",
     "name": "{20105,6064}",
+    "dlc_tag": "base",
     "macro": "missile_swarm_light_mk1_macro",
     "class": "missile",
     "tags": [
@@ -1435,6 +1472,7 @@
     "id": "missile_torpedo_heavy_mk1",
     "nameId": "{20105,6154}",
     "name": "{20105,6154}",
+    "dlc_tag": "base",
     "macro": "missile_torpedo_heavy_mk1_macro",
     "class": "missile",
     "tags": [
@@ -1478,6 +1516,7 @@
     "id": "missile_torpedo_light_mk1",
     "nameId": "{20105,6144}",
     "name": "{20105,6144}",
+    "dlc_tag": "base",
     "macro": "missile_torpedo_light_mk1_macro",
     "class": "missile",
     "tags": [

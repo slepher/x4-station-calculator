@@ -4,6 +4,7 @@
       "id": "Cluster_01_macro",
       "nameId": "{20003,10001}",
       "name": "Grand Exchange",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -575,6 +576,7 @@
       "id": "Cluster_02_macro",
       "nameId": "{20003,20001}",
       "name": "Eighteen Billion",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -778,6 +780,7 @@
       "id": "Cluster_03_macro",
       "nameId": "{20003,30001}",
       "name": "Memory of Profit",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -917,6 +920,7 @@
       "id": "Cluster_04_macro",
       "nameId": "{20003,40001}",
       "name": "Nopileos' Fortune",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -1231,6 +1235,7 @@
       "id": "Cluster_05_macro",
       "nameId": "{20003,50001}",
       "name": "Path to Profit",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -1342,6 +1347,7 @@
       "id": "Cluster_06_macro",
       "nameId": "{20003,60001}",
       "name": "Black Hole Sun",
+      "dlc_tag": "base",
       "owner": "argon",
       "owner_color": "#0069B3",
       "raw_pos": {
@@ -1671,6 +1677,7 @@
       "id": "Cluster_07_macro",
       "nameId": "{20003,70001}",
       "name": "The Reach",
+      "dlc_tag": "base",
       "owner": "argon",
       "owner_color": "#0069B3",
       "raw_pos": {
@@ -1772,6 +1779,7 @@
       "id": "Cluster_08_macro",
       "nameId": "{20003,80001}",
       "name": "Silent Witness",
+      "dlc_tag": "base",
       "owner": "argon",
       "owner_color": "#0069B3",
       "raw_pos": {
@@ -2044,6 +2052,7 @@
       "id": "Cluster_09_macro",
       "nameId": "{20003,90001}",
       "name": "Bright Promise",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -2289,6 +2298,7 @@
       "id": "Cluster_10_macro",
       "nameId": "{20003,100001}",
       "name": "Unholy Retribution",
+      "dlc_tag": "base",
       "owner": "paranid",
       "owner_color": "#B300B3",
       "raw_pos": {
@@ -2488,6 +2498,7 @@
       "id": "Cluster_11_macro",
       "nameId": "{20003,110001}",
       "name": "Pontifex's Claim",
+      "dlc_tag": "base",
       "owner": "holyorder",
       "owner_color": "#FF99FF",
       "raw_pos": {
@@ -2726,6 +2737,7 @@
       "id": "Cluster_12_macro",
       "nameId": "{20003,120001}",
       "name": "True Sight",
+      "dlc_tag": "base",
       "owner": "holyorder",
       "owner_color": "#FF99FF",
       "raw_pos": {
@@ -2939,6 +2951,7 @@
       "id": "Cluster_13_macro",
       "nameId": "{20003,130001}",
       "name": "Second Contact",
+      "dlc_tag": "base",
       "owner": "antigone",
       "owner_color": "#0095FF",
       "raw_pos": {
@@ -3213,6 +3226,7 @@
       "id": "Cluster_14_macro",
       "nameId": "{20003,140001}",
       "name": "Argon Prime",
+      "dlc_tag": "base",
       "owner": "argon",
       "owner_color": "#0069B3",
       "raw_pos": {
@@ -3446,6 +3460,7 @@
       "id": "Cluster_15_macro",
       "nameId": "{20003,150001}",
       "name": "Ianamus Zura",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -3836,6 +3851,7 @@
       "id": "Cluster_16_macro",
       "nameId": "{20003,160001}",
       "name": "Matrix #451",
+      "dlc_tag": "base",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -4055,6 +4071,7 @@
       "id": "Cluster_17_macro",
       "nameId": "{20003,170001}",
       "name": "Matrix #9",
+      "dlc_tag": "base",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -4226,6 +4243,7 @@
       "id": "Cluster_18_macro",
       "nameId": "{20003,180001}",
       "name": "Trinity Sanctum",
+      "dlc_tag": "base",
       "owner": "paranid",
       "owner_color": "#B300B3",
       "raw_pos": {
@@ -4601,6 +4619,7 @@
       "id": "Cluster_19_macro",
       "nameId": "{20003,190001}",
       "name": "Hewa's Twin",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -4990,6 +5009,7 @@
       "id": "Cluster_20_macro",
       "nameId": "{20003,200001}",
       "name": "Company Regard",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -5201,6 +5221,7 @@
       "id": "Cluster_21_macro",
       "nameId": "{20003,210001}",
       "name": "Scale Plate Green",
+      "dlc_tag": "base",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -5526,6 +5547,7 @@
       "id": "Cluster_22_macro",
       "nameId": "{20003,220001}",
       "name": "Pious Mists",
+      "dlc_tag": "base",
       "owner": "paranid",
       "owner_color": "#B300B3",
       "raw_pos": {
@@ -5807,6 +5829,7 @@
       "id": "Cluster_23_macro",
       "nameId": "{20003,230001}",
       "name": "Sacred Relic",
+      "dlc_tag": "base",
       "owner": "paranid",
       "owner_color": "#B300B3",
       "raw_pos": {
@@ -5925,6 +5948,7 @@
       "id": "Cluster_24_macro",
       "nameId": "{20003,240001}",
       "name": "Holy Vision",
+      "dlc_tag": "base",
       "owner": "holyorder",
       "owner_color": "#FF99FF",
       "raw_pos": {
@@ -6347,6 +6371,7 @@
       "id": "Cluster_25_macro",
       "nameId": "{20003,250001}",
       "name": "Faulty Logic",
+      "dlc_tag": "base",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -6725,6 +6750,7 @@
       "id": "Cluster_26_macro",
       "nameId": "{20003,260001}",
       "name": "Atiya's Misfortune",
+      "dlc_tag": "base",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -7032,6 +7058,7 @@
       "id": "Cluster_27_macro",
       "nameId": "{20003,270001}",
       "name": "The Void",
+      "dlc_tag": "base",
       "owner": "antigone",
       "owner_color": "#0095FF",
       "raw_pos": {
@@ -7213,6 +7240,7 @@
       "id": "Cluster_28_macro",
       "nameId": "{20003,280001}",
       "name": "Antigone Memorial",
+      "dlc_tag": "base",
       "owner": "antigone",
       "owner_color": "#0095FF",
       "raw_pos": {
@@ -7491,6 +7519,7 @@
       "id": "Cluster_29_macro",
       "nameId": "{20003,290001}",
       "name": "Hatikvah's Choice",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -7951,6 +7980,7 @@
       "id": "Cluster_30_macro",
       "nameId": "{20003,300001}",
       "name": "Morning Star",
+      "dlc_tag": "base",
       "owner": "argon",
       "owner_color": "#0069B3",
       "raw_pos": {
@@ -8065,6 +8095,7 @@
       "id": "Cluster_31_macro",
       "nameId": "{20003,310001}",
       "name": "Heretic's End",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -8204,6 +8235,7 @@
       "id": "Cluster_32_macro",
       "nameId": "{20003,320001}",
       "name": "Tharka's Cascade",
+      "dlc_tag": "base",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -8717,6 +8749,7 @@
       "id": "Cluster_33_macro",
       "nameId": "{20003,330001}",
       "name": "Matrix #79B",
+      "dlc_tag": "base",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -8934,6 +8967,7 @@
       "id": "Cluster_34_macro",
       "nameId": "{20003,340001}",
       "name": "Profit Center Alpha",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -9171,6 +9205,7 @@
       "id": "Cluster_35_macro",
       "nameId": "{20003,350001}",
       "name": "Lasting Vengeance",
+      "dlc_tag": "base",
       "owner": "holyorder",
       "owner_color": "#FF99FF",
       "raw_pos": {
@@ -9304,6 +9339,7 @@
       "id": "Cluster_36_macro",
       "nameId": "{20003,360001}",
       "name": "Cardinal's Redress",
+      "dlc_tag": "base",
       "owner": "holyorder",
       "owner_color": "#FF99FF",
       "raw_pos": {
@@ -9437,6 +9473,7 @@
       "id": "Cluster_37_macro",
       "nameId": "{20003,370001}",
       "name": "Pious Mists",
+      "dlc_tag": "base",
       "owner": "paranid",
       "owner_color": "#B300B3",
       "raw_pos": {
@@ -9644,6 +9681,7 @@
       "id": "Cluster_38_macro",
       "nameId": "{20003,380001}",
       "name": "Pious Mists",
+      "dlc_tag": "base",
       "owner": "paranid",
       "owner_color": "#B300B3",
       "raw_pos": {
@@ -9785,6 +9823,7 @@
       "id": "Cluster_39_macro",
       "nameId": "{20003,390001}",
       "name": "Memory of Profit",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -9889,6 +9928,7 @@
       "id": "Cluster_40_macro",
       "nameId": "{20003,400001}",
       "name": "Second Contact",
+      "dlc_tag": "base",
       "owner": "antigone",
       "owner_color": "#0095FF",
       "raw_pos": {
@@ -10026,6 +10066,7 @@
       "id": "Cluster_41_macro",
       "nameId": "{20003,410001}",
       "name": "Second Contact",
+      "dlc_tag": "base",
       "owner": "antigone",
       "owner_color": "#0095FF",
       "raw_pos": {
@@ -10147,6 +10188,7 @@
       "id": "Cluster_42_macro",
       "nameId": "{20003,420001}",
       "name": "Hewa's Twin",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -10369,6 +10411,7 @@
       "id": "Cluster_43_macro",
       "nameId": "{20003,430001}",
       "name": "Hewa's Twin",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -10463,6 +10506,7 @@
       "id": "Cluster_44_macro",
       "nameId": "{20003,440001}",
       "name": "Silent Witness",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -10592,6 +10636,7 @@
       "id": "Cluster_45_macro",
       "nameId": "{20003,450001}",
       "name": "Silent Witness",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -10783,6 +10828,7 @@
       "id": "Cluster_46_macro",
       "nameId": "{20003,460001}",
       "name": "Morning Star",
+      "dlc_tag": "base",
       "owner": "argon",
       "owner_color": "#0069B3",
       "raw_pos": {
@@ -10914,6 +10960,7 @@
       "id": "Cluster_47_macro",
       "nameId": "{20003,470001}",
       "name": "Trinity Sanctum",
+      "dlc_tag": "base",
       "owner": "paranid",
       "owner_color": "#B300B3",
       "raw_pos": {
@@ -11065,6 +11112,7 @@
       "id": "Cluster_48_macro",
       "nameId": "{20003,480001}",
       "name": "Getsu Fune",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -11205,6 +11253,7 @@
       "id": "Cluster_49_macro",
       "nameId": "{20003,490001}",
       "name": "Frontier Edge",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -11335,6 +11384,7 @@
       "id": "Cluster_50_macro",
       "nameId": "{20003,500001}",
       "name": "Turquoise Sea",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -11579,6 +11629,7 @@
       "id": "Cluster_709_macro",
       "nameId": "{20003,7090001}",
       "name": "Cardinal's Domain",
+      "dlc_tag": "base",
       "owner": "paranid",
       "owner_color": "#B300B3",
       "raw_pos": {
@@ -11759,6 +11810,7 @@
       "id": "Cluster_710_macro",
       "nameId": "{20003,7100001}",
       "name": "Moo-Kye's Revenge",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -11874,6 +11926,7 @@
       "id": "Cluster_711_macro",
       "nameId": "{20003,7110001}",
       "name": "Mi Ton's Refuge",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -11989,6 +12042,7 @@
       "id": "Cluster_712_macro",
       "nameId": "{20003,7120001}",
       "name": "Loomanckstrat's Legacy",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -12119,6 +12173,7 @@
       "id": "Cluster_713_macro",
       "nameId": "{20003,7130001}",
       "name": "CEO's Doubt",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -12275,6 +12330,7 @@
       "id": "Cluster_714_macro",
       "nameId": "{20003,7140001}",
       "name": "Freedom's Reach",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -12367,6 +12423,7 @@
       "id": "Cluster_715_macro",
       "nameId": "{20003,7150001}",
       "name": "Mists of Artemis",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -12580,6 +12637,7 @@
       "id": "Cluster_720_macro",
       "nameId": "{20003,7200001}",
       "name": "Ore Belt",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -12733,6 +12791,7 @@
       "id": "Cluster_721_macro",
       "nameId": "{20003,7210001}",
       "name": "Adventure's Promise",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -12872,6 +12931,7 @@
       "id": "Cluster_722_macro",
       "nameId": "{20003,7220001}",
       "name": "Sanctum Verge",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -13211,6 +13271,7 @@
       "id": "Cluster_723_macro",
       "nameId": "{20003,7230001}",
       "name": "Tempting Fumes",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -13320,6 +13381,7 @@
       "id": "Cluster_724_macro",
       "nameId": "{20003,7240001}",
       "name": "Circle of Deceit",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -13434,6 +13496,7 @@
       "id": "Cluster_725_macro",
       "nameId": "{20003,7250001}",
       "name": "Void of Opportunity",
+      "dlc_tag": "base",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -13613,6 +13676,7 @@
       "id": "Cluster_400_macro",
       "nameId": "{20003,4000001}",
       "name": "Wretched Skies",
+      "dlc_tag": "dlc_split",
       "owner": "split",
       "owner_color": "#B36100",
       "raw_pos": {
@@ -13717,6 +13781,7 @@
       "id": "Cluster_401_macro",
       "nameId": "{20003,4010001}",
       "name": "Family Zhin",
+      "dlc_tag": "dlc_split",
       "owner": "split",
       "owner_color": "#B36100",
       "raw_pos": {
@@ -13906,6 +13971,7 @@
       "id": "Cluster_402_macro",
       "nameId": "{20003,4020001}",
       "name": "Family Kritt",
+      "dlc_tag": "dlc_split",
       "owner": "split",
       "owner_color": "#B36100",
       "raw_pos": {
@@ -14043,6 +14109,7 @@
       "id": "Cluster_403_macro",
       "nameId": "{20003,4030001}",
       "name": "Wretched Skies",
+      "dlc_tag": "dlc_split",
       "owner": "split",
       "owner_color": "#B36100",
       "raw_pos": {
@@ -14171,6 +14238,7 @@
       "id": "Cluster_404_macro",
       "nameId": "{20003,4040001}",
       "name": "Zyarth's Dominion",
+      "dlc_tag": "dlc_split",
       "owner": "split",
       "owner_color": "#B36100",
       "raw_pos": {
@@ -14313,6 +14381,7 @@
       "id": "Cluster_405_macro",
       "nameId": "{20003,4050001}",
       "name": "Zyarth's Dominion",
+      "dlc_tag": "dlc_split",
       "owner": "split",
       "owner_color": "#B36100",
       "raw_pos": {
@@ -14473,6 +14542,7 @@
       "id": "Cluster_406_macro",
       "nameId": "{20003,4060001}",
       "name": "Zyarth's Dominion",
+      "dlc_tag": "dlc_split",
       "owner": "split",
       "owner_color": "#B36100",
       "raw_pos": {
@@ -14615,6 +14685,7 @@
       "id": "Cluster_407_macro",
       "nameId": "{20003,4070001}",
       "name": "Family Tkr",
+      "dlc_tag": "dlc_split",
       "owner": "freesplit",
       "owner_color": "#FF8B00",
       "raw_pos": {
@@ -14753,6 +14824,7 @@
       "id": "Cluster_408_macro",
       "nameId": "{20003,4080001}",
       "name": "Thuruk's Demise",
+      "dlc_tag": "dlc_split",
       "owner": "freesplit",
       "owner_color": "#FF8B00",
       "raw_pos": {
@@ -14977,6 +15049,7 @@
       "id": "Cluster_409_macro",
       "nameId": "{20003,4090001}",
       "name": "Tharka's Ravine",
+      "dlc_tag": "dlc_split",
       "owner": "freesplit",
       "owner_color": "#FF8B00",
       "raw_pos": {
@@ -15091,6 +15164,7 @@
       "id": "Cluster_410_macro",
       "nameId": "{20003,4100001}",
       "name": "Tharka's Ravine",
+      "dlc_tag": "dlc_split",
       "owner": "freesplit",
       "owner_color": "#FF8B00",
       "raw_pos": {
@@ -15238,6 +15312,7 @@
       "id": "Cluster_411_macro",
       "nameId": "{20003,4110001}",
       "name": "Heart of Acrimony",
+      "dlc_tag": "dlc_split",
       "owner": "freesplit",
       "owner_color": "#FF8B00",
       "raw_pos": {
@@ -15395,6 +15470,7 @@
       "id": "Cluster_412_macro",
       "nameId": "{20003,4120001}",
       "name": "Tharka's Ravine",
+      "dlc_tag": "dlc_split",
       "owner": "freesplit",
       "owner_color": "#FF8B00",
       "raw_pos": {
@@ -15538,6 +15614,7 @@
       "id": "Cluster_413_macro",
       "nameId": "{20003,4130001}",
       "name": "Tharka's Ravine",
+      "dlc_tag": "dlc_split",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -15657,6 +15734,7 @@
       "id": "Cluster_414_macro",
       "nameId": "{20003,4140001}",
       "name": "Rhy's Defiance",
+      "dlc_tag": "dlc_split",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -15768,6 +15846,7 @@
       "id": "Cluster_415_macro",
       "nameId": "{20003,4150001}",
       "name": "Matrix #598",
+      "dlc_tag": "dlc_split",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -15931,6 +16010,7 @@
       "id": "Cluster_416_macro",
       "nameId": "{20003,4160001}",
       "name": "Guiding Star",
+      "dlc_tag": "dlc_split",
       "owner": "argon",
       "owner_color": "#0069B3",
       "raw_pos": {
@@ -16177,6 +16257,7 @@
       "id": "Cluster_417_macro",
       "nameId": "{20003,4170001}",
       "name": "Eleventh Hour",
+      "dlc_tag": "dlc_split",
       "owner": "argon",
       "owner_color": "#0069B3",
       "raw_pos": {
@@ -16281,6 +16362,7 @@
       "id": "Cluster_418_macro",
       "nameId": "{20003,4180001}",
       "name": "Family Nhuut",
+      "dlc_tag": "dlc_split",
       "owner": "split",
       "owner_color": "#B36100",
       "raw_pos": {
@@ -16464,6 +16546,7 @@
       "id": "Cluster_419_macro",
       "nameId": "{20003,4190001}",
       "name": "Open Market",
+      "dlc_tag": "dlc_split",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -16590,6 +16673,7 @@
       "id": "Cluster_420_macro",
       "nameId": "{20003,4200001}",
       "name": "Two Grand",
+      "dlc_tag": "dlc_split",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -16727,6 +16811,7 @@
       "id": "Cluster_421_macro",
       "nameId": "{20003,4210001}",
       "name": "Fires of Defeat",
+      "dlc_tag": "dlc_split",
       "owner": "freesplit",
       "owner_color": "#FF8B00",
       "raw_pos": {
@@ -16858,6 +16943,7 @@
       "id": "Cluster_422_macro",
       "nameId": "{20003,4220001}",
       "name": "Wretched Skies",
+      "dlc_tag": "dlc_split",
       "owner": "paranid",
       "owner_color": "#B300B3",
       "raw_pos": {
@@ -16995,6 +17081,7 @@
       "id": "Cluster_423_macro",
       "nameId": "{20003,4230001}",
       "name": "Litany of Fury",
+      "dlc_tag": "dlc_split",
       "owner": "paranid",
       "owner_color": "#B300B3",
       "raw_pos": {
@@ -17219,6 +17306,7 @@
       "id": "Cluster_424_macro",
       "nameId": "{20003,4240001}",
       "name": "Emperor's Pride",
+      "dlc_tag": "dlc_split",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -17488,6 +17576,7 @@
       "id": "Cluster_425_macro",
       "nameId": "{20003,4250001}",
       "name": "Heart of Acrimony",
+      "dlc_tag": "dlc_split",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -17578,6 +17667,7 @@
       "id": "Cluster_100_macro",
       "nameId": "{20003,1000001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -17733,6 +17823,7 @@
       "id": "Cluster_101_macro",
       "nameId": "{20003,1010001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -17861,6 +17952,7 @@
       "id": "Cluster_102_macro",
       "nameId": "{20003,1020001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -17973,6 +18065,7 @@
       "id": "Cluster_104_macro",
       "nameId": "{20003,1040001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -18229,6 +18322,7 @@
       "id": "Cluster_106_macro",
       "nameId": "{20003,1060001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -18326,6 +18420,7 @@
       "id": "Cluster_107_macro",
       "nameId": "{20003,1070001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -18442,6 +18537,7 @@
       "id": "Cluster_108_macro",
       "nameId": "{20003,1080001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -18834,6 +18930,7 @@
       "id": "Cluster_109_macro",
       "nameId": "{20003,1090001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -18938,6 +19035,7 @@
       "id": "Cluster_110_macro",
       "nameId": "{20003,1100001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -19075,6 +19173,7 @@
       "id": "Cluster_111_macro",
       "nameId": "{20003,1110001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -19179,6 +19278,7 @@
       "id": "Cluster_112_macro",
       "nameId": "{20003,1120001}",
       "name": "Savage Spur",
+      "dlc_tag": "dlc_terran",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -19491,6 +19591,7 @@
       "id": "Cluster_113_macro",
       "nameId": "{20003,1130001}",
       "name": "Segaris",
+      "dlc_tag": "dlc_terran",
       "owner": "pioneers",
       "owner_color": "#00AFB3",
       "raw_pos": {
@@ -19662,6 +19763,7 @@
       "id": "Cluster_114_macro",
       "nameId": "{20003,1140001}",
       "name": "Gaian Prophecy",
+      "dlc_tag": "dlc_terran",
       "owner": "pioneers",
       "owner_color": "#00AFB3",
       "raw_pos": {
@@ -19837,6 +19939,7 @@
       "id": "Cluster_115_macro",
       "nameId": "{20003,1150001}",
       "name": "Brennan's Triumph",
+      "dlc_tag": "dlc_terran",
       "owner": "pioneers",
       "owner_color": "#00AFB3",
       "raw_pos": {
@@ -19987,6 +20090,7 @@
       "id": "Cluster_116_macro",
       "nameId": "{20003,1160001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -20122,6 +20226,7 @@
       "id": "Cluster_500_macro",
       "nameId": "{20003,5000001}",
       "name": "Avarice",
+      "dlc_tag": "dlc_pirate",
       "owner": "scavenger",
       "owner_color": "#003C66",
       "raw_pos": {
@@ -20611,6 +20716,7 @@
       "id": "Cluster_501_macro",
       "nameId": "{20003,5010001}",
       "name": "Windfall",
+      "dlc_tag": "dlc_pirate",
       "owner": "loanshark",
       "owner_color": "#B38600",
       "raw_pos": {
@@ -20796,6 +20902,7 @@
       "id": "Cluster_502_macro",
       "nameId": "{20003,5020001}",
       "name": "Windfall",
+      "dlc_tag": "dlc_pirate",
       "owner": "loanshark",
       "owner_color": "#B38600",
       "raw_pos": {
@@ -20927,6 +21034,7 @@
       "id": "Cluster_503_macro",
       "nameId": "{20003,5030001}",
       "name": "Windfall",
+      "dlc_tag": "dlc_pirate",
       "owner": "loanshark",
       "owner_color": "#B38600",
       "raw_pos": {
@@ -21092,6 +21200,7 @@
       "id": "Cluster_504_macro",
       "nameId": "{20003,5040001}",
       "name": "Unknown System",
+      "dlc_tag": "dlc_pirate",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -21198,6 +21307,7 @@
       "id": "Cluster_601_macro",
       "nameId": "{20003,6010001}",
       "name": "Watchful Gaze",
+      "dlc_tag": "dlc_boron",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -21316,6 +21426,7 @@
       "id": "Cluster_602_macro",
       "nameId": "{20003,6020001}",
       "name": "Barren Shores",
+      "dlc_tag": "dlc_boron",
       "owner": "boron",
       "owner_color": "#4DB5FF",
       "raw_pos": {
@@ -21445,6 +21556,7 @@
       "id": "Cluster_603_macro",
       "nameId": "{20003,6030001}",
       "name": "Great Reef",
+      "dlc_tag": "dlc_boron",
       "owner": "boron",
       "owner_color": "#4DB5FF",
       "raw_pos": {
@@ -21590,6 +21702,7 @@
       "id": "Cluster_604_macro",
       "nameId": "{20003,6040001}",
       "name": "Ocean of Fantasy",
+      "dlc_tag": "dlc_boron",
       "owner": "boron",
       "owner_color": "#4DB5FF",
       "raw_pos": {
@@ -21699,6 +21812,7 @@
       "id": "Cluster_605_macro",
       "nameId": "{20003,6050001}",
       "name": "Sanctuary of Darkness",
+      "dlc_tag": "dlc_boron",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -21946,6 +22060,7 @@
       "id": "Cluster_606_macro",
       "nameId": "{20003,6060001}",
       "name": "Kingdom End",
+      "dlc_tag": "dlc_boron",
       "owner": "boron",
       "owner_color": "#4DB5FF",
       "raw_pos": {
@@ -22724,6 +22839,7 @@
       "id": "Cluster_607_macro",
       "nameId": "{20003,6070001}",
       "name": "Rolk's Demise",
+      "dlc_tag": "dlc_boron",
       "owner": "boron",
       "owner_color": "#4DB5FF",
       "raw_pos": {
@@ -22875,6 +22991,7 @@
       "id": "Cluster_608_macro",
       "nameId": "{20003,6080001}",
       "name": "Atreus' Clouds",
+      "dlc_tag": "dlc_boron",
       "owner": "boron",
       "owner_color": "#4DB5FF",
       "raw_pos": {
@@ -23115,6 +23232,7 @@
       "id": "Cluster_609_macro",
       "nameId": "{20003,6090001}",
       "name": "Menelaus' Oasis",
+      "dlc_tag": "dlc_boron",
       "owner": "boron",
       "owner_color": "#4DB5FF",
       "raw_pos": {
@@ -23359,6 +23477,7 @@
       "id": "Cluster_701_macro",
       "nameId": "{20003,7010001}",
       "name": "Mitsuno's Remembrance",
+      "dlc_tag": "dlc_timelines",
       "owner": "kaori",
       "owner_color": "#FFB966",
       "raw_pos": {
@@ -23473,6 +23592,7 @@
       "id": "Cluster_702_macro",
       "nameId": "{20003,7020001}",
       "name": "Mitsuno's Remembrance",
+      "dlc_tag": "dlc_timelines",
       "owner": "kaori",
       "owner_color": "#FFB966",
       "raw_pos": {
@@ -23642,6 +23762,7 @@
       "id": "Cluster_703_macro",
       "nameId": "{20003,7030001}",
       "name": "Mitsuno's Remembrance",
+      "dlc_tag": "dlc_timelines",
       "owner": "kaori",
       "owner_color": "#FFB966",
       "raw_pos": {
@@ -23813,6 +23934,7 @@
       "id": "Cluster_704_macro",
       "nameId": "{20003,7040001}",
       "name": "President's End",
+      "dlc_tag": "dlc_timelines",
       "owner": "argon",
       "owner_color": "#0069B3",
       "raw_pos": {
@@ -23970,6 +24092,7 @@
       "id": "Cluster_705_macro",
       "nameId": "{20003,7050001}",
       "name": "Nopileos' Memorial",
+      "dlc_tag": "dlc_timelines",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -24107,6 +24230,7 @@
       "id": "Cluster_706_macro",
       "nameId": "{20003,7060001}",
       "name": "Hatikvah's Faith",
+      "dlc_tag": "dlc_timelines",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -24225,6 +24349,7 @@
       "id": "Cluster_708_macro",
       "nameId": "{20003,7080001}",
       "name": "Matrix #101",
+      "dlc_tag": "dlc_timelines",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -24344,6 +24469,7 @@
       "id": "Cluster_730_macro",
       "nameId": "{20003,7300001}",
       "name": "Third Redemption",
+      "dlc_tag": "dlc_mini_01",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -24461,6 +24587,7 @@
       "id": "Cluster_740_macro",
       "nameId": "{20003,7400001}",
       "name": "Scarlet Star",
+      "dlc_tag": "dlc_mini_02",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {

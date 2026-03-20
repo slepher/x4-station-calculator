@@ -54,9 +54,6 @@ def migrate_regionyields(regionyields_xml_path: Path) -> List[dict]:
             yield_item: Dict[str, object] = {}
             for key, value in yield_node.attrib.items():
                 yield_item[key] = coerce_attr_value(value)
-            # 添加 density 作为 resourcedensity 的别名（level 标识）
-            if "resourcedensity" in yield_item:
-                yield_item["density"] = yield_item["resourcedensity"]
             resource_item["yields"].append(yield_item)
         resources.append(resource_item)
     resources.sort(key=lambda item: item["ware"])
@@ -666,7 +663,8 @@ def migrate_region_definitions(
     """
     迁移 region 定义。
     """
-    from processor.map.writer import build_boundary, build_falloff, boundary_volume, compute_spline_length
+    from processor.map.converter import build_boundary, build_falloff
+    from processor.map.calculator import boundary_volume, compute_spline_length
 
     if not region_definitions_xml_path.exists():
         return {}, {}
@@ -914,6 +912,7 @@ def calculate_resourcearea_resources(
             results.append({
                 "ware": ware,
                 "resourcedensity": resourcedensity,
+                "yield_name": template_res.get("yield_name"),
                 "total_yield": round_yield_value(total_yield),
                 "total_respawn": round_yield_value(total_respawn),
                 "yield": round_yield_value(effective_yield),
@@ -946,6 +945,7 @@ def calculate_resourcearea_resources(
             results.append({
                 "ware": ware,
                 "resourcedensity": resourcedensity,
+                "yield_name": template_res.get("yield_name"),
                 "total_yield": round_yield_value(total_yield),
                 "total_respawn": round_yield_value(total_respawn),
                 "yield": round_yield_value(effective_yield),

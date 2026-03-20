@@ -14,6 +14,8 @@ import StorageImportWizard from './StorageImportWizard.vue'
 import StorageExportWizard from './StorageExportWizard.vue'
 import TopViewSwitch from './common/TopViewSwitch.vue'
 import VersionSettingsModal from './VersionSettingsModal.vue'
+import SettingsButton from './SettingsButton.vue'
+import DlcSettingsModal from './DlcSettingsModal.vue'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useToolbarWorkflowController } from '@/composables/useToolbarWorkflowController'
@@ -32,6 +34,7 @@ const showLoadFlowModal = ref(false)
 const showLoadBlueprintModal = ref(false)
 const showImportWizard = ref(false)
 const showVersionSettingsModal = ref(false)
+const showDlcSettingsModal = ref(false)
 const showExportWizard = ref(false)
 const smartDialog = reactive({
   isOpen: false,
@@ -240,6 +243,10 @@ const handleExport = () => {
       </button>
       <MissingTranslate />
       <LanguageSelector />
+      <SettingsButton
+        :show-indicator="gameData.needsDlcSetup"
+        @click="showDlcSettingsModal = true"
+      />
     </div>
 
     <LoadPlanModal :isOpen="showLoadModal" @close="showLoadModal = false" />
@@ -248,6 +255,7 @@ const handleExport = () => {
     <StorageImportWizard :isOpen="showImportWizard" @close="showImportWizard = false" />
     <StorageExportWizard :isOpen="showExportWizard" @close="showExportWizard = false" />
     <VersionSettingsModal :visible="showVersionSettingsModal" @close="showVersionSettingsModal = false" />
+    <DlcSettingsModal :visible="showDlcSettingsModal" @close="showDlcSettingsModal = false" />
 
     <SmartSaveDialog
       :isOpen="smartDialog.isOpen"

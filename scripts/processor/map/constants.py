@@ -7,6 +7,10 @@ GAS_XZ_LIMIT = 256_000         # 256 km
 GAS_Y_LIMIT = 64_000           # 64 km (总高度 128km)
 GAS_BLOCK_SIZE = 64_000        # 64 km 立方体网格
 GAS_MIN_HEIGHT = 64_000        # 气体最小高度 64km
+TOTAL_BLOCK_NEG_LIMIT = 960_000    # total_blocks 固定总窗口：-15 格
+TOTAL_BLOCK_POS_LIMIT = 1_024_000  # total_blocks 固定总窗口：+16 格
+TOTAL_BLOCK_Y_NEG_LIMIT = 256_000  # total_blocks 固定总窗口：-4 格
+TOTAL_BLOCK_Y_POS_LIMIT = 256_000  # total_blocks 固定总窗口：+4 格
 
 # 气体资源 ware 列表
 GAS_WARES = {"helium", "hydrogen", "methane", "bogas"}
