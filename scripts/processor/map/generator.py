@@ -54,6 +54,7 @@ from processor.map.calculator import (
 from processor.utils.data_utils import split_tags, coerce_attr_value, as_number
 from processor.utils.math_utils import round_to_int
 from processor.utils.xml_utils import parse_xml, parse_xml_attrs, parse_step_curve, piecewise_average
+from processor.dlc_tag import build_direct_entity_dlc_tag_map
 
 
 OWNER_COLORS = {
@@ -118,6 +119,7 @@ def generate_map_data(
     regionyields_xml_path: Optional[Path] = None,
     i18n_registry=None,
     resource_model: str = "regions",
+    dlc_order: Optional[List[str]] = None,
     sector_resource_areas: Optional[Dict[str, List[dict]]] = None,
     definitions: Optional[Dict[str, dict]] = None,
 ) -> Dict[str, object]:
@@ -156,6 +158,11 @@ def generate_map_data(
             "044": {"iso": "en", "name": "English"},
         })
     registry.collect_many(set(name_id_by_macro.values()))
+    cluster_dlc_tags = build_direct_entity_dlc_tag_map(
+        map_dir / "clusters",
+        dlc_order or [],
+        lambda node: node.get("name") if node.tag == "macro" and node.get("class") == "cluster" else None,
+    )
 
     galaxy_root = parse_xml(get_map_xml_path(str(map_dir), "galaxy"))
     clusters_root = parse_xml(get_map_xml_path(str(map_dir), "clusters"))
@@ -186,6 +193,7 @@ def generate_map_data(
                 "id": cluster_macro,
                 "nameId": name_id_by_macro.get(cluster_macro.lower(), ""),
                 "name": registry.get_name(name_id_by_macro.get(cluster_macro.lower(), ""), "en"),
+                "dlc_tag": cluster_dlc_tags.get(cluster_macro, "base"),
                 "owner": "neutral",
                 "owner_color": OWNER_COLORS.get("neutral", "#94a3b8"),
                 "raw_pos": raw_pos,
@@ -254,6 +262,7 @@ def generate_map_data(
                 "id": cluster_macro,
                 "nameId": name_id_by_macro.get(cluster_macro.lower(), ""),
                 "name": registry.get_name(name_id_by_macro.get(cluster_macro.lower(), ""), "en"),
+                "dlc_tag": cluster_dlc_tags.get(cluster_macro, "base"),
                 "owner": "neutral",
                 "owner_color": OWNER_COLORS.get("neutral", "#94a3b8"),
                 "raw_pos": raw_pos,

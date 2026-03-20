@@ -17,6 +17,7 @@ import type {
   X4RegionYield,
   X4Faction,
   X4Language,
+  X4Dlc,
   X4DefaultMax,
   X4ShipSlot
 } from '../../types/x4'
@@ -70,6 +71,7 @@ export type GameDataFiles = {
   defaultMaxes: Record<string, X4DefaultMax>
   shipSlots: Record<string, X4ShipSlot[]>
   languages: X4Language[]
+  dlcs: X4Dlc[]
 }
 
 type JsonModule<T = unknown> = { default: T }
@@ -107,7 +109,7 @@ export async function loadGameDataFiles(
     equipments, equipmentTypes, slotTags,
     consumables, drones, missiles, bullets,
     maps, regionyields, factions,
-    defaultMaxes, shipSlots, languages
+    defaultMaxes, shipSlots, languages, dlcs
   ] = await Promise.all([
     loadJsonFromBundle<X4Ware[]>(folderName, 'wares.json', loaders),
     loadJsonFromBundle<X4Module[]>(folderName, 'modules.json', loaders),
@@ -128,7 +130,8 @@ export async function loadGameDataFiles(
     loadJsonFromBundle<X4Faction[]>(folderName, 'factions.json', loaders),
     loadJsonFromBundle<Record<string, X4DefaultMax>>(folderName, 'default_maxes.json', loaders),
     loadJsonFromBundle<Record<string, X4ShipSlot[]>>(folderName, 'ship_slots.json', loaders),
-    loadJsonFromBundle<X4Language[]>(folderName, 'languages.json', loaders)
+    loadJsonFromBundle<X4Language[]>(folderName, 'languages.json', loaders),
+    loadJsonFromBundle<X4Dlc[]>(folderName, 'dlcs.json', loaders)
   ])
 
   return {
@@ -137,7 +140,7 @@ export async function loadGameDataFiles(
     equipments, equipmentTypes, slotTags,
     consumables, drones, missiles, bullets,
     maps, regionyields, factions,
-    defaultMaxes, shipSlots, languages
+    defaultMaxes, shipSlots, languages, dlcs
   }
 }
 

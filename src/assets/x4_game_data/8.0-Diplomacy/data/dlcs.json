@@ -1,0 +1,44 @@
+[
+  {
+    "id": "ego_dlc_boron",
+    "nameId": "{1021,66}",
+    "name": "Kingdom End",
+    "dependencyVersion": "6.0"
+  },
+  {
+    "id": "ego_dlc_mini_01",
+    "nameId": "{1021,71}",
+    "name": "Hyperion Pack",
+    "dependencyVersion": "7.5"
+  },
+  {
+    "id": "ego_dlc_mini_02",
+    "nameId": "{1021,72}",
+    "name": "Envoy Pack",
+    "dependencyVersion": "8.0"
+  },
+  {
+    "id": "ego_dlc_pirate",
+    "nameId": "{1021,63}",
+    "name": "Tides of Avarice",
+    "dependencyVersion": "6.0"
+  },
+  {
+    "id": "ego_dlc_split",
+    "nameId": "{1021,61}",
+    "name": "Split Vendetta",
+    "dependencyVersion": "6.0"
+  },
+  {
+    "id": "ego_dlc_terran",
+    "nameId": "{1021,62}",
+    "name": "Cradle of Humanity",
+    "dependencyVersion": "6.0"
+  },
+  {
+    "id": "ego_dlc_timelines",
+    "nameId": "{1021,67}",
+    "name": "Timelines",
+    "dependencyVersion": "7.0"
+  }
+]

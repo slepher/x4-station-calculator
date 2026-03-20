@@ -13,11 +13,13 @@ try:
     from processor.path_utils import get_library_xml
     from processor.versioning import get_target_versions, load_version_config, merge_version_config
     from processor.map.service import process_map_for_version
+    from processor.dlc_tag import build_ware_dlc_tag_map
 except ModuleNotFoundError:
     from scripts.processor.i18n import get_i18n_registry  # type: ignore
     from scripts.processor.path_utils import get_library_xml  # type: ignore
     from scripts.processor.versioning import get_target_versions, load_version_config, merge_version_config  # type: ignore
     from scripts.processor.map.service import process_map_for_version  # type: ignore
+    from scripts.processor.dlc_tag import build_ware_dlc_tag_map  # type: ignore
 
 # =============================================================================
 # ⚙️ 项目配置
@@ -87,6 +89,27 @@ SLOT_TAG_I18N_TARGETS = {
     "highpower"
 }
 
+DLC_I18N_PAGE_ID = "1021"
+DLC_I18N_TARGETS = [
+    {"id": "ego_dlc_boron", "lookup": "Kingdom End", "dependencyVersion": "600"},
+    {"id": "ego_dlc_mini_01", "lookup": "Hyperion Pack", "dependencyVersion": "750"},
+    {"id": "ego_dlc_mini_02", "lookup": "Envoy Pack", "dependencyVersion": "800"},
+    {"id": "ego_dlc_pirate", "lookup": "Tides of Avarice", "dependencyVersion": "600"},
+    {"id": "ego_dlc_split", "lookup": "Split Vendetta", "dependencyVersion": "600"},
+    {"id": "ego_dlc_terran", "lookup": "Cradle of Humanity", "dependencyVersion": "600"},
+    {"id": "ego_dlc_timelines", "lookup": "Timelines", "dependencyVersion": "700"},
+]
+
+
+def format_dependency_version(raw_version):
+    raw = str(raw_version).strip()
+    if not raw.isdigit() or len(raw) < 2:
+        return raw
+    major = raw[:-2] or "0"
+    minor = raw[-2:].rstrip("0")
+    minor = minor or "0"
+    return f"{int(major)}.{minor}"
+
 # =============================================================================
 
 class X4PrecisionLoader:
@@ -132,12 +155,16 @@ class X4PrecisionLoader:
         self.slot_tag_name_map = {}
         self.slot_tag_key_map = {}
         self.slot_tags_data = []
+        self.dlc_name_map = {}
+        self.dlc_key_map = {}
+        self.dlcs_data = []
         self.missiles_data = []  # 从 wares 导出的 missiles
         self.missile_macro_ids_from_ware = set()  # 记录从 ware 导出的 missile macro id
         self.bullets_data = []
         self.drones_data = []     # ship_xs, ship_s
         self.consumables_data = [] # mine, satellite, scanner, countermeasure, etc.
         self.ship_max_stats = {}  # ship class max statistics from defaults.xml
+        self.ware_dlc_tags = {}
 
         # 颜色相关数据库（版本专用）
         self.regionyields_db = {}  # 8.0: ware_id → {effect_r, effect_g, effect_b}
@@ -157,6 +184,7 @@ class X4PrecisionLoader:
     # =======================================================
     def build_database(self):
         print(f"📖 [1/5] 解析 wares.xml...")
+        self.ware_dlc_tags = build_ware_dlc_tag_map(Path(self.raw_path) / "libraries" / "wares", self.config.get("dlc_order", []))
         # 从配置中提取模块类型原始 Key
         for raw_key in self.config.get('module_types', {}).values():
             self.needed_raw_names.add(raw_key)
@@ -258,6 +286,7 @@ class X4PrecisionLoader:
                             "nameId": raw_name, # 原始引用 Key
                             "group": group,
                             "name": raw_name,   # ⚠️ 占位，稍后注入英文
+                            "dlc_tag": self.ware_dlc_tags.get(w_id, "base"),
                             "transport": transport,
                             "price": int(p_node.get('average') or 0),
                             "volume": volume,
@@ -548,6 +577,7 @@ class X4PrecisionLoader:
                     "wareId": info['module_ware_id'], 
                     "nameId": info['name_id'], 
                     "name": info['name_id'], 
+                    "dlc_tag": self.ware_dlc_tags.get(info['module_ware_id'], "base"),
                     "type": m_class, 
                     "group": m_class, 
                     "method": "none",
@@ -1447,6 +1477,7 @@ class X4PrecisionLoader:
                 "id": ware_id,
                 "nameId": name_id,
                 "name": name_id,
+                "dlc_tag": self.ware_dlc_tags.get(ware_id, "base"),
                 "class": info.get('class'),
                 "type": None,
                 "purposePrimary": info.get('purposePrimary'),
@@ -1829,6 +1860,7 @@ class X4PrecisionLoader:
                     "id": ware_id,
                     "nameId": name_id,
                     "name": name_id,
+                    "dlc_tag": self.ware_dlc_tags.get(ware_id, "base"),
                     "type": equip_type,
                     "class": m_class,
                     "mk": ident_info.get('mk'),
@@ -1993,6 +2025,7 @@ class X4PrecisionLoader:
                     "id": ware_id,
                     "nameId": name_id,
                     "name": name_id,
+                    "dlc_tag": self.ware_dlc_tags.get(ware_id, "base"),
                     "macro": macro_name,
                     "class": m_class,
                     "mk": ident_info.get('mk'),
@@ -2062,6 +2095,7 @@ class X4PrecisionLoader:
                     "id": ware_id,
                     "nameId": name_id,
                     "name": name_id,
+                    "dlc_tag": self.ware_dlc_tags.get(ware_id, "base"),
                     "macro": macro_name,
                     "class": m_class,
                     "tags": self._split_tags(ware_info.get('tags', '')),
@@ -2281,12 +2315,16 @@ class X4PrecisionLoader:
             if iso == 'en' and not self.slot_tag_name_map and os.path.exists(t_file):
                 self.slot_tag_name_map = self._load_slot_tags_from_locale(t_file)
                 self._build_slot_tag_key_map()
+            if iso == 'en' and not self.dlc_name_map and os.path.exists(t_file):
+                self.dlc_name_map = self._load_dlc_names_from_locale(t_file)
+                self._build_dlc_key_map()
 
             print(f"  ✅ [Done]  {iso:6} ({x4_id}) -> {len(exported)} 条")
             if iso == 'en' and os.path.exists(t_file):
                 self.ship_type_name_map = self._load_ship_types_from_locale(t_file)
                 self.equipment_type_name_map = self._load_equipment_types_from_locale(t_file)
                 self.slot_tag_name_map = self._load_slot_tags_from_locale(t_file)
+                self.dlc_name_map = self._load_dlc_names_from_locale(t_file)
 
     def refresh_exported_i18n(self):
         """在后续步骤新增 nameId 后，刷新内存中的多语言导出结果。"""
@@ -2364,6 +2402,28 @@ class X4PrecisionLoader:
         except Exception:
             return {}
 
+    def _load_dlc_names_from_locale(self, t_file):
+        if not t_file or not os.path.exists(t_file):
+            return {}
+        try:
+            tree = ET.parse(t_file)
+            root = tree.getroot()
+            page = root.find(f".//page[@id='{DLC_I18N_PAGE_ID}']")
+            if page is None:
+                return {}
+            dlc_map = {}
+            for t in page.findall('t'):
+                t_id = t.get('id')
+                if not t_id:
+                    continue
+                text = "".join(t.itertext()).strip()
+                if not text:
+                    continue
+                dlc_map[t_id] = text
+            return dlc_map
+        except Exception:
+            return {}
+
     def _build_ship_type_key_map(self):
         if not self.ship_type_name_map:
             return
@@ -2419,6 +2479,22 @@ class X4PrecisionLoader:
             if key:
                 self.slot_tag_key_map[slot_tag] = f"{{20228,{key}}}"
                 self.needed_raw_names.add(f"{{20228,{key}}}")
+
+    def _build_dlc_key_map(self):
+        if not self.dlc_name_map:
+            return
+        def norm(text):
+            return re.sub(r"\s+", "", text.lower())
+        value_index = {}
+        for key, text in self.dlc_name_map.items():
+            value_index[norm(text)] = key
+        for item in DLC_I18N_TARGETS:
+            lookup_text = item["lookup"]
+            key = value_index.get(norm(lookup_text))
+            if key:
+                raw_key = f"{{{DLC_I18N_PAGE_ID},{key}}}"
+                self.dlc_key_map[item["id"]] = raw_key
+                self.needed_raw_names.add(raw_key)
 
     def analyze_ship_types(self):
         print(f"\n🛸 [4.1.1/5] 分析船只类型映射 (page 20221)...")
@@ -2477,6 +2553,26 @@ class X4PrecisionLoader:
                 "nameId": key or "",
                 "name": key or "",
                 "count": count
+            })
+
+    def analyze_dlcs(self):
+        print(f"\n🧩 [4.1.4/5] 分析 DLC 映射 (page {DLC_I18N_PAGE_ID})...")
+        self._build_dlc_key_map()
+        self.dlcs_data = []
+        print(f"-" * 105)
+        print(f"{'DLC ID':<20} | {'Lookup':<20} | {'i18n Key':<15} | {'状态':<10} | {'English'}")
+        print(f"-" * 105)
+        for item in DLC_I18N_TARGETS:
+            dlc_id = item["id"]
+            lookup_text = item["lookup"]
+            key = self.dlc_key_map.get(dlc_id)
+            status = "✅ 已匹配" if key else "❌ 缺失"
+            print(f"{dlc_id:<20} | {lookup_text:<20} | {str(key or '---'):<15} | {status:<10} | {lookup_text}")
+            self.dlcs_data.append({
+                "id": dlc_id,
+                "nameId": key or "",
+                "name": key or lookup_text,
+                "dependencyVersion": format_dependency_version(item["dependencyVersion"])
             })
 
     # =======================================================
@@ -2549,8 +2645,15 @@ class X4PrecisionLoader:
             if raw_key and raw_key in en_map:
                 item['name'] = en_map[raw_key]
                 count_slot_tags += 1
+
+        count_dlcs = 0
+        for item in self.dlcs_data:
+            raw_key = item.get('nameId')
+            if raw_key and raw_key in en_map:
+                item['name'] = en_map[raw_key]
+                count_dlcs += 1
         
-        print(f"   ✅ 更新了 {count_wares} 个商品, {count_mods} 个模块, {count_wg} 个模块分组, {count_ships} 个飞船, {count_equips} 个装备, {count_ship_types} 个船只类型, {count_slot_tags} 个 slot tag 的英文名称。")
+        print(f"   ✅ 更新了 {count_wares} 个商品, {count_mods} 个模块, {count_wg} 个模块分组, {count_ships} 个飞船, {count_equips} 个装备, {count_ship_types} 个船只类型, {count_slot_tags} 个 slot tag, {count_dlcs} 个 DLC 的英文名称。")
 
     # =======================================================
     # 🆕 4.1. 模块类型分析
@@ -2743,6 +2846,8 @@ class X4PrecisionLoader:
             json.dump(self.equipment_types_data, f, indent=2, ensure_ascii=False)
         with open(os.path.join(data_dir, "slot_tags.json"), 'w', encoding='utf-8') as f:
             json.dump(self.slot_tags_data, f, indent=2, ensure_ascii=False)
+        with open(os.path.join(data_dir, "dlcs.json"), 'w', encoding='utf-8') as f:
+            json.dump(self.dlcs_data, f, indent=2, ensure_ascii=False)
         with open(os.path.join(data_dir, "missiles.json"), 'w', encoding='utf-8') as f:
             json.dump(self.missiles_data, f, indent=2, ensure_ascii=False)
         with open(os.path.join(data_dir, "bullets.json"), 'w', encoding='utf-8') as f:
@@ -2798,6 +2903,7 @@ def run_for_config(effective_config):
     loader.analyze_ship_types()
     loader.analyze_equipment_types()
     loader.analyze_slot_tags()
+    loader.analyze_dlcs()
     loader.refresh_exported_i18n()
     loader.inject_english_names()  # 新增步骤
     loader.analyze_module_types()
