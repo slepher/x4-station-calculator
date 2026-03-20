@@ -559,10 +559,11 @@ def generate_map_data(
                     respawn = yield_val * 60.0 / delay
 
                 # 构建该 area 的 resources 数组（每个 area 单独输出）
+                # 注意：yield/respawn 是单个实例的值，不乘以 amount
                 area_resources = [{
                     "ware": ware,
-                    "yield": round_to_int(yield_val * amount),
-                    "respawn": round_to_int(respawn * amount),
+                    "yield": round_to_int(yield_val),
+                    "respawn": round_to_int(respawn),
                     "delay": delay,
                     "gatherfactor": factor,
                     "rating": rating,

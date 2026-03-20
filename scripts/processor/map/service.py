@@ -112,9 +112,8 @@ def process_map_for_version(
         write_regionyield_definitions(definitions_list, regionyield_definitions_output_path)
         print(f"📦 Regionyield Definitions Output: {regionyield_definitions_output_path}")
 
-        # 9.0+ 不生成 regionyields，写入空数组
-        write_regionyields([], regionyields_output_path)
-        print(f"📦 Regionyields Output: {regionyields_output_path} (空数组占位)")
+        # 9.0+ 不生成 regionyields.json 文件
+        print(f"📦 Regionyields Output: 跳过 (9.0+ 不生成该文件)")
 
         result = generate_map_data(
             map_dir=map_dir,
