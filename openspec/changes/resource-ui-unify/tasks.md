@@ -102,18 +102,59 @@
 
 ---
 
+### 任务 7：高级过滤器跳数逻辑改造
+
+**目标**：修改跳数计算逻辑，同一 cluster 内的 sector 移动不计跳数
+
+**步骤**：
+1. 修改 `src/store/logic/mapAdvancedResourceFilter.ts` 中的 `breadthFirstReachable` 函数：
+   - 添加 `sectorClusterMap` 参数
+   - 在 BFS 遍历中，判断当前节点和下一节点是否在同一 cluster
+   - 同一 cluster 内移动：跳数增加 0
+   - 跨 cluster 移动：跳数增加 1
+2. 修改 `buildSectorGraph` 函数：
+   - 返回值中添加 `sectorClusterMap`
+3. 修改 `MapResourceFilterAdvancedPanel.vue`：
+   - 更新调用 `buildSectorGraph` 和 `buildAdvancedCandidates` 的代码，传入新的参数
+
+**验收**：
+- 同一 cluster 内的 sector 之间跳数为 0
+- 跨 cluster 的 sector 之间跳数为 1
+- 测试用例 1.7 和 1.8 通过
+
+---
+
+### 任务 8：高级过滤器评分逻辑修正
+
+**目标**：确保评分使用 `rating` 字段而非 `level` 字段
+
+**步骤**：
+1. 修改 `src/store/logic/mapAdvancedResourceFilter.ts` 中的 `matchSectorToTagGroup` 函数：
+   - 使用 `ordinaryRatings` 数组存储匹配资源的 rating 值
+   - `ordinaryAverageLevel` 使用 rating 的平均值计算
+2. 更新测试期望值（如测试 1.4.1 的期望值从 8 改为 5）
+
+**验收**：
+- `ordinaryAverageLevel` 使用 rating 计算而非 level
+- 所有单元测试通过
+
+---
+
 ## 任务依赖关系
 
 ```
 任务 1 (res.json 数据) ──> 任务 2 (数据加载器)
 任务 3 (UI 布局) ──────────┐
 任务 4 (Yield 改造) ───────┼──> 任务 5 (Tooltip 格式化) ──> 任务 6 (构建验证)
+任务 7 (跳数逻辑) ─────────┘
+任务 8 (评分逻辑) ─────────┘
 ```
 
 ---
 
 ## 完成标准
 
-- [x] 所有 6 个任务完成
-- [x] `npm run build` 通过
-- [x] 验收标准（DoD）全部满足
+- [ ] 所有 8 个任务完成
+- [ ] `npm run build` 通过
+- [ ] 所有单元测试通过
+- [ ] 验收标准（DoD）全部满足

@@ -163,7 +163,7 @@ export const matchSectorToTagGroup = (
 
   let matched = true
   let includesSunlight = false
-  const ordinaryLevels: number[] = []
+  const ordinaryRatings: number[] = []
   const ordinaryWareIds: string[] = []
 
   group.tagIds.forEach((tagId) => {
@@ -186,11 +186,11 @@ export const matchSectorToTagGroup = (
     }
 
     ordinaryWareIds.push(tagId)
-    ordinaryLevels.push(resource.level)
+    ordinaryRatings.push(actualRating)
   })
 
   // 如果没有任何资源匹配，则该组不匹配
-  if (ordinaryLevels.length === 0) {
+  if (ordinaryRatings.length === 0) {
     matched = false
   }
 
@@ -198,8 +198,8 @@ export const matchSectorToTagGroup = (
     groupId: group.id,
     matched,
     matchedOrdinaryWareIds: normalizeOrdinaryTagIds(ordinaryWareIds),
-    ordinaryAverageLevel: ordinaryLevels.length
-      ? ordinaryLevels.reduce((sum, level) => sum + level, 0) / ordinaryLevels.length
+    ordinaryAverageLevel: ordinaryRatings.length
+      ? ordinaryRatings.reduce((sum, rating) => sum + rating, 0) / ordinaryRatings.length
       : null,
     includesSunlight
   }

@@ -170,7 +170,7 @@ describe('1.4 buildAdvancedCandidates: 评分计算', () => {
       sectorGraph,
       sectorClusterMap
     })
-    expect(result.candidates[0]?.score).toBe(8)
+    expect(result.candidates[0]?.score).toBe(5)
 
     // 1.4.2 传入仅包含日光命中的星区，验证该星区不参与评分计算 #期望: [score=0]
     const sectorsSunlight: AdvancedResourceSector[] = [

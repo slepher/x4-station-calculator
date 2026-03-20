@@ -182,9 +182,137 @@ Tooltip 显示的资源数值从 yield 改为 respawn：
 
 ---
 
-## 5. 实现细节
+## 7. 跳数计算逻辑
 
-### 5.1 受影响的文件清单
+### 7.1 BFS 跳数算法
+
+高级资源过滤器使用 BFS（广度优先搜索）计算从枢纽 sector 可达的资源 sector。
+
+**核心逻辑**（`src/store/logic/mapAdvancedResourceFilter.ts`）：
+
+```typescript
+const breadthFirstReachable = (
+  graph: Record<string, string[]>,
+  start: string,
+  maxDepth: number,
+  sectorClusterMap: Record<string, string>
+) => {
+  const distances: Record<string, number> = { [start]: 0 }
+  const queue = [start]
+  let index = 0
+  const startClusterId = sectorClusterMap[start]
+
+  while (index < queue.length) {
+    const current = queue[index++]!
+    const currentDepth = distances[current] || 0
+    const currentClusterId = sectorClusterMap[current]
+
+    ;(graph[current] || []).forEach((next) => {
+      if (distances[next] !== undefined) return
+      const nextClusterId = sectorClusterMap[next]
+      // 同一 cluster 内移动不增加跳数，跨 cluster 移动跳数 +1
+      const depthIncrease = (currentClusterId && nextClusterId && currentClusterId !== nextClusterId) ? 1 : 0
+      const newDepth = currentDepth + depthIncrease
+      if (newDepth > maxDepth) return
+      distances[next] = newDepth
+      queue.push(next)
+    })
+  }
+
+  return distances
+}
+```
+
+### 7.2 Cluster 连通性
+
+跨 cluster 的连通性通过 `cluster_gates` 建立：
+
+1. 如果 sector A 有 gate 指向 cluster B
+2. 并且 cluster B 中有 sector C 有 gate 指向 cluster A
+3. 则 A 和 C 之间建立双向连接
+
+**实现**（`buildSectorGraph` 函数）：
+- 构建 sector 邻接图
+- 记录每个 sector 所属的 cluster
+- 双向检查 cluster gates 建立跨 cluster 连接
+
+---
+
+## 8. 评分逻辑
+
+### 8.1 Rating 等级
+
+资源 yield 等级映射到 rating（1-5）：
+
+| Yield 名称 | Rating |
+|------------|--------|
+| low | 1 |
+| midlow | 2 |
+| medium | 3 |
+| midhigh | 4 |
+| high | 5 |
+
+### 8.2 组匹配逻辑
+
+`matchSectorToTagGroup` 函数判定 sector 是否满足 tag group：
+
+1. 对每个普通资源 tag，检查 sector 中是否存在该资源且 rating >= 最低要求
+2. 如果包含日光 tag，检查 sector.sunlight >= sunlightMinimum
+3. 所有条件满足时返回 `matched=true`
+
+### 8.3 候选评分计算
+
+`buildCandidateScore` 函数计算候选方案的评分：
+
+```typescript
+const buildCandidateScore = (resourceSectorIds: string[]) => {
+  // 1. 对每个 tag group，取候选中所有 sector 在该 group 上的最高平均分
+  const groupScores = tagGroups
+    .map((group) => resourceSectorIds
+      .map((sectorId) => groupScoresBySector[sectorId]?.[group.id] ?? null)
+      .filter((value): value is number => value !== null)
+    )
+    .filter((scores) => scores.length > 0)
+    .map((scores) => Math.max(...scores))
+
+  if (!groupScores.length) return 0
+  // 2. 取所有组分数中的最低分（瓶颈）
+  return Math.min(...groupScores)
+}
+```
+
+**评分规则**：
+- 每个 tag group 的分数 = 该组匹配资源的平均 rating
+- 候选的某 group 分数 = 所有 sector 中该 group 的最高分
+- 最终评分 = 所有 group 分数的最小值（木桶原理）
+
+---
+
+## 9. 测试用例
+
+### 9.1 跳数逻辑测试
+
+| 测试用例 | 描述 | 期望 |
+|----------|------|------|
+| 1.7 | 同一 cluster 内的 sector 移动不计跳数 | jumpLimit=0 时，同一 cluster 内所有 sector 可达 |
+| 1.8 | 跨 cluster 的 sector 移动计跳数 | jumpLimit=0 时，跨 cluster 的 sector 不可达 |
+
+### 9.2 评分逻辑测试
+
+| 测试用例 | 描述 | 期望 |
+|----------|------|------|
+| 1.4 | 传入多个 tag 组配置 | score = 各组最佳 sector 平均 rating 的最小值 |
+| 1.4.2 | 仅日光命中的 sector | 不参与评分计算（score=0 或被过滤） |
+
+---
+
+## 10. 待确认项
+
+无
+
+---
+
+## 11. 受影响的文件清单
 
 #### 核心组件
 1. `src/components/empire/MapWorkbenchView.vue`
@@ -201,6 +329,21 @@ Tooltip 显示的资源数值从 yield 改为 respawn：
 #### 游戏数据
 9. `src/assets/x4_game_data/8.0-Diplomacy/data/res.json`
 10. `src/assets/x4_game_data/9.0-Empire-beta/data/res.json`
+
+#### 国际化
+11. `src/locales/en.json`
+12. `src/locales/zh-CN.json`
+
+#### 工具函数
+13. `src/utils/numberFormatter.ts`（新增：数字格式化通用函数）
+
+#### 高级过滤器逻辑
+14. `src/store/logic/mapAdvancedResourceFilter.ts`（跳数计算、评分逻辑）
+
+### 11.1 版本兼容
+
+- 8.0 Diplomacy 和 9.0 Empire 的 `res.json` 都需要同步更新
+- 通过 `useGameDataStore` 的 game version 检测自动切换数据源
 
 #### 国际化
 11. `src/locales/en.json`
