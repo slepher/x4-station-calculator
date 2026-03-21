@@ -39,6 +39,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_ROOT = PROJECT_ROOT / "src" / "assets" / "x4_game_data" / "8.0-Diplomacy" / "data"
 RESOURCEAREAS_JSON = DATA_ROOT / "resourceareas.json"
 REGIONS_JSON = DATA_ROOT / "regions.json"
+SAVE_SAMPLE_ROOT = PROJECT_ROOT / "save_sample_data"
 QUERY_RADIUS_14073F750 = 55425.625
 
 
@@ -76,6 +77,7 @@ class GasResourceEntry:
     resourcedensity: float
     recharge_time_seconds: float
     gather_speed_factor: float
+    yield_name: str = ""
 
 
 @dataclass
@@ -127,6 +129,44 @@ def find_sector_area_entry(sector_id: str, field_ref: str) -> dict:
     raise ValueError(f"sector/field not found in resourceareas.json: {sector_id} / {field_ref}")
 
 
+def load_save_sample_for_ware(sector_id: str, ware: str, yield_name: str) -> dict[tuple[int, int, int], dict]:
+    save_path = SAVE_SAMPLE_ROOT / f"{sector_id.lower()}.json"
+    if not save_path.exists():
+        return {}
+    with save_path.open("r", encoding="utf-8") as handle:
+        data = json.load(handle)
+    if ware not in data.get("ware", {}):
+        return {}
+    ware_data = data["ware"][ware]
+    # Try yield_name first, then fallback to resources or iterate yield names
+    if yield_name and yield_name in ware_data:
+        rows = ware_data[yield_name].get("resources", [])
+    elif "resources" in ware_data:
+        rows = ware_data.get("resources", [])
+    else:
+        # Merge all yield_name resources
+        rows = []
+        for yn, yd in ware_data.items():
+            if isinstance(yd, dict) and "resources" in yd:
+                rows.extend(yd["resources"])
+    return {(int(row["x"]), int(row["y"]), int(row["z"])): row for row in rows}
+
+
+def load_total_sample_for_ware(sector_id: str, ware: str, yield_name: str) -> dict:
+    total_path = SAVE_SAMPLE_ROOT / "total.json"
+    if not total_path.exists():
+        return {}
+    with total_path.open("r", encoding="utf-8") as handle:
+        data = json.load(handle)
+    for sector in data.get("sectors", []):
+        if sector.get("sector_id") == sector_id.lower():
+            ware_data = sector.get("ware", {}).get(ware, {})
+            if yield_name and yield_name in ware_data:
+                return ware_data[yield_name]
+            return ware_data
+    return {}
+
+
 def compute_resource_field_base_multiplier_140e80260(
     field: NebulaFieldState,
     resource: GasResourceEntry,
@@ -159,6 +199,7 @@ def build_nebula_field_from_sector_area_json_140e860c0(
             resourcedensity=float(row["resourcedensity"]),
             recharge_time_seconds=float(row["delay"]),
             gather_speed_factor=float(row.get("gatherfactor", 1.0)),
+            yield_name=str(row.get("yield", row.get("yield_name", ""))),
         )
         for row in region["resources"]
     ]
@@ -789,6 +830,15 @@ def main() -> None:
     field = build_nebula_field_from_sector_area_json_140e860c0(args.sector_id, args.field_ref)
     result = replay_gas_area_values_for_field_1407603F0(field)
 
+    # Load save sample data for comparison
+    save_tiles_by_ware: dict[str, dict] = {}
+    save_total_by_ware: dict[str, dict] = {}
+    for resource in field.resources:
+        ware_key = resource.ware_key
+        yield_name = resource.yield_name
+        save_tiles_by_ware[ware_key] = load_save_sample_for_ware(args.sector_id, ware_key, yield_name)
+        save_total_by_ware[ware_key] = load_total_sample_for_ware(args.sector_id, ware_key, yield_name)
+
     print(f"field={result['field']}")
     print(f"boundary_class={result['boundary_class']}")
     print("hit_check_mode=reverse")
@@ -802,9 +852,36 @@ def main() -> None:
     for ware_key, total in result["ware_totals"].items():
         print(f"  {ware_key}={total}")
     print("tile_values:")
+    replay_total_by_ware: dict[str, int] = {ware_key: 0 for ware_key in result["ware_totals"].keys()}
     for entry in result["per_tile"]:
+        coord = entry["coord"]
         values = [f"{key}={entry[key]}" for key in result["ware_totals"].keys()]
-        print(f"  {entry['coord']} " + " ".join(values))
+        print(f"  {coord} " + " ".join(values), end="")
+
+        # Compare with save sample for each ware
+        compare_parts = []
+        for ware_key in result["ware_totals"].keys():
+            tile_value = entry.get(ware_key, 0)
+            replay_total_by_ware[ware_key] += tile_value
+            save_tiles = save_tiles_by_ware.get(ware_key, {})
+            save_row = save_tiles.get(coord)
+            save_value = None if save_row is None else int(save_row.get("max", 0))
+            error_ratio = None
+            if save_value not in (None, 0):
+                error_ratio = (tile_value - save_value) / save_value
+            compare_parts.append(f"{ware_key}:save={save_value if save_value is not None else 'N/A'},err={f'{error_ratio:.4%}' if error_ratio is not None else 'N/A'}")
+        print(" | " + " ".join(compare_parts))
+
+    print("total_compare:")
+    for ware_key in result["ware_totals"].keys():
+        replay_total = replay_total_by_ware[ware_key]
+        save_total = save_total_by_ware.get(ware_key, {})
+        print(f"  {ware_key}: replay={replay_total}", end="")
+        if save_total and "max" in save_total and int(save_total["max"]) != 0:
+            total_error_ratio = (replay_total - int(save_total["max"])) / int(save_total["max"])
+            print(f" save={int(save_total['max'])} error_ratio={total_error_ratio:.4%}")
+        else:
+            print(" save=N/A error_ratio=N/A")
 
 
 if __name__ == "__main__":
