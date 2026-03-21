@@ -35,12 +35,18 @@ import struct
 
 AREA_SIZE = 64000.0
 AREA_HALF = AREA_SIZE / 2.0
+SAVE_GRID_MIN_CENTER_XZ = -960000
+SAVE_GRID_MAX_CENTER_XZ = 1024000
+SAVE_GRID_MIN_CENTER_Y = -960000
+SAVE_GRID_MAX_CENTER_Y = 1024000
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_ROOT = PROJECT_ROOT / "src" / "assets" / "x4_game_data" / "8.0-Diplomacy" / "data"
 RESOURCEAREAS_JSON = DATA_ROOT / "resourceareas.json"
 REGIONS_JSON = DATA_ROOT / "regions.json"
 SAVE_SAMPLE_ROOT = PROJECT_ROOT / "save_sample_data"
 QUERY_RADIUS_14073F750 = 55425.625
+SPLINETUBE_SEGMENT_COUNT_DEFAULT_14078EAC0 = 2000
+SPLINETUBE_INTERVAL_SAMPLE_COUNT_14093ED40 = 5
 
 
 def f32(value: float) -> float:
@@ -108,6 +114,54 @@ class NebulaFieldState:
     size_z: float = 0.0
     spline: list[SplineControlPoint] = field(default_factory=list)
     universe_yield_density_by_ware: dict[str, float] = field(default_factory=dict)
+
+
+@dataclass
+class QueryGridWindow:
+    origin_x: int
+    origin_y: int
+    origin_z: int
+
+
+def compute_axis_storage_origin_140760320(position: float, max_center: int) -> int:
+    if abs(position) <= max_center:
+        return 0
+    return int(math.floor(position / AREA_SIZE) * AREA_SIZE)
+
+
+def build_query_grid_window_140760320(
+    position_x: float,
+    position_y: float,
+    position_z: float,
+) -> QueryGridWindow:
+    return QueryGridWindow(
+        origin_x=compute_axis_storage_origin_140760320(position_x, SAVE_GRID_MAX_CENTER_XZ),
+        origin_y=compute_axis_storage_origin_140760320(position_y, SAVE_GRID_MAX_CENTER_Y),
+        origin_z=compute_axis_storage_origin_140760320(position_z, SAVE_GRID_MAX_CENTER_XZ),
+    )
+
+
+def world_coord_from_storage_coord_140760320(
+    grid: QueryGridWindow,
+    coord: tuple[int, int, int],
+) -> tuple[int, int, int]:
+    return (
+        coord[0] + grid.origin_x,
+        coord[1] + grid.origin_y,
+        coord[2] + grid.origin_z,
+    )
+
+
+def compute_storage_axis_range_140760320(
+    min_world: float,
+    max_world: float,
+    origin: int,
+    min_center: int,
+    max_center: int,
+) -> tuple[int, int]:
+    start = max(int(math.floor((min_world - origin) / AREA_SIZE) * int(AREA_SIZE)), min_center)
+    end = min(int(math.floor((max_world - origin) / AREA_SIZE) * int(AREA_SIZE)), max_center)
+    return start, end
 
 
 def load_json_rows(path: Path) -> object:
@@ -206,9 +260,9 @@ def build_nebula_field_from_sector_area_json_140e860c0(
 
     spline = [
         SplineControlPoint(
-            x=float(row["x"]),
-            y=float(row["y"]),
-            z=float(row["z"]),
+            x=float(row["x"]) + float(position["x"]),
+            y=float(row["y"]) + float(position["y"]),
+            z=float(row["z"]) + float(position["z"]),
             tx=float(row["tx"]),
             ty=float(row["ty"]),
             tz=float(row["tz"]),
@@ -300,6 +354,41 @@ def build_sampled_spline_points_from_region_bezier_closure_14093E5C0(
     return points
 
 
+def sample_composite_spline_uniform_param_1402D55C0(
+    field: NebulaFieldState,
+    t: float,
+) -> tuple[float, float, float]:
+    segment_count = len(field.spline) - 1
+    if segment_count <= 0:
+        raise ValueError("splinetube requires at least two spline control points")
+    t = clamp(t, 0.0, 1.0)
+    scaled = t * segment_count
+    seg_index = min(int(math.floor(scaled)), segment_count - 1)
+    local_t = scaled - seg_index
+    if t >= 1.0:
+        seg_index = segment_count - 1
+        local_t = 1.0
+    left = field.spline[seg_index]
+    right = field.spline[seg_index + 1]
+    p0 = (left.x, left.y, left.z)
+    p1 = (right.x, right.y, right.z)
+    c0 = (left.x + left.tx * left.outlength, left.y + left.ty * left.outlength, left.z + left.tz * left.outlength)
+    c1 = (right.x - right.tx * right.inlength, right.y - right.ty * right.inlength, right.z - right.tz * right.inlength)
+    return cubic_bezier_sample_14093E5C0(p0, c0, c1, p1, local_t)
+
+
+def build_runtime_sampled_splinetube_points_14078EAC0(
+    field: NebulaFieldState,
+) -> list[tuple[float, float, float]]:
+    return [
+        sample_composite_spline_uniform_param_1402D55C0(
+            field,
+            index / SPLINETUBE_SEGMENT_COUNT_DEFAULT_14078EAC0,
+        )
+        for index in range(SPLINETUBE_SEGMENT_COUNT_DEFAULT_14078EAC0 + 1)
+    ]
+
+
 def build_polyline_arclength_table_from_sampled_points_14093E5C0(
     points: list[tuple[float, float, float]],
 ) -> tuple[list[float], list[float], float]:
@@ -376,6 +465,84 @@ def nearest_distance_to_sampled_polyline_14093ED70(
     return best_distance, best_arclength
 
 
+def sample_point_on_sampled_polyline_at_fraction_1402D55C0(
+    points: list[tuple[float, float, float]],
+    seg_lengths: list[float],
+    accum: list[float],
+    total_length: float,
+    fraction: float,
+) -> tuple[float, float, float]:
+    if total_length <= 1e-6:
+        return points[0]
+    target = clamp(fraction, 0.0, 1.0) * total_length
+    for index, seg_len in enumerate(seg_lengths):
+        seg_start = accum[index]
+        seg_end = accum[index + 1]
+        if target <= seg_end or index == len(seg_lengths) - 1:
+            if seg_len <= 1e-6:
+                return points[index]
+            t = clamp((target - seg_start) / seg_len, 0.0, 1.0)
+            return vec_add(points[index], vec_mul(vec_sub(points[index + 1], points[index]), t))
+    return points[-1]
+
+
+def compute_composite_spline_nearest_global_t_1402D4FF0(
+    query: tuple[float, float, float],
+    points: list[tuple[float, float, float]],
+    seg_lengths: list[float],
+    accum: list[float],
+    total_length: float,
+) -> tuple[float, float]:
+    nearest_distance, nearest_arclength = nearest_distance_to_sampled_polyline_14093ED70(query, points, seg_lengths, accum)
+    if total_length <= 1e-6:
+        return (0.0, nearest_distance)
+    return (clamp(nearest_arclength / total_length, 0.0, 1.0), nearest_distance)
+
+
+def compute_composite_spline_interval_scan_1414F3B30(
+    query: tuple[float, float, float],
+    points: list[tuple[float, float, float]],
+    seg_lengths: list[float],
+    accum: list[float],
+    total_length: float,
+    query_radius: float,
+    sample_count: int,
+) -> tuple[tuple[float, float] | None, float]:
+    nearest_t, _nearest_distance = compute_composite_spline_nearest_global_t_1402D4FF0(
+        query, points, seg_lengths, accum, total_length
+    )
+    if total_length <= 1e-6:
+        sample_point = points[0]
+        sample_distance = vec_length(vec_sub(sample_point, query))
+        return ((0.0, 0.0), sample_distance) if sample_distance < query_radius else (None, sample_distance)
+
+    window = (query_radius + query_radius) / total_length
+    step = window / sample_count
+    start = nearest_t - window
+    end = start + window + window + step
+
+    first_hit: float | None = None
+    last_hit: float | None = None
+    t = start
+    while t < end:
+        point = sample_point_on_sampled_polyline_at_fraction_1402D55C0(points, seg_lengths, accum, total_length, t)
+        distance_to_query = vec_length(vec_sub(point, query))
+        if distance_to_query < query_radius:
+            hit_t = clamp(t, 0.0, 1.0)
+            if first_hit is None:
+                first_hit = hit_t
+            last_hit = hit_t
+        t += step
+
+    representative_point = sample_point_on_sampled_polyline_at_fraction_1402D55C0(
+        points, seg_lengths, accum, total_length, nearest_t
+    )
+    representative_distance = vec_length(vec_sub(representative_point, query))
+    if first_hit is None or last_hit is None:
+        return None, representative_distance
+    return (first_hit, last_hit), representative_distance
+
+
 def segment_param_interval_inside_radius(
     query: tuple[float, float, float],
     a: tuple[float, float, float],
@@ -441,10 +608,12 @@ def compute_splinetube_radial_interval_polyline_closure_14093EE10(
 
 
 def enumerate_planar_candidate_area_centers_for_splinetube_reverse_closure_14093EB60(
+    field: NebulaFieldState,
     points: list[tuple[float, float, float]],
     tube_radius: float,
     query_radius: float,
 ) -> list[tuple[int, int, int]]:
+    grid = build_query_grid_window_140760320(field.position_x, field.position_y, field.position_z)
     xs = [point[0] for point in points]
     zs = [point[2] for point in points]
     extension = tube_radius + query_radius
@@ -453,10 +622,12 @@ def enumerate_planar_candidate_area_centers_for_splinetube_reverse_closure_14093
     min_z = min(zs) - extension
     max_z = max(zs) + extension
 
-    start_x = math.floor(min_x / AREA_SIZE) * int(AREA_SIZE)
-    end_x = math.floor(max_x / AREA_SIZE) * int(AREA_SIZE)
-    start_z = math.floor(min_z / AREA_SIZE) * int(AREA_SIZE)
-    end_z = math.floor(max_z / AREA_SIZE) * int(AREA_SIZE)
+    start_x, end_x = compute_storage_axis_range_140760320(
+        min_x, max_x, grid.origin_x, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
+    )
+    start_z, end_z = compute_storage_axis_range_140760320(
+        min_z, max_z, grid.origin_z, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
+    )
 
     coords: list[tuple[int, int, int]] = []
     x = start_x
@@ -475,13 +646,55 @@ def compute_uniform_profile_weight_for_40km_cylinder_14073F750(field: NebulaFiel
     return f32(f32(field.falloff.lateral_factor) * f32(field.falloff.radial_factor))
 
 
+def compute_cylinder_axial_interval_gas_reverse_14093DD10(
+    field: NebulaFieldState,
+    query: tuple[float, float, float],
+) -> tuple[float, float]:
+    p0 = (field.position_x, field.position_y, field.position_z)
+    p1 = (field.position_x, field.position_y + field.linear, field.position_z)
+    axis = vec_sub(p1, p0)
+    axis_len = vec_length(axis)
+    axis_sq = dot(axis, axis)
+    t = dot(vec_sub(query, p0), axis) / axis_sq
+    delta = QUERY_RADIUS_14073F750 / axis_len
+    return (clamp(t - delta, 0.0, 1.0), clamp(t + delta, 0.0, 1.0))
+
+
+def compute_cylinder_radial_interval_gas_reverse_14093DE40(
+    field: NebulaFieldState,
+    query: tuple[float, float, float],
+) -> tuple[float, float]:
+    p0 = (field.position_x, field.position_y, field.position_z)
+    p1 = (field.position_x, field.position_y + field.linear, field.position_z)
+    axis = vec_sub(p1, p0)
+    axis_sq = dot(axis, axis)
+    t = dot(vec_sub(query, p0), axis) / axis_sq
+    closest = vec_add(p0, vec_mul(axis, t))
+    distance_to_axis = vec_length(vec_sub(query, closest))
+    return (
+        clamp((distance_to_axis - QUERY_RADIUS_14073F750) / field.radius, 0.0, 1.0),
+        clamp((distance_to_axis + QUERY_RADIUS_14073F750) / field.radius, 0.0, 1.0),
+    )
+
+
+def compute_cylinder_profile_weight_for_query_14073F750(
+    field: NebulaFieldState,
+    query: tuple[float, float, float],
+) -> float:
+    axial_interval = compute_cylinder_axial_interval_gas_reverse_14093DD10(field, query)
+    radial_interval = compute_cylinder_radial_interval_gas_reverse_14093DE40(field, query)
+    axial_weight = eval_profile_avg_1414ED970(field.falloff.lateral, axial_interval)
+    radial_weight = eval_profile_avg_1414ED970(field.falloff.radial, radial_interval)
+    return f32(f32(axial_weight) * f32(radial_weight))
+
+
 def area_intersects_field_query_box_140E83FF0(
     field: NebulaFieldState,
     tile_x: int,
     tile_y: int,
     tile_z: int,
 ) -> bool:
-    min_y = field.position_y - field.linear
+    min_y = field.position_y
     max_y = field.position_y + field.linear
     tile_min_y = tile_y - AREA_HALF
     tile_max_y = tile_y + AREA_HALF
@@ -499,24 +712,36 @@ def area_intersects_field_query_box_140E83FF0(
 def enumerate_candidate_area_centers_for_64k_query_boxes_140760320(
     field: NebulaFieldState,
 ) -> list[tuple[int, int, int]]:
+    grid = build_query_grid_window_140760320(field.position_x, field.position_y, field.position_z)
     min_x = field.position_x - field.radius - AREA_HALF
     max_x = field.position_x + field.radius + AREA_HALF
+    min_y = field.position_y - AREA_HALF
+    max_y = field.position_y + field.linear + AREA_HALF
     min_z = field.position_z - field.radius - AREA_HALF
     max_z = field.position_z + field.radius + AREA_HALF
 
-    start_x = int(min_x // AREA_SIZE) * int(AREA_SIZE)
-    end_x = int(max_x // AREA_SIZE) * int(AREA_SIZE)
-    start_z = int(min_z // AREA_SIZE) * int(AREA_SIZE)
-    end_z = int(max_z // AREA_SIZE) * int(AREA_SIZE)
+    start_x, end_x = compute_storage_axis_range_140760320(
+        min_x, max_x, grid.origin_x, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
+    )
+    start_y, end_y = compute_storage_axis_range_140760320(
+        min_y, max_y, grid.origin_y, SAVE_GRID_MIN_CENTER_Y, SAVE_GRID_MAX_CENTER_Y
+    )
+    start_z, end_z = compute_storage_axis_range_140760320(
+        min_z, max_z, grid.origin_z, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
+    )
 
     coords: list[tuple[int, int, int]] = []
     x = start_x
     while x <= end_x:
-        z = start_z
-        while z <= end_z:
-            if area_intersects_field_query_box_140E83FF0(field, x, 0, z):
-                coords.append((x, 0, z))
-            z += int(AREA_SIZE)
+        y = start_y
+        while y <= end_y:
+            z = start_z
+            while z <= end_z:
+                world_coord = world_coord_from_storage_coord_140760320(grid, (x, y, z))
+                if area_intersects_field_query_box_140E83FF0(field, *world_coord):
+                    coords.append((x, y, z))
+                z += int(AREA_SIZE)
+            y += int(AREA_SIZE)
         x += int(AREA_SIZE)
     return coords
 
@@ -526,31 +751,52 @@ def replay_cylinder_field_1407603F0(field: NebulaFieldState) -> dict[str, object
         raise ValueError("legacy cylinder replay path expects one gas resource row")
     resource = field.resources[0]
     tile_coords = enumerate_candidate_area_centers_for_64k_query_boxes_140760320(field)
-    if not resource_field_is_enabled_140e802d0(resource):
-        unit_max = 0
-    else:
+    per_tile: list[dict[str, object]] = []
+    total = 0
+    if resource_field_is_enabled_140e802d0(resource):
         base_multiplier = compute_resource_field_base_multiplier_140e80260(field, resource)
-        falloff_weight = compute_uniform_profile_weight_for_40km_cylinder_14073F750(field)
-        unit_max = truncate_to_runtime_int(f32(f32(base_multiplier) * f32(falloff_weight)))
-    per_tile = [{"coord": coord, resource.ware_key: unit_max} for coord in tile_coords]
+    else:
+        base_multiplier = 0.0
+    grid = build_query_grid_window_140760320(field.position_x, field.position_y, field.position_z)
+    for coord in tile_coords:
+        if base_multiplier <= 0.0:
+            falloff_weight = 0.0
+            tile_value = 0
+        else:
+            world_coord = world_coord_from_storage_coord_140760320(grid, coord)
+            query = (float(world_coord[0]), float(world_coord[1]), float(world_coord[2]))
+            falloff_weight = compute_cylinder_profile_weight_for_query_14073F750(field, query)
+            tile_value = truncate_to_runtime_int(f32(f32(base_multiplier) * f32(falloff_weight)))
+        total += tile_value
+        per_tile.append(
+            {
+                "coord": coord,
+                "world_coord": world_coord_from_storage_coord_140760320(grid, coord),
+                "falloff_weight": falloff_weight,
+                resource.ware_key: tile_value,
+            }
+        )
     return {
         "field": field.name,
         "boundary_class": field.boundary_class,
         "tile_count": len(tile_coords),
         "tile_coords": sorted(tile_coords),
         "per_tile": per_tile,
-        "ware_totals": {resource.ware_key: unit_max * len(tile_coords)},
-        "ware_unit_max": {resource.ware_key: unit_max},
+        "ware_totals": {resource.ware_key: total},
+        "grid_window": grid,
     }
 
 
 def replay_splinetube_field_planar_reverse_closure_1407603F0(
     field: NebulaFieldState,
 ) -> dict[str, object]:
-    sampled_points = build_sampled_spline_points_from_region_bezier_closure_14093E5C0(field)
+    bezier_points = build_sampled_spline_points_from_region_bezier_closure_14093E5C0(field)
+    sampled_points = build_runtime_sampled_splinetube_points_14078EAC0(field)
     seg_lengths, accum, total_length = build_polyline_arclength_table_from_sampled_points_14093E5C0(sampled_points)
     threshold = QUERY_RADIUS_14073F750 + field.radius
+    grid = build_query_grid_window_140760320(field.position_x, field.position_y, field.position_z)
     candidate_tiles = enumerate_planar_candidate_area_centers_for_splinetube_reverse_closure_14093EB60(
+        field,
         sampled_points,
         field.radius,
         QUERY_RADIUS_14073F750,
@@ -560,24 +806,22 @@ def replay_splinetube_field_planar_reverse_closure_1407603F0(
     ware_totals = {resource.ware_key: 0 for resource in field.resources}
 
     for coord in candidate_tiles:
-        query = (float(coord[0]), float(coord[1]), float(coord[2]))
-        nearest_distance, nearest_arclength = nearest_distance_to_sampled_polyline_14093ED70(query, sampled_points, seg_lengths, accum)
-        if nearest_distance > threshold:
-            continue
-
-        lateral_interval = compute_splinetube_lateral_interval_polyline_closure_14093ED40(
+        world_coord = world_coord_from_storage_coord_140760320(grid, coord)
+        query = (float(world_coord[0]), float(world_coord[1]), float(world_coord[2]))
+        lateral_interval, representative_distance = compute_composite_spline_interval_scan_1414F3B30(
             query,
             sampled_points,
             seg_lengths,
             accum,
             total_length,
             threshold,
+            SPLINETUBE_INTERVAL_SAMPLE_COUNT_14093ED40,
         )
         if lateral_interval is None:
             continue
 
         radial_interval = compute_splinetube_radial_interval_polyline_closure_14093EE10(
-            nearest_distance,
+            representative_distance,
             field.radius,
             QUERY_RADIUS_14073F750,
         )
@@ -588,8 +832,8 @@ def replay_splinetube_field_planar_reverse_closure_1407603F0(
 
         tile_entry: dict[str, object] = {
             "coord": coord,
-            "nearest_distance": nearest_distance,
-            "nearest_arclength": nearest_arclength,
+            "world_coord": world_coord,
+            "representative_distance": representative_distance,
             "lateral_interval": lateral_interval,
             "radial_interval": radial_interval,
             "lateral_weight": lateral_weight,
@@ -613,31 +857,45 @@ def replay_splinetube_field_planar_reverse_closure_1407603F0(
         "tile_coords": [entry["coord"] for entry in per_tile],
         "per_tile": per_tile,
         "ware_totals": ware_totals,
-        "sampled_point_count": len(sampled_points),
-        "sampled_segment_count": len(sampled_points) - 1,
+        "sampled_point_count": len(bezier_points),
+        "sampled_segment_count": len(bezier_points) - 1,
+        "runtime_sampled_point_count": len(sampled_points),
+        "runtime_sampled_segment_count": len(sampled_points) - 1,
         "query_radius": QUERY_RADIUS_14073F750,
+        "grid_window": grid,
     }
 
 
 def enumerate_planar_candidate_area_centers_for_sphere_reverse_closure_14093D1D0(
     field: NebulaFieldState,
 ) -> list[tuple[int, int, int]]:
+    grid = build_query_grid_window_140760320(field.position_x, field.position_y, field.position_z)
     extension = field.radius + QUERY_RADIUS_14073F750
     min_x = field.position_x - extension
     max_x = field.position_x + extension
+    min_y = field.position_y - extension
+    max_y = field.position_y + extension
     min_z = field.position_z - extension
     max_z = field.position_z + extension
-    start_x = math.floor(min_x / AREA_SIZE) * int(AREA_SIZE)
-    end_x = math.floor(max_x / AREA_SIZE) * int(AREA_SIZE)
-    start_z = math.floor(min_z / AREA_SIZE) * int(AREA_SIZE)
-    end_z = math.floor(max_z / AREA_SIZE) * int(AREA_SIZE)
+    start_x, end_x = compute_storage_axis_range_140760320(
+        min_x, max_x, grid.origin_x, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
+    )
+    start_y, end_y = compute_storage_axis_range_140760320(
+        min_y, max_y, grid.origin_y, SAVE_GRID_MIN_CENTER_Y, SAVE_GRID_MAX_CENTER_Y
+    )
+    start_z, end_z = compute_storage_axis_range_140760320(
+        min_z, max_z, grid.origin_z, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
+    )
     coords: list[tuple[int, int, int]] = []
     x = start_x
     while x <= end_x:
-        z = start_z
-        while z <= end_z:
-            coords.append((x, 0, z))
-            z += int(AREA_SIZE)
+        y = start_y
+        while y <= end_y:
+            z = start_z
+            while z <= end_z:
+                coords.append((x, y, z))
+                z += int(AREA_SIZE)
+            y += int(AREA_SIZE)
         x += int(AREA_SIZE)
     return coords
 
@@ -661,9 +919,11 @@ def replay_sphere_field_planar_reverse_closure_1407603F0(
     ware_totals = {resource.ware_key: 0 for resource in field.resources}
     center = (field.position_x, field.position_y, field.position_z)
     threshold = field.radius + QUERY_RADIUS_14073F750
+    grid = build_query_grid_window_140760320(field.position_x, field.position_y, field.position_z)
 
     for coord in enumerate_planar_candidate_area_centers_for_sphere_reverse_closure_14093D1D0(field):
-        query = (float(coord[0]), float(coord[1]), float(coord[2]))
+        world_coord = world_coord_from_storage_coord_140760320(grid, coord)
+        query = (float(world_coord[0]), float(world_coord[1]), float(world_coord[2]))
         distance_to_center = vec_length(vec_sub(query, center))
         if distance_to_center > threshold:
             continue
@@ -671,6 +931,7 @@ def replay_sphere_field_planar_reverse_closure_1407603F0(
         radial_weight = eval_profile_avg_1414ED970(field.falloff.radial, radial_interval)
         tile_entry: dict[str, object] = {
             "coord": coord,
+            "world_coord": world_coord,
             "radial_interval": radial_interval,
             "radial_weight": radial_weight,
             "tile_weight": radial_weight,
@@ -693,29 +954,42 @@ def replay_sphere_field_planar_reverse_closure_1407603F0(
         "per_tile": per_tile,
         "ware_totals": ware_totals,
         "query_radius": QUERY_RADIUS_14073F750,
+        "grid_window": grid,
     }
 
 
 def enumerate_planar_candidate_area_centers_for_box_reverse_closure_14093CAC0(
     field: NebulaFieldState,
 ) -> list[tuple[int, int, int]]:
+    grid = build_query_grid_window_140760320(field.position_x, field.position_y, field.position_z)
     extension_x = field.size_x + QUERY_RADIUS_14073F750
+    extension_y = field.size_y + QUERY_RADIUS_14073F750
     extension_z = field.size_z + QUERY_RADIUS_14073F750
     min_x = field.position_x - extension_x
     max_x = field.position_x + extension_x
+    min_y = field.position_y - extension_y
+    max_y = field.position_y + extension_y
     min_z = field.position_z - extension_z
     max_z = field.position_z + extension_z
-    start_x = math.floor(min_x / AREA_SIZE) * int(AREA_SIZE)
-    end_x = math.floor(max_x / AREA_SIZE) * int(AREA_SIZE)
-    start_z = math.floor(min_z / AREA_SIZE) * int(AREA_SIZE)
-    end_z = math.floor(max_z / AREA_SIZE) * int(AREA_SIZE)
+    start_x, end_x = compute_storage_axis_range_140760320(
+        min_x, max_x, grid.origin_x, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
+    )
+    start_y, end_y = compute_storage_axis_range_140760320(
+        min_y, max_y, grid.origin_y, SAVE_GRID_MIN_CENTER_Y, SAVE_GRID_MAX_CENTER_Y
+    )
+    start_z, end_z = compute_storage_axis_range_140760320(
+        min_z, max_z, grid.origin_z, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
+    )
     coords: list[tuple[int, int, int]] = []
     x = start_x
     while x <= end_x:
-        z = start_z
-        while z <= end_z:
-            coords.append((x, 0, z))
-            z += int(AREA_SIZE)
+        y = start_y
+        while y <= end_y:
+            z = start_z
+            while z <= end_z:
+                coords.append((x, y, z))
+                z += int(AREA_SIZE)
+            y += int(AREA_SIZE)
         x += int(AREA_SIZE)
     return coords
 
@@ -762,9 +1036,11 @@ def replay_box_field_planar_reverse_closure_1407603F0(
 ) -> dict[str, object]:
     per_tile: list[dict[str, object]] = []
     ware_totals = {resource.ware_key: 0 for resource in field.resources}
+    grid = build_query_grid_window_140760320(field.position_x, field.position_y, field.position_z)
 
     for coord in enumerate_planar_candidate_area_centers_for_box_reverse_closure_14093CAC0(field):
-        query = (float(coord[0]), float(coord[1]), float(coord[2]))
+        world_coord = world_coord_from_storage_coord_140760320(grid, coord)
+        query = (float(world_coord[0]), float(world_coord[1]), float(world_coord[2]))
         normalized_scalar = compute_box_normalized_scalar_14093CA30(field, query)
         if normalized_scalar > (1.0 + (QUERY_RADIUS_14073F750 / min(v for v in (field.size_x, field.size_y, field.size_z) if v > 0.0))):
             continue
@@ -772,6 +1048,7 @@ def replay_box_field_planar_reverse_closure_1407603F0(
         radial_weight = eval_profile_avg_1414ED970(field.falloff.radial, radial_interval)
         tile_entry: dict[str, object] = {
             "coord": coord,
+            "world_coord": world_coord,
             "radial_interval": radial_interval,
             "radial_weight": radial_weight,
             "tile_weight": radial_weight,
@@ -794,6 +1071,7 @@ def replay_box_field_planar_reverse_closure_1407603F0(
         "per_tile": per_tile,
         "ware_totals": ware_totals,
         "query_radius": QUERY_RADIUS_14073F750,
+        "grid_window": grid,
     }
 
 

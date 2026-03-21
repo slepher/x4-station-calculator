@@ -42,6 +42,10 @@ import xml.etree.ElementTree as ET
 
 AREA_SIZE = 64000.0
 AREA_HALF = AREA_SIZE / 2.0
+SAVE_GRID_MIN_CENTER_XZ = -960000
+SAVE_GRID_MAX_CENTER_XZ = 1024000
+SAVE_GRID_MIN_CENTER_Y = -960000
+SAVE_GRID_MAX_CENTER_Y = 1024000
 QUERY_RADIUS_14073F750 = 55425.625
 NOISE_CLAMP_SCALE_140E84C30 = 9.999999717180685e-10
 NOISE_CDF_CENTER_1414F5870 = 0.5
@@ -53,6 +57,8 @@ NOISE_CDF_QUAD_1414F5870 = 4.665377140045166
 NOISE_CDF_CROSS_SCALE_1414F5870 = 20.25
 NOISE_CDF_QUARTIC_1414F5870 = 32.02915954589844
 CLAMP_UPPER_140E84C30 = 262144.0
+SPLINETUBE_SEGMENT_COUNT_DEFAULT_14078EAC0 = 2000
+SPLINETUBE_INTERVAL_SAMPLE_COUNT_14093ED40 = 5
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_ROOT = PROJECT_ROOT / "src" / "assets" / "x4_game_data" / "8.0-Diplomacy" / "data"
 RESOURCEAREAS_JSON = DATA_ROOT / "resourceareas.json"
@@ -149,6 +155,13 @@ class SolidFieldState:
 
 
 @dataclass
+class QueryGridWindow:
+    origin_x: int
+    origin_y: int
+    origin_z: int
+
+
+@dataclass
 class SolidRegionState:
     sector_id: str
     field_ref: str
@@ -163,6 +176,47 @@ class SolidRegionState:
     payload: RegionYieldPayload
     fields: list[SolidFieldState]
     spline: list[SplineControlPoint] = field(default_factory=list)
+
+
+def compute_axis_storage_origin_140760320(position: float, max_center: int) -> int:
+    if abs(position) <= max_center:
+        return 0
+    return int(math.floor(position / AREA_SIZE) * AREA_SIZE)
+
+
+def build_query_grid_window_140760320(
+    position_x: float,
+    position_y: float,
+    position_z: float,
+) -> QueryGridWindow:
+    return QueryGridWindow(
+        origin_x=compute_axis_storage_origin_140760320(position_x, SAVE_GRID_MAX_CENTER_XZ),
+        origin_y=compute_axis_storage_origin_140760320(position_y, SAVE_GRID_MAX_CENTER_Y),
+        origin_z=compute_axis_storage_origin_140760320(position_z, SAVE_GRID_MAX_CENTER_XZ),
+    )
+
+
+def world_coord_from_storage_coord_140760320(
+    grid: QueryGridWindow,
+    coord: tuple[int, int, int],
+) -> tuple[int, int, int]:
+    return (
+        coord[0] + grid.origin_x,
+        coord[1] + grid.origin_y,
+        coord[2] + grid.origin_z,
+    )
+
+
+def compute_storage_axis_range_140760320(
+    min_world: float,
+    max_world: float,
+    origin: int,
+    min_center: int,
+    max_center: int,
+) -> tuple[int, int]:
+    start = max(int(math.floor((min_world - origin) / AREA_SIZE) * int(AREA_SIZE)), min_center)
+    end = min(int(math.floor((max_world - origin) / AREA_SIZE) * int(AREA_SIZE)), max_center)
+    return start, end
 
 
 def load_json_rows(path: Path) -> object:
@@ -242,25 +296,42 @@ def cubic_bezier_sample_14093E5C0(
     )
 
 
+def sample_composite_spline_uniform_param_14093E5C0(
+    region: SolidRegionState,
+    t: float,
+) -> tuple[float, float, float]:
+    segment_count = len(region.spline) - 1
+    if segment_count <= 0:
+        raise ValueError("splinetube requires at least two spline control points")
+    t = clamp(t, 0.0, 1.0)
+    scaled = t * segment_count
+    seg_index = min(int(math.floor(scaled)), segment_count - 1)
+    local_t = scaled - seg_index
+    if t >= 1.0:
+        seg_index = segment_count - 1
+        local_t = 1.0
+    left = region.spline[seg_index]
+    right = region.spline[seg_index + 1]
+    p0 = (left.x, left.y, left.z)
+    p1 = (right.x, right.y, right.z)
+    c0 = (left.x + left.tx * left.outlength, left.y + left.ty * left.outlength, left.z + left.tz * left.outlength)
+    c1 = (right.x - right.tx * right.inlength, right.y - right.ty * right.inlength, right.z - right.tz * right.inlength)
+    return cubic_bezier_sample_14093E5C0(p0, c0, c1, p1, local_t)
+
+
 def build_sampled_spline_points_from_region_bezier_closure_14093E5C0(
     region: SolidRegionState,
 ) -> list[tuple[float, float, float]]:
     if len(region.spline) < 2:
         raise ValueError("splinetube requires at least two spline control points")
 
-    points: list[tuple[float, float, float]] = []
-    for seg_index in range(len(region.spline) - 1):
-        left = region.spline[seg_index]
-        right = region.spline[seg_index + 1]
-        p0 = (left.x, left.y, left.z)
-        p1 = (right.x, right.y, right.z)
-        c0 = (left.x + left.tx * left.outlength, left.y + left.ty * left.outlength, left.z + left.tz * left.outlength)
-        c1 = (right.x - right.tx * right.inlength, right.y - right.ty * right.inlength, right.z - right.tz * right.inlength)
-        step_count = 16
-        start = 0 if seg_index == 0 else 1
-        for i in range(start, step_count + 1):
-            points.append(cubic_bezier_sample_14093E5C0(p0, c0, c1, p1, i / step_count))
-    return points
+    return [
+        sample_composite_spline_uniform_param_14093E5C0(
+            region,
+            index / SPLINETUBE_SEGMENT_COUNT_DEFAULT_14078EAC0,
+        )
+        for index in range(SPLINETUBE_SEGMENT_COUNT_DEFAULT_14078EAC0 + 1)
+    ]
 
 
 def build_polyline_arclength_table_from_sampled_points_14093E5C0(
@@ -305,6 +376,84 @@ def nearest_distance_to_sampled_polyline_14093ED70(
             best_distance = distance_to_seg
             best_arclength = accum[index] + seg_lengths[index] * t
     return best_distance, best_arclength
+
+
+def sample_point_on_sampled_polyline_at_fraction_1402D55C0(
+    points: list[tuple[float, float, float]],
+    seg_lengths: list[float],
+    accum: list[float],
+    total_length: float,
+    fraction: float,
+) -> tuple[float, float, float]:
+    if total_length <= 1e-6:
+        return points[0]
+    target = clamp(fraction, 0.0, 1.0) * total_length
+    for index, seg_len in enumerate(seg_lengths):
+        seg_start = accum[index]
+        seg_end = accum[index + 1]
+        if target <= seg_end or index == len(seg_lengths) - 1:
+            if seg_len <= 1e-6:
+                return points[index]
+            t = clamp((target - seg_start) / seg_len, 0.0, 1.0)
+            return vec_add(points[index], vec_mul(vec_sub(points[index + 1], points[index]), t))
+    return points[-1]
+
+
+def compute_composite_spline_nearest_global_t_1402D4FF0(
+    query: tuple[float, float, float],
+    points: list[tuple[float, float, float]],
+    seg_lengths: list[float],
+    accum: list[float],
+    total_length: float,
+) -> tuple[float, float]:
+    nearest_distance, nearest_arclength = nearest_distance_to_sampled_polyline_14093ED70(query, points, seg_lengths, accum)
+    if total_length <= 1e-6:
+        return (0.0, nearest_distance)
+    return (clamp(nearest_arclength / total_length, 0.0, 1.0), nearest_distance)
+
+
+def compute_composite_spline_interval_scan_1414F3B30(
+    query: tuple[float, float, float],
+    points: list[tuple[float, float, float]],
+    seg_lengths: list[float],
+    accum: list[float],
+    total_length: float,
+    query_radius: float,
+    sample_count: int,
+) -> tuple[tuple[float, float] | None, float]:
+    nearest_t, _nearest_distance = compute_composite_spline_nearest_global_t_1402D4FF0(
+        query, points, seg_lengths, accum, total_length
+    )
+    if total_length <= 1e-6:
+        sample_point = points[0]
+        sample_distance = vec_length(vec_sub(sample_point, query))
+        return ((0.0, 0.0), sample_distance) if sample_distance < query_radius else (None, sample_distance)
+
+    window = (query_radius + query_radius) / total_length
+    step = window / sample_count
+    start = nearest_t - window
+    end = start + window + window + step
+
+    first_hit: float | None = None
+    last_hit: float | None = None
+    t = start
+    while t < end:
+        point = sample_point_on_sampled_polyline_at_fraction_1402D55C0(points, seg_lengths, accum, total_length, t)
+        distance_to_query = vec_length(vec_sub(point, query))
+        if distance_to_query < query_radius:
+            hit_t = clamp(t, 0.0, 1.0)
+            if first_hit is None:
+                first_hit = hit_t
+            last_hit = hit_t
+        t += step
+
+    representative_point = sample_point_on_sampled_polyline_at_fraction_1402D55C0(
+        points, seg_lengths, accum, total_length, nearest_t
+    )
+    representative_distance = vec_length(vec_sub(representative_point, query))
+    if first_hit is None or last_hit is None:
+        return None, representative_distance
+    return (first_hit, last_hit), representative_distance
 
 
 def segment_param_interval_inside_radius(
@@ -371,30 +520,43 @@ def compute_splinetube_radial_interval_polyline_closure_14093EE10(
     )
 
 
-def enumerate_planar_candidate_area_centers_for_splinetube_reverse_closure_14093EB60(
+def enumerate_candidate_area_centers_for_splinetube_reverse_closure_14093EB60(
+    region: SolidRegionState,
     points: list[tuple[float, float, float]],
     tube_radius: float,
     query_radius: float,
 ) -> list[tuple[int, int, int]]:
+    grid = build_query_grid_window_140760320(region.position_x, region.position_y, region.position_z)
     xs = [point[0] for point in points]
+    ys = [point[1] for point in points]
     zs = [point[2] for point in points]
     extension = tube_radius + query_radius
     min_x = min(xs) - extension
     max_x = max(xs) + extension
+    min_y = min(ys) - extension
+    max_y = max(ys) + extension
     min_z = min(zs) - extension
     max_z = max(zs) + extension
-    start_x = math.floor(min_x / AREA_SIZE) * int(AREA_SIZE)
-    end_x = math.floor(max_x / AREA_SIZE) * int(AREA_SIZE)
-    start_z = math.floor(min_z / AREA_SIZE) * int(AREA_SIZE)
-    end_z = math.floor(max_z / AREA_SIZE) * int(AREA_SIZE)
+    start_x, end_x = compute_storage_axis_range_140760320(
+        min_x, max_x, grid.origin_x, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
+    )
+    start_y, end_y = compute_storage_axis_range_140760320(
+        min_y, max_y, grid.origin_y, SAVE_GRID_MIN_CENTER_Y, SAVE_GRID_MAX_CENTER_Y
+    )
+    start_z, end_z = compute_storage_axis_range_140760320(
+        min_z, max_z, grid.origin_z, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
+    )
 
     coords: list[tuple[int, int, int]] = []
     x = start_x
     while x <= end_x:
-        z = start_z
-        while z <= end_z:
-            coords.append((x, 0, z))
-            z += int(AREA_SIZE)
+        y = start_y
+        while y <= end_y:
+            z = start_z
+            while z <= end_z:
+                coords.append((x, y, z))
+                z += int(AREA_SIZE)
+            y += int(AREA_SIZE)
         x += int(AREA_SIZE)
     return coords
 
@@ -622,7 +784,7 @@ def compute_cylinder_falloff_weight_14073F750(
 
 def compute_boundary_volume_14093E1A0(region: SolidRegionState) -> float:
     if region.boundary_class == "cylinder":
-        return (2.0 * region.linear) * math.pi * region.radius * region.radius
+        return region.linear * math.pi * region.radius * region.radius
     if region.boundary_class == "splinetube":
         sampled_points = build_sampled_spline_points_from_region_bezier_closure_14093E5C0(region)
         _, _, total_length = build_polyline_arclength_table_from_sampled_points_14093E5C0(sampled_points)
@@ -653,30 +815,43 @@ def area_intersects_field_query_box_140E83FF0(region: SolidRegionState, tile_x: 
 def enumerate_candidate_area_centers_for_64k_query_boxes_140760320(region: SolidRegionState) -> list[tuple[int, int, int]]:
     if region.boundary_class == "splinetube":
         sampled_points = build_sampled_spline_points_from_region_bezier_closure_14093E5C0(region)
-        return enumerate_planar_candidate_area_centers_for_splinetube_reverse_closure_14093EB60(
+        return enumerate_candidate_area_centers_for_splinetube_reverse_closure_14093EB60(
+            region,
             sampled_points,
             region.radius,
             QUERY_RADIUS_14073F750,
         )
 
+    grid = build_query_grid_window_140760320(region.position_x, region.position_y, region.position_z)
     min_x = region.position_x - region.radius - AREA_HALF
     max_x = region.position_x + region.radius + AREA_HALF
+    min_y = region.position_y - region.linear - AREA_HALF
+    max_y = region.position_y + region.linear + AREA_HALF
     min_z = region.position_z - region.radius - AREA_HALF
     max_z = region.position_z + region.radius + AREA_HALF
 
-    start_x = math.floor(min_x / AREA_SIZE) * int(AREA_SIZE)
-    end_x = math.floor(max_x / AREA_SIZE) * int(AREA_SIZE)
-    start_z = math.floor(min_z / AREA_SIZE) * int(AREA_SIZE)
-    end_z = math.floor(max_z / AREA_SIZE) * int(AREA_SIZE)
+    start_x, end_x = compute_storage_axis_range_140760320(
+        min_x, max_x, grid.origin_x, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
+    )
+    start_y, end_y = compute_storage_axis_range_140760320(
+        min_y, max_y, grid.origin_y, SAVE_GRID_MIN_CENTER_Y, SAVE_GRID_MAX_CENTER_Y
+    )
+    start_z, end_z = compute_storage_axis_range_140760320(
+        min_z, max_z, grid.origin_z, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
+    )
 
     coords: list[tuple[int, int, int]] = []
     x = start_x
     while x <= end_x:
-        z = start_z
-        while z <= end_z:
-            if area_intersects_field_query_box_140E83FF0(region, x, 0, z):
-                coords.append((x, 0, z))
-            z += int(AREA_SIZE)
+        y = start_y
+        while y <= end_y:
+            z = start_z
+            while z <= end_z:
+                world_coord = world_coord_from_storage_coord_140760320(grid, (x, y, z))
+                if area_intersects_field_query_box_140E83FF0(region, *world_coord):
+                    coords.append((x, y, z))
+                z += int(AREA_SIZE)
+            y += int(AREA_SIZE)
         x += int(AREA_SIZE)
     return coords
 
@@ -690,9 +865,9 @@ def build_solid_region_from_raw_inputs_14073E110(sector_id: str, field_ref: str)
     falloff = region_json["falloff"]
     spline = [
         SplineControlPoint(
-            x=float(row["x"]),
-            y=float(row["y"]),
-            z=float(row["z"]),
+            x=float(row["x"]) + float(position["x"]),
+            y=float(row["y"]) + float(position["y"]),
+            z=float(row["z"]) + float(position["z"]),
             tx=float(row["tx"]),
             ty=float(row["ty"]),
             tz=float(row["tz"]),
@@ -752,30 +927,32 @@ def compute_splinetube_falloff_weight_14073F750(
     sampled_points = build_sampled_spline_points_from_region_bezier_closure_14093E5C0(region)
     seg_lengths, accum, total_length = build_polyline_arclength_table_from_sampled_points_14093E5C0(sampled_points)
     threshold = QUERY_RADIUS_14073F750 + region.radius
-    nearest_distance, nearest_arclength = nearest_distance_to_sampled_polyline_14093ED70(
-        query, sampled_points, seg_lengths, accum
-    )
-    if nearest_distance > threshold:
-        return None
-    lateral_interval = compute_splinetube_lateral_interval_polyline_closure_14093ED40(
+    lateral_interval, representative_distance = compute_composite_spline_interval_scan_1414F3B30(
         query,
         sampled_points,
         seg_lengths,
         accum,
         total_length,
         threshold,
+        SPLINETUBE_INTERVAL_SAMPLE_COUNT_14093ED40,
     )
+    nearest_t, _nearest_distance = compute_composite_spline_nearest_global_t_1402D4FF0(
+        query, sampled_points, seg_lengths, accum, total_length
+    )
+    nearest_arclength = nearest_t * total_length
+    if representative_distance > threshold:
+        return None
     if lateral_interval is None:
         return None
     radial_interval = compute_splinetube_radial_interval_polyline_closure_14093EE10(
-        nearest_distance,
+        representative_distance,
         region.radius,
         QUERY_RADIUS_14073F750,
     )
     axial_weight = eval_profile_avg_1414ED970(region.falloff.lateral, lateral_interval)
     radial_weight = eval_profile_avg_1414ED970(region.falloff.radial, radial_interval)
     return {
-        "nearest_distance": nearest_distance,
+        "nearest_distance": representative_distance,
         "nearest_arclength": nearest_arclength,
         "axial_interval": lateral_interval,
         "radial_interval": radial_interval,
@@ -827,9 +1004,10 @@ def replay_region_solid_sum_weights_and_areas_v2_14073E110(region: SolidRegionSt
     clamp_factor = compute_clamp_factor_140E84C30(region)
     per_tile: list[dict[str, object]] = []
     total_max = 0
+    grid = build_query_grid_window_140760320(region.position_x, region.position_y, region.position_z)
 
     for coord in enumerate_candidate_area_centers_for_64k_query_boxes_140760320(region):
-        tile_x, tile_y, tile_z = coord
+        tile_x, tile_y, tile_z = world_coord_from_storage_coord_140760320(grid, coord)
         for field in matching_fields:
             assert_noise_fast_path_supported_1414F4840(field, tile_x, tile_y, tile_z)
 
@@ -871,6 +1049,7 @@ def replay_region_solid_sum_weights_and_areas_v2_14073E110(region: SolidRegionSt
         per_tile.append(
             {
                 "coord": coord,
+                "world_coord": (tile_x, tile_y, tile_z),
                 "axial_interval": falloff_info["axial_interval"],
                 "radial_interval": falloff_info["radial_interval"],
                 "axial_weight": falloff_info["axial_weight"],
@@ -891,6 +1070,7 @@ def replay_region_solid_sum_weights_and_areas_v2_14073E110(region: SolidRegionSt
         "weights": weight_rows,
         "per_tile": per_tile,
         "total_max": total_max,
+        "grid_window": grid,
     }
 
 
@@ -936,6 +1116,10 @@ def main() -> None:
     print(f"sum_weights={result['sum_weights']:.6f}")
     print(f"per_field_value={result['per_field_value']:.6f}")
     print(f"clamp_factor={result['clamp_factor']:.6f}")
+    print(
+        "grid_window="
+        f"({result['grid_window'].origin_x}, {result['grid_window'].origin_y}, {result['grid_window'].origin_z})"
+    )
     print("weights:")
     for row in result["weights"]:
         print(
