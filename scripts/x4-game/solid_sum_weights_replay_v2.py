@@ -90,6 +90,18 @@ class FalloffProfiles:
 
 
 @dataclass
+class SplineControlPoint:
+    x: float
+    y: float
+    z: float
+    tx: float
+    ty: float
+    tz: float
+    inlength: float
+    outlength: float
+
+
+@dataclass
 class RegionYieldPayload:
     ware: str
     yield_name: str
@@ -140,6 +152,7 @@ class SolidFieldState:
 class SolidRegionState:
     sector_id: str
     field_ref: str
+    boundary_class: str
     position_x: float
     position_y: float
     position_z: float
@@ -149,6 +162,7 @@ class SolidRegionState:
     falloff: FalloffProfiles
     payload: RegionYieldPayload
     fields: list[SolidFieldState]
+    spline: list[SplineControlPoint] = field(default_factory=list)
 
 
 def load_json_rows(path: Path) -> object:
@@ -208,6 +222,181 @@ def dot(a: tuple[float, float, float], b: tuple[float, float, float]) -> float:
 
 def vec_length(a: tuple[float, float, float]) -> float:
     return math.sqrt(dot(a, a))
+
+
+def cubic_bezier_sample_14093E5C0(
+    p0: tuple[float, float, float],
+    c0: tuple[float, float, float],
+    c1: tuple[float, float, float],
+    p1: tuple[float, float, float],
+    t: float,
+) -> tuple[float, float, float]:
+    omt = 1.0 - t
+    omt2 = omt * omt
+    omt3 = omt2 * omt
+    t2 = t * t
+    t3 = t2 * t
+    return vec_add(
+        vec_add(vec_mul(p0, omt3), vec_mul(c0, 3.0 * omt2 * t)),
+        vec_add(vec_mul(c1, 3.0 * omt * t2), vec_mul(p1, t3)),
+    )
+
+
+def build_sampled_spline_points_from_region_bezier_closure_14093E5C0(
+    region: SolidRegionState,
+) -> list[tuple[float, float, float]]:
+    if len(region.spline) < 2:
+        raise ValueError("splinetube requires at least two spline control points")
+
+    points: list[tuple[float, float, float]] = []
+    for seg_index in range(len(region.spline) - 1):
+        left = region.spline[seg_index]
+        right = region.spline[seg_index + 1]
+        p0 = (left.x, left.y, left.z)
+        p1 = (right.x, right.y, right.z)
+        c0 = (left.x + left.tx * left.outlength, left.y + left.ty * left.outlength, left.z + left.tz * left.outlength)
+        c1 = (right.x - right.tx * right.inlength, right.y - right.ty * right.inlength, right.z - right.tz * right.inlength)
+        step_count = 16
+        start = 0 if seg_index == 0 else 1
+        for i in range(start, step_count + 1):
+            points.append(cubic_bezier_sample_14093E5C0(p0, c0, c1, p1, i / step_count))
+    return points
+
+
+def build_polyline_arclength_table_from_sampled_points_14093E5C0(
+    points: list[tuple[float, float, float]],
+) -> tuple[list[float], list[float], float]:
+    seg_lengths: list[float] = []
+    accum = [0.0]
+    total = 0.0
+    for a, b in zip(points, points[1:]):
+        seg_len = vec_length(vec_sub(b, a))
+        seg_lengths.append(seg_len)
+        total += seg_len
+        accum.append(total)
+    return seg_lengths, accum, total
+
+
+def distance_point_to_segment_with_param(
+    query: tuple[float, float, float],
+    a: tuple[float, float, float],
+    b: tuple[float, float, float],
+) -> tuple[float, float]:
+    ab = vec_sub(b, a)
+    ab2 = dot(ab, ab)
+    if ab2 <= 1e-6:
+        return vec_length(vec_sub(query, a)), 0.0
+    t = clamp(dot(vec_sub(query, a), ab) / ab2, 0.0, 1.0)
+    closest = vec_add(a, vec_mul(ab, t))
+    return vec_length(vec_sub(query, closest)), t
+
+
+def nearest_distance_to_sampled_polyline_14093ED70(
+    query: tuple[float, float, float],
+    points: list[tuple[float, float, float]],
+    seg_lengths: list[float],
+    accum: list[float],
+) -> tuple[float, float]:
+    best_distance = float("inf")
+    best_arclength = 0.0
+    for index, (a, b) in enumerate(zip(points, points[1:])):
+        distance_to_seg, t = distance_point_to_segment_with_param(query, a, b)
+        if distance_to_seg < best_distance:
+            best_distance = distance_to_seg
+            best_arclength = accum[index] + seg_lengths[index] * t
+    return best_distance, best_arclength
+
+
+def segment_param_interval_inside_radius(
+    query: tuple[float, float, float],
+    a: tuple[float, float, float],
+    b: tuple[float, float, float],
+    radius: float,
+) -> tuple[float, float] | None:
+    ab = vec_sub(b, a)
+    aq = vec_sub(a, query)
+    aa = dot(ab, ab)
+    if aa <= 1e-6:
+        if vec_length(aq) <= radius:
+            return (0.0, 1.0)
+        return None
+
+    bb = 2.0 * dot(aq, ab)
+    cc = dot(aq, aq) - radius * radius
+    disc = bb * bb - 4.0 * aa * cc
+    if disc < 0.0:
+        if vec_length(aq) <= radius and vec_length(vec_sub(b, query)) <= radius:
+            return (0.0, 1.0)
+        return None
+
+    root = math.sqrt(disc)
+    lower = clamp(min((-bb - root) / (2.0 * aa), (-bb + root) / (2.0 * aa)), 0.0, 1.0)
+    upper = clamp(max((-bb - root) / (2.0 * aa), (-bb + root) / (2.0 * aa)), 0.0, 1.0)
+    if upper <= lower:
+        if vec_length(aq) <= radius and vec_length(vec_sub(b, query)) <= radius:
+            return (0.0, 1.0)
+        return None
+    return (lower, upper)
+
+
+def compute_splinetube_lateral_interval_polyline_closure_14093ED40(
+    query: tuple[float, float, float],
+    points: list[tuple[float, float, float]],
+    seg_lengths: list[float],
+    accum: list[float],
+    total_length: float,
+    threshold: float,
+) -> tuple[float, float] | None:
+    hits: list[float] = []
+    for index, (a, b) in enumerate(zip(points, points[1:])):
+        local_interval = segment_param_interval_inside_radius(query, a, b, threshold)
+        if local_interval is None:
+            continue
+        local_lower, local_upper = local_interval
+        hits.append((accum[index] + seg_lengths[index] * local_lower) / total_length)
+        hits.append((accum[index] + seg_lengths[index] * local_upper) / total_length)
+    if not hits:
+        return None
+    return (min(hits), max(hits))
+
+
+def compute_splinetube_radial_interval_polyline_closure_14093EE10(
+    nearest_distance: float,
+    tube_radius: float,
+    query_radius: float,
+) -> tuple[float, float]:
+    return (
+        clamp((nearest_distance - query_radius) / tube_radius, 0.0, 1.0),
+        clamp((nearest_distance + query_radius) / tube_radius, 0.0, 1.0),
+    )
+
+
+def enumerate_planar_candidate_area_centers_for_splinetube_reverse_closure_14093EB60(
+    points: list[tuple[float, float, float]],
+    tube_radius: float,
+    query_radius: float,
+) -> list[tuple[int, int, int]]:
+    xs = [point[0] for point in points]
+    zs = [point[2] for point in points]
+    extension = tube_radius + query_radius
+    min_x = min(xs) - extension
+    max_x = max(xs) + extension
+    min_z = min(zs) - extension
+    max_z = max(zs) + extension
+    start_x = math.floor(min_x / AREA_SIZE) * int(AREA_SIZE)
+    end_x = math.floor(max_x / AREA_SIZE) * int(AREA_SIZE)
+    start_z = math.floor(min_z / AREA_SIZE) * int(AREA_SIZE)
+    end_z = math.floor(max_z / AREA_SIZE) * int(AREA_SIZE)
+
+    coords: list[tuple[int, int, int]] = []
+    x = start_x
+    while x <= end_x:
+        z = start_z
+        while z <= end_z:
+            coords.append((x, 0, z))
+            z += int(AREA_SIZE)
+        x += int(AREA_SIZE)
+    return coords
 
 
 def index_regions_by_id() -> dict[str, dict]:
@@ -432,7 +621,13 @@ def compute_cylinder_falloff_weight_14073F750(
 
 
 def compute_boundary_volume_14093E1A0(region: SolidRegionState) -> float:
-    return (2.0 * region.linear) * math.pi * region.radius * region.radius
+    if region.boundary_class == "cylinder":
+        return (2.0 * region.linear) * math.pi * region.radius * region.radius
+    if region.boundary_class == "splinetube":
+        sampled_points = build_sampled_spline_points_from_region_bezier_closure_14093E5C0(region)
+        _, _, total_length = build_polyline_arclength_table_from_sampled_points_14093E5C0(sampled_points)
+        return total_length * math.pi * region.radius * region.radius
+    raise ValueError(f"unsupported solid boundary class for volume: {region.boundary_class}")
 
 
 def compute_clamp_factor_140E84C30(region: SolidRegionState) -> float:
@@ -456,6 +651,14 @@ def area_intersects_field_query_box_140E83FF0(region: SolidRegionState, tile_x: 
 
 
 def enumerate_candidate_area_centers_for_64k_query_boxes_140760320(region: SolidRegionState) -> list[tuple[int, int, int]]:
+    if region.boundary_class == "splinetube":
+        sampled_points = build_sampled_spline_points_from_region_bezier_closure_14093E5C0(region)
+        return enumerate_planar_candidate_area_centers_for_splinetube_reverse_closure_14093EB60(
+            sampled_points,
+            region.radius,
+            QUERY_RADIUS_14073F750,
+        )
+
     min_x = region.position_x - region.radius - AREA_HALF
     max_x = region.position_x + region.radius + AREA_HALF
     min_z = region.position_z - region.radius - AREA_HALF
@@ -485,6 +688,19 @@ def build_solid_region_from_raw_inputs_14073E110(sector_id: str, field_ref: str)
     boundary = region_json["boundary"]
     size = boundary["size"]
     falloff = region_json["falloff"]
+    spline = [
+        SplineControlPoint(
+            x=float(row["x"]),
+            y=float(row["y"]),
+            z=float(row["z"]),
+            tx=float(row["tx"]),
+            ty=float(row["ty"]),
+            tz=float(row["tz"]),
+            inlength=float(row["inlength"]),
+            outlength=float(row["outlength"]),
+        )
+        for row in boundary.get("spline", [])
+    ]
 
     region_density, field_defs, (ware, yield_name) = parse_region_definition_140E80D20(field_ref)
     payload = parse_region_yield_payload_140E83F80(ware, yield_name)
@@ -512,6 +728,7 @@ def build_solid_region_from_raw_inputs_14073E110(sector_id: str, field_ref: str)
     return SolidRegionState(
         sector_id=sector_id,
         field_ref=field_ref,
+        boundary_class=str(boundary["class"]),
         position_x=float(position["x"]),
         position_y=float(position["y"]),
         position_z=float(position["z"]),
@@ -524,7 +741,59 @@ def build_solid_region_from_raw_inputs_14073E110(sector_id: str, field_ref: str)
         ),
         payload=payload,
         fields=fields,
+        spline=spline,
     )
+
+
+def compute_splinetube_falloff_weight_14073F750(
+    region: SolidRegionState,
+    query: tuple[float, float, float],
+) -> dict[str, object] | None:
+    sampled_points = build_sampled_spline_points_from_region_bezier_closure_14093E5C0(region)
+    seg_lengths, accum, total_length = build_polyline_arclength_table_from_sampled_points_14093E5C0(sampled_points)
+    threshold = QUERY_RADIUS_14073F750 + region.radius
+    nearest_distance, nearest_arclength = nearest_distance_to_sampled_polyline_14093ED70(
+        query, sampled_points, seg_lengths, accum
+    )
+    if nearest_distance > threshold:
+        return None
+    lateral_interval = compute_splinetube_lateral_interval_polyline_closure_14093ED40(
+        query,
+        sampled_points,
+        seg_lengths,
+        accum,
+        total_length,
+        threshold,
+    )
+    if lateral_interval is None:
+        return None
+    radial_interval = compute_splinetube_radial_interval_polyline_closure_14093EE10(
+        nearest_distance,
+        region.radius,
+        QUERY_RADIUS_14073F750,
+    )
+    axial_weight = eval_profile_avg_1414ED970(region.falloff.lateral, lateral_interval)
+    radial_weight = eval_profile_avg_1414ED970(region.falloff.radial, radial_interval)
+    return {
+        "nearest_distance": nearest_distance,
+        "nearest_arclength": nearest_arclength,
+        "axial_interval": lateral_interval,
+        "radial_interval": radial_interval,
+        "axial_weight": axial_weight,
+        "radial_weight": radial_weight,
+        "falloff": axial_weight * radial_weight,
+    }
+
+
+def compute_falloff_weight_for_query_14073F750(
+    region: SolidRegionState,
+    query: tuple[float, float, float],
+) -> dict[str, object] | None:
+    if region.boundary_class == "cylinder":
+        return compute_cylinder_falloff_weight_14073F750(region, query)
+    if region.boundary_class == "splinetube":
+        return compute_splinetube_falloff_weight_14073F750(region, query)
+    raise ValueError(f"unsupported solid boundary class for falloff: {region.boundary_class}")
 
 
 def replay_region_solid_sum_weights_and_areas_v2_14073E110(region: SolidRegionState) -> dict[str, object]:
@@ -565,7 +834,9 @@ def replay_region_solid_sum_weights_and_areas_v2_14073E110(region: SolidRegionSt
             assert_noise_fast_path_supported_1414F4840(field, tile_x, tile_y, tile_z)
 
         query = (float(tile_x), float(tile_y), float(tile_z))
-        falloff_info = compute_cylinder_falloff_weight_14073F750(region, query)
+        falloff_info = compute_falloff_weight_for_query_14073F750(region, query)
+        if falloff_info is None:
+            continue
 
         field_rows: list[dict[str, object]] = []
         tile_total_float = 0.0
@@ -625,8 +896,12 @@ def replay_region_solid_sum_weights_and_areas_v2_14073E110(region: SolidRegionSt
 
 def load_save_sample_for_ware(sector_id: str, ware: str, yield_name: str) -> dict[tuple[int, int, int], dict]:
     save_path = SAVE_SAMPLE_ROOT / f"{sector_id.lower()}.json"
+    if not save_path.exists():
+        return {}
     with save_path.open("r", encoding="utf-8") as handle:
         data = json.load(handle)
+    if ware not in data.get("ware", {}) or yield_name not in data["ware"][ware]:
+        return {}
     rows = data["ware"][ware][yield_name]["resources"]
     return {(int(row["x"]), int(row["y"]), int(row["z"])): row for row in rows}
 
@@ -636,8 +911,8 @@ def load_total_sample_for_ware(sector_id: str, ware: str, yield_name: str) -> di
         data = json.load(handle)
     for sector in data["sectors"]:
         if sector["sector_id"] == sector_id.lower():
-            return sector["ware"][ware][yield_name]
-    raise ValueError(f"sector not found in total.json: {sector_id}")
+            return sector.get("ware", {}).get(ware, {}).get(yield_name, {})
+    return {}
 
 
 def parse_args() -> argparse.Namespace:
@@ -655,6 +930,7 @@ def main() -> None:
     save_total = load_total_sample_for_ware(args.sector_id, region.payload.ware, region.payload.yield_name)
 
     print(f"field={result['field']}")
+    print(f"boundary_class={region.boundary_class}")
     print(f"ware={region.payload.ware}")
     print(f"yield_name={region.payload.yield_name}")
     print(f"sum_weights={result['sum_weights']:.6f}")
@@ -685,11 +961,15 @@ def main() -> None:
             f"save_max={save_value if save_value is not None else 'N/A'} "
             f"error_ratio={f'{error_ratio:.4%}' if error_ratio is not None else 'N/A'}"
         )
-    total_error_ratio = (result["total_max"] - int(save_total["max"])) / int(save_total["max"])
     print("total_compare:")
     print(f"  replay_total={result['total_max']}")
-    print(f"  save_total={int(save_total['max'])}")
-    print(f"  error_ratio={total_error_ratio:.4%}")
+    if save_total and "max" in save_total and int(save_total["max"]) != 0:
+        total_error_ratio = (result["total_max"] - int(save_total["max"])) / int(save_total["max"])
+        print(f"  save_total={int(save_total['max'])}")
+        print(f"  error_ratio={total_error_ratio:.4%}")
+    else:
+        print("  save_total=N/A")
+        print("  error_ratio=N/A")
 
 
 if __name__ == "__main__":
