@@ -101,6 +101,9 @@ class NebulaFieldState:
     linear: float
     falloff: FalloffProfiles
     resources: list[GasResourceEntry]
+    size_x: float = 0.0
+    size_y: float = 0.0
+    size_z: float = 0.0
     spline: list[SplineControlPoint] = field(default_factory=list)
     universe_yield_density_by_ware: dict[str, float] = field(default_factory=dict)
 
@@ -180,8 +183,11 @@ def build_nebula_field_from_sector_area_json_140e860c0(
         position_x=float(position["x"]),
         position_y=float(position["y"]),
         position_z=float(position["z"]),
-        radius=float(boundary_size["r"]),
-        linear=float(boundary_size["linear"]),
+        radius=float(boundary_size.get("r", 0.0)),
+        linear=float(boundary_size.get("linear", 0.0)),
+        size_x=float(boundary_size.get("x", 0.0)),
+        size_y=float(boundary_size.get("y", 0.0)),
+        size_z=float(boundary_size.get("z", 0.0)),
         falloff=FalloffProfiles(
             lateral=[ProfilePoint(float(p["position"]), float(p["value"])) for p in falloff["lateral"]],
             radial=[ProfilePoint(float(p["position"]), float(p["value"])) for p in falloff["radial"]],
@@ -268,6 +274,8 @@ def build_polyline_arclength_table_from_sampled_points_14093E5C0(
 
 
 def eval_profile_avg_1414ED970(profile: list[ProfilePoint], interval: tuple[float, float]) -> float:
+    if not profile:
+        return 1.0
     lower, upper = interval
     if upper <= lower:
         return 0.0
@@ -570,9 +578,191 @@ def replay_splinetube_field_planar_reverse_closure_1407603F0(
     }
 
 
+def enumerate_planar_candidate_area_centers_for_sphere_reverse_closure_14093D1D0(
+    field: NebulaFieldState,
+) -> list[tuple[int, int, int]]:
+    extension = field.radius + QUERY_RADIUS_14073F750
+    min_x = field.position_x - extension
+    max_x = field.position_x + extension
+    min_z = field.position_z - extension
+    max_z = field.position_z + extension
+    start_x = math.floor(min_x / AREA_SIZE) * int(AREA_SIZE)
+    end_x = math.floor(max_x / AREA_SIZE) * int(AREA_SIZE)
+    start_z = math.floor(min_z / AREA_SIZE) * int(AREA_SIZE)
+    end_z = math.floor(max_z / AREA_SIZE) * int(AREA_SIZE)
+    coords: list[tuple[int, int, int]] = []
+    x = start_x
+    while x <= end_x:
+        z = start_z
+        while z <= end_z:
+            coords.append((x, 0, z))
+            z += int(AREA_SIZE)
+        x += int(AREA_SIZE)
+    return coords
+
+
+def compute_sphere_radial_interval_14093D1D0(
+    field: NebulaFieldState,
+    query: tuple[float, float, float],
+) -> tuple[float, float]:
+    center = (field.position_x, field.position_y, field.position_z)
+    distance_to_center = vec_length(vec_sub(query, center))
+    return (
+        clamp((distance_to_center - QUERY_RADIUS_14073F750) / field.radius, 0.0, 1.0),
+        clamp((distance_to_center + QUERY_RADIUS_14073F750) / field.radius, 0.0, 1.0),
+    )
+
+
+def replay_sphere_field_planar_reverse_closure_1407603F0(
+    field: NebulaFieldState,
+) -> dict[str, object]:
+    per_tile: list[dict[str, object]] = []
+    ware_totals = {resource.ware_key: 0 for resource in field.resources}
+    center = (field.position_x, field.position_y, field.position_z)
+    threshold = field.radius + QUERY_RADIUS_14073F750
+
+    for coord in enumerate_planar_candidate_area_centers_for_sphere_reverse_closure_14093D1D0(field):
+        query = (float(coord[0]), float(coord[1]), float(coord[2]))
+        distance_to_center = vec_length(vec_sub(query, center))
+        if distance_to_center > threshold:
+            continue
+        radial_interval = compute_sphere_radial_interval_14093D1D0(field, query)
+        radial_weight = eval_profile_avg_1414ED970(field.falloff.radial, radial_interval)
+        tile_entry: dict[str, object] = {
+            "coord": coord,
+            "radial_interval": radial_interval,
+            "radial_weight": radial_weight,
+            "tile_weight": radial_weight,
+        }
+        for resource in field.resources:
+            if not resource_field_is_enabled_140e802d0(resource):
+                tile_value = 0
+            else:
+                base_multiplier = compute_resource_field_base_multiplier_140e80260(field, resource)
+                tile_value = truncate_to_runtime_int(f32(f32(base_multiplier) * f32(radial_weight)))
+            tile_entry[resource.ware_key] = tile_value
+            ware_totals[resource.ware_key] += tile_value
+        per_tile.append(tile_entry)
+
+    return {
+        "field": field.name,
+        "boundary_class": field.boundary_class,
+        "tile_count": len(per_tile),
+        "tile_coords": [entry["coord"] for entry in per_tile],
+        "per_tile": per_tile,
+        "ware_totals": ware_totals,
+        "query_radius": QUERY_RADIUS_14073F750,
+    }
+
+
+def enumerate_planar_candidate_area_centers_for_box_reverse_closure_14093CAC0(
+    field: NebulaFieldState,
+) -> list[tuple[int, int, int]]:
+    extension_x = field.size_x + QUERY_RADIUS_14073F750
+    extension_z = field.size_z + QUERY_RADIUS_14073F750
+    min_x = field.position_x - extension_x
+    max_x = field.position_x + extension_x
+    min_z = field.position_z - extension_z
+    max_z = field.position_z + extension_z
+    start_x = math.floor(min_x / AREA_SIZE) * int(AREA_SIZE)
+    end_x = math.floor(max_x / AREA_SIZE) * int(AREA_SIZE)
+    start_z = math.floor(min_z / AREA_SIZE) * int(AREA_SIZE)
+    end_z = math.floor(max_z / AREA_SIZE) * int(AREA_SIZE)
+    coords: list[tuple[int, int, int]] = []
+    x = start_x
+    while x <= end_x:
+        z = start_z
+        while z <= end_z:
+            coords.append((x, 0, z))
+            z += int(AREA_SIZE)
+        x += int(AREA_SIZE)
+    return coords
+
+
+def compute_box_normalized_scalar_14093CA30(
+    field: NebulaFieldState,
+    query: tuple[float, float, float],
+) -> float:
+    dx = abs(query[0] - field.position_x)
+    dy = abs(query[1] - field.position_y)
+    dz = abs(query[2] - field.position_z)
+    return max(
+        dx / field.size_x if field.size_x > 0.0 else float("inf"),
+        dy / field.size_y if field.size_y > 0.0 else float("inf"),
+        dz / field.size_z if field.size_z > 0.0 else float("inf"),
+    )
+
+
+def compute_box_interval_14093CAC0(
+    field: NebulaFieldState,
+    query: tuple[float, float, float],
+) -> tuple[float, float]:
+    dx = abs(query[0] - field.position_x)
+    dy = abs(query[1] - field.position_y)
+    dz = abs(query[2] - field.position_z)
+    lower = max(
+        clamp((dx - QUERY_RADIUS_14073F750) / field.size_x, 0.0, 1.0) if field.size_x > 0.0 else 1.0,
+        clamp((dy - QUERY_RADIUS_14073F750) / field.size_y, 0.0, 1.0) if field.size_y > 0.0 else 1.0,
+        clamp((dz - QUERY_RADIUS_14073F750) / field.size_z, 0.0, 1.0) if field.size_z > 0.0 else 1.0,
+    )
+    upper = min(
+        max(
+            clamp((dx + QUERY_RADIUS_14073F750) / field.size_x, 0.0, 1.0) if field.size_x > 0.0 else 1.0,
+            clamp((dy + QUERY_RADIUS_14073F750) / field.size_y, 0.0, 1.0) if field.size_y > 0.0 else 1.0,
+            clamp((dz + QUERY_RADIUS_14073F750) / field.size_z, 0.0, 1.0) if field.size_z > 0.0 else 1.0,
+        ),
+        1.0,
+    )
+    return (lower, upper)
+
+
+def replay_box_field_planar_reverse_closure_1407603F0(
+    field: NebulaFieldState,
+) -> dict[str, object]:
+    per_tile: list[dict[str, object]] = []
+    ware_totals = {resource.ware_key: 0 for resource in field.resources}
+
+    for coord in enumerate_planar_candidate_area_centers_for_box_reverse_closure_14093CAC0(field):
+        query = (float(coord[0]), float(coord[1]), float(coord[2]))
+        normalized_scalar = compute_box_normalized_scalar_14093CA30(field, query)
+        if normalized_scalar > (1.0 + (QUERY_RADIUS_14073F750 / min(v for v in (field.size_x, field.size_y, field.size_z) if v > 0.0))):
+            continue
+        radial_interval = compute_box_interval_14093CAC0(field, query)
+        radial_weight = eval_profile_avg_1414ED970(field.falloff.radial, radial_interval)
+        tile_entry: dict[str, object] = {
+            "coord": coord,
+            "radial_interval": radial_interval,
+            "radial_weight": radial_weight,
+            "tile_weight": radial_weight,
+        }
+        for resource in field.resources:
+            if not resource_field_is_enabled_140e802d0(resource):
+                tile_value = 0
+            else:
+                base_multiplier = compute_resource_field_base_multiplier_140e80260(field, resource)
+                tile_value = truncate_to_runtime_int(f32(f32(base_multiplier) * f32(radial_weight)))
+            tile_entry[resource.ware_key] = tile_value
+            ware_totals[resource.ware_key] += tile_value
+        per_tile.append(tile_entry)
+
+    return {
+        "field": field.name,
+        "boundary_class": field.boundary_class,
+        "tile_count": len(per_tile),
+        "tile_coords": [entry["coord"] for entry in per_tile],
+        "per_tile": per_tile,
+        "ware_totals": ware_totals,
+        "query_radius": QUERY_RADIUS_14073F750,
+    }
+
+
 def replay_gas_area_values_for_field_1407603F0(field: NebulaFieldState) -> dict[str, object]:
     if field.boundary_class == "cylinder":
         return replay_cylinder_field_1407603F0(field)
+    if field.boundary_class == "sphere":
+        return replay_sphere_field_planar_reverse_closure_1407603F0(field)
+    if field.boundary_class == "box":
+        return replay_box_field_planar_reverse_closure_1407603F0(field)
     if field.boundary_class == "splinetube":
         return replay_splinetube_field_planar_reverse_closure_1407603F0(field)
     raise ValueError(f"unsupported gas boundary class for replay: {field.boundary_class}")
@@ -588,6 +778,8 @@ def parse_args() -> argparse.Namespace:
 def describe_hit_check_mode() -> str:
     return (
         "reverse: cylinder 用有限高圆柱与 64k query box 相交；"
+        "sphere 用半径归一化区间；"
+        "box 用 box 度量归一化区间；"
         "splinetube 用 raw spline + raw falloff + query_radius=55425.625 的 planar box replay"
     )
 

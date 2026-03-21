@@ -458,6 +458,115 @@ index = (hx + hy + hz) & 0x3ff
 - `(x,y+1,z+1)`
 - `(x+1,y+1,z+1)`
 
+### 7. boundary RTTI / COL / vfptr 映射
+
+这一层已经可以从 RTTI `type descriptor` 顺着 `CompleteObjectLocator (COL)` 闭合到具体 `vfptr`。
+
+已确认的 `type descriptor`：
+
+- `Boundary`
+  - `0x1432f2a70`
+- `SplineTubeBoundary`
+  - `0x1432f2a98`
+- `CylinderBoundary`
+  - `0x1432f2ac8`
+- `BoxBoundary`
+  - `0x1432f46f0`
+- `SphereBoundary`
+  - `0x1432f4718`
+
+当前可直接闭合到的 `COL -> vfptr`：
+
+- `CylinderBoundary`
+  - `COL(offset=0)`: `0x142db9920`
+  - `vfptr`: `0x142bde490`
+  - 已确认槽位：
+    - `+0x00 -> 0x1400c58f0`
+    - `+0x08 -> 0x14031ba80`
+    - `+0x10 -> 0x14011b510`
+  - `COL(offset=8)`: `0x142db98d0`
+  - `vfptr`: `0x142bde570`
+  - 已确认槽位：
+    - `+0x00 -> 0x1406680cc`
+    - `+0x08 -> 0x14093d7a0`
+    - `+0x10 -> 0x14093d860`
+
+- `SplineTubeBoundary`
+  - `COL(offset=8)`: `0x142db98f8`
+  - `vfptr`: `0x142bde550`
+  - 已确认槽位：
+    - `+0x00 -> 0x140668108`
+    - `+0x08 -> 0x14093e9a0`
+    - `+0x10 -> 0x14093e9f0`
+  - `COL(offset=0)`: `0x142db98a8`
+  - `vfptr`: `0x142bde590`
+  - 已确认主表槽位：
+    - `+0x00 -> 0x140582d60`
+    - `+0x08 -> 0x140169370`
+    - `+0x10 -> 0x14011b510`
+    - `+0x18 -> 0x1403526a0`
+    - `+0x20 -> 0x1403526a0`
+    - `+0x28 -> 0x14093e440`
+    - `+0x30 -> 0x14093eaa0`
+    - `+0x38 -> 0x14093eb60`
+    - `+0x40 -> 0x14093ed00`
+    - `+0x48 -> 0x14009d970`
+    - `+0x50 -> 0x14093ed10`
+    - `+0x58 -> 0x14093ed40`
+    - `+0x60 -> 0x14009d970`
+    - `+0x68 -> 0x14093ed70`
+    - `+0x70 -> 0x14093ee10`
+    - `+0x78 -> 0x14093efc0`
+
+- `SphereBoundary`
+  - `COL(offset=8)`: `0x142dc1cd0`
+  - `vfptr`: `0x142c09a80`
+  - 已确认槽位：
+    - `+0x00 -> 0x140799814`
+    - `+0x08 -> 0x14093d000`
+    - `+0x10 -> 0x14093d030`
+  - `COL(offset=0)`: `0x142dc1ca8`
+  - `vfptr`: `0x142c09b40`
+  - 已确认主表槽位：
+    - `+0x00 -> 0x1400b6f60`
+    - `+0x08 -> 0x1400b6b40`
+    - `+0x10 -> 0x14011b510`
+    - `+0x18 -> 0x14066e490`
+    - `+0x20 -> 0x14066e490`
+    - `+0x28 -> 0x14093ccf0`
+    - `+0x30 -> 0x14093d070`
+    - `+0x38 -> 0x14093d0c0`
+    - `+0x40 -> 0x14093d160`
+    - `+0x48 -> 0x1400b5060`
+    - `+0x50 -> 0x14009afe0`
+    - `+0x58 -> 0x140582cd0`
+    - `+0x60 -> 0x14009d970`
+    - `+0x68 -> 0x14093d1a0`
+    - `+0x70 -> 0x14093d1d0`
+    - `+0x78 -> 0x14093d250`
+
+- `BoxBoundary`
+  - `COL(offset=8)`: `0x142dc1c80`
+  - `vfptr`: `0x142c09be0`
+  - 已确认槽位：
+    - `+0x00 -> 0x1407995d0`
+    - `+0x08 -> 0x14093c5a0`
+    - `+0x10 -> 0x14093c620`
+  - `COL(offset=0)`: `0x142dc1d00`
+  - 当前还没有拿到指向其 `vfptr` 的直接 xref，不能继续把主表槽位写死。
+
+注意：
+
+- 这里的 `COL(offset=0)` / `COL(offset=8)` 对应的是不同子对象视角下的 vfptr。
+- 真正被 `FUN_14093bd40 / FUN_14093bf90 / FUN_14093c2c0` 消费的是对象虚表上更深的槽位：
+  - `+0x48`
+  - `+0x58`
+  - `+0x60`
+  - `+0x70`
+  - `+0x78`
+- 当前已经能把 `SphereBoundary` 与 `SplineTubeBoundary` 的这些槽位完整列出；
+  `CylinderBoundary` 与 `BoxBoundary` 还只拿到了短表，需要继续沿数据结构追主表。
+
 各自都会通过这个 hash 流程得到一个 `0~1` 左右的角点值。
 
 因此这更像：
@@ -1158,22 +1267,33 @@ field_1150 * class_multiplier
 1. 读取：
    - `*(ulonglong *)(param_1 + 0x1110)`
    - `*(float *)(param_1 + 0x1118)`
-2. 分别去两张全局树：
-   - `DAT_143df3f88 + 0x170/+0x178`
+2. 分别去两张按 `ware` 查值的全局树：
    - `DAT_143df3f88 + 0x130/+0x138`
-   查两个按 key 对应的 float multiplier
+     - 对应 `universeyielddensities`
+   - `DAT_143df3f88 + 0x170/+0x178`
+     - 对应 `universeobjectyielddensities`
 3. 返回：
 
 ```text
-lookup_A(key_1110)
+lookup(universeyielddensities, ware_key)
  * field_1118
- * lookup_B(key_1110)
+ * lookup(universeobjectyielddensities, ware_key)
 ```
 
 说明：
 
-- `+0x1118` 已可视为 asteroid/group 的基础 `yield` 裸乘子；
-- `+0x1110` 是查两张全局倍率表的 key。
+- `+0x1118` 是当前 field 的 `yield`；其默认基础值来自：
+  - `regionyields[ware][yield_tag].resourcedensity`
+- `+0x1110` 是查两张 Universe 级覆盖表的 `ware` key。
+
+如果把“默认无自定义 gamestart 覆盖”的情形单独拿出来，那么：
+
+```text
+MultiplierB
+= regionyields[ware][yield_tag].resourcedensity
+```
+
+因为 `universeyielddensities(ware)` 与 `universeobjectyielddensities(ware)` 在无用户自定义时都可按单位乘子 `1` 处理。
 
 ### 8. 当前阶段可确认的 asteroid 贡献模型
 
@@ -2532,11 +2652,115 @@ region-yield payload(resourcedensity)
 
 仍与 solid 总量直接相关、尚未完全锁死的主要是：
 
-1. `DAT_143df3f88 + 0x130` 与 `+0x170`
-   - 它们都已明确参与 `FUN_140e803e0`
-   - 但精确语义还没拿到最终代码证据
-2. `FUN_140e85c10` 的返回值写入 candidate `+0x68/+0x6c` 的最后桥接点
+1. `FUN_140e85c10` 的返回值写入 candidate `+0x68/+0x6c` 的最后桥接点
    - 当前高可信，但还缺最后一跳
-3. `+0x111c = replenishtime`
+2. `+0x111c = replenishtime`
    - 已确认会被读取
    - 但当前仍不把它纳入 solid 初始总量公式，除非后续找到更直接的初始生成路径证据
+
+---
+
+## 九、2026-03-21 复核修正
+
+本节只记录对未提交扩写内容的复核结果。标准是：必须能在当前 Ghidra 工程 `X4.exe` 里直接对上函数反编译；否则不写成定论。
+
+### 1. `FUN_14073e110` 的 region 分配链可以确认
+
+当前重新核对 `FUN_14073e110` 后，可以继续保留以下结论：
+
+- 它会先对匹配 `ware` 的 field 调 `vfunc(+0x20)`，把 region-yield payload 灌入 field 本地状态。
+- 然后调用 `field->vfunc(+0xa0, 1)` 累加权重。
+- 若总权重大于 `0`，再从 `DAT_143df3f88 + 0x130` 查该 `ware` 的倍率，计算：
+
+```text
+per_field_value = lookup(DAT_143df3f88 + 0x130, ware_key) * resourcedensity / sum_weights
+```
+
+- 最后对匹配 field 调 `vfunc(+0x28, per_field_value)`。
+
+其中 `FUN_140e83f80` 的代码已经再次确认：
+
+- `param_2[2] -> field + 0x1118`（仅当当前 yield 仍为 `0`）
+- `param_2[0] -> field + 0x111c`
+- `param_2[1] -> field + 0x1120`
+
+### 2. `FUN_140e85b80` 的一个关键点之前被写错了
+
+`FUN_140e85b80(longlong *param_1, char param_2)` 现在已经重新反编译确认：
+
+```text
+return MultiplierA * MultiplierB * gate * (F(maxnoisevalue) - F(minnoisevalue))
+```
+
+但这里的 `gate` 不是总是 `resourcepercentage`：
+
+- 当 `param_2 == 0` 时，`gate = field.resourcepercentage`
+- 当 `param_2 != 0` 时，`gate = 1.0`
+
+而 `FUN_14073e110` 里调用的是 `field->vfunc(+0xa0, 1)`，所以 region 分配阶段累加的权重 **不包含** `resourcepercentage`。之前把它写成固定乘子，这一条不成立，已修正。
+
+### 3. `FUN_140e84c30` 可以确认是 AsteroidField 的 area contribution 计算
+
+当前工程里能直接反编译到的是 `FUN_140e84c30`，而不是之前扩写里反复写死的 `FUN_140e84170`。
+
+`FUN_140e84c30` 的结构可以确认包含：
+
+- `FUN_14073f750(...)` 的 boundary/falloff 权重
+- `FUN_1414f4840(param_1 + 0xd4)` 的局部 noise 项
+- `vfunc(+0x1b8)` 返回的 `MultiplierA`
+- `vfunc(+0x98)` 返回的 `MultiplierB`
+- `field + 0x1190` 的 `resourcepercentage`
+
+也就是说，AsteroidField 的单 area contribution 里，`resourcepercentage` 确实参与；但 region 分配时用于归一化的 `vfunc(+0xa0, 1)` 那一路不带这个因子。两者不能混写。
+
+### 4. `MultiplierB` 现在可以收束成最终结论
+
+在当前证据下，可以把 `MultiplierB` 直接写成：
+
+```text
+MultiplierB
+= universeyielddensities(ware)
+ * regionyields[ware][yield_tag].resourcedensity
+ * universeobjectyielddensities(ware)
+```
+
+其中：
+
+- `regionyields[ware][yield_tag].resourcedensity`
+  - 提供该 `ware` 在该 `yield tag` 下的基础资源量级
+- `universeyielddensities(ware)`
+  - 提供按 `ware` 的 Universe 级总量倍率
+- `universeobjectyielddensities(ware)`
+  - 提供按 `ware` 的 Universe 级单对象密度倍率
+
+如果用户没有在 `gamestarts.xml` 里做自定义覆盖，那么后两项按 `1` 处理，因此：
+
+```text
+MultiplierB
+= regionyields[ware][yield_tag].resourcedensity
+```
+
+从贡献角度看，当前可按下列方式理解这些元素：
+
+- `ware`
+  - 决定去查哪一行 `regionyields`，也决定两张 Universe 覆盖表查哪一项
+- `yield_tag`
+  - 决定同一 `ware` 下选 `low/medium/high/...` 的哪条定义
+- `resourcedensity`
+  - 决定基础量级；它是 `MultiplierB` 里真正的核心幅值来源
+- `universeyielddensities`
+  - 改的是该 `ware` 的全局倍率；影响同类资源整体偏高或偏低
+- `universeobjectyielddensities`
+  - 改的是该 `ware` 的对象级密度倍率；影响单对象 amount 的放大或压缩
+
+### 5. 下列说法本次不保留
+
+以下内容在当前工程里没有足够直接证据，或与实际反编译状态不一致，因此不再写成结论：
+
+- 把 `FUN_140e84170` 当作当前工程里已命名、已验证的 `ResourceField_GetContributionForQueryBox`
+- “RTTI / vftable 已完全定位”
+- “Solid 资源总量链已完全闭合”
+- “8.0 气体资源通过 `resourceareas.xml` + callback 系统处理，9.0+ 才引入 `ResourceAreasCallback@Sector@U@@`”
+- `RegionManager` 的完整结构定义和 `libraries/region_definitions.xml` / `.xsd` 的硬性绑定
+
+这些内容后续如果要重新加入，必须补上当前工程里的直接交叉证据。

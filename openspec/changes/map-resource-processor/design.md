@@ -128,7 +128,7 @@ yield = base × falloff × resourcedensity
 
 | 资源类型 | base |
 |----------|------|
-| **固体** | 有效体积 (km³) |
+| **固体** | 宏观总量收束后等价为体积项（见下文固体总量算法） |
 | **气体** | 有效方块数量 |
 
 **Falloff 计算：**
@@ -138,6 +138,19 @@ falloff = lateral_factor × radial_factor
 
 - `lateral_factor`: 横向 falloff 一元计算（平均值）
 - `radial_factor`: 径向 falloff 一元计算（加权平均值）
+
+**固体总量算法（最终保留口径）：**
+```
+solid_yield ≈ volume_km3 × falloff × resourcedensity
+```
+
+说明：
+- 这是固体资源的宏观期望总量收束式，作为最终固体总量算法保留。
+- 这里的 `falloff` 指 region 实例的平均 falloff 系数。
+- `resourcedensity` 是 region 资源定义中的目标资源密度。
+- `AvgNoise` 不应再额外乘一次；它已经通过 `sum_weights -> per_field_value -> writeback -> contribution` 这条归一化链被吸收。
+- `per_field_value` 在所有当前已确认的 writeback 分支中都只是在线性搬运同一个缩放系数；无论落在 `resourcepercentage`、`yield`，还是 `resourcepercentage_floor` 分支做等比例重分配，宏观总量都保持这条收束关系。
+- 这是整片矿区的宏观期望总量，不是单个 `64k area` 或单次实例化的严格值。
 
 **总量计算：**
 ```
@@ -158,7 +171,7 @@ sector_respawn = Σ(respawn × amount)
 - `resourcedensity`: 资源密度（从 regionyields 的 yield 定义）
 - `replenishtime` 单位是**分钟**
 - `× 60` 转换为每小时
-- `base_effective`: 截断后的有效体积（固体）或 截断后的有效方块数（气体）
+- `base_effective`: 对气体是截断后的有效方块数；对固体在最终口径下等价吸收到 `volume_km3`
 - `base_full`: 原始完整体积（固体）或 原始命中方块数（气体），不考虑截断限制
 - `total_yield/total_respawn`: 未经截断的基准值（用于评级参考）
 - `yield/respawn`: resourceareas.json 中每个 region 实例的产量（**未经 amount 乘法**）
@@ -225,6 +238,14 @@ def generate_gas_block_coordinates(
 - 方块中心到圆柱中心的距离 <= `effective_radius` 判定为命中
 - Y 轴重叠检查：方块 Y 范围与 region Y 范围有重叠
 
+**几何口径（最终保留）：**
+- `boundary.class = cylinder` 时，`position.(x, y, z)` 表示圆柱中心。
+- `boundary.size.r` 表示圆柱半径。
+- `boundary.size.linear` 表示圆柱半高，不是总高度。
+- 因此圆柱的 Y 范围为 `[position.y - linear, position.y + linear]`。
+- 未截断 cylinder 的完整高度为 `2 × linear`。
+- 这一口径与 40km 样例体积闭合一致：`π × r² × (2 × linear) / 10^9 ≈ volume_km3`。
+
 **气体产量公式：**
 ```
 yield = hit_block_count × falloff × resourcedensity
@@ -242,15 +263,20 @@ respawn = yield × 60 / replenishtime
 | 类型 | 半径上限 | 高度/长度上限 |
 |------|----------|---------------|
 | sphere | 200,000 m (200 km) | 80,000 m (80 km) 仅当超限时 |
-| cylinder | 200,000 m (200 km) | 80,000 m (80 km) |
+| cylinder | 200,000 m (200 km) | 80,000 m (80 km) 半高上限 |
 | splinetube | 200,000 m (200 km) | 1,000,000 m (1000 km) |
 
 **计算公式：**
 
 - **sphere** (r ≤ 200km): `(4/3) × π × r³ / 10^9`
 - **sphere** (r > 200km): `π × 200000² × 80000 / 10^9`（按圆柱体计算）
-- **cylinder**: `π × min(r, 200000)² × min(linear, 80000) / 10^9`
+- **cylinder**: `π × min(r, 200000)² × (2 × min(linear, 80000)) / 10^9`
 - **splinetube**: `π × min(r, 200000)² × min(spline_length, 1000000) / 10^9`
+
+其中：
+- `cylinder.position.y` 是圆柱中心 Y。
+- `linear` 是半高。
+- 因此 cylinder 的完整高度为 `2 × linear`。
 
 #### 1.3.5 Rating 计算（仅用于 sector.resources）
 

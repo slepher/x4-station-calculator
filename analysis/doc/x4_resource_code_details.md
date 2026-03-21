@@ -339,6 +339,128 @@ return MultiplierA * MultiplierB * gate * (F(maxnoisevalue) - F(minnoisevalue))
   - 对当前局部坐标/`64k area` 取 noise 值
   - 做 window 裁剪与软过渡
 
+### `seed` 的来源：`FUN_1407816b0`
+
+这轮已直接补齐 `FUN_140e80d20 -> FUN_1407816b0` 这条链。
+
+- `FUN_140e80d20`
+  - `uVar11 = FUN_1407816b0(param_3)`
+  - `param_1[0x21b] = uVar11`
+  - 随后用这个值初始化 1024 float noise table
+
+- `FUN_1407816b0`
+  - 在 XML 属性表中查找 attr id `0x6d`
+  - 若该属性存在且非空：
+    - 取其字符串
+    - 交给 `FUN_1414db690(...)`
+  - 返回值作为 noise seed
+
+因此当前可收成：
+
+```text
+field.seed_runtime
+= Hash(attr_0x6d_string)
+```
+
+也就是说，`seed` 不是运行时临时随机生成，而是来自 region field 配置上的稳定字符串/文本值，再经 hash 落成 runtime seed。
+
+### `FUN_140e80d20`：1024 noise table 初始化
+
+`FUN_140e80d20` 当前已可直接确认以下写入：
+
+- `+0x10d4 = FUN_140108c70(param_3, 0x4d, param_4)`
+  - `noisescale`
+- `+0x10e0 = FUN_140108c70(param_3, 0x44, param_6)`
+  - `minnoisevalue`
+- `+0x10e4 = FUN_140108c70(param_3, 0x40, param_7)`
+  - `maxnoisevalue`
+- `+0x10d4 .. +0x10d4 + 0x1000`
+  - 1024 个 `float`
+
+初始化循环：
+
+```text
+state = seed
+repeat 0x400 times:
+    state = state * 0x5851f42d4c957f2d + 0x14057b7ef767814f
+    u = state >> 0x1e
+    state = u | (state << 0x22)
+    table[i] = float(u & 0xffffffff) * DAT_142d7fb3c
+```
+
+其中：
+
+```text
+DAT_142d7fb3c = 2.3283064365386963e-10
+```
+
+即近似 `1 / 2^32`。
+
+### `FUN_1414f4840`：`local_noise` 的快/慢路径
+
+当前这一层已经能直接收成最终分支结构。
+
+- 输入：
+  - `field + 0xd4`
+    - noise table
+    - noisescale
+    - minnoisevalue
+    - maxnoisevalue
+  - 当前 `64k query box` 的归一化 min/max 坐标
+
+- `cell_count < 17`
+  - 进入慢路径
+  - 按格点遍历局部 lattice
+  - 调 `FUN_1414f4290(...)`
+  - 对 8 角噪声值做体积分段累计
+
+- `cell_count >= 17`
+  - 进入快路径
+  - 直接返回：
+
+```text
+FUN_1414f5870(maxnoisevalue) - FUN_1414f5870(minnoisevalue)
+```
+
+对 `p1_40km_ice_field` 这类：
+
+- `noisescale = 5000`
+- `query box = 64000`
+
+当前样本落在快路径上，因此 `local_noise` 在该 replay 中退化成每个 field 的常数，不再按 box 随机波动。
+
+### `FUN_1414f5870`：noise CDF 近似
+
+当前可直接保留的反编译式：
+
+```text
+x = param_1 - 0.5
+sign = -1 if x < 0 else (1 if x > 0 else 0)
+abs_scaled = abs(x) * 4.5
+
+poly
+= x^2 * 4.665377140045166
+ + abs_scaled * 0.30000001192092896
+ + abs_scaled * 0.0009720000089146197 * x^2 * 20.25
+ + x^4 * 32.02915954589844
+ + 1
+
+return ((sign - sign / poly^4) + 1) * 0.5
+```
+
+所以快路径下：
+
+```text
+local_noise_fast
+= F(maxnoisevalue) - F(minnoisevalue)
+```
+
+这也解释了为什么 `FUN_140e85b80` 在 region 分配阶段可以直接收成：
+
+```text
+MultiplierA * MultiplierB * gate * (F(maxnoisevalue) - F(minnoisevalue))
+```
+
 ## 8.1 boundary RTTI / COL / vfptr 映射
 
 这一层已经可以从 RTTI `type descriptor` 顺着 `CompleteObjectLocator (COL)` 闭合到具体 `vfptr`。
@@ -1055,6 +1177,73 @@ abs(projected_coord_axis) <= extent_axis + query_radius
   - 半长内含 gate：`+0x08`
   - 半长 + query_radius 扩张 gate：`+0x10`
 
+### gas 脚本口径同步
+
+当前 [`gas_sum_weights_replay.py`](/home/slepher/project/x4-station-calculator/scripts/x4-game/gas_sum_weights_replay.py)
+已经把 gas 的 `sphere / box` reverse 公式接进 replay 分派。
+
+- `sphere`
+  - 当前脚本对应：
+    - `+0x70 -> FUN_14093d1d0`
+    - `FUN_1414ed970`
+  - 保留口径：
+
+```text
+radial_interval
+= [max((d - query_radius) / R, 0), min((d + query_radius) / R, 1)]
+
+tile_weight
+= EvalAvg(radial_profile, radial_interval)
+```
+
+  - 当前 gas 路径未看到额外 lateral shape 约束，因此脚本把 sphere 视为：
+
+```text
+tile_value = base_multiplier * radial_weight
+```
+
+- `box`
+  - 当前脚本对应：
+    - `normalized_scalar -> FUN_14093ca30`
+    - `radial_interval -> FUN_14093cac0`
+    - `FUN_1414ed970`
+  - 保留口径：
+
+```text
+normalized_scalar
+= max(abs(local_x) / extent_x, abs(local_y) / extent_y, abs(local_z) / extent_z)
+
+radial_interval
+= [
+     max((abs(local_x)-query_radius)/extent_x,
+         (abs(local_y)-query_radius)/extent_y,
+         (abs(local_z)-query_radius)/extent_z,
+         0),
+     min(
+       max((abs(local_x)+query_radius)/extent_x,
+           (abs(local_y)+query_radius)/extent_y,
+           (abs(local_z)+query_radius)/extent_z),
+       1
+     )
+   ]
+
+tile_weight
+= EvalAvg(radial_profile, radial_interval)
+```
+
+  - 这里的 `extent_x/y/z` 是 runtime half-extent，不是全长。
+
+因此当前 gas 脚本层可收成：
+
+- `sphere`
+  - `tile_value = base_multiplier * EvalAvg(radial_interval)`
+- `box`
+  - `tile_value = base_multiplier * EvalAvg(box_metric_interval)`
+- 二者都使用：
+  - `query_radius = 55425.625`
+  - `base_multiplier = universeyielddensity(ware) * resourcedensity`
+  - 当前样例默认 `universeyielddensity = 1`
+
 ## 9. `FUN_140e84c30` 主乘法链复核
 
 - 这轮重新拉了汇编与 raw pcode，当前可直接确认：
@@ -1080,6 +1269,41 @@ area_value
   - 没看到 `MultiplierA` 被平方
   - 没看到 `MultiplierB` 之外的额外 Universe/group 公共倍率
   - 没看到 `sum_weights` 在这里被重新读取或显式抵消
+
+### `clamp` 层的当前对比状态
+
+这轮用 [`solid_sum_weights_replay_v2.py`](/home/slepher/project/x4-station-calculator/scripts/x4-game/solid_sum_weights_replay_v2.py)
+直接按：
+
+- `writeback`
+- `64k query box`
+- `FUN_14073f750`
+- `FUN_1414f4840` 快路径
+- `FUN_14093c2c0`
+
+重放 `Cluster_03_Sector001_macro / p1_40km_ice_field` 后，得到：
+
+- box 命中集合与存档一致
+- 每个 box 的值与总量都接近存档的 `2x`
+
+当前最可疑的统一系数是：
+
+```text
+clamp = min(FUN_14093c2c0(...) * 1e-9, upper_limit)
+```
+
+以及 `CylinderBoundary +0x78` 的长度语义在 replay 中是否又把半高乘成了全高。
+
+因此这条状态当前应记为：
+
+- `FUN_14093e1a0` 本身已确认返回：
+
+```text
+length(P1-P0) * π * r^2
+```
+
+- 但对 `region.json / region_definitions` 中 `linear` 到 runtime `P0/P1` 的装载语义，还需要继续闭合
+- 在 `p1_40km_ice_field` 样本上，这一层当前暴露出一个非常稳定的 `2x` 统一偏差，优先怀疑长度语义，而不是随机噪声
 
 - 证据锚点：
   - `140e84da9 .. 140e84db5`

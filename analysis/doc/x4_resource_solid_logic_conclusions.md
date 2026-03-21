@@ -525,6 +525,105 @@ Total ≈ Volume * AvgFalloff * resourcedensity
 - 这些分支改变的是矿区形态，不改变宏观总量
 - 当前真正需要保守处理的，只剩 `clamp / falloff / noise` 存在强耦合且不能被平均化吸收的情况
 
+### 5.6 当前更贴近 runtime 的总量计算口径：逐 `64k area` 叠加
+
+结论：`最终保留`
+
+如果目标不是“宏观期望总量”，而是更贴近游戏实际存档里的 `max`，当前最终应保留的口径不是：
+
+```text
+先对整片 region 做体积平均
+```
+
+而是：
+
+```text
+枚举命中的 64k query box
+-> 对每个 box 逐 field 计算 area contribution
+-> 每个 box 内先把各 field 相加
+-> 最后把所有 box 相加
+```
+
+也就是：
+
+```text
+Total_runtime_like
+= Σ_box AreaTotal(box)
+```
+
+其中：
+
+```text
+AreaTotal(box)
+= Σ_field AreaContribution(field, box)
+```
+
+而单个 field 在单个 box 上的当前保留式是：
+
+```text
+AreaContribution(field, box)
+= MultiplierB_after_writeback(field)
+ * MultiplierA(field)
+ * local_noise(field, box)
+ * resourcepercentage(field)
+ * falloff(box)
+ * clamp(region)
+```
+
+按当前逆向链，对应顺序就是：
+
+1. `FUN_14073e110`
+   - 找 matching field
+   - `vfunc(+0x20)` 写 payload
+   - `vfunc(+0xa0, 1)` 累加 `sum_weights`
+   - 算 `per_field_value`
+   - `vfunc(+0x28, per_field_value)` 做 writeback
+
+2. 枚举命中的 `64k query box`
+   - 当前样本口径下是 boundary 与 query box 的几何命中
+
+3. 对每个 box、每个 field 调 `FUN_140e84c30`
+   - 读取：
+     - `MultiplierA`
+     - `MultiplierB(after writeback)`
+     - `local_noise`
+     - `resourcepercentage`
+     - `falloff`
+     - `clamp`
+
+4. 先按 box 汇总，再对 box 求总和
+
+压成一条式子就是：
+
+```text
+Total_runtime_like
+= Σ_box Σ_field [
+     MultiplierB_after_writeback(field)
+   * MultiplierA(field)
+   * local_noise(field, box)
+   * resourcepercentage(field)
+   * falloff(box)
+   * clamp(region)
+ ]
+```
+
+这条口径与 `5.5` 的关系要明确区分：
+
+- `5.5`
+  - 是宏观平均后的收束式
+  - 适合解释为什么总量在数学上受 `resourcedensity` 约束
+- `5.6`
+  - 是当前更贴近 runtime / save 的直接计算口径
+  - 适合做逐 box replay 和与存档比较
+
+因此当前文档最后应保留的“运行时总量算法”是：
+
+```text
+总量 = 所有命中 64k box 的 area contribution 总和
+```
+
+而不是把 whole-region 先压成单一平均密度再回推。
+
 ## 6. 当前不要写成定论的部分
 
 ### 6.1 “solid 资源总量链已完全闭合”
