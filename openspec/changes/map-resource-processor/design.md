@@ -123,13 +123,13 @@ resolve_sector_macro_from_region_ref()
 
 **统一公式：**
 ```
-yield = base × falloff × resourcedensity
+yield = effective_volume_km3 × falloff × resourcedensity × gas_divisor
 ```
 
-| 资源类型 | base |
-|----------|------|
-| **固体** | 宏观总量收束后等价为体积项（见下文固体总量算法） |
-| **气体** | 有效方块数量 |
+| 资源类型 | `gas_divisor` | 几何基数 |
+|----------|---------------|------------|
+| **固体** | `1` | 有效体积 `volume_km3` |
+| **气体** | `1 / 64^3` | 有效体积 `volume_km3` |
 
 **Falloff 计算：**
 ```
@@ -138,6 +138,7 @@ falloff = lateral_factor × radial_factor
 
 - `lateral_factor`: 横向 falloff 一元计算（平均值）
 - `radial_factor`: 径向 falloff 一元计算（加权平均值）
+- 对 `solid box`，`falloff` 口径改为“轴向一元积分 + 径向二元积分”，不再简化为普通平均值乘积。
 
 **固体总量算法（最终保留口径）：**
 ```
@@ -155,11 +156,11 @@ solid_yield ≈ volume_km3 × falloff × resourcedensity
 **总量计算：**
 ```
 // 单个 region 实例的产量（未经 amount 乘法）
-yield = base_effective × falloff × resourcedensity
+yield = volume_km3 × falloff × resourcedensity × gas_divisor
 respawn = yield × 60 / replenishtime
 
 // 单个 region 实例的原始产量（未经 amount 乘法，用于评级参考）
-total_yield = base_full × falloff × resourcedensity
+total_yield = total_volume_km3 × falloff × resourcedensity × gas_divisor
 total_respawn = total_yield × 60 / replenishtime
 
 // Sector 聚合时才乘以 amount
@@ -171,50 +172,47 @@ sector_respawn = Σ(respawn × amount)
 - `resourcedensity`: 资源密度（从 regionyields 的 yield 定义）
 - `replenishtime` 单位是**分钟**
 - `× 60` 转换为每小时
-- `base_effective`: 对气体是截断后的有效方块数；对固体在最终口径下等价吸收到 `volume_km3`
-- `base_full`: 原始完整体积（固体）或 原始命中方块数（气体），不考虑截断限制
+- `gas_divisor`: 固体为 `1`；气体为 `1 / 64^3`，表示把体积折算为 `64km × 64km × 64km` 的离散体素数量
+- `volume_km3`: 截断、封顶、离散化后参与实际产量计算的有效体积
+- `total_volume_km3`: 应用有效空间裁剪前的原始几何体积
 - `total_yield/total_respawn`: 未经截断的基准值（用于评级参考）
 - `yield/respawn`: resourceareas.json 中每个 region 实例的产量（**未经 amount 乘法**）
 - `amount`: region 实例数量，在 sector 资源聚合时才应用
 
 #### 1.3.2 截断算法
 
-**适用范围：仅固体资源**
+**统一有效空间：**
 
-| 形状 | 截断规则 |
+| 维度 | 保留范围 |
 |------|----------|
-| **Sphere / Cylinder** | 体积上限限制：最大体积为 512km × 512km × 192km 的等效长方体体积 |
-| **Splinetube** | 截断中心曲线（spline）超出范围的部分，然后计算等效体积 |
+| X 轴 | `[-960km, +1024km]` |
+| Y 轴 | `[-960km, +1024km]` |
+| Z 轴 | `[-960km, +1024km]` |
 
-**固体截断范围（Splinetube 适用）：**
+**各形状口径：**
 
-| 维度 | 截断范围 |
-|------|----------|
-| X/Z 平面 | `[-256km, +256km]` |
-| Y 轴（高度） | `[-96km, +96km]`（总高度 192km） |
-
-**气体截断范围（仅用于 Block 中心过滤）：**
-
-| 维度 | 截断范围 |
-|------|----------|
-| X/Z 平面 | `[-256km, +256km]` |
-| Y 轴（高度） | `[-64km, +64km]`（总高度 128km） |
+| 资源类型 | 形状 | `total_volume_km3` | `volume_km3` |
+|----------|------|--------------------|--------------|
+| 固体 | `cylinder` | 原始圆柱体积 | 底面积封顶为 `2000km × 2000km`，总高度封顶为 `2000km` 后的体积 |
+| 固体 | `sphere` | 原始球体体积 | 不超过 `2000km × 2000km × 2000km` 立方体体积上限 |
+| 固体 | `splinetube` | 原始曲线长度对应体积 | 中心曲线按 `[-960km, +1024km]` 截断后的有效长度体积 |
+| 固体 | `box` | 原始 box 体积 | 盒体按 `[-960km, +1024km]` 截断后的有效体积 |
+| 气体 | `cylinder` | 原始圆柱体积 | 先按有效空间裁剪，再按坐标 `0` 切成整数个 `64km` 层后的离散体积 |
+| 气体 | `sphere` | 原始球体体积 | 半径上限 `2000km`，并按 `32km` 向上取整后的离散体积 |
+| 气体 | `splinetube` | 原始曲线长度对应体积 | 中心曲线按有效空间截断，半径按 `32km` 向上取整，横截面离散为 `64km × 64km` 方阵 |
+| 气体 | `box` | 原始 box 体积 | 按 `64k area` 的碰撞/占格结果离散统计体积 |
 
 #### 1.3.3 气体资源 Block 算法
 
-**两步截断流程：**
+**离散体积规则：**
 
-1. **原始 Block 命中（不考虑截断）**
-   - 将 sector 空间划分为 64km × 64km × 64km 的立方体网格
-   - 根据 region 形状和位置，判断命中哪些方块
-   - 原始 block 数量可能超过 243 个（如果 region 延伸到截断范围外）
-
-2. **截断过滤（仅针对已命中的 block）**
-   - 对方块中心应用截断范围过滤
-   - 只保留方块中心在以下范围内的 block：
-     - X 轴：`[-256km, +256km]`
-     - Z 轴：`[-256km, +256km]`
-     - Y 轴：`[-64km, +64km]`
+1. 将几何体先裁剪到有效空间 `x/y/z ∈ [-960km, +1024km]`
+2. 根据形状口径离散化有效体积：
+   - `cylinder`: 高度按坐标 `0` 切分为整数个 `64km` 层
+   - `sphere`: 半径按 `32km` 向上取整
+   - `splinetube`: 半径按 `32km` 向上取整，横截面离散为 `64km × 64km` 方阵
+   - `box`: 直接按 `64k area` 碰撞/占格结果统计
+3. 将离散后的 `volume_km3` 代入 `yield = volume_km3 × falloff × resourcedensity / 64^3`
 
 **方块命中判断算法：**
 
@@ -233,45 +231,46 @@ def generate_gas_block_coordinates(
     """
 ```
 
-**碰撞检测优化：**
-- 使用 `effective_radius = radius + block_half` 进行距离检查
-- 方块中心到圆柱中心的距离 <= `effective_radius` 判定为命中
-- Y 轴重叠检查：方块 Y 范围与 region Y 范围有重叠
-
 **几何口径（最终保留）：**
 - `boundary.class = cylinder` 时，`position.(x, y, z)` 表示圆柱中心。
 - `boundary.size.r` 表示圆柱半径。
 - `boundary.size.linear` 表示圆柱半高，不是总高度。
 - 因此圆柱的 Y 范围为 `[position.y - linear, position.y + linear]`。
-- 未截断 cylinder 的完整高度为 `2 × linear`。
-- 这一口径与 40km 样例体积闭合一致：`π × r² × (2 × linear) / 10^9 ≈ volume_km3`。
+- `box` 的 `size.x / size.y / size.z` 也按半长解释，实际空间向中心点两侧展开。
 
 **气体产量公式：**
 ```
-yield = hit_block_count × falloff × resourcedensity
+yield = volume_km3 × falloff × resourcedensity / 64^3
 respawn = yield × 60 / replenishtime
 ```
 
 **参数说明：**
-- `hit_block_count` = 截断后的 block 数量（不是原始 block 数量）
+- `volume_km3` = 裁剪和离散化后的有效体积
+- `64^3` = 单个 `64km × 64km × 64km` 体素的体积
 
 #### 1.3.4 体积计算（boundary_volume）
 
 单位：XML 中坐标和半径的单位为米（m），计算结果转换为 km³（除以 10^9）。
 
-**体积上限限制：**
-| 类型 | 半径上限 | 高度/长度上限 |
-|------|----------|---------------|
-| sphere | 200,000 m (200 km) | 80,000 m (80 km) 仅当超限时 |
-| cylinder | 200,000 m (200 km) | 80,000 m (80 km) 半高上限 |
-| splinetube | 200,000 m (200 km) | 1,000,000 m (1000 km) |
+**`total_volume_km3` 计算公式：**
 
-**计算公式：**
+- **sphere**: `(4/3) × π × r³ / 10^9`
+- **cylinder**: `π × r² × (2 × linear) / 10^9`
+- **splinetube**: `π × r² × spline_length / 10^9`
+- **box**: `(2 × x) × (2 × y) × (2 × z) / 10^9`
 
-- **sphere** (r ≤ 200km): `(4/3) × π × r³ / 10^9`
-- **sphere** (r > 200km): `π × 200000² × 80000 / 10^9`（按圆柱体计算）
-- **cylinder**: `π × min(r, 200000)² × (2 × min(linear, 80000)) / 10^9`
-- **splinetube**: `π × min(r, 200000)² × min(spline_length, 1000000) / 10^9`
+**`volume_km3` 计算口径：**
+
+以下表达式均表示已经换算到 `km` 尺度后的体积口径。
+
+- **固体 cylinder**: `min(π × r², 2000 × 2000) × min(2 × linear, 2000)`
+- **固体 sphere**: `min((4/3) × π × r³, 2000 × 2000 × 2000)`
+- **固体 splinetube**: `π × r² × clipped_spline_length`
+- **固体 box**: `clipped_box_volume`
+- **气体 cylinder**: `discretized_cylinder_volume`
+- **气体 sphere**: `discretized_sphere_volume(radius_ceil_32km)`
+- **气体 splinetube**: `discretized_spline_volume(radius_ceil_32km, clipped_length)`
+- **气体 box**: `voxelized_box_volume`
 
 其中：
 - `cylinder.position.y` 是圆柱中心 Y。
@@ -726,11 +725,11 @@ sustainableYieldPerHour = yield / respawnDelay × 60
 | 特性 | 8.0 (regions) | 9.0+ (resourceareas) |
 |------|---------------|----------------------|
 | 资源定义方式 | region 模板 + falloff | definition 模板直接引用 |
-| 产量计算 | falloff × resourcedensity × base | yield × amount |
-| 几何形状 | boundary (sphere/cylinder/splinetube) | 球形 (radius) |
+| 产量计算 | 体积 × falloff × resourcedensity（气体再除以 `64^3`） | yield × amount |
+| 几何形状 | boundary (`sphere` / `cylinder` / `splinetube` / `box`) | 球形 (radius) |
 | Falloff 计算 | ✓ lateral × radial | ✗ 无 |
-| 固体截断 | ✓ Splinetube 截断曲线 / Sphere/Cylinder 体积上限 | ✗ 无 |
-| 气体 Block 截断 | ✓ 两步：原始命中 → 方块中心过滤 | ✗ 无 |
+| 固体截断 | ✓ 体积封顶 + 有效空间裁剪 | ✗ 无 |
+| 气体离散化 | ✓ 有效空间裁剪 + `64km`/`32km` 规则 | ✗ 无 |
 | 坐标系统 | region 相对 sector | 隐式（definition 自带） |
 
 ### 3.2 输出文件对比
@@ -871,8 +870,9 @@ def process_map_for_version(
 │    └─► sector → region ref 映射                             │
 │                                                              │
 │  计算 resourcearea 实例资源                                  │
-│    ├─► 固体：计算截断体积 × falloff × resourcedensity        │
-│    └─► 气体：64km³ 方块网格命中 × falloff × resourcedensity  │
+│    ├─► 固体：effective_volume × falloff × resourcedensity   │
+│    └─► 气体：effective_volume × falloff × resourcedensity   │
+│            / 64^3                                            │
 │                                                              │
 │  build_80_resourceareas_array()                             │
 │    └─► resourceareas.json (引用关系)                         │
@@ -985,6 +985,7 @@ def process_map_for_version(
 | 2026-03-19 | 补充 generate_gas_block_coordinates() 函数说明；更新 aggregate_sector_resources_from_resourceareas() 支持四个字段独立聚合（yield/respawn/total_yield/total_respawn）；更新 Rating 计算为基于 respawn 的 5 级评级 | - |
 | 2026-03-19 | 统一文档中所有 `sector.resources` 包含 `total_yield`/`total_respawn`/`rating` 字段；更新 1.3.5 明确 rating 计算仅用于 sector.resources | - |
 | 2026-03-20 | 更新 1.4.3 resourceareas.json (8.0) 示例以匹配实际输出（包含 boundary 字段）；更新 2.4.2 resourceareas.json (9.0+) 示例以包含 rating 字段（来自 definition）；更新 2.4.3 说明 9.0+ sector.resources 不包含 total_yield/total_respawn；恢复 1.4.3 中的 position 字段 | - |
+| 2026-03-21 | 更新 `total_volume_km3` / `volume_km3` / `total_yield` / `yield` 口径：固体统一为体积 × falloff × 密度，气体统一为体积 × falloff × 密度 / `64^3`；将旧的 `512×512×192` 截断描述替换为 `[-960km, +1024km]` 有效空间与 `2000km` 封顶规则，并补充 `box` 几何口径 | - |
 
 ---
 

@@ -1,266 +1,362 @@
 {
   "sector_id": "cluster_706_sector001_macro",
   "ware": {
-    "ice": {
-      "medlow": {
-        "resources": [
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 128000,
-            "max": 1875808,
-            "time": 36000,
-            "resourcedensity": 9,
-            "falloff": 0.795071
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 64000,
-            "max": 1877996,
-            "time": 36000,
-            "resourcedensity": 9,
-            "falloff": 0.795998
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 0,
-            "max": 1866534,
-            "time": 36000,
-            "resourcedensity": 9,
-            "falloff": 0.79114
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 128000,
-            "max": 1877996,
-            "time": 36000,
-            "resourcedensity": 9,
-            "falloff": 0.795998
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 64000,
-            "max": 1877996,
-            "time": 36000,
-            "resourcedensity": 9,
-            "falloff": 0.795998
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 128000,
-            "max": 1867410,
-            "time": 36000,
-            "resourcedensity": 9,
-            "falloff": 0.791512
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 64000,
-            "max": 1872695,
-            "time": 36000,
-            "resourcedensity": 9,
-            "falloff": 0.793752
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 0,
-            "max": 1872423,
-            "time": 36000,
-            "resourcedensity": 9,
-            "falloff": 0.793636
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 0,
-            "max": 1836639,
-            "time": 36000,
-            "resourcedensity": 9,
-            "falloff": 0.778469
-          }
+    "ice": [
+      {
+        "yield_names": [
+          "medlow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 128000,
+        "max": 1875808,
+        "time": 36000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medlow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 1877996,
+        "time": 36000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medlow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 0,
+        "max": 1866534,
+        "time": 36000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medlow"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 128000,
+        "max": 1877996,
+        "time": 36000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medlow"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 64000,
+        "max": 1877996,
+        "time": 36000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medlow"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 128000,
+        "max": 1867410,
+        "time": 36000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medlow"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 64000,
+        "max": 1872695,
+        "time": 36000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medlow"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "max": 1872423,
+        "time": 36000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medlow"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 0,
+        "max": 1836639,
+        "time": 36000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
         ]
       }
-    },
-    "ore": {
-      "highlow": {
-        "resources": [
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 128000,
-            "max": 10004323,
-            "time": 216000,
-            "resourcedensity": 48,
-            "falloff": 0.795072
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 64000,
-            "max": 10015993,
-            "time": 216000,
-            "resourcedensity": 48,
-            "falloff": 0.796
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 0,
-            "max": 9954885,
-            "time": 216000,
-            "resourcedensity": 48,
-            "falloff": 0.791143
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 128000,
-            "max": 10015993,
-            "time": 216000,
-            "resourcedensity": 48,
-            "falloff": 0.796
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 64000,
-            "max": 10015993,
-            "time": 216000,
-            "resourcedensity": 48,
-            "falloff": 0.796
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 128000,
-            "max": 9959537,
-            "time": 216000,
-            "resourcedensity": 48,
-            "falloff": 0.791513
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 64000,
-            "max": 9987733,
-            "time": 216000,
-            "resourcedensity": 48,
-            "falloff": 0.793754
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 0,
-            "max": 9986309,
-            "time": 216000,
-            "resourcedensity": 48,
-            "falloff": 0.793641
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 0,
-            "max": 9795506,
-            "time": 216000,
-            "resourcedensity": 48,
-            "falloff": 0.778477
-          }
+    ],
+    "ore": [
+      {
+        "yield_names": [
+          "highlow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 128000,
+        "max": 10004323,
+        "time": 216000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "highlow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 10015993,
+        "time": 216000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "highlow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 0,
+        "max": 9954885,
+        "time": 216000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "highlow"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 128000,
+        "max": 10015993,
+        "time": 216000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "highlow"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 64000,
+        "max": 10015993,
+        "time": 216000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "highlow"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 128000,
+        "max": 9959537,
+        "time": 216000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "highlow"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 64000,
+        "max": 9987733,
+        "time": 216000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "highlow"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "max": 9986309,
+        "time": 216000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "highlow"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 0,
+        "max": 9795506,
+        "time": 216000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
         ]
       }
-    },
-    "silicon": {
-      "medhigh": {
-        "resources": [
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 128000,
-            "max": 6669552,
-            "time": 144000,
-            "resourcedensity": 32,
-            "falloff": 0.795073
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 64000,
-            "max": 6677322,
-            "time": 144000,
-            "resourcedensity": 32,
-            "falloff": 0.795999
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 0,
-            "max": 6636588,
-            "time": 144000,
-            "resourcedensity": 32,
-            "falloff": 0.791143
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 128000,
-            "max": 6677322,
-            "time": 144000,
-            "resourcedensity": 32,
-            "falloff": 0.795999
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 64000,
-            "max": 6677322,
-            "time": 144000,
-            "resourcedensity": 32,
-            "falloff": 0.795999
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 128000,
-            "max": 6639690,
-            "time": 144000,
-            "resourcedensity": 32,
-            "falloff": 0.791513
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 64000,
-            "max": 6658488,
-            "time": 144000,
-            "resourcedensity": 32,
-            "falloff": 0.793754
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 0,
-            "max": 6657534,
-            "time": 144000,
-            "resourcedensity": 32,
-            "falloff": 0.79364
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 0,
-            "max": 6530340,
-            "time": 144000,
-            "resourcedensity": 32,
-            "falloff": 0.778477
-          }
+    ],
+    "silicon": [
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 128000,
+        "max": 6669552,
+        "time": 144000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 6677322,
+        "time": 144000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 0,
+        "max": 6636588,
+        "time": 144000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 128000,
+        "max": 6677322,
+        "time": 144000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 64000,
+        "max": 6677322,
+        "time": 144000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 128000,
+        "max": 6639690,
+        "time": 144000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 64000,
+        "max": 6658488,
+        "time": 144000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "max": 6657534,
+        "time": 144000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 0,
+        "max": 6530340,
+        "time": 144000,
+        "regions": [
+          "region_cluster_706_sector_001_asteroids_1"
         ]
       }
-    }
+    ]
   }
 }

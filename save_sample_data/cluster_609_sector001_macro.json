@@ -1,2624 +1,3768 @@
 {
   "sector_id": "cluster_609_sector001_macro",
   "ware": {
-    "helium": {
-      "medhigh": {
-        "resources": [
-          {
-            "x": 320000,
-            "y": 0,
-            "z": 128000,
-            "max": 34195,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.6839
-          },
-          {
-            "x": 320000,
-            "y": 0,
-            "z": 64000,
-            "max": 37919,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.75838
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 192000,
-            "max": 38268,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.76536
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 256000,
-            "max": 38259,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.76518
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 192000,
-            "max": 39277,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.78554
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 128000,
-            "max": 39125,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.7825
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 64000,
-            "max": 39342,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.78684
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 128000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 64000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 320000,
-            "max": 33771,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.67542
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 320000,
-            "max": 37852,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.75704
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 320000,
-            "max": 38246,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.76492
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 320000,
-            "max": 37852,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.75704
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 256000,
-            "max": 39119,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.78238
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 192000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 256000,
-            "max": 39336,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.78672
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 192000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 128000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 64000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 128000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 64000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 192000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 256000,
-            "max": 39336,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.78672
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 192000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 128000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 64000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 128000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 64000,
-            "max": 22179,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.44358
-          },
-          {
-            "x": 320000,
-            "y": 0,
-            "z": -64000,
-            "max": 37955,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.7591
-          },
-          {
-            "x": 320000,
-            "y": 0,
-            "z": -128000,
-            "max": 8723,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.17446
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 0,
-            "max": 39396,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.78792
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": -64000,
-            "max": 39346,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.78692
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 0,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -64000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": -128000,
-            "max": 39139,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.78278
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": -192000,
-            "max": 38339,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.76678
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -128000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -192000,
-            "max": 39292,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.78584
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -256000,
-            "max": 38350,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.767
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 0,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -64000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 0,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -64000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -128000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -192000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -128000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -192000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 0,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -64000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 0,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -64000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -128000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -192000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -128000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -192000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -256000,
-            "max": 39145,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.7829
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -320000,
-            "max": 34946,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.69892
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -256000,
-            "max": 39352,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.78704
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -320000,
-            "max": 38020,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.7604
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -256000,
-            "max": 39403,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.78806
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -320000,
-            "max": 38362,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.76724
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -256000,
-            "max": 39352,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.78704
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -320000,
-            "max": 38020,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.7604
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 320000,
-            "max": 33812,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.67624
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 256000,
-            "max": 39120,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.7824
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 192000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 256000,
-            "max": 38259,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.76518
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 192000,
-            "max": 39278,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.78556
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 128000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 64000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 128000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 64000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": -256000,
-            "y": 0,
-            "z": 192000,
-            "max": 38271,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.76542
-          },
-          {
-            "x": -256000,
-            "y": 0,
-            "z": 128000,
-            "max": 39125,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.7825
-          },
-          {
-            "x": -256000,
-            "y": 0,
-            "z": 64000,
-            "max": 39342,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.78684
-          },
-          {
-            "x": -320000,
-            "y": 0,
-            "z": 128000,
-            "max": 34231,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.68462
-          },
-          {
-            "x": -320000,
-            "y": 0,
-            "z": 64000,
-            "max": 37923,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.75846
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 0,
-            "max": 25273,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.50546
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -64000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 0,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -64000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -128000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -192000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -128000,
-            "max": 39999,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.79998
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -192000,
-            "max": 39292,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.78584
-          },
-          {
-            "x": -256000,
-            "y": 0,
-            "z": 0,
-            "max": 39396,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.78792
-          },
-          {
-            "x": -256000,
-            "y": 0,
-            "z": -64000,
-            "max": 39346,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.78692
-          },
-          {
-            "x": -320000,
-            "y": 0,
-            "z": 0,
-            "max": 38309,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.76618
-          },
-          {
-            "x": -320000,
-            "y": 0,
-            "z": -64000,
-            "max": 37959,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.75918
-          },
-          {
-            "x": -256000,
-            "y": 0,
-            "z": -128000,
-            "max": 39140,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.7828
-          },
-          {
-            "x": -256000,
-            "y": 0,
-            "z": -192000,
-            "max": 38339,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.76678
-          },
-          {
-            "x": -320000,
-            "y": 0,
-            "z": -128000,
-            "max": 34689,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.69378
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -256000,
-            "max": 39145,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.7829
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -320000,
-            "max": 34973,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.69946
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -256000,
-            "max": 38350,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.767
-          }
+    "helium": [
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 320000,
+        "y": 0,
+        "z": 128000,
+        "max": 34195,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 320000,
+        "y": 0,
+        "z": 64000,
+        "max": 37919,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 192000,
+        "max": 38268,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 256000,
+        "max": 38259,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 192000,
+        "max": 39277,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 128000,
+        "max": 39125,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 64000,
+        "max": 39342,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 128000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 64000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 320000,
+        "max": 33771,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 320000,
+        "max": 37852,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 320000,
+        "max": 38246,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 320000,
+        "max": 37852,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 256000,
+        "max": 39119,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 192000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 256000,
+        "max": 39336,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 192000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 128000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 64000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 128000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 192000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 256000,
+        "max": 39336,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 192000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 128000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 64000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 128000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 64000,
+        "max": 22179,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 320000,
+        "y": 0,
+        "z": -64000,
+        "max": 37955,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 320000,
+        "y": 0,
+        "z": -128000,
+        "max": 8723,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 0,
+        "max": 39396,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -64000,
+        "max": 39346,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 0,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -64000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -128000,
+        "max": 39139,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -192000,
+        "max": 38339,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -128000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -192000,
+        "max": 39292,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -256000,
+        "max": 38350,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 0,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -64000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 0,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -64000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -128000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -192000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -128000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -192000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -64000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 0,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -64000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -128000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -192000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -128000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -192000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -256000,
+        "max": 39145,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -320000,
+        "max": 34946,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -256000,
+        "max": 39352,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -320000,
+        "max": 38020,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -256000,
+        "max": 39403,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -320000,
+        "max": 38362,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -256000,
+        "max": 39352,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -320000,
+        "max": 38020,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 320000,
+        "max": 33812,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 256000,
+        "max": 39120,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 192000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 256000,
+        "max": 38259,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 192000,
+        "max": 39278,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 128000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 64000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 128000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 64000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": 192000,
+        "max": 38271,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": 128000,
+        "max": 39125,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": 64000,
+        "max": 39342,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -320000,
+        "y": 0,
+        "z": 128000,
+        "max": 34231,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -320000,
+        "y": 0,
+        "z": 64000,
+        "max": 37923,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 0,
+        "max": 25273,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -64000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 0,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -64000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -128000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -192000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -128000,
+        "max": 39999,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -192000,
+        "max": 39292,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": 0,
+        "max": 39396,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": -64000,
+        "max": 39346,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -320000,
+        "y": 0,
+        "z": 0,
+        "max": 38309,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -320000,
+        "y": 0,
+        "z": -64000,
+        "max": 37959,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": -128000,
+        "max": 39140,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": -192000,
+        "max": 38339,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -320000,
+        "y": 0,
+        "z": -128000,
+        "max": 34689,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -256000,
+        "max": 39145,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -320000,
+        "max": 34973,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -256000,
+        "max": 38350,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
         ]
       }
-    },
-    "ore": {
-      "low": {
-        "resources": [
-          {
-            "x": 320000,
-            "y": 0,
-            "z": 128000,
-            "max": 107558,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.683835
-          },
-          {
-            "x": 320000,
-            "y": 0,
-            "z": 64000,
-            "max": 119275,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.75833
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 192000,
-            "max": 120369,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.765285
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 256000,
-            "max": 120342,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.765114
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 192000,
-            "max": 123541,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.785453
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 128000,
-            "max": 123068,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.782445
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 64000,
-            "max": 123747,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.786762
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 128000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 64000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 320000,
-            "max": 106222,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.675341
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 320000,
-            "max": 119060,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.756963
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 320000,
-            "max": 120302,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.76486
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 320000,
-            "max": 119060,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.756963
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 256000,
-            "max": 123045,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.782299
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 192000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 256000,
-            "max": 123723,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.78661
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 192000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 128000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 64000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 128000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 64000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 256000,
-            "max": 123897,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.787716
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 192000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 256000,
-            "max": 123723,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.78661
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 192000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 128000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 64000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 128000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 64000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 320000,
-            "y": 0,
-            "z": 0,
-            "max": 120492,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.766068
-          },
-          {
-            "x": 320000,
-            "y": 0,
-            "z": -64000,
-            "max": 119387,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.759042
-          },
-          {
-            "x": 320000,
-            "y": 0,
-            "z": -128000,
-            "max": 109007,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.693048
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 0,
-            "max": 123924,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.787888
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": -64000,
-            "max": 123752,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.786794
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 0,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -64000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": -128000,
-            "max": 123111,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.782719
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": -192000,
-            "max": 120594,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.766716
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -128000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -192000,
-            "max": 123589,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.785758
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -256000,
-            "max": 120637,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.766989
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 0,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -64000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 0,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -64000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -128000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -192000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -128000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -192000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 0,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -64000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 0,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -64000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -128000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -192000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -128000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -192000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -256000,
-            "max": 123132,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.782852
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -320000,
-            "max": 109922,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.698865
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -256000,
-            "max": 123779,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.786966
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -320000,
-            "max": 119586,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.760307
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -256000,
-            "max": 123945,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.788021
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -320000,
-            "max": 120665,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.767167
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -256000,
-            "max": 123779,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.786966
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -320000,
-            "max": 119586,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.760307
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 320000,
-            "max": 106356,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.676193
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 256000,
-            "max": 123055,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.782363
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 192000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 256000,
-            "max": 120342,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.765114
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 192000,
-            "max": 123546,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.785484
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 128000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 64000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 128000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 64000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": -256000,
-            "y": 0,
-            "z": 192000,
-            "max": 120380,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.765355
-          },
-          {
-            "x": -256000,
-            "y": 0,
-            "z": 128000,
-            "max": 123068,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.782445
-          },
-          {
-            "x": -256000,
-            "y": 0,
-            "z": 64000,
-            "max": 123752,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.786794
-          },
-          {
-            "x": -320000,
-            "y": 0,
-            "z": 128000,
-            "max": 107676,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.684586
-          },
-          {
-            "x": -320000,
-            "y": 0,
-            "z": 64000,
-            "max": 119291,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.758432
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 0,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -64000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 0,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -64000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -128000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -192000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -128000,
-            "max": 125815,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.79991
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -192000,
-            "max": 123589,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.785758
-          },
-          {
-            "x": -256000,
-            "y": 0,
-            "z": 0,
-            "max": 123924,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.787888
-          },
-          {
-            "x": -256000,
-            "y": 0,
-            "z": -64000,
-            "max": 123768,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.786896
-          },
-          {
-            "x": -320000,
-            "y": 0,
-            "z": 0,
-            "max": 120498,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.766106
-          },
-          {
-            "x": -320000,
-            "y": 0,
-            "z": -64000,
-            "max": 119398,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.759112
-          },
-          {
-            "x": -256000,
-            "y": 0,
-            "z": -128000,
-            "max": 123116,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.78275
-          },
-          {
-            "x": -256000,
-            "y": 0,
-            "z": -192000,
-            "max": 120594,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.766716
-          },
-          {
-            "x": -320000,
-            "y": 0,
-            "z": -128000,
-            "max": 109109,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.693696
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -256000,
-            "max": 123132,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.782852
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -320000,
-            "max": 110002,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.699374
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -256000,
-            "max": 120637,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.766989
-          }
+    ],
+    "ore": [
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 320000,
+        "y": 0,
+        "z": 128000,
+        "max": 107558,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 320000,
+        "y": 0,
+        "z": 64000,
+        "max": 119275,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 192000,
+        "max": 120369,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 256000,
+        "max": 120342,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 192000,
+        "max": 123541,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 128000,
+        "max": 123068,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 64000,
+        "max": 123747,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 128000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 64000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 320000,
+        "max": 106222,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 320000,
+        "max": 119060,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 320000,
+        "max": 120302,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 320000,
+        "max": 119060,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 256000,
+        "max": 123045,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 192000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 256000,
+        "max": 123723,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 192000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 128000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 64000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 128000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 256000,
+        "max": 123897,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 192000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 256000,
+        "max": 123723,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 192000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 128000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 64000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 128000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 64000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 320000,
+        "y": 0,
+        "z": 0,
+        "max": 120492,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 320000,
+        "y": 0,
+        "z": -64000,
+        "max": 119387,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 320000,
+        "y": 0,
+        "z": -128000,
+        "max": 109007,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 0,
+        "max": 123924,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -64000,
+        "max": 123752,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 0,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -64000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -128000,
+        "max": 123111,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -192000,
+        "max": 120594,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -128000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -192000,
+        "max": 123589,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -256000,
+        "max": 120637,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 0,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -64000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 0,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -64000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -128000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -192000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -128000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -192000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -64000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 0,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -64000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -128000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -192000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -128000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -192000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -256000,
+        "max": 123132,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -320000,
+        "max": 109922,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -256000,
+        "max": 123779,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -320000,
+        "max": 119586,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -256000,
+        "max": 123945,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -320000,
+        "max": 120665,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -256000,
+        "max": 123779,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -320000,
+        "max": 119586,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 320000,
+        "max": 106356,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 256000,
+        "max": 123055,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 192000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 256000,
+        "max": 120342,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 192000,
+        "max": 123546,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 128000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 64000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 128000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 64000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": 192000,
+        "max": 120380,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": 128000,
+        "max": 123068,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": 64000,
+        "max": 123752,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -320000,
+        "y": 0,
+        "z": 128000,
+        "max": 107676,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -320000,
+        "y": 0,
+        "z": 64000,
+        "max": 119291,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 0,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -64000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 0,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -64000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -128000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -192000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -128000,
+        "max": 125815,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -192000,
+        "max": 123589,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": 0,
+        "max": 123924,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": -64000,
+        "max": 123768,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -320000,
+        "y": 0,
+        "z": 0,
+        "max": 120498,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -320000,
+        "y": 0,
+        "z": -64000,
+        "max": 119398,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": -128000,
+        "max": 123116,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": -192000,
+        "max": 120594,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -320000,
+        "y": 0,
+        "z": -128000,
+        "max": 109109,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -256000,
+        "max": 123132,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -320000,
+        "max": 110002,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -256000,
+        "max": 120637,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
         ]
       }
-    },
-    "silicon": {
-      "low": {
-        "resources": [
-          {
-            "x": 320000,
-            "y": 0,
-            "z": 128000,
-            "max": 107559,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.683842
-          },
-          {
-            "x": 320000,
-            "y": 0,
-            "z": 64000,
-            "max": 119274,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.758324
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 192000,
-            "max": 120378,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.765343
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 256000,
-            "max": 120348,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.765152
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 192000,
-            "max": 123549,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.785503
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 128000,
-            "max": 123063,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.782413
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 64000,
-            "max": 123756,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.786819
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 128000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 64000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 320000,
-            "max": 106230,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.675392
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 320000,
-            "max": 119064,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.756989
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 320000,
-            "max": 120300,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.764847
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 320000,
-            "max": 119064,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.756989
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 256000,
-            "max": 123045,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.782299
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 192000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 256000,
-            "max": 123729,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.786648
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 192000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 128000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 64000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 128000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 64000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 256000,
-            "max": 123891,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.787678
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 192000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 256000,
-            "max": 123729,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.786648
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 192000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 128000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 64000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 128000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 64000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 320000,
-            "y": 0,
-            "z": 0,
-            "max": 120498,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.766106
-          },
-          {
-            "x": 320000,
-            "y": 0,
-            "z": -64000,
-            "max": 119385,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.759029
-          },
-          {
-            "x": 320000,
-            "y": 0,
-            "z": -128000,
-            "max": 109020,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.69313
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 0,
-            "max": 123918,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.787849
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": -64000,
-            "max": 123759,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.786839
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 0,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -64000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": -128000,
-            "max": 123105,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.782681
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": -192000,
-            "max": 120591,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.766697
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -128000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -192000,
-            "max": 123591,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.78577
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -256000,
-            "max": 120630,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.766945
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 0,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -64000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 0,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -64000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -128000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -192000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -128000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -192000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 0,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -64000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 0,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -64000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -128000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -192000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -128000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -192000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -256000,
-            "max": 123132,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.782852
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -320000,
-            "max": 109920,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.698853
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -256000,
-            "max": 123786,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.78701
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -320000,
-            "max": 119592,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.760345
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -256000,
-            "max": 123939,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.787983
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -320000,
-            "max": 120663,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.767155
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -256000,
-            "max": 123786,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.78701
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -320000,
-            "max": 119592,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.760345
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 320000,
-            "max": 106353,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.676174
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 256000,
-            "max": 123045,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.782299
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 192000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 256000,
-            "max": 120348,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.765152
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 192000,
-            "max": 123549,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.785503
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 128000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 64000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 128000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 64000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": -256000,
-            "y": 0,
-            "z": 192000,
-            "max": 120381,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.765362
-          },
-          {
-            "x": -256000,
-            "y": 0,
-            "z": 128000,
-            "max": 123063,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.782413
-          },
-          {
-            "x": -256000,
-            "y": 0,
-            "z": 64000,
-            "max": 123756,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.786819
-          },
-          {
-            "x": -320000,
-            "y": 0,
-            "z": 128000,
-            "max": 107676,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.684586
-          },
-          {
-            "x": -320000,
-            "y": 0,
-            "z": 64000,
-            "max": 119292,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.758438
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 0,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -64000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 0,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -64000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -128000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -192000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -128000,
-            "max": 125820,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.799942
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -192000,
-            "max": 123591,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.78577
-          },
-          {
-            "x": -256000,
-            "y": 0,
-            "z": 0,
-            "max": 123918,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.787849
-          },
-          {
-            "x": -256000,
-            "y": 0,
-            "z": -64000,
-            "max": 123768,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.786896
-          },
-          {
-            "x": -320000,
-            "y": 0,
-            "z": 0,
-            "max": 120501,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.766125
-          },
-          {
-            "x": -320000,
-            "y": 0,
-            "z": -64000,
-            "max": 119397,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.759106
-          },
-          {
-            "x": -256000,
-            "y": 0,
-            "z": -128000,
-            "max": 123105,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.782681
-          },
-          {
-            "x": -256000,
-            "y": 0,
-            "z": -192000,
-            "max": 120591,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.766697
-          },
-          {
-            "x": -320000,
-            "y": 0,
-            "z": -128000,
-            "max": 109113,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.693722
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -256000,
-            "max": 123132,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.782852
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -320000,
-            "max": 110007,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.699406
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -256000,
-            "max": 120630,
-            "time": 108000,
-            "resourcedensity": 0.6,
-            "falloff": 0.766945
-          }
+    ],
+    "silicon": [
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 320000,
+        "y": 0,
+        "z": 128000,
+        "max": 107559,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 320000,
+        "y": 0,
+        "z": 64000,
+        "max": 119274,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 192000,
+        "max": 120378,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 256000,
+        "max": 120348,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 192000,
+        "max": 123549,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 128000,
+        "max": 123063,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 64000,
+        "max": 123756,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 128000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 64000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 320000,
+        "max": 106230,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 320000,
+        "max": 119064,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 320000,
+        "max": 120300,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 320000,
+        "max": 119064,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 256000,
+        "max": 123045,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 192000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 256000,
+        "max": 123729,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 192000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 128000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 64000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 128000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 256000,
+        "max": 123891,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 192000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 256000,
+        "max": 123729,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 192000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 128000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 64000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 128000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 64000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 320000,
+        "y": 0,
+        "z": 0,
+        "max": 120498,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 320000,
+        "y": 0,
+        "z": -64000,
+        "max": 119385,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 320000,
+        "y": 0,
+        "z": -128000,
+        "max": 109020,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 0,
+        "max": 123918,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -64000,
+        "max": 123759,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 0,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -64000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -128000,
+        "max": 123105,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -192000,
+        "max": 120591,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -128000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -192000,
+        "max": 123591,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -256000,
+        "max": 120630,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 0,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -64000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 0,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -64000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -128000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -192000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -128000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -192000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -64000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 0,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -64000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -128000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -192000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -128000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -192000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -256000,
+        "max": 123132,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -320000,
+        "max": 109920,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -256000,
+        "max": 123786,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -320000,
+        "max": 119592,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -256000,
+        "max": 123939,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -320000,
+        "max": 120663,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -256000,
+        "max": 123786,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -320000,
+        "max": 119592,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 320000,
+        "max": 106353,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 256000,
+        "max": 123045,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 192000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 256000,
+        "max": 120348,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 192000,
+        "max": 123549,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 128000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 64000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 128000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 64000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": 192000,
+        "max": 120381,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": 128000,
+        "max": 123063,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": 64000,
+        "max": 123756,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -320000,
+        "y": 0,
+        "z": 128000,
+        "max": 107676,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -320000,
+        "y": 0,
+        "z": 64000,
+        "max": 119292,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 0,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -64000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 0,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -64000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -128000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -192000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -128000,
+        "max": 125820,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -192000,
+        "max": 123591,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": 0,
+        "max": 123918,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": -64000,
+        "max": 123768,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -320000,
+        "y": 0,
+        "z": 0,
+        "max": 120501,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -320000,
+        "y": 0,
+        "z": -64000,
+        "max": 119397,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": -128000,
+        "max": 123105,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": -192000,
+        "max": 120591,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -320000,
+        "y": 0,
+        "z": -128000,
+        "max": 109113,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -256000,
+        "max": 123132,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -320000,
+        "max": 110007,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -256000,
+        "max": 120630,
+        "time": 108000,
+        "regions": [
+          "c609s1_region1"
         ]
       }
-    }
+    ]
   }
 }

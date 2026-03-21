@@ -9,6 +9,7 @@ import regionYieldsData from '../src/assets/x4_game_data/8.0-Diplomacy/data/regi
 import regionsData from '../src/assets/x4_game_data/8.0-Diplomacy/data/regions.json'
 import resourceAreasData from '../src/assets/x4_game_data/8.0-Diplomacy/data/resourceareas.json'
 import {
+  aggregateSectorWithRegions,
   aggregateToTotal,
   buildSectorJson,
   extractSectorResourceXmlFromComponentXml,
@@ -56,12 +57,10 @@ async function writeSectorJson(
   const outputFile = path.join(outputDir, `${sectorName.toLowerCase()}.json`)
   await writeJson(outputFile, data)
 
-  const totalResources = Object.values(data.ware).reduce((sum, yieldMap) => {
-    return (
-      sum +
-      Object.values(yieldMap).reduce((innerSum, group) => innerSum + group.resources.length, 0)
-    )
-  }, 0)
+  const totalResources = Object.values(data.ware).reduce(
+    (sum, resources) => sum + resources.length,
+    0
+  )
 
   console.log(`Saved ${Object.keys(data.ware).length} wares, ${totalResources} resources to ${outputFile}`)
 }
@@ -91,11 +90,25 @@ async function loadSectorJsonList(saveName: string): Promise<SectorJsonData[]> {
 
 async function aggregateAndWriteTotal(saveName: string): Promise<void> {
   const sectors = await loadSectorJsonList(saveName)
-  const totalJson = aggregateToTotal(sectors, context)
   const outputDir = await ensureOutputDir(saveName)
-  const outputFile = path.join(outputDir, 'total.json')
-  await writeJson(outputFile, totalJson)
-  console.log(`Saved ${totalJson.sectors.length} sectors to ${outputFile}`)
+
+  // Process each sector and update with regions
+  const totalSectors = []
+  for (const sectorData of sectors) {
+    const result = aggregateSectorWithRegions(sectorData, context)
+
+    // Write updated sector JSON with regions
+    const sectorFile = path.join(outputDir, `${sectorData.sector_id}.json`)
+    await writeJson(sectorFile, result.sectorJson)
+
+    totalSectors.push(result.totalJson)
+  }
+
+  // Write total.json
+  const totalJson = { sectors: totalSectors }
+  const totalFile = path.join(outputDir, 'total.json')
+  await writeJson(totalFile, totalJson)
+  console.log(`Saved ${totalJson.sectors.length} sectors to ${totalFile}`)
 }
 
 function extractSectorMacro(line: string): string | null {
