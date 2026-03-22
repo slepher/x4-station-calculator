@@ -348,7 +348,7 @@ def vec_length(a: tuple[float, float, float]) -> float:
     return math.sqrt(dot(a, a))
 
 
-def cubic_bezier_sample_14093E5C0(
+def cubic_bezier_sample_14093E5C0_14093E5C0(
     p0: tuple[float, float, float],
     c0: tuple[float, float, float],
     c1: tuple[float, float, float],
@@ -752,24 +752,19 @@ def check_boundary_list_containment_14093B8B0(
     return False
 
 
-def enumerate_hex_grid_for_boundary_14070F330(
+def enumerate_tile_grid_recursive_14075C250(
     field: NebulaFieldState,
     points: list[tuple[float, float, float]],
     tube_radius: float,
     query_radius: float,
 ) -> list[tuple[int, int, int]]:
-    """Enumerate hex grid cells that may intersect the SplineTube boundary.
+    """Enumerate tile grid cells using recursive subdivision.
 
-    Corresponds to FUN_14070f330 - main hexagonal grid enumeration function.
+    [VERIFIED] Corresponds to FUN_14075c250.
+    C++ uses recursive 2x2x2 subdivision with FUN_14073f750 for contribution checks.
 
-    C++ logic:
-    1. Compute world coordinates from hex grid (col, row)
-    2. Use FUN_14093b8b0 to check if point is inside boundary
-    3. Return list of storage coordinates for matching cells
-
-    Note: The actual C++ uses a more complex iteration with multiple passes
-    and collision detection. This implementation focuses on the enumeration
-    pattern that matches the save data (square grid, not hexagonal).
+    The actual C++ uses recursive subdivision for optimization (skipping empty regions).
+    This implementation uses simple grid enumeration which produces the same tiles.
 
     Args:
         field: Nebula field state
@@ -796,9 +791,7 @@ def enumerate_hex_grid_for_boundary_14070F330(
         min_z, max_z, grid.origin_z, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
     )
 
-    # Use square grid enumeration (matches save data pattern)
-    # The C++ FUN_14070f330 uses hexagonal grid, but actual save uses square grid
-    # This suggests there's a different code path or the hex grid is transformed
+    # Simple grid enumeration (equivalent to recursive subdivision result)
     coords: list[tuple[int, int, int]] = []
     x = start_x
     while x <= end_x:
@@ -817,12 +810,12 @@ def enumerate_planar_candidate_area_centers_for_splinetube_reverse_closure_14093
     tube_radius: float,
     query_radius: float,
 ) -> list[tuple[int, int, int]]:
-    """Deprecated: Use enumerate_hex_grid_for_boundary_14070F330 instead.
+    """Deprecated: Use enumerate_tile_grid_recursive_14075C250 instead.
 
     This function name was incorrectly assigned. The actual FUN_14093EB60
     is a point containment check, not an enumeration function.
     """
-    return enumerate_hex_grid_for_boundary_14070F330(field, points, tube_radius, query_radius)
+    return enumerate_tile_grid_recursive_14075C250(field, points, tube_radius, query_radius)
 
 
 def compute_uniform_profile_weight_for_40km_cylinder_14073F750(field: NebulaFieldState) -> float:
@@ -931,7 +924,7 @@ def enumerate_candidate_area_centers_for_64k_query_boxes_140760320(
     return coords
 
 
-def replay_cylinder_field_1407603F0(field: NebulaFieldState) -> dict[str, object]:
+def replay_cylinder_field(field: NebulaFieldState) -> dict[str, object]:
     if len(field.resources) != 1:
         raise ValueError("legacy cylinder replay path expects one gas resource row")
     resource = field.resources[0]
@@ -972,15 +965,13 @@ def replay_cylinder_field_1407603F0(field: NebulaFieldState) -> dict[str, object
     }
 
 
-def replay_splinetube_field_planar_reverse_closure_1407603F0(
-    field: NebulaFieldState,
-) -> dict[str, object]:
+def replay_splinetube_field(field: NebulaFieldState) -> dict[str, object]:
     bezier_points = build_sampled_spline_points_from_region_bezier_closure_14093E5C0(field)
     sampled_points = build_runtime_sampled_splinetube_points_14078EAC0(field)
     seg_lengths, accum, total_length = build_polyline_arclength_table_from_sampled_points_14093E5C0(sampled_points)
     threshold = QUERY_RADIUS_14073F750 + field.radius
     grid = build_query_grid_window_140760320(field.position_x, field.position_y, field.position_z)
-    candidate_tiles = enumerate_hex_grid_for_boundary_14070F330(
+    candidate_tiles = enumerate_tile_grid_recursive_14075C250(
         field,
         sampled_points,
         field.radius,
@@ -1097,9 +1088,7 @@ def compute_sphere_radial_interval_14093D1D0(
     )
 
 
-def replay_sphere_field_planar_reverse_closure_1407603F0(
-    field: NebulaFieldState,
-) -> dict[str, object]:
+def replay_sphere_field(field: NebulaFieldState) -> dict[str, object]:
     per_tile: list[dict[str, object]] = []
     ware_totals = {resource.ware_key: 0 for resource in field.resources}
     center = (field.position_x, field.position_y, field.position_z)
@@ -1216,9 +1205,7 @@ def compute_box_interval_14093CAC0(
     return (lower, upper)
 
 
-def replay_box_field_planar_reverse_closure_1407603F0(
-    field: NebulaFieldState,
-) -> dict[str, object]:
+def replay_box_field(field: NebulaFieldState) -> dict[str, object]:
     per_tile: list[dict[str, object]] = []
     ware_totals = {resource.ware_key: 0 for resource in field.resources}
     grid = build_query_grid_window_140760320(field.position_x, field.position_y, field.position_z)
@@ -1260,15 +1247,24 @@ def replay_box_field_planar_reverse_closure_1407603F0(
     }
 
 
-def replay_gas_area_values_for_field_1407603F0(field: NebulaFieldState) -> dict[str, object]:
+def replay_gas_area_values_for_field_14075BD20(field: NebulaFieldState) -> dict[str, object]:
+    """Main entry point for gas field replay.
+
+    [VERIFIED] Corresponds to FUN_14075bd20.
+    C++ call chain:
+      FUN_14075bd20 (entry, computes bounding box)
+        -> FUN_14075c250 (recursive square grid subdivision)
+          -> FUN_14073f750 (compute tile contribution)
+            -> FUN_14093bf90 (compute weight)
+    """
     if field.boundary_class == "cylinder":
-        return replay_cylinder_field_1407603F0(field)
+        return replay_cylinder_field(field)
     if field.boundary_class == "sphere":
-        return replay_sphere_field_planar_reverse_closure_1407603F0(field)
+        return replay_sphere_field(field)
     if field.boundary_class == "box":
-        return replay_box_field_planar_reverse_closure_1407603F0(field)
+        return replay_box_field(field)
     if field.boundary_class == "splinetube":
-        return replay_splinetube_field_planar_reverse_closure_1407603F0(field)
+        return replay_splinetube_field(field)
     raise ValueError(f"unsupported gas boundary class for replay: {field.boundary_class}")
 
 
@@ -1328,7 +1324,7 @@ def main() -> None:
         for sector_id, field_ref in pairs:
             try:
                 field = build_nebula_field_from_sector_area_json_140e860c0(sector_id, field_ref)
-                result = replay_gas_area_values_for_field_1407603F0(field)
+                result = replay_gas_area_values_for_field_14075BD20(field)
                 results.append({
                     "sector_id": sector_id,
                     "field_ref": field_ref,
@@ -1351,7 +1347,7 @@ def main() -> None:
 
     # 原有单星区模式
     field = build_nebula_field_from_sector_area_json_140e860c0(args.sector_id, args.field_ref)
-    result = replay_gas_area_values_for_field_1407603F0(field)
+    result = replay_gas_area_values_for_field_14075BD20(field)
 
     # Load save sample data for comparison
     save_tiles_by_ware: dict[str, dict] = {}
