@@ -65,9 +65,9 @@ class GasSumWeightsReplayTests(unittest.TestCase):
         self.assertEqual(result["tile_count"], 26)
         self.assertEqual(result["sampled_point_count"], 33)
         self.assertEqual(result["sampled_segment_count"], 32)
-        self.assertEqual(result["ware_totals"]["hydrogen"], 521110)
-        self.assertEqual(result["ware_totals"]["helium"], 325692)
-        self.assertEqual(result["ware_totals"]["methane"], 1139946)
+        self.assertEqual(result["ware_totals"]["hydrogen"], 497254)
+        self.assertEqual(result["ware_totals"]["helium"], 310780)
+        self.assertEqual(result["ware_totals"]["methane"], 1087756)
         self.assertIn((-64000, 0, -384000), result["tile_coords"])
         self.assertIn((320000, 0, 128000), result["tile_coords"])
 

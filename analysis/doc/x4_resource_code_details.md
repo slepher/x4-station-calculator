@@ -700,8 +700,14 @@ SplineTube +0x58
 
 ```text
 lower = max((d - query_radius) / tube_radius, 0)
-upper = min((d + query_radius) / tube_radius, 1)
+upper = min((d + query_radius) / tube_radius, 1.0)
 ```
+
+注意：**upper 的上限是 1.0 (DAT_142d800e8 = 0x3f800000)**。
+
+`radial_factor`（通常为 0.995）是径向 profile 的参数，定义 profile 在何处开始下降，
+但它不用于 clamp radial_interval。radial_interval 的有效范围是 [0, 1]，
+而 radial_factor 影响的是 radial profile 的评估。
 
 也就是：**沿 spline 中心线取样后，对 tube 半径做归一化区间计算**。
 
@@ -711,6 +717,32 @@ upper = min((d + query_radius) / tube_radius, 1)
 - 但参数区间内部究竟如何挑样、是否总是双端点，都还值得继续追
 
 所以当前最稳口径是：它是 spline-tube 的半径归一化区间计算函数，但内部参数区间细节还值得继续追。
+
+**当前 replay 遗留问题：**
+
+对于 tube 外部但仍在 threshold 内的 query 点（`nearest_distance > tube_radius`），
+falloff 计算可能与游戏实际行为不符。典型异常点：
+- `(192000, 0, -192000)`：save_falloff=0.24，replay 给出 ~0.97
+- `(320000, 0, -256000)`：save_falloff=0.32，replay 给出 ~0.99
+- `(320000, 64000, -256000)`：save_falloff=0.33，replay 给出 ~0.99
+
+这些点的共同特点：
+- `nearest_distance > tube_radius`（位于 tube 外部）
+- 两点位于 spline 末端 (t ≈ 1.0)
+- 一点位于 spline 中段 (t ≈ 0.9) 但同样在 tube 外部
+
+当前测试结果：
+- 整体平均误差：~13%
+- 3 个异常点误差 > 200%
+
+可能的原因：
+1. Tube 末端可能有特殊处理（开放式末端 vs 封闭端盖）
+2. 对于 tube 外部的点，游戏可能使用不同的计算方式
+3. `FUN_14093bf90` 的 include/exclude list 遍历逻辑可能有特殊处理
+
+进一步调查方向：
+- 检查 `FUN_14093bf90` 中 param_1 + 0x08 (include list) 和 param_1 + 0x20 (exclude list) 的具体内容
+- 分析 SplineTubeBoundary 初始化时如何填充这两个列表
 
 - `+0x68 -> FUN_14093ed70`
 
@@ -1088,6 +1120,132 @@ raw spline control points
 -> cubic Bezier handles
 -> 33 sampled points / 32 sampled segments
 -> runtime splinetube replay
+```
+
+### `SplineTubeBoundary` 的实例化坐标修正
+
+继续对 `Cluster_602_Sector001_macro / c602s1_region1` 与
+`Cluster_713_Sector001_macro / region_cluster_713_sector_001_nebula_2` 做 replay 对比后，可以再收紧一条：
+
+- `regions.json.boundary.spline` 里的 control points 不能直接当最终世界坐标使用
+- 还需要叠加 `resourceareas.json.areas[*].position`
+
+也就是对每个 raw control point：
+
+```text
+runtime_point
+= raw_spline_point
++ area.position
+```
+
+这条修正对 gas / solid 都成立：
+
+- gas:
+  - [`gas_sum_weights_replay.py`](/home/slepher/project/x4-station-calculator/scripts/x4-game/gas_sum_weights_replay.py)
+- solid:
+  - [`solid_sum_weights_replay_v2.py`](/home/slepher/project/x4-station-calculator/scripts/x4-game/solid_sum_weights_replay_v2.py)
+
+对 `c602s1_region1`，把 `area.position = (0, 15000, 0)` 叠加到 spline 后：
+
+- replay block 集合从更明显的过宽状态收敛到：
+  - `save_count = 67`
+  - `replay_count = 74`
+  - `only_save = 2`
+  - `only_replay = 9`
+
+这说明 `resourceareas.position` 不是冗余元数据，而是 splinetube 实例化时必须参与的空间平移项。
+
+### `CompositeSpline<3>` / `SplineTubeBoundary` 的最终区间语义闭合
+
+继续沿 `SplineTubeBoundary +0x58 / +0x70` 追到 `Math::CompositeSpline<3>` 虚表后，可把这条链收成：
+
+- `CompositeSpline<3> +0x08 -> 0x1402d55c0`
+  - 语义：`sample(global_t)`
+  - 输入全局参数 `t ∈ [0,1]`
+  - 先定位到对应 spline 子段，再折算成子段内 `local_t`
+  - 调子段 sample，并加回该子段基点偏移
+
+- `CompositeSpline<3> +0x40 -> 0x1402d4ff0`
+  - 语义：全 spline 最近参数搜索
+  - 遍历所有子段，各自求局部最近参数 / 最近点
+  - 选最小距离那一段
+  - 再把局部参数折回整条 spline 的全局 `t`
+
+- `CompositeSpline<3> +0x70 -> 0x1414f3b30`
+  - 语义：围绕最近参数做局部扫描，返回命中的参数区间
+  - 公式结构：
+
+```text
+t0 = nearest_global_t(query)
+w = 2 * query_radius / total_spline_length
+step = w / sample_count
+scan [t0 - w, t0 + w + step]
+```
+
+  - 对扫描窗口内每个采样 `t`：
+
+```text
+p = sample(t)
+if distance(p, query) < query_radius:
+    mark hit_t
+```
+
+  - 最终返回：
+
+```text
+[first_hit_t, last_hit_t]
+```
+
+对 `SplineTubeBoundary`：
+
+- `+0x58 -> FUN_14093ed40`
+  - 不是直接算几何
+  - 它会把输入半径扩成：
+
+```text
+query_radius + tube_radius
+```
+
+  - 然后委托：
+
+```text
+CompositeSpline<3> +0x70(query_center, query_radius + tube_radius, sample_count = 5)
+```
+
+  - 所以 `+0x58` 的最终语义是：
+    - **spline 参数空间中的 lateral interval**
+
+- `+0x60`
+  - 当前可视为恒真 gate（`return 1`）
+
+- `+0x70 -> FUN_14093ee10`
+  - 当前最可信的闭合不是“区间两端包络”
+  - 而是：
+    - 先调 `+0x58`
+    - 再用返回结果里的代表参数 sample 一点
+    - 用该单点到 query 的距离 `d` 构造 tube 半径归一化区间：
+
+```text
+lower = max((d - query_radius) / tube_radius, 0)
+upper = min((d + query_radius) / tube_radius, 1)
+```
+
+因此 `SplineTubeBoundary` 在 runtime 里的核心不是“nearest polyline distance”这么简单，而是：
+
+```text
+nearest global t
+-> local scan around t
+-> lateral interval [t_min, t_max]
+-> representative sampled point
+-> radial interval [lower, upper]
+```
+
+最终 `64k query box` 的 splinetube falloff 则是：
+
+```text
+falloff
+= EvalAvg(lateral_profile, lateral_interval)
+ * EvalAvg(radial_profile, radial_interval)
 ```
 
 ## 8.6 `SphereBoundary` / `BoxBoundary` 同层公式补齐
