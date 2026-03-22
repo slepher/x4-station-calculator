@@ -192,8 +192,12 @@ def load_save_sample_for_ware(sector_id: str, ware: str, yield_name: str) -> dic
     if ware not in data.get("ware", {}):
         return {}
     ware_data = data["ware"][ware]
-    # Try yield_name first, then fallback to resources or iterate yield names
-    if yield_name and yield_name in ware_data:
+
+    # Handle new format: ware_data is a list of blocks
+    if isinstance(ware_data, list):
+        rows = ware_data
+    # Handle old format: ware_data is a dict with yield_name keys
+    elif yield_name and yield_name in ware_data:
         rows = ware_data[yield_name].get("resources", [])
     elif "resources" in ware_data:
         rows = ware_data.get("resources", [])
@@ -203,10 +207,18 @@ def load_save_sample_for_ware(sector_id: str, ware: str, yield_name: str) -> dic
         for yn, yd in ware_data.items():
             if isinstance(yd, dict) and "resources" in yd:
                 rows.extend(yd["resources"])
+
     return {(int(row["x"]), int(row["y"]), int(row["z"])): row for row in rows}
 
 
-def load_total_sample_for_ware(sector_id: str, ware: str, yield_name: str) -> dict:
+def load_total_sample_for_ware(sector_id: str, ware: str, region_filter: str = "") -> dict:
+    """Load total sample for a ware in a sector.
+
+    Args:
+        sector_id: Sector identifier
+        ware: Ware type (helium, hydrogen, etc.)
+        region_filter: Optional region name filter (e.g., 'nebula_2')
+    """
     total_path = SAVE_SAMPLE_ROOT / "total.json"
     if not total_path.exists():
         return {}
@@ -215,8 +227,22 @@ def load_total_sample_for_ware(sector_id: str, ware: str, yield_name: str) -> di
     for sector in data.get("sectors", []):
         if sector.get("sector_id") == sector_id.lower():
             ware_data = sector.get("ware", {}).get(ware, {})
-            if yield_name and yield_name in ware_data:
-                return ware_data[yield_name]
+            # Handle new format: ware_data is a list
+            if isinstance(ware_data, list):
+                # Sum all entries with matching regions
+                total = {"max": 0, "cutted": 0}
+                for entry in ware_data:
+                    # Check if any region matches the filter if specified
+                    if region_filter:
+                        regions = entry.get("regions", [])
+                        # region_filter might be a partial region name (e.g., 'nebula_2')
+                        # Check if it's contained in any region ref
+                        if not any(region_filter in r.get("ref", "") for r in regions):
+                            continue
+                    total["max"] += entry.get("max", 0)
+                    total["cutted"] += entry.get("cutted", 0)
+                return total if total["max"] > 0 else {}
+            # Handle old format: ware_data is a dict
             return ware_data
     return {}
 
@@ -607,12 +633,146 @@ def compute_splinetube_radial_interval_polyline_closure_14093EE10(
     )
 
 
-def enumerate_planar_candidate_area_centers_for_splinetube_reverse_closure_14093EB60(
+# Constants from C++ for hexagonal grid
+DAT_142d80234 = 1.5  # hex X step multiplier
+DAT_142d80300 = 1.7320508  # sqrt(3)
+DAT_142d80044 = 0.8660254  # sqrt(3)/2
+
+
+def check_splinetube_point_containment_14093EB60(
+    transform: list[float],
+    col: int,
+    row: int,
+    size: float,
+    spline_subobject,
+    tube_radius: float,
+) -> bool:
+    """Check if a hex grid point is inside the SplineTube boundary.
+
+    Corresponds to FUN_14093eb60 - SplineTubeBoundary vtable slot +0x38.
+
+    C++ logic:
+    1. Convert hex grid (col, row) to world coordinates (X, Z)
+    2. Transform world coords to local space using transform matrix
+    3. Find nearest point on spline
+    4. Check if 2D distance (XZ) is within tube_radius + query_radius
+
+    Args:
+        transform: 16-element transform matrix (position + rotation)
+        col: Hex grid column
+        row: Hex grid row
+        size: Grid cell size (AREA_SIZE)
+        spline_subobject: Spline object with sample method
+        tube_radius: Tube radius
+
+    Returns:
+        True if point is inside the tube boundary
+    """
+    # Hex grid to world coordinates (from FUN_14093eb60)
+    world_x = float(col) * DAT_142d80234 * size
+    world_z = float(row) * size * DAT_142d80300
+    if col & 1:
+        world_z = world_z + size * DAT_142d80044
+
+    # Transform matrix structure (param_2 in C++):
+    # [0,1,2,3] = position (translation)
+    # [4,5,6,7] = rotation row 0
+    # [8,9,10,11] = rotation row 1
+    # [12,13,14,15] = rotation row 2
+
+    # World to local: subtract position
+    rel_x = world_x - transform[0]
+    rel_y = 0.0 - transform[1]
+    rel_z = world_z - transform[2]
+
+    # Rotation (world to local space)
+    local_x = transform[4] * rel_x + transform[5] * rel_y + transform[6] * rel_z
+    local_y = transform[8] * rel_x + transform[9] * rel_y + transform[10] * rel_z
+    local_z = transform[12] * rel_x + transform[13] * rel_y + transform[14] * rel_z
+
+    # Query the spline for nearest point (vfunc +0x40 then +0x08)
+    # This is delegated to the spline_subobject
+    # For now, we use a simplified 2D distance check
+
+    # The actual C++ calls:
+    # - vfunc(+0x40) to find nearest parameter t
+    # - vfunc(+0x08) to sample point at t
+    # Then computes 2D distance (XZ only)
+
+    # Placeholder: if no spline_subobject provided, return True (no filtering)
+    if spline_subobject is None:
+        return True
+
+    # Find nearest point on spline and check distance
+    # This part requires the spline sampling infrastructure
+    # For now, delegate to the existing distance check
+    nearest_point, distance_2d = spline_subobject.find_nearest_2d(local_x, local_z)
+
+    # Check if within tube radius (the +0x60 offset in C++ is tube_radius)
+    threshold = tube_radius + size * 0.2  # DAT_142d7fe4c = 0.2
+    return distance_2d < threshold
+
+
+def check_boundary_list_containment_14093B8B0(
+    boundaries: list,
+    transform: list[float],
+    col: int,
+    row: int,
+    size: float,
+) -> bool:
+    """Check if hex grid point is inside any boundary in the list.
+
+    Corresponds to FUN_14093b8b0 - iterates boundary list and calls +0x38 slot.
+
+    Args:
+        boundaries: List of boundary objects with +0x38 slot implementation
+        transform: Transform matrix for the parent object
+        col: Hex grid column
+        row: Hex grid row
+        size: Grid cell size
+
+    Returns:
+        True if point is inside any boundary
+    """
+    if not boundaries:
+        return False
+
+    for boundary in boundaries:
+        # Call +0x38 slot on each boundary
+        if boundary.check_containment_38(transform, col, row, size):
+            return True
+
+    return False
+
+
+def enumerate_hex_grid_for_boundary_14070F330(
     field: NebulaFieldState,
     points: list[tuple[float, float, float]],
     tube_radius: float,
     query_radius: float,
 ) -> list[tuple[int, int, int]]:
+    """Enumerate hex grid cells that may intersect the SplineTube boundary.
+
+    Corresponds to FUN_14070f330 - main hexagonal grid enumeration function.
+
+    C++ logic:
+    1. Compute world coordinates from hex grid (col, row)
+    2. Use FUN_14093b8b0 to check if point is inside boundary
+    3. Return list of storage coordinates for matching cells
+
+    Note: The actual C++ uses a more complex iteration with multiple passes
+    and collision detection. This implementation focuses on the enumeration
+    pattern that matches the save data (square grid, not hexagonal).
+
+    Args:
+        field: Nebula field state
+        points: Sampled spline points
+        tube_radius: Tube radius
+        query_radius: Query radius
+
+    Returns:
+        List of (x, y, z) storage coordinates for candidate tiles
+    """
     grid = build_query_grid_window_140760320(field.position_x, field.position_y, field.position_z)
     xs = [point[0] for point in points]
     zs = [point[2] for point in points]
@@ -629,6 +789,9 @@ def enumerate_planar_candidate_area_centers_for_splinetube_reverse_closure_14093
         min_z, max_z, grid.origin_z, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
     )
 
+    # Use square grid enumeration (matches save data pattern)
+    # The C++ FUN_14070f330 uses hexagonal grid, but actual save uses square grid
+    # This suggests there's a different code path or the hex grid is transformed
     coords: list[tuple[int, int, int]] = []
     x = start_x
     while x <= end_x:
@@ -638,6 +801,21 @@ def enumerate_planar_candidate_area_centers_for_splinetube_reverse_closure_14093
             z += int(AREA_SIZE)
         x += int(AREA_SIZE)
     return coords
+
+
+# Legacy function name for backward compatibility
+def enumerate_planar_candidate_area_centers_for_splinetube_reverse_closure_14093EB60(
+    field: NebulaFieldState,
+    points: list[tuple[float, float, float]],
+    tube_radius: float,
+    query_radius: float,
+) -> list[tuple[int, int, int]]:
+    """Deprecated: Use enumerate_hex_grid_for_boundary_14070F330 instead.
+
+    This function name was incorrectly assigned. The actual FUN_14093EB60
+    is a point containment check, not an enumeration function.
+    """
+    return enumerate_hex_grid_for_boundary_14070F330(field, points, tube_radius, query_radius)
 
 
 def compute_uniform_profile_weight_for_40km_cylinder_14073F750(field: NebulaFieldState) -> float:
@@ -795,7 +973,7 @@ def replay_splinetube_field_planar_reverse_closure_1407603F0(
     seg_lengths, accum, total_length = build_polyline_arclength_table_from_sampled_points_14093E5C0(sampled_points)
     threshold = QUERY_RADIUS_14073F750 + field.radius
     grid = build_query_grid_window_140760320(field.position_x, field.position_y, field.position_z)
-    candidate_tiles = enumerate_planar_candidate_area_centers_for_splinetube_reverse_closure_14093EB60(
+    candidate_tiles = enumerate_hex_grid_for_boundary_14070F330(
         field,
         sampled_points,
         field.radius,
@@ -1111,11 +1289,12 @@ def main() -> None:
     # Load save sample data for comparison
     save_tiles_by_ware: dict[str, dict] = {}
     save_total_by_ware: dict[str, dict] = {}
+    # Use field_ref as region filter for totals
+    region_filter = args.field_ref
     for resource in field.resources:
         ware_key = resource.ware_key
-        yield_name = resource.yield_name
-        save_tiles_by_ware[ware_key] = load_save_sample_for_ware(args.sector_id, ware_key, yield_name)
-        save_total_by_ware[ware_key] = load_total_sample_for_ware(args.sector_id, ware_key, yield_name)
+        save_tiles_by_ware[ware_key] = load_save_sample_for_ware(args.sector_id, ware_key, resource.yield_name)
+        save_total_by_ware[ware_key] = load_total_sample_for_ware(args.sector_id, ware_key, region_filter)
 
     print(f"field={result['field']}")
     print(f"boundary_class={result['boundary_class']}")
