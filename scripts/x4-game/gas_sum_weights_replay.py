@@ -1272,6 +1272,15 @@ def replay_gas_area_values_for_field_1407603F0(field: NebulaFieldState) -> dict[
     raise ValueError(f"unsupported gas boundary class for replay: {field.boundary_class}")
 
 
+def describe_hit_check_mode() -> str:
+    return (
+        "reverse: cylinder 用有限高圆柱与 64k query box 相交；"
+        "sphere 用半径归一化区间；"
+        "box 用 box 度量归一化区间；"
+        "splinetube 用 raw spline + raw falloff + query_radius=55425.625 的 planar box replay"
+    )
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Replay one gas field from curated JSON sector data.")
     # 原有位置参数

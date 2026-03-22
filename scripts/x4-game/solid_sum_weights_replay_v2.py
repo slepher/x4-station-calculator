@@ -1162,18 +1162,69 @@ def load_save_sample_for_ware(sector_id: str, ware: str, yield_name: str) -> dic
         return {}
     with save_path.open("r", encoding="utf-8") as handle:
         data = json.load(handle)
-    if ware not in data.get("ware", {}) or yield_name not in data["ware"][ware]:
+    if ware not in data.get("ware", {}):
         return {}
-    rows = data["ware"][ware][yield_name]["resources"]
+    ware_data = data["ware"][ware]
+
+    # Handle new format: ware_data is a list of blocks
+    if isinstance(ware_data, list):
+        # Filter by yield_name (region name) if specified
+        if yield_name:
+            filtered_rows = []
+            for row in ware_data:
+                regions = row.get("regions", [])
+                # Handle both formats: regions as list of strings or list of dicts
+                region_refs = [r.get("ref", r) if isinstance(r, dict) else r for r in regions]
+                if any(yield_name in r for r in region_refs):
+                    filtered_rows.append(row)
+            rows = filtered_rows
+        else:
+            rows = ware_data
+    # Handle old format: ware_data is a dict with yield_name keys
+    elif yield_name and yield_name in ware_data:
+        rows = ware_data[yield_name].get("resources", [])
+    elif "resources" in ware_data:
+        rows = ware_data.get("resources", [])
+    else:
+        rows = []
+        for yn, yd in ware_data.items():
+            if isinstance(yd, dict) and "resources" in yd:
+                rows.extend(yd["resources"])
+
     return {(int(row["x"]), int(row["y"]), int(row["z"])): row for row in rows}
 
 
-def load_total_sample_for_ware(sector_id: str, ware: str, yield_name: str) -> dict:
-    with (SAVE_SAMPLE_ROOT / "total.json").open("r", encoding="utf-8") as handle:
+def load_total_sample_for_ware(sector_id: str, ware: str, region_filter: str = "") -> dict:
+    """Load total sample for a ware in a sector.
+
+    Args:
+        sector_id: Sector identifier
+        ware: Ware type (ice, ore, silicon, etc.)
+        region_filter: Optional region name filter
+    """
+    total_path = SAVE_SAMPLE_ROOT / "total.json"
+    if not total_path.exists():
+        return {}
+    with total_path.open("r", encoding="utf-8") as handle:
         data = json.load(handle)
-    for sector in data["sectors"]:
-        if sector["sector_id"] == sector_id.lower():
-            return sector.get("ware", {}).get(ware, {}).get(yield_name, {})
+    for sector in data.get("sectors", []):
+        if sector.get("sector_id") == sector_id.lower():
+            ware_data = sector.get("ware", {}).get(ware, {})
+            # Handle new format: ware_data is a list
+            if isinstance(ware_data, list):
+                total = {"max": 0, "cutted": 0}
+                for entry in ware_data:
+                    if region_filter:
+                        regions = entry.get("regions", [])
+                        if not any(region_filter in r.get("ref", "") for r in regions):
+                            continue
+                    total["max"] += entry.get("max", 0)
+                    total["cutted"] += entry.get("cutted", 0)
+                return total if total["max"] > 0 else {}
+            # Handle old format: ware_data is a dict
+            if region_filter and region_filter in ware_data:
+                return ware_data[region_filter]
+            return ware_data
     return {}
 
 
@@ -1265,8 +1316,8 @@ def main() -> None:
     # 原有单星区模式
     region = build_solid_region_from_raw_inputs_14073E110(args.sector_id, args.field_ref)
     result = replay_region_solid_sum_weights_and_areas_v2_14073E110(region)
-    save_tiles = load_save_sample_for_ware(args.sector_id, region.payload.ware, region.payload.yield_name)
-    save_total = load_total_sample_for_ware(args.sector_id, region.payload.ware, region.payload.yield_name)
+    save_tiles = load_save_sample_for_ware(args.sector_id, region.payload.ware, args.field_ref)
+    save_total = load_total_sample_for_ware(args.sector_id, region.payload.ware, args.field_ref)
 
     print(f"field={result['field']}")
     print(f"boundary_class={region.boundary_class}")
