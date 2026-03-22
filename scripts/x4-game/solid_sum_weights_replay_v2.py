@@ -46,6 +46,12 @@ SAVE_GRID_MIN_CENTER_XZ = -960000
 SAVE_GRID_MAX_CENTER_XZ = 1024000
 SAVE_GRID_MIN_CENTER_Y = -960000
 SAVE_GRID_MAX_CENTER_Y = 1024000
+
+# 15x15x3 网格范围（验收模式）
+CUT_MODE_15X15X3_MIN_XZ = -480000
+CUT_MODE_15X15X3_MAX_XZ = 480000
+CUT_MODE_15X15X3_MIN_Y = -96000
+CUT_MODE_15X15X3_MAX_Y = 96000
 QUERY_RADIUS_14073F750 = 55425.625
 NOISE_CLAMP_SCALE_140E84C30 = 9.999999717180685e-10
 NOISE_CDF_CENTER_1414F5870 = 0.5
@@ -525,6 +531,10 @@ def enumerate_candidate_area_centers_for_splinetube_reverse_closure_14093EB60(
     points: list[tuple[float, float, float]],
     tube_radius: float,
     query_radius: float,
+    min_center_xz: int = SAVE_GRID_MIN_CENTER_XZ,
+    max_center_xz: int = SAVE_GRID_MAX_CENTER_XZ,
+    min_center_y: int = SAVE_GRID_MIN_CENTER_Y,
+    max_center_y: int = SAVE_GRID_MAX_CENTER_Y,
 ) -> list[tuple[int, int, int]]:
     grid = build_query_grid_window_140760320(region.position_x, region.position_y, region.position_z)
     xs = [point[0] for point in points]
@@ -538,13 +548,13 @@ def enumerate_candidate_area_centers_for_splinetube_reverse_closure_14093EB60(
     min_z = min(zs) - extension
     max_z = max(zs) + extension
     start_x, end_x = compute_storage_axis_range_140760320(
-        min_x, max_x, grid.origin_x, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
+        min_x, max_x, grid.origin_x, min_center_xz, max_center_xz
     )
     start_y, end_y = compute_storage_axis_range_140760320(
-        min_y, max_y, grid.origin_y, SAVE_GRID_MIN_CENTER_Y, SAVE_GRID_MAX_CENTER_Y
+        min_y, max_y, grid.origin_y, min_center_y, max_center_y
     )
     start_z, end_z = compute_storage_axis_range_140760320(
-        min_z, max_z, grid.origin_z, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
+        min_z, max_z, grid.origin_z, min_center_xz, max_center_xz
     )
 
     coords: list[tuple[int, int, int]] = []
@@ -565,17 +575,36 @@ def index_regions_by_id() -> dict[str, dict]:
     return {row["id"]: row for row in load_json_rows(REGIONS_JSON)}
 
 
-def find_sector_area_entry(sector_id: str, field_ref: str) -> dict:
+def find_all_sector_area_entries(sector_id: str, field_ref: str) -> list[dict]:
+    """查找所有匹配的 area entries（一个 field 可能有多个 instance）。
+
+    Returns:
+        匹配的 area 列表
+    """
+    entries = []
     for sector_entry in load_json_rows(RESOURCEAREAS_JSON):
         if sector_entry.get("sector_id") != sector_id:
             continue
         for area in sector_entry.get("areas", []):
             if area.get("ref") == field_ref:
-                return area
+                entries.append(area)
+    return entries
+
+
+def find_sector_area_entry(sector_id: str, field_ref: str) -> dict:
+    """查找第一个匹配的 area entry（保持向后兼容）。"""
+    entries = find_all_sector_area_entries(sector_id, field_ref)
+    if entries:
+        return entries[0]
     raise ValueError(f"sector/field not found: {sector_id} / {field_ref}")
 
 
-def parse_region_definition_140E80D20(field_ref: str) -> tuple[float, list[SolidFieldDefinition], tuple[str, str]]:
+def parse_region_definition_140E80D20(field_ref: str) -> tuple[float, list[SolidFieldDefinition], list[tuple[str, str]]]:
+    """解析 region 定义。
+
+    Returns:
+        (density, field_defs, resources): 密度、字段定义、资源列表[(ware, yield_name), ...]
+    """
     root = load_xml_root(REGION_DEFINITIONS_XML)
     for region in root.findall("region"):
         if region.get("name") != field_ref:
@@ -592,8 +621,12 @@ def parse_region_definition_140E80D20(field_ref: str) -> tuple[float, list[Solid
             )
             for node in region.find("fields").findall("asteroid")
         ]
-        resource_node = region.find("resources").find("resource")
-        return density, field_defs, (str(resource_node.get("ware")), str(resource_node.get("yield")))
+        # 返回所有 resources
+        resources = [
+            (str(node.get("ware")), str(node.get("yield")))
+            for node in region.find("resources").findall("resource")
+        ]
+        return density, field_defs, resources
     raise ValueError(f"region definition not found: {field_ref}")
 
 
@@ -812,7 +845,28 @@ def area_intersects_field_query_box_140E83FF0(region: SolidRegionState, tile_x: 
     return (clamped_dx * clamped_dx + clamped_dz * clamped_dz) <= (region.radius * region.radius)
 
 
-def enumerate_candidate_area_centers_for_64k_query_boxes_140760320(region: SolidRegionState) -> list[tuple[int, int, int]]:
+def enumerate_candidate_area_centers_for_64k_query_boxes_140760320(
+    region: SolidRegionState,
+    cut_mode: str = "full",
+) -> list[tuple[int, int, int]]:
+    """枚举候选 area 中心点坐标。
+
+    Args:
+        region: region 状态
+        cut_mode: 网格范围模式，"full" 或 "15x15x3"
+    """
+    # 根据模式选择网格限制
+    if cut_mode == "15x15x3":
+        min_center_xz = CUT_MODE_15X15X3_MIN_XZ
+        max_center_xz = CUT_MODE_15X15X3_MAX_XZ
+        min_center_y = CUT_MODE_15X15X3_MIN_Y
+        max_center_y = CUT_MODE_15X15X3_MAX_Y
+    else:
+        min_center_xz = SAVE_GRID_MIN_CENTER_XZ
+        max_center_xz = SAVE_GRID_MAX_CENTER_XZ
+        min_center_y = SAVE_GRID_MIN_CENTER_Y
+        max_center_y = SAVE_GRID_MAX_CENTER_Y
+
     if region.boundary_class == "splinetube":
         sampled_points = build_sampled_spline_points_from_region_bezier_closure_14093E5C0(region)
         return enumerate_candidate_area_centers_for_splinetube_reverse_closure_14093EB60(
@@ -820,6 +874,10 @@ def enumerate_candidate_area_centers_for_64k_query_boxes_140760320(region: Solid
             sampled_points,
             region.radius,
             QUERY_RADIUS_14073F750,
+            min_center_xz,
+            max_center_xz,
+            min_center_y,
+            max_center_y,
         )
 
     grid = build_query_grid_window_140760320(region.position_x, region.position_y, region.position_z)
@@ -831,13 +889,13 @@ def enumerate_candidate_area_centers_for_64k_query_boxes_140760320(region: Solid
     max_z = region.position_z + region.radius + AREA_HALF
 
     start_x, end_x = compute_storage_axis_range_140760320(
-        min_x, max_x, grid.origin_x, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
+        min_x, max_x, grid.origin_x, min_center_xz, max_center_xz
     )
     start_y, end_y = compute_storage_axis_range_140760320(
-        min_y, max_y, grid.origin_y, SAVE_GRID_MIN_CENTER_Y, SAVE_GRID_MAX_CENTER_Y
+        min_y, max_y, grid.origin_y, min_center_y, max_center_y
     )
     start_z, end_z = compute_storage_axis_range_140760320(
-        min_z, max_z, grid.origin_z, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
+        min_z, max_z, grid.origin_z, min_center_xz, max_center_xz
     )
 
     coords: list[tuple[int, int, int]] = []
@@ -856,8 +914,24 @@ def enumerate_candidate_area_centers_for_64k_query_boxes_140760320(region: Solid
     return coords
 
 
-def build_solid_region_from_raw_inputs_14073E110(sector_id: str, field_ref: str) -> SolidRegionState:
-    area = find_sector_area_entry(sector_id, field_ref)
+def build_solid_region_from_raw_inputs_14073E110(
+    sector_id: str,
+    field_ref: str,
+    area: dict = None,
+    ware: str = None,
+    yield_name: str = None,
+) -> SolidRegionState:
+    """构建 SolidRegionState。
+
+    Args:
+        sector_id: 星区 ID
+        field_ref: field ref
+        area: 可选的 area 数据（如果提供，使用此数据而非查找）
+        ware: 可选的资源类型（如果不提供，使用第一个资源）
+        yield_name: 可选的 yield 名称
+    """
+    if area is None:
+        area = find_sector_area_entry(sector_id, field_ref)
     region_json = index_regions_by_id()[field_ref]
     position = area["position"]
     boundary = region_json["boundary"]
@@ -877,7 +951,12 @@ def build_solid_region_from_raw_inputs_14073E110(sector_id: str, field_ref: str)
         for row in boundary.get("spline", [])
     ]
 
-    region_density, field_defs, (ware, yield_name) = parse_region_definition_140E80D20(field_ref)
+    region_density, field_defs, resources = parse_region_definition_140E80D20(field_ref)
+
+    # 如果没有指定 ware，使用第一个资源
+    if ware is None or yield_name is None:
+        ware, yield_name = resources[0]
+
     payload = parse_region_yield_payload_140E83F80(ware, yield_name)
     groups = parse_region_object_groups_140E950A0()
 
@@ -973,7 +1052,10 @@ def compute_falloff_weight_for_query_14073F750(
     raise ValueError(f"unsupported solid boundary class for falloff: {region.boundary_class}")
 
 
-def replay_region_solid_sum_weights_and_areas_v2_14073E110(region: SolidRegionState) -> dict[str, object]:
+def replay_region_solid_sum_weights_and_areas_v2_14073E110(
+    region: SolidRegionState,
+    cut_mode: str = "full",
+) -> dict[str, object]:
     matching_fields = [field for field in region.fields if field.ware_key == region.payload.ware]
     for field in matching_fields:
         apply_region_yield_payload_to_field_140E83F80(field, region.payload)
@@ -1006,7 +1088,7 @@ def replay_region_solid_sum_weights_and_areas_v2_14073E110(region: SolidRegionSt
     total_max = 0
     grid = build_query_grid_window_140760320(region.position_x, region.position_y, region.position_z)
 
-    for coord in enumerate_candidate_area_centers_for_64k_query_boxes_140760320(region):
+    for coord in enumerate_candidate_area_centers_for_64k_query_boxes_140760320(region, cut_mode):
         tile_x, tile_y, tile_z = world_coord_from_storage_coord_140760320(grid, coord)
         for field in matching_fields:
             assert_noise_fast_path_supported_1414F4840(field, tile_x, tile_y, tile_z)
@@ -1097,13 +1179,90 @@ def load_total_sample_for_ware(sector_id: str, ware: str, yield_name: str) -> di
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Replay solid region weights and 64k area totals.")
-    parser.add_argument("sector_id", nargs="?", default="Cluster_03_Sector001_macro")
-    parser.add_argument("field_ref", nargs="?", default="p1_40km_ice_field")
+    # 原有位置参数
+    parser.add_argument("sector_id", nargs="?", default="Cluster_03_Sector001_macro",
+                        help="Sector ID (default: Cluster_03_Sector001_macro)")
+    parser.add_argument("field_ref", nargs="?", default="p1_40km_ice_field",
+                        help="Field reference (default: p1_40km_ice_field)")
+    # 新增验收参数
+    parser.add_argument("--all-sectors", action="store_true",
+                        help="Process all sectors from resourceareas.json")
+    parser.add_argument("--output-dir", type=Path,
+                        help="Output directory for resourcearea_blocks_game.json")
+    parser.add_argument("--cut-mode", choices=["full", "15x15x3"], default="full",
+                        help="Grid range mode: full (default) or 15x15x3")
     return parser.parse_args()
+
+
+def get_all_sector_field_pairs() -> list:
+    """从 resourceareas.json 获取所有 sector 和 field 对（每个 instance 一个）。"""
+    pairs = []
+    with RESOURCEAREAS_JSON.open("r", encoding="utf-8") as f:
+        data = json.load(f)
+    for entry in data:
+        sector_id = entry.get("sector_id", "")
+        areas = entry.get("areas", [])
+        for area in areas:
+            field_ref = area.get("ref", "")
+            if sector_id and field_ref:
+                pairs.append((sector_id, field_ref, area))  # 包含 area 数据
+    return pairs
+
+
+def get_field_resources(field_ref: str) -> list[tuple[str, str]]:
+    """获取 field 的所有资源类型。
+
+    Returns:
+        [(ware, yield_name), ...]
+    """
+    _, _, resources = parse_region_definition_140E80D20(field_ref)
+    return resources
 
 
 def main() -> None:
     args = parse_args()
+
+    if args.all_sectors:
+        # 验收模式：处理所有星区
+        pairs = get_all_sector_field_pairs()
+        results = []
+
+        for sector_id, field_ref, area in pairs:
+            try:
+                # 获取该 field 的所有资源类型
+                resources = get_field_resources(field_ref)
+
+                for ware, yield_name in resources:
+                    try:
+                        region = build_solid_region_from_raw_inputs_14073E110(
+                            sector_id, field_ref, area, ware, yield_name
+                        )
+                        result = replay_region_solid_sum_weights_and_areas_v2_14073E110(region, args.cut_mode)
+                        results.append({
+                            "sector_id": sector_id,
+                            "field_ref": field_ref,
+                            "ware": ware,
+                            "yield_name": yield_name,
+                            "total_max": result["total_max"],
+                            "per_tile": result["per_tile"],
+                        })
+                    except Exception as e:
+                        print(f"Error processing {sector_id}/{field_ref}/{ware}: {e}")
+            except Exception as e:
+                print(f"Error processing {sector_id}/{field_ref}: {e}")
+
+        if args.output_dir:
+            args.output_dir.mkdir(parents=True, exist_ok=True)
+            output_path = args.output_dir / "resourcearea_blocks_game.json"
+            with output_path.open("w", encoding="utf-8") as f:
+                json.dump(results, f, indent=2)
+            print(f"Output written to {output_path}")
+        else:
+            print(f"Processed {len(results)} sector/field/ware triples")
+
+        return
+
+    # 原有单星区模式
     region = build_solid_region_from_raw_inputs_14073E110(args.sector_id, args.field_ref)
     result = replay_region_solid_sum_weights_and_areas_v2_14073E110(region)
     save_tiles = load_save_sample_for_ware(args.sector_id, region.payload.ware, region.payload.yield_name)

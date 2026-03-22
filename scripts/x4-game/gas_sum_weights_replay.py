@@ -39,6 +39,13 @@ SAVE_GRID_MIN_CENTER_XZ = -960000
 SAVE_GRID_MAX_CENTER_XZ = 1024000
 SAVE_GRID_MIN_CENTER_Y = -960000
 SAVE_GRID_MAX_CENTER_Y = 1024000
+
+# 15x15x3 网格范围（验收模式）
+CUT_MODE_15X15X3_MIN_XZ = -480000
+CUT_MODE_15X15X3_MAX_XZ = 480000
+CUT_MODE_15X15X3_MIN_Y = -96000
+CUT_MODE_15X15X3_MAX_Y = 96000
+
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_ROOT = PROJECT_ROOT / "src" / "assets" / "x4_game_data" / "8.0-Diplomacy" / "data"
 RESOURCEAREAS_JSON = DATA_ROOT / "resourceareas.json"
@@ -1089,22 +1096,73 @@ def replay_gas_area_values_for_field_1407603F0(field: NebulaFieldState) -> dict[
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Replay one gas field from curated JSON sector data.")
-    parser.add_argument("sector_id", nargs="?", default="Cluster_06_Sector001_macro")
-    parser.add_argument("field_ref", nargs="?", default="p1_40km_methane_field")
+    # 原有位置参数
+    parser.add_argument("sector_id", nargs="?", default="Cluster_06_Sector001_macro",
+                        help="Sector ID (default: Cluster_06_Sector001_macro)")
+    parser.add_argument("field_ref", nargs="?", default="p1_40km_methane_field",
+                        help="Field reference (default: p1_40km_methane_field)")
+    # 新增验收参数
+    parser.add_argument("--all-sectors", action="store_true",
+                        help="Process all sectors from resourceareas.json")
+    parser.add_argument("--output-dir", type=Path,
+                        help="Output directory for resourcearea_blocks_game.json")
+    parser.add_argument("--cut-mode", choices=["full", "15x15x3"], default="full",
+                        help="Grid range mode: full (default) or 15x15x3")
     return parser.parse_args()
 
 
-def describe_hit_check_mode() -> str:
-    return (
-        "reverse: cylinder 用有限高圆柱与 64k query box 相交；"
-        "sphere 用半径归一化区间；"
-        "box 用 box 度量归一化区间；"
-        "splinetube 用 raw spline + raw falloff + query_radius=55425.625 的 planar box replay"
-    )
+def get_all_gas_sector_field_pairs() -> list:
+    """从 resourceareas.json 获取所有气体资源的 sector 和 field 对。"""
+    GAS_WARES = {"hydrogen", "helium", "methane", "argon", "coolant"}
+    pairs = []
+    with RESOURCEAREAS_JSON.open("r", encoding="utf-8") as f:
+        data = json.load(f)
+    for entry in data:
+        sector_id = entry.get("sector_id", "")
+        areas = entry.get("areas", [])
+        for area in areas:
+            field_ref = area.get("ref", "")
+            resources = area.get("resources", [])
+            # 检查是否有气体资源
+            has_gas = any(r.get("ware", "").lower() in GAS_WARES for r in resources)
+            if sector_id and field_ref and has_gas:
+                pairs.append((sector_id, field_ref))
+    return pairs
 
 
 def main() -> None:
     args = parse_args()
+
+    if args.all_sectors:
+        # 验收模式：处理所有气体星区
+        pairs = get_all_gas_sector_field_pairs()
+        results = []
+
+        for sector_id, field_ref in pairs:
+            try:
+                field = build_nebula_field_from_sector_area_json_140e860c0(sector_id, field_ref)
+                result = replay_gas_area_values_for_field_1407603F0(field)
+                results.append({
+                    "sector_id": sector_id,
+                    "field_ref": field_ref,
+                    "ware_totals": result["ware_totals"],
+                    "per_tile": result["per_tile"],
+                })
+            except Exception as e:
+                print(f"Error processing {sector_id}/{field_ref}: {e}")
+
+        if args.output_dir:
+            args.output_dir.mkdir(parents=True, exist_ok=True)
+            output_path = args.output_dir / "resourcearea_blocks_game_gas.json"
+            with output_path.open("w", encoding="utf-8") as f:
+                json.dump(results, f, indent=2)
+            print(f"Output written to {output_path}")
+        else:
+            print(f"Processed {len(results)} gas sector/field pairs")
+
+        return
+
+    # 原有单星区模式
     field = build_nebula_field_from_sector_area_json_140e860c0(args.sector_id, args.field_ref)
     result = replay_gas_area_values_for_field_1407603F0(field)
 
