@@ -5,6 +5,10 @@ const RESOURCE_BLOCK_HALF_DIAGONAL = Math.sqrt(
   3 * RESOURCE_BLOCK_HALF_SIZE * RESOURCE_BLOCK_HALF_SIZE
 )
 
+// Core area bounds for cutted calculation (15x15x3 64km blocks centered at origin)
+const CORE_AREA_XZ_LIMIT = 448000 // 448km
+const CORE_AREA_Y_LIMIT = 64000 // 64km
+
 export type SaveResourcePoint = {
   x: number
   y: number
@@ -16,16 +20,18 @@ export type SaveResourcePoint = {
 }
 
 export type SectorJsonResource = {
+  yield_names: string[]
   x: number
   y: number
   z: number
   max: number
   time: number
+  regions: string[]
 }
 
 export type SectorJsonData = {
   sector_id: string
-  ware: Record<string, Record<string, { resources: SectorJsonResource[] }>>
+  ware: Record<string, SectorJsonResource[]>
 }
 
 export type RegionSummary = {
@@ -34,6 +40,7 @@ export type RegionSummary = {
 
 export type WareRegionGroup = {
   max: number
+  cutted: number
   regions: RegionSummary[]
 }
 
@@ -454,14 +461,7 @@ function distancePointToSegment(point: Vector3, start: Vector3, end: Vector3): n
 }
 
 function boundaryCenter(position: Vector3, boundary: Boundary): Vector3 {
-  if (boundary.class === 'cylinder') {
-    return {
-      x: position.x,
-      y: position.y + boundary.size.linear / 2,
-      z: position.z
-    }
-  }
-
+  // cylinder and box position is already the center (linear/size are half-extents)
   return position
 }
 
@@ -477,10 +477,11 @@ function pointMatchesBoundary(
   }
 
   if (boundary.class === 'box') {
+    // size is half-extent, range is [position - size, position + size]
     return (
-      Math.abs(point.x - position.x) <= boundary.size.x / 2 + RESOURCE_BLOCK_HALF_SIZE &&
-      Math.abs(point.y - position.y) <= boundary.size.y / 2 + RESOURCE_BLOCK_HALF_SIZE &&
-      Math.abs(point.z - position.z) <= boundary.size.z / 2 + RESOURCE_BLOCK_HALF_SIZE
+      Math.abs(point.x - position.x) <= boundary.size.x + RESOURCE_BLOCK_HALF_SIZE &&
+      Math.abs(point.y - position.y) <= boundary.size.y + RESOURCE_BLOCK_HALF_SIZE &&
+      Math.abs(point.z - position.z) <= boundary.size.z + RESOURCE_BLOCK_HALF_SIZE
     )
   }
 
@@ -488,7 +489,8 @@ function pointMatchesBoundary(
     const dx = point.x - position.x
     const dz = point.z - position.z
     const radialDistance = Math.sqrt(dx * dx + dz * dz)
-    const minY = position.y - RESOURCE_BLOCK_HALF_SIZE
+    // linear is half-height, range is [position.y - linear, position.y + linear]
+    const minY = position.y - boundary.size.linear - RESOURCE_BLOCK_HALF_SIZE
     const maxY = position.y + boundary.size.linear + RESOURCE_BLOCK_HALF_SIZE
     return (
       radialDistance <= boundary.size.r * radiusScale + RESOURCE_BLOCK_HALF_DIAGONAL &&
@@ -505,14 +507,25 @@ function pointMatchesBoundary(
       if (!start || !end) {
         continue
       }
-      if (distancePointToSegment(point, start, end) <= limit) {
+      // spline coordinates are relative to position
+      const worldStart = {
+        x: start.x + position.x,
+        y: start.y + position.y,
+        z: start.z + position.z
+      }
+      const worldEnd = {
+        x: end.x + position.x,
+        y: end.y + position.y,
+        z: end.z + position.z
+      }
+      if (distancePointToSegment(point, worldStart, worldEnd) <= limit) {
         return true
       }
     }
     return false
   }
 
-  const fallbackLimit = boundary.size.r + boundary.size.linear / 2 + RESOURCE_BLOCK_HALF_DIAGONAL
+  const fallbackLimit = boundary.size.r + boundary.size.linear + RESOURCE_BLOCK_HALF_DIAGONAL
   return squaredDistance(point, position) <= fallbackLimit * fallbackLimit
 }
 
@@ -522,20 +535,22 @@ function boundaryReachRadius(boundary: Boundary): number {
   }
 
   if (boundary.class === 'box') {
+    // size is half-extent
     return Math.sqrt(
-      (boundary.size.x / 2) * (boundary.size.x / 2) +
-        (boundary.size.y / 2) * (boundary.size.y / 2) +
-        (boundary.size.z / 2) * (boundary.size.z / 2)
+      boundary.size.x * boundary.size.x +
+        boundary.size.y * boundary.size.y +
+        boundary.size.z * boundary.size.z
     )
   }
 
   if (boundary.class === 'cylinder') {
+    // linear is half-height
     return Math.sqrt(
-      boundary.size.r * boundary.size.r + (boundary.size.linear / 2) * (boundary.size.linear / 2)
+      boundary.size.r * boundary.size.r + boundary.size.linear * boundary.size.linear
     )
   }
 
-  return boundary.size.r + boundary.size.linear / 2
+  return boundary.size.r + boundary.size.linear
 }
 
 function distancePointToArea(point: Vector3, area: RegionArea): number {
@@ -547,7 +562,18 @@ function distancePointToArea(point: Vector3, area: RegionArea): number {
       if (!start || !end) {
         continue
       }
-      bestDistance = Math.min(bestDistance, distancePointToSegment(point, start, end))
+      // spline coordinates are relative to position
+      const worldStart = {
+        x: start.x + area.position.x,
+        y: start.y + area.position.y,
+        z: start.z + area.position.z
+      }
+      const worldEnd = {
+        x: end.x + area.position.x,
+        y: end.y + area.position.y,
+        z: end.z + area.position.z
+      }
+      bestDistance = Math.min(bestDistance, distancePointToSegment(point, worldStart, worldEnd))
     }
     if (bestDistance < Number.POSITIVE_INFINITY) {
       return bestDistance
@@ -973,24 +999,40 @@ export function buildSectorJson(
   data: SaveResourcePoint[],
   sectorName: string
 ): SectorJsonData {
-  const ware: SectorJsonData['ware'] = {}
+  const wareMap = new Map<string, Map<string, SectorJsonResource>>()
 
   for (const entry of data) {
     const wareName = entry.ware
-    const yieldName = entry.yield_name
-    if (!ware[wareName]) {
-      ware[wareName] = {}
+    const key = `${entry.x},${entry.y},${entry.z}`
+
+    if (!wareMap.has(wareName)) {
+      wareMap.set(wareName, new Map())
     }
-    if (!ware[wareName]?.[yieldName]) {
-      ware[wareName]![yieldName] = { resources: [] }
+
+    const wareEntries = wareMap.get(wareName)!
+    const existing = wareEntries.get(key)
+
+    if (existing) {
+      // Merge yield_names if same position
+      if (!existing.yield_names.includes(entry.yield_name)) {
+        existing.yield_names.push(entry.yield_name)
+      }
+    } else {
+      wareEntries.set(key, {
+        yield_names: entry.yield_name ? [entry.yield_name] : [],
+        x: entry.x,
+        y: entry.y,
+        z: entry.z,
+        max: entry.max,
+        time: entry.time,
+        regions: []
+      })
     }
-    ware[wareName]![yieldName]!.resources.push({
-      x: entry.x,
-      y: entry.y,
-      z: entry.z,
-      max: entry.max,
-      time: entry.time
-    })
+  }
+
+  const ware: Record<string, SectorJsonResource[]> = {}
+  for (const [wareName, entries] of wareMap) {
+    ware[wareName] = Array.from(entries.values())
   }
 
   return {
@@ -1002,112 +1044,138 @@ export function buildSectorJson(
 function matchRegionsForPoint(
   sectorAreas: RegionArea[],
   ware: string,
-  yieldName: string,
-  resource: SectorJsonResource,
-  radiusScale = 1
+  yieldNames: string[],
+  resource: { x: number; y: number; z: number }
 ): Array<{ area: RegionArea; definition: ResourceDefinition }> {
   const point = { x: resource.x, y: resource.y, z: resource.z }
-  const matches: Array<{ area: RegionArea; definition: ResourceDefinition }> = []
 
+  // Stage 1: Filter by ware + yield_name
+  const candidates: Array<{ area: RegionArea; definition: ResourceDefinition }> = []
   for (const area of sectorAreas) {
     const definition = area.resources.find(
       (candidate) =>
         normalizeId(candidate.ware) === normalizeId(ware) &&
-        normalizeId(candidate.yield_name) === normalizeId(yieldName)
+        yieldNames.some((yn) => normalizeId(yn) === normalizeId(candidate.yield_name))
     )
-
-    if (!definition) {
-      continue
-    }
-
-    if (pointMatchesBoundary(point, area.position, area.boundary, radiusScale)) {
-      matches.push({ area, definition })
+    if (definition) {
+      candidates.push({ area, definition })
     }
   }
 
-  return matches
+  // If no candidates or only one, return directly (skip spatial matching)
+  if (candidates.length <= 1) {
+    return candidates
+  }
+
+  // Stage 2: Spatial matching from candidates
+  const spatialMatches: Array<{ area: RegionArea; definition: ResourceDefinition }> = []
+  for (const candidate of candidates) {
+    if (pointMatchesBoundary(point, candidate.area.position, candidate.area.boundary, 1)) {
+      spatialMatches.push(candidate)
+    }
+  }
+
+  // If spatial matches found, use them; otherwise fall back to all candidates
+  return spatialMatches.length > 0 ? spatialMatches : candidates
+}
+
+function isInCoreArea(x: number, y: number, z: number): boolean {
+  return (
+    Math.abs(x) <= CORE_AREA_XZ_LIMIT &&
+    Math.abs(z) <= CORE_AREA_XZ_LIMIT &&
+    Math.abs(y) <= CORE_AREA_Y_LIMIT
+  )
+}
+
+export type AggregationResult = {
+  sectorJson: SectorJsonData
+  totalJson: TotalJsonSector
+}
+
+export function aggregateSectorWithRegions(
+  sectorData: SectorJsonData,
+  context: ExtractContext
+): AggregationResult {
+  const regionsById = parseRegionDefinitions(context.regionsData)
+  const sectorAreasMap = buildSectorRegionAreas(context.resourceAreasData, regionsById)
+  const sectorAreas = sectorAreasMap.get(normalizeId(sectorData.sector_id)) ?? []
+
+  const updatedWare: Record<string, SectorJsonResource[]> = {}
+  const wareSummary: TotalJsonSector['ware'] = {}
+
+  for (const [wareName, resources] of Object.entries(sectorData.ware)) {
+    const overlapComponents = buildRegionOverlapComponents(sectorAreas, wareName)
+    const bucketMap = new Map<string, { refs: string[]; max: number; cutted: number }>()
+
+    const updatedResources: SectorJsonResource[] = []
+
+    for (const resource of resources) {
+      const matches = matchRegionsForPoint(
+        sectorAreas,
+        wareName,
+        resource.yield_names,
+        resource
+      )
+
+      // Direct match results for sector JSON (no overlap expansion)
+      const matchedRegionRefs = matches
+        .map((m) => m.area.ref)
+        .filter((ref, index, arr) => arr.indexOf(ref) === index)
+        .sort((left, right) => left.localeCompare(right))
+
+      updatedResources.push({
+        ...resource,
+        regions: matchedRegionRefs
+      })
+
+      // For total.json, expand to overlap components
+      const bucketRefs = new Set<string>()
+      if (matches.length > 0) {
+        for (const match of matches) {
+          for (const ref of overlapComponents.get(match.area.ref) ?? [match.area.ref]) {
+            bucketRefs.add(ref)
+          }
+        }
+      }
+
+      const expandedRefs = Array.from(bucketRefs).sort((left, right) => left.localeCompare(right))
+      const refsKey = expandedRefs.length > 0 ? expandedRefs.join('\u0001') : ''
+      const existing = bucketMap.get(refsKey) ?? { refs: expandedRefs, max: 0, cutted: 0 }
+      existing.max += resource.max
+      if (isInCoreArea(resource.x, resource.y, resource.z)) {
+        existing.cutted += resource.max
+      }
+      bucketMap.set(refsKey, existing)
+    }
+
+    updatedWare[wareName] = updatedResources
+
+    wareSummary[wareName] = Array.from(bucketMap.values())
+      .sort((left, right) => left.refs.join('|').localeCompare(right.refs.join('|')))
+      .map((bucket) => ({
+        max: bucket.max,
+        cutted: bucket.cutted,
+        regions: bucket.refs.length > 0 ? bucket.refs.map((ref) => ({ ref })) : [{ ref: '' }]
+      }))
+  }
+
+  return {
+    sectorJson: {
+      sector_id: sectorData.sector_id,
+      ware: updatedWare
+    },
+    totalJson: {
+      sector_id: normalizeId(sectorData.sector_id),
+      ware: wareSummary
+    }
+  }
 }
 
 export function aggregateSectorToTotal(
   sectorData: SectorJsonData,
   context: ExtractContext
 ): TotalJsonSector {
-  const regionsById = parseRegionDefinitions(context.regionsData)
-  const sectorAreasMap = buildSectorRegionAreas(context.resourceAreasData, regionsById)
-  const sectorAreas = sectorAreasMap.get(normalizeId(sectorData.sector_id)) ?? []
-  const wareSummary: TotalJsonSector['ware'] = {}
-
-  for (const [wareName, yields] of Object.entries(sectorData.ware)) {
-    const overlapComponents = buildRegionOverlapComponents(sectorAreas, wareName)
-    const bucketMap = new Map<string, { refs: string[]; max: number }>()
-
-    for (const [yieldName, resourceGroup] of Object.entries(yields)) {
-      for (const resource of resourceGroup.resources) {
-        const candidates = sectorAreas.filter((area) =>
-          area.resources.some(
-            (candidate) =>
-              normalizeId(candidate.ware) === normalizeId(wareName) &&
-              normalizeId(candidate.yield_name) === normalizeId(yieldName)
-          )
-        )
-        const candidateRefs = Array.from(new Set(candidates.map((area) => area.ref))).sort((left, right) =>
-          left.localeCompare(right)
-        )
-        const bucketRefs = new Set<string>()
-        if (candidateRefs.length === 1) {
-          for (const expanded of overlapComponents.get(candidateRefs[0]!) ?? [candidateRefs[0]!]) {
-            bucketRefs.add(expanded)
-          }
-        } else {
-          const matches = matchRegionsForPoint(sectorAreas, wareName, yieldName, resource, 1)
-          if (matches.length > 0) {
-            for (const match of matches) {
-              for (const ref of overlapComponents.get(match.area.ref) ?? [match.area.ref]) {
-                bucketRefs.add(ref)
-              }
-            }
-          } else {
-            const relaxedMatches = matchRegionsForPoint(sectorAreas, wareName, yieldName, resource, 2)
-            if (relaxedMatches.length > 0) {
-              for (const match of relaxedMatches) {
-                for (const ref of overlapComponents.get(match.area.ref) ?? [match.area.ref]) {
-                  bucketRefs.add(ref)
-                }
-              }
-            } else {
-              for (const ref of candidateRefs) {
-                for (const expanded of overlapComponents.get(ref) ?? [ref]) {
-                  bucketRefs.add(expanded)
-                }
-              }
-            }
-          }
-        }
-
-        if (bucketRefs.size === 0) {
-          bucketRefs.add('')
-        }
-
-        const refs = Array.from(bucketRefs).sort((left, right) => left.localeCompare(right))
-        const bucketKey = refs.join('\u0001')
-        const existing = bucketMap.get(bucketKey) ?? { refs, max: 0 }
-        existing.max += resource.max
-        bucketMap.set(bucketKey, existing)
-      }
-    }
-
-    wareSummary[wareName] = Array.from(bucketMap.values())
-      .sort((left, right) => left.refs.join('|').localeCompare(right.refs.join('|')))
-      .map((bucket) => ({
-        max: bucket.max,
-        regions: bucket.refs.map((ref) => ({ ref }))
-      }))
-  }
-
-  return {
-    sector_id: normalizeId(sectorData.sector_id),
-    ware: wareSummary
-  }
+  return aggregateSectorWithRegions(sectorData, context).totalJson
 }
 
 export function aggregateToTotal(

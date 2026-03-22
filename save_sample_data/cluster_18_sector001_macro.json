@@ -1,191 +1,227 @@
 {
   "sector_id": "cluster_18_sector001_macro",
   "ware": {
-    "ice": {
-      "medium": {
-        "resources": [
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 128000,
-            "max": 51021,
-            "time": 36000,
-            "resourcedensity": 15,
-            "falloff": 0.012975
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 64000,
-            "max": 51021,
-            "time": 36000,
-            "resourcedensity": 15,
-            "falloff": 0.012975
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 128000,
-            "max": 102042,
-            "time": 36000,
-            "resourcedensity": 15,
-            "falloff": 0.025951
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 64000,
-            "max": 102042,
-            "time": 36000,
-            "resourcedensity": 15,
-            "falloff": 0.025951
-          }
+    "ice": [
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 128000,
+        "max": 51021,
+        "time": 36000,
+        "regions": [
+          "p1_40km_ice_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 64000,
+        "max": 51021,
+        "time": 36000,
+        "regions": [
+          "p1_40km_ice_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 128000,
+        "max": 102042,
+        "time": 36000,
+        "regions": [
+          "p1_40km_ice_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 102042,
+        "time": 36000,
+        "regions": [
+          "p1_40km_ice_field"
         ]
       }
-    },
-    "methane": {
-      "medium": {
-        "resources": [
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -64000,
-            "max": 17324,
-            "time": 36000,
-            "resourcedensity": 25000,
-            "falloff": 0.69296
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -64000,
-            "max": 17324,
-            "time": 36000,
-            "resourcedensity": 25000,
-            "falloff": 0.69296
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -128000,
-            "max": 17324,
-            "time": 36000,
-            "resourcedensity": 25000,
-            "falloff": 0.69296
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -128000,
-            "max": 17324,
-            "time": 36000,
-            "resourcedensity": 25000,
-            "falloff": 0.69296
-          }
+    ],
+    "methane": [
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -64000,
+        "max": 17324,
+        "time": 36000,
+        "regions": [
+          "p1_40km_methane_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -64000,
+        "max": 17324,
+        "time": 36000,
+        "regions": [
+          "p1_40km_methane_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -128000,
+        "max": 17324,
+        "time": 36000,
+        "regions": [
+          "p1_40km_methane_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -128000,
+        "max": 17324,
+        "time": 36000,
+        "regions": [
+          "p1_40km_methane_field"
         ]
       }
-    },
-    "nividium": {
-      "medium": {
-        "resources": [
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -64000,
-            "max": 5,
-            "time": 604800,
-            "resourcedensity": 0.001,
-            "falloff": 0.019073
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -64000,
-            "max": 5,
-            "time": 604800,
-            "resourcedensity": 0.001,
-            "falloff": 0.019073
-          }
+    ],
+    "nividium": [
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -64000,
+        "max": 5,
+        "time": 604800,
+        "regions": [
+          "p1_40km_asteroid_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -64000,
+        "max": 5,
+        "time": 604800,
+        "regions": [
+          "p1_40km_asteroid_field"
         ]
       }
-    },
-    "ore": {
-      "medium": {
-        "resources": [
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -64000,
-            "max": 40809,
-            "time": 144000,
-            "resourcedensity": 6,
-            "falloff": 0.025946
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -64000,
-            "max": 40809,
-            "time": 144000,
-            "resourcedensity": 6,
-            "falloff": 0.025946
-          }
+    ],
+    "ore": [
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -64000,
+        "max": 40809,
+        "time": 144000,
+        "regions": [
+          "p1_40km_asteroid_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -64000,
+        "max": 40809,
+        "time": 144000,
+        "regions": [
+          "p1_40km_asteroid_field"
         ]
       }
-    },
-    "silicon": {
-      "medium": {
-        "resources": [
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -64000,
-            "max": 40815,
-            "time": 144000,
-            "resourcedensity": 6,
-            "falloff": 0.025949
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -64000,
-            "max": 40815,
-            "time": 144000,
-            "resourcedensity": 6,
-            "falloff": 0.025949
-          }
+    ],
+    "silicon": [
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -64000,
+        "max": 40815,
+        "time": 144000,
+        "regions": [
+          "p1_40km_asteroid_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -64000,
+        "max": 40815,
+        "time": 144000,
+        "regions": [
+          "p1_40km_asteroid_field"
         ]
       }
-    },
-    "hydrogen": {
-      "medhigh": {
-        "resources": [
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -64000,
-            "max": 173249,
-            "time": 108000,
-            "resourcedensity": 250000,
-            "falloff": 0.692996
-          }
+    ],
+    "hydrogen": [
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -64000,
+        "max": 173249,
+        "time": 108000,
+        "regions": [
+          "p1_40km_hydrogen_field"
         ]
       }
-    },
-    "helium": {
-      "medhigh": {
-        "resources": [
-          {
-            "x": 0,
-            "y": 0,
-            "z": -192000,
-            "max": 34649,
-            "time": 108000,
-            "resourcedensity": 50000,
-            "falloff": 0.69298
-          }
+    ],
+    "helium": [
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -192000,
+        "max": 34649,
+        "time": 108000,
+        "regions": [
+          "p1_40km_helium_field"
         ]
       }
-    }
+    ]
   }
 }
