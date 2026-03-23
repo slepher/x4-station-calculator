@@ -26,7 +26,7 @@ Important current boundary:
 - `local_noise` only implements the reverse-confirmed fast path in
   `FUN_1414f4840`, i.e. `cell_count > 16 -> F(maxnoise) - F(minnoise)`.
 - If a field/query combination falls into the small-cell branch, the script
-  stops with an explicit error instead of guessing.
+  now implements the small-cell path using the reverse-engineered algorithm.
 """
 
 from __future__ import annotations
@@ -38,6 +38,12 @@ import math
 from pathlib import Path
 import struct
 import xml.etree.ElementTree as ET
+
+from solid_noise_small_cell import (
+    generate_noise_table,
+    compute_local_noise_small_cell,
+    compute_cell_count,
+)
 
 
 AREA_SIZE = 64000.0
@@ -158,6 +164,7 @@ class SolidFieldState:
     seed: str = ""
     minnoisevalue: float = 0.0
     maxnoisevalue: float = 1.0
+    _noise_table: list[float] | None = field(default=None, repr=False)
 
 
 @dataclass
@@ -747,13 +754,15 @@ def compute_local_noise_fast_path_1414F4840(field: SolidFieldState) -> float:
     return f32(compute_noise_cdf_1414F5870(field.maxnoisevalue) - compute_noise_cdf_1414F5870(field.minnoisevalue))
 
 
-def assert_noise_fast_path_supported_1414F4840(field: SolidFieldState, tile_x: int, tile_y: int, tile_z: int) -> None:
+def compute_local_noise_1414F4840(field: SolidFieldState, tile_x: int, tile_y: int, tile_z: int) -> float:
+    """计算局部噪声值，支持小单元格路径和快路径"""
     min_x = (tile_x - AREA_HALF) / field.noisescale
     max_x = (tile_x + AREA_HALF) / field.noisescale
     min_y = (tile_y - AREA_HALF) / field.noisescale
     max_y = (tile_y + AREA_HALF) / field.noisescale
     min_z = (tile_z - AREA_HALF) / field.noisescale
     max_z = (tile_z + AREA_HALF) / field.noisescale
+
     cell_count = (
         max(math.ceil(max_x), math.floor(min_x) + 1) - math.floor(min_x)
     ) * (
@@ -761,10 +770,20 @@ def assert_noise_fast_path_supported_1414F4840(field: SolidFieldState, tile_x: i
     ) * (
         max(math.ceil(max_z), math.floor(min_z) + 1) - math.floor(min_z)
     )
+
     if cell_count < 17:
-        raise NotImplementedError(
-            f"local_noise small-cell path not implemented for {field.name} at {(tile_x, tile_y, tile_z)}; cell_count={cell_count}"
+        # 小单元格路径：生成 noise table 并计算
+        if field._noise_table is None:
+            field._noise_table = generate_noise_table(field.seed)
+        return compute_local_noise_small_cell(
+            field._noise_table,
+            min_x, max_x,
+            min_y, max_y,
+            min_z, max_z
         )
+    else:
+        # 快路径：使用 CDF 差值
+        return compute_local_noise_fast_path_1414F4840(field)
 
 
 def compute_cylinder_axial_interval_14093DD10(
@@ -1090,8 +1109,6 @@ def replay_region_solid_sum_weights_and_areas_v2_14073E110(
 
     for coord in enumerate_candidate_area_centers_for_64k_query_boxes_140760320(region, cut_mode):
         tile_x, tile_y, tile_z = world_coord_from_storage_coord_140760320(grid, coord)
-        for field in matching_fields:
-            assert_noise_fast_path_supported_1414F4840(field, tile_x, tile_y, tile_z)
 
         query = (float(tile_x), float(tile_y), float(tile_z))
         falloff_info = compute_falloff_weight_for_query_14073F750(region, query)
@@ -1102,7 +1119,7 @@ def replay_region_solid_sum_weights_and_areas_v2_14073E110(
         tile_total_float = 0.0
         tile_total = 0
         for field in matching_fields:
-            local_noise = compute_local_noise_fast_path_1414F4840(field)
+            local_noise = compute_local_noise_1414F4840(field, tile_x, tile_y, tile_z)
             area_value_float = (
                 compute_multiplier_b_140E803E0(field)
                 * compute_multiplier_a_140E80300(field)
