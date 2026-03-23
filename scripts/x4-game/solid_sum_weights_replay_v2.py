@@ -610,6 +610,7 @@ def parse_region_definition_140E80D20(field_ref: str) -> tuple[float, list[Solid
         if region.get("name") != field_ref:
             continue
         density = float(region.get("density", "1"))
+        # 只处理有 groupref 的 asteroid（资源 asteroid）
         field_defs = [
             SolidFieldDefinition(
                 groupref=str(node.get("groupref")),
@@ -620,6 +621,7 @@ def parse_region_definition_140E80D20(field_ref: str) -> tuple[float, list[Solid
                 maxnoisevalue=float(node.get("maxnoisevalue", "1")),
             )
             for node in region.find("fields").findall("asteroid")
+            if node.get("groupref") is not None  # 只包含资源 asteroid
         ]
         # 返回所有 resources
         resources = [
@@ -627,6 +629,30 @@ def parse_region_definition_140E80D20(field_ref: str) -> tuple[float, list[Solid
             for node in region.find("resources").findall("resource")
         ]
         return density, field_defs, resources
+
+    # Fallback: 从 regions.json 查找（用于 XML 中不存在的 region）
+    regions_by_id = index_regions_by_id()
+    if field_ref in regions_by_id:
+        region_json = regions_by_id[field_ref]
+        density = region_json.get("density", 1.0)
+        # 从 fields 列表构建 field_defs
+        field_defs = []
+        for field in region_json.get("fields", []):
+            field_defs.append(SolidFieldDefinition(
+                groupref=field.get("groupref", ""),
+                densityfactor=field.get("densityfactor", 1.0),
+                noisescale=field.get("noisescale", 15000.0),
+                seed=field.get("seed", ""),
+                minnoisevalue=field.get("minnoisevalue", 0.0),
+                maxnoisevalue=field.get("maxnoisevalue", 1.0),
+            ))
+        # 返回所有 resources
+        resources = [
+            (res.get("ware"), res.get("yield"))
+            for res in region_json.get("resources", [])
+        ]
+        return density, field_defs, resources
+
     raise ValueError(f"region definition not found: {field_ref}")
 
 
