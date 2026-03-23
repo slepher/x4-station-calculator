@@ -965,7 +965,7 @@ def replay_cylinder_field(field: NebulaFieldState) -> dict[str, object]:
     }
 
 
-def replay_splinetube_field(field: NebulaFieldState) -> dict[str, object]:
+def replay_splinetube_field_old(field: NebulaFieldState) -> dict[str, object]:
     bezier_points = build_sampled_spline_points_from_region_bezier_closure_14093E5C0(field)
     sampled_points = build_runtime_sampled_splinetube_points_14078EAC0(field)
     seg_lengths, accum, total_length = build_polyline_arclength_table_from_sampled_points_14093E5C0(sampled_points)
@@ -1264,7 +1264,8 @@ def replay_gas_area_values_for_field_14075BD20(field: NebulaFieldState) -> dict[
     if field.boundary_class == "box":
         return replay_box_field(field)
     if field.boundary_class == "splinetube":
-        return replay_splinetube_field(field)
+        from replay_splinetube import replay_splinetube_field_14075BD20
+        return replay_splinetube_field_14075BD20(field)
     raise ValueError(f"unsupported gas boundary class for replay: {field.boundary_class}")
 
 
