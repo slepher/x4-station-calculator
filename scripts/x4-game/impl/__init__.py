@@ -42,6 +42,17 @@ from .solid_replay import (
     load_save_sample_for_ware as load_solid_save_sample,
     load_total_sample_for_ware as load_solid_total_sample,
 )
+from .region_replay import (
+    replay_region_14073E110,
+    RegionReplayResult,
+    FieldReplayResult,
+    TileResult as UnifiedTileResult,
+    FieldInfo,
+    ResourceInfo,
+    is_gas_ware,
+    is_solid_field,
+    is_gas_field,
+)
 
 __all__ = [
     # Context
@@ -83,4 +94,14 @@ __all__ = [
     'replay_solid_region_14073E110',
     'load_solid_save_sample',
     'load_solid_total_sample',
+    # Unified region replay
+    'replay_region_14073E110',
+    'RegionReplayResult',
+    'FieldReplayResult',
+    'UnifiedTileResult',
+    'FieldInfo',
+    'ResourceInfo',
+    'is_gas_ware',
+    'is_solid_field',
+    'is_gas_field',
 ]
