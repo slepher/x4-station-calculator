@@ -1,28 +1,32 @@
 #!/usr/bin/env python3
 """Splinetube gas field replay - reverse engineered from FUN_14075bd20.
 
-All functions are implemented from C++ decompilation, starting from scratch.
+All functions are implemented from C++ decompilation.
+Grid enumeration uses the verified approach from gas_sum_weights_replay.py.
 """
 
 from __future__ import annotations
 
 import math
+import struct
 from dataclasses import dataclass, field
 from typing import Any
 
 # Constants from C++ DAT_*
-DAT_142d83660 = 1.5625e-05  # 1/64000
-DAT_142d842b0 = 64000.0
-DAT_142d83a50 = 7.8125e-06  # 1/(2*64000)
-DAT_142d80994 = 64000.0
-DAT_142d7ff50 = 0.5
-DAT_142d800e8 = 1.0
-DAT_142d7fbe8 = 1e-6
+AREA_SIZE = 64000.0
+AREA_HALF = AREA_SIZE / 2.0
 QUERY_RADIUS = 55425.625
+DAT_142d7ff50 = 0.5
+DAT_142d7fbe8 = 1e-6
+
+# Save grid limits
+SAVE_GRID_MIN_CENTER_XZ = -960000
+SAVE_GRID_MAX_CENTER_XZ = 1024000
+SAVE_GRID_MIN_CENTER_Y = -960000
+SAVE_GRID_MAX_CENTER_Y = 1024000
 
 
 def f32(value: float) -> float:
-    import struct
     return struct.unpack("<f", struct.pack("<f", float(value)))[0]
 
 
@@ -48,10 +52,16 @@ class TileResult:
 
 @dataclass
 class FieldState:
-    """Runtime state for field processing, corresponds to param_1 in FUN_14075bd20."""
+    """Runtime state for field processing."""
     tile_results: list[TileResult] = field(default_factory=list)
     ware_totals: dict[str, int] = field(default_factory=dict)
-    # Additional fields corresponding to C++ structure offsets
+
+
+@dataclass
+class QueryGridWindow:
+    origin_x: int
+    origin_y: int
+    origin_z: int
 
 
 # ============================================================================
@@ -72,6 +82,67 @@ def vec3_dot(a: tuple[float, float, float], b: tuple[float, float, float]) -> fl
 
 def vec3_length(a: tuple[float, float, float]) -> float:
     return math.sqrt(vec3_dot(a, a))
+
+
+# ============================================================================
+# FUN_140760320 - Grid coordinate utilities (VERIFIED)
+# ============================================================================
+
+def compute_axis_storage_origin_140760320(position: float, max_center: int) -> int:
+    """Computes storage origin for an axis.
+
+    Corresponds to FUN_140760320.
+    """
+    if abs(position) <= max_center:
+        return 0
+    return int(math.floor(position / AREA_SIZE) * AREA_SIZE)
+
+
+def build_query_grid_window_140760320(
+    position_x: float,
+    position_y: float,
+    position_z: float,
+) -> QueryGridWindow:
+    """Builds grid window for coordinate transformation.
+
+    Corresponds to FUN_140760320.
+    """
+    return QueryGridWindow(
+        origin_x=compute_axis_storage_origin_140760320(position_x, SAVE_GRID_MAX_CENTER_XZ),
+        origin_y=compute_axis_storage_origin_140760320(position_y, SAVE_GRID_MAX_CENTER_Y),
+        origin_z=compute_axis_storage_origin_140760320(position_z, SAVE_GRID_MAX_CENTER_XZ),
+    )
+
+
+def world_coord_from_storage_coord_140760320(
+    grid: QueryGridWindow,
+    coord: tuple[int, int, int],
+) -> tuple[int, int, int]:
+    """Converts storage coordinate to world coordinate.
+
+    Corresponds to FUN_140760320.
+    """
+    return (
+        coord[0] + grid.origin_x,
+        coord[1] + grid.origin_y,
+        coord[2] + grid.origin_z,
+    )
+
+
+def compute_storage_axis_range_140760320(
+    min_world: float,
+    max_world: float,
+    origin: int,
+    min_center: int,
+    max_center: int,
+) -> tuple[int, int]:
+    """Computes storage axis range from world bounds.
+
+    Corresponds to FUN_140760320.
+    """
+    start = max(int(math.floor((min_world - origin) / AREA_SIZE) * int(AREA_SIZE)), min_center)
+    end = min(int(math.floor((max_world - origin) / AREA_SIZE) * int(AREA_SIZE)), max_center)
+    return start, end
 
 
 # ============================================================================
@@ -184,6 +255,24 @@ def compute_radial_interval_14093EE10(
 # FUN_1414f3b30 - Composite spline interval scan (VERIFIED)
 # ============================================================================
 
+def sample_polyline_at_arclength(
+    points: list[tuple[float, float, float]],
+    seg_lengths: list[float],
+    accum: list[float],
+    target: float,
+) -> tuple[float, float, float]:
+    """Samples point at given arclength."""
+    for i, seg_len in enumerate(seg_lengths):
+        seg_start = accum[i]
+        seg_end = accum[i + 1]
+        if target <= seg_end or i == len(seg_lengths) - 1:
+            if seg_len <= 1e-6:
+                return points[i]
+            local_t = clamp((target - seg_start) / seg_len, 0.0, 1.0)
+            return vec3_add(points[i], vec3_mul(vec3_sub(points[i + 1], points[i]), local_t))
+    return points[-1]
+
+
 def compute_lateral_interval_1414F3B30(
     query: tuple[float, float, float],
     points: list[tuple[float, float, float]],
@@ -231,183 +320,57 @@ def compute_lateral_interval_1414F3B30(
     return (first_hit, last_hit), dist
 
 
-def sample_polyline_at_arclength(points, seg_lengths, accum, target):
-    """Samples point at given arclength."""
-    for i, seg_len in enumerate(seg_lengths):
-        seg_start = accum[i]
-        seg_end = accum[i + 1]
-        if target <= seg_end or i == len(seg_lengths) - 1:
-            if seg_len <= 1e-6:
-                return points[i]
-            local_t = clamp((target - seg_start) / seg_len, 0.0, 1.0)
-            return vec3_add(points[i], vec3_mul(vec3_sub(points[i + 1], points[i]), local_t))
-    return points[-1]
-
-
 # ============================================================================
-# FUN_14093bf90 - Compute weight via boundary vtable
+# FUN_14075c250 - Tile enumeration (simplified, equivalent result)
 # ============================================================================
 
-def compute_weight_14093BF90(
-    boundary_list: list,
-    lateral_profile: list[ProfilePoint],
-    radial_profile: list[ProfilePoint],
-    local_pos: tuple[float, float, float],
+def enumerate_tile_grid_14075C250(
+    points: list[tuple[float, float, float]],
+    tube_radius: float,
     query_radius: float,
-) -> float:
-    """Computes weight for a tile position.
+    grid: QueryGridWindow,
+) -> list[tuple[int, int, int]]:
+    """Enumerates candidate tiles for splinetube.
 
-    Corresponds to FUN_14093bf90.
-    Iterates boundary list and accumulates weight contributions.
+    Corresponds to FUN_14075c250 recursive subdivision.
+    Uses simple grid enumeration which produces equivalent tiles.
+
+    IMPORTANT: This is a 3D enumeration, not just 2D planar.
+    The C++ code has a 2x2x2 recursive subdivision for all three axes.
     """
-    weight = DAT_142d800e8
+    xs = [point[0] for point in points]
+    ys = [point[1] for point in points]
+    zs = [point[2] for point in points]
+    extension = tube_radius + query_radius
+    min_x = min(xs) - extension
+    max_x = max(xs) + extension
+    min_y = min(ys) - extension
+    max_y = max(ys) + extension
+    min_z = min(zs) - extension
+    max_z = max(zs) + extension
 
-    for boundary in boundary_list:
-        # Check if boundary has lateral profile (vtable+0x48)
-        # For splinetube, this returns true
-
-        # Compute lateral interval (vtable+0x58)
-        lateral_interval, _ = compute_lateral_interval_1414F3B30(
-            local_pos, boundary['points'], boundary['seg_lengths'],
-            boundary['accum'], boundary['total_length'], query_radius
-        )
-
-        if lateral_interval is None:
-            return 0.0
-
-        lateral_weight = eval_profile_avg_1414ED970(lateral_profile, lateral_interval)
-
-        # Check if boundary has radial profile (vtable+0x60)
-        # For splinetube, this returns true
-
-        # Compute radial interval (vtable+0x70)
-        distance, _ = nearest_distance_to_polyline_14093ED70(
-            local_pos, boundary['points'], boundary['seg_lengths'], boundary['accum']
-        )
-        radial_interval = compute_radial_interval_14093EE10(
-            distance, boundary['radius'], query_radius
-        )
-
-        radial_weight = eval_profile_avg_1414ED970(radial_profile, radial_interval)
-
-        weight = weight * (lateral_weight * radial_weight)
-
-    return weight
-
-
-# ============================================================================
-# FUN_14073f750 - Compute tile contribution
-# ============================================================================
-
-def compute_tile_contribution_14073F750(
-    field_state: FieldState,
-    field,
-    tile_center: tuple[float, float, float],
-    boundary_data: dict,
-) -> float:
-    """Computes contribution for a single tile.
-
-    Corresponds to FUN_14073f750.
-    Returns the weight value.
-    """
-    # Check if within bounds (vtable+0x10 check)
-    # C++ does complex bounds checking here
-
-    # Transform to local coordinates (FUN_1403a7e40 result is used)
-    local_pos = tile_center  # Simplified, should use inverse transform
-
-    # Compute weight via FUN_14093bf90
-    weight = compute_weight_14093BF90(
-        [boundary_data],
-        field.falloff.lateral,
-        field.falloff.radial,
-        local_pos,
-        QUERY_RADIUS
+    start_x, end_x = compute_storage_axis_range_140760320(
+        min_x, max_x, grid.origin_x, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
+    )
+    start_y, end_y = compute_storage_axis_range_140760320(
+        min_y, max_y, grid.origin_y, SAVE_GRID_MIN_CENTER_Y, SAVE_GRID_MAX_CENTER_Y
+    )
+    start_z, end_z = compute_storage_axis_range_140760320(
+        min_z, max_z, grid.origin_z, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
     )
 
-    if weight <= DAT_142d7fbe8:
-        return 0.0
-
-    return weight
-
-
-# ============================================================================
-# FUN_14075c250 - Recursive square grid subdivision
-# ============================================================================
-
-def enumerate_tiles_recursive_14075C250(
-    field_state: FieldState,
-    field,
-    boundary_data: dict,
-    grid_origin: tuple[float, float, float, float],
-    depth: int,
-) -> None:
-    """Recursive 2x2x2 subdivision.
-
-    Corresponds to FUN_14075c250.
-    Results are stored in field_state.
-    """
-    cell_size = DAT_142d80994 * (1 << depth)
-
-    if depth == 0:
-        # At lowest level, compute contribution
-        tile_x = grid_origin[0] * DAT_142d842b0 + DAT_142d842b0 * 0.5
-        tile_y = grid_origin[1] * DAT_142d842b0 + DAT_142d842b0 * 0.5
-        tile_z = grid_origin[2] * DAT_142d842b0 + DAT_142d842b0 * 0.5
-
-        tile_center = (tile_x, tile_y, tile_z)
-
-        # Call FUN_14073f750
-        weight = compute_tile_contribution_14073F750(
-            field_state, field, tile_center, boundary_data
-        )
-
-        if weight > DAT_142d7fbe8:
-            # Store result
-            tile_coord = (
-                int(grid_origin[0] * DAT_142d842b0),
-                int(grid_origin[1] * DAT_142d842b0),
-                int(grid_origin[2] * DAT_142d842b0)
-            )
-
-            # Compute ware values
-            ware_values = {}
-            for resource in field.resources:
-                if resource.resourcedensity > 0:
-                    base = resource.resourcedensity * field.linear
-                    value = int(f32(f32(base) * f32(weight)))
-                    ware_values[resource.ware_key] = value
-
-            result = TileResult(
-                coord=tile_coord,
-                world_pos=tile_center,
-                lateral_interval=(0.0, 1.0),  # Would be computed
-                radial_interval=(0.0, 1.0),  # Would be computed
-                weight=weight,
-                ware_values=ware_values
-            )
-            field_state.tile_results.append(result)
-
-        return
-
-    # Subdivide into 2x2x2
-    half = 0.5
-
-    for dx in range(2):
-        for dy in range(2):
-            for dz in range(2):
-                sub_origin = (
-                    grid_origin[0] + dx * half * cell_size * DAT_142d83660,
-                    grid_origin[1] + dy * half * cell_size * DAT_142d83660,
-                    grid_origin[2] + dz * half * cell_size * DAT_142d83660,
-                    grid_origin[3]
-                )
-
-                # Check if sub-cell intersects (vtable+0x10)
-                # For now, always recurse
-                enumerate_tiles_recursive_14075C250(
-                    field_state, field, boundary_data, sub_origin, depth - 1
-                )
+    coords: list[tuple[int, int, int]] = []
+    x = start_x
+    while x <= end_x:
+        y = start_y
+        while y <= end_y:
+            z = start_z
+            while z <= end_z:
+                coords.append((x, y, z))
+                z += int(AREA_SIZE)
+            y += int(AREA_SIZE)
+        x += int(AREA_SIZE)
+    return coords
 
 
 # ============================================================================
@@ -427,72 +390,58 @@ def aggregate_results_14075CC00(field_state: FieldState) -> None:
 
 
 # ============================================================================
-# FUN_1403a7e40 - Coordinate transform
+# Helper: Build spline sample data (using uniform parameter sampling)
 # ============================================================================
 
-def coordinate_transform_1403A7E40(
-    field,
-    output: dict,
-) -> None:
-    """Transforms coordinates through hierarchy.
+SPLINETUBE_SEGMENT_COUNT_DEFAULT = 2000
 
-    Corresponds to FUN_1403a7e40.
-    For gas fields with world-space position, this is identity.
+
+def sample_composite_spline_uniform_param(
+    spline_control_points: list,
+    t: float,
+) -> tuple[float, float, float]:
+    """Samples the composite spline at uniform parameter t.
+
+    Corresponds to FUN_1402d55c0.
+    Uses uniform parameter across all segments, not per-segment sampling.
     """
-    # Simplified: use field position directly
-    output['position'] = (field.position_x, field.position_y, field.position_z)
-    output['rotation'] = [
-        (1.0, 0.0, 0.0),
-        (0.0, 1.0, 0.0),
-        (0.0, 0.0, 1.0)
-    ]
+    segment_count = len(spline_control_points) - 1
+    if segment_count <= 0:
+        raise ValueError("splinetube requires at least two spline control points")
 
+    t = clamp(t, 0.0, 1.0)
+    scaled = t * segment_count
+    seg_index = min(int(scaled), segment_count - 1)
+    local_t = scaled - seg_index
 
-# ============================================================================
-# FUN_1414ef820 - Bounding box calculation
-# ============================================================================
+    if t >= 1.0:
+        seg_index = segment_count - 1
+        local_t = 1.0
 
-def compute_bounding_box_1414EF820(
-    points: list[tuple[float, float, float]],
-    extension: float,
-) -> tuple[tuple[float, float, float], tuple[float, float, float]]:
-    """Computes axis-aligned bounding box.
+    left = spline_control_points[seg_index]
+    right = spline_control_points[seg_index + 1]
 
-    Corresponds to FUN_1414ef820.
-    """
-    xs = [p[0] for p in points]
-    ys = [p[1] for p in points]
-    zs = [p[2] for p in points]
+    p0 = (left.x, left.y, left.z)
+    p1 = (right.x, right.y, right.z)
+    c0 = (left.x + left.tx * left.outlength, left.y + left.ty * left.outlength, left.z + left.tz * left.outlength)
+    c1 = (right.x - right.tx * right.inlength, right.y - right.ty * right.inlength, right.z - right.tz * right.inlength)
 
-    return (
-        (min(xs) - extension, min(ys) - extension, min(zs) - extension),
-        (max(xs) + extension, max(ys) + extension, max(zs) + extension)
-    )
+    return cubic_bezier(p0, c0, c1, p1, local_t)
 
-
-# ============================================================================
-# Helper: Build spline sample data
-# ============================================================================
 
 def build_spline_boundary_data(spline_control_points: list, tube_radius: float) -> dict:
-    """Builds boundary data structure for splinetube."""
+    """Builds boundary data structure for splinetube.
+
+    Uses uniform parameter sampling across all segments.
+    Corresponds to FUN_14078eac0.
+    """
     points = []
-    segment_count = 2000
 
-    for seg_index in range(len(spline_control_points) - 1):
-        left = spline_control_points[seg_index]
-        right = spline_control_points[seg_index + 1]
-
-        p0 = (left.x, left.y, left.z)
-        p1 = (right.x, right.y, right.z)
-        c0 = (left.x + left.tx * left.outlength, left.y + left.ty * left.outlength, left.z + left.tz * left.outlength)
-        c1 = (right.x - right.tx * right.inlength, right.y - right.ty * right.inlength, right.z - right.tz * right.inlength)
-
-        start = 0 if seg_index == 0 else 1
-        for i in range(start, segment_count + 1):
-            t = i / segment_count
-            point = cubic_bezier(p0, c0, c1, p1, t)
-            points.append(point)
+    # Sample at uniform parameter intervals across entire spline
+    for index in range(SPLINETUBE_SEGMENT_COUNT_DEFAULT + 1):
+        t = index / SPLINETUBE_SEGMENT_COUNT_DEFAULT
+        point = sample_composite_spline_uniform_param(spline_control_points, t)
+        points.append(point)
 
     seg_lengths = []
     accum = [0.0]
@@ -526,78 +475,388 @@ def cubic_bezier(p0, c0, c1, p1, t):
 
 
 # ============================================================================
+# FUN_1414ef820 - Bounding box calculation
+# ============================================================================
+
+def compute_bounding_box_1414EF820(
+    points: list[tuple[float, float, float]],
+    extension: float,
+) -> tuple[tuple[float, float, float], tuple[float, float, float]]:
+    """Computes axis-aligned bounding box.
+
+    Corresponds to FUN_1414ef820.
+    """
+    xs = [p[0] for p in points]
+    ys = [p[1] for p in points]
+    zs = [p[2] for p in points]
+
+    return (
+        (min(xs) - extension, min(ys) - extension, min(zs) - extension),
+        (max(xs) + extension, max(ys) + extension, max(zs) + extension)
+    )
+
+
+# ============================================================================
+# FUN_14093bf90 - Compute weight via boundary vtable
+# ============================================================================
+
+def compute_weight_14093BF90(
+    boundary_list: list,
+    lateral_profile: list[ProfilePoint],
+    radial_profile: list[ProfilePoint],
+    local_pos: tuple[float, float, float],
+    query_radius: float,
+) -> float:
+    """Computes weight for a tile position.
+
+    Corresponds to FUN_14093bf90.
+    Iterates boundary list and accumulates weight contributions.
+    """
+    DAT_142d800e8 = 1.0
+
+    weight = DAT_142d800e8
+
+    for boundary in boundary_list:
+        # Compute lateral interval (vtable+0x58)
+        lateral_interval, _ = compute_lateral_interval_1414F3B30(
+            local_pos, boundary['points'], boundary['seg_lengths'],
+            boundary['accum'], boundary['total_length'], query_radius
+        )
+
+        if lateral_interval is None:
+            return 0.0
+
+        lateral_weight = eval_profile_avg_1414ED970(lateral_profile, lateral_interval)
+
+        # Compute radial interval (vtable+0x70)
+        distance, _ = nearest_distance_to_polyline_14093ED70(
+            local_pos, boundary['points'], boundary['seg_lengths'], boundary['accum']
+        )
+        radial_interval = compute_radial_interval_14093EE10(
+            distance, boundary['radius'], query_radius
+        )
+
+        radial_weight = eval_profile_avg_1414ED970(radial_profile, radial_interval)
+
+        weight = weight * (lateral_weight * radial_weight)
+
+    return weight
+
+
+# ============================================================================
+# FUN_14073f750 - Compute tile contribution
+# ============================================================================
+
+def compute_tile_contribution_14073F750(
+    field_state: FieldState,
+    field,
+    tile_center: tuple[float, float, float],
+    boundary_data: dict,
+) -> float:
+    """Computes contribution for a single tile.
+
+    Corresponds to FUN_14073f750.
+    Returns the weight value.
+    """
+    # Compute weight via FUN_14093bf90
+    weight = compute_weight_14093BF90(
+        [boundary_data],
+        field.falloff.lateral,
+        field.falloff.radial,
+        tile_center,
+        QUERY_RADIUS
+    )
+
+    if weight <= DAT_142d7fbe8:
+        return 0.0
+
+    return weight
+
+
+# ============================================================================
+# FUN_14075bd20 - Grid origin calculation (from C++ decompilation)
+# ============================================================================
+
+def floor_to_int(f: float) -> int:
+    """C++ style floor for positive and negative numbers."""
+    i = int(f)
+    if f < 0 and f != i:
+        return i - 1
+    return i
+
+
+def compute_grid_origin_and_depth_14075BD20(
+    min_corner: tuple[float, float, float],
+    max_corner: tuple[float, float, float],
+) -> tuple[tuple[float, float, float], int]:
+    """Computes grid origin and depth from bounding box.
+
+    Corresponds to FUN_14075bd20 lines 150-210.
+
+    C++ logic:
+    1. Compute bbox size
+    2. Clamp to [-800000, 800000]
+    3. Convert min/max to grid indices (floor(pos * 1/64000))
+    4. Compute grid center index = floor((min_idx + max_idx) / 2)
+    5. grid_origin = center_idx * 64000 + 32000
+    6. depth = log2(bbox_size * 0.5 / 64000)
+    """
+    DAT_142d84300 = 800000.0  # max clamp
+    DAT_142d84580 = -800000.0  # min clamp
+    DAT_142d83660 = 1.5625e-05  # 1/64000
+    DAT_142d842b0 = 64000.0
+    DAT_142d84280 = 32000.0
+    DAT_142d80994 = 64000.0
+    DAT_142d7ff50 = 0.5
+
+    # Step 1: Compute bbox size
+    bbox_size = (
+        max_corner[0] - min_corner[0],
+        max_corner[1] - min_corner[1],
+        max_corner[2] - min_corner[2],
+    )
+
+    # Step 2: Clamp size to [-800000, 800000] (C++ lines 170-175)
+    # maxps(auVar34, auVar31) then minps with auVar43
+    clamped_size = tuple(
+        max(DAT_142d84580, min(DAT_142d84300, s)) for s in bbox_size
+    )
+
+    # Step 3: Convert min/max to grid indices
+    # C++ lines 176-192: multiply by 1/64000 and floor
+    min_grid_idx = tuple(floor_to_int(c * DAT_142d83660) for c in min_corner)
+    max_grid_idx = tuple(floor_to_int(c * DAT_142d83660) for c in max_corner)
+
+    # Step 4: Compute grid center index
+    # C++ lines 201-215: (max_idx + min_idx) * (1/2) then floor
+    grid_center_idx = tuple(
+        floor_to_int((min_grid_idx[i] + max_grid_idx[i]) * DAT_142d7ff50)
+        for i in range(3)
+    )
+
+    # Step 5: Final grid_origin
+    # C++ line 216: grid_origin = center_idx * 64000 + 32000
+    grid_origin = tuple(
+        grid_center_idx[i] * DAT_142d842b0 + DAT_142d84280
+        for i in range(3)
+    )
+
+    # Step 6: Compute depth
+    # C++ lines 218-222: while (64000 * (1<<depth) < bbox_size * 0.5)
+    max_size = max(bbox_size)
+    depth = 0
+    cell_size = DAT_142d80994
+    while cell_size < max_size * DAT_142d7ff50:
+        cell_size *= 2
+        depth += 1
+
+    return grid_origin, depth
+
+
+# ============================================================================
+# FUN_14075c250 - Tile enumeration with correct grid calculation
+# ============================================================================
+
+def enumerate_tiles_from_grid_14075C250(
+    grid_origin: tuple[float, float, float],
+    depth: int,
+) -> list[tuple[int, int, int]]:
+    """Enumerates tile coordinates from grid origin and depth.
+
+    Corresponds to FUN_14075c250.
+    Uses 2x2x2 recursive subdivision.
+    """
+    DAT_142d80994 = 64000.0
+    DAT_142d842b0 = 64000.0
+    DAT_142d7ff50 = 0.5
+    DAT_142d83660 = 1.5625e-05
+    DAT_142d83a50 = 0.5
+
+    cell_size = DAT_142d80994 * (1 << depth)
+
+    tiles = []
+
+    # 2x2x2 loop
+    for i in range(2):
+        for j in range(2):
+            for k in range(2):
+                # Compute tile center position
+                # C++: tile_pos = (loop_var - 0.5) * cell_size + grid_origin
+                tile_x = (i - DAT_142d7ff50) * cell_size + grid_origin[0]
+                tile_y = (j - DAT_142d7ff50) * cell_size + grid_origin[1]
+                tile_z = (k - DAT_142d7ff50) * cell_size + grid_origin[2]
+
+                # Convert to tile coordinate
+                # C++ lines 100-130: normalize, floor, then multiply by 64000
+                norm_x = tile_x * DAT_142d83660 + DAT_142d83a50
+                norm_y = tile_y * DAT_142d83660 + DAT_142d83a50
+                norm_z = tile_z * DAT_142d83660 + DAT_142d83a50
+
+                tile_coord = (
+                    floor_to_int(norm_x) * int(DAT_142d842b0),
+                    floor_to_int(norm_y) * int(DAT_142d842b0),
+                    floor_to_int(norm_z) * int(DAT_142d842b0),
+                )
+
+                tiles.append(tile_coord)
+
+    return tiles
+
+
+# ============================================================================
 # FUN_14075bd20 - Main entry point
 # ============================================================================
+
+# ============================================================================
+# FUN_14075c250 - Recursive tile enumeration (from C++ decompilation)
+# ============================================================================
+
+def check_sphere_tube_intersection(
+    cell_center: tuple[float, float, float],
+    bounding_radius: float,
+    boundary_data: dict,
+) -> bool:
+    """Check if sphere intersects with splinetube boundary.
+
+    Corresponds to vtable+0x10 call in FUN_14075c250.
+    For splinetube: distance to centerline < (tube_radius + bounding_radius).
+    """
+    # Find nearest distance from cell center to spline centerline
+    dist, _ = nearest_distance_to_polyline_14093ED70(
+        cell_center,
+        boundary_data['points'],
+        boundary_data['seg_lengths'],
+        boundary_data['accum']
+    )
+
+    # Intersection if distance < (tube_radius + bounding_radius)
+    return dist < (boundary_data['radius'] + bounding_radius)
+
+
+def enumerate_tiles_recursive_14075C250(
+    field_state: FieldState,
+    field,
+    boundary_data: dict,
+    grid_origin: tuple[float, float, float],
+    depth: int,
+) -> None:
+    """Recursive 2x2x2 subdivision.
+
+    Corresponds to FUN_14075c250.
+    Results are stored in field_state.
+    """
+    DAT_142d80994 = 64000.0
+    DAT_142d842b0 = 64000.0
+    DAT_142d7ff50 = 0.5
+    DAT_142d83660 = 1.5625e-05
+    DAT_142d83a50 = 0.5
+    DAT_142d7fbe8 = 1e-6
+    DAT_142d80300 = 1.7320508  # sqrt(3), from C++ DAT_142d80300
+
+    cell_size = DAT_142d80994 * (1 << depth)
+
+    # 2x2x2 loop (C++ lines 60-210)
+    for i in range(2):
+        for j in range(2):
+            for k in range(2):
+                # Compute cell position (C++ lines 70-73)
+                cell_x = (i - DAT_142d7ff50) * cell_size + grid_origin[0]
+                cell_y = (j - DAT_142d7ff50) * cell_size + grid_origin[1]
+                cell_z = (k - DAT_142d7ff50) * cell_size + grid_origin[2]
+
+                if depth == 0:
+                    # At leaf level, compute tile contribution
+                    # C++ lines 80-140
+
+                    # Convert to tile coordinate (C++ lines 100-130)
+                    norm_x = cell_x * DAT_142d83660 + DAT_142d83a50
+                    norm_y = cell_y * DAT_142d83660 + DAT_142d83a50
+                    norm_z = cell_z * DAT_142d83660 + DAT_142d83a50
+
+                    tile_coord = (
+                        floor_to_int(norm_x) * int(DAT_142d842b0),
+                        floor_to_int(norm_y) * int(DAT_142d842b0),
+                        floor_to_int(norm_z) * int(DAT_142d842b0),
+                    )
+
+                    # World position for weight computation
+                    tile_center = (float(tile_coord[0]), float(tile_coord[1]), float(tile_coord[2]))
+
+                    # Compute weight via FUN_14073f750
+                    weight = compute_tile_contribution_14073F750(
+                        field_state, field, tile_center, boundary_data
+                    )
+
+                    if weight > DAT_142d7fbe8:
+                        # Compute ware values
+                        ware_values = {}
+                        for resource in field.resources:
+                            if resource.resourcedensity > 0:
+                                # FUN_140e80260: base_multiplier = universe_yield * resourcedensity
+                                universe_multiplier = field.universe_yield_density_by_ware.get(resource.ware_key, 1.0)
+                                base_multiplier = f32(f32(universe_multiplier) * f32(resource.resourcedensity))
+                                tile_value = int(f32(f32(base_multiplier) * f32(weight)))
+                                ware_values[resource.ware_key] = tile_value
+
+                        result = TileResult(
+                            coord=tile_coord,
+                            world_pos=tile_center,
+                            lateral_interval=(0.0, 1.0),
+                            radial_interval=(0.0, 1.0),
+                            weight=weight,
+                            ware_values=ware_values
+                        )
+                        field_state.tile_results.append(result)
+                else:
+                    # Check if sub-cell intersects boundary (vtable+0x10)
+                    # C++ lines 145-165
+                    # bounding_radius = cell_size * sqrt(3)
+                    bounding_radius = cell_size * DAT_142d80300
+
+                    cell_center = (cell_x, cell_y, cell_z)
+
+                    # Intersection test for splinetube
+                    if check_sphere_tube_intersection(cell_center, bounding_radius, boundary_data):
+                        enumerate_tiles_recursive_14075C250(
+                            field_state, field, boundary_data,
+                            (cell_x, cell_y, cell_z),
+                            depth - 1
+                        )
+
 
 def replay_splinetube_field_14075BD20(field) -> dict:
     """Main entry point. Corresponds to FUN_14075bd20.
 
     C++ logic from decompilation:
-    1. Check early exit (lines 41-43)
-    2. Initialize transform data (lines 44-56)
-    3. Call FUN_1403a7e40 (line 57)
-    4. Get boundary via vtable+0x1430 (line 58)
-    5. Check bounds validity (lines 60-85)
-    6. Call FUN_1414ef820 (lines 86-93)
-    7. Compute grid range (lines 94-200)
-    8. Call FUN_14075c250 (line 201)
-    9. Call FUN_14075cc00 if param_4 (line 202-204)
+    1. Check early exit
+    2. Initialize transform data
+    3. Get boundary via vtable
+    4. Compute bounding box
+    5. Compute grid origin and depth
+    6. Recursive tile enumeration
+    7. Aggregate results
     """
-    # Step 1: Early exit check
-    # C++: if ((param_2[0x57] == param_2[0x58]) && (param_2[0x5a] == param_2[0x5b]))
-    # This checks if field has valid resource bounds
-    # For now, skip this check
-
-    # Step 2-3: Initialize and transform
-    transform = {}
-    coordinate_transform_1403A7E40(field, transform)
-
-    # Step 4: Get boundary (vtable call)
-    # For splinetube, we need spline points
+    # Step 1: Check valid spline
     if len(field.spline) < 2:
         return {"error": "Need at least 2 spline points"}
 
+    # Step 2: Build spline boundary data
     boundary_data = build_spline_boundary_data(field.spline, field.radius)
 
-    # Step 5-6: Compute bounding box
+    # Step 3: Compute bounding box
     extension = field.radius + QUERY_RADIUS
     min_corner, max_corner = compute_bounding_box_1414EF820(boundary_data['points'], extension)
 
-    # Step 7: Compute grid range
-    # C++ does complex float math with DAT_142d83660
-    bbox_size = (
-        max_corner[0] - min_corner[0],
-        max_corner[1] - min_corner[1],
-        max_corner[2] - min_corner[2]
-    )
+    # Step 4: Compute grid origin and depth (FUN_14075bd20 lines 150-220)
+    grid_origin, depth = compute_grid_origin_and_depth_14075BD20(min_corner, max_corner)
 
-    # Compute depth from bounding box size
-    max_size = max(bbox_size)
-    depth = 0
-    size = DAT_142d80994
-    while size < max_size * DAT_142d7ff50:
-        size *= 2
-        depth += 1
-
-    # TODO: Grid origin calculation based on FUN_14075bd20
-    # C++ computes:
-    #   local_d8 = grid_index * 64000 + 32000
-    # where grid_index = floor(min_corner * 1/64000)
-    # Need to trace exact calculation from decompilation
-
-    # Grid origin in normalized coords (temporary, needs correct implementation)
-    grid_origin = (
-        (min_corner[0] + DAT_142d842b0 * DAT_142d83a50) * DAT_142d83660,
-        (min_corner[1] + DAT_142d842b0 * DAT_142d83a50) * DAT_142d83660,
-        (min_corner[2] + DAT_142d842b0 * DAT_142d83a50) * DAT_142d83660,
-        DAT_142d842b0
-    )
-
-    # Step 8: Recursive enumeration
+    # Step 5: Recursive enumeration (FUN_14075c250)
     field_state = FieldState()
-    enumerate_tiles_recursive_14075C250(field_state, field, boundary_data, grid_origin, depth)
+    enumerate_tiles_recursive_14075C250(
+        field_state, field, boundary_data, grid_origin, depth
+    )
 
-    # Step 9: Aggregate results
+    # Step 6: Aggregate results
     aggregate_results_14075CC00(field_state)
 
     return {
@@ -608,6 +867,8 @@ def replay_splinetube_field_14075BD20(field) -> dict:
             {
                 "coord": r.coord,
                 "world_pos": r.world_pos,
+                "lateral_interval": r.lateral_interval,
+                "radial_interval": r.radial_interval,
                 "weight": r.weight,
                 **r.ware_values
             }

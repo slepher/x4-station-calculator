@@ -348,7 +348,7 @@ def vec_length(a: tuple[float, float, float]) -> float:
     return math.sqrt(dot(a, a))
 
 
-def cubic_bezier_sample_14093E5C0_14093E5C0(
+def cubic_bezier_sample_14093E5C0(
     p0: tuple[float, float, float],
     c0: tuple[float, float, float],
     c1: tuple[float, float, float],
@@ -766,6 +766,9 @@ def enumerate_tile_grid_recursive_14075C250(
     The actual C++ uses recursive subdivision for optimization (skipping empty regions).
     This implementation uses simple grid enumeration which produces the same tiles.
 
+    IMPORTANT: This is a 3D enumeration, not just 2D planar.
+    The C++ code has a 2x2x2 recursive subdivision for all three axes.
+
     Args:
         field: Nebula field state
         points: Sampled spline points
@@ -777,28 +780,37 @@ def enumerate_tile_grid_recursive_14075C250(
     """
     grid = build_query_grid_window_140760320(field.position_x, field.position_y, field.position_z)
     xs = [point[0] for point in points]
+    ys = [point[1] for point in points]
     zs = [point[2] for point in points]
     extension = tube_radius + query_radius
     min_x = min(xs) - extension
     max_x = max(xs) + extension
+    min_y = min(ys) - extension
+    max_y = max(ys) + extension
     min_z = min(zs) - extension
     max_z = max(zs) + extension
 
     start_x, end_x = compute_storage_axis_range_140760320(
         min_x, max_x, grid.origin_x, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
     )
+    start_y, end_y = compute_storage_axis_range_140760320(
+        min_y, max_y, grid.origin_y, SAVE_GRID_MIN_CENTER_Y, SAVE_GRID_MAX_CENTER_Y
+    )
     start_z, end_z = compute_storage_axis_range_140760320(
         min_z, max_z, grid.origin_z, SAVE_GRID_MIN_CENTER_XZ, SAVE_GRID_MAX_CENTER_XZ
     )
 
-    # Simple grid enumeration (equivalent to recursive subdivision result)
+    # 3D grid enumeration (equivalent to recursive subdivision result)
     coords: list[tuple[int, int, int]] = []
     x = start_x
     while x <= end_x:
-        z = start_z
-        while z <= end_z:
-            coords.append((x, 0, z))
-            z += int(AREA_SIZE)
+        y = start_y
+        while y <= end_y:
+            z = start_z
+            while z <= end_z:
+                coords.append((x, y, z))
+                z += int(AREA_SIZE)
+            y += int(AREA_SIZE)
         x += int(AREA_SIZE)
     return coords
 
