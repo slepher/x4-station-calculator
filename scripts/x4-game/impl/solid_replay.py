@@ -53,12 +53,15 @@ DATA_ROOT = PROJECT_ROOT / "src" / "assets" / "x4_game_data" / "8.0-Diplomacy" /
 RAW_ROOT = PROJECT_ROOT / "x4raw_assets" / "8.0-Diplomacy" / "libraries"
 RESOURCEAREAS_JSON = DATA_ROOT / "resourceareas.json"
 REGIONS_JSON = DATA_ROOT / "regions.json"
-REGION_DEFINITIONS_XML = RAW_ROOT / "region_definitions" / "final.xml"
 REGIONOBJECTGROUPS_XML = RAW_ROOT / "regionobjectgroups" / "final.xml"
 SAVE_SAMPLE_ROOT = PROJECT_ROOT / "save_sample_data"
 
 
 # Constants
+# C++ evidence from FUN_140e84c30:
+# - DAT_142d7fb4c = 9.999999717180685e-10 (scale factor)
+# - DAT_14329cc48 = 262144.0 (clamp upper bound)
+CLAMP_SCALE_140E84C30 = 9.999999717180685e-10
 CLAMP_UPPER_140E84C30 = 262144.0
 
 
@@ -97,6 +100,8 @@ class SolidResourceEntry:
     delay: float = 0.0
     gatherfactor: float = 1.0
     yield_name: str = ""
+    theoretical_reserve: float = 0.0
+    reserve: float = 0.0
 
 
 @dataclass
@@ -165,56 +170,40 @@ def find_sector_area_entry(sector_id: str, field_ref: str) -> dict:
 
 
 # ============================================================================
-# XML parsing for field definitions (FUN_140E80D20, FUN_140E950A0)
+# JSON parsing for field definitions (updated for regions.json with fields)
 # ============================================================================
 
-def parse_region_field_definitions_140E80D20(field_ref: str) -> list[AsteroidFieldDef]:
-    """Parse asteroid field definitions from region_definitions XML.
-
-    Corresponds to FUN_140E80D20 field parsing.
-
-    C++ evidence:
-    - Iterates over <fields> element
-    - Each <asteroid> has: groupref (0x2b), densityfactor (0x19),
-      noisescale, seed, minnoisevalue, maxnoisevalue
+def parse_field_definitions_from_json(region_json: dict) -> list[AsteroidFieldDef]:
+    """Parse asteroid field definitions from regions.json.
 
     Args:
-        field_ref: Region name to look up
+        region_json: Region dict from regions.json
 
     Returns:
         List of AsteroidFieldDef for the region
     """
-    if not REGION_DEFINITIONS_XML.exists():
+    fields_data = region_json.get("fields", [])
+    if not fields_data:
         return []
 
-    tree = ET.parse(REGION_DEFINITIONS_XML)
-    root = tree.getroot()
-
-    for region in root.findall("region"):
-        if region.get("name") != field_ref:
+    fields = []
+    for f in fields_data:
+        if f.get("tag") != "asteroid":
             continue
 
-        fields = []
-        fields_elem = region.find("fields")
-        if fields_elem is None:
-            return []
+        fields.append(AsteroidFieldDef(
+            groupref=f.get("groupref", ""),
+            densityfactor=float(f.get("densityfactor", 1.0)),
+            noisescale=float(f.get("noisescale", 5000.0)),
+            seed=str(f.get("seed", "")),
+            minnoisevalue=float(f.get("minnoisevalue", 0.0)),
+            maxnoisevalue=float(f.get("maxnoisevalue", 1.0)),
+            resourcepercentage=float(f.get("resourcepercentage", 100)) * 0.01,
+            rotation=float(f.get("rotation", 0.0)),
+            rotationvariation=float(f.get("rotationvariation", 0.0)),
+        ))
 
-        for asteroid in fields_elem.findall("asteroid"):
-            fields.append(AsteroidFieldDef(
-                groupref=asteroid.get("groupref", ""),
-                densityfactor=float(asteroid.get("densityfactor", "1.0")),
-                noisescale=float(asteroid.get("noisescale", "5000")),
-                seed=asteroid.get("seed", ""),
-                minnoisevalue=float(asteroid.get("minnoisevalue", "0")),
-                maxnoisevalue=float(asteroid.get("maxnoisevalue", "1")),
-                resourcepercentage=float(asteroid.get("resourcepercentage", "100")) * 0.01,
-                rotation=float(asteroid.get("rotation", "0")),
-                rotationvariation=float(asteroid.get("rotationvariation", "0")),
-            ))
-
-        return fields
-
-    return []
+    return fields
 
 
 def parse_region_object_groups_140E950A0() -> dict[str, RegionObjectGroup]:
@@ -329,6 +318,40 @@ def build_field_states_from_definitions(
 
 
 # ============================================================================
+# Clamp factor computation (FUN_140e84c30)
+# ============================================================================
+
+def compute_clamp_factor_140E84C30(volume_km3: float) -> float:
+    """Compute clamp factor for area contribution.
+
+    Corresponds to FUN_140e84c30 clamp calculation.
+
+    C++ code:
+        fVar6 = FUN_14093c2c0(field + 0x2b0);  // sum of asteroid volumes in m³
+        fVar20 = fVar6 * DAT_142d7fb4c;         // scale by ~1e-9
+        if (DAT_14329cc48 <= fVar20) {
+            fVar20 = DAT_14329cc48;             // clamp to 262144
+        }
+
+    Note: volume_km3 in the JSON represents the field's solid volume factor,
+    which is already scaled appropriately for the clamp calculation.
+    The factor ~1e-9 converts m³ to the clamp unit.
+
+    Args:
+        volume_km3: Volume factor from region data (already scaled)
+
+    Returns:
+        Clamp factor (min(volume_km3, 262144))
+    """
+    # The volume_km3 is already the effective volume factor
+    # (volume_m3 * 1e-9 gives the same value)
+    fVar20 = volume_km3
+    if fVar20 >= CLAMP_UPPER_140E84C30:
+        return CLAMP_UPPER_140E84C30
+    return fVar20
+
+
+# ============================================================================
 # Build solid region state from JSON (FUN_14073E110)
 # ============================================================================
 
@@ -408,12 +431,12 @@ def build_solid_region_state_14073E110(
         gatherspeedfactor=float(resource_entry.get("gatherfactor", 1.0)),
     )
 
-    # Get region density from XML (C++ evidence: region.@density)
+    # Get region density from JSON (C++ evidence: region.@density)
     region_density = float(region_json.get("density", 1.0))
 
-    # Parse field definitions from XML
-    # C++ evidence: FUN_14073e110 iterates <fields> to build field states
-    field_defs = parse_region_field_definitions_140E80D20(field_ref)
+    # Parse field definitions from JSON
+    # C++ evidence: FUN_14073e110 iterates fields to build field states
+    field_defs = parse_field_definitions_from_json(region_json)
 
     # Parse object groups for groupref resolution
     # C++ evidence: FUN_140e81ff0 looks up groupref in regionobjectgroups
@@ -424,6 +447,11 @@ def build_solid_region_state_14073E110(
     fields = build_field_states_from_definitions(
         field_defs, object_groups, payload, region_density
     )
+
+    # Get solid volume for clamp factor (FUN_14093c2c0, FUN_140e84c30)
+    # C++ evidence: fVar20 = min(volume_sum * 1e-9, 262144)
+    # volume_km3 is the pre-computed volume in km³
+    solid_volume_km3 = float(region_json.get("volume_km3", 0.0))
 
     return SolidRegionState(
         sector_id=sector_id,
@@ -442,6 +470,7 @@ def build_solid_region_state_14073E110(
         payload=payload,
         fields=fields,
         spline=spline,
+        solid_volume_km3=solid_volume_km3,
     )
 
 
@@ -578,18 +607,23 @@ def replay_solid_region_14073E110(
         boundary._ensure_sampled()
         box_min, box_max = compute_splinetube_bounding_box(region)
     else:
-        # Cylinder boundary
-        boundary = CylinderBoundary(region.position_x, region.position_y, region.position_z, region.radius, region.linear)
-        # Compute bounding box for cylinder
+        # Cylinder boundary: axis is vertical (along y-axis)
+        # p0 = (x, y - linear/2, z), p1 = (x, y + linear/2, z)
+        half_height = region.linear / 2.0
+        p0 = (region.position_x, region.position_y - half_height, region.position_z)
+        p1 = (region.position_x, region.position_y + half_height, region.position_z)
+        boundary = CylinderBoundary.from_endpoints(p0, p1, region.radius)
+        # Compute bounding box for cylinder, expanded by query radius
+        # C++ evidence: tiles can overlap with boundary even if center is outside
         box_min = (
-            region.position_x - region.radius,
-            region.position_y - region.linear / 2,
-            region.position_z - region.radius,
+            region.position_x - region.radius - QUERY_RADIUS_14073F750,
+            region.position_y - region.linear / 2 - QUERY_RADIUS_14073F750,
+            region.position_z - region.radius - QUERY_RADIUS_14073F750,
         )
         box_max = (
-            region.position_x + region.radius,
-            region.position_y + region.linear / 2,
-            region.position_z + region.radius,
+            region.position_x + region.radius + QUERY_RADIUS_14073F750,
+            region.position_y + region.linear / 2 + QUERY_RADIUS_14073F750,
+            region.position_z + region.radius + QUERY_RADIUS_14073F750,
         )
 
     # Build grid window
@@ -602,7 +636,51 @@ def replay_solid_region_14073E110(
     # Enumerate storage coords
     storage_coords = enumerate_storage_coords_for_bbox(box_min, box_max, grid, cut_mode)
 
-    # Process each tile
+    # ========================================================================
+    # Phase 1: Region allocation (FUN_14073e110 allocation phase)
+    # C++ evidence: Calculate sum_weights and per_field_value
+    # ========================================================================
+    sum_weights = 0.0
+    for field in region.fields:
+        # field_weight = MultiplierA * MultiplierB * noise_window
+        # C++ evidence: noise_window = F(maxnoise) - F(minnoise) where F is CDF
+        noise_window = compute_local_noise_fast_path_1414F4840(field)
+        field_weight = (
+            compute_multiplier_a_140E80300(field)
+            * compute_multiplier_b_140E803E0(field)
+            * noise_window
+        )
+        sum_weights += field_weight
+
+    # Calculate per_field_value = resourcedensity / sum_weights
+    resourcedensity = region.payload.resourcedensity
+    if sum_weights > 0:
+        per_field_value = resourcedensity / sum_weights
+    else:
+        per_field_value = 0.0
+
+    # Write back to fields (FUN_140e84990)
+    # C++ evidence:
+    # - If per_field_value <= 1.0: resourcepercentage = per_field_value, yield unchanged
+    # - If per_field_value > 1.0: resourcepercentage = 1.0, yield *= per_field_value
+    for field in region.fields:
+        if per_field_value > 1.0:
+            field.resourcepercentage = 1.0
+            field.yield_value *= per_field_value
+        else:
+            field.resourcepercentage = per_field_value
+            # yield_value unchanged
+
+    # ========================================================================
+    # Phase 2: Area contribution (FUN_140e84c30)
+    # C++ evidence: Compute per-tile contributions with normalized fields
+    # ========================================================================
+
+    # Compute clamp factor fVar20 from volume (FUN_140e84c30)
+    # C++ code: fVar20 = min(volume_sum * 1e-9, 262144)
+    # volume_km3 is already in km³, which matches the expected unit
+    clamp_factor = compute_clamp_factor_140E84C30(region.solid_volume_km3)
+
     per_tile: list[TileResult] = []
     ware_totals: dict[str, float] = {}
 
@@ -628,12 +706,15 @@ def replay_solid_region_14073E110(
             # Use fast path noise for now
             noise = compute_local_noise_fast_path_1414F4840(field)
 
-            # Compute weight
+            # Area contribution (FUN_140e84c30):
+            # result = resourcepercentage * MultiplierB * noise * MultiplierA * falloff * clamp_factor
             weight = (
-                compute_multiplier_a_140E80300(field)
+                field.resourcepercentage
                 * compute_multiplier_b_140E803E0(field)
-                * profile_weight
                 * noise
+                * compute_multiplier_a_140E80300(field)
+                * profile_weight
+                * clamp_factor
             )
 
             ware = field.ware_key

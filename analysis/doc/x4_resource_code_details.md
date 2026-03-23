@@ -448,6 +448,51 @@ poly
 return ((sign - sign / poly^4) + 1) * 0.5
 ```
 
+## 9. Area Contribution：`FUN_140e84c30`
+
+- 函数：
+  - `FUN_140e84c30`
+- 作用：
+  - 计算 solid field 单个 64k area 的资源贡献值
+
+### 核心公式
+
+```text
+result = resourcepercentage * MultiplierB * noise * MultiplierA * falloff * clamp_factor
+```
+
+### `clamp_factor` 计算
+
+```text
+volume_sum = FUN_14093c2c0(field + 0x2b0)  // 体积累计（单位：km³）
+clamp_factor = min(volume_sum * 1e-9, 262144)
+```
+
+C++ 常量：
+- `DAT_142d7fb4c = 9.999999717180685e-10`（缩放因子）
+- `DAT_14329cc48 = 262144.0`（上限）
+
+### 体积累计 `FUN_14093c2c0`
+
+```text
+volume_sum = sum(asteroid.volume for asteroid in field.asteroids)
+```
+
+每个 asteroid 的 volume 通过虚槽 `+0x78` 获取。
+
+### 验证结果
+
+对 `p1_40km_ice_field` 的 replay 测试：
+
+| Tile | Save | Computed | Error |
+|------|------|----------|-------|
+| (128000, 0, 0) | 51021 | 51029 | +0.02% |
+| (128000, 0, 64000) | 47700 | 47705 | +0.01% |
+| (192000, 0, 0) | 51021 | 51029 | +0.02% |
+| (192000, 0, 64000) | 38442 | 38446 | +0.01% |
+
+结论：area contribution 公式已正确实现。
+
 所以快路径下：
 
 ```text

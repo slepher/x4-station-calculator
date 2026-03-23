@@ -9,6 +9,7 @@ C++ functions:
 from __future__ import annotations
 
 import math
+import struct
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -16,16 +17,31 @@ if TYPE_CHECKING:
     from .solid_context import SolidFieldState
 
 
-# C++ constants
-NOISE_CLAMP_SCALE_140E84C30 = 9.999999717180685e-10
-NOISE_CDF_CENTER_1414F5870 = 0.5
-NOISE_CDF_SIGN_NEGATIVE_1414F5870 = -1.0
-NOISE_CDF_ABS_SCALE_1414F5870 = 4.5
-NOISE_CDF_LINEAR_1414F5870 = 0.30000001192092896
-NOISE_CDF_CROSS_1414F5870 = 0.0009720000089146197
-NOISE_CDF_QUAD_1414F5870 = 4.665377140045166
-NOISE_CDF_CROSS_SCALE_1414F5870 = 20.25
-NOISE_CDF_QUARTIC_1414F5870 = 32.02915954589844
+# C++ constants from FUN_1414F5870
+DAT_142d7ff50 = 0.5  # Center point
+DAT_142d80b2c = -1.0  # Negative sign
+DAT_142d800e8 = 1.0  # Positive sign / unity
+_DAT_142d80658 = 0.550000011920929  # Linear coefficient
+_DAT_142d80670 = 0.5554999709129333  # Quadratic coefficient
+_DAT_142d7feac = 0.2783930003643036  # Linear term
+_DAT_142d7fc20 = 0.0009720000089146197  # Cross term
+_DAT_142d807d0 = 0.5773502588272095  # 1/sqrt(3)
+_DAT_142d80808 = 0.5833333730697632  # Quartic coefficient
+
+
+def _float_to_bits(f: float) -> int:
+    """Convert float to its bit representation."""
+    return struct.unpack('<I', struct.pack('<f', f))[0]
+
+
+def _bits_to_float(b: int) -> float:
+    """Convert bit representation to float."""
+    return struct.unpack('<f', struct.pack('<I', b & 0xFFFFFFFF))[0]
+
+
+def _float_abs_bits(f: float) -> int:
+    """Get absolute value of float via bit manipulation."""
+    return _float_to_bits(f) & 0x7FFFFFFF
 
 
 def compute_noise_cdf_1414F5870(param_1: float) -> float:
@@ -34,35 +50,41 @@ def compute_noise_cdf_1414F5870(param_1: float) -> float:
     Corresponds to FUN_1414F5870.
 
     This is a CDF transformation applied to noise values.
+    The function maps [0, 1] to approximately [0, 1] with S-curve shape.
 
     Args:
         param_1: Input noise value (0-1 range)
 
     Returns:
-        Transformed noise value
+        Transformed noise value (approximately 0-1 range)
     """
-    # CDF transformation
-    fVar1 = param_1 - NOISE_CDF_CENTER_1414F5870  # -0.5 to 0.5
-    fVar2 = abs(fVar1) * NOISE_CDF_ABS_SCALE_1414F5870  # 0 to 2.25
+    # Center the input around 0.5
+    param_1 = param_1 - DAT_142d7ff50  # -0.5 to 0.5
 
-    # Sign handling
-    if fVar1 < 0:
-        sign = NOISE_CDF_SIGN_NEGATIVE_1414F5870
+    # Determine sign factor
+    if param_1 < 0.0:
+        fVar3 = DAT_142d80b2c  # -1.0
     else:
-        sign = 1.0
+        fVar3 = DAT_142d800e8  # 1.0
 
-    # Polynomial approximation
-    fVar3 = (
-        NOISE_CDF_LINEAR_1414F5870
-        + fVar2 * NOISE_CDF_CROSS_1414F5870
-        + fVar2 * fVar2 * NOISE_CDF_QUAD_1414F5870
-    )
+    # Get absolute value via bit manipulation
+    abs_param = _bits_to_float(_float_abs_bits(param_1))
 
-    fVar4 = fVar2 * fVar2 * NOISE_CDF_CROSS_SCALE_1414F5870  # 20.25
-    fVar5 = fVar4 * fVar2 * fVar2 * NOISE_CDF_QUARTIC_1414F5870
+    # Compute polynomial terms
+    fVar2 = abs_param * _DAT_142d80658  # Linear term
+
+    abs_sq = abs_param * abs_param
+    fVar1 = abs_sq * _DAT_142d80670  # Quadratic term
+
+    # Full polynomial: fVar1 = quad * quad_coeff + linear * linear_term + cross + quartic + 1
+    cross_term = fVar2 * _DAT_142d7fc20 * abs_sq * _DAT_142d807d0
+    quartic_term = abs_sq * abs_sq * _DAT_142d80808
+
+    fVar1 = fVar1 + fVar2 * _DAT_142d7feac + cross_term + quartic_term + DAT_142d800e8
 
     # Final computation
-    result = (sign * fVar3 * fVar5 + param_1) * 0.5 + 0.5
+    fVar1 = fVar1 * fVar1
+    result = ((fVar3 - fVar3 / (fVar1 * fVar1)) + DAT_142d800e8) * DAT_142d7ff50
 
     return result
 

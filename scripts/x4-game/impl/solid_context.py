@@ -129,6 +129,7 @@ class SolidRegionState:
     payload: RegionYieldPayload
     fields: list[SolidFieldState]
     spline: list[SplineControlPoint] = field(default_factory=list)
+    solid_volume_km3: float = 0.0  # Volume factor for clamp (FUN_14093c2c0)
 
 
 # Import FalloffProfiles from profile_eval
