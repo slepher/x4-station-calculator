@@ -48,32 +48,32 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 9850000,
-              "respawn": 10350000,
+              "reserve": 1550000,
+              "respawn": 1650000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 10350000,
-              "respawn": 8950000,
+              "reserve": 2650000,
+              "respawn": 2300000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 500,
+              "reserve": 500,
               "respawn": 600,
               "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 34790000,
-              "respawn": 38790000,
+              "reserve": 3130000,
+              "respawn": 3510000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 9700000,
-              "respawn": 10560000,
+              "reserve": 1700000,
+              "respawn": 1860000,
               "rating": 5
             }
           ],
@@ -220,44 +220,44 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 50000,
+              "reserve": 50000,
               "respawn": 85714,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 800000,
-              "respawn": 960000,
+              "reserve": 400000,
+              "respawn": 480000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 150000,
+              "reserve": 150000,
               "respawn": 205714,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 35000,
+              "reserve": 35000,
               "respawn": 74000,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 28300000,
-              "respawn": 31530000,
+              "reserve": 2900000,
+              "respawn": 3210000,
               "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 10000,
+              "reserve": 10000,
               "respawn": 24000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 14500000,
-              "respawn": 17400000,
+              "reserve": 1900000,
+              "respawn": 2280000,
               "rating": 5
             }
           ],
@@ -396,26 +396,26 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 2200000,
-              "respawn": 2520000,
+              "reserve": 700000,
+              "respawn": 780000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 1000,
+              "reserve": 1000,
               "respawn": 800,
               "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 11150000,
-              "respawn": 14305716,
+              "reserve": 1450000,
+              "respawn": 1894286,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 9650000,
-              "respawn": 12840000,
+              "reserve": 1350000,
+              "respawn": 1800000,
               "rating": 5
             }
           ],
@@ -620,26 +620,26 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 1400000,
-              "respawn": 1971428,
+              "reserve": 500000,
+              "respawn": 642857,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 13850000,
-              "respawn": 12287500,
+              "reserve": 2950000,
+              "respawn": 2637500,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 10900000,
-              "respawn": 11080000,
+              "reserve": 2300000,
+              "respawn": 2360000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 5100000,
-              "respawn": 5640000,
+              "reserve": 1200000,
+              "respawn": 1320000,
               "rating": 5
             }
           ],
@@ -824,26 +824,26 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 200000,
+              "reserve": 200000,
               "respawn": 235714,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 1000,
+              "reserve": 1000,
               "respawn": 800,
               "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 150000,
+              "reserve": 150000,
               "respawn": 150000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 365000,
-              "respawn": 660000,
+              "reserve": 145000,
+              "respawn": 255000,
               "rating": 5
             }
           ],
@@ -964,26 +964,26 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 47500000,
-              "respawn": 42500000,
+              "reserve": 7000000,
+              "respawn": 6000000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 13850000,
-              "respawn": 13050000,
+              "reserve": 3550000,
+              "respawn": 3150000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 125000,
-              "respawn": 53570,
+              "reserve": 25000,
+              "respawn": 10714,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 52650000,
-              "respawn": 49450000,
+              "reserve": 7150000,
+              "respawn": 6350000,
               "rating": 5
             }
           ],
@@ -1279,8 +1279,8 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 41600000,
-              "respawn": 40600000,
+              "reserve": 4800000,
+              "respawn": 4550000,
               "rating": 5
             }
           ],
@@ -1391,38 +1391,38 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 100000,
-              "respawn": 200000,
+              "reserve": 50000,
+              "respawn": 100000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 950000,
-              "respawn": 1165714,
+              "reserve": 350000,
+              "respawn": 445714,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 150000,
+              "reserve": 150000,
               "respawn": 150000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 1500,
+              "reserve": 1500,
               "respawn": 818,
               "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 100000,
-              "respawn": 200000,
+              "reserve": 50000,
+              "respawn": 100000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 250000,
-              "respawn": 600000,
+              "reserve": 50000,
+              "respawn": 120000,
               "rating": 5
             }
           ],
@@ -1541,20 +1541,20 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 100000,
+              "reserve": 100000,
               "respawn": 120000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 1000000,
-              "respawn": 1000000,
+              "reserve": 700000,
+              "respawn": 700000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 200000,
-              "respawn": 342858,
+              "reserve": 100000,
+              "respawn": 171429,
               "rating": 5
             }
           ],
@@ -1721,8 +1721,8 @@
           "resources": [
             {
               "ware": "ore",
-              "yield": 14600000,
-              "respawn": 13600000,
+              "reserve": 2700000,
+              "respawn": 2450000,
               "rating": 5
             }
           ],
@@ -1823,20 +1823,20 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 15800000,
-              "respawn": 16080000,
+              "reserve": 2700000,
+              "respawn": 2610000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 45000,
-              "respawn": 19287,
+              "reserve": 15000,
+              "respawn": 6429,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 5300000,
-              "respawn": 4680000,
+              "reserve": 1900000,
+              "respawn": 1560000,
               "rating": 5
             }
           ],
@@ -2542,26 +2542,26 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 200000,
+              "reserve": 200000,
               "respawn": 240000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 1150000,
-              "respawn": 1150000,
+              "reserve": 650000,
+              "respawn": 650000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 850000,
-              "respawn": 850000,
+              "reserve": 550000,
+              "respawn": 550000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 1800000,
-              "respawn": 2200000,
+              "reserve": 700000,
+              "respawn": 800000,
               "rating": 5
             }
           ],
@@ -2995,32 +2995,32 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 4000000,
-              "respawn": 4320000,
+              "reserve": 1000000,
+              "respawn": 1080000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 14400000,
-              "respawn": 14400000,
+              "reserve": 2400000,
+              "respawn": 2400000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 10000,
+              "reserve": 10000,
               "respawn": 3529,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2350000,
-              "respawn": 2350000,
+              "reserve": 950000,
+              "respawn": 950000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 6250000,
-              "respawn": 6750000,
+              "reserve": 1250000,
+              "respawn": 1350000,
               "rating": 5
             }
           ],
@@ -3504,26 +3504,26 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 100000,
+              "reserve": 100000,
               "respawn": 120000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 175000,
+              "reserve": 175000,
               "respawn": 200000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 540000,
-              "respawn": 690000,
+              "reserve": 270000,
+              "respawn": 345000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 200000,
-              "respawn": 342858,
+              "reserve": 100000,
+              "respawn": 171429,
               "rating": 5
             }
           ],
@@ -3733,26 +3733,26 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 50000,
+              "reserve": 50000,
               "respawn": 75000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 500,
+              "reserve": 500,
               "respawn": 600,
               "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 600000,
-              "respawn": 921429,
+              "reserve": 300000,
+              "respawn": 407143,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 960000,
-              "respawn": 1320000,
+              "reserve": 340000,
+              "respawn": 450000,
               "rating": 5
             }
           ],
@@ -3895,20 +3895,20 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 11600000,
-              "respawn": 10357500,
+              "reserve": 2400000,
+              "respawn": 2167500,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 8050000,
-              "respawn": 6442500,
+              "reserve": 2350000,
+              "respawn": 1897500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 7000000,
-              "respawn": 6437500,
+              "reserve": 2000000,
+              "respawn": 1812500,
               "rating": 5
             }
           ],
@@ -4115,26 +4115,26 @@
           "resources": [
             {
               "ware": "methane",
-              "yield": 18400000,
-              "respawn": 16150000,
+              "reserve": 3400000,
+              "respawn": 3025000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 570000,
-              "respawn": 131287,
+              "reserve": 210000,
+              "respawn": 46429,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 27100000,
-              "respawn": 20887500,
+              "reserve": 4600000,
+              "respawn": 3637500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 24850000,
-              "respawn": 23287500,
+              "reserve": 3950000,
+              "respawn": 3637500,
               "rating": 5
             }
           ],
@@ -4287,44 +4287,44 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 55000,
-              "respawn": 132000,
+              "reserve": 35000,
+              "respawn": 84000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 300000,
-              "respawn": 462858,
+              "reserve": 200000,
+              "respawn": 291429,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 550000,
-              "respawn": 630000,
+              "reserve": 350000,
+              "respawn": 390000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 300000,
-              "respawn": 462858,
+              "reserve": 200000,
+              "respawn": 291429,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 500,
+              "reserve": 500,
               "respawn": 600,
               "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 75000,
+              "reserve": 75000,
               "respawn": 125000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 110000,
-              "respawn": 205714,
+              "reserve": 80000,
+              "respawn": 145714,
               "rating": 5
             }
           ],
@@ -4663,37 +4663,37 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 235000,
-              "respawn": 395358,
+              "reserve": 135000,
+              "respawn": 223929,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 300000,
-              "respawn": 462858,
+              "reserve": 200000,
+              "respawn": 291429,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 60000,
-              "respawn": 144000,
+              "reserve": 30000,
+              "respawn": 72000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 500,
+              "reserve": 500,
               "respawn": 600,
               "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 135000,
+              "reserve": 135000,
               "respawn": 172500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 150000,
+              "reserve": 150000,
               "respawn": 150000,
               "rating": 5
             }
@@ -4879,38 +4879,38 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 100000,
+              "reserve": 100000,
               "respawn": 120000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 700000,
-              "respawn": 800000,
+              "reserve": 350000,
+              "respawn": 400000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 85000,
+              "reserve": 85000,
               "respawn": 138214,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 1000,
+              "reserve": 1000,
               "respawn": 800,
               "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 1475000,
-              "respawn": 1912500,
+              "reserve": 475000,
+              "respawn": 562500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1350000,
-              "respawn": 1620000,
+              "reserve": 450000,
+              "respawn": 540000,
               "rating": 5
             }
           ],
@@ -5265,32 +5265,32 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 800000,
-              "respawn": 960000,
+              "reserve": 400000,
+              "respawn": 480000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 500,
+              "reserve": 500,
               "respawn": 600,
               "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 950000,
-              "respawn": 1155000,
+              "reserve": 350000,
+              "respawn": 435000,
               "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 3200000,
-              "respawn": 3457500,
+              "reserve": 1100000,
+              "respawn": 1117500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 350000,
-              "respawn": 492858,
+              "reserve": 250000,
+              "respawn": 321429,
               "rating": 5
             }
           ],
@@ -5427,14 +5427,14 @@
           "resources": [
             {
               "ware": "ore",
-              "yield": 17100000,
-              "respawn": 11857500,
+              "reserve": 4400000,
+              "respawn": 2917500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 14400000,
-              "respawn": 12900000,
+              "reserve": 3600000,
+              "respawn": 2850000,
               "rating": 5
             }
           ],
@@ -5992,44 +5992,44 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 200000,
-              "respawn": 342858,
+              "reserve": 100000,
+              "respawn": 171429,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 2200000,
-              "respawn": 2520000,
+              "reserve": 700000,
+              "respawn": 780000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 690000,
-              "respawn": 1251429,
+              "reserve": 210000,
+              "respawn": 377143,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 25000,
+              "reserve": 25000,
               "respawn": 50000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 1500,
+              "reserve": 1500,
               "respawn": 818,
               "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 1250000,
-              "respawn": 1911428,
+              "reserve": 350000,
+              "respawn": 522857,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 735000,
-              "respawn": 924000,
+              "reserve": 345000,
+              "respawn": 408000,
               "rating": 5
             }
           ],
@@ -6415,26 +6415,26 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 29150000,
-              "respawn": 21662500,
+              "reserve": 5450000,
+              "respawn": 4037500,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 20650000,
-              "respawn": 19087500,
+              "reserve": 3650000,
+              "respawn": 3337500,
               "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 150000,
+              "reserve": 150000,
               "respawn": 150000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 28850000,
-              "respawn": 23850000,
+              "reserve": 5050000,
+              "respawn": 4050000,
               "rating": 5
             }
           ],
@@ -6638,20 +6638,20 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 14000000,
-              "respawn": 13000000,
+              "reserve": 3000000,
+              "respawn": 2750000,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 23650000,
-              "respawn": 21400000,
+              "reserve": 3850000,
+              "respawn": 3475000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 14350000,
-              "respawn": 13350000,
+              "reserve": 2950000,
+              "respawn": 2700000,
               "rating": 5
             }
           ],
@@ -6794,20 +6794,20 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 11750000,
-              "respawn": 10750000,
+              "reserve": 2750000,
+              "respawn": 2500000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 1275000,
-              "respawn": 289284,
+              "reserve": 275000,
+              "respawn": 63571,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 5550000,
-              "respawn": 5167500,
+              "reserve": 1650000,
+              "respawn": 1522500,
               "rating": 5
             }
           ],
@@ -6930,26 +6930,26 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 8400000,
-              "respawn": 8400000,
+              "reserve": 2100000,
+              "respawn": 2100000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 1275000,
-              "respawn": 289284,
+              "reserve": 275000,
+              "respawn": 63571,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 8700000,
-              "respawn": 8880000,
+              "reserve": 1800000,
+              "respawn": 1860000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 7150000,
-              "respawn": 7087500,
+              "reserve": 1850000,
+              "respawn": 1762500,
               "rating": 5
             }
           ],
@@ -7102,44 +7102,44 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 75000,
+              "reserve": 75000,
               "respawn": 125000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 4800000,
-              "respawn": 7405712,
+              "reserve": 800000,
+              "respawn": 1165714,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 5050000,
-              "respawn": 6030000,
+              "reserve": 850000,
+              "respawn": 990000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 5050000,
-              "respawn": 6030000,
+              "reserve": 850000,
+              "respawn": 990000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 9000,
-              "respawn": 7200,
+              "reserve": 3000,
+              "respawn": 2400,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 14500000,
-              "respawn": 15480000,
+              "reserve": 1900000,
+              "respawn": 2040000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 4900000,
-              "respawn": 5400000,
+              "reserve": 1100000,
+              "respawn": 1200000,
               "rating": 5
             }
           ],
@@ -7284,38 +7284,38 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 450000,
-              "respawn": 565714,
+              "reserve": 250000,
+              "respawn": 325714,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 2150000,
-              "respawn": 3222855,
+              "reserve": 550000,
+              "respawn": 788571,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 11650000,
-              "respawn": 11650000,
+              "reserve": 2150000,
+              "respawn": 2150000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 60000,
-              "respawn": 16000,
+              "reserve": 30000,
+              "respawn": 8000,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 3850000,
-              "respawn": 4350000,
+              "reserve": 950000,
+              "respawn": 1050000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 6000000,
-              "respawn": 6720000,
+              "reserve": 1200000,
+              "respawn": 1320000,
               "rating": 5
             }
           ],
@@ -7841,44 +7841,44 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 150000,
+              "reserve": 150000,
               "respawn": 150000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 800000,
-              "respawn": 1371428,
+              "reserve": 200000,
+              "respawn": 342857,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 400000,
-              "respawn": 480000,
+              "reserve": 200000,
+              "respawn": 240000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 20000,
+              "reserve": 20000,
               "respawn": 51000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 7500,
+              "reserve": 7500,
               "respawn": 2971,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2400000,
-              "respawn": 3291428,
+              "reserve": 600000,
+              "respawn": 822857,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2600000,
-              "respawn": 3492855,
+              "reserve": 700000,
+              "respawn": 878571,
               "rating": 5
             }
           ],
@@ -8139,13 +8139,13 @@
           "resources": [
             {
               "ware": "ore",
-              "yield": 30250000,
-              "respawn": 25187500,
+              "reserve": 4250000,
+              "respawn": 3687500,
               "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 50000,
+              "reserve": 50000,
               "respawn": 75000,
               "rating": 5
             }
@@ -8279,32 +8279,32 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 20900000,
-              "respawn": 19337500,
+              "reserve": 3600000,
+              "respawn": 3287500,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 55000,
-              "respawn": 22620,
+              "reserve": 25000,
+              "respawn": 9762,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 29850000,
-              "respawn": 22650000,
+              "reserve": 4950000,
+              "respawn": 3750000,
               "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 15000,
+              "reserve": 15000,
               "respawn": 36000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 17650000,
-              "respawn": 16380000,
+              "reserve": 2950000,
+              "respawn": 2715000,
               "rating": 5
             }
           ],
@@ -8601,20 +8601,20 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 2000000,
-              "respawn": 2400000,
+              "reserve": 600000,
+              "respawn": 720000,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 31400000,
-              "respawn": 25800000,
+              "reserve": 4300000,
+              "respawn": 3600000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 13500000,
-              "respawn": 15120000,
+              "reserve": 1800000,
+              "respawn": 1980000,
               "rating": 5
             }
           ],
@@ -8793,13 +8793,13 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 450000,
-              "respawn": 771429,
+              "reserve": 150000,
+              "respawn": 257143,
               "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 100000,
+              "reserve": 100000,
               "respawn": 120000,
               "rating": 5
             }
@@ -9249,26 +9249,26 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 600000,
-              "respawn": 921429,
+              "reserve": 300000,
+              "respawn": 407143,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 4350000,
-              "respawn": 4650000,
+              "reserve": 1450000,
+              "respawn": 1350000,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2550000,
-              "respawn": 2317500,
+              "reserve": 1250000,
+              "respawn": 1072500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 7250000,
-              "respawn": 6982500,
+              "reserve": 2150000,
+              "respawn": 1807500,
               "rating": 5
             }
           ],
@@ -9383,20 +9383,20 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 10400000,
-              "respawn": 9400000,
+              "reserve": 2400000,
+              "respawn": 2150000,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 12400000,
-              "respawn": 12400000,
+              "reserve": 2600000,
+              "respawn": 2600000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 9850000,
-              "respawn": 9287500,
+              "reserve": 2450000,
+              "respawn": 2262500,
               "rating": 5
             }
           ],
@@ -9517,20 +9517,20 @@
           "resources": [
             {
               "ware": "methane",
-              "yield": 4000000,
-              "respawn": 4320000,
+              "reserve": 1000000,
+              "respawn": 1080000,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 8950000,
-              "respawn": 9270000,
+              "reserve": 1450000,
+              "respawn": 1530000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 16600000,
-              "respawn": 16920000,
+              "reserve": 1900000,
+              "respawn": 1980000,
               "rating": 5
             }
           ],
@@ -9725,38 +9725,38 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 4500000,
-              "respawn": 5400000,
+              "reserve": 900000,
+              "respawn": 1080000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 29850000,
-              "respawn": 29850000,
+              "reserve": 3450000,
+              "respawn": 3450000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 700000,
-              "respawn": 720000,
+              "reserve": 400000,
+              "respawn": 420000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 1475000,
-              "respawn": 390476,
+              "reserve": 325000,
+              "respawn": 79524,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 9850000,
-              "respawn": 10350000,
+              "reserve": 1550000,
+              "respawn": 1650000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 3400000,
-              "respawn": 3400000,
+              "reserve": 1100000,
+              "respawn": 1100000,
               "rating": 5
             }
           ],
@@ -9972,20 +9972,20 @@
           "resources": [
             {
               "ware": "nividium",
-              "yield": 26000,
-              "respawn": 11844,
+              "reserve": 13000,
+              "respawn": 5922,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 25850000,
-              "respawn": 24287500,
+              "reserve": 4050000,
+              "respawn": 3737500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 10250000,
-              "respawn": 9750000,
+              "reserve": 2250000,
+              "respawn": 2100000,
               "rating": 5
             }
           ],
@@ -10110,14 +10110,14 @@
           "resources": [
             {
               "ware": "ore",
-              "yield": 16650000,
-              "respawn": 16087500,
+              "reserve": 3150000,
+              "respawn": 2962500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 5300000,
-              "respawn": 4680000,
+              "reserve": 1900000,
+              "respawn": 1560000,
               "rating": 5
             }
           ],
@@ -10550,26 +10550,26 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 17450000,
-              "respawn": 16207500,
+              "reserve": 2850000,
+              "respawn": 2617500,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 475000,
-              "respawn": 128572,
+              "reserve": 125000,
+              "respawn": 34286,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 21600000,
-              "respawn": 18400000,
+              "reserve": 4300000,
+              "respawn": 3500000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 10900000,
-              "respawn": 9517500,
+              "reserve": 2300000,
+              "respawn": 2047500,
               "rating": 5
             }
           ],
@@ -10680,26 +10680,26 @@
           "resources": [
             {
               "ware": "ore",
-              "yield": 14050000,
-              "respawn": 14767500,
+              "reserve": 2450000,
+              "respawn": 2422500,
               "rating": 5
             },
             {
               "ware": "rawkhaakscrap",
-              "yield": 70000,
-              "respawn": 168000,
+              "reserve": 40000,
+              "respawn": 96000,
               "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 32400000,
-              "respawn": 25862500,
+              "reserve": 5200000,
+              "respawn": 4212500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 8500000,
-              "respawn": 7020000,
+              "reserve": 2500000,
+              "respawn": 1980000,
               "rating": 5
             }
           ],
@@ -10872,38 +10872,38 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 160000,
+              "reserve": 160000,
               "respawn": 174000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 1050000,
-              "respawn": 1230000,
+              "reserve": 450000,
+              "respawn": 510000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 16750000,
-              "respawn": 15750000,
+              "reserve": 3250000,
+              "respawn": 3000000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 495000,
-              "respawn": 163056,
+              "reserve": 105000,
+              "respawn": 33176,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 14000000,
-              "respawn": 12437500,
+              "reserve": 3000000,
+              "respawn": 2687500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 6900000,
-              "respawn": 6337500,
+              "reserve": 2100000,
+              "respawn": 1912500,
               "rating": 5
             }
           ],
@@ -11004,44 +11004,44 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 450000,
-              "respawn": 565714,
+              "reserve": 250000,
+              "respawn": 325714,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 600000,
-              "respawn": 921429,
+              "reserve": 300000,
+              "respawn": 407143,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 9750000,
-              "respawn": 7562500,
+              "reserve": 2250000,
+              "respawn": 1812500,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 300000,
-              "respawn": 462858,
+              "reserve": 200000,
+              "respawn": 291429,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 340000,
-              "respawn": 92572,
+              "reserve": 110000,
+              "respawn": 30286,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 4400000,
-              "respawn": 4150000,
+              "reserve": 1600000,
+              "respawn": 1475000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 11650000,
-              "respawn": 10650000,
+              "reserve": 2650000,
+              "respawn": 2400000,
               "rating": 5
             }
           ],
@@ -11156,32 +11156,32 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 11850000,
-              "respawn": 11287500,
+              "reserve": 2550000,
+              "respawn": 2362500,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 8000000,
-              "respawn": 8070000,
+              "reserve": 1800000,
+              "respawn": 1755000,
               "rating": 5
             },
             {
               "ware": "rawkhaakscrap",
-              "yield": 35000,
+              "reserve": 35000,
               "respawn": 74000,
               "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 16900000,
-              "respawn": 16830000,
+              "reserve": 2300000,
+              "respawn": 2235000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 25650000,
-              "respawn": 19487500,
+              "reserve": 4050000,
+              "respawn": 3162500,
               "rating": 5
             }
           ],
@@ -11297,32 +11297,32 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 300000,
-              "respawn": 462858,
+              "reserve": 200000,
+              "respawn": 291429,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 15850000,
-              "respawn": 15287500,
+              "reserve": 3050000,
+              "respawn": 2862500,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 1300000,
-              "respawn": 1260000,
+              "reserve": 900000,
+              "respawn": 780000,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 27100000,
-              "respawn": 27100000,
+              "reserve": 3800000,
+              "respawn": 3800000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 28750000,
-              "respawn": 25562500,
+              "reserve": 4750000,
+              "respawn": 4062500,
               "rating": 5
             }
           ],
@@ -11428,26 +11428,26 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 12350000,
-              "respawn": 10162500,
+              "reserve": 2950000,
+              "respawn": 2512500,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 90000,
-              "respawn": 31764,
+              "reserve": 30000,
+              "respawn": 10588,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 14150000,
-              "respawn": 13087500,
+              "reserve": 2650000,
+              "respawn": 2437500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 11650000,
-              "respawn": 9062500,
+              "reserve": 3550000,
+              "respawn": 2687500,
               "rating": 5
             }
           ],
@@ -11516,26 +11516,26 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 5950000,
-              "respawn": 6270000,
+              "reserve": 1450000,
+              "respawn": 1530000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 360000,
-              "respawn": 77906,
+              "reserve": 180000,
+              "respawn": 38952,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 6900000,
-              "respawn": 6517500,
+              "reserve": 1800000,
+              "respawn": 1672500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 6100000,
-              "respawn": 4300000,
+              "reserve": 2300000,
+              "respawn": 1700000,
               "rating": 5
             }
           ],
@@ -11674,38 +11674,38 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 1750000,
-              "respawn": 1830000,
+              "reserve": 650000,
+              "respawn": 690000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 5750000,
-              "respawn": 4830000,
+              "reserve": 1650000,
+              "respawn": 1440000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 9100000,
-              "respawn": 8537500,
+              "reserve": 2300000,
+              "respawn": 2112500,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 8650000,
-              "respawn": 7650000,
+              "reserve": 2350000,
+              "respawn": 2100000,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 4950000,
-              "respawn": 4950000,
+              "reserve": 1650000,
+              "respawn": 1650000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1500000,
-              "respawn": 1680000,
+              "reserve": 600000,
+              "respawn": 660000,
               "rating": 5
             }
           ],
@@ -11855,26 +11855,26 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 13600000,
-              "respawn": 13600000,
+              "reserve": 2200000,
+              "respawn": 2200000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 500,
+              "reserve": 500,
               "respawn": 600,
               "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 8000000,
-              "respawn": 7937500,
+              "reserve": 2000000,
+              "respawn": 1937500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 3350000,
-              "respawn": 3100000,
+              "reserve": 1450000,
+              "respawn": 1325000,
               "rating": 5
             }
           ],
@@ -11971,26 +11971,26 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 6400000,
-              "respawn": 6720000,
+              "reserve": 1600000,
+              "respawn": 1680000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 3500,
+              "reserve": 3500,
               "respawn": 1400,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 6050000,
-              "respawn": 6067500,
+              "reserve": 1350000,
+              "respawn": 1327500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 10850000,
-              "respawn": 10600000,
+              "reserve": 1950000,
+              "respawn": 1825000,
               "rating": 5
             }
           ],
@@ -12087,26 +12087,26 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 4250000,
-              "respawn": 3450000,
+              "reserve": 1750000,
+              "respawn": 1350000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 90000,
-              "respawn": 31764,
+              "reserve": 30000,
+              "respawn": 10588,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 4250000,
-              "respawn": 3630000,
+              "reserve": 1750000,
+              "respawn": 1410000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 6000000,
-              "respawn": 4380000,
+              "reserve": 2100000,
+              "respawn": 1560000,
               "rating": 5
             }
           ],
@@ -12218,38 +12218,38 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 2250000,
-              "respawn": 2430000,
+              "reserve": 750000,
+              "respawn": 810000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 3000000,
-              "respawn": 2970000,
+              "reserve": 1100000,
+              "respawn": 1005000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 11850000,
-              "respawn": 9450000,
+              "reserve": 3150000,
+              "respawn": 2550000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 3600000,
-              "respawn": 2800000,
+              "reserve": 1800000,
+              "respawn": 1400000,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 9150000,
-              "respawn": 7350000,
+              "reserve": 2850000,
+              "respawn": 2250000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 19000000,
-              "respawn": 15250000,
+              "reserve": 4000000,
+              "respawn": 3250000,
               "rating": 5
             }
           ],
@@ -12467,38 +12467,38 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 1750000,
-              "respawn": 1867500,
+              "reserve": 850000,
+              "respawn": 847500,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 2600000,
-              "respawn": 2537500,
+              "reserve": 1200000,
+              "respawn": 1137500,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 2750000,
-              "respawn": 2707500,
+              "reserve": 950000,
+              "respawn": 907500,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 625000,
-              "respawn": 178570,
+              "reserve": 125000,
+              "respawn": 35714,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 6900000,
-              "respawn": 6337500,
+              "reserve": 2100000,
+              "respawn": 1912500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 11500000,
-              "respawn": 11500000,
+              "reserve": 2500000,
+              "respawn": 2500000,
               "rating": 5
             }
           ],
@@ -12681,32 +12681,32 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 200000,
-              "respawn": 342858,
+              "reserve": 100000,
+              "respawn": 171429,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 300000,
-              "respawn": 462858,
+              "reserve": 200000,
+              "respawn": 291429,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 200000,
-              "respawn": 342858,
+              "reserve": 100000,
+              "respawn": 171429,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 5250000,
-              "respawn": 5820000,
+              "reserve": 1250000,
+              "respawn": 1380000,
               "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 6300000,
-              "respawn": 7290000,
+              "reserve": 1300000,
+              "respawn": 1470000,
               "rating": 5
             }
           ],
@@ -12835,38 +12835,38 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 900000,
-              "respawn": 892500,
+              "reserve": 700000,
+              "respawn": 652500,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 7150000,
-              "respawn": 7087500,
+              "reserve": 1850000,
+              "respawn": 1762500,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 4600000,
-              "respawn": 4350000,
+              "reserve": 1700000,
+              "respawn": 1575000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 25000,
+              "reserve": 25000,
               "respawn": 7143,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 14400000,
-              "respawn": 13050000,
+              "reserve": 3300000,
+              "respawn": 2850000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 7050000,
-              "respawn": 7050000,
+              "reserve": 1950000,
+              "respawn": 1950000,
               "rating": 5
             }
           ],
@@ -12975,26 +12975,26 @@
           "resources": [
             {
               "ware": "methane",
-              "yield": 5000,
+              "reserve": 5000,
               "respawn": 15000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 20000,
-              "respawn": 8572,
+              "reserve": 10000,
+              "respawn": 4286,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 5250000,
-              "respawn": 4657500,
+              "reserve": 1850000,
+              "respawn": 1567500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 8650000,
-              "respawn": 9150000,
+              "reserve": 1850000,
+              "respawn": 1950000,
               "rating": 5
             }
           ],
@@ -13315,8 +13315,8 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 31400000,
-              "respawn": 25800000,
+              "reserve": 4300000,
+              "respawn": 3600000,
               "rating": 5
             }
           ],
@@ -13425,26 +13425,26 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 1800000,
-              "respawn": 2160000,
+              "reserve": 600000,
+              "respawn": 720000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 13650000,
-              "respawn": 13087500,
+              "reserve": 2850000,
+              "respawn": 2662500,
               "rating": 5
             },
             {
               "ware": "rawkhaakscrap",
-              "yield": 70000,
-              "respawn": 160000,
+              "reserve": 60000,
+              "respawn": 130000,
               "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 3750000,
-              "respawn": 3750000,
+              "reserve": 1050000,
+              "respawn": 1050000,
               "rating": 5
             }
           ],
@@ -13538,38 +13538,38 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 50000,
+              "reserve": 50000,
               "respawn": 85714,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 240000,
-              "respawn": 410000,
+              "reserve": 120000,
+              "respawn": 205000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 200000,
-              "respawn": 342858,
+              "reserve": 100000,
+              "respawn": 171429,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 500,
+              "reserve": 500,
               "respawn": 600,
               "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 3100000,
-              "respawn": 3600000,
+              "reserve": 800000,
+              "respawn": 900000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 3150000,
-              "respawn": 3330000,
+              "reserve": 1050000,
+              "respawn": 1110000,
               "rating": 5
             }
           ],
@@ -13825,38 +13825,38 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 550000,
-              "respawn": 605358,
+              "reserve": 450000,
+              "respawn": 433929,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 1650000,
-              "respawn": 1830000,
+              "reserve": 750000,
+              "respawn": 810000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 850000,
-              "respawn": 787500,
+              "reserve": 550000,
+              "respawn": 487500,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 225000,
-              "respawn": 82142,
+              "reserve": 75000,
+              "respawn": 25000,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 12650000,
-              "respawn": 11087500,
+              "reserve": 2850000,
+              "respawn": 2537500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 5850000,
-              "respawn": 5287500,
+              "reserve": 1950000,
+              "respawn": 1762500,
               "rating": 5
             }
           ],
@@ -14015,20 +14015,20 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 5400000,
-              "respawn": 4600000,
+              "reserve": 2100000,
+              "respawn": 1700000,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 8250000,
-              "respawn": 7687500,
+              "reserve": 2250000,
+              "respawn": 2062500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 10400000,
-              "respawn": 9400000,
+              "reserve": 2600000,
+              "respawn": 2350000,
               "rating": 5
             }
           ],
@@ -15208,20 +15208,20 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 4200000,
-              "respawn": 3720000,
+              "reserve": 1700000,
+              "respawn": 1380000,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 8100000,
-              "respawn": 6637500,
+              "reserve": 2400000,
+              "respawn": 1987500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 9150000,
-              "respawn": 7530000,
+              "reserve": 2550000,
+              "respawn": 2010000,
               "rating": 5
             }
           ],
@@ -15356,26 +15356,26 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 3800000,
-              "respawn": 3630000,
+              "reserve": 1300000,
+              "respawn": 1215000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 34150000,
-              "respawn": 26662500,
+              "reserve": 5950000,
+              "respawn": 4537500,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 17850000,
-              "respawn": 17050000,
+              "reserve": 3450000,
+              "respawn": 3050000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 18900000,
-              "respawn": 17100000,
+              "reserve": 3900000,
+              "respawn": 3300000,
               "rating": 5
             }
           ],
@@ -15514,26 +15514,26 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 3600000,
-              "respawn": 3262500,
+              "reserve": 1600000,
+              "respawn": 1387500,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 3000000,
-              "respawn": 2280000,
+              "reserve": 1500000,
+              "respawn": 1140000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 5850000,
-              "respawn": 5287500,
+              "reserve": 1950000,
+              "respawn": 1762500,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 10800000,
-              "respawn": 7680000,
+              "reserve": 2800000,
+              "respawn": 2040000,
               "rating": 5
             }
           ],
@@ -15658,26 +15658,26 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 4600000,
-              "respawn": 4037500,
+              "reserve": 1700000,
+              "respawn": 1512500,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 16350000,
-              "respawn": 11850000,
+              "reserve": 3450000,
+              "respawn": 2550000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 8650000,
-              "respawn": 7650000,
+              "reserve": 2350000,
+              "respawn": 2100000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 33500000,
-              "respawn": 24420000,
+              "reserve": 5000000,
+              "respawn": 3720000,
               "rating": 5
             }
           ],
@@ -15778,8 +15778,8 @@
           "resources": [
             {
               "ware": "rawscrap",
-              "yield": 14150000,
-              "respawn": 12562500,
+              "reserve": 3550000,
+              "respawn": 2887500,
               "rating": 5
             }
           ],
@@ -15890,32 +15890,32 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 3800000,
-              "respawn": 2730000,
+              "reserve": 1900000,
+              "respawn": 1365000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 6250000,
-              "respawn": 5430000,
+              "reserve": 1750000,
+              "respawn": 1560000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 20500,
-              "respawn": 9172,
+              "reserve": 10500,
+              "respawn": 4886,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 12250000,
-              "respawn": 11687500,
+              "reserve": 2750000,
+              "respawn": 2562500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 14500000,
-              "respawn": 12700000,
+              "reserve": 3500000,
+              "respawn": 2900000,
               "rating": 5
             }
           ],
@@ -16143,8 +16143,8 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 53150000,
-              "respawn": 35362500,
+              "reserve": 8450000,
+              "respawn": 5587500,
               "rating": 5
             }
           ],
@@ -16406,56 +16406,56 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 50000,
+              "reserve": 50000,
               "respawn": 85714,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 150000,
+              "reserve": 150000,
               "respawn": 205714,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 1850000,
-              "respawn": 2742855,
+              "reserve": 550000,
+              "respawn": 728571,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 225000,
-              "respawn": 450000,
+              "reserve": 75000,
+              "respawn": 150000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 3500,
+              "reserve": 3500,
               "respawn": 1400,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 8000000,
-              "respawn": 7200000,
+              "reserve": 2500000,
+              "respawn": 2100000,
               "rating": 5
             },
             {
               "ware": "rawkhaakscrap",
-              "yield": 35000,
-              "respawn": 96000,
+              "reserve": 25000,
+              "respawn": 66000,
               "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 2185000,
-              "respawn": 2773928,
+              "reserve": 685000,
+              "respawn": 845357,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 3800000,
-              "respawn": 3630000,
+              "reserve": 1300000,
+              "respawn": 1215000,
               "rating": 5
             }
           ],
@@ -16717,14 +16717,14 @@
           "resources": [
             {
               "ware": "ore",
-              "yield": 6850000,
-              "respawn": 6850000,
+              "reserve": 1550000,
+              "respawn": 1550000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 3150000,
-              "respawn": 3330000,
+              "reserve": 1050000,
+              "respawn": 1110000,
               "rating": 5
             }
           ],
@@ -16855,7 +16855,7 @@
           "resources": [
             {
               "ware": "rawscrap",
-              "yield": 150000,
+              "reserve": 150000,
               "respawn": 205714,
               "rating": 5
             }
@@ -16987,20 +16987,20 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 19400000,
-              "respawn": 15112500,
+              "reserve": 3200000,
+              "respawn": 2587500,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 7750000,
-              "respawn": 7750000,
+              "reserve": 1750000,
+              "respawn": 1750000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 7300000,
-              "respawn": 8280000,
+              "reserve": 1300000,
+              "respawn": 1440000,
               "rating": 5
             }
           ],
@@ -17453,14 +17453,14 @@
           "resources": [
             {
               "ware": "ore",
-              "yield": 14600000,
-              "respawn": 10000000,
+              "reserve": 3900000,
+              "respawn": 2750000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 15000000,
-              "respawn": 12750000,
+              "reserve": 3000000,
+              "respawn": 2625000,
               "rating": 5
             }
           ],
@@ -17618,14 +17618,14 @@
           "resources": [
             {
               "ware": "ore",
-              "yield": 6750000,
-              "respawn": 7530000,
+              "reserve": 1650000,
+              "respawn": 1590000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 15000000,
-              "respawn": 11130000,
+              "reserve": 3300000,
+              "respawn": 2415000,
               "rating": 5
             }
           ],
@@ -17711,44 +17711,44 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 17000000,
-              "respawn": 14012500,
+              "reserve": 4000000,
+              "respawn": 3162500,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 17750000,
-              "respawn": 18030000,
+              "reserve": 2850000,
+              "respawn": 2760000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 28400000,
-              "respawn": 23550000,
+              "reserve": 4700000,
+              "respawn": 3900000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 17450000,
-              "respawn": 16207500,
+              "reserve": 2850000,
+              "respawn": 2617500,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 141000,
-              "respawn": 54400,
+              "reserve": 36000,
+              "respawn": 12400,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 15450000,
-              "respawn": 13207500,
+              "reserve": 3250000,
+              "respawn": 2707500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 8650000,
-              "respawn": 8087500,
+              "reserve": 2350000,
+              "respawn": 2162500,
               "rating": 5
             }
           ],
@@ -18364,8 +18364,8 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 27000000,
-              "respawn": 22980000,
+              "reserve": 4400000,
+              "respawn": 3540000,
               "rating": 5
             }
           ],
@@ -18708,14 +18708,14 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 31050000,
-              "respawn": 27330000,
+              "reserve": 4650000,
+              "respawn": 3810000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 18850000,
-              "respawn": 15137500,
+              "reserve": 3850000,
+              "respawn": 3137500,
               "rating": 5
             }
           ],
@@ -18797,32 +18797,32 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 8650000,
-              "respawn": 6062500,
+              "reserve": 3050000,
+              "respawn": 2187500,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 15650000,
-              "respawn": 15900000,
+              "reserve": 2350000,
+              "respawn": 2325000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 10150000,
-              "respawn": 10650000,
+              "reserve": 2150000,
+              "respawn": 2250000,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 13600000,
-              "respawn": 12037500,
+              "reserve": 2300000,
+              "respawn": 1987500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 15400000,
-              "respawn": 14400000,
+              "reserve": 3100000,
+              "respawn": 2850000,
               "rating": 5
             }
           ],
@@ -19079,14 +19079,14 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 7000000,
-              "respawn": 6437500,
+              "reserve": 2000000,
+              "respawn": 1812500,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 19850000,
-              "respawn": 18287500,
+              "reserve": 3450000,
+              "respawn": 3137500,
               "rating": 5
             }
           ],
@@ -19322,38 +19322,38 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 3950000,
-              "respawn": 4020000,
+              "reserve": 1350000,
+              "respawn": 1305000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 5650000,
-              "respawn": 5580000,
+              "reserve": 1550000,
+              "respawn": 1485000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 11050000,
-              "respawn": 11050000,
+              "reserve": 2450000,
+              "respawn": 2450000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 60000,
-              "respawn": 16000,
+              "reserve": 30000,
+              "respawn": 8000,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 9850000,
-              "respawn": 7650000,
+              "reserve": 3150000,
+              "respawn": 2400000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 15900000,
-              "respawn": 13200000,
+              "reserve": 3400000,
+              "respawn": 2700000,
               "rating": 5
             }
           ],
@@ -19481,38 +19481,38 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 7350000,
-              "respawn": 5550000,
+              "reserve": 2550000,
+              "respawn": 1950000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 10250000,
-              "respawn": 9750000,
+              "reserve": 2250000,
+              "respawn": 2100000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 11000000,
-              "respawn": 10920000,
+              "reserve": 2500000,
+              "respawn": 2220000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 245000,
-              "respawn": 72859,
+              "reserve": 85000,
+              "respawn": 25714,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 12550000,
-              "respawn": 9592500,
+              "reserve": 2750000,
+              "respawn": 2152500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 11600000,
-              "respawn": 10357500,
+              "reserve": 2400000,
+              "respawn": 2167500,
               "rating": 5
             }
           ],
@@ -19635,44 +19635,44 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 5300000,
-              "respawn": 4680000,
+              "reserve": 1900000,
+              "respawn": 1560000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 2750000,
-              "respawn": 2580000,
+              "reserve": 1150000,
+              "respawn": 1065000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 11650000,
-              "respawn": 10650000,
+              "reserve": 2650000,
+              "respawn": 2400000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 1950000,
-              "respawn": 2310000,
+              "reserve": 750000,
+              "respawn": 870000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 6500,
+              "reserve": 6500,
               "respawn": 2961,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 5300000,
-              "respawn": 4680000,
+              "reserve": 1900000,
+              "respawn": 1560000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 5300000,
-              "respawn": 4680000,
+              "reserve": 1900000,
+              "respawn": 1560000,
               "rating": 5
             }
           ],
@@ -19807,38 +19807,38 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 3400000,
-              "respawn": 4080000,
+              "reserve": 800000,
+              "respawn": 960000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 8650000,
-              "respawn": 6930000,
+              "reserve": 2450000,
+              "respawn": 1890000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 3450000,
-              "respawn": 2670000,
+              "reserve": 1550000,
+              "respawn": 1170000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 15000,
+              "reserve": 15000,
               "respawn": 4000,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 8750000,
-              "respawn": 7750000,
+              "reserve": 2250000,
+              "respawn": 2000000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 13650000,
-              "respawn": 11400000,
+              "reserve": 2850000,
+              "respawn": 2475000,
               "rating": 5
             }
           ],
@@ -20134,44 +20134,44 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 5650000,
-              "respawn": 5400000,
+              "reserve": 1850000,
+              "respawn": 1725000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 30750000,
-              "respawn": 21362500,
+              "reserve": 5750000,
+              "respawn": 4112500,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 11900000,
-              "respawn": 11400000,
+              "reserve": 2400000,
+              "respawn": 2250000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 20350000,
-              "respawn": 13950000,
+              "reserve": 4650000,
+              "respawn": 3300000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 340000,
-              "respawn": 92572,
+              "reserve": 110000,
+              "respawn": 30286,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 14500000,
-              "respawn": 14917500,
+              "reserve": 2500000,
+              "respawn": 2452500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 11750000,
-              "respawn": 10750000,
+              "reserve": 2750000,
+              "respawn": 2500000,
               "rating": 5
             }
           ],
@@ -20268,44 +20268,44 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 18900000,
-              "respawn": 17100000,
+              "reserve": 3900000,
+              "respawn": 3300000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 8900000,
-              "respawn": 8400000,
+              "reserve": 2100000,
+              "respawn": 1950000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 21250000,
-              "respawn": 19980000,
+              "reserve": 3250000,
+              "respawn": 3015000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 11650000,
-              "respawn": 9062500,
+              "reserve": 3550000,
+              "respawn": 2687500,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 5000,
+              "reserve": 5000,
               "respawn": 1667,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 14250000,
-              "respawn": 10262500,
+              "reserve": 3750000,
+              "respawn": 2712500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 16850000,
-              "respawn": 12900000,
+              "reserve": 3850000,
+              "respawn": 2925000,
               "rating": 5
             }
           ],
@@ -20433,44 +20433,44 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 27600000,
-              "respawn": 19950000,
+              "reserve": 5100000,
+              "respawn": 3675000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 24600000,
-              "respawn": 18250000,
+              "reserve": 5100000,
+              "respawn": 3775000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 35150000,
-              "respawn": 22221428,
+              "reserve": 5750000,
+              "respawn": 3642857,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 17850000,
-              "respawn": 13170000,
+              "reserve": 3650000,
+              "respawn": 2730000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 3500,
+              "reserve": 3500,
               "respawn": 1400,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 14750000,
-              "respawn": 11762500,
+              "reserve": 3750000,
+              "respawn": 2912500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 15100000,
-              "respawn": 11887500,
+              "reserve": 3100000,
+              "respawn": 2512500,
               "rating": 5
             }
           ],
@@ -20552,38 +20552,38 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 23000000,
-              "respawn": 17612500,
+              "reserve": 5000000,
+              "respawn": 3762500,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 34150000,
-              "respawn": 26662500,
+              "reserve": 5950000,
+              "respawn": 4537500,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 46650000,
-              "respawn": 33850000,
+              "reserve": 7050000,
+              "respawn": 5150000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 22050000,
-              "respawn": 15433928,
+              "reserve": 4450000,
+              "respawn": 3155357,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 14350000,
-              "respawn": 13882500,
+              "reserve": 2650000,
+              "respawn": 2467500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 12000000,
-              "respawn": 9905355,
+              "reserve": 3000000,
+              "respawn": 2341071,
               "rating": 5
             }
           ],
@@ -20760,32 +20760,32 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 7400000,
-              "respawn": 5812500,
+              "reserve": 2800000,
+              "respawn": 2137500,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 25250000,
-              "respawn": 21817500,
+              "reserve": 4150000,
+              "respawn": 3472500,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 1425000,
-              "respawn": 461273,
+              "reserve": 225000,
+              "respawn": 63627,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 21750000,
-              "respawn": 20550000,
+              "reserve": 3750000,
+              "respawn": 3150000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 14250000,
-              "respawn": 16050000,
+              "reserve": 2250000,
+              "respawn": 2250000,
               "rating": 5
             }
           ],
@@ -20944,8 +20944,8 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 36850000,
-              "respawn": 32700000,
+              "reserve": 5350000,
+              "respawn": 4575000,
               "rating": 5
             }
           ],
@@ -21078,38 +21078,38 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 22750000,
-              "respawn": 21780000,
+              "reserve": 3350000,
+              "respawn": 3135000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 14750000,
-              "respawn": 13950000,
+              "reserve": 3250000,
+              "respawn": 2850000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 1000,
+              "reserve": 1000,
               "respawn": 800,
               "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 150000,
+              "reserve": 150000,
               "respawn": 205714,
               "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 3850000,
-              "respawn": 4350000,
+              "reserve": 950000,
+              "respawn": 1050000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 200000,
-              "respawn": 342858,
+              "reserve": 100000,
+              "respawn": 171429,
               "rating": 5
             }
           ],
@@ -21244,26 +21244,26 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 30500000,
-              "respawn": 18300000,
+              "reserve": 5500000,
+              "respawn": 3300000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 45000,
-              "respawn": 16118,
+              "reserve": 25000,
+              "respawn": 9059,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 26500000,
-              "respawn": 15900000,
+              "reserve": 4500000,
+              "respawn": 2700000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 22500000,
-              "respawn": 13500000,
+              "reserve": 4500000,
+              "respawn": 2700000,
               "rating": 5
             }
           ],
@@ -21349,32 +21349,32 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 3800000,
-              "respawn": 3630000,
+              "reserve": 1300000,
+              "respawn": 1215000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 7400000,
-              "respawn": 5812500,
+              "reserve": 2800000,
+              "respawn": 2137500,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 3300000,
-              "respawn": 3180000,
+              "reserve": 1300000,
+              "respawn": 1140000,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 18100000,
-              "respawn": 16300000,
+              "reserve": 3800000,
+              "respawn": 3200000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 11600000,
-              "respawn": 9400000,
+              "reserve": 3400000,
+              "respawn": 2650000,
               "rating": 5
             }
           ],
@@ -21468,14 +21468,14 @@
           "resources": [
             {
               "ware": "ore",
-              "yield": 7400000,
-              "respawn": 7150000,
+              "reserve": 2100000,
+              "respawn": 1975000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 5850000,
-              "respawn": 5287500,
+              "reserve": 1950000,
+              "respawn": 1762500,
               "rating": 5
             }
           ],
@@ -21598,20 +21598,20 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 4650000,
-              "respawn": 3662500,
+              "reserve": 2050000,
+              "respawn": 1587500,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 18100000,
-              "respawn": 14725000,
+              "reserve": 4300000,
+              "respawn": 3175000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 20500000,
-              "respawn": 18700000,
+              "reserve": 4000000,
+              "respawn": 3400000,
               "rating": 5
             }
           ],
@@ -21744,8 +21744,8 @@
           "resources": [
             {
               "ware": "rawscrap",
-              "yield": 2250000,
-              "respawn": 1687500,
+              "reserve": 750000,
+              "respawn": 562500,
               "rating": 5
             }
           ],
@@ -21854,20 +21854,20 @@
           "resources": [
             {
               "ware": "nividium",
-              "yield": 2500,
+              "reserve": 2500,
               "respawn": 1304,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 100000,
+              "reserve": 100000,
               "respawn": 120000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 450000,
-              "respawn": 771429,
+              "reserve": 150000,
+              "respawn": 257143,
               "rating": 5
             }
           ],
@@ -22300,8 +22300,8 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 33500000,
-              "respawn": 29512500,
+              "reserve": 5500000,
+              "respawn": 4462500,
               "rating": 5
             }
           ],
@@ -22881,26 +22881,26 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 12200000,
-              "respawn": 12270000,
+              "reserve": 2100000,
+              "respawn": 2055000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 9250000,
-              "respawn": 7450000,
+              "reserve": 2750000,
+              "respawn": 2150000,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 8450000,
-              "respawn": 7207500,
+              "reserve": 1950000,
+              "respawn": 1717500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 10350000,
-              "respawn": 7150000,
+              "reserve": 2950000,
+              "respawn": 2150000,
               "rating": 5
             }
           ],
@@ -23033,20 +23033,20 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 24350000,
-              "respawn": 17950000,
+              "reserve": 5150000,
+              "respawn": 3800000,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 16000000,
-              "respawn": 16000000,
+              "reserve": 2500000,
+              "respawn": 2500000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 16350000,
-              "respawn": 16350000,
+              "reserve": 2550000,
+              "respawn": 2550000,
               "rating": 5
             }
           ],
@@ -23274,20 +23274,20 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 11950000,
-              "respawn": 10020000,
+              "reserve": 2350000,
+              "respawn": 2055000,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 7000000,
-              "respawn": 6750000,
+              "reserve": 2000000,
+              "respawn": 1875000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 11400000,
-              "respawn": 12120000,
+              "reserve": 2100000,
+              "respawn": 2220000,
               "rating": 5
             }
           ],
@@ -23636,44 +23636,44 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 600000,
-              "respawn": 600000,
+              "reserve": 300000,
+              "respawn": 300000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 1750000,
-              "respawn": 1830000,
+              "reserve": 650000,
+              "respawn": 690000,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 6350000,
-              "respawn": 5350000,
+              "reserve": 1950000,
+              "respawn": 1700000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 650000,
-              "respawn": 1011429,
+              "reserve": 250000,
+              "respawn": 377143,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 500,
+              "reserve": 500,
               "respawn": 600,
               "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 9350000,
-              "respawn": 9100000,
+              "reserve": 2050000,
+              "respawn": 1925000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 8250000,
-              "respawn": 8407500,
+              "reserve": 1950000,
+              "respawn": 1882500,
               "rating": 5
             }
           ],
@@ -23806,44 +23806,44 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 3300000,
-              "respawn": 3480000,
+              "reserve": 900000,
+              "respawn": 960000,
               "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 8600000,
-              "respawn": 8537500,
+              "reserve": 1800000,
+              "respawn": 1737500,
               "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 6250000,
-              "respawn": 6007500,
+              "reserve": 1750000,
+              "respawn": 1642500,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 9750000,
-              "respawn": 10470000,
+              "reserve": 1950000,
+              "respawn": 2070000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 1000,
+              "reserve": 1000,
               "respawn": 800,
               "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 2500000,
-              "respawn": 2617500,
+              "reserve": 1000000,
+              "respawn": 997500,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1850000,
-              "respawn": 1787500,
+              "reserve": 1050000,
+              "respawn": 987500,
               "rating": 5
             }
           ],
@@ -23978,20 +23978,20 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 2600000,
-              "respawn": 2537500,
+              "reserve": 1200000,
+              "respawn": 1137500,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 2500,
+              "reserve": 2500,
               "respawn": 1304,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 8750000,
-              "respawn": 8500000,
+              "reserve": 2250000,
+              "respawn": 2125000,
               "rating": 5
             }
           ],
@@ -24136,26 +24136,26 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 13900000,
-              "respawn": 12100000,
+              "reserve": 3400000,
+              "respawn": 2800000,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 2500,
+              "reserve": 2500,
               "respawn": 1304,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 14400000,
-              "respawn": 11200000,
+              "reserve": 3400000,
+              "respawn": 2600000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 10900000,
-              "respawn": 9100000,
+              "reserve": 3100000,
+              "respawn": 2500000,
               "rating": 5
             }
           ],
@@ -24274,20 +24274,20 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 7150000,
-              "respawn": 6362500,
+              "reserve": 2050000,
+              "respawn": 1787500,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 7350000,
-              "respawn": 6550000,
+              "reserve": 2450000,
+              "respawn": 2050000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 6100000,
-              "respawn": 4300000,
+              "reserve": 2300000,
+              "respawn": 1700000,
               "rating": 5
             }
           ],
@@ -24393,26 +24393,26 @@
           "resources": [
             {
               "ware": "ore",
-              "yield": 1500000,
-              "respawn": 1680000,
+              "reserve": 600000,
+              "respawn": 660000,
               "rating": 5
             },
             {
               "ware": "rawkhaakscrap",
-              "yield": 70000,
-              "respawn": 160000,
+              "reserve": 60000,
+              "respawn": 130000,
               "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 3750000,
-              "respawn": 3030000,
+              "reserve": 1650000,
+              "respawn": 1290000,
               "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 550000,
-              "respawn": 891429,
+              "reserve": 250000,
+              "respawn": 377143,
               "rating": 5
             }
           ],
@@ -24513,26 +24513,26 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 2150000,
-              "respawn": 2955000,
+              "reserve": 550000,
+              "respawn": 735000,
               "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 450000,
-              "respawn": 771429,
+              "reserve": 150000,
+              "respawn": 257143,
               "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 1500,
+              "reserve": 1500,
               "respawn": 1059,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 1500000,
-              "respawn": 1680000,
+              "reserve": 600000,
+              "respawn": 660000,
               "rating": 5
             }
           ],
@@ -24631,20 +24631,20 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 50000,
+              "reserve": 50000,
               "respawn": 85714,
               "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 7350000,
-              "respawn": 7350000,
+              "reserve": 1950000,
+              "respawn": 1950000,
               "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 5150000,
-              "respawn": 5587500,
+              "reserve": 1350000,
+              "respawn": 1387500,
               "rating": 5
             }
           ],
