@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from .boundary import Boundary
+from .composite_spline import CompositeSpline
 
 if TYPE_CHECKING:
     from .boundary_list import BoundaryList
@@ -113,10 +114,18 @@ class SplineTubeBoundary(Boundary):
     # Member data
     radius: float = 0.0  # +0x08: tube radius
     spline: list[SplineControlPoint] = field(default_factory=list)  # WORLD coordinates after transform
-    sampled_points: list[tuple[float, float, float]] = field(default_factory=list)  # WORLD coordinates
+
+    # +0x10: CompositeSpline<3> subobject
+    # This is the spline geometry that the tube follows
+    _composite_spline: CompositeSpline = field(default_factory=CompositeSpline)
+
+    # Legacy fields (now delegated to _composite_spline)
+    # Kept for backward compatibility during transition
+    sampled_points: list[tuple[float, float, float]] = field(default_factory=list)
     seg_lengths: list[float] = field(default_factory=list)
     accum: list[float] = field(default_factory=list)
     total_length: float = 0.0
+
     transform: list[float] = field(default_factory=lambda: [1.0] * 16)  # 4x4 matrix, identity
     _spline_is_world: bool = field(default=False, repr=False)  # Track coordinate state
 
@@ -157,6 +166,12 @@ class SplineTubeBoundary(Boundary):
             self.accum.append(total)
 
         self.total_length = total
+
+        # ====================================================================
+        # Also update CompositeSpline subobject (+0x10)
+        # This is the actual spline geometry used for interval computation
+        # ====================================================================
+        self._composite_spline.build_from_points(self.sampled_points)
 
     # ========================================================================
     # FUN_14093e5c0: Generate CylinderBoundary list
@@ -428,6 +443,9 @@ class SplineTubeBoundary(Boundary):
     # vtable+0x58 -> 0x14093ed40: Lateral interval computation
     # ========================================================================
 
+    # Sample count for interval scanning (from C++ SPLINETUBE_INTERVAL_SAMPLE_COUNT_14093ED40)
+    INTERVAL_SAMPLE_COUNT = 5
+
     def get_lateral_interval_0x58_14093ed40(
         self,
         pos: tuple[float, float, float],
@@ -437,34 +455,52 @@ class SplineTubeBoundary(Boundary):
 
         Corresponds to vtable+0x58, function 0x14093ed40.
 
-        This method wraps CompositeSpline<3>::get_interval (0x1414f3b30) with
-        expanded radius (query_radius + tube_radius).
+        C++ code (FUN_14093ed40):
+            // This is a DELEGATE wrapper that adds tube_radius to query_radius
+            // and forwards to CompositeSpline<3>::vtable+0x70
+            longlong spline_subobject = *(longlong *)(param_1 + 0x10);  // CompositeSpline<3> at +0x10
+            float tube_radius = *(float *)(param_1 + 0x08);              // tube radius at +0x08
+            float effective_radius = param_4 + tube_radius;              // query_radius + tube_radius
+
+            // Call CompositeSpline<3>::vtable+0x70 (FUN_1414f3b30)
+            (**(code **)(spline_subobject + 0x70))
+                (spline_subobject, param_2, param_3, effective_radius, 5);
+
+        This is a TWO-LAYER call:
+            1. SplineTubeBoundary::get_lateral_interval_0x58 (FUN_14093ed40)
+               - Adds tube_radius to query_radius
+               - Forwards to CompositeSpline
+            2. CompositeSpline<3>::get_parameter_interval_0x70 (FUN_1414f3b30)
+               - Performs the actual spline parameter scan
 
         Args:
             pos: Position in WORLD coordinates
-            query_radius: Query radius
+            query_radius: Query radius (55425.625 for gas fields)
 
-        Returns normalized interval along the spline [0, 1].
+        Returns normalized interval along the spline [0, 1], or None if no intersection.
         """
         self._ensure_sampled()
 
-        if self.total_length <= 1e-6:
-            return None
+        # ====================================================================
+        # Step 1: Compute effective_radius = query_radius + tube_radius
+        # Corresponds to C++: param_4 + *(float *)(param_1 + 0x08)
+        # ====================================================================
+        effective_radius = query_radius + self.radius
 
-        # Spline is now in world coordinates, find nearest directly
-        nearest_t = self._find_nearest_parameter(pos)
+        # ====================================================================
+        # Step 2: Delegate to CompositeSpline<3>::vtable+0x70
+        # Corresponds to C++: call to FUN_1414f3b30
+        # ====================================================================
+        return self._composite_spline.get_parameter_interval_0x70_1414f3b30(
+            query=pos,
+            radius=effective_radius,
+            sample_count=self.INTERVAL_SAMPLE_COUNT
+        )
 
-        # Compute interval based on query radius + tube_radius
-        # Corresponds to 0x14093ed40 expanding the radius before delegating
-        expanded_radius = query_radius + self.radius
-        window = (expanded_radius + expanded_radius) / self.total_length
-        lower = max(0.0, nearest_t - window)
-        upper = min(1.0, nearest_t + window)
-
-        return (lower, upper)
-
-    def _find_nearest_parameter(self, query: tuple[float, float, float]) -> float:
-        """Find normalized parameter t of nearest point on spline."""
+    def _find_nearest_parameter_with_distance(
+        self, query: tuple[float, float, float]
+    ) -> tuple[float, float]:
+        """Find normalized parameter t and distance of nearest point on spline."""
         best_dist = float('inf')
         best_t = 0.0
 
@@ -489,7 +525,40 @@ class SplineTubeBoundary(Boundary):
                 best_dist = dist
                 best_t = t
 
-        return best_t
+        return best_t, best_dist
+
+    def _sample_at_param(self, t: float) -> tuple[float, float, float]:
+        """Sample point on polyline at normalized parameter t."""
+        t = clamp(t, 0.0, 1.0)
+
+        if t >= 1.0:
+            return self.sampled_points[-1]
+
+        target = t * self.total_length
+
+        for i, seg_len in enumerate(self.seg_lengths):
+            seg_start = self.accum[i]
+            seg_end = self.accum[i + 1]
+
+            if target <= seg_end or i == len(self.seg_lengths) - 1:
+                if seg_len <= 1e-6:
+                    return self.sampled_points[i]
+
+                local_t = clamp((target - seg_start) / seg_len, 0.0, 1.0)
+                a = self.sampled_points[i]
+                b = self.sampled_points[i + 1]
+                return (
+                    a[0] + (b[0] - a[0]) * local_t,
+                    a[1] + (b[1] - a[1]) * local_t,
+                    a[2] + (b[2] - a[2]) * local_t,
+                )
+
+        return self.sampled_points[-1]
+
+    def _find_nearest_parameter(self, query: tuple[float, float, float]) -> float:
+        """Find normalized parameter t of nearest point on spline."""
+        t, _ = self._find_nearest_parameter_with_distance(query)
+        return t
 
     # ========================================================================
     # vtable+0x70 -> 0x14093ee10: Radial interval computation
@@ -504,10 +573,28 @@ class SplineTubeBoundary(Boundary):
 
         Corresponds to vtable+0x70, function 0x14093ee10.
 
-        Formula:
-            d = nearest_distance_to_spline(query)
-            lower = max((d - query_radius) / tube_radius, 0)
-            upper = min((d + query_radius) / tube_radius, 1)
+        C++ implementation (FUN_14093ee10):
+            // Step 1: Get lateral interval via vtable+0x58
+            (**(code **)(*param_1 + 0x58))(param_1, local_res8);
+            // local_res8[0] = lateral_lower, local_res8[1] = lateral_upper
+
+            // Step 2: Sample representative point using lateral_lower
+            // param_1[2] is CompositeSpline at +0x10
+            // vtable+0x08 is sample method
+            pfVar1 = (float *)(**(code **)(param_1[2] + 8))(param_1 + 2, local_68, local_res8[0]);
+
+            // Step 3: Compute distance from query to representative point
+            distance = sqrt(sum((pfVar1[i] - param_3[i])^2 for i in 0..2))
+
+            // Step 4: Compute radial interval
+            tube_radius = *(float *)(param_1 + 0x0c);
+            lower = max((distance - query_radius) / tube_radius, 0.0);
+            upper = min((distance + query_radius) / tube_radius, 1.0);
+
+        This is a TWO-STEP process:
+            1. Call get_lateral_interval_0x58 to get parameter range
+            2. Use lateral_lower to sample a representative point
+            3. Compute distance and normalize by tube_radius
 
         Args:
             pos: Position in WORLD coordinates
@@ -517,16 +604,38 @@ class SplineTubeBoundary(Boundary):
         """
         self._ensure_sampled()
 
-        if not self.sampled_points or self.radius <= 0:
+        if self.radius <= 0:
             return (0.0, 1.0)
 
-        # Spline is now in world coordinates, find distance directly
-        dist = self._nearest_distance_to_polyline(pos)
+        # ====================================================================
+        # Step 1: Get lateral interval (vtable+0x58)
+        # ====================================================================
+        lateral_interval = self.get_lateral_interval_0x58_14093ed40(pos, query_radius)
 
-        # Compute normalized interval
-        lower = (dist - query_radius) / self.radius
-        upper = (dist + query_radius) / self.radius
+        if lateral_interval is None:
+            return (0.0, 1.0)
 
+        lateral_lower, lateral_upper = lateral_interval
+
+        # ====================================================================
+        # Step 2: Sample representative point using lateral_lower
+        # Corresponds to C++: sample at local_res8[0] (lateral_lower)
+        # ====================================================================
+        representative_point = self._composite_spline.sample_0x08_1402d55c0(lateral_lower)
+
+        # ====================================================================
+        # Step 3: Compute distance from query to representative point
+        # ====================================================================
+        diff = vec3_sub(representative_point, pos)
+        distance = vec3_length(diff)
+
+        # ====================================================================
+        # Step 4: Compute radial interval normalized by tube_radius
+        # ====================================================================
+        lower = (distance - query_radius) / self.radius
+        upper = (distance + query_radius) / self.radius
+
+        # Clamp to [0, 1]
         lower = max(0.0, lower)
         upper = min(1.0, upper)
 
