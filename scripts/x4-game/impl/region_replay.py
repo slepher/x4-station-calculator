@@ -4,10 +4,11 @@ C++ entry: FUN_14073e110
 
 Field type detection (FUN_140e81620):
 - case 0x08 (8): AsteroidField -> solid
+- case 0x13 (19): DebrisField -> solid (uses same FUN_140e842e0 as AsteroidField)
 - case 0x4c (76): Nebula -> gas
 
 In JSON data:
-- Solid: fields array contains tag="asteroid"
+- Solid: fields array contains tag="asteroid" or tag="debris"
 - Gas: fields array contains tag="nebula"
 """
 
@@ -45,8 +46,42 @@ if TYPE_CHECKING:
 # Paths
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DATA_ROOT = PROJECT_ROOT / "src" / "assets" / "x4_game_data" / "8.0-Diplomacy" / "data"
+RAW_ROOT = PROJECT_ROOT / "x4raw_assets" / "8.0-Diplomacy" / "libraries"
 REGIONS_JSON = DATA_ROOT / "regions.json"
 RESOURCEAREAS_JSON = DATA_ROOT / "resourceareas.json"
+REGIONOBJECTGROUPS_XML = RAW_ROOT / "regionobjectgroups" / "final.xml"
+
+
+@dataclass
+class RegionObjectGroup:
+    """Region object group from regionobjectgroups XML."""
+    name: str
+    resource: str
+    yield_value: float
+    yieldvariation: float = 0.0
+
+
+def load_region_object_groups() -> dict[str, RegionObjectGroup]:
+    """Load region object groups from XML."""
+    import xml.etree.ElementTree as ET
+
+    if not REGIONOBJECTGROUPS_XML.exists():
+        return {}
+
+    tree = ET.parse(REGIONOBJECTGROUPS_XML)
+    root = tree.getroot()
+
+    groups = {}
+    for group in root.findall("group"):
+        name = group.get("name", "")
+        groups[name] = RegionObjectGroup(
+            name=name,
+            resource=group.get("resource", ""),
+            yield_value=float(group.get("yield", "0")),
+            yieldvariation=float(group.get("yieldvariation", "0")),
+        )
+
+    return groups
 
 
 @dataclass
@@ -170,6 +205,9 @@ def parse_resources_from_region(region_data: dict) -> list[ResourceInfo]:
 
 GAS_WARES = {"hydrogen", "helium", "methane"}
 
+# Solid field tags (C++ cases 0x08, 0x13)
+SOLID_FIELD_TAGS = {"asteroid", "debris"}
+
 
 def is_gas_ware(ware: str) -> bool:
     """Check if ware is a gas type."""
@@ -177,11 +215,13 @@ def is_gas_ware(ware: str) -> bool:
 
 
 def is_solid_field(field: FieldInfo) -> bool:
-    """Check if field is solid (AsteroidField).
+    """Check if field is solid (AsteroidField or DebrisField).
 
-    C++ evidence: case 0x08 in FUN_140e81620
+    C++ evidence from FUN_140e81620:
+    - case 0x08: AsteroidField
+    - case 0x13: DebrisField (uses same FUN_140e842e0 as AsteroidField)
     """
-    return field.tag == "asteroid"
+    return field.tag in SOLID_FIELD_TAGS
 
 
 def is_gas_field(field: FieldInfo) -> bool:
@@ -290,17 +330,31 @@ def replay_solid_field_14073E110(
         radial=[ProfilePoint(float(p["position"]), float(p["value"])) for p in falloff_data.get("radial", [])],
     )
 
+    # Load region object groups for groupref resolution
+    # C++ evidence: FUN_140e81ff0 looks up groupref in regionobjectgroups
+    object_groups = load_region_object_groups()
+
     # Build field states for weight calculation
+    # C++ evidence: field with groupref uses group.yield, group.resource
     field_states = []
     for f in asteroid_fields:
-        # Default yield from resources
-        matching_resources = [r for r in resources if not ware_filter or r.ware == ware_filter]
-        if not matching_resources:
-            matching_resources = resources[:1] if resources else []
+        # Resolve ware and yield from groupref if available
+        if f.groupref and f.groupref in object_groups:
+            group = object_groups[f.groupref]
+            ware_key = group.resource
+            yield_value = group.yield_value
+        else:
+            # Fallback: use resources
+            matching_resources = [r for r in resources if not ware_filter or r.ware == ware_filter]
+            if not matching_resources:
+                matching_resources = resources[:1] if resources else []
+            res = matching_resources[0] if matching_resources else None
+            ware_key = res.ware if res else ""
+            yield_value = res.resourcedensity if res else 1.0
 
-        res = matching_resources[0] if matching_resources else None
-        ware_key = res.ware if res else ""
-        yield_value = res.resourcedensity if res else 1.0
+        # Apply ware filter
+        if ware_filter and ware_key != ware_filter:
+            continue
 
         field_states.append(SolidFieldState(
             name=f.groupref or "default",
@@ -407,8 +461,11 @@ def replay_solid_field_14073E110(
             tile_values=tile_values,
         ))
 
-    # Determine primary ware
-    primary_ware = ware_filter or (resources[0].ware if resources else "")
+    # Determine primary ware from field states
+    if field_states:
+        primary_ware = ware_filter or field_states[0].ware_key
+    else:
+        primary_ware = ware_filter or ""
 
     return FieldReplayResult(
         field_type="solid",
