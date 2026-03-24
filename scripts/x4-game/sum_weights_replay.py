@@ -35,7 +35,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from impl import (
-    replay_region_14073E110,
+    replay_region_unified,
     RegionReplayResult,
     FieldReplayResult,
     is_gas_ware,
@@ -46,6 +46,7 @@ from impl import (
     build_replay_context_140e860c0,
     replay_gas_field_14075bd20,
 )
+from impl.save_sample_loader import load_save_sample
 
 
 def get_resourcedensity(ctx: ReplayContext, ware_id: str) -> float:
@@ -56,98 +57,87 @@ def get_resourcedensity(ctx: ReplayContext, ware_id: str) -> float:
     return 1.0
 
 
-def format_field_result(result: FieldReplayResult, verbose: bool = False) -> str:
-    """Format field replay result for output."""
-    type_label = "[GAS]" if result.field_type == "gas" else "[SOLID]"
+def format_field_result(
+    result: FieldReplayResult,
+    save_tiles_by_ware: dict[str, dict] | None = None,
+    verbose: bool = False,
+    compare: bool = False,
+) -> str:
+    """Format field replay result with per-tile comparison.
 
+    Args:
+        result: Field replay result
+        save_tiles_by_ware: Dict mapping ware_id to save tiles dict for comparison
+        verbose: Show per-tile details
+        compare: Compare with save data
+    """
     lines = [
-        f"{type_label} Field: {result.field_name}",
-        f"  Boundary: {result.boundary_class}",
-        f"  Sector: {result.sector_id}",
-        f"  Region: {result.region_id}",
-        f"  Ware: {result.ware_id}",
+        f"field={result.sector_id} / {result.region_id}",
+        f"boundary_class={result.boundary_class}",
+        f"tile_count={result.tile_count}",
+        "ware_totals:",
     ]
 
-    if result.yield_name:
-        lines.append(f"  Yield: {result.yield_name}")
-
-    lines.extend([
-        f"  Tile count: {result.tile_count}",
-        "",
-        "  Ware totals:",
-    ])
+    # Get all wares from result
+    all_wares = sorted(result.ware_totals.keys())
 
     for ware, total in sorted(result.ware_totals.items()):
-        lines.append(f"    {ware}: {total:.0f}")
+        lines.append(f"  {ware}={total:.0f}")
 
+    # Per-tile values with comparison
     if verbose and result.per_tile:
-        lines.append("")
-        lines.append("  Per-tile details (first 20):")
-        for tile in result.per_tile[:20]:
-            lines.append(
-                f"    {tile.storage_coord}: "
-                f"weight={tile.profile_weight:.4f}, "
-                f"values={tile.tile_values}"
-            )
-        if len(result.per_tile) > 20:
-            lines.append(f"    ... and {len(result.per_tile) - 20} more tiles")
+        lines.append("tile_values:")
 
-    return "\n".join(lines)
+        # Calculate replay totals per ware for verification
+        replay_total_by_ware: dict[str, int] = {ware: 0 for ware in all_wares}
 
+        for tile in result.per_tile:
+            coord = tile.storage_coord
+            # Build values string
+            values_parts = []
+            for ware in all_wares:
+                value = tile.tile_values.get(ware, 0)
+                values_parts.append(f"{ware}={value:.0f}")
+                replay_total_by_ware[ware] += int(value)
 
-def compare_gas_with_save(result: FieldReplayResult, ctx: ReplayContext) -> str:
-    """Compare gas result with save data."""
-    if not ctx.save_sample:
-        return "  No save sample data available for comparison"
+            line = f"  {coord} " + " ".join(values_parts)
 
-    density = get_resourcedensity(ctx, result.ware_id)
-    save_by_coord = ctx.save_sample
-    computed_by_coord = {t.storage_coord: t for t in result.per_tile}
+            # Add comparison if requested
+            if compare and save_tiles_by_ware:
+                compare_parts = []
+                for ware in all_wares:
+                    tile_value = tile.tile_values.get(ware, 0)
+                    save_tiles = save_tiles_by_ware.get(ware, {})
+                    save_row = save_tiles.get(coord)
+                    save_value = None if save_row is None else int(save_row.get("max", 0))
 
-    both_coords = set(save_by_coord.keys()) & set(computed_by_coord.keys())
-    total_save = sum(e.get("max", 0) for e in save_by_coord.values())
-    total_computed = result.ware_totals.get(result.ware_id, 0)
+                    error_ratio = None
+                    if save_value not in (None, 0):
+                        error_ratio = (tile_value - save_value) / save_value
 
-    lines = [
-        "  Comparison with save data:",
-        f"    Tiles in both: {len(both_coords)}",
-        f"    Tiles only in save: {len(save_by_coord) - len(both_coords)}",
-        f"    Tiles only in computed: {len(computed_by_coord) - len(both_coords)}",
-        f"    Save total: {total_save}",
-        f"    Computed total: {total_computed:.0f}",
-    ]
+                    compare_parts.append(
+                        f"{ware}:save={save_value if save_value is not None else 'N/A'},"
+                        f"err={f'{error_ratio:.2%}' if error_ratio is not None else 'N/A'}"
+                    )
+                line += " | " + " ".join(compare_parts)
 
-    if total_save > 0:
-        diff_pct = (total_computed - total_save) / total_save * 100
-        lines.append(f"    Difference: {total_computed - total_save:.0f} ({diff_pct:+.1f}%)")
+            lines.append(line)
 
-    return "\n".join(lines)
-
-
-def compare_solid_with_save(result: FieldReplayResult) -> str:
-    """Compare solid result with save data."""
-    save_tiles = load_solid_save_sample(result.sector_id, result.ware_id, result.yield_name)
-
-    if not save_tiles:
-        return "  No save sample data available for comparison"
-
-    computed_by_coord = {t.storage_coord: t for t in result.per_tile}
-    both_coords = set(save_tiles.keys()) & set(computed_by_coord.keys())
-    total_save = sum(e.get("max", 0) for e in save_tiles.values())
-    total_computed = result.ware_totals.get(result.ware_id, 0)
-
-    lines = [
-        "  Comparison with save data:",
-        f"    Tiles in both: {len(both_coords)}",
-        f"    Tiles only in save: {len(save_tiles) - len(both_coords)}",
-        f"    Tiles only in computed: {len(computed_by_coord) - len(both_coords)}",
-        f"    Save total: {total_save}",
-        f"    Computed total: {total_computed:.0f}",
-    ]
-
-    if total_save > 0:
-        diff_pct = (total_computed - total_save) / total_save * 100
-        lines.append(f"    Difference: {total_computed - total_save:.0f} ({diff_pct:+.1f}%)")
+        # Total comparison
+        if compare and save_tiles_by_ware:
+            lines.append("total_compare:")
+            for ware in all_wares:
+                replay_total = replay_total_by_ware[ware]
+                # Calculate save total for this ware
+                save_tiles = save_tiles_by_ware.get(ware, {})
+                save_total = sum(
+                    int(row.get("max", 0)) for row in save_tiles.values()
+                )
+                if save_total > 0:
+                    total_error = (replay_total - save_total) / save_total
+                    lines.append(f"  {ware}: replay={replay_total} save={save_total} error_ratio={total_error:.2%}")
+                else:
+                    lines.append(f"  {ware}: replay={replay_total} save={save_total} error_ratio=N/A")
 
     return "\n".join(lines)
 
@@ -185,7 +175,7 @@ def main():
 
     try:
         # Run unified replay
-        result = replay_region_14073E110(
+        result = replay_region_unified(
             sector_id=args.sector_id,
             region_id=args.region_id,
             ware_filter=args.ware_id,
@@ -209,22 +199,19 @@ def main():
 
         # Text output
         for field_result in result.fields:
-            print(format_field_result(field_result, args.verbose))
-
+            # Load save data for comparison - for all wares in the field
+            save_tiles_by_ware: dict[str, dict] = {}
             if args.compare:
-                print()
-                if field_result.field_type == "gas":
-                    # Get context for comparison
-                    ctx = build_replay_context_140e860c0(
+                all_wares = list(field_result.ware_totals.keys())
+                for ware in all_wares:
+                    save_tiles_by_ware[ware] = load_save_sample(
                         sector_id=args.sector_id,
-                        region_id=args.region_id,
-                        ware_id=field_result.ware_id,
+                        ware=ware,
+                        yield_name=field_result.yield_name,
+                        region_filter=args.region_id,
                     )
-                    print(compare_gas_with_save(field_result, ctx))
-                else:
-                    print(compare_solid_with_save(field_result))
 
-            print()
+            print(format_field_result(field_result, save_tiles_by_ware, args.verbose, args.compare))
 
         if not result.fields:
             print(f"No fields found for region: {args.region_id}")

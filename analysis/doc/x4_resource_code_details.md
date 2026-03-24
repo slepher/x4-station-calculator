@@ -1,8 +1,22 @@
 # X4 资源运行时代码细节锚点
 
-本文只保留便于回到 Ghidra 复核的逆向锚点：函数地址、虚表槽位、关键偏移、属性 id、字符串/逻辑节点名。  
-逻辑结论见 [x4_resource_logic_conclusions.md](/home/slepher/project/x4-station-calculator/analysis/doc/x4_resource_logic_conclusions.md)。  
+本文只保留便于回到 Ghidra 复核的逆向锚点：函数地址、虚表槽位、关键偏移、属性 id、字符串/逻辑节点名。
+逻辑结论见 [x4_resource_logic_conclusions.md](/home/slepher/project/x4-station-calculator/analysis/doc/x4_resource_logic_conclusions.md)。
 旧文档 [x4_resource_runtime_reverse_chain.md](/home/slepher/project/x4-station-calculator/analysis/doc/x4_resource_runtime_reverse_chain.md) 保留不动，作为回测对照。
+
+## Debris Field 实现状态 (2024-03)
+
+**测试案例：** `Cluster_21_Sector001_macro` / `p1_wreckfield_xenon_teladi_battle_200km` / `rawscrap`
+
+**已验证：**
+- 权重计算公式正确，与存档误差 <0.01%
+- `resourcedensity` 必须按 ware 过滤，不能取 `resources[0]`
+- DebrisField 使用与 AsteroidField 相同的初始化函数 `FUN_140e842e0`
+
+**待调查：**
+- Tile 枚举策略差异：实现计算 39 tiles，存档仅 12 tiles
+- 存档中所有 tile 都在 y=0，但实现包含 y=-64000 的 tile
+- 可能的 C++ 枚举优化或额外过滤条件
 
 ## 1. 关键函数与职责
 

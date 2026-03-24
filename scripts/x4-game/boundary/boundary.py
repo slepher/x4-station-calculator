@@ -171,6 +171,37 @@ class Boundary(ABC):
         pass
 
     # ========================================================================
+    # vtable+0x48 -> is_enabled
+    # ========================================================================
+
+    def is_enabled_0x48(self) -> bool:
+        """Check if boundary is enabled.
+
+        Corresponds to vtable+0x48.
+        Default implementation returns True.
+
+        Returns:
+            True if boundary is active/enabled
+        """
+        return True
+
+    # ========================================================================
+    # vtable+0x60 -> has_radial
+    # ========================================================================
+
+    def has_radial_0x60(self) -> bool:
+        """Check if boundary has radial dimension.
+
+        Corresponds to vtable+0x60.
+        Most boundaries have radial dimension, so default is True.
+        Override for boundaries without radial (e.g., infinite extent).
+
+        Returns:
+            True if boundary has radial dimension
+        """
+        return True
+
+    # ========================================================================
     # vtable+0x58 -> get_lateral_interval
     # ========================================================================
 

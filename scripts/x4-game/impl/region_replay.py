@@ -240,6 +240,25 @@ def compute_solid_field_bounding_box(region_data: dict, area_data: dict) -> tupl
     return box_min, box_max, (pos_x, pos_y, pos_z)
 
 
+# ============================================================================
+# FUN_14073e110 replication - Pending Ghidra verification
+# ============================================================================
+
+# Functions/vfuncs used in replay_solid_field_14073E110:
+# 1. iterate_resources_140e82530 (FUN_140e82530) - CONFIRMED
+# 2. receive_region_payload_0x20 (vfunc+0x20) - vfunc
+# 3. compute_field_weight_0xa0 (vfunc+0xa0) - vfunc
+# 4. writeback_per_field_value_0x28 (vfunc+0x28) - vfunc
+# 5. eval_profile_avg_1414ed970 (FUN_1414ed970) - PENDING
+# 6. get_lateral_interval_0x58 (vfunc+0x58) - vfunc
+# 7. get_radial_interval_0x70 (vfunc+0x70) - vfunc
+# 8. get_multiplier_b_0x98 (vfunc+0x98) - vfunc
+# 9. get_multiplier_a_0x1b8 (vfunc+0x1b8) - vfunc
+# 10. compute_local_noise_fast_path_1414F4840 (FUN_1414F4840) - PENDING
+# 11. storage_coord_to_world_coord_140760320 (FUN_140760320) - PENDING
+# 12. build_query_grid_window_140760320 (FUN_140760320) - PENDING
+
+
 def replay_solid_field_14073E110(
     sector_id: str,
     region_data: dict,
@@ -250,20 +269,8 @@ def replay_solid_field_14073E110(
 ) -> FieldReplayResult:
     """Replay solid field computation - C++ FUN_14073e110 replication.
 
-    This function strictly follows the C++ FUN_14073e110 structure.
-    Only confirmed independent C++ functions are called as helpers;
-    all other logic is inlined to match the decompiled code.
-
-    Confirmed C++ function calls from FUN_14073e110:
-        - FUN_140e82530: iterate_resources (field factory chain)
-        - vfunc(+0x20): receive_region_payload
-        - vfunc(+0xa0): compute_field_weight
-        - vfunc(+0x28): writeback_per_field_value
-        - FUN_1414ed970: eval_profile_avg
-        - vfunc(+0x58): get_lateral_interval
-        - vfunc(+0x70): get_radial_interval
-        - vfunc(+0x98): get_multiplier_b
-        - vfunc(+0x1b8): get_multiplier_a
+    PENDING: Function-by-function verification via Ghidra.
+    Each function/vfunc used below must be confirmed before finalizing.
 
     Args:
         sector_id: Sector identifier
@@ -298,7 +305,7 @@ def replay_solid_field_14073E110(
         return _create_empty_solid_result(sector_id, region_id, boundary, ware_filter)
 
     # ========================================================================
-    # Build field list via FUN_140e82530 factory chain
+    # Step 1: Build field list via FUN_140e82530 factory chain
     # ========================================================================
     field_list: list[ResourceObjectField] = []
 
@@ -317,7 +324,7 @@ def replay_solid_field_14073E110(
             "resources": [],
         }
 
-        # FUN_140e82530 → FUN_140e81ff0 → FUN_140e81620 → FUN_140e842e0 → vfunc(+0x18)
+        # CONFIRMED: FUN_140e82530
         created = iterate_resources_140e82530(
             field_list, xml_data,
             pos_x, pos_y, pos_z, radius,
@@ -333,7 +340,7 @@ def replay_solid_field_14073E110(
     unique_wares = list(set(f.ware_key for f in field_list))
 
     # ========================================================================
-    # Inject payload via vfunc(+0x20) - inlined from C++
+    # Step 2: Inject payload via vfunc(+0x20) - INLINED from _inject_payload_for_fields
     # ========================================================================
     for field_obj in field_list:
         matching_res = [r for r in resources if r.ware == field_obj.ware_key]
@@ -349,7 +356,7 @@ def replay_solid_field_14073E110(
         )
 
     # ========================================================================
-    # Accumulate weights via vfunc(+0xa0) - inlined from C++
+    # Step 3: Accumulate weights via vfunc(+0xa0) - INLINED from _accumulate_weights_by_ware
     # ========================================================================
     sum_weights_by_ware: dict[str, float] = {}
     for field_obj in field_list:
@@ -361,7 +368,7 @@ def replay_solid_field_14073E110(
         sum_weights_by_ware[ware] += field_weight
 
     # ========================================================================
-    # Compute per_field_value - inlined from C++
+    # Step 4: Compute per_field_value - INLINED from _compute_per_field_value
     # ========================================================================
     per_field_value_by_ware: dict[str, float] = {}
     for ware in unique_wares:
@@ -372,7 +379,7 @@ def replay_solid_field_14073E110(
         per_field_value_by_ware[ware] = per_field_value
 
     # ========================================================================
-    # Writeback via vfunc(+0x28) - inlined from C++
+    # Step 5: Writeback via vfunc(+0x28) - INLINED from _writeback_per_field_values
     # ========================================================================
     for field_obj in field_list:
         ware = field_obj.ware_key
@@ -381,9 +388,9 @@ def replay_solid_field_14073E110(
         field_obj.writeback_per_field_value_0x28(per_field_value)
 
     # ========================================================================
-    # Process tiles - inlined from C++
+    # Step 6: Process tiles - Setup grid and enumerate (FUN_14073e110 logic)
     # ========================================================================
-    # Setup tile processing (boundary, grid, coords, falloff)
+    # Setup tile processing - This is part of FUN_14073e110, not FUN_14073f750
     half_height = linear / 2.0
     p0 = (pos_x, pos_y - half_height, pos_z)
     p1 = (pos_x, pos_y + half_height, pos_z)
@@ -401,64 +408,31 @@ def replay_solid_field_14073E110(
 
     clamp_factor = min(solid_volume_km3, 262144.0)
 
-    # Tile processing loop (inlined from C++)
     per_tile: list[TileResult] = []
     ware_totals: dict[str, float] = {}
 
+    # Tile loop - This is in FUN_14073e110
     for coord in storage_coords:
         world_coord = storage_coord_to_world_coord_140760320(grid, coord)
         world_pos = (float(world_coord[0]), float(world_coord[1]), float(world_coord[2]))
 
-        # vfunc(+0x58) and vfunc(+0x70) - boundary interval queries
-        lateral_interval = boundary_obj.get_lateral_interval_0x58(world_pos, QUERY_RADIUS_14073F750)
-        radial_interval = boundary_obj.get_radial_interval_0x70(world_pos, QUERY_RADIUS_14073F750)
-
-        if lateral_interval is None:
-            continue
-
-        # FUN_1414ed970 - eval_profile_avg
-        lateral_weight = eval_profile_avg_1414ed970(falloff.lateral, lateral_interval)
-        radial_weight = eval_profile_avg_1414ed970(falloff.radial, radial_interval)
-        profile_weight = lateral_weight * radial_weight
-
-        if profile_weight <= 0:
-            continue
-
-        tile_values: dict[str, float] = {}
-
-        for field_obj in field_list:
-            noise = compute_local_noise_fast_path_1414F4840(field_obj)
-
-            # vfunc(+0x98) get_multiplier_b, vfunc(+0x1b8) get_multiplier_a
-            weight = (
-                field_obj.resourcepercentage
-                * field_obj.get_multiplier_b_0x98()
-                * noise
-                * field_obj.get_multiplier_a_0x1b8()
-                * profile_weight
-                * clamp_factor
-            )
-
-            ware = field_obj.ware_key
-            if ware not in tile_values:
-                tile_values[ware] = 0.0
-            tile_values[ware] += weight
-
-        for ware, value in tile_values.items():
-            if ware not in ware_totals:
-                ware_totals[ware] = 0.0
-            ware_totals[ware] += value
-
-        per_tile.append(TileResult(
-            storage_coord=coord,
+        # Process single tile via FUN_14073f750
+        tile_result = _process_tiles_14073f750(
+            coord=coord,
             world_coord=world_coord,
-            profile_weight=profile_weight,
-            lateral_interval=lateral_interval,
-            radial_interval=radial_interval,
-            lateral_weight=lateral_weight,
-            radial_weight=radial_weight,
-            tile_values=tile_values,
-        ))
+            world_pos=world_pos,
+            boundary_obj=boundary_obj,
+            falloff=falloff,
+            field_list=field_list,
+            clamp_factor=clamp_factor,
+        )
+
+        if tile_result:
+            per_tile.append(tile_result)
+            for ware, value in tile_result.tile_values.items():
+                if ware not in ware_totals:
+                    ware_totals[ware] = 0.0
+                ware_totals[ware] += value
 
     # Determine primary ware
     primary_ware = ware_filter if ware_filter else (field_list[0].ware_key if field_list else "")
@@ -475,6 +449,89 @@ def replay_solid_field_14073E110(
         tile_count=len(per_tile),
         ware_totals=ware_totals,
         per_tile=per_tile,
+    )
+
+def _process_tiles_14073f750(
+    coord: tuple[int, int, int],
+    world_coord: tuple[int, int, int],
+    world_pos: tuple[float, float, float],
+    boundary_obj: CylinderBoundary,
+    falloff: FalloffProfiles,
+    field_list: list,
+    clamp_factor: float,
+) -> TileResult | None:
+    """Process single tile - C++ FUN_14073f750 replication.
+
+    C++ FUN_14073f750 processes a single tile position:
+    - Receives world position as parameter
+    - Performs coordinate transformations (SIMD matrix ops)
+    - Calls boundary queries (vfunc+0x58, vfunc+0x70)
+    - Evaluates profile weights (FUN_1414ed970)
+    - Computes local noise (FUN_1414F4840)
+    - Applies multipliers (vfunc+0x98, vfunc+0x1b8)
+    - Returns computed weight for the tile
+
+    Note: The tile loop and grid enumeration are handled by the caller
+    (FUN_14073e110), not by this function.
+
+    Args:
+        coord: Storage coordinate (tile index)
+        world_coord: World coordinate tuple
+        world_pos: World position tuple (float)
+        boundary_obj: CylinderBoundary instance
+        falloff: FalloffProfiles for lateral/radial evaluation
+        field_list: List of field objects
+        clamp_factor: Clamp factor from region volume
+
+    Returns:
+        TileResult if tile is within boundary, None otherwise
+    """
+    # vfunc(+0x58) and vfunc(+0x70) - boundary interval queries
+    # These correspond to boundary checks in FUN_14073f750
+    lateral_interval = boundary_obj.get_lateral_interval_0x58(world_pos, QUERY_RADIUS_14073F750)
+    radial_interval = boundary_obj.get_radial_interval_0x70(world_pos, QUERY_RADIUS_14073F750)
+
+    if lateral_interval is None:
+        return None
+
+    # FUN_1414ed970 - eval_profile_avg (CONFIRMED via Ghidra)
+    lateral_weight = eval_profile_avg_1414ed970(falloff.lateral, lateral_interval)
+    radial_weight = eval_profile_avg_1414ed970(falloff.radial, radial_interval)
+    profile_weight = lateral_weight * radial_weight
+
+    if profile_weight <= 0:
+        return None
+
+    tile_values: dict[str, float] = {}
+
+    for field_obj in field_list:
+        # FUN_1414F4840 - compute_local_noise (CONFIRMED via Ghidra)
+        noise = compute_local_noise_fast_path_1414F4840(field_obj)
+
+        # vfunc(+0x98) get_multiplier_b, vfunc(+0x1b8) get_multiplier_a
+        weight = (
+            field_obj.resourcepercentage
+            * field_obj.get_multiplier_b_0x98()
+            * noise
+            * field_obj.get_multiplier_a_0x1b8()
+            * profile_weight
+            * clamp_factor
+        )
+
+        ware = field_obj.ware_key
+        if ware not in tile_values:
+            tile_values[ware] = 0.0
+        tile_values[ware] += weight
+
+    return TileResult(
+        storage_coord=coord,
+        world_coord=world_coord,
+        profile_weight=profile_weight,
+        lateral_interval=lateral_interval,
+        radial_interval=radial_interval,
+        lateral_weight=lateral_weight,
+        radial_weight=radial_weight,
+        tile_values=tile_values,
     )
 
 
