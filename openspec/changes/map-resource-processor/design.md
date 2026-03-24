@@ -348,6 +348,11 @@ falloff = lateral_factor × radial_factor
 - `theoretical_reserve`/`theoretical_respawn` 是基于估算体积的理论值
 - Sector 聚合时才应用 `amount` 乘法：`sector_reserve = Σ(reserve × amount)`
 
+**字段严格区分原则：**
+- `theoretical_reserve`/`theoretical_respawn`：**仅用于参考/对比**，禁止用于生成 `reserve`/`respawn`
+- `reserve`/`respawn`：**仅来自逐格计算**，无值则保持0，绝不回退到 theoretical
+- `aggregate_sector_resources_from_resourceareas()` 必须仅在逐格计算完成后调用
+
 #### 1.4.4 maps.json sector.resources
 
 ```json
@@ -371,14 +376,15 @@ falloff = lateral_factor × radial_factor
 # 使用 aggregate_sector_resources_from_resourceareas() 聚合
 # 该函数从 resourceareas_rows 聚合出 sector.resources
 
+# 必须在逐格计算完成后调用
 # 四个字段独立聚合：
 对于每个 sector + ware:
-  reserve = Σ(resourcearea.reserve × amount)
-  respawn = Σ(resourcearea.respawn × amount)
-  theoretical_reserve = Σ(resourcearea.theoretical_reserve)  # 仅当字段存在时
-  theoretical_respawn = Σ(resourcearea.theoretical_respawn)  # 仅当字段存在时
+  reserve = Σ(resourcearea.reserve × amount)           # 仅使用逐格计算值
+  respawn = Σ(resourcearea.respawn × amount)           # 仅使用逐格计算值
+  theoretical_reserve = Σ(resourcearea.theoretical_reserve)  # 仅用于参考
+  theoretical_respawn = Σ(resourcearea.theoretical_respawn)  # 仅用于参考
 
-# rating 基于 respawn 字段计算（见 1.3.4 节）
+# 注意：禁止用 theoretical 字段回退填充 reserve/respawn
 ```
 
 **字段说明：**
@@ -471,19 +477,23 @@ sustainableYieldPerHour = yield / respawnDelay × 60
 
 ```python
 # 使用 aggregate_sector_resources_from_resourceareas() 从 resourceareas_rows 聚合
+# 必须在逐格计算完成后调用
 
 # 四个字段独立聚合：
 对于每个 sector + ware:
-  yield = Σ(definition.yield × resourcearea.amount)
-  respawn = Σ(definition.respawn × resourcearea.amount)
-  total_yield = Σ(definition.total_yield)  # 仅当字段存在时
-  total_respawn = Σ(definition.total_respawn)  # 仅当字段存在时
+  reserve = Σ(definition.reserve × resourcearea.amount)      # 仅使用逐格计算值
+  respawn = Σ(definition.respawn × resourcearea.amount)  # 仅使用逐格计算值
+  theoretical_reserve = Σ(definition.theoretical_reserve)                # 仅用于参考
+  theoretical_respawn = Σ(definition.theoretical_respawn)            # 仅用于参考
+
+# 注意：禁止用 theoretical_reserve/theoretical_respawn 回退填充 reserve/respawn
 ```
 
 **注意：**
 - `aggregate_sector_resources_from_resourceareas()` 是统一的聚合函数，输出 `yield` 和 `respawn` 字段
 - 8.0 和 9.0+ 版本使用相同的聚合函数
 - rating 基于 respawn 字段计算（见 1.3.5 节），仅在 sector.resources 中出现
+- **必须在逐格计算完成后调用**，禁止用 theoretical 字段回退填充 yield/respawn
 
 ### 2.4 输出数据结构
 
@@ -576,7 +586,7 @@ sustainableYieldPerHour = yield / respawnDelay × 60
 - `reserve` 和 `respawn` 是单个 resourcearea 实例的值，**未经 amount 乘法**
 - Sector 聚合时才应用 `amount` 乘法：`sector_reserve = Σ(reserve × amount)`
 - `rating` 字段在 9.0+ resourceareas.json 中来自 definition，与 1.3.5 节的 sector.resources rating 计算不同
-- `total_yield`/`total_respawn` 字段仅在 8.0 版本中存在，9.0+ 版本 definition 不包含这些字段
+- `theoretical_reserve`/`theoretical_respawn` 字段仅在 8.0 版本中存在，9.0+ 版本 definition 不包含这些字段
 - `rating` 字段仅出现在 `sector.resources` 中，`resourceareas.json` 中不包含
 
 #### 2.4.3 maps.json sector.resources (9.0+)
@@ -598,18 +608,21 @@ sustainableYieldPerHour = yield / respawnDelay × 60
 **计算方式：**
 ```python
 # 使用 aggregate_sector_resources_from_resourceareas() 聚合
+# 必须在逐格计算完成后调用
 
 对于每个 sector + ware:
-  yield = Σ(definition.yield × resourcearea.amount)
-  respawn = Σ(definition.sustainableYieldPerHour × resourcearea.amount)
+  reserve = Σ(definition.reserve × resourcearea.amount)      # 仅使用逐格计算值
+  respawn = Σ(definition.sustainableYieldPerHour × resourcearea.amount)  # 仅使用逐格计算值
 
 # rating 基于 respawn 字段计算（见 1.3.5 节）
+# 注意：禁止用 theoretical 字段回退填充 reserve/respawn
 ```
 
 **注意：**
 - 8.0 和 9.0+ 版本统一使用 `yield` 字段名（而非 `amount`），由 `aggregate_sector_resources_from_resourceareas()` 函数统一输出
 - `rating` 基于 `respawn` 字段计算（1-5 级），仅在 `sector.resources` 中出现
-- 9.0+ 版本 definition 不包含 `total_yield`/`total_respawn` 字段，因此 sector.resources 中也不包含
+- 9.0+ 版本 definition 不包含 `theoretical_reserve`/`theoretical_respawn` 字段，因此 sector.resources 中也不包含
+- **必须在逐格计算完成后调用**，禁止用 theoretical 字段回退填充 yield/respawn
 
 #### 2.4.4 regionyields.json (9.0+)
 
@@ -779,9 +792,10 @@ scripts/x4-game/
 **状态**: 已废弃
 
 **原因**:
-- 该函数输出 `amount` 字段而非标准的 `yield` 字段
+- 该函数输出非标准字段
 - 其输出会被 `aggregate_sector_resources_from_resourceareas()` 的输出覆盖
 - 8.0 和 9.0+ 版本统一使用 `aggregate_sector_resources_from_resourceareas()` 进行 sector 资源聚合
+- **必须在逐格计算完成后调用**，禁止用 theoretical 字段回退填充 reserve/respawn
 
 **影响**: 该函数的输出不会出现在最终的 `maps.json` 中。
 
@@ -988,35 +1002,35 @@ Step 2 负责：
 ##### resourcearea_blocks.json 结构
 
 ```json
-[
-  {
-    "sector_id": "Cluster_01_Sector001_macro",
-    "regions": [
-      {
-        "region_ref": "region_ore_medium_01",
-        "resources": [
-          {
-            "ore": [
-              {"x": 0, "y": 0, "z": 0, "reserve": 1017374},
-              {"x": 64000, "y": 0, "z": 0, "reserve": 985632},
-              {"x": 128000, "y": 0, "z": 0, "reserve": 856421}
-            ]
-          }
-        ]
-      }
-    ]
-  }
-]
+{
+  "regions": [
+    {
+      "ref": "region_ore_medium_01",
+      "sector_id": "Cluster_01_Sector001_macro",
+      "total": {"ore": 485680, "silicon": 485692},
+      "tiles": [
+        {"x": 64000, "y": 0, "z": 128000, "wares": {"ore": 40818, "silicon": 40819}},
+        {"x": 128000, "y": 0, "z": 128000, "wares": {"ore": 98563, "silicon": 98564}}
+      ]
+    }
+  ]
+}
 ```
 
 | 字段 | 说明 |
 |------|------|
+| `ref` | region 模板 ID |
 | `sector_id` | 所属 sector |
-| `regions[].region_ref` | region 模板 ID |
-| `regions[].resources` | 按资源类型分组的方块数组 |
-| `resources[].<ware>` | 资源类型（如 ore, hydrogen） |
-| `<ware>[].x/y/z` | 64k area 中心坐标 |
-| `<ware>[].reserve` | 该格储量 |
+| `total` | 按 ware 汇总的总储量 |
+| `total.<ware>` | 资源类型（如 ore, silicon）及其总储量 |
+| `tiles` | 64k area 明细数组 |
+| `tiles[].x/y/z` | 64k area 中心坐标 |
+| `tiles[].wares` | 该格各 ware 的储量 |
+
+**缓存文件说明：**
+- `resourcearea_blocks.json`：新格式缓存，按 ware 汇总（符合游戏存档格式）
+- `resourcearea_old_blocks.json`：旧格式缓存（已废弃，保留对比）
+- `resourcearea_blocks_game.json`：游戏脚本调试输出（含 field 级别明细，仅用于开发验证）
 
 #### 8.2.2 9.0+ 版本
 
