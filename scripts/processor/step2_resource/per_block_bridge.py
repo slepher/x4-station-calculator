@@ -6,9 +6,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field as dataclass_field
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 from processor.step2_resource.per_block.common import (
     FalloffProfiles,
@@ -20,7 +18,6 @@ from processor.step2_resource.per_block.solid import (
     SolidFieldState,
     SolidRegionState,
     RegionYieldPayload,
-    RegionObjectGroup,
     replay_region_solid_sum_weights_and_areas,
 )
 from processor.step2_resource.per_block.gas import (
@@ -29,57 +26,6 @@ from processor.step2_resource.per_block.gas import (
     replay_gas_area_values_for_field,
 )
 from processor.step2_resource.estimator import is_gas_ware
-
-
-# 缓存
-_regionobjectgroups_cache: Optional[Dict[str, RegionObjectGroup]] = None
-
-
-@dataclass
-class FieldDefinition:
-    """Field 定义（从 regions.json 读取）。"""
-    tag: str
-    groupref: str
-    densityfactor: float
-    noisescale: float
-    seed: str
-    minnoisevalue: float
-    maxnoisevalue: float
-
-
-def _parse_regionobjectgroups(xml_path: Path) -> Dict[str, RegionObjectGroup]:
-    """解析 regionobjectgroups XML（只需要一次）。"""
-    import xml.etree.ElementTree as ET
-    result = {}
-    tree = ET.parse(xml_path)
-    root = tree.getroot()
-
-    for group_elem in root.findall(".//group"):
-        name = group_elem.get("name", "")
-        if not name:
-            continue
-
-        resource = group_elem.get("resource", "")
-        yield_value = float(group_elem.get("yield", "1.0"))
-        yieldvariation = float(group_elem.get("yieldvariation", "0.0"))
-
-        result[name] = RegionObjectGroup(
-            name=name,
-            resource=resource,
-            yield_value=yield_value,
-            yieldvariation=yieldvariation,
-        )
-
-    return result
-
-
-def get_regionobjectgroups() -> Dict[str, RegionObjectGroup]:
-    """获取 region object groups（带缓存）。"""
-    global _regionobjectgroups_cache
-    if _regionobjectgroups_cache is None:
-        xml_path = Path("x4raw_assets/8.0-Diplomacy/libraries/regionobjectgroups/final.xml")
-        _regionobjectgroups_cache = _parse_regionobjectgroups(xml_path)
-    return _regionobjectgroups_cache
 
 
 def build_solid_region_state(
@@ -123,10 +69,8 @@ def build_solid_region_state(
     region_density = region_json.get("density", 1.0)
     fields_defs = region_json.get("fields", [])
 
-    # 获取 groups
-    groups = get_regionobjectgroups()
-
     # 构建 fields（asteroid 和 debris 类型都作为固体资源处理）
+    # 直接从 field_def 读取 resource/yield/yieldvariation（Step 1 已合并）
     fields = []
     for field_def in fields_defs:
         tag = field_def.get("tag")
@@ -134,16 +78,16 @@ def build_solid_region_state(
             continue
 
         groupref = field_def.get("groupref", "")
-        group = groups.get(groupref)
+        resource = field_def.get("resource", "")
 
-        if group is None:
+        if not resource:
             continue
 
         state = SolidFieldState(
             name=groupref,
-            ware_key=group.resource,
-            yield_value=group.yield_value,
-            yieldvariation=group.yieldvariation,
+            ware_key=resource,
+            yield_value=float(field_def.get("yield", "1.0")),
+            yieldvariation=float(field_def.get("yieldvariation", "0.0")),
             densityfactor=field_def.get("densityfactor", 1.0),
             region_density=region_density,
             field_0x1150_density_base_scaled=field_def.get("densityfactor", 1.0) * region_density,
@@ -209,6 +153,7 @@ def calculate_field_per_block(
         region_json: regions.json 中的 region 定义
         ware: 要计算的资源类型
         resourcedensity: 资源密度
+        groups: regionobjectgroups 字典，默认从缓存获取
 
     Returns:
         逐格计算结果
@@ -239,8 +184,6 @@ __all__ = [
     "calculate_resource_per_block",
     "calculate_field_per_block",
     "calculate_gas_field_per_block",
-    "get_regionobjectgroups",
-    "FieldDefinition",
 ]
 
 

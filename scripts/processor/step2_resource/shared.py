@@ -82,10 +82,6 @@ def aggregate_sector_resources_from_resourceareas(
 ) -> Dict[str, List[dict]]:
     """从 resourceareas_rows 聚合出 sector.resources。
 
-    所有版本统一输出 reserve/respawn 字段：
-    - 8.0: reserve 来自 theoretical_reserve，respawn 来自 theoretical_respawn
-    - 9.0+: reserve 来自 yield，respawn 来自 respawn
-
     Args:
         resourceareas_rows: resourceareas 行数据列表
 
@@ -119,23 +115,15 @@ def aggregate_sector_resources_from_resourceareas(
                 "theoretical_respawn": 0.0,
             })
 
-            # reserve 字段：统一输出
-            # - 9.0+: 来自 yield
-            # - 8.0: 来自 theoretical_reserve
-            if "yield" in res:
-                entry["reserve"] += res.get("yield", 0) * amount
-            elif "theoretical_reserve" in res:
-                entry["reserve"] += res.get("theoretical_reserve", 0) * amount
+            # reserve 仅使用逐格计算值
+            if "reserve" in res:
+                entry["reserve"] += res.get("reserve", 0) * amount
 
-            # respawn 字段：统一输出
-            # - 9.0+: 来自 respawn
-            # - 8.0: 来自 theoretical_respawn
+            # respawn 仅使用逐格计算值
             if "respawn" in res:
                 entry["respawn"] += res.get("respawn", 0) * amount
-            elif "theoretical_respawn" in res:
-                entry["respawn"] += res.get("theoretical_respawn", 0) * amount
 
-            # theoretical_* 字段用于 8.0 版本参考
+            # theoretical_* 字段仅用于参考展示
             if "theoretical_reserve" in res:
                 entry["theoretical_reserve"] += res.get("theoretical_reserve", 0)
             if "theoretical_respawn" in res:

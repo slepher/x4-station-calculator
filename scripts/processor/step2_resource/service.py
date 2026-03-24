@@ -11,9 +11,10 @@ import json
 from pathlib import Path
 from typing import Dict, List, Optional
 
-# 固定输出目录
+# 固定输出目录（analysis 硬编码除外）
 ANALYSIS_RESOURCES_DIR = Path("analysis/resources")
 
+from processor.path_utils import build_output_paths
 from processor.shared.utils.math_utils import round_to_int, round_significant
 from processor.step2_resource.model_detector import detect_map_resource_model
 from processor.step2_resource.shared import (
@@ -43,6 +44,7 @@ def process_resources_for_version(
     mapdefaults_xml_path: Optional[Path] = None,
     regions_json_path: Optional[Path] = None,
     sector_id: Optional[str] = None,
+    force_recalc_per_block: bool = False,
 ) -> Dict[str, object]:
     """根据版本处理资源计算。
 
@@ -57,6 +59,7 @@ def process_resources_for_version(
         mapdefaults_xml_path: mapdefaults_final.xml 路径（9.0+ 需要）
         regions_json_path: regions.json 路径（8.0 版本需要）
         sector_id: 可选，仅处理指定 sector
+        force_recalc_per_block: 强制重新计算逐格数据（默认从已有文件读取）
 
     Returns:
         处理结果摘要
@@ -78,20 +81,25 @@ def process_resources_for_version(
             maps_json_path=maps_json_path,
             output_dir=output_dir,
             sector_id=sector_id,
+            force_recalc_per_block=force_recalc_per_block,
         )
 
 
 def _write_resourcearea_blocks(
     resourceareas: List[dict],
     sector_id: Optional[str] = None,
+    force_recalc: bool = False,
+    regions_json_path: Optional[Path] = None,
 ) -> Optional[Path]:
     """写入 resourcearea_blocks.json 到 analysis/resources/。
 
-    始终执行逐格计算，生成与游戏脚本可比对的明细数据。
+    默认从已有文件读取，除非强制重新计算或文件不存在。
 
     Args:
         resourceareas: resourceareas 数据列表
         sector_id: 可选，仅输出指定 sector
+        force_recalc: 强制重新计算逐格数据
+        regions_json_path: regions.json 文件路径（用于逐格计算）
 
     Returns:
         输出文件路径
@@ -99,23 +107,43 @@ def _write_resourcearea_blocks(
     if not resourceareas:
         return None
 
-    # 过滤指定 sector
-    if sector_id:
+    # 检查是否可以直接使用已有文件
+    ANALYSIS_RESOURCES_DIR.mkdir(parents=True, exist_ok=True)
+    blocks_path = ANALYSIS_RESOURCES_DIR / "resourcearea_blocks.json"
+
+    # 加载已有数据（如果存在）
+    existing_regions = {}
+    if blocks_path.exists():
+        try:
+            with blocks_path.open("r", encoding="utf-8") as f:
+                existing_data = json.load(f)
+            for region in existing_data.get("regions", []):
+                ref = region.get("ref", "")
+                if ref:
+                    existing_regions[ref] = region
+        except Exception:
+            existing_regions = {}
+
+    # 如果强制重新计算且指定了 sector，只删除该 sector 的数据
+    if force_recalc and sector_id:
         sector_id_lower = sector_id.lower()
-        resourceareas = [
-            r for r in resourceareas
-            if r.get("sector_id", "").lower() == sector_id_lower
-        ]
+        existing_regions = {
+            ref: region for ref, region in existing_regions.items()
+            if region.get("sector_id", "").lower() != sector_id_lower
+        }
 
-    if not resourceareas:
-        return None
+    # 如果不强制重新计算且已有完整数据，直接返回
+    if not force_recalc and not sector_id and existing_regions:
+        return blocks_path
 
-    blocks_output = []
+    blocks_output = {}
 
     # 逐格计算 - 加载依赖
     from processor.step2_resource.per_block_bridge import calculate_resource_per_block
 
-    regions_json_path = Path("src/assets/x4_game_data/8.0-Diplomacy/data/regions.json")
+    # 使用传入的 regions_json_path 或默认路径
+    if regions_json_path is None:
+        raise ValueError("regions_json_path is required for per-block calculation")
     if regions_json_path.exists():
         with regions_json_path.open("r", encoding="utf-8") as f:
             regions_data = json.load(f)
@@ -127,16 +155,15 @@ def _write_resourcearea_blocks(
         sector_id_val = entry.get("sector_id", "")
         areas = entry.get("areas", [])
 
-        # 按 coord 合并所有 fields（匹配游戏输出格式）
-        tiles_by_coord: Dict[str, dict] = {}
-
         for area in areas:
             ref = area.get("ref", "")
             region_json = regions_by_id.get(ref, {})
             if not region_json:
                 continue
 
+            position = area.get("position", {})
             resources = area.get("resources", [])
+
             for res in resources:
                 ware = res.get("ware", "")
                 resourcedensity = res.get("resourcedensity", 1.0)
@@ -150,40 +177,64 @@ def _write_resourcearea_blocks(
                     resourcedensity=resourcedensity,
                 )
 
+                # 初始化 region 数据（如果不存在）
+                if ref not in blocks_output:
+                    blocks_output[ref] = {
+                        "ref": ref,
+                        "sector_id": sector_id_val,
+                        "total": {},
+                        "tiles": {},
+                    }
+
+                # 处理每个 tile 的数据
                 for tile in result.get("per_tile", []):
-                    coord = tile.get("coord", (0, 0, 0))
-                    if isinstance(coord, tuple):
-                        coord_str = f"{coord[0]}_{coord[1]}_{coord[2]}"
-                    else:
-                        coord_str = str(coord)
+                    world_coord = tile.get("world_coord", (0, 0, 0))
+                    tile_x, tile_y, tile_z = world_coord
+                    tile_key = f"{tile_x}_{tile_y}_{tile_z}"
 
                     # 初始化 tile（如果不存在）
-                    if coord_str not in tiles_by_coord:
-                        tiles_by_coord[coord_str] = {
-                            "coord": coord_str,
-                            "fields": [],
+                    if tile_key not in blocks_output[ref]["tiles"]:
+                        blocks_output[ref]["tiles"][tile_key] = {
+                            "x": tile_x,
+                            "y": tile_y,
+                            "z": tile_z,
+                            "wares": {},
                         }
 
-                    # 添加所有 matching fields 到此 tile
+                    # 累加该 ware 的值到 tile
                     for field_result in tile.get("fields", []):
-                        field_ware = field_result.get("ware", "")
-                        if field_ware == ware:
-                            tiles_by_coord[coord_str]["fields"].append({
-                                "field": field_result.get("field", ""),
-                                "area_value": field_result.get("area_value", 0),
-                            })
+                        if field_result.get("ware") == ware:
+                            area_value = field_result.get("area_value", 0)
+                            blocks_output[ref]["tiles"][tile_key]["wares"][ware] = \
+                                blocks_output[ref]["tiles"][tile_key]["wares"].get(ware, 0) + area_value
+                            # 同时累加到 total
+                            blocks_output[ref]["total"][ware] = \
+                                blocks_output[ref]["total"].get(ware, 0) + area_value
 
-        blocks_output.append({
-            "sector_id": sector_id_val,
-            "per_tile": list(tiles_by_coord.values()),
+    # 转换为列表格式，并将 tiles 字典转换为列表
+    blocks_list = []
+
+    # 先添加新计算的数据
+    for ref, region_data in blocks_output.items():
+        blocks_list.append({
+            "ref": ref,
+            "sector_id": region_data.get("sector_id"),
+            "total": region_data["total"],
+            "tiles": list(region_data["tiles"].values()),
         })
+
+    # 再添加已有数据中未更新的部分
+    processed_refs = set(blocks_output.keys())
+    for ref, region_data in existing_regions.items():
+        if ref not in processed_refs:
+            blocks_list.append(region_data)
 
     # 写入到 analysis/resources/
     ANALYSIS_RESOURCES_DIR.mkdir(parents=True, exist_ok=True)
     blocks_path = ANALYSIS_RESOURCES_DIR / "resourcearea_blocks.json"
 
     with blocks_path.open("w", encoding="utf-8") as f:
-        json.dump(blocks_output, f, indent=2)
+        json.dump({"regions": blocks_list}, f, indent=2)
 
     return blocks_path
 
@@ -276,7 +327,7 @@ def _process_90plus_resources(
             json.dump(maps_data, f, indent=2)
 
     # 8. 输出 resourcearea_blocks.json 到 analysis/resources/
-    blocks_path = _write_resourcearea_blocks(resourceareas, sector_id)
+    blocks_path = _write_resourcearea_blocks(resourceareas, sector_id, False, None)
 
     return {
         "status": "success",
@@ -295,12 +346,13 @@ def _process_80_resources(
     maps_json_path: Path,
     output_dir: Path,
     sector_id: Optional[str],
+    force_recalc_per_block: bool = False,
 ) -> Dict[str, object]:
     """处理 8.0 版本资源。
 
     8.0 版本需要：
     1. 估算算法：计算理论储量
-    2. 逐格算法：计算精确储量
+    2. 逐格算法：计算精确储量（默认从已有文件读取，除非强制重新计算）
     """
     if regions_json_path is None:
         return {"status": "error", "message": "Missing regions.json path for 8.0 processing"}
@@ -315,6 +367,21 @@ def _process_80_resources(
 
     # 索引 regions
     regions_by_id = {r.get("id"): r for r in regions_data if isinstance(r, dict)}
+
+    # 尝试加载已有的 resourcearea_blocks.json（新格式：{regions: [...]}）
+    blocks_cache: Dict[str, dict] = {}
+    blocks_file = ANALYSIS_RESOURCES_DIR / "resourcearea_blocks.json"
+    if not force_recalc_per_block and blocks_file.exists():
+        try:
+            with blocks_file.open("r", encoding="utf-8") as f:
+                blocks_data = json.load(f)
+            # 新格式：{regions: [{ref, total, tiles}, ...]}
+            for entry in blocks_data.get("regions", []):
+                ref = entry.get("ref", "")
+                if ref:
+                    blocks_cache[ref] = entry
+        except Exception:
+            blocks_cache = {}
 
     # 处理每个 sector
     resourceareas_rows: List[dict] = []
@@ -343,9 +410,10 @@ def _process_80_resources(
                 ref = region_ref.get("ref", "")
                 amount = region_ref.get("amount", 1)
                 position = region_ref.get("position", {})
-                boundary = region_ref.get("boundary", {})
 
                 region_template = regions_by_id.get(ref, {})
+                # 使用 regions.json 中的 boundary（包含完整的 spline 数据）
+                boundary = region_template.get("boundary", {})
                 resources = region_template.get("resources", [])
                 falloff = region_template.get("falloff", {})
 
@@ -428,49 +496,76 @@ def _process_80_resources(
     sector_resources = aggregate_sector_resources_from_resourceareas(resourceareas_rows)
 
     # 二阶段：逐格计算，更新 reserve/respawn
-    from processor.step2_resource.per_block_bridge import calculate_resource_per_block
+    # 默认从已有文件读取，除非强制重新计算或文件不存在
+    if force_recalc_per_block or not blocks_cache:
+        # 重新执行逐格计算
+        from processor.step2_resource.per_block_bridge import calculate_resource_per_block
 
-    for row in resourceareas_rows:
-        ref = row.get("ref", "")
-        sector_id_val = row.get("sector_id", "")
-        region_json = regions_by_id.get(ref, {})
-        if not region_json:
-            continue
+        for row in resourceareas_rows:
+            ref = row.get("ref", "")
+            sector_id_val = row.get("sector_id", "")
+            region_json = regions_by_id.get(ref, {})
+            if not region_json:
+                continue
 
-        resources = row.get("resources", [])
-        for res in resources:
-            ware = res.get("ware", "")
-            resourcedensity = res.get("resourcedensity", 1.0)
+            resources = row.get("resources", [])
+            for res in resources:
+                ware = res.get("ware", "")
+                resourcedensity = res.get("resourcedensity", 1.0)
 
-            result = calculate_resource_per_block(
-                sector_id=sector_id_val,
-                field_ref=ref,
-                area_data=row,
-                region_json=region_json,
-                ware=ware,
-                resourcedensity=resourcedensity,
-            )
+                result = calculate_resource_per_block(
+                    sector_id=sector_id_val,
+                    field_ref=ref,
+                    area_data=row,
+                    region_json=region_json,
+                    ware=ware,
+                    resourcedensity=resourcedensity,
+                )
 
-            # 聚合所有 tile 的 area_value 作为 reserve
-            total_reserve = 0
-            for tile in result.get("per_tile", []):
-                # 固体资源：fields 列表
-                if "fields" in tile:
-                    for field_result in tile.get("fields", []):
-                        if field_result.get("ware") == ware:
-                            total_reserve += field_result.get("area_value", 0)
-                # 气体资源：直接用 ware 名作为 key
-                elif ware in tile:
-                    total_reserve += tile.get(ware, 0)
+                # 聚合所有 tile 的 area_value 作为 reserve
+                total_reserve = 0
+                for tile in result.get("per_tile", []):
+                    # 固体资源：fields 列表
+                    if "fields" in tile:
+                        for field_result in tile.get("fields", []):
+                            if field_result.get("ware") == ware:
+                                total_reserve += field_result.get("area_value", 0)
+                    # 气体资源：直接用 ware 名作为 key
+                    elif ware in tile:
+                        total_reserve += tile.get(ware, 0)
 
-            if total_reserve > 0:
-                res["reserve"] = total_reserve
-                # respawn 基于 delay 计算
-                delay = res.get("delay", 60.0)
-                if delay > 0:
-                    res["respawn"] = round_to_int(total_reserve * 60.0 / delay)
-                else:
-                    res["respawn"] = 0
+                if total_reserve > 0:
+                    res["reserve"] = total_reserve
+                    # respawn 基于 delay 计算
+                    delay = res.get("delay", 60.0)
+                    if delay > 0:
+                        res["respawn"] = round_to_int(total_reserve * 60.0 / delay)
+                    else:
+                        res["respawn"] = 0
+    else:
+        # 从缓存读取（新格式：从 total 字段读取 ware 汇总值）
+        for row in resourceareas_rows:
+            ref = row.get("ref", "")
+            region_cache = blocks_cache.get(ref, {})
+            if not region_cache:
+                continue
+
+            # 新格式：直接读取 total 字典
+            cached_totals = region_cache.get("total", {})
+
+            # 更新 resources
+            resources = row.get("resources", [])
+            for res in resources:
+                ware = res.get("ware", "")
+                if ware in cached_totals:
+                    total_reserve = cached_totals[ware]
+                    res["reserve"] = total_reserve
+                    # respawn 基于 delay 计算
+                    delay = res.get("delay", 60.0)
+                    if delay > 0:
+                        res["respawn"] = round_to_int(total_reserve * 60.0 / delay)
+                    else:
+                        res["respawn"] = 0
 
     # 写入输出文件
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -509,6 +604,9 @@ def _process_80_resources(
     with resourceareas_path.open("w", encoding="utf-8") as f:
         json.dump(resourceareas_output, f, indent=2)
 
+    # 逐格计算完成后，重新聚合 sector_resources（包含正确的 reserve）
+    sector_resources = aggregate_sector_resources_from_resourceareas(resourceareas_rows)
+
     # 更新 maps.json 中的 sector.resources
     for cluster_data in clusters.values():
         if not isinstance(cluster_data, dict):
@@ -525,7 +623,7 @@ def _process_80_resources(
         json.dump(maps_data, f, indent=2)
 
     # 输出 resourcearea_blocks.json 到 analysis/resources/
-    blocks_path = _write_resourcearea_blocks(resourceareas_output, sector_id)
+    blocks_path = _write_resourcearea_blocks(resourceareas_output, sector_id, force_recalc_per_block, regions_json_path)
 
     return {
         "status": "success",

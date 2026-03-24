@@ -1,6 +1,8 @@
-"""更新 regions.json 添加 field definitions。
+"""更新 regions.json 添加 field definitions 和 regionobjectgroups yield 数据。
 
-从 region_definitions XML 提取 field 定义，合并到 regions.json。
+从 region_definitions XML 提取 field 定义，
+从 regionobjectgroups XML 提取 yield 数据，
+合并到 regions.json。
 """
 
 from __future__ import annotations
@@ -51,17 +53,56 @@ def parse_region_definitions(xml_path: Path) -> Dict[str, Dict[str, Any]]:
     return result
 
 
+def parse_regionobjectgroups(xml_path: Path) -> Dict[str, Dict[str, Any]]:
+    """解析 regionobjectgroups XML，返回 yield 数据。
+
+    Returns:
+        Dict[groupref, {"resource": str, "yield": float, "yieldvariation": float}]
+    """
+    result = {}
+    tree = ET.parse(xml_path)
+    root = tree.getroot()
+
+    for group_elem in root.findall(".//group"):
+        name = group_elem.get("name", "")
+        if not name:
+            continue
+
+        resource = group_elem.get("resource", "")
+        yield_value = float(group_elem.get("yield", "1.0"))
+        yieldvariation = float(group_elem.get("yieldvariation", "0.0"))
+
+        result[name] = {
+            "resource": resource,
+            "yield": yield_value,
+            "yieldvariation": yieldvariation,
+        }
+
+    return result
+
+
 def update_regions_json(
     regions_json_path: Path,
     region_definitions_xml_path: Path,
+    regionobjectgroups_xml_path: Optional[Path] = None,
 ) -> int:
-    """更新 regions.json，添加 field definitions。
+    """更新 regions.json，添加 field definitions 和 yield 数据。
+
+    Args:
+        regions_json_path: regions.json 路径
+        region_definitions_xml_path: region_definitions XML 路径
+        regionobjectgroups_xml_path: regionobjectgroups XML 路径（可选）
 
     Returns:
         更新的 region 数量
     """
     # 解析 XML
     field_defs = parse_region_definitions(region_definitions_xml_path)
+
+    # 解析 regionobjectgroups（如果提供）
+    group_yields = {}
+    if regionobjectgroups_xml_path and regionobjectgroups_xml_path.exists():
+        group_yields = parse_regionobjectgroups(regionobjectgroups_xml_path)
 
     # 读取 regions.json
     with regions_json_path.open("r", encoding="utf-8") as f:
@@ -74,7 +115,18 @@ def update_regions_json(
         if region_id in field_defs:
             defs = field_defs[region_id]
             region["density"] = defs["density"]
-            region["fields"] = defs["fields"]
+
+            # 添加 yield 数据到每个 field
+            fields = defs["fields"]
+            for field in fields:
+                groupref = field.get("groupref", "")
+                if groupref in group_yields:
+                    yield_data = group_yields[groupref]
+                    field["resource"] = yield_data["resource"]
+                    field["yield"] = yield_data["yield"]
+                    field["yieldvariation"] = yield_data["yieldvariation"]
+
+            region["fields"] = fields
             updated += 1
 
     # 写回
@@ -87,7 +139,7 @@ def update_regions_json(
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="Update regions.json with field definitions")
+    parser = argparse.ArgumentParser(description="Update regions.json with field definitions and yield data")
     parser.add_argument(
         "--regions-json",
         type=Path,
@@ -100,8 +152,18 @@ if __name__ == "__main__":
         default=Path("x4raw_assets/8.0-Diplomacy/libraries/region_definitions/final.xml"),
         help="Path to region_definitions/final.xml",
     )
+    parser.add_argument(
+        "--regionobjectgroups-xml",
+        type=Path,
+        default=Path("x4raw_assets/8.0-Diplomacy/libraries/regionobjectgroups/final.xml"),
+        help="Path to regionobjectgroups/final.xml",
+    )
 
     args = parser.parse_args()
 
-    updated = update_regions_json(args.regions_json, args.region_definitions_xml)
-    print(f"Updated {updated} regions with field definitions")
+    updated = update_regions_json(
+        args.regions_json,
+        args.region_definitions_xml,
+        args.regionobjectgroups_xml,
+    )
+    print(f"Updated {updated} regions with field definitions and yield data")

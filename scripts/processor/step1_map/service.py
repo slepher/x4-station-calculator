@@ -18,6 +18,7 @@ from processor.step2_resource.modern_processor import (
 from processor.resource.legacy_processor import migrate_regionyields
 from processor.step1_map.generator import generate_map_data
 from processor.step1_map.converter import migrate_factions
+from processor.step1_map.update_regions_fields import update_regions_json
 from processor.shared.output_manager import (
     write_regionyields,
     write_factions,
@@ -170,6 +171,14 @@ def process_map_for_version(
         regions_rows = result.get("regions", [])
         write_regions(regions_rows, regions_output_path)
         print(f"📦 Regions Output: {regions_output_path} count={len(regions_rows)}")
+
+        # 更新 regions.json，添加 field definitions 和 yield 数据
+        updated_count = update_regions_json(
+            regions_output_path,
+            region_definitions_xml_path,
+            regionobjectgroups_xml_path,
+        )
+        print(f"📦 Regions Updated: {updated_count} regions with field definitions and yield data")
 
         # Step 1 不输出 resourceareas.json，由 Step 2 生成
         print(f"📦 Resourceareas Output: 跳过 (由 Step 2 生成)")
