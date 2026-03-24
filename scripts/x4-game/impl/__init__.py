@@ -45,7 +45,6 @@ from .solid_replay import (
 from .region_replay import (
     replay_region_unified,
     replay_solid_field_14073E110,
-    replay_solid_field_14073E110_deprecated,
     RegionReplayResult,
     FieldReplayResult,
     TileResult as UnifiedTileResult,
@@ -103,7 +102,6 @@ __all__ = [
     # Unified region replay
     'replay_region_unified',
     'replay_solid_field_14073E110',
-    'replay_solid_field_14073E110_deprecated',
     'RegionReplayResult',
     'FieldReplayResult',
     'UnifiedTileResult',
