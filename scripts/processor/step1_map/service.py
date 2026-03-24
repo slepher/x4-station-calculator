@@ -1,4 +1,4 @@
-"""Map 数据处理服务 - X4 Map Data Processor.
+"""Step 1 Map 处理服务 - X4 Map Data Processor.
 
 提供统一的 Map 数据处理服务，根据版本号自动选择资源模型并执行对应的处理流程。
 """
@@ -10,27 +10,21 @@ from typing import Dict, Optional, Any, Set
 from processor.i18n import get_i18n_registry, I18nRegistry
 from processor.path_utils import get_map_dir, get_library_xml
 from processor.versioning import load_version_config
-from processor.resource.model_detector import detect_map_resource_model
-from processor.resource.modern_processor import (
+from processor.step2_resource.model_detector import detect_map_resource_model
+from processor.step2_resource.modern_processor import (
     migrate_resourcearea_definitions,
     migrate_sector_resourceareas,
 )
 from processor.resource.legacy_processor import migrate_regionyields
-from processor.map.generator import generate_map_data
-from processor.map.converter import migrate_factions
-from processor.output_manager import (
+from processor.step1_map.generator import generate_map_data
+from processor.step1_map.converter import migrate_factions
+from processor.shared.output_manager import (
     write_regionyields,
     write_factions,
     write_regions,
     write_map,
     write_regionyield_definitions,
 )
-
-
-def write_map_output(payload: dict, output_path: Path) -> None:
-    """写入地图输出文件。"""
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def process_map_for_version(
@@ -74,7 +68,6 @@ def process_map_for_version(
     regions_output_path = Path(output_base) / "data" / "regions.json"
     regionyields_output_path = Path(output_base) / "data" / "regionyields.json"
     regionyield_definitions_output_path = Path(output_base) / "data" / "regionyield_definitions.json"
-    resourceareas_output_path = Path(output_base) / "data" / "resourceareas.json"
     maps_output_path = Path(output_base) / "data" / "maps.json"
 
     # 检测资源模型
@@ -129,8 +122,7 @@ def process_map_for_version(
             dlc_order=dlc_order,
         )
 
-        resourceareas_rows = result.get("resourceareas", [])
-        # Step 1 不再输出 resourceareas.json，由 Step 2 生成
+        # Step 1 不输出 resourceareas.json，由 Step 2 生成
         print(f"📦 Resourceareas Output: 跳过 (由 Step 2 生成)")
         print(f"📦 Regions Output: 跳过 (9.0+ 不生成)")
 
@@ -151,7 +143,6 @@ def process_map_for_version(
 
         return {
             "resource_model": "resourceareas",
-            "resourceareas_count": len(resourceareas_rows),
             "factions_count": len(factions_rows),
             "name_ids": map_name_ids,
         }
@@ -180,32 +171,28 @@ def process_map_for_version(
         write_regions(regions_rows, regions_output_path)
         print(f"📦 Regions Output: {regions_output_path} count={len(regions_rows)}")
 
-        # Step 1 不再输出 resourceareas.json，由 Step 2 生成
-        resourceareas_rows = result.get("resourceareas", [])
+        # Step 1 不输出 resourceareas.json，由 Step 2 生成
         print(f"📦 Resourceareas Output: 跳过 (由 Step 2 生成)")
 
-        print(f"📦 Regionyields Output: {regionyields_output_path} ({len(regionyields_rows)})")
+        # 输出 maps.json
+        payload = result.get("payload", {})
+        write_map(payload, maps_output_path)
+        print(f"📦 Maps Output: {maps_output_path}")
 
-    # 分支后处理：输出 maps.json 并收集 nameId（8.0 和 9.0 共有）
-    payload = result.get("payload", {})
-    write_map(payload, maps_output_path)
-    print(f"📦 Maps Output: {maps_output_path}")
+        # 收集 nameId
+        map_name_ids = set(result.get("name_ids", []))
+        missing = result.get("missing_name_ids", {})
+        ties = result.get("owner_resolution_ties", [])
 
-    # 收集 nameId
-    map_name_ids = set(result.get("name_ids", []))
-    missing = result.get("missing_name_ids", {})
-    ties = result.get("owner_resolution_ties", [])
+        print(f"   ✅ map nameId merged: {len(map_name_ids)}")
+        print(f"   ℹ️ owner resolution ties: {len(ties)}")
+        print(f"   ℹ️ map missing cluster nameId: {len(missing.get('clusters', []))}")
+        print(f"   ℹ️ map missing sector nameId: {len(missing.get('sectors', []))}")
 
-    print(f"   ✅ map nameId merged: {len(map_name_ids)}")
-    print(f"   ℹ️ owner resolution ties: {len(ties)}")
-    print(f"   ℹ️ map missing cluster nameId: {len(missing.get('clusters', []))}")
-    print(f"   ℹ️ map missing sector nameId: {len(missing.get('sectors', []))}")
-
-    return {
-        "resource_model": resource_model,
-        "resourceareas_count": len(result.get("resourceareas", [])),
-        "regions_count": len(result.get("regions", [])),
-        "regionyields_count": len(result.get("regionyields", [])),
-        "factions_count": len(factions_rows),
-        "name_ids": map_name_ids,
-    }
+        return {
+            "resource_model": resource_model,
+            "regions_count": len(regions_rows),
+            "regionyields_count": len(regionyields_rows),
+            "factions_count": len(factions_rows),
+            "name_ids": map_name_ids,
+        }

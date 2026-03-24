@@ -460,7 +460,7 @@ function distancePointToSegment(point: Vector3, start: Vector3, end: Vector3): n
   return Math.sqrt(squaredDistance(point, projection))
 }
 
-function boundaryCenter(position: Vector3, boundary: Boundary): Vector3 {
+function boundaryCenter(position: Vector3, _boundary: Boundary): Vector3 {
   // cylinder and box position is already the center (linear/size are half-extents)
   return position
 }
