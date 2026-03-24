@@ -151,7 +151,7 @@ def generate_map_data(
     from collections import defaultdict
     from processor.i18n import get_i18n_registry
 
-    name_id_by_macro, area_by_sector_macro = load_mapdefaults(mapdefaults_path)
+    name_id_by_macro, area_by_sector_macro, area_by_cluster_macro = load_mapdefaults(mapdefaults_path)
     registry = i18n_registry or get_i18n_registry()
     if i18n_registry is None:
         registry.configure("", {
@@ -371,10 +371,14 @@ def generate_map_data(
         cluster_id = f"Cluster_{int(match.group(1)):02d}_macro" if match else None
         raw_local = cluster_sector_offsets.get(cluster_id or "", {}).get(sector_macro, {"x": 0.0, "z": 0.0})
         cluster_raw = clusters.get(cluster_id or "", {}).get("raw_pos", {"x": 0.0, "z": 0.0})
-        area = area_by_sector_macro.get(
-            sector_macro.lower(),
-            {"sunlight": 0.0, "economy": 0.0, "security": 0.0, "tags": []},
-        )
+        # 获取area：优先使用sector自己的area，否则回退到cluster的area
+        sector_area = area_by_sector_macro.get(sector_macro.lower())
+        if sector_area is not None:
+            area = sector_area
+        elif cluster_id and cluster_id.lower() in area_by_cluster_macro:
+            area = area_by_cluster_macro[cluster_id.lower()]
+        else:
+            area = {"sunlight": 0.0, "economy": 0.0, "security": 0.0, "tags": []}
         sectors[sector_macro] = {
             "id": sector_macro,
             "cluster_id": cluster_id,
