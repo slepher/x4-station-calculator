@@ -43,7 +43,9 @@ from .solid_replay import (
     load_total_sample_for_ware as load_solid_total_sample,
 )
 from .region_replay import (
-    replay_region_14073E110,
+    replay_region_unified,
+    replay_solid_field_14073E110,
+    replay_solid_field_14073E110_deprecated,
     RegionReplayResult,
     FieldReplayResult,
     TileResult as UnifiedTileResult,
@@ -52,6 +54,10 @@ from .region_replay import (
     is_gas_ware,
     is_solid_field,
     is_gas_field,
+)
+from .save_sample_loader import (
+    load_save_sample,
+    load_total_save_sample,
 )
 
 __all__ = [
@@ -95,7 +101,9 @@ __all__ = [
     'load_solid_save_sample',
     'load_solid_total_sample',
     # Unified region replay
-    'replay_region_14073E110',
+    'replay_region_unified',
+    'replay_solid_field_14073E110',
+    'replay_solid_field_14073E110_deprecated',
     'RegionReplayResult',
     'FieldReplayResult',
     'UnifiedTileResult',
@@ -104,4 +112,7 @@ __all__ = [
     'is_gas_ware',
     'is_solid_field',
     'is_gas_field',
+    # Save sample loader
+    'load_save_sample',
+    'load_total_save_sample',
 ]
