@@ -44,15 +44,18 @@ from .solid_replay import (
 )
 from .region_replay import (
     replay_region_unified,
-    replay_solid_field_14073E110,
     RegionReplayResult,
     FieldReplayResult,
     TileResult as UnifiedTileResult,
-    FieldInfo,
-    ResourceInfo,
     is_gas_ware,
     is_solid_field,
     is_gas_field,
+)
+from .region_resource_field import (
+    region_resource_field_14073E110,
+    RegionResourceFieldResult,
+    FieldInfo,
+    ResourceInfo,
 )
 from .save_sample_loader import (
     load_save_sample,
@@ -101,15 +104,17 @@ __all__ = [
     'load_solid_total_sample',
     # Unified region replay
     'replay_region_unified',
-    'replay_solid_field_14073E110',
     'RegionReplayResult',
     'FieldReplayResult',
     'UnifiedTileResult',
-    'FieldInfo',
-    'ResourceInfo',
     'is_gas_ware',
     'is_solid_field',
     'is_gas_field',
+    # Region resource field (FUN_14073e110)
+    'region_resource_field_14073E110',
+    'RegionResourceFieldResult',
+    'FieldInfo',
+    'ResourceInfo',
     # Save sample loader
     'load_save_sample',
     'load_total_save_sample',

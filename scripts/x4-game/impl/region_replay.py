@@ -1,10 +1,16 @@
 """Unified region replay - reverse engineered from X4.exe.
 
-C++ entry: FUN_14073e110
+This module provides the unified entry point for region replay,
+coordinating between gas field and solid field processing.
+
+C++ entry points:
+- Gas: FUN_14075bd20
+- Solid field initialization: FUN_14073e110 (moved to region_resource_field.py)
+- Tile processing: FUN_14073f750
 
 Field type detection (FUN_140e81620):
 - case 0x08 (8): AsteroidField -> solid
-- case 0x13 (19): DebrisField -> solid (uses same FUN_140e842e0 as AsteroidField)
+- case 0x13 (19): DebrisField -> solid
 - case 0x4c (76): Nebula -> gas
 
 In JSON data:
@@ -15,72 +21,39 @@ In JSON data:
 from __future__ import annotations
 
 import json
-import math
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 from .profile_eval import ProfilePoint, eval_profile_avg_1414ed970
 from .grid_enumeration import (
-    AREA_SIZE,
-    QueryGridWindow,
     build_query_grid_window_140760320,
     storage_coord_to_world_coord_140760320,
     enumerate_storage_coords_for_bbox,
     QUERY_RADIUS_14073F750,
 )
 from .solid_context import (
-    SolidRegionState,
-    SolidFieldState,
     FalloffProfiles,
-    compute_multiplier_a_140E80300,
-    compute_multiplier_b_140E803E0,
 )
 from .noise import compute_local_noise_fast_path_1414F4840
-from .weight_computation import compute_resource_field_base_multiplier_140e80260
-from boundary.spline_tube_boundary import SplineTubeBoundary
 from boundary.cylinder_boundary import CylinderBoundary
-from field.field_factory import (
-    iterate_resources_140e82530,
-    resolve_groupref_140e81ff0,
-    field_factory_140e81620,
-    parse_region_object_groups_140E950A0,
-    FIELD_TYPE_ASTEROID,
-    FIELD_TYPE_DEBRIS,
+from .region_resource_field import (
+    region_resource_field_14073E110,
+    RegionResourceFieldResult,
+    ResourceInfo,
+    FieldInfo,
 )
 
 if TYPE_CHECKING:
-    pass
+    from field.resource_object_field import ResourceObjectField
 
 
 # Paths
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_ROOT = PROJECT_ROOT / "src" / "assets" / "x4_game_data" / "8.0-Diplomacy" / "data"
 RAW_ROOT = PROJECT_ROOT / "x4raw_assets" / "8.0-Diplomacy" / "libraries"
 REGIONS_JSON = DATA_ROOT / "regions.json"
 RESOURCEAREAS_JSON = DATA_ROOT / "resourceareas.json"
-
-
-@dataclass
-class FieldInfo:
-    """Field information extracted from region data."""
-    tag: str
-    groupref: str = ""
-    densityfactor: float = 1.0
-    noisescale: float = 5000.0
-    seed: str = ""
-    minnoisevalue: float = 0.0
-    maxnoisevalue: float = 1.0
-
-
-@dataclass
-class ResourceInfo:
-    """Resource information from region data."""
-    ware: str
-    resourcedensity: float
-    delay: float = 0.0
-    gatherfactor: float = 1.0
-    yield_name: str = ""
 
 
 @dataclass
@@ -192,20 +165,12 @@ def is_gas_ware(ware: str) -> bool:
 
 
 def is_solid_field(field: FieldInfo) -> bool:
-    """Check if field is solid (AsteroidField or DebrisField).
-
-    C++ evidence from FUN_140e81620:
-    - case 0x08: AsteroidField
-    - case 0x13: DebrisField (uses same FUN_140e842e0 as AsteroidField)
-    """
+    """Check if field is solid (AsteroidField or DebrisField)."""
     return field.tag in SOLID_FIELD_TAGS
 
 
 def is_gas_field(field: FieldInfo) -> bool:
-    """Check if field is gas (Nebula).
-
-    C++ evidence: case 0x4c in FUN_140e81620
-    """
+    """Check if field is gas (Nebula)."""
     return field.tag == "nebula"
 
 
@@ -241,217 +206,10 @@ def compute_solid_field_bounding_box(region_data: dict, area_data: dict) -> tupl
 
 
 # ============================================================================
-# FUN_14073e110 replication - Pending Ghidra verification
+# Tile processing - C++ FUN_14073f750
 # ============================================================================
 
-# Functions/vfuncs used in replay_solid_field_14073E110:
-# 1. iterate_resources_140e82530 (FUN_140e82530) - CONFIRMED
-# 2. receive_region_payload_0x20 (vfunc+0x20) - vfunc
-# 3. compute_field_weight_0xa0 (vfunc+0xa0) - vfunc
-# 4. writeback_per_field_value_0x28 (vfunc+0x28) - vfunc
-# 5. eval_profile_avg_1414ed970 (FUN_1414ed970) - PENDING
-# 6. get_lateral_interval_0x58 (vfunc+0x58) - vfunc
-# 7. get_radial_interval_0x70 (vfunc+0x70) - vfunc
-# 8. get_multiplier_b_0x98 (vfunc+0x98) - vfunc
-# 9. get_multiplier_a_0x1b8 (vfunc+0x1b8) - vfunc
-# 10. compute_local_noise_fast_path_1414F4840 (FUN_1414F4840) - PENDING
-# 11. storage_coord_to_world_coord_140760320 (FUN_140760320) - PENDING
-# 12. build_query_grid_window_140760320 (FUN_140760320) - PENDING
-
-
-def replay_solid_field_14073E110(
-    sector_id: str,
-    region_data: dict,
-    area_data: dict,
-    fields: list[FieldInfo],
-    resources: list[ResourceInfo],
-    ware_filter: str | None = None,
-) -> FieldReplayResult:
-    """Replay solid field computation - C++ FUN_14073e110 replication.
-
-    PENDING: Function-by-function verification via Ghidra.
-    Each function/vfunc used below must be confirmed before finalizing.
-
-    Args:
-        sector_id: Sector identifier
-        region_data: Region JSON data
-        area_data: Area JSON data
-        fields: List of FieldInfo (asteroid/debris fields only)
-        resources: List of ResourceInfo
-        ware_filter: Optional ware to filter
-
-    Returns:
-        FieldReplayResult with computed values
-    """
-    from field import ResourceObjectField
-
-    region_id = region_data["id"]
-    position = area_data.get("position", {})
-    boundary = region_data.get("boundary", {})
-    size = boundary.get("size", {})
-
-    pos_x = float(position.get("x", 0))
-    pos_y = float(position.get("y", 0))
-    pos_z = float(position.get("z", 0))
-    radius = float(size.get("r", 0))
-    linear = float(size.get("linear", 0))
-    region_density = float(region_data.get("density", 1.0))
-    solid_volume_km3 = float(region_data.get("volume_km3", 0))
-
-    # Filter solid fields (C++: case 0x08, 0x13 in FUN_140e81620)
-    solid_field_infos = [f for f in fields if is_solid_field(f)]
-
-    if not solid_field_infos:
-        return _create_empty_solid_result(sector_id, region_id, boundary, ware_filter)
-
-    # ========================================================================
-    # Step 1: Build field list via FUN_140e82530 factory chain
-    # ========================================================================
-    field_list: list[ResourceObjectField] = []
-
-    for f in solid_field_infos:
-        xml_data = {
-            "name": f.groupref or "default",
-            "groupref": f.groupref,
-            "densityfactor": f.densityfactor,
-            "noisescale": f.noisescale,
-            "seed": f.seed,
-            "minnoisevalue": f.minnoisevalue,
-            "maxnoisevalue": f.maxnoisevalue,
-            "resourcepercentage": 100.0,
-            "region_density": region_density,
-            "type": FIELD_TYPE_ASTEROID if f.tag == "asteroid" else FIELD_TYPE_DEBRIS,
-            "resources": [],
-        }
-
-        # CONFIRMED: FUN_140e82530
-        created = iterate_resources_140e82530(
-            field_list, xml_data,
-            pos_x, pos_y, pos_z, radius,
-            scale_factor=1.0, linear=linear
-        )
-
-        if ware_filter:
-            created = [f for f in created if f.ware_key == ware_filter]
-
-    if not field_list:
-        return _create_empty_solid_result(sector_id, region_id, boundary, ware_filter)
-
-    unique_wares = list(set(f.ware_key for f in field_list))
-
-    # ========================================================================
-    # Step 2: Inject payload via vfunc(+0x20) - INLINED from _inject_payload_for_fields
-    # ========================================================================
-    for field_obj in field_list:
-        matching_res = [r for r in resources if r.ware == field_obj.ware_key]
-        resourcedensity = matching_res[0].resourcedensity if matching_res else 1.0
-        yield_name = matching_res[0].yield_name if matching_res else ""
-        region_yield = matching_res[0].resourcedensity if matching_res else 0.0
-
-        # vfunc(+0x20) - receive_region_payload
-        field_obj.receive_region_payload_0x20(
-            payload_resourcedensity=resourcedensity,
-            payload_yield_name=yield_name,
-            payload_region_yield=region_yield
-        )
-
-    # ========================================================================
-    # Step 3: Accumulate weights via vfunc(+0xa0) - INLINED from _accumulate_weights_by_ware
-    # ========================================================================
-    sum_weights_by_ware: dict[str, float] = {}
-    for field_obj in field_list:
-        ware = field_obj.ware_key
-        # vfunc(+0xa0) - use_resourcepercentage=False for region allocation
-        field_weight = field_obj.compute_field_weight_0xa0(use_resourcepercentage=False)
-        if ware not in sum_weights_by_ware:
-            sum_weights_by_ware[ware] = 0.0
-        sum_weights_by_ware[ware] += field_weight
-
-    # ========================================================================
-    # Step 4: Compute per_field_value - INLINED from _compute_per_field_value
-    # ========================================================================
-    per_field_value_by_ware: dict[str, float] = {}
-    for ware in unique_wares:
-        matching_res = [r for r in resources if r.ware == ware]
-        resourcedensity = matching_res[0].resourcedensity if matching_res else 1.0
-        sum_weights = sum_weights_by_ware.get(ware, 0.0)
-        per_field_value = resourcedensity / sum_weights if sum_weights > 0 else 0.0
-        per_field_value_by_ware[ware] = per_field_value
-
-    # ========================================================================
-    # Step 5: Writeback via vfunc(+0x28) - INLINED from _writeback_per_field_values
-    # ========================================================================
-    for field_obj in field_list:
-        ware = field_obj.ware_key
-        per_field_value = per_field_value_by_ware.get(ware, 0.0)
-        # vfunc(+0x28) - writeback_per_field_value
-        field_obj.writeback_per_field_value_0x28(per_field_value)
-
-    # ========================================================================
-    # Step 6: Process tiles - Setup grid and enumerate (FUN_14073e110 logic)
-    # ========================================================================
-    # Setup tile processing - This is part of FUN_14073e110, not FUN_14073f750
-    half_height = linear / 2.0
-    p0 = (pos_x, pos_y - half_height, pos_z)
-    p1 = (pos_x, pos_y + half_height, pos_z)
-    boundary_obj = CylinderBoundary.from_endpoints(p0, p1, radius)
-
-    box_min, box_max, _ = compute_solid_field_bounding_box(region_data, area_data)
-    grid = build_query_grid_window_140760320(pos_x, pos_y, pos_z)
-    storage_coords = enumerate_storage_coords_for_bbox(box_min, box_max, grid, "full")
-
-    falloff_data = region_data.get("falloff", {})
-    falloff = FalloffProfiles(
-        lateral=[ProfilePoint(float(p["position"]), float(p["value"])) for p in falloff_data.get("lateral", [])],
-        radial=[ProfilePoint(float(p["position"]), float(p["value"])) for p in falloff_data.get("radial", [])],
-    )
-
-    clamp_factor = min(solid_volume_km3, 262144.0)
-
-    per_tile: list[TileResult] = []
-    ware_totals: dict[str, float] = {}
-
-    # Tile loop - This is in FUN_14073e110
-    for coord in storage_coords:
-        world_coord = storage_coord_to_world_coord_140760320(grid, coord)
-        world_pos = (float(world_coord[0]), float(world_coord[1]), float(world_coord[2]))
-
-        # Process single tile via FUN_14073f750
-        tile_result = _process_tiles_14073f750(
-            coord=coord,
-            world_coord=world_coord,
-            world_pos=world_pos,
-            boundary_obj=boundary_obj,
-            falloff=falloff,
-            field_list=field_list,
-            clamp_factor=clamp_factor,
-        )
-
-        if tile_result:
-            per_tile.append(tile_result)
-            for ware, value in tile_result.tile_values.items():
-                if ware not in ware_totals:
-                    ware_totals[ware] = 0.0
-                ware_totals[ware] += value
-
-    # Determine primary ware
-    primary_ware = ware_filter if ware_filter else (field_list[0].ware_key if field_list else "")
-    primary_yield = _find_yield_name(resources, primary_ware)
-
-    return FieldReplayResult(
-        field_type="solid",
-        field_name=region_id,
-        boundary_class=boundary.get("class", "cylinder"),
-        sector_id=sector_id,
-        region_id=region_id,
-        ware_id=primary_ware,
-        yield_name=primary_yield,
-        tile_count=len(per_tile),
-        ware_totals=ware_totals,
-        per_tile=per_tile,
-    )
-
-def _process_tiles_14073f750(
+def _process_single_tile_14073f750(
     coord: tuple[int, int, int],
     world_coord: tuple[int, int, int],
     world_pos: tuple[float, float, float],
@@ -462,39 +220,26 @@ def _process_tiles_14073f750(
 ) -> TileResult | None:
     """Process single tile - C++ FUN_14073f750 replication.
 
-    C++ FUN_14073f750 processes a single tile position:
-    - Receives world position as parameter
-    - Performs coordinate transformations (SIMD matrix ops)
-    - Calls boundary queries (vfunc+0x58, vfunc+0x70)
-    - Evaluates profile weights (FUN_1414ed970)
-    - Computes local noise (FUN_1414F4840)
-    - Applies multipliers (vfunc+0x98, vfunc+0x1b8)
-    - Returns computed weight for the tile
-
-    Note: The tile loop and grid enumeration are handled by the caller
-    (FUN_14073e110), not by this function.
-
     Args:
-        coord: Storage coordinate (tile index)
-        world_coord: World coordinate tuple
-        world_pos: World position tuple (float)
+        coord: Storage coordinate
+        world_coord: World coordinate
+        world_pos: World position (float)
         boundary_obj: CylinderBoundary instance
-        falloff: FalloffProfiles for lateral/radial evaluation
-        field_list: List of field objects
-        clamp_factor: Clamp factor from region volume
+        falloff: FalloffProfiles
+        field_list: List of ResourceObjectField
+        clamp_factor: Clamp factor
 
     Returns:
         TileResult if tile is within boundary, None otherwise
     """
     # vfunc(+0x58) and vfunc(+0x70) - boundary interval queries
-    # These correspond to boundary checks in FUN_14073f750
     lateral_interval = boundary_obj.get_lateral_interval_0x58(world_pos, QUERY_RADIUS_14073F750)
     radial_interval = boundary_obj.get_radial_interval_0x70(world_pos, QUERY_RADIUS_14073F750)
 
     if lateral_interval is None:
         return None
 
-    # FUN_1414ed970 - eval_profile_avg (CONFIRMED via Ghidra)
+    # FUN_1414ed970 - eval_profile_avg
     lateral_weight = eval_profile_avg_1414ed970(falloff.lateral, lateral_interval)
     radial_weight = eval_profile_avg_1414ed970(falloff.radial, radial_interval)
     profile_weight = lateral_weight * radial_weight
@@ -505,7 +250,7 @@ def _process_tiles_14073f750(
     tile_values: dict[str, float] = {}
 
     for field_obj in field_list:
-        # FUN_1414F4840 - compute_local_noise (CONFIRMED via Ghidra)
+        # FUN_1414F4840 - compute_local_noise
         noise = compute_local_noise_fast_path_1414F4840(field_obj)
 
         # vfunc(+0x98) get_multiplier_b, vfunc(+0x1b8) get_multiplier_a
@@ -535,33 +280,127 @@ def _process_tiles_14073f750(
     )
 
 
-# ============================================================================
-# C++ Function Replication Helpers
-# ============================================================================
-
-def _create_empty_solid_result(
+def replay_solid_field_14073E110(
     sector_id: str,
-    region_id: str,
-    boundary: dict,
-    ware_filter: str | None,
+    region_data: dict,
+    area_data: dict,
+    fields: list[FieldInfo],
+    resources: list[ResourceInfo],
+    ware_filter: str | None = None,
 ) -> FieldReplayResult:
-    """Create empty result - helper for early returns."""
+    """Replay solid field computation.
+
+    This function coordinates:
+    1. Field initialization (region_resource_field_14073E110)
+    2. Tile processing (_process_single_tile_14073f750)
+
+    Args:
+        sector_id: Sector identifier
+        region_data: Region JSON data
+        area_data: Area JSON data
+        fields: List of FieldInfo
+        resources: List of ResourceInfo
+        ware_filter: Optional ware filter
+
+    Returns:
+        FieldReplayResult with computed values
+    """
+    region_id = region_data["id"]
+    position = area_data.get("position", {})
+    boundary = region_data.get("boundary", {})
+    size = boundary.get("size", {})
+
+    pos_x = float(position.get("x", 0))
+    pos_y = float(position.get("y", 0))
+    pos_z = float(position.get("z", 0))
+    radius = float(size.get("r", 0))
+    linear = float(size.get("linear", 0))
+    solid_volume_km3 = float(region_data.get("volume_km3", 0))
+
+    # Step 1: Initialize resource fields (FUN_14073e110)
+    init_result = region_resource_field_14073E110(
+        sector_id=sector_id,
+        region_data=region_data,
+        area_data=area_data,
+        fields=fields,
+        resources=resources,
+        ware_filter=ware_filter,
+    )
+
+    if not init_result.field_list:
+        return FieldReplayResult(
+            field_type="solid",
+            field_name=region_id,
+            boundary_class=boundary.get("class", "cylinder"),
+            sector_id=sector_id,
+            region_id=region_id,
+            ware_id=ware_filter or "",
+        )
+
+    field_list = init_result.field_list
+
+    # Step 2: Process tiles (FUN_14073f750 loop)
+    half_height = linear / 2.0
+    p0 = (pos_x, pos_y - half_height, pos_z)
+    p1 = (pos_x, pos_y + half_height, pos_z)
+    boundary_obj = CylinderBoundary.from_endpoints(p0, p1, radius)
+
+    box_min, box_max, _ = compute_solid_field_bounding_box(region_data, area_data)
+    grid = build_query_grid_window_140760320(pos_x, pos_y, pos_z)
+    storage_coords = enumerate_storage_coords_for_bbox(box_min, box_max, grid, "full")
+
+    falloff_data = region_data.get("falloff", {})
+    falloff = FalloffProfiles(
+        lateral=[ProfilePoint(float(p["position"]), float(p["value"])) for p in falloff_data.get("lateral", [])],
+        radial=[ProfilePoint(float(p["position"]), float(p["value"])) for p in falloff_data.get("radial", [])],
+    )
+
+    clamp_factor = min(solid_volume_km3, 262144.0)
+
+    per_tile: list[TileResult] = []
+    ware_totals: dict[str, float] = {}
+
+    for coord in storage_coords:
+        world_coord = storage_coord_to_world_coord_140760320(grid, coord)
+        world_pos = (float(world_coord[0]), float(world_coord[1]), float(world_coord[2]))
+
+        tile_result = _process_single_tile_14073f750(
+            coord=coord,
+            world_coord=world_coord,
+            world_pos=world_pos,
+            boundary_obj=boundary_obj,
+            falloff=falloff,
+            field_list=field_list,
+            clamp_factor=clamp_factor,
+        )
+
+        if tile_result:
+            per_tile.append(tile_result)
+            for ware, value in tile_result.tile_values.items():
+                if ware not in ware_totals:
+                    ware_totals[ware] = 0.0
+                ware_totals[ware] += value
+
+    # Determine primary ware
+    primary_ware = ware_filter if ware_filter else (field_list[0].ware_key if field_list else "")
+    primary_yield = ""
+    for r in resources:
+        if r.ware == primary_ware:
+            primary_yield = r.yield_name
+            break
+
     return FieldReplayResult(
         field_type="solid",
         field_name=region_id,
         boundary_class=boundary.get("class", "cylinder"),
         sector_id=sector_id,
         region_id=region_id,
-        ware_id=ware_filter or "",
+        ware_id=primary_ware,
+        yield_name=primary_yield,
+        tile_count=len(per_tile),
+        ware_totals=ware_totals,
+        per_tile=per_tile,
     )
-
-
-def _find_yield_name(resources: list[ResourceInfo], ware: str) -> str:
-    """Find yield name for a ware."""
-    for r in resources:
-        if r.ware == ware:
-            return r.yield_name
-    return ""
 
 
 # ============================================================================
@@ -592,7 +431,7 @@ def replay_gas_field_14075bd20(
     Returns:
         FieldReplayResult with computed values for all wares
     """
-    from impl.replay_context import ReplayContext, GasResourceEntry, build_replay_context_140e860c0
+    from impl.replay_context import ReplayContext, build_replay_context_140e860c0
     from impl.gas_replay import replay_gas_field_14075bd20 as gas_replay_impl
 
     region_id = region_data["id"]
@@ -674,7 +513,6 @@ def replay_gas_field_14075bd20(
         sector_id=sector_id,
         region_id=region_id,
         ware_id=primary_ware,
-        yield_name="",
         tile_count=len(all_per_tile),
         ware_totals=all_ware_totals,
         per_tile=all_per_tile,
@@ -682,12 +520,7 @@ def replay_gas_field_14075bd20(
 
 
 # ============================================================================
-# Unified replay dispatch (Python helper, NOT a C++ function)
-# ============================================================================
-# Note: C++ has separate entry points:
-#   - FUN_14073E110: Solid field processing
-#   - FUN_14075BD20: Gas field processing
-# This Python helper dispatches to the appropriate C++-corresponding function.
+# Unified entry point
 # ============================================================================
 
 def replay_region_unified(
@@ -695,14 +528,17 @@ def replay_region_unified(
     region_id: str,
     ware_filter: str | None = None,
 ) -> RegionReplayResult:
-    """Unified replay dispatch - Python convenience helper.
+    """Unified region replay entry point.
 
-    ⚠️ IMPORTANT: This is NOT a C++ function.
-    C++ has separate entry points for solid and gas:
-    - FUN_14073E110 (solid)
-    - FUN_14075BD20 (gas)
+    Automatically detects field type and dispatches to appropriate handler.
 
-    This helper detects field type and dispatches appropriately.
+    Args:
+        sector_id: Sector identifier
+        region_id: Region identifier
+        ware_filter: Optional ware to filter
+
+    Returns:
+        RegionReplayResult
     """
     region_data = load_region_data(region_id)
     area_data = load_area_data(sector_id, region_id)
@@ -710,26 +546,31 @@ def replay_region_unified(
     fields = parse_fields_from_region(region_data)
     resources = parse_resources_from_region(region_data)
 
-    result = RegionReplayResult(
-        sector_id=sector_id,
-        region_id=region_id,
-    )
+    # Detect field type from fields array
+    has_solid = any(is_solid_field(f) for f in fields)
+    has_gas = any(is_gas_field(f) for f in fields)
 
-    # Separate fields by type
-    solid_fields = [f for f in fields if is_solid_field(f)]
-    gas_fields = [f for f in fields if is_gas_field(f)]
+    result = RegionReplayResult(sector_id=sector_id, region_id=region_id)
 
-    # Process solid fields
-    if solid_fields:
+    if has_solid:
         solid_result = replay_solid_field_14073E110(
-            sector_id, region_data, area_data, solid_fields, resources, ware_filter
+            sector_id=sector_id,
+            region_data=region_data,
+            area_data=area_data,
+            fields=fields,
+            resources=resources,
+            ware_filter=ware_filter,
         )
         result.fields.append(solid_result)
 
-    # Process gas fields
-    if gas_fields:
+    if has_gas:
         gas_result = replay_gas_field_14075bd20(
-            sector_id, region_data, area_data, gas_fields, resources, ware_filter
+            sector_id=sector_id,
+            region_data=region_data,
+            area_data=area_data,
+            fields=fields,
+            resources=resources,
+            ware_filter=ware_filter,
         )
         result.fields.append(gas_result)
 
