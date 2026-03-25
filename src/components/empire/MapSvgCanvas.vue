@@ -139,6 +139,9 @@ const RESOURCE_HIGHLIGHT_FILTER_ID = 'map-resource-sector-glow'
 const SEARCH_SELECTED_FILTER_ID = 'map-search-sector-selected-glow'
 const OVERLAY_ICON_SIZE = 18
 const PREVIEW_ICON_SIZE = 20
+const INNER_CLUSTER_PADDING_2SEC = 0.96  // 2-sector 内层边框 padding
+const INNER_CLUSTER_PADDING_3SEC = 0.98  // 3-sector 内层边框 padding
+const SECTOR_SCALE_3SEC = 0.97  // 3-sector sector 相对于内层的缩放
 
 const props = withDefaults(defineProps<{
   searchHighlightedSectorIds?: string[]
@@ -577,9 +580,20 @@ const clipDefs = computed(() => {
     Object.values(cluster.sectors || {}).forEach((sector) => {
       const ratio = sector.normalized?.center_offset_ratio || { x: 0, y: 0 }
       const sectorRadiusRatio = Number(sector.normalized?.sector_radius_ratio || 0)
-      const sx = center.x + ratio.x * clusterRadius
-      const sy = center.y + ratio.y * clusterRadius
-      const sectorRadius = sectorRadiusRatio * clusterRadius
+      // 根据 sector 数量确定内层 padding
+      const sectorCount = Object.keys(cluster.sectors || {}).length
+      let innerPadding = 1
+      let sectorScale = 1
+      if (sectorCount === 2) {
+        innerPadding = INNER_CLUSTER_PADDING_2SEC
+        sectorScale = INNER_CLUSTER_PADDING_2SEC  // 2-sector: sector 紧贴内层
+      } else if (sectorCount === 3) {
+        innerPadding = INNER_CLUSTER_PADDING_3SEC
+        sectorScale = INNER_CLUSTER_PADDING_3SEC * SECTOR_SCALE_3SEC  // 3-sector: 双层缩放
+      }
+      const sx = center.x + ratio.x * clusterRadius * innerPadding
+      const sy = center.y + ratio.y * clusterRadius * innerPadding
+      const sectorRadius = sectorRadiusRatio * clusterRadius * sectorScale
       defs.push({
         id: sectorClipId(clusterId, sector.id),
         points: hexPoints(sx, sy, sectorRadius)
@@ -640,9 +654,20 @@ const highwaySegments = computed(() => {
     Object.values(sectors).forEach((sector) => {
       const ratio = sector.normalized?.center_offset_ratio || { x: 0, y: 0 }
       const sectorRadiusRatio = Number(sector.normalized?.sector_radius_ratio || 0)
-      const sx = center.x + ratio.x * clusterRadius
-      const sy = center.y + ratio.y * clusterRadius
-      const sectorRadius = sectorRadiusRatio * clusterRadius
+      // 根据 sector 数量确定内层 padding
+      const sectorCount = Object.keys(cluster.sectors || {}).length
+      let innerPadding = 1
+      let sectorScale = 1
+      if (sectorCount === 2) {
+        innerPadding = INNER_CLUSTER_PADDING_2SEC
+        sectorScale = INNER_CLUSTER_PADDING_2SEC
+      } else if (sectorCount === 3) {
+        innerPadding = INNER_CLUSTER_PADDING_3SEC
+        sectorScale = INNER_CLUSTER_PADDING_3SEC * SECTOR_SCALE_3SEC
+      }
+      const sx = center.x + ratio.x * clusterRadius * innerPadding
+      const sy = center.y + ratio.y * clusterRadius * innerPadding
+      const sectorRadius = sectorRadiusRatio * clusterRadius * sectorScale
       const sectorHex = hexVertices(sx, sy, sectorRadius)
 
       Object.entries(sector.highways || {}).forEach(([highwayId, highway]) => {
@@ -748,14 +773,29 @@ const clusterPolygons = computed(() => {
       labelY: number
       labelFontSize: number
     }> = []
+    // 新方案：2-sector 和 3-sector 采用不同策略
+    // 2-sector: 内层虚拟边框 0.95，sector 紧贴内层边框
+    // 3-sector: 内层虚拟边框 0.98，sector 0.98 相对于内层
+    const sectorCount = Object.keys(cluster.sectors || {}).length
+    let innerPadding = 1
+    let sectorScale = 1
+    if (sectorCount === 2) {
+      innerPadding = INNER_CLUSTER_PADDING_2SEC
+      sectorScale = INNER_CLUSTER_PADDING_2SEC
+    } else if (sectorCount === 3) {
+      innerPadding = INNER_CLUSTER_PADDING_3SEC
+      sectorScale = INNER_CLUSTER_PADDING_3SEC * SECTOR_SCALE_3SEC
+    }
+
     Object.values(cluster.sectors || {}).forEach((sector) => {
       const ratio = sector.normalized?.center_offset_ratio || { x: 0, y: 0 }
       const sectorRadiusRatio = Number(sector.normalized?.sector_radius_ratio || 0)
-      const radius = Number(sector.normalized?.sector_radius_ratio || 0) * clusterRadius
-      const sx = center.x + ratio.x * clusterRadius
-      const sy = center.y + ratio.y * clusterRadius
-      const topEdgeY = sy - radius * HEX_TOP_EDGE_RATIO
-      const pad = Math.max(MULTI_SECTOR_LABEL_PAD_MIN_PX, radius * MULTI_SECTOR_LABEL_PAD_RATIO)
+      // 应用内层 padding 到位置和大小
+      const baseRadius = Number(sector.normalized?.sector_radius_ratio || 0) * clusterRadius * sectorScale
+      const sx = center.x + ratio.x * clusterRadius * innerPadding
+      const sy = center.y + ratio.y * clusterRadius * innerPadding
+      const topEdgeY = sy - baseRadius * HEX_TOP_EDGE_RATIO
+      const pad = Math.max(MULTI_SECTOR_LABEL_PAD_MIN_PX, baseRadius * MULTI_SECTOR_LABEL_PAD_RATIO)
       const baseLabelY = topEdgeY + pad
       const displayName = resolveName(sector.nameId, sector.name || sector.id)
       sectors.push({
@@ -770,7 +810,7 @@ const clusterPolygons = computed(() => {
           : [],
         sx,
         sy,
-        radius,
+        radius: baseRadius,
         color: resolveOwnerColor(sector),
         label: displayName,
         labelY: baseLabelY,
