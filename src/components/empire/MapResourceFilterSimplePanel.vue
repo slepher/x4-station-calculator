@@ -131,6 +131,10 @@ const sectorDataById = computed<Record<string, { resources: SectorResourceEntry[
   const out: Record<string, { resources: SectorResourceEntry[]; sunlight: number }> = {}
   const clusters = gameData.maps?.clusters || {}
   Object.values(clusters).forEach((cluster) => {
+    // DLC filter: skip clusters from inactive DLC
+    if (gameData.enforceDlcActivation && !gameData.isDlcActive(cluster.dlc_tag)) {
+      return
+    }
     Object.values(cluster.sectors || {}).forEach((sector: any) => {
       out[sector.id] = {
         resources: Array.isArray(sector.resources) ? sector.resources : [],

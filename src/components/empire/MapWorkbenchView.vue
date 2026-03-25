@@ -167,6 +167,10 @@ const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
   const out: Record<string, MapSectorDataset> = {}
   const clusters = gameDataStore.maps?.clusters || {}
   Object.entries(clusters).forEach(([clusterId, cluster]) => {
+    // DLC filter: skip clusters from inactive DLC
+    if (gameDataStore.enforceDlcActivation && !gameDataStore.isDlcActive(cluster.dlc_tag)) {
+      return
+    }
     Object.values(cluster.sectors || {}).forEach((sector: any) => {
       const displayName = sector.nameId && te(sector.nameId) ? t(sector.nameId) : (sector.name || sector.id)
       out[sector.id] = {
@@ -206,6 +210,10 @@ const stationPanelItems = computed<MapStationPanelItem[]>(() => {
     ;(empire.stations || [])
       .filter((station) => station.sectorId === sector.id)
       .forEach((station) => {
+        const targetSectorId = station.location?.sector_id
+        const isAddressInactive = gameDataStore.enforceDlcActivation &&
+          targetSectorId !== undefined &&
+          sectorsById.value[targetSectorId] === undefined
         items.push({
           id: station.id,
           kind: 'station',
@@ -214,7 +222,8 @@ const stationPanelItems = computed<MapStationPanelItem[]>(() => {
           groupId: sector.id,
           groupName: sector.name,
           targetSectorName: station.location ? (sectorsById.value[station.location.sector_id]?.displayName || station.location.sector_id) : undefined,
-          location: station.location
+          location: station.location,
+          isAddressInactive
         })
       })
   })
@@ -222,6 +231,10 @@ const stationPanelItems = computed<MapStationPanelItem[]>(() => {
   ;(empire.stations || [])
     .filter((station) => !station.sectorId)
     .forEach((station) => {
+      const targetSectorId = station.location?.sector_id
+      const isAddressInactive = gameDataStore.enforceDlcActivation &&
+        targetSectorId !== undefined &&
+        sectorsById.value[targetSectorId] === undefined
       items.push({
         id: station.id,
         kind: 'station',
@@ -230,7 +243,8 @@ const stationPanelItems = computed<MapStationPanelItem[]>(() => {
         groupId: UNASSIGNED_STATION_GROUP_ID,
         groupName: t('sectorManagement.unassigned'),
         targetSectorName: station.location ? (sectorsById.value[station.location.sector_id]?.displayName || station.location.sector_id) : undefined,
-        location: station.location
+        location: station.location,
+        isAddressInactive
       })
     })
 
