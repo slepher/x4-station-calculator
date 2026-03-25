@@ -121,7 +121,44 @@ type MapStationPanelItem = {
 }
 ```
 
-## 4. 样式设计
+## 4. 多 Sector Cluster 边距设计
+
+### 4.1 设计目标
+为多 sector cluster 添加内层虚拟边框，使 sector 与外层 cluster 边界之间产生均匀的视觉边距。
+
+### 4.2 方案参数
+
+| Cluster 类型 | 内层虚拟边框 | Sector 缩放 | 最终效果 |
+|-------------|-------------|------------|---------|
+| 1-sector | 无 | 1.0 (填满) | Sector 填满整个 cluster |
+| 2-sector | 0.96 | 0.96 | Sector 相对于内层边框，4% 边距 |
+| 3-sector | 0.98 | 0.97 | Sector 相对于内层边框，2-3% 边距 |
+
+### 4.3 计算逻辑
+```typescript
+// 根据 sector 数量确定参数
+if (sectorCount === 2) {
+  innerPadding = 0.96  // 内层边框为外层 96%
+  sectorScale = 0.96   // sector 紧贴内层边框
+} else if (sectorCount === 3) {
+  innerPadding = 0.98  // 内层边框为外层 98%
+  sectorScale = 0.97   // sector 相对于内层 97%
+}
+
+// 位置计算（相对于内层边框）
+const sx = center.x + ratio.x * clusterRadius * innerPadding
+const sy = center.y + ratio.y * clusterRadius * innerPadding
+
+// 大小计算
+const radius = sectorRadiusRatio * clusterRadius * sectorScale
+```
+
+### 4.4 影响范围
+- `clusterPolygons` - sector 位置和大小计算
+- `clipDefs` - resource overlay 剪裁路径
+- `highwayPaths` - highway 路径计算
+
+## 5. 样式设计
 
 ### 空间站地址标红样式
 ```css

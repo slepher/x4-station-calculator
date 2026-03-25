@@ -19,6 +19,15 @@
   - 对应的 sector 也使用虚线边框，并通过 `stroke-dashoffset` 对齐重叠部分的虚线
 - **状态**: ✅ 已完成
 
+### Task: MapSvgCanvas 多 Sector 内层边框与 Sector 边距
+- **文件**: `src/components/empire/MapSvgCanvas.vue`
+- **描述**:
+  - 2-sector cluster: 内层虚拟边框 0.96，sector 0.96 紧贴内层
+  - 3-sector cluster: 内层虚拟边框 0.98，sector 0.97 紧贴内层
+  - 1-sector cluster: 保持填满，无内层边框
+  - 统一在 `clipDefs` 和 `highwayPaths` 中应用相同的缩放逻辑
+- **状态**: ✅ 已完成
+
 ### Task: MapWorkbenchView SectorsById 过滤
 - **文件**: `src/components/empire/MapWorkbenchView.vue`
 - **描述**: 修改 `sectorsById` computed 属性，遍历 clusters 时过滤未激活 DLC 的星系
