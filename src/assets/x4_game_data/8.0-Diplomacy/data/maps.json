@@ -210,8 +210,8 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "reserve": 630227,
-              "respawn": 21008,
+              "reserve": 6431492,
+              "respawn": 214383,
               "rating": 5,
               "theoretical_reserve": 5749875,
               "theoretical_respawn": 191663
@@ -226,23 +226,23 @@
             },
             {
               "ware": "nividium",
-              "reserve": 72,
-              "respawn": 0,
+              "reserve": 1860,
+              "respawn": 12,
               "rating": 1,
               "theoretical_reserve": 56
             },
             {
               "ware": "ore",
-              "reserve": 16398001,
-              "respawn": 576430,
+              "reserve": 28570952,
+              "respawn": 878273,
               "rating": 5,
               "theoretical_reserve": 1988336,
               "theoretical_respawn": 60294
             },
             {
               "ware": "silicon",
-              "reserve": 2811564,
-              "respawn": 176938,
+              "reserve": 14870260,
+              "respawn": 478404,
               "rating": 5,
               "theoretical_reserve": 542022,
               "theoretical_respawn": 23628
@@ -617,40 +617,40 @@
           "resources": [
             {
               "ware": "helium",
-              "reserve": 69298,
-              "respawn": 2310,
+              "reserve": 1195732,
+              "respawn": 39858,
               "rating": 5,
               "theoretical_reserve": 311850,
               "theoretical_respawn": 10395
             },
             {
               "ware": "hydrogen",
-              "reserve": 435932,
-              "respawn": 20493,
+              "reserve": 6520926,
+              "respawn": 223326,
               "rating": 5,
               "theoretical_reserve": 1961704,
               "theoretical_respawn": 92220
             },
             {
               "ware": "ice",
-              "reserve": 248583,
-              "respawn": 24858,
+              "reserve": 5573614,
+              "respawn": 557362,
               "rating": 5,
               "theoretical_reserve": 204106,
               "theoretical_respawn": 20410
             },
             {
               "ware": "methane",
-              "reserve": 69296,
-              "respawn": 6930,
+              "reserve": 684146,
+              "respawn": 68415,
               "rating": 5,
               "theoretical_reserve": 155925,
               "theoretical_respawn": 15593
             },
             {
               "ware": "ore",
-              "reserve": 4054931,
-              "respawn": 332560,
+              "reserve": 5695120,
+              "respawn": 496579,
               "rating": 5,
               "theoretical_reserve": 247435,
               "theoretical_respawn": 19337
@@ -665,8 +665,8 @@
             },
             {
               "ware": "silicon",
-              "reserve": 20579397,
-              "respawn": 785844,
+              "reserve": 24364735,
+              "respawn": 975111,
               "rating": 5,
               "theoretical_reserve": 1402602,
               "theoretical_respawn": 52114
@@ -953,31 +953,31 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "reserve": 1015034,
-              "respawn": 33835,
+              "reserve": 12862984,
+              "respawn": 428766,
               "rating": 5,
               "theoretical_reserve": 3118500,
               "theoretical_respawn": 103950
             },
             {
               "ware": "nividium",
-              "reserve": 24,
-              "respawn": 0,
+              "reserve": 465,
+              "respawn": 3,
               "rating": 1,
               "theoretical_reserve": 14
             },
             {
               "ware": "ore",
-              "reserve": 12076830,
-              "respawn": 464654,
+              "reserve": 15049651,
+              "respawn": 538975,
               "rating": 5,
               "theoretical_reserve": 892449,
               "theoretical_respawn": 33574
             },
             {
               "ware": "silicon",
-              "reserve": 12076985,
-              "respawn": 464662,
+              "reserve": 15049869,
+              "respawn": 538984,
               "rating": 5,
               "theoretical_reserve": 892449,
               "theoretical_respawn": 33574
@@ -1448,31 +1448,31 @@
           "resources": [
             {
               "ware": "ice",
-              "reserve": 188193,
-              "respawn": 18819,
+              "reserve": 2786807,
+              "respawn": 278681,
               "rating": 5,
               "theoretical_reserve": 102053,
               "theoretical_respawn": 10205
             },
             {
               "ware": "nividium",
-              "reserve": 18,
-              "respawn": 0,
+              "reserve": 465,
+              "respawn": 3,
               "rating": 1,
               "theoretical_reserve": 14
             },
             {
               "ware": "ore",
-              "reserve": 119931,
-              "respawn": 2998,
+              "reserve": 3136030,
+              "respawn": 78401,
               "rating": 5,
               "theoretical_reserve": 81642,
               "theoretical_respawn": 2041
             },
             {
               "ware": "silicon",
-              "reserve": 119933,
-              "respawn": 2998,
+              "reserve": 3136097,
+              "respawn": 78402,
               "rating": 5,
               "theoretical_reserve": 81642,
               "theoretical_respawn": 2041
@@ -2174,47 +2174,47 @@
           "resources": [
             {
               "ware": "helium",
-              "reserve": 69298,
-              "respawn": 2310,
+              "reserve": 1195732,
+              "respawn": 39858,
               "rating": 5,
               "theoretical_reserve": 311850,
               "theoretical_respawn": 10395
             },
             {
               "ware": "hydrogen",
-              "reserve": 346498,
-              "respawn": 11550,
+              "reserve": 6431492,
+              "respawn": 214383,
               "rating": 5,
               "theoretical_reserve": 1559250,
               "theoretical_respawn": 51975
             },
             {
               "ware": "methane",
-              "reserve": 69296,
-              "respawn": 6930,
+              "reserve": 684146,
+              "respawn": 68415,
               "rating": 5,
               "theoretical_reserve": 155925,
               "theoretical_respawn": 15593
             },
             {
               "ware": "nividium",
-              "reserve": 18,
-              "respawn": 0,
+              "reserve": 465,
+              "respawn": 3,
               "rating": 1,
               "theoretical_reserve": 14
             },
             {
               "ware": "ore",
-              "reserve": 119613,
-              "respawn": 2990,
+              "reserve": 3136030,
+              "respawn": 78401,
               "rating": 5,
               "theoretical_reserve": 81642,
               "theoretical_respawn": 2041
             },
             {
               "ware": "silicon",
-              "reserve": 119616,
-              "respawn": 2990,
+              "reserve": 3136097,
+              "respawn": 78402,
               "rating": 5,
               "theoretical_reserve": 81642,
               "theoretical_respawn": 2041
@@ -2417,24 +2417,24 @@
           "resources": [
             {
               "ware": "helium",
-              "reserve": 233881,
-              "respawn": 7796,
+              "reserve": 2391464,
+              "respawn": 79716,
               "rating": 5,
               "theoretical_reserve": 623700,
               "theoretical_respawn": 20790
             },
             {
               "ware": "hydrogen",
-              "reserve": 692996,
-              "respawn": 23100,
+              "reserve": 12862984,
+              "respawn": 428766,
               "rating": 5,
               "theoretical_reserve": 3118500,
               "theoretical_respawn": 103950
             },
             {
               "ware": "methane",
-              "reserve": 68714,
-              "respawn": 6871,
+              "reserve": 684146,
+              "respawn": 68415,
               "rating": 5,
               "theoretical_reserve": 155925,
               "theoretical_respawn": 15593
@@ -3599,32 +3599,32 @@
           "resources": [
             {
               "ware": "helium",
-              "reserve": 360356,
-              "respawn": 6006,
+              "reserve": 720712,
+              "respawn": 12012,
               "rating": 5,
               "theoretical_reserve": 810810,
               "theoretical_respawn": 13514
             },
             {
               "ware": "hydrogen",
-              "reserve": 692996,
-              "respawn": 23100,
+              "reserve": 6431492,
+              "respawn": 214383,
               "rating": 5,
               "theoretical_reserve": 1559250,
               "theoretical_respawn": 51975
             },
             {
               "ware": "ice",
-              "reserve": 738645,
-              "respawn": 73865,
+              "reserve": 13934035,
+              "respawn": 1393405,
               "rating": 5,
               "theoretical_reserve": 510265,
               "theoretical_respawn": 51025
             },
             {
               "ware": "methane",
-              "reserve": 1039496,
-              "respawn": 12994,
+              "reserve": 1819118,
+              "respawn": 22739,
               "rating": 5,
               "theoretical_reserve": 2338875,
               "theoretical_respawn": 29236
@@ -4119,8 +4119,8 @@
             },
             {
               "ware": "ore",
-              "reserve": 1773840,
-              "respawn": 83348,
+              "reserve": 1888351,
+              "respawn": 83729,
               "rating": 5,
               "theoretical_reserve": 299910,
               "theoretical_respawn": 4307
@@ -4713,32 +4713,32 @@
           "resources": [
             {
               "ware": "helium",
-              "reserve": 138579,
-              "respawn": 4619,
+              "reserve": 1195732,
+              "respawn": 39858,
               "rating": 5,
               "theoretical_reserve": 311850,
               "theoretical_respawn": 10395
             },
             {
               "ware": "hydrogen",
-              "reserve": 173249,
-              "respawn": 5775,
+              "reserve": 6431492,
+              "respawn": 214383,
               "rating": 5,
               "theoretical_reserve": 1559250,
               "theoretical_respawn": 51975
             },
             {
               "ware": "ice",
-              "reserve": 297497,
-              "respawn": 29750,
+              "reserve": 5573614,
+              "respawn": 557362,
               "rating": 5,
               "theoretical_reserve": 204106,
               "theoretical_respawn": 20410
             },
             {
               "ware": "methane",
-              "reserve": 117763,
-              "respawn": 11776,
+              "reserve": 1368292,
+              "respawn": 136830,
               "rating": 5,
               "theoretical_reserve": 311850,
               "theoretical_respawn": 31186
@@ -5048,31 +5048,31 @@
           "resources": [
             {
               "ware": "ice",
-              "reserve": 497489,
-              "respawn": 49749,
+              "reserve": 8360421,
+              "respawn": 836043,
               "rating": 5,
               "theoretical_reserve": 306159,
               "theoretical_respawn": 30615
             },
             {
               "ware": "nividium",
-              "reserve": 59,
-              "respawn": 0,
+              "reserve": 1395,
+              "respawn": 9,
               "rating": 1,
               "theoretical_reserve": 42
             },
             {
               "ware": "ore",
-              "reserve": 398807,
-              "respawn": 9970,
+              "reserve": 9408090,
+              "respawn": 235203,
               "rating": 5,
               "theoretical_reserve": 244926,
               "theoretical_respawn": 6123
             },
             {
               "ware": "silicon",
-              "reserve": 398816,
-              "respawn": 9971,
+              "reserve": 9408291,
+              "respawn": 235206,
               "rating": 5,
               "theoretical_reserve": 244926,
               "theoretical_respawn": 6123
@@ -5756,55 +5756,55 @@
           "resources": [
             {
               "ware": "helium",
-              "reserve": 130639,
-              "respawn": 4355,
+              "reserve": 1195732,
+              "respawn": 39858,
               "rating": 5,
               "theoretical_reserve": 311850,
               "theoretical_respawn": 10395
             },
             {
               "ware": "hydrogen",
-              "reserve": 346498,
-              "respawn": 11550,
+              "reserve": 6431492,
+              "respawn": 214383,
               "rating": 5,
               "theoretical_reserve": 1559250,
               "theoretical_respawn": 51975
             },
             {
               "ware": "ice",
-              "reserve": 306150,
-              "respawn": 30615,
+              "reserve": 5573614,
+              "respawn": 557362,
               "rating": 5,
               "theoretical_reserve": 204106,
               "theoretical_respawn": 20410
             },
             {
               "ware": "methane",
-              "reserve": 69296,
-              "respawn": 6930,
+              "reserve": 684146,
+              "respawn": 68415,
               "rating": 5,
               "theoretical_reserve": 155925,
               "theoretical_respawn": 15593
             },
             {
               "ware": "nividium",
-              "reserve": 24,
-              "respawn": 0,
+              "reserve": 465,
+              "respawn": 3,
               "rating": 1,
               "theoretical_reserve": 14
             },
             {
               "ware": "ore",
-              "reserve": 158156,
-              "respawn": 3954,
+              "reserve": 3136030,
+              "respawn": 78401,
               "rating": 5,
               "theoretical_reserve": 81642,
               "theoretical_respawn": 2041
             },
             {
               "ware": "silicon",
-              "reserve": 158160,
-              "respawn": 3954,
+              "reserve": 3136097,
+              "respawn": 78402,
               "rating": 5,
               "theoretical_reserve": 81642,
               "theoretical_respawn": 2041
@@ -6227,47 +6227,47 @@
           "resources": [
             {
               "ware": "helium",
-              "reserve": 138596,
-              "respawn": 4620,
+              "reserve": 1195732,
+              "respawn": 39858,
               "rating": 5,
               "theoretical_reserve": 311850,
               "theoretical_respawn": 10395
             },
             {
               "ware": "hydrogen",
-              "reserve": 173249,
-              "respawn": 5775,
+              "reserve": 6431492,
+              "respawn": 214383,
               "rating": 5,
               "theoretical_reserve": 1559250,
               "theoretical_respawn": 51975
             },
             {
               "ware": "methane",
-              "reserve": 67157,
-              "respawn": 6716,
+              "reserve": 684146,
+              "respawn": 68415,
               "rating": 5,
               "theoretical_reserve": 155925,
               "theoretical_respawn": 15593
             },
             {
               "ware": "nividium",
-              "reserve": 29,
-              "respawn": 0,
+              "reserve": 930,
+              "respawn": 6,
               "rating": 1,
               "theoretical_reserve": 28
             },
             {
               "ware": "ore",
-              "reserve": 197808,
-              "respawn": 4945,
+              "reserve": 6272060,
+              "respawn": 156802,
               "rating": 5,
               "theoretical_reserve": 163284,
               "theoretical_respawn": 4082
             },
             {
               "ware": "silicon",
-              "reserve": 197812,
-              "respawn": 4945,
+              "reserve": 6272194,
+              "respawn": 156804,
               "rating": 5,
               "theoretical_reserve": 163284,
               "theoretical_respawn": 4082
@@ -6584,47 +6584,47 @@
           "resources": [
             {
               "ware": "helium",
-              "reserve": 69298,
-              "respawn": 2310,
+              "reserve": 1195732,
+              "respawn": 39858,
               "rating": 5,
               "theoretical_reserve": 311850,
               "theoretical_respawn": 10395
             },
             {
               "ware": "hydrogen",
-              "reserve": 346498,
-              "respawn": 11550,
+              "reserve": 6431492,
+              "respawn": 214383,
               "rating": 5,
               "theoretical_reserve": 1559250,
               "theoretical_respawn": 51975
             },
             {
               "ware": "methane",
-              "reserve": 68228,
-              "respawn": 6823,
+              "reserve": 684146,
+              "respawn": 68415,
               "rating": 5,
               "theoretical_reserve": 155925,
               "theoretical_respawn": 15593
             },
             {
               "ware": "nividium",
-              "reserve": 104,
-              "respawn": 0,
+              "reserve": 2325,
+              "respawn": 15,
               "rating": 1,
               "theoretical_reserve": 70
             },
             {
               "ware": "ore",
-              "reserve": 708134,
-              "respawn": 17703,
+              "reserve": 15680150,
+              "respawn": 392005,
               "rating": 5,
               "theoretical_reserve": 408210,
               "theoretical_respawn": 10205
             },
             {
               "ware": "silicon",
-              "reserve": 708149,
-              "respawn": 17704,
+              "reserve": 15680485,
+              "respawn": 392010,
               "rating": 5,
               "theoretical_reserve": 408210,
               "theoretical_respawn": 10205
@@ -7040,15 +7040,15 @@
             },
             {
               "ware": "nividium",
-              "reserve": 35,
-              "respawn": 0,
+              "reserve": 930,
+              "respawn": 6,
               "rating": 1,
               "theoretical_reserve": 28
             },
             {
               "ware": "ore",
-              "reserve": 239279,
-              "respawn": 5982,
+              "reserve": 6272060,
+              "respawn": 156802,
               "rating": 5,
               "theoretical_reserve": 163284,
               "theoretical_respawn": 4082
@@ -7063,8 +7063,8 @@
             },
             {
               "ware": "silicon",
-              "reserve": 239285,
-              "respawn": 5982,
+              "reserve": 6272194,
+              "respawn": 156804,
               "rating": 5,
               "theoretical_reserve": 163284,
               "theoretical_respawn": 4082
@@ -7922,55 +7922,55 @@
           "resources": [
             {
               "ware": "helium",
-              "reserve": 103882,
-              "respawn": 3463,
+              "reserve": 1195732,
+              "respawn": 39858,
               "rating": 5,
               "theoretical_reserve": 311850,
               "theoretical_respawn": 10395
             },
             {
               "ware": "hydrogen",
-              "reserve": 641520,
-              "respawn": 21384,
+              "reserve": 6431492,
+              "respawn": 214383,
               "rating": 5,
               "theoretical_reserve": 1559250,
               "theoretical_respawn": 51975
             },
             {
               "ware": "ice",
-              "reserve": 255125,
-              "respawn": 25513,
+              "reserve": 5573614,
+              "respawn": 557362,
               "rating": 5,
               "theoretical_reserve": 204106,
               "theoretical_respawn": 20410
             },
             {
               "ware": "methane",
-              "reserve": 50726,
-              "respawn": 5073,
+              "reserve": 684146,
+              "respawn": 68415,
               "rating": 5,
               "theoretical_reserve": 155925,
               "theoretical_respawn": 15593
             },
             {
               "ware": "nividium",
-              "reserve": 59,
-              "respawn": 0,
+              "reserve": 1395,
+              "respawn": 9,
               "rating": 1,
               "theoretical_reserve": 42
             },
             {
               "ware": "ore",
-              "reserve": 393575,
-              "respawn": 9839,
+              "reserve": 9408090,
+              "respawn": 235203,
               "rating": 5,
               "theoretical_reserve": 244926,
               "theoretical_respawn": 6123
             },
             {
               "ware": "silicon",
-              "reserve": 393582,
-              "respawn": 9839,
+              "reserve": 9408291,
+              "respawn": 235206,
               "rating": 5,
               "theoretical_reserve": 244926,
               "theoretical_respawn": 6123
@@ -9265,16 +9265,16 @@
           "resources": [
             {
               "ware": "helium",
-              "reserve": 69298,
-              "respawn": 2310,
+              "reserve": 1195732,
+              "respawn": 39858,
               "rating": 5,
               "theoretical_reserve": 311850,
               "theoretical_respawn": 10395
             },
             {
               "ware": "hydrogen",
-              "reserve": 1084121,
-              "respawn": 74207,
+              "reserve": 7002534,
+              "respawn": 271487,
               "rating": 5,
               "theoretical_reserve": 6447472,
               "theoretical_respawn": 540797
@@ -9289,8 +9289,8 @@
             },
             {
               "ware": "methane",
-              "reserve": 11291450,
-              "respawn": 147182,
+              "reserve": 23129002,
+              "respawn": 348975,
               "rating": 5,
               "theoretical_reserve": 49132575,
               "theoretical_respawn": 627801
@@ -9305,16 +9305,16 @@
             },
             {
               "ware": "ore",
-              "reserve": 68654088,
-              "respawn": 1716352,
+              "reserve": 117692611,
+              "respawn": 2942315,
               "rating": 5,
               "theoretical_reserve": 2739336,
               "theoretical_respawn": 68483
             },
             {
               "ware": "silicon",
-              "reserve": 51000046,
-              "respawn": 1291347,
+              "reserve": 100038569,
+              "respawn": 2517310,
               "rating": 5,
               "theoretical_reserve": 1925410,
               "theoretical_respawn": 48889
@@ -9511,8 +9511,8 @@
           "resources": [
             {
               "ware": "helium",
-              "reserve": 180178,
-              "respawn": 3003,
+              "reserve": 720712,
+              "respawn": 12012,
               "rating": 5,
               "theoretical_reserve": 810810,
               "theoretical_respawn": 13514
@@ -10211,56 +10211,56 @@
           "resources": [
             {
               "ware": "helium",
-              "reserve": 172963,
-              "respawn": 5765,
+              "reserve": 2391464,
+              "respawn": 79716,
               "rating": 5,
               "theoretical_reserve": 623700,
               "theoretical_respawn": 20790
             },
             {
               "ware": "hydrogen",
-              "reserve": 513150,
-              "respawn": 17105,
+              "reserve": 6431492,
+              "respawn": 214383,
               "rating": 5,
               "theoretical_reserve": 1559250,
               "theoretical_respawn": 51975
             },
             {
               "ware": "ice",
-              "reserve": 255125,
-              "respawn": 25512,
+              "reserve": 5573614,
+              "respawn": 557362,
               "rating": 5,
               "theoretical_reserve": 204106,
               "theoretical_respawn": 20410
             },
             {
               "ware": "methane",
-              "reserve": 34648,
-              "respawn": 3465,
+              "reserve": 684146,
+              "respawn": 68415,
               "rating": 5,
               "theoretical_reserve": 155925,
               "theoretical_respawn": 15593
             },
             {
               "ware": "nividium",
-              "reserve": 9392,
-              "respawn": 56,
+              "reserve": 9834,
+              "respawn": 59,
               "rating": 2,
               "theoretical_reserve": 9177,
               "theoretical_respawn": 55
             },
             {
               "ware": "ore",
-              "reserve": 715799,
-              "respawn": 31994,
+              "reserve": 3699991,
+              "respawn": 106599,
               "rating": 5,
               "theoretical_reserve": 631399,
               "theoretical_respawn": 29529
             },
             {
               "ware": "silicon",
-              "reserve": 715829,
-              "respawn": 31996,
+              "reserve": 3700087,
+              "respawn": 106602,
               "rating": 5,
               "theoretical_reserve": 631399,
               "theoretical_respawn": 29529
@@ -10566,9 +10566,9 @@
             },
             {
               "ware": "rawscrap",
-              "reserve": 47306,
-              "respawn": 676,
-              "rating": 4,
+              "reserve": 78131,
+              "respawn": 1116,
+              "rating": 5,
               "theoretical_reserve": 15298,
               "theoretical_respawn": 219
             }
@@ -10760,9 +10760,9 @@
             },
             {
               "ware": "rawscrap",
-              "reserve": 30825,
-              "respawn": 440,
-              "rating": 4,
+              "reserve": 78131,
+              "respawn": 1116,
+              "rating": 5,
               "theoretical_reserve": 15298,
               "theoretical_respawn": 219
             },
@@ -12155,8 +12155,8 @@
             },
             {
               "ware": "ore",
-              "reserve": 67980508,
-              "respawn": 1699513,
+              "reserve": 68209530,
+              "respawn": 1700276,
               "rating": 5,
               "theoretical_reserve": 6069079,
               "theoretical_respawn": 146764
@@ -12491,16 +12491,16 @@
             },
             {
               "ware": "ore",
-              "reserve": 36288339,
-              "respawn": 930292,
+              "reserve": 36746383,
+              "respawn": 931818,
               "rating": 5,
               "theoretical_reserve": 13795356,
               "theoretical_respawn": 340231
             },
             {
               "ware": "silicon",
-              "reserve": 11102020,
-              "respawn": 390591,
+              "reserve": 11331042,
+              "respawn": 391355,
               "rating": 5,
               "theoretical_reserve": 4508445,
               "theoretical_respawn": 141226
@@ -13804,32 +13804,32 @@
             },
             {
               "ware": "ice",
-              "reserve": 271766414,
-              "respawn": 54353283,
+              "reserve": 542770578,
+              "respawn": 108554116,
               "rating": 5,
               "theoretical_reserve": 684918456,
               "theoretical_respawn": 136983691
             },
             {
               "ware": "nividium",
-              "reserve": 180649,
-              "respawn": 1076,
+              "reserve": 361001,
+              "respawn": 2149,
               "rating": 5,
               "theoretical_reserve": 456598,
               "theoretical_respawn": 2718
             },
             {
               "ware": "ore",
-              "reserve": 124662110,
-              "respawn": 4019892,
+              "reserve": 233062778,
+              "respawn": 7633247,
               "rating": 5,
               "theoretical_reserve": 275109389,
               "theoretical_respawn": 9160615
             },
             {
               "ware": "silicon",
-              "reserve": 108414317,
-              "respawn": 3614690,
+              "reserve": 216815429,
+              "respawn": 7228061,
               "rating": 5,
               "theoretical_reserve": 273946506,
               "theoretical_respawn": 9131614
@@ -13998,8 +13998,8 @@
             },
             {
               "ware": "ice",
-              "reserve": 271013599,
-              "respawn": 54203978,
+              "reserve": 542017763,
+              "respawn": 108404811,
               "rating": 5,
               "theoretical_reserve": 684865754,
               "theoretical_respawn": 136973397
@@ -14014,24 +14014,24 @@
             },
             {
               "ware": "nividium",
-              "reserve": 180703,
-              "respawn": 1075,
+              "reserve": 361055,
+              "respawn": 2148,
               "rating": 5,
               "theoretical_reserve": 456633,
               "theoretical_respawn": 2718
             },
             {
               "ware": "ore",
-              "reserve": 108402294,
-              "respawn": 3613518,
+              "reserve": 216802962,
+              "respawn": 7226873,
               "rating": 5,
               "theoretical_reserve": 273945881,
               "theoretical_respawn": 9131551
             },
             {
               "ware": "silicon",
-              "reserve": 108402743,
-              "respawn": 3613533,
+              "reserve": 216803855,
+              "respawn": 7226904,
               "rating": 5,
               "theoretical_reserve": 273945881,
               "theoretical_respawn": 9131551
@@ -14359,8 +14359,8 @@
           "resources": [
             {
               "ware": "helium",
-              "reserve": 180178,
-              "respawn": 3003,
+              "reserve": 720712,
+              "respawn": 12012,
               "rating": 5,
               "theoretical_reserve": 810810,
               "theoretical_respawn": 13514
@@ -14375,8 +14375,8 @@
             },
             {
               "ware": "methane",
-              "reserve": 779622,
-              "respawn": 9745,
+              "reserve": 1819118,
+              "respawn": 22739,
               "rating": 5,
               "theoretical_reserve": 2338875,
               "theoretical_respawn": 29236
@@ -24931,7 +24931,7 @@
           "resources": [
             {
               "ware": "nividium",
-              "reserve": 174,
+              "reserve": 188,
               "respawn": 2,
               "rating": 1,
               "theoretical_reserve": 58,
@@ -24939,16 +24939,16 @@
             },
             {
               "ware": "ore",
-              "reserve": 10931164,
-              "respawn": 273279,
+              "reserve": 11890975,
+              "respawn": 297274,
               "rating": 5,
               "theoretical_reserve": 3480985,
               "theoretical_respawn": 87025
             },
             {
               "ware": "silicon",
-              "reserve": 10931189,
-              "respawn": 273279,
+              "reserve": 11891012,
+              "respawn": 297276,
               "rating": 5,
               "theoretical_reserve": 3480985,
               "theoretical_respawn": 87025
@@ -25958,10 +25958,13 @@
           "owner": "ownerless",
           "owner_color": "#C0C0C0",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 0.41,
+            "economy": 0.25,
+            "security": 0.25,
+            "tags": [
+              "boronborder",
+              "allowrandomanomaly"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -26121,10 +26124,13 @@
           "owner": "boron",
           "owner_color": "#4DB5FF",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 0.83,
+            "economy": 0.25,
+            "security": 0.5,
+            "tags": [
+              "boronborder",
+              "allowrandomanomaly"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -26273,10 +26279,13 @@
           "owner": "boron",
           "owner_color": "#4DB5FF",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 1.28,
+            "economy": 0.5,
+            "security": 0.75,
+            "tags": [
+              "boronborder",
+              "allowrandomanomaly"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -26443,10 +26452,13 @@
           "owner": "boron",
           "owner_color": "#4DB5FF",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 0.12,
+            "economy": 0.25,
+            "security": 0.25,
+            "tags": [
+              "boronborder",
+              "allowrandomanomaly"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -26573,9 +26585,9 @@
           "owner": "ownerless",
           "owner_color": "#C0C0C0",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
+            "sunlight": 1.74,
+            "economy": 0.25,
+            "security": 0.25,
             "tags": []
           },
           "raw_local_pos": {
@@ -27013,10 +27025,12 @@
           "owner": "boron",
           "owner_color": "#4DB5FF",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 1.18,
+            "economy": 0.75,
+            "security": 0.75,
+            "tags": [
+              "boroncore"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -27212,10 +27226,12 @@
           "owner": "boron",
           "owner_color": "#4DB5FF",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 1.18,
+            "economy": 0.75,
+            "security": 0.75,
+            "tags": [
+              "boroncore"
+            ]
           },
           "raw_local_pos": {
             "x": -622191.4,
@@ -27547,10 +27563,12 @@
           "owner": "boron",
           "owner_color": "#4DB5FF",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 1.18,
+            "economy": 0.75,
+            "security": 0.75,
+            "tags": [
+              "boroncore"
+            ]
           },
           "raw_local_pos": {
             "x": 59111760.0,
@@ -27814,10 +27832,13 @@
           "owner": "boron",
           "owner_color": "#4DB5FF",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 0.15,
+            "economy": 0.25,
+            "security": 0.25,
+            "tags": [
+              "boroncore",
+              "boronpirate"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -28008,10 +28029,13 @@
           "owner": "boron",
           "owner_color": "#4DB5FF",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 0.41,
+            "economy": 0.25,
+            "security": 0.25,
+            "tags": [
+              "boroncore",
+              "boronpirate"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -28273,10 +28297,13 @@
           "owner": "boron",
           "owner_color": "#4DB5FF",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 2.71,
+            "economy": 0.5,
+            "security": 0.25,
+            "tags": [
+              "boroncore",
+              "boronpirate"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
