@@ -30,6 +30,7 @@ watch(locale, (val) => {
     </svg>
 
     <select v-model="currentLang" @change="handleLanguageChange"
+      data-testid="language-select"
       class="bg-slate-900 border border-slate-600 text-slate-200 text-xs rounded p-1 focus:border-sky-500 outline-none cursor-pointer hover:border-slate-500 transition-colors">
       <option v-for="lang in languageList" :key="lang.code" :value="lang.code">
         {{ lang.name }}

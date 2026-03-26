@@ -139,7 +139,7 @@ const RESOURCE_HIGHLIGHT_FILTER_ID = 'map-resource-sector-glow'
 const SEARCH_SELECTED_FILTER_ID = 'map-search-sector-selected-glow'
 const OVERLAY_ICON_SIZE = 18
 const PREVIEW_ICON_SIZE = 20
-const INNER_CLUSTER_PADDING_2SEC = 0.96  // 2-sector 内层边框 padding
+const INNER_CLUSTER_PADDING_2SEC = 0.965  // 2-sector 内层边框 padding
 const INNER_CLUSTER_PADDING_3SEC = 0.98  // 3-sector 内层边框 padding
 const SECTOR_SCALE_3SEC = 0.97  // 3-sector sector 相对于内层的缩放
 
@@ -978,6 +978,7 @@ watchEffect(() => {
 <template>
   <svg
     class="map-svg"
+    data-testid="map-svg-canvas"
     :width="Math.round(canvasWidth)"
     :height="Math.round(canvasHeight)"
     :viewBox="`0 0 ${canvasWidth.toFixed(1)} ${canvasHeight.toFixed(1)}`"
@@ -1067,6 +1068,7 @@ watchEffect(() => {
           class="sector-hover-target"
           :data-sector-hover-id="cluster.sectors[0]?.id || ''"
           :data-map-sector-id="cluster.sectors[0]?.id || ''"
+          :data-cluster-id="cluster.id"
           @mouseenter="emitSectorHover($event, {
             sectorId: cluster.sectors[0]?.id || '',
             clusterId: cluster.sectors[0]?.clusterId || cluster.id,
@@ -1099,6 +1101,9 @@ watchEffect(() => {
             :stroke-width="sectorStrokeWidth(cluster.sectors[0]?.id || '', 2.8)"
             :stroke-opacity="sectorStrokeOpacity(cluster.sectors[0]?.id || '', 0.95)"
             :filter="sectorFilter(cluster.sectors[0]?.id || '')"
+            class="sector-polygon"
+            :data-sector-id="cluster.sectors[0]?.id || ''"
+            :data-cluster-id="cluster.id"
             :stroke-dasharray="!gameData.enforceDlcActivation && cluster.isDlcActive === false ? '6,4' : undefined"
           />
           <text
@@ -1111,6 +1116,7 @@ watchEffect(() => {
             :font-family="MAP_FONT_FAMILY"
             :font-weight="sectorLabelWeight(cluster.sectors[0]?.id || '')"
             :fill="sectorLabelFill(cluster.sectors[0]?.id || '')"
+            :data-cluster-id="cluster.id"
           >
             {{ cluster.singleLabel }}
           </text>
@@ -1152,6 +1158,8 @@ watchEffect(() => {
             :stroke="cluster.color"
             stroke-width="2.8"
             stroke-opacity="0.95"
+            class="cluster-polygon"
+            :data-cluster-id="cluster.id"
             :stroke-dasharray="!gameData.enforceDlcActivation && cluster.isDlcActive === false ? '6,4' : undefined"
           />
           <template v-for="sector in cluster.sectors" :key="sector.id">
@@ -1159,6 +1167,7 @@ watchEffect(() => {
               class="sector-hover-target"
               :data-sector-hover-id="sector.id"
               :data-map-sector-id="sector.id"
+              :data-cluster-id="cluster.id"
               @mouseenter="emitSectorHover($event, {
                 sectorId: sector.id,
                 clusterId: sector.clusterId,
@@ -1191,6 +1200,9 @@ watchEffect(() => {
                 :stroke-width="sectorStrokeWidth(sector.id, 2.2)"
                 :stroke-opacity="sectorStrokeOpacity(sector.id, 0.9)"
                 :filter="sectorFilter(sector.id)"
+                class="sector-polygon"
+                :data-sector-id="sector.id"
+                :data-cluster-id="cluster.id"
                 :stroke-dasharray="!gameData.enforceDlcActivation && cluster.isDlcActive === false ? '6,4' : undefined"
                 :stroke-dashoffset="!gameData.enforceDlcActivation && cluster.isDlcActive === false ? ((sector.sx + sector.sy) % 10).toFixed(1) : undefined"
               />
@@ -1204,6 +1216,8 @@ watchEffect(() => {
                 :font-family="MAP_FONT_FAMILY"
                 :font-weight="sectorLabelWeight(sector.id)"
                 :fill="sectorLabelFill(sector.id)"
+                :data-sector-id="sector.id"
+                :data-cluster-id="cluster.id"
               >
                 {{ sector.label }}
               </text>
@@ -1287,6 +1301,9 @@ watchEffect(() => {
       <circle
         v-for="gate in gateCircles"
         :key="gate.id"
+        class="gate-circle"
+        :data-gate-id="gate.id"
+        :data-cluster-id="gate.clusterId"
         :cx="gate.point.x.toFixed(1)"
         :cy="gate.point.y.toFixed(1)"
         :r="gate.r.toFixed(1)"
@@ -1300,6 +1317,8 @@ watchEffect(() => {
       <line
         v-for="line in crossClusterGateLines"
         :key="line.id"
+        class="gate-path"
+        :data-gate-line-id="line.id"
         :x1="line.left.x.toFixed(1)"
         :y1="line.left.y.toFixed(1)"
         :x2="line.right.x.toFixed(1)"

@@ -166,6 +166,7 @@ watch(() => props.open, (open) => {
           :key="filter.id"
           class="map-station-panel__chip"
           :class="{ active: activeFilter === filter.id }"
+          :data-testid="`filter-${filter.id}`"
           type="button"
           @click="activeFilter = filter.id"
         >
@@ -185,6 +186,7 @@ watch(() => props.open, (open) => {
             :key="`${item.kind}:${item.id}`"
             class="map-station-panel__item"
             :class="{ 'map-station-panel__item--placed': !!item.location }"
+            :data-testid="`station-item-${item.id}`"
             draggable="true"
             @dragstart="onDragStart($event, item)"
             @dragend="onDragEnd"
@@ -200,7 +202,7 @@ watch(() => props.open, (open) => {
               <div v-if="item.location" class="map-station-panel__meta">
                 <div class="map-station-panel__name">{{ item.name }}</div>
                 <div class="map-station-panel__sub-row">
-                  <div class="map-station-panel__sub-tag">
+                  <div class="map-station-panel__sub-tag station-address">
                     <span :class="{ 'text-red-500': item.isAddressInactive }">{{ item.targetSectorName }}</span>
                     <button
                       class="map-station-panel__clear-inline"

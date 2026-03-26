@@ -1085,7 +1085,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section class="map-workbench">
+  <section class="map-workbench" data-testid="map-workbench-view">
     <div class="map-layout" :class="{ 'sidebar-active': isResourcePanelOpen, 'station-sidebar-active': isStationPanelOpen }">
       <MapResourceFilterPanel
         v-show="isResourcePanelOpen"
@@ -1116,6 +1116,7 @@ onBeforeUnmount(() => {
         <div
           ref="viewportRef"
           class="map-viewport"
+          data-testid="map-viewport"
           :class="{ dragging: isDragging }"
           @mousedown="onMouseDown"
           @mousemove="onMouseMove"
@@ -1248,7 +1249,7 @@ onBeforeUnmount(() => {
             type="button"
             class="map-panel-tab"
             :class="{ active: isResourcePanelOpen }"
-            data-testid="map-resource-entry-button"
+            data-testid="map-resource-panel-tab"
             @click="onResourcePanelOpen"
           >
             <span class="map-panel-tab-label">{{ t('map.resource_filter_button') }}</span>
