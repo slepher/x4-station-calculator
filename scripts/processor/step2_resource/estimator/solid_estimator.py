@@ -48,11 +48,11 @@ def calculate_solid_volume_truncated(boundary: dict) -> Tuple[float, float]:
 
     elif boundary_class == "cylinder":
         linear = _as_number(size.get("linear"), 0.0)
-        # 圆柱：V = π × r² × h
-        total_volume = math.pi * (radius ** 2) * linear
+        # 圆柱：V = π × r² × h，其中 linear 是半高，所以全高 = linear × 2
+        total_volume = math.pi * (radius ** 2) * (linear * 2)
         # 截断：半径限制在 1024km，高度限制在 2048km
         capped_radius = min(radius, SOLID_XZ_LIMIT)
-        capped_height = min(linear, SOLID_Y_LIMIT * 2)  # 2048km
+        capped_height = min(linear * 2, SOLID_Y_LIMIT * 2)  # 2048km
         effective_volume = math.pi * (capped_radius ** 2) * capped_height
         return (total_volume, effective_volume)
 

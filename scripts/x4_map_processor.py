@@ -11,7 +11,7 @@ if str(script_dir) not in sys.path:
 
 from processor.config import apply_runtime_config, merge_version_config
 from processor.versioning import load_version_config, get_target_versions
-from processor.map.service import process_map_for_version
+from processor.step1_map.service import process_map_for_version
 
 
 def run_for_config(args: argparse.Namespace, effective_config: dict) -> None:

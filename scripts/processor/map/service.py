@@ -23,7 +23,6 @@ from processor.output_manager import (
     write_factions,
     write_regions,
     write_map,
-    write_resourceareas,
     write_regionyield_definitions,
 )
 
@@ -131,8 +130,8 @@ def process_map_for_version(
         )
 
         resourceareas_rows = result.get("resourceareas", [])
-        write_resourceareas(resourceareas_rows, resourceareas_output_path)
-        print(f"📦 Resourceareas Output: {resourceareas_output_path} count={len(resourceareas_rows)}")
+        # Step 1 不再输出 resourceareas.json，由 Step 2 生成
+        print(f"📦 Resourceareas Output: 跳过 (由 Step 2 生成)")
         print(f"📦 Regions Output: 跳过 (9.0+ 不生成)")
 
         # 输出 maps.json
@@ -181,10 +180,9 @@ def process_map_for_version(
         write_regions(regions_rows, regions_output_path)
         print(f"📦 Regions Output: {regions_output_path} count={len(regions_rows)}")
 
-        # 输出 resourceareas.json（8.0 也需要）
+        # Step 1 不再输出 resourceareas.json，由 Step 2 生成
         resourceareas_rows = result.get("resourceareas", [])
-        write_resourceareas(resourceareas_rows, resourceareas_output_path)
-        print(f"📦 Resourceareas Output: {resourceareas_output_path} count={len(resourceareas_rows)}")
+        print(f"📦 Resourceareas Output: 跳过 (由 Step 2 生成)")
 
         print(f"📦 Regionyields Output: {regionyields_output_path} ({len(regionyields_rows)})")
 

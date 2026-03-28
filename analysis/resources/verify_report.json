@@ -1,0 +1,258 @@
+{
+  "summary": {
+    "total_sectors": 109,
+    "passed_sectors": 72,
+    "failed_sectors": 7
+  },
+  "passed": [
+    "Cluster_01_Sector001_macro",
+    "Cluster_01_Sector002_macro",
+    "Cluster_01_Sector003_macro",
+    "Cluster_02_Sector001_macro",
+    "Cluster_03_Sector001_macro",
+    "Cluster_04_Sector001_macro",
+    "Cluster_06_Sector001_macro",
+    "Cluster_07_Sector001_macro",
+    "Cluster_100_Sector001_macro",
+    "Cluster_108_Sector003_macro",
+    "Cluster_112_Sector001_macro",
+    "Cluster_113_Sector001_macro",
+    "Cluster_114_Sector001_macro",
+    "Cluster_116_Sector001_macro",
+    "Cluster_11_Sector001_macro",
+    "Cluster_13_Sector001_macro",
+    "Cluster_15_Sector001_macro",
+    "Cluster_15_Sector002_macro",
+    "Cluster_16_Sector001_macro",
+    "Cluster_18_Sector001_macro",
+    "Cluster_19_Sector001_macro",
+    "Cluster_19_Sector002_macro",
+    "Cluster_21_Sector001_macro",
+    "Cluster_24_Sector001_macro",
+    "Cluster_26_Sector001_macro",
+    "Cluster_26_Sector002_macro",
+    "Cluster_27_Sector001_macro",
+    "Cluster_28_Sector001_macro",
+    "Cluster_29_Sector002_macro",
+    "Cluster_31_Sector001_macro",
+    "Cluster_32_Sector001_macro",
+    "Cluster_32_Sector002_macro",
+    "Cluster_35_Sector001_macro",
+    "Cluster_36_Sector001_macro",
+    "Cluster_37_Sector001_macro",
+    "Cluster_38_Sector001_macro",
+    "Cluster_401_Sector001_macro",
+    "Cluster_402_Sector001_macro",
+    "Cluster_410_Sector001_macro",
+    "Cluster_411_Sector001_macro",
+    "Cluster_412_Sector001_macro",
+    "Cluster_413_Sector001_macro",
+    "Cluster_416_Sector002_macro",
+    "Cluster_418_Sector001_macro",
+    "Cluster_422_Sector001_macro",
+    "Cluster_44_Sector001_macro",
+    "Cluster_48_Sector001_macro",
+    "Cluster_49_Sector001_macro",
+    "Cluster_503_Sector001_macro",
+    "Cluster_50_Sector001_macro",
+    "Cluster_50_Sector002_macro",
+    "Cluster_601_Sector001_macro",
+    "Cluster_602_Sector001_macro",
+    "Cluster_605_Sector001_macro",
+    "Cluster_607_Sector001_macro",
+    "Cluster_608_Sector001_macro",
+    "Cluster_609_Sector001_macro",
+    "Cluster_703_Sector001_macro",
+    "Cluster_704_Sector001_macro",
+    "Cluster_706_Sector001_macro",
+    "Cluster_708_Sector001_macro",
+    "Cluster_709_Sector001_macro",
+    "Cluster_711_Sector001_macro",
+    "Cluster_712_Sector001_macro",
+    "Cluster_713_Sector001_macro",
+    "Cluster_715_Sector001_macro",
+    "Cluster_720_Sector001_macro",
+    "Cluster_721_Sector001_macro",
+    "Cluster_722_Sector001_macro",
+    "Cluster_725_Sector001_macro",
+    "Cluster_730_Sector001_macro",
+    "Cluster_740_Sector001_macro"
+  ],
+  "failed_details": [
+    {
+      "sector_id": "Cluster_46_Sector001_macro",
+      "error": "resource_mismatch",
+      "details": [
+        {
+          "ware": "ore",
+          "error": "value_mismatch",
+          "game_total": 16261442.0,
+          "processor_total": 124662110.0,
+          "error_ratio": 6.666116571949769
+        },
+        {
+          "ware": "nividium",
+          "error": "value_mismatch",
+          "game_total": 297.0,
+          "processor_total": 180649.0,
+          "error_ratio": 607.2457912457912
+        },
+        {
+          "ware": "silicon",
+          "error": "value_mismatch",
+          "game_total": 13205.0,
+          "processor_total": 108414317.0,
+          "error_ratio": 8209.095948504355
+        },
+        {
+          "ware": "ice",
+          "error": "value_mismatch",
+          "game_total": 762250.0,
+          "processor_total": 271766414.0,
+          "error_ratio": 355.5318648737291
+        }
+      ]
+    },
+    {
+      "sector_id": "Cluster_47_Sector001_macro",
+      "error": "resource_mismatch",
+      "details": [
+        {
+          "ware": "ore",
+          "error": "value_mismatch",
+          "game_total": 1626.0,
+          "processor_total": 108402294.0,
+          "error_ratio": 66667.07749077491
+        },
+        {
+          "ware": "nividium",
+          "error": "value_mismatch",
+          "game_total": 351.0,
+          "processor_total": 180703.0,
+          "error_ratio": 513.8233618233618
+        },
+        {
+          "ware": "silicon",
+          "error": "value_mismatch",
+          "game_total": 1631.0,
+          "processor_total": 108402743.0,
+          "error_ratio": 66462.97486204782
+        },
+        {
+          "ware": "ice",
+          "error": "value_mismatch",
+          "game_total": 9435.0,
+          "processor_total": 271013599.0,
+          "error_ratio": 28723.28182299947
+        }
+      ]
+    },
+    {
+      "sector_id": "Cluster_500_Sector001_macro",
+      "error": "resource_mismatch",
+      "details": [
+        {
+          "ware": "ore",
+          "error": "value_mismatch",
+          "game_total": 1394944.0,
+          "processor_total": 2173982.0,
+          "error_ratio": 0.5584725981831529
+        },
+        {
+          "ware": "silicon",
+          "error": "value_mismatch",
+          "game_total": 1394944.0,
+          "processor_total": 2174268.0,
+          "error_ratio": 0.5586776243347403
+        },
+        {
+          "ware": "nividium",
+          "error": "value_mismatch",
+          "game_total": 512.0,
+          "processor_total": 3404.0,
+          "error_ratio": 5.6484375
+        }
+      ]
+    },
+    {
+      "sector_id": "Cluster_504_Sector001_macro",
+      "error": "resource_mismatch",
+      "details": [
+        {
+          "ware": "ore",
+          "error": "value_mismatch",
+          "game_total": 1395456.0,
+          "processor_total": 2174494.0,
+          "error_ratio": 0.5582676917079435
+        },
+        {
+          "ware": "silicon",
+          "error": "value_mismatch",
+          "game_total": 1395712.0,
+          "processor_total": 2175036.0,
+          "error_ratio": 0.5583702081804842
+        },
+        {
+          "ware": "nividium",
+          "error": "value_mismatch",
+          "game_total": 5120.0,
+          "processor_total": 8012.0,
+          "error_ratio": 0.56484375
+        }
+      ]
+    },
+    {
+      "sector_id": "Cluster_702_Sector001_macro",
+      "error": "resource_mismatch",
+      "details": [
+        {
+          "ware": "ore",
+          "error": "value_mismatch",
+          "game_total": 12442930.0,
+          "processor_total": 15356406.0,
+          "error_ratio": 0.234147102008932
+        },
+        {
+          "ware": "silicon",
+          "error": "value_mismatch",
+          "game_total": 18664419.0,
+          "processor_total": 23034639.0,
+          "error_ratio": 0.23414712239368393
+        },
+        {
+          "ware": "nividium",
+          "error": "value_mismatch",
+          "game_total": 300.0,
+          "processor_total": 370.0,
+          "error_ratio": 0.23333333333333334
+        }
+      ]
+    },
+    {
+      "sector_id": "Cluster_705_Sector001_macro",
+      "error": "resource_mismatch",
+      "details": [
+        {
+          "ware": "ice",
+          "error": "value_mismatch",
+          "game_total": 31101168.0,
+          "processor_total": 68474517.0,
+          "error_ratio": 1.2016702716759704
+        }
+      ]
+    },
+    {
+      "sector_id": "Cluster_710_Sector001_macro",
+      "error": "resource_mismatch",
+      "details": [
+        {
+          "ware": "ice",
+          "error": "value_mismatch",
+          "game_total": 15436299.0,
+          "processor_total": 97937272.0,
+          "error_ratio": 5.344608380545104
+        }
+      ]
+    }
+  ]
+}

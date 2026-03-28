@@ -16,6 +16,7 @@ export type MapStationPanelItem = {
   groupId: string
   groupName: string
   targetSectorName?: string
+  isAddressInactive?: boolean
   location?: {
     cluster_id: string
     sector_id: string
@@ -200,7 +201,7 @@ watch(() => props.open, (open) => {
                 <div class="map-station-panel__name">{{ item.name }}</div>
                 <div class="map-station-panel__sub-row">
                   <div class="map-station-panel__sub-tag">
-                    <span>{{ item.targetSectorName }}</span>
+                    <span :class="{ 'text-red-500': item.isAddressInactive }">{{ item.targetSectorName }}</span>
                     <button
                       class="map-station-panel__clear-inline"
                       type="button"

@@ -11,6 +11,7 @@ from processor.utils.data_utils import split_tags
 
 # 正则表达式模式
 SECTOR_MACRO_RE = re.compile(r"Cluster_(\d+)_Sector(\d+)_macro", re.IGNORECASE)
+CLUSTER_MACRO_RE = re.compile(r"Cluster_(\d+)_macro", re.IGNORECASE)
 REGION_CONNECTION_RES = (
     re.compile(r"C(\d+)S(\d+)_", re.IGNORECASE),
     re.compile(r"Cluster(\d+)_Sector(\d+)_", re.IGNORECASE),
@@ -34,19 +35,21 @@ def parse_xml(path: Path) -> ET.Element:
     return tree.getroot()
 
 
-def load_mapdefaults(mapdefaults_xml: Path) -> Tuple[Dict[str, str], Dict[str, dict]]:
+def load_mapdefaults(mapdefaults_xml: Path) -> Tuple[Dict[str, str], Dict[str, dict], Dict[str, dict]]:
     """
     加载 mapdefaults 配置。
 
     从 XML 中读取：
     - name_id_by_macro: dataset[@macro] -> identification[@name]
     - area_by_sector_macro: sector macro -> area 属性 (sunlight, economy, security, tags)
+    - area_by_cluster_macro: cluster macro -> area 属性 (sunlight, economy, security, tags)
     """
     if not mapdefaults_xml.exists():
-        return {}, {}
+        return {}, {}, {}
     root = parse_xml(mapdefaults_xml)
     name_id_by_macro: Dict[str, str] = {}
     area_by_sector_macro: Dict[str, dict] = {}
+    area_by_cluster_macro: Dict[str, dict] = {}
 
     for dataset in root.findall("./dataset[@macro]"):
         macro = (dataset.get("macro") or "").strip()
@@ -65,15 +68,19 @@ def load_mapdefaults(mapdefaults_xml: Path) -> Tuple[Dict[str, str], Dict[str, d
 
             # 读取 area：从 properties/area[@*]
             area_node = properties.find("./area")
-            if area_node is not None and SECTOR_MACRO_RE.fullmatch(macro):
-                area_by_sector_macro[macro_key] = {
+            if area_node is not None:
+                area_data = {
                     "sunlight": as_float(area_node.get("sunlight"), 0.0),
                     "economy": as_float(area_node.get("economy"), 0.0),
                     "security": as_float(area_node.get("security"), 0.0),
                     "tags": split_tags(area_node.get("tags")),
                 }
+                if SECTOR_MACRO_RE.fullmatch(macro):
+                    area_by_sector_macro[macro_key] = area_data
+                elif CLUSTER_MACRO_RE.fullmatch(macro):
+                    area_by_cluster_macro[macro_key] = area_data
 
-    return name_id_by_macro, area_by_sector_macro
+    return name_id_by_macro, area_by_sector_macro, area_by_cluster_macro
 
 
 def resolve_sector_macro_from_region_connection(connection_name: str) -> Optional[str]:

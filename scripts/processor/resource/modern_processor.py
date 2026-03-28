@@ -7,6 +7,8 @@ from typing import Dict, List, Optional, Tuple
 
 import xml.etree.ElementTree as ET
 
+from processor.shared.utils.math_utils import round_to_int
+
 # 正则表达式模式
 SECTOR_MACRO_RE = re.compile(r"Cluster_(\d+)_Sector(\d+)_macro", re.IGNORECASE)
 REGION_CONNECTION_RES = (
@@ -171,6 +173,10 @@ def build_sector_resource_summaries_from_resourceareas(
     """
     从 resourceareas 数据聚合出 sector 级资源摘要，兼容现有 maps.json 的 sector.resources 结构。
 
+    输出统一使用 reserve/respawn 字段：
+    - reserve: 来自 definition.yield
+    - respawn: 来自 yield / respawnDelay * 60
+
     Args:
         sector_resource_areas: sector 的资源区引用
         definitions: 资源区定义模板
@@ -199,22 +205,35 @@ def build_sector_resource_summaries_from_resourceareas(
             if respawn_delay > 0:
                 respawn = yield_val * 60.0 / respawn_delay
 
-            # 按 ware 聚合，yield 和 respawn 需要乘以 amount
+            # 按 ware 聚合，reserve 和 respawn 需要乘以 amount
             entry = by_ware.setdefault(ware, {
                 "ware": ware,
-                "yield": 0.0,
+                "reserve": 0.0,
                 "respawn": 0.0,
             })
-            entry["yield"] += yield_val * amount
+            entry["reserve"] += yield_val * amount
             entry["respawn"] += respawn * amount
 
         # 转换为兼容格式
         resources: List[dict] = []
         for ware, entry in sorted(by_ware.items()):
+            # rating 基于 respawn 计算
+            respawn_val = entry["respawn"]
+            if respawn_val < 30:
+                rating = 1
+            elif respawn_val < 100:
+                rating = 2
+            elif respawn_val < 300:
+                rating = 3
+            elif respawn_val < 1000:
+                rating = 4
+            else:
+                rating = 5
             resources.append({
                 "ware": ware,
-                "yield": int(entry["yield"]),
-                "respawn": int(entry["respawn"]),
+                "reserve": round_to_int(entry["reserve"]),
+                "respawn": round_to_int(entry["respawn"]),
+                "rating": rating,
             })
 
         summaries[sector_macro] = resources

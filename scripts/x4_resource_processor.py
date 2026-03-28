@@ -11,14 +11,11 @@
   # 处理所有星区（8.0 版本）
   python scripts/x4_resource_processor.py \
     --version 8.0 \
-    --maps-json src/assets/x4_game_data/8.0-Diplomacy/data/maps.json \
-    --regions-json src/assets/x4_game_data/8.0-Diplomacy/data/regions.json \
     --all-sectors
 
   # 处理所有星区（9.0+ 版本）
   python scripts/x4_resource_processor.py \
     --version 9.0 \
-    --maps-json src/assets/x4_game_data/9.0-Tides/data/maps.json \
     --regionyields-xml path/to/regionyields_final.xml \
     --mapdefaults-xml path/to/mapdefaults_final.xml \
     --all-sectors
@@ -26,8 +23,6 @@
   # 单星区增量更新
   python scripts/x4_resource_processor.py \
     --version 8.0 \
-    --maps-json src/assets/x4_game_data/8.0-Diplomacy/data/maps.json \
-    --regions-json src/assets/x4_game_data/8.0-Diplomacy/data/regions.json \
     --sector cluster_06_sector001_macro
 """
 
@@ -39,7 +34,22 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / "scripts"))
 
+from processor.path_utils import build_output_paths
 from processor.step2_resource.service import process_resources_for_version
+from processor.versioning import load_version_config, merge_version_config
+
+
+# 处理后的资源根目录（JSON 输出目录）
+PROCESSED_ASSETS_DIR = "src/assets/x4_game_data"
+
+
+def get_folder_name(version: str) -> str:
+    """从配置文件获取 folder_name。"""
+    config = load_version_config()
+    for v in config.get("versions", []):
+        if str(v.get("version")) == version:
+            return str(v.get("folder_name", version))
+    return version
 
 
 def main():
@@ -53,12 +63,11 @@ def main():
     )
     parser.add_argument(
         "--maps-json",
-        required=True,
-        help="maps.json 文件路径（输出目录由此推断）",
+        help="maps.json 文件路径（默认使用统一入口）",
     )
     parser.add_argument(
         "--regions-json",
-        help="regions.json 文件路径（8.0 版本需要）",
+        help="regions.json 文件路径（默认使用统一入口）",
     )
     parser.add_argument(
         "--regionyields-xml",
@@ -70,27 +79,36 @@ def main():
     )
     parser.add_argument(
         "--sector",
-        help="单星区增量更新（sector_id）",
+        help="单星区增量更新（sector_id），不传则处理所有星区",
     )
     parser.add_argument(
-        "--all-sectors",
+        "--force-recalc-per-block",
         action="store_true",
-        help="处理所有星区",
+        help="强制重新计算逐格数据（默认从 analysis/resources/resourcearea_blocks.json 读取）",
     )
 
     args = parser.parse_args()
 
-    # 确定处理的星区
-    sector_id = None if args.all_sectors else args.sector
+    # 使用统一入口构建默认路径
+    version = args.version
+    folder_name = get_folder_name(version)
+    default_paths = build_output_paths(PROCESSED_ASSETS_DIR, folder_name)
+
+    maps_json_path = Path(args.maps_json) if args.maps_json else Path(default_paths["maps"])
+    regions_json_path = Path(args.regions_json) if args.regions_json else Path(default_paths["regions"])
+
+    # 确定处理的星区：指定 sector 则处理单个，否则处理所有
+    sector_id = args.sector if args.sector else None
 
     # 执行处理
     result = process_resources_for_version(
-        version=args.version,
-        maps_json_path=Path(args.maps_json),
+        version=version,
+        maps_json_path=maps_json_path,
         regionyields_xml_path=Path(args.regionyields_xml) if args.regionyields_xml else None,
         mapdefaults_xml_path=Path(args.mapdefaults_xml) if args.mapdefaults_xml else None,
-        regions_json_path=Path(args.regions_json) if args.regions_json else None,
+        regions_json_path=regions_json_path,
         sector_id=sector_id,
+        force_recalc_per_block=getattr(args, 'force_recalc_per_block', False),
     )
 
     if result.get("status") == "error":

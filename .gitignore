@@ -37,6 +37,10 @@ x4_raw_data/
 # 之前的中间产物目录 (如果有残留)
 output_assets/
 
+# 存档提取数据
+save_data/
+save_*.xml
+
 # 忽略 Python 脚本生成的临时缓存或日志 (如果有)
 scripts/*.log
 
