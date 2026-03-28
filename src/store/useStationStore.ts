@@ -61,7 +61,9 @@ export const useStationStore = defineStore('station', () => {
     localizedModulesMap,
     localizedModuleGroupsMap,
     medicalConsumptionMap,
-    searchQuery
+    searchQuery,
+    activeDlcs,
+    enforceDlcActivation
   } = storeToRefs(gameData)
 
   const { currentLocale } = storeToRefs(gameData)
@@ -73,7 +75,9 @@ export const useStationStore = defineStore('station', () => {
       modulesMap: modulesMap.value,
       waresMap: waresMap.value,
       medicalConsumptionMap: medicalConsumptionMap.value,
-      buildPriceMultiplier: buildPriceMultiplier.value
+      buildPriceMultiplier: buildPriceMultiplier.value,
+      enforceDlcActivation: enforceDlcActivation.value,
+      isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(modulesMap.value[moduleId]?.dlc_tag)
     }
   }
 
@@ -154,9 +158,18 @@ export const useStationStore = defineStore('station', () => {
       searchQuery.value,
       currentLocale.value,
       localizedModulesMap.value,
-      localizedModuleGroupsMap.value
+      localizedModuleGroupsMap.value,
+      (module) => !enforceDlcActivation.value || gameData.isDlcActive(module.dlc_tag)
     )
   })
+
+  function isModuleDlcActive(moduleId: string): boolean {
+    return gameData.isDlcActive(modulesMap.value[moduleId]?.dlc_tag)
+  }
+
+  function isModuleCountEditable(moduleId: string): boolean {
+    return !enforceDlcActivation.value || isModuleDlcActive(moduleId)
+  }
 
   watch(savedPlans, (val) => {
     localStorage.setItem('x4_station_data', JSON.stringify(val))
@@ -166,7 +179,9 @@ export const useStationStore = defineStore('station', () => {
     () => ({
       stationId: empireStore.activeStation?.id,
       gameReady: gameData.isReady,
-      buildPrice: buildPriceMultiplier.value
+      buildPrice: buildPriceMultiplier.value,
+      enforceDlcActivation: enforceDlcActivation.value,
+      activeDlcsKey: activeDlcs.value.join('|')
     }),
     () => {
       syncStateFromActiveStation()
@@ -332,7 +347,7 @@ export const useStationStore = defineStore('station', () => {
       stationStateMap.mutate(stationId, (state) => {
         if (index >= 0 && index < state.plannedModules.length) {
           const module = state.plannedModules[index]
-          if (module) module.count = count
+          if (module && isModuleCountEditable(module.id)) module.count = count
         }
       })
     })
@@ -396,6 +411,7 @@ export const useStationStore = defineStore('station', () => {
 
   function isPlannedWare(wareId: string): boolean {
     return plannedModules.value.some(module => {
+      if (!isModuleCountEditable(module.id)) return false
       const moduleInfo = modulesMap.value[module.id]
       if (!moduleInfo) return false
       return Object.keys(moduleInfo.outputs || {}).includes(wareId)
@@ -488,11 +504,13 @@ export const useStationStore = defineStore('station', () => {
     plannedModules, autoIndustryModules, settings, currentPlanName,
     wares: waresMap, modules: localizedModulesMap, moduleGroups: localizedModuleGroupsMap, medicalConsumption: medicalConsumptionMap,
     searchQuery, filteredModulesGrouped,
+    enforceDlcActivation,
     loadData, savedPlans, saveCurrentPlan, loadPlan, mergePlan, deletePlan,
     lockedWares, isWareLocked, isWareOperable, toggleWareLock,
     warePriority, isPlannedWare, isAutoWare, getResolvedLevel, toggleWarePriority,
     updateSetting,
     addModule, importPlan, updateModuleId, updateModuleCount, removeModule, removeModuleById, transferModuleFromAutoIndustry, clearAll, getModuleInfo,
+    isModuleDlcActive, isModuleCountEditable,
     actualWorkforce, currentEfficiency, groupedFlows,
     buildPriceMultiplier, stationAnalysis
   }

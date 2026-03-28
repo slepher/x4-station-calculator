@@ -32,16 +32,16 @@ TOP_TASK_RE = re.compile(r"^(\s*)-\s*\[([ ✓✗x])\]\s*(\d+)\.(\d+)\s+(.+)$")
 SUBTASK_RE = re.compile(r"^(\s{2})-\s*\[([ ✓✗x])\]\s*(\d+)\.(\d+)\.(\d+)\s+(.+)$")
 CHILD_RE = re.compile(r"^(\s{4})-\s*\[([ ✓✗x])\]\s*(\d+)\.(\d+)\.(\d+)\.(\d+)\s+(.+)$")
 
-STATE_TASK_RE = re.compile(r"^状态:\s*(\S+)\s*$")
-TRANS_TASK_RE = re.compile(r"^切换:\s*(.+?)\s*->\s*(.+)$")
-CASE_TASK_RE = re.compile(r"^Case:\s+(.+)$")
-BUG_TASK_RE = re.compile(r"^BUG-(\d+):\s+(.+)$")
+STATE_TASK_RE = re.compile(r"^状态(?:：|:)\s*(.+)\s*$")
+TRANS_TASK_RE = re.compile(r"^切换(?:：|:)\s*(.+?)\s*->\s*(.+)$")
+CASE_TASK_RE = re.compile(r"^Case(?:：|:)\s+(.+)$")
+BUG_TASK_RE = re.compile(r"^BUG-(\d+)(?:：|:)\s+(.+)$")
 ROOT_CAUSE_HINT_RE = re.compile(r"(因为|由于|根因|源码|代码问题|实现问题|逻辑错误)")
 
-STATE_REF_RE = re.compile(r"^状态:\s*(\S+)\s*$")
-TRANS_REF_RE = re.compile(r"^切换:\s*(.+?)\s*->\s*(.+)$")
+STATE_REF_RE = re.compile(r"^状态(?:：|:)\s*(.+)\s*$")
+TRANS_REF_RE = re.compile(r"^切换(?:：|:)\s*(.+?)\s*->\s*(.+)$")
 
-EXPECT_MARKER_RE = re.compile(r"#期望:\s*\[(.+)\]\s*$")
+EXPECT_MARKER_RE = re.compile(r"#期望(?:：|:)\s*\[(.+)\]\s*$")
 CHECKLIST_NUMBER_RE = re.compile(r"^-\s*\[[ ✓✗x]\]\s*(\d+(?:\.\d+){1,3})\s*(.*)$")
 
 
@@ -75,7 +75,7 @@ def resolve_path(change_name: Optional[str], file_path: Optional[str]) -> Path:
 
 
 def has_expectation_semantics(text: str) -> bool:
-    return "期望" in text or "#期望:" in text
+    return "期望" in text or "#期望(?:：|:)" in text
 
 
 def is_before_assertion(text: str) -> bool:
@@ -543,7 +543,7 @@ def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
         if not EXPECT_MARKER_RE.search(text):
             add_error(
                 "EXPECTATION_MARKER_MISSING",
-                "expectation semantics must use #期望: [...]",
+                "expectation semantics must use #期望(?:：|:) [...]",
                 line=line_no,
             )
 
@@ -640,7 +640,7 @@ def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
                     if not has_before_assert:
                         add_error(
                             "CHAPTER4_BUG_BEFORE_ASSERT_MISSING",
-                            "Chapter 4 bug task must include at least one 修复前断言 with #期望: [...]",
+                            "Chapter 4 bug task must include at least one 修复前断言 with #期望(?:：|:) [...]",
                             case=t.task_no,
                             desc=t.desc,
                             line=t.line_no,
@@ -648,7 +648,7 @@ def validate(path: Path, content: str) -> Tuple[bool, List[Dict[str, str]]]:
                     if not has_after_assert:
                         add_error(
                             "CHAPTER4_BUG_AFTER_ASSERT_MISSING",
-                            "Chapter 4 bug task must include at least one 修复后断言 with #期望: [...]",
+                            "Chapter 4 bug task must include at least one 修复后断言 with #期望(?:：|:) [...]",
                             case=t.task_no,
                             desc=t.desc,
                             line=t.line_no,

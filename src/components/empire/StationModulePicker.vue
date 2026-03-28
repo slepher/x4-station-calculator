@@ -2,9 +2,11 @@
 import { ref } from 'vue'
 import { useStationStore } from '@/store/useStationStore'
 import { useI18n } from 'vue-i18n'
+import { useGameDataStore } from '@/store/useGameDataStore'
 
 const store = useStationStore()
 const { t } = useI18n()
+const gameData = useGameDataStore()
 
 // --- Search Logic & State ---
 const searchInput = ref<HTMLInputElement | null>(null)
@@ -87,7 +89,12 @@ const onEsc = () => {
           <div v-for="m in group.modules" :key="m.id" class="result-item" :data-testid="`station-module-candidate-${m.id}`" @click="handleSelect(m)">
             <div class="color-indicator" :style="{ backgroundColor: m.color_rgb || (m.moduleGroup?.type === 'habitation' || m.moduleGroup?.type?.includes('habitat') ? '#f97316' : '#0ea5e9') }">
             </div>
-            <span class="label">{{ m.displayLabel }}</span>
+            <div class="result-main">
+              <span class="label">{{ m.displayLabel }}</span>
+              <span v-if="m.dlc_tag !== 'base'" class="dlc-tag" :class="gameData.isDlcActive(m.dlc_tag) ? 'dlc-tag--active' : 'dlc-tag--inactive'">
+                {{ gameData.getDlcDisplayName(m.dlc_tag) }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -137,12 +144,28 @@ const onEsc = () => {
   @apply flex items-center h-10 px-3 hover:bg-sky-500/10 cursor-pointer border-b border-slate-800/40;
 }
 
+.result-main {
+  @apply flex min-w-0 flex-1 items-center gap-2;
+}
+
 .color-indicator {
   @apply w-1 h-4 rounded-full mr-3 flex-shrink-0;
 }
 
 .label {
-  @apply text-sm text-slate-300 truncate;
+  @apply text-sm text-slate-300 truncate min-w-0 flex-1;
+}
+
+.dlc-tag {
+  @apply inline-flex max-w-[110px] flex-shrink-0 items-center rounded-md border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide;
+}
+
+.dlc-tag--active {
+  @apply border-emerald-500/70 text-emerald-300;
+}
+
+.dlc-tag--inactive {
+  @apply border-rose-500/70 text-rose-300;
 }
 
 .no-results {

@@ -1,5 +1,5 @@
 import { useI18n } from 'vue-i18n';
-import type { X4Module, X4Ware, X4ModuleGroup, X4Ship, X4ShipType, X4EquipmentType, X4Equipment, X4SlotTag } from '../types/x4';
+import type { X4Module, X4Ware, X4ModuleGroup, X4Ship, X4ShipType, X4EquipmentType, X4Equipment, X4SlotTag, X4Dlc } from '../types/x4';
 import { useStatusStore } from '../store/useStatusStore';
 import { ref } from 'vue';
 
@@ -10,7 +10,7 @@ export function useX4I18n() {
   const { t, te } = useI18n();
   const statusStore = useStatusStore();
 
-  const translate = (id: string, nameId: string, category: 'module' | 'ware' | 'type' | 'ship' | 'ship_type' | 'equipment_type' | 'equipment' | 'slot_tag'): string => {
+  const translate = (id: string, nameId: string, category: 'module' | 'ware' | 'type' | 'ship' | 'ship_type' | 'equipment_type' | 'equipment' | 'slot_tag' | 'dlc'): string => {
     if (te(nameId)) {
       return t(nameId);
     }
@@ -73,6 +73,10 @@ export function useX4I18n() {
 
     translateSlotTag: (slotTag: X4SlotTag) => {
       return translate(slotTag.id, slotTag.nameId || 'MISSING_NAME_ID', 'slot_tag');
+    },
+
+    translateDlc: (dlc: X4Dlc) => {
+      return translate(dlc.id, dlc.nameId || 'MISSING_NAME_ID', 'dlc');
     },
 
     translate,

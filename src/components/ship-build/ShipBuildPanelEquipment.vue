@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEquipmentStats } from '@/composables/useEquipmentStats'
 import { useX4I18n } from '@/utils/UseX4I18n'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { extractEquipmentSlotCandidatesWithFacets } from '@/store/logic/shipEquipmentPicker'
 import MetricsPanel from '@/components/common/MetricsPanel.vue'
@@ -12,6 +13,7 @@ import type { FitEquipmentOption } from '@/components/ship-build/fitTypes'
 
 const { t } = useI18n()
 const { translateEquipment, translateSlotTag } = useX4I18n()
+const gameData = useGameDataStore()
 const shipBuildStore = useShipBuildStore()
 const slotTags = shipBuildStore.slotTags as X4SlotTag[]
 const slotTagMap = new Map<string, X4SlotTag>(slotTags.map((tag) => [tag.id, tag]))
@@ -42,12 +44,18 @@ const equipmentMap = shipBuildStore.equipmentMap
 
 const currentEquipment = computed(() => {
   if (!props.currentEquipmentId) return null
-  return equipmentMap.get(props.currentEquipmentId) || null
+  const equipment = equipmentMap.get(props.currentEquipmentId) || null
+  if (!equipment) return null
+  if (!shipBuildStore.isEquipmentDlcUsable(equipment)) return null
+  return equipment
 })
 
 const candidateEquipment = computed(() => {
   if (!props.highlightedEquipmentId) return null
-  return equipmentMap.get(props.highlightedEquipmentId) || null
+  const equipment = equipmentMap.get(props.highlightedEquipmentId) || null
+  if (!equipment) return null
+  if (!shipBuildStore.isEquipmentDlcUsable(equipment)) return null
+  return equipment
 })
 
 const viewMode = computed<'single' | 'diff'>(() => {
@@ -99,7 +107,8 @@ const extractPickerCandidates = (filters: { races: string[]; mks: string[]; tags
     slotType: props.slotType as EquipmentType,
     size: props.pickerTarget.size as ShipEquipmentSize,
     tagsAll: props.pickerTarget.tags,
-    filters
+    filters,
+    includeEquipment: (equipment) => shipBuildStore.isEquipmentDlcUsable(equipment)
   })
 }
 
@@ -164,6 +173,10 @@ const pagedCandidateItems = computed(() => {
 
 watch(candidateItemsWithEmpty, () => {
   if (currentPage.value > totalPages.value) currentPage.value = 1
+  const highlightedId = props.highlightedEquipmentId
+  if (highlightedId && !candidateItemsWithEmpty.value.some((item) => item?.id === highlightedId)) {
+    emit('update:highlightedEquipmentId', null)
+  }
 })
 
 watch(
@@ -561,7 +574,16 @@ function getEquipmentSummary2(equipment: X4Equipment): { labelKey: string; value
         @click="emit('update:highlightedEquipmentId', item?.id || null)"
       >
         <div class="candidate-left">
-          <div class="candidate-name">{{ item ? translateEquipment(item) : t('ship_build.fit_empty_slot') }}</div>
+          <div class="candidate-name-row">
+            <div class="candidate-name">{{ item ? translateEquipment(item) : t('ship_build.fit_empty_slot') }}</div>
+            <span
+              v-if="item && item.dlc_tag !== 'base'"
+              class="dlc-tag"
+              :class="gameData.isDlcActive(item.dlc_tag) ? 'dlc-tag--active' : 'dlc-tag--inactive'"
+            >
+              {{ gameData.getDlcDisplayName(item.dlc_tag) }}
+            </span>
+          </div>
           <div class="candidate-meta">{{ item ? `${item.race || 'GEN'} · ${item.mk ? `MK${item.mk}` : '-'}` : '-' }}</div>
         </div>
         <div v-if="item" class="candidate-right">
@@ -695,8 +717,24 @@ function getEquipmentSummary2(equipment: X4Equipment): { labelKey: string; value
   @apply min-w-0;
 }
 
+.candidate-name-row {
+  @apply flex items-center gap-2 min-w-0;
+}
+
 .candidate-name {
   @apply text-xs text-slate-100 truncate;
+}
+
+.dlc-tag {
+  @apply inline-flex max-w-[110px] flex-shrink-0 items-center rounded-md border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide;
+}
+
+.dlc-tag--active {
+  @apply border-emerald-500/70 text-emerald-300;
+}
+
+.dlc-tag--inactive {
+  @apply border-rose-500/70 text-rose-300;
 }
 
 .candidate-meta {

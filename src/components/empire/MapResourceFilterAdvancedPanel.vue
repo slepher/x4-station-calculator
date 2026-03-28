@@ -68,9 +68,24 @@ const emit = defineEmits<{
 const { t, locale } = useI18n()
 const gameData = useGameDataStore()
 const RESOURCE_ORDER = ['ore', 'silicon', 'methane', 'hydrogen', 'helium', 'ice', 'rawscrap', 'nividium'] as const
+
+const formatYieldLabel = (yieldName: string) => {
+  const levelKey = `map.yield_levels.${yieldName}`
+  const levelText = t(levelKey)
+  const fallbackLevel = yieldName === 'low' ? 'Low' :
+                      yieldName === 'midlow' ? 'Mid Low' :
+                      yieldName === 'medium' ? 'Medium' :
+                      yieldName === 'midhigh' ? 'Mid High' :
+                      yieldName === 'high' ? 'High' : yieldName
+
+  const displayLevel = levelKey !== levelText ? levelText : fallbackLevel
+
+  return displayLevel
+}
 const regionYields = computed(() => buildFixedYieldEntries([...RESOURCE_ORDER]))
-const regionYieldColors = computed<Record<string, string>>(() =>
-  Object.fromEntries(((gameData.regionyields || []) as Array<{ ware: string; color?: string }>).map((entry) => [entry.ware, entry.color || '#fbbf24']))
+// 使用 res.json 的 color_rgb 作为资源颜色（与 MapWorkbenchView.vue 保持一致）
+const resourceColorsFromRes = computed<Record<string, string>>(() =>
+  Object.fromEntries(((gameData.res || []) as Array<{ id: string; color_rgb?: string }>).map((entry) => [entry.id, entry.color_rgb || '#fbbf24']))
 )
 const yieldRanksByWare = computed(() => buildYieldRanksByWare(regionYields.value))
 const SUNLIGHT_COLOR = '#F7D24B'
@@ -101,7 +116,7 @@ const resourceCatalog = computed<ResourceCatalogItem[]>(() => [
   ...regionYields.value
     .map((entry) => ({
       ware: entry.ware,
-      color: regionYieldColors.value[entry.ware] || '#fbbf24',
+      color: resourceColorsFromRes.value[entry.ware] || '#fbbf24',
       yields: entry.yields.map((item) => item.name),
       kind: 'ware' as const
     })),
@@ -113,17 +128,14 @@ const resourceCatalog = computed<ResourceCatalogItem[]>(() => [
   }
 ])
 
-const resourceColors = computed<Record<string, string>>(() =>
-  resourceCatalog.value.reduce<Record<string, string>>((acc, item) => {
-    acc[item.ware] = item.color
-    return acc
-  }, {})
-)
-
 const sectorDataById = computed<Record<string, { resources: SectorResourceEntry[]; sunlight: number }>>(() => {
   const out: Record<string, { resources: SectorResourceEntry[]; sunlight: number }> = {}
   const clusters = gameData.maps?.clusters || {}
   Object.values(clusters).forEach((cluster) => {
+    // DLC filter: skip clusters from inactive DLC
+    if (gameData.enforceDlcActivation && !gameData.isDlcActive(cluster.dlc_tag)) {
+      return
+    }
     Object.values(cluster.sectors || {}).forEach((sector: any) => {
       out[sector.id] = {
         resources: Array.isArray(sector.resources) ? sector.resources : [],
@@ -134,7 +146,9 @@ const sectorDataById = computed<Record<string, { resources: SectorResourceEntry[
   return out
 })
 
-const sectorGraph = computed(() => buildSectorGraph(gameData.maps?.clusters || {}))
+const sectorGraphResult = computed(() => buildSectorGraph(gameData.maps?.clusters || {}))
+const sectorGraph = computed(() => sectorGraphResult.value.graph)
+const sectorClusterMap = computed(() => sectorGraphResult.value.sectorClusterMap)
 
 const sectors = computed<AdvancedResourceSector[]>(() =>
   props.sectorLayouts.map((layout) => ({
@@ -154,8 +168,9 @@ const appliedResult = computed(() => buildAdvancedCandidates({
   jumpLimit: jumpLimitApplied.value,
   allowTransit: allowTransitApplied.value,
   yieldRanksByWare: yieldRanksByWare.value,
-  resourceColors: resourceColors.value,
-  sectorGraph: sectorGraph.value
+  resourceColors: resourceColorsFromRes.value,
+  sectorGraph: sectorGraph.value,
+  sectorClusterMap: sectorClusterMap.value
 }))
 
 const candidateKeyOf = (resourceSectorIds: string[]) => resourceSectorIds.slice().sort().join('|')
@@ -339,7 +354,7 @@ const groupTagItems = (group: AdvancedResourceTagGroup) =>
     return {
       tagId,
       label,
-      color: resourceColors.value[tagId] || '#fbbf24'
+      color: resourceColorsFromRes.value[tagId] || '#fbbf24'
     }
   })
 
@@ -470,7 +485,7 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
                   :key="yieldName"
                   :value="yieldName"
                 >
-                  {{ t(`map.yield_names.${yieldName}`) }}
+                  {{ formatYieldLabel(yieldName) }}
                 </option>
               </select>
             </label>
@@ -487,7 +502,7 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
                   :key="yieldName"
                   :value="yieldName"
                 >
-                  {{ t(`map.yield_names.${yieldName}`) }}
+                  {{ formatYieldLabel(yieldName) }}
                 </option>
               </select>
             </label>

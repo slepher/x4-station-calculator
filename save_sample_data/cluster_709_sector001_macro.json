@@ -1,3227 +1,4619 @@
 {
   "sector_id": "cluster_709_sector001_macro",
   "ware": {
-    "helium": {
-      "medium": {
-        "resources": [
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 256000,
-            "max": 5275,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.351667
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 256000,
-            "max": 9596,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.639733
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 256000,
-            "max": 10253,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.683533
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 256000,
-            "max": 9596,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.639733
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 128000,
-            "max": 5275,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.351667
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 192000,
-            "max": 8660,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.577333
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 128000,
-            "max": 11427,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.7618
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 64000,
-            "max": 9596,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.639733
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 0,
-            "max": 10253,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.683533
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 64000,
-            "max": 12060,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.804
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 0,
-            "max": 12483,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.8322
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": -64000,
-            "max": 9596,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.639733
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": -128000,
-            "max": 5275,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.351667
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -64000,
-            "max": 12060,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.804
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -128000,
-            "max": 11427,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.7618
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -192000,
-            "max": 8660,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.577333
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 192000,
-            "max": 11427,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.7618
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 128000,
-            "max": 13402,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.893467
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 192000,
-            "max": 12060,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.804
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 128000,
-            "max": 13724,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.914933
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 64000,
-            "max": 13724,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.914933
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 0,
-            "max": 13724,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.914933
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 64000,
-            "max": 13724,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.914933
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 0,
-            "max": 13724,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.914933
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 192000,
-            "max": 12483,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.8322
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 128000,
-            "max": 13724,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.914933
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 192000,
-            "max": 12060,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.804
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 128000,
-            "max": 13724,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.914933
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 64000,
-            "max": 13724,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.914933
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 0,
-            "max": 13724,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.914933
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 64000,
-            "max": 13724,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.914933
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 0,
-            "max": 13724,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.914933
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -64000,
-            "max": 13724,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.914933
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -128000,
-            "max": 13402,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.893467
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -64000,
-            "max": 13724,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.914933
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -128000,
-            "max": 13724,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.914933
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -192000,
-            "max": 11427,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.7618
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -192000,
-            "max": 12060,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.804
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -64000,
-            "max": 13724,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.914933
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -128000,
-            "max": 13724,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.914933
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -64000,
-            "max": 13724,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.914933
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -128000,
-            "max": 13724,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.914933
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -192000,
-            "max": 12483,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.8322
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -192000,
-            "max": 12060,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.804
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 256000,
-            "max": 5275,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.351667
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 192000,
-            "max": 11427,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.7618
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 128000,
-            "max": 13402,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.893467
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 192000,
-            "max": 8660,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.577333
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 128000,
-            "max": 11427,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.7618
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 64000,
-            "max": 13724,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.914933
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 0,
-            "max": 13724,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.914933
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 64000,
-            "max": 12060,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.804
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 0,
-            "max": 12483,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.8322
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -64000,
-            "max": 13724,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.914933
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -128000,
-            "max": 13402,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.893467
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -64000,
-            "max": 12060,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.804
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -128000,
-            "max": 11427,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.7618
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -192000,
-            "max": 11427,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.7618
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -192000,
-            "max": 8660,
-            "time": 36000,
-            "resourcedensity": 15000,
-            "falloff": 0.577333
-          }
+    "helium": [
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 256000,
+        "max": 5275,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 256000,
+        "max": 9596,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 256000,
+        "max": 10253,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 256000,
+        "max": 9596,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 128000,
+        "max": 5275,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 192000,
+        "max": 8660,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 128000,
+        "max": 11427,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 64000,
+        "max": 9596,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 0,
+        "max": 10253,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 64000,
+        "max": 12060,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 0,
+        "max": 12483,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -64000,
+        "max": 9596,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -128000,
+        "max": 5275,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -64000,
+        "max": 12060,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -128000,
+        "max": 11427,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -192000,
+        "max": 8660,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 192000,
+        "max": 11427,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 128000,
+        "max": 13402,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 192000,
+        "max": 12060,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 128000,
+        "max": 13724,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 64000,
+        "max": 13724,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 0,
+        "max": 13724,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 13724,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 0,
+        "max": 13724,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 192000,
+        "max": 12483,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 128000,
+        "max": 13724,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 192000,
+        "max": 12060,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 128000,
+        "max": 13724,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 64000,
+        "max": 13724,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "max": 13724,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 64000,
+        "max": 13724,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 0,
+        "max": 13724,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -64000,
+        "max": 13724,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -128000,
+        "max": 13402,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -64000,
+        "max": 13724,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -128000,
+        "max": 13724,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -192000,
+        "max": 11427,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -192000,
+        "max": 12060,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -64000,
+        "max": 13724,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -128000,
+        "max": 13724,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -64000,
+        "max": 13724,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -128000,
+        "max": 13724,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -192000,
+        "max": 12483,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -192000,
+        "max": 12060,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 256000,
+        "max": 5275,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 192000,
+        "max": 11427,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 128000,
+        "max": 13402,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 192000,
+        "max": 8660,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 128000,
+        "max": 11427,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 64000,
+        "max": 13724,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 0,
+        "max": 13724,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 64000,
+        "max": 12060,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 0,
+        "max": 12483,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -64000,
+        "max": 13724,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -128000,
+        "max": 13402,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -64000,
+        "max": 12060,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -128000,
+        "max": 11427,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -192000,
+        "max": 11427,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -192000,
+        "max": 8660,
+        "time": 36000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
         ]
       }
-    },
-    "hydrogen": {
-      "medplus": {
-        "resources": [
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 256000,
-            "max": 37102,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.351678
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 256000,
-            "max": 67493,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.639744
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 256000,
-            "max": 72118,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.683583
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 256000,
-            "max": 67493,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.639744
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 128000,
-            "max": 37102,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.351678
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 192000,
-            "max": 60910,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.577346
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 128000,
-            "max": 80373,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.761829
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 64000,
-            "max": 67493,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.639744
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 0,
-            "max": 72118,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.683583
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 64000,
-            "max": 84827,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.804047
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 0,
-            "max": 87798,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.832209
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": -64000,
-            "max": 67493,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.639744
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": -128000,
-            "max": 37102,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.351678
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -64000,
-            "max": 84827,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.804047
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -128000,
-            "max": 80373,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.761829
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -192000,
-            "max": 60910,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.577346
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 192000,
-            "max": 80373,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.761829
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 128000,
-            "max": 94262,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.893479
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 192000,
-            "max": 84827,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.804047
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 128000,
-            "max": 96532,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.914995
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 64000,
-            "max": 96532,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.914995
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 0,
-            "max": 96532,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.914995
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 64000,
-            "max": 96532,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.914995
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 0,
-            "max": 96532,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.914995
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 192000,
-            "max": 87798,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.832209
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 128000,
-            "max": 96532,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.914995
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 192000,
-            "max": 84827,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.804047
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 128000,
-            "max": 96532,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.914995
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 64000,
-            "max": 96532,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.914995
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 0,
-            "max": 96532,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.914995
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 64000,
-            "max": 96532,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.914995
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 0,
-            "max": 96532,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.914995
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -64000,
-            "max": 96532,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.914995
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -128000,
-            "max": 94262,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.893479
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -64000,
-            "max": 96532,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.914995
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -128000,
-            "max": 96532,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.914995
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -192000,
-            "max": 80373,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.761829
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -192000,
-            "max": 84827,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.804047
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -64000,
-            "max": 96532,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.914995
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -128000,
-            "max": 96532,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.914995
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -64000,
-            "max": 96532,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.914995
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -128000,
-            "max": 96532,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.914995
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -192000,
-            "max": 87798,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.832209
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -192000,
-            "max": 84827,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.804047
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 256000,
-            "max": 37102,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.351678
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 192000,
-            "max": 80373,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.761829
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 128000,
-            "max": 94262,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.893479
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 192000,
-            "max": 60910,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.577346
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 128000,
-            "max": 80373,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.761829
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 64000,
-            "max": 96532,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.914995
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 0,
-            "max": 96532,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.914995
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 64000,
-            "max": 84827,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.804047
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 0,
-            "max": 87798,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.832209
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -64000,
-            "max": 96532,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.914995
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -128000,
-            "max": 94262,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.893479
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -64000,
-            "max": 84827,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.804047
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -128000,
-            "max": 80373,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.761829
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -192000,
-            "max": 80373,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.761829
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -192000,
-            "max": 60910,
-            "time": 108000,
-            "resourcedensity": 105500,
-            "falloff": 0.577346
-          }
+    ],
+    "hydrogen": [
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 256000,
+        "max": 37102,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 256000,
+        "max": 67493,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 256000,
+        "max": 72118,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 256000,
+        "max": 67493,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 128000,
+        "max": 37102,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 192000,
+        "max": 60910,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 128000,
+        "max": 80373,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 64000,
+        "max": 67493,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 0,
+        "max": 72118,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 64000,
+        "max": 84827,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 0,
+        "max": 87798,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -64000,
+        "max": 67493,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -128000,
+        "max": 37102,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -64000,
+        "max": 84827,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -128000,
+        "max": 80373,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -192000,
+        "max": 60910,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 192000,
+        "max": 80373,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 128000,
+        "max": 94262,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 192000,
+        "max": 84827,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 128000,
+        "max": 96532,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 64000,
+        "max": 96532,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 0,
+        "max": 96532,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 96532,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 0,
+        "max": 96532,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 192000,
+        "max": 87798,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 128000,
+        "max": 96532,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 192000,
+        "max": 84827,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 128000,
+        "max": 96532,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 64000,
+        "max": 96532,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "max": 96532,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 64000,
+        "max": 96532,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 0,
+        "max": 96532,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -64000,
+        "max": 96532,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -128000,
+        "max": 94262,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -64000,
+        "max": 96532,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -128000,
+        "max": 96532,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -192000,
+        "max": 80373,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -192000,
+        "max": 84827,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -64000,
+        "max": 96532,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -128000,
+        "max": 96532,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -64000,
+        "max": 96532,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -128000,
+        "max": 96532,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -192000,
+        "max": 87798,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -192000,
+        "max": 84827,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 256000,
+        "max": 37102,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 192000,
+        "max": 80373,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 128000,
+        "max": 94262,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 192000,
+        "max": 60910,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 128000,
+        "max": 80373,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 64000,
+        "max": 96532,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 0,
+        "max": 96532,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 64000,
+        "max": 84827,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 0,
+        "max": 87798,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -64000,
+        "max": 96532,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -128000,
+        "max": 94262,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -64000,
+        "max": 84827,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -128000,
+        "max": 80373,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -192000,
+        "max": 80373,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "medplus"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -192000,
+        "max": 60910,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
         ]
       }
-    },
-    "ice": {
-      "low": {
-        "resources": [
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 256000,
-            "max": 138272,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.351644
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 256000,
-            "max": 243244,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.618601
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 256000,
-            "max": 253582,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.644892
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 256000,
-            "max": 243244,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.618601
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 128000,
-            "max": 138272,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.351644
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 192000,
-            "max": 224084,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.569875
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 128000,
-            "max": 257949,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.655998
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 64000,
-            "max": 243244,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.618601
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 0,
-            "max": 253582,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.644892
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 64000,
-            "max": 241668,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.614594
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 0,
-            "max": 238340,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.60613
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": -64000,
-            "max": 243244,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.618601
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": -128000,
-            "max": 138272,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.351644
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -64000,
-            "max": 241668,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.614594
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -128000,
-            "max": 257949,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.655998
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -192000,
-            "max": 224084,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.569875
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 192000,
-            "max": 257949,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.655998
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 128000,
-            "max": 239002,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.607814
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 192000,
-            "max": 241668,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.614594
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 128000,
-            "max": 167539,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.426074
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 64000,
-            "max": 167539,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.426074
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 0,
-            "max": 143136,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.364014
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 64000,
-            "max": 102399,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.260414
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 0,
-            "max": 90368,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.229818
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 192000,
-            "max": 238340,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.60613
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 128000,
-            "max": 143136,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.364014
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 192000,
-            "max": 241668,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.614594
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 128000,
-            "max": 167539,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.426074
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 64000,
-            "max": 90368,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.229818
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 0,
-            "max": 50665,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.128848
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 64000,
-            "max": 102399,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.260414
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 0,
-            "max": 90368,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.229818
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -64000,
-            "max": 167539,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.426074
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -128000,
-            "max": 239002,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.607814
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -64000,
-            "max": 102399,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.260414
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -128000,
-            "max": 167539,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.426074
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -192000,
-            "max": 257949,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.655998
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -192000,
-            "max": 241668,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.614594
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -64000,
-            "max": 90368,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.229818
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -128000,
-            "max": 143136,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.364014
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -64000,
-            "max": 102399,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.260414
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -128000,
-            "max": 167539,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.426074
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -192000,
-            "max": 238340,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.60613
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -192000,
-            "max": 241668,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.614594
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 256000,
-            "max": 138272,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.351644
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 192000,
-            "max": 257949,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.655998
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 128000,
-            "max": 239002,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.607814
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 192000,
-            "max": 224084,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.569875
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 128000,
-            "max": 257949,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.655998
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 64000,
-            "max": 167539,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.426074
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 0,
-            "max": 143136,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.364014
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 64000,
-            "max": 241668,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.614594
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 0,
-            "max": 238340,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.60613
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -64000,
-            "max": 167539,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.426074
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -128000,
-            "max": 239002,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.607814
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -64000,
-            "max": 241668,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.614594
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -128000,
-            "max": 257949,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.655998
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -192000,
-            "max": 257949,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.655998
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -192000,
-            "max": 224084,
-            "time": 18000,
-            "resourcedensity": 1.5,
-            "falloff": 0.569875
-          }
+    ],
+    "ice": [
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 256000,
+        "max": 138272,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 256000,
+        "max": 243244,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 256000,
+        "max": 253582,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 256000,
+        "max": 243244,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 128000,
+        "max": 138272,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 192000,
+        "max": 224084,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 128000,
+        "max": 257949,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 64000,
+        "max": 243244,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 0,
+        "max": 253582,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 64000,
+        "max": 241668,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 0,
+        "max": 238340,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -64000,
+        "max": 243244,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -128000,
+        "max": 138272,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -64000,
+        "max": 241668,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -128000,
+        "max": 257949,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -192000,
+        "max": 224084,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 192000,
+        "max": 257949,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 128000,
+        "max": 239002,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 192000,
+        "max": 241668,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 128000,
+        "max": 167539,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 64000,
+        "max": 167539,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 0,
+        "max": 143136,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 102399,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 0,
+        "max": 90368,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 192000,
+        "max": 238340,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 128000,
+        "max": 143136,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 192000,
+        "max": 241668,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 128000,
+        "max": 167539,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 64000,
+        "max": 90368,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "max": 50665,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 64000,
+        "max": 102399,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 0,
+        "max": 90368,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -64000,
+        "max": 167539,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -128000,
+        "max": 239002,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -64000,
+        "max": 102399,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -128000,
+        "max": 167539,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -192000,
+        "max": 257949,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -192000,
+        "max": 241668,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -64000,
+        "max": 90368,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -128000,
+        "max": 143136,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -64000,
+        "max": 102399,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -128000,
+        "max": 167539,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -192000,
+        "max": 238340,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -192000,
+        "max": 241668,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 256000,
+        "max": 138272,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 192000,
+        "max": 257949,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 128000,
+        "max": 239002,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 192000,
+        "max": 224084,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 128000,
+        "max": 257949,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 64000,
+        "max": 167539,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 0,
+        "max": 143136,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 64000,
+        "max": 241668,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 0,
+        "max": 238340,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -64000,
+        "max": 167539,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -128000,
+        "max": 239002,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -64000,
+        "max": 241668,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -128000,
+        "max": 257949,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -192000,
+        "max": 257949,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -192000,
+        "max": 224084,
+        "time": 18000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
         ]
       }
-    },
-    "methane": {
-      "high": {
-        "resources": [
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 256000,
-            "max": 87920,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.35168
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 256000,
-            "max": 159938,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.639752
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 256000,
-            "max": 170897,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.683588
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 256000,
-            "max": 159938,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.639752
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 128000,
-            "max": 87920,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.35168
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 192000,
-            "max": 144336,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.577344
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 128000,
-            "max": 190458,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.761832
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 64000,
-            "max": 159938,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.639752
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 0,
-            "max": 170897,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.683588
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 64000,
-            "max": 201013,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.804052
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 0,
-            "max": 208053,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.832212
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": -64000,
-            "max": 159938,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.639752
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": -128000,
-            "max": 87920,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.35168
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -64000,
-            "max": 201013,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.804052
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -128000,
-            "max": 190458,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.761832
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -192000,
-            "max": 144336,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.577344
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 192000,
-            "max": 190458,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.761832
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 128000,
-            "max": 223369,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.893476
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 192000,
-            "max": 201013,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.804052
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 128000,
-            "max": 228749,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.914996
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 64000,
-            "max": 228749,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.914996
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 0,
-            "max": 228749,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.914996
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 64000,
-            "max": 228749,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.914996
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 0,
-            "max": 228749,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.914996
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 192000,
-            "max": 208053,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.832212
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 128000,
-            "max": 228749,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.914996
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 192000,
-            "max": 201013,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.804052
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 128000,
-            "max": 228749,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.914996
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 64000,
-            "max": 228749,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.914996
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 0,
-            "max": 228749,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.914996
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 64000,
-            "max": 228749,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.914996
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 0,
-            "max": 228749,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.914996
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -64000,
-            "max": 228749,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.914996
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -128000,
-            "max": 223369,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.893476
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -64000,
-            "max": 228749,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.914996
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -128000,
-            "max": 228749,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.914996
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -192000,
-            "max": 190458,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.761832
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -192000,
-            "max": 201013,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.804052
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -64000,
-            "max": 228749,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.914996
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -128000,
-            "max": 228749,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.914996
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -64000,
-            "max": 228749,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.914996
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -128000,
-            "max": 228749,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.914996
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -192000,
-            "max": 208053,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.832212
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -192000,
-            "max": 201013,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.804052
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 256000,
-            "max": 87920,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.35168
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 192000,
-            "max": 190458,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.761832
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 128000,
-            "max": 223369,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.893476
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 192000,
-            "max": 144336,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.577344
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 128000,
-            "max": 190458,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.761832
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 64000,
-            "max": 228749,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.914996
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 0,
-            "max": 228749,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.914996
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 64000,
-            "max": 201013,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.804052
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 0,
-            "max": 208053,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.832212
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -64000,
-            "max": 228749,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.914996
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -128000,
-            "max": 223369,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.893476
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -64000,
-            "max": 201013,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.804052
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -128000,
-            "max": 190458,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.761832
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -192000,
-            "max": 190458,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.761832
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -192000,
-            "max": 144336,
-            "time": 288000,
-            "resourcedensity": 250000,
-            "falloff": 0.577344
-          }
+    ],
+    "methane": [
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 256000,
+        "max": 87920,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 256000,
+        "max": 159938,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 256000,
+        "max": 170897,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 256000,
+        "max": 159938,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 128000,
+        "max": 87920,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 192000,
+        "max": 144336,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 128000,
+        "max": 190458,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 64000,
+        "max": 159938,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 0,
+        "max": 170897,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 64000,
+        "max": 201013,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 0,
+        "max": 208053,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -64000,
+        "max": 159938,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -128000,
+        "max": 87920,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -64000,
+        "max": 201013,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -128000,
+        "max": 190458,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -192000,
+        "max": 144336,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 192000,
+        "max": 190458,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 128000,
+        "max": 223369,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 192000,
+        "max": 201013,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 128000,
+        "max": 228749,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 64000,
+        "max": 228749,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 0,
+        "max": 228749,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 228749,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 0,
+        "max": 228749,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 192000,
+        "max": 208053,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 128000,
+        "max": 228749,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 192000,
+        "max": 201013,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 128000,
+        "max": 228749,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 64000,
+        "max": 228749,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "max": 228749,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 64000,
+        "max": 228749,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 0,
+        "max": 228749,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -64000,
+        "max": 228749,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -128000,
+        "max": 223369,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -64000,
+        "max": 228749,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -128000,
+        "max": 228749,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -192000,
+        "max": 190458,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -192000,
+        "max": 201013,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -64000,
+        "max": 228749,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -128000,
+        "max": 228749,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -64000,
+        "max": 228749,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -128000,
+        "max": 228749,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -192000,
+        "max": 208053,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -192000,
+        "max": 201013,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 256000,
+        "max": 87920,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 192000,
+        "max": 190458,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 128000,
+        "max": 223369,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 192000,
+        "max": 144336,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 128000,
+        "max": 190458,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 64000,
+        "max": 228749,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 0,
+        "max": 228749,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 64000,
+        "max": 201013,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 0,
+        "max": 208053,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -64000,
+        "max": 228749,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -128000,
+        "max": 223369,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -64000,
+        "max": 201013,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -128000,
+        "max": 190458,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -192000,
+        "max": 190458,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -192000,
+        "max": 144336,
+        "time": 288000,
+        "regions": [
+          "region_cluster_709_sector_001_nebula_1"
         ]
       }
-    },
-    "ore": {
-      "lowplus": {
-        "resources": [
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 256000,
-            "max": 165936,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.351664
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 256000,
-            "max": 291895,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.618606
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 256000,
-            "max": 304310,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.644917
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 256000,
-            "max": 291895,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.618606
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 128000,
-            "max": 165936,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.351664
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 192000,
-            "max": 268904,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.569882
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 128000,
-            "max": 309531,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.655982
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 64000,
-            "max": 291895,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.618606
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 0,
-            "max": 304310,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.644917
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 64000,
-            "max": 290011,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.614613
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 0,
-            "max": 286008,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.60613
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": -64000,
-            "max": 291895,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.618606
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": -128000,
-            "max": 165936,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.351664
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -64000,
-            "max": 290011,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.614613
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -128000,
-            "max": 309531,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.655982
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -192000,
-            "max": 268904,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.569882
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 192000,
-            "max": 309531,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.655982
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 128000,
-            "max": 286809,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.607828
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 192000,
-            "max": 290011,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.614613
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 128000,
-            "max": 201049,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.426078
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 64000,
-            "max": 201049,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.426078
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 0,
-            "max": 171761,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.364009
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 64000,
-            "max": 122883,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.260423
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 0,
-            "max": 108450,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.229836
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 192000,
-            "max": 286008,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.60613
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 128000,
-            "max": 171761,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.364009
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 192000,
-            "max": 290011,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.614613
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 128000,
-            "max": 201049,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.426078
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 64000,
-            "max": 108450,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.229836
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 0,
-            "max": 95911,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.203262
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 64000,
-            "max": 122883,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.260423
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 0,
-            "max": 108450,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.229836
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -64000,
-            "max": 201049,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.426078
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -128000,
-            "max": 286809,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.607828
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -64000,
-            "max": 122883,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.260423
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -128000,
-            "max": 201049,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.426078
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -192000,
-            "max": 309531,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.655982
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -192000,
-            "max": 290011,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.614613
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -64000,
-            "max": 108450,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.229836
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -128000,
-            "max": 171761,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.364009
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -64000,
-            "max": 122883,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.260423
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -128000,
-            "max": 201049,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.426078
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -192000,
-            "max": 286008,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.60613
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -192000,
-            "max": 290011,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.614613
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 256000,
-            "max": 165936,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.351664
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 192000,
-            "max": 309531,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.655982
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 128000,
-            "max": 286809,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.607828
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 192000,
-            "max": 268904,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.569882
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 128000,
-            "max": 309531,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.655982
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 64000,
-            "max": 201049,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.426078
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 0,
-            "max": 171761,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.364009
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 64000,
-            "max": 290011,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.614613
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 0,
-            "max": 286008,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.60613
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -64000,
-            "max": 201049,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.426078
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -128000,
-            "max": 286809,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.607828
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -64000,
-            "max": 290011,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.614613
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -128000,
-            "max": 309531,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.655982
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -192000,
-            "max": 309531,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.655982
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -192000,
-            "max": 268904,
-            "time": 108000,
-            "resourcedensity": 1.8,
-            "falloff": 0.569882
-          }
+    ],
+    "ore": [
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 256000,
+        "max": 165936,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 256000,
+        "max": 291895,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 256000,
+        "max": 304310,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 256000,
+        "max": 291895,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 128000,
+        "max": 165936,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 192000,
+        "max": 268904,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 128000,
+        "max": 309531,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 64000,
+        "max": 291895,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 0,
+        "max": 304310,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 64000,
+        "max": 290011,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 0,
+        "max": 286008,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -64000,
+        "max": 291895,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -128000,
+        "max": 165936,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -64000,
+        "max": 290011,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -128000,
+        "max": 309531,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -192000,
+        "max": 268904,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 192000,
+        "max": 309531,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 128000,
+        "max": 286809,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 192000,
+        "max": 290011,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 128000,
+        "max": 201049,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 64000,
+        "max": 201049,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 0,
+        "max": 171761,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 122883,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 0,
+        "max": 108450,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 192000,
+        "max": 286008,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 128000,
+        "max": 171761,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 192000,
+        "max": 290011,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 128000,
+        "max": 201049,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 64000,
+        "max": 108450,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "max": 95911,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 64000,
+        "max": 122883,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 0,
+        "max": 108450,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -64000,
+        "max": 201049,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -128000,
+        "max": 286809,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -64000,
+        "max": 122883,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -128000,
+        "max": 201049,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -192000,
+        "max": 309531,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -192000,
+        "max": 290011,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -64000,
+        "max": 108450,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -128000,
+        "max": 171761,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -64000,
+        "max": 122883,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -128000,
+        "max": 201049,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -192000,
+        "max": 286008,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -192000,
+        "max": 290011,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 256000,
+        "max": 165936,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 192000,
+        "max": 309531,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 128000,
+        "max": 286809,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 192000,
+        "max": 268904,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 128000,
+        "max": 309531,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 64000,
+        "max": 201049,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 0,
+        "max": 171761,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 64000,
+        "max": 290011,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 0,
+        "max": 286008,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -64000,
+        "max": 201049,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -128000,
+        "max": 286809,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -64000,
+        "max": 290011,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -128000,
+        "max": 309531,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -192000,
+        "max": 309531,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowplus"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -192000,
+        "max": 268904,
+        "time": 108000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
         ]
       }
-    },
-    "silicon": {
-      "verylow": {
-        "resources": [
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 256000,
-            "max": 5525,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.35127
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 256000,
-            "max": 9719,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.617917
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 256000,
-            "max": 10132,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.644175
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 256000,
-            "max": 9719,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.617917
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 128000,
-            "max": 5525,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.35127
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 192000,
-            "max": 8952,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.569153
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 128000,
-            "max": 10312,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.655619
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 64000,
-            "max": 9719,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.617917
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": 0,
-            "max": 10132,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.644175
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 64000,
-            "max": 9658,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.614039
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": 0,
-            "max": 9524,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.60552
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": -64000,
-            "max": 9719,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.617917
-          },
-          {
-            "x": 256000,
-            "y": 0,
-            "z": -128000,
-            "max": 5525,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.35127
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -64000,
-            "max": 9658,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.614039
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -128000,
-            "max": 10312,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.655619
-          },
-          {
-            "x": 192000,
-            "y": 0,
-            "z": -192000,
-            "max": 8952,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.569153
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 192000,
-            "max": 10312,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.655619
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 128000,
-            "max": 9548,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.607045
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 192000,
-            "max": 9658,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.614039
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 128000,
-            "max": 6695,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.425657
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 64000,
-            "max": 6695,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.425657
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 0,
-            "max": 5715,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.36335
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 64000,
-            "max": 4084,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.259654
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 0,
-            "max": 3610,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.229518
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 192000,
-            "max": 9524,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.60552
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 128000,
-            "max": 5715,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.36335
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 192000,
-            "max": 9658,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.614039
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 128000,
-            "max": 6695,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.425657
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 64000,
-            "max": 3610,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.229518
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 0,
-            "max": 3186,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.20256
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 64000,
-            "max": 4084,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.259654
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 0,
-            "max": 3610,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.229518
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -64000,
-            "max": 6695,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.425657
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -128000,
-            "max": 9548,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.607045
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -64000,
-            "max": 4084,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.259654
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -128000,
-            "max": 6695,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.425657
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": -192000,
-            "max": 10312,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.655619
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": -192000,
-            "max": 9658,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.614039
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -64000,
-            "max": 3610,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.229518
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -128000,
-            "max": 5715,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.36335
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -64000,
-            "max": 4084,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.259654
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -128000,
-            "max": 6695,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.425657
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": -192000,
-            "max": 9524,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.60552
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -192000,
-            "max": 9658,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.614039
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 256000,
-            "max": 5525,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.35127
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 192000,
-            "max": 10312,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.655619
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 128000,
-            "max": 9548,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.607045
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 192000,
-            "max": 8952,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.569153
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 128000,
-            "max": 10312,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.655619
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 64000,
-            "max": 6695,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.425657
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": 0,
-            "max": 5715,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.36335
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 64000,
-            "max": 9658,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.614039
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": 0,
-            "max": 9524,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.60552
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -64000,
-            "max": 6695,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.425657
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -128000,
-            "max": 9548,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.607045
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -64000,
-            "max": 9658,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.614039
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -128000,
-            "max": 10312,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.655619
-          },
-          {
-            "x": -128000,
-            "y": 0,
-            "z": -192000,
-            "max": 10312,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.655619
-          },
-          {
-            "x": -192000,
-            "y": 0,
-            "z": -192000,
-            "max": 8952,
-            "time": 72000,
-            "resourcedensity": 0.06,
-            "falloff": 0.569153
-          }
+    ],
+    "silicon": [
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 256000,
+        "max": 5525,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 256000,
+        "max": 9719,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 256000,
+        "max": 10132,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 256000,
+        "max": 9719,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 128000,
+        "max": 5525,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 192000,
+        "max": 8952,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 128000,
+        "max": 10312,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 64000,
+        "max": 9719,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 0,
+        "max": 10132,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 64000,
+        "max": 9658,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 0,
+        "max": 9524,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -64000,
+        "max": 9719,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -128000,
+        "max": 5525,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -64000,
+        "max": 9658,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -128000,
+        "max": 10312,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -192000,
+        "max": 8952,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 192000,
+        "max": 10312,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 128000,
+        "max": 9548,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 192000,
+        "max": 9658,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 128000,
+        "max": 6695,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 64000,
+        "max": 6695,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 0,
+        "max": 5715,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 4084,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 0,
+        "max": 3610,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 192000,
+        "max": 9524,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 128000,
+        "max": 5715,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 192000,
+        "max": 9658,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 128000,
+        "max": 6695,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 64000,
+        "max": 3610,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "max": 3186,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 64000,
+        "max": 4084,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 0,
+        "max": 3610,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -64000,
+        "max": 6695,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -128000,
+        "max": 9548,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -64000,
+        "max": 4084,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -128000,
+        "max": 6695,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -192000,
+        "max": 10312,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -192000,
+        "max": 9658,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -64000,
+        "max": 3610,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -128000,
+        "max": 5715,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -64000,
+        "max": 4084,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -128000,
+        "max": 6695,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -192000,
+        "max": 9524,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -192000,
+        "max": 9658,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 256000,
+        "max": 5525,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 192000,
+        "max": 10312,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 128000,
+        "max": 9548,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 192000,
+        "max": 8952,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 128000,
+        "max": 10312,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 64000,
+        "max": 6695,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 0,
+        "max": 5715,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 64000,
+        "max": 9658,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 0,
+        "max": 9524,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -64000,
+        "max": 6695,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -128000,
+        "max": 9548,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -64000,
+        "max": 9658,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -128000,
+        "max": 10312,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -192000,
+        "max": 10312,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -192000,
+        "max": 8952,
+        "time": 72000,
+        "regions": [
+          "region_cluster_709_sector_001_asteroids_1"
         ]
       }
-    }
+    ]
   }
 }

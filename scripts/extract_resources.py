@@ -171,6 +171,93 @@ def extract_sector_resources(save_file, sector_macro, region_yields_full=None):
     return results
 
 
+def extract_sector_xml(save_file, sector_macro, output_dir):
+    """
+    Extract raw XML resource areas for a single sector.
+    Output includes: area coordinates, wares with recharge, and yields elements.
+    Returns the XML string or None if sector not found.
+    """
+    sector_macro_lower = sector_macro.lower()
+    save_name = Path(save_file).stem
+
+    output_path = Path(output_dir) / save_name
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    output_file = output_path / f"{sector_macro_lower}_resources.xml"
+
+    print(f"Extracting XML resources for {sector_macro}...")
+
+    for event, elem in ET.iterparse(save_file, events=("start", "end")):
+        if event == "start":
+            if (elem.tag == "component" and
+                elem.get("class") == "sector" and
+                elem.get("macro", "").lower() == sector_macro_lower):
+                # Find resourceareas element
+                resourceareas = elem.find("resourceareas")
+                if resourceareas is None:
+                    print(f"  No resourceareas found in {sector_macro}")
+                    return None
+
+                # Build XML structure with only resource-related data
+                root = ET.Element("sector_resources", {
+                    "sector": sector_macro_lower,
+                    "class": "sector"
+                })
+
+                # Copy resourceareas with all area children
+                ra_copy = ET.SubElement(root, "resourceareas")
+                for area in resourceareas.findall("area"):
+                    area_copy = ET.SubElement(ra_copy, "area")
+                    # Copy coordinates
+                    for attr in ['x', 'y', 'z']:
+                        if attr in area.attrib:
+                            area_copy.set(attr, area.get(attr))
+
+                    # Copy wares
+                    wares_elem = area.find("wares")
+                    if wares_elem is not None:
+                        wares_copy = ET.SubElement(area_copy, "wares")
+                        for ware in wares_elem.findall("ware"):
+                            ware_copy = ET.SubElement(wares_copy, "ware", {"ware": ware.get("ware")})
+                            recharge = ware.find("recharge")
+                            if recharge is not None:
+                                recharge_copy = ET.SubElement(ware_copy, "recharge")
+                                for attr in ['max', 'current', 'time']:
+                                    if attr in recharge.attrib:
+                                        recharge_copy.set(attr, recharge.get(attr))
+
+                    # Copy yields
+                    yields_elem = area.find("yields")
+                    if yields_elem is not None:
+                        yields_copy = ET.SubElement(area_copy, "yields")
+                        for ware in yields_elem.findall("ware"):
+                            ware_copy = ET.SubElement(yields_copy, "ware", {"ware": ware.get("ware")})
+                            for yield_elem in ware.findall("yield"):
+                                ET.SubElement(ware_copy, "yield", {"name": yield_elem.get("name")})
+
+                # Write to file with pretty print
+                xml_content = ET.tostring(root, encoding='unicode', method='xml')
+
+                # Pretty print with indentation
+                import xml.dom.minidom as minidom
+                dom = minidom.parseString(xml_content)
+                pretty_xml = dom.toprettyxml(indent="  ", encoding=None)
+                # Remove extra blank lines and XML declaration (we add our own)
+                lines = [line for line in pretty_xml.split('\n') if line.strip()]
+
+                with open(output_file, 'w', encoding='utf-8') as f:
+                    f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+                    f.write('\n'.join(lines[1:]))  # Skip minidom's declaration
+
+                # Count areas
+                area_count = len(resourceareas.findall("area"))
+                print(f"  Found {area_count} areas, saved to {output_file}")
+                return output_file
+
+    print(f"  Sector {sector_macro} not found!")
+    return None
+
+
 def save_sector_json(data, save_name, sector_name):
     """
     Save extracted data to sector JSON file, aggregated by ware -> yield_name.
@@ -353,16 +440,36 @@ def extract_all_sectors(save_file):
     aggregate_to_total(save_name, region_yields)
 
 
+def extract_all_sectors_xml(save_file):
+    """Extract XML resources for all sectors from maps.json."""
+    save_name = Path(save_file).stem
+    sectors = load_maps_sectors()
+
+    print(f"Extracting XML from {save_file}")
+    print(f"Found {len(sectors)} sectors in maps.json")
+
+    output_dir = SAVE_DATA_DIR / save_name
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    for i, sector in enumerate(sectors):
+        print(f"\n[{i+1}/{len(sectors)}] Processing {sector}...")
+        extract_sector_xml(save_file, sector, output_dir)
+
+
 def main():
     if len(sys.argv) < 2:
         print("Usage:")
         print("  python3 extract_resources.py <save_file> --sector <sector_macro>")
+        print("  python3 extract_resources.py <save_file> --xml <sector_macro>")
+        print("  python3 extract_resources.py <save_file> --xml-all")
         print("  python3 extract_resources.py <save_file> --all")
         print("  python3 extract_resources.py <save_file> --aggregate")
         print()
         print("Examples:")
-        print("  python3 extract_resources.py save_005.xml --sector cluster_01_sector001_macro")
-        print("  python3 extract_resources.py save_005.xml --all")
+        print("  python3 extract_resources.py save_005.xml --sector cluster_01_sector001_macro  (JSON)")
+        print("  python3 extract_resources.py save_005.xml --xml cluster_01_sector001_macro    (XML)")
+        print("  python3 extract_resources.py save_005.xml --xml-all                           (All XML)")
+        print("  python3 extract_resources.py save_005.xml --all                               (All JSON)")
         print("  python3 extract_resources.py save_005.xml --aggregate")
         sys.exit(1)
 
@@ -373,7 +480,7 @@ def main():
         sys.exit(1)
 
     if len(sys.argv) < 3:
-        print("Error: Missing mode argument (--sector, --all, or --aggregate)")
+        print("Error: Missing mode argument (--sector, --xml, --xml-all, --all, or --aggregate)")
         sys.exit(1)
 
     mode = sys.argv[2]
@@ -389,11 +496,24 @@ def main():
         # Load region_yields_full for time-based yield matching
         region_yields_full = load_region_yields_full()
 
-        print(f"Extracting {sector_macro}...")
+        print(f"Extracting {sector_macro} to JSON...")
         entries = extract_sector_resources(save_file, sector_macro, region_yields_full)
         print(f"Found {len(entries)} resource entries")
 
         save_sector_json(entries, save_name, sector_macro)
+
+    elif mode == "--xml":
+        if len(sys.argv) < 4:
+            print("Error: Missing sector macro name")
+            sys.exit(1)
+
+        sector_macro = sys.argv[3]
+
+        print(f"Extracting {sector_macro} to XML...")
+        extract_sector_xml(save_file, sector_macro, SAVE_DATA_DIR)
+
+    elif mode == "--xml-all":
+        extract_all_sectors_xml(save_file)
 
     elif mode == "--all":
         extract_all_sectors(save_file)

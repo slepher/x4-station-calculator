@@ -10,7 +10,7 @@ import {
   type AdvancedResourceTagGroup,
   type AdvancedResourceSector
 } from '@/store/logic/mapAdvancedResourceFilter'
-import { buildYieldRanksByWare, type RegionYieldEntry } from '@/store/logic/mapResourceFilter'
+import { buildYieldRanksByWare, YIELD_NAME_TO_RATING, type RegionYieldEntry } from '@/store/logic/mapResourceFilter'
 
 const regionYields: RegionYieldEntry[] = [
   { ware: 'ore', yields: [{ name: 'lowest' }, { name: 'medium' }, { name: 'high' }] },
@@ -24,7 +24,10 @@ const makeSector = (id: string, resources: Array<{ ware: string; yield: string; 
   sectorId: id,
   name: id,
   displayName: id,
-  resources,
+  resources: resources.map(r => ({
+    ...r,
+    rating: YIELD_NAME_TO_RATING[r.yield] || 1
+  })),
   sunlight
 })
 
@@ -94,6 +97,7 @@ describe('1.3 buildAdvancedCandidates: 候选生成与合并', () => {
       h1: ['r1', 'r2'],
       h2: ['r1', 'r2']
     }
+    const sectorClusterMap = { r1: 'c1', r2: 'c1', h1: 'c1', h2: 'c1' }
     const result = buildAdvancedCandidates({
       sectors,
       tagGroups: groups,
@@ -101,10 +105,12 @@ describe('1.3 buildAdvancedCandidates: 候选生成与合并', () => {
       allowTransit: true,
       yieldRanksByWare,
       resourceColors: { ore: '#f00', silicon: '#0f0' },
-      sectorGraph
+      sectorGraph,
+      sectorClusterMap
     })
     expect(result.candidates).toHaveLength(1)
-    expect(result.candidates[0]?.hubCandidateSectorIds).toHaveLength(2)
+    // 所有 sector 都在同一 cluster，跳数限制为 1 时可以互访，所以 hubCandidateSectorIds 包含所有 4 个
+    expect(result.candidates[0]?.hubCandidateSectorIds).toHaveLength(4)
 
     // 1.3.2 传入一个资源星区集合为另一个严格子集的候选对，验证最终结果中子集候选被过滤 #期望: [candidates.length=1]
     // In this case, both r1 and r2 satisfy the ore requirement, so they both should be in the candidate
@@ -120,6 +126,7 @@ describe('1.3 buildAdvancedCandidates: 候选生成与合并', () => {
       r2: ['h1', 'r1'],
       h1: ['r1', 'r2']
     }
+    const sectorClusterMapSubset = { r1: 'c1', r2: 'c1', h1: 'c1' }
     const resultSubset = buildAdvancedCandidates({
       sectors: sectorsSubset,
       tagGroups: groupsSubset,
@@ -127,7 +134,8 @@ describe('1.3 buildAdvancedCandidates: 候选生成与合并', () => {
       allowTransit: true,
       yieldRanksByWare,
       resourceColors: { ore: '#f00' },
-      sectorGraph: sectorGraphSubset
+      sectorGraph: sectorGraphSubset,
+      sectorClusterMap: sectorClusterMapSubset
     })
     // Both r1 and r2 have ore, so the candidate should contain both
     expect(resultSubset.candidates).toHaveLength(1)
@@ -151,6 +159,7 @@ describe('1.4 buildAdvancedCandidates: 评分计算', () => {
       r1: ['r2'],
       r2: ['r1']
     }
+    const sectorClusterMap = { r1: 'c1', r2: 'c1' }
     const result = buildAdvancedCandidates({
       sectors,
       tagGroups: groups,
@@ -158,9 +167,10 @@ describe('1.4 buildAdvancedCandidates: 评分计算', () => {
       allowTransit: false,
       yieldRanksByWare,
       resourceColors: { ore: '#f00', silicon: '#0f0' },
-      sectorGraph
+      sectorGraph,
+      sectorClusterMap
     })
-    expect(result.candidates[0]?.score).toBe(8)
+    expect(result.candidates[0]?.score).toBe(5)
 
     // 1.4.2 传入仅包含日光命中的星区，验证该星区不参与评分计算 #期望: [score=0]
     const sectorsSunlight: AdvancedResourceSector[] = [
@@ -174,6 +184,7 @@ describe('1.4 buildAdvancedCandidates: 评分计算', () => {
       r1: ['s1'],
       s1: ['r1']
     }
+    const sectorClusterMapSunlight = { r1: 'c1', s1: 'c1' }
     const resultSunlight = buildAdvancedCandidates({
       sectors: sectorsSunlight,
       tagGroups: groupsSunlight,
@@ -181,7 +192,8 @@ describe('1.4 buildAdvancedCandidates: 评分计算', () => {
       allowTransit: true,
       yieldRanksByWare,
       resourceColors: { ore: '#f00' },
-      sectorGraph: sectorGraphSunlight
+      sectorGraph: sectorGraphSunlight,
+      sectorClusterMap: sectorClusterMapSunlight
     })
     const candidateWithS1 = resultSunlight.candidates.find(c => c.resourceSectorIds.includes('s1'))
     expect(candidateWithS1).toBeUndefined()
@@ -215,7 +227,7 @@ describe('1.5 buildSectorGraph: 跨 cluster 连通', () => {
         sector_links: {}
       }
     }
-    const graph = buildSectorGraph(clusters as any)
+    const { graph } = buildSectorGraph(clusters as any)
     expect(graph.s1).toContain('s2')
     expect(graph.s2).toContain('s1')
   })
@@ -233,6 +245,7 @@ describe('1.6 buildAdvancedCandidates: allowTransit 开关', () => {
       r1: ['nonResource'],
       nonResource: ['r1']
     }
+    const sectorClusterMap = { r1: 'c1', nonResource: 'c1' }
     const resultTrue = buildAdvancedCandidates({
       sectors,
       tagGroups: groups,
@@ -240,7 +253,8 @@ describe('1.6 buildAdvancedCandidates: allowTransit 开关', () => {
       allowTransit: true,
       yieldRanksByWare,
       resourceColors: { ore: '#f00' },
-      sectorGraph
+      sectorGraph,
+      sectorClusterMap
     })
     expect(resultTrue.candidates.some(c => c.hubCandidateSectorIds.includes('nonResource'))).toBe(true)
 
@@ -252,8 +266,71 @@ describe('1.6 buildAdvancedCandidates: allowTransit 开关', () => {
       allowTransit: false,
       yieldRanksByWare,
       resourceColors: { ore: '#f00' },
-      sectorGraph
+      sectorGraph,
+      sectorClusterMap
     })
     expect(resultFalse.candidates.every(c => !c.hubCandidateSectorIds.includes('nonResource'))).toBe(true)
+  })
+})
+
+describe('1.7 buildAdvancedCandidates: 同一 cluster 内跳数计算', () => {
+  it('1.7 同一 cluster 内的 sector 移动不计跳数', () => {
+    // 1.7.1 验证同一 cluster 内的 sector 之间跳数为 0
+    const sectors: AdvancedResourceSector[] = [
+      makeSector('r1', [{ ware: 'ore', yield: 'high', level: 10 }]),
+      makeSector('r2', [{ ware: 'ore', yield: 'high', level: 8 }]),
+      makeSector('r3', [{ ware: 'ore', yield: 'high', level: 6 }])
+    ]
+    const groups = [makeGroup('g1', ['ore'], { ore: 'medium' })]
+    // r1 -> r2 -> r3 在同一 cluster 内
+    const sectorGraph = {
+      r1: ['r2'],
+      r2: ['r1', 'r3'],
+      r3: ['r2']
+    }
+    const sectorClusterMap = { r1: 'c1', r2: 'c1', r3: 'c1' }
+    const result = buildAdvancedCandidates({
+      sectors,
+      tagGroups: groups,
+      jumpLimit: 0, // 跳数限制为 0，但因为在同一 cluster，应该都能访问到
+      allowTransit: false,
+      yieldRanksByWare,
+      resourceColors: { ore: '#f00' },
+      sectorGraph,
+      sectorClusterMap
+    })
+    // 所有资源星区都在同一 cluster，跳数限制为 0 也应该能访问到
+    expect(result.candidates[0]?.resourceSectorIds).toContain('r1')
+    expect(result.candidates[0]?.resourceSectorIds).toContain('r2')
+    expect(result.candidates[0]?.resourceSectorIds).toContain('r3')
+  })
+
+  it('1.8 跨 cluster 的 sector 移动计跳数', () => {
+    // 1.8.1 验证跨 cluster 的 sector 之间跳数 +1
+    const sectors: AdvancedResourceSector[] = [
+      makeSector('r1', [{ ware: 'ore', yield: 'high', level: 10 }]),
+      makeSector('r2', [{ ware: 'ore', yield: 'high', level: 8 }])
+    ]
+    const groups = [makeGroup('g1', ['ore'], { ore: 'medium' })]
+    // r1 和 r2 之间有连接，但在不同 cluster
+    const sectorGraph = {
+      r1: ['r2'],
+      r2: ['r1']
+    }
+    const sectorClusterMap = { r1: 'c1', r2: 'c2' } // 不同 cluster
+    const result = buildAdvancedCandidates({
+      sectors,
+      tagGroups: groups,
+      jumpLimit: 0, // 跳数限制为 0，跨 cluster 无法访问
+      allowTransit: false,
+      yieldRanksByWare,
+      resourceColors: { ore: '#f00' },
+      sectorGraph,
+      sectorClusterMap
+    })
+    // r1 和 r2 在不同 cluster，跳数限制为 0 时只能访问到各自的资源
+    expect(result.candidates.length).toBeGreaterThan(0)
+    // 每个候选只包含一个资源星区
+    expect(result.candidates[0]?.resourceSectorIds.length).toBe(1)
   })
 })

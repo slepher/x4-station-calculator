@@ -22,7 +22,10 @@ import type {
   X4ShipSlot,
   X4Consumable,
   X4Drone,
-  X4Missile
+  X4Missile,
+  X4Res,
+  X4Dlc,
+  X4SettingStorage
 } from '@/types/x4'
 import { generateFilteredModulesGrouped } from './logic/searchModule'
 import {
@@ -40,8 +43,8 @@ import {
 import type { GameDataFiles } from './logic/useGameData'
 
 export const useGameDataStore = defineStore('gameData', () => {
-  const { locale: currentLocale } = useI18n()
-  const { translateModule, translateModuleGroup, translateWare } = useX4I18n()
+  const { locale: currentLocale, t } = useI18n()
+  const { translateModule, translateModuleGroup, translateWare, translateDlc } = useX4I18n()
 
   // Version management state
   const versionsConfig = ref<VersionConfig[]>([])
@@ -73,10 +76,13 @@ export const useGameDataStore = defineStore('gameData', () => {
   const consumables = ref<X4Consumable[]>([])
   const maps = ref<X4Map>({ clusters: {} })
   const regionyields = ref<X4RegionYield[]>([])
+  const res = ref<X4Res[]>([])
   const factions = ref<X4Faction[]>([])
   const defaultMaxes = ref<Record<string, X4DefaultMax>>({})
   const shipSlots = ref<Record<string, X4ShipSlot[]>>({})
   const languages = ref<X4Language[]>([])
+  const dlcs = ref<X4Dlc[]>([])
+  const dlcSetting = ref<X4SettingStorage>({})
 
   // Version computed
   const currentVersionConfig = computed<VersionConfig | undefined>(() => {
@@ -124,13 +130,82 @@ export const useGameDataStore = defineStore('gameData', () => {
     )
   })
 
-  function getStorageKey(module: 'empire' | 'logic_flow' | 'ship_blueprints'): string {
+  function getStorageKey(module: 'empire' | 'logic_flow' | 'ship_blueprints' | 'setting'): string {
     const config = currentVersionConfig.value
     if (!config) {
       return module === 'empire' ? 'x4_empire_data' :
-             module === 'logic_flow' ? 'x4_logic_flow_plans' : 'x4_ship_blueprints'
+             module === 'logic_flow' ? 'x4_logic_flow_plans' :
+             module === 'ship_blueprints' ? 'x4_ship_blueprints' : 'x4-setting'
     }
     return config.storage_keys[module]
+  }
+
+  function parseVersionNumber(value: string): number {
+    const parsed = Number.parseFloat(value)
+    return Number.isFinite(parsed) ? parsed : 0
+  }
+
+  function normalizeDlcId(value: string): string {
+    return value.startsWith('ego_') ? value.slice(4) : value
+  }
+
+  function loadDlcSetting() {
+    try {
+      const raw = localStorage.getItem(getStorageKey('setting'))
+      if (!raw) {
+        dlcSetting.value = {}
+        return
+      }
+
+      const parsed = JSON.parse(raw) as X4SettingStorage
+      dlcSetting.value = {
+        activeDlcs: Array.isArray(parsed.activeDlcs)
+          ? parsed.activeDlcs.filter((item): item is string => typeof item === 'string')
+          : undefined,
+        enforceDlcActivation: parsed.enforceDlcActivation === true
+      }
+    } catch (error) {
+      console.warn('[GameDataStore] Failed to parse DLC setting, resetting:', error)
+      localStorage.removeItem(getStorageKey('setting'))
+      dlcSetting.value = {}
+    }
+  }
+
+  const availableDlcs = computed(() => {
+    const current = parseVersionNumber(currentVersion.value)
+    return dlcs.value.filter(dlc => parseVersionNumber(dlc.dependencyVersion) <= current)
+  })
+
+  const needsDlcSetup = computed(() => !Object.prototype.hasOwnProperty.call(dlcSetting.value, 'activeDlcs'))
+
+  const activeDlcs = computed(() => {
+    const availableIds = new Set(availableDlcs.value.map(dlc => dlc.id))
+    if (needsDlcSetup.value) {
+      return availableDlcs.value.map(dlc => dlc.id)
+    }
+    return (dlcSetting.value.activeDlcs || []).filter(id => availableIds.has(id))
+  })
+
+  const enforceDlcActivation = computed(() => dlcSetting.value.enforceDlcActivation === true)
+
+  function isDlcActive(dlcTag: string | null | undefined): boolean {
+    if (!dlcTag || dlcTag === 'base') return true
+    const normalized = normalizeDlcId(dlcTag)
+    return activeDlcs.value.some(id => normalizeDlcId(id) === normalized)
+  }
+
+  function filterActiveDlcItems<T extends { dlc_tag?: string }>(items: T[]): T[] {
+    return items.filter(item => isDlcActive(item.dlc_tag))
+  }
+
+  function saveDlcSetting(setting: X4SettingStorage) {
+    const availableIds = new Set(availableDlcs.value.map(dlc => dlc.id))
+    const nextState: X4SettingStorage = {
+      activeDlcs: (setting.activeDlcs || []).filter(id => availableIds.has(id)),
+      enforceDlcActivation: setting.enforceDlcActivation === true
+    }
+    localStorage.setItem(getStorageKey('setting'), JSON.stringify(nextState))
+    dlcSetting.value = nextState
   }
 
   function getDefaultVersionConfig(versionsData: VersionsFile): VersionConfig | undefined {
@@ -158,6 +233,15 @@ export const useGameDataStore = defineStore('gameData', () => {
   function getWareDisplayName(wareId: string | undefined): string {
     if (!wareId) return ''
     return localizedWaresMap.value[wareId]?.localeName || wareId
+  }
+
+  function getDlcDisplayName(dlcTag: string | null | undefined): string {
+    if (!dlcTag || dlcTag === 'base') return t('settings.dlc.baseLabel')
+    const normalized = normalizeDlcId(dlcTag)
+    const dlc = availableDlcs.value.find(item => normalizeDlcId(item.id) === normalized)
+      || dlcs.value.find(item => normalizeDlcId(item.id) === normalized)
+    if (!dlc) return dlcTag
+    return translateDlc(dlc)
   }
 
   function prepareLocalizedWares() {
@@ -253,7 +337,10 @@ export const useGameDataStore = defineStore('gameData', () => {
     // 5. Load language
     await loadLanguageAsync(currentLocale.value)
 
-    // 6. Load game data files
+    // 6. Load version-scoped settings
+    loadDlcSetting()
+
+    // 7. Load game data files
     await loadGameData()
 
     isReady.value = true
@@ -296,10 +383,12 @@ export const useGameDataStore = defineStore('gameData', () => {
     consumables.value = data.consumables
     maps.value = data.maps
     regionyields.value = data.regionyields
+    res.value = data.res
     factions.value = data.factions
     defaultMaxes.value = data.defaultMaxes
     shipSlots.value = data.shipSlots
     languages.value = data.languages
+    dlcs.value = data.dlcs
   }
 
   function setVersion(version: string, beta: boolean) {
@@ -420,10 +509,17 @@ export const useGameDataStore = defineStore('gameData', () => {
     consumables,
     maps,
     regionyields,
+    res,
     factions,
     defaultMaxes,
     shipSlots,
     languages,
+    dlcs,
+    availableDlcs,
+    activeDlcs,
+    dlcSetting,
+    needsDlcSetup,
+    enforceDlcActivation,
     // Methods
     getStorageKey,
     setVersion,
@@ -433,6 +529,10 @@ export const useGameDataStore = defineStore('gameData', () => {
     findModuleForWare,
     getModuleDisplayName,
     getWareDisplayName,
-    getModuleVolumeCompression
+    getDlcDisplayName,
+    getModuleVolumeCompression,
+    saveDlcSetting,
+    isDlcActive,
+    filterActiveDlcItems
   }
 })

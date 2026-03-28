@@ -48,6 +48,7 @@ type Cluster = {
   name?: string
   owner?: string
   owner_color?: string
+  dlc_tag?: string
   normalized?: { pixel_basis?: Vec2 }
   sectors?: Record<string, Sector>
   sector_links?: Record<string, SectorLink>
@@ -138,6 +139,9 @@ const RESOURCE_HIGHLIGHT_FILTER_ID = 'map-resource-sector-glow'
 const SEARCH_SELECTED_FILTER_ID = 'map-search-sector-selected-glow'
 const OVERLAY_ICON_SIZE = 18
 const PREVIEW_ICON_SIZE = 20
+const INNER_CLUSTER_PADDING_2SEC = 0.96  // 2-sector 内层边框 padding
+const INNER_CLUSTER_PADDING_3SEC = 0.98  // 3-sector 内层边框 padding
+const SECTOR_SCALE_3SEC = 0.97  // 3-sector sector 相对于内层的缩放
 
 const props = withDefaults(defineProps<{
   searchHighlightedSectorIds?: string[]
@@ -390,7 +394,22 @@ const gateClusterRatioFromRaw = (gate: Gate, sectorNorm: Sector['normalized']): 
   return sectorRatioToClusterRatio(sectorNorm, { x: raw.sx, y: raw.sy })
 }
 
-const clusters = computed<Record<string, Cluster>>(() => (gameData.maps as unknown as { clusters: Record<string, Cluster> })?.clusters || {})
+const clusters = computed<Record<string, Cluster>>(() => {
+  const allClusters = (gameData.maps as unknown as { clusters: Record<string, Cluster> })?.clusters || {}
+  if (!gameData.enforceDlcActivation) return allClusters
+
+  return Object.fromEntries(
+    Object.entries(allClusters).filter(([, cluster]) =>
+      gameData.isDlcActive(cluster.dlc_tag)
+    )
+  )
+})
+
+// 所有 clusters（用于布局计算，保持位置稳定）
+const allClusters = computed<Record<string, Cluster>>(() => {
+  return (gameData.maps as unknown as { clusters: Record<string, Cluster> })?.clusters || {}
+})
+
 const regionIds = computed(() => Object.keys(clusters.value))
 const searchHighlightedSectorIdSet = computed(() => new Set(props.searchHighlightedSectorIds))
 const resourceHighlightedSectorIdSet = computed(() => new Set(props.resourceHighlightedSectorIds))
@@ -518,15 +537,6 @@ const buildResourceGroupBadgeGeometries = (sectorId: string, cx: number, cy: num
   }))
 }
 
-const regionClusters = computed<Record<string, Cluster>>(() => {
-  const out: Record<string, Cluster> = {}
-  regionIds.value.forEach((id) => {
-    const cluster = clusters.value[id]
-    if (cluster) out[id] = cluster
-  })
-  return out
-})
-
 const layoutState = computed(() => {
   let cfg: LayoutConfig = {
     width: 3600 * CANVAS_SCALE_FACTOR,
@@ -535,10 +545,12 @@ const layoutState = computed(() => {
     padY: 180 * CANVAS_SCALE_FACTOR,
     topPad: 140 * CANVAS_SCALE_FACTOR
   }
-  const points = Object.values(regionClusters.value).map((cluster) => cluster.normalized?.pixel_basis || { x: 0, y: 0 })
+  // 使用全部 clusters 计算边界（方案A：保持位置稳定）
+  const points = Object.values(allClusters.value).map((cluster) => cluster.normalized?.pixel_basis || { x: 0, y: 0 })
   let fit = fitWorldToScreen(points, cfg)
   let centers: Record<string, Vec2> = {}
-  Object.entries(regionClusters.value).forEach(([clusterId, cluster]) => {
+  // 为全部 clusters 计算中心点（包括被过滤的）
+  Object.entries(allClusters.value).forEach(([clusterId, cluster]) => {
     centers[clusterId] = clusterCenterScreen(cluster, fit)
   })
 
@@ -549,7 +561,7 @@ const layoutState = computed(() => {
     cfg = scaledLayoutConfig(cfg, requiredDistance / minDistance)
     fit = fitWorldToScreen(points, cfg)
     centers = {}
-    Object.entries(regionClusters.value).forEach(([clusterId, cluster]) => {
+    Object.entries(allClusters.value).forEach(([clusterId, cluster]) => {
       centers[clusterId] = clusterCenterScreen(cluster, fit)
     })
   }
@@ -568,9 +580,20 @@ const clipDefs = computed(() => {
     Object.values(cluster.sectors || {}).forEach((sector) => {
       const ratio = sector.normalized?.center_offset_ratio || { x: 0, y: 0 }
       const sectorRadiusRatio = Number(sector.normalized?.sector_radius_ratio || 0)
-      const sx = center.x + ratio.x * clusterRadius
-      const sy = center.y + ratio.y * clusterRadius
-      const sectorRadius = sectorRadiusRatio * clusterRadius
+      // 根据 sector 数量确定内层 padding
+      const sectorCount = Object.keys(cluster.sectors || {}).length
+      let innerPadding = 1
+      let sectorScale = 1
+      if (sectorCount === 2) {
+        innerPadding = INNER_CLUSTER_PADDING_2SEC
+        sectorScale = INNER_CLUSTER_PADDING_2SEC  // 2-sector: sector 紧贴内层
+      } else if (sectorCount === 3) {
+        innerPadding = INNER_CLUSTER_PADDING_3SEC
+        sectorScale = INNER_CLUSTER_PADDING_3SEC * SECTOR_SCALE_3SEC  // 3-sector: 双层缩放
+      }
+      const sx = center.x + ratio.x * clusterRadius * innerPadding
+      const sy = center.y + ratio.y * clusterRadius * innerPadding
+      const sectorRadius = sectorRadiusRatio * clusterRadius * sectorScale
       defs.push({
         id: sectorClipId(clusterId, sector.id),
         points: hexPoints(sx, sy, sectorRadius)
@@ -631,9 +654,20 @@ const highwaySegments = computed(() => {
     Object.values(sectors).forEach((sector) => {
       const ratio = sector.normalized?.center_offset_ratio || { x: 0, y: 0 }
       const sectorRadiusRatio = Number(sector.normalized?.sector_radius_ratio || 0)
-      const sx = center.x + ratio.x * clusterRadius
-      const sy = center.y + ratio.y * clusterRadius
-      const sectorRadius = sectorRadiusRatio * clusterRadius
+      // 根据 sector 数量确定内层 padding
+      const sectorCount = Object.keys(cluster.sectors || {}).length
+      let innerPadding = 1
+      let sectorScale = 1
+      if (sectorCount === 2) {
+        innerPadding = INNER_CLUSTER_PADDING_2SEC
+        sectorScale = INNER_CLUSTER_PADDING_2SEC
+      } else if (sectorCount === 3) {
+        innerPadding = INNER_CLUSTER_PADDING_3SEC
+        sectorScale = INNER_CLUSTER_PADDING_3SEC * SECTOR_SCALE_3SEC
+      }
+      const sx = center.x + ratio.x * clusterRadius * innerPadding
+      const sy = center.y + ratio.y * clusterRadius * innerPadding
+      const sectorRadius = sectorRadiusRatio * clusterRadius * sectorScale
       const sectorHex = hexVertices(sx, sy, sectorRadius)
 
       Object.entries(sector.highways || {}).forEach(([highwayId, highway]) => {
@@ -691,6 +725,7 @@ const clusterPolygons = computed(() => {
     cy: number
     color: string
     clusterRadius: number
+    isDlcActive?: boolean
     sectors: Array<{
       id: string
       clusterId: string
@@ -720,6 +755,8 @@ const clusterPolygons = computed(() => {
     const center = centers[clusterId]
     if (!center) return
     const color = resolveOwnerColor(cluster)
+    // 当 enforceDlcActivation=false 时，标记未激活的 DLC cluster
+    const clusterDlcActive = gameData.isDlcActive(cluster.dlc_tag)
     const sectors: Array<{
       id: string
       clusterId: string
@@ -736,14 +773,29 @@ const clusterPolygons = computed(() => {
       labelY: number
       labelFontSize: number
     }> = []
+    // 新方案：2-sector 和 3-sector 采用不同策略
+    // 2-sector: 内层虚拟边框 0.95，sector 紧贴内层边框
+    // 3-sector: 内层虚拟边框 0.98，sector 0.98 相对于内层
+    const sectorCount = Object.keys(cluster.sectors || {}).length
+    let innerPadding = 1
+    let sectorScale = 1
+    if (sectorCount === 2) {
+      innerPadding = INNER_CLUSTER_PADDING_2SEC
+      sectorScale = INNER_CLUSTER_PADDING_2SEC
+    } else if (sectorCount === 3) {
+      innerPadding = INNER_CLUSTER_PADDING_3SEC
+      sectorScale = INNER_CLUSTER_PADDING_3SEC * SECTOR_SCALE_3SEC
+    }
+
     Object.values(cluster.sectors || {}).forEach((sector) => {
       const ratio = sector.normalized?.center_offset_ratio || { x: 0, y: 0 }
       const sectorRadiusRatio = Number(sector.normalized?.sector_radius_ratio || 0)
-      const radius = Number(sector.normalized?.sector_radius_ratio || 0) * clusterRadius
-      const sx = center.x + ratio.x * clusterRadius
-      const sy = center.y + ratio.y * clusterRadius
-      const topEdgeY = sy - radius * HEX_TOP_EDGE_RATIO
-      const pad = Math.max(MULTI_SECTOR_LABEL_PAD_MIN_PX, radius * MULTI_SECTOR_LABEL_PAD_RATIO)
+      // 应用内层 padding 到位置和大小
+      const baseRadius = Number(sector.normalized?.sector_radius_ratio || 0) * clusterRadius * sectorScale
+      const sx = center.x + ratio.x * clusterRadius * innerPadding
+      const sy = center.y + ratio.y * clusterRadius * innerPadding
+      const topEdgeY = sy - baseRadius * HEX_TOP_EDGE_RATIO
+      const pad = Math.max(MULTI_SECTOR_LABEL_PAD_MIN_PX, baseRadius * MULTI_SECTOR_LABEL_PAD_RATIO)
       const baseLabelY = topEdgeY + pad
       const displayName = resolveName(sector.nameId, sector.name || sector.id)
       sectors.push({
@@ -758,7 +810,7 @@ const clusterPolygons = computed(() => {
           : [],
         sx,
         sy,
-        radius,
+        radius: baseRadius,
         color: resolveOwnerColor(sector),
         label: displayName,
         labelY: baseLabelY,
@@ -776,6 +828,7 @@ const clusterPolygons = computed(() => {
         cy: center.y,
         color,
         clusterRadius,
+        isDlcActive: clusterDlcActive,
         sectors,
         singleLabel: sectors[0]!.label,
         singleRadius,
@@ -785,7 +838,7 @@ const clusterPolygons = computed(() => {
       return
     }
 
-    rows.push({ id: clusterId, cx: center.x, cy: center.y, color, clusterRadius, sectors })
+    rows.push({ id: clusterId, cx: center.x, cy: center.y, color, clusterRadius, isDlcActive: clusterDlcActive, sectors })
   })
   return rows
 })
@@ -1046,6 +1099,7 @@ watchEffect(() => {
             :stroke-width="sectorStrokeWidth(cluster.sectors[0]?.id || '', 2.8)"
             :stroke-opacity="sectorStrokeOpacity(cluster.sectors[0]?.id || '', 0.95)"
             :filter="sectorFilter(cluster.sectors[0]?.id || '')"
+            :stroke-dasharray="!gameData.enforceDlcActivation && cluster.isDlcActive === false ? '6,4' : undefined"
           />
           <text
             :x="cluster.cx.toFixed(1)"
@@ -1098,6 +1152,7 @@ watchEffect(() => {
             :stroke="cluster.color"
             stroke-width="2.8"
             stroke-opacity="0.95"
+            :stroke-dasharray="!gameData.enforceDlcActivation && cluster.isDlcActive === false ? '6,4' : undefined"
           />
           <template v-for="sector in cluster.sectors" :key="sector.id">
             <g
@@ -1136,6 +1191,8 @@ watchEffect(() => {
                 :stroke-width="sectorStrokeWidth(sector.id, 2.2)"
                 :stroke-opacity="sectorStrokeOpacity(sector.id, 0.9)"
                 :filter="sectorFilter(sector.id)"
+                :stroke-dasharray="!gameData.enforceDlcActivation && cluster.isDlcActive === false ? '6,4' : undefined"
+                :stroke-dashoffset="!gameData.enforceDlcActivation && cluster.isDlcActive === false ? ((sector.sx + sector.sy) % 10).toFixed(1) : undefined"
               />
               <text
                 :x="sector.sx.toFixed(1)"

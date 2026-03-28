@@ -1,5 +1,5 @@
 import type { SectorResourceFill, SectorResourceVisualInput } from './mapResourceFilter'
-import { buildSectorResourceFill } from './mapResourceFilter'
+import { buildSectorResourceFill, YIELD_NAME_TO_RATING } from '@/store/logic/mapResourceFilter'
 
 export const ADVANCED_SUNLIGHT_TAG_ID = 'sunlight'
 
@@ -37,6 +37,7 @@ export type BuildAdvancedCandidatesInput = {
   yieldRanksByWare: Record<string, Record<string, number>>
   resourceColors: Record<string, string>
   sectorGraph: Record<string, string[]>
+  sectorClusterMap: Record<string, string>
 }
 
 export type BuildAdvancedCandidatesResult = {
@@ -58,7 +59,12 @@ const isStrictSubset = (left: string[], right: string[]) => {
   return left.every((item) => rightSet.has(item))
 }
 
-const breadthFirstReachable = (graph: Record<string, string[]>, start: string, maxDepth: number) => {
+const breadthFirstReachable = (
+  graph: Record<string, string[]>,
+  start: string,
+  maxDepth: number,
+  sectorClusterMap: Record<string, string>
+) => {
   const distances: Record<string, number> = { [start]: 0 }
   const queue = [start]
   let index = 0
@@ -66,11 +72,17 @@ const breadthFirstReachable = (graph: Record<string, string[]>, start: string, m
   while (index < queue.length) {
     const current = queue[index++]!
     const currentDepth = distances[current] || 0
-    if (currentDepth >= maxDepth) continue
+    const currentClusterId = sectorClusterMap[current]
 
     ;(graph[current] || []).forEach((next) => {
       if (distances[next] !== undefined) return
-      distances[next] = currentDepth + 1
+      const nextClusterId = sectorClusterMap[next]
+      // 同一 cluster 内移动不增加跳数，跨 cluster 移动跳数 +1
+      const depthIncrease = (currentClusterId && nextClusterId && currentClusterId !== nextClusterId) ? 1 : 0
+      const newDepth = currentDepth + depthIncrease
+      // 只有当新深度超过限制时才跳过
+      if (newDepth > maxDepth) return
+      distances[next] = newDepth
       queue.push(next)
     })
   }
@@ -125,15 +137,18 @@ export const buildSectorGraph = (clusters: Record<string, {
     })
   })
 
-  return Object.fromEntries(
-    Object.entries(graph).map(([sectorId, neighbors]) => [sectorId, Array.from(neighbors)])
-  ) as Record<string, string[]>
+  return {
+    graph: Object.fromEntries(
+      Object.entries(graph).map(([sectorId, neighbors]) => [sectorId, Array.from(neighbors)])
+    ) as Record<string, string[]>,
+    sectorClusterMap: sectorClusterIdMap
+  }
 }
 
 export const matchSectorToTagGroup = (
   sector: AdvancedResourceSector,
   group: AdvancedResourceTagGroup,
-  yieldRanksByWare: Record<string, Record<string, number>>
+  _yieldRanksByWare: Record<string, Record<string, number>>
 ): AdvancedGroupMatch => {
   if (!group.tagIds.length) {
     return {
@@ -147,7 +162,7 @@ export const matchSectorToTagGroup = (
 
   let matched = true
   let includesSunlight = false
-  const ordinaryLevels: number[] = []
+  const ordinaryRatings: number[] = []
   const ordinaryWareIds: string[] = []
 
   group.tagIds.forEach((tagId) => {
@@ -158,26 +173,32 @@ export const matchSectorToTagGroup = (
     }
 
     const resource = sector.resources.find((entry) => entry.ware === tagId)
-    const rankMap = yieldRanksByWare[tagId]
     const minYieldName = group.minYieldByWare[tagId]
-    const actualRank = resource && rankMap ? rankMap[resource.yield] : undefined
-    const minimumRank = minYieldName && rankMap ? rankMap[minYieldName] : undefined
+    // 将 minYieldName（如 'low', 'high'）转换为 rating 数值
+    const minimumRating = minYieldName ? (YIELD_NAME_TO_RATING[minYieldName] ?? 1) : 1
+    const actualRating = resource?.rating ?? 0
 
-    if (!resource || actualRank === undefined || minimumRank === undefined || actualRank < minimumRank) {
+    // 如果资源不存在或 rating < 最低要求，设置 matched = false
+    if (!resource || actualRating < minimumRating) {
       matched = false
       return
     }
 
     ordinaryWareIds.push(tagId)
-    ordinaryLevels.push(resource.level || 0)
+    ordinaryRatings.push(actualRating)
   })
+
+  // 如果没有任何资源匹配，则该组不匹配
+  if (ordinaryRatings.length === 0) {
+    matched = false
+  }
 
   return {
     groupId: group.id,
     matched,
     matchedOrdinaryWareIds: normalizeOrdinaryTagIds(ordinaryWareIds),
-    ordinaryAverageLevel: ordinaryLevels.length
-      ? ordinaryLevels.reduce((sum, level) => sum + level, 0) / ordinaryLevels.length
+    ordinaryAverageLevel: ordinaryRatings.length
+      ? ordinaryRatings.reduce((sum, rating) => sum + rating, 0) / ordinaryRatings.length
       : null,
     includesSunlight
   }
@@ -190,7 +211,8 @@ export const buildAdvancedCandidates = ({
   allowTransit,
   yieldRanksByWare,
   resourceColors,
-  sectorGraph
+  sectorGraph,
+  sectorClusterMap
 }: BuildAdvancedCandidatesInput): BuildAdvancedCandidatesResult => {
   const groupIds = tagGroups.map((group) => group.id)
   const requiredGroupIdSet = new Set(groupIds)
@@ -205,11 +227,12 @@ export const buildAdvancedCandidates = ({
     const matchedGroupIds: string[] = []
     const ordinaryWareSet = new Set<string>()
     let hasSunlightMatch = false
-    const scoreMap: Record<string, number | null> = {}
+    const groupAverageScoresBySector: Record<string, number | null> = {}
 
     tagGroups.forEach((group) => {
       const match = matchSectorToTagGroup(sector, group, yieldRanksByWare)
-      scoreMap[group.id] = match.ordinaryAverageLevel
+      // 使用该组匹配资源的平均 rating 作为分数（可以是小数）
+      groupAverageScoresBySector[group.id] = match.ordinaryAverageLevel
       if (!match.matched) return
       matchedGroupIds.push(group.id)
       match.matchedOrdinaryWareIds.forEach((wareId) => ordinaryWareSet.add(wareId))
@@ -219,7 +242,7 @@ export const buildAdvancedCandidates = ({
     matchedGroupsBySector[sector.sectorId] = matchedGroupIds
     matchedResourceTagsBySector[sector.sectorId] = Array.from(ordinaryWareSet).sort()
     matchedSunlightBySector[sector.sectorId] = hasSunlightMatch
-    groupScoresBySector[sector.sectorId] = scoreMap
+    groupScoresBySector[sector.sectorId] = groupAverageScoresBySector
   })
 
   const matchedResourceSectorIds = sectors
@@ -230,7 +253,7 @@ export const buildAdvancedCandidates = ({
   const mergedCandidates = new Map<string, { resourceSectorIds: string[]; hubCandidateSectorIds: Set<string>; coveredGroupIds: string[] }>()
 
   hubSectorIds.forEach((hubSectorId) => {
-    const reachable = breadthFirstReachable(sectorGraph, hubSectorId, Math.max(0, jumpLimit))
+    const reachable = breadthFirstReachable(sectorGraph, hubSectorId, Math.max(0, jumpLimit), sectorClusterMap)
     const resourceSectorIds = matchedResourceSectorIds
       .filter((sectorId) => reachable[sectorId] !== undefined)
       .sort()
@@ -265,6 +288,7 @@ export const buildAdvancedCandidates = ({
   ))
 
   const buildCandidateScore = (resourceSectorIds: string[]) => {
+    // 1. 对每个 tag group，取候选中所有 sector 在该 group 上的最高平均分
     const groupScores = tagGroups
       .map((group) => resourceSectorIds
         .map((sectorId) => groupScoresBySector[sectorId]?.[group.id] ?? null)
@@ -274,6 +298,7 @@ export const buildAdvancedCandidates = ({
       .map((scores) => Math.max(...scores))
 
     if (!groupScores.length) return 0
+    // 2. 取所有组分数中的最低分（瓶颈）
     return Math.min(...groupScores)
   }
 

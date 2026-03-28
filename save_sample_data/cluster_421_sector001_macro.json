@@ -1,29 +1,33 @@
 {
   "sector_id": "cluster_421_sector001_macro",
   "ware": {
-    "rawscrap": {
-      "high": {
-        "resources": [
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 128000,
-            "max": 67837,
-            "time": 252000,
-            "resourcedensity": 7.5,
-            "falloff": 0.034504
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 128000,
-            "max": 67837,
-            "time": 252000,
-            "resourcedensity": 7.5,
-            "falloff": 0.034504
-          }
+    "rawscrap": [
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 128000,
+        "max": 67837,
+        "time": 252000,
+        "regions": [
+          "region_cluster_421_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 128000,
+        "max": 67837,
+        "time": 252000,
+        "regions": [
+          "region_cluster_421_sector_001"
         ]
       }
-    }
+    ]
   }
 }

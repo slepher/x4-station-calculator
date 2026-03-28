@@ -164,6 +164,13 @@
       "highplus": "High Plus",
       "veryhigh": "Very High",
       "highest": "Highest"
+    },
+    "yield_levels": {
+      "low": "Low",
+      "midlow": "Mid Low",
+      "medium": "Medium",
+      "midhigh": "Mid High",
+      "high": "High"
     }
   },
   "ship_build": {
@@ -538,6 +545,15 @@
       "moduleLogicFlow": "Flow",
       "moduleShipBlueprints": "Ship",
       "moduleNameLabel": "Name"
+    },
+    "dlc": {
+      "title": "DLC Settings",
+      "selectAll": "Select All",
+      "clearAll": "Clear All",
+      "baseLabel": "Base",
+      "requiredVersion": "Requires {version}",
+      "enforceTitle": "Restrict inactive DLC items",
+      "enforceHint": "Inactive DLC items will be hidden from search lists, and already configured inactive items will not take effect"
     }
   },
   "logicFlow": {

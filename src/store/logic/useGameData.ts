@@ -17,8 +17,10 @@ import type {
   X4RegionYield,
   X4Faction,
   X4Language,
+  X4Dlc,
   X4DefaultMax,
-  X4ShipSlot
+  X4ShipSlot,
+  X4Res
 } from '../../types/x4'
 
 export type LocalizedX4Module = X4Module & { localeName: string }
@@ -66,10 +68,12 @@ export type GameDataFiles = {
   bullets: X4Bullet[]
   maps: X4Map
   regionyields: X4RegionYield[]
+  res: X4Res[]
   factions: X4Faction[]
   defaultMaxes: Record<string, X4DefaultMax>
   shipSlots: Record<string, X4ShipSlot[]>
   languages: X4Language[]
+  dlcs: X4Dlc[]
 }
 
 type JsonModule<T = unknown> = { default: T }
@@ -106,8 +110,8 @@ export async function loadGameDataFiles(
     ships, shipRaces, shipTypes,
     equipments, equipmentTypes, slotTags,
     consumables, drones, missiles, bullets,
-    maps, regionyields, factions,
-    defaultMaxes, shipSlots, languages
+    maps, regionyields, res, factions,
+    defaultMaxes, shipSlots, languages, dlcs
   ] = await Promise.all([
     loadJsonFromBundle<X4Ware[]>(folderName, 'wares.json', loaders),
     loadJsonFromBundle<X4Module[]>(folderName, 'modules.json', loaders),
@@ -125,10 +129,12 @@ export async function loadGameDataFiles(
     loadJsonFromBundle<X4Bullet[]>(folderName, 'bullets.json', loaders),
     loadJsonFromBundle<X4Map>(folderName, 'maps.json', loaders),
     loadJsonFromBundle<X4RegionYield[]>(folderName, 'regionyields.json', loaders),
+    loadJsonFromBundle<X4Res[]>(folderName, 'res.json', loaders),
     loadJsonFromBundle<X4Faction[]>(folderName, 'factions.json', loaders),
     loadJsonFromBundle<Record<string, X4DefaultMax>>(folderName, 'default_maxes.json', loaders),
     loadJsonFromBundle<Record<string, X4ShipSlot[]>>(folderName, 'ship_slots.json', loaders),
-    loadJsonFromBundle<X4Language[]>(folderName, 'languages.json', loaders)
+    loadJsonFromBundle<X4Language[]>(folderName, 'languages.json', loaders),
+    loadJsonFromBundle<X4Dlc[]>(folderName, 'dlcs.json', loaders)
   ])
 
   return {
@@ -136,8 +142,8 @@ export async function loadGameDataFiles(
     ships, shipRaces, shipTypes,
     equipments, equipmentTypes, slotTags,
     consumables, drones, missiles, bullets,
-    maps, regionyields, factions,
-    defaultMaxes, shipSlots, languages
+    maps, regionyields, res, factions,
+    defaultMaxes, shipSlots, languages, dlcs
   }
 }
 

@@ -1,173 +1,221 @@
 {
   "sector_id": "cluster_11_sector001_macro",
   "ware": {
-    "methane": {
-      "highplus": {
-        "resources": [
-          {
-            "x": 64000,
-            "y": 64000,
-            "z": 128000,
-            "max": 259874,
-            "time": 288000,
-            "resourcedensity": 375000,
-            "falloff": 0.692997
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 128000,
-            "max": 259874,
-            "time": 288000,
-            "resourcedensity": 375000,
-            "falloff": 0.692997
-          },
-          {
-            "x": 0,
-            "y": 64000,
-            "z": 128000,
-            "max": 259874,
-            "time": 288000,
-            "resourcedensity": 375000,
-            "falloff": 0.692997
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 128000,
-            "max": 259874,
-            "time": 288000,
-            "resourcedensity": 375000,
-            "falloff": 0.692997
-          }
+    "methane": [
+      {
+        "yield_names": [
+          "highplus"
+        ],
+        "x": 64000,
+        "y": 64000,
+        "z": 128000,
+        "max": 259874,
+        "time": 288000,
+        "regions": [
+          "p1_40km_methane_highyield_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "highplus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 128000,
+        "max": 259874,
+        "time": 288000,
+        "regions": [
+          "p1_40km_methane_highyield_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "highplus"
+        ],
+        "x": 0,
+        "y": 64000,
+        "z": 128000,
+        "max": 259874,
+        "time": 288000,
+        "regions": [
+          "p1_40km_methane_highyield_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "highplus"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 128000,
+        "max": 259874,
+        "time": 288000,
+        "regions": [
+          "p1_40km_methane_highyield_field"
         ]
       }
-    },
-    "ice": {
-      "medium": {
-        "resources": [
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 64000,
-            "max": 95349,
-            "time": 36000,
-            "resourcedensity": 15,
-            "falloff": 0.024249
-          },
-          {
-            "x": 128000,
-            "y": 0,
-            "z": 0,
-            "max": 102042,
-            "time": 36000,
-            "resourcedensity": 15,
-            "falloff": 0.025951
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 64000,
-            "max": 102042,
-            "time": 36000,
-            "resourcedensity": 15,
-            "falloff": 0.025951
-          },
-          {
-            "x": 64000,
-            "y": 0,
-            "z": 0,
-            "max": 102042,
-            "time": 36000,
-            "resourcedensity": 15,
-            "falloff": 0.025951
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 128000,
-            "max": 51021,
-            "time": 36000,
-            "resourcedensity": 15,
-            "falloff": 0.012975
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 128000,
-            "max": 51021,
-            "time": 36000,
-            "resourcedensity": 15,
-            "falloff": 0.012975
-          }
+    ],
+    "ice": [
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 64000,
+        "max": 95349,
+        "time": 36000,
+        "regions": [
+          "p1_40km_ice_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 0,
+        "max": 102042,
+        "time": 36000,
+        "regions": [
+          "p1_40km_ice_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 102042,
+        "time": 36000,
+        "regions": [
+          "p1_40km_ice_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 0,
+        "max": 102042,
+        "time": 36000,
+        "regions": [
+          "p1_40km_ice_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 128000,
+        "max": 51021,
+        "time": 36000,
+        "regions": [
+          "p1_40km_ice_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 128000,
+        "max": 51021,
+        "time": 36000,
+        "regions": [
+          "p1_40km_ice_field"
         ]
       }
-    },
-    "hydrogen": {
-      "medhigh": {
-        "resources": [
-          {
-            "x": 0,
-            "y": 64000,
-            "z": 128000,
-            "max": 173249,
-            "time": 108000,
-            "resourcedensity": 250000,
-            "falloff": 0.692996
-          },
-          {
-            "x": 0,
-            "y": 0,
-            "z": 128000,
-            "max": 173249,
-            "time": 108000,
-            "resourcedensity": 250000,
-            "falloff": 0.692996
-          },
-          {
-            "x": -64000,
-            "y": 64000,
-            "z": 128000,
-            "max": 173249,
-            "time": 108000,
-            "resourcedensity": 250000,
-            "falloff": 0.692996
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": 128000,
-            "max": 173249,
-            "time": 108000,
-            "resourcedensity": 250000,
-            "falloff": 0.692996
-          }
+    ],
+    "hydrogen": [
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 0,
+        "y": 64000,
+        "z": 128000,
+        "max": 173249,
+        "time": 108000,
+        "regions": [
+          "p1_40km_hydrogen_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 128000,
+        "max": 173249,
+        "time": 108000,
+        "regions": [
+          "p1_40km_hydrogen_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -64000,
+        "y": 64000,
+        "z": 128000,
+        "max": 173249,
+        "time": 108000,
+        "regions": [
+          "p1_40km_hydrogen_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": 128000,
+        "max": 173249,
+        "time": 108000,
+        "regions": [
+          "p1_40km_hydrogen_field"
         ]
       }
-    },
-    "helium": {
-      "high": {
-        "resources": [
-          {
-            "x": -64000,
-            "y": 64000,
-            "z": -192000,
-            "max": 90089,
-            "time": 216000,
-            "resourcedensity": 130000,
-            "falloff": 0.692992
-          },
-          {
-            "x": -64000,
-            "y": 0,
-            "z": -192000,
-            "max": 90089,
-            "time": 216000,
-            "resourcedensity": 130000,
-            "falloff": 0.692992
-          }
+    ],
+    "helium": [
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -64000,
+        "y": 64000,
+        "z": -192000,
+        "max": 90089,
+        "time": 216000,
+        "regions": [
+          "p1_40km_helium_highyield_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "high"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -192000,
+        "max": 90089,
+        "time": 216000,
+        "regions": [
+          "p1_40km_helium_highyield_field"
         ]
       }
-    }
+    ]
   }
 }

@@ -93,6 +93,11 @@ const BUILT_IN_PRESETS: Array<{ key: BuiltInPresetKey; labelKey: string }> = [
 export const useShipBuildStore = defineStore('ship-build', () => {
   const gameData = useGameDataStore()
 
+  const canUseDlcTag = (dlcTag: string | null | undefined) => {
+    if (!gameData.enforceDlcActivation) return true
+    return gameData.isDlcActive(dlcTag)
+  }
+
   function getStorageKey(): string {
     return gameData.getStorageKey('ship_blueprints')
   }
@@ -261,6 +266,12 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     return shipMap.value.get(shipId) || null
   }
 
+  const isShipDlcUsable = (shipOrId: X4Ship | string | null | undefined): boolean => {
+    const ship = typeof shipOrId === 'string' ? findShip(shipOrId) : shipOrId
+    if (!ship) return false
+    return canUseDlcTag(ship.dlc_tag)
+  }
+
   const findEquipmentType = (typeId: EquipmentType | string | null | undefined): X4EquipmentType | null => {
     if (!typeId) return null
     return equipmentTypeMap.value.get(typeId as EquipmentType) || null
@@ -269,6 +280,18 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   const findEquipment = (equipmentId: string | null | undefined): X4Equipment | null => {
     if (!equipmentId) return null
     return equipmentMap.value.get(equipmentId) || null
+  }
+
+  const isEquipmentDlcUsable = (equipmentOrId: X4Equipment | string | null | undefined): boolean => {
+    const equipment = typeof equipmentOrId === 'string' ? findEquipment(equipmentOrId) : equipmentOrId
+    if (!equipment) return false
+    return canUseDlcTag(equipment.dlc_tag)
+  }
+
+  const isEquipmentDlcAutoSelectable = (equipmentOrId: X4Equipment | string | null | undefined): boolean => {
+    const equipment = typeof equipmentOrId === 'string' ? findEquipment(equipmentOrId) : equipmentOrId
+    if (!equipment) return false
+    return gameData.isDlcActive(equipment.dlc_tag)
   }
 
   const findWare = (wareId: string | null | undefined): X4Ware | null => {
@@ -374,6 +397,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     return equipments.value
       .filter((equipment) => !equipment.noplayerblueprint)
       .filter((equipment) => equipment.type === slotType && equipment.size === size)
+      .filter((equipment) => isEquipmentDlcAutoSelectable(equipment))
       .filter((equipment) => {
         if (connectionTags.length === 0) return true
         const equipmentTags = normalizeTagList(equipment.slotTags)
@@ -396,6 +420,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       const mineTurrets = equipments.value
         .filter((equipment) => !equipment.noplayerblueprint)
         .filter((equipment) => equipment.type === 'turret' && equipment.size === size)
+        .filter((equipment) => isEquipmentDlcAutoSelectable(equipment))
         .filter((equipment) => {
           const tags = normalizeTagList(equipment.slotTags).map((tag) => tag.toLowerCase())
           return tags.includes('mine') || tags.includes('mining')
@@ -1527,6 +1552,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     return equipments.value
       .filter((equipment) => !equipment.noplayerblueprint)
       .filter((equipment) => equipment.type === slotType && equipment.size === size)
+      .filter((equipment) => isEquipmentDlcUsable(equipment))
       .filter((equipment) => {
         if (connectionTags.length === 0) return true
         const equipmentTags = normalizeTagList(equipment.slotTags)
@@ -1547,6 +1573,20 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     const shipId = resolveCurrentShipId()
     return findShip(shipId)
   })
+
+  watch(
+    () => ({
+      shipId: selectedShipId.value,
+      enforceDlcActivation: gameData.enforceDlcActivation,
+      activeDlcsKey: gameData.activeDlcs.join('|')
+    }),
+    ({ shipId, enforceDlcActivation }) => {
+      if (!shipId || !enforceDlcActivation) return
+      if (isShipDlcUsable(shipId)) return
+      viewMode.value = 'selector'
+    },
+    { immediate: true }
+  )
 
   const hasSelectedShip = computed(() => Boolean(resolveCurrentShipId()))
 
@@ -1691,8 +1731,10 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     selectedShip,
     hasSelectedShip,
     findShip,
+    isShipDlcUsable,
     findEquipmentType,
     findEquipment,
+    isEquipmentDlcUsable,
     findWare,
     // Blueprint persistence
     blueprint,

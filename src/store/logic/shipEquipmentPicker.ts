@@ -114,8 +114,9 @@ export const parseSizeNToSizeNth = (sizeN: string): { size: ShipEquipmentSize; n
 export const extractShipCandidates = (payload: {
   shipMap: ShipLookup
   filters: ShipCandidateFilters
+  includeShip?: (ship: X4Ship) => boolean
 }): ShipCandidateResult => {
-  const { shipMap, filters } = payload
+  const { shipMap, filters, includeShip } = payload
   const { shipClass, races, types, query } = filters
   if (!shipClass) {
     return {
@@ -128,6 +129,7 @@ export const extractShipCandidates = (payload: {
   const normalizedQuery = (query || '').trim().toLowerCase()
   const base = listLookupValues(shipMap)
     .filter((ship) => ship.class === shipClass)
+    .filter((ship) => includeShip ? includeShip(ship) : true)
     .filter((ship) => {
       if (!normalizedQuery) return true
       return ship.id.toLowerCase().includes(normalizedQuery)
@@ -179,6 +181,7 @@ export const extractEquipmentSlotCandidates = (payload: {
   size: ShipEquipmentSize
   filters: EquipmentPickerFilters
   tagsAll?: string[]
+  includeEquipment?: (equipment: X4Equipment) => boolean
 }): FitEquipmentOption[] => {
   const {
     shipMap,
@@ -187,7 +190,8 @@ export const extractEquipmentSlotCandidates = (payload: {
     slotType,
     size,
     filters,
-    tagsAll = []
+    tagsAll = [],
+    includeEquipment
   } = payload
 
   const ship = readLookup(shipMap, shipId)
@@ -199,6 +203,7 @@ export const extractEquipmentSlotCandidates = (payload: {
   const candidates = listLookupValues(equipmentMap)
     .filter((equipment) => !equipment.noplayerblueprint)
     .filter((equipment) => equipment.type === slotType && equipment.size === size)
+    .filter((equipment) => includeEquipment ? includeEquipment(equipment) : true)
     .filter((equipment) => {
       const equipmentTags = normalizeTagList(equipment.slotTags)
       if (tagsAll.length > 0 && !matchesTagsAllSubset(equipmentTags, tagsAll)) return false
@@ -224,8 +229,9 @@ export const extractEquipmentSlotCandidatesWithFacets = (payload: {
   size: ShipEquipmentSize
   filters: EquipmentPickerFilters
   tagsAll?: string[]
+  includeEquipment?: (equipment: X4Equipment) => boolean
 }): EquipmentCandidateResult => {
-  const { shipMap, equipmentMap, shipId, slotType, size, filters, tagsAll = [] } = payload
+  const { shipMap, equipmentMap, shipId, slotType, size, filters, tagsAll = [], includeEquipment } = payload
 
   const items = extractEquipmentSlotCandidates({
     shipMap,
@@ -234,7 +240,8 @@ export const extractEquipmentSlotCandidatesWithFacets = (payload: {
     slotType,
     size,
     filters,
-    tagsAll
+    tagsAll,
+    includeEquipment
   })
 
   const racePool = extractEquipmentSlotCandidates({
@@ -244,7 +251,8 @@ export const extractEquipmentSlotCandidatesWithFacets = (payload: {
     slotType,
     size,
     filters: { races: [], mks: filters.mks, tags: filters.tags },
-    tagsAll
+    tagsAll,
+    includeEquipment
   })
   const mkPool = extractEquipmentSlotCandidates({
     shipMap,
@@ -253,7 +261,8 @@ export const extractEquipmentSlotCandidatesWithFacets = (payload: {
     slotType,
     size,
     filters: { races: filters.races, mks: [], tags: filters.tags },
-    tagsAll
+    tagsAll,
+    includeEquipment
   })
   const tagPool = extractEquipmentSlotCandidates({
     shipMap,
@@ -262,7 +271,8 @@ export const extractEquipmentSlotCandidatesWithFacets = (payload: {
     slotType,
     size,
     filters: { races: filters.races, mks: filters.mks, tags: [] },
-    tagsAll
+    tagsAll,
+    includeEquipment
   })
 
   const raceCountMap = new Map<string, number>()

@@ -6,7 +6,7 @@ defineProps<{
   resources: Array<{
     wareId: string
     label: string
-    yieldLabel: string
+    respawnLabel: string
     color: string
   }>
   sunlightLabel: string
@@ -28,7 +28,7 @@ defineProps<{
 
       <template v-for="resource in resources" :key="resource.wareId">
         <span class="resource-name">{{ resource.label }}</span>
-        <span class="resource-value">{{ resource.yieldLabel }}</span>
+        <span class="resource-value">{{ resource.respawnLabel }}</span>
         <span class="resource-color" :style="{ backgroundColor: resource.color }"></span>
       </template>
     </div>

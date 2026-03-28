@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import type { FitMode, FitConnectionRow, FitGroupRow } from '@/components/ship-build/fitTypes'
 import { useX4I18n } from '@/utils/UseX4I18n'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import type { ShipEquipmentSize, X4SlotTag } from '@/types/x4'
 import X4DualPhaseRangeSlider from '@/components/common/X4DualPhaseRangeSlider.vue'
@@ -60,6 +61,7 @@ const emit = defineEmits<{
 }>()
 
 const shipBuildStore = useShipBuildStore()
+const gameData = useGameDataStore()
 const { selectedShip, blueprint, mockTagPatch, isDirty, activeBlueprintStatusLabel, isBuiltInPresetUnchanged } = storeToRefs(shipBuildStore)
 const { applyConnectionAssignment, setConnectionAssignmentCount, enterShipSelector } = shipBuildStore
 
@@ -739,6 +741,7 @@ const pickerInitialEquipmentId = computed<string | null>(() => {
   if (!pickerTarget.value) return null
   const selected = selectedForConnectionKeys(pickerTarget.value.connectionKeys)
   if (!selected || selected === '__mixed__') return null
+  if (gameData.enforceDlcActivation && !shipBuildStore.isEquipmentDlcUsable(selected)) return null
   return selected
 })
 const selectedNameForTarget = (target: SlotTarget) => {
@@ -747,6 +750,17 @@ const selectedNameForTarget = (target: SlotTarget) => {
   if (selectedId === '__mixed__') return t('ship_build.fit_mixed_selection')
   const equipment = shipBuildStore.findEquipment(selectedId)
   return equipment ? translateEquipment(equipment) : selectedId
+}
+
+const selectedEquipmentForTarget = (target: SlotTarget) => {
+  const selectedId = selectedForConnectionKeys(target.connectionKeys)
+  if (!selectedId || selectedId === '__mixed__') return null
+  return shipBuildStore.findEquipment(selectedId)
+}
+
+const shouldShowSelectedDlcTag = (target: SlotTarget) => {
+  const equipment = selectedEquipmentForTarget(target)
+  return Boolean(equipment && equipment.dlc_tag !== 'base')
 }
 const isMixedSelectionInGroup = (target: SlotTarget) => fitMode.value === 'group' && selectedForConnectionKeys(target.connectionKeys) === '__mixed__'
 
@@ -1097,7 +1111,16 @@ watch(slotTargets, () => {
                 >
                   <div class="slot-row-main">
                     <div class="slot-row-title">{{ target.label }}</div>
-                    <div class="slot-row-value" :class="isMixedSelectionInGroup(target) ? 'slot-row-value-mixed' : ''">{{ selectedNameForTarget(target) }}</div>
+                    <div class="slot-row-value" :class="isMixedSelectionInGroup(target) ? 'slot-row-value-mixed' : ''">
+                      <span class="slot-row-value-text">{{ selectedNameForTarget(target) }}</span>
+                      <span
+                        v-if="shouldShowSelectedDlcTag(target)"
+                        class="dlc-tag"
+                        :class="gameData.isDlcActive(selectedEquipmentForTarget(target)?.dlc_tag) ? 'dlc-tag--active' : 'dlc-tag--inactive'"
+                      >
+                        {{ gameData.getDlcDisplayName(selectedEquipmentForTarget(target)?.dlc_tag) }}
+                      </span>
+                    </div>
                   </div>
                   <div class="slot-row-side">
                     <span class="slot-row-count">{{ getDisplayedCount(target) }}/{{ target.totalCount }}</span>
@@ -1145,6 +1168,18 @@ watch(slotTargets, () => {
 
 .ship-switcher-divider {
   @apply inline-block h-3 w-px bg-emerald-400/40;
+}
+
+.dlc-tag {
+  @apply inline-flex max-w-[110px] flex-shrink-0 items-center rounded-md border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide;
+}
+
+.dlc-tag--active {
+  @apply border-emerald-500/70 text-emerald-300;
+}
+
+.dlc-tag--inactive {
+  @apply border-rose-500/70 text-rose-300;
 }
 
 .ship-blueprint-picker {
@@ -1256,7 +1291,8 @@ watch(slotTargets, () => {
 .slot-row-expanded { @apply border-emerald-200 ring-1 ring-emerald-300; }
 .slot-row-main { @apply min-w-0; }
 .slot-row-title { @apply text-xs text-slate-100 font-semibold; }
-.slot-row-value { @apply text-[11px] text-slate-300 mt-0.5 truncate; }
+.slot-row-value { @apply mt-0.5 flex items-center gap-2 min-w-0 text-[11px] text-slate-300; }
+.slot-row-value-text { @apply truncate; }
 .slot-row-value-mixed { @apply text-amber-300 font-semibold; }
 .slot-row-side { @apply flex items-center gap-2 ml-2; }
 .slot-row-count { @apply text-[10px] text-emerald-300; }

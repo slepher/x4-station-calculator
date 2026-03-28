@@ -4,6 +4,7 @@
       "id": "Cluster_01_macro",
       "nameId": "{20003,10001}",
       "name": "Grand Exchange",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -47,28 +48,33 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 1550000,
-              "respawn": 1650000
+              "reserve": 1550000,
+              "respawn": 1650000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 2650000,
-              "respawn": 2300000
+              "reserve": 2650000,
+              "respawn": 2300000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 500,
-              "respawn": 600
+              "reserve": 500,
+              "respawn": 600,
+              "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 3130000,
-              "respawn": 3510000
+              "reserve": 3130000,
+              "respawn": 3510000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1700000,
-              "respawn": 1860000
+              "reserve": 1700000,
+              "respawn": 1860000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -214,38 +220,45 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 50000,
-              "respawn": 85714
+              "reserve": 50000,
+              "respawn": 85714,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 400000,
-              "respawn": 480000
+              "reserve": 400000,
+              "respawn": 480000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 150000,
-              "respawn": 205714
+              "reserve": 150000,
+              "respawn": 205714,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 35000,
-              "respawn": 74000
+              "reserve": 35000,
+              "respawn": 74000,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2900000,
-              "respawn": 3210000
+              "reserve": 2900000,
+              "respawn": 3210000,
+              "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 10000,
-              "respawn": 24000
+              "reserve": 10000,
+              "respawn": 24000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1900000,
-              "respawn": 2280000
+              "reserve": 1900000,
+              "respawn": 2280000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -383,23 +396,27 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 700000,
-              "respawn": 780000
+              "reserve": 700000,
+              "respawn": 780000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 1000,
-              "respawn": 800
+              "reserve": 1000,
+              "respawn": 800,
+              "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 1450000,
-              "respawn": 1894286
+              "reserve": 1450000,
+              "respawn": 1894286,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1350000,
-              "respawn": 1800000
+              "reserve": 1350000,
+              "respawn": 1800000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -559,6 +576,7 @@
       "id": "Cluster_02_macro",
       "nameId": "{20003,20001}",
       "name": "Eighteen Billion",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -602,23 +620,27 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 500000,
-              "respawn": 642857
+              "reserve": 500000,
+              "respawn": 642857,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 2950000,
-              "respawn": 2637500
+              "reserve": 2950000,
+              "respawn": 2637500,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2300000,
-              "respawn": 2360000
+              "reserve": 2300000,
+              "respawn": 2360000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1200000,
-              "respawn": 1320000
+              "reserve": 1200000,
+              "respawn": 1320000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -758,6 +780,7 @@
       "id": "Cluster_03_macro",
       "nameId": "{20003,30001}",
       "name": "Memory of Profit",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -801,23 +824,27 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 200000,
-              "respawn": 235714
+              "reserve": 200000,
+              "respawn": 235714,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 1000,
-              "respawn": 800
+              "reserve": 1000,
+              "respawn": 800,
+              "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 150000,
-              "respawn": 150000
+              "reserve": 150000,
+              "respawn": 150000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 145000,
-              "respawn": 255000
+              "reserve": 145000,
+              "respawn": 255000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -893,6 +920,7 @@
       "id": "Cluster_04_macro",
       "nameId": "{20003,40001}",
       "name": "Nopileos' Fortune",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -936,23 +964,27 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 7000000,
-              "respawn": 6000000
+              "reserve": 7000000,
+              "respawn": 6000000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 3550000,
-              "respawn": 3150000
+              "reserve": 3550000,
+              "respawn": 3150000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 25000,
-              "respawn": 10714
+              "reserve": 25000,
+              "respawn": 10714,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 7150000,
-              "respawn": 6350000
+              "reserve": 7150000,
+              "respawn": 6350000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -1203,6 +1235,7 @@
       "id": "Cluster_05_macro",
       "nameId": "{20003,50001}",
       "name": "Path to Profit",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -1246,8 +1279,9 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 4800000,
-              "respawn": 4550000
+              "reserve": 4800000,
+              "respawn": 4550000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -1313,6 +1347,7 @@
       "id": "Cluster_06_macro",
       "nameId": "{20003,60001}",
       "name": "Black Hole Sun",
+      "dlc_tag": "base",
       "owner": "argon",
       "owner_color": "#0069B3",
       "raw_pos": {
@@ -1356,33 +1391,39 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 50000,
-              "respawn": 100000
+              "reserve": 50000,
+              "respawn": 100000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 350000,
-              "respawn": 445714
+              "reserve": 350000,
+              "respawn": 445714,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 150000,
-              "respawn": 150000
+              "reserve": 150000,
+              "respawn": 150000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 1500,
-              "respawn": 818
+              "reserve": 1500,
+              "respawn": 818,
+              "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 50000,
-              "respawn": 100000
+              "reserve": 50000,
+              "respawn": 100000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 50000,
-              "respawn": 120000
+              "reserve": 50000,
+              "respawn": 120000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -1500,18 +1541,21 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 100000,
-              "respawn": 120000
+              "reserve": 100000,
+              "respawn": 120000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 700000,
-              "respawn": 700000
+              "reserve": 700000,
+              "respawn": 700000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 100000,
-              "respawn": 171429
+              "reserve": 100000,
+              "respawn": 171429,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -1633,6 +1677,7 @@
       "id": "Cluster_07_macro",
       "nameId": "{20003,70001}",
       "name": "The Reach",
+      "dlc_tag": "base",
       "owner": "argon",
       "owner_color": "#0069B3",
       "raw_pos": {
@@ -1676,8 +1721,9 @@
           "resources": [
             {
               "ware": "ore",
-              "yield": 2700000,
-              "respawn": 2450000
+              "reserve": 2700000,
+              "respawn": 2450000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -1733,6 +1779,7 @@
       "id": "Cluster_08_macro",
       "nameId": "{20003,80001}",
       "name": "Silent Witness",
+      "dlc_tag": "base",
       "owner": "argon",
       "owner_color": "#0069B3",
       "raw_pos": {
@@ -1776,18 +1823,21 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 2700000,
-              "respawn": 2610000
+              "reserve": 2700000,
+              "respawn": 2610000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 15000,
-              "respawn": 6429
+              "reserve": 15000,
+              "respawn": 6429,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1900000,
-              "respawn": 1560000
+              "reserve": 1900000,
+              "respawn": 1560000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -2002,6 +2052,7 @@
       "id": "Cluster_09_macro",
       "nameId": "{20003,90001}",
       "name": "Bright Promise",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -2247,6 +2298,7 @@
       "id": "Cluster_10_macro",
       "nameId": "{20003,100001}",
       "name": "Unholy Retribution",
+      "dlc_tag": "base",
       "owner": "paranid",
       "owner_color": "#B300B3",
       "raw_pos": {
@@ -2446,6 +2498,7 @@
       "id": "Cluster_11_macro",
       "nameId": "{20003,110001}",
       "name": "Pontifex's Claim",
+      "dlc_tag": "base",
       "owner": "holyorder",
       "owner_color": "#FF99FF",
       "raw_pos": {
@@ -2489,23 +2542,27 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 200000,
-              "respawn": 240000
+              "reserve": 200000,
+              "respawn": 240000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 650000,
-              "respawn": 650000
+              "reserve": 650000,
+              "respawn": 650000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 550000,
-              "respawn": 550000
+              "reserve": 550000,
+              "respawn": 550000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 700000,
-              "respawn": 800000
+              "reserve": 700000,
+              "respawn": 800000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -2680,6 +2737,7 @@
       "id": "Cluster_12_macro",
       "nameId": "{20003,120001}",
       "name": "True Sight",
+      "dlc_tag": "base",
       "owner": "holyorder",
       "owner_color": "#FF99FF",
       "raw_pos": {
@@ -2893,6 +2951,7 @@
       "id": "Cluster_13_macro",
       "nameId": "{20003,130001}",
       "name": "Second Contact",
+      "dlc_tag": "base",
       "owner": "antigone",
       "owner_color": "#0095FF",
       "raw_pos": {
@@ -2936,28 +2995,33 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 1000000,
-              "respawn": 1080000
+              "reserve": 1000000,
+              "respawn": 1080000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 2400000,
-              "respawn": 2400000
+              "reserve": 2400000,
+              "respawn": 2400000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 10000,
-              "respawn": 3529
+              "reserve": 10000,
+              "respawn": 3529,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 950000,
-              "respawn": 950000
+              "reserve": 950000,
+              "respawn": 950000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1250000,
-              "respawn": 1350000
+              "reserve": 1250000,
+              "respawn": 1350000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -3162,6 +3226,7 @@
       "id": "Cluster_14_macro",
       "nameId": "{20003,140001}",
       "name": "Argon Prime",
+      "dlc_tag": "base",
       "owner": "argon",
       "owner_color": "#0069B3",
       "raw_pos": {
@@ -3395,6 +3460,7 @@
       "id": "Cluster_15_macro",
       "nameId": "{20003,150001}",
       "name": "Ianamus Zura",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -3438,23 +3504,27 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 100000,
-              "respawn": 120000
+              "reserve": 100000,
+              "respawn": 120000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 175000,
-              "respawn": 200000
+              "reserve": 175000,
+              "respawn": 200000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 270000,
-              "respawn": 345000
+              "reserve": 270000,
+              "respawn": 345000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 100000,
-              "respawn": 171429
+              "reserve": 100000,
+              "respawn": 171429,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -3663,23 +3733,27 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 50000,
-              "respawn": 75000
+              "reserve": 50000,
+              "respawn": 75000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 500,
-              "respawn": 600
+              "reserve": 500,
+              "respawn": 600,
+              "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 300000,
-              "respawn": 407143
+              "reserve": 300000,
+              "respawn": 407143,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 340000,
-              "respawn": 450000
+              "reserve": 340000,
+              "respawn": 450000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -3777,6 +3851,7 @@
       "id": "Cluster_16_macro",
       "nameId": "{20003,160001}",
       "name": "Matrix #451",
+      "dlc_tag": "base",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -3820,18 +3895,21 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 2400000,
-              "respawn": 2167500
+              "reserve": 2400000,
+              "respawn": 2167500,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2350000,
-              "respawn": 1897500
+              "reserve": 2350000,
+              "respawn": 1897500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2000000,
-              "respawn": 1812500
+              "reserve": 2000000,
+              "respawn": 1812500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -3993,6 +4071,7 @@
       "id": "Cluster_17_macro",
       "nameId": "{20003,170001}",
       "name": "Matrix #9",
+      "dlc_tag": "base",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -4036,23 +4115,27 @@
           "resources": [
             {
               "ware": "methane",
-              "yield": 3400000,
-              "respawn": 3025000
+              "reserve": 3400000,
+              "respawn": 3025000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 210000,
-              "respawn": 46429
+              "reserve": 210000,
+              "respawn": 46429,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 4600000,
-              "respawn": 3637500
+              "reserve": 4600000,
+              "respawn": 3637500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 3950000,
-              "respawn": 3637500
+              "reserve": 3950000,
+              "respawn": 3637500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -4160,6 +4243,7 @@
       "id": "Cluster_18_macro",
       "nameId": "{20003,180001}",
       "name": "Trinity Sanctum",
+      "dlc_tag": "base",
       "owner": "paranid",
       "owner_color": "#B300B3",
       "raw_pos": {
@@ -4203,38 +4287,45 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 35000,
-              "respawn": 84000
+              "reserve": 35000,
+              "respawn": 84000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 200000,
-              "respawn": 291429
+              "reserve": 200000,
+              "respawn": 291429,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 350000,
-              "respawn": 390000
+              "reserve": 350000,
+              "respawn": 390000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 200000,
-              "respawn": 291429
+              "reserve": 200000,
+              "respawn": 291429,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 500,
-              "respawn": 600
+              "reserve": 500,
+              "respawn": 600,
+              "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 75000,
-              "respawn": 125000
+              "reserve": 75000,
+              "respawn": 125000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 80000,
-              "respawn": 145714
+              "reserve": 80000,
+              "respawn": 145714,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -4528,6 +4619,7 @@
       "id": "Cluster_19_macro",
       "nameId": "{20003,190001}",
       "name": "Hewa's Twin",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -4571,33 +4663,39 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 135000,
-              "respawn": 223929
+              "reserve": 135000,
+              "respawn": 223929,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 200000,
-              "respawn": 291429
+              "reserve": 200000,
+              "respawn": 291429,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 30000,
-              "respawn": 72000
+              "reserve": 30000,
+              "respawn": 72000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 500,
-              "respawn": 600
+              "reserve": 500,
+              "respawn": 600,
+              "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 135000,
-              "respawn": 172500
+              "reserve": 135000,
+              "respawn": 172500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 150000,
-              "respawn": 150000
+              "reserve": 150000,
+              "respawn": 150000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -4781,33 +4879,39 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 100000,
-              "respawn": 120000
+              "reserve": 100000,
+              "respawn": 120000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 350000,
-              "respawn": 400000
+              "reserve": 350000,
+              "respawn": 400000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 85000,
-              "respawn": 138214
+              "reserve": 85000,
+              "respawn": 138214,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 1000,
-              "respawn": 800
+              "reserve": 1000,
+              "respawn": 800,
+              "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 475000,
-              "respawn": 562500
+              "reserve": 475000,
+              "respawn": 562500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 450000,
-              "respawn": 540000
+              "reserve": 450000,
+              "respawn": 540000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -4905,6 +5009,7 @@
       "id": "Cluster_20_macro",
       "nameId": "{20003,200001}",
       "name": "Company Regard",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -5116,6 +5221,7 @@
       "id": "Cluster_21_macro",
       "nameId": "{20003,210001}",
       "name": "Scale Plate Green",
+      "dlc_tag": "base",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -5159,28 +5265,33 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 400000,
-              "respawn": 480000
+              "reserve": 400000,
+              "respawn": 480000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 500,
-              "respawn": 600
+              "reserve": 500,
+              "respawn": 600,
+              "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 350000,
-              "respawn": 435000
+              "reserve": 350000,
+              "respawn": 435000,
+              "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 1100000,
-              "respawn": 1117500
+              "reserve": 1100000,
+              "respawn": 1117500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 250000,
-              "respawn": 321429
+              "reserve": 250000,
+              "respawn": 321429,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -5316,13 +5427,15 @@
           "resources": [
             {
               "ware": "ore",
-              "yield": 4400000,
-              "respawn": 2917500
+              "reserve": 4400000,
+              "respawn": 2917500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 3600000,
-              "respawn": 2850000
+              "reserve": 3600000,
+              "respawn": 2850000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -5434,6 +5547,7 @@
       "id": "Cluster_22_macro",
       "nameId": "{20003,220001}",
       "name": "Pious Mists",
+      "dlc_tag": "base",
       "owner": "paranid",
       "owner_color": "#B300B3",
       "raw_pos": {
@@ -5715,6 +5829,7 @@
       "id": "Cluster_23_macro",
       "nameId": "{20003,230001}",
       "name": "Sacred Relic",
+      "dlc_tag": "base",
       "owner": "paranid",
       "owner_color": "#B300B3",
       "raw_pos": {
@@ -5833,6 +5948,7 @@
       "id": "Cluster_24_macro",
       "nameId": "{20003,240001}",
       "name": "Holy Vision",
+      "dlc_tag": "base",
       "owner": "holyorder",
       "owner_color": "#FF99FF",
       "raw_pos": {
@@ -5876,38 +5992,45 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 100000,
-              "respawn": 171429
+              "reserve": 100000,
+              "respawn": 171429,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 700000,
-              "respawn": 780000
+              "reserve": 700000,
+              "respawn": 780000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 210000,
-              "respawn": 377143
+              "reserve": 210000,
+              "respawn": 377143,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 25000,
-              "respawn": 50000
+              "reserve": 25000,
+              "respawn": 50000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 1500,
-              "respawn": 818
+              "reserve": 1500,
+              "respawn": 818,
+              "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 350000,
-              "respawn": 522857
+              "reserve": 350000,
+              "respawn": 522857,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 345000,
-              "respawn": 408000
+              "reserve": 345000,
+              "respawn": 408000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -6248,6 +6371,7 @@
       "id": "Cluster_25_macro",
       "nameId": "{20003,250001}",
       "name": "Faulty Logic",
+      "dlc_tag": "base",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -6291,23 +6415,27 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 5450000,
-              "respawn": 4037500
+              "reserve": 5450000,
+              "respawn": 4037500,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 3650000,
-              "respawn": 3337500
+              "reserve": 3650000,
+              "respawn": 3337500,
+              "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 150000,
-              "respawn": 150000
+              "reserve": 150000,
+              "respawn": 150000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 5050000,
-              "respawn": 4050000
+              "reserve": 5050000,
+              "respawn": 4050000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -6510,18 +6638,21 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 3000000,
-              "respawn": 2750000
+              "reserve": 3000000,
+              "respawn": 2750000,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 3850000,
-              "respawn": 3475000
+              "reserve": 3850000,
+              "respawn": 3475000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2950000,
-              "respawn": 2700000
+              "reserve": 2950000,
+              "respawn": 2700000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -6619,6 +6750,7 @@
       "id": "Cluster_26_macro",
       "nameId": "{20003,260001}",
       "name": "Atiya's Misfortune",
+      "dlc_tag": "base",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -6662,18 +6794,21 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 2750000,
-              "respawn": 2500000
+              "reserve": 2750000,
+              "respawn": 2500000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 275000,
-              "respawn": 63571
+              "reserve": 275000,
+              "respawn": 63571,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 1650000,
-              "respawn": 1522500
+              "reserve": 1650000,
+              "respawn": 1522500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -6795,23 +6930,27 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 2100000,
-              "respawn": 2100000
+              "reserve": 2100000,
+              "respawn": 2100000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 275000,
-              "respawn": 63571
+              "reserve": 275000,
+              "respawn": 63571,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 1800000,
-              "respawn": 1860000
+              "reserve": 1800000,
+              "respawn": 1860000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1850000,
-              "respawn": 1762500
+              "reserve": 1850000,
+              "respawn": 1762500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -6919,6 +7058,7 @@
       "id": "Cluster_27_macro",
       "nameId": "{20003,270001}",
       "name": "The Void",
+      "dlc_tag": "base",
       "owner": "antigone",
       "owner_color": "#0095FF",
       "raw_pos": {
@@ -6962,38 +7102,45 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 75000,
-              "respawn": 125000
+              "reserve": 75000,
+              "respawn": 125000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 800000,
-              "respawn": 1165714
+              "reserve": 800000,
+              "respawn": 1165714,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 850000,
-              "respawn": 990000
+              "reserve": 850000,
+              "respawn": 990000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 850000,
-              "respawn": 990000
+              "reserve": 850000,
+              "respawn": 990000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 3000,
-              "respawn": 2400
+              "reserve": 3000,
+              "respawn": 2400,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 1900000,
-              "respawn": 2040000
+              "reserve": 1900000,
+              "respawn": 2040000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1100000,
-              "respawn": 1200000
+              "reserve": 1100000,
+              "respawn": 1200000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -7093,6 +7240,7 @@
       "id": "Cluster_28_macro",
       "nameId": "{20003,280001}",
       "name": "Antigone Memorial",
+      "dlc_tag": "base",
       "owner": "antigone",
       "owner_color": "#0095FF",
       "raw_pos": {
@@ -7136,33 +7284,39 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 250000,
-              "respawn": 325714
+              "reserve": 250000,
+              "respawn": 325714,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 550000,
-              "respawn": 788571
+              "reserve": 550000,
+              "respawn": 788571,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 2150000,
-              "respawn": 2150000
+              "reserve": 2150000,
+              "respawn": 2150000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 30000,
-              "respawn": 8000
+              "reserve": 30000,
+              "respawn": 8000,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 950000,
-              "respawn": 1050000
+              "reserve": 950000,
+              "respawn": 1050000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1200000,
-              "respawn": 1320000
+              "reserve": 1200000,
+              "respawn": 1320000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -7365,6 +7519,7 @@
       "id": "Cluster_29_macro",
       "nameId": "{20003,290001}",
       "name": "Hatikvah's Choice",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -7686,38 +7841,45 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 150000,
-              "respawn": 150000
+              "reserve": 150000,
+              "respawn": 150000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 200000,
-              "respawn": 342857
+              "reserve": 200000,
+              "respawn": 342857,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 200000,
-              "respawn": 240000
+              "reserve": 200000,
+              "respawn": 240000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 20000,
-              "respawn": 51000
+              "reserve": 20000,
+              "respawn": 51000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 7500,
-              "respawn": 2971
+              "reserve": 7500,
+              "respawn": 2971,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 600000,
-              "respawn": 822857
+              "reserve": 600000,
+              "respawn": 822857,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 700000,
-              "respawn": 878571
+              "reserve": 700000,
+              "respawn": 878571,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -7818,6 +7980,7 @@
       "id": "Cluster_30_macro",
       "nameId": "{20003,300001}",
       "name": "Morning Star",
+      "dlc_tag": "base",
       "owner": "argon",
       "owner_color": "#0069B3",
       "raw_pos": {
@@ -7932,6 +8095,7 @@
       "id": "Cluster_31_macro",
       "nameId": "{20003,310001}",
       "name": "Heretic's End",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -7975,13 +8139,15 @@
           "resources": [
             {
               "ware": "ore",
-              "yield": 4250000,
-              "respawn": 3687500
+              "reserve": 4250000,
+              "respawn": 3687500,
+              "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 50000,
-              "respawn": 75000
+              "reserve": 50000,
+              "respawn": 75000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -8069,6 +8235,7 @@
       "id": "Cluster_32_macro",
       "nameId": "{20003,320001}",
       "name": "Tharka's Cascade",
+      "dlc_tag": "base",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -8112,28 +8279,33 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 3600000,
-              "respawn": 3287500
+              "reserve": 3600000,
+              "respawn": 3287500,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 25000,
-              "respawn": 9762
+              "reserve": 25000,
+              "respawn": 9762,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 4950000,
-              "respawn": 3750000
+              "reserve": 4950000,
+              "respawn": 3750000,
+              "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 15000,
-              "respawn": 36000
+              "reserve": 15000,
+              "respawn": 36000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2950000,
-              "respawn": 2715000
+              "reserve": 2950000,
+              "respawn": 2715000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -8429,18 +8601,21 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 600000,
-              "respawn": 720000
+              "reserve": 600000,
+              "respawn": 720000,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 4300000,
-              "respawn": 3600000
+              "reserve": 4300000,
+              "respawn": 3600000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1800000,
-              "respawn": 1980000
+              "reserve": 1800000,
+              "respawn": 1980000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -8574,6 +8749,7 @@
       "id": "Cluster_33_macro",
       "nameId": "{20003,330001}",
       "name": "Matrix #79B",
+      "dlc_tag": "base",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -8617,13 +8793,15 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 150000,
-              "respawn": 257143
+              "reserve": 150000,
+              "respawn": 257143,
+              "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 100000,
-              "respawn": 120000
+              "reserve": 100000,
+              "respawn": 120000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -8789,6 +8967,7 @@
       "id": "Cluster_34_macro",
       "nameId": "{20003,340001}",
       "name": "Profit Center Alpha",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -9026,6 +9205,7 @@
       "id": "Cluster_35_macro",
       "nameId": "{20003,350001}",
       "name": "Lasting Vengeance",
+      "dlc_tag": "base",
       "owner": "holyorder",
       "owner_color": "#FF99FF",
       "raw_pos": {
@@ -9069,23 +9249,27 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 300000,
-              "respawn": 407143
+              "reserve": 300000,
+              "respawn": 407143,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 1450000,
-              "respawn": 1350000
+              "reserve": 1450000,
+              "respawn": 1350000,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 1250000,
-              "respawn": 1072500
+              "reserve": 1250000,
+              "respawn": 1072500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2150000,
-              "respawn": 1807500
+              "reserve": 2150000,
+              "respawn": 1807500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -9155,6 +9339,7 @@
       "id": "Cluster_36_macro",
       "nameId": "{20003,360001}",
       "name": "Cardinal's Redress",
+      "dlc_tag": "base",
       "owner": "holyorder",
       "owner_color": "#FF99FF",
       "raw_pos": {
@@ -9198,18 +9383,21 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 2400000,
-              "respawn": 2150000
+              "reserve": 2400000,
+              "respawn": 2150000,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2600000,
-              "respawn": 2600000
+              "reserve": 2600000,
+              "respawn": 2600000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2450000,
-              "respawn": 2262500
+              "reserve": 2450000,
+              "respawn": 2262500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -9285,6 +9473,7 @@
       "id": "Cluster_37_macro",
       "nameId": "{20003,370001}",
       "name": "Pious Mists",
+      "dlc_tag": "base",
       "owner": "paranid",
       "owner_color": "#B300B3",
       "raw_pos": {
@@ -9328,18 +9517,21 @@
           "resources": [
             {
               "ware": "methane",
-              "yield": 1000000,
-              "respawn": 1080000
+              "reserve": 1000000,
+              "respawn": 1080000,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 1450000,
-              "respawn": 1530000
+              "reserve": 1450000,
+              "respawn": 1530000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1900000,
-              "respawn": 1980000
+              "reserve": 1900000,
+              "respawn": 1980000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -9489,6 +9681,7 @@
       "id": "Cluster_38_macro",
       "nameId": "{20003,380001}",
       "name": "Pious Mists",
+      "dlc_tag": "base",
       "owner": "paranid",
       "owner_color": "#B300B3",
       "raw_pos": {
@@ -9532,33 +9725,39 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 900000,
-              "respawn": 1080000
+              "reserve": 900000,
+              "respawn": 1080000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 3450000,
-              "respawn": 3450000
+              "reserve": 3450000,
+              "respawn": 3450000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 400000,
-              "respawn": 420000
+              "reserve": 400000,
+              "respawn": 420000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 325000,
-              "respawn": 79524
+              "reserve": 325000,
+              "respawn": 79524,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 1550000,
-              "respawn": 1650000
+              "reserve": 1550000,
+              "respawn": 1650000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1100000,
-              "respawn": 1100000
+              "reserve": 1100000,
+              "respawn": 1100000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -9624,6 +9823,7 @@
       "id": "Cluster_39_macro",
       "nameId": "{20003,390001}",
       "name": "Memory of Profit",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -9728,6 +9928,7 @@
       "id": "Cluster_40_macro",
       "nameId": "{20003,400001}",
       "name": "Second Contact",
+      "dlc_tag": "base",
       "owner": "antigone",
       "owner_color": "#0095FF",
       "raw_pos": {
@@ -9771,18 +9972,21 @@
           "resources": [
             {
               "ware": "nividium",
-              "yield": 13000,
-              "respawn": 5922
+              "reserve": 13000,
+              "respawn": 5922,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 4050000,
-              "respawn": 3737500
+              "reserve": 4050000,
+              "respawn": 3737500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2250000,
-              "respawn": 2100000
+              "reserve": 2250000,
+              "respawn": 2100000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -9862,6 +10066,7 @@
       "id": "Cluster_41_macro",
       "nameId": "{20003,410001}",
       "name": "Second Contact",
+      "dlc_tag": "base",
       "owner": "antigone",
       "owner_color": "#0095FF",
       "raw_pos": {
@@ -9905,13 +10110,15 @@
           "resources": [
             {
               "ware": "ore",
-              "yield": 3150000,
-              "respawn": 2962500
+              "reserve": 3150000,
+              "respawn": 2962500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1900000,
-              "respawn": 1560000
+              "reserve": 1900000,
+              "respawn": 1560000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -9981,6 +10188,7 @@
       "id": "Cluster_42_macro",
       "nameId": "{20003,420001}",
       "name": "Hewa's Twin",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -10203,6 +10411,7 @@
       "id": "Cluster_43_macro",
       "nameId": "{20003,430001}",
       "name": "Hewa's Twin",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -10297,6 +10506,7 @@
       "id": "Cluster_44_macro",
       "nameId": "{20003,440001}",
       "name": "Silent Witness",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -10340,23 +10550,27 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 2850000,
-              "respawn": 2617500
+              "reserve": 2850000,
+              "respawn": 2617500,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 125000,
-              "respawn": 34286
+              "reserve": 125000,
+              "respawn": 34286,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 4300000,
-              "respawn": 3500000
+              "reserve": 4300000,
+              "respawn": 3500000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2300000,
-              "respawn": 2047500
+              "reserve": 2300000,
+              "respawn": 2047500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -10422,6 +10636,7 @@
       "id": "Cluster_45_macro",
       "nameId": "{20003,450001}",
       "name": "Silent Witness",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -10465,23 +10680,27 @@
           "resources": [
             {
               "ware": "ore",
-              "yield": 2450000,
-              "respawn": 2422500
+              "reserve": 2450000,
+              "respawn": 2422500,
+              "rating": 5
             },
             {
               "ware": "rawkhaakscrap",
-              "yield": 40000,
-              "respawn": 96000
+              "reserve": 40000,
+              "respawn": 96000,
+              "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 5200000,
-              "respawn": 4212500
+              "reserve": 5200000,
+              "respawn": 4212500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2500000,
-              "respawn": 1980000
+              "reserve": 2500000,
+              "respawn": 1980000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -10609,6 +10828,7 @@
       "id": "Cluster_46_macro",
       "nameId": "{20003,460001}",
       "name": "Morning Star",
+      "dlc_tag": "base",
       "owner": "argon",
       "owner_color": "#0069B3",
       "raw_pos": {
@@ -10652,33 +10872,39 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 160000,
-              "respawn": 174000
+              "reserve": 160000,
+              "respawn": 174000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 450000,
-              "respawn": 510000
+              "reserve": 450000,
+              "respawn": 510000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 3250000,
-              "respawn": 3000000
+              "reserve": 3250000,
+              "respawn": 3000000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 105000,
-              "respawn": 33176
+              "reserve": 105000,
+              "respawn": 33176,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 3000000,
-              "respawn": 2687500
+              "reserve": 3000000,
+              "respawn": 2687500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2100000,
-              "respawn": 1912500
+              "reserve": 2100000,
+              "respawn": 1912500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -10734,6 +10960,7 @@
       "id": "Cluster_47_macro",
       "nameId": "{20003,470001}",
       "name": "Trinity Sanctum",
+      "dlc_tag": "base",
       "owner": "paranid",
       "owner_color": "#B300B3",
       "raw_pos": {
@@ -10777,38 +11004,45 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 250000,
-              "respawn": 325714
+              "reserve": 250000,
+              "respawn": 325714,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 300000,
-              "respawn": 407143
+              "reserve": 300000,
+              "respawn": 407143,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 2250000,
-              "respawn": 1812500
+              "reserve": 2250000,
+              "respawn": 1812500,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 200000,
-              "respawn": 291429
+              "reserve": 200000,
+              "respawn": 291429,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 110000,
-              "respawn": 30286
+              "reserve": 110000,
+              "respawn": 30286,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 1600000,
-              "respawn": 1475000
+              "reserve": 1600000,
+              "respawn": 1475000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2650000,
-              "respawn": 2400000
+              "reserve": 2650000,
+              "respawn": 2400000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -10878,6 +11112,7 @@
       "id": "Cluster_48_macro",
       "nameId": "{20003,480001}",
       "name": "Getsu Fune",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -10921,28 +11156,33 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 2550000,
-              "respawn": 2362500
+              "reserve": 2550000,
+              "respawn": 2362500,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 1800000,
-              "respawn": 1755000
+              "reserve": 1800000,
+              "respawn": 1755000,
+              "rating": 5
             },
             {
               "ware": "rawkhaakscrap",
-              "yield": 35000,
-              "respawn": 74000
+              "reserve": 35000,
+              "respawn": 74000,
+              "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 2300000,
-              "respawn": 2235000
+              "reserve": 2300000,
+              "respawn": 2235000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 4050000,
-              "respawn": 3162500
+              "reserve": 4050000,
+              "respawn": 3162500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -11013,6 +11253,7 @@
       "id": "Cluster_49_macro",
       "nameId": "{20003,490001}",
       "name": "Frontier Edge",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -11056,28 +11297,33 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 200000,
-              "respawn": 291429
+              "reserve": 200000,
+              "respawn": 291429,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 3050000,
-              "respawn": 2862500
+              "reserve": 3050000,
+              "respawn": 2862500,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 900000,
-              "respawn": 780000
+              "reserve": 900000,
+              "respawn": 780000,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 3800000,
-              "respawn": 3800000
+              "reserve": 3800000,
+              "respawn": 3800000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 4750000,
-              "respawn": 4062500
+              "reserve": 4750000,
+              "respawn": 4062500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -11138,6 +11384,7 @@
       "id": "Cluster_50_macro",
       "nameId": "{20003,500001}",
       "name": "Turquoise Sea",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -11181,23 +11428,27 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 2950000,
-              "respawn": 2512500
+              "reserve": 2950000,
+              "respawn": 2512500,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 30000,
-              "respawn": 10588
+              "reserve": 30000,
+              "respawn": 10588,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2650000,
-              "respawn": 2437500
+              "reserve": 2650000,
+              "respawn": 2437500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 3550000,
-              "respawn": 2687500
+              "reserve": 3550000,
+              "respawn": 2687500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -11265,23 +11516,27 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 1450000,
-              "respawn": 1530000
+              "reserve": 1450000,
+              "respawn": 1530000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 180000,
-              "respawn": 38952
+              "reserve": 180000,
+              "respawn": 38952,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 1800000,
-              "respawn": 1672500
+              "reserve": 1800000,
+              "respawn": 1672500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2300000,
-              "respawn": 1700000
+              "reserve": 2300000,
+              "respawn": 1700000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -11374,6 +11629,7 @@
       "id": "Cluster_709_macro",
       "nameId": "{20003,7090001}",
       "name": "Cardinal's Domain",
+      "dlc_tag": "base",
       "owner": "paranid",
       "owner_color": "#B300B3",
       "raw_pos": {
@@ -11418,33 +11674,39 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 650000,
-              "respawn": 690000
+              "reserve": 650000,
+              "respawn": 690000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 1650000,
-              "respawn": 1440000
+              "reserve": 1650000,
+              "respawn": 1440000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 2300000,
-              "respawn": 2112500
+              "reserve": 2300000,
+              "respawn": 2112500,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 2350000,
-              "respawn": 2100000
+              "reserve": 2350000,
+              "respawn": 2100000,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 1650000,
-              "respawn": 1650000
+              "reserve": 1650000,
+              "respawn": 1650000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 600000,
-              "respawn": 660000
+              "reserve": 600000,
+              "respawn": 660000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -11548,6 +11810,7 @@
       "id": "Cluster_710_macro",
       "nameId": "{20003,7100001}",
       "name": "Moo-Kye's Revenge",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -11592,23 +11855,27 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 2200000,
-              "respawn": 2200000
+              "reserve": 2200000,
+              "respawn": 2200000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 500,
-              "respawn": 600
+              "reserve": 500,
+              "respawn": 600,
+              "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 2000000,
-              "respawn": 1937500
+              "reserve": 2000000,
+              "respawn": 1937500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1450000,
-              "respawn": 1325000
+              "reserve": 1450000,
+              "respawn": 1325000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -11659,6 +11926,7 @@
       "id": "Cluster_711_macro",
       "nameId": "{20003,7110001}",
       "name": "Mi Ton's Refuge",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -11703,23 +11971,27 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 1600000,
-              "respawn": 1680000
+              "reserve": 1600000,
+              "respawn": 1680000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 3500,
-              "respawn": 1400
+              "reserve": 3500,
+              "respawn": 1400,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 1350000,
-              "respawn": 1327500
+              "reserve": 1350000,
+              "respawn": 1327500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1950000,
-              "respawn": 1825000
+              "reserve": 1950000,
+              "respawn": 1825000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -11770,6 +12042,7 @@
       "id": "Cluster_712_macro",
       "nameId": "{20003,7120001}",
       "name": "Loomanckstrat's Legacy",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -11814,23 +12087,27 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 1750000,
-              "respawn": 1350000
+              "reserve": 1750000,
+              "respawn": 1350000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 30000,
-              "respawn": 10588
+              "reserve": 30000,
+              "respawn": 10588,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 1750000,
-              "respawn": 1410000
+              "reserve": 1750000,
+              "respawn": 1410000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2100000,
-              "respawn": 1560000
+              "reserve": 2100000,
+              "respawn": 1560000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -11896,6 +12173,7 @@
       "id": "Cluster_713_macro",
       "nameId": "{20003,7130001}",
       "name": "CEO's Doubt",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -11940,33 +12218,39 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 750000,
-              "respawn": 810000
+              "reserve": 750000,
+              "respawn": 810000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 1100000,
-              "respawn": 1005000
+              "reserve": 1100000,
+              "respawn": 1005000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 3150000,
-              "respawn": 2550000
+              "reserve": 3150000,
+              "respawn": 2550000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 1800000,
-              "respawn": 1400000
+              "reserve": 1800000,
+              "respawn": 1400000,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2850000,
-              "respawn": 2250000
+              "reserve": 2850000,
+              "respawn": 2250000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 4000000,
-              "respawn": 3250000
+              "reserve": 4000000,
+              "respawn": 3250000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -12046,6 +12330,7 @@
       "id": "Cluster_714_macro",
       "nameId": "{20003,7140001}",
       "name": "Freedom's Reach",
+      "dlc_tag": "base",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -12138,6 +12423,7 @@
       "id": "Cluster_715_macro",
       "nameId": "{20003,7150001}",
       "name": "Mists of Artemis",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -12181,33 +12467,39 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 850000,
-              "respawn": 847500
+              "reserve": 850000,
+              "respawn": 847500,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 1200000,
-              "respawn": 1137500
+              "reserve": 1200000,
+              "respawn": 1137500,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 950000,
-              "respawn": 907500
+              "reserve": 950000,
+              "respawn": 907500,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 125000,
-              "respawn": 35714
+              "reserve": 125000,
+              "respawn": 35714,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2100000,
-              "respawn": 1912500
+              "reserve": 2100000,
+              "respawn": 1912500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2500000,
-              "respawn": 2500000
+              "reserve": 2500000,
+              "respawn": 2500000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -12345,6 +12637,7 @@
       "id": "Cluster_720_macro",
       "nameId": "{20003,7200001}",
       "name": "Ore Belt",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -12388,28 +12681,33 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 100000,
-              "respawn": 171429
+              "reserve": 100000,
+              "respawn": 171429,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 200000,
-              "respawn": 291429
+              "reserve": 200000,
+              "respawn": 291429,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 100000,
-              "respawn": 171429
+              "reserve": 100000,
+              "respawn": 171429,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 1250000,
-              "respawn": 1380000
+              "reserve": 1250000,
+              "respawn": 1380000,
+              "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 1300000,
-              "respawn": 1470000
+              "reserve": 1300000,
+              "respawn": 1470000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -12493,6 +12791,7 @@
       "id": "Cluster_721_macro",
       "nameId": "{20003,7210001}",
       "name": "Adventure's Promise",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -12536,33 +12835,39 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 700000,
-              "respawn": 652500
+              "reserve": 700000,
+              "respawn": 652500,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 1850000,
-              "respawn": 1762500
+              "reserve": 1850000,
+              "respawn": 1762500,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 1700000,
-              "respawn": 1575000
+              "reserve": 1700000,
+              "respawn": 1575000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 25000,
-              "respawn": 7143
+              "reserve": 25000,
+              "respawn": 7143,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 3300000,
-              "respawn": 2850000
+              "reserve": 3300000,
+              "respawn": 2850000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1950000,
-              "respawn": 1950000
+              "reserve": 1950000,
+              "respawn": 1950000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -12626,6 +12931,7 @@
       "id": "Cluster_722_macro",
       "nameId": "{20003,7220001}",
       "name": "Sanctum Verge",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -12669,23 +12975,27 @@
           "resources": [
             {
               "ware": "methane",
-              "yield": 5000,
-              "respawn": 15000
+              "reserve": 5000,
+              "respawn": 15000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 10000,
-              "respawn": 4286
+              "reserve": 10000,
+              "respawn": 4286,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 1850000,
-              "respawn": 1567500
+              "reserve": 1850000,
+              "respawn": 1567500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1850000,
-              "respawn": 1950000
+              "reserve": 1850000,
+              "respawn": 1950000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -12961,6 +13271,7 @@
       "id": "Cluster_723_macro",
       "nameId": "{20003,7230001}",
       "name": "Tempting Fumes",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -13004,8 +13315,9 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 4300000,
-              "respawn": 3600000
+              "reserve": 4300000,
+              "respawn": 3600000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -13069,6 +13381,7 @@
       "id": "Cluster_724_macro",
       "nameId": "{20003,7240001}",
       "name": "Circle of Deceit",
+      "dlc_tag": "base",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -13112,23 +13425,27 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 600000,
-              "respawn": 720000
+              "reserve": 600000,
+              "respawn": 720000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 2850000,
-              "respawn": 2662500
+              "reserve": 2850000,
+              "respawn": 2662500,
+              "rating": 5
             },
             {
               "ware": "rawkhaakscrap",
-              "yield": 60000,
-              "respawn": 130000
+              "reserve": 60000,
+              "respawn": 130000,
+              "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 1050000,
-              "respawn": 1050000
+              "reserve": 1050000,
+              "respawn": 1050000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -13179,6 +13496,7 @@
       "id": "Cluster_725_macro",
       "nameId": "{20003,7250001}",
       "name": "Void of Opportunity",
+      "dlc_tag": "base",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -13220,33 +13538,39 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 50000,
-              "respawn": 85714
+              "reserve": 50000,
+              "respawn": 85714,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 120000,
-              "respawn": 205000
+              "reserve": 120000,
+              "respawn": 205000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 100000,
-              "respawn": 171429
+              "reserve": 100000,
+              "respawn": 171429,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 500,
-              "respawn": 600
+              "reserve": 500,
+              "respawn": 600,
+              "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 800000,
-              "respawn": 900000
+              "reserve": 800000,
+              "respawn": 900000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1050000,
-              "respawn": 1110000
+              "reserve": 1050000,
+              "respawn": 1110000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -13352,6 +13676,7 @@
       "id": "Cluster_400_macro",
       "nameId": "{20003,4000001}",
       "name": "Wretched Skies",
+      "dlc_tag": "dlc_split",
       "owner": "split",
       "owner_color": "#B36100",
       "raw_pos": {
@@ -13456,6 +13781,7 @@
       "id": "Cluster_401_macro",
       "nameId": "{20003,4010001}",
       "name": "Family Zhin",
+      "dlc_tag": "dlc_split",
       "owner": "split",
       "owner_color": "#B36100",
       "raw_pos": {
@@ -13499,33 +13825,39 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 450000,
-              "respawn": 433929
+              "reserve": 450000,
+              "respawn": 433929,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 750000,
-              "respawn": 810000
+              "reserve": 750000,
+              "respawn": 810000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 550000,
-              "respawn": 487500
+              "reserve": 550000,
+              "respawn": 487500,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 75000,
-              "respawn": 25000
+              "reserve": 75000,
+              "respawn": 25000,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2850000,
-              "respawn": 2537500
+              "reserve": 2850000,
+              "respawn": 2537500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1950000,
-              "respawn": 1762500
+              "reserve": 1950000,
+              "respawn": 1762500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -13639,6 +13971,7 @@
       "id": "Cluster_402_macro",
       "nameId": "{20003,4020001}",
       "name": "Family Kritt",
+      "dlc_tag": "dlc_split",
       "owner": "split",
       "owner_color": "#B36100",
       "raw_pos": {
@@ -13682,18 +14015,21 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 2100000,
-              "respawn": 1700000
+              "reserve": 2100000,
+              "respawn": 1700000,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2250000,
-              "respawn": 2062500
+              "reserve": 2250000,
+              "respawn": 2062500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2600000,
-              "respawn": 2350000
+              "reserve": 2600000,
+              "respawn": 2350000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -13773,6 +14109,7 @@
       "id": "Cluster_403_macro",
       "nameId": "{20003,4030001}",
       "name": "Wretched Skies",
+      "dlc_tag": "dlc_split",
       "owner": "split",
       "owner_color": "#B36100",
       "raw_pos": {
@@ -13901,6 +14238,7 @@
       "id": "Cluster_404_macro",
       "nameId": "{20003,4040001}",
       "name": "Zyarth's Dominion",
+      "dlc_tag": "dlc_split",
       "owner": "split",
       "owner_color": "#B36100",
       "raw_pos": {
@@ -14043,6 +14381,7 @@
       "id": "Cluster_405_macro",
       "nameId": "{20003,4050001}",
       "name": "Zyarth's Dominion",
+      "dlc_tag": "dlc_split",
       "owner": "split",
       "owner_color": "#B36100",
       "raw_pos": {
@@ -14203,6 +14542,7 @@
       "id": "Cluster_406_macro",
       "nameId": "{20003,4060001}",
       "name": "Zyarth's Dominion",
+      "dlc_tag": "dlc_split",
       "owner": "split",
       "owner_color": "#B36100",
       "raw_pos": {
@@ -14345,6 +14685,7 @@
       "id": "Cluster_407_macro",
       "nameId": "{20003,4070001}",
       "name": "Family Tkr",
+      "dlc_tag": "dlc_split",
       "owner": "freesplit",
       "owner_color": "#FF8B00",
       "raw_pos": {
@@ -14483,6 +14824,7 @@
       "id": "Cluster_408_macro",
       "nameId": "{20003,4080001}",
       "name": "Thuruk's Demise",
+      "dlc_tag": "dlc_split",
       "owner": "freesplit",
       "owner_color": "#FF8B00",
       "raw_pos": {
@@ -14707,6 +15049,7 @@
       "id": "Cluster_409_macro",
       "nameId": "{20003,4090001}",
       "name": "Tharka's Ravine",
+      "dlc_tag": "dlc_split",
       "owner": "freesplit",
       "owner_color": "#FF8B00",
       "raw_pos": {
@@ -14821,6 +15164,7 @@
       "id": "Cluster_410_macro",
       "nameId": "{20003,4100001}",
       "name": "Tharka's Ravine",
+      "dlc_tag": "dlc_split",
       "owner": "freesplit",
       "owner_color": "#FF8B00",
       "raw_pos": {
@@ -14864,18 +15208,21 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 1700000,
-              "respawn": 1380000
+              "reserve": 1700000,
+              "respawn": 1380000,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2400000,
-              "respawn": 1987500
+              "reserve": 2400000,
+              "respawn": 1987500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2550000,
-              "respawn": 2010000
+              "reserve": 2550000,
+              "respawn": 2010000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -14965,6 +15312,7 @@
       "id": "Cluster_411_macro",
       "nameId": "{20003,4110001}",
       "name": "Heart of Acrimony",
+      "dlc_tag": "dlc_split",
       "owner": "freesplit",
       "owner_color": "#FF8B00",
       "raw_pos": {
@@ -15008,23 +15356,27 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 1300000,
-              "respawn": 1215000
+              "reserve": 1300000,
+              "respawn": 1215000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 5950000,
-              "respawn": 4537500
+              "reserve": 5950000,
+              "respawn": 4537500,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 3450000,
-              "respawn": 3050000
+              "reserve": 3450000,
+              "respawn": 3050000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 3900000,
-              "respawn": 3300000
+              "reserve": 3900000,
+              "respawn": 3300000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -15118,6 +15470,7 @@
       "id": "Cluster_412_macro",
       "nameId": "{20003,4120001}",
       "name": "Tharka's Ravine",
+      "dlc_tag": "dlc_split",
       "owner": "freesplit",
       "owner_color": "#FF8B00",
       "raw_pos": {
@@ -15161,23 +15514,27 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 1600000,
-              "respawn": 1387500
+              "reserve": 1600000,
+              "respawn": 1387500,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 1500000,
-              "respawn": 1140000
+              "reserve": 1500000,
+              "respawn": 1140000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 1950000,
-              "respawn": 1762500
+              "reserve": 1950000,
+              "respawn": 1762500,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 2800000,
-              "respawn": 2040000
+              "reserve": 2800000,
+              "respawn": 2040000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -15257,6 +15614,7 @@
       "id": "Cluster_413_macro",
       "nameId": "{20003,4130001}",
       "name": "Tharka's Ravine",
+      "dlc_tag": "dlc_split",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -15300,23 +15658,27 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 1700000,
-              "respawn": 1512500
+              "reserve": 1700000,
+              "respawn": 1512500,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 3450000,
-              "respawn": 2550000
+              "reserve": 3450000,
+              "respawn": 2550000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 2350000,
-              "respawn": 2100000
+              "reserve": 2350000,
+              "respawn": 2100000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 5000000,
-              "respawn": 3720000
+              "reserve": 5000000,
+              "respawn": 3720000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -15372,6 +15734,7 @@
       "id": "Cluster_414_macro",
       "nameId": "{20003,4140001}",
       "name": "Rhy's Defiance",
+      "dlc_tag": "dlc_split",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -15415,8 +15778,9 @@
           "resources": [
             {
               "ware": "rawscrap",
-              "yield": 3550000,
-              "respawn": 2887500
+              "reserve": 3550000,
+              "respawn": 2887500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -15482,6 +15846,7 @@
       "id": "Cluster_415_macro",
       "nameId": "{20003,4150001}",
       "name": "Matrix #598",
+      "dlc_tag": "dlc_split",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -15525,28 +15890,33 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 1900000,
-              "respawn": 1365000
+              "reserve": 1900000,
+              "respawn": 1365000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 1750000,
-              "respawn": 1560000
+              "reserve": 1750000,
+              "respawn": 1560000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 10500,
-              "respawn": 4886
+              "reserve": 10500,
+              "respawn": 4886,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2750000,
-              "respawn": 2562500
+              "reserve": 2750000,
+              "respawn": 2562500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 3500000,
-              "respawn": 2900000
+              "reserve": 3500000,
+              "respawn": 2900000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -15640,6 +16010,7 @@
       "id": "Cluster_416_macro",
       "nameId": "{20003,4160001}",
       "name": "Guiding Star",
+      "dlc_tag": "dlc_split",
       "owner": "argon",
       "owner_color": "#0069B3",
       "raw_pos": {
@@ -15772,8 +16143,9 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 8450000,
-              "respawn": 5587500
+              "reserve": 8450000,
+              "respawn": 5587500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -15885,6 +16257,7 @@
       "id": "Cluster_417_macro",
       "nameId": "{20003,4170001}",
       "name": "Eleventh Hour",
+      "dlc_tag": "dlc_split",
       "owner": "argon",
       "owner_color": "#0069B3",
       "raw_pos": {
@@ -15989,6 +16362,7 @@
       "id": "Cluster_418_macro",
       "nameId": "{20003,4180001}",
       "name": "Family Nhuut",
+      "dlc_tag": "dlc_split",
       "owner": "split",
       "owner_color": "#B36100",
       "raw_pos": {
@@ -16032,48 +16406,57 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 50000,
-              "respawn": 85714
+              "reserve": 50000,
+              "respawn": 85714,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 150000,
-              "respawn": 205714
+              "reserve": 150000,
+              "respawn": 205714,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 550000,
-              "respawn": 728571
+              "reserve": 550000,
+              "respawn": 728571,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 75000,
-              "respawn": 150000
+              "reserve": 75000,
+              "respawn": 150000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 3500,
-              "respawn": 1400
+              "reserve": 3500,
+              "respawn": 1400,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2500000,
-              "respawn": 2100000
+              "reserve": 2500000,
+              "respawn": 2100000,
+              "rating": 5
             },
             {
               "ware": "rawkhaakscrap",
-              "yield": 25000,
-              "respawn": 66000
+              "reserve": 25000,
+              "respawn": 66000,
+              "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 685000,
-              "respawn": 845357
+              "reserve": 685000,
+              "respawn": 845357,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1300000,
-              "respawn": 1215000
+              "reserve": 1300000,
+              "respawn": 1215000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -16163,6 +16546,7 @@
       "id": "Cluster_419_macro",
       "nameId": "{20003,4190001}",
       "name": "Open Market",
+      "dlc_tag": "dlc_split",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -16289,6 +16673,7 @@
       "id": "Cluster_420_macro",
       "nameId": "{20003,4200001}",
       "name": "Two Grand",
+      "dlc_tag": "dlc_split",
       "owner": "teladi",
       "owner_color": "#B3B300",
       "raw_pos": {
@@ -16332,13 +16717,15 @@
           "resources": [
             {
               "ware": "ore",
-              "yield": 1550000,
-              "respawn": 1550000
+              "reserve": 1550000,
+              "respawn": 1550000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1050000,
-              "respawn": 1110000
+              "reserve": 1050000,
+              "respawn": 1110000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -16424,6 +16811,7 @@
       "id": "Cluster_421_macro",
       "nameId": "{20003,4210001}",
       "name": "Fires of Defeat",
+      "dlc_tag": "dlc_split",
       "owner": "freesplit",
       "owner_color": "#FF8B00",
       "raw_pos": {
@@ -16467,8 +16855,9 @@
           "resources": [
             {
               "ware": "rawscrap",
-              "yield": 150000,
-              "respawn": 205714
+              "reserve": 150000,
+              "respawn": 205714,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -16554,6 +16943,7 @@
       "id": "Cluster_422_macro",
       "nameId": "{20003,4220001}",
       "name": "Wretched Skies",
+      "dlc_tag": "dlc_split",
       "owner": "paranid",
       "owner_color": "#B300B3",
       "raw_pos": {
@@ -16597,18 +16987,21 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 3200000,
-              "respawn": 2587500
+              "reserve": 3200000,
+              "respawn": 2587500,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 1750000,
-              "respawn": 1750000
+              "reserve": 1750000,
+              "respawn": 1750000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1300000,
-              "respawn": 1440000
+              "reserve": 1300000,
+              "respawn": 1440000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -16688,6 +17081,7 @@
       "id": "Cluster_423_macro",
       "nameId": "{20003,4230001}",
       "name": "Litany of Fury",
+      "dlc_tag": "dlc_split",
       "owner": "paranid",
       "owner_color": "#B300B3",
       "raw_pos": {
@@ -16912,6 +17306,7 @@
       "id": "Cluster_424_macro",
       "nameId": "{20003,4240001}",
       "name": "Emperor's Pride",
+      "dlc_tag": "dlc_split",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -17058,13 +17453,15 @@
           "resources": [
             {
               "ware": "ore",
-              "yield": 3900000,
-              "respawn": 2750000
+              "reserve": 3900000,
+              "respawn": 2750000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 3000000,
-              "respawn": 2625000
+              "reserve": 3000000,
+              "respawn": 2625000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -17179,6 +17576,7 @@
       "id": "Cluster_425_macro",
       "nameId": "{20003,4250001}",
       "name": "Heart of Acrimony",
+      "dlc_tag": "dlc_split",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -17220,13 +17618,15 @@
           "resources": [
             {
               "ware": "ore",
-              "yield": 1650000,
-              "respawn": 1590000
+              "reserve": 1650000,
+              "respawn": 1590000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 3300000,
-              "respawn": 2415000
+              "reserve": 3300000,
+              "respawn": 2415000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -17267,6 +17667,7 @@
       "id": "Cluster_100_macro",
       "nameId": "{20003,1000001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -17310,38 +17711,45 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 4000000,
-              "respawn": 3162500
+              "reserve": 4000000,
+              "respawn": 3162500,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 2850000,
-              "respawn": 2760000
+              "reserve": 2850000,
+              "respawn": 2760000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 4700000,
-              "respawn": 3900000
+              "reserve": 4700000,
+              "respawn": 3900000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 2850000,
-              "respawn": 2617500
+              "reserve": 2850000,
+              "respawn": 2617500,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 36000,
-              "respawn": 12400
+              "reserve": 36000,
+              "respawn": 12400,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 3250000,
-              "respawn": 2707500
+              "reserve": 3250000,
+              "respawn": 2707500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2350000,
-              "respawn": 2162500
+              "reserve": 2350000,
+              "respawn": 2162500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -17415,6 +17823,7 @@
       "id": "Cluster_101_macro",
       "nameId": "{20003,1010001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -17543,6 +17952,7 @@
       "id": "Cluster_102_macro",
       "nameId": "{20003,1020001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -17655,6 +18065,7 @@
       "id": "Cluster_104_macro",
       "nameId": "{20003,1040001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -17911,6 +18322,7 @@
       "id": "Cluster_106_macro",
       "nameId": "{20003,1060001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -17952,8 +18364,9 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 4400000,
-              "respawn": 3540000
+              "reserve": 4400000,
+              "respawn": 3540000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -18007,6 +18420,7 @@
       "id": "Cluster_107_macro",
       "nameId": "{20003,1070001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -18123,6 +18537,7 @@
       "id": "Cluster_108_macro",
       "nameId": "{20003,1080001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -18293,13 +18708,15 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 4650000,
-              "respawn": 3810000
+              "reserve": 4650000,
+              "respawn": 3810000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 3850000,
-              "respawn": 3137500
+              "reserve": 3850000,
+              "respawn": 3137500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -18380,28 +18797,33 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 3050000,
-              "respawn": 2187500
+              "reserve": 3050000,
+              "respawn": 2187500,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 2350000,
-              "respawn": 2325000
+              "reserve": 2350000,
+              "respawn": 2325000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 2150000,
-              "respawn": 2250000
+              "reserve": 2150000,
+              "respawn": 2250000,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2300000,
-              "respawn": 1987500
+              "reserve": 2300000,
+              "respawn": 1987500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 3100000,
-              "respawn": 2850000
+              "reserve": 3100000,
+              "respawn": 2850000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -18508,6 +18930,7 @@
       "id": "Cluster_109_macro",
       "nameId": "{20003,1090001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -18612,6 +19035,7 @@
       "id": "Cluster_110_macro",
       "nameId": "{20003,1100001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -18655,13 +19079,15 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 2000000,
-              "respawn": 1812500
+              "reserve": 2000000,
+              "respawn": 1812500,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 3450000,
-              "respawn": 3137500
+              "reserve": 3450000,
+              "respawn": 3137500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -18747,6 +19173,7 @@
       "id": "Cluster_111_macro",
       "nameId": "{20003,1110001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -18851,6 +19278,7 @@
       "id": "Cluster_112_macro",
       "nameId": "{20003,1120001}",
       "name": "Savage Spur",
+      "dlc_tag": "dlc_terran",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -18894,33 +19322,39 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 1350000,
-              "respawn": 1305000
+              "reserve": 1350000,
+              "respawn": 1305000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 1550000,
-              "respawn": 1485000
+              "reserve": 1550000,
+              "respawn": 1485000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 2450000,
-              "respawn": 2450000
+              "reserve": 2450000,
+              "respawn": 2450000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 30000,
-              "respawn": 8000
+              "reserve": 30000,
+              "respawn": 8000,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 3150000,
-              "respawn": 2400000
+              "reserve": 3150000,
+              "respawn": 2400000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 3400000,
-              "respawn": 2700000
+              "reserve": 3400000,
+              "respawn": 2700000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -19047,33 +19481,39 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 2550000,
-              "respawn": 1950000
+              "reserve": 2550000,
+              "respawn": 1950000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 2250000,
-              "respawn": 2100000
+              "reserve": 2250000,
+              "respawn": 2100000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 2500000,
-              "respawn": 2220000
+              "reserve": 2500000,
+              "respawn": 2220000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 85000,
-              "respawn": 25714
+              "reserve": 85000,
+              "respawn": 25714,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2750000,
-              "respawn": 2152500
+              "reserve": 2750000,
+              "respawn": 2152500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2400000,
-              "respawn": 2167500
+              "reserve": 2400000,
+              "respawn": 2167500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -19151,6 +19591,7 @@
       "id": "Cluster_113_macro",
       "nameId": "{20003,1130001}",
       "name": "Segaris",
+      "dlc_tag": "dlc_terran",
       "owner": "pioneers",
       "owner_color": "#00AFB3",
       "raw_pos": {
@@ -19194,38 +19635,45 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 1900000,
-              "respawn": 1560000
+              "reserve": 1900000,
+              "respawn": 1560000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 1150000,
-              "respawn": 1065000
+              "reserve": 1150000,
+              "respawn": 1065000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 2650000,
-              "respawn": 2400000
+              "reserve": 2650000,
+              "respawn": 2400000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 750000,
-              "respawn": 870000
+              "reserve": 750000,
+              "respawn": 870000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 6500,
-              "respawn": 2961
+              "reserve": 6500,
+              "respawn": 2961,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 1900000,
-              "respawn": 1560000
+              "reserve": 1900000,
+              "respawn": 1560000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1900000,
-              "respawn": 1560000
+              "reserve": 1900000,
+              "respawn": 1560000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -19315,6 +19763,7 @@
       "id": "Cluster_114_macro",
       "nameId": "{20003,1140001}",
       "name": "Gaian Prophecy",
+      "dlc_tag": "dlc_terran",
       "owner": "pioneers",
       "owner_color": "#00AFB3",
       "raw_pos": {
@@ -19358,33 +19807,39 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 800000,
-              "respawn": 960000
+              "reserve": 800000,
+              "respawn": 960000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 2450000,
-              "respawn": 1890000
+              "reserve": 2450000,
+              "respawn": 1890000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 1550000,
-              "respawn": 1170000
+              "reserve": 1550000,
+              "respawn": 1170000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 15000,
-              "respawn": 4000
+              "reserve": 15000,
+              "respawn": 4000,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2250000,
-              "respawn": 2000000
+              "reserve": 2250000,
+              "respawn": 2000000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2850000,
-              "respawn": 2475000
+              "reserve": 2850000,
+              "respawn": 2475000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -19484,6 +19939,7 @@
       "id": "Cluster_115_macro",
       "nameId": "{20003,1150001}",
       "name": "Brennan's Triumph",
+      "dlc_tag": "dlc_terran",
       "owner": "pioneers",
       "owner_color": "#00AFB3",
       "raw_pos": {
@@ -19634,6 +20090,7 @@
       "id": "Cluster_116_macro",
       "nameId": "{20003,1160001}",
       "name": "Sol",
+      "dlc_tag": "dlc_terran",
       "owner": "terran",
       "owner_color": "#99D5FF",
       "raw_pos": {
@@ -19677,38 +20134,45 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 1850000,
-              "respawn": 1725000
+              "reserve": 1850000,
+              "respawn": 1725000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 5750000,
-              "respawn": 4112500
+              "reserve": 5750000,
+              "respawn": 4112500,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 2400000,
-              "respawn": 2250000
+              "reserve": 2400000,
+              "respawn": 2250000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 4650000,
-              "respawn": 3300000
+              "reserve": 4650000,
+              "respawn": 3300000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 110000,
-              "respawn": 30286
+              "reserve": 110000,
+              "respawn": 30286,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2500000,
-              "respawn": 2452500
+              "reserve": 2500000,
+              "respawn": 2452500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2750000,
-              "respawn": 2500000
+              "reserve": 2750000,
+              "respawn": 2500000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -19762,6 +20226,7 @@
       "id": "Cluster_500_macro",
       "nameId": "{20003,5000001}",
       "name": "Avarice",
+      "dlc_tag": "dlc_pirate",
       "owner": "scavenger",
       "owner_color": "#003C66",
       "raw_pos": {
@@ -19803,38 +20268,45 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 3900000,
-              "respawn": 3300000
+              "reserve": 3900000,
+              "respawn": 3300000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 2100000,
-              "respawn": 1950000
+              "reserve": 2100000,
+              "respawn": 1950000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 3250000,
-              "respawn": 3015000
+              "reserve": 3250000,
+              "respawn": 3015000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 3550000,
-              "respawn": 2687500
+              "reserve": 3550000,
+              "respawn": 2687500,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 5000,
-              "respawn": 1667
+              "reserve": 5000,
+              "respawn": 1667,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 3750000,
-              "respawn": 2712500
+              "reserve": 3750000,
+              "respawn": 2712500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 3850000,
-              "respawn": 2925000
+              "reserve": 3850000,
+              "respawn": 2925000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -19961,38 +20433,45 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 5100000,
-              "respawn": 3675000
+              "reserve": 5100000,
+              "respawn": 3675000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 5100000,
-              "respawn": 3775000
+              "reserve": 5100000,
+              "respawn": 3775000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 5750000,
-              "respawn": 3642857
+              "reserve": 5750000,
+              "respawn": 3642857,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 3650000,
-              "respawn": 2730000
+              "reserve": 3650000,
+              "respawn": 2730000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 3500,
-              "respawn": 1400
+              "reserve": 3500,
+              "respawn": 1400,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 3750000,
-              "respawn": 2912500
+              "reserve": 3750000,
+              "respawn": 2912500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 3100000,
-              "respawn": 2512500
+              "reserve": 3100000,
+              "respawn": 2512500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -20073,33 +20552,39 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 5000000,
-              "respawn": 3762500
+              "reserve": 5000000,
+              "respawn": 3762500,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 5950000,
-              "respawn": 4537500
+              "reserve": 5950000,
+              "respawn": 4537500,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 7050000,
-              "respawn": 5150000
+              "reserve": 7050000,
+              "respawn": 5150000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 4450000,
-              "respawn": 3155357
+              "reserve": 4450000,
+              "respawn": 3155357,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2650000,
-              "respawn": 2467500
+              "reserve": 2650000,
+              "respawn": 2467500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 3000000,
-              "respawn": 2341071
+              "reserve": 3000000,
+              "respawn": 2341071,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -20231,6 +20716,7 @@
       "id": "Cluster_501_macro",
       "nameId": "{20003,5010001}",
       "name": "Windfall",
+      "dlc_tag": "dlc_pirate",
       "owner": "loanshark",
       "owner_color": "#B38600",
       "raw_pos": {
@@ -20274,28 +20760,33 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 2800000,
-              "respawn": 2137500
+              "reserve": 2800000,
+              "respawn": 2137500,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 4150000,
-              "respawn": 3472500
+              "reserve": 4150000,
+              "respawn": 3472500,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 225000,
-              "respawn": 63627
+              "reserve": 225000,
+              "respawn": 63627,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 3750000,
-              "respawn": 3150000
+              "reserve": 3750000,
+              "respawn": 3150000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2250000,
-              "respawn": 2250000
+              "reserve": 2250000,
+              "respawn": 2250000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -20411,6 +20902,7 @@
       "id": "Cluster_502_macro",
       "nameId": "{20003,5020001}",
       "name": "Windfall",
+      "dlc_tag": "dlc_pirate",
       "owner": "loanshark",
       "owner_color": "#B38600",
       "raw_pos": {
@@ -20452,8 +20944,9 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 5350000,
-              "respawn": 4575000
+              "reserve": 5350000,
+              "respawn": 4575000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -20541,6 +21034,7 @@
       "id": "Cluster_503_macro",
       "nameId": "{20003,5030001}",
       "name": "Windfall",
+      "dlc_tag": "dlc_pirate",
       "owner": "loanshark",
       "owner_color": "#B38600",
       "raw_pos": {
@@ -20584,33 +21078,39 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 3350000,
-              "respawn": 3135000
+              "reserve": 3350000,
+              "respawn": 3135000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 3250000,
-              "respawn": 2850000
+              "reserve": 3250000,
+              "respawn": 2850000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 1000,
-              "respawn": 800
+              "reserve": 1000,
+              "respawn": 800,
+              "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 150000,
-              "respawn": 205714
+              "reserve": 150000,
+              "respawn": 205714,
+              "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 950000,
-              "respawn": 1050000
+              "reserve": 950000,
+              "respawn": 1050000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 100000,
-              "respawn": 171429
+              "reserve": 100000,
+              "respawn": 171429,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -20700,6 +21200,7 @@
       "id": "Cluster_504_macro",
       "nameId": "{20003,5040001}",
       "name": "Unknown System",
+      "dlc_tag": "dlc_pirate",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -20743,23 +21244,27 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 5500000,
-              "respawn": 3300000
+              "reserve": 5500000,
+              "respawn": 3300000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 25000,
-              "respawn": 9059
+              "reserve": 25000,
+              "respawn": 9059,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 4500000,
-              "respawn": 2700000
+              "reserve": 4500000,
+              "respawn": 2700000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 4500000,
-              "respawn": 2700000
+              "reserve": 4500000,
+              "respawn": 2700000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -20802,6 +21307,7 @@
       "id": "Cluster_601_macro",
       "nameId": "{20003,6010001}",
       "name": "Watchful Gaze",
+      "dlc_tag": "dlc_boron",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -20843,28 +21349,33 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 1300000,
-              "respawn": 1215000
+              "reserve": 1300000,
+              "respawn": 1215000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 2800000,
-              "respawn": 2137500
+              "reserve": 2800000,
+              "respawn": 2137500,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 1300000,
-              "respawn": 1140000
+              "reserve": 1300000,
+              "respawn": 1140000,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 3800000,
-              "respawn": 3200000
+              "reserve": 3800000,
+              "respawn": 3200000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 3400000,
-              "respawn": 2650000
+              "reserve": 3400000,
+              "respawn": 2650000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -20915,6 +21426,7 @@
       "id": "Cluster_602_macro",
       "nameId": "{20003,6020001}",
       "name": "Barren Shores",
+      "dlc_tag": "dlc_boron",
       "owner": "boron",
       "owner_color": "#4DB5FF",
       "raw_pos": {
@@ -20956,13 +21468,15 @@
           "resources": [
             {
               "ware": "ore",
-              "yield": 2100000,
-              "respawn": 1975000
+              "reserve": 2100000,
+              "respawn": 1975000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1950000,
-              "respawn": 1762500
+              "reserve": 1950000,
+              "respawn": 1762500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -21042,6 +21556,7 @@
       "id": "Cluster_603_macro",
       "nameId": "{20003,6030001}",
       "name": "Great Reef",
+      "dlc_tag": "dlc_boron",
       "owner": "boron",
       "owner_color": "#4DB5FF",
       "raw_pos": {
@@ -21083,18 +21598,21 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 2050000,
-              "respawn": 1587500
+              "reserve": 2050000,
+              "respawn": 1587500,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 4300000,
-              "respawn": 3175000
+              "reserve": 4300000,
+              "respawn": 3175000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 4000000,
-              "respawn": 3400000
+              "reserve": 4000000,
+              "respawn": 3400000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -21184,6 +21702,7 @@
       "id": "Cluster_604_macro",
       "nameId": "{20003,6040001}",
       "name": "Ocean of Fantasy",
+      "dlc_tag": "dlc_boron",
       "owner": "boron",
       "owner_color": "#4DB5FF",
       "raw_pos": {
@@ -21225,8 +21744,9 @@
           "resources": [
             {
               "ware": "rawscrap",
-              "yield": 750000,
-              "respawn": 562500
+              "reserve": 750000,
+              "respawn": 562500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -21292,6 +21812,7 @@
       "id": "Cluster_605_macro",
       "nameId": "{20003,6050001}",
       "name": "Sanctuary of Darkness",
+      "dlc_tag": "dlc_boron",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -21333,18 +21854,21 @@
           "resources": [
             {
               "ware": "nividium",
-              "yield": 2500,
-              "respawn": 1304
+              "reserve": 2500,
+              "respawn": 1304,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 100000,
-              "respawn": 120000
+              "reserve": 100000,
+              "respawn": 120000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 150000,
-              "respawn": 257143
+              "reserve": 150000,
+              "respawn": 257143,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -21536,6 +22060,7 @@
       "id": "Cluster_606_macro",
       "nameId": "{20003,6060001}",
       "name": "Kingdom End",
+      "dlc_tag": "dlc_boron",
       "owner": "boron",
       "owner_color": "#4DB5FF",
       "raw_pos": {
@@ -21775,8 +22300,9 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 5500000,
-              "respawn": 4462500
+              "reserve": 5500000,
+              "respawn": 4462500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -22313,6 +22839,7 @@
       "id": "Cluster_607_macro",
       "nameId": "{20003,6070001}",
       "name": "Rolk's Demise",
+      "dlc_tag": "dlc_boron",
       "owner": "boron",
       "owner_color": "#4DB5FF",
       "raw_pos": {
@@ -22354,23 +22881,27 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 2100000,
-              "respawn": 2055000
+              "reserve": 2100000,
+              "respawn": 2055000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 2750000,
-              "respawn": 2150000
+              "reserve": 2750000,
+              "respawn": 2150000,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 1950000,
-              "respawn": 1717500
+              "reserve": 1950000,
+              "respawn": 1717500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2950000,
-              "respawn": 2150000
+              "reserve": 2950000,
+              "respawn": 2150000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -22460,6 +22991,7 @@
       "id": "Cluster_608_macro",
       "nameId": "{20003,6080001}",
       "name": "Atreus' Clouds",
+      "dlc_tag": "dlc_boron",
       "owner": "boron",
       "owner_color": "#4DB5FF",
       "raw_pos": {
@@ -22501,18 +23033,21 @@
           "resources": [
             {
               "ware": "hydrogen",
-              "yield": 5150000,
-              "respawn": 3800000
+              "reserve": 5150000,
+              "respawn": 3800000,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2500000,
-              "respawn": 2500000
+              "reserve": 2500000,
+              "respawn": 2500000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2550000,
-              "respawn": 2550000
+              "reserve": 2550000,
+              "respawn": 2550000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -22697,6 +23232,7 @@
       "id": "Cluster_609_macro",
       "nameId": "{20003,6090001}",
       "name": "Menelaus' Oasis",
+      "dlc_tag": "dlc_boron",
       "owner": "boron",
       "owner_color": "#4DB5FF",
       "raw_pos": {
@@ -22738,18 +23274,21 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 2350000,
-              "respawn": 2055000
+              "reserve": 2350000,
+              "respawn": 2055000,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2000000,
-              "respawn": 1875000
+              "reserve": 2000000,
+              "respawn": 1875000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2100000,
-              "respawn": 2220000
+              "reserve": 2100000,
+              "respawn": 2220000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -22938,6 +23477,7 @@
       "id": "Cluster_701_macro",
       "nameId": "{20003,7010001}",
       "name": "Mitsuno's Remembrance",
+      "dlc_tag": "dlc_timelines",
       "owner": "kaori",
       "owner_color": "#FFB966",
       "raw_pos": {
@@ -23052,6 +23592,7 @@
       "id": "Cluster_702_macro",
       "nameId": "{20003,7020001}",
       "name": "Mitsuno's Remembrance",
+      "dlc_tag": "dlc_timelines",
       "owner": "kaori",
       "owner_color": "#FFB966",
       "raw_pos": {
@@ -23095,38 +23636,45 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 300000,
-              "respawn": 300000
+              "reserve": 300000,
+              "respawn": 300000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 650000,
-              "respawn": 690000
+              "reserve": 650000,
+              "respawn": 690000,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 1950000,
-              "respawn": 1700000
+              "reserve": 1950000,
+              "respawn": 1700000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 250000,
-              "respawn": 377143
+              "reserve": 250000,
+              "respawn": 377143,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 500,
-              "respawn": 600
+              "reserve": 500,
+              "respawn": 600,
+              "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 2050000,
-              "respawn": 1925000
+              "reserve": 2050000,
+              "respawn": 1925000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1950000,
-              "respawn": 1882500
+              "reserve": 1950000,
+              "respawn": 1882500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -23214,6 +23762,7 @@
       "id": "Cluster_703_macro",
       "nameId": "{20003,7030001}",
       "name": "Mitsuno's Remembrance",
+      "dlc_tag": "dlc_timelines",
       "owner": "kaori",
       "owner_color": "#FFB966",
       "raw_pos": {
@@ -23257,38 +23806,45 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 900000,
-              "respawn": 960000
+              "reserve": 900000,
+              "respawn": 960000,
+              "rating": 5
             },
             {
               "ware": "hydrogen",
-              "yield": 1800000,
-              "respawn": 1737500
+              "reserve": 1800000,
+              "respawn": 1737500,
+              "rating": 5
             },
             {
               "ware": "ice",
-              "yield": 1750000,
-              "respawn": 1642500
+              "reserve": 1750000,
+              "respawn": 1642500,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 1950000,
-              "respawn": 2070000
+              "reserve": 1950000,
+              "respawn": 2070000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 1000,
-              "respawn": 800
+              "reserve": 1000,
+              "respawn": 800,
+              "rating": 4
             },
             {
               "ware": "ore",
-              "yield": 1000000,
-              "respawn": 997500
+              "reserve": 1000000,
+              "respawn": 997500,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 1050000,
-              "respawn": 987500
+              "reserve": 1050000,
+              "respawn": 987500,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -23378,6 +23934,7 @@
       "id": "Cluster_704_macro",
       "nameId": "{20003,7040001}",
       "name": "President's End",
+      "dlc_tag": "dlc_timelines",
       "owner": "argon",
       "owner_color": "#0069B3",
       "raw_pos": {
@@ -23421,18 +23978,21 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 1200000,
-              "respawn": 1137500
+              "reserve": 1200000,
+              "respawn": 1137500,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 2500,
-              "respawn": 1304
+              "reserve": 2500,
+              "respawn": 1304,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2250000,
-              "respawn": 2125000
+              "reserve": 2250000,
+              "respawn": 2125000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -23532,6 +24092,7 @@
       "id": "Cluster_705_macro",
       "nameId": "{20003,7050001}",
       "name": "Nopileos' Memorial",
+      "dlc_tag": "dlc_timelines",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -23575,23 +24136,27 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 3400000,
-              "respawn": 2800000
+              "reserve": 3400000,
+              "respawn": 2800000,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 2500,
-              "respawn": 1304
+              "reserve": 2500,
+              "respawn": 1304,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 3400000,
-              "respawn": 2600000
+              "reserve": 3400000,
+              "respawn": 2600000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 3100000,
-              "respawn": 2500000
+              "reserve": 3100000,
+              "respawn": 2500000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -23665,6 +24230,7 @@
       "id": "Cluster_706_macro",
       "nameId": "{20003,7060001}",
       "name": "Hatikvah's Faith",
+      "dlc_tag": "dlc_timelines",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -23708,18 +24274,21 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 2050000,
-              "respawn": 1787500
+              "reserve": 2050000,
+              "respawn": 1787500,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 2450000,
-              "respawn": 2050000
+              "reserve": 2450000,
+              "respawn": 2050000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 2300000,
-              "respawn": 1700000
+              "reserve": 2300000,
+              "respawn": 1700000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -23780,6 +24349,7 @@
       "id": "Cluster_708_macro",
       "nameId": "{20003,7080001}",
       "name": "Matrix #101",
+      "dlc_tag": "dlc_timelines",
       "owner": "xenon",
       "owner_color": "#B30000",
       "raw_pos": {
@@ -23823,23 +24393,27 @@
           "resources": [
             {
               "ware": "ore",
-              "yield": 600000,
-              "respawn": 660000
+              "reserve": 600000,
+              "respawn": 660000,
+              "rating": 5
             },
             {
               "ware": "rawkhaakscrap",
-              "yield": 60000,
-              "respawn": 130000
+              "reserve": 60000,
+              "respawn": 130000,
+              "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 1650000,
-              "respawn": 1290000
+              "reserve": 1650000,
+              "respawn": 1290000,
+              "rating": 5
             },
             {
               "ware": "silicon",
-              "yield": 250000,
-              "respawn": 377143
+              "reserve": 250000,
+              "respawn": 377143,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -23895,6 +24469,7 @@
       "id": "Cluster_730_macro",
       "nameId": "{20003,7300001}",
       "name": "Third Redemption",
+      "dlc_tag": "dlc_mini_01",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -23938,23 +24513,27 @@
           "resources": [
             {
               "ware": "ice",
-              "yield": 550000,
-              "respawn": 735000
+              "reserve": 550000,
+              "respawn": 735000,
+              "rating": 5
             },
             {
               "ware": "methane",
-              "yield": 150000,
-              "respawn": 257143
+              "reserve": 150000,
+              "respawn": 257143,
+              "rating": 5
             },
             {
               "ware": "nividium",
-              "yield": 1500,
-              "respawn": 1059
+              "reserve": 1500,
+              "respawn": 1059,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 600000,
-              "respawn": 660000
+              "reserve": 600000,
+              "respawn": 660000,
+              "rating": 5
             }
           ],
           "normalized": {
@@ -24008,6 +24587,7 @@
       "id": "Cluster_740_macro",
       "nameId": "{20003,7400001}",
       "name": "Scarlet Star",
+      "dlc_tag": "dlc_mini_02",
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "raw_pos": {
@@ -24051,18 +24631,21 @@
           "resources": [
             {
               "ware": "helium",
-              "yield": 50000,
-              "respawn": 85714
+              "reserve": 50000,
+              "respawn": 85714,
+              "rating": 5
             },
             {
               "ware": "ore",
-              "yield": 1950000,
-              "respawn": 1950000
+              "reserve": 1950000,
+              "respawn": 1950000,
+              "rating": 5
             },
             {
               "ware": "rawscrap",
-              "yield": 1350000,
-              "respawn": 1387500
+              "reserve": 1350000,
+              "respawn": 1387500,
+              "rating": 5
             }
           ],
           "normalized": {

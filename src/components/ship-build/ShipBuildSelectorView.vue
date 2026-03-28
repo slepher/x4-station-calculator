@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import { extractShipCandidates, filterTypesByClass } from '@/store/logic/shipEquipmentPicker'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import ShipBuildPanelShip from '@/components/ship-build/ShipBuildPanelShip.vue'
@@ -10,6 +11,7 @@ import type { X4Ship, EquipmentType, ShipEquipmentSize } from '@/types/x4'
 
 const { t } = useI18n()
 const { translateShip, translateShipType } = useX4I18n()
+const gameData = useGameDataStore()
 const shipBuildStore = useShipBuildStore()
 const { selectedShipId } = storeToRefs(shipBuildStore)
 const { setSelectedShipId, cancelShipSelector } = shipBuildStore
@@ -113,7 +115,8 @@ const shipCandidateResult = computed(() => extractShipCandidates({
     shipClass: selectedClass.value,
     races: selectedRaces.value,
     types: selectedTypes.value
-  }
+  },
+  includeShip: (ship) => shipBuildStore.isShipDlcUsable(ship)
 }))
 
 const raceCountMap = computed(() => shipCandidateResult.value.raceCountMap)
@@ -338,7 +341,16 @@ const goNextPage = () => {
               :class="pendingShipId === ship.id ? 'list-item-pending' : ''"
               @click="setPendingShipId(ship.id)"
             >
-              <div class="font-semibold text-slate-100 truncate" data-testid="ship-build-ship-name">{{ translateShip(ship) }}</div>
+              <div class="ship-name-row">
+                <div class="font-semibold text-slate-100 truncate" data-testid="ship-build-ship-name">{{ translateShip(ship) }}</div>
+                <span
+                  v-if="ship.dlc_tag !== 'base'"
+                  class="dlc-tag"
+                  :class="gameData.isDlcActive(ship.dlc_tag) ? 'dlc-tag--active' : 'dlc-tag--inactive'"
+                >
+                  {{ gameData.getDlcDisplayName(ship.dlc_tag) }}
+                </span>
+              </div>
               <div class="text-xs text-slate-300/90 equipment-line">
                 {{ getEquipmentSummary(ship, 'short') }}
               </div>
@@ -416,6 +428,22 @@ const goNextPage = () => {
 
 .list-header-actions {
   @apply inline-flex items-center gap-2;
+}
+
+.ship-name-row {
+  @apply flex items-center gap-2 min-w-0;
+}
+
+.dlc-tag {
+  @apply inline-flex max-w-[110px] flex-shrink-0 items-center rounded-md border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide;
+}
+
+.dlc-tag--active {
+  @apply border-emerald-500/70 text-emerald-300;
+}
+
+.dlc-tag--inactive {
+  @apply border-rose-500/70 text-rose-300;
 }
 
 .pager {

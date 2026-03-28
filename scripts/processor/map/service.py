@@ -9,6 +9,7 @@ from typing import Dict, Optional, Any, Set
 
 from processor.i18n import get_i18n_registry, I18nRegistry
 from processor.path_utils import get_map_dir, get_library_xml
+from processor.versioning import load_version_config
 from processor.resource.model_detector import detect_map_resource_model
 from processor.resource.modern_processor import (
     migrate_resourcearea_definitions,
@@ -22,7 +23,6 @@ from processor.output_manager import (
     write_factions,
     write_regions,
     write_map,
-    write_resourceareas,
     write_regionyield_definitions,
 )
 
@@ -84,6 +84,7 @@ def process_map_for_version(
     # 配置国际化 - 使用共享实例或创建新的
     use_shared = i18n_registry is not None
     registry = i18n_registry if use_shared else get_i18n_registry()
+    dlc_order = load_version_config().get("dlc_order", [])
 
     if not use_shared:
         # 仅在创建新 registry 时配置（x4_map_processor.py 场景）
@@ -110,9 +111,8 @@ def process_map_for_version(
         write_regionyield_definitions(definitions_list, regionyield_definitions_output_path)
         print(f"📦 Regionyield Definitions Output: {regionyield_definitions_output_path}")
 
-        # 9.0+ 不生成 regionyields，写入空数组
-        write_regionyields([], regionyields_output_path)
-        print(f"📦 Regionyields Output: {regionyields_output_path} (空数组占位)")
+        # 9.0+ 不生成 regionyields.json 文件
+        print(f"📦 Regionyields Output: 跳过 (9.0+ 不生成该文件)")
 
         result = generate_map_data(
             map_dir=map_dir,
@@ -126,11 +126,12 @@ def process_map_for_version(
             resource_model="resourceareas",
             sector_resource_areas=sector_resource_areas,
             definitions=definitions,
+            dlc_order=dlc_order,
         )
 
         resourceareas_rows = result.get("resourceareas", [])
-        write_resourceareas(resourceareas_rows, resourceareas_output_path)
-        print(f"📦 Resourceareas Output: {resourceareas_output_path} count={len(resourceareas_rows)}")
+        # Step 1 不再输出 resourceareas.json，由 Step 2 生成
+        print(f"📦 Resourceareas Output: 跳过 (由 Step 2 生成)")
         print(f"📦 Regions Output: 跳过 (9.0+ 不生成)")
 
         # 输出 maps.json
@@ -171,6 +172,7 @@ def process_map_for_version(
             regionyields_xml_path=regionyields_xml_path,
             i18n_registry=registry,
             resource_model="regions",
+            dlc_order=dlc_order,
         )
 
         # 输出 regions.json
@@ -178,10 +180,9 @@ def process_map_for_version(
         write_regions(regions_rows, regions_output_path)
         print(f"📦 Regions Output: {regions_output_path} count={len(regions_rows)}")
 
-        # 输出 resourceareas.json（8.0 也需要）
+        # Step 1 不再输出 resourceareas.json，由 Step 2 生成
         resourceareas_rows = result.get("resourceareas", [])
-        write_resourceareas(resourceareas_rows, resourceareas_output_path)
-        print(f"📦 Resourceareas Output: {resourceareas_output_path} count={len(resourceareas_rows)}")
+        print(f"📦 Resourceareas Output: 跳过 (由 Step 2 生成)")
 
         print(f"📦 Regionyields Output: {regionyields_output_path} ({len(regionyields_rows)})")
 

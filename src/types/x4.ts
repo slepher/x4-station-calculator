@@ -7,6 +7,7 @@ export interface X4Ware {
   id: string;
   nameId: string;
   name: string;
+  dlc_tag: string;
   transport: TransportType;
   volume: number;     // 单位体积
   price: number;      // 平均价格
@@ -68,6 +69,7 @@ export interface X4Ship {
   id: string;
   nameId: string;
   name: string;
+  dlc_tag: string;
   class: 'ship_s' | 'ship_m' | 'ship_l' | 'ship_xl';
   type: string;
   purposePrimary: string;
@@ -117,6 +119,7 @@ export interface X4Equipment {
   id: string;
   nameId: string;
   name: string;
+  dlc_tag: string;
   type: EquipmentType;
   class: string;
   size: ShipEquipmentSize;
@@ -171,6 +174,7 @@ export interface X4Missile {
   id: string;
   nameId: string;
   name: string;
+  dlc_tag: string;
   macro: string;
   class: string;
   tags: string[];
@@ -215,6 +219,7 @@ export interface X4Drone {
   id: string;
   nameId: string;
   name: string;
+  dlc_tag: string;
   macro: string;
   class: 'ship_xs' | 'ship_s';
   mk: string | null;
@@ -235,6 +240,7 @@ export interface X4Consumable {
   id: string;
   nameId: string;
   name: string;
+  dlc_tag: string;
   macro: string;
   class: string;
   mk: string | null;
@@ -302,6 +308,7 @@ export interface X4Module {
   wareId: string;     // 对应的商品 ID (用于关联图标和建造费)
   nameId: string;     // 国际化文本 ID (如 {20104,12101})
   name: string;
+  dlc_tag: string;
   type: 'production' | 'habitation' | 'storage' | 'dock' | 'connection' | string;
   method: 'terran' | 'closed_loop' | 'recycling' | 'default' | 'teladi' | 'none'; // 生产方式偏好
   isPlayerBlueprint: boolean; // 是否为玩家可建造的蓝图
@@ -852,6 +859,7 @@ export interface VersionConfig {
     empire: string
     logic_flow: string
     ship_blueprints: string
+    setting: string
   }
 }
 
@@ -864,6 +872,11 @@ export interface VersionsFile {
 export interface GameVersionStorage {
   version: string
   beta: boolean
+}
+
+export interface X4SettingStorage {
+  activeDlcs?: string[]
+  enforceDlcActivation?: boolean
 }
 
 // --- Map Data Types ---
@@ -893,6 +906,7 @@ export interface X4MapCluster {
   id: string
   nameId: string
   name: string
+  dlc_tag: string
   owner: string
   owner_color: string
   raw_pos?: { x: number; z: number }
@@ -931,6 +945,28 @@ export interface X4RegionYield {
   yields: X4YieldLevel[]
 }
 
+/**
+ * 资源定义 - 对应 res.json
+ * 用于地图资源颜色显示
+ */
+export interface X4Res {
+  id: string
+  color: string
+  color_rgb: string
+  name_en?: string
+  'name_zh-CN'?: string
+  'name_zh-TW'?: string
+  name_de?: string
+  name_fr?: string
+  name_it?: string
+  name_es?: string
+  name_ru?: string
+  name_ja?: string
+  name_ko?: string
+  'name_pt-BR'?: string
+  name_pl?: string
+}
+
 // --- Faction Types ---
 
 export interface X4Faction {
@@ -949,6 +985,13 @@ export interface X4Language {
   code: string
   name: string
   x4_id: string
+}
+
+export interface X4Dlc {
+  id: string
+  nameId: string
+  name: string
+  dependencyVersion: string
 }
 
 // --- Default Max Types ---
