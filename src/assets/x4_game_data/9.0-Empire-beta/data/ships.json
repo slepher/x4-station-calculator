@@ -718,8 +718,8 @@
         "method": "default",
         "noplayerbuild": false,
         "cost": {
-          "energycells": 1200.0,
-          "hullparts": 5640.0
+          "energycells": 7227.0,
+          "hullparts": 10512.0
         }
       }
     ],
@@ -1321,12 +1321,12 @@
     "crew": {
       "capacity": 46
     },
-    "hull": 26000,
+    "hull": 36000,
     "physics": {
       "mass": 205.27,
       "drag": {
-        "forward": 56.738,
-        "reverse": 255.0,
+        "forward": 50.9,
+        "reverse": 229.0,
         "horizontal": 40.5,
         "vertical": 40.5,
         "pitch": 140.897,
@@ -1334,8 +1334,8 @@
         "roll": 140.897
       },
       "accfactors": {
-        "horizontal": 1,
-        "vertical": 1
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -1609,12 +1609,12 @@
     "crew": {
       "capacity": 38
     },
-    "hull": 32000,
+    "hull": 43200,
     "physics": {
       "mass": 246.324,
       "drag": {
-        "forward": 62.485,
-        "reverse": 281.0,
+        "forward": 59.9,
+        "reverse": 270.0,
         "horizontal": 46.0,
         "vertical": 46.0,
         "pitch": 155.677,
@@ -1622,8 +1622,8 @@
         "roll": 155.677
       },
       "accfactors": {
-        "horizontal": 1,
-        "vertical": 1
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -1919,12 +1919,12 @@
     "crew": {
       "capacity": 46
     },
-    "hull": 26000,
+    "hull": 36000,
     "physics": {
       "mass": 204.245,
       "drag": {
-        "forward": 56.594,
-        "reverse": 255.0,
+        "forward": 50.9,
+        "reverse": 229.0,
         "horizontal": 40.5,
         "vertical": 40.5,
         "pitch": 140.528,
@@ -2229,12 +2229,12 @@
     "crew": {
       "capacity": 38
     },
-    "hull": 32000,
+    "hull": 43200,
     "physics": {
       "mass": 245.094,
       "drag": {
-        "forward": 62.313,
-        "reverse": 290.0,
+        "forward": 59.9,
+        "reverse": 270.0,
         "horizontal": 46.0,
         "vertical": 46.0,
         "pitch": 155.234,
@@ -2242,8 +2242,8 @@
         "roll": 155.234
       },
       "accfactors": {
-        "horizontal": 1,
-        "vertical": 1
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -8017,7 +8017,7 @@
     "physics": {
       "mass": 6.0,
       "drag": {
-        "forward": 3.7,
+        "forward": 3.58,
         "reverse": 11.829,
         "horizontal": 4.0,
         "vertical": 4.0,
@@ -9818,7 +9818,7 @@
     "crew": {
       "capacity": 3
     },
-    "hull": 2600,
+    "hull": 2800,
     "physics": {
       "mass": 14.0,
       "drag": {
@@ -10357,7 +10357,7 @@
     "crew": {
       "capacity": 5
     },
-    "hull": 2600,
+    "hull": 2800,
     "physics": {
       "mass": 18.0,
       "drag": {
@@ -10536,7 +10536,7 @@
     "crew": {
       "capacity": 4
     },
-    "hull": 3000,
+    "hull": 3200,
     "physics": {
       "mass": 19.5,
       "drag": {
@@ -12857,7 +12857,7 @@
     "cargo": [
       {
         "type": "container",
-        "capacity": 29000
+        "capacity": 53200
       }
     ],
     "dockarea": [
@@ -12901,7 +12901,7 @@
     "crew": {
       "capacity": 220
     },
-    "hull": 116000,
+    "hull": 140000,
     "physics": {
       "mass": 891.63,
       "drag": {
@@ -13127,7 +13127,7 @@
     "cargo": [
       {
         "type": "container",
-        "capacity": 34800
+        "capacity": 54500
       }
     ],
     "dockarea": [
@@ -13171,7 +13171,7 @@
     "crew": {
       "capacity": 183
     },
-    "hull": 139000,
+    "hull": 166000,
     "physics": {
       "mass": 1069.956,
       "drag": {
@@ -13207,9 +13207,9 @@
         "method": "default",
         "noplayerbuild": false,
         "cost": {
-          "computronicsubstrate": 352.0,
-          "energycells": 1296.0,
-          "metallicmicrolattice": 590.0
+          "computronicsubstrate": 460.0,
+          "energycells": 13224.0,
+          "metallicmicrolattice": 4232.0
         }
       }
     ],
@@ -14124,7 +14124,7 @@
     "crew": {
       "capacity": 360
     },
-    "hull": 275000,
+    "hull": 300000,
     "physics": {
       "mass": 600.0,
       "drag": {
@@ -14539,9 +14539,9 @@
         "method": "default",
         "noplayerbuild": false,
         "cost": {
-          "energycells": 1140.0,
-          "hullparts": 5570.0,
-          "water": 2385.0
+          "energycells": 6444.0,
+          "hullparts": 8387.0,
+          "water": 3891.0
         }
       }
     ],
@@ -15134,12 +15134,12 @@
     "crew": {
       "capacity": 52
     },
-    "hull": 31000,
+    "hull": 46000,
     "physics": {
       "mass": 294.322,
       "drag": {
-        "forward": 65.91,
-        "reverse": 358.692,
+        "forward": 70.5,
+        "reverse": 317.3,
         "horizontal": 77.0,
         "vertical": 77.0,
         "pitch": 103.531,
@@ -15409,12 +15409,12 @@
     "crew": {
       "capacity": 52
     },
-    "hull": 31000,
+    "hull": 46000,
     "physics": {
       "mass": 294.322,
       "drag": {
-        "forward": 65.91,
-        "reverse": 358.692,
+        "forward": 70.5,
+        "reverse": 317.0,
         "horizontal": 77.0,
         "vertical": 77.0,
         "pitch": 103.531,
@@ -16651,15 +16651,15 @@
     },
     "hull": 10900,
     "physics": {
-      "mass": 32.713,
+      "mass": 35.0,
       "drag": {
-        "forward": 4.405,
-        "reverse": 17.619,
-        "horizontal": 12.611,
-        "vertical": 12.611,
-        "pitch": 10.678,
-        "yaw": 10.678,
-        "roll": 10.678
+        "forward": 5.7,
+        "reverse": 22.8,
+        "horizontal": 13.8,
+        "vertical": 13.8,
+        "pitch": 14.4,
+        "yaw": 14.4,
+        "roll": 16.3
       },
       "accfactors": {
         "horizontal": 1.15,
@@ -17018,6 +17018,7 @@
               "size": "medium",
               "tags": [
                 "advanced",
+                "combat",
                 "mining"
               ],
               "count": 1
@@ -19387,7 +19388,7 @@
     "cargo": [
       {
         "type": "container",
-        "capacity": 40000
+        "capacity": 59200
       }
     ],
     "dockarea": [
@@ -19431,7 +19432,7 @@
     "crew": {
       "capacity": 154
     },
-    "hull": 174000,
+    "hull": 195000,
     "physics": {
       "mass": 1569.585,
       "drag": {
@@ -21777,8 +21778,8 @@
         "method": "default",
         "noplayerbuild": false,
         "cost": {
-          "energycells": 1066.0,
-          "hullparts": 4886.0
+          "energycells": 7649.0,
+          "hullparts": 11126.0
         }
       }
     ],
@@ -22192,8 +22193,8 @@
         "method": "default",
         "noplayerbuild": false,
         "cost": {
-          "energycells": 468.0,
-          "hullparts": 3235.0
+          "energycells": 2435.0,
+          "hullparts": 3543.0
         }
       }
     ],
@@ -23182,12 +23183,12 @@
     "crew": {
       "capacity": 41
     },
-    "hull": 29000,
+    "hull": 50000,
     "physics": {
       "mass": 153.679,
       "drag": {
-        "forward": 46.42,
-        "reverse": 265.259,
+        "forward": 51.0,
+        "reverse": 230.0,
         "horizontal": 62.0,
         "vertical": 62.0,
         "pitch": 110.0,
@@ -23950,12 +23951,12 @@
     "crew": {
       "capacity": 41
     },
-    "hull": 29000,
+    "hull": 50000,
     "physics": {
       "mass": 153.678,
       "drag": {
-        "forward": 46.42,
-        "reverse": 265.259,
+        "forward": 51.0,
+        "reverse": 230.0,
         "horizontal": 62.0,
         "vertical": 62.0,
         "pitch": 110.0,
@@ -32619,7 +32620,7 @@
     "cargo": [
       {
         "type": "container",
-        "capacity": 34040
+        "capacity": 56100
       }
     ],
     "dockarea": [
@@ -32663,7 +32664,7 @@
     "crew": {
       "capacity": 258
     },
-    "hull": 164000,
+    "hull": 190000,
     "physics": {
       "mass": 1256.778,
       "drag": {
@@ -32936,9 +32937,9 @@
     "crew": {
       "capacity": 31
     },
-    "hull": 26000,
+    "hull": 38000,
     "physics": {
-      "mass": 168.244,
+      "mass": 195.0,
       "drag": {
         "forward": 33.51,
         "reverse": 191.487,
@@ -34262,7 +34263,7 @@
     "crew": {
       "capacity": 4
     },
-    "hull": 2200,
+    "hull": 2500,
     "physics": {
       "mass": 19.407,
       "drag": {
@@ -34429,7 +34430,7 @@
     "crew": {
       "capacity": 4
     },
-    "hull": 2200,
+    "hull": 2500,
     "physics": {
       "mass": 16.876,
       "drag": {
@@ -35137,8 +35138,8 @@
         "method": "default",
         "noplayerbuild": false,
         "cost": {
-          "energycells": 1710.0,
-          "hullparts": 11822.0
+          "energycells": 11945.0,
+          "hullparts": 17375.0
         }
       }
     ],
@@ -35749,12 +35750,12 @@
     "crew": {
       "capacity": 29
     },
-    "hull": 21000,
+    "hull": 35000,
     "physics": {
       "mass": 159.275,
       "drag": {
         "forward": 40.867,
-        "reverse": 233.528,
+        "reverse": 180.0,
         "horizontal": 70.0,
         "vertical": 70.0,
         "pitch": 102.0,
@@ -35762,8 +35763,8 @@
         "roll": 98.855
       },
       "accfactors": {
-        "horizontal": 1,
-        "vertical": 1
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -36045,12 +36046,12 @@
     "crew": {
       "capacity": 29
     },
-    "hull": 21000,
+    "hull": 35000,
     "physics": {
       "mass": 159.275,
       "drag": {
         "forward": 40.867,
-        "reverse": 233.528,
+        "reverse": 180.0,
         "horizontal": 70.0,
         "vertical": 70.0,
         "pitch": 102.0,
@@ -36058,8 +36059,8 @@
         "roll": 98.855
       },
       "accfactors": {
-        "horizontal": 1,
-        "vertical": 1
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -37526,6 +37527,7 @@
               "tags": [
                 "advanced",
                 "combat",
+                "mining",
                 "unhittable"
               ],
               "count": 1
@@ -37540,6 +37542,7 @@
               "tags": [
                 "advanced",
                 "combat",
+                "mining",
                 "unhittable"
               ],
               "count": 1
@@ -40519,7 +40522,7 @@
     "cargo": [
       {
         "type": "container",
-        "capacity": 29000
+        "capacity": 57000
       }
     ],
     "dockarea": [
@@ -40563,17 +40566,17 @@
     "crew": {
       "capacity": 128
     },
-    "hull": 160000,
+    "hull": 202000,
     "physics": {
-      "mass": 1245.388,
+      "mass": 1120.0,
       "drag": {
-        "forward": 213.9,
-        "reverse": 855.602,
-        "horizontal": 240.0,
-        "vertical": 240.0,
-        "pitch": 949.078,
-        "yaw": 949.078,
-        "roll": 949.078
+        "forward": 189.0,
+        "reverse": 800.0,
+        "horizontal": 170.0,
+        "vertical": 170.0,
+        "pitch": 800.0,
+        "yaw": 800.0,
+        "roll": 880.0
       },
       "accfactors": {
         "horizontal": 1,
@@ -41399,8 +41402,8 @@
         "method": "default",
         "noplayerbuild": false,
         "cost": {
-          "energycells": 1300.0,
-          "hullparts": 6350.0
+          "energycells": 4714.0,
+          "hullparts": 6857.0
         }
       }
     ],
@@ -42735,12 +42738,12 @@
     "crew": {
       "capacity": 49
     },
-    "hull": 34800,
+    "hull": 40000,
     "physics": {
       "mass": 266.716,
       "drag": {
-        "forward": 89.843,
-        "reverse": 460.0,
+        "forward": 93.4,
+        "reverse": 420.0,
         "horizontal": 55.0,
         "vertical": 55.0,
         "pitch": 120.343,
@@ -43710,12 +43713,12 @@
     "crew": {
       "capacity": 49
     },
-    "hull": 35000,
+    "hull": 40000,
     "physics": {
       "mass": 267.133,
       "drag": {
-        "forward": 89.923,
-        "reverse": 440.0,
+        "forward": 93.4,
+        "reverse": 420.0,
         "horizontal": 55.0,
         "vertical": 55.0,
         "pitch": 120.427,
@@ -43723,8 +43726,8 @@
         "roll": 120.427
       },
       "accfactors": {
-        "horizontal": 1.0,
-        "vertical": 1.0
+        "horizontal": 1.1,
+        "vertical": 1.1
       }
     },
     "radarRange": 40000
@@ -50104,12 +50107,12 @@
     "crew": {
       "capacity": 7
     },
-    "hull": 2400,
+    "hull": 2600,
     "physics": {
       "mass": 18.466,
       "drag": {
-        "forward": 5.538,
-        "reverse": 24.241,
+        "forward": 5.76,
+        "reverse": 25.2,
         "horizontal": 5.323,
         "vertical": 5.323,
         "pitch": 6.0,
@@ -50283,11 +50286,11 @@
     "crew": {
       "capacity": 5
     },
-    "hull": 2800,
+    "hull": 3000,
     "physics": {
       "mass": 22.159,
       "drag": {
-        "forward": 6.046,
+        "forward": 6.28,
         "reverse": 27.934,
         "horizontal": 6.387,
         "vertical": 6.387,
@@ -51239,7 +51242,7 @@
     "physics": {
       "mass": 608.398,
       "drag": {
-        "forward": 277.309,
+        "forward": 250.0,
         "reverse": 1109.238,
         "horizontal": 120.0,
         "vertical": 120.0,
@@ -51647,7 +51650,7 @@
     "physics": {
       "mass": 730.078,
       "drag": {
-        "forward": 310.771,
+        "forward": 280.0,
         "reverse": 1243.086,
         "horizontal": 135.0,
         "vertical": 135.0,
@@ -51984,7 +51987,7 @@
     "cargo": [
       {
         "type": "container",
-        "capacity": 25000
+        "capacity": 50600
       }
     ],
     "dockarea": [
@@ -52028,7 +52031,7 @@
     "crew": {
       "capacity": 200
     },
-    "hull": 105000,
+    "hull": 128000,
     "physics": {
       "mass": 896.85,
       "drag": {
@@ -52369,7 +52372,7 @@
     "cargo": [
       {
         "type": "container",
-        "capacity": 30000
+        "capacity": 52600
       }
     ],
     "dockarea": [
@@ -52413,7 +52416,7 @@
     "crew": {
       "capacity": 166
     },
-    "hull": 126000,
+    "hull": 152000,
     "physics": {
       "mass": 1076.221,
       "drag": {
@@ -52449,9 +52452,9 @@
         "method": "default",
         "noplayerbuild": false,
         "cost": {
-          "computronicsubstrate": 281.0,
-          "energycells": 1034.0,
-          "metallicmicrolattice": 471.0
+          "computronicsubstrate": 295.0,
+          "energycells": 8491.0,
+          "metallicmicrolattice": 2717.0
         }
       }
     ],
@@ -52837,13 +52840,13 @@
     "physics": {
       "mass": 180.0,
       "drag": {
-        "forward": 58.0,
-        "reverse": 260.0,
-        "horizontal": 42.0,
-        "vertical": 42.0,
-        "pitch": 90.0,
-        "yaw": 107.0,
-        "roll": 70.0
+        "forward": 56.0,
+        "reverse": 252.0,
+        "horizontal": 37.0,
+        "vertical": 37.0,
+        "pitch": 84.0,
+        "yaw": 100.5,
+        "roll": 69.0
       },
       "accfactors": {
         "horizontal": 1.2,
@@ -53402,14 +53405,14 @@
     "crew": {
       "capacity": 33
     },
-    "hull": 24000,
+    "hull": 48000,
     "physics": {
       "mass": 120.0,
       "drag": {
-        "forward": 32.115,
-        "reverse": 183.513,
-        "horizontal": 72.0,
-        "vertical": 72.0,
+        "forward": 30.5,
+        "reverse": 137.3,
+        "horizontal": 69.0,
+        "vertical": 69.0,
         "pitch": 100.0,
         "yaw": 108.0,
         "roll": 80.0
@@ -53701,14 +53704,14 @@
     "crew": {
       "capacity": 33
     },
-    "hull": 24000,
+    "hull": 48000,
     "physics": {
       "mass": 120.0,
       "drag": {
-        "forward": 32.115,
-        "reverse": 183.513,
-        "horizontal": 72.0,
-        "vertical": 72.0,
+        "forward": 30.5,
+        "reverse": 137.3,
+        "horizontal": 69.0,
+        "vertical": 69.0,
         "pitch": 100.0,
         "yaw": 108.0,
         "roll": 80.0
@@ -57083,7 +57086,7 @@
     "purposePrimary": "fight",
     "droneTags": [],
     "race": "terran",
-    "shipgroup": "ter_scout_s",
+    "shipgroup": "pio_scout_s",
     "noplayerblueprint": false,
     "production": [
       {
@@ -58357,8 +58360,8 @@
     "physics": {
       "mass": 542.639,
       "drag": {
-        "forward": 141.396,
-        "reverse": 565.584,
+        "forward": 125.0,
+        "reverse": 562.0,
         "horizontal": 150.0,
         "vertical": 150.0,
         "pitch": 808.528,
@@ -58637,7 +58640,7 @@
     "cargo": [
       {
         "type": "container",
-        "capacity": 43000
+        "capacity": 71500
       }
     ],
     "dockarea": [
@@ -58681,12 +58684,12 @@
     "crew": {
       "capacity": 123
     },
-    "hull": 157000,
+    "hull": 180000,
     "physics": {
-      "mass": 1199.838,
+      "mass": 1080.0,
       "drag": {
-        "forward": 230.0,
-        "reverse": 910.0,
+        "forward": 190.0,
+        "reverse": 855.0,
         "horizontal": 160.0,
         "vertical": 160.0,
         "pitch": 939.968,
