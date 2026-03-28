@@ -1211,7 +1211,7 @@
     <component ref="shield_xen_xl_mothership_01_mk1"/>
     <properties>
       <identification name="{20106,9024}" basename="{20106,9021}" shortname="{20106,9025}" makerrace="xenon" description="{20106,9022}" mk="1"/>
-      <recharge max="86060" rate="240" delay="20.7" disruptionstability="10"/>
+      <recharge max="86060" rate="240" delay="17.55" disruptionstability="10"/>
       <hull max="25500"/>
     </properties>
   </macro>
@@ -1970,7 +1970,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="argon"/>
-      <cargo max="29000" tags="container"/>
+      <cargo max="53200" tags="container"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -1978,7 +1978,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="argon"/>
-      <cargo max="34800" tags="container"/>
+      <cargo max="54500" tags="container"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -2129,7 +2129,7 @@
   <macro name="storage_bor_xl_resupplier_01_a_macro" class="storage">
     <component ref="generic_storage"/>
     <properties>
-      <cargo max="40000" tags="container"/>
+      <cargo max="59200" tags="container"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -2526,7 +2526,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="paranid"/>
-      <cargo max="34040" tags="container"/>
+      <cargo max="56100" tags="container"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -2770,7 +2770,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="split"/>
-      <cargo max="29000" tags="container"/>
+      <cargo max="57000" tags="container"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -3102,7 +3102,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="teladi"/>
-      <cargo max="25000" tags="container"/>
+      <cargo max="50600" tags="container"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -3110,7 +3110,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="teladi"/>
-      <cargo max="30000" tags="container"/>
+      <cargo max="52600" tags="container"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -3293,7 +3293,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="terran"/>
-      <cargo max="43000" tags="container"/>
+      <cargo max="71500" tags="container"/>
       <hull integrated="1"/>
     </properties>
   </macro>

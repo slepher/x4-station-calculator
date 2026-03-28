@@ -2867,6 +2867,62 @@
   <entry name="effect_gen_l_boost_02" value="assets\fx\misc\effect_gen_l_boost_02"/>
   <entry name="effect_gen_xl_boost_01" value="assets\fx\misc\effect_gen_xl_boost_01"/>
   <entry name="effect_gen_xl_boost_02" value="assets\fx\misc\effect_gen_xl_boost_02"/>
+  <entry name="thruster_ship_xs_01" value="assets\units\xref_parts\thruster_ship_xs_01"/>
+  <entry name="muzzle_gen_m_plasma_01_mk1" value="assets\fx\weaponFx\muzzle_gen_m_plasma_01_mk1"/>
+  <entry name="impact_gen_m_plasma_01_mk1" value="assets\fx\weaponFx\impact_gen_m_plasma_01_mk1"/>
+  <entry name="test_etienne_ship_arg_xs_spacebike_01" value="assets\test\etienne\xs\test_etienne_ship_arg_xs_spacebike_01"/>
+  <entry name="muzzle_arg_l_laser_01_mk1" value="assets\fx\weaponFx\muzzle_arg_l_laser_01_mk1"/>
+  <entry name="muzzle_par_l_laser_01_mk1" value="assets\fx\weaponFx\muzzle_par_l_laser_01_mk1"/>
+  <entry name="muzzle_tel_l_laser_01_mk1" value="assets\fx\weaponFx\muzzle_tel_l_laser_01_mk1"/>
+  <entry name="impact_arg_l_laser_01_mk1" value="assets\fx\weaponFx\impact_arg_l_laser_01_mk1"/>
+  <entry name="impact_par_l_laser_01_mk1" value="assets\fx\weaponFx\impact_par_l_laser_01_mk1"/>
+  <entry name="impact_tel_l_laser_01_mk1" value="assets\fx\weaponFx\impact_tel_l_laser_01_mk1"/>
+  <entry name="test_olivier_anc_gate_01" value="assets\test\olivier\test_olivier_anc_gate_01"/>
+  <entry name="test_markus_room_01" value="assets\test\markus\test_markus_room_01"/>
+  <entry name="test_etienne_ship_spl_xs_spacebike_01" value="assets\test\etienne\xs\test_etienne_ship_spl_xs_spacebike_01"/>
+  <entry name="test_etienne_ship_tel_xs_spacebike_01" value="assets\test\etienne\xs\test_etienne_ship_tel_xs_spacebike_01"/>
+  <entry name="test_etienne_ship_par_xs_spacebike_01" value="assets\test\etienne\xs\test_etienne_ship_par_xs_spacebike_01"/>
+  <entry name="test_etienne_ship_bor_xs_spacebike_01" value="assets\test\etienne\xs\test_etienne_ship_bor_xs_spacebike_01"/>
+  <entry name="impact_tel_m_charge_01_mk1" value="assets\fx\weaponFx\impact_tel_m_charge_01_mk1"/>
+  <entry name="test_steven_ship_arg_s_heavyfighter_01" value="assets\test\steven\test_steven_ship_arg_s_heavyfighter_01"/>
+  <entry name="test_steven_ship_par_m_frigate_01" value="assets\test\steven\test_steven_ship_par_m_frigate_01"/>
+  <entry name="test_steven_ship_gen_s_fighter_01" value="assets\test\steven\test_steven_ship_gen_s_fighter_01"/>
+  <entry name="test_steven_ship_arg_s_fighter_04" value="assets\test\steven\test_steven_ship_arg_s_fighter_04"/>
+  <entry name="test_lino_env_asteroid_shard" value="assets\test\lino\test_lino_env_asteroid_shard"/>
+  <entry name="env_asteroid_shard_m_01" value="assets\environments\asteroids\env_asteroid_shard_m_01"/>
+  <entry name="env_asteroid_shard_l_01" value="assets\environments\asteroids\env_asteroid_shard_l_01"/>
+  <entry name="env_asteroid_shard_xl_01" value="assets\environments\asteroids\env_asteroid_shard_xl_01"/>
+  <entry name="test_etienne_turret_arg_m_mining_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_arg_m_mining_02_mk1"/>
+  <entry name="env_asteroid_shard_m_02" value="assets\environments\asteroids\env_asteroid_shard_m_02"/>
+  <entry name="env_asteroid_shard_m_03" value="assets\environments\asteroids\env_asteroid_shard_m_03"/>
+  <entry name="env_asteroid_shard_m_04" value="assets\environments\asteroids\env_asteroid_shard_m_04"/>
+  <entry name="env_asteroid_shard_m_05" value="assets\environments\asteroids\env_asteroid_shard_m_05"/>
+  <entry name="env_asteroid_shard_l_02" value="assets\environments\asteroids\env_asteroid_shard_l_02"/>
+  <entry name="env_asteroid_shard_l_03" value="assets\environments\asteroids\env_asteroid_shard_l_03"/>
+  <entry name="env_asteroid_shard_l_04" value="assets\environments\asteroids\env_asteroid_shard_l_04"/>
+  <entry name="env_asteroid_shard_xl_02" value="assets\environments\asteroids\env_asteroid_shard_xl_02"/>
+  <entry name="test_etienne_turret_arg_m_gatling_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_arg_m_gatling_02_mk1"/>
+  <entry name="test_etienne_turret_arg_m_shotgun_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_arg_m_shotgun_02_mk1"/>
+  <entry name="test_etienne_turret_arg_m_flak_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_arg_m_flak_02_mk1"/>
+  <entry name="test_etienne_turret_arg_m_dumbfire_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_arg_m_dumbfire_02_mk1"/>
+  <entry name="env_asteroid_nugget_l_01" value="assets\environments\asteroids\env_asteroid_nugget_l_01"/>
+  <entry name="env_asteroid_nugget_l_02" value="assets\environments\asteroids\env_asteroid_nugget_l_02"/>
+  <entry name="env_asteroid_nugget_l_03" value="assets\environments\asteroids\env_asteroid_nugget_l_03"/>
+  <entry name="env_asteroid_nugget_m_01" value="assets\environments\asteroids\env_asteroid_nugget_m_01"/>
+  <entry name="env_asteroid_nugget_m_02" value="assets\environments\asteroids\env_asteroid_nugget_m_02"/>
+  <entry name="env_asteroid_nugget_m_03" value="assets\environments\asteroids\env_asteroid_nugget_m_03"/>
+  <entry name="env_asteroid_nugget_m_04" value="assets\environments\asteroids\env_asteroid_nugget_m_04"/>
+  <entry name="env_asteroid_nugget_m_05" value="assets\environments\asteroids\env_asteroid_nugget_m_05"/>
+  <entry name="env_asteroid_nugget_xl_01" value="assets\environments\asteroids\env_asteroid_nugget_xl_01"/>
+  <entry name="env_asteroid_nugget_xl_02" value="assets\environments\asteroids\env_asteroid_nugget_xl_02"/>
+  <entry name="muzzle_gen_l_beam_01_mk1" value="assets\fx\weaponFx\muzzle_gen_l_beam_01_mk1"/>
+  <entry name="impact_gen_l_beam_01_mk1" value="assets\fx\weaponFx\impact_gen_l_beam_01_mk1"/>
+  <entry name="muzzle_arg_l_beam_01_mk1" value="assets\fx\weaponFx\muzzle_arg_l_beam_01_mk1"/>
+  <entry name="impact_arg_l_beam_01_mk1" value="assets\fx\weaponFx\impact_arg_l_beam_01_mk1"/>
+  <entry name="muzzle_par_l_beam_01_mk1" value="assets\fx\weaponFx\muzzle_par_l_beam_01_mk1"/>
+  <entry name="impact_par_l_beam_01_mk1" value="assets\fx\weaponFx\impact_par_l_beam_01_mk1"/>
+  <entry name="muzzle_tel_l_beam_01_mk1" value="assets\fx\weaponFx\muzzle_tel_l_beam_01_mk1"/>
+  <entry name="impact_tel_l_beam_01_mk1" value="assets\fx\weaponFx\impact_tel_l_beam_01_mk1"/>
   <entry name="station_spl_tradestation_base_01" value="extensions\ego_dlc_split\assets\structures\station_spl_tradestation_base_01"/>
   <entry name="defence_spl_claim_01" value="extensions\ego_dlc_split\assets\structures\defence\defence_spl_claim_01"/>
   <entry name="defence_spl_disc_01" value="extensions\ego_dlc_split\assets\structures\defence\defence_spl_disc_01"/>

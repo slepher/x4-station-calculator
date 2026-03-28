@@ -3332,6 +3332,10 @@
     <t id="11688">Doba vyhodnocování těžařů(následuje dvojtečka a přidané procento)</t>
     <t id="11689">Potenciální suroviny</t>
     <t id="11690">Detekovány suroviny</t>
+    <t id="11691">Představení prioritních příkazů</t>
+    <t id="11692">Nyní můžete pomocí modifikovaných kláves zadávat příkazy ve frontě \(%s($INPUT_MODIFIER_ICON$)\) a prioritní \(%s($INPUT_MODIFIER_ICON$)\) přímo z mapy nebo z menu Interakce. Ve výchozím nastavení nyní příkazy zadané lodím bez použití těchto modifikovaných kláves přepíší všechny dříve zadané příkazy ve frontě.</t>
+    <t id="11693">Pokud dáváte přednost starému chování, můžete změnit nastavení Výchozí chování objednávky v nabídce Nastavení hry na Fronta, takže stisknutí %s($INPUT_MODIFIER_ICON$) při použití nabídky Interakce přepíše objednávku místo jejího přidání do fronty.</t>
+    <t id="11694">Stiskněte Ano, pokud chcete vyzkoušet nové výchozí chování modifikátoru, nebo Ne, pokud chcete zachovat staré chování a použít %s($INPUT_MODIFIER_ICON$) k přepsání příkazů.</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Uložit offline</t>
     <t id="11702">Přepsat offline uložení</t>
@@ -3743,6 +3747,8 @@
     <t id="12786">AMD FSR Generátor snímků</t>
     <t id="12787">Experimentální vylepšená podpora ovladače</t>
     <t id="12788">AMD FSR</t>
+    <t id="12789">If this is your first time in X4, we suggest you try out some Tutorials before starting your journey into the Open Universe of X4.</t>
+    <t id="12790">Start New Open Universe</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">Akce velvyslanectví</t>
     <t id="12803">Diplomat</t>
@@ -3946,7 +3952,8 @@
     <t id="13324">Potvrdit modul</t>
     <t id="13325">Zrušit výběr modulu</t>
     <t id="13326">Zaměřit model stanice</t>
-    <t id="13327">Queued Priority Order</t>
+    <t id="13327">Fronta prioritních příkazů</t>
+    <t id="13328">Gather Rate(of resources; header item for table column)</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Sbohem</t>
@@ -5382,6 +5389,8 @@
     <t id="993">Chcete-li se podrobněji seznámit s mechanikou letu, vyzkoušejte výukovou hru Letecká Škola(translate as 1021,7000) v tutoriálu hry.</t>
     <t id="994">Zvýrazněné volby v rozhovorech posouvají příběh. Pokud chcete slyšet všechny dialogy, nejprve vyberte ostatní možnosti.</t>
     <t id="995">Tento výukový program a další výukové programy si můžete přehrát svým vlastním tempem tak, že otevřete nabídku možností a vyberete možnost Přehrát výukové programy ("Nabídka možností" je stejná jako {1001,2600}, "Přehrát výukové programy" je stejná jako {1001,12660}).</t>
+    <t id="996">Umístěte sondy na suroviny poblíž oblastí bohatých na suroviny. Pokud je detekován správná surovina, vaši těžaři budou tuto lokalitu preferovat, dokud nebude vyčerpána.</t>
+    <t id="997">Příliš mnoho sond na suroviny v jednom sektoru snižuje efektivitu, proto je používejte s rozvahou. Jsou zcela volitelné. Vaši těžaři si dokážou suroviny najít a těžit i sami.</t>
     <t id="1000">(Obecné rady)</t>
     <t id="1001">Tento tutoriál můžete zrušit v '{1001,8701}' nabídce.</t>
     <t id="1002">Výuka dokončena!</t>
@@ -7385,6 +7394,8 @@
     <t id="5901">Ukázkový scénář hry X4: Foundations</t>
     <t id="5902">Veletržní prostředí</t>
     <t id="5904">Vítejte v X4!\n\nTato ukázková demoverze vás vrhne přímo do akce. Ochutnejte velkolepé vesmírné bitvy X4, připojte se k spojenecké flotile, bojujte proti nepřátelským silám a braňte obléhanou stanici na hranici. Zapojte se do intenzivních bojových manévrů poblíž skokové brány, za podpory mocných bitevních lodí a automatizovaných obranných systémů. Bez nutnosti nastavování nebo čekání se můžete rovnou vrhnout do akce, převzít ovládání a zažít rozsah, napětí a krásu vesmírných bitev v X4: Foundations.</t>
+    <t id="5905">Výstavní hřiště</t>
+    <t id="5906">Vítejte v X4!\n\nTento scénář vás zavede do rušného sektoru ve zmenšeném vesmíru a nabídne vám ochutnávku obrovského rozsahu a možností hry X4: Foundations.</t>
     <t id="6000">Výukový program: Pokročilá hra</t>
     <t id="6001">{1021,6101}</t>
     <t id="6002">Rayma Sedim</t>
@@ -7794,7 +7805,7 @@
     <t id="50">Výzkum</t>
     <t id="51">Objednávka</t>
     <t id="52">Přepadení</t>
-    <t id="101">Inteligence</t>
+    <t id="101">Zpravodajství</t>
     <t id="103">Vojenské</t>
     <t id="105">Policie</t>
     <t id="150">Rozšířit Stanici</t>
@@ -8229,7 +8240,7 @@
     <t id="4602">Určete, zda by mělo být omezeno obchodování s určitými produkty na této stanici.</t>
     <t id="4800">(Options menu range 26xx continued)</t>
     <t id="4801">Vydejte se na cestu osamělého pilota a staňte se galaktickou velmocí v rozsáhlém a trvalém vesmíru, přičemž si můžete zvolit vlastní cestu pomocí volitelných příběhových misí.</t>
-    <t id="4802">Novým hráčům doporučujeme nejprve absolvovat základní výukové programy. Poté doporučujeme vyzkoušet Časové Linie, ale pokud dáváte přednost otevřenému světu, můžete se vydat rovnou do otevřeného vesmíru.</t>
+    <t id="4802">Novým hráčům se doporučuje nejprve dokončit základní tutoriály. Pokud ale dáváte přednost sandboxovému zážitku, můžete se rovnou vydat do otevřeného vesmíru a k tutoriálům se kdykoli vrátit.</t>
     <t id="4803">Zde navážete na poslední uloženou hru v otevřeném vesmíru.\n\nUpozorňujeme, že Časové Linie nevyžadují uloženou hru.</t>
     <t id="4804">Toto vám umožní vybrat si jednu z uložených her a pokračovat v otevřeném vesmíru.\n\nUpozorňujeme, že Časové Linie nevyžadují uloženou hru.</t>
     <t id="4805">K dispozici je celá řada rychlých návodů, které vás naučí nebo připomenou, jak ve hře fungují jednotlivé mechanismy.\n\nZačněte svou cestu zde a vraťte se sem, kdykoli narazíte na problém.</t>
@@ -8387,7 +8398,7 @@
     <t id="7222">Přepne postoj na aktuálně ovládané lodi, pokud je k dispozici.</t>
     <t id="7223">Dynamické generování snímků se zapne jen tehdy, když zlepší výkon nad původní snímkovou frekvenci hry.</t>
     <t id="7224">Ovlivňuje také efekty částic cestovního pohonu.</t>
-    <t id="7225">Umožňuje, aby nové objednávky lodí byly ve výchozím nastavení zařazeny do fronty nebo vymazány.</t>
+    <t id="7225">Umožňuje, aby nové rozkazy pro lodě byly ve výchozím nastavení řazeny do fronty nebo přepisovány.</t>
     <t id="7226">AMD FidelityFX Super Resolution - generování snímků zvyšuje počet snímků za sekundu tím, že vytváří dodatečné snímky z existujících vstupů.</t>
     <t id="7227">Tímto se aktivuje nový experimentální režim ovladače. Tento režim je stále ve vývoji a je plánováno, že se stane výchozím v budoucí verzi. Podělte se s námi o svou zpětnou vazbu!</t>
     <t id="7400">(Výzkumné menu)</t>
@@ -8654,6 +8665,7 @@
     <t id="9929">Tuto možnost nemůžete vybrat, protože byste tím zrušili výběr možnosti, která je nutná k odemčení sektoru, do kterého jste umístili majetek.</t>
     <t id="9930">Tuto hru nelze vybrat, protože obsahuje předměty s omezeným přístupem, které jste dosud neodemkli.</t>
     <t id="9931">Tato vlastní hra obsahuje vybavení, které je nekompatibilní. Nekompatibilní vybavení nebude nainstalováno.</t>
+    <t id="9932">This custom game contains wares or blueprints that are no longer valid. Affected items will not be used.</t>
     <t id="10000">(Obecná chyba / informace){1001,10003}</t>
     <t id="11300">(Online)</t>
     <t id="11301">Přijetí této mise přeruší jakoukoli jinou operaci v multivesmíru.</t>
@@ -9276,6 +9288,8 @@
     <t id="902">Záchrana lidí, kteří uvízli ve skafandrech v určené oblasti.</t>
     <t id="911">Návštěva stanic</t>
     <t id="912">Navštivte důležité stanice různých frakcí.</t>
+    <t id="921">Průzkum nalezišť</t>
+    <t id="922">Najděte oblasti se surovinami, označte je sondami, seberte a přemístěte staré sondy.</t>
     <t id="10000">Zrušit cestu</t>
     <t id="10001">Před dokončením</t>
     <t id="10002">Aktivní hlídka</t>
@@ -9439,6 +9453,7 @@
     <t id="10177">Zpoždění</t>
     <t id="10178">Zboží \(Ručně\)</t>
     <t id="10179">Koš na zboží</t>
+    <t id="10180">Maximální počet vysazených sond</t>
   </page>
   <page id="1042" title="Encyclopedia Data Texts" descr="Describes additional data in encyclopedia entries" voice="no">
     <t id="10011">Žádný</t>
@@ -11468,6 +11483,19 @@
     <t id="115">Nebo to všechno můžete ignorovat a jednoduše sledovat jednu z mnoha fascinujících dějových linií, zaměřit se na průzkum nebo vyzkoušet nespočet dalších aktivit, které jsou ve vesmíru X k dispozici.</t>
     <t id="116">Rychlost pohybu vpřed můžete nastavit pomocí kláves X a Y, kolečka myši nebo plynové páčky.</t>
     <t id="117">Jakmile vyberete cíl, zaměřovací systém se jej pokusí zaměřit. Jakmile se zaměření podaří, můžete pomocí klávesy R nebo sekundárního tlačítka střelby odpálit raketu.</t>
+    <t id="200">(Tradeshow Playground Scenario)</t>
+    <t id="201">Vítejte ve hře X4: Foundations, živoucím vesmíru se stovkami sektorů propojených branami. Tyto sektory lze prozkoumávat a obsahují tisíce lodí a stanic fungujících v rámci plně simulované ekonomiky. Můžete vlastnit a ovládat vše, od jedné malé stíhačky až po velké impérium s obchodními flotilami a mocnými kapitálovými loděmi, a utvářet tak svůj příběh.</t>
+    <t id="202">Tento scénář vás umístí do blízkosti jedné z mnoha stovek rušných vesmírných stanic, které najdete v našem živém vesmíru, kde obchodníci rozvážejí zboží a těžaři sbírají suroviny. \nV poslední době dochází k potyčkám se strojovou inteligencí známou jako Xenonové, která sem proudí z nedaleké brány a narušuje obchod.</t>
+    <t id="211">(vysvětlení k prozkoumání)Když opustíte stanici, můžete se vydat na průzkum ostatních sektorů a frakcí. Celý vesmír X obsahuje stovky jedinečných sektorů obývaných různými frakcemi a druhy, které mají bohatou historii.</t>
+    <t id="212">(vysvětlení boje)Síť Bran není vždy bezpečná. Mezi strojovou inteligencí známou jako Xenoni, piráty, válčícími frakcemi a příležitostnými oportunisty, kteří se snaží vydělat na válce, dochází ke střetům od malých potyček až po obří bitvy flotil.</t>
+    <t id="213">(vysvětlení těžby)Lodě jako tyto těží suroviny, na nichž je založena většina ekonomiky. Po jejich dodání jsou zušlechtěny, přesunuty do továren a nakonec přeměněny na zboží, které lze použít ke stavbě lodí a stanic, které vidíte.</t>
+    <t id="214">(vysvětlení obchodování)Obchodníci, přepravci a obchodníci přepravují zboží mezi stanicemi. Nakupují tam, kde je zboží dostatek, a prodávají tam, kde je ho nedostatek, a udržují tak soukolí ekonomiky v chodu.</t>
+    <t id="215">(stavba loděnice)Tato loď se právě staví z dílů vytvořených na jiných stanicích. Brzy bude bránit tento sektor před dalšími nájezdy.</t>
+    <t id="216">(vysvětlení odpalovacích trubic)Stanice vypouští stíhačky ze svých startovacích tubusů, aby se bránila proti přilétajícím útočníkům.</t>
+    <t id="217">(vysvětlení útoku na stanici)Blíží se nepřátelské Xenonské síly. Pokud poškodí stanici, může být výroba nových lodí značně omezena.</t>
+    <t id="218">(vysvětlení trestného činu)Zločinci se snaží vydělat na přepravě nelegálního zboží, aby dosáhli velkých zisků, a ukrývají se v provozu kolem stanic. Tito zločinci mohou dokonce provozovat organizované operace s vlastními stanicemi a maskovanými nákladními loděmi.</t>
+    <t id="219">(návrh na prozkoumání)Je zde více památek k vidění a možností, co dělat. Zkuste létat kolem a zaměřit se na různé objekty.</t>
+    <t id="220">X4: Foundations nabízí mnohem více. Rychle si můžete vydělat dost peněz na to, abyste mohli vlastnit flotilu lodí. Můžete si najmout další piloty, aby pro vás pracovali a plnili vaše rozkazy. Nechte je obchodovat nebo těžit, aby vám vydělávali peníze, zatímco vy budete sledovat jednu z mnoha dějových linií nebo plnit samostatné mise, které najdete v celém rozsáhlém vesmíru.</t>
   </page>
   <page id="10098" title="Torus Computer" descr="0" voice="yes">
     <t id="30224000">(Pioneer Terraforming Mission)</t>
@@ -20360,7 +20388,6 @@
   <page id="10120" title="Mission Argon/Terran NPC Female 22 / Segaris diplomat" descr="Lines for Segaris Faction Diplomat" voice="yes">
     <t id="2001">(Pozdrav - neutrální)Ahoj.</t>
     <t id="2007">(Sbohem - neutrální)Hodně štěstí.</t>
-    <t id="2009">(Sbohem - nepříteli)Dejte mi pokoj.</t>
     <t id="3000">(* Diplomat specific lines *)</t>
     <t id="3001">(Přijímá pozvání) Průkopníci Segarisu s radostí přijímají vaše pozvání. Brzy dorazím na vaše velvyslanectví.</t>
     <t id="3002">(Potvrzení příjezdu diplomata)Dorazil jsem na vaše velvyslanectví.</t>
@@ -23863,6 +23890,7 @@
     <t id="36">To vyřešíme později.</t>
     <t id="37">Zavřete mapu.</t>
     <t id="38">Teď.(jako "udělej to teď", přichází nějakou dobu po pokynu)</t>
+    <t id="39">Ještě jedna věc.</t>
     <t id="1000">(Introduction and physical)</t>
     <t id="1001">Ahoj. Jsem Jace Winger, váš dnešní letecký instruktor. Projdeme si celý plán lekce, ale pokud již znáte některé základy, můžeme se posunout dál.</t>
     <t id="1002">Než začneme, musím provést několik rutinních fyzických testů. Předpisy, víte.(say the last sentence slightly apologetically)</t>
@@ -24597,6 +24625,24 @@
     <t id="25040">Sloupec vpravo ukazuje, jak je vyčerpaný.</t>
     <t id="25041">Suroviny se časem doplňují, ale když je pole téměř prázdné, je pravděpodobně lepší najít mezitím jinou alternativu.</t>
     <t id="25042">Ty pokročilejší vyžadují zkušenějšího pilota, ale umožňují mu pracovat v řadě systémů.</t>
+    <t id="25043">Barevně označené oblasti ukazují potenciální umístění surovin.</t>
+    <t id="25044">Otevřete v nastavení filtr těžby.</t>
+    <t id="25045">Vyberte jeden plyn z vyznačených oblastí plynů.</t>
+    <t id="25046">Barva na mapě se změnila, aby označila vybranou surovinu.</t>
+    <t id="25047">Nyní vidíte pouze potenciální lokace právě této suroviny.(slight emphasis on "this resource")</t>
+    <t id="25048">Změňte jeho výchozí chování na Místní automatická těžba.</t>
+    <t id="25049">Nakonfigurujte jej tak, aby shromažďoval některý z plynů v tomto sektoru.</t>
+    <t id="25050">Loď se nyní pokusí najít surovinu, nasbírat ji a prodat v zadaném sektoru.</t>
+    <t id="25051">Jejich operace můžete řídit více ručně pomocí surovinových sond.</t>
+    <t id="25052">Umístěte jednu z nich v jedné z plynových oblastí.</t>
+    <t id="25053">Těžaři při určování místa, kde mají sbírat suroviny, nejprve zkontrolují surovinové sondy.</t>
+    <t id="25054">Čím více sond v sektoru rozmístíte, tím déle tento krok trvá, takže je používejte s rozmyslem.</t>
+    <t id="25055">Můžete také zjistit, kde přesně jsou suroviny aktuálně detekovány.</t>
+    <t id="25056">Znovu vyberte těžaře plynu a přímo mu nařiďte, aby těžil v jedné z oblastí s detekovanými surovinami.</t>
+    <t id="25057">Suroviny se nakonec vyčerpají.</t>
+    <t id="25058">Časem se doplní, ale pravděpodobně na jiném místě.</t>
+    <t id="25059">Sledujte proto své surovinové sondy a odstraňte nebo znovu nasaďte ty, které již nejsou užitečné.</t>
+    <t id="25060">Nebo, pokud máte volné lodě, vyčleňte někoho, kdo se bude věnovat průzkumu sektoru a udržování polohy sond se zdroji.</t>
     <t id="26000">(Station Building)</t>
     <t id="26001">Dnes se budeme věnovat jedné z mých nejpokročilejších lekcí: navrhování a stavění stanic.</t>
     <t id="26002">Pro začátek potřebujete parcelu.</t>

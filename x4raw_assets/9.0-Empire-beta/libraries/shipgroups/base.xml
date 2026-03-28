@@ -584,13 +584,13 @@
     <select macro="ship_xen_m_corvette_01_a_macro" weight="100"/>
   </group>
   <group name="xen_fighter_m">
-    <select macro="ship_xen_m_corvette_02_a_macro" weight="100"/>
-    <select macro="ship_xen_m_corvette_01_a_macro" weight="3"/>
+    <select macro="ship_xen_m_corvette_02_a_macro" weight="80"/>
+    <select macro="ship_xen_m_corvette_01_a_macro" weight="20"/>
   </group>
   <group name="xen_fighter_s">
-    <select macro="ship_xen_s_fighter_01_a_macro" weight="100"/>
-    <select macro="ship_xen_s_fighter_02_a_macro" weight="100"/>
-    <select macro="ship_xen_s_heavyfighter_01_a_macro" weight="3"/>
+    <select macro="ship_xen_s_fighter_01_a_macro" weight="80"/>
+    <select macro="ship_xen_s_fighter_02_a_macro" weight="80"/>
+    <select macro="ship_xen_s_heavyfighter_01_a_macro" weight="20"/>
   </group>
   <group name="xen_fighter_heavy_s">
     <select macro="ship_xen_s_fighter_01_a_macro" weight="20"/>

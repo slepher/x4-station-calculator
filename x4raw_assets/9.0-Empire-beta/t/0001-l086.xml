@@ -603,9 +603,9 @@
     <t id="2851">微小</t>
     <t id="2852">很小</t>
     <t id="2853">小</t>
-    <t id="2854">中等</t>
+    <t id="2854">中</t>
     <t id="2855">大</t>
-    <t id="2856">很大</t>
+    <t id="2856">巨型</t>
     <t id="2857">巨大</t>
     <t id="2900">交易报价</t>
     <t id="2901">贸易机会</t>
@@ -3332,6 +3332,10 @@
     <t id="11688">采矿船分析时间(followed by colon and added percentage)</t>
     <t id="11689">潜在资源</t>
     <t id="11690">已探明资源</t>
+    <t id="11691">Introducing Priority Orders</t>
+    <t id="11692">You can now use modifier keys to give queued \(%s($INPUT_MODIFIER_ICON$)\) and priority \(%s($INPUT_MODIFIER_ICON$)\) orders directly from the map or from within the Interact menu. By default, orders given to ships without using these modifier keys will now overwrite any previously queued order.</t>
+    <t id="11693">If you prefer the old behaviour then you can change the Default Order Behaviour setting in the Game Settings menu to Queue, so that pressing %s($INPUT_MODIFIER_ICON$) while using the Interact menu will overwrite the order instead of adding it to the queue.</t>
+    <t id="11694">Press Yes if you would like to try the new default modifier behaviour, or No if you would like to keep the old behaviour and use %s($INPUT_MODIFIER_ICON$) to overwrite orders.</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">离线存档</t>
     <t id="11702">覆盖离线存档</t>
@@ -3743,6 +3747,8 @@
     <t id="12786">AMD FSR 超分辨率与帧生成</t>
     <t id="12787">实验型改善控制器支持</t>
     <t id="12788">AMD FSR</t>
+    <t id="12789">If this is your first time in X4, we suggest you try out some Tutorials before starting your journey into the Open Universe of X4.</t>
+    <t id="12790">Start New Open Universe</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">大使馆行动</t>
     <t id="12803">外交官</t>
@@ -3893,7 +3899,7 @@
     <t id="13102">不再显示此扩展的消息</t>
     <t id="13200">(Ship configuration menu - continued from 80XX, 85XX)</t>
     <t id="13201">护盾回充延迟</t>
-    <t id="13202">护盾回充速度</t>
+    <t id="13202">护盾回充速率</t>
     <t id="13203">(default modifier value)普通</t>
     <t id="13204">飞船容量</t>
     <t id="13205">护盾</t>
@@ -3946,7 +3952,8 @@
     <t id="13324">确认模块</t>
     <t id="13325">取消选中模块</t>
     <t id="13326">聚焦空间站模型</t>
-    <t id="13327">Queued Priority Order</t>
+    <t id="13327">队列中的优先指令</t>
+    <t id="13328">Gather Rate(of resources; header item for table column)</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">再见</t>
@@ -4779,16 +4786,16 @@
     <t id="34">(FP)蹲下</t>
     <t id="35">(FP)行走</t>
     <t id="36">(FP)跳跃</t>
-    <t id="37">全息地图放大</t>
-    <t id="38">全息地图缩小</t>
-    <t id="39">全息地图向左</t>
-    <t id="40">全息地图向右</t>
-    <t id="41">全息地图向上</t>
-    <t id="42">全息地图向下</t>
-    <t id="43">全息地图向左转</t>
-    <t id="44">全息地图向右转</t>
-    <t id="45">全息地图向上转</t>
-    <t id="46">全息地图向下转</t>
+    <t id="37">地图：放大</t>
+    <t id="38">地图：缩小</t>
+    <t id="39">地图：向左平移</t>
+    <t id="40">地图：向右平移</t>
+    <t id="41">地图：向上平移</t>
+    <t id="42">地图：向下平移</t>
+    <t id="43">地图：向左旋转</t>
+    <t id="44">地图：向右旋转</t>
+    <t id="45">地图：向上旋转</t>
+    <t id="46">地图：向下旋转</t>
     <t id="47">鼠标点击</t>
     <t id="48">主武器向光标处射击</t>
     <t id="49">副武器瞄准发射</t>
@@ -4870,13 +4877,13 @@
     <t id="133">暂停飞行辅助(按住按钮可暂时禁用)</t>
     <t id="134">交互菜单优先指令</t>
     <t id="135">交互菜单维持指令队列</t>
-    <t id="136">全息地图重置位置</t>
-    <t id="137">全息地图重置旋转角度</t>
-    <t id="138">全息地图选择</t>
-    <t id="139">全息地图后退</t>
-    <t id="140">全息地图交互</t>
-    <t id="141">向左旋转全息地图项目</t>
-    <t id="142">向右旋转全息地图项目</t>
+    <t id="136">地图：重置位置</t>
+    <t id="137">地图：重置旋转角度</t>
+    <t id="138">地图：选择</t>
+    <t id="139">地图：后退</t>
+    <t id="140">地图：交互</t>
+    <t id="141">地图：向左旋转项目</t>
+    <t id="142">地图：向右旋转项目</t>
   </page>
   <page id="1007" title="Input Range Texts" descr="0" voice="no">
     <t id="1">左转/右转</t>
@@ -5249,7 +5256,7 @@
     <t id="811">执行邀请任务以参加晋升仪式。</t>
     <t id="812">与该势力的代表交谈。</t>
     <t id="813">(Boron Story Ch3)此信标部署的位置不在星门范围之内，距离之前所部署的信标太远。{30253,3020}</t>
-    <t id="814">(Boron Story Ch3)黑暗庇护所以其高危而广为人知。\n\n呆在红色标记的矿区以避免舰船受损。</t>
+    <t id="814">(Boron Story Ch3)黑暗庇护所以其高危而广为人知。\n\n呆在矿区以避免舰船受损。</t>
     <t id="815">(Boron Story Ch3)另外注意观察太空中小行星的位置，也可辅助定位矿区范围。</t>
     <t id="820">参加战争！</t>
     <t id="830">考虑尝试"$TUTORIAL$"教程。</t>
@@ -5382,6 +5389,8 @@
     <t id="993">想更详细地了解飞行机制，可以尝试飞行学院(translate as 1021,7000)教程开局。</t>
     <t id="994">高亮的对话选项会推进剧情。如果你想了解全部对话内容，请先选择其他选项。</t>
     <t id="995">你可以打开选项菜单选择"游玩教程"来重新游玩此教程和其他教程。("Options Menu" same as {1001,2600},  "Play Tutorials" same as {1001,12660})</t>
+    <t id="996">将资源探测器部署到资源富集区。如果检测到选定的资源，你的矿工会优先于此处采集，直到资源枯竭。</t>
+    <t id="997">在一个地区部署过多的资源探测器会降低效率，所以请合理使用。资源探测器并非必须项。你的矿工们靠自已也能找到需要采集的资源。</t>
     <t id="1000">(Generic Hints)</t>
     <t id="1001">你能在"{1001,8701}"菜单退出本教程。</t>
     <t id="1002">教程完成！</t>
@@ -7385,6 +7394,8 @@
     <t id="5901">《X4：基石》的展示场景</t>
     <t id="5902">展会环境</t>
     <t id="5904">欢迎来到《X4》！\n\n本次重点演示将带你直接进入紧张刺激的战斗之中。在强大的主力舰和自动防御系统支援下，你将加入一支盟军舰队，击退敌军，并保卫一座位于前线遭到围攻的空间站，亲身体验《X4》中大规模太空战斗，\n\n在星门附近参与激烈的缠斗。无需设置或停机时间，你可以立即上手，掌控飞船，亲身感受《X4：基石》中太空战斗的宏大规模、紧张氛围与震撼美感。</t>
+    <t id="5905">Tradeshow Playground</t>
+    <t id="5906">Welcome to X4!\n\nThis scenario drops you into a busy sector within a downscaled universe, giving you a taste of the immense scale and possibilities of X4: Foundations.</t>
     <t id="6000">教程：进阶游戏玩法</t>
     <t id="6001">{1021,6101}</t>
     <t id="6002">雷玛·塞迪姆</t>
@@ -8229,7 +8240,7 @@
     <t id="4602">确认是否限制该空间站的特定产品交易。</t>
     <t id="4800">(Options menu range 26xx continued)</t>
     <t id="4801">以一个孤独飞行员的身份开启旅程，并成长为一个宇宙中庞大长久的势力，可通过可选的故事情节来设置自己的开局。</t>
-    <t id="4802">建议新玩家先完成基本教程。之后我们建议尝试时间线，但如果你更喜欢沙盒体验，那么你可以直接前往开放宇宙。</t>
+    <t id="4802">建议新玩家先完成基本教程。但如果你更喜欢开放世界体验，也可以直接进入开放宇宙，并随时重温这些教程。</t>
     <t id="4803">这将继续最新的开放宇宙游戏存档。\n\n请注意《时间线》无需保存。</t>
     <t id="4804">这将使你可以从多个游戏存档中选择其一继续畅玩开放宇宙。\n\n请注意《时间线》无需保存。</t>
     <t id="4805">这里有各种各样的快速教程可以指导或提示你如何进行游戏。\n\n开始你的旅程吧，遇到问题随时回来。</t>
@@ -8412,8 +8423,8 @@
     <t id="7715">出售物品所获得资金。</t>
     <t id="7716">购买物品所支出资金。</t>
     <t id="7717">出售飞船所获得资金。</t>
-    <t id="7718">完成一项任务所获得资金。</t>
-    <t id="7719">在一项任务中所支出资金。</t>
+    <t id="7718">完成任务所获得资金。</t>
+    <t id="7719">在任务中所支出资金。</t>
     <t id="7720">从玩家账户直接转出或存入的资金。</t>
     <t id="7721">出售货物所转移资金。</t>
     <t id="7722">出售货物所获得资金。</t>
@@ -8654,6 +8665,7 @@
     <t id="9929">你无法选择该选项，该选项和另一个选项冲突。而那个选项是必须的，因为你已在它对应解锁的星区里放置了资产。</t>
     <t id="9930">无法选择此自定义游戏，因为它包含尚未解锁的受限物品。</t>
     <t id="9931">此自定义游戏中存在含有不兼容设备的飞船配置。不兼容的设备将不会被安装。</t>
+    <t id="9932">This custom game contains wares or blueprints that are no longer valid. Affected items will not be used.</t>
     <t id="10000">(Generic Error / Info){1001,10003}</t>
     <t id="11300">(Online)</t>
     <t id="11301">接受此任务意味着将放弃其他多元宇宙行动任务。</t>
@@ -9276,6 +9288,8 @@
     <t id="902">在指定空域营救身穿太空服的受困者。</t>
     <t id="911">访问空间站</t>
     <t id="912">访问属于各派系的重要空间站。</t>
+    <t id="921">资源探测</t>
+    <t id="922">找到资源产区并用资源探测器标记，回收再利用已经失效的资源探测器。</t>
     <t id="10000">中止路径</t>
     <t id="10001">即将结束</t>
     <t id="10002">主动巡逻</t>
@@ -9439,6 +9453,7 @@
     <t id="10177">推迟</t>
     <t id="10178">货物（手动）</t>
     <t id="10179">货物栏</t>
+    <t id="10180">资源探测器最大可放置数</t>
   </page>
   <page id="1042" title="Encyclopedia Data Texts" descr="Describes additional data in encyclopedia entries" voice="no">
     <t id="10011">无</t>
@@ -11468,6 +11483,19 @@
     <t id="115">或者你可以忽略这一切，就跟随众多引人入胜的剧情之一，专注于探索，或尝试《X宇宙》中数不胜数的其他活动。</t>
     <t id="116">你可以使用键盘的 X 和 Y 键、鼠标滚轮或油门杆来调整前进速度。</t>
     <t id="117">一旦你选定目标，瞄准系统就会尝试锁定。 锁定成功后，你可以按下 R键或辅助射击按钮发射导弹。</t>
+    <t id="200">(Tradeshow Playground Scenario)</t>
+    <t id="201">Welcome to X4: Foundations, a living universe with hundreds of sectors connected by gates. These sectors can be explored, and contain thousands of ships and stations operating within a fully simulated economy. You can own and command everything, ranging from a single tiny fighter to a grand empire with merchant fleets and powerful capital ships, to shape your story.</t>
+    <t id="202">This scenario places you near one of the many hundreds of bustling space stations you'll find in our living universe, with traders delivering wares and miners gathering resources. \nRecently there have been skirmishes with the machine intelligence known as the Xenon pouring in from the nearby gate, disrupting the trade.</t>
+    <t id="211">(explore explanation)Leaving the station behind, you are free to explore the other sectors and factions. The full X-Universe contains hundreds of unique sectors inhabited by various factions and species, all with rich history.</t>
+    <t id="212">(fight explanation)The Gate network is not always safe. Between the machine intelligence known as the Xenon, pirates, warring factions and the occasional war profiteering opportunist, you will see clashes ranging from small skirmishes to giant fleet brawls.</t>
+    <t id="213">(mining explanation)Ships like these mine the raw resources that the majority of the economy is based on. Once delivered they are refined, moved to factories and eventually turned into the wares that can be used to build the ships and stations you see.</t>
+    <t id="214">(trading explanation)Traders, haulers and merchants transport wares between stations. They buy where goods are plentiful and sell them where they are scarce, keeping the gears of the economy turning.</t>
+    <t id="215">(shipyard construction)This ship is currently under construction using the wares created by other stations. It will soon defend this sector from any further incursions.</t>
+    <t id="216">(launch tube explanation)The station is launching fighters from its launch tubes to defend itself from incoming attackers.</t>
+    <t id="217">(station attack explanation)A hostile Xenon force is approaching. If they damage the station, the production of new ships could be severely limited.</t>
+    <t id="218">(criminal explanation)Criminals try to capitalise on transporting illicit wares for great profits by hiding in traffic around stations. These criminals can even run organised operations with their own stations and masked freighters.</t>
+    <t id="219">(explore suggestion)There are more sights to see and things to do. Try flying around and targeting different objects.</t>
+    <t id="220">X4: Foundations has so much more to offer. You can quickly earn enough money to own a fleet of ships. You can hire other pilots to work for you, and follow your orders. Let them trade or mine to earn you money, while you follow one of the many plot lines or carry out standalone missions that can be found throughout the vast universe.</t>
   </page>
   <page id="10098" title="Torus Computer" descr="0" voice="yes">
     <t id="30224000">(Pioneer Terraforming Mission)</t>
@@ -16222,14 +16250,14 @@
     <t id="30401023">你的备用战机已经在停靠区准备好了。</t>
     <t id="30401024">当心，这是最后一个了！</t>
     <t id="30401025">确保他们无法逃离。飞行员，攻击他们的引擎！</t>
-    <t id="30401030">我们得确保门附近没有 Paranid 狂信徒。</t>
-    <t id="30401031">这条航线对援助船舰必须是安全的。</t>
-    <t id="30401032">看来是我们的第一个目标。</t>
-    <t id="30401033">飞行员们，进入战斗机！</t>
-    <t id="30401034">把那些三眼怪送回他们的茧里去！</t>
-    <t id="30401035">干得好，但保持警惕。</t>
-    <t id="30401036">可能还会有更多敌人。</t>
-    <t id="30401037">看来我们的 Argon 朋友们正冲向前线。</t>
+    <t id="30401030">(Argon,Female)(Captain)我们得确保星门附近没有 Paranid 狂信徒。</t>
+    <t id="30401031">(Argon,Female)(Captain)这条航线必须确保援助飞船的安全。</t>
+    <t id="30401032">(Argon,Female)(Captain)看来这就是我们的首个目标。</t>
+    <t id="30401033">(Argon,Female)(Captain)飞行员们，进入战机！</t>
+    <t id="30401034">(Argon,Female)(Captain)把那些三眼怪送回他们的茧里去！</t>
+    <t id="30401035">(Argon,Female)(Captain)干得好，但保持警惕。(wary)</t>
+    <t id="30401036">(Argon,Female)(Captain)可能还会有更多敌人。(wary)</t>
+    <t id="30401037">(Argon,Female)(Captain)看来我们的 Argon 朋友正冲向前线。(wary)</t>
     <t id="306020000">(* Story - Historical - Save Earth *)</t>
     <t id="306020101">{,11506}</t>
   </page>
@@ -20360,7 +20388,6 @@
   <page id="10120" title="Mission Argon/Terran NPC Female 22 / Segaris diplomat" descr="Lines for Segaris Faction Diplomat" voice="yes">
     <t id="2001">(Greeting - neutral)你好啊，伙计。</t>
     <t id="2007">(Goodbye - neutral)一路顺风。</t>
-    <t id="2009">(Goodbye - enemy)管他呢。</t>
     <t id="3000">(* Diplomat specific lines *)</t>
     <t id="3001">(Accepting invitation)塞格瑞斯先驱者欣然接受您的邀请。我将很快抵达您的大使馆。</t>
     <t id="3002">我已抵达您的大使馆。</t>
@@ -23863,6 +23890,7 @@
     <t id="36">我们稍后再做那个。</t>
     <t id="37">关闭星图。</t>
     <t id="38">现在试试吧。</t>
+    <t id="39">最后一步。</t>
     <t id="1000">(Introduction and physical)</t>
     <t id="1001">Hi，我是杰斯·温格，今天的飞行教练。我们计划完成整个训练课程，如果你对一些基本操作已经熟悉了，那我们也可以跳过前面的内容。</t>
     <t id="1002">在我们开始之前，我需要做一些常规的身体检查。规章制度，你懂的。(say the last sentence slightly apologetically)</t>
@@ -24597,6 +24625,24 @@
     <t id="25040">右侧的条形图显示了消耗的程度。</t>
     <t id="25041">资源会随着时间的推移而逐渐补充，但当一个区域的资源快采空时，你最好还是在这段时间里另寻他处。</t>
     <t id="25042">更先进的采矿命令需要更有经验的飞行员来执行，但可以在一系列星系中执行。</t>
+    <t id="25043">彩色区域表示潜在的资源位置。</t>
+    <t id="25044">打开采矿过滤器设置。</t>
+    <t id="25045">请选择一种高亮显示的气体资源。</t>
+    <t id="25046">选择资源后，地图上的颜色会发生相应变化。</t>
+    <t id="25047">现在你也就只能看到这一种资源的潜在位置了。(slight emphasis on "this resource")</t>
+    <t id="25048">将它的默认行为设置为"本地自动采矿"。</t>
+    <t id="25049">将其设置为采集本星区中的任意气态资源。</t>
+    <t id="25050">现在，此飞船就会在选定星区自动寻找资源并采集，然后进行售卖。</t>
+    <t id="25051">你也可以使用资源探测器手动引导它们的作业。</t>
+    <t id="25052">在气体富集区部署一个资源探测器。</t>
+    <t id="25053">你的采矿船在决定采集地点时，会优先检索资源探测器。</t>
+    <t id="25054">你在一个地区部署的资源探测器越多，检索所花费的时间也就越长，所以资源探测器并非越多越好。</t>
+    <t id="25055">你也可以精确地看到当前探测到资源的位置。</t>
+    <t id="25056">再次选择你的气体矿船，然后直接命令它在其中一个探测到资源的区域进行采矿。</t>
+    <t id="25057">资源最终会被采空。</t>
+    <t id="25058">随着时间的流逝，资源会恢复，但可能会在不同的位置。</t>
+    <t id="25059">所以请留意你的资源探测器，移除或重新部署那些不再有用的探测器。</t>
+    <t id="25060">或者，你有闲置的飞船，可以专门指派一艘去勘探某个星区，并维护好你资源探测器的部署位置。</t>
     <t id="26000">(Station Building)</t>
     <t id="26001">今天，我们将学习最高级的课程之一：设计和建造空间站。</t>
     <t id="26002">首先，你需要一块空地。</t>
@@ -42260,12 +42306,12 @@
     <t id="1000405">(failure in mission chain)进展并不顺利，但还有挽救的余地。</t>
     <t id="1000406">(mission aborted by NPC / script failure)抱歉。看起来不再需要你的帮助了。</t>
     <t id="30401000">(Combat Demo 1)</t>
-    <t id="30401030">跳跃完成，正在离开星门区域。</t>
-    <t id="30401031">重力雷达侦测到多个目标。</t>
-    <t id="30401032">它正处于拦截航线上。</t>
-    <t id="30401033">侦测到多艘小型舰船。</t>
-    <t id="30401034">只剩下碎片了…</t>
-    <t id="30401035">再无优先目标。</t>
+    <t id="30401030">(Teladi)(Navigator)跳跃完成，正在离开星门区域。(neutral)</t>
+    <t id="30401031">(Teladi)(Navigator)重力雷达侦测到多个目标。(neutral)</t>
+    <t id="30401032">(Teladi)(Navigator)它正处于拦截航线上。(nervous)</t>
+    <t id="30401033">(Teladi)(Navigator)侦测到多艘小型舰船。(calm, as a statement of fact)</t>
+    <t id="30401034">(Teladi)(Navigator?)只剩下碎片了…</t>
+    <t id="30401035">(Teladi)(Navigator?)再无优先目标。</t>
   </page>
   <page id="10502" title="Teladi NPC 2 / Ministry rep" descr="Lines for Teladi NPC 2" voice="yes">
     <t id="0">(Metadata, do not translate)[teladi] male female basic</t>
@@ -51145,7 +51191,7 @@
     <t id="74902">{20006,102}(No information available)</t>
     <t id="74903">(1-Dock Short){20104,71109}</t>
     <t id="75001">小型飞船展厅01</t>
-    <t id="75002">让我们面对现实吧：在宇宙中几乎所有文明区域，一艘飞船就是生活的刚需，无论官方人口普查数据让那些地方看起来多么拥挤。"企业家"和"中产阶级私家船主"的根本区别就是拥有两艘飞船。然而，拥有三、六、十二艘——或更多——飞船，则能让一位高贵的绅士跻身上流社会，成为那 1% 的顶尖权贵。实话说，哪位百万、亿万、兆万富翁会把自己闪闪发光、价值连城的飞船停在某个荒无人烟星系中的某颗无名卫星的轨道上吃灰？没错，没人会这么做！\n\n财富的法则如下：既然拥有，就得显摆。把它放进一座光彩夺目的展厅里，让成群精巧的机器手臂为其抛光船壳，让上方的雷射光束将其笼罩在耀眼的光芒中。然后，当你邀请心仪的对象、潜在的生意伙伴或是族中长辈来家里共进晚餐时，带领他们昂首阔步地经过你这些豪华飞船。\n\n这都是你打拼出来的！</t>
+    <t id="75002">让我们面对现实吧：在宇宙中几乎所有文明区域，一艘飞船就是生活的刚需，无论官方人口普查数据让那些地方看起来多么拥挤。"企业家"和"中产阶级私家船主"的根本区别就是拥有两艘飞船。然而，拥有三、六、十二艘——或更多——飞船，则能让一位高贵的绅士跻身上流社会，成为那 1% 的顶尖权贵。实话说，哪位百万、亿万、兆万富翁会把自己闪闪发光、价值连城的飞船停在某个荒无人烟星系中的某颗无名卫星的轨道上吃灰？没错，没人会这么做！\n\n财富的法则如下：既然拥有，就得显摆。把它放进一座光彩夺目的展厅里，让成群精巧的机器手臂为其抛光船壳，让上方的雷射光束将其笼罩在耀眼的光芒中。然后，当你邀请心仪的对象、潜在的生意伙伴或是族中长辈来家里共进晚餐时，带领他们昂首阔步地路过你这些豪华飞船。\n\n这都是你打拼出来的！</t>
     <t id="75003">S展厅01</t>
     <t id="75101">小型飞船展厅02</t>
     <t id="75102">{20104,75002}</t>
@@ -51401,14 +51447,14 @@
     <t id="110303">展览馆</t>
     <t id="120000">(*Processing Modules*)</t>
     <t id="120101">废料处理设施</t>
-    <t id="120102">星门关闭后的 Avarice｜贪婪 星系内资源极为有限，受困于此的Argon工程师因而开始开发各种回收设施。废料处理设施是其中之一，该模块将S和M级飞船残骸内的原始废料处理为废金属，以便回收再生为可用的资源。第一艘拖船也同步开发完成，用于将残骸运送到废料处理设施。随后废料块出现了，更大的残骸会被打包成这种方块以便于拖曳和处理。\n\n来自 Sacred Relic｜神圣遗迹 的信使无人机到达之后，Avarice｜贪婪 的居民也向其他断连的星系派出了无人机。这些无人机搭载了回收再生技术的蓝图，以期对其他地方同样挣扎于自然资源短缺的受困者能有所帮助。为此，他们在破潮砥柱上建立了当地的约言联盟分部。星门于新纪元825年首次重新建立连接，约言联盟随后搬到了位于 Windfall | 横财 属于他们自己的空间站。(Raw Scrap same as {20201,6801}, Scrap Metal same as {20201,6601}, Tug same as {20221,5051}, Scrap Cube same as {20109,10801})</t>
+    <t id="120102">星门关闭后的 Avarice｜贪婪 星系内资源极为有限，受困于此的Argon工程师因而开始开发各种回收设施。废料处理设施是其中之一，该模块将S和M级飞船残骸内的原始废料处理为废金属，以便回收再生为可用的资源。第一艘拖船也同步开发完成，用于将残骸运送到废料处理设施。随后废料块出现了，更大的残骸会被打包成这种方块以便于拖曳和处理。\n\n来自 Sacred Relic｜神圣遗迹 的信使无人机到达之后，Avarice｜贪婪 的居民也向其他断连的星系派出了无人机。这些无人机搭载了回收再生技术的蓝图，以期对其他地方同样挣扎于自然资源短缺的受困者能有所帮助。为此，他们在破潮砥柱上建立了当地的约言联盟分部。星门于新纪元825年首次重新建立连接，约言联盟随后搬到了位于 Windfall | 横财 的自有空间站。(Raw Scrap same as {20201,6801}, Scrap Metal same as {20201,6601}, Tug same as {20221,5051}, Scrap Cube same as {20109,10801})</t>
     <t id="120103">{20201,6601}</t>
     <t id="120201">{20201,7601}{20104,120101}(Allographyne Scrap Processor)</t>
     <t id="120202">星门关闭事件导致许多星区资源获取途径极为有限，这促使被困的工程师们设计出了先进的回收设施。其中一种便是异构石墨炔废料处理设施，该模块旨在将Kha'ak飞船残骸处理为异构石墨炔碎片，而后者又可被回收利用为其他可用资源。\n\n星门关闭后，首批星际信使无人机的抵达，促使许多星区的行政机构与现已无法通联的邻近星系共享生存关键信息，其中便包括了这种新型回收技术的蓝图。此举旨在支援资源匮乏的民众，并期望以此换取重要的情报作为回报。\n\n这种相互的信息交换体系运行得极为成功，以至于许多星区甚至在星门连接恢复后，仍在本地维持了这一体系。(Allographyne Fragments same as {20201,7401})</t>
     <t id="120203">{20201,7401}(Allographyne Fragments)</t>
     <t id="130000">(*Production Modules continued*)</t>
     <t id="130101">废料再生设施</t>
-    <t id="130102">星门关闭后的 Avarice｜贪婪 星系内资源极为有限，受困于此的Argon工程师因而开始开发各种回收设施。废料再生设施用于将废金属再生为可用资源，通过不同的生产流程将其转化为船体部件或电子黏土。\n\n来自 Sacred Relic｜神圣遗迹 的信使无人机到达之后，Avarice｜贪婪 的居民也向其他断连的星系派出了无人机。这些无人机搭载了回收再生技术的蓝图，以期对其他地方同样挣扎于自然资源短缺的受困者能有所帮助。为此，他们在破潮砥柱上建立了当地的约言联盟分部。星门于新纪元825年首次重新建立连接，约言联盟随后搬到了位于 Windfall | 横财 属于他们自己的空间站。(Scrap Metal same as {20201,6601}, Hull Parts same as {20201,1201}, Claytronics same as {20201,501})</t>
+    <t id="130102">星门关闭后的 Avarice｜贪婪 星系内资源极为有限，受困于此的Argon工程师因而开始开发各种回收设施。废料再生设施用于将废金属再生为可用资源，通过不同的生产流程将其转化为船体部件或电子黏土。\n\n来自 Sacred Relic｜神圣遗迹 的信使无人机到达之后，Avarice｜贪婪 的居民也向其他断连的星系派出了无人机。这些无人机搭载了回收再生技术的蓝图，以期对其他星系同样挣扎于自然资源短缺的受困者能有所帮助。为此，他们在破潮砥柱上建立了当地的约言联盟分部。星门于新纪元825年首次重新建立连接，约言联盟随后搬到了位于 Windfall | 横财 的自有空间站。(Scrap Metal same as {20201,6601}, Hull Parts same as {20201,1201}, Claytronics same as {20201,501})</t>
     <t id="130103">再生货物</t>
     <t id="130201">{20201,7601}{20104,130101}(Allographyne Scrap Recycler)</t>
     <t id="130202">星门关闭事件导致许多星区资源获取途径极为有限，这促使被困的工程师们设计出了先进的回收设施。其中一种便是异构石墨炔废料再生设施，该模块旨在将异构石墨炔碎片转化为可用的异构石墨炔资源。\n\n星门关闭后，首批星际信使无人机的抵达，促使许多星区的行政机构与现已无法通联的邻近星系共享生存关键信息，其中便包括了这种新型回收技术的蓝图。此举旨在支援资源匮乏的民众，并期望以此换取重要的情报作为回报。\n\n这种相互的信息交换体系运行得极为成功，以至于许多星区甚至在星门连接恢复后，仍在本地维持了这一体系。(Allographyne Fragments same as {20201,7401}, Allographyne same as {20201, 7601})</t>
@@ -51524,7 +51570,7 @@
     <t id="1244">(S Burst Ray Mk1){20111,5011} {20105,1241} {20111,101}</t>
     <t id="1245">(Burst Ray){20105,1241}</t>
     <t id="1251">爆能轰击炮</t>
-    <t id="1252">爆能轰击炮发射一种由超高温球粒物质包裹的紧凑型高爆弹头。弹头配备近炸引信，会在目标附近引爆，其巨大的爆炸半径弥补了该系统精度有限的不足。单次爆炸的覆盖范围足以瘫痪主力舰上的多个表面部件。\n\n由于其弹药速度高于等离子加农炮，因此常被拿来与之比较，并且在必要时具备有限攻击较小目标的能力。但它并非防空专用武器，而最适合用于对付难以规避其火力的中型或更大体型的舰船。\n\n爆能轰击炮的研发于教皇圣教团正式宣告成立之前，它体现了Paranid早期在工业产能受限的情况下，力求最大化战斗效能的努力。最终诞生的这款武器，兼具高破坏力与相对简单的制造工艺。\n\n</t>
+    <t id="1252">爆能轰击炮发射一种由超高温球粒物质包裹的紧凑型高爆弹头。弹头配备近炸引信，会在目标附近引爆，其巨大的爆炸半径弥补了该系统精度有限的不足。单次爆炸的覆盖范围足以瘫痪主力舰上的多个表面部件。\n\n由于其弹药速度高于等离子加农炮，因此常被拿来与之比较，并且在必要时具备有限攻击较小目标的能力。但它并非防空专用武器，而最适合用于对付难以规避其火力的中型或更大体型的舰船。\n\n爆能轰击炮的研发于教皇圣教团正式宣告成立之前，它体现了Paranid早期在工业产能受限的情况下，力求最大化战斗效能的努力。最终诞生的这款武器，兼具高破坏力与相对简单的制造工艺。</t>
     <t id="1254">(S Blast Mortar Mk1){20111,5011} {20105,1251} {20111,101}</t>
     <t id="1255">(Blast Mortar){20105,1251}</t>
     <t id="1261">(Burst Ray){20105,1241}</t>
@@ -51536,7 +51582,7 @@
     <t id="1274">(S Blast Mortar Mk2){20111,5011} {20105,1251} {20111,201}</t>
     <t id="1275">(Blast Mortar){20105,1271}</t>
     <t id="1281">玻色子矛</t>
-    <t id="1282">Split 玻色子矛可发射单发高速弹药，射程远，热输出可忽略不计。其主要局限在于其昂贵的能量恢复系统，该系统需要很长的再充能间隔，并且限制了更大的万向节摆动范围。\n\n因此，玻色子矛最常被用作副武器。尽管如此，Split 战斗机联队仍会经常指派一架专门配备此武器的战机，执行特定的拦截和初期交战任务。\n\n玻色子矛源自 Split 尖端武器研究，是相对较新的成果。在扎亚斯氏族政权与行星联合体重建联系后，Split获得了原始图纸，并对其设计进行了改良，以适应大规模制造。\n\n</t>
+    <t id="1282">Split 玻色子矛可发射单发高速弹药，射程远，热输出可忽略不计。其主要局限在于其昂贵的能量恢复系统，该系统需要很长的再充能间隔，并且限制了更大的万向节摆动范围。\n\n因此，玻色子矛最常被用作副武器。尽管如此，Split 战斗机联队仍会经常指派一架专门配备此武器的战机，执行特定的拦截和初期交战任务。\n\n玻色子矛源自 Split 尖端武器研究，是相对较新的成果。在扎亚斯氏族政权与行星联合体重建联系后，Split获得了原始图纸，并对其设计进行了改良，以适应大规模制造。</t>
     <t id="1284">(SPL S Boson Lance Mk1){20202,303} {20111,5011} {20105,1281} {20111,101}</t>
     <t id="1285">(Boson Lance){20105,1281}</t>
     <t id="1291">(Boson Lance){20105,1281}</t>
@@ -59591,7 +59637,7 @@
     <t id="1181">星门网络不稳定</t>
     <t id="1182">最初始于新纪元前24年，星门（包括地球人建造的在内）之间的连接，出乎意料的被切断了，随后，又同样意外的重新建立了连接。地球方面的侦察部队首先发现星门网络恢复连接后的配置和中断之前相比已经发生了变化。\n\n在"地球人冲突"期间，星门网络再次出现了不稳定，星门连接时断时续，一开始只是零星发生，后来达到了几乎每天都会出现的频率，最后在新纪元782年，星门之间的连接再一次彻底中断了。\n\n理论学家认为，星门的关闭与Xenon（或其他人工智能威胁）急剧增加的侵略行动具有高度的一致性，并怀疑此举是否是一种延缓智慧有机生命体被毁灭的尝试。</t>
     <t id="1191">星门关闭</t>
-    <t id="1192">新纪元782年，随着每一座星门都在毫无预警的情况下突然失效，星门网络彻底断开连接，整个宇宙顿时陷入混乱中。众多依赖于外部资源的星系陷入了无政府状态和内战，人们在恐慌中挣扎着为生存而战。久经考验的外交关系和联盟都被完全摧毁。许多星系和人员的命运都无从知晓。行星共同体——在运作了268年后，不复存在。</t>
+    <t id="1192">新纪元782年，在星门网络陷入不稳定20年之后，随着越来越多的星区失去联系，星门网络彻底宣告解离，整个宇宙顿时陷入混乱中。众多依赖于外部资源的星系陷入了无政府状态和内战，人们在恐慌中挣扎着为生存而战。久经考验的外交关系和联盟都被完全摧毁。许多星系和人员的命运都无从知晓。行星共同体——在运作了268年后，不复存在。</t>
     <t id="1201">约言联盟｜The Alliance of the Word</t>
     <t id="1202">新纪元801年，在行星共同体覆灭后19年，来自于神圣遗迹星区的信使无人机抵达了Argon之都和王国末路。无人机带来了Paranid人的消息，他们正试图寻找星门关闭的原因，并愿意提供任何可能的援助。这些Paranid自称为"约言联盟"，尽管跨星系的旅行已无法实现，但他们仍可以提供某种程度上的跨星系交流。\n\n至今，约言联盟仍然在神圣遗迹星区正常运作，不断向那些被困在已重新连接的星门网络之外的星系发射无人侦察机，以期能够找到那些在黑暗时代幸存下来的人们，并向他们提供必要的援助。</t>
     <t id="1211">总统末路（President\'s End）的大屠杀</t>

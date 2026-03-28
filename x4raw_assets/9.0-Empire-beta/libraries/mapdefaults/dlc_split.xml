@@ -223,8 +223,8 @@
         <resourcearea amount="3" ref="sphere_small_hydrogen_high"/>
         <resourcearea amount="1" ref="sphere_large_methane_low"/>
         <resourcearea amount="2" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="5" ref="sphere_small_nividium_medium"/>
-        <resourcearea amount="2" ref="sphere_small_nividium_veryhigh"/>
+        <resourcearea amount="3" ref="sphere_small_nividium_low"/>
+        <resourcearea amount="2" ref="sphere_small_nividium_medium"/>
         <resourcearea amount="5" ref="sphere_large_ore_low"/>
         <resourcearea amount="4" ref="sphere_medium_ore_medium"/>
         <resourcearea amount="4" ref="sphere_small_ore_veryhigh"/>

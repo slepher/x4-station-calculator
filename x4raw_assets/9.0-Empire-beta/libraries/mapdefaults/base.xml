@@ -456,12 +456,12 @@ Resource Area Yield level
         <resourcearea amount="2" ref="sphere_medium_ice_medium"/>
         <resourcearea amount="3" ref="sphere_small_ice_veryhigh"/>
         <resourcearea amount="6" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="5" ref="sphere_small_nividium_medium"/>
+        <resourcearea amount="4" ref="sphere_small_nividium_low"/>
         <resourcearea amount="4" ref="sphere_large_ore_medium"/>
         <resourcearea amount="6" ref="sphere_medium_ore_medium"/>
         <resourcearea amount="6" ref="sphere_small_ore_veryhigh"/>
         <resourcearea amount="11" ref="sphere_small_ore_veryhigh"/>
-        <!-- Additional resources for teh long highway region -->
+        <!-- Additional resources for the long highway region -->
         <!--
         <resourcearea amount="2" ref="sphere_large_silicon_medium"/>
         <resourcearea amount="3" ref="sphere_medium_silicon_medium"/>
@@ -997,9 +997,9 @@ Resource Area Yield level
         <resourcearea amount="6" ref="sphere_large_methane_low"/>
         <resourcearea amount="6" ref="sphere_medium_methane_medium"/>
         <resourcearea amount="4" ref="sphere_small_methane_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_large_nividium_high"/>
-        <resourcearea amount="3" ref="sphere_medium_nividium_high"/>
-        <resourcearea amount="3" ref="sphere_small_nividium_veryhigh"/>
+        <resourcearea amount="1" ref="sphere_medium_nividium_medium"/>
+        <resourcearea amount="2" ref="sphere_medium_nividium_medium"/>
+        <resourcearea amount="1" ref="sphere_small_nividium_veryhigh"/>
         <resourcearea amount="7" ref="sphere_large_ore_low"/>
         <resourcearea amount="6" ref="sphere_medium_ore_high"/>
         <resourcearea amount="3" ref="sphere_small_ore_veryhigh"/>
@@ -1427,7 +1427,7 @@ Resource Area Yield level
         <resourcearea amount="5" ref="sphere_medium_hydrogen_medium"/>
         <resourcearea amount="4" ref="sphere_small_hydrogen_veryhigh"/>
         <resourcearea amount="5" ref="sphere_medium_nividium_high"/>
-        <resourcearea amount="4" ref="sphere_small_nividium_veryhigh"/>
+        <resourcearea amount="3" ref="sphere_small_nividium_high"/>
         <resourcearea amount="3" ref="sphere_large_ore_low"/>
         <resourcearea amount="4" ref="sphere_medium_ore_medium"/>
         <resourcearea amount="3" ref="sphere_small_ore_high"/>
@@ -1447,7 +1447,7 @@ Resource Area Yield level
         <resourcearea amount="4" ref="sphere_medium_hydrogen_medium"/>
         <resourcearea amount="3" ref="sphere_small_hydrogen_veryhigh"/>
         <resourcearea amount="5" ref="sphere_medium_nividium_high"/>
-        <resourcearea amount="4" ref="sphere_small_nividium_veryhigh"/>
+        <resourcearea amount="3" ref="sphere_small_nividium_medium"/>
         <resourcearea amount="6" ref="sphere_large_ore_verylow"/>
         <resourcearea amount="4" ref="sphere_medium_ore_medium"/>
         <resourcearea amount="3" ref="sphere_small_ore_high"/>
@@ -1492,7 +1492,7 @@ Resource Area Yield level
         <resourcearea amount="7" ref="sphere_small_ice_high"/>
         <resourcearea amount="1" ref="sphere_medium_methane_medium"/>
         <resourcearea amount="7" ref="sphere_small_methane_high"/>
-        <resourcearea amount="3" ref="sphere_tiny_nividium_low"/>
+        <resourcearea amount="2" ref="sphere_small_nividium_medium"/>
         <resourcearea amount="8" ref="sphere_medium_ore_medium"/>
         <resourcearea amount="7" ref="sphere_small_ore_high"/>
         <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
@@ -1584,7 +1584,7 @@ Resource Area Yield level
         <resourcearea amount="1" ref="sphere_small_methane_verylow"/>
         <resourcearea amount="1" ref="sphere_tiny_methane_verylow"/>
         <resourcearea amount="1" ref="sphere_small_nividium_low"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_veryhigh"/>
+        <resourcearea amount="1" ref="sphere_tiny_nividium_high"/>
         <resourcearea amount="4" ref="sphere_medium_ore_low"/>
         <resourcearea amount="4" ref="sphere_small_ore_medium"/>
         <resourcearea amount="3" ref="sphere_medium_silicon_medium"/>
@@ -1896,9 +1896,9 @@ Resource Area Yield level
         <resourcearea amount="9" ref="sphere_small_hydrogen_veryhigh"/>
         <resourcearea amount="2" ref="sphere_medium_ice_medium"/>
         <resourcearea amount="1" ref="sphere_small_ice_high"/>
-        <resourcearea amount="2" ref="sphere_large_nividium_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_nividium_medium"/>
-        <resourcearea amount="6" ref="sphere_small_nividium_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_medium_nividium_low"/>
+        <resourcearea amount="3" ref="sphere_small_nividium_low"/>
+        <resourcearea amount="3" ref="sphere_small_nividium_medium"/>
         <resourcearea amount="7" ref="sphere_medium_ore_medium"/>
         <resourcearea amount="5" ref="sphere_small_ore_high"/>
         <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
@@ -2038,8 +2038,8 @@ Resource Area Yield level
         <resourcearea amount="5" ref="sphere_large_ice_low"/>
         <resourcearea amount="8" ref="sphere_medium_ice_medium"/>
         <resourcearea amount="4" ref="sphere_small_ice_high"/>
-        <resourcearea amount="5" ref="sphere_medium_nividium_medium"/>
-        <resourcearea amount="2" ref="sphere_small_nividium_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_medium_nividium_low"/>
+        <resourcearea amount="2" ref="sphere_small_nividium_medium"/>
         <resourcearea amount="4" ref="sphere_large_ore_medium"/>
         <resourcearea amount="7" ref="sphere_medium_ore_medium"/>
         <resourcearea amount="5" ref="sphere_small_ore_veryhigh"/>
@@ -2127,7 +2127,7 @@ Resource Area Yield level
         <resourcearea amount="2" ref="sphere_small_ice_veryhigh"/>
         <resourcearea amount="1" ref="sphere_medium_methane_low"/>
         <resourcearea amount="2" ref="sphere_small_methane_medium"/>
-        <resourcearea amount="4" ref="sphere_medium_nividium_medium"/>
+        <resourcearea amount="3" ref="sphere_medium_nividium_medium"/>
         <resourcearea amount="2" ref="sphere_small_nividium_veryhigh"/>
         <resourcearea amount="2" ref="sphere_large_ore_low"/>
         <resourcearea amount="4" ref="sphere_medium_ore_medium"/>
@@ -2314,9 +2314,9 @@ Resource Area Yield level
         <resourcearea amount="5" ref="sphere_large_hydrogen_verylow"/>
         <resourcearea amount="2" ref="sphere_medium_hydrogen_medium"/>
         <resourcearea amount="4" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="2" ref="sphere_large_nividium_medium"/>
+        <resourcearea amount="1" ref="sphere_large_nividium_low"/>
         <resourcearea amount="2" ref="sphere_medium_nividium_medium"/>
-        <resourcearea amount="2" ref="sphere_small_nividium_veryhigh"/>
+        <resourcearea amount="1" ref="sphere_small_nividium_high"/>
         <resourcearea amount="3" ref="sphere_large_ore_low"/>
         <resourcearea amount="5" ref="sphere_medium_ore_medium"/>
         <resourcearea amount="3" ref="sphere_small_ore_high"/>
@@ -2475,7 +2475,7 @@ Resource Area Yield level
       <resourceareas>
         <resourcearea amount="2" ref="sphere_large_ice_medium"/>
         <resourcearea amount="3" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_small_nividium_high"/>
+        <resourcearea amount="3" ref="sphere_small_nividium_medium"/>
         <resourcearea amount="2" ref="sphere_large_ore_medium"/>
         <resourcearea amount="3" ref="sphere_medium_ore_medium"/>
         <resourcearea amount="3" ref="sphere_small_ore_high"/>
@@ -2568,7 +2568,7 @@ Resource Area Yield level
       </worlds>
     </properties>
   </dataset>
-  <!--Mists of Artemmis-->
+  <!--Mists of Artemis-->
   <dataset macro="cluster_715_macro">
     <properties>
       <identification name="{20003,7150001}" description="{20003,7150002}" image="enc_cluster715"/>
@@ -2602,7 +2602,7 @@ Resource Area Yield level
         <resourcearea amount="1" ref="sphere_large_methane_low"/>
         <resourcearea amount="4" ref="sphere_medium_methane_medium"/>
         <resourcearea amount="1" ref="sphere_small_methane_high"/>
-        <resourcearea amount="5" ref="sphere_small_nividium_veryhigh"/>
+        <resourcearea amount="4" ref="sphere_small_nividium_medium"/>
         <resourcearea amount="3" ref="sphere_large_ore_low"/>
         <resourcearea amount="4" ref="sphere_medium_ore_medium"/>
         <resourcearea amount="3" ref="sphere_small_ore_veryhigh"/>
@@ -2699,7 +2699,7 @@ Resource Area Yield level
         <resourcearea amount="2" ref="sphere_large_methane_low"/>
         <resourcearea amount="3" ref="sphere_medium_methane_medium"/>
         <resourcearea amount="3" ref="sphere_small_methane_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_small_nividium_veryhigh"/>
+        <resourcearea amount="1" ref="sphere_small_nividium_medium"/>
         <resourcearea amount="3" ref="sphere_large_ore_low"/>
         <resourcearea amount="3" ref="sphere_medium_ore_high"/>
         <resourcearea amount="6" ref="sphere_small_ore_veryhigh"/>
