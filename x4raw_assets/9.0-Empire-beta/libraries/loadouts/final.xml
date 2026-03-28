@@ -2021,6 +2021,58 @@
       <crew role="service" exact="0"/>
     </crew>
   </loadout>
+  <loadout id="story_criminal_ministry_falcon" macro="ship_tel_s_fighter_01_b_macro">
+    <macros>
+      <engine macro="engine_tel_s_combat_01_mk1_macro" path="../con_engine_02"/>
+      <engine macro="engine_tel_s_combat_01_mk1_macro" path="../con_engine_01"/>
+      <weapon macro="weapon_gen_s_laser_01_mk1_macro" path="../con_weapon_01"/>
+      <weapon macro="weapon_gen_s_laser_01_mk1_macro" path="../con_weapon_02"/>
+      <shield macro="shield_tel_s_standard_01_mk2_macro" path="../con_shield_01"/>
+      <shield macro="shield_tel_s_standard_01_mk2_macro" path="../con_shield_02"/>
+    </macros>
+    <software>
+      <software ware="software_flightassistmk1"/>
+      <software ware="software_scannerlongrangemk1"/>
+      <software ware="software_scannerobjectmk1"/>
+      <software ware="software_targetmk1"/>
+    </software>
+    <virtualmacros>
+      <thruster macro="thruster_gen_s_allround_01_mk2_macro"/>
+    </virtualmacros>
+    <crew>
+      <crew role="service" exact="0"/>
+      <crew role="marine" exact="0"/>
+    </crew>
+  </loadout>
+  <loadout id="story_criminal_ministry_peregrine" macro="ship_tel_m_bomber_01_b_macro">
+    <macros>
+      <engine macro="engine_tel_m_combat_01_mk1_macro" path="../con_engine_02"/>
+      <engine macro="engine_tel_m_combat_01_mk1_macro" path="../con_engine_01"/>
+      <weapon macro="weapon_tel_m_charge_01_mk1_macro" path="../con_primaryweapon_002"/>
+      <weapon macro="weapon_tel_m_charge_01_mk1_macro" path="../con_primaryweapon_01"/>
+      <weapon macro="weapon_gen_m_dumbfire_02_mk1_macro" path="../con_missilelauncher_01"/>
+      <shield macro="shield_tel_m_standard_01_mk1_macro" path="../con_shield_01"/>
+      <shield macro="shield_tel_m_standard_01_mk1_macro" path="../con_shield_02"/>
+      <shield macro="shield_tel_m_standard_01_mk1_macro" path="../con_shield_003"/>
+      <turret macro="turret_tel_m_plasma_01_mk1_macro" path="../con_turret_l01"/>
+      <turret macro="turret_tel_m_plasma_01_mk1_macro" path="../con_turret_l03"/>
+      <turret macro="turret_tel_m_gatling_01_mk1_macro" path="../con_turret_l02"/>
+      <turret macro="turret_tel_m_gatling_01_mk1_macro" path="../con_turret_l04"/>
+    </macros>
+    <software>
+      <software ware="software_flightassistmk1"/>
+      <software ware="software_scannerlongrangemk1"/>
+      <software ware="software_scannerobjectmk1"/>
+      <software ware="software_targetmk1"/>
+    </software>
+    <virtualmacros>
+      <thruster macro="thruster_gen_m_allround_01_mk1_macro"/>
+    </virtualmacros>
+    <crew>
+      <crew role="service" exact="0"/>
+      <crew role="marine" exact="0"/>
+    </crew>
+  </loadout>
   <loadout id="story_thefan_scavenger" macro="ship_tel_m_trans_container_02_b_macro">
     <macros>
       <engine macro="engine_tel_m_combat_01_mk3_macro" path="../con_engine_01"/>
@@ -2326,8 +2378,8 @@
       <engine macro="engine_tel_s_combat_01_mk3_macro" path="../con_engine_02"/>
       <engine macro="engine_tel_s_combat_01_mk3_macro" path="../con_engine_01"/>
       <engine macro="engine_tel_s_combat_01_mk3_macro" path="../con_engine_04"/>
-      <weapon macro="weapon_tel_s_charge_01_mk2_macro" path="../con_weapon_01"/>
-      <weapon macro="weapon_tel_s_charge_01_mk2_macro" path="../con_weapon_02"/>
+      <weapon macro="weapon_gen_s_shotgun_01_mk2_macro" path="../con_weapon_01"/>
+      <weapon macro="weapon_gen_s_shotgun_01_mk2_macro" path="../con_weapon_02"/>
       <shield macro="shield_tel_s_standard_01_mk3_macro" path="../con_shield_01"/>
     </macros>
     <ammunition>
@@ -2452,8 +2504,8 @@
     <macros>
       <engine macro="engine_tel_s_allround_01_mk1_macro" path="../con_engine_02"/>
       <engine macro="engine_tel_s_allround_01_mk1_macro" path="../con_engine_01"/>
-      <weapon macro="weapon_tel_s_charge_01_mk2_macro" path="../con_weapon_01"/>
-      <weapon macro="weapon_tel_s_charge_01_mk2_macro" path="../con_weapon_02"/>
+      <weapon macro="weapon_gen_s_shotgun_01_mk2_macro" path="../con_weapon_01"/>
+      <weapon macro="weapon_gen_s_shotgun_01_mk2_macro" path="../con_weapon_02"/>
       <shield macro="shield_tel_s_standard_01_mk3_macro" path="../con_shield_01"/>
     </macros>
     <ammunition>

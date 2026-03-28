@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Last exported: 09.03.2026 17:03:19-->
+<!--Last exported: 19.03.2026 19:38:48-->
 <diff>
   <add sel="/wares/production">
     <method id="split" name="{20206,701}">
@@ -1149,11 +1149,11 @@
       <owner faction="split" />
     </ware>
     <ware id="ship_spl_l_destroyer_01_a" name="{20101,42801}" description="{20101,42811}" transport="ship" volume="1" tags="ship">
-      <price min="10617172" average="12490790" max="14364409" />
+      <price min="13761711" average="15290790" max="16819869" />
       <production time="309" amount="1" method="default" name="{20206,101}">
         <primary>
-          <ware ware="energycells" amount="1710" />
-          <ware ware="hullparts" amount="11822" />
+          <ware ware="energycells" amount="11945" />
+          <ware ware="hullparts" amount="17375" />
         </primary>
       </production>
       <component ref="ship_spl_l_destroyer_01_a_macro" />
@@ -1831,12 +1831,12 @@
       <owner faction="split" />
     </ware>
     <ware id="weapon_spl_l_destroyer_01_mk1" name="{20105,3034}" description="{20105,3032}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
-      <price min="1065524" average="1183915" max="1302307" />
+      <price min="1335524" average="1483915" max="1632307" />
       <production time="10" amount="1" method="default" name="{20206,101}">
         <primary>
-          <ware ware="advancedelectronics" amount="269" />
-          <ware ware="energycells" amount="2441" />
-          <ware ware="weaponcomponents" amount="274" />
+          <ware ware="advancedelectronics" amount="338" />
+          <ware ware="energycells" amount="3060" />
+          <ware ware="weaponcomponents" amount="343" />
         </primary>
       </production>
       <component ref="weapon_spl_l_destroyer_01_mk1_macro" />

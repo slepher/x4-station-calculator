@@ -1017,15 +1017,16 @@
     <mapping id="resource_icon_silicon" ref="azure_glow"/>
     <mapping id="resource_icon_nividium" ref="magenta_glow"/>
     <mapping id="resource_icon_ice" ref="azure_very_bright_glow"/>
+    <mapping id="resource_map_default" ref="azure_very_dark"/>
     <mapping id="resource_map_ore" ref="orange_dark"/>
-    <mapping id="resource_map_silicon" ref="azure_dark"/>
+    <mapping id="resource_map_silicon" ref="cyan_dark"/>
     <mapping id="resource_map_nividium" ref="magenta_dark"/>
-    <mapping id="resource_map_ice" ref="grey_128"/>
-    <mapping id="resource_map_hydrogen" ref="cyan_dark"/>
+    <mapping id="resource_map_ice" ref="azure_very_bright"/>
+    <mapping id="resource_map_hydrogen" ref="cyan_bright_glow"/>
     <mapping id="resource_map_helium" ref="yellow_dark"/>
     <mapping id="resource_map_methane" ref="green_dark"/>
-    <mapping id="resource_map_scrap" ref="grey_96"/>
-    <mapping id="resource_map_khaakscrap" ref="grey_96"/>
+    <mapping id="resource_map_scrap" ref="azure_extra_bright"/>
+    <mapping id="resource_map_khaakscrap" ref="magenta_extra_bright_moderate_glow"/>
     <mapping id="playeractivity_travel" ref="orange_dark_glow"/>
     <mapping id="playeractivity_travel_background" ref="orange_extra_dark"/>
     <mapping id="playeractivity_longrangescan" ref="cyan_bright_glow"/>

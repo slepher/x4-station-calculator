@@ -3332,6 +3332,10 @@
     <t id="11688">Miner evaluation time(followed by colon and added percentage)</t>
     <t id="11689">Potential Resource</t>
     <t id="11690">Detected Resource</t>
+    <t id="11691">Introducing Priority Orders</t>
+    <t id="11692">You can now use modifier keys to give queued \(%s($INPUT_MODIFIER_ICON$)\) and priority \(%s($INPUT_MODIFIER_ICON$)\) orders directly from the map or from within the Interact menu. By default, orders given to ships without using these modifier keys will now overwrite any previously queued order.</t>
+    <t id="11693">If you prefer the old behaviour then you can change the Default Order Behaviour setting in the Game Settings menu to Queue, so that pressing %s($INPUT_MODIFIER_ICON$) while using the Interact menu will overwrite the order instead of adding it to the queue.</t>
+    <t id="11694">Press Yes if you would like to try the new default modifier behaviour, or No if you would like to keep the old behaviour and use %s($INPUT_MODIFIER_ICON$) to overwrite orders.</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Save offline</t>
     <t id="11702">Overwrite offline save</t>
@@ -3743,6 +3747,8 @@
     <t id="12786">AMD FSR Frame Generation</t>
     <t id="12787">Experimental Improved Controller Support</t>
     <t id="12788">AMD FSR</t>
+    <t id="12789">If this is your first time in X4, we suggest you try out some Tutorials before starting your journey into the Open Universe of X4.</t>
+    <t id="12790">Start New Open Universe</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">Embassy Actions</t>
     <t id="12803">Diplomat</t>
@@ -3947,6 +3953,7 @@
     <t id="13325">Cancel Module Selection</t>
     <t id="13326">Focus Station Model</t>
     <t id="13327">Queued Priority Order</t>
+    <t id="13328">Gather Rate(of resources; header item for table column)</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Hoşçakal</t>
@@ -5382,6 +5389,8 @@
     <t id="993">For a more detailed introduction to flight mechanics, try the Flight School(translate as 1021,7000) tutorial gamestart.</t>
     <t id="994">Highlighted conversation options progress the story. If you wish to hear all the dialog, select the other options first.</t>
     <t id="995">You can replay this tutorial, and play other tutorials at your own pace, by opening the Options Menu and selecting Play Tutorials.("Options Menu" same as {1001,2600},  "Play Tutorials" same as {1001,12660})</t>
+    <t id="996">Place resource probes near rich resource areas. If the correct resource is detected, your miners will prefer that location until it's depleted.</t>
+    <t id="997">Too many resource probes in a sector reduce efficiency, so use them wisely. They are entirely optional. Your miners will be able to find and mine resources on their own.</t>
     <t id="1000">(Generic Hints)</t>
     <t id="1001">You can abort this tutorial in the '{1001,8701}' menu.</t>
     <t id="1002">Tutorial Completed!</t>
@@ -7385,6 +7394,8 @@
     <t id="5901">A showcase scenario of X4: Foundations</t>
     <t id="5902">Tradeshow Environment</t>
     <t id="5904">Welcome to X4!\n\nThis focused demo drops you straight into the action. Get a taste of X4's large-scale space battles as you join an allied fleet, fight off enemy forces, and defend a besieged station on the frontier.\n\nEngage in intense dogfights near a Jump Gate, backed by powerful capital ships and automated defences. With no setup or downtime, you're free to jump in, take the controls, and experience the scale, tension, and beauty of space combat in X4: Foundations.</t>
+    <t id="5905">Tradeshow Playground</t>
+    <t id="5906">Welcome to X4!\n\nThis scenario drops you into a busy sector within a downscaled universe, giving you a taste of the immense scale and possibilities of X4: Foundations.</t>
     <t id="6000">Tutorial: Advanced Gameplay</t>
     <t id="6001">{1021,6101}</t>
     <t id="6002">Rayma Sedim</t>
@@ -8229,7 +8240,7 @@
     <t id="4602">Determine whether trading in specific products at this station should be restricted.</t>
     <t id="4800">(Options menu range 26xx continued)</t>
     <t id="4801">Launch your journey as a lone pilot and rise to become a galactic power in a large, persistent universe, choosing your own path with optional story missions.</t>
-    <t id="4802">It is recommended that new players complete the basic tutorials first. We then suggest you try Timelines, but if you prefer a sandbox experience then you can head straight to the Open Universe.</t>
+    <t id="4802">It is recommended that new players complete the basic tutorials first. But if you prefer a sandbox experience then you can head straight to the Open Universe and revisit the tutorials at any time.</t>
     <t id="4803">This will continue your most recent savegame in the Open Universe.\n\nPlease note that Timelines does not require a savegame.</t>
     <t id="4804">This will allow you to choose one of multiple savegames to continue in the Open Universe.\n\nPlease note that Timelines does not require a savegame.</t>
     <t id="4805">There is a wide range of quick tutorials available to teach or remind you how the activities in the game will work.\n\nStart your journey here, and come back whenever you run into a problem.</t>
@@ -8654,6 +8665,7 @@
     <t id="9929">You cannot select this option because doing so would de-select an option that is required to unlock a sector in which you have placed property.</t>
     <t id="9930">This custom game cannot be chosen because it contains restricted objects that you have not yet unlocked.</t>
     <t id="9931">This custom game contains loadouts that include incompatible equipment. Incompatible equipment will not be installed.</t>
+    <t id="9932">This custom game contains wares or blueprints that are no longer valid. Affected items will not be used.</t>
     <t id="10000">(Generic Error / Info){1001,10003}</t>
     <t id="11300">(Online)</t>
     <t id="11301">Accepting this mission will abort any other multiverse operation mission.</t>
@@ -9071,7 +9083,7 @@
     <t id="5003">Orta</t>
     <t id="5004">Güçlü</t>
     <t id="5005">Çok Güçlü</t>
-    <t id="6001">Sızıyor</t>
+    <t id="6001">Sızılıyor</t>
     <t id="6002">Çatışmada</t>
     <t id="6003">Çatışmada Öldü</t>
   </page>
@@ -9276,6 +9288,8 @@
     <t id="902">Rescue people stranded in space suits in the specified area.</t>
     <t id="911">Visit stations</t>
     <t id="912">Visit important stations belonging to various factions.</t>
+    <t id="921">Prospect</t>
+    <t id="922">Find resource areas, mark them with resource probes, pick up and redeploy outdated probes.</t>
     <t id="10000">Abort path</t>
     <t id="10001">About to finish</t>
     <t id="10002">Active patrol</t>
@@ -9439,6 +9453,7 @@
     <t id="10177">Delay</t>
     <t id="10178">Wares \(Manual\)</t>
     <t id="10179">Ware basket</t>
+    <t id="10180">Max deployed resource probes</t>
   </page>
   <page id="1042" title="Encyclopedia Data Texts" descr="Describes additional data in encyclopedia entries" voice="no">
     <t id="10011">None</t>
@@ -11468,6 +11483,19 @@
     <t id="115">Or you can ignore all of this and simply follow one of the many fascinating plot lines, focus on exploration, or try the innumerable other activities that are available in the X Universe.</t>
     <t id="116">You can adjust your forward speed using the X and Y keys, the mouse wheel, or the throttle stick.</t>
     <t id="117">Once you've selected a target, the targeting system will try to lock on. When the lock is achieved, you can launch a missile with the R key or secondary fire button.</t>
+    <t id="200">(Tradeshow Playground Scenario)</t>
+    <t id="201">Welcome to X4: Foundations, a living universe with hundreds of sectors connected by gates. These sectors can be explored, and contain thousands of ships and stations operating within a fully simulated economy. You can own and command everything, ranging from a single tiny fighter to a grand empire with merchant fleets and powerful capital ships, to shape your story.</t>
+    <t id="202">This scenario places you near one of the many hundreds of bustling space stations you'll find in our living universe, with traders delivering wares and miners gathering resources. \nRecently there have been skirmishes with the machine intelligence known as the Xenon pouring in from the nearby gate, disrupting the trade.</t>
+    <t id="211">(explore explanation)Leaving the station behind, you are free to explore the other sectors and factions. The full X-Universe contains hundreds of unique sectors inhabited by various factions and species, all with rich history.</t>
+    <t id="212">(fight explanation)The Gate network is not always safe. Between the machine intelligence known as the Xenon, pirates, warring factions and the occasional war profiteering opportunist, you will see clashes ranging from small skirmishes to giant fleet brawls.</t>
+    <t id="213">(mining explanation)Ships like these mine the raw resources that the majority of the economy is based on. Once delivered they are refined, moved to factories and eventually turned into the wares that can be used to build the ships and stations you see.</t>
+    <t id="214">(trading explanation)Traders, haulers and merchants transport wares between stations. They buy where goods are plentiful and sell them where they are scarce, keeping the gears of the economy turning.</t>
+    <t id="215">(shipyard construction)This ship is currently under construction using the wares created by other stations. It will soon defend this sector from any further incursions.</t>
+    <t id="216">(launch tube explanation)The station is launching fighters from its launch tubes to defend itself from incoming attackers.</t>
+    <t id="217">(station attack explanation)A hostile Xenon force is approaching. If they damage the station, the production of new ships could be severely limited.</t>
+    <t id="218">(criminal explanation)Criminals try to capitalise on transporting illicit wares for great profits by hiding in traffic around stations. These criminals can even run organised operations with their own stations and masked freighters.</t>
+    <t id="219">(explore suggestion)There are more sights to see and things to do. Try flying around and targeting different objects.</t>
+    <t id="220">X4: Foundations has so much more to offer. You can quickly earn enough money to own a fleet of ships. You can hire other pilots to work for you, and follow your orders. Let them trade or mine to earn you money, while you follow one of the many plot lines or carry out standalone missions that can be found throughout the vast universe.</t>
   </page>
   <page id="10098" title="Torus Computer" descr="0" voice="yes">
     <t id="30224000">(Pioneer Terraforming Mission)</t>
@@ -20360,7 +20388,6 @@
   <page id="10120" title="Mission Argon/Terran NPC Female 22 / Segaris diplomat" descr="Lines for Segaris Faction Diplomat" voice="yes">
     <t id="2001">Merhabalar.</t>
     <t id="2007">Kendine iyi bak.</t>
-    <t id="2009">Sonunda.</t>
     <t id="3000">(* Diplomat specific lines *)</t>
     <t id="3001">Segaris Öncüleri olarak davetinizi memnuniyetle kabul ediyoruz. Kısa süre içinde elçiliğinize varacağım.</t>
     <t id="3002">Elçiliğinize vardım.</t>
@@ -23863,6 +23890,7 @@
     <t id="36">Bunu sonra yapacağız.</t>
     <t id="37">Haritayı kapat.</t>
     <t id="38">Şimdi.</t>
+    <t id="39">One last thing.</t>
     <t id="1000">(Introduction and physical)</t>
     <t id="1001">Merhaba. Ben Jace Winger, bugünkü uçuş eğitmeninim. Tüm ders planını gözden geçireceğiz, ancak bazı temel bilgileri zaten biliyorsan, ileriye atlamak için benimle konuşabilirsin.</t>
     <t id="1002">Başlamadan önce birkaç rutin fiziksel test yapmam gerekiyor. Yönetmelikler işte, anlarsın ya. (son cümleyi biraz özür dileyerek söyleyin)</t>
@@ -24597,6 +24625,24 @@
     <t id="25040">Sağdaki çubuk ne kadar tükendiğini gösteriyor.</t>
     <t id="25041">Kaynaklar zamanla yenilenir, ancak bir alan neredeyse boşaldığında bir alternatif bulmak muhtemelen daha iyi olur.</t>
     <t id="25042">Daha gelişmiş olanlar daha deneyimli bir pilot gerektirir, ancak bir dizi sistem içinde çalışmasını da mümkün kılar.</t>
+    <t id="25043">The coloured areas indicate potential resource locations.</t>
+    <t id="25044">Open the mining filter settings.</t>
+    <t id="25045">Select one of the highlighted gas resource wares.</t>
+    <t id="25046">The colour on the map has changed to indicate the selected resource.</t>
+    <t id="25047">You also only see potential locations for this resource now.(slight emphasis on "this resource")</t>
+    <t id="25048">Change its default behaviour to Local AutoMine.</t>
+    <t id="25049">Configure it to gather any of the gas resources in this sector.</t>
+    <t id="25050">The ship will now try to find the resource, gather it and sell it in the specified sector.</t>
+    <t id="25051">You can guide their operations more manually with resource probes.</t>
+    <t id="25052">Deploy one in one of the gas regions.</t>
+    <t id="25053">Your miners will check resource probes first when determining where to gather resources.</t>
+    <t id="25054">The more probes you deploy in a sector, the longer this step takes, so use them wisely.</t>
+    <t id="25055">You can also see exactly where resources are currently being detected.</t>
+    <t id="25056">Select your gas miner again, then directly order it to mine in one of the areas with detected resources.</t>
+    <t id="25057">Resources will eventually deplete.</t>
+    <t id="25058">They will replenish over time, but probably in a different location.</t>
+    <t id="25059">So keep an eye on your resource probes and remove or re-deploy the ones that aren't useful any longer.</t>
+    <t id="25060">Or, if you have the ships to spare, dedicate someone to prospecting a sector and maintaining the locations of your resource probes.</t>
     <t id="26000">(Station Building)</t>
     <t id="26001">Bugün en ileri düzey derslerimden birini ele alacağız: istasyon tasarlama ve inşa etme.</t>
     <t id="26002">Öncelikle bir arsaya ihtiyacın var.</t>
@@ -34897,7 +34943,7 @@
     <t id="10073">(variant)(apology for friendly fire)I cannot be held responsible for your poor positioning.</t>
     <t id="10074">(variant)(taunt - xenon)Mechanical monstrosity!</t>
     <t id="10075">(variant)(taunt - silent enemy)I will strike you down!</t>
-    <t id="10076">(variant)(single-crew ship hit without taking serious damage - xenon)This cursed machine that dares to hit me will be obliterated</t>
+    <t id="10076">(variant)(single-crew ship hit without taking serious damage - xenon)This cursed machine that dares to hit me will be obliterated.</t>
     <t id="10077">(variant)(single-crew ship hit without taking serious damage - silent enemy)Your firepower is insufficient.</t>
     <t id="10078">(variant)(threat)I WILL defeat you.</t>
     <t id="10079">(variant)(threat)Your inferiority is plain to see.</t>
@@ -34908,7 +34954,7 @@
     <t id="10084">(variant)(losing an enemy)Enough of this! I will shake them off.</t>
     <t id="10085">Dronlar gönderiliyor!</t>
     <t id="10086">(variant)(small ship hit, not in danger - generic)You will soon recognise your own inferiority.</t>
-    <t id="10087">(variant)(small ship hit, not in danger - generic)Your feeble attempts do not concern me</t>
+    <t id="10087">(variant)(small ship hit, not in danger - generic)Your feeble attempts do not concern me.</t>
     <t id="10088">(variant)(response to small ship hit, generic - small ship)What you have felt is only the start.</t>
     <t id="10089">(variant)(response to small ship hit, generic - big ship)Your annihilation is inevitable.</t>
     <t id="10090">(variant)(victorious cheering)For Paranid!</t>

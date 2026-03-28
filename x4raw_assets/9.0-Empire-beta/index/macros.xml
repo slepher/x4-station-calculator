@@ -2856,6 +2856,24 @@
   <entry name="effect_gen_s_boost_01_macro" value="assets\fx\misc\macros\effect_gen_s_boost_01_macro"/>
   <entry name="effect_gen_xl_boost_01_macro" value="assets\fx\misc\macros\effect_gen_xl_boost_01_macro"/>
   <entry name="effect_gen_xl_boost_02_macro" value="assets\fx\misc\macros\effect_gen_xl_boost_02_macro"/>
+  <entry name="impact_arg_l_laser_01_mk1_macro" value="assets\fx\weaponfx\macros\impact_arg_l_laser_01_mk1_macro"/>
+  <entry name="impact_par_l_laser_01_mk1_macro" value="assets\fx\weaponfx\macros\impact_par_l_laser_01_mk1_macro"/>
+  <entry name="impact_tel_l_laser_01_mk1_macro" value="assets\fx\weaponfx\macros\impact_tel_l_laser_01_mk1_macro"/>
+  <entry name="muzzle_arg_l_laser_01_mk1_macro" value="assets\fx\weaponfx\macros\muzzle_arg_l_laser_01_mk1_macro"/>
+  <entry name="muzzle_par_l_laser_01_mk1_macro" value="assets\fx\weaponfx\macros\muzzle_par_l_laser_01_mk1_macro"/>
+  <entry name="muzzle_tel_l_laser_01_mk1_macro" value="assets\fx\weaponfx\macros\muzzle_tel_l_laser_01_mk1_macro"/>
+  <entry name="muzzle_gen_m_plasma_01_mk1_macro" value="assets\fx\weaponfx\macros\muzzle_gen_m_plasma_01_mk1_macro"/>
+  <entry name="impact_gen_m_plasma_01_mk1_macro" value="assets\fx\weaponfx\macros\impact_gen_m_plasma_01_mk1_macro"/>
+  <entry name="test_markus_room_01_macro" value="assets\test\markus\macros\test_markus_room_01_macro"/>
+  <entry name="impact_tel_m_charge_01_mk1_macro" value="assets\fx\weaponfx\macros\impact_tel_m_charge_01_mk1_macro"/>
+  <entry name="impact_arg_l_beam_01_mk1_macro" value="assets\fx\weaponfx\macros\impact_arg_l_beam_01_mk1_macro"/>
+  <entry name="impact_gen_l_beam_01_mk1_macro" value="assets\fx\weaponfx\macros\impact_gen_l_beam_01_mk1_macro"/>
+  <entry name="impact_par_l_beam_01_mk1_macro" value="assets\fx\weaponfx\macros\impact_par_l_beam_01_mk1_macro"/>
+  <entry name="impact_tel_l_beam_01_mk1_macro" value="assets\fx\weaponfx\macros\impact_tel_l_beam_01_mk1_macro"/>
+  <entry name="muzzle_arg_l_beam_01_mk1_macro" value="assets\fx\weaponfx\macros\muzzle_arg_l_beam_01_mk1_macro"/>
+  <entry name="muzzle_gen_l_beam_01_mk1_macro" value="assets\fx\weaponfx\macros\muzzle_gen_l_beam_01_mk1_macro"/>
+  <entry name="muzzle_par_l_beam_01_mk1_macro" value="assets\fx\weaponfx\macros\muzzle_par_l_beam_01_mk1_macro"/>
+  <entry name="muzzle_tel_l_beam_01_mk1_macro" value="assets\fx\weaponfx\macros\muzzle_tel_l_beam_01_mk1_macro"/>
   <entry name="cluster_sm_split_macro" value="extensions\ego_dlc_split\assets\environments\cluster\macros\cluster_sm_split_macro"/>
   <entry name="cluster_400_macro" value="extensions\ego_dlc_split\maps\XU_ep2_universe\dlc4_clusters"/>
   <entry name="cluster_401_macro" value="extensions\ego_dlc_split\maps\XU_ep2_universe\dlc4_clusters"/>
@@ -3766,6 +3784,7 @@
   <entry name="shield_ter_m_standard_01_mk1_video_macro" value="extensions\ego_dlc_terran\assets\props\surfaceelements\macros\shield_ter_m_standard_01_mk1_video_macro"/>
   <entry name="shield_ter_m_standard_01_mk2_video_macro" value="extensions\ego_dlc_terran\assets\props\surfaceelements\macros\shield_ter_m_standard_01_mk2_video_macro"/>
   <entry name="shield_ter_m_standard_01_mk3_video_macro" value="extensions\ego_dlc_terran\assets\props\surfaceelements\macros\shield_ter_m_standard_01_mk3_video_macro"/>
+  <entry name="bullet_ter_turret_m_laser_01_mk1_macro" value="extensions\ego_dlc_terran\assets\fx\weaponfx\macros\bullet_ter_turret_m_laser_01_mk1_macro"/>
   <entry name="sm_pir_region_macro" value="extensions\ego_dlc_pirate\libraries\macro"/>
   <entry name="sm_pir_region2_macro" value="extensions\ego_dlc_pirate\libraries\macro"/>
   <entry name="sm_pir_region3_macro" value="extensions\ego_dlc_pirate\libraries\macro"/>

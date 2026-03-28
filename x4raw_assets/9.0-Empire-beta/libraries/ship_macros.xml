@@ -224,7 +224,7 @@
       </jerk>
       <explosiondamage value="800" shield="4000" shielddisruption="10"/>
       <storage missile="30" unit="10"/>
-      <hull max="26000"/>
+      <hull max="36000"/>
       <secrecy level="1"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -241,7 +241,8 @@
       </sounds>
       <physics mass="205.27">
         <inertia pitch="240" yaw="240" roll="200"/>
-        <drag forward="56.738" reverse="255" horizontal="40.5" vertical="40.5" pitch="140.897" yaw="140.897" roll="140.897"/>
+        <drag forward="50.9" reverse="229" horizontal="40.5" vertical="40.5" pitch="140.897" yaw="140.897" roll="140.897"/>
+        <accfactors forward="0.96"/>
       </physics>
       <thruster tags="large"/>
       <ship type="largeminer"/>
@@ -293,7 +294,7 @@
       </jerk>
       <explosiondamage value="800" shield="4000" shielddisruption="10"/>
       <storage missile="30" unit="10"/>
-      <hull max="32000"/>
+      <hull max="43200"/>
       <secrecy level="1"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -310,7 +311,8 @@
       </sounds>
       <physics mass="246.324">
         <inertia pitch="240" yaw="240" roll="200"/>
-        <drag forward="62.485" reverse="281" horizontal="46" vertical="46" pitch="155.677" yaw="155.677" roll="155.677"/>
+        <drag forward="59.9" reverse="270" horizontal="46" vertical="46" pitch="155.677" yaw="155.677" roll="155.677"/>
+        <accfactors forward="0.96"/>
       </physics>
       <thruster tags="large"/>
       <ship type="largeminer"/>
@@ -362,7 +364,7 @@
       </jerk>
       <explosiondamage value="800" shield="4000" shielddisruption="10"/>
       <storage missile="30" unit="10"/>
-      <hull max="26000"/>
+      <hull max="36000"/>
       <secrecy level="1"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -379,7 +381,7 @@
       </sounds>
       <physics mass="204.245">
         <inertia pitch="240" yaw="240" roll="200"/>
-        <drag forward="56.594" reverse="255" horizontal="40.5" vertical="40.5" pitch="140.528" yaw="140.528" roll="140.528"/>
+        <drag forward="50.9" reverse="229" horizontal="40.5" vertical="40.5" pitch="140.528" yaw="140.528" roll="140.528"/>
       </physics>
       <thruster tags="large"/>
       <ship type="largeminer"/>
@@ -431,7 +433,7 @@
       </jerk>
       <explosiondamage value="800" shield="4000" shielddisruption="10"/>
       <storage missile="30" unit="10"/>
-      <hull max="32000"/>
+      <hull max="43200"/>
       <secrecy level="1"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -448,7 +450,8 @@
       </sounds>
       <physics mass="245.094">
         <inertia pitch="240" yaw="240" roll="200"/>
-        <drag forward="62.313" reverse="290" horizontal="46" vertical="46" pitch="155.234" yaw="155.234" roll="155.234"/>
+        <drag forward="59.9" reverse="270" horizontal="46" vertical="46" pitch="155.234" yaw="155.234" roll="155.234"/>
+        <accfactors forward="0.96"/>
       </physics>
       <thruster tags="large"/>
       <ship type="largeminer"/>
@@ -2036,7 +2039,7 @@
       </sounds>
       <physics mass="6">
         <inertia pitch="1.229" yaw="1.229" roll="1.352"/>
-        <drag forward="3.7" reverse="11.829" horizontal="4" vertical="4" pitch="2.42" yaw="2.96" roll="2.4"/>
+        <drag forward="3.58" reverse="11.829" horizontal="4" vertical="4" pitch="2.42" yaw="2.96" roll="2.4"/>
         <accfactors forward="1.07"/>
       </physics>
       <thruster tags="small"/>
@@ -2589,7 +2592,7 @@
         <angular value="0.7"/>
       </jerk>
       <storage missile="0"/>
-      <hull max="2600"/>
+      <hull max="2800"/>
       <glow engine="1"/>
       <secrecy level="2"/>
       <steeringcurve>
@@ -2848,7 +2851,7 @@
         <angular value="0.7"/>
       </jerk>
       <storage missile="0"/>
-      <hull max="2600"/>
+      <hull max="2800"/>
       <glow engine="1"/>
       <secrecy level="2"/>
       <steeringcurve>
@@ -2910,7 +2913,7 @@
         <angular value="0.7"/>
       </jerk>
       <storage missile="0"/>
-      <hull max="3000"/>
+      <hull max="3200"/>
       <glow engine="1"/>
       <secrecy level="2"/>
       <steeringcurve>
@@ -3535,7 +3538,7 @@
       </jerk>
       <explosiondamage value="1200" shield="6000" shielddisruption="10"/>
       <storage missile="40" unit="100"/>
-      <hull max="116000"/>
+      <hull max="140000"/>
       <secrecy level="1"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -3632,7 +3635,7 @@
       </jerk>
       <explosiondamage value="1200" shield="6000" shielddisruption="10"/>
       <storage missile="40" unit="100"/>
-      <hull max="139000"/>
+      <hull max="166000"/>
       <secrecy level="1"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -4273,7 +4276,7 @@
       </jerk>
       <explosiondamage value="1500" shield="7500" shielddisruption="10"/>
       <storage missile="1160" unit="10"/>
-      <hull max="275000"/>
+      <hull max="300000"/>
       <threatscore value="35"/>
       <secrecy level="3"/>
       <steeringcurve>
@@ -4477,7 +4480,7 @@
       </jerk>
       <explosiondamage value="800" shield="4000" shielddisruption="10"/>
       <storage missile="30" unit="10"/>
-      <hull max="31000"/>
+      <hull max="46000"/>
       <secrecy level="1"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -4493,7 +4496,7 @@
       </sounds>
       <physics mass="294.322">
         <inertia pitch="260" yaw="260" roll="200"/>
-        <drag forward="65.91" reverse="358.692" horizontal="77" vertical="77" pitch="103.531" yaw="103.531" roll="103.531"/>
+        <drag forward="70.5" reverse="317.3" horizontal="77" vertical="77" pitch="103.531" yaw="103.531" roll="103.531"/>
         <accfactors horizontal="1.35" vertical="1.35"/>
       </physics>
       <thruster tags="large"/>
@@ -4547,7 +4550,7 @@
       </jerk>
       <explosiondamage value="800" shield="4000" shielddisruption="10"/>
       <storage missile="30" unit="10"/>
-      <hull max="31000"/>
+      <hull max="46000"/>
       <secrecy level="1"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -4563,7 +4566,7 @@
       </sounds>
       <physics mass="294.322">
         <inertia pitch="260" yaw="260" roll="200"/>
-        <drag forward="65.91" reverse="358.692" horizontal="77" vertical="77" pitch="103.531" yaw="103.531" roll="103.531"/>
+        <drag forward="70.5" reverse="317" horizontal="77" vertical="77" pitch="103.531" yaw="103.531" roll="103.531"/>
         <accfactors horizontal="1.35" vertical="1.35"/>
       </physics>
       <thruster tags="large"/>
@@ -4817,8 +4820,8 @@
       <steeringcurve>
         <point position="1.01" value="1"/>
         <point position="1.2" value="0.75"/>
-        <point position="1.6" value="0.45"/>
-        <point position="2" value="0.28"/>
+        <point position="1.6" value="0.44"/>
+        <point position="2" value="0.26"/>
         <point position="2.3" value="0.15"/>
         <point position="2.7" value="0.1"/>
       </steeringcurve>
@@ -4827,13 +4830,16 @@
       <sounds>
         <shipdetail ref="shipdetail_ship_boron_m_01"/>
       </sounds>
-      <physics mass="32.713">
+      <physics mass="35">
         <inertia pitch="9" yaw="9" roll="8"/>
-        <drag forward="4.405" reverse="17.619" horizontal="12.611" vertical="12.611" pitch="10.678" yaw="10.678" roll="10.678"/>
+        <drag forward="5.7" reverse="22.8" horizontal="13.8" vertical="13.8" pitch="14.4" yaw="14.4" roll="16.3"/>
         <accfactors forward="0.9" reverse="0.9" horizontal="1.15" vertical="1.15"/>
       </physics>
       <thruster tags="medium"/>
       <ship type="gunboat" prestige="20"/>
+      <modifiers>
+        <shield rechargerate="0.85"/>
+      </modifiers>
       <traveldrivestability maxvalue="2250"/>
     </properties>
     <connections>
@@ -5618,7 +5624,7 @@
       </jerk>
       <explosiondamage value="1200" shield="6000" shielddisruption="10"/>
       <storage missile="268" unit="100"/>
-      <hull max="174000"/>
+      <hull max="195000"/>
       <secrecy level="1"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -6502,7 +6508,7 @@
         </kill>
       </relation>
       <modifiers>
-        <weapon heat="1.4"/>
+        <weapon heat="1.2"/>
       </modifiers>
     </properties>
     <connections>
@@ -6579,7 +6585,7 @@
       <explosioneffect strength="100"/>
       <radar range="5000"/>
       <storage countermeasure="0"/>
-      <hull max="5000"/>
+      <hull max="2500"/>
       <secrecy level="2"/>
       <purpose primary="fight"/>
       <people capacity="0"/>
@@ -6606,6 +6612,9 @@
           <multiplier value="0.01"/>
         </kill>
       </relation>
+      <modifiers>
+        <weapon heat="1.1"/>
+      </modifiers>
     </properties>
     <connections>
       <connection ref="con_cockpit">
@@ -7333,6 +7342,9 @@
           <multiplier value="0.01"/>
         </kill>
       </relation>
+      <modifiers>
+        <weapon heat="1.3"/>
+      </modifiers>
     </properties>
     <connections>
       <connection ref="con_cockpit">
@@ -8253,7 +8265,7 @@
       </jerk>
       <explosiondamage value="800" shield="4000" shielddisruption="10"/>
       <storage missile="30" unit="10"/>
-      <hull max="29000"/>
+      <hull max="50000"/>
       <secrecy level="2"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -8267,7 +8279,7 @@
       <people capacity="41"/>
       <physics mass="153.679">
         <inertia pitch="220" yaw="220" roll="200"/>
-        <drag forward="46.42" reverse="265.259" horizontal="62" vertical="62" pitch="110" yaw="125" roll="90"/>
+        <drag forward="51" reverse="230" horizontal="62" vertical="62" pitch="110" yaw="125" roll="90"/>
         <accfactors reverse="0.85"/>
       </physics>
       <thruster tags="large"/>
@@ -8463,7 +8475,7 @@
       </jerk>
       <explosiondamage value="800" shield="4000" shielddisruption="10"/>
       <storage missile="30" unit="10"/>
-      <hull max="29000"/>
+      <hull max="50000"/>
       <secrecy level="2"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -8477,7 +8489,7 @@
       <people capacity="41"/>
       <physics mass="153.678">
         <inertia pitch="220" yaw="220" roll="200"/>
-        <drag forward="46.42" reverse="265.259" horizontal="62" vertical="62" pitch="110" yaw="125" roll="90"/>
+        <drag forward="51" reverse="230" horizontal="62" vertical="62" pitch="110" yaw="125" roll="90"/>
         <accfactors reverse="0.85"/>
       </physics>
       <thruster tags="large"/>
@@ -10965,7 +10977,7 @@
       </jerk>
       <explosiondamage value="1200" shield="6000" shielddisruption="10"/>
       <storage missile="40" unit="100"/>
-      <hull max="164000"/>
+      <hull max="190000"/>
       <secrecy level="2"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -11248,7 +11260,7 @@
       </jerk>
       <explosiondamage value="800" shield="4000" shielddisruption="10"/>
       <storage missile="30" unit="10"/>
-      <hull max="26000"/>
+      <hull max="38000"/>
       <secrecy level="1"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -11260,13 +11272,16 @@
       </steeringcurve>
       <purpose primary="mine"/>
       <people capacity="31"/>
-      <physics mass="168.244">
+      <physics mass="195">
         <inertia pitch="120" yaw="120" roll="100"/>
         <drag forward="33.51" reverse="191.487" horizontal="77.62" vertical="77.62" pitch="100.649" yaw="100.649" roll="100.649"/>
         <accfactors reverse="1.15"/>
       </physics>
       <thruster tags="large"/>
       <ship type="largeminer"/>
+      <modifiers>
+        <shield rechargedelay="0.8"/>
+      </modifiers>
     </properties>
     <connections>
       <connection ref="con_cockpit">
@@ -11688,7 +11703,7 @@
         <angular value="0.7"/>
       </jerk>
       <storage missile="0"/>
-      <hull max="2200"/>
+      <hull max="2500"/>
       <glow engine="1"/>
       <secrecy level="1"/>
       <steeringcurve>
@@ -11745,7 +11760,7 @@
         <angular value="0.7"/>
       </jerk>
       <storage missile="0"/>
-      <hull max="2200"/>
+      <hull max="2500"/>
       <glow engine="1"/>
       <secrecy level="1"/>
       <steeringcurve>
@@ -12001,11 +12016,11 @@
         <forward_boost accel="0.4" ratio="2"/>
         <forward_travel accel="0.7" decel="0.9" ratio="3"/>
         <strafe value="0.3"/>
-        <angular value="0.2"/>
+        <angular value="0.23"/>
       </jerk>
       <explosiondamage value="800" shield="4000" shielddisruption="10"/>
       <storage missile="30" unit="10"/>
-      <hull max="21000"/>
+      <hull max="35000"/>
       <secrecy level="1"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -12022,7 +12037,8 @@
       </sounds>
       <physics mass="159.275">
         <inertia pitch="200" yaw="200" roll="200"/>
-        <drag forward="40.867" reverse="233.528" horizontal="70" vertical="70" pitch="102" yaw="92" roll="98.855"/>
+        <drag forward="40.867" reverse="180" horizontal="70" vertical="70" pitch="102" yaw="92" roll="98.855"/>
+        <accfactors forward="0.96"/>
       </physics>
       <thruster tags="large"/>
       <ship type="largeminer"/>
@@ -12067,11 +12083,11 @@
         <forward_boost accel="0.4" ratio="2"/>
         <forward_travel accel="0.7" decel="0.9" ratio="3"/>
         <strafe value="0.3"/>
-        <angular value="0.2"/>
+        <angular value="0.23"/>
       </jerk>
       <explosiondamage value="800" shield="4000" shielddisruption="10"/>
       <storage missile="30" unit="10"/>
-      <hull max="21000"/>
+      <hull max="35000"/>
       <secrecy level="1"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -12088,7 +12104,8 @@
       </sounds>
       <physics mass="159.275">
         <inertia pitch="200" yaw="200" roll="200"/>
-        <drag forward="40.867" reverse="233.528" horizontal="70" vertical="70" pitch="102" yaw="92" roll="98.855"/>
+        <drag forward="40.867" reverse="180" horizontal="70" vertical="70" pitch="102" yaw="92" roll="98.855"/>
+        <accfactors forward="0.96"/>
       </physics>
       <thruster tags="large"/>
       <ship type="largeminer"/>
@@ -13759,7 +13776,7 @@
       </jerk>
       <explosiondamage value="1200" shield="6000" shielddisruption="10"/>
       <storage missile="40" unit="100"/>
-      <hull max="160000"/>
+      <hull max="202000"/>
       <secrecy level="2"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -13771,9 +13788,9 @@
       </steeringcurve>
       <purpose primary="auxiliary"/>
       <people capacity="128"/>
-      <physics mass="1245.388">
-        <inertia pitch="2000" yaw="2000" roll="1350"/>
-        <drag forward="213.9" reverse="855.602" horizontal="240" vertical="240" pitch="949.078" yaw="949.078" roll="949.078"/>
+      <physics mass="1120">
+        <inertia pitch="1850" yaw="1850" roll="1300"/>
+        <drag forward="189" reverse="800" horizontal="170" vertical="170" pitch="800" yaw="800" roll="880"/>
       </physics>
       <thruster tags="extralarge"/>
       <ship type="resupplier"/>
@@ -14649,7 +14666,7 @@
       </jerk>
       <explosiondamage value="800" shield="4000" shielddisruption="10"/>
       <storage missile="30" unit="10"/>
-      <hull max="34800"/>
+      <hull max="40000"/>
       <secrecy level="1"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -14663,7 +14680,7 @@
       <people capacity="49"/>
       <physics mass="266.716">
         <inertia pitch="220" yaw="220" roll="200"/>
-        <drag forward="89.843" reverse="460" horizontal="55" vertical="55" pitch="120.343" yaw="120.343" roll="120.343"/>
+        <drag forward="93.4" reverse="420" horizontal="55" vertical="55" pitch="120.343" yaw="120.343" roll="120.343"/>
         <accfactors reverse="0.85" horizontal="1.1" vertical="1.1"/>
       </physics>
       <thruster tags="large"/>
@@ -14841,7 +14858,7 @@
       </jerk>
       <explosiondamage value="800" shield="4000" shielddisruption="10"/>
       <storage missile="30" unit="10"/>
-      <hull max="35000"/>
+      <hull max="40000"/>
       <secrecy level="1"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -14855,8 +14872,8 @@
       <people capacity="49"/>
       <physics mass="267.133">
         <inertia pitch="220" yaw="220" roll="200"/>
-        <drag forward="89.923" reverse="440" horizontal="55" vertical="55" pitch="120.427" yaw="120.427" roll="120.427"/>
-        <accfactors reverse="0.85"/>
+        <drag forward="93.4" reverse="420" horizontal="55" vertical="55" pitch="120.427" yaw="120.427" roll="120.427"/>
+        <accfactors reverse="0.85" horizontal="1.1" vertical="1.1"/>
       </physics>
       <thruster tags="large"/>
       <ship type="largeminer"/>
@@ -16655,7 +16672,7 @@
         <angular value="0.6"/>
       </jerk>
       <storage missile="0"/>
-      <hull max="2400"/>
+      <hull max="2600"/>
       <glow engine="1"/>
       <secrecy level="2"/>
       <steeringcurve>
@@ -16671,7 +16688,7 @@
       <people capacity="7"/>
       <physics mass="18.466">
         <inertia pitch="4.771" yaw="4.771" roll="3.817"/>
-        <drag forward="5.538" reverse="24.241" horizontal="5.323" vertical="5.323" pitch="6" yaw="6.708" roll="6.708"/>
+        <drag forward="5.76" reverse="25.2" horizontal="5.323" vertical="5.323" pitch="6" yaw="6.708" roll="6.708"/>
       </physics>
       <thruster tags="small"/>
       <ship type="courier"/>
@@ -16714,7 +16731,7 @@
         <angular value="0.7"/>
       </jerk>
       <storage missile="0"/>
-      <hull max="2800"/>
+      <hull max="3000"/>
       <glow engine="1"/>
       <secrecy level="2"/>
       <steeringcurve>
@@ -16730,7 +16747,7 @@
       <people capacity="5"/>
       <physics mass="22.159">
         <inertia pitch="5.592" yaw="5.592" roll="4.474"/>
-        <drag forward="6.046" reverse="27.934" horizontal="6.387" vertical="6.387" pitch="7" yaw="7.862" roll="7.862"/>
+        <drag forward="6.28" reverse="27.934" horizontal="6.387" vertical="6.387" pitch="7" yaw="7.862" roll="7.862"/>
       </physics>
       <thruster tags="small"/>
       <ship type="courier"/>
@@ -16772,8 +16789,8 @@
         <strafe value="0.7"/>
         <angular value="0.6"/>
       </jerk>
-      <storage missile="0"/>
-      <hull max="6700"/>
+      <storage missile="10"/>
+      <hull max="6400"/>
       <glow engine="1"/>
       <secrecy level="3"/>
       <steeringcurve>
@@ -16787,13 +16804,14 @@
       </steeringcurve>
       <purpose primary="trade"/>
       <people capacity="5"/>
-      <physics mass="25.76">
+      <physics mass="24">
         <inertia pitch="6.097" yaw="6.097" roll="4.877"/>
-        <drag forward="8.102" reverse="32" horizontal="8" vertical="8" pitch="8.1" yaw="8.1" roll="9.511"/>
+        <drag forward="7.54" reverse="31.7" horizontal="8" vertical="8" pitch="7.6" yaw="7.6" roll="9.511"/>
       </physics>
       <thruster tags="small"/>
       <ship type="courier" prestige="20"/>
       <sound_occlusion inside="0.5"/>
+      <traveldrivestability maxvalue="500"/>
     </properties>
     <connections>
       <connection ref="con_cockpit">
@@ -16980,7 +16998,7 @@
       <people capacity="135"/>
       <physics mass="608.398">
         <inertia pitch="2000" yaw="2000" roll="1350"/>
-        <drag forward="277.309" reverse="1109.238" horizontal="120" vertical="120" pitch="821.68" yaw="821.68" roll="821.68"/>
+        <drag forward="250" reverse="1109.238" horizontal="120" vertical="120" pitch="821.68" yaw="821.68" roll="821.68"/>
       </physics>
       <thruster tags="extralarge"/>
       <ship type="carrier"/>
@@ -17072,7 +17090,7 @@
       <people capacity="112"/>
       <physics mass="730.078">
         <inertia pitch="2000" yaw="2000" roll="1350"/>
-        <drag forward="310.771" reverse="1243.086" horizontal="135" vertical="135" pitch="846.016" yaw="846.016" roll="846.016"/>
+        <drag forward="280" reverse="1243.086" horizontal="135" vertical="135" pitch="846.016" yaw="846.016" roll="846.016"/>
       </physics>
       <thruster tags="extralarge"/>
       <ship type="carrier"/>
@@ -17151,7 +17169,7 @@
       </jerk>
       <explosiondamage value="1200" shield="6000" shielddisruption="10"/>
       <storage missile="40" unit="100"/>
-      <hull max="105000"/>
+      <hull max="128000"/>
       <secrecy level="1"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -17244,7 +17262,7 @@
       </jerk>
       <explosiondamage value="1200" shield="6000" shielddisruption="10"/>
       <storage missile="40" unit="100"/>
-      <hull max="126000"/>
+      <hull max="152000"/>
       <secrecy level="1"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -17757,14 +17775,11 @@
       <people capacity="75"/>
       <physics mass="180">
         <inertia pitch="160" yaw="160" roll="130"/>
-        <drag forward="58" reverse="260" horizontal="42" vertical="42" pitch="90" yaw="107" roll="70"/>
+        <drag forward="56" reverse="252" horizontal="37" vertical="37" pitch="84" yaw="100.5" roll="69"/>
         <accfactors horizontal="1.2" vertical="1.2"/>
       </physics>
       <thruster tags="large"/>
       <ship type="destroyer"/>
-      <modifiers>
-        <shield rechargerate="0.8"/>
-      </modifiers>
     </properties>
     <connections>
       <connection ref="con_cockpit">
@@ -17951,7 +17966,7 @@
       </jerk>
       <explosiondamage value="800" shield="4000" shielddisruption="10"/>
       <storage missile="30" unit="10"/>
-      <hull max="24000"/>
+      <hull max="48000"/>
       <secrecy level="1"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -17965,7 +17980,7 @@
       <people capacity="33"/>
       <physics mass="120">
         <inertia pitch="110" yaw="110" roll="100"/>
-        <drag forward="32.115" reverse="183.513" horizontal="72" vertical="72" pitch="100" yaw="108" roll="80"/>
+        <drag forward="30.5" reverse="137.3" horizontal="69" vertical="69" pitch="100" yaw="108" roll="80"/>
       </physics>
       <thruster tags="large"/>
       <ship type="largeminer"/>
@@ -18014,7 +18029,7 @@
       </jerk>
       <explosiondamage value="800" shield="4000" shielddisruption="10"/>
       <storage missile="30" unit="10"/>
-      <hull max="24000"/>
+      <hull max="48000"/>
       <secrecy level="1"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -18028,7 +18043,7 @@
       <people capacity="33"/>
       <physics mass="120">
         <inertia pitch="110" yaw="110" roll="100"/>
-        <drag forward="32.115" reverse="183.513" horizontal="72" vertical="72" pitch="100" yaw="108" roll="80"/>
+        <drag forward="30.5" reverse="137.3" horizontal="69" vertical="69" pitch="100" yaw="108" roll="80"/>
       </physics>
       <thruster tags="large"/>
       <ship type="largeminer"/>
@@ -19542,10 +19557,13 @@
       <people capacity="201"/>
       <physics mass="542.639">
         <inertia pitch="2000" yaw="2000" roll="1350"/>
-        <drag forward="141.396" reverse="565.584" horizontal="150" vertical="150" pitch="808.528" yaw="808.528" roll="808.528"/>
+        <drag forward="125" reverse="562" horizontal="150" vertical="150" pitch="808.528" yaw="808.528" roll="808.528"/>
       </physics>
       <thruster tags="extralarge"/>
       <ship type="carrier"/>
+      <modifiers>
+        <shield capacity="1.2"/>
+      </modifiers>
     </properties>
     <connections>
       <connection ref="con_buildmodule">
@@ -19600,7 +19618,7 @@
       </jerk>
       <explosiondamage value="1200" shield="6000" shielddisruption="10"/>
       <storage missile="40" unit="100"/>
-      <hull max="157000"/>
+      <hull max="180000"/>
       <secrecy level="1"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -19612,13 +19630,16 @@
       </steeringcurve>
       <purpose primary="auxiliary"/>
       <people capacity="123"/>
-      <physics mass="1199.838">
+      <physics mass="1080">
         <inertia pitch="2000" yaw="2000" roll="1350"/>
-        <drag forward="230" reverse="910" horizontal="160" vertical="160" pitch="939.968" yaw="939.968" roll="939.968"/>
+        <drag forward="190" reverse="855" horizontal="160" vertical="160" pitch="939.968" yaw="939.968" roll="939.968"/>
         <accfactors forward="1.15"/>
       </physics>
       <thruster tags="extralarge"/>
       <ship type="resupplier"/>
+      <modifiers>
+        <shield capacity="1.2"/>
+      </modifiers>
     </properties>
     <connections>
       <connection ref="con_buildmodule">
@@ -20353,6 +20374,7 @@
         <software ware="software_trademk1" compatible="1"/>
       </software>
       <people capacity="0"/>
+      <traveldrivestability maxvalue="0"/>
     </properties>
     <connections>
       <connection ref="con_cockpit_01">
@@ -21067,6 +21089,7 @@
       </jerk>
       <storage missile="0"/>
       <hull max="1200"/>
+      <glow engine="1"/>
       <secrecy level="2"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -21079,7 +21102,8 @@
       <people capacity="0"/>
       <physics mass="5.363">
         <inertia pitch="0.849" yaw="0.849" roll="0.679"/>
-        <drag forward="1.645" reverse="6.582" horizontal="3.708" vertical="3.708" pitch="3.082" yaw="3.082" roll="3.082"/>
+        <drag forward="1.71" reverse="6.582" horizontal="3.708" vertical="3.708" pitch="3.082" yaw="3.082" roll="3.082"/>
+        <accfactors forward="0.9"/>
       </physics>
       <thruster tags="small"/>
       <loadouts>
@@ -21125,11 +21149,11 @@
         <forward accel="0.4" decel="0.9" ratio="3"/>
         <forward_boost accel="0.4" ratio="3"/>
         <forward_travel accel="0.6" decel="0.9" ratio="3"/>
-        <strafe value="0.6"/>
-        <angular value="0.6"/>
+        <strafe value="0.4"/>
+        <angular value="0.3"/>
       </jerk>
       <explosiondamage value="1500" shield="7500" shielddisruption="10"/>
-      <hull max="340000"/>
+      <hull max="400000"/>
       <threatscore value="35"/>
       <secrecy level="2"/>
       <steeringcurve>
@@ -21142,7 +21166,7 @@
       </steeringcurve>
       <purpose primary="fight"/>
       <people capacity="0"/>
-      <physics mass="876.951">
+      <physics mass="800">
         <inertia pitch="958.525" yaw="958.525" roll="766.82"/>
         <drag forward="255.39" reverse="1021.561" horizontal="110" vertical="110" pitch="787.851" yaw="787.851" roll="787.851"/>
       </physics>
@@ -21232,10 +21256,10 @@
         <forward_boost accel="0.4" ratio="3"/>
         <forward_travel accel="0.6" decel="0.9" ratio="3"/>
         <strafe value="0.6"/>
-        <angular value="0.6"/>
+        <angular value="0.3"/>
       </jerk>
       <explosiondamage value="1500" shield="7500" shielddisruption="10"/>
-      <hull max="165000"/>
+      <hull max="220000"/>
       <secrecy level="2"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -21248,7 +21272,7 @@
       <docksize tag="dock_xl"/>
       <purpose primary="fight"/>
       <people capacity="0"/>
-      <physics mass="421.625">
+      <physics mass="400">
         <inertia pitch="550" yaw="550" roll="500"/>
         <drag forward="164.325" reverse="657.3" horizontal="110" vertical="110" pitch="705.892" yaw="705.892" roll="705.892"/>
       </physics>

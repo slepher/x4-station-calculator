@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!--Last exported: 05.02.2026 16:03:24-->
+<!--Last exported: 13.03.2026 14:00:55-->
 <groups>
   <group id="agricultural" name="{20215,101}" factoryname="{20215,104}" icon="be_upgrade_agricultural" factorymapicon="mapob_agricultural" factoryhudicon="si_agricultural" tags="tradable" tier="5" priority="5"/>
   <group id="energy" name="{20215,201}" factoryname="{20215,204}" icon="be_upgrade_energy" factorymapicon="mapob_energy" factoryhudicon="si_energy" tags="tradable" tier="1" priority="1"/>

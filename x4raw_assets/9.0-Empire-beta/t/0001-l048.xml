@@ -3332,6 +3332,10 @@
     <t id="11688">Miner evaluation time(followed by colon and added percentage)</t>
     <t id="11689">Potential Resource</t>
     <t id="11690">Detected Resource</t>
+    <t id="11691">Introducing Priority Orders</t>
+    <t id="11692">You can now use modifier keys to give queued \(%s($INPUT_MODIFIER_ICON$)\) and priority \(%s($INPUT_MODIFIER_ICON$)\) orders directly from the map or from within the Interact menu. By default, orders given to ships without using these modifier keys will now overwrite any previously queued order.</t>
+    <t id="11693">If you prefer the old behaviour then you can change the Default Order Behaviour setting in the Game Settings menu to Queue, so that pressing %s($INPUT_MODIFIER_ICON$) while using the Interact menu will overwrite the order instead of adding it to the queue.</t>
+    <t id="11694">Press Yes if you would like to try the new default modifier behaviour, or No if you would like to keep the old behaviour and use %s($INPUT_MODIFIER_ICON$) to overwrite orders.</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Zapis offline</t>
     <t id="11702">Nadpisz zapis offline</t>
@@ -3743,6 +3747,8 @@
     <t id="12786">AMD FSR Frame Generation</t>
     <t id="12787">Experimental Improved Controller Support</t>
     <t id="12788">AMD FSR</t>
+    <t id="12789">If this is your first time in X4, we suggest you try out some Tutorials before starting your journey into the Open Universe of X4.</t>
+    <t id="12790">Start New Open Universe</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">Działania Ambasady</t>
     <t id="12803">Dyplomata</t>
@@ -3946,7 +3952,8 @@
     <t id="13324">Confirm Module</t>
     <t id="13325">Cancel Module Selection</t>
     <t id="13326">Focus Station Model</t>
-    <t id="13327">Queued Priority Order</t>
+    <t id="13327">Kolejność priorytetów w kolejce</t>
+    <t id="13328">Gather Rate(of resources; header item for table column)</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Do widzenia</t>
@@ -5382,6 +5389,8 @@
     <t id="993">For a more detailed introduction to flight mechanics, try the Flight School(translate as 1021,7000) tutorial gamestart.</t>
     <t id="994">Podświetlone opcje rozmowy prowadzą fabułę dalej. Jeśli chcesz wysłuchać całego dialogu, najpierw wybierz pozostałe opcje.</t>
     <t id="995">Możesz powtórzyć ten samouczek, i zagrać w inne samouczki we własnym tempie, otwierając Menu Opcji i wybierając Zagraj Samouczki.("Options Menu" same as {1001,2600},  "Play Tutorials" same as {1001,12660})</t>
+    <t id="996">Umieść sondy zasobów w pobliżu obszarów bogatych w zasoby. Jeśli wykryty zostanie odpowiedni surowiec, górnicy będą preferować tę lokalizację do momentu jego wyczerpania.</t>
+    <t id="997">Zbyt wiele sond zasobów w sektorze zmniejsza wydajność, więc używaj ich mądrze. Są one całkowicie opcjonalne. Górnicy będą w stanie samodzielnie znaleźć i wydobywać surowce.</t>
     <t id="1000">(Generic Hints)</t>
     <t id="1001">Możesz przerwać ten samouczek w menu '{1001,8701}'.</t>
     <t id="1002">Samouczek ukończony!</t>
@@ -7385,6 +7394,8 @@
     <t id="5901">Scenariusz pokazowy X4: Foundations</t>
     <t id="5902">Środowisko Targowe</t>
     <t id="5904">Witamy w X4!\n\nTo skoncentrowane demo rzuca Cię prosto w wir wydarzeń. Poczuj przedsmak wielkoskalowych bitew kosmicznych w X4, dołączając do sprzymierzonej floty, odpierając siły wroga i broniąc oblężonej stacji na rubieżach.\n\nWeź udział w intensywnych pojedynkach w pobliżu Wrot Skokowych, wspierany przez potężne okręty flagowe i zautomatyzowane systemy obronne. Bez przygotowań i bez przestojów - możesz od razu wskoczyć do kokpitu, przejąć stery i doświadczyć skali, napięcia oraz piękna kosmicznych starć w X4: Foundations.</t>
+    <t id="5905">Tradeshow Playground</t>
+    <t id="5906">Welcome to X4!\n\nThis scenario drops you into a busy sector within a downscaled universe, giving you a taste of the immense scale and possibilities of X4: Foundations.</t>
     <t id="6000">Samouczek: Rozgrywka zaawansowana</t>
     <t id="6001">{1021,6101}</t>
     <t id="6002">Rayma Sedim</t>
@@ -8229,7 +8240,7 @@
     <t id="4602">Determine whether trading in specific products at this station should be restricted.</t>
     <t id="4800">(Options menu range 26xx continued)</t>
     <t id="4801">Rozpocznij swoją podróż jako samotny pilot i stań się galaktyczną potęgą w dużym, trwałym wszechświecie, wybierając własną ścieżkę dzięki opcjonalnym misjom fabularnym.</t>
-    <t id="4802">Zaleca się, aby nowi gracze ukończyli podstawowe samouczki. Następnie sugerujemy wypróbowanie Timelines, ale jeśli wolisz doświadczenie sandboxowe, możesz od razu udać się do Otwartego Wszechświata.</t>
+    <t id="4802">Zaleca się, aby nowi gracze najpierw ukończyli podstawowe samouczki. Jeśli jednak wolisz rozgrywkę w trybie sandbox, możesz od razu przejść do trybu Otwartego Wszechświata i w dowolnym momencie powrócić do samouczków.</t>
     <t id="4803">Spowoduje to kontynuację ostatnio zapisanej gry w Otwartym Uniwersum.\n\nNależy pamiętać, że Timelines nie wymaga zapisu gry.</t>
     <t id="4804">Pozwoli Ci to wybrać jedną z wielu gier zapisu, aby kontynuować w Otwartym Uniwersum.\n\nNależy pamiętać, że Timelines nie wymaga zapisu gry.</t>
     <t id="4805">Dostępna jest szeroka gama szybkich samouczków, które uczą lub przypominają, jak działają aktywności w grze.\n\nZacznij swoją podróż tutaj i wracaj, gdy napotkasz problem.</t>
@@ -8654,6 +8665,7 @@
     <t id="9929">Nie możesz zaznaczyć tej opcji, ponieważ może to spowodować odznaczenie opcji wymaganej do odblokowania sektora, w którym znajduje się twoja własność.</t>
     <t id="9930">Nie można wybrać tej niestandardowej gry, ponieważ zawiera ona nieodblokowane przez ciebie rzeczy.</t>
     <t id="9931">This custom game contains loadouts that include incompatible equipment. Incompatible equipment will not be installed.</t>
+    <t id="9932">This custom game contains wares or blueprints that are no longer valid. Affected items will not be used.</t>
     <t id="10000">(Generic Error / Info){1001,10003}</t>
     <t id="11300">(Online)</t>
     <t id="11301">Zaakceptowanie tej misji spowoduje przerwanie każdej innej misji operacyjnej multiwersu.</t>
@@ -9276,6 +9288,8 @@
     <t id="902">Ratuje ludzi unieruchomionych w skafandrach kosmicznych na określonym obszarze.</t>
     <t id="911">Odwiedź stacje</t>
     <t id="912">Odwiedza ważne stacje należące do różnych frakcji.</t>
+    <t id="921">Poszukuj</t>
+    <t id="922">Znajdź obszary zasobów, oznacz je sondami zasobów, podnieś przestarzałe sondy i rozmieść je ponownie.</t>
     <t id="10000">Anuluj trasę</t>
     <t id="10001">Właśnie kończy</t>
     <t id="10002">Aktywuj patrol</t>
@@ -9439,6 +9453,7 @@
     <t id="10177">Opóźnienie</t>
     <t id="10178">Towary \(Podręcznik\)</t>
     <t id="10179">Kosz na towary</t>
+    <t id="10180">Maksymalna liczba rozmieszczonych sond zasobów</t>
   </page>
   <page id="1042" title="Encyclopedia Data Texts" descr="Describes additional data in encyclopedia entries" voice="no">
     <t id="10011">Brak</t>
@@ -11468,6 +11483,19 @@
     <t id="115">Or you can ignore all of this and simply follow one of the many fascinating plot lines, focus on exploration, or try the innumerable other activities that are available in the X Universe.</t>
     <t id="116">You can adjust your forward speed using the X and Y keys, the mouse wheel, or the throttle stick.</t>
     <t id="117">Once you've selected a target, the targeting system will try to lock on. When the lock is achieved, you can launch a missile with the R key or secondary fire button.</t>
+    <t id="200">(Tradeshow Playground Scenario)</t>
+    <t id="201">Welcome to X4: Foundations, a living universe with hundreds of sectors connected by gates. These sectors can be explored, and contain thousands of ships and stations operating within a fully simulated economy. You can own and command everything, ranging from a single tiny fighter to a grand empire with merchant fleets and powerful capital ships, to shape your story.</t>
+    <t id="202">This scenario places you near one of the many hundreds of bustling space stations you'll find in our living universe, with traders delivering wares and miners gathering resources. \nRecently there have been skirmishes with the machine intelligence known as the Xenon pouring in from the nearby gate, disrupting the trade.</t>
+    <t id="211">(explore explanation)Leaving the station behind, you are free to explore the other sectors and factions. The full X-Universe contains hundreds of unique sectors inhabited by various factions and species, all with rich history.</t>
+    <t id="212">(fight explanation)The Gate network is not always safe. Between the machine intelligence known as the Xenon, pirates, warring factions and the occasional war profiteering opportunist, you will see clashes ranging from small skirmishes to giant fleet brawls.</t>
+    <t id="213">(mining explanation)Ships like these mine the raw resources that the majority of the economy is based on. Once delivered they are refined, moved to factories and eventually turned into the wares that can be used to build the ships and stations you see.</t>
+    <t id="214">(trading explanation)Traders, haulers and merchants transport wares between stations. They buy where goods are plentiful and sell them where they are scarce, keeping the gears of the economy turning.</t>
+    <t id="215">(shipyard construction)This ship is currently under construction using the wares created by other stations. It will soon defend this sector from any further incursions.</t>
+    <t id="216">(launch tube explanation)The station is launching fighters from its launch tubes to defend itself from incoming attackers.</t>
+    <t id="217">(station attack explanation)A hostile Xenon force is approaching. If they damage the station, the production of new ships could be severely limited.</t>
+    <t id="218">(criminal explanation)Criminals try to capitalise on transporting illicit wares for great profits by hiding in traffic around stations. These criminals can even run organised operations with their own stations and masked freighters.</t>
+    <t id="219">(explore suggestion)There are more sights to see and things to do. Try flying around and targeting different objects.</t>
+    <t id="220">X4: Foundations has so much more to offer. You can quickly earn enough money to own a fleet of ships. You can hire other pilots to work for you, and follow your orders. Let them trade or mine to earn you money, while you follow one of the many plot lines or carry out standalone missions that can be found throughout the vast universe.</t>
   </page>
   <page id="10098" title="Torus Computer" descr="0" voice="yes">
     <t id="30224000">(Pioneer Terraforming Mission)</t>
@@ -20360,7 +20388,6 @@
   <page id="10120" title="Mission Argon/Terran NPC Female 22 / Segaris diplomat" descr="Lines for Segaris Faction Diplomat" voice="yes">
     <t id="2001">(Greeting - neutral)Witam.</t>
     <t id="2007">(Goodbye - neutral)Powodzenia na szlaku.</t>
-    <t id="2009">(Goodbye - enemy)Jak chcesz.</t>
     <t id="3000">(* Diplomat specific lines *)</t>
     <t id="3001">(Accepting invitation)Pionierzy Segaris z radością przyjmują zaproszenie. Wkrótce przybędę do twojej ambasady.</t>
     <t id="3002">(Potwierdzenie przybycia dyplomaty)Przybyłem do twojej ambasady.</t>
@@ -23863,6 +23890,7 @@
     <t id="36">Zrobimy to później.</t>
     <t id="37">Zamknij mapę.</t>
     <t id="38">Teraz.(jak w "zrób to teraz", pojawia się jakiś czas po instrukcji).</t>
+    <t id="39">Ostatnia rzecz.</t>
     <t id="1000">(Introduction and physical)</t>
     <t id="1001">Cześć. Jestem Jace Winger, Twój instruktor lotów na dzisiaj. Przerobimy pełny plan lekcji, ale jeśli już znasz jakieś podstawy, możesz powiedzieć mi, żebyśmy pominęli ten temat.</t>
     <t id="1002">Zanim zaczniemy, muszę przeprowadzić kilka rutynowych testów fizycznych. Wiesz, przepisy.(powiedz ostatnie zdanie nieco przepraszająco)</t>
@@ -24597,6 +24625,24 @@
     <t id="25040">Pasek po prawej stronie pokazuje, jak bardzo jest wyczerpany.</t>
     <t id="25041">Zasoby uzupełniają się z czasem, ale gdy pole jest prawie puste, prawdopodobnie lepiej jest znaleźć alternatywę w międzyczasie.</t>
     <t id="25042">Te bardziej zaawansowane wymagają bardziej doświadczonego pilota, ale pozwalają na działanie w różnych systemach.</t>
+    <t id="25043">Kolorowe obszary wskazują potencjalne lokalizacje zasobów.</t>
+    <t id="25044">Otwórz ustawienia filtra górniczego.</t>
+    <t id="25045">Wybierz jeden z podświetlonych surowców gazowych.</t>
+    <t id="25046">Kolor na mapie zmienił się, aby wskazać wybrany surowiec.</t>
+    <t id="25047">Widzisz teraz tylko potencjalne lokalizacje dla tego surowca.(slight emphasis on "this resource")</t>
+    <t id="25048">Zmień jego domyślne zachowanie na lokalne autowydobycie.</t>
+    <t id="25049">Skonfiguruj go tak, aby zbierał dowolne surowce gazowe w tym sektorze.</t>
+    <t id="25050">Statek spróbuje teraz znaleźć surowiec, zebrać go i sprzedać w określonym sektorze.</t>
+    <t id="25051">Możesz ściślej kierować ich działaniami za pomocą sond zasobów.</t>
+    <t id="25052">Rozmieść jedną w jednym z regionów gazowych.</t>
+    <t id="25053">Twoi górnicy będą najpierw sprawdzać sondy zasobów podczas określania, gdzie zbierać surowce.</t>
+    <t id="25054">Im więcej sond rozmieścisz w sektorze, tym dłużej potrwa ten etap, więc używaj ich mądrze.</t>
+    <t id="25055">Możesz także zobaczyć dokładnie, gdzie surowce są obecnie wykrywane.</t>
+    <t id="25056">Wybierz ponownie górnika gazu, a następnie bezpośrednio rozkaż mu wydobycie w jednym z obszarów z wykrytymi surowcami.</t>
+    <t id="25057">Surowce w końcu się wyczerpią.</t>
+    <t id="25058">Z czasem zostaną one uzupełnione, ale prawdopodobnie w innym miejscu.</t>
+    <t id="25059">Miej więc oko na swoje sondy zasobów i usuwaj lub ponownie wdrażaj te, które nie są już przydatne.</t>
+    <t id="25060">Lub, jeśli masz statki na zbyciu, poświęć kogoś na poszukiwanie sektora i utrzymywanie lokalizacji sond zasobów.</t>
     <t id="26000">(Station Building)</t>
     <t id="26001">Dzisiaj omówimy jedną z moich najbardziej zaawansowanych lekcji: projektowanie i budowanie stacji.</t>
     <t id="26002">Na początek potrzebujesz działki.</t>

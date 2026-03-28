@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Last exported: 09.03.2026 17:03:14-->
+<!--Last exported: 24.03.2026 17:37:03-->
 <diff>
   <add sel="/wares/production">
     <method id="terran" name="{20206,901}">
@@ -1466,12 +1466,12 @@
       <owner faction="terran" />
     </ware>
     <ware id="ship_atf_l_destroyer_01_a" name="{20101,66901}" description="{20101,66911}" transport="ship" volume="1" tags="blueprintsaleonly nocustomgamestart nodiplomacyblueprint ship">
-      <price min="12600383" average="14823980" max="17047577" />
+      <price min="11541582" average="12823980" max="14106378" />
       <production time="234" amount="1" method="default" name="{20206,901}">
         <primary>
-          <ware ware="computronicsubstrate" amount="352" />
-          <ware ware="energycells" amount="1296" />
-          <ware ware="metallicmicrolattice" amount="590" />
+          <ware ware="computronicsubstrate" amount="460" />
+          <ware ware="energycells" amount="13224" />
+          <ware ware="metallicmicrolattice" amount="4232" />
         </primary>
       </production>
       <component ref="ship_atf_l_destroyer_01_a_macro" />
@@ -1504,12 +1504,12 @@
       <owner faction="player" />
     </ware>
     <ware id="ship_ter_l_destroyer_01_a" name="{20101,60201}" description="{20101,60211}" transport="ship" volume="1" tags="ship">
-      <price min="10058790" average="11833870" max="13608951" />
+      <price min="7410483" average="8233870" max="9057257" />
       <production time="187" amount="1" method="default" name="{20206,901}">
         <primary>
-          <ware ware="computronicsubstrate" amount="281" />
-          <ware ware="energycells" amount="1034" />
-          <ware ware="metallicmicrolattice" amount="471" />
+          <ware ware="computronicsubstrate" amount="295" />
+          <ware ware="energycells" amount="8491" />
+          <ware ware="metallicmicrolattice" amount="2717" />
         </primary>
       </production>
       <component ref="ship_ter_l_destroyer_01_a_macro" />
@@ -1678,6 +1678,7 @@
       <component ref="ship_ter_s_fighter_02_a_macro" />
       <restriction licence="militaryship" />
       <owner faction="pioneers" />
+      <owner faction="terran" />
     </ware>
     <ware id="ship_ter_s_fighter_03_a" name="{20101,62401}" description="{20101,62411}" transport="ship" volume="1" tags="ship">
       <price min="291686" average="343160" max="394634" />
@@ -1744,6 +1745,7 @@
       </production>
       <component ref="ship_ter_s_scout_02_a_macro" />
       <restriction licence="generaluseship" />
+      <owner faction="pioneers" />
       <owner faction="terran" />
     </ware>
     <ware id="ship_ter_s_trans_container_01_a" name="{20101,63101}" description="{20101,63111}" transport="ship" volume="1" tags="ship">
@@ -2201,13 +2203,13 @@
       <owner faction="yaki" />
     </ware>
     <ware id="weapon_ter_l_destroyer_01_mk1" name="{20105,3051}" description="{20105,3052}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
-      <price min="2149448" average="2388276" max="2627104" />
+      <price min="1699448" average="1888276" max="2077104" />
       <production time="10" amount="1" method="default" name="{20206,901}">
         <primary>
-          <ware ware="computronicsubstrate" amount="108" />
-          <ware ware="energycells" amount="3731" />
-          <ware ware="metallicmicrolattice" amount="1194" />
-          <ware ware="siliconcarbide" amount="127" />
+          <ware ware="computronicsubstrate" amount="86" />
+          <ware ware="energycells" amount="2950" />
+          <ware ware="metallicmicrolattice" amount="944" />
+          <ware ware="siliconcarbide" amount="100" />
         </primary>
       </production>
       <component ref="weapon_ter_l_destroyer_01_mk1_macro" />
@@ -2585,6 +2587,10 @@
   <add sel="/wares/ware[@id='weapon_gen_m_shotgun_01_mk2']">
     <owner faction="yaki" />
   </add>
+  <add sel="/wares/ware[@id='weapon_gen_m_torpedo_02_mk1']">
+    <owner faction="pioneers" />
+    <owner faction="terran" />
+  </add>
   <add sel="/wares/ware[@id='weapon_gen_s_dumbfire_02_mk1']">
     <owner faction="pioneers" />
     <owner faction="terran" />
@@ -2615,6 +2621,10 @@
   </add>
   <add sel="/wares/ware[@id='weapon_gen_s_shotgun_01_mk2']">
     <owner faction="yaki" />
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_torpedo_02_mk1']">
+    <owner faction="pioneers" />
+    <owner faction="terran" />
   </add>
   <add sel="/wares/ware[@id='weapon_par_m_railgun_01_mk1']">
     <owner faction="yaki" />

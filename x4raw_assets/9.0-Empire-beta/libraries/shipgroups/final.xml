@@ -584,13 +584,13 @@
     <select macro="ship_xen_m_corvette_01_a_macro" weight="100"/>
   </group>
   <group name="xen_fighter_m">
-    <select macro="ship_xen_m_corvette_02_a_macro" weight="100"/>
-    <select macro="ship_xen_m_corvette_01_a_macro" weight="3"/>
+    <select macro="ship_xen_m_corvette_02_a_macro" weight="80"/>
+    <select macro="ship_xen_m_corvette_01_a_macro" weight="20"/>
   </group>
   <group name="xen_fighter_s">
-    <select macro="ship_xen_s_fighter_01_a_macro" weight="100"/>
-    <select macro="ship_xen_s_fighter_02_a_macro" weight="100"/>
-    <select macro="ship_xen_s_heavyfighter_01_a_macro" weight="3"/>
+    <select macro="ship_xen_s_fighter_01_a_macro" weight="80"/>
+    <select macro="ship_xen_s_fighter_02_a_macro" weight="80"/>
+    <select macro="ship_xen_s_heavyfighter_01_a_macro" weight="20"/>
   </group>
   <group name="xen_fighter_heavy_s">
     <select macro="ship_xen_s_fighter_01_a_macro" weight="20"/>
@@ -1316,9 +1316,11 @@
   <group name="ter_fighter_s">
     <select macro="ship_ter_s_heavyfighter_01_a_macro" weight="10"/>
     <select macro="ship_ter_s_fighter_01_a_macro" weight="90"/>
+    <select macro="ship_ter_s_fighter_02_a_macro" weight="30"/>
   </group>
   <group name="ter_fighter_heavy_s">
     <select macro="ship_ter_s_heavyfighter_01_a_macro" weight="100"/>
+    <select macro="ship_ter_s_fighter_02_a_macro" weight="50"/>
   </group>
   <group name="ter_fighter_light_s">
     <select macro="ship_ter_s_fighter_01_a_macro" weight="100"/>
@@ -1350,6 +1352,7 @@
   </group>
   <group name="pio_scout_s">
     <select macro="ship_ter_s_scout_01_a_macro" weight="100"/>
+    <select macro="ship_ter_s_scout_02_a_macro" weight="50"/>
   </group>
   <!-- Yaki -->
   <group name="yak_military_m">
