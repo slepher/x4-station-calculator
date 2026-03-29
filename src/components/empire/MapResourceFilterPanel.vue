@@ -303,6 +303,7 @@ const onPanelClose = () => emit('panel-close')
 
 :deep(.candidate-count) {
   @apply rounded border border-amber-300/20 px-1.5 py-0.5 text-[11px] text-amber-100;
+  font-variant-numeric: tabular-nums;
 }
 
 :deep(.candidate-list) {
@@ -319,6 +320,7 @@ const onPanelClose = () => emit('panel-close')
 
 :deep(.candidate-score) {
   @apply shrink-0 text-xs font-semibold text-amber-200;
+  font-variant-numeric: tabular-nums;
 }
 
 :deep(.resource-empty) {
