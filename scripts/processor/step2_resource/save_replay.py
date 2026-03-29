@@ -1,6 +1,6 @@
 """存档资源提取模块 - 从 save_sample_data 提取真实资源数据。
 
-处理存档 JSON 文件，筛选以 (0,0,0) 为中心的 9×9×3 方块，
+处理存档 JSON 文件，筛选以 (0,0,0) 为中心的 15×15×3 方块，
 聚合计算真实的 reserve 和 respawn 值。
 """
 
@@ -14,14 +14,14 @@ from processor.utils.math_utils import round_significant
 
 BLOCK_SIZE = 64000
 
-X_MIN = -256000
-X_MAX = 256000
+X_MIN = -480000
+X_MAX = 480000
 
 Y_MIN = -64000
 Y_MAX = 64000
 
-Z_MIN = -256000
-Z_MAX = 256000
+Z_MIN = -480000
+Z_MAX = 480000
 
 
 def load_sector_save_data(save_dir: Path, sector_id: str) -> Optional[dict]:
